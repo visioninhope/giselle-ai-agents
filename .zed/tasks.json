@@ -1,12 +1,12 @@
 [
 	{
 		"label": "biome & tsc",
-		"command": "cd $ZED_WORKTREE_ROOT/alpha && bun check-tsc",
+		"command": "bun check-tsc",
 		"allow_concurrent_runs": false
 	},
 	{
 		"label": "run devserver",
-		"command": "cd $ZED_WORKTREE_ROOT/alpha && bun dev",
+		"command": "bun dev",
 		"allow_concurrent_runs": false
 	}
 ]
