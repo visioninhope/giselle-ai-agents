@@ -1,7 +1,7 @@
 [
 	{
-		"label": "biome & tsc",
-		"command": "bun check-tsc",
+		"label": "biome",
+		"command": "bunx @biomejs/biome check --write .",
 		"allow_concurrent_runs": false
 	},
 	{
