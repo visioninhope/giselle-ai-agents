@@ -1,4 +1,4 @@
-import { type FC, useCallback } from "react";
+import { type FC, useCallback, useState } from "react";
 import { createNodeStructure } from "./strcture";
 
 const loopNodeStructure = createNodeStructure({
@@ -135,18 +135,37 @@ type NodeSelectCommandProps = {
 	onSelect: (key: NodeStructureKey) => void;
 };
 export const NodeSelectCommand: FC<NodeSelectCommandProps> = ({ onSelect }) => {
+	const [state, setState] = useState(false);
 	const handleSelect = useCallback(
 		(key: string) => {
-			onSelect(key as NodeStructureKey);
+			setState(true);
+			// onSelect(key as NodeStructureKey);
 		},
-		[onSelect],
+		[setState],
 	);
+	if (!state) {
+		return (
+			<Command className="rounded-lg border shadow-md">
+				<CommandInput placeholder="Type a command or search..." />
+				<CommandList>
+					<CommandEmpty>No results found.</CommandEmpty>
+					<CommandGroup heading="Actions">
+						{nodeStructures.map(({ key, name }) => (
+							<CommandItem key={key} value={key} onSelect={handleSelect}>
+								<span>{typeof name === "string" ? name : name()}</span>
+							</CommandItem>
+						))}
+					</CommandGroup>
+				</CommandList>
+			</Command>
+		);
+	}
 	return (
 		<Command className="rounded-lg border shadow-md">
-			<CommandInput placeholder="Type a command or search..." />
+			<CommandInput placeholder="O" />
 			<CommandList>
 				<CommandEmpty>No results found.</CommandEmpty>
-				<CommandGroup heading="Actions">
+				<CommandGroup heading="Context">
 					{nodeStructures.map(({ key, name }) => (
 						<CommandItem key={key} value={key} onSelect={handleSelect}>
 							<span>{typeof name === "string" ? name : name()}</span>

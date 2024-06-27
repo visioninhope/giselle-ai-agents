@@ -106,7 +106,7 @@ const WorkflowEditor: FC = () => {
 	);
 
 	return (
-		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-secondary flex flex-col text-foreground">
+		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
 			<div className="mb-2 text-primary">Agent Flow Editor</div>
 			<div className="w-full h-full flex border border-border bg-background">
 				<div className="w-[200px] border-r p-0.5">
@@ -147,7 +147,7 @@ const WorkflowEditor: FC = () => {
 					>
 						<Background
 							variant={BackgroundVariant.Dots}
-							className="bg-gradient-to-b from-zinc-800 to-zinc-900"
+							className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 						/>
 						<Controls />
 						<MiniMap />
@@ -159,7 +159,18 @@ const WorkflowEditor: FC = () => {
 									top: position.y - (containerRef?.current?.offsetTop ?? 0),
 								}}
 							>
-								<NodeSelectCommand onSelect={handleNodeSelect} />
+								<div className={"border border-border bg-background"}>
+									<div className="px-2 py-1 text-muted-foreground text-sm">
+										Create Basic Node
+									</div>
+									<div className="px-1 py-1">
+										<ul>
+											<li className="px-1 py-1 cursor-pointer hover:bg-accent hover:text-accent-foreground">
+												Loop
+											</li>
+										</ul>
+									</div>
+								</div>
 							</div>
 						)}
 					</ReactFlow>
