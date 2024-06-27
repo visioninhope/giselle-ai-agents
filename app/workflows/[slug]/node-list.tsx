@@ -136,13 +136,10 @@ type NodeSelectCommandProps = {
 };
 export const NodeSelectCommand: FC<NodeSelectCommandProps> = ({ onSelect }) => {
 	const [state, setState] = useState(false);
-	const handleSelect = useCallback(
-		(key: string) => {
-			setState(true);
-			// onSelect(key as NodeStructureKey);
-		},
-		[setState],
-	);
+	const handleSelect = useCallback((key: string) => {
+		setState(true);
+		// onSelect(key as NodeStructureKey);
+	}, []);
 	if (!state) {
 		return (
 			<Command className="rounded-lg border shadow-md">
