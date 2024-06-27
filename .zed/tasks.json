@@ -1,12 +1,22 @@
 [
 	{
 		"label": "biome",
-		"command": "bunx @biomejs/biome check --write .",
+		"command": "bunx @biomejs/biome check --write $ZED_WORKTREE_ROOT",
 		"allow_concurrent_runs": false
 	},
 	{
 		"label": "run devserver",
 		"command": "bun dev",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "drizzle studio",
+		"command": "bunx drizzle-kit studio",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "drizzle push",
+		"command": "bunx drizzle-kit push",
 		"allow_concurrent_runs": false
 	}
 ]
