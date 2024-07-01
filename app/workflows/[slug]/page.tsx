@@ -112,7 +112,7 @@ const WorkflowEditor: FC = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const { latestRunId, run } = useWorkflow();
+	const { latestRun, run } = useWorkflow();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
@@ -212,6 +212,7 @@ const WorkflowEditor: FC = () => {
 									variant={"ghost"}
 									size={"xs"}
 									className="text-muted-foreground"
+									onClick={() => run()}
 								>
 									<PlayIcon className="mr-1" />
 									Run Workflow
@@ -234,9 +235,11 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									<Panel position="top-right">
-										<WorkflowRunner runId={latestRunId} />
-									</Panel>
+									{latestRun && (
+										<Panel position="top-right">
+											<WorkflowRunner run={latestRun} />
+										</Panel>
+									)}
 
 									{isVisible && (
 										<div

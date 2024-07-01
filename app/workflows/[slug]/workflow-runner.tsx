@@ -3,7 +3,7 @@ import { cva } from "cva";
 import { CircleCheckIcon, CircleIcon, LoaderCircleIcon } from "lucide-react";
 import type { FC } from "react";
 import { match } from "ts-pattern";
-import type { Step } from "./runner";
+import type { Run, Step } from "./run";
 
 const stepListItemVariant = cva({
 	base: "flex items-center justify-between ",
@@ -18,53 +18,39 @@ const stepListItemVariant = cva({
 });
 
 type StepListItemProps = Step;
-const StepListItem: FC<StepListItemProps> = ({ title, time, status }) => (
+const StepListItem: FC<StepListItemProps> = ({ title, ...step }) => (
 	<div
 		className={cn(
 			stepListItemVariant({
-				status,
+				status: step.status,
 			}),
 		)}
 	>
 		<p>{title}</p>
 		<div className="flex items-center justify-end gap-2">
-			{match(status)
-				.with("idle", () => <></>)
-				.otherwise(() => (
-					<span className="text-xs">{time}</span>
+			{match(step)
+				.with({ status: "idle" }, () => <></>)
+				.otherwise((otherStep) => (
+					<span className="text-xs">{otherStep.time}</span>
 				))}
-			{match(status)
-				.with("idle", () => <CircleIcon className="w-4 h-4" />)
-				.with("running", () => (
+			{match(step)
+				.with({ status: "idle" }, () => <CircleIcon className="w-4 h-4" />)
+				.with({ status: "running" }, () => (
 					<LoaderCircleIcon className="w-4 h-4 animate-spin" />
 				))
-				.with("success", () => <CircleCheckIcon className="w-4 h-4" />)
-				.with("failure", () => <CircleIcon className="w-4 h-4" />)
+				.with({ status: "success" }, () => (
+					<CircleCheckIcon className="w-4 h-4" />
+				))
+				// .with({ status: "failure" }, () => <CircleIcon className="w-4 h-4" />)
 				.exhaustive()}
 		</div>
 	</div>
 );
 
 type WorkflowRunnerProps = {
-	runId: string;
+	run: Run;
 };
-const run = {
-	steps: [
-		{
-			id: "find-user",
-			title: "Find User",
-			time: "4s",
-			status: "success",
-		},
-		{
-			id: "send-mail",
-			title: "Send Mail",
-			time: "1s",
-			status: "running",
-		},
-	],
-} satisfies { steps: Step[] };
-export const WorkflowRunner: FC<WorkflowRunnerProps> = () => {
+export const WorkflowRunner: FC<WorkflowRunnerProps> = ({ run }) => {
 	return (
 		<div className="bg-background/50 border border-border w-[200px] text-sm">
 			<div className="px-4 py-1 border-b">
