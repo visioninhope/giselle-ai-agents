@@ -34,23 +34,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { createId } from "@paralleldrive/cuid2";
+import { PlayIcon } from "@radix-ui/react-icons";
 import {
 	ALargeSmallIcon,
+	CircleIcon,
 	GripIcon,
+	LoaderCircleIcon,
 	PlusIcon,
 	WorkflowIcon,
 } from "lucide-react";
 import invariant from "tiny-invariant";
 import { NodeTypes, useNodeTypes } from "./node";
-import {
-	NodeSelectCommand,
-	type NodeStructureKey,
-	type OnNodeSelect,
-	nodeStructures,
-} from "./node-list";
+import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { NodeData } from "./nodev2";
 import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
+import { useWorkflowRunner } from "./use-workflow-runner";
+import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [];
 const initialEdges: Edge[] = [];
@@ -87,6 +87,7 @@ const WorkflowEditor: FC = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
+	const { run } = useWorkflowRunner();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
@@ -181,7 +182,16 @@ const WorkflowEditor: FC = () => {
 							value="Workflow.wks"
 							className="w-full h-full flex flex-col"
 						>
-							<div className="bg-secondary h-4" />
+							<div className="bg-secondary py-1 px-1">
+								<Button
+									variant={"ghost"}
+									size={"xs"}
+									className="text-muted-foreground"
+								>
+									<PlayIcon className="mr-1" />
+									Run Workflow
+								</Button>
+							</div>
 							<div className="flex-1" ref={containerRef}>
 								<ReactFlow
 									onContextMenu={handleContextMenu}
@@ -199,6 +209,9 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
+									<Panel position="top-right">
+										<WorkflowRunner steps={run.steps} />
+									</Panel>
 
 									{isVisible && (
 										<div
@@ -290,6 +303,22 @@ const WorkflowEditor: FC = () => {
 																</DropdownMenuSubContent>
 															</DropdownMenuPortal>
 														</DropdownMenuSub>
+													</DropdownMenuGroup>
+													<DropdownMenuSeparator />
+													<DropdownMenuGroup>
+														<DropdownMenuLabel>
+															CREATE TEST NODE
+														</DropdownMenuLabel>
+														<DropdownMenuItem
+															onSelect={() => handleNodeSelect("FindUser")}
+														>
+															Find User
+														</DropdownMenuItem>
+														<DropdownMenuItem
+															onSelect={() => handleNodeSelect("SendMail")}
+														>
+															Send Mail
+														</DropdownMenuItem>
 													</DropdownMenuGroup>
 												</DropdownMenuContent>
 											</DropdownMenu>

@@ -111,65 +111,54 @@ const textGenerationNodeStructure = createNodeStructure({
 	],
 });
 
+const findUserNodeStructure = createNodeStructure({
+	key: "FindUser",
+	kind: "action",
+	name: "Find User",
+	inputs: [
+		{
+			key: "execFrom",
+			kind: "execution",
+		},
+	],
+	outputs: [
+		{ key: "execTo", kind: "execution" },
+		{
+			key: "user",
+			kind: "data",
+			dataType: "string",
+			label: "UserID",
+		},
+	],
+});
+
+const sendMailNodeStructure = createNodeStructure({
+	key: "SendMail",
+	kind: "action",
+	name: "Send Mail",
+	inputs: [
+		{
+			key: "execFrom",
+			kind: "execution",
+		},
+		{
+			key: "user",
+			kind: "data",
+			dataType: "string",
+			label: "UserID",
+		},
+	],
+	outputs: [{ key: "execTo", kind: "execution" }],
+});
+
 export const nodeStructures = [
 	loopNodeStructure,
 	contextNodeStructure,
 	createDocumentNodeStructure,
 	appendValueToContextNodeStructure,
 	textGenerationNodeStructure,
+	findUserNodeStructure,
+	sendMailNodeStructure,
 ];
 export type NodeStructures = typeof nodeStructures;
 export type NodeStructureKey = NodeStructures[number]["key"];
-
-import {
-	Command,
-	CommandEmpty,
-	CommandGroup,
-	CommandInput,
-	CommandItem,
-	CommandList,
-} from "@/components/ui/command";
-
-export type OnNodeSelect = (key: NodeStructureKey) => void;
-type NodeSelectCommandProps = {
-	onSelect: (key: NodeStructureKey) => void;
-};
-export const NodeSelectCommand: FC<NodeSelectCommandProps> = ({ onSelect }) => {
-	const [state, setState] = useState(false);
-	const handleSelect = useCallback((key: string) => {
-		setState(true);
-		// onSelect(key as NodeStructureKey);
-	}, []);
-	if (!state) {
-		return (
-			<Command className="rounded-lg border shadow-md">
-				<CommandInput placeholder="Type a command or search..." />
-				<CommandList>
-					<CommandEmpty>No results found.</CommandEmpty>
-					<CommandGroup heading="Actions">
-						{nodeStructures.map(({ key, name }) => (
-							<CommandItem key={key} value={key} onSelect={handleSelect}>
-								<span>{typeof name === "string" ? name : name()}</span>
-							</CommandItem>
-						))}
-					</CommandGroup>
-				</CommandList>
-			</Command>
-		);
-	}
-	return (
-		<Command className="rounded-lg border shadow-md">
-			<CommandInput placeholder="O" />
-			<CommandList>
-				<CommandEmpty>No results found.</CommandEmpty>
-				<CommandGroup heading="Context">
-					{nodeStructures.map(({ key, name }) => (
-						<CommandItem key={key} value={key} onSelect={handleSelect}>
-							<span>{typeof name === "string" ? name : name()}</span>
-						</CommandItem>
-					))}
-				</CommandGroup>
-			</CommandList>
-		</Command>
-	);
-};
