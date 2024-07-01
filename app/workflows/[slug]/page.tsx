@@ -49,11 +49,36 @@ import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { NodeData } from "./nodev2";
 import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
-import { useWorkflowRunner } from "./use-workflow-runner";
+import { useWorkflow } from "./use-workflow";
 import { WorkflowRunner } from "./workflow-runner";
 
-const initialNodes: Node[] = [];
-const initialEdges: Edge[] = [];
+const initialNodes: Node[] = [
+	{
+		id: "find-user",
+		type: NodeTypes.V2,
+		data: {
+			structureKey: "FindUser",
+			runStatus: "success",
+		},
+		position: { x: 10, y: 10 },
+	},
+	{
+		id: "send-mail",
+		type: NodeTypes.V2,
+		data: {
+			structureKey: "SendMail",
+			runStatus: "running",
+		},
+		position: { x: 300, y: 10 },
+	},
+];
+const initialEdges: Edge[] = [
+	{
+		id: "edge-1",
+		source: "find-user",
+		target: "send-mail",
+	},
+];
 const contexts: Context[] = [
 	{
 		key: "inputResources",
@@ -87,7 +112,7 @@ const WorkflowEditor: FC = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const { run } = useWorkflowRunner();
+	const { latestRunId, run } = useWorkflow();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
@@ -210,7 +235,7 @@ const WorkflowEditor: FC = () => {
 									/>
 									<Controls />
 									<Panel position="top-right">
-										<WorkflowRunner steps={run.steps} />
+										<WorkflowRunner runId={latestRunId} />
 									</Panel>
 
 									{isVisible && (
