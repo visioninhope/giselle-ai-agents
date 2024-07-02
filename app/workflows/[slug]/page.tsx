@@ -16,6 +16,7 @@ import ReactFlow, {
 	ReactFlowProvider,
 	Panel,
 } from "reactflow";
+import useSWR from "swr";
 
 import "reactflow/dist/style.css";
 import { Button } from "@/components/ui/button";
@@ -33,6 +34,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { fetcher } from "@/lib/fetcher";
 import { createId } from "@paralleldrive/cuid2";
 import { PlayIcon } from "@radix-ui/react-icons";
 import {
@@ -49,7 +51,7 @@ import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { NodeData } from "./nodev2";
 import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
-import { useWorkflow } from "./use-workflow";
+import { useWorkflow, useWorkflowRunner } from "./use-workflow";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
@@ -104,7 +106,11 @@ const contexts: Context[] = [
 	},
 ];
 
-const WorkflowEditor: FC = () => {
+type WorkflowEditorProps = {
+	workflowSlug: string;
+};
+const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
+	const { editorState } = useWorkflow(workflowSlug);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
 	const [nodes, setNodes, onNodesChange] =
@@ -112,7 +118,7 @@ const WorkflowEditor: FC = () => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const { latestRun, run } = useWorkflow();
+	const { latestRun, run } = useWorkflowRunner();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
@@ -222,8 +228,8 @@ const WorkflowEditor: FC = () => {
 								<ReactFlow
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
-									nodes={nodes}
-									edges={edges}
+									nodes={editorState.nodes}
+									edges={editorState.edges}
 									onNodesChange={onNodesChange}
 									onEdgesChange={onEdgesChange}
 									nodeTypes={nodeTypes}
@@ -365,7 +371,7 @@ const WorkflowEditor: FC = () => {
 export default function Page({ params }: { params: { slug: string } }) {
 	return (
 		<ReactFlowProvider>
-			<WorkflowEditor />
+			<WorkflowEditor workflowSlug={params.slug} />
 		</ReactFlowProvider>
 	);
 }

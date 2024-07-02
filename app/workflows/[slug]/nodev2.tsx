@@ -58,7 +58,6 @@ export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
 	const nodeStructure = nodeStructures.find(
 		(nodeStructure) => nodeStructure.key === data.structureKey,
 	);
-	console.log({ data });
 	invariant(
 		nodeStructure != null,
 		`${data.structureKey} Node structure not found`,
