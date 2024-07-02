@@ -1,26 +1,21 @@
 import type { ResponseJson } from "@/app/api/workflows/[slug]/route";
-import { fetcher, typedFetcher } from "@/lib/fetcher";
-import { useCallback, useMemo, useState } from "react";
+import { useMemo } from "react";
 import type { Edge, Node } from "reactflow";
-import useSWR from "swr";
 import { NodeTypes } from "./node";
-import type { Run } from "./run";
 
 type EditorState = {
 	nodes: Node[];
 	edges: Edge[];
 };
-
-export const useWorkflow = (slug: string) => {
-	const { data, error, isLoading, mutate } = useSWR<ResponseJson>(
-		`/api/workflows/${slug}`,
-		typedFetcher,
-	);
+type UseEditorOprions = {
+	workflow?: ResponseJson["workflow"];
+};
+export const useEditor = ({ workflow }: UseEditorOprions) => {
 	const editorState = useMemo<EditorState>(() => {
-		if (isLoading || data == null) {
+		if (workflow == null) {
 			return { nodes: [], edges: [] };
 		}
-		const nodes = data.workflow.nodes.map((node) => ({
+		const nodes = workflow.nodes.map((node) => ({
 			id: `${node.id}`,
 			type: NodeTypes.V2,
 			position: node.position,
@@ -28,7 +23,7 @@ export const useWorkflow = (slug: string) => {
 				structureKey: node.type,
 			},
 		}));
-		const edges = data.workflow.edges.map(
+		const edges = workflow.edges.map(
 			({ id, sourceNodeId, sourceHandleId, targetNodeId, targetHandleId }) => ({
 				id: `${id}`,
 				source: `${sourceNodeId}`,
@@ -38,9 +33,8 @@ export const useWorkflow = (slug: string) => {
 			}),
 		);
 		return { nodes, edges };
-	}, [isLoading, data]);
-
-	const run = useCallback(() => {}, []);
-
-	return { editorState, workflow: data?.workflow };
+	}, [workflow]);
+	return {
+		editorState,
+	};
 };

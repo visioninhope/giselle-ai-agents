@@ -30,7 +30,9 @@ export const workflowsRelations = relations(workflows, ({ many }) => ({
 export const nodes = pgTable("nodes", {
 	id: serial("id").primaryKey(),
 	type: text("type").notNull(),
-	workflowId: integer("workflow_id").references(() => workflows.id),
+	workflowId: integer("workflow_id")
+		.notNull()
+		.references(() => workflows.id),
 	position: jsonb("position").$type<{ x: number; y: number }>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
@@ -43,7 +45,9 @@ export const nodesRelations = relations(nodes, ({ one }) => ({
 
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
-	workflowId: integer("workflow_id").references(() => workflows.id),
+	workflowId: integer("workflow_id")
+		.notNull()
+		.references(() => workflows.id),
 	sourceNodeId: integer("source_node_id")
 		.notNull()
 		.references(() => nodes.id),
@@ -54,9 +58,18 @@ export const edges = pgTable("edges", {
 	targetHandleId: text("target_handle_id"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-const edgesRelations = relations(edges, ({ one }) => ({
+export const edgesRelations = relations(edges, ({ one }) => ({
 	workflow: one(workflows, {
 		fields: [edges.workflowId],
 		references: [workflows.id],
 	}),
 }));
+
+export const runs = pgTable("runs", {
+	id: serial("id").primaryKey(),
+	workflowId: integer("workflow_id")
+		.notNull()
+		.references(() => workflows.id),
+	runningNodeId: integer("running_node_id").references(() => nodes.id),
+	status: text("status").notNull(),
+});

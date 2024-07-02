@@ -51,7 +51,9 @@ import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { NodeData } from "./nodev2";
 import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
-import { useWorkflow, useWorkflowRunner } from "./use-workflow";
+import { useEditor } from "./use-editor";
+import { useWorkflow } from "./use-workflow";
+import { useWorkflowRunner } from "./use-workflow-runner";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
@@ -110,7 +112,9 @@ type WorkflowEditorProps = {
 	workflowSlug: string;
 };
 const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
-	const { editorState } = useWorkflow(workflowSlug);
+	const { workflow } = useWorkflow(workflowSlug);
+	const { run, latestRun } = useWorkflowRunner(workflowSlug);
+	const { editorState } = useEditor({ workflow });
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
 	const [nodes, setNodes, onNodesChange] =
@@ -118,7 +122,6 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
 	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const { latestRun, run } = useWorkflowRunner();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
@@ -243,7 +246,9 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
 									<Controls />
 									{latestRun && (
 										<Panel position="top-right">
-											<WorkflowRunner run={latestRun} />
+											{/* <WorkflowRunner run={latestRun} /> */}
+											<div>hello</div>
+											<p>{latestRun.run.status}</p>
 										</Panel>
 									)}
 
