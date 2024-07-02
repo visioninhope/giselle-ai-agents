@@ -1,11 +1,11 @@
-import { db, findWorkflowBySlug } from "@/drizzle/db";
+import { findWorkflowBySlug } from "@/drizzle/db";
+import { runWorkflow } from "./workflow-execution-engine";
 
-export type ResponseJson = Awaited<ReturnType<typeof findWorkflowBySlug>>;
 export const GET = async (
 	req: Request,
 	{ params }: { params: { slug: string } },
 ) => {
 	const workflow = await findWorkflowBySlug(params.slug);
-
+	await runWorkflow(workflow);
 	return Response.json({ workflow });
 };

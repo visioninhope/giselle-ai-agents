@@ -44,9 +44,13 @@ export const nodesRelations = relations(nodes, ({ one }) => ({
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
 	workflowId: integer("workflow_id").references(() => workflows.id),
-	sourceNodeId: integer("source_node_id").references(() => nodes.id),
+	sourceNodeId: integer("source_node_id")
+		.notNull()
+		.references(() => nodes.id),
 	sourceHandleId: text("source_handle_id"),
-	targetNodeId: integer("target_node_id").references(() => nodes.id),
+	targetNodeId: integer("target_node_id")
+		.notNull()
+		.references(() => nodes.id),
 	targetHandleId: text("target_handle_id"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
