@@ -14,7 +14,7 @@ export const workflows = pgTable(
 	{
 		id: serial("id").primaryKey(),
 		slug: text("slug").notNull(),
-		createdAt: timestamp("createdAt").defaultNow().notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(workflows) => {
 		return {
@@ -22,52 +22,37 @@ export const workflows = pgTable(
 		};
 	},
 );
-// export const workflowsRelations = relations(workflows, ({ many }) => ({
-// 	nodes2: many(nodesSchema),
-// 	edges: many(edges),
-// }));
+export const workflowsRelations = relations(workflows, ({ many }) => ({
+	nodes: many(nodes),
+	edges: many(edges),
+}));
 
-export const nodesSchema = pgTable("nodes", {
+export const nodes = pgTable("nodes", {
 	id: serial("id").primaryKey(),
 	type: text("type").notNull(),
-	workflowId: integer("workflowId").references(() => workflows.id),
+	workflowId: integer("workflow_id").references(() => workflows.id),
 	position: jsonb("position").$type<{ x: number; y: number }>().notNull(),
-	createdAt: timestamp("createdAt").defaultNow().notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-const nodesRelations = relations(nodesSchema, ({ one }) => ({
+export const nodesRelations = relations(nodes, ({ one }) => ({
 	workflow: one(workflows, {
-		fields: [nodesSchema.workflowId],
+		fields: [nodes.workflowId],
 		references: [workflows.id],
 	}),
 }));
 
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
-	workflowId: integer("workflowId").references(() => workflows.id),
-	sourceNodeId: integer("sourceNodeId").references(() => nodesSchema.id),
-	sourceHandleId: text("sourceHandleId"),
-	targetNodeId: integer("targetNodeId").references(() => nodesSchema.id),
-	targetHandleId: text("targetHandleId"),
-	createdAt: timestamp("createdAt").defaultNow().notNull(),
+	workflowId: integer("workflow_id").references(() => workflows.id),
+	sourceNodeId: integer("source_node_id").references(() => nodes.id),
+	sourceHandleId: text("source_handle_id"),
+	targetNodeId: integer("target_node_id").references(() => nodes.id),
+	targetHandleId: text("target_handle_id"),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-// const edgesRelations = relations(edges, ({ one }) => ({
-// 	workflow: one(workflows, {
-// 		fields: [edges.workflowId],
-// 		references: [workflows.id],
-// 	}),
-// }));
-export const users = pgTable("users", {
-	id: serial("id").primaryKey(),
-	name: text("name").notNull(),
-});
-export const usersRelations = relations(users, ({ many }) => ({
-	posts: many(posts),
-}));
-export const posts = pgTable("posts", {
-	id: serial("id").primaryKey(),
-	content: text("content").notNull(),
-	authorId: integer("author_id").notNull(),
-});
-export const postsRelations = relations(posts, ({ one }) => ({
-	author: one(users, { fields: [posts.authorId], references: [users.id] }),
+const edgesRelations = relations(edges, ({ one }) => ({
+	workflow: one(workflows, {
+		fields: [edges.workflowId],
+		references: [workflows.id],
+	}),
 }));

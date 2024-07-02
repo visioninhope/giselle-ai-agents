@@ -1,5 +1,5 @@
 import { db } from "@/drizzle/db";
-import { nodesSchema, workflows } from "@/drizzle/schema";
+import { nodes, workflows } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 
 export const GET = async (
@@ -7,7 +7,7 @@ export const GET = async (
 	{ params }: { params: { slug: string } },
 ) => {
 	const n = await db.query.nodesSchema.findFirst({
-		where: eq(nodesSchema.id, 1),
+		where: eq(nodes.id, 1),
 		with: {
 			workflows: true,
 		},
