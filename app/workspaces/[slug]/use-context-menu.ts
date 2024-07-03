@@ -9,15 +9,26 @@ export const useContextMenu = () => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
 	const [position, setPosition] = useState<ContextMenuPosition>({ x: 0, y: 0 });
 
-	const showContextMenu = useCallback((x: number, y: number) => {
-		setPosition({ x, y });
-		setIsVisible(true);
-	}, []);
+	const toggleContextMenu = useCallback(
+		(x: number, y: number) => {
+			if (isVisible) {
+				setIsVisible(false);
+				return;
+			}
+			setPosition({ x, y });
+			setIsVisible(true);
+		},
+		[isVisible],
+	);
 
-	const handleContextMenu: MouseEventHandler<HTMLDivElement> = (event) => {
-		event.preventDefault();
-		showContextMenu(event.clientX, event.clientY);
-	};
+	const handleContextMenu: MouseEventHandler<HTMLDivElement> = useCallback(
+		(event) => {
+			event.preventDefault();
+			console.log("handle!");
+			toggleContextMenu(event.clientX, event.clientY);
+		},
+		[toggleContextMenu],
+	);
 
 	const hideContextMenu = useCallback(() => {
 		setIsVisible(false);
@@ -26,7 +37,7 @@ export const useContextMenu = () => {
 	return {
 		isVisible,
 		position,
-		showContextMenu,
+		toggleContextMenu,
 		hideContextMenu,
 		handleContextMenu,
 	};

@@ -7,12 +7,21 @@ import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { InputPin } from "./strcture";
 
 const nodeVariant = cva({
-	base: "bg-card/50 border border-border text-card-foreground min-w-[150px]",
+	base: "bg-card/50 border text-card-foreground min-w-[150px]",
 	variants: {
 		kind: {
 			action: "rounded",
 			context: "rounded-full",
 		},
+		runStatus: {
+			idle: "border-border",
+			running: " border-blue-500",
+			success: "border-green-700",
+			error: "border-error",
+		},
+	},
+	defaultVariants: {
+		runStatus: "idle",
 	},
 });
 
@@ -43,12 +52,16 @@ export type NodeData = {
 	label?: string;
 	name?: string;
 	inputs?: InputPin[];
+	runStatus?: "idle" | "running" | "success" | "error";
 };
 export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
 	const nodeStructure = nodeStructures.find(
 		(nodeStructure) => nodeStructure.key === data.structureKey,
 	);
-	invariant(nodeStructure != null, "Node structure not found");
+	invariant(
+		nodeStructure != null,
+		`${data.structureKey} Node structure not found`,
+	);
 	const inputs = useMemo(() => {
 		const structuredInputs = match(nodeStructure)
 			.with({ kind: "action" }, ({ inputs }) => inputs ?? [])
@@ -56,7 +69,12 @@ export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
 		return [...structuredInputs, ...(data.inputs ?? [])];
 	}, [nodeStructure, data.inputs]);
 	return (
-		<div className={nodeVariant({ kind: nodeStructure.kind })}>
+		<div
+			className={nodeVariant({
+				kind: nodeStructure.kind,
+				runStatus: data.runStatus,
+			})}
+		>
 			{nodeStructure.kind === "action" && (
 				<div className={headerVariant()}>
 					{typeof nodeStructure.name === "function"
