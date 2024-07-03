@@ -53,7 +53,8 @@ import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
 import { useWorkflow } from "./use-workflow";
-import { useWorkflowRunner } from "./use-workflow-runner";
+// import { useWorkflowRunner } from "./use-workflow-runner";
+import { useWorkspace } from "./use-workspace";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
@@ -109,11 +110,12 @@ const contexts: Context[] = [
 ];
 
 type WorkflowEditorProps = {
-	workflowSlug: string;
+	workspaceSlug: string;
 };
-const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
-	const { workflow } = useWorkflow(workflowSlug);
-	const { run, latestRun } = useWorkflowRunner(workflowSlug);
+const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
+	const { workflow } = useWorkspace(workspaceSlug);
+	// const { run, latestRun } = useWorkflowRunner(workflowSlug);
+	const { createAndRunWorkflow, runningWorkflow } = useWorkflow(workspaceSlug);
 	const { editorState } = useEditor({ workflow });
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -221,7 +223,7 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
 									variant={"ghost"}
 									size={"xs"}
 									className="text-muted-foreground"
-									onClick={() => run()}
+									onClick={() => createAndRunWorkflow()}
 								>
 									<PlayIcon className="mr-1" />
 									Run Workflow
@@ -244,11 +246,12 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									{latestRun && (
+									{runningWorkflow && (
 										<Panel position="top-right">
-											{/* <WorkflowRunner run={latestRun} /> */}
-											<div>hello</div>
-											<p>{latestRun.run.status}</p>
+											<WorkflowRunner
+												status={runningWorkflow.latestRun.status}
+												steps={runningWorkflow.steps}
+											/>
 										</Panel>
 									)}
 
@@ -376,7 +379,7 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workflowSlug }) => {
 export default function Page({ params }: { params: { slug: string } }) {
 	return (
 		<ReactFlowProvider>
-			<WorkflowEditor workflowSlug={params.slug} />
+			<WorkflowEditor workspaceSlug={params.slug} />
 		</ReactFlowProvider>
 	);
 }

@@ -1,4 +1,4 @@
-import type { ResponseJson } from "@/app/api/workflows/[slug]/runs/[runId]/route";
+// import type { ResponseJson } from "@/app/api/workspaces/[slug]/workflows/route";
 import { fetcher } from "@/lib/fetcher";
 import { useCallback, useState } from "react";
 import useSWR from "swr";

@@ -1,5 +1,5 @@
-import { db, findWorkflowBySlug } from "@/drizzle/db";
-import { runs, workflows } from "@/drizzle/schema";
+import { db, findWorkspaceBySlug } from "@/drizzle/db";
+import { runs, workspaces } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 

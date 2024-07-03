@@ -1,7 +1,7 @@
 import {
 	type edges as edgesSchema,
 	type nodes as nodesSchema,
-	workflows,
+	workspaces,
 } from "@/drizzle/schema";
 import invariant from "tiny-invariant";
 

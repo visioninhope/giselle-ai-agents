@@ -1,5 +1,5 @@
-import type { ResponseJson } from "@/app/api/workflows/[slug]/route";
-import { fetcher, typedFetcher } from "@/lib/fetcher";
+import type { ResponseJson } from "@/app/api/workspaces/[slug]/route";
+import { fetcher } from "@/lib/fetcher";
 import { useCallback, useMemo, useState } from "react";
 import type { Edge, Node } from "reactflow";
 import useSWR from "swr";
@@ -11,10 +11,13 @@ type EditorState = {
 	edges: Edge[];
 };
 
-export const useWorkflow = (slug: string) => {
+export const getWorkspaceRequestKey = (slug: string) =>
+	`/api/workspaces/${slug}`;
+
+export const useWorkspace = (slug: string) => {
 	const { data, error, isLoading, mutate } = useSWR<ResponseJson>(
-		`/api/workflows/${slug}`,
-		typedFetcher,
+		getWorkspaceRequestKey(slug),
+		fetcher,
 	);
 	const editorState = useMemo<EditorState>(() => {
 		if (isLoading || data == null) {

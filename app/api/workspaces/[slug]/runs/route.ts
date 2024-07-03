@@ -1,5 +1,5 @@
-import { db, findWorkflowBySlug } from "@/drizzle/db";
-import { runs, workflows } from "@/drizzle/schema";
+import { db, findWorkspaceBySlug } from "@/drizzle/db";
+import { runs, workspaces } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
@@ -10,9 +10,7 @@ export const POST = async (
 	req: Request,
 	{ params }: { params: { slug: string; runId: string } },
 ) => {
-	const workflow = await db.query.workflows.findFirst({
-		where: eq(workflows.slug, params.slug),
-	});
+	const workflow = await findWorkspaceBySlug(params.slug);
 	invariant(workflow != null, "Workflow not found");
 	const results = await db
 		.insert(runs)
