@@ -58,12 +58,12 @@ export const edges = pgTable("edges", {
 	targetHandleId: text("target_handle_id"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
-// export const edgesRelations = relations(edges, ({ one }) => ({
-// 	workflow: one(workspaces, {
-// 		fields: [edges.workflowId],
-// 		references: [workspaces.id],
-// 	}),
-// }));
+export const edgesRelations = relations(edges, ({ one }) => ({
+	workspace: one(workspaces, {
+		fields: [edges.workspaceId],
+		references: [workspaces.id],
+	}),
+}));
 
 export const workflows = pgTable("workflows", {
 	id: serial("id").primaryKey(),
