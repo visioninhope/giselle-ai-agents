@@ -1,4 +1,4 @@
-import type { ResponseJson } from "@/app/api/workflows/[slug]/route";
+import type { ResponseJson } from "@/app/api/workspaces/[slug]/route";
 import { useMemo } from "react";
 import type { Edge, Node } from "reactflow";
 import { NodeTypes } from "./node";

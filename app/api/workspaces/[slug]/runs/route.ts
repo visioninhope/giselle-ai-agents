@@ -16,7 +16,7 @@ export const POST = async (
 		.insert(runs)
 		.values({
 			workflowId: workflow.id,
-			status: "initializing",
+			status: "running",
 		})
 		.returning({
 			insertedId: runs.id,
