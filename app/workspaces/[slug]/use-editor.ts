@@ -1,4 +1,7 @@
-import type { ResponseJson } from "@/app/api/workspaces/[slug]/route";
+import type { GET } from "@/app/api/workspaces/[slug]/workflows/[workflowId]/route";
+import type { StepWithNodeAndRunStep } from "@/app/api/workspaces/[slug]/workflows/types";
+import type { WorkspaceWithNodeAndEdge } from "@/drizzle/db";
+import type { InferResponse } from "@/lib/api";
 import { useMemo } from "react";
 import type { Edge, Node } from "reactflow";
 import { NodeTypes } from "./node";
@@ -8,22 +11,29 @@ type EditorState = {
 	edges: Edge[];
 };
 type UseEditorOprions = {
-	workflow?: ResponseJson["workflow"];
+	workspace?: WorkspaceWithNodeAndEdge;
+	workflow?: InferResponse<typeof GET>;
 };
-export const useEditor = ({ workflow }: UseEditorOprions) => {
+export const useEditor = ({ workspace, workflow }: UseEditorOprions) => {
 	const editorState = useMemo<EditorState>(() => {
-		if (workflow == null) {
+		if (workspace == null) {
 			return { nodes: [], edges: [] };
 		}
-		const nodes = workflow.nodes.map((node) => ({
-			id: `${node.id}`,
-			type: NodeTypes.V2,
-			position: node.position,
-			data: {
-				structureKey: node.type,
-			},
-		}));
-		const edges = workflow.edges.map(
+		const nodes = workspace.nodes.map((node) => {
+			const runningStep = workflow?.steps.find(
+				(step) => step.nodeId === node.id,
+			);
+			return {
+				id: `${node.id}`,
+				type: NodeTypes.V2,
+				position: node.position,
+				data: {
+					structureKey: node.type,
+					runStatus: runningStep?.runStep.status,
+				},
+			};
+		});
+		const edges = workspace.edges.map(
 			({ id, sourceNodeId, sourceHandleId, targetNodeId, targetHandleId }) => ({
 				id: `${id}`,
 				source: `${sourceNodeId}`,
@@ -33,7 +43,7 @@ export const useEditor = ({ workflow }: UseEditorOprions) => {
 			}),
 		);
 		return { nodes, edges };
-	}, [workflow]);
+	}, [workspace, workflow?.steps]);
 	return {
 		editorState,
 	};

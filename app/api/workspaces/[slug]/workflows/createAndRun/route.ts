@@ -3,11 +3,14 @@ import {
 	type edges as edgesSchema,
 	type nodes as nodesSchema,
 	runSteps,
+	runTriggerRelations,
 	runs,
 	steps as stepsSchema,
 	workflows,
 	workspaces,
 } from "@/drizzle/schema";
+import { workflowTask } from "@/trigger/workflow";
+import { asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 type Node = typeof nodesSchema.$inferSelect;
@@ -46,6 +49,7 @@ export const POST = async (
 	{ params }: { params: { slug: string } },
 ) => {
 	const workspace = await findWorkspaceBySlug(params.slug);
+
 	const insertedWorkflows = await db
 		.insert(workflows)
 		.values({
@@ -54,14 +58,18 @@ export const POST = async (
 		.returning({
 			insertedId: workflows.id,
 		});
-	const steps = inferSteps(workspace.nodes, workspace.edges);
+	const inferedSteps = inferSteps(workspace.nodes, workspace.edges);
 	const workflowId = insertedWorkflows[0].insertedId;
 	const insertedSteps = await db
 		.insert(stepsSchema)
-		.values(steps.map((step) => ({ ...step, workflowId })))
+		.values(inferedSteps.map((step) => ({ ...step, workflowId })))
 		.returning({
 			insertedId: stepsSchema.id,
 		});
+	const steps = await db.query.steps.findMany({
+		where: eq(stepsSchema.workflowId, workflowId),
+		orderBy: [asc(stepsSchema.order)],
+	});
 
 	const insertedRun = await db
 		.insert(runs)
@@ -72,11 +80,29 @@ export const POST = async (
 		.returning({ insertedId: runs.id });
 	const runId = insertedRun[0].insertedId;
 	await db.insert(runSteps).values(
-		insertedSteps.map<typeof runSteps.$inferInsert>((step, idx) => ({
+		insertedSteps.map<typeof runSteps.$inferInsert>((step) => ({
 			runId,
 			stepId: step.insertedId,
-			status: idx === 0 ? "running" : "idle",
+			status: "idle",
 		})),
 	);
+
+	const handle = await workflowTask.trigger({
+		runId,
+		steps: steps.map((step) => {
+			const node = workspace.nodes.find((n) => n.id === step.nodeId);
+			invariant(node != null, "Not found node");
+			return {
+				...step,
+				node,
+			};
+		}),
+	});
+
+	await db.insert(runTriggerRelations).values({
+		runId,
+		triggerId: handle.id,
+	});
+
 	return Response.json({ id: workflowId }, { status: 201 });
 };
