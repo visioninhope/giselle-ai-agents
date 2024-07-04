@@ -92,9 +92,19 @@ export const runs = pgTable("runs", {
 	runningNodeId: integer("running_node_id").references(() => nodes.id),
 	status: text("status").$type<RunStatus>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+	startedAt: timestamp("started_at"),
+	finishedAt: timestamp("finished_at"),
 });
 
-type RunStepStatus = "idle" | "running" | "success" | "failed";
+export const runTriggerRelations = pgTable("run_trigger_relations", {
+	id: serial("id").primaryKey(),
+	runId: integer("run_id")
+		.notNull()
+		.references(() => runs.id),
+	triggerId: text("trigger_id").notNull(),
+});
+
+export type RunStepStatus = "idle" | "running" | "success" | "failed";
 export const runSteps = pgTable("run_steps", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")

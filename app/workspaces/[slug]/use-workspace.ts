@@ -1,4 +1,5 @@
-import type { ResponseJson } from "@/app/api/workspaces/[slug]/route";
+import type { GET } from "@/app/api/workspaces/[slug]/route";
+import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useCallback, useMemo, useState } from "react";
 import type { Edge, Node } from "reactflow";
@@ -15,7 +16,7 @@ export const getWorkspaceRequestKey = (slug: string) =>
 	`/api/workspaces/${slug}`;
 
 export const useWorkspace = (slug: string) => {
-	const { data, error, isLoading, mutate } = useSWR<ResponseJson>(
+	const { data, isLoading } = useSWR<InferResponse<typeof GET>>(
 		getWorkspaceRequestKey(slug),
 		fetcher,
 	);
@@ -23,7 +24,7 @@ export const useWorkspace = (slug: string) => {
 		if (isLoading || data == null) {
 			return { nodes: [], edges: [] };
 		}
-		const nodes = data.workflow.nodes.map((node) => ({
+		const nodes = data.workspace.nodes.map((node) => ({
 			id: `${node.id}`,
 			type: NodeTypes.V2,
 			position: node.position,
@@ -31,7 +32,7 @@ export const useWorkspace = (slug: string) => {
 				structureKey: node.type,
 			},
 		}));
-		const edges = data.workflow.edges.map(
+		const edges = data.workspace.edges.map(
 			({ id, sourceNodeId, sourceHandleId, targetNodeId, targetHandleId }) => ({
 				id: `${id}`,
 				source: `${sourceNodeId}`,
@@ -45,5 +46,5 @@ export const useWorkspace = (slug: string) => {
 
 	const run = useCallback(() => {}, []);
 
-	return { editorState, workflow: data?.workflow };
+	return { editorState, workspace: data?.workspace };
 };

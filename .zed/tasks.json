@@ -23,5 +23,10 @@
 		"label": "trigger.dev@beta dev",
 		"command": "bunx trigger.dev@beta dev",
 		"allow_concurrent_runs": false
+	},
+	{
+		"label": "tsc",
+		"command": "bun tsc",
+		"allow_concurrent_runs": false
 	}
 ]

@@ -29,11 +29,11 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 	>
 		<p>{props.node.type}</p>
 		<div className="flex items-center justify-end gap-2">
-			{match(props.runStep)
+			{/* {match(props.runStep)
 				.with({ status: "idle" }, () => <></>)
 				.otherwise(() => (
 					<span className="text-xs">2s</span>
-				))}
+				))} */}
 			{match(props.runStep)
 				.with({ status: "idle" }, () => <CircleIcon className="w-4 h-4" />)
 				.with({ status: "running" }, () => (

@@ -2,7 +2,6 @@
 
 import { type FC, useCallback, useRef, useState } from "react";
 import ReactFlow, {
-	MiniMap,
 	Controls,
 	Background,
 	useNodesState,
@@ -16,7 +15,6 @@ import ReactFlow, {
 	ReactFlowProvider,
 	Panel,
 } from "reactflow";
-import useSWR from "swr";
 
 import "reactflow/dist/style.css";
 import { Button } from "@/components/ui/button";
@@ -34,14 +32,11 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { fetcher } from "@/lib/fetcher";
 import { createId } from "@paralleldrive/cuid2";
 import { PlayIcon } from "@radix-ui/react-icons";
 import {
 	ALargeSmallIcon,
-	CircleIcon,
 	GripIcon,
-	LoaderCircleIcon,
 	PlusIcon,
 	WorkflowIcon,
 } from "lucide-react";
@@ -53,7 +48,6 @@ import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
 import { useWorkflow } from "./use-workflow";
-// import { useWorkflowRunner } from "./use-workflow-runner";
 import { useWorkspace } from "./use-workspace";
 import { WorkflowRunner } from "./workflow-runner";
 
@@ -113,10 +107,13 @@ type WorkflowEditorProps = {
 	workspaceSlug: string;
 };
 const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
-	const { workflow } = useWorkspace(workspaceSlug);
+	const { workspace } = useWorkspace(workspaceSlug);
 	// const { run, latestRun } = useWorkflowRunner(workflowSlug);
 	const { createAndRunWorkflow, runningWorkflow } = useWorkflow(workspaceSlug);
-	const { editorState } = useEditor({ workflow });
+	const { editorState } = useEditor({
+		workspace,
+		workflow: runningWorkflow,
+	});
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
 	const [nodes, setNodes, onNodesChange] =

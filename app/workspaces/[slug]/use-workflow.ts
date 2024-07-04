@@ -20,6 +20,14 @@ export const useWorkflow = (workspaceSlug: string) => {
 	const { data } = useSWR<InferResponse<typeof GET>>(
 		getWorkflowRequestKey(workspaceSlug, workflowId),
 		fetcher,
+		{
+			refreshInterval: (latestData) => {
+				if (latestData != null) {
+					return latestData.latestRun?.status === "success" ? 0 : 1000;
+				}
+				return 1000;
+			},
+		},
 	);
 	const createAndRunWorkflow = async () => {
 		setOptimisticData({
@@ -32,6 +40,8 @@ export const useWorkflow = (workspaceSlug: string) => {
 				workflowId: 0,
 				runningNodeId: null,
 				createdAt: new Date(),
+				startedAt: null,
+				finishedAt: null,
 			},
 			latestRunSteps: [],
 		});

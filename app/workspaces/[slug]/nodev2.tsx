@@ -1,3 +1,4 @@
+import type { RunStepStatus } from "@/drizzle/schema";
 import { cva } from "cva";
 import { type FC, useMemo } from "react";
 import { Handle, type NodeProps, Position } from "reactflow";
@@ -17,7 +18,7 @@ const nodeVariant = cva({
 			idle: "border-border",
 			running: " border-blue-500",
 			success: "border-green-700",
-			error: "border-error",
+			failed: "border-error",
 		},
 	},
 	defaultVariants: {
@@ -52,7 +53,7 @@ export type NodeData = {
 	label?: string;
 	name?: string;
 	inputs?: InputPin[];
-	runStatus?: "idle" | "running" | "success" | "error";
+	runStatus?: RunStepStatus;
 };
 export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
 	const nodeStructure = nodeStructures.find(
