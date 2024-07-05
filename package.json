@@ -3,11 +3,14 @@
 	"version": "0.1.0",
 	"private": true,
 	"scripts": {
-		"dev": "next dev",
+		"dev": "turbo dev:next.js dev:trigger.dev",
+		"dev:next.js": "next dev",
+		"dev:trigger.dev": "bunx trigger.dev@3.0.0-beta.45 dev",
 		"build": "next build",
 		"start": "next start",
 		"lint": "next lint"
 	},
+	"packageManager": "bun@1.1.17",
 	"dependencies": {
 		"@clerk/elements": "0.9.1",
 		"@clerk/nextjs": "5.1.6",
@@ -48,6 +51,7 @@
 		"drizzle-kit": "0.22.7",
 		"postcss": "^8",
 		"tailwindcss": "^3.4.1",
+		"turbo": "2.0.6",
 		"typescript": "^5"
 	}
 }

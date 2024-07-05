@@ -5,7 +5,7 @@
 		"allow_concurrent_runs": false
 	},
 	{
-		"label": "run devserver",
+		"label": "dev",
 		"command": "bun dev",
 		"allow_concurrent_runs": false
 	},
