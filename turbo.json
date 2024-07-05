@@ -1,0 +1,14 @@
+{
+	"$schema": "https://turbo.build/schema.json",
+	"ui": "tui",
+	"tasks": {
+		"dev:next.js": {
+			"persistent": true,
+			"cache": false
+		},
+		"dev:trigger.dev": {
+			"persistent": true,
+			"cache": false
+		}
+	}
+}
