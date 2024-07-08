@@ -10,6 +10,7 @@ import { cva } from "cva";
 import { type FC, type ReactNode, useMemo } from "react";
 import { Handle, type NodeProps, Position } from "reactflow";
 import { NodeV2 } from "./nodev2";
+import { NodeV3 } from "./nodev3";
 
 const nodeVariant = cva({
 	base: "bg-card/50 border border-border rounded text-card-foreground min-w-[150px]",
@@ -343,6 +344,7 @@ export const NodeTypes = {
 	TextGeneration: "textGeneration",
 	TextGenerationResultToText: "textGenerationResultToText",
 	V2: "v2",
+	V3: "v3",
 } as const;
 
 export const useNodeTypes = () =>
@@ -355,6 +357,7 @@ export const useNodeTypes = () =>
 			[NodeTypes.TextGeneration]: TextGenerationNode,
 			[NodeTypes.TextGenerationResultToText]: TextGenerationResultToTextNode,
 			[NodeTypes.V2]: NodeV2,
+			[NodeTypes.V3]: NodeV3,
 		}),
 		[],
 	);

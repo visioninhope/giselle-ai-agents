@@ -1,6 +1,6 @@
 import "@/drizzle/envConfig";
 import { sql } from "@vercel/postgres";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import invariant from "tiny-invariant";
 import * as schema from "./schema";
@@ -20,11 +20,42 @@ export const findWorkspaceBySlug = async (slug: string) => {
 		where: eq(schema.workspaces.slug, slug),
 	});
 	invariant(workflow != null, "Workflow not found");
-	const nodes = await db.query.nodes.findMany({
-		where: eq(schema.nodes.workspaceId, workflow?.id),
+	const originalNodes = await db.query.nodes.findMany({
+		where: eq(schema.nodes.workspaceId, workflow.id),
 	});
-	const edges = await db.query.edges.findMany({
-		where: eq(schema.edges.workspaceId, workflow?.id),
+	const ports = await db.query.ports.findMany({
+		where: inArray(
+			schema.ports.nodeId,
+			originalNodes.map((node) => node.id),
+		),
+		orderBy: asc(schema.ports.order),
+	});
+	const nodes = originalNodes.map((node) => {
+		const inputPorts = ports.filter(
+			({ nodeId, direction }) => nodeId === node.id && direction === "input",
+		);
+		const outputPorts = ports.filter(
+			({ nodeId, direction }) => nodeId === node.id && direction === "output",
+		);
+		return {
+			...node,
+			inputPorts,
+			outputPorts,
+		};
+	});
+	const originalEdges = await db.query.edges.findMany({
+		where: eq(schema.edges.workspaceId, workflow.id),
+	});
+	const edges = originalEdges.map((edge) => {
+		const inputPort = ports.find((port) => port.id === edge.inputPortId);
+		const outputPort = ports.find((port) => port.id === edge.outputPortId);
+		invariant(inputPort != null, "Input port not found");
+		invariant(outputPort != null, "Output port not found");
+		return {
+			...edge,
+			inputPort,
+			outputPort,
+		};
 	});
 	return {
 		...workflow,

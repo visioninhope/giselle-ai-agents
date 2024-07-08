@@ -25,25 +25,27 @@ export const useEditor = ({ workspace, workflow }: UseEditorOprions) => {
 			);
 			return {
 				id: `${node.id}`,
-				type: NodeTypes.V2,
+				type: NodeTypes.V3,
 				position: node.position,
 				data: {
-					structureKey: node.type,
+					id: `${node.id}`,
+					nodeType: node.type,
 					runStatus: runningStep?.runStep.status,
+					inputPorts: node.inputPorts,
+					outputPorts: node.outputPorts,
 				},
 			};
 		});
-		const edges = workspace.edges.map(
-			({ id, sourceNodeId, sourceHandleId, targetNodeId, targetHandleId }) => ({
-				id: `${id}`,
-				source: `${sourceNodeId}`,
-				sourceHandle: sourceHandleId == null ? null : `${sourceHandleId}`,
-				target: `${targetNodeId}`,
-				targetHandle: targetHandleId == null ? null : `${targetHandleId}`,
-			}),
-		);
+		const edges = workspace.edges.map(({ id, inputPort, outputPort }) => ({
+			id: `${id}`,
+			source: `${outputPort.nodeId}`,
+			sourceHandle: `${outputPort.id}`,
+			target: `${inputPort.nodeId}`,
+			targetHandle: `${inputPort.id}`,
+		}));
 		return { nodes, edges };
 	}, [workspace, workflow?.steps]);
+	console.log({ editorState });
 	return {
 		editorState,
 	};

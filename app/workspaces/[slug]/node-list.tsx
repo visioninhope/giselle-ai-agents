@@ -149,6 +149,13 @@ const sendMailNodeStructure = createNodeStructure({
 	],
 	outputs: [{ key: "execTo", kind: "execution" }],
 });
+const variableNodeStructure = createNodeStructure({
+	key: "Variable",
+	kind: "action",
+	name: "Variable",
+	inputs: [],
+	outputs: [{ key: "value", kind: "data", dataType: "string", label: "Value" }],
+});
 
 export const nodeStructures = [
 	loopNodeStructure,
@@ -158,6 +165,7 @@ export const nodeStructures = [
 	textGenerationNodeStructure,
 	findUserNodeStructure,
 	sendMailNodeStructure,
+	variableNodeStructure,
 ];
 export type NodeStructures = typeof nodeStructures;
 export type NodeStructureKey = NodeStructures[number]["key"];
