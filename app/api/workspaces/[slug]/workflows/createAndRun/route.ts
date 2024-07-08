@@ -1,7 +1,8 @@
-import { db, findWorkspaceBySlug } from "@/drizzle/db";
+import { type EdgeWithPort, db, findWorkspaceBySlug } from "@/drizzle/db";
 import {
 	type edges as edgesSchema,
 	type nodes as nodesSchema,
+	type ports as portsSchema,
 	runSteps,
 	runTriggerRelations,
 	runs,
@@ -14,10 +15,9 @@ import { asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 type Node = typeof nodesSchema.$inferSelect;
-type Edge = typeof edgesSchema.$inferSelect;
 type Step = typeof stepsSchema.$inferInsert;
 
-const inferSteps = (nodes: Node[], edges: Edge[]) => {
+const inferSteps = (nodes: Node[], edges: EdgeWithPort[]) => {
 	const steps: Omit<Step, "workflowId">[] = [];
 	const visited = new Set<number>();
 	const dfs = (nodeId: number, order: number) => {
@@ -32,12 +32,12 @@ const inferSteps = (nodes: Node[], edges: Edge[]) => {
 			order,
 		});
 
-		const outgoingEdges = edges.filter((e) => e.sourceNodeId === nodeId);
+		const outgoingEdges = edges.filter((e) => e.outputPort.nodeId === nodeId);
 		for (const edge of outgoingEdges) {
-			dfs(edge.targetNodeId, order + 1);
+			dfs(edge.inputPort.nodeId, order + 1);
 		}
 	};
-	const targetNodeIds = new Set(edges.map((edge) => edge.targetNodeId));
+	const targetNodeIds = new Set(edges.map((edge) => edge.inputPort.nodeId));
 	const startNode = nodes.find((node) => !targetNodeIds.has(node.id));
 	invariant(startNode != null, "Not found");
 	dfs(startNode.id, 0);

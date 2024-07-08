@@ -15,6 +15,7 @@ export const getWorkflows = async () => {
 export type WorkspaceWithNodeAndEdge = Awaited<
 	ReturnType<typeof findWorkspaceBySlug>
 >;
+export type EdgeWithPort = WorkspaceWithNodeAndEdge["edges"][0];
 export const findWorkspaceBySlug = async (slug: string) => {
 	const workflow = await db.query.workspaces.findFirst({
 		where: eq(schema.workspaces.slug, slug),

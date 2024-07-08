@@ -134,3 +134,11 @@ export const runSteps = pgTable("run_steps", {
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
+
+export const runTriggerRelations = pgTable("run_trigger_relations", {
+	id: serial("id").primaryKey(),
+	runId: integer("run_id")
+		.notNull()
+		.references(() => runs.id),
+	triggerId: text("trigger_id").notNull(),
+});

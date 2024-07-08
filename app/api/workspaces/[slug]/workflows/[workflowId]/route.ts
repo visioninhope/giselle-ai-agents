@@ -34,7 +34,6 @@ export const GET = async (
 	const latestRunSteps = await db.query.runSteps.findMany({
 		where: eq(runStepsSchema.runId, latestRun.id),
 	});
-	console.log(latestRunSteps);
 	const stepsWithNodes: StepWithNodeAndRunStep[] = steps.map((step) => {
 		const node = nodes.find((n) => n.id === step.nodeId);
 		const latestRunStep = latestRunSteps.find(

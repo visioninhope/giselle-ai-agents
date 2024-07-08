@@ -38,12 +38,12 @@ export const useWorkflow = (workspaceSlug: string) => {
 				id: 0,
 				status: "creating",
 				workflowId: 0,
-				runningNodeId: null,
 				createdAt: new Date(),
 				startedAt: null,
 				finishedAt: null,
 			},
 			latestRunSteps: [],
+			createdAt: new Date(),
 		});
 		const { id } = await fetch(
 			`/api/workspaces/${workspaceSlug}/workflows/createAndRun`,
