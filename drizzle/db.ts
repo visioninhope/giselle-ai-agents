@@ -4,7 +4,13 @@ import { and, asc, eq, inArray } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
 import invariant from "tiny-invariant";
 import * as schema from "./schema";
-import { runSteps, runs } from "./schema";
+import {
+	runDataKnotMessages,
+	runSteps,
+	runs,
+	stepDataKnots as stepDataKnotsSchema,
+	stepStrands as stepStrandsSchema,
+} from "./schema";
 
 export const db = drizzle(sql, { schema });
 
@@ -86,4 +92,57 @@ export const updateRunStep = async (
 		.update(runSteps)
 		.set(updateValues)
 		.where(and(eq(runSteps.runId, runId), eq(runSteps.stepId, stepId)));
+};
+
+export const pullMessage = async (dataKnotId: number, runId: number) => {
+	const runDataKnotMessage = await db.query.runDataKnotMessages.findFirst({
+		where: and(
+			eq(runDataKnotMessages.dataKnotId, dataKnotId),
+			eq(runDataKnotMessages.runId, runId),
+		),
+	});
+	const dataKnot = await db.query.dataKnots.findFirst({
+		where: eq(schema.dataKnots.id, dataKnotId),
+	});
+};
+
+type Message = {
+	portName: string;
+	// biome-ignore lint: lint/suspicious/noExplicitAny
+	value: any;
+};
+export const leaveMessage = async (
+	runId: number,
+	stepId: number,
+	messages: Message[],
+) => {
+	const stepDataKnots = await db
+		.select()
+		.from(stepDataKnotsSchema)
+		.where(eq(stepDataKnotsSchema.stepId, stepId));
+	for (const message of messages) {
+		const stepDataKnot = stepDataKnots.find(
+			(stepDataKnot) => stepDataKnot.portName === message.portName,
+		);
+		if (stepDataKnot == null) {
+			continue;
+		}
+		await db.insert(runDataKnotMessages).values({
+			runId,
+			dataKnotId: stepDataKnot.dataKnotId,
+			message: message.value,
+		});
+	}
+};
+
+export const pullMessages = async (runId: number, stepId: number) => {
+	return await db
+		.select()
+		.from(stepStrandsSchema)
+		.where(
+			and(
+				eq(stepStrandsSchema.stepId, stepId),
+				eq(stepStrandsSchema.runId, runId),
+			),
+		);
 };

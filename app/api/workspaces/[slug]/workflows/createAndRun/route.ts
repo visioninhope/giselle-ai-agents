@@ -1,14 +1,13 @@
 import { type EdgeWithPort, db, findWorkspaceBySlug } from "@/drizzle/db";
 import {
-	type edges as edgesSchema,
+	dataKnots as dataKnotsSchema,
+	dataRoutes,
 	type nodes as nodesSchema,
-	type ports as portsSchema,
 	runSteps,
 	runTriggerRelations,
 	runs,
 	steps as stepsSchema,
 	workflows,
-	workspaces,
 } from "@/drizzle/schema";
 import { workflowTask } from "@/trigger/workflow";
 import { asc, eq } from "drizzle-orm";
@@ -71,6 +70,30 @@ export const POST = async (
 		orderBy: [asc(stepsSchema.order)],
 	});
 
+	const dataEdges = workspace.edges.filter(
+		({ edgeType }) => edgeType === "data",
+	);
+	for (const dataEdge of dataEdges) {
+		const inputStep = steps.find(
+			(step) => step.nodeId === dataEdge.inputPort.nodeId,
+		);
+		const outputStep = steps.find(
+			(step) => step.nodeId === dataEdge.outputPort.nodeId,
+		);
+		const [inputDataKnot, outputDataKnot] = await db
+			.insert(dataKnotsSchema)
+			.values([
+				{ stepId: inputStep?.id, portId: dataEdge.inputPort.id },
+				{ stepId: outputStep?.id, portId: dataEdge.outputPort.id },
+			])
+			.returning({
+				insertedId: dataKnotsSchema.id,
+			});
+		await db.insert(dataRoutes).values({
+			originKnotId: outputDataKnot.insertedId,
+			destinationKnotId: inputDataKnot.insertedId,
+		});
+	}
 	const insertedRun = await db
 		.insert(runs)
 		.values({
