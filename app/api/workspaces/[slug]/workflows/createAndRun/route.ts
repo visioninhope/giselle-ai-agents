@@ -1,4 +1,9 @@
-import { type EdgeWithPort, db, findWorkspaceBySlug } from "@/drizzle/db";
+import {
+	type EdgeWithPort,
+	type NodeWithPort,
+	db,
+	findWorkspaceBySlug,
+} from "@/drizzle/db";
 import {
 	dataKnots as dataKnotsSchema,
 	dataRoutes,
@@ -13,10 +18,9 @@ import { workflowTask } from "@/trigger/workflow";
 import { asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
-type Node = typeof nodesSchema.$inferSelect;
 type Step = typeof stepsSchema.$inferInsert;
 
-const inferSteps = (nodes: Node[], edges: EdgeWithPort[]) => {
+const inferSteps = (nodes: NodeWithPort[], edges: EdgeWithPort[]) => {
 	const steps: Omit<Step, "workflowId">[] = [];
 	const visited = new Set<number>();
 	const dfs = (nodeId: number, order: number) => {
