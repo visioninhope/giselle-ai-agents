@@ -4,10 +4,6 @@ import { type FC, useCallback, useRef, useState } from "react";
 import ReactFlow, {
 	Controls,
 	Background,
-	useNodesState,
-	useEdgesState,
-	addEdge,
-	type OnConnect,
 	type Node,
 	BackgroundVariant,
 	type Edge,
@@ -17,38 +13,22 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
+import { type NodeType, getNodeDef } from "@/app/api/nodeDefs";
 import { Button } from "@/components/ui/button";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuGroup,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuPortal,
-	DropdownMenuSeparator,
-	DropdownMenuSub,
-	DropdownMenuSubContent,
-	DropdownMenuSubTrigger,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { createId } from "@paralleldrive/cuid2";
 import { PlayIcon } from "@radix-ui/react-icons";
-import {
-	ALargeSmallIcon,
-	GripIcon,
-	PlusIcon,
-	WorkflowIcon,
-} from "lucide-react";
+import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import invariant from "tiny-invariant";
+import { EditorDropdownMenu } from "./editor-dropdown-menu";
 import { NodeTypes, useNodeTypes } from "./node";
 import { type NodeStructureKey, nodeStructures } from "./node-list";
-import type { NodeData } from "./nodev2";
 import type { Context } from "./strcture";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
+import { useNodeDefs } from "./use-node-defs";
 import { useWorkflow } from "./use-workflow";
 import { useWorkspace } from "./use-workspace";
+import { WorkspaceSlugProvider } from "./use-workspace-slug";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
@@ -103,35 +83,23 @@ const contexts: Context[] = [
 	},
 ];
 
-type WorkflowEditorProps = {
-	workspaceSlug: string;
-};
-const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
-	const { workspace } = useWorkspace(workspaceSlug);
-	// const { run, latestRun } = useWorkflowRunner(workflowSlug);
-	const { createAndRunWorkflow, runningWorkflow } = useWorkflow(workspaceSlug);
-	const { editorState } = useEditor({
+const WorkflowEditor: FC = () => {
+	const { workspace } = useWorkspace();
+	const { createAndRunWorkflow, runningWorkflow } = useWorkflow();
+	const { editorState, addNode } = useEditor({
 		workspace,
 		workflow: runningWorkflow,
 	});
+	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
-	const [nodes, setNodes, onNodesChange] =
-		useNodesState<NodeData>(initialNodes);
-	const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
 
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
-	const onConnect = useCallback<OnConnect>(
-		(params) => setEdges((eds) => addEdge(params, eds)),
-		[setEdges],
-	);
 	const handleNodeSelect = useCallback(
-		(key: NodeStructureKey, data?: unknown) => {
-			const nodeStructure = nodeStructures.find((node) => node.key === key);
-			invariant(nodeStructure != null, "Node structure not found");
+		(type: NodeType) => {
 			hideContextMenu();
 
 			if (reactFlowInstance == null) {
@@ -145,20 +113,24 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
 				x: position.x,
 				y: position.y,
 			});
-			setNodes((prevNodes) => [
-				...prevNodes,
-				{
-					id: createId(),
-					type: NodeTypes.V2,
-					position: { x: flowPosition.x, y: flowPosition.y },
-					data: {
-						structureKey: key,
-						...(data ?? {}),
-					},
-				},
-			]);
+			addNode({
+				nodeType: type,
+				position: { x: flowPosition.x, y: flowPosition.y },
+			});
+			// setNodes((prevNodes) => [
+			// 	...prevNodes,
+			// 	{
+			// 		id: createId(),
+			// 		type: NodeTypes.V2,
+			// 		position: { x: flowPosition.x, y: flowPosition.y },
+			// 		data: {
+			// 			structureKey: key,
+			// 			...(data ?? {}),
+			// 		},
+			// 	},
+			// ]);
 		},
-		[hideContextMenu, position, reactFlowInstance, setNodes],
+		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
 
 	return (
@@ -232,10 +204,7 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
 									onPaneClick={hideContextMenu}
 									nodes={editorState.nodes}
 									edges={editorState.edges}
-									onNodesChange={onNodesChange}
-									onEdgesChange={onEdgesChange}
 									nodeTypes={nodeTypes}
-									onConnect={onConnect}
 									onInit={setReactFlowInstance}
 								>
 									<Background
@@ -252,7 +221,7 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
 										</Panel>
 									)}
 
-									{isVisible && (
+									{nodeDefs != null && isVisible && (
 										<div
 											className="z-10 absolute"
 											style={{
@@ -262,105 +231,10 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
 													position.y - (containerRef?.current?.offsetTop ?? 0),
 											}}
 										>
-											<DropdownMenu defaultOpen={true} modal={false}>
-												<DropdownMenuTrigger />
-												<DropdownMenuContent>
-													<DropdownMenuGroup>
-														<DropdownMenuLabel>
-															CREATE BASIC NODE
-														</DropdownMenuLabel>
-														<DropdownMenuItem
-															onSelect={() =>
-																handleNodeSelect("TextGeneration")
-															}
-														>
-															<div className="flex items-center gap-2">
-																<WorkflowIcon className="w-6 h-6" />
-																<div>AI Agent</div>
-															</div>
-														</DropdownMenuItem>
-													</DropdownMenuGroup>
-													<DropdownMenuSeparator />
-													<DropdownMenuGroup>
-														<DropdownMenuLabel>
-															CREATE ADVANCED NODE
-														</DropdownMenuLabel>
-														<DropdownMenuItem
-															onSelect={() => handleNodeSelect("Loop")}
-														>
-															Loop
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															onSelect={() =>
-																handleNodeSelect("CreateDocument")
-															}
-														>
-															Create Document
-														</DropdownMenuItem>
-														<DropdownMenuSub>
-															<DropdownMenuSubTrigger>
-																Read Context
-															</DropdownMenuSubTrigger>
-															<DropdownMenuPortal>
-																<DropdownMenuSubContent>
-																	{contexts.map(({ key, name }) => (
-																		<DropdownMenuItem
-																			key={key}
-																			onSelect={() =>
-																				handleNodeSelect("Context", {
-																					label: name,
-																				})
-																			}
-																		>
-																			{name}
-																		</DropdownMenuItem>
-																	))}
-																</DropdownMenuSubContent>
-															</DropdownMenuPortal>
-														</DropdownMenuSub>
-														<DropdownMenuSub>
-															<DropdownMenuSubTrigger>
-																Set Valut to Context
-															</DropdownMenuSubTrigger>
-															<DropdownMenuPortal>
-																<DropdownMenuSubContent>
-																	{contexts.map(({ key, name }) => (
-																		<DropdownMenuItem
-																			key={key}
-																			onSelect={() =>
-																				handleNodeSelect(
-																					"AppendValueToContext",
-																					{
-																						label: name,
-																					},
-																				)
-																			}
-																		>
-																			{name}
-																		</DropdownMenuItem>
-																	))}
-																</DropdownMenuSubContent>
-															</DropdownMenuPortal>
-														</DropdownMenuSub>
-													</DropdownMenuGroup>
-													<DropdownMenuSeparator />
-													<DropdownMenuGroup>
-														<DropdownMenuLabel>
-															CREATE TEST NODE
-														</DropdownMenuLabel>
-														<DropdownMenuItem
-															onSelect={() => handleNodeSelect("FindUser")}
-														>
-															Find User
-														</DropdownMenuItem>
-														<DropdownMenuItem
-															onSelect={() => handleNodeSelect("SendMail")}
-														>
-															Send Mail
-														</DropdownMenuItem>
-													</DropdownMenuGroup>
-												</DropdownMenuContent>
-											</DropdownMenu>
+											<EditorDropdownMenu
+												nodeDefs={nodeDefs}
+												onSelect={handleNodeSelect}
+											/>
 										</div>
 									)}
 								</ReactFlow>
@@ -376,7 +250,9 @@ const WorkflowEditor: FC<WorkflowEditorProps> = ({ workspaceSlug }) => {
 export default function Page({ params }: { params: { slug: string } }) {
 	return (
 		<ReactFlowProvider>
-			<WorkflowEditor workspaceSlug={params.slug} />
+			<WorkspaceSlugProvider slug={params.slug}>
+				<WorkflowEditor />
+			</WorkspaceSlugProvider>
 		</ReactFlowProvider>
 	);
 }

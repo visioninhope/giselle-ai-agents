@@ -34,7 +34,7 @@ export const nodes = pgTable("nodes", {
 });
 
 type PortDirection = "input" | "output";
-type PortType = "data" | "execution";
+export type PortType = "data" | "execution";
 export const ports = pgTable("ports", {
 	id: serial("id").primaryKey(),
 	nodeId: integer("node_id")
