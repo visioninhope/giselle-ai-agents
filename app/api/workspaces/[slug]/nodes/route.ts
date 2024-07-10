@@ -15,7 +15,6 @@ type Payload = {
 		};
 	};
 };
-export const createPayload = (payload: Payload) => JSON.stringify(payload);
 
 // biome-ignore lint: lint/suspicious/noExplicitAny
 const ensurePayload = (payload: any): Payload => {
