@@ -4,6 +4,7 @@ import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useState } from "react";
 import useSWR from "swr";
+import { useWorkspaceSlug } from "./use-workspace-slug";
 
 const getWorkflowRequestKey = (workspaceSlug: string, workflowId?: number) => {
 	if (workflowId == null) {
@@ -12,7 +13,8 @@ const getWorkflowRequestKey = (workspaceSlug: string, workflowId?: number) => {
 	return `/api/workspaces/${workspaceSlug}/workflows/${workflowId}`;
 };
 
-export const useWorkflow = (workspaceSlug: string) => {
+export const useWorkflow = () => {
+	const workspaceSlug = useWorkspaceSlug();
 	const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
 	const [optimisticData, setOptimisticData] = useState<
 		InferResponse<typeof GET> | undefined

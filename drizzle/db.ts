@@ -22,12 +22,18 @@ export type WorkspaceWithNodeAndEdge = Awaited<
 	ReturnType<typeof findWorkspaceBySlug>
 >;
 export type EdgeWithPort = WorkspaceWithNodeAndEdge["edges"][0];
+export type NodeWithPort = WorkspaceWithNodeAndEdge["nodes"][0];
 export const findWorkspaceBySlug = async (slug: string) => {
 	const workflow = await db.query.workspaces.findFirst({
 		where: eq(schema.workspaces.slug, slug),
 	});
 	invariant(workflow != null, "Workflow not found");
 	const originalNodes = await db.query.nodes.findMany({
+		columns: {
+			id: true,
+			type: true,
+			position: true,
+		},
 		where: eq(schema.nodes.workspaceId, workflow.id),
 	});
 	const ports = await db.query.ports.findMany({
@@ -46,8 +52,12 @@ export const findWorkspaceBySlug = async (slug: string) => {
 		);
 		return {
 			...node,
-			inputPorts,
-			outputPorts,
+			inputPorts: inputPorts.map(({ id, name, type }) => ({ id, name, type })),
+			outputPorts: outputPorts.map(({ id, name, type }) => ({
+				id,
+				name,
+				type,
+			})),
 		};
 	});
 	const originalEdges = await db.query.edges.findMany({
