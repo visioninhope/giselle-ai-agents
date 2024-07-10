@@ -9,6 +9,10 @@
 		"dev:trigger.dev": {
 			"persistent": true,
 			"cache": false
+		},
+		"dev:drizzle": {
+			"persistent": true,
+			"cache": false
 		}
 	}
 }
