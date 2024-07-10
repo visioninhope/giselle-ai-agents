@@ -1,7 +1,11 @@
 import type { nodes, runSteps, steps } from "@/drizzle/schema";
 
+export type NodeSelectedColumnsForStep = Pick<
+	typeof nodes.$inferSelect,
+	"type" | "id"
+>;
 export type StepWithNode = typeof steps.$inferSelect & {
-	node: Pick<typeof nodes.$inferSelect, "type" | "id">;
+	node: NodeSelectedColumnsForStep;
 };
 
 export type StepWithNodeAndRunStep = StepWithNode & {
