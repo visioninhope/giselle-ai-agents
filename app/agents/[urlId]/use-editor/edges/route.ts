@@ -1,7 +1,7 @@
 "use server";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
-import { eq } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
 import {
@@ -18,7 +18,7 @@ type AssertPostPayload = (json: unknown) => asserts json is PostPayload;
 /**
  * @todo Implement this function
  */
-const assertPostPayload: AssertPostPayload = (json) => {};
+const assertPostPayload: AssertPostPayload = () => {};
 export const POST = async (
 	request: Request,
 	{ params }: { params: { urlId: string } },
@@ -58,4 +58,27 @@ export const POST = async (
 		outputPort,
 	};
 	return NextResponse.json({ edge });
+};
+
+type DeletePayload = {
+	deleteEdgeIds: number[];
+};
+
+type AssertDeletePayload = (json: unknown) => asserts json is DeletePayload;
+/**
+ * @todo Implement this function
+ */
+const assertDeletePayload: AssertDeletePayload = () => {};
+export const DELETE = async (request: Request) => {
+	const json = await request.json();
+	assertDeletePayload(json);
+	const deletedEdges = await db
+		.delete(schema.edges)
+		.where(inArray(schema.edges.id, json.deleteEdgeIds))
+		.returning({
+			deletedId: schema.edges.id,
+		});
+	return NextResponse.json({
+		deletedEdgeIds: deletedEdges.map((edge) => edge.deletedId),
+	});
 };

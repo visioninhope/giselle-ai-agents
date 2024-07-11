@@ -61,10 +61,10 @@ export const edges = pgTable("edges", {
 		.references(() => blueprints.id),
 	inputPortId: integer("input_port_id")
 		.notNull()
-		.references(() => ports.id),
+		.references(() => ports.id, { onDelete: "cascade" }),
 	outputPortId: integer("output_port_id")
 		.notNull()
-		.references(() => ports.id),
+		.references(() => ports.id, { onDelete: "cascade" }),
 	edgeType: text("edge_type").$type<EdgeType>().notNull(),
 });
 

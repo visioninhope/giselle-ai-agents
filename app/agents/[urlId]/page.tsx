@@ -82,7 +82,8 @@ const contexts: Context[] = [
 
 const WorkflowEditor: FC = () => {
 	const { runAgent, runningAgent } = useAgent();
-	const { editorState, addNode, deleteNodes, connectNodes } = useEditor();
+	const { editorState, addNode, deleteNodes, connectNodes, deleteEdges } =
+		useEditor();
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -223,6 +224,9 @@ const WorkflowEditor: FC = () => {
 												nodeId: Number.parseInt(target),
 											},
 										});
+									}}
+									onEdgesDelete={(edges) => {
+										deleteEdges(edges.map((edge) => Number.parseInt(edge.id)));
 									}}
 									edges={editorState.edges}
 									nodeTypes={nodeTypes}

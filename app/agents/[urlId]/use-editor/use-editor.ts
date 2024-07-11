@@ -11,6 +11,7 @@ import { NodeTypes } from "../node";
 import { useAgent } from "../use-agent";
 import { useBlueprint } from "../use-blueprint";
 import { execApi as execAddEdgeApi } from "./edges/add-edge";
+import { execApi as execDeleteEdgeApi } from "./edges/delete-edge";
 import { createDraftNode, execApi as execAddNodeApi } from "./nodes/add-node";
 import { execApi as execDeleteNodeApi } from "./nodes/delete-node";
 
@@ -33,6 +34,7 @@ type ConnectNodesArgs = {
 		nodeId: number;
 	};
 };
+type DeleteEdgesArgs = number[];
 export const useEditor = () => {
 	const { mutateBlueprint, blueprint } = useBlueprint();
 	const { runningAgent } = useAgent();
@@ -190,10 +192,49 @@ export const useEditor = () => {
 		[blueprint, mutateBlueprint],
 	);
 
+	const deleteEdges = useCallback(
+		(deleteEdgeIds: DeleteEdgesArgs) => {
+			if (blueprint == null) {
+				return;
+			}
+			mutateBlueprint(
+				(prev) =>
+					execDeleteEdgeApi(blueprint, deleteEdgeIds).then(
+						({ deletedEdgeIds }) => {
+							invariant(prev != null, "invalid state: blueprint is null");
+							return {
+								blueprint: {
+									...prev.blueprint,
+									edges: prev.blueprint.edges.filter(
+										(edge) => !deletedEdgeIds.includes(edge.id),
+									),
+								},
+							};
+						},
+					),
+				{
+					optimisticData: (prev) => {
+						invariant(prev != null, "invalid state: blueprint is null");
+						return {
+							blueprint: {
+								...prev.blueprint,
+								edges: prev.blueprint.edges.filter(
+									(edge) => !deleteEdgeIds.includes(edge.id),
+								),
+							},
+						};
+					},
+				},
+			);
+		},
+		[blueprint, mutateBlueprint],
+	);
+
 	return {
 		editorState,
 		addNode,
 		deleteNodes,
 		connectNodes,
+		deleteEdges,
 	};
 };
