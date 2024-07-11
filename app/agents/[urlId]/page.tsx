@@ -4,9 +4,7 @@ import { type FC, useCallback, useRef, useState } from "react";
 import ReactFlow, {
 	Controls,
 	Background,
-	type Node,
 	BackgroundVariant,
-	type Edge,
 	type ReactFlowInstance,
 	ReactFlowProvider,
 	Panel,
@@ -20,41 +18,13 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import { EditorDropdownMenu } from "./editor-dropdown-menu";
-import { NodeTypes, useNodeTypes } from "./node";
+import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
 import { useAgent } from "./use-agent";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
-import { WorkflowRunner } from "./workflow-runner";
 
-const initialNodes: Node[] = [
-	{
-		id: "find-user",
-		type: NodeTypes.V2,
-		data: {
-			structureKey: "FindUser",
-			runStatus: "success",
-		},
-		position: { x: 10, y: 10 },
-	},
-	{
-		id: "send-mail",
-		type: NodeTypes.V2,
-		data: {
-			structureKey: "SendMail",
-			runStatus: "running",
-		},
-		position: { x: 300, y: 10 },
-	},
-];
-const initialEdges: Edge[] = [
-	{
-		id: "edge-1",
-		source: "find-user",
-		target: "send-mail",
-	},
-];
 const contexts: Context[] = [
 	{
 		key: "inputResources",
@@ -111,18 +81,6 @@ const WorkflowEditor: FC = () => {
 				nodeType: type,
 				position: { x: flowPosition.x, y: flowPosition.y },
 			});
-			// setNodes((prevNodes) => [
-			// 	...prevNodes,
-			// 	{
-			// 		id: createId(),
-			// 		type: NodeTypes.V2,
-			// 		position: { x: flowPosition.x, y: flowPosition.y },
-			// 		data: {
-			// 			structureKey: key,
-			// 			...(data ?? {}),
-			// 		},
-			// 	},
-			// ]);
 		},
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);

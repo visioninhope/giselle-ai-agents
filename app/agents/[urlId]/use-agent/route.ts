@@ -1,94 +1,117 @@
+import type { AgentProcess } from "@/app/agents/models/agent-process";
+import { getAgentProcess } from "@/app/agents/queries/get-agent-process";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
-import { asc, desc, eq } from "drizzle-orm";
+import { invokeTask } from "@/trigger/invoke";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
-import { getAgentWithLatestBlueprint } from "../_helpers/get-blueprint";
-import type { AgentState } from "./agent-state";
+import { getBlueprint } from "../_helpers/get-blueprint";
+import { inferProcesses } from "./infer-process";
 
-export const POST = async () => {
-	const useAgentState: AgentState = {
+export const POST = async (
+	req: Request,
+	{ params }: { params: { urlId: string } },
+) => {
+	const blueprint = await getBlueprint(params.urlId);
+	const inferedProcesses = inferProcesses(blueprint);
+	const insertedProcesses = await db
+		.insert(schema.processes)
+		.values(
+			inferedProcesses.map((process) => ({
+				...process,
+				blueprintId: blueprint.id,
+			})),
+		)
+		.returning({
+			insertedId: schema.processes.id,
+			nodeId: schema.processes.nodeId,
+		});
+	const dataEdges = blueprint.edges.filter(
+		({ edgeType }) => edgeType === "data",
+	);
+	for (const dataEdge of dataEdges) {
+		const inputProcess = insertedProcesses.find(
+			({ nodeId }) => nodeId === dataEdge.inputPort.nodeId,
+		);
+		const outputProcess = insertedProcesses.find(
+			({ nodeId }) => nodeId === dataEdge.outputPort.nodeId,
+		);
+		const [inputDataKnot, outputDataKnot] = await db
+			.insert(schema.dataKnots)
+			.values([
+				{ processId: inputProcess?.insertedId, portId: dataEdge.inputPort.id },
+				{ processId: outputProcess?.insertedId, portId: dataEdge.inputPort.id },
+			])
+			.returning({
+				insertedId: schema.dataKnots.id,
+			});
+		await db.insert(schema.dataRoutes).values({
+			originKnotId: outputDataKnot.insertedId,
+			destinationKnotId: inputDataKnot.insertedId,
+		});
+	}
+
+	const [insertedRun] = await db
+		.insert(schema.runs)
+		.values({
+			blueprintId: blueprint.id,
+			status: "creating",
+		})
+		.returning({ insertedId: schema.runs.id });
+	await db.insert(schema.runProcesses).values(
+		insertedProcesses.map<typeof schema.runProcesses.$inferInsert>(
+			({ insertedId }) => ({
+				runId: insertedRun.insertedId,
+				processId: insertedId,
+				status: "idle",
+			}),
+		),
+	);
+	const handle = await invokeTask.trigger({
+		runId: insertedRun.insertedId,
+		agentUrlId: params.urlId,
+	});
+
+	await db.insert(schema.runTriggerRelations).values({
+		runId: insertedRun.insertedId,
+		triggerId: handle.id,
+	});
+
+	const agentProcess: AgentProcess = {
 		agent: {
-			latestRun: {
-				status: "creating",
-				processes: [],
+			id: blueprint.agent.id,
+			blueprint: {
+				id: blueprint.id,
 			},
 		},
+		run: {
+			id: insertedRun.insertedId,
+			status: "creating",
+			processes: insertedProcesses.map(({ insertedId, nodeId }) => {
+				const node = blueprint.nodes.find(({ id }) => id === nodeId);
+				invariant(node != null, `Node not found: ${nodeId}`);
+				return {
+					id: insertedId,
+					node: {
+						id: nodeId,
+						type: node.type,
+					},
+					status: "idle",
+					run: {
+						id: insertedRun.insertedId,
+					},
+				};
+			}),
+		},
 	};
-	return NextResponse.json(useAgentState);
+	return NextResponse.json(agentProcess);
 };
 
 export const GET = async (
 	req: Request,
 	{ params }: { params: { urlId: string } },
 ) => {
-	const agent = await getAgentWithLatestBlueprint(params.urlId);
-	const nodes = await db.query.nodes.findMany({
-		columns: {
-			id: true,
-			type: true,
-		},
-		where: eq(schema.nodes.blueprintId, agent.latestBlueprint.id),
-	});
-	const processes = await db.query.processes.findMany({
-		columns: {
-			id: true,
-			nodeId: true,
-		},
-		where: eq(schema.processes.blueprintId, agent.latestBlueprint.id),
-		orderBy: asc(schema.processes.order),
-	});
-	const latestRun = await db.query.runs.findFirst({
-		columns: {
-			id: true,
-			status: true,
-		},
-		where: eq(schema.runs.blueprintId, agent.latestBlueprint.id),
-		orderBy: desc(schema.runs.createdAt),
-	});
-	const latestRunProcesses =
-		latestRun == null
-			? []
-			: await db.query.runProcesses.findMany({
-					columns: {
-						id: true,
-						processId: true,
-						status: true,
-					},
-					where: eq(schema.runProcesses.runId, latestRun.id),
-				});
-	const latestRunProcessesWithNodes = processes.map(({ id, nodeId }) => {
-		const node = nodes.find((n) => n.id === nodeId);
-		const latestRunProcess = latestRunProcesses.find(
-			(runProcess) => runProcess.processId === id,
-		);
-		invariant(node != null, `No node found for process ${id}`);
-		invariant(
-			latestRunProcess != null,
-			`No run process found for process ${id}`,
-		);
-		return {
-			id,
-			node: {
-				id: node.id,
-				type: node.type,
-			},
-			run: {
-				status: latestRunProcess.status,
-			},
-		};
-	});
-	const useAgentState: AgentState = {
-		agent: {
-			latestRun:
-				latestRun == null
-					? null
-					: {
-							status: latestRun.status,
-							processes: latestRunProcessesWithNodes,
-						},
-		},
-	};
+	const agentProcess = await getAgentProcess(params.urlId);
 
-	return NextResponse.json(useAgentState);
+	return NextResponse.json(agentProcess);
 };

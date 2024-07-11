@@ -39,7 +39,7 @@ export const useEditor = () => {
 			return { nodes: [], edges: [] };
 		}
 		const nodes = blueprint.nodes.map((node) => {
-			const relevantProcess = runningAgent?.latestRun?.processes.find(
+			const relevantProcess = runningAgent?.run?.processes.find(
 				(process) => process.node.id === node.id,
 			);
 			return {
@@ -49,7 +49,7 @@ export const useEditor = () => {
 				data: {
 					id: `${node.id}`,
 					nodeType: node.type,
-					runStatus: relevantProcess?.run.status,
+					runStatus: relevantProcess?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,
 				},
@@ -177,6 +177,7 @@ export const useEditor = () => {
 									...prev.blueprint.edges,
 									{
 										id: prev.blueprint.edges.length + 1,
+										edgeType: "data",
 										inputPort: destinationPort,
 										outputPort: originPort,
 									},

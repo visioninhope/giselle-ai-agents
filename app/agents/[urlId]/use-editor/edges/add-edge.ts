@@ -1,9 +1,8 @@
-import type { Blueprint, Edge } from "../../_helpers/get-blueprint";
-import type { PostPayload } from "./route";
+import type { InferResponse } from "@/lib/api";
+import type { Blueprint } from "../../_helpers/get-blueprint";
+import type { POST, PostPayload } from "./route";
 
-type ExpectResponsePayload = {
-	edge: Edge;
-};
+type ExpectResponsePayload = InferResponse<typeof POST>;
 type AssertExpectResponsePayload = (
 	json: unknown,
 ) => asserts json is ExpectResponsePayload;

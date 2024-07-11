@@ -54,6 +54,7 @@ export const POST = async (
 		});
 	const edge: Edge = {
 		id: insertedEdge.insertedId,
+		edgeType: outputPort.type,
 		inputPort,
 		outputPort,
 	};

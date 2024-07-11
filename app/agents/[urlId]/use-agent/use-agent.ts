@@ -1,15 +1,16 @@
+import { assertAgentProcess } from "@/app/agents/models/agent-process";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
+import invariant from "tiny-invariant";
 import { useAgentUrlId } from "../use-agent-url-id";
-import { assertAgentState } from "./agent-state";
 import type { GET } from "./route";
 
 const execApi = async (urlId: string) => {
 	const agent = await fetch(`/agents/${urlId}/use-agent`, {
 		method: "POST",
 	}).then((res) => res.json());
-	assertAgentState(agent);
+	assertAgentProcess(agent);
 	return { agent };
 };
 export const useAgent = () => {
@@ -21,8 +22,8 @@ export const useAgent = () => {
 			refreshInterval: (latestData) => {
 				if (
 					latestData == null ||
-					latestData.agent.latestRun == null ||
-					latestData.agent.latestRun.status === "success"
+					latestData.run == null ||
+					latestData.run.status === "success"
 				) {
 					return 0;
 				}
@@ -34,16 +35,18 @@ export const useAgent = () => {
 		mutate(
 			execApi(urlId).then(({ agent }) => agent),
 			{
-				optimisticData: {
-					agent: {
-						latestRun: {
-							status: "creating",
-							processes: [],
+				optimisticData: (prev) => {
+					invariant(prev != null, "Previous data is missing");
+					return {
+						agent: {
+							...prev.agent,
 						},
-					},
+						status: "creating",
+						run: null,
+					};
 				},
 			},
 		);
 	};
-	return { runAgent, runningAgent: data?.agent };
+	return { runAgent, runningAgent: data };
 };
