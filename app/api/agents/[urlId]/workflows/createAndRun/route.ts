@@ -2,10 +2,10 @@ import { type EdgeWithPort, db, findWorkspaceBySlug } from "@/drizzle/db";
 import {
 	dataKnots as dataKnotsSchema,
 	dataRoutes,
-	runSteps,
+	runProcesses,
 	runTriggerRelations,
 	runs,
-	steps as stepsSchema,
+	processes as stepsSchema,
 	workflows,
 } from "@/drizzle/schema";
 import { workflowTask } from "@/trigger/workflow";
@@ -104,8 +104,8 @@ export const POST = async (
 		})
 		.returning({ insertedId: runs.id });
 	const runId = insertedRun[0].insertedId;
-	await db.insert(runSteps).values(
-		insertedSteps.map<typeof runSteps.$inferInsert>((step) => ({
+	await db.insert(runProcesses).values(
+		insertedSteps.map<typeof runProcesses.$inferInsert>((step) => ({
 			runId,
 			stepId: step.insertedId,
 			status: "idle",

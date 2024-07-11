@@ -1,4 +1,4 @@
-import type { RunStepStatus } from "@/drizzle/schema";
+import type { RunProcessStatus } from "@/drizzle/schema";
 import { cva } from "cva";
 import { type FC, useMemo } from "react";
 import { Handle, type NodeProps, Position } from "reactflow";
@@ -53,7 +53,7 @@ export type NodeData = {
 	label?: string;
 	name?: string;
 	inputs?: InputPin[];
-	runStatus?: RunStepStatus;
+	runStatus?: RunProcessStatus;
 };
 export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
 	const nodeStructure = nodeStructures.find(

@@ -13,22 +13,19 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
-import { type NodeType, getNodeDef } from "@/app/api/nodeDefs";
+import type { NodeType } from "@/app/api/nodeDefs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
-import invariant from "tiny-invariant";
 import { EditorDropdownMenu } from "./editor-dropdown-menu";
 import { NodeTypes, useNodeTypes } from "./node";
-import { type NodeStructureKey, nodeStructures } from "./node-list";
 import type { Context } from "./strcture";
+import { useAgent } from "./use-agent";
+import { AgentUrlIdProvider } from "./use-agent-url-id";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
 import { useNodeDefs } from "./use-node-defs";
-import { useWorkflow } from "./use-workflow";
-import { useWorkspace } from "./use-workspace";
-import { WorkspaceSlugProvider } from "./use-workspace-slug";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
@@ -84,12 +81,8 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { workspace } = useWorkspace();
-	const { createAndRunWorkflow, runningWorkflow } = useWorkflow();
-	const { editorState, addNode } = useEditor({
-		workspace,
-		workflow: runningWorkflow,
-	});
+	const { runAgent, runningAgent } = useAgent();
+	const { editorState, addNode, deleteNodes } = useEditor();
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -192,7 +185,7 @@ const WorkflowEditor: FC = () => {
 									variant={"ghost"}
 									size={"xs"}
 									className="text-muted-foreground"
-									onClick={() => createAndRunWorkflow()}
+									onClick={() => runAgent()}
 								>
 									<PlayIcon className="mr-1" />
 									Run Workflow
@@ -203,6 +196,9 @@ const WorkflowEditor: FC = () => {
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
 									nodes={editorState.nodes}
+									onNodesDelete={(nodes) => {
+										deleteNodes(nodes.map((node) => Number.parseInt(node.id)));
+									}}
 									edges={editorState.edges}
 									nodeTypes={nodeTypes}
 									onInit={setReactFlowInstance}
@@ -212,12 +208,13 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									{runningWorkflow && (
+									{runningAgent && (
 										<Panel position="top-right">
-											<WorkflowRunner
-												status={runningWorkflow.latestRun.status}
-												steps={runningWorkflow.steps}
-											/>
+											hello
+											{/* <WorkflowRunner
+												status={runningAgent.latestRun.status}
+												steps={runningAgent.steps}
+											/> */}
 										</Panel>
 									)}
 
@@ -247,12 +244,12 @@ const WorkflowEditor: FC = () => {
 	);
 };
 
-export default function Page({ params }: { params: { slug: string } }) {
+export default function Page({ params }: { params: { urlId: string } }) {
 	return (
 		<ReactFlowProvider>
-			<WorkspaceSlugProvider slug={params.slug}>
+			<AgentUrlIdProvider urlId={params.urlId}>
 				<WorkflowEditor />
-			</WorkspaceSlugProvider>
+			</AgentUrlIdProvider>
 		</ReactFlowProvider>
 	);
 }

@@ -1,12 +1,16 @@
 import * as nodeDefs from "@/app/api/nodeDefs";
 import type { NodeType } from "@/app/api/nodeDefs";
-import { type NodeWithPort, db } from "@/drizzle/db";
-import { nodes, ports as portsSchema, workspaces } from "@/drizzle/schema";
+import {
+	type NodeWithPort,
+	db,
+	getWorkspaceWithLatestWorkspaceHistory,
+} from "@/drizzle/db";
+import { agents, nodes, ports as portsSchema } from "@/drizzle/schema";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
 
-type Payload = {
+type PostPayload = {
 	node: {
 		type: NodeType;
 		position: {
@@ -17,7 +21,7 @@ type Payload = {
 };
 
 // biome-ignore lint: lint/suspicious/noExplicitAny
-const ensurePayload = (payload: any): Payload => {
+const ensurePostPayload = (payload: any): PostPayload => {
 	if (typeof payload.node !== "object" || payload.node === null) {
 		throw new Error("Invalid payload: node must be an object");
 	}
@@ -42,19 +46,16 @@ const ensurePayload = (payload: any): Payload => {
 };
 export const POST = async (
 	request: Request,
-	{ params }: { params: { slug: string } },
+	{ params }: { params: { urlId: string } },
 ) => {
 	const json = await request.json();
-	const payload = ensurePayload(json);
+	const payload = ensurePostPayload(json);
 	const nodeDef = nodeDefs.getNodeDef(payload.node.type);
-	const workspace = await db.query.workspaces.findFirst({
-		where: eq(workspaces.slug, params.slug),
-	});
-	invariant(workspace != null, "workspace missing");
+	const workspace = await getWorkspaceWithLatestWorkspaceHistory(params.urlId);
 	const [node] = await db
 		.insert(nodes)
 		.values({
-			workspaceId: workspace.id,
+			workspaceHistoryId: workspace.latestWorkspaceHistory.id,
 			type: nodeDef.key,
 			position: payload.node.position,
 		})
@@ -101,4 +102,26 @@ export const POST = async (
 	return NextResponse.json({
 		node: returnNode,
 	});
+};
+
+type DeletePayload = {
+	deletedNodeIds: number[];
+};
+
+// biome-ignore lint/suspicious/noExplicitAny:
+const ensureDeletePayload = (payload: any): DeletePayload => {
+	if (!Array.isArray(payload.deletedNodeIds)) {
+		throw new Error("Invalid payload: deletedNodeIds must be an array");
+	}
+	if (!payload.deletedNodeIds.every((id: unknown) => typeof id === "number")) {
+		throw new Error("Invalid payload: all deletedNodeIds must be numbers");
+	}
+	return payload;
+};
+export const DELETE = async (
+	request: Request,
+	{ params }: { params: { slug: string } },
+) => {
+	const json = await request.json();
+	const payload = ensureDeletePayload(json);
 };

@@ -8,14 +8,14 @@ export type ResponseJson = {
 };
 export const POST = async (
 	req: Request,
-	{ params }: { params: { slug: string; runId: string } },
+	{ params }: { params: { urlId: string; runId: string } },
 ) => {
-	const workflow = await findWorkspaceBySlug(params.slug);
-	invariant(workflow != null, "Workflow not found");
+	const workspace = await findWorkspaceBySlug(params.urlId);
+	invariant(workspace != null, "Workflow not found");
 	const results = await db
 		.insert(runs)
 		.values({
-			workflowId: workflow.id,
+			workflowId: workspace.id,
 			status: "running",
 		})
 		.returning({
@@ -26,12 +26,3 @@ export const POST = async (
 	});
 	return Response.json({ run });
 };
-
-// export const POST = async (
-// 	req: Request,
-// 	{ params }: { params: { slug: string } },
-// ) => {
-// 	const workflow = await findWorkflowBySlug(params.slug);
-// 	await runWorkflow(workflow);
-// 	return Response.json({ workflow });
-// };

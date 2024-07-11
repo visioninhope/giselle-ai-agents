@@ -9,25 +9,32 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const workspaces = pgTable(
-	"workspaces",
+export const agents = pgTable(
+	"agents",
 	{
 		id: serial("id").primaryKey(),
-		slug: text("slug").notNull(),
+		name: text("name"),
+		urlId: text("url_id").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(workspaces) => {
+	(agents) => {
 		return {
-			uniqueIdx: uniqueIndex("unique_idx").on(workspaces.slug),
+			uniqueIdx: uniqueIndex("unique_idx").on(agents.urlId),
 		};
 	},
 );
 
+export const blueprints = pgTable("blueprints", {
+	id: serial("id").primaryKey(),
+	agentId: integer("agent_id"),
+	version: integer("version").notNull(),
+});
+
 export const nodes = pgTable("nodes", {
 	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workspaces.id),
+		.references(() => blueprints.id),
 	type: text("type").notNull(),
 	position: jsonb("position").$type<{ x: number; y: number }>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -49,9 +56,9 @@ export const ports = pgTable("ports", {
 type EdgeType = "data" | "execution";
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workspaces.id),
+		.references(() => blueprints.id),
 	inputPortId: integer("input_port_id")
 		.notNull()
 		.references(() => ports.id),
@@ -61,19 +68,11 @@ export const edges = pgTable("edges", {
 	edgeType: text("edge_type").$type<EdgeType>().notNull(),
 });
 
-export const workflows = pgTable("workflows", {
+export const processes = pgTable("processes", {
 	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workspaces.id),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
-export const steps = pgTable("steps", {
-	id: serial("id").primaryKey(),
-	workflowId: integer("workflow_id")
-		.notNull()
-		.references(() => workflows.id),
+		.references(() => blueprints.id),
 	nodeId: integer("node_id")
 		.notNull()
 		.references(() => nodes.id),
@@ -82,7 +81,7 @@ export const steps = pgTable("steps", {
 
 export const dataKnots = pgTable("data_knots", {
 	id: serial("id").primaryKey(),
-	stepId: integer("step_id").references(() => steps.id),
+	processId: integer("process_id").references(() => processes.id),
 	portId: integer("port_id")
 		.notNull()
 		.references(() => ports.id),
@@ -101,25 +100,25 @@ export const dataRoutes = pgTable("data_routes", {
 export type RunStatus = "creating" | "running" | "success" | "failed";
 export const runs = pgTable("runs", {
 	id: serial("id").primaryKey(),
-	workflowId: integer("workflow_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workflows.id),
+		.references(() => blueprints.id),
 	status: text("status").$type<RunStatus>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
 
-export type RunStepStatus = "idle" | "running" | "success" | "failed";
-export const runSteps = pgTable("run_steps", {
+export type RunProcessStatus = "idle" | "running" | "success" | "failed";
+export const runProcesses = pgTable("run_processes", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
 		.references(() => runs.id),
-	stepId: integer("step_id")
+	processId: integer("process_id")
 		.notNull()
-		.references(() => steps.id),
-	status: text("status").$type<RunStepStatus>().notNull(),
+		.references(() => processes.id),
+	status: text("status").$type<RunProcessStatus>().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });

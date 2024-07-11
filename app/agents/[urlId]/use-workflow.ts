@@ -1,10 +1,10 @@
-import type { GET } from "@/app/api/workspaces/[slug]/workflows/[workflowId]/route";
-import type { ResponseJson } from "@/app/api/workspaces/[slug]/workflows/createAndRun/route";
+import type { GET } from "@/app/api/workspaces/[urlId]/workflows/[workflowId]/route";
+import type { ResponseJson } from "@/app/api/workspaces/[urlId]/workflows/createAndRun/route";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useState } from "react";
 import useSWR from "swr";
-import { useWorkspaceSlug } from "./use-workspace-slug";
+import { useAgentUrlId } from "./use-workspace-slug";
 
 const getWorkflowRequestKey = (workspaceSlug: string, workflowId?: number) => {
 	if (workflowId == null) {
@@ -14,7 +14,7 @@ const getWorkflowRequestKey = (workspaceSlug: string, workflowId?: number) => {
 };
 
 export const useWorkflow = () => {
-	const workspaceSlug = useWorkspaceSlug();
+	const workspaceSlug = useAgentUrlId();
 	const [workflowId, setWorkflowId] = useState<number | undefined>(undefined);
 	const [optimisticData, setOptimisticData] = useState<
 		InferResponse<typeof GET> | undefined

@@ -1,9 +1,9 @@
 import { db } from "@/drizzle/db";
 import {
 	nodes as nodesSchema,
-	runSteps as runStepsSchema,
+	runProcesses as runStepsSchema,
 	runs,
-	steps as stepsSchema,
+	processes as stepsSchema,
 	workflows,
 } from "@/drizzle/schema";
 import { asc, desc, eq } from "drizzle-orm";
@@ -13,14 +13,14 @@ import type { StepWithNodeAndRunStep } from "../types";
 
 export const GET = async (
 	req: Request,
-	{ params }: { params: { slug: string; workflowId: string } },
+	{ params }: { params: { urlId: string; workflowId: string } },
 ) => {
 	const workflow = await db.query.workflows.findFirst({
 		where: eq(workflows.id, Number.parseInt(params.workflowId)),
 	});
 	invariant(workflow != null, "Not found");
 	const nodes = await db.query.nodes.findMany({
-		where: eq(nodesSchema.workspaceId, workflow.workspaceId),
+		where: eq(nodesSchema.blueprintId, workflow.workspaceId),
 	});
 	const steps = await db.query.steps.findMany({
 		where: eq(stepsSchema.workflowId, workflow.id),
