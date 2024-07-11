@@ -46,7 +46,7 @@ export const ports = pgTable("ports", {
 	id: serial("id").primaryKey(),
 	nodeId: integer("node_id")
 		.notNull()
-		.references(() => nodes.id),
+		.references(() => nodes.id, { onDelete: "cascade" }),
 	name: text("name").notNull(),
 	direction: text("direction").$type<PortDirection>().notNull(),
 	type: text("type").$type<PortType>().notNull(),

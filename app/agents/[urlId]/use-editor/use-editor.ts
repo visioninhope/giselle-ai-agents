@@ -10,7 +10,8 @@ import invariant from "tiny-invariant";
 import { NodeTypes } from "../node";
 import { useAgent } from "../use-agent";
 import { useBlueprint } from "../use-blueprint";
-import { createDraftNode, execApi } from "./nodes/add-node";
+import { createDraftNode, execApi as execAddNodeApi } from "./nodes/add-node";
+import { execApi as execDeleteNodeApi } from "./nodes/delete-node";
 
 type EditorState = {
 	nodes: Node[];
@@ -21,7 +22,6 @@ type AddNodeArgs = {
 	position: { x: number; y: number };
 };
 type DeleteNodesArgs = number[];
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const useEditor = () => {
 	const { mutateBlueprint, blueprint } = useBlueprint();
 	const { runningAgent } = useAgent();
@@ -74,7 +74,7 @@ export const useEditor = () => {
 			});
 			mutateBlueprint(
 				(prev) =>
-					execApi(blueprint, draftNode).then(({ node }) => {
+					execAddNodeApi(blueprint, draftNode).then(({ node }) => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						return {
 							blueprint: {
@@ -105,14 +105,24 @@ export const useEditor = () => {
 				return;
 			}
 			mutateBlueprint(
-				sleep(2000).then(() => ({
-					blueprint,
-				})),
+				(prev) =>
+					execDeleteNodeApi(blueprint, deleteNodeIds).then(
+						({ deletedNodeIds }) => {
+							invariant(prev != null, "invalid state: blueprint is null");
+							console.log(deletedNodeIds);
+							return {
+								blueprint: {
+									...prev.blueprint,
+									nodes: prev.blueprint.nodes.filter(
+										(node) => !deletedNodeIds.includes(node.id),
+									),
+								},
+							};
+						},
+					),
 				{
 					optimisticData: (prev) => {
-						if (prev == null) {
-							return { blueprint };
-						}
+						invariant(prev != null, "invalid state: blueprint is null");
 						return {
 							blueprint: {
 								...prev.blueprint,

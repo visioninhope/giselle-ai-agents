@@ -1,6 +1,7 @@
 import { type NodeType, getNodeDef } from "@/app/node-defs";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
+import { inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import {
 	type Node,
@@ -81,23 +82,25 @@ export const POST = async (
 };
 
 type DeletePayload = {
-	deletedNodeIds: number[];
+	deleteNodeIds: number[];
 };
 
-// biome-ignore lint/suspicious/noExplicitAny:
-const ensureDeletePayload = (payload: any): DeletePayload => {
-	if (!Array.isArray(payload.deletedNodeIds)) {
-		throw new Error("Invalid payload: deletedNodeIds must be an array");
-	}
-	if (!payload.deletedNodeIds.every((id: unknown) => typeof id === "number")) {
-		throw new Error("Invalid payload: all deletedNodeIds must be numbers");
-	}
-	return payload;
-};
-export const DELETE = async (
-	request: Request,
-	{ params }: { params: { slug: string } },
-) => {
+type AssertDeletePayload = (json: unknown) => asserts json is DeletePayload;
+/**
+ * @todo Implement this function
+ */
+const assertDeletePayload: AssertDeletePayload = (json) => {};
+
+export const DELETE = async (request: Request) => {
 	const json = await request.json();
-	const payload = ensureDeletePayload(json);
+	assertDeletePayload(json);
+	const deletedNodeIds = await db
+		.delete(schema.nodes)
+		.where(inArray(schema.nodes.id, json.deleteNodeIds))
+		.returning({
+			deletedNodeId: schema.nodes.id,
+		});
+	return NextResponse.json({
+		deletedNodeIds: deletedNodeIds.map((node) => node.deletedNodeId),
+	});
 };
