@@ -6,11 +6,11 @@ import { assertAgentState } from "./agent-state";
 import type { GET } from "./route";
 
 const execApi = async (urlId: string) => {
-	const json = await fetch(`/agents/${urlId}/use-agent`, {
+	const agent = await fetch(`/agents/${urlId}/use-agent`, {
 		method: "POST",
 	}).then((res) => res.json());
-	assertAgentState(json);
-	return json;
+	assertAgentState(agent);
+	return { agent };
 };
 export const useAgent = () => {
 	const urlId = useAgentUrlId();
@@ -27,16 +27,19 @@ export const useAgent = () => {
 		},
 	);
 	const runAgent = () => {
-		mutate(execApi(urlId), {
-			optimisticData: {
-				agent: {
-					latestRun: {
-						status: "creating",
-						processes: [],
+		mutate(
+			execApi(urlId).then(({ agent }) => agent),
+			{
+				optimisticData: {
+					agent: {
+						latestRun: {
+							status: "creating",
+							processes: [],
+						},
 					},
 				},
 			},
-		});
+		);
 	};
 	return { runAgent, runningAgent: data?.agent };
 };

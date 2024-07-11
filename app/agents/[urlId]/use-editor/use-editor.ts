@@ -1,11 +1,16 @@
-import { type NodeType, getNodeDef } from "@/app/api/nodeDefs";
-import type { NodeWithPort } from "@/drizzle/db";
+import {
+	type NodeType,
+	findNodeDef,
+	getNodeDef,
+	useNodeDefs,
+} from "@/app/node-defs";
 import { useCallback, useMemo } from "react";
 import type { Edge, Node } from "reactflow";
+import invariant from "tiny-invariant";
 import { NodeTypes } from "../node";
 import { useAgent } from "../use-agent";
 import { useBlueprint } from "../use-blueprint";
-import { useNodeDefs } from "../use-node-defs";
+import { createDraftNode, execApi } from "./nodes/add-node";
 
 type EditorState = {
 	nodes: Node[];
@@ -60,51 +65,31 @@ export const useEditor = () => {
 			if (nodeDefs == null) {
 				return;
 			}
-			const nodeDef = getNodeDef(nodeType);
-			const newNode: NodeWithPort = {
+			const nodeDef = findNodeDef(nodeDefs, nodeType);
+			const draftNode = createDraftNode({
 				id: blueprint.nodes.length + 1,
+				nodeType,
+				nodeDef,
 				position,
-				type: nodeType,
-				inputPorts: (nodeDef.inputPorts ?? []).map(
-					({ type, label }, index) => ({
-						id: index,
-						type: type,
-						name: label ?? "",
-					}),
-				),
-				outputPorts: (nodeDef.outputPorts ?? []).map(
-					({ type, label }, index) => ({
-						id: index,
-						type: type,
-						name: label ?? "",
-					}),
-				),
-			};
+			});
 			mutateBlueprint(
-				async (prev) => {
-					if (prev == null) {
-						return { blueprint };
-					}
-					await fetch(`/api/workspaces/${blueprint.id}/nodes`, {
-						method: "POST",
-						body: JSON.stringify({ node: newNode }),
-					});
-					return {
-						blueprint: {
-							...prev.blueprint,
-							nodes: [...prev.blueprint.nodes, newNode],
-						},
-					};
-				},
-				{
-					optimisticData: (prev) => {
-						if (prev == null) {
-							return { blueprint };
-						}
+				(prev) =>
+					execApi(blueprint, draftNode).then(({ node }) => {
+						invariant(prev != null, "invalid state: blueprint is null");
 						return {
 							blueprint: {
 								...prev.blueprint,
-								nodes: [...prev.blueprint.nodes, newNode],
+								nodes: [...prev.blueprint.nodes, node],
+							},
+						};
+					}),
+				{
+					optimisticData: (prev) => {
+						invariant(prev != null, "invalid state: blueprint is null");
+						return {
+							blueprint: {
+								...prev.blueprint,
+								nodes: [...prev.blueprint.nodes, draftNode],
 							},
 						};
 					},

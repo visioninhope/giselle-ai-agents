@@ -24,7 +24,6 @@ export const useContextMenu = () => {
 	const handleContextMenu: MouseEventHandler<HTMLDivElement> = useCallback(
 		(event) => {
 			event.preventDefault();
-			console.log("handle!");
 			toggleContextMenu(event.clientX, event.clientY);
 		},
 		[toggleContextMenu],

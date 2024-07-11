@@ -1,7 +1,9 @@
+"use server";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { asc, desc, eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
+import type { Blueprint } from "./blueprint";
 
 /**
  * @todo Get it in a single query by using a view or join
@@ -30,7 +32,10 @@ export const getAgentWithLatestBlueprint = async (
 /**
  * @todo Get a specific version of the blueprint
  */
-export const getBlueprint = async (urlId: string, _version?: number) => {
+export const getBlueprint = async (
+	urlId: string,
+	_version?: number,
+): Promise<Blueprint> => {
 	const agent = await getAgentWithLatestBlueprint(urlId);
 	const originalNodes = await db.query.nodes.findMany({
 		columns: {
@@ -82,7 +87,11 @@ export const getBlueprint = async (urlId: string, _version?: number) => {
 		};
 	});
 	return {
-		...agent,
+		id: agent.latestBlueprint.id,
+		agent: {
+			id: agent.id,
+			urlId: agent.urlId,
+		},
 		nodes,
 		edges,
 	};

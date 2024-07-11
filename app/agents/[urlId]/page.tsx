@@ -13,7 +13,8 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
-import type { NodeType } from "@/app/api/nodeDefs";
+import type { NodeType } from "@/app/node-defs";
+import { useNodeDefs } from "@/app/node-defs/use-node-defs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
@@ -25,7 +26,6 @@ import { useAgent } from "./use-agent";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
-import { useNodeDefs } from "./use-node-defs";
 import { WorkflowRunner } from "./workflow-runner";
 
 const initialNodes: Node[] = [
