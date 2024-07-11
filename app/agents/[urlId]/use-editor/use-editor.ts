@@ -10,6 +10,7 @@ import invariant from "tiny-invariant";
 import { NodeTypes } from "../node";
 import { useAgent } from "../use-agent";
 import { useBlueprint } from "../use-blueprint";
+import { execApi as execAddEdgeApi } from "./edges/add-edge";
 import { createDraftNode, execApi as execAddNodeApi } from "./nodes/add-node";
 import { execApi as execDeleteNodeApi } from "./nodes/delete-node";
 
@@ -22,6 +23,16 @@ type AddNodeArgs = {
 	position: { x: number; y: number };
 };
 type DeleteNodesArgs = number[];
+type ConnectNodesArgs = {
+	originPort: {
+		id: number;
+		nodeId: number;
+	};
+	destinationPort: {
+		id: number;
+		nodeId: number;
+	};
+};
 export const useEditor = () => {
 	const { mutateBlueprint, blueprint } = useBlueprint();
 	const { runningAgent } = useAgent();
@@ -109,7 +120,6 @@ export const useEditor = () => {
 					execDeleteNodeApi(blueprint, deleteNodeIds).then(
 						({ deletedNodeIds }) => {
 							invariant(prev != null, "invalid state: blueprint is null");
-							console.log(deletedNodeIds);
 							return {
 								blueprint: {
 									...prev.blueprint,
@@ -138,9 +148,52 @@ export const useEditor = () => {
 		[blueprint, mutateBlueprint],
 	);
 
+	const connectNodes = useCallback(
+		({ originPort, destinationPort }: ConnectNodesArgs) => {
+			if (blueprint == null) {
+				return;
+			}
+			mutateBlueprint(
+				(prev) =>
+					execAddEdgeApi(blueprint, {
+						originPortId: originPort.id,
+						destinationPortId: destinationPort.id,
+					}).then(({ edge }) => {
+						invariant(prev != null, "invalid state: blueprint is null");
+						return {
+							blueprint: {
+								...prev.blueprint,
+								edges: [...prev.blueprint.edges, edge],
+							},
+						};
+					}),
+				{
+					optimisticData: (prev) => {
+						invariant(prev != null, "invalid state: blueprint is null");
+						return {
+							blueprint: {
+								...prev.blueprint,
+								edges: [
+									...prev.blueprint.edges,
+									{
+										id: prev.blueprint.edges.length + 1,
+										inputPort: destinationPort,
+										outputPort: originPort,
+									},
+								],
+							},
+						};
+					},
+				},
+			);
+		},
+		[blueprint, mutateBlueprint],
+	);
+
 	return {
 		editorState,
 		addNode,
 		deleteNodes,
+		connectNodes,
 	};
 };

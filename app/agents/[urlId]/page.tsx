@@ -82,7 +82,7 @@ const contexts: Context[] = [
 
 const WorkflowEditor: FC = () => {
 	const { runAgent, runningAgent } = useAgent();
-	const { editorState, addNode, deleteNodes } = useEditor();
+	const { editorState, addNode, deleteNodes, connectNodes } = useEditor();
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -198,6 +198,31 @@ const WorkflowEditor: FC = () => {
 									nodes={editorState.nodes}
 									onNodesDelete={(nodes) => {
 										deleteNodes(nodes.map((node) => Number.parseInt(node.id)));
+									}}
+									onConnect={({
+										source,
+										sourceHandle,
+										target,
+										targetHandle,
+									}) => {
+										if (
+											source == null ||
+											sourceHandle == null ||
+											target == null ||
+											targetHandle == null
+										) {
+											return;
+										}
+										connectNodes({
+											originPort: {
+												id: Number.parseInt(sourceHandle),
+												nodeId: Number.parseInt(source),
+											},
+											destinationPort: {
+												id: Number.parseInt(targetHandle),
+												nodeId: Number.parseInt(target),
+											},
+										});
 									}}
 									edges={editorState.edges}
 									nodeTypes={nodeTypes}

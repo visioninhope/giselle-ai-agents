@@ -19,7 +19,11 @@ export const useAgent = () => {
 		fetcher,
 		{
 			refreshInterval: (latestData) => {
-				if (latestData?.agent.latestRun?.status === "success") {
+				if (
+					latestData == null ||
+					latestData.agent.latestRun == null ||
+					latestData.agent.latestRun.status === "success"
+				) {
 					return 0;
 				}
 				return 1000;
