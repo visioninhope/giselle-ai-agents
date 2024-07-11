@@ -1,9 +1,4 @@
-import {
-	type NodeType,
-	findNodeDef,
-	getNodeDef,
-	useNodeDefs,
-} from "@/app/node-defs";
+import { type NodeType, findNodeDef, useNodeDefs } from "@/app/node-defs";
 import { useCallback, useMemo } from "react";
 import type { Edge, Node } from "reactflow";
 import invariant from "tiny-invariant";
@@ -97,6 +92,7 @@ export const useEditor = () => {
 						};
 					}),
 				{
+					revalidate: false,
 					optimisticData: (prev) => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						return {
@@ -133,6 +129,7 @@ export const useEditor = () => {
 						},
 					),
 				{
+					revalidate: false,
 					optimisticData: (prev) => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						return {
@@ -170,6 +167,7 @@ export const useEditor = () => {
 						};
 					}),
 				{
+					revalidate: false,
 					optimisticData: (prev) => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						return {
@@ -213,6 +211,7 @@ export const useEditor = () => {
 						},
 					),
 				{
+					revalidate: false,
 					optimisticData: (prev) => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						return {
