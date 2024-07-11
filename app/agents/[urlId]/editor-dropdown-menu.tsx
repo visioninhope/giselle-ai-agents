@@ -1,5 +1,5 @@
-import type { NodeType } from "@/app/api/nodeDefs";
-import type { GET } from "@/app/api/nodeDefs/route";
+import type { NodeType } from "@/app/node-defs";
+import type { GET } from "@/app/node-defs/use-node-defs/route";
 import {
 	DropdownMenu,
 	DropdownMenuContent,

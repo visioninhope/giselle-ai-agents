@@ -2,9 +2,12 @@ import { cn } from "@/lib/utils";
 import { cva } from "cva";
 import { CircleCheckIcon, CircleIcon, LoaderCircleIcon } from "lucide-react";
 import type { FC } from "react";
-import { match } from "ts-pattern";
+import { P, match } from "ts-pattern";
 
-import type { StepWithNodeAndRunStep } from "@/app/api/workspaces/[slug]/workflows/types";
+import type {
+	AgentProcess,
+	AgentProcessItem,
+} from "@/app/agents/models/agent-process";
 import type { RunStatus } from "@/drizzle/schema";
 const stepListItemVariant = cva({
 	base: "flex items-center justify-between ",
@@ -18,12 +21,12 @@ const stepListItemVariant = cva({
 	},
 });
 
-type StepListItemProps = StepWithNodeAndRunStep;
+type StepListItemProps = AgentProcessItem;
 const StepListItem: FC<StepListItemProps> = (props) => (
 	<div
 		className={cn(
 			stepListItemVariant({
-				status: props.runStep.status,
+				status: props.status,
 			}),
 		)}
 	>
@@ -34,7 +37,7 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 				.otherwise(() => (
 					<span className="text-xs">2s</span>
 				))} */}
-			{match(props.runStep)
+			{match(props)
 				.with({ status: "idle" }, () => <CircleIcon className="w-4 h-4" />)
 				.with({ status: "running" }, () => (
 					<LoaderCircleIcon className="w-4 h-4 animate-spin" />
@@ -48,11 +51,7 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 	</div>
 );
 
-type WorkflowRunnerProps = {
-	status: RunStatus;
-	steps: StepWithNodeAndRunStep[];
-};
-export const WorkflowRunner: FC<WorkflowRunnerProps> = ({ steps, status }) => {
+export const AgentProcessLogger: FC<AgentProcess> = ({ run }) => {
 	return (
 		<div className="bg-background/50 border border-border w-[200px] text-sm">
 			<div className="px-4 py-1 border-b">
@@ -60,10 +59,12 @@ export const WorkflowRunner: FC<WorkflowRunnerProps> = ({ steps, status }) => {
 			</div>
 
 			<div className="px-4 py-2 flex flex-col gap-2">
-				{match(status)
-					.with("creating", () => <p>Creating workflow...</p>)
-					.otherwise(() =>
-						steps.map((step) => <StepListItem key={step.id} {...step} />),
+				{match(run)
+					.with(P.nullish, () => <p>Creating workflow...</p>)
+					.otherwise(({ processes }) =>
+						processes.map((process) => (
+							<StepListItem key={process.id} {...process} />
+						)),
 					)}
 			</div>
 		</div>
