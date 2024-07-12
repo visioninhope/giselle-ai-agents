@@ -31,8 +31,6 @@ export const POST = async (req: Request) => {
 			status: "creating",
 		})
 		.returning({ id: requestsSchema.id });
-	console.log("3");
-	console.log({ steps });
 	await db.insert(requestStepSchema).values(
 		steps.map<typeof requestStepSchema.$inferInsert>(({ id }) => ({
 			requestId: request.id,
@@ -40,7 +38,6 @@ export const POST = async (req: Request) => {
 			status: "idle",
 		})),
 	);
-	console.log("4");
 	const handle = await invokeTask.trigger({
 		requestId: request.id,
 	});
