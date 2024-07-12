@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
-import { createAgent } from "./actions/create-agent";
-import { getAgents } from "./queries/get-agents";
+import { createAgent } from "./create-agent";
+import { getAgents } from "./get-agents";
 
 export default async function Page() {
 	const agents = await getAgents();
