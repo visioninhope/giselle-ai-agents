@@ -1,9 +1,9 @@
 "use server";
+import type { Blueprint } from "@/app/agents/blueprints";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { asc, desc, eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import type { Blueprint } from "./blueprint";
 
 /**
  * @todo Get it in a single query by using a view or join

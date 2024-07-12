@@ -1,13 +1,11 @@
 "use server";
+import type { Edge } from "@/app/agents/blueprints";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
-import {
-	type Edge,
-	getAgentWithLatestBlueprint,
-} from "../../_helpers/get-blueprint";
+import { getAgentWithLatestBlueprint } from "../../blueprints";
 
 export type PostPayload = {
 	originPortId: number;

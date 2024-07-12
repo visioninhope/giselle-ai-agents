@@ -1,9 +1,5 @@
+import { type Blueprint, type Node, assertNode } from "@/app/agents/blueprints";
 import type { NodeDef, NodeType } from "@/app/node-defs";
-import {
-	type Blueprint,
-	type Node,
-	assertNode,
-} from "../../_helpers/get-blueprint";
 
 type AddNodeArgs = {
 	id: number;

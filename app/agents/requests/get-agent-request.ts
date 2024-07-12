@@ -2,7 +2,7 @@ import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { asc, desc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import type { AgentRequest } from "../models/agent-process";
+import type { AgentRequest } from "./agent-request";
 
 export const getAgentRequest = async (
 	requestId: number,
@@ -40,7 +40,7 @@ export const getAgentRequest = async (
 			stepId: true,
 			status: true,
 		},
-		where: eq(schema.requestStep.runId, request.id),
+		where: eq(schema.requestStep.requestId, request.id),
 	});
 	const requestStepsWithNode = steps.map(({ id, nodeId }) => {
 		const node = nodes.find((n) => n.id === nodeId);
@@ -68,7 +68,7 @@ export const getAgentRequest = async (
 			},
 			id: request.id,
 			status: request.status,
-			processes: requestStepsWithNode,
+			steps: requestStepsWithNode,
 		},
 	};
 };

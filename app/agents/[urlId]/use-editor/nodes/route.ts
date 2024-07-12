@@ -1,12 +1,10 @@
+import type { Node } from "@/app/agents/blueprints";
 import { type NodeType, getNodeDef } from "@/app/node-defs";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import {
-	type Node,
-	getAgentWithLatestBlueprint,
-} from "../../_helpers/get-blueprint";
+import { getAgentWithLatestBlueprint } from "../../blueprints";
 
 type PostPayload = {
 	node: {

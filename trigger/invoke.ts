@@ -20,25 +20,25 @@ export const invokeTask = task({
 			startedAt: new Date(),
 		});
 		const agentProcess = await getAgentRequest(payload.requestId);
-		if (agentProcess.run == null) {
+		if (agentProcess.request == null) {
 			throw new Error("No run found");
 		}
 
-		for (const process of agentProcess.run.processes) {
-			await updateRunStep(payload.requestId, process.id, {
+		for (const step of agentProcess.request.steps) {
+			await updateRunStep(payload.requestId, step.id, {
 				status: "running",
 				startedAt: new Date(),
 			});
-			logger.log(`${process.node.type} started!!`);
-			if (process.node.type === "FindUser") {
-				await findUser(process);
+			logger.log(`${step.node.type} started!!`);
+			if (step.node.type === "FindUser") {
+				await findUser(step);
 			}
-			if (process.node.type === "SendMail") {
-				await sendMail(process);
+			if (step.node.type === "SendMail") {
+				await sendMail(step);
 			}
 			await wait.for({ seconds: 5 });
-			logger.log(`${process.node.type} finished!!`);
-			await updateRunStep(payload.requestId, process.id, {
+			logger.log(`${step.node.type} finished!!`);
+			await updateRunStep(payload.requestId, step.id, {
 				status: "success",
 				finishedAt: new Date(),
 			});

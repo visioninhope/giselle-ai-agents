@@ -1,6 +1,6 @@
+import type { Blueprint } from "@/app/agents/blueprints";
 import type { steps as stepsSchema } from "@/drizzle";
 import invariant from "tiny-invariant";
-import type { Blueprint } from "../_helpers/get-blueprint";
 
 type DbStep = typeof stepsSchema.$inferSelect;
 

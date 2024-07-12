@@ -11,19 +11,19 @@ import ReactFlow, {
 } from "reactflow";
 
 import "reactflow/dist/style.css";
-import type { NodeType } from "@/app/node-defs";
-import { useNodeDefs } from "@/app/node-defs/use-node-defs";
+import { useRequest } from "@/app/agents/requests";
+import { type NodeType, useNodeDefs } from "@/app/node-defs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
+import { useBlueprint } from "./blueprints";
 import { EditorDropdownMenu } from "./editor-dropdown-menu";
 import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
-import { useRequest } from "./use-request";
 
 const contexts: Context[] = [
 	{
@@ -51,7 +51,8 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { sendRequest: runAgent, request: runningAgent } = useRequest();
+	const { buildCurrent } = useBlueprint();
+	const { sendRequest, request } = useRequest();
 	const { editorState, addNode, deleteNodes, connectNodes, deleteEdges } =
 		useEditor();
 	const { nodeDefs } = useNodeDefs();
@@ -144,7 +145,11 @@ const WorkflowEditor: FC = () => {
 									variant={"ghost"}
 									size={"xs"}
 									className="text-muted-foreground"
-									onClick={() => runAgent()}
+									onClick={() =>
+										buildCurrent().then(({ blueprintId }) =>
+											sendRequest(blueprintId),
+										)
+									}
 								>
 									<PlayIcon className="mr-1" />
 									Run Workflow
@@ -195,7 +200,7 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									{runningAgent && (
+									{request && (
 										<Panel position="top-right">
 											hello
 											{/* <WorkflowRunner

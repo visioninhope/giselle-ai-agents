@@ -117,7 +117,7 @@ export const requests = pgTable("requests", {
 export type RequestStepStatus = "idle" | "running" | "success" | "failed";
 export const requestStep = pgTable("request_steps", {
 	id: serial("id").primaryKey(),
-	runId: integer("run_id")
+	requestId: integer("run_id")
 		.notNull()
 		.references(() => requests.id),
 	stepId: integer("step_id")

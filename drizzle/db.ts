@@ -120,7 +120,9 @@ export const updateRunStep = async (
 	await db
 		.update(requestStep)
 		.set(updateValues)
-		.where(and(eq(requestStep.runId, runId), eq(requestStep.stepId, stepId)));
+		.where(
+			and(eq(requestStep.requestId, runId), eq(requestStep.stepId, stepId)),
+		);
 };
 
 export const pullMessage = async (dataKnotId: number, runId: number) => {

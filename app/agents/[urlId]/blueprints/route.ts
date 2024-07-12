@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getBlueprint } from "../_helpers/get-blueprint";
+import { getBlueprint } from "./get-blueprint";
 
 export const GET = async (
 	req: Request,

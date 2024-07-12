@@ -6,9 +6,10 @@ import invariant from "tiny-invariant";
 import type { GET } from "./[requestId]/route";
 import { assertAgentRequest } from "./agent-request";
 
-const execApi = async () => {
+const execApi = async (blueprintId: number) => {
 	const request = await fetch("/agents/requests", {
 		method: "POST",
+		body: JSON.stringify({ blueprintId }),
 	}).then((res) => res.json());
 	assertAgentRequest(request);
 	return request;
@@ -38,9 +39,9 @@ export const useRequest = () => {
 			},
 		},
 	);
-	const sendRequest = () => {
+	const sendRequest = (blueprintId: number) => {
 		mutate(
-			execApi().then(({ request }) => {
+			execApi(blueprintId).then(({ request }) => {
 				setRequestId(request.id);
 				return { request };
 			}),
@@ -57,5 +58,5 @@ export const useRequest = () => {
 			},
 		);
 	};
-	return { sendRequest, request: data };
+	return { sendRequest, request: data?.request };
 };

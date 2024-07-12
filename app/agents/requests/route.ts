@@ -1,103 +1,78 @@
-import type { AgentRequest } from "@/app/agents/models/agent-process";
-import { db, steps as stepsSchema } from "@/drizzle";
-import * as schema from "@/drizzle/schema";
+import {
+	db,
+	requestStep as requestStepSchema,
+	requests as requestsSchema,
+	runTriggerRelations as runTriggerRelationsSchema,
+	steps as stepsSchema,
+} from "@/drizzle";
 import { invokeTask } from "@/trigger/invoke";
+import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
-import { getBlueprint } from "../_helpers/get-blueprint";
-import { inferSteps } from "./infer-step";
+import type { AgentRequest } from "./agent-request";
 
-export const POST = async (
-	req: Request,
-	{ params }: { params: { urlId: string } },
-) => {
-	const blueprint = await getBlueprint(params.urlId);
-	const inferedSteps = inferSteps(blueprint);
-	const insertedProcesses = await db
-		.insert(stepsSchema)
-		.values(
-			inferedSteps.map((process) => ({
-				...process,
-				blueprintId: blueprint.id,
-			})),
-		)
-		.returning({
-			insertedId: stepsSchema.id,
-			nodeId: stepsSchema.nodeId,
-		});
-	const dataEdges = blueprint.edges.filter(
-		({ edgeType }) => edgeType === "data",
-	);
-	for (const dataEdge of dataEdges) {
-		const inputProcess = insertedProcesses.find(
-			({ nodeId }) => nodeId === dataEdge.inputPort.nodeId,
-		);
-		const outputProcess = insertedProcesses.find(
-			({ nodeId }) => nodeId === dataEdge.outputPort.nodeId,
-		);
-		const [inputDataKnot, outputDataKnot] = await db
-			.insert(schema.dataKnots)
-			.values([
-				{ processId: inputProcess?.insertedId, portId: dataEdge.inputPort.id },
-				{ processId: outputProcess?.insertedId, portId: dataEdge.inputPort.id },
-			])
-			.returning({
-				insertedId: schema.dataKnots.id,
-			});
-		await db.insert(schema.dataRoutes).values({
-			originKnotId: outputDataKnot.insertedId,
-			destinationKnotId: inputDataKnot.insertedId,
-		});
-	}
-
-	const [insertedRun] = await db
-		.insert(schema.runs)
+type Payload = {
+	blueprintId: number;
+};
+type AssertPayload = (value: unknown) => asserts value is Payload;
+/** @todo */
+const assertPayload: AssertPayload = () => {};
+export const POST = async (req: Request) => {
+	const json = req.json();
+	assertPayload(json);
+	const steps = await db.query.steps.findMany({
+		where: eq(stepsSchema.blueprintId, json.blueprintId),
+		orderBy: asc(stepsSchema.order),
+	});
+	const [request] = await db
+		.insert(requestsSchema)
 		.values({
-			blueprintId: blueprint.id,
+			blueprintId: json.blueprintId,
 			status: "creating",
 		})
-		.returning({ insertedId: schema.runs.id });
-	await db.insert(schema.runProcesses).values(
-		insertedProcesses.map<typeof schema.runProcesses.$inferInsert>(
-			({ insertedId }) => ({
-				runId: insertedRun.insertedId,
-				processId: insertedId,
-				status: "idle",
-			}),
-		),
+		.returning({ id: requestsSchema.id });
+	await db.insert(requestStepSchema).values(
+		steps.map<typeof requestStepSchema.$inferInsert>(({ id }) => ({
+			requestId: request.id,
+			stepId: id,
+			status: "idle",
+		})),
 	);
 	const handle = await invokeTask.trigger({
-		requestId: insertedRun.insertedId,
-		agentUrlId: params.urlId,
+		requestId: request.id,
 	});
 
-	await db.insert(schema.runTriggerRelations).values({
-		runId: insertedRun.insertedId,
+	await db.insert(runTriggerRelationsSchema).values({
+		runId: request.id,
 		triggerId: handle.id,
 	});
 
-	const agentProcess: AgentRequest = {
-		agent: {
-			id: blueprint.agent.id,
-			blueprint: {
-				id: blueprint.id,
-			},
+	const nodes = await db.query.nodes.findMany({
+		columns: {
+			id: true,
+			type: true,
 		},
-		run: {
-			id: insertedRun.insertedId,
+		where: eq(stepsSchema.blueprintId, json.blueprintId),
+	});
+	const agentProcess: AgentRequest = {
+		request: {
+			id: request.id,
+			blueprint: {
+				id: json.blueprintId,
+			},
 			status: "creating",
-			processes: insertedProcesses.map(({ insertedId, nodeId }) => {
-				const node = blueprint.nodes.find(({ id }) => id === nodeId);
+			steps: steps.map(({ id, nodeId }) => {
+				const node = nodes.find(({ id }) => id === nodeId);
 				invariant(node != null, `Node not found: ${nodeId}`);
 				return {
-					id: insertedId,
+					id,
 					node: {
 						id: nodeId,
 						type: node.type,
 					},
 					status: "idle",
 					run: {
-						id: insertedRun.insertedId,
+						id: request.id,
 					},
 				};
 			}),

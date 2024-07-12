@@ -1,4 +1,4 @@
-import type { Blueprint } from "../../_helpers/get-blueprint";
+import type { Blueprint } from "@/app/agents/blueprints";
 
 type ExpectResponsePayload = {
 	deletedNodeIds: number[];

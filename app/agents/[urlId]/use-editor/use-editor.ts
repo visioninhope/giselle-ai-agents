@@ -1,10 +1,10 @@
+import { useRequest } from "@/app/agents/requests";
 import { type NodeType, findNodeDef, useNodeDefs } from "@/app/node-defs";
 import { useCallback, useMemo } from "react";
 import type { Edge, Node } from "reactflow";
 import invariant from "tiny-invariant";
+import { useBlueprint } from "../blueprints";
 import { NodeTypes } from "../node";
-import { useAgent } from "../use-agent";
-import { useBlueprint } from "../use-blueprint";
 import { execApi as execAddEdgeApi } from "./edges/add-edge";
 import { execApi as execDeleteEdgeApi } from "./edges/delete-edge";
 import { createDraftNode, execApi as execAddNodeApi } from "./nodes/add-node";
@@ -32,15 +32,15 @@ type ConnectNodesArgs = {
 type DeleteEdgesArgs = number[];
 export const useEditor = () => {
 	const { mutateBlueprint, blueprint } = useBlueprint();
-	const { runningAgent } = useAgent();
+	const { request } = useRequest();
 	const { nodeDefs } = useNodeDefs();
 	const editorState = useMemo<EditorState>(() => {
 		if (blueprint == null) {
 			return { nodes: [], edges: [] };
 		}
 		const nodes = blueprint.nodes.map((node) => {
-			const relevantProcess = runningAgent?.run?.processes.find(
-				(process) => process.node.id === node.id,
+			const relevantRequestStep = request?.steps.find(
+				(step) => step.node.id === node.id,
 			);
 			return {
 				id: `${node.id}`,
@@ -49,7 +49,7 @@ export const useEditor = () => {
 				data: {
 					id: `${node.id}`,
 					nodeType: node.type,
-					runStatus: relevantProcess?.status,
+					runStatus: relevantRequestStep?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,
 				},
@@ -63,7 +63,7 @@ export const useEditor = () => {
 			targetHandle: `${inputPort.id}`,
 		}));
 		return { nodes, edges };
-	}, [blueprint, runningAgent]);
+	}, [blueprint, request]);
 
 	const addNode = useCallback(
 		({ nodeType, position }: AddNodeArgs) => {

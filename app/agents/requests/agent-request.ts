@@ -19,7 +19,7 @@ export type AgentRequest = {
 		};
 		id: number;
 		status: RunStatus;
-		processes: Array<RequestStep>;
+		steps: Array<RequestStep>;
 	};
 };
 

@@ -1,5 +1,5 @@
+import type { Blueprint } from "@/app/agents/blueprints";
 import type { InferResponse } from "@/lib/api";
-import type { Blueprint } from "../../_helpers/get-blueprint";
 import type { DELETE } from "./route";
 
 type ExpectResponsePayload = InferResponse<typeof DELETE>;
