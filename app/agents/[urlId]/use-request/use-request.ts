@@ -1,4 +1,4 @@
-import { assertAgentProcess } from "@/app/agents/models/agent-process";
+import { assertAgentRequest } from "@/app/agents/models/agent-process";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
@@ -10,13 +10,13 @@ const execApi = async (urlId: string) => {
 	const agent = await fetch(`/agents/${urlId}/use-agent`, {
 		method: "POST",
 	}).then((res) => res.json());
-	assertAgentProcess(agent);
+	assertAgentRequest(agent);
 	return { agent };
 };
-export const useAgent = () => {
+export const useRequest = () => {
 	const urlId = useAgentUrlId();
 	const { data, mutate } = useSWR<InferResponse<typeof GET>>(
-		`/agents/${urlId}/use-agent`,
+		`/agents/${urlId}/use-request`,
 		fetcher,
 		{
 			refreshInterval: (latestData) => {
@@ -31,7 +31,7 @@ export const useAgent = () => {
 			},
 		},
 	);
-	const runAgent = () => {
+	const sendRequest = () => {
 		mutate(
 			execApi(urlId).then(({ agent }) => agent),
 			{
@@ -48,5 +48,5 @@ export const useAgent = () => {
 			},
 		);
 	};
-	return { runAgent, runningAgent: data };
+	return { sendRequest, request: data };
 };

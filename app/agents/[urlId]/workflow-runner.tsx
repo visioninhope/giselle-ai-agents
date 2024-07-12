@@ -5,8 +5,8 @@ import type { FC } from "react";
 import { P, match } from "ts-pattern";
 
 import type {
-	AgentProcess,
-	AgentProcessItem,
+	AgentRequest,
+	RequestStep,
 } from "@/app/agents/models/agent-process";
 import type { RunStatus } from "@/drizzle/schema";
 const stepListItemVariant = cva({
@@ -21,7 +21,7 @@ const stepListItemVariant = cva({
 	},
 });
 
-type StepListItemProps = AgentProcessItem;
+type StepListItemProps = RequestStep;
 const StepListItem: FC<StepListItemProps> = (props) => (
 	<div
 		className={cn(
@@ -51,7 +51,7 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 	</div>
 );
 
-export const AgentProcessLogger: FC<AgentProcess> = ({ run }) => {
+export const AgentProcessLogger: FC<AgentRequest> = ({ run }) => {
 	return (
 		<div className="bg-background/50 border border-border w-[200px] text-sm">
 			<div className="px-4 py-1 border-b">

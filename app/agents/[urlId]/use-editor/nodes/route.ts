@@ -1,7 +1,7 @@
 import { type NodeType, getNodeDef } from "@/app/node-defs";
 import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
-import { inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import {
 	type Node,
@@ -63,6 +63,10 @@ export const POST = async (
 		.returning({
 			insertedId: schema.ports.id,
 		});
+	await db
+		.update(schema.blueprints)
+		.set({ dirty: true })
+		.where(eq(schema.blueprints.id, agent.latestBlueprint.id));
 	const returnNode: Node = {
 		id: node.insertedId,
 		position: json.node.position,

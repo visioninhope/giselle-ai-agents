@@ -1,11 +1,11 @@
-import type { processes } from "@/drizzle/schema";
+import type { steps as stepsSchema } from "@/drizzle";
 import invariant from "tiny-invariant";
 import type { Blueprint } from "../_helpers/get-blueprint";
 
-type DbProcess = typeof processes.$inferSelect;
+type DbStep = typeof stepsSchema.$inferSelect;
 
-export const inferProcesses = ({ nodes, edges }: Blueprint) => {
-	const processes: Omit<DbProcess, "blueprintId" | "id">[] = [];
+export const inferSteps = ({ nodes, edges }: Blueprint) => {
+	const steps: Omit<DbStep, "blueprintId" | "id">[] = [];
 	const visited = new Set<number>();
 	const dfs = (nodeId: number, order: number) => {
 		if (visited.has(nodeId)) return;
@@ -14,7 +14,7 @@ export const inferProcesses = ({ nodes, edges }: Blueprint) => {
 		const node = nodes.find((n) => n.id === nodeId);
 		if (!node) return;
 
-		processes.push({
+		steps.push({
 			nodeId: node.id,
 			order,
 		});
@@ -28,5 +28,5 @@ export const inferProcesses = ({ nodes, edges }: Blueprint) => {
 	const startNode = nodes.find((node) => !targetNodeIds.has(node.id));
 	invariant(startNode != null, "Not found");
 	dfs(startNode.id, 0);
-	return processes;
+	return steps;
 };

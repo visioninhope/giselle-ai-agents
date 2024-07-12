@@ -1,35 +1,32 @@
-import type { RunProcessStatus, RunStatus } from "@/drizzle/schema";
+import type { RequestStepStatus, RunStatus } from "@/drizzle/schema";
 
-export type AgentProcessItem = {
+export type RequestStep = {
 	id: number;
 	node: {
 		id: number;
 		type: string;
 	};
-	status: RunProcessStatus;
+	status: RequestStepStatus;
 	run: {
 		id: number;
 	};
 };
 
-export type AgentProcess = {
-	agent: {
-		id: number;
+export type AgentRequest = {
+	request: {
 		blueprint: {
 			id: number;
 		};
-	};
-	run: {
 		id: number;
 		status: RunStatus;
-		processes: Array<AgentProcessItem>;
-	} | null;
+		processes: Array<RequestStep>;
+	};
 };
 
-type AssertAgentProcess = (value: unknown) => asserts value is AgentProcess;
+type AssertAgentRequest = (value: unknown) => asserts value is AgentRequest;
 /**
  * @todo Implement this function
  */
-export const assertAgentProcess: AssertAgentProcess = (value) => {
+export const assertAgentRequest: AssertAgentRequest = (value) => {
 	return;
 };

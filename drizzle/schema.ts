@@ -1,4 +1,5 @@
 import {
+	boolean,
 	integer,
 	jsonb,
 	pgTable,
@@ -26,8 +27,12 @@ export const agents = pgTable(
 
 export const blueprints = pgTable("blueprints", {
 	id: serial("id").primaryKey(),
-	agentId: integer("agent_id"),
+	agentId: integer("agent_id")
+		.notNull()
+		.references(() => agents.id),
 	version: integer("version").notNull(),
+	dirty: boolean("dirty").notNull().default(false),
+	builded: boolean("builded").notNull().default(false),
 });
 
 export const nodes = pgTable("nodes", {
@@ -68,7 +73,7 @@ export const edges = pgTable("edges", {
 	edgeType: text("edge_type").$type<EdgeType>().notNull(),
 });
 
-export const processes = pgTable("processes", {
+export const steps = pgTable("steps", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
 		.notNull()
@@ -81,7 +86,7 @@ export const processes = pgTable("processes", {
 
 export const dataKnots = pgTable("data_knots", {
 	id: serial("id").primaryKey(),
-	processId: integer("process_id").references(() => processes.id),
+	stepId: integer("step_id").references(() => steps.id),
 	portId: integer("port_id")
 		.notNull()
 		.references(() => ports.id),
@@ -98,7 +103,7 @@ export const dataRoutes = pgTable("data_routes", {
 });
 
 export type RunStatus = "creating" | "running" | "success" | "failed";
-export const runs = pgTable("runs", {
+export const requests = pgTable("requests", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
 		.notNull()
@@ -109,16 +114,16 @@ export const runs = pgTable("runs", {
 	finishedAt: timestamp("finished_at"),
 });
 
-export type RunProcessStatus = "idle" | "running" | "success" | "failed";
-export const runProcesses = pgTable("run_processes", {
+export type RequestStepStatus = "idle" | "running" | "success" | "failed";
+export const requestStep = pgTable("request_steps", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
-	processId: integer("process_id")
+		.references(() => requests.id),
+	stepId: integer("step_id")
 		.notNull()
-		.references(() => processes.id),
-	status: text("status").$type<RunProcessStatus>().notNull(),
+		.references(() => steps.id),
+	status: text("status").$type<RequestStepStatus>().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
@@ -127,7 +132,7 @@ export const runDataKnotMessages = pgTable("run_data_knot_messages", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
+		.references(() => requests.id),
 	dataKnotId: integer("data_knot_id")
 		.notNull()
 		.references(() => dataKnots.id),
@@ -138,7 +143,7 @@ export const runTriggerRelations = pgTable("run_trigger_relations", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
+		.references(() => requests.id),
 	triggerId: text("trigger_id").notNull(),
 });
 

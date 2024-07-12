@@ -1,5 +1,5 @@
-import type { AgentProcessItem } from "@/app/agents/models/agent-process";
-import { getAgentProcess } from "@/app/agents/queries/get-agent-process";
+import type { RequestStep } from "@/app/agents/models/agent-process";
+import { getAgentRequest } from "@/app/agents/queries/get-agent-process";
 import {
 	leaveMessage,
 	pullMessages,
@@ -21,7 +21,7 @@ export const invokeTask = task({
 			status: "running",
 			startedAt: new Date(),
 		});
-		const agentProcess = await getAgentProcess(payload.agentUrlId);
+		const agentProcess = await getAgentRequest(payload.agentUrlId);
 		if (agentProcess.run == null) {
 			throw new Error("No run found");
 		}
@@ -57,7 +57,7 @@ export const invokeTask = task({
 	},
 });
 
-const findUser = async ({ run, id }: AgentProcessItem) => {
+const findUser = async ({ run, id }: RequestStep) => {
 	logger.log("finding user...");
 	await wait.for({ seconds: 3 });
 	logger.log("user found!!");
@@ -69,7 +69,7 @@ const findUser = async ({ run, id }: AgentProcessItem) => {
 	]);
 };
 
-const sendMail = async ({ run, id }: AgentProcessItem) => {
+const sendMail = async ({ run, id }: RequestStep) => {
 	logger.log("sending mail...");
 	const messages = await pullMessages(run.id, id);
 	for (const message of messages) {

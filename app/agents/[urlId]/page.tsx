@@ -20,10 +20,10 @@ import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import { EditorDropdownMenu } from "./editor-dropdown-menu";
 import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
-import { useAgent } from "./use-agent";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 import { useContextMenu } from "./use-context-menu";
 import { useEditor } from "./use-editor";
+import { useRequest } from "./use-request";
 
 const contexts: Context[] = [
 	{
@@ -51,7 +51,7 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { runAgent, runningAgent } = useAgent();
+	const { sendRequest: runAgent, request: runningAgent } = useRequest();
 	const { editorState, addNode, deleteNodes, connectNodes, deleteEdges } =
 		useEditor();
 	const { nodeDefs } = useNodeDefs();

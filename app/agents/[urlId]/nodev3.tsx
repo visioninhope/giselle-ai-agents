@@ -1,4 +1,4 @@
-import type { RunProcessStatus, ports } from "@/drizzle/schema";
+import type { RequestStepStatus, ports } from "@/drizzle/schema";
 import { cva } from "cva";
 import type { FC } from "react";
 import { Handle, type NodeProps, NodeResizer, Position } from "reactflow";
@@ -8,7 +8,7 @@ type NodeData = {
 	nodeType: string;
 	inputPorts: (typeof ports.$inferSelect)[];
 	outputPorts: (typeof ports.$inferSelect)[];
-	runStatus?: RunProcessStatus;
+	runStatus?: RequestStepStatus;
 };
 export const NodeV3: FC<NodeProps<NodeData>> = ({
 	selected,

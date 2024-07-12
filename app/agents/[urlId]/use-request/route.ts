@@ -1,30 +1,30 @@
-import type { AgentProcess } from "@/app/agents/models/agent-process";
-import { getAgentProcess } from "@/app/agents/queries/get-agent-process";
-import { db } from "@/drizzle/db";
+import type { AgentRequest } from "@/app/agents/models/agent-process";
+import { getAgentRequest } from "@/app/agents/queries/get-agent-process";
+import { db, steps as stepsSchema } from "@/drizzle";
 import * as schema from "@/drizzle/schema";
 import { invokeTask } from "@/trigger/invoke";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
 import { getBlueprint } from "../_helpers/get-blueprint";
-import { inferProcesses } from "./infer-process";
+import { inferSteps } from "./infer-step";
 
 export const POST = async (
 	req: Request,
 	{ params }: { params: { urlId: string } },
 ) => {
 	const blueprint = await getBlueprint(params.urlId);
-	const inferedProcesses = inferProcesses(blueprint);
+	const inferedSteps = inferSteps(blueprint);
 	const insertedProcesses = await db
-		.insert(schema.processes)
+		.insert(stepsSchema)
 		.values(
-			inferedProcesses.map((process) => ({
+			inferedSteps.map((process) => ({
 				...process,
 				blueprintId: blueprint.id,
 			})),
 		)
 		.returning({
-			insertedId: schema.processes.id,
-			nodeId: schema.processes.nodeId,
+			insertedId: stepsSchema.id,
+			nodeId: stepsSchema.nodeId,
 		});
 	const dataEdges = blueprint.edges.filter(
 		({ edgeType }) => edgeType === "data",
@@ -77,7 +77,7 @@ export const POST = async (
 		triggerId: handle.id,
 	});
 
-	const agentProcess: AgentProcess = {
+	const agentProcess: AgentRequest = {
 		agent: {
 			id: blueprint.agent.id,
 			blueprint: {
@@ -111,7 +111,7 @@ export const GET = async (
 	req: Request,
 	{ params }: { params: { urlId: string } },
 ) => {
-	const agentProcess = await getAgentProcess(params.urlId);
+	const agentProcess = await getAgentRequest(params.urlId);
 
 	return NextResponse.json(agentProcess);
 };

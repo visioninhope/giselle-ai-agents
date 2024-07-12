@@ -2,84 +2,73 @@ import { db } from "@/drizzle/db";
 import * as schema from "@/drizzle/schema";
 import { asc, desc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import { getAgentWithLatestBlueprint } from "../[urlId]/_helpers/get-blueprint";
-import type { AgentProcess } from "../models/agent-process";
+import type { AgentRequest } from "../models/agent-process";
 
-/** @todo Get a specific run */
-export const getAgentProcess = async (urlId: string): Promise<AgentProcess> => {
-	const agent = await getAgentWithLatestBlueprint(urlId);
+export const getAgentRequest = async (
+	requestId: number,
+): Promise<AgentRequest> => {
+	const request = await db.query.requests.findFirst({
+		columns: {
+			blueprintId: true,
+
+			id: true,
+			status: true,
+		},
+		where: eq(schema.requests.id, requestId),
+	});
+	invariant(request != null, `Request not found with id: ${request}`);
+	const blueprintId = request.blueprintId;
+
 	const nodes = await db.query.nodes.findMany({
 		columns: {
 			id: true,
 			type: true,
 		},
-		where: eq(schema.nodes.blueprintId, agent.latestBlueprint.id),
+		where: eq(schema.nodes.blueprintId, blueprintId),
 	});
-	const processes = await db.query.processes.findMany({
+	const steps = await db.query.steps.findMany({
 		columns: {
 			id: true,
 			nodeId: true,
 		},
-		where: eq(schema.processes.blueprintId, agent.latestBlueprint.id),
-		orderBy: asc(schema.processes.order),
+		where: eq(schema.steps.blueprintId, blueprintId),
+		orderBy: asc(schema.steps.order),
 	});
-	const latestRun = await db.query.runs.findFirst({
+	const requestSteps = await db.query.requestStep.findMany({
 		columns: {
 			id: true,
+			stepId: true,
 			status: true,
 		},
-		where: eq(schema.runs.blueprintId, agent.latestBlueprint.id),
-		orderBy: desc(schema.runs.createdAt),
+		where: eq(schema.requestStep.runId, request.id),
 	});
-	console.log({ latestRun });
-	const latestRunProcesses =
-		latestRun == null
-			? []
-			: await db.query.runProcesses.findMany({
-					columns: {
-						id: true,
-						processId: true,
-						status: true,
-					},
-					where: eq(schema.runProcesses.runId, latestRun.id),
-				});
-	console.log({ nodes, latestRunProcesses });
-	const latestRunProcessesWithNodes = processes.map(({ id, nodeId }) => {
+	const requestStepsWithNode = steps.map(({ id, nodeId }) => {
 		const node = nodes.find((n) => n.id === nodeId);
-		const latestRunProcess = latestRunProcesses.find(
-			(runProcess) => runProcess.processId === id,
+		const requestStep = requestSteps.find(
+			(runProcess) => runProcess.stepId === id,
 		);
 		invariant(node != null, `No node found for process ${id}`);
-		invariant(
-			latestRunProcess != null,
-			`No run process found for process ${id}`,
-		);
+		invariant(requestStep != null, `No run process found for process ${id}`);
 		return {
 			id,
 			node: {
 				id: node.id,
 				type: node.type,
 			},
-			status: latestRunProcess.status,
+			status: requestStep.status,
 			run: {
-				id: latestRunProcess.id,
+				id: requestStep.id,
 			},
 		};
 	});
 	return {
-		agent: {
-			id: agent.id,
+		request: {
 			blueprint: {
-				id: agent.latestBlueprint.id,
+				id: blueprintId,
 			},
+			id: request.id,
+			status: request.status,
+			processes: requestStepsWithNode,
 		},
-		run:
-			latestRun == null
-				? null
-				: {
-						id: latestRun.id,
-						status: latestRun.status,
-						processes: latestRunProcessesWithNodes,
-					},
 	};
 };

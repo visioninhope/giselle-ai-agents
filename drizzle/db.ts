@@ -5,9 +5,9 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 import invariant from "tiny-invariant";
 import * as schema from "./schema";
 import {
+	requestStep,
+	requests,
 	runDataKnotMessages,
-	runProcesses,
-	runs,
 	stepDataKnots as stepDataKnotsSchema,
 	stepStrands as stepStrandsSchema,
 } from "./schema";
@@ -103,26 +103,24 @@ export const findWorkspaceBySlug = async (uniqueIdentifyingString: string) => {
 export const updateRun = async (
 	runId: number,
 	updateValues: Pick<
-		typeof runs.$inferInsert,
+		typeof requests.$inferInsert,
 		"status" | "startedAt" | "finishedAt"
 	>,
 ) => {
-	await db.update(runs).set(updateValues).where(eq(runs.id, runId));
+	await db.update(requests).set(updateValues).where(eq(requests.id, runId));
 };
 export const updateRunStep = async (
 	runId: number,
 	stepId: number,
 	updateValues: Pick<
-		typeof runProcesses.$inferInsert,
+		typeof requestStep.$inferInsert,
 		"status" | "startedAt" | "finishedAt"
 	>,
 ) => {
 	await db
-		.update(runProcesses)
+		.update(requestStep)
 		.set(updateValues)
-		.where(
-			and(eq(runProcesses.runId, runId), eq(runProcesses.processId, stepId)),
-		);
+		.where(and(eq(requestStep.runId, runId), eq(requestStep.stepId, stepId)));
 };
 
 export const pullMessage = async (dataKnotId: number, runId: number) => {

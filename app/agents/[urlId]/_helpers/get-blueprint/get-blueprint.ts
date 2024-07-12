@@ -92,6 +92,9 @@ export const getBlueprint = async (
 			id: agent.id,
 			urlId: agent.urlId,
 		},
+		version: agent.latestBlueprint.version,
+		dirty: agent.latestBlueprint.dirty,
+		builded: agent.latestBlueprint.builded,
 		nodes,
 		edges,
 	};

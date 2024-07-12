@@ -20,6 +20,9 @@ export type Blueprint = {
 	id: number;
 	nodes: Node[];
 	edges: Edge[];
+	version: number;
+	dirty: boolean;
+	builded: boolean;
 };
 
 type AssertNode = (input: unknown) => asserts input is Node;
