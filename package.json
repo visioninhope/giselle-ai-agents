@@ -5,7 +5,7 @@
 	"scripts": {
 		"dev": "turbo dev:next.js dev:trigger.dev dev:drizzle",
 		"dev:next.js": "next dev",
-		"dev:trigger.dev": "bunx trigger.dev@3.0.0-beta.45 dev",
+		"dev:trigger.dev": "bunx trigger.dev@3.0.0-beta.48 dev",
 		"dev:drizzle": "bunx drizzle-kit studio",
 		"build": "next build",
 		"start": "next start",
