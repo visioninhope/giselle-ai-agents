@@ -41,7 +41,6 @@ export const useEditor = (request: AgentRequest["request"] | undefined) => {
 			const relevantRequestStep = request?.steps.find(
 				(step) => step.node.id === node.id,
 			);
-			console.log(relevantRequestStep);
 			return {
 				id: `${node.id}`,
 				type: NodeTypes.V3,
