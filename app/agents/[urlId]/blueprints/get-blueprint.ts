@@ -64,12 +64,26 @@ export const getBlueprint = async (
 		);
 		return {
 			...node,
-			inputPorts: inputPorts.map(({ id, name, type }) => ({ id, name, type })),
-			outputPorts: outputPorts.map(({ id, name, type }) => ({
-				id,
-				name,
-				type,
-			})),
+			inputPorts: inputPorts.map(
+				({ id, name, type, direction, order, nodeId }) => ({
+					id,
+					name,
+					type,
+					direction,
+					order,
+					nodeId,
+				}),
+			),
+			outputPorts: outputPorts.map(
+				({ id, name, type, direction, order, nodeId }) => ({
+					id,
+					name,
+					type,
+					direction,
+					order,
+					nodeId,
+				}),
+			),
 		};
 	});
 	const originalEdges = await db.query.edges.findMany({

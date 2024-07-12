@@ -3,7 +3,10 @@ import type * as schema from "@/drizzle/schema";
 type DbNode = typeof schema.nodes.$inferSelect;
 type DbPort = typeof schema.ports.$inferSelect;
 type DbEdge = typeof schema.edges.$inferSelect;
-type Port = Pick<DbPort, "id" | "type" | "name">;
+type Port = Pick<
+	DbPort,
+	"id" | "nodeId" | "type" | "name" | "direction" | "order"
+>;
 export type Node = Pick<DbNode, "id" | "position" | "type"> & {
 	inputPorts: Port[];
 	outputPorts: Port[];
