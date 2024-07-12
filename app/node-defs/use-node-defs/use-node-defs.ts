@@ -1,3 +1,5 @@
+"use client";
+
 import type { GET } from "@/app/node-defs/use-node-defs/route";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";

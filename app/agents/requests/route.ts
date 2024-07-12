@@ -18,7 +18,7 @@ type AssertPayload = (value: unknown) => asserts value is Payload;
 /** @todo */
 const assertPayload: AssertPayload = () => {};
 export const POST = async (req: Request) => {
-	const json = req.json();
+	const json = await req.json();
 	assertPayload(json);
 	const steps = await db.query.steps.findMany({
 		where: eq(stepsSchema.blueprintId, json.blueprintId),
@@ -31,6 +31,8 @@ export const POST = async (req: Request) => {
 			status: "creating",
 		})
 		.returning({ id: requestsSchema.id });
+	console.log("3");
+	console.log({ steps });
 	await db.insert(requestStepSchema).values(
 		steps.map<typeof requestStepSchema.$inferInsert>(({ id }) => ({
 			requestId: request.id,
@@ -38,6 +40,7 @@ export const POST = async (req: Request) => {
 			status: "idle",
 		})),
 	);
+	console.log("4");
 	const handle = await invokeTask.trigger({
 		requestId: request.id,
 	});

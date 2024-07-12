@@ -1,3 +1,5 @@
+"use client";
+
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useState } from "react";

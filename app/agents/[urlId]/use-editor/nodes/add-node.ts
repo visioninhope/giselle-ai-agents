@@ -18,13 +18,19 @@ export const createDraftNode = ({
 	type: nodeType,
 	inputPorts: (nodeDef.inputPorts ?? []).map(({ type, label }, index) => ({
 		id: index,
+		nodeId: 0,
 		type: type,
 		name: label ?? "",
+		direction: "input",
+		order: index,
 	})),
 	outputPorts: (nodeDef.outputPorts ?? []).map(({ type, label }, index) => ({
 		id: index,
+		nodeId: 0,
 		type: type,
 		name: label ?? "",
+		direction: "output",
+		order: index,
 	})),
 });
 
