@@ -36,7 +36,7 @@ export const createDraftNode = ({
 
 export const execApi = async (blueprint: Blueprint, addNode: Node) => {
 	const { node } = await fetch(
-		`/agents/${blueprint.agent.urlId}/use-editor/nodes`,
+		`/agents/${blueprint.agent.urlId}/editor/nodes`,
 		{
 			method: "POST",
 			body: JSON.stringify({ node: addNode }),

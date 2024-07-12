@@ -18,12 +18,10 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import { useBlueprint } from "./blueprints";
-import { EditorDropdownMenu } from "./editor-dropdown-menu";
+import { EditorDropdownMenu, useContextMenu, useEditor } from "./editor";
 import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
-import { useContextMenu } from "./use-context-menu";
-import { useEditor } from "./use-editor";
 
 const contexts: Context[] = [
 	{

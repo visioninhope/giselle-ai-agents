@@ -12,13 +12,10 @@ export const execApi = async (
 	blueprint: Blueprint,
 	deleteNodeIds: number[],
 ) => {
-	const json = await fetch(
-		`/agents/${blueprint.agent.urlId}/use-editor/nodes`,
-		{
-			method: "DELETE",
-			body: JSON.stringify({ deleteNodeIds }),
-		},
-	).then((res) => res.json());
+	const json = await fetch(`/agents/${blueprint.agent.urlId}/editor/nodes`, {
+		method: "DELETE",
+		body: JSON.stringify({ deleteNodeIds }),
+	}).then((res) => res.json());
 	assertExpectResponsePayload(json);
 
 	return json;
