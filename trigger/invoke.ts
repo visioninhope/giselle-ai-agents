@@ -1,5 +1,4 @@
-import type { RequestStep } from "@/app/agents/models/agent-process";
-import { getAgentRequest } from "@/app/agents/queries/get-agent-process";
+import { type RequestStep, getAgentRequest } from "@/app/agents/requests";
 import {
 	leaveMessage,
 	pullMessages,
@@ -9,25 +8,24 @@ import {
 import { logger, task, wait } from "@trigger.dev/sdk/v3";
 
 type InvokeTaskPayload = {
-	runId: number;
-	agentUrlId: string;
+	requestId: number;
 };
 
 export const invokeTask = task({
 	id: "invoke",
 	run: async (payload: InvokeTaskPayload, { ctx }) => {
 		logger.log("start workflow", { payload, ctx });
-		await updateRun(payload.runId, {
+		await updateRun(payload.requestId, {
 			status: "running",
 			startedAt: new Date(),
 		});
-		const agentProcess = await getAgentRequest(payload.agentUrlId);
+		const agentProcess = await getAgentRequest(payload.requestId);
 		if (agentProcess.run == null) {
 			throw new Error("No run found");
 		}
 
 		for (const process of agentProcess.run.processes) {
-			await updateRunStep(payload.runId, process.id, {
+			await updateRunStep(payload.requestId, process.id, {
 				status: "running",
 				startedAt: new Date(),
 			});
@@ -40,13 +38,13 @@ export const invokeTask = task({
 			}
 			await wait.for({ seconds: 5 });
 			logger.log(`${process.node.type} finished!!`);
-			await updateRunStep(payload.runId, process.id, {
+			await updateRunStep(payload.requestId, process.id, {
 				status: "success",
 				finishedAt: new Date(),
 			});
 		}
 
-		await updateRun(payload.runId, {
+		await updateRun(payload.requestId, {
 			status: "success",
 			finishedAt: new Date(),
 		});

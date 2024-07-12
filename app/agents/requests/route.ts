@@ -1,5 +1,4 @@
 import type { AgentRequest } from "@/app/agents/models/agent-process";
-import { getAgentRequest } from "@/app/agents/queries/get-agent-process";
 import { db, steps as stepsSchema } from "@/drizzle";
 import * as schema from "@/drizzle/schema";
 import { invokeTask } from "@/trigger/invoke";
@@ -68,7 +67,7 @@ export const POST = async (
 		),
 	);
 	const handle = await invokeTask.trigger({
-		runId: insertedRun.insertedId,
+		requestId: insertedRun.insertedId,
 		agentUrlId: params.urlId,
 	});
 
@@ -104,14 +103,5 @@ export const POST = async (
 			}),
 		},
 	};
-	return NextResponse.json(agentProcess);
-};
-
-export const GET = async (
-	req: Request,
-	{ params }: { params: { urlId: string } },
-) => {
-	const agentProcess = await getAgentRequest(params.urlId);
-
 	return NextResponse.json(agentProcess);
 };
