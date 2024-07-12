@@ -20,6 +20,7 @@ import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import { useBlueprint } from "./blueprints";
 import { EditorDropdownMenu, useContextMenu, useEditor } from "./editor";
 import { useNodeTypes } from "./node";
+import { RequestLogger } from "./request-logger";
 import type { Context } from "./strcture";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 
@@ -52,7 +53,7 @@ const WorkflowEditor: FC = () => {
 	const { buildCurrent } = useBlueprint();
 	const { sendRequest, request } = useRequest();
 	const { editorState, addNode, deleteNodes, connectNodes, deleteEdges } =
-		useEditor();
+		useEditor(request);
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -200,11 +201,7 @@ const WorkflowEditor: FC = () => {
 									<Controls />
 									{request && (
 										<Panel position="top-right">
-											hello
-											{/* <WorkflowRunner
-												status={runningAgent.latestRun.status}
-												steps={runningAgent.steps}
-											/> */}
+											<RequestLogger request={request} />
 										</Panel>
 									)}
 

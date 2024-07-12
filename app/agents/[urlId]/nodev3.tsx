@@ -8,18 +8,18 @@ type NodeData = {
 	nodeType: string;
 	inputPorts: (typeof ports.$inferSelect)[];
 	outputPorts: (typeof ports.$inferSelect)[];
-	runStatus?: RequestStepStatus;
+	stepStatus?: RequestStepStatus;
 };
 export const NodeV3: FC<NodeProps<NodeData>> = ({
 	selected,
-	data: { nodeType, inputPorts, outputPorts, runStatus },
+	data: { nodeType, inputPorts, outputPorts, stepStatus },
 }) => {
 	return (
 		<>
 			{selected && <NodeResizer minWidth={100} minHeight={30} />}
 			<div
 				className={nodeVariant({
-					runStatus: runStatus,
+					stepStatus,
 				})}
 			>
 				<div className={headerVariant()}>
@@ -69,7 +69,7 @@ const nodeVariant = cva({
 			action: "rounded",
 			context: "rounded-full",
 		},
-		runStatus: {
+		stepStatus: {
 			idle: "border-border",
 			running: " border-blue-500",
 			success: "border-green-700",
@@ -77,7 +77,7 @@ const nodeVariant = cva({
 		},
 	},
 	defaultVariants: {
-		runStatus: "idle",
+		stepStatus: "idle",
 	},
 });
 

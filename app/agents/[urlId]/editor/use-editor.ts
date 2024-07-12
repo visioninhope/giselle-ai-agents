@@ -1,4 +1,4 @@
-import { useRequest } from "@/app/agents/requests";
+import { type AgentRequest, useRequest } from "@/app/agents/requests";
 import { type NodeType, findNodeDef, useNodeDefs } from "@/app/node-defs";
 import { useCallback, useMemo } from "react";
 import type { Edge, Node } from "reactflow";
@@ -30,9 +30,8 @@ type ConnectNodesArgs = {
 	};
 };
 type DeleteEdgesArgs = number[];
-export const useEditor = () => {
+export const useEditor = (request: AgentRequest["request"] | undefined) => {
 	const { mutateBlueprint, blueprint } = useBlueprint();
-	const { request } = useRequest();
 	const { nodeDefs } = useNodeDefs();
 	const editorState = useMemo<EditorState>(() => {
 		if (blueprint == null) {
@@ -42,6 +41,7 @@ export const useEditor = () => {
 			const relevantRequestStep = request?.steps.find(
 				(step) => step.node.id === node.id,
 			);
+			console.log(relevantRequestStep);
 			return {
 				id: `${node.id}`,
 				type: NodeTypes.V3,
@@ -49,7 +49,7 @@ export const useEditor = () => {
 				data: {
 					id: `${node.id}`,
 					nodeType: node.type,
-					runStatus: relevantRequestStep?.status,
+					stepStatus: relevantRequestStep?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,
 				},

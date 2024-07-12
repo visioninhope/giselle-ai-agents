@@ -47,7 +47,7 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 	</div>
 );
 
-export const AgentProcessLogger: FC<AgentRequest> = ({ request }) => {
+export const RequestLogger: FC<AgentRequest> = ({ request }) => {
 	return (
 		<div className="bg-background/50 border border-border w-[200px] text-sm">
 			<div className="px-4 py-1 border-b">
