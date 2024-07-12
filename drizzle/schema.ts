@@ -1,4 +1,5 @@
 import {
+	boolean,
 	integer,
 	jsonb,
 	pgTable,
@@ -9,25 +10,36 @@ import {
 	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
-export const workspaces = pgTable(
-	"workspaces",
+export const agents = pgTable(
+	"agents",
 	{
 		id: serial("id").primaryKey(),
-		slug: text("slug").notNull(),
+		name: text("name"),
+		urlId: text("url_id").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
-	(workspaces) => {
+	(agents) => {
 		return {
-			uniqueIdx: uniqueIndex("unique_idx").on(workspaces.slug),
+			uniqueIdx: uniqueIndex("unique_idx").on(agents.urlId),
 		};
 	},
 );
 
+export const blueprints = pgTable("blueprints", {
+	id: serial("id").primaryKey(),
+	agentId: integer("agent_id")
+		.notNull()
+		.references(() => agents.id),
+	version: integer("version").notNull(),
+	dirty: boolean("dirty").notNull().default(false),
+	builded: boolean("builded").notNull().default(false),
+});
+
 export const nodes = pgTable("nodes", {
 	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workspaces.id),
+		.references(() => blueprints.id),
 	type: text("type").notNull(),
 	position: jsonb("position").$type<{ x: number; y: number }>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
@@ -39,7 +51,7 @@ export const ports = pgTable("ports", {
 	id: serial("id").primaryKey(),
 	nodeId: integer("node_id")
 		.notNull()
-		.references(() => nodes.id),
+		.references(() => nodes.id, { onDelete: "cascade" }),
 	name: text("name").notNull(),
 	direction: text("direction").$type<PortDirection>().notNull(),
 	type: text("type").$type<PortType>().notNull(),
@@ -49,31 +61,23 @@ export const ports = pgTable("ports", {
 type EdgeType = "data" | "execution";
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workspaces.id),
+		.references(() => blueprints.id),
 	inputPortId: integer("input_port_id")
 		.notNull()
-		.references(() => ports.id),
+		.references(() => ports.id, { onDelete: "cascade" }),
 	outputPortId: integer("output_port_id")
 		.notNull()
-		.references(() => ports.id),
+		.references(() => ports.id, { onDelete: "cascade" }),
 	edgeType: text("edge_type").$type<EdgeType>().notNull(),
-});
-
-export const workflows = pgTable("workflows", {
-	id: serial("id").primaryKey(),
-	workspaceId: integer("workspace_id")
-		.notNull()
-		.references(() => workspaces.id),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const steps = pgTable("steps", {
 	id: serial("id").primaryKey(),
-	workflowId: integer("workflow_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workflows.id),
+		.references(() => blueprints.id),
 	nodeId: integer("node_id")
 		.notNull()
 		.references(() => nodes.id),
@@ -99,27 +103,27 @@ export const dataRoutes = pgTable("data_routes", {
 });
 
 export type RunStatus = "creating" | "running" | "success" | "failed";
-export const runs = pgTable("runs", {
+export const requests = pgTable("requests", {
 	id: serial("id").primaryKey(),
-	workflowId: integer("workflow_id")
+	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => workflows.id),
+		.references(() => blueprints.id),
 	status: text("status").$type<RunStatus>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
 
-export type RunStepStatus = "idle" | "running" | "success" | "failed";
-export const runSteps = pgTable("run_steps", {
+export type RequestStepStatus = "idle" | "running" | "success" | "failed";
+export const requestStep = pgTable("request_steps", {
 	id: serial("id").primaryKey(),
-	runId: integer("run_id")
+	requestId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
+		.references(() => requests.id),
 	stepId: integer("step_id")
 		.notNull()
 		.references(() => steps.id),
-	status: text("status").$type<RunStepStatus>().notNull(),
+	status: text("status").$type<RequestStepStatus>().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
@@ -128,7 +132,7 @@ export const runDataKnotMessages = pgTable("run_data_knot_messages", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
+		.references(() => requests.id),
 	dataKnotId: integer("data_knot_id")
 		.notNull()
 		.references(() => dataKnots.id),
@@ -139,7 +143,7 @@ export const runTriggerRelations = pgTable("run_trigger_relations", {
 	id: serial("id").primaryKey(),
 	runId: integer("run_id")
 		.notNull()
-		.references(() => runs.id),
+		.references(() => requests.id),
 	triggerId: text("trigger_id").notNull(),
 });
 

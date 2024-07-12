@@ -5,9 +5,9 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 import invariant from "tiny-invariant";
 import * as schema from "./schema";
 import {
+	requestStep,
+	requests,
 	runDataKnotMessages,
-	runSteps,
-	runs,
 	stepDataKnots as stepDataKnotsSchema,
 	stepStrands as stepStrandsSchema,
 } from "./schema";
@@ -15,7 +15,24 @@ import {
 export const db = drizzle(sql, { schema });
 
 export const getWorkflows = async () => {
-	return db.query.workspaces.findMany();
+	return db.query.agents.findMany();
+};
+
+/**
+ * @todo Get it in a single query by using a view or join
+ */
+export const getWorkspaceWithLatestWorkspaceHistory = async (
+	uniqueIdentifyingString: string,
+) => {
+	const workspace = await db.query.agents.findFirst({
+		where: eq(schema.agents.urlId, uniqueIdentifyingString),
+	});
+	invariant(workspace != null, "Workspace not found");
+	const latestWorkspaceHistory = await db.query.blueprints.findFirst({
+		where: eq(schema.blueprints.agentId, workspace.id),
+	});
+	invariant(latestWorkspaceHistory != null, "Workspace history not found");
+	return { ...workspace, latestWorkspaceHistory };
 };
 
 export type WorkspaceWithNodeAndEdge = Awaited<
@@ -23,26 +40,28 @@ export type WorkspaceWithNodeAndEdge = Awaited<
 >;
 export type EdgeWithPort = WorkspaceWithNodeAndEdge["edges"][0];
 export type NodeWithPort = WorkspaceWithNodeAndEdge["nodes"][0];
-export const findWorkspaceBySlug = async (slug: string) => {
-	const workflow = await db.query.workspaces.findFirst({
-		where: eq(schema.workspaces.slug, slug),
-	});
-	invariant(workflow != null, "Workflow not found");
+export const findWorkspaceBySlug = async (uniqueIdentifyingString: string) => {
+	const workspace = await getWorkspaceWithLatestWorkspaceHistory(
+		uniqueIdentifyingString,
+	);
 	const originalNodes = await db.query.nodes.findMany({
 		columns: {
 			id: true,
 			type: true,
 			position: true,
 		},
-		where: eq(schema.nodes.workspaceId, workflow.id),
+		where: eq(schema.nodes.blueprintId, workspace.latestWorkspaceHistory.id),
 	});
-	const ports = await db.query.ports.findMany({
-		where: inArray(
-			schema.ports.nodeId,
-			originalNodes.map((node) => node.id),
-		),
-		orderBy: asc(schema.ports.order),
-	});
+	const ports =
+		originalNodes.length === 0
+			? []
+			: await db.query.ports.findMany({
+					where: inArray(
+						schema.ports.nodeId,
+						originalNodes.map((node) => node.id),
+					),
+					orderBy: asc(schema.ports.order),
+				});
 	const nodes = originalNodes.map((node) => {
 		const inputPorts = ports.filter(
 			({ nodeId, direction }) => nodeId === node.id && direction === "input",
@@ -61,7 +80,7 @@ export const findWorkspaceBySlug = async (slug: string) => {
 		};
 	});
 	const originalEdges = await db.query.edges.findMany({
-		where: eq(schema.edges.workspaceId, workflow.id),
+		where: eq(schema.edges.blueprintId, workspace.latestWorkspaceHistory.id),
 	});
 	const edges = originalEdges.map((edge) => {
 		const inputPort = ports.find((port) => port.id === edge.inputPortId);
@@ -75,7 +94,7 @@ export const findWorkspaceBySlug = async (slug: string) => {
 		};
 	});
 	return {
-		...workflow,
+		...workspace,
 		nodes,
 		edges,
 	};
@@ -84,24 +103,26 @@ export const findWorkspaceBySlug = async (slug: string) => {
 export const updateRun = async (
 	runId: number,
 	updateValues: Pick<
-		typeof runs.$inferInsert,
+		typeof requests.$inferInsert,
 		"status" | "startedAt" | "finishedAt"
 	>,
 ) => {
-	await db.update(runs).set(updateValues).where(eq(runs.id, runId));
+	await db.update(requests).set(updateValues).where(eq(requests.id, runId));
 };
 export const updateRunStep = async (
 	runId: number,
 	stepId: number,
 	updateValues: Pick<
-		typeof runSteps.$inferInsert,
+		typeof requestStep.$inferInsert,
 		"status" | "startedAt" | "finishedAt"
 	>,
 ) => {
 	await db
-		.update(runSteps)
+		.update(requestStep)
 		.set(updateValues)
-		.where(and(eq(runSteps.runId, runId), eq(runSteps.stepId, stepId)));
+		.where(
+			and(eq(requestStep.requestId, runId), eq(requestStep.stepId, stepId)),
+		);
 };
 
 export const pullMessage = async (dataKnotId: number, runId: number) => {
