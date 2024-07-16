@@ -35,7 +35,7 @@ export const useDeleteNodesAction = (blueprintId: number | undefined) => {
 };
 
 const execApi = (blueprintId: number, payload: Payload) =>
-	fetch(`/agents/blueprints/${blueprintId}/nodes/delete-nodes`, {
+	fetch(`/agents/blueprints/${blueprintId}/delete-nodes`, {
 		method: "DELETE",
 		body: JSON.stringify(payload),
 	});

@@ -1,16 +1,14 @@
 import {
 	useAddEdgeAction,
+	useAddNodeAction,
 	useBlueprint,
 	useDeleteEdgesAction,
+	useDeleteNodesAction,
+	useUpdateNodesPositionAction,
 } from "@/app/agents/blueprints";
 import type { AgentRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
-import {
-	useAddNodeAction,
-	useDeleteNodesAction,
-	useUpdateNodesPositionAction,
-} from "../nodes/";
 
 export const useEditor = (
 	blueprintId: number | undefined,

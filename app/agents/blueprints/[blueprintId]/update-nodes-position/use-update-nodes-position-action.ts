@@ -1,6 +1,5 @@
-import { useBlueprint } from "@/app/agents/blueprints";
+import { type Node, useBlueprint } from "@/app/agents/blueprints";
 import { useCallback } from "react";
-import type { Node } from "../../../";
 import type { Payload } from "./route";
 
 export const useUpdateNodesPositionAction = (
@@ -34,7 +33,7 @@ export const useUpdateNodesPositionAction = (
 };
 
 const execApi = (blueprintId: number, payload: Payload) =>
-	fetch(`/agents/blueprints/${blueprintId}/nodes/update-nodes-position`, {
+	fetch(`/agents/blueprints/${blueprintId}/update-nodes-position`, {
 		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json",

@@ -1,8 +1,7 @@
-import { useBlueprint } from "@/app/agents/blueprints";
+import { type Node, useBlueprint } from "@/app/agents/blueprints";
 import { findNodeDef, useNodeDefs } from "@/app/node-defs";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
-import type { Node } from "../../../";
 import type { POST, Payload } from "./route";
 
 export const useAddNodeAction = (blueprintId: number | undefined) => {
@@ -65,7 +64,7 @@ type AssertApiResponseJson = (
 ) => asserts json is InferResponse<typeof POST>;
 const assertApiResponseJson: AssertApiResponseJson = (json) => {};
 const execApi = async (blueprintId: number, payload: Payload) => {
-	const json = await fetch(`/agents/blueprints/${blueprintId}/nodes/add-node`, {
+	const json = await fetch(`/agents/blueprints/${blueprintId}/add-node`, {
 		method: "POST",
 		body: JSON.stringify(payload),
 	}).then((res) => res.json());
