@@ -1,7 +1,7 @@
 import type { RequestStepStatus } from "@/drizzle/schema";
+import { Handle, type Node, Position } from "@xyflow/react";
 import { cva } from "cva";
 import { type FC, useMemo } from "react";
-import { Handle, type NodeProps, Position } from "reactflow";
 import invariant from "tiny-invariant";
 import { match } from "ts-pattern";
 import { type NodeStructureKey, nodeStructures } from "./node-list";
@@ -55,7 +55,7 @@ export type NodeData = {
 	inputs?: InputPin[];
 	runStatus?: RequestStepStatus;
 };
-export const NodeV2: FC<NodeProps<NodeData>> = ({ data }) => {
+export const NodeV2: FC<Node<NodeData>> = ({ data }) => {
 	const nodeStructure = nodeStructures.find(
 		(nodeStructure) => nodeStructure.key === data.structureKey,
 	);

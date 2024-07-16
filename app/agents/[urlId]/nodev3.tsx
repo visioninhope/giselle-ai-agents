@@ -1,7 +1,13 @@
 import type { RequestStepStatus, ports } from "@/drizzle/schema";
+import {
+	Handle,
+	type Node,
+	type NodeProps,
+	NodeResizer,
+	Position,
+} from "@xyflow/react";
 import { cva } from "cva";
 import type { FC } from "react";
-import { Handle, type NodeProps, NodeResizer, Position } from "reactflow";
 
 type NodeData = {
 	id: string;
@@ -10,7 +16,8 @@ type NodeData = {
 	outputPorts: (typeof ports.$inferSelect)[];
 	stepStatus?: RequestStepStatus;
 };
-export const NodeV3: FC<NodeProps<NodeData>> = ({
+type NodeV3 = Node<NodeData>;
+export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
 	data: { nodeType, inputPorts, outputPorts, stepStatus },
 }) => {

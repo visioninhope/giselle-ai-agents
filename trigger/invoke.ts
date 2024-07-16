@@ -1,4 +1,4 @@
-import { type RequestStep, getAgentRequest } from "@/app/agents/requests";
+import { type RequestStep, getRequest } from "@/app/agents/requests";
 import {
 	leaveMessage,
 	pullMessages,
@@ -19,12 +19,12 @@ export const invokeTask = task({
 			status: "running",
 			startedAt: new Date(),
 		});
-		const agentProcess = await getAgentRequest(payload.requestId);
-		if (agentProcess.request == null) {
+		const request = await getRequest(payload.requestId);
+		if (request == null) {
 			throw new Error("No run found");
 		}
 
-		for (const step of agentProcess.request.steps) {
+		for (const step of request.steps) {
 			await updateRunStep(payload.requestId, step.id, {
 				status: "running",
 				startedAt: new Date(),

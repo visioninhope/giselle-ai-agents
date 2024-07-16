@@ -6,9 +6,9 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Handle, type Node, type NodeTypes, Position } from "@xyflow/react";
 import { cva } from "cva";
 import { type FC, type ReactNode, useMemo } from "react";
-import { Handle, type NodeProps, Position } from "reactflow";
 import { NodeV2 } from "./nodev2";
 import { NodeV3 } from "./nodev3";
 
@@ -51,7 +51,7 @@ const NodeContainer: FC<{ title: string; children: ReactNode }> = ({
 	</div>
 );
 
-const LoopNode: FC<NodeProps> = () => {
+const LoopNode: FC<Node> = () => {
 	return (
 		<NodeContainer title="Loop">
 			<div className="flex gap-8 items-start w-full justify-between mb-2">
@@ -109,7 +109,7 @@ const LoopNode: FC<NodeProps> = () => {
 	);
 };
 
-const GetContextNode: FC<NodeProps> = () => {
+const GetContextNode: FC<Node> = () => {
 	return (
 		<NodeContainer title="GetContext">
 			<div className="flex flex-col gap-2">
@@ -141,7 +141,7 @@ const GetContextNode: FC<NodeProps> = () => {
 	);
 };
 
-const SetContextNode: FC<NodeProps> = () => {
+const SetContextNode: FC<Node> = () => {
 	return (
 		<NodeContainer title="SetContext">
 			<div className="flex gap-8 items-start w-full justify-between mb-2">
@@ -192,7 +192,7 @@ const SetContextNode: FC<NodeProps> = () => {
 	);
 };
 
-const LoaderNode: FC<NodeProps> = () => {
+const LoaderNode: FC<Node> = () => {
 	return (
 		<NodeContainer title="Loader">
 			<div className="flex gap-8 items-start w-full justify-between mb-2">
@@ -240,9 +240,7 @@ const LoaderNode: FC<NodeProps> = () => {
 type TextGenerationNodeData = {
 	params?: { name: string }[];
 };
-const TextGenerationNode: FC<NodeProps<TextGenerationNodeData>> = ({
-	data,
-}) => {
+const TextGenerationNode: FC<Node<TextGenerationNodeData>> = ({ data }) => {
 	return (
 		<NodeContainer title="Text Generation">
 			<div className="flex gap-8 items-start w-full justify-between mb-2">
@@ -291,7 +289,7 @@ const TextGenerationNode: FC<NodeProps<TextGenerationNodeData>> = ({
 	);
 };
 
-const TextGenerationResultToTextNode: FC<NodeProps> = () => {
+const TextGenerationResultToTextNode: FC<Node> = () => {
 	return (
 		<NodeContainer title="Text Generation Result to Text">
 			<div className="flex gap-8 items-start w-full justify-between mb-2">
@@ -336,7 +334,7 @@ const TextGenerationResultToTextNode: FC<NodeProps> = () => {
 	);
 };
 
-export const NodeTypes = {
+export const NodeType = {
 	Loop: "loop",
 	GetContext: "getContext",
 	Loader: "loader",
@@ -348,16 +346,9 @@ export const NodeTypes = {
 } as const;
 
 export const useNodeTypes = () =>
-	useMemo(
+	useMemo<NodeTypes>(
 		() => ({
-			[NodeTypes.Loop]: LoopNode,
-			[NodeTypes.GetContext]: GetContextNode,
-			[NodeTypes.Loader]: LoaderNode,
-			[NodeTypes.SetContext]: SetContextNode,
-			[NodeTypes.TextGeneration]: TextGenerationNode,
-			[NodeTypes.TextGenerationResultToText]: TextGenerationResultToTextNode,
-			[NodeTypes.V2]: NodeV2,
-			[NodeTypes.V3]: NodeV3,
+			[NodeType.V3]: NodeV3,
 		}),
 		[],
 	);

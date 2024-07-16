@@ -35,14 +35,25 @@ export const blueprints = pgTable("blueprints", {
 	builded: boolean("builded").notNull().default(false),
 });
 
+type NodePosition = { x: number; y: number };
 export const nodes = pgTable("nodes", {
+	id: serial("id").primaryKey(),
+	agentId: integer("agent_id")
+		.notNull()
+		.references(() => agents.id, { onDelete: "cascade" }),
+	class: text("class").notNull(),
+	position: jsonb("position").$type<NodePosition>().notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const nodesBlueprints = pgTable("nodes_blueprints", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
 		.notNull()
-		.references(() => blueprints.id),
-	type: text("type").notNull(),
-	position: jsonb("position").$type<{ x: number; y: number }>().notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
+		.references(() => blueprints.id, { onDelete: "cascade" }),
+	nodeId: integer("node_id")
+		.notNull()
+		.references(() => nodes.id, { onDelete: "cascade" }),
 });
 
 type PortDirection = "input" | "output";
@@ -61,9 +72,9 @@ export const ports = pgTable("ports", {
 type EdgeType = "data" | "execution";
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
-	blueprintId: integer("blueprint_id")
+	agentId: integer("agent_id")
 		.notNull()
-		.references(() => blueprints.id),
+		.references(() => agents.id, { onDelete: "cascade" }),
 	inputPortId: integer("input_port_id")
 		.notNull()
 		.references(() => ports.id, { onDelete: "cascade" }),
@@ -71,6 +82,16 @@ export const edges = pgTable("edges", {
 		.notNull()
 		.references(() => ports.id, { onDelete: "cascade" }),
 	edgeType: text("edge_type").$type<EdgeType>().notNull(),
+});
+
+export const edgesBlueprints = pgTable("edges_blueprints", {
+	id: serial("id").primaryKey(),
+	blueprintId: integer("blueprint_id")
+		.notNull()
+		.references(() => blueprints.id, { onDelete: "cascade" }),
+	edgeId: integer("edge_id")
+		.notNull()
+		.references(() => edges.id, { onDelete: "cascade" }),
 });
 
 export const steps = pgTable("steps", {
@@ -115,7 +136,7 @@ export const requests = pgTable("requests", {
 });
 
 export type RequestStepStatus = "idle" | "running" | "success" | "failed";
-export const requestStep = pgTable("request_steps", {
+export const requestSteps = pgTable("request_steps", {
 	id: serial("id").primaryKey(),
 	requestId: integer("run_id")
 		.notNull()

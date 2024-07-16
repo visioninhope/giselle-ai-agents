@@ -1,2 +1,1 @@
-export * from "./use-blueprint";
-export * from "./get-blueprint";
+export { useLatestBlueprintGlance } from "./get-latest";

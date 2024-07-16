@@ -7,7 +7,7 @@ type Port = Pick<
 	DbPort,
 	"id" | "nodeId" | "type" | "name" | "direction" | "order"
 >;
-export type Node = Pick<DbNode, "id" | "position" | "type"> & {
+export type Node = Pick<DbNode, "id" | "position" | "class"> & {
 	inputPorts: Port[];
 	outputPorts: Port[];
 };

@@ -1,24 +1,30 @@
 "use client";
 
-import { type FC, useCallback, useRef, useState } from "react";
-import ReactFlow, {
-	Controls,
+import {
 	Background,
 	BackgroundVariant,
+	Controls,
+	Panel,
+	ReactFlow,
 	type ReactFlowInstance,
 	ReactFlowProvider,
-	Panel,
-} from "reactflow";
+} from "@xyflow/react";
+import { type FC, useCallback, useRef, useState } from "react";
 
-import "reactflow/dist/style.css";
+import "@xyflow/react/dist/style.css";
+import {
+	EditorDropdownMenu,
+	useContextMenu,
+	useEditor,
+} from "@/app/agents/blueprints/editor";
 import { useRequest } from "@/app/agents/requests";
 import { type NodeType, useNodeDefs } from "@/app/node-defs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
-import { useBlueprint } from "./blueprints";
-import { EditorDropdownMenu, useContextMenu, useEditor } from "./editor";
+import { useBlueprint, useBuildBlueprintAction } from "../blueprints";
+import { useLatestBlueprintGlance } from "./blueprints";
 import { useNodeTypes } from "./node";
 import { RequestLogger } from "./request-logger";
 import type { Context } from "./strcture";
@@ -50,10 +56,11 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { buildCurrent } = useBlueprint();
-	const { sendRequest, request } = useRequest();
-	const { editorState, addNode, deleteNodes, connectNodes, deleteEdges } =
-		useEditor(request);
+	const { latestBlueprintGlance } = useLatestBlueprintGlance();
+	const { build } = useBuildBlueprintAction(latestBlueprintGlance?.id);
+	const { createRequest, request } = useRequest();
+	const { addNode, updateNodesPosition, deleteNodes, addEdge, deleteEdges } =
+		useEditor(latestBlueprintGlance?.id, request);
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -78,8 +85,10 @@ const WorkflowEditor: FC = () => {
 				y: position.y,
 			});
 			addNode({
-				nodeType: type,
-				position: { x: flowPosition.x, y: flowPosition.y },
+				node: {
+					class: type,
+					position: { x: flowPosition.x, y: flowPosition.y },
+				},
 			});
 		},
 		[hideContextMenu, position, reactFlowInstance, addNode],
@@ -145,8 +154,8 @@ const WorkflowEditor: FC = () => {
 									size={"xs"}
 									className="text-muted-foreground"
 									onClick={() =>
-										buildCurrent().then(({ blueprintId }) =>
-											sendRequest(blueprintId),
+										build().then(({ blueprintId }) =>
+											createRequest({ blueprintId }),
 										)
 									}
 								>
@@ -158,9 +167,14 @@ const WorkflowEditor: FC = () => {
 								<ReactFlow
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
-									nodes={editorState.nodes}
+									defaultNodes={[]}
+									defaultEdges={[]}
 									onNodesDelete={(nodes) => {
-										deleteNodes(nodes.map((node) => Number.parseInt(node.id)));
+										deleteNodes({
+											deleteNodeIds: nodes.map((node) =>
+												Number.parseInt(node.id),
+											),
+										});
 									}}
 									onConnect={({
 										source,
@@ -176,7 +190,7 @@ const WorkflowEditor: FC = () => {
 										) {
 											return;
 										}
-										connectNodes({
+										addEdge({
 											originPort: {
 												id: Number.parseInt(sourceHandle),
 												nodeId: Number.parseInt(source),
@@ -188,11 +202,25 @@ const WorkflowEditor: FC = () => {
 										});
 									}}
 									onEdgesDelete={(edges) => {
-										deleteEdges(edges.map((edge) => Number.parseInt(edge.id)));
+										deleteEdges({
+											deleteEdgeIds: edges.map((edge) =>
+												Number.parseInt(edge.id),
+											),
+										});
 									}}
-									edges={editorState.edges}
 									nodeTypes={nodeTypes}
 									onInit={setReactFlowInstance}
+									onNodeDragStop={(_event, _node, nodes) => {
+										updateNodesPosition({
+											nodes: nodes.map((node) => ({
+												id: Number.parseInt(node.id),
+												position: {
+													x: node.position.x,
+													y: node.position.y,
+												},
+											})),
+										});
+									}}
 								>
 									<Background
 										variant={BackgroundVariant.Dots}

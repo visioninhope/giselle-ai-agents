@@ -13,14 +13,12 @@ export type RequestStep = {
 };
 
 export type AgentRequest = {
-	request: {
-		blueprint: {
-			id: number;
-		};
+	blueprint: {
 		id: number;
-		status: RunStatus;
-		steps: Array<RequestStep>;
 	};
+	id: number;
+	status: RunStatus;
+	steps: Array<RequestStep>;
 };
 
 type AssertAgentRequest = (value: unknown) => asserts value is AgentRequest;

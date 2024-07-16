@@ -1,3 +1,3 @@
 export * from "./agent-request";
-export * from "./get-agent-request";
+export * from "./[requestId]";
 export * from "./use-request";
