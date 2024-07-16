@@ -8,8 +8,6 @@ import {
 import { invokeTask } from "@/trigger/invoke";
 import { asc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
-import invariant from "tiny-invariant";
-import type { AgentRequest } from "../agent-request";
 
 export type Payload = {
 	blueprintId: number;
@@ -20,10 +18,6 @@ const assertPayload: AssertPayload = () => {};
 export const POST = async (req: Request) => {
 	const json = await req.json();
 	assertPayload(json);
-	const steps = await db.query.steps.findMany({
-		where: eq(stepsSchema.blueprintId, json.blueprintId),
-		orderBy: asc(stepsSchema.order),
-	});
 	const [request] = await db
 		.insert(requestsSchema)
 		.values({
@@ -31,6 +25,10 @@ export const POST = async (req: Request) => {
 			status: "creating",
 		})
 		.returning({ id: requestsSchema.id });
+	const steps = await db.query.steps.findMany({
+		where: eq(stepsSchema.blueprintId, json.blueprintId),
+		orderBy: asc(stepsSchema.order),
+	});
 	await db.insert(requestStepSchema).values(
 		steps.map<typeof requestStepSchema.$inferInsert>(({ id }) => ({
 			requestId: request.id,
@@ -47,33 +45,7 @@ export const POST = async (req: Request) => {
 		triggerId: handle.id,
 	});
 
-	const nodes = await db.query.nodes.findMany({
-		columns: {
-			id: true,
-			class: true,
-		},
-		where: eq(stepsSchema.blueprintId, json.blueprintId),
-	});
-	return NextResponse.json<AgentRequest>({
+	return NextResponse.json({
 		id: request.id,
-		blueprint: {
-			id: json.blueprintId,
-		},
-		status: "creating",
-		steps: steps.map(({ id, nodeId }) => {
-			const node = nodes.find(({ id }) => id === nodeId);
-			invariant(node != null, `Node not found: ${nodeId}`);
-			return {
-				id,
-				node: {
-					id: nodeId,
-					type: node.class,
-				},
-				status: "idle",
-				run: {
-					id: request.id,
-				},
-			};
-		}),
 	});
 };

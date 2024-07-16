@@ -9,7 +9,7 @@ const requestKey = (requestId: number | undefined) => {
 	if (requestId == null) {
 		return false;
 	}
-	return `/agents/requests/${requestId}`;
+	return `/agents/requests/${requestId}/get-request`;
 };
 export const useRequestData = (requestId: number | undefined) => {
 	const { data } = useSWR<InferResponse<typeof GET>>(

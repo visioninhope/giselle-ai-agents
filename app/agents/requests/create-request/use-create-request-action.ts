@@ -4,7 +4,7 @@ import type { AgentRequest } from "../agent-request";
 import type { POST, Payload } from "./route";
 
 type UseCreateRequestActionArgs = {
-	onRequestCreated?: (request: AgentRequest) => void;
+	onRequestCreated?: (request: { id: number }) => void;
 };
 export const useCreateRequestAction = (args?: UseCreateRequestActionArgs) => {
 	const [optimisticdata, setOptimisticdata] = useState<
@@ -20,8 +20,8 @@ export const useCreateRequestAction = (args?: UseCreateRequestActionArgs) => {
 				status: "creating",
 				steps: [],
 			});
-			const agentRequest = await execApi(payload);
-			args?.onRequestCreated?.(agentRequest);
+			const createdRequest = await execApi(payload);
+			args?.onRequestCreated?.(createdRequest);
 		},
 		[args],
 	);
