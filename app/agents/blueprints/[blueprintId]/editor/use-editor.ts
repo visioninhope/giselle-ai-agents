@@ -1,8 +1,11 @@
-import { useBlueprint } from "@/app/agents/blueprints";
+import {
+	useAddEdgeAction,
+	useBlueprint,
+	useDeleteEdgesAction,
+} from "@/app/agents/blueprints";
 import type { AgentRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
-import { useAddEdgeAction, useDeleteEdgesAction } from "../edges";
 import {
 	useAddNodeAction,
 	useDeleteNodesAction,

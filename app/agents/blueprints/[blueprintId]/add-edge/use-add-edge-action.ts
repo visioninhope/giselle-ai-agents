@@ -66,7 +66,7 @@ type AssertResponse = (
 /** @todo */
 const assertResponse: AssertResponse = (json) => {};
 const execApi = async (blueprintId: number, payload: Payload) => {
-	const json = await fetch(`/agents/blueprints/${blueprintId}/edges/add-edge`, {
+	const json = await fetch(`/agents/blueprints/${blueprintId}/add-edge`, {
 		method: "POST",
 		body: JSON.stringify(payload),
 	}).then((res) => res.json());

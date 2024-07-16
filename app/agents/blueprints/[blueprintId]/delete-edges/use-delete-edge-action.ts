@@ -35,7 +35,7 @@ export const useDeleteEdgesAction = (blueprintId: number | undefined) => {
 };
 
 const execApi = (blueprintId: number, payload: Payload) =>
-	fetch(`/agents/blueprints/${blueprintId}/edges/delete-edges`, {
+	fetch(`/agents/blueprints/${blueprintId}/delete-edges`, {
 		method: "DELETE",
 		body: JSON.stringify(payload),
 	});
