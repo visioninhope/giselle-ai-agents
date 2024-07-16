@@ -1,6 +1,6 @@
 import type { Port } from "./type";
 
-export const key = "onrequest";
+export const key = "onRequest";
 
 export const label = "On Request";
 

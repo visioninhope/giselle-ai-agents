@@ -8,3 +8,5 @@ export const inputPorts: Port[] = [
 	{ type: "execution" },
 	{ type: "data", label: "User" },
 ];
+
+export const outputPorts: Port[] = [{ type: "execution" }];

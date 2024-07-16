@@ -1,12 +1,18 @@
 import invariant from "tiny-invariant";
 import * as findUser from "./find-user";
 import * as onRequest from "./on-request";
+import * as response from "./response";
 import * as sendMail from "./send-mail";
 import type { NodeDef } from "./type";
 export type { NodeDef } from "./type";
 export * from "./use-node-defs";
 
-export const nodeDefs = [findUser, sendMail, onRequest] satisfies NodeDef[];
+export const nodeDefs = [
+	findUser,
+	sendMail,
+	onRequest,
+	response,
+] satisfies NodeDef[];
 export type NodeType = (typeof nodeDefs)[number]["key"];
 export const getNodeDef = (type: NodeType): NodeDef => {
 	const nodeDef = nodeDefs.find((def) => def.key === type);
