@@ -10,7 +10,7 @@ const key = (blueprintId?: number) => {
 	if (blueprintId == null) {
 		return false;
 	}
-	return `/agents/blueprints/${blueprintId}`;
+	return `/agents/blueprints/${blueprintId}/get-blueprint`;
 };
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateArgs<T extends Promise<any>> = {

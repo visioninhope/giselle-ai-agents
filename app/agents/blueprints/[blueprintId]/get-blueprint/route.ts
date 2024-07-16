@@ -1,8 +1,7 @@
 "use server";
 
-import type { Blueprint } from "@/app/agents/blueprints";
+import { type Blueprint, getBlueprint } from "@/app/agents/blueprints";
 import { NextResponse } from "next/server";
-import { getBlueprint } from "./lib/get-blueprint";
 
 export const GET = async (
 	_req: Request,

@@ -1,6 +1,6 @@
+import { useBlueprint } from "@/app/agents/blueprints";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
-import { useBlueprint } from "../../use-blueprint";
 import type { POST, Payload } from "./route";
 
 type AddEdgeArgs = {

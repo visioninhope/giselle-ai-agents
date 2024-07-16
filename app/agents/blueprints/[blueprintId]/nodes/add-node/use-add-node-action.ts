@@ -1,8 +1,8 @@
+import { useBlueprint } from "@/app/agents/blueprints";
 import { findNodeDef, useNodeDefs } from "@/app/node-defs";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
 import type { Node } from "../../../";
-import { useBlueprint } from "../../use-blueprint";
 import type { POST, Payload } from "./route";
 
 export const useAddNodeAction = (blueprintId: number | undefined) => {

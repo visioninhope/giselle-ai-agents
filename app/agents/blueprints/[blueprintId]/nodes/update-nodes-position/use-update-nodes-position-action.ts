@@ -1,6 +1,6 @@
+import { useBlueprint } from "@/app/agents/blueprints";
 import { useCallback } from "react";
 import type { Node } from "../../../";
-import { useBlueprint } from "../../use-blueprint";
 import type { Payload } from "./route";
 
 export const useUpdateNodesPositionAction = (

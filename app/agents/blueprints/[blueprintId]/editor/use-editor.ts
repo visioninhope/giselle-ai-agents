@@ -1,3 +1,4 @@
+import { useBlueprint } from "@/app/agents/blueprints";
 import type { AgentRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
@@ -7,7 +8,6 @@ import {
 	useDeleteNodesAction,
 	useUpdateNodesPositionAction,
 } from "../nodes/";
-import { useBlueprint } from "../use-blueprint";
 
 export const useEditor = (
 	blueprintId: number | undefined,

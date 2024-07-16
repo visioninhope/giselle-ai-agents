@@ -1,8 +1,8 @@
+import { getBlueprint } from "@/app/agents/blueprints";
 import { blueprints as blueprintsSchema, db } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
-import { getBlueprint } from "../lib/get-blueprint";
 import { buildBlueprint } from "./build-blueprint";
 import { copyBlueprint } from "./copy-blueprint";
 
