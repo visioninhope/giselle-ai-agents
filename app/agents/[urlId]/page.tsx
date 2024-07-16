@@ -12,21 +12,23 @@ import {
 import { type FC, useCallback, useRef, useState } from "react";
 
 import "@xyflow/react/dist/style.css";
+import { type Node, useBuildBlueprintAction } from "@/app/agents/blueprints";
 import {
 	EditorDropdownMenu,
+	NodeModifyPanel,
+	RequestLogger,
 	useContextMenu,
 	useEditor,
 } from "@/app/agents/blueprints/editor";
+import { useNodeSelection } from "@/app/agents/canvas";
 import { useRequest } from "@/app/agents/requests";
 import { type NodeType, useNodeDefs } from "@/app/node-defs";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
-import { useBuildBlueprintAction } from "../blueprints";
 import { useLatestBlueprintGlance } from "./blueprints";
 import { useNodeTypes } from "./node";
-import { RequestLogger } from "./request-logger";
 import type { Context } from "./strcture";
 import { AgentUrlIdProvider } from "./use-agent-url-id";
 
@@ -93,6 +95,8 @@ const WorkflowEditor: FC = () => {
 		},
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
+	const { selectedNodes, addSelectedNodes, removeSelectedNodes } =
+		useNodeSelection(latestBlueprintGlance?.id);
 
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
@@ -167,6 +171,38 @@ const WorkflowEditor: FC = () => {
 								<ReactFlow
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
+									onNodeClick={(_, node) => {
+										if (reactFlowInstance == null) {
+											return;
+										}
+										addSelectedNodes([Number.parseInt(node.id, 10)]);
+									}}
+									onNodesChange={(changeNodes) => {
+										const changeSelectNodes = changeNodes
+											.map((changeNode) => {
+												if (changeNode.type === "select") {
+													return changeNode;
+												}
+												return null;
+											})
+											.filter((changeNode) => changeNode != null);
+										addSelectedNodes(
+											changeSelectNodes
+												.filter((changeSelectNode) => changeSelectNode.selected)
+												.map((selectedNode) =>
+													Number.parseInt(selectedNode.id, 10),
+												),
+										);
+										removeSelectedNodes(
+											changeSelectNodes
+												.filter(
+													(changeSelectNode) => !changeSelectNode.selected,
+												)
+												.map((deselectedNode) =>
+													Number.parseInt(deselectedNode.id, 10),
+												),
+										);
+									}}
 									defaultNodes={[]}
 									defaultEdges={[]}
 									onNodesDelete={(nodes) => {
@@ -227,11 +263,14 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									{request && (
-										<Panel position="top-right">
-											<RequestLogger request={request} />
-										</Panel>
-									)}
+									<Panel position="top-right" className="bottom-0">
+										<div className="flex gap-2 h-full">
+											{request && <RequestLogger request={request} />}
+											<NodeModifyPanel
+												blueprintId={latestBlueprintGlance?.id}
+											/>
+										</div>
+									</Panel>
 
 									{nodeDefs != null && isVisible && (
 										<div
