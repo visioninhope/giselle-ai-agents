@@ -12,7 +12,6 @@ import { eq, sql } from "drizzle-orm";
 
 /** @todo replace with drizzle syntax if drizzle supports `insert into ... select` [#1605](https://github.com/drizzle-team/drizzle-orm/pull/1605) */
 export const copyBlueprint = async (blueprint: Blueprint) => {
-	console.log("a");
 	const [newBlueprint] = await db
 		.insert(blueprints)
 		.values({
