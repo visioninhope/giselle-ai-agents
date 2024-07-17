@@ -10,7 +10,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { AlignLeftIcon, PlusIcon } from "lucide-react";
+import { PlusIcon } from "lucide-react";
 import { type FC, useCallback, useState } from "react";
 import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
 

@@ -1,13 +1,15 @@
 import type { RequestStepStatus, ports } from "@/drizzle/schema";
 import {
-	Handle,
 	type Node,
 	type NodeProps,
 	NodeResizer,
 	Position,
+	Handle as XYFlowHandle,
+	useNodeId,
+	useUpdateNodeInternals,
 } from "@xyflow/react";
 import { cva } from "cva";
-import type { FC } from "react";
+import { type ComponentProps, type FC, useEffect } from "react";
 
 type NodeData = {
 	id: string;
@@ -69,6 +71,17 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	);
 };
 
+const Handle: FC<ComponentProps<typeof XYFlowHandle>> = (props) => {
+	const nodeId = useNodeId();
+	const updateNodeInternals = useUpdateNodeInternals();
+	useEffect(() => {
+		if (nodeId == null) {
+			return;
+		}
+		updateNodeInternals(nodeId);
+	}, [updateNodeInternals, nodeId]);
+	return <XYFlowHandle {...props} />;
+};
 const nodeVariant = cva({
 	base: "bg-card/50 border text-card-foreground min-w-[150px]",
 	variants: {
