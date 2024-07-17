@@ -1,5 +1,5 @@
 import type { Node } from "@/app/agents/blueprints";
-import { type NodeType, getNodeDef } from "@/app/node-defs";
+import { type NodeClassName, getNodeClass } from "@/app/node-classes";
 import {
 	blueprints as blueprintsSchema,
 	db,
@@ -13,7 +13,7 @@ import invariant from "tiny-invariant";
 
 export type Payload = {
 	node: {
-		class: NodeType;
+		className: NodeClassName;
 		position: { x: number; y: number };
 	};
 };
@@ -34,19 +34,19 @@ export const POST = async (
 		where: eq(blueprintsSchema.id, Number.parseInt(params.blueprintId, 10)),
 	});
 	invariant(blueprint != null, `Blueprint not found: ${params.blueprintId}`);
-	const nodeDef = getNodeDef(payload.node.class);
+	const nodeClass = getNodeClass(payload.node.className);
 	const [node] = await db
 		.insert(nodesSchema)
 		.values({
 			agentId: blueprint.agentId,
-			class: nodeDef.key,
+			className: nodeClass.name,
 			position: payload.node.position,
 		})
 		.returning({
 			id: nodesSchema.id,
 		});
 	const inputPorts: (typeof portsSchema.$inferInsert)[] = (
-		nodeDef.inputPorts ?? []
+		nodeClass.inputPorts ?? []
 	).map((port, index) => ({
 		nodeId: node.id,
 		type: port.type,
@@ -55,7 +55,7 @@ export const POST = async (
 		name: port.label ?? "",
 	}));
 	const outputPorts: (typeof portsSchema.$inferInsert)[] = (
-		nodeDef.outputPorts ?? []
+		nodeClass.outputPorts ?? []
 	).map((port, index) => ({
 		nodeId: node.id,
 		type: port.type,
@@ -77,20 +77,19 @@ export const POST = async (
 		.update(blueprintsSchema)
 		.set({ dirty: true })
 		.where(eq(blueprintsSchema.id, Number.parseInt(params.blueprintId)));
-	const returnNode: Node = {
-		id: node.id,
-		position: payload.node.position,
-		class: payload.node.class,
-		inputPorts: inputPorts.map((port, index) => ({
-			...port,
-			id: ports[index].insertedId,
-		})),
-		outputPorts: outputPorts.map((port, index) => ({
-			...port,
-			id: ports[index].insertedId,
-		})),
-	};
-	return NextResponse.json({
-		node: returnNode,
+	return NextResponse.json<{ node: Node }>({
+		node: {
+			id: node.id,
+			position: payload.node.position,
+			className: payload.node.className,
+			inputPorts: inputPorts.map((port, index) => ({
+				...port,
+				id: ports[index].insertedId,
+			})),
+			outputPorts: outputPorts.map((port, index) => ({
+				...port,
+				id: ports[index].insertedId,
+			})),
+		},
 	});
 };

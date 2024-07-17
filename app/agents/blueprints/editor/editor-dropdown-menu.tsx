@@ -1,5 +1,4 @@
-import type { NodeType } from "@/app/node-defs";
-import type { GET } from "@/app/node-defs/use-node-defs/route";
+import { type NodeClassName, useNodeClasses } from "@/app/node-classes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -18,16 +17,15 @@ import { WorkflowIcon } from "lucide-react";
 import { type FC, useCallback } from "react";
 
 type EditorDropdownMenuProps = {
-	nodeDefs: InferResponse<typeof GET>["nodeDefs"];
-	onSelect: (key: NodeType) => void;
+	onSelect: (key: NodeClassName) => void;
 };
 export const EditorDropdownMenu: FC<EditorDropdownMenuProps> = ({
-	nodeDefs,
 	onSelect,
 }) => {
+	const nodeClasses = useNodeClasses();
 	const handleNodeSelect = useCallback(
-		(key: NodeType) => () => {
-			onSelect(key);
+		(name: NodeClassName) => () => {
+			onSelect(name);
 		},
 		[onSelect],
 	);
@@ -97,12 +95,12 @@ export const EditorDropdownMenu: FC<EditorDropdownMenuProps> = ({
 				<DropdownMenuSeparator /> */}
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
-					{nodeDefs.map((nodeDef) => (
+					{nodeClasses.map((nodeClass) => (
 						<DropdownMenuItem
-							key={nodeDef.key}
-							onSelect={handleNodeSelect(nodeDef.key)}
+							key={nodeClass.name}
+							onSelect={handleNodeSelect(nodeClass.name as NodeClassName)}
 						>
-							{nodeDef.label}
+							{nodeClass.label}
 						</DropdownMenuItem>
 					))}
 					{/* <DropdownMenuItem onSelect={() => handleNodeSelect("FindUser")}>

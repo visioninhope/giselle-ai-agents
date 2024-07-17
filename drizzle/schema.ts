@@ -41,7 +41,7 @@ export const nodes = pgTable("nodes", {
 	agentId: integer("agent_id")
 		.notNull()
 		.references(() => agents.id, { onDelete: "cascade" }),
-	class: text("class").notNull(),
+	className: text("class_name").notNull(),
 	position: jsonb("position").$type<NodePosition>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });

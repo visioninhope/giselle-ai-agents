@@ -1,6 +1,6 @@
-import type { Port } from "./type";
+import type { Port } from "../type";
 
-export const key = "response";
+export const name = "response";
 
 export const label = "Response";
 

@@ -27,7 +27,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 	const dbNodes = await db
 		.select({
 			id: nodesSchema.id,
-			class: nodesSchema.class,
+			className: nodesSchema.className,
 			position: nodesSchema.position,
 		})
 		.from(nodesSchema)
@@ -63,7 +63,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			id,
 			node: {
 				id: node.id,
-				type: node.class,
+				className: node.className,
 			},
 			status: requestStep.status,
 			run: {

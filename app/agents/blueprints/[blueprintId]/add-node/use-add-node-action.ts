@@ -3,7 +3,7 @@ import {
 	useBlueprint,
 	useBlueprintId,
 } from "@/app/agents/blueprints";
-import { findNodeDef, useNodeDefs } from "@/app/node-defs";
+import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
 import type { POST, Payload } from "./route";
@@ -11,17 +11,17 @@ import type { POST, Payload } from "./route";
 export const useAddNodeAction = () => {
 	const blueprintId = useBlueprintId();
 	const { mutateWithCache } = useBlueprint();
-	const { nodeDefs } = useNodeDefs();
+	const nodeClasses = useNodeClasses();
 	const addNode = useCallback(
 		({ node }: Payload) => {
-			if (nodeDefs == null) {
+			if (nodeClasses == null) {
 				return;
 			}
-			const nodeDef = findNodeDef(nodeDefs, node.class);
+			const nodeDef = findNodeClass(nodeClasses, node.className);
 			const draftNode: Node = {
 				id: 0,
 				position: node.position,
-				class: node.class,
+				className: node.className,
 				inputPorts: (nodeDef.inputPorts ?? []).map(
 					({ type, label }, index) => ({
 						id: index,
@@ -59,7 +59,7 @@ export const useAddNodeAction = () => {
 				}),
 			});
 		},
-		[blueprintId, nodeDefs, mutateWithCache],
+		[blueprintId, nodeClasses, mutateWithCache],
 	);
 	return { addNode };
 };

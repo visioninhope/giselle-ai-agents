@@ -32,7 +32,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 	const dbNodes = await db
 		.select({
 			id: nodesSchema.id,
-			class: nodesSchema.class,
+			className: nodesSchema.className,
 			position: nodesSchema.position,
 		})
 		.from(nodesSchema)

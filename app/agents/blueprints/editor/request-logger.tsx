@@ -26,7 +26,7 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 			}),
 		)}
 	>
-		<p>{props.node.type}</p>
+		<p>{props.node.className}</p>
 		<div className="flex items-center justify-end gap-2">
 			{/* {match(props.runStep)
 				.with({ status: "idle" }, () => <></>)

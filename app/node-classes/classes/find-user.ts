@@ -1,6 +1,6 @@
-import type { Port } from "./type";
+import type { Port } from "../type";
 
-export const key = "findUser";
+export const name = "findUser";
 
 export const label = "Find User";
 

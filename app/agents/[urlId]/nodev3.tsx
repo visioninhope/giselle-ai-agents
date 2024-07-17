@@ -11,7 +11,7 @@ import type { FC } from "react";
 
 type NodeData = {
 	id: string;
-	nodeType: string;
+	className: string;
 	inputPorts: (typeof ports.$inferSelect)[];
 	outputPorts: (typeof ports.$inferSelect)[];
 	stepStatus?: RequestStepStatus;
@@ -19,7 +19,7 @@ type NodeData = {
 type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { nodeType, inputPorts, outputPorts, stepStatus },
+	data: { className, inputPorts, outputPorts, stepStatus },
 }) => {
 	return (
 		<>
@@ -30,7 +30,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>{nodeType}</div>
+					<div>{className}</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">

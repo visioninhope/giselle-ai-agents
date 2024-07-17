@@ -1,6 +1,6 @@
-import type { Port } from "./type";
+import type { Port } from "../type";
 
-export const key = "sendMail";
+export const name = "sendMail";
 
 export const label = "Send Mail";
 

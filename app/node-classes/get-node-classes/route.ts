@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
-import { nodeDefs } from "../";
+import { nodeClasses } from "../classes";
 
 export const GET = async () => {
 	return NextResponse.json({
-		nodeDefs,
+		nodeClasses,
 	});
 };

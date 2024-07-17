@@ -37,7 +37,7 @@ export const useEditor = (request: AgentRequest | undefined) => {
 				position: node.position,
 				data: {
 					id: `${node.id}`,
-					nodeType: node.class,
+					className: node.className,
 					stepStatus: relevantRequestStep?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,

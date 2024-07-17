@@ -1,4 +1,5 @@
 import type { Node } from "@/app/agents/blueprints";
+import type { OnNodesChange } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import invariant from "tiny-invariant";
 import { useBlueprint } from "../blueprints";
@@ -6,15 +7,13 @@ import { useBlueprint } from "../blueprints";
 export const useNodeSelection = () => {
 	const { blueprint } = useBlueprint();
 	const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
+
 	const addSelectedNodes = useCallback(
 		(addNodeIds: number[]) => {
 			if (blueprint == null) {
 				return;
 			}
-			console.log(addNodeIds);
-			console.log("start");
 			setSelectedNodes((prev) => {
-				console.log({ prev });
 				return [
 					...prev,
 					...addNodeIds.map((addNodeId) => {
@@ -29,7 +28,6 @@ export const useNodeSelection = () => {
 					}),
 				];
 			});
-			console.log("end");
 		},
 		[blueprint],
 	);
@@ -38,5 +36,33 @@ export const useNodeSelection = () => {
 			selectedNodes.filter((node) => !removeNodeIds.includes(node.id)),
 		);
 	}, []);
-	return { selectedNodes, addSelectedNodes, removeSelectedNodes };
+
+	const handleNodesChange = useCallback<OnNodesChange>(
+		(nodesChange) => {
+			const changeSelectNodes = nodesChange
+				.map((nodeChange) => {
+					if (nodeChange.type === "select") {
+						return nodeChange;
+					}
+					return null;
+				})
+				.filter((changeNode) => changeNode != null);
+
+			const selectedNodes = changeSelectNodes
+				.filter((changeSelectNode) => changeSelectNode.selected)
+				.map((selectedNode) => Number.parseInt(selectedNode.id, 10));
+			addSelectedNodes(selectedNodes);
+			const deselectedNodes = changeSelectNodes
+				.filter((changeSelectNode) => !changeSelectNode.selected)
+				.map((deselectedNode) => Number.parseInt(deselectedNode.id, 10));
+			removeSelectedNodes(deselectedNodes);
+		},
+		[addSelectedNodes, removeSelectedNodes],
+	);
+	return {
+		selectedNodes,
+		addSelectedNodes,
+		removeSelectedNodes,
+		handleNodesChange,
+	};
 };

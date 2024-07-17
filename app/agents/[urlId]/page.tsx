@@ -4,6 +4,7 @@ import {
 	Background,
 	BackgroundVariant,
 	Controls,
+	type OnNodesChange,
 	Panel,
 	ReactFlow,
 	type ReactFlowInstance,
@@ -25,7 +26,8 @@ import {
 } from "@/app/agents/blueprints/editor";
 import { useNodeSelection } from "@/app/agents/canvas";
 import { useRequest } from "@/app/agents/requests";
-import { type NodeType, useNodeDefs } from "@/app/node-defs";
+import { type NodeClassName, NodeClassesProvider } from "@/app/node-classes";
+import type { NodeClass } from "@/app/node-classes/type";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
@@ -64,7 +66,6 @@ const WorkflowEditor: FC = () => {
 	const { createRequest, request } = useRequest();
 	const { addNode, updateNodesPosition, deleteNodes, addEdge, deleteEdges } =
 		useEditor(request);
-	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
@@ -73,7 +74,7 @@ const WorkflowEditor: FC = () => {
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
 	const handleNodeSelect = useCallback(
-		(type: NodeType) => {
+		(nodeClassName: NodeClassName) => {
 			hideContextMenu();
 
 			if (reactFlowInstance == null) {
@@ -89,16 +90,14 @@ const WorkflowEditor: FC = () => {
 			});
 			addNode({
 				node: {
-					class: type,
+					className: nodeClassName,
 					position: { x: flowPosition.x, y: flowPosition.y },
 				},
 			});
 		},
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
-	const { selectedNodes, addSelectedNodes, removeSelectedNodes } =
-		useNodeSelection();
-
+	const { selectedNodes, handleNodesChange } = useNodeSelection();
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
 			<div className="mb-2 text-primary">Agent Flow Editor</div>
@@ -172,39 +171,7 @@ const WorkflowEditor: FC = () => {
 								<ReactFlow
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
-									onNodeClick={(_, node) => {
-										if (reactFlowInstance == null) {
-											return;
-										}
-										addSelectedNodes([Number.parseInt(node.id, 10)]);
-									}}
-									onNodesChange={(changeNodes) => {
-										const changeSelectNodes = changeNodes
-											.map((changeNode) => {
-												if (changeNode.type === "select") {
-													return changeNode;
-												}
-												return null;
-											})
-											.filter((changeNode) => changeNode != null);
-										console.log("nodes change");
-										addSelectedNodes(
-											changeSelectNodes
-												.filter((changeSelectNode) => changeSelectNode.selected)
-												.map((selectedNode) =>
-													Number.parseInt(selectedNode.id, 10),
-												),
-										);
-										removeSelectedNodes(
-											changeSelectNodes
-												.filter(
-													(changeSelectNode) => !changeSelectNode.selected,
-												)
-												.map((deselectedNode) =>
-													Number.parseInt(deselectedNode.id, 10),
-												),
-										);
-									}}
+									onNodesChange={handleNodesChange}
 									defaultNodes={[]}
 									defaultEdges={[]}
 									onNodesDelete={(nodes) => {
@@ -268,11 +235,13 @@ const WorkflowEditor: FC = () => {
 									<Panel position="top-right" className="bottom-0">
 										<div className="flex gap-2 h-full">
 											{request && <RequestLogger request={request} />}
-											<NodeModifyPanel selectedNodes={selectedNodes} />
+											{selectedNodes.length > 0 && (
+												<NodeModifyPanel selectedNodes={selectedNodes} />
+											)}
 										</div>
 									</Panel>
 
-									{nodeDefs != null && isVisible && (
+									{isVisible && (
 										<div
 											className="z-10 absolute"
 											style={{
@@ -282,10 +251,7 @@ const WorkflowEditor: FC = () => {
 													position.y - (containerRef?.current?.offsetTop ?? 0),
 											}}
 										>
-											<EditorDropdownMenu
-												nodeDefs={nodeDefs}
-												onSelect={handleNodeSelect}
-											/>
+											<EditorDropdownMenu onSelect={handleNodeSelect} />
 										</div>
 									)}
 								</ReactFlow>
@@ -303,7 +269,9 @@ export default function Page({ params }: { params: { urlId: string } }) {
 	return (
 		<ReactFlowProvider>
 			<BlueprintIdProvider blueprintId={latestBlueprintGlance?.id}>
-				<WorkflowEditor />
+				<NodeClassesProvider>
+					<WorkflowEditor />
+				</NodeClassesProvider>
 			</BlueprintIdProvider>
 		</ReactFlowProvider>
 	);
