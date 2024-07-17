@@ -1,4 +1,4 @@
-import type { Blueprint } from "@/app/agents/blueprints";
+import { type Blueprint, inferSteps } from "@/app/agents/blueprints";
 import {
 	blueprints as blueprintsSchema,
 	dataRoutes as dataRoutesSchema,
@@ -7,7 +7,6 @@ import {
 	steps as stepsSchema,
 } from "@/drizzle";
 import { eq } from "drizzle-orm";
-import { inferSteps } from "./infer-step";
 
 export const buildBlueprint = async (blueprint: Blueprint) => {
 	const inferedSteps = inferSteps(blueprint);
