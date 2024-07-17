@@ -22,34 +22,44 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 	const { addNodePort } = useAddNodePortAction();
 	const heading = node.className === "onRequest" ? "Parameters" : "Output Port";
 	const [disclosure, setDisclosure] = useState(false);
-	const handleOpenChange = useCallback(
-		(open: boolean) => {
-			setDisclosure(open);
-			if (open) {
-				addNodePort({
-					port: {
-						nodeId: node.id,
-						direction: "output",
-						name: "Parameter",
-					},
-				});
-			}
-		},
-		[addNodePort, node],
-	);
+	const [value, setValue] = useState("");
+	const handleOpenChange = useCallback(() => {
+		addNodePort({
+			port: {
+				nodeId: node.id,
+				direction: "output",
+				name: value,
+			},
+		});
+		setDisclosure(false);
+		setValue("");
+	}, [addNodePort, node, value]);
 	return (
 		<div>
 			<div className="flex justify-between mb-2 px-4">
 				<h3 className="text-sm font-bold">{heading}</h3>
 				<div>
-					<Popover open={disclosure} onOpenChange={handleOpenChange}>
+					<Popover open={disclosure} onOpenChange={setDisclosure}>
 						<PopoverTrigger asChild>
 							<Button size="icon" variant="ghost">
 								<PlusIcon className="w-4 h-4" />
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent align="end">
-							<Input placeholder="Parameter" />
+							<div className="flex flex-col gap-4">
+								<Input
+									placeholder="Parameter"
+									value={value}
+									onChange={(e) => {
+										setValue(e.target.value);
+									}}
+								/>
+								<div className="flex justify-end">
+									<Button type="button" onClick={handleOpenChange}>
+										Create parameter
+									</Button>
+								</div>
+							</div>
 						</PopoverContent>
 					</Popover>
 				</div>

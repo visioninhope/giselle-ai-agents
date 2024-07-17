@@ -1,8 +1,10 @@
 import {
 	type BlueprintPort,
+	useDeletePortAction,
 	useUpdatePortnameAction,
 } from "@/app/agents/blueprints";
-import { AlignLeftIcon } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { AlignLeftIcon, TrashIcon } from "lucide-react";
 import { type FC, useCallback, useEffect, useRef, useState } from "react";
 
 type DynamicOutputPortListItemProps = {
@@ -15,6 +17,7 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 	const [value, setValue] = useState(port.name);
 	const ref = useRef<HTMLInputElement>(null);
 	const { updatePortName } = useUpdatePortnameAction();
+	const { deletePort } = useDeletePortAction();
 	useEffect(() => {
 		if (edit && ref.current != null) {
 			ref.current.focus();
@@ -34,7 +37,7 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 	}, [value, port, updatePortName]);
 	return (
 		<div
-			className="flex gap-2 items-center border border-transparent data-[state=show]:hover:border-blue-500 px-4 h-8 py-0.5"
+			className="flex gap-2 items-center border border-transparent data-[state=show]:hover:border-blue-500 px-4 h-8 py-0.5 group"
 			onDoubleClick={() => {
 				setEdit(true);
 			}}
@@ -53,8 +56,19 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 					}}
 				/>
 			) : (
-				<div>
+				<div className="flex justify-between w-full">
 					<span className="cursor-default">{port.name}</span>
+					<Button
+						size="icon"
+						type="button"
+						variant="ghost"
+						className="hidden group-hover:block"
+						onClick={() => {
+							deletePort({ port: { id: port.id } });
+						}}
+					>
+						<TrashIcon className="w-4 h-4" />
+					</Button>
 				</div>
 			)}
 		</div>
