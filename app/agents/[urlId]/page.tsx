@@ -161,7 +161,7 @@ const WorkflowEditor: FC = () => {
 									}
 								>
 									<PlayIcon className="mr-1" />
-									Run Workflow
+									Request to Agent
 								</Button>
 							</div>
 							<div className="flex-1" ref={containerRef}>

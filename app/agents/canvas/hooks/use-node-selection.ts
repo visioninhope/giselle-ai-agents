@@ -1,8 +1,7 @@
-import type { Node } from "@/app/agents/blueprints";
+import { type Node, useBlueprint } from "@/app/agents/blueprints";
 import type { OnNodesChange } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import invariant from "tiny-invariant";
-import { useBlueprint } from "../blueprints";
 
 export const useNodeSelection = () => {
 	const { blueprint } = useBlueprint();
