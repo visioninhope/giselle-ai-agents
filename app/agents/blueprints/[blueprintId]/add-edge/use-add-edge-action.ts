@@ -1,4 +1,4 @@
-import { useBlueprint } from "@/app/agents/blueprints";
+import { useBlueprint, useBlueprintId } from "@/app/agents/blueprints";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
 import type { POST, Payload } from "./route";
@@ -13,8 +13,9 @@ type AddEdgeArgs = {
 		nodeId: number;
 	};
 };
-export const useAddEdgeAction = (blueprintId: number | undefined) => {
-	const { mutateWithCache } = useBlueprint(blueprintId);
+export const useAddEdgeAction = () => {
+	const blueprintId = useBlueprintId();
+	const { mutateWithCache } = useBlueprint();
 	const addEdge = useCallback(
 		async (args: AddEdgeArgs) => {
 			if (blueprintId == null) {

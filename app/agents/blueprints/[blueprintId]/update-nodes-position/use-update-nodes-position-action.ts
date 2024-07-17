@@ -1,11 +1,14 @@
-import { type Node, useBlueprint } from "@/app/agents/blueprints";
+import {
+	type Node,
+	useBlueprint,
+	useBlueprintId,
+} from "@/app/agents/blueprints";
 import { useCallback } from "react";
 import type { Payload } from "./route";
 
-export const useUpdateNodesPositionAction = (
-	blueprintId: number | undefined,
-) => {
-	const { mutateWithCache } = useBlueprint(blueprintId);
+export const useUpdateNodesPositionAction = () => {
+	const blueprintId = useBlueprintId();
+	const { mutateWithCache } = useBlueprint();
 	const updateNodesPosition = useCallback(
 		async (payload: Payload) => {
 			if (blueprintId == null) {

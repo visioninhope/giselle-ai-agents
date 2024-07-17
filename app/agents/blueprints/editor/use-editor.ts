@@ -2,6 +2,7 @@ import {
 	useAddEdgeAction,
 	useAddNodeAction,
 	useBlueprint,
+	useBlueprintId,
 	useDeleteEdgesAction,
 	useDeleteNodesAction,
 	useUpdateNodesPositionAction,
@@ -10,17 +11,15 @@ import type { AgentRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
 
-export const useEditor = (
-	blueprintId: number | undefined,
-	request: AgentRequest | undefined,
-) => {
-	const { blueprint } = useBlueprint(blueprintId);
+export const useEditor = (request: AgentRequest | undefined) => {
+	const blueprintId = useBlueprintId();
+	const { blueprint } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
-	const { addNode } = useAddNodeAction(blueprintId);
-	const { updateNodesPosition } = useUpdateNodesPositionAction(blueprintId);
-	const { deleteNodes } = useDeleteNodesAction(blueprintId);
-	const { addEdge } = useAddEdgeAction(blueprintId);
-	const { deleteEdges } = useDeleteEdgesAction(blueprintId);
+	const { addNode } = useAddNodeAction();
+	const { updateNodesPosition } = useUpdateNodesPositionAction();
+	const { deleteNodes } = useDeleteNodesAction();
+	const { addEdge } = useAddEdgeAction();
+	const { deleteEdges } = useDeleteEdgesAction();
 	useEffect(() => {
 		if (blueprint == null) {
 			return;

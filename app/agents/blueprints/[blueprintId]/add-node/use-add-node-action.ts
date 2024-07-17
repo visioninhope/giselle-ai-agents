@@ -1,15 +1,20 @@
-import { type Node, useBlueprint } from "@/app/agents/blueprints";
+import {
+	type Node,
+	useBlueprint,
+	useBlueprintId,
+} from "@/app/agents/blueprints";
 import { findNodeDef, useNodeDefs } from "@/app/node-defs";
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
 import type { POST, Payload } from "./route";
 
-export const useAddNodeAction = (blueprintId: number | undefined) => {
-	const { mutateWithCache } = useBlueprint(blueprintId);
+export const useAddNodeAction = () => {
+	const blueprintId = useBlueprintId();
+	const { mutateWithCache } = useBlueprint();
 	const { nodeDefs } = useNodeDefs();
 	const addNode = useCallback(
 		({ node }: Payload) => {
-			if (blueprintId == null || nodeDefs == null) {
+			if (nodeDefs == null) {
 				return;
 			}
 			const nodeDef = findNodeDef(nodeDefs, node.class);

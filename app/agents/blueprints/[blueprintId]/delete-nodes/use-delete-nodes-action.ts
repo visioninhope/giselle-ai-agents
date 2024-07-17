@@ -1,9 +1,10 @@
-import { useBlueprint } from "@/app/agents/blueprints";
+import { useBlueprint, useBlueprintId } from "@/app/agents/blueprints";
 import { useCallback } from "react";
 import type { Payload } from "./route";
 
-export const useDeleteNodesAction = (blueprintId: number | undefined) => {
-	const { mutateWithCache } = useBlueprint(blueprintId);
+export const useDeleteNodesAction = () => {
+	const blueprintId = useBlueprintId();
+	const { mutateWithCache } = useBlueprint();
 	const deleteNodes = useCallback(
 		(payload: Payload) => {
 			if (blueprintId == null) {

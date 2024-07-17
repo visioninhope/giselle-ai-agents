@@ -1,15 +1,16 @@
 import type { InferResponse } from "@/lib/api";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
+import { useBlueprint, useBlueprintId } from "../..";
 import type { POST } from "./route";
 
 type UseBuildBlueprintActionOptions = {
 	onBuild?: () => void;
 };
 export const useBuildBlueprintAction = (
-	blueprintId: number | undefined,
 	options?: UseBuildBlueprintActionOptions,
 ) => {
+	const blueprintId = useBlueprintId();
 	const build = useCallback(async () => {
 		invariant(blueprintId != null, "blueprintId is required");
 		const json = await execApi(blueprintId);

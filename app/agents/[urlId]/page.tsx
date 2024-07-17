@@ -12,7 +12,10 @@ import {
 import { type FC, useCallback, useRef, useState } from "react";
 
 import "@xyflow/react/dist/style.css";
-import { type Node, useBuildBlueprintAction } from "@/app/agents/blueprints";
+import {
+	BlueprintIdProvider,
+	useBuildBlueprintAction,
+} from "@/app/agents/blueprints";
 import {
 	EditorDropdownMenu,
 	NodeModifyPanel,
@@ -30,7 +33,6 @@ import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
 import { useLatestBlueprintGlance } from "./blueprints";
 import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
-import { AgentUrlIdProvider } from "./use-agent-url-id";
 
 const contexts: Context[] = [
 	{
@@ -58,11 +60,10 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { latestBlueprintGlance } = useLatestBlueprintGlance();
-	const { build } = useBuildBlueprintAction(latestBlueprintGlance?.id);
+	const { build } = useBuildBlueprintAction();
 	const { createRequest, request } = useRequest();
 	const { addNode, updateNodesPosition, deleteNodes, addEdge, deleteEdges } =
-		useEditor(latestBlueprintGlance?.id, request);
+		useEditor(request);
 	const { nodeDefs } = useNodeDefs();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
@@ -96,7 +97,7 @@ const WorkflowEditor: FC = () => {
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
 	const { selectedNodes, addSelectedNodes, removeSelectedNodes } =
-		useNodeSelection(latestBlueprintGlance?.id);
+		useNodeSelection();
 
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
@@ -186,6 +187,7 @@ const WorkflowEditor: FC = () => {
 												return null;
 											})
 											.filter((changeNode) => changeNode != null);
+										console.log("nodes change");
 										addSelectedNodes(
 											changeSelectNodes
 												.filter((changeSelectNode) => changeSelectNode.selected)
@@ -266,9 +268,7 @@ const WorkflowEditor: FC = () => {
 									<Panel position="top-right" className="bottom-0">
 										<div className="flex gap-2 h-full">
 											{request && <RequestLogger request={request} />}
-											<NodeModifyPanel
-												blueprintId={latestBlueprintGlance?.id}
-											/>
+											<NodeModifyPanel selectedNodes={selectedNodes} />
 										</div>
 									</Panel>
 
@@ -299,11 +299,12 @@ const WorkflowEditor: FC = () => {
 };
 
 export default function Page({ params }: { params: { urlId: string } }) {
+	const { latestBlueprintGlance } = useLatestBlueprintGlance(params.urlId);
 	return (
 		<ReactFlowProvider>
-			<AgentUrlIdProvider urlId={params.urlId}>
+			<BlueprintIdProvider blueprintId={latestBlueprintGlance?.id}>
 				<WorkflowEditor />
-			</AgentUrlIdProvider>
+			</BlueprintIdProvider>
 		</ReactFlowProvider>
 	);
 }
