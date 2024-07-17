@@ -4,7 +4,6 @@ import {
 	Background,
 	BackgroundVariant,
 	Controls,
-	type OnNodesChange,
 	Panel,
 	ReactFlow,
 	type ReactFlowInstance,
@@ -19,15 +18,13 @@ import {
 } from "@/app/agents/blueprints";
 import {
 	EditorDropdownMenu,
-	NodeModifyPanel,
 	RequestLogger,
 	useContextMenu,
 	useEditor,
 } from "@/app/agents/blueprints/editor";
-import { useNodeSelection } from "@/app/agents/canvas";
+import { PropertyPanel, useNodeSelection } from "@/app/agents/canvas";
 import { useRequest } from "@/app/agents/requests";
 import { type NodeClassName, NodeClassesProvider } from "@/app/node-classes";
-import type { NodeClass } from "@/app/node-classes/type";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
@@ -236,7 +233,7 @@ const WorkflowEditor: FC = () => {
 										<div className="flex gap-2 h-full">
 											{request && <RequestLogger request={request} />}
 											{selectedNodes.length > 0 && (
-												<NodeModifyPanel selectedNodes={selectedNodes} />
+												<PropertyPanel selectedNodes={selectedNodes} />
 											)}
 										</div>
 									</Panel>

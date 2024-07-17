@@ -15,12 +15,10 @@ import { AlignLeftIcon, PlusIcon } from "lucide-react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { match } from "ts-pattern";
 
-type NodeModifyPanelProps = {
+type PropertyPanel = {
 	selectedNodes: Node[];
 };
-export const NodeModifyPanel: FC<NodeModifyPanelProps> = ({
-	selectedNodes,
-}) => {
+export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 	return (
 		<div className="bg-background/50 border border-border w-[300px] text-sm">
 			<div className="px-4 py-2">
