@@ -13,22 +13,25 @@ import { type FC, useCallback, useRef, useState } from "react";
 
 import "@xyflow/react/dist/style.css";
 import {
+	BlueprintIdProvider,
+	useBuildBlueprintAction,
+} from "@/app/agents/blueprints";
+import {
 	EditorDropdownMenu,
+	RequestLogger,
 	useContextMenu,
 	useEditor,
 } from "@/app/agents/blueprints/editor";
+import { PropertyPanel, useNodeSelection } from "@/app/agents/canvas";
 import { useRequest } from "@/app/agents/requests";
-import { type NodeType, useNodeDefs } from "@/app/node-defs";
+import { type NodeClassName, NodeClassesProvider } from "@/app/node-classes";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
 import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
-import { useBlueprint, useBuildBlueprintAction } from "../blueprints";
 import { useLatestBlueprintGlance } from "./blueprints";
 import { useNodeTypes } from "./node";
-import { RequestLogger } from "./request-logger";
 import type { Context } from "./strcture";
-import { AgentUrlIdProvider } from "./use-agent-url-id";
 
 const contexts: Context[] = [
 	{
@@ -56,12 +59,10 @@ const contexts: Context[] = [
 ];
 
 const WorkflowEditor: FC = () => {
-	const { latestBlueprintGlance } = useLatestBlueprintGlance();
-	const { build } = useBuildBlueprintAction(latestBlueprintGlance?.id);
+	const { build } = useBuildBlueprintAction();
 	const { createRequest, request } = useRequest();
 	const { addNode, updateNodesPosition, deleteNodes, addEdge, deleteEdges } =
-		useEditor(latestBlueprintGlance?.id, request);
-	const { nodeDefs } = useNodeDefs();
+		useEditor(request);
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes = useNodeTypes();
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
@@ -70,7 +71,7 @@ const WorkflowEditor: FC = () => {
 	const [reactFlowInstance, setReactFlowInstance] =
 		useState<ReactFlowInstance | null>(null);
 	const handleNodeSelect = useCallback(
-		(type: NodeType) => {
+		(nodeClassName: NodeClassName) => {
 			hideContextMenu();
 
 			if (reactFlowInstance == null) {
@@ -86,14 +87,14 @@ const WorkflowEditor: FC = () => {
 			});
 			addNode({
 				node: {
-					class: type,
+					className: nodeClassName,
 					position: { x: flowPosition.x, y: flowPosition.y },
 				},
 			});
 		},
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
-
+	const { selectedNodes, handleNodesChange } = useNodeSelection();
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
 			<div className="mb-2 text-primary">Agent Flow Editor</div>
@@ -117,7 +118,7 @@ const WorkflowEditor: FC = () => {
 						<div className="flex items-center justify-between text-secondary-foreground px-1 py-1 text-sm">
 							<p>Context</p>
 							<Button size="icon">
-								<PlusIcon className="w-4 h-4" />
+								<PlusIcon className="w-6 h-6" />
 							</Button>
 						</div>
 						<ul className="flex flex-col gap-1 mt-1">
@@ -160,13 +161,14 @@ const WorkflowEditor: FC = () => {
 									}
 								>
 									<PlayIcon className="mr-1" />
-									Run Workflow
+									Request to Agent
 								</Button>
 							</div>
 							<div className="flex-1" ref={containerRef}>
 								<ReactFlow
 									onContextMenu={handleContextMenu}
 									onPaneClick={hideContextMenu}
+									onNodesChange={handleNodesChange}
 									defaultNodes={[]}
 									defaultEdges={[]}
 									onNodesDelete={(nodes) => {
@@ -227,13 +229,16 @@ const WorkflowEditor: FC = () => {
 										className="bg-gradient-to-b from-zinc-900/80 to-zinc-900/20"
 									/>
 									<Controls />
-									{request && (
-										<Panel position="top-right">
-											<RequestLogger request={request} />
-										</Panel>
-									)}
+									<Panel position="top-right" className="bottom-0">
+										<div className="flex gap-2 h-full">
+											{request && <RequestLogger request={request} />}
+											{selectedNodes.length > 0 && (
+												<PropertyPanel selectedNodes={selectedNodes} />
+											)}
+										</div>
+									</Panel>
 
-									{nodeDefs != null && isVisible && (
+									{isVisible && (
 										<div
 											className="z-10 absolute"
 											style={{
@@ -243,10 +248,7 @@ const WorkflowEditor: FC = () => {
 													position.y - (containerRef?.current?.offsetTop ?? 0),
 											}}
 										>
-											<EditorDropdownMenu
-												nodeDefs={nodeDefs}
-												onSelect={handleNodeSelect}
-											/>
+											<EditorDropdownMenu onSelect={handleNodeSelect} />
 										</div>
 									)}
 								</ReactFlow>
@@ -260,11 +262,14 @@ const WorkflowEditor: FC = () => {
 };
 
 export default function Page({ params }: { params: { urlId: string } }) {
+	const { latestBlueprintGlance } = useLatestBlueprintGlance(params.urlId);
 	return (
 		<ReactFlowProvider>
-			<AgentUrlIdProvider urlId={params.urlId}>
-				<WorkflowEditor />
-			</AgentUrlIdProvider>
+			<BlueprintIdProvider blueprintId={latestBlueprintGlance?.id}>
+				<NodeClassesProvider>
+					<WorkflowEditor />
+				</NodeClassesProvider>
+			</BlueprintIdProvider>
 		</ReactFlowProvider>
 	);
 }

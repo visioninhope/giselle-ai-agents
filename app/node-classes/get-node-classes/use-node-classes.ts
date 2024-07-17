@@ -5,11 +5,10 @@ import { fetcher } from "@/lib/fetcher";
 import useSWR from "swr";
 import type { GET } from "./route";
 
-export const useLatestBlueprintGlance = (urlId: string) => {
+export const useNodeClasses = () => {
 	const { data } = useSWR<InferResponse<typeof GET>>(
-		`/agents/${urlId}/blueprints/get-latest`,
+		"/node-classes/get-node-classes",
 		fetcher,
 	);
-
-	return { latestBlueprintGlance: data?.blueprint };
+	return { nodeClasses: data?.nodeClasses };
 };

@@ -4,7 +4,7 @@ export type RequestStep = {
 	id: number;
 	node: {
 		id: number;
-		type: string;
+		className: string;
 	};
 	status: RequestStepStatus;
 	run: {

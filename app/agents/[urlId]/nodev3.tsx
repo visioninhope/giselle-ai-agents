@@ -1,17 +1,19 @@
 import type { RequestStepStatus, ports } from "@/drizzle/schema";
 import {
-	Handle,
 	type Node,
 	type NodeProps,
 	NodeResizer,
 	Position,
+	Handle as XYFlowHandle,
+	useNodeId,
+	useUpdateNodeInternals,
 } from "@xyflow/react";
 import { cva } from "cva";
-import type { FC } from "react";
+import { type ComponentProps, type FC, useEffect } from "react";
 
 type NodeData = {
 	id: string;
-	nodeType: string;
+	className: string;
 	inputPorts: (typeof ports.$inferSelect)[];
 	outputPorts: (typeof ports.$inferSelect)[];
 	stepStatus?: RequestStepStatus;
@@ -19,7 +21,7 @@ type NodeData = {
 type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { nodeType, inputPorts, outputPorts, stepStatus },
+	data: { className, inputPorts, outputPorts, stepStatus },
 }) => {
 	return (
 		<>
@@ -30,7 +32,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>{nodeType}</div>
+					<div>{className}</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
@@ -69,6 +71,17 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	);
 };
 
+const Handle: FC<ComponentProps<typeof XYFlowHandle>> = (props) => {
+	const nodeId = useNodeId();
+	const updateNodeInternals = useUpdateNodeInternals();
+	useEffect(() => {
+		if (nodeId == null) {
+			return;
+		}
+		updateNodeInternals(nodeId);
+	}, [updateNodeInternals, nodeId]);
+	return <XYFlowHandle {...props} />;
+};
 const nodeVariant = cva({
 	base: "bg-card/50 border text-card-foreground min-w-[150px]",
 	variants: {

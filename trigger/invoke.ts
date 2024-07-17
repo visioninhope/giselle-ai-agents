@@ -29,15 +29,15 @@ export const invokeTask = task({
 				status: "running",
 				startedAt: new Date(),
 			});
-			logger.log(`${step.node.type} started!!`);
-			if (step.node.type === "FindUser") {
+			logger.log(`${step.node.className} started!!`);
+			if (step.node.className === "FindUser") {
 				await findUser(step);
 			}
-			if (step.node.type === "SendMail") {
+			if (step.node.className === "SendMail") {
 				await sendMail(step);
 			}
 			await wait.for({ seconds: 5 });
-			logger.log(`${step.node.type} finished!!`);
+			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {
 				status: "success",
 				finishedAt: new Date(),

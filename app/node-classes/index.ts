@@ -1,0 +1,16 @@
+import invariant from "tiny-invariant";
+export { type NodeClassName, getNodeClass } from "./classes";
+import type { NodeClass } from "./type";
+export type { NodeClass, Feature } from "./type";
+export * from "./contexts";
+
+export const findNodeClass = (
+	nodeClasses: NodeClass[],
+	nodeClassName: string,
+) => {
+	const nodeClass = nodeClasses.find(
+		(nodeClass) => nodeClass.name === nodeClassName,
+	);
+	invariant(nodeClass != null, `missing nodeDef for ${nodeClassName}`);
+	return nodeClass;
+};
