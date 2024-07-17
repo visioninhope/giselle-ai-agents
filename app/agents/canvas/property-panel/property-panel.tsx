@@ -1,4 +1,4 @@
-import type { Node } from "@/app/agents/blueprints";
+import { type Node, useNode } from "@/app/agents/blueprints";
 import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import { type FC, useMemo } from "react";
 import { match } from "ts-pattern";
@@ -34,13 +34,14 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 		() => findNodeClass(nodeClasses, node.className),
 		[nodeClasses, node.className],
 	);
+	const blueprintNode = useNode(node.id);
 	return (
 		<div className="flex flex-col gap-2">
 			<div>
 				{nodeClass?.features?.map((feature) =>
 					match(feature)
 						.with({ name: "dynamicOutputPort" }, () => (
-							<DynamicOutputPort node={node} key={feature.name} />
+							<DynamicOutputPort node={blueprintNode} key={feature.name} />
 						))
 						.exhaustive(),
 				)}

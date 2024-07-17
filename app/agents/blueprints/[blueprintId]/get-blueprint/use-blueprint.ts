@@ -2,7 +2,7 @@
 
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import invariant from "tiny-invariant";
 import { useBlueprintId } from "../../";
@@ -53,4 +53,14 @@ export const useBlueprint = () => {
 		[mutate],
 	);
 	return { blueprint: data?.blueprint, mutateWithCache };
+};
+
+export const useNode = (nodeId: number) => {
+	const { blueprint } = useBlueprint();
+	const node = useMemo(() => {
+		const n = blueprint?.nodes.find(({ id }) => id === nodeId);
+		invariant(n != null, `invalid state: node ${nodeId} not found`);
+		return n;
+	}, [blueprint, nodeId]);
+	return node;
 };
