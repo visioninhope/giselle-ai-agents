@@ -1,5 +1,6 @@
 "use server";
 import type { Blueprint } from "@/app/agents/blueprints";
+import type { NodeClassName } from "@/app/node-classes";
 import {
 	agents as agentsSchema,
 	blueprints as blueprintsSchema,
@@ -51,7 +52,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					),
 					orderBy: asc(schema.ports.order),
 				});
-	const nodes = dbNodes.map((node) => {
+	const nodes = dbNodes.map(({ className, ...node }) => {
 		const inputPorts = ports.filter(
 			({ nodeId, direction }) => nodeId === node.id && direction === "input",
 		);
@@ -60,6 +61,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		);
 		return {
 			...node,
+			className: className as NodeClassName,
 			inputPorts: inputPorts.map(
 				({ id, name, type, direction, order, nodeId }) => ({
 					id,

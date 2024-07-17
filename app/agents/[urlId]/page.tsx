@@ -121,7 +121,7 @@ const WorkflowEditor: FC = () => {
 						<div className="flex items-center justify-between text-secondary-foreground px-1 py-1 text-sm">
 							<p>Context</p>
 							<Button size="icon">
-								<PlusIcon className="w-4 h-4" />
+								<PlusIcon className="w-6 h-6" />
 							</Button>
 						</div>
 						<ul className="flex flex-col gap-1 mt-1">

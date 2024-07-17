@@ -5,6 +5,7 @@ export type NodeClass = {
 	label: string;
 	inputPorts?: Port[];
 	outputPorts?: Port[];
+	features?: Feature[];
 };
 
 export type Port = {
@@ -12,8 +13,8 @@ export type Port = {
 	label?: string;
 };
 
-export type Feature = Array<DynamicOutputPort>;
+export type Feature = DynamicOutputPort;
 
 type DynamicOutputPort = {
-	class: "dynamicOutputPort";
+	name: "dynamicOutputPort";
 };
