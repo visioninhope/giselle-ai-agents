@@ -14,7 +14,7 @@ export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 				<p className="font-bold">Properties</p>
 			</div>
 
-			<div className="px-4 py-2 flex flex-col gap-2">
+			<div className="py-2 flex flex-col gap-2">
 				{selectedNodes.length > 1 ? (
 					<p>{selectedNodes.length} nodes selected</p>
 				) : (

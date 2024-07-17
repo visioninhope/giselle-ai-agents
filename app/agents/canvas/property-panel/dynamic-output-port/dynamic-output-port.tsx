@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/popover";
 import { AlignLeftIcon, PlusIcon } from "lucide-react";
 import { type FC, useCallback, useState } from "react";
+import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
 
 type DynamicOutputPortProps = {
 	node: Node;
@@ -38,7 +39,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 	);
 	return (
 		<div>
-			<div className="flex justify-between mb-2">
+			<div className="flex justify-between mb-2 px-4">
 				<h3 className="text-sm font-bold">{heading}</h3>
 				<div>
 					<Popover open={disclosure} onOpenChange={handleOpenChange}>
@@ -53,14 +54,11 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 					</Popover>
 				</div>
 			</div>
-			<div className="flex flex-col gap-2">
+			<div className="flex flex-col gap-1">
 				{node.outputPorts
 					.filter(({ type }) => type === "data")
 					.map((port) => (
-						<div key={port.id} className="flex gap-1 items-center">
-							<AlignLeftIcon className="w-4 h-4" />
-							<span>{port.name}</span>
-						</div>
+						<DynamicOutputPortListItem key={port.id} port={port} />
 					))}
 			</div>
 		</div>

@@ -6,3 +6,4 @@ export * from "./add-edge";
 export * from "./delete-edges";
 export * from "./update-nodes-position";
 export * from "./add-node-port";
+export * from "./update-port-name";
