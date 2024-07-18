@@ -23,7 +23,11 @@ import {
 	useContextMenu,
 	useEditor,
 } from "@/app/agents/blueprints/editor";
-import { PropertyPanel, useNodeSelection } from "@/app/agents/canvas";
+import {
+	PropertyPanel,
+	RequestButton,
+	useNodeSelection,
+} from "@/app/agents/canvas";
 import { useRequest } from "@/app/agents/requests";
 import { type NodeClassName, NodeClassesProvider } from "@/app/node-classes";
 import { Button } from "@/components/ui/button";
@@ -102,6 +106,9 @@ const WorkflowEditor: FC = () => {
 	);
 	const { selectedNodes, handleNodesChange } = useNodeSelection();
 	const requiredActions = useRequiredActions();
+	const handleSubmitRequest = useCallback(() => {
+		build().then(({ blueprintId }) => createRequest({ blueprintId }));
+	}, [build, createRequest]);
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
 			<div className="mb-2 text-primary">Agent Flow Editor</div>
@@ -163,19 +170,7 @@ const WorkflowEditor: FC = () => {
 										<p>{requiredActions.map(({ type }) => type).join(", ")}</p>
 									</div>
 								) : (
-									<Button
-										variant={"ghost"}
-										size={"xs"}
-										className="text-muted-foreground"
-										onClick={() =>
-											build().then(({ blueprintId }) =>
-												createRequest({ blueprintId }),
-											)
-										}
-									>
-										<PlayIcon className="mr-1" />
-										Request to Agent
-									</Button>
+									<RequestButton onClick={handleSubmitRequest} />
 								)}
 							</div>
 							<div className="flex-1" ref={containerRef}>
