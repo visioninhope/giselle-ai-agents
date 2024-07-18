@@ -88,7 +88,7 @@ export const POST = async (
 			})),
 			outputPorts: outputPorts.map((port, index) => ({
 				...port,
-				id: ports[index].insertedId,
+				id: ports[index + inputPorts.length].insertedId,
 			})),
 		},
 	});
