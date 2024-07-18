@@ -18,6 +18,14 @@ export type Edge = Pick<DbEdge, "id" | "edgeType"> & {
 	inputPort: Pick<DbPort, "id" | "nodeId">;
 	outputPort: Pick<DbPort, "id" | "nodeId">;
 };
+export type RequestInterfaceItem = {
+	portId: number;
+	name: string;
+};
+type RequestInterface = {
+	input: RequestInterfaceItem[];
+	output: RequestInterfaceItem[];
+};
 export type Blueprint = {
 	agent: {
 		id: number;
@@ -30,6 +38,7 @@ export type Blueprint = {
 	dirty: boolean;
 	builded: boolean;
 	requiredActions?: BlueprintRequiredAction[];
+	requestInterface?: RequestInterface | null | undefined;
 };
 
 type AssertNode = (input: unknown) => asserts input is Node;

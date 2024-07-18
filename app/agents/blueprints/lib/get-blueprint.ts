@@ -1,5 +1,9 @@
 "use server";
-import { type Blueprint, reviewRequiredActions } from "@/app/agents/blueprints";
+import {
+	type Blueprint,
+	inferRequestInterface,
+	reviewRequiredActions,
+} from "@/app/agents/blueprints";
 import type { NodeClassName } from "@/app/node-classes";
 import {
 	agents as agentsSchema,
@@ -121,8 +125,10 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		edges,
 	};
 	const requiredActions = reviewRequiredActions(tmpBlueprint);
+	const requestInterface = inferRequestInterface(tmpBlueprint);
 	return {
 		...tmpBlueprint,
 		requiredActions,
+		requestInterface,
 	};
 };

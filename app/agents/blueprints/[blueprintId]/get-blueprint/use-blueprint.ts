@@ -1,6 +1,10 @@
 "use client";
 
-import { reviewRequiredActions, useBlueprintId } from "@/app/agents/blueprints";
+import {
+	inferRequestInterface,
+	reviewRequiredActions,
+	useBlueprintId,
+} from "@/app/agents/blueprints";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useCallback, useMemo } from "react";
@@ -41,10 +45,12 @@ export const useBlueprint = () => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						const tmp = mutateWithCache(prev, json);
 						const requiredActions = reviewRequiredActions(tmp.blueprint);
+						const requestInterface = inferRequestInterface(tmp.blueprint);
 						return {
 							blueprint: {
 								...tmp.blueprint,
 								requiredActions,
+								requestInterface,
 							},
 						};
 					}),
@@ -54,10 +60,12 @@ export const useBlueprint = () => {
 						invariant(prev != null, "invalid state: blueprint is null");
 						const tmp = optimisticDataWithCache(prev);
 						const requiredActions = reviewRequiredActions(tmp.blueprint);
+						const requestInterface = inferRequestInterface(tmp.blueprint);
 						return {
 							blueprint: {
 								...tmp.blueprint,
 								requiredActions,
+								requestInterface,
 							},
 						};
 					},
@@ -82,4 +90,9 @@ export const useNode = (nodeId: number) => {
 export const useRequiredActions = () => {
 	const { blueprint } = useBlueprint();
 	return blueprint?.requiredActions;
+};
+
+export const useRequestInterface = () => {
+	const { blueprint } = useBlueprint();
+	return blueprint?.requestInterface;
 };
