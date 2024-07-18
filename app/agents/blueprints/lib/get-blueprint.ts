@@ -1,5 +1,5 @@
 "use server";
-import type { Blueprint } from "@/app/agents/blueprints";
+import { type Blueprint, reviewRequiredActions } from "@/app/agents/blueprints";
 import type { NodeClassName } from "@/app/node-classes";
 import {
 	agents as agentsSchema,
@@ -108,7 +108,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			outputPort,
 		};
 	});
-	return {
+	const tmpBlueprint: Blueprint = {
 		id: blueprint.id,
 		agent: {
 			id: blueprint.agentId,
@@ -119,5 +119,10 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		builded: blueprint.builded,
 		nodes,
 		edges,
+	};
+	const requiredActions = reviewRequiredActions(tmpBlueprint);
+	return {
+		...tmpBlueprint,
+		requiredActions,
 	};
 };

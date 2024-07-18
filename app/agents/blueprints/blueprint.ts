@@ -1,5 +1,6 @@
 import type { NodeClassName } from "@/app/node-classes";
 import type * as schema from "@/drizzle/schema";
+import type { BlueprintRequiredAction } from "./required-action";
 
 type DbNode = typeof schema.nodes.$inferSelect;
 type DbPort = typeof schema.ports.$inferSelect;
@@ -28,6 +29,7 @@ export type Blueprint = {
 	version: number;
 	dirty: boolean;
 	builded: boolean;
+	requiredActions?: BlueprintRequiredAction[];
 };
 
 type AssertNode = (input: unknown) => asserts input is Node;

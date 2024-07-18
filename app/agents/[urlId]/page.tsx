@@ -15,6 +15,7 @@ import "@xyflow/react/dist/style.css";
 import {
 	BlueprintIdProvider,
 	useBuildBlueprintAction,
+	useRequiredActions,
 } from "@/app/agents/blueprints";
 import {
 	EditorDropdownMenu,
@@ -28,7 +29,12 @@ import { type NodeClassName, NodeClassesProvider } from "@/app/node-classes";
 import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { PlayIcon } from "@radix-ui/react-icons";
-import { ALargeSmallIcon, GripIcon, PlusIcon } from "lucide-react";
+import {
+	ALargeSmallIcon,
+	CircleAlertIcon,
+	GripIcon,
+	PlusIcon,
+} from "lucide-react";
 import { useLatestBlueprintGlance } from "./blueprints";
 import { useNodeTypes } from "./node";
 import type { Context } from "./strcture";
@@ -95,6 +101,7 @@ const WorkflowEditor: FC = () => {
 		[hideContextMenu, position, reactFlowInstance, addNode],
 	);
 	const { selectedNodes, handleNodesChange } = useNodeSelection();
+	const requiredActions = useRequiredActions();
 	return (
 		<div className="w-screen h-screen pl-4 pb-4 pt-2 pr-2 bg-background flex flex-col text-foreground">
 			<div className="mb-2 text-primary">Agent Flow Editor</div>
@@ -150,19 +157,26 @@ const WorkflowEditor: FC = () => {
 							className="w-full h-full flex flex-col"
 						>
 							<div className="bg-secondary py-1 px-1">
-								<Button
-									variant={"ghost"}
-									size={"xs"}
-									className="text-muted-foreground"
-									onClick={() =>
-										build().then(({ blueprintId }) =>
-											createRequest({ blueprintId }),
-										)
-									}
-								>
-									<PlayIcon className="mr-1" />
-									Request to Agent
-								</Button>
+								{requiredActions == null ? null : requiredActions.length > 0 ? (
+									<div className="text-muted-foreground flex items-center gap-1 text-xs">
+										<CircleAlertIcon className="w-4 h-4" />
+										<p>{requiredActions.map(({ type }) => type).join(", ")}</p>
+									</div>
+								) : (
+									<Button
+										variant={"ghost"}
+										size={"xs"}
+										className="text-muted-foreground"
+										onClick={() =>
+											build().then(({ blueprintId }) =>
+												createRequest({ blueprintId }),
+											)
+										}
+									>
+										<PlayIcon className="mr-1" />
+										Request to Agent
+									</Button>
+								)}
 							</div>
 							<div className="flex-1" ref={containerRef}>
 								<ReactFlow

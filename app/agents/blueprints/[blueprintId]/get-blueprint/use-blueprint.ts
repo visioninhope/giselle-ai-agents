@@ -1,11 +1,11 @@
 "use client";
 
+import { reviewRequiredActions, useBlueprintId } from "@/app/agents/blueprints";
 import type { InferResponse } from "@/lib/api";
 import { fetcher } from "@/lib/fetcher";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import invariant from "tiny-invariant";
-import { useBlueprintId } from "../../";
 import type { GET } from "./route";
 
 type ApiResponse = InferResponse<typeof GET>;
@@ -39,13 +39,27 @@ export const useBlueprint = () => {
 				(prev) =>
 					sendRequest.then((json) => {
 						invariant(prev != null, "invalid state: blueprint is null");
-						return mutateWithCache(prev, json);
+						const tmp = mutateWithCache(prev, json);
+						const requiredActions = reviewRequiredActions(tmp.blueprint);
+						return {
+							blueprint: {
+								...tmp.blueprint,
+								requiredActions,
+							},
+						};
 					}),
 				{
 					revalidate: false,
 					optimisticData: (prev) => {
 						invariant(prev != null, "invalid state: blueprint is null");
-						return optimisticDataWithCache(prev);
+						const tmp = optimisticDataWithCache(prev);
+						const requiredActions = reviewRequiredActions(tmp.blueprint);
+						return {
+							blueprint: {
+								...tmp.blueprint,
+								requiredActions,
+							},
+						};
 					},
 				},
 			);
@@ -63,4 +77,9 @@ export const useNode = (nodeId: number) => {
 		return n;
 	}, [blueprint, nodeId]);
 	return node;
+};
+
+export const useRequiredActions = () => {
+	const { blueprint } = useBlueprint();
+	return blueprint?.requiredActions;
 };
