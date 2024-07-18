@@ -168,14 +168,14 @@ export const runTriggerRelations = pgTable("run_trigger_relations", {
 	triggerId: text("trigger_id").notNull(),
 });
 
-export const stepDataKnots = pgView("step_data_knots", {
-	stepId: integer("step_id").notNull(),
-	nodeId: integer("node_id").notNull(),
-	portId: integer("port_id").notNull(),
-	portName: text("port_name").notNull(),
-	portDirection: text("port_direction").notNull(),
-	dataKnotId: integer("data_knot_id").notNull(),
-}).existing();
+// export const stepDataKnots = pgView("step_data_knots", {
+// 	stepId: integer("step_id").notNull(),
+// 	nodeId: integer("node_id").notNull(),
+// 	portId: integer("port_id").notNull(),
+// 	portName: text("port_name").notNull(),
+// 	portDirection: text("port_direction").notNull(),
+// 	dataKnotId: integer("data_knot_id").notNull(),
+// }).existing();
 
 // Create `stepDataKnots` view
 //
@@ -195,13 +195,13 @@ export const stepDataKnots = pgView("step_data_knots", {
 //   INNER JOIN data_knots ON data_knots.port_id = ports.id
 //   AND data_knots.step_id = steps.id
 
-export const stepStrands = pgView("step_strands", {
-	stepId: integer("step_id").notNull(),
-	nodeId: integer("node_id").notNull(),
-	portName: text("port_name").notNull(),
-	runId: integer("run_id").notNull(),
-	message: jsonb("message").notNull(),
-}).existing();
+// export const stepStrands = pgView("step_strands", {
+// 	stepId: integer("step_id").notNull(),
+// 	nodeId: integer("node_id").notNull(),
+// 	portName: text("port_name").notNull(),
+// 	runId: integer("run_id").notNull(),
+// 	message: jsonb("message").notNull(),
+// }).existing();
 
 // Create `stepStrands` view
 //
