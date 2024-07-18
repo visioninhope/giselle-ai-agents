@@ -4,12 +4,14 @@ import * as findUser from "./find-user";
 import * as onRequest from "./on-request";
 import * as response from "./response";
 import * as sendMail from "./send-mail";
+import * as textGeneration from "./text-generation";
 
 export const nodeClasses = [
 	findUser,
 	sendMail,
 	onRequest,
 	response,
+	textGeneration,
 ] satisfies NodeClass[];
 export type NodeClassName = (typeof nodeClasses)[number]["name"];
 
