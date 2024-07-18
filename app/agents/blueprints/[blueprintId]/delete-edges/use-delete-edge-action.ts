@@ -15,16 +15,16 @@ export const useDeleteEdgesAction = () => {
 				mutateWithCache: (prev) => ({
 					blueprint: {
 						...prev.blueprint,
-						nodes: prev.blueprint.nodes.filter(
-							(node) => !payload.deleteEdgeIds.includes(node.id),
+						edges: prev.blueprint.edges.filter(
+							(edge) => !payload.deleteEdgeIds.includes(edge.id),
 						),
 					},
 				}),
 				optimisticDataWithCache: (prev) => ({
 					blueprint: {
 						...prev.blueprint,
-						nodes: prev.blueprint.nodes.filter(
-							(node) => !payload.deleteEdgeIds.includes(node.id),
+						edges: prev.blueprint.edges.filter(
+							(edge) => !payload.deleteEdgeIds.includes(edge.id),
 						),
 					},
 				}),

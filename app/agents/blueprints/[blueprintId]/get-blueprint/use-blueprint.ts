@@ -40,10 +40,10 @@ export const useBlueprint = () => {
 			optimisticDataWithCache,
 		}: MutateArgs<T>) => {
 			mutate(
-				(prev) =>
+				() =>
 					sendRequest.then((json) => {
-						invariant(prev != null, "invalid state: blueprint is null");
-						const tmp = mutateWithCache(prev, json);
+						invariant(data != null, "invalid state: blueprint is null");
+						const tmp = mutateWithCache(data, json);
 						const requiredActions = reviewRequiredActions(tmp.blueprint);
 						const requestInterface = inferRequestInterface(tmp.blueprint);
 						return {
@@ -56,9 +56,10 @@ export const useBlueprint = () => {
 					}),
 				{
 					revalidate: false,
-					optimisticData: (prev) => {
-						invariant(prev != null, "invalid state: blueprint is null");
-						const tmp = optimisticDataWithCache(prev);
+					optimisticData: () => {
+						invariant(data != null, "invalid state: blueprint is null");
+
+						const tmp = optimisticDataWithCache(data);
 						const requiredActions = reviewRequiredActions(tmp.blueprint);
 						const requestInterface = inferRequestInterface(tmp.blueprint);
 						return {
@@ -72,7 +73,7 @@ export const useBlueprint = () => {
 				},
 			);
 		},
-		[mutate],
+		[mutate, data],
 	);
 	return { blueprint: data?.blueprint, mutateWithCache };
 };

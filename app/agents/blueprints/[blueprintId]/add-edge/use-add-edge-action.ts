@@ -31,7 +31,16 @@ export const useAddEdgeAction = () => {
 				mutateWithCache: (prev, response) => ({
 					blueprint: {
 						...prev.blueprint,
-						edges: [...prev.blueprint.edges, response.edge],
+						edges: [
+							...prev.blueprint.edges.filter(
+								({ inputPort, outputPort }) =>
+									inputPort.id !== response.edge.inputPort.id ||
+									outputPort.id !== response.edge.outputPort.id ||
+									inputPort.nodeId !== response.edge.inputPort.nodeId ||
+									outputPort.nodeId !== response.edge.outputPort.nodeId,
+							),
+							response.edge,
+						],
 					},
 				}),
 				optimisticDataWithCache: (prev) => ({
