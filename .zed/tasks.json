@@ -28,5 +28,10 @@
 		"label": "tsc",
 		"command": "bun tsc",
 		"allow_concurrent_runs": false
+	},
+	{
+		"label": "npm-check-updates",
+		"command": "bunx npm-check-updates",
+		"allow_concurrent_runs": false
 	}
 ]
