@@ -79,11 +79,10 @@ export const useBlueprint = () => {
 
 export const useNode = (nodeId: number) => {
 	const { blueprint } = useBlueprint();
-	const node = useMemo(() => {
-		const n = blueprint?.nodes.find(({ id }) => id === nodeId);
-		invariant(n != null, `invalid state: node ${nodeId} not found`);
-		return n;
-	}, [blueprint, nodeId]);
+	const node = useMemo(
+		() => blueprint?.nodes.find(({ id }) => id === nodeId),
+		[blueprint, nodeId],
+	);
 	return node;
 };
 

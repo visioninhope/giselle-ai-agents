@@ -40,9 +40,11 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 			<div>
 				{nodeClass?.features?.map((feature) =>
 					match(feature)
-						.with({ name: "dynamicOutputPort" }, () => (
-							<DynamicOutputPort node={blueprintNode} key={feature.name} />
-						))
+						.with({ name: "dynamicOutputPort" }, () =>
+							blueprintNode == null ? null : (
+								<DynamicOutputPort node={blueprintNode} key={feature.name} />
+							),
+						)
 						.exhaustive(),
 				)}
 			</div>
