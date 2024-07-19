@@ -9,10 +9,7 @@ import { useCallback } from "react";
 import type { Payload } from "./route";
 
 type UpdatePortNameArgs = {
-	port: Pick<
-		typeof portsSchema.$inferSelect,
-		"id" | "nodeId" | "name" | "direction" | "order"
-	>;
+	port: BlueprintPort;
 };
 export const useUpdatePortnameAction = () => {
 	const blueprintId = useBlueprintId();

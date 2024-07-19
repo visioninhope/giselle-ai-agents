@@ -1,7 +1,9 @@
 import { getBlueprint } from "@/app/agents/blueprints";
 import { type RequestStep, getRequest } from "@/app/agents/requests";
 import { getInvokeFunction } from "@/app/node-classes";
+import { requestPortMessages } from "@/drizzle";
 import {
+	db,
 	leaveMessage,
 	pullMessages,
 	updateRun,
@@ -31,12 +33,21 @@ export const invokeTask = task({
 				!inputPorts.some(({ type }) => type === "execution") &&
 				!outputPorts.some(({ type }) => type === "execution"),
 		);
-		// for (const dataNode of dataNodes) {
-		// for (const key of Object.keys(dataNode.propertyPortMap)) {
-		//   dataNode.propertyPortMap[key]
-		// 	payload.requestId, dataNode.portId, dataNode.properties[key]
-
-		// }
+		for (const dataNode of dataNodes) {
+			for (const property of dataNode.properties) {
+				/** @todo dynamic */
+				if (dataNode.className === "text" && property.name === "text") {
+					const textPort = dataNode.outputPorts.find((p) => p.name === "Text");
+					if (textPort != null) {
+						await db.insert(requestPortMessages).values({
+							requestId: payload.requestId,
+							portsBlueprintsId: textPort.portsBlueprintsId,
+							message: property.value,
+						});
+					}
+				}
+			}
+		}
 
 		for (const step of request.steps) {
 			await updateRunStep(payload.requestId, step.id, {

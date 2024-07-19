@@ -78,12 +78,15 @@ export const POST = async (
 			nodeProperties: nodeClass.properties ?? [],
 		})
 		.returning({ id: nodesBlueprintsSchema.id });
-	await db.insert(portsBlueprintsSchema).values(
-		ports.map(({ id }) => ({
-			portId: id,
-			nodesBlueprintsId: nodeBlueprint.id,
-		})),
-	);
+	const portsBlueprints = await db
+		.insert(portsBlueprintsSchema)
+		.values(
+			ports.map(({ id }) => ({
+				portId: id,
+				nodesBlueprintsId: nodeBlueprint.id,
+			})),
+		)
+		.returning({ id: portsBlueprintsSchema.id });
 	await db
 		.update(blueprintsSchema)
 		.set({ dirty: true })
@@ -97,10 +100,12 @@ export const POST = async (
 			inputPorts: inputPorts.map((port, index) => ({
 				...port,
 				id: ports[index].id,
+				portsBlueprintsId: portsBlueprints[index].id,
 			})),
 			outputPorts: outputPorts.map((port, index) => ({
 				...port,
 				id: ports[index + inputPorts.length].id,
+				portsBlueprintsId: portsBlueprints[index + inputPorts.length].id,
 			})),
 		},
 	});

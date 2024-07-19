@@ -31,6 +31,7 @@ export const useAddNodeAction = () => {
 						name: label ?? "",
 						direction: "input",
 						order: index,
+						portsBlueprintsId: 0,
 					}),
 				),
 				outputPorts: (nodeClass.outputPorts ?? []).map(
@@ -41,6 +42,7 @@ export const useAddNodeAction = () => {
 						name: label ?? "",
 						direction: "output",
 						order: index,
+						portsBlueprintsId: 0,
 					}),
 				),
 			};

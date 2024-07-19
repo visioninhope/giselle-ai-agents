@@ -51,10 +51,13 @@ export const POST = async (
 				eq(nodesBlueprints.nodeId, json.port.nodeId),
 			),
 		);
-	await db.insert(portsBlueprintsSchema).values({
-		portId: port.id,
-		nodesBlueprintsId: nodeBlueprint.id,
-	});
+	const [portBlueprint] = await db
+		.insert(portsBlueprintsSchema)
+		.values({
+			portId: port.id,
+			nodesBlueprintsId: nodeBlueprint.id,
+		})
+		.returning({ id: portsBlueprintsSchema.id });
 
 	return NextResponse.json<{
 		port: BlueprintPort;
@@ -66,6 +69,7 @@ export const POST = async (
 			direction: json.port.direction,
 			type: "data",
 			order,
+			portsBlueprintsId: portBlueprint.id,
 		},
 	});
 };

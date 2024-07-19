@@ -169,6 +169,17 @@ export const requestSteps = pgTable("request_steps", {
 	finishedAt: timestamp("finished_at"),
 });
 
+export const requestPortMessages = pgTable("request_port_messages", {
+	id: serial("id").primaryKey(),
+	requestId: integer("request_id")
+		.notNull()
+		.references(() => requests.id),
+	portsBlueprintsId: integer("ports_blueprints_id")
+		.notNull()
+		.references(() => portsBlueprints.id),
+	message: jsonb("message").notNull(),
+});
+
 export const requestDataKnotMessages = pgTable("request_data_knot_messages", {
 	id: serial("id").primaryKey(),
 	requestId: integer("request_id")

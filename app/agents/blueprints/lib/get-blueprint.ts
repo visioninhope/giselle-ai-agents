@@ -60,6 +60,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 						type: portsSchema.type,
 						order: portsSchema.order,
 						blueprintId: nodeBlueprintsSchema.blueprintId,
+						portsBlueprintsId: portBlueprintsSchema.id,
 					})
 					.from(portsSchema)
 					.innerJoin(
@@ -90,23 +91,25 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			...node,
 			className: className as NodeClassName,
 			inputPorts: inputPorts.map(
-				({ id, name, type, direction, order, nodeId }) => ({
+				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
 					id,
 					name,
 					type,
 					direction,
 					order,
 					nodeId,
+					portsBlueprintsId,
 				}),
 			),
 			outputPorts: outputPorts.map(
-				({ id, name, type, direction, order, nodeId }) => ({
+				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
 					id,
 					name,
 					type,
 					direction,
 					order,
 					nodeId,
+					portsBlueprintsId,
 				}),
 			),
 		};

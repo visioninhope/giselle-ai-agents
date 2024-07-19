@@ -6,10 +6,11 @@ import type { BlueprintRequiredAction } from "./required-action";
 type DbNode = typeof schema.nodes.$inferSelect;
 type DbPort = typeof schema.ports.$inferSelect;
 type DbEdge = typeof schema.edges.$inferSelect;
+type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = Pick<
 	DbPort,
 	"id" | "nodeId" | "type" | "name" | "direction" | "order"
->;
+> & { portsBlueprintsId: DbPortsBlueprints["id"] };
 export type Node = Pick<DbNode, "id" | "position"> & {
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
