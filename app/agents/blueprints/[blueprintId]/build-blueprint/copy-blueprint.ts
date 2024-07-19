@@ -27,12 +27,14 @@ export const copyBlueprint = async (blueprint: Blueprint) => {
 	const originNodeBlueprints = await db.query.nodesBlueprints.findMany({
 		columns: {
 			nodeId: true,
+			nodeProperties: true,
 		},
 		where: eq(nodesBlueprints.blueprintId, blueprint.id),
 	});
 	await db.insert(nodesBlueprints).values(
-		originNodeBlueprints.map(({ nodeId }) => ({
+		originNodeBlueprints.map(({ nodeId, nodeProperties }) => ({
 			nodeId,
+			nodeProperties,
 			blueprintId: newBlueprint.id,
 		})),
 	);
