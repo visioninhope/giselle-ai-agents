@@ -13,9 +13,10 @@ import {
 	edges as edgesSchema,
 	nodesBlueprints as nodeBlueprintsSchema,
 	nodes as nodesSchema,
+	portsBlueprints as portBlueprintsSchema,
+	ports as portsSchema,
 } from "@/drizzle";
-import * as schema from "@/drizzle/schema";
-import { asc, desc, eq, inArray } from "drizzle-orm";
+import { and, desc, eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
@@ -47,21 +48,42 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			eq(nodeBlueprintsSchema.nodeId, nodesSchema.id),
 		)
 		.where(eq(nodeBlueprintsSchema.blueprintId, blueprint.id));
-	const ports =
+	const dbPorts =
 		dbNodes.length === 0
 			? []
-			: await db.query.ports.findMany({
-					where: inArray(
-						schema.ports.nodeId,
-						dbNodes.map((node) => node.id),
-					),
-					orderBy: asc(schema.ports.order),
-				});
+			: await db
+					.select({
+						id: portsSchema.id,
+						direction: portsSchema.direction,
+						nodeId: portsSchema.nodeId,
+						name: portsSchema.name,
+						type: portsSchema.type,
+						order: portsSchema.order,
+						blueprintId: nodeBlueprintsSchema.blueprintId,
+					})
+					.from(portsSchema)
+					.innerJoin(
+						portBlueprintsSchema,
+						eq(portBlueprintsSchema.portId, portsSchema.id),
+					)
+					.innerJoin(
+						nodeBlueprintsSchema,
+						eq(nodeBlueprintsSchema.id, portBlueprintsSchema.nodesBlueprintsId),
+					)
+					.where(
+						and(
+							eq(nodeBlueprintsSchema.blueprintId, blueprint.id),
+							inArray(
+								portsSchema.nodeId,
+								dbNodes.map((node) => node.id),
+							),
+						),
+					);
 	const nodes = dbNodes.map(({ className, ...node }) => {
-		const inputPorts = ports.filter(
+		const inputPorts = dbPorts.filter(
 			({ nodeId, direction }) => nodeId === node.id && direction === "input",
 		);
-		const outputPorts = ports.filter(
+		const outputPorts = dbPorts.filter(
 			({ nodeId, direction }) => nodeId === node.id && direction === "output",
 		);
 		return {
@@ -103,8 +125,8 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		)
 		.where(eq(edgeBlueprintsSchema.blueprintId, blueprint.id));
 	const edges = dbEdges.map((edge) => {
-		const inputPort = ports.find((port) => port.id === edge.inputPortId);
-		const outputPort = ports.find((port) => port.id === edge.outputPortId);
+		const inputPort = dbPorts.find((port) => port.id === edge.inputPortId);
+		const outputPort = dbPorts.find((port) => port.id === edge.outputPortId);
 		invariant(inputPort != null, "Input port not found");
 		invariant(outputPort != null, "Output port not found");
 		return {

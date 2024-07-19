@@ -15,6 +15,7 @@ export type Node = Pick<DbNode, "id" | "position"> & {
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
 	properties: NodeProperties;
+	// propertyPortMap: Record<string, string>;
 };
 export type Edge = Pick<DbEdge, "id" | "edgeType"> & {
 	inputPort: Pick<DbPort, "id" | "nodeId">;

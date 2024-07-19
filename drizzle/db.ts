@@ -9,9 +9,9 @@ import {
 	dataRoutes,
 	nodes,
 	ports,
+	requestDataKnotMessages,
 	requestSteps,
 	requests,
-	runDataKnotMessages,
 	steps,
 } from "./schema";
 
@@ -43,10 +43,10 @@ export const updateRunStep = async (
 };
 
 export const pullMessage = async (dataKnotId: number, runId: number) => {
-	const runDataKnotMessage = await db.query.runDataKnotMessages.findFirst({
+	const runDataKnotMessage = await db.query.requestDataKnotMessages.findFirst({
 		where: and(
-			eq(runDataKnotMessages.dataKnotId, dataKnotId),
-			eq(runDataKnotMessages.runId, runId),
+			eq(requestDataKnotMessages.dataKnotId, dataKnotId),
+			eq(requestDataKnotMessages.requestId, runId),
 		),
 	});
 	const dataKnot = await db.query.dataKnots.findFirst({
@@ -60,7 +60,7 @@ type Message = {
 	value: any;
 };
 export const leaveMessage = async (
-	runId: number,
+	requestId: number,
 	stepId: number,
 	messages: Message[],
 ) => {
@@ -86,8 +86,8 @@ export const leaveMessage = async (
 		if (stepDataKnot == null) {
 			continue;
 		}
-		await db.insert(runDataKnotMessages).values({
-			runId,
+		await db.insert(requestDataKnotMessages).values({
+			requestId,
 			dataKnotId: stepDataKnot.dataKnotId,
 			message: message.value,
 		});
@@ -130,7 +130,7 @@ export const pullMessages = async (runId: number, stepId: number) => {
 	const originDataKnots = alias(dataKnots, "originDataKnots");
 	const stepStrands = await db
 		.select({
-			message: runDataKnotMessages.message,
+			message: requestDataKnotMessages.message,
 			portName: ports.name,
 		})
 		.from(steps)
@@ -143,10 +143,10 @@ export const pullMessages = async (runId: number, stepId: number) => {
 		.innerJoin(dataRoutes, eq(dataRoutes.destinationKnotId, dataKnots.id))
 		.innerJoin(originDataKnots, eq(originDataKnots.id, dataRoutes.originKnotId))
 		.innerJoin(
-			runDataKnotMessages,
+			requestDataKnotMessages,
 			and(
-				eq(runDataKnotMessages.dataKnotId, originDataKnots.id),
-				eq(runDataKnotMessages.runId, runId),
+				eq(requestDataKnotMessages.dataKnotId, originDataKnots.id),
+				eq(requestDataKnotMessages.requestId, runId),
 			),
 		);
 	return stepStrands;

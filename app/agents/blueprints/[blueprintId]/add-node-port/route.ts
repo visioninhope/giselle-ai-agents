@@ -1,5 +1,11 @@
-import { db, ports as portsSchema } from "@/drizzle";
-import { desc, eq } from "drizzle-orm";
+import {
+	db,
+	nodes,
+	nodesBlueprints,
+	portsBlueprints as portsBlueprintsSchema,
+	ports as portsSchema,
+} from "@/drizzle";
+import { and, desc, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import type { BlueprintPort } from "../../blueprint";
 
@@ -9,7 +15,10 @@ export type Payload = {
 type AssertPayload = (json: unknown) => asserts json is Payload;
 /** @todo Implement this function */
 const assertPayload: AssertPayload = (json) => {};
-export const POST = async (request: Request) => {
+export const POST = async (
+	request: Request,
+	{ params }: { params: { blueprintId: string } },
+) => {
 	const json = await request.json();
 	assertPayload(json);
 	const lastPort = await db.query.ports.findFirst({
@@ -30,6 +39,22 @@ export const POST = async (request: Request) => {
 		.returning({
 			id: portsSchema.id,
 		});
+	const [nodeBlueprint] = await db
+		.select({ nodeId: nodesBlueprints.nodeId, id: nodesBlueprints.id })
+		.from(nodesBlueprints)
+		.where(
+			and(
+				eq(
+					nodesBlueprints.blueprintId,
+					Number.parseInt(params.blueprintId, 10),
+				),
+				eq(nodesBlueprints.nodeId, json.port.nodeId),
+			),
+		);
+	await db.insert(portsBlueprintsSchema).values({
+		portId: port.id,
+		nodesBlueprintsId: nodeBlueprint.id,
+	});
 
 	return NextResponse.json<{
 		port: BlueprintPort;

@@ -5,6 +5,7 @@ import {
 	db,
 	nodesBlueprints as nodesBlueprintsSchema,
 	nodes as nodesSchema,
+	portsBlueprints as portsBlueprintsSchema,
 	ports as portsSchema,
 } from "@/drizzle";
 import { eq, inArray } from "drizzle-orm";
@@ -67,13 +68,22 @@ export const POST = async (
 		.insert(portsSchema)
 		.values([...inputPorts, ...outputPorts])
 		.returning({
-			insertedId: portsSchema.id,
+			id: portsSchema.id,
 		});
-	await db.insert(nodesBlueprintsSchema).values({
-		nodeId: node.id,
-		blueprintId: blueprint.id,
-		nodeProperties: nodeClass.properties ?? [],
-	});
+	const [nodeBlueprint] = await db
+		.insert(nodesBlueprintsSchema)
+		.values({
+			nodeId: node.id,
+			blueprintId: blueprint.id,
+			nodeProperties: nodeClass.properties ?? [],
+		})
+		.returning({ id: nodesBlueprintsSchema.id });
+	await db.insert(portsBlueprintsSchema).values(
+		ports.map(({ id }) => ({
+			portId: id,
+			nodesBlueprintsId: nodeBlueprint.id,
+		})),
+	);
 	await db
 		.update(blueprintsSchema)
 		.set({ dirty: true })
@@ -86,11 +96,11 @@ export const POST = async (
 			properties: nodeClass.properties ?? [],
 			inputPorts: inputPorts.map((port, index) => ({
 				...port,
-				id: ports[index].insertedId,
+				id: ports[index].id,
 			})),
 			outputPorts: outputPorts.map((port, index) => ({
 				...port,
-				id: ports[index + inputPorts.length].insertedId,
+				id: ports[index + inputPorts.length].id,
 			})),
 		},
 	});

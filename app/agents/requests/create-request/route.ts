@@ -2,7 +2,7 @@ import {
 	db,
 	requestSteps as requestStepSchema,
 	requests as requestsSchema,
-	runTriggerRelations as runTriggerRelationsSchema,
+	requestTriggerRelations as runTriggerRelationsSchema,
 	steps as stepsSchema,
 } from "@/drizzle";
 import { invokeTask } from "@/trigger/invoke";
@@ -41,7 +41,7 @@ export const POST = async (req: Request) => {
 	});
 
 	await db.insert(runTriggerRelationsSchema).values({
-		runId: request.id,
+		requestId: request.id,
 		triggerId: handle.id,
 	});
 

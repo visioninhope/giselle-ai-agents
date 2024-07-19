@@ -1,4 +1,4 @@
-import type { RequestStepStatus, RunStatus } from "@/drizzle/schema";
+import type { RequestStatus, RequestStepStatus } from "@/drizzle/schema";
 
 export type RequestStep = {
 	id: number;
@@ -17,7 +17,7 @@ export type AgentRequest = {
 		id: number;
 	};
 	id: number;
-	status: RunStatus;
+	status: RequestStatus;
 	steps: Array<RequestStep>;
 };
 

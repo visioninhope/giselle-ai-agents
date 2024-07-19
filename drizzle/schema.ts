@@ -79,6 +79,16 @@ export const ports = pgTable("ports", {
 	order: integer("order").notNull(),
 });
 
+export const portsBlueprints = pgTable("ports_blueprints", {
+	id: serial("id").primaryKey(),
+	nodesBlueprintsId: integer("nodes_blueprints_id")
+		.notNull()
+		.references(() => nodesBlueprints.id, { onDelete: "cascade" }),
+	portId: integer("port_id")
+		.notNull()
+		.references(() => ports.id, { onDelete: "cascade" }),
+});
+
 type EdgeType = "data" | "execution";
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
@@ -133,13 +143,13 @@ export const dataRoutes = pgTable("data_routes", {
 		.references(() => dataKnots.id),
 });
 
-export type RunStatus = "creating" | "running" | "success" | "failed";
+export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
 		.notNull()
 		.references(() => blueprints.id),
-	status: text("status").$type<RunStatus>().notNull(),
+	status: text("status").$type<RequestStatus>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
@@ -159,9 +169,9 @@ export const requestSteps = pgTable("request_steps", {
 	finishedAt: timestamp("finished_at"),
 });
 
-export const runDataKnotMessages = pgTable("run_data_knot_messages", {
+export const requestDataKnotMessages = pgTable("request_data_knot_messages", {
 	id: serial("id").primaryKey(),
-	runId: integer("run_id")
+	requestId: integer("request_id")
 		.notNull()
 		.references(() => requests.id),
 	dataKnotId: integer("data_knot_id")
@@ -170,9 +180,9 @@ export const runDataKnotMessages = pgTable("run_data_knot_messages", {
 	message: jsonb("message").notNull(),
 });
 
-export const runTriggerRelations = pgTable("run_trigger_relations", {
+export const requestTriggerRelations = pgTable("request_trigger_relations", {
 	id: serial("id").primaryKey(),
-	runId: integer("run_id")
+	requestId: integer("request_id")
 		.notNull()
 		.references(() => requests.id),
 	triggerId: text("trigger_id").notNull(),
