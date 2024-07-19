@@ -18,13 +18,20 @@ export const inferSteps = ({ nodes, edges }: Blueprint) => {
 			order,
 		});
 
-		const outgoingEdges = edges.filter((e) => e.outputPort.nodeId === nodeId);
+		const outgoingEdges = edges.filter(
+			({ outputPort, edgeType }) =>
+				outputPort.nodeId === nodeId && edgeType === "execution",
+		);
 		for (const edge of outgoingEdges) {
 			dfs(edge.inputPort.nodeId, order + 1);
 		}
 	};
-	const targetNodeIds = new Set(edges.map((edge) => edge.inputPort.nodeId));
-	const startNode = nodes.find((node) => !targetNodeIds.has(node.id));
+	const targetNodeIds = new Set(
+		edges
+			.filter(({ edgeType }) => edgeType === "execution")
+			.map((edge) => edge.inputPort.nodeId),
+	);
+	const startNode = nodes.find((node) => node.className === "onRequest");
 	if (startNode == null) {
 		return [];
 	}

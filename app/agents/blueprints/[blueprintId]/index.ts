@@ -8,4 +8,4 @@ export * from "./update-nodes-position";
 export * from "./add-node-port";
 export * from "./update-port-name";
 export * from "./delete-port";
-export * from "./update-node-properties";
+export * from "./update-node-property";

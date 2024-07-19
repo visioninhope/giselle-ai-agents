@@ -52,7 +52,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 			</div>
 			<div className="px-4">
 				{blueprintNode.properties?.map((property) => (
-					<PropertyField key={property.name} {...property} />
+					<PropertyField key={property.name} nodeId={node.id} {...property} />
 				))}
 			</div>
 		</div>

@@ -7,7 +7,7 @@ import { useCallback } from "react";
 import type { Payload } from "./route";
 
 type UpdateNodePropertiesArgs = Omit<Payload, "blueprintId">;
-export const useUpdateNodeProperties = () => {
+export const useUpdateNodeProperty = () => {
 	const blueprintId = useBlueprintId();
 	const { mutateWithCache } = useBlueprint();
 	const updateNodeProperties = useCallback(
@@ -21,10 +21,13 @@ export const useUpdateNodeProperties = () => {
 		},
 		[blueprintId, mutateWithCache],
 	);
+	return {
+		updateNodeProperties,
+	};
 };
 
 const execApi = (blueprintId: number, payload: Payload) =>
-	fetch(`/agents/blueprints/${blueprintId}/update-node-properties`, {
+	fetch(`/agents/blueprints/${blueprintId}/update-node-property`, {
 		method: "PATCH",
 		headers: {
 			"Content-Type": "application/json",
@@ -42,7 +45,15 @@ const synthesize = (
 		}
 		return {
 			...node,
-			properties: payload.properties,
+			properties: node.properties.map((property) => {
+				if (property.name !== payload.property.name) {
+					return property;
+				}
+				return {
+					...property,
+					value: payload.property.value,
+				};
+			}),
 		};
 	});
 	return {
