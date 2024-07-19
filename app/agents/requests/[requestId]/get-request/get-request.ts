@@ -66,8 +66,8 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 				className: node.className,
 			},
 			status: requestStep.status,
-			run: {
-				id: requestStep.id,
+			request: {
+				id: request.id,
 			},
 		};
 	});
