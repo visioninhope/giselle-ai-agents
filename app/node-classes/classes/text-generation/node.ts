@@ -5,10 +5,10 @@ export const name = "textGeneration";
 export const label = "Text Generation";
 
 export const inputPorts: Port[] = [
-	{ type: "execution" },
-	{ type: "data", label: "Instruction" },
+	{ type: "execution", key: "from" },
+	{ type: "data", label: "Instruction", key: "instruction" },
 ];
 export const outputPorts: Port[] = [
-	{ type: "execution" },
-	{ type: "data", label: "Result" },
+	{ type: "execution", key: "to" },
+	{ type: "data", label: "Result", key: "result" },
 ];

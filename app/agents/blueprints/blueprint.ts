@@ -9,14 +9,14 @@ type DbEdge = typeof schema.edges.$inferSelect;
 type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = Pick<
 	DbPort,
-	"id" | "nodeId" | "type" | "name" | "direction" | "order"
+	"id" | "nodeId" | "type" | "name" | "direction" | "order" | "nodeClassKey"
 > & { portsBlueprintsId: DbPortsBlueprints["id"] };
 export type Node = Pick<DbNode, "id" | "position"> & {
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
 	properties: NodeProperties;
-	// propertyPortMap: Record<string, string>;
+	propertyPortMap: Record<string, string>;
 };
 export type Edge = Pick<DbEdge, "id" | "edgeType"> & {
 	inputPort: Pick<DbPort, "id" | "nodeId">;

@@ -23,8 +23,9 @@ export const useAddNodeAction = () => {
 				position: node.position,
 				className: node.className,
 				properties: nodeClass.properties ?? [],
+				propertyPortMap: nodeClass.propertyPortMap ?? {},
 				inputPorts: (nodeClass.inputPorts ?? []).map(
-					({ type, label }, index) => ({
+					({ type, label, key }, index) => ({
 						id: index,
 						nodeId: 0,
 						type: type,
@@ -32,10 +33,11 @@ export const useAddNodeAction = () => {
 						direction: "input",
 						order: index,
 						portsBlueprintsId: 0,
+						nodeClassKey: key,
 					}),
 				),
 				outputPorts: (nodeClass.outputPorts ?? []).map(
-					({ type, label }, index) => ({
+					({ type, label, key }, index) => ({
 						id: index,
 						nodeId: 0,
 						type: type,
@@ -43,6 +45,7 @@ export const useAddNodeAction = () => {
 						direction: "output",
 						order: index,
 						portsBlueprintsId: 0,
+						nodeClassKey: key,
 					}),
 				),
 			};

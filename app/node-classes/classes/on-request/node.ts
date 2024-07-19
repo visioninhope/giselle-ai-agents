@@ -4,6 +4,6 @@ export const name = "onRequest";
 
 export const label = "On Request";
 
-export const outputPorts: Port[] = [{ type: "execution" }];
+export const outputPorts: Port[] = [{ type: "execution", key: "to" }];
 
 export const features: Feature[] = [{ name: "dynamicOutputPort" }];

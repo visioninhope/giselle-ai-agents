@@ -70,6 +70,7 @@ export const POST = async (
 			type: "data",
 			order,
 			portsBlueprintsId: portBlueprint.id,
+			nodeClassKey: null,
 		},
 	});
 };

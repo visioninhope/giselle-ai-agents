@@ -54,6 +54,7 @@ export const POST = async (
 		direction: "input",
 		order: index,
 		name: port.label ?? "",
+		nodeClassKey: port.key,
 	}));
 	const outputPorts: (typeof portsSchema.$inferInsert)[] = (
 		nodeClass.outputPorts ?? []
@@ -63,6 +64,7 @@ export const POST = async (
 		direction: "output",
 		order: index,
 		name: port.label ?? "",
+		nodeClassKey: port.key,
 	}));
 	const ports = await db
 		.insert(portsSchema)
@@ -101,12 +103,15 @@ export const POST = async (
 				...port,
 				id: ports[index].id,
 				portsBlueprintsId: portsBlueprints[index].id,
+				nodeClassKey: port.nodeClassKey ?? null,
 			})),
 			outputPorts: outputPorts.map((port, index) => ({
 				...port,
 				id: ports[index + inputPorts.length].id,
 				portsBlueprintsId: portsBlueprints[index + inputPorts.length].id,
+				nodeClassKey: port.nodeClassKey ?? null,
 			})),
+			propertyPortMap: nodeClass.propertyPortMap ?? {},
 		},
 	});
 };

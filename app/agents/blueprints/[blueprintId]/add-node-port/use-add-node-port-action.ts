@@ -26,6 +26,7 @@ export const useAddNodePortAction = () => {
 				direction: port.direction,
 				order: 1000,
 				portsBlueprintsId: 0,
+				nodeClassKey: null,
 			};
 			mutateWithCache({
 				sendRequest: execApi(blueprintId, { port }),

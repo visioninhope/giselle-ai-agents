@@ -4,7 +4,7 @@ import {
 	inferRequestInterface,
 	reviewRequiredActions,
 } from "@/app/agents/blueprints";
-import type { NodeClassName } from "@/app/node-classes";
+import { type NodeClassName, getNodeClass } from "@/app/node-classes";
 import {
 	agents as agentsSchema,
 	blueprints as blueprintsSchema,
@@ -59,6 +59,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 						name: portsSchema.name,
 						type: portsSchema.type,
 						order: portsSchema.order,
+						nodeClassKey: portsSchema.nodeClassKey,
 						blueprintId: nodeBlueprintsSchema.blueprintId,
 						portsBlueprintsId: portBlueprintsSchema.id,
 					})
@@ -87,11 +88,13 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		const outputPorts = dbPorts.filter(
 			({ nodeId, direction }) => nodeId === node.id && direction === "output",
 		);
+		const nodeClass = getNodeClass(className as NodeClassName);
 		return {
 			...node,
 			className: className as NodeClassName,
+			propertyPortMap: nodeClass.propertyPortMap ?? {},
 			inputPorts: inputPorts.map(
-				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
+				({
 					id,
 					name,
 					type,
@@ -99,10 +102,20 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					order,
 					nodeId,
 					portsBlueprintsId,
+					nodeClassKey,
+				}) => ({
+					id,
+					name,
+					type,
+					direction,
+					order,
+					nodeId,
+					portsBlueprintsId,
+					nodeClassKey,
 				}),
 			),
 			outputPorts: outputPorts.map(
-				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
+				({
 					id,
 					name,
 					type,
@@ -110,6 +123,16 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					order,
 					nodeId,
 					portsBlueprintsId,
+					nodeClassKey,
+				}) => ({
+					id,
+					name,
+					type,
+					direction,
+					order,
+					nodeId,
+					portsBlueprintsId,
+					nodeClassKey,
 				}),
 			),
 		};
