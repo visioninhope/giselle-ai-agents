@@ -1,4 +1,5 @@
 import { type RequestStep, getRequest } from "@/app/agents/requests";
+import { getInvokeFunction } from "@/app/node-classes";
 import {
 	leaveMessage,
 	pullMessages,
@@ -30,11 +31,11 @@ export const invokeTask = task({
 				startedAt: new Date(),
 			});
 			logger.log(`${step.node.className} started!!`);
-			if (step.node.className === "FindUser") {
-				await findUser(step);
-			}
-			if (step.node.className === "SendMail") {
-				await sendMail(step);
+			const invokeFunction = getInvokeFunction(step.node.className);
+			if (invokeFunction == null) {
+				logger.log(`invokeFunction not implemented for ${step.node.className}`);
+			} else {
+				invokeFunction(step);
 			}
 			await wait.for({ seconds: 5 });
 			logger.log(`${step.node.className} finished!!`);

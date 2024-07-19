@@ -1,3 +1,4 @@
+import type { RequestStep } from "@/app/agents/requests";
 import type { PortType } from "@/drizzle/schema";
 
 export type NodeClass = {
@@ -7,6 +8,8 @@ export type NodeClass = {
 	outputPorts?: Port[];
 	features?: Feature[];
 };
+
+export type InvokeFunction = (requestStep: RequestStep) => Promise<void>;
 
 export type Port = {
 	type: PortType;

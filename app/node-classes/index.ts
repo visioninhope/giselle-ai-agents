@@ -1,5 +1,5 @@
 import invariant from "tiny-invariant";
-export { type NodeClassName, getNodeClass } from "./classes";
+export * from "./classes";
 import type { NodeClass } from "./type";
 export type { NodeClass, Feature } from "./type";
 export * from "./contexts";

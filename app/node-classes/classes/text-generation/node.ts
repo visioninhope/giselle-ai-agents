@@ -1,4 +1,4 @@
-import type { Port } from "../type";
+import type { Port } from "../../type";
 
 export const name = "textGeneration";
 

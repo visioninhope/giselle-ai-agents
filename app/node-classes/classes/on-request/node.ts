@@ -1,4 +1,4 @@
-import type { Feature, Port } from "../type";
+import type { Feature, Port } from "../../type";
 
 export const name = "onRequest";
 
