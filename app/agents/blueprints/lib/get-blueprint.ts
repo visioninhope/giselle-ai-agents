@@ -39,6 +39,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			id: nodesSchema.id,
 			className: nodesSchema.className,
 			position: nodesSchema.position,
+			properties: nodeBlueprintsSchema.nodeProperties,
 		})
 		.from(nodesSchema)
 		.innerJoin(

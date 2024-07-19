@@ -1,5 +1,6 @@
 import type { NodeClassName } from "@/app/node-classes";
 import type * as schema from "@/drizzle/schema";
+import type { NodeProperties } from "@/drizzle/schema";
 import type { BlueprintRequiredAction } from "./required-action";
 
 type DbNode = typeof schema.nodes.$inferSelect;
@@ -13,6 +14,7 @@ export type Node = Pick<DbNode, "id" | "position"> & {
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
+	properties: NodeProperties;
 };
 export type Edge = Pick<DbEdge, "id" | "edgeType"> & {
 	inputPort: Pick<DbPort, "id" | "nodeId">;

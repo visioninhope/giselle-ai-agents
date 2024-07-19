@@ -46,6 +46,12 @@ export const nodes = pgTable("nodes", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export type NodeProperty = {
+	name: string;
+	label?: string;
+	value?: string;
+};
+export type NodeProperties = NodeProperty[];
 export const nodesBlueprints = pgTable("nodes_blueprints", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
@@ -54,6 +60,10 @@ export const nodesBlueprints = pgTable("nodes_blueprints", {
 	nodeId: integer("node_id")
 		.notNull()
 		.references(() => nodes.id, { onDelete: "cascade" }),
+	nodeProperties: jsonb("node_properties")
+		.$type<NodeProperties>()
+		.notNull()
+		.default([]),
 });
 
 type PortDirection = "input" | "output";

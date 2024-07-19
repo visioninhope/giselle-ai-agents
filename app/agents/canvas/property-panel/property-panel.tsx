@@ -3,6 +3,7 @@ import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import { type FC, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DynamicOutputPort } from "./dynamic-output-port";
+import { PropertyField } from "./property-field";
 
 type PropertyPanel = {
 	selectedNodes: Node[];
@@ -35,18 +36,24 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 		[nodeClasses, node.className],
 	);
 	const blueprintNode = useNode(node.id);
+	if (blueprintNode == null) {
+		return null;
+	}
 	return (
 		<div className="flex flex-col gap-2">
 			<div>
-				{nodeClass?.features?.map((feature) =>
+				{nodeClass.features?.map((feature) =>
 					match(feature)
-						.with({ name: "dynamicOutputPort" }, () =>
-							blueprintNode == null ? null : (
-								<DynamicOutputPort node={blueprintNode} key={feature.name} />
-							),
-						)
+						.with({ name: "dynamicOutputPort" }, () => (
+							<DynamicOutputPort node={blueprintNode} key={feature.name} />
+						))
 						.exhaustive(),
 				)}
+			</div>
+			<div className="px-4">
+				{blueprintNode.properties?.map((property) => (
+					<PropertyField key={property.name} {...property} />
+				))}
 			</div>
 		</div>
 	);

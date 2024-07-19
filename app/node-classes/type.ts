@@ -7,12 +7,18 @@ export type NodeClass = {
 	inputPorts?: Port[];
 	outputPorts?: Port[];
 	features?: Feature[];
+	properties?: Property[];
 };
 
 export type InvokeFunction = (requestStep: RequestStep) => Promise<void>;
 
 export type Port = {
 	type: PortType;
+	label?: string;
+};
+
+export type Property = {
+	name: string;
 	label?: string;
 };
 

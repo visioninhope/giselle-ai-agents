@@ -17,12 +17,13 @@ export const useAddNodeAction = () => {
 			if (nodeClasses == null) {
 				return;
 			}
-			const nodeDef = findNodeClass(nodeClasses, node.className);
+			const nodeClass = findNodeClass(nodeClasses, node.className);
 			const draftNode: Node = {
 				id: 0,
 				position: node.position,
 				className: node.className,
-				inputPorts: (nodeDef.inputPorts ?? []).map(
+				properties: nodeClass.properties ?? [],
+				inputPorts: (nodeClass.inputPorts ?? []).map(
 					({ type, label }, index) => ({
 						id: index,
 						nodeId: 0,
@@ -32,7 +33,7 @@ export const useAddNodeAction = () => {
 						order: index,
 					}),
 				),
-				outputPorts: (nodeDef.outputPorts ?? []).map(
+				outputPorts: (nodeClass.outputPorts ?? []).map(
 					({ type, label }, index) => ({
 						id: index,
 						nodeId: 0,

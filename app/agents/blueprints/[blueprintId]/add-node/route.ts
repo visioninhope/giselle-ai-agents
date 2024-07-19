@@ -72,6 +72,7 @@ export const POST = async (
 	await db.insert(nodesBlueprintsSchema).values({
 		nodeId: node.id,
 		blueprintId: blueprint.id,
+		nodeProperties: nodeClass.properties ?? [],
 	});
 	await db
 		.update(blueprintsSchema)
@@ -82,6 +83,7 @@ export const POST = async (
 			id: node.id,
 			position: payload.node.position,
 			className: payload.node.className,
+			properties: nodeClass.properties ?? [],
 			inputPorts: inputPorts.map((port, index) => ({
 				...port,
 				id: ports[index].insertedId,
