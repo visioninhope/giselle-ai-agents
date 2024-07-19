@@ -69,9 +69,8 @@ export const invokeTask = task({
 			if (invokeFunction == null) {
 				logger.log(`invokeFunction not implemented for ${step.node.className}`);
 			} else {
-				invokeFunction(step);
+				await invokeFunction(step);
 			}
-			await wait.for({ seconds: 5 });
 			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {
 				status: "success",
@@ -89,24 +88,3 @@ export const invokeTask = task({
 		};
 	},
 });
-
-const findUser = async ({ request: run, id }: RequestStep) => {
-	logger.log("finding user...");
-	await wait.for({ seconds: 3 });
-	logger.log("user found!!");
-	await leaveMessage(run.id, id, [
-		{
-			portName: "user",
-			value: "John Doe",
-		},
-	]);
-};
-
-const sendMail = async ({ request: run, id }: RequestStep) => {
-	logger.log("sending mail...");
-	const messages = await pullMessages(run.id, id);
-	for (const message of messages) {
-		logger.log(`${message.portName} => ${message.message}`);
-		message.portName;
-	}
-};
