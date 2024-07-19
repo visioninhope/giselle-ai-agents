@@ -7,7 +7,7 @@ export type RequestStep = {
 		className: string;
 	};
 	status: RequestStepStatus;
-	run: {
+	request: {
 		id: number;
 	};
 };

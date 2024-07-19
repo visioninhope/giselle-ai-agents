@@ -35,17 +35,27 @@ export const invokeTask = task({
 		);
 		for (const dataNode of dataNodes) {
 			for (const property of dataNode.properties) {
-				/** @todo dynamic */
-				if (dataNode.className === "text" && property.name === "text") {
-					const textPort = dataNode.outputPorts.find((p) => p.name === "Text");
-					if (textPort != null) {
-						await db.insert(requestPortMessages).values({
-							requestId: payload.requestId,
-							portsBlueprintsId: textPort.portsBlueprintsId,
-							message: property.value,
-						});
-					}
+				const portKey = dataNode.propertyPortMap[property.name];
+				if (portKey == null) {
+					logger.log(
+						`targetPort not found for ${dataNode.className}.${property.name}`,
+					);
+					continue;
 				}
+				const targetPort = dataNode.outputPorts.find(
+					(outputPort) => outputPort.nodeClassKey === portKey,
+				);
+				if (targetPort == null) {
+					logger.log(
+						`targetPort not found for ${dataNode.className}.${portKey}`,
+					);
+					continue;
+				}
+				await db.insert(requestPortMessages).values({
+					requestId: payload.requestId,
+					portsBlueprintsId: targetPort.portsBlueprintsId,
+					message: property.value,
+				});
 			}
 		}
 
@@ -80,7 +90,7 @@ export const invokeTask = task({
 	},
 });
 
-const findUser = async ({ run, id }: RequestStep) => {
+const findUser = async ({ request: run, id }: RequestStep) => {
 	logger.log("finding user...");
 	await wait.for({ seconds: 3 });
 	logger.log("user found!!");
@@ -92,7 +102,7 @@ const findUser = async ({ run, id }: RequestStep) => {
 	]);
 };
 
-const sendMail = async ({ run, id }: RequestStep) => {
+const sendMail = async ({ request: run, id }: RequestStep) => {
 	logger.log("sending mail...");
 	const messages = await pullMessages(run.id, id);
 	for (const message of messages) {
