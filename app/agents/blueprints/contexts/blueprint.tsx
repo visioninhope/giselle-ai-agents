@@ -4,37 +4,63 @@ import {
 	type FC,
 	type PropsWithChildren,
 	createContext,
+	useCallback,
 	useContext,
 	useOptimistic,
+	useTransition,
 } from "react";
-import type { Blueprint } from "..";
+import type { Blueprint, Node } from "..";
 
 const BlueprintContextInternal = createContext<Blueprint | null>(null);
-const BlueprintOptimisticActionContextInternal = createContext<
-	((newBlueprint: Blueprint) => void) | null
->(null);
+type BlueprintOptimisticActionContextInternalState = {
+	setOptimisticBlueprint: (newBlueprint: OptimisticBlueprint) => void;
+	isPending: boolean;
+} | null;
+const BlueprintOptimisticActionContextInternal =
+	createContext<BlueprintOptimisticActionContextInternalState>(null);
 
 type BlueprintProviderProps = {
 	blueprint: Blueprint;
 };
+
+type OptimisticNode = Omit<Node, "id"> & { isCreating?: boolean; id: string };
+type OptimisticBlueprint = Omit<Blueprint, "nodes"> & {
+	nodes: OptimisticNode[];
+};
+
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const BlueprintProvider: FC<
 	PropsWithChildren<BlueprintProviderProps>
 > = ({ blueprint, children }) => {
-	const [optimisticBlueprint, SetOptimisticBlueprint] = useOptimistic<
+	const [isPending, startTransition] = useTransition();
+	const [optimisticBlueprint, setOptimisticBlueprintInternal] = useOptimistic<
 		Blueprint,
-		Blueprint
+		OptimisticBlueprint
 	>(blueprint, (state, newBlueprint) => ({
-		...state,
-		newBlueprint,
+		...newBlueprint,
 	}));
+	const setOptimisticBlueprint = useCallback(
+		(newBlueprint: OptimisticBlueprint) => {
+			startTransition(async () => {
+				setOptimisticBlueprintInternal({ ...newBlueprint });
+				await sleep(10000);
+			});
+		},
+		[setOptimisticBlueprintInternal],
+	);
+	console.log({ optimisticBlueprint, isPending });
+
 	return (
-		<BlueprintOptimisticActionContextInternal.Provider
-			value={SetOptimisticBlueprint}
-		>
-			<BlueprintContextInternal.Provider value={optimisticBlueprint}>
+		<BlueprintContextInternal.Provider value={optimisticBlueprint}>
+			<BlueprintOptimisticActionContextInternal.Provider
+				value={{
+					setOptimisticBlueprint,
+					isPending,
+				}}
+			>
 				{children}
-			</BlueprintContextInternal.Provider>
-		</BlueprintOptimisticActionContextInternal.Provider>
+			</BlueprintOptimisticActionContextInternal.Provider>
+		</BlueprintContextInternal.Provider>
 	);
 };
 

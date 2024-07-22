@@ -51,6 +51,7 @@ export const useEditor = (request: AgentRequest | undefined) => {
 			target: `${inputPort.nodeId}`,
 			targetHandle: `${inputPort.id}`,
 		}));
+		console.log("he");
 		reactFlowInstance.setNodes(nodes);
 		reactFlowInstance.setEdges(edges);
 	}, [blueprint, request, reactFlowInstance]);

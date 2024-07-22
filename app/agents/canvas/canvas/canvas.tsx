@@ -1,71 +1,64 @@
 "use client";
 
-import {
-	addNode,
-	useBlueprint,
-	useBlueprintOptimisticAction,
-} from "@/app/agents/blueprints";
+import { useBlueprint } from "@/app/agents/blueprints";
 import type { NodeClassName } from "@/app/node-classes";
 import {
 	Background,
 	ReactFlow,
 	type ReactFlowInstance,
 	ReactFlowProvider,
+	useReactFlow,
 } from "@xyflow/react";
-import { type FC, useCallback, useRef, useState } from "react";
+import { type FC, useCallback, useEffect, useRef, useState } from "react";
 import { useContextMenu, useSynthsize } from "../hooks/";
 import { NodeList, useNodeTypes } from "../node";
+import { useAddNodeAction } from "./use-add-node-action";
 
 const CanvasInner: FC = () => {
-	const [reactFlowInstance, setReactFlowInstance] =
-		useState<ReactFlowInstance | null>(null);
-	useSynthsize();
+	// useSynthsize();
 	const { isVisible, position, hideContextMenu, handleContextMenu } =
 		useContextMenu();
+	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const blueprint = useBlueprint();
-	const setOptimisticBlueprint = useBlueprintOptimisticAction();
 	const nodeTypes = useNodeTypes();
-
+	const blueprint = useBlueprint();
+	const reactFlowInstance = useReactFlow();
+	useEffect(() => {
+		const nodes = blueprint.nodes.map(({ id, position }) => ({
+			id: `${id}`,
+			position,
+			type: "input",
+			data: {},
+		}));
+		reactFlowInstance.setNodes(nodes);
+	}, [blueprint, reactFlowInstance]);
 	const handleNodeSelect = useCallback(
 		async (nodeClassName: NodeClassName) => {
-			hideContextMenu();
-
-			if (reactFlowInstance == null) {
-				return;
-			}
-
-			// reactFlowInstance.project was renamed to reactFlowInstance.screenToFlowPosition
-			// and you don't need to subtract the reactFlowBounds.left/top anymore
-			// details: https://reactflow.dev/whats-new/2023-11-10
-			const flowPosition = reactFlowInstance.screenToFlowPosition({
-				x: position.x,
-				y: position.y,
-			});
-			setOptimisticBlueprint({
-				...blueprint,
-			});
-			await addNode({
-				blueprintId: blueprint.id,
-				node: {
-					className: nodeClassName,
-					position: { x: flowPosition.x, y: flowPosition.y },
+			reactFlowInstance.setNodes([
+				{
+					id: "001",
+					type: "input",
+					position: {
+						x: position.x,
+						y: position.y,
+					},
+					data: {},
 				},
-			});
+			]);
+			// hideContextMenu();
+			// addNodeAction({
+			// 	nodeClassName,
+			// 	position,
+			// });
 		},
-		[
-			blueprint,
-			hideContextMenu,
-			position,
-			reactFlowInstance,
-			setOptimisticBlueprint,
-		],
+		[position, reactFlowInstance.setNodes],
 	);
 	return (
 		<div className="flex-1" ref={containerRef}>
+			<button type="button">add</button>
+			<pre>{JSON.stringify(blueprint.nodes)}</pre>
 			<ReactFlow
 				onContextMenu={handleContextMenu}
-				onInit={setReactFlowInstance}
 				nodeTypes={nodeTypes}
 				defaultNodes={[]}
 				defaultEdges={[]}
