@@ -6,9 +6,6 @@ export const useSynthsize = () => {
 	const blueprint = useBlueprint();
 	const reactFlowInstance = useReactFlow();
 	useEffect(() => {
-		if (blueprint == null) {
-			return;
-		}
 		const nodes = blueprint.nodes.map((node) => {
 			// const relevantRequestStep = request?.steps.find(
 			// 	(step) => step.node.id === node.id,

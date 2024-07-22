@@ -9,7 +9,7 @@ import { Suspense } from "react";
 import { ServerComponent } from "./server";
 
 import "@xyflow/react/dist/style.css";
-import { NodeClassesProvider, nodeClasses } from "@/app/node-classes";
+import { NodeClassesProvider, getNodeClasses } from "@/app/node-classes";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -22,7 +22,7 @@ const getCachedBlueprint = unstable_cache(
 );
 export default async function Page({ params }: { params: { urlId: string } }) {
 	const latestBlueprint = await getLatestBlueprint(params.urlId);
-	const blueprint = await getCachedBlueprint(latestBlueprint.id);
+	const blueprint = await getBlueprint(latestBlueprint.id);
 	const revalidate = async () => {
 		"use server";
 		await sleep(3000);
@@ -40,7 +40,7 @@ export default async function Page({ params }: { params: { urlId: string } }) {
 				</form>
 			</section>
 			<BlueprintProvider blueprint={blueprint}>
-				<NodeClassesProvider nodeClasses={nodeClasses}>
+				<NodeClassesProvider nodeClasses={getNodeClasses()}>
 					<Canvas />
 				</NodeClassesProvider>
 			</BlueprintProvider>

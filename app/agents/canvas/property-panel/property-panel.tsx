@@ -1,3 +1,5 @@
+"use client";
+
 import { type Node, useNode } from "@/app/agents/blueprints";
 import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import { type FC, useMemo } from "react";

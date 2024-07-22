@@ -6,7 +6,6 @@ import {
 	createContext,
 	useContext,
 } from "react";
-import { useNodeClasses as useNodeClassesData } from "../get-node-classes";
 import type { NodeClass } from "../type";
 
 const NodeClassesInternal = createContext<NodeClass[] | null>(null);

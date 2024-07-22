@@ -17,7 +17,7 @@ export const reviewRequiredActions = (blueprint: Blueprint) => {
 		requiredActions.push(startWithOnRequestNode);
 	}
 	const lastStepNode =
-		inferSteps.length === 0
+		inferedSteps.length === 0
 			? null
 			: blueprint.nodes.find(
 					(node) => inferedSteps[inferedSteps.length - 1].nodeId === node.id,

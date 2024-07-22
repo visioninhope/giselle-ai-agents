@@ -15,3 +15,4 @@ export const nodeClasses = [
 	text,
 ] satisfies NodeClass[];
 export type NodeClassName = (typeof nodeClasses)[number]["name"];
+export const getNodeClasses = () => JSON.parse(JSON.stringify(nodeClasses));
