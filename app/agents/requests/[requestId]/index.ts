@@ -1,1 +1,1 @@
-export { getRequest, useRequestData } from "./get-request";
+export { useRequestData } from "./get-request";

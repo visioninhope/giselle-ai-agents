@@ -1,80 +1,41 @@
 "use server";
 
-import {
-	db,
-	edges,
-	nodesBlueprints,
-	ports,
-	portsBlueprints,
-	requestPortMessages,
-	requests,
-	steps,
-} from "@/drizzle";
+import { leaveMessage, pullMessages } from "@/app/agents/requests";
+import type { InvokeFunction } from "@/app/node-classes";
 import { logger, wait } from "@trigger.dev/sdk/v3";
-import { and, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
-import type { InvokeFunction } from "../../type";
+import OpenAI from "openai";
 
-const originPortsBlueprints = alias(portsBlueprints, "originPortsBlueprints");
-const originNodesBlueprints = alias(nodesBlueprints, "originNodesBlueprints");
-const destinationPortsBlueprints = alias(
-	portsBlueprints,
-	"destinationPortsBlueprints",
-);
-const destinationNodesBlueprints = alias(
-	nodesBlueprints,
-	"destinationNodesBlueprints",
-);
+const openai = new OpenAI();
+
+type AssertContent = (value: unknown) => asserts value is string;
+const asssertContent: AssertContent = (value) => {};
+
 export const invoke: InvokeFunction = async ({ request, id }) => {
-	logger.log("text generation started...");
 	logger.log(`params: ${JSON.stringify({ request, id })}`);
-	const messages = await db
-		.select({
-			message: requestPortMessages.message,
-		})
-		.from(requestPortMessages)
-		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
-		.innerJoin(
-			originPortsBlueprints,
-			eq(originPortsBlueprints.id, requestPortMessages.portsBlueprintsId),
-		)
-		.innerJoin(
-			originNodesBlueprints,
-			eq(originNodesBlueprints.id, originPortsBlueprints.nodesBlueprintsId),
-		)
-		.innerJoin(
-			edges,
-			and(
-				eq(edges.outputPortId, originPortsBlueprints.portId),
-				eq(edges.edgeType, "data"),
-			),
-		)
-		.innerJoin(
-			destinationPortsBlueprints,
-			eq(destinationPortsBlueprints.portId, edges.inputPortId),
-		)
-		.innerJoin(ports, eq(ports.id, destinationPortsBlueprints.portId))
-		.innerJoin(
-			destinationNodesBlueprints,
-			and(
-				eq(
-					destinationNodesBlueprints.id,
-					destinationPortsBlueprints.nodesBlueprintsId,
-				),
-				eq(
-					destinationNodesBlueprints.blueprintId,
-					originNodesBlueprints.blueprintId,
-				),
-			),
-		)
-		.innerJoin(
-			steps,
-			and(
-				eq(steps.nodeId, destinationNodesBlueprints.nodeId),
-				eq(steps.blueprintId, destinationNodesBlueprints.blueprintId),
-			),
-		)
-		.where(and(eq(requests.id, request.id), eq(steps.id, id)));
-	logger.log(`messages: ${JSON.stringify(messages)}`);
-	await wait.for({ seconds: 5 });
+	const messages = await pullMessages({ requestId: request.id, stepId: id });
+	const instructionMessage = messages.find(
+		({ nodeClassKey }) => nodeClassKey === "instruction",
+	);
+	if (instructionMessage == null) {
+		logger.log(
+			`instruction message not found in messages: ${JSON.stringify(messages)}`,
+		);
+	} else {
+		const content = instructionMessage.content;
+		asssertContent(content);
+		const completion = await openai.chat.completions.create({
+			messages: [
+				{ role: "system", content: "You are a helpful assistant." },
+				{ role: "user", content },
+			],
+			model: "gpt-4o-mini",
+		});
+		logger.log(`completion: ${JSON.stringify(completion)}`);
+		await leaveMessage({
+			requestId: request.id,
+			port: { nodeClassKey: "result" },
+			stepId: id,
+			message: completion.choices[0].message.content ?? "",
+		});
+	}
 };

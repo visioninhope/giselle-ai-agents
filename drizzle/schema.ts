@@ -126,24 +126,6 @@ export const steps = pgTable("steps", {
 	order: integer("order").notNull(),
 });
 
-export const dataKnots = pgTable("data_knots", {
-	id: serial("id").primaryKey(),
-	stepId: integer("step_id").references(() => steps.id),
-	portId: integer("port_id")
-		.notNull()
-		.references(() => ports.id),
-});
-
-export const dataRoutes = pgTable("data_routes", {
-	id: serial("id").primaryKey(),
-	originKnotId: integer("origin_knot_id")
-		.notNull()
-		.references(() => dataKnots.id),
-	destinationKnotId: integer("destination_knot_id")
-		.notNull()
-		.references(() => dataKnots.id),
-});
-
 export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
 	id: serial("id").primaryKey(),
@@ -181,17 +163,6 @@ export const requestPortMessages = pgTable("request_port_messages", {
 	message: jsonb("message").notNull(),
 });
 
-export const requestDataKnotMessages = pgTable("request_data_knot_messages", {
-	id: serial("id").primaryKey(),
-	requestId: integer("request_id")
-		.notNull()
-		.references(() => requests.id),
-	dataKnotId: integer("data_knot_id")
-		.notNull()
-		.references(() => dataKnots.id),
-	message: jsonb("message").notNull(),
-});
-
 export const requestTriggerRelations = pgTable("request_trigger_relations", {
 	id: serial("id").primaryKey(),
 	requestId: integer("request_id")
@@ -199,58 +170,3 @@ export const requestTriggerRelations = pgTable("request_trigger_relations", {
 		.references(() => requests.id),
 	triggerId: text("trigger_id").notNull(),
 });
-
-// export const stepDataKnots = pgView("step_data_knots", {
-// 	stepId: integer("step_id").notNull(),
-// 	nodeId: integer("node_id").notNull(),
-// 	portId: integer("port_id").notNull(),
-// 	portName: text("port_name").notNull(),
-// 	portDirection: text("port_direction").notNull(),
-// 	dataKnotId: integer("data_knot_id").notNull(),
-// }).existing();
-
-// Create `stepDataKnots` view
-//
-// CREATE OR REPLACE VIEW
-//   "step_data_knots" AS
-// SELECT
-//   steps.id AS step_id,
-//   steps.node_id AS node_id,
-//   ports.id AS port_id,
-//   ports.name AS port_name,
-//   ports.direction as port_direction,
-//   data_knots.id AS data_knot_id
-// FROM
-//   steps
-//   INNER JOIN nodes ON nodes.id = steps.node_id
-//   INNER JOIN ports ON ports.node_id = nodes.id
-//   INNER JOIN data_knots ON data_knots.port_id = ports.id
-//   AND data_knots.step_id = steps.id
-
-// export const stepStrands = pgView("step_strands", {
-// 	stepId: integer("step_id").notNull(),
-// 	nodeId: integer("node_id").notNull(),
-// 	portName: text("port_name").notNull(),
-// 	runId: integer("run_id").notNull(),
-// 	message: jsonb("message").notNull(),
-// }).existing();
-
-// Create `stepStrands` view
-//
-// CREATE OR REPLACE VIEW
-//   "step_strands" AS
-// SELECT
-//   steps.id AS step_id,
-//   steps.node_id AS node_id,
-//   ports.name AS port_name,
-//   run_data_knot_messages.run_id AS run_id,
-//   run_data_knot_messages.message AS message
-// FROM
-//   steps
-//   INNER JOIN nodes ON nodes.id = steps.node_id
-//   INNER JOIN ports ON ports.node_id = nodes.id
-//   INNER JOIN data_knots ON data_knots.port_id = ports.id
-//   AND data_knots.step_id = steps.id
-//   INNER JOIN data_routes ON data_routes.destination_knot_id = data_knots.id
-//   INNER JOIN data_knots origin_data_knots ON origin_data_knots.id = data_routes.origin_knot_id
-//   INNER JOIN run_data_knot_messages ON run_data_knot_messages.data_knot_id = origin_data_knots.id

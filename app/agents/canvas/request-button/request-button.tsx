@@ -1,4 +1,5 @@
-import { useRequestInterface } from "@/app/agents/blueprints";
+import { useBlueprintId, useRequestInterface } from "@/app/agents/blueprints";
+import { createRequest } from "@/app/agents/requests";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -16,25 +17,24 @@ type RequestButtonProps = {
 export const RequestButton: FC<RequestButtonProps> = ({ onClick }) => {
 	const [disclosure, setDisclosure] = useState(false);
 	const requestInterface = useRequestInterface();
-	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-		(e) => {
-			e.preventDefault();
-			setDisclosure(false);
-			onClick();
-		},
-		[onClick],
-	);
+	const blueprintId = useBlueprintId();
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>((e) => {
+		setDisclosure(false);
+	}, []);
+	const createRequestWithBlueprintId = createRequest.bind(null, blueprintId);
 	if (requestInterface?.input == null || requestInterface.input.length < 1) {
 		return (
-			<Button
-				variant={"ghost"}
-				size={"xs"}
-				className="text-muted-foreground"
-				onClick={onClick}
-			>
-				<PlayIcon className="mr-1 w-3 h-3" />
-				Request to Agent
-			</Button>
+			<form action={createRequestWithBlueprintId}>
+				<Button
+					variant={"ghost"}
+					size={"xs"}
+					className="text-muted-foreground"
+					type="submit"
+				>
+					<PlayIcon className="mr-1 w-3 h-3" />
+					Request to Agent
+				</Button>
+			</form>
 		);
 	}
 	return (
@@ -46,12 +46,16 @@ export const RequestButton: FC<RequestButtonProps> = ({ onClick }) => {
 				</Button>
 			</PopoverTrigger>
 			<PopoverContent align="start">
-				<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+				<form
+					action={createRequestWithBlueprintId}
+					onSubmit={handleSubmit}
+					className="flex flex-col gap-4"
+				>
 					<div className="flex flex-col gap-2">
 						{requestInterface?.input.map(({ portId, name }) => (
 							<div key={portId}>
 								<Label htmlFor={`${portId}`}>{name}</Label>
-								<Input type="text" id={`${portId}`} />
+								<Input type="text" id={`${portId}`} name={name} />
 							</div>
 						))}
 					</div>

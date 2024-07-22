@@ -3,8 +3,8 @@ import { blueprints as blueprintsSchema, db } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 import invariant from "tiny-invariant";
-import { buildBlueprint } from "./build-blueprint";
-import { copyBlueprint } from "./copy-blueprint";
+import { buildBlueprint } from "../../lib/build-blueprint";
+import { copyBlueprint } from "../../lib/copy-blueprint";
 
 export const POST = async (
 	_req: Request,

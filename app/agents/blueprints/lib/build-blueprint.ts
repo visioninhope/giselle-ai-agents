@@ -1,8 +1,8 @@
+"use server";
+
 import { type Blueprint, inferSteps } from "@/app/agents/blueprints";
 import {
 	blueprints as blueprintsSchema,
-	dataRoutes as dataRoutesSchema,
-	dataKnots as dataknotsSchema,
 	db,
 	steps as stepsSchema,
 } from "@/drizzle";
@@ -32,19 +32,6 @@ export const buildBlueprint = async (blueprint: Blueprint) => {
 		const outputProcess = insertedProcesses.find(
 			({ nodeId }) => nodeId === dataEdge.outputPort.nodeId,
 		);
-		const [inputDataKnot, outputDataKnot] = await db
-			.insert(dataknotsSchema)
-			.values([
-				{ stepId: inputProcess?.insertedId, portId: dataEdge.inputPort.id },
-				{ stepId: outputProcess?.insertedId, portId: dataEdge.inputPort.id },
-			])
-			.returning({
-				insertedId: dataknotsSchema.id,
-			});
-		await db.insert(dataRoutesSchema).values({
-			originKnotId: outputDataKnot.insertedId,
-			destinationKnotId: inputDataKnot.insertedId,
-		});
 	}
 	await db
 		.update(blueprintsSchema)

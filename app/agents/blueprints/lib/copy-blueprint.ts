@@ -1,3 +1,5 @@
+"use server";
+
 import type { Blueprint } from "@/app/agents/blueprints";
 import {
 	blueprints,

@@ -1,5 +1,5 @@
+import { getRequest } from "@/app/agents/requests";
 import { NextResponse } from "next/server";
-import { getRequest } from "./get-request";
 
 export const GET = async (
 	req: Request,

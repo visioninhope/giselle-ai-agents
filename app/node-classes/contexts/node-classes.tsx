@@ -11,12 +11,12 @@ import type { NodeClass } from "../type";
 
 const NodeClassesInternal = createContext<NodeClass[] | null>(null);
 
-export const NodeClassesProvider: FC<PropsWithChildren> = ({ children }) => {
-	const { nodeClasses } = useNodeClassesData();
-
-	if (nodeClasses == null) {
-		return null;
-	}
+type NodeClassesProviderProps = {
+	nodeClasses: NodeClass[];
+};
+export const NodeClassesProvider: FC<
+	PropsWithChildren<NodeClassesProviderProps>
+> = ({ nodeClasses, children }) => {
 	return (
 		<NodeClassesInternal.Provider value={nodeClasses}>
 			{children}

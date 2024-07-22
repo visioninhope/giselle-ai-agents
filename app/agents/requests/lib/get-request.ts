@@ -1,5 +1,6 @@
 "use server";
 
+import type { AgentRequest } from "@/app/agents/requests";
 import {
 	db,
 	nodesBlueprints as nodesBlueprintsSchema,
@@ -10,7 +11,6 @@ import {
 } from "@/drizzle";
 import { asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import type { AgentRequest } from "../../agent-request";
 
 export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 	const request = await db.query.requests.findFirst({

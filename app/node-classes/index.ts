@@ -1,7 +1,7 @@
 import invariant from "tiny-invariant";
 export * from "./classes";
 import type { NodeClass } from "./type";
-export type { NodeClass, Feature } from "./type";
+export type * from "./type";
 export * from "./contexts";
 
 export const findNodeClass = (
