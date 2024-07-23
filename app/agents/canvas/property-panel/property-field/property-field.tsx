@@ -1,4 +1,8 @@
-import { useUpdateNodeProperty } from "@/app/agents/blueprints";
+import {
+	updateNodeProperty,
+	useBlueprint,
+	useBlueprintMutation,
+} from "@/app/agents/blueprints";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import type { NodeProperty } from "@/drizzle";
@@ -13,20 +17,41 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 	value,
 	nodeId,
 }) => {
-	const { updateNodeProperties } = useUpdateNodeProperty();
+	const { mutateBlueprint } = useBlueprintMutation();
+	const blueprint = useBlueprint();
 	const ref = useRef<HTMLInputElement | null>(null);
 	const handleBlur = useCallback(() => {
 		if (ref.current == null) {
 			return;
 		}
-		updateNodeProperties({
-			nodeId,
-			property: {
-				name,
-				value: ref.current.value,
+		mutateBlueprint({
+			optimisticAction: {
+				type: "updateNodeProperty",
+				node: {
+					nodeId,
+					property: {
+						name,
+						value: ref.current.value,
+					},
+				},
 			},
+			mutation: updateNodeProperty({
+				blueprintId: blueprint.id,
+				nodeId: Number.parseInt(nodeId, 10),
+				property: {
+					name,
+					value: ref.current.value,
+				},
+			}),
+			action: ({ property }) => ({
+				type: "updateNodeProperty",
+				node: {
+					nodeId,
+					property,
+				},
+			}),
 		});
-	}, [name, nodeId, updateNodeProperties]);
+	}, [name, nodeId, mutateBlueprint, blueprint.id]);
 	return (
 		<div>
 			<Label htmlFor={name}>{label ?? name}</Label>

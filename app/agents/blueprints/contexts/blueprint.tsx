@@ -24,14 +24,14 @@ type BlueprintAction =
 	| {
 			type: "updateNodesPosition";
 			nodes: Array<{
-				nodeId: number | string;
+				nodeId: string;
 				position: { x: number; y: number };
 			}>;
 	  }
 	| {
 			type: "deleteNodes";
 			deltedNodes: Array<{
-				nodeId: number | string;
+				nodeId: string;
 			}>;
 	  }
 	| {
@@ -41,6 +41,16 @@ type BlueprintAction =
 	| {
 			type: "deleteEdges";
 			deletedEdges: Array<{ edgeId: number }>;
+	  }
+	| {
+			type: "updateNodeProperty";
+			node: {
+				nodeId: string;
+				property: {
+					name: string;
+					value: string;
+				};
+			};
 	  };
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
@@ -113,6 +123,21 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 						!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
 				),
 			}),
+		}))
+		.with({ type: "updateNodeProperty" }, ({ node }) => ({
+			...state,
+			nodes: state.nodes.map((stateNode) =>
+				stateNode.id === node.nodeId
+					? {
+							...stateNode,
+							properties: stateNode.properties.map((property) =>
+								property.name === node.property.name
+									? { ...property, value: node.property.value }
+									: property,
+							),
+						}
+					: stateNode,
+			),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

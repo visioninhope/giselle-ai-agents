@@ -10,3 +10,4 @@ export { updateNodesPosition } from "./update-nodes-position";
 export { deleteNodes } from "./delete-nodes";
 export { connectNodes } from "./connect-nodes";
 export { deleteEdges } from "./delete-edges";
+export { updateNodeProperty } from "./update-node-property";

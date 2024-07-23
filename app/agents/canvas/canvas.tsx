@@ -133,7 +133,7 @@ const CanvasInner: FC = () => {
 						optimisticAction: {
 							type: "deleteNodes",
 							deltedNodes: nodes.map((node) => ({
-								nodeId: Number.parseInt(node.id, 10),
+								nodeId: node.id,
 							})),
 						},
 						mutation: deleteNodes({
@@ -143,7 +143,7 @@ const CanvasInner: FC = () => {
 						action: () => ({
 							type: "deleteNodes",
 							deltedNodes: nodes.map((node) => ({
-								nodeId: Number.parseInt(node.id, 10),
+								nodeId: node.id,
 							})),
 						}),
 					});
