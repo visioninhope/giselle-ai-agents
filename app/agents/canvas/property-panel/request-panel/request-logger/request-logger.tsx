@@ -11,8 +11,6 @@ import type { FC } from "react";
 import { P, match } from "ts-pattern";
 
 import type { AgentRequest, RequestStep } from "@/app/agents/requests";
-import { Button } from "@/components/ui/button";
-import { useRouter } from "next/navigation";
 const stepListItemVariant = cva({
 	base: "",
 	variants: {
@@ -65,16 +63,8 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 
 type RequestLoggerProps = { request: AgentRequest };
 export const RequestLogger: FC<RequestLoggerProps> = ({ request }) => {
-	const router = useRouter();
 	return (
 		<div className="px-4 py-2 flex flex-col gap-2">
-			<Button
-				onClick={() => {
-					router.refresh();
-				}}
-			>
-				Refresh
-			</Button>
 			<Accordion type="multiple">
 				{match(request)
 					.with(P.nullish, () => <p>Creating workflow...</p>)
