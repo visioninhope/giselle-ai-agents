@@ -14,7 +14,15 @@ import { match } from "ts-pattern";
 import type { Blueprint, Node } from "..";
 
 const BlueprintContextInternal = createContext<Blueprint | null>(null);
-type BlueprintAction = { type: "addNode"; node: Node };
+type BlueprintAction =
+	| { type: "addNode"; node: Node }
+	| {
+			type: "updateNodesPosition";
+			nodes: Array<{
+				nodeId: number | string;
+				position: { x: number; y: number };
+			}>;
+	  };
 
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
@@ -44,6 +52,20 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 		.with({ type: "addNode" }, ({ node }) => ({
 			...state,
 			nodes: [...state.nodes, node],
+		}))
+		.with({ type: "updateNodesPosition" }, ({ nodes }) => ({
+			...state,
+			nodes: state.nodes.map((stateNode) => {
+				const node = nodes.find(
+					({ nodeId }) => `${nodeId}` === `${stateNode.id}`,
+				);
+				return node
+					? {
+							...stateNode,
+							position: node.position,
+						}
+					: stateNode;
+			}),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

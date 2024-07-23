@@ -1,9 +1,15 @@
 "use client";
 
-import { useBlueprint } from "@/app/agents/blueprints";
+import {
+	updateNodesPosition,
+	useBlueprint,
+	useBlueprintMutation,
+} from "@/app/agents/blueprints";
 import type { NodeClassName } from "@/app/node-classes";
 import {
 	Background,
+	type Node,
+	type NodeTypes,
 	ReactFlow,
 	type ReactFlowInstance,
 	ReactFlowProvider,
@@ -20,8 +26,9 @@ const CanvasInner: FC = () => {
 		useContextMenu();
 	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const nodeTypes = useNodeTypes();
+	const nodeTypes: NodeTypes = useNodeTypes();
 	const blueprint = useBlueprint();
+	const { mutateBlueprint } = useBlueprintMutation();
 	const reactFlowInstance = useReactFlow();
 	const handleNodeSelect = useCallback(
 		async (nodeClassName: NodeClassName) => {
@@ -38,8 +45,41 @@ const CanvasInner: FC = () => {
 			<ReactFlow
 				onContextMenu={handleContextMenu}
 				nodeTypes={nodeTypes}
-				defaultNodes={[]}
+				defaultNodes={[] as Node[]}
 				defaultEdges={[]}
+				onNodeDragStop={(_event, _node, nodes) => {
+					mutateBlueprint({
+						optimisticAction: {
+							type: "updateNodesPosition",
+							nodes: nodes.map((node) => ({
+								nodeId: node.id,
+								position: {
+									x: node.position.x,
+									y: node.position.y,
+								},
+							})),
+						},
+						mutation: updateNodesPosition({
+							nodes: nodes.map((node) => ({
+								id: Number.parseInt(node.id, 10),
+								position: {
+									x: node.position.x,
+									y: node.position.y,
+								},
+							})),
+						}),
+						action: () => ({
+							type: "updateNodesPosition",
+							nodes: nodes.map((node) => ({
+								nodeId: node.id,
+								position: {
+									x: node.position.x,
+									y: node.position.y,
+								},
+							})),
+						}),
+					});
+				}}
 			>
 				<Background />
 				{isVisible && (
