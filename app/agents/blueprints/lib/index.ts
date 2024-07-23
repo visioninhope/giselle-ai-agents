@@ -7,3 +7,4 @@ export { buildBlueprint } from "./build-blueprint";
 export { getLatestBlueprint } from "./get-latest-blueprint";
 export * from "./add-node";
 export * from "./update-nodes-position";
+export * from "./delete-nodes";

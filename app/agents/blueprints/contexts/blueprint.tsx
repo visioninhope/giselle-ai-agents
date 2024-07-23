@@ -22,8 +22,13 @@ type BlueprintAction =
 				nodeId: number | string;
 				position: { x: number; y: number };
 			}>;
+	  }
+	| {
+			type: "deleteNodes";
+			deltedNodes: Array<{
+				nodeId: number | string;
+			}>;
 	  };
-
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
 	optimisticAction: BlueprintAction;
@@ -66,6 +71,13 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 						}
 					: stateNode;
 			}),
+		}))
+		.with({ type: "deleteNodes" }, ({ deltedNodes }) => ({
+			...state,
+			nodes: state.nodes.filter(
+				(node) =>
+					!deltedNodes.some(({ nodeId }) => `${nodeId}` === `${node.id}`),
+			),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

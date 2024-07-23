@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
 	useBlueprintMutation,
@@ -47,6 +48,26 @@ const CanvasInner: FC = () => {
 				nodeTypes={nodeTypes}
 				defaultNodes={[] as Node[]}
 				defaultEdges={[]}
+				onNodesDelete={(nodes) => {
+					mutateBlueprint({
+						optimisticAction: {
+							type: "deleteNodes",
+							deltedNodes: nodes.map((node) => ({
+								nodeId: Number.parseInt(node.id, 10),
+							})),
+						},
+						mutation: deleteNodes({
+							blueprintId: blueprint.id,
+							deleteNodeIds: nodes.map((node) => Number.parseInt(node.id, 10)),
+						}),
+						action: () => ({
+							type: "deleteNodes",
+							deltedNodes: nodes.map((node) => ({
+								nodeId: Number.parseInt(node.id, 10),
+							})),
+						}),
+					});
+				}}
 				onNodeDragStop={(_event, _node, nodes) => {
 					mutateBlueprint({
 						optimisticAction: {
