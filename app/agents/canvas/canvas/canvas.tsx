@@ -2,6 +2,7 @@
 
 import {
 	connectNodes,
+	deleteEdges,
 	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
@@ -11,14 +12,14 @@ import type { NodeClassName } from "@/app/node-classes";
 import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
+	type Edge,
 	type Node,
 	type NodeTypes,
 	ReactFlow,
-	type ReactFlowInstance,
 	ReactFlowProvider,
 	useReactFlow,
 } from "@xyflow/react";
-import { type FC, useCallback, useEffect, useRef, useState } from "react";
+import { type FC, useCallback, useRef } from "react";
 import { useContextMenu, useSynthsize } from "../hooks/";
 import { NodeList, useNodeTypes } from "../node";
 import { useAddNodeAction } from "./use-add-node-action";
@@ -49,7 +50,7 @@ const CanvasInner: FC = () => {
 				onContextMenu={handleContextMenu}
 				nodeTypes={nodeTypes}
 				defaultNodes={[] as Node[]}
-				defaultEdges={[]}
+				defaultEdges={[] as Edge[]}
 				onConnect={({ source, sourceHandle, target, targetHandle }) => {
 					if (
 						source == null ||
@@ -156,6 +157,26 @@ const CanvasInner: FC = () => {
 									x: node.position.x,
 									y: node.position.y,
 								},
+							})),
+						}),
+					});
+				}}
+				onEdgesDelete={(edges) => {
+					mutateBlueprint({
+						optimisticAction: {
+							type: "deleteEdges",
+							deletedEdges: edges.map((edge) => ({
+								edgeId: Number.parseInt(edge.id, 10),
+							})),
+						},
+						mutation: deleteEdges({
+							blueprintId: blueprint.id,
+							deleteEdgeIds: edges.map((edge) => Number.parseInt(edge.id, 10)),
+						}),
+						action: (deletedEdgeIds) => ({
+							type: "deleteEdges",
+							deletedEdges: deletedEdgeIds.map((edgeId) => ({
+								edgeId,
 							})),
 						}),
 					});

@@ -9,3 +9,4 @@ export * from "./add-node";
 export * from "./update-nodes-position";
 export * from "./delete-nodes";
 export * from "./connect-nodes";
+export * from "./delete-edges";

@@ -32,6 +32,10 @@ type BlueprintAction =
 	| {
 			type: "connectNodes";
 			edge: Edge;
+	  }
+	| {
+			type: "deleteEdges";
+			deletedEdges: Array<{ edgeId: number }>;
 	  };
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
@@ -86,6 +90,13 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 		.with({ type: "connectNodes" }, ({ edge }) => ({
 			...state,
 			edges: [...state.edges, edge],
+		}))
+		.with({ type: "deleteEdges" }, ({ deletedEdges }) => ({
+			...state,
+			edges: state.edges.filter(
+				(edge) =>
+					!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
+			),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<
