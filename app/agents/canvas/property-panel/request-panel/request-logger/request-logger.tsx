@@ -64,20 +64,14 @@ const StepListItem: FC<StepListItemProps> = (props) => (
 type RequestLoggerProps = { request: AgentRequest };
 export const RequestLogger: FC<RequestLoggerProps> = ({ request }) => {
 	return (
-		<div className="bg-background/50 border border-border w-[240px] text-sm">
-			<div className="px-4 py-1 border-b">
-				<p>Run Workflow</p>
-			</div>
-
-			<div className="px-4 py-2 flex flex-col gap-2">
-				<Accordion type="multiple">
-					{match(request)
-						.with(P.nullish, () => <p>Creating workflow...</p>)
-						.otherwise(({ steps }) =>
-							steps.map((step) => <StepListItem key={step.id} {...step} />),
-						)}
-				</Accordion>
-			</div>
+		<div className="px-4 py-2 flex flex-col gap-2">
+			<Accordion type="multiple">
+				{match(request)
+					.with(P.nullish, () => <p>Creating workflow...</p>)
+					.otherwise(({ steps }) =>
+						steps.map((step) => <StepListItem key={step.id} {...step} />),
+					)}
+			</Accordion>
 		</div>
 	);
 };

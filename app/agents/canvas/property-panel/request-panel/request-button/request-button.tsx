@@ -9,25 +9,51 @@ import {
 	PopoverTrigger,
 } from "@/components/ui/popover";
 import { PlayIcon } from "lucide-react";
-import { type FC, type FormEventHandler, useCallback, useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import {
+	type FC,
+	type FormEventHandler,
+	useCallback,
+	useState,
+	useTransition,
+} from "react";
 
+const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const RequestButton: FC = () => {
 	const [disclosure, setDisclosure] = useState(false);
+	const router = useRouter();
 	const blueprint = useBlueprint();
-	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>((e) => {
-		setDisclosure(false);
-	}, []);
+	const [isPending, startTransition] = useTransition();
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+		(formEvent) => {
+			formEvent.preventDefault();
+			startTransition(async () => {
+				const requestId = await createRequest(
+					blueprint.id,
+					new FormData(formEvent.currentTarget),
+				);
+				router.push(`/agents/yv2jg5xmbsmr1z1unatqpgt9/requests/${requestId}`);
+			});
+			setDisclosure(false);
+		},
+		[router, blueprint.id],
+	);
 	const createRequestWithBlueprintId = createRequest.bind(null, blueprint.id);
 	if (
 		blueprint.requestInterface?.input == null ||
 		blueprint.requestInterface.input.length < 1
 	) {
-		return (
-			<form action={createRequestWithBlueprintId}>
+		return isPending ? (
+			<div className="px-4 text-muted-foreground">loading...</div>
+		) : (
+			<form onSubmit={handleSubmit}>
+				{/*<Link href="/agents/yv2jg5xmbsmr1z1unatqpgt9/requests/2">*/}
 				<Button type="submit">
 					<PlayIcon className="mr-1 w-3 h-3" />
-					Request to Agent
+					Request to Agent!
 				</Button>
+				{/* </Link> */}
 			</form>
 		);
 	}

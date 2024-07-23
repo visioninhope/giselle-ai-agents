@@ -70,4 +70,5 @@ export const createRequest = async (
 		requestId: request.id,
 		triggerId: handle.id,
 	});
+	return request.id;
 };
