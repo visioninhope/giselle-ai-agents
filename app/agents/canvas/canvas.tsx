@@ -205,9 +205,7 @@ const CanvasInner: FC = () => {
 				<Background />
 				<Panel position="top-right" className="bottom-0">
 					<div className="flex gap-2 h-full">
-						{selectedNodes.length > 0 && (
-							<PropertyPanel selectedNodes={selectedNodes} />
-						)}
+						<PropertyPanel selectedNodes={selectedNodes} />
 					</div>
 				</Panel>
 				{isVisible && (

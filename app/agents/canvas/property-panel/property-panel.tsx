@@ -2,6 +2,7 @@
 
 import { type Node, useNode } from "@/app/agents/blueprints";
 import { findNodeClass, useNodeClasses } from "@/app/node-classes";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type FC, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DynamicOutputPort } from "./dynamic-output-port";
@@ -12,18 +13,25 @@ type PropertyPanel = {
 };
 export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 	return (
-		<div className="bg-background/50 border border-border w-[300px] text-sm">
-			<div className="px-4 py-2">
-				<p className="font-bold">Properties</p>
-			</div>
+		<div className="bg-background/60 border border-border w-[400px] text-sm">
+			<Tabs defaultValue="properties">
+				<TabsList>
+					<TabsTrigger value="Requests" className="font-bold">
+						Requests
+					</TabsTrigger>
+					<TabsTrigger value="properties" className="font-bold">
+						Properties
+					</TabsTrigger>
+				</TabsList>
 
-			<div className="py-2 flex flex-col gap-2">
-				{selectedNodes.length > 1 ? (
-					<p>{selectedNodes.length} nodes selected</p>
-				) : (
-					<NodeModifyPanelInner node={selectedNodes[0]} />
-				)}
-			</div>
+				<TabsContent value="properties" className="py-2 flex flex-col gap-2">
+					{selectedNodes.length === 0 ? null : selectedNodes.length > 1 ? (
+						<p>{selectedNodes.length} nodes selected</p>
+					) : (
+						<NodeModifyPanelInner node={selectedNodes[0]} />
+					)}
+				</TabsContent>
+			</Tabs>
 		</div>
 	);
 };
