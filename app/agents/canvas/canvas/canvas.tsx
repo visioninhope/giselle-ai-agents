@@ -23,6 +23,7 @@ import { type FC, useCallback, useRef } from "react";
 import { useContextMenu, useSynthsize } from "../hooks/";
 import { NodeList, useNodeTypes } from "../node";
 import { useAddNodeAction } from "./use-add-node-action";
+import { useInfereceConnectionEdgeType } from "./use-inference-connection-edge-type";
 
 const CanvasInner: FC = () => {
 	useSynthsize();
@@ -44,13 +45,17 @@ const CanvasInner: FC = () => {
 		},
 		[position, hideContextMenu, addNodeAction],
 	);
+	const { validateConnection, inferConnectionEdgeType } =
+		useInfereceConnectionEdgeType();
 	return (
 		<div className="flex-1" ref={containerRef}>
 			<ReactFlow
+				colorMode="dark"
 				onContextMenu={handleContextMenu}
 				nodeTypes={nodeTypes}
 				defaultNodes={[] as Node[]}
 				defaultEdges={[] as Edge[]}
+				isValidConnection={validateConnection}
 				onConnect={({ source, sourceHandle, target, targetHandle }) => {
 					if (
 						source == null ||
@@ -60,12 +65,19 @@ const CanvasInner: FC = () => {
 					) {
 						return;
 					}
+					const edgeType = inferConnectionEdgeType({
+						source,
+						sourceHandle,
+						target,
+						targetHandle,
+					});
+
 					mutateBlueprint({
 						optimisticAction: {
 							type: "connectNodes",
 							edge: {
 								id: createId(),
-								edgeType: "data",
+								edgeType,
 								inputPort: {
 									id: Number.parseInt(targetHandle, 10),
 									nodeId: Number.parseInt(target, 10),
@@ -80,7 +92,7 @@ const CanvasInner: FC = () => {
 							blueprintId: blueprint.id,
 							edge: {
 								id: createId(),
-								edgeType: "data",
+								edgeType,
 								inputPort: {
 									id: Number.parseInt(targetHandle, 10),
 									nodeId: Number.parseInt(target, 10),
@@ -95,7 +107,7 @@ const CanvasInner: FC = () => {
 							type: "connectNodes",
 							edge: {
 								id,
-								edgeType: "data",
+								edgeType,
 								inputPort: {
 									id: Number.parseInt(targetHandle, 10),
 									nodeId: Number.parseInt(target, 10),

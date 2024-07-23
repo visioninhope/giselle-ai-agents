@@ -22,6 +22,5 @@ export const deleteEdges = async ({
 		.returning({
 			deletedId: edgesBlueprints.edgeId,
 		});
-	console.log(deletedEdges);
 	return deletedEdges.map(({ deletedId }) => deletedId);
 };
