@@ -5,7 +5,7 @@ import type { NodeProperty } from "@/drizzle";
 import { type FC, useCallback, useRef } from "react";
 
 type PropertyFieldProps = NodeProperty & {
-	nodeId: number;
+	nodeId: string;
 };
 export const PropertyField: FC<PropertyFieldProps> = ({
 	label,

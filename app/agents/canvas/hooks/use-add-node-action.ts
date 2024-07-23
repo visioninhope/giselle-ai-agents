@@ -37,11 +37,12 @@ export const useAddNodeAction = () => {
 				y: position.y,
 			});
 			const nodeClass = findNodeClass(nodeClasses, nodeClassName);
+			const nodeId = createId();
 			mutateBlueprint({
 				optimisticAction: {
 					type: "addNode",
 					node: {
-						id: createId(),
+						id: nodeId,
 						isCreating: true,
 						position: {
 							x: flowPosition.x,
@@ -53,7 +54,7 @@ export const useAddNodeAction = () => {
 						inputPorts: (nodeClass.inputPorts ?? []).map(
 							({ type, label, key }, index) => ({
 								id: createId(),
-								nodeId: 0,
+								nodeId: nodeId,
 								type: type,
 								name: label ?? "",
 								direction: "input",
@@ -65,7 +66,7 @@ export const useAddNodeAction = () => {
 						outputPorts: (nodeClass.outputPorts ?? []).map(
 							({ type, label, key }, index) => ({
 								id: createId(),
-								nodeId: 0,
+								nodeId: nodeId,
 								type: type,
 								name: label ?? "",
 								direction: "output",

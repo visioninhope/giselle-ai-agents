@@ -13,8 +13,9 @@ export const buildBlueprint = async (blueprint: Blueprint) => {
 	const insertedProcesses = await db
 		.insert(stepsSchema)
 		.values(
-			inferedSteps.map((process) => ({
-				...process,
+			inferedSteps.map(({ nodeId, order }) => ({
+				nodeId: Number.parseInt(nodeId, 10),
+				order,
 				blueprintId: blueprint.id,
 			})),
 		)
@@ -22,17 +23,6 @@ export const buildBlueprint = async (blueprint: Blueprint) => {
 			insertedId: stepsSchema.id,
 			nodeId: stepsSchema.nodeId,
 		});
-	const dataEdges = blueprint.edges.filter(
-		({ edgeType }) => edgeType === "data",
-	);
-	for (const dataEdge of dataEdges) {
-		const inputProcess = insertedProcesses.find(
-			({ nodeId }) => nodeId === dataEdge.inputPort.nodeId,
-		);
-		const outputProcess = insertedProcesses.find(
-			({ nodeId }) => nodeId === dataEdge.outputPort.nodeId,
-		);
-	}
 	await db
 		.update(blueprintsSchema)
 		.set({ builded: true })

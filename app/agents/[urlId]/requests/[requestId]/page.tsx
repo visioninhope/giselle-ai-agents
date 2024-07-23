@@ -5,7 +5,7 @@ import { RequestProvider } from "@/app/agents/requests/contexts";
 export default async function Page({
 	params,
 }: { params: { requestId: string } }) {
-	const request = await getRequest(params.requestId);
+	const request = await getRequest(Number.parseInt(params.requestId, 10));
 	return (
 		<RequestProvider request={request}>
 			<Canvas />

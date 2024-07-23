@@ -12,14 +12,14 @@ import {
 import { asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
-export const getRequest = async (requestId: string): Promise<AgentRequest> => {
+export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 	const request = await db.query.requests.findFirst({
 		columns: {
 			blueprintId: true,
 			id: true,
 			status: true,
 		},
-		where: eq(requestsSchema.id, `${requestId}`),
+		where: eq(requestsSchema.id, requestId),
 	});
 	invariant(request != null, `Request not found with id: ${request}`);
 	const blueprintId = request.blueprintId;
