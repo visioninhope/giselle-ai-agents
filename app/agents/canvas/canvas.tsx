@@ -20,10 +20,13 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { type FC, useCallback, useRef } from "react";
-import { useContextMenu, useSynthsize } from "../hooks/";
-import { NodeList, useNodeTypes } from "../node";
-import { useAddNodeAction } from "./use-add-node-action";
-import { useInfereceConnectionEdgeType } from "./use-inference-connection-edge-type";
+import {
+	useAddNodeAction,
+	useContextMenu,
+	useInfereceConnectionEdgeType,
+	useSynthsize,
+} from "./hooks/";
+import { NodeList, useNodeTypes } from "./node";
 
 const CanvasInner: FC = () => {
 	useSynthsize();
