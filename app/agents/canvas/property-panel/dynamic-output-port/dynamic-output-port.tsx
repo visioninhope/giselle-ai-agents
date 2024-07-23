@@ -1,6 +1,6 @@
 import {
 	type Node,
-	useAddNodePortAction,
+	useBlueprint,
 	useBlueprintId,
 } from "@/app/agents/blueprints";
 import { Button } from "@/components/ui/button";
@@ -18,22 +18,22 @@ type DynamicOutputPortProps = {
 	node: Node;
 };
 export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
-	const blueprintId = useBlueprintId();
-	const { addNodePort } = useAddNodePortAction();
+	const blueprint = useBlueprint();
+	// const { addNodePort } = useAddNodePortAction();
 	const heading = node.className === "onRequest" ? "Parameters" : "Output Port";
 	const [disclosure, setDisclosure] = useState(false);
 	const [value, setValue] = useState("");
-	const handleOpenChange = useCallback(() => {
-		addNodePort({
-			port: {
-				nodeId: node.id,
-				direction: "output",
-				name: value,
-			},
-		});
-		setDisclosure(false);
-		setValue("");
-	}, [addNodePort, node, value]);
+	// const handleOpenChange = useCallback(() => {
+	// 	addNodePort({
+	// 		port: {
+	// 			nodeId: node.id,
+	// 			direction: "output",
+	// 			name: value,
+	// 		},
+	// 	});
+	// 	setDisclosure(false);
+	// 	setValue("");
+	// }, [addNodePort, node, value]);
 	return (
 		<div>
 			<div className="flex justify-between mb-2 px-4">
@@ -55,7 +55,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 									}}
 								/>
 								<div className="flex justify-end">
-									<Button type="button" onClick={handleOpenChange}>
+									<Button type="button" /*onClick={handleOpenChange}*/>
 										Create parameter
 									</Button>
 								</div>

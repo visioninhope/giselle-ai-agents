@@ -9,15 +9,14 @@ type DbEdge = typeof schema.edges.$inferSelect;
 type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = Pick<
 	DbPort,
-	"nodeId" | "type" | "name" | "direction" | "order" | "nodeClassKey"
+	"type" | "name" | "direction" | "order" | "nodeClassKey"
 > & {
-	/** number on db, string on optimistic */
-	id: number | string;
+	id: string;
+	nodeId: string;
 	portsBlueprintsId: DbPortsBlueprints["id"];
 };
 export type Node = Pick<DbNode, "position"> & {
-	/** number on db, string on optimistic */
-	id: number | string;
+	id: string;
 	isCreating?: boolean;
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
@@ -26,13 +25,12 @@ export type Node = Pick<DbNode, "position"> & {
 	propertyPortMap: Record<string, string>;
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {
-	/** number on db, string on optimistic */
-	id: number | string;
-	inputPort: Pick<DbPort, "id" | "nodeId">;
-	outputPort: Pick<DbPort, "id" | "nodeId">;
+	id: string;
+	inputPort: { id: string; nodeId: string };
+	outputPort: { id: string; nodeId: string };
 };
 export type RequestInterfaceItem = {
-	portId: number;
+	portId: string;
 	name: string;
 };
 type RequestInterface = {

@@ -3,10 +3,13 @@ import type { steps as stepsSchema } from "@/drizzle";
 
 type DbStep = typeof stepsSchema.$inferSelect;
 
+type Step = Omit<DbStep, "blueprintId" | "id" | "nodeId"> & {
+	nodeId: string;
+};
 export const inferSteps = ({ nodes, edges }: Blueprint) => {
-	const steps: Omit<DbStep, "blueprintId" | "id">[] = [];
-	const visited = new Set<number>();
-	const dfs = (nodeId: number, order: number) => {
+	const steps: Step[] = [];
+	const visited = new Set<string>();
+	const dfs = (nodeId: string, order: number) => {
 		if (visited.has(nodeId)) return;
 		visited.add(nodeId);
 

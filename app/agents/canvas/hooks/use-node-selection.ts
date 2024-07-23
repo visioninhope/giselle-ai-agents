@@ -4,14 +4,11 @@ import { useCallback, useState } from "react";
 import invariant from "tiny-invariant";
 
 export const useNodeSelection = () => {
-	const { blueprint } = useBlueprint();
+	const blueprint = useBlueprint();
 	const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
 
 	const addSelectedNodes = useCallback(
-		(addNodeIds: number[]) => {
-			if (blueprint == null) {
-				return;
-			}
+		(addNodeIds: string[]) => {
 			setSelectedNodes((prev) => {
 				return [
 					...prev,
@@ -30,7 +27,7 @@ export const useNodeSelection = () => {
 		},
 		[blueprint],
 	);
-	const removeSelectedNodes = useCallback((removeNodeIds: number[]) => {
+	const removeSelectedNodes = useCallback((removeNodeIds: string[]) => {
 		setSelectedNodes((selectedNodes) =>
 			selectedNodes.filter((node) => !removeNodeIds.includes(node.id)),
 		);
@@ -49,11 +46,11 @@ export const useNodeSelection = () => {
 
 			const selectedNodes = changeSelectNodes
 				.filter((changeSelectNode) => changeSelectNode.selected)
-				.map((selectedNode) => Number.parseInt(selectedNode.id, 10));
+				.map((selectedNode) => selectedNode.id);
 			addSelectedNodes(selectedNodes);
 			const deselectedNodes = changeSelectNodes
 				.filter((changeSelectNode) => !changeSelectNode.selected)
-				.map((deselectedNode) => Number.parseInt(deselectedNode.id, 10));
+				.map((deselectedNode) => deselectedNode.id);
 			removeSelectedNodes(deselectedNodes);
 		},
 		[addSelectedNodes, removeSelectedNodes],

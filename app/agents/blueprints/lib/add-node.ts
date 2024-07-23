@@ -84,19 +84,21 @@ export const addNode = async (args: AddNodeArgs): Promise<Node> => {
 		.set({ dirty: true })
 		.where(eq(blueprints.id, args.blueprintId));
 	return {
-		id: node.id,
+		id: `${node.id}`,
 		position: args.node.position,
 		className: args.node.className,
 		properties: nodeClass.properties ?? [],
-		inputPorts: inputPorts.map((port, index) => ({
+		inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
 			...port,
-			id: insertedPorts[index].id,
+			id: `${insertedPorts[index].id}`,
+			nodeId: `${nodeId}`,
 			portsBlueprintsId: insertedPortsBlueprints[index].id,
 			nodeClassKey: port.nodeClassKey ?? null,
 		})),
-		outputPorts: outputPorts.map((port, index) => ({
+		outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
 			...port,
-			id: insertedPorts[index + inputPorts.length].id,
+			id: `${insertedPorts[index + inputPorts.length].id}`,
+			nodeId: `${nodeId}`,
 			portsBlueprintsId: insertedPortsBlueprints[index + inputPorts.length].id,
 			nodeClassKey: port.nodeClassKey ?? null,
 		})),

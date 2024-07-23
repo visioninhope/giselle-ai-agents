@@ -158,3 +158,8 @@ export const useBlueprintMutation = () => {
 	}
 	return mutateBlueprint;
 };
+
+export const useNode = (nodeId: string) => {
+	const blueprint = useBlueprint();
+	return blueprint.nodes.find(({ id }) => id === nodeId);
+};

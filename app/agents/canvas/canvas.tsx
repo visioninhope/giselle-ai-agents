@@ -15,6 +15,7 @@ import {
 	type Edge,
 	type Node,
 	type NodeTypes,
+	Panel,
 	ReactFlow,
 	ReactFlowProvider,
 	useReactFlow,
@@ -24,9 +25,11 @@ import {
 	useAddNodeAction,
 	useContextMenu,
 	useInfereceConnectionEdgeType,
+	useNodeSelection,
 	useSynthsize,
 } from "./hooks/";
 import { NodeList, useNodeTypes } from "./node";
+import { PropertyPanel } from "./property-panel";
 
 const CanvasInner: FC = () => {
 	useSynthsize();
@@ -50,6 +53,7 @@ const CanvasInner: FC = () => {
 	);
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
+	const { handleNodesChange, selectedNodes } = useNodeSelection();
 	return (
 		<div className="flex-1" ref={containerRef}>
 			<ReactFlow
@@ -59,6 +63,7 @@ const CanvasInner: FC = () => {
 				defaultNodes={[] as Node[]}
 				defaultEdges={[] as Edge[]}
 				isValidConnection={validateConnection}
+				onNodesChange={handleNodesChange}
 				onConnect={({ source, sourceHandle, target, targetHandle }) => {
 					if (
 						source == null ||
@@ -82,12 +87,12 @@ const CanvasInner: FC = () => {
 								id: createId(),
 								edgeType,
 								inputPort: {
-									id: Number.parseInt(targetHandle, 10),
-									nodeId: Number.parseInt(target, 10),
+									id: targetHandle,
+									nodeId: target,
 								},
 								outputPort: {
-									id: Number.parseInt(sourceHandle, 10),
-									nodeId: Number.parseInt(source, 10),
+									id: sourceHandle,
+									nodeId: source,
 								},
 							},
 						},
@@ -97,12 +102,12 @@ const CanvasInner: FC = () => {
 								id: createId(),
 								edgeType,
 								inputPort: {
-									id: Number.parseInt(targetHandle, 10),
-									nodeId: Number.parseInt(target, 10),
+									id: targetHandle,
+									nodeId: target,
 								},
 								outputPort: {
-									id: Number.parseInt(sourceHandle, 10),
-									nodeId: Number.parseInt(source, 10),
+									id: sourceHandle,
+									nodeId: source,
 								},
 							},
 						}),
@@ -112,12 +117,12 @@ const CanvasInner: FC = () => {
 								id,
 								edgeType,
 								inputPort: {
-									id: Number.parseInt(targetHandle, 10),
-									nodeId: Number.parseInt(target, 10),
+									id: targetHandle,
+									nodeId: target,
 								},
 								outputPort: {
-									id: Number.parseInt(sourceHandle, 10),
-									nodeId: Number.parseInt(source, 10),
+									id: sourceHandle,
+									nodeId: source,
 								},
 							},
 						}),
@@ -198,6 +203,13 @@ const CanvasInner: FC = () => {
 				}}
 			>
 				<Background />
+				<Panel position="top-right" className="bottom-0">
+					<div className="flex gap-2 h-full">
+						{selectedNodes.length > 0 && (
+							<PropertyPanel selectedNodes={selectedNodes} />
+						)}
+					</div>
+				</Panel>
 				{isVisible && (
 					<div
 						className="z-10 absolute"
