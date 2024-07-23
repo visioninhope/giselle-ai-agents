@@ -1,15 +1,17 @@
 import { useBlueprint } from "@/app/agents/blueprints";
+import { useRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
 
 export const useSynthsize = () => {
 	const blueprint = useBlueprint();
+	const request = useRequest();
 	const reactFlowInstance = useReactFlow();
 	useEffect(() => {
 		const nodes = blueprint.nodes.map((node) => {
-			// const relevantRequestStep = request?.steps.find(
-			// 	(step) => step.node.id === node.id,
-			// );
+			const relevantRequestStep = request?.steps.find(
+				(step) => step.node.id === node.id,
+			);
 
 			const currentNode = reactFlowInstance.getNode(`${node.id}`);
 			return {
@@ -20,7 +22,7 @@ export const useSynthsize = () => {
 				data: {
 					id: `${node.id}`,
 					className: node.className,
-					// stepStatus: relevantRequestStep?.status,
+					stepStatus: relevantRequestStep?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,
 				},
@@ -37,6 +39,7 @@ export const useSynthsize = () => {
 		reactFlowInstance.setEdges(edges);
 	}, [
 		blueprint,
+		request,
 		reactFlowInstance.setNodes,
 		reactFlowInstance.setEdges,
 		reactFlowInstance.getNode,

@@ -10,7 +10,7 @@ import { CircleCheckIcon, CircleIcon, LoaderCircleIcon } from "lucide-react";
 import type { FC } from "react";
 import { P, match } from "ts-pattern";
 
-import type { AgentRequest, RequestStep } from "@/app/agents/requests";
+import type { AgentRequest, Step } from "@/app/agents/requests";
 const stepListItemVariant = cva({
 	base: "",
 	variants: {
@@ -23,7 +23,7 @@ const stepListItemVariant = cva({
 	},
 });
 
-type StepListItemProps = RequestStep;
+type StepListItemProps = Step;
 const StepListItem: FC<StepListItemProps> = (props) => (
 	<AccordionItem
 		value={props.node.className}

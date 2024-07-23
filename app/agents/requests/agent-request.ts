@@ -1,9 +1,9 @@
 import type { RequestStatus, RequestStepStatus } from "@/drizzle/schema";
 
-export type RequestStep = {
+export type Step = {
 	id: number;
 	node: {
-		id: number;
+		id: string;
 		className: string;
 	};
 	status: RequestStepStatus;
@@ -18,7 +18,7 @@ export type AgentRequest = {
 	};
 	id: number;
 	status: RequestStatus;
-	steps: Array<RequestStep>;
+	steps: Array<Step>;
 };
 
 type AssertAgentRequest = (value: unknown) => asserts value is AgentRequest;

@@ -33,11 +33,11 @@ export const RequestButton: FC = () => {
 					blueprint.id,
 					new FormData(formEvent.currentTarget),
 				);
-				router.push(`/agents/yv2jg5xmbsmr1z1unatqpgt9/requests/${requestId}`);
+				router.push(`/agents/${blueprint.agent.urlId}/requests/${requestId}`);
 			});
 			setDisclosure(false);
 		},
-		[router, blueprint.id],
+		[router, blueprint.id, blueprint.agent.urlId],
 	);
 	const createRequestWithBlueprintId = createRequest.bind(null, blueprint.id);
 	if (

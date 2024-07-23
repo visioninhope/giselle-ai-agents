@@ -11,3 +11,6 @@ export { deleteNodes } from "./delete-nodes";
 export { connectNodes } from "./connect-nodes";
 export { deleteEdges } from "./delete-edges";
 export { updateNodeProperty } from "./update-node-property";
+export { addNodePort } from "./add-node-port";
+export { updatePortName } from "./update-port-name";
+export { deletePort } from "./delete-port";

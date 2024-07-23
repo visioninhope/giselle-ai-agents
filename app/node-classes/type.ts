@@ -1,4 +1,4 @@
-import type { RequestStep } from "@/app/agents/requests";
+import type { Step } from "@/app/agents/requests";
 import type { PortType } from "@/drizzle/schema";
 
 export type NodeClass = {
@@ -11,7 +11,7 @@ export type NodeClass = {
 	propertyPortMap?: Record<string, string>;
 };
 
-export type InvokeFunction = (requestStep: RequestStep) => Promise<void>;
+export type InvokeFunction = (requestStep: Step) => Promise<void>;
 
 export type Port = { type: PortType; key: string; label?: string };
 

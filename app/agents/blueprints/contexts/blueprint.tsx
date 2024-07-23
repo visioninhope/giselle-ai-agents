@@ -13,6 +13,7 @@ import {
 import { match } from "ts-pattern";
 import {
 	type Blueprint,
+	type BlueprintPort,
 	type Edge,
 	type Node,
 	reviewRequiredActions,
@@ -51,7 +52,21 @@ type BlueprintAction =
 					value: string;
 				};
 			};
+	  }
+	| {
+			type: "addNodePort";
+			port: BlueprintPort;
+	  }
+	| {
+			type: "updatePortName";
+			portId: string;
+			name: string;
+	  }
+	| {
+			type: "deletePort";
+			deletePortId: string;
 	  };
+
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
 	optimisticAction: BlueprintAction;
@@ -138,6 +153,82 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 						}
 					: stateNode,
 			),
+		}))
+		.with({ type: "addNodePort" }, ({ port }) => ({
+			...state,
+			nodes: state.nodes.map((stateNode) => {
+				if (stateNode.id !== port.nodeId) {
+					return stateNode;
+				}
+
+				if (port.direction === "input") {
+					return {
+						...stateNode,
+						inputPorts: [...stateNode.inputPorts, port],
+					};
+				}
+				if (port.direction === "output") {
+					return {
+						...stateNode,
+						outputPorts: [...stateNode.outputPorts, port],
+					};
+				}
+				throw new Error(`Unexpected port direction: ${port.direction}`);
+			}),
+		}))
+		.with({ type: "updatePortName" }, ({ portId, name }) => ({
+			...state,
+			nodes: state.nodes.map((stateNode) => {
+				const port = stateNode.inputPorts.find(({ id }) => id === portId);
+				if (port) {
+					return {
+						...stateNode,
+						inputPorts: stateNode.inputPorts.map((inputPort) =>
+							inputPort.id === portId ? { ...inputPort, name } : inputPort,
+						),
+					};
+				}
+				const outputPort = stateNode.outputPorts.find(
+					({ id }) => id === portId,
+				);
+				if (outputPort) {
+					return {
+						...stateNode,
+						outputPorts: stateNode.outputPorts.map((outputPort) =>
+							outputPort.id === portId ? { ...outputPort, name } : outputPort,
+						),
+					};
+				}
+				return stateNode;
+			}),
+		}))
+		.with({ type: "deletePort" }, ({ deletePortId }) => ({
+			...state,
+			nodes: state.nodes.map((stateNode) => {
+				const inputPort = stateNode.inputPorts.find(
+					({ id }) => id === deletePortId,
+				);
+				if (inputPort) {
+					return {
+						...stateNode,
+						inputPorts: stateNode.inputPorts.filter(
+							({ id }) => id !== deletePortId,
+						),
+					};
+				}
+				const outputPort = stateNode.outputPorts.find(
+					({ id }) => id === deletePortId,
+				);
+				if (outputPort) {
+					return {
+						...stateNode,
+						outputPorts: stateNode.outputPorts.filter(
+							({ id }) => id !== deletePortId,
+						),
+					};
+				}
+				return stateNode;
+			}),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

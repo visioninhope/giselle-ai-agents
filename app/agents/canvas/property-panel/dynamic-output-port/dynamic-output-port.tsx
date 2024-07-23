@@ -1,7 +1,9 @@
 import {
+	type BlueprintPort,
 	type Node,
+	addNodePort,
 	useBlueprint,
-	useBlueprintId,
+	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -10,8 +12,9 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
-import { type FC, useCallback, useState } from "react";
+import { type FC, type FormEventHandler, useCallback, useState } from "react";
 import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
 
 type DynamicOutputPortProps = {
@@ -22,18 +25,46 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 	// const { addNodePort } = useAddNodePortAction();
 	const heading = node.className === "onRequest" ? "Parameters" : "Output Port";
 	const [disclosure, setDisclosure] = useState(false);
-	const [value, setValue] = useState("");
-	// const handleOpenChange = useCallback(() => {
-	// 	addNodePort({
-	// 		port: {
-	// 			nodeId: node.id,
-	// 			direction: "output",
-	// 			name: value,
-	// 		},
-	// 	});
-	// 	setDisclosure(false);
-	// 	setValue("");
-	// }, [addNodePort, node, value]);
+	const { mutateBlueprint } = useBlueprintMutation();
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+		(formEvent) => {
+			formEvent.preventDefault();
+			setDisclosure(false);
+			const formData = new FormData(formEvent.currentTarget);
+			const draftPort: BlueprintPort = {
+				id: createId(),
+				nodeId: node.id,
+				name: formData.get("name") as string,
+				type: "data",
+				direction: "output",
+				order: 1000 /** @todo  last port order +1  */,
+				portsBlueprintsId: 0,
+				nodeClassKey: null,
+			};
+			mutateBlueprint({
+				optimisticAction: {
+					type: "addNodePort",
+					port: draftPort,
+				},
+				mutation: addNodePort({
+					blueprintId: blueprint.id,
+					port: {
+						nodeId: Number.parseInt(node.id, 10),
+						name: draftPort.name,
+						direction: "output",
+					},
+				}),
+				action: ({ port }) => ({
+					type: "addNodePort",
+					port: {
+						...draftPort,
+						id: `${port.id}`,
+					},
+				}),
+			});
+		},
+		[mutateBlueprint, blueprint.id, node.id],
+	);
 	return (
 		<div>
 			<div className="flex justify-between mb-2 px-4">
@@ -46,20 +77,14 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent align="end">
-							<div className="flex flex-col gap-4">
-								<Input
-									placeholder="Parameter"
-									value={value}
-									onChange={(e) => {
-										setValue(e.target.value);
-									}}
-								/>
-								<div className="flex justify-end">
-									<Button type="button" /*onClick={handleOpenChange}*/>
-										Create parameter
-									</Button>
+							<form onSubmit={handleSubmit}>
+								<div className="flex flex-col gap-4">
+									<Input placeholder="Parameter" name="name" />
+									<div className="flex justify-end">
+										<Button type="submit">Create parameter</Button>
+									</div>
 								</div>
-							</div>
+							</form>
 						</PopoverContent>
 					</Popover>
 				</div>
