@@ -6,14 +6,14 @@ import { db, updateRun, updateRunStep } from "@/drizzle/db";
 import { logger, task } from "@trigger.dev/sdk/v3";
 
 type InvokeTaskPayload = {
-	requestId: number;
+	requestId: string;
 };
 
 export const invokeTask = task({
 	id: "invoke",
 	run: async (payload: InvokeTaskPayload, { ctx }) => {
 		logger.log("start workflow", { payload, ctx });
-		await updateRun(payload.requestId, {
+		await updateRun(Number.parseInt(payload.requestId, 10), {
 			status: "running",
 			startedAt: new Date(),
 		});
