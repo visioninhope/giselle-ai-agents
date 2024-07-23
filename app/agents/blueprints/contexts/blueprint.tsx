@@ -7,59 +7,83 @@ import {
 	useCallback,
 	useContext,
 	useOptimistic,
+	useReducer,
 	useTransition,
 } from "react";
+import { match } from "ts-pattern";
 import type { Blueprint, Node } from "..";
 
 const BlueprintContextInternal = createContext<Blueprint | null>(null);
-type BlueprintOptimisticActionContextInternalState = {
-	setOptimisticBlueprint: (newBlueprint: OptimisticBlueprint) => void;
+type BlueprintAction = { type: "addNode"; node: Node };
+
+// biome-ignore lint: lint/suspicious/noExplicitAny
+type MutateBlueprintArgs<T extends Promise<any>> = {
+	optimisticAction: BlueprintAction;
+	mutation: T;
+	action: (
+		result: T extends Promise<infer U> ? Awaited<U> : never,
+	) => BlueprintAction;
+};
+
+type BlueprintActionContextInternalState = {
+	// biome-ignore lint: lint/suspicious/noExplicitAny
+	mutateBlueprint: <T extends Promise<any>>(
+		args: MutateBlueprintArgs<T>,
+	) => void;
 	isPending: boolean;
 } | null;
-const BlueprintOptimisticActionContextInternal =
-	createContext<BlueprintOptimisticActionContextInternalState>(null);
+const BlueprintActionContextInternal =
+	createContext<BlueprintActionContextInternalState>(null);
 
 type BlueprintProviderProps = {
 	blueprint: Blueprint;
 };
 
-type OptimisticNode = Omit<Node, "id"> & { isCreating?: boolean; id: string };
-type OptimisticBlueprint = Omit<Blueprint, "nodes"> & {
-	nodes: OptimisticNode[];
-};
-
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const reducer = (state: Blueprint, action: BlueprintAction) =>
+	match(action)
+		.with({ type: "addNode" }, ({ node }) => ({
+			...state,
+			nodes: [...state.nodes, node],
+		}))
+		.exhaustive();
 export const BlueprintProvider: FC<
 	PropsWithChildren<BlueprintProviderProps>
-> = ({ blueprint, children }) => {
+> = ({ blueprint: defaultBlueprint, children }) => {
 	const [isPending, startTransition] = useTransition();
+	const [blueprint, setBlueprint] = useReducer(reducer, defaultBlueprint);
+
 	const [optimisticBlueprint, setOptimisticBlueprintInternal] = useOptimistic<
 		Blueprint,
-		OptimisticBlueprint
-	>(blueprint, (state, newBlueprint) => ({
-		...newBlueprint,
-	}));
-	const setOptimisticBlueprint = useCallback(
-		(newBlueprint: OptimisticBlueprint) => {
+		BlueprintAction
+	>(blueprint, reducer);
+
+	const mutateBlueprint = useCallback(
+		// biome-ignore lint: lint/suspicious/noExplicitAny
+		<T extends Promise<any>>({
+			optimisticAction,
+			mutation,
+			action,
+		}: MutateBlueprintArgs<T>) => {
 			startTransition(async () => {
-				setOptimisticBlueprintInternal({ ...newBlueprint });
-				await sleep(10000);
+				setOptimisticBlueprintInternal(optimisticAction);
+				await mutation.then((result) => {
+					setBlueprint(action(result));
+				});
 			});
 		},
 		[setOptimisticBlueprintInternal],
 	);
-	console.log({ optimisticBlueprint, isPending });
 
 	return (
 		<BlueprintContextInternal.Provider value={optimisticBlueprint}>
-			<BlueprintOptimisticActionContextInternal.Provider
+			<BlueprintActionContextInternal.Provider
 				value={{
-					setOptimisticBlueprint,
+					mutateBlueprint,
 					isPending,
 				}}
 			>
 				{children}
-			</BlueprintOptimisticActionContextInternal.Provider>
+			</BlueprintActionContextInternal.Provider>
 		</BlueprintContextInternal.Provider>
 	);
 };
@@ -72,14 +96,12 @@ export const useBlueprint = () => {
 	return blueprint;
 };
 
-export const useBlueprintOptimisticAction = () => {
-	const setOptimisticBlueprint = useContext(
-		BlueprintOptimisticActionContextInternal,
-	);
-	if (setOptimisticBlueprint === null) {
+export const useBlueprintMutation = () => {
+	const mutateBlueprint = useContext(BlueprintActionContextInternal);
+	if (mutateBlueprint === null) {
 		throw new Error(
-			"useBlueprintOptimisticAction must be used within a BlueprintProvider",
+			"useBlueprintMutation must be used within a BlueprintProvider",
 		);
 	}
-	return setOptimisticBlueprint;
+	return mutateBlueprint;
 };

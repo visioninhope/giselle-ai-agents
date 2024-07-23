@@ -9,16 +9,25 @@ type DbEdge = typeof schema.edges.$inferSelect;
 type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = Pick<
 	DbPort,
-	"id" | "nodeId" | "type" | "name" | "direction" | "order" | "nodeClassKey"
-> & { portsBlueprintsId: DbPortsBlueprints["id"] };
-export type Node = Pick<DbNode, "id" | "position"> & {
+	"nodeId" | "type" | "name" | "direction" | "order" | "nodeClassKey"
+> & {
+	/** number on db, string on optimistic */
+	id: number | string;
+	portsBlueprintsId: DbPortsBlueprints["id"];
+};
+export type Node = Pick<DbNode, "position"> & {
+	/** number on db, string on optimistic */
+	id: number | string;
+	isCreating?: boolean;
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
 	properties: NodeProperties;
 	propertyPortMap: Record<string, string>;
 };
-export type Edge = Pick<DbEdge, "id" | "edgeType"> & {
+export type Edge = Pick<DbEdge, "edgeType"> & {
+	/** number on db, string on optimistic */
+	id: number | string;
 	inputPort: Pick<DbPort, "id" | "nodeId">;
 	outputPort: Pick<DbPort, "id" | "nodeId">;
 };

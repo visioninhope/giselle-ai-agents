@@ -20,7 +20,6 @@ import { and, desc, eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
-	console.log("hehehehe");
 	const [blueprint] = await db
 		.select({
 			id: blueprintsSchema.id,
@@ -49,7 +48,6 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			eq(nodeBlueprintsSchema.nodeId, nodesSchema.id),
 		)
 		.where(eq(nodeBlueprintsSchema.blueprintId, blueprint.id));
-	console.log({ dbNodes });
 	const dbPorts =
 		dbNodes.length === 0
 			? []

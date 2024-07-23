@@ -41,7 +41,6 @@ export const createRequest = async (
 
 	const formEntries = {};
 	formData.forEach((value, key) => {
-		console.log({ value, key });
 		formData.get(key);
 	});
 

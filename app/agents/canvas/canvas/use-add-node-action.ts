@@ -1,7 +1,7 @@
 import {
 	addNode,
 	useBlueprint,
-	useBlueprintOptimisticAction,
+	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import {
 	type NodeClassName,
@@ -17,12 +17,15 @@ type AddNodeArgs = {
 	nodeClassName: NodeClassName;
 	position: { x: number; y: number };
 };
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+const sleep = (ms: number) =>
+	new Promise<{ hello: string }>((resolve) =>
+		setTimeout(() => resolve({ hello: "world" }), ms),
+	);
 export const useAddNodeAction = () => {
 	const reactFlowInstance = useReactFlow();
 	const blueprint = useBlueprint();
 	const nodeClasses = useNodeClasses();
-	const { setOptimisticBlueprint } = useBlueprintOptimisticAction();
+	const { mutateBlueprint } = useBlueprintMutation();
 	const addNodeAction = useCallback(
 		async ({ nodeClassName, position }: AddNodeArgs) => {
 			invariant(reactFlowInstance != null, "reactFlowInstance is null");
@@ -34,23 +37,22 @@ export const useAddNodeAction = () => {
 				y: position.y,
 			});
 			const nodeClass = findNodeClass(nodeClasses, nodeClassName);
-			setOptimisticBlueprint({
-				...blueprint,
-				nodes: [
-					...blueprint.nodes.map(({ id, ...node }) => ({
-						...node,
-						id: `${id}`,
-					})),
-					{
+			mutateBlueprint({
+				optimisticAction: {
+					type: "addNode",
+					node: {
 						id: createId(),
 						isCreating: true,
-						position,
+						position: {
+							x: flowPosition.x,
+							y: flowPosition.y,
+						},
 						className: nodeClassName,
 						properties: nodeClass.properties ?? [],
 						propertyPortMap: nodeClass.propertyPortMap ?? {},
 						inputPorts: (nodeClass.inputPorts ?? []).map(
 							({ type, label, key }, index) => ({
-								id: index,
+								id: createId(),
 								nodeId: 0,
 								type: type,
 								name: label ?? "",
@@ -62,7 +64,7 @@ export const useAddNodeAction = () => {
 						),
 						outputPorts: (nodeClass.outputPorts ?? []).map(
 							({ type, label, key }, index) => ({
-								id: index,
+								id: createId(),
 								nodeId: 0,
 								type: type,
 								name: label ?? "",
@@ -73,19 +75,21 @@ export const useAddNodeAction = () => {
 							}),
 						),
 					},
-				],
+				},
+				mutation: addNode({
+					blueprintId: blueprint.id,
+					node: {
+						className: nodeClassName,
+						position: { x: flowPosition.x, y: flowPosition.y },
+					},
+				}),
+				action: (result) => ({
+					type: "addNode",
+					node: result,
+				}),
 			});
-			// await sleep(1000);
-			// console.log("sleep!");
-			// await addNode({
-			// 	blueprintId: blueprint.id,
-			// 	node: {
-			// 		className: nodeClassName,
-			// 		position: { x: flowPosition.x, y: flowPosition.y },
-			// 	},
-			// });
 		},
-		[reactFlowInstance, blueprint, setOptimisticBlueprint, nodeClasses],
+		[reactFlowInstance, mutateBlueprint, nodeClasses, blueprint.id],
 	);
 	return { addNodeAction };
 };
