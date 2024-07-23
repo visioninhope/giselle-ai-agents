@@ -54,6 +54,7 @@ const CanvasInner: FC = () => {
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
 	const { handleNodesChange, selectedNodes } = useNodeSelection();
+	console.log({ blueprint });
 	return (
 		<div className="flex-1" ref={containerRef}>
 			<ReactFlow

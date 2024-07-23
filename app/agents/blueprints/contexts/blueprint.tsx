@@ -11,7 +11,12 @@ import {
 	useTransition,
 } from "react";
 import { match } from "ts-pattern";
-import type { Blueprint, Edge, Node } from "..";
+import {
+	type Blueprint,
+	type Edge,
+	type Node,
+	reviewRequiredActions,
+} from "..";
 
 const BlueprintContextInternal = createContext<Blueprint | null>(null);
 type BlueprintAction =
@@ -90,6 +95,10 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 		.with({ type: "connectNodes" }, ({ edge }) => ({
 			...state,
 			edges: [...state.edges, edge],
+			requiredActions: reviewRequiredActions({
+				...state,
+				edges: [...state.edges, edge],
+			}),
 		}))
 		.with({ type: "deleteEdges" }, ({ deletedEdges }) => ({
 			...state,
@@ -97,6 +106,13 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				(edge) =>
 					!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
 			),
+			requiredActions: reviewRequiredActions({
+				...state,
+				edges: state.edges.filter(
+					(edge) =>
+						!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
+				),
+			}),
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

@@ -7,17 +7,13 @@ export const useInfereceConnectionEdgeType = () => {
 	const blueprint = useBlueprint();
 	const getPorts = useCallback(
 		({ source, sourceHandle, target, targetHandle }: Connection | Edge) => {
-			const sourceNode = blueprint.nodes.find(
-				(node) => node.id === Number.parseInt(source, 10),
-			);
+			const sourceNode = blueprint.nodes.find((node) => node.id === source);
 			const sourcePort = sourceNode?.outputPorts.find(
-				(port) => port.id === Number.parseInt(sourceHandle ?? "", 10),
+				(port) => port.id === sourceHandle,
 			);
-			const targetNode = blueprint.nodes.find(
-				(node) => node.id === Number.parseInt(target, 10),
-			);
+			const targetNode = blueprint.nodes.find((node) => node.id === target);
 			const targetPort = targetNode?.inputPorts.find(
-				(port) => port.id === Number.parseInt(targetHandle ?? "", 10),
+				(port) => port.id === targetHandle,
 			);
 			if (sourcePort == null || targetPort == null) {
 				return {

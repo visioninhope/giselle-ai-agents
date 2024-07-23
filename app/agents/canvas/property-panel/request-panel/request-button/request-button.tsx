@@ -1,4 +1,4 @@
-import { useBlueprintId, useRequestInterface } from "@/app/agents/blueprints";
+import { useBlueprint } from "@/app/agents/blueprints";
 import { createRequest } from "@/app/agents/requests";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,26 +11,20 @@ import {
 import { PlayIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
 
-type RequestButtonProps = {
-	onClick: () => void;
-};
-export const RequestButton: FC<RequestButtonProps> = ({ onClick }) => {
+export const RequestButton: FC = () => {
 	const [disclosure, setDisclosure] = useState(false);
-	const requestInterface = useRequestInterface();
-	const blueprintId = useBlueprintId();
+	const blueprint = useBlueprint();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>((e) => {
 		setDisclosure(false);
 	}, []);
-	const createRequestWithBlueprintId = createRequest.bind(null, blueprintId);
-	if (requestInterface?.input == null || requestInterface.input.length < 1) {
+	const createRequestWithBlueprintId = createRequest.bind(null, blueprint.id);
+	if (
+		blueprint.requestInterface?.input == null ||
+		blueprint.requestInterface.input.length < 1
+	) {
 		return (
 			<form action={createRequestWithBlueprintId}>
-				<Button
-					variant={"ghost"}
-					size={"xs"}
-					className="text-muted-foreground"
-					type="submit"
-				>
+				<Button type="submit">
 					<PlayIcon className="mr-1 w-3 h-3" />
 					Request to Agent
 				</Button>
@@ -52,7 +46,7 @@ export const RequestButton: FC<RequestButtonProps> = ({ onClick }) => {
 					className="flex flex-col gap-4"
 				>
 					<div className="flex flex-col gap-2">
-						{requestInterface?.input.map(({ portId, name }) => (
+						{blueprint.requestInterface?.input.map(({ portId, name }) => (
 							<div key={portId}>
 								<Label htmlFor={`${portId}`}>{name}</Label>
 								<Input type="text" id={`${portId}`} name={name} />

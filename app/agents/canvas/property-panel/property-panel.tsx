@@ -7,6 +7,7 @@ import { type FC, useMemo } from "react";
 import { match } from "ts-pattern";
 import { DynamicOutputPort } from "./dynamic-output-port";
 import { PropertyField } from "./property-field";
+import { RequestPanel } from "./request-panel";
 
 type PropertyPanel = {
 	selectedNodes: Node[];
@@ -14,9 +15,9 @@ type PropertyPanel = {
 export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 	return (
 		<div className="bg-background/60 border border-border w-[400px] text-sm">
-			<Tabs defaultValue="properties">
+			<Tabs defaultValue="requests">
 				<TabsList>
-					<TabsTrigger value="Requests" className="font-bold">
+					<TabsTrigger value="requests" className="font-bold">
 						Requests
 					</TabsTrigger>
 					<TabsTrigger value="properties" className="font-bold">
@@ -30,6 +31,9 @@ export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 					) : (
 						<NodeModifyPanelInner node={selectedNodes[0]} />
 					)}
+				</TabsContent>
+				<TabsContent value="requests" className="py-2 flex flex-col gap-2">
+					<RequestPanel />
 				</TabsContent>
 			</Tabs>
 		</div>
