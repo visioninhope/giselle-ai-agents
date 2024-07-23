@@ -1,12 +1,14 @@
 "use client";
 
 import {
+	connectNodes,
 	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
 	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import type { NodeClassName } from "@/app/node-classes";
+import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
 	type Node,
@@ -48,6 +50,63 @@ const CanvasInner: FC = () => {
 				nodeTypes={nodeTypes}
 				defaultNodes={[] as Node[]}
 				defaultEdges={[]}
+				onConnect={({ source, sourceHandle, target, targetHandle }) => {
+					if (
+						source == null ||
+						sourceHandle == null ||
+						target == null ||
+						targetHandle == null
+					) {
+						return;
+					}
+					mutateBlueprint({
+						optimisticAction: {
+							type: "connectNodes",
+							edge: {
+								id: createId(),
+								edgeType: "data",
+								inputPort: {
+									id: Number.parseInt(targetHandle, 10),
+									nodeId: Number.parseInt(target, 10),
+								},
+								outputPort: {
+									id: Number.parseInt(sourceHandle, 10),
+									nodeId: Number.parseInt(source, 10),
+								},
+							},
+						},
+						mutation: connectNodes({
+							blueprintId: blueprint.id,
+							edge: {
+								id: createId(),
+								edgeType: "data",
+								inputPort: {
+									id: Number.parseInt(targetHandle, 10),
+									nodeId: Number.parseInt(target, 10),
+								},
+								outputPort: {
+									id: Number.parseInt(sourceHandle, 10),
+									nodeId: Number.parseInt(source, 10),
+								},
+							},
+						}),
+						action: ({ id }) => ({
+							type: "connectNodes",
+							edge: {
+								id,
+								edgeType: "data",
+								inputPort: {
+									id: Number.parseInt(targetHandle, 10),
+									nodeId: Number.parseInt(target, 10),
+								},
+								outputPort: {
+									id: Number.parseInt(sourceHandle, 10),
+									nodeId: Number.parseInt(source, 10),
+								},
+							},
+						}),
+					});
+				}}
 				onNodesDelete={(nodes) => {
 					mutateBlueprint({
 						optimisticAction: {

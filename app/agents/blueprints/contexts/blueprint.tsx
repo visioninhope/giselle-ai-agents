@@ -11,7 +11,7 @@ import {
 	useTransition,
 } from "react";
 import { match } from "ts-pattern";
-import type { Blueprint, Node } from "..";
+import type { Blueprint, Edge, Node } from "..";
 
 const BlueprintContextInternal = createContext<Blueprint | null>(null);
 type BlueprintAction =
@@ -28,6 +28,10 @@ type BlueprintAction =
 			deltedNodes: Array<{
 				nodeId: number | string;
 			}>;
+	  }
+	| {
+			type: "connectNodes";
+			edge: Edge;
 	  };
 // biome-ignore lint: lint/suspicious/noExplicitAny
 type MutateBlueprintArgs<T extends Promise<any>> = {
@@ -78,6 +82,10 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				(node) =>
 					!deltedNodes.some(({ nodeId }) => `${nodeId}` === `${node.id}`),
 			),
+		}))
+		.with({ type: "connectNodes" }, ({ edge }) => ({
+			...state,
+			edges: [...state.edges, edge],
 		}))
 		.exhaustive();
 export const BlueprintProvider: FC<

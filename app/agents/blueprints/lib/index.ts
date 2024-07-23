@@ -8,3 +8,4 @@ export { getLatestBlueprint } from "./get-latest-blueprint";
 export * from "./add-node";
 export * from "./update-nodes-position";
 export * from "./delete-nodes";
+export * from "./connect-nodes";
