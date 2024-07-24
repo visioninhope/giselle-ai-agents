@@ -1,7 +1,7 @@
-"use server";
-
+import { and, eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { db } from "./db";
 import {
-	db,
 	edges,
 	nodesBlueprints,
 	ports,
@@ -9,9 +9,8 @@ import {
 	requestPortMessages,
 	requests,
 	steps,
-} from "@/drizzle";
-import { and, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+} from "./schema";
+
 const originPortsBlueprints = alias(portsBlueprints, "originPortsBlueprints");
 const originNodesBlueprints = alias(nodesBlueprints, "originNodesBlueprints");
 const destinationPortsBlueprints = alias(
@@ -22,15 +21,13 @@ const destinationNodesBlueprints = alias(
 	nodesBlueprints,
 	"destinationNodesBlueprints",
 );
-type PullMessageArgs = {
-	requestId: number;
-	stepId: number;
-};
-export const pullMessages = async ({ requestId, stepId }: PullMessageArgs) =>
-	await db
+export const pullMessages = db.$with("pullMessages").as(
+	db
 		.select({
 			nodeClassKey: ports.nodeClassKey,
-			content: requestPortMessages.message,
+			content: sql<string>`${requestPortMessages.message}`.as("content"),
+			requestId: sql<number>`${requests.id}`.as("requestId"),
+			stepId: sql<number>`${steps.id}`.as("stepId"),
 		})
 		.from(requestPortMessages)
 		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
@@ -73,5 +70,5 @@ export const pullMessages = async ({ requestId, stepId }: PullMessageArgs) =>
 				eq(steps.nodeId, destinationNodesBlueprints.nodeId),
 				eq(steps.blueprintId, destinationNodesBlueprints.blueprintId),
 			),
-		)
-		.where(and(eq(requests.id, requestId), eq(steps.id, stepId)));
+		),
+);

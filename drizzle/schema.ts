@@ -3,7 +3,6 @@ import {
 	integer,
 	jsonb,
 	pgTable,
-	pgView,
 	serial,
 	text,
 	timestamp,
