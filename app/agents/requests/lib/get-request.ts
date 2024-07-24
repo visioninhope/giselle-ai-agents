@@ -90,7 +90,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			requestStep: {
 				id: requestStep.id,
 				input: inputMessages
-					.filter(({ nodeId: stepId }) => stepId === id)
+					.filter(({ nodeId }) => nodeId === node.id)
 					.map(({ content, portId }) => ({
 						value: content,
 						portId: `${portId}`,

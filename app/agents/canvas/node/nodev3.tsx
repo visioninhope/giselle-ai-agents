@@ -32,9 +32,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>
-						{className}:{id}
-					</div>
+					<div>{className}</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
@@ -48,9 +46,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 											position={Position.Left}
 											className={handleVariant({ type })}
 										/>
-										<p className="whitespace-nowrap">
-											{name}: {id}
-										</p>
+										<p className="whitespace-nowrap">{name}</p>
 									</div>
 								))}
 							</div>
@@ -58,9 +54,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 						<div className="flex flex-col gap-2 items-end flex-1">
 							{outputPorts?.map(({ id, name, type }) => (
 								<div className={portVariant()} key={id}>
-									<p className="whitespace-nowrap">
-										{name}: {id}
-									</p>
+									<p className="whitespace-nowrap">{name}</p>
 									<Handle
 										type="source"
 										id={`${id}`}
