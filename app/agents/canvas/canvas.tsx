@@ -21,6 +21,7 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { type FC, useCallback, useRef } from "react";
+import { Header } from "./header";
 import {
 	useAddNodeAction,
 	useContextMenu,
@@ -56,9 +57,7 @@ const CanvasInner: FC = () => {
 	const { handleNodesChange, selectedNodes } = useNodeSelection();
 	return (
 		<div className="flex flex-col h-full">
-			<header className="bg-background h-[50px] flex items-center px-4 text-foreground">
-				<p className="cursor-default">Untitled</p>
-			</header>
+			<Header />
 			<div className="flex-1" ref={containerRef}>
 				<ReactFlow
 					colorMode="dark"
