@@ -15,25 +15,21 @@ type PropertyPanel = {
 };
 export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 	return (
-		<div className="bg-background/60 border border-border w-[400px] text-sm">
-			<Tabs defaultValue="requests">
+		<div className="bg-background border border-border w-[400px] text-sm">
+			<Tabs defaultValue="requests" className="divide-y">
 				<TabsList>
-					<TabsTrigger value="requests" className="font-bold">
-						Requests
-					</TabsTrigger>
-					<TabsTrigger value="properties" className="font-bold">
-						Properties
-					</TabsTrigger>
+					<TabsTrigger value="requests">Requests</TabsTrigger>
+					<TabsTrigger value="properties">Properties</TabsTrigger>
 				</TabsList>
 
-				<TabsContent value="properties" className="py-2 flex flex-col gap-2">
+				<TabsContent value="properties" className="flex flex-col gap-2">
 					{selectedNodes.length === 0 ? null : selectedNodes.length > 1 ? (
 						<p>{selectedNodes.length} nodes selected</p>
 					) : (
 						<NodeModifyPanelInner node={selectedNodes[0]} />
 					)}
 				</TabsContent>
-				<TabsContent value="requests" className="py-2 flex flex-col gap-2">
+				<TabsContent value="requests" className="flex flex-col gap-2">
 					<RequestPanel />
 				</TabsContent>
 			</Tabs>
@@ -55,7 +51,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 		return null;
 	}
 	return (
-		<div className="flex flex-col gap-2">
+		<div className="flex flex-col gap-2 py-2">
 			{blueprintNode.properties.length > 0 && (
 				<>
 					<div className="px-4">
