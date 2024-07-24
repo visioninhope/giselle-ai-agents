@@ -13,7 +13,6 @@ import {
 	useTransition,
 } from "react";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const RequestButton: FC = () => {
 	const [disclosure, setDisclosure] = useState(false);
 	const router = useRouter();
@@ -33,7 +32,6 @@ export const RequestButton: FC = () => {
 		},
 		[router, blueprint.id, blueprint.agent.urlId],
 	);
-	const createRequestWithBlueprintId = createRequest.bind(null, blueprint.id);
 
 	if (isPending) {
 		return <div className="px-4 text-muted-foreground">loading...</div>;

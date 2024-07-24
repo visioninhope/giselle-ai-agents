@@ -10,12 +10,17 @@ export const RequestPanel: FC = () => {
 	const request = useRequest();
 	return (
 		<div className="px-4">
+			{request != null && (
+				<div className="mb-4 pb-4 border-b border-border">
+					<RequestLogger request={request} />
+				</div>
+			)}
 			{blueprint.requiredActions && (
 				<RequiredAction requiredActions={blueprint.requiredActions} />
 			)}
+			{request != null && <p>New request</p>}
 			{(blueprint.requiredActions == null ||
 				blueprint.requiredActions.length === 0) && <RequestButton />}
-			{request != null && <RequestLogger request={request} />}
 		</div>
 	);
 };
