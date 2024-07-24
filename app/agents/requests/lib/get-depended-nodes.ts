@@ -36,7 +36,7 @@ export const getDependedNodes = async ({
        edges.output_port_id,
        output_nodes.id target_node_id,
        output_nodes.class_name target_node_class_name,
-       1 AS DEPTH
+       1 AS depth
      FROM
        nodes
        INNER JOIN nodes_blueprints ON nodes_blueprints.node_id = nodes.id
@@ -75,7 +75,7 @@ export const getDependedNodes = async ({
        node_connections.output_port_id,
        node_connections.target_node_id,
        node_connections.target_node_class_name,
-       connection_tree.DEPTH + 1 AS DEPTH
+       connection_tree.depth + 1 AS depth
      FROM
        node_connections
        INNER JOIN connection_tree ON connection_tree.target_node_id = node_connections.source_node_id
@@ -85,7 +85,8 @@ export const getDependedNodes = async ({
  SELECT
    *
  FROM
-   connection_tree;
+   connection_tree
+ ORDER BY depth DESC
      `);
 	assertDependedNodes(result.rows);
 	return result.rows.map(({ target_node_id, target_node_class_name }) => ({

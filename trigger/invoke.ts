@@ -68,6 +68,9 @@ export const invokeTask = task({
 				if (resolver == null) {
 					logger.log(`resolver not implemented for ${dependedNode.className}`);
 				} else {
+					logger.log(
+						`resolver found for ${dependedNode.className}, node id: ${dependedNode.id}`,
+					);
 					await resolver({
 						requestId: request.id,
 						nodeId: dependedNode.id,
