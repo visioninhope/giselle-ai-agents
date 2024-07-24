@@ -5,11 +5,12 @@ import {
 	db,
 	nodesBlueprints as nodesBlueprintsSchema,
 	nodes as nodesSchema,
+	pullMessages,
 	requestSteps as requestStepsSchema,
 	requests as requestsSchema,
 	steps as stepsSchema,
 } from "@/drizzle";
-import { asc, eq } from "drizzle-orm";
+import { and, asc, eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 export const getRequest = async (requestId: number): Promise<AgentRequest> => {
@@ -52,6 +53,23 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 		},
 		where: eq(requestStepsSchema.requestId, request.id),
 	});
+	const inputMessages = await db
+		.with(pullMessages)
+		.select({
+			nodeId: pullMessages.nodeId,
+			portId: pullMessages.portId,
+			content: pullMessages.content,
+		})
+		.from(pullMessages)
+		.where(
+			and(
+				eq(pullMessages.requestId, request.id),
+				inArray(
+					pullMessages.nodeId,
+					steps.map(({ nodeId }) => nodeId),
+				),
+			),
+		);
 	const requestStepsWithNode = steps.map(({ id, nodeId }) => {
 		const node = dbNodes.find((n) => n.id === nodeId);
 		const requestStep = requestSteps.find(
@@ -68,6 +86,15 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			status: requestStep.status,
 			request: {
 				id: request.id,
+			},
+			requestStep: {
+				id: requestStep.id,
+				input: inputMessages
+					.filter(({ nodeId }) => nodeId === node.id)
+					.map(({ content, portId }) => ({
+						value: content,
+						portId: `${portId}`,
+					})),
 			},
 		};
 	});

@@ -1,3 +1,4 @@
+import type { Blueprint } from "@/app/agents/blueprints";
 import type { Step } from "@/app/agents/requests";
 import type { PortType } from "@/drizzle/schema";
 
@@ -20,8 +21,18 @@ export type Property = {
 	label?: string;
 };
 
-export type Feature = DynamicOutputPort;
+export type Feature = DynamicOutputPort | DynamicInputPort;
 
 type DynamicOutputPort = {
 	name: "dynamicOutputPort";
 };
+type DynamicInputPort = {
+	name: "dynamicInputPort";
+};
+
+type ResolverArgs = {
+	requestId: number;
+	nodeId: number;
+	blueprint: Blueprint;
+};
+export type Resolver = (args: ResolverArgs) => Promise<void>;

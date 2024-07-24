@@ -21,7 +21,7 @@ type NodeData = {
 type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { className, inputPorts, outputPorts, stepStatus },
+	data: { className, inputPorts, outputPorts, stepStatus, id },
 }) => {
 	return (
 		<>

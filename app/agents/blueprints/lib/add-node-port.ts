@@ -1,6 +1,12 @@
 "use server";
 
-import { db, nodesBlueprints, ports, portsBlueprints } from "@/drizzle";
+import {
+	blueprints,
+	db,
+	nodesBlueprints,
+	ports,
+	portsBlueprints,
+} from "@/drizzle";
 import { and, desc, eq } from "drizzle-orm";
 
 type AddNodePortArgs = {
@@ -43,6 +49,10 @@ export const addNodePort = async ({ port, blueprintId }: AddNodePortArgs) => {
 			nodesBlueprintsId: nodeBlueprint.id,
 		})
 		.returning({ id: portsBlueprints.id });
+	await db
+		.update(blueprints)
+		.set({ dirty: true })
+		.where(eq(blueprints.id, blueprintId));
 	return {
 		port: {
 			id: insertedPort.id,

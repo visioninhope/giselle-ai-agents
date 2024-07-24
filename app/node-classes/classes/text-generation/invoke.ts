@@ -1,8 +1,10 @@
 "use server";
 
-import { leaveMessage, pullMessages } from "@/app/agents/requests";
+import { leaveMessage } from "@/app/agents/requests";
 import type { InvokeFunction } from "@/app/node-classes";
+import { db, pullMessages } from "@/drizzle";
 import { logger, wait } from "@trigger.dev/sdk/v3";
+import { and, eq } from "drizzle-orm";
 import OpenAI from "openai";
 
 const openai = new OpenAI();
@@ -10,9 +12,19 @@ const openai = new OpenAI();
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = (value) => {};
 
-export const invoke: InvokeFunction = async ({ request, id }) => {
+export const invoke: InvokeFunction = async ({ request, id, node }) => {
 	logger.log(`params: ${JSON.stringify({ request, id })}`);
-	const messages = await pullMessages({ requestId: request.id, stepId: id });
+
+	const messages = await db
+		.with(pullMessages)
+		.select()
+		.from(pullMessages)
+		.where(
+			and(
+				eq(pullMessages.requestId, request.id),
+				eq(pullMessages.nodeId, Number.parseInt(node.id, 10)),
+			),
+		);
 	const instructionMessage = messages.find(
 		({ nodeClassKey }) => nodeClassKey === "instruction",
 	);

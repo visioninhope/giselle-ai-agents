@@ -1,17 +1,17 @@
-"use server";
-
+import { and, eq, sql } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import { db } from "./db";
 import {
-	db,
 	edges,
+	edgesBlueprints,
 	nodesBlueprints,
 	ports,
 	portsBlueprints,
 	requestPortMessages,
 	requests,
 	steps,
-} from "@/drizzle";
-import { and, eq } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+} from "./schema";
+
 const originPortsBlueprints = alias(portsBlueprints, "originPortsBlueprints");
 const originNodesBlueprints = alias(nodesBlueprints, "originNodesBlueprints");
 const destinationPortsBlueprints = alias(
@@ -22,15 +22,14 @@ const destinationNodesBlueprints = alias(
 	nodesBlueprints,
 	"destinationNodesBlueprints",
 );
-type PullMessageArgs = {
-	requestId: number;
-	stepId: number;
-};
-export const pullMessages = async ({ requestId, stepId }: PullMessageArgs) =>
-	await db
+export const pullMessages = db.$with("pullMessages").as(
+	db
 		.select({
 			nodeClassKey: ports.nodeClassKey,
-			content: requestPortMessages.message,
+			content: sql<string>`${requestPortMessages.message}`.as("content"),
+			requestId: sql<number>`${requests.id}`.as("requestId"),
+			nodeId: sql<number>`${destinationNodesBlueprints.nodeId}`.as("nodeId"),
+			portId: sql<number>`${ports.id}`.as("portId"),
 		})
 		.from(requestPortMessages)
 		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
@@ -50,6 +49,13 @@ export const pullMessages = async ({ requestId, stepId }: PullMessageArgs) =>
 			),
 		)
 		.innerJoin(
+			edgesBlueprints,
+			and(
+				eq(edgesBlueprints.edgeId, edges.id),
+				eq(edgesBlueprints.blueprintId, requests.blueprintId),
+			),
+		)
+		.innerJoin(
 			destinationPortsBlueprints,
 			eq(destinationPortsBlueprints.portId, edges.inputPortId),
 		)
@@ -66,12 +72,5 @@ export const pullMessages = async ({ requestId, stepId }: PullMessageArgs) =>
 					originNodesBlueprints.blueprintId,
 				),
 			),
-		)
-		.innerJoin(
-			steps,
-			and(
-				eq(steps.nodeId, destinationNodesBlueprints.nodeId),
-				eq(steps.blueprintId, destinationNodesBlueprints.blueprintId),
-			),
-		)
-		.where(and(eq(requests.id, requestId), eq(steps.id, stepId)));
+		),
+);
