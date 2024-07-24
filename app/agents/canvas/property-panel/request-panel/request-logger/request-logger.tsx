@@ -74,12 +74,12 @@ const StepListItem: FC<StepListItemProps> = (props) => {
 					.with({ status: "idle" }, () => null)
 					.with({ status: "running" }, () => <p>Running...</p>)
 					.with({ status: "success" }, () => (
-						<div>
+						<div className="max-h-[400px] overflow-y-auto">
 							{props.requestStep.input.length > 0 && (
 								<>
-									<p>Incoming Messages</p>
+									<p className="mb-2">Incoming Messages</p>
 									{props.requestStep.input.map((input) => (
-										<p key={input.portId}>
+										<p key={input.portId} className="text-xs">
 											{nodePorts[input.portId] ?? "noname"}: {input.value}
 										</p>
 									))}

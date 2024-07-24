@@ -1,6 +1,6 @@
 "use server";
 
-import { db, nodesBlueprints } from "@/drizzle";
+import { blueprints, db, nodesBlueprints } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 
 type UpdateNodePropertyArgs = {
@@ -39,5 +39,10 @@ export const updateNodeProperty = async ({
 			}),
 		})
 		.where(eq(nodesBlueprints.id, nodeBlueprint.id));
+
+	await db
+		.update(blueprints)
+		.set({ dirty: true })
+		.where(eq(blueprints.id, blueprintId));
 	return { property };
 };
