@@ -61,7 +61,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 					<div className="px-4">
 						{blueprintNode.properties?.map((property) => (
 							<PropertyField
-								key={property.name}
+								key={`${blueprintNode.id}-${property.name}`}
 								nodeId={node.id}
 								{...property}
 							/>
@@ -74,10 +74,16 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 				{nodeClass.features?.map((feature) =>
 					match(feature)
 						.with({ name: "dynamicOutputPort" }, () => (
-							<DynamicOutputPort node={blueprintNode} key={feature.name} />
+							<DynamicOutputPort
+								node={blueprintNode}
+								key={`${blueprintNode.id}-${feature.name}`}
+							/>
 						))
 						.with({ name: "dynamicInputPort" }, () => (
-							<DynamicInputPort node={blueprintNode} key={feature.name} />
+							<DynamicInputPort
+								node={blueprintNode}
+								key={`${blueprintNode.id}-${feature.name}`}
+							/>
 						))
 						.exhaustive(),
 				)}
