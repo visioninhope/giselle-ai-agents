@@ -6,7 +6,6 @@ export default async function Page({
 	params,
 }: { params: { requestId: string } }) {
 	const request = await getRequest(Number.parseInt(params.requestId, 10));
-	console.log(JSON.stringify(request, null, 2));
 	return (
 		<RequestProvider request={request}>
 			<Canvas />

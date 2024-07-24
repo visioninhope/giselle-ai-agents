@@ -16,6 +16,7 @@ import {
 import { invokeTask } from "@/trigger/invoke";
 import { and, asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
+import { leaveMessage } from "./leave-message";
 
 export const createRequest = async (
 	blueprintId: number,
@@ -40,9 +41,7 @@ export const createRequest = async (
 	}
 
 	const formEntries = {};
-	formData.forEach((value, key) => {
-		formData.get(key);
-	});
+	formData.forEach((value, key) => {});
 
 	const [request] = await db
 		.insert(requests)
@@ -62,6 +61,17 @@ export const createRequest = async (
 			status: "idle",
 		})),
 	);
+
+	formData.forEach(async (value, key) => {
+		await leaveMessage({
+			requestId: request.id,
+			stepId: stepsByBlueprintId[0].id,
+			port: {
+				id: Number.parseInt(key, 10),
+			},
+			message: `${value}`,
+		});
+	});
 	const handle = await invokeTask.trigger({
 		requestId: request.id,
 	});

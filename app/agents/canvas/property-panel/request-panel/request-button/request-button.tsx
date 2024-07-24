@@ -3,13 +3,7 @@ import { createRequest } from "@/app/agents/requests";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
 import { PlayIcon } from "lucide-react";
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
 	type FC,
@@ -40,48 +34,32 @@ export const RequestButton: FC = () => {
 		[router, blueprint.id, blueprint.agent.urlId],
 	);
 	const createRequestWithBlueprintId = createRequest.bind(null, blueprint.id);
+
+	if (isPending) {
+		return <div className="px-4 text-muted-foreground">loading...</div>;
+	}
 	if (
 		blueprint.requestInterface?.input == null ||
 		blueprint.requestInterface.input.length < 1
 	) {
-		return isPending ? (
-			<div className="px-4 text-muted-foreground">loading...</div>
-		) : (
-			<form onSubmit={handleSubmit}>
-				{/*<Link href="/agents/yv2jg5xmbsmr1z1unatqpgt9/requests/2">*/}
-				<Button type="submit">
-					<PlayIcon className="mr-1 w-3 h-3" />
-					Request to Agent!
-				</Button>
-				{/* </Link> */}
-			</form>
-		);
+		<form onSubmit={handleSubmit}>
+			<Button type="submit">
+				<PlayIcon className="mr-1 w-3 h-3" />
+				Request to Agent!
+			</Button>
+		</form>;
 	}
 	return (
-		<Popover open={disclosure} onOpenChange={setDisclosure}>
-			<PopoverTrigger asChild>
-				<Button variant={"ghost"} size={"xs"} className="text-muted-foreground">
-					<PlayIcon className="mr-1 w-3 h-3" />
-					Request to Agent
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent align="start">
-				<form
-					action={createRequestWithBlueprintId}
-					onSubmit={handleSubmit}
-					className="flex flex-col gap-4"
-				>
-					<div className="flex flex-col gap-2">
-						{blueprint.requestInterface?.input.map(({ portId, name }) => (
-							<div key={portId}>
-								<Label htmlFor={`${portId}`}>{name}</Label>
-								<Input type="text" id={`${portId}`} name={name} />
-							</div>
-						))}
+		<form onSubmit={handleSubmit} className="flex flex-col gap-4">
+			<div className="flex flex-col gap-2">
+				{blueprint.requestInterface?.input.map(({ portId, name }) => (
+					<div key={portId}>
+						<Label htmlFor={`${portId}`}>{name}</Label>
+						<Input type="text" id={`${portId}`} name={portId} required />
 					</div>
-					<Button type="submit">Request</Button>
-				</form>
-			</PopoverContent>
-		</Popover>
+				))}
+			</div>
+			<Button type="submit">Request</Button>
+		</form>
 	);
 };
