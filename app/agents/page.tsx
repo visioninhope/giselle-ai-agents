@@ -1,29 +1,27 @@
 import { Button } from "@/components/ui/button";
-import { agents, blueprints, db } from "@/drizzle";
+import { agents as agentsTable, blueprints, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { redirect } from "next/navigation";
 
-const getAgents = () => db.query.agents.findMany();
-
-const createAgent = async () => {
-	const urlId = createId();
-	const [agent] = await db
-		.insert(agents)
-		.values({
-			urlId: urlId,
-		})
-		.returning({
-			insertedId: agents.id,
-		});
-	await db.insert(blueprints).values({
-		agentId: agent.insertedId,
-		version: 1,
-	});
-	redirect(`/agents/${urlId}`);
-};
-
 export default async function Page() {
-	const agents = await getAgents();
+	const agents = await db.query.agents.findMany();
+	const createAgent = async () => {
+		"use server";
+		const urlId = createId();
+		const [agent] = await db
+			.insert(agentsTable)
+			.values({
+				urlId: urlId,
+			})
+			.returning({
+				insertedId: agentsTable.id,
+			});
+		await db.insert(blueprints).values({
+			agentId: agent.insertedId,
+			version: 1,
+		});
+		redirect(`/agents/${urlId}`);
+	};
 	return (
 		<section className="mx-auto w-[800px] text-foreground mt-[100px]">
 			<div className="flex flex-col gap-8">
