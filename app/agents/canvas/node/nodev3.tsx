@@ -21,7 +21,7 @@ type NodeData = {
 type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { className, inputPorts, outputPorts, stepStatus },
+	data: { className, inputPorts, outputPorts, stepStatus, id },
 }) => {
 	return (
 		<>
@@ -32,7 +32,9 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>{className}</div>
+					<div>
+						{className}:{id}
+					</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
@@ -46,7 +48,9 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 											position={Position.Left}
 											className={handleVariant({ type })}
 										/>
-										<p className="whitespace-nowrap">{name}</p>
+										<p className="whitespace-nowrap">
+											{name}: {id}
+										</p>
 									</div>
 								))}
 							</div>
@@ -54,7 +58,9 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 						<div className="flex flex-col gap-2 items-end flex-1">
 							{outputPorts?.map(({ id, name, type }) => (
 								<div className={portVariant()} key={id}>
-									<p className="whitespace-nowrap">{name}</p>
+									<p className="whitespace-nowrap">
+										{name}: {id}
+									</p>
 									<Handle
 										type="source"
 										id={`${id}`}

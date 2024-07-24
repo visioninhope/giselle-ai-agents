@@ -3,8 +3,8 @@ import {
 	useBlueprint,
 	useBlueprintMutation,
 } from "@/app/agents/blueprints";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import type { NodeProperty } from "@/drizzle";
 import { type FC, useCallback, useRef } from "react";
 
@@ -19,7 +19,7 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 }) => {
 	const { mutateBlueprint } = useBlueprintMutation();
 	const blueprint = useBlueprint();
-	const ref = useRef<HTMLInputElement | null>(null);
+	const ref = useRef<HTMLTextAreaElement | null>(null);
 	const handleBlur = useCallback(() => {
 		if (ref.current == null) {
 			return;
@@ -55,8 +55,7 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 	return (
 		<div>
 			<Label htmlFor={name}>{label ?? name}</Label>
-			<Input
-				type="text"
+			<Textarea
 				name={name}
 				id={name}
 				defaultValue={value}

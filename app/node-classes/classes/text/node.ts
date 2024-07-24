@@ -1,4 +1,4 @@
-import type { Port, Property } from "../../type";
+import type { Feature, Port, Property } from "../../type";
 
 export const name = "text";
 
@@ -13,3 +13,5 @@ export const properties: Property[] = [{ name: "text", label: "Text" }];
 export const propertyPortMap = {
 	text: "text-output",
 };
+
+export const features: Feature[] = [{ name: "dynamicInputPort" }];

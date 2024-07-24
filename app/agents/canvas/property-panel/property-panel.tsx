@@ -5,6 +5,7 @@ import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type FC, useMemo } from "react";
 import { match } from "ts-pattern";
+import { DynamicInputPort } from "./dynamic-input-port";
 import { DynamicOutputPort } from "./dynamic-output-port";
 import { PropertyField } from "./property-field";
 import { RequestPanel } from "./request-panel";
@@ -55,19 +56,31 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 	}
 	return (
 		<div className="flex flex-col gap-2">
+			{blueprintNode.properties.length > 0 && (
+				<>
+					<div className="px-4">
+						{blueprintNode.properties?.map((property) => (
+							<PropertyField
+								key={property.name}
+								nodeId={node.id}
+								{...property}
+							/>
+						))}
+					</div>
+					<hr className="my-4" />
+				</>
+			)}
 			<div>
 				{nodeClass.features?.map((feature) =>
 					match(feature)
 						.with({ name: "dynamicOutputPort" }, () => (
 							<DynamicOutputPort node={blueprintNode} key={feature.name} />
 						))
+						.with({ name: "dynamicInputPort" }, () => (
+							<DynamicInputPort node={blueprintNode} key={feature.name} />
+						))
 						.exhaustive(),
 				)}
-			</div>
-			<div className="px-4">
-				{blueprintNode.properties?.map((property) => (
-					<PropertyField key={property.name} nodeId={node.id} {...property} />
-				))}
 			</div>
 		</div>
 	);

@@ -28,7 +28,7 @@ export const pullMessages = db.$with("pullMessages").as(
 			nodeClassKey: ports.nodeClassKey,
 			content: sql<string>`${requestPortMessages.message}`.as("content"),
 			requestId: sql<number>`${requests.id}`.as("requestId"),
-			stepId: sql<number>`${steps.id}`.as("stepId"),
+			nodeId: sql<number>`${destinationNodesBlueprints.nodeId}`.as("nodeId"),
 			portId: sql<number>`${ports.id}`.as("portId"),
 		})
 		.from(requestPortMessages)
@@ -71,13 +71,6 @@ export const pullMessages = db.$with("pullMessages").as(
 					destinationNodesBlueprints.blueprintId,
 					originNodesBlueprints.blueprintId,
 				),
-			),
-		)
-		.innerJoin(
-			steps,
-			and(
-				eq(steps.nodeId, destinationNodesBlueprints.nodeId),
-				eq(steps.blueprintId, destinationNodesBlueprints.blueprintId),
 			),
 		),
 );

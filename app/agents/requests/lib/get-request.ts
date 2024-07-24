@@ -56,7 +56,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 	const inputMessages = await db
 		.with(pullMessages)
 		.select({
-			stepId: pullMessages.stepId,
+			nodeId: pullMessages.nodeId,
 			portId: pullMessages.portId,
 			content: pullMessages.content,
 		})
@@ -65,8 +65,8 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			and(
 				eq(pullMessages.requestId, request.id),
 				inArray(
-					pullMessages.stepId,
-					steps.map(({ id }) => id),
+					pullMessages.nodeId,
+					steps.map(({ nodeId }) => nodeId),
 				),
 			),
 		);
@@ -90,7 +90,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			requestStep: {
 				id: requestStep.id,
 				input: inputMessages
-					.filter(({ stepId }) => stepId === id)
+					.filter(({ nodeId: stepId }) => stepId === id)
 					.map(({ content, portId }) => ({
 						value: content,
 						portId: `${portId}`,

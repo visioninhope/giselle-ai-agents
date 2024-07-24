@@ -1,6 +1,6 @@
 import { getBlueprint } from "@/app/agents/blueprints";
-import { getRequest } from "@/app/agents/requests";
-import { getInvokeFunction } from "@/app/node-classes";
+import { getDependedNodes, getRequest } from "@/app/agents/requests";
+import { getInvokeFunction, getResolver } from "@/app/node-classes";
 import { requestPortMessages } from "@/drizzle";
 import { db, updateRun, updateRunStep } from "@/drizzle/db";
 import { logger, task } from "@trigger.dev/sdk/v3";
@@ -22,36 +22,36 @@ export const invokeTask = task({
 			throw new Error("No run found");
 		}
 		const blueprint = await getBlueprint(request.blueprint.id);
-		const dataNodes = blueprint.nodes.filter(
-			({ inputPorts, outputPorts }) =>
-				!inputPorts.some(({ type }) => type === "execution") &&
-				!outputPorts.some(({ type }) => type === "execution"),
-		);
-		for (const dataNode of dataNodes) {
-			for (const property of dataNode.properties) {
-				const portKey = dataNode.propertyPortMap[property.name];
-				if (portKey == null) {
-					logger.log(
-						`targetPort not found for ${dataNode.className}.${property.name}`,
-					);
-					continue;
-				}
-				const targetPort = dataNode.outputPorts.find(
-					(outputPort) => outputPort.nodeClassKey === portKey,
-				);
-				if (targetPort == null) {
-					logger.log(
-						`targetPort not found for ${dataNode.className}.${portKey}`,
-					);
-					continue;
-				}
-				await db.insert(requestPortMessages).values({
-					requestId: payload.requestId,
-					portsBlueprintsId: targetPort.portsBlueprintsId,
-					message: property.value,
-				});
-			}
-		}
+		// const dataNodes = blueprint.nodes.filter(
+		// 	({ inputPorts, outputPorts }) =>
+		// 		!inputPorts.some(({ type }) => type === "execution") &&
+		// 		!outputPorts.some(({ type }) => type === "execution"),
+		// );
+		// for (const dataNode of dataNodes) {
+		// 	for (const property of dataNode.properties) {
+		// 		const portKey = dataNode.propertyPortMap[property.name];
+		// 		if (portKey == null) {
+		// 			logger.log(
+		// 				`targetPort not found for ${dataNode.className}.${property.name}`,
+		// 			);
+		// 			continue;
+		// 		}
+		// 		const targetPort = dataNode.outputPorts.find(
+		// 			(outputPort) => outputPort.nodeClassKey === portKey,
+		// 		);
+		// 		if (targetPort == null) {
+		// 			logger.log(
+		// 				`targetPort not found for ${dataNode.className}.${portKey}`,
+		// 			);
+		// 			continue;
+		// 		}
+		// 		await db.insert(requestPortMessages).values({
+		// 			requestId: payload.requestId,
+		// 			portsBlueprintsId: targetPort.portsBlueprintsId,
+		// 			message: property.value,
+		// 		});
+		// 	}
+		// }
 
 		for (const step of request.steps) {
 			await updateRunStep(payload.requestId, step.id, {
@@ -59,6 +59,22 @@ export const invokeTask = task({
 				startedAt: new Date(),
 			});
 			logger.log(`${step.node.className} started!!`);
+			const dependedNodes = await getDependedNodes({
+				requestId: request.id,
+				nodeId: Number.parseInt(step.node.id, 10),
+			});
+			for (const dependedNode of dependedNodes) {
+				const resolver = getResolver(dependedNode.className);
+				if (resolver == null) {
+					logger.log(`resolver not implemented for ${dependedNode.className}`);
+				} else {
+					await resolver({
+						requestId: request.id,
+						nodeId: dependedNode.id,
+						blueprint,
+					});
+				}
+			}
 			const invokeFunction = getInvokeFunction(step.node.className);
 			if (invokeFunction == null) {
 				logger.log(`invokeFunction not implemented for ${step.node.className}`);

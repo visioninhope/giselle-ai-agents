@@ -5,7 +5,7 @@ import { logger } from "@trigger.dev/sdk/v3";
 import { and, eq } from "drizzle-orm";
 import type { InvokeFunction } from "../../type";
 
-export const invoke: InvokeFunction = async ({ request, id }) => {
+export const invoke: InvokeFunction = async ({ request, id, node }) => {
 	logger.log(`params: ${JSON.stringify({ request, id })}`);
 
 	const messages = await db
@@ -13,7 +13,10 @@ export const invoke: InvokeFunction = async ({ request, id }) => {
 		.select()
 		.from(pullMessages)
 		.where(
-			and(eq(pullMessages.requestId, request.id), eq(pullMessages.stepId, id)),
+			and(
+				eq(pullMessages.requestId, request.id),
+				eq(pullMessages.nodeId, Number.parseInt(node.id, 10)),
+			),
 		);
 	logger.log(`messages: ${JSON.stringify(messages)}`);
 };

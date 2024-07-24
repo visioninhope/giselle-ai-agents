@@ -12,7 +12,7 @@ const openai = new OpenAI();
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = (value) => {};
 
-export const invoke: InvokeFunction = async ({ request, id }) => {
+export const invoke: InvokeFunction = async ({ request, id, node }) => {
 	logger.log(`params: ${JSON.stringify({ request, id })}`);
 
 	const messages = await db
@@ -20,7 +20,10 @@ export const invoke: InvokeFunction = async ({ request, id }) => {
 		.select()
 		.from(pullMessages)
 		.where(
-			and(eq(pullMessages.requestId, request.id), eq(pullMessages.stepId, id)),
+			and(
+				eq(pullMessages.requestId, request.id),
+				eq(pullMessages.nodeId, Number.parseInt(node.id, 10)),
+			),
 		);
 	const instructionMessage = messages.find(
 		({ nodeClassKey }) => nodeClassKey === "instruction",
