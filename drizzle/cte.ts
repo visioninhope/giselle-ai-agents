@@ -3,6 +3,7 @@ import { alias } from "drizzle-orm/pg-core";
 import { db } from "./db";
 import {
 	edges,
+	edgesBlueprints,
 	nodesBlueprints,
 	ports,
 	portsBlueprints,
@@ -28,6 +29,7 @@ export const pullMessages = db.$with("pullMessages").as(
 			content: sql<string>`${requestPortMessages.message}`.as("content"),
 			requestId: sql<number>`${requests.id}`.as("requestId"),
 			stepId: sql<number>`${steps.id}`.as("stepId"),
+			portId: sql<number>`${ports.id}`.as("portId"),
 		})
 		.from(requestPortMessages)
 		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
@@ -44,6 +46,13 @@ export const pullMessages = db.$with("pullMessages").as(
 			and(
 				eq(edges.outputPortId, originPortsBlueprints.portId),
 				eq(edges.edgeType, "data"),
+			),
+		)
+		.innerJoin(
+			edgesBlueprints,
+			and(
+				eq(edgesBlueprints.edgeId, edges.id),
+				eq(edgesBlueprints.blueprintId, requests.blueprintId),
 			),
 		)
 		.innerJoin(

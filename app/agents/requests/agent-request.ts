@@ -10,6 +10,10 @@ export type Step = {
 	request: {
 		id: number;
 	};
+	requestStep: {
+		id: number;
+		input: Array<{ portId: string; value: string }>;
+	};
 };
 
 export type AgentRequest = {
