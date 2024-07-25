@@ -5,6 +5,7 @@ import {
 	type FC,
 	type PropsWithChildren,
 	createContext,
+	useCallback,
 	useContext,
 	useOptimistic,
 	useReducer,
@@ -12,104 +13,83 @@ import {
 } from "react";
 import { match } from "ts-pattern";
 
-type Agent = typeof agents.$inferSelect;
-type AgentAction = { type: "updateAgentName"; name: string } | { type: "noop" };
-type MutateArgs<T extends AgentAction["type"]> = {
-	optimistic: Omit<Extract<AgentAction, { type: T }>, "type">;
-};
-type ActionArgs<T extends AgentAction["type"], U> = MutateArgs<T> & {
-	mutateResult: U;
-};
-type AgentActionContextInternalState = {
-	mutateAgent: <T extends AgentAction["type"], U>(type: {
-		type: T;
-		optimistic: Omit<Extract<AgentAction, { type: T }>, "type">;
-		mutate: (args: MutateArgs<T>) => Promise<U>;
-		action: (args: ActionArgs<T, U>) => void;
-	}) => void;
-	isPending: boolean;
-};
-
-const reducer = (state: Agent, action: AgentAction): Agent =>
-	match(action)
-		.with({ type: "updateAgentName" }, () => state)
-		.with({ type: "noop" }, () => state)
-		.exhaustive();
-const mutate = <T extends AgentAction["type"], U>(args: {
+type AgentState = typeof agents.$inferSelect;
+type AgentAction = { type: "updateAgentName"; name: string };
+type AgentActionType = AgentAction["type"];
+type AgentActionPayload<T extends AgentActionType> = Omit<
+	Extract<AgentAction, { type: T }>,
+	"type"
+>;
+type MutateAgentArgs<
+	T extends AgentActionType,
+	D extends AgentActionPayload<T>,
+> = {
 	type: T;
-	optimistic: Omit<Extract<AgentAction, { type: T }>, "type">;
-	mutate: (args: MutateArgs<T>) => Promise<U>;
-	action: (args: ActionArgs<T, U>) => void;
-}) => {};
-mutate({
-	type: "updateAgentName",
-	optimistic: { name: "s" },
-	mutate: async ({ optimistic }) => {
-		optimistic.name;
-		return {
-			name: "string",
-		};
-	},
-	action: ({ mutateResult, optimistic }) => {
-		optimistic.name;
-	},
-});
+	action: (optimisticData: D) => Promise<AgentActionPayload<T>>;
+	optimisticData: D;
+};
 
-const AgentInternalContext = createContext<Agent | null>(null);
-const AgentActionContextInternal =
-	createContext<AgentActionContextInternalState | null>(null);
+const AgentContext = createContext<{
+	agent: AgentState;
+	mutate: <T extends AgentActionType, D extends AgentActionPayload<T>>(
+		args: MutateAgentArgs<T, D>,
+	) => void;
+	isPending: boolean;
+} | null>(null);
 
 type AgentProviderProps = {
-	agent: Agent;
+	agent: AgentState;
 };
+const reducer = (state: AgentState, action: AgentAction): AgentState =>
+	match(action)
+		.with({ type: "updateAgentName" }, ({ name }) => ({
+			...state,
+			name,
+		}))
+		.exhaustive();
+
 export const AgentProvider: FC<PropsWithChildren<AgentProviderProps>> = ({
-	children,
 	agent: defaultAgent,
+	children,
 }) => {
 	const [isPending, startTransition] = useTransition();
-	const [agent, setAgent] = useReducer(reducer, defaultAgent);
-
-	const [optimisticBlueprint, setOptimisticBlueprintInternal] = useOptimistic<
-		Agent,
+	const [agent, dispatch] = useReducer(reducer, defaultAgent);
+	const [optimisticAgent, setOptimisticBlueprint] = useOptimistic<
+		AgentState,
 		AgentAction
 	>(agent, reducer);
-	// const mutateAgent = <T extends AgentAction["type"], U>({
-	// 	type,
-	// 	optimistic,
-	// 	mutate,
-	// 	action,
-	// }: {
-	// 	type: T;
-	// 	optimistic: Omit<Extract<AgentAction, { type: T }>, "type">;
-	// 	mutate: (args: MutateArgs<T>) => Promise<U>;
-	// 	action: (args: ActionArgs<T, U>) => void;
-	// }) => {
-	// 	startTransition(() => {
-	// 		mutate({
-	// 			type,
-	// 			optimistic,
-	// 			mutate: async ({ optimistic }) => {
-	// 				const mutateResult = await mutate({ optimistic });
-	// 				action({ mutateResult, optimistic });
-	// 				return mutateResult;
-	// 			},
-	// 			action,
-	// 		});
-	// 	});
-	// };
+	const mutate = useCallback(
+		<T extends AgentActionType, D extends AgentActionPayload<T>>(
+			args: MutateAgentArgs<T, D>,
+		) => {
+			startTransition(async () => {
+				const { type, action, optimisticData } = args;
+				/** @todo remove type assertion */
+				setOptimisticBlueprint({ ...optimisticData, type } as AgentAction);
+				const result = await action(optimisticData);
+				/** @todo remove type assertion */
+				dispatch({ ...optimisticData, type } as AgentAction);
+			});
+		},
+		[setOptimisticBlueprint],
+	);
 	return (
-		<AgentInternalContext.Provider value={agent}>
-			<AgentActionContextInternal.Provider value={null}>
-				{children}
-			</AgentActionContextInternal.Provider>
-		</AgentInternalContext.Provider>
+		<AgentContext.Provider
+			value={{
+				agent: optimisticAgent,
+				mutate,
+				isPending,
+			}}
+		>
+			{children}
+		</AgentContext.Provider>
 	);
 };
 
 export const useAgent = () => {
-	const agent = useContext(AgentInternalContext);
-	if (!agent) {
-		throw new Error("useAgent must be used within a AgentProvider");
+	const context = useContext(AgentContext);
+	if (!context) {
+		throw new Error("useAgent must be used within an AgentProvider");
 	}
-	return agent;
+	return context;
 };

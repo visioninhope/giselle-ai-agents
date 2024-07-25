@@ -3,13 +3,13 @@ import {
 	getBlueprint,
 	getLatestBlueprint,
 } from "@/app/agents/blueprints";
-
 import "@xyflow/react/dist/style.css";
 import { NodeClassesProvider, getNodeClasses } from "@/app/node-classes";
 import { agents, db } from "@/drizzle";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { AgentProvider } from "../contexts";
+
 export default async function Layout({
 	children,
 	params,
@@ -25,11 +25,13 @@ export default async function Layout({
 	const blueprint = await getBlueprint(latestBlueprint.id);
 	return (
 		<div className="w-screen h-screen flex flex-col">
-			<BlueprintProvider blueprint={blueprint}>
-				<NodeClassesProvider nodeClasses={getNodeClasses()}>
-					<AgentProvider agent={agent}>{children}</AgentProvider>
-				</NodeClassesProvider>
-			</BlueprintProvider>
+			<AgentProvider agent={agent}>
+				<BlueprintProvider blueprint={blueprint}>
+					<NodeClassesProvider nodeClasses={getNodeClasses()}>
+						{children}
+					</NodeClassesProvider>
+				</BlueprintProvider>
+			</AgentProvider>
 		</div>
 	);
 }
