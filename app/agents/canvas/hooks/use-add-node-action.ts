@@ -5,6 +5,7 @@ import {
 } from "@/app/agents/blueprints";
 import {
 	type NodeClassName,
+	type Port,
 	findNodeClass,
 	useNodeClasses,
 } from "@/app/node-classes";
@@ -16,6 +17,7 @@ import invariant from "tiny-invariant";
 type AddNodeArgs = {
 	nodeClassName: NodeClassName;
 	position: { x: number; y: number };
+	inputPorts?: Port[];
 };
 const sleep = (ms: number) =>
 	new Promise<{ hello: string }>((resolve) =>
@@ -27,7 +29,7 @@ export const useAddNodeAction = () => {
 	const nodeClasses = useNodeClasses();
 	const { mutateBlueprint } = useBlueprintMutation();
 	const addNodeAction = useCallback(
-		async ({ nodeClassName, position }: AddNodeArgs) => {
+		async ({ nodeClassName, position, inputPorts }: AddNodeArgs) => {
 			invariant(reactFlowInstance != null, "reactFlowInstance is null");
 			// reactFlowInstance.project was renamed to reactFlowInstance.screenToFlowPosition
 			// and you don't need to subtract the reactFlowBounds.left/top anymore
@@ -51,7 +53,7 @@ export const useAddNodeAction = () => {
 						className: nodeClassName,
 						properties: nodeClass.properties ?? [],
 						propertyPortMap: nodeClass.propertyPortMap ?? {},
-						inputPorts: (nodeClass.inputPorts ?? []).map(
+						inputPorts: (inputPorts ?? nodeClass.inputPorts ?? []).map(
 							({ type, label, key }, index) => ({
 								id: createId(),
 								nodeId: nodeId,

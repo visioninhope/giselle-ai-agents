@@ -31,13 +31,13 @@ export default async function Page() {
 						<Button type="submit">Create new agent</Button>
 					</form>
 				</div>
-				{agents.map(({ id, urlId }) => (
+				{agents.map(({ id, urlId, name }) => (
 					<a
 						key={id}
 						className="border border-border p-4"
 						href={`/agents/${urlId}`}
 					>
-						{urlId}
+						{name ?? "Untitled"}
 					</a>
 				))}
 			</div>

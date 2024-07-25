@@ -1,5 +1,6 @@
 "use client";
 
+import type { AvailableAgentWithInputPort } from "@/app/agents";
 import {
 	connectNodes,
 	deleteEdges,
@@ -51,6 +52,13 @@ const CanvasInner: FC = () => {
 			});
 		},
 		[position, hideContextMenu, addNodeAction],
+	);
+	const handleAgentSelect = useCallback(
+		(agent: AvailableAgentWithInputPort) => {
+			hideContextMenu();
+			console.log({ agent });
+		},
+		[hideContextMenu],
 	);
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
@@ -223,7 +231,10 @@ const CanvasInner: FC = () => {
 								top: position.y - (containerRef?.current?.offsetTop ?? 0),
 							}}
 						>
-							<NodeList onSelect={handleNodeSelect} />
+							<NodeList
+								onSelect={handleNodeSelect}
+								onAgentSelect={handleAgentSelect}
+							/>
 						</div>
 					)}
 				</ReactFlow>

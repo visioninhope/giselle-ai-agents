@@ -1,3 +1,4 @@
+import type { AvailableAgentWithInputPort } from "@/app/agents";
 import { type NodeClassName, useNodeClasses } from "@/app/node-classes";
 import {
 	DropdownMenu,
@@ -12,14 +13,17 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { InferResponse } from "@/lib/api";
-import { WorkflowIcon } from "lucide-react";
 import { type FC, useCallback } from "react";
+import { AgentList } from "./agent-list";
 
 type EditorDropdownMenuProps = {
 	onSelect: (key: NodeClassName) => void;
+	onAgentSelect: (agent: AvailableAgentWithInputPort) => void;
 };
-export const NodeList: FC<EditorDropdownMenuProps> = ({ onSelect }) => {
+export const NodeList: FC<EditorDropdownMenuProps> = ({
+	onSelect,
+	onAgentSelect,
+}) => {
 	const nodeClasses = useNodeClasses();
 	const handleNodeSelect = useCallback(
 		(name: NodeClassName) => () => {
@@ -91,6 +95,21 @@ export const NodeList: FC<EditorDropdownMenuProps> = ({ onSelect }) => {
 					</DropdownMenuSub>
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator /> */}
+				<DropdownMenuGroup>
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent>
+								<AgentList
+									onSelect={(agent) => {
+										onAgentSelect(agent);
+									}}
+								/>
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 					{nodeClasses.map((nodeClass) => (

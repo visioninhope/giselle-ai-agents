@@ -1,1 +1,2 @@
-export { updateName } from "./update-name";
+export * from "./update-name";
+export * from "./get-available-agents";
