@@ -13,4 +13,5 @@ export const nodeClasses = [
 	agent,
 ] satisfies NodeClass[];
 export type NodeClassName = (typeof nodeClasses)[number]["name"];
+export type ExcludeAgentNodeClassName = Exclude<NodeClassName, "agent">;
 export const getNodeClasses = () => JSON.parse(JSON.stringify(nodeClasses));

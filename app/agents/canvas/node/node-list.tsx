@@ -1,5 +1,9 @@
 import type { AvailableAgentWithInputPort } from "@/app/agents";
-import { type NodeClassName, useNodeClasses } from "@/app/node-classes";
+import {
+	type ExcludeAgentNodeClassName,
+	type NodeClassName,
+	useNodeClasses,
+} from "@/app/node-classes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -17,7 +21,7 @@ import { type FC, useCallback } from "react";
 import { AgentList } from "./agent-list";
 
 type EditorDropdownMenuProps = {
-	onSelect: (key: NodeClassName) => void;
+	onSelect: (key: ExcludeAgentNodeClassName) => void;
 	onAgentSelect: (agent: AvailableAgentWithInputPort) => void;
 };
 export const NodeList: FC<EditorDropdownMenuProps> = ({
@@ -26,7 +30,7 @@ export const NodeList: FC<EditorDropdownMenuProps> = ({
 }) => {
 	const nodeClasses = useNodeClasses();
 	const handleNodeSelect = useCallback(
-		(name: NodeClassName) => () => {
+		(name: ExcludeAgentNodeClassName) => () => {
 			onSelect(name);
 		},
 		[onSelect],
@@ -115,7 +119,9 @@ export const NodeList: FC<EditorDropdownMenuProps> = ({
 					{nodeClasses.map((nodeClass) => (
 						<DropdownMenuItem
 							key={nodeClass.name}
-							onSelect={handleNodeSelect(nodeClass.name as NodeClassName)}
+							onSelect={handleNodeSelect(
+								nodeClass.name as ExcludeAgentNodeClassName,
+							)}
 						>
 							{nodeClass.label}
 						</DropdownMenuItem>

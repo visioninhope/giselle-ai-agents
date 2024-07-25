@@ -9,7 +9,10 @@ import {
 	useBlueprint,
 	useBlueprintMutation,
 } from "@/app/agents/blueprints";
-import type { NodeClassName } from "@/app/node-classes";
+import type {
+	ExcludeAgentNodeClassName,
+	NodeClassName,
+} from "@/app/node-classes";
 import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
@@ -44,7 +47,7 @@ const CanvasInner: FC = () => {
 	const { mutateBlueprint } = useBlueprintMutation();
 	const reactFlowInstance = useReactFlow();
 	const handleNodeSelect = useCallback(
-		async (nodeClassName: NodeClassName) => {
+		async (nodeClassName: ExcludeAgentNodeClassName) => {
 			hideContextMenu();
 			addNodeAction({
 				nodeClassName,
@@ -56,9 +59,19 @@ const CanvasInner: FC = () => {
 	const handleAgentSelect = useCallback(
 		(agent: AvailableAgentWithInputPort) => {
 			hideContextMenu();
-			console.log({ agent });
+			addNodeAction({
+				nodeClassName: "agent",
+				position,
+				relevantAgent: {
+					/** @todo remove ?? */
+					agentName: agent.name ?? "",
+					agentId: agent.id,
+					blueprintId: agent.blueprintId,
+					inputPorts: agent.inputPorts,
+				},
+			});
 		},
-		[hideContextMenu],
+		[hideContextMenu, position, addNodeAction],
 	);
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();

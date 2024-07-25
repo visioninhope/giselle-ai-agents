@@ -25,6 +25,7 @@ export const useSynthsize = () => {
 					stepStatus: relevantRequestStep?.status,
 					inputPorts: node.inputPorts,
 					outputPorts: node.outputPorts,
+					nodeProperties: node.properties,
 				},
 			};
 		});

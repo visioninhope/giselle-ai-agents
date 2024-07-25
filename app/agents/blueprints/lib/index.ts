@@ -14,3 +14,4 @@ export { updateNodeProperty } from "./update-node-property";
 export { addNodePort } from "./add-node-port";
 export { updatePortName } from "./update-port-name";
 export { deletePort } from "./delete-port";
+export { addAgentNode } from "./add-agent-node";

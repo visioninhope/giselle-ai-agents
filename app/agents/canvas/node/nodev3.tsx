@@ -1,4 +1,8 @@
-import type { RequestStepStatus, ports } from "@/drizzle/schema";
+import type {
+	NodeProperties,
+	RequestStepStatus,
+	ports,
+} from "@/drizzle/schema";
 import {
 	type Node,
 	type NodeProps,
@@ -16,13 +20,18 @@ type NodeData = {
 	className: string;
 	inputPorts: (typeof ports.$inferSelect)[];
 	outputPorts: (typeof ports.$inferSelect)[];
+	nodeProperties: NodeProperties;
 	stepStatus?: RequestStepStatus;
 };
 type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { className, inputPorts, outputPorts, stepStatus, id },
+	data: { className, inputPorts, outputPorts, stepStatus, id, nodeProperties },
 }) => {
+	console.log({ nodeProperties });
+	console.log({
+		aa: nodeProperties.find(({ name }) => name === "relevantAgent"),
+	});
 	return (
 		<>
 			{selected && <NodeResizer minWidth={100} minHeight={30} />}
@@ -32,7 +41,12 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>{className}</div>
+					<div>
+						{className === "agent"
+							? nodeProperties.find(({ name }) => name === "relevantAgent")
+									?.value
+							: className}
+					</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">

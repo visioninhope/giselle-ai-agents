@@ -16,6 +16,7 @@ import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 export type AvailableAgentWithInputPort = {
 	id: number;
 	name: string | null;
+	blueprintId: number;
 	inputPorts: Port[];
 };
 export const getAvailableAgentsWithInputPorts = async (): Promise<
@@ -77,16 +78,23 @@ export const getAvailableAgentsWithInputPorts = async (): Promise<
 	);
 
 	const availableAgents = await db
-		.select({ id: agents.id, name: agents.name })
+		.select({
+			id: agents.id,
+			name: agents.name,
+			blueprintId: availableAgentsQuery.latestBlueprintId,
+		})
 		.from(agents)
 		.innerJoin(
 			availableAgentsQuery,
 			eq(agents.id, availableAgentsQuery.agentId),
 		);
-	const availableAgentsWithPorts = availableAgents.map((agent) => ({
-		...agent,
-		inputPorts: portGroupsByAgentId[agent.id] || [],
-	}));
+	const availableAgentsWithPorts = availableAgents.map(
+		({ blueprintId, ...agent }) => ({
+			...agent,
+			blueprintId: blueprintId as number,
+			inputPorts: portGroupsByAgentId[agent.id] || [],
+		}),
+	);
 
 	return availableAgentsWithPorts;
 };
