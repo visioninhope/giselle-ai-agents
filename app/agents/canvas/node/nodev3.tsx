@@ -28,10 +28,6 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
 	data: { className, inputPorts, outputPorts, stepStatus, id, nodeProperties },
 }) => {
-	console.log({ nodeProperties });
-	console.log({
-		aa: nodeProperties.find(({ name }) => name === "relevantAgent"),
-	});
 	return (
 		<>
 			{selected && <NodeResizer minWidth={100} minHeight={30} />}
