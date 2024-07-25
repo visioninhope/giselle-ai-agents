@@ -9,7 +9,7 @@ export const RequestPanel: FC = () => {
 	const blueprint = useBlueprint();
 	const request = useRequest();
 	return (
-		<div className="px-4">
+		<div className="px-4 py-2">
 			{request != null && (
 				<div className="mb-4 pb-4 border-b border-border">
 					<RequestLogger request={request} />

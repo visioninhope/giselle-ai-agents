@@ -1,4 +1,9 @@
-import { type NodeClassName, useNodeClasses } from "@/app/node-classes";
+import type { AvailableAgentWithInputPort } from "@/app/agents";
+import {
+	type ExcludeAgentNodeClassName,
+	type NodeClassName,
+	useNodeClasses,
+} from "@/app/node-classes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -12,17 +17,20 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { InferResponse } from "@/lib/api";
-import { WorkflowIcon } from "lucide-react";
 import { type FC, useCallback } from "react";
+import { AgentList } from "./agent-list";
 
 type EditorDropdownMenuProps = {
-	onSelect: (key: NodeClassName) => void;
+	onSelect: (key: ExcludeAgentNodeClassName) => void;
+	onAgentSelect: (agent: AvailableAgentWithInputPort) => void;
 };
-export const NodeList: FC<EditorDropdownMenuProps> = ({ onSelect }) => {
+export const NodeList: FC<EditorDropdownMenuProps> = ({
+	onSelect,
+	onAgentSelect,
+}) => {
 	const nodeClasses = useNodeClasses();
 	const handleNodeSelect = useCallback(
-		(name: NodeClassName) => () => {
+		(name: ExcludeAgentNodeClassName) => () => {
 			onSelect(name);
 		},
 		[onSelect],
@@ -92,11 +100,28 @@ export const NodeList: FC<EditorDropdownMenuProps> = ({ onSelect }) => {
 				</DropdownMenuGroup>
 				<DropdownMenuSeparator /> */}
 				<DropdownMenuGroup>
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent>
+								<AgentList
+									onSelect={(agent) => {
+										onAgentSelect(agent);
+									}}
+								/>
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuGroup>
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 					{nodeClasses.map((nodeClass) => (
 						<DropdownMenuItem
 							key={nodeClass.name}
-							onSelect={handleNodeSelect(nodeClass.name as NodeClassName)}
+							onSelect={handleNodeSelect(
+								nodeClass.name as ExcludeAgentNodeClassName,
+							)}
 						>
 							{nodeClass.label}
 						</DropdownMenuItem>

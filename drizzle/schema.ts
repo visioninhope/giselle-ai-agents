@@ -169,3 +169,16 @@ export const requestTriggerRelations = pgTable("request_trigger_relations", {
 		.references(() => requests.id),
 	triggerId: text("trigger_id").notNull(),
 });
+
+export const nodeRepresentedAgents = pgTable("node_represented_agents", {
+	id: serial("id").primaryKey(),
+	nodeId: integer("node_id")
+		.notNull()
+		.references(() => nodes.id, { onDelete: "cascade" }),
+	agentId: integer("agent_id")
+		.notNull()
+		.references(() => agents.id, { onDelete: "cascade" }),
+	blueprintId: integer("blueprint_id")
+		.notNull()
+		.references(() => blueprints.id, { onDelete: "cascade" }),
+});
