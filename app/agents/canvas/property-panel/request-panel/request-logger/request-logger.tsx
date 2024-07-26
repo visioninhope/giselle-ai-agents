@@ -32,9 +32,10 @@ const StepListItem: FC<StepListItemProps> = (props) => {
 		if (node == null) {
 			return {};
 		}
-		return Object.fromEntries(
-			node.inputPorts.map(({ id, name }) => [id, name]),
-		);
+		return Object.fromEntries([
+			...node.inputPorts.map(({ id, name }) => [id, name]),
+			...node.outputPorts.map(({ id, name }) => [id, name]),
+		]);
 	}, [blueprint, props.node.id]);
 	return (
 		<AccordionItem
@@ -74,16 +75,26 @@ const StepListItem: FC<StepListItemProps> = (props) => {
 					.with({ status: "idle" }, () => null)
 					.with({ status: "running" }, () => <p>Running...</p>)
 					.with({ status: "success" }, () => (
-						<div className="max-h-[400px] overflow-y-auto">
+						<div className="max-h-[400px] overflow-y-auto flex flex-col gap-4">
 							{props.requestStep.input.length > 0 && (
-								<>
+								<div>
 									<p className="mb-2">Incoming Messages</p>
 									{props.requestStep.input.map((input) => (
 										<p key={input.portId} className="text-xs">
 											{nodePorts[input.portId] ?? "noname"}: {input.value}
 										</p>
 									))}
-								</>
+								</div>
+							)}
+							{props.requestStep.output.length > 0 && (
+								<div>
+									<p className="mb-2">Outgoing Messages</p>
+									{props.requestStep.output.map((output) => (
+										<p key={output.portId} className="text-xs">
+											{nodePorts[output.portId] ?? "noname"}: {output.value}
+										</p>
+									))}
+								</div>
 							)}
 						</div>
 					))
