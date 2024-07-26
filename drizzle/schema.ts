@@ -137,6 +137,14 @@ export const requests = pgTable("requests", {
 	finishedAt: timestamp("finished_at"),
 });
 
+export const requestResults = pgTable("request_results", {
+	id: serial("id").primaryKey(),
+	requestId: integer("request_id")
+		.notNull()
+		.references(() => requests.id),
+	text: text("text").notNull(),
+});
+
 export type RequestStepStatus = "idle" | "running" | "success" | "failed";
 export const requestSteps = pgTable("request_steps", {
 	id: serial("id").primaryKey(),
@@ -175,10 +183,23 @@ export const nodeRepresentedAgents = pgTable("node_represented_agents", {
 	nodeId: integer("node_id")
 		.notNull()
 		.references(() => nodes.id, { onDelete: "cascade" }),
-	agentId: integer("agent_id")
+	representedAgentId: integer("represented_agent_id")
 		.notNull()
 		.references(() => agents.id, { onDelete: "cascade" }),
-	blueprintId: integer("blueprint_id")
+	representedBlueprintId: integer("represented_blueprint_id")
 		.notNull()
 		.references(() => blueprints.id, { onDelete: "cascade" }),
 });
+
+export const portRepresentedAgentPorts = pgTable(
+	"port_represented_agent_ports",
+	{
+		id: serial("id").primaryKey(),
+		portId: integer("port_id")
+			.notNull()
+			.references(() => ports.id, { onDelete: "cascade" }),
+		representedAgentPortId: integer("represented_agent_port_id")
+			.notNull()
+			.references(() => ports.id, { onDelete: "cascade" }),
+	},
+);

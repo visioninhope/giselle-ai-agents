@@ -1,9 +1,10 @@
 import { getBlueprint } from "@/app/agents/blueprints";
 import { getDependedNodes, getRequest } from "@/app/agents/requests";
 import { getInvokeFunction, getResolver } from "@/app/node-classes";
-import { requestPortMessages } from "@/drizzle";
+import { requestPortMessages, requestResults } from "@/drizzle";
 import { db, updateRun, updateRunStep } from "@/drizzle/db";
 import { logger, task } from "@trigger.dev/sdk/v3";
+import { eq } from "drizzle-orm";
 
 type InvokeTaskPayload = {
 	requestId: number;
@@ -96,8 +97,13 @@ export const invokeTask = task({
 			finishedAt: new Date(),
 		});
 
+		const [result] = await db
+			.select()
+			.from(requestResults)
+			.where(eq(requestResults.requestId, payload.requestId));
+
 		return {
-			message: "Hello, world!",
+			text: result.text,
 		};
 	},
 });

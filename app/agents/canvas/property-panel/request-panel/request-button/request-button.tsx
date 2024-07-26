@@ -1,8 +1,8 @@
 import { useBlueprint } from "@/app/agents/blueprints";
-import { createRequest } from "@/app/agents/requests";
+import { type RequestParameter, createRequest } from "@/app/agents/requests";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 import { PlayIcon } from "lucide-react";
 import { useRouter } from "next/navigation";
 import {
@@ -21,10 +21,21 @@ export const RequestButton: FC = () => {
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(formEvent) => {
 			formEvent.preventDefault();
+			const formData = new FormData(formEvent.currentTarget);
+
+			const requestParameters: RequestParameter[] = [];
+			for (const [portId, message] of formData.entries()) {
+				requestParameters.push({
+					port: {
+						id: Number.parseInt(portId, 10),
+					},
+					message: message.toString(),
+				});
+			}
 			startTransition(async () => {
-				const requestId = await createRequest(
+				const { requestId } = await createRequest(
 					blueprint.id,
-					new FormData(formEvent.currentTarget),
+					requestParameters,
 				);
 				router.push(`/agents/${blueprint.agent.urlId}/requests/${requestId}`);
 			});
@@ -53,7 +64,7 @@ export const RequestButton: FC = () => {
 				{blueprint.requestInterface?.input.map(({ portId, name }) => (
 					<div key={portId}>
 						<Label htmlFor={`${portId}`}>{name}</Label>
-						<Input type="text" id={`${portId}`} name={portId} required />
+						<Textarea id={`${portId}`} name={portId} required />
 					</div>
 				))}
 			</div>

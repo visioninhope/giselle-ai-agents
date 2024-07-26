@@ -8,11 +8,13 @@ import {
 } from "@/app/node-classes";
 import {
 	type NodeProperty,
+	type PortType,
 	blueprints,
 	db,
 	nodeRepresentedAgents,
 	nodes,
 	nodesBlueprints,
+	portRepresentedAgentPorts,
 	ports,
 	portsBlueprints,
 } from "@/drizzle";
@@ -31,7 +33,7 @@ type AddagentNodeArgs = {
 	};
 };
 
-const getRelevantAgentPorts = async (blueprintId: number): Promise<Port[]> => {
+const getRelevantAgentPorts = async (blueprintId: number) => {
 	const dbPorts = await db
 		.select({
 			portId: ports.id,
@@ -57,11 +59,7 @@ const getRelevantAgentPorts = async (blueprintId: number): Promise<Port[]> => {
 				eq(ports.type, "data"),
 			),
 		);
-	return dbPorts.map(({ portId, portName }) => ({
-		type: "data",
-		key: `${portId}`,
-		label: portName,
-	}));
+	return dbPorts;
 };
 export const addAgentNode = async (args: AddagentNodeArgs): Promise<Node> => {
 	const blueprint = await db.query.blueprints.findFirst({
@@ -91,7 +89,11 @@ export const addAgentNode = async (args: AddagentNodeArgs): Promise<Node> => {
 	);
 	const inputPorts: (typeof ports.$inferInsert)[] = [
 		...(nodeClass.inputPorts ?? []),
-		...relevantAgentInputPorts,
+		...relevantAgentInputPorts.map(({ portName }) => ({
+			key: "",
+			type: "data" as PortType,
+			label: portName,
+		})),
 	].map((port, index) => ({
 		nodeId: node.id,
 		type: port.type,
@@ -144,9 +146,15 @@ export const addAgentNode = async (args: AddagentNodeArgs): Promise<Node> => {
 		.where(eq(blueprints.id, args.blueprintId));
 	await db.insert(nodeRepresentedAgents).values({
 		nodeId: node.id,
-		agentId: args.node.relevantAgent.id,
-		blueprintId: args.node.relevantAgent.blueprintId,
+		representedAgentId: args.node.relevantAgent.id,
+		representedBlueprintId: args.node.relevantAgent.blueprintId,
 	});
+	await db.insert(portRepresentedAgentPorts).values(
+		relevantAgentInputPorts.map(({ portId }, index) => ({
+			portId: insertedPorts[(nodeClass.inputPorts?.length ?? 0) + index].id,
+			representedAgentPortId: portId,
+		})),
+	);
 	return {
 		id: `${node.id}`,
 		position: args.node.position,
