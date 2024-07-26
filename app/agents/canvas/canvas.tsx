@@ -9,10 +9,7 @@ import {
 	useBlueprint,
 	useBlueprintMutation,
 } from "@/app/agents/blueprints";
-import type {
-	ExcludeAgentNodeClassName,
-	NodeClassName,
-} from "@/app/node-classes";
+import type { ExcludeAgentNodeClassName } from "@/app/node-classes";
 import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
