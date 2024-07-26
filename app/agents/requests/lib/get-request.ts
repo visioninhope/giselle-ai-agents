@@ -3,10 +3,14 @@
 import type { AgentRequest } from "@/app/agents/requests";
 import {
 	db,
-	nodesBlueprints as nodesBlueprintsSchema,
+	nodesBlueprints,
 	nodes as nodesSchema,
+	ports,
+	portsBlueprints,
 	pullMessages,
+	requestPortMessages,
 	requestSteps as requestStepsSchema,
+	requests,
 	requests as requestsSchema,
 	steps as stepsSchema,
 } from "@/drizzle";
@@ -32,11 +36,8 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 			position: nodesSchema.position,
 		})
 		.from(nodesSchema)
-		.innerJoin(
-			nodesBlueprintsSchema,
-			eq(nodesBlueprintsSchema.nodeId, nodesSchema.id),
-		)
-		.where(eq(nodesBlueprintsSchema.blueprintId, blueprintId));
+		.innerJoin(nodesBlueprints, eq(nodesBlueprints.nodeId, nodesSchema.id))
+		.where(eq(nodesBlueprints.blueprintId, blueprintId));
 	const steps = await db.query.steps.findMany({
 		columns: {
 			id: true,
@@ -70,6 +71,27 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 				),
 			),
 		);
+	const outputMessages = await db
+		.select({
+			nodeId: nodesBlueprints.nodeId,
+			portId: portsBlueprints.portId,
+			content: requestPortMessages.message,
+		})
+		.from(requestPortMessages)
+		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
+		.innerJoin(
+			portsBlueprints,
+			eq(portsBlueprints.id, requestPortMessages.portsBlueprintsId),
+		)
+		.innerJoin(
+			nodesBlueprints,
+			and(
+				eq(nodesBlueprints.blueprintId, requests.blueprintId),
+				eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
+			),
+		)
+		.where(eq(requestPortMessages.requestId, requestId));
+
 	const requestStepsWithNode = steps.map(({ id, nodeId }) => {
 		const node = dbNodes.find((n) => n.id === nodeId);
 		const requestStep = requestSteps.find(
@@ -93,6 +115,12 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 					.filter(({ nodeId }) => nodeId === node.id)
 					.map(({ content, portId }) => ({
 						value: content,
+						portId: `${portId}`,
+					})),
+				output: outputMessages
+					.filter(({ nodeId }) => nodeId === node.id)
+					.map(({ content, portId }) => ({
+						value: `${content}`,
 						portId: `${portId}`,
 					})),
 			},

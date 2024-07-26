@@ -13,6 +13,7 @@ export type Step = {
 	requestStep: {
 		id: number;
 		input: Array<{ portId: string; value: string }>;
+		output: Array<{ portId: string; value: string }>;
 	};
 };
 
