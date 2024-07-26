@@ -7,7 +7,6 @@ import {
 	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
-	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import type { ExcludeAgentNodeClassName } from "@/app/node-classes";
 import { createId } from "@paralleldrive/cuid2";
@@ -40,8 +39,7 @@ const CanvasInner: FC = () => {
 	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes: NodeTypes = useNodeTypes();
-	const blueprint = useBlueprint();
-	const { mutateBlueprint } = useBlueprintMutation();
+	const { blueprint, mutate } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
 	const handleNodeSelect = useCallback(
 		async (nodeClassName: ExcludeAgentNodeClassName) => {
@@ -101,9 +99,9 @@ const CanvasInner: FC = () => {
 							targetHandle,
 						});
 
-						mutateBlueprint({
-							optimisticAction: {
-								type: "connectNodes",
+						mutate({
+							type: "connectNodes",
+							optimisticData: {
 								edge: {
 									id: createId(),
 									edgeType,
@@ -117,64 +115,34 @@ const CanvasInner: FC = () => {
 									},
 								},
 							},
-							mutation: connectNodes({
-								blueprintId: blueprint.id,
-								edge: {
-									id: createId(),
-									edgeType,
-									inputPort: {
-										id: targetHandle,
-										nodeId: target,
-									},
-									outputPort: {
-										id: sourceHandle,
-										nodeId: source,
-									},
-								},
-							}),
-							action: ({ id }) => ({
-								type: "connectNodes",
-								edge: {
-									id,
-									edgeType,
-									inputPort: {
-										id: targetHandle,
-										nodeId: target,
-									},
-									outputPort: {
-										id: sourceHandle,
-										nodeId: source,
-									},
-								},
-							}),
+							action: async (optimisticData) =>
+								await connectNodes({
+									blueprintId: blueprint.id,
+									...optimisticData,
+								}),
 						});
 					}}
 					onNodesDelete={(nodes) => {
-						mutateBlueprint({
-							optimisticAction: {
-								type: "deleteNodes",
-								deltedNodes: nodes.map((node) => ({
-									nodeId: node.id,
-								})),
+						mutate({
+							type: "deleteNodes",
+							optimisticData: {
+								deleteNodeIds: nodes.map((node) => node.id),
 							},
-							mutation: deleteNodes({
-								blueprintId: blueprint.id,
-								deleteNodeIds: nodes.map((node) =>
-									Number.parseInt(node.id, 10),
-								),
-							}),
-							action: () => ({
-								type: "deleteNodes",
-								deltedNodes: nodes.map((node) => ({
-									nodeId: node.id,
+							action: () =>
+								deleteNodes({
+									blueprintId: blueprint.id,
+									deleteNodeIds: nodes.map((node) =>
+										Number.parseInt(node.id, 10),
+									),
+								}).then(({ deleteNodeIds }) => ({
+									deleteNodeIds: deleteNodeIds.map((id) => `${id}`),
 								})),
-							}),
 						});
 					}}
 					onNodeDragStop={(_event, _node, nodes) => {
-						mutateBlueprint({
-							optimisticAction: {
-								type: "updateNodesPosition",
+						mutate({
+							type: "updateNodesPosition",
+							optimisticData: {
 								nodes: nodes.map((node) => ({
 									nodeId: node.id,
 									position: {
@@ -183,47 +151,33 @@ const CanvasInner: FC = () => {
 									},
 								})),
 							},
-							mutation: updateNodesPosition({
-								nodes: nodes.map((node) => ({
-									id: Number.parseInt(node.id, 10),
-									position: {
-										x: node.position.x,
-										y: node.position.y,
-									},
+							action: (optimisticData) =>
+								updateNodesPosition({
+									nodes: optimisticData.nodes.map((node) => ({
+										...node,
+										id: Number.parseInt(node.nodeId, 10),
+									})),
+								}).then(({ nodes }) => ({
+									nodes: nodes.map((node) => ({
+										...node,
+										nodeId: `${node.id}`,
+									})),
 								})),
-							}),
-							action: () => ({
-								type: "updateNodesPosition",
-								nodes: nodes.map((node) => ({
-									nodeId: node.id,
-									position: {
-										x: node.position.x,
-										y: node.position.y,
-									},
-								})),
-							}),
 						});
 					}}
 					onEdgesDelete={(edges) => {
-						mutateBlueprint({
-							optimisticAction: {
-								type: "deleteEdges",
-								deletedEdges: edges.map((edge) => ({
-									edgeId: Number.parseInt(edge.id, 10),
-								})),
-							},
-							mutation: deleteEdges({
-								blueprintId: blueprint.id,
+						mutate({
+							type: "deleteEdges",
+							optimisticData: {
 								deleteEdgeIds: edges.map((edge) =>
 									Number.parseInt(edge.id, 10),
 								),
-							}),
-							action: (deletedEdgeIds) => ({
-								type: "deleteEdges",
-								deletedEdges: deletedEdgeIds.map((edgeId) => ({
-									edgeId,
-								})),
-							}),
+							},
+							action: (optimisticData) =>
+								deleteEdges({
+									blueprintId: blueprint.id,
+									...optimisticData,
+								}),
 						});
 					}}
 				>

@@ -89,7 +89,7 @@ export const portsBlueprints = pgTable("ports_blueprints", {
 		.references(() => ports.id, { onDelete: "cascade" }),
 });
 
-type EdgeType = "data" | "execution";
+export type EdgeType = "data" | "execution";
 export const edges = pgTable("edges", {
 	id: serial("id").primaryKey(),
 	agentId: integer("agent_id")

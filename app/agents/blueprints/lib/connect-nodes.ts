@@ -30,6 +30,9 @@ export const connectNodes = async ({ blueprintId, edge }: ConnectNodesArgs) => {
 		blueprintId: blueprint.id,
 	});
 	return {
-		id: `${insertedEdge.id}`,
+		edge: {
+			...edge,
+			id: `${insertedEdge.id}`,
+		},
 	};
 };

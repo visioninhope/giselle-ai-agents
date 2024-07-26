@@ -1,7 +1,4 @@
-"use client";
-
 import {
-	type FC,
 	type PropsWithChildren,
 	createContext,
 	useCallback,
@@ -19,7 +16,14 @@ import {
 	reviewRequiredActions,
 } from "..";
 
-const BlueprintContextInternal = createContext<Blueprint | null>(null);
+type AddNode = { type: "addNode"; node: Node };
+type UpdateNodesPosition = {
+	type: "updateNodesPosition";
+	nodes: Array<{
+		nodeId: string;
+		position: { x: number; y: number };
+	}>;
+};
 type BlueprintAction =
 	| { type: "addNode"; node: Node }
 	| {
@@ -31,9 +35,7 @@ type BlueprintAction =
 	  }
 	| {
 			type: "deleteNodes";
-			deltedNodes: Array<{
-				nodeId: string;
-			}>;
+			deleteNodeIds: Array<string>;
 	  }
 	| {
 			type: "connectNodes";
@@ -41,7 +43,7 @@ type BlueprintAction =
 	  }
 	| {
 			type: "deleteEdges";
-			deletedEdges: Array<{ edgeId: number }>;
+			deleteEdgeIds: Array<number>;
 	  }
 	| {
 			type: "updateNodeProperty";
@@ -67,28 +69,27 @@ type BlueprintAction =
 			deletePortId: string;
 	  };
 
-// biome-ignore lint: lint/suspicious/noExplicitAny
-type MutateBlueprintArgs<T extends Promise<any>> = {
-	optimisticAction: BlueprintAction;
-	mutation: T;
-	action: (
-		result: T extends Promise<infer U> ? Awaited<U> : never,
-	) => BlueprintAction;
+type BlueprintActionType = BlueprintAction["type"];
+type BlueprintActionPayload<T> = T extends BlueprintActionType
+	? Omit<Extract<BlueprintAction, { type: T }>, "type">
+	: never;
+
+type MutateBlueprintArgs<
+	T extends BlueprintActionType,
+	D extends BlueprintActionPayload<T>,
+> = {
+	type: T;
+	action: (optimisticData: D) => Promise<BlueprintActionPayload<T>>;
+	optimisticData: D;
 };
 
-type BlueprintActionContextInternalState = {
-	// biome-ignore lint: lint/suspicious/noExplicitAny
-	mutateBlueprint: <T extends Promise<any>>(
-		args: MutateBlueprintArgs<T>,
+const BlueprintContext = createContext<{
+	blueprint: Blueprint;
+	mutate: <T extends BlueprintActionType, D extends BlueprintActionPayload<T>>(
+		args: MutateBlueprintArgs<T, D>,
 	) => void;
 	isPending: boolean;
-} | null;
-const BlueprintActionContextInternal =
-	createContext<BlueprintActionContextInternalState>(null);
-
-type BlueprintProviderProps = {
-	blueprint: Blueprint;
-};
+} | null>(null);
 
 const reducer = (state: Blueprint, action: BlueprintAction) =>
 	match(action)
@@ -110,11 +111,11 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 					: stateNode;
 			}),
 		}))
-		.with({ type: "deleteNodes" }, ({ deltedNodes }) => ({
+		.with({ type: "deleteNodes" }, ({ deleteNodeIds }) => ({
 			...state,
 			nodes: state.nodes.filter(
 				(node) =>
-					!deltedNodes.some(({ nodeId }) => `${nodeId}` === `${node.id}`),
+					!deleteNodeIds.some((deletedNodeId) => deletedNodeId === node.id),
 			),
 		}))
 		.with({ type: "connectNodes" }, ({ edge }) => ({
@@ -125,17 +126,21 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				edges: [...state.edges, edge],
 			}),
 		}))
-		.with({ type: "deleteEdges" }, ({ deletedEdges }) => ({
+		.with({ type: "deleteEdges" }, ({ deleteEdgeIds }) => ({
 			...state,
 			edges: state.edges.filter(
 				(edge) =>
-					!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
+					!deleteEdgeIds.some(
+						(deleteEdgeId) => `${deleteEdgeId}` === `${edge.id}`,
+					),
 			),
 			requiredActions: reviewRequiredActions({
 				...state,
 				edges: state.edges.filter(
 					(edge) =>
-						!deletedEdges.some(({ edgeId }) => `${edgeId}` === `${edge.id}`),
+						!deleteEdgeIds.some(
+							(deleteEdgeId) => `${deleteEdgeId}` === `${edge.id}`,
+						),
 				),
 			}),
 		}))
@@ -231,67 +236,46 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 			}),
 		}))
 		.exhaustive();
-export const BlueprintProvider: FC<
+
+type BlueprintProviderProps = {
+	blueprint: Blueprint;
+};
+
+export const BlueprintProvider: React.FC<
 	PropsWithChildren<BlueprintProviderProps>
 > = ({ blueprint: defaultBlueprint, children }) => {
 	const [isPending, startTransition] = useTransition();
-	const [blueprint, setBlueprint] = useReducer(reducer, defaultBlueprint);
-
-	const [optimisticBlueprint, setOptimisticBlueprintInternal] = useOptimistic<
+	const [blueprint, dispatch] = useReducer(reducer, defaultBlueprint);
+	const [optimisticBlueprint, setOptimisticBlueprint] = useOptimistic<
 		Blueprint,
 		BlueprintAction
 	>(blueprint, reducer);
-
-	const mutateBlueprint = useCallback(
-		// biome-ignore lint: lint/suspicious/noExplicitAny
-		<T extends Promise<any>>({
-			optimisticAction,
-			mutation,
-			action,
-		}: MutateBlueprintArgs<T>) => {
+	const mutate = useCallback(
+		<T extends BlueprintActionType, D extends BlueprintActionPayload<T>>(
+			args: MutateBlueprintArgs<T, D>,
+		) => {
 			startTransition(async () => {
-				setOptimisticBlueprintInternal(optimisticAction);
-				await mutation.then((result) => {
-					setBlueprint(action(result));
-				});
+				const { type, action, optimisticData } = args;
+				/** @todo remove type assertion */
+				setOptimisticBlueprint({ ...optimisticData, type } as BlueprintAction);
+				const result = await action(optimisticData);
+				/** @todo remove type assertion */
+				dispatch({ ...optimisticData, ...result, type } as BlueprintAction);
 			});
 		},
-		[setOptimisticBlueprintInternal],
+		[setOptimisticBlueprint],
 	);
-
 	return (
-		<BlueprintContextInternal.Provider value={optimisticBlueprint}>
-			<BlueprintActionContextInternal.Provider
-				value={{
-					mutateBlueprint,
-					isPending,
-				}}
-			>
-				{children}
-			</BlueprintActionContextInternal.Provider>
-		</BlueprintContextInternal.Provider>
+		<BlueprintContext.Provider value={{ blueprint, mutate, isPending }}>
+			{children}
+		</BlueprintContext.Provider>
 	);
 };
 
 export const useBlueprint = () => {
-	const blueprint = useContext(BlueprintContextInternal);
-	if (blueprint === null) {
-		throw new Error("useBlueprint must be used within a BlueprintProvider");
+	const context = useContext(BlueprintContext);
+	if (!context) {
+		throw new Error("useAgent must be used within an AgentProvider");
 	}
-	return blueprint;
-};
-
-export const useBlueprintMutation = () => {
-	const mutateBlueprint = useContext(BlueprintActionContextInternal);
-	if (mutateBlueprint === null) {
-		throw new Error(
-			"useBlueprintMutation must be used within a BlueprintProvider",
-		);
-	}
-	return mutateBlueprint;
-};
-
-export const useNode = (nodeId: string) => {
-	const blueprint = useBlueprint();
-	return blueprint.nodes.find(({ id }) => id === nodeId);
+	return context;
 };

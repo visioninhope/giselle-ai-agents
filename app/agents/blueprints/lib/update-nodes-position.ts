@@ -18,4 +18,5 @@ export const updateNodesPosition = async (args: UpdateNodesPositionArgs) => {
 			})
 			.where(eq(nodes.id, node.id));
 	}
+	return args;
 };

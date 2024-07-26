@@ -19,4 +19,7 @@ export const deleteNodes = async ({
 				inArray(nodesBlueprints.nodeId, deleteNodeIds),
 			),
 		);
+	return {
+		deleteNodeIds,
+	};
 };

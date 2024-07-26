@@ -16,10 +16,9 @@ import { match } from "ts-pattern";
 type AgentState = typeof agents.$inferSelect;
 type AgentAction = { type: "updateAgentName"; name: string };
 type AgentActionType = AgentAction["type"];
-type AgentActionPayload<T extends AgentActionType> = Omit<
-	Extract<AgentAction, { type: T }>,
-	"type"
->;
+type AgentActionPayload<T> = T extends AgentActionType
+	? Omit<Extract<AgentAction, { type: T }>, "type">
+	: never;
 type MutateAgentArgs<
 	T extends AgentActionType,
 	D extends AgentActionPayload<T>,

@@ -6,7 +6,7 @@ import { RequestLogger } from "./request-logger";
 import { RequiredAction } from "./required-action";
 
 export const RequestPanel: FC = () => {
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const request = useRequest();
 	return (
 		<div className="px-4 py-2">

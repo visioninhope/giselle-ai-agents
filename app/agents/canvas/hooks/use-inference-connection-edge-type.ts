@@ -1,4 +1,5 @@
 import { useBlueprint } from "@/app/agents/blueprints";
+import type { EdgeType } from "@/drizzle";
 import type { Connection, Edge } from "@xyflow/react";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
@@ -39,7 +40,7 @@ export const useInfereceConnectionEdgeType = () => {
 		[getPorts],
 	);
 	const inferConnectionEdgeType = useCallback(
-		(connection: Connection | Edge) => {
+		(connection: Connection | Edge): EdgeType => {
 			const ports = getPorts(connection);
 			invariant(ports.inputPort != null, "Ports not found");
 			return ports.inputPort.type;
