@@ -18,9 +18,18 @@ import { and, asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { leaveMessage } from "./leave-message";
 
+export type RequestParameter = {
+	port:
+		| {
+				id?: never;
+				nodeClassKey: string;
+		  }
+		| { id: number; nodeClassKey?: never };
+	message: string;
+};
 export const createRequest = async (
 	blueprintId: number,
-	formData: FormData,
+	requestParameters: RequestParameter[],
 ) => {
 	const blueprint = await getBlueprint(blueprintId);
 	let requestBlueprintId = blueprint.id;
@@ -39,9 +48,6 @@ export const createRequest = async (
 		invariant(previousBlueprint != null, "Previous blueprint not found");
 		requestBlueprintId = previousBlueprint.id;
 	}
-
-	const formEntries = {};
-	formData.forEach((value, key) => {});
 
 	const [request] = await db
 		.insert(requests)
@@ -62,16 +68,14 @@ export const createRequest = async (
 		})),
 	);
 
-	formData.forEach(async (value, key) => {
+	for (const requestParameter of requestParameters) {
 		await leaveMessage({
 			requestId: request.id,
 			stepId: stepsByBlueprintId[0].id,
-			port: {
-				id: Number.parseInt(key, 10),
-			},
-			message: `${value}`,
+			port: requestParameter.port,
+			message: requestParameter.message,
 		});
-	});
+	}
 	const handle = await invokeTask.trigger({
 		requestId: request.id,
 	});
@@ -80,5 +84,5 @@ export const createRequest = async (
 		requestId: request.id,
 		triggerId: handle.id,
 	});
-	return request.id;
+	return { requestId: request.id, triggerRunId: handle.id };
 };
