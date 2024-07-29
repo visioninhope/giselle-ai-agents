@@ -69,7 +69,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 						<PopoverContent align="end">
 							<form onSubmit={handleSubmit}>
 								<div className="flex flex-col gap-4">
-									<Input placeholder="Parameter" name="name" />
+									<Input placeholder="Parameter" name="name" data-1p-ignore />
 									<div className="flex justify-end">
 										<Button type="submit">Create parameter</Button>
 									</div>

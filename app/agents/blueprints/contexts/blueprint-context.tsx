@@ -16,6 +16,7 @@ import {
 	type BlueprintPort,
 	type Edge,
 	type Node,
+	inferRequestInterface,
 	reviewRequiredActions,
 } from "..";
 
@@ -119,6 +120,10 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				...state,
 				edges: [...state.edges, edge],
 			}),
+			requestInterface: inferRequestInterface({
+				...state,
+				edges: [...state.edges, edge],
+			}),
 		}))
 		.with({ type: "deleteEdges" }, ({ deleteEdgeIds }) => ({
 			...state,
@@ -153,28 +158,34 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 					: stateNode,
 			),
 		}))
-		.with({ type: "addNodePort" }, ({ port }) => ({
-			...state,
-			nodes: state.nodes.map((stateNode) => {
-				if (stateNode.id !== port.nodeId) {
-					return stateNode;
-				}
+		.with({ type: "addNodePort" }, ({ port }) => {
+			const newBlueprint = {
+				...state,
+				nodes: state.nodes.map((stateNode) => {
+					if (stateNode.id !== port.nodeId) {
+						return stateNode;
+					}
 
-				if (port.direction === "input") {
-					return {
-						...stateNode,
-						inputPorts: [...stateNode.inputPorts, port],
-					};
-				}
-				if (port.direction === "output") {
-					return {
-						...stateNode,
-						outputPorts: [...stateNode.outputPorts, port],
-					};
-				}
-				throw new Error(`Unexpected port direction: ${port.direction}`);
-			}),
-		}))
+					if (port.direction === "input") {
+						return {
+							...stateNode,
+							inputPorts: [...stateNode.inputPorts, port],
+						};
+					}
+					if (port.direction === "output") {
+						return {
+							...stateNode,
+							outputPorts: [...stateNode.outputPorts, port],
+						};
+					}
+					throw new Error(`Unexpected port direction: ${port.direction}`);
+				}),
+			};
+			return {
+				...newBlueprint,
+				requestInterface: inferRequestInterface(newBlueprint),
+			};
+		})
 		.with({ type: "updatePortName" }, ({ portId, name }) => ({
 			...state,
 			nodes: state.nodes.map((stateNode) => {
@@ -256,7 +267,7 @@ export const BlueprintProvider: React.FC<
 				setOptimisticBlueprint({ ...optimisticData, type } as BlueprintAction);
 				const result = await action(optimisticData);
 				/** @todo remove type assertion */
-				dispatch({ ...optimisticData, ...result, type } as BlueprintAction);
+				dispatch({ ...result, type } as BlueprintAction);
 			});
 		},
 		[setOptimisticBlueprint],

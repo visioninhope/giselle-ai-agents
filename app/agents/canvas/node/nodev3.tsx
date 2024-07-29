@@ -22,11 +22,20 @@ type NodeData = {
 	outputPorts: (typeof ports.$inferSelect)[];
 	nodeProperties: NodeProperties;
 	stepStatus?: RequestStepStatus;
+	isCreating?: boolean;
 };
-type NodeV3 = Node<NodeData>;
+export type NodeV3 = Node<NodeData>;
 export const NodeV3: FC<NodeProps<NodeV3>> = ({
 	selected,
-	data: { className, inputPorts, outputPorts, stepStatus, id, nodeProperties },
+	data: {
+		className,
+		inputPorts,
+		outputPorts,
+		stepStatus,
+		id,
+		nodeProperties,
+		isCreating,
+	},
 }) => {
 	return (
 		<>
@@ -34,6 +43,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 			<div
 				className={nodeVariant({
 					stepStatus,
+					status: isCreating ? "creating" : "created",
 				})}
 			>
 				<div className={headerVariant()}>
@@ -104,6 +114,10 @@ const nodeVariant = cva({
 			running: " border-blue-500",
 			success: "border-green-700",
 			failed: "border-error",
+		},
+		status: {
+			creating: "opacity-40",
+			created: "",
 		},
 	},
 	defaultVariants: {

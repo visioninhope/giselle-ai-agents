@@ -13,6 +13,7 @@ export type BlueprintPort = Pick<
 > & {
 	id: number;
 	nodeId: number;
+	isCreating?: boolean;
 	portsBlueprintsId: DbPortsBlueprints["id"];
 };
 export type Node = Pick<DbNode, "position"> & {
@@ -26,6 +27,7 @@ export type Node = Pick<DbNode, "position"> & {
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {
 	id: number;
+	isCreating?: boolean;
 	inputPort: { id: number; nodeId: number };
 	outputPort: { id: number; nodeId: number };
 };
