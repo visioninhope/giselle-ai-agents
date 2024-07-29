@@ -19,6 +19,7 @@ import {
 	inferRequestInterface,
 	reviewRequiredActions,
 } from "..";
+import { createTemporaryId } from "./create-temporary-id";
 
 type BlueprintAction =
 	| { type: "addNode"; node: Node }
@@ -246,8 +247,6 @@ type BlueprintProviderProps = {
 	blueprint: Blueprint;
 };
 
-let temporaryIndex = 0;
-
 export const BlueprintProvider: React.FC<
 	PropsWithChildren<BlueprintProviderProps>
 > = ({ blueprint: defaultBlueprint, children }) => {
@@ -272,11 +271,6 @@ export const BlueprintProvider: React.FC<
 		},
 		[setOptimisticBlueprint],
 	);
-	/** @todo description the intent */
-	const createTemporaryId = useCallback(() => {
-		temporaryIndex = temporaryIndex - 1;
-		return temporaryIndex;
-	}, []);
 	return (
 		<BlueprintContext.Provider
 			value={{
@@ -294,7 +288,7 @@ export const BlueprintProvider: React.FC<
 export const useBlueprint = () => {
 	const context = useContext(BlueprintContext);
 	if (!context) {
-		throw new Error("useAgent must be used within an AgentProvider");
+		throw new Error("useBlueprint must be used within an BlueprintProvider");
 	}
 	return context;
 };
