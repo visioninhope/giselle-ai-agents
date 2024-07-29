@@ -16,7 +16,7 @@ import {
 export const RequestButton: FC = () => {
 	const [disclosure, setDisclosure] = useState(false);
 	const router = useRouter();
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const [isPending, startTransition] = useTransition();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(formEvent) => {

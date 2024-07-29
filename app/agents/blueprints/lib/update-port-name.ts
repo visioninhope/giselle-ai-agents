@@ -4,17 +4,16 @@ import { db, ports } from "@/drizzle";
 import { eq } from "drizzle-orm";
 
 type UpdatePortNameArgs = {
-	port: {
-		id: number;
-		name: string;
-	};
+	portId: number;
+	name: string;
 };
 
 export const updatePortName = async (args: UpdatePortNameArgs) => {
 	await db
 		.update(ports)
 		.set({
-			name: args.port.name,
+			name: args.name,
 		})
-		.where(eq(ports.id, args.port.id));
+		.where(eq(ports.id, args.portId));
+	return args;
 };

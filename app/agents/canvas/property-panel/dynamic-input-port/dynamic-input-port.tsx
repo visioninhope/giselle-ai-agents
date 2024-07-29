@@ -3,7 +3,6 @@ import {
 	type Node,
 	addNodePort,
 	useBlueprint,
-	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -21,9 +20,8 @@ type DynamicInputPortProps = {
 	node: Node;
 };
 export const DynamicInputPort: FC<DynamicInputPortProps> = ({ node }) => {
-	const blueprint = useBlueprint();
+	const { blueprint, mutate } = useBlueprint();
 	const [disclosure, setDisclosure] = useState(false);
-	const { mutateBlueprint } = useBlueprintMutation();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(formEvent) => {
 			formEvent.preventDefault();
@@ -39,29 +37,25 @@ export const DynamicInputPort: FC<DynamicInputPortProps> = ({ node }) => {
 				portsBlueprintsId: 0,
 				nodeClassKey: null,
 			};
-			mutateBlueprint({
-				optimisticAction: {
-					type: "addNodePort",
+			mutate({
+				type: "addNodePort",
+				optimisticData: {
 					port: draftPort,
 				},
-				mutation: addNodePort({
-					blueprintId: blueprint.id,
-					port: {
-						nodeId: Number.parseInt(node.id, 10),
-						name: draftPort.name,
-						direction: "input",
-					},
-				}),
-				action: ({ port }) => ({
-					type: "addNodePort",
-					port: {
-						...draftPort,
-						id: `${port.id}`,
-					},
-				}),
+				action: () =>
+					addNodePort({
+						blueprintId: blueprint.id,
+						port: {
+							nodeId: Number.parseInt(node.id, 10),
+							name: draftPort.name,
+							direction: "input",
+						},
+					}).then((result) => ({
+						port: { ...draftPort, id: `${result.port.id}` },
+					})),
 			});
 		},
-		[mutateBlueprint, blueprint.id, node.id],
+		[mutate, blueprint.id, node.id],
 	);
 	return (
 		<div>

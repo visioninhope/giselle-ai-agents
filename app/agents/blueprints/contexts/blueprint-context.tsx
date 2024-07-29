@@ -48,7 +48,7 @@ type BlueprintAction =
 	| {
 			type: "updateNodeProperty";
 			node: {
-				nodeId: string;
+				id: string;
 				property: {
 					name: string;
 					value: string;
@@ -147,7 +147,7 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 		.with({ type: "updateNodeProperty" }, ({ node }) => ({
 			...state,
 			nodes: state.nodes.map((stateNode) =>
-				stateNode.id === node.nodeId
+				stateNode.id === node.id
 					? {
 							...stateNode,
 							properties: stateNode.properties.map((property) =>

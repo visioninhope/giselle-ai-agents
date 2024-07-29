@@ -4,7 +4,7 @@ import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
 
 export const useSynthsize = () => {
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const request = useRequest();
 	const reactFlowInstance = useReactFlow();
 	useEffect(() => {

@@ -3,7 +3,6 @@ import {
 	deletePort,
 	updatePortName,
 	useBlueprint,
-	useBlueprintMutation,
 } from "@/app/agents/blueprints";
 import { Button } from "@/components/ui/button";
 import { AlignLeftIcon, TrashIcon } from "lucide-react";
@@ -24,10 +23,9 @@ type DynamicOutputPortListItemProps = {
 export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 	port,
 }) => {
-	const blueprint = useBlueprint();
+	const { blueprint, mutate } = useBlueprint();
 	const [edit, setEdit] = useState(false);
 	const ref = useRef<HTMLInputElement>(null);
-	const { mutateBlueprint } = useBlueprintMutation();
 	useEffect(() => {
 		if (edit && ref.current != null) {
 			ref.current.focus();
@@ -42,27 +40,24 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 				name != null && typeof name === "string",
 				"name must be a string",
 			);
-			mutateBlueprint({
-				optimisticAction: {
-					type: "updatePortName",
+			mutate({
+				type: "updatePortName",
+				optimisticData: {
 					portId: port.id,
 					name,
 				},
-				mutation: updatePortName({
-					port: {
-						id: Number.parseInt(port.id, 10),
+				action: () =>
+					updatePortName({
+						portId: Number.parseInt(port.id, 10),
 						name,
-					},
-				}),
-				action: () => ({
-					type: "updatePortName",
-					portId: port.id,
-					name,
-				}),
+					}).then((result) => ({
+						name: result.name,
+						portId: `${result.portId}`,
+					})),
 			});
 			setEdit(false);
 		},
-		[mutateBlueprint, port.id],
+		[mutate, port.id],
 	);
 	const handleBlur = useCallback<FocusEventHandler<HTMLInputElement>>(
 		(focusEvent) => {
@@ -103,19 +98,18 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 						variant="ghost"
 						className="hidden group-hover:block"
 						onClick={() => {
-							mutateBlueprint({
-								optimisticAction: {
-									type: "deletePort",
+							mutate({
+								type: "deletePort",
+								optimisticData: {
 									deletePortId: port.id,
 								},
-								mutation: deletePort({
-									blueprintId: blueprint.id,
-									deletePortId: Number.parseInt(port.id, 10),
-								}),
-								action: () => ({
-									type: "deletePort",
-									deletePortId: port.id,
-								}),
+								action: () =>
+									deletePort({
+										blueprintId: blueprint.id,
+										deletePortId: Number.parseInt(port.id, 10),
+									}).then((result) => ({
+										deletePortId: `${result.deletePortId}`,
+									})),
 							});
 						}}
 					>

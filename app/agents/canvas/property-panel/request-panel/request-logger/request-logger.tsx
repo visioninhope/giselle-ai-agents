@@ -26,7 +26,7 @@ const stepListItemVariant = cva({
 
 type StepListItemProps = Step;
 const StepListItem: FC<StepListItemProps> = (props) => {
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const nodePorts = useMemo(() => {
 		const node = blueprint?.nodes.find((node) => node.id === props.node.id);
 		if (node == null) {

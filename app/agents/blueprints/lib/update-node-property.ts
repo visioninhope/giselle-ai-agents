@@ -5,23 +5,24 @@ import { and, eq } from "drizzle-orm";
 
 type UpdateNodePropertyArgs = {
 	blueprintId: number;
-	nodeId: number;
-	property: {
-		name: string;
-		value: string;
+	node: {
+		id: number;
+		property: {
+			name: string;
+			value: string;
+		};
 	};
 };
 export const updateNodeProperty = async ({
 	blueprintId,
-	nodeId,
-	property,
+	node,
 }: UpdateNodePropertyArgs) => {
 	const [nodeBlueprint] = await db
 		.select()
 		.from(nodesBlueprints)
 		.where(
 			and(
-				eq(nodesBlueprints.nodeId, nodeId),
+				eq(nodesBlueprints.nodeId, node.id),
 				eq(nodesBlueprints.blueprintId, blueprintId),
 			),
 		);
@@ -29,12 +30,12 @@ export const updateNodeProperty = async ({
 		.update(nodesBlueprints)
 		.set({
 			nodeProperties: nodeBlueprint.nodeProperties.map((nodeProperty) => {
-				if (nodeProperty.name !== property.name) {
+				if (nodeProperty.name !== node.property.name) {
 					return nodeProperty;
 				}
 				return {
 					...nodeProperty,
-					value: property.value,
+					value: node.property.value,
 				};
 			}),
 		})
@@ -44,5 +45,7 @@ export const updateNodeProperty = async ({
 		.update(blueprints)
 		.set({ dirty: true })
 		.where(eq(blueprints.id, blueprintId));
-	return { property };
+	return {
+		node,
+	};
 };

@@ -1,8 +1,4 @@
-import {
-	updateNodeProperty,
-	useBlueprint,
-	useBlueprintMutation,
-} from "@/app/agents/blueprints";
+import { updateNodeProperty, useBlueprint } from "@/app/agents/blueprints";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import type { NodeProperty } from "@/drizzle";
@@ -17,41 +13,40 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 	value,
 	nodeId,
 }) => {
-	const { mutateBlueprint } = useBlueprintMutation();
-	const blueprint = useBlueprint();
+	const { blueprint, mutate } = useBlueprint();
 	const ref = useRef<HTMLTextAreaElement | null>(null);
 	const handleBlur = useCallback(() => {
 		if (ref.current == null) {
 			return;
 		}
-		mutateBlueprint({
-			optimisticAction: {
-				type: "updateNodeProperty",
+		mutate({
+			type: "updateNodeProperty",
+			optimisticData: {
 				node: {
-					nodeId,
+					id: nodeId,
 					property: {
 						name,
 						value: ref.current.value,
 					},
 				},
 			},
-			mutation: updateNodeProperty({
-				blueprintId: blueprint.id,
-				nodeId: Number.parseInt(nodeId, 10),
-				property: {
-					name,
-					value: ref.current.value,
-				},
-			}),
-			action: ({ property }) => ({
-				type: "updateNodeProperty",
-				node: {
-					nodeId,
-					property,
-				},
-			}),
+			action: (optimisticData) =>
+				updateNodeProperty({
+					blueprintId: blueprint.id,
+					...optimisticData,
+					node: {
+						...optimisticData.node,
+						id: Number.parseInt(optimisticData.node.id, 10),
+					},
+				}).then((result) => ({
+					...result,
+					node: {
+						...result.node,
+						id: `${result.node.id}`,
+					},
+				})),
 		});
-	}, [name, nodeId, mutateBlueprint, blueprint.id]);
+	}, [name, nodeId, mutate, blueprint.id]);
 	return (
 		<div>
 			<Label htmlFor={name}>{label ?? name}</Label>

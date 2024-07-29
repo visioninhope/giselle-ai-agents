@@ -37,4 +37,7 @@ export const deletePort = async ({
 				eq(portsBlueprints.nodesBlueprintsId, relation.nodesBlueprintsId),
 			),
 		);
+	return {
+		deletePortId,
+	};
 };

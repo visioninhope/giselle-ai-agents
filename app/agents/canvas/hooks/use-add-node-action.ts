@@ -1,9 +1,4 @@
-import {
-	addAgentNode,
-	addNode,
-	useBlueprint,
-	useBlueprintMutation,
-} from "@/app/agents/blueprints";
+import { addAgentNode, addNode, useBlueprint } from "@/app/agents/blueprints";
 import {
 	type ExcludeAgentNodeClassName,
 	type Port,
@@ -33,9 +28,8 @@ type AddNodeArgs =
 	  };
 export const useAddNodeAction = () => {
 	const reactFlowInstance = useReactFlow();
-	const blueprint = useBlueprint();
+	const { blueprint, mutate } = useBlueprint();
 	const nodeClasses = useNodeClasses();
-	const { mutateBlueprint } = useBlueprintMutation();
 	const addNodeAction = useCallback(
 		async ({ nodeClassName, position, relevantAgent }: AddNodeArgs) => {
 			invariant(reactFlowInstance != null, "reactFlowInstance is null");
@@ -49,9 +43,9 @@ export const useAddNodeAction = () => {
 			const nodeClass = findNodeClass(nodeClasses, nodeClassName);
 			const nodeId = createId();
 			if (nodeClassName === "agent") {
-				mutateBlueprint({
-					optimisticAction: {
-						type: "addNode",
+				mutate({
+					type: "addNode",
+					optimisticData: {
 						node: {
 							id: nodeId,
 							isCreating: true,
@@ -95,26 +89,23 @@ export const useAddNodeAction = () => {
 							),
 						},
 					},
-					mutation: addAgentNode({
-						blueprintId: blueprint.id,
-						node: {
-							className: nodeClassName,
-							position: { x: flowPosition.x, y: flowPosition.y },
-							relevantAgent: {
-								id: relevantAgent.agentId,
-								blueprintId: relevantAgent.blueprintId,
+					action: () =>
+						addAgentNode({
+							blueprintId: blueprint.id,
+							node: {
+								className: nodeClassName,
+								position: { x: flowPosition.x, y: flowPosition.y },
+								relevantAgent: {
+									id: relevantAgent.agentId,
+									blueprintId: relevantAgent.blueprintId,
+								},
 							},
-						},
-					}),
-					action: (result) => ({
-						type: "addNode",
-						node: result,
-					}),
+						}),
 				});
 			} else {
-				mutateBlueprint({
-					optimisticAction: {
-						type: "addNode",
+				mutate({
+					type: "addNode",
+					optimisticData: {
 						node: {
 							id: nodeId,
 							isCreating: true,
@@ -151,21 +142,18 @@ export const useAddNodeAction = () => {
 							),
 						},
 					},
-					mutation: addNode({
-						blueprintId: blueprint.id,
-						node: {
-							className: nodeClassName,
-							position: { x: flowPosition.x, y: flowPosition.y },
-						},
-					}),
-					action: (result) => ({
-						type: "addNode",
-						node: result,
-					}),
+					action: () =>
+						addNode({
+							blueprintId: blueprint.id,
+							node: {
+								className: nodeClassName,
+								position: { x: flowPosition.x, y: flowPosition.y },
+							},
+						}),
 				});
 			}
 		},
-		[reactFlowInstance, mutateBlueprint, nodeClasses, blueprint.id],
+		[reactFlowInstance, mutate, nodeClasses, blueprint.id],
 	);
 	return { addNodeAction };
 };

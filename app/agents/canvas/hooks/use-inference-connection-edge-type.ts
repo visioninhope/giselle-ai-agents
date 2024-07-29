@@ -5,7 +5,7 @@ import { useCallback } from "react";
 import invariant from "tiny-invariant";
 
 export const useInfereceConnectionEdgeType = () => {
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const getPorts = useCallback(
 		({ source, sourceHandle, target, targetHandle }: Connection | Edge) => {
 			const sourceNode = blueprint.nodes.find((node) => node.id === source);

@@ -4,7 +4,7 @@ import { useCallback, useState } from "react";
 import invariant from "tiny-invariant";
 
 export const useNodeSelection = () => {
-	const blueprint = useBlueprint();
+	const { blueprint } = useBlueprint();
 	const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
 
 	const addSelectedNodes = useCallback(

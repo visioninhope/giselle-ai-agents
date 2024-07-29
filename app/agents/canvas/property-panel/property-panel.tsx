@@ -1,6 +1,6 @@
 "use client";
 
-import { type Node, useNode } from "@/app/agents/blueprints";
+import { type Node, useBlueprint } from "@/app/agents/blueprints";
 import { findNodeClass, useNodeClasses } from "@/app/node-classes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { type FC, useMemo } from "react";
@@ -46,7 +46,11 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 		() => findNodeClass(nodeClasses, node.className),
 		[nodeClasses, node.className],
 	);
-	const blueprintNode = useNode(node.id);
+	const { blueprint } = useBlueprint();
+	const blueprintNode = useMemo(
+		() => blueprint.nodes.find(({ id }) => node.id),
+		[blueprint.nodes, node.id],
+	);
 	if (blueprintNode == null) {
 		return null;
 	}

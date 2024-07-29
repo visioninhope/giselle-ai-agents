@@ -61,7 +61,9 @@ const getRelevantAgentPorts = async (blueprintId: number) => {
 		);
 	return dbPorts;
 };
-export const addAgentNode = async (args: AddagentNodeArgs): Promise<Node> => {
+export const addAgentNode = async (
+	args: AddagentNodeArgs,
+): Promise<{ node: Node }> => {
 	const blueprint = await db.query.blueprints.findFirst({
 		where: eq(blueprints.id, args.blueprintId),
 	});
@@ -156,30 +158,33 @@ export const addAgentNode = async (args: AddagentNodeArgs): Promise<Node> => {
 		})),
 	);
 	return {
-		id: `${node.id}`,
-		position: args.node.position,
-		className: args.node.className,
-		properties: [
-			...(nodeClass.properties ?? []),
-			{
-				name: "relevantAgent",
-				value: relevantAgent.name,
-			} as NodeProperty,
-		],
-		inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
-			...port,
-			id: `${insertedPorts[index].id}`,
-			nodeId: `${nodeId}`,
-			portsBlueprintsId: insertedPortsBlueprints[index].id,
-			nodeClassKey: port.nodeClassKey ?? null,
-		})),
-		outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
-			...port,
-			id: `${insertedPorts[index + inputPorts.length].id}`,
-			nodeId: `${nodeId}`,
-			portsBlueprintsId: insertedPortsBlueprints[index + inputPorts.length].id,
-			nodeClassKey: port.nodeClassKey ?? null,
-		})),
-		propertyPortMap: nodeClass.propertyPortMap ?? {},
+		node: {
+			id: `${node.id}`,
+			position: args.node.position,
+			className: args.node.className,
+			properties: [
+				...(nodeClass.properties ?? []),
+				{
+					name: "relevantAgent",
+					value: relevantAgent.name,
+				} as NodeProperty,
+			],
+			inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
+				...port,
+				id: `${insertedPorts[index].id}`,
+				nodeId: `${nodeId}`,
+				portsBlueprintsId: insertedPortsBlueprints[index].id,
+				nodeClassKey: port.nodeClassKey ?? null,
+			})),
+			outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
+				...port,
+				id: `${insertedPorts[index + inputPorts.length].id}`,
+				nodeId: `${nodeId}`,
+				portsBlueprintsId:
+					insertedPortsBlueprints[index + inputPorts.length].id,
+				nodeClassKey: port.nodeClassKey ?? null,
+			})),
+			propertyPortMap: nodeClass.propertyPortMap ?? {},
+		},
 	};
 };
