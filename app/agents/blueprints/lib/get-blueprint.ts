@@ -91,7 +91,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		const nodeClass = getNodeClass(className as NodeClassName);
 		return {
 			...node,
-			id: `${id}`,
+			id,
 			className: className as NodeClassName,
 			propertyPortMap: nodeClass.propertyPortMap ?? {},
 			inputPorts: inputPorts.map(
@@ -105,12 +105,12 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					portsBlueprintsId,
 					nodeClassKey,
 				}) => ({
-					id: `${id}`,
+					id,
 					name,
 					type,
 					direction,
 					order,
-					nodeId: `${nodeId}`,
+					nodeId,
 					portsBlueprintsId,
 					nodeClassKey,
 				}),
@@ -126,12 +126,12 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					portsBlueprintsId,
 					nodeClassKey,
 				}) => ({
-					id: `${id}`,
+					id,
 					name,
 					type,
 					direction,
 					order,
-					nodeId: `${nodeId}`,
+					nodeId,
 					portsBlueprintsId,
 					nodeClassKey,
 				}),
@@ -151,24 +151,15 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			eq(edgeBlueprintsSchema.edgeId, edgesSchema.id),
 		)
 		.where(eq(edgeBlueprintsSchema.blueprintId, blueprint.id));
-	const edges = dbEdges.map(({ id, ...edge }) => {
+	const edges = dbEdges.map((edge) => {
 		const inputPort = dbPorts.find((port) => port.id === edge.inputPortId);
 		const outputPort = dbPorts.find((port) => port.id === edge.outputPortId);
 		invariant(inputPort != null, "Input port not found");
 		invariant(outputPort != null, "Output port not found");
 		return {
 			...edge,
-			id: `${id}`,
-			inputPort: {
-				...inputPort,
-				id: `${inputPort.id}`,
-				nodeId: `${inputPort.nodeId}`,
-			},
-			outputPort: {
-				...outputPort,
-				id: `${outputPort.id}`,
-				nodeId: `${outputPort.nodeId}`,
-			},
+			inputPort,
+			outputPort,
 		};
 	});
 	const tmpBlueprint: Blueprint = {

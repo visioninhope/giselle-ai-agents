@@ -5,7 +5,7 @@ import type { NodeProperty } from "@/drizzle";
 import { type FC, useCallback, useRef } from "react";
 
 type PropertyFieldProps = NodeProperty & {
-	nodeId: string;
+	nodeId: number;
 };
 export const PropertyField: FC<PropertyFieldProps> = ({
 	label,
@@ -34,17 +34,7 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 				updateNodeProperty({
 					blueprintId: blueprint.id,
 					...optimisticData,
-					node: {
-						...optimisticData.node,
-						id: Number.parseInt(optimisticData.node.id, 10),
-					},
-				}).then((result) => ({
-					...result,
-					node: {
-						...result.node,
-						id: `${result.node.id}`,
-					},
-				})),
+				}),
 		});
 	}, [name, nodeId, mutate, blueprint.id]);
 	return (

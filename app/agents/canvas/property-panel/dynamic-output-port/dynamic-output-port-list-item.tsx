@@ -46,14 +46,7 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 					portId: port.id,
 					name,
 				},
-				action: () =>
-					updatePortName({
-						portId: Number.parseInt(port.id, 10),
-						name,
-					}).then((result) => ({
-						name: result.name,
-						portId: `${result.portId}`,
-					})),
+				action: (optimisticData) => updatePortName(optimisticData),
 			});
 			setEdit(false);
 		},
@@ -103,13 +96,11 @@ export const DynamicOutputPortListItem: FC<DynamicOutputPortListItemProps> = ({
 								optimisticData: {
 									deletePortId: port.id,
 								},
-								action: () =>
+								action: (optimisticData) =>
 									deletePort({
 										blueprintId: blueprint.id,
-										deletePortId: Number.parseInt(port.id, 10),
-									}).then((result) => ({
-										deletePortId: `${result.deletePortId}`,
-									})),
+										...optimisticData,
+									}),
 							});
 						}}
 					>

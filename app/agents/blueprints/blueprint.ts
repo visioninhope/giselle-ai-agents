@@ -11,12 +11,12 @@ export type BlueprintPort = Pick<
 	DbPort,
 	"type" | "name" | "direction" | "order" | "nodeClassKey"
 > & {
-	id: string;
-	nodeId: string;
+	id: number;
+	nodeId: number;
 	portsBlueprintsId: DbPortsBlueprints["id"];
 };
 export type Node = Pick<DbNode, "position"> & {
-	id: string;
+	id: number;
 	isCreating?: boolean;
 	className: NodeClassName;
 	inputPorts: BlueprintPort[];
@@ -25,12 +25,12 @@ export type Node = Pick<DbNode, "position"> & {
 	propertyPortMap: Record<string, string>;
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {
-	id: string;
-	inputPort: { id: string; nodeId: string };
-	outputPort: { id: string; nodeId: string };
+	id: number;
+	inputPort: { id: number; nodeId: number };
+	outputPort: { id: number; nodeId: number };
 };
 export type RequestInterfaceItem = {
-	portId: string;
+	portId: number;
 	name: string;
 };
 type RequestInterface = {

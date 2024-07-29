@@ -18,8 +18,8 @@ export const connectNodes = async ({ blueprintId, edge }: ConnectNodesArgs) => {
 		.insert(edges)
 		.values({
 			agentId: blueprint.agentId,
-			inputPortId: Number.parseInt(edge.inputPort.id, 10),
-			outputPortId: Number.parseInt(edge.outputPort.id, 10),
+			inputPortId: edge.inputPort.id,
+			outputPortId: edge.outputPort.id,
 			edgeType: edge.edgeType,
 		})
 		.returning({
@@ -32,7 +32,7 @@ export const connectNodes = async ({ blueprintId, edge }: ConnectNodesArgs) => {
 	return {
 		edge: {
 			...edge,
-			id: `${insertedEdge.id}`,
+			id: insertedEdge.id,
 		},
 	};
 };

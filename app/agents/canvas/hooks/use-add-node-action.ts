@@ -5,7 +5,6 @@ import {
 	findNodeClass,
 	useNodeClasses,
 } from "@/app/node-classes";
-import { createId } from "@paralleldrive/cuid2";
 import { useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
@@ -28,7 +27,7 @@ type AddNodeArgs =
 	  };
 export const useAddNodeAction = () => {
 	const reactFlowInstance = useReactFlow();
-	const { blueprint, mutate } = useBlueprint();
+	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const nodeClasses = useNodeClasses();
 	const addNodeAction = useCallback(
 		async ({ nodeClassName, position, relevantAgent }: AddNodeArgs) => {
@@ -41,7 +40,7 @@ export const useAddNodeAction = () => {
 				y: position.y,
 			});
 			const nodeClass = findNodeClass(nodeClasses, nodeClassName);
-			const nodeId = createId();
+			const nodeId = createTemporaryId();
 			if (nodeClassName === "agent") {
 				mutate({
 					type: "addNode",
@@ -66,8 +65,8 @@ export const useAddNodeAction = () => {
 								...(nodeClass?.inputPorts ?? []),
 								...relevantAgent.inputPorts,
 							].map(({ type, label, key }, index) => ({
-								id: createId(),
-								nodeId: nodeId,
+								id: createTemporaryId(),
+								nodeId,
 								type: type,
 								name: label ?? "",
 								direction: "input",
@@ -77,8 +76,8 @@ export const useAddNodeAction = () => {
 							})),
 							outputPorts: (nodeClass.outputPorts ?? []).map(
 								({ type, label, key }, index) => ({
-									id: createId(),
-									nodeId: nodeId,
+									id: createTemporaryId(),
+									nodeId,
 									type: type,
 									name: label ?? "",
 									direction: "output",
@@ -118,8 +117,8 @@ export const useAddNodeAction = () => {
 							propertyPortMap: nodeClass.propertyPortMap ?? {},
 							inputPorts: (nodeClass.inputPorts ?? []).map(
 								({ type, label, key }, index) => ({
-									id: createId(),
-									nodeId: nodeId,
+									id: createTemporaryId(),
+									nodeId,
 									type: type,
 									name: label ?? "",
 									direction: "input",
@@ -130,8 +129,8 @@ export const useAddNodeAction = () => {
 							),
 							outputPorts: (nodeClass.outputPorts ?? []).map(
 								({ type, label, key }, index) => ({
-									id: createId(),
-									nodeId: nodeId,
+									id: createTemporaryId(),
+									nodeId,
 									type: type,
 									name: label ?? "",
 									direction: "output",
@@ -153,7 +152,7 @@ export const useAddNodeAction = () => {
 				});
 			}
 		},
-		[reactFlowInstance, mutate, nodeClasses, blueprint.id],
+		[reactFlowInstance, mutate, nodeClasses, blueprint.id, createTemporaryId],
 	);
 	return { addNodeAction };
 };

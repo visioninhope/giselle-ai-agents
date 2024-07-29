@@ -23,6 +23,7 @@ import {
 import { type FC, useCallback, useRef } from "react";
 import { Header } from "./header";
 import {
+	convertXyFlowConnection,
 	useAddNodeAction,
 	useContextMenu,
 	useInfereceConnectionEdgeType,
@@ -39,7 +40,7 @@ const CanvasInner: FC = () => {
 	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes: NodeTypes = useNodeTypes();
-	const { blueprint, mutate } = useBlueprint();
+	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
 	const handleNodeSelect = useCallback(
 		async (nodeClassName: ExcludeAgentNodeClassName) => {
@@ -81,7 +82,28 @@ const CanvasInner: FC = () => {
 					nodeTypes={nodeTypes}
 					defaultNodes={[] as Node[]}
 					defaultEdges={[] as Edge[]}
-					isValidConnection={validateConnection}
+					isValidConnection={({
+						source,
+						sourceHandle,
+						target,
+						targetHandle,
+					}) => {
+						if (
+							source == null ||
+							sourceHandle == null ||
+							target == null ||
+							targetHandle == null
+						) {
+							return false;
+						}
+						const connection = convertXyFlowConnection({
+							source,
+							sourceHandle,
+							target,
+							targetHandle,
+						});
+						return validateConnection(connection);
+					}}
 					onNodesChange={handleNodesChange}
 					onConnect={({ source, sourceHandle, target, targetHandle }) => {
 						if (
@@ -92,26 +114,27 @@ const CanvasInner: FC = () => {
 						) {
 							return;
 						}
-						const edgeType = inferConnectionEdgeType({
+						const connection = convertXyFlowConnection({
 							source,
 							sourceHandle,
 							target,
 							targetHandle,
 						});
+						const edgeType = inferConnectionEdgeType(connection);
 
 						mutate({
 							type: "connectNodes",
 							optimisticData: {
 								edge: {
-									id: createId(),
+									id: createTemporaryId(),
 									edgeType,
 									inputPort: {
-										id: targetHandle,
-										nodeId: target,
+										id: Number.parseInt(targetHandle, 10),
+										nodeId: Number.parseInt(target, 10),
 									},
 									outputPort: {
-										id: sourceHandle,
-										nodeId: source,
+										id: Number.parseInt(sourceHandle, 10),
+										nodeId: Number.parseInt(source, 10),
 									},
 								},
 							},
@@ -126,7 +149,7 @@ const CanvasInner: FC = () => {
 						mutate({
 							type: "deleteNodes",
 							optimisticData: {
-								deleteNodeIds: nodes.map((node) => node.id),
+								deleteNodeIds: nodes.map((node) => Number.parseInt(node.id)),
 							},
 							action: () =>
 								deleteNodes({
@@ -134,9 +157,7 @@ const CanvasInner: FC = () => {
 									deleteNodeIds: nodes.map((node) =>
 										Number.parseInt(node.id, 10),
 									),
-								}).then(({ deleteNodeIds }) => ({
-									deleteNodeIds: deleteNodeIds.map((id) => `${id}`),
-								})),
+								}),
 						});
 					}}
 					onNodeDragStop={(_event, _node, nodes) => {
@@ -144,25 +165,14 @@ const CanvasInner: FC = () => {
 							type: "updateNodesPosition",
 							optimisticData: {
 								nodes: nodes.map((node) => ({
-									nodeId: node.id,
+									id: Number.parseInt(node.id),
 									position: {
 										x: node.position.x,
 										y: node.position.y,
 									},
 								})),
 							},
-							action: (optimisticData) =>
-								updateNodesPosition({
-									nodes: optimisticData.nodes.map((node) => ({
-										...node,
-										id: Number.parseInt(node.nodeId, 10),
-									})),
-								}).then(({ nodes }) => ({
-									nodes: nodes.map((node) => ({
-										...node,
-										nodeId: `${node.id}`,
-									})),
-								})),
+							action: (optimisticData) => updateNodesPosition(optimisticData),
 						});
 					}}
 					onEdgesDelete={(edges) => {

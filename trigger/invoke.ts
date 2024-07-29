@@ -62,7 +62,7 @@ export const invokeTask = task({
 			logger.log(`${step.node.className} started!!`);
 			const dependedNodes = await getDependedNodes({
 				requestId: request.id,
-				nodeId: Number.parseInt(step.node.id, 10),
+				nodeId: step.node.id,
 			});
 			for (const dependedNode of dependedNodes) {
 				const resolver = getResolver(dependedNode.className);

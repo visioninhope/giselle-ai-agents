@@ -102,7 +102,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 		return {
 			id,
 			node: {
-				id: `${node.id}`,
+				id: node.id,
 				className: node.className,
 			},
 			status: requestStep.status,
@@ -115,13 +115,13 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 					.filter(({ nodeId }) => nodeId === node.id)
 					.map(({ content, portId }) => ({
 						value: content,
-						portId: `${portId}`,
+						portId,
 					})),
 				output: outputMessages
 					.filter(({ nodeId }) => nodeId === node.id)
 					.map(({ content, portId }) => ({
 						value: `${content}`,
-						portId: `${portId}`,
+						portId,
 					})),
 			},
 		};

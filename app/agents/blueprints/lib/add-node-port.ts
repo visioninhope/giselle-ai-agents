@@ -8,13 +8,17 @@ import {
 	portsBlueprints,
 } from "@/drizzle";
 import { and, desc, eq } from "drizzle-orm";
+import type { BlueprintPort } from "../blueprint";
 
 type AddNodePortArgs = {
 	blueprintId: number;
 	port: Pick<typeof ports.$inferInsert, "nodeId" | "name" | "direction">;
 };
 
-export const addNodePort = async ({ port, blueprintId }: AddNodePortArgs) => {
+export const addNodePort = async ({
+	port,
+	blueprintId,
+}: AddNodePortArgs): Promise<{ port: BlueprintPort }> => {
 	const lastPort = await db.query.ports.findFirst({
 		columns: { order: true },
 		where: eq(ports.nodeId, port.nodeId),
@@ -56,6 +60,11 @@ export const addNodePort = async ({ port, blueprintId }: AddNodePortArgs) => {
 	return {
 		port: {
 			id: insertedPort.id,
+			...port,
+			type: "data",
+			order,
+			nodeClassKey: null,
+			portsBlueprintsId: portBlueprint.id,
 		},
 	};
 };

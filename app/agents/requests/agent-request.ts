@@ -3,7 +3,7 @@ import type { RequestStatus, RequestStepStatus } from "@/drizzle/schema";
 export type Step = {
 	id: number;
 	node: {
-		id: string;
+		id: number;
 		className: string;
 	};
 	status: RequestStepStatus;
@@ -12,8 +12,8 @@ export type Step = {
 	};
 	requestStep: {
 		id: number;
-		input: Array<{ portId: string; value: string }>;
-		output: Array<{ portId: string; value: string }>;
+		input: Array<{ portId: number; value: string }>;
+		output: Array<{ portId: number; value: string }>;
 	};
 };
 

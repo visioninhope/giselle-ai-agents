@@ -1,11 +1,7 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
-import {
-	type NodeClassName,
-	type Port,
-	getNodeClass,
-} from "@/app/node-classes";
+import { type NodeClassName, getNodeClass } from "@/app/node-classes";
 import {
 	type NodeProperty,
 	type PortType,
@@ -159,7 +155,7 @@ export const addAgentNode = async (
 	);
 	return {
 		node: {
-			id: `${node.id}`,
+			id: node.id,
 			position: args.node.position,
 			className: args.node.className,
 			properties: [
@@ -171,15 +167,15 @@ export const addAgentNode = async (
 			],
 			inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
 				...port,
-				id: `${insertedPorts[index].id}`,
-				nodeId: `${nodeId}`,
+				id: insertedPorts[index].id,
+				nodeId: nodeId,
 				portsBlueprintsId: insertedPortsBlueprints[index].id,
 				nodeClassKey: port.nodeClassKey ?? null,
 			})),
 			outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
 				...port,
-				id: `${insertedPorts[index + inputPorts.length].id}`,
-				nodeId: `${nodeId}`,
+				id: insertedPorts[index + inputPorts.length].id,
+				nodeId: nodeId,
 				portsBlueprintsId:
 					insertedPortsBlueprints[index + inputPorts.length].id,
 				nodeClassKey: port.nodeClassKey ?? null,

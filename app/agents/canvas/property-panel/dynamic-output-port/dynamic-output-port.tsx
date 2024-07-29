@@ -11,7 +11,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
 import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
@@ -20,8 +19,7 @@ type DynamicOutputPortProps = {
 	node: Node;
 };
 export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
-	const { blueprint, mutate } = useBlueprint();
-	// const { addNodePort } = useAddNodePortAction();
+	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const heading = node.className === "onRequest" ? "Parameters" : "Output Port";
 	const [disclosure, setDisclosure] = useState(false);
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -30,7 +28,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 			setDisclosure(false);
 			const formData = new FormData(formEvent.currentTarget);
 			const draftPort: BlueprintPort = {
-				id: createId(),
+				id: createTemporaryId(),
 				nodeId: node.id,
 				name: formData.get("name") as string,
 				type: "data",
@@ -48,16 +46,14 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({ node }) => {
 					addNodePort({
 						blueprintId: blueprint.id,
 						port: {
-							nodeId: Number.parseInt(node.id, 10),
+							nodeId: node.id,
 							name: draftPort.name,
 							direction: "output",
 						},
-					}).then((result) => ({
-						port: { ...draftPort, id: `${result.port.id}` },
-					})),
+					}),
 			});
 		},
-		[mutate, blueprint.id, node.id],
+		[mutate, blueprint.id, node.id, createTemporaryId],
 	);
 	return (
 		<div>

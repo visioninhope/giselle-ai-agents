@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	type PropsWithChildren,
 	createContext,
@@ -5,6 +7,7 @@ import {
 	useContext,
 	useOptimistic,
 	useReducer,
+	useState,
 	useTransition,
 } from "react";
 import { match } from "ts-pattern";
@@ -16,26 +19,18 @@ import {
 	reviewRequiredActions,
 } from "..";
 
-type AddNode = { type: "addNode"; node: Node };
-type UpdateNodesPosition = {
-	type: "updateNodesPosition";
-	nodes: Array<{
-		nodeId: string;
-		position: { x: number; y: number };
-	}>;
-};
 type BlueprintAction =
 	| { type: "addNode"; node: Node }
 	| {
 			type: "updateNodesPosition";
 			nodes: Array<{
-				nodeId: string;
+				id: number;
 				position: { x: number; y: number };
 			}>;
 	  }
 	| {
 			type: "deleteNodes";
-			deleteNodeIds: Array<string>;
+			deleteNodeIds: Array<number>;
 	  }
 	| {
 			type: "connectNodes";
@@ -48,7 +43,7 @@ type BlueprintAction =
 	| {
 			type: "updateNodeProperty";
 			node: {
-				id: string;
+				id: number;
 				property: {
 					name: string;
 					value: string;
@@ -61,12 +56,12 @@ type BlueprintAction =
 	  }
 	| {
 			type: "updatePortName";
-			portId: string;
+			portId: number;
 			name: string;
 	  }
 	| {
 			type: "deletePort";
-			deletePortId: string;
+			deletePortId: number;
 	  };
 
 type BlueprintActionType = BlueprintAction["type"];
@@ -89,6 +84,7 @@ const BlueprintContext = createContext<{
 		args: MutateBlueprintArgs<T, D>,
 	) => void;
 	isPending: boolean;
+	createTemporaryId: () => number;
 } | null>(null);
 
 const reducer = (state: Blueprint, action: BlueprintAction) =>
@@ -100,9 +96,7 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 		.with({ type: "updateNodesPosition" }, ({ nodes }) => ({
 			...state,
 			nodes: state.nodes.map((stateNode) => {
-				const node = nodes.find(
-					({ nodeId }) => `${nodeId}` === `${stateNode.id}`,
-				);
+				const node = nodes.find(({ id }) => id === stateNode.id);
 				return node
 					? {
 							...stateNode,
@@ -241,6 +235,8 @@ type BlueprintProviderProps = {
 	blueprint: Blueprint;
 };
 
+let temporaryIndex = 0;
+
 export const BlueprintProvider: React.FC<
 	PropsWithChildren<BlueprintProviderProps>
 > = ({ blueprint: defaultBlueprint, children }) => {
@@ -265,8 +261,20 @@ export const BlueprintProvider: React.FC<
 		},
 		[setOptimisticBlueprint],
 	);
+	/** @todo description the intent */
+	const createTemporaryId = useCallback(() => {
+		temporaryIndex = temporaryIndex - 1;
+		return temporaryIndex;
+	}, []);
 	return (
-		<BlueprintContext.Provider value={{ blueprint, mutate, isPending }}>
+		<BlueprintContext.Provider
+			value={{
+				blueprint: optimisticBlueprint,
+				mutate,
+				isPending,
+				createTemporaryId,
+			}}
+		>
 			{children}
 		</BlueprintContext.Provider>
 	);

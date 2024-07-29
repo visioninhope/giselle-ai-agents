@@ -48,7 +48,6 @@ const waitForRun = async (
 };
 
 export const invoke: InvokeFunction = async ({ request, id, node }) => {
-	const nodeId = Number.parseInt(node.id, 10);
 	const messages = await db
 		.with(pullMessages)
 		.select({
@@ -63,7 +62,7 @@ export const invoke: InvokeFunction = async ({ request, id, node }) => {
 		.where(
 			and(
 				eq(pullMessages.requestId, request.id),
-				eq(pullMessages.nodeId, Number.parseInt(node.id, 10)),
+				eq(pullMessages.nodeId, node.id),
 			),
 		);
 	const [relevantAgent] = await db
@@ -72,7 +71,10 @@ export const invoke: InvokeFunction = async ({ request, id, node }) => {
 			blueprintId: nodeRepresentedAgents.representedBlueprintId,
 		})
 		.from(agents)
-		.innerJoin(nodeRepresentedAgents, eq(nodeRepresentedAgents.nodeId, nodeId));
+		.innerJoin(
+			nodeRepresentedAgents,
+			eq(nodeRepresentedAgents.nodeId, node.id),
+		);
 	const [firstStep] = await db
 		.select({ id: steps.id })
 		.from(steps)

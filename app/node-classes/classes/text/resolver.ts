@@ -24,7 +24,7 @@ export const resolver: Resolver = async ({ requestId, nodeId, blueprint }) => {
 				eq(pullMessages.nodeId, nodeId),
 			),
 		);
-	const node = blueprint.nodes.find(({ id }) => id === `${nodeId}`);
+	const node = blueprint.nodes.find(({ id }) => id === nodeId);
 	invariant(node, `node not found: ${nodeId}`);
 	for (const property of node.properties) {
 		if (property.value == null) {
@@ -52,9 +52,7 @@ export const resolver: Resolver = async ({ requestId, nodeId, blueprint }) => {
 				logger.log(`inputPort not found for ${node.className}.${match[0]}`);
 				continue;
 			}
-			const message = messages.find(
-				({ portId }) => portId === Number.parseInt(inputPort.id, 10),
-			);
+			const message = messages.find(({ portId }) => portId === inputPort.id);
 			if (message == null) {
 				logger.log(
 					`message not found for ${node.className}.${inputPort.name}, ${inputPort.id}`,

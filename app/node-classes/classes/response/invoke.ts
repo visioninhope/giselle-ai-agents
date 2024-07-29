@@ -15,7 +15,7 @@ export const invoke: InvokeFunction = async ({ request, id, node }) => {
 		.where(
 			and(
 				eq(pullMessages.requestId, request.id),
-				eq(pullMessages.nodeId, Number.parseInt(node.id, 10)),
+				eq(pullMessages.nodeId, node.id),
 			),
 		);
 	logger.log(`messages: ${JSON.stringify(messages)}`);

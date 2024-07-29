@@ -20,7 +20,7 @@ type DynamicInputPortProps = {
 	node: Node;
 };
 export const DynamicInputPort: FC<DynamicInputPortProps> = ({ node }) => {
-	const { blueprint, mutate } = useBlueprint();
+	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const [disclosure, setDisclosure] = useState(false);
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(formEvent) => {
@@ -28,7 +28,7 @@ export const DynamicInputPort: FC<DynamicInputPortProps> = ({ node }) => {
 			setDisclosure(false);
 			const formData = new FormData(formEvent.currentTarget);
 			const draftPort: BlueprintPort = {
-				id: createId(),
+				id: createTemporaryId(),
 				nodeId: node.id,
 				name: formData.get("name") as string,
 				type: "data",
@@ -46,16 +46,14 @@ export const DynamicInputPort: FC<DynamicInputPortProps> = ({ node }) => {
 					addNodePort({
 						blueprintId: blueprint.id,
 						port: {
-							nodeId: Number.parseInt(node.id, 10),
+							nodeId: node.id,
 							name: draftPort.name,
 							direction: "input",
 						},
-					}).then((result) => ({
-						port: { ...draftPort, id: `${result.port.id}` },
-					})),
+					}),
 			});
 		},
-		[mutate, blueprint.id, node.id],
+		[mutate, blueprint.id, node.id, createTemporaryId],
 	);
 	return (
 		<div>

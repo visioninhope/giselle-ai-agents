@@ -14,7 +14,7 @@ export const buildBlueprint = async (blueprint: Blueprint) => {
 		.insert(stepsSchema)
 		.values(
 			inferedSteps.map(({ nodeId, order }) => ({
-				nodeId: Number.parseInt(nodeId, 10),
+				nodeId,
 				order,
 				blueprintId: blueprint.id,
 			})),

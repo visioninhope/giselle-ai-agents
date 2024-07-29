@@ -64,7 +64,7 @@ export const RequestButton: FC = () => {
 				{blueprint.requestInterface?.input.map(({ portId, name }) => (
 					<div key={portId}>
 						<Label htmlFor={`${portId}`}>{name}</Label>
-						<Textarea id={`${portId}`} name={portId} required />
+						<Textarea id={`${portId}`} name={`${portId}`} required />
 					</div>
 				))}
 			</div>

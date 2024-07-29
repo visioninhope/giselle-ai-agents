@@ -1,13 +1,31 @@
 import { useBlueprint } from "@/app/agents/blueprints";
 import type { EdgeType } from "@/drizzle";
-import type { Connection, Edge } from "@xyflow/react";
+import type {
+	Connection as XYFlowConnection,
+	Edge as XYFlowEdge,
+} from "@xyflow/react";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
+
+type Connection = {
+	source: number;
+	sourceHandle: number;
+	target: number;
+	targetHandle: number;
+};
+export const convertXyFlowConnection = (
+	xyFlowConnection: XYFlowConnection,
+): Connection => ({
+	source: Number.parseInt(xyFlowConnection.source, 10),
+	sourceHandle: Number.parseInt(xyFlowConnection.sourceHandle ?? "", 10),
+	target: Number.parseInt(xyFlowConnection.target, 10),
+	targetHandle: Number.parseInt(xyFlowConnection.targetHandle ?? "", 10),
+});
 
 export const useInfereceConnectionEdgeType = () => {
 	const { blueprint } = useBlueprint();
 	const getPorts = useCallback(
-		({ source, sourceHandle, target, targetHandle }: Connection | Edge) => {
+		({ source, sourceHandle, target, targetHandle }: Connection) => {
 			const sourceNode = blueprint.nodes.find((node) => node.id === source);
 			const sourcePort = sourceNode?.outputPorts.find(
 				(port) => port.id === sourceHandle,
@@ -30,7 +48,7 @@ export const useInfereceConnectionEdgeType = () => {
 		[blueprint],
 	);
 	const validateConnection = useCallback(
-		(connection: Connection | Edge) => {
+		(connection: Connection) => {
 			const ports = getPorts(connection);
 			if (ports == null) {
 				return false;
@@ -40,7 +58,7 @@ export const useInfereceConnectionEdgeType = () => {
 		[getPorts],
 	);
 	const inferConnectionEdgeType = useCallback(
-		(connection: Connection | Edge): EdgeType => {
+		(connection: Connection): EdgeType => {
 			const ports = getPorts(connection);
 			invariant(ports.inputPort != null, "Ports not found");
 			return ports.inputPort.type;

@@ -8,7 +8,7 @@ export const useNodeSelection = () => {
 	const [selectedNodes, setSelectedNodes] = useState<Node[]>([]);
 
 	const addSelectedNodes = useCallback(
-		(addNodeIds: string[]) => {
+		(addNodeIds: number[]) => {
 			setSelectedNodes((prev) => {
 				return [
 					...prev,
@@ -27,7 +27,7 @@ export const useNodeSelection = () => {
 		},
 		[blueprint],
 	);
-	const removeSelectedNodes = useCallback((removeNodeIds: string[]) => {
+	const removeSelectedNodes = useCallback((removeNodeIds: number[]) => {
 		setSelectedNodes((selectedNodes) =>
 			selectedNodes.filter((node) => !removeNodeIds.includes(node.id)),
 		);
@@ -46,11 +46,11 @@ export const useNodeSelection = () => {
 
 			const selectedNodes = changeSelectNodes
 				.filter((changeSelectNode) => changeSelectNode.selected)
-				.map((selectedNode) => selectedNode.id);
+				.map((selectedNode) => Number.parseInt(selectedNode.id));
 			addSelectedNodes(selectedNodes);
 			const deselectedNodes = changeSelectNodes
 				.filter((changeSelectNode) => !changeSelectNode.selected)
-				.map((deselectedNode) => deselectedNode.id);
+				.map((deselectedNode) => Number.parseInt(deselectedNode.id, 10));
 			removeSelectedNodes(deselectedNodes);
 		},
 		[addSelectedNodes, removeSelectedNodes],
