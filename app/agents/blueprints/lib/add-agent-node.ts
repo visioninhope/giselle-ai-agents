@@ -168,14 +168,14 @@ export const addAgentNode = async (
 			inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
 				...port,
 				id: insertedPorts[index].id,
-				nodeId: nodeId,
+				nodeId,
 				portsBlueprintsId: insertedPortsBlueprints[index].id,
 				nodeClassKey: port.nodeClassKey ?? null,
 			})),
 			outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
 				...port,
 				id: insertedPorts[index + inputPorts.length].id,
-				nodeId: nodeId,
+				nodeId,
 				portsBlueprintsId:
 					insertedPortsBlueprints[index + inputPorts.length].id,
 				nodeClassKey: port.nodeClassKey ?? null,

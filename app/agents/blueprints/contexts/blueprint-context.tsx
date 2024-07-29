@@ -130,17 +130,13 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 			...state,
 			edges: state.edges.filter(
 				(edge) =>
-					!deleteEdgeIds.some(
-						(deleteEdgeId) => `${deleteEdgeId}` === `${edge.id}`,
-					),
+					!deleteEdgeIds.some((deleteEdgeId) => deleteEdgeId === edge.id),
 			),
 			requiredActions: reviewRequiredActions({
 				...state,
 				edges: state.edges.filter(
 					(edge) =>
-						!deleteEdgeIds.some(
-							(deleteEdgeId) => `${deleteEdgeId}` === `${edge.id}`,
-						),
+						!deleteEdgeIds.some((deleteEdgeId) => deleteEdgeId === edge.id),
 				),
 			}),
 		}))

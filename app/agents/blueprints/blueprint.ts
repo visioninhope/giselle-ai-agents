@@ -7,12 +7,7 @@ type DbNode = typeof schema.nodes.$inferSelect;
 type DbPort = typeof schema.ports.$inferSelect;
 type DbEdge = typeof schema.edges.$inferSelect;
 type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
-export type BlueprintPort = Pick<
-	DbPort,
-	"type" | "name" | "direction" | "order" | "nodeClassKey"
-> & {
-	id: number;
-	nodeId: number;
+export type BlueprintPort = DbPort & {
 	isCreating?: boolean;
 	portsBlueprintsId: DbPortsBlueprints["id"];
 };
