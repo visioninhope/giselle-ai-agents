@@ -29,6 +29,9 @@ export const useSynthsize = () => {
 					id: `${node.id}`,
 					type: "v3",
 					position,
+					draggable: !isCreating,
+					selectable: !isCreating,
+					connectable: !isCreating,
 					data: {
 						id: `${node.id}`,
 						className,
