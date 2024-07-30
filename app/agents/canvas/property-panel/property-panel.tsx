@@ -48,7 +48,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ node }) => {
 	);
 	const { blueprint } = useBlueprint();
 	const blueprintNode = useMemo(
-		() => blueprint.nodes.find(({ id }) => node.id),
+		() => blueprint.nodes.find(({ id }) => id === node.id),
 		[blueprint.nodes, node.id],
 	);
 	if (blueprintNode == null) {
