@@ -1,11 +1,13 @@
 "use server";
 
+import { type AuthError, createClient } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase";
-
-export async function login(formData: FormData) {
+export async function login(
+	prevState: AuthError | null,
+	formData: FormData,
+): Promise<AuthError | null> {
 	const supabase = createClient();
 
 	// type-casting here for convenience
@@ -18,10 +20,14 @@ export async function login(formData: FormData) {
 	const { error } = await supabase.auth.signInWithPassword(data);
 
 	if (error) {
-		console.log(error);
-		redirect("/error");
+		return {
+			code: error.code,
+			status: error.status,
+			message: error.message,
+			name: error.name,
+		};
 	}
 
-	revalidatePath("/", "layout");
 	redirect("/");
+	return null;
 }
