@@ -38,7 +38,9 @@ export const supabaseMiddleware = (
 
 		const {
 			data: { user },
+			error,
 		} = await supabase.auth.getUser();
+		console.log(JSON.stringify({ error }));
 		const response = guardCallback?.(user, request);
 		if (response != null) {
 			return response;

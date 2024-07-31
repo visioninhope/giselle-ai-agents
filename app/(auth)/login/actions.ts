@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 
 import { createClient } from "@/lib/supabase";
 
-export async function signup(formData: FormData) {
+export async function login(formData: FormData) {
 	const supabase = createClient();
 
 	// type-casting here for convenience
@@ -15,13 +15,13 @@ export async function signup(formData: FormData) {
 		password: formData.get("password") as string,
 	};
 
-	const { error } = await supabase.auth.signUp(data);
+	const { error } = await supabase.auth.signInWithPassword(data);
 
 	if (error) {
-		console.log(JSON.stringify(error));
+		console.log(error);
 		redirect("/error");
 	}
 
-	revalidatePath("/agents", "layout");
-	redirect("/agents");
+	revalidatePath("/", "layout");
+	redirect("/");
 }
