@@ -2,8 +2,7 @@
 
 import { redirect } from "next/navigation";
 
-import { createClient } from "@/lib/supabase";
-import type { AuthError } from "@supabase/auth-js";
+import { type AuthError, createClient } from "@/lib/supabase";
 import { cookies } from "next/headers";
 
 export async function signup(prevState: AuthError | null, formData: FormData) {
