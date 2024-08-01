@@ -13,8 +13,8 @@ export default function EmailConfirmationPage() {
 				<div className="grid gap-2 text-center">
 					<h1 className="text-3xl font-bold">Verify Your Email</h1>
 					<p className="text-balance text-muted-foreground">
-						We've sent a one-time password to your email({verificationEmail}).
-						Please enter it below to complete your registration.
+						We've sent a one-time password to your email. Please enter it below
+						to complete your registration.
 					</p>
 				</div>
 				<VerifyEmailForm verificationEmail={verificationEmail} />
