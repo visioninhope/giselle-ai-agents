@@ -7,7 +7,7 @@ export const supabaseMiddleware = (
 		user: User | null,
 		request: NextRequest,
 		// biome-ignore lint/suspicious/noConfusingVoidType:
-	) => NextResponse | void,
+	) => Promise<NextResponse | void>,
 ) => {
 	return async (request: NextRequest) => {
 		let supabaseResponse = NextResponse.next({

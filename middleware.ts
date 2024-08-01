@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
+import { getUserInitializationTask } from "./app/(auth)/lib";
 import { supabaseMiddleware } from "./lib/supabase";
 
-export default supabaseMiddleware((user, request) => {
+export default supabaseMiddleware(async (user, request) => {
 	if (
 		!user &&
 		!request.nextUrl.pathname.startsWith("/login") &&
@@ -12,6 +13,12 @@ export default supabaseMiddleware((user, request) => {
 		const url = request.nextUrl.clone();
 		url.pathname = "/login";
 		return NextResponse.redirect(url);
+	}
+	if (user != null) {
+		const task = await getUserInitializationTask({ supabaseUserId: user.id });
+		if (task.status !== "COMPLETED") {
+			return NextResponse.redirect("/account-initializing");
+		}
 	}
 });
 

@@ -1,4 +1,3 @@
-import "@/drizzle/envConfig";
 import { sql } from "@vercel/postgres";
 import { and, eq } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/vercel-postgres";
