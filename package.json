@@ -13,8 +13,6 @@
 	},
 	"packageManager": "bun@1.1.17",
 	"dependencies": {
-		"@clerk/elements": "0.10.7",
-		"@clerk/nextjs": "5.2.8",
 		"@next/env": "14.2.5",
 		"@paralleldrive/cuid2": "2.2.2",
 		"@radix-ui/react-accordion": "^1.2.0",
