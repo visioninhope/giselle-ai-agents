@@ -10,14 +10,14 @@ export async function signup(prevState: AuthError | null, formData: FormData) {
 
 	// type-casting here for convenience
 	// in practice, you should validate your inputs
-	const data = {
+	const credentials = {
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
 	};
 
-	const { error } = await supabase.auth.signUp(data);
+	const { error } = await supabase.auth.signUp(credentials);
 
-	if (error) {
+	if (error != null) {
 		return {
 			code: error.code,
 			status: error.status,
@@ -25,8 +25,7 @@ export async function signup(prevState: AuthError | null, formData: FormData) {
 			name: error.name,
 		};
 	}
-
-	cookies().set("verification-email", data.email, {
+	cookies().set("verification-email", credentials.email, {
 		httpOnly: true,
 		secure: true,
 		maxAge: 60,
