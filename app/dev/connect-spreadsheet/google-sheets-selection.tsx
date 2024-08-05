@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import type React from "react";
+import { useState } from "react";
 
 const drives = [
 	{ id: "1", name: "My Drive" },
@@ -25,13 +26,13 @@ export function GoogleSheetsSelection() {
 	const [selectedSheet, setSelectedSheet] = useState("");
 	const [selectedWorksheet, setSelectedWorksheet] = useState("");
 
-	const handleDriveChange = (e) => {
+	const handleDriveChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedDrive(e.target.value);
 		setSelectedSheet("");
 		setSelectedWorksheet("");
 	};
 
-	const handleSheetChange = (e) => {
+	const handleSheetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedSheet(e.target.value);
 		setSelectedWorksheet("");
 	};
