@@ -16,8 +16,13 @@ export default supabaseMiddleware(async (user, request) => {
 	}
 	if (user != null) {
 		const task = await getUserInitializationTask({ supabaseUserId: user.id });
-		if (task.status !== "COMPLETED") {
-			return NextResponse.redirect("/account-initializing");
+		if (
+			task.status !== "COMPLETED" &&
+			!request.nextUrl.pathname.startsWith("/account-initialization")
+		) {
+			const url = request.nextUrl.clone();
+			url.pathname = "/account-initialization";
+			return NextResponse.redirect(url);
 		}
 	}
 });
