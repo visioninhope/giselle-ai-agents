@@ -1,11 +1,30 @@
-import { clerkMiddleware, createRouteMatcher } from "@clerk/nextjs/server";
+import { NextResponse } from "next/server";
+import { getUserInitializationTask } from "./app/(auth)/lib";
+import { supabaseMiddleware } from "./lib/supabase";
 export { auth as middleware } from "@/app/dev/connect-spreadsheet/_utils/auth"; // https://authjs.dev/getting-started/installation?framework=next.js#configure
 
-const isPublicRoute = createRouteMatcher(["/sign-in(.*)", "/sign-up(.*)"]);
-
-export default clerkMiddleware((auth, request) => {
-	if (!isPublicRoute(request)) {
-		auth().protect();
+export default supabaseMiddleware(async (user, request) => {
+	if (
+		!user &&
+		!request.nextUrl.pathname.startsWith("/login") &&
+		!request.nextUrl.pathname.startsWith("/signup") &&
+		!request.nextUrl.pathname.startsWith("/verify-email")
+	) {
+		// no user, potentially respond by redirecting the user to the login page
+		const url = request.nextUrl.clone();
+		url.pathname = "/login";
+		return NextResponse.redirect(url);
+	}
+	if (user != null) {
+		const task = await getUserInitializationTask({ supabaseUserId: user.id });
+		if (
+			task.status !== "COMPLETED" &&
+			!request.nextUrl.pathname.startsWith("/account-initialization")
+		) {
+			const url = request.nextUrl.clone();
+			url.pathname = "/account-initialization";
+			return NextResponse.redirect(url);
+		}
 	}
 });
 
