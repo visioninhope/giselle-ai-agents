@@ -1,5 +1,5 @@
-import { GoogleSessionButton } from "./GoogleSessionButton";
 import { auth } from "./_utils/auth";
+import { GoogleSessionButton } from "./google-session-button";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
 export default async function ConnectSpreadsheetPage() {
