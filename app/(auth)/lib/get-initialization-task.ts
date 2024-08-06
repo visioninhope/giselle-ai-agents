@@ -1,3 +1,5 @@
+"use server";
+
 import { db, supabaseUserMappings, userInitialTasks } from "@/drizzle";
 import { runs } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";

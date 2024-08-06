@@ -40,7 +40,7 @@ export async function login(
 		.where(eq(supabaseUserMappings.supabaseUserId, data.user.id));
 	const run = await runs.retrieve(task.id);
 	if (run.status === "COMPLETED") {
-		redirect("/");
+		redirect("/agents");
 		return null;
 	}
 	redirect("/initializing-account");

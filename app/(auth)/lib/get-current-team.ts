@@ -1,3 +1,5 @@
+"use server";
+
 import { db, supabaseUserMappings, teamMemberships, teams } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
