@@ -28,9 +28,7 @@ async function fetchDrives(session: Session | null) {
 	if (!res.ok) {
 		const errorDetail = await res.json();
 		console.error("Error fetching team drives:", errorDetail);
-		return new Response(JSON.stringify(errorDetail), {
-			status: res.status,
-		});
+		return [];
 	}
 
 	const { drives } = await res.json();
@@ -113,10 +111,10 @@ async function fetchSheets(session: Session | null, sheetId: string) {
 
 export default async function ConnectSpreadsheetPage() {
 	const session = await auth();
-	console.log("session", session);
+	// console.log("session", session);
 
 	const drives = await fetchDrives(session);
-	console.log("drives", drives);
+	// console.log("drives", drives);
 
 	const drivesWithSpreadsheets = await Promise.all(
 		drives.map(async (drive: any) => {
@@ -129,13 +127,13 @@ export default async function ConnectSpreadsheetPage() {
 		}),
 	);
 
-	console.log(
-		"drivesWithSpreadsheets",
-		JSON.stringify(drivesWithSpreadsheets, null, 2),
-	);
+	// console.log(
+	// 	"drivesWithSpreadsheets",
+	// 	JSON.stringify(drivesWithSpreadsheets, null, 2),
+	// );
 
 	// drivesWithSpreadsheets に spreadsheets が含まれているので、これをループして、さらに sheets 一覧を取得する
-	const result = await Promise.all(
+	const data = await Promise.all(
 		drivesWithSpreadsheets.map(async (driveWithSpreadsheets) => {
 			const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;
 
@@ -154,7 +152,7 @@ export default async function ConnectSpreadsheetPage() {
 		}),
 	);
 
-	console.log("result", JSON.stringify(result, null, 2));
+	// console.log("data", JSON.stringify(data, null, 2));
 
 	return (
 		<>
@@ -171,7 +169,7 @@ export default async function ConnectSpreadsheetPage() {
 			)}
 
 			<GoogleSessionButton session={session} />
-			<GoogleSheetsSelection />
+			<GoogleSheetsSelection data={data} />
 		</>
 	);
 }

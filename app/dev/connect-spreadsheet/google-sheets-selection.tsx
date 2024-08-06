@@ -3,39 +3,48 @@
 import type React from "react";
 import { useState } from "react";
 
-const drives = [
-	{ id: "1", name: "My Drive" },
-	{ id: "2", name: "Shared Drive" },
-	{ id: "3", name: "Team Drive" },
-];
-
-const sheets = [
-	{ id: "1", name: "Budget 2024" },
-	{ id: "2", name: "Project Tracker" },
-	{ id: "3", name: "Employee Records" },
-];
-
-const worksheets = [
-	{ id: "1", name: "January" },
-	{ id: "2", name: "February" },
-	{ id: "3", name: "March" },
-];
-
-export function GoogleSheetsSelection() {
+export function GoogleSheetsSelection({ data }: { data: any }) {
 	const [selectedDrive, setSelectedDrive] = useState("");
+	const [selectedSpreadsheet, setSelectedSpreadsheet] = useState("");
 	const [selectedSheet, setSelectedSheet] = useState("");
-	const [selectedWorksheet, setSelectedWorksheet] = useState("");
 
 	const handleDriveChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedDrive(e.target.value);
+		setSelectedSpreadsheet("");
 		setSelectedSheet("");
-		setSelectedWorksheet("");
+	};
+
+	const handleSpreadsheetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+		setSelectedSpreadsheet(e.target.value);
+		setSelectedSheet("");
 	};
 
 	const handleSheetChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
 		setSelectedSheet(e.target.value);
-		setSelectedWorksheet("");
 	};
+
+	const drives = data.map((drive: any) => ({
+		id: drive.driveId,
+		name: drive.driveName,
+	}));
+
+	const selectedDriveData = data.find(
+		(drive: any) => drive.driveId === selectedDrive,
+	);
+
+	const spreadsheets = selectedDriveData?.spreadsheets.map((sheet: any) => ({
+		id: sheet.sheetId,
+		name: sheet.sheetName,
+	}));
+
+	const selectedSpreadsheetData = selectedDriveData?.spreadsheets.find(
+		(sheet: any) => sheet.sheetId === selectedSpreadsheet,
+	);
+
+	const sheets = selectedSpreadsheetData?.sheets.map((sheet: any) => ({
+		id: sheet.properties.sheetId,
+		title: sheet.properties.title,
+	}));
 
 	return (
 		<div className="p-4 space-y-4">
@@ -53,7 +62,7 @@ export function GoogleSheetsSelection() {
 					className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 				>
 					<option value="">Choose a drive</option>
-					{drives.map((drive) => (
+					{drives.map((drive: any) => (
 						<option key={drive.id} value={drive.id}>
 							{drive.name}
 						</option>
@@ -67,42 +76,42 @@ export function GoogleSheetsSelection() {
 						htmlFor="sheet-select"
 						className="block text-sm font-medium text-gray-700 mb-1"
 					>
-						Select a Sheet
+						Select a SpreadSheet
 					</label>
 					<select
 						id="sheet-select"
-						value={selectedSheet}
-						onChange={handleSheetChange}
+						value={selectedSpreadsheet}
+						onChange={handleSpreadsheetChange}
 						className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 					>
 						<option value="">Choose a sheet</option>
-						{sheets.map((sheet) => (
-							<option key={sheet.id} value={sheet.id}>
-								{sheet.name}
+						{spreadsheets.map((spreadsheet: any) => (
+							<option key={spreadsheet.id} value={spreadsheet.id}>
+								{spreadsheet.name}
 							</option>
 						))}
 					</select>
 				</div>
 			)}
 
-			{selectedSheet && (
+			{selectedSpreadsheet && (
 				<div>
 					<label
 						htmlFor="worksheet-select"
 						className="block text-sm font-medium text-gray-700 mb-1"
 					>
-						Select a Worksheet
+						Select a sheet
 					</label>
 					<select
 						id="worksheet-select"
-						value={selectedWorksheet}
-						onChange={(e) => setSelectedWorksheet(e.target.value)}
+						value={selectedSheet}
+						onChange={handleSheetChange}
 						className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 					>
-						<option value="">Choose a worksheet</option>
-						{worksheets.map((worksheet) => (
-							<option key={worksheet.id} value={worksheet.id}>
-								{worksheet.name}
+						<option value="">Choose a sheet</option>
+						{sheets.map((sheet: any) => (
+							<option key={sheet.id} value={sheet.id}>
+								{sheet.title}
 							</option>
 						))}
 					</select>
