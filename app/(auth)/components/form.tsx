@@ -8,7 +8,6 @@ import type { AuthError } from "@/lib/supabase";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import type { FC } from "react";
-import { useFormState, useFormStatus } from "react-dom";
 
 type FormProps = {
 	authError: AuthError | null;
