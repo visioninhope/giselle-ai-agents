@@ -30,24 +30,26 @@ export default async function Page() {
 		redirect(`/agents/${urlId}`);
 	};
 	return (
-		<section className="mx-auto w-[800px] text-foreground mt-[100px]">
-			<div className="flex flex-col gap-8">
-				<div className="flex justify-between">
-					<h1>Agents</h1>
-					<form action={createAgent}>
-						<Button type="submit">Create new agent</Button>
-					</form>
+		<div className="container mt-8">
+			<section className="text-foreground">
+				<div className="flex flex-col gap-8">
+					<div className="flex justify-between">
+						<h1>Agents</h1>
+						<form action={createAgent}>
+							<Button type="submit">Create new agent</Button>
+						</form>
+					</div>
+					{agents.map(({ id, urlId, name }) => (
+						<a
+							key={id}
+							className="border border-border p-4"
+							href={`/agents/${urlId}`}
+						>
+							{name ?? "Untitled"}
+						</a>
+					))}
 				</div>
-				{agents.map(({ id, urlId, name }) => (
-					<a
-						key={id}
-						className="border border-border p-4"
-						href={`/agents/${urlId}`}
-					>
-						{name ?? "Untitled"}
-					</a>
-				))}
-			</div>
-		</section>
+			</section>
+		</div>
 	);
 }
