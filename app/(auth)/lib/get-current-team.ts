@@ -13,6 +13,7 @@ export const getCurrentTeam = async () => {
 		.innerJoin(
 			supabaseUserMappings,
 			eq(supabaseUserMappings.userId, teamMemberships.userId),
-		);
+		)
+		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 	return team;
 };
