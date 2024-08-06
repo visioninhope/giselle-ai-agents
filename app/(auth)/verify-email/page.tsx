@@ -1,9 +1,7 @@
 import { cookies } from "next/headers";
 import { VerifyEmailForm } from "./verify-email-form";
 export default function EmailConfirmationPage() {
-	const verificationEmail =
-		cookies().get("verification-email")?.value ||
-		"satoshi.toyama+a1@route06.co.jp";
+	const verificationEmail = cookies().get("verification-email")?.value;
 	if (verificationEmail == null) {
 		throw new Error("Unexpected error: Please retry the registration process");
 	}

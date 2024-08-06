@@ -60,6 +60,9 @@ export const agents = pgTable(
 		id: serial("id").primaryKey(),
 		name: text("name"),
 		urlId: text("url_id").notNull(),
+		teamId: integer("team_id")
+			.notNull()
+			.references(() => teams.id),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(agents) => {
