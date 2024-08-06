@@ -15,6 +15,15 @@ export async function signup(prevState: AuthError | null, formData: FormData) {
 		password: formData.get("password") as string,
 	};
 
+	if (!credentials.email.endsWith("@route06.co.jp")) {
+		return {
+			code: "invalid_email_domain",
+			status: 400,
+			message: "Invalid email domain.",
+			name: "InvalidEmailDomainError",
+		};
+	}
+
 	const { error } = await supabase.auth.signUp(credentials);
 
 	if (error != null) {
