@@ -70,10 +70,45 @@ async function fetchSpreadSheets(session: Session | null, driveId: string) {
 	const { files } = await res.json();
 
 	const spreadsheets = files.filter(
-		(file) => file.mimeType === "application/vnd.google-apps.spreadsheet",
+		(file: any) => file.mimeType === "application/vnd.google-apps.spreadsheet",
 	);
 
 	return spreadsheets;
+}
+
+async function fetchSheets(session: Session | null, sheetId: string) {
+	if (!session) {
+		console.error("Not authenticated", { status: 401 });
+		return [];
+	}
+
+	if (!(session.accessToken && typeof session.accessToken === "string")) {
+		console.error("Not authenticated", { status: 401 });
+		return [];
+	}
+
+	const accessToken = session.accessToken as string;
+
+	// Google Sheets APIを使用してスプレッドシートのシート一覧を取得
+	// https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get
+	const res = await fetch(
+		`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`,
+		{
+			headers: {
+				Authorization: `Bearer ${accessToken}`,
+			},
+		},
+	);
+
+	if (!res.ok) {
+		const errorDetail = await res.json();
+		console.error("Error fetching sheets:", errorDetail);
+		return [];
+	}
+
+	const { sheets } = await res.json();
+
+	return sheets;
 }
 
 export default async function ConnectSpreadsheetPage() {
@@ -98,6 +133,28 @@ export default async function ConnectSpreadsheetPage() {
 		"drivesWithSpreadsheets",
 		JSON.stringify(drivesWithSpreadsheets, null, 2),
 	);
+
+	// drivesWithSpreadsheets に spreadsheets が含まれているので、これをループして、さらに sheets 一覧を取得する
+	const result = await Promise.all(
+		drivesWithSpreadsheets.map(async (driveWithSpreadsheets) => {
+			const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;
+
+			const spreadsheetsWithSheets = await Promise.all(
+				spreadsheets.map(async (spreadsheet: any) => {
+					const sheetId = spreadsheet.id;
+					const sheetName = spreadsheet.name;
+
+					const sheets = await fetchSheets(session, sheetId);
+
+					return { sheetId, sheetName, sheets };
+				}),
+			);
+
+			return { driveId, driveName, spreadsheets: spreadsheetsWithSheets };
+		}),
+	);
+
+	console.log("result", JSON.stringify(result, null, 2));
 
 	return (
 		<>
