@@ -1,10 +1,16 @@
+import { getCurrentTeam } from "@/app/(auth)";
 import { Button } from "@/components/ui/button";
 import { agents as agentsTable, blueprints, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export default async function Page() {
-	const agents = await db.query.agents.findMany();
+	const team = await getCurrentTeam();
+	const agents = await db
+		.select()
+		.from(agentsTable)
+		.where(eq(agentsTable.teamId, team.id));
 	const createAgent = async () => {
 		"use server";
 		const urlId = createId();
@@ -12,6 +18,7 @@ export default async function Page() {
 			.insert(agentsTable)
 			.values({
 				urlId: urlId,
+				teamId: team.id,
 			})
 			.returning({
 				insertedId: agentsTable.id,
