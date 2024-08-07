@@ -33,7 +33,7 @@ export default async function Layout({
 	const latestBlueprint = await getLatestBlueprint(params.urlId);
 	const blueprint = await getBlueprint(latestBlueprint.id);
 	return (
-		<div className="w-screen h-screen flex flex-col">
+		<div className="w-full flex flex-col">
 			<AgentProvider agent={agent}>
 				<BlueprintProvider blueprint={blueprint}>
 					<NodeClassesProvider nodeClasses={getNodeClasses()}>
