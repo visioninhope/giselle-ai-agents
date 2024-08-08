@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { getUserInitializationTask } from "./app/(auth)/lib";
 import { supabaseMiddleware } from "./lib/supabase";
-export { auth as middleware } from "@/app/dev/connect-spreadsheet/_utils/auth"; // https://authjs.dev/getting-started/installation?framework=next.js#configure
 
 export default supabaseMiddleware(async (user, request) => {
 	if (
