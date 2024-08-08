@@ -1,7 +1,15 @@
-import NextAuth, { type DefaultSession, type DefaultUser } from "next-auth";
+import NextAuth, { type DefaultSession } from "next-auth";
+import type { DefaultJWT } from "next-auth/jwt";
 
 declare module "next-auth" {
 	interface Session {
 		accessToken?: string;
+		message?: string;
+	}
+}
+
+declare module "next-auth/jwt" {
+	interface JWT {
+		accessTokenExpires: number;
 	}
 }
