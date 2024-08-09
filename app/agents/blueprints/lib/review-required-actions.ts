@@ -14,7 +14,6 @@ export const reviewRequiredActions = (blueprint: Blueprint) => {
 		inferedSteps.length === 0
 			? null
 			: blueprint.nodes.find((node) => inferedSteps[0].nodeId === node.id);
-	console.log({ firstStepNode, name: onRequest.name });
 	if (firstStepNode?.className !== onRequest.name) {
 		requiredActions.push(startWithOnRequestNode);
 	}

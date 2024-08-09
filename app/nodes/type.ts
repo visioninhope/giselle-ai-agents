@@ -13,7 +13,7 @@ import type { FC } from "react";
 // 	propertyPortMap?: Record<string, string>;
 // };
 
-// export type InvokeFunction = (requestStep: Step) => Promise<void>;
+export type InvokeFunction = (requestStep: Step) => Promise<void>;
 
 export type Port = { type: PortType; key: string; label?: string };
 

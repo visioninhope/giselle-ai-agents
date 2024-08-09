@@ -28,7 +28,6 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 	invariant(blueprint != null, `Blueprint not found: ${args.blueprintId}`);
 	const nodeClass = getNodeClass({ name: args.node.className });
 	invariant(nodeClass != null, `Node class not found: ${args.node.className}`);
-	console.log(JSON.stringify(nodeClass));
 	if (nodeClass.name == null) {
 		throw new Error("Node class name is required");
 	}
