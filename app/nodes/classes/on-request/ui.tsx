@@ -6,8 +6,10 @@ import type { PanelProps } from "../../type";
 
 export const Panel: FC<PanelProps> = ({ node }) => {
 	return (
-		<div className="px-4">
-			<DynamicOutputPort node={node} heading="Parameters" />
+		<div className="divide-y">
+			<div className="p-2">
+				<DynamicOutputPort node={node} heading="Parameters" />
+			</div>
 		</div>
 	);
 };

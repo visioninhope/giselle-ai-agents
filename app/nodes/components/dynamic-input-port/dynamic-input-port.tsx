@@ -11,17 +11,18 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
-import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
+import { DynamicInputPortListItem } from "./dynamic-input-port-list-item";
 
-type DynamicOutputPortProps = {
+type DynamicInputPortProps = {
 	node: Node;
 	heading?: string;
 };
-export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
+export const DynamicInputPort: FC<DynamicInputPortProps> = ({
 	node,
-	heading = "Output Port",
+	heading = "Input Port",
 }) => {
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const [disclosure, setDisclosure] = useState(false);
@@ -35,7 +36,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 				nodeId: node.id,
 				name: formData.get("name") as string,
 				type: "data",
-				direction: "output",
+				direction: "input",
 				order: 1000 /** @todo  last port order +1  */,
 				portsBlueprintsId: 0,
 				nodeClassKey: null,
@@ -51,7 +52,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 						port: {
 							nodeId: node.id,
 							name: draftPort.name,
-							direction: "output",
+							direction: "input",
 						},
 					}),
 			});
@@ -72,7 +73,7 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 						<PopoverContent align="end">
 							<form onSubmit={handleSubmit}>
 								<div className="flex flex-col gap-4">
-									<Input placeholder="Parameter" name="name" data-1p-ignore />
+									<Input placeholder="Parameter" name="name" />
 									<div className="flex justify-end">
 										<Button type="submit">Create parameter</Button>
 									</div>
@@ -83,10 +84,10 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 				</div>
 			</div>
 			<div className="flex flex-col gap-1">
-				{node.outputPorts
+				{node.inputPorts
 					.filter(({ type }) => type === "data")
 					.map((port) => (
-						<DynamicOutputPortListItem key={port.id} port={port} />
+						<DynamicInputPortListItem key={port.id} port={port} />
 					))}
 			</div>
 		</div>
