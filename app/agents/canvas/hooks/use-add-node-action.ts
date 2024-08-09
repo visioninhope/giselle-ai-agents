@@ -1,36 +1,37 @@
 import { addAgentNode, addNode, useBlueprint } from "@/app/agents/blueprints";
+import { getNodeClass } from "@/app/node-classes";
 import {
 	type ExcludeAgentNodeClassName,
+	type NodeClass,
 	type Port,
 	findNodeClass,
 	useNodeClasses,
-} from "@/app/node-classes";
+} from "@/app/nodes";
 import { useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
 
-type AddNodeArgs =
-	| {
-			nodeClassName: ExcludeAgentNodeClassName;
-			position: { x: number; y: number };
-			relevantAgent?: never;
-	  }
-	| {
-			nodeClassName: "agent";
-			position: { x: number; y: number };
-			relevantAgent: {
-				agentId: number;
-				agentName: string;
-				blueprintId: number;
-				inputPorts: Port[];
-			};
-	  };
+type AddNodeArgs = {
+	nodeClass: NodeClass;
+	position: { x: number; y: number };
+	relevantAgent?: never;
+};
+// | {
+// 		nodeClassName: "agent";
+// 		position: { x: number; y: number };
+// 		relevantAgent: {
+// 			agentId: number;
+// 			agentName: string;
+// 			blueprintId: number;
+// 			inputPorts: Port[];
+// 		};
+//   };
 export const useAddNodeAction = () => {
 	const reactFlowInstance = useReactFlow();
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
-	const nodeClasses = useNodeClasses();
+	// const nodeClasses = useNodeClasses();
 	const addNodeAction = useCallback(
-		async ({ nodeClassName, position, relevantAgent }: AddNodeArgs) => {
+		async ({ nodeClass, position, relevantAgent }: AddNodeArgs) => {
 			invariant(reactFlowInstance != null, "reactFlowInstance is null");
 			// reactFlowInstance.project was renamed to reactFlowInstance.screenToFlowPosition
 			// and you don't need to subtract the reactFlowBounds.left/top anymore
@@ -39,32 +40,82 @@ export const useAddNodeAction = () => {
 				x: position.x,
 				y: position.y,
 			});
-			const nodeClass = findNodeClass(nodeClasses, nodeClassName);
 			const nodeId = createTemporaryId();
-			if (nodeClassName === "agent") {
-				mutate({
-					type: "addNode",
-					optimisticData: {
-						node: {
-							id: nodeId,
-							isCreating: true,
-							position: {
-								x: flowPosition.x,
-								y: flowPosition.y,
-							},
-							className: nodeClassName,
-							properties: [
-								...(nodeClass.properties ?? []),
-								{
-									name: "relevantAgent",
-									value: relevantAgent.agentName,
-								},
-							],
-							propertyPortMap: nodeClass.propertyPortMap ?? {},
-							inputPorts: [
-								...(nodeClass?.inputPorts ?? []),
-								...relevantAgent.inputPorts,
-							].map(({ type, label, key }, index) => ({
+			// if (nodeClassName === "agent") {
+			// 	mutate({
+			// 		type: "addNode",
+			// 		optimisticData: {
+			// 			node: {
+			// 				id: nodeId,
+			// 				isCreating: true,
+			// 				position: {
+			// 					x: flowPosition.x,
+			// 					y: flowPosition.y,
+			// 				},
+			// 				className: nodeClassName,
+			// 				properties: [
+			// 					...(nodeClass.properties ?? []),
+			// 					{
+			// 						name: "relevantAgent",
+			// 						value: relevantAgent.agentName,
+			// 					},
+			// 				],
+			// 				propertyPortMap: nodeClass.propertyPortMap ?? {},
+			// 				inputPorts: [
+			// 					...(nodeClass?.inputPorts ?? []),
+			// 					...relevantAgent.inputPorts,
+			// 				].map(({ type, label, key }, index) => ({
+			// 					id: createTemporaryId(),
+			// 					nodeId,
+			// 					type: type,
+			// 					name: label ?? "",
+			// 					direction: "input",
+			// 					order: index,
+			// 					portsBlueprintsId: 0,
+			// 					nodeClassKey: key,
+			// 				})),
+			// 				outputPorts: (nodeClass.outputPorts ?? []).map(
+			// 					({ type, label, key }, index) => ({
+			// 						id: createTemporaryId(),
+			// 						nodeId,
+			// 						type: type,
+			// 						name: label ?? "",
+			// 						direction: "output",
+			// 						order: index,
+			// 						portsBlueprintsId: 0,
+			// 						nodeClassKey: key,
+			// 					}),
+			// 				),
+			// 			},
+			// 		},
+			// 		action: () =>
+			// 			addAgentNode({
+			// 				blueprintId: blueprint.id,
+			// 				node: {
+			// 					className: nodeClassName,
+			// 					position: { x: flowPosition.x, y: flowPosition.y },
+			// 					relevantAgent: {
+			// 						id: relevantAgent.agentId,
+			// 						blueprintId: relevantAgent.blueprintId,
+			// 					},
+			// 				},
+			// 			}),
+			// 	});
+			// } else {
+			mutate({
+				type: "addNode",
+				optimisticData: {
+					node: {
+						id: nodeId,
+						isCreating: true,
+						position: {
+							x: flowPosition.x,
+							y: flowPosition.y,
+						},
+						className: nodeClass.name,
+						properties: nodeClass.template.properties ?? [],
+						inputPorts: (nodeClass.template.inputPorts ?? []).map(
+							({ type, label, key }, index) => ({
 								id: createTemporaryId(),
 								nodeId,
 								type: type,
@@ -73,86 +124,34 @@ export const useAddNodeAction = () => {
 								order: index,
 								portsBlueprintsId: 0,
 								nodeClassKey: key,
-							})),
-							outputPorts: (nodeClass.outputPorts ?? []).map(
-								({ type, label, key }, index) => ({
-									id: createTemporaryId(),
-									nodeId,
-									type: type,
-									name: label ?? "",
-									direction: "output",
-									order: index,
-									portsBlueprintsId: 0,
-									nodeClassKey: key,
-								}),
-							),
-						},
+							}),
+						),
+						outputPorts: (nodeClass.template.outputPorts ?? []).map(
+							({ type, label, key }, index) => ({
+								id: createTemporaryId(),
+								nodeId,
+								type: type,
+								name: label ?? "",
+								direction: "output",
+								order: index,
+								portsBlueprintsId: 0,
+								nodeClassKey: key,
+							}),
+						),
 					},
-					action: () =>
-						addAgentNode({
-							blueprintId: blueprint.id,
-							node: {
-								className: nodeClassName,
-								position: { x: flowPosition.x, y: flowPosition.y },
-								relevantAgent: {
-									id: relevantAgent.agentId,
-									blueprintId: relevantAgent.blueprintId,
-								},
-							},
-						}),
-				});
-			} else {
-				mutate({
-					type: "addNode",
-					optimisticData: {
+				},
+				action: () =>
+					addNode({
+						blueprintId: blueprint.id,
 						node: {
-							id: nodeId,
-							isCreating: true,
-							position: {
-								x: flowPosition.x,
-								y: flowPosition.y,
-							},
-							className: nodeClassName,
-							properties: nodeClass.properties ?? [],
-							propertyPortMap: nodeClass.propertyPortMap ?? {},
-							inputPorts: (nodeClass.inputPorts ?? []).map(
-								({ type, label, key }, index) => ({
-									id: createTemporaryId(),
-									nodeId,
-									type: type,
-									name: label ?? "",
-									direction: "input",
-									order: index,
-									portsBlueprintsId: 0,
-									nodeClassKey: key,
-								}),
-							),
-							outputPorts: (nodeClass.outputPorts ?? []).map(
-								({ type, label, key }, index) => ({
-									id: createTemporaryId(),
-									nodeId,
-									type: type,
-									name: label ?? "",
-									direction: "output",
-									order: index,
-									portsBlueprintsId: 0,
-									nodeClassKey: key,
-								}),
-							),
+							className: nodeClass.name,
+							position: { x: flowPosition.x, y: flowPosition.y },
 						},
-					},
-					action: () =>
-						addNode({
-							blueprintId: blueprint.id,
-							node: {
-								className: nodeClassName,
-								position: { x: flowPosition.x, y: flowPosition.y },
-							},
-						}),
-				});
-			}
+					}),
+			});
+			// }
 		},
-		[reactFlowInstance, mutate, nodeClasses, blueprint.id, createTemporaryId],
+		[reactFlowInstance, mutate, blueprint.id, createTemporaryId],
 	);
 	return { addNodeAction };
 };

@@ -20,6 +20,7 @@ export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 				<TabsList>
 					<TabsTrigger value="requests">Requests</TabsTrigger>
 					<TabsTrigger value="properties">Properties</TabsTrigger>
+					<TabsTrigger value="storages">Storages</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="properties" className="flex flex-col gap-2">
@@ -32,6 +33,10 @@ export const PropertyPanel: FC<PropertyPanel> = ({ selectedNodes }) => {
 				<TabsContent value="requests" className="flex flex-col gap-2">
 					<RequestPanel />
 				</TabsContent>
+				<TabsContent
+					value="storages"
+					className="flex flex-col gap-2"
+				></TabsContent>
 			</Tabs>
 		</div>
 	);

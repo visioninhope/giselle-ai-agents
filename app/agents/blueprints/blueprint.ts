@@ -1,4 +1,4 @@
-import type { NodeClassName } from "@/app/node-classes";
+import type { NodeClassName } from "@/app/nodes";
 import type * as schema from "@/drizzle/schema";
 import type { NodeProperties } from "@/drizzle/schema";
 import type { BlueprintRequiredAction } from "./required-action";
@@ -18,7 +18,7 @@ export type Node = Pick<DbNode, "position"> & {
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
 	properties: NodeProperties;
-	propertyPortMap: Record<string, string>;
+	// propertyPortMap: Record<string, string>;
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {
 	id: number;

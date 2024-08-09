@@ -9,6 +9,7 @@ import {
 	useBlueprint,
 } from "@/app/agents/blueprints";
 import type { ExcludeAgentNodeClassName } from "@/app/node-classes";
+import { Finder, type NodeClass } from "@/app/nodes";
 import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
@@ -43,10 +44,10 @@ const CanvasInner: FC = () => {
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
 	const handleNodeSelect = useCallback(
-		async (nodeClassName: ExcludeAgentNodeClassName) => {
+		async (nodeClass: NodeClass) => {
 			hideContextMenu();
 			addNodeAction({
-				nodeClassName,
+				nodeClass,
 				position,
 			});
 		},
@@ -205,10 +206,7 @@ const CanvasInner: FC = () => {
 								top: position.y - (containerRef?.current?.offsetTop ?? 0),
 							}}
 						>
-							<NodeList
-								onSelect={handleNodeSelect}
-								onAgentSelect={handleAgentSelect}
-							/>
+							<Finder onSelect={handleNodeSelect} />
 						</div>
 					)}
 				</ReactFlow>
