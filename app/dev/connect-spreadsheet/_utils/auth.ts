@@ -4,6 +4,55 @@ import { and, eq, sql } from "drizzle-orm/sql";
 import NextAuth from "next-auth";
 import Google from "next-auth/providers/google";
 
+export async function getSession() {
+	const supabaseUser = await getUser();
+
+	const supabaseUserMap = await db
+		.select()
+		.from(supabaseUserMappings)
+		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+		.limit(1);
+
+	const userId = supabaseUserMap[0].userId;
+
+	const queries = await db
+		.select({
+			accessToken: oauthCredentials.accessToken,
+			refreshToken: oauthCredentials.refreshToken,
+			expiresAt: oauthCredentials.expiresAt,
+			providerAccountId: oauthCredentials.providerAccountId,
+		})
+		.from(oauthCredentials)
+		.where(eq(oauthCredentials.userId, userId));
+
+	let accessToken = null;
+
+	if (queries.length !== 0) {
+		const oauthCredential = queries[0];
+
+		const isAccessTokenValid =
+			oauthCredential.expiresAt &&
+			Date.now() < oauthCredential.expiresAt.getTime();
+
+		if (isAccessTokenValid) {
+			accessToken = oauthCredential.accessToken;
+		} else {
+			const refreshedToken = await refreshAccessToken({
+				userId,
+				refreshToken: oauthCredential.refreshToken,
+				providerAccountId: oauthCredential.providerAccountId,
+			});
+
+			accessToken = refreshedToken.accessToken;
+		}
+	}
+
+	return {
+		userId,
+		accessToken,
+	};
+}
+
 export const { handlers, signIn, signOut, auth } = NextAuth({
 	providers: [
 		Google({
@@ -56,6 +105,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						console.error(message);
 						throw new Error(message);
 					}
+
+					token.userId = userId;
 
 					const now = new Date();
 
@@ -167,6 +218,7 @@ async function refreshAccessToken(token: any) {
 			})
 			.where(
 				and(
+					eq(oauthCredentials.userId, token.userId),
 					eq(oauthCredentials.provider, "google"),
 					eq(oauthCredentials.providerAccountId, token.providerAccountId),
 				),

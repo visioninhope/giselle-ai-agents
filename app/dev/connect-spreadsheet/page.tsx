@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { db, oauthCredentials, supabaseUserMappings } from "@/drizzle";
-import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
-import { signIn } from "./_utils/auth";
+import { getSession, signIn } from "./_utils/auth";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
 type UserInfo = {
@@ -105,24 +104,7 @@ async function fetchSheets(accessToken: string, sheetId: string) {
 }
 
 export default async function ConnectSpreadsheetPage() {
-	const supabaseUser = await getUser();
-
-	const supabaseUserMap = await db
-		.select()
-		.from(supabaseUserMappings)
-		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
-		.limit(1);
-
-	const userId = supabaseUserMap[0].userId;
-
-	const queries = await db
-		.select({
-			accessToken: oauthCredentials.accessToken,
-		})
-		.from(oauthCredentials)
-		.where(eq(oauthCredentials.userId, userId));
-
-	const accessToken = queries.length === 0 ? null : queries[0].accessToken;
+	const { userId, accessToken } = await getSession();
 
 	let userInfo = null;
 	let data = null;
