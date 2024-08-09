@@ -96,7 +96,7 @@ export const nodes = pgTable("nodes", {
 export type NodeProperty = {
 	name: string;
 	label?: string;
-	value?: string;
+	value: string;
 };
 export type NodeProperties = NodeProperty[];
 export const nodesBlueprints = pgTable("nodes_blueprints", {
