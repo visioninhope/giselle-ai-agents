@@ -5,6 +5,7 @@ import {
 	inferSteps,
 	startWithOnRequestNode,
 } from "@/app/agents/blueprints";
+import { onRequest, response } from "@/app/nodes";
 
 export const reviewRequiredActions = (blueprint: Blueprint) => {
 	const requiredActions: BlueprintRequiredAction[] = [];
@@ -13,7 +14,8 @@ export const reviewRequiredActions = (blueprint: Blueprint) => {
 		inferedSteps.length === 0
 			? null
 			: blueprint.nodes.find((node) => inferedSteps[0].nodeId === node.id);
-	if (firstStepNode?.className !== "onRequest") {
+	console.log({ firstStepNode, name: onRequest.name });
+	if (firstStepNode?.className !== onRequest.name) {
 		requiredActions.push(startWithOnRequestNode);
 	}
 	const lastStepNode =
@@ -22,7 +24,7 @@ export const reviewRequiredActions = (blueprint: Blueprint) => {
 			: blueprint.nodes.find(
 					(node) => inferedSteps[inferedSteps.length - 1].nodeId === node.id,
 				);
-	if (lastStepNode?.className !== "response") {
+	if (lastStepNode?.className !== response.name) {
 		requiredActions.push(endWithResponseNode);
 	}
 	return requiredActions;

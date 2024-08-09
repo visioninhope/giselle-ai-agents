@@ -46,6 +46,6 @@ export type NodeTemplate = {
 export type PanelProps = { node: Node };
 export type NodeClass = {
 	name: string;
-	Panel: FC<PanelProps>;
+	Panel?: FC<PanelProps>;
 	template: NodeTemplate;
 };

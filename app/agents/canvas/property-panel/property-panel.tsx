@@ -74,7 +74,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
 	);
 	return (
 		<div className="flex flex-col gap-2 py-2">
-			{<nodeClass.Panel node={blueprintNode} />}
+			{nodeClass.Panel && <nodeClass.Panel node={blueprintNode} />}
 			{
 				// {blueprintNode.properties.length > 0 && (
 				// 	<>
