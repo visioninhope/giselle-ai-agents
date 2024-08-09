@@ -1,4 +1,4 @@
-import type { Node } from "@/app/agents/blueprints";
+import type { Blueprint, Node } from "@/app/agents/blueprints";
 import type { Step } from "@/app/agents/requests";
 import type { PortType } from "@/drizzle/schema";
 import type { FC } from "react";
@@ -13,7 +13,7 @@ import type { FC } from "react";
 // 	propertyPortMap?: Record<string, string>;
 // };
 
-export type InvokeFunction = (requestStep: Step) => Promise<void>;
+export type Action = (requestStep: Step) => Promise<void>;
 
 export type Port = { type: PortType; key: string; label?: string };
 
@@ -31,12 +31,12 @@ export type Property = {
 // 	name: "dynamicInputPort";
 // };
 
-// type ResolverArgs = {
-// 	requestId: number;
-// 	nodeId: number;
-// 	blueprint: Blueprint;
-// };
-// export type Resolver = (args: ResolverArgs) => Promise<void>;
+type ResolverArgs = {
+	requestId: number;
+	nodeId: number;
+	blueprint: Blueprint;
+};
+export type Resolver = (args: ResolverArgs) => Promise<void>;
 
 export type NodeTemplate = {
 	inputPorts?: Port[];
@@ -46,6 +46,8 @@ export type NodeTemplate = {
 export type PanelProps = { node: Node };
 export type NodeClass = {
 	name: string;
+	action?: Action;
+	resolver?: Resolver;
 	Panel?: FC<PanelProps>;
 	template: NodeTemplate;
 };

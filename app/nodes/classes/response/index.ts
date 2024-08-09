@@ -8,3 +8,5 @@ export const template: NodeTemplate = {
 		{ type: "data", label: "Output", key: "output" },
 	],
 };
+
+export { action } from "./action";

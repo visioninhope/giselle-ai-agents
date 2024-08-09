@@ -3,9 +3,9 @@
 import { db, pullMessages, requestResults } from "@/drizzle";
 import { logger } from "@trigger.dev/sdk/v3";
 import { and, eq } from "drizzle-orm";
-import type { InvokeFunction } from "../../type";
+import type { Action } from "../../type";
 
-export const invoke: InvokeFunction = async ({ request, id, node }) => {
+export const action: Action = async ({ request, id, node }) => {
 	logger.log(`params: ${JSON.stringify({ request, id })}`);
 
 	const messages = await db

@@ -1,6 +1,6 @@
 import { getBlueprint } from "@/app/agents/blueprints";
 import { getDependedNodes, getRequest } from "@/app/agents/requests";
-import { getInvokeFunction, getResolver } from "@/app/node-classes";
+import { getNodeClass, nodeClasses } from "@/app/nodes";
 import { requestPortMessages, requestResults } from "@/drizzle";
 import { db, updateRun, updateRunStep } from "@/drizzle/db";
 import { logger, task } from "@trigger.dev/sdk/v3";
@@ -65,7 +65,10 @@ export const invokeTask = task({
 				nodeId: step.node.id,
 			});
 			for (const dependedNode of dependedNodes) {
-				const resolver = getResolver(dependedNode.className);
+				const dependedNodeClass = getNodeClass({
+					name: dependedNode.className,
+				});
+				const resolver = dependedNodeClass.resolver;
 				if (resolver == null) {
 					logger.log(`resolver not implemented for ${dependedNode.className}`);
 				} else {
@@ -79,11 +82,11 @@ export const invokeTask = task({
 					});
 				}
 			}
-			const invokeFunction = getInvokeFunction(step.node.className);
-			if (invokeFunction == null) {
-				logger.log(`invokeFunction not implemented for ${step.node.className}`);
+			const nodeClass = getNodeClass({ name: step.node.className });
+			if (nodeClass.action == null) {
+				logger.log(`action not implemented for ${step.node.className}`);
 			} else {
-				await invokeFunction(step);
+				await nodeClass.action(step);
 			}
 			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {
