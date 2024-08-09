@@ -4,7 +4,6 @@ import {
 	getLatestBlueprint,
 } from "@/app/agents/blueprints";
 import "@xyflow/react/dist/style.css";
-import { NodeClassesProvider, getNodeClasses } from "@/app/node-classes";
 import { agents, db } from "@/drizzle";
 import { createClient } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
@@ -35,11 +34,7 @@ export default async function Layout({
 	return (
 		<div className="w-full flex flex-col">
 			<AgentProvider agent={agent}>
-				<BlueprintProvider blueprint={blueprint}>
-					<NodeClassesProvider nodeClasses={getNodeClasses()}>
-						{children}
-					</NodeClassesProvider>
-				</BlueprintProvider>
+				<BlueprintProvider blueprint={blueprint}>{children}</BlueprintProvider>
 			</AgentProvider>
 		</div>
 	);

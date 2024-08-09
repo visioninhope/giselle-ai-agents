@@ -8,9 +8,7 @@ import {
 	updateNodesPosition,
 	useBlueprint,
 } from "@/app/agents/blueprints";
-import type { ExcludeAgentNodeClassName } from "@/app/node-classes";
 import { Finder, type NodeClass } from "@/app/nodes";
-import { createId } from "@paralleldrive/cuid2";
 import {
 	Background,
 	type Edge,
@@ -30,7 +28,7 @@ import {
 	useInfereceConnectionEdgeType,
 	useSynthsize,
 } from "./hooks/";
-import { NodeList, useNodeTypes } from "./node";
+import { useNodeTypes } from "./node";
 import { PropertyPanel } from "./property-panel";
 
 const CanvasInner: FC = () => {
