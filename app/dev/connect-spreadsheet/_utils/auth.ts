@@ -32,7 +32,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						accessTokenExpires: expiresAt,
 						tokenType: account.token_type,
 						scope: account.scope,
-						idToken: account.id_token,
 						providerAccountId: account.providerAccountId,
 					};
 
@@ -69,7 +68,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						expiresAt: new Date(expiresAt),
 						tokenType: account.token_type,
 						scope: account.scope,
-						idToken: account.id_token,
 						createdAt: now,
 						updatedAt: now,
 					};
@@ -89,7 +87,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 								expiresAt: sql`excluded.expires_at`,
 								tokenType: sql`excluded.token_type`,
 								scope: sql`excluded.scope`,
-								idToken: sql`excluded.id_token`,
 								updatedAt: sql`excluded.updated_at`,
 							},
 						})
