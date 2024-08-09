@@ -267,7 +267,6 @@ export const oauthCredentials = pgTable(
 		expiresAt: timestamp("expires_at"),
 		tokenType: text("token_type"),
 		scope: text("scope"),
-		idToken: text("id_token"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at").defaultNow().notNull(),
 	},
