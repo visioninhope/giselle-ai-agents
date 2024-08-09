@@ -28,7 +28,6 @@ import {
 	useAddNodeAction,
 	useContextMenu,
 	useInfereceConnectionEdgeType,
-	useNodeSelection,
 	useSynthsize,
 } from "./hooks/";
 import { NodeList, useNodeTypes } from "./node";
@@ -72,7 +71,6 @@ const CanvasInner: FC = () => {
 	);
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
-	const { handleNodesChange, selectedNodes } = useNodeSelection();
 	return (
 		<div className="flex flex-col h-full">
 			<Header />
@@ -105,7 +103,6 @@ const CanvasInner: FC = () => {
 						});
 						return validateConnection(connection);
 					}}
-					onNodesChange={handleNodesChange}
 					onConnect={({ source, sourceHandle, target, targetHandle }) => {
 						if (
 							source == null ||
@@ -195,7 +192,7 @@ const CanvasInner: FC = () => {
 					<Background className="!bg-zinc-900/70" />
 					<Panel position="top-right" className="bottom-0">
 						<div className="flex gap-2 h-full">
-							<PropertyPanel selectedNodes={selectedNodes} />
+							<PropertyPanel />
 						</div>
 					</Panel>
 					{isVisible && (

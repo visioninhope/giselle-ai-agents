@@ -1,4 +1,4 @@
-import type { Blueprint } from "@/app/agents/blueprints";
+import type { Node } from "@/app/agents/blueprints";
 import type { Step } from "@/app/agents/requests";
 import type { PortType } from "@/drizzle/schema";
 import type { FC } from "react";
@@ -43,8 +43,9 @@ export type NodeTemplate = {
 	outputPorts?: Port[];
 	properties?: Property[];
 };
+export type PanelProps = { node: Node };
 export type NodeClass = {
 	name: string;
-	Panel: FC;
+	Panel: FC<PanelProps>;
 	template: NodeTemplate;
 };

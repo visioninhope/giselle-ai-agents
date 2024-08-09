@@ -1,17 +1,13 @@
 "use client";
 
 import type { FC } from "react";
+import { DynamicOutputPort } from "../../components/dynamic-output-port";
+import type { PanelProps } from "../../type";
 
-export const Panel: FC = () => {
+export const Panel: FC<PanelProps> = ({ node }) => {
 	return (
-		<div className="panel">
-			<h2>Panel</h2>
-			<p>
-				Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed non
-				vestibulum nunc. Nullam nec nulla nec nulla tincidunt tincidunt. Donec
-				nec nulla nec nulla tincidunt tincidunt. Donec nec nulla nec nulla
-				tincidunt tincidunt. Donec nec nulla nec nulla tincidunt tincidunt.
-			</p>
+		<div className="px-4">
+			<DynamicOutputPort node={node} heading="Parameters" />
 		</div>
 	);
 };
