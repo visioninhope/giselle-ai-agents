@@ -3,6 +3,45 @@ import { auth } from "./_utils/auth";
 import { signIn, signOut } from "./_utils/auth";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
+type UserInfo = {
+	sub: string;
+	name: string;
+	given_name: string;
+	family_name: string;
+	picture: string;
+	email: string;
+	email_verified: boolean;
+	hd: string;
+};
+
+async function getUserInfo(session: Session | null): Promise<UserInfo | null> {
+	if (!session) {
+		console.error("Not authenticated", { status: 401 });
+		return null;
+	}
+
+	if (!(session.accessToken && typeof session.accessToken === "string")) {
+		console.error("Not authenticated", { status: 401 });
+		return null;
+	}
+
+	const response = await fetch(
+		"https://www.googleapis.com/oauth2/v3/userinfo",
+		{
+			headers: {
+				Authorization: `Bearer ${session.accessToken}`,
+			},
+		},
+	);
+
+	if (!response.ok) {
+		throw new Error("Failed to fetch user info");
+	}
+
+	const userInfo = await response.json();
+	return userInfo;
+}
+
 async function fetchDrives(session: Session | null) {
 	if (!session) {
 		console.error("Not authenticated", { status: 401 });
@@ -113,6 +152,9 @@ export default async function ConnectSpreadsheetPage() {
 	const session = await auth();
 	// console.log("session", session);
 
+	const userInfo = await getUserInfo(session);
+	console.log("userInfo", userInfo);
+
 	const drives = await fetchDrives(session);
 	// console.log("drives", drives);
 
@@ -153,6 +195,8 @@ export default async function ConnectSpreadsheetPage() {
 	);
 
 	// console.log("data", JSON.stringify(data, null, 2));
+
+	console.log("session", session);
 
 	return (
 		<>
