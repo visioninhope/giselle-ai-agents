@@ -23,36 +23,6 @@ export const invokeTask = task({
 			throw new Error("No run found");
 		}
 		const blueprint = await getBlueprint(request.blueprint.id);
-		// const dataNodes = blueprint.nodes.filter(
-		// 	({ inputPorts, outputPorts }) =>
-		// 		!inputPorts.some(({ type }) => type === "execution") &&
-		// 		!outputPorts.some(({ type }) => type === "execution"),
-		// );
-		// for (const dataNode of dataNodes) {
-		// 	for (const property of dataNode.properties) {
-		// 		const portKey = dataNode.propertyPortMap[property.name];
-		// 		if (portKey == null) {
-		// 			logger.log(
-		// 				`targetPort not found for ${dataNode.className}.${property.name}`,
-		// 			);
-		// 			continue;
-		// 		}
-		// 		const targetPort = dataNode.outputPorts.find(
-		// 			(outputPort) => outputPort.nodeClassKey === portKey,
-		// 		);
-		// 		if (targetPort == null) {
-		// 			logger.log(
-		// 				`targetPort not found for ${dataNode.className}.${portKey}`,
-		// 			);
-		// 			continue;
-		// 		}
-		// 		await db.insert(requestPortMessages).values({
-		// 			requestId: payload.requestId,
-		// 			portsBlueprintsId: targetPort.portsBlueprintsId,
-		// 			message: property.value,
-		// 		});
-		// 	}
-		// }
 
 		for (const step of request.steps) {
 			await updateRunStep(payload.requestId, step.id, {
