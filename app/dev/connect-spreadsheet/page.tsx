@@ -1,6 +1,8 @@
-import type { Session } from "next-auth";
-import { auth } from "./_utils/auth";
-import { signIn, signOut } from "./_utils/auth";
+import { Button } from "@/components/ui/button";
+import { db, oauthCredentials, supabaseUserMappings } from "@/drizzle";
+import { getUser } from "@/lib/supabase";
+import { eq } from "drizzle-orm";
+import { signIn } from "./_utils/auth";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
 type UserInfo = {
@@ -14,22 +16,12 @@ type UserInfo = {
 	hd: string;
 };
 
-async function getUserInfo(session: Session | null): Promise<UserInfo | null> {
-	if (!session) {
-		console.error("Not authenticated", { status: 401 });
-		return null;
-	}
-
-	if (!(session.accessToken && typeof session.accessToken === "string")) {
-		console.error("Not authenticated", { status: 401 });
-		return null;
-	}
-
+async function getUserInfo(accessToken: string): Promise<UserInfo> {
 	const response = await fetch(
 		"https://www.googleapis.com/oauth2/v3/userinfo",
 		{
 			headers: {
-				Authorization: `Bearer ${session.accessToken}`,
+				Authorization: `Bearer ${accessToken}`,
 			},
 		},
 	);
@@ -42,19 +34,7 @@ async function getUserInfo(session: Session | null): Promise<UserInfo | null> {
 	return userInfo;
 }
 
-async function fetchDrives(session: Session | null) {
-	if (!session) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	if (!(session.accessToken && typeof session.accessToken === "string")) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	const accessToken = session.accessToken as string;
-
+async function fetchDrives(accessToken: string) {
 	// Google Drive API を使用してユーザーの共有ドライブを一覧を取得
 	const url = "https://www.googleapis.com/drive/v3/drives";
 
@@ -74,19 +54,7 @@ async function fetchDrives(session: Session | null) {
 	return drives;
 }
 
-async function fetchSpreadSheets(session: Session | null, driveId: string) {
-	if (!session) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	if (!(session.accessToken && typeof session.accessToken === "string")) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	const accessToken = session.accessToken as string;
-
+async function fetchSpreadSheets(accessToken: string, driveId: string) {
 	// Google Drive APIを使用して共有ドライブ内のファイル一覧を取得
 	const res = await fetch(
 		`https://www.googleapis.com/drive/v3/files?q='${driveId}'+in+parents&includeItemsFromAllDrives=true&supportsAllDrives=true`,
@@ -113,19 +81,7 @@ async function fetchSpreadSheets(session: Session | null, driveId: string) {
 	return spreadsheets;
 }
 
-async function fetchSheets(session: Session | null, sheetId: string) {
-	if (!session) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	if (!(session.accessToken && typeof session.accessToken === "string")) {
-		console.error("Not authenticated", { status: 401 });
-		return [];
-	}
-
-	const accessToken = session.accessToken as string;
-
+async function fetchSheets(accessToken: string, sheetId: string) {
 	// Google Sheets APIを使用してスプレッドシートのシート一覧を取得
 	// https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get
 	const res = await fetch(
@@ -149,87 +105,121 @@ async function fetchSheets(session: Session | null, sheetId: string) {
 }
 
 export default async function ConnectSpreadsheetPage() {
-	const session = await auth();
-	// console.log("session", session);
+	const supabaseUser = await getUser();
 
-	const userInfo = await getUserInfo(session);
-	console.log("userInfo", userInfo);
+	const supabaseUserMap = await db
+		.select()
+		.from(supabaseUserMappings)
+		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+		.limit(1);
 
-	const drives = await fetchDrives(session);
-	// console.log("drives", drives);
+	const userId = supabaseUserMap[0].userId;
 
-	const drivesWithSpreadsheets = await Promise.all(
-		drives.map(async (drive: any) => {
-			const driveId = drive.id;
-			const driveName = drive.name;
+	const queries = await db
+		.select({
+			accessToken: oauthCredentials.accessToken,
+		})
+		.from(oauthCredentials)
+		.where(eq(oauthCredentials.userId, userId));
 
-			const spreadsheets = await fetchSpreadSheets(session, driveId);
+	const accessToken = queries.length === 0 ? null : queries[0].accessToken;
 
-			return { driveId, driveName, spreadsheets };
-		}),
-	);
+	let userInfo = null;
+	let data = null;
 
-	// console.log(
-	// 	"drivesWithSpreadsheets",
-	// 	JSON.stringify(drivesWithSpreadsheets, null, 2),
-	// );
+	if (accessToken) {
+		userInfo = await getUserInfo(accessToken);
 
-	// drivesWithSpreadsheets に spreadsheets が含まれているので、これをループして、さらに sheets 一覧を取得する
-	const data = await Promise.all(
-		drivesWithSpreadsheets.map(async (driveWithSpreadsheets) => {
-			const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;
+		const drives = await fetchDrives(accessToken);
 
-			const spreadsheetsWithSheets = await Promise.all(
-				spreadsheets.map(async (spreadsheet: any) => {
-					const sheetId = spreadsheet.id;
-					const sheetName = spreadsheet.name;
+		const drivesWithSpreadsheets = await Promise.all(
+			drives.map(async (drive: any) => {
+				const driveId = drive.id;
+				const driveName = drive.name;
 
-					const sheets = await fetchSheets(session, sheetId);
+				const spreadsheets = await fetchSpreadSheets(accessToken, driveId);
 
-					return { sheetId, sheetName, sheets };
-				}),
-			);
+				return { driveId, driveName, spreadsheets };
+			}),
+		);
 
-			return { driveId, driveName, spreadsheets: spreadsheetsWithSheets };
-		}),
-	);
+		// drivesWithSpreadsheets に spreadsheets が含まれているので、これをループして、さらに sheets 一覧を取得する
+		data = await Promise.all(
+			drivesWithSpreadsheets.map(async (driveWithSpreadsheets) => {
+				const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;
 
-	// console.log("data", JSON.stringify(data, null, 2));
+				const spreadsheetsWithSheets = await Promise.all(
+					spreadsheets.map(async (spreadsheet: any) => {
+						const sheetId = spreadsheet.id;
+						const sheetName = spreadsheet.name;
 
-	console.log("session", session);
+						const sheets = await fetchSheets(accessToken, sheetId);
+
+						return { sheetId, sheetName, sheets };
+					}),
+				);
+
+				return { driveId, driveName, spreadsheets: spreadsheetsWithSheets };
+			}),
+		);
+	}
 
 	return (
-		<>
+		<div className="flex flex-col gap-8 p-8">
 			<div>Hello Connect Spreadsheet!</div>
-			{session?.user ? (
-				<>
-					<div>Logged in as {session.user.name}</div>
-					<div>id: {session.user.id}</div>
-					<div>email: {session.user.email}</div>
-					<div>image: {session.user.image}</div>
-				</>
+
+			{userInfo && data ? (
+				<div className="flex flex-col gap-4">
+					<div className="flex justify-between items-center p-4 w-1/2 border border-gray-200 rounded-sm">
+						<div className="flex flex-col gap-1">
+							<div className="flex items-center">
+								Connected to Google Spreadsheet
+							</div>
+							<div className="flex items-center gap-1 text-sm text-gray-200">
+								<img
+									src={userInfo.picture}
+									alt=""
+									height={20}
+									width={20}
+									className="rounded-full"
+								/>
+								{userInfo.name}({userInfo.email})
+							</div>
+						</div>
+
+						<form
+							action={async () => {
+								"use server";
+								// await signOut(); // 初回 OAuth 取得時には next-auth 側の session も存在するので、消してもいいが、 next-auth の session は利用していないので、どちらでもよさそう。
+								await db
+									.delete(oauthCredentials)
+									.where(eq(oauthCredentials.userId, userId));
+							}}
+						>
+							<Button type="submit" variant="ghost">
+								Disconnect
+							</Button>
+						</form>
+					</div>
+
+					<GoogleSheetsSelection data={data} />
+				</div>
 			) : (
-				<div>Not logged in</div>
+				<div className="flex justify-between items-center p-4 h-20 w-1/2 border border-gray-200 rounded-sm">
+					<div>Not connect to Google Spreadsheet</div>
+
+					<form
+						action={async () => {
+							"use server";
+							await signIn("google");
+						}}
+					>
+						<Button type="submit" variant="secondary">
+							Connect
+						</Button>
+					</form>
+				</div>
 			)}
-
-			<form
-				action={async () => {
-					"use server";
-					await signOut();
-				}}
-			>
-				<button type="submit">Sign out</button>
-			</form>
-
-			<form
-				action={async () => {
-					"use server";
-					await signIn("google");
-				}}
-			>
-				<button type="submit">Connect to Google Spreadsheet</button>
-			</form>
-			<GoogleSheetsSelection data={data} />
-		</>
+		</div>
 	);
 }
