@@ -1,6 +1,6 @@
 import type { Session } from "next-auth";
 import { auth } from "./_utils/auth";
-import { GoogleSessionButton } from "./google-session-button";
+import { signIn, signOut } from "./_utils/auth";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
 async function fetchDrives(session: Session | null) {
@@ -168,7 +168,23 @@ export default async function ConnectSpreadsheetPage() {
 				<div>Not logged in</div>
 			)}
 
-			<GoogleSessionButton session={session} />
+			<form
+				action={async () => {
+					"use server";
+					await signOut();
+				}}
+			>
+				<button type="submit">Sign out</button>
+			</form>
+
+			<form
+				action={async () => {
+					"use server";
+					await signIn("google");
+				}}
+			>
+				<button type="submit">Connect to Google Spreadsheet</button>
+			</form>
 			<GoogleSheetsSelection data={data} />
 		</>
 	);
