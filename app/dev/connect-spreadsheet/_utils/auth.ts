@@ -79,6 +79,7 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 						.values(values)
 						.onConflictDoUpdate({
 							target: [
+								oauthCredentials.userId,
 								oauthCredentials.provider,
 								oauthCredentials.providerAccountId,
 							],

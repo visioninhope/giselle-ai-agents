@@ -273,6 +273,7 @@ export const oauthCredentials = pgTable(
 	},
 	(table) => ({
 		providerAccountIdUnique: unique("provider_account_id_unique").on(
+			table.userId,
 			table.provider,
 			table.providerAccountId,
 		),
