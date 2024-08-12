@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { db, oauthCredentials, supabaseUserMappings } from "@/drizzle";
 import { eq } from "drizzle-orm";
-import { getSession, signIn } from "./_utils/auth";
+import { getSession, signIn, signOut } from "./_utils/auth";
 import { GoogleSheetsSelection } from "./google-sheets-selection";
 
 type UserInfo = {
@@ -172,10 +172,12 @@ export default async function ConnectSpreadsheetPage() {
 						<form
 							action={async () => {
 								"use server";
-								// await signOut(); // 初回 OAuth 取得時には next-auth 側の session も存在するので、消してもいいが、 next-auth の session は利用していないので、どちらでもよさそう。
+
 								await db
 									.delete(oauthCredentials)
 									.where(eq(oauthCredentials.userId, userId));
+
+								await signOut();
 							}}
 						>
 							<Button type="submit" variant="ghost">
