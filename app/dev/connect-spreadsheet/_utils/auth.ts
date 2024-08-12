@@ -53,7 +53,7 @@ export async function getSession() {
 	};
 }
 
-export const { handlers, signIn, signOut, auth } = NextAuth({
+export const { handlers, signIn, signOut } = NextAuth({
 	providers: [
 		Google({
 			authorization: {
@@ -155,21 +155,6 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
 				token.message = "JWTCallbackError";
 				return token;
 			}
-		},
-		session({ session, token }) {
-			if (token.id && typeof token.id === "string") {
-				session.user.id = token.id;
-			}
-
-			if (token.accessToken && typeof token.accessToken === "string") {
-				session.accessToken = token.accessToken;
-			}
-
-			if (token.message && typeof token.message == "string") {
-				session.message = token.message;
-			}
-
-			return session;
 		},
 	},
 });
