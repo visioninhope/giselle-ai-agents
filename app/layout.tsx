@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
+await import("@/sentry.client.config"); // initialize Sentry on client
+
 export const metadata: Metadata = {
 	title: "un-name",
 };
