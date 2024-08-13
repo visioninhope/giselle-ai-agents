@@ -1,3 +1,4 @@
+import { nodeFactory } from "@/app/nodes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,10 +12,16 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { createTemporaryId } from "@/lib/create-temporary-id";
 import type { FC } from "react";
-import { AgentList } from "./agent-list";
+import { addNode, useBlueprint } from "../../blueprints";
+// import { AgentList } from "./agent-list";
 
-export const Finder: FC = () => {
+type FinderProps = {
+	position: { x: number; y: number };
+};
+export const Finder: FC<FinderProps> = ({ position }) => {
+	const { mutate, blueprint } = useBlueprint();
 	return (
 		<DropdownMenu defaultOpen={true} modal={false}>
 			<DropdownMenuTrigger />
@@ -34,7 +41,14 @@ export const Finder: FC = () => {
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 					<DropdownMenuItem
 						onSelect={() => {
-							console.log("select!!");
+							const node = nodeFactory.createNode("onRequest", {
+								position,
+							});
+							mutate({
+								type: "addNode",
+								optimisticData: { node },
+								action: () => addNode({ blueprintId: blueprint.id, node }),
+							});
 						}}
 					>
 						On Request

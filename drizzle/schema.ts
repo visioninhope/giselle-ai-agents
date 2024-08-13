@@ -82,23 +82,17 @@ export const blueprints = pgTable("blueprints", {
 	builded: boolean("builded").notNull().default(false),
 });
 
-type NodePosition = { x: number; y: number };
 export const nodes = pgTable("nodes", {
 	id: serial("id").primaryKey(),
 	agentId: integer("agent_id")
 		.notNull()
 		.references(() => agents.id, { onDelete: "cascade" }),
 	className: text("class_name").notNull(),
-	position: jsonb("position").$type<NodePosition>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export type NodeProperty = {
-	name: string;
-	label?: string;
-	value: string;
-};
-export type NodeProperties = NodeProperty[];
+export type NodeData = Record<string, unknown>;
+export type NodePosition = { x: number; y: number };
 export const nodesBlueprints = pgTable("nodes_blueprints", {
 	id: serial("id").primaryKey(),
 	blueprintId: integer("blueprint_id")
@@ -107,10 +101,8 @@ export const nodesBlueprints = pgTable("nodes_blueprints", {
 	nodeId: integer("node_id")
 		.notNull()
 		.references(() => nodes.id, { onDelete: "cascade" }),
-	nodeProperties: jsonb("node_properties")
-		.$type<NodeProperties>()
-		.notNull()
-		.default([]),
+	data: jsonb("data").$type<NodeData>(),
+	position: jsonb("position").$type<NodePosition>().notNull(),
 });
 
 type PortDirection = "input" | "output";

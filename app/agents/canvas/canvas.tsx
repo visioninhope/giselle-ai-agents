@@ -1,14 +1,12 @@
-"use client";
-
 import type { AvailableAgentWithInputPort } from "@/app/agents";
 import {
+	addNode,
 	connectNodes,
 	deleteEdges,
 	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
 } from "@/app/agents/blueprints";
-import { Finder, type NodeClass } from "@/app/nodes";
 import {
 	Background,
 	type Edge,
@@ -20,6 +18,8 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { type FC, useCallback, useRef } from "react";
+import invariant from "tiny-invariant";
+import { Finder } from "./components/finder";
 import { Header } from "./header";
 import {
 	convertXyFlowConnection,
@@ -33,40 +33,40 @@ import { PropertyPanel } from "./property-panel";
 
 const CanvasInner: FC = () => {
 	useSynthsize();
-	const { isVisible, position, hideContextMenu, handleContextMenu } =
+	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
 	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes: NodeTypes = useNodeTypes();
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
-	const handleNodeSelect = useCallback(
-		async (nodeClass: NodeClass) => {
-			hideContextMenu();
-			addNodeAction({
-				nodeClass,
-				position,
-			});
-		},
-		[position, hideContextMenu, addNodeAction],
-	);
-	const handleAgentSelect = useCallback(
-		(agent: AvailableAgentWithInputPort) => {
-			hideContextMenu();
-			addNodeAction({
-				nodeClassName: "agent",
-				position,
-				relevantAgent: {
-					/** @todo remove ?? */
-					agentName: agent.name ?? "",
-					agentId: agent.id,
-					blueprintId: agent.blueprintId,
-					inputPorts: agent.inputPorts,
-				},
-			});
-		},
-		[hideContextMenu, position, addNodeAction],
-	);
+	// const handleNodeSelect = useCallback(
+	// 	async (nodeClass: NodeClass) => {
+	// 		hideContextMenu();
+	// 		addNodeAction({
+	// 			nodeClass,
+	// 			position: contextMenuPosition,
+	// 		});
+	// 	},
+	// 	[contextMenuPosition, hideContextMenu, addNodeAction],
+	// );
+	// const handleAgentSelect = useCallback(
+	// 	(agent: AvailableAgentWithInputPort) => {
+	// 		hideContextMenu();
+	// 		addNodeAction({
+	// 			nodeClassName: "agent",
+	// 			position: contextMenuPosition,
+	// 			relevantAgent: {
+	// 				/** @todo remove ?? */
+	// 				agentName: agent.name ?? "",
+	// 				agentId: agent.id,
+	// 				blueprintId: agent.blueprintId,
+	// 				inputPorts: agent.inputPorts,
+	// 			},
+	// 		});
+	// 	},
+	// 	[hideContextMenu, contextMenuPosition, addNodeAction],
+	// );
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
 	return (
@@ -193,15 +193,77 @@ const CanvasInner: FC = () => {
 							<PropertyPanel />
 						</div>
 					</Panel>
-					{isVisible && (
+					{reactFlowInstance && isVisible && (
 						<div
 							className="z-10 absolute"
 							style={{
-								left: position.x - (containerRef?.current?.offsetLeft ?? 0),
-								top: position.y - (containerRef?.current?.offsetTop ?? 0),
+								left:
+									contextMenuPosition.x -
+									(containerRef?.current?.offsetLeft ?? 0),
+								top:
+									contextMenuPosition.y -
+									(containerRef?.current?.offsetTop ?? 0),
 							}}
 						>
-							<Finder onSelect={handleNodeSelect} />
+							<Finder
+								position={reactFlowInstance.screenToFlowPosition({
+									x: contextMenuPosition.x,
+									y: contextMenuPosition.y,
+								})}
+
+								// onSelect={(nodeClass) => {
+								// 	invariant(
+								// 		reactFlowInstance != null,
+								// 		"reactFlowInstance is null",
+								// 	);
+								// 	const position = reactFlowInstance.screenToFlowPosition({
+								// 		x: contextMenuPosition.x,
+								// 		y: contextMenuPosition.y,
+								// 	});
+								// 	const nodeId = createTemporaryId();
+								// 	mutate({
+								// 		type: "addNode",
+								// 		optimisticData: {
+								// 			node: {
+								// 				id: nodeId,
+								// 				isCreating: true,
+								// 				position,
+								// 				className: nodeClass.name,
+								// 				properties: nodeClass.template.properties ?? [],
+								// 				inputPorts: (nodeClass.template.inputPorts ?? []).map(
+								// 					({ type, label, key }, index) => ({
+								// 						id: createTemporaryId(),
+								// 						nodeId,
+								// 						type,
+								// 						name: label ?? "",
+								// 						direction: "input",
+								// 						order: index,
+								// 						portsBlueprintsId: 0,
+								// 						nodeClassKey: key,
+								// 					}),
+								// 				),
+								// 				outputPorts: (nodeClass.template.outputPorts ?? []).map(
+								// 					({ type, label, key }, index) => ({
+								// 						id: createTemporaryId(),
+								// 						nodeId,
+								// 						type,
+								// 						name: label ?? "",
+								// 						direction: "output",
+								// 						order: index,
+								// 						portsBlueprintsId: 0,
+								// 						nodeClassKey: key,
+								// 					}),
+								// 				),
+								// 			},
+								// 		},
+								// 		action: ({ node }) =>
+								// 			addNode({
+								// 				blueprintId: blueprint.id,
+								// 				node,
+								// 			}),
+								// 	});
+								// }}
+							/>
 						</div>
 					)}
 				</ReactFlow>

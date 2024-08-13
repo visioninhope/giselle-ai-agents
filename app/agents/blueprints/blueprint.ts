@@ -1,24 +1,23 @@
-import type { NodeClassName } from "@/app/nodes";
 import type * as schema from "@/drizzle/schema";
-import type { NodeProperties } from "@/drizzle/schema";
+import type { NodeData, NodePosition } from "@/drizzle/schema";
 import type { BlueprintRequiredAction } from "./required-action";
 
 type DbNode = typeof schema.nodes.$inferSelect;
-type DbPort = typeof schema.ports.$inferSelect;
+type DbPort = Omit<typeof schema.ports.$inferSelect, "nodeClassKey">;
 type DbEdge = typeof schema.edges.$inferSelect;
 type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = DbPort & {
 	isCreating?: boolean;
 	portsBlueprintsId: DbPortsBlueprints["id"];
 };
-export type Node = Pick<DbNode, "position"> & {
+export type Node = {
 	id: number;
 	isCreating?: boolean;
-	className: NodeClassName;
+	className: string;
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
-	properties: NodeProperties;
-	// propertyPortMap: Record<string, string>;
+	data?: NodeData;
+	position: NodePosition;
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {
 	id: number;

@@ -1,6 +1,8 @@
-import type { NodeTemplate } from "../../type";
+import { NodeClassCategory, type NodeTemplate } from "../../type";
 
 export const name = "Text Generation";
+
+export const category = NodeClassCategory.Core;
 
 export const template: NodeTemplate = {
 	inputPorts: [

@@ -2,7 +2,6 @@ import {
 	type AvailableAgentWithInputPort,
 	getAvailableAgentsWithInputPorts,
 } from "@/app/agents";
-import { type NodeClass, agent as agentNodeClass } from "@/app/nodes";
 import {
 	Command,
 	CommandEmpty,
@@ -13,19 +12,10 @@ import {
 	CommandLoading,
 } from "@/components/ui/command";
 import { type FC, useCallback, useEffect, useState } from "react";
-
-const labels = [
-	"feature",
-	"bug",
-	"enhancement",
-	"documentation",
-	"design",
-	"question",
-	"maintenance",
-];
+import { type AgentNodeClass, agent as agentNodeClass } from "../";
 
 type AgentListProps = {
-	onSelect: (nodeClass: NodeClass) => void;
+	onSelect: (nodeClass: AgentNodeClass) => void;
 };
 export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 	const [loading, setLoading] = useState(true);
@@ -39,9 +29,35 @@ export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 	useEffect(() => {
 		fetchAgents();
 	}, [fetchAgents]);
+
 	const handleSelect = useCallback(
 		(agent: AvailableAgentWithInputPort) => () => {
-			onSelect(agentNodeClass);
+			onSelect({
+				...agentNodeClass,
+				template: {
+					...agentNodeClass.template,
+					inputPorts: [
+						...(agentNodeClass.template.inputPorts ?? []),
+						...agent.inputPorts,
+					],
+					properties: [
+						...(agentNodeClass.template.properties ?? []),
+						{
+							name: "relevantAgentId",
+							value: `${agent.id}`,
+						},
+						{
+							name: "relevantAgentName",
+							value: agent.name ?? "",
+						},
+						{
+							name: "relevantAgentBlueprintId",
+							value: `${agent.blueprintId}`,
+						},
+					],
+				},
+				data: {},
+			});
 		},
 		[onSelect],
 	);

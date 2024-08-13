@@ -4,7 +4,6 @@ import {
 	inferRequestInterface,
 	reviewRequiredActions,
 } from "@/app/agents/blueprints";
-import { type NodeClassName, getNodeClass } from "@/app/nodes";
 import {
 	agents as agentsSchema,
 	blueprints as blueprintsSchema,
@@ -39,8 +38,8 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		.select({
 			id: nodesSchema.id,
 			className: nodesSchema.className,
-			position: nodesSchema.position,
-			properties: nodeBlueprintsSchema.nodeProperties,
+			position: nodeBlueprintsSchema.position,
+			data: nodeBlueprintsSchema.data,
 		})
 		.from(nodesSchema)
 		.innerJoin(

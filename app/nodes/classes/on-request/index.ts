@@ -1,9 +1,13 @@
-import type { NodeTemplate } from "../../type";
+import { buildDefaultPort, buildNodeClass } from "../../builder";
+import { DefaultPortType, NodeClassCategory } from "../../type";
+import { Panel } from "./ui";
 
-export { Panel } from "./ui";
-
-export const name = "On Request";
-
-export const template: NodeTemplate = {
-	outputPorts: [{ type: "execution", key: "to" }],
-};
+export const onRequest = buildNodeClass("onRequest", {
+	category: NodeClassCategory.Core,
+	defaultPorts: {
+		outputPorts: [
+			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),
+		],
+	},
+	panel: Panel,
+});

@@ -8,6 +8,7 @@ import {
 import { onRequest, response } from "@/app/nodes";
 
 export const reviewRequiredActions = (blueprint: Blueprint) => {
+	return [];
 	const requiredActions: BlueprintRequiredAction[] = [];
 	const inferedSteps = inferSteps(blueprint);
 	const firstStepNode =

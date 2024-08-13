@@ -1,24 +1,25 @@
 import { addNode, useBlueprint } from "@/app/agents/blueprints";
-import type { NodeClass } from "@/app/nodes";
+import type { NodeClass, Port } from "@/app/nodes";
 import { useReactFlow } from "@xyflow/react";
 import { useCallback } from "react";
 import invariant from "tiny-invariant";
 
-type AddNodeArgs = {
-	nodeClass: NodeClass;
-	position: { x: number; y: number };
-	relevantAgent?: never;
-};
-// | {
-// 		nodeClassName: "agent";
-// 		position: { x: number; y: number };
-// 		relevantAgent: {
-// 			agentId: number;
-// 			agentName: string;
-// 			blueprintId: number;
-// 			inputPorts: Port[];
-// 		};
-//   };
+type AddNodeArgs =
+	| {
+			nodeClass: NodeClass;
+			position: { x: number; y: number };
+			relevantAgent?: never;
+	  }
+	| {
+			nodeClassName: "agent";
+			position: { x: number; y: number };
+			relevantAgent: {
+				agentId: number;
+				agentName: string;
+				blueprintId: number;
+				inputPorts: Port[];
+			};
+	  };
 export const useAddNodeAction = () => {
 	const reactFlowInstance = useReactFlow();
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();

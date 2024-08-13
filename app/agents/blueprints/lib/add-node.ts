@@ -1,7 +1,11 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
-import { type NodeClassName, getNodeClass } from "@/app/nodes";
+import {
+	NodeClassCategory,
+	type NodeClassName,
+	getNodeClass,
+} from "@/app/nodes";
 import {
 	blueprints,
 	db,
@@ -15,10 +19,7 @@ import invariant from "tiny-invariant";
 
 type AddNodeArgs = {
 	blueprintId: number;
-	node: {
-		className: NodeClassName;
-		position: { x: number; y: number };
-	};
+	node: Node;
 };
 
 export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
@@ -31,46 +32,36 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 	if (nodeClass.name == null) {
 		throw new Error("Node class name is required");
 	}
-	const [node] = await db
+	const [insertedNode] = await db
 		.insert(nodes)
 		.values({
 			agentId: blueprint.agentId,
-			className: nodeClass.name,
+			className: args.node.className,
 			position: args.node.position,
 		})
 		.returning({
 			id: nodes.id,
 		});
-	const inputPorts: (typeof ports.$inferInsert)[] = (
-		nodeClass.template.inputPorts ?? []
-	).map((port, index) => ({
-		nodeId: node.id,
-		type: port.type,
-		direction: "input",
-		order: index,
-		name: port.label ?? "",
-		nodeClassKey: port.key,
-	}));
-	const outputPorts: (typeof ports.$inferInsert)[] = (
-		nodeClass.template.outputPorts ?? []
-	).map((port, index) => ({
-		nodeId: node.id,
-		type: port.type,
-		direction: "output",
-		order: index,
-		name: port.label ?? "",
-		nodeClassKey: port.key,
-	}));
 	const insertedPorts = await db
 		.insert(ports)
-		.values([...inputPorts, ...outputPorts])
+		.values(
+			[...args.node.inputPorts, ...args.node.outputPorts].map(
+				({ type, direction, order, name }) => ({
+					nodeId: insertedNode.id,
+					type,
+					direction,
+					order,
+					name,
+				}),
+			),
+		)
 		.returning({
 			id: ports.id,
 		});
 	const [nodeBlueprint] = await db
 		.insert(nodesBlueprints)
 		.values({
-			nodeId: node.id,
+			nodeId: insertedNode.id,
 			blueprintId: blueprint.id,
 			nodeProperties: nodeClass.template.properties ?? [],
 		})
@@ -90,24 +81,22 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 		.where(eq(blueprints.id, args.blueprintId));
 	return {
 		node: {
-			id: node.id,
+			id: insertedNode.id,
 			position: args.node.position,
 			className: args.node.className,
 			properties: nodeClass.template.properties ?? [],
-			inputPorts: inputPorts.map(({ nodeId, ...port }, index) => ({
+			inputPorts: args.node.inputPorts.map((port, index) => ({
 				...port,
 				id: insertedPorts[index].id,
-				nodeId,
+				nodeId: insertedNode.id,
 				portsBlueprintsId: insertedPortsBlueprints[index].id,
-				nodeClassKey: port.nodeClassKey ?? null,
 			})),
-			outputPorts: outputPorts.map(({ nodeId, ...port }, index) => ({
+			outputPorts: args.node.outputPorts.map((port, index) => ({
 				...port,
-				id: insertedPorts[index + inputPorts.length].id,
-				nodeId,
+				id: insertedPorts[index + args.node.inputPorts.length].id,
+				nodeId: insertedNode.id,
 				portsBlueprintsId:
-					insertedPortsBlueprints[index + inputPorts.length].id,
-				nodeClassKey: port.nodeClassKey ?? null,
+					insertedPortsBlueprints[index + args.node.inputPorts.length].id,
 			})),
 		},
 	};

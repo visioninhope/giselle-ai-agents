@@ -1,53 +1,51 @@
-import type { Blueprint, Node } from "@/app/agents/blueprints";
-import type { Step } from "@/app/agents/requests";
-import type { PortType } from "@/drizzle/schema";
+import type { Node } from "@/app/agents/blueprints";
 import type { FC } from "react";
+import type { BaseSchema } from "valibot";
 
-// export type NodeClass = {
-// 	name: string;
-// 	label: string;
-// 	inputPorts?: Port[];
-// 	outputPorts?: Port[];
-// 	features?: Feature[];
-// 	properties?: Property[];
-// 	propertyPortMap?: Record<string, string>;
-// };
-
-export type Action = (requestStep: Step) => Promise<void>;
-
-export type Port = { type: PortType; key: string; label?: string };
-
-export type Property = {
-	name: string;
-	label?: string;
+export enum DefaultPortType {
+	Execution = "execution",
+	Data = "data",
+}
+export type DefaultPort<TType extends DefaultPortType, TName extends string> = {
+	type: TType;
+	name: TName;
 };
 
-// export type Feature = DynamicOutputPort | DynamicInputPort;
+export interface DefaultPorts<
+	TInputPorts extends DefaultPort<DefaultPortType, string>[],
+	TOutputPorts extends DefaultPort<DefaultPortType, string>[],
+> {
+	inputPorts?: TInputPorts;
+	outputPorts?: TOutputPorts;
+}
 
-// type DynamicOutputPort = {
-// 	name: "dynamicOutputPort";
-// };
-// type DynamicInputPort = {
-// 	name: "dynamicInputPort";
-// };
+export enum NodeClassCategory {
+	Core = 0,
+	Agent = 1,
+}
 
-type ResolverArgs = {
-	requestId: number;
-	nodeId: number;
-	blueprint: Blueprint;
-};
-export type Resolver = (args: ResolverArgs) => Promise<void>;
+export interface NodeClassOptions<
+	TNodeClassCategory extends NodeClassCategory,
+	TDefaultPorts extends DefaultPorts<any, any>,
+	TBaseSchema extends BaseSchema<any, any, any> = never,
+> {
+	category: TNodeClassCategory;
+	defaultPorts: TDefaultPorts;
+	dataSchema?: TBaseSchema;
+	panel?: FC;
+}
 
-export type NodeTemplate = {
-	inputPorts?: Port[];
-	outputPorts?: Port[];
-	properties?: Property[];
-};
+export interface NodeClass<
+	TNodeName extends string,
+	TNodeClassCategory extends NodeClassCategory,
+	TDefaultPorts extends DefaultPorts<any, any>,
+	TBaseSchema extends BaseSchema<any, any, any>,
+> {
+	name: TNodeName;
+	category: TNodeClassCategory;
+	defaultPorts: TDefaultPorts;
+	dataSchema?: TBaseSchema;
+	panel?: FC;
+}
+
 export type PanelProps = { node: Node };
-export type NodeClass = {
-	name: string;
-	action?: Action;
-	resolver?: Resolver;
-	Panel?: FC<PanelProps>;
-	template: NodeTemplate;
-};

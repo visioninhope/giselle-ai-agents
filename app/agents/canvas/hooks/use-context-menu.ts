@@ -7,7 +7,11 @@ interface ContextMenuPosition {
 
 export const useContextMenu = () => {
 	const [isVisible, setIsVisible] = useState<boolean>(false);
-	const [position, setPosition] = useState<ContextMenuPosition>({ x: 0, y: 0 });
+	const [contextMenuPosition, setContextMenuPosition] =
+		useState<ContextMenuPosition>({
+			x: 0,
+			y: 0,
+		});
 
 	const toggleContextMenu = useCallback(
 		(x: number, y: number) => {
@@ -15,7 +19,7 @@ export const useContextMenu = () => {
 				setIsVisible(false);
 				return;
 			}
-			setPosition({ x, y });
+			setContextMenuPosition({ x, y });
 			setIsVisible(true);
 		},
 		[isVisible],
@@ -35,7 +39,7 @@ export const useContextMenu = () => {
 
 	return {
 		isVisible,
-		position,
+		contextMenuPosition,
 		toggleContextMenu,
 		hideContextMenu,
 		handleContextMenu,
