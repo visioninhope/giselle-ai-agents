@@ -7,6 +7,7 @@ export const inferRequestInterface = (blueprint: Blueprint) => {
 	if (requiredActions.length > 0) {
 		return null;
 	}
+	return null;
 
 	const inferedSteps = inferSteps(blueprint);
 	const firstStepNode = blueprint.nodes.find(

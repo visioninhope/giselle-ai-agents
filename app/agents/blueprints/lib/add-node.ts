@@ -2,11 +2,6 @@
 
 import type { Node } from "@/app/agents/blueprints";
 import {
-	NodeClassCategory,
-	type NodeClassName,
-	getNodeClass,
-} from "@/app/nodes";
-import {
 	blueprints,
 	db,
 	nodes,
@@ -27,17 +22,11 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 		where: eq(blueprints.id, args.blueprintId),
 	});
 	invariant(blueprint != null, `Blueprint not found: ${args.blueprintId}`);
-	const nodeClass = getNodeClass({ name: args.node.className });
-	invariant(nodeClass != null, `Node class not found: ${args.node.className}`);
-	if (nodeClass.name == null) {
-		throw new Error("Node class name is required");
-	}
 	const [insertedNode] = await db
 		.insert(nodes)
 		.values({
 			agentId: blueprint.agentId,
 			className: args.node.className,
-			position: args.node.position,
 		})
 		.returning({
 			id: nodes.id,
@@ -63,7 +52,8 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 		.values({
 			nodeId: insertedNode.id,
 			blueprintId: blueprint.id,
-			nodeProperties: nodeClass.template.properties ?? [],
+			data: args.node.data,
+			position: args.node.position,
 		})
 		.returning({ id: nodesBlueprints.id });
 	const insertedPortsBlueprints = await db
@@ -84,7 +74,7 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 			id: insertedNode.id,
 			position: args.node.position,
 			className: args.node.className,
-			properties: nodeClass.template.properties ?? [],
+			data: args.node.data,
 			inputPorts: args.node.inputPorts.map((port, index) => ({
 				...port,
 				id: insertedPorts[index].id,

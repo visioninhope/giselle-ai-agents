@@ -1,13 +1,12 @@
+import type { Node } from "@/app/agents/blueprints";
 import { createTemporaryId } from "@/lib/create-temporary-id";
 import type { InferInput, ObjectSchema } from "valibot";
-import type { Node } from "../agents/blueprints";
-import { agent } from "./classes/agent";
-import { onRequest } from "./classes/on-request";
 import {
 	type DefaultPort,
 	DefaultPortType,
 	type DefaultPorts,
 	type NodeClass,
+	type NodeClasses,
 } from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
@@ -32,20 +31,20 @@ type CreateNodeData<TData> = TData extends ObjectSchema<infer E, infer M>
 	? BaseNodeData & { data: InferInput<ObjectSchema<E, M>> }
 	: BaseNodeData & { data?: never };
 
-function factory<
-	TNodeClasses extends Record<
-		string,
-		NodeClass<
-			any,
-			any,
-			DefaultPorts<
-				DefaultPort<DefaultPortType, string>[],
-				DefaultPort<DefaultPortType, string>[]
-			>,
-			any
-		>
-	>,
->(nodeClasses: TNodeClasses) {
+type Factory<TNodeClasses extends NodeClasses> = {
+	createNode: <Key extends keyof TNodeClasses>(
+		name: Key,
+		data: CreateNodeData<InferSchema<TNodeClasses[Key]>>,
+	) => Node;
+	renderPanel: <Key extends keyof TNodeClasses>(
+		name: Key,
+	) => TNodeClasses[Key]["panel"];
+	$inferClassNames: keyof TNodeClasses;
+};
+
+export function factory<TNodeClasses extends NodeClasses>(
+	nodeClasses: TNodeClasses,
+): Factory<TNodeClasses> {
 	return {
 		createNode: <Key extends keyof TNodeClasses>(
 			name: Key,
@@ -87,10 +86,9 @@ function factory<
 				data: data.data,
 			};
 		},
-		classList: (): [keyof TNodeClasses, NodeClass<any, any, any, any>][] =>
-			Object.entries(nodeClasses),
-		$inferClassKeys: "" as keyof TNodeClasses,
+		renderPanel: (name) => {
+			return nodeClasses[name].panel;
+		},
+		$inferClassNames: "" as keyof TNodeClasses,
 	};
 }
-
-export const nodeFactory = factory({ onRequest, agent });

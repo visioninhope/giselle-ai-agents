@@ -1,8 +1,7 @@
 "use client";
 
-import { type Node, useBlueprint } from "@/app/agents/blueprints";
-import { findNodeClass, useNodeClasses } from "@/app/node-classes";
-import { getNodeClass } from "@/app/nodes";
+import { useBlueprint } from "@/app/agents/blueprints";
+import { assertNodeClassName, nodeFactory } from "@/app/nodes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	type OnSelectionChangeFunc,
@@ -10,10 +9,6 @@ import {
 } from "@xyflow/react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import invariant from "tiny-invariant";
-import { match } from "ts-pattern";
-import { DynamicInputPort } from "./dynamic-input-port";
-import { DynamicOutputPort } from "./dynamic-output-port";
-import { PropertyField } from "./property-field";
 import { RequestPanel } from "./request-panel";
 
 export const PropertyPanel: FC = () => {
@@ -68,13 +63,14 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
 		return node;
 	}, [blueprint.nodes, nodeId]);
 
-	const nodeClass = useMemo(
-		() => getNodeClass({ name: blueprintNode.className }),
-		[blueprintNode.className],
-	);
+	const Panel = useMemo(() => {
+		const className = blueprintNode.className;
+		assertNodeClassName(className);
+		return nodeFactory.renderPanel(className);
+	}, [blueprintNode.className]);
 	return (
 		<div className="flex flex-col gap-2 py-2">
-			{nodeClass.Panel && <nodeClass.Panel node={blueprintNode} />}
+			{Panel && <Panel node={blueprintNode} />}
 			{
 				// {blueprintNode.properties.length > 0 && (
 				// 	<>

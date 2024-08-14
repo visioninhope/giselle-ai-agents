@@ -1,5 +1,4 @@
 import type { Blueprint } from "@/app/agents/blueprints";
-import { onRequest } from "@/app/nodes";
 import type { steps as stepsSchema } from "@/drizzle";
 
 type DbStep = typeof stepsSchema.$inferSelect;
@@ -34,7 +33,7 @@ export const inferSteps = ({ nodes, edges }: Blueprint) => {
 			.filter(({ edgeType }) => edgeType === "execution")
 			.map((edge) => edge.inputPort.nodeId),
 	);
-	const startNode = nodes.find((node) => node.className === onRequest.name);
+	const startNode = nodes.find((node) => node.className === "onrequest");
 	if (startNode == null) {
 		return [];
 	}

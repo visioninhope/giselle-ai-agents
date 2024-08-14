@@ -87,11 +87,10 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		const outputPorts = dbPorts.filter(
 			({ nodeId, direction }) => nodeId === id && direction === "output",
 		);
-		const nodeClass = getNodeClass({ name: className });
 		return {
 			...node,
 			id,
-			className: className as NodeClassName,
+			className,
 			inputPorts: inputPorts.map(
 				({
 					id,

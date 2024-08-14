@@ -168,7 +168,11 @@ const CanvasInner: FC = () => {
 									},
 								})),
 							},
-							action: (optimisticData) => updateNodesPosition(optimisticData),
+							action: (optimisticData) =>
+								updateNodesPosition({
+									...optimisticData,
+									blueprintId: blueprint.id,
+								}),
 						});
 					}}
 					onEdgesDelete={(edges) => {
