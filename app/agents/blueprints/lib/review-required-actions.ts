@@ -5,26 +5,24 @@ import {
 	inferSteps,
 	startWithOnRequestNode,
 } from "@/app/agents/blueprints";
-import { onRequest, response } from "@/app/nodes";
+import { NodeClassCategory, nodeClassHasCategory } from "@/app/nodes";
 
 export const reviewRequiredActions = (blueprint: Blueprint) => {
-	return [];
 	const requiredActions: BlueprintRequiredAction[] = [];
 	const inferedSteps = inferSteps(blueprint);
-	const firstStepNode =
-		inferedSteps.length === 0
-			? null
-			: blueprint.nodes.find((node) => inferedSteps[0].nodeId === node.id);
-	if (firstStepNode?.className !== onRequest.name) {
+	if (inferedSteps.length < 1) {
 		requiredActions.push(startWithOnRequestNode);
 	}
 	const lastStepNode =
-		inferedSteps.length === 0
+		inferedSteps.length < 2
 			? null
 			: blueprint.nodes.find(
 					(node) => inferedSteps[inferedSteps.length - 1].nodeId === node.id,
 				);
-	if (lastStepNode?.className !== response.name) {
+	if (
+		lastStepNode == null ||
+		!nodeClassHasCategory(lastStepNode.className, NodeClassCategory.Response)
+	) {
 		requiredActions.push(endWithResponseNode);
 	}
 	return requiredActions;

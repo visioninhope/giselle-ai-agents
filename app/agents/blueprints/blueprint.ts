@@ -16,7 +16,7 @@ export type Node = {
 	className: string;
 	inputPorts: BlueprintPort[];
 	outputPorts: BlueprintPort[];
-	data?: NodeData;
+	data?: NodeData | null;
 	position: NodePosition;
 };
 export type Edge = Pick<DbEdge, "edgeType"> & {

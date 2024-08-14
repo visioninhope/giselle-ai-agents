@@ -3,7 +3,7 @@ import { DefaultPortType, NodeClassCategory } from "../../type";
 import { Panel } from "./ui";
 
 export const onRequest = buildNodeClass("onRequest", {
-	category: NodeClassCategory.Core,
+	categories: [NodeClassCategory.Trigger],
 	defaultPorts: {
 		outputPorts: [
 			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),

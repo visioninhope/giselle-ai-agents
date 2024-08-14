@@ -28,16 +28,16 @@ export function buildDefaultPort<
 
 export function buildNodeClass<
 	NodeName extends string,
-	Category extends NodeClassCategory,
+	TNodeClassCategories extends NodeClassCategory[],
 	TDefaultPorts extends DefaultPorts<any, any>,
 	DataSchema extends BaseSchema<any, any, any> = never,
 >(
 	nodeName: NodeName,
-	options: NodeClassOptions<Category, TDefaultPorts, DataSchema>,
-): NodeClass<NodeName, Category, TDefaultPorts, DataSchema> {
+	options: NodeClassOptions<TNodeClassCategories, TDefaultPorts, DataSchema>,
+): NodeClass<NodeName, TNodeClassCategories, TDefaultPorts, DataSchema> {
 	return {
 		name: nodeName,
-		category: options.category,
+		categories: options.categories,
 		defaultPorts: options.defaultPorts,
 		dataSchema: options.dataSchema,
 		panel: options.panel,

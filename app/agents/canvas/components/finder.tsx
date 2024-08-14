@@ -13,8 +13,8 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { createTemporaryId } from "@/lib/create-temporary-id";
-import type { FC } from "react";
-import { addNode, useBlueprint } from "../../blueprints";
+import { type FC, useCallback } from "react";
+import { type Node, addNode, useBlueprint } from "../../blueprints";
 // import { AgentList } from "./agent-list";
 
 type FinderProps = {
@@ -22,6 +22,16 @@ type FinderProps = {
 };
 export const Finder: FC<FinderProps> = ({ position }) => {
 	const { mutate, blueprint } = useBlueprint();
+	const addNodeMutation = useCallback(
+		(node: Node) => {
+			mutate({
+				type: "addNode",
+				optimisticData: { node },
+				action: () => addNode({ blueprintId: blueprint.id, node }),
+			});
+		},
+		[mutate, blueprint.id],
+	);
 	return (
 		<DropdownMenu defaultOpen={true} modal={false}>
 			<DropdownMenuTrigger />
@@ -44,14 +54,20 @@ export const Finder: FC<FinderProps> = ({ position }) => {
 							const node = nodeFactory.createNode("onRequest", {
 								position,
 							});
-							mutate({
-								type: "addNode",
-								optimisticData: { node },
-								action: () => addNode({ blueprintId: blueprint.id, node }),
-							});
+							addNodeMutation(node);
 						}}
 					>
 						On Request
+					</DropdownMenuItem>
+					<DropdownMenuItem
+						onSelect={() => {
+							const node = nodeFactory.createNode("response", {
+								position,
+							});
+							addNodeMutation(node);
+						}}
+					>
+						Response
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>

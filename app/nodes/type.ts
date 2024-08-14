@@ -20,16 +20,17 @@ export type DefaultPorts<
 };
 
 export enum NodeClassCategory {
-	Core = 0,
-	Agent = 1,
+	Trigger = "trigger",
+	LLM = "llm",
+	Response = "response",
 }
 
 export type NodeClassOptions<
-	TNodeClassCategory extends NodeClassCategory,
+	TNodeClassCategories extends NodeClassCategory[],
 	TDefaultPorts extends DefaultPorts<any, any>,
 	TBaseSchema extends BaseSchema<any, any, any> = never,
 > = {
-	category: TNodeClassCategory;
+	categories: TNodeClassCategories;
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
 	panel?: FC<PanelProps>;
@@ -37,12 +38,12 @@ export type NodeClassOptions<
 
 export type NodeClass<
 	TNodeName extends string,
-	TNodeClassCategory extends NodeClassCategory,
+	TNodeClassCategories extends NodeClassCategory[],
 	TDefaultPorts extends DefaultPorts<any, any>,
 	TBaseSchema extends BaseSchema<any, any, any> = never,
 > = {
 	name: TNodeName;
-	category: TNodeClassCategory;
+	categories: TNodeClassCategories;
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
 	panel?: FC<PanelProps>;
