@@ -1,10 +1,13 @@
 import {
+	type Node as BlueprintNode,
+	addNode,
 	connectNodes,
 	deleteEdges,
 	deleteNodes,
 	updateNodesPosition,
 	useBlueprint,
 } from "@/app/agents/blueprints";
+import { Finder } from "@/app/nodes";
 import {
 	Background,
 	type Edge,
@@ -15,8 +18,7 @@ import {
 	ReactFlowProvider,
 	useReactFlow,
 } from "@xyflow/react";
-import { type FC, useRef } from "react";
-import { Finder } from "./components/finder";
+import { type FC, useCallback, useRef } from "react";
 import { Header } from "./header";
 import {
 	convertXyFlowConnection,
@@ -37,6 +39,17 @@ const CanvasInner: FC = () => {
 	const reactFlowInstance = useReactFlow();
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
+
+	const mutateAddNode = useCallback(
+		(node: BlueprintNode) => {
+			mutate({
+				type: "addNode",
+				optimisticData: { node },
+				action: () => addNode({ blueprintId: blueprint.id, node }),
+			});
+		},
+		[mutate, blueprint.id],
+	);
 	return (
 		<div className="flex flex-col h-full">
 			<Header />
@@ -182,59 +195,7 @@ const CanvasInner: FC = () => {
 									x: contextMenuPosition.x,
 									y: contextMenuPosition.y,
 								})}
-
-								// onSelect={(nodeClass) => {
-								// 	invariant(
-								// 		reactFlowInstance != null,
-								// 		"reactFlowInstance is null",
-								// 	);
-								// 	const position = reactFlowInstance.screenToFlowPosition({
-								// 		x: contextMenuPosition.x,
-								// 		y: contextMenuPosition.y,
-								// 	});
-								// 	const nodeId = createTemporaryId();
-								// 	mutate({
-								// 		type: "addNode",
-								// 		optimisticData: {
-								// 			node: {
-								// 				id: nodeId,
-								// 				isCreating: true,
-								// 				position,
-								// 				className: nodeClass.name,
-								// 				properties: nodeClass.template.properties ?? [],
-								// 				inputPorts: (nodeClass.template.inputPorts ?? []).map(
-								// 					({ type, label, key }, index) => ({
-								// 						id: createTemporaryId(),
-								// 						nodeId,
-								// 						type,
-								// 						name: label ?? "",
-								// 						direction: "input",
-								// 						order: index,
-								// 						portsBlueprintsId: 0,
-								// 						nodeClassKey: key,
-								// 					}),
-								// 				),
-								// 				outputPorts: (nodeClass.template.outputPorts ?? []).map(
-								// 					({ type, label, key }, index) => ({
-								// 						id: createTemporaryId(),
-								// 						nodeId,
-								// 						type,
-								// 						name: label ?? "",
-								// 						direction: "output",
-								// 						order: index,
-								// 						portsBlueprintsId: 0,
-								// 						nodeClassKey: key,
-								// 					}),
-								// 				),
-								// 			},
-								// 		},
-								// 		action: ({ node }) =>
-								// 			addNode({
-								// 				blueprintId: blueprint.id,
-								// 				node,
-								// 			}),
-								// 	});
-								// }}
+								onSelect={mutateAddNode}
 							/>
 						</div>
 					)}

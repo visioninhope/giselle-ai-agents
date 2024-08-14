@@ -3,6 +3,7 @@ import { factory } from "./factory";
 import type { NodeClassCategory } from "./type";
 export { NodeClassCategory } from "./type";
 export { nodeClasses } from "./classes";
+export { Finder } from "./components/finder";
 
 export const nodeFactory = factory(nodeClasses);
 
