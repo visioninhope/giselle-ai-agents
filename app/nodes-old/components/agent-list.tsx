@@ -1,7 +1,4 @@
-import {
-	type AvailableAgentWithInputPort,
-	getAvailableAgentsWithInputPorts,
-} from "@/app/agents";
+import { type AvailableAgent, getAvailableAgents } from "@/app/agents";
 import {
 	Command,
 	CommandEmpty,
@@ -19,11 +16,9 @@ type AgentListProps = {
 };
 export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 	const [loading, setLoading] = useState(true);
-	const [availableAgents, setAvaialbleAgents] = useState<
-		AvailableAgentWithInputPort[]
-	>([]);
+	const [availableAgents, setAvaialbleAgents] = useState<AvailableAgent[]>([]);
 	const fetchAgents = useCallback(async () => {
-		setAvaialbleAgents(await getAvailableAgentsWithInputPorts());
+		setAvaialbleAgents(await getAvailableAgents());
 		setLoading(false);
 	}, []);
 	useEffect(() => {
@@ -31,7 +26,7 @@ export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 	}, [fetchAgents]);
 
 	const handleSelect = useCallback(
-		(agent: AvailableAgentWithInputPort) => () => {
+		(agent: AvailableAgent) => () => {
 			onSelect({
 				...agentNodeClass,
 				template: {

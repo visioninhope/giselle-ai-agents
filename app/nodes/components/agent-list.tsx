@@ -1,7 +1,5 @@
-import {
-	type AvailableAgentWithInputPort,
-	getAvailableAgentsWithInputPorts,
-} from "@/app/agents";
+import { type AvailableAgent, getAvailableAgents } from "@/app/agents";
+import type { Node } from "@/app/agents/blueprints";
 import {
 	Command,
 	CommandEmpty,
@@ -12,62 +10,21 @@ import {
 	CommandLoading,
 } from "@/components/ui/command";
 import { type FC, useCallback, useEffect, useState } from "react";
-import { type AgentNodeClass, agent as agentNodeClass } from "../";
+import { nodeFactory } from "..";
 
 type AgentListProps = {
-	onSelect: (nodeClass: AgentNodeClass) => void;
+	position: { x: number; y: number };
+	onSelect: (node: Node) => void;
 };
-export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
-	const [loading, setLoading] = useState(true);
-	const [availableAgents, setAvaialbleAgents] = useState<
-		AvailableAgentWithInputPort[]
-	>([]);
-	const fetchAgents = useCallback(async () => {
-		setAvaialbleAgents(await getAvailableAgentsWithInputPorts());
-		setLoading(false);
-	}, []);
-	useEffect(() => {
-		fetchAgents();
-	}, [fetchAgents]);
-
-	const handleSelect = useCallback(
-		(agent: AvailableAgentWithInputPort) => () => {
-			onSelect({
-				...agentNodeClass,
-				template: {
-					...agentNodeClass.template,
-					inputPorts: [
-						...(agentNodeClass.template.inputPorts ?? []),
-						...agent.inputPorts,
-					],
-					properties: [
-						...(agentNodeClass.template.properties ?? []),
-						{
-							name: "relevantAgentId",
-							value: `${agent.id}`,
-						},
-						{
-							name: "relevantAgentName",
-							value: agent.name ?? "",
-						},
-						{
-							name: "relevantAgentBlueprintId",
-							value: `${agent.blueprintId}`,
-						},
-					],
-				},
-				data: {},
-			});
-		},
-		[onSelect],
+export const LoadingAgentList: FC = () => {
+	return (
+		<Command>
+			<CommandLoading>Loading...</CommandLoading>
+		</Command>
 	);
-	if (loading) {
-		return (
-			<Command>
-				<CommandLoading>Loading...</CommandLoading>
-			</Command>
-		);
-	}
+};
+export const AgentList: FC<AgentListProps> = async ({ onSelect, position }) => {
+	const availableAgents = await getAvailableAgents();
 	return (
 		<Command>
 			<CommandInput
@@ -81,8 +38,15 @@ export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 					{availableAgents.map((availableAgent) => (
 						<CommandItem
 							key={availableAgent.id}
-							value={`${availableAgent.id}`}
-							onSelect={handleSelect(availableAgent)}
+							onSelect={() => {
+								const node = nodeFactory.createNode("agent", {
+									position,
+									data: {
+										relevantAgent: availableAgent,
+									},
+								});
+								onSelect(node);
+							}}
 						>
 							{availableAgent.name}
 						</CommandItem>

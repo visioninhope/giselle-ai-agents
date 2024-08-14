@@ -1,6 +1,5 @@
 "use server";
 
-import type { Port } from "@/app/node-classes";
 import {
 	agents,
 	blueprints,
@@ -13,15 +12,12 @@ import {
 } from "@/drizzle";
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 
-export type AvailableAgentWithInputPort = {
+export type AvailableAgent = {
 	id: number;
-	name: string | null;
+	name: string;
 	blueprintId: number;
-	inputPorts: Port[];
 };
-export const getAvailableAgentsWithInputPorts = async (): Promise<
-	AvailableAgentWithInputPort[]
-> => {
+export const getAvailableAgents = async (): Promise<AvailableAgent[]> => {
 	const availableAgentsQuery = db
 		.select({
 			agentId: blueprints.agentId,
@@ -36,47 +32,6 @@ export const getAvailableAgentsWithInputPorts = async (): Promise<
 		.where(eq(requests.status, "success"))
 		.groupBy(blueprints.agentId)
 		.as("availableAgentsQuery");
-	const availableAgentInputPorts = await db
-		.select({
-			agentId: availableAgentsQuery.agentId,
-			id: ports.id,
-			type: ports.type,
-			name: ports.name,
-		})
-		.from(ports)
-		.innerJoin(portsBlueprints, eq(portsBlueprints.portId, ports.id))
-		.innerJoin(
-			nodesBlueprints,
-			eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
-		)
-		.innerJoin(
-			availableAgentsQuery,
-			eq(availableAgentsQuery.latestBlueprintId, nodesBlueprints.blueprintId),
-		)
-		.innerJoin(
-			nodes,
-			and(
-				eq(nodes.id, nodesBlueprints.nodeId),
-				eq(nodes.className, "onRequest"),
-			),
-		)
-		.where(and(eq(ports.direction, "output"), eq(ports.type, "data")));
-
-	const portGroupsByAgentId = availableAgentInputPorts.reduce(
-		(acc: { [key: number]: Port[] }, port) => {
-			if (!acc[port.agentId]) {
-				acc[port.agentId] = [];
-			}
-			acc[port.agentId].push({
-				type: port.type,
-				label: port.name,
-				key: `${port.id}`,
-			});
-			return acc;
-		},
-		{},
-	);
-
 	const availableAgents = await db
 		.select({
 			id: agents.id,
@@ -88,13 +43,9 @@ export const getAvailableAgentsWithInputPorts = async (): Promise<
 			availableAgentsQuery,
 			eq(agents.id, availableAgentsQuery.agentId),
 		);
-	const availableAgentsWithPorts = availableAgents.map(
-		({ blueprintId, ...agent }) => ({
-			...agent,
-			blueprintId: blueprintId as number,
-			inputPorts: portGroupsByAgentId[agent.id] || [],
-		}),
-	);
-
-	return availableAgentsWithPorts;
+	return availableAgents.map(({ blueprintId, name, ...agent }) => ({
+		...agent,
+		name: name ?? "",
+		blueprintId: blueprintId as number,
+	}));
 };

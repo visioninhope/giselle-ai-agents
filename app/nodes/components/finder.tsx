@@ -6,10 +6,15 @@ import {
 	DropdownMenuGroup,
 	DropdownMenuItem,
 	DropdownMenuLabel,
+	DropdownMenuPortal,
+	DropdownMenuSeparator,
+	DropdownMenuSub,
+	DropdownMenuSubContent,
+	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { FC } from "react";
-// import { AgentList } from "./agent-list";
+import { type FC, Suspense } from "react";
+import { AgentList, LoadingAgentList } from "./agent-list";
 
 type FinderProps = {
 	position: { x: number; y: number };
@@ -20,17 +25,20 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 		<DropdownMenu defaultOpen={true} modal={false}>
 			<DropdownMenuTrigger />
 			<DropdownMenuContent>
-				{/**<DropdownMenuGroup>
+				<DropdownMenuGroup>
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
 						<DropdownMenuPortal>
 							<DropdownMenuSubContent>
-								<AgentList onSelect={onSelect} />
+								<div>
+									<p>hello</p>
+									<AgentList position={position} onSelect={onSelect} />
+								</div>
 							</DropdownMenuSubContent>
 						</DropdownMenuPortal>
 					</DropdownMenuSub>
-					</DropdownMenuGroup>
-				<DropdownMenuSeparator /> **/}
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 					<DropdownMenuItem
