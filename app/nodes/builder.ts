@@ -29,7 +29,9 @@ export function buildDefaultPort<
 export function buildNodeClass<
 	NodeName extends string,
 	TNodeClassCategories extends NodeClassCategory[],
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	TDefaultPorts extends DefaultPorts<any, any>,
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	DataSchema extends BaseSchema<any, any, any> = never,
 >(
 	nodeName: NodeName,
@@ -41,6 +43,8 @@ export function buildNodeClass<
 		defaultPorts: options.defaultPorts,
 		dataSchema: options.dataSchema,
 		panel: options.panel,
+		action: options.action,
+		resolver: options.resolver,
 	};
 }
 // const onRequest = buildNodeClass("onRequest", {

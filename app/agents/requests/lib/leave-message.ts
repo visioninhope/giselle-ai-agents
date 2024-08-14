@@ -14,12 +14,7 @@ import { and, eq } from "drizzle-orm";
 type LeaveMessageArgs = {
 	requestId: number;
 	stepId: number;
-	port:
-		| {
-				id?: never;
-				nodeClassKey: string;
-		  }
-		| { id: number; nodeClassKey?: never };
+	port: { id: number };
 	message: string;
 };
 export const leaveMessage = async ({
@@ -49,9 +44,7 @@ export const leaveMessage = async ({
 		.where(
 			and(
 				eq(requests.id, requestId),
-				port.nodeClassKey != null
-					? eq(ports.nodeClassKey, port.nodeClassKey)
-					: eq(ports.id, port.id),
+				eq(ports.id, port.id),
 				eq(steps.id, stepId),
 			),
 		);

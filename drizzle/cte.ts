@@ -25,7 +25,6 @@ const destinationNodesBlueprints = alias(
 export const pullMessages = db.$with("pullMessages").as(
 	db
 		.select({
-			nodeClassKey: ports.nodeClassKey,
 			content: sql<string>`${requestPortMessages.message}`.as("content"),
 			requestId: sql<number>`${requests.id}`.as("requestId"),
 			nodeId: sql<number>`${destinationNodesBlueprints.nodeId}`.as("nodeId"),

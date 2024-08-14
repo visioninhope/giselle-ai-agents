@@ -13,18 +13,13 @@ import {
 	requests,
 	steps,
 } from "@/drizzle";
-// import { invokeTask } from "@/trigger/invoke";
+import { invokeTask } from "@/trigger/invoke";
 import { and, asc, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import { leaveMessage } from "./leave-message";
 
 export type RequestParameter = {
-	port:
-		| {
-				id?: never;
-				nodeClassKey: string;
-		  }
-		| { id: number; nodeClassKey?: never };
+	port: { id: number };
 	message: string;
 };
 export const createRequest = async (
@@ -76,13 +71,13 @@ export const createRequest = async (
 			message: requestParameter.message,
 		});
 	}
-	// const handle = await invokeTask.trigger({
-	// 	requestId: request.id,
-	// });
+	const handle = await invokeTask.trigger({
+		requestId: request.id,
+	});
 
-	// await db.insert(requestTriggerRelations).values({
-	// 	requestId: request.id,
-	// 	triggerId: handle.id,
-	// });
+	await db.insert(requestTriggerRelations).values({
+		requestId: request.id,
+		triggerId: handle.id,
+	});
 	return { requestId: request.id, triggerRunId: handle.id };
 };

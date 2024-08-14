@@ -33,7 +33,7 @@ export const getRequest = async (requestId: number): Promise<AgentRequest> => {
 		.select({
 			id: nodesSchema.id,
 			className: nodesSchema.className,
-			position: nodesSchema.position,
+			position: nodesBlueprints.position,
 		})
 		.from(nodesSchema)
 		.innerJoin(nodesBlueprints, eq(nodesBlueprints.nodeId, nodesSchema.id))

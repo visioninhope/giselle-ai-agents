@@ -1,6 +1,7 @@
-import type { Node } from "@/app/agents/blueprints";
+import type { Blueprint, Node } from "@/app/agents/blueprints";
 import type { FC } from "react";
 import type { BaseSchema } from "valibot";
+import type { Step } from "../agents/requests";
 
 export enum DefaultPortType {
 	Execution = "execution",
@@ -23,7 +24,17 @@ export enum NodeClassCategory {
 	Trigger = "trigger",
 	LLM = "llm",
 	Response = "response",
+	Utility = "utility",
 }
+
+export type Action = (requestStep: Step) => Promise<void>;
+
+type ResolverArgs = {
+	requestId: number;
+	nodeId: number;
+	blueprint: Blueprint;
+};
+export type Resolver = (args: ResolverArgs) => Promise<void>;
 
 export type NodeClassOptions<
 	TNodeClassCategories extends NodeClassCategory[],
@@ -34,6 +45,8 @@ export type NodeClassOptions<
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
 	panel?: FC<PanelProps>;
+	action?: Action;
+	resolver?: Resolver;
 };
 
 export type NodeClass<
@@ -47,6 +60,8 @@ export type NodeClass<
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
 	panel?: FC<PanelProps>;
+	action?: Action;
+	resolver?: Resolver;
 };
 
 export type NodeClasses = Record<string, NodeClass<any, any, any, any>>;

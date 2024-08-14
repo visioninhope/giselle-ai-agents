@@ -7,13 +7,13 @@ type UpdateNodePropertyArgs = {
 	blueprintId: number;
 	node: {
 		id: number;
-		property: {
+		data: {
 			name: string;
 			value: string;
 		};
 	};
 };
-export const updateNodeProperty = async ({
+export const updateNodeData = async ({
 	blueprintId,
 	node,
 }: UpdateNodePropertyArgs) => {
@@ -29,15 +29,10 @@ export const updateNodeProperty = async ({
 	await db
 		.update(nodesBlueprints)
 		.set({
-			nodeProperties: nodeBlueprint.nodeProperties.map((nodeProperty) => {
-				if (nodeProperty.name !== node.property.name) {
-					return nodeProperty;
-				}
-				return {
-					...nodeProperty,
-					value: node.property.value,
-				};
-			}),
+			data: {
+				...nodeBlueprint.data,
+				[node.data.name]: node.data.value,
+			},
 		})
 		.where(eq(nodesBlueprints.id, nodeBlueprint.id));
 

@@ -15,7 +15,7 @@ export const useSynthsize = () => {
 				className,
 				inputPorts,
 				outputPorts,
-				properties,
+				data,
 				isCreating,
 				...node
 			}) => {
@@ -38,7 +38,7 @@ export const useSynthsize = () => {
 						stepStatus: relevantRequestStep?.status,
 						inputPorts,
 						outputPorts,
-						nodeProperties: properties,
+						data,
 						isCreating,
 					},
 				};

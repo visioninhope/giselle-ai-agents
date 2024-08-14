@@ -63,7 +63,6 @@ export const addNodePort = async ({
 			...port,
 			type: "data",
 			order,
-			nodeClassKey: null,
 			portsBlueprintsId: portBlueprint.id,
 		},
 	};

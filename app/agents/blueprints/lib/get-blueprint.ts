@@ -58,7 +58,6 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 						name: portsSchema.name,
 						type: portsSchema.type,
 						order: portsSchema.order,
-						nodeClassKey: portsSchema.nodeClassKey,
 						blueprintId: nodeBlueprintsSchema.blueprintId,
 						portsBlueprintsId: portBlueprintsSchema.id,
 					})
@@ -92,7 +91,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			id,
 			className,
 			inputPorts: inputPorts.map(
-				({
+				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
 					id,
 					name,
 					type,
@@ -100,20 +99,10 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					order,
 					nodeId,
 					portsBlueprintsId,
-					nodeClassKey,
-				}) => ({
-					id,
-					name,
-					type,
-					direction,
-					order,
-					nodeId,
-					portsBlueprintsId,
-					nodeClassKey,
 				}),
 			),
 			outputPorts: outputPorts.map(
-				({
+				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
 					id,
 					name,
 					type,
@@ -121,16 +110,6 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 					order,
 					nodeId,
 					portsBlueprintsId,
-					nodeClassKey,
-				}) => ({
-					id,
-					name,
-					type,
-					direction,
-					order,
-					nodeId,
-					portsBlueprintsId,
-					nodeClassKey,
 				}),
 			),
 		};

@@ -1,6 +1,4 @@
-import type { AvailableAgentWithInputPort } from "@/app/agents";
 import {
-	addNode,
 	connectNodes,
 	deleteEdges,
 	deleteNodes,
@@ -17,13 +15,11 @@ import {
 	ReactFlowProvider,
 	useReactFlow,
 } from "@xyflow/react";
-import { type FC, useCallback, useRef } from "react";
-import invariant from "tiny-invariant";
+import { type FC, useRef } from "react";
 import { Finder } from "./components/finder";
 import { Header } from "./header";
 import {
 	convertXyFlowConnection,
-	useAddNodeAction,
 	useContextMenu,
 	useInfereceConnectionEdgeType,
 	useSynthsize,
@@ -35,38 +31,10 @@ const CanvasInner: FC = () => {
 	useSynthsize();
 	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const { addNodeAction } = useAddNodeAction();
 	const containerRef = useRef<HTMLDivElement>(null);
 	const nodeTypes: NodeTypes = useNodeTypes();
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
-	// const handleNodeSelect = useCallback(
-	// 	async (nodeClass: NodeClass) => {
-	// 		hideContextMenu();
-	// 		addNodeAction({
-	// 			nodeClass,
-	// 			position: contextMenuPosition,
-	// 		});
-	// 	},
-	// 	[contextMenuPosition, hideContextMenu, addNodeAction],
-	// );
-	// const handleAgentSelect = useCallback(
-	// 	(agent: AvailableAgentWithInputPort) => {
-	// 		hideContextMenu();
-	// 		addNodeAction({
-	// 			nodeClassName: "agent",
-	// 			position: contextMenuPosition,
-	// 			relevantAgent: {
-	// 				/** @todo remove ?? */
-	// 				agentName: agent.name ?? "",
-	// 				agentId: agent.id,
-	// 				blueprintId: agent.blueprintId,
-	// 				inputPorts: agent.inputPorts,
-	// 			},
-	// 		});
-	// 	},
-	// 	[hideContextMenu, contextMenuPosition, addNodeAction],
-	// );
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
 	return (

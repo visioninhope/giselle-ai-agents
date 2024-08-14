@@ -42,10 +42,10 @@ type BlueprintAction =
 			deleteEdgeIds: Array<number>;
 	  }
 	| {
-			type: "updateNodeProperty";
+			type: "updateNodeData";
 			node: {
 				id: number;
-				property: {
+				data: {
 					name: string;
 					value: string;
 				};
@@ -139,20 +139,17 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				),
 			}),
 		}))
-		.with({ type: "updateNodeProperty" }, ({ node }) => ({
+		.with({ type: "updateNodeData" }, ({ node }) => ({
 			...state,
-			nodes: state.nodes.map((stateNode) =>
-				stateNode.id === node.id
-					? {
-							...stateNode,
-							properties: stateNode.properties.map((property) =>
-								property.name === node.property.name
-									? { ...property, value: node.property.value }
-									: property,
-							),
-						}
-					: stateNode,
-			),
+			nodes: state.nodes.map((stateNode) => {
+				if (stateNode.id !== node.id) {
+					return stateNode;
+				}
+				return {
+					...stateNode,
+					data: { ...stateNode.data, [node.data.name]: node.data.value },
+				};
+			}),
 		}))
 		.with({ type: "addNodePort" }, ({ port }) => {
 			const newBlueprint = {

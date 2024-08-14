@@ -1,10 +1,13 @@
-import { updateNodeProperty, useBlueprint } from "@/app/agents/blueprints";
+import { updateNodeData, useBlueprint } from "@/app/agents/blueprints";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { NodeProperty } from "@/drizzle";
+import type { NodeData } from "@/drizzle";
 import { type FC, useCallback, useRef } from "react";
 
-type PropertyFieldProps = NodeProperty & {
+type PropertyFieldProps = {
+	name: string;
+	label?: string;
+	value: string;
 	nodeId: number;
 };
 export const PropertyField: FC<PropertyFieldProps> = ({
@@ -20,18 +23,18 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 			return;
 		}
 		mutate({
-			type: "updateNodeProperty",
+			type: "updateNodeData",
 			optimisticData: {
 				node: {
 					id: nodeId,
-					property: {
+					data: {
 						name,
 						value: ref.current.value,
 					},
 				},
 			},
 			action: (optimisticData) =>
-				updateNodeProperty({
+				updateNodeData({
 					blueprintId: blueprint.id,
 					...optimisticData,
 				}),

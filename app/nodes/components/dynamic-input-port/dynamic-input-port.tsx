@@ -11,7 +11,6 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
-import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
 import { DynamicInputPortListItem } from "./dynamic-input-port-list-item";
@@ -39,7 +38,6 @@ export const DynamicInputPort: FC<DynamicInputPortProps> = ({
 				direction: "input",
 				order: 1000 /** @todo  last port order +1  */,
 				portsBlueprintsId: 0,
-				nodeClassKey: null,
 			};
 			mutate({
 				type: "addNodePort",

@@ -1,12 +1,14 @@
 import type { Node } from "@/app/agents/blueprints";
 import { createTemporaryId } from "@/lib/create-temporary-id";
 import type { InferInput, ObjectSchema } from "valibot";
+import type { Step } from "../agents/requests";
 import {
+	type Action,
 	type DefaultPort,
 	DefaultPortType,
 	type DefaultPorts,
-	type NodeClass,
 	type NodeClasses,
+	type Resolver,
 } from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
@@ -32,13 +34,19 @@ type CreateNodeData<TData> = TData extends ObjectSchema<infer E, infer M>
 	: BaseNodeData & { data?: never };
 
 type Factory<TNodeClasses extends NodeClasses> = {
-	createNode: <Key extends keyof TNodeClasses>(
-		name: Key,
-		data: CreateNodeData<InferSchema<TNodeClasses[Key]>>,
+	createNode: <ClassName extends keyof TNodeClasses>(
+		name: ClassName,
+		data: CreateNodeData<InferSchema<TNodeClasses[ClassName]>>,
 	) => Node;
-	renderPanel: <Key extends keyof TNodeClasses>(
-		name: Key,
-	) => TNodeClasses[Key]["panel"];
+	renderPanel: <ClassName extends keyof TNodeClasses>(
+		name: ClassName,
+	) => TNodeClasses[ClassName]["panel"];
+	getAction: <ClassName extends keyof TNodeClasses>(
+		className: ClassName,
+	) => Action | undefined | null;
+	getResolver: <ClassName extends keyof TNodeClasses>(
+		className: ClassName,
+	) => Resolver | undefined | null;
 	$inferClassNames: keyof TNodeClasses;
 };
 
@@ -88,6 +96,12 @@ export function factory<TNodeClasses extends NodeClasses>(
 		},
 		renderPanel: (name) => {
 			return nodeClasses[name].panel;
+		},
+		getAction: (name) => {
+			return nodeClasses[name].action;
+		},
+		getResolver: (name) => {
+			return nodeClasses[name].resolver;
 		},
 		$inferClassNames: "" as keyof TNodeClasses,
 	};
