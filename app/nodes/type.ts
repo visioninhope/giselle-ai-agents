@@ -1,7 +1,6 @@
 import type { Blueprint, Node } from "@/app/agents/blueprints";
 import type { FC } from "react";
 import type { BaseSchema } from "valibot";
-import type { Step } from "../agents/requests";
 
 export enum DefaultPortType {
 	Execution = "execution",
@@ -27,7 +26,12 @@ export enum NodeClassCategory {
 	Utility = "utility",
 }
 
-export type Action = (requestStep: Step) => Promise<void>;
+type ActionArgs = {
+	requestId: number;
+	nodeId: number;
+	blueprint: Blueprint;
+};
+export type Action = (args: ActionArgs) => Promise<void>;
 
 type ResolverArgs = {
 	requestId: number;

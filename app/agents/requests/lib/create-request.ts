@@ -66,8 +66,7 @@ export const createRequest = async (
 	for (const requestParameter of requestParameters) {
 		await leaveMessage({
 			requestId: request.id,
-			stepId: stepsByBlueprintId[0].id,
-			port: requestParameter.port,
+			portId: requestParameter.port.id,
 			message: requestParameter.message,
 		});
 	}

@@ -13,14 +13,12 @@ import { and, eq } from "drizzle-orm";
 
 type LeaveMessageArgs = {
 	requestId: number;
-	stepId: number;
-	port: { id: number };
+	portId: number;
 	message: string;
 };
 export const leaveMessage = async ({
 	requestId,
-	stepId,
-	port,
+	portId,
 	message,
 }: LeaveMessageArgs) => {
 	const [result] = await db
@@ -41,13 +39,7 @@ export const leaveMessage = async ({
 				eq(steps.nodeId, nodesBlueprints.nodeId),
 			),
 		)
-		.where(
-			and(
-				eq(requests.id, requestId),
-				eq(ports.id, port.id),
-				eq(steps.id, stepId),
-			),
-		);
+		.where(and(eq(requests.id, requestId), eq(ports.id, portId)));
 	await db.insert(requestPortMessages).values({
 		portsBlueprintsId: result.portsBlueprintsId,
 		requestId,

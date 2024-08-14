@@ -82,6 +82,16 @@ export const Finder: FC<FinderProps> = ({ position }) => {
 					>
 						Text
 					</DropdownMenuItem>
+					<DropdownMenuItem
+						onSelect={() => {
+							const node = nodeFactory.createNode("textGeneration", {
+								position,
+							});
+							addNodeMutation(node);
+						}}
+					>
+						Text Generation
+					</DropdownMenuItem>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>

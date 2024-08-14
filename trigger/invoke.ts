@@ -56,7 +56,11 @@ export const invokeTask = task({
 			if (action == null) {
 				logger.log(`action not implemented for ${step.node.className}`);
 			} else {
-				await action(step);
+				await action({
+					requestId: request.id,
+					nodeId: step.node.id,
+					blueprint,
+				});
 			}
 			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {
