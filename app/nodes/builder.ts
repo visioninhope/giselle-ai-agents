@@ -1,11 +1,4 @@
-import {
-	type BaseSchema,
-	never,
-	number,
-	object,
-	string,
-	unknown,
-} from "valibot";
+import type { BaseSchema } from "valibot";
 import type {
 	DefaultPort,
 	DefaultPortType,
@@ -32,7 +25,7 @@ export function buildNodeClass<
 	// biome-ignore lint: lint/suspicious/noExplicitAny
 	TDefaultPorts extends DefaultPorts<any, any>,
 	// biome-ignore lint: lint/suspicious/noExplicitAny
-	DataSchema extends BaseSchema<any, any, any> = never,
+	DataSchema extends BaseSchema<any, any, any> = any,
 >(
 	nodeName: NodeName,
 	options: NodeClassOptions<TNodeClassCategories, TDefaultPorts, DataSchema>,
@@ -42,66 +35,8 @@ export function buildNodeClass<
 		categories: options.categories,
 		defaultPorts: options.defaultPorts,
 		dataSchema: options.dataSchema,
-		panel: options.panel,
+		renderPanel: options.renderPanel,
 		action: options.action,
 		resolver: options.resolver,
 	};
 }
-// const onRequest = buildNodeClass("onRequest", {
-// 	category: NodeClassCategory.Core,
-// 	defaultPorts: {
-// 		outputPorts: [buildPort({ type: PortType.Execution, name: "to" })],
-// 	},
-// });
-
-// const response = buildNodeClass("response", {
-// 	category: NodeClassCategory.Core,
-// 	defaultPorts: {
-// 		inputPorts: [
-// 			buildPort({ type: PortType.Execution, name: "from" }),
-// 			buildPort({ type: PortType.Data, name: "Output" }),
-// 		],
-// 	},
-// });
-
-// const text = buildNodeClass("text", {
-// 	category: NodeClassCategory.Core,
-// 	defaultPorts: {
-// 		outputPorts: [buildPort({ type: PortType.Data, name: "text" })],
-// 	},
-// 	dataSchema: object({
-// 		content: string(),
-// 	}),
-// 	defaultData: {
-// 		content: "",
-// 	},
-// });
-
-// export const textGeneration = buildNodeClass("textGeneration", {
-// 	category: NodeClassCategory.Core,
-// 	defaultPorts: {
-// 		inputPorts: [
-// 			buildPort({ type: PortType.Execution, name: "from" }),
-// 			buildPort({ type: PortType.Data, name: "instruction" }),
-// 		],
-// 		outputPorts: [
-// 			buildPort({ type: PortType.Execution, name: "to" }),
-// 			buildPort({ type: PortType.Data, name: "result" }),
-// 		],
-// 	},
-// });
-
-// export const agent = buildNodeClass("agent", {
-// 	category: NodeClassCategory.Agent,
-// 	defaultPorts: {
-// 		inputPorts: [buildPort({ type: PortType.Execution, name: "from" })],
-// 		outputPorts: [buildPort({ type: PortType.Execution, name: "to" })],
-// 	},
-// 	dataSchema: object({
-// 		agent: object({
-// 			id: number(),
-// 			blueprintId: number(),
-// 			name: string(),
-// 		}),
-// 	}),
-// });

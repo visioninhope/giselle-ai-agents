@@ -1,7 +1,7 @@
 "use client";
 
 import { useBlueprint } from "@/app/agents/blueprints";
-import { assertNodeClassName, nodeFactory } from "@/app/nodes";
+import { assertNodeClassName, nodeService } from "@/app/nodes";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
 	type OnSelectionChangeFunc,
@@ -66,45 +66,7 @@ const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
 	const Panel = useMemo(() => {
 		const className = blueprintNode.className;
 		assertNodeClassName(className);
-		return nodeFactory.renderPanel(className);
-	}, [blueprintNode.className]);
-	return (
-		<div className="flex flex-col gap-2 py-2">
-			{Panel && <Panel node={blueprintNode} />}
-			{
-				// {blueprintNode.properties.length > 0 && (
-				// 	<>
-				// 		<div className="px-4">
-				// 			{blueprintNode.properties?.map((property) => (
-				// 				<PropertyField
-				// 					key={`${blueprintNode.id}-${property.name}`}
-				// 					nodeId={node.id}
-				// 					{...property}
-				// 				/>
-				// 			))}
-				// 		</div>
-				// 		<hr className="my-4" />
-				// 	</>
-				// )}
-				// <div>
-				// 	{nodeClass.features?.map((feature) =>
-				// 		match(feature)
-				// 			.with({ name: "dynamicOutputPort" }, () => (
-				// 				<DynamicOutputPort
-				// 					node={blueprintNode}
-				// 					key={`${blueprintNode.id}-${feature.name}`}
-				// 				/>
-				// 			))
-				// 			.with({ name: "dynamicInputPort" }, () => (
-				// 				<DynamicInputPort
-				// 					node={blueprintNode}
-				// 					key={`${blueprintNode.id}-${feature.name}`}
-				// 				/>
-				// 			))
-				// 			.exhaustive(),
-				// 	)}
-				// </div>
-			}
-		</div>
-	);
+		return nodeService.renderPanel(className, { node: blueprintNode });
+	}, [blueprintNode]);
+	return <div className="flex flex-col gap-2 py-2">{Panel}</div>;
 };

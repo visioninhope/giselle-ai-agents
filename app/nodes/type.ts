@@ -1,5 +1,5 @@
-import type { Blueprint, Node } from "@/app/agents/blueprints";
-import type { FC } from "react";
+import type { BlueprintPort, Node } from "@/app/agents/blueprints";
+import type { FC, JSX } from "react";
 import type { BaseSchema } from "valibot";
 
 export enum DefaultPortType {
@@ -26,48 +26,74 @@ export enum NodeClassCategory {
 	Utility = "utility",
 }
 
-type ActionArgs = {
+type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestId: number;
-	nodeId: number;
-	blueprint: Blueprint;
+	node: Node;
+	dataSchema: TBaseSchema;
+	findDefaultInputPortAsBlueprint: (
+		// biome-ignore lint: lint/suspicious/noExplicitAny
+		name: TDefaultPorts extends DefaultPorts<infer InputPorts, any>
+			? InputPorts[number]["name"]
+			: never,
+	) => BlueprintPort;
+	findDefaultOutputPortAsBlueprint: (
+		// biome-ignore lint: lint/suspicious/noExplicitAny
+		name: TDefaultPorts extends DefaultPorts<any, infer OutputPorts>
+			? OutputPorts[number]["name"]
+			: never,
+	) => BlueprintPort;
 };
-export type Action = (args: ActionArgs) => Promise<void>;
+type Resolver<TBaseSchema, TDefaultPorts> = (
+	args: ResolverArgs<TBaseSchema, TDefaultPorts>,
+) => Promise<void>;
 
-type ResolverArgs = {
-	requestId: number;
-	nodeId: number;
-	blueprint: Blueprint;
+type ActionArgs<TBaseSchema, TDefaultPorts> = ResolverArgs<
+	TBaseSchema,
+	TDefaultPorts
+>;
+type Action<TBaseSchema, TDefaultPorts> = (
+	args: ActionArgs<TBaseSchema, TDefaultPorts>,
+) => Promise<void>;
+
+type RenderPanelArgs<TBaseSchema> = {
+	node: Node;
+	dataSchema: TBaseSchema;
 };
-export type Resolver = (args: ResolverArgs) => Promise<void>;
+type RenderPanel<TBaseSchema> = (
+	args: RenderPanelArgs<TBaseSchema>,
+) => JSX.Element;
 
 export type NodeClassOptions<
 	TNodeClassCategories extends NodeClassCategory[],
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	TDefaultPorts extends DefaultPorts<any, any>,
-	TBaseSchema extends BaseSchema<any, any, any> = never,
+	// biome-ignore lint: lint/suspicious/noExplicitAny
+	TBaseSchema extends BaseSchema<any, any, any> = any,
 > = {
 	categories: TNodeClassCategories;
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
-	panel?: FC<PanelProps>;
-	action?: Action;
-	resolver?: Resolver;
+	renderPanel?: RenderPanel<TBaseSchema>;
+	action?: Action<TBaseSchema, TDefaultPorts>;
+	resolver?: Resolver<TBaseSchema, TDefaultPorts>;
 };
 
 export type NodeClass<
 	TNodeName extends string,
 	TNodeClassCategories extends NodeClassCategory[],
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	TDefaultPorts extends DefaultPorts<any, any>,
-	TBaseSchema extends BaseSchema<any, any, any> = never,
+	// biome-ignore lint: lint/suspicious/noExplicitAny
+	TBaseSchema extends BaseSchema<any, any, any> = any,
 > = {
 	name: TNodeName;
 	categories: TNodeClassCategories;
 	defaultPorts: TDefaultPorts;
 	dataSchema?: TBaseSchema;
-	panel?: FC<PanelProps>;
-	action?: Action;
-	resolver?: Resolver;
+	renderPanel?: RenderPanel<TBaseSchema>;
+	action?: Action<TBaseSchema, TDefaultPorts>;
+	resolver?: Resolver<TBaseSchema, TDefaultPorts>;
 };
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 export type NodeClasses = Record<string, NodeClass<any, any, any, any>>;
-
-export type PanelProps = { node: Node };

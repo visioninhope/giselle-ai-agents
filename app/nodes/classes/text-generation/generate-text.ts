@@ -4,26 +4,25 @@ import { leaveMessage } from "@/app/agents/requests";
 import { db, pullMessages } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import OpenAI from "openai";
-import invariant from "tiny-invariant";
-import type { Action } from "../../type";
 
 const openai = new OpenAI();
 
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = () => {};
 
-export const action: Action = async ({ requestId, nodeId, blueprint }) => {
-	const blueprintNode = blueprint.nodes.find(({ id }) => id === nodeId);
-	invariant(blueprintNode != null, `node not found: ${nodeId}`);
-	const instructionPort = blueprintNode.inputPorts.find(
-		({ name }) => name === "instruction",
-	);
-	invariant(instructionPort != null, `instruction port not found: ${nodeId}`);
-	const resultPort = blueprintNode.outputPorts.find(
-		({ name }) => name === "result",
-	);
-	invariant(resultPort != null, `result port not found: ${nodeId}`);
+type ActionArgs = {
+	requestId: number;
+	nodeId: number;
+	instructionPortId: number;
+	resultPortId: number;
+};
 
+export const generateText = async ({
+	requestId,
+	nodeId,
+	instructionPortId,
+	resultPortId,
+}: ActionArgs) => {
 	const [instructionMessage] = await db
 		.with(pullMessages)
 		.select()
@@ -32,7 +31,7 @@ export const action: Action = async ({ requestId, nodeId, blueprint }) => {
 			and(
 				eq(pullMessages.requestId, requestId),
 				eq(pullMessages.nodeId, nodeId),
-				eq(pullMessages.portId, instructionPort.id),
+				eq(pullMessages.portId, instructionPortId),
 			),
 		);
 	const content = instructionMessage.content;
@@ -46,7 +45,7 @@ export const action: Action = async ({ requestId, nodeId, blueprint }) => {
 	});
 	await leaveMessage({
 		requestId,
-		portId: resultPort.id,
+		portId: resultPortId,
 		message: completion.choices[0].message.content ?? "",
 	});
 };

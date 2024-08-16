@@ -1,14 +1,13 @@
 import type { Node } from "@/app/agents/blueprints";
 import { createTemporaryId } from "@/lib/create-temporary-id";
+import type { JSX } from "react";
+import invariant from "tiny-invariant";
 import type { InferInput, ObjectSchema } from "valibot";
-import type { Step } from "../agents/requests";
 import {
-	type Action,
 	type DefaultPort,
 	DefaultPortType,
 	type DefaultPorts,
 	type NodeClasses,
-	type Resolver,
 } from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
@@ -33,26 +32,29 @@ type CreateNodeData<TData> = TData extends ObjectSchema<infer E, infer M>
 	? BaseNodeData & { data: InferInput<ObjectSchema<E, M>> }
 	: BaseNodeData & { data?: never };
 
-type Factory<TNodeClasses extends NodeClasses> = {
+type NodeService<TNodeClasses extends NodeClasses> = {
 	createNode: <ClassName extends keyof TNodeClasses>(
 		name: ClassName,
 		data: CreateNodeData<InferSchema<TNodeClasses[ClassName]>>,
 	) => Node;
 	renderPanel: <ClassName extends keyof TNodeClasses>(
 		name: ClassName,
-	) => TNodeClasses[ClassName]["panel"];
-	getAction: <ClassName extends keyof TNodeClasses>(
-		className: ClassName,
-	) => Action | undefined | null;
-	getResolver: <ClassName extends keyof TNodeClasses>(
-		className: ClassName,
-	) => Resolver | undefined | null;
+		{ node }: { node: Node },
+	) => JSX.Element | null;
 	$inferClassNames: keyof TNodeClasses;
+	runAction: <ClassName extends keyof TNodeClasses>(
+		className: ClassName,
+		{ node, requestId }: { node: Node; requestId: number },
+	) => Promise<void>;
+	runResolver: <ClassName extends keyof TNodeClasses>(
+		className: ClassName,
+		{ node, requestId }: { node: Node; requestId: number },
+	) => Promise<void>;
 };
 
-export function factory<TNodeClasses extends NodeClasses>(
+export function createNodeService<TNodeClasses extends NodeClasses>(
 	nodeClasses: TNodeClasses,
-): Factory<TNodeClasses> {
+): NodeService<TNodeClasses> {
 	return {
 		createNode: <Key extends keyof TNodeClasses>(
 			name: Key,
@@ -94,14 +96,66 @@ export function factory<TNodeClasses extends NodeClasses>(
 				data: data.data,
 			};
 		},
-		renderPanel: (name) => {
-			return nodeClasses[name].panel;
+		renderPanel: (name, { node }) => {
+			const nodeClass = nodeClasses[name];
+			const renderPanel = nodeClass.renderPanel;
+			if (renderPanel == null) {
+				return null;
+			}
+			return renderPanel({ node, dataSchema: nodeClass.dataSchema });
 		},
-		getAction: (name) => {
-			return nodeClasses[name].action;
+		runAction: async (name, { node, requestId }) => {
+			const nodeClass = nodeClasses[name];
+			const action = nodeClass.action;
+			if (action == null) {
+				return;
+			}
+			await action({
+				requestId,
+				node,
+				dataSchema: nodeClass.dataSchema,
+				findDefaultInputPortAsBlueprint: (name) => {
+					const port = node.inputPorts.find(
+						({ name: portName }) => portName === name,
+					);
+					invariant(port != null, `Port not found: ${name}`);
+					return port;
+				},
+				findDefaultOutputPortAsBlueprint: (name) => {
+					const port = node.outputPorts.find(
+						({ name: portName }) => portName === name,
+					);
+					invariant(port != null, `Port not found: ${name}`);
+					return port;
+				},
+			});
 		},
-		getResolver: (name) => {
-			return nodeClasses[name].resolver;
+		runResolver: async (name, { node, requestId }) => {
+			const nodeClass = nodeClasses[name];
+			const resolver = nodeClass.resolver;
+			if (resolver == null) {
+				console.log("Resolver not found");
+				return;
+			}
+			await resolver({
+				requestId,
+				node,
+				dataSchema: nodeClass.dataSchema,
+				findDefaultInputPortAsBlueprint: (name) => {
+					const port = node.inputPorts.find(
+						({ name: portName }) => portName === name,
+					);
+					invariant(port != null, `Port not found: ${name}`);
+					return port;
+				},
+				findDefaultOutputPortAsBlueprint: (name) => {
+					const port = node.outputPorts.find(
+						({ name: portName }) => portName === name,
+					);
+					invariant(port != null, `Port not found: ${name}`);
+					return port;
+				},
+			});
 		},
 		$inferClassNames: "" as keyof TNodeClasses,
 	};

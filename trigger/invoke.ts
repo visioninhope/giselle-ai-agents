@@ -1,14 +1,20 @@
-import { getBlueprint } from "@/app/agents/blueprints";
+import { type Blueprint, getBlueprint } from "@/app/agents/blueprints";
 import { getDependedNodes, getRequest } from "@/app/agents/requests";
-import { getResolver } from "@/app/node-classes";
-import { assertNodeClassName, nodeFactory } from "@/app/nodes";
-import { requestPortMessages, requestResults } from "@/drizzle";
+import { assertNodeClassName, nodeService } from "@/app/nodes";
+import { requestResults } from "@/drizzle";
 import { db, updateRun, updateRunStep } from "@/drizzle/db";
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
+import invariant from "tiny-invariant";
 
 type InvokeTaskPayload = {
 	requestId: number;
+};
+
+const findNode = (blueprint: Blueprint, nodeId: number) => {
+	const node = blueprint.nodes.find(({ id }) => id === nodeId);
+	invariant(node != null, `Node not found: ${nodeId}`);
+	return node;
 };
 
 export const invokeTask = task({
@@ -37,31 +43,17 @@ export const invokeTask = task({
 			});
 			for (const dependedNode of dependedNodes) {
 				assertNodeClassName(dependedNode.className);
-				const resolver = nodeFactory.getResolver(dependedNode.className);
-				if (resolver == null) {
-					logger.log(`resolver not implemented for ${dependedNode.className}`);
-				} else {
-					logger.log(
-						`resolver found for ${dependedNode.className}, node id: ${dependedNode.id}`,
-					);
-					await resolver({
-						requestId: request.id,
-						nodeId: dependedNode.id,
-						blueprint,
-					});
-				}
-			}
-			assertNodeClassName(step.node.className);
-			const action = nodeFactory.getAction(step.node.className);
-			if (action == null) {
-				logger.log(`action not implemented for ${step.node.className}`);
-			} else {
-				await action({
+				logger.log(`run resolver for ${dependedNode.className}`);
+				await nodeService.runResolver(dependedNode.className, {
+					node: findNode(blueprint, dependedNode.id),
 					requestId: request.id,
-					nodeId: step.node.id,
-					blueprint,
 				});
 			}
+			assertNodeClassName(step.node.className);
+			await nodeService.runAction(step.node.className, {
+				requestId: request.id,
+				node: findNode(blueprint, step.node.id),
+			});
 			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {
 				status: "success",

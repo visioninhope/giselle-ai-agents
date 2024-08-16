@@ -2,9 +2,16 @@
 
 import { db, nodes, ports, pullMessages, requestResults } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
-import type { Action } from "../../type";
 
-export const action: Action = async ({ requestId, nodeId }) => {
+type InsertRequestResultArgs = {
+	requestId: number;
+	nodeId: number;
+};
+
+export const insertRequestResult = async ({
+	requestId,
+	nodeId,
+}: InsertRequestResultArgs) => {
 	const [outputPort] = await db
 		.select({ id: ports.id, name: ports.name })
 		.from(ports)

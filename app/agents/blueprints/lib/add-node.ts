@@ -1,6 +1,7 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
+import { assertNodeClassName } from "@/app/nodes";
 import {
 	blueprints,
 	db,
@@ -9,7 +10,7 @@ import {
 	ports,
 	portsBlueprints,
 } from "@/drizzle";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 type AddNodeArgs = {
@@ -18,6 +19,7 @@ type AddNodeArgs = {
 };
 
 export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
+	assertNodeClassName(args.node.className);
 	const blueprint = await db.query.blueprints.findFirst({
 		where: eq(blueprints.id, args.blueprintId),
 	});
@@ -69,6 +71,9 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 		.update(blueprints)
 		.set({ dirty: true })
 		.where(eq(blueprints.id, args.blueprintId));
+	// if (args.node.className === "agent") {
+	// const relevantAgentInputPorts = await getRelevantAgentInputPorts(args.node.data.relevantbb
+	// }
 	return {
 		node: {
 			id: insertedNode.id,
@@ -90,4 +95,33 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 			})),
 		},
 	};
+};
+
+const getRelevantAgentInputPorts = async (blueprintId: number) => {
+	const dbPorts = await db
+		.select({
+			portId: ports.id,
+			portName: ports.name,
+		})
+		.from(ports)
+		.innerJoin(portsBlueprints, eq(portsBlueprints.portId, ports.id))
+		.innerJoin(
+			nodesBlueprints,
+			eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
+		)
+		.innerJoin(
+			nodes,
+			and(
+				eq(nodes.id, nodesBlueprints.nodeId),
+				eq(nodes.className, "onRequest"),
+			),
+		)
+		.where(
+			and(
+				eq(nodesBlueprints.blueprintId, blueprintId),
+				eq(ports.direction, "output"),
+				eq(ports.type, "data"),
+			),
+		);
+	return dbPorts;
 };

@@ -1,11 +1,11 @@
 import { nodeClasses } from "./classes";
-import { factory } from "./factory";
+import { createNodeService } from "./service";
 import type { NodeClassCategory } from "./type";
 export { NodeClassCategory } from "./type";
 export { nodeClasses } from "./classes";
 export { Finder } from "./components/finder";
 
-export const nodeFactory = factory(nodeClasses);
+export const nodeService = createNodeService(nodeClasses);
 
 export function assertNodeClassName(
 	name: string | number | symbol,

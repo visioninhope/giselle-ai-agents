@@ -10,21 +10,30 @@ import {
 	CommandLoading,
 } from "@/components/ui/command";
 import { type FC, useCallback, useEffect, useState } from "react";
-import { nodeFactory } from "..";
+import { nodeService } from "../..";
 
 type AgentListProps = {
 	position: { x: number; y: number };
 	onSelect: (node: Node) => void;
 };
-export const LoadingAgentList: FC = () => {
-	return (
-		<Command>
-			<CommandLoading>Loading...</CommandLoading>
-		</Command>
-	);
-};
-export const AgentList: FC<AgentListProps> = async ({ onSelect, position }) => {
-	const availableAgents = await getAvailableAgents();
+export const AgentList: FC<AgentListProps> = ({ onSelect, position }) => {
+	const [loading, setLoading] = useState(true);
+	const [availableAgents, setAvaialbleAgents] = useState<AvailableAgent[]>([]);
+	const fetchAgents = useCallback(async () => {
+		setAvaialbleAgents(await getAvailableAgents());
+		setLoading(false);
+	}, []);
+	useEffect(() => {
+		fetchAgents();
+	}, [fetchAgents]);
+
+	if (loading) {
+		return (
+			<Command>
+				<CommandLoading>Loading...</CommandLoading>
+			</Command>
+		);
+	}
 	return (
 		<Command>
 			<CommandInput
@@ -39,13 +48,12 @@ export const AgentList: FC<AgentListProps> = async ({ onSelect, position }) => {
 						<CommandItem
 							key={availableAgent.id}
 							onSelect={() => {
-								const node = nodeFactory.createNode("agent", {
+								nodeService.createNode("agent", {
 									position,
 									data: {
 										relevantAgent: availableAgent,
 									},
 								});
-								onSelect(node);
 							}}
 						>
 							{availableAgent.name}

@@ -46,6 +46,5 @@ export const inferSteps = ({ nodes, edges }: Blueprint) => {
 		return [];
 	}
 	dfs(startNode.id, 0);
-	console.log({ steps });
 	return steps;
 };

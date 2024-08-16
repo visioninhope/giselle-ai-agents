@@ -1,6 +1,6 @@
 import { buildDefaultPort, buildNodeClass } from "../../builder";
 import { DefaultPortType, NodeClassCategory } from "../../type";
-import { action } from "./action";
+import { insertRequestResult } from "./insert-request-result";
 
 export const response = buildNodeClass("response", {
 	categories: [NodeClassCategory.Response],
@@ -10,5 +10,10 @@ export const response = buildNodeClass("response", {
 			buildDefaultPort({ type: DefaultPortType.Data, name: "output" }),
 		],
 	},
-	action,
+	action: async ({ requestId, node }) => {
+		await insertRequestResult({
+			requestId,
+			nodeId: node.id,
+		});
+	},
 });
