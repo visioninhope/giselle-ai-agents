@@ -2,7 +2,6 @@ import { nodeClasses } from "./classes";
 import { createNodeService } from "./service";
 import type { NodeClassCategory } from "./type";
 export { NodeClassCategory } from "./type";
-export { nodeClasses } from "./classes";
 export { Finder } from "./components/finder";
 
 export const nodeService = createNodeService(nodeClasses);

@@ -1,10 +1,5 @@
 import type { Blueprint } from "@/app/agents/blueprints";
-import {
-	NodeClassCategory,
-	assertNodeClassName,
-	nodeClassHasCategory,
-	nodeClasses,
-} from "@/app/nodes";
+import { NodeClassCategory, nodeClassHasCategory } from "@/app/nodes";
 import type { steps as stepsSchema } from "@/drizzle";
 
 type DbStep = typeof stepsSchema.$inferSelect;
