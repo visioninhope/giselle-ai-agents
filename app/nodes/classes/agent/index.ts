@@ -10,6 +10,7 @@ export const agent = buildNodeClass("agent", {
 		],
 		outputPorts: [
 			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),
+			buildDefaultPort({ type: DefaultPortType.Data, name: "result" }),
 		],
 	},
 	dataSchema: object({
@@ -19,4 +20,5 @@ export const agent = buildNodeClass("agent", {
 			name: string(),
 		}),
 	}),
+	action: async () => {},
 });

@@ -1,6 +1,6 @@
 import type { BlueprintPort, Node } from "@/app/agents/blueprints";
 import type { FC, JSX } from "react";
-import type { BaseSchema } from "valibot";
+import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
 
 export enum DefaultPortType {
 	Execution = "execution",
@@ -29,7 +29,9 @@ export enum NodeClassCategory {
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestId: number;
 	node: Node;
-	dataSchema: TBaseSchema;
+	data: TBaseSchema extends ObjectSchema<infer E, infer M>
+		? InferInput<ObjectSchema<E, M>>
+		: never;
 	findDefaultInputPortAsBlueprint: (
 		// biome-ignore lint: lint/suspicious/noExplicitAny
 		name: TDefaultPorts extends DefaultPorts<infer InputPorts, any>
@@ -57,7 +59,9 @@ type Action<TBaseSchema, TDefaultPorts> = (
 
 type RenderPanelArgs<TBaseSchema> = {
 	node: Node;
-	dataSchema: TBaseSchema;
+	data: TBaseSchema extends ObjectSchema<infer E, infer M>
+		? InferInput<ObjectSchema<E, M>>
+		: never;
 };
 type RenderPanel<TBaseSchema> = (
 	args: RenderPanelArgs<TBaseSchema>,

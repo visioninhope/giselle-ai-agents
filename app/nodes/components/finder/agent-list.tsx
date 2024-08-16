@@ -11,6 +11,8 @@ import {
 } from "@/components/ui/command";
 import { type FC, useCallback, useEffect, useState } from "react";
 import { nodeService } from "../..";
+import { buildDefaultPort } from "../../builder";
+import { DefaultPortType } from "../../type";
 
 type AgentListProps = {
 	position: { x: number; y: number };
@@ -48,12 +50,23 @@ export const AgentList: FC<AgentListProps> = ({ onSelect, position }) => {
 						<CommandItem
 							key={availableAgent.id}
 							onSelect={() => {
-								nodeService.createNode("agent", {
+								const node = nodeService.createNode("agent", {
 									position,
 									data: {
-										relevantAgent: availableAgent,
+										relevantAgent: {
+											id: availableAgent.id,
+											name: availableAgent.name,
+											blueprintId: availableAgent.blueprintId,
+										},
 									},
+									inputPorts: availableAgent.inputPorts.map((port) =>
+										buildDefaultPort({
+											type: DefaultPortType.Data,
+											name: port.name,
+										}),
+									),
 								});
+								onSelect(node);
 							}}
 						>
 							{availableAgent.name}

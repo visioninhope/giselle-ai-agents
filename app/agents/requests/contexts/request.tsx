@@ -25,7 +25,7 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 		if (request.status === "creating" || request.status === "running") {
 			setTimeout(() => {
 				router.refresh();
-			}, 500);
+			}, 2000);
 		}
 	}, [request, router]);
 	return (

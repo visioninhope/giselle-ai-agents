@@ -14,8 +14,7 @@ export const text = buildNodeClass("text", {
 	dataSchema: object({
 		template: string(),
 	}),
-	renderPanel: ({ node, dataSchema }) => {
-		const data = parse(dataSchema, node.data);
+	renderPanel: ({ node, data }) => {
 		return (
 			<TextNodePanel
 				node={node}
@@ -27,13 +26,10 @@ export const text = buildNodeClass("text", {
 	resolver: async ({
 		requestId,
 		node,
-		dataSchema,
+		data,
 		findDefaultOutputPortAsBlueprint,
 	}) => {
 		const textPort = findDefaultOutputPortAsBlueprint("text");
-		console.log(JSON.stringify(node.data));
-		const data = parse(dataSchema, node.data);
-		node.outputPorts.find(({ name }) => name === "text");
 		await buildTemplate({
 			requestId,
 			nodeId: node.id,

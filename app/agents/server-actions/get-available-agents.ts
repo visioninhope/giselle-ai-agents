@@ -12,10 +12,14 @@ import {
 } from "@/drizzle";
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 
+type Port = {
+	name: string;
+};
 export type AvailableAgent = {
 	id: number;
 	name: string;
 	blueprintId: number;
+	inputPorts: Port[];
 };
 export const getAvailableAgents = async (): Promise<AvailableAgent[]> => {
 	const availableAgentsQuery = db
@@ -32,6 +36,44 @@ export const getAvailableAgents = async (): Promise<AvailableAgent[]> => {
 		.where(eq(requests.status, "success"))
 		.groupBy(blueprints.agentId)
 		.as("availableAgentsQuery");
+
+	const availableAgentInputPorts = await db
+		.select({
+			agentId: availableAgentsQuery.agentId,
+			id: ports.id,
+			type: ports.type,
+			name: ports.name,
+		})
+		.from(ports)
+		.innerJoin(portsBlueprints, eq(portsBlueprints.portId, ports.id))
+		.innerJoin(
+			nodesBlueprints,
+			eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
+		)
+		.innerJoin(
+			availableAgentsQuery,
+			eq(availableAgentsQuery.latestBlueprintId, nodesBlueprints.blueprintId),
+		)
+		.innerJoin(
+			nodes,
+			and(
+				eq(nodes.id, nodesBlueprints.nodeId),
+				eq(nodes.className, "onRequest"),
+			),
+		)
+		.where(and(eq(ports.direction, "output"), eq(ports.type, "data")));
+
+	const portGroupsByAgentId = availableAgentInputPorts.reduce(
+		(acc: { [key: number]: Port[] }, port) => {
+			if (!acc[port.agentId]) {
+				acc[port.agentId] = [];
+			}
+			acc[port.agentId].push(port);
+			return acc;
+		},
+		{},
+	);
+
 	const availableAgents = await db
 		.select({
 			id: agents.id,
@@ -47,5 +89,6 @@ export const getAvailableAgents = async (): Promise<AvailableAgent[]> => {
 		...agent,
 		name: name ?? "",
 		blueprintId: blueprintId as number,
+		inputPorts: portGroupsByAgentId[agent.id] ?? [],
 	}));
 };

@@ -2,7 +2,7 @@ import type { Node } from "@/app/agents/blueprints";
 import { createTemporaryId } from "@/lib/create-temporary-id";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
-import type { InferInput, ObjectSchema } from "valibot";
+import { type InferInput, type ObjectSchema, parse } from "valibot";
 import {
 	type DefaultPort,
 	DefaultPortType,
@@ -102,7 +102,9 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			if (renderPanel == null) {
 				return null;
 			}
-			return renderPanel({ node, dataSchema: nodeClass.dataSchema });
+			const dataSchema = nodeClass.dataSchema;
+			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
+			return renderPanel({ node, data });
 		},
 		runAction: async (name, { node, requestId }) => {
 			const nodeClass = nodeClasses[name];
@@ -110,10 +112,12 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			if (action == null) {
 				return;
 			}
+			const dataSchema = nodeClass.dataSchema;
+			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({
 				requestId,
 				node,
-				dataSchema: nodeClass.dataSchema,
+				data,
 				findDefaultInputPortAsBlueprint: (name) => {
 					const port = node.inputPorts.find(
 						({ name: portName }) => portName === name,
@@ -137,10 +141,12 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				console.log("Resolver not found");
 				return;
 			}
+			const dataSchema = nodeClass.dataSchema;
+			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await resolver({
 				requestId,
 				node,
-				dataSchema: nodeClass.dataSchema,
+				data,
 				findDefaultInputPortAsBlueprint: (name) => {
 					const port = node.inputPorts.find(
 						({ name: portName }) => portName === name,
