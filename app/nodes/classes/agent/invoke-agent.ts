@@ -127,7 +127,7 @@ export const invokeAgent = async ({
 	const [relevantAgentRequestResult] = await db
 		.select({ text: requestResults.text })
 		.from(requestResults)
-		.where(eq(requestResults.requestId, requestId));
+		.where(eq(requestResults.requestId, createdReqesut.requestId));
 
 	logger.log(`messages: ${JSON.stringify({ relevantAgentRequestResult })}`);
 	await leaveMessage({
