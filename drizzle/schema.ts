@@ -6,6 +6,7 @@ import {
 	serial,
 	text,
 	timestamp,
+	unique,
 	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
@@ -241,4 +242,30 @@ export const portRepresentedAgentPorts = pgTable(
 			.notNull()
 			.references(() => ports.id, { onDelete: "cascade" }),
 	},
+);
+
+export const oauthCredentials = pgTable(
+	"oauth_credentials",
+	{
+		id: serial("id").primaryKey(),
+		userId: integer("user_id")
+			.notNull()
+			.references(() => users.id),
+		provider: text("provider").notNull(),
+		providerAccountId: text("provider_account_id").notNull(),
+		accessToken: text("access_token").notNull(),
+		refreshToken: text("refresh_token"),
+		expiresAt: timestamp("expires_at"),
+		tokenType: text("token_type"),
+		scope: text("scope"),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at").defaultNow().notNull(),
+	},
+	(table) => ({
+		providerAccountIdUnique: unique("provider_account_id_unique").on(
+			table.userId,
+			table.provider,
+			table.providerAccountId,
+		),
+	}),
 );
