@@ -1,7 +1,11 @@
 "use server";
 
-import type { Node } from "@/app/agents/blueprints";
-import { createRequest, leaveMessage } from "@/app/agents/requests";
+import { type Node, getBlueprint } from "@/app/agents/blueprints";
+import {
+	type RequestParameter,
+	createRequest,
+	leaveMessage,
+} from "@/app/agents/requests";
 import {
 	agents,
 	db,
@@ -14,6 +18,7 @@ import {
 } from "@/drizzle";
 import { logger, runs } from "@trigger.dev/sdk/v3";
 import { and, asc, eq } from "drizzle-orm";
+import invariant from "tiny-invariant";
 
 const waitForRun = async (
 	runId: string,
@@ -51,12 +56,17 @@ type InvokeAgentArgs = {
 	requestId: number;
 	node: Node;
 	resultPortId: number;
+	relevantAgent: {
+		id: number;
+		blueprintId: number;
+	};
 };
 
 export const invokeAgent = async ({
 	requestId,
 	node,
 	resultPortId,
+	relevantAgent,
 }: InvokeAgentArgs) => {
 	const messages = await db
 		.with(pullMessages)
@@ -68,25 +78,48 @@ export const invokeAgent = async ({
 				eq(pullMessages.nodeId, node.id),
 			),
 		);
-	const [relevantAgent] = await db
-		.select({
-			agentId: nodeRepresentedAgents.representedAgentId,
-			blueprintId: nodeRepresentedAgents.representedBlueprintId,
-		})
-		.from(agents)
-		.innerJoin(
-			nodeRepresentedAgents,
-			eq(nodeRepresentedAgents.nodeId, node.id),
-		);
 
+	const relevantAgentBlueprint = await getBlueprint(relevantAgent.blueprintId);
+	invariant(
+		relevantAgentBlueprint.requestInterface != null,
+		`No request interface found for blueprint id:${relevantAgent.blueprintId}`,
+	);
+
+	const inputs = node.inputPorts.map((inputPort) => ({
+		id: inputPort.id,
+		name: inputPort.name,
+		message: messages.find((m) => m.portId === inputPort.id)?.content ?? "",
+	}));
+
+	const requestParameters: RequestParameter[] = [];
+	for (const inputPort of node.inputPorts) {
+		const relevantAgentInputPort =
+			relevantAgentBlueprint.requestInterface.input.find(
+				(relevantAgentInput) => relevantAgentInput.name === inputPort.name,
+			);
+		if (relevantAgentInputPort == null) {
+			logger.log(
+				`No relevant agent input port found for input port: ${inputPort.name}:${inputPort.id}`,
+			);
+			continue;
+		}
+		const message = messages.find(({ portId }) => portId === inputPort.id);
+		if (message == null) {
+			logger.log(
+				`No message found for input port: ${inputPort.name}:${inputPort.id}`,
+			);
+			continue;
+		}
+		requestParameters.push({
+			port: {
+				id: relevantAgentInputPort.portId,
+			},
+			message: message.content,
+		});
+	}
 	const createdReqesut = await createRequest(
 		relevantAgent.blueprintId,
-		messages.map(({ content, representedAgentPortId }) => ({
-			port: {
-				id: representedAgentPortId,
-			},
-			message: content,
-		})),
+		requestParameters,
 	);
 
 	await waitForRun(createdReqesut.triggerRunId);

@@ -1,6 +1,7 @@
 import { number, object, string } from "valibot";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
 import { DefaultPortType, NodeClassCategory } from "../../type";
+import { invokeAgent } from "./invoke-agent";
 
 export const agent = buildNodeClass("agent", {
 	categories: [NodeClassCategory.LLM],
@@ -20,5 +21,20 @@ export const agent = buildNodeClass("agent", {
 			name: string(),
 		}),
 	}),
-	action: async () => {},
+	action: async ({
+		requestId,
+		node,
+		data,
+		findDefaultOutputPortAsBlueprint,
+	}) => {
+		await invokeAgent({
+			requestId,
+			node,
+			resultPortId: findDefaultOutputPortAsBlueprint("result").id,
+			relevantAgent: {
+				id: data.relevantAgent.id,
+				blueprintId: data.relevantAgent.blueprintId,
+			},
+		});
+	},
 });

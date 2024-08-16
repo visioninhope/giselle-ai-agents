@@ -1,0 +1,15 @@
+#!/bin/bash
+
+# package.jsonファイルのパスを指定
+PACKAGE_JSON="package.json"
+
+# sedコマンドを使用してバージョンを元に戻す
+sed -i '' -e 's/"next": ".*"/"next": "^npm i next@15.0.0-canary.116"/' \
+    -e 's/"react": ".*"/"react": "^19.0.0-rc-187dd6a7-20240806"/' \
+    -e 's/"react-dom": ".*"/"react-dom": "^19.0.0-rc-187dd6a7-20240806"/' \
+    "$PACKAGE_JSON"
+
+echo "package.jsonファイルが元のバージョンに戻されました。"
+
+rm -rf node_modules
+bun i
