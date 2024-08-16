@@ -12,7 +12,6 @@ import {
 	Background,
 	type Edge,
 	type Node,
-	type NodeTypes,
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
@@ -24,9 +23,9 @@ import {
 	convertXyFlowConnection,
 	useContextMenu,
 	useInfereceConnectionEdgeType,
+	useNodeTypes,
 	useSynthsize,
 } from "./hooks/";
-import { useNodeTypes } from "./node";
 import { PropertyPanel } from "./property-panel";
 
 const CanvasInner: FC = () => {
@@ -34,21 +33,22 @@ const CanvasInner: FC = () => {
 	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
 	const containerRef = useRef<HTMLDivElement>(null);
-	const nodeTypes: NodeTypes = useNodeTypes();
+	const nodeTypes = useNodeTypes();
 	const { blueprint, mutate, createTemporaryId } = useBlueprint();
 	const reactFlowInstance = useReactFlow();
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
 
-	const mutateAddNode = useCallback(
+	const handleSelectNode = useCallback(
 		(node: BlueprintNode) => {
+			hideContextMenu();
 			mutate({
 				type: "addNode",
 				optimisticData: { node },
 				action: () => addNode({ blueprintId: blueprint.id, node }),
 			});
 		},
-		[mutate, blueprint.id],
+		[mutate, blueprint.id, hideContextMenu],
 	);
 	return (
 		<div className="flex flex-col h-full">
@@ -195,7 +195,7 @@ const CanvasInner: FC = () => {
 									x: contextMenuPosition.x,
 									y: contextMenuPosition.y,
 								})}
-								onSelect={mutateAddNode}
+								onSelect={handleSelectNode}
 							/>
 						</div>
 					)}

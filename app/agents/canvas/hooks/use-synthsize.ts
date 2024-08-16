@@ -2,12 +2,12 @@ import { useBlueprint } from "@/app/agents/blueprints";
 import { useRequest } from "@/app/agents/requests";
 import { useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
-import type { NodeV3 } from "../node/nodev3";
+import { NodeType } from "./use-node-types";
 
 export const useSynthsize = () => {
 	const { blueprint } = useBlueprint();
 	const request = useRequest();
-	const reactFlowInstance = useReactFlow<NodeV3>();
+	const reactFlowInstance = useReactFlow();
 	useEffect(() => {
 		const nodes = blueprint.nodes.map(
 			({
@@ -27,7 +27,7 @@ export const useSynthsize = () => {
 				return {
 					...currentNode,
 					id: `${node.id}`,
-					type: "v3",
+					type: NodeType.Giselle,
 					position,
 					draggable: !isCreating,
 					selectable: !isCreating,

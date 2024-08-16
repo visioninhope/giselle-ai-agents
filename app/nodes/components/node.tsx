@@ -1,3 +1,5 @@
+"use client";
+
 import type {
 	NodeData as NodeDataSchema,
 	RequestStepStatus,
@@ -24,8 +26,8 @@ type NodeData = {
 	stepStatus?: RequestStepStatus;
 	isCreating?: boolean;
 };
-export type NodeV3 = Node<NodeData>;
-export const NodeV3: FC<NodeProps<NodeV3>> = ({
+type NodeV3Data = Node<NodeData>;
+export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 	selected,
 	data: {
 		className,
@@ -47,12 +49,7 @@ export const NodeV3: FC<NodeProps<NodeV3>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>
-						{/** className === "agent"
-							? nodeProperties.find(({ name }) => name === "relevantAgent")
-									?.value
-									: className */}
-					</div>
+					<div>{className}</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
