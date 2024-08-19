@@ -49,10 +49,7 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 				})}
 			>
 				<div className={headerVariant()}>
-					<div>
-						{className}
-						{id}
-					</div>
+					<div>{className}</div>
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
@@ -60,7 +57,6 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 							<div className="flex flex-col gap-2 flex-1">
 								{inputPorts.map(({ id, name, type }) => (
 									<div className={portVariant()} key={id}>
-										{id}
 										<Handle
 											type="target"
 											id={`${id}`}
@@ -82,7 +78,6 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 										position={Position.Right}
 										className={handleVariant({ type })}
 									/>
-									{id}
 								</div>
 							))}
 						</div>
