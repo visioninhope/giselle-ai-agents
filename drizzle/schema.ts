@@ -7,7 +7,6 @@ import {
 	text,
 	timestamp,
 	unique,
-	uniqueIndex,
 } from "drizzle-orm/pg-core";
 
 export const organizations = pgTable("organizations", {
