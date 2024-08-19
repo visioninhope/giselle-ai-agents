@@ -8,11 +8,8 @@ import {
 	agents as agentsSchema,
 	blueprints as blueprintsSchema,
 	db,
-	edgesBlueprints as edgeBlueprintsSchema,
 	edges as edgesSchema,
-	nodesBlueprints as nodeBlueprintsSchema,
 	nodes as nodesSchema,
-	portsBlueprints as portBlueprintsSchema,
 	ports as portsSchema,
 } from "@/drizzle";
 import { and, desc, eq, inArray } from "drizzle-orm";
@@ -30,23 +27,17 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		})
 		.from(blueprintsSchema)
 		.innerJoin(agentsSchema, eq(agentsSchema.id, blueprintsSchema.agentId))
-		.where(eq(blueprintsSchema.id, blueprintId))
-		.orderBy(desc(blueprintsSchema.version))
-		.limit(1);
+		.where(eq(blueprintsSchema.id, blueprintId));
 
 	const dbNodes = await db
 		.select({
 			id: nodesSchema.id,
 			className: nodesSchema.className,
-			position: nodeBlueprintsSchema.position,
-			data: nodeBlueprintsSchema.data,
+			position: nodesSchema.position,
+			data: nodesSchema.data,
 		})
 		.from(nodesSchema)
-		.innerJoin(
-			nodeBlueprintsSchema,
-			eq(nodeBlueprintsSchema.nodeId, nodesSchema.id),
-		)
-		.where(eq(nodeBlueprintsSchema.blueprintId, blueprint.id));
+		.where(eq(nodesSchema.blueprintId, blueprint.id));
 	const dbPorts =
 		dbNodes.length === 0
 			? []
@@ -58,25 +49,14 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 						name: portsSchema.name,
 						type: portsSchema.type,
 						order: portsSchema.order,
-						blueprintId: nodeBlueprintsSchema.blueprintId,
-						portsBlueprintsId: portBlueprintsSchema.id,
+						blueprintId: nodesSchema.blueprintId,
 					})
 					.from(portsSchema)
-					.innerJoin(
-						portBlueprintsSchema,
-						eq(portBlueprintsSchema.portId, portsSchema.id),
-					)
-					.innerJoin(
-						nodeBlueprintsSchema,
-						eq(nodeBlueprintsSchema.id, portBlueprintsSchema.nodesBlueprintsId),
-					)
+					.innerJoin(nodesSchema, eq(nodesSchema.id, portsSchema.nodeId))
 					.where(
-						and(
-							eq(nodeBlueprintsSchema.blueprintId, blueprint.id),
-							inArray(
-								portsSchema.nodeId,
-								dbNodes.map((node) => node.id),
-							),
+						inArray(
+							portsSchema.nodeId,
+							dbNodes.map((node) => node.id),
 						),
 					);
 	const nodes = dbNodes.map(({ className, id, ...node }) => {
@@ -91,25 +71,23 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			id,
 			className,
 			inputPorts: inputPorts.map(
-				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
+				({ id, name, type, direction, order, nodeId }) => ({
 					id,
 					name,
 					type,
 					direction,
 					order,
 					nodeId,
-					portsBlueprintsId,
 				}),
 			),
 			outputPorts: outputPorts.map(
-				({ id, name, type, direction, order, nodeId, portsBlueprintsId }) => ({
+				({ id, name, type, direction, order, nodeId }) => ({
 					id,
 					name,
 					type,
 					direction,
 					order,
 					nodeId,
-					portsBlueprintsId,
 				}),
 			),
 		};
@@ -122,11 +100,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			outputPortId: edgesSchema.outputPortId,
 		})
 		.from(edgesSchema)
-		.innerJoin(
-			edgeBlueprintsSchema,
-			eq(edgeBlueprintsSchema.edgeId, edgesSchema.id),
-		)
-		.where(eq(edgeBlueprintsSchema.blueprintId, blueprint.id));
+		.where(eq(edgesSchema.blueprintId, blueprint.id));
 	const edges = dbEdges.map((edge) => {
 		const inputPort = dbPorts.find((port) => port.id === edge.inputPortId);
 		const outputPort = dbPorts.find((port) => port.id === edge.outputPortId);

@@ -35,7 +35,7 @@ export const text = buildNodeClass("text", {
 			nodeId: node.id,
 			template: data.template,
 			inputPorts: node.inputPorts,
-			outputPortBlueprintId: textPort.portsBlueprintsId,
+			outputPortId: textPort.id,
 		});
 	},
 });

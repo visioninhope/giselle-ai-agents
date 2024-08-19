@@ -39,26 +39,21 @@ export const getDependedNodes = async ({
        1 AS depth
      FROM
        nodes
-       INNER JOIN nodes_blueprints ON nodes_blueprints.node_id = nodes.id
-       INNER JOIN requests ON requests.blueprint_id = nodes_blueprints.blueprint_id
+       INNER JOIN requests ON requests.blueprint_id = nodes.blueprint_id
        INNER JOIN ports input_ports ON input_ports.node_id = nodes.id
        AND input_ports.direction = 'input'
-       AND input_ports.type = 'data'
        INNER JOIN edges ON edges.input_port_id = input_ports.id
-       INNER JOIN edges_blueprints ON edges_blueprints.edge_id = edges.id
-       AND edges_blueprints.blueprint_id = requests.blueprint_id
        INNER JOIN ports output_ports ON output_ports.id = edges.output_port_id
-       INNER JOIN ports_blueprints output_ports_blueprints ON output_ports_blueprints.port_id = output_ports.id
-       INNER JOIN nodes_blueprints output_nodes_blueprints ON output_nodes_blueprints.id = output_ports_blueprints.nodes_blueprints_id
-       AND output_nodes_blueprints.blueprint_id = requests.blueprint_id
-       INNER JOIN nodes output_nodes ON output_nodes.id = output_nodes_blueprints.node_id
+       INNER JOIN nodes output_nodes ON output_nodes.id = output_ports.node_id
      WHERE
        requests.id = ${requestId}
+       AND input_ports.type = 'data'
+       AND output_ports.type = 'data'
        AND NOT EXISTS (
         SELECT *
         FROM request_port_messages
         WHERE request_port_messages.request_id = requests.id
-        AND request_port_messages.ports_blueprints_id = output_ports_blueprints.id
+        AND request_port_messages.port_id = output_ports.id
        )
    ),
    connection_tree AS (

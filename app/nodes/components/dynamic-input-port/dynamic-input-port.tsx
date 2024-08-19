@@ -37,7 +37,6 @@ export const DynamicInputPort: FC<DynamicInputPortProps> = ({
 				type: "data",
 				direction: "input",
 				order: 1000 /** @todo  last port order +1  */,
-				portsBlueprintsId: 0,
 			};
 			mutate({
 				type: "addNodePort",

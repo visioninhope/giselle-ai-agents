@@ -9,8 +9,6 @@ import {
 import {
 	agents,
 	db,
-	nodeRepresentedAgents,
-	portRepresentedAgentPorts,
 	pullMessages,
 	requestResults,
 	requests,
