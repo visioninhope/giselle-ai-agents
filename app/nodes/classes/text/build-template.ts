@@ -9,7 +9,7 @@ type BuildTemplateArgs = {
 	nodeId: number;
 	template: string;
 	inputPorts: { name: string; id: number }[];
-	outputPortBlueprintId: number;
+	outputPortId: number;
 };
 
 export const buildTemplate = async ({
@@ -17,7 +17,7 @@ export const buildTemplate = async ({
 	nodeId,
 	template,
 	inputPorts,
-	outputPortBlueprintId,
+	outputPortId,
 }: BuildTemplateArgs) => {
 	const messages = await db
 		.with(pullMessages)
@@ -48,7 +48,7 @@ export const buildTemplate = async ({
 	}
 	await db.insert(requestPortMessages).values({
 		requestId,
-		portsBlueprintsId: outputPortBlueprintId,
+		portId: outputPortId,
 		message: finalText,
 	});
 };

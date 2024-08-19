@@ -1,7 +1,7 @@
 "use server";
 
-import { db, nodes, nodesBlueprints } from "@/drizzle";
-import { and, eq } from "drizzle-orm";
+import { db, nodes } from "@/drizzle";
+import { eq } from "drizzle-orm";
 
 type UpdateNodesPositionArgs = {
 	blueprintId: number;
@@ -13,16 +13,11 @@ type UpdateNodesPositionArgs = {
 export const updateNodesPosition = async (args: UpdateNodesPositionArgs) => {
 	for (const node of args.nodes) {
 		await db
-			.update(nodesBlueprints)
+			.update(nodes)
 			.set({
 				position: node.position,
 			})
-			.where(
-				and(
-					eq(nodesBlueprints.blueprintId, args.blueprintId),
-					eq(nodesBlueprints.id, node.id),
-				),
-			);
+			.where(eq(nodes.id, node.id));
 	}
 	return args;
 };

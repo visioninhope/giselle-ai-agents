@@ -9,6 +9,7 @@ import {
 } from "@xyflow/react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import invariant from "tiny-invariant";
+import { KnowledgeAccordion } from "./knowledge";
 import { RequestPanel } from "./request-panel";
 
 export const PropertyPanel: FC = () => {
@@ -30,7 +31,7 @@ export const PropertyPanel: FC = () => {
 				<TabsList>
 					<TabsTrigger value="requests">Requests</TabsTrigger>
 					<TabsTrigger value="properties">Properties</TabsTrigger>
-					<TabsTrigger value="storages">Storages</TabsTrigger>
+					<TabsTrigger value="knowledges">Knowledges</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="properties" className="flex flex-col gap-2">
@@ -43,10 +44,9 @@ export const PropertyPanel: FC = () => {
 				<TabsContent value="requests" className="flex flex-col gap-2">
 					<RequestPanel />
 				</TabsContent>
-				<TabsContent
-					value="storages"
-					className="flex flex-col gap-2"
-				></TabsContent>
+				<TabsContent value="knowledges" className="flex flex-col gap-2">
+					<KnowledgeAccordion />
+				</TabsContent>
 			</Tabs>
 		</div>
 	);

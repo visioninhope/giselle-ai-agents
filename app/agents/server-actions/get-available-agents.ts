@@ -1,15 +1,6 @@
 "use server";
 
-import {
-	agents,
-	blueprints,
-	db,
-	nodes,
-	nodesBlueprints,
-	ports,
-	portsBlueprints,
-	requests,
-} from "@/drizzle";
+import { agents, blueprints, db, nodes, ports, requests } from "@/drizzle";
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 
 type Port = {
@@ -45,21 +36,13 @@ export const getAvailableAgents = async (): Promise<AvailableAgent[]> => {
 			name: ports.name,
 		})
 		.from(ports)
-		.innerJoin(portsBlueprints, eq(portsBlueprints.portId, ports.id))
 		.innerJoin(
-			nodesBlueprints,
-			eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
+			nodes,
+			and(eq(nodes.id, ports.nodeId), eq(nodes.className, "onRequest")),
 		)
 		.innerJoin(
 			availableAgentsQuery,
-			eq(availableAgentsQuery.latestBlueprintId, nodesBlueprints.blueprintId),
-		)
-		.innerJoin(
-			nodes,
-			and(
-				eq(nodes.id, nodesBlueprints.nodeId),
-				eq(nodes.className, "onRequest"),
-			),
+			eq(availableAgentsQuery.latestBlueprintId, nodes.blueprintId),
 		)
 		.where(and(eq(ports.direction, "output"), eq(ports.type, "data")));
 

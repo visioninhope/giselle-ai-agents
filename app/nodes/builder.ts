@@ -19,6 +19,13 @@ export function buildDefaultPort<
 	return args;
 }
 
+/**
+ * Constructs a NodeClass object with the specified name and options.
+ *
+ * @param nodeName - The name of the node class.
+ * @param options - The options to configure the node class. Includes categories, default ports, data schema, render panel, action, and resolver.
+ * @returns The constructed NodeClass object.
+ */
 export function buildNodeClass<
 	NodeName extends string,
 	TNodeClassCategories extends NodeClassCategory[],

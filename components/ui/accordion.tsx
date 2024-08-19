@@ -23,19 +23,26 @@ AccordionItem.displayName = "AccordionItem";
 
 const AccordionTrigger = React.forwardRef<
 	React.ElementRef<typeof AccordionPrimitive.Trigger>,
-	React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger>
->(({ className, children, ...props }, ref) => (
+	React.ComponentPropsWithoutRef<typeof AccordionPrimitive.Trigger> & {
+		handlePosition?: "left" | "right";
+	}
+>(({ className, children, handlePosition = "left", ...props }, ref) => (
 	<AccordionPrimitive.Header className="flex">
 		<AccordionPrimitive.Trigger
 			ref={ref}
 			className={cn(
-				"flex flex-1 items-center gap-2 py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg]:rotate-90",
+				"flex flex-1 items-center gap-2 py-4 text-sm font-medium transition-all hover:underline [&[data-state=open]>svg.accordion-handle]:rotate-90",
 				className,
 			)}
 			{...props}
 		>
-			<ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200" />
+			{handlePosition === "left" && (
+				<ChevronRight className="h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 accordion-handle" />
+			)}
 			{children}
+			{handlePosition === "right" && (
+				<ChevronRight className="ml-auto h-4 w-4 shrink-0 text-muted-foreground transition-transform duration-200 accordion-handle" />
+			)}
 		</AccordionPrimitive.Trigger>
 	</AccordionPrimitive.Header>
 ));

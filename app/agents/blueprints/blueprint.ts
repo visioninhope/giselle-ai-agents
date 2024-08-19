@@ -5,10 +5,8 @@ import type { BlueprintRequiredAction } from "./required-action";
 type DbNode = typeof schema.nodes.$inferSelect;
 type DbPort = Omit<typeof schema.ports.$inferSelect, "nodeClassKey">;
 type DbEdge = typeof schema.edges.$inferSelect;
-type DbPortsBlueprints = typeof schema.portsBlueprints.$inferSelect;
 export type BlueprintPort = DbPort & {
 	isCreating?: boolean;
-	portsBlueprintsId: DbPortsBlueprints["id"];
 };
 export type Node = {
 	id: number;
@@ -47,9 +45,3 @@ export type Blueprint = {
 	requiredActions?: BlueprintRequiredAction[];
 	requestInterface?: RequestInterface | null | undefined;
 };
-
-type AssertNode = (input: unknown) => asserts input is Node;
-/**
- * @todo Implement this function
- */
-export const assertNode: AssertNode = (input) => {};

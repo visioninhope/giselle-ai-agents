@@ -1,6 +1,6 @@
 "use server";
 
-import { blueprints, db, edges, edgesBlueprints, ports } from "@/drizzle";
+import { blueprints, db, edges, ports } from "@/drizzle";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import type { Edge } from "..";
@@ -17,7 +17,7 @@ export const connectNodes = async ({ blueprintId, edge }: ConnectNodesArgs) => {
 	const [insertedEdge] = await db
 		.insert(edges)
 		.values({
-			agentId: blueprint.agentId,
+			blueprintId,
 			inputPortId: edge.inputPort.id,
 			outputPortId: edge.outputPort.id,
 			edgeType: edge.edgeType,
@@ -25,10 +25,6 @@ export const connectNodes = async ({ blueprintId, edge }: ConnectNodesArgs) => {
 		.returning({
 			id: edges.id,
 		});
-	await db.insert(edgesBlueprints).values({
-		edgeId: insertedEdge.id,
-		blueprintId: blueprint.id,
-	});
 	return {
 		edge: {
 			...edge,

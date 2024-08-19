@@ -1,6 +1,6 @@
 "use server";
 
-import { blueprints, db, nodesBlueprints } from "@/drizzle";
+import { blueprints, db, nodes } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 
 type UpdateNodePropertyArgs = {
@@ -13,34 +13,32 @@ type UpdateNodePropertyArgs = {
 		};
 	};
 };
-export const updateNodeData = async ({
-	blueprintId,
-	node,
-}: UpdateNodePropertyArgs) => {
-	const [nodeBlueprint] = await db
+export const updateNodeData = async (args: UpdateNodePropertyArgs) => {
+	const [node] = await db
 		.select()
-		.from(nodesBlueprints)
-		.where(
-			and(
-				eq(nodesBlueprints.nodeId, node.id),
-				eq(nodesBlueprints.blueprintId, blueprintId),
-			),
-		);
+		.from(nodes)
+		.where(eq(nodes.id, args.node.id));
 	await db
-		.update(nodesBlueprints)
+		.update(nodes)
 		.set({
 			data: {
-				...nodeBlueprint.data,
-				[node.data.name]: node.data.value,
+				...node.data,
+				[args.node.data.name]: args.node.data.value,
 			},
 		})
-		.where(eq(nodesBlueprints.id, nodeBlueprint.id));
+		.where(eq(nodes.id, node.id));
 
 	await db
 		.update(blueprints)
 		.set({ dirty: true })
-		.where(eq(blueprints.id, blueprintId));
+		.where(eq(blueprints.id, args.blueprintId));
 	return {
-		node,
+		node: {
+			id: node.id,
+			data: {
+				name: args.node.data.name,
+				value: args.node.data.value,
+			},
+		},
 	};
 };

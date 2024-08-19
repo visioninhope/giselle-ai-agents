@@ -1,17 +1,8 @@
 "use server";
 
 import type { Blueprint } from "@/app/agents/blueprints";
-import {
-	blueprints,
-	db,
-	edges,
-	edgesBlueprints,
-	nodes,
-	nodesBlueprints,
-	ports,
-	portsBlueprints,
-} from "@/drizzle";
-import { and, eq, sql } from "drizzle-orm";
+import { blueprints, db, edges, nodes, ports } from "@/drizzle";
+import { and, eq, inArray, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 
 /** @todo replace with drizzle syntax if drizzle supports `insert into ... select` [#1605](https://github.com/drizzle-team/drizzle-orm/pull/1605) */
@@ -26,61 +17,64 @@ export const copyBlueprint = async (blueprint: Blueprint) => {
 			id: blueprints.id,
 		});
 
-	const originNodeBlueprints = await db.query.nodesBlueprints.findMany({
-		columns: {
-			nodeId: true,
-			data: true,
-			position: true,
-		},
-		where: eq(nodesBlueprints.blueprintId, blueprint.id),
+	const currentNodes = await db.query.nodes.findMany({
+		where: eq(nodes.blueprintId, blueprint.id),
 	});
-	await db.insert(nodesBlueprints).values(
-		originNodeBlueprints.map(({ nodeId, data, position }) => ({
-			nodeId,
-			data,
-			position,
-			blueprintId: newBlueprint.id,
-		})),
+	const insertedNodes = await db
+		.insert(nodes)
+		.values(
+			currentNodes.map(({ className, data, position }) => ({
+				className,
+				data,
+				position,
+				blueprintId: newBlueprint.id,
+			})),
+		)
+		.returning({ id: nodes.id });
+	const nodeMap = new Map(
+		currentNodes.map((node, index) => [node.id, insertedNodes[index].id]),
 	);
-	const originEdgeBlueprints = await db.query.edgesBlueprints.findMany({
-		columns: {
-			edgeId: true,
-		},
-		where: eq(edgesBlueprints.blueprintId, blueprint.id),
+	const currentPorts = await db
+		.select()
+		.from(ports)
+		.where(
+			inArray(
+				ports.nodeId,
+				currentNodes.map(({ id }) => id),
+			),
+		);
+	const insertedPorts = await db
+		.insert(ports)
+		.values(
+			currentPorts
+				.map(({ nodeId, direction, type, order, name }) => ({
+					direction,
+					type,
+					order,
+					name,
+					nodeId: nodeMap.get(nodeId) ?? 0,
+				}))
+				.filter(({ nodeId }) => nodeId !== 0),
+		)
+		.returning({ id: ports.id });
+
+	const portMap = new Map(
+		currentPorts.map((port, index) => [port.id, insertedPorts[index].id]),
+	);
+	const currentEdges = await db.query.edges.findMany({
+		where: eq(edges.blueprintId, blueprint.id),
 	});
-	await db.insert(edgesBlueprints).values(
-		originEdgeBlueprints.map(({ edgeId }) => ({
-			edgeId,
-			blueprintId: newBlueprint.id,
-		})),
-	);
-	const newNodesBlueprints = alias(nodesBlueprints, "newNodesBlueprints");
-	const originPortsBlueprints = await db
-		.select({
-			portId: portsBlueprints.portId,
-			blueprintId: nodesBlueprints.blueprintId,
-			newNodesBlueprintsId: newNodesBlueprints.id,
-		})
-		.from(portsBlueprints)
-		.innerJoin(
-			nodesBlueprints,
-			and(
-				eq(nodesBlueprints.id, portsBlueprints.nodesBlueprintsId),
-				eq(nodesBlueprints.blueprintId, blueprint.id),
+	await db.insert(edges).values(
+		currentEdges
+			.map(({ inputPortId, outputPortId, edgeType }) => ({
+				inputPortId: portMap.get(inputPortId) ?? 0,
+				outputPortId: portMap.get(outputPortId) ?? 0,
+				edgeType,
+				blueprintId: newBlueprint.id,
+			}))
+			.filter(
+				({ inputPortId, outputPortId }) =>
+					inputPortId !== 0 && outputPortId !== 0,
 			),
-		)
-		.innerJoin(
-			newNodesBlueprints,
-			and(
-				eq(newNodesBlueprints.nodeId, nodesBlueprints.nodeId),
-				eq(newNodesBlueprints.blueprintId, newBlueprint.id),
-			),
-		)
-		.where(eq(nodesBlueprints.blueprintId, blueprint.id));
-	await db.insert(portsBlueprints).values(
-		originPortsBlueprints.map(({ portId, newNodesBlueprintsId }) => ({
-			portId,
-			nodesBlueprintsId: newNodesBlueprintsId,
-		})),
 	);
 };
