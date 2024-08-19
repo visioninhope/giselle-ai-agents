@@ -241,10 +241,38 @@ export const oauthCredentials = pgTable(
 	}),
 );
 
-export const knowledge = pgTable("knowledge", {
+export const knowledges = pgTable("knowledges", {
 	id: serial("id").primaryKey(),
 	name: text("name").notNull(),
 	blueprintId: integer("blueprint_id")
 		.notNull()
 		.references(() => blueprints.id, { onDelete: "cascade" }),
 });
+
+export const files = pgTable("files", {
+	id: serial("id").primaryKey(),
+	fileName: text("file_name").notNull(),
+	fileType: text("file_type").notNull(),
+	fileSize: integer("file_size").notNull(),
+	blobUrl: text("blob_url").notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+
+export const knowledgeAffiliations = pgTable(
+	"knowledge_affiliations",
+	{
+		id: serial("id").primaryKey(),
+		knowledgeId: integer("knowledge_id")
+			.notNull()
+			.references(() => knowledges.id, { onDelete: "cascade" }),
+		fileId: integer("file_id")
+			.notNull()
+			.references(() => files.id, { onDelete: "cascade" }),
+	},
+	(knowledgeAffliations) => ({
+		knowledgeAffliationsKnowledgeIdFileIdUnique: unique().on(
+			knowledgeAffliations.fileId,
+			knowledgeAffliations.knowledgeId,
+		),
+	}),
+);

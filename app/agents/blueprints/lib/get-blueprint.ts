@@ -9,6 +9,9 @@ import {
 	blueprints as blueprintsSchema,
 	db,
 	edges as edgesSchema,
+	files,
+	knowledgeAffiliations,
+	knowledges as knowledgesSchema,
 	nodes as nodesSchema,
 	ports as portsSchema,
 } from "@/drizzle";
@@ -112,6 +115,46 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			outputPort,
 		};
 	});
+	const dbKnowledges = await db
+		.select()
+		.from(knowledgesSchema)
+		.where(eq(knowledgesSchema.blueprintId, blueprint.id));
+	const dbFiles = await db
+		.select({
+			id: files.id,
+			fileName: files.fileName,
+			fileType: files.fileType,
+			knowledgeId: knowledgeAffiliations.knowledgeId,
+		})
+		.from(files)
+		.innerJoin(
+			knowledgeAffiliations,
+			eq(knowledgeAffiliations.fileId, files.id),
+		)
+		.where(
+			inArray(
+				knowledgeAffiliations.knowledgeId,
+				dbKnowledges.map(({ id }) => id),
+			),
+		);
+	const knowledges = dbKnowledges.map(({ id, ...knowledge }) => {
+		const files = dbFiles.filter(({ knowledgeId }) => knowledgeId === id);
+		return {
+			id,
+			...knowledge,
+			files,
+		};
+	});
+	const filesByKnowledge = dbKnowledges.reduce(
+		(acc, knowledge) => {
+			acc[knowledge.id] = dbFiles.filter(
+				({ knowledgeId }) => knowledgeId === knowledge.id,
+			);
+			return acc;
+		},
+		{} as Record<number, typeof dbFiles>,
+	);
+
 	const tmpBlueprint: Blueprint = {
 		id: blueprint.id,
 		agent: {
@@ -123,6 +166,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		builded: blueprint.builded,
 		nodes,
 		edges,
+		knowledges,
 	};
 	const requiredActions = reviewRequiredActions(tmpBlueprint);
 	const requestInterface = inferRequestInterface(tmpBlueprint);

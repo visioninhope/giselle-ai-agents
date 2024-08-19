@@ -23,6 +23,16 @@ export type Edge = Pick<DbEdge, "edgeType"> & {
 	inputPort: { id: number; nodeId: number };
 	outputPort: { id: number; nodeId: number };
 };
+type KnowledgeFile = {
+	id: number;
+	fileName: string;
+};
+export type Knowledge = {
+	isCreating?: boolean;
+	id: number;
+	name: string;
+	files: KnowledgeFile[];
+};
 export type RequestInterfaceItem = {
 	portId: number;
 	name: string;
@@ -39,6 +49,7 @@ export type Blueprint = {
 	id: number;
 	nodes: Node[];
 	edges: Edge[];
+	knowledges: Knowledge[];
 	version: number;
 	dirty: boolean;
 	builded: boolean;

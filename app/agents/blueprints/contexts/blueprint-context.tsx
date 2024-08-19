@@ -14,6 +14,7 @@ import {
 	type Blueprint,
 	type BlueprintPort,
 	type Edge,
+	type Knowledge,
 	type Node,
 	inferRequestInterface,
 	reviewRequiredActions,
@@ -63,6 +64,11 @@ type BlueprintAction =
 	| {
 			type: "deletePort";
 			deletePortId: number;
+	  }
+	| {
+			type: "addKnowledge";
+			blueprintId: number;
+			knowledge: Knowledge;
 	  };
 
 type BlueprintActionType = BlueprintAction["type"];
@@ -232,6 +238,10 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				}
 				return stateNode;
 			}),
+		}))
+		.with({ type: "addKnowledge" }, ({ knowledge }) => ({
+			...state,
+			knowledges: [...state.knowledges, knowledge],
 		}))
 		.exhaustive();
 

@@ -9,5 +9,5 @@ export const onRequest = buildNodeClass("onRequest", {
 			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),
 		],
 	},
-	renderPanel: ({node}) => <OnRequestNodePanel node={node} />,
+	renderPanel: ({ node }) => <OnRequestNodePanel node={node} />,
 });
