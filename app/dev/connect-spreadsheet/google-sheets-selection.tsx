@@ -3,6 +3,7 @@
 import type React from "react";
 import { useState } from "react";
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 export function GoogleSheetsSelection({ data }: { data: any }) {
 	const [selectedDrive, setSelectedDrive] = useState("");
 	const [selectedSpreadsheet, setSelectedSpreadsheet] = useState("");
@@ -23,24 +24,29 @@ export function GoogleSheetsSelection({ data }: { data: any }) {
 		setSelectedSheet(e.target.value);
 	};
 
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	const drives = data.map((drive: any) => ({
 		id: drive.driveId,
 		name: drive.driveName,
 	}));
 
 	const selectedDriveData = data.find(
+		// biome-ignore lint: lint/suspicious/noExplicitAny
 		(drive: any) => drive.driveId === selectedDrive,
 	);
 
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	const spreadsheets = selectedDriveData?.spreadsheets.map((sheet: any) => ({
 		id: sheet.sheetId,
 		name: sheet.sheetName,
 	}));
 
 	const selectedSpreadsheetData = selectedDriveData?.spreadsheets.find(
+		// biome-ignore lint: lint/suspicious/noExplicitAny
 		(sheet: any) => sheet.sheetId === selectedSpreadsheet,
 	);
 
+	// biome-ignore lint: lint/suspicious/noExplicitAny
 	const sheets = selectedSpreadsheetData?.sheets.map((sheet: any) => ({
 		id: sheet.properties.sheetId,
 		title: sheet.properties.title,
@@ -62,11 +68,14 @@ export function GoogleSheetsSelection({ data }: { data: any }) {
 					className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 				>
 					<option value="">Choose a drive</option>
-					{drives.map((drive: any) => (
-						<option key={drive.id} value={drive.id}>
-							{drive.name}
-						</option>
-					))}
+					{
+						// biome-ignore lint: lint/suspicious/noExplicitAny
+						drives.map((drive: any) => (
+							<option key={drive.id} value={drive.id}>
+								{drive.name}
+							</option>
+						))
+					}
 				</select>
 			</div>
 
@@ -85,11 +94,14 @@ export function GoogleSheetsSelection({ data }: { data: any }) {
 						className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 					>
 						<option value="">Choose a sheet</option>
-						{spreadsheets.map((spreadsheet: any) => (
-							<option key={spreadsheet.id} value={spreadsheet.id}>
-								{spreadsheet.name}
-							</option>
-						))}
+						{
+							// biome-ignore lint: lint/suspicious/noExplicitAny
+							spreadsheets.map((spreadsheet: any) => (
+								<option key={spreadsheet.id} value={spreadsheet.id}>
+									{spreadsheet.name}
+								</option>
+							))
+						}
 					</select>
 				</div>
 			)}
@@ -109,11 +121,14 @@ export function GoogleSheetsSelection({ data }: { data: any }) {
 						className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
 					>
 						<option value="">Choose a sheet</option>
-						{sheets.map((sheet: any) => (
-							<option key={sheet.id} value={sheet.id}>
-								{sheet.title}
-							</option>
-						))}
+						{
+							// biome-ignore lint: lint/suspicious/noExplicitAny
+							sheets.map((sheet: any) => (
+								<option key={sheet.id} value={sheet.id}>
+									{sheet.title}
+								</option>
+							))
+						}
 					</select>
 				</div>
 			)}

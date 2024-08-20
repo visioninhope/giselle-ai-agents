@@ -14,6 +14,8 @@ import {
 	type Blueprint,
 	type BlueprintPort,
 	type Edge,
+	type Knowledge,
+	type KnowledgeFile,
 	type Node,
 	inferRequestInterface,
 	reviewRequiredActions,
@@ -63,6 +65,16 @@ type BlueprintAction =
 	| {
 			type: "deletePort";
 			deletePortId: number;
+	  }
+	| {
+			type: "addKnowledge";
+			blueprintId: number;
+			knowledge: Knowledge;
+	  }
+	| {
+			type: "addFileToKnowledge";
+			knowledgeId: number;
+			file: KnowledgeFile;
 	  };
 
 type BlueprintActionType = BlueprintAction["type"];
@@ -233,6 +245,25 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 				return stateNode;
 			}),
 		}))
+		.with({ type: "addKnowledge" }, ({ knowledge }) => ({
+			...state,
+			knowledges: [...state.knowledges, knowledge],
+		}))
+		.with({ type: "addFileToKnowledge" }, ({ knowledgeId, file }) => {
+			const newKnowledges = state.knowledges.map((knowledge) => {
+				if (knowledge.id !== knowledgeId) {
+					return knowledge;
+				}
+				return {
+					...knowledge,
+					files: [...knowledge.files, file],
+				};
+			});
+			return {
+				...state,
+				knowledges: newKnowledges,
+			};
+		})
 		.exhaustive();
 
 type BlueprintProviderProps = {

@@ -159,6 +159,7 @@ export const { handlers, signIn, signOut } = NextAuth({
 	},
 });
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 async function refreshAccessToken(token: any) {
 	try {
 		const url = "https://oauth2.googleapis.com/token";

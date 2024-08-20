@@ -74,6 +74,7 @@ async function fetchSpreadSheets(accessToken: string, driveId: string) {
 	const { files } = await res.json();
 
 	const spreadsheets = files.filter(
+		// biome-ignore lint: lint/suspicious/noExplicitAny
 		(file: any) => file.mimeType === "application/vnd.google-apps.spreadsheet",
 	);
 
@@ -115,6 +116,7 @@ export default async function ConnectSpreadsheetPage() {
 		const drives = await fetchDrives(accessToken);
 
 		const drivesWithSpreadsheets = await Promise.all(
+			// biome-ignore lint: lint/suspicious/noExplicitAny
 			drives.map(async (drive: any) => {
 				const driveId = drive.id;
 				const driveName = drive.name;
@@ -131,6 +133,7 @@ export default async function ConnectSpreadsheetPage() {
 				const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;
 
 				const spreadsheetsWithSheets = await Promise.all(
+					// biome-ignore lint: lint/suspicious/noExplicitAny
 					spreadsheets.map(async (spreadsheet: any) => {
 						const sheetId = spreadsheet.id;
 						const sheetName = spreadsheet.name;
