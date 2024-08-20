@@ -23,7 +23,8 @@ export type Edge = Pick<DbEdge, "edgeType"> & {
 	inputPort: { id: number; nodeId: number };
 	outputPort: { id: number; nodeId: number };
 };
-type KnowledgeFile = {
+export type KnowledgeFile = {
+	isCreating?: boolean;
 	id: number;
 	fileName: string;
 };

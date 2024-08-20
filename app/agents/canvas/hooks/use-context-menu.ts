@@ -6,7 +6,7 @@ interface ContextMenuPosition {
 }
 
 export const useContextMenu = () => {
-	const [isVisible, setIsVisible] = useState<boolean>(false);
+	const [isVisible, setIsVisible] = useState(false);
 	const [contextMenuPosition, setContextMenuPosition] =
 		useState<ContextMenuPosition>({
 			x: 0,

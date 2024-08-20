@@ -19,14 +19,28 @@ import {
 	CommandItem,
 	CommandList,
 } from "@/components/ui/command";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
 } from "@/components/ui/popover";
+import { Textarea } from "@/components/ui/textarea";
 import { createTemporaryId } from "@/lib/create-temporary-id";
-import { createKnowledge } from "@/services/knowledges/actions";
+import {
+	addFileToKnowledge,
+	createKnowledge,
+} from "@/services/knowledges/actions";
 import {
 	BookOpenIcon,
 	HardDriveUploadIcon,
@@ -35,8 +49,143 @@ import {
 	UploadIcon,
 } from "lucide-react";
 
-import type { FC } from "react";
+import { type FC, useState } from "react";
 import invariant from "tiny-invariant";
+
+type ContentUploaderProps = {
+	knowledgeId: number;
+};
+const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
+	const { mutate } = useBlueprint();
+	const [open, setOpen] = useState(false);
+	return (
+		<Popover open={open} onOpenChange={setOpen}>
+			<PopoverTrigger asChild>
+				<Button size="sm" variant="secondary" className="gap-2">
+					<UploadIcon className="w-4 h-4" />
+					<p>Add Content</p>
+				</Button>
+			</PopoverTrigger>
+			<PopoverContent className="p-0 w-[200px]" align="end">
+				<Command>
+					<CommandList>
+						<CommandGroup>
+							<CommandItem>
+								<form>
+									<label className="flex items-center gap-2">
+										<input
+											type="file"
+											name="file"
+											className="hidden"
+											onChange={(e) => {
+												e.preventDefault();
+												setOpen(false);
+												if (e.target.files == null) {
+													return;
+												}
+												mutate({
+													type: "addFileToKnowledge",
+													optimisticData: {
+														knowledgeId,
+														file: {
+															isCreating: true,
+															id: createTemporaryId(),
+															fileName: e.target.files[0].name,
+														},
+													},
+													action: () =>
+														e.target.files == null
+															? (() => {
+																	throw new Error("File not found");
+																})()
+															: addFileToKnowledge({
+																	knowledgeId,
+																	file: e.target.files[0],
+																}),
+												});
+											}}
+										/>
+										<HardDriveUploadIcon className="w-4 h-4" />
+										<p>Upload from device</p>
+									</label>
+								</form>
+							</CommandItem>
+							<CommandItem>
+								<Dialog>
+									<DialogTrigger asChild>
+										<button type="button" className="flex items-center gap-2">
+											<TextIcon className="w-4 h-4" />
+											<p>Add text conent</p>
+										</button>
+									</DialogTrigger>
+									<DialogContent>
+										<form
+											onSubmit={(e) => {
+												e.preventDefault();
+												const formData = new FormData(e.currentTarget);
+												const title = formData.get("title");
+												const body = formData.get("body");
+												invariant(
+													typeof title === "string" && title.length > 0,
+													"Title is required",
+												);
+												invariant(
+													typeof body === "string" && body.length > 0,
+													"Body is required",
+												);
+
+												const content = `# ${title}\n\n${body}`;
+												const blob = new Blob([content], {
+													type: "text/markdown",
+												});
+												const file = new File([blob], title, {
+													type: "text/markdown",
+												});
+												mutate({
+													type: "addFileToKnowledge",
+													optimisticData: {
+														knowledgeId,
+														file: {
+															isCreating: true,
+															id: createTemporaryId(),
+															fileName: title,
+														},
+													},
+													action: () =>
+														addFileToKnowledge({
+															knowledgeId,
+															file,
+														}),
+												});
+											}}
+										>
+											<DialogHeader>
+												<DialogTitle>Add text content</DialogTitle>
+											</DialogHeader>
+											<div className="grid gap-4 py-4">
+												<div className="flex flex-col gap-4">
+													<Label htmlFor="title">Title</Label>
+													<Input id="title" name="title" />
+												</div>
+												<div className="flex flex-col gap-4">
+													<Label htmlFor="content">Content</Label>
+													<Textarea id="content" name="body" rows={10} />
+												</div>
+											</div>
+											<DialogFooter>
+												<Button type="submit">Add Content</Button>
+											</DialogFooter>
+										</form>
+									</DialogContent>
+								</Dialog>
+							</CommandItem>
+						</CommandGroup>
+					</CommandList>
+				</Command>
+			</PopoverContent>
+		</Popover>
+	);
+};
 
 export const KnowledgeAccordion: FC = () => {
 	const { blueprint, mutate } = useBlueprint();
@@ -78,44 +227,7 @@ export const KnowledgeAccordion: FC = () => {
 								))}
 							</ul>
 							<div>
-								<Popover>
-									<PopoverTrigger asChild>
-										<Button size="sm" variant="secondary" className="gap-2">
-											<UploadIcon className="w-4 h-4" />
-											<p>Add Content</p>
-										</Button>
-									</PopoverTrigger>
-									<PopoverContent className="p-0 w-[200px]" align="end">
-										<Command>
-											<CommandList>
-												<CommandGroup>
-													<CommandItem>
-														<form>
-															<label className="flex items-center gap-2">
-																<input
-																	type="file"
-																	name="file"
-																	className="hidden"
-																/>
-																<HardDriveUploadIcon className="w-4 h-4" />
-																<p>Upload from device</p>
-															</label>
-														</form>
-													</CommandItem>
-													<CommandItem>
-														<button
-															type="button"
-															className="flex items-center gap-2"
-														>
-															<TextIcon className="w-4 h-4" />
-															<p>Add text conent</p>
-														</button>
-													</CommandItem>
-												</CommandGroup>
-											</CommandList>
-										</Command>
-									</PopoverContent>
-								</Popover>
+								<ContentUploader knowledgeId={id} />
 							</div>
 						</AccordionContent>
 					</AccordionItem>
