@@ -15,7 +15,7 @@ import {
 	nodes as nodesSchema,
 	ports as portsSchema,
 } from "@/drizzle";
-import { and, desc, eq, inArray } from "drizzle-orm";
+import { eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
 export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
@@ -145,15 +145,6 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			files,
 		};
 	});
-	const filesByKnowledge = dbKnowledges.reduce(
-		(acc, knowledge) => {
-			acc[knowledge.id] = dbFiles.filter(
-				({ knowledgeId }) => knowledgeId === knowledge.id,
-			);
-			return acc;
-		},
-		{} as Record<number, typeof dbFiles>,
-	);
 
 	const tmpBlueprint: Blueprint = {
 		id: blueprint.id,
