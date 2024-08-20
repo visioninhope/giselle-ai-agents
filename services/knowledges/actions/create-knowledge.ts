@@ -1,6 +1,11 @@
 "use server";
 
-import { db, knowledges } from "@/drizzle";
+import {
+	db,
+	knowledgeOpenaiVectorStoreRepresentations,
+	knowledges,
+} from "@/drizzle";
+import { openai } from "@/lib/openai";
 
 type CreateKnowledgeArgs = {
 	knowledge: {
@@ -18,6 +23,14 @@ export const createKnowledge = async (args: CreateKnowledgeArgs) => {
 		.returning({
 			id: knowledges.id,
 		});
+	const vectorStore = await openai.beta.vectorStores.create({
+		name: args.knowledge.name,
+	});
+	await db.insert(knowledgeOpenaiVectorStoreRepresentations).values({
+		knowledgeId: knowledge.id,
+		openaiVectorStoreId: vectorStore.id,
+		status: vectorStore.status,
+	});
 	return {
 		blueprintId: args.blueprintId,
 		knowledge: {

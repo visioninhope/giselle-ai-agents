@@ -9,6 +9,8 @@ import {
 	unique,
 } from "drizzle-orm/pg-core";
 
+import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
+
 export const organizations = pgTable("organizations", {
 	id: serial("id").primaryKey(),
 	name: text("name").notNull(),
@@ -249,6 +251,18 @@ export const knowledges = pgTable("knowledges", {
 		.references(() => blueprints.id, { onDelete: "cascade" }),
 });
 
+type OpenaiVectorStoreStatus = VectorStore["status"];
+export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
+	"knowledge_openai_vector_store_representations",
+	{
+		id: serial("id").primaryKey(),
+		knowledgeId: integer("knowledge_id")
+			.notNull()
+			.references(() => knowledges.id, { onDelete: "cascade" }),
+		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
+		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
+	},
+);
 export const files = pgTable("files", {
 	id: serial("id").primaryKey(),
 	fileName: text("file_name").notNull(),
@@ -257,6 +271,16 @@ export const files = pgTable("files", {
 	blobUrl: text("blob_url").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
+export const fileOpenaiFileRepresentations = pgTable(
+	"file_openai_file_representations",
+	{
+		id: serial("id").primaryKey(),
+		fileId: integer("file_id")
+			.notNull()
+			.references(() => files.id, { onDelete: "cascade" }),
+		openaiFileId: text("openai_file_id").notNull().unique(),
+	},
+);
 
 export const knowledgeAffiliations = pgTable(
 	"knowledge_affiliations",
@@ -275,4 +299,17 @@ export const knowledgeAffiliations = pgTable(
 			knowledgeAffliations.knowledgeId,
 		),
 	}),
+);
+
+export const knowledgeAfflicationOpenaiVectorStoreFileRepresentations = pgTable(
+	"knowledge_afflication_openai_vector_store_file_representations",
+	{
+		id: serial("id").primaryKey(),
+		knowledgeAffiliationId: integer("knowledge_affiliation_id")
+			.notNull()
+			.references(() => knowledgeAffiliations.id, { onDelete: "cascade" }),
+		openaiVectorStoreFileId: text("openai_vector_store_file_id")
+			.notNull()
+			.unique(),
+	},
 );
