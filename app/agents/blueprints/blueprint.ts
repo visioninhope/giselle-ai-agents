@@ -1,5 +1,9 @@
 import type * as schema from "@/drizzle/schema";
-import type { NodeData, NodePosition } from "@/drizzle/schema";
+import type {
+	KnowledgeContentType,
+	NodeData,
+	NodePosition,
+} from "@/drizzle/schema";
 import type { BlueprintRequiredAction } from "./required-action";
 
 type DbNode = typeof schema.nodes.$inferSelect;
@@ -23,16 +27,20 @@ export type Edge = Pick<DbEdge, "edgeType"> & {
 	inputPort: { id: number; nodeId: number };
 	outputPort: { id: number; nodeId: number };
 };
-export type KnowledgeFile = {
+export type KnowledgeContent = {
 	isCreating?: boolean;
 	id: number;
-	fileName: string;
+	name: string;
+	type: KnowledgeContentType;
+	file: {
+		id: number;
+	};
 };
 export type Knowledge = {
 	isCreating?: boolean;
 	id: number;
 	name: string;
-	files: KnowledgeFile[];
+	contents: KnowledgeContent[];
 };
 export type RequestInterfaceItem = {
 	portId: number;

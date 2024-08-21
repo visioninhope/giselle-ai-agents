@@ -36,7 +36,7 @@ export const createKnowledge = async (args: CreateKnowledgeArgs) => {
 		knowledge: {
 			id: knowledge.id,
 			name: args.knowledge.name,
-			files: [],
+			contents: [],
 		},
 	};
 };

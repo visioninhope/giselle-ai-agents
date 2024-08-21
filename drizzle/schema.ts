@@ -282,10 +282,15 @@ export const fileOpenaiFileRepresentations = pgTable(
 	},
 );
 
-export const knowledgeAffiliations = pgTable(
-	"knowledge_affiliations",
+export type KnowledgeContentType = "file" | "text";
+export const knowledgeContents = pgTable(
+	"knowledge_contents",
 	{
 		id: serial("id").primaryKey(),
+		name: text("name").notNull(),
+		type: text("knowledge_content_type")
+			.$type<KnowledgeContentType>()
+			.notNull(),
 		knowledgeId: integer("knowledge_id")
 			.notNull()
 			.references(() => knowledges.id, { onDelete: "cascade" }),
@@ -293,21 +298,21 @@ export const knowledgeAffiliations = pgTable(
 			.notNull()
 			.references(() => files.id, { onDelete: "cascade" }),
 	},
-	(knowledgeAffliations) => ({
-		knowledgeAffliationsKnowledgeIdFileIdUnique: unique().on(
-			knowledgeAffliations.fileId,
-			knowledgeAffliations.knowledgeId,
+	(knowledgeContents) => ({
+		knowledgeContentsKnowledgeIdFileIdUnique: unique().on(
+			knowledgeContents.fileId,
+			knowledgeContents.knowledgeId,
 		),
 	}),
 );
 
-export const knowledgeAfflicationOpenaiVectorStoreFileRepresentations = pgTable(
-	"knowledge_afflication_openai_vector_store_file_representations",
+export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
+	"knowledge_content_openai_vector_store_file_representations",
 	{
 		id: serial("id").primaryKey(),
 		knowledgeAffiliationId: integer("knowledge_affiliation_id")
 			.notNull()
-			.references(() => knowledgeAffiliations.id, { onDelete: "cascade" }),
+			.references(() => knowledgeContents.id, { onDelete: "cascade" }),
 		openaiVectorStoreFileId: text("openai_vector_store_file_id")
 			.notNull()
 			.unique(),

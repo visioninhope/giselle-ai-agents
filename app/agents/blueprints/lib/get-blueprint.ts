@@ -10,7 +10,7 @@ import {
 	db,
 	edges as edgesSchema,
 	files,
-	knowledgeAffiliations,
+	knowledgeContents,
 	knowledges as knowledgesSchema,
 	nodes as nodesSchema,
 	ports as portsSchema,
@@ -121,28 +121,37 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 		.where(eq(knowledgesSchema.blueprintId, blueprint.id));
 	const dbFiles = await db
 		.select({
-			id: files.id,
+			id: knowledgeContents.id,
+			type: knowledgeContents.type,
+			name: knowledgeContents.name,
+			fileId: files.id,
 			fileName: files.fileName,
 			fileType: files.fileType,
-			knowledgeId: knowledgeAffiliations.knowledgeId,
+			knowledgeId: knowledgeContents.knowledgeId,
 		})
 		.from(files)
-		.innerJoin(
-			knowledgeAffiliations,
-			eq(knowledgeAffiliations.fileId, files.id),
-		)
+		.innerJoin(knowledgeContents, eq(knowledgeContents.fileId, files.id))
 		.where(
 			inArray(
-				knowledgeAffiliations.knowledgeId,
+				knowledgeContents.knowledgeId,
 				dbKnowledges.map(({ id }) => id),
 			),
 		);
 	const knowledges = dbKnowledges.map(({ id, ...knowledge }) => {
-		const files = dbFiles.filter(({ knowledgeId }) => knowledgeId === id);
+		const contents = dbFiles
+			.filter(({ knowledgeId }) => knowledgeId === id)
+			.map(({ id, type, fileId, name }) => ({
+				id,
+				type,
+				name,
+				file: {
+					id: fileId,
+				},
+			}));
 		return {
 			id,
 			...knowledge,
-			files,
+			contents,
 		};
 	});
 

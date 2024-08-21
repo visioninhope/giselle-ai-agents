@@ -15,7 +15,7 @@ import {
 	type BlueprintPort,
 	type Edge,
 	type Knowledge,
-	type KnowledgeFile,
+	type KnowledgeContent,
 	type Node,
 	inferRequestInterface,
 	reviewRequiredActions,
@@ -72,9 +72,9 @@ type BlueprintAction =
 			knowledge: Knowledge;
 	  }
 	| {
-			type: "addFileToKnowledge";
+			type: "addContentToKnowledge";
 			knowledgeId: number;
-			file: KnowledgeFile;
+			content: KnowledgeContent;
 	  };
 
 type BlueprintActionType = BlueprintAction["type"];
@@ -249,14 +249,14 @@ const reducer = (state: Blueprint, action: BlueprintAction) =>
 			...state,
 			knowledges: [...state.knowledges, knowledge],
 		}))
-		.with({ type: "addFileToKnowledge" }, ({ knowledgeId, file }) => {
+		.with({ type: "addContentToKnowledge" }, ({ knowledgeId, content }) => {
 			const newKnowledges = state.knowledges.map((knowledge) => {
 				if (knowledge.id !== knowledgeId) {
 					return knowledge;
 				}
 				return {
 					...knowledge,
-					files: [...knowledge.files, file],
+					contents: [...knowledge.contents, content],
 				};
 			});
 			return {

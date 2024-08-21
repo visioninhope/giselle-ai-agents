@@ -1,7 +1,7 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
-import { db, files, knowledgeAffiliations } from "@/drizzle";
+import { db, files, knowledgeContents } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { eq, inArray } from "drizzle-orm";
 import type { Message } from "openai/resources/beta/threads/messages.mjs";
@@ -56,14 +56,11 @@ export const retrieval = async (args: RetrievalArgs) => {
 	const dbFiles = await db
 		.select({
 			blobUrl: files.blobUrl,
-			knowledgeId: knowledgeAffiliations.knowledgeId,
+			knowledgeId: knowledgeContents.knowledgeId,
 		})
 		.from(files)
-		.innerJoin(
-			knowledgeAffiliations,
-			eq(knowledgeAffiliations.fileId, files.id),
-		)
-		.where(inArray(knowledgeAffiliations.knowledgeId, args.knowledgeIds));
+		.innerJoin(knowledgeContents, eq(knowledgeContents.fileId, files.id))
+		.where(inArray(knowledgeContents.knowledgeId, args.knowledgeIds));
 
 	const knowledgeFiles: Record<number, (typeof dbFiles)["file"]> = {};
 	for (const file of dbFiles) {

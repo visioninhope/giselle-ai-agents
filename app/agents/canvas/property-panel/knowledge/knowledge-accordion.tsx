@@ -38,7 +38,7 @@ import {
 import { Textarea } from "@/components/ui/textarea";
 import { createTemporaryId } from "@/lib/create-temporary-id";
 import {
-	addFileToKnowledge,
+	addContentToKnowledge,
 	createKnowledge,
 } from "@/services/knowledges/actions";
 import {
@@ -84,13 +84,17 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 													return;
 												}
 												mutate({
-													type: "addFileToKnowledge",
+													type: "addContentToKnowledge",
 													optimisticData: {
 														knowledgeId,
-														file: {
+														content: {
+															type: "file",
 															isCreating: true,
 															id: createTemporaryId(),
-															fileName: e.target.files[0].name,
+															name: e.target.files[0].name,
+															file: {
+																id: createTemporaryId(),
+															},
 														},
 													},
 													action: () =>
@@ -98,9 +102,13 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 															? (() => {
 																	throw new Error("File not found");
 																})()
-															: addFileToKnowledge({
+															: addContentToKnowledge({
 																	knowledgeId,
-																	file: e.target.files[0],
+																	content: {
+																		name: e.target.files[0].name,
+																		type: "file",
+																		file: e.target.files[0],
+																	},
 																}),
 												});
 											}}
@@ -138,23 +146,31 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 												const blob = new Blob([content], {
 													type: "text/markdown",
 												});
-												const file = new File([blob], title, {
+												const file = new File([blob], `${title}.md`, {
 													type: "text/markdown",
 												});
 												mutate({
-													type: "addFileToKnowledge",
+													type: "addContentToKnowledge",
 													optimisticData: {
 														knowledgeId,
-														file: {
+														content: {
+															type: "text",
 															isCreating: true,
 															id: createTemporaryId(),
-															fileName: title,
+															name: title,
+															file: {
+																id: createTemporaryId(),
+															},
 														},
 													},
 													action: () =>
-														addFileToKnowledge({
+														addContentToKnowledge({
 															knowledgeId,
-															file,
+															content: {
+																type: "text",
+																name: title,
+																file,
+															},
 														}),
 												});
 											}}
@@ -192,7 +208,7 @@ export const KnowledgeAccordion: FC = () => {
 	return (
 		<div className="px-4 py-2 gap-4 flex flex-col">
 			<Accordion type="single" collapsible className="w-full">
-				{blueprint.knowledges.map(({ id, name, files }) => (
+				{blueprint.knowledges.map(({ id, name, contents: files }) => (
 					<AccordionItem value={name} key={id}>
 						<AccordionTrigger handlePosition="right" className="flex gap-2">
 							<BookOpenIcon className="w-4 h-4" />
@@ -214,7 +230,7 @@ export const KnowledgeAccordion: FC = () => {
 										</p>
 									</div>
 								)}
-								{files.map(({ id, fileName }) => (
+								{files.map(({ id, name: fileName }) => (
 									<li
 										key={id}
 										className="flex items-center justify-between py-1"
@@ -258,7 +274,7 @@ export const KnowledgeAccordion: FC = () => {
 										isCreating: true,
 										id: createTemporaryId(),
 										name,
-										files: [],
+										contents: [],
 									},
 								},
 								action: (optimisticData) => createKnowledge(optimisticData),
