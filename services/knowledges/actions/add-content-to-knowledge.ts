@@ -81,7 +81,7 @@ export const addContentToKnowledge = async (
 	);
 
 	await db.insert(knowledgeContentOpenaiVectorStoreFileRepresentations).values({
-		knowledgeAffiliationId: knowledgeContent.id,
+		knowledgeContentId: knowledgeContent.id,
 		openaiVectorStoreFileId: openaiVectorStoreFile.id,
 	});
 	return {
@@ -90,6 +90,7 @@ export const addContentToKnowledge = async (
 			id: knowledgeContent.id,
 			name: args.content.name,
 			type: args.content.type,
+			status: openaiVectorStoreFile.status,
 			file: {
 				id: file.id,
 			},

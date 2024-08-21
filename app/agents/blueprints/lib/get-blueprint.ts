@@ -15,6 +15,7 @@ import {
 	nodes as nodesSchema,
 	ports as portsSchema,
 } from "@/drizzle";
+import { getKnowledges } from "@/services/knowledges/actions";
 import { eq, inArray } from "drizzle-orm";
 import invariant from "tiny-invariant";
 
@@ -115,45 +116,7 @@ export const getBlueprint = async (blueprintId: number): Promise<Blueprint> => {
 			outputPort,
 		};
 	});
-	const dbKnowledges = await db
-		.select()
-		.from(knowledgesSchema)
-		.where(eq(knowledgesSchema.blueprintId, blueprint.id));
-	const dbFiles = await db
-		.select({
-			id: knowledgeContents.id,
-			type: knowledgeContents.type,
-			name: knowledgeContents.name,
-			fileId: files.id,
-			fileName: files.fileName,
-			fileType: files.fileType,
-			knowledgeId: knowledgeContents.knowledgeId,
-		})
-		.from(files)
-		.innerJoin(knowledgeContents, eq(knowledgeContents.fileId, files.id))
-		.where(
-			inArray(
-				knowledgeContents.knowledgeId,
-				dbKnowledges.map(({ id }) => id),
-			),
-		);
-	const knowledges = dbKnowledges.map(({ id, ...knowledge }) => {
-		const contents = dbFiles
-			.filter(({ knowledgeId }) => knowledgeId === id)
-			.map(({ id, type, fileId, name }) => ({
-				id,
-				type,
-				name,
-				file: {
-					id: fileId,
-				},
-			}));
-		return {
-			id,
-			...knowledge,
-			contents,
-		};
-	});
+	const knowledges = await getKnowledges({ blueprintId: blueprint.id });
 
 	const tmpBlueprint: Blueprint = {
 		id: blueprint.id,

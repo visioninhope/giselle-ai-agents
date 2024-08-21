@@ -1,5 +1,6 @@
 "use client";
 
+import type { Knowledge, KnowledgeContent } from "@/services/knowledges";
 import {
 	type PropsWithChildren,
 	createContext,
@@ -14,8 +15,6 @@ import {
 	type Blueprint,
 	type BlueprintPort,
 	type Edge,
-	type Knowledge,
-	type KnowledgeContent,
 	type Node,
 	inferRequestInterface,
 	reviewRequiredActions,

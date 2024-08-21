@@ -1,9 +1,9 @@
 "use server";
 
 import type { Blueprint } from "@/app/agents/blueprints";
-import { blueprints, db, edges, nodes, ports } from "@/drizzle";
-import { and, eq, inArray, sql } from "drizzle-orm";
-import { alias } from "drizzle-orm/pg-core";
+import { blueprints, db, edges, knowledges, nodes, ports } from "@/drizzle";
+import { copyKnolwedges } from "@/services/knowledges/actions";
+import { eq, inArray } from "drizzle-orm";
 
 /** @todo replace with drizzle syntax if drizzle supports `insert into ... select` [#1605](https://github.com/drizzle-team/drizzle-orm/pull/1605) */
 export const copyBlueprint = async (blueprint: Blueprint) => {
@@ -77,4 +77,6 @@ export const copyBlueprint = async (blueprint: Blueprint) => {
 					inputPortId !== 0 && outputPortId !== 0,
 			),
 	);
+
+	await copyKnolwedges(blueprint.id, newBlueprint.id);
 };

@@ -5,6 +5,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
 	Card,
@@ -52,6 +53,9 @@ import {
 import { type FC, useState } from "react";
 import invariant from "tiny-invariant";
 
+const upperCaseFirstLetter = (str: string) =>
+	str.charAt(0).toUpperCase() + str.slice(1);
+
 type ContentUploaderProps = {
 	knowledgeId: number;
 };
@@ -92,6 +96,7 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 															isCreating: true,
 															id: createTemporaryId(),
 															name: e.target.files[0].name,
+															status: "in_progress",
 															file: {
 																id: createTemporaryId(),
 															},
@@ -158,6 +163,7 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 															isCreating: true,
 															id: createTemporaryId(),
 															name: title,
+															status: "in_progress",
 															file: {
 																id: createTemporaryId(),
 															},
@@ -230,12 +236,17 @@ export const KnowledgeAccordion: FC = () => {
 										</p>
 									</div>
 								)}
-								{files.map(({ id, name: fileName }) => (
+								{files.map(({ id, name: fileName, status }) => (
 									<li
 										key={id}
 										className="flex items-center justify-between py-1"
 									>
-										<span>{fileName}</span>
+										<div className="flex items-center gap-2">
+											<span>{fileName}</span>
+											<Badge variant="outline">
+												{upperCaseFirstLetter(status)}
+											</Badge>
+										</div>
 										<Button variant="ghost" size="sm">
 											<TrashIcon className="h-4 w-4" />
 										</Button>
