@@ -1,6 +1,7 @@
 "use server";
 import {
 	db,
+	fileOpenaiFileRepresentations,
 	files,
 	knowledgeContentOpenaiVectorStoreFileRepresentations,
 	knowledgeContents,
@@ -43,6 +44,7 @@ export const getKnowledges = async (args: GetKnowledgesArgs) => {
 			fileName: files.fileName,
 			fileType: files.fileType,
 			knowledgeId: knowledgeContents.knowledgeId,
+			openaiFileId: fileOpenaiFileRepresentations.openaiFileId,
 			openaiVectorStoreFileId:
 				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
 		})
@@ -54,6 +56,10 @@ export const getKnowledges = async (args: GetKnowledgesArgs) => {
 				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentId,
 				knowledgeContents.id,
 			),
+		)
+		.innerJoin(
+			fileOpenaiFileRepresentations,
+			eq(files.id, fileOpenaiFileRepresentations.fileId),
 		)
 		.where(
 			inArray(
@@ -80,7 +86,9 @@ export const getKnowledges = async (args: GetKnowledgesArgs) => {
 					name: dbKnowledgeContent.name,
 					type: dbKnowledgeContent.type,
 					status: vectorStoreFile.status,
+					openaiVectorStoreFileId: dbKnowledgeContent.openaiVectorStoreFileId,
 					file: {
+						openaiFileId: dbKnowledgeContent.openaiFileId,
 						id: dbKnowledgeContent.fileId,
 					},
 				};
@@ -90,6 +98,7 @@ export const getKnowledges = async (args: GetKnowledgesArgs) => {
 		knowledges.push({
 			id: dbKnowledge.id,
 			name: dbKnowledge.name,
+			openaiVectorStoreId: dbKnowledge.openaiVectorStoreId,
 			contents,
 		});
 	}

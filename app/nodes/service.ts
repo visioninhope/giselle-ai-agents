@@ -1,5 +1,6 @@
 import type { Node } from "@/app/agents/blueprints";
 import { createTemporaryId } from "@/lib/create-temporary-id";
+import type { Knowledge } from "@/services/knowledges";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
 import { type InferInput, type ObjectSchema, parse } from "valibot";
@@ -44,11 +45,15 @@ type NodeService<TNodeClasses extends NodeClasses> = {
 	$inferClassNames: keyof TNodeClasses;
 	runAction: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		{ node, requestId }: { node: Node; requestId: number },
+		args: { node: Node; requestId: number; knowledges: Knowledge[] },
 	) => Promise<void>;
 	runResolver: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		{ node, requestId }: { node: Node; requestId: number },
+		args: { node: Node; requestId: number; knowledges: Knowledge[] },
+	) => Promise<void>;
+	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
+		className: ClassName,
+		args: { node: Node },
 	) => Promise<void>;
 };
 
@@ -106,7 +111,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			return renderPanel({ node, data });
 		},
-		runAction: async (name, { node, requestId }) => {
+		runAction: async (name, { node, requestId, knowledges }) => {
 			const nodeClass = nodeClasses[name];
 			const action = nodeClass.action;
 			if (action == null) {
@@ -117,6 +122,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			await action({
 				requestId,
 				node,
+				knowledges,
 				data,
 				findDefaultInputPortAsBlueprint: (name) => {
 					const port = node.inputPorts.find(
@@ -134,7 +140,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				},
 			});
 		},
-		runResolver: async (name, { node, requestId }) => {
+		runResolver: async (name, { node, requestId, knowledges }) => {
 			const nodeClass = nodeClasses[name];
 			const resolver = nodeClass.resolver;
 			if (resolver == null) {
@@ -146,6 +152,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			await resolver({
 				requestId,
 				node,
+				knowledges,
 				data,
 				findDefaultInputPortAsBlueprint: (name) => {
 					const port = node.inputPorts.find(
@@ -162,6 +169,15 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 					return port;
 				},
 			});
+		},
+		runAfterCreateCallback: async (name, { node }) => {
+			const nodeClass = nodeClasses[name];
+			const afterCreate = nodeClass.afterCreate;
+			if (afterCreate == null) {
+				console.log("After create not found");
+				return;
+			}
+			await afterCreate({ node, dataSchema: nodeClass.dataSchema });
 		},
 		$inferClassNames: "" as keyof TNodeClasses,
 	};

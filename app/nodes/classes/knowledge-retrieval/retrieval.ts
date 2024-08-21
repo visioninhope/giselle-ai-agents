@@ -1,30 +1,25 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
-import { db, files, knowledgeContents } from "@/drizzle";
+import { leaveMessage } from "@/app/agents/requests";
+import {
+	db,
+	files,
+	knowledgeContentOpenaiVectorStoreFileRepresentations,
+	knowledgeContents,
+	knowledgeOpenaiVectorStoreRepresentations,
+	knowledges as knowledgesSchema,
+	pullMessages,
+} from "@/drizzle";
 import { openai } from "@/lib/openai";
-import { eq, inArray } from "drizzle-orm";
+import type { Knowledge } from "@/services/knowledges";
+import { and, eq, inArray } from "drizzle-orm";
 import type { Message } from "openai/resources/beta/threads/messages.mjs";
+import { match } from "ts-pattern";
+import { retrivalInstructions } from "./prompts";
 
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = (value) => {};
-
-const getOrCreateOpenAiAssistant = async (
-	node: Node,
-	openAiAssistantId: string | null,
-) => {
-	if (openAiAssistantId != null) {
-		return await openai.beta.assistants.retrieve(openAiAssistantId);
-	}
-	const assistant = await openai.beta.assistants.create({
-		model: "gpt-4o-mini",
-	});
-	await db.insert(nodeExecutingOpenaiAssistants).values({
-		nodeId,
-		openaiAssistantId: assistant.id,
-	});
-	return assistant;
-};
 
 const messageToText = (message: Message) => {
 	let result = "";
@@ -44,73 +39,124 @@ const messageToText = (message: Message) => {
 	return result;
 };
 
+const prepareVectorStores = async (knowledges: Knowledge[]) => {
+	for (const knowledge of knowledges) {
+		const vectorStore = await openai.beta.vectorStores.retrieve(
+			knowledge.openaiVectorStoreId,
+		);
+		await match(vectorStore.status)
+			.with("completed", () => {})
+			.with("in_progress", async () => {
+				/** @todo ensure to complete */
+				await new Promise((resolve) => setTimeout(resolve, 1000));
+			})
+			.with("expired", async () => {
+				await db
+					.update(knowledgeOpenaiVectorStoreRepresentations)
+					.set({
+						status: "expired",
+					})
+					.where(
+						eq(
+							knowledgeOpenaiVectorStoreRepresentations.knowledgeId,
+							knowledge.id,
+						),
+					);
+				const newVectorStore = await openai.beta.vectorStores.create({
+					name: knowledge.name,
+					expires_after: {
+						anchor: "last_active_at",
+						days: 1,
+					},
+				});
+				await db.insert(knowledgeOpenaiVectorStoreRepresentations).values({
+					knowledgeId: knowledge.id,
+					openaiVectorStoreId: newVectorStore.id,
+					status: newVectorStore.status,
+				});
+				await Promise.all(
+					knowledge.contents.map(async ({ file, id }) => {
+						const newVectorStoreFile =
+							await openai.beta.vectorStores.files.createAndPoll(
+								newVectorStore.id,
+								{
+									file_id: file.openaiFileId,
+								},
+							);
+						await db
+							.update(knowledgeContentOpenaiVectorStoreFileRepresentations)
+							.set({
+								openaiVectorStoreFileId: newVectorStoreFile.id,
+							})
+							.where(
+								eq(
+									knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentId,
+									id,
+								),
+							);
+					}),
+				);
+			})
+			.exhaustive();
+	}
+};
+
 type RetrievalArgs = {
 	node: Node;
-	openAiAssistantId: string;
-	knowledgeIds: number[];
+	openaiAssistantId: string;
+	knowledges: Knowledge[];
+	queryPortId: number;
+	requestId: number;
+	resultPortId: number;
 };
 export const retrieval = async (args: RetrievalArgs) => {
-	const assistant = await openai.beta.assistants.retrieve(
-		args.openAiAssistantId,
-	);
-	const dbFiles = await db
-		.select({
-			blobUrl: files.blobUrl,
-			knowledgeId: knowledgeContents.knowledgeId,
-		})
-		.from(files)
-		.innerJoin(knowledgeContents, eq(knowledgeContents.fileId, files.id))
-		.where(inArray(knowledgeContents.knowledgeId, args.knowledgeIds));
+	await prepareVectorStores(args.knowledges);
+	await openai.beta.assistants.update(args.openaiAssistantId, {
+		instructions: retrivalInstructions,
+		tools: [{ type: "file_search" }],
+		tool_resources: {
+			file_search: {
+				vector_store_ids: args.knowledges.map(
+					({ openaiVectorStoreId }) => openaiVectorStoreId,
+				),
+			},
+		},
+	});
 
-	const knowledgeFiles: Record<number, (typeof dbFiles)["file"]> = {};
-	for (const file of dbFiles) {
-		if (!knowledgeFiles[file.knowledgeId]) {
-			knowledgeFiles[file.knowledgeId] = [];
-		}
-		knowledgeFiles[file.knowledgeId].push(file);
-	}
+	const [queryMessage] = await db
+		.with(pullMessages)
+		.select()
+		.from(pullMessages)
+		.where(
+			and(
+				eq(pullMessages.requestId, args.requestId),
+				eq(pullMessages.nodeId, args.node.id),
+				eq(pullMessages.portId, args.queryPortId),
+			),
+		);
+	const content = queryMessage.content;
+	asssertContent(content);
+	const thread = await openai.beta.threads.create({
+		messages: [
+			{
+				role: "user",
+				content,
+			},
+		],
+	});
+	const run = await openai.beta.threads.runs.createAndPoll(thread.id, {
+		assistant_id: args.openaiAssistantId,
+	});
+	const messagesPage = await openai.beta.threads.messages.list(run.thread_id, {
+		order: "desc",
+		limit: 1,
+	});
+	const lastMessage = messagesPage.data[0];
+	const text = messageToText(lastMessage);
 
-	// const openaiAssistant = await getOrCreateOpenAiAssistant(node.id);
-	// const messages = await db
-	// 	.with(pullMessages)
-	// 	.select()
-	// 	.from(pullMessages)
-	// 	.where(
-	// 		and(
-	// 			eq(pullMessages.requestId, request.id),
-	// 			eq(pullMessages.nodeId, node.id),
-	// 		),
-	// 	);
-	// /** @todo set value to openaiAssistant */
-	// const instructionMessage = messages.find(
-	// 	({ nodeClassKey }) => nodeClassKey === "instruction",
-	// );
-	// if (instructionMessage == null) {
-	// 	logger.log(
-	// 		`instruction message not found in messages: ${JSON.stringify(messages)}`,
-	// 	);
-	// } else {
-	// 	const instructions = instructionMessage.content;
-	// 	asssertContent(instructions);
-	// 	const thread = await openai.beta.threads.create();
-	// 	const run = await openai.beta.threads.runs.createAndPoll(thread.id, {
-	// 		assistant_id: openaiAssistant.id,
-	// 		instructions,
-	// 	});
-	// 	const messagesPage = await openai.beta.threads.messages.list(
-	// 		run.thread_id,
-	// 		{
-	// 			order: "desc",
-	// 			limit: 1,
-	// 		},
-	// 	);
-	// 	const lastMessage = messagesPage.data[0];
-	// 	const text = messageToText(lastMessage);
-	// 	await leaveMessage({
-	// 		requestId: request.id,
-	// 		port: { nodeClassKey: "result" },
-	// 		stepId: id,
-	// 		message: text,
-	// 	});
-	// }
+	await leaveMessage({
+		requestId: args.requestId,
+		portId: args.resultPortId,
+		message: text,
+	});
 };

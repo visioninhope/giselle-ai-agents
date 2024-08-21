@@ -1,7 +1,7 @@
 "use server";
 
 import type { Node } from "@/app/agents/blueprints";
-import { assertNodeClassName } from "@/app/nodes";
+import { assertNodeClassName, nodeService } from "@/app/nodes";
 import { blueprints, db, nodes, ports } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
@@ -48,22 +48,24 @@ export const addNode = async (args: AddNodeArgs): Promise<{ node: Node }> => {
 		.update(blueprints)
 		.set({ dirty: true })
 		.where(eq(blueprints.id, args.blueprintId));
-	return {
-		node: {
-			id: insertedNode.id,
-			position: args.node.position,
-			className: args.node.className,
-			data: args.node.data,
-			inputPorts: args.node.inputPorts.map((port, index) => ({
-				...port,
-				id: insertedPorts[index].id,
-				nodeId: insertedNode.id,
-			})),
-			outputPorts: args.node.outputPorts.map((port, index) => ({
-				...port,
-				id: insertedPorts[index + args.node.inputPorts.length].id,
-				nodeId: insertedNode.id,
-			})),
-		},
+	const node: Node = {
+		id: insertedNode.id,
+		position: args.node.position,
+		className: args.node.className,
+		data: args.node.data,
+		inputPorts: args.node.inputPorts.map((port, index) => ({
+			...port,
+			id: insertedPorts[index].id,
+			nodeId: insertedNode.id,
+		})),
+		outputPorts: args.node.outputPorts.map((port, index) => ({
+			...port,
+			id: insertedPorts[index + args.node.inputPorts.length].id,
+			nodeId: insertedNode.id,
+		})),
 	};
+
+	await nodeService.runAfterCreateCallback(args.node.className, { node });
+
+	return { node };
 };

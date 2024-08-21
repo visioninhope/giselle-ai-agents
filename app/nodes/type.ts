@@ -1,5 +1,6 @@
 import type { BlueprintPort, Node } from "@/app/agents/blueprints";
-import type { FC, JSX } from "react";
+import type { Knowledge } from "@/services/knowledges";
+import type { JSX } from "react";
 import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
 
 export enum DefaultPortType {
@@ -29,6 +30,7 @@ export enum NodeClassCategory {
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestId: number;
 	node: Node;
+	knowledges: Knowledge[];
 	data: TBaseSchema extends ObjectSchema<infer E, infer M>
 		? InferInput<ObjectSchema<E, M>>
 		: never;
@@ -67,6 +69,16 @@ type RenderPanel<TBaseSchema> = (
 	args: RenderPanelArgs<TBaseSchema>,
 ) => JSX.Element;
 
+type AfterCreateCallbackArgs<TBaseSchema> = {
+	node: Node;
+	dataSchema: TBaseSchema extends ObjectSchema<infer E, infer M>
+		? ObjectSchema<E, M>
+		: never;
+};
+type AfterCreateCallback<TBaseSchema> = (
+	args: AfterCreateCallbackArgs<TBaseSchema>,
+) => Promise<void>;
+
 export type NodeClassOptions<
 	TNodeClassCategories extends NodeClassCategory[],
 	// biome-ignore lint: lint/suspicious/noExplicitAny
@@ -80,6 +92,7 @@ export type NodeClassOptions<
 	renderPanel?: RenderPanel<TBaseSchema>;
 	action?: Action<TBaseSchema, TDefaultPorts>;
 	resolver?: Resolver<TBaseSchema, TDefaultPorts>;
+	afterCreate?: AfterCreateCallback<TBaseSchema>;
 };
 
 export type NodeClass<
@@ -97,6 +110,7 @@ export type NodeClass<
 	renderPanel?: RenderPanel<TBaseSchema>;
 	action?: Action<TBaseSchema, TDefaultPorts>;
 	resolver?: Resolver<TBaseSchema, TDefaultPorts>;
+	afterCreate?: AfterCreateCallback<TBaseSchema>;
 };
 
 // biome-ignore lint: lint/suspicious/noExplicitAny

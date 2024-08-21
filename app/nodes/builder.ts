@@ -45,5 +45,6 @@ export function buildNodeClass<
 		renderPanel: options.renderPanel,
 		action: options.action,
 		resolver: options.resolver,
+		afterCreate: options.afterCreate,
 	};
 }

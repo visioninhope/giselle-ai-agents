@@ -7,8 +7,10 @@ export type KnowledgeContent = {
 	name: string;
 	type: KnowledgeContentType;
 	status: VectorStoreFile["status"];
+	openaiVectorStoreFileId: string;
 	file: {
 		id: number;
+		openaiFileId: string;
 	};
 };
 
@@ -16,5 +18,6 @@ export type Knowledge = {
 	isCreating?: boolean;
 	id: number;
 	name: string;
+	openaiVectorStoreId: string;
 	contents: KnowledgeContent[];
 };

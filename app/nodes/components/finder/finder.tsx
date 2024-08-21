@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { type FC, Suspense } from "react";
 import { AgentList } from "./agent-list";
+import { KnowledgeList } from "./knowledge-list";
 
 type FinderProps = {
 	position: { x: number; y: number };
@@ -81,6 +82,17 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 					>
 						Text Generation
 					</DropdownMenuItem>
+				</DropdownMenuGroup>
+				<DropdownMenuSeparator />
+				<DropdownMenuGroup>
+					<DropdownMenuSub>
+						<DropdownMenuSubTrigger>Knowledge Retrieval</DropdownMenuSubTrigger>
+						<DropdownMenuPortal>
+							<DropdownMenuSubContent>
+								<KnowledgeList position={position} onSelect={onSelect} />
+							</DropdownMenuSubContent>
+						</DropdownMenuPortal>
+					</DropdownMenuSub>
 				</DropdownMenuGroup>
 			</DropdownMenuContent>
 		</DropdownMenu>
