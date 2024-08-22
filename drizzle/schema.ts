@@ -310,7 +310,7 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 	"knowledge_content_openai_vector_store_file_representations",
 	{
 		id: serial("id").primaryKey(),
-		knowledgeContentId: integer("knowledge_affiliation_id")
+		knowledgeContentId: integer("knowledge_content_id")
 			.notNull()
 			.references(() => knowledgeContents.id, { onDelete: "cascade" }),
 		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
