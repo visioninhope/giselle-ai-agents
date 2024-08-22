@@ -8,9 +8,10 @@ import {
 	knowledgeContents,
 	knowledgeOpenaiVectorStoreRepresentations,
 	knowledges,
+	nodes,
 } from "@/drizzle";
 import { openai } from "@/lib/openai";
-import { eq } from "drizzle-orm";
+import { and, arrayContains, eq, sql } from "drizzle-orm";
 
 export const copyKnolwedges = async (
 	currentBlueprintId: number,
@@ -41,6 +42,7 @@ export const copyKnolwedges = async (
 		const newOpenaiVectorStore = await openai.beta.vectorStores.create({
 			name: currentKnowledge.name,
 		});
+		await updateNode(newBlueprintId, currentKnowledge.id, newKnolwedge.id);
 		await db.insert(knowledgeOpenaiVectorStoreRepresentations).values({
 			knowledgeId: newKnolwedge.id,
 			openaiVectorStoreId: newOpenaiVectorStore.id,
@@ -58,7 +60,7 @@ export const copyKnolwedges = async (
 			.from(knowledgeContents)
 			.innerJoin(
 				fileOpenaiFileRepresentations,
-				eq(fileOpenaiFileRepresentations.fileId, files.id),
+				eq(fileOpenaiFileRepresentations.fileId, knowledgeContents.fileId),
 			)
 			.where(eq(knowledgeContents.knowledgeId, currentKnowledge.id));
 		for (const currentKnowledgeContent of currentKnowledgeContents) {
@@ -68,7 +70,7 @@ export const copyKnolwedges = async (
 					name: currentKnowledgeContent.name,
 					type: currentKnowledgeContent.type,
 					fileId: currentKnowledgeContent.fileId,
-					knowledgeId: currentKnowledgeContent.knowledgeId,
+					knowledgeId: newKnolwedge.id,
 				})
 				.returning({ id: knowledgeContents.id });
 
@@ -84,4 +86,41 @@ export const copyKnolwedges = async (
 				});
 		}
 	}
+};
+
+export const updateNode = async (
+	newBlueprintId: number,
+	currentKnowledgeId: number,
+	newKnowledgeId: number,
+) => {
+	await db
+		.update(nodes)
+		.set({
+			data: sql`
+      		JSONB_SET(
+            ${nodes.data},
+            '{knowledgeIds}',
+            (
+              SELECT
+                JSONB_AGG(
+                  CASE
+                    WHEN VALUE::TEXT = ${currentKnowledgeId}::TEXT THEN ${newKnowledgeId}::JSONB
+                    ELSE VALUE
+                  END
+                )
+              FROM
+                JSONB_ARRAY_ELEMENTS(${nodes.data} -> 'knowledgeIds')
+            ),
+            TRUE
+          )
+    `,
+		})
+		.where(
+			and(
+				eq(nodes.blueprintId, newBlueprintId),
+				arrayContains(sql`${nodes.data} -> 'knowledgeIds'`, [
+					currentKnowledgeId,
+				]),
+			),
+		);
 };

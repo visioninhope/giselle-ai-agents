@@ -47,12 +47,14 @@ export const invokeTask = task({
 				await nodeService.runResolver(dependedNode.className, {
 					node: findNode(blueprint, dependedNode.id),
 					requestId: request.id,
+					knowledges: blueprint.knowledges,
 				});
 			}
 			assertNodeClassName(step.node.className);
 			await nodeService.runAction(step.node.className, {
 				requestId: request.id,
 				node: findNode(blueprint, step.node.id),
+				knowledges: blueprint.knowledges,
 			});
 			logger.log(`${step.node.className} finished!!`);
 			await updateRunStep(payload.requestId, step.id, {

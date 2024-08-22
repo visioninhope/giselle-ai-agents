@@ -97,8 +97,10 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 															id: createTemporaryId(),
 															name: e.target.files[0].name,
 															status: "in_progress",
+															openaiVectorStoreFileId: "",
 															file: {
 																id: createTemporaryId(),
+																openaiFileId: "",
 															},
 														},
 													},
@@ -164,7 +166,9 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 															id: createTemporaryId(),
 															name: title,
 															status: "in_progress",
+															openaiVectorStoreFileId: "",
 															file: {
+																openaiFileId: "",
 																id: createTemporaryId(),
 															},
 														},
@@ -286,6 +290,7 @@ export const KnowledgeAccordion: FC = () => {
 										id: createTemporaryId(),
 										name,
 										contents: [],
+										openaiVectorStoreId: "",
 									},
 								},
 								action: (optimisticData) => createKnowledge(optimisticData),

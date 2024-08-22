@@ -33,5 +33,15 @@
 		"label": "npm-check-updates",
 		"command": "bunx npm-check-updates",
 		"allow_concurrent_runs": false
+	},
+	{
+		"label": "deploy-trigger-staging",
+		"command": "./deploy-trigger",
+		"env": { "ENV": "staging" }
+	},
+	{
+		"label": "deploy-trigger-production",
+		"command": "./deploy-trigger",
+		"env": { "ENV": "prod" }
 	}
 ]

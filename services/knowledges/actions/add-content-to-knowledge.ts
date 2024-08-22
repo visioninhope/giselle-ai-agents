@@ -12,6 +12,7 @@ import {
 import { openai } from "@/lib/openai";
 import { put } from "@vercel/blob";
 import { and, eq } from "drizzle-orm";
+import type { KnowledgeContent } from "../type";
 
 type AddContentToKnowledgeArgs = {
 	content: {
@@ -91,8 +92,10 @@ export const addContentToKnowledge = async (
 			name: args.content.name,
 			type: args.content.type,
 			status: openaiVectorStoreFile.status,
+			openaiVectorStoreFileId: openaiVectorStoreFile.id,
 			file: {
 				id: file.id,
+				openaiFileId: openaiFile.id,
 			},
 		},
 	};

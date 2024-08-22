@@ -39,8 +39,11 @@ const CanvasInner: FC = () => {
 	const { validateConnection, inferConnectionEdgeType } =
 		useInfereceConnectionEdgeType();
 
+	console.log({ blueprint: blueprint.id });
+
 	const handleSelectNode = useCallback(
 		(node: BlueprintNode) => {
+			console.log("handle select node", blueprint.id);
 			hideContextMenu();
 			mutate({
 				type: "addNode",

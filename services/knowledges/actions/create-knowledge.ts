@@ -37,6 +37,7 @@ export const createKnowledge = async (args: CreateKnowledgeArgs) => {
 			id: knowledge.id,
 			name: args.knowledge.name,
 			contents: [],
+			openaiVectorStoreId: vectorStore.id,
 		},
 	};
 };
