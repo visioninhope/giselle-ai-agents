@@ -32,7 +32,7 @@ export const copyKnolwedges = async (
 		.where(eq(knowledges.blueprintId, currentBlueprintId));
 
 	for (const currentKnowledge of currentKnowledges) {
-		const [newKnolwedge] = await db
+		const [newKnowledge] = await db
 			.insert(knowledges)
 			.values({
 				name: currentKnowledge.name,
@@ -42,9 +42,9 @@ export const copyKnolwedges = async (
 		const newOpenaiVectorStore = await openai.beta.vectorStores.create({
 			name: currentKnowledge.name,
 		});
-		await updateNode(newBlueprintId, currentKnowledge.id, newKnolwedge.id);
+		await updateNode(newBlueprintId, currentKnowledge.id, newKnowledge.id);
 		await db.insert(knowledgeOpenaiVectorStoreRepresentations).values({
-			knowledgeId: newKnolwedge.id,
+			knowledgeId: newKnowledge.id,
 			openaiVectorStoreId: newOpenaiVectorStore.id,
 			status: newOpenaiVectorStore.status,
 		});
@@ -70,7 +70,7 @@ export const copyKnolwedges = async (
 					name: currentKnowledgeContent.name,
 					type: currentKnowledgeContent.type,
 					fileId: currentKnowledgeContent.fileId,
-					knowledgeId: newKnolwedge.id,
+					knowledgeId: newKnowledge.id,
 				})
 				.returning({ id: knowledgeContents.id });
 
