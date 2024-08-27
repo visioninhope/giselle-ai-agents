@@ -1,3 +1,4 @@
+import type { PlaygroundGraph } from "@/app/dev/playground/types";
 import {
 	boolean,
 	integer,
@@ -79,6 +80,10 @@ export const blueprints = pgTable(
 	"blueprints",
 	{
 		id: serial("id").primaryKey(),
+		graph: jsonb("graph")
+			.$type<PlaygroundGraph>()
+			.notNull()
+			.default({ nodes: [], edges: [] }),
 		agentId: integer("agent_id")
 			.notNull()
 			.references(() => agents.id),
