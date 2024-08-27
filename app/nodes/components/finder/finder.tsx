@@ -1,5 +1,4 @@
-import type { Node } from "@/app/agents/blueprints";
-import { nodeService } from "@/app/nodes";
+import { type NodeGraph, nodeService } from "@/app/nodes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,20 +12,19 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { type FC, Suspense } from "react";
+import type { FC } from "react";
 import { AgentList } from "./agent-list";
 import { KnowledgeList } from "./knowledge-list";
 
 type FinderProps = {
-	position: { x: number; y: number };
-	onSelect: (node: Node) => void;
+	onSelect: (node: NodeGraph) => void;
 };
-export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
+export const Finder: FC<FinderProps> = ({ onSelect }) => {
 	return (
 		<DropdownMenu defaultOpen={true} modal={false}>
 			<DropdownMenuTrigger />
 			<DropdownMenuContent>
-				<DropdownMenuGroup>
+				{/** <DropdownMenuGroup>
 					<DropdownMenuSub>
 						<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
 						<DropdownMenuPortal>
@@ -36,14 +34,13 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 						</DropdownMenuPortal>
 					</DropdownMenuSub>
 				</DropdownMenuGroup>
+				**/}
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 					<DropdownMenuItem
 						onSelect={() => {
-							const node = nodeService.createNode("onRequest", {
-								position,
-							});
+							const node = nodeService.createNode("onRequest");
 							onSelect(node);
 						}}
 					>
@@ -51,9 +48,7 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onSelect={() => {
-							const node = nodeService.createNode("response", {
-								position,
-							});
+							const node = nodeService.createNode("response");
 							onSelect(node);
 						}}
 					>
@@ -62,7 +57,6 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 					<DropdownMenuItem
 						onSelect={() => {
 							const node = nodeService.createNode("text", {
-								position,
 								data: {
 									template: "",
 								},
@@ -74,15 +68,14 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 					</DropdownMenuItem>
 					<DropdownMenuItem
 						onSelect={() => {
-							const node = nodeService.createNode("textGeneration", {
-								position,
-							});
+							const node = nodeService.createNode("textGeneration");
 							onSelect(node);
 						}}
 					>
 						Text Generation
 					</DropdownMenuItem>
 				</DropdownMenuGroup>
+				{/**
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuSub>
@@ -94,6 +87,7 @@ export const Finder: FC<FinderProps> = ({ position, onSelect }) => {
 						</DropdownMenuPortal>
 					</DropdownMenuSub>
 				</DropdownMenuGroup>
+				*/}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);

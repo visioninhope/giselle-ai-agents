@@ -1,17 +1,15 @@
 import { number, object, string } from "valibot";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { DefaultPortType, NodeClassCategory } from "../../type";
+import { nodeClassCategory, portType } from "../../type";
 import { invokeAgent } from "./invoke-agent";
 
 export const agent = buildNodeClass("agent", {
-	categories: [NodeClassCategory.LLM],
+	categories: [nodeClassCategory.llm],
 	defaultPorts: {
-		inputPorts: [
-			buildDefaultPort({ type: DefaultPortType.Execution, name: "from" }),
-		],
+		inputPorts: [buildDefaultPort({ type: portType.execution, name: "from" })],
 		outputPorts: [
-			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),
-			buildDefaultPort({ type: DefaultPortType.Data, name: "result" }),
+			buildDefaultPort({ type: portType.execution, name: "to" }),
+			buildDefaultPort({ type: portType.data, name: "result" }),
 		],
 	},
 	dataSchema: object({

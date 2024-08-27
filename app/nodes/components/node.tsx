@@ -1,10 +1,6 @@
 "use client";
 
-import type {
-	NodeData as NodeDataSchema,
-	RequestStepStatus,
-	ports,
-} from "@/drizzle/schema";
+import type { RequestStepStatus } from "@/drizzle/schema";
 import {
 	type Node,
 	type NodeProps,
@@ -16,28 +12,18 @@ import {
 } from "@xyflow/react";
 import { cva } from "cva";
 import { type ComponentProps, type FC, useEffect } from "react";
+import type { Port } from "../type";
 
-type NodeData = {
-	id: string;
+export type GiselleNodeData = {
 	className: string;
-	inputPorts: (typeof ports.$inferSelect)[];
-	outputPorts: (typeof ports.$inferSelect)[];
-	data: NodeDataSchema;
+	targetPorts: Port[];
+	sourcePorts: Port[];
 	stepStatus?: RequestStepStatus;
-	isCreating?: boolean;
 };
-type NodeV3Data = Node<NodeData>;
-export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
+type GiselleNode = Node<GiselleNodeData>;
+export const GiselleNode: FC<NodeProps<GiselleNode>> = ({
 	selected,
-	data: {
-		className,
-		inputPorts,
-		outputPorts,
-		stepStatus,
-		id,
-		data,
-		isCreating,
-	},
+	data: { className, targetPorts, sourcePorts, stepStatus },
 }) => {
 	return (
 		<>
@@ -45,7 +31,6 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 			<div
 				className={nodeVariant({
 					stepStatus,
-					status: isCreating ? "creating" : "created",
 				})}
 			>
 				<div className={headerVariant()}>
@@ -53,9 +38,9 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 				</div>
 				<div className={contentVariant()}>
 					<div className="flex gap-8 items-start">
-						{inputPorts.length > 0 && (
+						{targetPorts.length > 0 && (
 							<div className="flex flex-col gap-2 flex-1">
-								{inputPorts.map(({ id, name, type }) => (
+								{targetPorts.map(({ id, name, type }) => (
 									<div className={portVariant()} key={id}>
 										<Handle
 											type="target"
@@ -69,7 +54,7 @@ export const GiselleNode: FC<NodeProps<NodeV3Data>> = ({
 							</div>
 						)}
 						<div className="flex flex-col gap-2 items-end flex-1">
-							{outputPorts?.map(({ id, name, type }) => (
+							{sourcePorts?.map(({ id, name, type }) => (
 								<div className={portVariant()} key={id}>
 									<p className="whitespace-nowrap">{name}</p>
 									<Handle

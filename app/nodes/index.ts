@@ -1,9 +1,9 @@
 import { nodeClasses } from "./classes";
 import { createNodeService } from "./service";
 import type { NodeClassCategory } from "./type";
-export { NodeClassCategory } from "./type";
+export type { NodeClassCategory, NodeGraph, Node, Port } from "./type";
 export { Finder } from "./components/finder";
-export { GiselleNode } from "./components/node";
+export { GiselleNode, type GiselleNodeData } from "./components/node";
 
 export const nodeService = createNodeService(nodeClasses);
 

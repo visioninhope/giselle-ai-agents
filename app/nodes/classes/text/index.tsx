@@ -1,15 +1,13 @@
 import { object, parse, string } from "valibot";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { DefaultPortType, NodeClassCategory } from "../../type";
+import { nodeClassCategory, portType } from "../../type";
 import { buildTemplate } from "./build-template";
 import { TextNodePanel } from "./ui";
 
 export const text = buildNodeClass("text", {
-	categories: [NodeClassCategory.Utility],
+	categories: [nodeClassCategory.utility],
 	defaultPorts: {
-		outputPorts: [
-			buildDefaultPort({ type: DefaultPortType.Data, name: "text" }),
-		],
+		outputPorts: [buildDefaultPort({ type: portType.data, name: "text" })],
 	},
 	dataSchema: object({
 		template: string(),

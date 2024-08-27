@@ -1,15 +1,9 @@
-import type { Node } from "@/app/agents/blueprints";
-import { createTemporaryId } from "@/lib/create-temporary-id";
 import type { Knowledge } from "@/services/knowledges";
+import { createId } from "@paralleldrive/cuid2";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
 import { type InferInput, type ObjectSchema, parse } from "valibot";
-import {
-	type DefaultPort,
-	DefaultPortType,
-	type DefaultPorts,
-	type NodeClasses,
-} from "./type";
+import type { DefaultPort, DefaultPorts, NodeClasses, NodeGraph } from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
 	? U extends undefined
@@ -19,41 +13,35 @@ type InferSchema<T> = T extends { dataSchema?: infer U }
 			: unknown
 	: unknown;
 
-type Position = {
-	x: number;
-	y: number;
-};
-type BaseNodeData = DefaultPorts<
-	DefaultPort<DefaultPortType, string>[],
-	DefaultPort<DefaultPortType, string>[]
-> & {
-	position: Position;
-};
 type CreateNodeData<TData> = TData extends ObjectSchema<infer E, infer M>
-	? BaseNodeData & { data: InferInput<ObjectSchema<E, M>> }
-	: BaseNodeData & { data?: never };
+	? { data: InferInput<ObjectSchema<E, M>> }
+	: { data?: never };
+type CreateNodeArgs<TData> = DefaultPorts<
+	DefaultPort[],
+	DefaultPort[]
+> & {} & CreateNodeData<TData>;
 
 type NodeService<TNodeClasses extends NodeClasses> = {
 	createNode: <ClassName extends keyof TNodeClasses>(
 		name: ClassName,
-		data: CreateNodeData<InferSchema<TNodeClasses[ClassName]>>,
-	) => Node;
+		args?: CreateNodeArgs<InferSchema<TNodeClasses[ClassName]>>,
+	) => NodeGraph;
 	renderPanel: <ClassName extends keyof TNodeClasses>(
 		name: ClassName,
-		{ node }: { node: Node },
+		{ node }: { node: NodeGraph },
 	) => JSX.Element | null;
 	$inferClassNames: keyof TNodeClasses;
 	runAction: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: Node; requestId: number; knowledges: Knowledge[] },
+		args: { node: NodeGraph; requestId: number; knowledges: Knowledge[] },
 	) => Promise<void>;
 	runResolver: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: Node; requestId: number; knowledges: Knowledge[] },
+		args: { node: NodeGraph; requestId: number; knowledges: Knowledge[] },
 	) => Promise<void>;
 	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: Node },
+		args: { node: NodeGraph },
 	) => Promise<void>;
 };
 
@@ -61,44 +49,36 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 	nodeClasses: TNodeClasses,
 ): NodeService<TNodeClasses> {
 	return {
-		createNode: <Key extends keyof TNodeClasses>(
-			name: Key,
-			data: CreateNodeData<InferSchema<TNodeClasses[Key]>>,
-		): Node => {
+		createNode: (name, args) => {
+			invariant(typeof name === "string", "name must be a string");
 			const nodeClass = nodeClasses[name];
 			const inputPorts = [
 				...(nodeClass.defaultPorts.inputPorts ?? []),
-				...(data.inputPorts ?? []),
-			];
+				...(args?.inputPorts ?? []),
+			] as DefaultPort[];
 			const outputPorts = [
 				...(nodeClass.defaultPorts.outputPorts ?? []),
-				...(data.outputPorts ?? []),
-			];
-			const id = createTemporaryId();
+				...(args?.outputPorts ?? []),
+			] as DefaultPort[];
+			const id = `nd_${createId()}` as const;
+
 			return {
 				id,
-				isCreating: true,
-				position: data.position,
-				className: name as string,
-				inputPorts: inputPorts.map(({ type, name }, index) => ({
-					id: createTemporaryId(),
+				className: name,
+				name,
+				data: args?.data,
+				sourcePorts: inputPorts.map(({ type, name }) => ({
+					id: `pt_${createId()}` as const,
 					nodeId: id,
-					type: type === DefaultPortType.Execution ? "execution" : "data",
+					type,
 					name,
-					direction: "input",
-					order: index,
-					portsBlueprintsId: createTemporaryId(),
 				})),
-				outputPorts: outputPorts.map(({ type, name }, index) => ({
-					id: createTemporaryId(),
+				targetPorts: outputPorts.map(({ type, name }) => ({
+					id: `pt_${createId()}` as const,
 					nodeId: id,
-					type: type === DefaultPortType.Execution ? "execution" : "data",
+					type,
 					name,
-					direction: "output",
-					order: index,
-					portsBlueprintsId: createTemporaryId(),
 				})),
-				data: data.data,
 			};
 		},
 		renderPanel: (name, { node }) => {
@@ -125,14 +105,14 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				knowledges,
 				data,
 				findDefaultInputPortAsBlueprint: (name) => {
-					const port = node.inputPorts.find(
+					const port = node.sourcePorts.find(
 						({ name: portName }) => portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;
 				},
 				findDefaultOutputPortAsBlueprint: (name) => {
-					const port = node.outputPorts.find(
+					const port = node.targetPorts.find(
 						({ name: portName }) => portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
@@ -155,14 +135,14 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				knowledges,
 				data,
 				findDefaultInputPortAsBlueprint: (name) => {
-					const port = node.inputPorts.find(
+					const port = node.sourcePorts.find(
 						({ name: portName }) => portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;
 				},
 				findDefaultOutputPortAsBlueprint: (name) => {
-					const port = node.outputPorts.find(
+					const port = node.targetPorts.find(
 						({ name: portName }) => portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);

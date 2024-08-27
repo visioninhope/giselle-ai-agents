@@ -1,13 +1,11 @@
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { DefaultPortType, NodeClassCategory } from "../../type";
+import { nodeClassCategory, portType } from "../../type";
 import { OnRequestNodePanel } from "./ui";
 
 export const onRequest = buildNodeClass("onRequest", {
-	categories: [NodeClassCategory.Trigger],
+	categories: [nodeClassCategory.trigger],
 	defaultPorts: {
-		outputPorts: [
-			buildDefaultPort({ type: DefaultPortType.Execution, name: "to" }),
-		],
+		outputPorts: [buildDefaultPort({ type: portType.execution, name: "to" })],
 	},
 	renderPanel: ({ node }) => <OnRequestNodePanel node={node} />,
 });

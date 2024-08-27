@@ -1,31 +1,54 @@
-import type { BlueprintPort, Node } from "@/app/agents/blueprints";
 import type { Knowledge } from "@/services/knowledges";
 import type { JSX } from "react";
 import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
 
-export enum DefaultPortType {
-	Execution = "execution",
-	Data = "data",
-}
-export type DefaultPort<TType extends DefaultPortType, TName extends string> = {
-	type: TType;
+export type Node<TClassName extends string = string, TData = any> = {
+	id: `nd_${string}`;
+	className: TClassName;
+	name: string;
+	data: TData;
+};
+
+export const portType = {
+	execution: "execution",
+	data: "data",
+} as const;
+type PortType = (typeof portType)[keyof typeof portType];
+export type Port<TName extends string = string> = {
+	id: `pt_${string}`;
+	nodeId: Node["id"];
+	type: PortType;
 	name: TName;
 };
 
+export type NodeGraph<TClassName extends string = string, TData = any> = Node<
+	TClassName,
+	TData
+> & {
+	sourcePorts: Port[];
+	targetPorts: Port[];
+};
+
+export type DefaultPort<TName extends string = string> = Omit<
+	Port<TName>,
+	"id" | "nodeId"
+>;
 export type DefaultPorts<
-	TInputPorts extends DefaultPort<DefaultPortType, string>[],
-	TOutputPorts extends DefaultPort<DefaultPortType, string>[],
+	TInputPorts extends DefaultPort<string>[],
+	TOutputPorts extends DefaultPort<string>[],
 > = {
 	inputPorts?: TInputPorts;
 	outputPorts?: TOutputPorts;
 };
 
-export enum NodeClassCategory {
-	Trigger = "trigger",
-	LLM = "llm",
-	Response = "response",
-	Utility = "utility",
-}
+export const nodeClassCategory = {
+	trigger: "trigger",
+	llm: "llm",
+	response: "response",
+	utility: "utility",
+};
+export type NodeClassCategory =
+	(typeof nodeClassCategory)[keyof typeof nodeClassCategory];
 
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestId: number;
@@ -39,13 +62,13 @@ type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 		name: TDefaultPorts extends DefaultPorts<infer InputPorts, any>
 			? InputPorts[number]["name"]
 			: never,
-	) => BlueprintPort;
+	) => Port;
 	findDefaultOutputPortAsBlueprint: (
 		// biome-ignore lint: lint/suspicious/noExplicitAny
 		name: TDefaultPorts extends DefaultPorts<any, infer OutputPorts>
 			? OutputPorts[number]["name"]
 			: never,
-	) => BlueprintPort;
+	) => Port;
 };
 type Resolver<TBaseSchema, TDefaultPorts> = (
 	args: ResolverArgs<TBaseSchema, TDefaultPorts>,
