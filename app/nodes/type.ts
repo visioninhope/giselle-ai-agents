@@ -14,24 +14,29 @@ export const portType = {
 	data: "data",
 } as const;
 type PortType = (typeof portType)[keyof typeof portType];
+export const portDirection = {
+	source: "source",
+	target: "target",
+} as const;
+export type PortDirection = (typeof portDirection)[keyof typeof portDirection];
 export type Port<TName extends string = string> = {
 	id: `pt_${string}`;
 	nodeId: Node["id"];
 	type: PortType;
 	name: TName;
+	direction: PortDirection;
 };
 
 export type NodeGraph<TClassName extends string = string, TData = any> = Node<
 	TClassName,
 	TData
 > & {
-	sourcePorts: Port[];
-	targetPorts: Port[];
+	ports: Port[];
 };
 
 export type DefaultPort<TName extends string = string> = Omit<
 	Port<TName>,
-	"id" | "nodeId"
+	"id" | "nodeId" | "direction"
 >;
 export type DefaultPorts<
 	TInputPorts extends DefaultPort<string>[],

@@ -1,4 +1,3 @@
-import { type AvailableAgent, getAvailableAgents } from "@/app/agents";
 import { type Node, useBlueprint } from "@/app/agents/blueprints";
 import {
 	Command,
@@ -7,21 +6,14 @@ import {
 	CommandInput,
 	CommandItem,
 	CommandList,
-	CommandLoading,
 } from "@/components/ui/command";
-import { type FC, useCallback, useEffect, useState } from "react";
-import { nodeService } from "../..";
-import { buildDefaultPort } from "../../builder";
-import { DefaultPortType } from "../../type";
+import type { FC } from "react";
+import { type NodeGraph, nodeService } from "../..";
 
 type KnowledgeListProps = {
-	position: { x: number; y: number };
-	onSelect: (node: Node) => void;
+	onSelect: (node: NodeGraph) => void;
 };
-export const KnowledgeList: FC<KnowledgeListProps> = ({
-	position,
-	onSelect,
-}) => {
+export const KnowledgeList: FC<KnowledgeListProps> = ({ onSelect }) => {
 	const { blueprint } = useBlueprint();
 	return (
 		<Command>
@@ -43,7 +35,6 @@ export const KnowledgeList: FC<KnowledgeListProps> = ({
 							key={knowledge.id}
 							onSelect={() => {
 								const node = nodeService.createNode("knowledgeRetrieval", {
-									position,
 									data: {
 										knowledgeIds: [knowledge.id],
 										openaiAssistantId: "",

@@ -1,5 +1,4 @@
 import { type AvailableAgent, getAvailableAgents } from "@/app/agents";
-import type { Node } from "@/app/agents/blueprints";
 import {
 	Command,
 	CommandEmpty,
@@ -10,15 +9,14 @@ import {
 	CommandLoading,
 } from "@/components/ui/command";
 import { type FC, useCallback, useEffect, useState } from "react";
-import { nodeService } from "../..";
+import { type NodeGraph, nodeService } from "../..";
 import { buildDefaultPort } from "../../builder";
-import { DefaultPortType } from "../../type";
+import { portType } from "../../type";
 
 type AgentListProps = {
-	position: { x: number; y: number };
-	onSelect: (node: Node) => void;
+	onSelect: (node: NodeGraph) => void;
 };
-export const AgentList: FC<AgentListProps> = ({ onSelect, position }) => {
+export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 	const [loading, setLoading] = useState(true);
 	const [availableAgents, setAvaialbleAgents] = useState<AvailableAgent[]>([]);
 	const fetchAgents = useCallback(async () => {
@@ -51,7 +49,6 @@ export const AgentList: FC<AgentListProps> = ({ onSelect, position }) => {
 							key={availableAgent.id}
 							onSelect={() => {
 								const node = nodeService.createNode("agent", {
-									position,
 									data: {
 										relevantAgent: {
 											id: availableAgent.id,
@@ -61,7 +58,7 @@ export const AgentList: FC<AgentListProps> = ({ onSelect, position }) => {
 									},
 									inputPorts: availableAgent.inputPorts.map((port) =>
 										buildDefaultPort({
-											type: DefaultPortType.Data,
+											type: portType.data,
 											name: port.name,
 										}),
 									),

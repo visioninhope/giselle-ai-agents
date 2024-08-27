@@ -9,19 +9,20 @@ import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
 import { useAddPort } from "../../context/add-port";
-import type { NodeGraph } from "../../type";
-import { DynamicOutputPortListItem } from "./dynamic-output-port-list-item";
+import type { NodeGraph, PortDirection } from "../../type";
+import { PortListItem } from "./port-list-item";
 
-type DynamicOutputPortProps = {
+type PortsField = {
 	node: NodeGraph;
 	heading?: string;
+	direction: PortDirection;
 };
-export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
+export const PortsField: FC<PortsField> = ({
 	node,
-	heading = "Output Port",
+	heading = "Port Field",
+	direction,
 }) => {
-	const { addSourceport: addInputPort, addTargetPort: addOutputPort } =
-		useAddPort();
+	const { addPort } = useAddPort();
 	const [disclosure, setDisclosure] = useState(false);
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(formEvent) => {
@@ -30,12 +31,13 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 			const formData = new FormData(formEvent.currentTarget);
 			addPort({
 				nodeId: node.id,
-				id: `pt_${createId()}`,
+				id: `pt_${createId()}` as const,
 				type: "data",
 				name: formData.get("name") as string,
+				direction,
 			});
 		},
-		[node.id, addPort],
+		[node.id, addPort, direction],
 	);
 	return (
 		<div>
@@ -62,10 +64,12 @@ export const DynamicOutputPort: FC<DynamicOutputPortProps> = ({
 				</div>
 			</div>
 			<div className="flex flex-col gap-1">
-				{node.sourcePorts
-					.filter(({ type }) => type === "data")
+				{node.ports
+					.filter(
+						(port) => port.type === "data" && port.direction === direction,
+					)
 					.map((port) => (
-						<DynamicOutputPortListItem key={port.id} port={port} />
+						<PortListItem key={port.id} port={port} />
 					))}
 			</div>
 		</div>

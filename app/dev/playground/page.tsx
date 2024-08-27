@@ -9,7 +9,12 @@ import {
 import { type FC, useEffect } from "react";
 import "@xyflow/react/dist/style.css";
 import { useContextMenu } from "@/app/agents/canvas/hooks";
-import { Finder, GiselleNode } from "@/app/nodes";
+import {
+	Finder,
+	GiselleNode,
+	GiselleNodeData,
+	portDirection,
+} from "@/app/nodes";
 import { GraphProvider, useGraph } from "./graph-context";
 
 export default function Playground() {
@@ -33,10 +38,26 @@ const nodeTypes = {
 const Inner: FC = () => {
 	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
-	const reactFlowInstance = useReactFlow();
+	const reactFlowInstance = useReactFlow<GiselleNode>();
 	const { graph, dispatch } = useGraph();
 	useEffect(() => {
-		reactFlowInstance.setNodes(graph.nodes);
+		reactFlowInstance.setNodes(
+			graph.nodes.map((node) => ({
+				id: node.id,
+				type: "giselle",
+				data: {
+					...node.data,
+					className: node.className,
+					sourcePorts: node.ports.filter(
+						(port) => port.direction === portDirection.source,
+					),
+					targetPorts: node.ports.filter(
+						(port) => port.direction === portDirection.target,
+					),
+				},
+				position: node.position,
+			})),
+		);
 	}, [reactFlowInstance.setNodes, graph]);
 	return (
 		<div className="h-screen w-full">
@@ -48,35 +69,26 @@ const Inner: FC = () => {
 			>
 				<Background />
 				{isVisible && reactFlowInstance && (
-					<div
+					<Finder
 						className="z-10 absolute"
 						style={{
 							left: contextMenuPosition.x,
 							top: contextMenuPosition.y,
 						}}
-					>
-						<Finder
-							onSelect={({ id, className, sourcePorts, targetPorts }) => {
-								hideContextMenu();
-								dispatch({
-									type: "ADD_NODE",
-									node: {
-										id,
-										type: "giselle",
-										data: {
-											className,
-											sourcePorts,
-											targetPorts,
-										},
-										position: reactFlowInstance.screenToFlowPosition({
-											x: contextMenuPosition.x,
-											y: contextMenuPosition.y,
-										}),
-									},
-								});
-							}}
-						/>
-					</div>
+						onSelect={(node) => {
+							hideContextMenu();
+							dispatch({
+								type: "ADD_NODE",
+								node: {
+									...node,
+									position: reactFlowInstance.screenToFlowPosition({
+										x: contextMenuPosition.x,
+										y: contextMenuPosition.y,
+									}),
+								},
+							});
+						}}
+					/>
 				)}
 			</ReactFlow>
 		</div>

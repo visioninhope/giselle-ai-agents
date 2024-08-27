@@ -20,7 +20,7 @@ export type GiselleNodeData = {
 	sourcePorts: Port[];
 	stepStatus?: RequestStepStatus;
 };
-type GiselleNode = Node<GiselleNodeData>;
+export type GiselleNode = Node<GiselleNodeData>;
 export const GiselleNode: FC<NodeProps<GiselleNode>> = ({
 	selected,
 	data: { className, targetPorts, sourcePorts, stepStatus },

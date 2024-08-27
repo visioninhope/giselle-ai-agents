@@ -3,7 +3,13 @@ import { createId } from "@paralleldrive/cuid2";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
 import { type InferInput, type ObjectSchema, parse } from "valibot";
-import type { DefaultPort, DefaultPorts, NodeClasses, NodeGraph } from "./type";
+import type {
+	DefaultPort,
+	DefaultPorts,
+	NodeClasses,
+	NodeGraph,
+	Port,
+} from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
 	? U extends undefined
@@ -52,11 +58,11 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 		createNode: (name, args) => {
 			invariant(typeof name === "string", "name must be a string");
 			const nodeClass = nodeClasses[name];
-			const inputPorts = [
+			const targetPorts = [
 				...(nodeClass.defaultPorts.inputPorts ?? []),
 				...(args?.inputPorts ?? []),
 			] as DefaultPort[];
-			const outputPorts = [
+			const sourcePorts = [
 				...(nodeClass.defaultPorts.outputPorts ?? []),
 				...(args?.outputPorts ?? []),
 			] as DefaultPort[];
@@ -67,18 +73,22 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				className: name,
 				name,
 				data: args?.data,
-				sourcePorts: inputPorts.map(({ type, name }) => ({
-					id: `pt_${createId()}` as const,
-					nodeId: id,
-					type,
-					name,
-				})),
-				targetPorts: outputPorts.map(({ type, name }) => ({
-					id: `pt_${createId()}` as const,
-					nodeId: id,
-					type,
-					name,
-				})),
+				ports: [
+					...targetPorts.map(({ type, name }) => ({
+						id: `pt_${createId()}` as const,
+						nodeId: id,
+						direction: "target" as const,
+						type,
+						name,
+					})),
+					...sourcePorts.map(({ type, name }) => ({
+						id: `pt_${createId()}` as const,
+						nodeId: id,
+						direction: "source" as const,
+						type,
+						name,
+					})),
+				],
 			};
 		},
 		renderPanel: (name, { node }) => {

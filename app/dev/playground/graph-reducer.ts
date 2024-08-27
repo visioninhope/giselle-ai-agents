@@ -1,17 +1,22 @@
 import {
-	type PlaygroundEdge,
-	type PlaygroundGraph,
-	type PlaygroundNode,
-	type PlaygroundNodeGraph,
-	type PlaygroundPort,
-	playgroundPortDirection,
-} from "./types";
+	type Node,
+	type Port,
+	type PortDirection,
+	portDirection,
+} from "@/app/nodes";
+import type { PlaygroundEdge, PlaygroundGraph, PlaygroundNode } from "./types";
 
 export type GraphAction =
-	| { type: "ADD_NODE"; node: PlaygroundNodeGraph }
+	| { type: "ADD_NODE"; node: PlaygroundNode }
 	| { type: "REMOVE_NODE"; nodeId: PlaygroundNode["id"] }
-	| { type: "ADD_PORT"; port: PlaygroundPort }
-	| { type: "REMOVE_PORT"; portId: PlaygroundPort["id"] }
+	| {
+			type: "UPDATE_NODE";
+			nodeId: PlaygroundNode["id"];
+			updates: Partial<Pick<Node, "data" | "name">>;
+	  }
+	| { type: "ADD_PORT"; port: Port; direction: PortDirection }
+	| { type: "REMOVE_PORT"; portId: Port["id"] }
+	| { type: "UPDATE_PORT"; portId: Port["id"]; updates: Partial<Port> }
 	| { type: "ADD_EDGE"; edge: PlaygroundEdge }
 	| { type: "REMOVE_EDGE"; edgeId: PlaygroundEdge["id"] };
 
@@ -29,52 +34,55 @@ export function graphReducer(
 			return {
 				...state,
 				nodes: state.nodes.filter((node) => node.id !== action.nodeId),
-				edges: state.edges.filter(
-					(edge) =>
-						!state.nodes
-							.find((node) => node.id === action.nodeId)
-							?.sourcePorts.some((port) => port.id === edge.sourcePortId) &&
-						!state.nodes
-							.find((node) => node.id === action.nodeId)
-							?.targetPorts.some((port) => port.id === edge.targetPortId),
-				),
+			};
+		case "UPDATE_NODE":
+			return {
+				...state,
+				nodes: state.nodes.map((node) => {
+					if (node.id !== action.nodeId) {
+						return node;
+					}
+					return {
+						...node,
+						...action.updates,
+					};
+				}),
 			};
 		case "ADD_PORT":
 			return {
 				...state,
-				nodes: state.nodes.map((node) =>
-					node.id === action.port.nodeId
-						? {
-								...node,
-								sourcePorts:
-									action.port.direction === playgroundPortDirection.source
-										? [...node.sourcePorts, action.port]
-										: node.sourcePorts,
-								targetPorts:
-									action.port.direction === playgroundPortDirection.target
-										? [...node.targetPorts, action.port]
-										: node.targetPorts,
-							}
-						: node,
-				),
+				nodes: state.nodes.map((node) => {
+					if (node.id !== action.port.nodeId) {
+						return node;
+					}
+					return {
+						...node,
+						ports: [...node.ports, action.port],
+					};
+				}),
 			};
 		case "REMOVE_PORT":
 			return {
 				...state,
 				nodes: state.nodes.map((node) => ({
 					...node,
-					sourcePorts: node.sourcePorts.filter(
-						(port) => port.id !== action.portId,
-					),
-					targetPorts: node.targetPorts.filter(
-						(port) => port.id !== action.portId,
-					),
+					ports: node.ports.filter((port) => port.id !== action.portId),
 				})),
 				edges: state.edges.filter(
 					(edge) =>
 						edge.sourcePortId !== action.portId &&
 						edge.targetPortId !== action.portId,
 				),
+			};
+		case "UPDATE_PORT":
+			return {
+				...state,
+				nodes: state.nodes.map((node) => ({
+					...node,
+					ports: node.ports.map((port) =>
+						port.id === action.portId ? { ...port, ...action.updates } : port,
+					),
+				})),
 			};
 		case "ADD_EDGE":
 			return {

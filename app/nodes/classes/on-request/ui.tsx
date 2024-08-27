@@ -1,17 +1,17 @@
 "use client";
 
-import type { Node } from "@/app/agents/blueprints";
 import type { FC } from "react";
-import { DynamicOutputPort } from "../../components/dynamic-output-port";
+import { PortsField } from "../../components/ports-field";
+import type { NodeGraph } from "../../type";
 
 type OnRequestNodePanelProps = {
-	node: Node;
+	node: NodeGraph;
 };
 export const OnRequestNodePanel: FC<OnRequestNodePanelProps> = ({ node }) => {
 	return (
 		<div className="divide-y">
 			<div className="p-2">
-				<DynamicOutputPort node={node} heading="Parameters" />
+				<PortsField node={node} heading="Parameters" direction="target" />
 			</div>
 		</div>
 	);

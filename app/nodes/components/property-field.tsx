@@ -1,45 +1,32 @@
-import { updateNodeData, useBlueprint } from "@/app/agents/blueprints";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import type { NodeData } from "@/drizzle";
 import { type FC, useCallback, useRef } from "react";
+import { useUpdateNode } from "../context/update-node";
+import type { Node } from "../type";
 
 type PropertyFieldProps = {
 	name: string;
 	label?: string;
 	value: string;
-	nodeId: number;
+	node: Node;
 };
 export const PropertyField: FC<PropertyFieldProps> = ({
 	label,
 	name,
 	value,
-	nodeId,
+	node,
 }) => {
-	const { blueprint, mutate } = useBlueprint();
+	const { updateNode } = useUpdateNode();
 	const ref = useRef<HTMLTextAreaElement | null>(null);
 	const handleBlur = useCallback(() => {
 		if (ref.current == null) {
 			return;
 		}
-		mutate({
-			type: "updateNodeData",
-			optimisticData: {
-				node: {
-					id: nodeId,
-					data: {
-						name,
-						value: ref.current.value,
-					},
-				},
-			},
-			action: (optimisticData) =>
-				updateNodeData({
-					blueprintId: blueprint.id,
-					...optimisticData,
-				}),
+		updateNode(node.id, {
+			...node.data,
+			[name]: value,
 		});
-	}, [name, nodeId, mutate, blueprint.id]);
+	}, [name, node, value, updateNode]);
 	return (
 		<div>
 			<Label htmlFor={name}>{label ?? name}</Label>

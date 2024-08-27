@@ -1,12 +1,12 @@
 "use client";
 
-import type { Node } from "@/app/agents/blueprints";
-import { type FC, useMemo } from "react";
-import { DynamicInputPort } from "../../components/dynamic-input-port";
+import type { FC } from "react";
+import { PortsField } from "../../components/ports-field";
 import { PropertyField } from "../../components/property-field";
+import type { NodeGraph } from "../../type";
 
 type TextNodePanelProps = {
-	node: Node;
+	node: NodeGraph;
 	textFieldName: string;
 	textFieldValue: string;
 };
@@ -20,14 +20,14 @@ export const TextNodePanel: FC<TextNodePanelProps> = ({
 		<div className="divide-y">
 			<div className="p-2">
 				<PropertyField
-					nodeId={node.id}
+					node={node}
 					name={textFieldName}
 					value={textFieldValue}
 					label="Text"
 				/>
 			</div>
 			<div className="p-2">
-				<DynamicInputPort node={node} heading="Text Parameters" />
+				<PortsField node={node} heading="Text Parameters" direction="target" />
 			</div>
 		</div>
 	);

@@ -12,70 +12,73 @@ import {
 	DropdownMenuSubTrigger,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import type { FC } from "react";
+import type { FC, HTMLAttributes } from "react";
 import { AgentList } from "./agent-list";
 import { KnowledgeList } from "./knowledge-list";
 
-type FinderProps = {
+type FinderProps = Pick<
+	HTMLAttributes<HTMLDivElement>,
+	"className" | "style"
+> & {
 	onSelect: (node: NodeGraph) => void;
 };
-export const Finder: FC<FinderProps> = ({ onSelect }) => {
+export const Finder: FC<FinderProps> = ({ onSelect, style, className }) => {
 	return (
-		<DropdownMenu defaultOpen={true} modal={false}>
-			<DropdownMenuTrigger />
-			<DropdownMenuContent>
-				{/** <DropdownMenuGroup>
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
-						<DropdownMenuPortal>
-							<DropdownMenuSubContent>
-								<AgentList position={position} onSelect={onSelect} />
-							</DropdownMenuSubContent>
-						</DropdownMenuPortal>
-					</DropdownMenuSub>
-				</DropdownMenuGroup>
-				**/}
-				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
-					<DropdownMenuItem
-						onSelect={() => {
-							const node = nodeService.createNode("onRequest");
-							onSelect(node);
-						}}
-					>
-						On Request
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onSelect={() => {
-							const node = nodeService.createNode("response");
-							onSelect(node);
-						}}
-					>
-						Response
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onSelect={() => {
-							const node = nodeService.createNode("text", {
-								data: {
-									template: "",
-								},
-							});
-							onSelect(node);
-						}}
-					>
-						Text
-					</DropdownMenuItem>
-					<DropdownMenuItem
-						onSelect={() => {
-							const node = nodeService.createNode("textGeneration");
-							onSelect(node);
-						}}
-					>
-						Text Generation
-					</DropdownMenuItem>
-				</DropdownMenuGroup>
-				{/**
+		<div style={style} className={className}>
+			<DropdownMenu defaultOpen={true} modal={false}>
+				<DropdownMenuTrigger />
+				<DropdownMenuContent>
+					<DropdownMenuGroup>
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
+							<DropdownMenuPortal>
+								<DropdownMenuSubContent>
+									<AgentList onSelect={onSelect} />
+								</DropdownMenuSubContent>
+							</DropdownMenuPortal>
+						</DropdownMenuSub>
+					</DropdownMenuGroup>
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
+						<DropdownMenuItem
+							onSelect={() => {
+								const node = nodeService.createNode("onRequest");
+								onSelect(node);
+							}}
+						>
+							On Request
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => {
+								const node = nodeService.createNode("response");
+								onSelect(node);
+							}}
+						>
+							Response
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => {
+								const node = nodeService.createNode("text", {
+									data: {
+										template: "",
+									},
+								});
+								onSelect(node);
+							}}
+						>
+							Text
+						</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => {
+								const node = nodeService.createNode("textGeneration");
+								onSelect(node);
+							}}
+						>
+							Text Generation
+						</DropdownMenuItem>
+					</DropdownMenuGroup>
+					{/**
 				<DropdownMenuSeparator />
 				<DropdownMenuGroup>
 					<DropdownMenuSub>
@@ -88,7 +91,8 @@ export const Finder: FC<FinderProps> = ({ onSelect }) => {
 					</DropdownMenuSub>
 				</DropdownMenuGroup>
 				*/}
-			</DropdownMenuContent>
-		</DropdownMenu>
+				</DropdownMenuContent>
+			</DropdownMenu>
+		</div>
 	);
 };

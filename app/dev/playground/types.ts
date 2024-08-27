@@ -1,22 +1,12 @@
-import type { GiselleNodeData, Port } from "@/app/nodes";
-import type { Node } from "@xyflow/react";
+import type { NodeGraph, Port } from "@/app/nodes";
+import type { XYPosition } from "@xyflow/react";
 
-export type PlaygroundNode = Node<GiselleNodeData>;
-
-export const playgroundPortDirection = {
-	source: "source",
-	target: "target",
-} as const;
-type PlaygroundPortDirection = keyof typeof playgroundPortDirection;
-export type PlaygroundPort = Port & {
-	direction: PlaygroundPortDirection;
-	order: number;
-};
+export type PlaygroundNode = NodeGraph & { position: XYPosition };
 
 export type PlaygroundEdge = {
 	id: `ed_${string}`;
-	sourcePortId: PlaygroundPort["id"];
-	targetPortId: PlaygroundPort["id"];
+	sourcePortId: Port["id"];
+	targetPortId: Port["id"];
 };
 
 export type PlaygroundGraph = {
