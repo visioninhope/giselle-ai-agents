@@ -72,7 +72,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				id,
 				className: name,
 				name,
-				data: args?.data,
+				data: args?.data ?? {},
 				ports: [
 					...targetPorts.map(({ type, name }) => ({
 						id: `pt_${createId()}` as const,
