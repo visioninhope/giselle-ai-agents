@@ -13,7 +13,7 @@ type AddPortContextState = {
 
 const AddPortContext = createContext<AddPortContextState | null>(null);
 
-type AddPortProviderProps = {
+export type AddPortProviderProps = {
 	addPort: AddPortFn;
 };
 export const AddPortProvider: FC<PropsWithChildren<AddPortProviderProps>> = ({

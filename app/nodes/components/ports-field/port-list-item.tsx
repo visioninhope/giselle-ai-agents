@@ -10,8 +10,8 @@ import {
 	useState,
 } from "react";
 import invariant from "tiny-invariant";
-import { useDeletePort } from "../../context/delete-port";
-import { useUpdatePort } from "../../context/update-port";
+import { useDeletePort } from "../../contexts/delete-port";
+import { useUpdatePort } from "../../contexts/update-port";
 import type { Port } from "../../type";
 
 type PortListItemProps = {

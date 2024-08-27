@@ -2,6 +2,7 @@
 
 import {
 	Background,
+	Panel,
 	ReactFlow,
 	ReactFlowProvider,
 	useReactFlow,
@@ -16,6 +17,7 @@ import {
 	portDirection,
 } from "@/app/nodes";
 import { GraphProvider, useGraph } from "./graph-context";
+import { PropertyPanel } from "./property-panel";
 
 export default function Playground() {
 	return (
@@ -90,6 +92,11 @@ const Inner: FC = () => {
 						}}
 					/>
 				)}
+				<Panel>
+					<div className="flex gap-2 h-full">
+						<PropertyPanel />
+					</div>
+				</Panel>
 			</ReactFlow>
 		</div>
 	);

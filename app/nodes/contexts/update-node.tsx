@@ -16,7 +16,7 @@ type UpdateNodeContextState = {
 
 const UpdateNodeContext = createContext<UpdateNodeContextState | null>(null);
 
-type UpdateNodeProviderProps = {
+export type UpdateNodeProviderProps = {
 	updateNode: UpdateNodeFn;
 };
 export const UpdateNodeProvider: FC<

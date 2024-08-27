@@ -2,7 +2,7 @@
 
 import type { FC } from "react";
 import { PortsField } from "../../components/ports-field";
-import type { NodeGraph } from "../../type";
+import { type NodeGraph, portDirection } from "../../type";
 
 type OnRequestNodePanelProps = {
 	node: NodeGraph;
@@ -11,7 +11,11 @@ export const OnRequestNodePanel: FC<OnRequestNodePanelProps> = ({ node }) => {
 	return (
 		<div className="divide-y">
 			<div className="p-2">
-				<PortsField node={node} heading="Parameters" direction="target" />
+				<PortsField
+					node={node}
+					heading="Parameters"
+					direction={portDirection.source}
+				/>
 			</div>
 		</div>
 	);

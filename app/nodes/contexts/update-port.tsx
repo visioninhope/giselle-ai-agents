@@ -13,7 +13,7 @@ type UpdatePortContextState = {
 
 const UpdatePortContext = createContext<UpdatePortContextState | null>(null);
 
-type UpdatePortProviderProps = {
+export type UpdatePortProviderProps = {
 	updatePort: UpdatePortFn;
 };
 export const UpdatePortProvider: FC<

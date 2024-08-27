@@ -11,6 +11,7 @@ export type {
 export { portDirection } from "./type";
 export { Finder } from "./components/finder";
 export { GiselleNode, type GiselleNodeData } from "./components/node";
+export { OperationProvider } from "./contexts";
 
 export const nodeService = createNodeService(nodeClasses);
 

@@ -3,7 +3,7 @@
 import type { FC } from "react";
 import { PortsField } from "../../components/ports-field";
 import { PropertyField } from "../../components/property-field";
-import type { NodeGraph } from "../../type";
+import { type NodeGraph, portDirection } from "../../type";
 
 type TextNodePanelProps = {
 	node: NodeGraph;
@@ -27,7 +27,11 @@ export const TextNodePanel: FC<TextNodePanelProps> = ({
 				/>
 			</div>
 			<div className="p-2">
-				<PortsField node={node} heading="Text Parameters" direction="target" />
+				<PortsField
+					node={node}
+					heading="Text Parameters"
+					direction={portDirection.source}
+				/>
 			</div>
 		</div>
 	);

@@ -1,3 +1,4 @@
+import { OperationProvider } from "@/app/nodes";
 import { type ReactNode, createContext, useContext, useReducer } from "react";
 import { type GraphAction, graphReducer } from "./graph-reducer";
 import type { PlaygroundGraph } from "./types";
@@ -17,7 +18,22 @@ export const GraphProvider: React.FC<{
 
 	return (
 		<GraphContext.Provider value={{ graph, dispatch }}>
-			{children}
+			<OperationProvider
+				addPort={(port) => {
+					dispatch({ type: "ADD_PORT", port });
+				}}
+				updatePort={(portId, updates) => {
+					dispatch({ type: "UPDATE_PORT", portId, updates });
+				}}
+				deletePort={(portId) => {
+					dispatch({ type: "REMOVE_PORT", portId });
+				}}
+				updateNode={(nodeId, updates) => {
+					dispatch({ type: "UPDATE_NODE", nodeId, updates });
+				}}
+			>
+				{children}
+			</OperationProvider>
 		</GraphContext.Provider>
 	);
 };

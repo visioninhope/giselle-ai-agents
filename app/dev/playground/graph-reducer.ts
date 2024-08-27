@@ -1,9 +1,4 @@
-import {
-	type Node,
-	type Port,
-	type PortDirection,
-	portDirection,
-} from "@/app/nodes";
+import type { Node, Port } from "@/app/nodes";
 import type { PlaygroundEdge, PlaygroundGraph, PlaygroundNode } from "./types";
 
 export type GraphAction =
@@ -14,7 +9,7 @@ export type GraphAction =
 			nodeId: PlaygroundNode["id"];
 			updates: Partial<Pick<Node, "data" | "name">>;
 	  }
-	| { type: "ADD_PORT"; port: Port; direction: PortDirection }
+	| { type: "ADD_PORT"; port: Port }
 	| { type: "REMOVE_PORT"; portId: Port["id"] }
 	| { type: "UPDATE_PORT"; portId: Port["id"]; updates: Partial<Port> }
 	| { type: "ADD_EDGE"; edge: PlaygroundEdge }

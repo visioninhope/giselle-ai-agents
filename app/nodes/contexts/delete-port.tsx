@@ -13,7 +13,7 @@ type DeletePortContextState = {
 
 const DeletePortContext = createContext<DeletePortContextState | null>(null);
 
-type DeletePortProviderProps = {
+export type DeletePortProviderProps = {
 	deletePort: DeletePortFn;
 };
 export const DeletePortProvider: FC<
