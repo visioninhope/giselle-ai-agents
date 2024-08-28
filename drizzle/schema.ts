@@ -93,7 +93,7 @@ export const agents = pgTable("agents", {
 });
 
 export const blueprints = pgTable("blueprints", {
-	id: text("id").$type<`blpr_${string}`>().unique(),
+	id: text("id").$type<`blpr_${string}`>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	graph: jsonb("graph").$type<PlaygroundGraph>().notNull(),
 	graphHash: text("graph_hash").notNull().unique(),

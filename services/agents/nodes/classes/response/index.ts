@@ -3,7 +3,7 @@ import { nodeClassCategory, portType } from "../../type";
 import { insertRequestResult } from "./insert-request-result";
 
 export const response = buildNodeClass("response", {
-	categories: [nodeClassCategory.eesponse],
+	categories: [nodeClassCategory.response],
 	defaultPorts: {
 		inputPorts: [
 			buildDefaultPort({ type: portType.execution, name: "from" }),

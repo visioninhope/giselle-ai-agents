@@ -6,7 +6,13 @@
 // import { RequiredAction } from "./required-action";
 
 import { SubmitButton } from "@/components/ui/submit-button";
-import { getOrBuildBlueprint } from "@/services/agents/requests/process";
+import { nodeClassHasCategory } from "@/services/agents/nodes";
+import { nodeClassCategory } from "@/services/agents/nodes/type";
+import { meta } from "@/services/agents/requests/actors/meta";
+import {
+	getOrBuildBlueprint,
+	startRequest,
+} from "@/services/agents/requests/process";
 import type { AgentId } from "@/services/agents/types";
 import { type FC, type FormEventHandler, useCallback } from "react";
 import { useGraph } from "../../graph-context";
@@ -37,6 +43,9 @@ export const RequestPanel: FC = () => {
 		async (e) => {
 			e.preventDefault();
 			const blueprint = await getOrBuildBlueprint(agentId as AgentId);
+			console.log({ blueprint });
+			const request = await startRequest(blueprint.id);
+			await meta({ requestDbId: request.dbId });
 		},
 		[agentId],
 	);

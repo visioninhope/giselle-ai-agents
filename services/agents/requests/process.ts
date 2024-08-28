@@ -23,7 +23,7 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 		.from(blueprints)
 		.where(eq(blueprints.graphHash, agent.graphHash));
 	if (blueprint != null) {
-		return blueprint;
+		return { id: blueprint.id };
 	}
 	const [newBlueprint] = await db
 		.insert(blueprints)
@@ -34,6 +34,7 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 			graphHash: agent.graphHash,
 		})
 		.returning({
+			id: blueprints.id,
 			dbId: blueprints.dbId,
 		});
 	const newNodes = await db
@@ -89,10 +90,12 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 		})
 		.filter((v) => v != null);
 	await db.insert(edges).values(edgeInsertValues);
-	return blueprint;
+	return { id: newBlueprint.id };
 };
 
-export const startRequest = async (blueprintId: (typeof blueprints)["id"]) => {
+export const startRequest = async (
+	blueprintId: (typeof blueprints.$inferInsert)["id"],
+) => {
 	const [blueprint] = await db
 		.select({ dbId: blueprints.dbId })
 		.from(blueprints)
@@ -105,4 +108,5 @@ export const startRequest = async (blueprintId: (typeof blueprints)["id"]) => {
 		.returning({
 			dbId: requests.dbId,
 		});
+	return newRequest;
 };
