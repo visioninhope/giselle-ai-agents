@@ -1,8 +1,8 @@
 import { type Blueprint, getBlueprint } from "@/app/agents/blueprints";
 import { getDependedNodes, getRequest } from "@/app/agents/requests";
-import { assertNodeClassName, nodeService } from "@/app/nodes";
 import { requestResults } from "@/drizzle";
 import { db, updateRun, updateRunStep } from "@/drizzle/db";
+import { assertNodeClassName, nodeService } from "@/services/agents/nodes";
 import { logger, task } from "@trigger.dev/sdk/v3";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";

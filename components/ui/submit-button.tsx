@@ -1,3 +1,5 @@
+"use client";
+
 import type { FC, ReactNode, Ref } from "react";
 import { useFormStatus } from "react-dom";
 import { Button, type ButtonProps } from "./button";

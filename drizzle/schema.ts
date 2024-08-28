@@ -1,4 +1,10 @@
-import type { PlaygroundGraph } from "@/app/dev/playground/types";
+import type { Node, Port, PortDirection, PortType } from "@/app/nodes";
+import type { AgentId } from "@/services/agents";
+import type {
+	PlaygroundEdge,
+	PlaygroundGraph,
+} from "@/services/agents/playground/types";
+import { relations } from "drizzle-orm";
 import {
 	boolean,
 	integer,
@@ -67,104 +73,107 @@ export const teamMemberships = pgTable(
 );
 
 export const agents = pgTable("agents", {
-	id: serial("id").primaryKey(),
+	id: text("id").$type<AgentId>().notNull().unique(),
+	dbId: serial("db_id").primaryKey(),
 	name: text("name"),
-	urlId: text("url_id").notNull().unique(),
-	teamId: integer("team_id")
+	graph: jsonb("graph")
+		.$type<PlaygroundGraph>()
 		.notNull()
-		.references(() => teams.id),
+		.default({
+			nodes: [],
+			edges: [],
+			viewport: {
+				x: 0,
+				y: 0,
+				zoom: 1,
+			},
+		}),
+	graphHash: text("graph_hash").notNull().unique(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const blueprints = pgTable(
-	"blueprints",
-	{
-		id: serial("id").primaryKey(),
-		graph: jsonb("graph")
-			.$type<PlaygroundGraph>()
-			.notNull()
-			.default({ nodes: [], edges: [] }),
-		agentId: integer("agent_id")
-			.notNull()
-			.references(() => agents.id),
-		version: integer("version").notNull(),
-		dirty: boolean("dirty").notNull().default(false),
-		builded: boolean("builded").notNull().default(false),
-	},
-	(blueprint) => ({
-		blueprintsAgentIdVersionUnique: unique().on(
-			blueprint.agentId,
-			blueprint.version,
-		),
-	}),
-);
-
-export type NodeData = Record<string, unknown>;
-export type NodePosition = { x: number; y: number };
-export const nodes = pgTable("nodes", {
-	id: serial("id").primaryKey(),
-	blueprintId: integer("blueprint_id")
+export const blueprints = pgTable("blueprints", {
+	id: text("id").$type<`blpr_${string}`>().unique(),
+	dbId: serial("db_id").primaryKey(),
+	graph: jsonb("graph").$type<PlaygroundGraph>().notNull(),
+	agentDbId: integer("agent_db_id")
 		.notNull()
-		.references(() => blueprints.id, { onDelete: "cascade" }),
+		.references(() => agents.dbId),
+	beforeId: integer("before_id"),
+	after: integer("after_id"),
+});
+export const blueprintRelations = relations(blueprints, ({ one }) => ({
+	beforeBlueprint: one(blueprints, {
+		fields: [blueprints.beforeId],
+		references: [blueprints.id],
+	}),
+	afterBlueprint: one(blueprints, {
+		fields: [blueprints.after],
+		references: [blueprints.id],
+	}),
+}));
+
+export const nodes = pgTable("nodes", {
+	id: text("id").$type<Node["id"]>().notNull(),
+	dbId: serial("db_id").primaryKey(),
+	blueprintDbId: integer("blueprint_db_id")
+		.notNull()
+		.references(() => blueprints.dbId, { onDelete: "cascade" }),
 	className: text("class_name").notNull(),
-	data: jsonb("data").$type<NodeData>(),
-	position: jsonb("position").$type<NodePosition>().notNull(),
+	data: jsonb("data").notNull(),
 });
 
-type PortDirection = "input" | "output";
-export type PortType = "data" | "execution";
 export const ports = pgTable("ports", {
-	id: serial("id").primaryKey(),
-	nodeId: integer("node_id")
+	id: text("id").$type<Port["id"]>().notNull(),
+	dbId: serial("db_id").primaryKey(),
+	nodeDbId: integer("node_db_id")
 		.notNull()
-		.references(() => nodes.id, { onDelete: "cascade" }),
+		.references(() => nodes.dbId, { onDelete: "cascade" }),
 	name: text("name").notNull(),
 	direction: text("direction").$type<PortDirection>().notNull(),
 	type: text("type").$type<PortType>().notNull(),
-	order: integer("order").notNull(),
 });
 
-export type EdgeType = "data" | "execution";
 export const edges = pgTable(
 	"edges",
 	{
-		id: serial("id").primaryKey(),
-		blueprintId: integer("blueprint_id")
+		id: text("id").$type<PlaygroundEdge["id"]>().notNull().unique(),
+		dbId: serial("db_id").primaryKey(),
+		blueprintDbId: integer("blueprint_db_id")
 			.notNull()
-			.references(() => blueprints.id, { onDelete: "cascade" }),
-		inputPortId: integer("input_port_id")
+			.references(() => blueprints.dbId, { onDelete: "cascade" }),
+		inputPortDbId: integer("input_port_db_id")
 			.notNull()
-			.references(() => ports.id, { onDelete: "cascade" }),
-		outputPortId: integer("output_port_id")
+			.references(() => ports.dbId, { onDelete: "cascade" }),
+		outputPortDbId: integer("output_port_db_id")
 			.notNull()
-			.references(() => ports.id, { onDelete: "cascade" }),
-		edgeType: text("edge_type").$type<EdgeType>().notNull(),
+			.references(() => ports.dbId, { onDelete: "cascade" }),
 	},
 	(edge) => ({
 		edgesInputPortIdOutputPortIdUnique: unique().on(
-			edge.inputPortId,
-			edge.outputPortId,
+			edge.inputPortDbId,
+			edge.outputPortDbId,
 		),
 	}),
 );
 
 export const steps = pgTable("steps", {
-	id: serial("id").primaryKey(),
-	blueprintId: integer("blueprint_id")
+	dbId: serial("db_id").primaryKey(),
+	blueprintDbId: integer("blueprint_db_id")
 		.notNull()
-		.references(() => blueprints.id),
-	nodeId: integer("node_id")
+		.references(() => blueprints.dbId),
+	nodeDbId: integer("node_db_id")
 		.notNull()
-		.references(() => nodes.id),
+		.references(() => nodes.dbId),
 	order: integer("order").notNull(),
 });
 
 export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
-	id: serial("id").primaryKey(),
-	blueprintId: integer("blueprint_id")
+	dbId: serial("db_id").primaryKey(),
+	blueprintDbId: integer("blueprint_db_id")
 		.notNull()
-		.references(() => blueprints.id),
+		.references(() => blueprints.dbId),
 	status: text("status").$type<RequestStatus>().notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
@@ -172,23 +181,23 @@ export const requests = pgTable("requests", {
 });
 
 export const requestResults = pgTable("request_results", {
-	id: serial("id").primaryKey(),
-	requestId: integer("request_id")
+	dbId: serial("db_id").primaryKey(),
+	requestDbId: integer("request_db_id")
 		.notNull()
-		.references(() => requests.id)
+		.references(() => requests.dbId)
 		.unique(),
 	text: text("text").notNull(),
 });
 
 export type RequestStepStatus = "idle" | "running" | "success" | "failed";
 export const requestSteps = pgTable("request_steps", {
-	id: serial("id").primaryKey(),
-	requestId: integer("run_id")
+	dbId: serial("db_id").primaryKey(),
+	requestDbId: integer("request_db_id")
 		.notNull()
-		.references(() => requests.id),
-	stepId: integer("step_id")
+		.references(() => requests.dbId),
+	stepDbId: integer("step_db_id")
 		.notNull()
-		.references(() => steps.id),
+		.references(() => steps.dbId),
 	status: text("status").$type<RequestStepStatus>().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
@@ -197,28 +206,28 @@ export const requestSteps = pgTable("request_steps", {
 export const requestPortMessages = pgTable(
 	"request_port_messages",
 	{
-		id: serial("id").primaryKey(),
-		requestId: integer("request_id")
+		dbId: serial("db_id").primaryKey(),
+		requestDbId: integer("request_db_id")
 			.notNull()
-			.references(() => requests.id),
-		portId: integer("port_id")
+			.references(() => requests.dbId),
+		portDbId: integer("port_db_id")
 			.notNull()
-			.references(() => ports.id),
+			.references(() => ports.dbId),
 		message: jsonb("message").notNull(),
 	},
 	(requestPortMessage) => ({
 		requestPortMessagesRequestIdPortIdUnique: unique().on(
-			requestPortMessage.requestId,
-			requestPortMessage.portId,
+			requestPortMessage.requestDbId,
+			requestPortMessage.portDbId,
 		),
 	}),
 );
 
 export const requestTriggerRelations = pgTable("request_trigger_relations", {
-	id: serial("id").primaryKey(),
-	requestId: integer("request_id")
+	dbId: serial("db_id").primaryKey(),
+	requestDbId: integer("request_db_id")
 		.notNull()
-		.references(() => requests.id),
+		.references(() => requests.dbId),
 	triggerId: text("trigger_id").notNull(),
 });
 
@@ -248,76 +257,76 @@ export const oauthCredentials = pgTable(
 	}),
 );
 
-export const knowledges = pgTable("knowledges", {
-	id: serial("id").primaryKey(),
-	name: text("name").notNull(),
-	blueprintId: integer("blueprint_id")
-		.notNull()
-		.references(() => blueprints.id, { onDelete: "cascade" }),
-});
+// export const knowledges = pgTable("knowledges", {
+// 	id: serial("id").primaryKey(),
+// 	name: text("name").notNull(),
+// 	blueprintId: integer("blueprint_id")
+// 		.notNull()
+// 		.references(() => blueprints.id, { onDelete: "cascade" }),
+// });
 
-type OpenaiVectorStoreStatus = VectorStore["status"];
-export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
-	"knowledge_openai_vector_store_representations",
-	{
-		id: serial("id").primaryKey(),
-		knowledgeId: integer("knowledge_id")
-			.notNull()
-			.references(() => knowledges.id, { onDelete: "cascade" }),
-		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
-		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
-	},
-);
-export const files = pgTable("files", {
-	id: serial("id").primaryKey(),
-	fileName: text("file_name").notNull(),
-	fileType: text("file_type").notNull(),
-	fileSize: integer("file_size").notNull(),
-	blobUrl: text("blob_url").notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-export const fileOpenaiFileRepresentations = pgTable(
-	"file_openai_file_representations",
-	{
-		id: serial("id").primaryKey(),
-		fileId: integer("file_id")
-			.notNull()
-			.references(() => files.id, { onDelete: "cascade" }),
-		openaiFileId: text("openai_file_id").notNull().unique(),
-	},
-);
+// type OpenaiVectorStoreStatus = VectorStore["status"];
+// export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
+// 	"knowledge_openai_vector_store_representations",
+// 	{
+// 		id: serial("id").primaryKey(),
+// 		knowledgeId: integer("knowledge_id")
+// 			.notNull()
+// 			.references(() => knowledges.id, { onDelete: "cascade" }),
+// 		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
+// 		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
+// 	},
+// );
+// export const files = pgTable("files", {
+// 	id: serial("id").primaryKey(),
+// 	fileName: text("file_name").notNull(),
+// 	fileType: text("file_type").notNull(),
+// 	fileSize: integer("file_size").notNull(),
+// 	blobUrl: text("blob_url").notNull(),
+// 	createdAt: timestamp("created_at").defaultNow().notNull(),
+// });
+// export const fileOpenaiFileRepresentations = pgTable(
+// 	"file_openai_file_representations",
+// 	{
+// 		id: serial("id").primaryKey(),
+// 		fileId: integer("file_id")
+// 			.notNull()
+// 			.references(() => files.id, { onDelete: "cascade" }),
+// 		openaiFileId: text("openai_file_id").notNull().unique(),
+// 	},
+// );
 
-export type KnowledgeContentType = "file" | "text";
-export const knowledgeContents = pgTable(
-	"knowledge_contents",
-	{
-		id: serial("id").primaryKey(),
-		name: text("name").notNull(),
-		type: text("knowledge_content_type")
-			.$type<KnowledgeContentType>()
-			.notNull(),
-		knowledgeId: integer("knowledge_id")
-			.notNull()
-			.references(() => knowledges.id, { onDelete: "cascade" }),
-		fileId: integer("file_id")
-			.notNull()
-			.references(() => files.id, { onDelete: "cascade" }),
-	},
-	(knowledgeContents) => ({
-		knowledgeContentsKnowledgeIdFileIdUnique: unique().on(
-			knowledgeContents.fileId,
-			knowledgeContents.knowledgeId,
-		),
-	}),
-);
+// export type KnowledgeContentType = "file" | "text";
+// export const knowledgeContents = pgTable(
+// 	"knowledge_contents",
+// 	{
+// 		id: serial("id").primaryKey(),
+// 		name: text("name").notNull(),
+// 		type: text("knowledge_content_type")
+// 			.$type<KnowledgeContentType>()
+// 			.notNull(),
+// 		knowledgeId: integer("knowledge_id")
+// 			.notNull()
+// 			.references(() => knowledges.id, { onDelete: "cascade" }),
+// 		fileId: integer("file_id")
+// 			.notNull()
+// 			.references(() => files.id, { onDelete: "cascade" }),
+// 	},
+// 	(knowledgeContents) => ({
+// 		knowledgeContentsKnowledgeIdFileIdUnique: unique().on(
+// 			knowledgeContents.fileId,
+// 			knowledgeContents.knowledgeId,
+// 		),
+// 	}),
+// );
 
-export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
-	"knowledge_content_openai_vector_store_file_representations",
-	{
-		id: serial("id").primaryKey(),
-		knowledgeContentId: integer("knowledge_content_id")
-			.notNull()
-			.references(() => knowledgeContents.id, { onDelete: "cascade" }),
-		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
-	},
-);
+// export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
+// 	"knowledge_content_openai_vector_store_file_representations",
+// 	{
+// 		id: serial("id").primaryKey(),
+// 		knowledgeContentId: integer("knowledge_content_id")
+// 			.notNull()
+// 			.references(() => knowledgeContents.id, { onDelete: "cascade" }),
+// 		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
+// 	},
+// );

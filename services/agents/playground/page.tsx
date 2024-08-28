@@ -1,0 +1,179 @@
+"use client";
+
+import { createId } from "@paralleldrive/cuid2";
+import {
+	Background,
+	Panel,
+	ReactFlow,
+	ReactFlowProvider,
+	useReactFlow,
+} from "@xyflow/react";
+import { type FC, useEffect } from "react";
+import {
+	Finder,
+	GiselleNode,
+	type Node,
+	type Port,
+	portDirection,
+} from "../nodes";
+import type { AgentId } from "../types";
+import { GraphProvider, graphState, useGraph } from "./graph-context";
+import { PropertyPanel } from "./property-panel";
+import type { PlaygroundEdge, PlaygroundNode } from "./types";
+import { useContextMenu } from "./use-context-menu";
+
+type PlaygroundProps = {
+	agentId: AgentId;
+};
+export const Playground: FC<PlaygroundProps> = ({ agentId }) => {
+	return (
+		<GraphProvider agentId={agentId}>
+			<ReactFlowProvider>
+				<Inner />
+			</ReactFlowProvider>
+		</GraphProvider>
+	);
+};
+const nodeTypes = {
+	giselle: GiselleNode,
+};
+
+const playgroundNodesToReactFlowNodes = (playgroundNodes: PlaygroundNode[]) =>
+	playgroundNodes.map(({ id, data, className, ports, position }) => ({
+		id,
+		type: "giselle",
+		data: {
+			...data,
+			className: className,
+			sourcePorts: ports.filter(
+				(port) => port.direction === portDirection.source,
+			),
+			targetPorts: ports.filter(
+				(port) => port.direction === portDirection.target,
+			),
+		},
+		position,
+	}));
+const playgroundEdgesToReactFlowEdges = (playgroundEdges: PlaygroundEdge[]) =>
+	playgroundEdges.map(
+		({ id, sourceNodeId, sourcePortId, targetNodeId, targetPortId }) => ({
+			id,
+			source: sourceNodeId,
+			sourceHandle: sourcePortId,
+			target: targetNodeId,
+			targetHandle: targetPortId,
+		}),
+	);
+
+const Inner: FC = () => {
+	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
+		useContextMenu();
+	const reactFlowInstance = useReactFlow<GiselleNode>();
+	const { graph, state, dispatch } = useGraph();
+	useEffect(() => {
+		reactFlowInstance.setNodes(playgroundNodesToReactFlowNodes(graph.nodes));
+		reactFlowInstance.setEdges(playgroundEdgesToReactFlowEdges(graph.edges));
+	}, [reactFlowInstance.setNodes, reactFlowInstance.setEdges, graph]);
+	return (
+		<div className="h-screen w-full">
+			{state === graphState.initialize ? (
+				<ReactFlow key={"loader"}>
+					<Background />
+				</ReactFlow>
+			) : (
+				<ReactFlow
+					onContextMenu={handleContextMenu}
+					nodeTypes={nodeTypes}
+					defaultNodes={playgroundNodesToReactFlowNodes(graph.nodes)}
+					defaultEdges={playgroundEdgesToReactFlowEdges(graph.edges)}
+					isValidConnection={({
+						source,
+						sourceHandle,
+						target,
+						targetHandle,
+					}) => {
+						const sourcePort = graph.nodes
+							.find((node) => node.id === source)
+							?.ports.find((port) => port.id === sourceHandle);
+						const targetPort = graph.nodes
+							.find((node) => node.id === target)
+							?.ports.find((port) => port.id === targetHandle);
+						if (sourcePort == null || targetPort == null) {
+							return false;
+						}
+						return targetPort.type === sourcePort.type;
+					}}
+					onConnect={({ source, sourceHandle, target, targetHandle }) => {
+						// Since validation is already performed by isValidConnection,
+						// there is no need for additional validation here.
+						dispatch({
+							type: "ADD_EDGE",
+							edge: {
+								id: `ed_${createId()}`,
+								sourceNodeId: source as Node["id"],
+								sourcePortId: sourceHandle as Port["id"],
+								targetNodeId: target as Node["id"],
+								targetPortId: targetHandle as Port["id"],
+							},
+						});
+					}}
+					onNodeDragStop={(_event, _node, nodes) => {
+						nodes.map((node) => {
+							dispatch({
+								type: "UPDATE_NODE",
+								nodeId: node.id as Node["id"],
+								updates: {
+									position: node.position,
+								},
+							});
+						});
+					}}
+					onNodesDelete={(nodes) => {
+						nodes.map((node) => {
+							dispatch({
+								type: "REMOVE_NODE",
+								nodeId: node.id as Node["id"],
+							});
+						});
+					}}
+					defaultViewport={graph.viewport}
+					onViewportChange={(viewport) => {
+						dispatch({
+							type: "UPDATE_VIEWPORT",
+							viewport,
+						});
+					}}
+				>
+					<Background />
+					{isVisible && reactFlowInstance && (
+						<Finder
+							className="z-10 absolute"
+							style={{
+								left: contextMenuPosition.x,
+								top: contextMenuPosition.y,
+							}}
+							onSelect={(node) => {
+								hideContextMenu();
+								dispatch({
+									type: "ADD_NODE",
+									node: {
+										...node,
+										position: reactFlowInstance.screenToFlowPosition({
+											x: contextMenuPosition.x,
+											y: contextMenuPosition.y,
+										}),
+									},
+								});
+							}}
+						/>
+					)}
+					<Panel>
+						<div className="flex gap-2 h-full">
+							<PropertyPanel />
+						</div>
+					</Panel>
+				</ReactFlow>
+			)}
+		</div>
+	);
+};

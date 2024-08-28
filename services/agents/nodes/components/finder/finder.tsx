@@ -1,4 +1,3 @@
-import { type NodeGraph, nodeService } from "@/app/nodes";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -13,6 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { FC, HTMLAttributes } from "react";
+import { type NodeGraph, nodeService } from "../../";
 import { AgentList } from "./agent-list";
 import { KnowledgeList } from "./knowledge-list";
 

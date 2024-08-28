@@ -4,7 +4,7 @@ import { drizzle } from "drizzle-orm/vercel-postgres";
 import * as schema from "./schema";
 import { requestSteps, requests } from "./schema";
 
-export const db = drizzle(sql, { schema });
+export const db = drizzle(sql, { schema, logger: true });
 
 export const updateRun = async (
 	runId: number,

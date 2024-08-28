@@ -6,6 +6,7 @@ export type {
 	NodeGraph,
 	Node,
 	Port,
+	PortType,
 	PortDirection,
 } from "./type";
 export { portDirection } from "./type";

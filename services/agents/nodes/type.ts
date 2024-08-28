@@ -13,7 +13,7 @@ export const portType = {
 	execution: "execution",
 	data: "data",
 } as const;
-type PortType = (typeof portType)[keyof typeof portType];
+export type PortType = (typeof portType)[keyof typeof portType];
 export const portDirection = {
 	source: "source",
 	target: "target",
