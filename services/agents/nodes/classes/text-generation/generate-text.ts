@@ -3,8 +3,14 @@
 import { db, pullMessages, requestPortMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { insertRequestPortMessage } from "@/services/agents/requests/insert-request-port-message";
+import { metrics } from "@opentelemetry/api";
 import { and, eq } from "drizzle-orm";
 import type { Port } from "../../types";
+
+const meter = metrics.getMeter("OpenAI");
+const requestCounter = meter.createCounter("token_consumed", {
+	description: "Number of OpenAI API tokens consumed by each request",
+});
 
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = () => {};
@@ -47,4 +53,10 @@ export const generateText = async ({
 		portId: resultPort.id,
 		message: completion.choices[0].message.content ?? "",
 	});
+	if (completion.usage && completion.usage.total_tokens !== undefined) {
+		requestCounter.add(
+			completion.usage.total_tokens,
+			// TODO: add tag `subscriptionId`
+		);
+	}
 };
