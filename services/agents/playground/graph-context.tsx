@@ -26,6 +26,7 @@ type GraphContextType = {
 	graph: PlaygroundGraph;
 	dispatch: React.Dispatch<GraphAction>;
 	state: GraphState;
+	agentId: AgentId;
 };
 
 const GraphContext = createContext<GraphContextType | undefined>(undefined);
@@ -80,6 +81,7 @@ export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
 				graph,
 				dispatch: dispatchWithMiddleware,
 				state,
+				agentId,
 			}}
 		>
 			<OperationProvider

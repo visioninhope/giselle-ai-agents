@@ -1,21 +1,20 @@
 import type { BaseSchema } from "valibot";
 import type {
 	DefaultPort,
-	DefaultPortType,
 	DefaultPorts,
 	NodeClass,
 	NodeClassCategory,
 	NodeClassOptions,
+	PortType,
 } from "./type";
 
-type CreatePortArgs<TType extends DefaultPortType, TName extends string> = {
+type CreatePortArgs<TType extends PortType, TName extends string> = {
 	name: TName;
 	type: TType;
 };
-export function buildDefaultPort<
-	TType extends DefaultPortType,
-	TName extends string,
->(args: CreatePortArgs<TType, TName>): DefaultPort<TType, TName> {
+export function buildDefaultPort<TType extends PortType, TName extends string>(
+	args: CreatePortArgs<TType, TName>,
+): DefaultPort<TName> {
 	return args;
 }
 

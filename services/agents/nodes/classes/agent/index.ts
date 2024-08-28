@@ -25,14 +25,15 @@ export const agent = buildNodeClass("agent", {
 		data,
 		findDefaultOutputPortAsBlueprint,
 	}) => {
-		await invokeAgent({
-			requestId,
-			node,
-			resultPortId: findDefaultOutputPortAsBlueprint("result").id,
-			relevantAgent: {
-				id: data.relevantAgent.id,
-				blueprintId: data.relevantAgent.blueprintId,
-			},
-		});
+		await invokeAgent();
+		// await invokeAgent({
+		// 	requestId,
+		// 	node,
+		// 	resultPortId: findDefaultOutputPortAsBlueprint("result").id,
+		// 	relevantAgent: {
+		// 		id: data.relevantAgent.id,
+		// 		blueprintId: data.relevantAgent.blueprintId,
+		// 	},
+		// });
 	},
 });

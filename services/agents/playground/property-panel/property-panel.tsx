@@ -6,11 +6,10 @@ import {
 	useOnSelectionChange,
 } from "@xyflow/react";
 import { type FC, useCallback, useMemo, useState } from "react";
-import invariant from "tiny-invariant";
 import { assertNodeClassName, nodeService } from "../../nodes";
 import { useGraph } from "../graph-context";
 // import { KnowledgeAccordion } from "./knowledge";
-// import { RequestPanel } from "./request-panel";
+import { RequestPanel } from "./request-panel";
 
 export const PropertyPanel: FC = () => {
 	const [selectedNodes, setSelectedNodes] = useState<string[]>([]);
@@ -42,7 +41,7 @@ export const PropertyPanel: FC = () => {
 					)}
 				</TabsContent>
 				<TabsContent value="requests" className="flex flex-col gap-2">
-					{/** <RequestPanel /> **/}
+					<RequestPanel />
 				</TabsContent>
 				<TabsContent value="knowledges" className="flex flex-col gap-2">
 					{/**<KnowledgeAccordion /> **/}

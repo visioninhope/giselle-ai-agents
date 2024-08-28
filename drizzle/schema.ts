@@ -88,7 +88,7 @@ export const agents = pgTable("agents", {
 				zoom: 1,
 			},
 		}),
-	graphHash: text("graph_hash").notNull().unique(),
+	graphHash: text("graph_hash").unique(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
@@ -96,6 +96,7 @@ export const blueprints = pgTable("blueprints", {
 	id: text("id").$type<`blpr_${string}`>().unique(),
 	dbId: serial("db_id").primaryKey(),
 	graph: jsonb("graph").$type<PlaygroundGraph>().notNull(),
+	graphHash: text("graph_hash").notNull().unique(),
 	agentDbId: integer("agent_db_id")
 		.notNull()
 		.references(() => agents.dbId),
@@ -113,47 +114,60 @@ export const blueprintRelations = relations(blueprints, ({ one }) => ({
 	}),
 }));
 
-export const nodes = pgTable("nodes", {
-	id: text("id").$type<Node["id"]>().notNull(),
-	dbId: serial("db_id").primaryKey(),
-	blueprintDbId: integer("blueprint_db_id")
-		.notNull()
-		.references(() => blueprints.dbId, { onDelete: "cascade" }),
-	className: text("class_name").notNull(),
-	data: jsonb("data").notNull(),
-});
-
-export const ports = pgTable("ports", {
-	id: text("id").$type<Port["id"]>().notNull(),
-	dbId: serial("db_id").primaryKey(),
-	nodeDbId: integer("node_db_id")
-		.notNull()
-		.references(() => nodes.dbId, { onDelete: "cascade" }),
-	name: text("name").notNull(),
-	direction: text("direction").$type<PortDirection>().notNull(),
-	type: text("type").$type<PortType>().notNull(),
-});
-
-export const edges = pgTable(
-	"edges",
+export const nodes = pgTable(
+	"nodes",
 	{
-		id: text("id").$type<PlaygroundEdge["id"]>().notNull().unique(),
+		id: text("id").$type<Node["id"]>().notNull(),
 		dbId: serial("db_id").primaryKey(),
 		blueprintDbId: integer("blueprint_db_id")
 			.notNull()
 			.references(() => blueprints.dbId, { onDelete: "cascade" }),
-		inputPortDbId: integer("input_port_db_id")
+		className: text("class_name").notNull(),
+		data: jsonb("data").notNull(),
+	},
+	(nodes) => ({
+		nodesIdBlueprintDbIdUnieque: unique().on(nodes.id, nodes.blueprintDbId),
+	}),
+);
+
+export const ports = pgTable(
+	"ports",
+	{
+		id: text("id").$type<Port["id"]>().notNull(),
+		dbId: serial("db_id").primaryKey(),
+		nodeDbId: integer("node_db_id")
+			.notNull()
+			.references(() => nodes.dbId, { onDelete: "cascade" }),
+		name: text("name").notNull(),
+		direction: text("direction").$type<PortDirection>().notNull(),
+		type: text("type").$type<PortType>().notNull(),
+	},
+	(ports) => ({
+		portsIdNodeDbIdUnique: unique().on(ports.id, ports.nodeDbId),
+	}),
+);
+
+export const edges = pgTable(
+	"edges",
+	{
+		id: text("id").$type<PlaygroundEdge["id"]>().notNull(),
+		dbId: serial("db_id").primaryKey(),
+		blueprintDbId: integer("blueprint_db_id")
+			.notNull()
+			.references(() => blueprints.dbId, { onDelete: "cascade" }),
+		targetPortDbId: integer("target_port_db_id")
 			.notNull()
 			.references(() => ports.dbId, { onDelete: "cascade" }),
-		outputPortDbId: integer("output_port_db_id")
+		sourcePortDbId: integer("source_port_db_id")
 			.notNull()
 			.references(() => ports.dbId, { onDelete: "cascade" }),
 	},
 	(edge) => ({
 		edgesInputPortIdOutputPortIdUnique: unique().on(
-			edge.inputPortDbId,
-			edge.outputPortDbId,
+			edge.targetPortDbId,
+			edge.sourcePortDbId,
 		),
+		edgesIdBlueprintDbIdUnique: unique().on(edge.id, edge.blueprintDbId),
 	}),
 );
 
@@ -170,11 +184,12 @@ export const steps = pgTable("steps", {
 
 export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
+	id: text("id").$type<`rqst_${string}`>().unique(),
 	dbId: serial("db_id").primaryKey(),
 	blueprintDbId: integer("blueprint_db_id")
 		.notNull()
 		.references(() => blueprints.dbId),
-	status: text("status").$type<RequestStatus>().notNull(),
+	status: text("status").$type<RequestStatus>().notNull().default("creating"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
@@ -189,20 +204,41 @@ export const requestResults = pgTable("request_results", {
 	text: text("text").notNull(),
 });
 
-export type RequestStepStatus = "idle" | "running" | "success" | "failed";
-export const requestSteps = pgTable("request_steps", {
+export const requestStacks = pgTable("request_stacks", {
 	dbId: serial("db_id").primaryKey(),
 	requestDbId: integer("request_db_id")
 		.notNull()
 		.references(() => requests.dbId),
-	stepDbId: integer("step_db_id")
+	startNodeDbId: integer("start_node_db_id")
+		.notNull()
+		.references(() => nodes.dbId),
+	endNodeDbId: integer("end_node_db_id")
+		.notNull()
+		.references(() => nodes.dbId),
+});
+
+export const requestStackRunners = pgTable("request_stack_runners", {
+	dbId: serial("db_id").primaryKey(),
+	requestStackDbId: integer("request_stack_db_id")
+		.notNull()
+		.references(() => requestStacks.dbId),
+	runnerId: text("runner_id").notNull().unique(),
+});
+
+export type RequestStepStatus = "idle" | "running" | "success" | "failed";
+export const requestSteps = pgTable("request_steps", {
+	id: text("id").$type<`rqst.stp_${string}`>().unique(),
+	dbId: serial("db_id").primaryKey(),
+	requestStackDbId: integer("request_stack_db_id")
+		.notNull()
+		.references(() => requestStacks.dbId),
+	nodeDbId: integer("node_db_id")
 		.notNull()
 		.references(() => steps.dbId),
-	status: text("status").$type<RequestStepStatus>().notNull(),
+	status: text("status").$type<RequestStepStatus>().notNull().default("idle"),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
-
 export const requestPortMessages = pgTable(
 	"request_port_messages",
 	{

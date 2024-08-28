@@ -26,7 +26,6 @@ export default function AgentListPage() {
 		const id = `agnt_${createId()}` as const;
 		await db.insert(schema.agents).values({
 			id,
-			graphHash: createId(),
 		});
 		redirect(`/v2/agents/${id}`);
 	};

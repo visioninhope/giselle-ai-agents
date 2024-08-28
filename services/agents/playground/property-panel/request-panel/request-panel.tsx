@@ -1,26 +1,52 @@
-import { useBlueprint } from "@/app/agents/blueprints";
-import { useRequest } from "@/app/agents/requests";
-import type { FC } from "react";
-import { RequestButton } from "./request-button";
-import { RequestLogger } from "./request-logger";
-import { RequiredAction } from "./required-action";
+// import { useBlueprint } from "@/app/agents/blueprints";
+// import { useRequest } from "@/app/agents/requests";
+// import type { FC } from "react";
+// import { RequestButton } from "./request-button";
+// import { RequestLogger } from "./request-logger";
+// import { RequiredAction } from "./required-action";
+
+import { SubmitButton } from "@/components/ui/submit-button";
+import { getOrBuildBlueprint } from "@/services/agents/requests/process";
+import type { AgentId } from "@/services/agents/types";
+import { type FC, type FormEventHandler, useCallback } from "react";
+import { useGraph } from "../../graph-context";
+
+// export const RequestPanel: FC = () => {
+// 	const { blueprint } = useBlueprint();
+// 	const request = useRequest();
+// 	return (
+// 		<div className="px-4 py-2">
+// 			{request != null && (
+// 				<div className="mb-4 pb-4 border-b border-border">
+// 					<RequestLogger request={request} />
+// 				</div>
+// 			)}
+// 			{blueprint.requiredActions && (
+// 				<RequiredAction requiredActions={blueprint.requiredActions} />
+// 			)}
+// 			{request != null && <p>New request</p>}
+// 			{(blueprint.requiredActions == null ||
+// 				blueprint.requiredActions.length === 0) && <RequestButton />}
+// 		</div>
+// 	);
+// };
 
 export const RequestPanel: FC = () => {
-	const { blueprint } = useBlueprint();
-	const request = useRequest();
+	const { agentId } = useGraph();
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+		async (e) => {
+			e.preventDefault();
+			const blueprint = await getOrBuildBlueprint(agentId as AgentId);
+		},
+		[agentId],
+	);
 	return (
 		<div className="px-4 py-2">
-			{request != null && (
-				<div className="mb-4 pb-4 border-b border-border">
-					<RequestLogger request={request} />
-				</div>
-			)}
-			{blueprint.requiredActions && (
-				<RequiredAction requiredActions={blueprint.requiredActions} />
-			)}
-			{request != null && <p>New request</p>}
-			{(blueprint.requiredActions == null ||
-				blueprint.requiredActions.length === 0) && <RequestButton />}
+			<p>Request panel</p>
+			<form onSubmit={handleSubmit}>
+				<SubmitButton type="submit">Submit</SubmitButton>
+				<input type="hidden" value={agentId} name="agentId" />
+			</form>
 		</div>
 	);
 };
