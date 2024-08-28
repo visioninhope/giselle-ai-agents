@@ -7,7 +7,7 @@ export type GraphAction =
 	| {
 			type: "UPDATE_NODE";
 			nodeId: PlaygroundNode["id"];
-			updates: Partial<Pick<Node, "data" | "name">>;
+			updates: Partial<Pick<PlaygroundNode, "data" | "name" | "position">>;
 	  }
 	| { type: "ADD_PORT"; port: Port }
 	| { type: "REMOVE_PORT"; portId: Port["id"] }

@@ -39,7 +39,7 @@ export const GraphProvider: React.FC<{
 		async (blueprintId: number, graph: PlaygroundGraph) => {
 			await setGraphToDb(blueprintId, graph);
 		},
-		3000,
+		2000,
 	);
 
 	const dispatchWithMiddleware = useCallback((action: GraphAction) => {
