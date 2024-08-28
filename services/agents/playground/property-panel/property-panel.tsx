@@ -57,16 +57,14 @@ type NodeModifyPanelInnerProps = {
 };
 const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
 	const { graph } = useGraph();
-	const node = useMemo(() => {
-		const node = graph.nodes.find((node) => node.id === nodeId);
-		invariant(node != null, `Not found node with id ${nodeId} in blueprint`);
-		return node;
-	}, [graph.nodes, nodeId]);
-
 	const Panel = useMemo(() => {
+		const node = graph.nodes.find((node) => node.id === nodeId);
+		if (node == null) {
+			return null;
+		}
 		const className = node.className;
 		assertNodeClassName(className);
-		return nodeService.renderPanel(className, { node: node });
-	}, [node]);
+		return nodeService.renderPanel(className, { node });
+	}, [graph, nodeId]);
 	return <div className="flex flex-col gap-2 py-2">{Panel}</div>;
 };

@@ -23,10 +23,12 @@ export const PropertyField: FC<PropertyFieldProps> = ({
 			return;
 		}
 		updateNode(node.id, {
-			...node.data,
-			[name]: value,
+			data: {
+				...node.data,
+				[name]: ref.current.value,
+			},
 		});
-	}, [name, node, value, updateNode]);
+	}, [name, node, updateNode]);
 	return (
 		<div>
 			<Label htmlFor={name}>{label ?? name}</Label>

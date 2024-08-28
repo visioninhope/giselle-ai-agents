@@ -30,7 +30,7 @@ export const TextNodePanel: FC<TextNodePanelProps> = ({
 				<PortsField
 					node={node}
 					heading="Text Parameters"
-					direction={portDirection.source}
+					direction={portDirection.target}
 				/>
 			</div>
 		</div>

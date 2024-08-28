@@ -71,7 +71,13 @@ const Inner: FC = () => {
 	const reactFlowInstance = useReactFlow<GiselleNode>();
 	const { graph, state, dispatch } = useGraph();
 	useEffect(() => {
-		reactFlowInstance.setNodes(playgroundNodesToReactFlowNodes(graph.nodes));
+		reactFlowInstance.setNodes((prevNodes) => {
+			const newNodes = playgroundNodesToReactFlowNodes(graph.nodes);
+			return newNodes.map((newNode) => {
+				const prevNode = prevNodes.find(({ id }) => id === newNode.id);
+				return prevNode ? { ...prevNode, ...newNode } : newNode;
+			});
+		});
 		reactFlowInstance.setEdges(playgroundEdgesToReactFlowEdges(graph.edges));
 	}, [reactFlowInstance.setNodes, reactFlowInstance.setEdges, graph]);
 	return (
@@ -167,7 +173,7 @@ const Inner: FC = () => {
 							}}
 						/>
 					)}
-					<Panel>
+					<Panel position="top-right" className="bottom-0">
 						<div className="flex gap-2 h-full">
 							<PropertyPanel />
 						</div>
