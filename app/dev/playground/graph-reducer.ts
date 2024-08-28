@@ -1,5 +1,10 @@
 import type { Node, Port } from "@/app/nodes";
-import type { PlaygroundEdge, PlaygroundGraph, PlaygroundNode } from "./types";
+import type {
+	PlaygroundEdge,
+	PlaygroundGraph,
+	PlaygroundNode,
+	PlaygroundViewport,
+} from "./types";
 
 export type GraphAction =
 	| { type: "ADD_NODE"; node: PlaygroundNode }
@@ -14,7 +19,8 @@ export type GraphAction =
 	| { type: "UPDATE_PORT"; portId: Port["id"]; updates: Partial<Port> }
 	| { type: "ADD_EDGE"; edge: PlaygroundEdge }
 	| { type: "REMOVE_EDGE"; edgeId: PlaygroundEdge["id"] }
-	| { type: "SET_GRAPH"; graph: PlaygroundGraph };
+	| { type: "SET_GRAPH"; graph: PlaygroundGraph }
+	| { type: "UPDATE_VIEWPORT"; viewport: PlaygroundViewport };
 
 export function graphReducer(
 	state: PlaygroundGraph,
@@ -92,6 +98,11 @@ export function graphReducer(
 			};
 		case "SET_GRAPH":
 			return action.graph;
+		case "UPDATE_VIEWPORT":
+			return {
+				...state,
+				viewport: action.viewport,
+			};
 		default:
 			return state;
 	}

@@ -31,7 +31,15 @@ const GraphContext = createContext<GraphContextType | undefined>(undefined);
 export const GraphProvider: React.FC<{
 	children: ReactNode;
 }> = ({ children }) => {
-	const [graph, dispatch] = useReducer(graphReducer, { nodes: [], edges: [] });
+	const [graph, dispatch] = useReducer(graphReducer, {
+		nodes: [],
+		edges: [],
+		viewport: {
+			x: 0,
+			y: 0,
+			zoom: 1,
+		},
+	});
 	const [dirty, setDirty] = useState(false);
 	const [state, setState] = useState<GraphState>(graphState.initialize);
 	const debounceSetGraphToDb = useDebounce(

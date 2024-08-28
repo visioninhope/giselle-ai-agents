@@ -126,6 +126,13 @@ const Inner: FC = () => {
 						});
 					});
 				}}
+				viewport={graph.viewport}
+				onViewportChange={(viewport) => {
+					dispatch({
+						type: "UPDATE_VIEWPORT",
+						viewport,
+					});
+				}}
 			>
 				<Background />
 				{isVisible && reactFlowInstance && (

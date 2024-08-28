@@ -1,5 +1,5 @@
 import type { Node, NodeGraph, Port } from "@/app/nodes";
-import type { XYPosition } from "@xyflow/react";
+import type { Viewport, XYPosition } from "@xyflow/react";
 
 export type PlaygroundNode = NodeGraph & { position: XYPosition };
 
@@ -11,7 +11,9 @@ export type PlaygroundEdge = {
 	targetPortId: Port["id"];
 };
 
+export type PlaygroundViewport = Viewport;
 export type PlaygroundGraph = {
 	nodes: PlaygroundNode[];
 	edges: PlaygroundEdge[];
+	viewport: PlaygroundViewport;
 };
