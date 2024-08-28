@@ -13,7 +13,8 @@ export type GraphAction =
 	| { type: "REMOVE_PORT"; portId: Port["id"] }
 	| { type: "UPDATE_PORT"; portId: Port["id"]; updates: Partial<Port> }
 	| { type: "ADD_EDGE"; edge: PlaygroundEdge }
-	| { type: "REMOVE_EDGE"; edgeId: PlaygroundEdge["id"] };
+	| { type: "REMOVE_EDGE"; edgeId: PlaygroundEdge["id"] }
+	| { type: "SET_GRAPH"; graph: PlaygroundGraph };
 
 export function graphReducer(
 	state: PlaygroundGraph,
@@ -89,6 +90,8 @@ export function graphReducer(
 				...state,
 				edges: state.edges.filter((edge) => edge.id !== action.edgeId),
 			};
+		case "SET_GRAPH":
+			return action.graph;
 		default:
 			return state;
 	}

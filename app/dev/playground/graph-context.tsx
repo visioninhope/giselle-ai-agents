@@ -8,14 +8,22 @@ import {
 	useReducer,
 	useState,
 } from "react";
+import { getGraphToDb } from "./get-graph-to-db";
 import { type GraphAction, graphReducer } from "./graph-reducer";
 import { setGraphToDb } from "./set-graph-to-db";
 import type { PlaygroundGraph } from "./types";
 import { useDebounce } from "./use-debounce";
 
+const graphState = {
+	initialize: "initialize",
+	idle: "idle",
+	saving: "saving",
+};
+type GraphState = (typeof graphState)[keyof typeof graphState];
 type GraphContextType = {
 	graph: PlaygroundGraph;
 	dispatch: React.Dispatch<GraphAction>;
+	state: GraphState;
 };
 
 const GraphContext = createContext<GraphContextType | undefined>(undefined);
@@ -26,6 +34,7 @@ export const GraphProvider: React.FC<{
 }> = ({ children, initialGraph }) => {
 	const [graph, dispatch] = useReducer(graphReducer, initialGraph);
 	const [dirty, setDirty] = useState(false);
+	const [state, setState] = useState<GraphState>(graphState.initialize);
 	const debounceSetGraphToDb = useDebounce(
 		async (blueprintId: number, graph: PlaygroundGraph) => {
 			await setGraphToDb(blueprintId, graph);
@@ -45,8 +54,21 @@ export const GraphProvider: React.FC<{
 		debounceSetGraphToDb(1, graph);
 	}, [graph, dirty, debounceSetGraphToDb]);
 
+	useEffect(() => {
+		getGraphToDb(1).then((graph) => {
+			dispatch({ type: "SET_GRAPH", graph });
+			setState(graphState.idle);
+		});
+	}, []);
+
 	return (
-		<GraphContext.Provider value={{ graph, dispatch: dispatchWithMiddleware }}>
+		<GraphContext.Provider
+			value={{
+				graph,
+				dispatch: dispatchWithMiddleware,
+				state,
+			}}
+		>
 			<OperationProvider
 				addPort={(port) => {
 					dispatchWithMiddleware({ type: "ADD_PORT", port });

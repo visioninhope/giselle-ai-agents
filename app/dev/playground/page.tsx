@@ -10,12 +10,7 @@ import {
 import { type FC, useEffect } from "react";
 import "@xyflow/react/dist/style.css";
 import { useContextMenu } from "@/app/agents/canvas/hooks";
-import {
-	Finder,
-	GiselleNode,
-	GiselleNodeData,
-	portDirection,
-} from "@/app/nodes";
+import { Finder, GiselleNode, portDirection } from "@/app/nodes";
 import { GraphProvider, useGraph } from "./graph-context";
 import { PropertyPanel } from "./property-panel";
 
