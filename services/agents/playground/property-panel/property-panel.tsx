@@ -7,7 +7,7 @@ import {
 } from "@xyflow/react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { assertNodeClassName, nodeService } from "../../nodes";
-import { useGraph } from "../graph-context";
+import { usePlayground } from "../playground-context";
 // import { KnowledgeAccordion } from "./knowledge";
 import { RequestPanel } from "./request-panel";
 
@@ -55,7 +55,7 @@ type NodeModifyPanelInnerProps = {
 	nodeId: string;
 };
 const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
-	const { graph } = useGraph();
+	const { graph } = usePlayground();
 	const Panel = useMemo(() => {
 		const node = graph.nodes.find((node) => node.id === nodeId);
 		if (node == null) {

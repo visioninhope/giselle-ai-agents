@@ -93,20 +93,22 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 	return { id: newBlueprint.id };
 };
 
-export const startRequest = async (
+export const createRequest = async (
 	blueprintId: (typeof blueprints.$inferInsert)["id"],
 ) => {
 	const [blueprint] = await db
 		.select({ dbId: blueprints.dbId })
 		.from(blueprints)
 		.where(eq(blueprints.id, blueprintId));
+	const requestId = `rqst_${createId()}` as const;
 	const [newRequest] = await db
 		.insert(requests)
 		.values({
+			id: requestId,
 			blueprintDbId: blueprint.dbId,
 		})
 		.returning({
 			dbId: requests.dbId,
 		});
-	return newRequest;
+	return { requestId };
 };

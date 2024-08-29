@@ -1,6 +1,8 @@
+"use client";
+
 import {
+	type FC,
 	type PropsWithChildren,
-	type ReactNode,
 	createContext,
 	useCallback,
 	useContext,
@@ -9,36 +11,39 @@ import {
 	useState,
 } from "react";
 import { OperationProvider } from "../nodes";
+import { RequestProvider, type RequestStartHandler } from "../requests";
 import type { AgentId } from "../types";
 import { getGraphFromDb } from "./get-graph-from-db";
-import { type GraphAction, graphReducer } from "./graph-reducer";
+import { type PlaygroundAction, playgroundReducer } from "./playground-reducer";
 import { setGraphToDb } from "./set-graph-to-db";
 import type { PlaygroundGraph } from "./types";
 import { useDebounce } from "./use-debounce";
 
-export const graphState = {
+export const playgroundState = {
 	initialize: "initialize",
 	idle: "idle",
 	saving: "saving",
 } as const;
-type GraphState = (typeof graphState)[keyof typeof graphState];
-type GraphContextType = {
+type PlaygroundState = (typeof playgroundState)[keyof typeof playgroundState];
+type PlaygroundContextType = {
 	graph: PlaygroundGraph;
-	dispatch: React.Dispatch<GraphAction>;
-	state: GraphState;
+	dispatch: React.Dispatch<PlaygroundAction>;
+	state: PlaygroundState;
 	agentId: AgentId;
 };
 
-const GraphContext = createContext<GraphContextType | undefined>(undefined);
+const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
+	undefined,
+);
 
-type GraphProviderProps = {
+export type PlaygroundProviderProps = {
 	agentId: AgentId;
+	onRequestStartAction: RequestStartHandler;
 };
-export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
-	agentId,
-	children,
-}) => {
-	const [graph, dispatch] = useReducer(graphReducer, {
+export const PlaygroundProvider: FC<
+	PropsWithChildren<PlaygroundProviderProps>
+> = ({ agentId, onRequestStartAction: onRequestStart, children }) => {
+	const [graph, dispatch] = useReducer(playgroundReducer, {
 		nodes: [],
 		edges: [],
 		viewport: {
@@ -48,7 +53,9 @@ export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
 		},
 	});
 	const [dirty, setDirty] = useState(false);
-	const [state, setState] = useState<GraphState>(graphState.initialize);
+	const [state, setState] = useState<PlaygroundState>(
+		playgroundState.initialize,
+	);
 	const debounceSetGraphToDb = useDebounce(
 		async (agentId: AgentId, graph: PlaygroundGraph) => {
 			await setGraphToDb(agentId, graph);
@@ -56,7 +63,7 @@ export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
 		2000,
 	);
 
-	const dispatchWithMiddleware = useCallback((action: GraphAction) => {
+	const dispatchWithMiddleware = useCallback((action: PlaygroundAction) => {
 		dispatch(action);
 		setDirty(true);
 	}, []);
@@ -71,12 +78,12 @@ export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
 	useEffect(() => {
 		getGraphFromDb(agentId).then((graph) => {
 			dispatch({ type: "SET_GRAPH", graph });
-			setState(graphState.idle);
+			setState(playgroundState.idle);
 		});
 	}, [agentId]);
 
 	return (
-		<GraphContext.Provider
+		<PlaygroundContext.Provider
 			value={{
 				graph,
 				dispatch: dispatchWithMiddleware,
@@ -98,14 +105,19 @@ export const GraphProvider: React.FC<PropsWithChildren<GraphProviderProps>> = ({
 					dispatchWithMiddleware({ type: "UPDATE_NODE", nodeId, updates });
 				}}
 			>
-				{children}
+				<RequestProvider
+					agentId={agentId}
+					onRequestStartAction={onRequestStart}
+				>
+					{children}
+				</RequestProvider>
 			</OperationProvider>
-		</GraphContext.Provider>
+		</PlaygroundContext.Provider>
 	);
 };
 
-export const useGraph = () => {
-	const context = useContext(GraphContext);
+export const usePlayground = () => {
+	const context = useContext(PlaygroundContext);
 	if (context === undefined) {
 		throw new Error("useGraph must be used within a GraphProvider");
 	}

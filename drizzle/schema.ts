@@ -1,9 +1,15 @@
-import type { Node, Port, PortDirection, PortType } from "@/app/nodes";
 import type { AgentId } from "@/services/agents";
+import type {
+	Node,
+	Port,
+	PortDirection,
+	PortType,
+} from "@/services/agents/nodes";
 import type {
 	PlaygroundEdge,
 	PlaygroundGraph,
 } from "@/services/agents/playground/types";
+import type { RequestId } from "@/services/agents/requests";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -184,7 +190,7 @@ export const steps = pgTable("steps", {
 
 export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
-	id: text("id").$type<`rqst_${string}`>().unique(),
+	id: text("id").$type<RequestId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	blueprintDbId: integer("blueprint_db_id")
 		.notNull()

@@ -6,7 +6,7 @@ import type {
 	PlaygroundViewport,
 } from "./types";
 
-export type GraphAction =
+export type PlaygroundAction =
 	| { type: "ADD_NODE"; node: PlaygroundNode }
 	| { type: "REMOVE_NODE"; nodeId: PlaygroundNode["id"] }
 	| {
@@ -22,9 +22,9 @@ export type GraphAction =
 	| { type: "SET_GRAPH"; graph: PlaygroundGraph }
 	| { type: "UPDATE_VIEWPORT"; viewport: PlaygroundViewport };
 
-export function graphReducer(
+export function playgroundReducer(
 	state: PlaygroundGraph,
-	action: GraphAction,
+	action: PlaygroundAction,
 ): PlaygroundGraph {
 	switch (action.type) {
 		case "ADD_NODE":
