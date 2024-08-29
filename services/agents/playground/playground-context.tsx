@@ -25,14 +25,14 @@ export const playgroundState = {
 	saving: "saving",
 } as const;
 type PlaygroundState = (typeof playgroundState)[keyof typeof playgroundState];
-type PlaygroundContextType = {
+type PlaygroundContextState = {
 	graph: PlaygroundGraph;
 	dispatch: React.Dispatch<PlaygroundAction>;
 	state: PlaygroundState;
 	agentId: AgentId;
 };
 
-const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
+const PlaygroundContext = createContext<PlaygroundContextState | undefined>(
 	undefined,
 );
 

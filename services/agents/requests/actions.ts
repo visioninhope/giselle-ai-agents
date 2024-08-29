@@ -13,6 +13,19 @@ import { getDependedNodes } from "./get-depended-nodes";
 import { getNextNode } from "./get-next-node";
 import { getNodeDbId } from "./get-node-id";
 import { getResponseNode, getTriggerNode } from "./helpers";
+import { type RequestStatus, requestStatus, requestStepStatus } from "./types";
+
+export const updateRequestStatus = async (
+	requestDbId: number,
+	status: RequestStatus,
+) => {
+	await db
+		.update(requests)
+		.set({
+			status,
+		})
+		.where(eq(requests.dbId, requestDbId));
+};
 
 type CreateRequestStackArgs = {
 	requestDbId: number;
@@ -41,6 +54,7 @@ export async function* createRequestStackGenerator(
 	const [newRequestStack] = await db
 		.insert(requestStacks)
 		.values({
+			id: `rqst.stck_${createId()}`,
 			requestDbId: request.dbId,
 			startNodeDbId: triggerNodeDbId,
 			endNodeDbId: responseNodeDbId,
@@ -79,20 +93,20 @@ export async function* runStackGenerator(requestStackDbId: number) {
 	);
 
 	while (true) {
-		const [step] = await getFirstIdleStep(requestStackDbId);
+		const [step] = await getFirstQueuedStep(requestStackDbId);
 		if (step == null) break;
 		yield step;
 	}
 }
 
-async function getFirstIdleStep(requestStackDbId: number) {
+async function getFirstQueuedStep(requestStackDbId: number) {
 	return await db
 		.select({ dbId: requestSteps.dbId })
 		.from(requestSteps)
 		.where(
 			and(
 				eq(requestSteps.requestStackDbId, requestStackDbId),
-				eq(requestSteps.status, "idle"),
+				eq(requestSteps.status, requestStepStatus.queued),
 			),
 		)
 		.orderBy(asc(requestSteps.dbId))
@@ -136,7 +150,7 @@ export async function runStep(
 	await db
 		.update(requestSteps)
 		.set({
-			status: "success",
+			status: requestStepStatus.completed,
 		})
 		.where(eq(requestSteps.dbId, requestStepDbId));
 }

@@ -1,7 +1,9 @@
+import { requestStatus } from "@/services/agents/requests";
 import {
 	createRequestStackGenerator,
 	runStackGenerator,
 	runStep,
+	updateRequestStatus,
 } from "@/services/agents/requests/actions";
 import { task } from "@trigger.dev/sdk/v3";
 
@@ -12,12 +14,14 @@ type RequestArgs = {
 export const requestRunner = task({
 	id: "requestRunner",
 	run: async (args: RequestArgs) => {
+		await updateRequestStatus(args.requestDbId, requestStatus.inProgress);
 		for await (const requestStack of createRequestStackGenerator(args)) {
 			await requestStackRunner.triggerAndWait({
 				requestDbId: args.requestDbId,
 				requestStackDbId: requestStack.dbId,
 			});
 		}
+		await updateRequestStatus(args.requestDbId, requestStatus.completed);
 	},
 });
 

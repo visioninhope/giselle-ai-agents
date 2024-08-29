@@ -38,7 +38,6 @@ export function playgroundReducer(
 				nodes: state.nodes.filter((node) => node.id !== action.nodeId),
 			};
 		case "UPDATE_NODE":
-			console.log(action.updates);
 			return {
 				...state,
 				nodes: state.nodes.map((node) => {

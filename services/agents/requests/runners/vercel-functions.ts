@@ -6,7 +6,9 @@ import {
 	createRequestStackGenerator,
 	runStackGenerator,
 	runStep,
+	updateRequestStatus,
 } from "../actions";
+import { requestStatus } from "../types";
 import type { StartRunnerArgs } from "./types";
 
 export const start = async (args: StartRunnerArgs) => {
@@ -14,6 +16,7 @@ export const start = async (args: StartRunnerArgs) => {
 		.select({ dbId: requests.dbId })
 		.from(requests)
 		.where(eq(requests.id, args.requestId));
+	await updateRequestStatus(request.dbId, requestStatus.inProgress);
 	for await (const requestStack of createRequestStackGenerator({
 		requestDbId: request.dbId,
 	})) {
@@ -21,4 +24,5 @@ export const start = async (args: StartRunnerArgs) => {
 			await runStep(request.dbId, requestStack.dbId, step.dbId);
 		}
 	}
+	await updateRequestStatus(request.dbId, requestStatus.completed);
 };

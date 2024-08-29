@@ -6,31 +6,44 @@ import { type FC, useEffect } from "react";
 import {
 	Finder,
 	GiselleNode,
+	GiselleNodeData,
 	type Node,
 	type Port,
 	portDirection,
 } from "../nodes";
+import { type Request, useRequest } from "../requests";
 import { playgroundState, usePlayground } from "./playground-context";
 import { PropertyPanel } from "./property-panel";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
 import { useContextMenu } from "./use-context-menu";
 
-const playgroundNodesToReactFlowNodes = (playgroundNodes: PlaygroundNode[]) =>
-	playgroundNodes.map(({ id, data, className, ports, position }) => ({
-		id,
-		type: "giselle",
-		data: {
-			...data,
-			className: className,
-			sourcePorts: ports.filter(
-				(port) => port.direction === portDirection.source,
-			),
-			targetPorts: ports.filter(
-				(port) => port.direction === portDirection.target,
-			),
-		},
-		position,
-	}));
+const playgroundNodesToReactFlowNodes = (
+	playgroundNodes: PlaygroundNode[],
+	request?: Request | null | undefined,
+) =>
+	playgroundNodes.map(
+		({ id, data, className, ports, position }) =>
+			({
+				id,
+				type: "giselle",
+				data: {
+					...data,
+					className: className,
+					sourcePorts: ports.filter(
+						(port) => port.direction === portDirection.source,
+					),
+					targetPorts: ports.filter(
+						(port) => port.direction === portDirection.target,
+					),
+					stepStatus: request?.stacks
+						.flatMap(
+							(stack) => stack.steps.find((step) => step.nodeId === id)?.status,
+						)
+						.find((status) => status != null),
+				},
+				position,
+			}) satisfies GiselleNode,
+	);
 const playgroundEdgesToReactFlowEdges = (playgroundEdges: PlaygroundEdge[]) =>
 	playgroundEdges.map(
 		({ id, sourceNodeId, sourcePortId, targetNodeId, targetPortId }) => ({
@@ -51,16 +64,25 @@ export const Inner: FC = () => {
 		useContextMenu();
 	const reactFlowInstance = useReactFlow<GiselleNode>();
 	const { graph, state, dispatch } = usePlayground();
+	const { lastRequest } = useRequest();
 	useEffect(() => {
 		reactFlowInstance.setNodes((prevNodes) => {
-			const newNodes = playgroundNodesToReactFlowNodes(graph.nodes);
+			const newNodes = playgroundNodesToReactFlowNodes(
+				graph.nodes,
+				lastRequest,
+			);
 			return newNodes.map((newNode) => {
 				const prevNode = prevNodes.find(({ id }) => id === newNode.id);
 				return prevNode ? { ...prevNode, ...newNode } : newNode;
 			});
 		});
 		reactFlowInstance.setEdges(playgroundEdgesToReactFlowEdges(graph.edges));
-	}, [reactFlowInstance.setNodes, reactFlowInstance.setEdges, graph]);
+	}, [
+		reactFlowInstance.setNodes,
+		reactFlowInstance.setEdges,
+		graph,
+		lastRequest,
+	]);
 	return (
 		<div className="h-screen w-full">
 			{state === playgroundState.initialize ? (

@@ -6,14 +6,23 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useEffect,
+	useState,
 } from "react";
 import type { AgentId } from "../../types";
+import { getRequest } from "../get-request";
 import { createRequest, getOrBuildBlueprint } from "../process";
 import { runOnTriggerDev, runOnVercel } from "../runners";
-import type { RequestRunnerProvider, RequestStartHandler } from "../types";
+import {
+	type Request,
+	type RequestId,
+	type RequestRunnerProvider,
+	requestStatus,
+} from "../types";
 
 type RequestProviderState = {
 	requestStart: () => Promise<void>;
+	lastRequest?: Request | undefined | null;
 };
 
 const RequestContext = createContext<RequestProviderState | null>(null);
@@ -27,20 +36,49 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	agentId,
 	requestRunnerProvider,
 }) => {
+	const [requestId, setRequestId] = useState<RequestId | undefined>();
+	const [lastRequest, setLastRequest] = useState<Request | undefined | null>();
 	const requestStart = useCallback(async () => {
 		const blueprint = await getOrBuildBlueprint(agentId);
-		const request = await createRequest(blueprint.id);
+		const newRequest = await createRequest(blueprint.id);
+		setRequestId(newRequest.requestId);
 		switch (requestRunnerProvider) {
 			case "vercelFunctions":
-				await runOnVercel(request);
+				fetch(`/v2/agents/requests/${newRequest.requestId}`, {
+					method: "POST",
+				});
 				return;
 			case "triggerDev":
-				await runOnTriggerDev(request);
+				runOnTriggerDev(newRequest);
 				return;
 		}
 	}, [agentId, requestRunnerProvider]);
+
+	useEffect(() => {
+		if (requestId == null) {
+			return;
+		}
+
+		let timeoutId: NodeJS.Timeout;
+
+		async function pollingGetRequest(requestId: RequestId) {
+			const request = await getRequest(requestId);
+			setLastRequest(request);
+			if (request != null && request.status === requestStatus.completed) {
+				return; // ポーリング終了
+			}
+			// 次のポーリングをスケジュール
+			timeoutId = setTimeout(() => pollingGetRequest(requestId), 2000);
+		}
+
+		pollingGetRequest(requestId);
+
+		return () => {
+			clearTimeout(timeoutId);
+		};
+	}, [requestId]);
 	return (
-		<RequestContext.Provider value={{ requestStart }}>
+		<RequestContext.Provider value={{ requestStart, lastRequest }}>
 			{children}
 		</RequestContext.Provider>
 	);

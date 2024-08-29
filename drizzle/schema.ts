@@ -10,7 +10,13 @@ import type {
 	PlaygroundEdge,
 	PlaygroundGraph,
 } from "@/services/agents/playground/types";
-import type { RequestId } from "@/services/agents/requests";
+import type {
+	RequestId,
+	RequestStackId,
+	RequestStatus,
+	RequestStepId,
+	RequestStepStatus,
+} from "@/services/agents/requests";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -179,14 +185,13 @@ export const edges = pgTable(
 	}),
 );
 
-export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {
 	id: text("id").$type<RequestId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	blueprintDbId: integer("blueprint_db_id")
 		.notNull()
 		.references(() => blueprints.dbId),
-	status: text("status").$type<RequestStatus>().notNull().default("creating"),
+	status: text("status").$type<RequestStatus>().notNull().default("queued"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
@@ -210,6 +215,7 @@ export const requestResults = pgTable("request_results", {
 });
 
 export const requestStacks = pgTable("request_stacks", {
+	id: text("id").$type<RequestStackId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	requestDbId: integer("request_db_id")
 		.notNull()
@@ -230,9 +236,8 @@ export const requestStackRunners = pgTable("request_stack_runners", {
 	runnerId: text("runner_id").notNull().unique(),
 });
 
-export type RequestStepStatus = "idle" | "running" | "success" | "failed";
 export const requestSteps = pgTable("request_steps", {
-	id: text("id").$type<`rqst.stp_${string}`>().unique().notNull(),
+	id: text("id").$type<RequestStepId>().unique().notNull(),
 	dbId: serial("db_id").primaryKey(),
 	requestStackDbId: integer("request_stack_db_id")
 		.notNull()
@@ -240,7 +245,7 @@ export const requestSteps = pgTable("request_steps", {
 	nodeDbId: integer("node_db_id")
 		.notNull()
 		.references(() => nodes.dbId),
-	status: text("status").$type<RequestStepStatus>().notNull().default("idle"),
+	status: text("status").$type<RequestStepStatus>().notNull().default("queued"),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });

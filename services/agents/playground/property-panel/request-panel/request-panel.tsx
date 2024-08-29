@@ -5,7 +5,7 @@
 // import { RequestLogger } from "./request-logger";
 // import { RequiredAction } from "./required-action";
 
-import { RequestButton } from "@/services/agents/requests";
+import { RequestButton, RequestLogger } from "@/services/agents/requests";
 import type { FC } from "react";
 
 // export const RequestPanel: FC = () => {
@@ -33,6 +33,7 @@ export const RequestPanel: FC = () => {
 		<div className="px-4 py-2">
 			<p>Request panel</p>
 			<RequestButton />
+			<RequestLogger />
 		</div>
 	);
 };

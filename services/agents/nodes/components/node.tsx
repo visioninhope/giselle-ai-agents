@@ -1,6 +1,5 @@
 "use client";
 
-import type { RequestStepStatus } from "@/drizzle/schema";
 import {
 	type Node,
 	type NodeProps,
@@ -12,6 +11,7 @@ import {
 } from "@xyflow/react";
 import { cva } from "cva";
 import { type ComponentProps, type FC, useEffect } from "react";
+import { type RequestStepStatus, requestStepStatus } from "../../requests";
 import type { Port } from "../type";
 
 export type GiselleNodeData = {
@@ -92,10 +92,12 @@ const nodeVariant = cva({
 			context: "rounded-full",
 		},
 		stepStatus: {
-			idle: "border-border",
-			running: " border-blue-500",
-			success: "border-green-700",
-			failed: "border-error",
+			[requestStepStatus.queued]: "border-border",
+			[requestStepStatus.cancelled]: "border-border",
+			[requestStepStatus.expired]: "border-border",
+			[requestStepStatus.inProgress]: " border-blue-500",
+			[requestStepStatus.completed]: "border-green-700",
+			[requestStepStatus.failed]: "border-error",
 		},
 		status: {
 			creating: "opacity-40",
@@ -103,7 +105,7 @@ const nodeVariant = cva({
 		},
 	},
 	defaultVariants: {
-		stepStatus: "idle",
+		stepStatus: requestStepStatus.queued,
 	},
 });
 

@@ -5,8 +5,8 @@ import { and, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { portType } from "../nodes/type";
 
-const sourcePorts = alias(ports, "originNodes");
-const targetPorts = alias(ports, "destinationNodes");
+const sourcePorts = alias(ports, "originPorts");
+const targetPorts = alias(ports, "targetPorts");
 export const getNextNode = async (nodeDbId: number) => {
 	const [node] = await db
 		.select({
