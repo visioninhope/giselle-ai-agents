@@ -84,5 +84,10 @@ async function getFirstIdleStep(requestStackDbId: number) {
 }
 
 export async function runStep(requestStepDbId: number) {
-	// Implement step running logic here
+	await db
+		.update(requestSteps)
+		.set({
+			status: "success",
+		})
+		.where(eq(requestSteps.dbId, requestStepDbId));
 }

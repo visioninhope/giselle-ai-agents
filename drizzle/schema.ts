@@ -248,7 +248,7 @@ export const requestSteps = pgTable("request_steps", {
 		.references(() => requestStacks.dbId),
 	nodeDbId: integer("node_db_id")
 		.notNull()
-		.references(() => steps.dbId),
+		.references(() => nodes.dbId),
 	status: text("status").$type<RequestStepStatus>().notNull().default("idle"),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
@@ -272,14 +272,6 @@ export const requestPortMessages = pgTable(
 		),
 	}),
 );
-
-export const requestTriggerRelations = pgTable("request_trigger_relations", {
-	dbId: serial("db_id").primaryKey(),
-	requestDbId: integer("request_db_id")
-		.notNull()
-		.references(() => requests.dbId),
-	triggerId: text("trigger_id").notNull(),
-});
 
 export const oauthCredentials = pgTable(
 	"oauth_credentials",
