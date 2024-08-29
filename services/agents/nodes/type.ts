@@ -56,22 +56,22 @@ export type NodeClassCategory =
 	(typeof nodeClassCategory)[keyof typeof nodeClassCategory];
 
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
-	requestId: number;
+	requestDbId: number;
 	node: Node;
-	knowledges: Knowledge[];
+	// knowledges: Knowledge[];
 	data: TBaseSchema extends ObjectSchema<infer E, infer M>
 		? InferInput<ObjectSchema<E, M>>
 		: never;
-	findDefaultInputPortAsBlueprint: (
+	findDefaultTargetPort: (
 		// biome-ignore lint: lint/suspicious/noExplicitAny
-		name: TDefaultPorts extends DefaultPorts<infer InputPorts, any>
-			? InputPorts[number]["name"]
+		name: TDefaultPorts extends DefaultPorts<infer TargetPorts, any>
+			? TargetPorts[number]["name"]
 			: never,
 	) => Port;
-	findDefaultOutputPortAsBlueprint: (
+	findDefaultSourceport: (
 		// biome-ignore lint: lint/suspicious/noExplicitAny
-		name: TDefaultPorts extends DefaultPorts<any, infer OutputPorts>
-			? OutputPorts[number]["name"]
+		name: TDefaultPorts extends DefaultPorts<any, infer SourcePorts>
+			? SourcePorts[number]["name"]
 			: never,
 	) => Port;
 };

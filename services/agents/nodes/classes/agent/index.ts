@@ -20,10 +20,10 @@ export const agent = buildNodeClass("agent", {
 		}),
 	}),
 	action: async ({
-		requestId,
+		requestDbId: requestId,
 		node,
 		data,
-		findDefaultOutputPortAsBlueprint,
+		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {
 		await invokeAgent();
 		// await invokeAgent({

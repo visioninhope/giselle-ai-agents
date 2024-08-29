@@ -3,12 +3,12 @@ import { createId } from "@paralleldrive/cuid2";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
 import { type InferInput, type ObjectSchema, parse } from "valibot";
-import type {
-	DefaultPort,
-	DefaultPorts,
-	NodeClasses,
-	NodeGraph,
-	Port,
+import {
+	type DefaultPort,
+	type DefaultPorts,
+	type NodeClasses,
+	type NodeGraph,
+	portDirection,
 } from "./type";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
@@ -39,11 +39,11 @@ type NodeService<TNodeClasses extends NodeClasses> = {
 	$inferClassNames: keyof TNodeClasses;
 	runAction: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestId: number; knowledges: Knowledge[] },
+		args: { node: NodeGraph; requestDbId: number },
 	) => Promise<void>;
 	runResolver: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestId: number; knowledges: Knowledge[] },
+		args: { node: NodeGraph; requestDbId: number },
 	) => Promise<void>;
 	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
@@ -101,7 +101,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			return renderPanel({ node, data });
 		},
-		runAction: async (name, { node, requestId, knowledges }) => {
+		runAction: async (name, { node, requestDbId, knowledges }) => {
 			const nodeClass = nodeClasses[name];
 			const action = nodeClass.action;
 			if (action == null) {
@@ -110,27 +110,29 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({
-				requestId,
+				requestDbId,
 				node,
-				knowledges,
+				// knowledges,
 				data,
-				findDefaultInputPortAsBlueprint: (name) => {
-					const port = node.sourcePorts.find(
-						({ name: portName }) => portName === name,
+				findDefaultTargetPort: (name) => {
+					const port = node.ports.find(
+						({ name: portName, direction }) =>
+							direction === portDirection.target && portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;
 				},
-				findDefaultOutputPortAsBlueprint: (name) => {
-					const port = node.targetPorts.find(
-						({ name: portName }) => portName === name,
+				findDefaultSourceport: (name) => {
+					const port = node.ports.find(
+						({ name: portName, direction }) =>
+							direction === portDirection.source && portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;
 				},
 			});
 		},
-		runResolver: async (name, { node, requestId, knowledges }) => {
+		runResolver: async (name, { node, requestDbId, knowledges }) => {
 			const nodeClass = nodeClasses[name];
 			const resolver = nodeClass.resolver;
 			if (resolver == null) {
@@ -140,20 +142,22 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await resolver({
-				requestId,
+				requestDbId,
 				node,
-				knowledges,
+				// knowledges,
 				data,
-				findDefaultInputPortAsBlueprint: (name) => {
-					const port = node.sourcePorts.find(
-						({ name: portName }) => portName === name,
+				findDefaultTargetPort: (name) => {
+					const port = node.ports.find(
+						({ name: portName, direction }) =>
+							direction === portDirection.target && portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;
 				},
-				findDefaultOutputPortAsBlueprint: (name) => {
-					const port = node.targetPorts.find(
-						({ name: portName }) => portName === name,
+				findDefaultSourceport: (name) => {
+					const port = node.ports.find(
+						({ name: portName, direction }) =>
+							direction === portDirection.source && portName === name,
 					);
 					invariant(port != null, `Port not found: ${name}`);
 					return port;

@@ -1,6 +1,7 @@
 import type { AgentId } from "@/services/agents";
 import type {
 	Node,
+	NodeGraph,
 	Port,
 	PortDirection,
 	PortType,
@@ -130,6 +131,7 @@ export const nodes = pgTable(
 			.references(() => blueprints.dbId, { onDelete: "cascade" }),
 		className: text("class_name").notNull(),
 		data: jsonb("data").notNull(),
+		graph: jsonb("graph").$type<NodeGraph>().notNull(),
 	},
 	(nodes) => ({
 		nodesIdBlueprintDbIdUnieque: unique().on(nodes.id, nodes.blueprintDbId),
@@ -176,17 +178,6 @@ export const edges = pgTable(
 		edgesIdBlueprintDbIdUnique: unique().on(edge.id, edge.blueprintDbId),
 	}),
 );
-
-export const steps = pgTable("steps", {
-	dbId: serial("db_id").primaryKey(),
-	blueprintDbId: integer("blueprint_db_id")
-		.notNull()
-		.references(() => blueprints.dbId),
-	nodeDbId: integer("node_db_id")
-		.notNull()
-		.references(() => nodes.dbId),
-	order: integer("order").notNull(),
-});
 
 export type RequestStatus = "creating" | "running" | "success" | "failed";
 export const requests = pgTable("requests", {

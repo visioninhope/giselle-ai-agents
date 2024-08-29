@@ -1,12 +1,15 @@
 import {
 	blueprints,
 	db,
+	nodes,
 	requestStacks,
 	requestSteps,
 	requests,
 } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq } from "drizzle-orm";
+import { assertNodeClassName, nodeService } from "../nodes";
+import { getDependedNodes } from "./get-depended-nodes";
 import { getNextNode } from "./get-next-node";
 import { getNodeDbId } from "./get-node-id";
 import { getResponseNode, getTriggerNode } from "./helpers";
@@ -49,18 +52,31 @@ export async function* createRequestStackGenerator(
 	yield newRequestStack;
 }
 
+const pushNextNodeToRequestStack = async (
+	requestStackDbId: number,
+	currentNodeDbId: number,
+) => {
+	const nextNode = await getNextNode(currentNodeDbId);
+	if (nextNode == null) {
+		return;
+	}
+	await db.insert(requestSteps).values({
+		id: `rqst.stp_${createId()}`,
+		requestStackDbId,
+		nodeDbId: nextNode.dbId,
+	});
+};
+
 export async function* runStackGenerator(requestStackDbId: number) {
 	const [requestStack] = await db
 		.select()
 		.from(requestStacks)
 		.where(eq(requestStacks.dbId, requestStackDbId));
 
-	const nextNode = await getNextNode(requestStack.startNodeDbId);
-	await db.insert(requestSteps).values({
-		id: `rqst.stp_${createId()}`,
+	await pushNextNodeToRequestStack(
 		requestStackDbId,
-		nodeDbId: nextNode.dbId,
-	});
+		requestStack.startNodeDbId,
+	);
 
 	while (true) {
 		const [step] = await getFirstIdleStep(requestStackDbId);
@@ -83,7 +99,38 @@ async function getFirstIdleStep(requestStackDbId: number) {
 		.limit(1);
 }
 
-export async function runStep(requestStepDbId: number) {
+export async function runStep(
+	requestDbId: number,
+	requestStackDbId: number,
+	requestStepDbId: number,
+) {
+	const [node] = await db
+		.select({
+			id: nodes.id,
+			dbId: nodes.dbId,
+			className: nodes.className,
+			graph: nodes.graph,
+		})
+		.from(nodes)
+		.innerJoin(requestSteps, eq(nodes.dbId, requestSteps.nodeDbId))
+		.where(eq(requestSteps.dbId, requestStepDbId));
+	const dependedNodes = await getDependedNodes({
+		requestDbId,
+		nodeDbId: node.dbId,
+	});
+	for (const dependedNode of dependedNodes) {
+		assertNodeClassName(dependedNode.className);
+		await nodeService.runResolver(dependedNode.className, {
+			requestDbId,
+			node: dependedNode.graph,
+		});
+	}
+	assertNodeClassName(node.className);
+	await nodeService.runAction(node.className, {
+		requestDbId,
+		node: node.graph,
+	});
+	await pushNextNodeToRequestStack(requestStackDbId, node.dbId);
 	await db
 		.update(requestSteps)
 		.set({

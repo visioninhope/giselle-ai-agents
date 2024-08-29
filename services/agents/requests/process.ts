@@ -40,11 +40,18 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 	const newNodes = await db
 		.insert(nodes)
 		.values(
-			agent.graph.nodes.map(({ id, className, data }) => ({
+			agent.graph.nodes.map(({ id, className, data, ports, name }) => ({
 				id,
 				blueprintDbId: newBlueprint.dbId,
 				className,
 				data,
+				graph: {
+					id,
+					name,
+					className,
+					data,
+					ports,
+				},
 			})),
 		)
 		.returning({

@@ -21,5 +21,8 @@ export const getNextNode = async (nodeDbId: number) => {
 				eq(sourcePorts.type, portType.execution),
 			),
 		);
+	if (node == null) {
+		return null;
+	}
 	return node;
 };

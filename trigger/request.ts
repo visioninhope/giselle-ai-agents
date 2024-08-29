@@ -14,6 +14,7 @@ export const requestRunner = task({
 	run: async (args: RequestArgs) => {
 		for await (const requestStack of createRequestStackGenerator(args)) {
 			await requestStackRunner.triggerAndWait({
+				requestDbId: args.requestDbId,
 				requestStackDbId: requestStack.dbId,
 			});
 		}
@@ -21,6 +22,7 @@ export const requestRunner = task({
 });
 
 type RequestStackRunnerArgs = {
+	requestDbId: number;
 	requestStackDbId: number;
 };
 export const requestStackRunner = task({
@@ -28,6 +30,8 @@ export const requestStackRunner = task({
 	run: async (args: RequestStackRunnerArgs) => {
 		for await (const step of runStackGenerator(args.requestStackDbId)) {
 			await requestStepRunner.triggerAndWait({
+				requestDbId: args.requestDbId,
+				requestStackDbId: args.requestStackDbId,
 				requestStepDbId: step.dbId,
 			});
 		}
@@ -35,11 +39,17 @@ export const requestStackRunner = task({
 });
 
 type RequestStepRunnerArgs = {
+	requestDbId: number;
+	requestStackDbId: number;
 	requestStepDbId: number;
 };
 export const requestStepRunner = task({
 	id: "requestStepRunner",
 	run: async (args: RequestStepRunnerArgs) => {
-		await runStep(args.requestStepDbId);
+		await runStep(
+			args.requestDbId,
+			args.requestStackDbId,
+			args.requestStepDbId,
+		);
 	},
 });

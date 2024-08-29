@@ -18,7 +18,7 @@ export const start = async (args: StartRunnerArgs) => {
 		requestDbId: request.dbId,
 	})) {
 		for await (const step of runStackGenerator(requestStack.dbId)) {
-			await runStep(step.dbId);
+			await runStep(request.dbId, requestStack.dbId, step.dbId);
 		}
 	}
 };

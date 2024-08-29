@@ -16,9 +16,9 @@ export const textGeneration = buildNodeClass("textGeneration", {
 	},
 	action: async ({
 		node,
-		requestId,
-		findDefaultInputPortAsBlueprint,
-		findDefaultOutputPortAsBlueprint,
+		requestDbId: requestId,
+		findDefaultTargetPort: findDefaultInputPortAsBlueprint,
+		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {
 		const instructionPort = findDefaultInputPortAsBlueprint("instruction");
 		const resultPort = findDefaultOutputPortAsBlueprint("result");

@@ -21,9 +21,9 @@ export const knowledgeRetrieval = buildNodeClass("knowledgeRetrieval", {
 		data,
 		node,
 		knowledges,
-		findDefaultInputPortAsBlueprint,
-		requestId,
-		findDefaultOutputPortAsBlueprint,
+		findDefaultTargetPort: findDefaultInputPortAsBlueprint,
+		requestDbId: requestId,
+		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {
 		await retrieval({
 			node,

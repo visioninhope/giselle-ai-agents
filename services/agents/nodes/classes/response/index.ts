@@ -10,7 +10,7 @@ export const response = buildNodeClass("response", {
 			buildDefaultPort({ type: portType.data, name: "output" }),
 		],
 	},
-	action: async ({ requestId, node }) => {
+	action: async ({ requestDbId: requestId, node }) => {
 		await insertRequestResult({
 			requestId,
 			nodeId: node.id,
