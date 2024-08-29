@@ -1,35 +1,50 @@
 "use server";
 
-import { db, nodes, ports, pullMessages, requestResults } from "@/drizzle";
+import {
+	blueprints,
+	db,
+	edges,
+	nodes,
+	ports,
+	pullMessages,
+	requestPortMessages,
+	requestResults,
+	requests,
+} from "@/drizzle";
 import { and, eq } from "drizzle-orm";
+import { alias } from "drizzle-orm/pg-core";
+import type { Port } from "../../type";
 
 type InsertRequestResultArgs = {
-	requestId: number;
-	nodeId: number;
+	requestDbId: number;
+	nodeDbId: number;
+	outputPort: Port;
 };
 
+const sourcePorts = alias(ports, "source_ports");
+const targetPorts = alias(ports, "target_ports");
 export const insertRequestResult = async ({
-	requestId,
-	nodeId,
+	requestDbId,
+	nodeDbId,
+	...args
 }: InsertRequestResultArgs) => {
-	const [outputPort] = await db
-		.select({ id: ports.id, name: ports.name })
-		.from(ports)
-		.innerJoin(nodes, eq(ports.nodeId, nodes.id))
-		.where(and(eq(nodes.id, nodeId), eq(ports.name, "output")));
-	const [outputMessage] = await db
-		.with(pullMessages)
-		.select()
-		.from(pullMessages)
+	const [message] = await db
+		.select({ content: requestPortMessages.message })
+		.from(requestPortMessages)
+		.innerJoin(sourcePorts, eq(sourcePorts.dbId, requestPortMessages.portDbId))
+		.innerJoin(edges, eq(edges.sourcePortDbId, sourcePorts.dbId))
+		.innerJoin(targetPorts, eq(targetPorts.dbId, edges.targetPortDbId))
+		.innerJoin(nodes, eq(nodes.dbId, targetPorts.nodeDbId))
+		.innerJoin(blueprints, eq(blueprints.dbId, nodes.blueprintDbId))
+		.innerJoin(requests, eq(requests.blueprintDbId, blueprints.dbId))
 		.where(
 			and(
-				eq(pullMessages.requestId, requestId),
-				eq(pullMessages.nodeId, nodeId),
-				eq(pullMessages.portId, outputPort.id),
+				eq(requests.dbId, requestDbId),
+				eq(targetPorts.id, args.outputPort.id),
 			),
 		);
 	await db.insert(requestResults).values({
-		requestId,
-		text: outputMessage.content,
+		requestDbId,
+		text: message.content as string,
 	});
 };

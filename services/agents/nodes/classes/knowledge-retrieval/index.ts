@@ -19,7 +19,7 @@ export const knowledgeRetrieval = buildNodeClass("knowledgeRetrieval", {
 	dataSchema,
 	action: async ({
 		data,
-		node,
+		nodeGraph: node,
 		knowledges,
 		findDefaultTargetPort: findDefaultInputPortAsBlueprint,
 		requestDbId: requestId,

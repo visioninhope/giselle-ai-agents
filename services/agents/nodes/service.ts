@@ -39,11 +39,11 @@ type NodeService<TNodeClasses extends NodeClasses> = {
 	$inferClassNames: keyof TNodeClasses;
 	runAction: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestDbId: number },
+		args: { node: NodeGraph; requestDbId: number; nodeDbId: number },
 	) => Promise<void>;
 	runResolver: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestDbId: number },
+		args: { node: NodeGraph; requestDbId: number; nodeDbId: number },
 	) => Promise<void>;
 	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
@@ -101,7 +101,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			return renderPanel({ node, data });
 		},
-		runAction: async (name, { node, requestDbId, knowledges }) => {
+		runAction: async (name, { node, requestDbId, knowledges, nodeDbId }) => {
 			const nodeClass = nodeClasses[name];
 			const action = nodeClass.action;
 			if (action == null) {
@@ -111,7 +111,8 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({
 				requestDbId,
-				node,
+				nodeGraph: node,
+				nodeDbId,
 				// knowledges,
 				data,
 				findDefaultTargetPort: (name) => {
@@ -132,7 +133,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				},
 			});
 		},
-		runResolver: async (name, { node, requestDbId, knowledges }) => {
+		runResolver: async (name, { node, requestDbId, nodeDbId }) => {
 			const nodeClass = nodeClasses[name];
 			const resolver = nodeClass.resolver;
 			if (resolver == null) {
@@ -143,7 +144,8 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await resolver({
 				requestDbId,
-				node,
+				nodeGraph: node,
+				nodeDbId,
 				// knowledges,
 				data,
 				findDefaultTargetPort: (name) => {

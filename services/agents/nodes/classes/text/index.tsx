@@ -22,17 +22,18 @@ export const text = buildNodeClass("text", {
 		);
 	},
 	resolver: async ({
-		requestDbId: requestId,
-		node,
+		requestDbId,
+		nodeDbId,
+		nodeGraph,
 		data,
 		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {
 		const textPort = findDefaultOutputPortAsBlueprint("text");
 		await buildTemplate({
-			requestId,
-			nodeId: node.id,
+			requestDbId,
+			nodeDbId,
 			template: data.template,
-			inputPorts: node.inputPorts,
+			inputPorts: nodeGraph.ports,
 			outputPortId: textPort.id,
 		});
 	},

@@ -1,20 +1,29 @@
 "use server";
 
-import { db, pullMessages, requestPortMessages } from "@/drizzle";
+import {
+	blueprints,
+	db,
+	nodes,
+	ports,
+	pullMessages,
+	requestPortMessages,
+	requests,
+} from "@/drizzle";
 import { logger } from "@trigger.dev/sdk/v3";
 import { and, eq } from "drizzle-orm";
+import type { Port } from "../../type";
 
 type BuildTemplateArgs = {
-	requestId: number;
-	nodeId: number;
+	requestDbId: number;
+	nodeDbId: number;
 	template: string;
-	inputPorts: { name: string; id: number }[];
-	outputPortId: number;
+	inputPorts: Port[];
+	outputPortId: Port["id"];
 };
 
 export const buildTemplate = async ({
-	requestId,
-	nodeId,
+	requestDbId,
+	nodeDbId,
 	template,
 	inputPorts,
 	outputPortId,
@@ -25,8 +34,8 @@ export const buildTemplate = async ({
 		.from(pullMessages)
 		.where(
 			and(
-				eq(pullMessages.requestId, requestId),
-				eq(pullMessages.nodeId, nodeId),
+				eq(pullMessages.requestDbId, requestDbId),
+				eq(pullMessages.nodeDbId, nodeDbId),
 			),
 		);
 
@@ -46,9 +55,16 @@ export const buildTemplate = async ({
 		}
 		finalText = finalText.replace(`{${match[0]}}`, message.content);
 	}
+	const [outputPort] = await db
+		.select({ dbId: ports.dbId })
+		.from(ports)
+		.innerJoin(nodes, eq(nodes.dbId, ports.nodeDbId))
+		.innerJoin(blueprints, eq(blueprints.dbId, nodes.blueprintDbId))
+		.innerJoin(requests, eq(requests.blueprintDbId, blueprints.dbId))
+		.where(and(eq(requests.dbId, requestDbId), eq(ports.id, outputPortId)));
 	await db.insert(requestPortMessages).values({
-		requestId,
-		portId: outputPortId,
+		requestDbId: requestDbId,
+		portDbId: outputPort.dbId,
 		message: finalText,
 	});
 };

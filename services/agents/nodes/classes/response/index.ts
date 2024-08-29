@@ -10,10 +10,11 @@ export const response = buildNodeClass("response", {
 			buildDefaultPort({ type: portType.data, name: "output" }),
 		],
 	},
-	action: async ({ requestDbId: requestId, node }) => {
+	action: async ({ requestDbId, nodeDbId, findDefaultTargetPort }) => {
 		await insertRequestResult({
-			requestId,
-			nodeId: node.id,
+			requestDbId,
+			nodeDbId,
+			outputPort: findDefaultTargetPort("output"),
 		});
 	},
 });

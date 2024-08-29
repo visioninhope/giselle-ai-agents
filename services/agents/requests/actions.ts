@@ -122,12 +122,14 @@ export async function runStep(
 		assertNodeClassName(dependedNode.className);
 		await nodeService.runResolver(dependedNode.className, {
 			requestDbId,
+			nodeDbId: dependedNode.dbId,
 			node: dependedNode.graph,
 		});
 	}
 	assertNodeClassName(node.className);
 	await nodeService.runAction(node.className, {
 		requestDbId,
+		nodeDbId: node.dbId,
 		node: node.graph,
 	});
 	await pushNextNodeToRequestStack(requestStackDbId, node.dbId);

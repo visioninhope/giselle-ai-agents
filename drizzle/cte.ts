@@ -1,72 +1,23 @@
+import type { Port } from "@/services/agents/nodes";
 import { eq, sql } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { db } from "./db";
 import { edges, ports, requestPortMessages, requests } from "./schema";
 
-const originPorts = alias(ports, "originPorts");
-const destinationPorts = alias(ports, "destinationPorts");
+const sourcePorts = alias(ports, "source_ports");
+const targetPorts = alias(ports, "target_ports");
 export const pullMessages = db.$with("pullMessages").as(
 	db
 		.select({
 			content: sql<string>`${requestPortMessages.message}`.as("content"),
-			requestId: sql<number>`${requests.id}`.as("requestId"),
-			portId: sql<number>`${destinationPorts.id}`.as("portId"),
-			nodeId: sql<number>`${destinationPorts.nodeId}`.as("nodeId"),
+			requestDbId: sql<number>`${requests.dbId}`.as("requestDbId"),
+			portDbId: sql<number>`${targetPorts.dbId}`.as("portDbId"),
+			portId: sql<Port["id"]>`${targetPorts.id}`.as("portId"),
+			nodeDbId: sql<number>`${targetPorts.nodeDbId}`.as("nodeDbId"),
 		})
 		.from(requestPortMessages)
-		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
-		.innerJoin(originPorts, eq(originPorts.id, requestPortMessages.portId))
-		.innerJoin(edges, eq(edges.outputPortId, originPorts.id))
-		.innerJoin(destinationPorts, eq(destinationPorts.id, edges.inputPortId)),
+		.innerJoin(requests, eq(requests.dbId, requestPortMessages.requestDbId))
+		.innerJoin(sourcePorts, eq(sourcePorts.dbId, requestPortMessages.portDbId))
+		.innerJoin(edges, eq(edges.sourcePortDbId, sourcePorts.dbId))
+		.innerJoin(targetPorts, eq(targetPorts.dbId, edges.targetPortDbId)),
 );
-// export const pullMessages = db.$with("pullMessages").as(
-// 	db
-// 		.select({
-// 			content: sql<string>`${requestPortMessages.message}`.as("content"),
-// 			requestId: sql<number>`${requests.id}`.as("requestId"),
-// 			nodeId: sql<number>`${destinationNodesBlueprints.nodeId}`.as("nodeId"),
-// 			portId: sql<number>`${ports.id}`.as("portId"),
-// 		})
-// 		.from(requestPortMessages)
-// 		.innerJoin(requests, eq(requests.id, requestPortMessages.requestId))
-// 		.innerJoin(
-// 			originPorts,
-// 			eq(originPorts.id, requestPortMessages.portsBlueprintsId),
-// 		)
-// 		.innerJoin(
-// 			originNodes,
-// 			eq(originNodes.id, originPorts.nodesBlueprintsId),
-// 		)
-// 		.innerJoin(
-// 			edges,
-// 			and(
-// 				eq(edges.outputPortId, originPorts.portId),
-// 				eq(edges.edgeType, "data"),
-// 			),
-// 		)
-// 		.innerJoin(
-// 			edgesBlueprints,
-// 			and(
-// 				eq(edgesBlueprints.edgeId, edges.id),
-// 				eq(edgesBlueprints.blueprintId, requests.blueprintId),
-// 			),
-// 		)
-// 		.innerJoin(
-// 			destinationPortsBlueprints,
-// 			eq(destinationPortsBlueprints.portId, edges.inputPortId),
-// 		)
-// 		.innerJoin(ports, eq(ports.id, destinationPortsBlueprints.portId))
-// 		.innerJoin(
-// 			destinationNodesBlueprints,
-// 			and(
-// 				eq(
-// 					destinationNodesBlueprints.id,
-// 					destinationPortsBlueprints.nodesBlueprintsId,
-// 				),
-// 				eq(
-// 					destinationNodesBlueprints.blueprintId,
-// 					originNodes.blueprintId,
-// 				),
-// 			),
-// 		),
-// );

@@ -21,7 +21,7 @@ export const agent = buildNodeClass("agent", {
 	}),
 	action: async ({
 		requestDbId: requestId,
-		node,
+		nodeGraph: node,
 		data,
 		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {

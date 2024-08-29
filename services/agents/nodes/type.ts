@@ -57,7 +57,8 @@ export type NodeClassCategory =
 
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestDbId: number;
-	node: Node;
+	nodeDbId: number;
+	nodeGraph: NodeGraph;
 	// knowledges: Knowledge[];
 	data: TBaseSchema extends ObjectSchema<infer E, infer M>
 		? InferInput<ObjectSchema<E, M>>
@@ -88,7 +89,7 @@ type Action<TBaseSchema, TDefaultPorts> = (
 ) => Promise<void>;
 
 type RenderPanelArgs<TBaseSchema> = {
-	node: Node;
+	node: NodeGraph;
 	data: TBaseSchema extends ObjectSchema<infer E, infer M>
 		? InferInput<ObjectSchema<E, M>>
 		: never;
