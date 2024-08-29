@@ -11,7 +11,7 @@ import {
 	useState,
 } from "react";
 import { OperationProvider } from "../nodes";
-import { RequestProvider, type RequestStartHandler } from "../requests";
+import { RequestProvider, type RequestRunnerProvider } from "../requests";
 import type { AgentId } from "../types";
 import { getGraphFromDb } from "./get-graph-from-db";
 import { type PlaygroundAction, playgroundReducer } from "./playground-reducer";
@@ -38,11 +38,11 @@ const PlaygroundContext = createContext<PlaygroundContextType | undefined>(
 
 export type PlaygroundProviderProps = {
 	agentId: AgentId;
-	onRequestStartAction: RequestStartHandler;
+	requestRunnerProvider: RequestRunnerProvider;
 };
 export const PlaygroundProvider: FC<
 	PropsWithChildren<PlaygroundProviderProps>
-> = ({ agentId, onRequestStartAction: onRequestStart, children }) => {
+> = ({ agentId, requestRunnerProvider, children }) => {
 	const [graph, dispatch] = useReducer(playgroundReducer, {
 		nodes: [],
 		edges: [],
@@ -107,7 +107,7 @@ export const PlaygroundProvider: FC<
 			>
 				<RequestProvider
 					agentId={agentId}
-					onRequestStartAction={onRequestStart}
+					requestRunnerProvider={requestRunnerProvider}
 				>
 					{children}
 				</RequestProvider>

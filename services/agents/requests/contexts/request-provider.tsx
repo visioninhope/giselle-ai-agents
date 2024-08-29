@@ -9,7 +9,8 @@ import {
 } from "react";
 import type { AgentId } from "../../types";
 import { createRequest, getOrBuildBlueprint } from "../process";
-import type { RequestStartHandler } from "../types";
+import { runOnTriggerDev, runOnVercel } from "../runners";
+import type { RequestRunnerProvider, RequestStartHandler } from "../types";
 
 type RequestProviderState = {
 	requestStart: () => Promise<void>;
@@ -19,18 +20,25 @@ const RequestContext = createContext<RequestProviderState | null>(null);
 
 type RequestProviderProps = {
 	agentId: AgentId;
-	onRequestStartAction: RequestStartHandler;
+	requestRunnerProvider: RequestRunnerProvider;
 };
 export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	children,
 	agentId,
-	onRequestStartAction: onRequestStart,
+	requestRunnerProvider,
 }) => {
 	const requestStart = useCallback(async () => {
 		const blueprint = await getOrBuildBlueprint(agentId);
 		const request = await createRequest(blueprint.id);
-		onRequestStart(request);
-	}, [agentId, onRequestStart]);
+		switch (requestRunnerProvider) {
+			case "vercelFunctions":
+				await runOnVercel(request);
+				return;
+			case "triggerDev":
+				await runOnTriggerDev(request);
+				return;
+		}
+	}, [agentId, requestRunnerProvider]);
 	return (
 		<RequestContext.Provider value={{ requestStart }}>
 			{children}

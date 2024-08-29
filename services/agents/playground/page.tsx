@@ -9,12 +9,12 @@ import {
 type PlaygroundProps = PlaygroundProviderProps;
 export const Playground: FC<PlaygroundProps> = ({
 	agentId,
-	onRequestStartAction,
+	requestRunnerProvider,
 }) => {
 	return (
 		<PlaygroundProvider
 			agentId={agentId}
-			onRequestStartAction={onRequestStartAction}
+			requestRunnerProvider={requestRunnerProvider}
 		>
 			<ReactFlowProvider>
 				<Inner />

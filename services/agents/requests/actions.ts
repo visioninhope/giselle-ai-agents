@@ -5,6 +5,7 @@ import {
 	requestSteps,
 	requests,
 } from "@/drizzle";
+import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq } from "drizzle-orm";
 import { getNextNode } from "./get-next-node";
 import { getNodeDbId } from "./get-node-id";
@@ -56,6 +57,7 @@ export async function* runStackGenerator(requestStackDbId: number) {
 
 	const nextNode = await getNextNode(requestStack.startNodeDbId);
 	await db.insert(requestSteps).values({
+		id: `rqst.stp_${createId()}`,
 		requestStackDbId,
 		nodeDbId: nextNode.dbId,
 	});

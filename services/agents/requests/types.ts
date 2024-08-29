@@ -6,3 +6,9 @@ export type RequestStartHandlerArgs = {
 export type RequestStartHandler = (
 	args: RequestStartHandlerArgs,
 ) => Promise<void>;
+
+export const requestRunnerProvider = {
+	vercelFunctions: "vercelFunctions",
+	triggerDev: "triggerDev",
+};
+export type RequestRunnerProvider = keyof typeof requestRunnerProvider;

@@ -241,7 +241,7 @@ export const requestStackRunners = pgTable("request_stack_runners", {
 
 export type RequestStepStatus = "idle" | "running" | "success" | "failed";
 export const requestSteps = pgTable("request_steps", {
-	id: text("id").$type<`rqst.stp_${string}`>().unique(),
+	id: text("id").$type<`rqst.stp_${string}`>().unique().notNull(),
 	dbId: serial("db_id").primaryKey(),
 	requestStackDbId: integer("request_stack_db_id")
 		.notNull()
