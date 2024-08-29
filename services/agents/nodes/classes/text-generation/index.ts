@@ -15,18 +15,18 @@ export const textGeneration = buildNodeClass("textGeneration", {
 		],
 	},
 	action: async ({
-		nodeGraph: node,
-		requestDbId: requestId,
+		nodeDbId,
+		requestDbId,
 		findDefaultTargetPort: findDefaultInputPortAsBlueprint,
 		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
 	}) => {
 		const instructionPort = findDefaultInputPortAsBlueprint("instruction");
 		const resultPort = findDefaultOutputPortAsBlueprint("result");
 		await generateText({
-			instructionPortId: instructionPort.id,
-			resultPortId: resultPort.id,
-			nodeId: node.id,
-			requestId,
+			instructionPort,
+			resultPort,
+			nodeDbId,
+			requestDbId,
 		});
 	},
 });

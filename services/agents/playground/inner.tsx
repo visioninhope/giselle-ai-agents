@@ -104,6 +104,14 @@ export const Inner: FC = () => {
 							},
 						});
 					}}
+					onEdgesDelete={(edges) => {
+						edges.map((edge) => {
+							dispatch({
+								type: "REMOVE_EDGE",
+								edgeId: edge.id,
+							});
+						});
+					}}
 					onNodeDragStop={(_event, _node, nodes) => {
 						nodes.map((node) => {
 							dispatch({

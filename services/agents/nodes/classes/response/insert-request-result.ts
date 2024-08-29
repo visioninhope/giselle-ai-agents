@@ -6,7 +6,6 @@ import {
 	edges,
 	nodes,
 	ports,
-	pullMessages,
 	requestPortMessages,
 	requestResults,
 	requests,
