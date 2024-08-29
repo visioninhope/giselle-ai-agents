@@ -8,4 +8,4 @@ export type {
 } from "./types";
 export { useRequest, RequestProvider } from "./contexts/request-provider";
 export { RequestButton } from "./components/request-button";
-export { startRequest } from "./actions/start-request";
+export { createRequestStack as startRequest } from "./actions/start-request";

@@ -200,6 +200,14 @@ export const requests = pgTable("requests", {
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
+export const requestRunners = pgTable("request_runners", {
+	dbId: serial("db_id").primaryKey(),
+	requestDbId: integer("request_db_id")
+		.notNull()
+		.references(() => requests.dbId),
+	provider: text("provider").notNull(),
+	runnerId: text("runner_id").notNull().unique(),
+});
 
 export const requestResults = pgTable("request_results", {
 	dbId: serial("db_id").primaryKey(),
