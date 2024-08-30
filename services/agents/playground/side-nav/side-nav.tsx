@@ -5,7 +5,7 @@ import {
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
-import { BookOpenIcon, LayersIcon } from "lucide-react";
+import { BookOpenIcon, LayersIcon, XIcon } from "lucide-react";
 import { type FC, useState } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { match } from "ts-pattern";
@@ -49,7 +49,7 @@ export const SideNav: FC = () => {
 						icon={<BookOpenIcon />}
 						tooltip="Knowledges"
 						onClick={() => {
-							setShow("true");
+							setShow(true);
 							setActiveMenu("knowledges");
 						}}
 					/>
@@ -58,15 +58,27 @@ export const SideNav: FC = () => {
 			<AnimatePresence>
 				{show && (
 					<motion.div
-						className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10"
+						className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
 						initial={{ width: 0 }}
 						animate={{ width: "300px" }}
 						exit={{ width: 0 }}
 					>
-						{match(activeMenu)
-							.with("overview", () => "Overview")
-							.with("knowledges", () => "Knowledge")
-							.otherwise(() => null)}
+						<div className="flex justify-between">
+							<div>
+								{match(activeMenu)
+									.with("overview", () => "Overview")
+									.with("knowledges", () => "Knowledge")
+									.otherwise(() => null)}
+							</div>
+							<button
+								type="button"
+								onClick={() => {
+									setShow(false);
+								}}
+							>
+								<XIcon />
+							</button>
+						</div>
 					</motion.div>
 				)}
 			</AnimatePresence>
