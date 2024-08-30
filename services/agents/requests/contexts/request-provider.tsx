@@ -41,15 +41,15 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	const requestStart = useCallback(async () => {
 		const build = await buildPlaygroundGraph(agentId);
 		const newRequest = await createRequest(build.id);
-		setRequestId(newRequest.requestId);
+		setRequestId(newRequest.id);
 		switch (requestRunnerProvider) {
 			case "vercelFunctions":
-				fetch(`/v2/agents/requests/${newRequest.requestId}`, {
+				fetch(`/v2/agents/requests/${newRequest.id}`, {
 					method: "POST",
 				});
 				return;
 			case "triggerDev":
-				runOnTriggerDev(newRequest);
+				runOnTriggerDev({ requestId: newRequest.id });
 				return;
 		}
 	}, [agentId, requestRunnerProvider]);

@@ -55,6 +55,7 @@ export const AgentList: FC<AgentListProps> = ({ onSelect }) => {
 											id: availableAgent.id,
 											name: availableAgent.name ?? "",
 											buildId: availableAgent.buildId,
+											args: availableAgent.args,
 										},
 									},
 									inputPorts: availableAgent.args.map((port) =>

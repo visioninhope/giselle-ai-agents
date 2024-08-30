@@ -121,15 +121,15 @@ export const createRequest = async (
 		.select({ dbId: builds.dbId })
 		.from(builds)
 		.where(eq(builds.id, buildId));
-	const requestId = `rqst_${createId()}` as const;
+	const id = `rqst_${createId()}` as const;
 	const [newRequest] = await db
 		.insert(requests)
 		.values({
-			id: requestId,
+			id: id,
 			buildDbId: build.dbId,
 		})
 		.returning({
 			dbId: requests.dbId,
 		});
-	return { requestId };
+	return { id, dbId: newRequest.dbId };
 };

@@ -1,4 +1,5 @@
 import { literal, number, object, string } from "valibot";
+import { agentSchema } from "../../../types";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
 import { nodeClassCategory, portType } from "../../type";
 import { invokeAgent } from "./invoke-agent";
@@ -13,27 +14,14 @@ export const agent = buildNodeClass("agent", {
 		],
 	},
 	dataSchema: object({
-		relevantAgent: object({
-			id: literal(`agnt_${string()}`),
-			buildId: literal(`bld_${string()}`),
-			name: string(),
-		}),
+		relevantAgent: agentSchema,
 	}),
-	action: async ({
-		requestDbId: requestId,
-		nodeGraph: node,
-		data,
-		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
-	}) => {
-		await invokeAgent();
-		// await invokeAgent({
-		// 	requestId,
-		// 	node,
-		// 	resultPortId: findDefaultOutputPortAsBlueprint("result").id,
-		// 	relevantAgent: {
-		// 		id: data.relevantAgent.id,
-		// 		blueprintId: data.relevantAgent.blueprintId,
-		// 	},
-		// });
+	action: async ({ requestDbId, nodeDbId, findDefaultSourceport, data }) => {
+		await invokeAgent({
+			requestDbId,
+			nodeDbId,
+			agent: data.relevantAgent,
+			resultPort: findDefaultSourceport("result"),
+		});
 	},
 });
