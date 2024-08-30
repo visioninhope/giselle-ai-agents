@@ -1,4 +1,4 @@
-import { number, object, string } from "valibot";
+import { literal, number, object, string } from "valibot";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
 import { nodeClassCategory, portType } from "../../type";
 import { invokeAgent } from "./invoke-agent";
@@ -14,8 +14,8 @@ export const agent = buildNodeClass("agent", {
 	},
 	dataSchema: object({
 		relevantAgent: object({
-			id: number(),
-			blueprintId: number(),
+			id: literal(`agnt_${string()}`),
+			buildId: literal(`bld_${string()}`),
 			name: string(),
 		}),
 	}),

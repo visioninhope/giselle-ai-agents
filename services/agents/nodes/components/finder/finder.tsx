@@ -13,7 +13,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { FC, HTMLAttributes } from "react";
 import { type NodeGraph, nodeService } from "../../";
-// import { AgentList } from "./agent-list";
+import { AgentList } from "./agent-list";
 import { KnowledgeList } from "./knowledge-list";
 
 type FinderProps = Pick<
@@ -28,7 +28,7 @@ export const Finder: FC<FinderProps> = ({ onSelect, style, className }) => {
 			<DropdownMenu defaultOpen={true} modal={false}>
 				<DropdownMenuTrigger />
 				<DropdownMenuContent>
-					{/**<DropdownMenuGroup>
+					<DropdownMenuGroup>
 						<DropdownMenuSub>
 							<DropdownMenuSubTrigger>Agent</DropdownMenuSubTrigger>
 							<DropdownMenuPortal>
@@ -38,7 +38,7 @@ export const Finder: FC<FinderProps> = ({ onSelect, style, className }) => {
 							</DropdownMenuPortal>
 						</DropdownMenuSub>
 					</DropdownMenuGroup>
-					<DropdownMenuSeparator /> **/}
+					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
 						<DropdownMenuLabel>CREATE TEST NODE</DropdownMenuLabel>
 						<DropdownMenuItem

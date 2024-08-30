@@ -1,16 +1,25 @@
 "use server";
 
-import { agents, builds, db, nodes, ports, requests } from "@/drizzle";
+import {
+	agents,
+	builds,
+	db,
+	nodes,
+	ports,
+	requests,
+	triggerNodes,
+} from "@/drizzle";
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 import { requestStatus } from "../../requests";
 import type { Agent } from "../../types";
+import { portDirection, portType } from "../type";
 
 export const getAvailableAgents = async () => {
 	await db.select().from(agents);
 	const availableAgentsQuery = db
 		.select({
 			agentDbId: agents.dbId,
-			latestBlueprintDbId: max(builds.dbId).as("latestBlueprintDbId"),
+			latestBuildDbId: max(builds.dbId).as("latestBuildDbId"),
 		})
 		.from(requests)
 		.innerJoin(builds, eq(builds.dbId, requests.dbId))
@@ -19,58 +28,34 @@ export const getAvailableAgents = async () => {
 			and(eq(agents.dbId, builds.agentDbId), isNotNull(agents.name)),
 		)
 		.where(eq(requests.status, requestStatus.completed))
-		.groupBy(builds.agentDbId)
+		.groupBy(agents.dbId)
 		.as("available_agents_query");
 
 	const availableAgents = await db
 		.select({
 			id: agents.id,
 			name: agents.name,
-			blueprintId: builds.id,
+			buildId: builds.id,
+			triggerNode: nodes.graph,
 		})
 		.from(agents)
 		.innerJoin(
 			availableAgentsQuery,
 			eq(agents.dbId, availableAgentsQuery.agentDbId),
 		)
-		.innerJoin(
-			builds,
-			eq(builds.dbId, availableAgentsQuery.latestBlueprintDbId),
-		);
-
-	// const availableAgentInputPorts = await db
-	// 	.select({
-	// 		agentId: availableAgentsQuery.agentId,
-	// 		id: ports.id,
-	// 		type: ports.type,
-	// 		name: ports.name,
-	// 	})
-	// 	.from(ports)
-	// 	.innerJoin(
-	// 		nodes,
-	// 		and(eq(nodes.id, ports.nodeId), eq(nodes.className, "onRequest")),
-	// 	)
-	// 	.innerJoin(
-	// 		availableAgentsQuery,
-	// 		eq(availableAgentsQuery.latestBlueprintId, nodes.blueprintId),
-	// 	)
-	// 	.where(and(eq(ports.direction, "output"), eq(ports.type, "data")));
-
-	// const portGroupsByAgentId = availableAgentInputPorts.reduce(
-	// 	(acc: { [key: number]: Port[] }, port) => {
-	// 		if (!acc[port.agentId]) {
-	// 			acc[port.agentId] = [];
-	// 		}
-	// 		acc[port.agentId].push(port);
-	// 		return acc;
-	// 	},
-	// 	{},
-	// );
-
-	// return availableAgents.map(({ blueprintId, name, ...agent }) => ({
-	// 	...agent,
-	// 	name: name ?? "",
-	// 	blueprintId: blueprintId as number,
-	// 	inputPorts: portGroupsByAgentId[agent.id] ?? [],
-	// }));
+		.innerJoin(builds, eq(builds.dbId, availableAgentsQuery.latestBuildDbId))
+		.innerJoin(triggerNodes, eq(triggerNodes.buildDbId, builds.dbId))
+		.innerJoin(nodes, eq(nodes.dbId, triggerNodes.nodeDbId));
+	return availableAgents.map(
+		(agent) =>
+			({
+				id: agent.id,
+				name: agent.name,
+				buildId: agent.buildId,
+				args: agent.triggerNode.ports.filter(
+					({ direction, type }) =>
+						direction === portDirection.source && type === portType.data,
+				),
+			}) satisfies Agent,
+	);
 };

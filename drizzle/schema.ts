@@ -144,6 +144,17 @@ export const nodes = pgTable(
 	}),
 );
 
+export const triggerNodes = pgTable("trigger_nodes", {
+	dbId: serial("db_id").primaryKey(),
+	buildDbId: integer("build_db_id")
+		.notNull()
+		.references(() => builds.dbId, { onDelete: "cascade" })
+		.unique(),
+	nodeDbId: integer("node_db_id")
+		.notNull()
+		.references(() => nodes.dbId, { onDelete: "cascade" }),
+});
+
 export const ports = pgTable(
 	"ports",
 	{
