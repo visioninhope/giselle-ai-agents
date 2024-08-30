@@ -4,9 +4,11 @@ import {
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { AnimatePresence, motion } from "framer-motion";
 import { BookOpenIcon, LayersIcon } from "lucide-react";
 import { type FC, useState } from "react";
 import type { JSX } from "react/jsx-runtime";
+import { match } from "ts-pattern";
 
 type NavItemProps = {
 	icon: JSX.Element;
@@ -30,6 +32,7 @@ const NavItem: FC<NavItemProps> = ({ icon, tooltip, onClick }) => {
 
 export const SideNav: FC = () => {
 	const [activeMenu, setActiveMenu] = useState("");
+	const [show, setShow] = useState(false);
 	return (
 		<div className="relative">
 			<div className="bg-slate-800 h-full px-2 pt-8 w-[60px]">
@@ -37,25 +40,36 @@ export const SideNav: FC = () => {
 					<NavItem
 						icon={<LayersIcon />}
 						tooltip="Overview"
-						onClick={() => setActiveMenu("overview")}
+						onClick={() => {
+							setShow(true);
+							setActiveMenu("overview");
+						}}
 					/>
 					<NavItem
 						icon={<BookOpenIcon />}
 						tooltip="Knowledges"
-						onClick={() => setActiveMenu("knowledges")}
+						onClick={() => {
+							setShow("true");
+							setActiveMenu("knowledges");
+						}}
 					/>
 				</div>
 			</div>
-			{activeMenu === "overview" && (
-				<div className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10">
-					Overview
-				</div>
-			)}
-			{activeMenu === "knowledges" && (
-				<div className="bg-blue-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10">
-					Knowledge
-				</div>
-			)}
+			<AnimatePresence>
+				{show && (
+					<motion.div
+						className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10"
+						initial={{ width: 0 }}
+						animate={{ width: "300px" }}
+						exit={{ width: 0 }}
+					>
+						{match(activeMenu)
+							.with("overview", () => "Overview")
+							.with("knowledges", () => "Knowledge")
+							.otherwise(() => null)}
+					</motion.div>
+				)}
+			</AnimatePresence>
 		</div>
 	);
 };
