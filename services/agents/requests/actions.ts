@@ -1,5 +1,5 @@
 import {
-	blueprints,
+	builds,
 	db,
 	nodes,
 	requestStacks,
@@ -36,10 +36,10 @@ export async function* createRequestStackGenerator(
 	const [request] = await db
 		.select({
 			dbId: requests.dbId,
-			graph: blueprints.graph,
+			graph: builds.graph,
 		})
 		.from(requests)
-		.innerJoin(blueprints, eq(blueprints.dbId, requests.blueprintDbId))
+		.innerJoin(builds, eq(builds.dbId, requests.buildDbId))
 		.where(eq(requests.dbId, args.requestDbId));
 
 	const triggerNode = getTriggerNode(request.graph);

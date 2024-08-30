@@ -1,4 +1,4 @@
-import type { AgentId } from "@/services/agents";
+import type { AgentId, BuildId } from "@/services/agents";
 import type {
 	Node,
 	NodeGraph,
@@ -105,8 +105,8 @@ export const agents = pgTable("agents", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const blueprints = pgTable("blueprints", {
-	id: text("id").$type<`blpr_${string}`>().notNull().unique(),
+export const builds = pgTable("builds", {
+	id: text("id").$type<BuildId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	graph: jsonb("graph").$type<PlaygroundGraph>().notNull(),
 	graphHash: text("graph_hash").notNull().unique(),
@@ -116,14 +116,14 @@ export const blueprints = pgTable("blueprints", {
 	beforeId: integer("before_id"),
 	after: integer("after_id"),
 });
-export const blueprintRelations = relations(blueprints, ({ one }) => ({
-	beforeBlueprint: one(blueprints, {
-		fields: [blueprints.beforeId],
-		references: [blueprints.id],
+export const buildRelations = relations(builds, ({ one }) => ({
+	before: one(builds, {
+		fields: [builds.beforeId],
+		references: [builds.id],
 	}),
-	afterBlueprint: one(blueprints, {
-		fields: [blueprints.after],
-		references: [blueprints.id],
+	after: one(builds, {
+		fields: [builds.after],
+		references: [builds.id],
 	}),
 }));
 
@@ -132,15 +132,15 @@ export const nodes = pgTable(
 	{
 		id: text("id").$type<Node["id"]>().notNull(),
 		dbId: serial("db_id").primaryKey(),
-		blueprintDbId: integer("blueprint_db_id")
+		buildDbId: integer("build_db_id")
 			.notNull()
-			.references(() => blueprints.dbId, { onDelete: "cascade" }),
+			.references(() => builds.dbId, { onDelete: "cascade" }),
 		className: text("class_name").notNull(),
 		data: jsonb("data").notNull(),
 		graph: jsonb("graph").$type<NodeGraph>().notNull(),
 	},
 	(nodes) => ({
-		nodesIdBlueprintDbIdUnieque: unique().on(nodes.id, nodes.blueprintDbId),
+		nodesIdBuildDbIdUnieque: unique().on(nodes.id, nodes.buildDbId),
 	}),
 );
 
@@ -166,9 +166,9 @@ export const edges = pgTable(
 	{
 		id: text("id").$type<PlaygroundEdge["id"]>().notNull(),
 		dbId: serial("db_id").primaryKey(),
-		blueprintDbId: integer("blueprint_db_id")
+		buildDbId: integer("build_db_id")
 			.notNull()
-			.references(() => blueprints.dbId, { onDelete: "cascade" }),
+			.references(() => builds.dbId, { onDelete: "cascade" }),
 		targetPortDbId: integer("target_port_db_id")
 			.notNull()
 			.references(() => ports.dbId, { onDelete: "cascade" }),
@@ -181,16 +181,16 @@ export const edges = pgTable(
 			edge.targetPortDbId,
 			edge.sourcePortDbId,
 		),
-		edgesIdBlueprintDbIdUnique: unique().on(edge.id, edge.blueprintDbId),
+		edgesIdBuildDbIdUnique: unique().on(edge.id, edge.buildDbId),
 	}),
 );
 
 export const requests = pgTable("requests", {
 	id: text("id").$type<RequestId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
-	blueprintDbId: integer("blueprint_db_id")
+	buildDbId: integer("build_db_id")
 		.notNull()
-		.references(() => blueprints.dbId),
+		.references(() => builds.dbId),
 	status: text("status").$type<RequestStatus>().notNull().default("queued"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	startedAt: timestamp("started_at"),

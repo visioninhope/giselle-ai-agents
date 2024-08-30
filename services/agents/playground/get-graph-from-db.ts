@@ -1,6 +1,6 @@
 "use server";
 
-import { agents, blueprints, db } from "@/drizzle";
+import { agents, builds, db } from "@/drizzle";
 import { eq } from "drizzle-orm";
 import type { AgentId } from "../types";
 

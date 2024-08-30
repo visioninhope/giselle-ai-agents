@@ -1,6 +1,6 @@
 "use server";
 
-import { agents, blueprints, db } from "@/drizzle";
+import { agents, builds, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import type { AgentId } from "../types";

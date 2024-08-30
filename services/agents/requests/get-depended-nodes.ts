@@ -54,7 +54,7 @@ export const getDependedNodes = async ({
       1 DEPTH
     FROM
       nodes source_nodes
-      INNER JOIN requests ON requests.blueprint_db_id = source_nodes.blueprint_db_id
+      INNER JOIN requests ON requests.build_db_id = source_nodes.build_db_id
       INNER JOIN ports source_ports ON source_ports.node_db_id = source_nodes.db_id
       AND source_ports.type = 'data'
       AND source_ports.direction = 'target'

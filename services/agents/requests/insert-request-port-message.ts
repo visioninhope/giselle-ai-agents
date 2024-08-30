@@ -1,5 +1,5 @@
 import {
-	blueprints,
+	builds,
 	db,
 	nodes,
 	ports,
@@ -21,8 +21,8 @@ export const insertRequestPortMessage = async (
 		.select({ dbId: ports.dbId })
 		.from(ports)
 		.innerJoin(nodes, eq(nodes.dbId, ports.nodeDbId))
-		.innerJoin(blueprints, eq(blueprints.dbId, nodes.blueprintDbId))
-		.innerJoin(requests, eq(requests.blueprintDbId, blueprints.dbId))
+		.innerJoin(builds, eq(builds.dbId, nodes.buildDbId))
+		.innerJoin(requests, eq(requests.buildDbId, builds.dbId))
 		.where(and(eq(requests.dbId, args.requestDbId), eq(ports.id, args.portId)));
 	await db.insert(requestPortMessages).values({
 		requestDbId: args.requestDbId,

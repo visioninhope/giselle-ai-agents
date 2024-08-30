@@ -1,48 +1,40 @@
 "use server";
 
-import {
-	agents,
-	blueprints,
-	db,
-	edges,
-	nodes,
-	ports,
-	requests,
-} from "@/drizzle";
+import { agents, builds, db, edges, nodes, ports, requests } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
 import type { AgentId } from "../types";
 
-export const getOrBuildBlueprint = async (agentId: AgentId) => {
+export const buildPlaygroundGraph = async (agentId: AgentId) => {
 	const [agent] = await db.select().from(agents).where(eq(agents.id, agentId));
 	invariant(agent.graphHash != null, "Agent graph must be set");
 
-	const [blueprint] = await db
+	const [build] = await db
 		.select()
-		.from(blueprints)
-		.where(eq(blueprints.graphHash, agent.graphHash));
-	if (blueprint != null) {
-		return { id: blueprint.id };
+		.from(builds)
+		.where(eq(builds.graphHash, agent.graphHash));
+	if (build != null) {
+		return { id: build.id };
 	}
-	const [newBlueprint] = await db
-		.insert(blueprints)
+	const [newBuild] = await db
+		.insert(builds)
 		.values({
-			id: `blpr_${createId()}`,
+			id: `bld_${createId()}`,
 			agentDbId: agent.dbId,
 			graph: agent.graph,
 			graphHash: agent.graphHash,
 		})
 		.returning({
-			id: blueprints.id,
-			dbId: blueprints.dbId,
+			id: builds.id,
+			dbId: builds.dbId,
 		});
 	const newNodes = await db
 		.insert(nodes)
 		.values(
 			agent.graph.nodes.map(({ id, className, data, ports, name }) => ({
 				id,
-				blueprintDbId: newBlueprint.dbId,
+				buildDbId: newBuild.dbId,
 				className,
 				data,
 				graph: {
@@ -89,7 +81,7 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 			}
 			const edgeInsertValue = {
 				id,
-				blueprintDbId: newBlueprint.dbId,
+				buildDbId: newBuild.dbId,
 				sourcePortDbId: sourcePort.dbId,
 				targetPortDbId: targetPort.dbId,
 			} satisfies typeof edges.$inferInsert;
@@ -97,22 +89,22 @@ export const getOrBuildBlueprint = async (agentId: AgentId) => {
 		})
 		.filter((v) => v != null);
 	await db.insert(edges).values(edgeInsertValues);
-	return { id: newBlueprint.id };
+	return { id: newBuild.id };
 };
 
 export const createRequest = async (
-	blueprintId: (typeof blueprints.$inferInsert)["id"],
+	buildId: (typeof builds.$inferInsert)["id"],
 ) => {
-	const [blueprint] = await db
-		.select({ dbId: blueprints.dbId })
-		.from(blueprints)
-		.where(eq(blueprints.id, blueprintId));
+	const [build] = await db
+		.select({ dbId: builds.dbId })
+		.from(builds)
+		.where(eq(builds.id, buildId));
 	const requestId = `rqst_${createId()}` as const;
 	const [newRequest] = await db
 		.insert(requests)
 		.values({
 			id: requestId,
-			blueprintDbId: blueprint.dbId,
+			buildDbId: build.dbId,
 		})
 		.returning({
 			dbId: requests.dbId,

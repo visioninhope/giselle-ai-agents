@@ -1,7 +1,7 @@
 "use server";
 
 import {
-	blueprints,
+	builds,
 	db,
 	nodes,
 	ports,
@@ -59,8 +59,8 @@ export const buildTemplate = async ({
 		.select({ dbId: ports.dbId })
 		.from(ports)
 		.innerJoin(nodes, eq(nodes.dbId, ports.nodeDbId))
-		.innerJoin(blueprints, eq(blueprints.dbId, nodes.blueprintDbId))
-		.innerJoin(requests, eq(requests.blueprintDbId, blueprints.dbId))
+		.innerJoin(builds, eq(builds.dbId, nodes.buildDbId))
+		.innerJoin(requests, eq(requests.buildDbId, builds.dbId))
 		.where(and(eq(requests.dbId, requestDbId), eq(ports.id, outputPortId)));
 	await db.insert(requestPortMessages).values({
 		requestDbId: requestDbId,

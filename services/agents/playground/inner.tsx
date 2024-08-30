@@ -37,7 +37,8 @@ const playgroundNodesToReactFlowNodes = (
 					),
 					stepStatus: request?.stacks
 						.flatMap(
-							(stack) => stack.steps.find((step) => step.nodeId === id)?.status,
+							(stack) =>
+								stack.steps.find((step) => step.node.id === id)?.status,
 						)
 						.find((status) => status != null),
 				},

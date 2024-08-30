@@ -11,7 +11,7 @@ import {
 } from "react";
 import type { AgentId } from "../../types";
 import { getRequest } from "../get-request";
-import { createRequest, getOrBuildBlueprint } from "../process";
+import { buildPlaygroundGraph, createRequest } from "../process";
 import { runOnTriggerDev, runOnVercel } from "../runners";
 import {
 	type Request,
@@ -39,8 +39,8 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	const [requestId, setRequestId] = useState<RequestId | undefined>();
 	const [lastRequest, setLastRequest] = useState<Request | undefined | null>();
 	const requestStart = useCallback(async () => {
-		const blueprint = await getOrBuildBlueprint(agentId);
-		const newRequest = await createRequest(blueprint.id);
+		const build = await buildPlaygroundGraph(agentId);
+		const newRequest = await createRequest(build.id);
 		setRequestId(newRequest.requestId);
 		switch (requestRunnerProvider) {
 			case "vercelFunctions":

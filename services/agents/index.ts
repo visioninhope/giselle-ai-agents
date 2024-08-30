@@ -1,1 +1,1 @@
-export type { AgentId } from "./types";
+export type { AgentId, BuildId } from "./types";

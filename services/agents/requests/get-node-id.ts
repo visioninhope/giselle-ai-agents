@@ -1,6 +1,6 @@
 "use server";
 
-import { blueprints, db, nodes, requests } from "@/drizzle";
+import { builds, db, nodes, requests } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import type { Node } from "../nodes";
 
@@ -10,7 +10,7 @@ export const getNodeDbId = async (nodeId: Node["id"], requestDbId: number) => {
 			dbId: nodes.dbId,
 		})
 		.from(nodes)
-		.innerJoin(requests, eq(requests.blueprintDbId, nodes.blueprintDbId))
+		.innerJoin(requests, eq(requests.buildDbId, nodes.buildDbId))
 		.where(and(eq(nodes.id, nodeId), eq(requests.dbId, requestDbId)));
 	return node.dbId;
 };

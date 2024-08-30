@@ -1,7 +1,7 @@
 "use server";
 
 import {
-	blueprints,
+	builds,
 	db,
 	edges,
 	nodes,
@@ -34,8 +34,8 @@ export const insertRequestResult = async ({
 		.innerJoin(edges, eq(edges.sourcePortDbId, sourcePorts.dbId))
 		.innerJoin(targetPorts, eq(targetPorts.dbId, edges.targetPortDbId))
 		.innerJoin(nodes, eq(nodes.dbId, targetPorts.nodeDbId))
-		.innerJoin(blueprints, eq(blueprints.dbId, nodes.blueprintDbId))
-		.innerJoin(requests, eq(requests.blueprintDbId, blueprints.dbId))
+		.innerJoin(builds, eq(builds.dbId, nodes.buildDbId))
+		.innerJoin(requests, eq(requests.buildDbId, builds.dbId))
 		.where(
 			and(
 				eq(requests.dbId, requestDbId),
