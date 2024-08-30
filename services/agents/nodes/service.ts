@@ -1,4 +1,3 @@
-import type { Knowledge } from "@/services/knowledges";
 import { createId } from "@paralleldrive/cuid2";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
@@ -101,7 +100,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			return renderPanel({ node, data });
 		},
-		runAction: async (name, { node, requestDbId, knowledges, nodeDbId }) => {
+		runAction: async (name, { node, requestDbId, nodeDbId }) => {
 			const nodeClass = nodeClasses[name];
 			const action = nodeClass.action;
 			if (action == null) {

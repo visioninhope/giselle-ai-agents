@@ -14,7 +14,7 @@ const agentIdSchema = custom<AgentId>(
 );
 
 export type BuildId = `bld_${string}`;
-const buildIdSchema = custom<AgentId>(
+const buildIdSchema = custom<BuildId>(
 	(input) => typeof input === "string" && /^bld_.*$/.test(input),
 );
 

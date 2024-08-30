@@ -1,4 +1,4 @@
-import { literal, number, object, string } from "valibot";
+import { object } from "valibot";
 import { agentSchema } from "../../../types";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
 import { nodeClassCategory, portType } from "../../type";
@@ -16,10 +16,9 @@ export const agent = buildNodeClass("agent", {
 	dataSchema: object({
 		relevantAgent: agentSchema,
 	}),
-	action: async ({ requestDbId, nodeDbId, findDefaultSourceport, data }) => {
+	action: async ({ requestDbId, findDefaultSourceport, data }) => {
 		await invokeAgent({
 			requestDbId,
-			nodeDbId,
 			agent: data.relevantAgent,
 			resultPort: findDefaultSourceport("result"),
 		});
