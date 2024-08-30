@@ -7,7 +7,7 @@ import { insertRequestPortMessage } from "../../../requests/insert-request-port-
 import { createRequest } from "../../../requests/process";
 import { runOnVercel } from "../../../requests/runners";
 import type { Agent } from "../../../types";
-import type { Port } from "../../type";
+import type { Port } from "../../types";
 
 type InvokeAgentArgs = {
 	requestDbId: number;

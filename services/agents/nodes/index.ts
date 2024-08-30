@@ -1,6 +1,6 @@
 import { nodeClasses } from "./classes";
 import { createNodeService } from "./service";
-import type { NodeClassCategory } from "./type";
+import type { NodeClassCategory } from "./types";
 export type {
 	NodeClassCategory,
 	NodeGraph,
@@ -8,8 +8,8 @@ export type {
 	Port,
 	PortType,
 	PortDirection,
-} from "./type";
-export { portDirection } from "./type";
+} from "./types";
+export { portDirection } from "./types";
 export { Finder } from "./components/finder";
 export { GiselleNode, type GiselleNodeData } from "./components/node";
 export { OperationProvider } from "./contexts";

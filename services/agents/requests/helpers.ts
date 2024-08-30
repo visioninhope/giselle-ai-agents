@@ -1,5 +1,5 @@
 import { nodeClassHasCategory } from "../nodes";
-import { nodeClassCategory } from "../nodes/type";
+import { nodeClassCategory } from "../nodes/types";
 import type { PlaygroundGraph } from "../playground/types";
 
 export const getTriggerNode = (graph: PlaygroundGraph) => {

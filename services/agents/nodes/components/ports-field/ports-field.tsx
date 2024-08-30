@@ -9,7 +9,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { PlusIcon } from "lucide-react";
 import { type FC, type FormEventHandler, useCallback, useState } from "react";
 import { useAddPort } from "../../contexts/add-port";
-import type { NodeGraph, PortDirection } from "../../type";
+import type { NodeGraph, PortDirection } from "../../types";
 import { PortListItem } from "./port-list-item";
 
 type PortsField = {

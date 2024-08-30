@@ -3,7 +3,7 @@
 import type { FC } from "react";
 import { PortsField } from "../../components/ports-field";
 import { PropertyField } from "../../components/property-field";
-import { type NodeGraph, portDirection } from "../../type";
+import { type NodeGraph, portDirection } from "../../types";
 
 type TextNodePanelProps = {
 	node: NodeGraph;

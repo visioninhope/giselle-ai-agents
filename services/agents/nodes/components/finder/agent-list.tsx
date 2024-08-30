@@ -12,7 +12,7 @@ import { nodeService } from "../..";
 import type { Agent } from "../../../types";
 import { getAvailableAgents } from "../../actions/get-available-agents";
 import { buildDefaultPort } from "../../builder";
-import { type NodeGraph, portType } from "../../type";
+import { type NodeGraph, portType } from "../../types";
 
 type AgentListProps = {
 	onSelect: (node: NodeGraph) => void;

@@ -1,4 +1,4 @@
-import type { NodeClasses } from "../type";
+import type { NodeClasses } from "../types";
 import { agent } from "./agent";
 import { onRequest } from "./on-request";
 import { response } from "./response";

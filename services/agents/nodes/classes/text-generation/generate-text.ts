@@ -4,7 +4,7 @@ import { db, pullMessages, requestPortMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { insertRequestPortMessage } from "@/services/agents/requests/insert-request-port-message";
 import { and, eq } from "drizzle-orm";
-import type { Port } from "../../type";
+import type { Port } from "../../types";
 
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = () => {};

@@ -12,7 +12,7 @@ import {
 } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import type { Port } from "../../type";
+import type { Port } from "../../types";
 
 type InsertRequestResultArgs = {
 	requestDbId: number;

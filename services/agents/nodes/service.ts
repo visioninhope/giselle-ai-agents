@@ -8,7 +8,7 @@ import {
 	type NodeClasses,
 	type NodeGraph,
 	portDirection,
-} from "./type";
+} from "./types";
 
 type InferSchema<T> = T extends { dataSchema?: infer U }
 	? U extends undefined

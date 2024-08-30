@@ -1,11 +1,10 @@
-import type { AgentId, BuildId } from "@/services/agents";
 import type {
 	Node,
 	NodeGraph,
 	Port,
 	PortDirection,
 	PortType,
-} from "@/services/agents/nodes";
+} from "@/services/agents/nodes/types";
 import type {
 	PlaygroundEdge,
 	PlaygroundGraph,
@@ -16,7 +15,8 @@ import type {
 	RequestStatus,
 	RequestStepId,
 	RequestStepStatus,
-} from "@/services/agents/requests";
+} from "@/services/agents/requests/types";
+import type { AgentId, BuildId } from "@/services/agents/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,

@@ -1,6 +1,6 @@
 import { object, parse, string } from "valibot";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { nodeClassCategory, portType } from "../../type";
+import { nodeClassCategory, portType } from "../../types";
 import { buildTemplate } from "./build-template";
 import { TextNodePanel } from "./ui";
 

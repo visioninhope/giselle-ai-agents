@@ -4,7 +4,7 @@ import {
 	createContext,
 	useContext,
 } from "react";
-import type { Port } from "../type";
+import type { Port } from "../types";
 
 type UpdatePortFn = (portId: Port["id"], updates: Partial<Port>) => void;
 type UpdatePortContextState = {

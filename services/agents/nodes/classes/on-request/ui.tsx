@@ -2,7 +2,7 @@
 
 import type { FC } from "react";
 import { PortsField } from "../../components/ports-field";
-import { type NodeGraph, portDirection } from "../../type";
+import { type NodeGraph, portDirection } from "../../types";
 
 type OnRequestNodePanelProps = {
 	node: NodeGraph;

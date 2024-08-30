@@ -4,7 +4,7 @@ import {
 	createContext,
 	useContext,
 } from "react";
-import type { Port } from "../type";
+import type { Port } from "../types";
 
 type DeletePortFn = (portId: Port["id"]) => void;
 type DeletePortContextState = {

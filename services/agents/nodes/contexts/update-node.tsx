@@ -4,7 +4,7 @@ import {
 	createContext,
 	useContext,
 } from "react";
-import type { Node } from "../type";
+import type { Node } from "../types";
 
 type UpdateNodeFn = (
 	portId: Node["id"],

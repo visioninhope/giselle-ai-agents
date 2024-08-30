@@ -1,5 +1,5 @@
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { nodeClassCategory, portType } from "../../type";
+import { nodeClassCategory, portType } from "../../types";
 import { insertRequestResult } from "./insert-request-result";
 
 export const response = buildNodeClass("response", {

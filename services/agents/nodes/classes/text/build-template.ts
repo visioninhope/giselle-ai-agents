@@ -11,7 +11,7 @@ import {
 } from "@/drizzle";
 import { logger } from "@trigger.dev/sdk/v3";
 import { and, eq } from "drizzle-orm";
-import type { Port } from "../../type";
+import type { Port } from "../../types";
 
 type BuildTemplateArgs = {
 	requestDbId: number;

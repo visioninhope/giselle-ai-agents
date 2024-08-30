@@ -1,11 +1,11 @@
 import { SubmitButton } from "@/components/ui/submit-button";
-import { db, schema } from "@/drizzle";
+import { agents as agentsTable, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 async function AgentList() {
-	const agents = await db.select().from(schema.agents);
+	const agents = await db.select().from(agentsTable);
 	return (
 		<div>
 			{agents.map(({ id, name }) => (
@@ -24,7 +24,7 @@ export default function AgentListPage() {
 	const createAgent = async () => {
 		"use server";
 		const id = `agnt_${createId()}` as const;
-		await db.insert(schema.agents).values({
+		await db.insert(agentsTable).values({
 			id,
 		});
 		redirect(`/v2/agents/${id}`);

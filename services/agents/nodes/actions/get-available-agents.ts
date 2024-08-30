@@ -12,7 +12,7 @@ import {
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
 import { requestStatus } from "../../requests";
 import type { Agent } from "../../types";
-import { portDirection, portType } from "../type";
+import { portDirection, portType } from "../types";
 
 export const getAvailableAgents = async () => {
 	await db.select().from(agents);

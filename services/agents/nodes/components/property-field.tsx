@@ -2,7 +2,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { type FC, useCallback, useRef } from "react";
 import { useUpdateNode } from "../contexts/update-node";
-import type { Node } from "../type";
+import type { Node } from "../types";
 
 type PropertyFieldProps = {
 	name: string;

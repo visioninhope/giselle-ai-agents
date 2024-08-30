@@ -12,7 +12,7 @@ import {
 import invariant from "tiny-invariant";
 import { useDeletePort } from "../../contexts/delete-port";
 import { useUpdatePort } from "../../contexts/update-port";
-import type { Port } from "../../type";
+import type { Port } from "../../types";
 
 type PortListItemProps = {
 	port: Port;

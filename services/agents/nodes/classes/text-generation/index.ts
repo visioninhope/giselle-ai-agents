@@ -1,5 +1,5 @@
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { nodeClassCategory, portType } from "../../type";
+import { nodeClassCategory, portType } from "../../types";
 import { generateText } from "./generate-text";
 
 export const textGeneration = buildNodeClass("textGeneration", {

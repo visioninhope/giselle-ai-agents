@@ -8,7 +8,7 @@ import { CheckCircleIcon, CircleIcon, LoaderCircleIcon } from "lucide-react";
 import type { FC } from "react";
 import { match } from "ts-pattern";
 import { portDirection } from "../../nodes";
-import { portType } from "../../nodes/type";
+import { portType } from "../../nodes/types";
 import { useRequest } from "../contexts/request-provider";
 import { requestStepStatus } from "../types";
 

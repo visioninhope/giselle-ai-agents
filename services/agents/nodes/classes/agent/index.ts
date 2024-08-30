@@ -1,7 +1,7 @@
 import { object } from "valibot";
 import { agentSchema } from "../../../types";
 import { buildDefaultPort, buildNodeClass } from "../../builder";
-import { nodeClassCategory, portType } from "../../type";
+import { nodeClassCategory, portType } from "../../types";
 import { invokeAgent } from "./invoke-agent";
 
 export const agent = buildNodeClass("agent", {

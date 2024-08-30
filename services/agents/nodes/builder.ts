@@ -6,7 +6,7 @@ import type {
 	NodeClassCategory,
 	NodeClassOptions,
 	PortType,
-} from "./type";
+} from "./types";
 
 type CreatePortArgs<TType extends PortType, TName extends string> = {
 	name: TName;
