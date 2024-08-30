@@ -118,6 +118,12 @@ export async function runStep(
 	requestStackDbId: number,
 	requestStepDbId: number,
 ) {
+	await db
+		.update(requestSteps)
+		.set({
+			status: requestStepStatus.inProgress,
+		})
+		.where(eq(requestSteps.dbId, requestStepDbId));
 	const [node] = await db
 		.select({
 			id: nodes.id,
