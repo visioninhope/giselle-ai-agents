@@ -1,4 +1,4 @@
-import type { Node } from "../nodes";
+import type { Node, NodeGraph, Port } from "../nodes";
 export type RequestId = `rqst_${string}`;
 export type RequestStackId = `rqst.stck_${string}`;
 export type RequestStepId = `rqst.stp_${string}`;
@@ -28,8 +28,12 @@ export type RequestStepStatus =
 	(typeof requestStepStatus)[keyof typeof requestStepStatus];
 type RequestStep = {
 	id: RequestStepId;
-	nodeId: Node["id"];
+	node: NodeGraph;
 	status: RequestStepStatus;
+	portMessages: Array<{
+		portId: Port["id"];
+		message: string;
+	}>;
 };
 export type RequestStack = {
 	id: RequestStackId;

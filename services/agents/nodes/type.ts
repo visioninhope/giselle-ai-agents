@@ -2,6 +2,7 @@ import type { Knowledge } from "@/services/knowledges";
 import type { JSX } from "react";
 import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 export type Node<TClassName extends string = string, TData = any> = {
 	id: `nd_${string}`;
 	className: TClassName;
@@ -27,6 +28,7 @@ export type Port<TName extends string = string> = {
 	direction: PortDirection;
 };
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 export type NodeGraph<TClassName extends string = string, TData = any> = Node<
 	TClassName,
 	TData

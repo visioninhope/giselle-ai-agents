@@ -1,6 +1,7 @@
 // useDebounce.ts
 import { useCallback, useEffect, useRef } from "react";
 
+// biome-ignore lint: lint/suspicious/noExplicitAny
 export function useDebounce<T extends (...args: any[]) => any>(
 	callback: T,
 	delay: number,

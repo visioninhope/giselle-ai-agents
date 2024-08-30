@@ -7,6 +7,8 @@ import {
 import { CheckCircleIcon, CircleIcon, LoaderCircleIcon } from "lucide-react";
 import type { FC } from "react";
 import { match } from "ts-pattern";
+import { portDirection } from "../../nodes";
+import { portType } from "../../nodes/type";
 import { useRequest } from "../contexts/request-provider";
 import { requestStepStatus } from "../types";
 
@@ -25,7 +27,7 @@ export const RequestLogger: FC = () => {
 						<AccordionItem key={step.id} value={step.id}>
 							<AccordionTrigger>
 								<div className="flex items-center justify-between w-full">
-									<p>{step.id}</p>
+									<p>{step.node.name}</p>
 									<div className="flex items-center justify-end gap-2">
 										{match(step)
 											.with({ status: requestStepStatus.queued }, () => (
@@ -41,7 +43,67 @@ export const RequestLogger: FC = () => {
 									</div>
 								</div>
 							</AccordionTrigger>
-							<AccordionContent>hello</AccordionContent>
+							<AccordionContent>
+								{match(step)
+									.with({ status: requestStepStatus.inProgress }, () => (
+										<p>Running...</p>
+									))
+									.with({ status: requestStepStatus.completed }, () => (
+										<div className="max-h-[400px] overflow-y-auto flex flex-col gap-4">
+											{step.node.ports.filter(
+												({ direction, type }) =>
+													type === portType.data &&
+													direction === portDirection.target,
+											).length > 0 && (
+												<div>
+													<p className="mb-2">Incoming Messages</p>
+													{step.node.ports
+														.filter(
+															({ direction, type }) =>
+																type === portType.data &&
+																direction === portDirection.target,
+														)
+														.map((port) => (
+															<p key={port.id} className="text-xs">
+																{port.name}:
+																{
+																	step.portMessages.find(
+																		({ portId }) => portId === port.id,
+																	)?.message
+																}
+															</p>
+														))}
+												</div>
+											)}
+											{step.node.ports.filter(
+												({ direction, type }) =>
+													type === portType.data &&
+													direction === portDirection.source,
+											).length > 0 && (
+												<div>
+													<p className="mb-2">Outgoing Messages</p>
+													{step.node.ports
+														.filter(
+															({ direction, type }) =>
+																type === portType.data &&
+																direction === portDirection.source,
+														)
+														.map((port) => (
+															<p key={port.id} className="text-xs">
+																{port.name}:
+																{
+																	step.portMessages.find(
+																		({ portId }) => portId === port.id,
+																	)?.message
+																}
+															</p>
+														))}
+												</div>
+											)}
+										</div>
+									))
+									.otherwise(() => null)}
+							</AccordionContent>
 						</AccordionItem>
 					)),
 				)}
