@@ -1,4 +1,9 @@
 import type {
+	FileId,
+	KnowledgeContentType,
+	KnowledgeId,
+} from "@/services/agents/knowledges/types";
+import type {
 	Node,
 	NodeGraph,
 	Port,
@@ -306,76 +311,85 @@ export const oauthCredentials = pgTable(
 	}),
 );
 
-// export const knowledges = pgTable("knowledges", {
-// 	id: serial("id").primaryKey(),
-// 	name: text("name").notNull(),
-// 	blueprintId: integer("blueprint_id")
-// 		.notNull()
-// 		.references(() => blueprints.id, { onDelete: "cascade" }),
-// });
+export const knowledges = pgTable("knowledges", {
+	id: text("id").$type<KnowledgeId>().notNull().unique(),
+	dbId: serial("db_id").primaryKey(),
+	name: text("name").notNull(),
+	agentDbId: integer("agent_db_id")
+		.notNull()
+		.references(() => agents.dbId, { onDelete: "cascade" }),
+});
 
-// type OpenaiVectorStoreStatus = VectorStore["status"];
-// export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
-// 	"knowledge_openai_vector_store_representations",
-// 	{
-// 		id: serial("id").primaryKey(),
-// 		knowledgeId: integer("knowledge_id")
-// 			.notNull()
-// 			.references(() => knowledges.id, { onDelete: "cascade" }),
-// 		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
-// 		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
-// 	},
-// );
-// export const files = pgTable("files", {
-// 	id: serial("id").primaryKey(),
-// 	fileName: text("file_name").notNull(),
-// 	fileType: text("file_type").notNull(),
-// 	fileSize: integer("file_size").notNull(),
-// 	blobUrl: text("blob_url").notNull(),
-// 	createdAt: timestamp("created_at").defaultNow().notNull(),
-// });
-// export const fileOpenaiFileRepresentations = pgTable(
-// 	"file_openai_file_representations",
-// 	{
-// 		id: serial("id").primaryKey(),
-// 		fileId: integer("file_id")
-// 			.notNull()
-// 			.references(() => files.id, { onDelete: "cascade" }),
-// 		openaiFileId: text("openai_file_id").notNull().unique(),
-// 	},
-// );
+type OpenaiVectorStoreStatus = VectorStore["status"];
+export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
+	"knowledge_openai_vector_store_representations",
+	{
+		dbId: serial("db_id").primaryKey(),
+		knowledgeDbId: integer("knowledge_db_id")
+			.notNull()
+			.references(() => knowledges.dbId, { onDelete: "cascade" }),
+		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
+		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
+	},
+);
+export const files = pgTable("files", {
+	id: text("id").$type<FileId>().notNull().unique(),
+	dbId: serial("db_id").primaryKey(),
+	fileName: text("file_name").notNull(),
+	fileType: text("file_type").notNull(),
+	fileSize: integer("file_size").notNull(),
+	blobUrl: text("blob_url").notNull(),
+	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export const fileOpenaiFileRepresentations = pgTable(
+	"file_openai_file_representations",
+	{
+		dbId: serial("db_id").primaryKey(),
+		fileId: integer("file_id")
+			.notNull()
+			.references(() => files.dbId, { onDelete: "cascade" }),
+		openaiFileId: text("openai_file_id").notNull().unique(),
+	},
+);
 
-// export type KnowledgeContentType = "file" | "text";
-// export const knowledgeContents = pgTable(
-// 	"knowledge_contents",
-// 	{
-// 		id: serial("id").primaryKey(),
-// 		name: text("name").notNull(),
-// 		type: text("knowledge_content_type")
-// 			.$type<KnowledgeContentType>()
-// 			.notNull(),
-// 		knowledgeId: integer("knowledge_id")
-// 			.notNull()
-// 			.references(() => knowledges.id, { onDelete: "cascade" }),
-// 		fileId: integer("file_id")
-// 			.notNull()
-// 			.references(() => files.id, { onDelete: "cascade" }),
-// 	},
-// 	(knowledgeContents) => ({
-// 		knowledgeContentsKnowledgeIdFileIdUnique: unique().on(
-// 			knowledgeContents.fileId,
-// 			knowledgeContents.knowledgeId,
-// 		),
-// 	}),
-// );
+export const knowledgeContents = pgTable(
+	"knowledge_contents",
+	{
+		dbId: serial("db_id").primaryKey(),
+		name: text("name").notNull(),
+		type: text("knowledge_content_type")
+			.$type<KnowledgeContentType>()
+			.notNull(),
+		knowledgeDbId: integer("knowledge_db_id")
+			.notNull()
+			.references(() => knowledges.dbId, { onDelete: "cascade" }),
+		fileDbId: integer("file_db_id")
+			.notNull()
+			.references(() => files.dbId, { onDelete: "cascade" }),
+	},
+	(knowledgeContents) => ({
+		knowledgeContentsKnowledgeDbIdFileDbIdUnique: unique().on(
+			knowledgeContents.fileDbId,
+			knowledgeContents.knowledgeDbId,
+		),
+	}),
+);
 
-// export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
-// 	"knowledge_content_openai_vector_store_file_representations",
-// 	{
-// 		id: serial("id").primaryKey(),
-// 		knowledgeContentId: integer("knowledge_content_id")
-// 			.notNull()
-// 			.references(() => knowledgeContents.id, { onDelete: "cascade" }),
-// 		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
-// 	},
-// );
+export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
+	"knowledge_content_openai_vector_store_file_representations",
+	{
+		dbId: serial("db_id").primaryKey(),
+		knowledgeContentDbId: integer("knowledge_content_db_id")
+			.notNull()
+			.references(() => knowledgeContents.dbId, { onDelete: "cascade" }),
+		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
+	},
+
+	(knowledgeContentOpenaiVectorStoreFileRepresentations) => ({
+		knowledgeContentOpenaiVectorStoreFileRepresentationsKnowledgeDbIdOpenaiVectorStoreFileDbIdUnique:
+			unique().on(
+				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
+				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
+			),
+	}),
+);
