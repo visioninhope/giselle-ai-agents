@@ -1,4 +1,3 @@
-import type { Knowledge } from "@/services/knowledges";
 import type { JSX } from "react";
 import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
 

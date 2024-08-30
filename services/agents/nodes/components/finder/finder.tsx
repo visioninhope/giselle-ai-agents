@@ -14,7 +14,6 @@ import {
 import type { FC, HTMLAttributes } from "react";
 import { type NodeGraph, nodeService } from "../../";
 import { AgentList } from "./agent-list";
-import { KnowledgeList } from "./knowledge-list";
 
 type FinderProps = Pick<
 	HTMLAttributes<HTMLDivElement>,
