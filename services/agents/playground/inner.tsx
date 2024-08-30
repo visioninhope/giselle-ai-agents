@@ -14,6 +14,7 @@ import {
 import { type Request, useRequest } from "../requests";
 import { playgroundState, usePlayground } from "./playground-context";
 import { PropertyPanel } from "./property-panel";
+import { SideNav } from "./side-nav";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
 import { useContextMenu } from "./use-context-menu";
 
@@ -85,7 +86,8 @@ export const Inner: FC = () => {
 		lastRequest,
 	]);
 	return (
-		<div className="h-screen w-full">
+		<div className="h-screen w-full flex">
+			<SideNav />
 			{state === playgroundState.initialize ? (
 				<ReactFlow key={"loader"}>
 					<Background />
