@@ -7,8 +7,7 @@ export default supabaseMiddleware(async (user, request) => {
 		!user &&
 		!request.nextUrl.pathname.startsWith("/login") &&
 		!request.nextUrl.pathname.startsWith("/signup") &&
-		!request.nextUrl.pathname.startsWith("/verify-email") &&
-		!request.nextUrl.pathname.startsWith("/v2")
+		!request.nextUrl.pathname.startsWith("/verify-email")
 	) {
 		// no user, potentially respond by redirecting the user to the login page
 		const url = request.nextUrl.clone();

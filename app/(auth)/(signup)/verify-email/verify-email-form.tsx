@@ -8,12 +8,11 @@ import {
 } from "@/components/ui/input-otp";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { type FC, useActionState, useCallback, useRef } from "react";
+import { useSignupContext } from "../context";
 import { verifyEmail } from "./verify-email";
 
-type VerifyEmailForm = {
-	verificationEmail: string;
-};
-export const VerifyEmailForm: FC<VerifyEmailForm> = ({ verificationEmail }) => {
+export const VerifyEmailForm: FC = () => {
+	const { state } = useSignupContext();
 	const [authError, action] = useActionState(verifyEmail, null);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
@@ -40,11 +39,7 @@ export const VerifyEmailForm: FC<VerifyEmailForm> = ({ verificationEmail }) => {
 						<InputOTPSlot index={5} />
 					</InputOTPGroup>
 				</InputOTP>
-				<input
-					type="hidden"
-					name="verificationEmail"
-					value={verificationEmail}
-				/>
+				<input type="hidden" name="verificationEmail" value={state.email} />
 				<SubmitButton className="w-full">Verify</SubmitButton>
 			</div>
 		</form>

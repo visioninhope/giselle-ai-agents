@@ -16,6 +16,7 @@ export const verifyEmail = async (
 		token,
 		type: "email",
 	});
+	console.log(JSON.stringify(error));
 	if (error != null) {
 		return {
 			code: error.code,

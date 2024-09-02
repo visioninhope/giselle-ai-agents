@@ -1,10 +1,5 @@
-import { cookies } from "next/headers";
 import { VerifyEmailForm } from "./verify-email-form";
 export default function EmailConfirmationPage() {
-	const verificationEmail = cookies().get("verification-email")?.value;
-	if (verificationEmail == null) {
-		throw new Error("Unexpected error: Please retry the registration process");
-	}
 	return (
 		<div className="flex items-center justify-center py-12">
 			<div className="mx-auto grid w-[550px] gap-6">
@@ -15,7 +10,7 @@ export default function EmailConfirmationPage() {
 						to complete your registration.
 					</p>
 				</div>
-				<VerifyEmailForm verificationEmail={verificationEmail} />
+				<VerifyEmailForm />
 			</div>
 		</div>
 	);
