@@ -385,24 +385,29 @@ export const knowledgeContents = pgTable(
 	}),
 );
 
-export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
-	"knowledge_content_openai_vector_store_file_representations",
-	{
-		dbId: serial("db_id").primaryKey(),
-		knowledgeContentDbId: integer("knowledge_content_db_id")
-			.notNull()
-			.references(() => knowledgeContents.dbId, { onDelete: "cascade" }),
-		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
-		openaiVectorStoreFileStatus: text("openai_vector_store_status")
-			.$type<VectorStoreFile["status"]>()
-			.notNull(),
-	},
+// export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
+// 	"knowledge_content_openai_vector_store_file_representations",
+// 	{
+// 		dbId: serial("db_id").primaryKey(),
+// 		knowledgeContentDbId: integer("knowledge_content_db_id")
+// 			.notNull()
+// 			.references(() => knowledgeContents.dbId, { onDelete: "cascade" }),
+// 		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
+// 		openaiVectorStoreFileStatus: text("openai_vector_store_status")
+// 			.$type<VectorStoreFile["status"]>()
+// 			.notNull(),
+// 	},
 
-	(knowledgeContentOpenaiVectorStoreFileRepresentations) => ({
-		knowledgeContentOpenaiVectorStoreFileRepresentationsKnowledgeDbIdOpenaiVectorStoreFileDbIdUnique:
-			unique().on(
-				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
-				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
-			),
-	}),
-);
+// 	(knowledgeContentOpenaiVectorStoreFileRepresentations) => ({
+// 		knowledgeContentOpenaiVectorStoreFileRepresentationsKnowledgeDbIdOpenaiVectorStoreFileDbIdUnique:
+// 			unique().on(
+// 				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
+// 				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
+// 			),
+// 	}),
+// );
+
+export const tasks = pgTable("tasks", {
+	id: serial("id").primaryKey(),
+	name: text("name").notNull(),
+});
