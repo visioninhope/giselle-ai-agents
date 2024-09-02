@@ -38,6 +38,7 @@ const PlaygroundContext = createContext<PlaygroundContextState | undefined>(
 
 export type PlaygroundProviderProps = {
 	agentId: AgentId;
+	userId: string;
 	requestRunnerProvider: RequestRunnerProvider;
 };
 export const PlaygroundProvider: FC<

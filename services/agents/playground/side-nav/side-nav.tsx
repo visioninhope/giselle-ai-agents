@@ -1,3 +1,4 @@
+"use client";
 import {
 	Tooltip,
 	TooltipContent,
@@ -6,7 +7,7 @@ import {
 } from "@/components/ui/tooltip";
 import { AnimatePresence, motion } from "framer-motion";
 import { BookOpenIcon, LayersIcon, XIcon } from "lucide-react";
-import { type FC, useState } from "react";
+import { type FC, type ReactNode, useState } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { match } from "ts-pattern";
 
@@ -30,7 +31,10 @@ const NavItem: FC<NavItemProps> = ({ icon, tooltip, onClick }) => {
 	);
 };
 
-export const SideNav: FC = () => {
+type SideNavProps = {
+	knowledge: ReactNode;
+};
+export const SideNav: FC<SideNavProps> = ({ knowledge }) => {
 	const [activeMenu, setActiveMenu] = useState("");
 	const [show, setShow] = useState(false);
 	return (
@@ -67,7 +71,7 @@ export const SideNav: FC = () => {
 							<div>
 								{match(activeMenu)
 									.with("overview", () => "Overview")
-									.with("knowledges", () => "Knowledge")
+									.with("knowledges", () => knowledge)
 									.otherwise(() => null)}
 							</div>
 							<button
