@@ -1,128 +1,13 @@
-"use server";
-import {
-	db,
-	fileOpenaiFileRepresentations,
-	files,
-	knowledgeContentOpenaiVectorStoreFileRepresentations,
-	knowledgeContents,
-	knowledgeOpenaiVectorStoreRepresentations,
-	knowledges as knowledgesSchema,
-} from "@/drizzle";
-import { openai } from "@/lib/openai";
-import { eq, inArray } from "drizzle-orm";
-import type { CursorPage } from "openai/pagination";
-import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files";
-import type { Knowledge, KnowledgeContent } from "../type";
+import { agents, db, knowledges } from "@/drizzle";
+import type { AgentId } from "@/services/agents";
+import { eq } from "drizzle-orm";
 
-type GetKnowledgesArgs = {
-	blueprintId: number;
-};
-
-export const getKnowledges = async (args: GetKnowledgesArgs) => {
-	const dbKnowledges = await db
+export const getKnowledges = async (agentId: AgentId) =>
+	await db
 		.select({
-			id: knowledgesSchema.id,
-			name: knowledgesSchema.name,
-			openaiVectorStoreId:
-				knowledgeOpenaiVectorStoreRepresentations.openaiVectorStoreId,
+			id: knowledges.id,
+			name: knowledges.name,
 		})
-		.from(knowledgesSchema)
-		.innerJoin(
-			knowledgeOpenaiVectorStoreRepresentations,
-			eq(
-				knowledgeOpenaiVectorStoreRepresentations.knowledgeId,
-				knowledgesSchema.id,
-			),
-		)
-		.where(eq(knowledgesSchema.blueprintId, args.blueprintId));
-	const dbKnowledgeContents = await db
-		.select({
-			id: knowledgeContents.id,
-			type: knowledgeContents.type,
-			name: knowledgeContents.name,
-			fileId: files.id,
-			fileName: files.fileName,
-			fileType: files.fileType,
-			knowledgeId: knowledgeContents.knowledgeId,
-			openaiFileId: fileOpenaiFileRepresentations.openaiFileId,
-			openaiVectorStoreFileId:
-				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
-		})
-		.from(files)
-		.innerJoin(knowledgeContents, eq(knowledgeContents.fileId, files.id))
-		.innerJoin(
-			knowledgeContentOpenaiVectorStoreFileRepresentations,
-			eq(
-				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentId,
-				knowledgeContents.id,
-			),
-		)
-		.innerJoin(
-			fileOpenaiFileRepresentations,
-			eq(files.id, fileOpenaiFileRepresentations.fileId),
-		)
-		.where(
-			inArray(
-				knowledgeContents.knowledgeId,
-				dbKnowledges.map(({ id }) => id),
-			),
-		);
-	const knowledges: Knowledge[] = [];
-	for (const dbKnowledge of dbKnowledges) {
-		const vectorStoreFiles = await retrieveVectorStoreFiles(
-			dbKnowledge.openaiVectorStoreId,
-		);
-		const contents = dbKnowledgeContents
-			.filter(({ knowledgeId }) => knowledgeId === dbKnowledge.id)
-			.map((dbKnowledgeContent) => {
-				const vectorStoreFile = vectorStoreFiles.find(
-					({ id }) => id === dbKnowledgeContent.openaiVectorStoreFileId,
-				);
-				if (vectorStoreFile == null) {
-					return null;
-				}
-				const knowledgeContent: KnowledgeContent = {
-					id: dbKnowledgeContent.id,
-					name: dbKnowledgeContent.name,
-					type: dbKnowledgeContent.type,
-					status: vectorStoreFile.status,
-					openaiVectorStoreFileId: dbKnowledgeContent.openaiVectorStoreFileId,
-					file: {
-						openaiFileId: dbKnowledgeContent.openaiFileId,
-						id: dbKnowledgeContent.fileId,
-					},
-				};
-				return knowledgeContent;
-			})
-			.filter((content) => content != null);
-		knowledges.push({
-			id: dbKnowledge.id,
-			name: dbKnowledge.name,
-			openaiVectorStoreId: dbKnowledge.openaiVectorStoreId,
-			contents,
-		});
-	}
-	return knowledges;
-};
-
-const retrieveVectorStoreFiles = async (
-	vectorStoreId: string,
-): Promise<VectorStoreFile[]> => {
-	const recursiveList = async (
-		fileList: CursorPage<VectorStoreFile>,
-	): Promise<VectorStoreFile[]> => {
-		const files = fileList.data;
-
-		if (fileList.hasNextPage()) {
-			const nextPage = await fileList.getNextPage();
-			const nextPageFiles = await recursiveList(nextPage);
-			return [...files, ...nextPageFiles];
-		}
-
-		return files;
-	};
-
-	const initialFileList =
-		await openai.beta.vectorStores.files.list(vectorStoreId);
-	return recursiveList(initialFileList);
-};
+		.from(knowledges)
+		.innerJoin(agents, eq(agents.dbId, knowledges.agentDbId))
+		.where(eq(agents.id, agentId));

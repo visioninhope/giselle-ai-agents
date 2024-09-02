@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getUserInitializationTask } from "./app/(auth)/lib";
+// import { getUserInitializationTask } from "./app/(auth)/lib";
 import { supabaseMiddleware } from "./lib/supabase";
 
 export default supabaseMiddleware(async (user, request) => {
@@ -15,17 +15,17 @@ export default supabaseMiddleware(async (user, request) => {
 		url.pathname = "/login";
 		return NextResponse.redirect(url);
 	}
-	if (user != null) {
-		const task = await getUserInitializationTask({ supabaseUserId: user.id });
-		if (
-			task.status !== "COMPLETED" &&
-			!request.nextUrl.pathname.startsWith("/account-initialization")
-		) {
-			const url = request.nextUrl.clone();
-			url.pathname = "/account-initialization";
-			return NextResponse.redirect(url);
-		}
-	}
+	// if (user != null) {
+	// 	const task = await getUserInitializationTask({ supabaseUserId: user.id });
+	// 	if (
+	// 		task.status !== "COMPLETED" &&
+	// 		!request.nextUrl.pathname.startsWith("/account-initialization")
+	// 	) {
+	// 		const url = request.nextUrl.clone();
+	// 		url.pathname = "/account-initialization";
+	// 		return NextResponse.redirect(url);
+	// 	}
+	// }
 });
 
 export const config = {

@@ -1,5 +1,6 @@
 import type {
 	FileId,
+	KnowledgeContentId,
 	KnowledgeContentType,
 	KnowledgeId,
 } from "@/services/agents/knowledges/types";
@@ -33,7 +34,7 @@ import {
 	timestamp,
 	unique,
 } from "drizzle-orm/pg-core";
-
+import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files";
 import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
 
 export const organizations = pgTable("organizations", {
@@ -329,7 +330,9 @@ export const knowledgeOpenaiVectorStoreRepresentations = pgTable(
 			.notNull()
 			.references(() => knowledges.dbId, { onDelete: "cascade" }),
 		openaiVectorStoreId: text("openai_vector_store_id").notNull().unique(),
-		status: text("status").$type<OpenaiVectorStoreStatus>().notNull(),
+		openaiVectorStoreStatus: text("status")
+			.$type<OpenaiVectorStoreStatus>()
+			.notNull(),
 	},
 );
 export const files = pgTable("files", {
@@ -338,8 +341,14 @@ export const files = pgTable("files", {
 	fileName: text("file_name").notNull(),
 	fileType: text("file_type").notNull(),
 	fileSize: integer("file_size").notNull(),
-	blobUrl: text("blob_url").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+});
+export const fileBlobs = pgTable("file_blobs", {
+	dbId: serial("db_id").primaryKey(),
+	fileDbId: integer("file_db_id")
+		.notNull()
+		.references(() => files.dbId, { onDelete: "cascade" }),
+	blobUrl: text("blob_url").notNull(),
 });
 export const fileOpenaiFileRepresentations = pgTable(
 	"file_openai_file_representations",
@@ -355,6 +364,7 @@ export const fileOpenaiFileRepresentations = pgTable(
 export const knowledgeContents = pgTable(
 	"knowledge_contents",
 	{
+		id: text("id").$type<KnowledgeContentId>().notNull().unique(),
 		dbId: serial("db_id").primaryKey(),
 		name: text("name").notNull(),
 		type: text("knowledge_content_type")
@@ -383,6 +393,9 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 			.notNull()
 			.references(() => knowledgeContents.dbId, { onDelete: "cascade" }),
 		openaiVectorStoreFileId: text("openai_vector_store_file_id").notNull(),
+		openaiVectorStoreFileStatus: text("openai_vector_store_status")
+			.$type<VectorStoreFile["status"]>()
+			.notNull(),
 	},
 
 	(knowledgeContentOpenaiVectorStoreFileRepresentations) => ({

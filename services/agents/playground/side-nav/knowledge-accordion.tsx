@@ -44,180 +44,190 @@ import {
 	TrashIcon,
 	UploadIcon,
 } from "lucide-react";
-import {
-	addContentToKnowledge,
-	createKnowledge,
-} from "../../knowledges/actions";
+// import {
+// 	addContentToKnowledge,
+// 	createKnowledge,
+// } from "../../knowledges/actions";
 
+import { SubmitButton } from "@/components/ui/submit-button";
+import { createId } from "@paralleldrive/cuid2";
 import { type FC, useState } from "react";
 import invariant from "tiny-invariant";
+import { addKnowledgeToDb } from "../../knowledges/actions/add-knowledge-to-db";
+import { useKnowledges } from "../../knowledges/context";
+import type { AsyncKnowledgeAction } from "../../knowledges/reducer";
+import {
+	type File,
+	type Knowledge,
+	type KnowledgeContent,
+	type KnowledgeId,
+	knowledgeContentStatus,
+} from "../../knowledges/types";
+import type { AgentId } from "../../types";
+import { usePlayground } from "../playground-context";
 
 const upperCaseFirstLetter = (str: string) =>
 	str.charAt(0).toUpperCase() + str.slice(1);
 
-type ContentUploaderProps = {
-	knowledgeId: number;
+export const addKnowledge = (
+	agentId: AgentId,
+	knowledge: Knowledge,
+): AsyncKnowledgeAction => {
+	return async (dispatch) => {
+		// dispatch({ type: "SET_ADDING_KNOWLEDGE" });
+		await addKnowledgeToDb(agentId, knowledge);
+		dispatch({ type: "ADD_KNOWLEDGE", knowledge });
+	};
 };
-const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
-	const { mutate } = useBlueprint();
-	const [open, setOpen] = useState(false);
-	return (
-		<Popover open={open} onOpenChange={setOpen}>
-			<PopoverTrigger asChild>
-				<Button size="sm" variant="secondary" className="gap-2">
-					<UploadIcon className="w-4 h-4" />
-					<p>Add Content</p>
-				</Button>
-			</PopoverTrigger>
-			<PopoverContent className="p-0 w-[200px]" align="end">
-				<Command>
-					<CommandList>
-						<CommandGroup>
-							<CommandItem>
-								<form>
-									<label className="flex items-center gap-2">
-										<input
-											type="file"
-											name="file"
-											className="hidden"
-											onChange={(e) => {
-												e.preventDefault();
-												setOpen(false);
-												if (e.target.files == null) {
-													return;
-												}
-												mutate({
-													type: "addContentToKnowledge",
-													optimisticData: {
-														knowledgeId,
-														content: {
-															type: "file",
-															isCreating: true,
-															id: createTemporaryId(),
-															name: e.target.files[0].name,
-															status: "in_progress",
-															openaiVectorStoreFileId: "",
-															file: {
-																id: createTemporaryId(),
-																openaiFileId: "",
-															},
-														},
-													},
-													action: () =>
-														e.target.files == null
-															? (() => {
-																	throw new Error("File not found");
-																})()
-															: addContentToKnowledge({
-																	knowledgeId,
-																	content: {
-																		name: e.target.files[0].name,
-																		type: "file",
-																		file: e.target.files[0],
-																	},
-																}),
-												});
-											}}
-										/>
-										<HardDriveUploadIcon className="w-4 h-4" />
-										<p>Upload from device</p>
-									</label>
-								</form>
-							</CommandItem>
-							<CommandItem>
-								<Dialog>
-									<DialogTrigger asChild>
-										<button type="button" className="flex items-center gap-2">
-											<TextIcon className="w-4 h-4" />
-											<p>Add text conent</p>
-										</button>
-									</DialogTrigger>
-									<DialogContent>
-										<form
-											onSubmit={(e) => {
-												e.preventDefault();
-												const formData = new FormData(e.currentTarget);
-												const title = formData.get("title");
-												const body = formData.get("body");
-												invariant(
-													typeof title === "string" && title.length > 0,
-													"Title is required",
-												);
-												invariant(
-													typeof body === "string" && body.length > 0,
-													"Body is required",
-												);
 
-												const content = `# ${title}\n\n${body}`;
-												const blob = new Blob([content], {
-													type: "text/markdown",
-												});
-												const file = new File([blob], `${title}.md`, {
-													type: "text/markdown",
-												});
-												mutate({
-													type: "addContentToKnowledge",
-													optimisticData: {
-														knowledgeId,
-														content: {
-															type: "text",
-															isCreating: true,
-															id: createTemporaryId(),
-															name: title,
-															status: "in_progress",
-															openaiVectorStoreFileId: "",
-															file: {
-																openaiFileId: "",
-																id: createTemporaryId(),
-															},
-														},
-													},
-													action: () =>
-														addContentToKnowledge({
-															knowledgeId,
-															content: {
-																type: "text",
-																name: title,
-																file,
-															},
-														}),
-												});
-											}}
-										>
-											<DialogHeader>
-												<DialogTitle>Add text content</DialogTitle>
-											</DialogHeader>
-											<div className="grid gap-4 py-4">
-												<div className="flex flex-col gap-4">
-													<Label htmlFor="title">Title</Label>
-													<Input id="title" name="title" />
-												</div>
-												<div className="flex flex-col gap-4">
-													<Label htmlFor="content">Content</Label>
-													<Textarea id="content" name="body" rows={10} />
-												</div>
-											</div>
-											<DialogFooter>
-												<Button type="submit">Add Content</Button>
-											</DialogFooter>
-										</form>
-									</DialogContent>
-								</Dialog>
-							</CommandItem>
-						</CommandGroup>
-					</CommandList>
-				</Command>
-			</PopoverContent>
-		</Popover>
-	);
-};
+// type ContentUploaderProps = {
+// 	knowledgeId: KnowledgeId;
+// };
+// const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
+// 	const { dispatch } = useKnowledges();
+// 	const [open, setOpen] = useState(false);
+// 	return (
+// 		<Popover open={open} onOpenChange={setOpen}>
+// 			<PopoverTrigger asChild>
+// 				<Button size="sm" variant="secondary" className="gap-2">
+// 					<UploadIcon className="w-4 h-4" />
+// 					<p>Add Content</p>
+// 				</Button>
+// 			</PopoverTrigger>
+// 			<PopoverContent className="p-0 w-[200px]" align="end">
+// 				<Command>
+// 					<CommandList>
+// 						<CommandGroup>
+// 							<CommandItem>
+// 								<form>
+// 									<label className="flex items-center gap-2">
+// 										<input
+// 											type="file"
+// 											name="file"
+// 											className="hidden"
+// 											onChange={(e) => {
+// 												e.preventDefault();
+// 												setOpen(false);
+// 												if (e.target.files == null) {
+// 													return;
+// 												}
+// 												const file = {
+// 													id: `fl_${createId()}`,
+// 												} satisfies File;
+// 												const knowledgeContent = {
+// 													id: `knwl.cnt_${createId()}`,
+// 													name: e.target.files[0].name,
+// 													status: knowledgeContentStatus.inProgress,
+// 													file,
+// 												} satisfies KnowledgeContent;
+// 												dispatch({
+// 													type: "ADD_CONTENT",
+// 													knowledgeId,
+// 													content: knowledgeContent,
+// 												});
+// 											}}
+// 										/>
+// 										<HardDriveUploadIcon className="w-4 h-4" />
+// 										<p>Upload from device</p>
+// 									</label>
+// 								</form>
+// 							</CommandItem>
+// 							<CommandItem>
+// 								<Dialog>
+// 									<DialogTrigger asChild>
+// 										<button type="button" className="flex items-center gap-2">
+// 											<TextIcon className="w-4 h-4" />
+// 											<p>Add text conent</p>
+// 										</button>
+// 									</DialogTrigger>
+// 									<DialogContent>
+// 										<form
+// 											onSubmit={(e) => {
+// 												e.preventDefault();
+// 												const formData = new FormData(e.currentTarget);
+// 												const title = formData.get("title");
+// 												const body = formData.get("body");
+// 												invariant(
+// 													typeof title === "string" && title.length > 0,
+// 													"Title is required",
+// 												);
+// 												invariant(
+// 													typeof body === "string" && body.length > 0,
+// 													"Body is required",
+// 												);
+
+// 												const content = `# ${title}\n\n${body}`;
+// 												const blob = new Blob([content], {
+// 													type: "text/markdown",
+// 												});
+// 												const file = new File([blob], `${title}.md`, {
+// 													type: "text/markdown",
+// 												});
+// 												mutate({
+// 													type: "addContentToKnowledge",
+// 													optimisticData: {
+// 														knowledgeId,
+// 														content: {
+// 															type: "text",
+// 															isCreating: true,
+// 															id: createTemporaryId(),
+// 															name: title,
+// 															status: "in_progress",
+// 															openaiVectorStoreFileId: "",
+// 															file: {
+// 																openaiFileId: "",
+// 																id: createTemporaryId(),
+// 															},
+// 														},
+// 													},
+// 													action: () =>
+// 														addContentToKnowledge({
+// 															knowledgeId,
+// 															content: {
+// 																type: "text",
+// 																name: title,
+// 																file,
+// 															},
+// 														}),
+// 												});
+// 											}}
+// 										>
+// 											<DialogHeader>
+// 												<DialogTitle>Add text content</DialogTitle>
+// 											</DialogHeader>
+// 											<div className="grid gap-4 py-4">
+// 												<div className="flex flex-col gap-4">
+// 													<Label htmlFor="title">Title</Label>
+// 													<Input id="title" name="title" />
+// 												</div>
+// 												<div className="flex flex-col gap-4">
+// 													<Label htmlFor="content">Content</Label>
+// 													<Textarea id="content" name="body" rows={10} />
+// 												</div>
+// 											</div>
+// 											<DialogFooter>
+// 												<Button type="submit">Add Content</Button>
+// 											</DialogFooter>
+// 										</form>
+// 									</DialogContent>
+// 								</Dialog>
+// 							</CommandItem>
+// 						</CommandGroup>
+// 					</CommandList>
+// 				</Command>
+// 			</PopoverContent>
+// 		</Popover>
+// 	);
+// };
 
 export const KnowledgeAccordion: FC = () => {
-	const { blueprint, mutate } = useBlueprint();
+	// const { blueprint, mutate } = useBlueprint();
+	const { agentId } = usePlayground();
+	const { state, dispatch } = useKnowledges();
 	return (
 		<div className="px-4 py-2 gap-4 flex flex-col">
 			<Accordion type="single" collapsible className="w-full">
-				{blueprint.knowledges.map(({ id, name, contents: files }) => (
+				{state.knowledges.map(({ id, name, contents }) => (
 					<AccordionItem value={name} key={id}>
 						<AccordionTrigger handlePosition="right" className="flex gap-2">
 							<BookOpenIcon className="w-4 h-4" />
@@ -225,7 +235,7 @@ export const KnowledgeAccordion: FC = () => {
 						</AccordionTrigger>
 						<AccordionContent className="flex flex-col gap-2">
 							<ul className="list-disc list-inside">
-								{files.length === 0 && (
+								{contents.length === 0 && (
 									<div className="flex justify-center flex-col items-center py-8 px-4 bg-muted rounded gap-4">
 										<div className="">
 											<BookOpenIcon className="w-8 h-8" strokeWidth={1} />
@@ -239,13 +249,13 @@ export const KnowledgeAccordion: FC = () => {
 										</p>
 									</div>
 								)}
-								{files.map(({ id, name: fileName, status }) => (
+								{contents.map(({ id, name, status }) => (
 									<li
 										key={id}
 										className="flex items-center justify-between py-1"
 									>
 										<div className="flex items-center gap-2">
-											<span>{fileName}</span>
+											<span>{name}</span>
 											<Badge variant="outline">
 												{upperCaseFirstLetter(status)}
 											</Badge>
@@ -256,9 +266,7 @@ export const KnowledgeAccordion: FC = () => {
 									</li>
 								))}
 							</ul>
-							<div>
-								<ContentUploader knowledgeId={id} />
-							</div>
+							<div>{/**<ContentUploader knowledgeId={id} /> **/}</div>
 						</AccordionContent>
 					</AccordionItem>
 				))}
@@ -280,26 +288,17 @@ export const KnowledgeAccordion: FC = () => {
 							const name = formData.get("name");
 							e.currentTarget.reset();
 							invariant(typeof name === "string", "Name must be a string");
-							mutate({
-								type: "addKnowledge",
-								optimisticData: {
-									blueprintId: blueprint.id,
-									knowledge: {
-										isCreating: true,
-										id: createTemporaryId(),
-										name,
-										contents: [],
-										openaiVectorStoreId: "",
-									},
-								},
-								action: (optimisticData) => createKnowledge(optimisticData),
-							});
+							dispatch(
+								addKnowledge(agentId, {
+									id: `knwl_${createId()}`,
+									name,
+									contents: [],
+								}),
+							);
 						}}
 					>
 						<Input name="name" data-1p-ignore />
-						<Button size="sm" type="submit">
-							Add
-						</Button>
+						<SubmitButton size="sm">Add</SubmitButton>
 					</form>
 				</CardContent>
 			</Card>

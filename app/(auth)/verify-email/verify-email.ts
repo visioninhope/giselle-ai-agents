@@ -1,8 +1,7 @@
 "use server";
 
-import { db, supabaseUserMappings, userInitialTasks, users } from "@/drizzle";
 import { type AuthError, createClient } from "@/lib/supabase";
-import { initializeAccountTask } from "@/trigger/initializeAccount";
+import { initializeAccount } from "@/services/accounts";
 import { redirect } from "next/navigation";
 
 export const verifyEmail = async (
@@ -34,20 +33,7 @@ export const verifyEmail = async (
 		};
 	}
 
-	const [user] = await db.insert(users).values({}).returning({
-		id: users.id,
-	});
-	await db.insert(supabaseUserMappings).values({
-		userId: user.id,
-		supabaseUserId: supabaseData.user.id,
-	});
-	const handle = await initializeAccountTask.trigger({
-		userId: user.id,
-	});
-	await db.insert(userInitialTasks).values({
-		userId: user.id,
-		taskId: handle.id,
-	});
+	await initializeAccount(supabaseData.user.id);
 
-	redirect("/account-initialization");
+	redirect("/v2/agents");
 };
