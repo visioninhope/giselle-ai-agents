@@ -1,6 +1,7 @@
 import { db, tasks } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { unstable_cache } from "next/cache";
+import { Fetcher } from "./fetcher";
 import { RefreshButton } from "./refresh-button";
 import { RevalidateButton } from "./revalidate-button";
 
@@ -48,6 +49,7 @@ export default async function TasksPage() {
 						<li key={task.id}>{task.name}</li>
 					))}
 				</ul>
+				<Fetcher />
 			</div>
 		</div>
 	);
