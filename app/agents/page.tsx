@@ -1,7 +1,7 @@
 import { SubmitButton } from "@/components/ui/submit-button";
 import { agents as agentsTable, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
-import { revalidatePath } from "next/cache";
+import { revalidatePath, revalidateTag } from "next/cache";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -28,7 +28,7 @@ export default function AgentListPage() {
 		await db.insert(agentsTable).values({
 			id,
 		});
-		revalidatePath("/agents/page");
+		// revalidateTag("hello");
 		redirect(`/agents/${id}`);
 	};
 	return (
