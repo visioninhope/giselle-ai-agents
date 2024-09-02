@@ -44,7 +44,7 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 		setRequestId(newRequest.id);
 		switch (requestRunnerProvider) {
 			case "vercelFunctions":
-				fetch(`/v2/agents/requests/${newRequest.id}`, {
+				fetch(`/agents/requests/${newRequest.id}`, {
 					method: "POST",
 				});
 				return;
