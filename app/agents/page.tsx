@@ -8,14 +8,14 @@ import { Suspense } from "react";
 async function AgentList() {
 	const agents = await db.select().from(agentsTable);
 	return (
-		<div>
+		<div className="flex flex-col gap-2">
 			{agents.map(({ id, name }) => (
 				<a
 					key={id}
-					className="border border-border p-4"
-					href={`/v2/agents/${id}`}
+					className="flex border border-border p-4"
+					href={`/agents/${id}`}
 				>
-					{name ?? "Untitled"}
+					{name ?? id}
 				</a>
 			))}
 		</div>
@@ -28,8 +28,8 @@ export default function AgentListPage() {
 		await db.insert(agentsTable).values({
 			id,
 		});
-		// redirect(`/v2/agents/${id}`);
-		revalidatePath("/v2/agents/page");
+		revalidatePath("/agents/page");
+		redirect(`/agents/${id}`);
 	};
 	return (
 		<div className="container mt-8">

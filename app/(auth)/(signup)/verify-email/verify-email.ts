@@ -36,5 +36,5 @@ export const verifyEmail = async (
 
 	await initializeAccount(supabaseData.user.id);
 
-	redirect("/v2/agents");
+	redirect("/agents");
 };
