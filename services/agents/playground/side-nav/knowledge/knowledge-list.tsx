@@ -19,7 +19,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { type FC, useActionState } from "react";
 import { type Knowledge, addKnowledge } from "../../../knowledges";
 import { usePlayground } from "../../context";
-import { AddContentStateProvider } from "./add-content-state-provider";
+import { ContentStateProvider } from "./content-state-provider";
 import { KnowledgeContentList } from "./knowledge-content-list";
 
 type KnowledgeListProps = {
@@ -33,12 +33,12 @@ export const KnowledgeList: FC<KnowledgeListProps> = ({ knowledges }) => {
 					<AccordionItem key={knowledge.id} value={knowledge.id}>
 						<AccordionTrigger> {knowledge.name}</AccordionTrigger>
 						<AccordionContent>
-							<AddContentStateProvider>
+							<ContentStateProvider>
 								<KnowledgeContentList
 									knowledgeId={knowledge.id}
 									knowledgeContents={knowledge.contents}
 								/>
-							</AddContentStateProvider>
+							</ContentStateProvider>
 						</AccordionContent>
 					</AccordionItem>
 				))}

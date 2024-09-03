@@ -7,6 +7,16 @@ import {
 	CommandList,
 } from "@/components/ui/command";
 import {
+	Dialog,
+	DialogClose,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import {
 	Popover,
 	PopoverContent,
 	PopoverTrigger,
@@ -18,16 +28,23 @@ import {
 	UploadIcon,
 } from "lucide-react";
 import { type FC, useEffect, useState } from "react";
-import type { KnowledgeContent, KnowledgeId } from "../../../knowledges";
-import { useAddContentState } from "./add-content-state-provider";
+import {
+	type KnowledgeContent,
+	type KnowledgeId,
+	removeKnowledgeContent,
+} from "../../../knowledges";
 import { AddFileToKnowledgeContentForm } from "./add-file-to-knowledge-content-form";
 import { AddTextToKnowledgeContentForm } from "./add-text-to-knowledge-content-form";
+import { useContentState } from "./content-state-provider";
 
-const AddedTrigger: FC = () => {
-	const { dispatch } = useAddContentState();
+const Trigger: FC = () => {
+	const { dispatch } = useContentState();
 	useEffect(() => {
 		console.log("show");
 		dispatch({ type: "ADDED" });
+		return () => {
+			dispatch({ type: "REMOVED" });
+		};
 	}, [dispatch]);
 	return null;
 };
@@ -40,8 +57,9 @@ export const KnowledgeContentList: React.FC<KnowledgeContentListProps> = ({
 	knowledgeId,
 	knowledgeContents,
 }) => {
+	const { dispatch, isRemoving } = useContentState();
 	return (
-		<div>
+		<div className="flex flex-col gap-4">
 			<ul className="list-disc list-inside">
 				{knowledgeContents.length === 0 && (
 					<div className="flex justify-center flex-col items-center py-8 px-4 bg-muted rounded gap-4">
@@ -63,10 +81,46 @@ export const KnowledgeContentList: React.FC<KnowledgeContentListProps> = ({
 							<span>{name}</span>
 							<Badge variant="outline">{status}</Badge>
 						</div>
-						<Button variant="ghost" size="sm">
-							<TrashIcon className="h-4 w-4" />
-						</Button>
-						<AddedTrigger />
+
+						<Dialog>
+							<DialogTrigger asChild>
+								<Button variant="ghost" size="sm">
+									<TrashIcon className="h-4 w-4" />
+								</Button>
+							</DialogTrigger>
+							<DialogContent className="sm:max-w-[425px]">
+								<DialogHeader>
+									<DialogTitle>Confirm deletion of content</DialogTitle>
+									<DialogDescription>
+										Are you sure you would like to delete the content{" "}
+										<span className="font-bold">{name}</span>({id})?
+									</DialogDescription>
+								</DialogHeader>
+								<DialogFooter>
+									<DialogClose asChild>
+										<Button
+											type="button"
+											variant="secondary"
+											disabled={isRemoving}
+										>
+											Cancel
+										</Button>
+									</DialogClose>
+									<Button
+										type="submit"
+										variant="destructive"
+										disabled={isRemoving}
+										onClick={async () => {
+											dispatch({ type: "REMOVING" });
+											await removeKnowledgeContent(id);
+										}}
+									>
+										Delete file
+									</Button>
+								</DialogFooter>
+							</DialogContent>
+						</Dialog>
+						<Trigger />
 					</li>
 				))}
 			</ul>
@@ -82,7 +136,7 @@ type ContentUploaderProps = {
 };
 const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 	const [open, setOpen] = useState(false);
-	const { isAdding, dispatch } = useAddContentState();
+	const { isAdding, dispatch } = useContentState();
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
