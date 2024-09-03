@@ -7,7 +7,7 @@ import {
 } from "@xyflow/react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { assertNodeClassName, nodeService } from "../../nodes";
-import { usePlayground } from "../playground-context";
+import { usePlayground } from "../context";
 // import { KnowledgeAccordion } from "./knowledge";
 import { RequestPanel } from "./request-panel";
 
@@ -55,15 +55,15 @@ type NodeModifyPanelInnerProps = {
 	nodeId: string;
 };
 const NodeModifyPanelInner: FC<NodeModifyPanelInnerProps> = ({ nodeId }) => {
-	const { graph } = usePlayground();
+	const { state } = usePlayground();
 	const Panel = useMemo(() => {
-		const node = graph.nodes.find((node) => node.id === nodeId);
+		const node = state.graph.nodes.find((node) => node.id === nodeId);
 		if (node == null) {
 			return null;
 		}
 		const className = node.className;
 		assertNodeClassName(className);
 		return nodeService.renderPanel(className, { node });
-	}, [graph, nodeId]);
+	}, [state, nodeId]);
 	return <div className="flex flex-col gap-2 py-2">{Panel}</div>;
 };

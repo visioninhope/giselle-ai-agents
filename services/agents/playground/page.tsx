@@ -1,18 +1,15 @@
 import { db, tasks } from "@/drizzle";
-import { ReactFlowProvider } from "@xyflow/react";
-import { unstable_cache } from "next/cache";
-import { type FC, Suspense } from "react";
+import { Background, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { Suspense } from "react";
+import type { RequestRunnerProvider } from "../requests/types";
+import type { AgentId } from "../types";
+import { getGraph } from "./actions/get-graph";
+import { PlaygroundProvider } from "./context";
 import { Inner } from "./inner";
-import {
-	PlaygroundProvider,
-	type PlaygroundProviderProps,
-} from "./playground-context";
 import { SideNav } from "./side-nav";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 export const Knowledges = async () => {
 	const getTasks = async () => {
-		await sleep(3000);
 		const result = await db.select().from(tasks);
 		return result;
 	};
@@ -26,30 +23,48 @@ export const Knowledges = async () => {
 	);
 };
 
-type PlaygroundProps = PlaygroundProviderProps;
-export const Playground: FC<PlaygroundProps> = ({
-	agentId,
-	requestRunnerProvider,
-	userId,
-}) => {
+const Skeleton = () => {
 	return (
-		<PlaygroundProvider
-			agentId={agentId}
-			requestRunnerProvider={requestRunnerProvider}
-			userId={userId}
-		>
-			<ReactFlowProvider>
-				<div className="h-screen w-full flex">
-					<SideNav
-						knowledge={
-							<Suspense fallback={<div>Loading...</div>}>
-								<Knowledges />
-							</Suspense>
-						}
-					/>
-					<Inner />
-				</div>
-			</ReactFlowProvider>
-		</PlaygroundProvider>
+		<div className="h-screen w-full">
+			<ReactFlow key={"loader"}>
+				<Background />
+			</ReactFlow>
+		</div>
 	);
 };
+
+type PlaygroundProps = {
+	agentId: AgentId;
+	userId: string;
+	requestRunnerProvider: RequestRunnerProvider;
+};
+export async function Playground({
+	agentId,
+	userId,
+	requestRunnerProvider,
+}: PlaygroundProps) {
+	const graph = await getGraph({ agentId, userId });
+	return (
+		<Suspense fallback={<Skeleton />}>
+			<PlaygroundProvider
+				agentId={agentId}
+				requestRunnerProvider={requestRunnerProvider}
+				userId={userId}
+				graph={graph}
+			>
+				<ReactFlowProvider>
+					<div className="h-screen w-full flex">
+						<SideNav
+							knowledge={
+								<Suspense fallback={<div>Loading...</div>}>
+									<Knowledges />
+								</Suspense>
+							}
+						/>
+						<Inner />
+					</div>
+				</ReactFlowProvider>
+			</PlaygroundProvider>
+		</Suspense>
+	);
+}

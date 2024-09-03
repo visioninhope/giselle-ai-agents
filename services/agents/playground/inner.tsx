@@ -12,7 +12,7 @@ import {
 	portDirection,
 } from "../nodes";
 import { type Request, useRequest } from "../requests";
-import { playgroundState, usePlayground } from "./playground-context";
+import { usePlayground } from "./context";
 import { PropertyPanel } from "./property-panel";
 import { SideNav } from "./side-nav";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
@@ -65,12 +65,12 @@ export const Inner: FC = () => {
 	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
 	const reactFlowInstance = useReactFlow<GiselleNode>();
-	const { graph, state, dispatch } = usePlayground();
+	const { state, dispatch } = usePlayground();
 	const { lastRequest } = useRequest();
 	useEffect(() => {
 		reactFlowInstance.setNodes((prevNodes) => {
 			const newNodes = playgroundNodesToReactFlowNodes(
-				graph.nodes,
+				state.graph.nodes,
 				lastRequest,
 			);
 			return newNodes.map((newNode) => {
@@ -78,28 +78,26 @@ export const Inner: FC = () => {
 				return prevNode ? { ...prevNode, ...newNode } : newNode;
 			});
 		});
-		reactFlowInstance.setEdges(playgroundEdgesToReactFlowEdges(graph.edges));
+		reactFlowInstance.setEdges(
+			playgroundEdgesToReactFlowEdges(state.graph.edges),
+		);
 	}, [
 		reactFlowInstance.setNodes,
 		reactFlowInstance.setEdges,
-		graph,
+		state.graph,
 		lastRequest,
 	]);
-	return state === playgroundState.initialize ? (
-		<ReactFlow key={"loader"}>
-			<Background />
-		</ReactFlow>
-	) : (
+	return (
 		<ReactFlow
 			onContextMenu={handleContextMenu}
 			nodeTypes={nodeTypes}
-			defaultNodes={playgroundNodesToReactFlowNodes(graph.nodes)}
-			defaultEdges={playgroundEdgesToReactFlowEdges(graph.edges)}
+			defaultNodes={playgroundNodesToReactFlowNodes(state.graph.nodes)}
+			defaultEdges={playgroundEdgesToReactFlowEdges(state.graph.edges)}
 			isValidConnection={({ source, sourceHandle, target, targetHandle }) => {
-				const sourcePort = graph.nodes
+				const sourcePort = state.graph.nodes
 					.find((node) => node.id === source)
 					?.ports.find((port) => port.id === sourceHandle);
-				const targetPort = graph.nodes
+				const targetPort = state.graph.nodes
 					.find((node) => node.id === target)
 					?.ports.find((port) => port.id === targetHandle);
 				if (sourcePort == null || targetPort == null) {
@@ -148,7 +146,7 @@ export const Inner: FC = () => {
 					});
 				});
 			}}
-			defaultViewport={graph.viewport}
+			defaultViewport={state.graph.viewport}
 			onViewportChange={(viewport) => {
 				dispatch({
 					type: "UPDATE_VIEWPORT",

@@ -64,7 +64,7 @@ import {
 	knowledgeContentStatus,
 } from "../../knowledges/types";
 import type { AgentId } from "../../types";
-import { usePlayground } from "../playground-context";
+import { usePlayground } from "../context";
 
 const upperCaseFirstLetter = (str: string) =>
 	str.charAt(0).toUpperCase() + str.slice(1);
@@ -222,7 +222,9 @@ export const addKnowledge = (
 
 export const KnowledgeAccordion: FC = () => {
 	// const { blueprint, mutate } = useBlueprint();
-	const { agentId } = usePlayground();
+	const {
+		state: { agentId },
+	} = usePlayground();
 	const { state, dispatch } = useKnowledges();
 	return (
 		<div className="px-4 py-2 gap-4 flex flex-col">
