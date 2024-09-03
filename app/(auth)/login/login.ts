@@ -30,19 +30,6 @@ export async function login(
 			name: error.name,
 		};
 	}
-	const [task] = await db
-		.select({ id: userInitialTasks.taskId })
-		.from(supabaseUserMappings)
-		.innerJoin(
-			userInitialTasks,
-			eq(userInitialTasks.userId, supabaseUserMappings.userId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, data.user.id));
-	const run = await runs.retrieve(task.id);
-	if (run.status === "COMPLETED") {
-		redirect("/agents");
-		return null;
-	}
-	redirect("/initializing-account");
+	redirect("/agents");
 	return null;
 }
