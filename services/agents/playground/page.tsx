@@ -1,22 +1,12 @@
-import { db, tasks } from "@/drizzle";
 import { Background, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { Suspense } from "react";
-import { getKnowledges } from "../knowledges";
 import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { getGraph } from "./actions/get-graph";
 import { PlaygroundProvider } from "./context";
 import { Inner } from "./inner";
 import { SideNav } from "./side-nav";
-import { KnowledgeList } from "./side-nav/knowledge-list";
-
-type KnowledgesProps = {
-	agentId: AgentId;
-};
-export const Knowledges = async ({ agentId }: KnowledgesProps) => {
-	const knowledges = await getKnowledges(agentId);
-	return <KnowledgeList knowledges={knowledges} />;
-};
+import { Knowledges } from "./side-nav/knowledge/knowledge";
 
 const Skeleton = () => {
 	return (

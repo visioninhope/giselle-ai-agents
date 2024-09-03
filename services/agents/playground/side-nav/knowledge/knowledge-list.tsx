@@ -17,8 +17,10 @@ import { Input } from "@/components/ui/input";
 import { SubmitButton } from "@/components/ui/submit-button";
 import { createId } from "@paralleldrive/cuid2";
 import { type FC, useActionState } from "react";
-import { type Knowledge, addKnowledge } from "../../knowledges";
-import { usePlayground } from "../context";
+import { type Knowledge, addKnowledge } from "../../../knowledges";
+import { usePlayground } from "../../context";
+import { AddContentStateProvider } from "./add-content-state-provider";
+import { KnowledgeContentList } from "./knowledge-content-list";
 
 type KnowledgeListProps = {
 	knowledges: Knowledge[];
@@ -31,7 +33,12 @@ export const KnowledgeList: FC<KnowledgeListProps> = ({ knowledges }) => {
 					<AccordionItem key={knowledge.id} value={knowledge.id}>
 						<AccordionTrigger> {knowledge.name}</AccordionTrigger>
 						<AccordionContent>
-							<div>Knowledge</div>
+							<AddContentStateProvider>
+								<KnowledgeContentList
+									knowledgeId={knowledge.id}
+									knowledgeContents={knowledge.contents}
+								/>
+							</AddContentStateProvider>
 						</AccordionContent>
 					</AccordionItem>
 				))}
@@ -57,6 +64,7 @@ export const AddKnowledgeForm: FC = () => {
 			await addKnowledge(state.agentId, {
 				id: `knwl_${createId()}`,
 				name,
+				contents: [],
 			});
 			return null;
 		},

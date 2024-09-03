@@ -28,12 +28,12 @@ export type KnowledgeContent = {
 	id: KnowledgeContentId;
 	name: string;
 	status: KnowledgeContentStatus;
-	file: File;
 };
 
 export type Knowledge = {
 	id: KnowledgeId;
 	name: string;
+	contents: KnowledgeContent[];
 };
 
 export type KnowledgeState = {
