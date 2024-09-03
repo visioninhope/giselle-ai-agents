@@ -6,7 +6,6 @@ import {
 	addContentToKnowledge,
 	knowledgeContentType,
 } from "../../../knowledges";
-import { useAddContentState } from "./add-content-state-provider";
 
 type AddFileToKnowledgeContentFormProps = {
 	knowledgeId: KnowledgeId;
@@ -15,7 +14,6 @@ type AddFileToKnowledgeContentFormProps = {
 export const AddFileToKnowledgeContentForm: FC<
 	AddFileToKnowledgeContentFormProps
 > = ({ knowledgeId, onSubmit }) => {
-	const { dispatch } = useAddContentState();
 	const [state, action, pending] = useFormState<string | null, FormData>(
 		async (prevState, formData) => {
 			const file = formData.get("file");
