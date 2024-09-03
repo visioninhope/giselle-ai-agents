@@ -30,7 +30,6 @@ const PlaygroundContext = createContext<PlaygroundContext | undefined>(
 
 export type PlaygroundProviderProps = {
 	agentId: AgentId;
-	userId: string;
 	graph: PlaygroundGraph;
 	requestRunnerProvider: RequestRunnerProvider;
 };

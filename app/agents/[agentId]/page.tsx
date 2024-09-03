@@ -11,7 +11,6 @@ export default async function AgentPlaygroundPage({
 	const user = await getUser();
 	return (
 		<Playground
-			userId={user.id}
 			agentId={params.agentId}
 			requestRunnerProvider="vercelFunctions"
 		/>

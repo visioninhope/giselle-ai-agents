@@ -35,21 +35,18 @@ const Skeleton = () => {
 
 type PlaygroundProps = {
 	agentId: AgentId;
-	userId: string;
 	requestRunnerProvider: RequestRunnerProvider;
 };
 export async function Playground({
 	agentId,
-	userId,
 	requestRunnerProvider,
 }: PlaygroundProps) {
-	const graph = await getGraph({ agentId, userId });
+	const graph = await getGraph({ agentId });
 	return (
 		<Suspense fallback={<Skeleton />}>
 			<PlaygroundProvider
 				agentId={agentId}
 				requestRunnerProvider={requestRunnerProvider}
-				userId={userId}
 				graph={graph}
 			>
 				<ReactFlowProvider>
