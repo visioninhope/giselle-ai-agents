@@ -1,26 +1,21 @@
 import { db, tasks } from "@/drizzle";
 import { Background, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { Suspense } from "react";
+import { getKnowledges } from "../knowledges";
 import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { getGraph } from "./actions/get-graph";
 import { PlaygroundProvider } from "./context";
 import { Inner } from "./inner";
 import { SideNav } from "./side-nav";
+import { KnowledgeList } from "./side-nav/knowledge-list";
 
-export const Knowledges = async () => {
-	const getTasks = async () => {
-		const result = await db.select().from(tasks);
-		return result;
-	};
-	const allTasks = await getTasks();
-	return (
-		<ul>
-			{allTasks.map((task) => (
-				<li key={task.id}>{task.name}</li>
-			))}
-		</ul>
-	);
+type KnowledgesProps = {
+	agentId: AgentId;
+};
+export const Knowledges = async ({ agentId }: KnowledgesProps) => {
+	const knowledges = await getKnowledges(agentId);
+	return <KnowledgeList knowledges={knowledges} />;
 };
 
 const Skeleton = () => {
@@ -54,7 +49,7 @@ export async function Playground({
 						<SideNav
 							knowledge={
 								<Suspense fallback={<div>Loading...</div>}>
-									<Knowledges />
+									<Knowledges agentId={agentId} />
 								</Suspense>
 							}
 						/>

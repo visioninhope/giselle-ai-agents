@@ -34,7 +34,6 @@ export type KnowledgeContent = {
 export type Knowledge = {
 	id: KnowledgeId;
 	name: string;
-	contents: KnowledgeContent[];
 };
 
 export type KnowledgeState = {

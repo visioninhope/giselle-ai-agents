@@ -62,12 +62,12 @@ export const SideNav: FC<SideNavProps> = ({ knowledge }) => {
 			<AnimatePresence>
 				{show && (
 					<motion.div
-						className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
+						className="bg-green-800 h-full pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
 						initial={{ width: 0 }}
 						animate={{ width: "300px" }}
 						exit={{ width: 0 }}
 					>
-						<div className="flex justify-between">
+						<div className="flex justify-between w-[300px] px-2">
 							<div>
 								{match(activeMenu)
 									.with("overview", () => "Overview")
