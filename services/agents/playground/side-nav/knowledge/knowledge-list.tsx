@@ -84,7 +84,7 @@ export const AddKnowledgeForm: FC = () => {
 			<CardContent>
 				<form className="flex items-center gap-4" action={action}>
 					<Input name="name" data-1p-ignore />
-					<SubmitButton size="sm">Add</SubmitButton>
+					<SubmitButton>Add</SubmitButton>
 				</form>
 			</CardContent>
 		</Card>

@@ -1,12 +1,12 @@
+import { Button } from "@/components/ui/button";
 import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
-import { Button } from "../components/button";
 import { LinkText } from "../components/link-text";
 
 export default function SignupPage() {
 	return (
-		<div className="min-h-screen bg-black-100 flex items-center justify-center p-4 gap-16">
+		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex flex-col gap-[16px]">
 				<h2
 					className="text-3xl font-extrabold text-black--30 text-left font-[Rosart]"
@@ -54,7 +54,7 @@ export default function SignupPage() {
 						<span className="px-2 bg-navy-900 text-gray-400">or</span>
 					</div>
 				</div>
-				<Button variant="submit" asChild>
+				<Button asChild>
 					<Link href="/signup/email">
 						<p>Sign up for Email</p>
 						<MailIcon className="h-5 w-5 mr-2" />

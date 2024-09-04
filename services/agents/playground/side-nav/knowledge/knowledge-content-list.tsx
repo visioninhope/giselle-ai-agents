@@ -66,12 +66,7 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 	return (
 		<Popover open={open} onOpenChange={setOpen}>
 			<PopoverTrigger asChild>
-				<Button
-					size="sm"
-					variant="secondary"
-					className="gap-2"
-					disabled={isAdding}
-				>
+				<Button className="gap-2" disabled={isAdding}>
 					{isAdding ? (
 						<LoaderCircle className="w-4 h-4 animate-spin" />
 					) : (

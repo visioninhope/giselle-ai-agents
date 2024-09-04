@@ -60,6 +60,7 @@ const config = {
 					50: "hsl(var(--black_50))",
 					30: "hsl(var(--black_30))",
 					"-30": "hsl(var(--black_-30))",
+					"-50": "hsl(var(--black_-50))",
 					"-70": "hsl(var(--black_-70))",
 				},
 				white: {

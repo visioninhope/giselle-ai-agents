@@ -183,9 +183,7 @@ export default async function ConnectSpreadsheetPage() {
 								await signOut();
 							}}
 						>
-							<Button type="submit" variant="ghost">
-								Disconnect
-							</Button>
+							<Button type="submit">Disconnect</Button>
 						</form>
 					</div>
 
@@ -201,9 +199,7 @@ export default async function ConnectSpreadsheetPage() {
 							await signIn("google");
 						}}
 					>
-						<Button type="submit" variant="secondary">
-							Connect
-						</Button>
+						<Button type="submit">Connect</Button>
 					</form>
 				</div>
 			)}
