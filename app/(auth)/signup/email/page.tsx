@@ -21,13 +21,19 @@ export default function Page() {
 
 				<p className="mt-2 text-center text-sm text-gray-400">
 					By continuing, you agree to our{" "}
-					<a href="#" className="font-medium text-cyan-300 hover:text-cyan-200">
+					<Link
+						href="/terms"
+						className="font-medium text-cyan-300 hover:text-cyan-200"
+					>
 						Terms of Service
-					</a>{" "}
+					</Link>{" "}
 					and{" "}
-					<a href="#" className="font-medium text-cyan-300 hover:text-cyan-200">
+					<Link
+						href="/privacy"
+						className="font-medium text-cyan-300 hover:text-cyan-200"
+					>
 						Privacy Policy
-					</a>
+					</Link>
 					.
 				</p>
 
