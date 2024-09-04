@@ -24,8 +24,7 @@ export const getKnowledges = async (agentId: AgentId) => {
 				contents: knowledge.contents.map((knowledgeContent) => ({
 					id: knowledgeContent.id,
 					name: knowledgeContent.name,
-					// status: knowledgeContent.status,
-					status: "in_progress",
+					status: knowledgeContent.status,
 				})),
 			}) satisfies Knowledge,
 	);

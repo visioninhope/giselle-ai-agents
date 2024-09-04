@@ -42,9 +42,7 @@ type AddContentToKnowledgeArgs = {
  * This process enables the uploaded content to be used in AI-assisted knowledge retrieval
  * and ensures all necessary records and representations are created and linked properly.
  */
-export const addContentToKnowledge = async (
-	args: AddContentToKnowledgeArgs,
-) => {
+export const addKnowledgeContent = async (args: AddContentToKnowledgeArgs) => {
 	const blob = await put(args.content.file.name, args.content.file, {
 		access: "public",
 		contentType: args.content.file.type,

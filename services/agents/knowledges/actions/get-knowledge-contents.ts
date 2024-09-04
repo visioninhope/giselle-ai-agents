@@ -20,8 +20,8 @@ export const getKnowledgeContents = async (knowledgeId: KnowledgeId) => {
 				.select({
 					id: knowledgeContents.id,
 					name: knowledgeContents.name,
-					// status:
-					// 	knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileStatus,
+					status:
+						knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileStatus,
 					knowledgeName: knowledges.name,
 					knowledgeId: knowledges.id,
 				})
@@ -30,13 +30,13 @@ export const getKnowledgeContents = async (knowledgeId: KnowledgeId) => {
 					knowledges,
 					eq(knowledges.dbId, knowledgeContents.knowledgeDbId),
 				)
-				// .innerJoin(
-				// 	knowledgeContentOpenaiVectorStoreFileRepresentations,
-				// 	eq(
-				// 		knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
-				// 		knowledgeContents.dbId,
-				// 	),
-				// )
+				.innerJoin(
+					knowledgeContentOpenaiVectorStoreFileRepresentations,
+					eq(
+						knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
+						knowledgeContents.dbId,
+					),
+				)
 				.where(eq(knowledges.id, knowledgeId));
 		},
 		[knowledgeId],

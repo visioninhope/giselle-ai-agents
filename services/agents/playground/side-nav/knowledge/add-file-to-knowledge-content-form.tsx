@@ -3,7 +3,7 @@ import type { FC } from "react";
 import { useFormState } from "react-dom";
 import {
 	type KnowledgeId,
-	addContentToKnowledge,
+	addKnowledgeContent,
 	knowledgeContentType,
 } from "../../../knowledges";
 
@@ -20,7 +20,7 @@ export const AddFileToKnowledgeContentForm: FC<
 			if (file == null || typeof file === "string") {
 				return "File is required.";
 			}
-			await addContentToKnowledge({
+			await addKnowledgeContent({
 				knowledgeId,
 				content: {
 					name: file.name,

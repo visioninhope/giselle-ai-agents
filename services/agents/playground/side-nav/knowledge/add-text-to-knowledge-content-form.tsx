@@ -15,7 +15,7 @@ import type { FC } from "react";
 import { useFormState } from "react-dom";
 import {
 	type KnowledgeId,
-	addContentToKnowledge,
+	addKnowledgeContent,
 	knowledgeContentType,
 } from "../../../knowledges";
 
@@ -44,7 +44,7 @@ export const AddTextToKnowledgeContentForm: FC<
 			const file = new File([blob], `${title}.md`, {
 				type: "text/markdown",
 			});
-			await addContentToKnowledge({
+			await addKnowledgeContent({
 				knowledgeId,
 				content: {
 					name: title,
