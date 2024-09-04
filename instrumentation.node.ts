@@ -20,7 +20,7 @@ const otlpMetricsExporter = new OTLPMetricExporter({
 const sdk = new NodeSDK({
 	resource: new Resource({
 		[SEMRESATTRS_SERVICE_NAME]: "serverside",
-		environment: process.env.VERCEL_ENV || "not-set",
+		environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "not-set",
 	}),
 	metricReader: new PeriodicExportingMetricReader({
 		exporter: otlpMetricsExporter,
