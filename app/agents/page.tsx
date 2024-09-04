@@ -1,12 +1,14 @@
 import { SubmitButton } from "@/components/ui/submit-button";
-import { agents as agentsTable, db } from "@/drizzle";
-import { createId } from "@paralleldrive/cuid2";
-import { revalidatePath, revalidateTag } from "next/cache";
+import { getUser } from "@/lib/supabase";
+import { createAgent, getAgents } from "@/services/agents";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
-async function AgentList() {
-	const agents = await db.select().from(agentsTable);
+type AgentListProps = {
+	userId: string;
+};
+async function AgentList(props: AgentListProps) {
+	const agents = await getAgents({ userId: props.userId });
 	return (
 		<div className="flex flex-col gap-2">
 			{agents.map(({ id, name }) => (
@@ -21,15 +23,14 @@ async function AgentList() {
 		</div>
 	);
 }
-export default function AgentListPage() {
-	const createAgent = async () => {
+export default async function AgentListPage() {
+	const user = await getUser();
+	const action = async () => {
 		"use server";
-		const id = `agnt_${createId()}` as const;
-		await db.insert(agentsTable).values({
-			id,
+		const agent = await createAgent({
+			userId: user.id,
 		});
-		// revalidateTag("hello");
-		redirect(`/agents/${id}`);
+		redirect(`/agents/${agent.id}`);
 	};
 	return (
 		<div className="container mt-8">
@@ -37,14 +38,14 @@ export default function AgentListPage() {
 				<div className="flex flex-col gap-8">
 					<div className="flex justify-between">
 						<h1>Agents</h1>
-						<form action={createAgent}>
+						<form action={action}>
 							<SubmitButton type="submit" pendingNode={"Creating..."}>
 								Create new agent
 							</SubmitButton>
 						</form>
 					</div>
 					<Suspense fallback={<span>loading</span>}>
-						<AgentList />
+						<AgentList userId={user.id} />
 					</Suspense>
 				</div>
 			</section>
