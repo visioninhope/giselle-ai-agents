@@ -1,5 +1,6 @@
 "use server";
 
+import { getUserSubscriptionId } from "@/app/(auth)/lib";
 import { db, pullMessages, requestPortMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { insertRequestPortMessage } from "@/services/agents/requests/insert-request-port-message";
@@ -54,9 +55,8 @@ export const generateText = async ({
 		message: completion.choices[0].message.content ?? "",
 	});
 	if (completion.usage && completion.usage.total_tokens !== undefined) {
-		requestCounter.add(
-			completion.usage.total_tokens,
-			// TODO: add tag `subscriptionId`
-		);
+		requestCounter.add(completion.usage.total_tokens, {
+			subscriptionId: await getUserSubscriptionId(),
+		});
 	}
 };
