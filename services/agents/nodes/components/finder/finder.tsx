@@ -14,6 +14,7 @@ import {
 import type { FC, HTMLAttributes } from "react";
 import { type NodeGraph, nodeService } from "../../";
 import { AgentList } from "./agent-list";
+import { KnowledgeList } from "./knowledge-list";
 
 type FinderProps = Pick<
 	HTMLAttributes<HTMLDivElement>,
@@ -77,19 +78,19 @@ export const Finder: FC<FinderProps> = ({ onSelect, style, className }) => {
 							Text Generation
 						</DropdownMenuItem>
 					</DropdownMenuGroup>
-					{/**
-				<DropdownMenuSeparator />
-				<DropdownMenuGroup>
-					<DropdownMenuSub>
-						<DropdownMenuSubTrigger>Knowledge Retrieval</DropdownMenuSubTrigger>
-						<DropdownMenuPortal>
-							<DropdownMenuSubContent>
-								<KnowledgeList position={position} onSelect={onSelect} />
-							</DropdownMenuSubContent>
-						</DropdownMenuPortal>
-					</DropdownMenuSub>
-				</DropdownMenuGroup>
-				*/}
+					<DropdownMenuSeparator />
+					<DropdownMenuGroup>
+						<DropdownMenuSub>
+							<DropdownMenuSubTrigger>
+								Knowledge Retrieval
+							</DropdownMenuSubTrigger>
+							<DropdownMenuPortal>
+								<DropdownMenuSubContent>
+									<KnowledgeList onSelect={onSelect} />
+								</DropdownMenuSubContent>
+							</DropdownMenuPortal>
+						</DropdownMenuSub>
+					</DropdownMenuGroup>
 				</DropdownMenuContent>
 			</DropdownMenu>
 		</div>
