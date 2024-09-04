@@ -2,6 +2,7 @@ import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../components/button";
+import { LinkText } from "../components/link-text";
 
 export default function SignupPage() {
 	return (
@@ -62,27 +63,24 @@ export default function SignupPage() {
 				<p className="mt-2 text-center text-sm text-gray-400">
 					By continuing, you agree to our{" "}
 					<Link
-						href="/terms"
+						href="/legal/tos"
 						className="font-medium text-cyan-300 hover:text-cyan-200"
 					>
 						Terms of Service
 					</Link>{" "}
 					and{" "}
 					<Link
-						href="/privacy"
+						href="/legal/privacy"
 						className="font-medium text-cyan-300 hover:text-cyan-200"
 					>
 						Privacy Policy
 					</Link>
 				</p>
-				<p className="text-center text-sm text-gray-400">
+				<p className="text-center text-sm text-gray-400 font-[Rosart]">
 					Already have an account?{" "}
-					<Link
-						href="/login"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						Log in
-					</Link>
+					<LinkText asChild>
+						<Link href="/login">Log in</Link>
+					</LinkText>
 				</p>
 			</div>
 		</div>
