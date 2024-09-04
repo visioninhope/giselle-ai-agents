@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut } from "@/app/(auth)";
+// import { signOut } from "@/app/(auth)";
 import type { FC } from "react";
 
 export const SignOutButton: FC = () => {
@@ -8,7 +8,7 @@ export const SignOutButton: FC = () => {
 		<button
 			type="button"
 			onClick={() => {
-				signOut();
+				// signOut();
 			}}
 		>
 			Logout

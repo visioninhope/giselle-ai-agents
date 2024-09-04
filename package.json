@@ -10,6 +10,7 @@
 	},
 	"packageManager": "bun@1.1.17",
 	"dependencies": {
+		"@icons-pack/react-simple-icons": "10.0.0",
 		"@next/env": "14.2.5",
 		"@paralleldrive/cuid2": "2.2.2",
 		"@radix-ui/react-accordion": "^1.2.0",
