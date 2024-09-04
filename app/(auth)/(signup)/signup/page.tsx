@@ -1,10 +1,12 @@
 import Link from "next/link";
 
+import { SignupPage } from "@/services/accounts";
 import { SignupForm } from "./signup-form";
 
 export default function Page() {
-	return (
-		<div className="flex items-center justify-center py-12">
+	return <SignupPage />;
+}
+/** <div className="flex items-center justify-center py-12">
 			<div className="mx-auto grid w-[350px] gap-6">
 				<div className="grid gap-2 text-center">
 					<h1 className="text-3xl font-bold">Sign up</h1>
@@ -20,6 +22,4 @@ export default function Page() {
 					</Link>
 				</div>
 			</div>
-		</div>
-	);
-}
+		</div> **/
