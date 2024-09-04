@@ -11,6 +11,11 @@ const nextConfig = {
 			fullUrl: true,
 		},
 	},
+	experimental: {
+		serverActions: {
+			bodySizeLimit: "2mb",
+		},
+	},
 };
 
 export default withSentryConfig(nextConfig, {

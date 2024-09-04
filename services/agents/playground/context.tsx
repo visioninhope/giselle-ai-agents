@@ -11,6 +11,7 @@ import {
 	useReducer,
 	useState,
 } from "react";
+import type { Knowledge } from "../knowledges";
 import { OperationProvider } from "../nodes";
 import { RequestProvider, type RequestRunnerProvider } from "../requests";
 import type { AgentId } from "../types";
@@ -32,6 +33,7 @@ export type PlaygroundProviderProps = {
 	agentId: AgentId;
 	graph: PlaygroundGraph;
 	requestRunnerProvider: RequestRunnerProvider;
+	knowledges: Knowledge[];
 };
 export const PlaygroundProvider: FC<
 	PropsWithChildren<PlaygroundProviderProps>
@@ -39,6 +41,7 @@ export const PlaygroundProvider: FC<
 	const [state, dispatch] = useReducer(playgroundReducer, {
 		agentId: props.agentId,
 		graph: props.graph,
+		knowledges: props.knowledges,
 	});
 	const debounceSetGraph = useDebounce(
 		async (agentId: AgentId, graph: PlaygroundGraph) => {
@@ -75,6 +78,7 @@ export const PlaygroundProvider: FC<
 				updateNode={(nodeId, updates) => {
 					dispatchWithMiddleware({ type: "UPDATE_NODE", nodeId, updates });
 				}}
+				knowledges={props.knowledges}
 			>
 				<RequestProvider
 					agentId={props.agentId}

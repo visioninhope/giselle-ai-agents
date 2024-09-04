@@ -7,9 +7,17 @@ import { revalidateTag, unstable_cache } from "next/cache";
 import type { Knowledge } from "../types";
 import { getKnowledgeContents } from "./get-knowledge-contents";
 
-const getKnowledgesTag = (agentId: AgentId) => `${agentId}.getKnowledges`;
-export const getKnowledges = async (agentId: AgentId) => {
-	const dbKnowledges = await getCachedKnowledges(agentId);
+type GetKnowledgesArgs = {
+	agentId: AgentId;
+};
+type TagParams = {
+	agentId: AgentId;
+};
+
+const getKnowledgesTag = (params: TagParams) =>
+	`${params.agentId}.getKnowledges`;
+export const getKnowledges = async (args: GetKnowledgesArgs) => {
+	const dbKnowledges = await getCachedKnowledges(args);
 	const knowledgeWithContents = await Promise.all(
 		dbKnowledges.map(async (knowledge) => ({
 			...knowledge,
@@ -30,11 +38,11 @@ export const getKnowledges = async (agentId: AgentId) => {
 	);
 };
 
-export const revalidateGetKnowledges = async (agentId: AgentId) => {
-	revalidateTag(getKnowledgesTag(agentId));
+export const revalidateGetKnowledges = async (params: TagParams) => {
+	revalidateTag(getKnowledgesTag(params));
 };
 
-const getCachedKnowledges = async (agentId: AgentId) => {
+const getCachedKnowledges = async (args: GetKnowledgesArgs) => {
 	const cachedKnowledges = unstable_cache(
 		() =>
 			db
@@ -44,10 +52,10 @@ const getCachedKnowledges = async (agentId: AgentId) => {
 				})
 				.from(knowledges)
 				.innerJoin(agents, eq(agents.dbId, knowledges.agentDbId))
-				.where(eq(agents.id, agentId)),
-		[agentId],
+				.where(eq(agents.id, args.agentId)),
+		[args.agentId],
 		{
-			tags: [getKnowledgesTag(agentId)],
+			tags: [getKnowledgesTag(args)],
 		},
 	);
 

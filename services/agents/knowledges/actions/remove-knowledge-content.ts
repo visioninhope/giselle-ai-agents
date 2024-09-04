@@ -45,40 +45,40 @@ export const removeKnowledgeContent = async (
 			dbId: knowledgeContents.dbId,
 			fileDbId: files.dbId,
 			fileBlobUrl: files.blobUrl,
-			// knowledgeOpenaiVectorStoreId:
-			// 	knowledgeOpenaiVectorStoreRepresentations.openaiVectorStoreId,
-			// openaiFileId: fileOpenaiFileRepresentations.openaiFileId,
-			// openaiVectorStoreFileId:
-			// 	knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
+			knowledgeOpenaiVectorStoreId:
+				knowledgeOpenaiVectorStoreRepresentations.openaiVectorStoreId,
+			openaiFileId: fileOpenaiFileRepresentations.openaiFileId,
+			openaiVectorStoreFileId:
+				knowledgeContentOpenaiVectorStoreFileRepresentations.openaiVectorStoreFileId,
 		})
 		.from(knowledgeContents)
-		// .innerJoin(
-		// 	knowledgeContentOpenaiVectorStoreFileRepresentations,
-		// 	eq(
-		// 		knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
-		// 		knowledgeContents.dbId,
-		// 	),
-		// )
+		.innerJoin(
+			knowledgeContentOpenaiVectorStoreFileRepresentations,
+			eq(
+				knowledgeContentOpenaiVectorStoreFileRepresentations.knowledgeContentDbId,
+				knowledgeContents.dbId,
+			),
+		)
 		.innerJoin(files, eq(files.dbId, knowledgeContents.dbId))
-		// .innerJoin(
-		// 	fileOpenaiFileRepresentations,
-		// 	eq(fileOpenaiFileRepresentations.fileDbId, files.dbId),
-		// )
+		.innerJoin(
+			fileOpenaiFileRepresentations,
+			eq(fileOpenaiFileRepresentations.fileDbId, files.dbId),
+		)
 		.innerJoin(knowledges, eq(knowledges.dbId, knowledgeContents.knowledgeDbId))
+		.innerJoin(
+			knowledgeOpenaiVectorStoreRepresentations,
+			eq(
+				knowledgeOpenaiVectorStoreRepresentations.knowledgeDbId,
+				knowledges.dbId,
+			),
+		)
 		.where(eq(knowledgeContents.id, knowledgeContentId));
-	// .innerJoin(
-	// 	knowledgeOpenaiVectorStoreRepresentations,
-	// 	eq(
-	// 		knowledgeOpenaiVectorStoreRepresentations.knowledgeDbId,
-	// 		knowledges.dbId,
-	// 	),
-	// );
 	await db.transaction(async (tx) => {
-		// await openai.beta.vectorStores.files.del(
-		// 	knowledgeContent.knowledgeOpenaiVectorStoreId,
-		// 	knowledgeContent.openaiVectorStoreFileId,
-		// );
-		// await openai.files.del(knowledgeContent.openaiFileId);
+		await openai.beta.vectorStores.files.del(
+			knowledgeContent.knowledgeOpenaiVectorStoreId,
+			knowledgeContent.openaiVectorStoreFileId,
+		);
+		await openai.files.del(knowledgeContent.openaiFileId);
 		await del(knowledgeContent.fileBlobUrl);
 
 		// The following deletion will cascade to related tables (knowledgeContents,

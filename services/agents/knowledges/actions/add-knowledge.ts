@@ -41,5 +41,5 @@ export const addKnowledge = async (args: AddKnowledgeArgs) => {
 			openaiVectorStoreStatus: openaiVectorStore.status,
 		});
 	});
-	await revalidateGetKnowledges(args.agentId);
+	await revalidateGetKnowledges({ agentId: args.agentId });
 };

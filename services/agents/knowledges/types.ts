@@ -1,4 +1,9 @@
+import { custom } from "valibot";
+
 export type KnowledgeId = `knwl_${string}`;
+export const knowledgeIdSchema = custom<KnowledgeId>(
+	(input) => typeof input === "string" && /^knwl_.*$/.test(input),
+);
 
 export type KnowledgeContentId = `knwl.cnt_${string}`;
 export type FileId = `fl_${string}`;
