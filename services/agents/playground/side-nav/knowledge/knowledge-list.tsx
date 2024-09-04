@@ -61,10 +61,13 @@ export const AddKnowledgeForm: FC = () => {
 			if (name.length === 0) {
 				return "name is required";
 			}
-			await addKnowledge(state.agentId, {
-				id: `knwl_${createId()}`,
-				name,
-				contents: [],
+			await addKnowledge({
+				agentId: state.agentId,
+				knowledge: {
+					id: `knwl_${createId()}`,
+					name,
+					contents: [],
+				},
 			});
 			return null;
 		},

@@ -98,10 +98,6 @@ export const addContentToKnowledge = async (
 						knowledgeOpenaiVectorStoreRepresentations.knowledgeDbId,
 						knowledge.dbId,
 					),
-					eq(
-						knowledgeOpenaiVectorStoreRepresentations.openaiVectorStoreStatus,
-						"completed",
-					),
 				),
 			);
 		const openaiVectorStoreFile = await openai.beta.vectorStores.files.create(

@@ -1,6 +1,5 @@
 import { getKnowledges } from "../../../knowledges";
 import type { AgentId } from "../../../types";
-import { AddContentStateProvider } from "./add-content-state-provider";
 import { KnowledgeList } from "./knowledge-list";
 
 type KnowledgesProps = {
