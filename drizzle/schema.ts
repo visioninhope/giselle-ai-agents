@@ -395,8 +395,3 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 			.notNull(),
 	},
 );
-
-export const tasks = pgTable("tasks", {
-	id: serial("id").primaryKey(),
-	name: text("name").notNull(),
-});
