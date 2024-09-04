@@ -12,7 +12,7 @@ import { SEMRESATTRS_SERVICE_NAME } from "@opentelemetry/semantic-conventions";
 const otlpMetricsExporter = new OTLPMetricExporter({
 	url: "https://ingest.us.signoz.cloud:443/v1/metrics",
 	headers: {
-		"signoz-access-token": process.env.SIGNOZ_ACCESS_TOKEN,
+		"signoz-access-token": process.env.SIGNOZ_INGESTION_TOKEN,
 	},
 });
 
