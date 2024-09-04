@@ -1,8 +1,8 @@
 import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
 import { MailIcon } from "lucide-react";
-import React from "react";
+import Link from "next/link";
 
-const SignupPage = () => {
+export default function SignupPage() {
 	return (
 		<div className="min-h-screen bg-navy-900 flex items-center justify-center p-4">
 			<div className="text-center">
@@ -48,9 +48,12 @@ const SignupPage = () => {
 						<span className="px-2 bg-navy-900 text-gray-400">or</span>
 					</div>
 				</div>
-				<button className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500">
+				<Link
+					href="/signup/email"
+					className="w-full flex items-center justify-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-cyan-600 hover:bg-cyan-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-500"
+				>
 					<MailIcon className="h-5 w-5 mr-2" /> Sign up for Email
-				</button>
+				</Link>
 				<p className="mt-2 text-center text-sm text-gray-400">
 					By continuing, you agree to our{" "}
 					<a href="#" className="font-medium text-cyan-300 hover:text-cyan-200">
@@ -71,6 +74,4 @@ const SignupPage = () => {
 			</div>
 		</div>
 	);
-};
-
-export default SignupPage;
+}

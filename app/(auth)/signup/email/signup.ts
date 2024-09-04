@@ -27,6 +27,6 @@ export async function signup(email: string, password: string) {
 		};
 	}
 
-	redirect("/verify-email");
+	redirect("/signup/verify-email");
 	return null;
 }
