@@ -6,8 +6,8 @@ import { type FC, useActionState, useCallback, useMemo } from "react";
 import { portDirection } from "../../nodes";
 import { portType } from "../../nodes/types";
 import type { PlaygroundGraph } from "../../playground/types";
+import { useRequest } from "../context";
 import { getTriggerNode } from "../helpers";
-import { useRequest } from "../provider";
 
 type RequestTriggerProps = {
 	playgroundGraph: PlaygroundGraph;

@@ -9,7 +9,7 @@ import type { FC } from "react";
 import { match } from "ts-pattern";
 import { portDirection } from "../../nodes";
 import { portType } from "../../nodes/types";
-import { useRequest } from "../provider";
+import { useRequest } from "../context";
 import { requestStepStatus } from "../types";
 
 export const RequestLogger: FC = () => {

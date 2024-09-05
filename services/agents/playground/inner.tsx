@@ -10,7 +10,7 @@ import {
 	type Port,
 	portDirection,
 } from "../nodes";
-import { useRequest } from "../requests";
+import { useRequest } from "../requests/context";
 import type { Request } from "../requests/types";
 import { usePlayground } from "./context";
 import { PropertyPanel } from "./property-panel";

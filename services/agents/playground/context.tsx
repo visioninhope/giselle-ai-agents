@@ -7,13 +7,11 @@ import {
 	createContext,
 	useCallback,
 	useContext,
-	useEffect,
 	useReducer,
-	useState,
 } from "react";
 import type { Knowledge } from "../knowledges";
 import { OperationProvider } from "../nodes";
-import { RequestProvider } from "../requests";
+import { RequestProvider } from "../requests/provider";
 import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { setGraph } from "./actions/set-graph";

@@ -56,3 +56,8 @@ export type Request = {
 	stacks: RequestStack[];
 	status: RequestStatus;
 };
+
+export type RequestState = {
+	requestStartAction: () => Promise<void>;
+	lastRequest?: Request | undefined | null;
+};

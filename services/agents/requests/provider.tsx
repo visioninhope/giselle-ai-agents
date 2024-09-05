@@ -15,6 +15,7 @@ import {
 	createRequest,
 } from "./actions/build-playground-graph";
 import { getRequest } from "./actions/get-request";
+import { RequestContext } from "./context";
 import { runOnTriggerDev, runOnVercel } from "./runners";
 import {
 	type Request,
@@ -22,13 +23,6 @@ import {
 	type RequestRunnerProvider,
 	requestStatus,
 } from "./types";
-
-type RequestProviderState = {
-	requestStartAction: () => Promise<void>;
-	lastRequest?: Request | undefined | null;
-};
-
-const RequestContext = createContext<RequestProviderState | null>(null);
 
 type RequestProviderProps = {
 	agentId: AgentId;
@@ -85,12 +79,4 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 			{children}
 		</RequestContext.Provider>
 	);
-};
-
-export const useRequest = () => {
-	const context = useContext(RequestContext);
-	if (!context) {
-		throw new Error("useRequest must be used within a RequestProvider");
-	}
-	return context;
 };
