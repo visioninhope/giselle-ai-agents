@@ -13,9 +13,9 @@ import {
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import { assertNodeClassName, nodeService } from "../nodes";
-import type { AgentId } from "../types";
-import { getTriggerNode } from "./helpers";
+import { assertNodeClassName, nodeService } from "../../nodes";
+import type { AgentId } from "../../types";
+import { getTriggerNode } from "../helpers";
 
 export const buildPlaygroundGraph = async (agentId: AgentId) => {
 	const [agent] = await db.select().from(agents).where(eq(agents.id, agentId));

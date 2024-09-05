@@ -17,3 +17,4 @@ export { useRequest, RequestProvider } from "./provider";
 export { RequestButton } from "./components/request-button";
 export { RequestLogger } from "./components/request-logger";
 export { insertRequestPortMessage } from "./actions/insert-request-port-message";
+export { buildPlaygroundGraph, createRequest } from "./actions/process";
