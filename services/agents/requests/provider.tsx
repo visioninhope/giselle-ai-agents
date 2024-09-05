@@ -9,16 +9,16 @@ import {
 	useEffect,
 	useState,
 } from "react";
-import type { AgentId } from "../../types";
-import { getRequest } from "../get-request";
-import { buildPlaygroundGraph, createRequest } from "../process";
-import { runOnTriggerDev, runOnVercel } from "../runners";
+import type { AgentId } from "../types";
+import { getRequest } from "./get-request";
+import { buildPlaygroundGraph, createRequest } from "./process";
+import { runOnTriggerDev, runOnVercel } from "./runners";
 import {
 	type Request,
 	type RequestId,
 	type RequestRunnerProvider,
 	requestStatus,
-} from "../types";
+} from "./types";
 
 type RequestProviderState = {
 	requestStartAction: () => Promise<void>;

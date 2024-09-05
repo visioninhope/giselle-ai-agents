@@ -15,6 +15,6 @@ export type {
 	RequestStepStatus,
 	RequestRunnerProvider,
 } from "./types";
-export { useRequest, RequestProvider } from "./contexts/request-provider";
+export { useRequest, RequestProvider } from "./provider";
 export { RequestButton } from "./components/request-button";
 export { RequestLogger } from "./components/request-logger";
