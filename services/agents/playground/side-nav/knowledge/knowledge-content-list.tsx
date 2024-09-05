@@ -15,6 +15,7 @@ import { type FC, useState } from "react";
 import type { KnowledgeContent, KnowledgeId } from "../../../knowledges";
 import { AddFileToKnowledgeContentForm } from "./add-file-to-knowledge-content-form";
 import { AddTextToKnowledgeContentForm } from "./add-text-to-knowledge-content-form";
+import { AddWebpageToKnowledgeContentForm } from "./add-webpage-to-knowledge-content-form";
 import { useContentState } from "./content-state-provider";
 import { KnowledgeContentListItem } from "./knowledge-content-list-item";
 
@@ -91,6 +92,16 @@ const ContentUploader: FC<ContentUploaderProps> = ({ knowledgeId }) => {
 
 							<CommandItem>
 								<AddTextToKnowledgeContentForm
+									knowledgeId={knowledgeId}
+									onSubmit={() => {
+										setOpen(false);
+										dispatch({ type: "ADDING" });
+									}}
+								/>
+							</CommandItem>
+
+							<CommandItem>
+								<AddWebpageToKnowledgeContentForm
 									knowledgeId={knowledgeId}
 									onSubmit={() => {
 										setOpen(false);
