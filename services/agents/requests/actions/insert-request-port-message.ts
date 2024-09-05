@@ -7,7 +7,7 @@ import {
 	requests,
 } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
-import type { Port } from "../nodes";
+import type { Port } from "../../nodes";
 
 type InsertRequestPortMessageArgs = {
 	requestDbId: number;
