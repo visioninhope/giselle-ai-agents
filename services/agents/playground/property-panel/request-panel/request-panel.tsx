@@ -5,8 +5,8 @@
 // import { RequestLogger } from "./request-logger";
 // import { RequiredAction } from "./required-action";
 
-import { RequestButton, RequestLogger } from "@/services/agents/requests";
 import type { FC } from "react";
+import { RequestButton, RequestLogger } from "../../../requests/components";
 import { usePlayground } from "../../context";
 
 // export const RequestPanel: FC = () => {
