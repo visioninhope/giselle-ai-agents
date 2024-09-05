@@ -30,12 +30,12 @@ export const Form: FC<FormProps> = ({
 					</AlertDescription>
 				</Alert>
 			)}
-			<div className="grid gap-4">
-				<div className="grid gap-2">
+			<div className="grid gap-[16px]">
+				<div className="grid gap-[4px]">
 					<Label htmlFor="email">Email</Label>
 					<Input id="email" type="email" name="email" required />
 				</div>
-				<div className="grid gap-2">
+				<div className="grid gap-[4px]">
 					<div className="flex items-center">
 						<Label htmlFor="password">Password</Label>
 						{linkToResetPassword && (

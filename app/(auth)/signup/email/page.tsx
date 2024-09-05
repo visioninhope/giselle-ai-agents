@@ -1,19 +1,20 @@
 import Link from "next/link";
 
 import { SendIcon } from "lucide-react";
+import { PageTitle } from "../../components/page-title";
 import { SignupForm } from "./signup-form";
 
 export default function Page() {
 	return (
 		<div className="min-h-screen bg-navy-900 flex items-center justify-center p-4">
-			<div className="max-w-md w-full space-y-8">
+			<div className="w-[320px] space-y-8">
 				<div className="text-center">
-					<h2 className="mt-6 text-3xl font-bold text-white">
+					<PageTitle>
 						Create new account
 						<br />
 						with Email.
-					</h2>
-					<p className="mt-2 text-sm text-gray-400">
+					</PageTitle>
+					<p className="mt-2 text-sm text-black-50">
 						Free forever. No credit card required.
 					</p>
 				</div>
@@ -21,13 +22,19 @@ export default function Page() {
 
 				<p className="mt-2 text-center text-sm text-gray-400">
 					By continuing, you agree to our{" "}
-					<a href="#" className="font-medium text-cyan-300 hover:text-cyan-200">
+					<Link
+						href="/terms"
+						className="font-medium text-cyan-300 hover:text-cyan-200"
+					>
 						Terms of Service
-					</a>{" "}
+					</Link>{" "}
 					and{" "}
-					<a href="#" className="font-medium text-cyan-300 hover:text-cyan-200">
+					<Link
+						href="/privacy"
+						className="font-medium text-cyan-300 hover:text-cyan-200"
+					>
 						Privacy Policy
-					</a>
+					</Link>
 					.
 				</p>
 

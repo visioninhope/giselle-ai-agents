@@ -52,7 +52,7 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ knowledgeContent }) => {
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Button variant="ghost" size="sm">
+				<Button>
 					<TrashIcon className="h-4 w-4" />
 				</Button>
 			</DialogTrigger>
@@ -67,13 +67,12 @@ const DeleteDialog: FC<DeleteDialogProps> = ({ knowledgeContent }) => {
 				</DialogHeader>
 				<DialogFooter>
 					<DialogClose asChild>
-						<Button type="button" variant="secondary" disabled={isRemoving}>
+						<Button type="button" disabled={isRemoving}>
 							Cancel
 						</Button>
 					</DialogClose>
 					<Button
 						type="submit"
-						variant="destructive"
 						disabled={isRemoving}
 						onClick={async () => {
 							dispatch({ type: "REMOVING" });

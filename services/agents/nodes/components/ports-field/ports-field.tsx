@@ -46,7 +46,7 @@ export const PortsField: FC<PortsField> = ({
 				<div>
 					<Popover open={disclosure} onOpenChange={setDisclosure}>
 						<PopoverTrigger asChild>
-							<Button size="icon" variant="ghost">
+							<Button>
 								<PlusIcon className="w-4 h-4" />
 							</Button>
 						</PopoverTrigger>

@@ -75,9 +75,7 @@ export const PortListItem: FC<PortListItemProps> = ({ port }) => {
 				<div className="flex justify-between w-full">
 					<span className="cursor-default">{port.name}</span>
 					<Button
-						size="icon"
 						type="button"
-						variant="ghost"
 						className="hidden group-hover:block"
 						onClick={() => {
 							deletePort(port.id);

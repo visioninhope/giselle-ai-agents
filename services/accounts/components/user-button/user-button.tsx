@@ -17,11 +17,7 @@ export const UserButton: FC = async () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
-				<Button
-					variant="ghost"
-					size="icon"
-					className="overflow-hidden rounded-full"
-				>
+				<Button className="overflow-hidden rounded-full">
 					<UserRoundIcon className="w-6 h-6" />
 				</Button>
 			</DropdownMenuTrigger>
