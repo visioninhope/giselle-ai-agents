@@ -1,4 +1,5 @@
 import type { Node, NodeGraph, Port } from "../nodes";
+import type { AgentId } from "../types";
 export type RequestId = `rqst_${string}`;
 export type RequestStackId = `rqst.stck_${string}`;
 export type RequestStepId = `rqst.stp_${string}`;
@@ -58,6 +59,7 @@ export type Request = {
 };
 
 export type RequestState = {
-	requestStartAction: () => Promise<void>;
-	lastRequest?: Request | undefined | null;
+	agentId: AgentId;
+	requestId?: RequestId | undefined | null;
+	request?: Request | undefined | null;
 };

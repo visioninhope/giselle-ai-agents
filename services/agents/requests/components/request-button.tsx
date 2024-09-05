@@ -1,20 +1,21 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
-import { SubmitButton } from "@/components/ui/submit-button";
-import { type FC, useActionState, useCallback, useMemo } from "react";
+import { type FC, useActionState, useMemo } from "react";
 import { portDirection } from "../../nodes";
 import { portType } from "../../nodes/types";
 import type { PlaygroundGraph } from "../../playground/types";
+import { buildPlaygroundGraph, createRequest } from "../actions";
 import { useRequest } from "../context";
 import { getTriggerNode } from "../helpers";
+import type { BuildAndRequestActionError } from "./build-and-request-action";
 
 type RequestTriggerProps = {
 	playgroundGraph: PlaygroundGraph;
 };
 export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
-	const { requestStartAction } = useRequest();
-	const [state, action] = useActionState(() => {}, null);
+	const { agentId } = useRequest();
 	const requestParameters = useMemo(() => {
 		const triggerNode = getTriggerNode(playgroundGraph);
 		if (triggerNode == null) {
@@ -25,27 +26,43 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 				direction === portDirection.source && type === portType.data,
 		);
 	}, [playgroundGraph]);
-	const handleSubmit = useCallback(
-		(e: React.FormEvent<HTMLFormElement>) => {
-			e.preventDefault();
-			requestStartAction();
+	const [state, action, isPending] = useActionState(
+		async (
+			prevState: BuildAndRequestActionError | null,
+			formData: FormData,
+		) => {
+			const inputRequestParameters = requestParameters
+				?.map(({ id }) => {
+					const value = formData.get(id);
+					if (value == null) {
+						return null;
+					}
+					return { key: id, value: value.toString() };
+				})
+				.filter((i) => i !== null);
+			const build = await buildPlaygroundGraph(agentId);
+			const request = await createRequest(build.id);
+			return null;
 		},
-		[requestStartAction],
+		null,
 	);
 	if (requestParameters == null || requestParameters.length === 0) {
 		return (
-			<form onSubmit={handleSubmit}>
-				<pre>{JSON.stringify(requestParameters, null, 2)}</pre>
-				<SubmitButton pendingNode={"Requesting..."}>Request</SubmitButton>
+			<form action={action}>
+				<Button type="submit" disabled={isPending}>
+					Request
+				</Button>
 			</form>
 		);
 	}
 	return (
 		<form action={action} className="grid gap-[16px]">
 			{requestParameters.map(({ id, name }) => (
-				<Field key={id} name={name} label={name} type="text" required />
+				<Field key={id} name={id} label={name} type="text" required />
 			))}
-			<SubmitButton pendingNode={"Requesting..."}>Request</SubmitButton>
+			<Button type="submit" disabled={isPending}>
+				Request
+			</Button>
 		</form>
 	);
 };

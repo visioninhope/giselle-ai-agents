@@ -8,7 +8,7 @@ import { signup } from "./signup";
 
 export const SignupForm: FC = () => {
 	const { dispatch } = useSignupContext();
-	const [authError, action] = useActionState(
+	const [authError, action, isPending] = useActionState(
 		(prevState: AuthError | null, formData: FormData) => {
 			// type-casting here for convenience
 			// in practice, you should validate your inputs
@@ -23,7 +23,11 @@ export const SignupForm: FC = () => {
 	);
 	return (
 		<form action={action}>
-			<Form submitText="Create an account" authError={authError} />
+			<Form
+				submitText="Create an account"
+				authError={authError}
+				isPending={isPending}
+			/>
 		</form>
 	);
 };

@@ -10,11 +10,7 @@ import {
 	useState,
 } from "react";
 import type { AgentId } from "../types";
-import {
-	buildPlaygroundGraph,
-	createRequest,
-} from "./actions/build-playground-graph";
-import { getRequest } from "./actions/get-request";
+import { buildPlaygroundGraph, createRequest, getRequest } from "./actions";
 import { RequestContext } from "./context";
 import { runOnTriggerDev, runOnVercel } from "./runners";
 import {
@@ -75,7 +71,9 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 		};
 	}, [requestId]);
 	return (
-		<RequestContext.Provider value={{ requestStartAction, lastRequest }}>
+		<RequestContext.Provider
+			value={{ requestStartAction, lastRequest, agentId }}
+		>
 			{children}
 		</RequestContext.Provider>
 	);

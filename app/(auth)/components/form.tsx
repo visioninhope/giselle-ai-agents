@@ -1,9 +1,9 @@
 "use client";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { SubmitButton } from "@/components/ui/submit-button";
 import type { AuthError } from "@/lib/supabase";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
@@ -13,11 +13,13 @@ type FormProps = {
 	authError: AuthError | null;
 	linkToResetPassword?: boolean;
 	submitText?: string;
+	isPending: boolean;
 };
 export const Form: FC<FormProps> = ({
 	linkToResetPassword = false,
 	submitText = "Submit",
 	authError,
+	isPending,
 }) => {
 	return (
 		<div className="grid gap-6">
@@ -49,7 +51,9 @@ export const Form: FC<FormProps> = ({
 					</div>
 					<Input id="password" type="password" name="password" required />
 				</div>
-				<SubmitButton className="w-full">{submitText}</SubmitButton>
+				<Button className="w-full" type="submit" disabled={isPending}>
+					{submitText}
+				</Button>
 			</div>
 		</div>
 	);
