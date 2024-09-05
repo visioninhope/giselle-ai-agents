@@ -13,7 +13,7 @@ const buttonVariants = cva(
 			variant: {
 				default:
 					"justify-center text-white bg-black-70 border-black-70 gap-[8px] hover:bg-black-30 hover:text-black-80",
-				link: "flex-start gap-[40px] text-white bg-transparent border-gray-700 hover:bg-black-30 hover:text-black-80",
+				link: "flex-start gap-[40px] text-white bg-transparent border-black-30 hover:bg-black-30 hover:text-black-80",
 			},
 		},
 		defaultVariants: {
