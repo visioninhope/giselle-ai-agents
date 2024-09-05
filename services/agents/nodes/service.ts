@@ -106,7 +106,6 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			if (action == null) {
 				return;
 			}
-			console.log(JSON.stringify(node, null, 2));
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({

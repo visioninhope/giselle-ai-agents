@@ -21,7 +21,7 @@ import {
 } from "../types";
 
 type RequestProviderState = {
-	requestStart: () => Promise<void>;
+	requestStartAction: () => Promise<void>;
 	lastRequest?: Request | undefined | null;
 };
 
@@ -38,7 +38,7 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 }) => {
 	const [requestId, setRequestId] = useState<RequestId | undefined>();
 	const [lastRequest, setLastRequest] = useState<Request | undefined | null>();
-	const requestStart = useCallback(async () => {
+	const requestStartAction = useCallback(async () => {
 		const build = await buildPlaygroundGraph(agentId);
 		const newRequest = await createRequest(build.id);
 		setRequestId(newRequest.id);
@@ -78,7 +78,7 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 		};
 	}, [requestId]);
 	return (
-		<RequestContext.Provider value={{ requestStart, lastRequest }}>
+		<RequestContext.Provider value={{ requestStartAction, lastRequest }}>
 			{children}
 		</RequestContext.Provider>
 	);

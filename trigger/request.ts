@@ -4,7 +4,7 @@ import {
 	runStackGenerator,
 	runStep,
 	updateRequestStatus,
-} from "@/services/agents/requests/actions";
+} from "@/services/agents/requests/actions/run";
 import { task } from "@trigger.dev/sdk/v3";
 
 type RequestArgs = {

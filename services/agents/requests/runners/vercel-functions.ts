@@ -7,7 +7,7 @@ import {
 	runStackGenerator,
 	runStep,
 	updateRequestStatus,
-} from "../actions";
+} from "../actions/run";
 import { requestStatus } from "../types";
 import type { StartRunnerArgs } from "./types";
 
