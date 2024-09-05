@@ -6,15 +6,14 @@ import { type FC, useEffect } from "react";
 import {
 	Finder,
 	GiselleNode,
-	GiselleNodeData,
 	type Node,
 	type Port,
 	portDirection,
 } from "../nodes";
-import { type Request, useRequest } from "../requests";
+import { useRequest } from "../requests";
+import type { Request } from "../requests/types";
 import { usePlayground } from "./context";
 import { PropertyPanel } from "./property-panel";
-import { SideNav } from "./side-nav";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
 import { useContextMenu } from "./use-context-menu";
 

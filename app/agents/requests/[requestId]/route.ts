@@ -1,5 +1,5 @@
-import type { RequestId } from "@/services/agents/requests";
 import { runOnVercel } from "@/services/agents/requests/runners";
+import type { RequestId } from "@/services/agents/requests/types";
 
 export async function POST(
 	request: Request,

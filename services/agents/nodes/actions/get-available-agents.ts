@@ -10,7 +10,7 @@ import {
 	triggerNodes,
 } from "@/drizzle";
 import { and, eq, exists, isNotNull, max, sql } from "drizzle-orm";
-import { requestStatus } from "../../requests";
+import { requestStatus } from "../../requests/types";
 import type { Agent } from "../../types";
 import { portDirection, portType } from "../types";
 

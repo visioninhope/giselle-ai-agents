@@ -3,7 +3,10 @@
 import { db, pullMessages, requestResults } from "@/drizzle";
 import { logger, runs } from "@trigger.dev/sdk/v3";
 import { and, eq } from "drizzle-orm";
-import { createRequest, insertRequestPortMessage } from "../../../requests";
+import {
+	createRequest,
+	insertRequestPortMessage,
+} from "../../../requests/actions";
 import { runOnVercel } from "../../../requests/runners";
 import type { Agent } from "../../../types";
 import type { Port } from "../../types";

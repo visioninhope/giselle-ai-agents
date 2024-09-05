@@ -10,8 +10,11 @@ import {
 	useState,
 } from "react";
 import type { AgentId } from "../types";
+import {
+	buildPlaygroundGraph,
+	createRequest,
+} from "./actions/build-playground-graph";
 import { getRequest } from "./actions/get-request";
-import { buildPlaygroundGraph, createRequest } from "./actions/process";
 import { runOnTriggerDev, runOnVercel } from "./runners";
 import {
 	type Request,

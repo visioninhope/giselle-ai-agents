@@ -13,7 +13,8 @@ import {
 } from "react";
 import type { Knowledge } from "../knowledges";
 import { OperationProvider } from "../nodes";
-import { RequestProvider, type RequestRunnerProvider } from "../requests";
+import { RequestProvider } from "../requests";
+import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { setGraph } from "./actions/set-graph";
 import { type PlaygroundAction, playgroundReducer } from "./reducer";

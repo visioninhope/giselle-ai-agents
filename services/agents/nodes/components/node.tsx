@@ -11,7 +11,10 @@ import {
 } from "@xyflow/react";
 import { cva } from "cva";
 import { type ComponentProps, type FC, useEffect } from "react";
-import { type RequestStepStatus, requestStepStatus } from "../../requests";
+import {
+	type RequestStepStatus,
+	requestStepStatus,
+} from "../../requests/types";
 import type { Port } from "../types";
 
 export type GiselleNodeData = {

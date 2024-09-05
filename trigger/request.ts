@@ -1,10 +1,10 @@
-import { requestStatus } from "@/services/agents/requests";
 import {
 	createRequestStackGenerator,
 	runStackGenerator,
 	runStep,
 	updateRequestStatus,
 } from "@/services/agents/requests/actions/run";
+import { requestStatus } from "@/services/agents/requests/types";
 import { task } from "@trigger.dev/sdk/v3";
 
 type RequestArgs = {
