@@ -17,7 +17,11 @@ import { RequestProvider, type RequestRunnerProvider } from "../requests";
 import type { AgentId } from "../types";
 import { setGraph } from "./actions/set-graph";
 import { type PlaygroundAction, playgroundReducer } from "./reducer";
-import type { PlaygroundGraph, PlaygroundState } from "./types";
+import type {
+	PlaygroundGraph,
+	PlaygroundOption,
+	PlaygroundState,
+} from "./types";
 import { useDebounce } from "./use-debounce";
 
 type PlaygroundContext = {
@@ -34,6 +38,7 @@ export type PlaygroundProviderProps = {
 	graph: PlaygroundGraph;
 	requestRunnerProvider: RequestRunnerProvider;
 	knowledges: Knowledge[];
+	options: PlaygroundOption[];
 };
 export const PlaygroundProvider: FC<
 	PropsWithChildren<PlaygroundProviderProps>
@@ -42,6 +47,7 @@ export const PlaygroundProvider: FC<
 		agentId: props.agentId,
 		graph: props.graph,
 		knowledges: props.knowledges,
+		options: props.options,
 	});
 	const debounceSetGraph = useDebounce(
 		async (agentId: AgentId, graph: PlaygroundGraph) => {
