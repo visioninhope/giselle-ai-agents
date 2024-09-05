@@ -18,7 +18,7 @@ import {
 	type RequestStack,
 	type RequestStackId,
 	requestStatus,
-} from "./types";
+} from "../types";
 
 const targetPorts = alias(ports, "target_ports");
 export const getRequest = async (requestId: RequestId) => {

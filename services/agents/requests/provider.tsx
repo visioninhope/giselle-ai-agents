@@ -10,7 +10,7 @@ import {
 	useState,
 } from "react";
 import type { AgentId } from "../types";
-import { getRequest } from "./get-request";
+import { getRequest } from "./actions/get-request";
 import { buildPlaygroundGraph, createRequest } from "./process";
 import { runOnTriggerDev, runOnVercel } from "./runners";
 import {
