@@ -3,7 +3,7 @@
 import { db, edges, nodes, ports } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
-import { portType } from "../nodes/types";
+import { portType } from "../../nodes/types";
 
 const sourcePorts = alias(ports, "originPorts");
 const targetPorts = alias(ports, "targetPorts");

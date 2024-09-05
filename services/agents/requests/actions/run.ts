@@ -10,10 +10,10 @@ import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq } from "drizzle-orm";
 import { assertNodeClassName, nodeService } from "../../nodes";
 import { getDependedNodes } from "../get-depended-nodes";
-import { getNextNode } from "../get-next-node";
-import { getNodeDbId } from "../get-node-id";
 import { getResponseNode, getTriggerNode } from "../helpers";
 import { type RequestStatus, requestStatus, requestStepStatus } from "../types";
+import { getNextNode } from "./get-next-node";
+import { getNodeDbId } from "./get-node-id";
 
 export const updateRequestStatus = async (
 	requestDbId: number,
