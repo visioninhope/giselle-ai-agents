@@ -9,7 +9,7 @@ import { and, eq } from "drizzle-orm";
 import type { Port } from "../../types";
 
 const meter = metrics.getMeter("OpenAI");
-const requestCounter = meter.createCounter("token_consumed", {
+const tokenCounter = meter.createCounter("token_consumed", {
 	description: "Number of OpenAI API tokens consumed by each request",
 });
 
@@ -55,7 +55,7 @@ export const generateText = async ({
 		message: completion.choices[0].message.content ?? "",
 	});
 	if (completion.usage && completion.usage.total_tokens !== undefined) {
-		requestCounter.add(completion.usage.total_tokens, {
+		tokenCounter.add(completion.usage.total_tokens, {
 			subscriptionId: await getUserSubscriptionId(),
 		});
 	}
