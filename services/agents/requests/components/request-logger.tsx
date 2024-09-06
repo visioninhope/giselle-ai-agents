@@ -9,20 +9,20 @@ import type { FC } from "react";
 import { match } from "ts-pattern";
 import { portDirection } from "../../nodes";
 import { portType } from "../../nodes/types";
-import { useRequest } from "../contexts/request-provider";
+import { useRequest } from "../context";
 import { requestStepStatus } from "../types";
 
 export const RequestLogger: FC = () => {
-	const { lastRequest } = useRequest();
+	const { state } = useRequest();
 
-	if (lastRequest == null) {
+	if (state.request == null) {
 		return;
 	}
 	return (
 		<div>
 			<h1>Request Logger</h1>
 			<Accordion type="multiple">
-				{lastRequest.stacks.flatMap((stack) =>
+				{state.request.stacks.flatMap((stack) =>
 					stack.steps.map((step) => (
 						<AccordionItem key={step.id} value={step.id}>
 							<AccordionTrigger>
@@ -30,9 +30,6 @@ export const RequestLogger: FC = () => {
 									<p>{step.node.name}</p>
 									<div className="flex items-center justify-end gap-2">
 										{match(step)
-											.with({ status: requestStepStatus.queued }, () => (
-												<CircleIcon className="w-4 h-4" />
-											))
 											.with({ status: requestStepStatus.inProgress }, () => (
 												<LoaderCircleIcon className="w-4 h-4 animate-spin" />
 											))

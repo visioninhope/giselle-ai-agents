@@ -6,15 +6,14 @@ import { type FC, useEffect } from "react";
 import {
 	Finder,
 	GiselleNode,
-	GiselleNodeData,
 	type Node,
 	type Port,
 	portDirection,
 } from "../nodes";
-import { type Request, useRequest } from "../requests";
+import { useRequest } from "../requests/context";
+import type { Request } from "../requests/types";
 import { usePlayground } from "./context";
 import { PropertyPanel } from "./property-panel";
-import { SideNav } from "./side-nav";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
 import { useContextMenu } from "./use-context-menu";
 
@@ -66,12 +65,14 @@ export const Inner: FC = () => {
 		useContextMenu();
 	const reactFlowInstance = useReactFlow<GiselleNode>();
 	const { state, dispatch } = usePlayground();
-	const { lastRequest } = useRequest();
+	const {
+		state: { request },
+	} = useRequest();
 	useEffect(() => {
 		reactFlowInstance.setNodes((prevNodes) => {
 			const newNodes = playgroundNodesToReactFlowNodes(
 				state.graph.nodes,
-				lastRequest,
+				request,
 			);
 			return newNodes.map((newNode) => {
 				const prevNode = prevNodes.find(({ id }) => id === newNode.id);
@@ -85,7 +86,7 @@ export const Inner: FC = () => {
 		reactFlowInstance.setNodes,
 		reactFlowInstance.setEdges,
 		state.graph,
-		lastRequest,
+		request,
 	]);
 	return (
 		<ReactFlow

@@ -1,10 +1,6 @@
 "use server";
 
-import { db, supabaseUserMappings, userInitialTasks } from "@/drizzle";
 import { type AuthError, createClient } from "@/lib/supabase";
-import { runs } from "@trigger.dev/sdk/v3";
-import { eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function login(

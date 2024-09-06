@@ -7,13 +7,12 @@ import {
 	createContext,
 	useCallback,
 	useContext,
-	useEffect,
 	useReducer,
-	useState,
 } from "react";
 import type { Knowledge } from "../knowledges";
 import { OperationProvider } from "../nodes";
-import { RequestProvider, type RequestRunnerProvider } from "../requests";
+import { RequestProvider } from "../requests/provider";
+import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { setGraph } from "./actions/set-graph";
 import { type PlaygroundAction, playgroundReducer } from "./reducer";
@@ -53,7 +52,7 @@ export const PlaygroundProvider: FC<
 		async (agentId: AgentId, graph: PlaygroundGraph) => {
 			await setGraph(agentId, graph);
 		},
-		2000,
+		1000,
 	);
 
 	const dispatchWithMiddleware = useCallback(
@@ -86,10 +85,7 @@ export const PlaygroundProvider: FC<
 				}}
 				knowledges={props.knowledges}
 			>
-				<RequestProvider
-					agentId={props.agentId}
-					requestRunnerProvider={props.requestRunnerProvider}
-				>
+				<RequestProvider agentId={props.agentId}>
 					{props.children}
 				</RequestProvider>
 			</OperationProvider>

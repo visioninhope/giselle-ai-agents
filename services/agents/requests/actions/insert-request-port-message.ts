@@ -1,3 +1,5 @@
+"use server";
+
 import {
 	builds,
 	db,
@@ -7,9 +9,12 @@ import {
 	requests,
 } from "@/drizzle";
 import { and, eq } from "drizzle-orm";
-import type { Port } from "../nodes";
+import type { Port } from "../../nodes";
+import type { RequestId } from "../types";
+import { revalidateGetRequest } from "./get-request";
 
 type InsertRequestPortMessageArgs = {
+	requestId: RequestId;
 	requestDbId: number;
 	portId: Port["id"];
 	message: string;
@@ -29,4 +34,5 @@ export const insertRequestPortMessage = async (
 		portDbId: port.dbId,
 		message: args.message,
 	});
+	await revalidateGetRequest(args.requestId);
 };

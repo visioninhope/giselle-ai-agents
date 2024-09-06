@@ -16,6 +16,7 @@ export const textGeneration = buildNodeClass("textGeneration", {
 	},
 	action: async ({
 		nodeDbId,
+		requestId,
 		requestDbId,
 		findDefaultTargetPort: findDefaultInputPortAsBlueprint,
 		findDefaultSourceport: findDefaultOutputPortAsBlueprint,
@@ -25,6 +26,7 @@ export const textGeneration = buildNodeClass("textGeneration", {
 		await generateText({
 			instructionPort,
 			resultPort,
+			requestId,
 			nodeDbId,
 			requestDbId,
 		});

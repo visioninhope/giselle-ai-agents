@@ -11,7 +11,10 @@ import {
 } from "@xyflow/react";
 import { cva } from "cva";
 import { type ComponentProps, type FC, useEffect } from "react";
-import { type RequestStepStatus, requestStepStatus } from "../../requests";
+import {
+	type RequestStepStatus,
+	requestStepStatus,
+} from "../../requests/types";
 import type { Port } from "../types";
 
 export type GiselleNodeData = {
@@ -92,7 +95,6 @@ const nodeVariant = cva({
 			context: "rounded-full",
 		},
 		stepStatus: {
-			[requestStepStatus.queued]: "border-border",
 			[requestStepStatus.cancelled]: "border-border",
 			[requestStepStatus.expired]: "border-border",
 			[requestStepStatus.inProgress]: " border-blue-500",
@@ -104,9 +106,7 @@ const nodeVariant = cva({
 			created: "",
 		},
 	},
-	defaultVariants: {
-		stepStatus: requestStepStatus.queued,
-	},
+	defaultVariants: {},
 });
 
 const headerVariant = cva({

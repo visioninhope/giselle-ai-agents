@@ -1,4 +1,6 @@
+import type { FC } from "react";
 import type { Node, NodeGraph, Port } from "../nodes";
+import type { AgentId } from "../types";
 export type RequestId = `rqst_${string}`;
 export type RequestStackId = `rqst.stck_${string}`;
 export type RequestStepId = `rqst.stp_${string}`;
@@ -17,7 +19,6 @@ export const requestRunnerProvider = {
 export type RequestRunnerProvider = keyof typeof requestRunnerProvider;
 
 export const requestStepStatus = {
-	queued: "queued",
 	inProgress: "in_progress",
 	cancelled: "cancelled",
 	failed: "failed",
@@ -26,7 +27,7 @@ export const requestStepStatus = {
 } as const;
 export type RequestStepStatus =
 	(typeof requestStepStatus)[keyof typeof requestStepStatus];
-type RequestStep = {
+export type RequestStep = {
 	id: RequestStepId;
 	node: NodeGraph;
 	status: RequestStepStatus;
@@ -55,4 +56,9 @@ export type Request = {
 	id: RequestId;
 	stacks: RequestStack[];
 	status: RequestStatus;
+};
+
+export type RequestState = {
+	agentId: AgentId;
+	request?: Request | undefined | null;
 };

@@ -45,7 +45,6 @@ export function playgroundReducer(
 				},
 			};
 		case "UPDATE_NODE":
-			console.log(action);
 			return {
 				...state,
 				graph: {

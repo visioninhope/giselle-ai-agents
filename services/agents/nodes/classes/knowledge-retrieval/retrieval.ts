@@ -2,9 +2,10 @@
 
 import { db, pullMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
-import { insertRequestPortMessage } from "@/services/agents/requests/insert-request-port-message";
 import { and, eq } from "drizzle-orm";
 import type { Message } from "openai/resources/beta/threads/messages";
+import { insertRequestPortMessage } from "../../../requests/actions";
+import type { RequestId } from "../../../requests/types";
 import type { Port } from "../../types";
 
 type AssertContent = (value: unknown) => asserts value is string;
@@ -32,6 +33,7 @@ type RetrievalArgs = {
 	openaiAssistantId: string;
 	queryPort: Port;
 	resultPort: Port;
+	requestId: RequestId;
 	requestDbId: number;
 	nodeDbId: number;
 };
@@ -67,6 +69,7 @@ export const retrieval = async (args: RetrievalArgs) => {
 	const lastMessage = messagesPage.data[0];
 	const text = messageToText(lastMessage);
 	await insertRequestPortMessage({
+		requestId: args.requestId,
 		requestDbId: args.requestDbId,
 		portId: args.resultPort.id,
 		message: text,

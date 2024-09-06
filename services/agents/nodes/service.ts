@@ -2,6 +2,7 @@ import { createId } from "@paralleldrive/cuid2";
 import type { JSX } from "react";
 import invariant from "tiny-invariant";
 import { type InferInput, type ObjectSchema, parse } from "valibot";
+import type { RequestId } from "../requests/types";
 import {
 	type DefaultPort,
 	type DefaultPorts,
@@ -38,11 +39,21 @@ type NodeService<TNodeClasses extends NodeClasses> = {
 	$inferClassNames: keyof TNodeClasses;
 	runAction: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestDbId: number; nodeDbId: number },
+		args: {
+			node: NodeGraph;
+			requestId: RequestId;
+			requestDbId: number;
+			nodeDbId: number;
+		},
 	) => Promise<void>;
 	runResolver: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph; requestDbId: number; nodeDbId: number },
+		args: {
+			node: NodeGraph;
+			requestId: RequestId;
+			requestDbId: number;
+			nodeDbId: number;
+		},
 	) => Promise<void>;
 	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
@@ -100,17 +111,17 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			return renderPanel({ node, data });
 		},
-		runAction: async (name, { node, requestDbId, nodeDbId }) => {
+		runAction: async (name, { node, requestId, requestDbId, nodeDbId }) => {
 			const nodeClass = nodeClasses[name];
 			const action = nodeClass.action;
 			if (action == null) {
 				return;
 			}
-			console.log(JSON.stringify(node, null, 2));
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({
 				requestDbId,
+				requestId,
 				nodeGraph: node,
 				nodeDbId,
 				data,
@@ -132,7 +143,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				},
 			});
 		},
-		runResolver: async (name, { node, requestDbId, nodeDbId }) => {
+		runResolver: async (name, { node, requestId, requestDbId, nodeDbId }) => {
 			const nodeClass = nodeClasses[name];
 			const resolver = nodeClass.resolver;
 			if (resolver == null) {
@@ -142,6 +153,7 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await resolver({
+				requestId,
 				requestDbId,
 				nodeGraph: node,
 				nodeDbId,

@@ -6,6 +6,7 @@ import {
 	AccordionItem,
 	AccordionTrigger,
 } from "@/components/ui/accordion";
+import { Button } from "@/components/ui/button";
 import {
 	Card,
 	CardContent,
@@ -14,7 +15,6 @@ import {
 	CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { createId } from "@paralleldrive/cuid2";
 import { type FC, useActionState } from "react";
 import { type Knowledge, addKnowledge } from "../../../knowledges";
@@ -52,7 +52,7 @@ export const KnowledgeList: FC<KnowledgeListProps> = ({ knowledges }) => {
 type AddKnowledgeError = string;
 export const AddKnowledgeForm: FC = () => {
 	const { state } = usePlayground();
-	const [error, action] = useActionState(
+	const [error, action, isPending] = useActionState(
 		async (prevState: AddKnowledgeError | null, formData: FormData) => {
 			const name = formData.get("name");
 			if (typeof name !== "string") {
@@ -84,7 +84,9 @@ export const AddKnowledgeForm: FC = () => {
 			<CardContent>
 				<form className="flex items-center gap-4" action={action}>
 					<Input name="name" data-1p-ignore />
-					<SubmitButton>Add</SubmitButton>
+					<Button type="submit" disabled={isPending}>
+						Add
+					</Button>
 				</form>
 			</CardContent>
 		</Card>

@@ -5,8 +5,9 @@
 // import { RequestLogger } from "./request-logger";
 // import { RequiredAction } from "./required-action";
 
-import { RequestButton, RequestLogger } from "@/services/agents/requests";
 import type { FC } from "react";
+import { RequestButton, RequestLogger } from "../../../requests/components";
+import { usePlayground } from "../../context";
 
 // export const RequestPanel: FC = () => {
 // 	const { blueprint } = useBlueprint();
@@ -29,10 +30,10 @@ import type { FC } from "react";
 // };
 
 export const RequestPanel: FC = () => {
+	const { state } = usePlayground();
 	return (
 		<div className="px-4 py-2">
-			<p>Request panel</p>
-			<RequestButton />
+			<RequestButton playgroundGraph={state.graph} />
 			<RequestLogger />
 		</div>
 	);

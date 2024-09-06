@@ -1,19 +1,19 @@
 "use client";
 
+import { Button } from "@/components/ui/button";
 import {
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSeparator,
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
-import { SubmitButton } from "@/components/ui/submit-button";
 import { type FC, useActionState, useCallback, useRef } from "react";
 import { useSignupContext } from "../context";
 import { verifyEmail } from "./verify-email";
 
 export const VerifyEmailForm: FC = () => {
 	const { state } = useSignupContext();
-	const [authError, action] = useActionState(verifyEmail, null);
+	const [authError, action, isPending] = useActionState(verifyEmail, null);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
 		formRef.current?.requestSubmit();
@@ -40,7 +40,9 @@ export const VerifyEmailForm: FC = () => {
 					</InputOTPGroup>
 				</InputOTP>
 				<input type="hidden" name="verificationEmail" value={state.email} />
-				<SubmitButton className="w-full">Verify</SubmitButton>
+				<Button className="w-full" type="submit" disabled={isPending}>
+					Verify
+				</Button>
 			</div>
 		</form>
 	);

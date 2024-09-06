@@ -2,7 +2,7 @@
 
 import { db, edges, nodes, ports } from "@/drizzle";
 import { sql } from "drizzle-orm";
-import type { Node, NodeGraph } from "../nodes";
+import type { Node, NodeGraph } from "../../nodes";
 
 type GetDependedNodesArgs = {
 	requestDbId: number;

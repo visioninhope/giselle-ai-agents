@@ -1,6 +1,6 @@
-import { SubmitButton } from "@/components/ui/submit-button";
 import { getUser } from "@/lib/supabase";
 import { createAgent, getAgents } from "@/services/agents";
+import { CreateAgentButton } from "@/services/agents/components";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
@@ -25,24 +25,18 @@ async function AgentList(props: AgentListProps) {
 }
 export default async function AgentListPage() {
 	const user = await getUser();
-	const action = async () => {
+	async function createAgentAction() {
 		"use server";
-		const agent = await createAgent({
-			userId: user.id,
-		});
+		const agent = await createAgent({ userId: user.id });
 		redirect(`/agents/${agent.id}`);
-	};
+	}
 	return (
 		<div className="container mt-8">
 			<section className="text-foreground">
 				<div className="flex flex-col gap-8">
 					<div className="flex justify-between">
 						<h1>Agents</h1>
-						<form action={action}>
-							<SubmitButton type="submit" pendingNode={"Creating..."}>
-								Create new agent
-							</SubmitButton>
-						</form>
+						<CreateAgentButton createAgentAction={createAgentAction} />
 					</div>
 					<Suspense fallback={<span>loading</span>}>
 						<AgentList userId={user.id} />

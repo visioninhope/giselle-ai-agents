@@ -15,12 +15,13 @@ import type {
 	PlaygroundEdge,
 	PlaygroundGraph,
 } from "@/services/agents/playground/types";
-import type {
-	RequestId,
-	RequestStackId,
-	RequestStatus,
-	RequestStepId,
-	RequestStepStatus,
+import {
+	type RequestId,
+	type RequestStackId,
+	type RequestStatus,
+	type RequestStepId,
+	type RequestStepStatus,
+	requestStepStatus,
 } from "@/services/agents/requests/types";
 import type { AgentId, BuildId } from "@/services/agents/types";
 import { relations } from "drizzle-orm";
@@ -262,7 +263,10 @@ export const requestSteps = pgTable("request_steps", {
 	nodeDbId: integer("node_db_id")
 		.notNull()
 		.references(() => nodes.dbId),
-	status: text("status").$type<RequestStepStatus>().notNull().default("queued"),
+	status: text("status")
+		.$type<RequestStepStatus>()
+		.notNull()
+		.default(requestStepStatus.inProgress),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
@@ -385,11 +389,11 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 		dbId: serial("db_id").primaryKey(),
 		knowledgeContentDbId: integer("knowledge_content_db_id")
 			.notNull()
-			.unique()
+			.unique("kcovsfr_knowledge_content_db_id_unique")
 			.references(() => knowledgeContents.dbId, { onDelete: "cascade" }),
 		openaiVectorStoreFileId: text("openai_vector_store_file_id")
 			.notNull()
-			.unique(),
+			.unique("kcovsfr_openai_vector_store_file_id_unique"),
 		openaiVectorStoreFileStatus: text("openai_vector_store_status")
 			.$type<VectorStoreFile["status"]>()
 			.notNull(),

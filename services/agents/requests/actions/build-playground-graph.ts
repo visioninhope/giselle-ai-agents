@@ -7,15 +7,14 @@ import {
 	edges,
 	nodes,
 	ports,
-	requests,
 	triggerNodes,
 } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
-import { assertNodeClassName, nodeService } from "../nodes";
-import type { AgentId } from "../types";
-import { getTriggerNode } from "./helpers";
+import { assertNodeClassName, nodeService } from "../../nodes";
+import type { AgentId } from "../../types";
+import { getTriggerNode } from "../helpers";
 
 export const buildPlaygroundGraph = async (agentId: AgentId) => {
 	const [agent] = await db.select().from(agents).where(eq(agents.id, agentId));
@@ -124,24 +123,4 @@ export const buildPlaygroundGraph = async (agentId: AgentId) => {
 		return { id: newBuild.id };
 	});
 	return result;
-};
-
-export const createRequest = async (
-	buildId: (typeof builds.$inferInsert)["id"],
-) => {
-	const [build] = await db
-		.select({ dbId: builds.dbId })
-		.from(builds)
-		.where(eq(builds.id, buildId));
-	const id = `rqst_${createId()}` as const;
-	const [newRequest] = await db
-		.insert(requests)
-		.values({
-			id: id,
-			buildDbId: build.dbId,
-		})
-		.returning({
-			dbId: requests.dbId,
-		});
-	return { id, dbId: newRequest.dbId };
 };

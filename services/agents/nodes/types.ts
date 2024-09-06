@@ -1,5 +1,6 @@
 import type { JSX } from "react";
 import type { BaseSchema, InferInput, ObjectSchema } from "valibot";
+import type { RequestId } from "../requests/types";
 
 // biome-ignore lint: lint/suspicious/noExplicitAny
 export type Node<TClassName extends string = string, TData = any> = {
@@ -58,6 +59,7 @@ export type NodeClassCategory =
 
 type ResolverArgs<TBaseSchema, TDefaultPorts> = {
 	requestDbId: number;
+	requestId: RequestId;
 	nodeDbId: number;
 	nodeGraph: NodeGraph;
 	// knowledges: Knowledge[];
