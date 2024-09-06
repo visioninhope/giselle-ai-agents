@@ -44,18 +44,9 @@ export async function* runStackGenerator(requestStackId: RequestStackId) {
 	const [requestStack] = await db
 		.select({
 			dbId: requestStacks.dbId,
-			startNodeDbId: requestStacks.startNodeDbId,
-			requestId: requests.id,
 		})
 		.from(requestStacks)
-		.innerJoin(requests, eq(requests.dbId, requestStacks.requestDbId))
 		.where(eq(requestStacks.id, requestStackId));
-
-	await pushNextNodeToRequestStack(
-		requestStack.dbId,
-		requestStack.startNodeDbId,
-		requestStack.requestId,
-	);
 
 	while (true) {
 		const [step] = await getFirstQueuedStep(requestStack.dbId);
