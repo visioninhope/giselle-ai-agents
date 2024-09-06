@@ -32,9 +32,6 @@ export async function runStep(
 	if (request == null || requestStack == null || requestStep == null) {
 		throw new Error("Request, request stack, or request step not found");
 	}
-	if (requestStep.status === requestStepStatus.inProgress) {
-		return;
-	}
 	await db
 		.update(requestSteps)
 		.set({
