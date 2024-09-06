@@ -27,10 +27,7 @@ export const RequestLogger: FC = () => {
 						<AccordionItem key={step.id} value={step.id}>
 							<AccordionTrigger>
 								<div className="flex items-center justify-between w-full">
-									<p>
-										{step.node.name}
-										{step.status}
-									</p>
+									<p>{step.node.name}</p>
 									<div className="flex items-center justify-end gap-2">
 										{match(step)
 											.with({ status: requestStepStatus.inProgress }, () => (

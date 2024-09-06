@@ -16,11 +16,19 @@ export const agent = buildNodeClass("agent", {
 	dataSchema: object({
 		relevantAgent: agentSchema,
 	}),
-	action: async ({ requestDbId, findDefaultSourceport, data }) => {
+	action: async ({
+		requestDbId,
+		nodeDbId,
+		findDefaultSourceport,
+		data,
+		nodeGraph,
+	}) => {
 		await invokeAgent({
 			requestDbId,
+			nodeDbId,
 			agent: data.relevantAgent,
 			resultPort: findDefaultSourceport("result"),
+			nodeGraph,
 		});
 	},
 });
