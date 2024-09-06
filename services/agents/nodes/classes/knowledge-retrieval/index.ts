@@ -20,6 +20,7 @@ export const knowledgeRetrieval = buildNodeClass("knowledgeRetrieval", {
 	action: async ({
 		data,
 		findDefaultTargetPort,
+		requestId,
 		requestDbId,
 		nodeDbId,
 		findDefaultSourceport,
@@ -27,6 +28,7 @@ export const knowledgeRetrieval = buildNodeClass("knowledgeRetrieval", {
 		await retrieval({
 			openaiAssistantId: data.openaiAssistantId,
 			queryPort: findDefaultTargetPort("query"),
+			requestId,
 			requestDbId,
 			resultPort: findDefaultSourceport("result"),
 			nodeDbId,

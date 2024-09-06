@@ -3,10 +3,9 @@
 import { Button } from "@/components/ui/button";
 import { Field } from "@/components/ui/field";
 import { type FC, useActionState, useMemo } from "react";
-import { portDirection } from "../../nodes";
-import { portType } from "../../nodes/types";
+import { portDirection, portType } from "../../nodes/types";
 import type { PlaygroundGraph } from "../../playground/types";
-import { buildPlaygroundGraph, createRequest } from "../actions";
+import { buildPlaygroundGraph, createRequest, startRequest } from "../actions";
 import { useRequest } from "../context";
 import { getTriggerNode } from "../helpers";
 import { requestStatus } from "../types";
@@ -29,7 +28,7 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 	}, [playgroundGraph]);
 	const [_, action, isPending] = useActionState(
 		async (
-			prevState: BuildAndRequestActionError | null,
+			_prevState: BuildAndRequestActionError | null,
 			formData: FormData,
 		) => {
 			const inputRequestParameters = requestParameters
@@ -51,6 +50,7 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 					status: requestStatus.queued,
 				},
 			});
+			await startRequest(request.id);
 			return null;
 		},
 		null,

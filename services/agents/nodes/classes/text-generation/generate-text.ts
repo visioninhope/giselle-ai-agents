@@ -4,12 +4,14 @@ import { db, pullMessages, requestPortMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { and, eq } from "drizzle-orm";
 import { insertRequestPortMessage } from "../../../requests/actions";
+import type { RequestId } from "../../../requests/types";
 import type { Port } from "../../types";
 
 type AssertContent = (value: unknown) => asserts value is string;
 const asssertContent: AssertContent = () => {};
 
 type ActionArgs = {
+	requestId: RequestId;
 	requestDbId: number;
 	nodeDbId: number;
 	instructionPort: Port;
@@ -17,6 +19,7 @@ type ActionArgs = {
 };
 
 export const generateText = async ({
+	requestId,
 	requestDbId,
 	nodeDbId,
 	instructionPort,
@@ -43,6 +46,7 @@ export const generateText = async ({
 		model: "gpt-4o-mini",
 	});
 	await insertRequestPortMessage({
+		requestId,
 		requestDbId,
 		portId: resultPort.id,
 		message: completion.choices[0].message.content ?? "",

@@ -31,6 +31,7 @@ export const invokeAgent = async ({
 		.from(requestResults)
 		.where(eq(requestResults.requestDbId, request.dbId));
 	await insertRequestPortMessage({
+		requestId: request.id,
 		requestDbId,
 		portId: resultPort.id,
 		message: relevantAgentRequestResult.text,

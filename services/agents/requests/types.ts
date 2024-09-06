@@ -19,7 +19,6 @@ export const requestRunnerProvider = {
 export type RequestRunnerProvider = keyof typeof requestRunnerProvider;
 
 export const requestStepStatus = {
-	queued: "queued",
 	inProgress: "in_progress",
 	cancelled: "cancelled",
 	failed: "failed",
@@ -28,7 +27,7 @@ export const requestStepStatus = {
 } as const;
 export type RequestStepStatus =
 	(typeof requestStepStatus)[keyof typeof requestStepStatus];
-type RequestStep = {
+export type RequestStep = {
 	id: RequestStepId;
 	node: NodeGraph;
 	status: RequestStepStatus;

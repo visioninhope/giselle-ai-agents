@@ -27,12 +27,12 @@ export const RequestLogger: FC = () => {
 						<AccordionItem key={step.id} value={step.id}>
 							<AccordionTrigger>
 								<div className="flex items-center justify-between w-full">
-									<p>{step.node.name}</p>
+									<p>
+										{step.node.name}
+										{step.status}
+									</p>
 									<div className="flex items-center justify-end gap-2">
 										{match(step)
-											.with({ status: requestStepStatus.queued }, () => (
-												<CircleIcon className="w-4 h-4" />
-											))
 											.with({ status: requestStepStatus.inProgress }, () => (
 												<LoaderCircleIcon className="w-4 h-4 animate-spin" />
 											))

@@ -60,8 +60,8 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	// }, [requestId]);
 	return (
 		<RequestContext.Provider value={{ state, dispatch }}>
+			{state.request != null && <RequestRunner requestId={state.request.id} />}
 			{children}
-			{state.request != null && <RequestRunner request={state.request} />}
 		</RequestContext.Provider>
 	);
 };

@@ -1,22 +1,16 @@
-import {
-	builds,
-	db,
-	nodes,
-	requestStacks,
-	requestSteps,
-	requests,
-} from "@/drizzle";
+import { db, requestStacks, requestSteps, requests } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq } from "drizzle-orm";
-import { assertNodeClassName, nodeService } from "../../nodes";
-import { getResponseNode, getTriggerNode } from "../helpers";
-import { type RequestStatus, requestStatus, requestStepStatus } from "../types";
-import { getDependedNodes } from "./get-depended-nodes";
+import {
+	type RequestId,
+	type RequestStatus,
+	requestStepStatus,
+} from "../types";
 import { getNextNode } from "./get-next-node";
-import { getNodeDbId } from "./get-node-id";
+import { revalidateGetRequest } from "./get-request";
 
 export const updateRequestStatus = async (
-	requestDbId: number,
+	requestId: RequestId,
 	status: RequestStatus,
 ) => {
 	await db
@@ -24,51 +18,14 @@ export const updateRequestStatus = async (
 		.set({
 			status,
 		})
-		.where(eq(requests.dbId, requestDbId));
+		.where(eq(requests.id, requestId));
+	await revalidateGetRequest(requestId);
 };
 
-type CreateRequestStackArgs = {
-	requestDbId: number;
-};
-export async function* createRequestStackGenerator(
-	args: CreateRequestStackArgs,
-) {
-	const [request] = await db
-		.select({
-			dbId: requests.dbId,
-			graph: builds.graph,
-		})
-		.from(requests)
-		.innerJoin(builds, eq(builds.dbId, requests.buildDbId))
-		.where(eq(requests.dbId, args.requestDbId));
-
-	const triggerNode = getTriggerNode(request.graph);
-	const responseNode = getResponseNode(request.graph);
-	if (triggerNode == null || responseNode == null) {
-		throw new Error("Required node not found");
-	}
-
-	const triggerNodeDbId = await getNodeDbId(triggerNode.id, request.dbId);
-	const responseNodeDbId = await getNodeDbId(responseNode.id, request.dbId);
-
-	const [newRequestStack] = await db
-		.insert(requestStacks)
-		.values({
-			id: `rqst.stck_${createId()}`,
-			requestDbId: request.dbId,
-			startNodeDbId: triggerNodeDbId,
-			endNodeDbId: responseNodeDbId,
-		})
-		.returning({
-			dbId: requestStacks.dbId,
-		});
-
-	yield newRequestStack;
-}
-
-const pushNextNodeToRequestStack = async (
+export const pushNextNodeToRequestStack = async (
 	requestStackDbId: number,
 	currentNodeDbId: number,
+	requestId: RequestId,
 ) => {
 	const nextNode = await getNextNode(currentNodeDbId);
 	if (nextNode == null) {
@@ -79,17 +36,23 @@ const pushNextNodeToRequestStack = async (
 		requestStackDbId,
 		nodeDbId: nextNode.dbId,
 	});
+	await revalidateGetRequest(requestId);
 };
 
 export async function* runStackGenerator(requestStackDbId: number) {
 	const [requestStack] = await db
-		.select()
+		.select({
+			startNodeDbId: requestStacks.startNodeDbId,
+			requestId: requests.id,
+		})
 		.from(requestStacks)
+		.innerJoin(requests, eq(requests.dbId, requestStacks.requestDbId))
 		.where(eq(requestStacks.dbId, requestStackDbId));
 
 	await pushNextNodeToRequestStack(
 		requestStackDbId,
 		requestStack.startNodeDbId,
+		requestStack.requestId,
 	);
 
 	while (true) {
@@ -106,57 +69,9 @@ async function getFirstQueuedStep(requestStackDbId: number) {
 		.where(
 			and(
 				eq(requestSteps.requestStackDbId, requestStackDbId),
-				eq(requestSteps.status, requestStepStatus.queued),
+				eq(requestSteps.status, requestStepStatus.inProgress),
 			),
 		)
 		.orderBy(asc(requestSteps.dbId))
 		.limit(1);
-}
-
-export async function runStep(
-	requestDbId: number,
-	requestStackDbId: number,
-	requestStepDbId: number,
-) {
-	await db
-		.update(requestSteps)
-		.set({
-			status: requestStepStatus.inProgress,
-		})
-		.where(eq(requestSteps.dbId, requestStepDbId));
-	const [node] = await db
-		.select({
-			id: nodes.id,
-			dbId: nodes.dbId,
-			className: nodes.className,
-			graph: nodes.graph,
-		})
-		.from(nodes)
-		.innerJoin(requestSteps, eq(nodes.dbId, requestSteps.nodeDbId))
-		.where(eq(requestSteps.dbId, requestStepDbId));
-	const dependedNodes = await getDependedNodes({
-		requestDbId,
-		nodeDbId: node.dbId,
-	});
-	for (const dependedNode of dependedNodes) {
-		assertNodeClassName(dependedNode.className);
-		await nodeService.runResolver(dependedNode.className, {
-			requestDbId,
-			nodeDbId: dependedNode.dbId,
-			node: dependedNode.graph,
-		});
-	}
-	assertNodeClassName(node.className);
-	await nodeService.runAction(node.className, {
-		requestDbId,
-		nodeDbId: node.dbId,
-		node: node.graph,
-	});
-	await pushNextNodeToRequestStack(requestStackDbId, node.dbId);
-	await db
-		.update(requestSteps)
-		.set({
-			status: requestStepStatus.completed,
-		})
-		.where(eq(requestSteps.dbId, requestStepDbId));
 }

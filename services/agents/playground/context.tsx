@@ -52,7 +52,7 @@ export const PlaygroundProvider: FC<
 		async (agentId: AgentId, graph: PlaygroundGraph) => {
 			await setGraph(agentId, graph);
 		},
-		2000,
+		1000,
 	);
 
 	const dispatchWithMiddleware = useCallback(
