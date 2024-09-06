@@ -22,7 +22,10 @@ export const invokeAgent = async ({
 	agent,
 	resultPort,
 }: InvokeAgentArgs) => {
-	const request = await createRequest(agent.buildId);
+	const request = await createRequest({
+		buildId: agent.buildId,
+		parameters: [],
+	});
 	await runOnVercel({
 		requestId: request.id,
 	});

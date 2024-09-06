@@ -41,7 +41,10 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 				})
 				.filter((i) => i !== null);
 			const build = await buildPlaygroundGraph(state.agentId);
-			const request = await createRequest(build.id);
+			const request = await createRequest({
+				buildId: build.id,
+				parameters: inputRequestParameters ?? [],
+			});
 			dispatch({
 				type: "SET_REQUEST",
 				request: {
