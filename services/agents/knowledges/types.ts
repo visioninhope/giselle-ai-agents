@@ -15,6 +15,7 @@ export type File = {
 export const knowledgeContentType = {
 	file: "file",
 	text: "text",
+	markdown: "markdown",
 } as const;
 
 export type KnowledgeContentType =

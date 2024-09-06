@@ -20,8 +20,15 @@ export type PlaygroundGraph = {
 	viewport: PlaygroundViewport;
 };
 
+export const playgroundOption = {
+	webscraping: "webscraping",
+} as const;
+
+export type PlaygroundOption = keyof typeof playgroundOption;
+
 export type PlaygroundState = {
 	agentId: AgentId;
 	graph: PlaygroundGraph;
 	knowledges: Knowledge[];
+	options: PlaygroundOption[];
 };
