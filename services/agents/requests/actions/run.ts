@@ -3,6 +3,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { and, asc, eq } from "drizzle-orm";
 import {
 	type RequestId,
+	type RequestStackId,
 	type RequestStatus,
 	requestStepStatus,
 } from "../types";
@@ -39,24 +40,25 @@ export const pushNextNodeToRequestStack = async (
 	await revalidateGetRequest(requestId);
 };
 
-export async function* runStackGenerator(requestStackDbId: number) {
+export async function* runStackGenerator(requestStackId: RequestStackId) {
 	const [requestStack] = await db
 		.select({
+			dbId: requestStacks.dbId,
 			startNodeDbId: requestStacks.startNodeDbId,
 			requestId: requests.id,
 		})
 		.from(requestStacks)
 		.innerJoin(requests, eq(requests.dbId, requestStacks.requestDbId))
-		.where(eq(requestStacks.dbId, requestStackDbId));
+		.where(eq(requestStacks.id, requestStackId));
 
 	await pushNextNodeToRequestStack(
-		requestStackDbId,
+		requestStack.dbId,
 		requestStack.startNodeDbId,
 		requestStack.requestId,
 	);
 
 	while (true) {
-		const [step] = await getFirstQueuedStep(requestStackDbId);
+		const [step] = await getFirstQueuedStep(requestStack.dbId);
 		if (step == null) break;
 		yield step;
 	}
@@ -64,7 +66,7 @@ export async function* runStackGenerator(requestStackDbId: number) {
 
 async function getFirstQueuedStep(requestStackDbId: number) {
 	return await db
-		.select({ dbId: requestSteps.dbId })
+		.select({ dbId: requestSteps.dbId, id: requestSteps.id })
 		.from(requestSteps)
 		.where(
 			and(
