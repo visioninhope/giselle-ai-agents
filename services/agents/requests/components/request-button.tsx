@@ -9,13 +9,14 @@ import type { PlaygroundGraph } from "../../playground/types";
 import { buildPlaygroundGraph, createRequest } from "../actions";
 import { useRequest } from "../context";
 import { getTriggerNode } from "../helpers";
+import { requestStatus } from "../types";
 import type { BuildAndRequestActionError } from "./build-and-request-action";
 
 type RequestTriggerProps = {
 	playgroundGraph: PlaygroundGraph;
 };
 export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
-	const { agentId } = useRequest();
+	const { state, dispatch } = useRequest();
 	const requestParameters = useMemo(() => {
 		const triggerNode = getTriggerNode(playgroundGraph);
 		if (triggerNode == null) {
@@ -26,7 +27,7 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 				direction === portDirection.source && type === portType.data,
 		);
 	}, [playgroundGraph]);
-	const [state, action, isPending] = useActionState(
+	const [_, action, isPending] = useActionState(
 		async (
 			prevState: BuildAndRequestActionError | null,
 			formData: FormData,
@@ -34,14 +35,22 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 			const inputRequestParameters = requestParameters
 				?.map(({ id }) => {
 					const value = formData.get(id);
-					if (value == null) {
+					if (value == null || typeof value !== "string") {
 						return null;
 					}
-					return { key: id, value: value.toString() };
+					return { portId: id, value };
 				})
 				.filter((i) => i !== null);
-			const build = await buildPlaygroundGraph(agentId);
+			const build = await buildPlaygroundGraph(state.agentId);
 			const request = await createRequest(build.id);
+			dispatch({
+				type: "SET_REQUEST",
+				request: {
+					id: request.id,
+					stacks: [],
+					status: requestStatus.queued,
+				},
+			});
 			return null;
 		},
 		null,

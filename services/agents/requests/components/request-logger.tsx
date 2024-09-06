@@ -13,16 +13,16 @@ import { useRequest } from "../context";
 import { requestStepStatus } from "../types";
 
 export const RequestLogger: FC = () => {
-	const { lastRequest } = useRequest();
+	const { state } = useRequest();
 
-	if (lastRequest == null) {
+	if (state.request == null) {
 		return;
 	}
 	return (
 		<div>
 			<h1>Request Logger</h1>
 			<Accordion type="multiple">
-				{lastRequest.stacks.flatMap((stack) =>
+				{state.request.stacks.flatMap((stack) =>
 					stack.steps.map((step) => (
 						<AccordionItem key={step.id} value={step.id}>
 							<AccordionTrigger>

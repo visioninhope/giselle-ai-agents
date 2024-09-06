@@ -85,10 +85,7 @@ export const PlaygroundProvider: FC<
 				}}
 				knowledges={props.knowledges}
 			>
-				<RequestProvider
-					agentId={props.agentId}
-					requestRunnerProvider={props.requestRunnerProvider}
-				>
+				<RequestProvider agentId={props.agentId}>
 					{props.children}
 				</RequestProvider>
 			</OperationProvider>

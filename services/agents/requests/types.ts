@@ -1,3 +1,4 @@
+import type { FC } from "react";
 import type { Node, NodeGraph, Port } from "../nodes";
 import type { AgentId } from "../types";
 export type RequestId = `rqst_${string}`;
@@ -60,6 +61,5 @@ export type Request = {
 
 export type RequestState = {
 	agentId: AgentId;
-	requestId?: RequestId | undefined | null;
 	request?: Request | undefined | null;
 };

@@ -91,26 +91,18 @@ export const getRequest = async (requestId: RequestId) => {
 					message: message as string,
 				})),
 		];
-		if (stack) {
-			stack.steps.push({
-				id: item.requestStepId,
-				node: item.requestStepNodeGraph,
-				status: item.requestStepStatus,
-				portMessages,
-			});
-		} else {
-			stackMap.set(item.requestStackId, {
-				id: item.requestStackId,
-				steps: [
-					{
-						id: item.requestStepId,
-						node: item.requestStepNodeGraph,
-						status: item.requestStepStatus,
-						portMessages,
-					},
-				],
-			});
-		}
+		stackMap.set(item.requestStackId, {
+			id: item.requestStackId,
+			steps: [
+				...(stack?.steps ?? []),
+				{
+					id: item.requestStepId,
+					node: item.requestStepNodeGraph,
+					status: item.requestStepStatus,
+					portMessages,
+				},
+			],
+		});
 	}
 	return {
 		id: requestId,

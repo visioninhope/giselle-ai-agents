@@ -1,7 +1,12 @@
-import { createContext, useContext } from "react";
+import { type Dispatch, createContext, useContext } from "react";
+import type { RequestAction } from "./reducer";
 import type { RequestState } from "./types";
 
-export const RequestContext = createContext<RequestState | null>(null);
+type RequestContext = {
+	state: RequestState;
+	dispatch: Dispatch<RequestAction>;
+};
+export const RequestContext = createContext<RequestContext | null>(null);
 
 export const useRequest = () => {
 	const context = useContext(RequestContext);
