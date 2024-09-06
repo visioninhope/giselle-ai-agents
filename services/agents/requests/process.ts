@@ -13,6 +13,7 @@ import {
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
 import invariant from "tiny-invariant";
+import { assertNodeClassName, nodeService } from "../nodes";
 import type { AgentId } from "../types";
 import { getTriggerNode } from "./helpers";
 
@@ -62,7 +63,18 @@ export const buildPlaygroundGraph = async (agentId: AgentId) => {
 			.returning({
 				id: nodes.id,
 				dbId: nodes.dbId,
+				className: nodes.className,
+				graph: nodes.graph,
 			});
+		await Promise.all(
+			newNodes.map(async (newNode) => {
+				assertNodeClassName(newNode.className);
+				await nodeService.runAfterCreateCallback(newNode.className, {
+					nodeDbId: newNode.dbId,
+					nodeGraph: newNode.graph,
+				});
+			}),
+		);
 		const portInsertValues = agent.graph.nodes
 			.flatMap((node) =>
 				node.ports.map(({ id, name, nodeId, type, direction }) => {

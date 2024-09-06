@@ -12,7 +12,7 @@ import {
 	portDirection,
 } from "../nodes";
 import { type Request, useRequest } from "../requests";
-import { playgroundState, usePlayground } from "./playground-context";
+import { usePlayground } from "./context";
 import { PropertyPanel } from "./property-panel";
 import { SideNav } from "./side-nav";
 import type { PlaygroundEdge, PlaygroundNode } from "./types";
@@ -65,12 +65,12 @@ export const Inner: FC = () => {
 	const { isVisible, contextMenuPosition, hideContextMenu, handleContextMenu } =
 		useContextMenu();
 	const reactFlowInstance = useReactFlow<GiselleNode>();
-	const { graph, state, dispatch } = usePlayground();
+	const { state, dispatch } = usePlayground();
 	const { lastRequest } = useRequest();
 	useEffect(() => {
 		reactFlowInstance.setNodes((prevNodes) => {
 			const newNodes = playgroundNodesToReactFlowNodes(
-				graph.nodes,
+				state.graph.nodes,
 				lastRequest,
 			);
 			return newNodes.map((newNode) => {
@@ -78,122 +78,110 @@ export const Inner: FC = () => {
 				return prevNode ? { ...prevNode, ...newNode } : newNode;
 			});
 		});
-		reactFlowInstance.setEdges(playgroundEdgesToReactFlowEdges(graph.edges));
+		reactFlowInstance.setEdges(
+			playgroundEdgesToReactFlowEdges(state.graph.edges),
+		);
 	}, [
 		reactFlowInstance.setNodes,
 		reactFlowInstance.setEdges,
-		graph,
+		state.graph,
 		lastRequest,
 	]);
 	return (
-		<div className="h-screen w-full flex">
-			<SideNav />
-			{state === playgroundState.initialize ? (
-				<ReactFlow key={"loader"}>
-					<Background />
-				</ReactFlow>
-			) : (
-				<ReactFlow
-					onContextMenu={handleContextMenu}
-					nodeTypes={nodeTypes}
-					defaultNodes={playgroundNodesToReactFlowNodes(graph.nodes)}
-					defaultEdges={playgroundEdgesToReactFlowEdges(graph.edges)}
-					isValidConnection={({
-						source,
-						sourceHandle,
-						target,
-						targetHandle,
-					}) => {
-						const sourcePort = graph.nodes
-							.find((node) => node.id === source)
-							?.ports.find((port) => port.id === sourceHandle);
-						const targetPort = graph.nodes
-							.find((node) => node.id === target)
-							?.ports.find((port) => port.id === targetHandle);
-						if (sourcePort == null || targetPort == null) {
-							return false;
-						}
-						return targetPort.type === sourcePort.type;
+		<ReactFlow
+			onContextMenu={handleContextMenu}
+			nodeTypes={nodeTypes}
+			defaultNodes={playgroundNodesToReactFlowNodes(state.graph.nodes)}
+			defaultEdges={playgroundEdgesToReactFlowEdges(state.graph.edges)}
+			isValidConnection={({ source, sourceHandle, target, targetHandle }) => {
+				const sourcePort = state.graph.nodes
+					.find((node) => node.id === source)
+					?.ports.find((port) => port.id === sourceHandle);
+				const targetPort = state.graph.nodes
+					.find((node) => node.id === target)
+					?.ports.find((port) => port.id === targetHandle);
+				if (sourcePort == null || targetPort == null) {
+					return false;
+				}
+				return targetPort.type === sourcePort.type;
+			}}
+			onConnect={({ source, sourceHandle, target, targetHandle }) => {
+				// Since validation is already performed by isValidConnection,
+				// there is no need for additional validation here.
+				dispatch({
+					type: "ADD_EDGE",
+					edge: {
+						id: `ed_${createId()}`,
+						sourceNodeId: source as Node["id"],
+						sourcePortId: sourceHandle as Port["id"],
+						targetNodeId: target as Node["id"],
+						targetPortId: targetHandle as Port["id"],
+					},
+				});
+			}}
+			onEdgesDelete={(edges) => {
+				edges.map((edge) => {
+					dispatch({
+						type: "REMOVE_EDGE",
+						edgeId: edge.id,
+					});
+				});
+			}}
+			onNodeDragStop={(_event, _node, nodes) => {
+				nodes.map((node) => {
+					dispatch({
+						type: "UPDATE_NODE",
+						nodeId: node.id as Node["id"],
+						updates: {
+							position: node.position,
+						},
+					});
+				});
+			}}
+			onNodesDelete={(nodes) => {
+				nodes.map((node) => {
+					dispatch({
+						type: "REMOVE_NODE",
+						nodeId: node.id as Node["id"],
+					});
+				});
+			}}
+			defaultViewport={state.graph.viewport}
+			onViewportChange={(viewport) => {
+				dispatch({
+					type: "UPDATE_VIEWPORT",
+					viewport,
+				});
+			}}
+		>
+			<Background />
+			{isVisible && reactFlowInstance && (
+				<Finder
+					className="z-10 absolute"
+					style={{
+						left: contextMenuPosition.x,
+						top: contextMenuPosition.y,
 					}}
-					onConnect={({ source, sourceHandle, target, targetHandle }) => {
-						// Since validation is already performed by isValidConnection,
-						// there is no need for additional validation here.
+					onSelect={(node) => {
+						hideContextMenu();
 						dispatch({
-							type: "ADD_EDGE",
-							edge: {
-								id: `ed_${createId()}`,
-								sourceNodeId: source as Node["id"],
-								sourcePortId: sourceHandle as Port["id"],
-								targetNodeId: target as Node["id"],
-								targetPortId: targetHandle as Port["id"],
+							type: "ADD_NODE",
+							node: {
+								...node,
+								position: reactFlowInstance.screenToFlowPosition({
+									x: contextMenuPosition.x,
+									y: contextMenuPosition.y,
+								}),
 							},
 						});
 					}}
-					onEdgesDelete={(edges) => {
-						edges.map((edge) => {
-							dispatch({
-								type: "REMOVE_EDGE",
-								edgeId: edge.id,
-							});
-						});
-					}}
-					onNodeDragStop={(_event, _node, nodes) => {
-						nodes.map((node) => {
-							dispatch({
-								type: "UPDATE_NODE",
-								nodeId: node.id as Node["id"],
-								updates: {
-									position: node.position,
-								},
-							});
-						});
-					}}
-					onNodesDelete={(nodes) => {
-						nodes.map((node) => {
-							dispatch({
-								type: "REMOVE_NODE",
-								nodeId: node.id as Node["id"],
-							});
-						});
-					}}
-					defaultViewport={graph.viewport}
-					onViewportChange={(viewport) => {
-						dispatch({
-							type: "UPDATE_VIEWPORT",
-							viewport,
-						});
-					}}
-				>
-					<Background />
-					{isVisible && reactFlowInstance && (
-						<Finder
-							className="z-10 absolute"
-							style={{
-								left: contextMenuPosition.x,
-								top: contextMenuPosition.y,
-							}}
-							onSelect={(node) => {
-								hideContextMenu();
-								dispatch({
-									type: "ADD_NODE",
-									node: {
-										...node,
-										position: reactFlowInstance.screenToFlowPosition({
-											x: contextMenuPosition.x,
-											y: contextMenuPosition.y,
-										}),
-									},
-								});
-							}}
-						/>
-					)}
-					<Panel position="top-right" className="bottom-0">
-						<div className="flex gap-2 h-full">
-							<PropertyPanel />
-						</div>
-					</Panel>
-				</ReactFlow>
+				/>
 			)}
-		</div>
+			<Panel position="top-right" className="bottom-0">
+				<div className="flex gap-2 h-full">
+					<PropertyPanel />
+				</div>
+			</Panel>
+		</ReactFlow>
 	);
 };

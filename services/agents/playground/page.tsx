@@ -1,24 +1,61 @@
-import { ReactFlowProvider } from "@xyflow/react";
-import type { FC } from "react";
+import { Background, ReactFlow, ReactFlowProvider } from "@xyflow/react";
+import { Suspense } from "react";
+import { getKnowledges } from "../knowledges";
+import type { RequestRunnerProvider } from "../requests/types";
+import type { AgentId } from "../types";
+import { getGraph } from "./actions/get-graph";
+import { PlaygroundProvider } from "./context";
+import { Header } from "./header/header";
 import { Inner } from "./inner";
-import {
-	PlaygroundProvider,
-	type PlaygroundProviderProps,
-} from "./playground-context";
+import { SideNav } from "./side-nav";
+import { KnowledgeList } from "./side-nav/knowledge/knowledge-list";
+import type { PlaygroundOption } from "./types";
 
-type PlaygroundProps = PlaygroundProviderProps;
-export const Playground: FC<PlaygroundProps> = ({
-	agentId,
-	requestRunnerProvider,
-}) => {
+const Skeleton = () => {
 	return (
-		<PlaygroundProvider
-			agentId={agentId}
-			requestRunnerProvider={requestRunnerProvider}
-		>
-			<ReactFlowProvider>
-				<Inner />
-			</ReactFlowProvider>
-		</PlaygroundProvider>
+		<div className="h-screen w-full">
+			<ReactFlow key={"loader"}>
+				<Background />
+			</ReactFlow>
+		</div>
 	);
 };
+
+type PlaygroundProps = {
+	agentId: AgentId;
+	requestRunnerProvider: RequestRunnerProvider;
+	headerUserButton?: React.ReactNode;
+	options?: PlaygroundOption[];
+};
+export async function Playground({
+	agentId,
+	requestRunnerProvider,
+	headerUserButton,
+	options,
+}: PlaygroundProps) {
+	const [graph, knowledges] = await Promise.all([
+		getGraph({ agentId }),
+		getKnowledges({ agentId }),
+	]);
+	return (
+		<Suspense fallback={<Skeleton />}>
+			<PlaygroundProvider
+				agentId={agentId}
+				requestRunnerProvider={requestRunnerProvider}
+				graph={graph}
+				knowledges={knowledges}
+				options={options ?? []}
+			>
+				<ReactFlowProvider>
+					<div className="h-screen w-full flex flex-col">
+						<Header userButton={headerUserButton} />
+						<div className="flex flex-1">
+							<SideNav knowledge={<KnowledgeList knowledges={knowledges} />} />
+							<Inner />
+						</div>
+					</div>
+				</ReactFlowProvider>
+			</PlaygroundProvider>
+		</Suspense>
+	);
+}

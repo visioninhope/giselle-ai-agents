@@ -15,7 +15,6 @@ export const SubmitButton: FC<SubmitButtonProps> = ({
 	...props
 }) => {
 	const { pending } = useFormStatus();
-	console.log(pending);
 	if (pending) {
 		return (
 			<Button disabled {...props}>

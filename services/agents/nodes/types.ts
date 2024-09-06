@@ -100,9 +100,10 @@ type RenderPanel<TBaseSchema> = (
 ) => JSX.Element;
 
 type AfterCreateCallbackArgs<TBaseSchema> = {
-	node: Node;
-	dataSchema: TBaseSchema extends ObjectSchema<infer E, infer M>
-		? ObjectSchema<E, M>
+	nodeGraph: NodeGraph;
+	nodeDbId: number;
+	data: TBaseSchema extends ObjectSchema<infer E, infer M>
+		? InferInput<ObjectSchema<E, M>>
 		: never;
 };
 type AfterCreateCallback<TBaseSchema> = (

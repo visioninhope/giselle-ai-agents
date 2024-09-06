@@ -1,5 +1,6 @@
 import type { NodeClasses } from "../types";
 import { agent } from "./agent";
+import { knowledgeRetrieval } from "./knowledge-retrieval";
 import { onRequest } from "./on-request";
 import { response } from "./response";
 import { text } from "./text";
@@ -11,4 +12,5 @@ export const nodeClasses = {
 	response,
 	text,
 	textGeneration,
+	knowledgeRetrieval,
 } satisfies NodeClasses;

@@ -46,7 +46,7 @@ type NodeService<TNodeClasses extends NodeClasses> = {
 	) => Promise<void>;
 	runAfterCreateCallback: <ClassName extends keyof TNodeClasses>(
 		className: ClassName,
-		args: { node: NodeGraph },
+		args: { nodeGraph: NodeGraph; nodeDbId: number },
 	) => Promise<void>;
 };
 
@@ -106,13 +106,13 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 			if (action == null) {
 				return;
 			}
+			console.log(JSON.stringify(node, null, 2));
 			const dataSchema = nodeClass.dataSchema;
 			const data = dataSchema == null ? {} : parse(dataSchema, node.data);
 			await action({
 				requestDbId,
 				nodeGraph: node,
 				nodeDbId,
-				// knowledges,
 				data,
 				findDefaultTargetPort: (name) => {
 					const port = node.ports.find(
@@ -165,14 +165,16 @@ export function createNodeService<TNodeClasses extends NodeClasses>(
 				},
 			});
 		},
-		runAfterCreateCallback: async (name, { node }) => {
+		runAfterCreateCallback: async (name, { nodeDbId, nodeGraph }) => {
 			const nodeClass = nodeClasses[name];
 			const afterCreate = nodeClass.afterCreate;
 			if (afterCreate == null) {
 				console.log("After create not found");
 				return;
 			}
-			await afterCreate({ node, dataSchema: nodeClass.dataSchema });
+			const dataSchema = nodeClass.dataSchema;
+			const data = dataSchema == null ? {} : parse(dataSchema, nodeGraph.data);
+			await afterCreate({ nodeGraph, data, nodeDbId });
 		},
 		$inferClassNames: "" as keyof TNodeClasses,
 	};

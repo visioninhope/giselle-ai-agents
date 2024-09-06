@@ -1,12 +1,13 @@
+"use client";
 import {
 	Tooltip,
 	TooltipContent,
 	TooltipProvider,
 	TooltipTrigger,
 } from "@/components/ui/tooltip";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { BookOpenIcon, LayersIcon, XIcon } from "lucide-react";
-import { type FC, useState } from "react";
+import { type FC, type ReactNode, useState } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { match } from "ts-pattern";
 
@@ -30,7 +31,10 @@ const NavItem: FC<NavItemProps> = ({ icon, tooltip, onClick }) => {
 	);
 };
 
-export const SideNav: FC = () => {
+type SideNavProps = {
+	knowledge: ReactNode;
+};
+export const SideNav: FC<SideNavProps> = ({ knowledge }) => {
 	const [activeMenu, setActiveMenu] = useState("");
 	const [show, setShow] = useState(false);
 	return (
@@ -55,33 +59,37 @@ export const SideNav: FC = () => {
 					/>
 				</div>
 			</div>
-			<AnimatePresence>
-				{show && (
-					<motion.div
-						className="bg-green-800 h-full px-2 pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
-						initial={{ width: 0 }}
-						animate={{ width: "300px" }}
-						exit={{ width: 0 }}
-					>
-						<div className="flex justify-between">
-							<div>
-								{match(activeMenu)
-									.with("overview", () => "Overview")
-									.with("knowledges", () => "Knowledge")
-									.otherwise(() => null)}
+			<LazyMotion features={domAnimation}>
+				<AnimatePresence>
+					{show && (
+						<m.div
+							className="bg-green-800 h-full pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
+							initial={{ width: 0 }}
+							animate={{ width: "300px" }}
+							exit={{ width: 0 }}
+						>
+							<div className="w-[300px] px-2">
+								<div className="flex justify-end">
+									<button
+										type="button"
+										onClick={() => {
+											setShow(false);
+										}}
+									>
+										<XIcon />
+									</button>
+								</div>
+								<div>
+									{match(activeMenu)
+										.with("overview", () => "Overview")
+										.with("knowledges", () => knowledge)
+										.otherwise(() => null)}
+								</div>
 							</div>
-							<button
-								type="button"
-								onClick={() => {
-									setShow(false);
-								}}
-							>
-								<XIcon />
-							</button>
-						</div>
-					</motion.div>
-				)}
-			</AnimatePresence>
+						</m.div>
+					)}
+				</AnimatePresence>
+			</LazyMotion>
 		</div>
 	);
 };
