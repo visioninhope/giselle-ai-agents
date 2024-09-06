@@ -3,7 +3,6 @@
 import { getUserSubscriptionId } from "@/app/(auth)/lib";
 import { db, pullMessages, requestPortMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
-import { insertRequestPortMessage } from "@/services/agents/requests/insert-request-port-message";
 import { metrics } from "@opentelemetry/api";
 import { and, eq } from "drizzle-orm";
 import { insertRequestPortMessage } from "../../../requests/actions";
