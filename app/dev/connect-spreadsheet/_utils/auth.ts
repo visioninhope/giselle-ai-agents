@@ -13,7 +13,7 @@ export async function getSession() {
 		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
 		.limit(1);
 
-	const userId = supabaseUserMap[0].userId;
+	const userId = supabaseUserMap[0].userDbId;
 
 	const queries = await db
 		.select({
@@ -98,7 +98,7 @@ export const { handlers, signIn, signOut } = NextAuth({
 						);
 					}
 
-					const userId = existingSupabaseUserMapping[0].userId;
+					const userId = existingSupabaseUserMapping[0].userDbId;
 
 					if (!account.access_token) {
 						const message = "Access token is missing";

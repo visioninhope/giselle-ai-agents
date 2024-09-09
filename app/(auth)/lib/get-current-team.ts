@@ -8,13 +8,13 @@ export const getCurrentTeam = async () => {
 	const user = await getUser();
 	const [team] = await db
 		.select({
-			id: teams.id,
+			id: teams.dbId,
 		})
 		.from(teams)
-		.innerJoin(teamMemberships, eq(teamMemberships.teamId, teams.id))
+		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(
 			supabaseUserMappings,
-			eq(supabaseUserMappings.userId, teamMemberships.userId),
+			eq(supabaseUserMappings.userDbId, teamMemberships.userDbId),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 	return team;

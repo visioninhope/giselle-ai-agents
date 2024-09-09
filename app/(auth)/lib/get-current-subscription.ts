@@ -14,14 +14,14 @@ export const getUserSubscriptionId = async () => {
 	const user = await getUser();
 	const [subscription] = await db
 		.select({
-			organizationId: organizations.id, // todo: replace with 'subscriptionId' if subscriptions table is created in the future
+			organizationId: organizations.dbId, // todo: replace with 'subscriptionId' if subscriptions table is created in the future
 		})
 		.from(organizations)
-		.innerJoin(teams, eq(teams.organizationId, organizations.id))
-		.innerJoin(teamMemberships, eq(teamMemberships.teamId, teams.id))
+		.innerJoin(teams, eq(teams.organizationDbId, organizations.dbId))
+		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(
 			supabaseUserMappings,
-			eq(supabaseUserMappings.userId, teamMemberships.userId),
+			eq(supabaseUserMappings.userDbId, teamMemberships.userDbId),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 	return subscription.organizationId;
