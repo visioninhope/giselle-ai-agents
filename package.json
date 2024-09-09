@@ -53,6 +53,7 @@
 		"openai": "4.56.0",
 		"react": "19.0.0-rc-7771d3a7-20240827",
 		"react-dom": "19.0.0-rc-7771d3a7-20240827",
+		"stripe": "16.10.0",
 		"swr": "2.2.5",
 		"tailwind-merge": "^2.4.0",
 		"tailwindcss-animate": "^1.0.7",

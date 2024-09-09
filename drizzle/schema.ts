@@ -46,7 +46,7 @@ export const organizations = pgTable("organizations", {
 
 export const subscriptions = pgTable("subscriptions", {
 	// Subscription ID from Stripe, e.g. sub_1234.
-	id: text("id").unique(),
+	id: text("id").notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	organizationDbId: integer("organization_db_id")
 		.notNull()
@@ -62,15 +62,26 @@ export const teams = pgTable("teams", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export type UserId = `usr_${string}`;
 export const users = pgTable("users", {
+	id: text("id").$type<UserId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 });
 
 export const supabaseUserMappings = pgTable("supabase_user_mappings", {
 	userDbId: integer("user_db_id")
+		.unique()
 		.notNull()
 		.references(() => users.dbId),
-	supabaseUserId: text("supabase_user_id").notNull(),
+	supabaseUserId: text("supabase_user_id").notNull().unique(),
+});
+
+export const stripeUserMappings = pgTable("stripe_user_mappings", {
+	userDbId: integer("user_db_id")
+		.notNull()
+		.unique()
+		.references(() => users.dbId),
+	stripeCustomerId: text("stripe_customer_id").notNull().unique(),
 });
 
 type TeamRole = "admin" | "member";

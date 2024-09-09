@@ -8,15 +8,22 @@ import {
 	teams,
 	users,
 } from "@/drizzle";
+import { createId } from "@paralleldrive/cuid2";
 import type { User } from "@supabase/auth-js";
 
 export const initializeAccount = async (supabaseUserId: User["id"]) => {
-	await db.transaction(async (tx) => {
-		const [user] = await tx.insert(users).values({}).returning({
-			id: users.dbId,
-		});
+	const result = await db.transaction(async (tx) => {
+		const userId = `usr_${createId()}` as const;
+		const [user] = await tx
+			.insert(users)
+			.values({
+				id: userId,
+			})
+			.returning({
+				dbId: users.dbId,
+			});
 		await tx.insert(supabaseUserMappings).values({
-			userDbId: user.id,
+			userDbId: user.dbId,
 			supabaseUserId,
 		});
 		const [organization] = await tx
@@ -38,9 +45,11 @@ export const initializeAccount = async (supabaseUserId: User["id"]) => {
 			});
 
 		await tx.insert(teamMemberships).values({
-			userDbId: user.id,
+			userDbId: user.dbId,
 			teamDbId: team.id,
 			role: "admin",
 		});
+		return { id: userId };
 	});
+	return result;
 };
