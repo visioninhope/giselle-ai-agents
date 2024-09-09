@@ -39,35 +39,28 @@ import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files"
 import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
 
 export const organizations = pgTable("organizations", {
-	id: serial("id").primaryKey(),
+	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const teams = pgTable("teams", {
-	id: serial("id").primaryKey(),
-	organizationId: integer("organization_id")
+	dbId: serial("db_id").primaryKey(),
+	organizationDbId: integer("organization_db_id")
 		.notNull()
-		.references(() => organizations.id),
+		.references(() => organizations.dbId),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
 export const users = pgTable("users", {
-	id: serial("id").primaryKey(),
-});
-export const userInitialTasks = pgTable("user_initial_tasks", {
-	id: serial("id").primaryKey(),
-	userId: integer("user_id")
-		.notNull()
-		.references(() => users.id),
-	taskId: text("task_id").notNull(),
+	dbId: serial("db_id").primaryKey(),
 });
 
 export const supabaseUserMappings = pgTable("supabase_user_mappings", {
-	userId: integer("user_id")
+	userDbId: integer("user_db_id")
 		.notNull()
-		.references(() => users.id),
+		.references(() => users.dbId),
 	supabaseUserId: text("supabase_user_id").notNull(),
 });
 
@@ -76,18 +69,18 @@ export const teamMemberships = pgTable(
 	"team_memberships",
 	{
 		id: serial("id").primaryKey(),
-		userId: integer("user_id")
+		userDbId: integer("user_db_id")
 			.notNull()
-			.references(() => users.id),
-		teamId: integer("team_id")
+			.references(() => users.dbId),
+		teamDbId: integer("team_db_id")
 			.notNull()
-			.references(() => teams.id),
+			.references(() => teams.dbId),
 		role: text("role").notNull().$type<TeamRole>(),
 	},
 	(teamMembership) => ({
 		teamMembershipsUserTeamUnique: unique().on(
-			teamMembership.userId,
-			teamMembership.teamId,
+			teamMembership.userDbId,
+			teamMembership.teamDbId,
 		),
 	}),
 );
@@ -296,7 +289,7 @@ export const oauthCredentials = pgTable(
 		id: serial("id").primaryKey(),
 		userId: integer("user_id")
 			.notNull()
-			.references(() => users.id),
+			.references(() => users.dbId),
 		provider: text("provider").notNull(),
 		providerAccountId: text("provider_account_id").notNull(),
 		accessToken: text("access_token").notNull(),

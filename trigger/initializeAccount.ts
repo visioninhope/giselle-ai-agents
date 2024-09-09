@@ -21,21 +21,21 @@ export const initializeAccountTask = task({
 				name: "default",
 			})
 			.returning({
-				id: organizations.id,
+				id: organizations.dbId,
 			});
 		const [team] = await db
 			.insert(teams)
 			.values({
-				organizationId: organization.id,
+				organizationDbId: organization.id,
 				name: "default",
 			})
 			.returning({
-				id: teams.id,
+				id: teams.dbId,
 			});
 
 		await db.insert(teamMemberships).values({
-			userId,
-			teamId: team.id,
+			userDbId: userId,
+			teamDbId: team.id,
 			role: "admin",
 		});
 	},

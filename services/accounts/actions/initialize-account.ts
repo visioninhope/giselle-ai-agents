@@ -13,10 +13,10 @@ import type { User } from "@supabase/auth-js";
 export const initializeAccount = async (supabaseUserId: User["id"]) => {
 	await db.transaction(async (tx) => {
 		const [user] = await tx.insert(users).values({}).returning({
-			id: users.id,
+			id: users.dbId,
 		});
 		await tx.insert(supabaseUserMappings).values({
-			userId: user.id,
+			userDbId: user.id,
 			supabaseUserId,
 		});
 		const [organization] = await tx
@@ -25,21 +25,21 @@ export const initializeAccount = async (supabaseUserId: User["id"]) => {
 				name: "default",
 			})
 			.returning({
-				id: organizations.id,
+				id: organizations.dbId,
 			});
 		const [team] = await tx
 			.insert(teams)
 			.values({
-				organizationId: organization.id,
+				organizationDbId: organization.id,
 				name: "default",
 			})
 			.returning({
-				id: teams.id,
+				id: teams.dbId,
 			});
 
 		await tx.insert(teamMemberships).values({
-			userId: user.id,
-			teamId: team.id,
+			userDbId: user.id,
+			teamDbId: team.id,
 			role: "admin",
 		});
 	});
