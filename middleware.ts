@@ -1,32 +1,27 @@
+import { retrieveStripeSubscriptionBySupabaseUserId } from "@/services/accounts/actions";
+import { createCheckoutBySupabaseUser } from "@/services/external/stripe/actions";
 import { NextResponse } from "next/server";
-// import { getUserInitializationTask } from "./app/(auth)/lib";
 import { supabaseMiddleware } from "./lib/supabase";
 
 export default supabaseMiddleware(async (user, request) => {
-	if (
-		!user &&
-		!request.nextUrl.pathname.startsWith("/login") &&
-		!request.nextUrl.pathname.startsWith("/signup") &&
-		!request.nextUrl.pathname.startsWith("/verify-email")
-	) {
+	if (user == null) {
 		// no user, potentially respond by redirecting the user to the login page
 		const url = request.nextUrl.clone();
 		url.pathname = "/login";
 		return NextResponse.redirect(url);
 	}
-	// if (user != null) {
-	// 	const task = await getUserInitializationTask({ supabaseUserId: user.id });
-	// 	if (
-	// 		task.status !== "COMPLETED" &&
-	// 		!request.nextUrl.pathname.startsWith("/account-initialization")
-	// 	) {
-	// 		const url = request.nextUrl.clone();
-	// 		url.pathname = "/account-initialization";
-	// 		return NextResponse.redirect(url);
-	// 	}
-	// }
+	const subscription = await retrieveStripeSubscriptionBySupabaseUserId(
+		user.id,
+	);
+	if (subscription == null) {
+		const checkout = await createCheckoutBySupabaseUser(user);
+		return NextResponse.redirect(checkout.url as string);
+	}
+	/** @todo Validate subscription status */
 });
 
 export const config = {
-	matcher: ["/((?!.*\\..*|_next).*)", "/", "/(api|trpc)(.*)"],
+	matcher: [
+		"/((?!_next/static|_next/image|dev|webhooks|login|signup|pricing|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+	],
 };

@@ -1,11 +1,5 @@
 import { stripe } from "@/services/external/stripe";
-import {
-	deletePriceRecord,
-	deleteProductRecord,
-	manageSubscriptionStatusChange,
-	upsertPriceRecord,
-	upsertProductRecord,
-} from "@/utils/supabase/admin";
+import { createSubscription } from "@/services/external/stripe/actions";
 import type Stripe from "stripe";
 
 const relevantEvents = new Set([
@@ -16,9 +10,9 @@ const relevantEvents = new Set([
 	// "price.updated",
 	// "price.deleted",
 	"checkout.session.completed",
-	"customer.subscription.created",
-	"customer.subscription.updated",
-	"customer.subscription.deleted",
+	// "customer.subscription.created",
+	// "customer.subscription.updated",
+	// "customer.subscription.deleted",
 ]);
 
 export async function POST(req: Request) {
@@ -32,6 +26,8 @@ export async function POST(req: Request) {
 			return new Response("Webhook secret not found.", { status: 400 });
 		event = stripe.webhooks.constructEvent(body, sig, webhookSecret);
 		console.log(`🔔  Webhook received: ${event.type}`);
+
+		// biome-ignore lint: lint/suspicious/noExplicitAny: @todo error handling
 	} catch (err: any) {
 		console.log(`❌ Error message: ${err.message}`);
 		return new Response(`Webhook Error: ${err.message}`, { status: 400 });
@@ -54,25 +50,40 @@ export async function POST(req: Request) {
 				// case "product.deleted":
 				// 	await deleteProductRecord(event.data.object as Stripe.Product);
 				// 	break;
-				case "customer.subscription.created":
-				case "customer.subscription.updated":
-				case "customer.subscription.deleted":
-					// const subscription = event.data.object as Stripe.Subscription;
-					await manageSubscriptionStatusChange(
-						event.data.object.id,
-						event.data.object.customer,
-						event.type === "customer.subscription.created",
-					);
-					break;
+				// case "customer.subscription.created":
+				// case "customer.subscription.updated":
+				// case "customer.subscription.deleted":
+				// const subscription = event.data.object as Stripe.Subscription;
+				// await manageSubscriptionStatusChange(
+				// 	event.data.object.id,
+				// 	event.data.object.customer,
+				// 	event.type === "customer.subscription.created",
+				// );
+				// break;
 				case "checkout.session.completed":
-					if (event.data.object.mode === "subscription") {
-						const subscriptionId = event.data.object.subscription;
-						await manageSubscriptionStatusChange(
-							subscriptionId as string,
-							event.data.object.customer,
-							true,
+					if (event.data.object.mode !== "subscription") {
+						throw new Error("Unhandled relevant event!");
+					}
+					if (
+						event.data.object.subscription == null ||
+						typeof event.data.object.subscription !== "string"
+					) {
+						throw new Error(
+							"The checkout session is missing a valid subscription ID. Please check the session data.",
 						);
 					}
+					if (
+						event.data.object.customer == null ||
+						typeof event.data.object.customer !== "string"
+					) {
+						throw new Error(
+							"The checkout session is missing a valid customer ID. Please check the session data.",
+						);
+					}
+					await createSubscription(
+						event.data.object.subscription,
+						event.data.object.customer,
+					);
 					break;
 				default:
 					throw new Error("Unhandled relevant event!");

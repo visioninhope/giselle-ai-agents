@@ -1,44 +1,46 @@
 "use server";
 
-import { db, stripeUserMappings, supabaseUserMappings, users } from "@/drizzle";
-import type { User } from "@supabase/auth-js";
+import {
+	type UserId,
+	db,
+	stripeUserMappings,
+	supabaseUserMappings,
+	users,
+} from "@/drizzle";
 import { eq } from "drizzle-orm";
 import { stripe } from "../config";
 
-export const createOrRetrieveCustomer = async (user: User) => {
+export const createOrRetrieveCustomer = async (
+	userId: UserId,
+	userEmail: string,
+) => {
 	const [stripeUserMapping] = await db
 		.select({ stripeCustomerId: stripeUserMappings.stripeCustomerId })
 		.from(stripeUserMappings)
-		.innerJoin(
-			supabaseUserMappings,
-			eq(supabaseUserMappings.userDbId, stripeUserMappings.userDbId),
-		);
+		.innerJoin(users, eq(users.dbId, stripeUserMappings.userDbId))
+		.where(eq(users.id, userId));
 	if (stripeUserMapping != null) {
 		return stripeUserMapping.stripeCustomerId;
 	}
-	const newCustomer = await createCustomer(user);
+	const newCustomer = await createCustomer(userId, userEmail);
 	const [dbUser] = await db
 		.select({
 			dbId: users.dbId,
 		})
 		.from(users)
-		.innerJoin(
-			supabaseUserMappings,
-			eq(users.dbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+		.where(eq(users.id, userId));
 	await db.insert(stripeUserMappings).values({
 		userDbId: dbUser.dbId,
 		stripeCustomerId: newCustomer.id,
 	});
+	return newCustomer.id;
 };
 
-const createCustomer = async (user: User) => {
-	const customerData = {
-		metadata: { supabaseUUID: user.id },
-		email: user.email,
-	};
-	const newCustomer = await stripe.customers.create(customerData);
+const createCustomer = async (userId: UserId, userEmail: string) => {
+	const newCustomer = await stripe.customers.create({
+		email: userEmail,
+		metadata: { userId },
+	});
 	if (!newCustomer) throw new Error("Stripe customer creation failed.");
 
 	return newCustomer;
