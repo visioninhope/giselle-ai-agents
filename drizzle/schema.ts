@@ -44,6 +44,15 @@ export const organizations = pgTable("organizations", {
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 });
 
+export const subscriptions = pgTable("subscriptions", {
+	// Subscription ID from Stripe, e.g. sub_1234.
+	id: text("id").unique(),
+	dbId: serial("db_id").primaryKey(),
+	organizationDbId: integer("organization_db_id")
+		.notNull()
+		.references(() => organizations.dbId),
+});
+
 export const teams = pgTable("teams", {
 	dbId: serial("db_id").primaryKey(),
 	organizationDbId: integer("organization_db_id")
