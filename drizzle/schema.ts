@@ -74,7 +74,7 @@ export const supabaseUserMappings = pgTable("supabase_user_mappings", {
 });
 
 export const stripeUserMappings = pgTable("stripe_user_mappings", {
-	userId: integer("user_id")
+	userDbId: integer("user_id")
 		.notNull()
 		.unique()
 		.references(() => users.dbId),
