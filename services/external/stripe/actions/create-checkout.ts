@@ -9,6 +9,7 @@ import { stripe } from "../config";
 import { createOrRetrieveCustomer } from "./create-or-retrieve-customer";
 
 export const createCheckoutBySupabaseUser = async (user: User) => {
+	console.log(user.id);
 	const [dbUser] = await db
 		.select({ id: users.id })
 		.from(users)

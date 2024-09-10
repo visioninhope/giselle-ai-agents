@@ -22,6 +22,6 @@ export default supabaseMiddleware(async (user, request) => {
 
 export const config = {
 	matcher: [
-		"/((?!_next/static|_next/image|dev|webhooks|login|signup|pricing|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+		"/((?!_next/static|_next/image|dev|webhooks|login|signup|pricing|password_reset|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
 	],
 };
