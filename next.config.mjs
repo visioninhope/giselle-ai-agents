@@ -16,6 +16,7 @@ const nextConfig = {
 			bodySizeLimit: "2mb",
 		},
 	},
+	serverExternalPackages: ["@opentelemetry/sdk-node"],
 };
 
 export default withSentryConfig(nextConfig, {
