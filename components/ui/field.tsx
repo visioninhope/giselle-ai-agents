@@ -7,10 +7,23 @@ type FieldProps = {
 	type: HTMLInputTypeAttribute;
 	required?: boolean;
 	label: string;
+	ignore1password?: boolean;
 };
-export const Field: FC<FieldProps> = ({ name, type, required, label }) => (
+export const Field: FC<FieldProps> = ({
+	name,
+	type,
+	required,
+	label,
+	ignore1password = false,
+}) => (
 	<div className="grid gap-[4px]">
 		<Label htmlFor={name}>{label}</Label>
-		<Input id={name} type={type} name={name} required={required} />
+		<Input
+			id={name}
+			type={type}
+			name={name}
+			required={required}
+			data-1p-ignore={ignore1password}
+		/>
 	</div>
 );
