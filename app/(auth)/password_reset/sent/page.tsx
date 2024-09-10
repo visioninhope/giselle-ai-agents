@@ -1,13 +1,11 @@
-import { PageTitle } from "../components/page-title";
-import { Form } from "./form";
+import { PageTitle } from "../../components/page-title";
 
-export default function ResetPasswordPage() {
+export default function SentPasswordResetMailPage() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
-					<PageTitle>Reset your password</PageTitle>
-					<Form />
+					<PageTitle>Check your Email</PageTitle>
 				</div>
 			</div>
 		</div>

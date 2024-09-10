@@ -17,6 +17,6 @@ export const resetPassword = async (
 	if (error != null) {
 		return error;
 	}
-	redirect("/agents");
+	redirect("/password_reset/complete");
 	return null;
 };
