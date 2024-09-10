@@ -22,6 +22,5 @@ export const sendPasswordResetEmail = async (
 	if (error) {
 		return error;
 	}
-	console.log(data);
 	return null;
 };

@@ -9,7 +9,6 @@ export const resetPassword = async (
 	formData: FormData,
 ): Promise<AuthError | null> => {
 	const newPassword = formData.get("new_password");
-	console.log({ newPassword });
 	if (newPassword == null || typeof newPassword !== "string") {
 		return new AuthError("invalid_new_password");
 	}
