@@ -5,6 +5,7 @@ import { onRequest } from "./on-request";
 import { response } from "./response";
 import { text } from "./text";
 import { textGeneration } from "./text-generation";
+import { webScraping } from "./web-scraper";
 
 export const nodeClasses = {
 	onRequest,
@@ -13,4 +14,5 @@ export const nodeClasses = {
 	text,
 	textGeneration,
 	knowledgeRetrieval,
+	webScraping,
 } satisfies NodeClasses;

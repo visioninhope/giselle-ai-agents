@@ -77,6 +77,14 @@ export const Finder: FC<FinderProps> = ({ onSelect, style, className }) => {
 						>
 							Text Generation
 						</DropdownMenuItem>
+						<DropdownMenuItem
+							onSelect={() => {
+								const node = nodeService.createNode("webScraping");
+								onSelect(node);
+							}}
+						>
+							Web Scraping
+						</DropdownMenuItem>
 					</DropdownMenuGroup>
 					<DropdownMenuSeparator />
 					<DropdownMenuGroup>
