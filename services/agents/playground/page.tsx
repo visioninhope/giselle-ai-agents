@@ -5,7 +5,6 @@ import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { getGraph } from "./actions/get-graph";
 import { PlaygroundProvider } from "./context";
-import { Header } from "./header/header";
 import { Inner } from "./inner";
 import { SideNav } from "./side-nav";
 import { KnowledgeList } from "./side-nav/knowledge/knowledge-list";
@@ -24,13 +23,11 @@ const Skeleton = () => {
 type PlaygroundProps = {
 	agentId: AgentId;
 	requestRunnerProvider: RequestRunnerProvider;
-	headerUserButton?: React.ReactNode;
 	options?: PlaygroundOption[];
 };
 export async function Playground({
 	agentId,
 	requestRunnerProvider,
-	headerUserButton,
 	options,
 }: PlaygroundProps) {
 	const [graph, knowledges] = await Promise.all([

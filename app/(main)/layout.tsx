@@ -15,7 +15,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 					<UserButton />
 				</div>
 			</header>
-			<main>{children}</main>
+			<main className="h-full">{children}</main>
 		</div>
 	);
 }
