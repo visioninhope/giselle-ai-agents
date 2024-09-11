@@ -27,18 +27,16 @@ export default async function AccountSettingPage() {
 					/>
 				</div>
 			</Card>
-			<Card title="Reset Password">
-				<div className="w-[220px]">
-					<Link href="/password_reset/new_password">
-						<Button>Reset Password</Button>
-					</Link>
-				</div>
-			</Card>
+			<Card
+				title="Reset Password"
+				action={{
+					content: "Reset Password",
+					href: "/password_reset/new_password",
+				}}
+			/>
 			<Card title="Delete Account">
 				<div className="w-[220px]">
-					<Link href="#">
-						<LinkText>Contact Support</LinkText>
-					</Link>
+					<LinkText>Contact Support</LinkText>
 				</div>
 			</Card>
 		</div>
