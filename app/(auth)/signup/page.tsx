@@ -1,9 +1,8 @@
 import { Button } from "@/components/ui/button";
-import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
+import { LinkText } from "@/components/ui/link-text";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
 import { Divider } from "../components/divider";
-import { LinkText } from "../components/link-text";
 import { OAuthProviders } from "../components/oauth-providers";
 
 export default function SignupPage() {

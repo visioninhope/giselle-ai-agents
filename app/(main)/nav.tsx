@@ -22,7 +22,7 @@ export const Nav: FC = () => {
 			{pathname !== "/" && <Link href="/">Lobby</Link>}
 			{!pathname.startsWith("/agents") && <Link href="/agents">Agents</Link>}
 			{!pathname.startsWith("/settings") && (
-				<Link href="/settings/profile"> Settings</Link>
+				<Link href="/settings/account">Settings</Link>
 			)}
 		</div>
 	);

@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -9,7 +8,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { getUser } from "@/lib/supabase";
 import Avatar from "boring-avatars";
-import { UserRoundIcon } from "lucide-react";
+import Link from "next/link";
 import type { FC } from "react";
 import { SignOutButton } from "./sign-out-button";
 
@@ -28,8 +27,9 @@ export const UserButton: FC = async () => {
 			<DropdownMenuContent align="end">
 				<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
 				<DropdownMenuSeparator />
-				<DropdownMenuItem className="justify-end">Settings</DropdownMenuItem>
-				<DropdownMenuItem className="justify-end">Support</DropdownMenuItem>
+				<DropdownMenuItem className="justify-end">
+					<Link href="/settings/account">Settings</Link>
+				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem className="justify-end">
 					<SignOutButton />
