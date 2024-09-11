@@ -1,5 +1,4 @@
 import "@xyflow/react/dist/style.css";
-import { UserButton } from "@/services/accounts";
 import type { AgentId } from "@/services/agents";
 import { Playground, resolveOptions } from "@/services/agents/playground";
 
@@ -13,7 +12,6 @@ export default async function AgentPlaygroundPage({
 		<Playground
 			agentId={params.agentId}
 			requestRunnerProvider="vercelFunctions"
-			headerUserButton={<UserButton />}
 			options={options}
 		/>
 	);

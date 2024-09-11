@@ -39,6 +39,7 @@
 		"@vercel/otel": "1.10.0",
 		"@vercel/postgres": "0.9.0",
 		"@xyflow/react": "12.0.3",
+		"boring-avatars": "1.11.1",
 		"class-variance-authority": "^0.7.0",
 		"clsx": "^2.1.1",
 		"cmdk": "^1.0.0",

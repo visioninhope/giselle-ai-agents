@@ -8,6 +8,7 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getUser } from "@/lib/supabase";
+import Avatar from "boring-avatars";
 import { UserRoundIcon } from "lucide-react";
 import type { FC } from "react";
 import { SignOutButton } from "./sign-out-button";
@@ -16,10 +17,13 @@ export const UserButton: FC = async () => {
 	const user = await getUser();
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger asChild>
-				<Button className="overflow-hidden rounded-full">
-					<UserRoundIcon className="w-6 h-6" />
-				</Button>
+			<DropdownMenuTrigger>
+				<Avatar
+					name={user.email}
+					variant="marble"
+					size={36}
+					colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end">
 				<DropdownMenuLabel>{user.email}</DropdownMenuLabel>
