@@ -29,8 +29,5 @@ export const retrieveStripeSubscriptionBySupabaseUserId = async (
 			eq(supabaseUserMappings.userDbId, users.dbId),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUserId));
-	if (subscription == null) {
-		return null;
-	}
-	return await stripe.subscriptions.retrieve(subscription.id);
+	return subscription;
 };
