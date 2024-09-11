@@ -37,6 +37,7 @@ import {
 } from "drizzle-orm/pg-core";
 import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files";
 import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
+import type { Stripe } from "stripe";
 
 export const organizations = pgTable("organizations", {
 	dbId: serial("db_id").primaryKey(),
@@ -51,6 +52,16 @@ export const subscriptions = pgTable("subscriptions", {
 	organizationDbId: integer("organization_db_id")
 		.notNull()
 		.references(() => organizations.dbId),
+	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
+	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
+	cancelAt: timestamp("cancel_at"),
+	canceledAt: timestamp("canceled_at"),
+	currentPeriodStart: timestamp("current_period_start").notNull(),
+	currentPeriodEnd: timestamp("current_period_end").notNull(),
+	created: timestamp("created").defaultNow().notNull(),
+	endedAt: timestamp("ended_at"),
+	trialStart: timestamp("trial_start"),
+	trialEnd: timestamp("trial_end"),
 });
 
 export const teams = pgTable("teams", {
