@@ -48,7 +48,6 @@ export async function Playground({
 			>
 				<ReactFlowProvider>
 					<div className="h-screen w-full flex flex-col">
-						<Header userButton={headerUserButton} />
 						<div className="flex flex-1">
 							<SideNav knowledge={<KnowledgeList knowledges={knowledges} />} />
 							<Inner />
