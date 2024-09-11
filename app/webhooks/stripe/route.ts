@@ -1,5 +1,5 @@
 import { stripe } from "@/services/external/stripe";
-import { createSubscription } from "@/services/external/stripe/actions";
+import { upsertSubscription } from "@/services/external/stripe/actions";
 import type Stripe from "stripe";
 
 const relevantEvents = new Set([
@@ -10,9 +10,9 @@ const relevantEvents = new Set([
 	// "price.updated",
 	// "price.deleted",
 	"checkout.session.completed",
-	// "customer.subscription.created",
-	// "customer.subscription.updated",
-	// "customer.subscription.deleted",
+	"customer.subscription.created",
+	"customer.subscription.updated",
+	"customer.subscription.deleted",
 ]);
 
 export async function POST(req: Request) {
@@ -50,16 +50,22 @@ export async function POST(req: Request) {
 				// case "product.deleted":
 				// 	await deleteProductRecord(event.data.object as Stripe.Product);
 				// 	break;
-				// case "customer.subscription.created":
-				// case "customer.subscription.updated":
-				// case "customer.subscription.deleted":
-				// const subscription = event.data.object as Stripe.Subscription;
-				// await manageSubscriptionStatusChange(
-				// 	event.data.object.id,
-				// 	event.data.object.customer,
-				// 	event.type === "customer.subscription.created",
-				// );
-				// break;
+				case "customer.subscription.created":
+				case "customer.subscription.updated":
+				case "customer.subscription.deleted":
+					if (
+						event.data.object.customer == null ||
+						typeof event.data.object.customer !== "string"
+					) {
+						throw new Error(
+							"The checkout session is missing a valid customer ID. Please check the session data.",
+						);
+					}
+					await upsertSubscription(
+						event.data.object.id,
+						event.data.object.customer,
+					);
+					break;
 				case "checkout.session.completed":
 					if (event.data.object.mode !== "subscription") {
 						throw new Error("Unhandled relevant event!");
@@ -80,7 +86,7 @@ export async function POST(req: Request) {
 							"The checkout session is missing a valid customer ID. Please check the session data.",
 						);
 					}
-					await createSubscription(
+					await upsertSubscription(
 						event.data.object.subscription,
 						event.data.object.customer,
 					);

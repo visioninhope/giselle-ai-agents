@@ -1,4 +1,4 @@
-export { createSubscription } from "./actions/create-subscription";
+export { upsertSubscription } from "./actions/upsert-subscription";
 export {
 	createCheckout,
 	createCheckoutBySupabaseUser,
