@@ -6,8 +6,7 @@ import type { AgentId } from "../types";
 import { getGraph } from "./actions/get-graph";
 import { PlaygroundProvider } from "./context";
 import { Inner } from "./inner";
-import { SideNav } from "./side-nav";
-import { KnowledgeList } from "./side-nav/knowledge/knowledge-list";
+import { SideNav } from "./side-nav/components";
 import type { PlaygroundOption } from "./types";
 
 const Skeleton = () => {
@@ -46,7 +45,7 @@ export async function Playground({
 				<ReactFlowProvider>
 					<div className="h-full w-full flex flex-col">
 						<div className="flex flex-1">
-							<SideNav knowledge={<KnowledgeList knowledges={knowledges} />} />
+							<SideNav />
 							<Inner />
 						</div>
 					</div>

@@ -15,7 +15,7 @@ import { type FC, useEffect } from "react";
 import {
 	type KnowledgeContent,
 	removeKnowledgeContent,
-} from "../../../knowledges";
+} from "../../../../knowledges";
 import { useContentState } from "./content-state-provider";
 
 type KnowledgeContentListItemProps = {

@@ -5,7 +5,7 @@ import {
 	type KnowledgeId,
 	addKnowledgeContent,
 	knowledgeContentType,
-} from "../../../knowledges";
+} from "../../../../knowledges";
 
 type AddFileToKnowledgeContentFormProps = {
 	knowledgeId: KnowledgeId;

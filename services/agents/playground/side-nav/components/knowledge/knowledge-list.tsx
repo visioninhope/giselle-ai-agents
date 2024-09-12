@@ -17,8 +17,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { createId } from "@paralleldrive/cuid2";
 import { type FC, useActionState } from "react";
-import { type Knowledge, addKnowledge } from "../../../knowledges";
-import { usePlayground } from "../../context";
+import { type Knowledge, addKnowledge } from "../../../../knowledges";
+import { usePlayground } from "../../../context";
+import { Layout } from "../layout";
 import { ContentStateProvider } from "./content-state-provider";
 import { KnowledgeContentList } from "./knowledge-content-list";
 
@@ -27,25 +28,27 @@ type KnowledgeListProps = {
 };
 export const KnowledgeList: FC<KnowledgeListProps> = ({ knowledges }) => {
 	return (
-		<div className="flex flex-col gap-8">
-			<Accordion type="multiple">
-				{knowledges.map((knowledge) => (
-					<AccordionItem key={knowledge.id} value={knowledge.id}>
-						<AccordionTrigger> {knowledge.name}</AccordionTrigger>
-						<AccordionContent>
-							<ContentStateProvider>
-								<KnowledgeContentList
-									knowledgeId={knowledge.id}
-									knowledgeContents={knowledge.contents}
-								/>
-							</ContentStateProvider>
-						</AccordionContent>
-					</AccordionItem>
-				))}
-			</Accordion>
+		<Layout title="Knowledge">
+			<div className="flex flex-col gap-8">
+				<Accordion type="multiple">
+					{knowledges.map((knowledge) => (
+						<AccordionItem key={knowledge.id} value={knowledge.id}>
+							<AccordionTrigger> {knowledge.name}</AccordionTrigger>
+							<AccordionContent>
+								<ContentStateProvider>
+									<KnowledgeContentList
+										knowledgeId={knowledge.id}
+										knowledgeContents={knowledge.contents}
+									/>
+								</ContentStateProvider>
+							</AccordionContent>
+						</AccordionItem>
+					))}
+				</Accordion>
 
-			<AddKnowledgeForm />
-		</div>
+				<AddKnowledgeForm />
+			</div>
+		</Layout>
 	);
 };
 
