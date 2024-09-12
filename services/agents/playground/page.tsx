@@ -1,13 +1,13 @@
 import { Background, ReactFlow, ReactFlowProvider } from "@xyflow/react";
 import { Suspense } from "react";
+import { getAgent } from "../actions/get-agent";
 import { getKnowledges } from "../knowledges";
 import type { RequestRunnerProvider } from "../requests/types";
 import type { AgentId } from "../types";
 import { getGraph } from "./actions/get-graph";
 import { PlaygroundProvider } from "./context";
 import { Inner } from "./inner";
-import { SideNav } from "./side-nav";
-import { KnowledgeList } from "./side-nav/knowledge/knowledge-list";
+import { SideNav } from "./side-nav/components";
 import type { PlaygroundOption } from "./types";
 
 const Skeleton = () => {
@@ -30,7 +30,8 @@ export async function Playground({
 	requestRunnerProvider,
 	options,
 }: PlaygroundProps) {
-	const [graph, knowledges] = await Promise.all([
+	const [agent, graph, knowledges] = await Promise.all([
+		getAgent({ agentId }),
 		getGraph({ agentId }),
 		getKnowledges({ agentId }),
 	]);
@@ -38,6 +39,7 @@ export async function Playground({
 		<Suspense fallback={<Skeleton />}>
 			<PlaygroundProvider
 				agentId={agentId}
+				name={agent.name}
 				requestRunnerProvider={requestRunnerProvider}
 				graph={graph}
 				knowledges={knowledges}
@@ -46,7 +48,7 @@ export async function Playground({
 				<ReactFlowProvider>
 					<div className="h-full w-full flex flex-col">
 						<div className="flex flex-1">
-							<SideNav knowledge={<KnowledgeList knowledges={knowledges} />} />
+							<SideNav />
 							<Inner />
 						</div>
 					</div>

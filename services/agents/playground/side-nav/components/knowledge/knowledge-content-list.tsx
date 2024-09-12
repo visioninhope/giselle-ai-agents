@@ -12,9 +12,9 @@ import {
 } from "@/components/ui/popover";
 import { BookOpenIcon, LoaderCircle, UploadIcon } from "lucide-react";
 import { type FC, useState } from "react";
-import type { KnowledgeContent, KnowledgeId } from "../../../knowledges";
-import { usePlayground } from "../../context";
-import { playgroundOption } from "../../types";
+import type { KnowledgeContent, KnowledgeId } from "../../../../knowledges";
+import { usePlayground } from "../../../context";
+import { playgroundOption } from "../../../types";
 import { AddFileToKnowledgeContentForm } from "./add-file-to-knowledge-content-form";
 import { AddTextToKnowledgeContentForm } from "./add-text-to-knowledge-content-form";
 import { AddWebpageToKnowledgeContentForm } from "./add-webpage-to-knowledge-content-form";

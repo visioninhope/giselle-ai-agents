@@ -21,7 +21,11 @@ export type PlaygroundAction =
 	| { type: "ADD_EDGE"; edge: PlaygroundEdge }
 	| { type: "REMOVE_EDGE"; edgeId: PlaygroundEdge["id"] }
 	| { type: "SET_GRAPH"; graph: PlaygroundGraph }
-	| { type: "UPDATE_VIEWPORT"; viewport: PlaygroundViewport };
+	| { type: "UPDATE_VIEWPORT"; viewport: PlaygroundViewport }
+	| {
+			type: "SET_AGENT_NAME";
+			agentName: string;
+	  };
 
 export function playgroundReducer(
 	state: PlaygroundState,
@@ -132,6 +136,14 @@ export function playgroundReducer(
 				graph: {
 					...state.graph,
 					viewport: action.viewport,
+				},
+			};
+		case "SET_AGENT_NAME":
+			return {
+				...state,
+				agent: {
+					...state.agent,
+					name: action.agentName,
 				},
 			};
 		default:

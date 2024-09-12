@@ -7,9 +7,15 @@ import {
 } from "@/components/ui/tooltip";
 import { AnimatePresence, LazyMotion, domAnimation, m } from "framer-motion";
 import { BookOpenIcon, LayersIcon, XIcon } from "lucide-react";
-import { type FC, type ReactNode, useState } from "react";
+import { type FC, useState } from "react";
 import type { JSX } from "react/jsx-runtime";
 import { match } from "ts-pattern";
+import { usePlayground } from "../../context";
+import { useSideNav } from "../context";
+import { SideNavProvider } from "../provider";
+import { sideNavs } from "../types";
+import { Detail } from "./detail";
+import { KnowledgeList } from "./knowledge/knowledge-list";
 
 type NavItemProps = {
 	icon: JSX.Element;
@@ -31,60 +37,51 @@ const NavItem: FC<NavItemProps> = ({ icon, tooltip, onClick }) => {
 	);
 };
 
-type SideNavProps = {
-	knowledge: ReactNode;
-};
-export const SideNav: FC<SideNavProps> = ({ knowledge }) => {
-	const [activeMenu, setActiveMenu] = useState("");
-	const [show, setShow] = useState(false);
+const SideNavInner: FC = () => {
+	const { state: sideNavState, dispatch: dispatchSideNavAction } = useSideNav();
+	const { state } = usePlayground();
 	return (
 		<div className="relative">
-			<div className="bg-slate-800 h-full px-2 pt-8 w-[60px]">
+			<div className="bg-black-100 h-full px-2 pt-8 w-[60px] border-r border-black-80">
 				<div className="flex flex-col gap-4">
 					<NavItem
 						icon={<LayersIcon />}
-						tooltip="Overview"
+						tooltip="Detail"
 						onClick={() => {
-							setShow(true);
-							setActiveMenu("overview");
+							dispatchSideNavAction({
+								type: "OPEN",
+								active: sideNavs.detail,
+							});
 						}}
 					/>
 					<NavItem
 						icon={<BookOpenIcon />}
 						tooltip="Knowledges"
 						onClick={() => {
-							setShow(true);
-							setActiveMenu("knowledges");
+							dispatchSideNavAction({
+								type: "OPEN",
+								active: sideNavs.knowledges,
+							});
 						}}
 					/>
 				</div>
 			</div>
 			<LazyMotion features={domAnimation}>
 				<AnimatePresence>
-					{show && (
+					{sideNavState.open && (
 						<m.div
-							className="bg-green-800 h-full pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden"
+							className="bg-black-100 h-full pt-8 absolute top-0 right-0 translate-x-[100%] z-10 overflow-x-hidden border-r border-black-80"
 							initial={{ width: 0 }}
 							animate={{ width: "300px" }}
 							exit={{ width: 0 }}
 						>
-							<div className="w-[300px] px-2">
-								<div className="flex justify-end">
-									<button
-										type="button"
-										onClick={() => {
-											setShow(false);
-										}}
-									>
-										<XIcon />
-									</button>
-								</div>
-								<div>
-									{match(activeMenu)
-										.with("overview", () => "Overview")
-										.with("knowledges", () => knowledge)
-										.otherwise(() => null)}
-								</div>
+							<div className="w-[300px]">
+								{match(sideNavState.active)
+									.with(sideNavs.detail, () => <Detail />)
+									.with(sideNavs.knowledges, () => (
+										<KnowledgeList knowledges={state.knowledges} />
+									))
+									.otherwise(() => null)}
 							</div>
 						</m.div>
 					)}
@@ -93,3 +90,9 @@ export const SideNav: FC<SideNavProps> = ({ knowledge }) => {
 		</div>
 	);
 };
+
+export const SideNav = () => (
+	<SideNavProvider>
+		<SideNavInner />
+	</SideNavProvider>
+);
