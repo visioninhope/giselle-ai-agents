@@ -28,6 +28,7 @@ export type PlaygroundOption = keyof typeof playgroundOption;
 
 export type PlaygroundState = {
 	agentId: AgentId;
+	agent: { name: string | null; id: AgentId };
 	graph: PlaygroundGraph;
 	knowledges: Knowledge[];
 	options: PlaygroundOption[];

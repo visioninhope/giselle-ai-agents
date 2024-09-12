@@ -14,6 +14,7 @@ import { usePlayground } from "../../context";
 import { useSideNav } from "../context";
 import { SideNavProvider } from "../provider";
 import { sideNavs } from "../types";
+import { Detail } from "./detail";
 import { KnowledgeList } from "./knowledge/knowledge-list";
 
 type NavItemProps = {
@@ -76,7 +77,7 @@ const SideNavInner: FC = () => {
 						>
 							<div className="w-[300px]">
 								{match(sideNavState.active)
-									.with(sideNavs.overview, () => "Overview")
+									.with(sideNavs.overview, () => <Detail />)
 									.with(sideNavs.knowledges, () => (
 										<KnowledgeList knowledges={state.knowledges} />
 									))

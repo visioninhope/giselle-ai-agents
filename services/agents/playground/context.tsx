@@ -9,6 +9,7 @@ import {
 	useContext,
 	useReducer,
 } from "react";
+import { setAgentName } from "../actions/set-agent-name";
 import type { Knowledge } from "../knowledges";
 import { OperationProvider } from "../nodes";
 import { RequestProvider } from "../requests/provider";
@@ -34,6 +35,7 @@ const PlaygroundContext = createContext<PlaygroundContext | undefined>(
 
 export type PlaygroundProviderProps = {
 	agentId: AgentId;
+	name: string | null;
 	graph: PlaygroundGraph;
 	requestRunnerProvider: RequestRunnerProvider;
 	knowledges: Knowledge[];
@@ -44,6 +46,10 @@ export const PlaygroundProvider: FC<
 > = (props) => {
 	const [state, dispatch] = useReducer(playgroundReducer, {
 		agentId: props.agentId,
+		agent: {
+			id: props.agentId,
+			name: props.name,
+		},
 		graph: props.graph,
 		knowledges: props.knowledges,
 		options: props.options,
@@ -56,9 +62,16 @@ export const PlaygroundProvider: FC<
 	);
 
 	const dispatchWithMiddleware = useCallback(
-		(action: PlaygroundAction) => {
+		async (action: PlaygroundAction) => {
 			dispatch(action);
-			debounceSetGraph(props.agentId, playgroundReducer(state, action).graph);
+			if (action.type !== "SET_AGENT_NAME") {
+				debounceSetGraph(props.agentId, playgroundReducer(state, action).graph);
+			} else {
+				await setAgentName({
+					agentId: props.agentId,
+					name: action.agentName,
+				});
+			}
 		},
 		[state, debounceSetGraph, props.agentId],
 	);

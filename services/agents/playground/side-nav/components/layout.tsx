@@ -11,9 +11,14 @@ export const Layout: FC<PropsWithChildren<LayoutProps>> = ({
 }) => {
 	const { dispatch } = useSideNav();
 	return (
-		<div className="grid gap-[24px]">
+		<div className="grid gap-[24px] px-[16px]">
 			<header className="flex justify-between">
-				<p>{title}</p>
+				<p
+					className="text-[22px] font-rosart text-black--30"
+					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				>
+					{title}
+				</p>
 				<button
 					type="button"
 					onClick={() => {
