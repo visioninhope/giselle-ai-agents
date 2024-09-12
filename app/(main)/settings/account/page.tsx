@@ -1,9 +1,6 @@
-import { Button } from "@/components/ui/button";
+import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
-import { Label } from "@/components/ui/label";
-import { LinkText } from "@/components/ui/link-text";
 import { getUser } from "@/lib/supabase";
-import Link from "next/link";
 import { Card } from "../components/card";
 
 export default async function AccountSettingPage() {
@@ -36,7 +33,7 @@ export default async function AccountSettingPage() {
 			/>
 			<Card title="Delete Account">
 				<div className="w-[220px]">
-					<LinkText>Contact Support</LinkText>
+					<ClickableText>Contact Support</ClickableText>
 				</div>
 			</Card>
 		</div>

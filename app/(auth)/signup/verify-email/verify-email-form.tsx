@@ -8,6 +8,7 @@ import {
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { type FC, useActionState, useCallback, useRef } from "react";
+import { ActionPrompt } from "../../components/action-prompt";
 import { useSignupContext } from "../context";
 import { verifyEmail } from "./verify-email";
 
@@ -40,6 +41,13 @@ export const VerifyEmailForm: FC = () => {
 					</InputOTPGroup>
 				</InputOTP>
 				<input type="hidden" name="verificationEmail" value={state.email} />
+
+				<div className="flex justify-center">
+					<ActionPrompt
+						prompt="Didn’t receive a code?"
+						action="Click to resend"
+					/>
+				</div>
 				<Button className="w-full" type="submit" disabled={isPending}>
 					Verify
 				</Button>

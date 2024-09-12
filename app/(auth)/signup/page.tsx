@@ -1,9 +1,12 @@
 import { Button } from "@/components/ui/button";
-import { LinkText } from "@/components/ui/link-text";
+import { ClickableText } from "@/components/ui/clicable-text";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
+import { ActionPrompt } from "../components/action-prompt";
 import { Divider } from "../components/divider";
+import { LegalConsent } from "../components/legal-consent";
 import { OAuthProviders } from "../components/oauth-providers";
+import { PageHeader } from "../components/page-header";
 
 export default function SignupPage() {
 	return (
@@ -23,9 +26,7 @@ export default function SignupPage() {
 				</p>
 			</div>
 			<div className="mt-8 space-y-6 w-[320px]">
-				<div className="text-black-30 font-[Rosart] text-[32px] font-normal leading-[38.4px] tracking-tighter text-center">
-					Get Started for free
-				</div>
+				<PageHeader title="Get Started for free" />
 				<OAuthProviders />
 				<Divider label="or" />
 				<Button asChild>
@@ -34,28 +35,17 @@ export default function SignupPage() {
 						<MailIcon className="h-5 w-5 mr-2" />
 					</Link>
 				</Button>
-				<p className="mt-2 text-center text-sm text-gray-400">
-					By continuing, you agree to our{" "}
-					<Link
-						href="/legal/tos"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						Terms of Service
-					</Link>{" "}
-					and{" "}
-					<Link
-						href="/legal/privacy"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						Privacy Policy
-					</Link>
-				</p>
-				<p className="text-center text-sm text-gray-400 font-[Rosart]">
-					Already have an account?{" "}
-					<LinkText asChild>
-						<Link href="/login">Log in</Link>
-					</LinkText>
-				</p>
+				<LegalConsent />
+				<div className="flex justify-center">
+					<ActionPrompt
+						prompt="Already have an account?"
+						action={
+							<ClickableText asChild>
+								<Link href="/login">Log in</Link>
+							</ClickableText>
+						}
+					/>
+				</div>
 			</div>
 		</div>
 	);

@@ -26,7 +26,7 @@ export const Card: FC<PropsWithChildren<CardProps>> = ({
 }) => (
 	<div className="bg-transparent rounded-[16px] border border-black-70 py-[16px] px-[24px] w-full gap-[16px] grid">
 		<div className="flex justify-between">
-			<div className="grid gap-[3px] font-[Avenir]">
+			<div className="grid gap-[3px] font-avenir">
 				<h2 className="text-black-30 text-[16px]">{title}</h2>
 				{description && (
 					<p className="text-[12px] text-black-70">{description}</p>

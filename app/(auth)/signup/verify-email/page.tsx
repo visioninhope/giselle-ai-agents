@@ -1,15 +1,13 @@
+import { PageHeader } from "../../components/page-header";
 import { VerifyEmailForm } from "./verify-email-form";
 export default function EmailConfirmationPage() {
 	return (
-		<div className="flex items-center justify-center py-12">
-			<div className="mx-auto grid w-[550px] gap-6">
-				<div className="grid gap-2 text-center">
-					<h1 className="text-3xl font-bold">Verify Your Email</h1>
-					<p className="text-balance text-muted-foreground">
-						We've sent a one-time password to your email. Please enter it below
-						to complete your registration.
-					</p>
-				</div>
+		<div className="min-h-screen flex flex-col items-center justify-center">
+			<div className="w-[320px] space-y-8">
+				<PageHeader
+					title="Verify Your Email"
+					description="We've sent a one-time password to your email. Please enter it below to complete your registration."
+				/>
 				<VerifyEmailForm />
 			</div>
 		</div>

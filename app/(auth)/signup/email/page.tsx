@@ -1,12 +1,14 @@
 import Link from "next/link";
 
+import { ClickableText } from "@/components/ui/clicable-text";
 import { SendIcon } from "lucide-react";
+import { ActionPrompt } from "../../components/action-prompt";
 import { PageTitle } from "../../components/page-title";
 import { SignupForm } from "./signup-form";
 
 export default function Page() {
 	return (
-		<div className="min-h-screen bg-navy-900 flex items-center justify-center p-4">
+		<div className="min-h-screen flex items-center justify-center p-4">
 			<div className="w-[320px] space-y-8">
 				<div className="text-center">
 					<PageTitle>
@@ -38,15 +40,16 @@ export default function Page() {
 					.
 				</p>
 
-				<p className="text-center text-sm text-gray-400">
-					Get started for free by{" "}
-					<Link
-						href="/signup"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						other way?
-					</Link>
-				</p>
+				<div className="flex justify-center">
+					<ActionPrompt
+						prompt="Get started for free by"
+						action={
+							<ClickableText asChild>
+								<Link href="/signup">other way?</Link>
+							</ClickableText>
+						}
+					/>
+				</div>
 			</div>
 		</div>
 	);

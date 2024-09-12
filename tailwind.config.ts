@@ -19,6 +19,10 @@ const config = {
 			},
 		},
 		extend: {
+			fontFamily: {
+				rosart: ["var(--font-rosart)", "Times New Roman", "serif"],
+				avenir: ["Avenir", "Arial", "sans-serif"],
+			},
 			colors: {
 				border: "hsl(var(--border))",
 				input: "hsl(var(--input))",
