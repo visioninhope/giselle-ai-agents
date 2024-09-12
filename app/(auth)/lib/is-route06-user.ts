@@ -4,7 +4,7 @@ import { getUser } from "@/lib/supabase";
 
 const R06_EMAIL_DOMAIN = "route06.co.jp";
 
-export const isR06User = async () => {
+export const isRoute06User = async () => {
         const supabaseUser = await getUser();
         const email = supabaseUser.email;
 
