@@ -46,11 +46,11 @@ const SideNavInner: FC = () => {
 				<div className="flex flex-col gap-4">
 					<NavItem
 						icon={<LayersIcon />}
-						tooltip="Overview"
+						tooltip="Detail"
 						onClick={() => {
 							dispatchSideNavAction({
 								type: "OPEN",
-								active: sideNavs.overview,
+								active: sideNavs.detail,
 							});
 						}}
 					/>
@@ -77,7 +77,7 @@ const SideNavInner: FC = () => {
 						>
 							<div className="w-[300px]">
 								{match(sideNavState.active)
-									.with(sideNavs.overview, () => <Detail />)
+									.with(sideNavs.detail, () => <Detail />)
 									.with(sideNavs.knowledges, () => (
 										<KnowledgeList knowledges={state.knowledges} />
 									))

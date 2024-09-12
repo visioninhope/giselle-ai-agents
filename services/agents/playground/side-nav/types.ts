@@ -1,5 +1,5 @@
 export const sideNavs = {
-	overview: "overview",
+	detail: "detail",
 	knowledges: "knowledges",
 } as const;
 
