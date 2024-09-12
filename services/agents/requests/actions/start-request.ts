@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserSubscriptionId } from "@/app/(auth)/lib";
+import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
 import { metrics } from "@opentelemetry/api";
 import { type RequestId, requestStatus } from "../types";
 import { revalidateGetRequest } from "./get-request";
@@ -15,7 +15,9 @@ export const startRequest = async (requestId: RequestId) => {
 	});
 
 	const subscriptionId = await getUserSubscriptionId();
+	const isR06User = await isRoute06User();
 	requestCounter.add(1, {
 		subscriptionId,
+		isR06User,
 	});
 };
