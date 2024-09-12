@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ClickableText } from "@/components/ui/clicable-text";
 import { SendIcon } from "lucide-react";
 import { ActionPrompt } from "../../components/action-prompt";
+import { LegalConsent } from "../../components/legal-consent";
 import { PageTitle } from "../../components/page-title";
 import { SignupForm } from "./signup-form";
 
@@ -21,24 +22,7 @@ export default function Page() {
 					</p>
 				</div>
 				<SignupForm />
-
-				<p className="mt-2 text-center text-sm text-gray-400">
-					By continuing, you agree to our{" "}
-					<Link
-						href="/terms"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						Terms of Service
-					</Link>{" "}
-					and{" "}
-					<Link
-						href="/privacy"
-						className="font-medium text-cyan-300 hover:text-cyan-200"
-					>
-						Privacy Policy
-					</Link>
-					.
-				</p>
+				<LegalConsent />
 
 				<div className="flex justify-center">
 					<ActionPrompt

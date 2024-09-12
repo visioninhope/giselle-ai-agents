@@ -7,7 +7,7 @@ export default function SettingLayout({ children }: { children: ReactNode }) {
 		<div className="flex divide-x divide-black-80 h-full">
 			<div className="w-[200px] p-[24px]">
 				<div className="grid gap-[16px]">
-					{/**<h3 className="px-[16px] text-[14px] font-[Rosart] text-black-30">
+					{/**<h3 className="px-[16px] text-[14px] font-rosart text-black-30">
 						Account
 					</h3>**/}
 					<MenuLink

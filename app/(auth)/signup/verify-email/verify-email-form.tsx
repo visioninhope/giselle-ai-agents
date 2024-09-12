@@ -1,12 +1,15 @@
 "use client";
 
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import { ClickableText } from "@/components/ui/clicable-text";
 import {
 	InputOTP,
 	InputOTPGroup,
 	InputOTPSeparator,
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
+import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState, useCallback, useRef } from "react";
 import { ActionPrompt } from "../../components/action-prompt";
 import { useSignupContext } from "../context";
@@ -20,38 +23,49 @@ export const VerifyEmailForm: FC = () => {
 		formRef.current?.requestSubmit();
 	}, []);
 	return (
-		<form className="flex justify-center" action={action} ref={formRef}>
-			<div className="grid gap-4">
-				<InputOTP
-					maxLength={6}
-					data-1p-ignore
-					name="token"
-					onComplete={handleComplete}
-				>
-					<InputOTPGroup>
-						<InputOTPSlot index={0} />
-						<InputOTPSlot index={1} />
-						<InputOTPSlot index={2} />
-					</InputOTPGroup>
-					<InputOTPSeparator />
-					<InputOTPGroup>
-						<InputOTPSlot index={3} />
-						<InputOTPSlot index={4} />
-						<InputOTPSlot index={5} />
-					</InputOTPGroup>
-				</InputOTP>
-				<input type="hidden" name="verificationEmail" value={state.email} />
+		<div className="grid gap-[8px]">
+			{authError && (
+				<Alert variant="destructive">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Authentication Error</AlertTitle>
+					<AlertDescription>
+						{authError.message || "An error occurred. Please try again."}
+					</AlertDescription>
+				</Alert>
+			)}
+			<form className="flex justify-center" action={action} ref={formRef}>
+				<div className="grid gap-4">
+					<InputOTP
+						maxLength={6}
+						data-1p-ignore
+						name="token"
+						onComplete={handleComplete}
+					>
+						<InputOTPGroup>
+							<InputOTPSlot index={0} />
+							<InputOTPSlot index={1} />
+							<InputOTPSlot index={2} />
+						</InputOTPGroup>
+						<InputOTPSeparator />
+						<InputOTPGroup>
+							<InputOTPSlot index={3} />
+							<InputOTPSlot index={4} />
+							<InputOTPSlot index={5} />
+						</InputOTPGroup>
+					</InputOTP>
+					<input type="hidden" name="verificationEmail" value={state.email} />
 
-				<div className="flex justify-center">
-					<ActionPrompt
-						prompt="Didn’t receive a code?"
-						action="Click to resend"
-					/>
+					<div className="flex justify-center">
+						<ActionPrompt
+							prompt="Didn’t receive a code?"
+							action={<ClickableText>Click to resend</ClickableText>}
+						/>
+					</div>
+					<Button className="w-full" type="submit" disabled={isPending}>
+						Verify
+					</Button>
 				</div>
-				<Button className="w-full" type="submit" disabled={isPending}>
-					Verify
-				</Button>
-			</div>
-		</form>
+			</form>
+		</div>
 	);
 };

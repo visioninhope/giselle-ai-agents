@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import type { FC, PropsWithChildren, ReactNode } from "react";
 
 const menuLinkVariant = cva(
-	"flex items-center rounded-[8px] px-[16px] h-[32px] gap-[16px] font-[Rosart] text-black-30 ",
+	"flex items-center rounded-[8px] px-[16px] h-[32px] gap-[16px] font-rosart text-black-30 ",
 	{
 		variants: {
 			variant: {

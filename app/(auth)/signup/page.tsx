@@ -13,13 +13,13 @@ export default function SignupPage() {
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex flex-col gap-[16px]">
 				<h2
-					className="text-3xl font-extrabold text-black--30 text-left font-[Rosart]"
+					className="text-[40px] font-[500] text-black--30 text-left font-rosart"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Unleash Your Potential
 					<br />- Free of Charge.
 				</h2>
-				<p className="text-lg leading-[30.6px] tracking-tighter text-left text-black-50">
+				<p className="text-[18px] font-avenir leading-[30.6px] tracking-tighter text-left text-black-70">
 					• Easy setup, no coding required
 					<br />• Free forever for core features
 					<br />• 14-day trial of premium features & apps

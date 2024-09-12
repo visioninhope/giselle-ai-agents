@@ -43,7 +43,7 @@ export const Form: FC<FormProps> = ({
 						{linkToResetPassword && (
 							<Link
 								href="/password_reset"
-								className="ml-auto inline-block text-sm underline"
+								className="ml-auto text-[12px] text-black-70"
 							>
 								Forgot your password?
 							</Link>

@@ -1,13 +1,16 @@
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
-import { PageTitle } from "../../components/page-title";
+import { PageHeader } from "../../components/page-header";
 
 export default function CompleteResetPasswordPage() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
-					<PageTitle>Reset Password</PageTitle>
+					<PageHeader
+						title="Reset Password"
+						description="Your  password have been successfully reset."
+					/>
 					<Button asChild>
 						<Link href="/agents">Continue</Link>
 					</Button>
