@@ -56,6 +56,7 @@ export type Request = {
 	id: RequestId;
 	stacks: RequestStack[];
 	status: RequestStatus;
+	result: string | null;
 };
 
 export type RequestState = {

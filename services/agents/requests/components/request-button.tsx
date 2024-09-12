@@ -51,6 +51,7 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 					id: request.id,
 					stacks: [],
 					status: requestStatus.queued,
+					result: null,
 				},
 			});
 			await startRequest(request.id);

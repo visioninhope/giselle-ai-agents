@@ -6,6 +6,7 @@ import {
 	nodes,
 	ports,
 	requestPortMessages,
+	requestResults,
 	requestStacks,
 	requestSteps,
 	requests,
@@ -13,6 +14,8 @@ import {
 import { asc, eq } from "drizzle-orm";
 import { alias } from "drizzle-orm/pg-core";
 import { revalidateTag, unstable_cache } from "next/cache";
+import { remark } from "remark";
+import html from "remark-html";
 import {
 	type Request,
 	type RequestId,
@@ -37,7 +40,8 @@ export const getRequest = async (requestId: RequestId) => {
 					id: requestId,
 					status: request.status,
 					stacks: [],
-				};
+					result: null,
+				} satisfies Request;
 			}
 			const requestItems = await db
 				.select({
@@ -116,10 +120,27 @@ export const getRequest = async (requestId: RequestId) => {
 					],
 				});
 			}
+			let result: string | null = null;
+			if (request.status === requestStatus.completed) {
+				const [requestResult] = await db
+					.select({ text: requestResults.text })
+					.from(requests)
+					.innerJoin(
+						requestResults,
+						eq(requestResults.requestDbId, requests.dbId),
+					)
+					.where(eq(requests.id, requestId));
+
+				const parsedContent = await remark()
+					.use(html)
+					.process(requestResult.text);
+				result = parsedContent.toString();
+			}
 			return {
 				id: requestId,
 				stacks: Array.from(stackMap.values()),
 				status: request.status,
+				result,
 			} satisfies Request;
 		},
 		[requestId, "getRequest"],

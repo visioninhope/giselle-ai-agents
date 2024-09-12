@@ -38,6 +38,7 @@ export const pushNextNodeToRequestStack = async (
 		nodeDbId: nextNode.dbId,
 	});
 	await revalidateGetRequest(requestId);
+	return nextNode;
 };
 
 export async function* runStackGenerator(requestStackId: RequestStackId) {

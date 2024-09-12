@@ -42,8 +42,10 @@ export const insertRequestResult = async ({
 				eq(targetPorts.id, args.outputPort.id),
 			),
 		);
+	console.log("start insert request result");
 	await db.insert(requestResults).values({
 		requestDbId,
 		text: message.content as string,
 	});
+	console.log("end insert request result");
 };

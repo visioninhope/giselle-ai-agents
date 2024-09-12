@@ -179,7 +179,7 @@ export const Inner: FC = () => {
 				/>
 			)}
 			<Panel position="top-right" className="bottom-0">
-				<div className="flex gap-2 h-full">
+				<div className="flex gap-2 h-full overflow-hidden">
 					<PropertyPanel />
 				</div>
 			</Panel>

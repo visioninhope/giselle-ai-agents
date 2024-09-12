@@ -26,11 +26,10 @@ export const PropertyPanel: FC = () => {
 	});
 	return (
 		<div className="bg-background border border-border w-[400px] text-sm">
-			<Tabs defaultValue="requests" className="divide-y">
+			<Tabs defaultValue="requests" className="divide-y h-full">
 				<TabsList>
 					<TabsTrigger value="requests">Requests</TabsTrigger>
 					<TabsTrigger value="properties">Properties</TabsTrigger>
-					<TabsTrigger value="knowledges">Knowledges</TabsTrigger>
 				</TabsList>
 
 				<TabsContent value="properties" className="flex flex-col gap-2">
@@ -40,11 +39,11 @@ export const PropertyPanel: FC = () => {
 						<NodeModifyPanelInner nodeId={selectedNodes[0]} />
 					)}
 				</TabsContent>
-				<TabsContent value="requests" className="flex flex-col gap-2">
+				<TabsContent
+					value="requests"
+					className="flex flex-col gap-2 h-full overflow-scroll"
+				>
 					<RequestPanel />
-				</TabsContent>
-				<TabsContent value="knowledges" className="flex flex-col gap-2">
-					{/**<KnowledgeAccordion /> **/}
 				</TabsContent>
 			</Tabs>
 		</div>

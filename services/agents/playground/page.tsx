@@ -12,7 +12,7 @@ import type { PlaygroundOption } from "./types";
 
 const Skeleton = () => {
 	return (
-		<div className="h-screen w-full">
+		<div className="h-full w-full">
 			<ReactFlow key={"loader"}>
 				<Background />
 			</ReactFlow>
@@ -44,7 +44,7 @@ export async function Playground({
 				options={options ?? []}
 			>
 				<ReactFlowProvider>
-					<div className="h-screen w-full flex flex-col">
+					<div className="h-full w-full flex flex-col">
 						<div className="flex flex-1">
 							<SideNav knowledge={<KnowledgeList knowledges={knowledges} />} />
 							<Inner />

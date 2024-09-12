@@ -62,6 +62,7 @@ export async function runStep(
 		});
 	}
 	assertNodeClassName(node.className);
+	console.log(`action ---- ${node.className}`);
 	await nodeService.runAction(node.className, {
 		requestId,
 		requestDbId: request.dbId,
@@ -80,12 +81,14 @@ export async function runStep(
 		})
 		.where(eq(requestSteps.dbId, requestStep.dbId));
 	if (nextNode == null) {
+		console.log("start set complete");
 		await db
 			.update(requests)
 			.set({
 				status: requestStatus.completed,
 			})
 			.where(eq(requests.dbId, request.dbId));
+		console.log("end set complete");
 	}
 	await revalidateGetRequest(requestId);
 }
