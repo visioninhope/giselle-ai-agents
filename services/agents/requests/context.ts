@@ -4,6 +4,7 @@ import type { RequestState } from "./types";
 
 type RequestContext = {
 	state: RequestState;
+	onBeforeRequestStartAction: () => Promise<void>;
 	dispatch: Dispatch<RequestAction>;
 };
 export const RequestContext = createContext<RequestContext | null>(null);

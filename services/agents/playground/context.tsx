@@ -98,7 +98,12 @@ export const PlaygroundProvider: FC<
 				}}
 				knowledges={props.knowledges}
 			>
-				<RequestProvider agentId={props.agentId}>
+				<RequestProvider
+					agentId={props.agentId}
+					onBeforeRequestStartAction={async () => {
+						await setGraph(state.agentId, state.graph);
+					}}
+				>
 					{props.children}
 				</RequestProvider>
 			</OperationProvider>

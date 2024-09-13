@@ -15,7 +15,7 @@ type RequestTriggerProps = {
 	playgroundGraph: PlaygroundGraph;
 };
 export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
-	const { state, dispatch } = useRequest();
+	const { state, dispatch, onBeforeRequestStartAction } = useRequest();
 	const requestParameters = useMemo(() => {
 		const triggerNode = getTriggerNode(playgroundGraph);
 		if (triggerNode == null) {
@@ -40,6 +40,7 @@ export const RequestButton: FC<RequestTriggerProps> = ({ playgroundGraph }) => {
 					return { portId: id, value };
 				})
 				.filter((i) => i !== null);
+			await onBeforeRequestStartAction();
 			const build = await buildPlaygroundGraph(state.agentId);
 			const request = await createRequest({
 				buildId: build.id,

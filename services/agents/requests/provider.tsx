@@ -9,10 +9,12 @@ import { RequestRunner } from "./runners";
 
 type RequestProviderProps = {
 	agentId: AgentId;
+	onBeforeRequestStartAction: () => Promise<void>;
 	// requestRunner: RequestRunnerComponent;
 };
 export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	children,
+	onBeforeRequestStartAction,
 	agentId,
 }) => {
 	const [state, dispatch] = useReducer(requestReducer, {
@@ -59,7 +61,13 @@ export const RequestProvider: FC<PropsWithChildren<RequestProviderProps>> = ({
 	// 	};
 	// }, [requestId]);
 	return (
-		<RequestContext.Provider value={{ state, dispatch }}>
+		<RequestContext.Provider
+			value={{
+				state,
+				dispatch,
+				onBeforeRequestStartAction,
+			}}
+		>
 			{state.request != null && <RequestRunner requestId={state.request.id} />}
 			{children}
 		</RequestContext.Provider>
