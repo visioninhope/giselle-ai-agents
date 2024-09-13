@@ -15,7 +15,7 @@ export const startRequest = async (requestId: RequestId) => {
 	});
 
 	const subscriptionId = await getUserSubscriptionId();
-	const isR06User = false;
+	const isR06User = await isRoute06User();
 	requestCounter.add(1, {
 		subscriptionId,
 		isR06User,
