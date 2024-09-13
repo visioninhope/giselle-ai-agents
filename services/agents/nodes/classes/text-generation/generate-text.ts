@@ -59,9 +59,10 @@ export const generateText = async ({
 		message: completion.choices[0].message.content ?? "",
 	});
 	if (completion.usage && completion.usage.total_tokens !== undefined) {
+		const subscriptionId = await getUserSubscriptionId();
 		const isR06User = await isRoute06User();
 		tokenCounter.add(completion.usage.total_tokens, {
-			subscriptionId: await getUserSubscriptionId(),
+			subscriptionId,
 			isR06User,
 		});
 	}
