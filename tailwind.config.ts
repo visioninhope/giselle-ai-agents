@@ -70,6 +70,23 @@ const config = {
 				white: {
 					DEFAULT: "hsl(var(--white))",
 				},
+				rosepine: {
+					base: "hsl(var(--rosepine_base))",
+					surface: "hsl(var(--rosepine_surface))",
+					overlay: "hsl(var(--rosepine_overlay))",
+					muted: "hsl(var(--rosepine_muted))",
+					subtle: "hsl(var(--rosepine_subtle))",
+					text: "hsl(var(--rosepine_text))",
+					love: "hsl(var(--rosepine_love))",
+					gold: "hsl(var(--rosepine_gold))",
+					rose: "hsl(var(--rosepine_rose))",
+					pine: "hsl(var(--rosepine_pine))",
+					foam: "hsl(var(--rosepine_foam))",
+					iris: "hsl(var(--rosepine_iris))",
+					highlightLow: "hsl(var(--rosepine_highlightLow))",
+					highlightMed: "hsl(var(--rosepine_highlightMed))",
+					highlightHigh: "hsl(var(--rosepine_highlightHigh))",
+				},
 			},
 			borderRadius: {
 				lg: "var(--radius)",

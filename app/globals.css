@@ -33,6 +33,23 @@
     --ring: 240 10% 3.9%;
 
     --radius: 0.5rem;
+
+
+    --rosepine_base: 246 24% 17%;
+	--rosepine_surface: 248 24% 20%;
+	--rosepine_overlay: 248 21% 26%;
+	--rosepine_muted: 249 12% 47%;
+	--rosepine_subtle: 248 15% 61%;
+	--rosepine_text: 245 50% 91%;
+	--rosepine_love: 343 76% 68%;
+	--rosepine_gold: 35 88% 72%;
+	--rosepine_rose: 2 66% 75%;
+	--rosepine_pine: 197 48% 47%;
+	--rosepine_foam: 189 43% 73%;
+	--rosepine_iris: 267 57% 78%;
+	--rosepine_highlightLow: 245 22% 20%;
+	--rosepine_highlightMed: 247 16% 30%;
+	--rosepine_highlightHigh: 249 15% 38%;
   }
 
   .dark {
