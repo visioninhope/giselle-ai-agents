@@ -85,7 +85,7 @@ const initialEdges = [
 	},
 ];
 
-export function Inner() {
+function Inner() {
 	const [sideMenu, setSideMenu] = useState(false);
 	const [leftSideMenu, setLeftSideMenu] = useState(false);
 	return (
