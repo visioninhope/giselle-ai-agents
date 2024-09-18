@@ -1,0 +1,70 @@
+---
+- - :permit
+  - MIT
+  - &1
+    :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 04:48:24.532612000 Z
+- - :permit
+  - Apache 2.0
+  - *1
+- - :permit
+  - ISC
+  - :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 06:17:35.742242000 Z
+- - :permit
+  - New BSD
+  - &2
+    :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 06:27:28.918434000 Z
+- - :permit
+  - Simplified BSD
+  - *2
+- - :permit
+  - BSD Zero Clause License
+  - :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 06:33:58.436978000 Z
+- - :approve
+  - gitconfiglocal
+  - :who:
+    :why: The BSD license in package.json is wrong. See https://github.com/soldair/node-gitconfiglocal/pull/13
+    :versions: []
+    :when: 2024-09-18 06:35:16.597322000 Z
+- - :permit
+  - BlueOak-1.0.0
+  - :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 06:43:07.596790000 Z
+- - :permit
+  - The Unlicense
+  - :who:
+    :why:
+    :versions: []
+    :when: 2024-09-18 06:46:06.140937000 Z
+- - :approve
+  - caniuse-lite
+  - :who:
+    :why: This license is CC-BY-4.0. And added to NOTICE.md
+    :versions: []
+    :when: 2024-09-18 08:22:24.583085000 Z
+- - :approve
+  - "@img/sharp-libvips-linux-x64"
+  - &3
+    :who:
+    :why: This license is LGPL-3.0-or-later. And added to NOTICE.md
+    :versions: []
+    :when: 2024-09-18 08:37:19.756571000 Z
+- - :approve
+  - "@img/sharp-libvips-linuxmusl-x64"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-darwin-arm64"
+  - *3
