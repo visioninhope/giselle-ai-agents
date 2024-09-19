@@ -56,15 +56,45 @@
     :versions: []
     :when: 2024-09-18 08:22:24.583085000 Z
 - - :approve
-  - "@img/sharp-libvips-linux-x64"
+  - "@img/sharp-libvips-darwin-arm64"
   - &3
     :who:
     :why: This license is LGPL-3.0-or-later. And added to NOTICE.md
     :versions: []
     :when: 2024-09-18 08:37:19.756571000 Z
 - - :approve
+  - "@img/sharp-libvips-darwin-x64"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-dev"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-dev-wasm32"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linux-arm"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linux-arm64"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linux-ppc64"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linux-s390x"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linux-x64"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-linuxmusl-arm64"
+  - *3
+- - :approve
   - "@img/sharp-libvips-linuxmusl-x64"
   - *3
 - - :approve
-  - "@img/sharp-libvips-darwin-arm64"
+  - "@img/sharp-libvips-win32-ia32"
+  - *3
+- - :approve
+  - "@img/sharp-libvips-win32-x64"
   - *3
