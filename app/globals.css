@@ -95,10 +95,9 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+    .mask-fill {
+        -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0); /* 2つのマスクレイヤー */
+        -webkit-mask-clip: padding-box, border-box; /* レイヤーごとの描画領域の範囲 */
+        -webkit-mask-composite: destination-out; /* レイヤーが重なっていない領域を描画対象 */
+    }
 }
