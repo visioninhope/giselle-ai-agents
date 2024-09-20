@@ -9,26 +9,11 @@ import {
 	ReactFlowProvider,
 	SelectionMode,
 } from "@xyflow/react";
-import {
-	ChevronUpIcon,
-	FileCode2Icon,
-	FileSearchIcon,
-	FlagTriangleRightIcon,
-	HandIcon,
-	MousePointer2Icon,
-	SparkleIcon,
-	SparklesIcon,
-	TextIcon,
-} from "lucide-react";
 import { type FC, type PropsWithChildren, forwardRef, useState } from "react";
 import bg from "./bg.png";
-import { NodeSelector } from "./components/node-selector";
-import { Popover, PopoverContent, PopoverTrigger } from "./components/popover";
 import "@xyflow/react/dist/style.css";
-import { TextGenerationIcon } from "./components/icons/text-generation";
-import { WillisIcon } from "./components/icons/willis";
-import { ListItem } from "./components/list-item";
-import { DnDProvider } from "./contexts/drag-and-drop";
+import { Toolbar } from "./tool/components";
+import { ToolProvider } from "./tool/provider";
 
 const GradientBorder: FC = () => (
 	<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -94,124 +79,7 @@ function Inner() {
 				/>
 
 				<Panel position={"bottom-center"}>
-					<div className="relative rounded-[8px] overflow-hidden bg-[hsla(233,26%,21%,0.6)]">
-						<GradientBorder />
-						<div className="flex divide-x divide-[hsla(222,21%,40%,1)] items-center h-[56px]">
-							<div className="flex justify-center items-center z-10 h-full p-[16px]">
-								<Popover>
-									<PopoverTrigger asChild>
-										<button
-											type="button"
-											className="flex items-center gap-[7px]"
-										>
-											<MousePointer2Icon size={24} strokeWidth={1} />
-											<ChevronUpIcon size={14} strokeWidth={1} />
-										</button>
-									</PopoverTrigger>
-									<PopoverContent sideOffset={24}>
-										<div className="grid">
-											<ListItem
-												icon={<MousePointer2Icon size={16} strokeWidth={1} />}
-												title="Move"
-											/>
-											<ListItem
-												icon={<HandIcon size={16} strokeWidth={1} />}
-												title="Hand"
-											/>
-										</div>
-									</PopoverContent>
-								</Popover>
-							</div>
-							<div className="flex items-center px-2 z-10 h-full">
-								<div className="flex gap-[4px] p-[4px] rounded-[8px] text-sm bg-[hsla(0,0%,69%,0.1)]">
-									<Popover>
-										<PopoverTrigger asChild>
-											<ToolbarButton>
-												<span>Action</span>
-												<ChevronUpIcon size={14} strokeWidth={1} />
-											</ToolbarButton>
-										</PopoverTrigger>
-										<PopoverContent sideOffset={24}>
-											<div className="grid">
-												<NodeSelector
-													nodeClassName="text-generation"
-													icon={
-														<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
-													}
-													label="Text Generation"
-												/>
-												<NodeSelector
-													nodeClassName="knowledge-retrieval"
-													icon={
-														<FileSearchIcon
-															size={16}
-															strokeWidth={2}
-															className="text-black-30"
-														/>
-													}
-													label="Knowledge Retrieval"
-												/>
-												<NodeSelector
-													nodeClassName="web-scraping"
-													icon={
-														<FileCode2Icon
-															size={16}
-															strokeWidth={2}
-															className="text-black-30"
-														/>
-													}
-													label="Web Scraping"
-												/>
-											</div>
-										</PopoverContent>
-									</Popover>
-
-									<Popover>
-										<PopoverTrigger asChild>
-											<ToolbarButton>
-												<span>Data</span>
-												<ChevronUpIcon size={14} strokeWidth={1} />
-											</ToolbarButton>
-										</PopoverTrigger>
-										<PopoverContent sideOffset={24}>
-											<div className="flex gap-6">
-												<NodeSelector
-													nodeClassName="text-generation"
-													icon={
-														<TextIcon
-															size={16}
-															strokeWidth={1}
-															className="text-black-30"
-														/>
-													}
-													label="Text"
-												/>
-											</div>
-										</PopoverContent>
-									</Popover>
-									<Popover>
-										<PopoverTrigger asChild>
-											<ToolbarButton>
-												<span>Agent</span>
-												<ChevronUpIcon size={14} strokeWidth={1} />
-											</ToolbarButton>
-										</PopoverTrigger>
-										<PopoverContent sideOffset={24}>
-											<div className="flex gap-6">
-												<NodeSelector
-													nodeClassName="text-generation"
-													icon={
-														<WillisIcon className="fill-black-30 w-[16px] h-[16px]" />
-													}
-													label="Response"
-												/>
-											</div>
-										</PopoverContent>
-									</Popover>
-								</div>
-							</div>
-						</div>
-					</div>
+					<Toolbar />
 				</Panel>
 			</ReactFlow>
 		</div>
@@ -221,9 +89,9 @@ function Inner() {
 export default function Page() {
 	return (
 		<ReactFlowProvider>
-			<DnDProvider>
+			<ToolProvider>
 				<Inner />
-			</DnDProvider>
+			</ToolProvider>
 		</ReactFlowProvider>
 	);
 }
