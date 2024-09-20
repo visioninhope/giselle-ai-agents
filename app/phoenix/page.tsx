@@ -2,16 +2,12 @@
 
 import { GiselleLogo } from "@/components/giselle-logo";
 import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "@/components/ui/popover";
-import {
 	Background,
 	BackgroundVariant,
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
+	SelectionMode,
 } from "@xyflow/react";
 import {
 	ChevronUpIcon,
@@ -24,14 +20,32 @@ import {
 	SparklesIcon,
 	TextIcon,
 } from "lucide-react";
-import { type FC, useState } from "react";
+import { type FC, type PropsWithChildren, forwardRef, useState } from "react";
 import bg from "./bg.png";
 import { NodeSelector } from "./components/node-selector";
+import { Popover, PopoverContent, PopoverTrigger } from "./components/popover";
 import "@xyflow/react/dist/style.css";
+import { TextGenerationIcon } from "./components/icons/text-generation";
+import { WillisIcon } from "./components/icons/willis";
+import { ListItem } from "./components/list-item";
 import { DnDProvider } from "./contexts/drag-and-drop";
 
 const GradientBorder: FC = () => (
 	<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+);
+
+// const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+// 	({ className, variant, asChild = false, ...props }, ref) => {
+
+const ToolbarButton = forwardRef<HTMLButtonElement, PropsWithChildren>(
+	(props, ref) => (
+		<button
+			type="button"
+			className="rounded-[8px] border-[0.5px] border-[hsla(207,19%,77%,0.3)] h-[32px] px-[8px] flex items-center gap-[6px] hover:border-[hsla(207,19%,77%,1)] data-[state=open]:border-[1px] data-[state=open]:border-black-30"
+			ref={ref}
+			{...props}
+		/>
+	),
 );
 
 function Inner() {
@@ -60,7 +74,13 @@ function Inner() {
 					</div>
 				</div>
 			</div>
-			<ReactFlow>
+			<ReactFlow
+				panOnScroll
+				selectionOnDrag
+				panOnDrag={[1, 2]}
+				selectionMode={SelectionMode.Partial}
+				colorMode="dark"
+			>
 				<Background
 					className="!bg-black-100"
 					lineWidth={0}
@@ -76,142 +96,114 @@ function Inner() {
 				<Panel position={"bottom-center"}>
 					<div className="relative rounded-[8px] overflow-hidden bg-[hsla(233,26%,21%,0.6)]">
 						<GradientBorder />
-						<div className="z-10 flex divide-x divide-[hsla(222,21%,40%,1)] items-stretch">
-							<div className="grid divide-y h-full">
-								<button
-									type="button"
-									className="hover:bg-rosepine-highlightLow flex justify-center items-center p-1"
-								>
-									<MousePointer2Icon size={24} strokeWidth={1} />
-								</button>
-
-								<button
-									type="button"
-									className="hover:bg-rosepine-highlightLow flex justify-center items-center p-1"
-								>
-									<HandIcon size={24} strokeWidth={1} />
-								</button>
-							</div>
-							<div className="flex items-center px-2">
-								<div className="flex gap-2 text-sm">
-									<Popover>
-										<PopoverTrigger className="rounded  hover:bg-rosepine-highlightLow px-3 py-2 border border-rosepine-highlightMed flex items-center gap-2">
-											<span>Action</span>
+						<div className="flex divide-x divide-[hsla(222,21%,40%,1)] items-center h-[56px]">
+							<div className="flex justify-center items-center z-10 h-full p-[16px]">
+								<Popover>
+									<PopoverTrigger asChild>
+										<button
+											type="button"
+											className="flex items-center gap-[7px]"
+										>
+											<MousePointer2Icon size={24} strokeWidth={1} />
 											<ChevronUpIcon size={14} strokeWidth={1} />
+										</button>
+									</PopoverTrigger>
+									<PopoverContent sideOffset={24}>
+										<div className="grid">
+											<ListItem
+												icon={<MousePointer2Icon size={16} strokeWidth={1} />}
+												title="Move"
+											/>
+											<ListItem
+												icon={<HandIcon size={16} strokeWidth={1} />}
+												title="Hand"
+											/>
+										</div>
+									</PopoverContent>
+								</Popover>
+							</div>
+							<div className="flex items-center px-2 z-10 h-full">
+								<div className="flex gap-[4px] p-[4px] rounded-[8px] text-sm bg-[hsla(0,0%,69%,0.1)]">
+									<Popover>
+										<PopoverTrigger asChild>
+											<ToolbarButton>
+												<span>Action</span>
+												<ChevronUpIcon size={14} strokeWidth={1} />
+											</ToolbarButton>
 										</PopoverTrigger>
 										<PopoverContent sideOffset={24}>
-											<div className="flex gap-6">
+											<div className="grid">
 												<NodeSelector
-													className="[&_div.iconBase]:bg-rosepine-foam/20 [&_div.iconWrap]:bg-rosepine-foam/60 [&_div.iconMain]:fill-rosepine-foam/10 [&_div.iconMain]:text-rosepine-surface"
 													nodeClassName="text-generation"
 													icon={
-														<SparkleIcon
-															size={24}
-															strokeWidth={2}
-															className="fill-rosepine-foam/10 text-white"
-														/>
+														<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
 													}
-													label={
-														<div>
-															Text
-															<br />
-															Generation
-														</div>
-													}
+													label="Text Generation"
 												/>
 												<NodeSelector
 													nodeClassName="knowledge-retrieval"
-													className="[&_div.iconBase]:bg-rosepine-foam/20 [&_div.iconWrap]:bg-rosepine-foam/60 [&_div.iconMain]:fill-rosepine-foam/10 [&_div.iconMain]:text-rosepine-surface"
 													icon={
 														<FileSearchIcon
-															size={24}
+															size={16}
 															strokeWidth={2}
-															className="fill-rosepine-foam/10 text-white"
+															className="text-black-30"
 														/>
 													}
-													label={
-														<div>
-															Knowledge
-															<br />
-															Retrieval
-														</div>
-													}
+													label="Knowledge Retrieval"
 												/>
 												<NodeSelector
-													className="[&_div.iconBase]:bg-rosepine-foam/20 [&_div.iconWrap]:bg-rosepine-foam/60 [&_div.iconMain]:fill-rosepine-foam/10 [&_div.iconMain]:text-rosepine-surface"
 													nodeClassName="web-scraping"
 													icon={
 														<FileCode2Icon
-															size={24}
+															size={16}
 															strokeWidth={2}
-															className="fill-rosepine-foam/10 text-white"
+															className="text-black-30"
 														/>
 													}
-													label={
-														<div>
-															Web
-															<br />
-															Scraping
-														</div>
-													}
-												/>
-
-												<NodeSelector
-													className="[&_div.iconBase]:bg-rosepine-foam/20 [&_div.iconWrap]:bg-rosepine-foam/60 [&_div.iconMain]:fill-rosepine-foam/10 [&_div.iconMain]:text-rosepine-surface"
-													nodeClassName="agent"
-													icon={
-														<SparklesIcon
-															size={24}
-															strokeWidth={2}
-															className="fill-rosepine-foam/10 text-white"
-														/>
-													}
-													label={<div>Agent</div>}
+													label="Web Scraping"
 												/>
 											</div>
 										</PopoverContent>
 									</Popover>
 
 									<Popover>
-										<PopoverTrigger className="rounded  hover:bg-rosepine-highlightLow px-3 py-2 border border-rosepine-highlightMed flex items-center gap-2">
-											<span>Data</span>
-											<ChevronUpIcon size={14} strokeWidth={1} />
+										<PopoverTrigger asChild>
+											<ToolbarButton>
+												<span>Data</span>
+												<ChevronUpIcon size={14} strokeWidth={1} />
+											</ToolbarButton>
 										</PopoverTrigger>
 										<PopoverContent sideOffset={24}>
 											<div className="flex gap-6">
 												<NodeSelector
 													nodeClassName="text-generation"
-													className="[&_div.iconBase]:bg-rosepine-gold/20 [&_div.iconWrap]:bg-rosepine-gold/60 [&_div.iconMain]:fill-rosepine-gold/10 [&_div.iconMain]:text-rosepine-surface"
 													icon={
 														<TextIcon
-															size={24}
-															strokeWidth={2}
-															className="fill-rosepine-gold/10 text-white"
+															size={16}
+															strokeWidth={1}
+															className="text-black-30"
 														/>
 													}
-													label={<div>Text</div>}
+													label="Text"
 												/>
 											</div>
 										</PopoverContent>
 									</Popover>
 									<Popover>
-										<PopoverTrigger className="rounded  hover:bg-rosepine-highlightLow px-3 py-2 border border-rosepine-highlightMed flex items-center gap-2">
-											<span>Result</span>
-											<ChevronUpIcon size={14} strokeWidth={1} />
+										<PopoverTrigger asChild>
+											<ToolbarButton>
+												<span>Agent</span>
+												<ChevronUpIcon size={14} strokeWidth={1} />
+											</ToolbarButton>
 										</PopoverTrigger>
 										<PopoverContent sideOffset={24}>
 											<div className="flex gap-6">
 												<NodeSelector
 													nodeClassName="text-generation"
-													className="[&_div.iconBase]:bg-rosepine-iris/20 [&_div.iconWrap]:bg-rosepine-iris/60 [&_div.iconMain]:fill-rosepine-iris/10 [&_div.iconMain]:text-rosepine-surface"
 													icon={
-														<FlagTriangleRightIcon
-															size={24}
-															strokeWidth={2}
-															className="fill-rosepine-iris/10 text-white"
-														/>
+														<WillisIcon className="fill-black-30 w-[16px] h-[16px]" />
 													}
-													label={<div>Response</div>}
+													label="Response"
 												/>
 											</div>
 										</PopoverContent>

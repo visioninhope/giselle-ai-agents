@@ -19,4 +19,6 @@ Sentry.init({
 	replaysSessionSampleRate: 0.1,
 
 	integrations: [],
+
+	enabled: process.env.NEXT_PUBLIC_VERCEL_ENV !== undefined,
 });
