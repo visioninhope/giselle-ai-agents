@@ -47,11 +47,11 @@ export const Toolbar: FC = () => (
 					<PopoverContent sideOffset={24}>
 						<div className="grid">
 							<ListItem
-								icon={<MousePointer2Icon size={16} strokeWidth={1} />}
+								leftIcon={<MousePointer2Icon size={16} strokeWidth={1} />}
 								title="Move"
 							/>
 							<ListItem
-								icon={<HandIcon size={16} strokeWidth={1} />}
+								leftIcon={<HandIcon size={16} strokeWidth={1} />}
 								title="Hand"
 							/>
 						</div>

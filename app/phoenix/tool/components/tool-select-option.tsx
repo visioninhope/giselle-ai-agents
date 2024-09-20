@@ -1,3 +1,4 @@
+import { CheckIcon } from "lucide-react";
 import { type FC, type ReactNode, useCallback } from "react";
 import { ListItem } from "../../components/list-item";
 import { setTool } from "../actions";
@@ -15,9 +16,17 @@ export const ToolSelectOption: FC<ToolSelectOptionProps> = ({
 	tool,
 	label,
 }) => {
-	const { dispatch } = useTool();
+	const { dispatch, state } = useTool();
 	const handleClick = useCallback(() => {
 		dispatch(setTool(tool));
 	}, [dispatch, tool]);
-	return <ListItem icon={icon} title={label} onClick={handleClick} />;
+	return (
+		<button type="button" onClick={handleClick}>
+			<ListItem
+				leftIcon={icon}
+				title={label}
+				rightIcon={state.currentTool === tool ? <CheckIcon size={16} /> : null}
+			/>
+		</button>
+	);
 };

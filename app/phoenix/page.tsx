@@ -7,31 +7,12 @@ import {
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
-	SelectionMode,
 } from "@xyflow/react";
-import { type FC, type PropsWithChildren, forwardRef, useState } from "react";
+import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { Toolbar } from "./tool/components";
 import { ToolProvider } from "./tool/provider";
-
-const GradientBorder: FC = () => (
-	<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-);
-
-// const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-// 	({ className, variant, asChild = false, ...props }, ref) => {
-
-const ToolbarButton = forwardRef<HTMLButtonElement, PropsWithChildren>(
-	(props, ref) => (
-		<button
-			type="button"
-			className="rounded-[8px] border-[0.5px] border-[hsla(207,19%,77%,0.3)] h-[32px] px-[8px] flex items-center gap-[6px] hover:border-[hsla(207,19%,77%,1)] data-[state=open]:border-[1px] data-[state=open]:border-black-30"
-			ref={ref}
-			{...props}
-		/>
-	),
-);
 
 function Inner() {
 	const [previewMode, setPreviewMode] = useState(false);
@@ -59,13 +40,7 @@ function Inner() {
 					</div>
 				</div>
 			</div>
-			<ReactFlow
-				panOnScroll
-				selectionOnDrag
-				panOnDrag={[1, 2]}
-				selectionMode={SelectionMode.Partial}
-				colorMode="dark"
-			>
+			<ReactFlow panOnScroll selectionOnDrag panOnDrag={false} colorMode="dark">
 				<Background
 					className="!bg-black-100"
 					lineWidth={0}

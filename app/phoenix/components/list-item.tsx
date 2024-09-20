@@ -1,17 +1,20 @@
 import type { FC, ReactNode } from "react";
 
 type ListItemProps = {
-	icon: ReactNode;
+	leftIcon: ReactNode;
 	title: string;
-	onClick?: () => void;
+	rightIcon?: ReactNode | undefined | null;
 };
-export const ListItem: FC<ListItemProps> = ({ icon, title, onClick }) => (
-	<button
-		type="button"
+export const ListItem: FC<ListItemProps> = ({ leftIcon, title, rightIcon }) => (
+	<div
 		className={"flex gap-[8px] px-[16[px] py-[8px] min-w-[150px] items-center"}
-		onClick={onClick}
 	>
-		<div className="flex items-center">{icon}</div>
+		<div className="flex items-center">{leftIcon}</div>
 		<div className="font-avenir text-[14px] text-black-30">{title}</div>
-	</button>
+		{rightIcon ? (
+			<div className="flex items-center ml-auto">{rightIcon}</div>
+		) : (
+			<div className="w-[16px]" />
+		)}
+	</div>
 );
