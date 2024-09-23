@@ -35,7 +35,7 @@ const ToolbarButton = forwardRef<HTMLButtonElement, PropsWithChildren>(
 export const Toolbar: FC = () => (
 	<div className="relative rounded-[8px] overflow-hidden bg-[hsla(233,26%,21%,0.6)]">
 		<GradientBorder />
-		<div className="flex divide-x divide-[hsla(222,21%,40%,1)] items-center h-[56px]">
+		<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[56px]">
 			<div className="flex justify-center items-center z-10 h-full p-[16px]">
 				<Popover>
 					<PopoverTrigger asChild>

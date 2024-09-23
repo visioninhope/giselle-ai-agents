@@ -1,9 +1,11 @@
-type SelectTool = {
-	type: "select";
-};
-type HandTool = {
-	type: "hand";
-};
+export const selectTool = {
+	type: "select",
+} as const;
+type SelectTool = typeof selectTool;
+export const handTool = {
+	type: "hand",
+} as const;
+type HandTool = typeof handTool;
 type AddTextGenerationNodeTool = {
 	type: "add-text-generation-node";
 };

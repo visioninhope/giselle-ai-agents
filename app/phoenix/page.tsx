@@ -11,11 +11,20 @@ import {
 import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
+import {
+	MousePositionProvider,
+	useMousePosition,
+} from "./contexts/mouse-position";
+import { GiselleNode } from "./giselle-node/components";
 import { Toolbar } from "./tool/components";
+import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
+import { handTool, selectTool } from "./tool/types";
 
 function Inner() {
 	const [previewMode, setPreviewMode] = useState(false);
+	const { state } = useTool();
+	const mousePosition = useMousePosition();
 	return (
 		<div className="w-full h-screen">
 			<div className="absolute z-10 left-[20px] right-[20px] top-[20px] h-[36px] flex justify-between">
@@ -40,7 +49,20 @@ function Inner() {
 					</div>
 				</div>
 			</div>
-			<ReactFlow panOnScroll selectionOnDrag panOnDrag={false} colorMode="dark">
+			<ReactFlow
+				panOnScroll
+				selectionOnDrag
+				panOnDrag={false}
+				colorMode="dark"
+				onPaneMouseMove={(e) => {
+					console.log(e);
+				}}
+				className={
+					state.currentTool !== selectTool && state.currentTool !== handTool
+						? "[&_div]:!cursor-crosshair"
+						: ""
+				}
+			>
 				<Background
 					className="!bg-black-100"
 					lineWidth={0}
@@ -52,6 +74,17 @@ function Inner() {
 						backgroundSize: "cover",
 					}}
 				/>
+				{state.currentTool !== selectTool && state.currentTool !== handTool && (
+					<div
+						className="absolute"
+						style={{
+							left: `${mousePosition.x - 0}px`,
+							top: `${mousePosition.y - 0}px`,
+						}}
+					>
+						<GiselleNode />
+					</div>
+				)}
 
 				<Panel position={"bottom-center"}>
 					<Toolbar />
@@ -64,9 +97,11 @@ function Inner() {
 export default function Page() {
 	return (
 		<ReactFlowProvider>
-			<ToolProvider>
-				<Inner />
-			</ToolProvider>
+			<MousePositionProvider>
+				<ToolProvider>
+					<Inner />
+				</ToolProvider>
+			</MousePositionProvider>
 		</ReactFlowProvider>
 	);
 }

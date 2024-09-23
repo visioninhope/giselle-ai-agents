@@ -25,7 +25,9 @@ export const ToolSelectOption: FC<ToolSelectOptionProps> = ({
 			<ListItem
 				leftIcon={icon}
 				title={label}
-				rightIcon={state.currentTool === tool ? <CheckIcon size={16} /> : null}
+				rightIcon={
+					state.currentTool.type === tool.type ? <CheckIcon size={16} /> : null
+				}
 			/>
 		</button>
 	);
