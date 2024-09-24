@@ -11,11 +11,13 @@ import {
 import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
+import { nodeTypes } from "./components/custom-node";
 import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
-import { GiselleNode } from "./giselle-node/components";
+import { GiselleNode, GiselleNodeType } from "./giselle-node/components";
+import { nodeArchetypes, textGenerator } from "./giselle-node/types";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
@@ -50,6 +52,7 @@ function Inner() {
 				</div>
 			</div>
 			<ReactFlow
+				nodeTypes={nodeTypes}
 				panOnScroll
 				selectionOnDrag
 				panOnDrag={false}
@@ -78,13 +81,15 @@ function Inner() {
 					<div
 						className="absolute"
 						style={{
-							// left: `${mousePosition.x - 0}px`,
-							// top: `${mousePosition.y - 0}px`,
-							left: 200,
-							top: 200,
+							left: `${mousePosition.x - 0}px`,
+							top: `${mousePosition.y - 0}px`,
 						}}
 					>
-						<GiselleNode />
+						<GiselleNode
+							name={textGenerator.name}
+							parameters={textGenerator.parameters}
+							archetype={nodeArchetypes.action}
+						/>
 					</div>
 				)}
 
