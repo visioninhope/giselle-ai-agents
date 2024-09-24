@@ -1,6 +1,7 @@
 import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
 import { getUser } from "@/lib/supabase";
+import Link from "next/link";
 import { Card } from "../components/card";
 
 export default async function AccountSettingPage() {
@@ -33,7 +34,11 @@ export default async function AccountSettingPage() {
 			/>
 			<Card title="Delete Account">
 				<div className="w-[220px]">
-					<ClickableText>Contact Support</ClickableText>
+					<ClickableText asChild>
+						<Link href="mailto:support@giselles.ai?Subject=Please%20delete%20my%20giselle%20account">
+							Contact Support
+						</Link>
+					</ClickableText>
 				</div>
 			</Card>
 		</div>
