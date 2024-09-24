@@ -78,8 +78,10 @@ function Inner() {
 					<div
 						className="absolute"
 						style={{
-							left: `${mousePosition.x - 0}px`,
-							top: `${mousePosition.y - 0}px`,
+							// left: `${mousePosition.x - 0}px`,
+							// top: `${mousePosition.y - 0}px`,
+							left: 200,
+							top: 200,
 						}}
 					>
 						<GiselleNode />
