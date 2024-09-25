@@ -1,6 +1,7 @@
 import type { FC } from "react";
 import { TextGenerationIcon } from "../components/icons/text-generation";
-import type { GiselleNodeType, Parameter } from "./types";
+import type { Parameter, ParameterBlueprint } from "./parameter/types";
+import type { GiselleNodeBlueprint, GiselleNodeObject } from "./types";
 
 type GradientBorderProps = {
 	rounded: string;
@@ -18,9 +19,14 @@ export const GradientBorder: FC<GradientBorderProps> = ({
 );
 
 export function GiselleNode<
-	TName extends string,
-	TParameter extends Parameter<Record<string, Parameter>>,
->(props: GiselleNodeType<TName, TParameter>) {
+	TArchetype extends string,
+	TParameterClass extends ParameterBlueprint,
+	TParameter extends Parameter,
+>(
+	props:
+		| GiselleNodeBlueprint<TArchetype, TParameterClass>
+		| GiselleNodeObject<TArchetype, TParameter>,
+) {
 	return (
 		<div
 			className="rounded-[16px] bg-gradient-to-tl from-[hsla(187,79%,54%,0.2)] to-[hsla(207,100%,9%,0.2)] min-w-[180px] backdrop-blur-[1px]"
@@ -42,34 +48,36 @@ export function GiselleNode<
 						<TextGenerationIcon className="w-[18px] h-[18px] fill-black-100" />
 					</div>
 					<div className="font-rosart text-[16px] text-black-30">
-						{props.name}
+						{props.archetype}
 					</div>
 				</div>
 			</div>
-			<div className="pb-[4px]">
-				<div className="h-[28px]">
-					<div className="flex justify-between h-full">
-						<div className="grid">
-							{props.parameters.type === "object" &&
-								props.parameters.properties.map((parameter) => (
-									<div className="relative flex items-center" key={key}>
+			<div className="py-[4px]">
+				<div className="flex justify-between h-full">
+					<div className="grid">
+						{props.parameters !== undefined &&
+							props.parameters.type === "object" &&
+							Object.entries(props.parameters.properties).map(
+								([key, property]) => (
+									<div
+										className="relative flex items-center h-[28px]"
+										key={key}
+									>
 										<div className="absolute w-[6px] h-[12px] bg-[hsla(187,71%,48%,1)] rounded-l-[12px] top-[50%] -translate-y-[50%] -left-[14px]" />
 										<div className="text-[14px] text-black--30 px-[12px]">
-											Instuction
+											{property.label ?? key}
 										</div>
 									</div>
-								))}
-						</div>
+								),
+							)}
+					</div>
 
-						<div className="grid">
-							<div className="relative flex items-center">
-								<div className="text-[14px] text-black--30 px-[12px]">
-									Result
-								</div>
-								<div className="absolute -right-[10px] translate-x-[6px]">
-									<div className="h-[28px] w-[10px] bg-[hsla(195,74%,21%,1)]" />
-									<div className="absolute w-[12px] h-[12px] bg-black-100 rounded-full border-[2px] border-[hsla(195,74%,21%,1)] top-[50%] -translate-y-[50%] translate-x-[5px]" />
-								</div>
+					<div className="grid">
+						<div className="relative flex items-center h-[28px]">
+							<div className="text-[14px] text-black--30 px-[12px]">Result</div>
+							<div className="absolute -right-[10px] translate-x-[6px]">
+								<div className="h-[28px] w-[10px] bg-[hsla(195,74%,21%,1)]" />
+								<div className="absolute w-[12px] h-[12px] bg-black-100 rounded-full border-[2px] border-[hsla(195,74%,21%,1)] top-[50%] -translate-y-[50%] translate-x-[5px]" />
 							</div>
 						</div>
 					</div>

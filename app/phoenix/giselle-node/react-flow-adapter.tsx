@@ -1,10 +1,13 @@
 import type { Node, NodeProps, NodeTypes } from "@xyflow/react";
 import type { FC } from "react";
+import type { promptBlueprint, textGeneratorBlueprint } from "./blueprints";
 import { GiselleNode } from "./components";
-import type { prompt, textGenerator } from "./types";
 
-type TextGeneratorAsReactFlowNode = Node<typeof textGenerator, "textGerator">;
-type PromptAsReactFlowNode = Node<typeof prompt, "prompt">;
+type TextGeneratorAsReactFlowNode = Node<
+	typeof textGeneratorBlueprint,
+	"textGerator"
+>;
+type PromptAsReactFlowNode = Node<typeof promptBlueprint, "prompt">;
 
 type ReactFlowNode = TextGeneratorAsReactFlowNode | PromptAsReactFlowNode;
 

@@ -18,6 +18,7 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "../../components/popover";
+import { textGeneratorBlueprint } from "../../giselle-node/blueprints";
 import { ToolSelectOption } from "./tool-select-option";
 
 export const GradientBorder: FC = () => (
@@ -75,7 +76,8 @@ export const Toolbar: FC = () => (
 							<div className="grid">
 								<ToolSelectOption
 									tool={{
-										type: "add-text-generation-node",
+										type: "addGiselleNode",
+										giselleNodeBlueprint: textGeneratorBlueprint,
 									}}
 									icon={
 										<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
@@ -114,6 +116,7 @@ export const Toolbar: FC = () => (
 						</PopoverContent>
 					</Popover>
 
+					{/**
 					<Popover>
 						<PopoverTrigger asChild>
 							<ToolbarButton>
@@ -132,6 +135,7 @@ export const Toolbar: FC = () => (
 							</div>
 						</PopoverContent>
 					</Popover>
+				 */}
 				</div>
 			</div>
 		</div>

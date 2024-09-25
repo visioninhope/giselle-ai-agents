@@ -1,37 +1,16 @@
-export const selectTool = {
-	type: "select",
-} as const;
-type SelectTool = typeof selectTool;
-export const handTool = {
-	type: "hand",
-} as const;
-type HandTool = typeof handTool;
-type AddTextGenerationNodeTool = {
-	type: "add-text-generation-node";
-};
-type AddKnowledgeRetrievalNodeTool = {
-	type: "add-knowledge-retrieval-node";
-};
-type AddWebScrapingNodeTool = {
-	type: "add-web-scraping-node";
-};
-type AddTextNodeTool = {
-	type: "add-text-node";
-};
-type AddAgentNodeTool = {
-	type: "add-agent-node";
-	agentId: string;
+import type { GiselleNodeBlueprint } from "../giselle-node/types";
+
+type SelectTool = { type: "select" };
+export const selectTool: SelectTool = { type: "select" };
+type HandTool = { type: "hand" };
+export const handTool: HandTool = { type: "hand" };
+type AddGiselleNodeTool = {
+	type: "addGiselleNode";
+	giselleNodeBlueprint: GiselleNodeBlueprint;
 };
 
-export type Tool =
-	| SelectTool
-	| HandTool
-	| AddTextGenerationNodeTool
-	| AddKnowledgeRetrievalNodeTool
-	| AddWebScrapingNodeTool
-	| AddTextNodeTool
-	| AddAgentNodeTool;
+export type Tool = SelectTool | HandTool | AddGiselleNodeTool;
 
 export type ToolState = {
-	currentTool: Tool;
+	activeTool: Tool;
 };

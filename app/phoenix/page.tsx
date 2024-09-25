@@ -7,6 +7,7 @@ import {
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
+	useReactFlow,
 } from "@xyflow/react";
 import { useState } from "react";
 import bg from "./bg.png";
@@ -16,16 +17,20 @@ import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
-import { GiselleNode, GiselleNodeType } from "./giselle-node/components";
-import { nodeArchetypes, textGenerator } from "./giselle-node/types";
+import { GiselleNode } from "./giselle-node/components";
+import { addNode } from "./graph/actions";
+import { useGraph } from "./graph/context";
+import { GraphProvider } from "./graph/provider";
+import { setSelectTool, setTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
-import { handTool, selectTool } from "./tool/types";
 
 function Inner() {
 	const [previewMode, setPreviewMode] = useState(false);
-	const { state } = useTool();
+	const { state: toolState, dispatch: toolDispatch } = useTool();
+	const { dispatch: graphDispatch } = useGraph();
+	const reactFlowInstance = useReactFlow();
 	const mousePosition = useMousePosition();
 	return (
 		<div className="w-full h-screen">
@@ -57,11 +62,21 @@ function Inner() {
 				selectionOnDrag
 				panOnDrag={false}
 				colorMode="dark"
-				onPaneMouseMove={(e) => {
-					console.log(e);
+				onPaneClick={(event) => {
+					event.preventDefault();
+					const position = reactFlowInstance.flowToScreenPosition({
+						x: event.clientX,
+						y: event.clientY,
+					});
+					if (toolState.activeTool.type === "addGiselleNode") {
+						graphDispatch(
+							addNode(toolState.activeTool.giselleNodeBlueprint, position),
+						);
+						toolDispatch(setSelectTool);
+					}
 				}}
 				className={
-					state.currentTool !== selectTool && state.currentTool !== handTool
+					toolState.activeTool.type === "addGiselleNode"
 						? "[&_div]:!cursor-crosshair"
 						: ""
 				}
@@ -77,7 +92,7 @@ function Inner() {
 						backgroundSize: "cover",
 					}}
 				/>
-				{state.currentTool !== selectTool && state.currentTool !== handTool && (
+				{toolState.activeTool.type === "addGiselleNode" && (
 					<div
 						className="absolute"
 						style={{
@@ -85,11 +100,7 @@ function Inner() {
 							top: `${mousePosition.y - 0}px`,
 						}}
 					>
-						<GiselleNode
-							name={textGenerator.name}
-							parameters={textGenerator.parameters}
-							archetype={nodeArchetypes.action}
-						/>
+						<GiselleNode {...toolState.activeTool.giselleNodeBlueprint} />
 					</div>
 				)}
 
@@ -106,7 +117,9 @@ export default function Page() {
 		<ReactFlowProvider>
 			<MousePositionProvider>
 				<ToolProvider>
-					<Inner />
+					<GraphProvider>
+						<Inner />
+					</GraphProvider>
 				</ToolProvider>
 			</MousePositionProvider>
 		</ReactFlowProvider>

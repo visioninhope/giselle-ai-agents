@@ -1,11 +1,15 @@
 import { type FC, type PropsWithChildren, useReducer } from "react";
 import { ToolContext } from "./context";
 import { toolReducer } from "./reducer";
-import { selectTool } from "./types";
+import { type ToolState, selectTool } from "./types";
+
+const initialState: ToolState = {
+	activeTool: selectTool,
+};
 
 export const ToolProvider: FC<PropsWithChildren> = ({ children }) => {
 	const [state, dispatch] = useReducer(toolReducer, {
-		currentTool: selectTool,
+		activeTool: selectTool,
 	});
 
 	return (

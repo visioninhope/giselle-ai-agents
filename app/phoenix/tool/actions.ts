@@ -13,4 +13,7 @@ export const setTool = (tool: Tool): SetToolAction => ({
 	payload: tool,
 });
 
+export const setHandTool = setTool({ type: "hand" });
+export const setSelectTool = setTool({ type: "select" });
+
 export type ToolActions = SetToolAction;
