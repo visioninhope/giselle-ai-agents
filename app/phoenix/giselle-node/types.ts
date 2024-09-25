@@ -14,6 +14,7 @@ export type GiselleNodeBlueprint = {
 	category: GiselleNodeCategory;
 	archetype: string;
 	parameters?: ParameterBlueprint;
+	resultPortLabel: string;
 };
 
 export type XYPosition = {
@@ -30,6 +31,7 @@ export type GiselleNodeObject = {
 	ui: {
 		position: XYPosition;
 	};
+	resultPortLabel: string;
 };
 
 export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
@@ -43,4 +45,5 @@ export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
 	ui: {
 		position: XYPosition;
 	};
+	resultPortLabel: T["resultPortLabel"];
 };

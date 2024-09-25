@@ -155,7 +155,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 
 					<div className="grid">
 						<SourceParameter
-							label="Result"
+							label={props.resultPortLabel}
 							category={props.category}
 							handle={
 								(props.object === "node" &&

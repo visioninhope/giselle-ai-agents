@@ -16,8 +16,14 @@ import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
+import {
+	giselleNodeArchetypes,
+	promptBlueprint,
+	textGeneratorBlueprint,
+	textGeneratorParameterNames,
+} from "./giselle-node/blueprints";
 import { GiselleNode } from "./giselle-node/components";
-import { addNode } from "./graph/actions";
+import { addNode, addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
 import { nodeTypes } from "./react-flow-adapter/giselle-node";
@@ -73,9 +79,44 @@ function Inner() {
 						y: event.clientY,
 					});
 					if (toolState.activeTool.type === "addGiselleNode") {
-						graphDispatch(
-							addNode(toolState.activeTool.giselleNodeBlueprint, position),
-						);
+						if (
+							toolState.activeTool.giselleNodeBlueprint.archetype ===
+							giselleNodeArchetypes.textGenerator
+						) {
+							graphDispatch(
+								addNodesAndConnect({
+									sourceNode: {
+										node: promptBlueprint,
+										position: {
+											x: position.x - 200,
+											y: position.y + 100,
+										},
+									},
+									targetNode: {
+										node: toolState.activeTool.giselleNodeBlueprint,
+										position,
+									},
+									connector: {
+										targetParameterName:
+											textGeneratorParameterNames.instruction,
+									},
+								}),
+							);
+						}
+						// graphDispatch(
+						// 	addNode(toolState.activeTool.giselleNodeBlueprint, position),
+						// );
+						// if (
+						// 	toolState.activeTool.giselleNodeBlueprint.archetype ===
+						// 	giselleNodeArchetypes.textGenerator
+						// ) {
+						// 	graphDispatch(
+						// 		addNode(promptBlueprint, {
+						// 			x: position.x - 200,
+						// 			y: position.y + 200,
+						// 		}),
+						// 	);
+						// }
 						toolDispatch(setSelectTool);
 					}
 				}}

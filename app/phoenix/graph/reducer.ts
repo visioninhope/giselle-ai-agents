@@ -14,6 +14,14 @@ export const graphReducer = (
 					nodes: [...state.graph.nodes, action.payload.node],
 				},
 			};
+		case "addConnector":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					connectors: [...state.graph.connectors, action.payload.connector],
+				},
+			};
 		default:
 			return state;
 	}

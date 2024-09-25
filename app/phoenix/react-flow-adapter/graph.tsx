@@ -1,4 +1,4 @@
-import { useReactFlow } from "@xyflow/react";
+import { type Edge, useReactFlow } from "@xyflow/react";
 import { useEffect } from "react";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
@@ -16,8 +16,18 @@ export function graphToReactFlow(grpah: Graph) {
 		};
 	});
 
+	const edges: Edge[] = grpah.connectors.map((connector) => {
+		return {
+			id: connector.id,
+			source: connector.source,
+			target: connector.target,
+			targetHandle: connector.targetHandle,
+		};
+	});
+
 	return {
 		nodes,
+		edges,
 	};
 }
 
@@ -26,7 +36,8 @@ export const useGraphToReactFlowEffect = () => {
 	const reactFlowInstance = useReactFlow();
 
 	useEffect(() => {
-		const { nodes } = graphToReactFlow(state.graph);
+		const { nodes, edges } = graphToReactFlow(state.graph);
 		reactFlowInstance.setNodes(nodes);
-	}, [reactFlowInstance.setNodes, state.graph]);
+		reactFlowInstance.setEdges(edges);
+	}, [reactFlowInstance.setNodes, reactFlowInstance.setEdges, state.graph]);
 };

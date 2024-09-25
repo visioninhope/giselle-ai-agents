@@ -1,10 +1,15 @@
-import { type Dispatch, createContext, useContext } from "react";
+import { createContext, useContext } from "react";
 import type { GraphAction } from "./actions";
 import type { GraphState } from "./types";
 
+export type ThunkAction = (
+	dispatch: EnhancedDispatch,
+	getState: () => GraphState,
+) => void;
+export type EnhancedDispatch = (action: GraphAction | ThunkAction) => void;
 export type GraphContext = {
 	state: GraphState;
-	dispatch: Dispatch<GraphAction>;
+	dispatch: EnhancedDispatch;
 };
 
 export const GraphContext = createContext<GraphContext | undefined>(undefined);
