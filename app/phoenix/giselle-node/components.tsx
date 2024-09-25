@@ -5,6 +5,7 @@ import { TextGenerationIcon } from "../components/icons/text-generation";
 import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
+import { PromptPropertyPanel } from "./components/panel/propt";
 import {
 	TabContent,
 	TabGroup,
@@ -256,7 +257,11 @@ export const GiselleNodeInformationPanel: FC = () => {
 								{selectedNodes[0].archetype}
 							</div>
 						</div>
-						<TabContent value="property">Hello</TabContent>
+						<TabContent value="property">
+							{selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
+								<PromptPropertyPanel />
+							)}
+						</TabContent>
 					</div>
 				</TabProvider>
 			)}

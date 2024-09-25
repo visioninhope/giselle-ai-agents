@@ -75,7 +75,7 @@ export const TabContent: React.FC<PropsWithChildren<TabProps>> = ({
 
 	if (activeTab !== value) return null;
 
-	return <div className={className}>{children}</div>;
+	return <div className="px-[24px]">{children}</div>;
 };
 
 // TabGroup component
