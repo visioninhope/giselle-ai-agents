@@ -22,6 +22,20 @@ export const graphReducer = (
 					connectors: [...state.graph.connectors, action.payload.connector],
 				},
 			};
+		case "selectNode":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) => ({
+						...node,
+						ui: {
+							...node.ui,
+							selected: action.payload.selectedNodeIds.includes(node.id),
+						},
+					})),
+				},
+			};
 		default:
 			return state;
 	}

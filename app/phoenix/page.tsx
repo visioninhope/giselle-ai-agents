@@ -21,7 +21,10 @@ import {
 	promptBlueprint,
 	textGeneratorParameterNames,
 } from "./giselle-node/blueprints";
-import { GiselleNode } from "./giselle-node/components";
+import {
+	GiselleNode,
+	GiselleNodeInformationPanel,
+} from "./giselle-node/components";
 import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
@@ -136,6 +139,12 @@ function Inner() {
 
 				<Panel position={"bottom-center"}>
 					<Toolbar />
+				</Panel>
+				<Panel
+					position="top-right"
+					className="!top-[80px] !bottom-[20px] !right-[20px]"
+				>
+					<GiselleNodeInformationPanel />
 				</Panel>
 			</ReactFlow>
 		</div>

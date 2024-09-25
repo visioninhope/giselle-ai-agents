@@ -1,5 +1,12 @@
-import { type Edge, useReactFlow } from "@xyflow/react";
-import { useEffect } from "react";
+import {
+	type Edge,
+	type OnSelectionChangeFunc,
+	useOnSelectionChange,
+	useReactFlow,
+} from "@xyflow/react";
+import { useCallback, useEffect } from "react";
+import type { GiselleNodeId } from "../giselle-node/types";
+import { selectNode } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
 import { type ReactFlowNode, giselleNodeType } from "./giselle-node";
@@ -10,6 +17,7 @@ export function graphToReactFlow(grpah: Graph) {
 			id: node.id,
 			type: giselleNodeType,
 			position: node.ui.position,
+			selected: node.ui.selected,
 			data: {
 				...node,
 			},
@@ -32,7 +40,7 @@ export function graphToReactFlow(grpah: Graph) {
 }
 
 export const useGraphToReactFlowEffect = () => {
-	const { state } = useGraph();
+	const { state, dispatch } = useGraph();
 	const reactFlowInstance = useReactFlow();
 
 	useEffect(() => {
@@ -40,4 +48,19 @@ export const useGraphToReactFlowEffect = () => {
 		reactFlowInstance.setNodes(nodes);
 		reactFlowInstance.setEdges(edges);
 	}, [reactFlowInstance.setNodes, reactFlowInstance.setEdges, state.graph]);
+
+	const onChange = useCallback<OnSelectionChangeFunc>(
+		({ nodes }) => {
+			dispatch(
+				selectNode({
+					selectedNodeIds: nodes.map((node) => node.id as GiselleNodeId),
+				}),
+			);
+		},
+		[dispatch],
+	);
+
+	useOnSelectionChange({
+		onChange,
+	});
 };

@@ -118,4 +118,23 @@ export const addNodesAndConnect = (
 	};
 };
 
-export type GraphAction = AddNodeAction | AddConnectorAction;
+type SelectNodeAction = {
+	type: "selectNode";
+	payload: {
+		selectedNodeIds: GiselleNodeId[];
+	};
+};
+
+type SelectNodeArgs = {
+	selectedNodeIds: GiselleNodeId[];
+};
+export const selectNode = (args: SelectNodeArgs): SelectNodeAction => {
+	return {
+		type: "selectNode",
+		payload: {
+			selectedNodeIds: args.selectedNodeIds,
+		},
+	};
+};
+
+export type GraphAction = AddNodeAction | AddConnectorAction | SelectNodeAction;

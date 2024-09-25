@@ -30,6 +30,7 @@ export type GiselleNodeObject = {
 	parameters?: Parameter;
 	ui: {
 		position: XYPosition;
+		selected?: boolean;
 	};
 	resultPortLabel: string;
 };

@@ -56,7 +56,7 @@ export const TabTrigger: React.FC<PropsWithChildren<TabProps>> = ({
 
 	return (
 		<button
-			className={className}
+			className="font-rosart text-[16px] text-black-70 data-[state=active]:text-black-30"
 			type="button"
 			onClick={() => setActiveTab(value)}
 			data-state={activeTab === value ? "active" : "inactive"}
@@ -86,5 +86,5 @@ export const TabGroup: FC<PropsWithChildren<TabGroupProps>> = ({
 	className,
 	children,
 }) => {
-	return <div className={className}>{children}</div>;
+	return <div className="gap-[16px] flex items-center">{children}</div>;
 };

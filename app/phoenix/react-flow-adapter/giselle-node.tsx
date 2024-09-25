@@ -14,7 +14,6 @@ export type ReactFlowNode = Node<GiselleNodeObject>;
 
 export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
 	const edges = useEdges();
-	console.log({ edges });
 	return (
 		<GiselleNode
 			{...data}

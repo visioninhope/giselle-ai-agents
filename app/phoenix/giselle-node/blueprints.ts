@@ -41,3 +41,6 @@ export const giselleNodeArchetypes = {
 	textGenerator: textGeneratorBlueprint.archetype,
 	prompt: promptBlueprint.archetype,
 } as const;
+
+export type GiselleNodeArchetype =
+	(typeof giselleNodeArchetypes)[keyof typeof giselleNodeArchetypes];
