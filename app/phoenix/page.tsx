@@ -19,16 +19,15 @@ import {
 import {
 	giselleNodeArchetypes,
 	promptBlueprint,
-	textGeneratorBlueprint,
 	textGeneratorParameterNames,
 } from "./giselle-node/blueprints";
 import { GiselleNode } from "./giselle-node/components";
-import { addNode, addNodesAndConnect } from "./graph/actions";
+import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
 import { nodeTypes } from "./react-flow-adapter/giselle-node";
 import { useGraphToReactFlowEffect } from "./react-flow-adapter/graph";
-import { setSelectTool, setTool } from "./tool/actions";
+import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
@@ -103,20 +102,6 @@ function Inner() {
 								}),
 							);
 						}
-						// graphDispatch(
-						// 	addNode(toolState.activeTool.giselleNodeBlueprint, position),
-						// );
-						// if (
-						// 	toolState.activeTool.giselleNodeBlueprint.archetype ===
-						// 	giselleNodeArchetypes.textGenerator
-						// ) {
-						// 	graphDispatch(
-						// 		addNode(promptBlueprint, {
-						// 			x: position.x - 200,
-						// 			y: position.y + 200,
-						// 		}),
-						// 	);
-						// }
 						toolDispatch(setSelectTool);
 					}
 				}}
