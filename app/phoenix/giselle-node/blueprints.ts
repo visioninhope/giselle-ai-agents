@@ -22,3 +22,8 @@ export const textGeneratorBlueprint = createGiselleNodeBlueprint({
 export const promptBlueprint = createGiselleNodeBlueprint({
 	archetype: "Prompt",
 });
+
+export const archetypes = {
+	textGenerator: textGeneratorBlueprint.archetype,
+	prompt: promptBlueprint.archetype,
+} as const;

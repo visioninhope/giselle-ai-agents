@@ -22,3 +22,15 @@ export type GiselleNodeObject = {
 		position: XYPosition;
 	};
 };
+
+export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
+	id: GiselleNodeId;
+	object: "node";
+	archetype: T["archetype"];
+	parameters?: T["parameters"] extends ParameterBlueprint
+		? Parameter
+		: undefined;
+	ui: {
+		position: XYPosition;
+	};
+};

@@ -12,7 +12,6 @@ import {
 import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { nodeTypes } from "./components/custom-node";
 import {
 	MousePositionProvider,
 	useMousePosition,
@@ -21,6 +20,8 @@ import { GiselleNode } from "./giselle-node/components";
 import { addNode } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
+import { nodeTypes } from "./react-flow-adapter/giselle-node";
+import { useGraphToReactFlowEffect } from "./react-flow-adapter/graph";
 import { setSelectTool, setTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
@@ -32,6 +33,7 @@ function Inner() {
 	const { dispatch: graphDispatch } = useGraph();
 	const reactFlowInstance = useReactFlow();
 	const mousePosition = useMousePosition();
+	useGraphToReactFlowEffect();
 	return (
 		<div className="w-full h-screen">
 			<div className="absolute z-10 left-[20px] right-[20px] top-[20px] h-[36px] flex justify-between">
@@ -57,6 +59,8 @@ function Inner() {
 				</div>
 			</div>
 			<ReactFlow
+				defaultNodes={[]}
+				defaultEdges={[]}
 				nodeTypes={nodeTypes}
 				panOnScroll
 				selectionOnDrag

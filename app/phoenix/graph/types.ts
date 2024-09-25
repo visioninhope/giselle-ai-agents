@@ -1,6 +1,6 @@
 import type { GiselleNodeObject } from "../giselle-node/types";
 
-type Graph = {
+export type Graph = {
 	nodes: GiselleNodeObject[];
 };
 
