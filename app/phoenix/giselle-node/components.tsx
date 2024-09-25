@@ -1,7 +1,6 @@
 import { clsx } from "clsx/lite";
 import { type FC, type ReactNode, useMemo } from "react";
 import { PanelCloseIcon } from "../components/icons/panel-close";
-import { TextGenerationIcon } from "../components/icons/text-generation";
 import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
