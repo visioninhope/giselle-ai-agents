@@ -1,6 +1,5 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
 import { TextGenerationIcon } from "../components/icons/text-generation";
-import type { Parameter, ParameterBlueprint } from "./parameter/types";
 import type { GiselleNodeBlueprint, GiselleNodeObject } from "./types";
 
 type GradientBorderProps = {
@@ -18,19 +17,47 @@ export const GradientBorder: FC<GradientBorderProps> = ({
 	/>
 );
 
-export function GiselleNode<
-	TArchetype extends string,
-	TParameterClass extends ParameterBlueprint,
-	TParameter extends Parameter,
->(
-	props:
-		| GiselleNodeBlueprint<TArchetype, TParameterClass>
-		| GiselleNodeObject<TArchetype, TParameter>,
-) {
+type GiselleNodeProps = (GiselleNodeBlueprint | GiselleNodeObject) & {
+	customTargetHandle?: FC<{ key: string }>;
+	customSourceHandle?: FC<{ key: string }>;
+};
+
+type TargetParameterProps = {
+	handle?: ReactNode;
+	label: string;
+};
+const TargetParameter: FC<TargetParameterProps> = ({ handle, label }) => (
+	<div className="relative flex items-center h-[28px]">
+		<div className="*:!absolute *:!w-[6px] *:!h-[12px] *:!bg-[hsla(187,71%,48%,1)] *:!rounded-l-[12px] *:!rounded-r-none *:!top-[50%] *:!-translate-y-[50%] *:!-left-[10px]">
+			{handle}
+		</div>
+		<div className="text-[14px] text-black--30 px-[12px]">{label}</div>
+	</div>
+);
+
+type SourceParameterProps = {
+	handle?: ReactNode;
+	label: string;
+};
+const SourceParameter: FC<SourceParameterProps> = ({ handle, label }) => (
+	<div className="relative flex items-center h-[28px]">
+		{handle && (
+			<div className="absolute -right-[10px] translate-x-[6px]">
+				<div className="h-[28px] w-[10px] bg-[hsla(195,74%,21%,1)]" />
+				<div className="*:!w-[12px] *:!absolute *:!h-[12px] *:!bg-black-100 *:!rounded-full *:!border-[2px] *:!border-[hsla(195,74%,21%,1)] *:!top-[50%] *:!-translate-y-[50%] *:!translate-x-[5px]">
+					{handle}
+				</div>
+			</div>
+		)}
+		<div className="text-[14px] text-black--30 px-[12px]">{label}</div>
+	</div>
+);
+
+export function GiselleNode(props: GiselleNodeProps) {
 	return (
 		<div
 			className="rounded-[16px] bg-gradient-to-tl from-[hsla(187,79%,54%,0.2)] to-[hsla(207,100%,9%,0.2)] min-w-[180px] backdrop-blur-[1px]"
-			style={{ boxShadow: "0px 0px 16px 0px hsla(187, 79%, 54%, 0.5)" }}
+			// style={{ boxShadow: "0px 0px 16px 0px hsla(187, 79%, 54%, 0.5)" }}
 		>
 			<GradientBorder
 				rounded="rounded-[16px]"
@@ -56,30 +83,33 @@ export function GiselleNode<
 				<div className="flex justify-between h-full">
 					<div className="grid">
 						{props.parameters !== undefined &&
-							props.parameters.type === "object" &&
+							props.parameters.object === "objectParameter" &&
 							Object.entries(props.parameters.properties).map(
 								([key, property]) => (
-									<div
-										className="relative flex items-center h-[28px]"
+									<TargetParameter
 										key={key}
-									>
-										<div className="absolute w-[6px] h-[12px] bg-[hsla(187,71%,48%,1)] rounded-l-[12px] top-[50%] -translate-y-[50%] -left-[14px]" />
-										<div className="text-[14px] text-black--30 px-[12px]">
-											{property.label ?? key}
-										</div>
-									</div>
+										label={property.label ?? key}
+										handle={props.customTargetHandle?.({ key }) ?? <div />}
+									/>
+								),
+							)}
+						{props.parameters !== undefined &&
+							props.parameters.object === "objectParameterBlueprint" &&
+							Object.entries(props.parameters.properties).map(
+								([key, property]) => (
+									<TargetParameter key={key} label={property.label ?? key} />
 								),
 							)}
 					</div>
 
 					<div className="grid">
-						<div className="relative flex items-center h-[28px]">
-							<div className="text-[14px] text-black--30 px-[12px]">Result</div>
-							<div className="absolute -right-[10px] translate-x-[6px]">
-								<div className="h-[28px] w-[10px] bg-[hsla(195,74%,21%,1)]" />
-								<div className="absolute w-[12px] h-[12px] bg-black-100 rounded-full border-[2px] border-[hsla(195,74%,21%,1)] top-[50%] -translate-y-[50%] translate-x-[5px]" />
-							</div>
-						</div>
+						<SourceParameter
+							label="Result"
+							handle={
+								(props.object === "node" &&
+									props.customSourceHandle?.({ key: "result" })) ?? <div />
+							}
+						/>
 					</div>
 				</div>
 			</div>

@@ -1,20 +1,31 @@
-import type { Node, NodeProps, NodeTypes } from "@xyflow/react";
-import type { FC } from "react";
 import {
-	archetypes,
-	type promptBlueprint,
-	type textGeneratorBlueprint,
-} from "../giselle-node/blueprints";
+	Handle,
+	type Node,
+	type NodeProps,
+	type NodeTypes,
+	Position,
+	useEdges,
+} from "@xyflow/react";
+import type { FC } from "react";
 import { GiselleNode } from "../giselle-node/components";
-import type {
-	GiselleNodeObject,
-	InferGiselleNodeObject,
-} from "../giselle-node/types";
+import type { GiselleNodeObject } from "../giselle-node/types";
 
 export type ReactFlowNode = Node<GiselleNodeObject>;
 
 export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
-	return <GiselleNode {...data} />;
+	const edges = useEdges();
+	console.log({ edges });
+	return (
+		<GiselleNode
+			{...data}
+			customTargetHandle={({ key }) => (
+				<Handle id={key} type="target" position={Position.Left} />
+			)}
+			customSourceHandle={({ key }) => (
+				<Handle id={key} type="source" position={Position.Right} />
+			)}
+		/>
+	);
 };
 
 export const giselleNodeType = "giselleNode";
