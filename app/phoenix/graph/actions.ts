@@ -35,6 +35,7 @@ export const addNode = (
 		payload: {
 			node: {
 				object: "node",
+				category: node.category,
 				id: createGiselleNodeId(),
 				archetype: node.archetype,
 				parameters,

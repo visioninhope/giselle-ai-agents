@@ -3,9 +3,11 @@ import {
 	createObjectParameterBlueprint,
 	createStringParameterBlueprint,
 } from "./parameter/factory";
+import { giselleNodeCategories } from "./types";
 
 export const textGeneratorBlueprint = createGiselleNodeBlueprint({
 	archetype: "Text Generator",
+	category: giselleNodeCategories.action,
 	parameters: createObjectParameterBlueprint({
 		type: "object",
 		properties: {
@@ -21,6 +23,7 @@ export const textGeneratorBlueprint = createGiselleNodeBlueprint({
 
 export const promptBlueprint = createGiselleNodeBlueprint({
 	archetype: "Prompt",
+	category: giselleNodeCategories.instruction,
 });
 
 export const archetypes = {
