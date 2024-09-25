@@ -5,17 +5,13 @@ import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
 import { PromptPropertyPanel } from "./components/panel/propt";
-import {
-	TabContent,
-	TabGroup,
-	TabProvider,
-	TabTrigger,
-} from "./components/tabs";
+import { TabTrigger } from "./components/tabs";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
 	type GiselleNodeObject,
 	giselleNodeCategories,
+	panelTabs,
 } from "./types";
 
 type GiselleNodeProps = (GiselleNodeBlueprint | GiselleNodeObject) & {
@@ -225,44 +221,43 @@ export const GiselleNodeInformationPanel: FC = () => {
 					</div>
 				</div>
 			) : (
-				<TabProvider>
-					<div className="grid gap-[10px]">
-						<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
-							<button type="button">
-								<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
-							</button>
-							<TabGroup>
-								<TabTrigger value="property">Property</TabTrigger>
-								<TabTrigger value="status">Status</TabTrigger>
-								<TabTrigger value="result">Result</TabTrigger>
-							</TabGroup>
+				<div className="grid gap-[10px]">
+					<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
+						<button type="button">
+							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
+						</button>
+						<div className="gap-[16px] flex items-center">
+							<TabTrigger value="property">Property</TabTrigger>
+							<TabTrigger value="status">Status</TabTrigger>
+							<TabTrigger value="result">Result</TabTrigger>
 						</div>
-						<div className="bg-black-80 px-[24px] py-[8px] flex items-center gap-[8px]">
-							<div
-								className={clsx(
-									"rounded-[2px] flex items-center justify-center px-[4px] py-[4px]",
-									selectedNodes[0].category === giselleNodeCategories.action &&
-										" bg-[hsla(187,71%,48%,1)]",
-									selectedNodes[0].category ===
-										giselleNodeCategories.instruction && "bg-white",
-								)}
-							>
-								<ArchetypeIcon
-									archetype={selectedNodes[0].archetype}
-									className="w-[14px] h-[14px] fill-black-100"
-								/>
-							</div>
-							<div className="font-avenir text-[16px] text-black-30">
-								{selectedNodes[0].archetype}
-							</div>
+					</div>
+					<div className="bg-black-80 px-[24px] py-[8px] flex items-center gap-[8px]">
+						<div
+							className={clsx(
+								"rounded-[2px] flex items-center justify-center px-[4px] py-[4px]",
+								selectedNodes[0].category === giselleNodeCategories.action &&
+									" bg-[hsla(187,71%,48%,1)]",
+								selectedNodes[0].category ===
+									giselleNodeCategories.instruction && "bg-white",
+							)}
+						>
+							<ArchetypeIcon
+								archetype={selectedNodes[0].archetype}
+								className="w-[14px] h-[14px] fill-black-100"
+							/>
 						</div>
-						<TabContent value="property">
-							{selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
+						<div className="font-avenir text-[16px] text-black-30">
+							{selectedNodes[0].archetype}
+						</div>
+					</div>
+					<div className="px-[24px]">
+						{selectedNodes[0].ui.panelTab === panelTabs.property &&
+							selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
 								<PromptPropertyPanel />
 							)}
-						</TabContent>
 					</div>
-				</TabProvider>
+				</div>
 			)}
 		</div>
 	);

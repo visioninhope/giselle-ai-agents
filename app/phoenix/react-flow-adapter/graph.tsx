@@ -5,8 +5,8 @@ import {
 	useReactFlow,
 } from "@xyflow/react";
 import { useCallback, useEffect } from "react";
-import type { GiselleNodeId } from "../giselle-node/types";
-import { selectNode } from "../graph/actions";
+import { type GiselleNodeId, panelTabs } from "../giselle-node/types";
+import { selectNode, selectNodeAndSetPanelTab } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
 import { type ReactFlowNode, giselleNodeType } from "./giselle-node";
@@ -51,11 +51,22 @@ export const useGraphToReactFlowEffect = () => {
 
 	const onChange = useCallback<OnSelectionChangeFunc>(
 		({ nodes }) => {
-			dispatch(
-				selectNode({
-					selectedNodeIds: nodes.map((node) => node.id as GiselleNodeId),
-				}),
-			);
+			if (nodes.length === 1) {
+				dispatch(
+					selectNodeAndSetPanelTab({
+						selectNode: {
+							id: nodes[0].id as GiselleNodeId,
+							panelTab: panelTabs.property,
+						},
+					}),
+				);
+			} else {
+				dispatch(
+					selectNode({
+						selectedNodeIds: nodes.map((node) => node.id as GiselleNodeId),
+					}),
+				);
+			}
 		},
 		[dispatch],
 	);

@@ -36,6 +36,24 @@ export const graphReducer = (
 					})),
 				},
 			};
+		case "setPanelTab":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) => ({
+						...node,
+						ui: {
+							...node.ui,
+							panelTab:
+								node.id === action.payload.node.id
+									? action.payload.node.panelTab
+									: node.ui.panelTab,
+						},
+					})),
+				},
+			};
+
 		default:
 			return state;
 	}

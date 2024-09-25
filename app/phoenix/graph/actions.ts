@@ -14,6 +14,7 @@ import type {
 	GiselleNodeCategory,
 	GiselleNodeId,
 	GiselleNodeObject,
+	PanelTab,
 	XYPosition,
 } from "../giselle-node/types";
 import type { ThunkAction } from "./context";
@@ -137,4 +138,55 @@ export const selectNode = (args: SelectNodeArgs): SelectNodeAction => {
 	};
 };
 
-export type GraphAction = AddNodeAction | AddConnectorAction | SelectNodeAction;
+type SetPanelTabAction = {
+	type: "setPanelTab";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			panelTab: PanelTab;
+		};
+	};
+};
+type SetPanelTabArgs = {
+	node: {
+		id: GiselleNodeId;
+		panelTab: PanelTab;
+	};
+};
+export const setPanelTab = (args: SetPanelTabArgs): SetPanelTabAction => {
+	return {
+		type: "setPanelTab",
+		payload: {
+			node: args.node,
+		},
+	};
+};
+
+export const selectNodeAndSetPanelTab = (args: {
+	selectNode: {
+		id: GiselleNodeId;
+		panelTab: PanelTab;
+	};
+}): ThunkAction => {
+	return (dispatch) => {
+		dispatch(
+			selectNode({
+				selectedNodeIds: [args.selectNode.id],
+			}),
+		);
+		dispatch(
+			setPanelTab({
+				node: {
+					id: args.selectNode.id,
+					panelTab: args.selectNode.panelTab,
+				},
+			}),
+		);
+	};
+};
+
+export type GraphAction =
+	| AddNodeAction
+	| AddConnectorAction
+	| SelectNodeAction
+	| SetPanelTabAction;

@@ -22,6 +22,14 @@ export type XYPosition = {
 	y: number;
 };
 
+export const panelTabs = {
+	property: "property",
+	status: "status",
+	result: "result",
+} as const;
+
+export type PanelTab = (typeof panelTabs)[keyof typeof panelTabs];
+
 export type GiselleNodeObject = {
 	id: GiselleNodeId;
 	object: "node";
@@ -31,6 +39,7 @@ export type GiselleNodeObject = {
 	ui: {
 		position: XYPosition;
 		selected?: boolean;
+		panelTab?: PanelTab;
 	};
 	resultPortLabel: string;
 };
