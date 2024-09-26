@@ -6,6 +6,7 @@ import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
 import { PromptPropertyPanel } from "./components/panel/prompt";
+import { TextGeneratorPropertyPanel } from "./components/panel/text-generator";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
@@ -252,9 +253,15 @@ export const GiselleNodeInformationPanel: FC = () => {
 					</div>
 				</div>
 			) : (
-				selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
-					<PromptPropertyPanel node={selectedNodes[0]} />
-				)
+				<>
+					{selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
+						<PromptPropertyPanel node={selectedNodes[0]} />
+					)}
+					{selectedNodes[0].archetype ===
+						giselleNodeArchetypes.textGenerator && (
+						<TextGeneratorPropertyPanel node={selectedNodes[0]} />
+					)}
+				</>
 			)}
 		</div>
 	);
