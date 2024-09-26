@@ -16,11 +16,11 @@ import type { FC } from "react";
 import type { ConnectorObject } from "../connector/types";
 import { GiselleNode } from "../giselle-node/components";
 import {
-	type GiselleNodeObject,
+	type GiselleNode as GiselleNodeType,
 	giselleNodeCategories,
 } from "../giselle-node/types";
 
-export type ReactFlowNode = Node<GiselleNodeObject>;
+export type ReactFlowNode = Node<GiselleNodeType>;
 
 export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
 	const edges = useEdges<ReactFlowEdge>();

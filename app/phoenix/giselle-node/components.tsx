@@ -10,7 +10,7 @@ import { TabTrigger } from "./components/tabs";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
-	type GiselleNodeObject,
+	type GiselleNode as GiselleNodeType,
 	giselleNodeCategories,
 	panelTabs,
 } from "./types";
@@ -21,7 +21,7 @@ type PortHandleProps = {
 	state?: string;
 };
 
-type GiselleNodeProps = (GiselleNodeBlueprint | GiselleNodeObject) & {
+type GiselleNodeProps = (GiselleNodeBlueprint | GiselleNodeType) & {
 	parameterPortHandle?: FC<PortHandleProps>;
 	resultPortHandle?: FC<PortHandleProps>;
 	incomingConnections?: ConnectorObject[];

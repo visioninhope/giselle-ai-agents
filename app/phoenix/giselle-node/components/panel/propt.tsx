@@ -4,7 +4,7 @@ import clsx from "clsx";
 import { type FC, useCallback, useState } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
-	type GiselleNodeObject,
+	type GiselleNode,
 	giselleNodeCategories,
 	panelTabs,
 } from "../../types";
@@ -12,7 +12,7 @@ import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 
 type PromptPropertyPanelProps = {
-	node: GiselleNodeObject;
+	node: GiselleNode;
 };
 export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	const { dispatch } = useGraph();

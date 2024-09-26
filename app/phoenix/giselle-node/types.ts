@@ -36,7 +36,7 @@ export const panelTabs = {
 
 export type PanelTab = (typeof panelTabs)[keyof typeof panelTabs];
 
-export type GiselleNodeObject = {
+export type GiselleNode = {
 	id: GiselleNodeId;
 	object: "node";
 	category: GiselleNodeCategory;

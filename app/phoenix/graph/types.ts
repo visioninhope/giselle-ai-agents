@@ -1,12 +1,12 @@
 import type { ConnectorObject } from "../connector/types";
 import type {
+	GiselleNode,
 	GiselleNodeCategory,
 	GiselleNodeId,
-	GiselleNodeObject,
 } from "../giselle-node/types";
 
 export type Graph = {
-	nodes: GiselleNodeObject[];
+	nodes: GiselleNode[];
 	connectors: ConnectorObject[];
 };
 

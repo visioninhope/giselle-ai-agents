@@ -10,10 +10,10 @@ import type {
 	StringParameter,
 } from "../giselle-node/parameter/types";
 import type {
+	GiselleNode,
 	GiselleNodeBlueprint,
 	GiselleNodeCategory,
 	GiselleNodeId,
-	GiselleNodeObject,
 	PanelTab,
 	XYPosition,
 } from "../giselle-node/types";
@@ -22,7 +22,7 @@ import type { ThunkAction } from "./context";
 export type AddNodeAction = {
 	type: "addNode";
 	payload: {
-		node: GiselleNodeObject;
+		node: GiselleNode;
 	};
 };
 
