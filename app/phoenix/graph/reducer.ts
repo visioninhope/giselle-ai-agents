@@ -53,6 +53,28 @@ export const graphReducer = (
 					})),
 				},
 			};
+		case "updateNodesPosition":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((currentNode) => {
+						const updateNode = action.payload.nodes.find(
+							(payloadNode) => payloadNode.id === currentNode.id,
+						);
+						if (updateNode == null) {
+							return currentNode;
+						}
+						return {
+							...currentNode,
+							ui: {
+								...currentNode.ui,
+								position: updateNode.position,
+							},
+						};
+					}),
+				},
+			};
 
 		default:
 			return state;

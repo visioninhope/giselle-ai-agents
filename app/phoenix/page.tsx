@@ -33,6 +33,7 @@ import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
 import {
 	useConnectionHandler,
 	useGraphToReactFlowEffect,
+	useNodeEventHandler,
 } from "./react-flow-adapter/graph";
 import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
@@ -47,6 +48,7 @@ function Inner() {
 	const mousePosition = useMousePosition();
 	useGraphToReactFlowEffect();
 	const { handleConnect } = useConnectionHandler();
+	const { handleNodeDragStop } = useNodeEventHandler();
 	return (
 		<div className="w-full h-screen">
 			<div className="absolute z-10 left-[20px] right-[20px] top-[20px] h-[36px] flex justify-between">
@@ -76,11 +78,12 @@ function Inner() {
 				defaultEdges={[]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
-				onConnect={handleConnect}
 				panOnScroll
 				selectionOnDrag
 				panOnDrag={false}
 				colorMode="dark"
+				onConnect={handleConnect}
+				onNodeDragStop={handleNodeDragStop}
 				onPaneClick={(event) => {
 					event.preventDefault();
 					const position = reactFlowInstance.flowToScreenPosition({

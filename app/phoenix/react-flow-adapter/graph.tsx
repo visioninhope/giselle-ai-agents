@@ -1,6 +1,7 @@
 import {
 	type Connection,
 	type Edge,
+	type OnNodeDrag,
 	type OnSelectionChangeFunc,
 	useOnSelectionChange,
 	useReactFlow,
@@ -15,6 +16,7 @@ import {
 	addConnector,
 	selectNode,
 	selectNodeAndSetPanelTab,
+	updateNodesPosition,
 } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
@@ -139,5 +141,27 @@ export const useConnectionHandler = () => {
 
 	return {
 		handleConnect,
+	};
+};
+
+export const useNodeEventHandler = () => {
+	const { dispatch } = useGraph();
+
+	const handleNodeDragStop = useCallback<OnNodeDrag<ReactFlowNode>>(
+		(_event, _node, nodes) => {
+			dispatch(
+				updateNodesPosition({
+					nodes: nodes.map((node) => ({
+						id: node.id as GiselleNodeId,
+						position: node.position,
+					})),
+				}),
+			);
+		},
+		[dispatch],
+	);
+
+	return {
+		handleNodeDragStop,
 	};
 };

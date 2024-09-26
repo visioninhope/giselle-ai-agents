@@ -185,9 +185,35 @@ export const selectNodeAndSetPanelTab = (args: {
 		);
 	};
 };
+type UpdateNodesPositionAction = {
+	type: "updateNodesPosition";
+	payload: {
+		nodes: Array<{
+			id: GiselleNodeId;
+			position: XYPosition;
+		}>;
+	};
+};
+type UpdateNodesPositionArgs = {
+	nodes: Array<{
+		id: GiselleNodeId;
+		position: XYPosition;
+	}>;
+};
+export const updateNodesPosition = (
+	args: UpdateNodesPositionArgs,
+): UpdateNodesPositionAction => {
+	return {
+		type: "updateNodesPosition",
+		payload: {
+			nodes: args.nodes,
+		},
+	};
+};
 
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
 	| SelectNodeAction
-	| SetPanelTabAction;
+	| SetPanelTabAction
+	| UpdateNodesPositionAction;
