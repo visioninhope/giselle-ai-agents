@@ -187,7 +187,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 		[state.graph.nodes],
 	);
 	return (
-		<div className="bg-black-100 w-[380px] rounded-[16px] h-full relative shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]">
+		<div className="bg-black-100 w-[380px] rounded-[16px] h-full overflow-hidden relative shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]">
 			<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 
 			{selectedNodes.length > 1 ? (
@@ -221,7 +221,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 					</div>
 				</div>
 			) : (
-				<div className="grid gap-[10px]">
+				<div className="flex gap-[10px] flex-col h-full">
 					<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
 						<button type="button">
 							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
@@ -251,7 +251,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 							{selectedNodes[0].archetype}
 						</div>
 					</div>
-					<div className="px-[24px]">
+					<div className="px-[24px] pb-[16px] overflow-scroll">
 						{selectedNodes[0].ui.panelTab === panelTabs.property &&
 							selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
 								<PromptPropertyPanel />

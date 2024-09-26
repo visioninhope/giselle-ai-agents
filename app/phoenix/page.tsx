@@ -111,7 +111,7 @@ function Inner() {
 				className={
 					toolState.activeTool.type === "addGiselleNode"
 						? "[&_div]:!cursor-crosshair"
-						: ""
+						: "[&_div]:!cursor-default"
 				}
 			>
 				<Background

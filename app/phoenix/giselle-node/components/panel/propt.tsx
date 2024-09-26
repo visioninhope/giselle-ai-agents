@@ -10,7 +10,7 @@ export const PromptPropertyPanel: FC = () => (
 				<textarea
 					name="text"
 					id="text"
-					className="w-full text-[14px] h-[123px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[8px] font-rosart outline-none"
+					className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
 				/>
 			</fieldset>
 		</form>
