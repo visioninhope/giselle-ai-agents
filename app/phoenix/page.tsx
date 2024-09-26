@@ -26,10 +26,19 @@ import {
 	GiselleNode,
 	GiselleNodeInformationPanel,
 } from "./giselle-node/components";
-import { addNodesAndConnect } from "./graph/actions";
+import { type GiselleNodeId, panelTabs } from "./giselle-node/types";
+import {
+	addNodesAndConnect,
+	selectNode,
+	selectNodeAndSetPanelTab,
+} from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
-import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
+import {
+	type ReactFlowNode,
+	edgeTypes,
+	nodeTypes,
+} from "./react-flow-adapter/giselle-node";
 import {
 	useConnectionHandler,
 	useGraphToReactFlowEffect,
@@ -73,7 +82,7 @@ function Inner() {
 					</div>
 				</div>
 			</div>
-			<ReactFlow
+			<ReactFlow<ReactFlowNode>
 				defaultNodes={[]}
 				defaultEdges={[]}
 				nodeTypes={nodeTypes}
@@ -84,13 +93,28 @@ function Inner() {
 				colorMode="dark"
 				onConnect={handleConnect}
 				onNodeDragStop={handleNodeDragStop}
+				onNodeClick={(_, node) => {
+					graphDispatch(
+						selectNodeAndSetPanelTab({
+							selectNode: {
+								id: node.id as GiselleNodeId,
+								panelTab: panelTabs.property,
+							},
+						}),
+					);
+				}}
 				onPaneClick={(event) => {
 					event.preventDefault();
-					const position = reactFlowInstance.flowToScreenPosition({
-						x: event.clientX,
-						y: event.clientY,
-					});
+					graphDispatch(
+						selectNode({
+							selectedNodeIds: [],
+						}),
+					);
 					if (toolState.activeTool.type === "addGiselleNode") {
+						const position = reactFlowInstance.flowToScreenPosition({
+							x: event.clientX,
+							y: event.clientY,
+						});
 						if (
 							toolState.activeTool.giselleNodeBlueprint.archetype ===
 							giselleNodeArchetypes.textGenerator

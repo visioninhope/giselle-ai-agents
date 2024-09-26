@@ -197,13 +197,14 @@ export function GiselleNode(props: GiselleNodeProps) {
 				</div>
 			</div>
 			{props.object === "node" && (
-				<div className="absolute top-[calc(100%+8px)] left-[8px] right-[8px] font-mono text-[8px] py-[4px] px-[8px] bg-black-100/20 border border-black-70 ">
+				<div className="absolute top-[calc(100%+8px)] left-[8px] right-[8px] font-mono text-[8px] py-[4px] px-[8px] bg-black-100/30 border border-black-70 text-black--30">
 					<div className="flex flex-col gap-[4px]">
 						<div>Debug info</div>
 						<div>id: {props.id}</div>
 						<div>incoming: {props.incomingConnections?.length ?? 0}</div>
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
+						<div>ui: {JSON.stringify(props.ui, null, 2)}</div>
 						<div>output: {JSON.stringify(props.output)}</div>
 					</div>
 				</div>

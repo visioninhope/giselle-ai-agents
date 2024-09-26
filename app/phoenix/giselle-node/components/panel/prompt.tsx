@@ -1,4 +1,5 @@
 import {
+	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
 	updateNodesUI,
@@ -91,6 +92,16 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 		},
 		[dispatch, node.id, text],
 	);
+	const handleClick = useCallback(() => {
+		dispatch(
+			selectNodeAndSetPanelTab({
+				selectNode: {
+					id: outgoingConnections[0].target,
+					panelTab: panelTabs.result,
+				},
+			}),
+		);
+	}, [dispatch, outgoingConnections]);
 	return (
 		<div className="flex gap-[10px] flex-col h-full">
 			<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
@@ -130,6 +141,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 						disabled={text.length === 0}
 						onMouseEnter={handleMouseEnter}
 						onMouseLeave={handleMouseLeave}
+						onClick={handleClick}
 					>
 						Push Value
 					</button>

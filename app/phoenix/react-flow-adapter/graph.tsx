@@ -88,9 +88,9 @@ export const useGraphToReactFlowEffect = () => {
 		[dispatch],
 	);
 
-	useOnSelectionChange({
-		onChange,
-	});
+	// useOnSelectionChange({
+	// 	onChange,
+	// });
 };
 
 type GiselleConnection = {
