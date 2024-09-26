@@ -51,6 +51,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 				parameters,
 				ui: { position: args.position },
 				properties: args.properties ?? {},
+				output: "",
 			},
 		},
 	};
@@ -187,31 +188,6 @@ export const selectNodeAndSetPanelTab = (args: {
 		);
 	};
 };
-type UpdateNodesPositionAction = {
-	type: "updateNodesPosition";
-	payload: {
-		nodes: Array<{
-			id: GiselleNodeId;
-			position: XYPosition;
-		}>;
-	};
-};
-type UpdateNodesPositionArgs = {
-	nodes: Array<{
-		id: GiselleNodeId;
-		position: XYPosition;
-	}>;
-};
-export const updateNodesPosition = (
-	args: UpdateNodesPositionArgs,
-): UpdateNodesPositionAction => {
-	return {
-		type: "updateNodesPosition",
-		payload: {
-			nodes: args.nodes,
-		},
-	};
-};
 
 type UpdateNodePropertyAction = {
 	type: "updateNodeProperties";
@@ -247,10 +223,64 @@ export const updateNodeProperty = (
 	};
 };
 
+type UpdateNodesUIAction = {
+	type: "updateNodesUI";
+	payload: {
+		nodes: Array<{
+			id: GiselleNodeId;
+			ui: Partial<GiselleNode["ui"]>;
+		}>;
+	};
+};
+
+type UpdateNodesUIArgs = {
+	nodes: Array<{
+		id: GiselleNodeId;
+		ui: Partial<GiselleNode["ui"]>;
+	}>;
+};
+
+export const updateNodesUI = (args: UpdateNodesUIArgs): UpdateNodesUIAction => {
+	return {
+		type: "updateNodesUI",
+		payload: {
+			nodes: args.nodes,
+		},
+	};
+};
+
+type SetNodeOutputAction = {
+	type: "setNodeOutput";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			// biome-ignore lint: lint/suspicious/noExplicitAny
+			output: any;
+		};
+	};
+};
+
+type SetNodeOutputArgs = {
+	node: {
+		id: GiselleNodeId;
+		// biome-ignore lint: lint/suspicious/noExplicitAny
+		output: any;
+	};
+};
+export const setNodeOutput = (args: SetNodeOutputArgs): SetNodeOutputAction => {
+	return {
+		type: "setNodeOutput",
+		payload: {
+			node: args.node,
+		},
+	};
+};
+
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
 	| SelectNodeAction
 	| SetPanelTabAction
-	| UpdateNodesPositionAction
-	| UpdateNodePropertyAction;
+	| UpdateNodePropertyAction
+	| UpdateNodesUIAction
+	| SetNodeOutputAction;

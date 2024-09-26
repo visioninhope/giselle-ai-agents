@@ -53,28 +53,6 @@ export const graphReducer = (
 					})),
 				},
 			};
-		case "updateNodesPosition":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((currentNode) => {
-						const updateNode = action.payload.nodes.find(
-							(payloadNode) => payloadNode.id === currentNode.id,
-						);
-						if (updateNode == null) {
-							return currentNode;
-						}
-						return {
-							...currentNode,
-							ui: {
-								...currentNode.ui,
-								position: updateNode.position,
-							},
-						};
-					}),
-				},
-			};
 
 		case "updateNodeProperties":
 			return {
@@ -96,7 +74,43 @@ export const graphReducer = (
 					}),
 				},
 			};
-
+		case "updateNodesUI":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((currentNode) => {
+						const updateNode = action.payload.nodes.find(
+							(payloadNode) => payloadNode.id === currentNode.id,
+						);
+						if (updateNode == null) {
+							return currentNode;
+						}
+						return {
+							...currentNode,
+							ui: {
+								...currentNode.ui,
+								...updateNode.ui,
+							},
+						};
+					}),
+				},
+			};
+		case "setNodeOutput":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) =>
+						node.id !== action.payload.node.id
+							? node
+							: {
+									...node,
+									output: action.payload.node.output,
+								},
+					),
+				},
+			};
 		default:
 			return state;
 	}

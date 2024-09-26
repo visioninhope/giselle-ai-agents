@@ -5,14 +5,12 @@ import type { ConnectorObject } from "../connector/types";
 import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
-import { PromptPropertyPanel } from "./components/panel/propt";
-import { TabTrigger } from "./components/tabs";
+import { PromptPropertyPanel } from "./components/panel/prompt";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
 	type GiselleNode as GiselleNodeType,
 	giselleNodeCategories,
-	panelTabs,
 } from "./types";
 
 type PortHandleProps = {
@@ -115,6 +113,9 @@ export function GiselleNode(props: GiselleNodeProps) {
 				props.object === "node" &&
 					props.ui.selected &&
 					"shadow-[0px_0px_16px_0px_hsla(187,_79%,_54%,_0.5)]",
+				props.object === "node" &&
+					props.ui.isInflluencable &&
+					"shadow-[0px_0px_16px_0px_hsla(187,_79%,_54%,_0.5)]",
 			)}
 		>
 			<div
@@ -202,6 +203,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 						<div>incoming: {props.incomingConnections?.length ?? 0}</div>
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
+						<div>output: {JSON.stringify(props.output)}</div>
 					</div>
 				</div>
 			)}

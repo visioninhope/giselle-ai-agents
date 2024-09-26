@@ -1,38 +1,93 @@
-import { updateNodeProperty } from "@/app/phoenix/graph/actions";
-import { useGraph } from "@/app/phoenix/graph/context";
+import {
+	setNodeOutput,
+	updateNodeProperty,
+	updateNodesUI,
+} from "@/app/phoenix/graph/actions";
+import { type ThunkAction, useGraph } from "@/app/phoenix/graph/context";
 import clsx from "clsx";
-import { type FC, useCallback, useState } from "react";
+import { type FC, useCallback, useMemo, useState } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
 	type GiselleNode,
+	type GiselleNodeId,
 	giselleNodeCategories,
 	panelTabs,
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 
+function setTextToPropertyAndOutput(
+	nodeId: GiselleNodeId,
+	text: string,
+): ThunkAction {
+	return (dispatch) => {
+		dispatch(
+			updateNodeProperty({
+				node: {
+					id: nodeId,
+					property: {
+						key: "text",
+						value: text,
+					},
+				},
+			}),
+		);
+		dispatch(
+			setNodeOutput({
+				node: {
+					id: nodeId,
+					output: text,
+				},
+			}),
+		);
+	};
+}
+
 type PromptPropertyPanelProps = {
 	node: GiselleNode;
 };
 export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
-	const { dispatch } = useGraph();
+	const { state, dispatch } = useGraph();
+	const outgoingConnections = useMemo(
+		() =>
+			state.graph.connectors.filter(
+				(connector) => connector.source === node.id,
+			),
+		[state.graph.connectors, node.id],
+	);
 	const [text, setText] = useState<string>(
 		(node.properties?.text as string) ?? "",
 	);
+	const handleMouseEnter = useCallback(() => {
+		dispatch(
+			updateNodesUI({
+				nodes: outgoingConnections.map((connector) => ({
+					id: connector.target,
+					ui: {
+						isInflluencable: true,
+					},
+				})),
+			}),
+		);
+	}, [dispatch, outgoingConnections]);
+
+	const handleMouseLeave = useCallback(() => {
+		dispatch(
+			updateNodesUI({
+				nodes: outgoingConnections.map((connector) => ({
+					id: connector.target,
+					ui: {
+						isInflluencable: false,
+					},
+				})),
+			}),
+		);
+	}, [dispatch, outgoingConnections]);
+
 	const handleBlur = useCallback(
 		(event: React.FormEvent<HTMLTextAreaElement>) => {
 			event.preventDefault();
-			dispatch(
-				updateNodeProperty({
-					node: {
-						id: node.id,
-						property: {
-							key: "text",
-							value: text,
-						},
-					},
-				}),
-			);
+			dispatch(setTextToPropertyAndOutput(node.id, text));
 		},
 		[dispatch, node.id, text],
 	);
@@ -73,6 +128,8 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 						type="button"
 						className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
 						disabled={text.length === 0}
+						onMouseEnter={handleMouseEnter}
+						onMouseLeave={handleMouseLeave}
 					>
 						Push Value
 					</button>

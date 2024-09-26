@@ -1,6 +1,5 @@
 import {
 	type Connection,
-	type Edge,
 	type OnNodeDrag,
 	type OnSelectionChangeFunc,
 	useOnSelectionChange,
@@ -16,7 +15,7 @@ import {
 	addConnector,
 	selectNode,
 	selectNodeAndSetPanelTab,
-	updateNodesPosition,
+	updateNodesUI,
 } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
@@ -150,10 +149,10 @@ export const useNodeEventHandler = () => {
 	const handleNodeDragStop = useCallback<OnNodeDrag<ReactFlowNode>>(
 		(_event, _node, nodes) => {
 			dispatch(
-				updateNodesPosition({
+				updateNodesUI({
 					nodes: nodes.map((node) => ({
 						id: node.id as GiselleNodeId,
-						position: node.position,
+						ui: { position: node.position },
 					})),
 				}),
 			);

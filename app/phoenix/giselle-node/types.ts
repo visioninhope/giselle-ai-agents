@@ -46,9 +46,11 @@ export type GiselleNode = {
 		position: XYPosition;
 		selected?: boolean;
 		panelTab?: PanelTab;
+		isInflluencable?: boolean;
 	};
 	resultPortLabel: string;
 	properties: Record<string, unknown>;
+	output: unknown;
 };
 
 export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
