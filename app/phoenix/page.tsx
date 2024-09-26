@@ -28,7 +28,7 @@ import {
 import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
-import { nodeTypes } from "./react-flow-adapter/giselle-node";
+import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
 import { useGraphToReactFlowEffect } from "./react-flow-adapter/graph";
 import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
@@ -70,6 +70,7 @@ function Inner() {
 				defaultNodes={[]}
 				defaultEdges={[]}
 				nodeTypes={nodeTypes}
+				edgeTypes={edgeTypes}
 				panOnScroll
 				selectionOnDrag
 				panOnDrag={false}

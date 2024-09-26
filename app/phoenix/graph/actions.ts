@@ -1,5 +1,5 @@
 import { createConnectorId } from "../connector/factory";
-import type { Connector } from "../connector/types";
+import type { ConnectorObject } from "../connector/types";
 import { createGiselleNodeId } from "../giselle-node/factory";
 import {
 	createObjectParameter,
@@ -57,7 +57,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 export type AddConnectorAction = {
 	type: "addConnector";
 	payload: {
-		connector: Connector;
+		connector: ConnectorObject;
 	};
 };
 
@@ -78,6 +78,7 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 		payload: {
 			connector: {
 				id: createConnectorId(),
+				object: "connector",
 				source: args.sourceNode.id,
 				sourceNodeCategory: args.sourceNode.category,
 				target: args.targetNode.id,

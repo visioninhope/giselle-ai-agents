@@ -1,6 +1,7 @@
 import { clsx } from "clsx/lite";
 import { type FC, type ReactNode, useMemo } from "react";
 import { PanelCloseIcon } from "../components/icons/panel-close";
+import type { ConnectorObject } from "../connector/types";
 import { useGraph } from "../graph/context";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
@@ -14,49 +15,65 @@ import {
 	panelTabs,
 } from "./types";
 
+type PortHandleProps = {
+	id: string;
+	className?: string;
+	state?: string;
+};
+
 type GiselleNodeProps = (GiselleNodeBlueprint | GiselleNodeObject) & {
-	customTargetHandle?: FC<{ key: string }>;
-	customSourceHandle?: FC<{ key: string }>;
+	parameterPortHandle?: FC<PortHandleProps>;
+	resultPortHandle?: FC<PortHandleProps>;
+	incomingConnections?: ConnectorObject[];
+	outgoingConnections?: ConnectorObject[];
 };
 
 type TargetParameterProps = {
-	handle?: ReactNode;
+	id: string;
+	handle?: FC<PortHandleProps>;
 	label: string;
 	category: GiselleNodeCategory;
 };
 const TargetParameter: FC<TargetParameterProps> = ({
-	handle,
+	id,
+	handle: Handle,
 	label,
 	category,
 }) => (
 	<div className="relative flex items-center h-[28px]">
-		<div
-			className={clsx(
-				"*:!absolute *:!w-[6px] *:!h-[12px] *:!rounded-l-[12px] *:!rounded-r-none *:!top-[50%] *:!-translate-y-[50%] *:!-left-[10px]",
-				category === giselleNodeCategories.action &&
-					"*:!bg-[hsla(187,71%,48%,1)]",
-				category === giselleNodeCategories.instruction &&
-					"*:!bg-[hsla(236,7%,39%,1)]",
-			)}
-		>
-			{handle}
-		</div>
+		{Handle && (
+			<div
+				className={clsx(
+					"*:!absolute *:!w-[6px] *:!h-[12px] *:!rounded-l-[12px] *:!rounded-r-none *:!top-[50%] *:!-translate-y-[50%] *:!-left-[10px]",
+					category === giselleNodeCategories.action &&
+						"*:!bg-[hsla(187,71%,48%,1)]",
+					category === giselleNodeCategories.instruction &&
+						"*:!bg-[hsla(236,7%,39%,1)]",
+				)}
+			>
+				<Handle id={id} />
+			</div>
+		)}
 		<div className="text-[14px] text-black--30 px-[12px]">{label}</div>
 	</div>
 );
 
 type SourceParameterProps = {
-	handle?: ReactNode;
+	id: string;
+	handle?: FC<PortHandleProps>;
 	label: string;
 	category: GiselleNodeCategory;
+	connections: ConnectorObject[];
 };
 const SourceParameter: FC<SourceParameterProps> = ({
-	handle,
+	id,
+	handle: Handle,
 	label,
 	category,
+	connections,
 }) => (
 	<div className="relative flex items-center h-[28px]">
-		{handle && (
+		{Handle && (
 			<div className="absolute -right-[10px] translate-x-[6px]">
 				<div
 					className={clsx(
@@ -67,17 +84,19 @@ const SourceParameter: FC<SourceParameterProps> = ({
 							"bg-[hsla(236,7%,39%,1)]",
 					)}
 				/>
-				<div
-					className={clsx(
-						"*:!w-[12px] *:!absolute *:!h-[12px] *:!bg-black-100 *:!rounded-full *:!border-[2px] *:!top-[50%] *:!-translate-y-[50%] *:!translate-x-[5px]",
-						category === giselleNodeCategories.action &&
-							"*:!border-[hsla(195,74%,21%,1)]",
-						category === giselleNodeCategories.instruction &&
-							"*:!border-[hsla(236,7%,39%,1)]",
-					)}
-				>
-					{handle}
-				</div>
+				{Handle && (
+					<Handle
+						id={id}
+						className={clsx(
+							"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
+							category === giselleNodeCategories.action &&
+								"!border-[hsla(195,74%,21%,1)]",
+							category === giselleNodeCategories.instruction &&
+								"!border-[hsla(236,7%,39%,1)] data-[state=connected]:!bg-white",
+						)}
+						state={connections.length ? "connected" : "disconnected"}
+					/>
+				)}
 			</div>
 		)}
 		<div className="text-[14px] text-black--30 px-[12px]">{label}</div>
@@ -88,7 +107,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 	return (
 		<div
 			className={clsx(
-				"rounded-[16px] bg-gradient-to-tl min-w-[180px] backdrop-blur-[1px] transition-shadow",
+				"relative rounded-[16px] bg-gradient-to-tl min-w-[180px] backdrop-blur-[1px] transition-shadow",
 				props.category === giselleNodeCategories.action &&
 					"from-[hsla(187,79%,54%,0.2)] to-[hsla(207,100%,9%,0.2)]",
 				props.category === giselleNodeCategories.instruction &&
@@ -139,24 +158,24 @@ export function GiselleNode(props: GiselleNodeProps) {
 			<div className="py-[4px]">
 				<div className="flex justify-between h-full">
 					<div className="grid">
-						{props.parameters !== undefined &&
-							props.parameters.object === "objectParameter" &&
+						{props.parameters?.object === "objectParameter" &&
 							Object.entries(props.parameters.properties).map(
 								([key, property]) => (
 									<TargetParameter
 										key={key}
+										id={key}
 										label={property.label ?? key}
-										handle={props.customTargetHandle?.({ key }) ?? <div />}
+										handle={props.parameterPortHandle}
 										category={props.category}
 									/>
 								),
 							)}
-						{props.parameters !== undefined &&
-							props.parameters.object === "objectParameterBlueprint" &&
+						{props.parameters?.object === "objectParameterBlueprint" &&
 							Object.entries(props.parameters.properties).map(
 								([key, property]) => (
 									<TargetParameter
 										key={key}
+										id={key}
 										label={property.label ?? key}
 										category={props.category}
 									/>
@@ -166,16 +185,25 @@ export function GiselleNode(props: GiselleNodeProps) {
 
 					<div className="grid">
 						<SourceParameter
+							id="result"
 							label={props.resultPortLabel}
 							category={props.category}
-							handle={
-								(props.object === "node" &&
-									props.customSourceHandle?.({ key: "result" })) ?? <div />
-							}
+							connections={props.outgoingConnections ?? []}
+							handle={props.resultPortHandle}
 						/>
 					</div>
 				</div>
 			</div>
+			{props.object === "node" && (
+				<div className="absolute top-[calc(100%+8px)] left-[8px] right-[8px] font-mono text-[8px] py-[4px] px-[8px] bg-black-100/20 border border-black-70 ">
+					<div className="flex flex-col gap-[4px]">
+						<div>Debug info</div>
+						<div>id: {props.id}</div>
+						<div>incoming: {props.incomingConnections?.length ?? 0}</div>
+						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }

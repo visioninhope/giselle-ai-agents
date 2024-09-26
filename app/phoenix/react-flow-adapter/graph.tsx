@@ -9,7 +9,12 @@ import { type GiselleNodeId, panelTabs } from "../giselle-node/types";
 import { selectNode, selectNodeAndSetPanelTab } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
-import { type ReactFlowNode, giselleNodeType } from "./giselle-node";
+import {
+	type ReactFlowEdge,
+	type ReactFlowNode,
+	giselleEdgeType,
+	giselleNodeType,
+} from "./giselle-node";
 
 export function graphToReactFlow(grpah: Graph) {
 	const nodes: ReactFlowNode[] = grpah.nodes.map((node) => {
@@ -24,12 +29,14 @@ export function graphToReactFlow(grpah: Graph) {
 		};
 	});
 
-	const edges: Edge[] = grpah.connectors.map((connector) => {
+	const edges: ReactFlowEdge[] = grpah.connectors.map((connector) => {
 		return {
 			id: connector.id,
+			type: giselleEdgeType,
 			source: connector.source,
 			target: connector.target,
 			targetHandle: connector.targetHandle,
+			data: connector,
 		};
 	});
 
