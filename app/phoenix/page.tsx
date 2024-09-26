@@ -12,6 +12,7 @@ import {
 import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
+import { GradientPathDefinitions } from "./connector/gradient-definitions";
 import {
 	MousePositionProvider,
 	useMousePosition,
@@ -163,6 +164,7 @@ export default function Page() {
 			<MousePositionProvider>
 				<ToolProvider>
 					<GraphProvider>
+						<GradientPathDefinitions />
 						<Inner />
 					</GraphProvider>
 				</ToolProvider>

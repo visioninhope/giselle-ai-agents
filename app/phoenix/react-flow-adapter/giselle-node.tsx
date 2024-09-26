@@ -11,10 +11,14 @@ import {
 	getBezierPath,
 	useEdges,
 } from "@xyflow/react";
+import clsx from "clsx/lite";
 import type { FC } from "react";
 import type { ConnectorObject } from "../connector/types";
 import { GiselleNode } from "../giselle-node/components";
-import type { GiselleNodeObject } from "../giselle-node/types";
+import {
+	type GiselleNodeObject,
+	giselleNodeCategories,
+} from "../giselle-node/types";
 
 export type ReactFlowNode = Node<GiselleNodeObject>;
 
@@ -61,6 +65,7 @@ export const ReactFlowEdge: FC<EdgeProps<ReactFlowEdge>> = ({
 	targetX,
 	targetY,
 	targetPosition,
+	data,
 }) => {
 	const [edgePath] = getBezierPath({
 		sourceX,
@@ -70,9 +75,24 @@ export const ReactFlowEdge: FC<EdgeProps<ReactFlowEdge>> = ({
 		targetY,
 		targetPosition,
 	});
+	if (data == null) {
+		return null;
+	}
 	return (
 		<>
-			<BaseEdge id={id} path={edgePath} />
+			<BaseEdge
+				id={id}
+				path={edgePath}
+				className={clsx(
+					"!stroke-[2px]",
+					data.sourceNodeCategory === giselleNodeCategories.instruction &&
+						data.targetNodeCategory === giselleNodeCategories.action &&
+						" !stroke-[url(#instructionToAction)]",
+					data.sourceNodeCategory === giselleNodeCategories.action &&
+						data.targetNodeCategory === giselleNodeCategories.action &&
+						" !stroke-[url(#actionToAction)]",
+				)}
+			/>
 		</>
 	);
 };
