@@ -58,5 +58,10 @@ export const resendOtp = async (
 			name: error.name,
 		};
 	}
-	return null;
+	return {
+		code: "success",
+		status: 200,
+		message: "Resent a one-time password to your email address.",
+		name: "Success",
+	};
 };

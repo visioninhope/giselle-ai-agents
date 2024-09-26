@@ -52,12 +52,21 @@ export const VerifyEmailForm: FC = () => {
 					</AlertDescription>
 				</Alert>
 			)}
-			{resendState && (
+			{resendState && resendState.code !== "success" && (
 				<Alert variant="destructive">
 					<TriangleAlertIcon className="w-4 h-4" />
 					<AlertTitle>Authentication Error</AlertTitle>
 					<AlertDescription>
 						{resendState.message || "An error occurred. Please try again."}
+					</AlertDescription>
+				</Alert>
+			)}
+			{resendState && resendState.code === "success" && (
+				<Alert variant="primary">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Success</AlertTitle>
+					<AlertDescription>
+						{resendState.message || "Resend completed!"}
 					</AlertDescription>
 				</Alert>
 			)}
