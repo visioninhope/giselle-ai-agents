@@ -17,23 +17,26 @@ import { verifyEmail } from "./verify-email";
 
 export const VerifyEmailForm: FC = () => {
 	const { state } = useSignupContext();
-	const [authError, action, isPending] = useActionState(verifyEmail, null);
+	const [verifyState, verifyAction, isVerifyPending] = useActionState(
+		verifyEmail,
+		null,
+	);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
 		formRef.current?.requestSubmit();
 	}, []);
 	return (
 		<div className="grid gap-[8px]">
-			{authError && (
+			{verifyState && (
 				<Alert variant="destructive">
 					<TriangleAlertIcon className="w-4 h-4" />
 					<AlertTitle>Authentication Error</AlertTitle>
 					<AlertDescription>
-						{authError.message || "An error occurred. Please try again."}
+						{verifyState.message || "An error occurred. Please try again."}
 					</AlertDescription>
 				</Alert>
 			)}
-			<form className="flex justify-center" action={action} ref={formRef}>
+			<form className="flex justify-center" action={verifyAction} ref={formRef}>
 				<div className="grid gap-4">
 					<InputOTP
 						maxLength={6}
@@ -61,7 +64,7 @@ export const VerifyEmailForm: FC = () => {
 							action={<ClickableText>Click to resend</ClickableText>}
 						/>
 					</div>
-					<Button className="w-full" type="submit" disabled={isPending}>
+					<Button className="w-full" type="submit" disabled={isVerifyPending}>
 						Verify
 					</Button>
 				</div>
