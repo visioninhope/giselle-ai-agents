@@ -100,7 +100,7 @@ function Inner() {
 									sourceNode: {
 										node: promptBlueprint,
 										position: {
-											x: position.x - 200,
+											x: position.x - 300,
 											y: position.y + 100,
 										},
 									},

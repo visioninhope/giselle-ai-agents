@@ -48,6 +48,7 @@ export type GiselleNodeObject = {
 		panelTab?: PanelTab;
 	};
 	resultPortLabel: string;
+	properties: Record<string, unknown>;
 };
 
 export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {

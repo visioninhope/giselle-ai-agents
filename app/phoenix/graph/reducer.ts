@@ -76,6 +76,27 @@ export const graphReducer = (
 				},
 			};
 
+		case "updateNodeProperties":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) => {
+						if (action.payload.node.id !== node.id) {
+							return node;
+						}
+						return {
+							...node,
+							properties: {
+								...node.properties,
+								[action.payload.node.property.key]:
+									action.payload.node.property.value,
+							},
+						};
+					}),
+				},
+			};
+
 		default:
 			return state;
 	}

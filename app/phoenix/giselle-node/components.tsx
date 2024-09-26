@@ -201,6 +201,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 						<div>id: {props.id}</div>
 						<div>incoming: {props.incomingConnections?.length ?? 0}</div>
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
+						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
 					</div>
 				</div>
 			)}
@@ -249,55 +250,9 @@ export const GiselleNodeInformationPanel: FC = () => {
 					</div>
 				</div>
 			) : (
-				<div className="flex gap-[10px] flex-col h-full">
-					<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
-						<button type="button">
-							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
-						</button>
-						<div className="gap-[16px] flex items-center">
-							<TabTrigger value="property">Property</TabTrigger>
-							<TabTrigger value="status">Status</TabTrigger>
-							<TabTrigger value="result">Result</TabTrigger>
-						</div>
-					</div>
-					<div className="bg-black-80 px-[24px] py-[8px] flex items-center justify-between">
-						<div className="flex items-center gap-[8px]">
-							<div
-								className={clsx(
-									"rounded-[2px] flex items-center justify-center px-[4px] py-[4px]",
-									selectedNodes[0].category === giselleNodeCategories.action &&
-										"bg-[hsla(187,71%,48%,1)]",
-									selectedNodes[0].category ===
-										giselleNodeCategories.instruction && "bg-white",
-								)}
-							>
-								<ArchetypeIcon
-									archetype={selectedNodes[0].archetype}
-									className="w-[14px] h-[14px] fill-black-100"
-								/>
-							</div>
-							<div className="font-avenir text-[16px] text-black-30">
-								{selectedNodes[0].archetype}
-							</div>
-						</div>
-						<div className="">
-							<div className="absolute rounded-[8px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
-							<button
-								type="button"
-								className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-								disabled
-							>
-								Push Value
-							</button>
-						</div>
-					</div>
-					<div className="px-[24px] pb-[16px] overflow-scroll">
-						{selectedNodes[0].ui.panelTab === panelTabs.property &&
-							selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
-								<PromptPropertyPanel />
-							)}
-					</div>
-				</div>
+				selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
+					<PromptPropertyPanel node={selectedNodes[0]} />
+				)
 			)}
 		</div>
 	);

@@ -29,6 +29,7 @@ export type AddNodeAction = {
 type AddNodeArgs = {
 	node: GiselleNodeBlueprint;
 	position: XYPosition;
+	properties?: Record<string, unknown>;
 };
 
 export const addNode = (args: AddNodeArgs): AddNodeAction => {
@@ -49,6 +50,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 				resultPortLabel: args.node.resultPortLabel,
 				parameters,
 				ui: { position: args.position },
+				properties: args.properties ?? {},
 			},
 		},
 	};
@@ -211,9 +213,44 @@ export const updateNodesPosition = (
 	};
 };
 
+type UpdateNodePropertyAction = {
+	type: "updateNodeProperties";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			property: {
+				key: string;
+				value: unknown;
+			};
+		};
+	};
+};
+
+type UpdateNodePropertyArgs = {
+	node: {
+		id: GiselleNodeId;
+		property: {
+			key: string;
+			value: unknown;
+		};
+	};
+};
+
+export const updateNodeProperty = (
+	args: UpdateNodePropertyArgs,
+): UpdateNodePropertyAction => {
+	return {
+		type: "updateNodeProperties",
+		payload: {
+			node: args.node,
+		},
+	};
+};
+
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
 	| SelectNodeAction
 	| SetPanelTabAction
-	| UpdateNodesPositionAction;
+	| UpdateNodesPositionAction
+	| UpdateNodePropertyAction;
