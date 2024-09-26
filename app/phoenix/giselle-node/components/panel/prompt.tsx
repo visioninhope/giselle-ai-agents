@@ -95,6 +95,16 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	);
 	const handleClick = useCallback(() => {
 		dispatch(
+			updateNodesUI({
+				nodes: outgoingConnections.map((connector) => ({
+					id: connector.target,
+					ui: {
+						isInflluencable: false,
+					},
+				})),
+			}),
+		);
+		dispatch(
 			selectNodeAndSetPanelTab({
 				selectNode: {
 					id: outgoingConnections[0].target,
