@@ -201,6 +201,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 					<div className="flex flex-col gap-[4px]">
 						<div>Debug info</div>
 						<div>id: {props.id}</div>
+						<div>state: {props.state}</div>
 						<div>incoming: {props.incomingConnections?.length ?? 0}</div>
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>

@@ -1,5 +1,7 @@
+import { readStreamableValue } from "ai/rsc";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorObject } from "../connector/types";
+import { textGeneratorParameterNames } from "../giselle-node/blueprints";
 import { createGiselleNodeId } from "../giselle-node/factory";
 import {
 	createObjectParameter,
@@ -9,15 +11,18 @@ import type {
 	ObjectParameter,
 	StringParameter,
 } from "../giselle-node/parameter/types";
-import type {
-	GiselleNode,
-	GiselleNodeBlueprint,
-	GiselleNodeCategory,
-	GiselleNodeId,
-	PanelTab,
-	XYPosition,
+import {
+	type GiselleNode,
+	type GiselleNodeBlueprint,
+	type GiselleNodeCategory,
+	type GiselleNodeId,
+	type GiselleNodeState,
+	type PanelTab,
+	type XYPosition,
+	giselleNodeState,
 } from "../giselle-node/types";
 import type { ThunkAction } from "./context";
+import { streamText } from "./server-actions";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -51,6 +56,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 				parameters,
 				ui: { position: args.position },
 				properties: args.properties ?? {},
+				state: giselleNodeState.idle,
 				output: "",
 			},
 		},
@@ -276,6 +282,92 @@ export const setNodeOutput = (args: SetNodeOutputArgs): SetNodeOutputAction => {
 	};
 };
 
+type UpdateNodeStateAction = {
+	type: "updateNodeState";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			state: GiselleNodeState;
+		};
+	};
+};
+type UpdateNodeStateArgs = {
+	node: {
+		id: GiselleNodeId;
+		state: GiselleNodeState;
+	};
+};
+export const updateNodeState = (
+	args: UpdateNodeStateArgs,
+): UpdateNodeStateAction => {
+	return {
+		type: "updateNodeState",
+		payload: {
+			node: args.node,
+		},
+	};
+};
+
+type GenerateTextArgs = {
+	textGeneratorNode: {
+		id: GiselleNodeId;
+	};
+};
+
+export const generateText =
+	(args: GenerateTextArgs): ThunkAction =>
+	async (dispatch, getState) => {
+		dispatch(
+			setNodeOutput({
+				node: {
+					id: args.textGeneratorNode.id,
+					output: "",
+				},
+			}),
+		);
+		dispatch(
+			updateNodeState({
+				node: {
+					id: args.textGeneratorNode.id,
+					state: giselleNodeState.inProgress,
+				},
+			}),
+		);
+		const state = getState();
+		const instructionConnector = state.graph.connectors.find(
+			(connector) =>
+				connector.target === args.textGeneratorNode.id &&
+				connector.targetHandle === textGeneratorParameterNames.instruction,
+		);
+		const instructionNode = state.graph.nodes.find(
+			(node) => node.id === instructionConnector?.source,
+		);
+
+		const result = await streamText([
+			{
+				role: "user",
+				content: (instructionNode?.output as string) ?? "",
+			},
+		]);
+		for await (const content of readStreamableValue(result)) {
+			dispatch(
+				setNodeOutput({
+					node: {
+						id: args.textGeneratorNode.id,
+						output: content,
+					},
+				}),
+			);
+		}
+		dispatch(
+			updateNodeState({
+				node: {
+					id: args.textGeneratorNode.id,
+					state: giselleNodeState.completed,
+				},
+			}),
+		);
+	};
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
@@ -283,4 +375,5 @@ export type GraphAction =
 	| SetPanelTabAction
 	| UpdateNodePropertyAction
 	| UpdateNodesUIAction
-	| SetNodeOutputAction;
+	| SetNodeOutputAction
+	| UpdateNodeStateAction;

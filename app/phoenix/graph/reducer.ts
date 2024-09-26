@@ -96,6 +96,18 @@ export const graphReducer = (
 					}),
 				},
 			};
+		case "updateNodeState":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) => ({
+						...node,
+						state: action.payload.node.state,
+					})),
+				},
+			};
+
 		case "setNodeOutput":
 			return {
 				...state,

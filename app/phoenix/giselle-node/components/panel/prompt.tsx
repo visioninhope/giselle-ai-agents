@@ -1,4 +1,5 @@
 import {
+	generateText,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
@@ -98,6 +99,13 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 				selectNode: {
 					id: outgoingConnections[0].target,
 					panelTab: panelTabs.result,
+				},
+			}),
+		);
+		dispatch(
+			generateText({
+				textGeneratorNode: {
+					id: outgoingConnections[0].target,
 				},
 			}),
 		);

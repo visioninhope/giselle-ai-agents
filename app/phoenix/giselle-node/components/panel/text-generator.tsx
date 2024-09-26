@@ -1,3 +1,4 @@
+import { Spinner } from "@/app/phoenix/components/spinner";
 import { updateNodeProperty } from "@/app/phoenix/graph/actions";
 import { useGraph } from "@/app/phoenix/graph/context";
 import clsx from "clsx";
@@ -15,6 +16,7 @@ import {
 import {
 	type GiselleNode,
 	giselleNodeCategories,
+	giselleNodeState,
 	panelTabs,
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
@@ -116,6 +118,14 @@ export const TextGeneratorPropertyPanel: FC<
 								</Select>
 							</div>
 						</div>
+					</div>
+				</div>
+			)}
+			{node.ui.panelTab === panelTabs.result && (
+				<div className="px-[24px] pb-[16px] overflow-scroll">
+					<div>
+						{node.state === giselleNodeState.inProgress && <Spinner />}
+						<div>{node.output as string}</div>
 					</div>
 				</div>
 			)}

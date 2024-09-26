@@ -5,7 +5,7 @@ import type { GraphState } from "./types";
 export type ThunkAction = (
 	dispatch: EnhancedDispatch,
 	getState: () => GraphState,
-) => void;
+) => void | Promise<void>;
 export type EnhancedDispatch = (action: GraphAction | ThunkAction) => void;
 export type GraphContext = {
 	state: GraphState;

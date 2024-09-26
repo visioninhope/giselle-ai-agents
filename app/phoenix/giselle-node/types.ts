@@ -36,6 +36,15 @@ export const panelTabs = {
 
 export type PanelTab = (typeof panelTabs)[keyof typeof panelTabs];
 
+export const giselleNodeState = {
+	idle: "idle",
+	inProgress: "inProgress",
+	completed: "completed",
+} as const;
+
+export type GiselleNodeState =
+	(typeof giselleNodeState)[keyof typeof giselleNodeState];
+
 export type GiselleNode = {
 	id: GiselleNodeId;
 	object: "node";
@@ -48,6 +57,7 @@ export type GiselleNode = {
 		panelTab?: PanelTab;
 		isInflluencable?: boolean;
 	};
+	state: GiselleNodeState;
 	resultPortLabel: string;
 	properties: Record<string, unknown>;
 	output: unknown;
