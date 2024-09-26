@@ -23,8 +23,15 @@ export const VerifyEmailForm: FC = () => {
 	);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
-		formRef.current?.requestSubmit();
-	}, []);
+		const formData = new FormData(formRef.current || undefined);
+		verifyAction(formData);
+	}, [verifyAction]);
+	const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+		const formData = new FormData(formRef.current || undefined);
+		verifyAction(formData);
+	};
+
 	return (
 		<div className="grid gap-[8px]">
 			{verifyState && (
@@ -36,7 +43,11 @@ export const VerifyEmailForm: FC = () => {
 					</AlertDescription>
 				</Alert>
 			)}
-			<form className="flex justify-center" action={verifyAction} ref={formRef}>
+			<form
+				className="flex justify-center"
+				onSubmit={handleSubmit}
+				ref={formRef}
+			>
 				<div className="grid gap-4">
 					<InputOTP
 						maxLength={6}
