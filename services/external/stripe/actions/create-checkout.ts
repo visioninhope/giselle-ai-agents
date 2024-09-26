@@ -43,6 +43,9 @@ export const createCheckout = async (userId: UserId, userEmail: string) => {
 					quantity: 1,
 				},
 			],
+			automatic_tax: {
+				enabled: true
+			},
 			customer,
 			customer_update: {
 				address: "auto",
