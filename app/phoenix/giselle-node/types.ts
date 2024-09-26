@@ -2,6 +2,12 @@ import type { Parameter, ParameterBlueprint } from "./parameter/types";
 
 export type GiselleNodeId = `nd_${string}`;
 
+export function assertGiselleNodeId(id: string): asserts id is GiselleNodeId {
+	if (!id.startsWith("nd_")) {
+		throw new Error(`Invalid GiselleNodeId: ${id}`);
+	}
+}
+
 export const giselleNodeCategories = {
 	instruction: "instruction",
 	action: "action",

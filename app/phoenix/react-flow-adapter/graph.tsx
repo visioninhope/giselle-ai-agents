@@ -1,12 +1,21 @@
 import {
+	type Connection,
 	type Edge,
 	type OnSelectionChangeFunc,
 	useOnSelectionChange,
 	useReactFlow,
 } from "@xyflow/react";
 import { useCallback, useEffect } from "react";
-import { type GiselleNodeId, panelTabs } from "../giselle-node/types";
-import { selectNode, selectNodeAndSetPanelTab } from "../graph/actions";
+import {
+	type GiselleNodeId,
+	assertGiselleNodeId,
+	panelTabs,
+} from "../giselle-node/types";
+import {
+	addConnector,
+	selectNode,
+	selectNodeAndSetPanelTab,
+} from "../graph/actions";
 import { useGraph } from "../graph/context";
 import type { Graph } from "../graph/types";
 import {
@@ -81,4 +90,54 @@ export const useGraphToReactFlowEffect = () => {
 	useOnSelectionChange({
 		onChange,
 	});
+};
+
+type GiselleConnection = {
+	source: GiselleNodeId;
+	sourceHandle: string | null;
+	target: GiselleNodeId;
+	targetHandle: string;
+};
+function assertConnection(
+	connection: Connection,
+): asserts connection is GiselleConnection {
+	assertGiselleNodeId(connection.source);
+	assertGiselleNodeId(connection.target);
+}
+
+export const useConnectionHandler = () => {
+	const { state, dispatch } = useGraph();
+
+	const handleConnect = useCallback(
+		(connection: Connection) => {
+			assertConnection(connection);
+			const sourceNode = state.graph.nodes.find(
+				(node) => node.id === connection.source,
+			);
+			const targetNode = state.graph.nodes.find(
+				(node) => node.id === connection.target,
+			);
+			if (sourceNode == null || targetNode == null) {
+				return;
+			}
+			dispatch(
+				addConnector({
+					sourceNode: {
+						id: sourceNode.id,
+						category: sourceNode.category,
+					},
+					targetNode: {
+						id: targetNode.id,
+						handle: connection.targetHandle,
+						category: targetNode?.category,
+					},
+				}),
+			);
+		},
+		[dispatch, state.graph.nodes],
+	);
+
+	return {
+		handleConnect,
+	};
 };

@@ -90,7 +90,7 @@ const SourceParameter: FC<SourceParameterProps> = ({
 						className={clsx(
 							"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
 							category === giselleNodeCategories.action &&
-								"!border-[hsla(195,74%,21%,1)]",
+								"!border-[hsla(195,74%,21%,1)] data-[state=connected]:!bg-[hsla(187,71%,48%,1)]",
 							category === giselleNodeCategories.instruction &&
 								"!border-[hsla(236,7%,39%,1)] data-[state=connected]:!bg-white",
 						)}
@@ -265,7 +265,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 							className={clsx(
 								"rounded-[2px] flex items-center justify-center px-[4px] py-[4px]",
 								selectedNodes[0].category === giselleNodeCategories.action &&
-									" bg-[hsla(187,71%,48%,1)]",
+									"bg-[hsla(187,71%,48%,1)]",
 								selectedNodes[0].category ===
 									giselleNodeCategories.instruction && "bg-white",
 							)}
