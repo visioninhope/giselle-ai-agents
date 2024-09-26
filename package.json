@@ -10,6 +10,7 @@
 	},
 	"packageManager": "bun@1.1.17",
 	"dependencies": {
+		"@ai-sdk/openai": "0.0.62",
 		"@icons-pack/react-simple-icons": "10.0.0",
 		"@mendable/firecrawl-js": "1.2.2",
 		"@next/env": "14.2.5",
