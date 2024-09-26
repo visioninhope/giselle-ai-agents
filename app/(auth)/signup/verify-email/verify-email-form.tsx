@@ -13,12 +13,16 @@ import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState, useCallback, useRef } from "react";
 import { ActionPrompt } from "../../components/action-prompt";
 import { useSignupContext } from "../context";
-import { verifyEmail } from "./verify-email";
+import { resendOtp, verifyEmail } from "./verify-email";
 
 export const VerifyEmailForm: FC = () => {
 	const { state } = useSignupContext();
 	const [verifyState, verifyAction, isVerifyPending] = useActionState(
 		verifyEmail,
+		null,
+	);
+	const [resendState, resendAction, isResendPending] = useActionState(
+		resendOtp,
 		null,
 	);
 	const formRef = useRef<HTMLFormElement>(null);
@@ -31,6 +35,11 @@ export const VerifyEmailForm: FC = () => {
 		const formData = new FormData(formRef.current || undefined);
 		verifyAction(formData);
 	};
+	const handleResend: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+		e.preventDefault();
+		const formData = new FormData(formRef.current || undefined);
+		resendAction(formData);
+	};
 
 	return (
 		<div className="grid gap-[8px]">
@@ -40,6 +49,15 @@ export const VerifyEmailForm: FC = () => {
 					<AlertTitle>Authentication Error</AlertTitle>
 					<AlertDescription>
 						{verifyState.message || "An error occurred. Please try again."}
+					</AlertDescription>
+				</Alert>
+			)}
+			{resendState && (
+				<Alert variant="destructive">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Authentication Error</AlertTitle>
+					<AlertDescription>
+						{resendState.message || "An error occurred. Please try again."}
 					</AlertDescription>
 				</Alert>
 			)}
@@ -72,7 +90,14 @@ export const VerifyEmailForm: FC = () => {
 					<div className="flex justify-center">
 						<ActionPrompt
 							prompt="Didn’t receive a code?"
-							action={<ClickableText>Click to resend</ClickableText>}
+							action={
+								<ClickableText
+									onClick={handleResend}
+									disabled={isResendPending}
+								>
+									Click to resend
+								</ClickableText>
+							}
 						/>
 					</div>
 					<Button className="w-full" type="submit" disabled={isVerifyPending}>

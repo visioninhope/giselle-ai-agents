@@ -39,3 +39,24 @@ export const verifyEmail = async (
 
 	redirect(checkout.url as string);
 };
+
+export const resendOtp = async (
+	prevState: null | AuthError,
+	formData: FormData,
+): Promise<AuthError | null> => {
+	const verificationEmail = formData.get("verificationEmail") as string;
+	const supabase = createClient();
+	const { error } = await supabase.auth.resend({
+		type: "signup",
+		email: verificationEmail,
+	});
+	if (error != null) {
+		return {
+			code: error.code,
+			message: error.message,
+			status: error.status,
+			name: error.name,
+		};
+	}
+	return null;
+};
