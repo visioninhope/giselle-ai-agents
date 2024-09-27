@@ -4,8 +4,8 @@ import {
 	setNodeOutput,
 	updateNodeProperty,
 	updateNodesUI,
-} from "@/app/phoenix/graph/actions";
-import { type ThunkAction, useGraph } from "@/app/phoenix/graph/context";
+} from "@/app/beta-proto/graph/actions";
+import { type ThunkAction, useGraph } from "@/app/beta-proto/graph/context";
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { CheckIcon, CirclePlusIcon } from "lucide-react";

@@ -1,6 +1,6 @@
-import { Spinner } from "@/app/phoenix/components/spinner";
-import { updateNodeProperty } from "@/app/phoenix/graph/actions";
-import { useGraph } from "@/app/phoenix/graph/context";
+import { Spinner } from "@/app/beta-proto/components/spinner";
+import { updateNodeProperty } from "@/app/beta-proto/graph/actions";
+import { useGraph } from "@/app/beta-proto/graph/context";
 import clsx from "clsx";
 import type { FC } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
