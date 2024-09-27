@@ -117,6 +117,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 				props.object === "node" &&
 					props.ui.isInflluencable &&
 					"shadow-[0px_0px_16px_0px_hsla(187,_79%,_54%,_0.5)]",
+				props.object === "nodeBlueprint" && "opacity-50",
 			)}
 		>
 			<div
