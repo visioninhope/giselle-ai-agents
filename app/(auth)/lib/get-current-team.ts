@@ -8,7 +8,7 @@ export const getCurrentTeam = async () => {
 	const user = await getUser();
 	const [team] = await db
 		.select({
-			id: teams.dbId,
+			dbId: teams.dbId,
 		})
 		.from(teams)
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
