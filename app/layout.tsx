@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rosart } from "./fonts";
 
@@ -15,6 +16,8 @@ export default function RootLayout({
 }>) {
 	return (
 		<html lang="en">
+			<GoogleTagManager gtmId={process.env.GTM_ID ?? ""} />
+
 			<body className={`${rosart.variable} font-sans`}>
 				<ThemeProvider
 					attribute="class"

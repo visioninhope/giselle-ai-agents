@@ -25,8 +25,13 @@ export const createCheckoutBySupabaseUser = async (user: User) => {
 };
 export const createCheckout = async (userId: UserId, userEmail: string) => {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+	const priceId = process.env.STRIPE_PRICE_ID;
+
 	if (siteUrl == null) {
 		throw new Error("siteUrl is null");
+	}
+	if (priceId == null) {
+		throw new Error("The environment variable STRIPE_PRICE_ID is null.");
 	}
 	const customer = await createOrRetrieveCustomer(userId, userEmail);
 	const checkoutSession: Stripe.Checkout.Session =
@@ -34,10 +39,13 @@ export const createCheckout = async (userId: UserId, userEmail: string) => {
 			mode: "subscription",
 			line_items: [
 				{
-					price: "price_1Pvwvk2MBZMnjD8tWOMzkt4O",
+					price: priceId,
 					quantity: 1,
 				},
 			],
+			automatic_tax: {
+				enabled: true
+			},
 			customer,
 			customer_update: {
 				address: "auto",
