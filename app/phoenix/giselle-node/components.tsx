@@ -129,6 +129,11 @@ export function GiselleNode(props: GiselleNodeProps) {
 						"from-[hsla(0,0%,91%,1)] to-[hsla(0,0%,35%,1)]",
 				)}
 			/>
+			{props.object === "node" && (
+				<div className="absolute text-black-30 font-rosart text-[12px] -translate-y-full left-[8px] -top-[2px]">
+					{props.name}
+				</div>
+			)}
 			<div
 				className={clsx(
 					"py-[12px] rounded-t-[16px]",

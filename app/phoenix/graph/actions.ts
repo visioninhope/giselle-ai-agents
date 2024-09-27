@@ -34,6 +34,7 @@ export type AddNodeAction = {
 type AddNodeArgs = {
 	node: GiselleNodeBlueprint;
 	position: XYPosition;
+	name: string;
 	properties?: Record<string, unknown>;
 };
 
@@ -49,6 +50,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 		payload: {
 			node: {
 				object: "node",
+				name: args.name,
 				category: args.node.category,
 				id: createGiselleNodeId(),
 				archetype: args.node.archetype,
@@ -99,8 +101,8 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 };
 
 type AddNodesAndConnectArgs = {
-	sourceNode: AddNodeArgs;
-	targetNode: AddNodeArgs;
+	sourceNode: Omit<AddNodeArgs, "name">;
+	targetNode: Omit<AddNodeArgs, "name">;
 	connector: {
 		targetParameterName: string;
 	};
@@ -109,9 +111,16 @@ export const addNodesAndConnect = (
 	args: AddNodesAndConnectArgs,
 ): ThunkAction => {
 	return (dispatch, getState) => {
-		const addSourceNode = addNode(args.sourceNode);
+		const currentNodes = getState().graph.nodes;
+		const addSourceNode = addNode({
+			...args.sourceNode,
+			name: `Untitled node - ${currentNodes.length + 1}`,
+		});
 		dispatch(addSourceNode);
-		const addTargetNode = addNode(args.targetNode);
+		const addTargetNode = addNode({
+			...args.targetNode,
+			name: `Untitled node - ${currentNodes.length + 2}`,
+		});
 		dispatch(addTargetNode);
 		dispatch(
 			addConnector({
