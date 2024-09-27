@@ -25,6 +25,7 @@ export const createCheckoutBySupabaseUser = async (user: User) => {
 };
 export const createCheckout = async (userId: UserId, userEmail: string) => {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
 	const priceId = process.env.STRIPE_PRICE_ID;
 
 	if (siteUrl == null) {
@@ -44,14 +45,14 @@ export const createCheckout = async (userId: UserId, userEmail: string) => {
 				},
 			],
 			automatic_tax: {
-				enabled: true
+				enabled: true,
 			},
 			customer,
 			customer_update: {
 				address: "auto",
 			},
 			success_url: `${siteUrl}/agents`,
-			cancel_url: `${siteUrl}/pricing`,
+			cancel_url: `${serviceSiteUrl}/pricing`,
 		});
 	if (checkoutSession.url == null) {
 		throw new Error("checkoutSession.url is null");
