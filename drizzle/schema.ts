@@ -119,6 +119,9 @@ export const teamMemberships = pgTable(
 export const agents = pgTable("agents", {
 	id: text("id").$type<AgentId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
+	teamDbId: integer("team_db_id")
+		.notNull()
+		.references(() => teams.dbId, { onDelete: "cascade" }),
 	name: text("name"),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()
