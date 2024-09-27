@@ -27,9 +27,8 @@ export const VerifyEmailForm: FC = () => {
 	);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
-		const formData = new FormData(formRef.current || undefined);
-		verifyAction(formData);
-	}, [verifyAction]);
+		formRef.current?.requestSubmit();
+	}, []);
 	const handleResend: React.MouseEventHandler<HTMLButtonElement> = (e) => {
 		e.preventDefault();
 		const formData = new FormData(formRef.current || undefined);
