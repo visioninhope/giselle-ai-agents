@@ -98,3 +98,9 @@
 - - :approve
   - "@img/sharp-libvips-win32-x64"
   - *3
+- - :approve
+  - mdn-data
+  - :who:
+    :why: Not conflicting with Apache-2.0. And added to NOTICE.md
+    :versions: []
+    :when: 2024-09-27 04:12:38.962251000 Z
