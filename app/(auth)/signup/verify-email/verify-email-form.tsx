@@ -13,27 +13,58 @@ import { TriangleAlertIcon } from "lucide-react";
 import { type FC, useActionState, useCallback, useRef } from "react";
 import { ActionPrompt } from "../../components/action-prompt";
 import { useSignupContext } from "../context";
-import { verifyEmail } from "./verify-email";
+import { resendOtp, verifyEmail } from "./verify-email";
 
 export const VerifyEmailForm: FC = () => {
 	const { state } = useSignupContext();
-	const [authError, action, isPending] = useActionState(verifyEmail, null);
+	const [verifyState, verifyAction, isVerifyPending] = useActionState(
+		verifyEmail,
+		null,
+	);
+	const [resendState, resendAction, isResendPending] = useActionState(
+		resendOtp,
+		null,
+	);
 	const formRef = useRef<HTMLFormElement>(null);
 	const handleComplete = useCallback(() => {
 		formRef.current?.requestSubmit();
 	}, []);
+	const handleResend: React.MouseEventHandler<HTMLButtonElement> = (e) => {
+		e.preventDefault();
+		const formData = new FormData(formRef.current || undefined);
+		resendAction(formData);
+	};
+
 	return (
 		<div className="grid gap-[8px]">
-			{authError && (
+			{verifyState && (
 				<Alert variant="destructive">
 					<TriangleAlertIcon className="w-4 h-4" />
 					<AlertTitle>Authentication Error</AlertTitle>
 					<AlertDescription>
-						{authError.message || "An error occurred. Please try again."}
+						{verifyState.message || "An error occurred. Please try again."}
 					</AlertDescription>
 				</Alert>
 			)}
-			<form className="flex justify-center" action={action} ref={formRef}>
+			{resendState && resendState.code !== "success" && (
+				<Alert variant="destructive">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Authentication Error</AlertTitle>
+					<AlertDescription>
+						{resendState.message || "An error occurred. Please try again."}
+					</AlertDescription>
+				</Alert>
+			)}
+			{resendState && resendState.code === "success" && (
+				<Alert variant="primary">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Success</AlertTitle>
+					<AlertDescription>
+						{resendState.message || "Resend completed!"}
+					</AlertDescription>
+				</Alert>
+			)}
+			<form className="flex justify-center" action={verifyAction} ref={formRef}>
 				<div className="grid gap-4">
 					<InputOTP
 						maxLength={6}
@@ -58,10 +89,17 @@ export const VerifyEmailForm: FC = () => {
 					<div className="flex justify-center">
 						<ActionPrompt
 							prompt="Didn’t receive a code?"
-							action={<ClickableText>Click to resend</ClickableText>}
+							action={
+								<ClickableText
+									onClick={handleResend}
+									disabled={isResendPending}
+								>
+									Click to resend
+								</ClickableText>
+							}
 						/>
 					</div>
-					<Button className="w-full" type="submit" disabled={isPending}>
+					<Button className="w-full" type="submit" disabled={isVerifyPending}>
 						Verify
 					</Button>
 				</div>
