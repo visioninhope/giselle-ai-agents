@@ -40,30 +40,6 @@ export const Toolbar: FC = () => (
 	<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 		<GradientBorder />
 		<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
-			<div className="flex justify-center items-center z-10 h-full px-[16px]">
-				<Popover>
-					<PopoverTrigger asChild>
-						<button
-							type="button"
-							className="flex items-center justify-center w-[32px]"
-						>
-							<MousePointer2Icon size={24} strokeWidth={1} />
-						</button>
-					</PopoverTrigger>
-					<PopoverContent sideOffset={24}>
-						<div className="grid">
-							<ListItem
-								leftIcon={<MousePointer2Icon size={16} strokeWidth={1} />}
-								title="Move"
-							/>
-							<ListItem
-								leftIcon={<HandIcon size={16} strokeWidth={1} />}
-								title="Hand"
-							/>
-						</div>
-					</PopoverContent>
-				</Popover>
-			</div>
 			<div className="flex items-center px-2 z-10 h-full">
 				<div className="flex gap-[4px]">
 					<Popover>
