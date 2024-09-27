@@ -31,6 +31,11 @@ export const createCheckout = async (userId: UserId, userEmail: string) => {
 	if (siteUrl == null) {
 		throw new Error("siteUrl is null");
 	}
+	if (serviceSiteUrl == null) {
+		throw new Error(
+			"The environment variable NEXT_PUBLIC_SERVICE_SITE_URL  is null",
+		);
+	}
 	if (priceId == null) {
 		throw new Error("The environment variable STRIPE_PRICE_ID is null.");
 	}
