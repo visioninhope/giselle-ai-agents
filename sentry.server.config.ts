@@ -15,4 +15,6 @@ Sentry.init({
 
 	// Uncomment the line below to enable Spotlight (https://spotlightjs.com)
 	// spotlight: process.env.NODE_ENV === 'development',
+
+	enabled: process.env.NEXT_PUBLIC_VERCEL_ENV !== undefined,
 });

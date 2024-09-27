@@ -85,6 +85,7 @@
     --black_80: 218 58% 21%;
     --black_70: 222 21% 40%;
     --black_50: 222 21% 40%;
+    --black_40: 207 12% 57%;
     --black_30: 207 19% 77%;
     --black_-30: 192 73% 84%;
     --black_-50: 210 58% 71%;
@@ -95,10 +96,9 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  body {
-    @apply bg-background text-foreground;
-  }
+    .mask-fill {
+        -webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0); /* 2つのマスクレイヤー */
+        -webkit-mask-clip: padding-box, border-box; /* レイヤーごとの描画領域の範囲 */
+        -webkit-mask-composite: destination-out; /* レイヤーが重なっていない領域を描画対象 */
+    }
 }
