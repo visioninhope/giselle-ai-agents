@@ -1,6 +1,6 @@
-import { Spinner } from "@/app/phoenix/components/spinner";
-import { updateNodeProperty } from "@/app/phoenix/graph/actions";
-import { useGraph } from "@/app/phoenix/graph/context";
+import { Spinner } from "@/app/beta-proto/components/spinner";
+import { updateNodeProperty } from "@/app/beta-proto/graph/actions";
+import { useGraph } from "@/app/beta-proto/graph/context";
 import clsx from "clsx";
 import type { FC } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
@@ -36,8 +36,6 @@ export const TextGeneratorPropertyPanel: FC<
 					<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
 				</button>
 				<div className="gap-[16px] flex items-center">
-					<TabTrigger value="property">Property</TabTrigger>
-					<TabTrigger value="status">Status</TabTrigger>
 					<TabTrigger value="result">Result</TabTrigger>
 				</div>
 			</div>
@@ -62,7 +60,7 @@ export const TextGeneratorPropertyPanel: FC<
 				</div>
 			</div>
 
-			{node.ui.panelTab === panelTabs.property && (
+			{/** node.ui.panelTab === panelTabs.property && (
 				<div className="px-[24px] pb-[16px] overflow-scroll">
 					<div>
 						<div className="relative z-10">
@@ -120,7 +118,7 @@ export const TextGeneratorPropertyPanel: FC<
 						</div>
 					</div>
 				</div>
-			)}
+			) */}
 			{node.ui.panelTab === panelTabs.result && (
 				<div className="px-[24px] pb-[16px] overflow-scroll">
 					<div>

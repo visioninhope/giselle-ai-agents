@@ -4,9 +4,11 @@ import {
 	setNodeOutput,
 	updateNodeProperty,
 	updateNodesUI,
-} from "@/app/phoenix/graph/actions";
-import { type ThunkAction, useGraph } from "@/app/phoenix/graph/context";
+} from "@/app/beta-proto/graph/actions";
+import { type ThunkAction, useGraph } from "@/app/beta-proto/graph/context";
+import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
+import { CheckIcon, CirclePlusIcon } from "lucide-react";
 import { type FC, useCallback, useMemo, useState } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
@@ -128,8 +130,6 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 				</button>
 				<div className="gap-[16px] flex items-center">
 					<TabTrigger value="property">Property</TabTrigger>
-					<TabTrigger value="status">Status</TabTrigger>
-					<TabTrigger value="result">Result</TabTrigger>
 				</div>
 			</div>
 			<div className="bg-black-80 px-[24px] flex items-center justify-between  h-[48px]">
@@ -166,15 +166,15 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			</div>
 
 			{node.ui.panelTab === panelTabs.property && (
-				<div className="px-[24px] pb-[16px] overflow-scroll">
+				<div className="px-[24px] pb-[16px] overflow-y-auto">
 					<div>
-						<div className="relative z-10">
-							<div className="grid gap-[8px]">
+						<div className="relative z-10 flex flex-col gap-[10px]">
+							<div className="grid gap-[8px] pb-[14px]">
 								<label
 									htmlFor="text"
 									className="font-rosart text-[16px] text-black-30"
 								>
-									Text
+									Instruction
 								</label>
 								<textarea
 									name="text"
@@ -187,6 +187,55 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 									}}
 								/>
 							</div>
+
+							{/**
+							<div className="border-t -mx-[24px] border-[hsla(222,21%,40%,1)]" />
+							<div className="grid gap-[8px]">
+								<div className="flex justify-between">
+									<div className="font-rosart text-[16px] text-black-30">
+										Sources
+									</div>
+									<Popover.Root>
+										<Popover.Trigger asChild>
+											<button type="button">
+												<CirclePlusIcon
+													size={20}
+													className="stroke-black-100 fill-black-30"
+												/>
+											</button>
+										</Popover.Trigger>
+										<Popover.Content
+											side={"top"}
+											align="end"
+											className="rounded-[16px] p-[8px] text-[14px] w-[200px] text-black-30 bg-black-100 border border-[hsla(222,21%,40%,1)] shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+											sideOffset={5}
+										>
+											<div className="px-[8px]">
+												<div>
+													<label className="flex justify-between items-center py-[4px] cursor-pointer">
+														Text generator 001
+														<input type="checkbox" className="peer hidden" />
+														<CheckIcon
+															size={16}
+															className="stroke-white hidden peer-checked:block"
+														/>
+													</label>
+
+													<label className="flex justify-between items-center py-[4px] cursor-pointer">
+														Text generator 002
+														<input type="checkbox" className="peer hidden" />
+														<CheckIcon
+															size={16}
+															className="stroke-white hidden peer-checked:block"
+														/>
+													</label>
+												</div>
+											</div>
+										</Popover.Content>
+									</Popover.Root>
+								</div>
+							</div>
+						 */}
 						</div>
 					</div>
 				</div>

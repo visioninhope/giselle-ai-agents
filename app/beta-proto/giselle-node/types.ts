@@ -48,6 +48,7 @@ export type GiselleNodeState =
 export type GiselleNode = {
 	id: GiselleNodeId;
 	object: "node";
+	name: string;
 	category: GiselleNodeCategory;
 	archetype: string;
 	parameters?: Parameter;

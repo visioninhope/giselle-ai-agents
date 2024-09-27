@@ -6,7 +6,6 @@ import {
 import { giselleNodeCategories } from "./types";
 
 export const textGeneratorParameterNames = {
-	input: "input",
 	instruction: "instruction",
 };
 export const textGeneratorBlueprint = createGiselleNodeBlueprint({
@@ -16,10 +15,6 @@ export const textGeneratorBlueprint = createGiselleNodeBlueprint({
 	parameters: createObjectParameterBlueprint({
 		type: "object",
 		properties: {
-			[textGeneratorParameterNames.input]: createStringParameterBlueprint({
-				type: "string",
-				label: "Input",
-			}),
 			[textGeneratorParameterNames.instruction]: createStringParameterBlueprint(
 				{
 					type: "string",
