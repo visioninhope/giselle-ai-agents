@@ -132,7 +132,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 					<TabTrigger value="result">Result</TabTrigger>
 				</div>
 			</div>
-			<div className="bg-black-80 px-[24px] py-[8px] flex items-center justify-between">
+			<div className="bg-black-80 px-[24px] flex items-center justify-between  h-[48px]">
 				<div className="flex items-center gap-[8px]">
 					<div
 						className={clsx(
@@ -152,7 +152,6 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 					</div>
 				</div>
 				<div className="">
-					<div className="absolute rounded-[8px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 					<button
 						type="button"
 						className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"

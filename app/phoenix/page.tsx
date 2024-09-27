@@ -174,10 +174,7 @@ function Inner() {
 				<Panel position={"bottom-center"}>
 					<Toolbar />
 				</Panel>
-				<Panel
-					position="top-right"
-					className="!top-[80px] !bottom-[20px] !right-[20px]"
-				>
+				<Panel position="top-right" className="!top-0 !bottom-0 !right-0 !m-0">
 					<GiselleNodeInformationPanel />
 				</Panel>
 			</ReactFlow>

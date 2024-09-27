@@ -221,7 +221,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 		[state.graph.nodes],
 	);
 	return (
-		<div className="bg-black-100 w-[380px] rounded-[16px] h-full overflow-hidden relative shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]">
+		<div className="absolute bg-black-100 w-[380px] rounded-[16px] overflow-hidden shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)] top-[80px] bottom-[20px] right-[20px]">
 			<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 
 			{selectedNodes.length > 1 ? (

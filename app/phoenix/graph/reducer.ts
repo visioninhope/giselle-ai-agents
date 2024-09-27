@@ -103,7 +103,10 @@ export const graphReducer = (
 					...state.graph,
 					nodes: state.graph.nodes.map((node) => ({
 						...node,
-						state: action.payload.node.state,
+						state:
+							node.id === action.payload.node.id
+								? action.payload.node.state
+								: node.state,
 					})),
 				},
 			};
