@@ -3,6 +3,7 @@ import "@xyflow/react/dist/style.css";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import type { AgentId } from "@/services/agents";
 import { Playground, resolveOptions } from "@/services/agents/playground";
+import { notFound } from "next/navigation";
 
 export default async function AgentPlaygroundPage({
 	params,
@@ -15,11 +16,7 @@ export default async function AgentPlaygroundPage({
 	const teamMembership = await getTeamMembershipByAgentId(agentId);
 
 	if (!teamMembership) {
-		return (
-			<div className="pt-10 flex justify-center items-center font-rosart text-3xl">
-				404 Not found
-			</div>
-		);
+		notFound();
 	}
 
 	return (
