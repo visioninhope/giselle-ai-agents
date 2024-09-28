@@ -17,14 +17,25 @@ export default function Page() {
 						<br />
 						with Email.
 					</PageTitle>
+					{/* @todo Hide at the time of beta release.
 					<p className="mt-2 text-sm text-black-50">
 						Free forever. No credit card required.
 					</p>
+					*/}
 				</div>
 				<SignupForm />
 				<LegalConsent />
 
 				<div className="flex justify-center">
+					<ActionPrompt
+						prompt="Already have an account?"
+						action={
+							<ClickableText asChild>
+								<Link href="/login">Log in</Link>
+							</ClickableText>
+						}
+					/>
+					{/* @todo Hide at the time of beta release.
 					<ActionPrompt
 						prompt="Get started for free by"
 						action={
@@ -33,6 +44,7 @@ export default function Page() {
 							</ClickableText>
 						}
 					/>
+					*/}
 				</div>
 			</div>
 		</div>
