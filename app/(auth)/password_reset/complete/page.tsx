@@ -9,7 +9,7 @@ export default function CompleteResetPasswordPage() {
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<PageHeader
 						title="Reset Password"
-						description="Your  password have been successfully reset."
+						description="Your password has been successfully reset."
 					/>
 					<Button asChild>
 						<Link href="/agents">Continue</Link>
