@@ -17,6 +17,15 @@ const nextConfig = {
 		},
 	},
 	serverExternalPackages: ["@opentelemetry/sdk-node"],
+	async redirects() {
+		return [
+			{
+				source: "/signup",
+				destination: "/signup/email",
+				permanent: false,
+			},
+		];
+	},
 };
 
 export default withSentryConfig(nextConfig, {
