@@ -19,7 +19,7 @@ export default function ResetPasswordPage() {
 							}
 							action={
 								<ClickableText asChild>
-									<Link href="/login">Back to Login</Link>
+									<Link href="/login">Back to sign in</Link>
 								</ClickableText>
 							}
 						/>
