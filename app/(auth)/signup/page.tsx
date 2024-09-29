@@ -50,7 +50,7 @@ export default function SignupPage() {
 						prompt="Already have an account?"
 						action={
 							<ClickableText asChild>
-								<Link href="/login">Log in</Link>
+								<Link href="/login">Sign in</Link>
 							</ClickableText>
 						}
 					/>

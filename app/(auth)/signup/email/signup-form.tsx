@@ -24,7 +24,7 @@ export const SignupForm: FC = () => {
 	return (
 		<form action={action}>
 			<Form
-				submitText="Create an account"
+				submitText="Create account"
 				authError={authError}
 				isPending={isPending}
 			/>
