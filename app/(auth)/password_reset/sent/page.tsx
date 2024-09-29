@@ -20,7 +20,7 @@ export default function SentPasswordResetMailPage() {
 							}
 							action={
 								<ClickableText asChild>
-									<Link href="/login">Back to sign in</Link>
+									<Link href="/login">Back to log in</Link>
 								</ClickableText>
 							}
 						/>

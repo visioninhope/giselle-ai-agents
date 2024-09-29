@@ -29,7 +29,7 @@ export default function Page() {
 						prompt="Already have an account?"
 						action={
 							<ClickableText asChild>
-								<Link href="/login">Sign in</Link>
+								<Link href="/login">Log in</Link>
 							</ClickableText>
 						}
 					/>

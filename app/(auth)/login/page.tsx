@@ -14,7 +14,7 @@ export default function Page() {
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
-					<PageTitle>Sign in to Giselle</PageTitle>
+					<PageTitle>Log in to Giselle</PageTitle>
 					<div className="grid gap-[16px]">
 						{/**
 						@todo Hide at the time of beta release.

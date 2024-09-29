@@ -10,7 +10,7 @@ export const LoginForm: FC = () => {
 		<form action={action}>
 			<Form
 				linkToResetPassword={true}
-				submitText="Sign in"
+				submitText="Log in"
 				authError={authError}
 				isPending={isPending}
 			/>
