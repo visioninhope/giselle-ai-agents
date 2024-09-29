@@ -13,9 +13,7 @@ export default function Page() {
 			<div className="w-[320px] space-y-8">
 				<div className="text-center">
 					<PageTitle>
-						Create new account
-						<br />
-						with Email.
+						Sign up
 					</PageTitle>
 					{/* @todo Hide at the time of beta release.
 					<p className="mt-2 text-sm text-black-50">

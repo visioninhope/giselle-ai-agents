@@ -61,7 +61,7 @@ export const resendOtp = async (
 	return {
 		code: "success",
 		status: 200,
-		message: "Resent a one-time password to your email address.",
+		message: "A new confirmation code has been sent to your email address.",
 		name: "Success",
 	};
 };

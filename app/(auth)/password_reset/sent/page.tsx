@@ -10,7 +10,7 @@ export default function SentPasswordResetMailPage() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<PageHeader
-						title="Check your Email"
+						title="Check your email"
 						description="We have sent you an email with a link to reset your password. If you don't see the email, check other places it might be, like your junk, spam, social, or other folders."
 					/>
 					<div className="flex justify-center">
@@ -20,7 +20,7 @@ export default function SentPasswordResetMailPage() {
 							}
 							action={
 								<ClickableText asChild>
-									<Link href="/login">Back to Login</Link>
+									<Link href="/login">Back to log in</Link>
 								</ClickableText>
 							}
 						/>
