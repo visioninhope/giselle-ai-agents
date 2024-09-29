@@ -27,12 +27,12 @@ export const Form: FC = () => {
 				)}
 				<Field
 					type="email"
-					label="Enter your user account's verified email address and we will send you a password reset link."
+					label="Enter your account's email address and we will send you a password reset link."
 					name="email"
 					ignore1password
 				/>
 				<Button type="submit" disabled={isPending}>
-					Verify
+					Reset password
 				</Button>
 			</div>
 		</form>
