@@ -8,7 +8,7 @@ export default function CompleteResetPasswordPage() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<PageHeader
-						title="Reset Password"
+						title="Set new password"
 						description="Your password has been successfully reset."
 					/>
 					<Button asChild>

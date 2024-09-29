@@ -24,7 +24,7 @@ export const Form: FC = () => {
 				)}
 				<Field type="password" label="New password" name="new_password" />
 				<Button type="submit" disabled={isPending}>
-					Verify
+					Confirm
 				</Button>
 			</div>
 		</form>
