@@ -19,7 +19,7 @@ export const Nav: FC = () => {
 							: ""}
 			</p>
 			<p>/</p>
-			{pathname !== "/" && <Link href="/">Lobby</Link>}
+			{/** pathname !== "/" && <Link href="/">Lobby</Link> */}
 			{!pathname.startsWith("/agents") && <Link href="/agents">Agents</Link>}
 			{!pathname.startsWith("/settings") && (
 				<Link href="/settings/account">Settings</Link>
