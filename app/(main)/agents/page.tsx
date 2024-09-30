@@ -22,11 +22,7 @@ async function AgentList(props: AgentListProps) {
 	return (
 		<div className="flex flex-col gap-2">
 			{agents.map(({ id, name }) => (
-				<a
-					key={id}
-					className="flex border border-border p-4"
-					href={`/agents/${id}`}
-				>
+				<a key={id} className="flex border border-border p-4" href={`/p/${id}`}>
 					{name ?? id}
 				</a>
 			))}
@@ -38,7 +34,7 @@ export default async function AgentListPage() {
 	async function createAgentAction() {
 		"use server";
 		const agent = await createAgent({ userId: user.id });
-		redirect(`/agents/${agent.id}`);
+		redirect(`/p/${agent.id}`);
 	}
 	return (
 		<div className="container mt-8">
