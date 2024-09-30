@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rosart } from "./fonts";
 
 export const metadata: Metadata = {
-	title: "un-name",
+	title: "Giselle",
 };
 
 export default function RootLayout({
