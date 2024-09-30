@@ -1,18 +1,7 @@
-import { Spinner } from "@/app/beta-proto/components/spinner";
-import { updateNodeProperty } from "@/app/beta-proto/graph/actions";
-import { useGraph } from "@/app/beta-proto/graph/context";
 import clsx from "clsx";
 import type { FC } from "react";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
-import {
-	Select,
-	SelectContent,
-	SelectGroup,
-	SelectItem,
-	SelectLabel,
-	SelectTrigger,
-	SelectValue,
-} from "../../../components/select";
+import { Spinner } from "../../../components/spinner";
 import {
 	type GiselleNode,
 	giselleNodeCategories,
@@ -28,7 +17,6 @@ type TextGeneratorPropertyPanelProps = {
 export const TextGeneratorPropertyPanel: FC<
 	TextGeneratorPropertyPanelProps
 > = ({ node }) => {
-	const { dispatch } = useGraph();
 	return (
 		<div className="flex gap-[10px] flex-col h-full">
 			<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">

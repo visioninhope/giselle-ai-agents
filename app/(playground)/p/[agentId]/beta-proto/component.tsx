@@ -184,7 +184,7 @@ function Inner() {
 	);
 }
 
-export default function Page() {
+export function Playground() {
 	return (
 		<ReactFlowProvider>
 			<MousePositionProvider>
