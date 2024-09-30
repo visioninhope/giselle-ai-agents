@@ -1,16 +1,14 @@
+import clsx from "clsx";
+import { type FC, useCallback, useMemo, useState } from "react";
+import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
 	generateText,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
 	updateNodesUI,
-} from "@/app/beta-proto/graph/actions";
-import { type ThunkAction, useGraph } from "@/app/beta-proto/graph/context";
-import * as Popover from "@radix-ui/react-popover";
-import clsx from "clsx";
-import { CheckIcon, CirclePlusIcon } from "lucide-react";
-import { type FC, useCallback, useMemo, useState } from "react";
-import { PanelCloseIcon } from "../../../components/icons/panel-close";
+} from "../../../graph/actions";
+import { type ThunkAction, useGraph } from "../../../graph/context";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
