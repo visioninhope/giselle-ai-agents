@@ -35,9 +35,8 @@ export const verifyEmail = async (
 	}
 
 	const user = await initializeAccount(supabaseData.user.id);
-	const checkout = await createCheckout(user.id, verificationEmail);
 
-	redirect(checkout.url as string);
+	redirect("/");
 };
 
 export const resendOtp = async (

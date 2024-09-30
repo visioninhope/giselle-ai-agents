@@ -24,6 +24,11 @@ const nextConfig = {
 				destination: "/signup/email",
 				permanent: false,
 			},
+			{
+				source: "/",
+				destination: "/agents",
+				permanent: false,
+			},
 		];
 	},
 };
