@@ -20,7 +20,6 @@ export const GET = async () => {
 			supabaseUserMappings,
 			eq(supabaseUserMappings.userDbId, users.dbId),
 		)
-		.innerJoin(stripeUserMappings, eq(stripeUserMappings.userDbId, users.dbId))
 		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 	if (user == null) {
 		throw new Error("No user found");
