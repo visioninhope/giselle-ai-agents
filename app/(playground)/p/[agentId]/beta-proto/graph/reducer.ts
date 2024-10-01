@@ -127,6 +127,14 @@ export const graphReducer = (
 					),
 				},
 			};
+		case "addArtifact":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					artifacts: [...state.graph.artifacts, action.payload.artifact],
+				},
+			};
 		default:
 			return state;
 	}

@@ -1,16 +1,11 @@
 import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
-import type { GiselleNode, GiselleNodeId } from "../giselle-node/types";
-
-export type ArtifactAndMetadata = Artifact & {
-	authorNodeId: GiselleNodeId;
-	materialNodeIds: GiselleNodeId[];
-};
+import type { GiselleNode } from "../giselle-node/types";
 
 export type Graph = {
 	nodes: GiselleNode[];
 	connectors: ConnectorObject[];
-	artifacts: ArtifactAndMetadata[];
+	artifacts: Artifact[];
 };
 
 export type GraphState = {

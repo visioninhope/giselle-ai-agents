@@ -26,9 +26,9 @@ import {
 	type XYPosition,
 	giselleNodeState,
 } from "../giselle-node/types";
+import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { ThunkAction } from "./context";
 import { generateObjectStream } from "./server-actions";
-import type { ArtifactAndMetadata } from "./types";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -350,13 +350,11 @@ export const updateNodeState = (
 
 type AddArtifactAction = {
 	type: "addArtifact";
-	payload: {
-		artifact: ArtifactAndMetadata;
-	};
+	payload: AddArtifactArgs;
 };
 
 type AddArtifactArgs = {
-	artifact: ArtifactAndMetadata;
+	artifact: Artifact;
 };
 
 export const addArtifact = (args: AddArtifactArgs): AddArtifactAction => {
@@ -400,33 +398,36 @@ export const generateText =
 		const instructionNode = state.graph.nodes.find(
 			(node) => node.id === instructionConnector?.source,
 		);
+		if (instructionNode === undefined) {
+			/** @todo error handling  */
+			throw new Error("Instruction node not found");
+		}
 
 		const { object } = await generateObjectStream(
-			instructionNode?.output as string,
+			instructionNode.output as string,
 		);
-		let artifact: Artifact = {
-			title: "",
-			content: "",
-			completed: false,
-		};
-		for await (const content of readStreamableValue(object)) {
+		let content: PartialGeneratedObject = {};
+		for await (const streamContent of readStreamableValue(object)) {
 			dispatch(
 				setTextGenerationNodeOutput({
 					node: {
 						id: args.textGeneratorNode.id,
 						output:
-							content as PartialGeneratedObject /** @todo type assertion */,
+							streamContent as PartialGeneratedObject /** @todo type assertion */,
 					},
 				}),
 			);
-			artifact = content.artifact;
+			content = streamContent as PartialGeneratedObject;
 		}
+
 		dispatch(
 			addArtifact({
 				artifact: {
-					...artifact,
-					authorNodeId: args.textGeneratorNode.id,
-					materialNodeIds: [],
+					type: "artifact",
+					title: content?.artifact?.title ?? "",
+					content: content?.artifact?.content ?? "",
+					generatedNodeId: args.textGeneratorNode.id,
+					elements: [giselleNodeToGiselleNodeArtifactElement(instructionNode)],
 				},
 			}),
 		);

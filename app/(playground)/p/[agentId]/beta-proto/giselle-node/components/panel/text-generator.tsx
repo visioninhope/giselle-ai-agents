@@ -109,7 +109,7 @@ export const TextGeneratorPropertyPanel: FC<
 				</div>
 			) */}
 			{node.ui.panelTab === panelTabs.result && (
-				<div className="px-[24px] pb-[16px] overflow-scroll text-black-30 font-rosart text-[12px]">
+				<div className="px-[24px] pb-[16px] overflow-y-auto overflow-x-hidden text-black-30 font-rosart text-[12px]">
 					<div className="flex flex-col gap-[8px]">
 						{node.state === giselleNodeState.inProgress && <Spinner />}
 						<div>{(node.output as PartialGeneratedObject).thinking}</div>
