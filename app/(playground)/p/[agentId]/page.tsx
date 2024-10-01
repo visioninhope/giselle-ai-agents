@@ -1,9 +1,16 @@
 import "@xyflow/react/dist/style.css";
 
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
-import type { AgentId } from "@/services/agents";
+import { agents, db } from "@/drizzle";
+import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Playground } from "./beta-proto/component";
+import type { AgentId } from "./beta-proto/types";
+
+async function getAgent(agentId: AgentId) {
+	const [agent] = await db.select().from(agents).where(eq(agents.id, agentId));
+	return agent;
+}
 
 export default async function AgentPlaygroundPage({
 	params,
@@ -18,5 +25,7 @@ export default async function AgentPlaygroundPage({
 		notFound();
 	}
 
-	return <Playground />;
+	const agent = await getAgent(agentId);
+
+	return <Playground agentId={agentId} graph={agent.graphv2} />;
 }

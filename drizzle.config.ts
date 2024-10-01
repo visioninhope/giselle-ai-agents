@@ -6,6 +6,7 @@ loadEnvConfig(projectDir);
 
 export default defineConfig({
 	schema: "./drizzle/schema.ts",
+	out: "./migrations",
 	dialect: "postgresql",
 	dbCredentials: {
 		// biome-ignore lint/style/noNonNullAssertion: <explanation>

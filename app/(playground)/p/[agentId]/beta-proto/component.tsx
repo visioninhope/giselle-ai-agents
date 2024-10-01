@@ -34,6 +34,7 @@ import {
 } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
+import type { Graph } from "./graph/types";
 import {
 	type ReactFlowNode,
 	edgeTypes,
@@ -48,6 +49,7 @@ import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
+import type { AgentId } from "./types";
 
 function Inner() {
 	const [previewMode, setPreviewMode] = useState(false);
@@ -184,12 +186,16 @@ function Inner() {
 	);
 }
 
-export function Playground() {
+type PlaygroundProps = {
+	agentId: AgentId;
+	graph: Graph;
+};
+export function Playground(props: PlaygroundProps) {
 	return (
 		<ReactFlowProvider>
 			<MousePositionProvider>
 				<ToolProvider>
-					<GraphProvider>
+					<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
 						<GradientPathDefinitions />
 						<Inner />
 					</GraphProvider>

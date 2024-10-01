@@ -1,3 +1,4 @@
+import type { Graph } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import type {
 	FileId,
 	KnowledgeContentId,
@@ -123,17 +124,17 @@ export const agents = pgTable("agents", {
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
 	name: text("name"),
+	graphv2: jsonb("graphv2").$type<Graph>().notNull().default({
+		nodes: [],
+		connectors: [],
+	}),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()
 		.notNull()
 		.default({
 			nodes: [],
 			edges: [],
-			viewport: {
-				x: 0,
-				y: 0,
-				zoom: 1,
-			},
+			viewport: { x: 0, y: 0, zoom: 1 },
 		}),
 	graphHash: text("graph_hash").unique(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
