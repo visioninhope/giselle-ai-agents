@@ -1,5 +1,5 @@
 {
-  "id": "9f5b8dd0-715c-42a1-8a2c-c4d7349a7a19",
+  "id": "85d819e5-d988-4dd1-be31-d3629f9291c7",
   "prevId": "17d927b6-3557-489f-b445-2625f36b6d32",
   "version": "7",
   "dialect": "postgresql",
@@ -32,12 +32,19 @@
           "primaryKey": false,
           "notNull": false
         },
+        "graphv2": {
+          "name": "graphv2",
+          "type": "jsonb",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'{\"nodes\":[],\"connectors\":[]}'::jsonb"
+        },
         "graph": {
           "name": "graph",
           "type": "jsonb",
           "primaryKey": false,
           "notNull": true,
-          "default": "'{\"nodes\":[],\"connectors\":[]}'::jsonb"
+          "default": "'{\"nodes\":[],\"edges\":[],\"viewport\":{\"x\":0,\"y\":0,\"zoom\":1}}'::jsonb"
         },
         "graph_hash": {
           "name": "graph_hash",

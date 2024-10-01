@@ -27,5 +27,5 @@ export default async function AgentPlaygroundPage({
 
 	const agent = await getAgent(agentId);
 
-	return <Playground agentId={agentId} graph={agent.graph} />;
+	return <Playground agentId={agentId} graph={agent.graphv2} />;
 }

@@ -37,6 +37,6 @@ export async function streamText(messages: CoreMessage[]) {
 export async function setGraphToDb(agentId: AgentId, graph: Graph) {
 	await db
 		.update(agents)
-		.set({ graph, graphHash: createId() })
+		.set({ graphv2: graph, graphHash: createId() })
 		.where(eq(agents.id, agentId));
 }
