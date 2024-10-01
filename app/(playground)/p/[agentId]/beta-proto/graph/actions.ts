@@ -1,4 +1,9 @@
 import { readStreamableValue } from "ai/rsc";
+import type { Artifact } from "../artifact/types";
+import type {
+	GeneratedObject,
+	PartialGeneratedObject,
+} from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorObject } from "../connector/types";
 import { textGeneratorParameterNames } from "../giselle-node/blueprints";
@@ -22,7 +27,8 @@ import {
 	giselleNodeState,
 } from "../giselle-node/types";
 import type { ThunkAction } from "./context";
-import { streamText } from "./server-actions";
+import { generateObjectStream } from "./server-actions";
+import type { ArtifactAndMetadata } from "./types";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -291,6 +297,31 @@ export const setNodeOutput = (args: SetNodeOutputArgs): SetNodeOutputAction => {
 	};
 };
 
+type SetTextGenerationNodeOutputAction = {
+	type: "setTextGenerationNodeOutput";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			output: PartialGeneratedObject;
+		};
+	};
+};
+
+type SetTextGenerationNodeOutputArgs = {
+	node: {
+		id: GiselleNodeId;
+		output: PartialGeneratedObject;
+	};
+};
+const setTextGenerationNodeOutput = (
+	args: SetTextGenerationNodeOutputArgs,
+): SetTextGenerationNodeOutputAction => {
+	return {
+		type: "setTextGenerationNodeOutput",
+		payload: args,
+	};
+};
+
 type UpdateNodeStateAction = {
 	type: "updateNodeState";
 	payload: {
@@ -314,6 +345,24 @@ export const updateNodeState = (
 		payload: {
 			node: args.node,
 		},
+	};
+};
+
+type AddArtifactAction = {
+	type: "addArtifact";
+	payload: {
+		artifact: ArtifactAndMetadata;
+	};
+};
+
+type AddArtifactArgs = {
+	artifact: ArtifactAndMetadata;
+};
+
+export const addArtifact = (args: AddArtifactArgs): AddArtifactAction => {
+	return {
+		type: "addArtifact",
+		payload: args,
 	};
 };
 
@@ -352,22 +401,35 @@ export const generateText =
 			(node) => node.id === instructionConnector?.source,
 		);
 
-		const result = await streamText([
-			{
-				role: "user",
-				content: (instructionNode?.output as string) ?? "",
-			},
-		]);
-		for await (const content of readStreamableValue(result)) {
+		const { object } = await generateObjectStream(
+			instructionNode?.output as string,
+		);
+		let artifact: Artifact = {
+			title: "",
+			content: "",
+			completed: false,
+		};
+		for await (const content of readStreamableValue(object)) {
 			dispatch(
-				setNodeOutput({
+				setTextGenerationNodeOutput({
 					node: {
 						id: args.textGeneratorNode.id,
-						output: content,
+						output:
+							content as PartialGeneratedObject /** @todo type assertion */,
 					},
 				}),
 			);
+			artifact = content.artifact;
 		}
+		dispatch(
+			addArtifact({
+				artifact: {
+					...artifact,
+					authorNodeId: args.textGeneratorNode.id,
+					materialNodeIds: [],
+				},
+			}),
+		);
 		dispatch(
 			updateNodeState({
 				node: {
@@ -385,4 +447,6 @@ export type GraphAction =
 	| UpdateNodePropertyAction
 	| UpdateNodesUIAction
 	| SetNodeOutputAction
-	| UpdateNodeStateAction;
+	| SetTextGenerationNodeOutputAction
+	| UpdateNodeStateAction
+	| AddArtifactAction;

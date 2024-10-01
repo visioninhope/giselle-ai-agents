@@ -112,6 +112,7 @@ export const graphReducer = (
 			};
 
 		case "setNodeOutput":
+		case "setTextGenerationNodeOutput":
 			return {
 				...state,
 				graph: {

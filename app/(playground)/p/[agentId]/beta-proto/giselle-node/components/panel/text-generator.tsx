@@ -1,5 +1,6 @@
 import clsx from "clsx";
 import type { FC } from "react";
+import type { PartialGeneratedObject } from "../../../artifact/types";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import { Spinner } from "../../../components/spinner";
 import {
@@ -108,10 +109,25 @@ export const TextGeneratorPropertyPanel: FC<
 				</div>
 			) */}
 			{node.ui.panelTab === panelTabs.result && (
-				<div className="px-[24px] pb-[16px] overflow-scroll">
-					<div>
+				<div className="px-[24px] pb-[16px] overflow-scroll text-black-30 font-rosart text-[12px]">
+					<div className="flex flex-col gap-[8px]">
 						{node.state === giselleNodeState.inProgress && <Spinner />}
-						<div>{node.output as string}</div>
+						<div>{(node.output as PartialGeneratedObject).thinking}</div>
+						{(node.output as PartialGeneratedObject).artifact?.content &&
+							!(node.output as PartialGeneratedObject).artifact?.completed && (
+								<div className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)]">
+									Generating...
+									<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
+								</div>
+							)}
+						{(node.output as PartialGeneratedObject).artifact?.content &&
+							(node.output as PartialGeneratedObject).artifact?.completed && (
+								<div className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)]">
+									{(node.output as PartialGeneratedObject).artifact?.title}
+									<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
+								</div>
+							)}
+						<div>{(node.output as PartialGeneratedObject).description}</div>
 					</div>
 				</div>
 			)}

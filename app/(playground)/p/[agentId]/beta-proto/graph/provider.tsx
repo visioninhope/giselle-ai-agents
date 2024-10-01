@@ -15,6 +15,7 @@ const initialState = {
 	graph: {
 		nodes: [],
 		connectors: [],
+		artifacts: [],
 	},
 };
 
