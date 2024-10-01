@@ -212,7 +212,6 @@ export function GiselleNode(props: GiselleNodeProps) {
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
 						<div>ui: {JSON.stringify(props.ui, null, 2)}</div>
-						<div>output: {JSON.stringify(props.output)}</div>
 					</div>
 				</div>
 			)}
