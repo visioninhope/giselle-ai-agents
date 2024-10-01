@@ -5,8 +5,28 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rosart } from "./fonts";
 
+const title = "Giselle";
+const description = "";
+const url = process.env.NEXT_PUBLIC_SITE_URL || "https://studio.giselles.ai";
+
 export const metadata: Metadata = {
-	title: "Giselle",
+	title,
+	description,
+	openGraph: {
+		title,
+		description,
+		url,
+		siteName: title,
+		images: [
+			{
+				url: `${url}/og.png`,
+				width: 1200,
+				height: 600,
+			},
+		],
+		locale: "en_US",
+		type: "website",
+	},
 };
 
 export default function RootLayout({
