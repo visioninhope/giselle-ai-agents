@@ -132,7 +132,7 @@ const config = {
 						"--tw-prose-captions": theme("colors.black[30]"),
 						"--tw-prose-code": theme("colors.black[30]"),
 						"--tw-prose-pre-code": theme("colors.black[30]"),
-						"--tw-prose-pre-bg": theme("colors.black[-30]"),
+						"--tw-prose-pre-bg": theme("colors.black[80]"),
 						"--tw-prose-th-borders": theme("colors.black[30]"),
 						"--tw-prose-td-borders": theme("colors.black[30]"),
 					},
