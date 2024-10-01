@@ -5,7 +5,12 @@ import { type CoreMessage, streamText as sdkStreamText } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { agents, db } from "@/drizzle";
 import { metrics } from "@opentelemetry/api";
+import { createId } from "@paralleldrive/cuid2";
+import { eq } from "drizzle-orm";
+import type { AgentId } from "../types";
+import type { Graph } from "./types";
 
 export async function streamText(messages: CoreMessage[]) {
 	const result = await sdkStreamText({
@@ -27,4 +32,11 @@ export async function streamText(messages: CoreMessage[]) {
 
 	const stream = createStreamableValue(result.textStream);
 	return stream.value;
+}
+
+export async function setGraphToDb(agentId: AgentId, graph: Graph) {
+	await db
+		.update(agents)
+		.set({ graph, graphHash: createId() })
+		.where(eq(agents.id, agentId));
 }
