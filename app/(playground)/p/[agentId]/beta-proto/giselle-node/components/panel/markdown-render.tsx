@@ -8,21 +8,16 @@ type MarkdownRenderProps = {
 export function MarkdownRender(props: MarkdownRenderProps) {
 	const [markdown, setMarkdown] = useState("");
 	useEffect(() => {
-		console.log(props.markdownLike);
 		remark()
 			.use(html)
 			.process(props.markdownLike)
 			.then((parsedContent) => {
-				console.log(parsedContent.toString());
 				setMarkdown(parsedContent.toString());
 			});
 	}, [props.markdownLike]);
-	console.log(markdown);
 	if (markdown === "") {
 		return null;
 	}
-
-	console.log("here?");
 
 	return (
 		<div
