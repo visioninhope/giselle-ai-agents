@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rosart } from "./fonts";
 
 const title = "Giselle";
-const description = "";
+const description = "AI for Agentic Workflows. Human-AI Collaboration";
 const url = process.env.NEXT_PUBLIC_SITE_URL || "https://studio.giselles.ai";
 
 export const metadata: Metadata = {
