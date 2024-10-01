@@ -28,6 +28,7 @@ export async function streamText(messages: CoreMessage[]) {
 				isR06User,
 			});
 		},
+		experimental_telemetry: { isEnabled: true },
 	});
 
 	const stream = createStreamableValue(result.textStream);
