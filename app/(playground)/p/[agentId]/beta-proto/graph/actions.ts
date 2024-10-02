@@ -1,11 +1,12 @@
 import { readStreamableValue } from "ai/rsc";
-import type { Artifact } from "../artifact/types";
+import { createArtifactId } from "../artifact/factory";
+import type { Artifact, ArtifactId } from "../artifact/types";
 import type {
 	GeneratedObject,
 	PartialGeneratedObject,
 } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
-import type { ConnectorObject } from "../connector/types";
+import type { ConnectorId, ConnectorObject } from "../connector/types";
 import { textGeneratorParameterNames } from "../giselle-node/blueprints";
 import { createGiselleNodeId } from "../giselle-node/factory";
 import {
@@ -14,6 +15,7 @@ import {
 } from "../giselle-node/parameter/factory";
 import type {
 	ObjectParameter,
+	Parameter,
 	StringParameter,
 } from "../giselle-node/parameter/types";
 import {
@@ -103,6 +105,26 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 				targetNodeCategory: args.targetNode.category,
 			},
 		},
+	};
+};
+
+export type RemoveConnectorAction = {
+	type: "removeConnector";
+	payload: RemoveConnectorArgs;
+};
+
+type RemoveConnectorArgs = {
+	connector: {
+		id: ConnectorId;
+	};
+};
+
+export const removeConnector = (
+	args: RemoveConnectorArgs,
+): RemoveConnectorAction => {
+	return {
+		type: "removeConnector",
+		payload: args,
 	};
 };
 
@@ -348,18 +370,20 @@ export const updateNodeState = (
 	};
 };
 
-type AddArtifactAction = {
-	type: "addArtifact";
-	payload: AddArtifactArgs;
+type AddOrReplaceArtifactAction = {
+	type: "addOrReplaceArtifact";
+	payload: AddOrReplaceArtifactArgs;
 };
 
-type AddArtifactArgs = {
+type AddOrReplaceArtifactArgs = {
 	artifact: Artifact;
 };
 
-export const addArtifact = (args: AddArtifactArgs): AddArtifactAction => {
+export const addOrReplaceArtifact = (
+	args: AddOrReplaceArtifactArgs,
+): AddOrReplaceArtifactAction => {
 	return {
-		type: "addArtifact",
+		type: "addOrReplaceArtifact",
 		payload: args,
 	};
 };
@@ -419,14 +443,32 @@ export const generateText =
 			);
 			content = streamContent as PartialGeneratedObject;
 		}
+		const artifact = state.graph.artifacts.find(
+			(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
+		);
+		const node = state.graph.nodes.find(
+			(node) => node.id === args.textGeneratorNode.id,
+		);
+		if (node === undefined) {
+			/** @todo error handling  */
+			throw new Error("Node not found");
+		}
 
 		dispatch(
-			addArtifact({
+			addOrReplaceArtifact({
 				artifact: {
+					id: artifact === undefined ? createArtifactId() : artifact.id,
 					type: "artifact",
 					title: content?.artifact?.title ?? "",
 					content: content?.artifact?.content ?? "",
-					generatedNodeId: args.textGeneratorNode.id,
+					generatorNode: {
+						id: node.id,
+						category: node.category,
+						archetype: node.archetype,
+						name: node.name,
+						object: "node.artifactElement",
+						properties: node.properties,
+					},
 					elements: [giselleNodeToGiselleNodeArtifactElement(instructionNode)],
 				},
 			}),
@@ -440,9 +482,188 @@ export const generateText =
 			}),
 		);
 	};
+
+type AddParameterToNodeAction = {
+	type: "addParameterToNode";
+	payload: AddParameterToNodeArgs;
+};
+type AddParameterToNodeArgs = {
+	node: {
+		id: GiselleNodeId;
+	};
+	parameter: {
+		key: string;
+		value: Parameter;
+	};
+};
+export function addParameterToNode(
+	args: AddParameterToNodeArgs,
+): AddParameterToNodeAction {
+	return {
+		type: "addParameterToNode",
+		payload: args,
+	};
+}
+
+type RemoveParameterFromNodeAction = {
+	type: "removeParameterFromNode";
+	payload: RemoveParameterFromNodeArgs;
+};
+type RemoveParameterFromNodeArgs = {
+	node: {
+		id: GiselleNodeId;
+	};
+	parameter: {
+		key: string;
+	};
+};
+export function removeParameterFromNode(
+	args: RemoveParameterFromNodeArgs,
+): RemoveParameterFromNodeAction {
+	return {
+		type: "removeParameterFromNode",
+		payload: args,
+	};
+}
+
+type AddSourceToPromptNodeArgs = {
+	promptNode: {
+		id: GiselleNodeId;
+		sources: ArtifactId[];
+	};
+	source: Artifact;
+};
+export function addSourceToPromptNode(
+	args: AddSourceToPromptNodeArgs,
+): ThunkAction {
+	return (dispatch, getState) => {
+		dispatch(
+			updateNodeProperty({
+				node: {
+					id: args.promptNode.id,
+					property: {
+						key: "sources",
+						value: [...args.promptNode.sources, args.source.id],
+					},
+				},
+			}),
+		);
+		const state = getState();
+		const outgoingConnectors = state.graph.connectors.filter(
+			({ source }) => source === args.promptNode.id,
+		);
+		for (const outgoingConnector of outgoingConnectors) {
+			const outgoingNode = state.graph.nodes.find(
+				(node) => node.id === outgoingConnector.target,
+			);
+			if (outgoingNode === undefined) {
+				continue;
+			}
+			const currentSourceHandleLength =
+				outgoingNode.parameters?.object === "objectParameter"
+					? Object.keys(outgoingNode.parameters.properties).filter((key) =>
+							key.startsWith("source"),
+						).length
+					: 0;
+			dispatch(
+				addParameterToNode({
+					node: {
+						id: outgoingConnector.target,
+					},
+					parameter: {
+						key: `source${currentSourceHandleLength + 1}`,
+						value: createStringParameter({
+							label: `Source${currentSourceHandleLength + 1}`,
+						}),
+					},
+				}),
+			);
+			dispatch(
+				addConnector({
+					sourceNode: {
+						id: args.source.generatorNode.id,
+						category: args.source.generatorNode.category,
+					},
+					targetNode: {
+						id: outgoingConnector.target,
+						handle: `source${currentSourceHandleLength + 1}`,
+						category: outgoingConnector.targetNodeCategory,
+					},
+				}),
+			);
+		}
+	};
+}
+
+type RemoveSourceFromPromptNodeArgs = {
+	promptNode: {
+		id: GiselleNodeId;
+		sources: ArtifactId[];
+	};
+	source: Artifact;
+};
+export function removeSourceFromPromptNode(
+	args: RemoveSourceFromPromptNodeArgs,
+): ThunkAction {
+	return (dispatch, getState) => {
+		dispatch(
+			updateNodeProperty({
+				node: {
+					id: args.promptNode.id,
+					property: {
+						key: "sources",
+						value: args.promptNode.sources.filter(
+							(source) => source !== args.source.id,
+						),
+					},
+				},
+			}),
+		);
+		const state = getState();
+		const outgoingConnectors = state.graph.connectors.filter(
+			({ source }) => source === args.promptNode.id,
+		);
+		for (const outgoingConnector of outgoingConnectors) {
+			const outgoingNode = state.graph.nodes.find(
+				(node) => node.id === outgoingConnector.target,
+			);
+			if (outgoingNode === undefined) {
+				continue;
+			}
+			const artifactCreatorNodeToOutgoingNodeConnector =
+				state.graph.connectors.find(
+					(connector) =>
+						connector.target === outgoingNode.id &&
+						connector.source === args.source.generatorNode.id,
+				);
+			if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
+				continue;
+			}
+			dispatch(
+				removeConnector({
+					connector: {
+						id: artifactCreatorNodeToOutgoingNodeConnector.id,
+					},
+				}),
+			);
+			dispatch(
+				removeParameterFromNode({
+					node: {
+						id: outgoingConnector.target,
+					},
+					parameter: {
+						key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
+					},
+				}),
+			);
+		}
+	};
+}
+
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
+	| RemoveConnectorAction
 	| SelectNodeAction
 	| SetPanelTabAction
 	| UpdateNodePropertyAction
@@ -450,4 +671,6 @@ export type GraphAction =
 	| SetNodeOutputAction
 	| SetTextGenerationNodeOutputAction
 	| UpdateNodeStateAction
-	| AddArtifactAction;
+	| AddOrReplaceArtifactAction
+	| AddParameterToNodeAction
+	| RemoveParameterFromNodeAction;

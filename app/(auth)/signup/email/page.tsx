@@ -12,9 +12,7 @@ export default function Page() {
 		<div className="min-h-screen flex items-center justify-center p-4">
 			<div className="w-[320px] space-y-8">
 				<div className="text-center">
-					<PageTitle>
-						Sign up
-					</PageTitle>
+					<PageTitle>Sign up</PageTitle>
 					{/* @todo Hide at the time of beta release.
 					<p className="mt-2 text-sm text-black-50">
 						Free forever. No credit card required.

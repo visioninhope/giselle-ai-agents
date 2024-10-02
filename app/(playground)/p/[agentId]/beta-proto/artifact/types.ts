@@ -4,11 +4,13 @@ import type {
 } from "../giselle-node/types";
 
 type ArtifactElement = GiselleNodeArtifactElement | Artifact;
+export type ArtifactId = `art_${string}`;
 export type Artifact = {
+	id: ArtifactId;
 	type: "artifact";
 	title: string;
 	content: string;
-	generatedNodeId: GiselleNodeId;
+	generatorNode: GiselleNodeArtifactElement;
 	elements: ArtifactElement[];
 };
 

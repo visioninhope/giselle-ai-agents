@@ -1,8 +1,13 @@
+import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
+import { CheckIcon, CirclePlusIcon } from "lucide-react";
 import { type FC, useCallback, useMemo, useState } from "react";
+import type { Artifact, ArtifactId } from "../../../artifact/types";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
+	addSourceToPromptNode,
 	generateText,
+	removeSourceFromPromptNode,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
@@ -17,6 +22,7 @@ import {
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
+import { ArtifactBlock } from "./artifact-block";
 
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
@@ -120,6 +126,53 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			}),
 		);
 	}, [dispatch, outgoingConnections]);
+
+	const availableArtifacts = useMemo<Artifact[]>(
+		() =>
+			state.graph.artifacts.filter(
+				(artifact) =>
+					!outgoingConnections.some(
+						({ target }) => target === artifact.generatorNode.id,
+					),
+			),
+		[outgoingConnections, state.graph.artifacts],
+	);
+	const sources = useMemo<Artifact[]>(
+		() =>
+			(node.properties.sources as ArtifactId[])
+				?.map((source) =>
+					state.graph.artifacts.find((artifact) => artifact.id === source),
+				)
+				.filter((artifactIdsOrNull) => artifactIdsOrNull != null) ?? [],
+		[node.properties.sources, state.graph.artifacts],
+	);
+	const handleArtifactClick = useCallback(
+		(artifact: Artifact) => () => {
+			const artifactIds = sources.map(({ id }) => id);
+			if (artifactIds.includes(artifact.id)) {
+				dispatch(
+					removeSourceFromPromptNode({
+						promptNode: {
+							id: node.id,
+							sources: artifactIds,
+						},
+						source: artifact,
+					}),
+				);
+			} else {
+				dispatch(
+					addSourceToPromptNode({
+						promptNode: {
+							id: node.id,
+							sources: artifactIds,
+						},
+						source: artifact,
+					}),
+				);
+			}
+		},
+		[dispatch, node.id, sources],
+	);
 	return (
 		<div className="flex gap-[10px] flex-col h-full">
 			<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
@@ -164,7 +217,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			</div>
 
 			{node.ui.panelTab === panelTabs.property && (
-				<div className="px-[24px] pb-[16px] overflow-y-auto">
+				<div className="px-[16px] pb-[16px] overflow-y-auto">
 					<div>
 						<div className="relative z-10 flex flex-col gap-[10px]">
 							<div className="grid gap-[8px] pb-[14px]">
@@ -186,7 +239,6 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 								/>
 							</div>
 
-							{/**
 							<div className="border-t -mx-[24px] border-[hsla(222,21%,40%,1)]" />
 							<div className="grid gap-[8px]">
 								<div className="flex justify-between">
@@ -210,30 +262,41 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 										>
 											<div className="px-[8px]">
 												<div>
-													<label className="flex justify-between items-center py-[4px] cursor-pointer">
-														Text generator 001
-														<input type="checkbox" className="peer hidden" />
-														<CheckIcon
-															size={16}
-															className="stroke-white hidden peer-checked:block"
-														/>
-													</label>
-
-													<label className="flex justify-between items-center py-[4px] cursor-pointer">
-														Text generator 002
-														<input type="checkbox" className="peer hidden" />
-														<CheckIcon
-															size={16}
-															className="stroke-white hidden peer-checked:block"
-														/>
-													</label>
+													{availableArtifacts.map((artifact) => (
+														<button
+															type="button"
+															className="flex justify-between items-center py-[4px] w-full"
+															key={artifact.id}
+															onClick={handleArtifactClick(artifact)}
+														>
+															<p className="line-clamp-1 text-left">
+																{artifact.title}
+															</p>
+															{sources.some(
+																(source) => source.id === artifact.id,
+															) && (
+																<CheckIcon
+																	size={16}
+																	className="stroke-white flex-shrink-0"
+																/>
+															)}
+														</button>
+													))}
 												</div>
 											</div>
 										</Popover.Content>
 									</Popover.Root>
 								</div>
+								<div className="grid grid-cols-2 gap-4">
+									{sources.map((source) => (
+										<ArtifactBlock
+											key={source.id}
+											title={source.title}
+											node={source.generatorNode}
+										/>
+									))}
+								</div>
 							</div>
-						 */}
 						</div>
 					</div>
 				</div>

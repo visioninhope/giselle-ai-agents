@@ -23,11 +23,7 @@ export const SignupForm: FC = () => {
 	);
 	return (
 		<form action={action}>
-			<Form
-				submitText="Sign up"
-				authError={authError}
-				isPending={isPending}
-			/>
+			<Form submitText="Sign up" authError={authError} isPending={isPending} />
 		</form>
 	);
 };

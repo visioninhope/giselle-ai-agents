@@ -127,12 +127,90 @@ export const graphReducer = (
 					),
 				},
 			};
-		case "addArtifact":
+		case "addOrReplaceArtifact": {
+			const replace = state.graph.artifacts.some(
+				(artifact) => artifact.id === action.payload.artifact.id,
+			);
+			if (replace) {
+				return {
+					...state,
+					graph: {
+						...state.graph,
+						artifacts: [
+							...state.graph.artifacts.filter(
+								(artifact) => artifact.id !== action.payload.artifact.id,
+							),
+							action.payload.artifact,
+						],
+					},
+				};
+			}
 			return {
 				...state,
 				graph: {
 					...state.graph,
 					artifacts: [...state.graph.artifacts, action.payload.artifact],
+				},
+			};
+		}
+		case "addParameterToNode":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) =>
+						node.id !== action.payload.node.id
+							? node
+							: {
+									...node,
+									parameters:
+										node.parameters?.object === "objectParameter"
+											? {
+													...node.parameters,
+													properties: {
+														...node.parameters.properties,
+														[action.payload.parameter.key]:
+															action.payload.parameter.value,
+													},
+												}
+											: node.parameters,
+								},
+					),
+				},
+			};
+		case "removeParameterFromNode":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) =>
+						node.id !== action.payload.node.id
+							? node
+							: {
+									...node,
+									parameters:
+										node.parameters?.object === "objectParameter"
+											? {
+													...node.parameters,
+													properties: Object.fromEntries(
+														Object.entries(node.parameters.properties).filter(
+															([key]) => key !== action.payload.parameter.key,
+														),
+													),
+												}
+											: node.parameters,
+								},
+					),
+				},
+			};
+		case "removeConnector":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					connectors: state.graph.connectors.filter(
+						(connector) => connector.id !== action.payload.connector.id,
+					),
 				},
 			};
 		default:

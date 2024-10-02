@@ -110,11 +110,20 @@ const config = {
 					"0%,70%,100%": { opacity: "1" },
 					"20%,50%": { opacity: "0" },
 				},
+				"follow-through-overlap-spin": {
+					"0%": { transform: "rotate(0deg)" },
+					"40%": { transform: "rotate(-400deg)" },
+					"60%": { transform: "rotate(-300deg)" },
+					"80%": { transform: "rotate(-370deg)" },
+					"100%": { transform: "rotate(-360deg)" },
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
 				"accordion-up": "accordion-up 0.2s ease-out",
 				"caret-blink": "caret-blink 1.25s ease-out infinite",
+				"follow-through-spin":
+					"follow-through-overlap-spin 1.75s ease-out infinite",
 			},
 			typography: (theme: PluginAPI["theme"]) => ({
 				giselle: {
