@@ -9,6 +9,7 @@ import {
 	ReactFlowProvider,
 	useReactFlow,
 } from "@xyflow/react";
+import Link from "next/link";
 import { useState } from "react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
@@ -64,7 +65,9 @@ function Inner() {
 		<div className="w-full h-screen">
 			<div className="absolute z-10 left-[20px] right-[20px] top-[20px] h-[36px] flex justify-between">
 				<div className="flex gap-[8px] items-center">
-					<GiselleLogo className="fill-white w-[70px] h-auto mt-[6px]" />
+					<Link href="/">
+						<GiselleLogo className="fill-white w-[70px] h-auto mt-[6px]" />
+					</Link>
 					<div className="font-rosart text-[18px] text-black--30">
 						Playground
 					</div>
