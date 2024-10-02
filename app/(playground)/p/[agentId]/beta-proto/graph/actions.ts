@@ -1,4 +1,5 @@
 import { readStreamableValue } from "ai/rsc";
+import { createArtifactId } from "../artifact/factory";
 import type { Artifact } from "../artifact/types";
 import type {
 	GeneratedObject,
@@ -423,6 +424,7 @@ export const generateText =
 		dispatch(
 			addArtifact({
 				artifact: {
+					id: createArtifactId(),
 					type: "artifact",
 					title: content?.artifact?.title ?? "",
 					content: content?.artifact?.content ?? "",

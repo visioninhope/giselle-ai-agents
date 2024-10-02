@@ -127,7 +127,27 @@ export const graphReducer = (
 					),
 				},
 			};
-		case "addArtifact":
+		case "addArtifact": {
+			const replace = state.graph.artifacts.some(
+				(artifact) =>
+					artifact.generatedNodeId === action.payload.artifact.generatedNodeId,
+			);
+			if (replace) {
+				return {
+					...state,
+					graph: {
+						...state.graph,
+						artifacts: [
+							...state.graph.artifacts.filter(
+								(artifact) =>
+									artifact.generatedNodeId !==
+									action.payload.artifact.generatedNodeId,
+							),
+							action.payload.artifact,
+						],
+					},
+				};
+			}
 			return {
 				...state,
 				graph: {
@@ -135,6 +155,7 @@ export const graphReducer = (
 					artifacts: [...state.graph.artifacts, action.payload.artifact],
 				},
 			};
+		}
 		default:
 			return state;
 	}
