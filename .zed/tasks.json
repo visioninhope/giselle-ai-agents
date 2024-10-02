@@ -15,19 +15,10 @@
 		"allow_concurrent_runs": false
 	},
 	{
-		"label": "drizzle push",
-		"command": "bunx drizzle-kit push",
-		"allow_concurrent_runs": false
-	},
-	{
-		"label": "trigger.dev@beta dev",
-		"command": "bunx trigger.dev@beta dev",
-		"allow_concurrent_runs": false
-	},
-	{
 		"label": "tsc",
 		"command": "bun tsc",
-		"allow_concurrent_runs": false
+		"allow_concurrent_runs": false,
+		"hide": "on_success"
 	},
 	{
 		"label": "npm-check-updates",

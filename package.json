@@ -75,6 +75,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "1.8.3",
+		"@tailwindcss/typography": "0.5.15",
 		"@types/node": "^22",
 		"@types/react": "npm:types-react@rc",
 		"@types/react-dom": "npm:types-react-dom@rc",

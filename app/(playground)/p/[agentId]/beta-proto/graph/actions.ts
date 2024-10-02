@@ -1,4 +1,9 @@
 import { readStreamableValue } from "ai/rsc";
+import type { Artifact } from "../artifact/types";
+import type {
+	GeneratedObject,
+	PartialGeneratedObject,
+} from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorObject } from "../connector/types";
 import { textGeneratorParameterNames } from "../giselle-node/blueprints";
@@ -21,8 +26,9 @@ import {
 	type XYPosition,
 	giselleNodeState,
 } from "../giselle-node/types";
+import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { ThunkAction } from "./context";
-import { streamText } from "./server-actions";
+import { generateObjectStream } from "./server-actions";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -291,6 +297,31 @@ export const setNodeOutput = (args: SetNodeOutputArgs): SetNodeOutputAction => {
 	};
 };
 
+type SetTextGenerationNodeOutputAction = {
+	type: "setTextGenerationNodeOutput";
+	payload: {
+		node: {
+			id: GiselleNodeId;
+			output: PartialGeneratedObject;
+		};
+	};
+};
+
+type SetTextGenerationNodeOutputArgs = {
+	node: {
+		id: GiselleNodeId;
+		output: PartialGeneratedObject;
+	};
+};
+const setTextGenerationNodeOutput = (
+	args: SetTextGenerationNodeOutputArgs,
+): SetTextGenerationNodeOutputAction => {
+	return {
+		type: "setTextGenerationNodeOutput",
+		payload: args,
+	};
+};
+
 type UpdateNodeStateAction = {
 	type: "updateNodeState";
 	payload: {
@@ -314,6 +345,22 @@ export const updateNodeState = (
 		payload: {
 			node: args.node,
 		},
+	};
+};
+
+type AddArtifactAction = {
+	type: "addArtifact";
+	payload: AddArtifactArgs;
+};
+
+type AddArtifactArgs = {
+	artifact: Artifact;
+};
+
+export const addArtifact = (args: AddArtifactArgs): AddArtifactAction => {
+	return {
+		type: "addArtifact",
+		payload: args,
 	};
 };
 
@@ -351,23 +398,39 @@ export const generateText =
 		const instructionNode = state.graph.nodes.find(
 			(node) => node.id === instructionConnector?.source,
 		);
+		if (instructionNode === undefined) {
+			/** @todo error handling  */
+			throw new Error("Instruction node not found");
+		}
 
-		const result = await streamText([
-			{
-				role: "user",
-				content: (instructionNode?.output as string) ?? "",
-			},
-		]);
-		for await (const content of readStreamableValue(result)) {
+		const { object } = await generateObjectStream(
+			instructionNode.output as string,
+		);
+		let content: PartialGeneratedObject = {};
+		for await (const streamContent of readStreamableValue(object)) {
 			dispatch(
-				setNodeOutput({
+				setTextGenerationNodeOutput({
 					node: {
 						id: args.textGeneratorNode.id,
-						output: content,
+						output:
+							streamContent as PartialGeneratedObject /** @todo type assertion */,
 					},
 				}),
 			);
+			content = streamContent as PartialGeneratedObject;
 		}
+
+		dispatch(
+			addArtifact({
+				artifact: {
+					type: "artifact",
+					title: content?.artifact?.title ?? "",
+					content: content?.artifact?.content ?? "",
+					generatedNodeId: args.textGeneratorNode.id,
+					elements: [giselleNodeToGiselleNodeArtifactElement(instructionNode)],
+				},
+			}),
+		);
 		dispatch(
 			updateNodeState({
 				node: {
@@ -385,4 +448,6 @@ export type GraphAction =
 	| UpdateNodePropertyAction
 	| UpdateNodesUIAction
 	| SetNodeOutputAction
-	| UpdateNodeStateAction;
+	| SetTextGenerationNodeOutputAction
+	| UpdateNodeStateAction
+	| AddArtifactAction;

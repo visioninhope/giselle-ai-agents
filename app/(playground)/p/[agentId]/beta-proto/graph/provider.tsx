@@ -2,7 +2,9 @@ import {
 	type FC,
 	type PropsWithChildren,
 	useCallback,
+	useEffect,
 	useReducer,
+	useRef,
 } from "react";
 import type { AgentId } from "../types";
 import { type EnhancedDispatch, GraphContext } from "./context";
@@ -15,6 +17,7 @@ const initialState = {
 	graph: {
 		nodes: [],
 		connectors: [],
+		artifacts: [],
 	},
 };
 
@@ -31,24 +34,28 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 	const [state, originalDispatch] = useReducer(graphReducer, {
 		graph: defaultGraph,
 	});
+	const isInitialMount = useRef(true);
 
 	const deboucedSetGraphToDb = useDebounce(async (graph: Graph) => {
 		setGraphToDb(agentId, graph);
 	}, 500);
 	const enhancedDispatch: EnhancedDispatch = useCallback(
-		(action) => {
+		async (action) => {
 			if (typeof action === "function") {
-				// This is a thunk
-				action(enhancedDispatch, () => state);
+				await action(enhancedDispatch, () => state);
 			} else {
-				// This is a regular action
-				console.log("regular action");
 				originalDispatch(action);
-				deboucedSetGraphToDb(graphReducer(state, action).graph);
 			}
 		},
-		[state, deboucedSetGraphToDb],
+		[state],
 	);
+	useEffect(() => {
+		if (isInitialMount.current) {
+			isInitialMount.current = false;
+		} else {
+			deboucedSetGraphToDb(state.graph);
+		}
+	}, [state, deboucedSetGraphToDb]);
 	return (
 		<GraphContext.Provider value={{ state, dispatch: enhancedDispatch }}>
 			{children}

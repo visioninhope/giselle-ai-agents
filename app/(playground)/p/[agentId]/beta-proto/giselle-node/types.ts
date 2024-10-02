@@ -64,6 +64,15 @@ export type GiselleNode = {
 	output: unknown;
 };
 
+export type GiselleNodeArtifactElement = {
+	id: GiselleNodeId;
+	object: "node.artifactElement";
+	name: string;
+	category: GiselleNodeCategory;
+	archetype: string;
+	properties: Record<string, unknown>;
+};
+
 export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
 	id: GiselleNodeId;
 	object: "node";

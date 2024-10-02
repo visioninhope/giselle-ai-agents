@@ -146,11 +146,6 @@ function Inner() {
 						toolDispatch(setSelectTool);
 					}
 				}}
-				className={
-					toolState.activeTool.type === "addGiselleNode"
-						? "[&_div]:!cursor-crosshair"
-						: "[&_div]:!cursor-default"
-				}
 			>
 				<Background
 					className="!bg-black-100"

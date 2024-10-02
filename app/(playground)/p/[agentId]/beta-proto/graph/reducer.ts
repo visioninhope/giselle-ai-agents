@@ -112,6 +112,7 @@ export const graphReducer = (
 			};
 
 		case "setNodeOutput":
+		case "setTextGenerationNodeOutput":
 			return {
 				...state,
 				graph: {
@@ -124,6 +125,14 @@ export const graphReducer = (
 									output: action.payload.node.output,
 								},
 					),
+				},
+			};
+		case "addArtifact":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					artifacts: [...state.graph.artifacts, action.payload.artifact],
 				},
 			};
 		default:
