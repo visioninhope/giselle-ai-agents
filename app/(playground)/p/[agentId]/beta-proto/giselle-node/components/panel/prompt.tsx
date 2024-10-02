@@ -20,6 +20,7 @@ import {
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
+import { ArtifactBlock } from "./artifact-block";
 
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
@@ -129,30 +130,32 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			state.graph.artifacts.filter(
 				(artifact) =>
 					!outgoingConnections.some(
-						({ target }) => target === artifact.generatedNodeId,
+						({ target }) => target === artifact.generatorNode.id,
 					),
 			),
 		[outgoingConnections, state.graph.artifacts],
 	);
-	const sources = useMemo<ArtifactId[]>(
+	const sources = useMemo<Artifact[]>(
 		() =>
 			(node.properties.sources as ArtifactId[])
-				?.map(
-					(id) =>
-						state.graph.artifacts.find((artifact) => artifact.id === id)?.id,
+				?.map((source) =>
+					state.graph.artifacts.find((artifact) => artifact.id === source),
 				)
 				.filter((artifactIdsOrNull) => artifactIdsOrNull != null) ?? [],
 		[node.properties.sources, state.graph.artifacts],
 	);
 	const handleArtifactClick = useCallback(
 		(artifact: Artifact) => () => {
+			const artifactIds = sources.map(({ id }) => id);
 			dispatch(
 				updateNodeProperty({
 					node: {
 						id: node.id,
 						property: {
 							key: "sources",
-							value: [...sources, artifact.id],
+							value: artifactIds.includes(artifact.id)
+								? artifactIds.filter((artifactId) => artifactId !== artifact.id)
+								: [...artifactIds, artifact.id],
 						},
 					},
 				}),
@@ -204,7 +207,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			</div>
 
 			{node.ui.panelTab === panelTabs.property && (
-				<div className="px-[24px] pb-[16px] overflow-y-auto">
+				<div className="px-[16px] pb-[16px] overflow-y-auto">
 					<div>
 						<div className="relative z-10 flex flex-col gap-[10px]">
 							<div className="grid gap-[8px] pb-[14px]">
@@ -259,7 +262,9 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 															<p className="line-clamp-1 text-left">
 																{artifact.title}
 															</p>
-															{sources.includes(artifact.id) && (
+															{sources.some(
+																(source) => source.id === artifact.id,
+															) && (
 																<CheckIcon
 																	size={16}
 																	className="stroke-white flex-shrink-0"
@@ -272,7 +277,15 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 										</Popover.Content>
 									</Popover.Root>
 								</div>
-								<div></div>
+								<div className="grid grid-cols-2 gap-4">
+									{sources.map((source) => (
+										<ArtifactBlock
+											key={source.id}
+											title={source.title}
+											node={source.generatorNode}
+										/>
+									))}
+								</div>
 							</div>
 						</div>
 					</div>

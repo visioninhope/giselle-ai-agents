@@ -349,18 +349,20 @@ export const updateNodeState = (
 	};
 };
 
-type AddArtifactAction = {
-	type: "addArtifact";
-	payload: AddArtifactArgs;
+type AddOrReplaceArtifactAction = {
+	type: "addOrReplaceArtifact";
+	payload: AddOrReplaceArtifactArgs;
 };
 
-type AddArtifactArgs = {
+type AddOrReplaceArtifactArgs = {
 	artifact: Artifact;
 };
 
-export const addArtifact = (args: AddArtifactArgs): AddArtifactAction => {
+export const addOrReplaceArtifact = (
+	args: AddOrReplaceArtifactArgs,
+): AddOrReplaceArtifactAction => {
 	return {
-		type: "addArtifact",
+		type: "addOrReplaceArtifact",
 		payload: args,
 	};
 };
@@ -420,15 +422,32 @@ export const generateText =
 			);
 			content = streamContent as PartialGeneratedObject;
 		}
+		const artifact = state.graph.artifacts.find(
+			(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
+		);
+		const node = state.graph.nodes.find(
+			(node) => node.id === args.textGeneratorNode.id,
+		);
+		if (node === undefined) {
+			/** @todo error handling  */
+			throw new Error("Node not found");
+		}
 
 		dispatch(
-			addArtifact({
+			addOrReplaceArtifact({
 				artifact: {
-					id: createArtifactId(),
+					id: artifact === undefined ? createArtifactId() : artifact.id,
 					type: "artifact",
 					title: content?.artifact?.title ?? "",
 					content: content?.artifact?.content ?? "",
-					generatedNodeId: args.textGeneratorNode.id,
+					generatorNode: {
+						id: node.id,
+						category: node.category,
+						archetype: node.archetype,
+						name: node.name,
+						object: "node.artifactElement",
+						properties: node.properties,
+					},
 					elements: [giselleNodeToGiselleNodeArtifactElement(instructionNode)],
 				},
 			}),
@@ -452,4 +471,4 @@ export type GraphAction =
 	| SetNodeOutputAction
 	| SetTextGenerationNodeOutputAction
 	| UpdateNodeStateAction
-	| AddArtifactAction;
+	| AddOrReplaceArtifactAction;

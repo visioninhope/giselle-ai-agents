@@ -10,7 +10,7 @@ export type Artifact = {
 	type: "artifact";
 	title: string;
 	content: string;
-	generatedNodeId: GiselleNodeId;
+	generatorNode: GiselleNodeArtifactElement;
 	elements: ArtifactElement[];
 };
 

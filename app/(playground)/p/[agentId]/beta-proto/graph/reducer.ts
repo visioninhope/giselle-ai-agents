@@ -127,10 +127,9 @@ export const graphReducer = (
 					),
 				},
 			};
-		case "addArtifact": {
+		case "addOrReplaceArtifact": {
 			const replace = state.graph.artifacts.some(
-				(artifact) =>
-					artifact.generatedNodeId === action.payload.artifact.generatedNodeId,
+				(artifact) => artifact.id === action.payload.artifact.id,
 			);
 			if (replace) {
 				return {
@@ -139,9 +138,7 @@ export const graphReducer = (
 						...state.graph,
 						artifacts: [
 							...state.graph.artifacts.filter(
-								(artifact) =>
-									artifact.generatedNodeId !==
-									action.payload.artifact.generatedNodeId,
+								(artifact) => artifact.id !== action.payload.artifact.id,
 							),
 							action.payload.artifact,
 						],
