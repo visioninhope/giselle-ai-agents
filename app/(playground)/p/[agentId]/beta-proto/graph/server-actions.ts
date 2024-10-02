@@ -27,6 +27,11 @@ export async function generateObjectStream(prompt: string, traceId: string) {
 
 	(async () => {
 		const model = "gpt-4o-mini";
+		const lf = new Langfuse();
+		const trace = lf.trace({
+			id: `giselle-${Date.now()}`,
+			name: 'agent',
+		});
 		const generation = trace.generation({
 			input: prompt,
 			model,

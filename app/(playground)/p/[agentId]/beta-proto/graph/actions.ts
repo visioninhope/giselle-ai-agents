@@ -29,7 +29,6 @@ import {
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { ThunkAction } from "./context";
 import { generateObjectStream } from "./server-actions";
-import { LangfuseTraceClient } from "langfuse";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -372,7 +371,7 @@ type GenerateTextArgs = {
 };
 
 export const generateText =
-	(args: GenerateTextArgs, trace: LangfuseTraceClient): ThunkAction =>
+	(args: GenerateTextArgs): ThunkAction =>
 	async (dispatch, getState) => {
 		dispatch(
 			setNodeOutput({
