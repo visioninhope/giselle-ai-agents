@@ -405,7 +405,6 @@ export const generateText =
 
 		const { object } = await generateObjectStream(
 			instructionNode.output as string,
-			trace.traceId,
 		);
 		let content: PartialGeneratedObject = {};
 		for await (const streamContent of readStreamableValue(object)) {
