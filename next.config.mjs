@@ -15,7 +15,6 @@ const nextConfig = {
 		serverActions: {
 			bodySizeLimit: "2mb",
 		},
-		instrumentationHook: true,
 	},
 	serverExternalPackages: ["@opentelemetry/sdk-node"],
 	async redirects() {
