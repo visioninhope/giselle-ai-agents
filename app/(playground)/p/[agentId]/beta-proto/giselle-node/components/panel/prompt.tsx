@@ -7,6 +7,7 @@ import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
 	addSourceToPromptNode,
 	generateText,
+	removeSourceFromPromptNode,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
@@ -150,16 +151,12 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			const artifactIds = sources.map(({ id }) => id);
 			if (artifactIds.includes(artifact.id)) {
 				dispatch(
-					updateNodeProperty({
-						node: {
+					removeSourceFromPromptNode({
+						promptNode: {
 							id: node.id,
-							property: {
-								key: "sources",
-								value: artifactIds.filter(
-									(artifactId) => artifactId !== artifact.id,
-								),
-							},
+							sources: artifactIds,
 						},
+						source: artifact,
 					}),
 				);
 			} else {

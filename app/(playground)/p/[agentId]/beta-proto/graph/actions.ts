@@ -6,7 +6,7 @@ import type {
 	PartialGeneratedObject,
 } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
-import type { ConnectorObject } from "../connector/types";
+import type { ConnectorId, ConnectorObject } from "../connector/types";
 import { textGeneratorParameterNames } from "../giselle-node/blueprints";
 import { createGiselleNodeId } from "../giselle-node/factory";
 import {
@@ -105,6 +105,26 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 				targetNodeCategory: args.targetNode.category,
 			},
 		},
+	};
+};
+
+export type RemoveConnectorAction = {
+	type: "removeConnector";
+	payload: RemoveConnectorArgs;
+};
+
+type RemoveConnectorArgs = {
+	connector: {
+		id: ConnectorId;
+	};
+};
+
+export const removeConnector = (
+	args: RemoveConnectorArgs,
+): RemoveConnectorAction => {
+	return {
+		type: "removeConnector",
+		payload: args,
 	};
 };
 
@@ -485,6 +505,27 @@ export function addParameterToNode(
 	};
 }
 
+type RemoveParameterFromNodeAction = {
+	type: "removeParameterFromNode";
+	payload: RemoveParameterFromNodeArgs;
+};
+type RemoveParameterFromNodeArgs = {
+	node: {
+		id: GiselleNodeId;
+	};
+	parameter: {
+		key: string;
+	};
+};
+export function removeParameterFromNode(
+	args: RemoveParameterFromNodeArgs,
+): RemoveParameterFromNodeAction {
+	return {
+		type: "removeParameterFromNode",
+		payload: args,
+	};
+}
+
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
@@ -511,7 +552,6 @@ export function addSourceToPromptNode(
 		const outgoingConnectors = state.graph.connectors.filter(
 			({ source }) => source === args.promptNode.id,
 		);
-		console.log({ outgoingConnectors });
 		for (const outgoingConnector of outgoingConnectors) {
 			const outgoingNode = state.graph.nodes.find(
 				(node) => node.id === outgoingConnector.target,
@@ -555,9 +595,75 @@ export function addSourceToPromptNode(
 	};
 }
 
+type RemoveSourceFromPromptNodeArgs = {
+	promptNode: {
+		id: GiselleNodeId;
+		sources: ArtifactId[];
+	};
+	source: Artifact;
+};
+export function removeSourceFromPromptNode(
+	args: RemoveSourceFromPromptNodeArgs,
+): ThunkAction {
+	return (dispatch, getState) => {
+		dispatch(
+			updateNodeProperty({
+				node: {
+					id: args.promptNode.id,
+					property: {
+						key: "sources",
+						value: args.promptNode.sources.filter(
+							(source) => source !== args.source.id,
+						),
+					},
+				},
+			}),
+		);
+		const state = getState();
+		const outgoingConnectors = state.graph.connectors.filter(
+			({ source }) => source === args.promptNode.id,
+		);
+		for (const outgoingConnector of outgoingConnectors) {
+			const outgoingNode = state.graph.nodes.find(
+				(node) => node.id === outgoingConnector.target,
+			);
+			if (outgoingNode === undefined) {
+				continue;
+			}
+			const artifactCreatorNodeToOutgoingNodeConnector =
+				state.graph.connectors.find(
+					(connector) =>
+						connector.target === outgoingNode.id &&
+						connector.source === args.source.generatorNode.id,
+				);
+			if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
+				continue;
+			}
+			dispatch(
+				removeConnector({
+					connector: {
+						id: artifactCreatorNodeToOutgoingNodeConnector.id,
+					},
+				}),
+			);
+			dispatch(
+				removeParameterFromNode({
+					node: {
+						id: outgoingConnector.target,
+					},
+					parameter: {
+						key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
+					},
+				}),
+			);
+		}
+	};
+}
+
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
+	| RemoveConnectorAction
 	| SelectNodeAction
 	| SetPanelTabAction
 	| UpdateNodePropertyAction
@@ -566,4 +672,5 @@ export type GraphAction =
 	| SetTextGenerationNodeOutputAction
 	| UpdateNodeStateAction
 	| AddOrReplaceArtifactAction
-	| AddParameterToNodeAction;
+	| AddParameterToNodeAction
+	| RemoveParameterFromNodeAction;
