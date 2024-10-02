@@ -20,6 +20,7 @@ import { Langfuse } from 'langfuse'
 
 export async function generateObjectStream(prompt: string) {
 	const lf = new Langfuse();
+	lf.debug(true);
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
