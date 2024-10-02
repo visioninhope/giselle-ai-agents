@@ -133,7 +133,7 @@ export const TextGeneratorPropertyPanel: FC<
 							(node.output as PartialGeneratedObject).artifact?.completed && (
 								<div>
 									<Dialog>
-										<DialogTrigger asChild>
+										<DialogTrigger>
 											<ArtifactBlock
 												title={
 													(node.output as PartialGeneratedObject).artifact

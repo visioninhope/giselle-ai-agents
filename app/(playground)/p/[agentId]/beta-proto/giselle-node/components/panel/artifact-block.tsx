@@ -9,10 +9,7 @@ type ArtifactBlockProps = {
 };
 export function ArtifactBlock(props: ArtifactBlockProps) {
 	return (
-		<button
-			type="button"
-			className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left inline-flex items-center gap-[16px]"
-		>
+		<div className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left inline-flex items-center gap-[16px]">
 			{props.loading ? (
 				<SpinnerIcon className="w-[18px] h-[18px] stroke-black-30 animate-follow-through-spin fill-transparent" />
 			) : (
@@ -25,6 +22,6 @@ export function ArtifactBlock(props: ArtifactBlockProps) {
 				</p>
 			</div>
 			<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
-		</button>
+		</div>
 	);
 }
