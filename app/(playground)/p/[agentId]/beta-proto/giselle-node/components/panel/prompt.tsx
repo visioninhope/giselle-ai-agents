@@ -5,6 +5,7 @@ import { type FC, useCallback, useMemo, useState } from "react";
 import type { Artifact, ArtifactId } from "../../../artifact/types";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
+	addSourceToPromptNode,
 	generateText,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
@@ -147,19 +148,31 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	const handleArtifactClick = useCallback(
 		(artifact: Artifact) => () => {
 			const artifactIds = sources.map(({ id }) => id);
-			dispatch(
-				updateNodeProperty({
-					node: {
-						id: node.id,
-						property: {
-							key: "sources",
-							value: artifactIds.includes(artifact.id)
-								? artifactIds.filter((artifactId) => artifactId !== artifact.id)
-								: [...artifactIds, artifact.id],
+			if (artifactIds.includes(artifact.id)) {
+				dispatch(
+					updateNodeProperty({
+						node: {
+							id: node.id,
+							property: {
+								key: "sources",
+								value: artifactIds.filter(
+									(artifactId) => artifactId !== artifact.id,
+								),
+							},
 						},
-					},
-				}),
-			);
+					}),
+				);
+			} else {
+				dispatch(
+					addSourceToPromptNode({
+						promptNode: {
+							id: node.id,
+							sources: artifactIds,
+						},
+						source: artifact,
+					}),
+				);
+			}
 		},
 		[dispatch, node.id, sources],
 	);

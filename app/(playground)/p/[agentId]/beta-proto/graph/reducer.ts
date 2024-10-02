@@ -153,6 +153,31 @@ export const graphReducer = (
 				},
 			};
 		}
+		case "addParameterToNode":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.map((node) =>
+						node.id !== action.payload.node.id
+							? node
+							: {
+									...node,
+									parameters:
+										node.parameters?.object === "objectParameter"
+											? {
+													...node.parameters,
+													properties: {
+														...node.parameters.properties,
+														[action.payload.parameter.key]:
+															action.payload.parameter.value,
+													},
+												}
+											: node.parameters,
+								},
+					),
+				},
+			};
 		default:
 			return state;
 	}

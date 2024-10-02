@@ -1,6 +1,6 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
-import type { Artifact } from "../artifact/types";
+import type { Artifact, ArtifactId } from "../artifact/types";
 import type {
 	GeneratedObject,
 	PartialGeneratedObject,
@@ -15,6 +15,7 @@ import {
 } from "../giselle-node/parameter/factory";
 import type {
 	ObjectParameter,
+	Parameter,
 	StringParameter,
 } from "../giselle-node/parameter/types";
 import {
@@ -461,6 +462,99 @@ export const generateText =
 			}),
 		);
 	};
+
+type AddParameterToNodeAction = {
+	type: "addParameterToNode";
+	payload: AddParameterToNodeArgs;
+};
+type AddParameterToNodeArgs = {
+	node: {
+		id: GiselleNodeId;
+	};
+	parameter: {
+		key: string;
+		value: Parameter;
+	};
+};
+export function addParameterToNode(
+	args: AddParameterToNodeArgs,
+): AddParameterToNodeAction {
+	return {
+		type: "addParameterToNode",
+		payload: args,
+	};
+}
+
+type AddSourceToPromptNodeArgs = {
+	promptNode: {
+		id: GiselleNodeId;
+		sources: ArtifactId[];
+	};
+	source: Artifact;
+};
+export function addSourceToPromptNode(
+	args: AddSourceToPromptNodeArgs,
+): ThunkAction {
+	return (dispatch, getState) => {
+		dispatch(
+			updateNodeProperty({
+				node: {
+					id: args.promptNode.id,
+					property: {
+						key: "sources",
+						value: [...args.promptNode.sources, args.source.id],
+					},
+				},
+			}),
+		);
+		const state = getState();
+		const outgoingConnectors = state.graph.connectors.filter(
+			({ source }) => source === args.promptNode.id,
+		);
+		console.log({ outgoingConnectors });
+		for (const outgoingConnector of outgoingConnectors) {
+			const outgoingNode = state.graph.nodes.find(
+				(node) => node.id === outgoingConnector.target,
+			);
+			if (outgoingNode === undefined) {
+				continue;
+			}
+			const currentSourceHandleLength =
+				outgoingNode.parameters?.object === "objectParameter"
+					? Object.keys(outgoingNode.parameters.properties).filter((key) =>
+							key.startsWith("source"),
+						).length
+					: 0;
+			dispatch(
+				addParameterToNode({
+					node: {
+						id: outgoingConnector.target,
+					},
+					parameter: {
+						key: `source${currentSourceHandleLength + 1}`,
+						value: createStringParameter({
+							label: `Source${currentSourceHandleLength + 1}`,
+						}),
+					},
+				}),
+			);
+			dispatch(
+				addConnector({
+					sourceNode: {
+						id: args.source.generatorNode.id,
+						category: args.source.generatorNode.category,
+					},
+					targetNode: {
+						id: outgoingConnector.target,
+						handle: `source${currentSourceHandleLength + 1}`,
+						category: outgoingConnector.targetNodeCategory,
+					},
+				}),
+			);
+		}
+	};
+}
+
 export type GraphAction =
 	| AddNodeAction
 	| AddConnectorAction
@@ -471,4 +565,5 @@ export type GraphAction =
 	| SetNodeOutputAction
 	| SetTextGenerationNodeOutputAction
 	| UpdateNodeStateAction
-	| AddOrReplaceArtifactAction;
+	| AddOrReplaceArtifactAction
+	| AddParameterToNodeAction;

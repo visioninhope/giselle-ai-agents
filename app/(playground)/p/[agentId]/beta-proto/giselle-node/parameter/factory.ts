@@ -23,14 +23,21 @@ export function createParameterId(): ParameterId {
 	return `prm_${createId()}`;
 }
 
+type StringParameterInput = Pick<StringParameter, "label">;
 export function createStringParameter(
-	stringPrameterBlueprint: StringParameterBlueprint,
+	blueprint: StringParameterBlueprint,
+): StringParameter;
+export function createStringParameter(
+	input: StringParameterInput,
+): StringParameter;
+export function createStringParameter(
+	args: StringParameterInput | StringParameterBlueprint,
 ): StringParameter {
 	return {
 		object: "stringParameter",
 		id: createParameterId(),
 		type: "string",
-		label: stringPrameterBlueprint.label,
+		label: args.label,
 	};
 }
 
