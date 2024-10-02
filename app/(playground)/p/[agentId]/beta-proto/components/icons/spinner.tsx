@@ -14,10 +14,10 @@ export const SpinnerIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 			cy="10"
 			r="9"
 			transform="rotate(-180 10 10)"
-			stroke-width="2"
-			stroke-miterlimit="2.9238"
-			stroke-linecap="round"
-			stroke-dasharray="6 8"
+			strokeWidth="2"
+			strokeMiterlimit="2.9238"
+			strokeLinecap="round"
+			strokeDasharray="6 8"
 		/>
 	</svg>
 );
