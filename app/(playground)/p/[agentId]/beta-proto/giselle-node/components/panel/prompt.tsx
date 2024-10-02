@@ -17,6 +17,7 @@ import {
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
+import Langfuse from "langfuse";
 
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
@@ -112,12 +113,17 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 				},
 			}),
 		);
+		const lf = new Langfuse();
+		const trace = lf.trace({
+			id: `giselle-${Date.now()}`,
+			name: 'agent',
+		});
 		dispatch(
 			generateText({
 				textGeneratorNode: {
 					id: outgoingConnections[0].target,
 				},
-			}),
+			}, trace),
 		);
 	}, [dispatch, outgoingConnections]);
 	return (

@@ -10,9 +10,4 @@ export async function register() {
 	if (process.env.NEXT_RUNTIME === "edge") {
 		await import("./sentry.edge.config");
 	}
-
-	registerOTel({
-		serviceName: "giselle",
-		traceExporter: new LangfuseExporter({ debug: true }),
-	});
 }
