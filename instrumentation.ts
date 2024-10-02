@@ -12,7 +12,7 @@ export async function register() {
 	}
 
 	registerOTel({
-		serviceName: "langfuse-vercel-giselle",
+		serviceName: "giselle-dev",
 		traceExporter: new LangfuseExporter({ debug: true }),
 	});
 }
