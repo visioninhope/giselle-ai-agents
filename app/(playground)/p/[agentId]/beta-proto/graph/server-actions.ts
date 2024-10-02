@@ -51,6 +51,7 @@ export async function generateObjectStream(prompt: string) {
 				generation.end({
 					output: result,
 				});
+				await lf.shutdownAsync();
 			},
 		});
 
@@ -61,7 +62,6 @@ export async function generateObjectStream(prompt: string) {
 		stream.done();
 	})();
 
-	await lf.shutdownAsync();
 	return { object: stream.value };
 }
 
