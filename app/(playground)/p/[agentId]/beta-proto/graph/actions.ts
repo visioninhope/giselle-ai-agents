@@ -718,8 +718,59 @@ export function removeSourceFromPromptNode(
 	};
 }
 
+type RemoveNodeAction = {
+	type: "removeNode";
+	payload: RemoveNodeArgs;
+};
+
+type RemoveNodeArgs = {
+	node: {
+		id: GiselleNodeId;
+	};
+};
+
+export function removeNode(args: RemoveNodeArgs): RemoveNodeAction {
+	return {
+		type: "removeNode",
+		payload: args,
+	};
+}
+
+export function removeSelectedNodesOrFeedback(): ThunkAction {
+	return (dispatch, getState) => {
+		const state = getState();
+		const selectedNodes = state.graph.nodes.filter((node) => node.ui.selected);
+		console.log(selectedNodes);
+		if (selectedNodes.length < 1) {
+			return;
+		}
+		const onlyDeletableNodesSelected = selectedNodes.every((selectedNode) => {
+			switch (selectedNode.archetype) {
+				case giselleNodeArchetypes.prompt:
+					return true;
+				case giselleNodeArchetypes.textGenerator:
+					return true;
+			}
+		});
+		if (!onlyDeletableNodesSelected) {
+			/** @todo set ui state to present feedback dialog */
+			return;
+		}
+		for (const selectedNode of selectedNodes) {
+			dispatch(
+				removeNode({
+					node: {
+						id: selectedNode.id,
+					},
+				}),
+			);
+		}
+	};
+}
+
 export type GraphAction =
 	| AddNodeAction
+	| RemoveNodeAction
 	| AddConnectorAction
 	| RemoveConnectorAction
 	| SelectNodeAction

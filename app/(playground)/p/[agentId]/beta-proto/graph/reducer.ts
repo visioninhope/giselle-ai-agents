@@ -213,6 +213,16 @@ export const graphReducer = (
 					),
 				},
 			};
+		case "removeNode":
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					nodes: state.graph.nodes.filter(
+						(node) => node.id !== action.payload.node.id,
+					),
+				},
+			};
 		default:
 			return state;
 	}
