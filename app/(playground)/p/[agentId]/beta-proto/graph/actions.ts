@@ -740,7 +740,6 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 	return (dispatch, getState) => {
 		const state = getState();
 		const selectedNodes = state.graph.nodes.filter((node) => node.ui.selected);
-		console.log(selectedNodes);
 		if (selectedNodes.length < 1) {
 			return;
 		}
@@ -755,6 +754,24 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 		if (!onlyDeletableNodesSelected) {
 			/** @todo set ui state to present feedback dialog */
 			return;
+		}
+		const relatedConnectors = state.graph.connectors.filter(
+			(connector) =>
+				selectedNodes.some(
+					(selectedNode) => selectedNode.id === connector.source,
+				) ||
+				selectedNodes.some(
+					(selectedNode) => selectedNode.id === connector.target,
+				),
+		);
+		for (const relatedConnector of relatedConnectors) {
+			dispatch(
+				removeConnector({
+					connector: {
+						id: relatedConnector.id,
+					},
+				}),
+			);
 		}
 		for (const selectedNode of selectedNodes) {
 			dispatch(
