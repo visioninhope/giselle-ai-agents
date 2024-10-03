@@ -39,6 +39,7 @@ export type PanelTab = (typeof panelTabs)[keyof typeof panelTabs];
 export const giselleNodeState = {
 	idle: "idle",
 	inProgress: "inProgress",
+	streaming: "streaming",
 	completed: "completed",
 } as const;
 
