@@ -463,6 +463,19 @@ ${instructionSources.map((source) => `<Artifact title="${source.title}" id="${so
 		});
 		let content: PartialGeneratedObject = {};
 		for await (const streamContent of readStreamableValue(object)) {
+			if (
+				typeof streamContent === "object" &&
+				Object.keys(streamContent).length > 0
+			) {
+				dispatch(
+					updateNodeState({
+						node: {
+							id: args.textGeneratorNode.id,
+							state: giselleNodeState.streaming,
+						},
+					}),
+				);
+			}
 			dispatch(
 				setTextGenerationNodeOutput({
 					node: {
