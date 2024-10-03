@@ -30,6 +30,7 @@ import {
 	type PanelTab,
 	type XYPosition,
 	giselleNodeState,
+	panelTabs,
 } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { ThunkAction } from "./context";
@@ -166,6 +167,22 @@ export const addNodesAndConnect = (
 				},
 			}),
 		);
+		if (addSourceNode.payload.node.archetype === giselleNodeArchetypes.prompt) {
+			dispatch(
+				updateNodesUI({
+					nodes: [
+						{
+							id: addSourceNode.payload.node.id,
+							ui: {
+								forceFocus: true,
+								selected: true,
+								panelTab: panelTabs.property,
+							},
+						},
+					],
+				}),
+			);
+		}
 	};
 };
 
