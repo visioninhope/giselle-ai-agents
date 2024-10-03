@@ -17,7 +17,6 @@ import {
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
-import Langfuse from "langfuse";
 
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
