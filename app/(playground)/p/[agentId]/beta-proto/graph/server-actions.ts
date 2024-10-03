@@ -16,13 +16,23 @@ import { eq } from "drizzle-orm";
 import { schema } from "../artifact/schema";
 import type { AgentId } from "../types";
 import type { Graph } from "./types";
+import { Langfuse } from 'langfuse'
 
 export async function generateObjectStream(prompt: string) {
+	const lf = new Langfuse();
+	const trace = lf.trace({
+		id: `giselle-${Date.now()}`,
+	});
 	const stream = createStreamableValue();
 
 	(async () => {
+		const model = "gpt-4o-mini";
+		const generation = trace.generation({
+			input: prompt,
+			model,
+		});
 		const { partialObjectStream } = await streamObject({
-			model: openai("gpt-4o-mini"),
+			model: openai(model),
 			system: "You generate an answer to a question. ",
 			prompt,
 			schema,
@@ -37,6 +47,10 @@ export async function generateObjectStream(prompt: string) {
 					subscriptionId,
 					isR06User,
 				});
+				generation.end({
+					output: result,
+				});
+				await lf.shutdownAsync();
 			},
 		});
 
