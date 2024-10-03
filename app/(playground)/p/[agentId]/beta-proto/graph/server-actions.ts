@@ -13,12 +13,16 @@ import { agents, db } from "@/drizzle";
 import { metrics } from "@opentelemetry/api";
 import { createId } from "@paralleldrive/cuid2";
 import { eq } from "drizzle-orm";
+import { Langfuse } from "langfuse";
 import { schema } from "../artifact/schema";
 import type { AgentId } from "../types";
 import type { Graph } from "./types";
-import { Langfuse } from 'langfuse'
 
-export async function generateObjectStream(prompt: string) {
+type GenerateObjectStreamParams = {
+	userPrompt: string;
+	systemPrompt?: string;
+};
+export async function generateObjectStream(params: GenerateObjectStreamParams) {
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
@@ -28,13 +32,13 @@ export async function generateObjectStream(prompt: string) {
 	(async () => {
 		const model = "gpt-4o-mini";
 		const generation = trace.generation({
-			input: prompt,
+			input: params.userPrompt,
 			model,
 		});
 		const { partialObjectStream } = await streamObject({
 			model: openai(model),
-			system: "You generate an answer to a question. ",
-			prompt,
+			system: params.systemPrompt ?? "You generate an answer to a question. ",
+			prompt: params.userPrompt,
 			schema,
 			onFinish: async (result) => {
 				const meter = metrics.getMeter("OpenAI");

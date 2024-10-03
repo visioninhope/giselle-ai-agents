@@ -7,7 +7,10 @@ import type {
 } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
-import { textGeneratorParameterNames } from "../giselle-node/blueprints";
+import {
+	giselleNodeArchetypes,
+	textGeneratorParameterNames,
+} from "../giselle-node/blueprints";
 import { createGiselleNodeId } from "../giselle-node/factory";
 import {
 	createObjectParameter,
@@ -422,14 +425,42 @@ export const generateText =
 		const instructionNode = state.graph.nodes.find(
 			(node) => node.id === instructionConnector?.source,
 		);
-		if (instructionNode === undefined) {
+		if (
+			instructionNode === undefined ||
+			instructionNode.archetype !== giselleNodeArchetypes.prompt
+		) {
 			/** @todo error handling  */
 			throw new Error("Instruction node not found");
 		}
 
-		const { object } = await generateObjectStream(
-			instructionNode.output as string,
-		);
+		const instructionSources: Artifact[] = [];
+		if (Array.isArray(instructionNode.properties.sources)) {
+			for (const source of instructionNode.properties.sources) {
+				if (typeof source !== "string") {
+					continue;
+				}
+				const artifact = state.graph.artifacts.find(
+					(artifact) => artifact.id === source,
+				);
+				if (artifact !== undefined) {
+					instructionSources.push(artifact);
+				}
+			}
+		}
+
+		const systemPrompt =
+			instructionSources.length > 0
+				? `
+Your primary objective is to fulfill the user's request by utilizing the information provided within the <Artifact> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
+
+${instructionSources.map((source) => `<Artifact title="${source.title}" id="${source.id}">${source.content}</Artifact>`).join("\n")}
+`
+				: undefined;
+
+		const { object } = await generateObjectStream({
+			userPrompt: instructionNode.output as string,
+			systemPrompt,
+		});
 		let content: PartialGeneratedObject = {};
 		for await (const streamContent of readStreamableValue(object)) {
 			dispatch(
