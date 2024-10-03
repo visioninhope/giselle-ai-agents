@@ -149,6 +149,7 @@ function Inner() {
 						toolDispatch(setSelectTool);
 					}
 				}}
+				deleteKeyCode={null}
 			>
 				<Background
 					className="!bg-black-100"
