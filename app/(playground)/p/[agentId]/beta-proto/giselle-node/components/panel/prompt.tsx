@@ -1,7 +1,14 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
 import { CheckIcon, CirclePlusIcon } from "lucide-react";
-import { type FC, useCallback, useMemo, useState } from "react";
+import {
+	type FC,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type { Artifact, ArtifactId } from "../../../artifact/types";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
@@ -173,6 +180,15 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 		},
 		[dispatch, node.id, sources],
 	);
+	const instructionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
+	useEffect(() => {
+		if (instructionTextareaRef.current === null) {
+			return;
+		}
+		if (node.ui.forceFocus) {
+			instructionTextareaRef.current.focus();
+		}
+	}, [node]);
 	return (
 		<div className="flex gap-[10px] flex-col h-full">
 			<div className="relative z-10 pt-[16px] px-[24px] flex justify-between h-[40px]">
@@ -235,7 +251,15 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 									value={text}
 									onChange={(event) => {
 										setText(event.target.value);
+										if (node.ui.forceFocus && event.target.value !== "") {
+											dispatch(
+												updateNodesUI({
+													nodes: [{ id: node.id, ui: { forceFocus: false } }],
+												}),
+											);
+										}
 									}}
+									ref={instructionTextareaRef}
 								/>
 							</div>
 

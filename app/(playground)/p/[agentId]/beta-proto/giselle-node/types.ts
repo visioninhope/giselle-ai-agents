@@ -58,6 +58,7 @@ export type GiselleNode = {
 		selected?: boolean;
 		panelTab?: PanelTab;
 		isInflluencable?: boolean;
+		forceFocus?: boolean;
 	};
 	state: GiselleNodeState;
 	resultPortLabel: string;

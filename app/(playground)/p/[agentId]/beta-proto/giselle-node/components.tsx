@@ -262,11 +262,17 @@ export const GiselleNodeInformationPanel: FC = () => {
 			) : (
 				<>
 					{selectedNodes[0].archetype === giselleNodeArchetypes.prompt && (
-						<PromptPropertyPanel node={selectedNodes[0]} />
+						<PromptPropertyPanel
+							node={selectedNodes[0]}
+							key={selectedNodes[0].id}
+						/>
 					)}
 					{selectedNodes[0].archetype ===
 						giselleNodeArchetypes.textGenerator && (
-						<TextGeneratorPropertyPanel node={selectedNodes[0]} />
+						<TextGeneratorPropertyPanel
+							node={selectedNodes[0]}
+							key={selectedNodes[0].id}
+						/>
 					)}
 				</>
 			)}
