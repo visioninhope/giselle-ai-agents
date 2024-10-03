@@ -51,7 +51,12 @@ export const Form: FC<FormProps> = ({
 					</div>
 					<Input id="password" type="password" name="password" required />
 				</div>
-				<Button className="w-full" type="submit" disabled={isPending}>
+				<Button
+					className="w-full"
+					type="submit"
+					disabled={isPending}
+					data-loading={isPending}
+				>
 					{submitText}
 				</Button>
 			</div>
