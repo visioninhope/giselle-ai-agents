@@ -1,10 +1,7 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
 import type { Artifact, ArtifactId } from "../artifact/types";
-import type {
-	GeneratedObject,
-	PartialGeneratedObject,
-} from "../artifact/types";
+import type { PartialGeneratedObject } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
 import {
