@@ -13,7 +13,10 @@ async function AgentList(props: AgentListProps) {
 	const agents = (
 		await Promise.all(
 			allAgents.map(async (agent) => {
-				const teamMembership = await getTeamMembershipByAgentId(agent.id);
+				const teamMembership = await getTeamMembershipByAgentId(
+					agent.id,
+					props.userId,
+				);
 				return teamMembership ? agent : null;
 			}),
 		)
