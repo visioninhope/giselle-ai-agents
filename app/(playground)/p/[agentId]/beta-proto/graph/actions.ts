@@ -475,11 +475,16 @@ export const generateText =
 		const instructionSources: Artifact[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
-				if (typeof source !== "string") {
+				if (
+					typeof source !== "object" ||
+					source === null ||
+					typeof source.id !== "string" ||
+					typeof source.object !== "string"
+				) {
 					continue;
 				}
 				const artifact = state.graph.artifacts.find(
-					(artifact) => artifact.id === source,
+					(artifact) => artifact.id === source.id,
 				);
 				if (artifact !== undefined) {
 					instructionSources.push(artifact);
