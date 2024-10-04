@@ -5,7 +5,7 @@ import {
 	useOnSelectionChange,
 	useReactFlow,
 } from "@xyflow/react";
-import { useCallback, useEffect } from "react";
+import { type KeyboardEventHandler, useCallback, useEffect } from "react";
 import {
 	type GiselleNodeId,
 	assertGiselleNodeId,
@@ -13,6 +13,7 @@ import {
 } from "../giselle-node/types";
 import {
 	addConnector,
+	removeSelectedNodesOrFeedback,
 	selectNode,
 	selectNodeAndSetPanelTab,
 	updateNodesUI,
@@ -164,3 +165,21 @@ export const useNodeEventHandler = () => {
 		handleNodeDragStop,
 	};
 };
+
+export function useKeyUpHandler() {
+	const { dispatch } = useGraph();
+	const handleKeyUp = useCallback<KeyboardEventHandler>(
+		(event) => {
+			switch (event.code) {
+				case "Backspace":
+					dispatch(removeSelectedNodesOrFeedback());
+					break;
+			}
+		},
+		[dispatch],
+	);
+
+	return {
+		handleKeyUp,
+	};
+}
