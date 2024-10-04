@@ -411,6 +411,26 @@ type GenerateTextArgs = {
 	};
 };
 
+type RemoveArtifactAction = {
+	type: "removeArtifact";
+	payload: RemoveArtifactArgs;
+};
+
+type RemoveArtifactArgs = {
+	artifact: {
+		id: ArtifactId;
+	};
+};
+
+export const removeArtifact = (
+	args: RemoveArtifactArgs,
+): RemoveArtifactAction => {
+	return {
+		type: "removeArtifact",
+		payload: args,
+	};
+};
+
 export const generateText =
 	(args: GenerateTextArgs): ThunkAction =>
 	async (dispatch, getState) => {
@@ -755,6 +775,35 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 			/** @todo set ui state to present feedback dialog */
 			return;
 		}
+		// List of artifacts that are created by the selected nodes
+		const relatedArtifacts = state.graph.artifacts.filter((artifact) =>
+			selectedNodes.some(
+				(selectedNode) => selectedNode.id === artifact.generatorNode.id,
+			),
+		);
+		for (const relatedArtifact of relatedArtifacts) {
+			// List of prompt nodes that depend on the artifact
+			const promptNodesDependedOnByArtifact = state.graph.nodes.filter(
+				(node) =>
+					Array.isArray(node.properties.sources) &&
+					node.properties.sources.includes(relatedArtifact.id),
+			);
+			for (const promptNodeDependedOnByArtifact of promptNodesDependedOnByArtifact) {
+				if (!Array.isArray(promptNodeDependedOnByArtifact.properties.sources)) {
+					continue;
+				}
+				dispatch(
+					removeSourceFromPromptNode({
+						promptNode: {
+							id: promptNodeDependedOnByArtifact.id,
+							sources: promptNodeDependedOnByArtifact.properties.sources,
+						},
+						source: relatedArtifact,
+					}),
+				);
+			}
+			dispatch(removeArtifact({ artifact: { id: relatedArtifact.id } }));
+		}
 		const relatedConnectors = state.graph.connectors.filter(
 			(connector) =>
 				selectedNodes.some(
@@ -798,5 +847,6 @@ export type GraphAction =
 	| SetTextGenerationNodeOutputAction
 	| UpdateNodeStateAction
 	| AddOrReplaceArtifactAction
+	| RemoveArtifactAction
 	| AddParameterToNodeAction
 	| RemoveParameterFromNodeAction;
