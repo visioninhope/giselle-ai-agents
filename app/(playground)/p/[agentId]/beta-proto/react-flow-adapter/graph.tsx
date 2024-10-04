@@ -171,9 +171,18 @@ export function useKeyUpHandler() {
 	const handleKeyUp = useCallback<KeyboardEventHandler>(
 		(event) => {
 			switch (event.code) {
-				case "Backspace":
+				case "Backspace": {
+					const isInputElement =
+						event.target instanceof HTMLInputElement ||
+						event.target instanceof HTMLTextAreaElement;
+
+					// Skip the following process if the focus is on the input element.
+					if (isInputElement) {
+						return;
+					}
 					dispatch(removeSelectedNodesOrFeedback());
 					break;
+				}
 			}
 		},
 		[dispatch],
