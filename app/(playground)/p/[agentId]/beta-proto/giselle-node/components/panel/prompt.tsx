@@ -1,6 +1,7 @@
+import { Button } from "@/components/ui/button";
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { CheckIcon, CirclePlusIcon } from "lucide-react";
+import { CheckIcon, CirclePlusIcon, PaperclipIcon } from "lucide-react";
 import {
 	type FC,
 	useCallback,
@@ -34,6 +35,7 @@ import {
 } from "../../types";
 import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
+import { AddSourceDialog } from "./add-source-dialog";
 import { ArtifactBlock } from "./artifact-block";
 
 function setTextToPropertyAndOutput(
@@ -280,47 +282,50 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 									<div className="font-rosart text-[16px] text-black-30">
 										Sources
 									</div>
-									<Popover.Root>
-										<Popover.Trigger asChild>
-											<button type="button">
-												<CirclePlusIcon
-													size={20}
-													className="stroke-black-100 fill-black-30"
-												/>
-											</button>
-										</Popover.Trigger>
-										<Popover.Content
-											side={"top"}
-											align="end"
-											className="rounded-[16px] p-[8px] text-[14px] w-[200px] text-black-30 bg-black-100 border border-[hsla(222,21%,40%,1)] shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-											sideOffset={5}
-										>
-											<div className="px-[8px]">
-												<div>
-													{availableArtifacts.map((artifact) => (
-														<button
-															type="button"
-															className="flex justify-between items-center py-[4px] w-full"
-															key={artifact.id}
-															onClick={handleArtifactClick(artifact)}
-														>
-															<p className="line-clamp-1 text-left">
-																{artifact.title}
-															</p>
-															{sources.some(
-																(source) => source.id === artifact.id,
-															) && (
-																<CheckIcon
-																	size={16}
-																	className="stroke-white flex-shrink-0"
-																/>
-															)}
-														</button>
-													))}
+									<div className="flex items-center gap-[4px]">
+										<AddSourceDialog />
+										<Popover.Root>
+											<Popover.Trigger asChild>
+												<button type="button">
+													<CirclePlusIcon
+														size={20}
+														className="stroke-black-100 fill-black-30"
+													/>
+												</button>
+											</Popover.Trigger>
+											<Popover.Content
+												side={"top"}
+												align="end"
+												className="rounded-[16px] p-[8px] text-[14px] w-[200px] text-black-30 bg-black-100 border border-[hsla(222,21%,40%,1)] shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+												sideOffset={5}
+											>
+												<div className="px-[8px]">
+													<div>
+														{availableArtifacts.map((artifact) => (
+															<button
+																type="button"
+																className="flex justify-between items-center py-[4px] w-full"
+																key={artifact.id}
+																onClick={handleArtifactClick(artifact)}
+															>
+																<p className="line-clamp-1 text-left">
+																	{artifact.title}
+																</p>
+																{sources.some(
+																	(source) => source.id === artifact.id,
+																) && (
+																	<CheckIcon
+																		size={16}
+																		className="stroke-white flex-shrink-0"
+																	/>
+																)}
+															</button>
+														))}
+													</div>
 												</div>
-											</div>
-										</Popover.Content>
-									</Popover.Root>
+											</Popover.Content>
+										</Popover.Root>
+									</div>
 								</div>
 								<div className="grid grid-cols-2 gap-4">
 									{sources.map((source) => (
