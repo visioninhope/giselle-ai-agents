@@ -283,7 +283,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 										Sources
 									</div>
 									<div className="flex items-center gap-[4px]">
-										<AddSourceDialog />
+										<AddSourceDialog node={node} />
 										<Popover.Root>
 											<Popover.Trigger asChild>
 												<button type="button">

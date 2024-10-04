@@ -9,14 +9,32 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../../../components/dialog";
+import { updateNodeProperty } from "../../../graph/actions";
+import { useGraph } from "../../../graph/context";
+import type { GiselleNode } from "../../types";
 
-export function AddSourceDialog() {
+type AddSourceDialogProps = {
+	node: GiselleNode;
+};
+export function AddSourceDialog(props: AddSourceDialogProps) {
+	const { dispatch } = useGraph();
 	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
 			const title = formData.get("title") as string;
 			const content = formData.get("content") as string;
+			dispatch(
+				updateNodeProperty({
+					node: {
+						id: props.node.id,
+						property: {
+							key: "source",
+							value: props.node.properties.source,
+						},
+					},
+				}),
+			);
 			console.log({ title, content });
 		},
 		[],
