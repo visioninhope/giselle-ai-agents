@@ -613,7 +613,6 @@ type Source = ArtifactReference | TextContentReference;
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
-		sources: Source[];
 	};
 	source: Source;
 };
@@ -621,60 +620,81 @@ export function addSourceToPromptNode(
 	args: AddSourceToPromptNodeArgs,
 ): ThunkAction {
 	return (dispatch, getState) => {
+		const state = getState();
+		const updateNode = state.graph.nodes.find(
+			(node) => node.id === args.promptNode.id,
+		);
+		if (updateNode === undefined) {
+			return;
+		}
+		if (updateNode.archetype !== giselleNodeArchetypes.prompt) {
+			return;
+		}
+		const currentSources = updateNode.properties.sources;
+		if (!Array.isArray(currentSources)) {
+			throw new Error(`${updateNode.id}'s sources property is not an array`);
+		}
 		dispatch(
 			updateNodeProperty({
 				node: {
 					id: args.promptNode.id,
 					property: {
 						key: "sources",
-						value: [...args.promptNode.sources, args.source.id],
+						value: [...currentSources, args.source],
 					},
 				},
 			}),
 		);
-		const state = getState();
-		const outgoingConnectors = state.graph.connectors.filter(
-			({ source }) => source === args.promptNode.id,
-		);
-		for (const outgoingConnector of outgoingConnectors) {
-			const outgoingNode = state.graph.nodes.find(
-				(node) => node.id === outgoingConnector.target,
+		if (args.source.object === "artifact.reference") {
+			const artifact = state.graph.artifacts.find(
+				(artifact) => artifact.id === args.source.id,
 			);
-			if (outgoingNode === undefined) {
-				continue;
+			if (artifact === undefined) {
+				return;
 			}
-			const currentSourceHandleLength =
-				outgoingNode.parameters?.object === "objectParameter"
-					? Object.keys(outgoingNode.parameters.properties).filter((key) =>
-							key.startsWith("source"),
-						).length
-					: 0;
-			dispatch(
-				addParameterToNode({
-					node: {
-						id: outgoingConnector.target,
-					},
-					parameter: {
-						key: `source${currentSourceHandleLength + 1}`,
-						value: createStringParameter({
-							label: `Source${currentSourceHandleLength + 1}`,
-						}),
-					},
-				}),
+			const outgoingConnectors = state.graph.connectors.filter(
+				({ source }) => source === args.promptNode.id,
 			);
-			dispatch(
-				addConnector({
-					sourceNode: {
-						id: args.source.generatorNode.id,
-						category: args.source.generatorNode.category,
-					},
-					targetNode: {
-						id: outgoingConnector.target,
-						handle: `source${currentSourceHandleLength + 1}`,
-						category: outgoingConnector.targetNodeCategory,
-					},
-				}),
-			);
+			for (const outgoingConnector of outgoingConnectors) {
+				const outgoingNode = state.graph.nodes.find(
+					(node) => node.id === outgoingConnector.target,
+				);
+				if (outgoingNode === undefined) {
+					continue;
+				}
+				const currentSourceHandleLength =
+					outgoingNode.parameters?.object === "objectParameter"
+						? Object.keys(outgoingNode.parameters.properties).filter((key) =>
+								key.startsWith("source"),
+							).length
+						: 0;
+				dispatch(
+					addParameterToNode({
+						node: {
+							id: outgoingConnector.target,
+						},
+						parameter: {
+							key: `source${currentSourceHandleLength + 1}`,
+							value: createStringParameter({
+								label: `Source${currentSourceHandleLength + 1}`,
+							}),
+						},
+					}),
+				);
+				dispatch(
+					addConnector({
+						sourceNode: {
+							id: artifact.generatorNode.id,
+							category: artifact.generatorNode.category,
+						},
+						targetNode: {
+							id: outgoingConnector.target,
+							handle: `source${currentSourceHandleLength + 1}`,
+							category: outgoingConnector.targetNodeCategory,
+						},
+					}),
+				);
+			}
 		}
 	};
 }
@@ -682,64 +702,89 @@ export function addSourceToPromptNode(
 type RemoveSourceFromPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
-		sources: ArtifactId[];
 	};
-	source: Artifact;
+	source: Source;
 };
 export function removeSourceFromPromptNode(
 	args: RemoveSourceFromPromptNodeArgs,
 ): ThunkAction {
 	return (dispatch, getState) => {
+		const state = getState();
+		const targetNode = state.graph.nodes.find(
+			(node) => node.id === args.promptNode.id,
+		);
+		if (targetNode === undefined) {
+			return;
+		}
+		if (targetNode.archetype !== giselleNodeArchetypes.prompt) {
+			return;
+		}
+		const currentSources = targetNode.properties.sources;
+		if (!Array.isArray(currentSources)) {
+			throw new Error(`${targetNode.id}'s sources property is not an array`);
+		}
+
 		dispatch(
 			updateNodeProperty({
 				node: {
 					id: args.promptNode.id,
 					property: {
 						key: "sources",
-						value: args.promptNode.sources.filter(
-							(source) => source !== args.source.id,
+						value: currentSources.filter(
+							(currentSource) =>
+								typeof currentSource === "object" &&
+								currentSource !== null &&
+								typeof currentSource.id === "string" &&
+								currentSource.id !== args.source.id,
 						),
 					},
 				},
 			}),
 		);
-		const state = getState();
-		const outgoingConnectors = state.graph.connectors.filter(
-			({ source }) => source === args.promptNode.id,
-		);
-		for (const outgoingConnector of outgoingConnectors) {
-			const outgoingNode = state.graph.nodes.find(
-				(node) => node.id === outgoingConnector.target,
+		if (args.source.object === "artifact.reference") {
+			const artifact = state.graph.artifacts.find(
+				(artifact) => artifact.id === args.source.id,
 			);
-			if (outgoingNode === undefined) {
-				continue;
+			if (artifact === undefined) {
+				return;
 			}
-			const artifactCreatorNodeToOutgoingNodeConnector =
-				state.graph.connectors.find(
-					(connector) =>
-						connector.target === outgoingNode.id &&
-						connector.source === args.source.generatorNode.id,
+			const outgoingConnectors = state.graph.connectors.filter(
+				({ source }) => source === args.promptNode.id,
+			);
+			for (const outgoingConnector of outgoingConnectors) {
+				const outgoingNode = state.graph.nodes.find(
+					(node) => node.id === outgoingConnector.target,
 				);
-			if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
-				continue;
+				if (outgoingNode === undefined) {
+					continue;
+				}
+				const artifactCreatorNodeToOutgoingNodeConnector =
+					state.graph.connectors.find(
+						(connector) =>
+							connector.target === outgoingNode.id &&
+							connector.source === artifact.generatorNode.id,
+					);
+				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
+					continue;
+				}
+				dispatch(
+					removeConnector({
+						connector: {
+							id: artifactCreatorNodeToOutgoingNodeConnector.id,
+						},
+					}),
+				);
+				dispatch(
+					removeParameterFromNode({
+						node: {
+							id: outgoingConnector.target,
+						},
+						parameter: {
+							key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
+						},
+					}),
+				);
 			}
-			dispatch(
-				removeConnector({
-					connector: {
-						id: artifactCreatorNodeToOutgoingNodeConnector.id,
-					},
-				}),
-			);
-			dispatch(
-				removeParameterFromNode({
-					node: {
-						id: outgoingConnector.target,
-					},
-					parameter: {
-						key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
-					},
-				}),
-			);
 		}
 	};
 }
@@ -802,9 +847,8 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 					removeSourceFromPromptNode({
 						promptNode: {
 							id: promptNodeDependedOnByArtifact.id,
-							sources: promptNodeDependedOnByArtifact.properties.sources,
 						},
-						source: relatedArtifact,
+						source: { id: relatedArtifact.id, object: "artifact.reference" },
 					}),
 				);
 			}

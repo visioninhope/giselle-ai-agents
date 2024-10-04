@@ -9,7 +9,11 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { Artifact, ArtifactId } from "../../../artifact/types";
+import type {
+	Artifact,
+	ArtifactId,
+	ArtifactReference,
+} from "../../../artifact/types";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import {
 	addSourceToPromptNode,
@@ -21,6 +25,7 @@ import {
 	updateNodesUI,
 } from "../../../graph/actions";
 import { type ThunkAction, useGraph } from "../../../graph/context";
+import type { TextContentReference } from "../../../text-content/types";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
@@ -57,6 +62,8 @@ function setTextToPropertyAndOutput(
 		);
 	};
 }
+
+type Source = ArtifactReference | TextContentReference;
 
 type PromptPropertyPanelProps = {
 	node: GiselleNode;
@@ -146,9 +153,9 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	);
 	const sources = useMemo<Artifact[]>(
 		() =>
-			(node.properties.sources as ArtifactId[])
+			(node.properties.sources as Source[])
 				?.map((source) =>
-					state.graph.artifacts.find((artifact) => artifact.id === source),
+					state.graph.artifacts.find((artifact) => artifact.id === source.id),
 				)
 				.filter((artifactIdsOrNull) => artifactIdsOrNull != null) ?? [],
 		[node.properties.sources, state.graph.artifacts],
@@ -161,9 +168,11 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 					removeSourceFromPromptNode({
 						promptNode: {
 							id: node.id,
-							sources: artifactIds,
 						},
-						source: artifact,
+						source: {
+							id: artifact.id,
+							object: "artifact.reference",
+						},
 					}),
 				);
 			} else {
@@ -171,9 +180,11 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 					addSourceToPromptNode({
 						promptNode: {
 							id: node.id,
-							sources: artifactIds,
 						},
-						source: artifact,
+						source: {
+							id: artifact.id,
+							object: "artifact.reference",
+						},
 					}),
 				);
 			}
