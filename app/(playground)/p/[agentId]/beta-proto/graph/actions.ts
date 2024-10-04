@@ -1,6 +1,10 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
-import type { Artifact, ArtifactId } from "../artifact/types";
+import type {
+	Artifact,
+	ArtifactId,
+	ArtifactReference,
+} from "../artifact/types";
 import type { PartialGeneratedObject } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
@@ -30,6 +34,7 @@ import {
 	panelTabs,
 } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
+import type { TextContentReference } from "../text-content/types";
 import type { ThunkAction } from "./context";
 import { generateObjectStream } from "./server-actions";
 
@@ -536,7 +541,7 @@ ${instructionSources.map((source) => `<Artifact title="${source.title}" id="${so
 			addOrReplaceArtifact({
 				artifact: {
 					id: artifact === undefined ? createArtifactId() : artifact.id,
-					type: "artifact",
+					object: "artifact",
 					title: content?.artifact?.title ?? "",
 					content: content?.artifact?.content ?? "",
 					generatorNode: {
@@ -604,12 +609,13 @@ export function removeParameterFromNode(
 	};
 }
 
+type Source = ArtifactReference | TextContentReference;
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
-		sources: ArtifactId[];
+		sources: Source[];
 	};
-	source: Artifact;
+	source: Source;
 };
 export function addSourceToPromptNode(
 	args: AddSourceToPromptNodeArgs,

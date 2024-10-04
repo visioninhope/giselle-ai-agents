@@ -7,11 +7,15 @@ type ArtifactElement = GiselleNodeArtifactElement | Artifact;
 export type ArtifactId = `art_${string}`;
 export type Artifact = {
 	id: ArtifactId;
-	type: "artifact";
+	object: "artifact";
 	title: string;
 	content: string;
 	generatorNode: GiselleNodeArtifactElement;
 	elements: ArtifactElement[];
+};
+export type ArtifactReference = {
+	id: ArtifactId;
+	object: "artifact.reference";
 };
 
 export type GeneratedObject = {
