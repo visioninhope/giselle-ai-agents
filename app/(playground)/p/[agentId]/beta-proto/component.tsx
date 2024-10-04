@@ -44,7 +44,6 @@ import {
 import {
 	useConnectionHandler,
 	useGraphToReactFlowEffect,
-	useKeyUpHandler,
 	useNodeEventHandler,
 } from "./react-flow-adapter/graph";
 import { setSelectTool } from "./tool/actions";
@@ -62,7 +61,6 @@ function Inner() {
 	useGraphToReactFlowEffect();
 	const { handleConnect } = useConnectionHandler();
 	const { handleNodeDragStop } = useNodeEventHandler();
-	const { handleKeyUp } = useKeyUpHandler();
 	return (
 		<div className="w-full h-screen">
 			<div className="absolute z-10 left-[20px] right-[20px] top-[20px] h-[36px] flex justify-between">
@@ -97,7 +95,6 @@ function Inner() {
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				panOnScroll
-				onKeyUp={handleKeyUp}
 				selectionOnDrag
 				panOnDrag={false}
 				colorMode="dark"
@@ -152,7 +149,6 @@ function Inner() {
 						toolDispatch(setSelectTool);
 					}
 				}}
-				deleteKeyCode={null}
 			>
 				<Background
 					className="!bg-black-100"
