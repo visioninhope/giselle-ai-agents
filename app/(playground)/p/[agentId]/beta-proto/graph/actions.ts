@@ -484,7 +484,6 @@ export const generateText =
 				) {
 					continue;
 				}
-				console.log({ source });
 				if (source.object === "textContent") {
 					instructionSources.push(source);
 				} else if (source.object === "artifact.reference") {
@@ -506,7 +505,6 @@ Your primary objective is to fulfill the user's request by utilizing the informa
 ${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
 `
 				: undefined;
-		console.log(systemPrompt);
 
 		const { object } = await generateObjectStream({
 			userPrompt: instructionNode.output as string,
