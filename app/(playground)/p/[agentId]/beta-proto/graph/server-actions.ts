@@ -1,7 +1,5 @@
 "use server";
 
-export const maxDuration = 60;
-
 import { openai } from "@ai-sdk/openai";
 import {
 	type CoreMessage,
