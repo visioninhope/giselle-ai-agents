@@ -9,8 +9,12 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../../../components/dialog";
-import { updateNodeProperty } from "../../../graph/actions";
+import {
+	addSourceToPromptNode,
+	updateNodeProperty,
+} from "../../../graph/actions";
 import { useGraph } from "../../../graph/context";
+import { createTextContentId } from "../../../text-content/factory";
 import type { GiselleNode } from "../../types";
 
 type AddSourceDialogProps = {
@@ -25,22 +29,25 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 			const title = formData.get("title") as string;
 			const content = formData.get("content") as string;
 			dispatch(
-				updateNodeProperty({
-					node: {
+				addSourceToPromptNode({
+					promptNode: {
 						id: props.node.id,
-						property: {
-							key: "source",
-							value: props.node.properties.source,
-						},
+					},
+					source: {
+						object: "textContent",
+						id: createTextContentId(),
+						title,
+						content,
 					},
 				}),
 			);
-			console.log({ title, content });
+			setOpen(false);
 		},
-		[],
+		[dispatch, props.node.id],
 	);
+	const [open, setOpen] = useState(false);
 	return (
-		<Dialog>
+		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger>
 				<PaperclipIcon size={18} className="stroke-black-30" />
 			</DialogTrigger>

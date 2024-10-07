@@ -1,7 +1,6 @@
-import { Button } from "@/components/ui/button";
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { CheckIcon, CirclePlusIcon, PaperclipIcon } from "lucide-react";
+import { CheckIcon, CirclePlusIcon, Trash2Icon, TrashIcon } from "lucide-react";
 import {
 	type FC,
 	useCallback,
@@ -10,12 +9,10 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type {
-	Artifact,
-	ArtifactId,
-	ArtifactReference,
-} from "../../../artifact/types";
+import type { Artifact, ArtifactReference } from "../../../artifact/types";
+import { DocumentIcon } from "../../../components/icons/document";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
+import { TextsIcon } from "../../../components/icons/texts";
 import {
 	addSourceToPromptNode,
 	generateText,
@@ -26,7 +23,10 @@ import {
 	updateNodesUI,
 } from "../../../graph/actions";
 import { type ThunkAction, useGraph } from "../../../graph/context";
-import type { TextContentReference } from "../../../text-content/types";
+import type {
+	TextContent,
+	TextContentReference,
+} from "../../../text-content/types";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
@@ -65,7 +65,7 @@ function setTextToPropertyAndOutput(
 	};
 }
 
-type Source = ArtifactReference | TextContentReference;
+type Source = ArtifactReference | TextContent;
 
 type PromptPropertyPanelProps = {
 	node: GiselleNode;
@@ -153,11 +153,15 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			),
 		[outgoingConnections, state.graph.artifacts],
 	);
-	const sources = useMemo<Artifact[]>(
+	const sources = useMemo<(Artifact | TextContent)[]>(
 		() =>
 			(node.properties.sources as Source[])
 				?.map((source) =>
-					state.graph.artifacts.find((artifact) => artifact.id === source.id),
+					source.object === "textContent"
+						? source
+						: state.graph.artifacts.find(
+								(artifact) => artifact.id === source.id,
+							),
 				)
 				.filter((artifactIdsOrNull) => artifactIdsOrNull != null) ?? [],
 		[node.properties.sources, state.graph.artifacts],
@@ -192,6 +196,22 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			}
 		},
 		[dispatch, node.id, sources],
+	);
+	const removeTextContent = useCallback(
+		(textContent: Pick<TextContentReference, "id">) => () => {
+			dispatch(
+				removeSourceFromPromptNode({
+					promptNode: {
+						id: node.id,
+					},
+					source: {
+						id: textContent.id,
+						object: "textContent.reference",
+					},
+				}),
+			);
+		},
+		[dispatch, node.id],
 	);
 	const instructionTextareaRef = useRef<HTMLTextAreaElement | null>(null);
 	useEffect(() => {
@@ -328,13 +348,38 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 									</div>
 								</div>
 								<div className="grid grid-cols-2 gap-4">
-									{sources.map((source) => (
-										<ArtifactBlock
-											key={source.id}
-											title={source.title}
-											node={source.generatorNode}
-										/>
-									))}
+									{sources.map((source) =>
+										source.object === "artifact" ? (
+											<ArtifactBlock
+												key={source.id}
+												title={source.title}
+												node={source.generatorNode}
+											/>
+										) : (
+											<div
+												className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center justify-between group"
+												key={source.id}
+											>
+												<div className="flex items-center gap-[16px]">
+													<TextsIcon className="w-[18px] h-[18px] fill-black-30" />
+													<div>
+														<p className="line-clamp-1 text-[14px] font-rosart">
+															{source.title}
+														</p>
+														<p className="line-clamp-1 font-rosart text-black-70 text-[8px]" />
+													</div>
+												</div>
+												<button
+													type="button"
+													className="z-10 hidden group-hover:block p-[2px] rounded-[4px] hover:bg-[hsla(0,0%,100%,0.2)] transition-colors duration-200 ease-in-out"
+													onClick={removeTextContent({ id: source.id })}
+												>
+													<Trash2Icon size={16} className="stroke-black-30" />
+												</button>
+												<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
+											</div>
+										),
+									)}
 								</div>
 							</div>
 						</div>

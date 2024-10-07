@@ -34,7 +34,7 @@ import {
 	panelTabs,
 } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
-import type { TextContentReference } from "../text-content/types";
+import type { TextContent, TextContentReference } from "../text-content/types";
 import type { ThunkAction } from "./context";
 import { generateObjectStream } from "./server-actions";
 
@@ -614,7 +614,7 @@ export function removeParameterFromNode(
 	};
 }
 
-type Source = ArtifactReference | TextContentReference;
+type Source = ArtifactReference | TextContent;
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
@@ -635,7 +635,7 @@ export function addSourceToPromptNode(
 		if (updateNode.archetype !== giselleNodeArchetypes.prompt) {
 			return;
 		}
-		const currentSources = updateNode.properties.sources;
+		const currentSources = updateNode.properties.sources ?? [];
 		if (!Array.isArray(currentSources)) {
 			throw new Error(`${updateNode.id}'s sources property is not an array`);
 		}
@@ -704,11 +704,12 @@ export function addSourceToPromptNode(
 	};
 }
 
+type Source2 = ArtifactReference | TextContentReference;
 type RemoveSourceFromPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
 	};
-	source: Source;
+	source: Source2;
 };
 export function removeSourceFromPromptNode(
 	args: RemoveSourceFromPromptNodeArgs,
@@ -724,7 +725,7 @@ export function removeSourceFromPromptNode(
 		if (targetNode.archetype !== giselleNodeArchetypes.prompt) {
 			return;
 		}
-		const currentSources = targetNode.properties.sources;
+		const currentSources = targetNode.properties.sources ?? [];
 		if (!Array.isArray(currentSources)) {
 			throw new Error(`${targetNode.id}'s sources property is not an array`);
 		}
