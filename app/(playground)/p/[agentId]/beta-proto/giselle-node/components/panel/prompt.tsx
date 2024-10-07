@@ -361,7 +361,7 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 												key={source.id}
 											>
 												<div className="flex items-center gap-[16px]">
-													<TextsIcon className="w-[18px] h-[18px] fill-black-30" />
+													<TextsIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
 													<div>
 														<p className="line-clamp-1 text-[14px] font-rosart">
 															{source.title}
