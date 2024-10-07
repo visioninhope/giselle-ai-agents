@@ -15,9 +15,9 @@ async function getAgent(agentId: AgentId) {
 export default async function AgentPlaygroundPage({
 	params,
 }: {
-	params: { agentId: AgentId };
+	params: Promise<{ agentId: AgentId }>;
 }) {
-	const { agentId } = params;
+	const { agentId } = await params;
 	const user = await getUser();
 
 	const teamMembership = await getTeamMembershipByAgentId(agentId, user.id);
