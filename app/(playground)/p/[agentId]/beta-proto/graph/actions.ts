@@ -472,7 +472,8 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		const instructionSources: Artifact[] = [];
+		type Source = Artifact | TextContent;
+		const instructionSources: Source[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
 				if (
@@ -483,11 +484,16 @@ export const generateText =
 				) {
 					continue;
 				}
-				const artifact = state.graph.artifacts.find(
-					(artifact) => artifact.id === source.id,
-				);
-				if (artifact !== undefined) {
-					instructionSources.push(artifact);
+				console.log({ source });
+				if (source.object === "textContent") {
+					instructionSources.push(source);
+				} else if (source.object === "artifact.reference") {
+					const artifact = state.graph.artifacts.find(
+						(artifact) => artifact.id === source.id,
+					);
+					if (artifact !== undefined) {
+						instructionSources.push(artifact);
+					}
 				}
 			}
 		}
@@ -495,11 +501,12 @@ export const generateText =
 		const systemPrompt =
 			instructionSources.length > 0
 				? `
-Your primary objective is to fulfill the user's request by utilizing the information provided within the <Artifact> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
+Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
 
-${instructionSources.map((source) => `<Artifact title="${source.title}" id="${source.id}">${source.content}</Artifact>`).join("\n")}
+${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
 `
 				: undefined;
+		console.log(systemPrompt);
 
 		const { object } = await generateObjectStream({
 			userPrompt: instructionNode.output as string,
