@@ -1,8 +1,8 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "./create-server-client";
 
-export const createClient = () => {
-	const cookieStore = cookies();
+export const createClient = async () => {
+	const cookieStore = await cookies();
 	return createServerClient({
 		cookies: {
 			getAll() {

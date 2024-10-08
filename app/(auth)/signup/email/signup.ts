@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase";
 
 export async function signup(email: string, password: string) {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { error } = await supabase.auth.signUp({ email, password });
 

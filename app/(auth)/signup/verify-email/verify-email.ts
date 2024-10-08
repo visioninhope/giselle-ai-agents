@@ -11,7 +11,7 @@ export const verifyEmail = async (
 ): Promise<AuthError | null> => {
 	const verificationEmail = formData.get("verificationEmail") as string;
 	const token = formData.get("token") as string;
-	const supabase = createClient();
+	const supabase = await createClient();
 	const { data: supabaseData, error } = await supabase.auth.verifyOtp({
 		email: verificationEmail,
 		token,
@@ -44,7 +44,7 @@ export const resendOtp = async (
 	formData: FormData,
 ): Promise<AuthError | null> => {
 	const verificationEmail = formData.get("verificationEmail") as string;
-	const supabase = createClient();
+	const supabase = await createClient();
 	const { error } = await supabase.auth.resend({
 		type: "signup",
 		email: verificationEmail,

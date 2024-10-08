@@ -7,7 +7,7 @@ export async function login(
 	prevState: AuthError | null,
 	formData: FormData,
 ): Promise<AuthError | null> {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	// type-casting here for convenience
 	// in practice, you should validate your inputs
@@ -15,7 +15,6 @@ export async function login(
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
 	};
-
 	const { data, error } = await supabase.auth.signInWithPassword(credentails);
 
 	if (error) {

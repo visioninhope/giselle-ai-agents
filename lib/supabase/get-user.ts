@@ -10,7 +10,7 @@ import { createClient } from "./server";
  * Make sure the user is logged in before calling this function.
  */
 export const getUser = async () => {
-	const supabase = createClient();
+	const supabase = await createClient();
 
 	const { data, error } = await supabase.auth.getUser();
 	if (error != null) {

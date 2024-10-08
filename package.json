@@ -32,7 +32,7 @@
 		"@radix-ui/react-slot": "^1.1.0",
 		"@radix-ui/react-tabs": "^1.1.0",
 		"@radix-ui/react-tooltip": "^1.1.2",
-		"@sentry/nextjs": "^8",
+		"@sentry/nextjs": "8.33.1",
 		"@sentry/wizard": "^3.26.0",
 		"@supabase/ssr": "0.4.0",
 		"@supabase/supabase-js": "2.45.0",
@@ -53,12 +53,12 @@
 		"input-otp": "^1.2.4",
 		"langfuse": "3.26.0",
 		"lucide-react": "0.417.0",
-		"next": "15.0.0-canary.135",
+		"next": "15.0.0-canary.179",
 		"next-auth": "^5.0.0-beta.20",
 		"next-themes": "0.3.0",
 		"openai": "4.64.0",
-		"react": "19.0.0-rc-7771d3a7-20240827",
-		"react-dom": "19.0.0-rc-7771d3a7-20240827",
+		"react": "19.0.0-rc-1460d67c-20241003",
+		"react-dom": "19.0.0-rc-1460d67c-20241003",
 		"remark": "15.0.1",
 		"remark-html": "16.0.1",
 		"stripe": "16.10.0",
@@ -84,5 +84,6 @@
 	"overrides": {
 		"@types/react": "npm:types-react@rc",
 		"@types/react-dom": "npm:types-react-dom@rc"
-	}
+	},
+	"trustedDependencies": ["@sentry/cli"]
 }
