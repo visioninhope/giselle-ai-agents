@@ -11,11 +11,6 @@ export default supabaseMiddleware(async (user, request) => {
 		return NextResponse.redirect(url);
 	}
 
-	// debug
-	if (request.nextUrl.searchParams.has("debug")) {
-		throw new Error("debug error from middleware");
-	}
-
 	// Proceeding to check the user's subscription status since the email is not from the route06.co.jp
 	if (!isEmailFromRoute06(user.email ?? "")) {
 		const subscription = await retrieveStripeSubscriptionBySupabaseUserId(
