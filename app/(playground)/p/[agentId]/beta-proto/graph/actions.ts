@@ -176,7 +176,6 @@ export const addNodesAndConnect = (
 						{
 							id: addSourceNode.payload.node.id,
 							ui: {
-								forceFocus: true,
 								selected: true,
 								panelTab: panelTabs.property,
 							},
