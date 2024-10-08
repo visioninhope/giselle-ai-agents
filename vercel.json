@@ -1,6 +1,6 @@
 {
 	"functions": {
-		"app/(playground)/p/[agentId]/beta-proto/graph/server-actions.ts": {
+		"app/**/*": {
 			"maxDuration": 60
 		}
 	}
