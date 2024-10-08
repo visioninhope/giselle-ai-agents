@@ -2,7 +2,6 @@ import { uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag } from "@/f
 
 export default async function () {
 	const uploadFileToPromptNodeFlag = await getUploadFileToPromptNodeFlag();
-	console.log(uploadFileToPromptNodeFlag);
 	return (
 		<div>
 			uploadFileToPromptNodeFlag:{" "}
