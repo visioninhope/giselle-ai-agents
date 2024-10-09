@@ -23,7 +23,7 @@ export function MarkdownRender(props: MarkdownRenderProps) {
 		<div
 			// biome-ignore lint: lint/security/noDangerouslySetInnerHtml
 			dangerouslySetInnerHTML={{ __html: markdown }}
-			className="prose prose-sm prose-giselle"
+			className="prose prose-sm prose-giselle max-w-none"
 		/>
 	);
 }
