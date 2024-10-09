@@ -355,6 +355,8 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 												key={source.id}
 												title={source.title}
 												node={source.generatorNode}
+												content={source.content}
+												completed={true}
 											/>
 										) : (
 											<Block
