@@ -37,6 +37,7 @@ import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 import { AddSourceDialog } from "./add-source-dialog";
 import { ArtifactBlock } from "./artifact-block";
+import { Block } from "./block";
 
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
@@ -354,30 +355,18 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 												key={source.id}
 												title={source.title}
 												node={source.generatorNode}
+												content={source.content}
+												completed={true}
 											/>
 										) : (
-											<div
-												className="px-[16px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center justify-between group"
+											<Block
 												key={source.id}
-											>
-												<div className="flex items-center gap-[16px]">
+												title={source.title}
+												icon={
 													<TextsIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
-													<div>
-														<p className="line-clamp-1 text-[14px] font-rosart">
-															{source.title}
-														</p>
-														<p className="line-clamp-1 font-rosart text-black-70 text-[8px]" />
-													</div>
-												</div>
-												<button
-													type="button"
-													className="z-10 hidden group-hover:block p-[2px] rounded-[4px] hover:bg-[hsla(0,0%,100%,0.2)] transition-colors duration-200 ease-in-out"
-													onClick={removeTextContent({ id: source.id })}
-												>
-													<Trash2Icon size={16} className="stroke-black-30" />
-												</button>
-												<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
-											</div>
+												}
+												onDelete={removeTextContent({ id: source.id })}
+											/>
 										),
 									)}
 								</div>
