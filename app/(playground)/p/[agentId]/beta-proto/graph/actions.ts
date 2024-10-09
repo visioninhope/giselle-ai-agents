@@ -535,6 +535,22 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 			);
 			content = streamContent as PartialGeneratedObject;
 		}
+		dispatch(
+			setTextGenerationNodeOutput({
+				node: {
+					id: args.textGeneratorNode.id,
+					output: {
+						...content,
+						artifact: {
+							title: content?.artifact?.title ?? "",
+							content: content?.artifact?.content ?? "",
+							completed: true,
+						},
+					},
+				},
+			}),
+		);
+
 		const artifact = state.graph.artifacts.find(
 			(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
 		);
