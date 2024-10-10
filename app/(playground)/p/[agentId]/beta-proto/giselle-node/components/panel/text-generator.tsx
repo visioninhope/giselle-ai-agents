@@ -12,6 +12,7 @@ import {
 } from "../../../components/dialog";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import { SpinnerIcon } from "../../../components/icons/spinner";
+import { WillisIcon } from "../../../components/icons/willis";
 import { Spinner } from "../../../components/spinner";
 import {
 	type GiselleNode,
@@ -23,6 +24,16 @@ import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 import { ArtifactBlock } from "./artifact-block";
 import { MarkdownRender } from "./markdown-render";
+
+function PopPopWillis() {
+	return (
+		<div className="flex gap-[16px]">
+			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_infinite]" />
+			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_0.7s_infinite]" />
+			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_1.4s_infinite]" />
+		</div>
+	);
+}
 
 type TextGeneratorPropertyPanelProps = {
 	node: GiselleNode;
@@ -123,7 +134,16 @@ export const TextGeneratorPropertyPanel: FC<
 			{node.ui.panelTab === panelTabs.result && (
 				<div className="px-[24px] pb-[16px] overflow-y-auto overflow-x-hidden text-black-30 font-rosart text-[12px]">
 					<div className="flex flex-col gap-[8px]">
-						{node.state === giselleNodeState.inProgress && <Spinner />}
+						{node.state === giselleNodeState.inProgress && (
+							<div className="flex justify-center mt-[120px]">
+								<div className="flex flex-col gap-[36px]">
+									<p className="text-black-30 font-rosart text-[18px]">
+										Generating...
+									</p>
+									<PopPopWillis />
+								</div>
+							</div>
+						)}
 						<div>{(node.output as PartialGeneratedObject).thinking}</div>
 						{(node.output as PartialGeneratedObject).artifact?.content && (
 							<div>
