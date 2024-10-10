@@ -8,6 +8,7 @@ import type {
 import type { PartialGeneratedObject } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
+import type { GiselleFile } from "../files/types";
 import {
 	giselleNodeArchetypes,
 	textGeneratorParameterNames,
@@ -634,7 +635,7 @@ export function removeParameterFromNode(
 	};
 }
 
-type Source = ArtifactReference | TextContent;
+type Source = ArtifactReference | TextContent | GiselleFile;
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;

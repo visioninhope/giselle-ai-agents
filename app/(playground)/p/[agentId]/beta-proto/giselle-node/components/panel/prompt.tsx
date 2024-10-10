@@ -13,6 +13,7 @@ import type { Artifact, ArtifactReference } from "../../../artifact/types";
 import { DocumentIcon } from "../../../components/icons/document";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import { TextsIcon } from "../../../components/icons/texts";
+import type { GiselleFile } from "../../../files/types";
 import {
 	addSourceToPromptNode,
 	generateText,
@@ -66,7 +67,7 @@ function setTextToPropertyAndOutput(
 	};
 }
 
-type Source = ArtifactReference | TextContent;
+type Source = ArtifactReference | TextContent | GiselleFile;
 
 type PromptPropertyPanelProps = {
 	node: GiselleNode;
@@ -154,11 +155,11 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			),
 		[outgoingConnections, state.graph.artifacts],
 	);
-	const sources = useMemo<(Artifact | TextContent)[]>(
+	const sources = useMemo<(Artifact | TextContent | GiselleFile)[]>(
 		() =>
 			(node.properties.sources as Source[])
 				?.map((source) =>
-					source.object === "textContent"
+					source.object === "textContent" || source.object === "file"
 						? source
 						: state.graph.artifacts.find(
 								(artifact) => artifact.id === source.id,
@@ -357,6 +358,23 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 												node={source.generatorNode}
 												content={source.content}
 												completed={true}
+											/>
+										) : source.object === "file" ? (
+											<Block
+												key={source.id}
+												title={source.name}
+												description={
+													source.status === "uploading"
+														? "Uploading..."
+														: source.status === "processing"
+															? "Processing..."
+															: source.status === "processed"
+																? "Ready"
+																: "Pending"
+												}
+												icon={
+													<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
+												}
 											/>
 										) : (
 											<Block
