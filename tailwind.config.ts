@@ -117,6 +117,20 @@ const config = {
 					"80%": { transform: "rotate(-370deg)" },
 					"100%": { transform: "rotate(-360deg)" },
 				},
+				"pop-pop": {
+					"0%": {
+						transform: "translateY(0)",
+						fill: "hsl(var(--black_40))",
+					},
+					"33.3333%": {
+						transform: "translateY(-4px)",
+						fill: "hsl(var(--black_30))",
+					},
+					"44.4444%": {
+						transform: "translateY(0px)",
+						fill: "hsl(var(--black_40))",
+					},
+				},
 			},
 			animation: {
 				"accordion-down": "accordion-down 0.2s ease-out",
@@ -124,6 +138,7 @@ const config = {
 				"caret-blink": "caret-blink 1.25s ease-out infinite",
 				"follow-through-spin":
 					"follow-through-overlap-spin 1.75s ease-out infinite",
+				"ticktock-bounce": "ticktock-bounce 1.5s steps(2, jump-none) infinite",
 			},
 			typography: (theme: PluginAPI["theme"]) => ({
 				giselle: {
