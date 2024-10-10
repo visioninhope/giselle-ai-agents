@@ -12,6 +12,7 @@ type DraftFile = {
 	id: FileId;
 	object: "file";
 	name: string;
+	file: File;
 	status: Extract<FileStatus, "uploading">;
 };
 type UploadedFile = {

@@ -645,7 +645,7 @@ type AddSourceToPromptNodeArgs = {
 export function addSourceToPromptNode(
 	args: AddSourceToPromptNodeArgs,
 ): ThunkAction {
-	return (dispatch, getState) => {
+	return async (dispatch, getState) => {
 		const state = getState();
 		const updateNode = state.graph.nodes.find(
 			(node) => node.id === args.promptNode.id,
@@ -721,6 +721,9 @@ export function addSourceToPromptNode(
 					}),
 				);
 			}
+		} else if (args.source.object === "file") {
+			/** @todo file upload */
+			/** @todo parse file */
 		}
 	};
 }

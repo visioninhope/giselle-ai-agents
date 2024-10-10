@@ -1,11 +1,7 @@
 import { Button } from "@/components/ui/button";
 import * as Tabs from "@radix-ui/react-tabs";
 import clsx from "clsx/lite";
-import {
-	ArrowUpFromLine,
-	ArrowUpFromLineIcon,
-	PaperclipIcon,
-} from "lucide-react";
+import { ArrowUpFromLineIcon, PaperclipIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import {
 	Dialog,
@@ -15,13 +11,9 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "../../../components/dialog";
-import { DataIcon } from "../../../components/icons/data";
 import { DocumentIcon } from "../../../components/icons/document";
 import { createFileId } from "../../../files/utils";
-import {
-	addSourceToPromptNode,
-	updateNodeProperty,
-} from "../../../graph/actions";
+import { addSourceToPromptNode } from "../../../graph/actions";
 import { useGraph } from "../../../graph/context";
 import { createTextContentId } from "../../../text-content/factory";
 import type { GiselleNode } from "../../types";
@@ -68,53 +60,49 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 		setIsDragging(false);
 	}, []);
 
-	const onDrop = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		setIsDragging(false);
-		const droppedFiles = Array.from(e.dataTransfer.files);
-		for (const droppedFile of droppedFiles) {
-			console.log("dispatch");
-			dispatch(
-				addSourceToPromptNode({
-					promptNode: {
-						id: props.node.id,
-					},
-					source: {
-						object: "file",
-						name: droppedFile.name,
-						id: createFileId(),
-						status: "uploading",
-					},
-				}),
-			);
-		}
-		setFiles((prevFiles) => [...prevFiles, ...droppedFiles]);
-	}, []);
+	const addFilesToPromptNode = useCallback(
+		(files: File[]) => {
+			for (const file of files) {
+				dispatch(
+					addSourceToPromptNode({
+						promptNode: {
+							id: props.node.id,
+						},
+						source: {
+							object: "file",
+							name: file.name,
+							id: createFileId(),
+							status: "uploading",
+							file,
+						},
+					}),
+				);
+			}
+			setFiles((prevFiles) => [...prevFiles, ...files]);
+		},
+		[dispatch, props.node.id],
+	);
+
+	const onDrop = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			const droppedFiles = Array.from(e.dataTransfer.files);
+			addFilesToPromptNode(droppedFiles);
+			setOpen(false);
+		},
+		[addFilesToPromptNode],
+	);
 
 	const onFileChange = useCallback(
 		(e: React.ChangeEvent<HTMLInputElement>) => {
 			if (e.target.files) {
 				const selectedFiles = Array.from(e.target.files);
-				for (const selectedFile of selectedFiles) {
-					console.log("dispatch");
-					dispatch(
-						addSourceToPromptNode({
-							promptNode: {
-								id: props.node.id,
-							},
-							source: {
-								object: "file",
-								name: selectedFile.name,
-								id: createFileId(),
-								status: "uploading",
-							},
-						}),
-					);
-				}
-				setFiles((prevFiles) => [...prevFiles, ...selectedFiles]);
+				addFilesToPromptNode(selectedFiles);
+				setOpen(false);
 			}
 		},
-		[dispatch, props.node.id],
+		[addFilesToPromptNode],
 	);
 
 	const removeFile = useCallback((fileToRemove: File) => {
@@ -167,17 +155,34 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 										<p className="text-center">Drop to upload your files</p>
 									</>
 								) : (
-									<>
+									<div className="flex flex-col gap-[16px] justify-center items-center">
 										<ArrowUpFromLineIcon
 											size={38}
 											className="stroke-black-70"
 										/>
-										<p className="text-center">
-											No contents added yet. Click to upload or drag and drop
-											files here (supports images, documents, and more; max 10MB
-											per file).
-										</p>
-									</>
+										<div className="text-center flex flex-col gap-[16px]">
+											<p>
+												No contents added yet. Click to upload or drag and drop
+												files here (supports images, documents, and more; max
+												10MB per file).
+											</p>
+											<div className="flex gap-[8px] justify-center items-center">
+												<span>or</span>
+												<label
+													htmlFor="file"
+													className="font-bold text-black--50 text-[14px] underline cursor-pointer"
+												>
+													Select files
+													<input
+														id="file"
+														type="file"
+														onChange={onFileChange}
+														className="hidden"
+													/>
+												</label>
+											</div>
+										</div>
+									</div>
 								)}
 							</div>
 						</Tabs.Content>
