@@ -106,7 +106,13 @@
     :when: 2024-09-27 04:12:38.962251000 Z
 - - :approve
   - "@vercel/flags"
-  - :who: 
+  - :who:
     :why: The license is none. Check it later via https://github.com/route06/edge/issues/1774
     :versions: []
     :when: 2024-10-08 09:38:17.316315298 Z
+- - :permit
+  - Zlib
+  - :who:
+    :why: To not conflict with Apache-2.0 license. https://zlib.net/zlib_license.html
+    :versions: []
+    :when: 2024-10-11 06:16:13.501764000 Z
