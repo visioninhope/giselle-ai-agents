@@ -30,5 +30,11 @@ type ProcessedFile = {
 	object: "file";
 	status: Extract<FileStatus, "processed">;
 };
+export type StructuredData = {
+	id: FileId;
+	title: string;
+	object: "file";
+	content: string;
+};
 
 export type GiselleFile = DraftFile | UploadedFile | ProcessedFile;

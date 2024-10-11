@@ -8,7 +8,11 @@ import type {
 import type { PartialGeneratedObject } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
-import { type GiselleFile, fileStatuses } from "../files/types";
+import {
+	type GiselleFile,
+	type StructuredData,
+	fileStatuses,
+} from "../files/types";
 import {
 	giselleNodeArchetypes,
 	textGeneratorParameterNames,
@@ -472,7 +476,7 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		type Source = Artifact | TextContent;
+		type Source = Artifact | TextContent | StructuredData;
 		const instructionSources: Source[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
@@ -492,6 +496,23 @@ export const generateText =
 					);
 					if (artifact !== undefined) {
 						instructionSources.push(artifact);
+					}
+				} else if (source.object === "file") {
+					if (
+						typeof source.status === "string" &&
+						source.status === fileStatuses.processed &&
+						typeof source.structuredDataBlobUrl === "string" &&
+						typeof source.name === "string"
+					) {
+						const structuredData = await fetch(
+							source.structuredDataBlobUrl,
+						).then((res) => res.text());
+						instructionSources.push({
+							id: source.id,
+							object: "file",
+							title: source.name,
+							content: structuredData,
+						});
 					}
 				}
 			}
