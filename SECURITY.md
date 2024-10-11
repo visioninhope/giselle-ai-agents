@@ -8,13 +8,11 @@ As an open source product, we will only provide security patches for the latest 
 
 ### case1: Report via Email
 
-<!-- Replace [INSERT CONTACT EMAIL] and [X] -->
-
 If you discover a security vulnerability, please report it to us in the following manner:
 
 1. **Email us** at oss@giselles.dev. Please do not create a public GitHub issue.
 2. Include as much detail as possible, including steps to reproduce the vulnerability, potential impact, and any other relevant information.
-3. We will acknowledge your email within [X] business days and work with you to understand the issue and address it promptly.
+3. We will acknowledge your email within 3 business days and work with you to understand the issue and address it promptly.
 
 ### case2: Report via GitHub Private vulnerability reporting
 
