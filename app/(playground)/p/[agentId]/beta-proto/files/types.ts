@@ -17,15 +17,15 @@ type DraftFile = {
 };
 type UploadedFile = {
 	id: FileId;
-	fileBlobId: string;
+	blobUrl: string;
 	object: "file";
 	name: string;
 	status: Extract<FileStatus, "processing">;
 };
 type ProcessedFile = {
 	id: FileId;
-	fileBlobId: string;
-	structuredDataBlobId: string;
+	blobUrl: string;
+	structuredDataBlobUrl: string;
 	name: string;
 	object: "file";
 	status: Extract<FileStatus, "processed">;

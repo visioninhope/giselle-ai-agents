@@ -8,7 +8,7 @@ import type {
 import type { PartialGeneratedObject } from "../artifact/types";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
-import type { GiselleFile } from "../files/types";
+import { type GiselleFile, fileStatuses } from "../files/types";
 import {
 	giselleNodeArchetypes,
 	textGeneratorParameterNames,
@@ -37,7 +37,7 @@ import {
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { TextContent, TextContentReference } from "../text-content/types";
 import type { ThunkAction } from "./context";
-import { generateObjectStream } from "./server-actions";
+import { generateObjectStream, parseFile, uploadFile } from "./server-actions";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -722,8 +722,54 @@ export function addSourceToPromptNode(
 				);
 			}
 		} else if (args.source.object === "file") {
-			/** @todo file upload */
-			/** @todo parse file */
+			if (args.source.status === fileStatuses.uploading) {
+				const fileVercelBlob = await uploadFile({
+					file: args.source.file,
+					fileId: args.source.id,
+				});
+				dispatch(
+					updateNodeProperty({
+						node: {
+							id: args.promptNode.id,
+							property: {
+								key: "sources",
+								value: [
+									...currentSources,
+									{
+										...args.source,
+										blobUrl: fileVercelBlob.url,
+										status: fileStatuses.processing,
+									},
+								],
+							},
+						},
+					}),
+				);
+				const structuredDataVercelBlob = await parseFile({
+					id: args.source.id,
+					name: args.source.name,
+					blobUrl: fileVercelBlob.url,
+				});
+				dispatch(
+					updateNodeProperty({
+						node: {
+							id: args.promptNode.id,
+							property: {
+								key: "sources",
+								value: [
+									...currentSources,
+									{
+										...args.source,
+										blobUrl: fileVercelBlob.url,
+										structuredDataBlobUrl: structuredDataVercelBlob.url,
+										status: fileStatuses.processed,
+									},
+								],
+							},
+						},
+					}),
+				);
+			}
 		}
 	};
 }
