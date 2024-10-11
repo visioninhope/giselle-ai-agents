@@ -18,6 +18,8 @@ import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
+import { FeatureFlagProvider } from "./feature-flags/provider";
+import type { FeatureFlags } from "./feature-flags/types";
 import {
 	giselleNodeArchetypes,
 	promptBlueprint,
@@ -198,21 +200,24 @@ function Inner() {
 	);
 }
 
-type PlaygroundProps = {
+interface PlaygroundProps {
 	agentId: AgentId;
 	graph: Graph;
-};
+	featureFlags: FeatureFlags;
+}
 export function Playground(props: PlaygroundProps) {
 	return (
 		<ReactFlowProvider>
-			<MousePositionProvider>
-				<ToolProvider>
-					<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
-						<GradientPathDefinitions />
-						<Inner />
-					</GraphProvider>
-				</ToolProvider>
-			</MousePositionProvider>
+			<FeatureFlagProvider {...props.featureFlags}>
+				<MousePositionProvider>
+					<ToolProvider>
+						<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
+							<GradientPathDefinitions />
+							<Inner />
+						</GraphProvider>
+					</ToolProvider>
+				</MousePositionProvider>
+			</FeatureFlagProvider>
 		</ReactFlowProvider>
 	);
 }
