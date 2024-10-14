@@ -20,30 +20,28 @@ const downloadFile = async (url, destination) => {
 };
 
 (async () => {
-	// TODO: 一旦 preview 用にコメントアウト
-	// if (process.env.NODE_ENV === "production") {
+	if (process.env.NODE_ENV === "production") {
+		const BLOB_URL = process.env.BLOB_URL;
 
-	const BLOB_URL = process.env.BLOB_URL;
-
-	if (!BLOB_URL) {
-		console.error("BLOB_URL is not defined");
-		return;
-	}
-
-	const filesToDownload = fileNames.map((fileName) => ({
-		url: `${BLOB_URL}/fonts/${fileName}.woff2`,
-		destination: `./app/fonts/${fileName}.woff2`,
-	}));
-
-	for (const file of filesToDownload) {
-		try {
-			await downloadFile(file.url, file.destination);
-			console.log(`Downloaded: ${file.destination}`);
-		} catch (error) {
-			console.error(`Error downloading ${file.url}:`, error);
+		if (!BLOB_URL) {
+			console.error("BLOB_URL is not defined");
+			return;
 		}
+
+		const filesToDownload = fileNames.map((fileName) => ({
+			url: `${BLOB_URL}/fonts/${fileName}.woff2`,
+			destination: `./app/fonts/${fileName}.woff2`,
+		}));
+
+		for (const file of filesToDownload) {
+			try {
+				await downloadFile(file.url, file.destination);
+				console.log(`Downloaded: ${file.destination}`);
+			} catch (error) {
+				console.error(`Error downloading ${file.url}:`, error);
+			}
+		}
+	} else {
+		console.log("Skipping download in non-production environment");
 	}
-	// } else {
-	//  console.log("Skipping download in non-production environment");
-	// }
 })();
