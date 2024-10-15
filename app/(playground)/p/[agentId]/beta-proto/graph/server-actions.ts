@@ -20,6 +20,7 @@ import { Strategy } from "unstructured-client/sdk/models/shared";
 import { schema } from "../artifact/schema";
 import type { FileId } from "../files/types";
 import type { AgentId } from "../types";
+import { elementsToMarkdown } from "../utils/unstructured";
 import type { Graph } from "./types";
 
 type GenerateObjectStreamParams = {
@@ -123,13 +124,19 @@ export async function parseFile(args: ParseFileArgs) {
 		throw new Error(`Failed to parse file: ${partitionReponse.statusCode}`);
 	}
 	const jsonString = JSON.stringify(partitionReponse.elements, null, 2);
-
 	const blob = new Blob([jsonString], { type: "application/json" });
-	const file = new File([blob], "partition.json", { type: "application/json" });
 
-	const vercelBlob = await put(`files/${args.id}/partition.json`, file, {
+	await put(`files/${args.id}/partition.json`, blob, {
 		access: "public",
-		contentType: file.type,
+		contentType: blob.type,
 	});
+
+	const markdown = elementsToMarkdown(partitionReponse.elements ?? []);
+	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
+	const vercelBlob = await put(`files/${args.id}/markdown.md`, markdownBlob, {
+		access: "public",
+		contentType: markdownBlob.type,
+	});
+
 	return vercelBlob;
 }
