@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { type FC, type PropsWithChildren, forwardRef } from "react";
 import { DataIcon } from "../../components/icons/data";
+import { GlobeIcon } from "../../components/icons/globe";
 import { PromptIcon } from "../../components/icons/prompt";
 import { TextGenerationIcon } from "../../components/icons/text-generation";
 import { ToolIcon } from "../../components/icons/tool";
@@ -18,7 +19,10 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "../../components/popover";
-import { textGeneratorBlueprint } from "../../giselle-node/blueprints";
+import {
+	textGeneratorBlueprint,
+	webSearchBlueprint,
+} from "../../giselle-node/blueprints";
 import { ToolSelectOption } from "./tool-select-option";
 
 export const GradientBorder: FC = () => (
@@ -59,6 +63,16 @@ export const Toolbar: FC = () => (
 										<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
 									}
 									label="Text Generation"
+								/>
+								<ToolSelectOption
+									tool={{
+										type: "addGiselleNode",
+										giselleNodeBlueprint: webSearchBlueprint,
+									}}
+									icon={
+										<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
+									}
+									label="Web Search"
 								/>
 								{/**
 								<ToolSelectOption

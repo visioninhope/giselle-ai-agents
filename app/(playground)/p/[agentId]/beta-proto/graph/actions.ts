@@ -926,6 +926,8 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 					return true;
 				case giselleNodeArchetypes.textGenerator:
 					return true;
+				case giselleNodeArchetypes.webSearch:
+					return true;
 			}
 		});
 		if (!onlyDeletableNodesSelected) {

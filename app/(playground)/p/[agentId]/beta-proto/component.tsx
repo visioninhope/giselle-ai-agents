@@ -24,6 +24,7 @@ import {
 	giselleNodeArchetypes,
 	promptBlueprint,
 	textGeneratorParameterNames,
+	webSearchBlueprint,
 } from "./giselle-node/blueprints";
 import {
 	GiselleNode,
@@ -130,6 +131,30 @@ function Inner() {
 						if (
 							toolState.activeTool.giselleNodeBlueprint.archetype ===
 							giselleNodeArchetypes.textGenerator
+						) {
+							graphDispatch(
+								addNodesAndConnect({
+									sourceNode: {
+										node: promptBlueprint,
+										position: {
+											x: position.x - 300,
+											y: position.y + 100,
+										},
+									},
+									targetNode: {
+										node: toolState.activeTool.giselleNodeBlueprint,
+										position,
+									},
+									connector: {
+										targetParameterName:
+											textGeneratorParameterNames.instruction,
+									},
+								}),
+							);
+						}
+						if (
+							toolState.activeTool.giselleNodeBlueprint.archetype ===
+							giselleNodeArchetypes.webSearch
 						) {
 							graphDispatch(
 								addNodesAndConnect({
