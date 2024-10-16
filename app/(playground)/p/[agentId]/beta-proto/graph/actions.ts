@@ -14,6 +14,7 @@ import {
 	fileStatuses,
 } from "../files/types";
 import {
+	type GiselleNodeArchetype,
 	giselleNodeArchetypes,
 	textGeneratorParameterNames,
 } from "../giselle-node/blueprints";
@@ -95,11 +96,13 @@ type AddConnectorArgs = {
 	sourceNode: {
 		id: GiselleNodeId;
 		category: GiselleNodeCategory;
+		archetype: GiselleNodeArchetype;
 	};
 	targetNode: {
 		id: GiselleNodeId;
 		handle: string;
 		category: GiselleNodeCategory;
+		archetype: GiselleNodeArchetype;
 	};
 };
 export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
@@ -111,9 +114,11 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 				object: "connector",
 				source: args.sourceNode.id,
 				sourceNodeCategory: args.sourceNode.category,
+				sourceNodeArcheType: args.sourceNode.archetype,
 				target: args.targetNode.id,
 				targetHandle: args.targetNode.handle,
 				targetNodeCategory: args.targetNode.category,
+				targetNodeArcheType: args.targetNode.archetype,
 			},
 		},
 	};
@@ -166,11 +171,13 @@ export const addNodesAndConnect = (
 				sourceNode: {
 					id: addSourceNode.payload.node.id,
 					category: args.sourceNode.node.category,
+					archetype: args.sourceNode.node.archetype,
 				},
 				targetNode: {
 					id: addTargetNode.payload.node.id,
 					handle: args.connector.targetParameterName,
 					category: args.targetNode.node.category,
+					archetype: args.targetNode.node.archetype,
 				},
 			}),
 		);
@@ -733,11 +740,13 @@ export function addSourceToPromptNode(
 						sourceNode: {
 							id: artifact.generatorNode.id,
 							category: artifact.generatorNode.category,
+							archetype: artifact.generatorNode.archetype,
 						},
 						targetNode: {
 							id: outgoingConnector.target,
 							handle: `source${currentSourceHandleLength + 1}`,
 							category: outgoingConnector.targetNodeCategory,
+							archetype: outgoingNode.archetype,
 						},
 					}),
 				);

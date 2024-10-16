@@ -127,11 +127,13 @@ export const useConnectionHandler = () => {
 					sourceNode: {
 						id: sourceNode.id,
 						category: sourceNode.category,
+						archetype: sourceNode.archetype,
 					},
 					targetNode: {
 						id: targetNode.id,
 						handle: connection.targetHandle,
 						category: targetNode?.category,
+						archetype: targetNode?.archetype,
 					},
 				}),
 			);
