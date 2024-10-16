@@ -36,13 +36,19 @@ import {
 	type GiselleNodeState,
 	type PanelTab,
 	type XYPosition,
+	giselleNodeCategories,
 	giselleNodeState,
 	panelTabs,
 } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { TextContent, TextContentReference } from "../text-content/types";
 import type { ThunkAction } from "./context";
-import { generateObjectStream, parseFile, uploadFile } from "./server-actions";
+import {
+	generateArtifactStream,
+	generateWebSearchStream,
+	parseFile,
+	uploadFile,
+} from "./server-actions";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -470,8 +476,13 @@ export const generateText =
 		const instructionConnector = state.graph.connectors.find(
 			(connector) =>
 				connector.target === args.textGeneratorNode.id &&
-				connector.targetHandle === textGeneratorParameterNames.instruction,
+				connector.targetHandle === textGeneratorParameterNames.instruction &&
+				connector.sourceNodeCategory === giselleNodeCategories.instruction,
 		);
+		if (instructionConnector === undefined) {
+			/** @todo error handling  */
+			throw new Error("Instruction connector not found");
+		}
 		const instructionNode = state.graph.nodes.find(
 			(node) => node.id === instructionConnector?.source,
 		);
@@ -525,99 +536,235 @@ export const generateText =
 			}
 		}
 
-		const systemPrompt =
-			instructionSources.length > 0
-				? `
+		console.log(instructionConnector.targetNodeArcheType);
+		switch (instructionConnector.targetNodeArcheType) {
+			case giselleNodeArchetypes.textGenerator: {
+				const systemPrompt =
+					instructionSources.length > 0
+						? `
 Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
 
 ${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
 `
-				: undefined;
+						: undefined;
+				console.log({
+					systemPrompt,
+					instructionNodeOutput: instructionNode.output,
+				});
 
-		const { object } = await generateObjectStream({
-			userPrompt: instructionNode.output as string,
-			systemPrompt,
-		});
-		let content: PartialGeneratedObject = {};
-		for await (const streamContent of readStreamableValue(object)) {
-			if (
-				typeof streamContent === "object" &&
-				Object.keys(streamContent).length > 0
-			) {
+				const { object } = await generateArtifactStream({
+					userPrompt: instructionNode.output as string,
+					systemPrompt,
+				});
+				let content: PartialGeneratedObject = {};
+				for await (const streamContent of readStreamableValue(object)) {
+					if (
+						typeof streamContent === "object" &&
+						Object.keys(streamContent).length > 0
+					) {
+						dispatch(
+							updateNodeState({
+								node: {
+									id: args.textGeneratorNode.id,
+									state: giselleNodeState.streaming,
+								},
+							}),
+						);
+					}
+					dispatch(
+						setTextGenerationNodeOutput({
+							node: {
+								id: args.textGeneratorNode.id,
+								output:
+									streamContent as PartialGeneratedObject /** @todo type assertion */,
+							},
+						}),
+					);
+					content = streamContent as PartialGeneratedObject;
+				}
+				dispatch(
+					setTextGenerationNodeOutput({
+						node: {
+							id: args.textGeneratorNode.id,
+							output: {
+								...content,
+								artifact: {
+									title: content?.artifact?.title ?? "",
+									content: content?.artifact?.content ?? "",
+									completed: true,
+								},
+							},
+						},
+					}),
+				);
+
+				const artifact = state.graph.artifacts.find(
+					(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
+				);
+				const node = state.graph.nodes.find(
+					(node) => node.id === args.textGeneratorNode.id,
+				);
+				if (node === undefined) {
+					/** @todo error handling  */
+					throw new Error("Node not found");
+				}
+
+				dispatch(
+					addOrReplaceArtifact({
+						artifact: {
+							id: artifact === undefined ? createArtifactId() : artifact.id,
+							object: "artifact",
+							title: content?.artifact?.title ?? "",
+							content: content?.artifact?.content ?? "",
+							generatorNode: {
+								id: node.id,
+								category: node.category,
+								archetype: node.archetype,
+								name: node.name,
+								object: "node.artifactElement",
+								properties: node.properties,
+							},
+							elements: [
+								giselleNodeToGiselleNodeArtifactElement(instructionNode),
+							],
+						},
+					}),
+				);
 				dispatch(
 					updateNodeState({
 						node: {
 							id: args.textGeneratorNode.id,
-							state: giselleNodeState.streaming,
+							state: giselleNodeState.completed,
 						},
 					}),
 				);
+				break;
 			}
-			dispatch(
-				setTextGenerationNodeOutput({
-					node: {
-						id: args.textGeneratorNode.id,
-						output:
-							streamContent as PartialGeneratedObject /** @todo type assertion */,
-					},
-				}),
-			);
-			content = streamContent as PartialGeneratedObject;
-		}
-		dispatch(
-			setTextGenerationNodeOutput({
-				node: {
-					id: args.textGeneratorNode.id,
-					output: {
-						...content,
+			case giselleNodeArchetypes.webSearch: {
+				const systemPrompt = `
+You are an AI assistant specialized in generating effective keywords for Google Search based on user requests. Your task is to analyze the user's input and produce a concise, relevant keyword or short phrase that will yield the most useful search results.
+
+Follow these guidelines:
+1. Identify the core topic or intent of the user's request.
+2. Extract the most important words or concepts.
+3. Consider synonyms or related terms that might be more commonly used.
+4. Aim for specificity while avoiding overly niche terms.
+5. Keep the keyword or phrase concise, typically 1-3 words.
+6. Avoid branded terms unless specifically mentioned by the user.
+7. Use common spelling and avoid abbreviations unless they are widely recognized.
+8. You must suggest keywords at least 3 times.
+9. If provided, incorporate relevant reference information to refine the keyword.
+
+Examples:
+User request: "I need information about the health benefits of eating apples."
+Keyword: "apple health benefits"
+
+User request: "What are some good restaurants in New York City for Italian cuisine?"
+Keyword: "best NYC Italian restaurants"
+
+User request: "How do I fix a leaky faucet in my bathroom sink?"
+Keyword: "fix leaky faucet"
+
+User request: "Tell me about the impact of climate change on polar bears."
+Reference info: Recent studies show declining sea ice affects hunting patterns.
+Keyword: "polar bear sea ice impact"
+
+Now, generate an appropriate keyword or short phrase for Google Search based on the user's request and any provided reference information.
+
+--
+${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
+--
+			`;
+
+				const { object } = await generateWebSearchStream({
+					userPrompt: instructionNode.output as string,
+					systemPrompt,
+				});
+				let content: PartialGeneratedObject = {};
+				for await (const streamContent of readStreamableValue(object)) {
+					if (
+						typeof streamContent === "object" &&
+						Object.keys(streamContent).length > 0
+					) {
+						dispatch(
+							updateNodeState({
+								node: {
+									id: args.textGeneratorNode.id,
+									state: giselleNodeState.streaming,
+								},
+							}),
+						);
+					}
+					dispatch(
+						setTextGenerationNodeOutput({
+							node: {
+								id: args.textGeneratorNode.id,
+								output:
+									streamContent as PartialGeneratedObject /** @todo type assertion */,
+							},
+						}),
+					);
+					content = streamContent as PartialGeneratedObject;
+				}
+				dispatch(
+					setTextGenerationNodeOutput({
+						node: {
+							id: args.textGeneratorNode.id,
+							output: {
+								...content,
+								artifact: {
+									title: content?.artifact?.title ?? "",
+									content: content?.artifact?.content ?? "",
+									completed: true,
+								},
+							},
+						},
+					}),
+				);
+
+				const artifact = state.graph.artifacts.find(
+					(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
+				);
+				const node = state.graph.nodes.find(
+					(node) => node.id === args.textGeneratorNode.id,
+				);
+				if (node === undefined) {
+					/** @todo error handling  */
+					throw new Error("Node not found");
+				}
+
+				dispatch(
+					addOrReplaceArtifact({
 						artifact: {
+							id: artifact === undefined ? createArtifactId() : artifact.id,
+							object: "artifact",
 							title: content?.artifact?.title ?? "",
 							content: content?.artifact?.content ?? "",
-							completed: true,
+							generatorNode: {
+								id: node.id,
+								category: node.category,
+								archetype: node.archetype,
+								name: node.name,
+								object: "node.artifactElement",
+								properties: node.properties,
+							},
+							elements: [
+								giselleNodeToGiselleNodeArtifactElement(instructionNode),
+							],
 						},
-					},
-				},
-			}),
-		);
-
-		const artifact = state.graph.artifacts.find(
-			(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
-		);
-		const node = state.graph.nodes.find(
-			(node) => node.id === args.textGeneratorNode.id,
-		);
-		if (node === undefined) {
-			/** @todo error handling  */
-			throw new Error("Node not found");
+					}),
+				);
+				dispatch(
+					updateNodeState({
+						node: {
+							id: args.textGeneratorNode.id,
+							state: giselleNodeState.completed,
+						},
+					}),
+				);
+				break;
+			}
 		}
-
-		dispatch(
-			addOrReplaceArtifact({
-				artifact: {
-					id: artifact === undefined ? createArtifactId() : artifact.id,
-					object: "artifact",
-					title: content?.artifact?.title ?? "",
-					content: content?.artifact?.content ?? "",
-					generatorNode: {
-						id: node.id,
-						category: node.category,
-						archetype: node.archetype,
-						name: node.name,
-						object: "node.artifactElement",
-						properties: node.properties,
-					},
-					elements: [giselleNodeToGiselleNodeArtifactElement(instructionNode)],
-				},
-			}),
-		);
-		dispatch(
-			updateNodeState({
-				node: {
-					id: args.textGeneratorNode.id,
-					state: giselleNodeState.completed,
-				},
-			}),
-		);
 	};
 
 type AddParameterToNodeAction = {

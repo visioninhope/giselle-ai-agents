@@ -7,6 +7,7 @@ import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
 import { PromptPropertyPanel } from "./components/panel/prompt";
 import { TextGeneratorPropertyPanel } from "./components/panel/text-generator";
+import { WebSearchPropertyPanel } from "./components/panel/web-search";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
@@ -270,6 +271,12 @@ export const GiselleNodeInformationPanel: FC = () => {
 					{selectedNodes[0].archetype ===
 						giselleNodeArchetypes.textGenerator && (
 						<TextGeneratorPropertyPanel
+							node={selectedNodes[0]}
+							key={selectedNodes[0].id}
+						/>
+					)}
+					{selectedNodes[0].archetype === giselleNodeArchetypes.webSearch && (
+						<WebSearchPropertyPanel
 							node={selectedNodes[0]}
 							key={selectedNodes[0].id}
 						/>
