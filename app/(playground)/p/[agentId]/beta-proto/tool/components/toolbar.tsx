@@ -8,6 +8,7 @@ import {
 } from "lucide-react";
 import { type FC, type PropsWithChildren, forwardRef } from "react";
 import { DataIcon } from "../../components/icons/data";
+import { GlobeIcon } from "../../components/icons/globe";
 import { PromptIcon } from "../../components/icons/prompt";
 import { TextGenerationIcon } from "../../components/icons/text-generation";
 import { ToolIcon } from "../../components/icons/tool";
@@ -18,7 +19,11 @@ import {
 	PopoverContent,
 	PopoverTrigger,
 } from "../../components/popover";
-import { textGeneratorBlueprint } from "../../giselle-node/blueprints";
+import { useFeatureFlags } from "../../feature-flags/context";
+import {
+	textGeneratorBlueprint,
+	webSearchBlueprint,
+} from "../../giselle-node/blueprints";
 import { ToolSelectOption } from "./tool-select-option";
 
 export const GradientBorder: FC = () => (
@@ -36,31 +41,45 @@ const ToolbarButton = forwardRef<HTMLButtonElement, PropsWithChildren>(
 	),
 );
 
-export const Toolbar: FC = () => (
-	<div className="relative rounded-[46px] overflow-hidden bg-black-100">
-		<GradientBorder />
-		<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
-			<div className="flex items-center px-2 z-10 h-full">
-				<div className="flex gap-[4px]">
-					<Popover>
-						<PopoverTrigger asChild>
-							<ToolbarButton>
-								<ToolIcon className="fill-black-30" />
-							</ToolbarButton>
-						</PopoverTrigger>
-						<PopoverContent sideOffset={24}>
-							<div className="grid">
-								<ToolSelectOption
-									tool={{
-										type: "addGiselleNode",
-										giselleNodeBlueprint: textGeneratorBlueprint,
-									}}
-									icon={
-										<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
-									}
-									label="Text Generation"
-								/>
-								{/**
+export const Toolbar: FC = () => {
+	const { webSearchNodeFlag } = useFeatureFlags();
+	return (
+		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
+			<GradientBorder />
+			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
+				<div className="flex items-center px-2 z-10 h-full">
+					<div className="flex gap-[4px]">
+						<Popover>
+							<PopoverTrigger asChild>
+								<ToolbarButton>
+									<ToolIcon className="fill-black-30" />
+								</ToolbarButton>
+							</PopoverTrigger>
+							<PopoverContent sideOffset={24}>
+								<div className="grid">
+									<ToolSelectOption
+										tool={{
+											type: "addGiselleNode",
+											giselleNodeBlueprint: textGeneratorBlueprint,
+										}}
+										icon={
+											<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
+										}
+										label="Text Generation"
+									/>
+									{webSearchNodeFlag && (
+										<ToolSelectOption
+											tool={{
+												type: "addGiselleNode",
+												giselleNodeBlueprint: webSearchBlueprint,
+											}}
+											icon={
+												<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
+											}
+											label="Web Search"
+										/>
+									)}
+									{/**
 								<ToolSelectOption
 									tool={{
 										type: "add-knowledge-retrieval-node",
@@ -88,11 +107,11 @@ export const Toolbar: FC = () => (
 									label="Web Scraping"
 								/>
 						  */}
-							</div>
-						</PopoverContent>
-					</Popover>
+								</div>
+							</PopoverContent>
+						</Popover>
 
-					{/**
+						{/**
 					<Popover>
 						<PopoverTrigger asChild>
 							<ToolbarButton>
@@ -112,8 +131,9 @@ export const Toolbar: FC = () => (
 						</PopoverContent>
 					</Popover>
 				 */}
+					</div>
 				</div>
 			</div>
 		</div>
-	</div>
-);
+	);
+};

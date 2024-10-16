@@ -26,6 +26,24 @@ export const textGeneratorBlueprint = createGiselleNodeBlueprint({
 	}),
 });
 
+export const webSearchBlueprint = createGiselleNodeBlueprint({
+	archetype: "Web Search",
+	category: giselleNodeCategories.action,
+	resultPortLabel: "Result",
+	parameters: createObjectParameterBlueprint({
+		type: "object",
+		properties: {
+			[textGeneratorParameterNames.instruction]: createStringParameterBlueprint(
+				{
+					type: "string",
+					label: "Instruction",
+				},
+			),
+		},
+		required: ["instruction"],
+	}),
+});
+
 export const promptBlueprint = createGiselleNodeBlueprint({
 	archetype: "Prompt",
 	category: giselleNodeCategories.instruction,
@@ -35,6 +53,7 @@ export const promptBlueprint = createGiselleNodeBlueprint({
 export const giselleNodeArchetypes = {
 	textGenerator: textGeneratorBlueprint.archetype,
 	prompt: promptBlueprint.archetype,
+	webSearch: webSearchBlueprint.archetype,
 } as const;
 
 export type GiselleNodeArchetype =

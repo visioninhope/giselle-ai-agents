@@ -1,7 +1,10 @@
 import "@xyflow/react/dist/style.css";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
-import { uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag } from "@/flags";
+import {
+	uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag,
+	webSearchNodeFlag as getWebSearchNodeFlag,
+} from "@/flags";
 import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -28,6 +31,7 @@ export default async function AgentPlaygroundPage({
 	}
 
 	const uploadFileToPromptNodeFlag = await getUploadFileToPromptNodeFlag();
+	const webSearchNodeFlag = await getWebSearchNodeFlag();
 
 	const agent = await getAgent(agentId);
 
@@ -35,7 +39,7 @@ export default async function AgentPlaygroundPage({
 		<Playground
 			agentId={agentId}
 			graph={agent.graphv2}
-			featureFlags={{ uploadFileToPromptNodeFlag }}
+			featureFlags={{ uploadFileToPromptNodeFlag, webSearchNodeFlag }}
 		/>
 	);
 }

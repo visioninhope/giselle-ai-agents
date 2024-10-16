@@ -20,3 +20,24 @@ export const uploadFileToPromptNodeFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const webSearchNodeFlag = flag<boolean>({
+	key: "web-search-node",
+	async decide() {
+		// You can do async things in here like reading edge config or querying
+		// your feature flag provider.
+		//
+		// You can access data passed in by middleware through unstable_getPrecomputationContext
+		// const context = unstable_getPrecomputationContext()
+		//
+		// This is great for creating a single instance of your flag provider
+		// and then passing the client down from middleware
+		return false;
+	},
+	description: "User can use a web search node",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
