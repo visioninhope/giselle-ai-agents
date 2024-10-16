@@ -99,7 +99,6 @@ type GenerateWebSearchStreamInputs = {
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
 ) {
-	console.log("GENERATE WEB SEARCH STREAM");
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,

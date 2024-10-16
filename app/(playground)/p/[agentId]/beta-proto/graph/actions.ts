@@ -536,7 +536,6 @@ export const generateText =
 			}
 		}
 
-		console.log(instructionConnector.targetNodeArcheType);
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
 				const systemPrompt =
@@ -547,10 +546,6 @@ Your primary objective is to fulfill the user's request by utilizing the informa
 ${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
 `
 						: undefined;
-				console.log({
-					systemPrompt,
-					instructionNodeOutput: instructionNode.output,
-				});
 
 				const { object } = await generateArtifactStream({
 					userPrompt: instructionNode.output as string,

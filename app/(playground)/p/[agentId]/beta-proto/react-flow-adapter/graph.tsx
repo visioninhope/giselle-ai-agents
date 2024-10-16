@@ -178,7 +178,6 @@ export function useKeyUpHandler() {
 						event.target instanceof HTMLInputElement ||
 						event.target instanceof HTMLTextAreaElement;
 
-					console.log("L");
 					// Skip the following process if the focus is on the input element.
 					if (isInputElement) {
 						return;
