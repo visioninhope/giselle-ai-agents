@@ -1,12 +1,7 @@
 "use server";
 
 import { openai } from "@ai-sdk/openai";
-import {
-	type CoreMessage,
-	jsonSchema,
-	streamText as sdkStreamText,
-	streamObject,
-} from "ai";
+import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { UnstructuredClient } from "unstructured-client";
 
@@ -20,25 +15,9 @@ import { Langfuse } from "langfuse";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { FileId } from "../files/types";
-import type { GiselleNodeArchetype } from "../giselle-node/blueprints";
 import type { AgentId } from "../types";
 import { elementsToMarkdown } from "../utils/unstructured";
 import type { Graph } from "./types";
-
-const webSearchSchema = jsonSchema<{ keywords: string[] }>({
-	$schema: "https://json-schema.org/draft/2020-12/schema",
-	title: "keyword schema",
-	type: "object",
-	properties: {
-		keywords: {
-			type: "array",
-			items: {
-				type: "string",
-			},
-		},
-	},
-	required: ["keywords"],
-});
 
 type GenerateArtifactStreamParams = {
 	userPrompt: string;
