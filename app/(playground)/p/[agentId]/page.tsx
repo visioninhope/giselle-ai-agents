@@ -39,7 +39,7 @@ export default async function AgentPlaygroundPage({
 		<Playground
 			agentId={agentId}
 			graph={agent.graphv2}
-			featureFlags={{ uploadFileToPromptNodeFlag, webSearchNodeFlag: true }}
+			featureFlags={{ uploadFileToPromptNodeFlag, webSearchNodeFlag }}
 		/>
 	);
 }
