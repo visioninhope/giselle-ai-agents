@@ -3,11 +3,11 @@ import { type FC, useMemo } from "react";
 import { PanelCloseIcon } from "../components/icons/panel-close";
 import type { ConnectorObject } from "../connector/types";
 import { useGraph } from "../graph/context";
+import { WebSearchPropertyPanel } from "../web-search/panel";
 import { giselleNodeArchetypes } from "./blueprints";
 import { ArchetypeIcon } from "./components/archetype-icon";
 import { PromptPropertyPanel } from "./components/panel/prompt";
 import { TextGeneratorPropertyPanel } from "./components/panel/text-generator";
-import { WebSearchPropertyPanel } from "./components/panel/web-search";
 import {
 	type GiselleNodeBlueprint,
 	type GiselleNodeCategory,
