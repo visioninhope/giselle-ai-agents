@@ -1,6 +1,6 @@
 type WebSearchId = `wbs_${string}`;
 
-const webSearchStatus = {
+export const webSearchStatus = {
 	pending: "pending",
 	processing: "processing",
 	completed: "completed",
@@ -8,7 +8,7 @@ const webSearchStatus = {
 
 type WebSearchStatus = (typeof webSearchStatus)[keyof typeof webSearchStatus];
 
-interface WebSearch {
+export interface WebSearch {
 	id: WebSearchId;
 	status: WebSearchStatus;
 	name: string;
@@ -28,14 +28,16 @@ type WebSearchItemStatus =
 
 interface WebSearchItem {
 	id: WebSearchContentId;
-	stauts: WebSearchItemStatus;
+	status: WebSearchItemStatus;
 	title: string;
 	content: string;
 	url: string;
 }
 
-interface GeneratedObject {
+export interface GeneratedObject {
 	thinking: string;
 	webSearch: WebSearch;
 	description: string;
 }
+
+export type PartialGeneratedObject = Partial<GeneratedObject>;

@@ -42,10 +42,10 @@ import {
 } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { TextContent, TextContentReference } from "../text-content/types";
+import { generateWebSearchStream } from "../web-search/server-action";
 import type { ThunkAction } from "./context";
 import {
 	generateArtifactStream,
-	generateWebSearchStream,
 	parseFile,
 	uploadFile,
 } from "./server-actions";
@@ -717,38 +717,6 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 					}),
 				);
 
-				const artifact = state.graph.artifacts.find(
-					(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
-				);
-				const node = state.graph.nodes.find(
-					(node) => node.id === args.textGeneratorNode.id,
-				);
-				if (node === undefined) {
-					/** @todo error handling  */
-					throw new Error("Node not found");
-				}
-
-				dispatch(
-					addOrReplaceArtifact({
-						artifact: {
-							id: artifact === undefined ? createArtifactId() : artifact.id,
-							object: "artifact",
-							title: content?.artifact?.title ?? "",
-							content: content?.artifact?.content ?? "",
-							generatorNode: {
-								id: node.id,
-								category: node.category,
-								archetype: node.archetype,
-								name: node.name,
-								object: "node.artifactElement",
-								properties: node.properties,
-							},
-							elements: [
-								giselleNodeToGiselleNodeArtifactElement(instructionNode),
-							],
-						},
-					}),
-				);
 				dispatch(
 					updateNodeState({
 						node: {
