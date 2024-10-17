@@ -1,0 +1,38 @@
+[
+	{
+		"label": "biome",
+		"command": "bunx @biomejs/biome check --write $ZED_WORKTREE_ROOT",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "dev",
+		"command": "bun dev",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "drizzle studio",
+		"command": "bunx drizzle-kit studio",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "tsc",
+		"command": "bun tsc",
+		"allow_concurrent_runs": false,
+		"hide": "on_success"
+	},
+	{
+		"label": "npm-check-updates",
+		"command": "bunx npm-check-updates",
+		"allow_concurrent_runs": false
+	},
+	{
+		"label": "deploy-trigger-staging",
+		"command": "./deploy-trigger",
+		"env": { "ENV": "staging" }
+	},
+	{
+		"label": "deploy-trigger-production",
+		"command": "./deploy-trigger",
+		"env": { "ENV": "prod" }
+	}
+]
