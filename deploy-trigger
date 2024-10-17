@@ -1,0 +1,36 @@
+#!/bin/bash
+
+PACKAGE_JSON="package.json"
+REACT_STABLE_VERSION="18.3.1"
+NEXTJS_STABLE_VERSION="14.2.5"
+REACT_BETA_VERSION="19.0.0-rc-19bd26be-20240815"
+NEXTJS_BETA_VERSION="15.0.0-canary.116"
+
+if [ -z "$ENV" ]; then
+    echo "Please set the ENV environment variable before running this script. Exiting now."
+    exit 1
+fi
+
+# Update versions using the sed command
+sed -i '' -e 's/"next": ".*"/"next": "'$NEXTJS_STABLE_VERSION'"/' \
+    -e 's/"react": ".*"/"react": "'$REACT_STABLE_VERSION'"/'\
+    -e 's/"react-dom": ".*"/"react-dom": "'$REACT_STABLE_VERSION'"/'\
+    "$PACKAGE_JSON"
+
+echo "Replacing package.json with stable version."
+
+rm -rf node_modules
+bun i
+
+bunx trigger.dev@beta deploy --env $ENV
+
+# Revert the changes to the package.json file
+sed -i '' -e 's/"next": ".*"/"next": "'$NEXTJS_BETA_VERSION'"/' \
+    -e 's/"react": ".*"/"react": "'$REACT_BETA_VERSION'"/'\
+    -e 's/"react-dom": ".*"/"react-dom": "'$REACT_BETA_VERSION'"/'\
+    "$PACKAGE_JSON"
+
+echo "Reverting package.json to beta version."
+
+rm -rf node_modules
+bun i
