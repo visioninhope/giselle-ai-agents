@@ -1,13 +1,6 @@
 "use server";
 
-import { openai } from "@ai-sdk/openai";
-import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
-
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
-import { metrics } from "@opentelemetry/api";
-import { Langfuse } from "langfuse";
-import { schema as artifactSchema } from "../artifact/schema";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
