@@ -1,12 +1,7 @@
 "use server";
 
 import { openai } from "@ai-sdk/openai";
-import {
-	type CoreMessage,
-	jsonSchema,
-	streamText as sdkStreamText,
-	streamObject,
-} from "ai";
+import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { UnstructuredClient } from "unstructured-client";
 
@@ -20,25 +15,9 @@ import { Langfuse } from "langfuse";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { FileId } from "../files/types";
-import type { GiselleNodeArchetype } from "../giselle-node/blueprints";
 import type { AgentId } from "../types";
 import { elementsToMarkdown } from "../utils/unstructured";
 import type { Graph } from "./types";
-
-const webSearchSchema = jsonSchema<{ keywords: string[] }>({
-	$schema: "https://json-schema.org/draft/2020-12/schema",
-	title: "keyword schema",
-	type: "object",
-	properties: {
-		keywords: {
-			type: "array",
-			items: {
-				type: "string",
-			},
-		},
-	},
-	required: ["keywords"],
-});
 
 type GenerateArtifactStreamParams = {
 	userPrompt: string;
@@ -63,58 +42,6 @@ export async function generateArtifactStream(
 			model: openai(model),
 			system: params.systemPrompt ?? "You generate an answer to a question. ",
 			prompt: params.userPrompt,
-			schema: artifactSchema,
-			onFinish: async (result) => {
-				const meter = metrics.getMeter("OpenAI");
-				const tokenCounter = meter.createCounter("token_consumed", {
-					description: "Number of OpenAI API tokens consumed by each request",
-				});
-				const subscriptionId = await getUserSubscriptionId();
-				const isR06User = await isRoute06User();
-				tokenCounter.add(result.usage.totalTokens, {
-					subscriptionId,
-					isR06User,
-				});
-				generation.end({
-					output: result,
-				});
-				await lf.shutdownAsync();
-			},
-		});
-
-		for await (const partialObject of partialObjectStream) {
-			stream.update(partialObject);
-		}
-
-		stream.done();
-	})();
-
-	return { object: stream.value };
-}
-
-type GenerateWebSearchStreamInputs = {
-	userPrompt: string;
-	systemPrompt?: string;
-};
-export async function generateWebSearchStream(
-	inputs: GenerateWebSearchStreamInputs,
-) {
-	const lf = new Langfuse();
-	const trace = lf.trace({
-		id: `giselle-${Date.now()}`,
-	});
-	const stream = createStreamableValue();
-
-	(async () => {
-		const model = "gpt-4o-mini";
-		const generation = trace.generation({
-			input: inputs.userPrompt,
-			model,
-		});
-		const { partialObjectStream } = await streamObject({
-			model: openai(model),
-			system: inputs.systemPrompt ?? "You generate an answer to a question. ",
-			prompt: inputs.userPrompt,
 			schema: artifactSchema,
 			onFinish: async (result) => {
 				const meter = metrics.getMeter("OpenAI");

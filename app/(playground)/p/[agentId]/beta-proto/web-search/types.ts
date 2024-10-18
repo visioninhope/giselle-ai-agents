@@ -35,7 +35,7 @@ interface WebSearchItem {
 }
 
 export interface GeneratedObject {
-	thinking: string;
+	plan: string;
 	webSearch: WebSearch;
 	description: string;
 }
