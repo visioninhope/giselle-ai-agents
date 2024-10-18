@@ -18,9 +18,18 @@ export type ArtifactReference = {
 	object: "artifact.reference";
 };
 
+interface Citation {
+	title: string;
+	url: string;
+}
 export type GeneratedObject = {
 	thinking: string;
-	artifact: { title: string; content: string; completed: boolean };
+	artifact: {
+		title: string;
+		content: string;
+		citations: Citation[];
+		completed: boolean;
+	};
 	description: string;
 };
 export type PartialGeneratedObject = Partial<GeneratedObject>;

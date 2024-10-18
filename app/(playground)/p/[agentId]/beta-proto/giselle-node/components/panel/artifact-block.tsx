@@ -10,9 +10,14 @@ import type { GiselleNode } from "../../types";
 import { Block } from "./block";
 import { MarkdownRender } from "./markdown-render";
 
+interface Citation {
+	title: string;
+	url: string;
+}
 type ArtifactBlockProps = {
 	title?: string;
 	content?: string;
+	citations?: Citation[];
 	completed?: boolean;
 	node: Pick<GiselleNode, "archetype" | "name">;
 };
@@ -20,6 +25,7 @@ export function ArtifactBlock(props: ArtifactBlockProps) {
 	const title = props.title ?? "Generating...";
 	const content = props.content ?? "";
 	const completed = props.completed ?? false;
+	const citations = props.citations ?? [];
 	return (
 		<Dialog>
 			<DialogTrigger>
@@ -48,7 +54,15 @@ export function ArtifactBlock(props: ArtifactBlockProps) {
 					<div className="border-t border-black-40" />
 					<div className="overflow-x-hidden overflow-y-auto flex-1">
 						<div className="px-[32px] py-[16px] font-rosart text-[18px] text-black-30">
-							<MarkdownRender markdownLike={content} />
+							<MarkdownRender
+								markdownLike={`
+${content}
+
+${citations.length > 0 ? "## Citations" : ""}
+
+${citations.map((citation) => `[${citation.title}](${citation.url})`).join("\n")}
+`}
+							/>
 						</div>
 					</div>
 					<div className="px-[32px] flex items-center py-[12px] justify-between">
