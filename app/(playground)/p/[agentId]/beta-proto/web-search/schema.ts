@@ -14,8 +14,10 @@ export const webSearchSchema = jsonSchema<{ plan: string; keywords: string[] }>(
 				type: "array",
 				items: {
 					type: "string",
-					description: "The keywords to search for user request",
+					description:
+						"Suggest appropriate search queries with relevant keywords at least 3-5 words long",
 				},
+				description: "The keywords to search for user request",
 			},
 		},
 		required: ["plan", "keywords"],

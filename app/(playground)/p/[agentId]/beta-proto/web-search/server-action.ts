@@ -52,7 +52,6 @@ export async function generateWebSearchStream(
 			},
 		});
 		for await (const partialObject of partialObjectStream) {
-			console.log(partialObject);
 			stream.update(partialObject);
 		}
 
