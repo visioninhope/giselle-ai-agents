@@ -38,7 +38,7 @@ export async function generateArtifactStream(
 			input: params.userPrompt,
 			model,
 		});
-		const { partialObjectStream } = await streamObject({
+		const { partialObjectStream, object } = await streamObject({
 			model: openai(model),
 			system: params.systemPrompt ?? "You generate an answer to a question. ",
 			prompt: params.userPrompt,
@@ -64,6 +64,8 @@ export async function generateArtifactStream(
 		for await (const partialObject of partialObjectStream) {
 			stream.update(partialObject);
 		}
+
+		const result = await object;
 
 		stream.done();
 	})();

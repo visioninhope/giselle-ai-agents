@@ -33,10 +33,9 @@ export const webSearchItemStatus = {
 type WebSearchItemStatus =
 	(typeof webSearchItemStatus)[keyof typeof webSearchItemStatus];
 
-interface WebSearchItem {
+export interface WebSearchItem {
 	id: WebSearchContentId;
 	object: "webSearch.item";
-	status: WebSearchItemStatus;
 	title: string;
 	content: string;
 	url: string;
@@ -56,7 +55,7 @@ interface CompletedWebSearchItemReference {
 	contentBlobUrl: string;
 	url: string;
 }
-type WebSearchItemReference =
+export type WebSearchItemReference =
 	| PendingWebSearchItemReference
 	| CompletedWebSearchItemReference;
 export interface GeneratedObject {

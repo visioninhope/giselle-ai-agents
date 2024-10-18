@@ -28,6 +28,7 @@ import type {
 	TextContent,
 	TextContentReference,
 } from "../../../text-content/types";
+import type { WebSearch } from "../../../web-search/types";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
@@ -67,7 +68,7 @@ function setTextToPropertyAndOutput(
 	};
 }
 
-type Source = ArtifactReference | TextContent | GiselleFile;
+type Source = ArtifactReference | TextContent | GiselleFile | WebSearch;
 
 type PromptPropertyPanelProps = {
 	node: GiselleNode;
@@ -145,21 +146,30 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 		);
 	}, [dispatch, outgoingConnections]);
 
-	const availableArtifacts = useMemo<Artifact[]>(
-		() =>
-			state.graph.artifacts.filter(
+	const availableArtifactsOrWebSearches = useMemo<(Artifact | WebSearch)[]>(
+		() => [
+			...state.graph.artifacts.filter(
 				(artifact) =>
 					!outgoingConnections.some(
 						({ target }) => target === artifact.generatorNode.id,
 					),
 			),
-		[outgoingConnections, state.graph.artifacts],
+			...state.graph.webSearches.filter(
+				(webSearch) =>
+					!outgoingConnections.some(
+						({ target }) => target === webSearch.generatorNode.id,
+					),
+			),
+		],
+		[outgoingConnections, state.graph.artifacts, state.graph.webSearches],
 	);
-	const sources = useMemo<(Artifact | TextContent | GiselleFile)[]>(
+	const sources = useMemo<(Artifact | TextContent | GiselleFile | WebSearch)[]>(
 		() =>
 			(node.properties.sources as Source[])
 				?.map((source) =>
-					source.object === "textContent" || source.object === "file"
+					source.object === "textContent" ||
+					source.object === "file" ||
+					source.object === "webSearch"
 						? source
 						: state.graph.artifacts.find(
 								(artifact) => artifact.id === source.id,
@@ -193,6 +203,31 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 							id: artifact.id,
 							object: "artifact.reference",
 						},
+					}),
+				);
+			}
+		},
+		[dispatch, node.id, sources],
+	);
+	const handleWebSearchClick = useCallback(
+		(webSearch: WebSearch) => () => {
+			const webSearchIds = sources.map(({ id }) => id);
+			if (webSearchIds.includes(webSearch.id)) {
+				dispatch(
+					removeSourceFromPromptNode({
+						promptNode: {
+							id: node.id,
+						},
+						source: webSearch,
+					}),
+				);
+			} else {
+				dispatch(
+					addSourceToPromptNode({
+						promptNode: {
+							id: node.id,
+						},
+						source: webSearch,
 					}),
 				);
 			}
@@ -323,26 +358,54 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 											>
 												<div className="px-[8px]">
 													<div>
-														{availableArtifacts.map((artifact) => (
-															<button
-																type="button"
-																className="flex justify-between items-center py-[4px] w-full"
-																key={artifact.id}
-																onClick={handleArtifactClick(artifact)}
-															>
-																<p className="line-clamp-1 text-left">
-																	{artifact.title}
-																</p>
-																{sources.some(
-																	(source) => source.id === artifact.id,
-																) && (
-																	<CheckIcon
-																		size={16}
-																		className="stroke-white flex-shrink-0"
-																	/>
-																)}
-															</button>
-														))}
+														{availableArtifactsOrWebSearches.map(
+															(artifactOrWebSearch) =>
+																artifactOrWebSearch.object === "artifact" ? (
+																	<button
+																		type="button"
+																		className="flex justify-between items-center py-[4px] w-full"
+																		key={artifactOrWebSearch.id}
+																		onClick={handleArtifactClick(
+																			artifactOrWebSearch,
+																		)}
+																	>
+																		<p className="line-clamp-1 text-left">
+																			{artifactOrWebSearch.title}
+																		</p>
+																		{sources.some(
+																			(source) =>
+																				source.id === artifactOrWebSearch.id,
+																		) && (
+																			<CheckIcon
+																				size={16}
+																				className="stroke-white flex-shrink-0"
+																			/>
+																		)}
+																	</button>
+																) : (
+																	<button
+																		type="button"
+																		className="flex justify-between items-center py-[4px] w-full"
+																		key={artifactOrWebSearch.id}
+																		onClick={handleWebSearchClick(
+																			artifactOrWebSearch,
+																		)}
+																	>
+																		<p className="line-clamp-1 text-left">
+																			{artifactOrWebSearch.name}
+																		</p>
+																		{sources.some(
+																			(source) =>
+																				source.id === artifactOrWebSearch.id,
+																		) && (
+																			<CheckIcon
+																				size={16}
+																				className="stroke-white flex-shrink-0"
+																			/>
+																		)}
+																	</button>
+																),
+														)}
 													</div>
 												</div>
 											</Popover.Content>
@@ -374,6 +437,14 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 												}
 												icon={
 													<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
+												}
+											/>
+										) : source.object === "webSearch" ? (
+											<Block
+												key={source.id}
+												title={source.name}
+												icon={
+													<TextsIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
 												}
 											/>
 										) : (

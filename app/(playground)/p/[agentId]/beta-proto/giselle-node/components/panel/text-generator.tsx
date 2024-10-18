@@ -157,6 +157,9 @@ export const TextGeneratorPropertyPanel: FC<
 									completed={
 										(node.output as PartialGeneratedObject).artifact?.completed
 									}
+									citations={
+										(node.output as PartialGeneratedObject).artifact?.citations
+									}
 									node={node}
 								/>
 							</div>

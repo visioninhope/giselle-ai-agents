@@ -43,7 +43,13 @@ import {
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { TextContent, TextContentReference } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
-import type { WebSearch } from "../web-search/types";
+import {
+	type WebSearch,
+	type WebSearchItem,
+	type WebSearchItemReference,
+	webSearchItemStatus,
+	webSearchStatus,
+} from "../web-search/types";
 import type { ThunkAction } from "./context";
 import {
 	generateArtifactStream,
@@ -495,7 +501,7 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		type Source = Artifact | TextContent | StructuredData;
+		type Source = Artifact | TextContent | StructuredData | WebSearchItem;
 		const instructionSources: Source[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
@@ -533,6 +539,29 @@ export const generateText =
 							content: structuredData,
 						});
 					}
+				} else if (source.object === "webSearch") {
+					if (
+						typeof source.status === "string" &&
+						source.status === webSearchStatus.completed &&
+						Array.isArray(source.items)
+					) {
+						await Promise.all(
+							(source.items as WebSearchItemReference[]).map(async (item) => {
+								if (item.status === webSearchItemStatus.completed) {
+									const webSearchData = await fetch(item.contentBlobUrl).then(
+										(res) => res.text(),
+									);
+									instructionSources.push({
+										id: item.id,
+										object: "webSearch.item",
+										url: item.url,
+										title: item.title,
+										content: webSearchData,
+									});
+								}
+							}),
+						);
+					}
 				}
 			}
 		}
@@ -549,9 +578,11 @@ export const generateText =
 				const systemPrompt =
 					instructionSources.length > 0
 						? `
-Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
+Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
 
-${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
+If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
+
+${instructionSources.map((source) => (source.object === "webSearch.item" ? `<WebPage title="${source.title}" type="${source.object}" rel="${source.url}" id="${source.id}">${source.content}</WebPage>` : `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`)).join("\n")}
 `
 						: undefined;
 
@@ -594,6 +625,7 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 								artifact: {
 									title: content?.artifact?.title ?? "",
 									content: content?.artifact?.content ?? "",
+									citations: content?.artifact?.citations ?? [],
 									completed: true,
 								},
 							},
@@ -695,6 +727,7 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 								artifact: {
 									title: content?.artifact?.title ?? "",
 									content: content?.artifact?.content ?? "",
+									citations: content?.artifact?.citations ?? [],
 									completed: true,
 								},
 							},
@@ -713,7 +746,7 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 				dispatch(
 					upsertWebSearch({
 						// biome-ignore lint: lint/suspicious/noExplicitAny be typesafe earlier
-						webSearch: content as any,
+						webSearch: (content as any).webSearch,
 					}),
 				);
 				break;
@@ -764,7 +797,7 @@ export function removeParameterFromNode(
 	};
 }
 
-type Source = ArtifactReference | TextContent | GiselleFile;
+type Source = ArtifactReference | TextContent | GiselleFile | WebSearch;
 type AddSourceToPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
@@ -901,11 +934,63 @@ export function addSourceToPromptNode(
 					}),
 				);
 			}
+		} else if (args.source.object === "webSearch") {
+			const webSearch = state.graph.webSearches.find(
+				(webSearch) => webSearch.id === args.source.id,
+			);
+			if (webSearch === undefined) {
+				return;
+			}
+			const outgoingConnectors = state.graph.connectors.filter(
+				({ source }) => source === args.promptNode.id,
+			);
+			for (const outgoingConnector of outgoingConnectors) {
+				const outgoingNode = state.graph.nodes.find(
+					(node) => node.id === outgoingConnector.target,
+				);
+				if (outgoingNode === undefined) {
+					continue;
+				}
+				const currentSourceHandleLength =
+					outgoingNode.parameters?.object === "objectParameter"
+						? Object.keys(outgoingNode.parameters.properties).filter((key) =>
+								key.startsWith("source"),
+							).length
+						: 0;
+				dispatch(
+					addParameterToNode({
+						node: {
+							id: outgoingConnector.target,
+						},
+						parameter: {
+							key: `source${currentSourceHandleLength + 1}`,
+							value: createStringParameter({
+								label: `Source${currentSourceHandleLength + 1}`,
+							}),
+						},
+					}),
+				);
+				dispatch(
+					addConnector({
+						sourceNode: {
+							id: webSearch.generatorNode.id,
+							category: webSearch.generatorNode.category,
+							archetype: webSearch.generatorNode.archetype,
+						},
+						targetNode: {
+							id: outgoingConnector.target,
+							handle: `source${currentSourceHandleLength + 1}`,
+							category: outgoingConnector.targetNodeCategory,
+							archetype: outgoingNode.archetype,
+						},
+					}),
+				);
+			}
 		}
 	};
 }
 
-type Source2 = ArtifactReference | TextContentReference;
+type Source2 = ArtifactReference | TextContentReference | WebSearch;
 type RemoveSourceFromPromptNodeArgs = {
 	promptNode: {
 		id: GiselleNodeId;
@@ -949,6 +1034,50 @@ export function removeSourceFromPromptNode(
 			}),
 		);
 		if (args.source.object === "artifact.reference") {
+			const artifact = state.graph.artifacts.find(
+				(artifact) => artifact.id === args.source.id,
+			);
+			if (artifact === undefined) {
+				return;
+			}
+			const outgoingConnectors = state.graph.connectors.filter(
+				({ source }) => source === args.promptNode.id,
+			);
+			for (const outgoingConnector of outgoingConnectors) {
+				const outgoingNode = state.graph.nodes.find(
+					(node) => node.id === outgoingConnector.target,
+				);
+				if (outgoingNode === undefined) {
+					continue;
+				}
+				const artifactCreatorNodeToOutgoingNodeConnector =
+					state.graph.connectors.find(
+						(connector) =>
+							connector.target === outgoingNode.id &&
+							connector.source === artifact.generatorNode.id,
+					);
+				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
+					continue;
+				}
+				dispatch(
+					removeConnector({
+						connector: {
+							id: artifactCreatorNodeToOutgoingNodeConnector.id,
+						},
+					}),
+				);
+				dispatch(
+					removeParameterFromNode({
+						node: {
+							id: outgoingConnector.target,
+						},
+						parameter: {
+							key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
+						},
+					}),
+				);
+			}
+		} else if (args.source.object === "webSearch") {
 			const artifact = state.graph.artifacts.find(
 				(artifact) => artifact.id === args.source.id,
 			);
