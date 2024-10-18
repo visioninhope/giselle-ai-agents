@@ -2,11 +2,16 @@
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
 import { openai } from "@ai-sdk/openai";
+import FirecrawlApp from "@mendable/firecrawl-js";
 import { metrics } from "@opentelemetry/api";
+import { createId } from "@paralleldrive/cuid2";
+import { put } from "@vercel/blob";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import Langfuse from "langfuse";
 import { webSearchSchema } from "./schema";
+import { search } from "./tavily";
+import { type WebSearch, webSearchItemStatus, webSearchStatus } from "./types";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -57,74 +62,75 @@ export async function generateWebSearchStream(
 
 		const result = await object;
 
-		await sleep(500);
+		const searchResults = await Promise.all(
+			result.keywords.map((keyword) => search(keyword)),
+		).then((results) => [...new Set(results.flat())]);
+
+		const webSearch: WebSearch = {
+			id: `wbs_${createId()}`,
+			object: "webSearch",
+			name: result.name,
+			status: "pending",
+			items: searchResults.map((searchResult) => ({
+				id: `wbs.cnt_${createId()}`,
+				object: "webSearch.item.reference",
+				title: searchResult.title,
+				url: searchResult.url,
+				status: "pending",
+			})),
+		};
+
 		stream.update({
 			...result,
-			webSearch: {
-				name: "Why Deno is the best choice for biginner",
-			},
+			webSearch,
 		});
 
-		await sleep(1000);
+		if (process.env.FIRECRAWL_API_KEY === undefined) {
+			throw new Error("FIRECRAWL_API_KEY is not set");
+		}
+		const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
+		let mutableItems = webSearch.items;
+		await Promise.all(
+			webSearch.items.map(async (webSearchItem) => {
+				const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
+					formats: ["markdown"],
+				});
+				if (scrapeResponse.success) {
+					const blob = await put(
+						`webSearch/${webSearchItem.id}.md`,
+						scrapeResponse.markdown ?? "",
+						{
+							access: "public",
+							contentType: "text/markdown",
+						},
+					);
+					mutableItems = mutableItems.map((item) => {
+						if (item.id !== webSearchItem.id) {
+							return item;
+						}
+						return {
+							...webSearchItem,
+							contentBlobUrl: blob.url,
+							status: webSearchItemStatus.completed,
+						};
+					});
+					stream.update({
+						...result,
+						webSearch: {
+							...webSearch,
+							items: mutableItems,
+						},
+					});
+				}
+			}),
+		);
 		stream.update({
 			...result,
 			webSearch: {
-				name: "Why Deno is the best choice for biginner",
-				items: [
-					{
-						id: "wbs.cnt_1",
-						title: "Deno vs Node.js: A Detailed Comparison",
-						url: "https://www.freecodecamp.org/news/deno-vs-node-js/",
-						status: "pending",
-					},
-				],
+				...webSearch,
+				status: webSearchStatus.completed,
+				items: mutableItems,
 			},
-		});
-
-		await sleep(1000);
-		stream.update({
-			...result,
-			webSearch: {
-				name: "Why Deno is the best choice for biginner",
-				items: [
-					{
-						id: "wbs.cnt_1",
-						title: "Deno Beginner",
-						url: "https://denobeginner.com/",
-						status: "completed",
-					},
-					{
-						id: "wbs.cnt_2",
-						title: "Intro to Deno – Guide for Beginners",
-						url: "https://www.freecodecamp.org/news/intro-to-deno/",
-						status: "processing",
-					},
-				],
-			},
-		});
-		await sleep(1000);
-		stream.update({
-			...result,
-			webSearch: {
-				name: "Why Deno is the best choice for biginner",
-				items: [
-					{
-						id: "wbs.cnt_1",
-						title: "Deno Beginner",
-						url: "https://denobeginner.com/",
-						status: "completed",
-					},
-					{
-						id: "wbs.cnt_2",
-						title: "Intro to Deno – Guide for Beginners",
-						url: "https://www.freecodecamp.org/news/intro-to-deno/",
-						status: "completed",
-					},
-				],
-				status: "completed",
-			},
-			description:
-				"Deno is a runtime for JavaScript and TypeScript that is based on the V8 JavaScript engine and the Rust programming language. It was created by Ryan Dahl, the original creator of Node.js, and was designed to address some of the shortcomings of Node.js. Deno is designed to be secure by default, with no file, network, or environment access unless explicitly enabled. It also has built-in support for TypeScript, which makes it easier to write and maintain large codebases. Deno is still relatively new compared to Node.js, but it has been gaining popularity among developers who are looking for a more secure and modern alternative to Node.js.",
 		});
 
 		stream.done();
