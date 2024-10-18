@@ -223,6 +223,27 @@ export const graphReducer = (
 					),
 				},
 			};
+		case "upsertWebSearch": {
+			const isUpdate = state.graph.webSearches.some(
+				(webSearch) =>
+					webSearch.generatorNode.id ===
+					action.inputs.webSearch.generatorNode.id,
+			);
+			return {
+				...state,
+				graph: {
+					...state.graph,
+					webSearches: isUpdate
+						? state.graph.webSearches.map((webSearch) =>
+								webSearch.generatorNode.id !==
+								action.inputs.webSearch.generatorNode.id
+									? webSearch
+									: action.inputs.webSearch,
+							)
+						: [...state.graph.webSearches, action.inputs.webSearch],
+				},
+			};
+		}
 		default:
 			return state;
 	}
