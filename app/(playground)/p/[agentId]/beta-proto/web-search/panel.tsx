@@ -73,7 +73,7 @@ export const WebSearchPropertyPanel: FC<WebSearchPropertyPanelProps> = ({
 								</div>
 							</div>
 						)}
-						<div>{(node.output as PartialGeneratedObject).thinking}</div>
+						<div>{(node.output as PartialGeneratedObject).plan}</div>
 						{(node.output as PartialGeneratedObject).webSearch && (
 							<div>
 								<WebSearchBlock

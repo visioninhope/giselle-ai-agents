@@ -1,6 +1,12 @@
 "use server";
 
+import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { openai } from "@ai-sdk/openai";
+import { metrics } from "@opentelemetry/api";
+import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
+import Langfuse from "langfuse";
+import { webSearchSchema } from "./schema";
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -11,25 +17,50 @@ interface GenerateWebSearchStreamInputs {
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
 ) {
+	const lf = new Langfuse();
+	const trace = lf.trace({
+		id: `giselle-${Date.now()}`,
+	});
 	const stream = createStreamableValue();
 
 	(async () => {
-		stream.update({});
-
-		await sleep(500);
-
-		stream.update({
-			thinking: "Search the web",
+		const model = "gpt-4o-mini";
+		const generation = trace.generation({
+			input: inputs.userPrompt,
+			model,
 		});
-
-		await sleep(500);
-		stream.update({
-			thinking: "Search the web to find information relevant to your request.",
+		const { partialObjectStream, object } = await streamObject({
+			model: openai(model),
+			system: inputs.systemPrompt ?? "You generate an answer to a question. ",
+			prompt: inputs.userPrompt,
+			schema: webSearchSchema,
+			onFinish: async (result) => {
+				const meter = metrics.getMeter("OpenAI");
+				const tokenCounter = meter.createCounter("token_consumed", {
+					description: "Number of OpenAI API tokens consumed by each request",
+				});
+				const subscriptionId = await getUserSubscriptionId();
+				const isR06User = await isRoute06User();
+				tokenCounter.add(result.usage.totalTokens, {
+					subscriptionId,
+					isR06User,
+				});
+				generation.end({
+					output: result,
+				});
+				await lf.shutdownAsync();
+			},
 		});
+		for await (const partialObject of partialObjectStream) {
+			console.log(partialObject);
+			stream.update(partialObject);
+		}
+
+		const result = await object;
 
 		await sleep(500);
 		stream.update({
-			thinking: "Search the web to find information relevant to your request.",
+			...result,
 			webSearch: {
 				name: "Why Deno is the best choice for biginner",
 			},
@@ -37,7 +68,7 @@ export async function generateWebSearchStream(
 
 		await sleep(1000);
 		stream.update({
-			thinking: "Search the web to find information relevant to your request.",
+			...result,
 			webSearch: {
 				name: "Why Deno is the best choice for biginner",
 				items: [
@@ -53,7 +84,7 @@ export async function generateWebSearchStream(
 
 		await sleep(1000);
 		stream.update({
-			thinking: "Search the web to find information relevant to your request.",
+			...result,
 			webSearch: {
 				name: "Why Deno is the best choice for biginner",
 				items: [
@@ -74,7 +105,7 @@ export async function generateWebSearchStream(
 		});
 		await sleep(1000);
 		stream.update({
-			thinking: "Search the web to find information relevant to your request.",
+			...result,
 			webSearch: {
 				name: "Why Deno is the best choice for biginner",
 				items: [

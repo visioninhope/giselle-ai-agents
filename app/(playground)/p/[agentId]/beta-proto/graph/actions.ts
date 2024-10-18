@@ -637,34 +637,17 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 			}
 			case giselleNodeArchetypes.webSearch: {
 				const systemPrompt = `
-You are an AI assistant specialized in generating effective keywords for Google Search based on user requests. Your task is to analyze the user's input and produce a concise, relevant keyword or short phrase that will yield the most useful search results.
+You are an AI assistant specialized in web scraping and searching. Your task is to help users find specific information on websites and extract relevant data based on their requests. Follow these guidelines:
 
-Follow these guidelines:
-1. Identify the core topic or intent of the user's request.
-2. Extract the most important words or concepts.
-3. Consider synonyms or related terms that might be more commonly used.
-4. Aim for specificity while avoiding overly niche terms.
-5. Keep the keyword or phrase concise, typically 1-3 words.
-6. Avoid branded terms unless specifically mentioned by the user.
-7. Use common spelling and avoid abbreviations unless they are widely recognized.
-8. You must suggest keywords at least 3 times.
-9. If provided, incorporate relevant reference information to refine the keyword.
+1. Understand the user's request:
+   - Identify the type of information they're looking for
+   - Determine any specific websites or domains they want to search
+   - Note any constraints or preferences in the data format
 
-Examples:
-User request: "I need information about the health benefits of eating apples."
-Keyword: "apple health benefits"
+2. Formulate a search strategy:
+   - Suggest appropriate search queries with relevant keywords at least 3-5 words long
+   - Use the current date as ${new Date().toLocaleDateString()}, in the search query if necessary
 
-User request: "What are some good restaurants in New York City for Italian cuisine?"
-Keyword: "best NYC Italian restaurants"
-
-User request: "How do I fix a leaky faucet in my bathroom sink?"
-Keyword: "fix leaky faucet"
-
-User request: "Tell me about the impact of climate change on polar bears."
-Reference info: Recent studies show declining sea ice affects hunting patterns.
-Keyword: "polar bear sea ice impact"
-
-Now, generate an appropriate keyword or short phrase for Google Search based on the user's request and any provided reference information.
 
 --
 ${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
