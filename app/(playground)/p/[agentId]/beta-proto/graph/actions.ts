@@ -43,6 +43,7 @@ import {
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { TextContent, TextContentReference } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
+import type { WebSearch } from "../web-search/types";
 import type { ThunkAction } from "./context";
 import {
 	generateArtifactStream,
@@ -536,6 +537,13 @@ export const generateText =
 			}
 		}
 
+		const node = state.graph.nodes.find(
+			(node) => node.id === args.textGeneratorNode.id,
+		);
+		if (node === undefined) {
+			/** @todo error handling  */
+			throw new Error("Node not found");
+		}
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
 				const systemPrompt =
@@ -596,13 +604,6 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 				const artifact = state.graph.artifacts.find(
 					(artifact) => artifact.generatorNode.id === args.textGeneratorNode.id,
 				);
-				const node = state.graph.nodes.find(
-					(node) => node.id === args.textGeneratorNode.id,
-				);
-				if (node === undefined) {
-					/** @todo error handling  */
-					throw new Error("Node not found");
-				}
 
 				dispatch(
 					addOrReplaceArtifact({
@@ -657,6 +658,7 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 				const { object } = await generateWebSearchStream({
 					userPrompt: instructionNode.output as string,
 					systemPrompt,
+					node,
 				});
 				let content: PartialGeneratedObject = {};
 				for await (const streamContent of readStreamableValue(object)) {
@@ -706,6 +708,12 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 							id: args.textGeneratorNode.id,
 							state: giselleNodeState.completed,
 						},
+					}),
+				);
+				dispatch(
+					upsertWebSearch({
+						// biome-ignore lint: lint/suspicious/noExplicitAny be typesafe earlier
+						webSearch: content as any,
 					}),
 				);
 				break;
@@ -1085,6 +1093,20 @@ export function removeSelectedNodesOrFeedback(): ThunkAction {
 	};
 }
 
+interface UpsertWebSearchAction {
+	type: "upsertWebSearch";
+	inputs: UpsertWebSearchInputs;
+}
+interface UpsertWebSearchInputs {
+	webSearch: WebSearch;
+}
+function upsertWebSearch(inputs: UpsertWebSearchInputs): UpsertWebSearchAction {
+	return {
+		type: "upsertWebSearch",
+		inputs,
+	};
+}
+
 export type GraphAction =
 	| AddNodeAction
 	| RemoveNodeAction
@@ -1100,4 +1122,5 @@ export type GraphAction =
 	| AddOrReplaceArtifactAction
 	| RemoveArtifactAction
 	| AddParameterToNodeAction
-	| RemoveParameterFromNodeAction;
+	| RemoveParameterFromNodeAction
+	| UpsertWebSearchAction;

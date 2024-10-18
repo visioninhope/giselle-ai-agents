@@ -9,15 +9,15 @@ import { put } from "@vercel/blob";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import Langfuse from "langfuse";
+import type { GiselleNode } from "../giselle-node/types";
 import { webSearchSchema } from "./schema";
 import { search } from "./tavily";
 import { type WebSearch, webSearchItemStatus, webSearchStatus } from "./types";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-
 interface GenerateWebSearchStreamInputs {
 	userPrompt: string;
 	systemPrompt?: string;
+	node: GiselleNode;
 }
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
@@ -68,6 +68,7 @@ export async function generateWebSearchStream(
 
 		const webSearch: WebSearch = {
 			id: `wbs_${createId()}`,
+			generatedNodeId: inputs.node.id,
 			object: "webSearch",
 			name: result.name,
 			status: "pending",

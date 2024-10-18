@@ -128,6 +128,7 @@ export const agents = pgTable("agents", {
 		nodes: [],
 		connectors: [],
 		artifacts: [],
+		webSearches: [],
 	}),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()

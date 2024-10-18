@@ -1,3 +1,5 @@
+import type { GiselleNodeId } from "../giselle-node/types";
+
 type WebSearchId = `wbs_${string}`;
 
 export const webSearchStatus = {
@@ -14,6 +16,7 @@ export interface WebSearch {
 	status: WebSearchStatus;
 	name: string;
 	items: WebSearchItemReference[];
+	generatedNodeId: GiselleNodeId;
 }
 
 type WebSearchContentId = `wbs.cnt_${string}`;
