@@ -68,7 +68,10 @@ export async function generateWebSearchStream(
 
 		const webSearch: WebSearch = {
 			id: `wbs_${createId()}`,
-			generatedNodeId: inputs.node.id,
+			generatorNode: {
+				...inputs.node,
+				object: "node.webSearchElement",
+			},
 			object: "webSearch",
 			name: result.name,
 			status: "pending",

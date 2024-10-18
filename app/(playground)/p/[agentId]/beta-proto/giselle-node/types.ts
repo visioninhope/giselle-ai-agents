@@ -75,6 +75,15 @@ export type GiselleNodeArtifactElement = {
 	properties: Record<string, unknown>;
 };
 
+export type GiselleNodeWebSearchElement = {
+	id: GiselleNodeId;
+	object: "node.webSearchElement";
+	name: string;
+	category: GiselleNodeCategory;
+	archetype: string;
+	properties: Record<string, unknown>;
+};
+
 export type InferGiselleNodeObject<T extends GiselleNodeBlueprint> = {
 	id: GiselleNodeId;
 	object: "node";

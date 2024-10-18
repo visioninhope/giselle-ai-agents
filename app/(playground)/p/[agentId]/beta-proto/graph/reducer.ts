@@ -226,7 +226,8 @@ export const graphReducer = (
 		case "upsertWebSearch": {
 			const isUpdate = state.graph.webSearches.some(
 				(webSearch) =>
-					webSearch.generatedNodeId === action.inputs.webSearch.generatedNodeId,
+					webSearch.generatorNode.id ===
+					action.inputs.webSearch.generatorNode.id,
 			);
 			return {
 				...state,
@@ -234,8 +235,8 @@ export const graphReducer = (
 					...state.graph,
 					webSearches: isUpdate
 						? state.graph.webSearches.map((webSearch) =>
-								webSearch.generatedNodeId !==
-								action.inputs.webSearch.generatedNodeId
+								webSearch.generatorNode.id !==
+								action.inputs.webSearch.generatorNode.id
 									? webSearch
 									: action.inputs.webSearch,
 							)

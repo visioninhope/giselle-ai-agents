@@ -1,4 +1,7 @@
-import type { GiselleNodeId } from "../giselle-node/types";
+import type {
+	GiselleNodeId,
+	GiselleNodeWebSearchElement,
+} from "../giselle-node/types";
 
 type WebSearchId = `wbs_${string}`;
 
@@ -16,7 +19,7 @@ export interface WebSearch {
 	status: WebSearchStatus;
 	name: string;
 	items: WebSearchItemReference[];
-	generatedNodeId: GiselleNodeId;
+	generatorNode: GiselleNodeWebSearchElement;
 }
 
 type WebSearchContentId = `wbs.cnt_${string}`;
