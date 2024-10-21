@@ -10,8 +10,15 @@ jobs:
   license_finder:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    permissions:
+      contents: write
+      pull-requests: read
+    env:
+      LICENSE_REPORT: docs/packages-license.md
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
       # To make the success of this job a prerequisite for merging into the main branch,
       # set a filter here instead of on: to determine whether or not to proceed to the next step.
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
@@ -40,3 +47,18 @@ jobs:
       - name: Run License Finder
         if: steps.changes.outputs.target == 'true'
         run: license_finder
+
+      # Commit the License Finder report as docs/packages-license.md
+      - name: Generate license report
+        if: steps.changes.outputs.target == 'true' && github.ref_name != github.event.repository.default_branch
+        run: license_finder report --format=markdown | tail -n +2 > "$LICENSE_REPORT"
+      - name: Commit license report and push
+        if: steps.changes.outputs.target == 'true' && github.ref_name != github.event.repository.default_branch
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email 'github-actions[bot]@users.noreply.github.com'
+          git add "$LICENSE_REPORT"
+          git commit -m "Update $LICENSE_REPORT"
+          git push origin ${{ github.event.pull_request.head.ref }}
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
