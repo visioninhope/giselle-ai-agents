@@ -14,6 +14,7 @@ import {
 import clsx from "clsx/lite";
 import type { FC } from "react";
 import type { ConnectorObject } from "../connector/types";
+import { useFeatureFlags } from "../feature-flags/context";
 import { GiselleNode } from "../giselle-node/components";
 import {
 	type GiselleNode as GiselleNodeType,
@@ -24,6 +25,7 @@ export type ReactFlowNode = Node<GiselleNodeType>;
 
 export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
 	const edges = useEdges<ReactFlowEdge>();
+	const { debugFlag } = useFeatureFlags();
 	return (
 		<GiselleNode
 			{...data}
@@ -52,6 +54,7 @@ export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
 				.filter((edge) => edge.source === data.id)
 				.map((edge) => edge.data)
 				.filter((connector) => connector != null)}
+			debug={debugFlag}
 		/>
 	);
 };
