@@ -4,4 +4,5 @@ import { Roboto_Serif } from "next/font/google";
  */
 export const rosart = Roboto_Serif({
 	variable: "--font-rosart",
+	subsets: ["latin"],
 });
