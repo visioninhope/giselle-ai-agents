@@ -41,3 +41,16 @@ export const webSearchNodeFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const debugFlag = flag<boolean>({
+	key: "debug",
+	async decide() {
+		return false;
+	},
+	description: "Enable debug mode",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

@@ -1,4 +1,5 @@
 export interface FeatureFlags {
 	uploadFileToPromptNodeFlag: boolean;
 	webSearchNodeFlag: boolean;
+	debugFlag: boolean;
 }
