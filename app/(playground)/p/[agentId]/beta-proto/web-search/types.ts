@@ -46,6 +46,7 @@ interface PendingWebSearchItemReference {
 	status: Extract<WebSearchStatus, "pending">;
 	title: string;
 	url: string;
+	relevance: number;
 }
 interface CompletedWebSearchItemReference {
 	id: WebSearchContentId;
@@ -54,6 +55,7 @@ interface CompletedWebSearchItemReference {
 	title: string;
 	contentBlobUrl: string;
 	url: string;
+	relevance: number;
 }
 export type WebSearchItemReference =
 	| PendingWebSearchItemReference

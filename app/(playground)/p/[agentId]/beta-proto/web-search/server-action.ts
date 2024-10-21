@@ -85,6 +85,7 @@ export async function generateWebSearchStream(
 				title: searchResult.title,
 				url: searchResult.url,
 				status: "pending",
+				relevance: searchResult.score,
 			})),
 		};
 

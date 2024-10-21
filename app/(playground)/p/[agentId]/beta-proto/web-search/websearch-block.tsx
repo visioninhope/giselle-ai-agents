@@ -1,10 +1,11 @@
 import { CopyIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../components/dialog";
+import { CircleCheckIcon } from "../components/icons/circle-check";
 import { DocumentIcon } from "../components/icons/document";
 import { SpinnerIcon } from "../components/icons/spinner";
 import { Block } from "../giselle-node/components/panel/block";
 import type { GiselleNode } from "../giselle-node/types";
-import { type WebSearch, webSearchStatus } from "./types";
+import { type WebSearch, webSearchItemStatus, webSearchStatus } from "./types";
 
 interface WebSearchBlockProps extends Partial<WebSearch> {
 	node: Pick<GiselleNode, "archetype" | "name">;
@@ -41,27 +42,43 @@ export function WebSearchBlock(props: WebSearchBlockProps) {
 					</div>
 					<div className="border-t border-black-40" />
 					<div className="overflow-x-hidden overflow-y-auto flex-1">
-						<div className="px-[32px] py-[16px] font-rosart text-[18px] text-black-30">
-							<table className="min-w-full divide-y divide-black-40">
-								<thead className="bg-black-10">
+						<div className="px-[16px] py-[16px] font-rosart text-[18px] text-black-30">
+							<table className="w-full divide-y divide-black-40 font-avenir border-separate border-spacing-[16px] text-left text-black-70 ">
+								<colgroup>
+									<col width="0%" />
+									<col width="100%" />
+									<col width="0%" />
+								</colgroup>
+								<thead className="font-[500] text-[12px]">
 									<tr>
-										<th className="px-4 py-2 text-left text-[16px] font-bold text-black-70">
-											Status
-										</th>
-										<th className="px-4 py-2 text-left text-[16px] font-bold text-black-70">
-											Content
-										</th>
-										<th className="px-4 py-2 text-left text-[16px] font-bold text-black-70">
-											URL
-										</th>
+										<th>Status</th>
+										<th>Content</th>
+										<th>Relevance</th>
 									</tr>
 								</thead>
-								<tbody className="bg-white divide-y divide-black-40">
+								<tbody className="">
 									{items.map((item) => (
 										<tr key={item.id}>
-											<td className="px-4 py-2 text-black-70">{item.status}</td>
-											<td className="px-4 py-2 text-black-70">{item.title}</td>
-											<td className="px-4 py-2 text-black-70">{item.url}</td>
+											<td>
+												{item.status === webSearchItemStatus.completed ? (
+													<CircleCheckIcon className="w-[20px] h-[20px] fill-green" />
+												) : (
+													""
+												)}
+											</td>
+											<td className="text-black-30 max-w-[1px]">
+												<p className="font-rosart text-[18px] underline truncate">
+													{item.title}
+												</p>
+												<p className="text-[12px] truncate">{item.url}</p>
+											</td>
+											<td className="text-green font-[900]">
+												{item.status === webSearchStatus.completed &&
+													Math.min(
+														0.99,
+														Number.parseFloat(item.relevance.toFixed(2)),
+													)}
+											</td>
 										</tr>
 									))}
 								</tbody>

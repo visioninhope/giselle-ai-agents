@@ -74,6 +74,9 @@ const config = {
 				white: {
 					DEFAULT: "hsl(var(--white))",
 				},
+				green: {
+					DEFAULT: "hsl(var(--green))",
+				},
 				rosepine: {
 					base: "hsl(var(--rosepine_base))",
 					surface: "hsl(var(--rosepine_surface))",
