@@ -35,6 +35,7 @@ const downloadFile = async (url, destination) => {
 			url: `${BLOB_URL}/fonts/${fileName}.woff2`,
 			destination: `./app/fonts/${fileName}.woff2`,
 		}));
+		fs.copyFile("./vendor/fonts/rosert.ts", "./app/fonts/index.ts");
 
 		for (const file of filesToDownload) {
 			try {
@@ -45,6 +46,7 @@ const downloadFile = async (url, destination) => {
 			}
 		}
 	} else {
-		console.log("Skipping download in non-production environment");
+		fs.copyFile("./vendor/fonts/alternative.ts", "./app/fonts/index.ts");
+		console.log("Using an alternative font file in development mode.");
 	}
 })();
