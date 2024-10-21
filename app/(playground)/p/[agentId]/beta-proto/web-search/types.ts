@@ -39,6 +39,7 @@ export interface WebSearchItem {
 	title: string;
 	content: string;
 	url: string;
+	relevance: number;
 }
 interface PendingWebSearchItemReference {
 	id: WebSearchContentId;

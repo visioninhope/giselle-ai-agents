@@ -12,7 +12,39 @@ import Langfuse from "langfuse";
 import type { GiselleNode } from "../giselle-node/types";
 import { webSearchSchema } from "./schema";
 import { search } from "./tavily";
-import { type WebSearch, webSearchItemStatus, webSearchStatus } from "./types";
+import {
+	type WebSearch,
+	type WebSearchItemReference,
+	webSearchItemStatus,
+	webSearchStatus,
+} from "./types";
+
+async function limitConcurrency<T>(
+	tasks: (() => Promise<T>)[],
+	maxConcurrent: number,
+): Promise<T[]> {
+	const results: T[] = [];
+	const runningTasks = new Set<Promise<void>>();
+
+	for (const task of tasks) {
+		if (runningTasks.size >= maxConcurrent) {
+			await Promise.race(runningTasks);
+		}
+
+		const runningTask = (async () => {
+			try {
+				results.push(await task());
+			} finally {
+				runningTasks.delete(runningTask);
+			}
+		})();
+
+		runningTasks.add(runningTask);
+	}
+
+	await Promise.all(runningTasks);
+	return results;
+}
 
 interface GenerateWebSearchStreamInputs {
 	userPrompt: string;
@@ -99,37 +131,51 @@ export async function generateWebSearchStream(
 		}
 		const app = new FirecrawlApp({ apiKey: process.env.FIRECRAWL_API_KEY });
 		let mutableItems = webSearch.items;
+		const numberOfSubArrays = 5;
+		const subArrayLength = Math.ceil(
+			webSearch.items.length / numberOfSubArrays,
+		);
+		const chunkedArray: WebSearchItemReference[][] = [];
+
+		for (let i = 0; i < numberOfSubArrays; i++) {
+			chunkedArray.push(
+				webSearch.items.slice(i * subArrayLength, (i + 1) * subArrayLength),
+			);
+		}
+
 		await Promise.all(
-			webSearch.items.map(async (webSearchItem) => {
-				const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
-					formats: ["markdown"],
-				});
-				if (scrapeResponse.success) {
-					const blob = await put(
-						`webSearch/${webSearchItem.id}.md`,
-						scrapeResponse.markdown ?? "",
-						{
-							access: "public",
-							contentType: "text/markdown",
-						},
-					);
-					mutableItems = mutableItems.map((item) => {
-						if (item.id !== webSearchItem.id) {
-							return item;
-						}
-						return {
-							...webSearchItem,
-							contentBlobUrl: blob.url,
-							status: webSearchItemStatus.completed,
-						};
+			chunkedArray.map(async (webSearchItems) => {
+				for (const webSearchItem of webSearchItems) {
+					const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
+						formats: ["markdown"],
 					});
-					stream.update({
-						...result,
-						webSearch: {
-							...webSearch,
-							items: mutableItems,
-						},
-					});
+					if (scrapeResponse.success) {
+						const blob = await put(
+							`webSearch/${webSearchItem.id}.md`,
+							scrapeResponse.markdown ?? "",
+							{
+								access: "public",
+								contentType: "text/markdown",
+							},
+						);
+						mutableItems = mutableItems.map((item) => {
+							if (item.id !== webSearchItem.id) {
+								return item;
+							}
+							return {
+								...webSearchItem,
+								contentBlobUrl: blob.url,
+								status: webSearchItemStatus.completed,
+							};
+						});
+						stream.update({
+							...result,
+							webSearch: {
+								...webSearch,
+								items: mutableItems,
+							},
+						});
+					}
 				}
 			}),
 		);
