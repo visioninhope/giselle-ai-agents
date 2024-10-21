@@ -46,6 +46,7 @@ interface PendingWebSearchItemReference {
 	status: Extract<WebSearchStatus, "pending">;
 	title: string;
 	url: string;
+	relevance: number;
 }
 interface CompletedWebSearchItemReference {
 	id: WebSearchContentId;
