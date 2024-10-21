@@ -19,33 +19,6 @@ import {
 	webSearchStatus,
 } from "./types";
 
-async function limitConcurrency<T>(
-	tasks: (() => Promise<T>)[],
-	maxConcurrent: number,
-): Promise<T[]> {
-	const results: T[] = [];
-	const runningTasks = new Set<Promise<void>>();
-
-	for (const task of tasks) {
-		if (runningTasks.size >= maxConcurrent) {
-			await Promise.race(runningTasks);
-		}
-
-		const runningTask = (async () => {
-			try {
-				results.push(await task());
-			} finally {
-				runningTasks.delete(runningTask);
-			}
-		})();
-
-		runningTasks.add(runningTask);
-	}
-
-	await Promise.all(runningTasks);
-	return results;
-}
-
 interface GenerateWebSearchStreamInputs {
 	userPrompt: string;
 	systemPrompt?: string;
