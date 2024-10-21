@@ -54,6 +54,7 @@ interface CompletedWebSearchItemReference {
 	title: string;
 	contentBlobUrl: string;
 	url: string;
+	relevance: number;
 }
 export type WebSearchItemReference =
 	| PendingWebSearchItemReference
