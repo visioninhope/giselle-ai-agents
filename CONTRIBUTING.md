@@ -10,13 +10,31 @@ Please note we have a [code of conduct](CODE_OF_CONDUCT.md), please follow it in
 
 To set up a development environment, please follow these steps:
 
-1. Clone the repo
+### 1. Fork this repository and clone it
 
-   ```sh
-   git clone https://github.com/route06inc/giselle
-   ```
+1. [Fork this repository](https://github.com/route06inc/giselle/fork) to your own GitHub account
+2. [Clone](https://help.github.com/articles/cloning-a-repository/) it to your local device.
 
-2. [TODO]
+### 2. Prerequisites
+
+- Bun (Version: >= 1.1.17)
+
+### 3. Set up your .env file
+
+1. Duplicate .env.example to .env.
+2. Please set the environment variables in the .env file.
+
+### 4. Install dependencies
+
+```sh
+bun install
+```
+
+### 5. Start developing and watch for code changes
+
+```sh
+bun dev
+```
 
 ## Issues and feature requests
 
