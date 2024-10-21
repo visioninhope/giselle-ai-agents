@@ -557,6 +557,7 @@ export const generateText =
 										url: item.url,
 										title: item.title,
 										content: webSearchData,
+										relevance: item.relevance,
 									});
 								}
 							}),

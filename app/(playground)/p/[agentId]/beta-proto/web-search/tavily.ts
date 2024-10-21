@@ -81,7 +81,7 @@ export async function search(query: string) {
 		include_images: false,
 		include_image_descriptions: false,
 		include_raw_content: false,
-		max_results: 1,
+		max_results: 3,
 		include_domains: [],
 		exclude_domains: [],
 	};
