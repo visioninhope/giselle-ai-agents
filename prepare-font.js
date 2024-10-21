@@ -35,7 +35,7 @@ const downloadFile = async (url, destination) => {
 			url: `${BLOB_URL}/fonts/${fileName}.woff2`,
 			destination: `./app/fonts/${fileName}.woff2`,
 		}));
-		fs.copyFile("./vendor/fonts/rosert.ts", "./app/fonts/index.ts");
+		fs.copyFile("./vendor/fonts/rosart.ts", "./app/fonts/index.ts");
 
 		for (const file of filesToDownload) {
 			try {
