@@ -1148,10 +1148,10 @@ export function removeSourceFromPromptNode(
 				}
 			}
 		} else if (args.source.object === "webSearch") {
-			const artifact = state.graph.artifacts.find(
-				(artifact) => artifact.id === args.source.id,
+			const webSearch = state.graph.webSearches.find(
+				(webSearch) => webSearch.id === args.source.id,
 			);
-			if (artifact === undefined) {
+			if (webSearch === undefined) {
 				return;
 			}
 			const outgoingConnectors = state.graph.connectors.filter(
@@ -1168,7 +1168,7 @@ export function removeSourceFromPromptNode(
 					state.graph.connectors.find(
 						(connector) =>
 							connector.target === outgoingNode.id &&
-							connector.source === artifact.generatorNode.id,
+							connector.source === webSearch.generatorNode.id,
 					);
 				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
 					continue;
@@ -1202,7 +1202,7 @@ export function removeSourceFromPromptNode(
 					dispatch(
 						updateNode({
 							input: {
-								id: artifact.generatorNode.id,
+								id: webSearch.generatorNode.id,
 								isFinal: true,
 							},
 						}),
