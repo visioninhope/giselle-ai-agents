@@ -28,6 +28,7 @@ export const webSearchItemStatus = {
 	pending: "pending",
 	processing: "processing",
 	completed: "completed",
+	failed: "failed",
 } as const;
 
 type WebSearchItemStatus =
@@ -44,7 +45,7 @@ export interface WebSearchItem {
 interface PendingWebSearchItemReference {
 	id: WebSearchContentId;
 	object: "webSearch.item.reference";
-	status: Extract<WebSearchStatus, "pending">;
+	status: Extract<WebSearchItemStatus, "pending">;
 	title: string;
 	url: string;
 	relevance: number;
@@ -52,15 +53,24 @@ interface PendingWebSearchItemReference {
 interface CompletedWebSearchItemReference {
 	id: WebSearchContentId;
 	object: "webSearch.item.reference";
-	status: Extract<WebSearchStatus, "completed">;
+	status: Extract<WebSearchItemStatus, "completed">;
 	title: string;
 	contentBlobUrl: string;
 	url: string;
 	relevance: number;
 }
+export interface FailedWebSearchItemReference {
+	id: WebSearchContentId;
+	object: "webSearch.item.reference";
+	status: Extract<WebSearchItemStatus, "failed">;
+	title: string;
+	url: string;
+	relevance: number;
+}
 export type WebSearchItemReference =
 	| PendingWebSearchItemReference
-	| CompletedWebSearchItemReference;
+	| CompletedWebSearchItemReference
+	| FailedWebSearchItemReference;
 export interface GeneratedObject {
 	plan: string;
 	webSearch: WebSearch;

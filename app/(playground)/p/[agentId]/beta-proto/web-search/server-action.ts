@@ -13,6 +13,7 @@ import type { GiselleNode } from "../giselle-node/types";
 import { webSearchSchema } from "./schema";
 import { search } from "./tavily";
 import {
+	type FailedWebSearchItemReference,
 	type WebSearch,
 	type WebSearchItemReference,
 	webSearchItemStatus,
@@ -119,26 +120,45 @@ export async function generateWebSearchStream(
 		await Promise.all(
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
-					const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
-						formats: ["markdown"],
-					});
-					if (scrapeResponse.success) {
-						const blob = await put(
-							`webSearch/${webSearchItem.id}.md`,
-							scrapeResponse.markdown ?? "",
-							{
-								access: "public",
-								contentType: "text/markdown",
-							},
-						);
+					try {
+						const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
+							formats: ["markdown"],
+						});
+						if (scrapeResponse.success) {
+							const blob = await put(
+								`webSearch/${webSearchItem.id}.md`,
+								scrapeResponse.markdown ?? "",
+								{
+									access: "public",
+									contentType: "text/markdown",
+								},
+							);
+							mutableItems = mutableItems.map((item) => {
+								if (item.id !== webSearchItem.id) {
+									return item;
+								}
+								return {
+									...webSearchItem,
+									contentBlobUrl: blob.url,
+									status: webSearchItemStatus.completed,
+								};
+							});
+							stream.update({
+								...result,
+								webSearch: {
+									...webSearch,
+									items: mutableItems,
+								},
+							});
+						}
+					} catch {
 						mutableItems = mutableItems.map((item) => {
 							if (item.id !== webSearchItem.id) {
 								return item;
 							}
 							return {
 								...webSearchItem,
-								contentBlobUrl: blob.url,
-								status: webSearchItemStatus.completed,
+								status: webSearchItemStatus.failed,
 							};
 						});
 						stream.update({
