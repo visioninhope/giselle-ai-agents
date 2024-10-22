@@ -1128,6 +1128,24 @@ export function removeSourceFromPromptNode(
 						},
 					}),
 				);
+				if (outgoingNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: artifact.generatorNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		} else if (args.source.object === "webSearch") {
 			const artifact = state.graph.artifacts.find(
@@ -1172,6 +1190,24 @@ export function removeSourceFromPromptNode(
 						},
 					}),
 				);
+				if (outgoingNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: artifact.generatorNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		}
 	};
