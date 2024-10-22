@@ -1,3 +1,4 @@
+import { giselleNodeCategories } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
 import { agents, db } from "@/drizzle";
 import { eq } from "drizzle-orm";
 
@@ -10,10 +11,7 @@ function chunkArray<T>(array: T[], chunkSize: number): T[][] {
 }
 
 console.log("Add 'isFinal' to the all of the nodes...");
-const listOfAgents = await db
-	.select()
-	.from(agents)
-	.where(eq(agents.id, "agnt_a23elgoizppud3e8bygx39ea"));
+const listOfAgents = await db.select().from(agents);
 console.log(`Updating ${listOfAgents.length} agents...`);
 
 const agentChunks = chunkArray(listOfAgents, 10);
@@ -26,15 +24,30 @@ for (let i = 0; i < agentChunks.length; i++) {
 
 	await Promise.all(
 		chunk.map(async (agent) => {
-			await db.update(agents).set({
-				graphv2: {
-					...agent.graphv2,
-					nodes: agent.graphv2.nodes.map((node) => ({
-						...node,
-						isFinal: false,
-					})),
-				},
-			});
+			const instructionNodes = agent.graphv2.nodes.filter(
+				(node) => node.category === giselleNodeCategories.instruction,
+			);
+			const actionNodes = agent.graphv2.nodes.filter(
+				(node) => node.category === giselleNodeCategories.action,
+			);
+			await db
+				.update(agents)
+				.set({
+					graphv2: {
+						...agent.graphv2,
+						nodes: [
+							...instructionNodes.map((node) => ({
+								...node,
+								isFinal: false,
+							})),
+							...actionNodes.map((node, index) => ({
+								...node,
+								isFinal: index === actionNodes.length - 1,
+							})),
+						],
+					},
+				})
+				.where(eq(agents.id, agent.id));
 		}),
 	);
 
