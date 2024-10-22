@@ -74,3 +74,9 @@
     :why: To not conflict with Apache-2.0 license. https://creativecommons.org/publicdomain/zero/1.0/
     :versions: []
     :when: 2024-10-22 07:22:41.342554000 Z
+- - :permit
+  - CC-BY-4.0
+  - :who:
+    :why: To not conflict with Apache-2.0 license. https://creativecommons.org/licenses/by/4.0/
+    :versions: []
+    :when: 2024-10-22 07:23:14.573790000 Z
