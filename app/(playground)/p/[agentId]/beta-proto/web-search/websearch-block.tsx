@@ -1,6 +1,7 @@
 import { CopyIcon } from "lucide-react";
 import { Dialog, DialogContent, DialogTrigger } from "../components/dialog";
 import { CircleCheckIcon } from "../components/icons/circle-check";
+import { CircleXIcon } from "../components/icons/circle-x";
 import { DocumentIcon } from "../components/icons/document";
 import { SpinnerIcon } from "../components/icons/spinner";
 import { Block } from "../giselle-node/components/panel/block";
@@ -62,6 +63,8 @@ export function WebSearchBlock(props: WebSearchBlockProps) {
 											<td>
 												{item.status === webSearchItemStatus.completed ? (
 													<CircleCheckIcon className="w-[20px] h-[20px] fill-green" />
+												) : item.status === webSearchItemStatus.failed ? (
+													<CircleXIcon className="w-[20px] h-[20px] fill-[hsla(11,100%,50%,1)]" />
 												) : (
 													""
 												)}
