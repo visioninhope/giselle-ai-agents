@@ -1,14 +1,12 @@
 import {
 	db,
 	organizations,
-	stripeUserMappings,
 	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
 	users,
 } from "@/drizzle";
-import { stripe } from "@/services/external/stripe";
 import { and, eq } from "drizzle-orm";
 
 export const retrieveActiveStripeSubscriptionBySupabaseUserId = async (
