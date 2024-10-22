@@ -1,8 +1,7 @@
 "use server";
 
 import { getUser } from "@/lib/supabase";
-
-const R06_EMAIL_DOMAIN = "route06.co.jp";
+import { isEmailFromRoute06 } from "@/lib/utils";
 
 export const isRoute06User = async () => {
 	const supabaseUser = await getUser();
@@ -12,6 +11,5 @@ export const isRoute06User = async () => {
 		throw new Error("No email found for user");
 	}
 
-	const emailDomain = email.split("@")[1];
-	return emailDomain === R06_EMAIL_DOMAIN;
+	return isEmailFromRoute06(email);
 };

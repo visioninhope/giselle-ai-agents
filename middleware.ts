@@ -1,4 +1,4 @@
-import { retrieveStripeSubscriptionBySupabaseUserId } from "@/services/accounts/actions";
+import { retrieveActiveStripeSubscriptionBySupabaseUserId } from "@/services/accounts/actions";
 import { NextResponse } from "next/server";
 import { supabaseMiddleware } from "./lib/supabase";
 import { isEmailFromRoute06 } from "./lib/utils";
@@ -13,7 +13,7 @@ export default supabaseMiddleware(async (user, request) => {
 
 	// Proceeding to check the user's subscription status since the email is not from the route06.co.jp
 	if (!isEmailFromRoute06(user.email ?? "")) {
-		const subscription = await retrieveStripeSubscriptionBySupabaseUserId(
+		const subscription = await retrieveActiveStripeSubscriptionBySupabaseUserId(
 			user.id,
 		);
 		if (subscription == null) {
