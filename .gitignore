@@ -42,4 +42,4 @@ next-env.d.ts
 .env.sentry-build-plugin
 
 # prepare fonts programmatically
-app/fonts/index.ts
+app/fonts/
