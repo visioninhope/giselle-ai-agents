@@ -68,3 +68,9 @@
     :why: To not conflict with Apache-2.0 license. https://opensource.org/license/LGPL-3.0
     :versions: []
     :when: 2024-10-22 07:22:03.743391000 Z
+- - :permit
+  - CC0 1.0 Universal
+  - :who:
+    :why: To not conflict with Apache-2.0 license. https://creativecommons.org/publicdomain/zero/1.0/
+    :versions: []
+    :when: 2024-10-22 07:22:41.342554000 Z
