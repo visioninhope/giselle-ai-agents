@@ -9,9 +9,9 @@ import {
 	users,
 } from "@/drizzle";
 import { stripe } from "@/services/external/stripe";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
-export const retrieveStripeSubscriptionBySupabaseUserId = async (
+export const retrieveActiveStripeSubscriptionBySupabaseUserId = async (
 	supabaseUserId: string,
 ) => {
 	const [subscription] = await db
@@ -28,6 +28,11 @@ export const retrieveStripeSubscriptionBySupabaseUserId = async (
 			supabaseUserMappings,
 			eq(supabaseUserMappings.userDbId, users.dbId),
 		)
-		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUserId));
+		.where(
+			and(
+				eq(supabaseUserMappings.supabaseUserId, supabaseUserId),
+				eq(subscriptions.status, "active"),
+			),
+		);
 	return subscription;
 };

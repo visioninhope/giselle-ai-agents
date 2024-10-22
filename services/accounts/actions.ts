@@ -1,1 +1,1 @@
-export { retrieveStripeSubscriptionBySupabaseUserId } from "./actions/retrieve-stripe-subscription";
+export { retrieveActiveStripeSubscriptionBySupabaseUserId as retrieveStripeSubscriptionBySupabaseUserId } from "./actions/retrieve-stripe-subscription";
