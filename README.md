@@ -24,8 +24,8 @@ Here are some ways you can contribute:
 
 - [Report a bug](https://github.com/route06inc/giselle/issues/new?template=1_bug_report.yml) you found while using Giselle
 - [Request a feature](https://github.com/route06inc/giselle/discussions/categories/ideas) that you believe would be helpful
-- [Submit a pull request](https://github.com/route06inc/giselle/blob/main/CONTRIBUTING.md#how-to-submit-a-pull-request) if you'd like to add new features or fix bugs
+- [Submit a pull request](CONTRIBUTING.md#how-to-submit-a-pull-request) if you'd like to add new features or fix bugs
 
 ## License
 
-Giselle is licensed under the [Apache License Version 2.0](https://github.com/route06inc/giselle/blob/main/LICENSE).
+Giselle is licensed under the [Apache License Version 2.0](LICENSE).
