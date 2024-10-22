@@ -1,6 +1,6 @@
 # giselle
 
-As of October 22, 2024  7:04am. 926 total
+As of October 22, 2024  7:29am. 926 total
 
 ## Summary
 * 667 MIT
@@ -595,11 +595,7 @@ This package provides the Simple Icons packaged as a set of React components.
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-LGPL-3.0-or-later manually approved
-
->This license is LGPL-3.0-or-later. And added to NOTICE.md
-
-><cite>  2024-09-18</cite>
+LGPL-3.0-or-later permitted
 
 Prebuilt libvips and dependencies for use with sharp on Linux (glibc) x64
 
@@ -610,11 +606,7 @@ Prebuilt libvips and dependencies for use with sharp on Linux (glibc) x64
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-LGPL-3.0-or-later manually approved
-
->This license is LGPL-3.0-or-later. And added to NOTICE.md
-
-><cite>  2024-09-18</cite>
+LGPL-3.0-or-later permitted
 
 Prebuilt libvips and dependencies for use with sharp on Linux (musl) x64
 
@@ -4457,11 +4449,7 @@ Convert a kebab-cased CSS property into a camelCased DOM property.
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-CC-BY-4.0 manually approved
-
->This license is CC-BY-4.0. And added to NOTICE.md
-
-><cite>  2024-09-18</cite>
+CC-BY-4.0 permitted
 
 A smaller version of caniuse-db, with only the essentials!
 
@@ -6907,11 +6895,7 @@ mdast utility to get the plain text content of a node
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-<a href="http://creativecommons.org/publicdomain/zero/1.0">CC0 1.0 Universal</a> manually approved
-
->Not conflicting with Apache-2.0. And added to NOTICE.md
-
-><cite>  2024-09-27</cite>
+<a href="http://creativecommons.org/publicdomain/zero/1.0">CC0 1.0 Universal</a> permitted
 
 Open Web data by the Mozilla Developer Network
 
