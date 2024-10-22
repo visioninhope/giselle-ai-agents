@@ -132,7 +132,8 @@ export function GiselleNode(props: GiselleNodeProps) {
 				)}
 			/>
 			{props.object === "node" && (
-				<div className="absolute text-black-30 font-rosart text-[12px] -translate-y-full left-[8px] -top-[2px]">
+				<div className="absolute text-black-30 font-rosart text-[12px] -translate-y-full left-[8px] -top-[2px] flex items-center gap-[12px]">
+					{props.isFinal && <span>Final</span>}
 					{props.name}
 				</div>
 			)}
@@ -214,6 +215,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
 						<div>ui: {JSON.stringify(props.ui, null, 2)}</div>
+						<div>isFinal: {JSON.stringify(props.isFinal)}</div>
 					</div>
 				</div>
 			)}
