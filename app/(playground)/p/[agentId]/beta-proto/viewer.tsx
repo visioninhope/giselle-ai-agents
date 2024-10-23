@@ -44,6 +44,9 @@ function buildDependencyGraph(
 	const dependencyMap = new Map<GiselleNodeId, Set<GiselleNodeId>>();
 
 	for (const connector of connectors) {
+		if (connector.sourceNodeCategory === giselleNodeCategories.instruction) {
+			continue;
+		}
 		if (!dependencyMap.has(connector.source)) {
 			dependencyMap.set(connector.source, new Set());
 		}
@@ -71,7 +74,6 @@ function resolveTargetDependencies(
 		const currentLayer: GiselleNodeId[] = [];
 
 		for (const node of nodes) {
-			// Changed to for...of
 			if (!visited.has(node)) {
 				const dependencies = dependencyMap.get(node) || new Set();
 				const isReady = Array.from(dependencies).every((dep) =>
@@ -89,7 +91,6 @@ function resolveTargetDependencies(
 		}
 
 		for (const node of currentLayer) {
-			// Changed to for...of
 			visited.add(node);
 		}
 		result.push(currentLayer);
@@ -131,16 +132,20 @@ export function Viewer() {
 					)}
 				</div>
 				<div className="flex-1 w-full flex items-center justify-center">
-					<div className="flex flex-col items-center gap-[8px]">
-						<WilliIcon className="fill-black-70 w-[32px] h-[32px]" />
-						<p className="font-[800] text-black-30">
-							This has not yet been executed
-						</p>
-						<p className="text-black-70 text-[12px] text-center leading-5">
-							You have not yet executed the node. <br />
-							Let's execute the entire thing and create the final output.
-						</p>
-					</div>
+					{state.graph.flow == null ? (
+						<div className="flex flex-col items-center gap-[8px]">
+							<WilliIcon className="fill-black-70 w-[32px] h-[32px]" />
+							<p className="font-[800] text-black-30">
+								This has not yet been executed
+							</p>
+							<p className="text-black-70 text-[12px] text-center leading-5">
+								You have not yet executed the node. <br />
+								Let's execute the entire thing and create the final output.
+							</p>
+						</div>
+					) : (
+						<pre>{JSON.stringify(dependencies, null, 2)}</pre>
+					)}
 				</div>
 			</div>
 		</div>
