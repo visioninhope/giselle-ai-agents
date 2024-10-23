@@ -35,7 +35,7 @@ export async function generateWebSearchStream(
 	const stream = createStreamableValue();
 
 	(async () => {
-		const model = "gpt-4o-mini";
+		const model = "gpt-4o";
 		const generation = trace.generation({
 			input: inputs.userPrompt,
 			model,
