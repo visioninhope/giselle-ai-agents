@@ -7,7 +7,8 @@ export const playgroundModes = {
 	edit: "edit",
 	view: "view",
 } as const;
-type PlaygroundMode = (typeof playgroundModes)[keyof typeof playgroundModes];
+export type PlaygroundMode =
+	(typeof playgroundModes)[keyof typeof playgroundModes];
 export type Graph = {
 	nodes: GiselleNode[];
 	connectors: ConnectorObject[];

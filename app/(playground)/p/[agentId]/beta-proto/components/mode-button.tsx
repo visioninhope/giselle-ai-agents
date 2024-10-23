@@ -1,4 +1,7 @@
 import type { ReactNode } from "react";
+import { useGraph } from "../graph/context";
+import type { PlaygroundMode } from "../graph/types";
+import { updateMode } from "../graph/v2/mode";
 
 function SelectionIndicator() {
 	return (
@@ -22,16 +25,28 @@ function SelectionIndicator() {
 
 interface ModeButtonProps {
 	children: ReactNode;
+	mode: PlaygroundMode;
 	selected?: boolean;
 }
 export function ModeButton(props: ModeButtonProps) {
+	const { state, dispatch } = useGraph();
+
 	return (
 		<button
 			type="button"
 			className="px-[16px] uppercase font-bold text-[14px] relative"
+			onClick={() => {
+				dispatch(
+					updateMode({
+						input: {
+							mode: props.mode,
+						},
+					}),
+				);
+			}}
 		>
 			{props.children}
-			{props.selected && (
+			{state.graph.mode === props.mode && (
 				<div className="absolute left-0 -top-[6px]">
 					<SelectionIndicator />
 				</div>
