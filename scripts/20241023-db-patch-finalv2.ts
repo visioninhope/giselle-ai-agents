@@ -1,3 +1,4 @@
+import { playgroundModes } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import {
 	type MigrateGraphV2Function,
 	migrateAgents,
@@ -20,6 +21,7 @@ const updateAgentGraph: MigrateGraphV2Function = (agent) => {
 	return {
 		...agent.graphv2,
 		nodes: updatedNodes,
+		mode: playgroundModes.edit,
 	};
 };
 

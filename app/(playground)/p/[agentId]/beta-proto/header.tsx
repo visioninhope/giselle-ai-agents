@@ -2,8 +2,11 @@ import { GiselleLogo } from "@/components/giselle-logo";
 import Link from "next/link";
 import { SparklesIcon } from "./components/icons/sparkles";
 import { ModeButton } from "./components/mode-button";
+import { useGraph } from "./graph/context";
+import { playgroundModes } from "./graph/types";
 
 export function Header() {
+	const { state } = useGraph();
 	return (
 		<div className="h-[60px] flex items-center justify-between mx-[20px]">
 			<div className="flex gap-[8px] items-center">
@@ -29,8 +32,12 @@ export function Header() {
 								 */}
 			</div>
 			<div className="flex items-center gap-[10px]">
-				<ModeButton>edit</ModeButton>
-				<ModeButton>view</ModeButton>
+				<ModeButton selected={state.graph.mode === playgroundModes.edit}>
+					edit
+				</ModeButton>
+				<ModeButton selected={state.graph.mode === playgroundModes.view}>
+					view
+				</ModeButton>
 			</div>
 			<div>
 				<button
