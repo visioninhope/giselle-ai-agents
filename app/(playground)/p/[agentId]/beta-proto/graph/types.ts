@@ -1,5 +1,6 @@
 import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
+import type { Flow } from "../flow/types";
 import type { GiselleNode } from "../giselle-node/types";
 import type { WebSearch } from "../web-search/types";
 
@@ -15,6 +16,7 @@ export type Graph = {
 	artifacts: Artifact[];
 	webSearches: WebSearch[];
 	mode: PlaygroundMode;
+	flow?: Flow | null | undefined;
 };
 
 export type GraphState = {
