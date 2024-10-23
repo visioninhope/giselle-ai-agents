@@ -71,6 +71,7 @@ export const VerifyEmailForm: FC = () => {
 						data-1p-ignore
 						name="token"
 						onComplete={handleComplete}
+						className="notranslate"
 					>
 						<InputOTPGroup>
 							<InputOTPSlot index={0} />
