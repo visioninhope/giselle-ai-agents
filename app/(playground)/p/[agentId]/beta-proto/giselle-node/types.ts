@@ -64,6 +64,7 @@ export type GiselleNode = {
 	resultPortLabel: string;
 	properties: Record<string, unknown>;
 	output: unknown;
+	isFinal: boolean;
 };
 
 export type GiselleNodeArtifactElement = {

@@ -56,6 +56,7 @@ import {
 	parseFile,
 	uploadFile,
 } from "./server-actions";
+import { type V2NodeAction, updateNode } from "./v2/node";
 
 export type AddNodeAction = {
 	type: "addNode";
@@ -68,6 +69,7 @@ type AddNodeArgs = {
 	node: GiselleNodeBlueprint;
 	position: XYPosition;
 	name: string;
+	isFinal?: boolean;
 	properties?: Record<string, unknown>;
 };
 
@@ -92,6 +94,7 @@ export const addNode = (args: AddNodeArgs): AddNodeAction => {
 				ui: { position: args.position },
 				properties: args.properties ?? {},
 				state: giselleNodeState.idle,
+				isFinal: args.isFinal ?? false,
 				output: "",
 			},
 		},
@@ -168,6 +171,8 @@ export const addNodesAndConnect = (
 	args: AddNodesAndConnectArgs,
 ): ThunkAction => {
 	return (dispatch, getState) => {
+		const state = getState();
+		const hasFinalNode = state.graph.nodes.some((node) => node.isFinal);
 		const currentNodes = getState().graph.nodes;
 		const addSourceNode = addNode({
 			...args.sourceNode,
@@ -176,6 +181,7 @@ export const addNodesAndConnect = (
 		dispatch(addSourceNode);
 		const addTargetNode = addNode({
 			...args.targetNode,
+			isFinal: !hasFinalNode,
 			name: `Untitled node - ${currentNodes.length + 2}`,
 		});
 		dispatch(addTargetNode);
@@ -810,18 +816,20 @@ export function addSourceToPromptNode(
 ): ThunkAction {
 	return async (dispatch, getState) => {
 		const state = getState();
-		const updateNode = state.graph.nodes.find(
+		const targetPromptNode = state.graph.nodes.find(
 			(node) => node.id === args.promptNode.id,
 		);
-		if (updateNode === undefined) {
+		if (targetPromptNode === undefined) {
 			return;
 		}
-		if (updateNode.archetype !== giselleNodeArchetypes.prompt) {
+		if (targetPromptNode.archetype !== giselleNodeArchetypes.prompt) {
 			return;
 		}
-		const currentSources = updateNode.properties.sources ?? [];
+		const currentSources = targetPromptNode.properties.sources ?? [];
 		if (!Array.isArray(currentSources)) {
-			throw new Error(`${updateNode.id}'s sources property is not an array`);
+			throw new Error(
+				`${targetPromptNode.id}'s sources property is not an array`,
+			);
 		}
 		dispatch(
 			updateNodeProperty({
@@ -885,6 +893,28 @@ export function addSourceToPromptNode(
 						},
 					}),
 				);
+
+				const artifactGeneratorNode = state.graph.nodes.find(
+					(node) => node.id === artifact?.generatorNode.id,
+				);
+				if (artifactGeneratorNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: artifact.generatorNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		} else if (args.source.object === "file") {
 			if (args.source.status === fileStatuses.uploading) {
@@ -986,6 +1016,27 @@ export function addSourceToPromptNode(
 						},
 					}),
 				);
+				const webSearchGeneratorNode = state.graph.nodes.find(
+					(node) => node.id === webSearch.generatorNode.id,
+				);
+				if (webSearchGeneratorNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: webSearchGeneratorNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		}
 	};
@@ -1077,12 +1128,30 @@ export function removeSourceFromPromptNode(
 						},
 					}),
 				);
+				if (outgoingNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: artifact.generatorNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		} else if (args.source.object === "webSearch") {
-			const artifact = state.graph.artifacts.find(
-				(artifact) => artifact.id === args.source.id,
+			const webSearch = state.graph.webSearches.find(
+				(webSearch) => webSearch.id === args.source.id,
 			);
-			if (artifact === undefined) {
+			if (webSearch === undefined) {
 				return;
 			}
 			const outgoingConnectors = state.graph.connectors.filter(
@@ -1099,7 +1168,7 @@ export function removeSourceFromPromptNode(
 					state.graph.connectors.find(
 						(connector) =>
 							connector.target === outgoingNode.id &&
-							connector.source === artifact.generatorNode.id,
+							connector.source === webSearch.generatorNode.id,
 					);
 				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
 					continue;
@@ -1121,6 +1190,24 @@ export function removeSourceFromPromptNode(
 						},
 					}),
 				);
+				if (outgoingNode?.isFinal) {
+					dispatch(
+						updateNode({
+							input: {
+								id: outgoingNode.id,
+								isFinal: false,
+							},
+						}),
+					);
+					dispatch(
+						updateNode({
+							input: {
+								id: webSearch.generatorNode.id,
+								isFinal: true,
+							},
+						}),
+					);
+				}
 			}
 		}
 	};
@@ -1253,4 +1340,5 @@ export type GraphAction =
 	| RemoveArtifactAction
 	| AddParameterToNodeAction
 	| RemoveParameterFromNodeAction
-	| UpsertWebSearchAction;
+	| UpsertWebSearchAction
+	| V2NodeAction;
