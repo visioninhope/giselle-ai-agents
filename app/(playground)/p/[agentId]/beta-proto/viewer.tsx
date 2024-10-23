@@ -1,5 +1,5 @@
 import bg from "./bg.png";
-import { WillisIcon } from "./components/icons/willis";
+import { WilliIcon } from "./components/icons/willi";
 import { Header } from "./header";
 
 export function Viewer() {
@@ -20,7 +20,7 @@ export function Viewer() {
 				</div>
 				<div className="flex-1 w-full flex items-center justify-center">
 					<div className="flex flex-col items-center gap-[8px]">
-						<WillisIcon className="fill-black-70 w-[32px] h-[32px]" />
+						<WilliIcon className="fill-black-70 w-[32px] h-[32px]" />
 						<p className="font-[800] text-black-30">
 							This has not yet been executed
 						</p>

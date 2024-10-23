@@ -12,7 +12,7 @@ import { GlobeIcon } from "../../components/icons/globe";
 import { PromptIcon } from "../../components/icons/prompt";
 import { TextGenerationIcon } from "../../components/icons/text-generation";
 import { ToolIcon } from "../../components/icons/tool";
-import { WillisIcon } from "../../components/icons/willis";
+import { WilliIcon } from "../../components/icons/willi";
 import { ListItem } from "../../components/list-item";
 import {
 	Popover,

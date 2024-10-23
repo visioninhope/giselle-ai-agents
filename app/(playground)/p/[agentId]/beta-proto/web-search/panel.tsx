@@ -1,7 +1,7 @@
 import clsx from "clsx";
 import type { FC } from "react";
 import { PanelCloseIcon } from "../components/icons/panel-close";
-import { WillisIcon } from "../components/icons/willis";
+import { WilliIcon } from "../components/icons/willi";
 import { ArchetypeIcon } from "../giselle-node/components/archetype-icon";
 import { TabTrigger } from "../giselle-node/components/tabs";
 import {
@@ -16,9 +16,9 @@ import { WebSearchBlock } from "./websearch-block";
 function PopPopWillis() {
 	return (
 		<div className="flex gap-[16px]">
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_infinite]" />
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_0.7s_infinite]" />
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_1.4s_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_0.7s_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_1.4s_infinite]" />
 		</div>
 	);
 }

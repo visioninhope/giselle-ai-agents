@@ -12,7 +12,7 @@ import {
 } from "../../../components/dialog";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import { SpinnerIcon } from "../../../components/icons/spinner";
-import { WillisIcon } from "../../../components/icons/willis";
+import { WilliIcon } from "../../../components/icons/willi";
 import { Spinner } from "../../../components/spinner";
 import {
 	type GiselleNode,
@@ -28,9 +28,9 @@ import { MarkdownRender } from "./markdown-render";
 function PopPopWillis() {
 	return (
 		<div className="flex gap-[16px]">
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_infinite]" />
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_0.7s_infinite]" />
-			<WillisIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_1.4s_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_0.7s_infinite]" />
+			<WilliIcon className="w-[24px] h-[24px] fill-black-40 animate-[pop-pop_2.1s_steps(1)_1.4s_infinite]" />
 		</div>
 	);
 }
