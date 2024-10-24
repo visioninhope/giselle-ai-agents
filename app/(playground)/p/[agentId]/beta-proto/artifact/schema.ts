@@ -15,7 +15,7 @@ export const schema = jsonSchema<GeneratedObject>({
 				title: { type: "string", description: "The title of the artefact" },
 				content: {
 					type: "string",
-					description: `The content of the artefact formatted markdown.`,
+					description: "The content of the artefact formatted markdown.",
 				},
 				citations: {
 					type: "array",
