@@ -8,6 +8,7 @@
 		"prebuild": "node prepare-font.js",
 		"build": "next build",
 		"start": "next start",
+		"ci": "bunx @biomejs/biome ci",
 		"check": "bunx @biomejs/biome check --write",
 		"lint": "next lint"
 	},

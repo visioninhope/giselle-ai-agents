@@ -19,6 +19,6 @@ jobs:
 
       - name: Check if codebase is up-to-date
         run: |
-          bunx @biomejs/biome ci
+          bun run ci
           git diff --compact-summary --exit-code || \
             (echo; echo "Unexpected git diff detected"; exit 1)
