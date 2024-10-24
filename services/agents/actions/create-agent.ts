@@ -1,6 +1,7 @@
 "use server";
 
 import { getCurrentTeam } from "@/app/(auth)/lib";
+import { playgroundModes } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import { agents, db } from "@/drizzle";
 import { createId } from "@paralleldrive/cuid2";
 import { revalidateGetAgents } from "./get-agent";
@@ -14,6 +15,14 @@ export const createAgent = async (args: CreateAgentArgs) => {
 	await db.insert(agents).values({
 		id,
 		teamDbId: team.dbId,
+		graphv2: {
+			agentId: id,
+			nodes: [],
+			connectors: [],
+			artifacts: [],
+			webSearches: [],
+			mode: playgroundModes.edit,
+		},
 	});
 	revalidateGetAgents({
 		userId: args.userId,
