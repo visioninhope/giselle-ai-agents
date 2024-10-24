@@ -149,9 +149,11 @@ export async function runAction(input: RunActionInput) {
 }
 
 async function generateText() {
-	console.log("\x1b[33mTODO:\x1b[0m Implement text generation functionality");
+	console.log(
+		"\x1b[33m\x1b[1mTODO:\x1b[0m Implement text generation functionality",
+	);
 }
 
 async function webSearch() {
-	console.log("\x1b[33mTODO:\x1b[0m Implement websearch functionality");
+	console.log("\x1b[33m\x1b[1mTODO:\x1b[0m Implement websearch functionality");
 }
