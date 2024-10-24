@@ -1,4 +1,7 @@
-import type { Graph } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
+import {
+	type Graph,
+	playgroundModes,
+} from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import type {
 	FileId,
 	KnowledgeContentId,
@@ -129,6 +132,7 @@ export const agents = pgTable("agents", {
 		connectors: [],
 		artifacts: [],
 		webSearches: [],
+		mode: playgroundModes.edit,
 	}),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()

@@ -56,6 +56,7 @@ import {
 	parseFile,
 	uploadFile,
 } from "./server-actions";
+import type { V2ModeAction } from "./v2/mode";
 import { type V2NodeAction, updateNode } from "./v2/node";
 
 export type AddNodeAction = {
@@ -1341,4 +1342,5 @@ export type GraphAction =
 	| AddParameterToNodeAction
 	| RemoveParameterFromNodeAction
 	| UpsertWebSearchAction
-	| V2NodeAction;
+	| V2NodeAction
+	| V2ModeAction;
