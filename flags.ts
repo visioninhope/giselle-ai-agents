@@ -54,3 +54,16 @@ export const debugFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const viewFlag = flag<boolean>({
+	key: "view",
+	async decide() {
+		return false;
+	},
+	description: "Enable view mode",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

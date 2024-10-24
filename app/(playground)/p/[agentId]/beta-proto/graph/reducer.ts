@@ -1,10 +1,30 @@
 import type { GraphAction } from "./actions";
 import type { GraphState } from "./types";
+import { isV2ModeAction, v2ModeReducer } from "./v2/mode";
+import { isV2NodeAction, v2NodeReducer } from "./v2/node";
 
 export const graphReducer = (
 	state: GraphState,
 	action: GraphAction,
 ): GraphState => {
+	if (isV2NodeAction(action)) {
+		return {
+			...state,
+			graph: {
+				...state.graph,
+				nodes: v2NodeReducer(state.graph.nodes, action),
+			},
+		};
+	}
+	if (isV2ModeAction(action)) {
+		return {
+			...state,
+			graph: {
+				...state.graph,
+				mode: v2ModeReducer(state.graph.mode, action),
+			},
+		};
+	}
 	switch (action.type) {
 		case "addNode":
 			return {

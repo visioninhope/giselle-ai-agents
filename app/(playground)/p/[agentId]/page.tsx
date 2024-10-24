@@ -4,6 +4,7 @@ import { agents, db } from "@/drizzle";
 import {
 	debugFlag as getDebugFlag,
 	uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag,
+	viewFlag as getViewFlag,
 	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
@@ -34,6 +35,7 @@ export default async function AgentPlaygroundPage({
 	const uploadFileToPromptNodeFlag = await getUploadFileToPromptNodeFlag();
 	const webSearchNodeFlag = await getWebSearchNodeFlag();
 	const debugFlag = await getDebugFlag();
+	const viewFlag = await getViewFlag();
 
 	const agent = await getAgent(agentId);
 
@@ -45,6 +47,7 @@ export default async function AgentPlaygroundPage({
 				uploadFileToPromptNodeFlag,
 				webSearchNodeFlag,
 				debugFlag,
+				viewFlag,
 			}}
 		/>
 	);

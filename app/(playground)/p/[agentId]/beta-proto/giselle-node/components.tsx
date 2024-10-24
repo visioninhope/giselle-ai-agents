@@ -132,7 +132,8 @@ export function GiselleNode(props: GiselleNodeProps) {
 				)}
 			/>
 			{props.object === "node" && (
-				<div className="absolute text-black-30 font-rosart text-[12px] -translate-y-full left-[8px] -top-[2px]">
+				<div className="absolute text-black-30 font-rosart text-[12px] -translate-y-full left-[8px] -top-[2px] flex items-center gap-[12px]">
+					{props.isFinal && <span>Final</span>}
 					{props.name}
 				</div>
 			)}
@@ -214,6 +215,7 @@ export function GiselleNode(props: GiselleNodeProps) {
 						<div>outgoing: {props.outgoingConnections?.length ?? 0}</div>
 						<div>property: {JSON.stringify(props.properties, null, 2)}</div>
 						<div>ui: {JSON.stringify(props.ui, null, 2)}</div>
+						<div>isFinal: {JSON.stringify(props.isFinal)}</div>
 					</div>
 				</div>
 			)}
@@ -228,7 +230,7 @@ export const GiselleNodeInformationPanel: FC = () => {
 		[state.graph.nodes],
 	);
 	return (
-		<div className="absolute bg-black-100 w-[380px] rounded-[16px] overflow-hidden shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)] top-[80px] bottom-[20px] right-[20px]">
+		<div className="absolute bg-black-100 w-[380px] rounded-[16px] overflow-hidden shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)] top-[0px] bottom-[20px] right-[20px] mt-[60px]">
 			<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 
 			{selectedNodes.length > 1 ? (

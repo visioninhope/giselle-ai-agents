@@ -21,8 +21,10 @@ const downloadFile = async (url, destination) => {
 
 (async () => {
 	if (
-		process.env.NODE_ENV === "production" &&
-		process.env.VERCEL_ENV === "production"
+		// Check if the environment is production or force downloading fonts
+		(process.env.NODE_ENV === "production" &&
+			process.env.VERCEL_ENV === "production") ||
+		process.env.FORCE_DOWNLOAD_FONTS
 	) {
 		const BLOB_URL = process.env.BLOB_URL;
 

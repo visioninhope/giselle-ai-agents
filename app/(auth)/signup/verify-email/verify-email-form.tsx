@@ -71,6 +71,7 @@ export const VerifyEmailForm: FC = () => {
 						data-1p-ignore
 						name="token"
 						onComplete={handleComplete}
+						className="notranslate" // prevent Google Chrome translation to avoid DOM error
 					>
 						<InputOTPGroup>
 							<InputOTPSlot index={0} />

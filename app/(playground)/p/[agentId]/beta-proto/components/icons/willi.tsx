@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const WillisIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+export const WilliIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="16"
 		height="16"
