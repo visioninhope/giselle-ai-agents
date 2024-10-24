@@ -52,7 +52,9 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 	useEffect(() => {
 		if (isInitialMount.current) {
 			isInitialMount.current = false;
+			console.log({ a: state.graph });
 		} else {
+			console.log({ b: state.graph });
 			deboucedSetGraphToDb(state.graph);
 		}
 	}, [state, deboucedSetGraphToDb]);

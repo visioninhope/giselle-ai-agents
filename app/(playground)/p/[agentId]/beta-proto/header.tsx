@@ -3,6 +3,7 @@ import Link from "next/link";
 import { SparklesIcon } from "./components/icons/sparkles";
 import { ModeButton } from "./components/mode-button";
 import { useFeatureFlags } from "./feature-flags/context";
+import { RunButton } from "./flow/components/run-button";
 import { useGraph } from "./graph/context";
 import { playgroundModes } from "./graph/types";
 
@@ -40,16 +41,7 @@ export function Header() {
 			)}
 			{viewFlag && (
 				<div>
-					<button
-						type="button"
-						className="px-[16px] py-[8px] rounded-[8px] flex items-center gap-[2px] bg-[hsla(207,19%,77%,0.3)] font-rosart"
-						style={{
-							boxShadow: "0px 0px 3px 0px hsla(0, 0%, 100%, 0.25) inset",
-						}}
-					>
-						<SparklesIcon className="w-[18px] h-[18px] fill-white drop-shadow-[0.66px_1.32px_2.64px_hsla(0,0%,100%,0.25)]" />
-						<span>Run</span>
-					</button>
+					<RunButton />
 				</div>
 			)}
 		</div>

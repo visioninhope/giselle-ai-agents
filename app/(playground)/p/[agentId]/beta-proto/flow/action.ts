@@ -1,5 +1,4 @@
-import type { GiselleNodeId } from "../giselle-node/types";
-import type { Flow } from "./types";
+import type { Flow, QueuedFlow, RunningFlow } from "./types";
 
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
@@ -10,10 +9,11 @@ type V2FlowActionType =
 
 interface SetFlowAction {
 	type: Extract<V2FlowActionType, "v2.setFlow">;
-	input: SetFlowInput;
+	input: SetFlowActionInput;
 }
-
-interface SetFlowInput extends Partial<Flow> {}
+type SetFlowActionInput =
+	| Omit<QueuedFlow, "object">
+	| Omit<RunningFlow, "object">;
 
 export type V2FlowAction = SetFlowAction;
 
@@ -23,17 +23,20 @@ export function isV2FlowAction(action: unknown): action is V2FlowAction {
 	);
 }
 
-export function setFlow({ input }: { input: SetFlowInput }) {
+export function setFlow({ input }: { input: SetFlowActionInput }) {
 	return {
 		type: v2FlowActionTypes.setFlow,
 		input,
 	};
 }
 
-export function v2FlowReducer(flow: Flow, action: V2FlowAction): Flow {
+export function v2FlowReducer(
+	flow: Flow | null | undefined,
+	action: V2FlowAction,
+): Flow | null | undefined {
 	switch (action.type) {
 		case v2FlowActionTypes.setFlow:
-			return { ...flow, ...action.input };
+			return { ...action.input, object: "flow" };
 	}
 	return flow;
 }

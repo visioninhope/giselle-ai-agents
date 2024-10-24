@@ -9,107 +9,8 @@ import {
 import { useGraph } from "./graph/context";
 import { Header } from "./header";
 
-function getRelevantConnectors(
-	connectors: ConnectorObject[],
-	targetNode: GiselleNodeId,
-): ConnectorObject[] {
-	const relevantConnectors: ConnectorObject[] = [];
-	const relevantNodes = new Set<GiselleNodeId>([targetNode]);
-	let connectorsToProcess = connectors.filter(
-		(connector) => connector.target === targetNode,
-	);
-
-	while (connectorsToProcess.length > 0) {
-		relevantConnectors.push(...connectorsToProcess);
-		const sourceNodes = connectorsToProcess.map(
-			(connector) => connector.source,
-		);
-		for (const node of sourceNodes) {
-			relevantNodes.add(node);
-		}
-
-		connectorsToProcess = connectors.filter(
-			(connector) =>
-				!relevantConnectors.includes(connector) &&
-				sourceNodes.includes(connector.target),
-		);
-	}
-
-	return relevantConnectors;
-}
-
-function buildDependencyGraph(
-	connectors: ConnectorObject[],
-): Map<GiselleNodeId, Set<GiselleNodeId>> {
-	const dependencyMap = new Map<GiselleNodeId, Set<GiselleNodeId>>();
-
-	for (const connector of connectors) {
-		if (connector.sourceNodeCategory === giselleNodeCategories.instruction) {
-			continue;
-		}
-		if (!dependencyMap.has(connector.source)) {
-			dependencyMap.set(connector.source, new Set());
-		}
-		if (!dependencyMap.has(connector.target)) {
-			dependencyMap.set(connector.target, new Set());
-		}
-		dependencyMap.get(connector.target)?.add(connector.source);
-	}
-
-	return dependencyMap;
-}
-
-function resolveTargetDependencies(
-	connectors: ConnectorObject[],
-	targetNode: GiselleNodeId,
-): GiselleNodeId[][] {
-	const relevantConnectors = getRelevantConnectors(connectors, targetNode);
-	const dependencyMap = buildDependencyGraph(relevantConnectors);
-
-	const result: GiselleNodeId[][] = [];
-	const visited = new Set<GiselleNodeId>();
-	const nodes = Array.from(dependencyMap.keys());
-
-	while (visited.size < nodes.length) {
-		const currentLayer: GiselleNodeId[] = [];
-
-		for (const node of nodes) {
-			if (!visited.has(node)) {
-				const dependencies = dependencyMap.get(node) || new Set();
-				const isReady = Array.from(dependencies).every((dep) =>
-					visited.has(dep),
-				);
-
-				if (isReady) {
-					currentLayer.push(node);
-				}
-			}
-		}
-
-		if (currentLayer.length === 0 && visited.size < nodes.length) {
-			throw new Error("Circular dependency detected");
-		}
-
-		for (const node of currentLayer) {
-			visited.add(node);
-		}
-		result.push(currentLayer);
-	}
-
-	return result;
-}
-
 export function Viewer() {
 	const { state } = useGraph();
-	const dependencies = useMemo(() => {
-		if (state.graph.flow == null) {
-			return null;
-		}
-		return resolveTargetDependencies(
-			state.graph.connectors,
-			state.graph.flow.finalNodeId,
-		);
-	}, [state.graph]);
 	return (
 		<div
 			className="w-full h-screen bg-black-100 flex flex-col"
@@ -144,7 +45,7 @@ export function Viewer() {
 							</p>
 						</div>
 					) : (
-						<pre>{JSON.stringify(dependencies, null, 2)}</pre>
+						<pre>{JSON.stringify(state.graph.flow, null, 2)}</pre>
 					)}
 				</div>
 			</div>
