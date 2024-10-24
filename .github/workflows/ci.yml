@@ -1,6 +1,7 @@
 name: CI
 
 on:
+  - push
   - pull_request
 
 jobs:
@@ -9,15 +10,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-
-      - name: Setup Bun
-        uses: oven-sh/setup-bun@v2
-
-      - name: Install dependencies
-        run: bun install
-
-      - name: Check if codebase is up-to-date
-        run: |
-          bun run ci
-          git diff --compact-summary --exit-code || \
-            (echo; echo "Unexpected git diff detected"; exit 1)
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: biome ci .
