@@ -1,6 +1,6 @@
 # giselle
 
-As of October 24, 2024 10:00am. 926 total
+As of October 24, 2024 10:30am. 926 total
 
 ## Summary
 * 667 MIT
@@ -347,7 +347,7 @@ The Babel Traverse module maintains the overall tree state, and is responsible f
 Babel Types is a Lodash-esque utility library for AST nodes
 
 <a name="@biomejs/biome"></a>
-### <a href="https://biomejs.dev">@biomejs/biome</a> v1.8.3 (devDependencies)
+### <a href="https://biomejs.dev">@biomejs/biome</a> v1.9.4 (devDependencies)
 #### 
 
 ##### Paths
@@ -358,7 +358,7 @@ MIT OR Apache-2.0 permitted
 Biome is a toolchain for the web: formatter, linter and more
 
 <a name="@biomejs/cli-linux-x64"></a>
-### <a href="https://biomejs.dev">@biomejs/cli-linux-x64</a> v1.8.3 (devDependencies)
+### <a href="https://biomejs.dev">@biomejs/cli-linux-x64</a> v1.9.4 (devDependencies)
 #### 
 
 ##### Paths
@@ -369,7 +369,7 @@ MIT OR Apache-2.0 permitted
 
 
 <a name="@biomejs/cli-linux-x64-musl"></a>
-### <a href="https://biomejs.dev">@biomejs/cli-linux-x64-musl</a> v1.8.3 (devDependencies)
+### <a href="https://biomejs.dev">@biomejs/cli-linux-x64-musl</a> v1.9.4 (devDependencies)
 #### 
 
 ##### Paths
