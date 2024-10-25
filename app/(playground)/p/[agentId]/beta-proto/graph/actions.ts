@@ -51,7 +51,7 @@ import {
 	webSearchItemStatus,
 	webSearchStatus,
 } from "../web-search/types";
-import type { ThunkAction } from "./context";
+import type { CompositeAction } from "./context";
 import {
 	generateArtifactStream,
 	parseFile,
@@ -171,7 +171,7 @@ type AddNodesAndConnectArgs = {
 };
 export const addNodesAndConnect = (
 	args: AddNodesAndConnectArgs,
-): ThunkAction => {
+): CompositeAction => {
 	return (dispatch, getState) => {
 		const state = getState();
 		const hasFinalNode = state.graph.nodes.some((node) => node.isFinal);
@@ -268,7 +268,7 @@ export const selectNodeAndSetPanelTab = (args: {
 		id: GiselleNodeId;
 		panelTab: PanelTab;
 	};
-}): ThunkAction => {
+}): CompositeAction => {
 	return (dispatch) => {
 		dispatch(
 			selectNode({
@@ -469,7 +469,7 @@ export const removeArtifact = (
 };
 
 export const generateText =
-	(args: GenerateTextArgs): ThunkAction =>
+	(args: GenerateTextArgs): CompositeAction =>
 	async (dispatch, getState) => {
 		dispatch(
 			setNodeOutput({
@@ -815,7 +815,7 @@ type AddSourceToPromptNodeArgs = {
 };
 export function addSourceToPromptNode(
 	args: AddSourceToPromptNodeArgs,
-): ThunkAction {
+): CompositeAction {
 	return async (dispatch, getState) => {
 		const state = getState();
 		const targetPromptNode = state.graph.nodes.find(
@@ -1053,7 +1053,7 @@ type RemoveSourceFromPromptNodeArgs = {
 };
 export function removeSourceFromPromptNode(
 	args: RemoveSourceFromPromptNodeArgs,
-): ThunkAction {
+): CompositeAction {
 	return (dispatch, getState) => {
 		const state = getState();
 		const targetNode = state.graph.nodes.find(
@@ -1233,7 +1233,7 @@ export function removeNode(args: RemoveNodeArgs): RemoveNodeAction {
 	};
 }
 
-export function removeSelectedNodesOrFeedback(): ThunkAction {
+export function removeSelectedNodesOrFeedback(): CompositeAction {
 	return (dispatch, getState) => {
 		const state = getState();
 		const selectedNodes = state.graph.nodes.filter((node) => node.ui.selected);
