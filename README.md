@@ -31,3 +31,5 @@ For more details, please see the [contributing guide](CONTRIBUTING.md).
 ## License
 
 Giselle is licensed under the [Apache License Version 2.0](LICENSE).
+
+Licenses for third-party packages can be found in [docs/packages-license.md](docs/packages-license.md).
