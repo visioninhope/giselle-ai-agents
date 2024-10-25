@@ -31,33 +31,37 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 	agentId,
 	defaultGraph,
 }) => {
-	const [state, originalDispatch] = useReducer(graphReducer, {
+	const [originalState, originalDispatch] = useReducer(graphReducer, {
 		graph: defaultGraph,
 	});
 	const isInitialMount = useRef(true);
+	const stateRef = useRef(originalState);
+
+	useEffect(() => {
+		stateRef.current = originalState;
+	}, [originalState]);
 
 	const deboucedSetGraphToDb = useDebounce(async (graph: Graph) => {
 		setGraphToDb(agentId, graph);
 	}, 500);
-	const enhancedDispatch: EnhancedDispatch = useCallback(
-		async (action) => {
-			if (typeof action === "function") {
-				await action(enhancedDispatch, () => state);
-			} else {
-				originalDispatch(action);
-			}
-		},
-		[state],
-	);
+	const enhancedDispatch: EnhancedDispatch = useCallback(async (action) => {
+		if (typeof action === "function") {
+			await action(enhancedDispatch, () => stateRef.current);
+		} else {
+			originalDispatch(action);
+		}
+	}, []);
 	useEffect(() => {
 		if (isInitialMount.current) {
 			isInitialMount.current = false;
 		} else {
-			deboucedSetGraphToDb(state.graph);
+			deboucedSetGraphToDb(originalState.graph);
 		}
-	}, [state, deboucedSetGraphToDb]);
+	}, [originalState, deboucedSetGraphToDb]);
 	return (
-		<GraphContext.Provider value={{ state, dispatch: enhancedDispatch }}>
+		<GraphContext.Provider
+			value={{ state: originalState, dispatch: enhancedDispatch }}
+		>
 			{children}
 		</GraphContext.Provider>
 	);
