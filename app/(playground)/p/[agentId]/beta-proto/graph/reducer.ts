@@ -1,3 +1,4 @@
+import { isV2FlowAction, v2FlowReducer } from "../flow/action";
 import type { GraphAction } from "./actions";
 import type { GraphState } from "./types";
 import { isV2ModeAction, v2ModeReducer } from "./v2/mode";
@@ -22,6 +23,15 @@ export const graphReducer = (
 			graph: {
 				...state.graph,
 				mode: v2ModeReducer(state.graph.mode, action),
+			},
+		};
+	}
+	if (isV2FlowAction(action)) {
+		return {
+			...state,
+			graph: {
+				...state.graph,
+				flow: v2FlowReducer(state.graph.flow, action),
 			},
 		};
 	}

@@ -13,6 +13,7 @@ import {
 	type StructuredData,
 	fileStatuses,
 } from "../files/types";
+import type { V2FlowAction } from "../flow/action";
 import {
 	type GiselleNodeArchetype,
 	giselleNodeArchetypes,
@@ -1343,4 +1344,5 @@ export type GraphAction =
 	| RemoveParameterFromNodeAction
 	| UpsertWebSearchAction
 	| V2NodeAction
-	| V2ModeAction;
+	| V2ModeAction
+	| V2FlowAction;
