@@ -23,7 +23,7 @@ import {
 	updateNodeProperty,
 	updateNodesUI,
 } from "../../../graph/actions";
-import { type ThunkAction, useGraph } from "../../../graph/context";
+import { type CompositeAction, useGraph } from "../../../graph/context";
 import type {
 	TextContent,
 	TextContentReference,
@@ -44,7 +44,7 @@ import { Block } from "./block";
 function setTextToPropertyAndOutput(
 	nodeId: GiselleNodeId,
 	text: string,
-): ThunkAction {
+): CompositeAction {
 	return (dispatch) => {
 		dispatch(
 			updateNodeProperty({

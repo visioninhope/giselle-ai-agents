@@ -1,5 +1,5 @@
 import type { GiselleNode } from "../giselle-node/types";
-import type { ThunkAction } from "../graph/context";
+import type { CompositeAction } from "../graph/context";
 import { playgroundModes } from "../graph/types";
 import { updateMode } from "../graph/v2/mode";
 import { setFlow } from "./action";
@@ -7,7 +7,7 @@ import { runAction } from "./server-action";
 import { flowStatuses } from "./types";
 import { createFlowActionId, createFlowId, resolveActionLayers } from "./utils";
 
-export function runFlow(finalNode: GiselleNode): ThunkAction {
+export function runFlow(finalNode: GiselleNode): CompositeAction {
 	return async (dispatch, getState) => {
 		const state = getState();
 		dispatch(
