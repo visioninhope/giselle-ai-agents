@@ -24,6 +24,7 @@ import {
 	updateNodesUI,
 } from "../../../graph/actions";
 import { type CompositeAction, useGraph } from "../../../graph/context";
+import { addSource } from "../../../graph/v2/composition/add-source";
 import { removeSource } from "../../../graph/v2/composition/remove-source";
 import type {
 	TextContent,
@@ -196,13 +197,13 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 				);
 			} else {
 				dispatch(
-					addSourceToPromptNode({
-						promptNode: {
-							id: node.id,
-						},
-						source: {
-							id: artifact.id,
-							object: "artifact.reference",
+					addSource({
+						input: {
+							nodeId: node.id,
+							source: {
+								id: artifact.id,
+								object: "artifact.reference",
+							},
 						},
 					}),
 				);

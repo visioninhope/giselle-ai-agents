@@ -61,53 +61,55 @@ export function removeSource({
 		if (sourceCreatorNodeId === undefined) {
 			throw new Error(`Source creator node not found: ${input.source.id}`);
 		}
-		const relevantConnectors = getState().graph.connectors.filter(
+		const instructionToActionConnectors = getState().graph.connectors.filter(
 			(connector) => connector.source === input.nodeId,
 		);
-		for (const relevantConnector of relevantConnectors) {
+		for (const instructionToActionConnector of instructionToActionConnectors) {
 			const sourceConnector = getState().graph.connectors.find(
 				(connector) =>
 					connector.source === sourceCreatorNodeId &&
-					connector.target === relevantConnector.target,
+					connector.target === instructionToActionConnector.target,
 			);
 			if (sourceConnector === undefined) {
 				throw new Error(
-					`Source connector not found: ${sourceCreatorNodeId} -> ${relevantConnector.target}`,
+					`Source connector not found: ${sourceCreatorNodeId} -> ${instructionToActionConnector.target}`,
 				);
 			}
 			const relevantNode = getState().graph.nodes.find(
-				(node) => node.id === relevantConnector.target,
+				(node) => node.id === instructionToActionConnector.target,
 			);
 			if (relevantNode === undefined) {
-				throw new Error(`Node not found: ${relevantConnector.target}`);
+				throw new Error(
+					`Node not found: ${instructionToActionConnector.target}`,
+				);
 			}
 			if (relevantNode.parameters?.object !== "objectParameter") {
 				throw new Error(
-					`Node's parameters are not an object: ${relevantConnector.target}`,
+					`Node's parameters are not an object: ${instructionToActionConnector.target}`,
 				);
 			}
-			const { [relevantConnector.targetHandle]: _, ...properties } =
+			const { [instructionToActionConnector.targetHandle]: _, ...properties } =
 				relevantNode.parameters.properties;
-			dispatch(
-				updateNode({
-					input: {
-						nodeId: relevantConnector.target,
-						parameters: {
-							...relevantNode.parameters,
-							properties,
-						},
-					},
-				}),
-			);
-			dispatch(
-				setConnectors({
-					input: {
-						connectors: getState().graph.connectors.filter(
-							(connector) => connector.id !== sourceConnector.id,
-						),
-					},
-				}),
-			);
+			// dispatch(
+			// 	setConnectors({
+			// 		input: {
+			// 			connectors: getState().graph.connectors.filter(
+			// 				(connector) => connector.id !== sourceConnector.id,
+			// 			),
+			// 		},
+			// 	}),
+			// );
+			// dispatch(
+			// 	updateNode({
+			// 		input: {
+			// 			nodeId: instructionToActionConnector.target,
+			// 			parameters: {
+			// 				...relevantNode.parameters,
+			// 				properties,
+			// 			},
+			// 		},
+			// 	}),
+			// );
 		}
 	};
 }
