@@ -3,6 +3,7 @@ import type { ConnectorId } from "../../../connector/types";
 import { giselleNodeArchetypes } from "../../../giselle-node/blueprints";
 import { giselleNodeCategories } from "../../../giselle-node/types";
 import type { CompositeAction } from "../../context";
+import { setXyFlowEdges } from "../xy-flow";
 import { type Source, removeSource } from "./remove-source";
 
 type RemoveConnectorInput = {
@@ -17,8 +18,27 @@ export function removeConnector({
 			(connector) => connector.id === input.connectorId,
 		);
 		if (removeConnector === undefined) {
-			throw new Error(`Connector not found: ${input.connectorId}`);
+			return;
 		}
+		dispatch(
+			setConnectors({
+				input: {
+					connectors: getState().graph.connectors.filter(
+						(connector) => connector.id !== removeConnector.id,
+					),
+				},
+			}),
+		);
+		dispatch(
+			setXyFlowEdges({
+				input: {
+					xyFlowEdges: getState().graph.xyFlow.edges.filter(
+						(edge) => edge.id !== removeConnector.id,
+					),
+				},
+			}),
+		);
+
 		switch (removeConnector.targetNodeCategory) {
 			case giselleNodeCategories.action: {
 				switch (removeConnector.sourceNodeCategory) {

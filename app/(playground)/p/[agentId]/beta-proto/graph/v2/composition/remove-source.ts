@@ -1,15 +1,17 @@
 import type { ArtifactReference } from "../../../artifact/types";
-import { setConnectors } from "../../../connector/actions";
-import type { GiselleNode, GiselleNodeId } from "../../../giselle-node/types";
+import type { GiselleNodeId } from "../../../giselle-node/types";
 import type { TextContentReference } from "../../../text-content/types";
 import type { WebSearch } from "../../../web-search/types";
-import { removeParameterFromNode, updateNodeProperty } from "../../actions";
 import type { CompositeAction } from "../../context";
+import { removeConnector } from "./remove-connector";
 import { updateNode } from "./update-node";
 
 export type Source = ArtifactReference | TextContentReference | WebSearch;
 type RemoveSourceInput = {
 	source: Source;
+	/**
+	 * Instruction Node
+	 */
 	nodeId: GiselleNodeId;
 };
 
@@ -17,24 +19,26 @@ export function removeSource({
 	input,
 }: { input: RemoveSourceInput }): CompositeAction {
 	return (dispatch, getState) => {
-		const node = getState().graph.nodes.find(
+		const instructionNode = getState().graph.nodes.find(
 			(node) => node.id === input.nodeId,
 		);
-		if (node === undefined) {
+		if (instructionNode === undefined) {
 			throw new Error(`Node not found: ${input.nodeId}`);
 		}
 
 		// Remove the source from the sourceNode property
-		const currentSources = node.properties.sources ?? [];
+		const currentSources = instructionNode.properties.sources ?? [];
 		if (!Array.isArray(currentSources)) {
-			throw new Error(`${node.id}'s sources property is not an array`);
+			throw new Error(
+				`${instructionNode.id}'s sources property is not an array`,
+			);
 		}
 		dispatch(
 			updateNode({
 				input: {
 					nodeId: input.nodeId,
 					properties: {
-						...node.properties,
+						...instructionNode.properties,
 						sources: currentSources.filter(
 							(currentSource) =>
 								typeof currentSource === "object" &&
@@ -71,9 +75,7 @@ export function removeSource({
 					connector.target === instructionToActionConnector.target,
 			);
 			if (sourceConnector === undefined) {
-				throw new Error(
-					`Source connector not found: ${sourceCreatorNodeId} -> ${instructionToActionConnector.target}`,
-				);
+				continue;
 			}
 			const relevantNode = getState().graph.nodes.find(
 				(node) => node.id === instructionToActionConnector.target,
@@ -88,28 +90,26 @@ export function removeSource({
 					`Node's parameters are not an object: ${instructionToActionConnector.target}`,
 				);
 			}
-			const { [instructionToActionConnector.targetHandle]: _, ...properties } =
+			const { [sourceConnector.targetHandle]: _, ...properties } =
 				relevantNode.parameters.properties;
-			// dispatch(
-			// 	setConnectors({
-			// 		input: {
-			// 			connectors: getState().graph.connectors.filter(
-			// 				(connector) => connector.id !== sourceConnector.id,
-			// 			),
-			// 		},
-			// 	}),
-			// );
-			// dispatch(
-			// 	updateNode({
-			// 		input: {
-			// 			nodeId: instructionToActionConnector.target,
-			// 			parameters: {
-			// 				...relevantNode.parameters,
-			// 				properties,
-			// 			},
-			// 		},
-			// 	}),
-			// );
+			dispatch(
+				removeConnector({
+					input: {
+						connectorId: sourceConnector.id,
+					},
+				}),
+			);
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: instructionToActionConnector.target,
+						parameters: {
+							...relevantNode.parameters,
+							properties,
+						},
+					},
+				}),
+			);
 		}
 	};
 }
