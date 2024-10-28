@@ -15,14 +15,14 @@ type DraftFile = {
 	file: File;
 	status: Extract<FileStatus, "uploading">;
 };
-type UploadedFile = {
+export type UploadedFile = {
 	id: FileId;
 	blobUrl: string;
 	object: "file";
 	name: string;
 	status: Extract<FileStatus, "processing">;
 };
-type ProcessedFile = {
+export type ProcessedFile = {
 	id: FileId;
 	blobUrl: string;
 	structuredDataBlobUrl: string;

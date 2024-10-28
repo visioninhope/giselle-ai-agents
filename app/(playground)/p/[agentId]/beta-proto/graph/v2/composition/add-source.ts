@@ -1,5 +1,12 @@
 import type { ArtifactReference } from "../../../artifact/types";
 import { buildConnector } from "../../../connector/utils";
+import { parseFile, uploadFile } from "../../../files/server-actions";
+import {
+	type GiselleFile,
+	type ProcessedFile,
+	type StructuredData,
+	fileStatuses,
+} from "../../../files/types";
 import { createStringParameter } from "../../../giselle-node/parameter/factory";
 import type { GiselleNodeId } from "../../../giselle-node/types";
 import type { TextContent } from "../../../text-content/types";
@@ -9,7 +16,7 @@ import type { CompositeAction } from "../../context";
 import { addConnector } from "./add-connector";
 import { updateNode } from "./update-node";
 
-export type Source = ArtifactReference | TextContent | WebSearch;
+export type Source = ArtifactReference | TextContent | WebSearch | GiselleFile;
 type AddSourceInput = {
 	source: Source;
 	/**
@@ -134,6 +141,90 @@ export function connectRelevanceNodes({
 					},
 				}),
 			);
+		}
+	};
+}
+
+interface UploadSourceInput {
+	source: Source;
+	/**
+	 * Instruction Node
+	 */
+	nodeId: GiselleNodeId;
+}
+export function uploadSource({
+	input,
+}: { input: UploadSourceInput }): CompositeAction {
+	return async (dispatch, getState) => {
+		switch (input.source.object) {
+			case "file": {
+				if (input.source.status === fileStatuses.uploading) {
+					const fileVercelBlob = await uploadFile({
+						input: {
+							file: input.source.file,
+							fileId: input.source.id,
+						},
+					});
+					const node = getState().graph.nodes.find(
+						(node) => node.id === input.nodeId,
+					);
+					if (node === undefined) {
+						throw new Error(`Node not found: ${input.nodeId}`);
+					}
+
+					// Add the source to the instruction node property
+					const currentSources = node.properties.sources ?? [];
+					if (!Array.isArray(currentSources)) {
+						throw new Error(`${node.id}'s sources property is not an array`);
+					}
+					dispatch(
+						updateNode({
+							input: {
+								nodeId: input.nodeId,
+								properties: {
+									...node.properties,
+									sources: currentSources.map((source) =>
+										source.id === input.source.id
+											? {
+													...source,
+													blobUrl: fileVercelBlob.url,
+													status: fileStatuses.processing,
+												}
+											: source,
+									),
+								},
+							},
+						}),
+					);
+
+					const structuredDataVercelBlob = await parseFile({
+						id: input.source.id,
+						name: input.source.name,
+						blobUrl: fileVercelBlob.url,
+					});
+
+					dispatch(
+						updateNode({
+							input: {
+								nodeId: input.nodeId,
+								properties: {
+									...node.properties,
+									sources: currentSources.map((source) =>
+										source.id === input.source.id
+											? ({
+													...source,
+													blobUrl: fileVercelBlob.url,
+													structuredDataBlobUrl: structuredDataVercelBlob.url,
+													status: fileStatuses.processed,
+												} satisfies ProcessedFile)
+											: source,
+									),
+								},
+							},
+						}),
+					);
+				}
+			}
 		}
 	};
 }
