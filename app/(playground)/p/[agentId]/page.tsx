@@ -82,7 +82,6 @@ export default async function AgentPlaygroundPage({
 	const viewFlag = await getViewFlag();
 
 	const agent = await getAgent(agentId);
-	console.log({ grpahv2: agent.graphv2 });
 
 	return (
 		<Playground
