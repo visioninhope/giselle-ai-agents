@@ -1,6 +1,6 @@
 import { setNodes } from "../../../giselle-node/actions";
 import type { Parameter } from "../../../giselle-node/parameter/types";
-import type { GiselleNodeId } from "../../../giselle-node/types";
+import type { GiselleNode, GiselleNodeId } from "../../../giselle-node/types";
 import type { CompositeAction } from "../../context";
 import { setXyFlowNodes } from "../xy-flow";
 
@@ -9,6 +9,7 @@ interface UpdateNodeInput {
 	isFinal?: boolean;
 	properties?: Record<string, unknown>;
 	parameters?: Parameter | undefined;
+	ui?: Partial<GiselleNode["ui"]>;
 }
 
 export function updateNode({
@@ -26,6 +27,10 @@ export function updateNode({
 									isFinal: input.isFinal ?? node.isFinal,
 									properties: input.properties ?? node.properties,
 									parameters: input.parameters ?? node.parameters,
+									ui: {
+										...node.ui,
+										...input.ui,
+									},
 								},
 					),
 				},
@@ -39,11 +44,16 @@ export function updateNode({
 							? xyFlowNode
 							: {
 									...xyFlowNode,
+									selected: input.ui?.selected ?? xyFlowNode.selected,
 									data: {
 										...xyFlowNode.data,
 										isFinal: input.isFinal ?? xyFlowNode.data.isFinal,
 										properties: input.properties ?? xyFlowNode.data.properties,
 										parameters: input.parameters ?? xyFlowNode.data.parameters,
+										ui: {
+											...xyFlowNode.data.ui,
+											...input.ui,
+										},
 									},
 								},
 					),

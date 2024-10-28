@@ -218,17 +218,30 @@ export const addNodesAndConnect = (
 			}),
 		);
 		if (addSourceNode.archetype === giselleNodeArchetypes.prompt) {
-			dispatch(
-				updateNodesUI({
-					nodes: [
-						{
-							id: addSourceNode.id,
+			const selectedNodes = getState().graph.nodes.filter(
+				(node) => node.ui.selected,
+			);
+			selectedNodes.map((node) => {
+				dispatch(
+					v2UpdateNode({
+						input: {
+							nodeId: node.id,
 							ui: {
-								selected: true,
-								panelTab: panelTabs.property,
+								selected: false,
 							},
 						},
-					],
+					}),
+				);
+			});
+			dispatch(
+				v2UpdateNode({
+					input: {
+						nodeId: addSourceNode.id,
+						ui: {
+							selected: true,
+							panelTab: panelTabs.property,
+						},
+					},
 				}),
 			);
 		}
