@@ -116,24 +116,6 @@ export function addSource({
 					},
 				}),
 			);
-			if (sourceCreatorNode.isFinal) {
-				dispatch(
-					updateNode({
-						input: {
-							nodeId: sourceCreatorNode.id,
-							isFinal: false,
-						},
-					}),
-				);
-				dispatch(
-					updateNode({
-						input: {
-							nodeId: targetNode.id,
-							isFinal: true,
-						},
-					}),
-				);
-			}
 		}
 	};
 }

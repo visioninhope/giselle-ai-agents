@@ -3,6 +3,7 @@ import type { ConnectorObject } from "../../../connector/types";
 import { giselleEdgeType } from "../../../react-flow-adapter/giselle-node";
 import type { CompositeAction } from "../../context";
 import { setXyFlowEdges } from "../xy-flow";
+import { updateNode } from "./update-node";
 
 interface AddConnectorInput {
 	connector: ConnectorObject;
@@ -35,5 +36,26 @@ export function addConnector({
 				},
 			}),
 		);
+		const sourceNode = getState().graph.nodes.find(
+			(node) => node.id === input.connector.source,
+		);
+		if (sourceNode?.isFinal) {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: sourceNode.id,
+						isFinal: false,
+					},
+				}),
+			);
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: input.connector.target,
+						isFinal: true,
+					},
+				}),
+			);
+		}
 	};
 }
