@@ -239,13 +239,13 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	const removeTextContent = useCallback(
 		(textContent: Pick<TextContentReference, "id">) => () => {
 			dispatch(
-				removeSourceFromPromptNode({
-					promptNode: {
-						id: node.id,
-					},
-					source: {
-						id: textContent.id,
-						object: "textContent.reference",
+				removeSource({
+					input: {
+						nodeId: node.id,
+						source: {
+							id: textContent.id,
+							object: "textContent.reference",
+						},
 					},
 				}),
 			);

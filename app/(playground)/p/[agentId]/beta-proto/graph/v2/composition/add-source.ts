@@ -2,14 +2,14 @@ import type { ArtifactReference } from "../../../artifact/types";
 import { buildConnector } from "../../../connector/utils";
 import { createStringParameter } from "../../../giselle-node/parameter/factory";
 import type { GiselleNodeId } from "../../../giselle-node/types";
-import type { TextContentReference } from "../../../text-content/types";
+import type { TextContent } from "../../../text-content/types";
 import type { WebSearch } from "../../../web-search/types";
 import { removeParameterFromNode, updateNodeProperty } from "../../actions";
 import type { CompositeAction } from "../../context";
 import { addConnector } from "./add-connector";
 import { updateNode } from "./update-node";
 
-export type Source = ArtifactReference | TextContentReference | WebSearch;
+export type Source = ArtifactReference | TextContent | WebSearch;
 type AddSourceInput = {
 	source: Source;
 	/**
@@ -61,7 +61,7 @@ export function addSource({
 			(node) => node.id === sourceCreatorNodeId,
 		);
 		if (sourceCreatorNode === undefined) {
-			throw new Error(`Source creator node not found: ${sourceCreatorNodeId}`);
+			return;
 		}
 		const targetNodes = getState()
 			.graph.connectors.filter((connector) => connector.source === input.nodeId)

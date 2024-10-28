@@ -16,6 +16,7 @@ import { useFeatureFlags } from "../../../feature-flags/context";
 import { createFileId } from "../../../files/utils";
 import { addSourceToPromptNode } from "../../../graph/actions";
 import { useGraph } from "../../../graph/context";
+import { addSource } from "../../../graph/v2/composition/add-source";
 import { createTextContentId } from "../../../text-content/factory";
 import type { GiselleNode } from "../../types";
 
@@ -32,15 +33,15 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 			const title = formData.get("title") as string;
 			const content = formData.get("content") as string;
 			dispatch(
-				addSourceToPromptNode({
-					promptNode: {
-						id: props.node.id,
-					},
-					source: {
-						object: "textContent",
-						id: createTextContentId(),
-						title,
-						content,
+				addSource({
+					input: {
+						nodeId: props.node.id,
+						source: {
+							object: "textContent",
+							id: createTextContentId(),
+							title,
+							content,
+						},
 					},
 				}),
 			);

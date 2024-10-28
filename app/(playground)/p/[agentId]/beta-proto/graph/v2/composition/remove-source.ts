@@ -63,7 +63,7 @@ export function removeSource({
 			)?.generatorNode?.id;
 		}
 		if (sourceCreatorNodeId === undefined) {
-			throw new Error(`Source creator node not found: ${input.source.id}`);
+			return;
 		}
 		const instructionToActionConnectors = getState().graph.connectors.filter(
 			(connector) => connector.source === input.nodeId,
