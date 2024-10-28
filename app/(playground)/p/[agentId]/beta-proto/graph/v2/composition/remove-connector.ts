@@ -150,7 +150,10 @@ function updateFinalFlag({
 		const targetNode = getState().graph.nodes.find(
 			(node) => node.id === input.connector.target,
 		);
-		if (targetNode?.isFinal) {
+		if (
+			targetNode?.isFinal &&
+			input.connector.sourceNodeCategory === giselleNodeCategories.action
+		) {
 			dispatch(
 				updateNode({
 					input: {
