@@ -45,8 +45,26 @@ export function addSource({
 				},
 			}),
 		);
+		dispatch(
+			connectRelevanceNodes({
+				input,
+			}),
+		);
+	};
+}
 
-		// Add the parameter of the source to the targetNode
+interface ConnectRelevanceNodesInput {
+	source: Source;
+	/**
+	 * Instruction Node
+	 */
+	nodeId: GiselleNodeId;
+}
+export function connectRelevanceNodes({
+	input,
+}: { input: ConnectRelevanceNodesInput }): CompositeAction {
+	return (dispatch, getState) => {
+		// Add the parameter of the source to the target node
 		let sourceCreatorNodeId: GiselleNodeId | undefined;
 		if (input.source.object === "artifact.reference") {
 			sourceCreatorNodeId = getState().graph.artifacts.find(
