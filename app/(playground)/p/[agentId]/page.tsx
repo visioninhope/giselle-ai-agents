@@ -20,7 +20,7 @@ import {
 } from "./beta-proto/react-flow-adapter/types";
 import type { AgentId } from "./beta-proto/types";
 
-export function graphToReactFlow(grpah: Graph) {
+function graphToReactFlow(grpah: Graph) {
 	const nodes: ReactFlowNode[] = grpah.nodes.map((node) => {
 		return {
 			id: node.id,
