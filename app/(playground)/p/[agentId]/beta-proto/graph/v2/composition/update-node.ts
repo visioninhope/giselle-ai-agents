@@ -6,6 +6,7 @@ import { setXyFlowNodes } from "../xy-flow";
 
 interface UpdateNodeInput {
 	nodeId: GiselleNodeId;
+	isFinal?: boolean;
 	properties?: Record<string, unknown>;
 	parameters?: Parameter | undefined;
 }
@@ -22,6 +23,7 @@ export function updateNode({
 							? node
 							: {
 									...node,
+									isFinal: input.isFinal ?? node.isFinal,
 									properties: input.properties ?? node.properties,
 									parameters: input.parameters ?? node.parameters,
 								},
@@ -39,6 +41,7 @@ export function updateNode({
 									...xyFlowNode,
 									data: {
 										...xyFlowNode.data,
+										isFinal: input.isFinal ?? xyFlowNode.data.isFinal,
 										properties: input.properties ?? xyFlowNode.data.properties,
 										parameters: input.parameters ?? xyFlowNode.data.parameters,
 									},
