@@ -13,10 +13,11 @@ import type { Artifact, ArtifactReference } from "../../../artifact/types";
 import { DocumentIcon } from "../../../components/icons/document";
 import { PanelCloseIcon } from "../../../components/icons/panel-close";
 import { TextsIcon } from "../../../components/icons/texts";
+import type { ConnectorObject } from "../../../connector/types";
 import type { GiselleFile } from "../../../files/types";
 import {
 	addSourceToPromptNode,
-	generateText,
+	generateText as generateTextAction,
 	removeSourceFromPromptNode,
 	selectNodeAndSetPanelTab,
 	setNodeOutput,
@@ -26,6 +27,7 @@ import {
 import { type CompositeAction, useGraph } from "../../../graph/context";
 import { addSource } from "../../../graph/v2/composition/add-source";
 import { removeSource } from "../../../graph/v2/composition/remove-source";
+import { updateNode } from "../../../graph/v2/composition/update-node";
 import type {
 	TextContent,
 	TextContentReference,
@@ -64,6 +66,62 @@ function setTextToPropertyAndOutput(
 				node: {
 					id: nodeId,
 					output: text,
+				},
+			}),
+		);
+	};
+}
+
+interface CreateGenerateTextActionInput {
+	outgoingConnections: ConnectorObject[];
+}
+function createGenerateTextAction({
+	input,
+}: { input: CreateGenerateTextActionInput }): CompositeAction {
+	return (dispatch, getState) => {
+		input.outgoingConnections.map((connector) => {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: connector.target,
+						ui: {
+							isInflluencable: false,
+						},
+					},
+				}),
+			);
+		});
+
+		const selectedNodes = getState().graph.nodes.filter(
+			(node) => node.ui.selected,
+		);
+		selectedNodes.map((node) => {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: node.id,
+						ui: {
+							selected: false,
+						},
+					},
+				}),
+			);
+		});
+		dispatch(
+			updateNode({
+				input: {
+					nodeId: input.outgoingConnections[0].target,
+					ui: {
+						selected: true,
+						panelTab: panelTabs.result,
+					},
+				},
+			}),
+		);
+		dispatch(
+			generateTextAction({
+				textGeneratorNode: {
+					id: input.outgoingConnections[0].target,
 				},
 			}),
 		);
@@ -122,27 +180,9 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 	);
 	const handleClick = useCallback(() => {
 		dispatch(
-			updateNodesUI({
-				nodes: outgoingConnections.map((connector) => ({
-					id: connector.target,
-					ui: {
-						isInflluencable: false,
-					},
-				})),
-			}),
-		);
-		dispatch(
-			selectNodeAndSetPanelTab({
-				selectNode: {
-					id: outgoingConnections[0].target,
-					panelTab: panelTabs.result,
-				},
-			}),
-		);
-		dispatch(
-			generateText({
-				textGeneratorNode: {
-					id: outgoingConnections[0].target,
+			createGenerateTextAction({
+				input: {
+					outgoingConnections,
 				},
 			}),
 		);
