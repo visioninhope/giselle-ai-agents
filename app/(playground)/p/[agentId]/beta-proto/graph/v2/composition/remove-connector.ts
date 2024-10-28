@@ -1,5 +1,5 @@
 import { setConnectors } from "../../../connector/actions";
-import type { ConnectorId } from "../../../connector/types";
+import type { ConnectorId, ConnectorObject } from "../../../connector/types";
 import { giselleNodeArchetypes } from "../../../giselle-node/blueprints";
 import { giselleNodeCategories } from "../../../giselle-node/types";
 import type { CompositeAction } from "../../context";
@@ -38,10 +38,24 @@ export function removeConnector({
 				},
 			}),
 		);
+		dispatch(
+			removeSourcesConnected({
+				input: { connector: removeConnector },
+			}),
+		);
+	};
+}
 
-		switch (removeConnector.targetNodeCategory) {
+interface RemoveSourcesConnectedInput {
+	connector: ConnectorObject;
+}
+function removeSourcesConnected({
+	input,
+}: { input: RemoveSourcesConnectedInput }): CompositeAction {
+	return (dispatch, getState) => {
+		switch (input.connector.targetNodeCategory) {
 			case giselleNodeCategories.action: {
-				switch (removeConnector.sourceNodeCategory) {
+				switch (input.connector.sourceNodeCategory) {
 					case giselleNodeCategories.action: {
 						// Execute this process when a connector
 						// from an action node like TextGenerator
@@ -52,23 +66,21 @@ export function removeConnector({
 						const relevantInstructionConnector =
 							getState().graph.connectors.find(
 								(connector) =>
-									connector.target === removeConnector.target &&
+									connector.target === input.connector.target &&
 									connector.sourceNodeCategory ===
 										giselleNodeCategories.instruction,
 							);
 						if (relevantInstructionConnector === undefined) {
-							throw new Error(
-								`Instruction connector not found: ${removeConnector.target}`,
-							);
+							return;
 						}
 						let source: Source | undefined;
 						if (
-							removeConnector.sourceNodeArcheType ===
+							input.connector.sourceNodeArcheType ===
 							giselleNodeArchetypes.textGenerator
 						) {
 							const removeArtifact = getState().graph.artifacts.find(
 								(artifact) =>
-									artifact.generatorNode.id === removeConnector.source,
+									artifact.generatorNode.id === input.connector.source,
 							);
 							if (removeArtifact !== undefined) {
 								source = {
@@ -77,19 +89,19 @@ export function removeConnector({
 								};
 							}
 						} else if (
-							removeConnector.sourceNodeArcheType ===
+							input.connector.sourceNodeArcheType ===
 							giselleNodeArchetypes.webSearch
 						) {
 							const webSearch = getState().graph.webSearches.find(
 								(webSearch) =>
-									webSearch.generatorNode.id === removeConnector.source,
+									webSearch.generatorNode.id === input.connector.source,
 							);
 							if (webSearch !== undefined) {
 								source = webSearch;
 							}
 						}
 						if (source === undefined) {
-							throw new Error(`Source not found: ${removeConnector.source}`);
+							throw new Error(`Source not found: ${input.connector.source}`);
 						}
 
 						dispatch(
@@ -107,7 +119,7 @@ export function removeConnector({
 							setConnectors({
 								input: {
 									connectors: getState().graph.connectors.filter(
-										(connector) => connector.id !== removeConnector.id,
+										(connector) => connector.id !== input.connector.id,
 									),
 								},
 							}),
@@ -118,10 +130,6 @@ export function removeConnector({
 			}
 			default:
 				throw new Error("Unexpected target node category detected");
-		}
-		if (removeConnector.targetNodeCategory === giselleNodeCategories.action) {
-			if (removeConnector.sourceNodeCategory === giselleNodeCategories.action) {
-			}
 		}
 	};
 }
