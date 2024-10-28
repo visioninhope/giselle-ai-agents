@@ -53,7 +53,6 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 			deboucedSetGraphToDb(stateRef.current.graph);
 		}
 	}, [deboucedSetGraphToDb]);
-	console.log({ defaultGraph });
 	return (
 		<GraphContext.Provider value={{ state, dispatch: enhancedDispatch }}>
 			{children}
