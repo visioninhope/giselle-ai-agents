@@ -2,7 +2,7 @@ import type { GiselleNode, GiselleNodeId } from "../../giselle-node/types";
 import type {
 	ReactFlowEdge,
 	ReactFlowNode,
-} from "../../react-flow-adapter/giselle-node";
+} from "../../react-flow-adapter/types";
 import type { XYFlow } from "../types";
 
 const v2XyFlowActionTypes = {

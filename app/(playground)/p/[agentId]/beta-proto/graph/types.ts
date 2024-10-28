@@ -2,10 +2,7 @@ import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
 import type { Flow } from "../flow/types";
 import type { GiselleNode } from "../giselle-node/types";
-import type {
-	ReactFlowEdge,
-	ReactFlowNode,
-} from "../react-flow-adapter/giselle-node";
+import type { ReactFlowEdge, ReactFlowNode } from "../react-flow-adapter/types";
 import type { AgentId } from "../types";
 import type { WebSearch } from "../web-search/types";
 

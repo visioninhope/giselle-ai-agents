@@ -1,6 +1,6 @@
 import { setConnectors } from "../../../connector/actions";
 import type { ConnectorObject } from "../../../connector/types";
-import { giselleEdgeType } from "../../../react-flow-adapter/giselle-node";
+import { giselleEdgeType } from "../../../react-flow-adapter/types";
 import type { CompositeAction } from "../../context";
 import { setXyFlowEdges } from "../xy-flow";
 import { updateNode } from "./update-node";

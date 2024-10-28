@@ -24,6 +24,7 @@ interface PlaygroundProps {
 	featureFlags: FeatureFlags;
 }
 export function Playground(props: PlaygroundProps) {
+	console.log({ "props.graph": props.graph });
 	return (
 		<FeatureFlagProvider {...props.featureFlags}>
 			<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>

@@ -35,20 +35,15 @@ import {
 import { useGraph } from "./graph/context";
 import type { Graph } from "./graph/types";
 import { Header } from "./header";
-import {
-	type ReactFlowEdge,
-	type ReactFlowNode,
-	edgeTypes,
-	nodeTypes,
-} from "./react-flow-adapter/giselle-node";
+import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
 import {
 	useConnectionHandler,
-	useGraphToReactFlowEffect,
 	useKeyUpHandler,
 	useNodeEventHandler,
 	useReacrFlowEdgeEventHandler,
 	useReactFlowNodeEventHandler,
 } from "./react-flow-adapter/graph";
+import type { ReactFlowEdge, ReactFlowNode } from "./react-flow-adapter/types";
 import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";

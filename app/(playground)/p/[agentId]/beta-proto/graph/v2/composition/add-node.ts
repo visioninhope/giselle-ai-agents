@@ -1,6 +1,6 @@
 import { setNodes } from "../../../giselle-node/actions";
 import type { GiselleNode } from "../../../giselle-node/types";
-import { giselleNodeType } from "../../../react-flow-adapter/giselle-node";
+import { giselleNodeType } from "../../../react-flow-adapter/types";
 import type { CompositeAction } from "../../context";
 import { setXyFlowNodes } from "../xy-flow";
 
