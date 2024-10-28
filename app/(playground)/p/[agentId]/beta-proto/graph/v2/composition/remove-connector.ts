@@ -5,6 +5,7 @@ import { giselleNodeCategories } from "../../../giselle-node/types";
 import type { CompositeAction } from "../../context";
 import { setXyFlowEdges } from "../xy-flow";
 import { type Source, removeSource } from "./remove-source";
+import { updateNode } from "./update-node";
 
 type RemoveConnectorInput = {
 	connectorId: ConnectorId;
@@ -40,6 +41,11 @@ export function removeConnector({
 		);
 		dispatch(
 			removeSourcesConnected({
+				input: { connector: removeConnector },
+			}),
+		);
+		dispatch(
+			updateFinalFlag({
 				input: { connector: removeConnector },
 			}),
 		);
@@ -130,6 +136,29 @@ function removeSourcesConnected({
 			}
 			default:
 				throw new Error("Unexpected target node category detected");
+		}
+	};
+}
+
+interface UpdateFinalFlagInput {
+	connector: ConnectorObject;
+}
+function updateFinalFlag({
+	input,
+}: { input: UpdateFinalFlagInput }): CompositeAction {
+	return (dispatch, getState) => {
+		const targetNode = getState().graph.nodes.find(
+			(node) => node.id === input.connector.target,
+		);
+		if (targetNode?.isFinal) {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: input.connector.source,
+						isFinal: true,
+					},
+				}),
+			);
 		}
 	};
 }
