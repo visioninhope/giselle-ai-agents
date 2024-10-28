@@ -146,29 +146,33 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 		(node.properties?.text as string) ?? "",
 	);
 	const handleMouseEnter = useCallback(() => {
-		dispatch(
-			updateNodesUI({
-				nodes: outgoingConnections.map((connector) => ({
-					id: connector.target,
-					ui: {
-						isInflluencable: true,
+		outgoingConnections.map((connector) => {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: connector.target,
+						ui: {
+							isInflluencable: true,
+						},
 					},
-				})),
-			}),
-		);
+				}),
+			);
+		});
 	}, [dispatch, outgoingConnections]);
 
 	const handleMouseLeave = useCallback(() => {
-		dispatch(
-			updateNodesUI({
-				nodes: outgoingConnections.map((connector) => ({
-					id: connector.target,
-					ui: {
-						isInflluencable: false,
+		outgoingConnections.map((connector) => {
+			dispatch(
+				updateNode({
+					input: {
+						nodeId: connector.target,
+						ui: {
+							isInflluencable: false,
+						},
 					},
-				})),
-			}),
-		);
+				}),
+			);
+		});
 	}, [dispatch, outgoingConnections]);
 
 	const handleBlur = useCallback(
