@@ -1,6 +1,6 @@
 import * as Popover from "@radix-ui/react-popover";
 import clsx from "clsx";
-import { CheckIcon, CirclePlusIcon, Trash2Icon, TrashIcon } from "lucide-react";
+import { CheckIcon, CirclePlusIcon } from "lucide-react";
 import {
 	type FC,
 	useCallback,
@@ -16,10 +16,7 @@ import { TextsIcon } from "../../../components/icons/texts";
 import type { ConnectorObject } from "../../../connector/types";
 import type { GiselleFile } from "../../../files/types";
 import {
-	addSourceToPromptNode,
 	generateText as generateTextAction,
-	removeSourceFromPromptNode,
-	selectNodeAndSetPanelTab,
 	setNodeOutput,
 	updateNodeProperty,
 	updateNodesUI,
@@ -260,20 +257,20 @@ export const PromptPropertyPanel: FC<PromptPropertyPanelProps> = ({ node }) => {
 			const webSearchIds = sources.map(({ id }) => id);
 			if (webSearchIds.includes(webSearch.id)) {
 				dispatch(
-					removeSourceFromPromptNode({
-						promptNode: {
-							id: node.id,
+					removeSource({
+						input: {
+							nodeId: node.id,
+							source: webSearch,
 						},
-						source: webSearch,
 					}),
 				);
 			} else {
 				dispatch(
-					addSourceToPromptNode({
-						promptNode: {
-							id: node.id,
+					addSource({
+						input: {
+							nodeId: node.id,
+							source: webSearch,
 						},
-						source: webSearch,
 					}),
 				);
 			}
