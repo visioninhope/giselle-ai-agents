@@ -11,11 +11,55 @@ import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Playground } from "./beta-proto/component";
+import type { Graph } from "./beta-proto/graph/types";
+import {
+	type ReactFlowEdge,
+	type ReactFlowNode,
+	giselleEdgeType,
+	giselleNodeType,
+} from "./beta-proto/react-flow-adapter/types";
 import type { AgentId } from "./beta-proto/types";
+
+function graphToReactFlow(grpah: Graph) {
+	const nodes: ReactFlowNode[] = grpah.nodes.map((node) => {
+		return {
+			id: node.id,
+			type: giselleNodeType,
+			position: node.ui.position,
+			selected: node.ui.selected,
+			data: {
+				...node,
+			},
+		};
+	});
+
+	const edges: ReactFlowEdge[] = grpah.connectors.map((connector) => {
+		return {
+			id: connector.id,
+			type: giselleEdgeType,
+			source: connector.source,
+			target: connector.target,
+			targetHandle: connector.targetHandle,
+			data: connector,
+		};
+	});
+
+	return {
+		nodes,
+		edges,
+	};
+}
 
 async function getAgent(agentId: AgentId) {
 	const [agent] = await db.select().from(agents).where(eq(agents.id, agentId));
-	return agent;
+	const xyFlow = graphToReactFlow(agent.graphv2);
+	return {
+		...agent,
+		graphv2: {
+			...agent.graphv2,
+			xyFlow,
+		},
+	};
 }
 
 export default async function AgentPlaygroundPage({
