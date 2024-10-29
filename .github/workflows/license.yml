@@ -1,5 +1,13 @@
 name: License Compliance
 
+# ## Summary
+#
+# This workflow runs the license_finder CLI only when it detects an update to files related to the License Finder.
+# It also updates $LICENSE_REPORT and git commit.
+#
+# When triggered by a PR from a forked repository, $LICENSE_REPORT is not updated.
+# When triggered by a push to the default branch, $LICENSE_REPORT is not updated either.
+
 on:
   push:
     branches:
