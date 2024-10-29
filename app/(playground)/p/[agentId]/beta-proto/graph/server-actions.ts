@@ -15,6 +15,7 @@ import { Langfuse } from "langfuse";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { FileId } from "../files/types";
+import type { SourceIndex } from "../source/types";
 import type { AgentId } from "../types";
 import { elementsToMarkdown } from "../utils/unstructured";
 import type { Graph } from "./types";
@@ -22,6 +23,7 @@ import type { Graph } from "./types";
 type GenerateArtifactStreamParams = {
 	userPrompt: string;
 	systemPrompt?: string;
+	sourceIndexes: SourceIndex[];
 };
 export async function generateArtifactStream(
 	params: GenerateArtifactStreamParams,

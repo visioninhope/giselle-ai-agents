@@ -551,6 +551,7 @@ ${instructionSources.map((source) => (source.object === "webSearch.item" ? `<Web
 				const { object } = await generateArtifactStream({
 					userPrompt: instructionNode.output as string,
 					systemPrompt,
+					sourceIndexes: [],
 				});
 				let content: PartialGeneratedObject = {};
 				for await (const streamContent of readStreamableValue(object)) {
