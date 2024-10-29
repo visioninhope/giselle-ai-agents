@@ -5,15 +5,10 @@ on:
     branches:
       - main
   pull_request:
-  pull_request_target:
-    types: [labeled]
 
 jobs:
   license_finder:
     runs-on: ubuntu-latest
-    if: |
-      github.event.pull_request.head.repo.fork == false
-      || contains(github.event.pull_request.labels.*.name, 'safe to test')
     concurrency:
       group: ${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
