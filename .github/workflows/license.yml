@@ -26,10 +26,15 @@ jobs:
         with:
           app-id: ${{ vars.CI_TRIGGER_APP_ID }}
           private-key: ${{ secrets.CI_TRIGGER_APP_PRIVATE_KEY }}
-      - uses: actions/checkout@v4
+      - name: Checkout code for non-fork PRs
+        if: steps.fork-check.outputs.is_fork != 'true'
+        uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-          token: ${{ steps.app-token.outputs.token || secrets.GITHUB_TOKEN }}
+          token: ${{ steps.app-token.outputs.token }}
+      - name: Checkout code for forked PRs
+        if: steps.fork-check.outputs.is_fork == 'true'
+        uses: actions/checkout@v4
       # To make the success of this job a prerequisite for merging into the main branch,
       # set a filter here instead of on: to determine whether or not to proceed to the next step.
       - name: Cache dependency files
