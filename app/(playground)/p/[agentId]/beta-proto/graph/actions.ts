@@ -39,7 +39,8 @@ import {
 	buildGiselleNode,
 	giselleNodeToGiselleNodeArtifactElement,
 } from "../giselle-node/utils";
-import type { TextContent } from "../text-content/types";
+import type { SourceIndex } from "../source/types";
+import type { TextContent, TextContentId } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
 import {
 	type WebSearch,
@@ -464,6 +465,7 @@ export const generateText =
 
 		type Source = Artifact | TextContent | StructuredData | WebSearchItem;
 		const instructionSources: Source[] = [];
+		const sourceIndexes: SourceIndex[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
 				if (
@@ -476,12 +478,22 @@ export const generateText =
 				}
 				if (source.object === "textContent") {
 					instructionSources.push(source);
+					sourceIndexes.push({
+						id: source.id as TextContentId,
+						object: "textContent",
+						title: source.title as string,
+						content: source.content as string,
+					});
 				} else if (source.object === "artifact.reference") {
 					const artifact = state.graph.artifacts.find(
 						(artifact) => artifact.id === source.id,
 					);
 					if (artifact !== undefined) {
 						instructionSources.push(artifact);
+						sourceIndexes.push({
+							object: "artifact.reference",
+							id: artifact.id,
+						});
 					}
 				} else if (source.object === "file") {
 					if (
@@ -499,6 +511,14 @@ export const generateText =
 							title: source.name,
 							content: structuredData,
 						});
+						sourceIndexes.push({
+							object: "file",
+							id: source.id,
+							blobUrl: source.blobUrl,
+							structuredDataBlobUrl: source.structuredDataBlobUrl,
+							name: source.name,
+							status: "processed",
+						});
 					}
 				} else if (source.object === "webSearch") {
 					if (
@@ -506,6 +526,14 @@ export const generateText =
 						source.status === webSearchStatus.completed &&
 						Array.isArray(source.items)
 					) {
+						sourceIndexes.push({
+							object: "webSearch",
+							id: source.id,
+							name: source.name,
+							items: source.items,
+							generatorNode: source.generatorNode,
+							status: "completed",
+						});
 						await Promise.all(
 							(source.items as WebSearchItemReference[]).map(async (item) => {
 								if (item.status === webSearchItemStatus.completed) {
@@ -551,7 +579,7 @@ ${instructionSources.map((source) => (source.object === "webSearch.item" ? `<Web
 				const { object } = await generateArtifactStream({
 					userPrompt: instructionNode.output as string,
 					systemPrompt,
-					sourceIndexes: [],
+					sourceIndexes,
 				});
 				let content: PartialGeneratedObject = {};
 				for await (const streamContent of readStreamableValue(object)) {
