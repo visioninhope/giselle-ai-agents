@@ -1,22 +1,14 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
-import type {
-	Artifact,
-	ArtifactId,
-	ArtifactReference,
-} from "../artifact/types";
+import type { Artifact, ArtifactId } from "../artifact/types";
 import type { PartialGeneratedObject } from "../artifact/types";
 import type { V2ConnectorAction } from "../connector/actions";
 import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
 import { buildConnector } from "../connector/utils";
-import {
-	type GiselleFile,
-	type StructuredData,
-	fileStatuses,
-} from "../files/types";
+import { type StructuredData, fileStatuses } from "../files/types";
 import type { V2FlowAction } from "../flow/action";
-import { type V2NodeAction, updateNode } from "../giselle-node/actions";
+import type { V2NodeAction } from "../giselle-node/actions";
 import {
 	type GiselleNodeArchetype,
 	giselleNodeArchetypes,
@@ -29,7 +21,6 @@ import {
 } from "../giselle-node/parameter/factory";
 import type {
 	ObjectParameter,
-	Parameter,
 	StringParameter,
 } from "../giselle-node/parameter/types";
 import {
@@ -48,7 +39,7 @@ import {
 	buildGiselleNode,
 	giselleNodeToGiselleNodeArtifactElement,
 } from "../giselle-node/utils";
-import type { TextContent, TextContentReference } from "../text-content/types";
+import type { TextContent } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
 import {
 	type WebSearch,
@@ -58,11 +49,7 @@ import {
 	webSearchStatus,
 } from "../web-search/types";
 import type { CompositeAction } from "./context";
-import {
-	generateArtifactStream,
-	parseFile,
-	uploadFile,
-} from "./server-actions";
+import { generateArtifactStream } from "./server-actions";
 import { addConnector as v2AddConnector } from "./v2/composition/add-connector";
 import { addNode as v2AddNode } from "./v2/composition/add-node";
 import { updateNode as v2UpdateNode } from "./v2/composition/update-node";
@@ -153,26 +140,6 @@ export const addConnector = (args: AddConnectorArgs): AddConnectorAction => {
 	};
 };
 
-export type RemoveConnectorAction = {
-	type: "removeConnector";
-	payload: RemoveConnectorArgs;
-};
-
-type RemoveConnectorArgs = {
-	connector: {
-		id: ConnectorId;
-	};
-};
-
-export const removeConnector = (
-	args: RemoveConnectorArgs,
-): RemoveConnectorAction => {
-	return {
-		type: "removeConnector",
-		payload: args,
-	};
-};
-
 type AddNodesAndConnectArgs = {
 	sourceNode: Omit<AddNodeArgs, "name">;
 	targetNode: Omit<AddNodeArgs, "name">;
@@ -248,25 +215,6 @@ export const addNodesAndConnect = (
 	};
 };
 
-type SelectNodeAction = {
-	type: "selectNode";
-	payload: {
-		selectedNodeIds: GiselleNodeId[];
-	};
-};
-
-type SelectNodeArgs = {
-	selectedNodeIds: GiselleNodeId[];
-};
-export const selectNode = (args: SelectNodeArgs): SelectNodeAction => {
-	return {
-		type: "selectNode",
-		payload: {
-			selectedNodeIds: args.selectedNodeIds,
-		},
-	};
-};
-
 type SetPanelTabAction = {
 	type: "setPanelTab";
 	payload: {
@@ -288,29 +236,6 @@ export const setPanelTab = (args: SetPanelTabArgs): SetPanelTabAction => {
 		payload: {
 			node: args.node,
 		},
-	};
-};
-
-export const selectNodeAndSetPanelTab = (args: {
-	selectNode: {
-		id: GiselleNodeId;
-		panelTab: PanelTab;
-	};
-}): CompositeAction => {
-	return (dispatch) => {
-		dispatch(
-			selectNode({
-				selectedNodeIds: [args.selectNode.id],
-			}),
-		);
-		dispatch(
-			setPanelTab({
-				node: {
-					id: args.selectNode.id,
-					panelTab: args.selectNode.panelTab,
-				},
-			}),
-		);
 	};
 };
 
@@ -791,473 +716,6 @@ ${instructionSources.map((source) => `<Source title="${source.title}" type="${so
 		}
 	};
 
-type AddParameterToNodeAction = {
-	type: "addParameterToNode";
-	payload: AddParameterToNodeArgs;
-};
-type AddParameterToNodeArgs = {
-	node: {
-		id: GiselleNodeId;
-	};
-	parameter: {
-		key: string;
-		value: Parameter;
-	};
-};
-export function addParameterToNode(
-	args: AddParameterToNodeArgs,
-): AddParameterToNodeAction {
-	return {
-		type: "addParameterToNode",
-		payload: args,
-	};
-}
-
-type RemoveParameterFromNodeAction = {
-	type: "removeParameterFromNode";
-	payload: RemoveParameterFromNodeArgs;
-};
-type RemoveParameterFromNodeArgs = {
-	node: {
-		id: GiselleNodeId;
-	};
-	parameter: {
-		key: string;
-	};
-};
-export function removeParameterFromNode(
-	args: RemoveParameterFromNodeArgs,
-): RemoveParameterFromNodeAction {
-	return {
-		type: "removeParameterFromNode",
-		payload: args,
-	};
-}
-
-type Source = ArtifactReference | TextContent | GiselleFile | WebSearch;
-type AddSourceToPromptNodeArgs = {
-	promptNode: {
-		id: GiselleNodeId;
-	};
-	source: Source;
-};
-export function addSourceToPromptNode(
-	args: AddSourceToPromptNodeArgs,
-): CompositeAction {
-	return async (dispatch, getState) => {
-		const state = getState();
-		const targetPromptNode = state.graph.nodes.find(
-			(node) => node.id === args.promptNode.id,
-		);
-		if (targetPromptNode === undefined) {
-			return;
-		}
-		if (targetPromptNode.archetype !== giselleNodeArchetypes.prompt) {
-			return;
-		}
-		const currentSources = targetPromptNode.properties.sources ?? [];
-		if (!Array.isArray(currentSources)) {
-			throw new Error(
-				`${targetPromptNode.id}'s sources property is not an array`,
-			);
-		}
-		dispatch(
-			updateNodeProperty({
-				node: {
-					id: args.promptNode.id,
-					property: {
-						key: "sources",
-						value: [...currentSources, args.source],
-					},
-				},
-			}),
-		);
-		if (args.source.object === "artifact.reference") {
-			const artifact = state.graph.artifacts.find(
-				(artifact) => artifact.id === args.source.id,
-			);
-			if (artifact === undefined) {
-				return;
-			}
-			const outgoingConnectors = state.graph.connectors.filter(
-				({ source }) => source === args.promptNode.id,
-			);
-			for (const outgoingConnector of outgoingConnectors) {
-				const outgoingNode = state.graph.nodes.find(
-					(node) => node.id === outgoingConnector.target,
-				);
-				if (outgoingNode === undefined) {
-					continue;
-				}
-				const currentSourceHandleLength =
-					outgoingNode.parameters?.object === "objectParameter"
-						? Object.keys(outgoingNode.parameters.properties).filter((key) =>
-								key.startsWith("source"),
-							).length
-						: 0;
-				dispatch(
-					v2UpdateNode({
-						input: {
-							nodeId: outgoingConnector.target,
-							parameters:
-								outgoingNode.parameters?.object === "objectParameter"
-									? {
-											...outgoingNode.parameters,
-											properties: {
-												...outgoingNode.parameters.properties,
-												[`source${currentSourceHandleLength + 1}`]:
-													createStringParameter({
-														label: `Source${currentSourceHandleLength + 1}`,
-													}),
-											},
-										}
-									: undefined,
-						},
-					}),
-				);
-				dispatch(
-					v2AddConnector({
-						input: {
-							connector: buildConnector({
-								sourceNode: {
-									id: artifact.generatorNode.id,
-									category: artifact.generatorNode.category,
-									archetype: artifact.generatorNode.archetype,
-								},
-								targetNode: {
-									id: outgoingConnector.target,
-									handle: `source${currentSourceHandleLength + 1}`,
-									category: outgoingConnector.targetNodeCategory,
-									archetype: outgoingNode.archetype,
-								},
-							}),
-						},
-					}),
-				);
-
-				const artifactGeneratorNode = state.graph.nodes.find(
-					(node) => node.id === artifact?.generatorNode.id,
-				);
-				if (artifactGeneratorNode?.isFinal) {
-					dispatch(
-						updateNode({
-							input: {
-								id: artifact.generatorNode.id,
-								isFinal: false,
-							},
-						}),
-					);
-					dispatch(
-						updateNode({
-							input: {
-								id: outgoingNode.id,
-								isFinal: true,
-							},
-						}),
-					);
-				}
-			}
-		} else if (args.source.object === "file") {
-			if (args.source.status === fileStatuses.uploading) {
-				const fileVercelBlob = await uploadFile({
-					file: args.source.file,
-					fileId: args.source.id,
-				});
-				dispatch(
-					updateNodeProperty({
-						node: {
-							id: args.promptNode.id,
-							property: {
-								key: "sources",
-								value: [
-									...currentSources,
-									{
-										...args.source,
-										blobUrl: fileVercelBlob.url,
-										status: fileStatuses.processing,
-									},
-								],
-							},
-						},
-					}),
-				);
-				const structuredDataVercelBlob = await parseFile({
-					id: args.source.id,
-					name: args.source.name,
-					blobUrl: fileVercelBlob.url,
-				});
-				dispatch(
-					updateNodeProperty({
-						node: {
-							id: args.promptNode.id,
-							property: {
-								key: "sources",
-								value: [
-									...currentSources,
-									{
-										...args.source,
-										blobUrl: fileVercelBlob.url,
-										structuredDataBlobUrl: structuredDataVercelBlob.url,
-										status: fileStatuses.processed,
-									},
-								],
-							},
-						},
-					}),
-				);
-			}
-		} else if (args.source.object === "webSearch") {
-			const webSearch = state.graph.webSearches.find(
-				(webSearch) => webSearch.id === args.source.id,
-			);
-			if (webSearch === undefined) {
-				return;
-			}
-			const outgoingConnectors = state.graph.connectors.filter(
-				({ source }) => source === args.promptNode.id,
-			);
-			for (const outgoingConnector of outgoingConnectors) {
-				const outgoingNode = state.graph.nodes.find(
-					(node) => node.id === outgoingConnector.target,
-				);
-				if (outgoingNode === undefined) {
-					continue;
-				}
-				const currentSourceHandleLength =
-					outgoingNode.parameters?.object === "objectParameter"
-						? Object.keys(outgoingNode.parameters.properties).filter((key) =>
-								key.startsWith("source"),
-							).length
-						: 0;
-				dispatch(
-					addParameterToNode({
-						node: {
-							id: outgoingConnector.target,
-						},
-						parameter: {
-							key: `source${currentSourceHandleLength + 1}`,
-							value: createStringParameter({
-								label: `Source${currentSourceHandleLength + 1}`,
-							}),
-						},
-					}),
-				);
-				dispatch(
-					v2AddConnector({
-						input: {
-							connector: buildConnector({
-								sourceNode: {
-									id: webSearch.generatorNode.id,
-									category: webSearch.generatorNode.category,
-									archetype: webSearch.generatorNode.archetype,
-								},
-								targetNode: {
-									id: outgoingConnector.target,
-									handle: `source${currentSourceHandleLength + 1}`,
-									category: outgoingConnector.targetNodeCategory,
-									archetype: outgoingNode.archetype,
-								},
-							}),
-						},
-					}),
-				);
-				const webSearchGeneratorNode = state.graph.nodes.find(
-					(node) => node.id === webSearch.generatorNode.id,
-				);
-				if (webSearchGeneratorNode?.isFinal) {
-					dispatch(
-						updateNode({
-							input: {
-								id: webSearchGeneratorNode.id,
-								isFinal: false,
-							},
-						}),
-					);
-					dispatch(
-						updateNode({
-							input: {
-								id: outgoingNode.id,
-								isFinal: true,
-							},
-						}),
-					);
-				}
-			}
-		}
-	};
-}
-
-type Source2 = ArtifactReference | TextContentReference | WebSearch;
-type RemoveSourceFromPromptNodeArgs = {
-	promptNode: {
-		id: GiselleNodeId;
-	};
-	source: Source2;
-};
-export function removeSourceFromPromptNode(
-	args: RemoveSourceFromPromptNodeArgs,
-): CompositeAction {
-	return (dispatch, getState) => {
-		const state = getState();
-		const targetNode = state.graph.nodes.find(
-			(node) => node.id === args.promptNode.id,
-		);
-		if (targetNode === undefined) {
-			return;
-		}
-		if (targetNode.archetype !== giselleNodeArchetypes.prompt) {
-			return;
-		}
-		const currentSources = targetNode.properties.sources ?? [];
-		if (!Array.isArray(currentSources)) {
-			throw new Error(`${targetNode.id}'s sources property is not an array`);
-		}
-
-		dispatch(
-			updateNodeProperty({
-				node: {
-					id: args.promptNode.id,
-					property: {
-						key: "sources",
-						value: currentSources.filter(
-							(currentSource) =>
-								typeof currentSource === "object" &&
-								currentSource !== null &&
-								typeof currentSource.id === "string" &&
-								currentSource.id !== args.source.id,
-						),
-					},
-				},
-			}),
-		);
-		if (args.source.object === "artifact.reference") {
-			const artifact = state.graph.artifacts.find(
-				(artifact) => artifact.id === args.source.id,
-			);
-			if (artifact === undefined) {
-				return;
-			}
-			const outgoingConnectors = state.graph.connectors.filter(
-				({ source }) => source === args.promptNode.id,
-			);
-			for (const outgoingConnector of outgoingConnectors) {
-				const outgoingNode = state.graph.nodes.find(
-					(node) => node.id === outgoingConnector.target,
-				);
-				if (outgoingNode === undefined) {
-					continue;
-				}
-				const artifactCreatorNodeToOutgoingNodeConnector =
-					state.graph.connectors.find(
-						(connector) =>
-							connector.target === outgoingNode.id &&
-							connector.source === artifact.generatorNode.id,
-					);
-				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
-					continue;
-				}
-				dispatch(
-					removeConnector({
-						connector: {
-							id: artifactCreatorNodeToOutgoingNodeConnector.id,
-						},
-					}),
-				);
-				dispatch(
-					removeParameterFromNode({
-						node: {
-							id: outgoingConnector.target,
-						},
-						parameter: {
-							key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
-						},
-					}),
-				);
-				if (outgoingNode?.isFinal) {
-					dispatch(
-						updateNode({
-							input: {
-								id: outgoingNode.id,
-								isFinal: false,
-							},
-						}),
-					);
-					dispatch(
-						updateNode({
-							input: {
-								id: artifact.generatorNode.id,
-								isFinal: true,
-							},
-						}),
-					);
-				}
-			}
-		} else if (args.source.object === "webSearch") {
-			const webSearch = state.graph.webSearches.find(
-				(webSearch) => webSearch.id === args.source.id,
-			);
-			if (webSearch === undefined) {
-				return;
-			}
-			const outgoingConnectors = state.graph.connectors.filter(
-				({ source }) => source === args.promptNode.id,
-			);
-			for (const outgoingConnector of outgoingConnectors) {
-				const outgoingNode = state.graph.nodes.find(
-					(node) => node.id === outgoingConnector.target,
-				);
-				if (outgoingNode === undefined) {
-					continue;
-				}
-				const artifactCreatorNodeToOutgoingNodeConnector =
-					state.graph.connectors.find(
-						(connector) =>
-							connector.target === outgoingNode.id &&
-							connector.source === webSearch.generatorNode.id,
-					);
-				if (artifactCreatorNodeToOutgoingNodeConnector === undefined) {
-					continue;
-				}
-				dispatch(
-					removeConnector({
-						connector: {
-							id: artifactCreatorNodeToOutgoingNodeConnector.id,
-						},
-					}),
-				);
-				dispatch(
-					removeParameterFromNode({
-						node: {
-							id: outgoingConnector.target,
-						},
-						parameter: {
-							key: artifactCreatorNodeToOutgoingNodeConnector.targetHandle,
-						},
-					}),
-				);
-				if (outgoingNode?.isFinal) {
-					dispatch(
-						updateNode({
-							input: {
-								id: outgoingNode.id,
-								isFinal: false,
-							},
-						}),
-					);
-					dispatch(
-						updateNode({
-							input: {
-								id: webSearch.generatorNode.id,
-								isFinal: true,
-							},
-						}),
-					);
-				}
-			}
-		}
-	};
-}
-
 type RemoveNodeAction = {
 	type: "removeNode";
 	payload: RemoveNodeArgs;
@@ -1273,85 +731,6 @@ export function removeNode(args: RemoveNodeArgs): RemoveNodeAction {
 	return {
 		type: "removeNode",
 		payload: args,
-	};
-}
-
-export function removeSelectedNodesOrFeedback(): CompositeAction {
-	return (dispatch, getState) => {
-		const state = getState();
-		const selectedNodes = state.graph.nodes.filter((node) => node.ui.selected);
-		if (selectedNodes.length < 1) {
-			return;
-		}
-		const onlyDeletableNodesSelected = selectedNodes.every((selectedNode) => {
-			switch (selectedNode.archetype) {
-				case giselleNodeArchetypes.prompt:
-					return true;
-				case giselleNodeArchetypes.textGenerator:
-					return true;
-				case giselleNodeArchetypes.webSearch:
-					return true;
-			}
-		});
-		if (!onlyDeletableNodesSelected) {
-			/** @todo set ui state to present feedback dialog */
-			return;
-		}
-		// List of artifacts that are created by the selected nodes
-		const relatedArtifacts = state.graph.artifacts.filter((artifact) =>
-			selectedNodes.some(
-				(selectedNode) => selectedNode.id === artifact.generatorNode.id,
-			),
-		);
-		for (const relatedArtifact of relatedArtifacts) {
-			// List of prompt nodes that depend on the artifact
-			const promptNodesDependedOnByArtifact = state.graph.nodes.filter(
-				(node) =>
-					Array.isArray(node.properties.sources) &&
-					node.properties.sources.includes(relatedArtifact.id),
-			);
-			for (const promptNodeDependedOnByArtifact of promptNodesDependedOnByArtifact) {
-				if (!Array.isArray(promptNodeDependedOnByArtifact.properties.sources)) {
-					continue;
-				}
-				dispatch(
-					removeSourceFromPromptNode({
-						promptNode: {
-							id: promptNodeDependedOnByArtifact.id,
-						},
-						source: { id: relatedArtifact.id, object: "artifact.reference" },
-					}),
-				);
-			}
-			dispatch(removeArtifact({ artifact: { id: relatedArtifact.id } }));
-		}
-		const relatedConnectors = state.graph.connectors.filter(
-			(connector) =>
-				selectedNodes.some(
-					(selectedNode) => selectedNode.id === connector.source,
-				) ||
-				selectedNodes.some(
-					(selectedNode) => selectedNode.id === connector.target,
-				),
-		);
-		for (const relatedConnector of relatedConnectors) {
-			dispatch(
-				removeConnector({
-					connector: {
-						id: relatedConnector.id,
-					},
-				}),
-			);
-		}
-		for (const selectedNode of selectedNodes) {
-			dispatch(
-				removeNode({
-					node: {
-						id: selectedNode.id,
-					},
-				}),
-			);
-		}
 	};
 }
 
@@ -1373,8 +752,6 @@ export type GraphAction =
 	| AddNodeAction
 	| RemoveNodeAction
 	| AddConnectorAction
-	| RemoveConnectorAction
-	| SelectNodeAction
 	| SetPanelTabAction
 	| UpdateNodePropertyAction
 	| UpdateNodesUIAction
@@ -1383,8 +760,6 @@ export type GraphAction =
 	| UpdateNodeStateAction
 	| AddOrReplaceArtifactAction
 	| RemoveArtifactAction
-	| AddParameterToNodeAction
-	| RemoveParameterFromNodeAction
 	| UpsertWebSearchAction
 	| V2NodeAction
 	| V2ModeAction

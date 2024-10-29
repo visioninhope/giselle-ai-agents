@@ -3,29 +3,14 @@ import {
 	type EdgeChange,
 	type NodeChange,
 	type OnNodeDrag,
-	type OnSelectionChangeFunc,
 	applyEdgeChanges,
 	applyNodeChanges,
-	useOnSelectionChange,
-	useReactFlow,
 } from "@xyflow/react";
-import { type KeyboardEventHandler, useCallback, useEffect } from "react";
+import { useCallback } from "react";
 import type { ConnectorId } from "../connector/types";
-import { setNodes } from "../giselle-node/actions";
-import {
-	type GiselleNodeId,
-	assertGiselleNodeId,
-	panelTabs,
-} from "../giselle-node/types";
-import {
-	addConnector,
-	removeSelectedNodesOrFeedback,
-	selectNode,
-	selectNodeAndSetPanelTab,
-	updateNodesUI,
-} from "../graph/actions";
+import { type GiselleNodeId, assertGiselleNodeId } from "../giselle-node/types";
+import { addConnector, updateNodesUI } from "../graph/actions";
 import { useGraph } from "../graph/context";
-import type { Graph } from "../graph/types";
 import { removeConnector } from "../graph/v2/composition/remove-connector";
 import { removeNode } from "../graph/v2/composition/remove-node";
 import { setXyFlowEdges, setXyFlowNodes } from "../graph/v2/xy-flow";
@@ -182,30 +167,3 @@ export const useNodeEventHandler = () => {
 		handleNodeDragStop,
 	};
 };
-
-export function useKeyUpHandler() {
-	const { dispatch } = useGraph();
-	const handleKeyUp = useCallback<KeyboardEventHandler>(
-		(event) => {
-			switch (event.code) {
-				case "Backspace": {
-					const isInputElement =
-						event.target instanceof HTMLInputElement ||
-						event.target instanceof HTMLTextAreaElement;
-
-					// Skip the following process if the focus is on the input element.
-					if (isInputElement) {
-						return;
-					}
-					dispatch(removeSelectedNodesOrFeedback());
-					break;
-				}
-			}
-		},
-		[dispatch],
-	);
-
-	return {
-		handleKeyUp,
-	};
-}

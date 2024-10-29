@@ -72,20 +72,6 @@ export const graphReducer = (
 					connectors: [...state.graph.connectors, action.payload.connector],
 				},
 			};
-		case "selectNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) => ({
-						...node,
-						ui: {
-							...node.ui,
-							selected: action.payload.selectedNodeIds.includes(node.id),
-						},
-					})),
-				},
-			};
 		case "setPanelTab":
 			return {
 				...state,
@@ -119,28 +105,6 @@ export const graphReducer = (
 								...node.properties,
 								[action.payload.node.property.key]:
 									action.payload.node.property.value,
-							},
-						};
-					}),
-				},
-			};
-		case "updateNodesUI":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((currentNode) => {
-						const updateNode = action.payload.nodes.find(
-							(payloadNode) => payloadNode.id === currentNode.id,
-						);
-						if (updateNode == null) {
-							return currentNode;
-						}
-						return {
-							...currentNode,
-							ui: {
-								...currentNode.ui,
-								...updateNode.ui,
 							},
 						};
 					}),
@@ -203,66 +167,6 @@ export const graphReducer = (
 				},
 			};
 		}
-		case "addParameterToNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) =>
-						node.id !== action.payload.node.id
-							? node
-							: {
-									...node,
-									parameters:
-										node.parameters?.object === "objectParameter"
-											? {
-													...node.parameters,
-													properties: {
-														...node.parameters.properties,
-														[action.payload.parameter.key]:
-															action.payload.parameter.value,
-													},
-												}
-											: node.parameters,
-								},
-					),
-				},
-			};
-		case "removeParameterFromNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) =>
-						node.id !== action.payload.node.id
-							? node
-							: {
-									...node,
-									parameters:
-										node.parameters?.object === "objectParameter"
-											? {
-													...node.parameters,
-													properties: Object.fromEntries(
-														Object.entries(node.parameters.properties).filter(
-															([key]) => key !== action.payload.parameter.key,
-														),
-													),
-												}
-											: node.parameters,
-								},
-					),
-				},
-			};
-		case "removeConnector":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					connectors: state.graph.connectors.filter(
-						(connector) => connector.id !== action.payload.connector.id,
-					),
-				},
-			};
 		case "removeNode":
 			return {
 				...state,

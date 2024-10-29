@@ -4,14 +4,12 @@ import { parseFile, uploadFile } from "../../../files/server-actions";
 import {
 	type GiselleFile,
 	type ProcessedFile,
-	type StructuredData,
 	fileStatuses,
 } from "../../../files/types";
 import { createStringParameter } from "../../../giselle-node/parameter/factory";
 import type { GiselleNodeId } from "../../../giselle-node/types";
 import type { TextContent } from "../../../text-content/types";
 import type { WebSearch } from "../../../web-search/types";
-import { removeParameterFromNode, updateNodeProperty } from "../../actions";
 import type { CompositeAction } from "../../context";
 import { addConnector } from "./add-connector";
 import { updateNode } from "./update-node";

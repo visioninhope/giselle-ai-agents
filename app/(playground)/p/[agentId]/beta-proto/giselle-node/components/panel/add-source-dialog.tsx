@@ -14,7 +14,6 @@ import {
 import { DocumentIcon } from "../../../components/icons/document";
 import { useFeatureFlags } from "../../../feature-flags/context";
 import { createFileId } from "../../../files/utils";
-import { addSourceToPromptNode } from "../../../graph/actions";
 import { useGraph } from "../../../graph/context";
 import { addSource } from "../../../graph/v2/composition/add-source";
 import { createTextContentId } from "../../../text-content/factory";
