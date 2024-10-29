@@ -3,15 +3,9 @@ import { ClickableText } from "@/components/ui/clicable-text";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
 import { ActionPrompt } from "../components/action-prompt";
-/**
-@todo Hide at the time of beta release.
 import { Divider } from "../components/divider";
-*/
 import { LegalConsent } from "../components/legal-consent";
-/**
-@todo Hide at the time of beta release.
 import { OAuthProviders } from "../components/oauth-providers";
-*/
 import { PageHeader } from "../components/page-header";
 
 export default function SignupPage() {
@@ -33,11 +27,8 @@ export default function SignupPage() {
 			</div>
 			<div className="mt-8 space-y-6 w-[320px]">
 				<PageHeader title="Get Started for free" />
-				{/**
-		    @todo Hide at the time of beta release.
-				<OAuthProviders />
+				<OAuthProviders labelPrefix="Sign up" />
 				<Divider label="or" />
-				*/}
 				<Button asChild>
 					<Link href="/signup/email">
 						<p>Sign up for Email</p>

@@ -25,7 +25,7 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 		<Button asChild variant="link">
 			<Link href="/signup/github">
 				<SiGithub className="h-[20px] w-[20px]" />
-				<p>{labelPrefix} GitHub</p>
+				<p>{labelPrefix} with GitHub</p>
 			</Link>
 		</Button>
 	</div>

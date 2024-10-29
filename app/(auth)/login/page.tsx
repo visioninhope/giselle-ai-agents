@@ -13,7 +13,7 @@ export default function Page() {
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<PageTitle>Log in to Giselle</PageTitle>
 					<div className="grid gap-[16px]">
-						<OAuthProviders labelPrefix="Continue with" />
+						<OAuthProviders labelPrefix="Continue" />
 						<Divider />
 						<LoginForm />
 
