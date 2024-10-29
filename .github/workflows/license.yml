@@ -65,10 +65,14 @@ jobs:
 
       # Commit the License Finder report as docs/packages-license.md
       - name: Generate license report
-        if: steps.determine.outputs.files_changed == 'true' && github.ref_name != github.event.repository.default_branch
+        if: |
+          steps.determine.outputs.files_changed == 'true'
+          && github.ref_name != github.event.repository.default_branch
         run: license_finder report --format=markdown | tail -n +2 > "$LICENSE_REPORT"
       - name: Commit license report and push
-        if: steps.determine.outputs.files_changed == 'true' && github.ref_name != github.event.repository.default_branch
+        if: |
+          steps.determine.outputs.files_changed == 'true'
+          && github.ref_name != github.event.repository.default_branch
         run: |
           git config user.name 'github-actions[bot]'
           git config user.email 'github-actions[bot]@users.noreply.github.com'
