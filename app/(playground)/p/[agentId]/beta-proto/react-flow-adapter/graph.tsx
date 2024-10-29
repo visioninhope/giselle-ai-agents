@@ -23,7 +23,10 @@ export const useReactFlowNodeEventHandler = () => {
 	const handleNodesChange = useCallback(
 		(changes: NodeChange<ReactFlowNode>[]) => {
 			const filteredChanges = changes.filter(
-				(change) => change.type !== "remove" && change.type !== "select",
+				(change) =>
+					change.type !== "remove" &&
+					change.type !== "select" &&
+					change.type !== "position",
 			);
 			if (filteredChanges.length > 0) {
 				dispatch(
@@ -44,6 +47,15 @@ export const useReactFlowNodeEventHandler = () => {
 							input: {
 								nodeId: change.id as GiselleNodeId,
 								ui: { selected: change.selected },
+							},
+						}),
+					);
+				} else if (change.type === "position") {
+					dispatch(
+						updateNode({
+							input: {
+								nodeId: change.id as GiselleNodeId,
+								ui: { position: change.position },
 							},
 						}),
 					);

@@ -45,6 +45,7 @@ export function updateNode({
 							: {
 									...xyFlowNode,
 									selected: input.ui?.selected ?? xyFlowNode.selected,
+									position: input.ui?.position ?? xyFlowNode.position,
 									data: {
 										...xyFlowNode.data,
 										isFinal: input.isFinal ?? xyFlowNode.data.isFinal,
