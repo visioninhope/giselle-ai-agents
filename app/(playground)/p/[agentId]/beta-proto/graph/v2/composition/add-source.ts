@@ -57,6 +57,11 @@ export function addSource({
 				input,
 			}),
 		);
+		dispatch(
+			uploadSource({
+				input,
+			}),
+		);
 	};
 }
 

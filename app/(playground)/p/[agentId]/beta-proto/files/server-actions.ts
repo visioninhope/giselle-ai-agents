@@ -1,3 +1,5 @@
+"use server";
+
 import { put } from "@vercel/blob";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";

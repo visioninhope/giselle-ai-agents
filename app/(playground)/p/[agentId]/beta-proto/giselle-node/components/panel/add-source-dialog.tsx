@@ -67,16 +67,16 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 		(files: File[]) => {
 			for (const file of files) {
 				dispatch(
-					addSourceToPromptNode({
-						promptNode: {
-							id: props.node.id,
-						},
-						source: {
-							object: "file",
-							name: file.name,
-							id: createFileId(),
-							status: "uploading",
-							file,
+					addSource({
+						input: {
+							nodeId: props.node.id,
+							source: {
+								object: "file",
+								name: file.name,
+								id: createFileId(),
+								status: "uploading",
+								file,
+							},
 						},
 					}),
 				);
@@ -108,9 +108,6 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 		[addFilesToPromptNode],
 	);
 
-	const removeFile = useCallback((fileToRemove: File) => {
-		setFiles((prevFiles) => prevFiles.filter((file) => file !== fileToRemove));
-	}, []);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger>
