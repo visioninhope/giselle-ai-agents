@@ -17,16 +17,13 @@ export default function SignupPage() {
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Unleash Your Potential
-					<br />- Free of Charge.
 				</h2>
 				<p className="text-[18px] font-avenir leading-[30.6px] tracking-tighter text-left text-black-70">
 					• Easy setup, no coding required
-					<br />• Free forever for core features
-					<br />• 14-day trial of premium features & apps
 				</p>
 			</div>
 			<div className="mt-8 space-y-6 w-[320px]">
-				<PageHeader title="Get Started for free" />
+				<PageHeader title="Get Started" />
 				<OAuthProviders labelPrefix="Sign up" />
 				<Divider label="or" />
 				<Button asChild>
