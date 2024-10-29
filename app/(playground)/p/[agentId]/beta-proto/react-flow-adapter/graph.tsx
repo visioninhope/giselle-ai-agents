@@ -13,6 +13,7 @@ import { addConnector, updateNodesUI } from "../graph/actions";
 import { useGraph } from "../graph/context";
 import { removeConnector } from "../graph/v2/composition/remove-connector";
 import { removeNode } from "../graph/v2/composition/remove-node";
+import { updateNode } from "../graph/v2/composition/update-node";
 import { setXyFlowEdges, setXyFlowNodes } from "../graph/v2/xy-flow";
 import type { ReactFlowEdge, ReactFlowNode } from "./types";
 
@@ -21,15 +22,15 @@ export const useReactFlowNodeEventHandler = () => {
 
 	const handleNodesChange = useCallback(
 		(changes: NodeChange<ReactFlowNode>[]) => {
-			const nonRemovedChanges = changes.filter(
-				(change) => change.type !== "remove",
+			const filteredChanges = changes.filter(
+				(change) => change.type !== "remove" && change.type !== "select",
 			);
-			if (nonRemovedChanges.length > 0) {
+			if (filteredChanges.length > 0) {
 				dispatch(
 					setXyFlowNodes({
 						input: {
 							xyFlowNodes: applyNodeChanges(
-								nonRemovedChanges,
+								filteredChanges,
 								state.graph.xyFlow.nodes,
 							),
 						},
@@ -39,13 +40,11 @@ export const useReactFlowNodeEventHandler = () => {
 			changes.map((change) => {
 				if (change.type === "select") {
 					dispatch(
-						updateNodesUI({
-							nodes: [
-								{
-									id: change.id as GiselleNodeId,
-									ui: { selected: change.selected },
-								},
-							],
+						updateNode({
+							input: {
+								nodeId: change.id as GiselleNodeId,
+								ui: { selected: change.selected },
+							},
 						}),
 					);
 				} else if (change.type === "remove") {
