@@ -9,12 +9,12 @@ import type { GiselleNode } from "../giselle-node/types";
 import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
 import {
-	type WebSearch,
 	type WebSearchItem,
+	type WebSearch as WebSearchReference,
 	webSearchItemStatus,
 	webSearchStatus,
 } from "../web-search/types";
-import type { Source, SourceIndex } from "./types";
+import type { Source, SourceIndex, WebSearch } from "./types";
 
 interface SourceIndexesToSourcesInput {
 	agentId: AgentId;
@@ -187,7 +187,7 @@ export function extractSourceIndexesFromNode(node: GiselleNode): SourceIndex[] {
 					items: source.items,
 					generatorNode: source.generatorNode,
 					status: webSearchStatus.completed,
-				} satisfies WebSearch;
+				} satisfies WebSearchReference;
 			}
 			return null;
 		})
