@@ -154,7 +154,6 @@ export const addNodesAndConnect = (
 ): CompositeAction => {
 	return (dispatch, getState) => {
 		const state = getState();
-		const hasFinalNode = state.graph.nodes.some((node) => node.isFinal);
 		const currentNodes = getState().graph.nodes;
 		const addSourceNode = buildGiselleNode({
 			...args.sourceNode,
@@ -163,7 +162,7 @@ export const addNodesAndConnect = (
 		dispatch(v2AddNode({ input: { node: addSourceNode } }));
 		const addTargetNode = buildGiselleNode({
 			...args.targetNode,
-			isFinal: !hasFinalNode,
+			isFinal: true,
 			name: `Untitled node - ${currentNodes.length + 2}`,
 		});
 		dispatch(v2AddNode({ input: { node: addTargetNode } }));
