@@ -1,8 +1,20 @@
 import { db } from "@/drizzle";
-import { type StructuredData, fileStatuses } from "../files/types";
+import type { ArtifactReference } from "../artifact/types";
+import {
+	type GiselleFile,
+	type StructuredData,
+	fileStatuses,
+} from "../files/types";
+import type { GiselleNode } from "../giselle-node/types";
+import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
-import { type WebSearchItem, webSearchItemStatus } from "../web-search/types";
-import type { Source, SourceIndex, WebSearch } from "./types";
+import {
+	type WebSearch,
+	type WebSearchItem,
+	webSearchItemStatus,
+	webSearchStatus,
+} from "../web-search/types";
+import type { Source, SourceIndex } from "./types";
 
 interface SourceIndexesToSourcesInput {
 	agentId: AgentId;
@@ -111,4 +123,73 @@ ${sources
 				: "",
 	)
 	.join("\n")}`;
+}
+
+export function extractSourceIndexesFromNode(node: GiselleNode): SourceIndex[] {
+	if (!Array.isArray(node.properties.sources)) {
+		return [];
+	}
+	return node.properties.sources
+		.map((source) => {
+			if (
+				typeof source !== "object" ||
+				source === null ||
+				typeof source.id !== "string" ||
+				typeof source.object !== "string"
+			) {
+				return null;
+			}
+
+			if (source.object === "textContent") {
+				return {
+					id: source.id as TextContentId,
+					object: "textContent",
+					title: source.title as string,
+					content: source.content as string,
+				} satisfies TextContent;
+			}
+			if (source.object === "artifact.reference") {
+				return {
+					object: "artifact.reference",
+					id: source.id,
+				} satisfies ArtifactReference;
+			}
+			if (source.object === "file") {
+				if (
+					typeof source.status !== "string" ||
+					source.status !== fileStatuses.processed ||
+					typeof source.structuredDataBlobUrl !== "string" ||
+					typeof source.name !== "string"
+				) {
+					return null;
+				}
+				return {
+					object: "file",
+					id: source.id,
+					blobUrl: source.blobUrl,
+					structuredDataBlobUrl: source.structuredDataBlobUrl,
+					name: source.name,
+					status: "processed",
+				} satisfies GiselleFile;
+			}
+			if (source.object === "webSearch") {
+				if (
+					typeof source.status !== "string" ||
+					source.status !== webSearchStatus.completed ||
+					Array.isArray(source.items)
+				) {
+					return null;
+				}
+				return {
+					object: "webSearch",
+					id: source.id,
+					name: source.name,
+					items: source.items,
+					generatorNode: source.generatorNode,
+					status: webSearchStatus.completed,
+				} satisfies WebSearch;
+			}
+			return null;
+		})
+		.filter((sourceIndex) => sourceIndex !== null);
 }

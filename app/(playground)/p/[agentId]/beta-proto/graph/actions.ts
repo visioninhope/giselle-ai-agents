@@ -41,6 +41,7 @@ import {
 	giselleNodeToGiselleNodeArtifactElement,
 } from "../giselle-node/utils";
 import type { SourceIndex } from "../source/types";
+import { extractSourceIndexesFromNode } from "../source/utils";
 import type { TextContent, TextContentId } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
 import {
@@ -463,81 +464,6 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		const sourceIndexes: SourceIndex[] = [];
-		if (Array.isArray(instructionNode.properties.sources)) {
-			for (const source of instructionNode.properties.sources) {
-				if (
-					typeof source !== "object" ||
-					source === null ||
-					typeof source.id !== "string" ||
-					typeof source.object !== "string"
-				) {
-					continue;
-				}
-				if (source.object === "textContent") {
-					sourceIndexes.push({
-						id: source.id as TextContentId,
-						object: "textContent",
-						title: source.title as string,
-						content: source.content as string,
-					});
-				} else if (source.object === "artifact.reference") {
-					const artifact = state.graph.artifacts.find(
-						(artifact) => artifact.id === source.id,
-					);
-					if (artifact !== undefined) {
-						sourceIndexes.push({
-							object: "artifact.reference",
-							id: artifact.id,
-						});
-					}
-				} else if (source.object === "file") {
-					if (
-						typeof source.status === "string" &&
-						source.status === fileStatuses.processed &&
-						typeof source.structuredDataBlobUrl === "string" &&
-						typeof source.name === "string"
-					) {
-						const structuredData = await fetch(
-							source.structuredDataBlobUrl,
-						).then((res) => res.text());
-						sourceIndexes.push({
-							object: "file",
-							id: source.id,
-							blobUrl: source.blobUrl,
-							structuredDataBlobUrl: source.structuredDataBlobUrl,
-							name: source.name,
-							status: "processed",
-						});
-					}
-				} else if (source.object === "webSearch") {
-					if (
-						typeof source.status === "string" &&
-						source.status === webSearchStatus.completed &&
-						Array.isArray(source.items)
-					) {
-						sourceIndexes.push({
-							object: "webSearch",
-							id: source.id,
-							name: source.name,
-							items: source.items,
-							generatorNode: source.generatorNode,
-							status: "completed",
-						});
-						await Promise.all(
-							(source.items as WebSearchItemReference[]).map(async (item) => {
-								if (item.status === webSearchItemStatus.completed) {
-									const webSearchData = await fetch(item.contentBlobUrl).then(
-										(res) => res.text(),
-									);
-								}
-							}),
-						);
-					}
-				}
-			}
-		}
-
 		const node = state.graph.nodes.find(
 			(node) => node.id === args.textGeneratorNode.id,
 		);
@@ -545,6 +471,8 @@ export const generateText =
 			/** @todo error handling  */
 			throw new Error("Node not found");
 		}
+
+		const sourceIndexes = extractSourceIndexesFromNode(node);
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
 				const { object } = await generateArtifactStream({
