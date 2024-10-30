@@ -1,5 +1,6 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
+import { generateArtifactStream } from "../artifact/server-actions";
 import type { Artifact, ArtifactId } from "../artifact/types";
 import type { PartialGeneratedObject } from "../artifact/types";
 import type { V2ConnectorAction } from "../connector/actions";
@@ -50,7 +51,6 @@ import {
 	webSearchStatus,
 } from "../web-search/types";
 import type { CompositeAction } from "./context";
-import { generateArtifactStream } from "./server-actions";
 import { addConnector as v2AddConnector } from "./v2/composition/add-connector";
 import { addNode as v2AddNode } from "./v2/composition/add-node";
 import { updateNode as v2UpdateNode } from "./v2/composition/update-node";
