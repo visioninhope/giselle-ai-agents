@@ -4,13 +4,21 @@ import {
 	type GiselleNodeId,
 	giselleNodeCategories,
 } from "../giselle-node/types";
+import type { Graph } from "../graph/types";
+import type { AgentId } from "../types";
 import {
+	type Flow,
 	type FlowActionId,
 	type FlowActionLayer,
 	type FlowActionLayerId,
 	type FlowId,
+	type InitializingFlow,
+	type InitializingFlowIndex,
+	type QueuedFlowIndex,
+	type RunningFlowIndex,
 	flowActionLayerStatuses,
 	flowActionStatuses,
+	flowStatuses,
 } from "./types";
 
 export const createFlowId = (): FlowId => `flw_${createId()}`;
@@ -116,4 +124,54 @@ export function resolveActionLayers(
 	}
 
 	return result;
+}
+
+interface BuildFlowInput {
+	agentId: AgentId;
+	finalNodeId: GiselleNodeId;
+	graph: Pick<Graph, "nodes" | "connectors">;
+}
+export function buildFlow({ input }: { input: BuildFlowInput }) {
+	const actionLayers = resolveActionLayers(
+		input.graph.connectors,
+		input.finalNodeId,
+	);
+	return {
+		id: createFlowId(),
+		object: "flow",
+		agentId: input.agentId,
+		status: flowStatuses.initializing,
+		finalNodeId: input.finalNodeId,
+		graph: {
+			nodes: input.graph.nodes,
+			connectors: input.graph.connectors,
+		},
+		actionLayers,
+	} satisfies InitializingFlow;
+}
+
+export function buildFlowIndex({ input }: { input: Flow }) {
+	if (input.status === flowStatuses.initializing) {
+		return {
+			object: "flow.index",
+			id: input.id,
+			status: flowStatuses.initializing,
+		} satisfies InitializingFlowIndex;
+	}
+	if (input.status === flowStatuses.queued) {
+		return {
+			object: "flow.index",
+			id: input.id,
+			status: flowStatuses.queued,
+		} satisfies QueuedFlowIndex;
+	}
+	if (input.status === flowStatuses.running) {
+		return {
+			object: "flow.index",
+			id: input.id,
+			status: flowStatuses.running,
+			dataUrl: input.dataUrl,
+		} satisfies RunningFlowIndex;
+	}
+	throw new Error("Invalid flow status");
 }

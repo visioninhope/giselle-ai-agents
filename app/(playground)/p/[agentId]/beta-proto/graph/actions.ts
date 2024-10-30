@@ -8,7 +8,7 @@ import { createConnectorId } from "../connector/factory";
 import type { ConnectorId, ConnectorObject } from "../connector/types";
 import { buildConnector } from "../connector/utils";
 import { type StructuredData, fileStatuses } from "../files/types";
-import type { V2FlowAction } from "../flow/action";
+import type { V2FlowAction, V2FlowIndexAction } from "../flow/action";
 import type { V2NodeAction } from "../giselle-node/actions";
 import {
 	type GiselleNodeArchetype,
@@ -673,6 +673,7 @@ export type GraphAction =
 	| UpsertWebSearchAction
 	| V2NodeAction
 	| V2ModeAction
-	| V2FlowAction
+	| V2FlowIndexAction
 	| V2XyFlowAction
-	| V2ConnectorAction;
+	| V2ConnectorAction
+	| V2FlowAction;

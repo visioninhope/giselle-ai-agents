@@ -1,6 +1,7 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
+import { put } from "@vercel/blob";
 import { eq } from "drizzle-orm";
 import type { Artifact } from "../artifact/types";
 import { type StructuredData, fileStatuses } from "../files/types";
@@ -22,6 +23,7 @@ import {
 	webSearchItemStatus,
 	webSearchStatus,
 } from "../web-search/types";
+import type { Flow } from "./types";
 
 type Source = Artifact | TextContent | StructuredData | WebSearchItem;
 interface GatherInstructionSourcesInput {
@@ -156,4 +158,19 @@ async function generateText() {
 
 async function webSearch() {
 	console.log("\x1b[33m\x1b[1mTODO:\x1b[0m Implement websearch functionality");
+}
+
+interface PutFlowInput {
+	flow: Flow;
+}
+export async function putFlow({ input }: { input: PutFlowInput }) {
+	const blob = await put(
+		`/flows/${input.flow.id}/flow.json`,
+		JSON.stringify(input.flow),
+		{
+			access: "public",
+			contentType: "application/json",
+		},
+	);
+	return blob;
 }

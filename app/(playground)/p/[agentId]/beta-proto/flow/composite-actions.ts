@@ -2,20 +2,35 @@ import type { GiselleNode } from "../giselle-node/types";
 import type { CompositeAction } from "../graph/context";
 import { playgroundModes } from "../graph/types";
 import { updateMode } from "../graph/v2/mode";
-import { setFlow } from "./action";
-import { runAction } from "./server-action";
+import { setFlow, setFlowIndexes } from "./action";
+import { putFlow, runAction } from "./server-action";
 import { flowStatuses } from "./types";
-import { createFlowActionId, createFlowId, resolveActionLayers } from "./utils";
+import {
+	buildFlow,
+	buildFlowIndex,
+	createFlowActionId,
+	createFlowId,
+	resolveActionLayers,
+} from "./utils";
 
 export function runFlow(finalNode: GiselleNode): CompositeAction {
 	return async (dispatch, getState) => {
 		const state = getState();
+		const flow = buildFlow({
+			input: {
+				agentId: state.graph.agentId,
+				finalNodeId: finalNode.id,
+				graph: state.graph,
+			},
+		});
+		dispatch(setFlow({ input: { flow } }));
 		dispatch(
-			setFlow({
+			setFlowIndexes({
 				input: {
-					id: createFlowId(),
-					status: flowStatuses.queued,
-					finalNodeId: finalNode.id,
+					flowIndexes: [
+						...getState().graph.flowIndexes,
+						buildFlowIndex({ input: flow }),
+					],
 				},
 			}),
 		);
@@ -26,21 +41,30 @@ export function runFlow(finalNode: GiselleNode): CompositeAction {
 				},
 			}),
 		);
-		const actionLayers = resolveActionLayers(
-			state.graph.connectors,
-			finalNode.id,
-		);
+		const blob = await putFlow({ input: { flow } });
 		dispatch(
 			setFlow({
 				input: {
-					id: createFlowId(),
-					status: flowStatuses.running,
-					finalNodeId: finalNode.id,
-					actionLayers,
+					flow: {
+						...flow,
+						status: flowStatuses.queued,
+						dataUrl: blob.url,
+					},
 				},
 			}),
 		);
-		for (const actionLayer of actionLayers) {
+		dispatch(
+			setFlowIndexes({
+				input: {
+					flowIndexes: getState().graph.flowIndexes.map((flowIndex) =>
+						flowIndex.id === flow.id
+							? buildFlowIndex({ input: flow })
+							: flowIndex,
+					),
+				},
+			}),
+		);
+		for (const actionLayer of flow.actionLayers) {
 			await Promise.all(
 				actionLayer.actions.map(async (action) => {
 					await runAction({
