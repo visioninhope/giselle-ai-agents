@@ -16,11 +16,13 @@ import { Strategy } from "unstructured-client/sdk/models/shared";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { FileId } from "../files/types";
 import type { SourceIndex } from "../source/types";
+import { sourceIndexesToSources } from "../source/utils";
 import type { AgentId } from "../types";
 import { elementsToMarkdown } from "../utils/unstructured";
 import type { Graph } from "./types";
 
 type GenerateArtifactStreamParams = {
+	agentId: AgentId;
 	userPrompt: string;
 	systemPrompt?: string;
 	sourceIndexes: SourceIndex[];
@@ -31,6 +33,12 @@ export async function generateArtifactStream(
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
+	});
+	const sources = sourceIndexesToSources({
+		input: {
+			agentId: params.agentId,
+			sourceIndexes: params.sourceIndexes,
+		},
 	});
 	const stream = createStreamableValue();
 

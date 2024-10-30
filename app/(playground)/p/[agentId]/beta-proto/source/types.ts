@@ -14,7 +14,7 @@ export type SourceIndex =
 	| GiselleFile
 	| TextContent;
 
-interface WebSearch {
+export interface WebSearch {
 	id: WebSearchId;
 	object: "webSearch";
 	name: string;

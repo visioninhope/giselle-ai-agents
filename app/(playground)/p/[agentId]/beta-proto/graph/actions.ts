@@ -577,6 +577,7 @@ ${instructionSources.map((source) => (source.object === "webSearch.item" ? `<Web
 						: undefined;
 
 				const { object } = await generateArtifactStream({
+					agentId: getState().graph.agentId,
 					userPrompt: instructionNode.output as string,
 					systemPrompt,
 					sourceIndexes,
