@@ -1,8 +1,10 @@
+"use server";
+
 import { getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
-export async function GET(_request: Request) {
+export async function authorizeGitHub() {
 	const supabase = await createClient();
 
 	const { data, error } = await supabase.auth.signInWithOAuth({

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { SiGithub, SiGoogle } from "@icons-pack/react-simple-icons";
-import Link from "next/link";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { FC } from "react";
+import { authorizeGitHub } from "../signup/actions";
 
 type OauthProvidersProps = {
 	labelPrefix: string;
@@ -23,10 +23,12 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 						</button>**/}
 
 		<Button asChild variant="link">
-			<Link href="/signup/github">
+			<form>
 				<SiGithub className="h-[20px] w-[20px]" />
-				<p>{labelPrefix} with GitHub</p>
-			</Link>
+				<button type="submit" formAction={authorizeGitHub}>
+					{labelPrefix} with GitHub
+				</button>
+			</form>
 		</Button>
 	</div>
 );
