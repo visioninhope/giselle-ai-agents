@@ -1,11 +1,11 @@
 # giselle
 
-As of October 24, 2024 10:30am. 926 total
+As of October 30, 2024  7:53am. 936 total
 
 ## Summary
-* 667 MIT
-* 135 Apache 2.0
-* 64 ISC
+* 675 MIT
+* 136 Apache 2.0
+* 65 ISC
 * 24 New BSD
 * 12 Simplified BSD
 * 4 (MIT OR CC0-1.0)
@@ -895,6 +895,94 @@ Get the status of a file with some features
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 A library for efficiently walking a directory recursively
+
+<a name="@octokit/auth-token"></a>
+### @octokit/auth-token v5.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub API token authentication for browsers and Node.js
+
+<a name="@octokit/core"></a>
+### @octokit/core v6.1.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Extendable client for GitHub's REST & GraphQL APIs
+
+<a name="@octokit/endpoint"></a>
+### @octokit/endpoint v10.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Turns REST API endpoints into generic request options
+
+<a name="@octokit/graphql"></a>
+### @octokit/graphql v8.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub GraphQL API client for browsers and Node
+
+<a name="@octokit/openapi-types"></a>
+### @octokit/openapi-types v22.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Generated TypeScript definitions based on GitHub's OpenAPI spec for api.github.com
+
+<a name="@octokit/request"></a>
+### @octokit/request v9.1.3 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Send parameterized requests to GitHub's APIs with sensible defaults in browsers and Node
+
+<a name="@octokit/request-error"></a>
+### @octokit/request-error v6.1.5 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Error class for Octokit request errors
+
+<a name="@octokit/types"></a>
+### @octokit/types v13.6.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Shared TypeScript definitions for Octokit projects
 
 <a name="@open-draft/deferred-promise"></a>
 ### @open-draft/deferred-promise v2.2.0 (dependencies)
@@ -4276,6 +4364,17 @@ Match balanced character pairs, like "{" and "}"
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Base64 encoding/decoding in pure JS
+
+<a name="before-after-hook"></a>
+### before-after-hook v3.0.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+asynchronous before/error/after hooks for internal functionality
 
 <a name="big-integer"></a>
 ### big-integer v1.6.52 (dependencies)
@@ -9637,6 +9736,17 @@ unist utility to visit nodes
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 unist utility to recursively walk over nodes, with ancestral information
+
+<a name="universal-user-agent"></a>
+### universal-user-agent v7.0.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+Get a user agent string across all JavaScript Runtime Environments
 
 <a name="universalify"></a>
 ### <a href="https://github.com/RyanZim/universalify#readme">universalify</a> v0.2.0 (dependencies)
