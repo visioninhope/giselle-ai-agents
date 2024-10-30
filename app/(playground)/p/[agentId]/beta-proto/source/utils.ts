@@ -100,7 +100,9 @@ ${sources
 		)
 		.join("\n")}
 </WebSearch>`
-			: source.object === "artifact"
+			: source.object === "artifact" ||
+					source.object === "file" ||
+					source.object === "textContent"
 				? `
 <Source title="${source.title}" type="${source.object}" id="${source.id}">
   ${source.content}
