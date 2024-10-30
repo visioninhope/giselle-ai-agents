@@ -15,7 +15,6 @@ import type { AgentId } from "../types";
 type GenerateArtifactStreamParams = {
 	agentId: AgentId;
 	userPrompt: string;
-	systemPrompt?: string;
 	sourceIndexes: SourceIndex[];
 };
 export async function generateArtifactStream(
@@ -25,12 +24,49 @@ export async function generateArtifactStream(
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
-	const sources = sourceIndexesToSources({
+	const sources = await sourceIndexesToSources({
 		input: {
 			agentId: params.agentId,
 			sourceIndexes: params.sourceIndexes,
 		},
 	});
+
+	const system =
+		sources.length > 0
+			? `
+Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
+
+If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
+
+${sources
+	.map((source) =>
+		source.object === "webSearch"
+			? `
+<WebSearch title="${source.name}" id="${source.id}">
+  ${source.items
+		.map(
+			(item) => `
+  <WebPage title="${item.title}" type="${item.object}" rel="${item.url}" id="${item.id}">
+    ${item.content}
+  </WebPage>`,
+		)
+		.join("\n")}
+</WebSearch>`
+			: source.object === "artifact"
+				? `
+<Source title="${source.title}" type="${source.object}" id="${source.id}">
+  ${source.content}
+</Source>
+`
+				: "",
+	)
+	.join("\n")}
+
+`
+			: "You generate an answer to a question. ";
+
+	console.log(system);
+
 	const stream = createStreamableValue();
 
 	(async () => {
@@ -41,7 +77,7 @@ export async function generateArtifactStream(
 		});
 		const { partialObjectStream, object } = await streamObject({
 			model: openai(model),
-			system: params.systemPrompt ?? "You generate an answer to a question. ",
+			system,
 			prompt: params.userPrompt,
 			schema: artifactSchema,
 			onFinish: async (result) => {

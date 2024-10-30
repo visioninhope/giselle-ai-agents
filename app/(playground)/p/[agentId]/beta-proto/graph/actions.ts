@@ -565,21 +565,9 @@ export const generateText =
 		}
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
-				const systemPrompt =
-					instructionSources.length > 0
-						? `
-Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
-
-If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
-
-${instructionSources.map((source) => (source.object === "webSearch.item" ? `<WebPage title="${source.title}" type="${source.object}" rel="${source.url}" id="${source.id}">${source.content}</WebPage>` : `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`)).join("\n")}
-`
-						: undefined;
-
 				const { object } = await generateArtifactStream({
 					agentId: getState().graph.agentId,
 					userPrompt: instructionNode.output as string,
-					systemPrompt,
 					sourceIndexes,
 				});
 				let content: PartialGeneratedObject = {};
