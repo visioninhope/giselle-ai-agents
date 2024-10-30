@@ -1,4 +1,5 @@
 // export { getUserInitializationTask } from "./get-initialization-task";
+export { deleteOauthCredential } from "./delete-oauth-credential";
 export { getAuthCallbackUrl } from "./get-auth-callback-url";
 export { getUserSubscriptionId } from "./get-current-subscription";
 export { getCurrentTeam } from "./get-current-team";
