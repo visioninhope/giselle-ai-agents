@@ -8,23 +8,39 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
 	const { searchParams, origin } = new URL(request.url);
+	const errorMessage = checkError(searchParams);
+	if (errorMessage) {
+		return new Response(errorMessage, {
+			status: 400,
+		});
+	}
+
 	const code = searchParams.get("code");
 	// if "next" is in param, use it as the redirect URL
 	const next = searchParams.get("next") ?? "/";
 	if (!code) {
-		throw new Error("No code provided");
+		return new Response("No code provided", { status: 400 });
 	}
 
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 	if (error) {
 		const { code, message, name, status } = error;
-		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
+		return new Response(`${name} occurred: ${code} (${status}): ${message}`, {
+			status: 500,
+		});
 	}
 
-	const { user, session } = data;
-	await initializeUserIfNeeded(user);
-	await storeProviderTokens(user, session);
+	try {
+		const { user, session } = data;
+		await initializeUserIfNeeded(user);
+		await storeProviderTokens(user, session);
+	} catch (error) {
+		if (error instanceof Error) {
+			return new Response(error.message, { status: 500 });
+		}
+		throw new Error("Unknown error occurred", { cause: error });
+	}
 
 	const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
 	const isLocalEnv = process.env.NODE_ENV === "development";
@@ -36,6 +52,17 @@ export async function GET(request: Request) {
 		return NextResponse.redirect(`https://${forwardedHost}${next}`);
 	}
 	return NextResponse.redirect(`${origin}${next}`);
+}
+
+function checkError(searchParams: URLSearchParams) {
+	const error = searchParams.get("error");
+	if (error) {
+		// if error is in param, return an error response
+		const errorDescription = searchParams.get("error_description");
+		const errorCpode = searchParams.get("error_code");
+		return `Error occurred: ${errorCpode} - ${errorDescription}`;
+	}
+	return "";
 }
 
 async function initializeUserIfNeeded(user: User) {
