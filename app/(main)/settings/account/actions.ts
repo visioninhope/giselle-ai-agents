@@ -5,7 +5,7 @@ import { createClient, getUser } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function redirectToGitHubAuthorizePage() {
+export async function authorizeGitHub() {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.linkIdentity({
 		provider: "github",

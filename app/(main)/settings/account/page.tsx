@@ -5,7 +5,7 @@ import { getUser } from "@/lib/supabase";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "../components/card";
-import GitHubIntegrations from "./github-integrations";
+import GitHubAuthentication from "./github-authentication";
 
 export default async function AccountSettingPage() {
 	const user = await getUser();
@@ -28,9 +28,16 @@ export default async function AccountSettingPage() {
 					/>
 				</div>
 			</Card>
-			<Card title="GitHub Integrations">
-				<Suspense fallback={<Skeleton className="min-w-max min-h-14" />}>
-					<GitHubIntegrations />
+			<Card
+				title="Authentication"
+				description="Connect your Giselle account to third-party services."
+			>
+				<Suspense
+					fallback={
+						<Skeleton className="rounded-md border border-black-70 w-full h-16" />
+					}
+				>
+					<GitHubAuthentication />
 				</Suspense>
 			</Card>
 			<Card
