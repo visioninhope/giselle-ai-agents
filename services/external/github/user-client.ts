@@ -37,29 +37,13 @@ export class GitHubUserClient {
 
 	async getUser() {
 		const cli = await this.buildClient();
-		try {
-			const res = await cli.request("GET /user");
-			return res.data;
-		} catch (error) {
-			// TODO: handle github error especially 401
-			console.error(error);
-			return null;
-		}
+		const res = await cli.request("GET /user");
+		return res.data;
 	}
 
 	private async buildClient() {
 		if (this.needsRefreshAccessToken()) {
-			const refreshedToken = await this.refreshAccessToken();
-
-			await this.refreshCredentialsFunc(
-				"github",
-				refreshedToken.accessToken,
-				refreshedToken.refreshToken,
-				refreshedToken.expiresAt,
-				refreshedToken.scope,
-				refreshedToken.tokenType,
-			);
-			this.token = refreshedToken;
+			await this.refreshAccessToken();
 		}
 
 		return new Octokit({
@@ -110,6 +94,9 @@ export class GitHubUserClient {
 		}
 
 		const data = await response.json();
+		if ("error" in data) {
+			throw new Error("Failed to refresh access token", { cause: data });
+		}
 
 		const accessToken = data.access_token;
 		const expiresAt = new Date(Date.now() + data.expires_in * 1000);
@@ -117,6 +104,21 @@ export class GitHubUserClient {
 		const scope = data.scope;
 		const tokenType = data.token_type;
 
-		return { accessToken, expiresAt, refreshToken, scope, tokenType };
+		try {
+			await this.refreshCredentialsFunc(
+				"github",
+				accessToken,
+				refreshToken,
+				expiresAt,
+				scope,
+				tokenType,
+			);
+		} catch (error) {
+			throw new Error("Failed to save refreshed access token", {
+				cause: error,
+			});
+		}
+
+		this.token = { accessToken, expiresAt, refreshToken };
 	}
 }
