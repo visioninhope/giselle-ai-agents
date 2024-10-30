@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { FC } from "react";
-import { authorizeGitHub } from "../signup/actions";
+import { authorizeGitHub } from "../actions";
 
 type OauthProvidersProps = {
 	labelPrefix: string;
