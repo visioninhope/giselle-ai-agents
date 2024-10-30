@@ -1,8 +1,11 @@
 import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
+import { Skeleton } from "@/components/ui/skeleton";
 import { getUser } from "@/lib/supabase";
 import Link from "next/link";
+import { Suspense } from "react";
 import { Card } from "../components/card";
+import GitHubIntegrations from "./github-integrations";
 
 export default async function AccountSettingPage() {
 	const user = await getUser();
@@ -24,6 +27,11 @@ export default async function AccountSettingPage() {
 						disabled
 					/>
 				</div>
+			</Card>
+			<Card title="GitHub Integrations">
+				<Suspense fallback={<Skeleton className="min-w-max min-h-14" />}>
+					<GitHubIntegrations />
+				</Suspense>
 			</Card>
 			<Card
 				title="Reset Password"
