@@ -1,6 +1,4 @@
-import { getAuthCallbackUrl } from "@/app/(auth)/lib";
-import { getOauthCredential } from "@/app/(auth)/lib/get-oauth-credential";
-import { refreshOauthCredential } from "@/app/(auth)/lib/refresh-oauth-credential";
+import { getAuthCallbackUrl, getOauthCredential, refreshOauthCredential } from "@/app/(auth)/lib";
 import { Button } from "@/components/ui/button";
 import { createClient } from "@/lib/supabase";
 import {
