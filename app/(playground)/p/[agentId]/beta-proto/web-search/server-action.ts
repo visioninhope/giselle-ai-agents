@@ -10,6 +10,9 @@ import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import Langfuse from "langfuse";
 import type { GiselleNode } from "../giselle-node/types";
+import type { SourceIndex } from "../source/types";
+import { sourceIndexesToSources, sourcesToText } from "../source/utils";
+import type { AgentId } from "../types";
 import { webSearchSchema } from "./schema";
 import { search } from "./tavily";
 import {
@@ -21,9 +24,11 @@ import {
 } from "./types";
 
 interface GenerateWebSearchStreamInputs {
+	agentId: AgentId;
 	userPrompt: string;
 	systemPrompt?: string;
 	node: GiselleNode;
+	sourceIndexes: SourceIndex[];
 }
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
@@ -32,6 +37,32 @@ export async function generateWebSearchStream(
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
+
+	const sources = await sourceIndexesToSources({
+		input: {
+			agentId: inputs.agentId,
+			sourceIndexes: inputs.sourceIndexes,
+		},
+	});
+
+	const system = `
+You are an AI assistant specialized in web scraping and searching. Your task is to help users find specific information on websites and extract relevant data based on their requests. Follow these guidelines:
+
+1. Understand the user's request:
+   - Identify the type of information they're looking for
+   - Determine any specific websites or domains they want to search
+   - Note any constraints or preferences in the data format
+
+2. Formulate a search strategy:
+   - Suggest appropriate search queries with relevant keywords at least 3-5 words long
+   - Use the current date as ${new Date().toLocaleDateString()}, in the search query if necessary
+
+
+--
+${sourcesToText(sources)}
+--
+`;
+
 	const stream = createStreamableValue();
 
 	(async () => {
@@ -42,7 +73,7 @@ export async function generateWebSearchStream(
 		});
 		const { partialObjectStream, object } = await streamObject({
 			model: openai(model),
-			system: inputs.systemPrompt ?? "You generate an answer to a question. ",
+			system,
 			prompt: inputs.userPrompt,
 			schema: webSearchSchema,
 			onFinish: async (result) => {

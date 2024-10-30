@@ -649,27 +649,10 @@ export const generateText =
 				break;
 			}
 			case giselleNodeArchetypes.webSearch: {
-				const systemPrompt = `
-You are an AI assistant specialized in web scraping and searching. Your task is to help users find specific information on websites and extract relevant data based on their requests. Follow these guidelines:
-
-1. Understand the user's request:
-   - Identify the type of information they're looking for
-   - Determine any specific websites or domains they want to search
-   - Note any constraints or preferences in the data format
-
-2. Formulate a search strategy:
-   - Suggest appropriate search queries with relevant keywords at least 3-5 words long
-   - Use the current date as ${new Date().toLocaleDateString()}, in the search query if necessary
-
-
---
-${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
---
-			`;
-
 				const { object } = await generateWebSearchStream({
+					agentId: getState().graph.agentId,
 					userPrompt: instructionNode.output as string,
-					systemPrompt,
+					sourceIndexes,
 					node,
 				});
 				let content: PartialGeneratedObject = {};
