@@ -66,10 +66,9 @@ export const flowActionStatuses = {
 	queued: "queued",
 	running: "running",
 	completed: "completed",
-	failed: "failed",
 } as const;
 
-type FlowActionStatus =
+export type FlowActionStatus =
 	(typeof flowActionStatuses)[keyof typeof flowActionStatuses];
 
 interface BaseFlowAction {
@@ -83,8 +82,14 @@ interface QueuedFlowAction extends BaseFlowAction {
 interface RunningFlowAction extends BaseFlowAction {
 	status: Extract<FlowActionStatus, "running">;
 }
+interface CompletedFlowAction extends BaseFlowAction {
+	status: Extract<FlowActionStatus, "completed">;
+}
 
-type FlowAction = QueuedFlowAction | RunningFlowAction;
+export type FlowAction =
+	| QueuedFlowAction
+	| RunningFlowAction
+	| CompletedFlowAction;
 
 interface BaseFlowIndex {
 	object: "flow.index";

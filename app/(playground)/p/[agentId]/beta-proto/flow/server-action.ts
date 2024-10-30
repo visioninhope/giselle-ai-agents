@@ -15,6 +15,10 @@ import {
 	giselleNodeCategories,
 } from "../giselle-node/types";
 import type { Graph } from "../graph/types";
+import {
+	extractSourceIndexesFromNode,
+	sourceIndexesToSources,
+} from "../source/utils";
 import type { TextContent } from "../text-content/types";
 import type { AgentId } from "../types";
 import {
@@ -102,6 +106,7 @@ async function gatherInstructionSources(input: GatherInstructionSourcesInput) {
 interface RunActionInput {
 	agentId: AgentId;
 	nodeId: GiselleNodeId;
+	stream: boolean;
 }
 export async function runAction(input: RunActionInput) {
 	const agent = await db.query.agents.findFirst({
@@ -135,9 +140,9 @@ export async function runAction(input: RunActionInput) {
 		);
 	}
 
-	const sources = await gatherInstructionSources({
-		node: instructionNode,
-		graph,
+	const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
+	const sources = await sourceIndexesToSources({
+		input: { sourceIndexes, agentId: input.agentId },
 	});
 
 	switch (instructionConnector.targetNodeArcheType) {
