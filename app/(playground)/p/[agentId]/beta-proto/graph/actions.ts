@@ -1,5 +1,6 @@
 import { readStreamableValue } from "ai/rsc";
 import { createArtifactId } from "../artifact/factory";
+import { generateArtifactStream } from "../artifact/server-actions";
 import type { Artifact, ArtifactId } from "../artifact/types";
 import type { PartialGeneratedObject } from "../artifact/types";
 import type { V2ConnectorAction } from "../connector/actions";
@@ -39,7 +40,9 @@ import {
 	buildGiselleNode,
 	giselleNodeToGiselleNodeArtifactElement,
 } from "../giselle-node/utils";
-import type { TextContent } from "../text-content/types";
+import type { SourceIndex } from "../source/types";
+import { extractSourceIndexesFromNode } from "../source/utils";
+import type { TextContent, TextContentId } from "../text-content/types";
 import { generateWebSearchStream } from "../web-search/server-action";
 import {
 	type WebSearch,
@@ -49,7 +52,6 @@ import {
 	webSearchStatus,
 } from "../web-search/types";
 import type { CompositeAction } from "./context";
-import { generateArtifactStream } from "./server-actions";
 import { addConnector as v2AddConnector } from "./v2/composition/add-connector";
 import { addNode as v2AddNode } from "./v2/composition/add-node";
 import { updateNode as v2UpdateNode } from "./v2/composition/update-node";
@@ -462,72 +464,6 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		type Source = Artifact | TextContent | StructuredData | WebSearchItem;
-		const instructionSources: Source[] = [];
-		if (Array.isArray(instructionNode.properties.sources)) {
-			for (const source of instructionNode.properties.sources) {
-				if (
-					typeof source !== "object" ||
-					source === null ||
-					typeof source.id !== "string" ||
-					typeof source.object !== "string"
-				) {
-					continue;
-				}
-				if (source.object === "textContent") {
-					instructionSources.push(source);
-				} else if (source.object === "artifact.reference") {
-					const artifact = state.graph.artifacts.find(
-						(artifact) => artifact.id === source.id,
-					);
-					if (artifact !== undefined) {
-						instructionSources.push(artifact);
-					}
-				} else if (source.object === "file") {
-					if (
-						typeof source.status === "string" &&
-						source.status === fileStatuses.processed &&
-						typeof source.structuredDataBlobUrl === "string" &&
-						typeof source.name === "string"
-					) {
-						const structuredData = await fetch(
-							source.structuredDataBlobUrl,
-						).then((res) => res.text());
-						instructionSources.push({
-							id: source.id,
-							object: "file",
-							title: source.name,
-							content: structuredData,
-						});
-					}
-				} else if (source.object === "webSearch") {
-					if (
-						typeof source.status === "string" &&
-						source.status === webSearchStatus.completed &&
-						Array.isArray(source.items)
-					) {
-						await Promise.all(
-							(source.items as WebSearchItemReference[]).map(async (item) => {
-								if (item.status === webSearchItemStatus.completed) {
-									const webSearchData = await fetch(item.contentBlobUrl).then(
-										(res) => res.text(),
-									);
-									instructionSources.push({
-										id: item.id,
-										object: "webSearch.item",
-										url: item.url,
-										title: item.title,
-										content: webSearchData,
-										relevance: item.relevance,
-									});
-								}
-							}),
-						);
-					}
-				}
-			}
-		}
-
 		const node = state.graph.nodes.find(
 			(node) => node.id === args.textGeneratorNode.id,
 		);
@@ -535,22 +471,14 @@ export const generateText =
 			/** @todo error handling  */
 			throw new Error("Node not found");
 		}
+
+		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
-				const systemPrompt =
-					instructionSources.length > 0
-						? `
-Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
-
-If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
-
-${instructionSources.map((source) => (source.object === "webSearch.item" ? `<WebPage title="${source.title}" type="${source.object}" rel="${source.url}" id="${source.id}">${source.content}</WebPage>` : `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`)).join("\n")}
-`
-						: undefined;
-
 				const { object } = await generateArtifactStream({
+					agentId: getState().graph.agentId,
 					userPrompt: instructionNode.output as string,
-					systemPrompt,
+					sourceIndexes,
 				});
 				let content: PartialGeneratedObject = {};
 				for await (const streamContent of readStreamableValue(object)) {
@@ -631,27 +559,10 @@ ${instructionSources.map((source) => (source.object === "webSearch.item" ? `<Web
 				break;
 			}
 			case giselleNodeArchetypes.webSearch: {
-				const systemPrompt = `
-You are an AI assistant specialized in web scraping and searching. Your task is to help users find specific information on websites and extract relevant data based on their requests. Follow these guidelines:
-
-1. Understand the user's request:
-   - Identify the type of information they're looking for
-   - Determine any specific websites or domains they want to search
-   - Note any constraints or preferences in the data format
-
-2. Formulate a search strategy:
-   - Suggest appropriate search queries with relevant keywords at least 3-5 words long
-   - Use the current date as ${new Date().toLocaleDateString()}, in the search query if necessary
-
-
---
-${instructionSources.map((source) => `<Source title="${source.title}" type="${source.object}" id="${source.id}">${source.content}</Source>`).join("\n")}
---
-			`;
-
 				const { object } = await generateWebSearchStream({
+					agentId: getState().graph.agentId,
 					userPrompt: instructionNode.output as string,
-					systemPrompt,
+					sourceIndexes,
 					node,
 				});
 				let content: PartialGeneratedObject = {};
