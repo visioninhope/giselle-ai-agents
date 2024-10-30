@@ -9,7 +9,7 @@ import { metrics } from "@opentelemetry/api";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { SourceIndex } from "../source/types";
-import { sourceIndexesToSources } from "../source/utils";
+import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 
 type GenerateArtifactStreamParams = {
@@ -38,34 +38,10 @@ Your primary objective is to fulfill the user's request by utilizing the informa
 
 If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
 
-${sources
-	.map((source) =>
-		source.object === "webSearch"
-			? `
-<WebSearch title="${source.name}" id="${source.id}">
-  ${source.items
-		.map(
-			(item) => `
-  <WebPage title="${item.title}" type="${item.object}" rel="${item.url}" id="${item.id}">
-    ${item.content}
-  </WebPage>`,
-		)
-		.join("\n")}
-</WebSearch>`
-			: source.object === "artifact"
-				? `
-<Source title="${source.title}" type="${source.object}" id="${source.id}">
-  ${source.content}
-</Source>
-`
-				: "",
-	)
-	.join("\n")}
+${sourcesToText(sources)}
 
 `
 			: "You generate an answer to a question. ";
-
-	console.log(system);
 
 	const stream = createStreamableValue();
 

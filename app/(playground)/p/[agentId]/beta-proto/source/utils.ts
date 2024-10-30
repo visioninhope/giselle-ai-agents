@@ -83,3 +83,30 @@ export async function sourceIndexesToSources({
 	).then((sources) => sources.filter((source) => source !== null));
 	return sources;
 }
+
+export function sourcesToText(sources: Source[]) {
+	return `
+${sources
+	.map((source) =>
+		source.object === "webSearch"
+			? `
+<WebSearch title="${source.name}" id="${source.id}">
+  ${source.items
+		.map(
+			(item) => `
+  <WebPage title="${item.title}" type="${item.object}" rel="${item.url}" id="${item.id}">
+    ${item.content}
+  </WebPage>`,
+		)
+		.join("\n")}
+</WebSearch>`
+			: source.object === "artifact"
+				? `
+<Source title="${source.title}" type="${source.object}" id="${source.id}">
+  ${source.content}
+</Source>
+`
+				: "",
+	)
+	.join("\n")}`;
+}
