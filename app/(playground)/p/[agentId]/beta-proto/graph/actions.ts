@@ -472,7 +472,7 @@ export const generateText =
 			throw new Error("Node not found");
 		}
 
-		const sourceIndexes = extractSourceIndexesFromNode(node);
+		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator: {
 				const { object } = await generateArtifactStream({
