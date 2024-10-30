@@ -463,8 +463,6 @@ export const generateText =
 			throw new Error("Instruction node not found");
 		}
 
-		type Source = Artifact | TextContent | StructuredData | WebSearchItem;
-		const instructionSources: Source[] = [];
 		const sourceIndexes: SourceIndex[] = [];
 		if (Array.isArray(instructionNode.properties.sources)) {
 			for (const source of instructionNode.properties.sources) {
@@ -477,7 +475,6 @@ export const generateText =
 					continue;
 				}
 				if (source.object === "textContent") {
-					instructionSources.push(source);
 					sourceIndexes.push({
 						id: source.id as TextContentId,
 						object: "textContent",
@@ -489,7 +486,6 @@ export const generateText =
 						(artifact) => artifact.id === source.id,
 					);
 					if (artifact !== undefined) {
-						instructionSources.push(artifact);
 						sourceIndexes.push({
 							object: "artifact.reference",
 							id: artifact.id,
@@ -505,12 +501,6 @@ export const generateText =
 						const structuredData = await fetch(
 							source.structuredDataBlobUrl,
 						).then((res) => res.text());
-						instructionSources.push({
-							id: source.id,
-							object: "file",
-							title: source.name,
-							content: structuredData,
-						});
 						sourceIndexes.push({
 							object: "file",
 							id: source.id,
@@ -540,14 +530,6 @@ export const generateText =
 									const webSearchData = await fetch(item.contentBlobUrl).then(
 										(res) => res.text(),
 									);
-									instructionSources.push({
-										id: item.id,
-										object: "webSearch.item",
-										url: item.url,
-										title: item.title,
-										content: webSearchData,
-										relevance: item.relevance,
-									});
 								}
 							}),
 						);
