@@ -47,7 +47,10 @@ export const organizations = pgTable("organizations", {
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export const subscriptions = pgTable("subscriptions", {
@@ -76,7 +79,10 @@ export const teams = pgTable("teams", {
 		.references(() => organizations.dbId),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export type UserId = `usr_${string}`;
@@ -140,7 +146,10 @@ export const agents = pgTable("agents", {
 		}),
 	graphHash: text("graph_hash").unique(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export const builds = pgTable("builds", {
@@ -242,7 +251,10 @@ export const requests = pgTable("requests", {
 		.references(() => builds.dbId),
 	status: text("status").$type<RequestStatus>().notNull().default("queued"),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 	startedAt: timestamp("started_at"),
 	finishedAt: timestamp("finished_at"),
 });
@@ -379,7 +391,10 @@ export const files = pgTable("files", {
 	fileSize: integer("file_size").notNull(),
 	blobUrl: text("blob_url").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at").defaultNow().notNull().$onUpdate(() => new Date()),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 export const fileOpenaiFileRepresentations = pgTable(
 	"file_openai_file_representations",

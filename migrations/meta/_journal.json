@@ -1,48 +1,48 @@
 {
-  "version": "7",
-  "dialect": "postgresql",
-  "entries": [
-    {
-      "idx": 0,
-      "version": "7",
-      "when": 1727672114041,
-      "tag": "0000_aberrant_stardust",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1727751238434,
-      "tag": "0001_glorious_mathemanic",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1727759326160,
-      "tag": "0002_mighty_zarek",
-      "breakpoints": true
-    },
-    {
-      "idx": 3,
-      "version": "7",
-      "when": 1729227804577,
-      "tag": "0003_messy_fabian_cortez",
-      "breakpoints": true
-    },
-    {
-      "idx": 4,
-      "version": "7",
-      "when": 1729759218608,
-      "tag": "0004_handy_kylun",
-      "breakpoints": true
-    },
-    {
-      "idx": 5,
-      "version": "7",
-      "when": 1730358603269,
-      "tag": "0005_overrated_scarlet_spider",
-      "breakpoints": true
-    }
-  ]
+	"version": "7",
+	"dialect": "postgresql",
+	"entries": [
+		{
+			"idx": 0,
+			"version": "7",
+			"when": 1727672114041,
+			"tag": "0000_aberrant_stardust",
+			"breakpoints": true
+		},
+		{
+			"idx": 1,
+			"version": "7",
+			"when": 1727751238434,
+			"tag": "0001_glorious_mathemanic",
+			"breakpoints": true
+		},
+		{
+			"idx": 2,
+			"version": "7",
+			"when": 1727759326160,
+			"tag": "0002_mighty_zarek",
+			"breakpoints": true
+		},
+		{
+			"idx": 3,
+			"version": "7",
+			"when": 1729227804577,
+			"tag": "0003_messy_fabian_cortez",
+			"breakpoints": true
+		},
+		{
+			"idx": 4,
+			"version": "7",
+			"when": 1729759218608,
+			"tag": "0004_handy_kylun",
+			"breakpoints": true
+		},
+		{
+			"idx": 5,
+			"version": "7",
+			"when": 1730358603269,
+			"tag": "0005_overrated_scarlet_spider",
+			"breakpoints": true
+		}
+	]
 }
