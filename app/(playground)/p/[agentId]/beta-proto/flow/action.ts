@@ -89,6 +89,7 @@ interface SetStepOutputAction {
 	input: SetStepOutputActionInput;
 }
 interface SetStepOutputActionInput {
+	stepId: StepId;
 	output: unknown;
 }
 export function setStepOutput({
@@ -159,6 +160,21 @@ export function v2FlowReducer(
 			return {
 				...flow,
 				artifacts: [...flow.artifacts, action.input.artifact],
+			};
+		case v2FlowActionTypes.setStepOutput:
+			if (flow == null) {
+				return flow;
+			}
+			return {
+				...flow,
+				jobs: flow.jobs.map((job) => ({
+					...job,
+					actions: job.steps.map((step) =>
+						step.id === action.input.stepId
+							? { ...step, output: action.input.output }
+							: step,
+					),
+				})),
 			};
 	}
 	return flow;

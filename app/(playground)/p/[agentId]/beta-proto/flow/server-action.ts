@@ -4,26 +4,16 @@ import { agents, db } from "@/drizzle";
 import { openai } from "@ai-sdk/openai";
 import { put } from "@vercel/blob";
 import { type LanguageModelV1, streamObject } from "ai";
-import { createStreamableValue, readStreamableValue } from "ai/rsc";
+import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { GeneratedObject } from "../artifact/types";
-import { giselleNodeArchetypes } from "../giselle-node/blueprints";
-import {
-	type GiselleNodeId,
-	giselleNodeCategories,
-} from "../giselle-node/types";
+import type { GiselleNodeId } from "../giselle-node/types";
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
-import {
-	type V2FlowAction,
-	addArtifact,
-	replaceStep,
-	setFlow,
-	setStepOutput,
-} from "./action";
-import { type Flow, type Step, flowStatuses, stepStatuses } from "./types";
+import { type V2FlowAction, setFlow, setStepOutput } from "./action";
+import { type Flow, flowStatuses } from "./types";
 import { buildFlow } from "./utils";
 
 export async function executeFlow(
@@ -72,6 +62,7 @@ export async function executeFlow(
 								stream.update(
 									setStepOutput({
 										input: {
+											stepId: step.id,
 											output: object,
 										},
 									}),
@@ -82,6 +73,7 @@ export async function executeFlow(
 				}),
 			);
 		}
+		stream.done();
 	})();
 
 	return { streamableValue: stream.value };
