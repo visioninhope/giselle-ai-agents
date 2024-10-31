@@ -2,6 +2,7 @@
 
 import { agents, db } from "@/drizzle";
 import { put } from "@vercel/blob";
+import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
 import type { Artifact } from "../artifact/types";
 import { type StructuredData, fileStatuses } from "../files/types";
@@ -18,6 +19,7 @@ import type { Graph } from "../graph/types";
 import {
 	extractSourceIndexesFromNode,
 	sourceIndexesToSources,
+	sourcesToText,
 } from "../source/utils";
 import type { TextContent } from "../text-content/types";
 import type { AgentId } from "../types";
@@ -27,7 +29,13 @@ import {
 	webSearchItemStatus,
 	webSearchStatus,
 } from "../web-search/types";
-import type { Flow } from "./types";
+import { type V2FlowAction, replaceFlowAction, setFlow } from "./action";
+import {
+	type Flow,
+	type FlowAction,
+	type FlowActionLayer,
+	flowActionStatuses,
+} from "./types";
 
 type Source = Artifact | TextContent | StructuredData | WebSearchItem;
 interface GatherInstructionSourcesInput {
@@ -106,53 +114,79 @@ async function gatherInstructionSources(input: GatherInstructionSourcesInput) {
 interface RunActionInput {
 	agentId: AgentId;
 	nodeId: GiselleNodeId;
+	action: FlowAction;
 	stream: boolean;
 }
 export async function runAction(input: RunActionInput) {
-	const agent = await db.query.agents.findFirst({
-		where: eq(agents.id, input.agentId),
-	});
-	if (agent === undefined) {
-		throw new Error(`Agent with id ${input.agentId} not found`);
-	}
-	const graph = agent.graphv2;
-
-	const instructionConnector = graph.connectors.find(
-		(connector) =>
-			connector.target === input.nodeId &&
-			connector.sourceNodeCategory === giselleNodeCategories.instruction,
-	);
-
-	if (instructionConnector === undefined) {
-		throw new Error(`No instruction connector found for node ${input.nodeId}`);
-	}
-
-	const instructionNode = graph.nodes.find(
-		(node) => node.id === instructionConnector.source,
-	);
-	const actionNode = graph.nodes.find(
-		(node) => node.id === instructionConnector.target,
-	);
-
-	if (instructionNode === undefined || actionNode === undefined) {
-		throw new Error(
-			`Instruction node ${instructionConnector.source} or action node ${instructionConnector.target} not found`,
+	const stream = createStreamableValue<V2FlowAction>();
+	(async () => {
+		stream.update(
+			replaceFlowAction({
+				input: {
+					...input.action,
+					status: flowActionStatuses.running,
+				},
+			}),
 		);
-	}
+		const agent = await db.query.agents.findFirst({
+			where: eq(agents.id, input.agentId),
+		});
+		if (agent === undefined) {
+			throw new Error(`Agent with id ${input.agentId} not found`);
+		}
+		const graph = agent.graphv2;
 
-	const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
-	const sources = await sourceIndexesToSources({
-		input: { sourceIndexes, agentId: input.agentId },
-	});
+		const instructionConnector = graph.connectors.find(
+			(connector) =>
+				connector.target === input.nodeId &&
+				connector.sourceNodeCategory === giselleNodeCategories.instruction,
+		);
 
-	switch (instructionConnector.targetNodeArcheType) {
-		case giselleNodeArchetypes.textGenerator:
-			await generateText();
-			break;
-		case giselleNodeArchetypes.webSearch:
-			await webSearch();
-			break;
-	}
+		if (instructionConnector === undefined) {
+			throw new Error(
+				`No instruction connector found for node ${input.nodeId}`,
+			);
+		}
+
+		const instructionNode = graph.nodes.find(
+			(node) => node.id === instructionConnector.source,
+		);
+		const actionNode = graph.nodes.find(
+			(node) => node.id === instructionConnector.target,
+		);
+
+		if (instructionNode === undefined || actionNode === undefined) {
+			throw new Error(
+				`Instruction node ${instructionConnector.source} or action node ${instructionConnector.target} not found`,
+			);
+		}
+
+		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
+		const sources = await sourceIndexesToSources({
+			input: { sourceIndexes, agentId: input.agentId },
+		});
+		switch (instructionConnector.targetNodeArcheType) {
+			case giselleNodeArchetypes.textGenerator:
+				await generateText();
+				break;
+			case giselleNodeArchetypes.webSearch:
+				await webSearch();
+				break;
+		}
+		stream.update(
+			replaceFlowAction({
+				input: {
+					...input.action,
+					status: flowActionStatuses.completed,
+				},
+			}),
+		);
+		stream.done();
+	})();
+
+	return {
+		object: stream.value,
+	};
 }
 
 async function generateText() {

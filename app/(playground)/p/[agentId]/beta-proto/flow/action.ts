@@ -1,4 +1,4 @@
-import type { Flow, FlowIndex } from "./types";
+import type { Flow, FlowAction, FlowActionId, FlowIndex } from "./types";
 
 const v2FlowIndexActionTypes = {
 	setFlowIndex: "v2.setFlowIndex",
@@ -45,6 +45,7 @@ export function v2FlowIndexReducer(
 
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
+	replaceFlowAction: "v2.replaceFlowAction",
 } as const;
 
 type V2FlowActionType =
@@ -64,7 +65,23 @@ export function setFlow({ input }: { input: SetFlowActionInput }) {
 	};
 }
 
-export type V2FlowAction = SetFlowAction;
+interface ReplaceFlowActionAction {
+	type: Extract<V2FlowActionType, "v2.replaceFlowAction">;
+	input: ReplaceFlowActionActionInput;
+}
+type ReplaceFlowActionActionInput = FlowAction;
+export function replaceFlowAction({
+	input,
+}: {
+	input: ReplaceFlowActionActionInput;
+}): ReplaceFlowActionAction {
+	return {
+		type: v2FlowActionTypes.replaceFlowAction,
+		input,
+	};
+}
+
+export type V2FlowAction = SetFlowAction | ReplaceFlowActionAction;
 
 export function isV2FlowAction(action: unknown): action is V2FlowAction {
 	return Object.values(v2FlowActionTypes).includes(
@@ -79,6 +96,19 @@ export function v2FlowReducer(
 	switch (action.type) {
 		case v2FlowActionTypes.setFlow:
 			return action.input.flow;
+		case v2FlowActionTypes.replaceFlowAction:
+			if (flow == null) {
+				return flow;
+			}
+			return {
+				...flow,
+				actionLayers: flow.actionLayers.map((actionLayer) => ({
+					...actionLayer,
+					actions: actionLayer.actions.map((flowAction) =>
+						flowAction.id === action.input.id ? action.input : flowAction,
+					),
+				})),
+			};
 	}
 	return flow;
 }

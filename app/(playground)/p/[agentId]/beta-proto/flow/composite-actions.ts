@@ -1,49 +1,12 @@
+import { readStreamableValue } from "ai/rsc";
 import type { GiselleNode } from "../giselle-node/types";
 import type { CompositeAction } from "../graph/context";
 import { playgroundModes } from "../graph/types";
 import { updateMode } from "../graph/v2/mode";
 import { setFlow, setFlowIndexes } from "./action";
 import { putFlow, runAction } from "./server-action";
-import {
-	type Flow,
-	type FlowAction,
-	type FlowActionLayer,
-	type FlowActionStatus,
-	flowActionStatuses,
-	flowStatuses,
-} from "./types";
-import {
-	buildFlow,
-	buildFlowIndex,
-	createFlowActionId,
-	createFlowId,
-	resolveActionLayers,
-} from "./utils";
-
-const updateActionStatus = ({
-	input,
-}: {
-	input: {
-		flow: Flow;
-		actionLayer: FlowActionLayer;
-		action: FlowAction;
-		status: FlowActionStatus;
-	};
-}): Flow => ({
-	...input.flow,
-	actionLayers: input.flow.actionLayers.map((actionLayer) =>
-		actionLayer.id === input.actionLayer.id
-			? {
-					...actionLayer,
-					actions: actionLayer.actions.map((action) =>
-						action.id === input.action.id
-							? { ...action, status: input.status }
-							: action,
-					),
-				}
-			: actionLayer,
-	),
-});
+import { flowStatuses } from "./types";
+import { buildFlow, buildFlowIndex } from "./utils";
 
 export function runFlow(finalNode: GiselleNode): CompositeAction {
 	return async (dispatch, getState) => {
@@ -96,45 +59,21 @@ export function runFlow(finalNode: GiselleNode): CompositeAction {
 				},
 			}),
 		);
-		let mutableFlow: Flow = flow;
 		for (const actionLayer of flow.actionLayers) {
 			await Promise.all(
 				actionLayer.actions.map(async (action) => {
-					mutableFlow = updateActionStatus({
-						input: {
-							flow: mutableFlow,
-							actionLayer,
-							action,
-							status: flowActionStatuses.running,
-						},
-					});
-					dispatch(
-						setFlow({
-							input: {
-								flow: mutableFlow,
-							},
-						}),
-					);
-					await runAction({
+					const { object } = await runAction({
 						nodeId: action.nodeId,
 						agentId: state.graph.agentId,
+						action,
 						stream: true,
 					});
-					mutableFlow = updateActionStatus({
-						input: {
-							flow: mutableFlow,
-							actionLayer,
-							action,
-							status: flowActionStatuses.completed,
-						},
-					});
-					dispatch(
-						setFlow({
-							input: {
-								flow: mutableFlow,
-							},
-						}),
-					);
+					for await (const streamContent of readStreamableValue(object)) {
+						if (streamContent === undefined) {
+							continue;
+						}
+						dispatch(streamContent);
+					}
 				}),
 			);
 		}
