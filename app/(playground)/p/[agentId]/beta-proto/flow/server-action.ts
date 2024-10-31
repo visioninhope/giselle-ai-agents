@@ -15,7 +15,7 @@ import {
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
-import { type V2FlowAction, replaceFlowAction } from "./action";
+import { type V2FlowAction, addArtifact, replaceFlowAction } from "./action";
 import { type Flow, type FlowAction, flowActionStatuses } from "./types";
 
 interface RunActionInput {
@@ -69,36 +69,65 @@ export async function runAction(input: RunActionInput) {
 			);
 		}
 
+		const artifact = agent.graphv2.artifacts.find(
+			(artifact) => artifact.generatorNode.id === actionNode.id,
+		);
+		if (artifact === undefined) {
+			throw new Error(`No artifact found for node ${actionNode.id}`);
+		}
+
 		const sources: Source[] = [];
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator:
-				await generateText({
-					input: {
-						action: input.action,
-						prompt: instructionNode.output as string,
-						sources,
-						model: openai("gpt-4o"),
-					},
-					options: {
-						onAction: (action) => {
-							stream.update(action);
+				{
+					const result = await generateText({
+						input: {
+							action: input.action,
+							prompt: instructionNode.output as string,
+							sources,
+							model: openai("gpt-4o"),
 						},
-					},
-				});
+						options: {
+							onAction: (action) => {
+								stream.update(action);
+							},
+						},
+					});
+					stream.update(
+						replaceFlowAction({
+							input: {
+								...input.action,
+								output: result,
+								status: flowActionStatuses.completed,
+							},
+						}),
+					);
+					stream.update(
+						addArtifact({
+							input: {
+								artifact: {
+									...result.artifact,
+									id: artifact.id,
+									object: "artifact",
+									generatorNode: {
+										id: actionNode.id,
+										category: actionNode.category,
+										archetype: actionNode.archetype,
+										name: actionNode.name,
+										object: "node.artifactElement",
+										properties: actionNode.properties,
+									},
+									elements: [],
+								},
+							},
+						}),
+					);
+				}
 				break;
 			case giselleNodeArchetypes.webSearch:
 				await webSearch();
 				break;
 		}
-		stream.update(
-			replaceFlowAction({
-				input: {
-					...input.action,
-					status: flowActionStatuses.completed,
-					output: "Done!",
-				},
-			}),
-		);
 		stream.done();
 	})();
 
@@ -135,7 +164,7 @@ async function generateText({
  `
 			: "You generate an answer to a question. ";
 
-	const { partialObjectStream } = await streamObject({
+	const { partialObjectStream, object } = await streamObject({
 		model: input.model,
 		system,
 		prompt: input.prompt,
@@ -153,6 +182,7 @@ async function generateText({
 			}),
 		);
 	}
+	return await object;
 }
 
 async function webSearch() {

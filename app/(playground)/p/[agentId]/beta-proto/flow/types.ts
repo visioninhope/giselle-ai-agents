@@ -1,6 +1,8 @@
+import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
 import type { GiselleNode, GiselleNodeId } from "../giselle-node/types";
 import type { AgentId } from "../types";
+import type { WebSearch } from "../web-search/types";
 
 export type FlowId = `flw_${string}`;
 
@@ -22,6 +24,8 @@ interface BaseFlow {
 		connectors: ConnectorObject[];
 	};
 	actionLayers: FlowActionLayer[];
+	artifacts: Artifact[];
+	webSearches: WebSearch[];
 }
 
 export interface InitializingFlow extends BaseFlow {

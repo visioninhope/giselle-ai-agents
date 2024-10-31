@@ -1,3 +1,4 @@
+import type { Artifact } from "../artifact/types";
 import type { Flow, FlowAction, FlowActionId, FlowIndex } from "./types";
 
 const v2FlowIndexActionTypes = {
@@ -46,6 +47,7 @@ export function v2FlowIndexReducer(
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
 	replaceFlowAction: "v2.replaceFlowAction",
+	addArtifact: "v2.addArtifact",
 } as const;
 
 type V2FlowActionType =
@@ -81,7 +83,28 @@ export function replaceFlowAction({
 	};
 }
 
-export type V2FlowAction = SetFlowAction | ReplaceFlowActionAction;
+interface AddArtifactAction {
+	type: Extract<V2FlowActionType, "v2.addArtifact">;
+	input: AddArtifactActionInput;
+}
+interface AddArtifactActionInput {
+	artifact: Artifact;
+}
+export function addArtifact({
+	input,
+}: {
+	input: AddArtifactActionInput;
+}): AddArtifactAction {
+	return {
+		type: v2FlowActionTypes.addArtifact,
+		input,
+	};
+}
+
+export type V2FlowAction =
+	| SetFlowAction
+	| ReplaceFlowActionAction
+	| AddArtifactAction;
 
 export function isV2FlowAction(action: unknown): action is V2FlowAction {
 	return Object.values(v2FlowActionTypes).includes(
@@ -108,6 +131,14 @@ export function v2FlowReducer(
 						flowAction.id === action.input.id ? action.input : flowAction,
 					),
 				})),
+			};
+		case v2FlowActionTypes.addArtifact:
+			if (flow == null) {
+				return flow;
+			}
+			return {
+				...flow,
+				artifacts: [...flow.artifacts, action.input.artifact],
 			};
 	}
 	return flow;

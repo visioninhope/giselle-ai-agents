@@ -147,6 +147,8 @@ export function buildFlow({ input }: { input: BuildFlowInput }) {
 			connectors: input.graph.connectors,
 		},
 		actionLayers,
+		artifacts: [],
+		webSearches: [],
 	} satisfies InitializingFlow;
 }
 
