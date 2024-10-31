@@ -3,10 +3,13 @@ import { getUser } from "@/lib/supabase";
 import type { GitHubUserClient } from "@/services/external/github/user-client";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import Link from "next/link";
-import { authorizeGitHub, unlinkIdentity } from "../account/actions";
+import {
+	connectGitHubIdentity,
+	disconnectGitHubIdentity,
+} from "../account/actions";
 import {
 	GitHubConnectButton,
-	type GitHubConnectButtonMode,
+	GitHubDisconnectButton,
 } from "./github-connection-button";
 
 type GitHubUser = Awaited<ReturnType<GitHubUserClient["getUser"]>>;
@@ -16,16 +19,20 @@ export async function GitHubConnection({
 }: {
 	gitHubUser?: GitHubUser;
 }) {
-	const supabaseUser = await getUser();
-	const unlinkable =
-		supabaseUser.identities && supabaseUser.identities.length > 1;
+	const ConnectButton = async () => {
+		if (!gitHubUser) {
+			return <GitHubConnectButton action={connectGitHubIdentity} />;
+		}
 
-	let connectMode: GitHubConnectButtonMode = "hidden";
-	if (!gitHubUser) {
-		connectMode = "connect";
-	} else if (unlinkable) {
-		connectMode = "disconnect";
-	}
+		const supabaseUser = await getUser();
+		const unlinkable =
+			supabaseUser.identities && supabaseUser.identities.length > 1;
+		if (unlinkable) {
+			return <GitHubDisconnectButton action={disconnectGitHubIdentity} />;
+		}
+
+		return null;
+	};
 
 	return (
 		<div className="bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
@@ -45,11 +52,7 @@ export async function GitHubConnection({
 						)}
 					</div>
 				</div>
-				<GitHubConnectButton
-					mode={connectMode}
-					connectAction={authorizeGitHub}
-					disconnectAction={unlinkIdentity}
-				/>
+				{ConnectButton()}
 			</div>
 		</div>
 	);

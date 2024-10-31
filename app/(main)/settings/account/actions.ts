@@ -5,7 +5,7 @@ import { createClient, getUser } from "@/lib/supabase";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-export async function authorizeGitHub() {
+export async function connectGitHubIdentity() {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.linkIdentity({
 		provider: "github",
@@ -23,7 +23,7 @@ export async function authorizeGitHub() {
 	}
 }
 
-export async function unlinkIdentity() {
+export async function disconnectGitHubIdentity() {
 	const supabaseUser = await getUser();
 	const supabase = await createClient();
 	if (!supabaseUser.identities) {
