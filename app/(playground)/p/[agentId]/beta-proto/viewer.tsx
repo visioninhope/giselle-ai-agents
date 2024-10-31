@@ -49,13 +49,13 @@ export function Viewer() {
 					<div className="flex-1 flex w-full gap-[16px] pt-[16px]">
 						<div className="w-[200px]">
 							<div className="flex flex-col gap-[8px]">
-								{state.flow.actionLayers.map((actionLayer, index) => (
+								{state.flow.jobs.map((actionLayer, index) => (
 									<div key={actionLayer.id}>
 										<p className="text-[12px] text-black-30">
 											Step {index + 1}
 										</p>
 										<div className="flex flex-col gap-[4px]">
-											{actionLayer.actions.map((action) => (
+											{actionLayer.steps.map((action) => (
 												<ActionItem
 													key={action.id}
 													action={action}

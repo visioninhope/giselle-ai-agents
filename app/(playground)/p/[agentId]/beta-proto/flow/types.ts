@@ -1,5 +1,6 @@
 import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
+import type { GiselleNodeArchetype } from "../giselle-node/blueprints";
 import type { GiselleNode, GiselleNodeId } from "../giselle-node/types";
 import type { AgentId } from "../types";
 import type { WebSearch } from "../web-search/types";
@@ -23,7 +24,7 @@ interface BaseFlow {
 		nodes: GiselleNode[];
 		connectors: ConnectorObject[];
 	};
-	actionLayers: FlowActionLayer[];
+	jobs: Job[];
 	artifacts: Artifact[];
 	webSearches: WebSearch[];
 }
@@ -43,59 +44,57 @@ export interface RunningFlow extends BaseFlow {
 
 export type Flow = InitializingFlow | QueuedFlow | RunningFlow;
 
-export type FlowActionLayerId = `flw.stk_${string}`;
-export const flowActionLayerStatuses = {
+export type JobId = `jb_${string}`;
+export const jobStatuses = {
 	queued: "queued",
 	running: "running",
 	completed: "completed",
 	failed: "failed",
 } as const;
-type FlowActionLayerType =
-	(typeof flowActionLayerStatuses)[keyof typeof flowActionLayerStatuses];
-interface BaseFlowActionLayer {
-	object: "flow.actionLayer";
-	id: FlowActionLayerId;
-	actions: FlowAction[];
+type JobStatus = (typeof jobStatuses)[keyof typeof jobStatuses];
+interface BaseJob {
+	object: "job";
+	id: JobId;
+	steps: Step[];
 }
-interface QueuedFlowActionLayer extends BaseFlowActionLayer {
-	status: Extract<FlowActionLayerType, "queued">;
+interface QueuedJob extends BaseJob {
+	status: Extract<JobStatus, "queued">;
 }
-interface RunningFlowActionLayer extends BaseFlowActionLayer {
-	status: Extract<FlowActionLayerType, "running">;
+interface RunningJob extends BaseJob {
+	status: Extract<JobStatus, "running">;
 }
-export type FlowActionLayer = QueuedFlowActionLayer | RunningFlowActionLayer;
+export type Job = QueuedJob | RunningJob;
 
-export type FlowActionId = `flw.act_${string}`;
-export const flowActionStatuses = {
+export type StepId = `stp_${string}`;
+export const stepStatuses = {
 	queued: "queued",
 	running: "running",
 	completed: "completed",
 } as const;
 
-export type FlowActionStatus =
-	(typeof flowActionStatuses)[keyof typeof flowActionStatuses];
+export type StepStatus = (typeof stepStatuses)[keyof typeof stepStatuses];
 
-interface BaseFlowAction {
-	id: FlowActionId;
-	object: "flow.action";
+type StepAction = GiselleNodeArchetype;
+interface BaseStep {
+	id: StepId;
+	object: "step";
 	nodeId: GiselleNodeId;
+	action: StepAction;
+	prompt: string;
 }
-interface QueuedFlowAction extends BaseFlowAction {
-	status: Extract<FlowActionStatus, "queued">;
+interface QueuedStep extends BaseStep {
+	status: Extract<StepStatus, "queued">;
 }
-interface RunningFlowAction extends BaseFlowAction {
-	status: Extract<FlowActionStatus, "running">;
+interface RunningStep extends BaseStep {
+	status: Extract<StepStatus, "running">;
 	output: unknown;
 }
-interface CompletedFlowAction extends BaseFlowAction {
-	status: Extract<FlowActionStatus, "completed">;
+interface CompletedStep extends BaseStep {
+	status: Extract<StepStatus, "completed">;
 	output: unknown;
 }
 
-export type FlowAction =
-	| QueuedFlowAction
-	| RunningFlowAction
-	| CompletedFlowAction;
+export type Step = QueuedStep | RunningStep | CompletedStep;
 
 interface BaseFlowIndex {
 	object: "flow.index";

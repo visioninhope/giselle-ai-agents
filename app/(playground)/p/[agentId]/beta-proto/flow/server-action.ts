@@ -4,9 +4,10 @@ import { agents, db } from "@/drizzle";
 import { openai } from "@ai-sdk/openai";
 import { put } from "@vercel/blob";
 import { type LanguageModelV1, streamObject } from "ai";
-import { createStreamableValue } from "ai/rsc";
+import { createStreamableValue, readStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
 import { schema as artifactSchema } from "../artifact/schema";
+import type { GeneratedObject } from "../artifact/types";
 import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import {
 	type GiselleNodeId,
@@ -15,135 +16,84 @@ import {
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
-import { type V2FlowAction, addArtifact, replaceFlowAction } from "./action";
-import { type Flow, type FlowAction, flowActionStatuses } from "./types";
+import {
+	type V2FlowAction,
+	addArtifact,
+	replaceStep,
+	setFlow,
+	setStepOutput,
+} from "./action";
+import { type Flow, type Step, flowStatuses, stepStatuses } from "./types";
+import { buildFlow } from "./utils";
 
-interface RunActionInput {
-	agentId: AgentId;
-	nodeId: GiselleNodeId;
-	action: FlowAction;
-	stream: boolean;
-}
-export async function runAction(input: RunActionInput) {
+export async function executeFlow(
+	agentId: AgentId,
+	finalNodeId: GiselleNodeId,
+) {
 	const stream = createStreamableValue<V2FlowAction>();
 	(async () => {
+		const agent = await db.query.agents.findFirst({
+			where: eq(agents.id, agentId),
+		});
+		if (agent === undefined) {
+			throw new Error(`Agent with id ${agentId} not found`);
+		}
+		const graph = agent.graphv2;
+		const flow = buildFlow({
+			input: {
+				agentId: graph.agentId,
+				finalNodeId: finalNodeId,
+				graph: graph,
+			},
+		});
+		const flowBlob = await putFlow({ input: { flow } });
 		stream.update(
-			replaceFlowAction({
+			setFlow({
 				input: {
-					...input.action,
-					status: flowActionStatuses.running,
-					output: "",
+					flow: {
+						...flow,
+						status: flowStatuses.queued,
+						dataUrl: flowBlob.url,
+					},
 				},
 			}),
 		);
-		const agent = await db.query.agents.findFirst({
-			where: eq(agents.id, input.agentId),
-		});
-		if (agent === undefined) {
-			throw new Error(`Agent with id ${input.agentId} not found`);
-		}
-		const graph = agent.graphv2;
-
-		const instructionConnector = graph.connectors.find(
-			(connector) =>
-				connector.target === input.nodeId &&
-				connector.sourceNodeCategory === giselleNodeCategories.instruction,
-		);
-
-		if (instructionConnector === undefined) {
-			throw new Error(
-				`No instruction connector found for node ${input.nodeId}`,
-			);
-		}
-
-		const instructionNode = graph.nodes.find(
-			(node) => node.id === instructionConnector.source,
-		);
-		const actionNode = graph.nodes.find(
-			(node) => node.id === instructionConnector.target,
-		);
-
-		if (instructionNode === undefined || actionNode === undefined) {
-			throw new Error(
-				`Instruction node ${instructionConnector.source} or action node ${instructionConnector.target} not found`,
-			);
-		}
-
-		const artifact = agent.graphv2.artifacts.find(
-			(artifact) => artifact.generatorNode.id === actionNode.id,
-		);
-		if (artifact === undefined) {
-			throw new Error(`No artifact found for node ${actionNode.id}`);
-		}
-
-		const sources: Source[] = [];
-		switch (instructionConnector.targetNodeArcheType) {
-			case giselleNodeArchetypes.textGenerator:
-				{
-					const result = await generateText({
+		for (const job of flow.jobs) {
+			await Promise.all(
+				job.steps.map(async (step) => {
+					await generateText({
 						input: {
-							action: input.action,
-							prompt: instructionNode.output as string,
-							sources,
-							model: openai("gpt-4o"),
+							prompt: step.prompt,
+							model: openai("gpt-4o-mini"),
+							sources: [],
 						},
 						options: {
-							onAction: (action) => {
-								stream.update(action);
+							onStreamPartialObject: (object) => {
+								stream.update(
+									setStepOutput({
+										input: {
+											output: object,
+										},
+									}),
+								);
 							},
 						},
 					});
-					stream.update(
-						replaceFlowAction({
-							input: {
-								...input.action,
-								output: result,
-								status: flowActionStatuses.completed,
-							},
-						}),
-					);
-					stream.update(
-						addArtifact({
-							input: {
-								artifact: {
-									...result.artifact,
-									id: artifact.id,
-									object: "artifact",
-									generatorNode: {
-										id: actionNode.id,
-										category: actionNode.category,
-										archetype: actionNode.archetype,
-										name: actionNode.name,
-										object: "node.artifactElement",
-										properties: actionNode.properties,
-									},
-									elements: [],
-								},
-							},
-						}),
-					);
-				}
-				break;
-			case giselleNodeArchetypes.webSearch:
-				await webSearch();
-				break;
+				}),
+			);
 		}
-		stream.done();
 	})();
 
-	return {
-		object: stream.value,
-	};
+	return { streamableValue: stream.value };
 }
 
 interface GenerateTextInput {
 	model: LanguageModelV1;
 	prompt: string;
-	action: FlowAction;
 	sources: Source[];
 }
 interface GenerateTextOptions {
-	onAction?: (action: V2FlowAction) => void;
+	onStreamPartialObject?: (partialObject: Partial<GeneratedObject>) => void;
 }
 async function generateText({
 	input,
@@ -172,15 +122,21 @@ async function generateText({
 	});
 
 	for await (const partialObject of partialObjectStream) {
-		options.onAction?.(
-			replaceFlowAction({
-				input: {
-					...input.action,
-					status: flowActionStatuses.running,
-					output: partialObject,
-				},
-			}),
-		);
+		options.onStreamPartialObject?.({
+			thinking: partialObject.thinking,
+			artifact: {
+				title: partialObject.artifact?.title || "",
+				content: partialObject.artifact?.content || "",
+				citations: (partialObject.artifact?.citations || [])?.map(
+					(citation) => ({
+						title: citation?.title ?? "",
+						url: citation?.url ?? "",
+					}),
+				),
+				completed: partialObject.artifact?.completed || false,
+			},
+			description: partialObject.description,
+		});
 	}
 	return await object;
 }

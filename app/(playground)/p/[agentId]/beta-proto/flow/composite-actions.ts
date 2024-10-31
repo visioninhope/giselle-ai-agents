@@ -4,31 +4,13 @@ import type { CompositeAction } from "../graph/context";
 import { playgroundModes } from "../graph/types";
 import { updateMode } from "../graph/v2/mode";
 import { setFlow, setFlowIndexes } from "./action";
-import { putFlow, runAction } from "./server-action";
+import { executeFlow as executeFlowOnServer, putFlow } from "./server-action";
 import { flowStatuses } from "./types";
 import { buildFlow, buildFlowIndex } from "./utils";
 
-export function runFlow(finalNode: GiselleNode): CompositeAction {
+export function executeFlow(finalNode: GiselleNode): CompositeAction {
 	return async (dispatch, getState) => {
-		const state = getState();
-		const flow = buildFlow({
-			input: {
-				agentId: state.graph.agentId,
-				finalNodeId: finalNode.id,
-				graph: state.graph,
-			},
-		});
-		dispatch(setFlow({ input: { flow } }));
-		dispatch(
-			setFlowIndexes({
-				input: {
-					flowIndexes: [
-						...getState().graph.flowIndexes,
-						buildFlowIndex({ input: flow }),
-					],
-				},
-			}),
-		);
+		dispatch(setFlow({ input: { flow: null } }));
 		dispatch(
 			updateMode({
 				input: {
@@ -36,46 +18,15 @@ export function runFlow(finalNode: GiselleNode): CompositeAction {
 				},
 			}),
 		);
-		const blob = await putFlow({ input: { flow } });
-		dispatch(
-			setFlow({
-				input: {
-					flow: {
-						...flow,
-						status: flowStatuses.queued,
-						dataUrl: blob.url,
-					},
-				},
-			}),
+		const { streamableValue } = await executeFlowOnServer(
+			getState().graph.agentId,
+			finalNode.id,
 		);
-		dispatch(
-			setFlowIndexes({
-				input: {
-					flowIndexes: getState().graph.flowIndexes.map((flowIndex) =>
-						flowIndex.id === flow.id
-							? buildFlowIndex({ input: flow })
-							: flowIndex,
-					),
-				},
-			}),
-		);
-		for (const actionLayer of flow.actionLayers) {
-			await Promise.all(
-				actionLayer.actions.map(async (action) => {
-					const { object } = await runAction({
-						nodeId: action.nodeId,
-						agentId: state.graph.agentId,
-						action,
-						stream: true,
-					});
-					for await (const streamContent of readStreamableValue(object)) {
-						if (streamContent === undefined) {
-							continue;
-						}
-						dispatch(streamContent);
-					}
-				}),
-			);
+		for await (const streamContent of readStreamableValue(streamableValue)) {
+			if (streamContent === undefined) {
+				continue;
+			}
+			dispatch(streamContent);
 		}
 	};
 }

@@ -1,5 +1,5 @@
 import type { Artifact } from "../artifact/types";
-import type { Flow, FlowAction, FlowActionId, FlowIndex } from "./types";
+import type { Flow, FlowIndex, Step, StepId } from "./types";
 
 const v2FlowIndexActionTypes = {
 	setFlowIndex: "v2.setFlowIndex",
@@ -46,7 +46,8 @@ export function v2FlowIndexReducer(
 
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
-	replaceFlowAction: "v2.replaceFlowAction",
+	replaceStep: "v2.replaceStep",
+	setStepOutput: "v2.setStepOutput",
 	addArtifact: "v2.addArtifact",
 } as const;
 
@@ -58,7 +59,7 @@ interface SetFlowAction {
 	input: SetFlowActionInput;
 }
 interface SetFlowActionInput {
-	flow: Flow;
+	flow: Flow | null | undefined;
 }
 export function setFlow({ input }: { input: SetFlowActionInput }) {
 	return {
@@ -68,17 +69,35 @@ export function setFlow({ input }: { input: SetFlowActionInput }) {
 }
 
 interface ReplaceFlowActionAction {
-	type: Extract<V2FlowActionType, "v2.replaceFlowAction">;
+	type: Extract<V2FlowActionType, "v2.replaceStep">;
 	input: ReplaceFlowActionActionInput;
 }
-type ReplaceFlowActionActionInput = FlowAction;
-export function replaceFlowAction({
+type ReplaceFlowActionActionInput = Step;
+export function replaceStep({
 	input,
 }: {
 	input: ReplaceFlowActionActionInput;
 }): ReplaceFlowActionAction {
 	return {
-		type: v2FlowActionTypes.replaceFlowAction,
+		type: v2FlowActionTypes.replaceStep,
+		input,
+	};
+}
+
+interface SetStepOutputAction {
+	type: Extract<V2FlowActionType, "v2.setStepOutput">;
+	input: SetStepOutputActionInput;
+}
+interface SetStepOutputActionInput {
+	output: unknown;
+}
+export function setStepOutput({
+	input,
+}: {
+	input: SetStepOutputActionInput;
+}): SetStepOutputAction {
+	return {
+		type: v2FlowActionTypes.setStepOutput,
 		input,
 	};
 }
@@ -104,6 +123,7 @@ export function addArtifact({
 export type V2FlowAction =
 	| SetFlowAction
 	| ReplaceFlowActionAction
+	| SetStepOutputAction
 	| AddArtifactAction;
 
 export function isV2FlowAction(action: unknown): action is V2FlowAction {
@@ -119,15 +139,15 @@ export function v2FlowReducer(
 	switch (action.type) {
 		case v2FlowActionTypes.setFlow:
 			return action.input.flow;
-		case v2FlowActionTypes.replaceFlowAction:
+		case v2FlowActionTypes.replaceStep:
 			if (flow == null) {
 				return flow;
 			}
 			return {
 				...flow,
-				actionLayers: flow.actionLayers.map((actionLayer) => ({
+				jobs: flow.jobs.map((actionLayer) => ({
 					...actionLayer,
-					actions: actionLayer.actions.map((flowAction) =>
+					actions: actionLayer.steps.map((flowAction) =>
 						flowAction.id === action.input.id ? action.input : flowAction,
 					),
 				})),
