@@ -4,112 +4,18 @@ import { agents, db } from "@/drizzle";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
-import type { Artifact } from "../artifact/types";
-import { type StructuredData, fileStatuses } from "../files/types";
+import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import {
-	giselleNodeArchetypes,
-	textGeneratorParameterNames,
-} from "../giselle-node/blueprints";
-import {
-	type GiselleNode,
 	type GiselleNodeId,
 	giselleNodeCategories,
 } from "../giselle-node/types";
-import type { Graph } from "../graph/types";
 import {
 	extractSourceIndexesFromNode,
 	sourceIndexesToSources,
-	sourcesToText,
 } from "../source/utils";
-import type { TextContent } from "../text-content/types";
 import type { AgentId } from "../types";
-import {
-	type WebSearchItem,
-	type WebSearchItemReference,
-	webSearchItemStatus,
-	webSearchStatus,
-} from "../web-search/types";
-import { type V2FlowAction, replaceFlowAction, setFlow } from "./action";
-import {
-	type Flow,
-	type FlowAction,
-	type FlowActionLayer,
-	flowActionStatuses,
-} from "./types";
-
-type Source = Artifact | TextContent | StructuredData | WebSearchItem;
-interface GatherInstructionSourcesInput {
-	node: GiselleNode;
-	graph: Graph;
-}
-async function gatherInstructionSources(input: GatherInstructionSourcesInput) {
-	if (!Array.isArray(input.node.properties.sources)) {
-		return [];
-	}
-	const instructionSources: Source[] = [];
-	for (const source of input.node.properties.sources) {
-		if (
-			typeof source !== "object" ||
-			source === null ||
-			typeof source.id !== "string" ||
-			typeof source.object !== "string"
-		) {
-			continue;
-		}
-		if (source.object === "textContent") {
-			instructionSources.push(source);
-		} else if (source.object === "artifact.reference") {
-			const artifact = input.graph.artifacts.find(
-				(artifact) => artifact.id === source.id,
-			);
-			if (artifact !== undefined) {
-				instructionSources.push(artifact);
-			}
-		} else if (source.object === "file") {
-			if (
-				typeof source.status === "string" &&
-				source.status === fileStatuses.processed &&
-				typeof source.structuredDataBlobUrl === "string" &&
-				typeof source.name === "string"
-			) {
-				const structuredData = await fetch(source.structuredDataBlobUrl).then(
-					(res) => res.text(),
-				);
-				instructionSources.push({
-					id: source.id,
-					object: "file",
-					title: source.name,
-					content: structuredData,
-				});
-			}
-		} else if (source.object === "webSearch") {
-			if (
-				typeof source.status === "string" &&
-				source.status === webSearchStatus.completed &&
-				Array.isArray(source.items)
-			) {
-				await Promise.all(
-					(source.items as WebSearchItemReference[]).map(async (item) => {
-						if (item.status === webSearchItemStatus.completed) {
-							const webSearchData = await fetch(item.contentBlobUrl).then(
-								(res) => res.text(),
-							);
-							instructionSources.push({
-								id: item.id,
-								object: "webSearch.item",
-								url: item.url,
-								title: item.title,
-								content: webSearchData,
-								relevance: item.relevance,
-							});
-						}
-					}),
-				);
-			}
-		}
-	}
-	return instructionSources;
-}
+import { type V2FlowAction, replaceFlowAction } from "./action";
+import { type Flow, type FlowAction, flowActionStatuses } from "./types";
 
 interface RunActionInput {
 	agentId: AgentId;
@@ -162,9 +68,6 @@ export async function runAction(input: RunActionInput) {
 		}
 
 		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
-		const sources = await sourceIndexesToSources({
-			input: { sourceIndexes, agentId: input.agentId },
-		});
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator:
 				await generateText();
