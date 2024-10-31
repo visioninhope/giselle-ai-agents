@@ -81,11 +81,11 @@ interface QueuedFlowAction extends BaseFlowAction {
 }
 interface RunningFlowAction extends BaseFlowAction {
 	status: Extract<FlowActionStatus, "running">;
-	output: string;
+	output: unknown;
 }
 interface CompletedFlowAction extends BaseFlowAction {
 	status: Extract<FlowActionStatus, "completed">;
-	output: string;
+	output: unknown;
 }
 
 export type FlowAction =

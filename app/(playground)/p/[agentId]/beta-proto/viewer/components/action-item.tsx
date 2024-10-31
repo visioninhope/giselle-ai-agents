@@ -31,7 +31,10 @@ export function ActionItem(props: ActionItemProps) {
 				{(props.action.status === flowActionStatuses.running ||
 					props.action.status === flowActionStatuses.completed) && (
 					<p className="line-clamp-1 font-rosart text-black-70 text-[8px]">
-						output: {props.action.output}
+						output:{" "}
+						{(typeof props.action.output === "object" &&
+							JSON.stringify(props.action.output)) ||
+							(props.action.output as string)}
 					</p>
 				)}
 			</div>

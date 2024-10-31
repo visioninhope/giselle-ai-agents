@@ -1,18 +1,19 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
+import { openai } from "@ai-sdk/openai";
 import { put } from "@vercel/blob";
+import { type LanguageModelV1, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
+import { schema as artifactSchema } from "../artifact/schema";
 import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import {
 	type GiselleNodeId,
 	giselleNodeCategories,
 } from "../giselle-node/types";
-import {
-	extractSourceIndexesFromNode,
-	sourceIndexesToSources,
-} from "../source/utils";
+import type { Source } from "../source/types";
+import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import { type V2FlowAction, replaceFlowAction } from "./action";
 import { type Flow, type FlowAction, flowActionStatuses } from "./types";
@@ -68,11 +69,16 @@ export async function runAction(input: RunActionInput) {
 			);
 		}
 
-		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
+		const sources: Source[] = [];
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator:
 				await generateText({
-					input: { action: input.action },
+					input: {
+						action: input.action,
+						prompt: instructionNode.output as string,
+						sources,
+						model: openai("gpt-4o"),
+					},
 					options: {
 						onAction: (action) => {
 							stream.update(action);
@@ -102,7 +108,10 @@ export async function runAction(input: RunActionInput) {
 }
 
 interface GenerateTextInput {
+	model: LanguageModelV1;
+	prompt: string;
 	action: FlowAction;
+	sources: Source[];
 }
 interface GenerateTextOptions {
 	onAction?: (action: V2FlowAction) => void;
@@ -114,18 +123,36 @@ async function generateText({
 	input: GenerateTextInput;
 	options: GenerateTextOptions;
 }) {
-	options.onAction?.(
-		replaceFlowAction({
-			input: {
-				...input.action,
-				status: flowActionStatuses.running,
-				output: "hello world",
-			},
-		}),
-	);
-	console.log(
-		"\x1b[33m\x1b[1mTODO:\x1b[0m Implement text generation functionality",
-	);
+	const system =
+		input.sources.length > 0
+			? `
+ Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
+
+ If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
+
+ ${sourcesToText(input.sources)}
+
+ `
+			: "You generate an answer to a question. ";
+
+	const { partialObjectStream } = await streamObject({
+		model: input.model,
+		system,
+		prompt: input.prompt,
+		schema: artifactSchema,
+	});
+
+	for await (const partialObject of partialObjectStream) {
+		options.onAction?.(
+			replaceFlowAction({
+				input: {
+					...input.action,
+					status: flowActionStatuses.running,
+					output: partialObject,
+				},
+			}),
+		);
+	}
 }
 
 async function webSearch() {
