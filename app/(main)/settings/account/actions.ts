@@ -2,7 +2,6 @@
 
 import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient, getUser } from "@/lib/supabase";
-import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 export async function connectGitHubIdentity() {
@@ -44,5 +43,4 @@ export async function disconnectGitHubIdentity() {
 	}
 
 	await deleteOauthCredential("github");
-	revalidatePath("/settings/account");
 }
