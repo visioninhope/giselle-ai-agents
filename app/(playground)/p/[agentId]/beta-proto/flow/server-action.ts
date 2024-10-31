@@ -31,6 +31,7 @@ export async function runAction(input: RunActionInput) {
 				input: {
 					...input.action,
 					status: flowActionStatuses.running,
+					output: "",
 				},
 			}),
 		);
@@ -70,7 +71,14 @@ export async function runAction(input: RunActionInput) {
 		const sourceIndexes = extractSourceIndexesFromNode(instructionNode);
 		switch (instructionConnector.targetNodeArcheType) {
 			case giselleNodeArchetypes.textGenerator:
-				await generateText();
+				await generateText({
+					input: { action: input.action },
+					options: {
+						onAction: (action) => {
+							stream.update(action);
+						},
+					},
+				});
 				break;
 			case giselleNodeArchetypes.webSearch:
 				await webSearch();
@@ -81,6 +89,7 @@ export async function runAction(input: RunActionInput) {
 				input: {
 					...input.action,
 					status: flowActionStatuses.completed,
+					output: "Done!",
 				},
 			}),
 		);
@@ -92,7 +101,28 @@ export async function runAction(input: RunActionInput) {
 	};
 }
 
-async function generateText() {
+interface GenerateTextInput {
+	action: FlowAction;
+}
+interface GenerateTextOptions {
+	onAction?: (action: V2FlowAction) => void;
+}
+async function generateText({
+	input,
+	options,
+}: {
+	input: GenerateTextInput;
+	options: GenerateTextOptions;
+}) {
+	options.onAction?.(
+		replaceFlowAction({
+			input: {
+				...input.action,
+				status: flowActionStatuses.running,
+				output: "hello world",
+			},
+		}),
+	);
 	console.log(
 		"\x1b[33m\x1b[1mTODO:\x1b[0m Implement text generation functionality",
 	);

@@ -28,6 +28,12 @@ export function ActionItem(props: ActionItemProps) {
 				<p className="line-clamp-1 font-rosart text-black-70 text-[8px]">
 					{props.node.name} / {props.action.status}
 				</p>
+				{(props.action.status === flowActionStatuses.running ||
+					props.action.status === flowActionStatuses.completed) && (
+					<p className="line-clamp-1 font-rosart text-black-70 text-[8px]">
+						output: {props.action.output}
+					</p>
+				)}
 			</div>
 		</div>
 	);
