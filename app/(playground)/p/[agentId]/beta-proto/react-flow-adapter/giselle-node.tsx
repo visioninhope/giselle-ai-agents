@@ -20,15 +20,32 @@ import {
 	type GiselleNode as GiselleNodeType,
 	giselleNodeCategories,
 } from "../giselle-node/types";
+import {
+	type ReactFlowEdge as ReactFlowEdgeType,
+	type ReactFlowNode as ReactFlowNodeType,
+	giselleEdgeType,
+	giselleNodeType,
+} from "./types";
 
-export type ReactFlowNode = Node<GiselleNodeType>;
-
-export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
-	const edges = useEdges<ReactFlowEdge>();
+export const ReactFlowNode: FC<NodeProps<ReactFlowNodeType>> = ({
+	data,
+	selected,
+	positionAbsoluteX,
+	positionAbsoluteY,
+}) => {
+	const edges = useEdges<ReactFlowEdgeType>();
 	const { debugFlag } = useFeatureFlags();
 	return (
 		<GiselleNode
 			{...data}
+			ui={{
+				...data.ui,
+				position: {
+					x: positionAbsoluteX,
+					y: positionAbsoluteY,
+				},
+				selected,
+			}}
 			parameterPortHandle={({ id, className }) => (
 				<Handle
 					id={id}
@@ -59,8 +76,7 @@ export const ReactFlowNode: FC<NodeProps<ReactFlowNode>> = ({ data }) => {
 	);
 };
 
-export type ReactFlowEdge = Edge<ConnectorObject>;
-export const ReactFlowEdge: FC<EdgeProps<ReactFlowEdge>> = ({
+export const ReactFlowEdge: FC<EdgeProps<ReactFlowEdgeType>> = ({
 	id,
 	sourceX,
 	sourceY,
@@ -100,12 +116,10 @@ export const ReactFlowEdge: FC<EdgeProps<ReactFlowEdge>> = ({
 	);
 };
 
-export const giselleNodeType = "giselleNode";
 export const nodeTypes: NodeTypes = {
 	[giselleNodeType]: ReactFlowNode,
 };
 
-export const giselleEdgeType = "giselleEdge";
 export const edgeTypes: EdgeTypes = {
 	[giselleEdgeType]: ReactFlowEdge,
 };

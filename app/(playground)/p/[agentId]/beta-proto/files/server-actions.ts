@@ -1,41 +1,33 @@
 "use server";
 
-import { agents, db } from "@/drizzle";
-import { createId } from "@paralleldrive/cuid2";
 import { put } from "@vercel/blob";
-import { eq } from "drizzle-orm";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
-import type { FileId } from "../files/types";
-import type { AgentId } from "../types";
 import { elementsToMarkdown } from "../utils/unstructured";
-import type { Graph } from "./types";
+import type { FileId } from "./types";
 
-export async function setGraphToDb(agentId: AgentId, graph: Graph) {
-	await db
-		.update(agents)
-		.set({ graphv2: graph, graphHash: createId() })
-		.where(eq(agents.id, agentId));
-}
-
-type UploadFileArgs = {
+type UploadFileInput = {
 	fileId: FileId;
 	file: File;
 };
-export async function uploadFile(args: UploadFileArgs) {
-	const blob = await put(`files/${args.fileId}/${args.file.name}`, args.file, {
-		access: "public",
-		contentType: args.file.type,
-	});
+export async function uploadFile({ input }: { input: UploadFileInput }) {
+	const blob = await put(
+		`files/${input.fileId}/${input.file.name}`,
+		input.file,
+		{
+			access: "public",
+			contentType: input.file.type,
+		},
+	);
 	return blob;
 }
 
-type ParseFileArgs = {
+type ParseFileInput = {
 	id: FileId;
 	name: string;
 	blobUrl: string;
 };
-export async function parseFile(args: ParseFileArgs) {
+export async function parseFile(args: ParseFileInput) {
 	if (process.env.UNSTRUCTURED_API_KEY === undefined) {
 		throw new Error("UNSTRUCTURED_API_KEY is not set");
 	}

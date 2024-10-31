@@ -3,15 +3,14 @@ import {
 	type PropsWithChildren,
 	useCallback,
 	useEffect,
-	useReducer,
 	useRef,
+	useState,
 } from "react";
 import type { AgentId } from "../types";
 import { type EnhancedDispatch, GraphContext } from "./context";
 import { graphReducer } from "./reducer";
 import { setGraphToDb } from "./server-actions";
 import type { Graph } from "./types";
-import { useDebounce } from "./use-debounce";
 
 const initialState = {
 	graph: {
@@ -31,37 +30,37 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 	agentId,
 	defaultGraph,
 }) => {
-	const [originalState, originalDispatch] = useReducer(graphReducer, {
-		graph: defaultGraph,
-	});
 	const isInitialMount = useRef(true);
-	const stateRef = useRef(originalState);
+	const stateRef = useRef({ graph: defaultGraph });
+	const [state, setState] = useState(stateRef.current);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+	const enhancedDispatch: EnhancedDispatch = useCallback(
+		async (action) => {
+			if (typeof action === "function") {
+				await action(enhancedDispatch, () => stateRef.current);
+			} else {
+				stateRef.current = graphReducer(stateRef.current, action);
+				if (timeoutRef.current) {
+					clearTimeout(timeoutRef.current);
+				}
+				timeoutRef.current = setTimeout(async () => {
+					await setGraphToDb(agentId, stateRef.current.graph);
+				}, 500);
+			}
+			setState(stateRef.current);
+		},
+		[agentId],
+	);
 	useEffect(() => {
-		stateRef.current = originalState;
-	}, [originalState]);
-
-	const deboucedSetGraphToDb = useDebounce(async (graph: Graph) => {
-		setGraphToDb(agentId, graph);
-	}, 500);
-	const enhancedDispatch: EnhancedDispatch = useCallback(async (action) => {
-		if (typeof action === "function") {
-			await action(enhancedDispatch, () => stateRef.current);
-		} else {
-			originalDispatch(action);
-		}
+		return () => {
+			if (timeoutRef.current) {
+				clearTimeout(timeoutRef.current);
+			}
+		};
 	}, []);
-	useEffect(() => {
-		if (isInitialMount.current) {
-			isInitialMount.current = false;
-		} else {
-			deboucedSetGraphToDb(originalState.graph);
-		}
-	}, [originalState, deboucedSetGraphToDb]);
 	return (
-		<GraphContext.Provider
-			value={{ state: originalState, dispatch: enhancedDispatch }}
-		>
+		<GraphContext.Provider value={{ state, dispatch: enhancedDispatch }}>
 			{children}
 		</GraphContext.Provider>
 	);

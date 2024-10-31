@@ -16,7 +16,6 @@ import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
-import type { FeatureFlags } from "./feature-flags/types";
 import {
 	giselleNodeArchetypes,
 	promptBlueprint,
@@ -26,73 +25,46 @@ import {
 	GiselleNode,
 	GiselleNodeInformationPanel,
 } from "./giselle-node/components";
-import { type GiselleNodeId, panelTabs } from "./giselle-node/types";
-import {
-	addNodesAndConnect,
-	selectNode,
-	selectNodeAndSetPanelTab,
-} from "./graph/actions";
+import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
-import type { Graph } from "./graph/types";
 import { Header } from "./header";
-import {
-	type ReactFlowNode,
-	edgeTypes,
-	nodeTypes,
-} from "./react-flow-adapter/giselle-node";
+import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
 import {
 	useConnectionHandler,
-	useGraphToReactFlowEffect,
-	useKeyUpHandler,
-	useNodeEventHandler,
+	useReacrFlowEdgeEventHandler,
+	useReactFlowNodeEventHandler,
 } from "./react-flow-adapter/graph";
+import type { ReactFlowEdge, ReactFlowNode } from "./react-flow-adapter/types";
 import { setSelectTool } from "./tool/actions";
 import { Toolbar } from "./tool/components";
 import { useTool } from "./tool/context";
 import { ToolProvider } from "./tool/provider";
-import type { AgentId } from "./types";
 
 function EditorInner() {
 	const [previewMode, setPreviewMode] = useState(false);
 	const { state: toolState, dispatch: toolDispatch } = useTool();
-	const { dispatch: graphDispatch } = useGraph();
+	const { state: graphState, dispatch: graphDispatch } = useGraph();
 	const reactFlowInstance = useReactFlow();
 	const mousePosition = useMousePosition();
-	useGraphToReactFlowEffect();
 	const { handleConnect } = useConnectionHandler();
-	const { handleNodeDragStop } = useNodeEventHandler();
-	const { handleKeyUp } = useKeyUpHandler();
+	const { handleNodesChange } = useReactFlowNodeEventHandler();
+	const { handleEdgesChange } = useReacrFlowEdgeEventHandler();
 	return (
 		<div className="w-full h-screen">
-			<ReactFlow<ReactFlowNode>
-				defaultNodes={[]}
-				defaultEdges={[]}
+			<ReactFlow<ReactFlowNode, ReactFlowEdge>
+				nodes={graphState.graph.xyFlow.nodes}
+				edges={graphState.graph.xyFlow.edges}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				panOnScroll
-				onKeyUp={handleKeyUp}
 				selectionOnDrag
 				panOnDrag={false}
 				colorMode="dark"
 				onConnect={handleConnect}
-				onNodeDragStop={handleNodeDragStop}
-				onNodeClick={(_, node) => {
-					graphDispatch(
-						selectNodeAndSetPanelTab({
-							selectNode: {
-								id: node.id as GiselleNodeId,
-								panelTab: panelTabs.property,
-							},
-						}),
-					);
-				}}
+				onNodesChange={handleNodesChange}
+				onEdgesChange={handleEdgesChange}
 				onPaneClick={(event) => {
 					event.preventDefault();
-					graphDispatch(
-						selectNode({
-							selectedNodeIds: [],
-						}),
-					);
 					if (toolState.activeTool.type === "addGiselleNode") {
 						const position = reactFlowInstance.flowToScreenPosition({
 							x: event.clientX,
@@ -149,7 +121,6 @@ function EditorInner() {
 						toolDispatch(setSelectTool);
 					}
 				}}
-				deleteKeyCode={null}
 			>
 				<Background
 					className="!bg-black-100"

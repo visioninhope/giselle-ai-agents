@@ -14,8 +14,8 @@ import {
 import { DocumentIcon } from "../../../components/icons/document";
 import { useFeatureFlags } from "../../../feature-flags/context";
 import { createFileId } from "../../../files/utils";
-import { addSourceToPromptNode } from "../../../graph/actions";
 import { useGraph } from "../../../graph/context";
+import { addSource } from "../../../graph/v2/composition/add-source";
 import { createTextContentId } from "../../../text-content/factory";
 import type { GiselleNode } from "../../types";
 
@@ -32,15 +32,15 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 			const title = formData.get("title") as string;
 			const content = formData.get("content") as string;
 			dispatch(
-				addSourceToPromptNode({
-					promptNode: {
-						id: props.node.id,
-					},
-					source: {
-						object: "textContent",
-						id: createTextContentId(),
-						title,
-						content,
+				addSource({
+					input: {
+						nodeId: props.node.id,
+						source: {
+							object: "textContent",
+							id: createTextContentId(),
+							title,
+							content,
+						},
 					},
 				}),
 			);
@@ -66,16 +66,16 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 		(files: File[]) => {
 			for (const file of files) {
 				dispatch(
-					addSourceToPromptNode({
-						promptNode: {
-							id: props.node.id,
-						},
-						source: {
-							object: "file",
-							name: file.name,
-							id: createFileId(),
-							status: "uploading",
-							file,
+					addSource({
+						input: {
+							nodeId: props.node.id,
+							source: {
+								object: "file",
+								name: file.name,
+								id: createFileId(),
+								status: "uploading",
+								file,
+							},
 						},
 					}),
 				);
@@ -107,9 +107,6 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 		[addFilesToPromptNode],
 	);
 
-	const removeFile = useCallback((fileToRemove: File) => {
-		setFiles((prevFiles) => prevFiles.filter((file) => file !== fileToRemove));
-	}, []);
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger>

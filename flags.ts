@@ -1,17 +1,21 @@
 import { unstable_flag as flag } from "@vercel/flags/next";
 
+function takeLocalEnv(localEnvironemntKey: string) {
+	if (process.env.NODE_ENV !== "development") {
+		return false;
+	}
+	if (
+		process.env[localEnvironemntKey] === undefined ||
+		process.env[localEnvironemntKey] === "false"
+	) {
+		return false;
+	}
+	return true;
+}
 export const uploadFileToPromptNodeFlag = flag<boolean>({
 	key: "upload-file-to-prompt-node",
 	async decide() {
-		// You can do async things in here like reading edge config or querying
-		// your feature flag provider.
-		//
-		// You can access data passed in by middleware through unstable_getPrecomputationContext
-		// const context = unstable_getPrecomputationContext()
-		//
-		// This is great for creating a single instance of your flag provider
-		// and then passing the client down from middleware
-		return false;
+		return takeLocalEnv("UPLOAD_FILE_TO_PROMPT_NODE_FLAG");
 	},
 	description: "User can upload a file to the prompt node",
 	defaultValue: false,
@@ -24,15 +28,7 @@ export const uploadFileToPromptNodeFlag = flag<boolean>({
 export const webSearchNodeFlag = flag<boolean>({
 	key: "web-search-node",
 	async decide() {
-		// You can do async things in here like reading edge config or querying
-		// your feature flag provider.
-		//
-		// You can access data passed in by middleware through unstable_getPrecomputationContext
-		// const context = unstable_getPrecomputationContext()
-		//
-		// This is great for creating a single instance of your flag provider
-		// and then passing the client down from middleware
-		return false;
+		return takeLocalEnv("WEB_SEARCH_NODE_FLAG");
 	},
 	description: "User can use a web search node",
 	defaultValue: false,
@@ -45,7 +41,7 @@ export const webSearchNodeFlag = flag<boolean>({
 export const debugFlag = flag<boolean>({
 	key: "debug",
 	async decide() {
-		return false;
+		return takeLocalEnv("DEBUG_FLAG");
 	},
 	description: "Enable debug mode",
 	defaultValue: false,
@@ -58,7 +54,7 @@ export const debugFlag = flag<boolean>({
 export const viewFlag = flag<boolean>({
 	key: "view",
 	async decide() {
-		return false;
+		return takeLocalEnv("VIEW_FLAG");
 	},
 	description: "Enable view mode",
 	defaultValue: false,

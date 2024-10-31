@@ -3,7 +3,7 @@ import type {
 	GiselleNodeWebSearchElement,
 } from "../giselle-node/types";
 
-type WebSearchId = `wbs_${string}`;
+export type WebSearchId = `wbs_${string}`;
 
 export const webSearchStatus = {
 	pending: "pending",

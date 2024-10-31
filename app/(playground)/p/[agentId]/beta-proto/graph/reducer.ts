@@ -1,8 +1,10 @@
+import { isV2ConnectorAction, v2ConnectorReducer } from "../connector/actions";
 import { isV2FlowAction, v2FlowReducer } from "../flow/action";
+import { isV2NodeAction, v2NodeReducer } from "../giselle-node/actions";
 import type { GraphAction } from "./actions";
 import type { GraphState } from "./types";
 import { isV2ModeAction, v2ModeReducer } from "./v2/mode";
-import { isV2NodeAction, v2NodeReducer } from "./v2/node";
+import { isV2XyFlowAction, v2XyFlowReducer } from "./v2/xy-flow";
 
 export const graphReducer = (
 	state: GraphState,
@@ -35,6 +37,24 @@ export const graphReducer = (
 			},
 		};
 	}
+	if (isV2XyFlowAction(action)) {
+		return {
+			...state,
+			graph: {
+				...state.graph,
+				xyFlow: v2XyFlowReducer(state.graph.xyFlow, action),
+			},
+		};
+	}
+	if (isV2ConnectorAction(action)) {
+		return {
+			...state,
+			graph: {
+				...state.graph,
+				connectors: v2ConnectorReducer(state.graph.connectors, action),
+			},
+		};
+	}
 	switch (action.type) {
 		case "addNode":
 			return {
@@ -50,20 +70,6 @@ export const graphReducer = (
 				graph: {
 					...state.graph,
 					connectors: [...state.graph.connectors, action.payload.connector],
-				},
-			};
-		case "selectNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) => ({
-						...node,
-						ui: {
-							...node.ui,
-							selected: action.payload.selectedNodeIds.includes(node.id),
-						},
-					})),
 				},
 			};
 		case "setPanelTab":
@@ -99,28 +105,6 @@ export const graphReducer = (
 								...node.properties,
 								[action.payload.node.property.key]:
 									action.payload.node.property.value,
-							},
-						};
-					}),
-				},
-			};
-		case "updateNodesUI":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((currentNode) => {
-						const updateNode = action.payload.nodes.find(
-							(payloadNode) => payloadNode.id === currentNode.id,
-						);
-						if (updateNode == null) {
-							return currentNode;
-						}
-						return {
-							...currentNode,
-							ui: {
-								...currentNode.ui,
-								...updateNode.ui,
 							},
 						};
 					}),
@@ -183,66 +167,6 @@ export const graphReducer = (
 				},
 			};
 		}
-		case "addParameterToNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) =>
-						node.id !== action.payload.node.id
-							? node
-							: {
-									...node,
-									parameters:
-										node.parameters?.object === "objectParameter"
-											? {
-													...node.parameters,
-													properties: {
-														...node.parameters.properties,
-														[action.payload.parameter.key]:
-															action.payload.parameter.value,
-													},
-												}
-											: node.parameters,
-								},
-					),
-				},
-			};
-		case "removeParameterFromNode":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					nodes: state.graph.nodes.map((node) =>
-						node.id !== action.payload.node.id
-							? node
-							: {
-									...node,
-									parameters:
-										node.parameters?.object === "objectParameter"
-											? {
-													...node.parameters,
-													properties: Object.fromEntries(
-														Object.entries(node.parameters.properties).filter(
-															([key]) => key !== action.payload.parameter.key,
-														),
-													),
-												}
-											: node.parameters,
-								},
-					),
-				},
-			};
-		case "removeConnector":
-			return {
-				...state,
-				graph: {
-					...state.graph,
-					connectors: state.graph.connectors.filter(
-						(connector) => connector.id !== action.payload.connector.id,
-					),
-				},
-			};
 		case "removeNode":
 			return {
 				...state,
