@@ -46,7 +46,7 @@ export function Viewer() {
 						<div className="text-black-70 font-[800] text-[18px]">No exist</div>
 					) : (
 						<div className="text-black-70 font-[800] text-[18px]">
-							{state.flow.finalNodeId}
+							{/* {state.flow.finalNodeId} */}
 						</div>
 					)}
 				</div>
@@ -64,7 +64,7 @@ export function Viewer() {
 						</div>
 					</div>
 				) : (
-					<div className="flex-1 flex w-full gap-[16px] pt-[16px]">
+					<div className="flex-1 flex w-full gap-[16px] pt-[16px] overflow-hidden">
 						<div className="w-[200px]">
 							<div className="flex flex-col gap-[8px]">
 								{state.flow.jobs.map((actionLayer, index) => (
@@ -85,7 +85,7 @@ export function Viewer() {
 								))}
 							</div>
 						</div>
-						<div>
+						<div className="overflow-y-scroll">
 							{lastArtifact && (
 								<ArtifactRender
 									title={lastArtifact.title}
