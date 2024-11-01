@@ -1,6 +1,9 @@
 import { useMemo } from "react";
+import { ArtifactRender } from "./artifact/render";
+import type { Artifact, GeneratedObject } from "./artifact/types";
 import bg from "./bg.png";
 import { WilliIcon } from "./components/icons/willi";
+import { stepStatuses } from "./flow/types";
 import { useGraph } from "./graph/context";
 import { Header } from "./header";
 import { ActionItem } from "./viewer/components/action-item";
@@ -11,6 +14,21 @@ export function Viewer() {
 		() => Object.fromEntries(state.graph.nodes.map((node) => [node.id, node])),
 		[state.graph.nodes],
 	);
+	const lastArtifact = useMemo(() => {
+		const lastJob = state.flow?.jobs[state.flow.jobs.length - 1];
+		const lastStep = lastJob?.steps[lastJob.steps.length - 1];
+		if (
+			lastStep === undefined ||
+			lastStep.status === stepStatuses.queued ||
+			lastStep.status === stepStatuses.running
+		) {
+			return null;
+		}
+		return {
+			title: (lastStep.output as GeneratedObject).artifact.title ?? "",
+			content: (lastStep.output as GeneratedObject).artifact.content ?? "",
+		};
+	}, [state.flow]);
 	return (
 		<div
 			className="w-full h-screen bg-black-100 flex flex-col"
@@ -67,7 +85,14 @@ export function Viewer() {
 								))}
 							</div>
 						</div>
-						<div>main</div>
+						<div>
+							{lastArtifact && (
+								<ArtifactRender
+									title={lastArtifact.title}
+									content={lastArtifact.content}
+								/>
+							)}
+						</div>
 					</div>
 				)}
 			</div>
