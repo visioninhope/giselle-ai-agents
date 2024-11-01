@@ -189,9 +189,6 @@ export function v2FlowReducer(
 							action.input.status !== undefined
 								? {
 										status: action.input.status,
-										...(isInProgressStep
-											? {}
-											: { output: action.input.output }),
 									}
 								: {};
 
