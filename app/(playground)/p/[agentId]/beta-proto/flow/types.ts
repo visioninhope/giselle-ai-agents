@@ -69,6 +69,7 @@ export type StepId = `stp_${string}`;
 export const stepStatuses = {
 	queued: "queued",
 	running: "running",
+	streaming: "streaming",
 	completed: "completed",
 } as const;
 
@@ -87,6 +88,9 @@ interface QueuedStep extends BaseStep {
 }
 interface RunningStep extends BaseStep {
 	status: Extract<StepStatus, "running">;
+}
+interface StreamingStep extends BaseStep {
+	status: Extract<StepStatus, "streaming">;
 	output: unknown;
 }
 interface CompletedStep extends BaseStep {
@@ -94,7 +98,7 @@ interface CompletedStep extends BaseStep {
 	output: unknown;
 }
 
-export type Step = QueuedStep | RunningStep | CompletedStep;
+export type Step = QueuedStep | RunningStep | StreamingStep | CompletedStep;
 
 interface BaseFlowIndex {
 	object: "flow.index";

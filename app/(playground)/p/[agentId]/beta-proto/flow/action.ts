@@ -1,5 +1,12 @@
 import type { Artifact } from "../artifact/types";
-import type { Flow, FlowIndex, Step, StepId } from "./types";
+import {
+	type Flow,
+	type FlowIndex,
+	type Step,
+	type StepId,
+	type StepStatus,
+	stepStatuses,
+} from "./types";
 
 const v2FlowIndexActionTypes = {
 	setFlowIndex: "v2.setFlowIndex",
@@ -47,7 +54,7 @@ export function v2FlowIndexReducer(
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
 	replaceStep: "v2.replaceStep",
-	setStepOutput: "v2.setStepOutput",
+	updateStep: "v2.updateStep",
 	addArtifact: "v2.addArtifact",
 } as const;
 
@@ -84,21 +91,22 @@ export function replaceStep({
 	};
 }
 
-interface SetStepOutputAction {
-	type: Extract<V2FlowActionType, "v2.setStepOutput">;
-	input: SetStepOutputActionInput;
+interface UpdateStepAction {
+	type: Extract<V2FlowActionType, "v2.updateStep">;
+	input: UpdateStepActionInput;
 }
-interface SetStepOutputActionInput {
+interface UpdateStepActionInput {
 	stepId: StepId;
-	output: unknown;
+	status?: StepStatus;
+	output?: unknown;
 }
-export function setStepOutput({
+export function updateStep({
 	input,
 }: {
-	input: SetStepOutputActionInput;
-}): SetStepOutputAction {
+	input: UpdateStepActionInput;
+}): UpdateStepAction {
 	return {
-		type: v2FlowActionTypes.setStepOutput,
+		type: v2FlowActionTypes.updateStep,
 		input,
 	};
 }
@@ -124,7 +132,7 @@ export function addArtifact({
 export type V2FlowAction =
 	| SetFlowAction
 	| ReplaceFlowActionAction
-	| SetStepOutputAction
+	| UpdateStepAction
 	| AddArtifactAction;
 
 export function isV2FlowAction(action: unknown): action is V2FlowAction {
@@ -161,7 +169,7 @@ export function v2FlowReducer(
 				...flow,
 				artifacts: [...flow.artifacts, action.input.artifact],
 			};
-		case v2FlowActionTypes.setStepOutput:
+		case v2FlowActionTypes.updateStep:
 			if (flow == null) {
 				return flow;
 			}
@@ -169,11 +177,40 @@ export function v2FlowReducer(
 				...flow,
 				jobs: flow.jobs.map((job) => ({
 					...job,
-					actions: job.steps.map((step) =>
-						step.id === action.input.stepId
-							? { ...step, output: action.input.output }
-							: step,
-					),
+					steps: job.steps.map((step) => {
+						if (step.id !== action.input.stepId) {
+							return step;
+						}
+						if (action.input.status !== undefined) {
+							if (
+								action.input.status === stepStatuses.queued ||
+								action.input.status === stepStatuses.running
+							) {
+								return {
+									...step,
+									status: action.input.status,
+								};
+							}
+							return {
+								...step,
+								status: action.input.status,
+								output: action.input.output,
+							};
+						}
+						if (action.input.output !== undefined) {
+							if (
+								action.input.status === stepStatuses.queued ||
+								action.input.status === stepStatuses.running
+							) {
+								return step;
+							}
+							return {
+								...step,
+								output: action.input.output,
+							};
+						}
+						return step;
+					}),
 				})),
 			};
 	}

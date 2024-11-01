@@ -12,8 +12,8 @@ import type { GiselleNodeId } from "../giselle-node/types";
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
-import { type V2FlowAction, setFlow, setStepOutput } from "./action";
-import { type Flow, flowStatuses } from "./types";
+import { type V2FlowAction, setFlow, updateStep } from "./action";
+import { type Flow, flowStatuses, stepStatuses } from "./types";
 import { buildFlow } from "./utils";
 
 export async function executeFlow(
@@ -51,6 +51,11 @@ export async function executeFlow(
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
+					stream.update(
+						updateStep({
+							input: { stepId: step.id, status: stepStatuses.running },
+						}),
+					);
 					await generateText({
 						input: {
 							prompt: step.prompt,
@@ -60,9 +65,10 @@ export async function executeFlow(
 						options: {
 							onStreamPartialObject: (object) => {
 								stream.update(
-									setStepOutput({
+									updateStep({
 										input: {
 											stepId: step.id,
+											status: stepStatuses.streaming,
 											output: object,
 										},
 									}),
@@ -70,6 +76,11 @@ export async function executeFlow(
 							},
 						},
 					});
+					stream.update(
+						updateStep({
+							input: { stepId: step.id, status: stepStatuses.completed },
+						}),
+					);
 				}),
 			);
 		}

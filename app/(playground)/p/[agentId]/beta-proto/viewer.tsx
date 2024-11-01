@@ -55,11 +55,11 @@ export function Viewer() {
 											Step {index + 1}
 										</p>
 										<div className="flex flex-col gap-[4px]">
-											{actionLayer.steps.map((action) => (
+											{actionLayer.steps.map((step) => (
 												<ActionItem
-													key={action.id}
-													action={action}
-													node={nodeIndexes[action.nodeId]}
+													key={step.id}
+													step={step}
+													node={nodeIndexes[step.nodeId]}
 												/>
 											))}
 										</div>
