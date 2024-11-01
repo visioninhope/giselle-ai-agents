@@ -29,7 +29,7 @@ export async function executeFlow(
 			throw new Error(`Agent with id ${agentId} not found`);
 		}
 		const graph = agent.graphv2;
-		const flow = buildFlow({
+		const flow = await buildFlow({
 			input: {
 				agentId: graph.agentId,
 				finalNodeId: finalNodeId,
@@ -60,7 +60,7 @@ export async function executeFlow(
 						input: {
 							prompt: step.prompt,
 							model: openai("gpt-4o-mini"),
-							sources: [],
+							sources: step.sources,
 						},
 						options: {
 							onStreamPartialObject: (object) => {

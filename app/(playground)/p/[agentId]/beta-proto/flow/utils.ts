@@ -1,11 +1,13 @@
 import { createId } from "@paralleldrive/cuid2";
 import type { ConnectorObject } from "../connector/types";
+import { type StructuredData, fileStatuses } from "../files/types";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
 	giselleNodeCategories,
 } from "../giselle-node/types";
 import type { Graph } from "../graph/types";
+import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
 import {
 	type Flow,
@@ -16,6 +18,7 @@ import {
 	type JobId,
 	type QueuedFlowIndex,
 	type RunningFlowIndex,
+	type Step,
 	type StepId,
 	flowStatuses,
 	jobStatuses,
@@ -76,11 +79,11 @@ function buildDependencyGraph(
 	return dependencyMap;
 }
 
-export function resolveJobs(
+export async function resolveJobs(
 	nodes: GiselleNode[],
 	connectors: ConnectorObject[],
 	targetNode: GiselleNodeId,
-): Job[] {
+) {
 	const relevantConnectors = getRelevantConnectors(connectors, targetNode);
 	const dependencyMap = buildDependencyGraph(relevantConnectors);
 
@@ -114,18 +117,26 @@ export function resolveJobs(
 		for (const node of currentLayer) {
 			visited.add(node.id);
 		}
+		const steps = await Promise.all(
+			currentLayer.map(
+				async (node) =>
+					({
+						id: createStepId(),
+						object: "step",
+						status: stepStatuses.queued,
+						nodeId: node.id,
+						action: node.archetype,
+						prompt: resolvePrompt(node.id, nodes, relevantConnectors),
+						sources: await resolveSources(node.id, nodes, relevantConnectors),
+					}) satisfies Step,
+			),
+		);
+
 		result.push({
 			id: createJobId(),
 			object: "job",
 			status: jobStatuses.queued,
-			steps: currentLayer.map((node) => ({
-				id: createStepId(),
-				object: "step",
-				status: stepStatuses.queued,
-				nodeId: node.id,
-				action: node.archetype,
-				prompt: resolvePrompt(node.id, nodes, relevantConnectors),
-			})),
+			steps,
 		});
 	}
 
@@ -153,8 +164,8 @@ interface BuildFlowInput {
 	finalNodeId: GiselleNodeId;
 	graph: Pick<Graph, "nodes" | "connectors">;
 }
-export function buildFlow({ input }: { input: BuildFlowInput }) {
-	const jobs = resolveJobs(
+export async function buildFlow({ input }: { input: BuildFlowInput }) {
+	const jobs = await resolveJobs(
 		input.graph.nodes,
 		input.graph.connectors,
 		input.finalNodeId,
@@ -173,6 +184,64 @@ export function buildFlow({ input }: { input: BuildFlowInput }) {
 		artifacts: [],
 		webSearches: [],
 	} satisfies InitializingFlow;
+}
+
+export async function resolveSources(
+	nodeId: GiselleNodeId,
+	nodes: GiselleNode[],
+	connectors: ConnectorObject[],
+) {
+	const connector = connectors.find((connector) => connector.target === nodeId);
+	if (connector === undefined) {
+		return [];
+	}
+	const sourceNode = nodes.find((node) => node.id === connector.source);
+	if (sourceNode === undefined) {
+		return [];
+	}
+	if (!Array.isArray(sourceNode.properties.sources)) {
+		return [];
+	}
+	return await Promise.all(
+		sourceNode.properties.sources.map(async (source) => {
+			if (
+				typeof source !== "object" ||
+				source === null ||
+				typeof source.id !== "string" ||
+				typeof source.object !== "string"
+			) {
+				return null;
+			}
+			if (source.object === "textContent") {
+				return {
+					id: source.id as TextContentId,
+					object: "textContent",
+					title: source.title as string,
+					content: source.content as string,
+				} satisfies TextContent;
+			}
+			if (source.object === "file") {
+				if (
+					typeof source.status !== "string" ||
+					source.status !== fileStatuses.processed ||
+					typeof source.structuredDataBlobUrl !== "string" ||
+					typeof source.name !== "string"
+				) {
+					return null;
+				}
+				const structuredData = await fetch(source.structuredDataBlobUrl).then(
+					(res) => res.text(),
+				);
+				return {
+					id: source.id,
+					title: source.name,
+					object: "file",
+					content: structuredData,
+				} satisfies StructuredData;
+			}
+			return null;
+		}),
+	).then((sources) => sources.filter((source) => source != null));
 }
 
 export function buildFlowIndex({ input }: { input: Flow }) {

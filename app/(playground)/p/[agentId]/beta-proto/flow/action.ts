@@ -2,6 +2,7 @@ import type { Artifact } from "../artifact/types";
 import {
 	type Flow,
 	type FlowIndex,
+	type Job,
 	type Step,
 	type StepId,
 	type StepStatus,
@@ -53,7 +54,6 @@ export function v2FlowIndexReducer(
 
 const v2FlowActionTypes = {
 	setFlow: "v2.setFlow",
-	replaceStep: "v2.replaceStep",
 	updateStep: "v2.updateStep",
 	addArtifact: "v2.addArtifact",
 } as const;
@@ -71,22 +71,6 @@ interface SetFlowActionInput {
 export function setFlow({ input }: { input: SetFlowActionInput }) {
 	return {
 		type: v2FlowActionTypes.setFlow,
-		input,
-	};
-}
-
-interface ReplaceFlowActionAction {
-	type: Extract<V2FlowActionType, "v2.replaceStep">;
-	input: ReplaceFlowActionActionInput;
-}
-type ReplaceFlowActionActionInput = Step;
-export function replaceStep({
-	input,
-}: {
-	input: ReplaceFlowActionActionInput;
-}): ReplaceFlowActionAction {
-	return {
-		type: v2FlowActionTypes.replaceStep,
 		input,
 	};
 }
@@ -129,11 +113,7 @@ export function addArtifact({
 	};
 }
 
-export type V2FlowAction =
-	| SetFlowAction
-	| ReplaceFlowActionAction
-	| UpdateStepAction
-	| AddArtifactAction;
+export type V2FlowAction = SetFlowAction | UpdateStepAction | AddArtifactAction;
 
 export function isV2FlowAction(action: unknown): action is V2FlowAction {
 	return Object.values(v2FlowActionTypes).includes(
@@ -148,19 +128,6 @@ export function v2FlowReducer(
 	switch (action.type) {
 		case v2FlowActionTypes.setFlow:
 			return action.input.flow;
-		case v2FlowActionTypes.replaceStep:
-			if (flow == null) {
-				return flow;
-			}
-			return {
-				...flow,
-				jobs: flow.jobs.map((actionLayer) => ({
-					...actionLayer,
-					actions: actionLayer.steps.map((flowAction) =>
-						flowAction.id === action.input.id ? action.input : flowAction,
-					),
-				})),
-			};
 		case v2FlowActionTypes.addArtifact:
 			if (flow == null) {
 				return flow;
@@ -203,10 +170,9 @@ export function v2FlowReducer(
 							...step,
 							...updatedStatus,
 							...updatedOutput,
-						};
+						} as Step;
 					}),
 				})),
 			};
 	}
-	return flow;
 }

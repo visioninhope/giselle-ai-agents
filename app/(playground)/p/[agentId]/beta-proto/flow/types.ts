@@ -1,7 +1,9 @@
 import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
+import type { StructuredData } from "../files/types";
 import type { GiselleNodeArchetype } from "../giselle-node/blueprints";
 import type { GiselleNode, GiselleNodeId } from "../giselle-node/types";
+import type { TextContent } from "../text-content/types";
 import type { AgentId } from "../types";
 import type { WebSearch } from "../web-search/types";
 
@@ -82,6 +84,7 @@ interface BaseStep {
 	nodeId: GiselleNodeId;
 	action: StepAction;
 	prompt: string;
+	sources: (StructuredData | TextContent)[];
 }
 interface QueuedStep extends BaseStep {
 	status: Extract<StepStatus, "queued">;
