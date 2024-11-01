@@ -47,6 +47,10 @@ export const organizations = pgTable("organizations", {
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export const subscriptions = pgTable("subscriptions", {
@@ -75,6 +79,10 @@ export const teams = pgTable("teams", {
 		.references(() => organizations.dbId),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export type UserId = `usr_${string}`;
@@ -138,6 +146,10 @@ export const agents = pgTable("agents", {
 		}),
 	graphHash: text("graph_hash").unique(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
+	updatedAt: timestamp("updated_at")
+		.defaultNow()
+		.notNull()
+		.$onUpdate(() => new Date()),
 });
 
 export const builds = pgTable("builds", {
