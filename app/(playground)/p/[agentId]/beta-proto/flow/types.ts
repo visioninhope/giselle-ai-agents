@@ -85,6 +85,7 @@ interface BaseStep {
 	action: StepAction;
 	prompt: string;
 	sources: (StructuredData | TextContent)[];
+	sourceNodeIds: GiselleNodeId[];
 }
 interface QueuedStep extends BaseStep {
 	status: Extract<StepStatus, "queued">;

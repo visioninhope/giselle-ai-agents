@@ -128,6 +128,7 @@ export async function resolveJobs(
 						action: node.archetype,
 						prompt: resolvePrompt(node.id, nodes, relevantConnectors),
 						sources: await resolveSources(node.id, nodes, relevantConnectors),
+						sourceNodeIds: resolveSourceNodeIds(node.id, connectors),
 					}) satisfies Step,
 			),
 		);
@@ -242,6 +243,19 @@ export async function resolveSources(
 			return null;
 		}),
 	).then((sources) => sources.filter((source) => source != null));
+}
+
+export function resolveSourceNodeIds(
+	nodeId: GiselleNodeId,
+	connectors: ConnectorObject[],
+) {
+	return connectors
+		.filter(
+			(connector) =>
+				connector.target === nodeId &&
+				connector.sourceNodeCategory === giselleNodeCategories.action,
+		)
+		.map((connector) => connector.source);
 }
 
 export function buildFlowIndex({ input }: { input: Flow }) {

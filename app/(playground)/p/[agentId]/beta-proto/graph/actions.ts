@@ -535,15 +535,10 @@ export const generateText =
 							content: content?.artifact?.content ?? "",
 							generatorNode: {
 								id: node.id,
-								category: node.category,
 								archetype: node.archetype,
 								name: node.name,
 								object: "node.artifactElement",
-								properties: node.properties,
 							},
-							elements: [
-								giselleNodeToGiselleNodeArtifactElement(instructionNode),
-							],
 						},
 					}),
 				);
