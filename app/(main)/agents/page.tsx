@@ -1,4 +1,3 @@
-import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { getUser } from "@/lib/supabase";
 import { createAgent, getAgents } from "@/services/agents";
 import { CreateAgentButton } from "@/services/agents/components";
@@ -9,18 +8,7 @@ type AgentListProps = {
 	userId: string;
 };
 async function AgentList(props: AgentListProps) {
-	const allAgents = await getAgents({ userId: props.userId });
-	const agents = (
-		await Promise.all(
-			allAgents.map(async (agent) => {
-				const teamMembership = await getTeamMembershipByAgentId(
-					agent.id,
-					props.userId,
-				);
-				return teamMembership ? agent : null;
-			}),
-		)
-	).filter((v) => v != null);
+	const agents = await getAgents({ userId: props.userId });
 
 	return (
 		<div className="flex flex-col gap-2">
