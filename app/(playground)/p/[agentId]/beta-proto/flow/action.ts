@@ -181,35 +181,32 @@ export function v2FlowReducer(
 						if (step.id !== action.input.stepId) {
 							return step;
 						}
-						if (action.input.status !== undefined) {
-							if (
-								action.input.status === stepStatuses.queued ||
-								action.input.status === stepStatuses.running
-							) {
-								return {
-									...step,
-									status: action.input.status,
-								};
-							}
-							return {
-								...step,
-								status: action.input.status,
-								output: action.input.output,
-							};
-						}
-						if (action.input.output !== undefined) {
-							if (
-								action.input.status === stepStatuses.queued ||
-								action.input.status === stepStatuses.running
-							) {
-								return step;
-							}
-							return {
-								...step,
-								output: action.input.output,
-							};
-						}
-						return step;
+						const isInProgressStep =
+							action.input.status === stepStatuses.queued ||
+							action.input.status === stepStatuses.running;
+
+						const updatedStatus =
+							action.input.status !== undefined
+								? {
+										status: action.input.status,
+										...(isInProgressStep
+											? {}
+											: { output: action.input.output }),
+									}
+								: {};
+
+						const updatedOutput =
+							action.input.output !== undefined && !isInProgressStep
+								? {
+										output: action.input.output,
+									}
+								: {};
+
+						return {
+							...step,
+							...updatedStatus,
+							...updatedOutput,
+						};
 					}),
 				})),
 			};
