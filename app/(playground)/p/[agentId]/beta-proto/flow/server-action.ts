@@ -16,6 +16,10 @@ import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import { type V2FlowAction, setFlow, updateStep } from "./action";
+import {
+	type WebSearchArtifact,
+	generateWebSearchArtifactObject,
+} from "./server-actions/websearch";
 import { type Flow, flowStatuses, stepStatuses } from "./types";
 import { buildFlow } from "./utils";
 
@@ -51,7 +55,7 @@ export async function executeFlow(
 				},
 			}),
 		);
-		const artifacts: Artifact[] = [];
+		const artifacts: (Artifact | WebSearchArtifact)[] = [];
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
@@ -106,6 +110,37 @@ export async function executeFlow(
 								generatorNode:
 									giselleNodeToGiselleNodeArtifactElement(stepNode),
 							});
+							break;
+						}
+						case giselleNodeArchetypes.webSearch: {
+							const webSearchArtifact = await generateWebSearchArtifactObject({
+								input: {
+									prompt: step.prompt,
+									sources: [...step.sources, ...sourceArtifacts],
+								},
+								options: {
+									onStreamPartialObject: (object) => {
+										stream.update(
+											updateStep({
+												input: {
+													stepId: step.id,
+													status: stepStatuses.streaming,
+													output: object,
+												},
+											}),
+										);
+									},
+								},
+							});
+							artifacts.push({
+								id: createArtifactId(),
+								object: "artifact.webSearch",
+								keywords: webSearchArtifact.keywords,
+								scrapingTasks: webSearchArtifact.scrapingTasks,
+								generatorNode:
+									giselleNodeToGiselleNodeArtifactElement(stepNode),
+							});
+							break;
 						}
 					}
 					stream.update(
@@ -174,10 +209,6 @@ async function generateArtifactObject({
 		});
 	}
 	return await object;
-}
-
-async function webSearch() {
-	console.log("\x1b[33m\x1b[1mTODO:\x1b[0m Implement websearch functionality");
 }
 
 interface PutFlowInput {
