@@ -40,7 +40,7 @@ export function Viewer() {
 			}}
 		>
 			<Header />
-			<div className="flex-1 flex flex-col items-center divide-y mx-[20px]">
+			<div className="flex-1 flex flex-col items-center divide-y mx-[20px] overflow-hidden">
 				<div className="flex items-center h-[40px]">
 					{state.flow == null ? (
 						<div className="text-black-70 font-[800] text-[18px]">No exist</div>
