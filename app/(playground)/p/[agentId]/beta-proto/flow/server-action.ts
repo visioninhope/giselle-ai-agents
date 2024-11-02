@@ -9,6 +9,7 @@ import { eq } from "drizzle-orm";
 import { createArtifactId } from "../artifact/factory";
 import { schema as artifactSchema } from "../artifact/schema";
 import type { Artifact, GeneratedObject } from "../artifact/types";
+import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import type { GiselleNodeId } from "../giselle-node/types";
 import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { Source } from "../source/types";
@@ -54,7 +55,6 @@ export async function executeFlow(
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
-					console.log(`step: ${JSON.stringify(step)}`);
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.running },
@@ -76,38 +76,43 @@ export async function executeFlow(
 							return sourceArtifact;
 						})
 						.filter((sourceArtifact) => sourceArtifact !== null);
-					const artifactObject = await generateArtifactObject({
-						input: {
-							prompt: step.prompt,
-							model: openai("gpt-4o-mini"),
-							sources: [...step.sources, ...sourceArtifacts],
-						},
-						options: {
-							onStreamPartialObject: (object) => {
-								stream.update(
-									updateStep({
-										input: {
-											stepId: step.id,
-											status: stepStatuses.streaming,
-											output: object,
-										},
-									}),
-								);
-							},
-						},
-					});
+					switch (step.action) {
+						case giselleNodeArchetypes.textGenerator: {
+							const artifactObject = await generateArtifactObject({
+								input: {
+									prompt: step.prompt,
+									model: openai("gpt-4o-mini"),
+									sources: [...step.sources, ...sourceArtifacts],
+								},
+								options: {
+									onStreamPartialObject: (object) => {
+										stream.update(
+											updateStep({
+												input: {
+													stepId: step.id,
+													status: stepStatuses.streaming,
+													output: object,
+												},
+											}),
+										);
+									},
+								},
+							});
+							artifacts.push({
+								id: createArtifactId(),
+								object: "artifact",
+								title: artifactObject.artifact.title,
+								content: artifactObject.artifact.content,
+								generatorNode:
+									giselleNodeToGiselleNodeArtifactElement(stepNode),
+							});
+						}
+					}
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.completed },
 						}),
 					);
-					artifacts.push({
-						id: createArtifactId(),
-						object: "artifact",
-						title: artifactObject.artifact.title,
-						content: artifactObject.artifact.content,
-						generatorNode: giselleNodeToGiselleNodeArtifactElement(stepNode),
-					});
 				}),
 			);
 		}
