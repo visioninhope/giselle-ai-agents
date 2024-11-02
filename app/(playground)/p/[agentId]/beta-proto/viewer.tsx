@@ -6,7 +6,7 @@ import { WilliIcon } from "./components/icons/willi";
 import { stepStatuses } from "./flow/types";
 import { useGraph } from "./graph/context";
 import { Header } from "./header";
-import { ActionItem } from "./viewer/components/action-item";
+import { StepItem } from "./viewer/components/step-item";
 
 export function Viewer() {
 	const { state } = useGraph();
@@ -73,8 +73,8 @@ export function Viewer() {
 											Step {index + 1}
 										</p>
 										<div className="flex flex-col gap-[4px]">
-											{actionLayer.steps.map((step) => (
-												<ActionItem
+											{actionLayer.steps.map((step, item) => (
+												<StepItem
 													key={step.id}
 													step={step}
 													node={nodeIndexes[step.nodeId]}

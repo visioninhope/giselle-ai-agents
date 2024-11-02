@@ -7,7 +7,7 @@ interface ActionItemProps {
 	step: Step;
 	node: GiselleNode;
 }
-export function ActionItem(props: ActionItemProps) {
+export function StepItem(props: ActionItemProps) {
 	return (
 		<div className="flex items-center gap-[8px]">
 			{props.step.status === stepStatuses.queued && (
