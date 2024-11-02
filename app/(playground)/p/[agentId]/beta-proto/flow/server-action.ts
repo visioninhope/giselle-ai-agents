@@ -6,9 +6,11 @@ import { put } from "@vercel/blob";
 import { type LanguageModelV1, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
+import { createArtifactId } from "../artifact/factory";
 import { schema as artifactSchema } from "../artifact/schema";
-import type { GeneratedObject } from "../artifact/types";
+import type { Artifact, GeneratedObject } from "../artifact/types";
 import type { GiselleNodeId } from "../giselle-node/types";
+import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
@@ -48,19 +50,37 @@ export async function executeFlow(
 				},
 			}),
 		);
+		const artifacts: Artifact[] = [];
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
+					console.log(`step: ${JSON.stringify(step)}`);
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.running },
 						}),
 					);
-					await generateText({
+					const stepNode = graph.nodes.find((node) => node.id === step.nodeId);
+					if (stepNode === undefined) {
+						return;
+					}
+					const sourceArtifacts = step.sourceNodeIds
+						.map((sourceNodeId) => {
+							const sourceArtifact = artifacts.find(
+								(artifact) => artifact.generatorNode.id === sourceNodeId,
+							);
+							/** @todo log warning */
+							if (sourceArtifact === undefined) {
+								return null;
+							}
+							return sourceArtifact;
+						})
+						.filter((sourceArtifact) => sourceArtifact !== null);
+					const artifactObject = await generateArtifactObject({
 						input: {
 							prompt: step.prompt,
 							model: openai("gpt-4o-mini"),
-							sources: step.sources,
+							sources: [...step.sources, ...sourceArtifacts],
 						},
 						options: {
 							onStreamPartialObject: (object) => {
@@ -81,6 +101,13 @@ export async function executeFlow(
 							input: { stepId: step.id, status: stepStatuses.completed },
 						}),
 					);
+					artifacts.push({
+						id: createArtifactId(),
+						object: "artifact",
+						title: artifactObject.artifact.title,
+						content: artifactObject.artifact.content,
+						generatorNode: giselleNodeToGiselleNodeArtifactElement(stepNode),
+					});
 				}),
 			);
 		}
@@ -90,20 +117,20 @@ export async function executeFlow(
 	return { streamableValue: stream.value };
 }
 
-interface GenerateTextInput {
+interface GenerateArtifactObjectInput {
 	model: LanguageModelV1;
 	prompt: string;
 	sources: Source[];
 }
-interface GenerateTextOptions {
+interface GenerateArtifactObjectOptions {
 	onStreamPartialObject?: (partialObject: Partial<GeneratedObject>) => void;
 }
-async function generateText({
+async function generateArtifactObject({
 	input,
 	options,
 }: {
-	input: GenerateTextInput;
-	options: GenerateTextOptions;
+	input: GenerateArtifactObjectInput;
+	options: GenerateArtifactObjectOptions;
 }) {
 	const system =
 		input.sources.length > 0
