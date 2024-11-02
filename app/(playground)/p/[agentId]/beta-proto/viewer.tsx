@@ -1,3 +1,4 @@
+import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo } from "react";
 import { ArtifactRender } from "./artifact/render";
 import type { Artifact, GeneratedObject } from "./artifact/types";
@@ -64,36 +65,53 @@ export function Viewer() {
 						</div>
 					</div>
 				) : (
-					<div className="flex-1 flex w-full gap-[16px] pt-[16px] overflow-hidden">
+					<Tabs.Root className="flex-1 flex w-full gap-[16px] pt-[16px] overflow-hidden">
 						<div className="w-[200px]">
-							<div className="flex flex-col gap-[8px]">
+							<Tabs.List className="flex flex-col gap-[8px]">
 								{state.flow.jobs.map((actionLayer, index) => (
 									<div key={actionLayer.id}>
-										<p className="text-[12px] text-black-30">
+										<p className="text-[12px] text-black-30 mb-[4px]">
 											Step {index + 1}
 										</p>
 										<div className="flex flex-col gap-[4px]">
 											{actionLayer.steps.map((step, item) => (
-												<StepItem
-													key={step.id}
-													step={step}
-													node={nodeIndexes[step.nodeId]}
-												/>
+												<Tabs.Trigger key={step.id} value={step.id} asChild>
+													<StepItem
+														key={step.id}
+														step={step}
+														node={nodeIndexes[step.nodeId]}
+													/>
+												</Tabs.Trigger>
 											))}
 										</div>
 									</div>
 								))}
-							</div>
+							</Tabs.List>
 						</div>
-						<div className="overflow-y-scroll">
-							{lastArtifact && (
-								<ArtifactRender
-									title={lastArtifact.title}
-									content={lastArtifact.content}
-								/>
+						<div className="overflow-y-scroll flex-1">
+							{state.flow.jobs.flatMap((job) =>
+								job.steps
+									.filter(
+										(step) =>
+											step.status === stepStatuses.streaming ||
+											step.status === stepStatuses.completed,
+									)
+									.map((step) => (
+										<Tabs.Content key={step.id} value={step.id}>
+											<ArtifactRender
+												title={
+													(step.output as GeneratedObject).artifact.title ?? ""
+												}
+												content={
+													(step.output as GeneratedObject).artifact.content ??
+													""
+												}
+											/>
+										</Tabs.Content>
+									)),
 							)}
 						</div>
-					</div>
+					</Tabs.Root>
 				)}
 			</div>
 		</div>
