@@ -3,19 +3,32 @@ import FirecrawlApp from "@mendable/firecrawl-js";
 import { createId } from "@paralleldrive/cuid2";
 import { put } from "@vercel/blob";
 import { generateObject } from "ai";
+import { createArtifactId } from "../../artifact/factory";
 import type { ArtifactId } from "../../artifact/types";
 import type { GiselleNodeArtifactElement } from "../../giselle-node/types";
-import type { Source } from "../../source/types";
-import { sourcesToText } from "../../source/utils";
 import { webSearchSchema } from "../../web-search/schema";
 import { search } from "../../web-search/tavily";
+import type { Source } from "../source/types";
+import { sourcesToText } from "../source/utils";
 
 export interface WebSearchArtifact {
 	id: ArtifactId;
 	object: "artifact.webSearch";
 	keywords: string[];
 	scrapingTasks: ScrapingTask[];
-	generatorNode: GiselleNodeArtifactElement;
+}
+export type BuildWebSearchArtifactInput = Omit<
+	WebSearchArtifact,
+	"id" | "object"
+>;
+export function buildWebSearchArtifact(
+	input: BuildWebSearchArtifactInput,
+): WebSearchArtifact {
+	return {
+		...input,
+		object: "artifact.webSearch",
+		id: createArtifactId(),
+	};
 }
 
 interface GenerateWebSearchArtifactObjectInput {

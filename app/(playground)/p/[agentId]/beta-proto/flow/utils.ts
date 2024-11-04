@@ -10,8 +10,12 @@ import type { Graph } from "../graph/types";
 import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
 import {
+	type Artifact,
 	type Flow,
 	type FlowId,
+	type GenerateResult,
+	type GenerateResultId,
+	type GeneratorNode,
 	type InitializingFlow,
 	type InitializingFlowIndex,
 	type Job,
@@ -282,4 +286,37 @@ export function buildFlowIndex({ input }: { input: Flow }) {
 		} satisfies RunningFlowIndex;
 	}
 	throw new Error("Invalid flow status");
+}
+
+export interface BuildGeneratorNodeInput {
+	nodeId: GiselleNodeId;
+	name: string;
+	archetype: string;
+}
+export function buildGeneratorNode(
+	input: BuildGeneratorNodeInput,
+): GeneratorNode {
+	return {
+		nodeId: input.nodeId,
+		object: "generator-node",
+		name: input.name,
+		archetype: input.archetype,
+	};
+}
+function createGenerateResultId(): GenerateResultId {
+	return `gnr_${createId()}`;
+}
+interface BuildGenerateResultInput {
+	generator: GeneratorNode;
+	artifact: Artifact;
+}
+export function buildGenerateResult(
+	input: BuildGenerateResultInput,
+): GenerateResult {
+	return {
+		id: createGenerateResultId(),
+		object: "generate-result",
+		generator: input.generator,
+		artifact: input.artifact,
+	};
 }

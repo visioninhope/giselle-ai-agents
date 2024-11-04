@@ -1,8 +1,8 @@
-import type { Artifact } from "../artifact/types";
 import {
+	type Artifact,
 	type Flow,
 	type FlowIndex,
-	type Job,
+	type GenerateResult,
 	type Step,
 	type StepId,
 	type StepStatus,
@@ -82,7 +82,7 @@ interface UpdateStepAction {
 interface UpdateStepActionInput {
 	stepId: StepId;
 	status?: StepStatus;
-	output?: unknown;
+	output?: Artifact;
 }
 export function updateStep({
 	input,

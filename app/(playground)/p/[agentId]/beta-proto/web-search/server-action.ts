@@ -101,7 +101,9 @@ ${sourcesToText(sources)}
 
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) => search(keyword)),
-		).then((results) => [...new Set(results.flat())]);
+		)
+			.then((results) => [...new Set(results.flat())])
+			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
 
 		const webSearch: WebSearch = {
 			id: `wbs_${createId()}`,

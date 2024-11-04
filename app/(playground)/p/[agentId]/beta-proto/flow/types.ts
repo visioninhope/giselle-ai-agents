@@ -1,4 +1,3 @@
-import type { Artifact } from "../artifact/types";
 import type { ConnectorObject } from "../connector/types";
 import type { StructuredData } from "../files/types";
 import type { GiselleNodeArchetype } from "../giselle-node/blueprints";
@@ -6,6 +5,8 @@ import type { GiselleNode, GiselleNodeId } from "../giselle-node/types";
 import type { TextContent } from "../text-content/types";
 import type { AgentId } from "../types";
 import type { WebSearch } from "../web-search/types";
+import type { TextArtifact } from "./server-actions/generate-text";
+import type { WebSearchArtifact } from "./server-actions/websearch";
 
 export type FlowId = `flw_${string}`;
 
@@ -78,6 +79,21 @@ export const stepStatuses = {
 export type StepStatus = (typeof stepStatuses)[keyof typeof stepStatuses];
 
 type StepAction = GiselleNodeArchetype;
+
+export type Artifact = TextArtifact | WebSearchArtifact;
+export interface GeneratorNode {
+	nodeId: GiselleNodeId;
+	object: "generator-node";
+	name: string;
+	archetype: string;
+}
+export type GenerateResultId = `gnr_${string}`;
+export interface GenerateResult {
+	id: GenerateResultId;
+	object: "generate-result";
+	generator: GeneratorNode;
+	artifact: Artifact;
+}
 interface BaseStep {
 	id: StepId;
 	object: "step";
@@ -95,11 +111,11 @@ interface RunningStep extends BaseStep {
 }
 interface StreamingStep extends BaseStep {
 	status: Extract<StepStatus, "streaming">;
-	output: unknown;
+	output: Artifact;
 }
 interface CompletedStep extends BaseStep {
 	status: Extract<StepStatus, "completed">;
-	output: unknown;
+	output: Artifact;
 }
 
 export type Step = QueuedStep | RunningStep | StreamingStep | CompletedStep;

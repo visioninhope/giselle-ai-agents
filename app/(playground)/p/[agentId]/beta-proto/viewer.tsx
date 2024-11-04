@@ -1,8 +1,9 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { useMemo } from "react";
 import { ArtifactRender } from "./artifact/render";
-import type { Artifact, GeneratedObject } from "./artifact/types";
 import bg from "./bg.png";
+import { CircleCheckIcon } from "./components/icons/circle-check";
+import { CircleXIcon } from "./components/icons/circle-x";
 import { WilliIcon } from "./components/icons/willi";
 import { stepStatuses } from "./flow/types";
 import { useGraph } from "./graph/context";
@@ -15,21 +16,6 @@ export function Viewer() {
 		() => Object.fromEntries(state.graph.nodes.map((node) => [node.id, node])),
 		[state.graph.nodes],
 	);
-	const lastArtifact = useMemo(() => {
-		const lastJob = state.flow?.jobs[state.flow.jobs.length - 1];
-		const lastStep = lastJob?.steps[lastJob.steps.length - 1];
-		if (
-			lastStep === undefined ||
-			lastStep.status === stepStatuses.queued ||
-			lastStep.status === stepStatuses.running
-		) {
-			return null;
-		}
-		return {
-			title: (lastStep.output as GeneratedObject).artifact.title ?? "",
-			content: (lastStep.output as GeneratedObject).artifact.content ?? "",
-		};
-	}, [state.flow]);
 	return (
 		<div
 			className="w-full h-screen bg-black-100 flex flex-col"
@@ -74,7 +60,7 @@ export function Viewer() {
 											Step {index + 1}
 										</p>
 										<div className="flex flex-col gap-[4px]">
-											{actionLayer.steps.map((step, item) => (
+											{actionLayer.steps.map((step) => (
 												<Tabs.Trigger key={step.id} value={step.id} asChild>
 													<StepItem
 														key={step.id}
@@ -98,15 +84,60 @@ export function Viewer() {
 									)
 									.map((step) => (
 										<Tabs.Content key={step.id} value={step.id}>
-											<ArtifactRender
-												title={
-													(step.output as GeneratedObject).artifact.title ?? ""
-												}
-												content={
-													(step.output as GeneratedObject).artifact.content ??
-													""
-												}
-											/>
+											{step.output.object === "artifact.text" ? (
+												<ArtifactRender
+													title={step.output.title}
+													content={step.output.content}
+												/>
+											) : (
+												<div className="px-[16px] py-[16px] font-rosart text-[18px] text-black-30">
+													<table className="w-full divide-y divide-black-40 font-avenir border-separate border-spacing-[16px] text-left text-black-70 ">
+														<colgroup>
+															<col width="0%" />
+															<col width="100%" />
+															<col width="0%" />
+														</colgroup>
+														<thead className="font-[500] text-[12px]">
+															<tr>
+																<th>Status</th>
+																<th>Content</th>
+																<th>Relevance</th>
+															</tr>
+														</thead>
+														<tbody className="">
+															{step.output.scrapingTasks.map((scrapingTask) => (
+																<tr key={scrapingTask.id}>
+																	<td>
+																		{scrapingTask.state === "completed" ? (
+																			<CircleCheckIcon className="w-[20px] h-[20px] fill-green" />
+																		) : scrapingTask.state === "failed" ? (
+																			<CircleXIcon className="w-[20px] h-[20px] fill-[hsla(11,100%,50%,1)]" />
+																		) : (
+																			""
+																		)}
+																	</td>
+																	<td className="text-black-30 max-w-[1px]">
+																		<p className="font-rosart text-[18px] underline truncate">
+																			{scrapingTask.title}
+																		</p>
+																		<p className="text-[12px] truncate">
+																			{scrapingTask.url}
+																		</p>
+																	</td>
+																	<td className="text-green font-[900]">
+																		{Math.min(
+																			0.99,
+																			Number.parseFloat(
+																				scrapingTask.relevance.toFixed(2),
+																			),
+																		)}
+																	</td>
+																</tr>
+															))}
+														</tbody>
+													</table>
+												</div>
+											)}
 										</Tabs.Content>
 									)),
 							)}

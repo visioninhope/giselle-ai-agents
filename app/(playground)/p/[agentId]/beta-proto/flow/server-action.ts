@@ -3,25 +3,27 @@
 import { agents, db } from "@/drizzle";
 import { openai } from "@ai-sdk/openai";
 import { put } from "@vercel/blob";
-import { type LanguageModelV1, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
-import { createArtifactId } from "../artifact/factory";
-import { schema as artifactSchema } from "../artifact/schema";
-import type { Artifact, GeneratedObject } from "../artifact/types";
 import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import type { GiselleNodeId } from "../giselle-node/types";
-import { giselleNodeToGiselleNodeArtifactElement } from "../giselle-node/utils";
-import type { Source } from "../source/types";
-import { sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import { type V2FlowAction, setFlow, updateStep } from "./action";
 import {
-	type WebSearchArtifact,
+	buildTextArtifact,
+	generateArtifactObject,
+} from "./server-actions/generate-text";
+import {
+	buildWebSearchArtifact,
 	generateWebSearchArtifactObject,
 } from "./server-actions/websearch";
-import { type Flow, flowStatuses, stepStatuses } from "./types";
-import { buildFlow } from "./utils";
+import {
+	type Flow,
+	type GenerateResult,
+	flowStatuses,
+	stepStatuses,
+} from "./types";
+import { buildFlow, buildGenerateResult, buildGeneratorNode } from "./utils";
 
 export async function executeFlow(
 	agentId: AgentId,
@@ -55,7 +57,7 @@ export async function executeFlow(
 				},
 			}),
 		);
-		const artifacts: (Artifact | WebSearchArtifact)[] = [];
+		const generateResults: GenerateResult[] = [];
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
@@ -68,10 +70,11 @@ export async function executeFlow(
 					if (stepNode === undefined) {
 						return;
 					}
-					const sourceArtifacts = step.sourceNodeIds
+					const relevanceResults = step.sourceNodeIds
 						.map((sourceNodeId) => {
-							const sourceArtifact = artifacts.find(
-								(artifact) => artifact.generatorNode.id === sourceNodeId,
+							const sourceArtifact = generateResults.find(
+								(generateResult) =>
+									generateResult.generator.nodeId === sourceNodeId,
 							);
 							/** @todo log warning */
 							if (sourceArtifact === undefined) {
@@ -86,7 +89,10 @@ export async function executeFlow(
 								input: {
 									prompt: step.prompt,
 									model: openai("gpt-4o-mini"),
-									sources: [...step.sources, ...sourceArtifacts],
+									sources: [
+										...step.sources,
+										...relevanceResults.map((result) => result.artifact),
+									],
 								},
 								options: {
 									onStreamPartialObject: (object) => {
@@ -95,28 +101,39 @@ export async function executeFlow(
 												input: {
 													stepId: step.id,
 													status: stepStatuses.streaming,
-													output: object,
+													output: buildTextArtifact({
+														title: object.title ?? "",
+														content: object.content ?? "",
+													}),
 												},
 											}),
 										);
 									},
 								},
 							});
-							artifacts.push({
-								id: createArtifactId(),
-								object: "artifact",
-								title: artifactObject.artifact.title,
-								content: artifactObject.artifact.content,
-								generatorNode:
-									giselleNodeToGiselleNodeArtifactElement(stepNode),
-							});
+							generateResults.push(
+								buildGenerateResult({
+									generator: buildGeneratorNode({
+										nodeId: stepNode.id,
+										archetype: stepNode.archetype,
+										name: stepNode.name,
+									}),
+									artifact: buildTextArtifact({
+										title: artifactObject.artifact.title,
+										content: artifactObject.artifact.content,
+									}),
+								}),
+							);
 							break;
 						}
 						case giselleNodeArchetypes.webSearch: {
 							const webSearchArtifact = await generateWebSearchArtifactObject({
 								input: {
 									prompt: step.prompt,
-									sources: [...step.sources, ...sourceArtifacts],
+									sources: [
+										...step.sources,
+										...relevanceResults.map((result) => result.artifact),
+									],
 								},
 								options: {
 									onStreamPartialObject: (object) => {
@@ -125,21 +142,29 @@ export async function executeFlow(
 												input: {
 													stepId: step.id,
 													status: stepStatuses.streaming,
-													output: object,
+													output: buildWebSearchArtifact({
+														keywords: object.keywords ?? [],
+														scrapingTasks: object.scrapingTasks ?? [],
+													}),
 												},
 											}),
 										);
 									},
 								},
 							});
-							artifacts.push({
-								id: createArtifactId(),
-								object: "artifact.webSearch",
-								keywords: webSearchArtifact.keywords,
-								scrapingTasks: webSearchArtifact.scrapingTasks,
-								generatorNode:
-									giselleNodeToGiselleNodeArtifactElement(stepNode),
-							});
+							generateResults.push(
+								buildGenerateResult({
+									generator: buildGeneratorNode({
+										nodeId: stepNode.id,
+										archetype: stepNode.archetype,
+										name: stepNode.name,
+									}),
+									artifact: buildWebSearchArtifact({
+										keywords: webSearchArtifact.keywords,
+										scrapingTasks: webSearchArtifact.scrapingTasks,
+									}),
+								}),
+							);
 							break;
 						}
 					}
@@ -155,60 +180,6 @@ export async function executeFlow(
 	})();
 
 	return { streamableValue: stream.value };
-}
-
-interface GenerateArtifactObjectInput {
-	model: LanguageModelV1;
-	prompt: string;
-	sources: Source[];
-}
-interface GenerateArtifactObjectOptions {
-	onStreamPartialObject?: (partialObject: Partial<GeneratedObject>) => void;
-}
-async function generateArtifactObject({
-	input,
-	options,
-}: {
-	input: GenerateArtifactObjectInput;
-	options: GenerateArtifactObjectOptions;
-}) {
-	const system =
-		input.sources.length > 0
-			? `
- Your primary objective is to fulfill the user's request by utilizing the information provided within the <Source> or <WebPage> tags. Analyze the structured content carefully and leverage it to generate accurate and relevant responses. Focus on addressing the user's needs effectively while maintaining coherence and context throughout the interaction.
-
- If you use the information provided in the <WebPage>, After each piece of information, add a superscript number for citation (e.g. 1, 2, etc.).
-
- ${sourcesToText(input.sources)}
-
- `
-			: "You generate an answer to a question. ";
-
-	const { partialObjectStream, object } = await streamObject({
-		model: input.model,
-		system,
-		prompt: input.prompt,
-		schema: artifactSchema,
-	});
-
-	for await (const partialObject of partialObjectStream) {
-		options.onStreamPartialObject?.({
-			thinking: partialObject.thinking,
-			artifact: {
-				title: partialObject.artifact?.title || "",
-				content: partialObject.artifact?.content || "",
-				citations: (partialObject.artifact?.citations || [])?.map(
-					(citation) => ({
-						title: citation?.title ?? "",
-						url: citation?.url ?? "",
-					}),
-				),
-				completed: partialObject.artifact?.completed || false,
-			},
-			description: partialObject.description,
-		});
-	}
-	return await object;
 }
 
 interface PutFlowInput {
