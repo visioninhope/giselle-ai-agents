@@ -2,6 +2,7 @@ import { getOauthCredential } from "@/app/(auth)/lib";
 import { githubIntegrationFlag } from "@/flags";
 import { gitHubAppInstallURL } from "@/services/external/github/app";
 import {
+	type GitHubUserClient,
 	buildGitHubUserClient,
 	needsAuthorization,
 } from "@/services/external/github/user-client";
@@ -85,7 +86,7 @@ async function GitHubIntegration() {
 
 type InstallationProps = {
 	installation: Awaited<
-		ReturnType<ReturnType<typeof buildGitHubUserClient>["getInstallations"]>
+		ReturnType<GitHubUserClient["getInstallations"]>
 	>["installations"][number];
 };
 

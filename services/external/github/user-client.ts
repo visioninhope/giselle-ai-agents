@@ -227,3 +227,5 @@ class GitHubUserClient {
 		this.token = { accessToken, expiresAt, refreshToken };
 	}
 }
+
+export type { GitHubUserClient };
