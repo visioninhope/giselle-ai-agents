@@ -8,7 +8,7 @@ import {
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Building2 } from "lucide-react";
 import { Card } from "../components/card";
-import { GitHubAppInstallButton } from "../components/github-app-install-button";
+import { GitHubAppConfigureButton } from "../components/github-app-configure-button";
 
 export default async function IntegrationPage() {
 	const displayGitHubIntegration = await githubIntegrationFlag();
@@ -54,7 +54,7 @@ async function GitHubIntegration() {
 				description={`Logged in as @${gitHubUser.login}.`}
 				action={{
 					component: (
-						<GitHubAppInstallButton
+						<GitHubAppConfigureButton
 							installationUrl={await gitHubAppInstallURL()}
 						/>
 					),

@@ -8,7 +8,7 @@ type Props = {
 	installationUrl: string;
 };
 
-export function GitHubAppInstallButton({ installationUrl }: Props) {
+export function GitHubAppConfigureButton({ installationUrl }: Props) {
 	const popupRef = useRef<Window | null>(null);
 	const intervalRef = useRef<number | null>(null);
 	const router = useRouter();
@@ -21,7 +21,7 @@ export function GitHubAppInstallButton({ installationUrl }: Props) {
 
 		popupRef.current = window.open(
 			installationUrl,
-			"Install GitHub App",
+			"Configure GitHub App",
 			`width=${width},height=${height},top=${top},left=${left},popup=1`,
 		);
 
@@ -63,5 +63,5 @@ export function GitHubAppInstallButton({ installationUrl }: Props) {
 		};
 	}, [router]);
 
-	return <Button onClick={handleInstall}>Install GitHub App</Button>;
+	return <Button onClick={handleInstall}>Configure GitHub App</Button>;
 }
