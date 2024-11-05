@@ -2,6 +2,7 @@ import { buildAppInstallationClient } from "@/services/external/github/app";
 import { webhooks } from "@/services/external/github/webhook";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
+import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 
 function setupHandlers() {
@@ -21,7 +22,7 @@ export async function POST(request: NextRequest) {
 			payload: body,
 		});
 	} catch (error) {
-		console.error(error);
+		captureException(error);
 		return new Response("Failed to verify and receive webhook", {
 			status: 400,
 		});
