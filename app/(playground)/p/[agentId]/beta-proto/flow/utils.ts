@@ -1,6 +1,7 @@
 import { createId } from "@paralleldrive/cuid2";
 import type { ConnectorObject } from "../connector/types";
 import { type StructuredData, fileStatuses } from "../files/types";
+import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import {
 	type GiselleNode,
 	type GiselleNodeId,
@@ -9,6 +10,7 @@ import {
 import type { Graph } from "../graph/types";
 import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
+import { buildStepNode } from "./step-nodes/utils";
 import {
 	type Artifact,
 	type Flow,
@@ -23,6 +25,7 @@ import {
 	type QueuedFlowIndex,
 	type RunningFlowIndex,
 	type Step,
+	type StepAction,
 	type StepId,
 	flowStatuses,
 	jobStatuses,
@@ -83,6 +86,16 @@ function buildDependencyGraph(
 	return dependencyMap;
 }
 
+function resolveStepAction(node: GiselleNode): StepAction {
+	if (node.archetype === giselleNodeArchetypes.textGenerator) {
+		return "generate-text";
+	}
+	if (node.archetype === giselleNodeArchetypes.webSearch) {
+		return "search-web";
+	}
+	throw new Error("Unexpected node");
+}
+
 export async function resolveJobs(
 	nodes: GiselleNode[],
 	connectors: ConnectorObject[],
@@ -128,8 +141,8 @@ export async function resolveJobs(
 						id: createStepId(),
 						object: "step",
 						status: stepStatuses.queued,
-						nodeId: node.id,
-						action: node.archetype,
+						node: buildStepNode(node),
+						action: resolveStepAction(node),
 						prompt: resolvePrompt(node.id, nodes, relevantConnectors),
 						sources: await resolveSources(node.id, nodes, relevantConnectors),
 						sourceNodeIds: resolveSourceNodeIds(node.id, connectors),

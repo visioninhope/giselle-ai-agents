@@ -7,6 +7,7 @@ import type { AgentId } from "../types";
 import type { WebSearch } from "../web-search/types";
 import type { TextArtifact } from "./server-actions/generate-text";
 import type { WebSearchArtifact } from "./server-actions/websearch";
+import type { StepNode } from "./step-nodes/types";
 
 export type FlowId = `flw_${string}`;
 
@@ -78,7 +79,7 @@ export const stepStatuses = {
 
 export type StepStatus = (typeof stepStatuses)[keyof typeof stepStatuses];
 
-type StepAction = GiselleNodeArchetype;
+export type StepAction = "generate-text" | "search-web";
 
 export type Artifact = TextArtifact | WebSearchArtifact;
 export interface GeneratorNode {
@@ -97,7 +98,7 @@ export interface GenerateResult {
 interface BaseStep {
 	id: StepId;
 	object: "step";
-	nodeId: GiselleNodeId;
+	node: StepNode;
 	action: StepAction;
 	prompt: string;
 	sources: (StructuredData | TextContent)[];
