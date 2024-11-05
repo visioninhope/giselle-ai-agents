@@ -1,4 +1,5 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
+import { githubIntegrationFlag } from "@/flags";
 import { gitHubAppInstallURL } from "@/services/external/github/app";
 import {
 	buildGitHubUserClient,
@@ -9,7 +10,11 @@ import { Building2 } from "lucide-react";
 import { Card } from "../components/card";
 import { GitHubAppInstallButton } from "../components/github-app-install-button";
 
-export default function IntegrationPage() {
+export default async function IntegrationPage() {
+	const displayGitHubIntegration = await githubIntegrationFlag();
+	if (!displayGitHubIntegration) {
+		return null;
+	}
 	return (
 		<div className="grid gap-[16px]">
 			<h3
