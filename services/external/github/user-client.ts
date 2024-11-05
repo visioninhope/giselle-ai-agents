@@ -132,7 +132,6 @@ class GitHubUserClient {
 			"GET /user/installations",
 			{ per_page: maxFetchCount }, // default is 30
 		);
-		this.logger.info(`fetched ${res.data.total_count} installations`);
 		const totalCount = res.data.total_count;
 		if (totalCount > maxFetchCount - warningFetchCountBuffer) {
 			this.logger.warning(
