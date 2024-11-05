@@ -58,6 +58,7 @@ async function getAgent(agentId: AgentId) {
 		graphv2: {
 			...agent.graphv2,
 			xyFlow,
+			flowIndexes: [],
 		},
 	};
 }
