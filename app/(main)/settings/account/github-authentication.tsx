@@ -1,7 +1,7 @@
-import { getOauthCredential, refreshOauthCredential } from "@/app/(auth)/lib";
+import { getOauthCredential } from "@/app/(auth)/lib";
 import { getUser } from "@/lib/supabase";
 import {
-	GitHubUserClient,
+	buildGitHubUserClient,
 	needsAuthorization,
 } from "@/services/external/github/user-client";
 import { TriangleAlert } from "lucide-react";
@@ -19,7 +19,7 @@ export async function GitHubAuthentication() {
 		return <GitHubAuthentcationPresentation button={GitHubConnectButton} />;
 	}
 
-	const gitHubClient = new GitHubUserClient(credential, refreshOauthCredential);
+	const gitHubClient = buildGitHubUserClient(credential);
 	try {
 		const gitHubUser = await gitHubClient.getUser();
 		const supabaseUser = await getUser();

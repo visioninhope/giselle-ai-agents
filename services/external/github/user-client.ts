@@ -1,17 +1,51 @@
+import { refreshOauthCredential } from "@/app/(auth)/lib";
 import { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
+import * as Sentry from "@sentry/nextjs";
+import { info } from "node:console";
 
-// MARK: Types
+// MARK: Factory method
 
-export type GitHubUserCredential = {
-	accessToken: string;
-	expiresAt: Date | null;
-	refreshToken: string | null;
-};
+export function buildGitHubUserClient(token: GitHubUserCredential) {
+	const clientId = process.env.GITHUB_APP_CLIENT_ID;
+	if (!clientId) {
+		throw new Error("GITHUB_APP_CLIENT_ID is empty");
+	}
+	const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
+	if (!clientSecret) {
+		throw new Error("GITHUB_APP_CLIENT_SECRET is empty");
+	}
+
+	const loggerWithSentry = {
+		error: (error: Error) => {
+			if (process.env.NODE_ENV === "development") {
+				console.error(error);
+			}
+			Sentry.captureException(error);
+		},
+		warning: (message: string) => {
+			if (process.env.NODE_ENV === "development") {
+				console.warn(message);
+			}
+			Sentry.captureMessage(message, "warning");
+		},
+		info: (message: string) => {
+			info(message);
+		},
+	};
+
+	return new GitHubUserClient(
+		token,
+		clientId,
+		clientSecret,
+		refreshOauthCredential,
+		loggerWithSentry,
+	);
+}
 
 // MARK: Errors
 
-export class GitHubTokenRefreshError extends Error {
+class GitHubTokenRefreshError extends Error {
 	constructor(message: string, options?: { cause?: unknown }) {
 		super(message, options);
 		this.name = this.constructor.name;
@@ -38,37 +72,73 @@ export function needsAuthorization(error: unknown) {
 	return false;
 }
 
-export class GitHubUserClient {
+// MARK: Types
+
+type GitHubUserCredential = {
+	accessToken: string;
+	expiresAt: Date | null;
+	refreshToken: string | null;
+};
+
+type Logger = {
+	error: (error: Error) => void;
+	warning: (message: string) => void;
+	info: (message: string) => void;
+};
+
+type RefreshCredentialsFunc = (
+	provider: string,
+	accessToken: string,
+	refreshToken: string,
+	expiresAt: Date,
+	scope: string,
+	tokenType: string,
+) => Promise<void>;
+
+// MARK: Client
+
+class GitHubUserClient {
 	private clientId: string;
 	private clientSecret: string;
+	private refreshCredentialsFunc: RefreshCredentialsFunc;
+	private logger: Logger;
 
 	constructor(
 		private token: GitHubUserCredential,
-		private refreshCredentialsFunc: (
-			provider: string,
-			accessToken: string,
-			refreshToken: string,
-			expiresAt: Date,
-			scope: string,
-			tokenType: string,
-		) => Promise<void>,
+		clientId: string,
+		clientSecret: string,
+		refreshCredentialsFunc: RefreshCredentialsFunc,
+		logger: Logger,
 	) {
-		const clientId = process.env.GITHUB_APP_CLIENT_ID;
-		if (!clientId) {
-			throw new Error("GITHUB_APP_CLIENT_ID is empty");
-		}
-		const clientSecret = process.env.GITHUB_APP_CLIENT_SECRET;
-		if (!clientSecret) {
-			throw new Error("GITHUB_APP_CLIENT_SECRET is empty");
-		}
-
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
+		this.refreshCredentialsFunc = refreshCredentialsFunc;
+		this.logger = logger;
 	}
 
 	async getUser() {
 		const cli = await this.buildClient();
 		const res = await cli.request("GET /user");
+		return res.data;
+	}
+
+	async getInstallations() {
+		// 30 is pretty much the limit of installations, but we should handle the case where there are more
+		const maxFetchCount = 30;
+		const warningFetchCountBuffer = 5;
+
+		const cli = await this.buildClient();
+		const res = await cli.request(
+			"GET /user/installations",
+			{ per_page: maxFetchCount }, // default is 30
+		);
+		this.logger.info(`fetched ${res.data.total_count} installations`);
+		const totalCount = res.data.total_count;
+		if (totalCount > maxFetchCount - warningFetchCountBuffer) {
+			this.logger.warning(
+				`user has ${totalCount} installations. consider increasing maxFetchCount`,
+			);
+		}
 		return res.data;
 	}
 
