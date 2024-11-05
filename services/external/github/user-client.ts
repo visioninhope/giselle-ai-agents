@@ -1,4 +1,7 @@
 import { Octokit } from "@octokit/core";
+import { RequestError } from "@octokit/request-error";
+
+// MARK: Types
 
 export type GitHubUserCredential = {
 	accessToken: string;
@@ -6,7 +9,35 @@ export type GitHubUserCredential = {
 	refreshToken: string | null;
 };
 
-// GitHub Client as Authenticated User
+// MARK: Errors
+
+export class GitHubTokenRefreshError extends Error {
+	constructor(message: string, options?: { cause?: unknown }) {
+		super(message, options);
+		this.name = this.constructor.name;
+		Object.setPrototypeOf(this, GitHubTokenRefreshError.prototype);
+	}
+}
+
+/**
+ * Determines if the given error requires authorization.
+ * if return value is true, the user should be redirected to the authorization page.
+ *
+ * see {@link https://supabase.com/docs/reference/javascript/auth-signinwithoauth}
+ *
+ * @param error - The error to check.
+ * @returns True if the error requires authorization, false otherwise.
+ */
+export function needsAuthorization(error: unknown) {
+	if (error instanceof GitHubTokenRefreshError) {
+		return true;
+	}
+	if (error instanceof RequestError) {
+		return error.status === 401 || error.status === 403 || error.status === 404;
+	}
+	return false;
+}
+
 export class GitHubUserClient {
 	private clientId: string;
 	private clientSecret: string;
@@ -61,7 +92,7 @@ export class GitHubUserClient {
 
 	private async refreshAccessToken() {
 		if (this.token.refreshToken == null) {
-			throw new Error("Refresh token is not available");
+			throw new GitHubTokenRefreshError("Refresh token is not available");
 		}
 		const formData = {
 			client_id: this.clientId,
@@ -90,12 +121,14 @@ export class GitHubUserClient {
 		);
 
 		if (!response.ok) {
-			throw new Error("Failed to refresh access token");
+			throw new GitHubTokenRefreshError("Failed to refresh access token");
 		}
 
 		const data = await response.json();
 		if ("error" in data) {
-			throw new Error("Failed to refresh access token", { cause: data });
+			throw new GitHubTokenRefreshError("Failed to refresh access token", {
+				cause: data,
+			});
 		}
 
 		const accessToken = data.access_token;
@@ -114,9 +147,12 @@ export class GitHubUserClient {
 				tokenType,
 			);
 		} catch (error) {
-			throw new Error("Failed to save refreshed access token", {
-				cause: error,
-			});
+			throw new GitHubTokenRefreshError(
+				"Failed to save refreshed access token",
+				{
+					cause: error,
+				},
+			);
 		}
 
 		this.token = { accessToken, expiresAt, refreshToken };

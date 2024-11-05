@@ -1,41 +1,31 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
-import { getUser } from "@/lib/supabase";
 import type { GitHubUserClient } from "@/services/external/github/user-client";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
-import {
-	connectGitHubIdentity,
-	disconnectGitHubIdentity,
-} from "../account/actions";
-import {
-	GitHubConnectButton,
-	GitHubDisconnectButton,
-} from "./github-connection-button";
 
 type GitHubUser = Awaited<ReturnType<GitHubUserClient["getUser"]>>;
 
-export async function GitHubConnection({
-	gitHubUser,
-}: {
+type GitHubAuthentcationPresentationProps = {
 	gitHubUser?: GitHubUser;
-}) {
-	const ConnectButton = async () => {
-		if (!gitHubUser) {
-			return <GitHubConnectButton action={connectGitHubIdentity} />;
-		}
-
-		const supabaseUser = await getUser();
-		const unlinkable =
-			supabaseUser.identities && supabaseUser.identities.length > 1;
-		if (unlinkable) {
-			return <GitHubDisconnectButton action={disconnectGitHubIdentity} />;
-		}
-
-		return null;
-	};
-
+	button?: () => React.ReactNode;
+	alert?: string;
+};
+export function GitHubAuthentcationPresentation({
+	gitHubUser,
+	button,
+	alert,
+}: GitHubAuthentcationPresentationProps) {
 	return (
-		<div className="bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
+		<div className="grid gap-4 bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
+			{alert && (
+				<Alert variant="destructive">
+					<TriangleAlertIcon className="w-4 h-4" />
+					<AlertTitle>Authentication Error</AlertTitle>
+					<AlertDescription>{alert}</AlertDescription>
+				</Alert>
+			)}
 			<div className="flex items-center justify-between">
 				<div className="flex items-center gap-4">
 					<SiGithub className="h-[20px] w-[20px]" />
@@ -46,13 +36,13 @@ export async function GitHubConnection({
 								{gitHubUser.name} (
 								<ClickableText asChild>
 									<Link href={gitHubUser.html_url}>@{gitHubUser.login}</Link>
-								</ClickableText>
+								</ClickableText>{" "}
 								)
 							</div>
 						)}
 					</div>
 				</div>
-				{ConnectButton()}
+				{button?.()}
 			</div>
 		</div>
 	);
