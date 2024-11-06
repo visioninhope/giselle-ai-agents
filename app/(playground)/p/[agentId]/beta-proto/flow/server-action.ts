@@ -84,7 +84,7 @@ export async function executeFlow(
 							const artifactObject = await generateArtifactObject({
 								input: {
 									prompt: step.prompt,
-									model: openai("gpt-4o-mini"),
+									model: step.modelConfiguration,
 									sources: [
 										...step.sources,
 										...relevanceResults.map((result) => result.artifact),

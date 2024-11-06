@@ -17,6 +17,7 @@ import {
 	type FlowId,
 	type GenerateResult,
 	type GenerateResultId,
+	type GenerateTextAction,
 	type GeneratorNode,
 	type InitializingFlow,
 	type InitializingFlowIndex,
@@ -24,8 +25,8 @@ import {
 	type JobId,
 	type QueuedFlowIndex,
 	type RunningFlowIndex,
+	type SearchWebAction,
 	type Step,
-	type StepAction,
 	type StepId,
 	flowStatuses,
 	jobStatuses,
@@ -86,16 +87,6 @@ function buildDependencyGraph(
 	return dependencyMap;
 }
 
-function resolveStepAction(node: GiselleNode): StepAction {
-	if (node.archetype === giselleNodeArchetypes.textGenerator) {
-		return "generate-text";
-	}
-	if (node.archetype === giselleNodeArchetypes.webSearch) {
-		return "search-web";
-	}
-	throw new Error("Unexpected node");
-}
-
 export async function resolveJobs(
 	nodes: GiselleNode[],
 	connectors: ConnectorObject[],
@@ -142,10 +133,10 @@ export async function resolveJobs(
 						object: "step",
 						status: stepStatuses.queued,
 						node: buildStepNode(node),
-						action: resolveStepAction(node),
 						prompt: resolvePrompt(node.id, nodes, relevantConnectors),
 						sources: await resolveSources(node.id, nodes, relevantConnectors),
 						sourceNodeIds: resolveSourceNodeIds(node.id, connectors),
+						...resolveStepAction(node),
 					}) satisfies Step,
 			),
 		);
@@ -332,4 +323,24 @@ export function buildGenerateResult(
 		generator: input.generator,
 		artifact: input.artifact,
 	};
+}
+
+export function resolveStepAction(node: GiselleNode) {
+	if (node.archetype === giselleNodeArchetypes.textGenerator) {
+		return {
+			action: "generate-text",
+			modelConfiguration: {
+				provider: "openai",
+				modelId: "gpt-4o-mini",
+				temperature: 0.7,
+				topP: 0.8,
+			},
+		} satisfies GenerateTextAction;
+	}
+	if (node.archetype === giselleNodeArchetypes.webSearch) {
+		return {
+			action: "search-web",
+		} satisfies SearchWebAction;
+	}
+	throw new Error(`Detect invalid archetype: ${node.archetype}`);
 }
