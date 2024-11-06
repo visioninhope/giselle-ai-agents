@@ -10,6 +10,7 @@ import {
 import type { Graph } from "../graph/types";
 import type { TextContent, TextContentId } from "../text-content/types";
 import type { AgentId } from "../types";
+import { isModelProvider } from "./server-actions/generate-text";
 import { buildStepNode } from "./step-nodes/utils";
 import {
 	type Artifact,
@@ -327,6 +328,25 @@ export function buildGenerateResult(
 
 export function resolveStepAction(node: GiselleNode) {
 	if (node.archetype === giselleNodeArchetypes.textGenerator) {
+		if (
+			node.properties !== null &&
+			typeof node.properties === "object" &&
+			"llm" in node.properties &&
+			typeof node.properties.llm === "string"
+		) {
+			const [provider, modelId] = node.properties.llm.split(":");
+			if (isModelProvider(provider) && typeof modelId === "string") {
+				return {
+					action: "generate-text",
+					modelConfiguration: {
+						provider,
+						modelId,
+						temperature: 0.7,
+						topP: 0.8,
+					},
+				} satisfies GenerateTextAction;
+			}
+		}
 		return {
 			action: "generate-text",
 			modelConfiguration: {

@@ -1,3 +1,4 @@
+import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
 import { createArtifactId } from "../../artifact/factory";
@@ -9,6 +10,9 @@ import { sourcesToText } from "../source/utils";
 export function buildLanguageModel(modelConfiguration: ModelConfiguration) {
 	if (modelConfiguration.provider === "openai") {
 		return openai("gpt-4o-mini");
+	}
+	if (modelConfiguration.provider === "anthropic") {
+		return anthropic("claude-3-5-sonnet-20241022");
 	}
 	throw new Error("Unsupported model provider");
 }
@@ -28,7 +32,10 @@ export function buildTextArtifact(input: BuildTextArtifactInput): TextArtifact {
 	};
 }
 
-type ModelProvider = "openai";
+type ModelProvider = "openai" | "anthropic";
+export function isModelProvider(value: unknown): value is ModelProvider {
+	return value === "openai" || value === "anthropic";
+}
 export interface ModelConfiguration {
 	provider: ModelProvider;
 	modelId: string;
