@@ -1,13 +1,15 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
-import { streamObject } from "ai";
+import { type LanguageModelV1, streamObject } from "ai";
 import { createArtifactId } from "../../artifact/factory";
 import { schema as artifactSchema } from "../../artifact/schema";
 import type { ArtifactId } from "../../artifact/types";
 import type { Source } from "../source/types";
 import { sourcesToText } from "../source/utils";
 
-export function buildLanguageModel(modelConfiguration: ModelConfiguration) {
+export function buildLanguageModel(
+	modelConfiguration: ModelConfiguration,
+): LanguageModelV1 {
 	if (modelConfiguration.provider === "openai") {
 		return openai("gpt-4o-mini");
 	}
