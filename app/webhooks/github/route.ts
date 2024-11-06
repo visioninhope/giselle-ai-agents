@@ -10,10 +10,6 @@ import type { NextRequest } from "next/server";
 
 function setupHandlers() {
 	webhooks.on("issues", issuesHandler);
-	webhooks.onError((error) => {
-		// TODO: consider filtering out expected errors
-		captureException(error);
-	});
 }
 
 setupHandlers();
