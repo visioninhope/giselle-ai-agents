@@ -1,11 +1,11 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { githubIntegrationFlag } from "@/flags";
-import { gitHubAppInstallURL } from "@/services/external/github/app";
 import {
 	type GitHubUserClient,
 	buildGitHubUserClient,
+	gitHubAppInstallURL,
 	needsAuthorization,
-} from "@/services/external/github/user-client";
+} from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Building2 } from "lucide-react";
 import { Card } from "../components/card";

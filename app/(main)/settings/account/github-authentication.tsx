@@ -3,7 +3,7 @@ import { getUser } from "@/lib/supabase";
 import {
 	buildGitHubUserClient,
 	needsAuthorization,
-} from "@/services/external/github/user-client";
+} from "@/services/external/github";
 import { TriangleAlert } from "lucide-react";
 import { GitHubAuthentcationPresentation } from "../components/github-authentication-presentation";
 import { GitHubConnectionButton } from "../components/github-connection-button";

@@ -1,6 +1,6 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
-import type { GitHubUserClient } from "@/services/external/github/user-client";
+import type { GitHubUserClient } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";

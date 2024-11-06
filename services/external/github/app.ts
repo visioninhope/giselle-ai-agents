@@ -1,5 +1,6 @@
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
+import { RequestError } from "@octokit/request-error";
 
 /**
  * Generates the GitHub App installation URL.
@@ -39,6 +40,13 @@ export async function buildAppInstallationClient(installationId: number) {
 	return new Octokit({
 		auth: installationAuth.token,
 	});
+}
+
+export function needsAdditionalPermissions(error: unknown) {
+	if (error instanceof RequestError) {
+		return error.status === 403;
+	}
+	return false;
 }
 
 function appAuth() {
