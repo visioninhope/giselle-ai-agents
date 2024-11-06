@@ -19,14 +19,15 @@ function setupHandlers() {
 setupHandlers();
 
 export async function POST(request: NextRequest) {
-	const { id, name, signature, payload } = await parseWebhookRequest(request);
+	const { id, name, signature, body } = await parseWebhookRequest(request);
 
-	const verifyOK = await webhooks.verify(payload, signature);
+	const verifyOK = await webhooks.verify(body, signature);
 	if (!verifyOK) {
 		return new Response("Failed to verify webhook", { status: 400 });
 	}
 
 	try {
+		const payload = JSON.parse(body);
 		await webhooks.receive({ id, name, payload } as EmitterWebhookEvent);
 		return new Response("OK");
 	} catch (error) {
@@ -34,6 +35,9 @@ export async function POST(request: NextRequest) {
 			// TODO: notify the user that additional permissions are required
 			throw new Error("Additional permissions required");
 		}
+
+		// TODO: consider filtering out expected errors
+		captureException(error);
 		return new Response("Failed to receive webhook", {
 			status: 400,
 		});
@@ -44,8 +48,8 @@ async function parseWebhookRequest(request: NextRequest) {
 	const id = request.headers.get("X-GitHub-Delivery") ?? "";
 	const name = request.headers.get("X-GitHub-Event") as WebhookEventName;
 	const signature = request.headers.get("X-Hub-Signature-256") ?? "";
-	const payload = await request.text();
-	return { id, name, signature, payload };
+	const body = await request.text();
+	return { id, name, signature, body };
 }
 
 function requireAdditionalPermission(error: unknown) {
