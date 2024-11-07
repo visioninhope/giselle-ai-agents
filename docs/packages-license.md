@@ -1,11 +1,11 @@
 # giselle
 
-As of November  6, 2024  2:16am. 846 total
+As of November  7, 2024  6:38am. 845 total
 
 ## Summary
 * 624 MIT
 * 108 Apache 2.0
-* 60 ISC
+* 59 ISC
 * 23 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
@@ -797,7 +797,7 @@ Get the status of a file with some features
 A library for efficiently walking a directory recursively
 
 <a name="@octokit/auth-app"></a>
-### @octokit/auth-app v7.1.2 (dependencies)
+### @octokit/auth-app v7.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -3538,17 +3538,6 @@ WebAssembly binary format parser
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 WebAssembly text format printer
-
-<a name="@wolfy1339/lru-cache"></a>
-### @wolfy1339/lru-cache v11.0.2-patch.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-A cache object that deletes the least-recently-used items.
 
 <a name="@xmldom/xmldom"></a>
 ### <a href="https://github.com/xmldom/xmldom">@xmldom/xmldom</a> v0.8.10 (dependencies)
