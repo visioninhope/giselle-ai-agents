@@ -14,12 +14,12 @@ type LinkAction = {
 	content: string;
 	href: string;
 };
-type Comp = {
+type CustomComponentAction = {
 	component: React.ReactNode;
 	onAction?: never;
 	href?: never;
 };
-type Action = SubmitAction | LinkAction | Comp;
+type Action = SubmitAction | LinkAction | CustomComponentAction;
 type CardProps = {
 	title: string;
 	description?: string;
