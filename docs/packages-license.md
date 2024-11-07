@@ -1,6 +1,6 @@
 # giselle
 
-As of November  7, 2024  6:38am. 845 total
+As of November  7, 2024  6:42am. 845 total
 
 ## Summary
 * 624 MIT
@@ -984,7 +984,7 @@ GitHub webhook events toolset for Node.js
 Methods to handle GitHub Webhook requests
 
 <a name="@octokit/webhooks-types"></a>
-### @octokit/webhooks-types v7.6.1 (dependencies)
+### @octokit/webhooks-types v7.6.1 (devDependencies)
 #### 
 
 ##### Paths
