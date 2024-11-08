@@ -9,7 +9,7 @@ export function TopPSlider(props: TopPSliderProps) {
 	const [topP, setTopP] = useState(props.value);
 	return (
 		<div className="flex items-center gap-[8px]">
-			<div className="font-rosart text-[14px] text-black-40 w-[100px]">
+			<div className="font-rosart text-[14px] text-black-40 w-[90px] shrink-0">
 				Top P
 			</div>
 			<Slider

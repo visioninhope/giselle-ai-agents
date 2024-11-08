@@ -150,7 +150,7 @@ export const TextGeneratorPropertyPanel: FC<
 								</div>
 								<div className="grid gap-[16px]">
 									<TemperatureSlider
-										value={(node.properties.temperature as number) ?? 0.5}
+										value={(node.properties.temperature as number) ?? 1.0}
 										onChange={(temperature) => {
 											dispatch(
 												updateNode({

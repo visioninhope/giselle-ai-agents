@@ -9,7 +9,7 @@ export function TemperatureSlider(props: TemperatureSliderProps) {
 	const [temperature, setTemperature] = useState(props.value);
 	return (
 		<div className="flex items-center gap-[8px]">
-			<div className="font-rosart text-[14px] text-black-40 w-[100px]">
+			<div className="font-rosart text-[14px] text-black-40 w-[90px] shrink-0">
 				Temperature
 			</div>
 			<Slider
