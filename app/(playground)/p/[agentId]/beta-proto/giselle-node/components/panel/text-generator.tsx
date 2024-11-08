@@ -167,7 +167,7 @@ export const TextGeneratorPropertyPanel: FC<
 									/>
 								</div>
 								<TopPSlider
-									value={(node.properties.topP as number) ?? 0.5}
+									value={(node.properties.topP as number) ?? 1.0}
 									onChange={(topP) => {
 										dispatch(
 											updateNode({
