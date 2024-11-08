@@ -144,42 +144,44 @@ export const TextGeneratorPropertyPanel: FC<
 								</Select>
 							</div>
 							<div className="border-t border-[hsla(222,21%,40%,1)]" />
-							<div className="grid gap-[8px]">
+							<div className="grid gap-[16px]">
 								<div className="font-rosart text-[16px] text-black-30">
 									Parameters
 								</div>
-								<TopPSlider
-									value={(node.properties.topP as number) ?? 0.5}
-									onChange={(topP) => {
-										dispatch(
-											updateNode({
-												input: {
-													nodeId: node.id,
-													properties: {
-														...node.properties,
-														topP,
+								<div className="grid gap-[16px]">
+									<TopPSlider
+										value={(node.properties.topP as number) ?? 0.5}
+										onChange={(topP) => {
+											dispatch(
+												updateNode({
+													input: {
+														nodeId: node.id,
+														properties: {
+															...node.properties,
+															topP,
+														},
 													},
-												},
-											}),
-										);
-									}}
-								/>
-								<TemperatureSlider
-									value={(node.properties.temperature as number) ?? 0.5}
-									onChange={(temperature) => {
-										dispatch(
-											updateNode({
-												input: {
-													nodeId: node.id,
-													properties: {
-														...node.properties,
-														temperature,
+												}),
+											);
+										}}
+									/>
+									<TemperatureSlider
+										value={(node.properties.temperature as number) ?? 0.5}
+										onChange={(temperature) => {
+											dispatch(
+												updateNode({
+													input: {
+														nodeId: node.id,
+														properties: {
+															...node.properties,
+															temperature,
+														},
 													},
-												},
-											}),
-										);
-									}}
-								/>
+												}),
+											);
+										}}
+									/>
+								</div>
 							</div>
 						</div>
 					</div>
