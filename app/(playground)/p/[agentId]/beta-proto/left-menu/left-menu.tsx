@@ -4,8 +4,13 @@ import { LayersIcon } from "../components/icons/layers";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
 
 export function LeftMenu() {
+	const [tabValue, setTabValue] = useState("");
 	return (
-		<Tabs orientation="vertical">
+		<Tabs
+			orientation="vertical"
+			value={tabValue}
+			onValueChange={(value) => setTabValue(value)}
+		>
 			<TabsList>
 				<TabsTrigger value="overview">
 					<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
@@ -24,7 +29,10 @@ export function LeftMenu() {
 							Overview
 						</p>
 						<button type="button">
-							<XIcon className="w-[16px] h-[16px]" />
+							<XIcon
+								className="w-[16px] h-[16px]"
+								onClick={() => setTabValue("")}
+							/>
 						</button>
 					</header>
 					{/* <div>
@@ -48,7 +56,10 @@ export function LeftMenu() {
 							GitHub Integration
 						</p>
 						<button type="button">
-							<XIcon className="w-[16px] h-[16px]" />
+							<XIcon
+								className="w-[16px] h-[16px]"
+								onClick={() => setTabValue("")}
+							/>
 						</button>
 					</header>
 				</div>
