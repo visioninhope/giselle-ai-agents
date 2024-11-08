@@ -13,15 +13,15 @@ export function TemperatureSlider(props: TemperatureSliderProps) {
 				Temperature
 			</div>
 			<Slider
-				max={1.0}
+				max={2.0}
 				min={0.0}
-				step={0.1}
+				step={0.01}
 				defaultValue={[temperature]}
 				onValueChange={(v) => setTemperature(v[0])}
 				onValueCommit={(v) => props.onChange(v[0])}
 			/>
 			<div className="text-[12px] text-black-40 w-[3em] text-right">
-				{temperature}
+				{temperature.toFixed(2)}
 			</div>
 		</div>
 	);

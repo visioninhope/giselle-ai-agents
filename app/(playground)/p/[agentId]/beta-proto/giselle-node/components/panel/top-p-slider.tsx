@@ -15,12 +15,14 @@ export function TopPSlider(props: TopPSliderProps) {
 			<Slider
 				max={1.0}
 				min={0.0}
-				step={0.1}
+				step={0.01}
 				defaultValue={[topP]}
 				onValueChange={(v) => setTopP(v[0])}
 				onValueCommit={(v) => props.onChange(v[0])}
 			/>
-			<div className="text-[12px] text-black-40 w-[3em] text-right">{topP}</div>
+			<div className="text-[12px] text-black-40 w-[3em] text-right">
+				{topP.toFixed(2)}
+			</div>
 		</div>
 	);
 }
