@@ -149,22 +149,6 @@ export const TextGeneratorPropertyPanel: FC<
 									Parameters
 								</div>
 								<div className="grid gap-[16px]">
-									<TopPSlider
-										value={(node.properties.topP as number) ?? 0.5}
-										onChange={(topP) => {
-											dispatch(
-												updateNode({
-													input: {
-														nodeId: node.id,
-														properties: {
-															...node.properties,
-															topP,
-														},
-													},
-												}),
-											);
-										}}
-									/>
 									<TemperatureSlider
 										value={(node.properties.temperature as number) ?? 0.5}
 										onChange={(temperature) => {
@@ -182,6 +166,22 @@ export const TextGeneratorPropertyPanel: FC<
 										}}
 									/>
 								</div>
+								<TopPSlider
+									value={(node.properties.topP as number) ?? 0.5}
+									onChange={(topP) => {
+										dispatch(
+											updateNode({
+												input: {
+													nodeId: node.id,
+													properties: {
+														...node.properties,
+														topP,
+													},
+												},
+											}),
+										);
+									}}
+								/>
 							</div>
 						</div>
 					</div>
