@@ -3038,7 +3038,7 @@ The Vercel Blob JavaScript API client
 
 unknown manually approved
 
->The license is none. Check https://github.com/route06inc/giselle/issues/12 later
+>The license is none. Check https://github.com/giselles-ai/giselle/issues/12 later
 
 ><cite>  2024-10-08</cite>
 
