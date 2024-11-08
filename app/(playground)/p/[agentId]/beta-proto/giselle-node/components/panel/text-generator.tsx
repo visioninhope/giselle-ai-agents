@@ -37,6 +37,7 @@ import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 import { ArtifactBlock } from "./artifact-block";
 import { MarkdownRender } from "./markdown-render";
+import { TemperatureSlider } from "./temperature-slider";
 import { TopPSlider } from "./top-p-slider";
 
 function PopPopWillis() {
@@ -157,6 +158,22 @@ export const TextGeneratorPropertyPanel: FC<
 													properties: {
 														...node.properties,
 														topP,
+													},
+												},
+											}),
+										);
+									}}
+								/>
+								<TemperatureSlider
+									value={(node.properties.temperature as number) ?? 0.5}
+									onChange={(temperature) => {
+										dispatch(
+											updateNode({
+												input: {
+													nodeId: node.id,
+													properties: {
+														...node.properties,
+														temperature,
 													},
 												},
 											}),
