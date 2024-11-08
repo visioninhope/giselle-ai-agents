@@ -22,6 +22,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../../components/select";
+import { Slider } from "../../../components/slider";
 import { Spinner } from "../../../components/spinner";
 import { useFeatureFlags } from "../../../feature-flags/context";
 import { useGraph } from "../../../graph/context";
@@ -36,6 +37,8 @@ import { ArchetypeIcon } from "../archetype-icon";
 import { TabTrigger } from "../tabs";
 import { ArtifactBlock } from "./artifact-block";
 import { MarkdownRender } from "./markdown-render";
+import { TemperatureSlider } from "./temperature-slider";
+import { TopPSlider } from "./top-p-slider";
 
 function PopPopWillis() {
 	return (
@@ -90,9 +93,9 @@ export const TextGeneratorPropertyPanel: FC<
 			</div>
 
 			{chooseModelFlag && node.ui.panelTab === panelTabs.property && (
-				<div className="px-[24px] pb-[16px] overflow-scroll">
+				<div className="px-[16px] pb-[16px] overflow-y-auto overflow-x-hidden">
 					<div>
-						<div className="relative z-10">
+						<div className="relative z-10 flex flex-col gap-[10px]">
 							<div className="grid gap-[8px]">
 								<label
 									htmlFor="text"
@@ -139,6 +142,46 @@ export const TextGeneratorPropertyPanel: FC<
 										)}
 									</SelectContent>
 								</Select>
+							</div>
+							<div className="border-t border-[hsla(222,21%,40%,1)]" />
+							<div className="grid gap-[16px]">
+								<div className="font-rosart text-[16px] text-black-30">
+									Parameters
+								</div>
+								<div className="grid gap-[16px]">
+									<TemperatureSlider
+										value={(node.properties.temperature as number) ?? 1.0}
+										onChange={(temperature) => {
+											dispatch(
+												updateNode({
+													input: {
+														nodeId: node.id,
+														properties: {
+															...node.properties,
+															temperature,
+														},
+													},
+												}),
+											);
+										}}
+									/>
+								</div>
+								<TopPSlider
+									value={(node.properties.topP as number) ?? 1.0}
+									onChange={(topP) => {
+										dispatch(
+											updateNode({
+												input: {
+													nodeId: node.id,
+													properties: {
+														...node.properties,
+														topP,
+													},
+												},
+											}),
+										);
+									}}
+								/>
 							</div>
 						</div>
 					</div>

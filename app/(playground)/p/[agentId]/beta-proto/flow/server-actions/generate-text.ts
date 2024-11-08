@@ -74,6 +74,8 @@ export async function generateArtifactObject({
 
 	const { partialObjectStream, object } = await streamObject({
 		model,
+		topP: input.model.topP,
+		temperature: input.model.temperature,
 		system,
 		prompt: input.prompt,
 		schema: artifactSchema,
