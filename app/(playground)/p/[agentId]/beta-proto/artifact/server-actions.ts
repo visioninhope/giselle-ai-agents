@@ -53,10 +53,16 @@ ${sourcesToText(sources)}
 		const generation = trace.generation({
 			input: params.userPrompt,
 			model: params.modelConfiguration.modelId,
+			modelParameters: {
+				topP: params.modelConfiguration.topP,
+				temperature: params.modelConfiguration.temperature,
+			},
 		});
 		const { partialObjectStream, object } = await streamObject({
 			model,
 			system,
+			temperature: params.modelConfiguration.temperature,
+			topP: params.modelConfiguration.topP,
 			prompt: params.userPrompt,
 			schema: artifactSchema,
 			onFinish: async (result) => {
