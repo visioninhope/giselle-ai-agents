@@ -7,8 +7,12 @@ const metricExporter = new OTLPMetricExporter({
 	headers,
 });
 
+const exportIntervalMillis = Number.parseInt(
+	process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+);
+
 export const metricReader = new PeriodicExportingMetricReader({
 	exporter: metricExporter,
-	exportIntervalMillis: 1000,
-	exportTimeoutMillis: 900, // retries exporting if timeout
+	exportIntervalMillis,
+	exportTimeoutMillis: exportIntervalMillis - 100, // retries exporting if timeout
 });
