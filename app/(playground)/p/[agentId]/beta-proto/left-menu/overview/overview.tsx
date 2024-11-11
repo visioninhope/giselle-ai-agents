@@ -1,5 +1,7 @@
 import { XIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useGraph } from "../../graph/context";
+import { updateAgentName as updateAgentNameAction } from "./server-actions";
 
 interface OverviewProps {
 	setTabValue: (value: string) => void;
@@ -10,14 +12,37 @@ export function Overview(props: OverviewProps) {
 	const transitionToEditTitle = useCallback(() => {
 		setEditTitle(true);
 	}, []);
-	const handleBlur = useCallback(() => {
+	const { state } = useGraph();
+	const updateAgentName = useCallback(async () => {
+		if (inputRef.current) {
+			await updateAgentNameAction({
+				agentId: state.graph.agentId,
+				name: inputRef.current.value,
+			});
+		}
+	}, [state.graph.agentId]);
+	const handleBlur = useCallback(async () => {
 		setEditTitle(false);
-	}, []);
+		updateAgentName();
+	}, [updateAgentName]);
 	useEffect(() => {
-		if (editTitle && inputRef.current) {
+		if (inputRef.current === null) {
+			return;
+		}
+		if (editTitle) {
 			inputRef.current.focus();
 			inputRef.current.select();
 		}
+
+		const callback = (e: KeyboardEvent) => {
+			if (e.key === "Enter") {
+				inputRef.current?.blur();
+			}
+		};
+		inputRef.current.addEventListener("keydown", callback);
+		return () => {
+			inputRef.current?.removeEventListener("keydown", callback);
+		};
 	}, [editTitle]);
 	return (
 		<div className="grid gap-[24px] px-[24px] py-[24px]">
