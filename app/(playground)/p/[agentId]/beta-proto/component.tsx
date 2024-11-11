@@ -1,6 +1,7 @@
 "use client";
 
 import "@xyflow/react/dist/style.css";
+import { AgentNameProvider } from "./contexts/agent-name";
 import { Editor } from "./editor";
 import { FeatureFlagProvider } from "./feature-flags/provider";
 import type { FeatureFlags } from "./feature-flags/types";
@@ -20,15 +21,18 @@ function Inner() {
 
 interface PlaygroundProps {
 	agentId: AgentId;
+	agentName: string;
 	graph: Graph;
 	featureFlags: FeatureFlags;
 }
 export function Playground(props: PlaygroundProps) {
 	return (
 		<FeatureFlagProvider {...props.featureFlags}>
-			<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
-				<Inner />
-			</GraphProvider>
+			<AgentNameProvider initialName={props.agentName}>
+				<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
+					<Inner />
+				</GraphProvider>
+			</AgentNameProvider>
 		</FeatureFlagProvider>
 	);
 }

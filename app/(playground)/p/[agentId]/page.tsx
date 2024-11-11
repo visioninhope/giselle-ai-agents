@@ -95,6 +95,7 @@ export default async function AgentPlaygroundPage({
 	return (
 		<Playground
 			agentId={agentId}
+			agentName={agent.name || "Untitled Agent"}
 			graph={agent.graphv2}
 			featureFlags={{
 				uploadFileToPromptNodeFlag,

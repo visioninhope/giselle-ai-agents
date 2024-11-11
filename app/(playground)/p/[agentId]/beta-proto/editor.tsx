@@ -28,6 +28,7 @@ import {
 import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
 import { Header } from "./header";
+import { LeftMenu } from "./left-menu/left-menu";
 import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
 import {
 	useConnectionHandler,
@@ -150,6 +151,9 @@ function EditorInner() {
 				</Panel>
 				<Panel position="top-left" className="!top-0 !left-0 !right-0 !m-0">
 					<Header />
+				</Panel>
+				<Panel position="top-left" className="!top-0 !bottom-0 !left-0 !m-0">
+					<LeftMenu />
 				</Panel>
 				<Panel position="top-right" className="!top-0 !bottom-0 !right-0 !m-0">
 					<GiselleNodeInformationPanel />
