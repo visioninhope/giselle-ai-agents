@@ -1,4 +1,5 @@
 import { XIcon } from "lucide-react";
+import { Label } from "../../components/label";
 import {
 	Select,
 	SelectContent,
@@ -20,6 +21,17 @@ const mockRepositories = [
 	{
 		id: "r-3",
 		name: "toyamarinyon/coral",
+	},
+];
+
+const mockEvents = [
+	{
+		id: "e-1",
+		name: "Comment on Issue",
+	},
+	{
+		id: "e-2",
+		name: "Issue created",
 	},
 ];
 interface GitHubIntegrationProps {
@@ -60,15 +72,15 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 				</Section>
 				<Section>
 					<SectionHeader title="Trigger" />
-
-					<Select>
+					<Label htmlFor="event">Event</Label>
+					<Select name="event">
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Choose value" />
 						</SelectTrigger>
 						<SelectContent>
-							{mockRepositories.map((repository) => (
-								<SelectItem value={repository.id} key={repository.id}>
-									{repository.name}
+							{mockEvents.map((event) => (
+								<SelectItem value={event.id} key={event.id}>
+									{event.name}
 								</SelectItem>
 							))}
 						</SelectContent>
