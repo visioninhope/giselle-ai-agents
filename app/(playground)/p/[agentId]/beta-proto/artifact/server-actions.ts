@@ -83,7 +83,12 @@ ${sourcesToText(sources)}
 				await lf.shutdownAsync();
 				waitUntil(
 					new Promise((resolve) =>
-						setTimeout(resolve, parseInt(process.env.VERCEL_FUNCTION_MAX_DURATION ?? "300")),
+						setTimeout(
+							resolve,
+							Number.parseInt(
+								process.env.VERCEL_FUNCTION_MAX_DURATION ?? "300",
+							),
+						),
 					),
 				); // wait until telemetry sent
 			},
