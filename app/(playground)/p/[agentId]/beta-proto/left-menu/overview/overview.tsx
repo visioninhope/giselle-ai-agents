@@ -1,5 +1,6 @@
 import { XIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useAgentName } from "../../contexts/agent-name";
 import { useGraph } from "../../graph/context";
 import { updateAgentName as updateAgentNameAction } from "./server-actions";
 
@@ -8,6 +9,7 @@ interface OverviewProps {
 }
 export function Overview(props: OverviewProps) {
 	const [editTitle, setEditTitle] = useState(false);
+	const { name, setName } = useAgentName();
 	const inputRef = useRef<HTMLInputElement>(null);
 	const transitionToEditTitle = useCallback(() => {
 		setEditTitle(true);
@@ -15,12 +17,13 @@ export function Overview(props: OverviewProps) {
 	const { state } = useGraph();
 	const updateAgentName = useCallback(async () => {
 		if (inputRef.current) {
+			setName(inputRef.current.value);
 			await updateAgentNameAction({
 				agentId: state.graph.agentId,
 				name: inputRef.current.value,
 			});
 		}
-	}, [state.graph.agentId]);
+	}, [state.graph.agentId, setName]);
 	const handleBlur = useCallback(async () => {
 		setEditTitle(false);
 		updateAgentName();
@@ -66,7 +69,7 @@ export function Overview(props: OverviewProps) {
 					className="text-[16px] text-black-30 p-[4px] text-left outline-black-70 rounded-[8px]"
 					onBlur={handleBlur}
 					ref={inputRef}
-					defaultValue={"Unnamed Agent"}
+					defaultValue={name}
 				/>
 			) : (
 				<button
@@ -74,7 +77,7 @@ export function Overview(props: OverviewProps) {
 					onClick={() => transitionToEditTitle()}
 					className="text-[16px] text-black-30 p-[4px] text-left"
 				>
-					Unnamed Agent
+					{name}
 				</button>
 			)}
 		</div>
