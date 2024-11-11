@@ -1,7 +1,7 @@
-interface HeadingProps {
+interface SectionHeaderProps {
 	title: string;
 }
-export function Heading(props: HeadingProps) {
+export function SectionHeader(props: SectionHeaderProps) {
 	return (
 		<div className="flex items-center">
 			<span className="flex-shrink text-black-30 text-[16px] font-rosart font-[500]">

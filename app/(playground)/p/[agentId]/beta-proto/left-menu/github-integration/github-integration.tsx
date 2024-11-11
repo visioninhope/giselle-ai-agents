@@ -6,7 +6,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
-import { Heading } from "../components/section";
+import { SectionHeader } from "../components/section";
 
 const mockRepositories = [
 	{
@@ -44,7 +44,7 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 			</header>
 			<div>
 				<div className="grid gap-[8px]">
-					<Heading title="Repository" />
+					<SectionHeader title="Repository" />
 					<Select>
 						<SelectTrigger className="w-[180px]">
 							<SelectValue placeholder="Choose value" />
