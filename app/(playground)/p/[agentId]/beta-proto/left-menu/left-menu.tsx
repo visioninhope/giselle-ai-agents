@@ -1,8 +1,8 @@
 import { GithubIcon, XIcon } from "lucide-react";
 import { useState } from "react";
 import { LayersIcon } from "../components/icons/layers";
-import { Overview } from "./components/overview";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/tabs";
+import { Overview } from "./overview/overview";
 
 export function LeftMenu() {
 	const [tabValue, setTabValue] = useState("");
