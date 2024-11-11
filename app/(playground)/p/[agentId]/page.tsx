@@ -24,7 +24,7 @@ import type { AgentId } from "./beta-proto/types";
 
 // Extend the max duration of the server actions from this page to 5 minutes
 // https://vercel.com/docs/functions/runtimes#max-duration
-export const maxDuration = 300;
+export const maxDuration = process.env.VERCEL_FUNCTION_MAX_DURATION;
 
 function graphToReactFlow(grpah: Graph) {
 	const nodes: ReactFlowNode[] = grpah.nodes.map((node) => {
