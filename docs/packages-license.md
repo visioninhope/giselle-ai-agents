@@ -1,11 +1,11 @@
 # giselle
 
-As of November  8, 2024  9:59am. 838 total
+As of November 11, 2024  4:47am. 849 total
 
 ## Summary
-* 607 MIT
-* 118 Apache 2.0
-* 59 ISC
+* 626 MIT
+* 109 Apache 2.0
+* 60 ISC
 * 23 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
@@ -807,6 +807,204 @@ Get the status of a file with some features
 
 A library for efficiently walking a directory recursively
 
+<a name="@octokit/auth-app"></a>
+### @octokit/auth-app v7.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub App authentication for JavaScript
+
+<a name="@octokit/auth-oauth-app"></a>
+### @octokit/auth-oauth-app v8.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub OAuth App authentication for JavaScript
+
+<a name="@octokit/auth-oauth-device"></a>
+### @octokit/auth-oauth-device v7.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub OAuth Device authentication strategy for JavaScript
+
+<a name="@octokit/auth-oauth-user"></a>
+### @octokit/auth-oauth-user v5.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Octokit authentication strategy for OAuth clients
+
+<a name="@octokit/auth-token"></a>
+### @octokit/auth-token v5.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub API token authentication for browsers and Node.js
+
+<a name="@octokit/core"></a>
+### @octokit/core v6.1.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Extendable client for GitHub's REST & GraphQL APIs
+
+<a name="@octokit/endpoint"></a>
+### @octokit/endpoint v10.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Turns REST API endpoints into generic request options
+
+<a name="@octokit/graphql"></a>
+### @octokit/graphql v8.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub GraphQL API client for browsers and Node
+
+<a name="@octokit/oauth-authorization-url"></a>
+### @octokit/oauth-authorization-url v7.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Universal library to retrieve GitHubâs identity URL for the OAuth web flow
+
+<a name="@octokit/oauth-methods"></a>
+### @octokit/oauth-methods v5.1.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Set of stateless request methods to create, check, reset, refresh, and delete user access tokens for OAuth and GitHub Apps
+
+<a name="@octokit/openapi-types"></a>
+### @octokit/openapi-types v22.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Generated TypeScript definitions based on GitHub's OpenAPI spec for api.github.com
+
+<a name="@octokit/openapi-webhooks-types"></a>
+### @octokit/openapi-webhooks-types v8.3.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Generated TypeScript definitions based on GitHub's OpenAPI spec for api.github.com
+
+<a name="@octokit/request"></a>
+### @octokit/request v9.1.3 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Send parameterized requests to GitHub's APIs with sensible defaults in browsers and Node
+
+<a name="@octokit/request-error"></a>
+### @octokit/request-error v6.1.5 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Error class for Octokit request errors
+
+<a name="@octokit/types"></a>
+### @octokit/types v13.6.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Shared TypeScript definitions for Octokit projects
+
+<a name="@octokit/webhooks"></a>
+### @octokit/webhooks v13.3.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+GitHub webhook events toolset for Node.js
+
+<a name="@octokit/webhooks-methods"></a>
+### @octokit/webhooks-methods v5.1.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Methods to handle GitHub Webhook requests
+
+<a name="@octokit/webhooks-types"></a>
+### @octokit/webhooks-types v7.6.1 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Generated TypeScript definitions based on community contributed JSON Schemas
+
 <a name="@opentelemetry/api"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/api">@opentelemetry/api</a> v1.9.0 (dependencies)
 #### 
@@ -842,17 +1040,6 @@ Public logs API for OpenTelemetry
 
 <a name="@opentelemetry/api-logs"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs">@opentelemetry/api-logs</a> v0.53.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Public logs API for OpenTelemetry
-
-<a name="@opentelemetry/api-logs"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs">@opentelemetry/api-logs</a> v0.54.2 (dependencies)
 #### 
 
 ##### Paths
@@ -916,28 +1103,6 @@ OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.
-
-<a name="@opentelemetry/core"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core">@opentelemetry/core</a> v1.27.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.
-
-<a name="@opentelemetry/exporter-logs-otlp-http"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-http">@opentelemetry/exporter-logs-otlp-http</a> v0.54.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector
 
 <a name="@opentelemetry/exporter-metrics-otlp-http"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http">@opentelemetry/exporter-metrics-otlp-http</a> v0.52.1 (dependencies)
@@ -1291,17 +1456,6 @@ OpenTelemetry OTLP Exporter base (for internal use only)
 
 OpenTelemetry OTLP Exporter base (for internal use only)
 
-<a name="@opentelemetry/otlp-exporter-base"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base">@opentelemetry/otlp-exporter-base</a> v0.54.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry OTLP Exporter base (for internal use only)
-
 <a name="@opentelemetry/otlp-grpc-exporter-base"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base">@opentelemetry/otlp-grpc-exporter-base</a> v0.51.1 (dependencies)
 #### 
@@ -1337,17 +1491,6 @@ Transform OpenTelemetry SDK data into OTLP
 
 <a name="@opentelemetry/otlp-transformer"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer">@opentelemetry/otlp-transformer</a> v0.52.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Transform OpenTelemetry SDK data into OTLP
-
-<a name="@opentelemetry/otlp-transformer"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer">@opentelemetry/otlp-transformer</a> v0.54.2 (dependencies)
 #### 
 
 ##### Paths
@@ -1423,17 +1566,6 @@ OpenTelemetry SDK resources
 
 OpenTelemetry SDK resources
 
-<a name="@opentelemetry/resources"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-resources">@opentelemetry/resources</a> v1.27.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry SDK resources
-
 <a name="@opentelemetry/sdk-logs"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs">@opentelemetry/sdk-logs</a> v0.51.1 (dependencies)
 #### 
@@ -1456,17 +1588,6 @@ OpenTelemetry logs SDK
 
 OpenTelemetry logs SDK
 
-<a name="@opentelemetry/sdk-logs"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs">@opentelemetry/sdk-logs</a> v0.54.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry logs SDK
-
 <a name="@opentelemetry/sdk-metrics"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.24.1 (dependencies)
 #### 
@@ -1480,17 +1601,6 @@ OpenTelemetry metrics SDK
 
 <a name="@opentelemetry/sdk-metrics"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.25.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry metrics SDK
-
-<a name="@opentelemetry/sdk-metrics"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.27.0 (dependencies)
 #### 
 
 ##### Paths
@@ -1535,17 +1645,6 @@ OpenTelemetry Tracing
 
 <a name="@opentelemetry/sdk-trace-base"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a> v1.26.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-OpenTelemetry Tracing
-
-<a name="@opentelemetry/sdk-trace-base"></a>
-### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a> v1.27.0 (dependencies)
 #### 
 
 ##### Paths
@@ -3176,17 +3275,6 @@ unknown manually approved
 
 Make the Vercel Toolbar aware of your feature flags and read overrides set by it
 
-<a name="@vercel/functions"></a>
-### <a href="https://vercel.com">@vercel/functions</a> v1.5.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Runtime functions to be used with your Vercel Functions
-
 <a name="@vercel/otel"></a>
 ### @vercel/otel v1.10.0 (dependencies)
 #### 
@@ -3879,6 +3967,17 @@ Match balanced character pairs, like "{" and "}"
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Base64 encoding/decoding in pure JS
+
+<a name="before-after-hook"></a>
+### before-after-hook v3.0.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+asynchronous before/error/after hooks for internal functionality
 
 <a name="big-integer"></a>
 ### big-integer v1.6.52 (dependencies)
@@ -8752,6 +8851,28 @@ unist utility to visit nodes
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 unist utility to recursively walk over nodes, with ancestral information
+
+<a name="universal-github-app-jwt"></a>
+### universal-github-app-jwt v2.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Calculate GitHub App bearer tokens for Node & modern browsers
+
+<a name="universal-user-agent"></a>
+### universal-user-agent v7.0.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+Get a user agent string across all JavaScript Runtime Environments
 
 <a name="unplugin"></a>
 ### unplugin v1.0.1 (dependencies)
