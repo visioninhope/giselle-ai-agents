@@ -6,7 +6,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
-import { Heading } from "../components/heading";
+import { Heading } from "../components/section";
 
 const mockRepositories = [
 	{
