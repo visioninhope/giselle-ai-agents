@@ -34,6 +34,17 @@ const mockEvents = [
 		name: "Issue created",
 	},
 ];
+
+const mockNodes = [
+	{
+		id: "n-1",
+		name: "Untitled node - 1",
+	},
+	{
+		id: "n-2",
+		name: "Untitled node - 3",
+	},
+];
 interface GitHubIntegrationProps {
 	setTabValue: (value: string) => void;
 }
@@ -81,6 +92,22 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 							{mockEvents.map((event) => (
 								<SelectItem value={event.id} key={event.id}>
 									{event.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</Section>
+				<Section>
+					<SectionHeader title="Action" />
+					<Label htmlFor="event">Start</Label>
+					<Select name="event">
+						<SelectTrigger className="w-[180px]">
+							<SelectValue placeholder="Choose value" />
+						</SelectTrigger>
+						<SelectContent>
+							{mockNodes.map((node) => (
+								<SelectItem value={node.id} key={node.id}>
+									{node.name}
 								</SelectItem>
 							))}
 						</SelectContent>
