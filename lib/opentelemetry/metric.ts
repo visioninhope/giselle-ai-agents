@@ -9,6 +9,6 @@ const metricExporter = new OTLPMetricExporter({
 
 export const metricReader = new PeriodicExportingMetricReader({
 	exporter: metricExporter,
-	exportIntervalMillis: 14000,
-	exportTimeoutMillis: 5000,
+	exportIntervalMillis: 1000,
+	exportTimeoutMillis: 900, // retries exporting if timeout
 });
