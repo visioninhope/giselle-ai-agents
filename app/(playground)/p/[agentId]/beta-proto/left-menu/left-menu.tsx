@@ -16,9 +16,9 @@ export function LeftMenu() {
 				<TabsTrigger value="overview">
 					<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
 				</TabsTrigger>
-				<TabsTrigger value="github">
+				{/* <TabsTrigger value="github">
 					<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
-				</TabsTrigger>
+				</TabsTrigger> */}
 			</TabsList>
 			<TabsContent value="overview">
 				<Overview setTabValue={setTabValue} />
