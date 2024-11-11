@@ -1,5 +1,27 @@
 import { XIcon } from "lucide-react";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "../../components/select";
+import { Heading } from "../components/heading";
 
+const mockRepositories = [
+	{
+		id: "r-1",
+		name: "rou06inc/giselle",
+	},
+	{
+		id: "r-2",
+		name: "toyamarinyon/langfuse-ai-sdk",
+	},
+	{
+		id: "r-3",
+		name: "toyamarinyon/coral",
+	},
+];
 interface GitHubIntegrationProps {
 	setTabValue: (value: string) => void;
 }
@@ -20,6 +42,23 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 					/>
 				</button>
 			</header>
+			<div>
+				<div className="grid gap-[8px]">
+					<Heading title="Repository" />
+					<Select>
+						<SelectTrigger className="w-[180px]">
+							<SelectValue placeholder="Choose value" />
+						</SelectTrigger>
+						<SelectContent>
+							{mockRepositories.map((repository) => (
+								<SelectItem value={repository.id} key={repository.id}>
+									{repository.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+			</div>
 		</div>
 	);
 }
