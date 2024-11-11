@@ -10,6 +10,9 @@ export function Overview(props: OverviewProps) {
 	const transitionToEditTitle = useCallback(() => {
 		setEditTitle(true);
 	}, []);
+	const handleBlur = useCallback(() => {
+		setEditTitle(false);
+	}, []);
 	useEffect(() => {
 		if (editTitle && inputRef.current) {
 			inputRef.current.focus();
@@ -36,7 +39,7 @@ export function Overview(props: OverviewProps) {
 				<input
 					type="text"
 					className="text-[16px] text-black-30 p-[4px] text-left outline-black-70 rounded-[8px]"
-					onBlur={() => setEditTitle(false)}
+					onBlur={handleBlur}
 					ref={inputRef}
 					defaultValue={"Unnamed Agent"}
 				/>
