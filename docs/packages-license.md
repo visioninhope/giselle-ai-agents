@@ -1,10 +1,10 @@
 # giselle
 
-As of November 11, 2024  4:47am. 849 total
+As of November 11, 2024  7:02am. 859 total
 
 ## Summary
 * 626 MIT
-* 109 Apache 2.0
+* 119 Apache 2.0
 * 60 ISC
 * 23 New BSD
 * 12 Simplified BSD
@@ -1049,6 +1049,17 @@ Public logs API for OpenTelemetry
 
 Public logs API for OpenTelemetry
 
+<a name="@opentelemetry/api-logs"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/api-logs">@opentelemetry/api-logs</a> v0.54.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+Public logs API for OpenTelemetry
+
 <a name="@opentelemetry/context-async-hooks"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-context-async-hooks">@opentelemetry/context-async-hooks</a> v1.24.1 (dependencies)
 #### 
@@ -1103,6 +1114,28 @@ OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.
+
+<a name="@opentelemetry/core"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core">@opentelemetry/core</a> v1.27.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.
+
+<a name="@opentelemetry/exporter-logs-otlp-http"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/exporter-logs-otlp-http">@opentelemetry/exporter-logs-otlp-http</a> v0.54.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry Collector Logs Exporter allows user to send collected logs to the OpenTelemetry Collector
 
 <a name="@opentelemetry/exporter-metrics-otlp-http"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/opentelemetry-exporter-metrics-otlp-http">@opentelemetry/exporter-metrics-otlp-http</a> v0.52.1 (dependencies)
@@ -1456,6 +1489,17 @@ OpenTelemetry OTLP Exporter base (for internal use only)
 
 OpenTelemetry OTLP Exporter base (for internal use only)
 
+<a name="@opentelemetry/otlp-exporter-base"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-exporter-base">@opentelemetry/otlp-exporter-base</a> v0.54.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry OTLP Exporter base (for internal use only)
+
 <a name="@opentelemetry/otlp-grpc-exporter-base"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-grpc-exporter-base">@opentelemetry/otlp-grpc-exporter-base</a> v0.51.1 (dependencies)
 #### 
@@ -1491,6 +1535,17 @@ Transform OpenTelemetry SDK data into OTLP
 
 <a name="@opentelemetry/otlp-transformer"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer">@opentelemetry/otlp-transformer</a> v0.52.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+Transform OpenTelemetry SDK data into OTLP
+
+<a name="@opentelemetry/otlp-transformer"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/otlp-transformer">@opentelemetry/otlp-transformer</a> v0.54.2 (dependencies)
 #### 
 
 ##### Paths
@@ -1566,6 +1621,17 @@ OpenTelemetry SDK resources
 
 OpenTelemetry SDK resources
 
+<a name="@opentelemetry/resources"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-resources">@opentelemetry/resources</a> v1.27.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry SDK resources
+
 <a name="@opentelemetry/sdk-logs"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs">@opentelemetry/sdk-logs</a> v0.51.1 (dependencies)
 #### 
@@ -1588,6 +1654,17 @@ OpenTelemetry logs SDK
 
 OpenTelemetry logs SDK
 
+<a name="@opentelemetry/sdk-logs"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs">@opentelemetry/sdk-logs</a> v0.54.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry logs SDK
+
 <a name="@opentelemetry/sdk-metrics"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.24.1 (dependencies)
 #### 
@@ -1601,6 +1678,17 @@ OpenTelemetry metrics SDK
 
 <a name="@opentelemetry/sdk-metrics"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.25.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry metrics SDK
+
+<a name="@opentelemetry/sdk-metrics"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/sdk-metrics">@opentelemetry/sdk-metrics</a> v1.27.0 (dependencies)
 #### 
 
 ##### Paths
@@ -1645,6 +1733,17 @@ OpenTelemetry Tracing
 
 <a name="@opentelemetry/sdk-trace-base"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a> v1.26.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry Tracing
+
+<a name="@opentelemetry/sdk-trace-base"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-sdk-trace-base">@opentelemetry/sdk-trace-base</a> v1.27.0 (dependencies)
 #### 
 
 ##### Paths
@@ -3274,6 +3373,17 @@ unknown manually approved
 ><cite>  2024-10-08</cite>
 
 Make the Vercel Toolbar aware of your feature flags and read overrides set by it
+
+<a name="@vercel/functions"></a>
+### <a href="https://vercel.com">@vercel/functions</a> v1.5.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+Runtime functions to be used with your Vercel Functions
 
 <a name="@vercel/otel"></a>
 ### @vercel/otel v1.10.0 (dependencies)
