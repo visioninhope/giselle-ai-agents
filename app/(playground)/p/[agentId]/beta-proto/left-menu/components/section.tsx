@@ -1,3 +1,5 @@
+import type { ReactNode } from "react";
+
 interface SectionHeaderProps {
 	title: string;
 }
@@ -10,4 +12,11 @@ export function SectionHeader(props: SectionHeaderProps) {
 			<div className="ml-[16px] flex-grow border-t border-black-80" />
 		</div>
 	);
+}
+
+interface SectionProps {
+	children: ReactNode;
+}
+export function Section(props: SectionProps) {
+	return <div className="grid gap-[8px]">{props.children}</div>;
 }
