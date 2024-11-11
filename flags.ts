@@ -64,6 +64,32 @@ export const viewFlag = flag<boolean>({
 	],
 });
 
+export const chooseModelFlag = flag<boolean>({
+	key: "choose-model",
+	async decide() {
+		return takeLocalEnv("CHOOSE_MODEL_FLAG");
+	},
+	description: "Enable choose model",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const anthropicFlag = flag<boolean>({
+	key: "anthropic",
+	async decide() {
+		return takeLocalEnv("ANTHROPIC_FLAG");
+	},
+	description: "Enable anthropic",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
 export const githubIntegrationFlag = flag<boolean>({
 	key: "github-integration",
 	async decide() {
