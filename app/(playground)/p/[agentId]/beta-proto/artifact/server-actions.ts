@@ -86,7 +86,7 @@ ${sourcesToText(sources)}
 						setTimeout(
 							resolve,
 							Number.parseInt(
-								process.env.OTEL_EXPORT_INTERVAL_MILLIS?? "1000",
+								process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
 							),
 						),
 					),
