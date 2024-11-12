@@ -49,6 +49,16 @@ const mockNodes = [
 		name: "Untitled node - 3 → Untitle node - 4",
 	},
 ];
+const mockNextActions = [
+	{
+		id: "r-1",
+		name: "Comment on trigger issue",
+	},
+	{
+		id: "r-2",
+		name: "Create a pull request",
+	},
+];
 interface GitHubIntegrationProps {
 	setTabValue: (value: string) => void;
 }
@@ -105,7 +115,6 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 				</Section>
 				<Section>
 					<SectionHeader title="Action" />
-
 					<SectionFormField>
 						<Label htmlFor="event">Run flow</Label>
 						<Select name="event">
@@ -116,6 +125,21 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 								{mockNodes.map((node) => (
 									<SelectItem value={node.id} key={node.id}>
 										{node.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</SectionFormField>
+					<SectionFormField>
+						<Label htmlFor="event">Then</Label>
+						<Select name="event">
+							<SelectTrigger>
+								<SelectValue placeholder="Choose value" />
+							</SelectTrigger>
+							<SelectContent>
+								{mockNextActions.map((nextAction) => (
+									<SelectItem value={nextAction.id} key={nextAction.id}>
+										{nextAction.name}
 									</SelectItem>
 								))}
 							</SelectContent>
