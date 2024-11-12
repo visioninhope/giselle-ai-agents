@@ -121,6 +121,13 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 							placeholder="Enter call sign"
 							className="w-full"
 						/>
+						<span className="text-black-70 text-[12px]">
+							You can call this agent by commenting{" "}
+							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
+								/giselle report-agent
+							</span>{" "}
+							in the issue route06inc/giselle.
+						</span>
 					</SectionFormField>
 				</Section>
 				<Section>
