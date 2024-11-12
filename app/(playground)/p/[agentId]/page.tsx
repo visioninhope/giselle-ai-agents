@@ -5,6 +5,7 @@ import {
 	anthropicFlag as getAnthropicFlag,
 	chooseModelFlag as getChooseModelFlag,
 	debugFlag as getDebugFlag,
+	githubIntegrationFlag as getGitHubIntegrationFlag,
 	uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag,
 	viewFlag as getViewFlag,
 	webSearchNodeFlag as getWebSearchNodeFlag,
@@ -89,6 +90,7 @@ export default async function AgentPlaygroundPage({
 	const viewFlag = await getViewFlag();
 	const chooseModelFlag = await getChooseModelFlag();
 	const anthropicFlag = await getAnthropicFlag();
+	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 
 	const agent = await getAgent(agentId);
 
@@ -104,6 +106,7 @@ export default async function AgentPlaygroundPage({
 				viewFlag,
 				chooseModelFlag,
 				anthropicFlag,
+				gitHubIntegrationFlag,
 			}}
 		/>
 	);

@@ -5,4 +5,5 @@ export interface FeatureFlags {
 	viewFlag: boolean;
 	chooseModelFlag: boolean;
 	anthropicFlag: boolean;
+	gitHubIntegrationFlag: boolean;
 }
