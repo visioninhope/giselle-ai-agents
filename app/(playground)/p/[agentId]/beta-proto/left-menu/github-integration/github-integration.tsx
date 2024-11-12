@@ -7,7 +7,11 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
-import { Section, SectionHeader } from "../components/section";
+import {
+	Section,
+	SectionFormField,
+	SectionHeader,
+} from "../components/section";
 
 const mockRepositories = [
 	{
@@ -37,12 +41,12 @@ const mockEvents = [
 
 const mockNodes = [
 	{
-		id: "n-1",
-		name: "Untitled node - 1",
+		id: "f-1",
+		name: "Untitled node - 1 → Untitle node - 6",
 	},
 	{
-		id: "n-2",
-		name: "Untitled node - 3",
+		id: "f-2",
+		name: "Untitled node - 3 → Untitle node - 4",
 	},
 ];
 interface GitHubIntegrationProps {
@@ -83,35 +87,40 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 				</Section>
 				<Section>
 					<SectionHeader title="Trigger" />
-					<Label htmlFor="event">Event</Label>
-					<Select name="event">
-						<SelectTrigger className="w-[180px]">
-							<SelectValue placeholder="Choose value" />
-						</SelectTrigger>
-						<SelectContent>
-							{mockEvents.map((event) => (
-								<SelectItem value={event.id} key={event.id}>
-									{event.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<SectionFormField>
+						<Label htmlFor="event">Event</Label>
+						<Select name="event">
+							<SelectTrigger className="w-[180px]">
+								<SelectValue placeholder="Choose value" />
+							</SelectTrigger>
+							<SelectContent>
+								{mockEvents.map((event) => (
+									<SelectItem value={event.id} key={event.id}>
+										{event.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</SectionFormField>
 				</Section>
 				<Section>
 					<SectionHeader title="Action" />
-					<Label htmlFor="event">Start</Label>
-					<Select name="event">
-						<SelectTrigger className="w-[180px]">
-							<SelectValue placeholder="Choose value" />
-						</SelectTrigger>
-						<SelectContent>
-							{mockNodes.map((node) => (
-								<SelectItem value={node.id} key={node.id}>
-									{node.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+
+					<SectionFormField>
+						<Label htmlFor="event">Run flow</Label>
+						<Select name="event">
+							<SelectTrigger>
+								<SelectValue placeholder="Choose value" />
+							</SelectTrigger>
+							<SelectContent>
+								{mockNodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+					</SectionFormField>
 				</Section>
 			</div>
 		</div>

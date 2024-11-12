@@ -20,3 +20,10 @@ interface SectionProps {
 export function Section(props: SectionProps) {
 	return <div className="grid gap-[8px]">{props.children}</div>;
 }
+
+interface SectionFormFieldProps {
+	children: ReactNode;
+}
+export function SectionFormField(props: SectionFormFieldProps) {
+	return <div className="grid gap-[2px]">{props.children}</div>;
+}
