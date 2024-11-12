@@ -1,3 +1,4 @@
+import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import { Label } from "../../components/label";
 import {
@@ -83,7 +84,7 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 				<Section>
 					<SectionHeader title="Repository" />
 					<Select>
-						<SelectTrigger className="w-[180px]">
+						<SelectTrigger>
 							<SelectValue placeholder="Choose value" />
 						</SelectTrigger>
 						<SelectContent>
@@ -100,7 +101,7 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 					<SectionFormField>
 						<Label htmlFor="event">Event</Label>
 						<Select name="event">
-							<SelectTrigger className="w-[180px]">
+							<SelectTrigger>
 								<SelectValue placeholder="Choose value" />
 							</SelectTrigger>
 							<SelectContent>
@@ -111,6 +112,15 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 								))}
 							</SelectContent>
 						</Select>
+					</SectionFormField>
+					<SectionFormField>
+						<Label htmlFor="command">Call sign</Label>
+						<Input
+							type="text"
+							name="command"
+							placeholder="Enter call sign"
+							className="w-full"
+						/>
 					</SectionFormField>
 				</Section>
 				<Section>
