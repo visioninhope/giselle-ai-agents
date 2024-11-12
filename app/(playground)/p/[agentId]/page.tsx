@@ -92,12 +92,16 @@ async function fetchGitHubRepositories(): Promise<{
 	const gitHubClient = buildGitHubUserClient(credential);
 	try {
 		const { installations } = await gitHubClient.getInstallations();
-		for (const installation of installations) {
-			const { repositories: repos } = await gitHubClient.getRepositories(
-				installation.id,
-			);
-			repositories.push(...repos.flat());
-		}
+		const allRepositories = await Promise.all(
+			installations.map(async (installation) => {
+				const { repositories: repos } = await gitHubClient.getRepositories(
+					installation.id,
+				);
+				return repos;
+			}),
+		);
+		repositories.push(...allRepositories.flat());
+		repositories.sort((a, b) => a.name.localeCompare(b.name));
 		return { needsAuthorization: false, repositories };
 	} catch (error) {
 		if (needsAuthorization(error)) {
