@@ -1,11 +1,11 @@
 # giselle
 
-As of November 11, 2024  7:02am. 859 total
+As of November 12, 2024  3:47am. 872 total
 
 ## Summary
-* 626 MIT
+* 638 MIT
 * 119 Apache 2.0
-* 60 ISC
+* 61 ISC
 * 23 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
@@ -4012,6 +4012,17 @@ Retrying made simple, easy and async
 
 Minimal async jobs utility library, with streams support
 
+<a name="atomic-sleep"></a>
+### <a href="https://github.com/davidmarkclements/atomic-sleep#readme">atomic-sleep</a> v1.0.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Zero CPU overhead, zero dependency, true event-loop blocking sleep
+
 <a name="axios"></a>
 ### <a href="https://axios-http.com">axios</a> v1.6.0 (dependencies)
 #### 
@@ -5287,6 +5298,17 @@ It's a very fast and efficient glob library for Node.js
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 deterministic `JSON.stringify()` - a faster version of substack's json-stable-strigify without jsonify
+
+<a name="fast-redact"></a>
+### <a href="https://github.com/davidmarkclements/fast-redact#readme">fast-redact</a> v3.5.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+very fast object redaction
 
 <a name="fastq"></a>
 ### <a href="https://github.com/mcollina/fastq#readme">fastq</a> v1.17.1 (dependencies, devDependencies)
@@ -7081,6 +7103,17 @@ string representations of objects in node and the browser
 
 
 
+<a name="on-exit-leak-free"></a>
+### <a href="https://github.com/mcollina/on-exit-or-gc#readme">on-exit-leak-free</a> v2.1.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Execute a function on exit without leaking memory, allowing all objects to be garbage collected
+
 <a name="once"></a>
 ### once v1.4.0 (dependencies)
 #### 
@@ -7344,6 +7377,39 @@ Blazing fast and accurate glob matcher written in JavaScript, with no dependenci
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Promisify a callback-style function
+
+<a name="pino"></a>
+### <a href="https://getpino.io">pino</a> v9.5.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+super fast, all natural json logger
+
+<a name="pino-abstract-transport"></a>
+### <a href="https://github.com/pinojs/pino-abstract-transport#readme">pino-abstract-transport</a> v2.0.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Write Pino transports easily
+
+<a name="pino-std-serializers"></a>
+### <a href="https://github.com/pinojs/pino-std-serializers#readme">pino-std-serializers</a> v7.0.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A collection of standard object serializers for Pino
 
 <a name="pirates"></a>
 ### <a href="https://github.com/danez/pirates#readme">pirates</a> v4.0.6 (dependencies, devDependencies)
@@ -7609,6 +7675,17 @@ Render JSX to an HTML string, with support for Preact components.
 
 Stringify any JavaScript value.
 
+<a name="process-warning"></a>
+### <a href="https://github.com/fastify/fastify-warning#readme">process-warning</a> v4.0.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A small utility for creating warnings and emitting them.
+
 <a name="progress"></a>
 ### progress v2.0.3 (dependencies)
 #### 
@@ -7685,6 +7762,17 @@ A querystring parser that supports nesting and arrays, with a depth limit
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 fast, tiny `queueMicrotask` shim for modern engines
+
+<a name="quick-format-unescaped"></a>
+### <a href="https://github.com/davidmarkclements/quick-format#readme">quick-format-unescaped</a> v4.0.4 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Solves a problem with util.format
 
 <a name="r2"></a>
 ### r2 v2.0.1 (dependencies)
@@ -7817,6 +7905,17 @@ Convert environment variables into JSON object
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Recursive version of fs.readdir with streaming API.
+
+<a name="real-require"></a>
+### <a href="https://github.com/pinojs/real-require">real-require</a> v0.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Keep require and import consistent after bundling or transpiling
 
 <a name="recast"></a>
 ### <a href="http://github.com/benjamn/recast">recast</a> v0.23.9 (dependencies)
@@ -8015,6 +8114,17 @@ Reactive Extensions for modern JavaScript
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Safer Node.js Buffer API
+
+<a name="safe-stable-stringify"></a>
+### <a href="https://github.com/BridgeAR/safe-stable-stringify#readme">safe-stable-stringify</a> v2.5.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Deterministic and safely JSON.stringify to quickly serialize JavaScript objects
 
 <a name="safer-buffer"></a>
 ### safer-buffer v2.1.2 (dependencies)
@@ -8225,6 +8335,17 @@ Simply swizzle your arguments
 
 ANSI escape codes for some terminal swag
 
+<a name="sonic-boom"></a>
+### <a href="https://github.com/pinojs/sonic-boom#readme">sonic-boom</a> v4.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Extremely fast utf8 only stream implementation
+
 <a name="source-map"></a>
 ### <a href="https://github.com/mozilla/source-map">source-map</a> v0.6.1 (dependencies, devDependencies)
 #### 
@@ -8279,6 +8400,17 @@ Fixes stack traces for files with source maps
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Parse and stringify space separated tokens
+
+<a name="split2"></a>
+### split2 v4.2.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+split a Text Stream into a Line Stream, using Stream 3
 
 <a name="sswr"></a>
 ### sswr v2.1.0 (dependencies)
@@ -8631,6 +8763,17 @@ Promisifies all the selected functions in an object
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
+
+<a name="thread-stream"></a>
+### <a href="https://github.com/mcollina/thread-stream#readme">thread-stream</a> v3.1.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A streaming way to send data to a Node.js Worker Thread
 
 <a name="throttleit"></a>
 ### throttleit v2.1.0 (dependencies)
