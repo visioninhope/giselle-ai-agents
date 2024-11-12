@@ -54,51 +54,21 @@ interface GitHubIntegrationProps {
 export function GitHubIntegration(props: GitHubIntegrationProps) {
 	const { needsAuthorization, repositories } = useGitHubIntegration();
 
-	if (needsAuthorization) {
+	const goToAccountSettings = () => {
 		return (
-			<div className="grid gap-[24px] px-[24px] py-[24px]">
-				<header className="flex justify-between">
-					<p
-						className="text-[22px] font-rosart text-black--30"
-						style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
-					>
-						GitHub Integration
-					</p>
-					<button type="button">
-						<XIcon
-							className="w-[16px] h-[16px]"
-							onClick={() => props.setTabValue("")}
-						/>
-					</button>
-				</header>
-				<div className="grid gap-[16px]">
-					<div className="text-sm text-gray-600">
-						Please connect your GitHub account to get started
-					</div>
-					<Button asChild>
-						<Link href="/settings/account">Connect GitHub</Link>
-					</Button>
+			<div className="grid gap-[16px]">
+				<div className="text-sm text-gray-600">
+					Please connect your GitHub account to get started
 				</div>
+				<Button asChild>
+					<Link href="/settings/account">Connect GitHub</Link>
+				</Button>
 			</div>
 		);
-	}
+	};
 
-	return (
-		<div className="grid gap-[24px] px-[24px] py-[24px]">
-			<header className="flex justify-between">
-				<p
-					className="text-[22px] font-rosart text-black--30"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
-				>
-					GitHub Integration
-				</p>
-				<button type="button">
-					<XIcon
-						className="w-[16px] h-[16px]"
-						onClick={() => props.setTabValue("")}
-					/>
-				</button>
-			</header>
+	const githubIntegrationForm = () => {
+		return (
 			<div className="grid gap-[16px]">
 				<Section>
 					<SectionHeader title="Repository" />
@@ -186,6 +156,26 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 					</SectionFormField>
 				</Section>
 			</div>
+		);
+	};
+
+	return (
+		<div className="grid gap-[24px] px-[24px] py-[24px]">
+			<header className="flex justify-between">
+				<p
+					className="text-[22px] font-rosart text-black--30"
+					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				>
+					GitHub Integration
+				</p>
+				<button type="button">
+					<XIcon
+						className="w-[16px] h-[16px]"
+						onClick={() => props.setTabValue("")}
+					/>
+				</button>
+			</header>
+			{needsAuthorization ? goToAccountSettings() : githubIntegrationForm()}
 		</div>
 	);
 }
