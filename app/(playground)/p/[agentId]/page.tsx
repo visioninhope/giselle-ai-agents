@@ -11,12 +11,16 @@ import {
 	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
-import { buildGitHubUserClient, GitHubUserClient, needsAuthorization } from "@/services/external/github";
+import {
+	type GitHubUserClient,
+	buildGitHubUserClient,
+	needsAuthorization,
+} from "@/services/external/github";
 import "@xyflow/react/dist/style.css";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Playground } from "./beta-proto/component";
-import { Repository } from "./beta-proto/github-integration/context";
+import type { Repository } from "./beta-proto/github-integration/context";
 import type { Graph } from "./beta-proto/graph/types";
 import {
 	type ReactFlowEdge,
@@ -73,21 +77,28 @@ async function getAgent(agentId: AgentId) {
 	};
 }
 
-async function fetchGitHubRepositories(): Promise<{needsAuthorization: boolean; repositories: Repository[]}> {
-  const credential = await getOauthCredential("github");
+async function fetchGitHubRepositories(): Promise<{
+	needsAuthorization: boolean;
+	repositories: Repository[];
+}> {
+	const credential = await getOauthCredential("github");
 	if (!credential) {
-		return {needsAuthorization: true, repositories: []};
+		return { needsAuthorization: true, repositories: [] };
 	}
 
-	let repositories: Awaited<ReturnType<GitHubUserClient["getRepositories"]>>["repositories"] = [];
+	const repositories: Awaited<
+		ReturnType<GitHubUserClient["getRepositories"]>
+	>["repositories"] = [];
 	const gitHubClient = buildGitHubUserClient(credential);
 	try {
-		const {installations} = await gitHubClient.getInstallations();
+		const { installations } = await gitHubClient.getInstallations();
 		for (const installation of installations) {
-			const { repositories: repos } = await gitHubClient.getRepositories(installation.id);
+			const { repositories: repos } = await gitHubClient.getRepositories(
+				installation.id,
+			);
 			repositories.push(...repos.flat());
 		}
-		return {needsAuthorization: false, repositories};
+		return { needsAuthorization: false, repositories };
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return { needsAuthorization: true, repositories: [] };
@@ -135,12 +146,10 @@ export default async function AgentPlaygroundPage({
 				anthropicFlag,
 				gitHubIntegrationFlag,
 			}}
-			gitHubIntegration={
-				{
-					repositories,
-					needsAuthorization
-				}
-			}
+			gitHubIntegration={{
+				repositories,
+				needsAuthorization,
+			}}
 		/>
 	);
 }

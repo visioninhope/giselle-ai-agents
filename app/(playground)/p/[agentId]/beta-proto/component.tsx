@@ -5,7 +5,7 @@ import { AgentNameProvider } from "./contexts/agent-name";
 import { Editor } from "./editor";
 import { FeatureFlagProvider } from "./feature-flags/provider";
 import type { FeatureFlags } from "./feature-flags/types";
-import { Repository } from "./github-integration/context";
+import type { Repository } from "./github-integration/context";
 import { GitHubIntegrationProvider } from "./github-integration/provider";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
@@ -36,7 +36,10 @@ export function Playground(props: PlaygroundProps) {
 		<FeatureFlagProvider {...props.featureFlags}>
 			<AgentNameProvider initialName={props.agentName}>
 				<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
-					<GitHubIntegrationProvider needsAuthorization={props.gitHubIntegration.needsAuthorization} repositories={props.gitHubIntegration.repositories}>
+					<GitHubIntegrationProvider
+						needsAuthorization={props.gitHubIntegration.needsAuthorization}
+						repositories={props.gitHubIntegration.repositories}
+					>
 						<Inner />
 					</GitHubIntegrationProvider>
 				</GraphProvider>
