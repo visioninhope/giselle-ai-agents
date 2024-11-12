@@ -1,5 +1,7 @@
+import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
+import Link from "next/link";
 import { Label } from "../../components/label";
 import {
 	Select,
@@ -14,21 +16,6 @@ import {
 	SectionFormField,
 	SectionHeader,
 } from "../components/section";
-
-const mockRepositories = [
-	{
-		id: "r-1",
-		name: "giselles-ai/giselle",
-	},
-	{
-		id: "r-2",
-		name: "toyamarinyon/langfuse-ai-sdk",
-	},
-	{
-		id: "r-3",
-		name: "toyamarinyon/coral",
-	},
-];
 
 const mockEvents = [
 	{
@@ -67,6 +54,35 @@ interface GitHubIntegrationProps {
 export function GitHubIntegration(props: GitHubIntegrationProps) {
 	const { needsAuthorization, repositories } = useGitHubIntegration();
 
+	if (needsAuthorization) {
+		return (
+			<div className="grid gap-[24px] px-[24px] py-[24px]">
+				<header className="flex justify-between">
+					<p
+						className="text-[22px] font-rosart text-black--30"
+						style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+					>
+						GitHub Integration
+					</p>
+					<button type="button">
+						<XIcon
+							className="w-[16px] h-[16px]"
+							onClick={() => props.setTabValue("")}
+						/>
+					</button>
+				</header>
+				<div className="grid gap-[16px]">
+					<div className="text-sm text-gray-600">
+						Please connect your GitHub account to get started
+					</div>
+					<Button asChild>
+						<Link href="/settings/account">Connect GitHub</Link>
+					</Button>
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div className="grid gap-[24px] px-[24px] py-[24px]">
 			<header className="flex justify-between">
@@ -91,9 +107,12 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 							<SelectValue placeholder="Choose value" />
 						</SelectTrigger>
 						<SelectContent>
-							{mockRepositories.map((repository) => (
-								<SelectItem value={repository.id} key={repository.id}>
-									{repository.name}
+							{repositories.map((repository) => (
+								<SelectItem
+									value={repository.id.toString()}
+									key={repository.id}
+								>
+									{repository.full_name}
 								</SelectItem>
 							))}
 						</SelectContent>
