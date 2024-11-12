@@ -8,6 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
+import { useGitHubIntegration } from "../../github-integration/context";
 import {
 	Section,
 	SectionFormField,
@@ -64,6 +65,8 @@ interface GitHubIntegrationProps {
 	setTabValue: (value: string) => void;
 }
 export function GitHubIntegration(props: GitHubIntegrationProps) {
+	const { needsAuthorization, repositories } = useGitHubIntegration();
+
 	return (
 		<div className="grid gap-[24px] px-[24px] py-[24px]">
 			<header className="flex justify-between">
