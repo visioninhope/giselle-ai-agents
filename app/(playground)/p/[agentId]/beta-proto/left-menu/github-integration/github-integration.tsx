@@ -17,7 +17,7 @@ import {
 const mockRepositories = [
 	{
 		id: "r-1",
-		name: "rou06inc/giselle",
+		name: "giselles-ai/giselle",
 	},
 	{
 		id: "r-2",
