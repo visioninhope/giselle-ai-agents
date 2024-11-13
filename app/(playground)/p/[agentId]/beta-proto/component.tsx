@@ -5,6 +5,8 @@ import { AgentNameProvider } from "./contexts/agent-name";
 import { Editor } from "./editor";
 import { FeatureFlagProvider } from "./feature-flags/provider";
 import type { FeatureFlags } from "./feature-flags/types";
+import type { Repository } from "./github-integration/context";
+import { GitHubIntegrationProvider } from "./github-integration/provider";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
 import { type Graph, playgroundModes } from "./graph/types";
@@ -24,13 +26,22 @@ interface PlaygroundProps {
 	agentName: string;
 	graph: Graph;
 	featureFlags: FeatureFlags;
+	gitHubIntegration: {
+		repositories: Repository[];
+		needsAuthorization: boolean;
+	};
 }
 export function Playground(props: PlaygroundProps) {
 	return (
 		<FeatureFlagProvider {...props.featureFlags}>
 			<AgentNameProvider initialName={props.agentName}>
 				<GraphProvider agentId={props.agentId} defaultGraph={props.graph}>
-					<Inner />
+					<GitHubIntegrationProvider
+						needsAuthorization={props.gitHubIntegration.needsAuthorization}
+						repositories={props.gitHubIntegration.repositories}
+					>
+						<Inner />
+					</GitHubIntegrationProvider>
 				</GraphProvider>
 			</AgentNameProvider>
 		</FeatureFlagProvider>

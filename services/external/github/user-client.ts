@@ -140,6 +140,27 @@ class GitHubUserClient {
 		return res.data;
 	}
 
+	async getRepositories(installationId: number) {
+		// 100 is pretty much the limit of installations, but we should handle the case where there are more
+		const maxFetchCount = 100;
+		const warningFetchCountBuffer = 10;
+		const cli = await this.buildClient();
+		const res = await cli.request(
+			"GET /user/installations/{installation_id}/repositories",
+			{
+				installation_id: installationId,
+				per_page: maxFetchCount,
+			},
+		);
+		const totalCount = res.data.total_count;
+		if (totalCount > maxFetchCount - warningFetchCountBuffer) {
+			this.logger.warning(
+				`user has ${totalCount} repositories. consider increasing maxFetchCount`,
+			);
+		}
+		return res.data;
+	}
+
 	private async buildClient() {
 		if (this.needsRefreshAccessToken()) {
 			await this.refreshAccessToken();

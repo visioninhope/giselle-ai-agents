@@ -7,9 +7,10 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import { parseCommand } from "./command";
 
 function setupHandlers() {
-	webhooks.on("issues", issuesHandler);
+	webhooks.on("issue_comment", issueCommentHandler);
 }
 
 setupHandlers();
@@ -62,27 +63,62 @@ function requireAdditionalPermission(error: unknown) {
 	return needsAdditionalPermissions(error);
 }
 
-async function issuesHandler(event: EmitterWebhookEvent<"issues">) {
+async function retrieveIntegrations(
+	repositoryFullName: string,
+	callSign: string,
+) {
+	return [
+		{
+			agentId: "agt_demo",
+			action: {
+				runFlow: {
+					startNodeId: "nd_demo1",
+					endNodeId: "nd_demo2",
+				},
+			},
+			nextAction: "commentToIssueTriggered",
+		},
+	] as const;
+}
+
+async function issueCommentHandler(
+	event: EmitterWebhookEvent<"issue_comment">,
+) {
 	const payload = event.payload;
 
 	const issueNumber = payload.issue.number;
 	const repoName = payload.repository.name;
 	const repoOwner = payload.repository.owner.login;
-	const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login}`;
-
-	const installation = payload.installation;
-	if (!installation) {
-		throw new Error("No installation found in payload");
+	const repositoryFullName = payload.repository.full_name;
+	const command = parseCommand(payload.comment.body);
+	if (command === null) {
+		return;
 	}
-	const octokit = await buildAppInstallationClient(installation.id);
+	const integrations = await retrieveIntegrations(
+		repositoryFullName,
+		command.callSign,
+	);
+	await Promise.all(
+		integrations.map(async (integration) => {
+			if (integration.nextAction === "commentToIssueTriggered") {
+				const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login} you have triggered the action with call sign ${command.callSign}!`;
 
-	await octokit.request(
-		"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-		{
-			owner: repoOwner,
-			repo: repoName,
-			issue_number: issueNumber,
-			body: commentBody,
-		},
+				const installation = payload.installation;
+				if (!installation) {
+					throw new Error("No installation found in payload");
+				}
+				const octokit = await buildAppInstallationClient(installation.id);
+
+				await octokit.request(
+					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+					{
+						owner: repoOwner,
+						repo: repoName,
+						issue_number: issueNumber,
+						body: commentBody,
+					},
+				);
+			}
+		}),
 	);
 }
