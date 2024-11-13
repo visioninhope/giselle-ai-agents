@@ -7,6 +7,7 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import { parseCommand } from "./command";
 
 function setupHandlers() {
 	webhooks.on("issue_comment", issueCommentHandler);
@@ -80,11 +81,6 @@ async function retrieveIntegrations(
 	] as const;
 }
 
-type CallSign = `/giselle ${string}`;
-function isTextAsCallsign(text: string): text is CallSign {
-	return text.startsWith("/giselle");
-}
-
 async function issueCommentHandler(
 	event: EmitterWebhookEvent<"issue_comment">,
 ) {
@@ -94,17 +90,18 @@ async function issueCommentHandler(
 	const repoName = payload.repository.name;
 	const repoOwner = payload.repository.owner.login;
 	const repositoryFullName = payload.repository.full_name;
-	if (!isTextAsCallsign(payload.comment.body)) {
+	const command = parseCommand(payload.comment.body);
+	if (command === null) {
 		return;
 	}
 	const integrations = await retrieveIntegrations(
 		repositoryFullName,
-		payload.comment.body,
+		command.callSign,
 	);
 	await Promise.all(
 		integrations.map(async (integration) => {
 			if (integration.nextAction === "commentToIssueTriggered") {
-				const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login}`;
+				const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login} you have triggered the action with call sign ${command.callSign}!`;
 
 				const installation = payload.installation;
 				if (!installation) {

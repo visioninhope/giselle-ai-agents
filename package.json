@@ -86,6 +86,7 @@
 		"@biomejs/biome": "1.9.4",
 		"@octokit/webhooks-types": "7.6.1",
 		"@tailwindcss/typography": "0.5.15",
+		"@types/bun": "1.1.13",
 		"@types/node": "^22",
 		"@types/react": "npm:types-react@rc",
 		"@types/react-dom": "npm:types-react-dom@rc",
