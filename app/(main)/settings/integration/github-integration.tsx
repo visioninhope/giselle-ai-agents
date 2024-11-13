@@ -60,9 +60,8 @@ export async function GitHubIntegration() {
 				/>
 			);
 		}
+		throw error;
 	}
-
-	return;
 }
 
 type InstallationProps = {
