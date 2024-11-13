@@ -54,111 +54,6 @@ interface GitHubIntegrationProps {
 export function GitHubIntegration(props: GitHubIntegrationProps) {
 	const { needsAuthorization, repositories } = useGitHubIntegration();
 
-	const goToAccountSettings = () => {
-		return (
-			<div className="grid gap-[16px]">
-				<div className="text-sm text-gray-600">
-					Please connect your GitHub account to get started
-				</div>
-				<Button asChild>
-					<Link href="/settings/account">Connect GitHub</Link>
-				</Button>
-			</div>
-		);
-	};
-
-	const githubIntegrationForm = () => {
-		return (
-			<div className="grid gap-[16px]">
-				<Section>
-					<SectionHeader title="Repository" />
-					<Select>
-						<SelectTrigger>
-							<SelectValue placeholder="Choose value" />
-						</SelectTrigger>
-						<SelectContent>
-							{repositories.map((repository) => (
-								<SelectItem
-									value={repository.id.toString()}
-									key={repository.id}
-								>
-									{repository.full_name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</Section>
-				<Section>
-					<SectionHeader title="Trigger" />
-					<SectionFormField>
-						<Label htmlFor="event">Event</Label>
-						<Select name="event">
-							<SelectTrigger>
-								<SelectValue placeholder="Choose value" />
-							</SelectTrigger>
-							<SelectContent>
-								{mockEvents.map((event) => (
-									<SelectItem value={event.id} key={event.id}>
-										{event.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</SectionFormField>
-					<SectionFormField>
-						<Label htmlFor="command">Call sign</Label>
-						<Input
-							type="text"
-							name="command"
-							placeholder="Enter call sign"
-							className="w-full"
-						/>
-						<span className="text-black-70 text-[12px]">
-							You can call this agent by commenting{" "}
-							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
-								/giselle report-agent
-							</span>{" "}
-							in the issue route06inc/giselle.
-						</span>
-					</SectionFormField>
-				</Section>
-				<Section>
-					<SectionHeader title="Action" />
-					<SectionFormField>
-						<Label htmlFor="event">Run flow</Label>
-						<Select name="event">
-							<SelectTrigger>
-								<SelectValue placeholder="Choose value" />
-							</SelectTrigger>
-							<SelectContent>
-								{mockNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</SectionFormField>
-					<SectionFormField>
-						<Label htmlFor="event">Then</Label>
-						<Select name="event">
-							<SelectTrigger>
-								<SelectValue placeholder="Choose value" />
-							</SelectTrigger>
-							<SelectContent>
-								{mockNextActions.map((nextAction) => (
-									<SelectItem value={nextAction.id} key={nextAction.id}>
-										{nextAction.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</SectionFormField>
-				</Section>
-			</div>
-		);
-	};
-
 	return (
 		<div className="grid gap-[24px] px-[24px] py-[24px]">
 			<header className="flex justify-between">
@@ -175,7 +70,116 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 					/>
 				</button>
 			</header>
-			{needsAuthorization ? goToAccountSettings() : githubIntegrationForm()}
+			{needsAuthorization
+				? GoToAccountSettings()
+				: GithubIntegrationForm({ repositories })}
+		</div>
+	);
+}
+
+function GoToAccountSettings() {
+	return (
+		<div className="grid gap-[16px]">
+			<div className="text-sm text-gray-600">
+				Please connect your GitHub account to get started
+			</div>
+			<Button asChild>
+				<Link href="/settings/account">Connect GitHub</Link>
+			</Button>
+		</div>
+	);
+}
+interface GitHubIntegrationFormProps {
+	repositories: Array<{
+		id: number;
+		full_name: string;
+	}>;
+}
+function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
+	return (
+		<div className="grid gap-[16px]">
+			<Section>
+				<SectionHeader title="Repository" />
+				<Select>
+					<SelectTrigger>
+						<SelectValue placeholder="Choose value" />
+					</SelectTrigger>
+					<SelectContent>
+						{repositories.map((repository) => (
+							<SelectItem value={repository.id.toString()} key={repository.id}>
+								{repository.full_name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</Section>
+			<Section>
+				<SectionHeader title="Trigger" />
+				<SectionFormField>
+					<Label htmlFor="event">Event</Label>
+					<Select name="event">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose value" />
+						</SelectTrigger>
+						<SelectContent>
+							{mockEvents.map((event) => (
+								<SelectItem value={event.id} key={event.id}>
+									{event.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</SectionFormField>
+				<SectionFormField>
+					<Label htmlFor="command">Call sign</Label>
+					<Input
+						type="text"
+						name="command"
+						placeholder="Enter call sign"
+						className="w-full"
+					/>
+					<span className="text-black-70 text-[12px]">
+						You can call this agent by commenting{" "}
+						<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
+							/giselle report-agent
+						</span>{" "}
+						in the issue route06inc/giselle.
+					</span>
+				</SectionFormField>
+			</Section>
+			<Section>
+				<SectionHeader title="Action" />
+				<SectionFormField>
+					<Label htmlFor="event">Run flow</Label>
+					<Select name="event">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose value" />
+						</SelectTrigger>
+						<SelectContent>
+							{mockNodes.map((node) => (
+								<SelectItem value={node.id} key={node.id}>
+									{node.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</SectionFormField>
+				<SectionFormField>
+					<Label htmlFor="event">Then</Label>
+					<Select name="event">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose value" />
+						</SelectTrigger>
+						<SelectContent>
+							{mockNextActions.map((nextAction) => (
+								<SelectItem value={nextAction.id} key={nextAction.id}>
+									{nextAction.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</SectionFormField>
+			</Section>
 		</div>
 	);
 }
