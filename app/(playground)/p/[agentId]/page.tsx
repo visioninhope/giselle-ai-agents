@@ -1,4 +1,4 @@
-import "@xyflow/react/dist/style.css";
+import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import {
@@ -11,9 +11,16 @@ import {
 	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
+import {
+	type GitHubUserClient,
+	buildGitHubUserClient,
+	needsAuthorization,
+} from "@/services/external/github";
+import "@xyflow/react/dist/style.css";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { Playground } from "./beta-proto/component";
+import type { Repository } from "./beta-proto/github-integration/context";
 import type { Graph } from "./beta-proto/graph/types";
 import {
 	type ReactFlowEdge,
@@ -70,6 +77,40 @@ async function getAgent(agentId: AgentId) {
 	};
 }
 
+async function fetchGitHubRepositories(): Promise<{
+	needsAuthorization: boolean;
+	repositories: Repository[];
+}> {
+	const credential = await getOauthCredential("github");
+	if (!credential) {
+		return { needsAuthorization: true, repositories: [] };
+	}
+
+	const repositories: Awaited<
+		ReturnType<GitHubUserClient["getRepositories"]>
+	>["repositories"] = [];
+	const gitHubClient = buildGitHubUserClient(credential);
+	try {
+		const { installations } = await gitHubClient.getInstallations();
+		const allRepositories = await Promise.all(
+			installations.map(async (installation) => {
+				const { repositories: repos } = await gitHubClient.getRepositories(
+					installation.id,
+				);
+				return repos;
+			}),
+		);
+		repositories.push(...allRepositories.flat());
+		repositories.sort((a, b) => a.name.localeCompare(b.name));
+		return { needsAuthorization: false, repositories };
+	} catch (error) {
+		if (needsAuthorization(error)) {
+			return { needsAuthorization: true, repositories: [] };
+		}
+		throw error;
+	}
+}
+
 export default async function AgentPlaygroundPage({
 	params,
 }: {
@@ -93,6 +134,7 @@ export default async function AgentPlaygroundPage({
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 
 	const agent = await getAgent(agentId);
+	const { repositories, needsAuthorization } = await fetchGitHubRepositories();
 
 	return (
 		<Playground
@@ -107,6 +149,10 @@ export default async function AgentPlaygroundPage({
 				chooseModelFlag,
 				anthropicFlag,
 				gitHubIntegrationFlag,
+			}}
+			gitHubIntegration={{
+				repositories,
+				needsAuthorization,
 			}}
 		/>
 	);
