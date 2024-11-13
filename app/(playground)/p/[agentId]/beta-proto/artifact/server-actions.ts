@@ -5,6 +5,7 @@ import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { logger } from "@/lib/logger";
 import { metrics } from "@opentelemetry/api";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
@@ -80,6 +81,12 @@ ${sourcesToText(sources)}
 				generation.end({
 					output: result,
 				});
+
+				logger.debug(
+					{ tokenConsumed: result.usage.totalTokens },
+					"response obtained",
+				);
+
 				await lf.shutdownAsync();
 				waitUntil(
 					new Promise((resolve) =>
