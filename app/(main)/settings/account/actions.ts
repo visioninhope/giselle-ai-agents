@@ -6,6 +6,21 @@ import { redirect } from "next/navigation";
 
 export async function connectGitHubIdentity() {
 	const supabase = await createClient();
+
+	// Manual linking allows the user to link multiple same-provider identities.
+	// But it introduces additional complexity, and not suitable for most use cases.
+	// We should check if the user already has a GitHub identity here.
+	// https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta
+	const supabaseUser = await getUser();
+	if (supabaseUser.identities) {
+		const githubIdentity = supabaseUser.identities.find(
+			(it) => it.provider === "github",
+		);
+		if (githubIdentity) {
+			throw new Error("Already linked to GitHub");
+		}
+	}
+
 	const { data, error } = await supabase.auth.linkIdentity({
 		provider: "github",
 		options: {
