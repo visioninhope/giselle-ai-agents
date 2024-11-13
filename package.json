@@ -5,7 +5,7 @@
 	"scripts": {
 		"predev": "bun prepare-font.js",
 		"dev": "SENTRY_SUPPRESS_TURBOPACK_WARNING=1 next dev --turbo",
-		"debug": "LOGLEVEL=debug bun run dev",
+		"dev-debug": "LOGLEVEL=debug bun run dev",
 		"prebuild": "node prepare-font.js",
 		"build": "next build",
 		"start": "next start",
