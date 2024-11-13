@@ -7,7 +7,6 @@ import {
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
 	viewFlag as getViewFlag,
-	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import {
@@ -124,7 +123,6 @@ export default async function AgentPlaygroundPage({
 		notFound();
 	}
 
-	const webSearchNodeFlag = await getWebSearchNodeFlag();
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
 	const chooseModelFlag = await getChooseModelFlag();
@@ -140,7 +138,6 @@ export default async function AgentPlaygroundPage({
 			agentName={agent.name || "Untitled Agent"}
 			graph={agent.graphv2}
 			featureFlags={{
-				webSearchNodeFlag,
 				debugFlag,
 				viewFlag,
 				chooseModelFlag,

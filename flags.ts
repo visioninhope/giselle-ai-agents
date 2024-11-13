@@ -13,19 +13,6 @@ function takeLocalEnv(localEnvironemntKey: string) {
 	return true;
 }
 
-export const webSearchNodeFlag = flag<boolean>({
-	key: "web-search-node",
-	async decide() {
-		return takeLocalEnv("WEB_SEARCH_NODE_FLAG");
-	},
-	description: "User can use a web search node",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const debugFlag = flag<boolean>({
 	key: "debug",
 	async decide() {
