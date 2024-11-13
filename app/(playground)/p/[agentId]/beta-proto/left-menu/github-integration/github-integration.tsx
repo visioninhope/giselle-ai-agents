@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
+import { useMemo } from "react";
 import { Label } from "../../components/label";
 import {
 	Select,
@@ -11,6 +12,7 @@ import {
 	SelectValue,
 } from "../../components/select";
 import { useGitHubIntegration } from "../../github-integration/context";
+import { useGraph } from "../../graph/context";
 import {
 	Section,
 	SectionFormField,
@@ -28,16 +30,6 @@ const mockEvents = [
 	},
 ];
 
-const mockNodes = [
-	{
-		id: "f-1",
-		name: "Untitled node - 1 → Untitle node - 6",
-	},
-	{
-		id: "f-2",
-		name: "Untitled node - 3 → Untitle node - 4",
-	},
-];
 const mockNextActions = [
 	{
 		id: "r-1",
@@ -97,6 +89,18 @@ interface GitHubIntegrationFormProps {
 	}>;
 }
 function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
+	const { state } = useGraph();
+	const startNodes = useMemo(
+		() =>
+			state.graph.nodes.filter(
+				(node) =>
+					!state.graph.connectors.some(
+						(connector) => connector.target === node.id,
+					),
+			),
+		[state.graph],
+	);
+
 	return (
 		<div className="grid gap-[16px]">
 			<Section>
@@ -151,13 +155,13 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 			<Section>
 				<SectionHeader title="Action" />
 				<SectionFormField>
-					<Label htmlFor="event">Run flow</Label>
-					<Select name="event">
+					<Label>Start flow from</Label>
+					<Select name="start">
 						<SelectTrigger>
-							<SelectValue placeholder="Choose value" />
+							<SelectValue placeholder="Choose node" />
 						</SelectTrigger>
 						<SelectContent>
-							{mockNodes.map((node) => (
+							{startNodes.map((node) => (
 								<SelectItem value={node.id} key={node.id}>
 									{node.name}
 								</SelectItem>
