@@ -26,6 +26,7 @@ export const getUser = async () => {
 		return data.user;
 	};
 
+	// No specific reason
 	const retryCount = 5;
 	const user = await withRetry(getUserFunc, {
 		retries: retryCount,
