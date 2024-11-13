@@ -2,8 +2,6 @@ import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import {
-	anthropicFlag as getAnthropicFlag,
-	chooseModelFlag as getChooseModelFlag,
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
 	viewFlag as getViewFlag,
@@ -125,8 +123,6 @@ export default async function AgentPlaygroundPage({
 
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
-	const chooseModelFlag = await getChooseModelFlag();
-	const anthropicFlag = await getAnthropicFlag();
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 
 	const agent = await getAgent(agentId);
@@ -140,8 +136,6 @@ export default async function AgentPlaygroundPage({
 			featureFlags={{
 				debugFlag,
 				viewFlag,
-				chooseModelFlag,
-				anthropicFlag,
 				gitHubIntegrationFlag,
 			}}
 			gitHubIntegration={{
