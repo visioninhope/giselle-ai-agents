@@ -1,9 +1,9 @@
 # giselle
 
-As of November 12, 2024  3:47am. 872 total
+As of November 13, 2024  5:03am. 875 total
 
 ## Summary
-* 638 MIT
+* 641 MIT
 * 119 Apache 2.0
 * 61 ISC
 * 23 New BSD
@@ -3029,6 +3029,17 @@ External helpers for the swc project.
 
 A Tailwind CSS plugin for automatically styling plain HTML content with beautiful typographic defaults.
 
+<a name="@types/bun"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/bun">@types/bun</a> v1.1.13 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for bun
+
 <a name="@types/connect"></a>
 ### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/connect">@types/connect</a> v3.4.36 (dependencies)
 #### 
@@ -3239,6 +3250,17 @@ TypeScript definitions for mysql
 TypeScript definitions for node
 
 <a name="@types/node"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node">@types/node</a> v20.12.14 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for node
+
+<a name="@types/node"></a>
 ### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node">@types/node</a> v22.3.0 (dependencies, devDependencies)
 #### 
 
@@ -3327,7 +3349,7 @@ TypeScript definitions for shimmer
 TypeScript definitions for unist
 
 <a name="@types/ws"></a>
-### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/ws">@types/ws</a> v8.5.12 (dependencies)
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/ws">@types/ws</a> v8.5.12 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -4209,6 +4231,17 @@ Share target browsers between different front-end tools, like Autoprefixer, Styl
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 WebSocket buffer utils
+
+<a name="bun-types"></a>
+### <a href="https://bun.sh">bun-types</a> v1.1.34 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Type definitions for Bun, an incredibly fast JavaScript runtime
 
 <a name="busboy"></a>
 ### busboy v1.6.0 (dependencies)
