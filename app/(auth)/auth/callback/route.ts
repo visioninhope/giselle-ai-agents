@@ -42,14 +42,12 @@ export async function GET(request: Request) {
 		throw new Error("Unknown error occurred", { cause: error });
 	}
 
-	const forwardedHost = request.headers.get("x-forwarded-host"); // original origin before load balancer
-	const isLocalEnv = process.env.NODE_ENV === "development";
-	if (isLocalEnv) {
-		// we can be sure that there is no load balancer in between, so no need to watch for X-Forwarded-Host
-		return NextResponse.redirect(`${origin}${next}`);
-	}
+	// original origin before load balancer
+	const forwardedHost = request.headers.get("x-forwarded-host");
 	if (forwardedHost) {
-		return NextResponse.redirect(`https://${forwardedHost}${next}`);
+		// fallback to https if x-forwarded-proto is not set
+		const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
+		return NextResponse.redirect(`${forwardedProto}://${forwardedHost}${next}`);
 	}
 	return NextResponse.redirect(`${origin}${next}`);
 }
@@ -59,8 +57,8 @@ function checkError(searchParams: URLSearchParams) {
 	if (error) {
 		// if error is in param, return an error response
 		const errorDescription = searchParams.get("error_description");
-		const errorCpode = searchParams.get("error_code");
-		return `Error occurred: ${errorCpode} - ${errorDescription}`;
+		const errorCode = searchParams.get("error_code");
+		return `Error occurred: ${errorCode} - ${errorDescription}`;
 	}
 	return "";
 }
