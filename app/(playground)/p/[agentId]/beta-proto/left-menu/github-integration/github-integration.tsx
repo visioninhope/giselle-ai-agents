@@ -89,6 +89,7 @@ function GoToAccountSettings() {
 		</div>
 	);
 }
+
 interface GitHubIntegrationFormProps {
 	repositories: Array<{
 		id: number;
