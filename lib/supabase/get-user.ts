@@ -1,3 +1,5 @@
+import { isAuthRetryableFetchError } from "@supabase/supabase-js";
+import { withRetry } from "../utils";
 import { createClient } from "./server";
 
 /**
@@ -12,12 +14,28 @@ import { createClient } from "./server";
 export const getUser = async () => {
 	const supabase = await createClient();
 
-	const { data, error } = await supabase.auth.getUser();
-	if (error != null) {
-		throw error;
-	}
-	if (data.user == null) {
-		throw new Error("No user returned");
-	}
-	return data.user;
+	const getUserFunc = async () => {
+		const { data, error } = await supabase.auth.getUser();
+
+		if (error != null) {
+			throw error;
+		}
+		if (data.user == null) {
+			throw new Error("No user returned");
+		}
+		return data.user;
+	};
+
+	const user = await withRetry(getUserFunc, {
+		useExponentialBackoff: true,
+		onRetry: (retryCount, error) => {
+			console.error(`getUser failed, retrying (${retryCount})`, error);
+		},
+		shouldAbort: (error) => {
+			// retry if the error is a retryable fetch error
+			return !isAuthRetryableFetchError(error);
+		},
+	});
+
+	return user;
 };
