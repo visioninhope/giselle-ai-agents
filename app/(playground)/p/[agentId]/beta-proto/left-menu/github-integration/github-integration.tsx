@@ -3,6 +3,10 @@ import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
 import { useMemo } from "react";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "../../../../../../../services/external/github/types";
 import { Label } from "../../components/label";
 import {
 	Select,
@@ -11,6 +15,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
+import { allFlowEdges } from "../../flow/utils";
+import type { GiselleNode, GiselleNodeId } from "../../giselle-node/types";
 import { useGitHubIntegration } from "../../github-integration/context";
 import { useGraph } from "../../graph/context";
 import {
@@ -19,25 +25,25 @@ import {
 	SectionHeader,
 } from "../components/section";
 
-const mockEvents = [
+interface GitHubTriggerEventItem {
+	label: string;
+	type: GitHubTriggerEvent;
+}
+const mockEvents: GitHubTriggerEventItem[] = [
 	{
-		id: "e-1",
-		name: "Comment on Issue",
-	},
-	{
-		id: "e-2",
-		name: "Issue created",
+		type: "github.issue_comment.created",
+		label: "Comment on Issue",
 	},
 ];
 
-const mockNextActions = [
+interface NextActionItem {
+	label: string;
+	type: GitHubNextAction;
+}
+const mockNextActions: NextActionItem[] = [
 	{
-		id: "r-1",
-		name: "Comment on trigger issue",
-	},
-	{
-		id: "r-2",
-		name: "Create a pull request",
+		type: "github.issue_comment.reply",
+		label: "Comment on trigger issue",
 	},
 ];
 interface GitHubIntegrationProps {
@@ -89,17 +95,23 @@ interface GitHubIntegrationFormProps {
 	}>;
 }
 function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
+	interface Flow {
+		start: GiselleNode;
+		end: GiselleNode;
+	}
 	const { state } = useGraph();
-	const startNodes = useMemo(
-		() =>
-			state.graph.nodes.filter(
-				(node) =>
-					!state.graph.connectors.some(
-						(connector) => connector.target === node.id,
-					),
-			),
-		[state.graph],
-	);
+	const flows = useMemo(() => {
+		const edges = allFlowEdges(state.graph.nodes, state.graph.connectors);
+		const tmpFlows: Flow[] = [];
+		for (const edge of edges) {
+			const start = state.graph.nodes.find((node) => node.id === edge.start);
+			const end = state.graph.nodes.find((node) => node.id === edge.end);
+			if (start && end) {
+				tmpFlows.push({ start, end });
+			}
+		}
+		return tmpFlows;
+	}, [state.graph]);
 
 	return (
 		<div className="grid gap-[16px]">
@@ -128,8 +140,8 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 						</SelectTrigger>
 						<SelectContent>
 							{mockEvents.map((event) => (
-								<SelectItem value={event.id} key={event.id}>
-									{event.name}
+								<SelectItem value={event.type} key={event.type}>
+									{event.label}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -155,15 +167,18 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 			<Section>
 				<SectionHeader title="Action" />
 				<SectionFormField>
-					<Label>Start flow from</Label>
+					<Label>Run flow</Label>
 					<Select name="start">
 						<SelectTrigger>
-							<SelectValue placeholder="Choose node" />
+							<SelectValue placeholder="Choose flow" />
 						</SelectTrigger>
 						<SelectContent>
-							{startNodes.map((node) => (
-								<SelectItem value={node.id} key={node.id}>
-									{node.name}
+							{flows.map((flow) => (
+								<SelectItem
+									value={JSON.stringify(flow)}
+									key={`${flow.start.id}-${flow.end.id}`}
+								>
+									{flow.start.name} → {flow.end.name}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -177,8 +192,8 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 						</SelectTrigger>
 						<SelectContent>
 							{mockNextActions.map((nextAction) => (
-								<SelectItem value={nextAction.id} key={nextAction.id}>
-									{nextAction.name}
+								<SelectItem value={nextAction.type} key={nextAction.type}>
+									{nextAction.label}
 								</SelectItem>
 							))}
 						</SelectContent>

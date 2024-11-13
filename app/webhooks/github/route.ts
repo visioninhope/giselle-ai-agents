@@ -1,3 +1,4 @@
+import { db, gitHubIntegrations } from "@/drizzle";
 import {
 	buildAppInstallationClient,
 	needsAdditionalPermissions,
@@ -7,6 +8,7 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import { buildFlow } from "../../(playground)/p/[agentId]/beta-proto/flow/utils";
 import { parseCommand } from "./command";
 
 function setupHandlers() {
@@ -67,18 +69,10 @@ async function retrieveIntegrations(
 	repositoryFullName: string,
 	callSign: string,
 ) {
-	return [
-		{
-			agentId: "agt_demo",
-			action: {
-				runFlow: {
-					startNodeId: "nd_demo1",
-					endNodeId: "nd_demo2",
-				},
-			},
-			nextAction: "commentToIssueTriggered",
-		},
-	] as const;
+	return await db.query.gitHubIntegrations.findMany({
+		where: (gitHubIntegrations, { eq }) =>
+			eq(gitHubIntegrations.respositoryFullName, repositoryFullName),
+	});
 }
 
 async function issueCommentHandler(
@@ -100,7 +94,21 @@ async function issueCommentHandler(
 	);
 	await Promise.all(
 		integrations.map(async (integration) => {
-			if (integration.nextAction === "commentToIssueTriggered") {
+			const agent = await db.query.agents.findFirst({
+				where: (agents, { eq }) => eq(agents.dbId, integration.agentDbId),
+			});
+			if (agent === undefined) {
+				return;
+			}
+			// buildFlow({
+			// 	input: {
+			// 		agentId: agent.id,
+
+			// 		graph: agent.graphv2,
+			// 	},
+			// });
+
+			if (integration.nextAction === "github.issue_comment.reply") {
 				const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login} you have triggered the action with call sign ${command.callSign}!`;
 
 				const installation = payload.installation;
