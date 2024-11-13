@@ -1,5 +1,5 @@
 export interface Command {
-	callSign: CallSign;
+	callSign: string;
 	instruction: string;
 }
 
