@@ -42,7 +42,6 @@ const ToolbarButton = forwardRef<HTMLButtonElement, PropsWithChildren>(
 );
 
 export const Toolbar: FC = () => {
-	const { webSearchNodeFlag } = useFeatureFlags();
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<GradientBorder />
@@ -67,18 +66,16 @@ export const Toolbar: FC = () => {
 										}
 										label="Text Generation"
 									/>
-									{webSearchNodeFlag && (
-										<ToolSelectOption
-											tool={{
-												type: "addGiselleNode",
-												giselleNodeBlueprint: webSearchBlueprint,
-											}}
-											icon={
-												<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
-											}
-											label="Web Search"
-										/>
-									)}
+									<ToolSelectOption
+										tool={{
+											type: "addGiselleNode",
+											giselleNodeBlueprint: webSearchBlueprint,
+										}}
+										icon={
+											<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
+										}
+										label="Web Search"
+									/>
 									{/**
 								<ToolSelectOption
 									tool={{

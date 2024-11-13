@@ -2,13 +2,9 @@ import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import {
-	anthropicFlag as getAnthropicFlag,
-	chooseModelFlag as getChooseModelFlag,
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
-	uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag,
 	viewFlag as getViewFlag,
-	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import {
@@ -125,12 +121,8 @@ export default async function AgentPlaygroundPage({
 		notFound();
 	}
 
-	const uploadFileToPromptNodeFlag = await getUploadFileToPromptNodeFlag();
-	const webSearchNodeFlag = await getWebSearchNodeFlag();
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
-	const chooseModelFlag = await getChooseModelFlag();
-	const anthropicFlag = await getAnthropicFlag();
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 
 	const agent = await getAgent(agentId);
@@ -142,12 +134,8 @@ export default async function AgentPlaygroundPage({
 			agentName={agent.name || "Untitled Agent"}
 			graph={agent.graphv2}
 			featureFlags={{
-				uploadFileToPromptNodeFlag,
-				webSearchNodeFlag,
 				debugFlag,
 				viewFlag,
-				chooseModelFlag,
-				anthropicFlag,
 				gitHubIntegrationFlag,
 			}}
 			gitHubIntegration={{

@@ -12,31 +12,6 @@ function takeLocalEnv(localEnvironemntKey: string) {
 	}
 	return true;
 }
-export const uploadFileToPromptNodeFlag = flag<boolean>({
-	key: "upload-file-to-prompt-node",
-	async decide() {
-		return takeLocalEnv("UPLOAD_FILE_TO_PROMPT_NODE_FLAG");
-	},
-	description: "User can upload a file to the prompt node",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const webSearchNodeFlag = flag<boolean>({
-	key: "web-search-node",
-	async decide() {
-		return takeLocalEnv("WEB_SEARCH_NODE_FLAG");
-	},
-	description: "User can use a web search node",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
 
 export const debugFlag = flag<boolean>({
 	key: "debug",
@@ -57,32 +32,6 @@ export const viewFlag = flag<boolean>({
 		return takeLocalEnv("VIEW_FLAG");
 	},
 	description: "Enable view mode",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const chooseModelFlag = flag<boolean>({
-	key: "choose-model",
-	async decide() {
-		return takeLocalEnv("CHOOSE_MODEL_FLAG");
-	},
-	description: "Enable choose model",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const anthropicFlag = flag<boolean>({
-	key: "anthropic",
-	async decide() {
-		return takeLocalEnv("ANTHROPIC_FLAG");
-	},
-	description: "Enable anthropic",
 	defaultValue: false,
 	options: [
 		{ value: false, label: "disable" },
