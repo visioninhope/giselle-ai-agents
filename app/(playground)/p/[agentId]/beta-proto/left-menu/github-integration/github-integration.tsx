@@ -107,7 +107,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				<SectionHeader title="Repository" />
 				<Select>
 					<SelectTrigger>
-						<SelectValue placeholder="Choose value" />
+						<SelectValue placeholder="Choose repository" />
 					</SelectTrigger>
 					<SelectContent>
 						{repositories.map((repository) => (
@@ -124,7 +124,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 					<Label htmlFor="event">Event</Label>
 					<Select name="event">
 						<SelectTrigger>
-							<SelectValue placeholder="Choose value" />
+							<SelectValue placeholder="Choose event" />
 						</SelectTrigger>
 						<SelectContent>
 							{mockEvents.map((event) => (
@@ -170,10 +170,10 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 					</Select>
 				</SectionFormField>
 				<SectionFormField>
-					<Label htmlFor="event">Then</Label>
-					<Select name="event">
+					<Label>Then</Label>
+					<Select name="nextAction">
 						<SelectTrigger>
-							<SelectValue placeholder="Choose value" />
+							<SelectValue placeholder="Choose next action" />
 						</SelectTrigger>
 						<SelectContent>
 							{mockNextActions.map((nextAction) => (
