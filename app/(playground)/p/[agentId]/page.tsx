@@ -6,7 +6,6 @@ import {
 	chooseModelFlag as getChooseModelFlag,
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
-	uploadFileToPromptNodeFlag as getUploadFileToPromptNodeFlag,
 	viewFlag as getViewFlag,
 	webSearchNodeFlag as getWebSearchNodeFlag,
 } from "@/flags";
@@ -125,7 +124,6 @@ export default async function AgentPlaygroundPage({
 		notFound();
 	}
 
-	const uploadFileToPromptNodeFlag = await getUploadFileToPromptNodeFlag();
 	const webSearchNodeFlag = await getWebSearchNodeFlag();
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
@@ -142,7 +140,6 @@ export default async function AgentPlaygroundPage({
 			agentName={agent.name || "Untitled Agent"}
 			graph={agent.graphv2}
 			featureFlags={{
-				uploadFileToPromptNodeFlag,
 				webSearchNodeFlag,
 				debugFlag,
 				viewFlag,

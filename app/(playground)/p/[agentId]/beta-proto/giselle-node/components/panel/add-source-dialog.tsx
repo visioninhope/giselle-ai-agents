@@ -24,7 +24,6 @@ type AddSourceDialogProps = {
 };
 export function AddSourceDialog(props: AddSourceDialogProps) {
 	const { dispatch } = useGraph();
-	const { uploadFileToPromptNodeFlag } = useFeatureFlags();
 	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
@@ -123,14 +122,12 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 					</DialogDescription>
 					<Tabs.Root className="p-[40px] font-rosart text-[14px] text-black-30 drop-shadow-[0px_0px_20px_0px_hsla(207,_100%,_48%,_1)] gap-[24px] flex flex-col">
 						<Tabs.List className="border-b border-black-70 pb-[4px] flex text-black-70">
-							{uploadFileToPromptNodeFlag && (
-								<Tabs.Trigger
-									value="file"
-									className="flex-1 data-[state=active]:text-black-30"
-								>
-									Add files
-								</Tabs.Trigger>
-							)}
+							<Tabs.Trigger
+								value="file"
+								className="flex-1 data-[state=active]:text-black-30"
+							>
+								Add files
+							</Tabs.Trigger>
 							<Tabs.Trigger
 								value="text-content"
 								className="flex-1 data-[state=active]:text-black-30"

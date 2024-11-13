@@ -12,18 +12,6 @@ function takeLocalEnv(localEnvironemntKey: string) {
 	}
 	return true;
 }
-export const uploadFileToPromptNodeFlag = flag<boolean>({
-	key: "upload-file-to-prompt-node",
-	async decide() {
-		return takeLocalEnv("UPLOAD_FILE_TO_PROMPT_NODE_FLAG");
-	},
-	description: "User can upload a file to the prompt node",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
 
 export const webSearchNodeFlag = flag<boolean>({
 	key: "web-search-node",
