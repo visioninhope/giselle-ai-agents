@@ -57,8 +57,8 @@ function checkError(searchParams: URLSearchParams) {
 	if (error) {
 		// if error is in param, return an error response
 		const errorDescription = searchParams.get("error_description");
-		const errorCpode = searchParams.get("error_code");
-		return `Error occurred: ${errorCpode} - ${errorDescription}`;
+		const errorCode = searchParams.get("error_code");
+		return `Error occurred: ${errorCode} - ${errorDescription}`;
 	}
 	return "";
 }
