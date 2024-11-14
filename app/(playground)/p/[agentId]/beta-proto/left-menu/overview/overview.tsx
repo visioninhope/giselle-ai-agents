@@ -58,7 +58,7 @@ export function Overview(props: OverviewProps) {
 				</p>
 				<button type="button">
 					<XIcon
-						className="w-[16px] h-[16px]"
+						className="w-[16px] h-[16px] text-black-30"
 						onClick={() => props.setTabValue("")}
 					/>
 				</button>
