@@ -113,7 +113,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 		}
 		return tmpFlows;
 	}, [state.graph]);
-	const [error, action, isPending] = useActionState(async () => {
+	const [_, action, isPending] = useActionState(async () => {
 		await save({
 			agentId: "agnt_2",
 			repositoryFullName: "route06inc/giselle",
