@@ -77,7 +77,7 @@ export async function generateWebSearchArtifactObject({
 	options,
 }: {
 	input: GenerateWebSearchArtifactObjectInput;
-	options: GenerateWebSearchArtifactObjectOptions;
+	options?: GenerateWebSearchArtifactObjectOptions;
 }) {
 	const system = `
  You are an AI assistant specialized in web scraping and searching. Your task is to help users find specific information on websites and extract relevant data based on their requests. Follow these guidelines:
@@ -121,7 +121,7 @@ export async function generateWebSearchArtifactObject({
 					}) as ScrapingTask,
 			),
 		);
-	options.onStreamPartialObject?.({
+	options?.onStreamPartialObject?.({
 		scrapingTasks,
 	});
 
@@ -164,7 +164,7 @@ export async function generateWebSearchArtifactObject({
 								state: "completed",
 							} satisfies CompletedScrapingTask;
 						});
-						options.onStreamPartialObject?.({
+						options?.onStreamPartialObject?.({
 							scrapingTasks: mutableItems,
 						});
 					}
@@ -178,7 +178,7 @@ export async function generateWebSearchArtifactObject({
 							state: "failed",
 						} satisfies FailedScrapingTask;
 					});
-					options.onStreamPartialObject?.({
+					options?.onStreamPartialObject?.({
 						scrapingTasks: mutableItems,
 					});
 				}

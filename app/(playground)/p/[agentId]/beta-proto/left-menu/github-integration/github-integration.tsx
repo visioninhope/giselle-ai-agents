@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useActionState, useMemo } from "react";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
@@ -24,6 +24,7 @@ import {
 	SectionFormField,
 	SectionHeader,
 } from "../components/section";
+import { save } from "./server-actions";
 
 interface GitHubTriggerEventItem {
 	label: string;
@@ -112,9 +113,20 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 		}
 		return tmpFlows;
 	}, [state.graph]);
+	const [error, action, isPending] = useActionState(async () => {
+		await save({
+			agentId: "agnt_2",
+			repositoryFullName: "route06inc/giselle",
+			event: "github.issue_comment.created",
+			callSign: "report-agent",
+			nextAction: "github.issue_comment.reply",
+			startNodeId: "nd_1",
+			endNodeId: "nd_2",
+		});
+	}, null);
 
 	return (
-		<div className="grid gap-[16px]">
+		<form className="grid gap-[16px]" action={action}>
 			<Section>
 				<SectionHeader title="Repository" />
 				<Select>
@@ -200,6 +212,12 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 					</Select>
 				</SectionFormField>
 			</Section>
-		</div>
+			<div>
+				<input type="hidden" name="agentId" value={state.graph.agentId} />
+				<Button type="submit" disabled={isPending} data-loading={isPending}>
+					Save
+				</Button>
+			</div>
+		</form>
 	);
 }
