@@ -97,8 +97,8 @@ interface GitHubIntegrationFormProps {
 }
 function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 	interface Flow {
-		start: GiselleNode;
-		end: GiselleNode;
+		start: Pick<GiselleNode, "id" | "name">;
+		end: Pick<GiselleNode, "id" | "name">;
 	}
 	const { state } = useGraph();
 	const flows = useMemo(() => {
@@ -108,28 +108,46 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 			const start = state.graph.nodes.find((node) => node.id === edge.start);
 			const end = state.graph.nodes.find((node) => node.id === edge.end);
 			if (start && end) {
-				tmpFlows.push({ start, end });
+				tmpFlows.push({
+					start: {
+						id: start.id as GiselleNodeId,
+						name: start.name,
+					},
+					end: {
+						id: end.id as GiselleNodeId,
+						name: end.name,
+					},
+				});
 			}
 		}
 		return tmpFlows;
 	}, [state.graph]);
-	const [_, action, isPending] = useActionState(async () => {
-		await save({
-			agentId: "agnt_2",
-			repositoryFullName: "route06inc/giselle",
-			event: "github.issue_comment.created",
-			callSign: "report-agent",
-			nextAction: "github.issue_comment.reply",
-			startNodeId: "nd_1",
-			endNodeId: "nd_2",
-		});
-	}, null);
+	const [_, action, isPending] = useActionState(
+		async (prevState: unknown, formData: FormData) => {
+			const repositoryFullName = formData.get("repository") as string;
+			const event = formData.get("event") as GitHubTriggerEvent;
+			const callSign = formData.get("callSign") as string;
+			const nextAction = formData.get("nextAction") as GitHubNextAction;
+			const flow = formData.get("flow") as string;
+			const { start, end } = JSON.parse(flow) as Flow;
+			await save({
+				agentId: state.graph.agentId,
+				repositoryFullName,
+				event,
+				callSign,
+				nextAction,
+				startNodeId: start.id,
+				endNodeId: end.id,
+			});
+		},
+		null,
+	);
 
 	return (
 		<form className="grid gap-[16px]" action={action}>
 			<Section>
 				<SectionHeader title="Repository" />
-				<Select>
+				<Select name="repository">
 					<SelectTrigger>
 						<SelectValue placeholder="Choose repository" />
 					</SelectTrigger>
@@ -160,10 +178,11 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 					</Select>
 				</SectionFormField>
 				<SectionFormField>
-					<Label htmlFor="command">Call sign</Label>
+					<Label htmlFor="callSign">Call sign</Label>
 					<Input
 						type="text"
-						name="command"
+						name="callSign"
+						id="callSign"
 						placeholder="Enter call sign"
 						className="w-full"
 					/>
@@ -180,7 +199,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				<SectionHeader title="Action" />
 				<SectionFormField>
 					<Label>Run flow</Label>
-					<Select name="start">
+					<Select name="flow">
 						<SelectTrigger>
 							<SelectValue placeholder="Choose flow" />
 						</SelectTrigger>

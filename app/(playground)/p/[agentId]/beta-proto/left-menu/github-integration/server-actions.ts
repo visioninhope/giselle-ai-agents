@@ -8,7 +8,6 @@ import type {
 import type { GiselleNodeId } from "../../giselle-node/types";
 import type { AgentId } from "../../types";
 
-const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 interface SaveInput {
 	agentId: AgentId;
 	repositoryFullName: string;
@@ -19,14 +18,13 @@ interface SaveInput {
 	endNodeId: GiselleNodeId;
 }
 export async function save(input: SaveInput) {
-	await sleep(1000);
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, input.agentId),
 	});
 	if (agent === undefined) {
 		throw new Error(`Agent with id ${input.agentId} not found`);
 	}
-	db.insert(gitHubIntegrations).values({
+	await db.insert(gitHubIntegrations).values({
 		agentDbId: agent.dbId,
 		repositoryFullName: input.repositoryFullName,
 		callSign: input.callSign,
@@ -35,5 +33,4 @@ export async function save(input: SaveInput) {
 		endNodeId: input.endNodeId,
 		nextAction: input.nextAction,
 	});
-	return "Saved!";
 }
