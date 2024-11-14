@@ -24,7 +24,7 @@ export default function SignupPage() {
 			</div>
 			<div className="mt-8 space-y-6 w-[320px]">
 				<PageHeader title="Get Started" />
-				<OAuthProviders labelPrefix="Sign up" />
+				<OAuthProviders labelPrefix="Continue" />
 				<Divider label="or" />
 				<Button asChild>
 					<Link href="/signup/email">
