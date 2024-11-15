@@ -71,6 +71,7 @@
 		"next-themes": "0.3.0",
 		"openai": "4.64.0",
 		"pino": "9.5.0",
+		"pino-pretty": "13.0.0",
 		"react": "19.0.0-rc-4d577fd2-20241104",
 		"react-dom": "19.0.0-rc-4d577fd2-20241104",
 		"remark": "15.0.1",
