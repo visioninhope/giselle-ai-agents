@@ -1,5 +1,6 @@
 // The client you created from the Server-Side Auth instructions
 import { db, oauthCredentials, supabaseUserMappings, users } from "@/drizzle";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import { initializeAccount } from "@/services/accounts";
 import type { Session, User } from "@supabase/supabase-js";
@@ -16,6 +17,7 @@ export async function GET(request: Request) {
 		});
 	}
 
+	logger.debug({ requestUrl: request.url }, "url to parse");
 	const code = searchParams.get("code");
 	// if "next" is in param, use it as the redirect URL
 	const next = searchParams.get("next") ?? "/";
@@ -32,6 +34,13 @@ export async function GET(request: Request) {
 		});
 	}
 
+	logger.debug(
+		{
+			provider: data.session.user.app_metadata.provider,
+			providers: data.session.user.app_metadata.providers,
+		},
+		"provider info in supabase data",
+	);
 	try {
 		const { user, session } = data;
 		await initializeUserIfNeeded(user);
@@ -107,6 +116,7 @@ async function storeProviderTokens(user: User, session: Session) {
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;
 	});
+	logger.info({ currentProvider: provider });
 	if (!identity) {
 		throw new Error(`No identity found for provider: ${provider}`);
 	}

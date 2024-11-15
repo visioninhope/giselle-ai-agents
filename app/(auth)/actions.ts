@@ -1,6 +1,7 @@
 "use server";
 
 import { type OAuthProvider, getAuthCallbackUrl } from "@/app/(auth)/lib";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
@@ -12,6 +13,7 @@ async function authorizeOAuth(provider: OAuthProvider) {
 			redirectTo: getAuthCallbackUrl(),
 		},
 	});
+	logger.debug(`authorized with ${provider}`);
 
 	if (error != null) {
 		const { code, message, name, status } = error;
