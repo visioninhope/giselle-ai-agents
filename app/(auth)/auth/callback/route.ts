@@ -93,7 +93,7 @@ async function storeProviderTokens(user: User, session: Session) {
 	if (provider_token.startsWith("ghu_")) {
 		provider = "github";
 	}
-	if (session.user.app_metadata.providers.includes("google")) {
+	if (provider_token.startsWith("ya29.")) {
 		provider = "google";
 	}
 	// TODO: add another logic for other providers
