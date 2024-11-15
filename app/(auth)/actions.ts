@@ -1,7 +1,7 @@
 "use server";
 
-import { logger } from "@/lib/logger";
 import { getAuthCallbackUrl } from "@/app/(auth)/lib";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
@@ -21,6 +21,7 @@ async function authorizeOAuth(provider: OAuthProvider) {
 		const { code, message, name, status } = error;
 		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
 	}
+	logger.debug({ data: data }, `OAuth data got from ${provider}`);
 
 	if (data.url) {
 		redirect(data.url);

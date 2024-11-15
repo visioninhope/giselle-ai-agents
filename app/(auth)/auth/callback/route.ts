@@ -9,6 +9,15 @@ import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
 	const { searchParams, origin } = new URL(request.url);
+	logger.debug(
+		{
+			allParams: Object.fromEntries(searchParams),
+			cookies: request.headers.get("cookie"),
+			referrer: request.headers.get("referer"),
+			request: request.url,
+		},
+		"info",
+	);
 	const errorMessage = checkError(searchParams);
 	if (errorMessage) {
 		return new Response(errorMessage, {
@@ -16,8 +25,8 @@ export async function GET(request: Request) {
 		});
 	}
 
-	logger.debug({ requestUrl: request.url }, "url to parse");
 	const code = searchParams.get("code");
+	logger.debug({ code }, "code got from query param");
 	// if "next" is in param, use it as the redirect URL
 	const next = searchParams.get("next") ?? "/";
 	if (!code) {
@@ -38,7 +47,7 @@ export async function GET(request: Request) {
 			provider: data.session.user.app_metadata.provider,
 			providers: data.session.user.app_metadata.providers,
 		},
-		"provider info in supabase data",
+		"session data got from supabase data",
 	);
 	try {
 		const { user, session } = data;
@@ -100,6 +109,8 @@ async function storeProviderTokens(user: User, session: Session) {
 	if (provider === "") {
 		throw new Error("No provider found");
 	}
+
+        logger.debug({ provider }, `use ${provider} as OAuth provider`);
 
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;
