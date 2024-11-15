@@ -6,9 +6,12 @@ import type {
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
 import type { GiselleNodeId } from "../../giselle-node/types";
+import type { GitHubIntegrationId } from "../../github-integration/types";
+import { generateId } from "../../github-integration/utils";
 import type { AgentId } from "../../types";
 
 interface SaveInput {
+	id: GitHubIntegrationId | undefined;
 	agentId: AgentId;
 	repositoryFullName: string;
 	callSign: string;
@@ -24,13 +27,30 @@ export async function save(input: SaveInput) {
 	if (agent === undefined) {
 		throw new Error(`Agent with id ${input.agentId} not found`);
 	}
-	await db.insert(gitHubIntegrations).values({
-		agentDbId: agent.dbId,
-		repositoryFullName: input.repositoryFullName,
-		callSign: input.callSign,
-		event: input.event,
-		startNodeId: input.startNodeId,
-		endNodeId: input.endNodeId,
-		nextAction: input.nextAction,
-	});
+	await db
+		.insert(gitHubIntegrations)
+		.values({
+			id: input.id ?? generateId(),
+			dbId: 123,
+			agentDbId: agent.dbId,
+			repositoryFullName: input.repositoryFullName,
+			callSign: input.callSign,
+			event: input.event,
+			startNodeId: input.startNodeId,
+			endNodeId: input.endNodeId,
+			nextAction: input.nextAction,
+		})
+		.onConflictDoUpdate({
+			target: gitHubIntegrations.id,
+			set: {
+				dbId: 123,
+				agentDbId: agent.dbId,
+				repositoryFullName: input.repositoryFullName,
+				callSign: input.callSign,
+				event: input.event,
+				startNodeId: input.startNodeId,
+				endNodeId: input.endNodeId,
+				nextAction: input.nextAction,
+			},
+		});
 }

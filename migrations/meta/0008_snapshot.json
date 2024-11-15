@@ -1,6 +1,6 @@
 {
-	"id": "2e8fd230-3caa-4154-bc4c-df364cf9a11c",
-	"prevId": "4726f4d8-0183-445f-bb90-3c6d6a117716",
+	"id": "9bc9085d-008b-4718-a01e-b955134914be",
+	"prevId": "46187981-2801-4796-a167-4b48a68fc429",
 	"version": "7",
 	"dialect": "postgresql",
 	"tables": {
@@ -351,6 +351,12 @@
 			"name": "github_integrations",
 			"schema": "",
 			"columns": {
+				"id": {
+					"name": "id",
+					"type": "text",
+					"primaryKey": false,
+					"notNull": true
+				},
 				"db_id": {
 					"name": "db_id",
 					"type": "serial",
@@ -429,7 +435,13 @@
 				}
 			},
 			"compositePrimaryKeys": {},
-			"uniqueConstraints": {}
+			"uniqueConstraints": {
+				"github_integrations_id_unique": {
+					"name": "github_integrations_id_unique",
+					"nullsNotDistinct": false,
+					"columns": ["id"]
+				}
+			}
 		},
 		"public.knowledge_content_openai_vector_store_file_representations": {
 			"name": "knowledge_content_openai_vector_store_file_representations",

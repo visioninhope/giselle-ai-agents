@@ -5,12 +5,14 @@ import type {
 } from "@/services/external/github/types";
 import { createContext, useContext } from "react";
 import type { GiselleNodeId } from "../giselle-node/types";
+import type { GitHubIntegrationId } from "./types";
 
 export type Repository = Awaited<
 	ReturnType<GitHubUserClient["getRepositories"]>
 >["repositories"][number];
 
 export interface GitHubIntegrationSetting {
+	id: GitHubIntegrationId;
 	repositoryFullName: string;
 	callSign: string;
 	event: GitHubTriggerEvent;
@@ -22,7 +24,7 @@ export interface GitHubIntegrationSetting {
 interface GitHubIntegrationState {
 	repositories: Repository[];
 	needsAuthorization: boolean;
-	setting: GitHubIntegrationSetting | null;
+	setting: GitHubIntegrationSetting | undefined;
 }
 
 export const GitHubIntegrationContext =

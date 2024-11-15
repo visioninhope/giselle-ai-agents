@@ -122,6 +122,8 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 		}
 		return tmpFlows;
 	}, [state.graph]);
+
+	const { setting } = useGitHubIntegration();
 	const [_, action, isPending] = useActionState(
 		async (prevState: unknown, formData: FormData) => {
 			const repositoryFullName = formData.get("repository") as string;
@@ -131,6 +133,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 			const flow = formData.get("flow") as string;
 			const { start, end } = JSON.parse(flow) as Flow;
 			await save({
+				id: setting?.id,
 				agentId: state.graph.agentId,
 				repositoryFullName,
 				event,
@@ -143,7 +146,6 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 		null,
 	);
 
-	const { setting } = useGitHubIntegration();
 	return (
 		<form className="grid gap-[16px]" action={action}>
 			<Section>

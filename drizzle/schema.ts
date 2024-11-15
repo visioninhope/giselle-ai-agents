@@ -1,4 +1,5 @@
 import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
+import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/beta-proto/github-integration/types";
 import {
 	type Graph,
 	playgroundModes,
@@ -449,6 +450,7 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 export const gitHubIntegrations = pgTable(
 	"github_integrations",
 	{
+		id: text("id").$type<GitHubIntegrationId>().notNull().unique(),
 		dbId: serial("db_id").primaryKey(),
 		agentDbId: integer("agent_db_id")
 			.notNull()
