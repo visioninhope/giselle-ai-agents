@@ -153,7 +153,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 					</SelectTrigger>
 					<SelectContent>
 						{repositories.map((repository) => (
-							<SelectItem value={repository.id.toString()} key={repository.id}>
+							<SelectItem value={repository.full_name} key={repository.id}>
 								{repository.full_name}
 							</SelectItem>
 						))}
