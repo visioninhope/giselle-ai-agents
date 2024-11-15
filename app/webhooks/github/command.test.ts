@@ -4,10 +4,7 @@ import { parseCommand } from "./command";
 test("parseCommand", () => {
 	expect(
 		parseCommand(`
-/giselle hello
-
-Please write a blog.
-Theme is free.
+/giselle hello\r\n\r\nPlease write a blog.\r\nTheme is free.
 `),
 	).toStrictEqual({
 		callSign: "hello",
@@ -18,9 +15,7 @@ Theme is free.
 test("parseCommand2", () => {
 	expect(
 		parseCommand(`
-/giselle hello
-Please write a blog.
-Theme is free.
+		/giselle hello\r\nPlease write a blog.\r\nTheme is free.
 `),
 	).toStrictEqual({
 		callSign: "hello",
@@ -31,11 +26,7 @@ Theme is free.
 test("parseCommand3", () => {
 	expect(
 		parseCommand(`
-/giselle hello
-Please write a blog.
-Theme is free.
-
-Text mood is ....
+/giselle hello\r\nPlease write a blog.\r\nTheme is free.\r\n\r\nText mood is ....
 `),
 	).toStrictEqual({
 		callSign: "hello",
