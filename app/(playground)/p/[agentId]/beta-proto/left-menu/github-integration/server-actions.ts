@@ -31,7 +31,6 @@ export async function save(input: SaveInput) {
 		.insert(gitHubIntegrations)
 		.values({
 			id: input.id ?? generateId(),
-			dbId: 123,
 			agentDbId: agent.dbId,
 			repositoryFullName: input.repositoryFullName,
 			callSign: input.callSign,
@@ -43,7 +42,6 @@ export async function save(input: SaveInput) {
 		.onConflictDoUpdate({
 			target: gitHubIntegrations.id,
 			set: {
-				dbId: 123,
 				agentDbId: agent.dbId,
 				repositoryFullName: input.repositoryFullName,
 				callSign: input.callSign,
