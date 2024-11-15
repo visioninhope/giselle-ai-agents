@@ -1,3 +1,5 @@
+import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
+import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/beta-proto/github-integration/types";
 import {
 	type Graph,
 	playgroundModes,
@@ -28,9 +30,14 @@ import {
 	requestStepStatus,
 } from "@/services/agents/requests/types";
 import type { AgentId, BuildId } from "@/services/agents/types";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "@/services/external/github/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
+	index,
 	integer,
 	jsonb,
 	pgTable,
@@ -437,5 +444,27 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 		openaiVectorStoreFileStatus: text("openai_vector_store_status")
 			.$type<VectorStoreFile["status"]>()
 			.notNull(),
+	},
+);
+
+export const gitHubIntegrations = pgTable(
+	"github_integrations",
+	{
+		id: text("id").$type<GitHubIntegrationId>().notNull().unique(),
+		dbId: serial("db_id").primaryKey(),
+		agentDbId: integer("agent_db_id")
+			.notNull()
+			.references(() => agents.dbId),
+		repositoryFullName: text("repository_full_name").notNull(),
+		callSign: text("call_sign").notNull(),
+		event: text("event").$type<GitHubTriggerEvent>().notNull(),
+		startNodeId: text("start_node_id").$type<GiselleNodeId>().notNull(),
+		endNodeId: text("end_node_id").$type<GiselleNodeId>().notNull(),
+		nextAction: text("next_action").$type<GitHubNextAction>().notNull(),
+	},
+	(table) => {
+		return {
+			repositoryFullNameIdx: index().on(table.repositoryFullName),
+		};
 	},
 );

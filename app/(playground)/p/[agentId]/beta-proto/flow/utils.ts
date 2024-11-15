@@ -364,3 +364,61 @@ export function resolveStepAction(node: GiselleNode) {
 	}
 	throw new Error(`Detect invalid archetype: ${node.archetype}`);
 }
+
+export function allFlowEdges(
+	nodes: GiselleNode[],
+	connectors: ConnectorObject[],
+) {
+	const graph: Record<GiselleNodeId, GiselleNodeId[]> = {};
+	for (const connector of connectors) {
+		if (!graph[connector.source]) {
+			graph[connector.source] = [];
+		}
+		graph[connector.source].push(connector.target);
+	}
+
+	const endNodes = nodes
+		.filter((node) => node.isFinal === true)
+		.map((node) => node.id);
+
+	const flows: { start: GiselleNodeId; end: GiselleNodeId }[] = [];
+
+	function findPaths(
+		current: GiselleNodeId,
+		visited: Set<GiselleNodeId>,
+		path: GiselleNodeId[],
+	) {
+		path.push(current);
+		visited.add(current);
+
+		if (endNodes.includes(current)) {
+			flows.push({
+				start: path[0],
+				end: current,
+			});
+		}
+
+		if (graph[current]) {
+			for (const next of graph[current]) {
+				if (!visited.has(next)) {
+					findPaths(next, new Set(visited), [...path]);
+				}
+			}
+		}
+	}
+
+	const startNodes = new Set(
+		nodes.filter((node) => node.category === "action").map((node) => node.id),
+	);
+	for (const connector of connectors.filter(
+		(connector) => connector.sourceNodeCategory === "action",
+	)) {
+		startNodes.delete(connector.target);
+	}
+
+	for (const startNode of startNodes) {
+		findPaths(startNode, new Set(), []);
+	}
+
+	return flows;
+}

@@ -1,3 +1,5 @@
+import type { GenerateResult } from "@/app/(playground)/p/[agentId]/beta-proto/flow/types";
+import { db, gitHubIntegrations } from "@/drizzle";
 import {
 	buildAppInstallationClient,
 	needsAdditionalPermissions,
@@ -7,6 +9,19 @@ import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import {
+	buildTextArtifact,
+	generateArtifactObject,
+} from "../../(playground)/p/[agentId]/beta-proto/flow/server-actions/generate-text";
+import {
+	buildWebSearchArtifact,
+	generateWebSearchArtifactObject,
+} from "../../(playground)/p/[agentId]/beta-proto/flow/server-actions/websearch";
+import {
+	buildFlow,
+	buildGenerateResult,
+	buildGeneratorNode,
+} from "../../(playground)/p/[agentId]/beta-proto/flow/utils";
 import { parseCommand } from "./command";
 
 function setupHandlers() {
@@ -67,18 +82,13 @@ async function retrieveIntegrations(
 	repositoryFullName: string,
 	callSign: string,
 ) {
-	return [
-		{
-			agentId: "agt_demo",
-			action: {
-				runFlow: {
-					startNodeId: "nd_demo1",
-					endNodeId: "nd_demo2",
-				},
-			},
-			nextAction: "commentToIssueTriggered",
-		},
-	] as const;
+	return await db.query.gitHubIntegrations.findMany({
+		where: (gitHubIntegrations, { eq, and }) =>
+			and(
+				eq(gitHubIntegrations.repositoryFullName, repositoryFullName),
+				eq(gitHubIntegrations.callSign, callSign),
+			),
+	});
 }
 
 async function issueCommentHandler(
@@ -100,8 +110,114 @@ async function issueCommentHandler(
 	);
 	await Promise.all(
 		integrations.map(async (integration) => {
-			if (integration.nextAction === "commentToIssueTriggered") {
-				const commentBody = `Hello from the GitHub App! @${payload.issue.user?.login} you have triggered the action with call sign ${command.callSign}!`;
+			const agent = await db.query.agents.findFirst({
+				where: (agents, { eq }) => eq(agents.dbId, integration.agentDbId),
+			});
+			if (agent === undefined) {
+				return;
+			}
+			const flow = await buildFlow({
+				input: {
+					agentId: agent.id,
+					finalNodeId: integration.endNodeId,
+					graph: agent.graphv2,
+				},
+			});
+
+			const generateResults: GenerateResult[] = [];
+			for (const job of flow.jobs) {
+				await Promise.all(
+					job.steps.map(async (step) => {
+						const relevanceResults = step.sourceNodeIds
+							.map((sourceNodeId) => {
+								const sourceArtifact = generateResults.find(
+									(generateResult) =>
+										generateResult.generator.nodeId === sourceNodeId,
+								);
+								/** @todo log warning */
+								if (sourceArtifact === undefined) {
+									return null;
+								}
+								return sourceArtifact;
+							})
+							.filter((sourceArtifact) => sourceArtifact !== null);
+						switch (step.action) {
+							case "generate-text": {
+								const prompt =
+									integration.startNodeId === step.node.id
+										? command.content
+										: step.prompt;
+								const artifactObject = await generateArtifactObject({
+									input: {
+										prompt,
+										model: step.modelConfiguration,
+										sources: [
+											...step.sources,
+											...relevanceResults.map((result) => result.artifact),
+										],
+									},
+								});
+								generateResults.push(
+									buildGenerateResult({
+										generator: buildGeneratorNode({
+											nodeId: step.node.id,
+											archetype: step.node.archetype,
+											name: step.node.name,
+										}),
+										artifact: buildTextArtifact({
+											title: artifactObject.artifact.title,
+											content: artifactObject.artifact.content,
+										}),
+									}),
+								);
+								break;
+							}
+							case "search-web": {
+								const webSearchArtifact = await generateWebSearchArtifactObject(
+									{
+										input: {
+											prompt: step.prompt,
+											sources: [
+												...step.sources,
+												...relevanceResults.map((result) => result.artifact),
+											],
+										},
+									},
+								);
+								generateResults.push(
+									buildGenerateResult({
+										generator: buildGeneratorNode({
+											nodeId: step.node.id,
+											archetype: step.node.archetype,
+											name: step.node.name,
+										}),
+										artifact: buildWebSearchArtifact({
+											keywords: webSearchArtifact.keywords,
+											scrapingTasks: webSearchArtifact.scrapingTasks,
+										}),
+									}),
+								);
+								break;
+							}
+						}
+					}),
+				);
+			}
+
+			const output = generateResults.find(
+				(generateResult) =>
+					generateResult.generator.nodeId === integration.endNodeId,
+			);
+			if (
+				output === undefined ||
+				output.artifact.object === "artifact.webSearch"
+			) {
+				/** @todo log */
+				return;
+			}
+
+			if (integration.nextAction === "github.issue_comment.reply") {
+				const commentBody = output.artifact.content;
 
 				const installation = payload.installation;
 				if (!installation) {

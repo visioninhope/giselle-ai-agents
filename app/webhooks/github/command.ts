@@ -4,7 +4,7 @@ export interface Command {
 }
 
 export function parseCommand(text: string) {
-	const lines = text.trim().split("\n");
+	const lines = text.trim().split("\r\n");
 
 	const commandLine = lines[0];
 	const commandMatch = commandLine.match(/^\/giselle\s+([^\]]+)/);

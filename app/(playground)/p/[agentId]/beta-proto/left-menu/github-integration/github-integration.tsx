@@ -2,7 +2,11 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
-import { useMemo } from "react";
+import { useActionState, useMemo } from "react";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "../../../../../../../services/external/github/types";
 import { Label } from "../../components/label";
 import {
 	Select,
@@ -11,6 +15,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../components/select";
+import { allFlowEdges } from "../../flow/utils";
+import type { GiselleNode, GiselleNodeId } from "../../giselle-node/types";
 import { useGitHubIntegration } from "../../github-integration/context";
 import { useGraph } from "../../graph/context";
 import {
@@ -18,26 +24,27 @@ import {
 	SectionFormField,
 	SectionHeader,
 } from "../components/section";
+import { save } from "./server-actions";
 
-const mockEvents = [
+interface GitHubTriggerEventItem {
+	label: string;
+	type: GitHubTriggerEvent;
+}
+const mockEvents: GitHubTriggerEventItem[] = [
 	{
-		id: "e-1",
-		name: "Comment on Issue",
-	},
-	{
-		id: "e-2",
-		name: "Issue created",
+		type: "github.issue_comment.created",
+		label: "Comment on Issue",
 	},
 ];
 
-const mockNextActions = [
+interface NextActionItem {
+	label: string;
+	type: GitHubNextAction;
+}
+const mockNextActions: NextActionItem[] = [
 	{
-		id: "r-1",
-		name: "Comment on trigger issue",
-	},
-	{
-		id: "r-2",
-		name: "Create a pull request",
+		type: "github.issue_comment.reply",
+		label: "Comment on trigger issue",
 	},
 ];
 interface GitHubIntegrationProps {
@@ -57,7 +64,7 @@ export function GitHubIntegration(props: GitHubIntegrationProps) {
 				</p>
 				<button type="button">
 					<XIcon
-						className="w-[16px] h-[16px]"
+						className="w-[16px] h-[16px] text-black-30"
 						onClick={() => props.setTabValue("")}
 					/>
 				</button>
@@ -89,29 +96,67 @@ interface GitHubIntegrationFormProps {
 	}>;
 }
 function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
+	interface Flow {
+		start: Pick<GiselleNode, "id" | "name">;
+		end: Pick<GiselleNode, "id" | "name">;
+	}
 	const { state } = useGraph();
-	const startNodes = useMemo(
-		() =>
-			state.graph.nodes.filter(
-				(node) =>
-					!state.graph.connectors.some(
-						(connector) => connector.target === node.id,
-					),
-			),
-		[state.graph],
+	const flows = useMemo(() => {
+		const edges = allFlowEdges(state.graph.nodes, state.graph.connectors);
+		const tmpFlows: Flow[] = [];
+		for (const edge of edges) {
+			const start = state.graph.nodes.find((node) => node.id === edge.start);
+			const end = state.graph.nodes.find((node) => node.id === edge.end);
+			if (start && end) {
+				tmpFlows.push({
+					start: {
+						id: start.id as GiselleNodeId,
+						name: start.name,
+					},
+					end: {
+						id: end.id as GiselleNodeId,
+						name: end.name,
+					},
+				});
+			}
+		}
+		return tmpFlows;
+	}, [state.graph]);
+
+	const { setting } = useGitHubIntegration();
+	const [_, action, isPending] = useActionState(
+		async (prevState: unknown, formData: FormData) => {
+			const repositoryFullName = formData.get("repository") as string;
+			const event = formData.get("event") as GitHubTriggerEvent;
+			const callSign = formData.get("callSign") as string;
+			const nextAction = formData.get("nextAction") as GitHubNextAction;
+			const flow = formData.get("flow") as string;
+			const { start, end } = JSON.parse(flow) as Flow;
+			await save({
+				id: setting?.id,
+				agentId: state.graph.agentId,
+				repositoryFullName,
+				event,
+				callSign,
+				nextAction,
+				startNodeId: start.id,
+				endNodeId: end.id,
+			});
+		},
+		null,
 	);
 
 	return (
-		<div className="grid gap-[16px]">
+		<form className="grid gap-[16px]" action={action}>
 			<Section>
 				<SectionHeader title="Repository" />
-				<Select>
+				<Select name="repository" defaultValue={setting?.repositoryFullName}>
 					<SelectTrigger>
 						<SelectValue placeholder="Choose repository" />
 					</SelectTrigger>
 					<SelectContent>
 						{repositories.map((repository) => (
-							<SelectItem value={repository.id.toString()} key={repository.id}>
+							<SelectItem value={repository.full_name} key={repository.id}>
 								{repository.full_name}
 							</SelectItem>
 						))}
@@ -122,26 +167,28 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				<SectionHeader title="Trigger" />
 				<SectionFormField>
 					<Label htmlFor="event">Event</Label>
-					<Select name="event">
+					<Select name="event" defaultValue={setting?.event}>
 						<SelectTrigger>
 							<SelectValue placeholder="Choose event" />
 						</SelectTrigger>
 						<SelectContent>
 							{mockEvents.map((event) => (
-								<SelectItem value={event.id} key={event.id}>
-									{event.name}
+								<SelectItem value={event.type} key={event.type}>
+									{event.label}
 								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
 				</SectionFormField>
 				<SectionFormField>
-					<Label htmlFor="command">Call sign</Label>
+					<Label htmlFor="callSign">Call sign</Label>
 					<Input
 						type="text"
-						name="command"
+						name="callSign"
+						id="callSign"
 						placeholder="Enter call sign"
 						className="w-full"
+						defaultValue={setting?.callSign}
 					/>
 					<span className="text-black-70 text-[12px]">
 						You can call this agent by commenting{" "}
@@ -155,15 +202,27 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 			<Section>
 				<SectionHeader title="Action" />
 				<SectionFormField>
-					<Label>Start flow from</Label>
-					<Select name="start">
+					<Label>Run flow</Label>
+					<Select
+						name="flow"
+						defaultValue={JSON.stringify(
+							flows.find(
+								(flow) =>
+									flow.start.id === setting?.startNodeId &&
+									flow.end.id === setting?.endNodeId,
+							),
+						)}
+					>
 						<SelectTrigger>
-							<SelectValue placeholder="Choose node" />
+							<SelectValue placeholder="Choose flow" />
 						</SelectTrigger>
 						<SelectContent>
-							{startNodes.map((node) => (
-								<SelectItem value={node.id} key={node.id}>
-									{node.name}
+							{flows.map((flow) => (
+								<SelectItem
+									value={JSON.stringify(flow)}
+									key={`${flow.start.id}-${flow.end.id}`}
+								>
+									{flow.start.name} → {flow.end.name}
 								</SelectItem>
 							))}
 						</SelectContent>
@@ -171,20 +230,26 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				</SectionFormField>
 				<SectionFormField>
 					<Label>Then</Label>
-					<Select name="nextAction">
+					<Select name="nextAction" defaultValue={setting?.nextAction}>
 						<SelectTrigger>
 							<SelectValue placeholder="Choose next action" />
 						</SelectTrigger>
 						<SelectContent>
 							{mockNextActions.map((nextAction) => (
-								<SelectItem value={nextAction.id} key={nextAction.id}>
-									{nextAction.name}
+								<SelectItem value={nextAction.type} key={nextAction.type}>
+									{nextAction.label}
 								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
 				</SectionFormField>
 			</Section>
-		</div>
+			<div>
+				<input type="hidden" name="agentId" value={state.graph.agentId} />
+				<Button type="submit" disabled={isPending} data-loading={isPending}>
+					Save
+				</Button>
+			</div>
+		</form>
 	);
 }

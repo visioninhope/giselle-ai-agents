@@ -107,6 +107,13 @@ async function fetchGitHubRepositories(): Promise<{
 	}
 }
 
+async function getGitHubIntegrationSetting(agentDbId: number) {
+	return await db.query.gitHubIntegrations.findFirst({
+		where: (gitHubIntegrations, { eq }) =>
+			eq(gitHubIntegrations.agentDbId, agentDbId),
+	});
+}
+
 export default async function AgentPlaygroundPage({
 	params,
 }: {
@@ -126,6 +133,9 @@ export default async function AgentPlaygroundPage({
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 
 	const agent = await getAgent(agentId);
+	const gitHubIntegrationSetting = await getGitHubIntegrationSetting(
+		agent.dbId,
+	);
 	const { repositories, needsAuthorization } = await fetchGitHubRepositories();
 
 	return (
@@ -141,6 +151,7 @@ export default async function AgentPlaygroundPage({
 			gitHubIntegration={{
 				repositories,
 				needsAuthorization,
+				setting: gitHubIntegrationSetting,
 			}}
 		/>
 	);

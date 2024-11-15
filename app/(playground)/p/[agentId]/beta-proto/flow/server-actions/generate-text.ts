@@ -57,7 +57,7 @@ export async function generateArtifactObject({
 	options,
 }: {
 	input: GenerateArtifactObjectInput;
-	options: GenerateArtifactObjectOptions;
+	options?: GenerateArtifactObjectOptions;
 }) {
 	const model = buildLanguageModel(input.model);
 	const system =
@@ -82,7 +82,7 @@ export async function generateArtifactObject({
 	});
 
 	for await (const partialObject of partialObjectStream) {
-		options.onStreamPartialObject?.({
+		options?.onStreamPartialObject?.({
 			object: "artifact.text",
 			title: partialObject.artifact?.title || "",
 			content: partialObject.artifact?.content || "",
