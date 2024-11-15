@@ -1,9 +1,11 @@
 "use server";
 
-import { type OAuthProvider, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
+import { getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
+
+type OAuthProvider = "github" | "google";
 
 async function authorizeOAuth(provider: OAuthProvider) {
 	const supabase = await createClient();
