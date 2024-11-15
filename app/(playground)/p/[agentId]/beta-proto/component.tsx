@@ -5,7 +5,10 @@ import { AgentNameProvider } from "./contexts/agent-name";
 import { Editor } from "./editor";
 import { FeatureFlagProvider } from "./feature-flags/provider";
 import type { FeatureFlags } from "./feature-flags/types";
-import type { Repository } from "./github-integration/context";
+import type {
+	GitHubIntegrationSetting,
+	Repository,
+} from "./github-integration/context";
 import { GitHubIntegrationProvider } from "./github-integration/provider";
 import { useGraph } from "./graph/context";
 import { GraphProvider } from "./graph/provider";
@@ -29,6 +32,7 @@ interface PlaygroundProps {
 	gitHubIntegration: {
 		repositories: Repository[];
 		needsAuthorization: boolean;
+		setting: GitHubIntegrationSetting | undefined;
 	};
 }
 export function Playground(props: PlaygroundProps) {
@@ -39,6 +43,7 @@ export function Playground(props: PlaygroundProps) {
 					<GitHubIntegrationProvider
 						needsAuthorization={props.gitHubIntegration.needsAuthorization}
 						repositories={props.gitHubIntegration.repositories}
+						setting={props.gitHubIntegration.setting}
 					>
 						<Inner />
 					</GitHubIntegrationProvider>

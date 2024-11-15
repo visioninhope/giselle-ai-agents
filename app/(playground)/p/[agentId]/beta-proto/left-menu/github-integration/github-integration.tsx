@@ -143,11 +143,12 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 		null,
 	);
 
+	const { setting } = useGitHubIntegration();
 	return (
 		<form className="grid gap-[16px]" action={action}>
 			<Section>
 				<SectionHeader title="Repository" />
-				<Select name="repository">
+				<Select name="repository" defaultValue={setting?.repositoryFullName}>
 					<SelectTrigger>
 						<SelectValue placeholder="Choose repository" />
 					</SelectTrigger>
@@ -164,7 +165,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				<SectionHeader title="Trigger" />
 				<SectionFormField>
 					<Label htmlFor="event">Event</Label>
-					<Select name="event">
+					<Select name="event" defaultValue={setting?.event}>
 						<SelectTrigger>
 							<SelectValue placeholder="Choose event" />
 						</SelectTrigger>
@@ -185,6 +186,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 						id="callSign"
 						placeholder="Enter call sign"
 						className="w-full"
+						defaultValue={setting?.callSign}
 					/>
 					<span className="text-black-70 text-[12px]">
 						You can call this agent by commenting{" "}
@@ -199,7 +201,16 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				<SectionHeader title="Action" />
 				<SectionFormField>
 					<Label>Run flow</Label>
-					<Select name="flow">
+					<Select
+						name="flow"
+						defaultValue={JSON.stringify(
+							flows.find(
+								(flow) =>
+									flow.start.id === setting?.startNodeId &&
+									flow.end.id === setting?.endNodeId,
+							),
+						)}
+					>
 						<SelectTrigger>
 							<SelectValue placeholder="Choose flow" />
 						</SelectTrigger>
@@ -217,7 +228,7 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 				</SectionFormField>
 				<SectionFormField>
 					<Label>Then</Label>
-					<Select name="nextAction">
+					<Select name="nextAction" defaultValue={setting?.nextAction}>
 						<SelectTrigger>
 							<SelectValue placeholder="Choose next action" />
 						</SelectTrigger>
