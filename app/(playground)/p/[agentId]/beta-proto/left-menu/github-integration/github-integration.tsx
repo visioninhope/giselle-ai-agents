@@ -2,7 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { XIcon } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useMemo } from "react";
+import { useActionState, useMemo, useState } from "react";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
@@ -124,11 +124,11 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 	}, [state.graph]);
 
 	const { setting } = useGitHubIntegration();
+	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [_, action, isPending] = useActionState(
 		async (prevState: unknown, formData: FormData) => {
 			const repositoryFullName = formData.get("repository") as string;
 			const event = formData.get("event") as GitHubTriggerEvent;
-			const callSign = formData.get("callSign") as string;
 			const nextAction = formData.get("nextAction") as GitHubNextAction;
 			const flow = formData.get("flow") as string;
 			const { start, end } = JSON.parse(flow) as Flow;
@@ -188,12 +188,13 @@ function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
 						id="callSign"
 						placeholder="Enter call sign"
 						className="w-full"
-						defaultValue={setting?.callSign}
+						value={callSign}
+						onChange={(e) => setCallSign(e.target.value)}
 					/>
 					<span className="text-black-70 text-[12px]">
 						You can call this agent by commenting{" "}
 						<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
-							/giselle report-agent
+							/giselle {callSign === "" ? "[call sign]" : callSign}
 						</span>{" "}
 						in the issue route06inc/giselle.
 					</span>
