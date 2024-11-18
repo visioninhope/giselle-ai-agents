@@ -1,4 +1,11 @@
 import { GiselleLogo } from "@/components/giselle-logo";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 import { UserButton } from "@/services/accounts/components";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -14,7 +21,17 @@ export default function Layout({ children }: { children: ReactNode }) {
 					</Link>
 					<Nav />
 				</div>
-				<div>
+				<div className="flex items-center gap-4">
+					<Select defaultValue="team-1">
+						<SelectTrigger className="w-[180px]">
+							<SelectValue placeholder="Select Team" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="team-1">Giselle Team</SelectItem>
+							<SelectItem value="team-2">AI Research Team</SelectItem>
+							<SelectItem value="team-3">Development Team</SelectItem>
+						</SelectContent>
+					</Select>
 					<UserButton />
 				</div>
 			</header>
