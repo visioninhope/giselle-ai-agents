@@ -6,6 +6,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 import { GitHubAuthentication } from "./github-authentication";
+import { GoogleAuthentication } from "./google-authentication";
 
 export default async function AccountSettingPage() {
 	const user = await getUser();
@@ -38,6 +39,13 @@ export default async function AccountSettingPage() {
 					}
 				>
 					<GitHubAuthentication />
+				</Suspense>
+				<Suspense
+					fallback={
+						<Skeleton className="rounded-md border border-black-70 w-full h-16" />
+					}
+				>
+					<GoogleAuthentication />
 				</Suspense>
 			</Card>
 			<Card
