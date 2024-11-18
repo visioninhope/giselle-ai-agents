@@ -21,14 +21,14 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertCircle } from "lucide-react";
 import Link from "next/link";
-import { useState } from "react";
+import { type FormEvent, useState } from "react";
 
 const TeamCreationModal = () => {
 	const [teamName, setTeamName] = useState("");
 	const [selectedPlan, setSelectedPlan] = useState("");
 	const hasExistingFreeTeam = true;
 
-	const handleSubmit = (e) => {
+	const handleSubmit = (e: FormEvent) => {
 		e.preventDefault();
 		if (selectedPlan === "pro") {
 			alert("Redirecting to Stripe...");
