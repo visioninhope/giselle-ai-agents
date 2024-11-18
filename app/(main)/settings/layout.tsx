@@ -1,5 +1,5 @@
 import { githubIntegrationFlag } from "@/flags";
-import { CreditCardIcon, UserIcon } from "lucide-react";
+import { UserIcon, UsersIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { IntegrationIcon } from "./components/integration-icon";
 import { MenuLink } from "./components/menu-link";
@@ -29,11 +29,17 @@ export default async function SettingLayout({
 							Integration
 						</MenuLink>
 					)}
-					<MenuLink
+					{/* <MenuLink
 						href="/settings/billing"
 						icon={<CreditCardIcon className="w-4 h-4" />}
 					>
 						Billing
+					</MenuLink> */}
+					<MenuLink
+						href="/settings/team"
+						icon={<UsersIcon className="w-4 h-4" />}
+					>
+						Team
 					</MenuLink>
 				</div>
 			</div>
