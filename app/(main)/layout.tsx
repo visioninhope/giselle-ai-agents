@@ -30,6 +30,14 @@ export default function Layout({ children }: { children: ReactNode }) {
 							<SelectItem value="team-1">Giselle Team</SelectItem>
 							<SelectItem value="team-2">AI Research Team</SelectItem>
 							<SelectItem value="team-3">Development Team</SelectItem>
+							<div className="px-2 py-2 border-t border-black-80">
+								<Link
+									href="/teams/new"
+									className="flex items-center text-sm text-blue-500 hover:text-blue-400"
+								>
+									+ Create New Team
+								</Link>
+							</div>
 						</SelectContent>
 					</Select>
 					<UserButton />
