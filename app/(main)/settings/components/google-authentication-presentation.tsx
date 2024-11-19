@@ -1,13 +1,15 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
+import { SiGoogle } from "@icons-pack/react-simple-icons";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
-import { SiGoogle } from "@icons-pack/react-simple-icons";
 
 type GoogleAuthentcationPresentationProps = {
+	button?: () => React.ReactNode;
 	alert?: string;
 };
 export function GoogleAuthentcationPresentation({
+	button,
 	alert,
 }: GoogleAuthentcationPresentationProps) {
 	return (
@@ -26,6 +28,7 @@ export function GoogleAuthentcationPresentation({
 						<div>Google</div>
 					</div>
 				</div>
+				{button?.()}
 			</div>
 		</div>
 	);

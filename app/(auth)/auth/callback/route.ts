@@ -110,7 +110,7 @@ async function storeProviderTokens(user: User, session: Session) {
 		throw new Error("No provider found");
 	}
 
-        logger.debug({ provider }, `use ${provider} as OAuth provider`);
+	logger.debug({ provider }, `use ${provider} as OAuth provider`);
 
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;

@@ -77,3 +77,21 @@ export async function disconnectGitHubIdentity() {
 
 	await deleteOauthCredential("github");
 }
+
+export async function reconnectGoogleIdentity() {
+	const supabase = await createClient();
+	const { data, error } = await supabase.auth.signInWithOAuth({
+		provider: "google",
+		options: {
+			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
+		},
+	});
+
+	if (error != null) {
+		const { code, message, name, status } = error;
+		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
+	}
+	if (data.url) {
+		redirect(data.url);
+	}
+}
