@@ -16,17 +16,21 @@ import {
 	MousePositionProvider,
 	useMousePosition,
 } from "./contexts/mouse-position";
+import { useFeatureFlags } from "./feature-flags/context";
 import {
 	giselleNodeArchetypes,
 	promptBlueprint,
+	textGeneratorBlueprint,
 	textGeneratorParameterNames,
 } from "./giselle-node/blueprints";
 import {
 	GiselleNode,
 	GiselleNodeInformationPanel,
 } from "./giselle-node/components";
+import { buildGiselleNode } from "./giselle-node/utils";
 import { addNodesAndConnect } from "./graph/actions";
 import { useGraph } from "./graph/context";
+import { addNode } from "./graph/v2/composition/add-node";
 import { Header } from "./header";
 import { LeftMenu } from "./left-menu/left-menu";
 import { edgeTypes, nodeTypes } from "./react-flow-adapter/giselle-node";
@@ -50,6 +54,7 @@ function EditorInner() {
 	const { handleConnect } = useConnectionHandler();
 	const { handleNodesChange } = useReactFlowNodeEventHandler();
 	const { handleEdgesChange } = useReacrFlowEdgeEventHandler();
+	const { playgroundV2Flag } = useFeatureFlags();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<ReactFlowNode, ReactFlowEdge>
@@ -71,53 +76,74 @@ function EditorInner() {
 							x: event.clientX,
 							y: event.clientY,
 						});
-						if (
-							toolState.activeTool.giselleNodeBlueprint.archetype ===
-							giselleNodeArchetypes.textGenerator
-						) {
-							graphDispatch(
-								addNodesAndConnect({
-									sourceNode: {
-										node: promptBlueprint,
-										position: {
-											x: position.x - 300,
-											y: position.y + 100,
+						if (playgroundV2Flag) {
+							switch (toolState.activeTool.giselleNodeBlueprint.archetype) {
+								case giselleNodeArchetypes.textGenerator:
+									graphDispatch(
+										addNode({
+											input: {
+												node: buildGiselleNode({
+													node: textGeneratorBlueprint,
+													name: `Untitled node - ${graphState.graph.nodes.length + 1}`,
+													position: {
+														x: position.x - 300,
+														y: position.y + 100,
+													},
+												}),
+											},
+										}),
+									);
+									break;
+							}
+						} else {
+							if (
+								toolState.activeTool.giselleNodeBlueprint.archetype ===
+								giselleNodeArchetypes.textGenerator
+							) {
+								graphDispatch(
+									addNodesAndConnect({
+										sourceNode: {
+											node: promptBlueprint,
+											position: {
+												x: position.x - 300,
+												y: position.y + 100,
+											},
 										},
-									},
-									targetNode: {
-										node: toolState.activeTool.giselleNodeBlueprint,
-										position,
-									},
-									connector: {
-										targetParameterName:
-											textGeneratorParameterNames.instruction,
-									},
-								}),
-							);
-						}
-						if (
-							toolState.activeTool.giselleNodeBlueprint.archetype ===
-							giselleNodeArchetypes.webSearch
-						) {
-							graphDispatch(
-								addNodesAndConnect({
-									sourceNode: {
-										node: promptBlueprint,
-										position: {
-											x: position.x - 300,
-											y: position.y + 100,
+										targetNode: {
+											node: toolState.activeTool.giselleNodeBlueprint,
+											position,
 										},
-									},
-									targetNode: {
-										node: toolState.activeTool.giselleNodeBlueprint,
-										position,
-									},
-									connector: {
-										targetParameterName:
-											textGeneratorParameterNames.instruction,
-									},
-								}),
-							);
+										connector: {
+											targetParameterName:
+												textGeneratorParameterNames.instruction,
+										},
+									}),
+								);
+							}
+							if (
+								toolState.activeTool.giselleNodeBlueprint.archetype ===
+								giselleNodeArchetypes.webSearch
+							) {
+								graphDispatch(
+									addNodesAndConnect({
+										sourceNode: {
+											node: promptBlueprint,
+											position: {
+												x: position.x - 300,
+												y: position.y + 100,
+											},
+										},
+										targetNode: {
+											node: toolState.activeTool.giselleNodeBlueprint,
+											position,
+										},
+										connector: {
+											targetParameterName:
+												textGeneratorParameterNames.instruction,
+										},
+									}),
+								);
+							}
 						}
 						toolDispatch(setSelectTool);
 					}
