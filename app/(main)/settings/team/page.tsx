@@ -21,21 +21,13 @@ import {
 } from "@/components/ui/select";
 import { Check, ChevronRight, Pencil, X } from "lucide-react";
 import React from "react";
+import AgentTimeUsage from "./components/AgentTimeUsage";
 
 const TeamSettings = () => {
 	const [teamName, setTeamName] = React.useState("Giselle Team");
 	const [isEditingName, setIsEditingName] = React.useState(false);
 	const [tempTeamName, setTempTeamName] = React.useState(teamName);
 	const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
-
-	// Usage data
-	const proPlanLimit = 120;
-	const usageMinutes = 150;
-	const percentageUsed = Math.min((usageMinutes / proPlanLimit) * 100, 100);
-	const percentageOverage = Math.max(
-		0,
-		((usageMinutes - proPlanLimit) / proPlanLimit) * 100,
-	);
 
 	const members = [
 		{
@@ -81,57 +73,27 @@ const TeamSettings = () => {
 		setIsEditingName(false);
 	};
 
-	const UsageDisplay = () => (
-		<Card className="bg-zinc-950 border-zinc-800">
-			<CardHeader>
-				<CardTitle className="text-zinc-200">Agent Time Usage</CardTitle>
-			</CardHeader>
-			<CardContent className="space-y-6">
-				<div className="space-y-4">
-					<div className="relative h-4 w-full bg-zinc-800 overflow-hidden rounded-full">
-						<div
-							className="absolute top-0 left-0 h-full bg-blue-500"
-							style={{ width: `${percentageUsed}%` }}
-						/>
-						{percentageOverage > 0 && (
-							<div
-								className="absolute top-0 right-0 h-full bg-rose-500"
-								style={{ width: `${percentageOverage}%` }}
-							/>
-						)}
-					</div>
-					<div className="flex justify-between text-sm text-zinc-400">
-						<span>0 min</span>
-						<span className="font-semibold text-zinc-300">
-							{proPlanLimit} min
-						</span>
-						<span>{usageMinutes} min</span>
-					</div>
-					<div className="space-y-2">
-						<p className="text-sm text-zinc-200">
-							<span className="font-semibold">{usageMinutes} minutes</span> used
-						</p>
-						<p className="text-sm text-zinc-400">
-							{proPlanLimit} minutes included with Pro plan
-						</p>
-						{usageMinutes > proPlanLimit && (
-							<Alert className="mt-4 bg-rose-500/10 border-rose-500/20">
-								<AlertDescription className="text-rose-200">
-									{usageMinutes - proPlanLimit} minutes over Pro plan limit.
-									Additional minutes will be billed at the standard rate.
-								</AlertDescription>
-							</Alert>
-						)}
-					</div>
-				</div>
-			</CardContent>
-		</Card>
-	);
+	const UsageDisplay = () => {
+		// Usage data
+		const includedMinutes = 120;
+		const warningThreshold = 0.8;
+		const usageMinutes = 125;
+
+		return (
+			<AgentTimeUsage
+				usedMinutes={usageMinutes}
+				includedMinutes={includedMinutes}
+				warningThreshold={warningThreshold}
+			/>
+		);
+	};
 
 	return (
 		<div className="space-y-6 p-6 bg-black min-h-screen">
 			{/* Usage Display */}
-			<UsageDisplay />
+			<Card className="bg-zinc-950 border-zinc-800">
+				<UsageDisplay />
+			</Card>
 
 			{/* Team Name Section */}
 			<Card className="bg-zinc-950 border-zinc-800">

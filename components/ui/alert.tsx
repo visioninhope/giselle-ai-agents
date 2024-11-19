@@ -11,6 +11,8 @@ const alertVariants = cva(
 				default: "bg-background text-foreground",
 				primary:
 					"border-primary/50 text-primary dark:border-primary [&>svg]:text-primary",
+				warning:
+					"border-warning/50 text-warning dark:border-warning [&>svg]:text-warning",
 				destructive:
 					"border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
 			},
@@ -58,4 +60,4 @@ const AlertDescription = React.forwardRef<
 ));
 AlertDescription.displayName = "AlertDescription";
 
-export { Alert, AlertTitle, AlertDescription };
+export { Alert, AlertDescription, AlertTitle };
