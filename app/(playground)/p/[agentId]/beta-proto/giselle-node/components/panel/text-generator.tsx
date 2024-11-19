@@ -65,7 +65,7 @@ export const TextGeneratorPropertyPanel: FC<
 					<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
 				</button>
 				<div className="gap-[16px] flex items-center">
-					{playgroundV2Flag && <TabTrigger value="prompt">Ptompt</TabTrigger>}
+					{playgroundV2Flag && <TabTrigger value="prompt">Prompt</TabTrigger>}
 					<TabTrigger value="property">Property</TabTrigger>
 					<TabTrigger value="result">Result</TabTrigger>
 				</div>
