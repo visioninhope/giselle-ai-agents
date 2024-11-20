@@ -1,8 +1,19 @@
 import pino from "pino";
 
-export const logger = pino({
+const baseConfig = {
 	level: process.env.LOGLEVEL || "info",
-	transport: {
-		target: "pino-pretty",
-	},
-});
+};
+
+export const logger = (() => {
+	if (process.env.NODE_ENV === "development") {
+		// enable pretty logging only in development
+		return pino({
+			...baseConfig,
+			transport: {
+				target: "pino-pretty",
+			},
+		});
+	}
+
+	return pino(baseConfig);
+})();
