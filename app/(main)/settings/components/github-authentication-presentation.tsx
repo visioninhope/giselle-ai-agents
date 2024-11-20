@@ -7,16 +7,16 @@ import Link from "next/link";
 
 type GitHubUser = Awaited<ReturnType<GitHubUserClient["getUser"]>>;
 
-type GitHubAuthentcationPresentationProps = {
+type GitHubAuthenticationPresentationProps = {
 	gitHubUser?: GitHubUser;
 	button?: () => React.ReactNode;
 	alert?: string;
 };
-export function GitHubAuthentcationPresentation({
+export function GitHubAuthenticationPresentation({
 	gitHubUser,
 	button,
 	alert,
-}: GitHubAuthentcationPresentationProps) {
+}: GitHubAuthenticationPresentationProps) {
 	return (
 		<div className="grid gap-4 bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
 			{alert && (

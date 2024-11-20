@@ -10,16 +10,16 @@ import Link from "next/link";
 
 type GoogleUser = Awaited<GoogleUserData>;
 
-type GoogleAuthentcationPresentationProps = {
+type GoogleAuthenticationPresentationProps = {
 	googleUser?: GoogleUser;
 	button?: () => React.ReactNode;
 	alert?: string;
 };
-export function GoogleAuthentcationPresentation({
+export function GoogleAuthenticationPresentation({
 	googleUser,
 	button,
 	alert,
-}: GoogleAuthentcationPresentationProps) {
+}: GoogleAuthenticationPresentationProps) {
 	return (
 		<div className="grid gap-4 bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
 			{alert && (

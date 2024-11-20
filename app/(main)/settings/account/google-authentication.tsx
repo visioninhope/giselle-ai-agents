@@ -1,7 +1,7 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/supabase";
-import { GoogleAuthentcationPresentation } from "../components/google-authentication-presentation";
+import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
 import { GoogleConnectionButton } from "../components/google-connection-button";
 
 import {
@@ -20,7 +20,7 @@ export async function GoogleAuthentication() {
 	const credential = await getOauthCredential("google");
 
 	if (!credential) {
-		return <GoogleAuthentcationPresentation button={GoogleConnectButton} />;
+		return <GoogleAuthenticationPresentation button={GoogleConnectButton} />;
 	}
 	logger.debug({ credential }, "google credential");
 
@@ -32,7 +32,7 @@ export async function GoogleAuthentication() {
 			supabaseUser.identities && supabaseUser.identities.length > 1;
 		logger.debug({ googleUser }, "google user");
 		return (
-			<GoogleAuthentcationPresentation
+			<GoogleAuthenticationPresentation
 				googleUser={googleUser}
 				button={unlinkable ? GoogleDisconnectButton : undefined}
 			/>
@@ -40,7 +40,7 @@ export async function GoogleAuthentication() {
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return (
-				<GoogleAuthentcationPresentation
+				<GoogleAuthenticationPresentation
 					button={GoogleReconnectButton}
 					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
 				/>

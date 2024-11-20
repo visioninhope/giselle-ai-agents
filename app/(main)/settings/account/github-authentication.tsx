@@ -5,7 +5,7 @@ import {
 	needsAuthorization,
 } from "@/services/external/github";
 import { TriangleAlert } from "lucide-react";
-import { GitHubAuthentcationPresentation } from "../components/github-authentication-presentation";
+import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
 import { GitHubConnectionButton } from "../components/github-connection-button";
 import {
 	connectGitHubIdentity,
@@ -16,7 +16,7 @@ import {
 export async function GitHubAuthentication() {
 	const credential = await getOauthCredential("github");
 	if (!credential) {
-		return <GitHubAuthentcationPresentation button={GitHubConnectButton} />;
+		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
 
 	const gitHubClient = buildGitHubUserClient(credential);
@@ -27,7 +27,7 @@ export async function GitHubAuthentication() {
 			supabaseUser.identities && supabaseUser.identities.length > 1;
 
 		return (
-			<GitHubAuthentcationPresentation
+			<GitHubAuthenticationPresentation
 				gitHubUser={gitHubUser}
 				button={unlinkable ? GitHubDisconnectButton : undefined}
 			/>
@@ -35,7 +35,7 @@ export async function GitHubAuthentication() {
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return (
-				<GitHubAuthentcationPresentation
+				<GitHubAuthenticationPresentation
 					button={GitHubReconnectButton}
 					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
 				/>
