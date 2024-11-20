@@ -12,6 +12,7 @@ const baseConfig = {
 			"credential.accessToken",
 			"credential.refreshToken",
 			"credential.providerAccountId",
+			"cookies",
 		],
 		censor: partialCensor,
 	},

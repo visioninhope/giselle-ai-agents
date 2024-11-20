@@ -10,14 +10,18 @@ import {
 } from "@/services/external/google";
 
 import { TriangleAlert } from "lucide-react";
-import { disconnectGoogleIdentity, reconnectGoogleIdentity } from "./actions";
+import {
+	connectGoogleIdentity,
+	disconnectGoogleIdentity,
+	reconnectGoogleIdentity,
+} from "./actions";
 
 export async function GoogleAuthentication() {
 	const credential = await getOauthCredential("google");
 	logger.debug({ credential }, "google credential");
 
 	if (!credential) {
-		return <>{/*·todo·connectbutton·"connect·to·google"·*/}</>;
+		return <GoogleAuthentcationPresentation button={GoogleConnectButton} />;
 	}
 
 	const googleClient = buildGoogleUserClient(credential);
@@ -35,10 +39,23 @@ export async function GoogleAuthentication() {
 		);
 	} catch (error) {
 		if (needsAuthorization(error)) {
-			return <GoogleAuthentcationPresentation button={GoogleReconnectButton} />;
+			return (
+				<GoogleAuthentcationPresentation
+					button={GoogleReconnectButton}
+					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
+				/>
+			);
 		}
 		throw error;
 	}
+}
+
+function GoogleConnectButton() {
+	return (
+		<GoogleConnectionButton action={connectGoogleIdentity}>
+			Connect
+		</GoogleConnectionButton>
+	);
 }
 
 function GoogleReconnectButton() {

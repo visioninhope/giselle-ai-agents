@@ -144,7 +144,11 @@ class GoogleUserClient {
 	}
 
 	private async buildClient() {
-		const client = new google.auth.OAuth2(this.clientId, this.clientSecret);
+		const client = new google.auth.OAuth2(
+			this.clientId,
+			this.clientSecret,
+			"http://localhost:3000",
+		);
 
 		client.setCredentials({
 			access_token: this.token.accessToken,
