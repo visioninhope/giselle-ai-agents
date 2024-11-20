@@ -1,5 +1,6 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
+import { getUser } from "@/lib/supabase";
 import { GoogleAuthentcationPresentation } from "../components/google-authentication-presentation";
 import { GoogleConnectionButton } from "../components/google-connection-button";
 
@@ -9,7 +10,7 @@ import {
 } from "@/services/external/google";
 
 import { TriangleAlert } from "lucide-react";
-import { reconnectGoogleIdentity } from "./actions";
+import { disconnectGoogleIdentity, reconnectGoogleIdentity } from "./actions";
 
 export async function GoogleAuthentication() {
 	const credential = await getOauthCredential("google");
@@ -22,8 +23,16 @@ export async function GoogleAuthentication() {
 	const googleClient = buildGoogleUserClient(credential);
 	try {
 		const googleUser = await googleClient.getUser();
+		const supabaseUser = await getUser();
+		const unlinkable =
+			supabaseUser.identities && supabaseUser.identities.length > 1;
 		logger.debug({ googleUser }, "google user");
-		return <GoogleAuthentcationPresentation />;
+		return (
+			<GoogleAuthentcationPresentation
+				googleUser={googleUser}
+				button={unlinkable ? GoogleDisconnectButton : undefined}
+			/>
+		);
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return <GoogleAuthentcationPresentation button={GoogleReconnectButton} />;
@@ -42,5 +51,16 @@ function GoogleReconnectButton() {
 				<TriangleAlert /> Reconnect
 			</GoogleConnectionButton>
 		</div>
+	);
+}
+
+function GoogleDisconnectButton() {
+	return (
+		<GoogleConnectionButton
+			action={disconnectGoogleIdentity}
+			className="text-red-500"
+		>
+			Disconnect
+		</GoogleConnectionButton>
 	);
 }

@@ -1,14 +1,22 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
+import type {
+	GoogleUserClient,
+	GoogleUserData,
+} from "@/services/external/google";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 
+type GoogleUser = Awaited<GoogleUserData>;
+
 type GoogleAuthentcationPresentationProps = {
+	googleUser?: GoogleUser;
 	button?: () => React.ReactNode;
 	alert?: string;
 };
 export function GoogleAuthentcationPresentation({
+	googleUser,
 	button,
 	alert,
 }: GoogleAuthentcationPresentationProps) {
@@ -26,6 +34,12 @@ export function GoogleAuthentcationPresentation({
 					<SiGoogle className="h-[20px] w-[20px]" />
 					<div className="flex flex-col">
 						<div>Google</div>
+
+						{googleUser && (
+							<div className="text-black-70 text-[12px]">
+								{googleUser.name} ({googleUser.email})
+							</div>
+						)}
 					</div>
 				</div>
 				{button?.()}

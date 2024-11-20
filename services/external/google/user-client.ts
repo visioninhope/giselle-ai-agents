@@ -65,6 +65,11 @@ export function needsAuthorization(error: unknown) {
 	return false;
 }
 
+export type GoogleUserData = {
+	name: string;
+	email: string;
+};
+
 class GoogleUserClient {
 	private clientId: string;
 	private clientSecret: string;
@@ -81,7 +86,7 @@ class GoogleUserClient {
 		this.logger = logger;
 	}
 
-	async getUser() {
+	async getUser(): Promise<GoogleUserData> {
 		try {
 			logger.debug({ clientId: this.clientId }, "this.clientId");
 			const authClient = await this.buildClient();
@@ -119,7 +124,10 @@ class GoogleUserClient {
 			};
 
 			logger.debug({ user_data }, "Processed user data");
-			return user_data;
+			return {
+				name: `${user_data.first_name} ${user_data.last_name}`,
+				email: user_data.email,
+			} as GoogleUserData;
 		} catch (error) {
 			logger.error(
 				{

@@ -95,3 +95,26 @@ export async function reconnectGoogleIdentity() {
 		redirect(data.url);
 	}
 }
+
+export async function disconnectGoogleIdentity() {
+	const supabaseUser = await getUser();
+	const supabase = await createClient();
+	if (!supabaseUser.identities) {
+		throw new Error("No identities");
+	}
+	if (supabaseUser.identities.length === 1) {
+		throw new Error("Cannot unlink last identity");
+	}
+	const googleIdentity = supabaseUser.identities.find(
+		(it) => it.provider === "google",
+	);
+	if (!googleIdentity) {
+		throw new Error("No google identity");
+	}
+	const { error } = await supabase.auth.unlinkIdentity(googleIdentity);
+	if (error) {
+		throw new Error("Failed to unlink identity", { cause: error });
+	}
+
+	await deleteOauthCredential("google");
+}
