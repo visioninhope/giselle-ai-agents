@@ -1,6 +1,7 @@
 type NodeId = `nd_${string}`;
 interface NodeBase {
 	id: NodeId;
+	name: string;
 	type: string;
 	position: Position;
 }
@@ -17,7 +18,7 @@ interface Action extends NodeBase {
 interface ActionContentBase {
 	type: string;
 }
-interface TextGeneration extends ActionContentBase {
+interface TextGenerateActionContent extends ActionContentBase {
 	type: "textGeneration";
 	llm: string;
 	temperature: number;
@@ -26,10 +27,16 @@ interface TextGeneration extends ActionContentBase {
 	requirement: NodeHandle;
 	sources: NodeHandle[];
 }
-interface WebSearch extends ActionContentBase {
+export interface TextGeneration extends Action {
+	content: TextGenerateActionContent;
+}
+interface WebSearchActionContent extends ActionContentBase {
 	type: "webSearch";
 }
-type ActionContent = TextGeneration | WebSearch;
+export interface WebSearchAction extends Action {
+	content: WebSearchActionContent;
+}
+type ActionContent = TextGenerateActionContent | WebSearchActionContent;
 
 interface Variable extends NodeBase {
 	type: "variable";
