@@ -1,9 +1,9 @@
 # giselle
 
-As of November 13, 2024  5:03am. 875 total
+As of November 20, 2024  9:28am. 885 total
 
 ## Summary
-* 641 MIT
+* 651 MIT
 * 119 Apache 2.0
 * 61 ISC
 * 23 New BSD
@@ -4035,7 +4035,7 @@ Retrying made simple, easy and async
 Minimal async jobs utility library, with streams support
 
 <a name="atomic-sleep"></a>
-### <a href="https://github.com/davidmarkclements/atomic-sleep#readme">atomic-sleep</a> v1.0.0 (dependencies)
+### <a href="https://github.com/davidmarkclements/atomic-sleep#readme">atomic-sleep</a> v1.0.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -4628,6 +4628,17 @@ A list of color names and its values
 
 Parser and generator for CSS color strings
 
+<a name="colorette"></a>
+### colorette v2.0.20 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+🌈Easily set your terminal text color & styles.
+
 <a name="combined-stream"></a>
 ### <a href="https://github.com/felixge/node-combined-stream">combined-stream</a> v1.0.8 (dependencies)
 #### 
@@ -4859,6 +4870,17 @@ Animated transitions for D3 selections.
 
 Pan and zoom SVG, HTML or Canvas using mouse or touch input.
 
+<a name="dateformat"></a>
+### <a href="https://github.com/felixge/node-dateformat">dateformat</a> v4.6.3 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A node.js package for Steven Levithan's excellent dateFormat() function.
+
 <a name="debug"></a>
 ### debug v4.3.6 (dependencies, devDependencies)
 #### 
@@ -5056,6 +5078,17 @@ A regular expression to match all Emoji-only symbols as per the Unicode Standard
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 A regular expression to match all Emoji-only symbols as per the Unicode Standard.
+
+<a name="end-of-stream"></a>
+### <a href="https://github.com/mafintosh/end-of-stream">end-of-stream</a> v1.4.4 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Call a callback when a readable/writable/duplex stream has completed or failed.
 
 <a name="enhanced-resolve"></a>
 ### <a href="http://github.com/webpack/enhanced-resolve">enhanced-resolve</a> v5.17.1 (dependencies)
@@ -5299,6 +5332,17 @@ Port of jQuery.extend for node.js and the browser
 
 Edit a string with the users preferred text editor using $VISUAL or $ENVIRONMENT
 
+<a name="fast-copy"></a>
+### <a href="https://github.com/planttheidea/fast-copy#readme">fast-copy</a> v3.0.2 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A blazing fast deep object copier
+
 <a name="fast-deep-equal"></a>
 ### <a href="https://github.com/epoberezkin/fast-deep-equal#readme">fast-deep-equal</a> v3.1.3 (dependencies)
 #### 
@@ -5342,6 +5386,17 @@ deterministic `JSON.stringify()` - a faster version of substack's json-stable-st
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 very fast object redaction
+
+<a name="fast-safe-stringify"></a>
+### <a href="https://github.com/davidmarkclements/fast-safe-stringify#readme">fast-safe-stringify</a> v2.1.1 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Safely and quickly serialize JavaScript objects
 
 <a name="fastq"></a>
 ### <a href="https://github.com/mcollina/fastq#readme">fastq</a> v1.17.1 (dependencies, devDependencies)
@@ -5727,6 +5782,17 @@ hast utility to serialize to HTML
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 hast utility to check if a node is inter-element whitespace
+
+<a name="help-me"></a>
+### <a href="https://github.com/mcollina/help-me">help-me</a> v5.0.0 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Help command for node, partner of minimist and commist
 
 <a name="hoist-non-react-statics"></a>
 ### hoist-non-react-statics v3.3.2 (dependencies)
@@ -6134,6 +6200,17 @@ JWA, JWS, JWE, JWT, JWK, JWKS for Node.js, Browser, Cloudflare Workers, Deno, Bu
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 JWA, JWS, JWE, JWT, JWK, JWKS for Node.js, Browser, Cloudflare Workers, Deno, Bun, and other Web-interoperable runtimes
+
+<a name="joycon"></a>
+### joycon v3.1.1 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Load config with ease.
 
 <a name="js-tokens"></a>
 ### js-tokens v4.0.0 (dependencies)
@@ -6873,7 +6950,7 @@ a glob matcher in javascript
 a glob matcher in javascript
 
 <a name="minimist"></a>
-### <a href="https://github.com/minimistjs/minimist">minimist</a> v1.2.8 (dependencies)
+### <a href="https://github.com/minimistjs/minimist">minimist</a> v1.2.8 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -7137,7 +7214,7 @@ string representations of objects in node and the browser
 
 
 <a name="on-exit-leak-free"></a>
-### <a href="https://github.com/mcollina/on-exit-or-gc#readme">on-exit-leak-free</a> v2.1.2 (dependencies)
+### <a href="https://github.com/mcollina/on-exit-or-gc#readme">on-exit-leak-free</a> v2.1.2 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -7148,7 +7225,7 @@ string representations of objects in node and the browser
 Execute a function on exit without leaking memory, allowing all objects to be garbage collected
 
 <a name="once"></a>
-### once v1.4.0 (dependencies)
+### once v1.4.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -7423,7 +7500,7 @@ Promisify a callback-style function
 super fast, all natural json logger
 
 <a name="pino-abstract-transport"></a>
-### <a href="https://github.com/pinojs/pino-abstract-transport#readme">pino-abstract-transport</a> v2.0.0 (dependencies)
+### <a href="https://github.com/pinojs/pino-abstract-transport#readme">pino-abstract-transport</a> v2.0.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -7432,6 +7509,17 @@ super fast, all natural json logger
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Write Pino transports easily
+
+<a name="pino-pretty"></a>
+### <a href="https://github.com/pinojs/pino-pretty#readme">pino-pretty</a> v13.0.0 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Prettifier for Pino log lines
 
 <a name="pino-std-serializers"></a>
 ### <a href="https://github.com/pinojs/pino-std-serializers#readme">pino-std-serializers</a> v7.0.0 (dependencies)
@@ -7762,6 +7850,17 @@ Protocol Buffers for JavaScript (& TypeScript).
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Offers getProxyForUrl to get the proxy URL for a URL, respecting the *_PROXY (e.g. HTTP_PROXY) and NO_PROXY environment variables.
+
+<a name="pump"></a>
+### pump v3.0.2 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+pipe streams together and close all of them if one of them closes
 
 <a name="punycode"></a>
 ### <a href="https://mths.be/punycode">punycode</a> v2.3.1 (dependencies)
@@ -8204,7 +8303,7 @@ Cooperative scheduler for the browser environment.
 webpack Validation Utils
 
 <a name="secure-json-parse"></a>
-### <a href="https://github.com/fastify/secure-json-parse#readme">secure-json-parse</a> v2.7.0 (dependencies)
+### <a href="https://github.com/fastify/secure-json-parse#readme">secure-json-parse</a> v2.7.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8369,7 +8468,7 @@ Simply swizzle your arguments
 ANSI escape codes for some terminal swag
 
 <a name="sonic-boom"></a>
-### <a href="https://github.com/pinojs/sonic-boom#readme">sonic-boom</a> v4.2.0 (dependencies)
+### <a href="https://github.com/pinojs/sonic-boom#readme">sonic-boom</a> v4.2.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8435,7 +8534,7 @@ Fixes stack traces for files with source maps
 Parse and stringify space separated tokens
 
 <a name="split2"></a>
-### split2 v4.2.0 (dependencies)
+### split2 v4.2.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8576,6 +8675,17 @@ Strip ANSI escape codes from a string
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Strip ANSI escape codes from a string
+
+<a name="strip-json-comments"></a>
+### strip-json-comments v3.1.1 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Strip comments from JSON. Lets you use comments in your JSON files!
 
 <a name="stripe"></a>
 ### <a href="https://github.com/stripe/stripe-node">stripe</a> v16.10.0 (dependencies)
@@ -9447,7 +9557,7 @@ Wordwrap a string with ANSI escape codes
 Wordwrap a string with ANSI escape codes
 
 <a name="wrappy"></a>
-### <a href="https://github.com/npm/wrappy">wrappy</a> v1.0.2 (dependencies)
+### <a href="https://github.com/npm/wrappy">wrappy</a> v1.0.2 (dependencies, devDependencies)
 #### 
 
 ##### Paths
