@@ -2,17 +2,22 @@ import pino from "pino";
 
 const partialCensor = (value: string) => {
 	if (!value || typeof value !== "string") return value;
-	return `${value.slice(0, 5)}***`;
+	return `${value.slice(0, 3)}***`;
 };
 
 const baseConfig = {
 	level: process.env.LOGLEVEL || "info",
 	redact: {
 		paths: [
+			"code",
 			"credential.accessToken",
 			"credential.refreshToken",
-			"credential.providerAccountId",
-			"cookies",
+			"data.email",
+			"data.name",
+			"data.given_name",
+			"data.family_name",
+			"googleUser.name",
+			"googleUser.email",
 		],
 		censor: partialCensor,
 	},

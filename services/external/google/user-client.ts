@@ -88,7 +88,6 @@ class GoogleUserClient {
 
 	async getUser(): Promise<GoogleUserData> {
 		try {
-			logger.debug({ clientId: this.clientId }, "this.clientId");
 			const authClient = await this.buildClient();
 			logger.debug(
 				{
@@ -102,18 +101,6 @@ class GoogleUserClient {
 				version: "v2",
 				auth: authClient,
 			});
-			logger.debug("oauth2 built");
-			logger.debug(
-				{
-					userinfo: {
-						methods: Object.getOwnPropertyNames(oauth2.userinfo),
-						prototype: Object.getOwnPropertyNames(
-							Object.getPrototypeOf(oauth2.userinfo),
-						),
-					},
-				},
-				"Detailed userinfo methods",
-			);
 			const { data } = await oauth2.userinfo.get();
 			logger.debug({ data }, "userinfo.get() response");
 
@@ -123,7 +110,6 @@ class GoogleUserClient {
 				email: data.email,
 			};
 
-			logger.debug({ user_data }, "Processed user data");
 			return {
 				name: `${user_data.first_name} ${user_data.last_name}`,
 				email: user_data.email,
@@ -149,13 +135,14 @@ class GoogleUserClient {
 			this.clientSecret,
 			"http://localhost:3000",
 		);
+		logger.debug("OAuth client initialized");
 
 		client.setCredentials({
 			access_token: this.token.accessToken,
 			refresh_token: this.token.refreshToken ?? undefined,
 		});
+		logger.debug("credentials set to OAuth client");
 
-		logger.debug("auth client built");
 		return client;
 	}
 }

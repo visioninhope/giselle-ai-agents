@@ -11,12 +11,11 @@ export async function GET(request: Request) {
 	const { searchParams, origin } = new URL(request.url);
 	logger.debug(
 		{
-			allParams: Object.fromEntries(searchParams),
-			cookies: request.headers.get("cookie"),
-			referrer: request.headers.get("referer"),
-			request: request.url,
+			searchParams,
+			origin,
+			url: request.url,
 		},
-		"info",
+		"'searchParams' and 'origin' got from request",
 	);
 	const errorMessage = checkError(searchParams);
 	if (errorMessage) {
@@ -47,7 +46,7 @@ export async function GET(request: Request) {
 			provider: data.session.user.app_metadata.provider,
 			providers: data.session.user.app_metadata.providers,
 		},
-		"session data got from supabase data",
+		"session data got from Supabase",
 	);
 	try {
 		const { user, session } = data;
@@ -110,7 +109,7 @@ async function storeProviderTokens(user: User, session: Session) {
 		throw new Error("No provider found");
 	}
 
-	logger.debug({ provider }, `use ${provider} as OAuth provider`);
+	logger.debug(`provider: '${provider}'`);
 
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;

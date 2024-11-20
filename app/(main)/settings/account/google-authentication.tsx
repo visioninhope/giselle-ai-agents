@@ -18,11 +18,11 @@ import {
 
 export async function GoogleAuthentication() {
 	const credential = await getOauthCredential("google");
-	logger.debug({ credential }, "google credential");
 
 	if (!credential) {
 		return <GoogleAuthentcationPresentation button={GoogleConnectButton} />;
 	}
+	logger.debug({ credential }, "google credential");
 
 	const googleClient = buildGoogleUserClient(credential);
 	try {
