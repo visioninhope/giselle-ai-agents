@@ -1,6 +1,7 @@
 "use server";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { langfuseModel } from "@/lib/llm";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { metrics } from "@opentelemetry/api";
@@ -69,7 +70,7 @@ ${sourcesToText(sources)}
 		const model = "gpt-4o-mini";
 		const generation = trace.generation({
 			input: inputs.userPrompt,
-			model,
+			model: langfuseModel(model),
 		});
 		const { partialObjectStream, object } = await streamObject({
 			model: openai(model),

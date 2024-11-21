@@ -5,6 +5,7 @@ import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { langfuseModel } from "@/lib/llm";
 import { logger } from "@/lib/logger";
 import { metrics } from "@opentelemetry/api";
 import { waitUntil } from "@vercel/functions";
@@ -54,7 +55,7 @@ ${sourcesToText(sources)}
 		const model = buildLanguageModel(params.modelConfiguration);
 		const generation = trace.generation({
 			input: params.userPrompt,
-			model: params.modelConfiguration.modelId,
+			model: langfuseModel(params.modelConfiguration.modelId),
 			modelParameters: {
 				topP: params.modelConfiguration.topP,
 				temperature: params.modelConfiguration.temperature,
