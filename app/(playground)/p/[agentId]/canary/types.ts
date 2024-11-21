@@ -63,7 +63,7 @@ export interface File extends Variable {
 	content: FileContent;
 }
 
-type NodeHandleId = `ndr_${string}`;
+type NodeHandleId = `ndh_${string}`;
 interface NodeHandle {
 	id: NodeHandleId;
 	label: string;
@@ -73,9 +73,11 @@ export type Node = Action | Variable;
 
 export interface Connection {
 	sourceNodeId: NodeId;
-	sourceNodeHandleId: NodeHandleId;
+	sourceNodeHandleId?: NodeHandleId;
+	sourceNodeType: Node["type"];
 	targetNodeId: NodeId;
-	targetNodeHandleId: NodeHandleId;
+	targetNodeHandleId?: NodeHandleId;
+	targetNodeType: Node["type"];
 }
 
 export interface Graph {

@@ -8,6 +8,7 @@ import {
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
+import { Edge } from "./edge";
 import { Node } from "./node";
 
 export function Editor() {
@@ -20,9 +21,12 @@ export function Editor() {
 const nodeTypes = {
 	giselleNode: Node,
 };
+const edgeTypes = {
+	giselleEdge: Edge,
+};
 const defaultNodes: Node[] = [
 	{
-		id: "1",
+		id: "nd_123",
 		position: { x: 120, y: 200 },
 		type: "giselleNode",
 		data: {
@@ -37,14 +41,14 @@ const defaultNodes: Node[] = [
 					temperature: 0.7,
 					topP: 1,
 					instruction: "Write a short story about a cat",
-					requirement: { id: "ndr_123", label: "Requirement" },
+					requirement: { id: "ndh_123", label: "Requirement" },
 					sources: [],
 				},
 			},
 		},
 	},
 	{
-		id: "2",
+		id: "nd_456",
 		position: { x: 320, y: 200 },
 		type: "giselleNode",
 		data: {
@@ -59,10 +63,10 @@ const defaultNodes: Node[] = [
 					temperature: 0.7,
 					topP: 1,
 					instruction: "Write a short story about a cat",
-					requirement: { id: "ndr_123", label: "Requirement" },
+					requirement: { id: "ndh_456", label: "Requirement" },
 					sources: [
 						{
-							id: "ndr_456",
+							id: "ndh_789",
 							label: "Source1",
 						},
 					],
@@ -71,7 +75,7 @@ const defaultNodes: Node[] = [
 		},
 	},
 	{
-		id: "3",
+		id: "nd_789",
 		position: { x: 220, y: 400 },
 		type: "giselleNode",
 		data: {
@@ -87,13 +91,66 @@ const defaultNodes: Node[] = [
 		},
 	},
 ];
+
+const defaultEdges: Edge[] = [
+	{
+		id: "ed_123",
+		source: "nd_789",
+		target: "nd_123",
+		targetHandle: "ndh_123",
+		type: "giselleEdge",
+		data: {
+			connection: {
+				sourceNodeId: "nd_789",
+				sourceNodeType: "variable",
+				targetNodeId: "nd_123",
+				targetNodeHandleId: "ndh_123",
+				targetNodeType: "action",
+			},
+		},
+	},
+	{
+		id: "ed_456",
+		source: "nd_789",
+		target: "nd_456",
+		targetHandle: "ndh_456",
+		type: "giselleEdge",
+		data: {
+			connection: {
+				sourceNodeId: "nd_789",
+				sourceNodeType: "variable",
+				targetNodeId: "nd_456",
+				targetNodeHandleId: "ndh_456",
+				targetNodeType: "action",
+			},
+		},
+	},
+	{
+		id: "ed_789",
+		source: "nd_123",
+		target: "nd_456",
+		targetHandle: "ndh_789",
+		type: "giselleEdge",
+		data: {
+			connection: {
+				sourceNodeId: "nd_123",
+				sourceNodeType: "action",
+				targetNodeId: "nd_456",
+				targetNodeHandleId: "ndh_789",
+				targetNodeType: "action",
+			},
+		},
+	},
+];
 function EditorInner() {
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow
 				colorMode="dark"
 				defaultNodes={defaultNodes}
+				defaultEdges={defaultEdges}
 				nodeTypes={nodeTypes}
+				edgeTypes={edgeTypes}
 			>
 				<Background
 					className="!bg-black-100"
