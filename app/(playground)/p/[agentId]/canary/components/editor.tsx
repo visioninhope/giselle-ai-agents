@@ -76,7 +76,7 @@ function EditorInner(props: EditorInnerProps) {
 	const { selectNode } = useGraphSelection();
 	return (
 		<div className="w-full h-screen">
-			<ReactFlow
+			<ReactFlow<Node, Edge>
 				colorMode="dark"
 				defaultNodes={defaultNodes}
 				defaultEdges={defaultEdges}
@@ -86,6 +86,16 @@ function EditorInner(props: EditorInnerProps) {
 					nodesChange.map((nodeChange) => {
 						if (nodeChange.type === "select") {
 							selectNode(nodeChange.id as NodeId, nodeChange.selected);
+						}
+						if (nodeChange.type === "remove") {
+							console.log(nodeChange);
+						}
+					});
+				}}
+				onEdgesChange={(edgesChange) => {
+					edgesChange.map((edgeChange) => {
+						if (edgeChange.type === "remove") {
+							console.log(edgeChange);
 						}
 					});
 				}}
