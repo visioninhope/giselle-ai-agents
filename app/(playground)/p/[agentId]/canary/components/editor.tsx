@@ -8,8 +8,6 @@ import {
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { TextGenerationNode } from "../text-generation/node";
-import { TextNode } from "../text/node";
 import { Node } from "./node";
 
 export function Editor() {
@@ -20,8 +18,6 @@ export function Editor() {
 	);
 }
 const nodeTypes = {
-	textGeneration: TextGenerationNode,
-	text: TextNode,
 	giselleNode: Node,
 };
 const defaultNodes = [
