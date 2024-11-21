@@ -9,6 +9,7 @@ import {
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { TextGenerationNode } from "../text-generation/node";
+import { TextNode } from "../text/node";
 
 export function Editor() {
 	return (
@@ -19,6 +20,7 @@ export function Editor() {
 }
 const nodeTypes = {
 	textGeneration: TextGenerationNode,
+	text: TextNode,
 };
 const defaultNodes = [
 	{
@@ -37,12 +39,26 @@ const defaultNodes = [
 	},
 	{
 		id: "2",
-		position: { x: 220, y: 200 },
+		position: { x: 320, y: 200 },
 		type: "textGeneration",
 		data: {
 			node: {
 				name: "Untitled Node - 2",
 				type: "action",
+				content: {
+					type: "textGeneration",
+				},
+			},
+		},
+	},
+	{
+		id: "3",
+		position: { x: 220, y: 200 },
+		type: "text",
+		data: {
+			node: {
+				name: "Untitled Node - 3",
+				type: "variable",
 				content: {
 					type: "textGeneration",
 				},

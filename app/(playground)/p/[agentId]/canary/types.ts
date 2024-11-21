@@ -47,14 +47,21 @@ interface VariableContentBase {
 	type: string;
 }
 
-interface Text extends VariableContentBase {
+interface TextContent extends VariableContentBase {
 	type: "text";
 }
-interface File extends VariableContentBase {
+interface FileContent extends VariableContentBase {
 	type: "file";
 }
 
-type VariableContent = Text | File;
+type VariableContent = TextContent | FileContent;
+
+export interface Text extends Variable {
+	content: TextContent;
+}
+export interface File extends Variable {
+	content: FileContent;
+}
 
 type NodeHandleId = `ndr_${string}`;
 interface NodeHandle {
