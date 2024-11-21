@@ -1,7 +1,7 @@
 "use server";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
-import { langfuseModel } from "@/lib/llm"
+import { langfuseModel } from "@/lib/llm";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { metrics } from "@opentelemetry/api";
