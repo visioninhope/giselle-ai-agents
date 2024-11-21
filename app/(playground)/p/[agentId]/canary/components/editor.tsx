@@ -10,6 +10,7 @@ import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { TextGenerationNode } from "../text-generation/node";
 import { TextNode } from "../text/node";
+import { Node } from "./node";
 
 export function Editor() {
 	return (
@@ -21,12 +22,13 @@ export function Editor() {
 const nodeTypes = {
 	textGeneration: TextGenerationNode,
 	text: TextNode,
+	giselleNode: Node,
 };
 const defaultNodes = [
 	{
 		id: "1",
 		position: { x: 120, y: 200 },
-		type: "textGeneration",
+		type: "giselleNode",
 		data: {
 			node: {
 				name: "Untitled Node - 1",
@@ -40,7 +42,7 @@ const defaultNodes = [
 	{
 		id: "2",
 		position: { x: 320, y: 200 },
-		type: "textGeneration",
+		type: "giselleNode",
 		data: {
 			node: {
 				name: "Untitled Node - 2",
@@ -54,13 +56,13 @@ const defaultNodes = [
 	{
 		id: "3",
 		position: { x: 220, y: 200 },
-		type: "text",
+		type: "giselleNode",
 		data: {
 			node: {
 				name: "Untitled Node - 3",
 				type: "variable",
 				content: {
-					type: "textGeneration",
+					type: "text",
 				},
 			},
 		},
