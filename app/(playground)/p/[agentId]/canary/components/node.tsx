@@ -80,6 +80,9 @@ export function Node({
 				{data.node.content.type === "textGeneration" && (
 					<NodeHeader name="Text Generator" />
 				)}
+				{data.node.content.type === "webSearch" && (
+					<NodeHeader name="Web Search" />
+				)}
 				{data.node.content.type === "text" && <NodeHeader name="Text" />}
 				{data.node.content.type === "file" && <NodeHeader name="File" />}
 			</div>
