@@ -5,7 +5,7 @@ import {
 	type Node as XYFlowNode,
 } from "@xyflow/react";
 import clsx from "clsx/lite";
-import React from "react";
+import React, { useMemo } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
 import type { TextGeneration } from "../types";
 import type { Text } from "../types";
@@ -35,6 +35,15 @@ export function Node({
 	data,
 	preview = false,
 }: NodeProps<Node> & { preview?: boolean }) {
+	const targetHandles = useMemo(() => {
+		if (data.node.content.type === "textGeneration") {
+			return [
+				data.node.content.requirement,
+				...data.node.content.sources,
+			].filter((item) => item !== undefined);
+		}
+		return [];
+	}, [data.node]);
 	return (
 		<div
 			data-type={data.node.type}
@@ -75,29 +84,26 @@ export function Node({
 			<div className="py-[4px] min-h-[30px]">
 				<div className="flex justify-between h-full">
 					<div className="grid">
-						{/* {props.parameters?.object === "objectParameter" &&
-							Object.entries(props.parameters.properties).map(
-								([key, property]) => (
-									<TargetParameter
-										key={key}
-										id={key}
-										label={property.label ?? key}
-										handle={props.parameterPortHandle}
-										category={props.category}
-									/>
-								),
-							)}
-						{props.parameters?.object === "objectParameterBlueprint" &&
-							Object.entries(props.parameters.properties).map(
-								([key, property]) => (
-									<TargetParameter
-										key={key}
-										id={key}
-										label={property.label ?? key}
-										category={props.category}
-									/>
-								),
-							)} */}
+						{targetHandles.map((targetHandle) => (
+							<div
+								className="relative flex items-center h-[28px]"
+								key={targetHandle.id}
+							>
+								<Handle
+									type="target"
+									position={Position.Left}
+									id={targetHandle.id}
+									className={clsx(
+										"!absolute !w-[6px] !h-[12px] !rounded-l-[12px] !rounded-r-none !top-[50%] !-translate-y-[50%] !-left-[10px]",
+										"group-data-[type=action]:!bg-[hsla(187,71%,48%,1)]",
+										"group-data-[type=variable]:!bg-[hsla(236,7%,39%,1)]",
+									)}
+								/>
+								<div className="text-[14px] text-black--30 px-[12px]">
+									{targetHandle.label}
+								</div>
+							</div>
+						))}
 					</div>
 
 					<div className="grid">

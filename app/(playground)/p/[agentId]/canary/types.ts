@@ -24,7 +24,7 @@ interface TextGenerateActionContent extends ActionContentBase {
 	temperature: number;
 	topP: number;
 	instruction: string;
-	requirement: NodeHandle;
+	requirement?: NodeHandle;
 	sources: NodeHandle[];
 }
 export interface TextGeneration extends Action {
@@ -40,7 +40,7 @@ type ActionContent = TextGenerateActionContent | WebSearchActionContent;
 
 interface Variable extends NodeBase {
 	type: "variable";
-	variableContent: VariableContent;
+	content: VariableContent;
 }
 
 interface VariableContentBase {
