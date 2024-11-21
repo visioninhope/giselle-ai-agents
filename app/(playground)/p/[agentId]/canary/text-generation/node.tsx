@@ -1,4 +1,5 @@
 import type { Node, NodeProps } from "@xyflow/react";
+import { Handle, Position } from "@xyflow/react";
 import clsx from "clsx/lite";
 import React from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
@@ -62,8 +63,8 @@ export function TextGenerationNode({
 			</div>
 			<div className="py-[4px] min-h-[30px]">
 				<div className="flex justify-between h-full">
-					{/* <div className="grid">
-						{props.parameters?.object === "objectParameter" &&
+					<div className="grid">
+						{/* {props.parameters?.object === "objectParameter" &&
 							Object.entries(props.parameters.properties).map(
 								([key, property]) => (
 									<TargetParameter
@@ -85,17 +86,31 @@ export function TextGenerationNode({
 										category={props.category}
 									/>
 								),
-							)}
-					</div> */}
+							)} */}
+					</div>
 
 					<div className="grid">
-						{/* <SourceParameter
-							id="result"
-							label={props.resultPortLabel}
-							category={props.category}
-							connections={props.outgoingConnections ?? []}
-							handle={props.resultPortHandle}
-						/> */}
+						<div className="relative flex items-center h-[28px]">
+							<div className="absolute -right-[10px] translate-x-[6px]">
+								<div
+									className={clsx(
+										"h-[28px] w-[10px]",
+										"group-data-[type=action]:bg-[hsla(195,74%,21%,1)]",
+										"group-data-[type=variable]:bg-[hsla(236,7%,39%,1)]",
+									)}
+								/>
+								<Handle
+									type="source"
+									position={Position.Right}
+									className={clsx(
+										"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
+										"group-data-[type=action]:!border-[hsla(195,74%,21%,1)] group-data-[type=action]:data-[state=connected]:!bg-[hsla(187,71%,48%,1)] group-data-[type=action]:hover:!bg-[hsla(187,71%,48%,1)]",
+										"group-data-[type=variable]:!border-[hsla(236,7%,39%,1)] group-data-[type=variable]:data-[state=connected]:!bg-white",
+									)}
+								/>
+							</div>
+							<div className="text-[14px] text-black--30 px-[12px]">Output</div>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -23,11 +23,25 @@ const nodeTypes = {
 const defaultNodes = [
 	{
 		id: "1",
-		position: { x: 0, y: 0 },
+		position: { x: 120, y: 200 },
 		type: "textGeneration",
 		data: {
 			node: {
 				name: "Untitled Node - 1",
+				type: "action",
+				content: {
+					type: "textGeneration",
+				},
+			},
+		},
+	},
+	{
+		id: "2",
+		position: { x: 220, y: 200 },
+		type: "textGeneration",
+		data: {
+			node: {
+				name: "Untitled Node - 2",
 				type: "action",
 				content: {
 					type: "textGeneration",
