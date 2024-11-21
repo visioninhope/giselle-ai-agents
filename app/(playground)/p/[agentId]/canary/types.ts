@@ -86,3 +86,6 @@ export interface Graph {
 	nodes: Node[];
 	connections: Connection[];
 }
+export interface GraphSelection {
+	nodeIds: NodeId[];
+}

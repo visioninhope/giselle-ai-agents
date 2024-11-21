@@ -34,6 +34,7 @@ function NodeHeader({ name }: { name: string }) {
 
 export function Node({
 	data,
+	selected,
 	preview = false,
 }: NodeProps<Node> & { preview?: boolean }) {
 	const targetHandles = useMemo(() => {
@@ -49,11 +50,12 @@ export function Node({
 		<div
 			data-type={data.node.type}
 			data-preview={preview}
+			data-selected={selected}
 			className={clsx(
 				"group relative rounded-[16px] bg-gradient-to-tl min-w-[180px] backdrop-blur-[1px] transition-shadow",
 				"data-[type=action]:from-[hsla(187,79%,54%,0.2)] data-[type=action]:to-[hsla(207,100%,9%,0.2)]",
 				"data-[type=variable]:from-[hsla(0,0%,91%,0.2)] data-[type=variable]:to-[hsla(0,0%,16%,0.2)]",
-				"shadow-[0px_0px_16px_0px_hsla(187,_79%,_54%,_0.5)]",
+				"data-[selected=true]:shadow-[0px_0px_16px_0px_hsla(187,_79%,_54%,_0.5)]",
 				"data-[preview=true]:opacity-50",
 			)}
 		>

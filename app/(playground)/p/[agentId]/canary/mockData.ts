@@ -3,7 +3,7 @@ import type { Connection, Node } from "./types";
 const outlineNode: Node = {
 	id: "nd_outline",
 	name: "Untitled Node - 1",
-	position: { x: 0, y: 0 },
+	position: { x: 332.3, y: 277.5 },
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -27,7 +27,7 @@ const outlineNode: Node = {
 const sectionNode1: Node = {
 	id: "nd_section1",
 	name: "Untitled Node - 2",
-	position: { x: 100, y: 0 },
+	position: { x: 600, y: 275.0 },
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -56,7 +56,7 @@ const sectionNode1: Node = {
 const sectionNode2: Node = {
 	id: "nd_section2",
 	name: "Untitled Node - 3",
-	position: { x: 200, y: 0 },
+	position: { x: 600, y: 600 },
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -85,7 +85,7 @@ const sectionNode2: Node = {
 const concatNode: Node = {
 	id: "nd_concat",
 	name: "Untitled Node - 4",
-	position: { x: 300, y: 0 },
+	position: { x: 900, y: 300 },
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -109,7 +109,7 @@ const concatNode: Node = {
 const reviewNode: Node = {
 	id: "nd_review",
 	name: "Untitled Node - 5",
-	position: { x: 400, y: 0 },
+	position: { x: 1150, y: 100 },
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -137,7 +137,7 @@ const reviewNode: Node = {
 const fileNode: Node = {
 	id: "nd_file",
 	name: "Untitled Node - 6",
-	position: { x: 500, y: 0 },
+	position: { x: -15, y: 100 },
 	type: "variable",
 	content: {
 		type: "file",
@@ -147,7 +147,7 @@ const fileNode: Node = {
 const textNode: Node = {
 	id: "nd_text",
 	name: "Untitled Node - 7",
-	position: { x: 600, y: 0 },
+	position: { x: -15, y: 300 },
 	type: "variable",
 	content: {
 		type: "text",
@@ -157,7 +157,7 @@ const textNode: Node = {
 const webSearchNode: Node = {
 	id: "nd_web-search",
 	name: "Untitled Node - 8",
-	position: { x: 700, y: 0 },
+	position: { x: -15, y: 478 },
 	type: "action",
 	content: {
 		type: "webSearch",
