@@ -93,6 +93,7 @@
 		"@types/react": "npm:types-react@rc",
 		"@types/react-dom": "npm:types-react-dom@rc",
 		"drizzle-kit": "0.23.0",
+		"pino-pretty": "13.0.0",
 		"postcss": "^8",
 		"tailwindcss": "^3.4.7",
 		"turbo": "2.0.9",
