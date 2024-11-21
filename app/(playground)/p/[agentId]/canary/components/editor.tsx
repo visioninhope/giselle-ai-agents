@@ -42,7 +42,12 @@ const defaultNodes: Node[] = [
 					topP: 1,
 					instruction: "Write a short story about a cat",
 					requirement: { id: "ndh_123", label: "Requirement" },
-					sources: [],
+					sources: [
+						{
+							id: "ndh_source1",
+							label: "Source1",
+						},
+					],
 				},
 			},
 		},
@@ -63,11 +68,15 @@ const defaultNodes: Node[] = [
 					temperature: 0.7,
 					topP: 1,
 					instruction: "Write a short story about a cat",
-					requirement: { id: "ndh_456", label: "Requirement" },
+					requirement: { id: "ndh_123", label: "Requirement" },
 					sources: [
 						{
-							id: "ndh_789",
+							id: "ndh_source1",
 							label: "Source1",
+						},
+						{
+							id: "ndh_source2",
+							label: "Source2",
 						},
 					],
 				},
@@ -86,6 +95,22 @@ const defaultNodes: Node[] = [
 				type: "variable",
 				content: {
 					type: "text",
+				},
+			},
+		},
+	},
+	{
+		id: "nd_321",
+		position: { x: 220, y: 600 },
+		type: "giselleNode",
+		data: {
+			node: {
+				id: "nd_321",
+				name: "Untitled Node - 4",
+				position: { x: 220, y: 600 },
+				type: "variable",
+				content: {
+					type: "file",
 				},
 			},
 		},
@@ -113,14 +138,14 @@ const defaultEdges: Edge[] = [
 		id: "ed_456",
 		source: "nd_789",
 		target: "nd_456",
-		targetHandle: "ndh_456",
+		targetHandle: "ndh_123",
 		type: "giselleEdge",
 		data: {
 			connection: {
 				sourceNodeId: "nd_789",
 				sourceNodeType: "variable",
 				targetNodeId: "nd_456",
-				targetNodeHandleId: "ndh_456",
+				targetNodeHandleId: "ndh_123",
 				targetNodeType: "action",
 			},
 		},
@@ -129,14 +154,46 @@ const defaultEdges: Edge[] = [
 		id: "ed_789",
 		source: "nd_123",
 		target: "nd_456",
-		targetHandle: "ndh_789",
+		targetHandle: "ndh_source1",
 		type: "giselleEdge",
 		data: {
 			connection: {
 				sourceNodeId: "nd_123",
 				sourceNodeType: "action",
 				targetNodeId: "nd_456",
-				targetNodeHandleId: "ndh_789",
+				targetNodeHandleId: "ndh_source1",
+				targetNodeType: "action",
+			},
+		},
+	},
+	{
+		id: "ed_1",
+		source: "nd_321",
+		target: "nd_123",
+		targetHandle: "ndh_source1",
+		type: "giselleEdge",
+		data: {
+			connection: {
+				sourceNodeId: "nd_321",
+				sourceNodeType: "variable",
+				targetNodeId: "nd_123",
+				targetNodeHandleId: "ndh_source1",
+				targetNodeType: "action",
+			},
+		},
+	},
+	{
+		id: "ed_2",
+		source: "nd_321",
+		target: "nd_456",
+		targetHandle: "ndh_source2",
+		type: "giselleEdge",
+		data: {
+			connection: {
+				sourceNodeId: "nd_321",
+				sourceNodeType: "variable",
+				targetNodeId: "nd_456",
+				targetNodeHandleId: "ndh_source2",
 				targetNodeType: "action",
 			},
 		},

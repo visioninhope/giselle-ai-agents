@@ -7,12 +7,13 @@ import {
 import clsx from "clsx/lite";
 import React, { useMemo } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
-import type { TextGeneration } from "../types";
-import type { Text } from "../types";
+import type { File, Text, TextGeneration, WebSearch } from "../types";
 
 type TextNode = XYFlowNode<{ node: Text }>;
+type FileNode = XYFlowNode<{ node: File }>;
 type TextGenerationNode = XYFlowNode<{ node: TextGeneration }>;
-export type Node = TextNode | TextGenerationNode;
+type WebSearchNode = XYFlowNode<{ node: WebSearch }>;
+export type Node = TextNode | FileNode | TextGenerationNode | WebSearchNode;
 
 function NodeHeader({ name }: { name: string }) {
 	return (
@@ -80,6 +81,7 @@ export function Node({
 					<NodeHeader name="Text Generator" />
 				)}
 				{data.node.content.type === "text" && <NodeHeader name="Text" />}
+				{data.node.content.type === "file" && <NodeHeader name="File" />}
 			</div>
 			<div className="py-[4px] min-h-[30px]">
 				<div className="flex justify-between h-full">

@@ -33,7 +33,7 @@ export interface TextGeneration extends Action {
 interface WebSearchActionContent extends ActionContentBase {
 	type: "webSearch";
 }
-export interface WebSearchAction extends Action {
+export interface WebSearch extends Action {
 	content: WebSearchActionContent;
 }
 type ActionContent = TextGenerateActionContent | WebSearchActionContent;
