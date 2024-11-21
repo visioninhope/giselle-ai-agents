@@ -1,4 +1,4 @@
-type NodeId = `nd_${string}`;
+export type NodeId = `nd_${string}`;
 interface NodeBase {
 	id: NodeId;
 	name: string;
@@ -85,7 +85,4 @@ export interface Connection {
 export interface Graph {
 	nodes: Node[];
 	connections: Connection[];
-}
-export interface GraphSelection {
-	nodeIds: NodeId[];
 }

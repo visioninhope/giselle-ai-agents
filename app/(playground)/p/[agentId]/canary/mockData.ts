@@ -173,7 +173,7 @@ export const nodes = [
 	fileNode,
 	textNode,
 	webSearchNode,
-] as const;
+];
 
 const fileOutlineConnection: Connection = {
 	id: "cnnc_file-outline",

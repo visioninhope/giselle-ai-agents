@@ -9,15 +9,24 @@ import {
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { useMemo } from "react";
-import { connections, nodes } from "../mockData";
+import {
+	GraphSelectionContextProvider,
+	useGraphSelection,
+} from "../contexts/graph-selection";
+import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
 
-export function Editor() {
+interface EditorProps {
+	graph: Graph;
+}
+export function Editor(props: EditorProps) {
 	return (
-		<ReactFlowProvider>
-			<EditorInner />
-		</ReactFlowProvider>
+		<GraphSelectionContextProvider graph={props.graph}>
+			<ReactFlowProvider>
+				<EditorInner graph={props.graph} />
+			</ReactFlowProvider>
+		</GraphSelectionContextProvider>
 	);
 }
 const nodeTypes = {
@@ -26,10 +35,13 @@ const nodeTypes = {
 const edgeTypes = {
 	giselleEdge: Edge,
 };
-function EditorInner() {
+interface EditorInnerProps {
+	graph: Graph;
+}
+function EditorInner(props: EditorInnerProps) {
 	const defaultNodes = useMemo<Node[]>(
 		() =>
-			nodes.map(
+			props.graph.nodes.map(
 				(node) =>
 					({
 						id: node.id,
@@ -40,12 +52,12 @@ function EditorInner() {
 						},
 					}) as Node,
 			),
-		[],
+		[props.graph.nodes],
 	);
 
 	const defaultEdges = useMemo<Edge[]>(
 		() =>
-			connections.map(
+			props.graph.connections.map(
 				(connection) =>
 					({
 						id: connection.id,
@@ -58,8 +70,10 @@ function EditorInner() {
 						},
 					}) satisfies Edge,
 			),
-		[],
+		[props.graph.connections],
 	);
+
+	const { selectNode } = useGraphSelection();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow
@@ -68,6 +82,13 @@ function EditorInner() {
 				defaultEdges={defaultEdges}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
+				onNodesChange={(nodesChange) => {
+					nodesChange.map((nodeChange) => {
+						if (nodeChange.type === "select") {
+							selectNode(nodeChange.id as NodeId, nodeChange.selected);
+						}
+					});
+				}}
 			>
 				<Background
 					className="!bg-black-100"
