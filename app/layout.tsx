@@ -3,10 +3,10 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { rosart } from "./fonts";
-import { Analytics } from './providers'
-import { Tracking } from './Tracking'
 import { Suspense } from "react";
+import { Tracking } from "./Tracking";
+import { rosart } from "./fonts";
+import { Analytics } from "./providers";
 
 const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
@@ -47,9 +47,9 @@ export default function RootLayout({
 						defaultTheme="dark"
 						disableTransitionOnChange
 					>
-					<Suspense>
-						<Tracking />
-					</Suspense>
+						<Suspense>
+							<Tracking />
+						</Suspense>
 						{children}
 					</ThemeProvider>
 					<SpeedInsights />
