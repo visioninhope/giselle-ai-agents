@@ -108,7 +108,6 @@ ${sourcesToText(sources)}
 			}
 
 			const result = await object;
-
 		} catch (error) {
 			stream.append(`${error}`);
 		}

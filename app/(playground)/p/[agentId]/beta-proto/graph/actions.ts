@@ -511,8 +511,9 @@ export const generateText =
 								node: {
 									id: args.textGeneratorNode.id,
 									output: {
-										thinking: 'Sorry, a temporary issue has occurred.\nPlease try again after a while.'
-									}
+										thinking:
+											"Sorry, a temporary issue has occurred.\nPlease try again after a while.",
+									},
 								},
 							}),
 						);
