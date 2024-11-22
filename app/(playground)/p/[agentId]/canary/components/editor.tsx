@@ -10,6 +10,7 @@ import {
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { useMemo } from "react";
+import { GraphContextProvider } from "../contexts/graph";
 import {
 	GraphSelectionContextProvider,
 	useGraphSelection,
@@ -24,11 +25,13 @@ interface EditorProps {
 }
 export function Editor(props: EditorProps) {
 	return (
-		<GraphSelectionContextProvider graph={props.graph}>
-			<ReactFlowProvider>
-				<EditorInner graph={props.graph} />
-			</ReactFlowProvider>
-		</GraphSelectionContextProvider>
+		<GraphContextProvider graph={props.graph}>
+			<GraphSelectionContextProvider graph={props.graph}>
+				<ReactFlowProvider>
+					<EditorInner graph={props.graph} />
+				</ReactFlowProvider>
+			</GraphSelectionContextProvider>
+		</GraphContextProvider>
 	);
 }
 const nodeTypes = {

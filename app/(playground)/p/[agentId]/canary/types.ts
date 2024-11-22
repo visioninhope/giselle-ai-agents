@@ -18,7 +18,7 @@ interface Action extends NodeBase {
 interface ActionContentBase {
 	type: string;
 }
-interface TextGenerateActionContent extends ActionContentBase {
+export interface TextGenerateActionContent extends ActionContentBase {
 	type: "textGeneration";
 	llm: string;
 	temperature: number;
@@ -63,7 +63,7 @@ export interface File extends Variable {
 	content: FileContent;
 }
 
-type NodeHandleId = `ndh_${string}`;
+export type NodeHandleId = `ndh_${string}`;
 interface NodeHandle {
 	id: NodeHandleId;
 	label: string;

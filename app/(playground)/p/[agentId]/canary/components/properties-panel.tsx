@@ -1,9 +1,27 @@
 import clsx from "clsx/lite";
 import { useState } from "react";
+import { CirclePlusIcon } from "../../beta-proto/components/icons/circle-plus";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
+import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
+import type { Node, TextGenerateActionContent, TextGeneration } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
+import {
+	DropdownMenu,
+	DropdownMenuCheckboxItem,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./properties-panel-dropdown-menu";
+import {
+	Popover,
+	PopoverContent,
+	PopoverTrigger,
+} from "./properties-panel-popover";
 import {
 	Tabs,
 	TabsContent,
@@ -75,42 +93,106 @@ export function PropertiesPanel() {
 							</div>
 						</div>
 					)}
-					<TabsContent value="Prompt">
-						<div className="relative z-10 flex flex-col gap-[10px]">
-							<div className="grid gap-[8px] pb-[14px]">
-								<label
-									htmlFor="text"
-									className="font-rosart text-[16px] text-black-30"
-								>
-									Instruction
-								</label>
-								<textarea
-									name="text"
-									id="text"
-									className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
-								/>
-							</div>
 
-							<div className="border-t border-[hsla(222,21%,40%,1)]" />
+					{selectedNode?.content?.type === "textGeneration" && (
+						<TabsContent value="Prompt">
+							<TabsContentPrompt content={selectedNode.content} />
+						</TabsContent>
+					)}
+					<TabsContent value="LLM">hello</TabsContent>
+					<TabsContent value="Result">hello</TabsContent>
+				</Tabs>
+			) : (
+				<div className="relative z-10 flex justify-between items-center">
+					<button
+						type="button"
+						onClick={() => setShow(true)}
+						className="p-[16px]"
+					>
+						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-30" />
+					</button>
+				</div>
+			)}
+		</div>
+	);
+}
 
-							<div className="grid gap-[8px]">
-								<div className="flex justify-between">
-									<div className="font-rosart text-[16px] text-black-30">
-										Requirement
-									</div>
-								</div>
-							</div>
+function TabsContentPrompt({
+	content,
+}: {
+	content: TextGenerateActionContent;
+}) {
+	const { nodes } = useGraph();
+	const requirementableNodes = nodes.filter(
+		(node) =>
+			node.content.type === "text" || node.content.type === "textGeneration",
+	);
+	const requirementNode = useNode({
+		targetNodeHandleId: content.requirement?.id,
+	});
+	return (
+		<div className="relative z-10 flex flex-col gap-[10px]">
+			<div className="grid gap-[8px] pb-[14px]">
+				<label htmlFor="text" className="font-rosart text-[16px] text-black-30">
+					Instruction
+				</label>
+				<textarea
+					name="text"
+					id="text"
+					className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
+				/>
+			</div>
 
-							<div className="border-t border-[hsla(222,21%,40%,1)]" />
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 
-							<div className="grid gap-[8px]">
-								<div className="flex justify-between">
-									<div className="font-rosart text-[16px] text-black-30">
-										Sources
-									</div>
-								</div>
-							</div>
-							{/* <div className="grid gap-[8px]">
+			<div className="grid gap-[8px]">
+				<div className="flex justify-between">
+					<div className="font-rosart text-[16px] text-black-30">
+						Requirement
+					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger />
+						<DropdownMenuContent>
+							<DropdownMenuRadioGroup>
+								<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+								<DropdownMenuRadioItem value="nd_1">
+									Untitle Node - 1
+								</DropdownMenuRadioItem>
+								<DropdownMenuRadioItem value="nd_2">
+									Untitle Node - 2
+								</DropdownMenuRadioItem>
+								<DropdownMenuSeparator />
+								<DropdownMenuLabel>Text</DropdownMenuLabel>
+								<DropdownMenuRadioItem value="nd_3">
+									Untitled Node - 7
+								</DropdownMenuRadioItem>
+							</DropdownMenuRadioGroup>
+						</DropdownMenuContent>
+					</DropdownMenu>
+				</div>
+				{requirementNode === null ? (
+					<div className="text-[12px] text-black-40">
+						This prompt has no requirement.
+					</div>
+				) : (
+					<div>{requirementNode.name}</div>
+				)}
+			</div>
+
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+
+			<div className="grid gap-[8px]">
+				<div className="flex justify-between">
+					<div className="font-rosart text-[16px] text-black-30">Sources</div>
+
+					<Popover>
+						<PopoverTrigger />
+						<PopoverContent />
+						{/* <div className="px-[8px]">ii</div> */}
+					</Popover>
+				</div>
+			</div>
+			{/* <div className="grid gap-[8px]">
 								<div className="flex justify-between">
 									<div className="font-rosart text-[16px] text-black-30">
 										Sources
@@ -236,22 +318,6 @@ export function PropertiesPanel() {
 									)}
 								</div>
 							</div> */}
-						</div>
-					</TabsContent>
-					<TabsContent value="LLM">hello</TabsContent>
-					<TabsContent value="Result">hello</TabsContent>
-				</Tabs>
-			) : (
-				<div className="relative z-10 flex justify-between items-center">
-					<button
-						type="button"
-						onClick={() => setShow(true)}
-						className="p-[16px]"
-					>
-						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-30" />
-					</button>
-				</div>
-			)}
 		</div>
 	);
 }
