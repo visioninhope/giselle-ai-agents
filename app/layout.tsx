@@ -6,6 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { rosart } from "./fonts";
 import { Analytics } from './providers'
 import { Tracking } from './Tracking'
+import { Suspense } from "react";
 
 const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
@@ -46,7 +47,9 @@ export default function RootLayout({
 						defaultTheme="dark"
 						disableTransitionOnChange
 					>
-					<Tracking />
+					<Suspense>
+						<Tracking />
+					</Suspense>
 						{children}
 					</ThemeProvider>
 					<SpeedInsights />
