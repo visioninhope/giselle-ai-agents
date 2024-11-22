@@ -145,6 +145,7 @@ function TabsContentPrompt({
 					name="text"
 					id="text"
 					className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
+					defaultValue={content.instruction}
 				/>
 			</div>
 
