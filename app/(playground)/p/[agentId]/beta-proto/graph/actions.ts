@@ -481,6 +481,7 @@ export const generateText =
 					sourceIndexes,
 					modelConfiguration: resolveModelConfiguration(node),
 				});
+
 				let content: PartialGeneratedObject = {};
 				for await (const streamContent of readStreamableValue(object)) {
 					if (
@@ -495,17 +496,39 @@ export const generateText =
 								},
 							}),
 						);
+						dispatch(
+							setTextGenerationNodeOutput({
+								node: {
+									id: args.textGeneratorNode.id,
+									output:
+										streamContent as PartialGeneratedObject /** @todo type assertion */,
+								},
+							}),
+						);
+					} else if (typeof streamContent === "string") {
+						dispatch(
+							setTextGenerationNodeOutput({
+								node: {
+									id: args.textGeneratorNode.id,
+									output: {
+										thinking: 'Sorry, a temporary issue has occurred.\nPlease try again after a while.'
+									}
+								},
+							}),
+						);
 					}
+					content = streamContent as PartialGeneratedObject;
+				}
+				if (typeof content === "string") {
 					dispatch(
-						setTextGenerationNodeOutput({
+						updateNodeState({
 							node: {
 								id: args.textGeneratorNode.id,
-								output:
-									streamContent as PartialGeneratedObject /** @todo type assertion */,
+								state: giselleNodeState.completed,
 							},
 						}),
 					);
-					content = streamContent as PartialGeneratedObject;
+					break;
 				}
 				dispatch(
 					setTextGenerationNodeOutput({
