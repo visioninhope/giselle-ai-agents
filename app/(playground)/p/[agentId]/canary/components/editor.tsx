@@ -3,6 +3,7 @@
 import {
 	Background,
 	BackgroundVariant,
+	Panel,
 	ReactFlow,
 	ReactFlowProvider,
 } from "@xyflow/react";
@@ -16,6 +17,7 @@ import {
 import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
+import { PropertiesPanel } from "./properties-panel";
 
 interface EditorProps {
 	graph: Graph;
@@ -111,6 +113,9 @@ function EditorInner(props: EditorInnerProps) {
 						backgroundSize: "cover",
 					}}
 				/>
+				<Panel position="top-right" className="!top-0 !bottom-0 !right-0 !m-0">
+					<PropertiesPanel />
+				</Panel>
 			</ReactFlow>
 		</div>
 	);
