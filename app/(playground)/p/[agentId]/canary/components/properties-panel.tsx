@@ -132,6 +132,9 @@ function TabsContentPrompt({
 	const connectableTextGeneratorNodes = nodes.filter(
 		(node) => node.content.type === "textGeneration",
 	);
+	const connectableFileNodes = nodes.filter(
+		(node) => node.content.type === "file",
+	);
 	const requirementNode = useNode({
 		targetNodeHandleId: content.requirement?.id,
 	});
@@ -221,6 +224,16 @@ function TabsContentPrompt({
 							<DropdownMenuSeparator />
 							<DropdownMenuLabel>Text</DropdownMenuLabel>
 							{connectableTextNodes.map((node) => (
+								<DropdownMenuCheckboxItem
+									checked={sourceNodes.some((source) => source.id === node.id)}
+									key={node.id}
+								>
+									{node.name}
+								</DropdownMenuCheckboxItem>
+							))}
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel>File</DropdownMenuLabel>
+							{connectableFileNodes.map((node) => (
 								<DropdownMenuCheckboxItem
 									checked={sourceNodes.some((source) => source.id === node.id)}
 									key={node.id}
