@@ -46,7 +46,7 @@ export function PropertiesPanel() {
 			<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 
 			{show ? (
-				<Tabs>
+				<Tabs className="h-full overflow-y-hidden flex flex-col">
 					<div className="relative z-10 flex justify-between items-center pl-[16px] pr-[24px] py-[10px] h-[56px]">
 						<button
 							type="button"
@@ -98,7 +98,7 @@ export function PropertiesPanel() {
 					)}
 
 					{selectedNode?.content?.type === "textGeneration" && (
-						<TabsContent value="Prompt">
+						<TabsContent value="Prompt" className="flex-1">
 							<TabsContentPrompt
 								content={selectedNode.content}
 								key={selectedNode.id}
@@ -157,22 +157,22 @@ function TabsContentPrompt({
 		[connections, content.sources, nodes],
 	);
 	return (
-		<div className="relative z-10 flex flex-col gap-[10px]">
-			<div className="grid gap-[8px] pb-[14px]">
+		<div className="relative z-10 flex flex-col gap-[10px] h-full">
+			<div className="flex flex-col gap-[8px] pb-[14px] flex-1">
 				<label htmlFor="text" className="font-rosart text-[16px] text-black-30">
 					Instruction
 				</label>
 				<textarea
 					name="text"
 					id="text"
-					className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
+					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1"
 					defaultValue={content.instruction}
 				/>
 			</div>
 
-			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+			{/* <div className="border-t border-[hsla(222,21%,40%,1)]" /> */}
 
-			<div className="grid gap-[8px]">
+			{/* <div className="grid gap-[8px]">
 				<div className="flex justify-between">
 					<div className="font-rosart text-[16px] text-black-30">
 						Requirement
@@ -256,7 +256,7 @@ function TabsContentPrompt({
 						</DropdownMenuContent>
 					</DropdownMenu>
 				</div>
-			</div>
+			</div> */}
 			{/* <div className="grid gap-[8px]">
 								<div className="flex justify-between">
 									<div className="font-rosart text-[16px] text-black-30">
