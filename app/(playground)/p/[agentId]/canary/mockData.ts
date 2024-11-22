@@ -216,7 +216,7 @@ const textSection1Connection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: sectionNode1.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_requirement",
 };
 
 const textSection2Connection: Connection = {
@@ -225,7 +225,7 @@ const textSection2Connection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: sectionNode2.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_requirement",
 };
 
 const outlineToSection1Connection: Connection = {
@@ -234,7 +234,7 @@ const outlineToSection1Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode1.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_requirement",
+	targetNodeHandleId: "ndh_source2",
 };
 
 const outlineToSection2Connection: Connection = {
@@ -243,7 +243,7 @@ const outlineToSection2Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode2.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_requirement",
+	targetNodeHandleId: "ndh_source2",
 };
 const section1ToConcatConnection: Connection = {
 	id: "cnnc_section1-concat",
