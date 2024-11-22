@@ -162,7 +162,7 @@ export function AddSourceDialog(props: AddSourceDialogProps) {
 											<p>
 												No contents added yet. Click to upload or drag and drop
 												files here (supports images, documents, and more; max
-												10MB per file).
+												4.5MB per file).
 											</p>
 											<div className="flex gap-[8px] justify-center items-center">
 												<span>or</span>
