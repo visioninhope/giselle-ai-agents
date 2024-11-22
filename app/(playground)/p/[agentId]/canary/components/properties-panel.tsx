@@ -96,7 +96,10 @@ export function PropertiesPanel() {
 
 					{selectedNode?.content?.type === "textGeneration" && (
 						<TabsContent value="Prompt">
-							<TabsContentPrompt content={selectedNode.content} />
+							<TabsContentPrompt
+								content={selectedNode.content}
+								key={selectedNode.id}
+							/>
 						</TabsContent>
 					)}
 					<TabsContent value="LLM">hello</TabsContent>
