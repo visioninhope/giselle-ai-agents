@@ -11,6 +11,7 @@ import type { Graph, Node, NodeId } from "../types";
 interface GraphSelectionContextValue {
 	selectedNodeIds: Set<NodeId>;
 	selectedNodes: Node[];
+	selectedNode: Node | null;
 	selectNode: (nodeId: NodeId, selected: boolean) => void;
 }
 
@@ -55,12 +56,17 @@ export function GraphSelectionContextProvider({
 				.filter((node) => node !== undefined),
 		[selectedNodeIds, graph.nodes],
 	);
+	const selectedNode = useMemo(
+		() => (selectedNodes.length === 1 ? selectedNodes[0] : null),
+		[selectedNodes],
+	);
 
 	return (
 		<GraphSelectionContext.Provider
 			value={{
 				selectedNodeIds,
 				selectedNodes,
+				selectedNode,
 				selectNode,
 			}}
 		>
