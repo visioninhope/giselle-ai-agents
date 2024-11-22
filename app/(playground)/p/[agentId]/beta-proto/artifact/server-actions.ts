@@ -61,53 +61,56 @@ ${sourcesToText(sources)}
 				temperature: params.modelConfiguration.temperature,
 			},
 		});
-		const { partialObjectStream, object } = await streamObject({
-			model,
-			system,
-			temperature: params.modelConfiguration.temperature,
-			topP: params.modelConfiguration.topP,
-			prompt: params.userPrompt,
-			schema: artifactSchema,
-			onFinish: async (result) => {
-				const meter = metrics.getMeter(params.modelConfiguration.provider);
-				const tokenCounter = meter.createCounter("token_consumed", {
-					description: "Number of OpenAI API tokens consumed by each request",
-				});
-				const subscriptionId = await getUserSubscriptionId();
-				const isR06User = await isRoute06User();
-				tokenCounter.add(result.usage.totalTokens, {
-					subscriptionId,
-					isR06User,
-				});
-				generation.end({
-					output: result,
-				});
+		try {
+			const { partialObjectStream, object } = await streamObject({
+				model,
+				system,
+				temperature: params.modelConfiguration.temperature,
+				topP: params.modelConfiguration.topP,
+				prompt: params.userPrompt,
+				schema: artifactSchema,
+				onFinish: async (result) => {
+					const meter = metrics.getMeter(params.modelConfiguration.provider);
+					const tokenCounter = meter.createCounter("token_consumed", {
+						description: "Number of OpenAI API tokens consumed by each request",
+					});
+					const subscriptionId = await getUserSubscriptionId();
+					const isR06User = await isRoute06User();
+					tokenCounter.add(result.usage.totalTokens, {
+						subscriptionId,
+						isR06User,
+					});
+					generation.end({
+						output: result,
+					});
 
-				logger.debug(
-					{ tokenConsumed: result.usage.totalTokens },
-					"response obtained",
-				);
+					logger.debug(
+						{ tokenConsumed: result.usage.totalTokens },
+						"response obtained",
+					);
 
-				await lf.shutdownAsync();
-				waitUntil(
-					new Promise((resolve) =>
-						setTimeout(
-							resolve,
-							Number.parseInt(
-								process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+					await lf.shutdownAsync();
+					waitUntil(
+						new Promise((resolve) =>
+							setTimeout(
+								resolve,
+								Number.parseInt(
+									process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+								),
 							),
 						),
-					),
-				); // wait until telemetry sent
-			},
-		});
+					); // wait until telemetry sent
+				},
+			});
 
-		for await (const partialObject of partialObjectStream) {
-			stream.update(partialObject);
+			for await (const partialObject of partialObjectStream) {
+				stream.update(partialObject);
+			}
+
+			const result = await object;
+		} catch (error) {
+			stream.append(`${error}`);
 		}
-
-		const result = await object;
-
 		stream.done();
 	})();
 
