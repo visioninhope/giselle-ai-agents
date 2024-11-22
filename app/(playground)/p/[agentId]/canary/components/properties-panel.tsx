@@ -38,7 +38,7 @@ export function PropertiesPanel() {
 							{selectedNode?.content?.type === "textGeneration" && (
 								<>
 									<TabsTrigger value="Prompt">Prompt</TabsTrigger>
-									<TabsTrigger value="Property">Property</TabsTrigger>
+									<TabsTrigger value="LLM">LLM</TabsTrigger>
 									<TabsTrigger value="Result">Result</TabsTrigger>
 								</>
 							)}
@@ -75,6 +75,170 @@ export function PropertiesPanel() {
 							</div>
 						</div>
 					)}
+					<TabsContent value="Prompt">
+						<div className="relative z-10 flex flex-col gap-[10px]">
+							<div className="grid gap-[8px] pb-[14px]">
+								<label
+									htmlFor="text"
+									className="font-rosart text-[16px] text-black-30"
+								>
+									Instruction
+								</label>
+								<textarea
+									name="text"
+									id="text"
+									className="w-full text-[14px] h-[200px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none"
+								/>
+							</div>
+
+							<div className="border-t border-[hsla(222,21%,40%,1)]" />
+
+							<div className="grid gap-[8px]">
+								<div className="flex justify-between">
+									<div className="font-rosart text-[16px] text-black-30">
+										Requirement
+									</div>
+								</div>
+							</div>
+
+							<div className="border-t border-[hsla(222,21%,40%,1)]" />
+
+							<div className="grid gap-[8px]">
+								<div className="flex justify-between">
+									<div className="font-rosart text-[16px] text-black-30">
+										Sources
+									</div>
+								</div>
+							</div>
+							{/* <div className="grid gap-[8px]">
+								<div className="flex justify-between">
+									<div className="font-rosart text-[16px] text-black-30">
+										Sources
+									</div>
+									<div className="flex items-center gap-[4px]">
+										<AddSourceDialog node={node} />
+										<Popover.Root>
+											<Popover.Trigger asChild>
+												<button type="button">
+													<CirclePlusIcon
+														size={20}
+														className="stroke-black-100 fill-black-30"
+													/>
+												</button>
+											</Popover.Trigger>
+											<Popover.Content
+												side={"top"}
+												align="end"
+												className="rounded-[16px] p-[8px] text-[14px] w-[200px] text-black-30 bg-black-100 border border-[hsla(222,21%,40%,1)] shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+												sideOffset={5}
+											>
+												<div className="px-[8px]">
+													<div>
+														{availableArtifactsOrWebSearches.map(
+															(artifactOrWebSearch) =>
+																artifactOrWebSearch.object === "artifact" ? (
+																	<button
+																		type="button"
+																		className="flex justify-between items-center py-[4px] w-full"
+																		key={artifactOrWebSearch.id}
+																		onClick={handleArtifactClick(
+																			artifactOrWebSearch,
+																		)}
+																	>
+																		<p className="line-clamp-1 text-left">
+																			{artifactOrWebSearch.title}
+																		</p>
+																		{sources.some(
+																			(source) =>
+																				source.id === artifactOrWebSearch.id,
+																		) && (
+																			<CheckIcon
+																				size={16}
+																				className="stroke-white flex-shrink-0"
+																			/>
+																		)}
+																	</button>
+																) : (
+																	<button
+																		type="button"
+																		className="flex justify-between items-center py-[4px] w-full"
+																		key={artifactOrWebSearch.id}
+																		onClick={handleWebSearchClick(
+																			artifactOrWebSearch,
+																		)}
+																	>
+																		<p className="line-clamp-1 text-left">
+																			{artifactOrWebSearch.name}
+																		</p>
+																		{sources.some(
+																			(source) =>
+																				source.id === artifactOrWebSearch.id,
+																		) && (
+																			<CheckIcon
+																				size={16}
+																				className="stroke-white flex-shrink-0"
+																			/>
+																		)}
+																	</button>
+																),
+														)}
+													</div>
+												</div>
+											</Popover.Content>
+										</Popover.Root>
+									</div>
+								</div>
+								<div className="grid grid-cols-2 gap-4">
+									{sources.map((source) =>
+										source.object === "artifact" ? (
+											<ArtifactBlock
+												key={source.id}
+												title={source.title}
+												node={source.generatorNode}
+												content={source.content}
+												completed={true}
+											/>
+										) : source.object === "file" ? (
+											<Block
+												key={source.id}
+												title={source.name}
+												description={
+													source.status === "uploading"
+														? "Uploading..."
+														: source.status === "processing"
+															? "Processing..."
+															: source.status === "processed"
+																? "Ready"
+																: "Pending"
+												}
+												icon={
+													<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
+												}
+											/>
+										) : source.object === "webSearch" ? (
+											<Block
+												key={source.id}
+												title={source.name}
+												icon={
+													<TextsIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
+												}
+											/>
+										) : (
+											<Block
+												key={source.id}
+												title={source.title}
+												icon={
+													<TextsIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
+												}
+												onDelete={removeTextContent({ id: source.id })}
+											/>
+										),
+									)}
+								</div>
+							</div> */}
+						</div>
+					</TabsContent>
+					<TabsContent value="LLM">hello</TabsContent>
 					<TabsContent value="Result">hello</TabsContent>
 				</Tabs>
 			) : (
