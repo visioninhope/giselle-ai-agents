@@ -126,9 +126,11 @@ function TabsContentPrompt({
 	content: TextGenerateActionContent;
 }) {
 	const { nodes } = useGraph();
-	const requirementableNodes = nodes.filter(
-		(node) =>
-			node.content.type === "text" || node.content.type === "textGeneration",
+	const requirementableTextNodes = nodes.filter(
+		(node) => node.content.type === "text",
+	);
+	const requirementableTextGeneratorNodes = nodes.filter(
+		(node) => node.content.type === "textGeneration",
 	);
 	const requirementNode = useNode({
 		targetNodeHandleId: content.requirement?.id,
@@ -156,19 +158,20 @@ function TabsContentPrompt({
 					<DropdownMenu>
 						<DropdownMenuTrigger />
 						<DropdownMenuContent>
-							<DropdownMenuRadioGroup>
+							<DropdownMenuRadioGroup value={requirementNode?.id}>
 								<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-								<DropdownMenuRadioItem value="nd_1">
-									Untitle Node - 1
-								</DropdownMenuRadioItem>
-								<DropdownMenuRadioItem value="nd_2">
-									Untitle Node - 2
-								</DropdownMenuRadioItem>
+								{requirementableTextGeneratorNodes.map((node) => (
+									<DropdownMenuRadioItem value={node.id} key={node.id}>
+										{node.name}
+									</DropdownMenuRadioItem>
+								))}
 								<DropdownMenuSeparator />
 								<DropdownMenuLabel>Text</DropdownMenuLabel>
-								<DropdownMenuRadioItem value="nd_3">
-									Untitled Node - 7
-								</DropdownMenuRadioItem>
+								{requirementableTextNodes.map((node) => (
+									<DropdownMenuRadioItem value={node.id} key={node.id}>
+										{node.name}
+									</DropdownMenuRadioItem>
+								))}
 							</DropdownMenuRadioGroup>
 						</DropdownMenuContent>
 					</DropdownMenu>
