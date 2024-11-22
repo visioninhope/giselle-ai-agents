@@ -1,5 +1,4 @@
 import { logger } from "@/lib/logger";
-import * as Sentry from "@sentry/nextjs";
 import { GaxiosError } from "gaxios";
 import { google } from "googleapis";
 
@@ -13,25 +12,7 @@ export function buildGoogleUserClient(token: GoogleUserCredential) {
 		throw new Error("GOOGLE_OAUTH_CLIENT_SECRET is empty");
 	}
 
-	const loggerWithSentry = {
-		error: (error: Error) => {
-			if (process.env.NODE_ENV === "development") {
-				console.error(error);
-			}
-			Sentry.captureException(error);
-		},
-		warning: (message: string) => {
-			if (process.env.NODE_ENV === "development") {
-				console.warn(message);
-			}
-			Sentry.captureMessage(message, "warning");
-		},
-		info: (message: string) => {
-			console.info(message);
-		},
-	};
-
-	return new GoogleUserClient(token, clientId, clientSecret, loggerWithSentry);
+	return new GoogleUserClient(token, clientId, clientSecret);
 }
 
 // MARK: Errors
@@ -73,17 +54,14 @@ export type GoogleUserData = {
 class GoogleUserClient {
 	private clientId: string;
 	private clientSecret: string;
-	private logger: Logger;
 
 	constructor(
 		private token: GoogleUserCredential,
 		clientId: string,
 		clientSecret: string,
-		logger: Logger,
 	) {
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
-		this.logger = logger;
 	}
 
 	async getUser(): Promise<GoogleUserData> {
@@ -151,12 +129,6 @@ type GoogleUserCredential = {
 	accessToken: string;
 	expiresAt: Date | null;
 	refreshToken: string | null;
-};
-
-type Logger = {
-	error: (error: Error) => void;
-	warning: (message: string) => void;
-	info: (message: string) => void;
 };
 
 export type { GoogleUserClient };
