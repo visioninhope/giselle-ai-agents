@@ -1,4 +1,5 @@
 import clsx from "clsx/lite";
+import { ChevronsUpDownIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { CirclePlusIcon } from "../../beta-proto/components/icons/circle-plus";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
@@ -6,7 +7,9 @@ import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import type { Node, TextGenerateActionContent, TextGeneration } from "../types";
+import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
+import { NodeBlock } from "./node-block";
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
@@ -196,11 +199,20 @@ function TabsContentPrompt({
 					</DropdownMenu>
 				</div>
 				{requirementNode === null ? (
-					<div className="text-[12px] text-black-40">
+					<div className="text-[12px] text-black-40 h-[36px]">
 						This prompt has no requirement.
 					</div>
 				) : (
-					<div>{requirementNode.name}</div>
+					// <Block
+					// 	icon={
+					// 		<ContentTypeIcon
+					// 			contentType={requirementNode.content.type}
+					// 			className="fill-white"
+					// 		/>
+					// 	}
+					// 	title={requirementNode.name}
+					// />
+					<NodeBlock node={requirementNode} />
 				)}
 			</div>
 
