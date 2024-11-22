@@ -1,5 +1,5 @@
 import clsx from "clsx/lite";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { CirclePlusIcon } from "../../beta-proto/components/icons/circle-plus";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
@@ -125,16 +125,31 @@ function TabsContentPrompt({
 }: {
 	content: TextGenerateActionContent;
 }) {
-	const { nodes } = useGraph();
-	const requirementableTextNodes = nodes.filter(
+	const { nodes, connections } = useGraph();
+	const connectableTextNodes = nodes.filter(
 		(node) => node.content.type === "text",
 	);
-	const requirementableTextGeneratorNodes = nodes.filter(
+	const connectableTextGeneratorNodes = nodes.filter(
 		(node) => node.content.type === "textGeneration",
 	);
 	const requirementNode = useNode({
 		targetNodeHandleId: content.requirement?.id,
 	});
+	const sourceNodes = useMemo(
+		() =>
+			content.sources
+				.map((source) => {
+					const connection = connections.find(
+						(connection) => connection.targetNodeHandleId === source.id,
+					);
+					const node = nodes.find(
+						(node) => node.id === connection?.sourceNodeId,
+					);
+					return node;
+				})
+				.filter((node) => node !== undefined),
+		[connections, content.sources, nodes],
+	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[10px]">
 			<div className="grid gap-[8px] pb-[14px]">
@@ -161,14 +176,14 @@ function TabsContentPrompt({
 						<DropdownMenuContent>
 							<DropdownMenuRadioGroup value={requirementNode?.id}>
 								<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-								{requirementableTextGeneratorNodes.map((node) => (
+								{connectableTextGeneratorNodes.map((node) => (
 									<DropdownMenuRadioItem value={node.id} key={node.id}>
 										{node.name}
 									</DropdownMenuRadioItem>
 								))}
 								<DropdownMenuSeparator />
 								<DropdownMenuLabel>Text</DropdownMenuLabel>
-								{requirementableTextNodes.map((node) => (
+								{connectableTextNodes.map((node) => (
 									<DropdownMenuRadioItem value={node.id} key={node.id}>
 										{node.name}
 									</DropdownMenuRadioItem>
@@ -191,12 +206,30 @@ function TabsContentPrompt({
 			<div className="grid gap-[8px]">
 				<div className="flex justify-between">
 					<div className="font-rosart text-[16px] text-black-30">Sources</div>
-
-					<Popover>
-						<PopoverTrigger />
-						<PopoverContent />
-						{/* <div className="px-[8px]">ii</div> */}
-					</Popover>
+					<DropdownMenu>
+						<DropdownMenuTrigger />
+						<DropdownMenuContent>
+							<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+							{connectableTextGeneratorNodes.map((node) => (
+								<DropdownMenuCheckboxItem
+									checked={sourceNodes.some((source) => source.id === node.id)}
+									key={node.id}
+								>
+									{node.name}
+								</DropdownMenuCheckboxItem>
+							))}
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel>Text</DropdownMenuLabel>
+							{connectableTextNodes.map((node) => (
+								<DropdownMenuCheckboxItem
+									checked={sourceNodes.some((source) => source.id === node.id)}
+									key={node.id}
+								>
+									{node.name}
+								</DropdownMenuCheckboxItem>
+							))}
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 			{/* <div className="grid gap-[8px]">
