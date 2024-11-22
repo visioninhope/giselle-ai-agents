@@ -1,6 +1,7 @@
 import clsx from "clsx/lite";
 import { useState } from "react";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
+import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraphSelection } from "../contexts/graph-selection";
 
 export function PropertiesPanel() {
@@ -25,7 +26,7 @@ export function PropertiesPanel() {
 			) : (
 				<div className="relative z-10 flex justify-between items-center">
 					<button type="button" onClick={() => setShow(true)}>
-						<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
+						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-30" />
 					</button>
 				</div>
 			)}
