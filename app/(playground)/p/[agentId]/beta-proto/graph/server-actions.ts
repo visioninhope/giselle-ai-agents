@@ -46,7 +46,7 @@ export async function parseFile(args: ParseFileArgs) {
 	});
 	const response = await fetch(args.blobUrl);
 	const content = await response.blob();
-	const partitionReponse = await client.general.partition({
+	const partitionResponse = await client.general.partition({
 		partitionParameters: {
 			files: {
 				fileName: args.name,
@@ -57,11 +57,11 @@ export async function parseFile(args: ParseFileArgs) {
 			splitPdfConcurrencyLevel: 1,
 		},
 	});
-	if (partitionReponse.statusCode !== 200) {
-		console.error(partitionReponse.rawResponse);
-		throw new Error(`Failed to parse file: ${partitionReponse.statusCode}`);
+	if (partitionResponse.statusCode !== 200) {
+		console.error(partitionResponse.rawResponse);
+		throw new Error(`Failed to parse file: ${partitionResponse.statusCode}`);
 	}
-	const jsonString = JSON.stringify(partitionReponse.elements, null, 2);
+	const jsonString = JSON.stringify(partitionResponse.elements, null, 2);
 	const blob = new Blob([jsonString], { type: "application/json" });
 
 	await put(`files/${args.id}/partition.json`, blob, {
@@ -69,7 +69,7 @@ export async function parseFile(args: ParseFileArgs) {
 		contentType: blob.type,
 	});
 
-	const markdown = elementsToMarkdown(partitionReponse.elements ?? []);
+	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
 	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
 	const vercelBlob = await put(`files/${args.id}/markdown.md`, markdownBlob, {
 		access: "public",
