@@ -1,6 +1,7 @@
 # giselle
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 As of November 20, 2024  9:28am. 885 total
 
 ## Summary
@@ -13,6 +14,13 @@ As of November 20, 2024 10:20am. 880 total
 * 645 MIT
 * 120 Apache 2.0
 >>>>>>> 0aa66f0 (Update docs/packages-license.md)
+=======
+As of November 20, 2024 10:20am. 880 total
+
+## Summary
+* 645 MIT
+* 120 Apache 2.0
+>>>>>>> 6b381108f2aee7b095f08aad8dfb39f9c3bfb924
 * 61 ISC
 * 23 New BSD
 * 12 Simplified BSD
