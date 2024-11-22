@@ -18,7 +18,10 @@ export default supabaseMiddleware(async (user, request) => {
 		);
 		if (subscription == null) {
 			const url = request.nextUrl.clone();
-			url.pathname = "/subscriptions/checkout";
+			// We are planning a pricing revision.
+			// Temporarily hide new signups until the new plan is ready.
+			// url.pathname = "/subscriptions/checkout";
+			url.pathname = "/subscriptions/coming-soon";
 			return NextResponse.redirect(url);
 		}
 		/** @todo Validate subscription status */
