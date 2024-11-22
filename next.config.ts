@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
 	},
 	experimental: {
 		serverActions: {
-			bodySizeLimit: "2mb",
+			bodySizeLimit: "4.5mb",
 		},
 	},
 	serverExternalPackages: ["@opentelemetry/sdk-node", "pino", "pino-pretty"],
