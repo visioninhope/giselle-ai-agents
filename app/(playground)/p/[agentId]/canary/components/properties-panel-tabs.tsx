@@ -43,10 +43,7 @@ const TabsContent: FC<ComponentProps<typeof TabsPrimitive.Content>> = ({
 }) => (
 	<TabsPrimitive.Content
 		ref={ref}
-		className={cn(
-			"px-[24px] pt-[16px] pb-[24px] overflow-y-auto overflow-x-hidden",
-			className,
-		)}
+		className={cn("overflow-y-auto overflow-x-hidden", className)}
 		{...props}
 	/>
 );

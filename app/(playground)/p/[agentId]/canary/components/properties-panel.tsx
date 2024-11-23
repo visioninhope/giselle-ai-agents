@@ -1,36 +1,28 @@
 import clsx from "clsx/lite";
-import { ChevronsUpDownIcon } from "lucide-react";
+import { ChevronsDownUpIcon, ChevronsUpDownIcon } from "lucide-react";
 import { useMemo, useState } from "react";
-import { CirclePlusIcon } from "../../beta-proto/components/icons/circle-plus";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
-import type { Node, TextGenerateActionContent, TextGeneration } from "../types";
-import { Block } from "./block";
+import type { TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
-import { NodeBlock } from "./node-block";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "./properties-panel-dropdown-menu";
-import {
-	Popover,
-	PopoverContent,
-	PopoverTrigger,
-} from "./properties-panel-popover";
+import { PropertiesPanelCollapsible } from "./properties-panel-collapsible";
 import {
 	Tabs,
 	TabsContent,
 	TabsList,
 	TabsTrigger,
 } from "./properties-panel-tabs";
+import {
+	Select,
+	SelectContent,
+	SelectGroup,
+	SelectItem,
+	SelectLabel,
+	SelectTrigger,
+	SelectValue,
+} from "./select";
 
 export function PropertiesPanel() {
 	const { selectedNode } = useGraphSelection();
@@ -157,8 +149,68 @@ function TabsContentPrompt({
 		[connections, content.sources, nodes],
 	);
 	return (
-		<div className="relative z-10 flex flex-col gap-[10px] h-full">
-			<div className="flex flex-col gap-[8px] pb-[14px] flex-1">
+		<div className="relative z-10 flex flex-col gap-[2px] h-full">
+			<PropertiesPanelCollapsible title="Requirement" glanceLabel="Selected">
+				<div className="mb-[4px]">
+					<Select>
+						<SelectTrigger>
+							<SelectValue placeholder="Select a requirement" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Text Generator</SelectLabel>
+								{connectableTextGeneratorNodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+							<SelectGroup>
+								<SelectLabel>Text</SelectLabel>
+								{connectableTextNodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+			</PropertiesPanelCollapsible>
+
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+
+			<PropertiesPanelCollapsible title="Sources" glanceLabel="No sources">
+				<div className="mb-[4px]">
+					<Select>
+						<SelectTrigger>
+							<SelectValue placeholder="Select a requirement" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectGroup>
+								<SelectLabel>Text Generator</SelectLabel>
+								{connectableTextGeneratorNodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+							<SelectGroup>
+								<SelectLabel>Text</SelectLabel>
+								{connectableTextNodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectGroup>
+						</SelectContent>
+					</Select>
+				</div>
+			</PropertiesPanelCollapsible>
+
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+
+			<div className="flex flex-col gap-[8px] flex-1 pb-[24px] px-[24px] pt-[8px]">
 				<label htmlFor="text" className="font-rosart text-[16px] text-black-30">
 					Instruction
 				</label>
@@ -169,8 +221,6 @@ function TabsContentPrompt({
 					defaultValue={content.instruction}
 				/>
 			</div>
-
-			{/* <div className="border-t border-[hsla(222,21%,40%,1)]" /> */}
 
 			{/* <div className="grid gap-[8px]">
 				<div className="flex justify-between">
