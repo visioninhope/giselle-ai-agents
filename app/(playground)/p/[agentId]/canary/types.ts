@@ -49,6 +49,7 @@ interface VariableContentBase {
 
 interface TextContent extends VariableContentBase {
 	type: "text";
+	text: string;
 }
 interface FileContent extends VariableContentBase {
 	type: "file";

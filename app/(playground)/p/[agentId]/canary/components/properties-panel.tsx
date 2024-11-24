@@ -5,7 +5,7 @@ import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
-import type { TextGenerateActionContent } from "../types";
+import type { Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
 import { PropertiesPanelCollapsible } from "./properties-panel-collapsible";
 import {
@@ -121,9 +121,9 @@ function TabsContentPrompt({
 	content: TextGenerateActionContent;
 }) {
 	const { nodes, connections } = useGraph();
-	const connectableTextNodes = nodes.filter(
-		(node) => node.content.type === "text",
-	);
+	const connectableTextNodes: Text[] = nodes
+		.filter((node) => node.content.type === "text")
+		.map((node) => node as Text);
 	const connectableTextGeneratorNodes = nodes.filter(
 		(node) => node.content.type === "textGeneration",
 	);
@@ -150,9 +150,14 @@ function TabsContentPrompt({
 	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full">
-			<PropertiesPanelCollapsible title="Requirement" glanceLabel="Selected">
+			<PropertiesPanelCollapsible
+				title="Requirement"
+				glanceLabel={
+					requirementNode === null ? "Not selected" : requirementNode.name
+				}
+			>
 				<div className="mb-[4px]">
-					<Select>
+					<Select value={requirementNode?.id}>
 						<SelectTrigger>
 							<SelectValue placeholder="Select a requirement" />
 						</SelectTrigger>
@@ -160,16 +165,16 @@ function TabsContentPrompt({
 							<SelectGroup>
 								<SelectLabel>Text Generator</SelectLabel>
 								{connectableTextGeneratorNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
+									<SelectItem value={node.id} key={node.id} label={node.name}>
+										<p>it's a text generator</p>
 									</SelectItem>
 								))}
 							</SelectGroup>
 							<SelectGroup>
 								<SelectLabel>Text</SelectLabel>
 								{connectableTextNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
+									<SelectItem value={node.id} key={node.id} label={node.name}>
+										<p>{node.content.text}</p>
 									</SelectItem>
 								))}
 							</SelectGroup>
@@ -180,7 +185,14 @@ function TabsContentPrompt({
 
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 
-			<PropertiesPanelCollapsible title="Sources" glanceLabel="No sources">
+			<PropertiesPanelCollapsible
+				title="Sources"
+				glanceLabel={
+					sourceNodes.length < 1
+						? "No sources"
+						: `${sourceNodes.length} sources selected`
+				}
+			>
 				<div className="mb-[4px]">
 					<Select>
 						<SelectTrigger>
@@ -190,17 +202,15 @@ function TabsContentPrompt({
 							<SelectGroup>
 								<SelectLabel>Text Generator</SelectLabel>
 								{connectableTextGeneratorNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
+									<SelectItem value={node.id} key={node.id} label={node.name}>
+										<p>it's a text generator</p>
 									</SelectItem>
 								))}
 							</SelectGroup>
 							<SelectGroup>
 								<SelectLabel>Text</SelectLabel>
 								{connectableTextNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
-									</SelectItem>
+									<SelectItem value={node.id} key={node.id} label={node.name} />
 								))}
 							</SelectGroup>
 						</SelectContent>

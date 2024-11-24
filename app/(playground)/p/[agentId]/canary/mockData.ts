@@ -151,6 +151,7 @@ const textNode: Node = {
 	type: "variable",
 	content: {
 		type: "text",
+		text: "This is a text",
 	},
 };
 
