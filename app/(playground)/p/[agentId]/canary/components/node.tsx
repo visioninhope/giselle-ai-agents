@@ -7,7 +7,14 @@ import {
 import clsx from "clsx/lite";
 import React, { useMemo } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
-import type { File, Text, TextGeneration, WebSearch } from "../types";
+import type {
+	File,
+	Node as NodeType,
+	Text,
+	TextGeneration,
+	WebSearch,
+} from "../types";
+import { ContentTypeIcon } from "./content-type-icon";
 
 type TextNode = XYFlowNode<{ node: Text }>;
 type FileNode = XYFlowNode<{ node: File }>;
@@ -15,7 +22,10 @@ type TextGenerationNode = XYFlowNode<{ node: TextGeneration }>;
 type WebSearchNode = XYFlowNode<{ node: WebSearch }>;
 export type Node = TextNode | FileNode | TextGenerationNode | WebSearchNode;
 
-function NodeHeader({ name }: { name: string }) {
+function NodeHeader({
+	name,
+	contentType,
+}: { name: string; contentType: NodeType["content"]["type"] }) {
 	return (
 		<div className="flex items-center gap-[8px] px-[12px]">
 			<div
@@ -25,7 +35,10 @@ function NodeHeader({ name }: { name: string }) {
 					"group-data-[type=variable]:bg-white group-data-[type=variable]:shadow-[hsla(0,0%,93%,0.8)]",
 				)}
 			>
-				<TextGenerationIcon className="w-[18px] h-[18px] fill-black-100" />
+				<ContentTypeIcon
+					contentType={contentType}
+					className="w-[18px] h-[18px] fill-black-100"
+				/>
 			</div>
 			<div className="font-rosart text-[16px] text-black-30">{name}</div>
 		</div>
@@ -80,13 +93,17 @@ export function Node({
 				)}
 			>
 				{data.node.content.type === "textGeneration" && (
-					<NodeHeader name="Text Generator" />
+					<NodeHeader name="Text Generator" contentType={"textGeneration"} />
 				)}
 				{data.node.content.type === "webSearch" && (
-					<NodeHeader name="Web Search" />
+					<NodeHeader name="Web Search" contentType="webSearch" />
 				)}
-				{data.node.content.type === "text" && <NodeHeader name="Text" />}
-				{data.node.content.type === "file" && <NodeHeader name="File" />}
+				{data.node.content.type === "text" && (
+					<NodeHeader name="Text" contentType="text" />
+				)}
+				{data.node.content.type === "file" && (
+					<NodeHeader name="File" contentType="file" />
+				)}
 			</div>
 			<div className="py-[4px] min-h-[30px]">
 				<div className="flex justify-between h-full">

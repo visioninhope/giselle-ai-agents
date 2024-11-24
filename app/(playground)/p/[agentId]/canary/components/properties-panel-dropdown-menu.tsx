@@ -10,8 +10,8 @@ export const DropdownMenu = DropdownMenuPrimitive.Root;
 
 export function DropdownMenuTrigger() {
 	return (
-		<DropdownMenuPrimitive.Trigger>
-			<CirclePlusIcon className="stroke-black-100 fill-black-30" />
+		<DropdownMenuPrimitive.Trigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
+			Select
 		</DropdownMenuPrimitive.Trigger>
 	);
 }

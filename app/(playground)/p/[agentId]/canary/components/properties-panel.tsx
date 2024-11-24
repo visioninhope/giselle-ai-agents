@@ -1,5 +1,10 @@
 import clsx from "clsx/lite";
-import { ChevronsDownUpIcon, ChevronsUpDownIcon } from "lucide-react";
+import {
+	ChevronsDownUpIcon,
+	ChevronsUpDownIcon,
+	Trash2Icon,
+	TrashIcon,
+} from "lucide-react";
 import { useMemo, useState } from "react";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
@@ -7,7 +12,22 @@ import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import type { Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
+import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { PropertiesPanelCollapsible } from "./properties-panel-collapsible";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./properties-panel-dropdown-menu";
+import {
+	HoverCard,
+	HoverCardContent,
+	HoverCardTrigger,
+} from "./properties-panel-hover-card";
 import {
 	Tabs,
 	TabsContent,
@@ -156,7 +176,62 @@ function TabsContentPrompt({
 					requirementNode === null ? "Not selected" : requirementNode.name
 				}
 			>
-				<div className="mb-[4px]">
+				{requirementNode === null ? (
+					<div className="flex items-center gap-[4px]">
+						<div className="py-[4px] text-[12px] flex-1">Not selected</div>
+						<DropdownMenu>
+							<DropdownMenuTrigger />
+							<DropdownMenuContent>
+								<DropdownMenuRadioGroup>
+									<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+									{connectableTextGeneratorNodes.map((node) => (
+										<DropdownMenuRadioItem value={node.id} key={node.id}>
+											{node.name}
+										</DropdownMenuRadioItem>
+									))}
+									<DropdownMenuSeparator />
+									<DropdownMenuLabel>Text</DropdownMenuLabel>
+									{connectableTextNodes.map((node) => (
+										<DropdownMenuRadioItem value={node.id} key={node.id}>
+											{node.name}
+										</DropdownMenuRadioItem>
+									))}
+								</DropdownMenuRadioGroup>
+							</DropdownMenuContent>
+						</DropdownMenu>
+					</div>
+				) : (
+					<HoverCard>
+						<HoverCardTrigger asChild>
+							<div className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center  justify-between group">
+								<div className="z-10">
+									<div className="flex items-center gap-[8px]">
+										<p className="truncate text-[14px] font-rosart">
+											{requirementNode.name}
+										</p>
+									</div>
+								</div>
+								<button
+									type="button"
+									className="z-10 group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+								>
+									<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+								</button>
+								<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
+							</div>
+						</HoverCardTrigger>
+						<HoverCardContent className="w-80">
+							<div className="flex justify-between space-x-4">
+								{requirementNode.content.type === "text" && (
+									<div className="line-clamp-5 text-[14px]">
+										{requirementNode.content.text}
+									</div>
+								)}
+							</div>
+						</HoverCardContent>
+					</HoverCard>
+				)}
+				{/* <div className="mb-[4px]">
 					<Select value={requirementNode?.id}>
 						<SelectTrigger>
 							<SelectValue placeholder="Select a requirement" />
@@ -180,7 +255,7 @@ function TabsContentPrompt({
 							</SelectGroup>
 						</SelectContent>
 					</Select>
-				</div>
+				</div> */}
 			</PropertiesPanelCollapsible>
 
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />

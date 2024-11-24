@@ -87,6 +87,7 @@
 	"devDependencies": {
 		"@biomejs/biome": "1.9.4",
 		"@octokit/webhooks-types": "7.6.1",
+		"@radix-ui/react-hover-card": "1.1.2",
 		"@tailwindcss/typography": "0.5.15",
 		"@types/bun": "1.1.13",
 		"@types/node": "^22",

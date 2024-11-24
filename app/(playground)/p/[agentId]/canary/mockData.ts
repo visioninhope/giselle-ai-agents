@@ -151,7 +151,33 @@ const textNode: Node = {
 	type: "variable",
 	content: {
 		type: "text",
-		text: "This is a text",
+		text: `Analyze the following git diff and generate a clear, concise commit message that follows these rules:
+
+1. Start with a type prefix in parentheses, choosing from:
+   - (feat): New feature
+   - (fix): Bug fix
+   - (docs): Documentation changes
+   - (style): Code style changes (formatting, etc)
+   - (refactor): Code refactoring
+   - (perf): Performance improvements
+   - (test): Adding or modifying tests
+   - (chore): Maintenance tasks
+
+2. Follow with a short (50 chars or less) summary in imperative mood
+3. Add a blank line followed by more detailed description if needed
+4. Break description into bullet points for multiple changes
+5. Reference any issue numbers at the end
+
+Here is the diff to analyze:
+
+{diff_text}
+
+Generate a commit message following the above format and these additional guidelines:
+- Be specific about what changed, but concise
+- Use imperative mood ("Add feature" not "Added feature")
+- Focus on the "what" and "why", not "how"
+- Mention significant implementation details only if important
+- Include breaking changes prominently if any`,
 	},
 };
 
