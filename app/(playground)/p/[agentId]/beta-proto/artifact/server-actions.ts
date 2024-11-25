@@ -54,6 +54,7 @@ ${sourcesToText(sources)}
 	(async () => {
 		const model = buildLanguageModel(params.modelConfiguration);
 		const generation = trace.generation({
+			name: "generate-text",
 			input: params.userPrompt,
 			model: langfuseModel(params.modelConfiguration.modelId),
 			modelParameters: {
