@@ -18,10 +18,10 @@ import {
 } from "react";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
-import { useGraph, useNode } from "../contexts/graph";
+import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
-import type { Text, TextGenerateActionContent } from "../types";
+import type { Node, Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
 	Select,
@@ -50,7 +50,7 @@ function PropertiesPanelCollapsible({
 	return (
 		<>
 			{isExpanded ? (
-				<div className="px-6 text-base text-black-30 py-2 grid gap-2">
+				<div className="px-[24px] text-base text-black-30 py-[8px] grid gap-2">
 					<div className="flex justify-between items-center">
 						<p className="font-rosart">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
@@ -65,7 +65,7 @@ function PropertiesPanelCollapsible({
 			) : (
 				<button
 					type="button"
-					className="px-6 text-base text-black-30 flex justify-between items-center py-2 group"
+					className="px-[24px] text-base text-black-30 flex justify-between items-center py-[8px] group"
 					onClick={() => setIsExpanded(true)}
 				>
 					<div className="flex gap-2 items-center">
@@ -317,7 +317,11 @@ export function PropertiesPanel() {
 							/>
 						</TabsContent>
 					)}
-					<TabsContent value="Result">hello</TabsContent>
+					{selectedNode && (
+						<TabsContent value="Result">
+							<TabContentGenerateTextResult node={selectedNode} />
+						</TabsContent>
+					)}
 				</Tabs>
 			) : (
 				<div className="relative z-10 flex justify-between items-center">
@@ -826,6 +830,21 @@ function TabsContentPrompt({
 									)}
 								</div>
 							</div> */}
+		</div>
+	);
+}
+
+function TabContentGenerateTextResult({
+	node,
+}: {
+	node: Node;
+}) {
+	const artifact = useArtifact({ creatorNodeId: node.id });
+	return (
+		<div className="grid gap-[2px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px]">
+			<div>{artifact?.messages.plan}</div>
+			<div>{artifact?.content}</div>
+			<div>{artifact?.messages.description}</div>
 		</div>
 	);
 }

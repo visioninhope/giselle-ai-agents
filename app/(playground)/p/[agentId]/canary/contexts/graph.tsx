@@ -1,5 +1,5 @@
 import { type ReactNode, createContext, useContext, useMemo } from "react";
-import type { Graph, NodeHandleId } from "../types";
+import type { Artifact, Graph, NodeHandleId, NodeId } from "../types";
 
 interface GraphContextValue {
 	graph: Graph;
@@ -46,4 +46,19 @@ export function useNode(query: TargetHandle) {
 		return node;
 	}, [connections, nodes, query]);
 	return node;
+}
+
+interface CreatorNode {
+	creatorNodeId?: NodeId;
+}
+export function useArtifact(query: CreatorNode): Artifact | null {
+	const { artifacts } = useGraph();
+	const artifact = useMemo(() => {
+		const createdArtifacts = artifacts.filter(
+			(artifact) => artifact.creatorNodeId === query.creatorNodeId,
+		);
+		createdArtifacts.sort((a, b) => a.createdAt - b.createdAt);
+		return createdArtifacts[0];
+	}, [artifacts, query]);
+	return artifact;
 }

@@ -1,4 +1,4 @@
-import type { Connection, Node } from "./types";
+import type { Artifact, Connection, Node } from "./types";
 
 const outlineNode: Node = {
 	id: "nd_outline",
@@ -362,4 +362,101 @@ export const connections = [
 	webSearchToSection1Connection,
 	webSearchToSection2Connection,
 	webSearchToReviewConnection,
+];
+
+const outlineArtifact: Artifact = {
+	id: "artf_outline",
+	type: "text",
+	content:
+		"Once upon a time, there was a cat named Whiskers. Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
+	creatorNodeId: outlineNode.id,
+	messages: {
+		plan: "Write a short story about a cat",
+		description: "Write a short story about a cat",
+	},
+	createdAt: Date.now(),
+};
+
+const section1Artifact: Artifact = {
+	id: "artf_section1",
+	type: "text",
+	content:
+		"Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world.",
+	creatorNodeId: sectionNode1.id,
+	messages: {
+		plan: "Write a short story about a cat",
+		description: "Write a short story about a cat",
+	},
+	createdAt: Date.now(),
+};
+
+const section2Artifact: Artifact = {
+	id: "artf_section2",
+	type: "text",
+	content:
+		"Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
+	creatorNodeId: sectionNode2.id,
+	messages: {
+		plan: "Write a short story about a cat",
+		description: "Write a short story about a cat",
+	},
+	createdAt: Date.now(),
+};
+
+const concatArtifact: Artifact = {
+	id: "artf_concat",
+	type: "text",
+	content: "Combined story sections about Whiskers the cat",
+	creatorNodeId: concatNode.id,
+	messages: {
+		plan: "Combine story sections",
+		description: "Combined text from sections",
+	},
+	createdAt: Date.now(),
+};
+
+const reviewArtifact: Artifact = {
+	id: "artf_review",
+	type: "text",
+	content: "Review of cat story",
+	creatorNodeId: reviewNode.id,
+	messages: {
+		plan: "Review story",
+		description: "Review combined story",
+	},
+	createdAt: Date.now(),
+};
+
+const webSearchArtifact: Artifact = {
+	id: "artf_web-search",
+	type: "text",
+	content: "Web search results",
+	creatorNodeId: webSearchNode.id,
+	messages: {
+		plan: "Search web",
+		description: "Web search results",
+	},
+	createdAt: Date.now(),
+};
+
+const standAloneArtifact: Artifact = {
+	id: "artf_stand-alone",
+	type: "text",
+	content: "Standalone generated text",
+	creatorNodeId: textGenerationStandAloneNode.id,
+	messages: {
+		plan: "Generate text",
+		description: "Standalone text generation",
+	},
+	createdAt: Date.now(),
+};
+
+export const artifacts = [
+	outlineArtifact,
+	section1Artifact,
+	section2Artifact,
+	concatArtifact,
+	reviewArtifact,
+	webSearchArtifact,
+	standAloneArtifact,
 ];

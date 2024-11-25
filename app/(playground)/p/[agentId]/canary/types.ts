@@ -83,7 +83,25 @@ export interface Connection {
 	targetNodeType: Node["type"];
 }
 
+type ArtifactId = `artf_${string}`;
+interface ArtifactBase {
+	id: ArtifactId;
+	type: string;
+	creatorNodeId: NodeId;
+	createdAt: number;
+}
+interface TextArtifact extends ArtifactBase {
+	type: "text";
+	content: string;
+	messages: {
+		plan: string;
+		description: string;
+	};
+}
+export type Artifact = TextArtifact;
+
 export interface Graph {
 	nodes: Node[];
 	connections: Connection[];
+	artifacts: Artifact[];
 }
