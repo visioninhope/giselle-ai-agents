@@ -69,6 +69,7 @@ ${sourcesToText(sources)}
 	(async () => {
 		const model = "gpt-4o-mini";
 		const generation = trace.generation({
+			name: "generate-search-keywords",
 			input: inputs.userPrompt,
 			model: langfuseModel(model),
 		});
@@ -91,7 +92,6 @@ ${sourcesToText(sources)}
 				generation.end({
 					output: result,
 				});
-				await lf.shutdownAsync();
 			},
 		});
 		for await (const partialObject of partialObjectStream) {
@@ -100,11 +100,24 @@ ${sourcesToText(sources)}
 
 		const result = await object;
 
+		const webSearchSpan = trace.span({
+			name: "web-search",
+			input: {
+				searchKeywords: result.keywords,
+			},
+		});
+
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) => search(keyword)),
 		)
 			.then((results) => [...new Set(results.flat())])
 			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
+
+		webSearchSpan.end({
+			output: {
+				searchResults: searchResults,
+			}
+		});
 
 		const webSearch: WebSearch = {
 			id: `wbs_${createId()}`,
@@ -150,6 +163,13 @@ ${sourcesToText(sources)}
 				webSearch.items.slice(i * subArrayLength, (i + 1) * subArrayLength),
 			);
 		}
+
+		const webScrapeSpan = trace.span({
+			name: "web-scrape",
+			input: {
+				scrapeItems: chunkedArray,
+			},
+		});
 
 		await Promise.all(
 			chunkedArray.map(async (webSearchItems) => {
@@ -206,6 +226,14 @@ ${sourcesToText(sources)}
 				}
 			}),
 		);
+
+		webScrapeSpan.end({
+			output: {
+				items: mutableItems,
+			},
+		});
+		await lf.shutdownAsync();
+
 		stream.update({
 			...result,
 			webSearch: {
