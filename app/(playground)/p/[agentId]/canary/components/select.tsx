@@ -113,9 +113,8 @@ SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
 function SelectItem({
 	children,
-	label,
 	...props
-}: React.ComponentProps<typeof SelectPrimitive.Item> & { label: string }) {
+}: React.ComponentProps<typeof SelectPrimitive.Item>) {
 	return (
 		<SelectPrimitive.Item
 			className={cn(
@@ -130,8 +129,7 @@ function SelectItem({
 			</span>
 
 			<div>
-				<SelectPrimitive.ItemText>{label}</SelectPrimitive.ItemText>
-				{children && <div>{children}</div>}
+				<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
 			</div>
 		</SelectPrimitive.Item>
 	);

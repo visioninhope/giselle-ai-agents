@@ -42,6 +42,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "./select";
+import { Slider } from "./slider";
 
 export function PropertiesPanel() {
 	const { selectedNode } = useGraphSelection();
@@ -118,7 +119,10 @@ export function PropertiesPanel() {
 					)}
 					{selectedNode?.content?.type === "textGeneration" && (
 						<TabsContent value="LLM">
-							<TabContentsLlm />
+							<TabContentsLlm
+								content={selectedNode.content}
+								key={selectedNode.id}
+							/>
 						</TabsContent>
 					)}
 					<TabsContent value="Result">hello</TabsContent>
@@ -585,6 +589,55 @@ function TabsContentPrompt({
 	);
 }
 
-function TabContentsLlm() {
-	return <div>LLM</div>;
+function TabContentsLlm({
+	content,
+}: {
+	content: TextGenerateActionContent;
+}) {
+	return (
+		<div className="px-[16px] pb-[16px] overflow-y-auto overflow-x-hidden">
+			<div>
+				<div className="relative z-10 flex flex-col gap-[10px]">
+					<div className="grid gap-[8px]">
+						<label
+							htmlFor="text"
+							className="font-rosart text-[16px] text-black-30"
+						>
+							LLM
+						</label>
+						<Select>
+							<SelectTrigger className="w-[280px]">
+								<SelectValue placeholder="Select a timezone" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>OpenAI</SelectLabel>
+									<SelectItem value="openai:gpt-4o">gpt-4o</SelectItem>
+									<SelectItem value="openai:gpt-4o-mini">
+										gpt-4o-mini
+									</SelectItem>
+								</SelectGroup>
+								<SelectGroup>
+									<SelectLabel>Anthropic </SelectLabel>
+									<SelectItem value="anthropic:claude-3.5-sonnet">
+										Claude 3.5 Sonnet
+									</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="border-t border-[hsla(222,21%,40%,1)]" />
+					<div className="grid gap-[16px]">
+						<div className="font-rosart text-[16px] text-black-30">
+							Parameters
+						</div>
+						<div className="grid gap-[16px]">
+							<Slider label="Temperature" value={content.temperature} />
+						</div>
+						<Slider label="Top P" value={content.topP} />
+					</div>
+				</div>
+			</div>
+		</div>
+	);
 }
