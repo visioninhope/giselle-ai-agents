@@ -47,23 +47,10 @@ import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files"
 import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
 import type { Stripe } from "stripe";
 
-export const organizations = pgTable("organizations", {
-	dbId: serial("db_id").primaryKey(),
-	name: text("name").notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at")
-		.defaultNow()
-		.notNull()
-		.$onUpdate(() => new Date()),
-});
-
 export const subscriptions = pgTable("subscriptions", {
 	// Subscription ID from Stripe, e.g. sub_1234.
 	id: text("id").notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
-	organizationDbId: integer("organization_db_id")
-		.notNull()
-		.references(() => organizations.dbId),
 	teamDbId: integer("team_db_id")
 		.notNull()
 		.references(() => teams.dbId),
@@ -81,9 +68,6 @@ export const subscriptions = pgTable("subscriptions", {
 
 export const teams = pgTable("teams", {
 	dbId: serial("db_id").primaryKey(),
-	organizationDbId: integer("organization_db_id")
-		.notNull()
-		.references(() => organizations.dbId),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")
