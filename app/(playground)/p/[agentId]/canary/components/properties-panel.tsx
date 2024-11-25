@@ -1,33 +1,27 @@
+import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
+import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
+import * as TabsPrimitive from "@radix-ui/react-tabs";
 import clsx from "clsx/lite";
-import { TrashIcon } from "lucide-react";
-import { useMemo, useState } from "react";
+import {
+	CheckIcon,
+	ChevronsUpDownIcon,
+	DotIcon,
+	Minimize2Icon,
+	TrashIcon,
+} from "lucide-react";
+import {
+	type ComponentProps,
+	type FC,
+	type ReactNode,
+	useMemo,
+	useState,
+} from "react";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import type { Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
-import { PropertiesPanelCollapsible } from "./properties-panel-collapsible";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuLabel,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "./properties-panel-dropdown-menu";
-import {
-	HoverCard,
-	HoverCardContent,
-	HoverCardTrigger,
-} from "./properties-panel-hover-card";
-import {
-	Tabs,
-	TabsContent,
-	TabsList,
-	TabsTrigger,
-} from "./properties-panel-tabs";
 import {
 	Select,
 	SelectContent,
@@ -38,6 +32,212 @@ import {
 	SelectValue,
 } from "./select";
 import { Slider } from "./slider";
+
+interface PropertiesPanelCollapsible {
+	title: string;
+	glanceLabel?: string;
+	children: ReactNode;
+}
+
+function PropertiesPanelCollapsible({
+	title,
+	glanceLabel,
+	children,
+}: PropertiesPanelCollapsible) {
+	const [isExpanded, setIsExpanded] = useState(false);
+
+	return (
+		<>
+			{isExpanded ? (
+				<div className="px-6 text-base text-black-30 py-2 grid gap-2">
+					<div className="flex justify-between items-center">
+						<p className="font-rosart">{title}</p>
+						<button type="button" onClick={() => setIsExpanded(false)}>
+							<Minimize2Icon
+								size={16}
+								className="text-black-50 hover:text-black-30"
+							/>
+						</button>
+					</div>
+					{children}
+				</div>
+			) : (
+				<button
+					type="button"
+					className="px-6 text-base text-black-30 flex justify-between items-center py-2 group"
+					onClick={() => setIsExpanded(true)}
+				>
+					<div className="flex gap-2 items-center">
+						<p className="font-rosart">{title}</p>
+						{glanceLabel && (
+							<span className="text-[10px] text-black-50">{glanceLabel}</span>
+						)}
+					</div>
+					<ChevronsUpDownIcon
+						size={16}
+						className="text-black-50 group-hover:text-black-30"
+					/>
+				</button>
+			)}
+		</>
+	);
+}
+
+const DropdownMenu = DropdownMenuPrimitive.Root;
+
+function DropdownMenuTrigger({ label = "Select" }: { label?: string }) {
+	return (
+		<DropdownMenuPrimitive.Trigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
+			{label}
+		</DropdownMenuPrimitive.Trigger>
+	);
+}
+
+const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+
+const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
+
+function DropdownMenuContent({ children }: { children: React.ReactNode }) {
+	return (
+		<DropdownMenuPrimitive.Portal>
+			<DropdownMenuPrimitive.Content
+				sideOffset={4}
+				align="end"
+				className={clsx(
+					"z-50 min-w-[8rem] overflow-hidden rounded-[16px] border border-black-70 bg-black-100 p-[8px] text-black-30 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
+					"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+				)}
+			>
+				{children}
+			</DropdownMenuPrimitive.Content>
+		</DropdownMenuPrimitive.Portal>
+	);
+}
+DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
+
+function DropdownMenuCheckboxItem({
+	children,
+	checked = false,
+}: {
+	children: React.ReactNode;
+	checked?: boolean;
+}) {
+	return (
+		<DropdownMenuPrimitive.CheckboxItem
+			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			checked={checked}
+		>
+			{children}
+			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+				<DropdownMenuPrimitive.ItemIndicator>
+					<CheckIcon className="h-4 w-4" />
+				</DropdownMenuPrimitive.ItemIndicator>
+			</span>
+		</DropdownMenuPrimitive.CheckboxItem>
+	);
+}
+DropdownMenuCheckboxItem.displayName =
+	DropdownMenuPrimitive.CheckboxItem.displayName;
+
+function DropdownMenuLabel({ children }: { children: ReactNode }) {
+	return (
+		<DropdownMenuPrimitive.Label className="px-2 py-[2px] text-[12px] text-black-70">
+			{children}
+		</DropdownMenuPrimitive.Label>
+	);
+}
+DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
+
+function DropdownMenuSeparator() {
+	return (
+		<DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-muted" />
+	);
+}
+DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
+
+function DropdownMenuRadioItem({
+	children,
+	value,
+}: {
+	children: ReactNode;
+	value: ComponentProps<typeof DropdownMenuPrimitive.RadioItem>["value"];
+}) {
+	return (
+		<DropdownMenuPrimitive.RadioItem
+			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			value={value}
+		>
+			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
+				<DropdownMenuPrimitive.ItemIndicator>
+					<DotIcon className="h-8 w-8 fill-current" />
+				</DropdownMenuPrimitive.ItemIndicator>
+			</span>
+			{children}
+		</DropdownMenuPrimitive.RadioItem>
+	);
+}
+DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
+
+const HoverCard = HoverCardPrimitive.Root;
+
+const HoverCardTrigger = HoverCardPrimitive.Trigger;
+
+function HoverCardContent({
+	className,
+	align = "center",
+	sideOffset = 4,
+	side = "left",
+	...props
+}: ComponentProps<typeof HoverCardPrimitive.Content>) {
+	return (
+		<HoverCardPrimitive.Content
+			align={align}
+			side={side}
+			sideOffset={sideOffset}
+			className="z-50 w-64 rounded-[16px] border border-black-70 bg-black-100 p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+			{...props}
+		/>
+	);
+}
+HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
+
+const Tabs = TabsPrimitive.Root;
+
+function TabsList(props: ComponentProps<typeof TabsPrimitive.List>) {
+	return (
+		<TabsPrimitive.List className="gap-[16px] flex items-center" {...props} />
+	);
+}
+TabsList.displayName = TabsPrimitive.List.displayName;
+
+const TabsTrigger: FC<ComponentProps<typeof TabsPrimitive.Trigger>> = ({
+	ref,
+	className,
+	...props
+}) => (
+	<TabsPrimitive.Trigger
+		ref={ref}
+		className="font-rosart text-[16px] text-black-70 data-[state=active]:text-black-30 py-[6px] px-[2px]"
+		{...props}
+	/>
+);
+TabsTrigger.displayName = TabsPrimitive.Trigger.displayName;
+
+const TabsContent: FC<ComponentProps<typeof TabsPrimitive.Content>> = ({
+	ref,
+	...props
+}) => (
+	<TabsPrimitive.Content
+		ref={ref}
+		className="overflow-y-auto overflow-x-hidden"
+		{...props}
+	/>
+);
+TabsContent.displayName = TabsPrimitive.Content.displayName;
+
+export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 export function PropertiesPanel() {
 	const { selectedNode } = useGraphSelection();
