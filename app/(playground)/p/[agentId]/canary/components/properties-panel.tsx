@@ -301,6 +301,7 @@ export function PropertiesPanel() {
 								<button
 									type="button"
 									className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
+									onClick={() => setTab("Result")}
 								>
 									Generate
 								</button>
