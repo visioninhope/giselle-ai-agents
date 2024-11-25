@@ -20,6 +20,7 @@ import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
+import { usePropertiesPanel } from "../contexts/properties-panel";
 import type { Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -241,23 +242,27 @@ export { Tabs, TabsList, TabsTrigger, TabsContent };
 
 export function PropertiesPanel() {
 	const { selectedNode } = useGraphSelection();
-	const [show, setShow] = useState(false);
+	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	return (
 		<div
 			className={clsx(
 				"absolute bg-black-100 rounded-[16px] overflow-hidden shadow-[0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)] top-[0px] right-[20px] mt-[60px]",
 				"data-[state=show]:w-[380px] data-[state=show]:bottom-[20px]",
 			)}
-			data-state={show ? "show" : "hidden"}
+			data-state={open ? "show" : "hidden"}
 		>
 			<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 
-			{show ? (
-				<Tabs className="h-full overflow-y-hidden flex flex-col">
+			{open ? (
+				<Tabs
+					className="h-full overflow-y-hidden flex flex-col"
+					value={tab}
+					onValueChange={(v) => setTab(v)}
+				>
 					<div className="relative z-10 flex justify-between items-center pl-[16px] pr-[24px] py-[10px] h-[56px]">
 						<button
 							type="button"
-							onClick={() => setShow(false)}
+							onClick={() => setOpen(false)}
 							className="p-[8px]"
 						>
 							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
@@ -317,7 +322,7 @@ export function PropertiesPanel() {
 				<div className="relative z-10 flex justify-between items-center">
 					<button
 						type="button"
-						onClick={() => setShow(true)}
+						onClick={() => setOpen(true)}
 						className="p-[16px]"
 					>
 						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-30" />

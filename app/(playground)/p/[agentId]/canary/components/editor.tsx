@@ -15,6 +15,7 @@ import {
 	GraphSelectionContextProvider,
 	useGraphSelection,
 } from "../contexts/graph-selection";
+import { PropertiesPanelProvider } from "../contexts/properties-panel";
 import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
@@ -27,9 +28,11 @@ export function Editor(props: EditorProps) {
 	return (
 		<GraphContextProvider graph={props.graph}>
 			<GraphSelectionContextProvider graph={props.graph}>
-				<ReactFlowProvider>
-					<EditorInner graph={props.graph} />
-				</ReactFlowProvider>
+				<PropertiesPanelProvider>
+					<ReactFlowProvider>
+						<EditorInner graph={props.graph} />
+					</ReactFlowProvider>
+				</PropertiesPanelProvider>
 			</GraphSelectionContextProvider>
 		</GraphContextProvider>
 	);
