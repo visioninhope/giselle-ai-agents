@@ -12,7 +12,6 @@ import { useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import type { Text, TextGenerateActionContent } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
-import { Dialog, DialogContent, DialogTrigger } from "./dialog";
 import { PropertiesPanelCollapsible } from "./properties-panel-collapsible";
 import {
 	DropdownMenu,
