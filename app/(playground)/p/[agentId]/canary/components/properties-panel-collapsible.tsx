@@ -1,4 +1,4 @@
-import { ChevronsDownUpIcon, ChevronsUpDownIcon } from "lucide-react";
+import { ChevronsUpDownIcon, Minimize2Icon } from "lucide-react";
 import { type ReactNode, useState } from "react";
 
 interface PropertiesPanelCollapsible {
@@ -21,7 +21,7 @@ export function PropertiesPanelCollapsible({
 					<div className="flex justify-between items-center">
 						<p className="font-rosart">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
-							<ChevronsDownUpIcon
+							<Minimize2Icon
 								size={16}
 								className="text-black-50 hover:text-black-30"
 							/>
