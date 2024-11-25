@@ -116,7 +116,7 @@ ${sourcesToText(sources)}
 		webSearchSpan.end({
 			output: {
 				searchResults: searchResults,
-			}
+			},
 		});
 
 		const webSearch: WebSearch = {
