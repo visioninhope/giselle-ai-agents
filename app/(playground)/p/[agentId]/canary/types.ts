@@ -92,6 +92,7 @@ interface ArtifactBase {
 }
 interface TextArtifact extends ArtifactBase {
 	type: "text";
+	title: string;
 	content: string;
 	messages: {
 		plan: string;

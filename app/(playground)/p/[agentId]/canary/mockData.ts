@@ -375,6 +375,7 @@ const outlineArtifact: Artifact = {
 		description: "Write a short story about a cat",
 	},
 	createdAt: Date.now(),
+	title: "Cat Story Outline",
 };
 
 const section1Artifact: Artifact = {
@@ -388,6 +389,7 @@ const section1Artifact: Artifact = {
 		description: "Write a short story about a cat",
 	},
 	createdAt: Date.now(),
+	title: "Cat Story Section 1",
 };
 
 const section2Artifact: Artifact = {
@@ -401,6 +403,7 @@ const section2Artifact: Artifact = {
 		description: "Write a short story about a cat",
 	},
 	createdAt: Date.now(),
+	title: "Cat Story Section 2",
 };
 
 const concatArtifact: Artifact = {
@@ -413,6 +416,7 @@ const concatArtifact: Artifact = {
 		description: "Combined text from sections",
 	},
 	createdAt: Date.now(),
+	title: "Combined Cat Story",
 };
 
 const reviewArtifact: Artifact = {
@@ -425,6 +429,7 @@ const reviewArtifact: Artifact = {
 		description: "Review combined story",
 	},
 	createdAt: Date.now(),
+	title: "Story Review",
 };
 
 const webSearchArtifact: Artifact = {
@@ -437,6 +442,7 @@ const webSearchArtifact: Artifact = {
 		description: "Web search results",
 	},
 	createdAt: Date.now(),
+	title: "Web Search Results",
 };
 
 const standAloneArtifact: Artifact = {
@@ -449,6 +455,7 @@ const standAloneArtifact: Artifact = {
 		description: "Standalone text generation",
 	},
 	createdAt: Date.now(),
+	title: "Standalone Text",
 };
 
 export const artifacts = [

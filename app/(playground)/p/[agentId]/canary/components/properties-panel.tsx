@@ -843,6 +843,7 @@ function TabContentGenerateTextResult({
 	return (
 		<div className="grid gap-[2px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px]">
 			<div>{artifact?.messages.plan}</div>
+			<div>{artifact?.title}</div>
 			<div>{artifact?.content}</div>
 			<div>{artifact?.messages.description}</div>
 		</div>
