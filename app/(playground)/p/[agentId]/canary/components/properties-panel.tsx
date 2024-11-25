@@ -16,8 +16,10 @@ import {
 	useMemo,
 	useState,
 } from "react";
+import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
+import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
@@ -840,11 +842,20 @@ function TabContentGenerateTextResult({
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
 	return (
-		<div className="grid gap-[2px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px]">
+		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
 			<div>{artifact?.messages.plan}</div>
-			<div>{artifact?.title}</div>
-			<div>{artifact?.content}</div>
+			<Block size="large">
+				<div className="flex items-center gap-[12px]">
+					<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
+					<div className="text-[14px]">{artifact?.title}</div>
+				</div>
+			</Block>
 			<div>{artifact?.messages.description}</div>
+			<div>
+				<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
+					<p className="italic">Generation completed.</p>
+				</div>
+			</div>
 		</div>
 	);
 }

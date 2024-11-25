@@ -1,9 +1,20 @@
+import clsx from "clsx/lite";
 import type { ReactNode } from "react";
 
-export function Block({ children, ...props }: { children: ReactNode }) {
+type BlockSize = "default" | "large";
+export function Block({
+	children,
+	size = "default",
+	...props
+}: { children: ReactNode; size?: BlockSize }) {
 	return (
 		<div
-			className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left group"
+			data-size={size}
+			className={clsx(
+				"rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left group",
+				"data-[size=default]:px-[12px] data-[size=default]:py-[8px]",
+				"data-[size=large]:px-[16px] data-[size=large]:py-[8px]",
+			)}
 			{...props}
 		>
 			<div className="z-10 relative">{children}</div>
