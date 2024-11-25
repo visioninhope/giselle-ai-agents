@@ -191,6 +191,21 @@ const webSearchNode: Node = {
 	},
 };
 
+const textGenerationStandAloneNode: Node = {
+	id: "nd_stand-alone",
+	name: "Untitled Node - 9",
+	position: { x: 600, y: 100 },
+	type: "action",
+	content: {
+		type: "textGeneration",
+		llm: "gpt2",
+		temperature: 0.7,
+		topP: 1,
+		instruction: "Write a short story about a cat",
+		sources: [],
+	},
+};
+
 export const nodes = [
 	outlineNode,
 	sectionNode1,
@@ -200,6 +215,7 @@ export const nodes = [
 	fileNode,
 	textNode,
 	webSearchNode,
+	textGenerationStandAloneNode,
 ];
 
 const fileOutlineConnection: Connection = {

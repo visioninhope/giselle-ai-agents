@@ -268,28 +268,28 @@ function TabsContentPrompt({
 						: `${sourceNodes.length} sources selected`
 				}
 			>
-				<div className="mb-[4px]">
-					<Select>
-						<SelectTrigger>
-							<SelectValue placeholder="Select a requirement" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectGroup>
-								<SelectLabel>Text Generator</SelectLabel>
+				<div className="flex items-center gap-[4px]">
+					<div className="py-[4px] text-[12px] flex-1">Not selected</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger />
+						<DropdownMenuContent>
+							<DropdownMenuRadioGroup>
+								<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
 								{connectableTextGeneratorNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id} label={node.name}>
-										<p>it's a text generator</p>
-									</SelectItem>
+									<DropdownMenuRadioItem value={node.id} key={node.id}>
+										{node.name}
+									</DropdownMenuRadioItem>
 								))}
-							</SelectGroup>
-							<SelectGroup>
-								<SelectLabel>Text</SelectLabel>
+								<DropdownMenuSeparator />
+								<DropdownMenuLabel>Text</DropdownMenuLabel>
 								{connectableTextNodes.map((node) => (
-									<SelectItem value={node.id} key={node.id} label={node.name} />
+									<DropdownMenuRadioItem value={node.id} key={node.id}>
+										{node.name}
+									</DropdownMenuRadioItem>
 								))}
-							</SelectGroup>
-						</SelectContent>
-					</Select>
+							</DropdownMenuRadioGroup>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</PropertiesPanelCollapsible>
 
