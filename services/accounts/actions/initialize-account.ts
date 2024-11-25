@@ -2,7 +2,6 @@
 
 import {
 	db,
-	organizations,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -26,18 +25,9 @@ export const initializeAccount = async (supabaseUserId: User["id"]) => {
 			userDbId: user.dbId,
 			supabaseUserId,
 		});
-		const [organization] = await tx
-			.insert(organizations)
-			.values({
-				name: "default",
-			})
-			.returning({
-				id: organizations.dbId,
-			});
 		const [team] = await tx
 			.insert(teams)
 			.values({
-				organizationDbId: organization.id,
 				name: "default",
 			})
 			.returning({
