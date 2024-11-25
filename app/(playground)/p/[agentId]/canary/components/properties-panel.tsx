@@ -22,6 +22,7 @@ import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import type { Node, Text, TextGenerateActionContent } from "../types";
+import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
 	Select,
@@ -455,22 +456,21 @@ function TabsContentPrompt({
 				) : (
 					<HoverCard>
 						<HoverCardTrigger asChild>
-							<div className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center  justify-between group">
-								<div className="z-10">
+							<Block>
+								<div className="flex items-center justify-between">
 									<div className="flex items-center gap-[8px]">
 										<p className="truncate text-[14px] font-rosart">
 											{requirementNode.name}
 										</p>
 									</div>
+									<button
+										type="button"
+										className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+									>
+										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+									</button>
 								</div>
-								<button
-									type="button"
-									className="z-10 group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
-								>
-									<TrashIcon className="w-[16px] h-[16px] text-black-30" />
-								</button>
-								<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
-							</div>
+							</Block>
 						</HoverCardTrigger>
 						<HoverCardContent className="w-80">
 							<div className="flex justify-between space-x-4">
@@ -549,22 +549,21 @@ function TabsContentPrompt({
 						{sourceNodes.map((sourceNode) => (
 							<HoverCard key={sourceNode.id}>
 								<HoverCardTrigger asChild>
-									<div className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center  justify-between group">
-										<div className="z-10">
+									<Block>
+										<div className="flex items-center justify-between">
 											<div className="flex items-center gap-[8px]">
 												<p className="truncate text-[14px] font-rosart">
 													{sourceNode.name}
 												</p>
 											</div>
+											<button
+												type="button"
+												className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+											>
+												<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+											</button>
 										</div>
-										<button
-											type="button"
-											className="z-10 group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
-										>
-											<TrashIcon className="w-[16px] h-[16px] text-black-30" />
-										</button>
-										<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
-									</div>
+									</Block>
 								</HoverCardTrigger>
 								<HoverCardContent className="w-80">
 									<div className="flex justify-between space-x-4">
