@@ -71,7 +71,6 @@ export function PropertiesPanel() {
 							{selectedNode?.content?.type === "textGeneration" && (
 								<>
 									<TabsTrigger value="Prompt">Prompt</TabsTrigger>
-									<TabsTrigger value="LLM">LLM</TabsTrigger>
 									<TabsTrigger value="Result">Result</TabsTrigger>
 								</>
 							)}
@@ -112,14 +111,6 @@ export function PropertiesPanel() {
 					{selectedNode?.content?.type === "textGeneration" && (
 						<TabsContent value="Prompt" className="flex-1">
 							<TabsContentPrompt
-								content={selectedNode.content}
-								key={selectedNode.id}
-							/>
-						</TabsContent>
-					)}
-					{selectedNode?.content?.type === "textGeneration" && (
-						<TabsContent value="LLM">
-							<TabContentsLlm
 								content={selectedNode.content}
 								key={selectedNode.id}
 							/>
@@ -177,6 +168,55 @@ function TabsContentPrompt({
 	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full">
+			<PropertiesPanelCollapsible title="LLM" glanceLabel={content.llm}>
+				<div className="flex flex-col gap-[10px]">
+					<div className="grid gap-[8px]">
+						<Select value={content.llm}>
+							<SelectTrigger>
+								<SelectValue placeholder="Select a LLM" />
+							</SelectTrigger>
+							<SelectContent>
+								<SelectGroup>
+									<SelectLabel>OpenAI</SelectLabel>
+									<SelectItem value="openai:gpt-4o">gpt-4o</SelectItem>
+									<SelectItem value="openai:gpt-4o-mini">
+										gpt-4o-mini
+									</SelectItem>
+								</SelectGroup>
+								<SelectGroup>
+									<SelectLabel>Anthropic </SelectLabel>
+									<SelectItem value="anthropic:claude-3.5-sonnet">
+										Claude 3.5 Sonnet
+									</SelectItem>
+								</SelectGroup>
+							</SelectContent>
+						</Select>
+					</div>
+					<div className="grid gap-[8px]">
+						<div className="font-rosart text-[16px] text-black-30">
+							Parameters
+						</div>
+						<div className="grid gap-[16px]">
+							<Slider
+								label="Temperature"
+								value={content.temperature}
+								max={2.0}
+								min={0.0}
+								step={0.01}
+							/>
+						</div>
+						<Slider
+							label="Top P"
+							value={content.topP}
+							max={1.0}
+							min={0.0}
+							step={0.01}
+						/>
+					</div>
+				</div>
+			</PropertiesPanelCollapsible>
+
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 			<PropertiesPanelCollapsible
 				title="Requirement"
 				glanceLabel={
@@ -585,59 +625,6 @@ function TabsContentPrompt({
 									)}
 								</div>
 							</div> */}
-		</div>
-	);
-}
-
-function TabContentsLlm({
-	content,
-}: {
-	content: TextGenerateActionContent;
-}) {
-	return (
-		<div className="px-[16px] pb-[16px] overflow-y-auto overflow-x-hidden">
-			<div>
-				<div className="relative z-10 flex flex-col gap-[10px]">
-					<div className="grid gap-[8px]">
-						<label
-							htmlFor="text"
-							className="font-rosart text-[16px] text-black-30"
-						>
-							LLM
-						</label>
-						<Select>
-							<SelectTrigger className="w-[280px]">
-								<SelectValue placeholder="Select a timezone" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectGroup>
-									<SelectLabel>OpenAI</SelectLabel>
-									<SelectItem value="openai:gpt-4o">gpt-4o</SelectItem>
-									<SelectItem value="openai:gpt-4o-mini">
-										gpt-4o-mini
-									</SelectItem>
-								</SelectGroup>
-								<SelectGroup>
-									<SelectLabel>Anthropic </SelectLabel>
-									<SelectItem value="anthropic:claude-3.5-sonnet">
-										Claude 3.5 Sonnet
-									</SelectItem>
-								</SelectGroup>
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="border-t border-[hsla(222,21%,40%,1)]" />
-					<div className="grid gap-[16px]">
-						<div className="font-rosart text-[16px] text-black-30">
-							Parameters
-						</div>
-						<div className="grid gap-[16px]">
-							<Slider label="Temperature" value={content.temperature} />
-						</div>
-						<Slider label="Top P" value={content.topP} />
-					</div>
-				</div>
-			</div>
 		</div>
 	);
 }

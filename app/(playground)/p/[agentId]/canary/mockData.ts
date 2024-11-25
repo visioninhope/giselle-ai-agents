@@ -7,7 +7,7 @@ const outlineNode: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
@@ -31,7 +31,7 @@ const sectionNode1: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
@@ -60,7 +60,7 @@ const sectionNode2: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
@@ -89,7 +89,7 @@ const concatNode: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
@@ -113,7 +113,7 @@ const reviewNode: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
@@ -198,7 +198,7 @@ const textGenerationStandAloneNode: Node = {
 	type: "action",
 	content: {
 		type: "textGeneration",
-		llm: "gpt2",
+		llm: "anthropic:claude-3.5-sonnet",
 		temperature: 0.7,
 		topP: 1,
 		instruction: "Write a short story about a cat",
