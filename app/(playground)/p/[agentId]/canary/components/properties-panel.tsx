@@ -1,3 +1,4 @@
+import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
@@ -12,6 +13,7 @@ import {
 import {
 	type ComponentProps,
 	type FC,
+	type HTMLAttributes,
 	type ReactNode,
 	useMemo,
 	useState,
@@ -241,7 +243,77 @@ const TabsContent: FC<ComponentProps<typeof TabsPrimitive.Content>> = ({
 );
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+const Dialog = DialogPrimitive.Root;
+
+const DialogTrigger = DialogPrimitive.Trigger;
+
+const DialogPortal = DialogPrimitive.Portal;
+
+const DialogClose = DialogPrimitive.Close;
+
+function DialogOverlay(props: ComponentProps<typeof DialogPrimitive.Overlay>) {
+	return (
+		<DialogPrimitive.Overlay
+			className="fixed inset-0 z-50 bg-black-100/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0"
+			{...props}
+		/>
+	);
+}
+DialogOverlay.displayName = DialogPrimitive.Overlay.displayName;
+
+function DialogContent({
+	children,
+	...props
+}: ComponentProps<typeof DialogPrimitive.Content>) {
+	return (
+		<DialogPortal>
+			<DialogOverlay />
+			<DialogPrimitive.Content
+				className={clsx(
+					"fixed left-[50%] top-[50%] z-50",
+					"w-[800px] h-[90%] overflow-hidden translate-x-[-50%] translate-y-[-50%]",
+					"px-[32px] py-[32px] flex",
+					"font-rosart bg-black-100 rounded-[16px] shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset,0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]",
+					"duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
+				)}
+				{...props}
+			>
+				<div className="relative z-10 flex flex-col">{children}</div>
+				<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
+			</DialogPrimitive.Content>
+		</DialogPortal>
+	);
+}
+DialogContent.displayName = DialogPrimitive.Content.displayName;
+
+function DialogHeader(props: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className="flex flex-col space-y-1.5 text-center sm:text-left"
+			{...props}
+		/>
+	);
+}
+DialogHeader.displayName = "DialogHeader";
+
+function DialogTitle(props: ComponentProps<typeof DialogPrimitive.Title>) {
+	return (
+		<DialogPrimitive.Title
+			className="text-lg font-semibold leading-none tracking-tight"
+			{...props}
+		/>
+	);
+}
+
+function DialogFooter(props: HTMLAttributes<HTMLDivElement>) {
+	return (
+		<div
+			className="flex flex-col space-y-1.5 text-center sm:text-left"
+			{...props}
+		/>
+	);
+}
+DialogFooter.displayName = "DialogHeader";
 
 export function PropertiesPanel() {
 	const { selectedNode } = useGraphSelection();
@@ -835,22 +907,176 @@ function TabsContentPrompt({
 	);
 }
 
+/**
+ * Formats a timestamp number into common English date string formats
+ */
+const formatTimestamp = {
+	/**
+	 * Format: Nov 25, 2024 10:30:45 AM
+	 */
+	toLongDateTime: (timestamp: number): string => {
+		return new Date(timestamp).toLocaleString("en-US", {
+			year: "numeric",
+			month: "short",
+			day: "numeric",
+			hour: "numeric",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: true,
+		});
+	},
+
+	/**
+	 * Format: 11/25/2024 10:30 AM
+	 */
+	toShortDateTime: (timestamp: number): string => {
+		return new Date(timestamp).toLocaleString("en-US", {
+			year: "numeric",
+			month: "numeric",
+			day: "numeric",
+			hour: "numeric",
+			minute: "2-digit",
+			hour12: true,
+		});
+	},
+
+	/**
+	 * Format: November 25, 2024
+	 */
+	toLongDate: (timestamp: number): string => {
+		return new Date(timestamp).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "long",
+			day: "numeric",
+		});
+	},
+
+	/**
+	 * Format: 11/25/2024
+	 */
+	toShortDate: (timestamp: number): string => {
+		return new Date(timestamp).toLocaleDateString("en-US", {
+			year: "numeric",
+			month: "numeric",
+			day: "numeric",
+		});
+	},
+
+	/**
+	 * Format: 10:30:45 AM
+	 */
+	toTime: (timestamp: number): string => {
+		return new Date(timestamp).toLocaleTimeString("en-US", {
+			hour: "numeric",
+			minute: "2-digit",
+			second: "2-digit",
+			hour12: true,
+		});
+	},
+
+	/**
+	 * Format: ISO 8601 (2024-11-25T10:30:45Z)
+	 * Useful for APIs and database storage
+	 */
+	toISO: (timestamp: number): string => {
+		return new Date(timestamp).toISOString();
+	},
+
+	/**
+	 * Returns relative time like "2 hours ago", "in 3 days", etc.
+	 * Supports both past and future dates
+	 */
+	toRelativeTime: (timestamp: number): string => {
+		const now = Date.now();
+		const diff = timestamp - now;
+		const absMs = Math.abs(diff);
+		const isPast = diff < 0;
+
+		// Time units in milliseconds
+		const minute = 60 * 1000;
+		const hour = 60 * minute;
+		const day = 24 * hour;
+		const week = 7 * day;
+		const month = 30 * day;
+		const year = 365 * day;
+
+		// Helper function to format the time with proper pluralization
+		const formatUnit = (value: number, unit: string): string => {
+			const plural = value === 1 ? "" : "s";
+			return isPast
+				? `${value} ${unit}${plural} ago`
+				: `in ${value} ${unit}${plural}`;
+		};
+
+		if (absMs < minute) {
+			return isPast ? "just now" : "in a few seconds";
+		}
+
+		if (absMs < hour) {
+			const mins = Math.floor(absMs / minute);
+			return formatUnit(mins, "minute");
+		}
+
+		if (absMs < day) {
+			const hrs = Math.floor(absMs / hour);
+			return formatUnit(hrs, "hour");
+		}
+
+		if (absMs < week) {
+			const days = Math.floor(absMs / day);
+			return formatUnit(days, "day");
+		}
+
+		if (absMs < month) {
+			const weeks = Math.floor(absMs / week);
+			return formatUnit(weeks, "week");
+		}
+
+		if (absMs < year) {
+			const months = Math.floor(absMs / month);
+			return formatUnit(months, "month");
+		}
+
+		const years = Math.floor(absMs / year);
+		return formatUnit(years, "year");
+	},
+};
+
 function TabContentGenerateTextResult({
 	node,
 }: {
 	node: Node;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
+	if (artifact === null) {
+		return null;
+	}
 	return (
 		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
-			<div>{artifact?.messages.plan}</div>
-			<Block size="large">
-				<div className="flex items-center gap-[12px]">
-					<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
-					<div className="text-[14px]">{artifact?.title}</div>
-				</div>
-			</Block>
-			<div>{artifact?.messages.description}</div>
+			<div>{artifact.messages.plan}</div>
+
+			<Dialog>
+				<DialogTrigger>
+					<Block size="large">
+						<div className="flex items-center gap-[12px]">
+							<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
+							<div className="text-[14px]">{artifact.title}</div>
+						</div>
+					</Block>
+				</DialogTrigger>
+				<DialogContent>
+					<div className="sr-only">
+						<DialogHeader>
+							<DialogTitle>{artifact.title}</DialogTitle>
+						</DialogHeader>
+					</div>
+					<div className="flex-1">{artifact.content}</div>
+					<DialogFooter className="text-[14px] font-bold text-black-70">
+						Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+					</DialogFooter>
+				</DialogContent>
+			</Dialog>
+			<div>{artifact.messages.description}</div>
 			<div>
 				<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 					<p className="italic">Generation completed.</p>
