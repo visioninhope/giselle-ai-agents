@@ -117,7 +117,11 @@ export function PropertiesPanel() {
 							/>
 						</TabsContent>
 					)}
-					<TabsContent value="LLM">hello</TabsContent>
+					{selectedNode?.content?.type === "textGeneration" && (
+						<TabsContent value="LLM">
+							<TabContentsLlm />
+						</TabsContent>
+					)}
 					<TabsContent value="Result">hello</TabsContent>
 				</Tabs>
 			) : (
@@ -580,4 +584,8 @@ function TabsContentPrompt({
 							</div> */}
 		</div>
 	);
+}
+
+function TabContentsLlm() {
+	return <div>LLM</div>;
 }
