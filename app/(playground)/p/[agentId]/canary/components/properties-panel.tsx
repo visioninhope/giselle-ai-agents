@@ -1,10 +1,5 @@
 import clsx from "clsx/lite";
-import {
-	ChevronsDownUpIcon,
-	ChevronsUpDownIcon,
-	Trash2Icon,
-	TrashIcon,
-} from "lucide-react";
+import { TrashIcon } from "lucide-react";
 import { useMemo, useState } from "react";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
