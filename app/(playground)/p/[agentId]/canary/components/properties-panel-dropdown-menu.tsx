@@ -8,10 +8,10 @@ import { CirclePlusIcon } from "../../beta-proto/components/icons/circle-plus";
 
 export const DropdownMenu = DropdownMenuPrimitive.Root;
 
-export function DropdownMenuTrigger() {
+export function DropdownMenuTrigger({ label = "Select" }: { label?: string }) {
 	return (
 		<DropdownMenuPrimitive.Trigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
-			Select
+			{label}
 		</DropdownMenuPrimitive.Trigger>
 	);
 }

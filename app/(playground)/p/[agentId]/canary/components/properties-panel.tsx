@@ -272,7 +272,7 @@ function TabsContentPrompt({
 					<div className="flex items-center gap-[4px]">
 						<div className="py-[4px] text-[12px] flex-1">Not selected</div>
 						<DropdownMenu>
-							<DropdownMenuTrigger />
+							<DropdownMenuTrigger label="Add" />
 							<DropdownMenuContent>
 								<DropdownMenuRadioGroup>
 									<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
@@ -293,38 +293,63 @@ function TabsContentPrompt({
 						</DropdownMenu>
 					</div>
 				) : (
-					sourceNodes.map((sourceNode) => (
-						<HoverCard key={sourceNode.id}>
-							<HoverCardTrigger asChild>
-								<div className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center  justify-between group">
-									<div className="z-10">
-										<div className="flex items-center gap-[8px]">
-											<p className="truncate text-[14px] font-rosart">
-												{sourceNode.name}
-											</p>
+					<div className="grid gap-2">
+						{sourceNodes.map((sourceNode) => (
+							<HoverCard key={sourceNode.id}>
+								<HoverCardTrigger asChild>
+									<div className="px-[12px] py-[8px] rounded-[4px] relative bg-[hsla(202,52%,46%,0.1)] text-left flex items-center  justify-between group">
+										<div className="z-10">
+											<div className="flex items-center gap-[8px]">
+												<p className="truncate text-[14px] font-rosart">
+													{sourceNode.name}
+												</p>
+											</div>
 										</div>
+										<button
+											type="button"
+											className="z-10 group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+										>
+											<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+										</button>
+										<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
 									</div>
-									<button
-										type="button"
-										className="z-10 group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
-									>
-										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
-									</button>
-									<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
-								</div>
-							</HoverCardTrigger>
-							<HoverCardContent className="w-80">
-								<div className="flex justify-between space-x-4">
-									node type: {sourceNode.content.type}
-									{sourceNode.content.type === "text" && (
-										<div className="line-clamp-5 text-[14px]">
-											{sourceNode.content.text}
-										</div>
-									)}
-								</div>
-							</HoverCardContent>
-						</HoverCard>
-					))
+								</HoverCardTrigger>
+								<HoverCardContent className="w-80">
+									<div className="flex justify-between space-x-4">
+										node type: {sourceNode.content.type}
+										{sourceNode.content.type === "text" && (
+											<div className="line-clamp-5 text-[14px]">
+												{sourceNode.content.text}
+											</div>
+										)}
+									</div>
+								</HoverCardContent>
+							</HoverCard>
+						))}
+
+						<div className="flex items-center gap-[4px]">
+							<DropdownMenu>
+								<DropdownMenuTrigger label="Add source" />
+								<DropdownMenuContent>
+									<DropdownMenuRadioGroup>
+										<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+										{connectableTextGeneratorNodes.map((node) => (
+											<DropdownMenuRadioItem value={node.id} key={node.id}>
+												{node.name}
+											</DropdownMenuRadioItem>
+										))}
+										<DropdownMenuSeparator />
+										<DropdownMenuLabel>Text</DropdownMenuLabel>
+										{connectableTextNodes.map((node) => (
+											<DropdownMenuRadioItem value={node.id} key={node.id}>
+												{node.name}
+											</DropdownMenuRadioItem>
+										))}
+									</DropdownMenuRadioGroup>
+								</DropdownMenuContent>
+							</DropdownMenu>
+						</div>
+					</div>
 				)}
 			</PropertiesPanelCollapsible>
 
