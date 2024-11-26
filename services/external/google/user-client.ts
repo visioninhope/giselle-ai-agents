@@ -111,7 +111,7 @@ class GoogleUserClient {
 		const client = new google.auth.OAuth2(
 			this.clientId,
 			this.clientSecret,
-			"http://localhost:3000",
+			process.env.NEXT_PUBLIC_SITE_URL,
 		);
 		logger.debug("OAuth client initialized");
 
