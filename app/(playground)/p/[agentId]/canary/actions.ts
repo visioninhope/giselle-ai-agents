@@ -62,6 +62,13 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
+
+	/**
+	 * This function is a helper that retrieves a node from the graph
+	 * based on its NodeHandleId. It looks for a connection in the
+	 * graph that matches the provided handleId and returns the
+	 * corresponding node if found, or null if no such node exists.
+	 */
 	function findNode(handleId: NodeHandleId) {
 		const connection = graph.connections.find(
 			(connection) => connection.targetNodeHandleId === handleId,
@@ -74,6 +81,15 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 		}
 		return node;
 	}
+
+	/**
+	 * The resolveSources function maps over an array of NodeHandles,
+	 * finds the corresponding nodes in the graph, and returns an
+	 * array of ActionSources. It handles both text and text generation
+	 * sources and filters out any null results. If a text node is
+	 * found, it extracts the text content; if a textGeneration node
+	 * is found, it retrieves the corresponding generatedArtifact.
+	 */
 	function resolveSources(sources: NodeHandle[]) {
 		return sources
 			.map((source) => {
@@ -108,6 +124,17 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 			})
 			.filter((actionSource) => actionSource !== null);
 	}
+
+	/**
+	 * The resolveRequirement function retrieves the content of a
+	 * specified requirement node, if it exists. It looks for
+	 * the node in the graph based on the given NodeHandle.
+	 * If the node is of type "text", it returns the text
+	 * content; if it is of type "textGeneration", it looks
+	 * for the corresponding generated artifact and returns
+	 * its content. If the node is not found or does not match
+	 * the expected types, it returns null.
+	 */
 	function resolveRequirement(requirement?: NodeHandle) {
 		if (requirement === undefined) {
 			return null;
@@ -133,6 +160,7 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 		}
 	}
 
+	// The main switch statement handles the different types of nodes
 	switch (node.content.type) {
 		case "textGeneration": {
 			const actionSources = resolveSources(node.content.sources);
