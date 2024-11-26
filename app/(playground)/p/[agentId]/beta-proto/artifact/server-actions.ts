@@ -6,7 +6,7 @@ import { createStreamableValue } from "ai/rsc";
 
 import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { logger } from "@/lib/logger";
+import { logger } from "@/lib/opentelemetry";
 import { metrics } from "@opentelemetry/api";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
