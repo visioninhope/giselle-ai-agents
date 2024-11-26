@@ -111,7 +111,7 @@ async function storeProviderTokens(
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;
 	});
-	logger.info({ currentProvider: provider });
+	logger.debug({ currentProvider: provider });
 	if (!identity) {
 		throw new Error(`No identity found for provider: ${provider}`);
 	}
