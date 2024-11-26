@@ -1,3 +1,5 @@
+"use server";
+
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { getUser } from "@/lib/supabase";
 import {
@@ -13,8 +15,10 @@ import {
 	reconnectGitHubIdentity,
 } from "./actions";
 
+const provider = "github";
+
 export async function GitHubAuthentication() {
-	const credential = await getOauthCredential("github");
+	const credential = await getOauthCredential(provider);
 	if (!credential) {
 		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}

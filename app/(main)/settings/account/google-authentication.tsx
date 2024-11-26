@@ -16,8 +16,10 @@ import {
 	reconnectGoogleIdentity,
 } from "./actions";
 
+const provider = "google";
+
 export async function GoogleAuthentication() {
-	const credential = await getOauthCredential("google");
+	const credential = await getOauthCredential(provider);
 
 	if (!credential) {
 		return <GoogleAuthenticationPresentation button={GoogleConnectButton} />;

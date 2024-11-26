@@ -4,26 +4,27 @@ import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient, getUser } from "@/lib/supabase";
 import { redirect } from "next/navigation";
+import { type Provider } from "@/app/(auth)";
 
-export async function connectGitHubIdentity() {
+async function connectIdentity(provider: Provider) {
 	const supabase = await createClient();
 
 	// Manual linking allows the user to link multiple same-provider identities.
 	// But it introduces additional complexity, and not suitable for most use cases.
-	// We should check if the user already has a GitHub identity here.
+	// We should check if the user already has the given provider identity here.
 	// https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta
 	const supabaseUser = await getUser();
 	if (supabaseUser.identities) {
-		const githubIdentity = supabaseUser.identities.find(
-			(it) => it.provider === "github",
+		const existingIdentity = supabaseUser.identities.find(
+			(it) => it.provider === provider,
 		);
-		if (githubIdentity) {
-			throw new Error("Already linked to GitHub");
+		if (existingIdentity) {
+			throw new Error(`Already linked to ${provider}`);
 		}
 	}
 
 	const { data, error } = await supabase.auth.linkIdentity({
-		provider: "github",
+		provider,
 		options: {
 			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
 		},
@@ -79,39 +80,6 @@ export async function disconnectGitHubIdentity() {
 	await deleteOauthCredential("github");
 }
 
-export async function connectGoogleIdentity() {
-	const supabase = await createClient();
-
-	// Manual linking allows the user to link multiple same-provider identities.
-	// But it introduces additional complexity, and not suitable for most use cases.
-	// We should check if the user already has a Google identity here.
-	// https://supabase.com/docs/guides/auth/auth-identity-linking#manual-linking-beta
-	const supabaseUser = await getUser();
-	if (supabaseUser.identities) {
-		const googleIdentity = supabaseUser.identities.find(
-			(it) => it.provider === "google",
-		);
-		if (googleIdentity) {
-			throw new Error("Already linked to Google");
-		}
-	}
-
-	const { data, error } = await supabase.auth.linkIdentity({
-		provider: "google",
-		options: {
-			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
-		},
-	});
-
-	if (error != null) {
-		const { code, message, name, status } = error;
-		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
-	}
-	if (data.url) {
-		redirect(data.url);
-	}
-}
-
 export async function reconnectGoogleIdentity() {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
@@ -151,4 +119,12 @@ export async function disconnectGoogleIdentity() {
 	}
 
 	await deleteOauthCredential("google");
+}
+
+export async function connectGoogleIdentity() {
+  return connectIdentity("google");
+}
+
+export async function connectGitHubIdentity() {
+  return connectIdentity("github");
 }
