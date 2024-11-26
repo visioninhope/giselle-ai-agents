@@ -51,39 +51,49 @@ export function TeamCreationForm({
 					className="grid grid-cols-2 gap-4"
 				>
 					<Card
-						className={`bg-gray-900 border-gray-800 ${hasExistingFreeTeam ? "opacity-50" : ""}`}
+						className={`bg-gray-900 border-gray-800 ${
+							hasExistingFreeTeam ? "opacity-50" : "cursor-pointer"
+						}`}
 					>
-						<CardHeader>
-							<CardTitle className="text-gray-100">Free</CardTitle>
-							<CardDescription className="text-gray-400">
-								Basic features for small teams
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<RadioGroupItem
-								value="free"
-								id="free"
-								disabled={hasExistingFreeTeam}
-								className="text-blue-500"
-							/>
-							<Label htmlFor="free" className="ml-2 text-gray-300">
-								$0/month
-							</Label>
-						</CardContent>
+						<label htmlFor="free">
+							<CardHeader>
+								<CardTitle className="text-gray-100">Free</CardTitle>
+								<CardDescription className="text-gray-400">
+									Basic features for small teams
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<RadioGroupItem
+									value="free"
+									id="free"
+									disabled={hasExistingFreeTeam}
+									className="text-blue-500"
+								/>
+								<Label htmlFor="free" className="ml-2 text-gray-300">
+									$0/month
+								</Label>
+							</CardContent>
+						</label>
 					</Card>
-					<Card className="bg-gray-900 border-gray-800">
-						<CardHeader>
-							<CardTitle className="text-gray-100">Pro</CardTitle>
-							<CardDescription className="text-gray-400">
-								Advanced features & support
-							</CardDescription>
-						</CardHeader>
-						<CardContent>
-							<RadioGroupItem value="pro" id="pro" className="text-blue-500" />
-							<Label htmlFor="pro" className="ml-2 text-gray-300">
-								$29/month
-							</Label>
-						</CardContent>
+					<Card className="bg-gray-900 border-gray-800 cursor-pointer">
+						<label htmlFor="pro">
+							<CardHeader>
+								<CardTitle className="text-gray-100">Pro</CardTitle>
+								<CardDescription className="text-gray-400">
+									Advanced features & support
+								</CardDescription>
+							</CardHeader>
+							<CardContent>
+								<RadioGroupItem
+									value="pro"
+									id="pro"
+									className="text-blue-500"
+								/>
+								<Label htmlFor="pro" className="ml-2 text-gray-300">
+									$29/month
+								</Label>
+							</CardContent>
+						</label>
 					</Card>
 				</RadioGroup>
 				{hasExistingFreeTeam && (
@@ -101,7 +111,8 @@ export function TeamCreationForm({
 			</div>
 			<Button
 				type="submit"
-				className="w-full bg-gradient-to-r from-blue-600 to-violet-600 hover:from-blue-700 hover:to-violet-700"
+				variant="default"
+				className="transition-colors duration-200"
 				disabled={!teamName || !selectedPlan}
 			>
 				{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
