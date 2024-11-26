@@ -26,7 +26,7 @@ interface EditorProps {
 }
 export function Editor(props: EditorProps) {
 	return (
-		<GraphContextProvider graph={props.graph}>
+		<GraphContextProvider defaultGraph={props.graph}>
 			<GraphSelectionContextProvider graph={props.graph}>
 				<PropertiesPanelProvider>
 					<ReactFlowProvider>

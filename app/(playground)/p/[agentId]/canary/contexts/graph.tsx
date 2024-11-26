@@ -1,20 +1,71 @@
-import { type ReactNode, createContext, useContext, useMemo } from "react";
+import {
+	type ReactNode,
+	createContext,
+	useCallback,
+	useContext,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import type { Artifact, Graph, NodeHandleId, NodeId } from "../types";
+
+interface UpsertArtifactActionInput {
+	nodeId: NodeId;
+	artifact: Artifact;
+}
+interface UpsertArtifactAction {
+	type: "upsertArtifact";
+	input: UpsertArtifactActionInput;
+}
+type GraphAction = UpsertArtifactAction;
+
+export function upsertArtifact(
+	input: UpsertArtifactActionInput,
+): UpsertArtifactAction {
+	return {
+		type: "upsertArtifact",
+		input,
+	};
+}
 
 interface GraphContextValue {
 	graph: Graph;
+	dispatch: (action: GraphAction) => void;
 }
 const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 
+function graphReducer(graph: Graph, action: GraphAction) {
+	switch (action.type) {
+		case "upsertArtifact":
+			return {
+				...graph,
+				artifacts: [
+					...graph.artifacts.filter(
+						(artifact) => artifact.creatorNodeId !== action.input.nodeId,
+					),
+					action.input.artifact,
+				],
+			};
+	}
+}
+
 export function GraphContextProvider({
 	children,
-	graph,
+	defaultGraph,
 }: {
 	children: ReactNode;
-	graph: Graph;
+	defaultGraph: Graph;
 }) {
+	const graphRef = useRef(defaultGraph);
+	const [graph, setGraph] = useState(graphRef.current);
+	const dispatch = useCallback((action: GraphAction) => {
+		graphRef.current = graphReducer(graphRef.current, action);
+		setGraph(graphRef.current);
+	}, []);
 	return (
-		<GraphContext.Provider value={{ graph }}>{children}</GraphContext.Provider>
+		<GraphContext.Provider value={{ graph, dispatch }}>
+			{children}
+		</GraphContext.Provider>
 	);
 }
 
@@ -23,14 +74,16 @@ export function useGraph() {
 	if (context === undefined) {
 		throw new Error("useGraph must be used within a GraphContextProvider");
 	}
-	return context.graph;
+	return context;
 }
 
 interface TargetHandle {
 	targetNodeHandleId?: NodeHandleId;
 }
 export function useNode(query: TargetHandle) {
-	const { nodes, connections } = useGraph();
+	const {
+		graph: { nodes, connections },
+	} = useGraph();
 	const node = useMemo(() => {
 		const connection = connections.find(
 			(connection) =>
@@ -52,7 +105,9 @@ interface CreatorNode {
 	creatorNodeId?: NodeId;
 }
 export function useArtifact(query: CreatorNode): Artifact | null {
-	const { artifacts } = useGraph();
+	const {
+		graph: { artifacts },
+	} = useGraph();
 	const artifact = useMemo(() => {
 		const createdArtifacts = artifacts.filter(
 			(artifact) => artifact.creatorNodeId === query.creatorNodeId,

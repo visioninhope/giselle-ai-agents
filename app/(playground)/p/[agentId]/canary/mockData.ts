@@ -366,96 +366,117 @@ export const connections = [
 
 const outlineArtifact: Artifact = {
 	id: "artf_outline",
-	type: "text",
-	content:
-		"Once upon a time, there was a cat named Whiskers. Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
-	creatorNodeId: outlineNode.id,
-	messages: {
-		plan: "Write a short story about a cat",
-		description: "Write a short story about a cat",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		title: "Cat Story Outline",
+		content:
+			"Once upon a time, there was a cat named Whiskers. Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
+		messages: {
+			plan: "Write a short story about a cat",
+			description: "Write a short story about a cat",
+		},
 	},
+	creatorNodeId: outlineNode.id,
 	createdAt: Date.now(),
-	title: "Cat Story Outline",
 };
 
 const section1Artifact: Artifact = {
 	id: "artf_section1",
-	type: "text",
-	content:
-		"Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world.",
-	creatorNodeId: sectionNode1.id,
-	messages: {
-		plan: "Write a short story about a cat",
-		description: "Write a short story about a cat",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content:
+			"Whiskers was a very curious cat who loved to explore the world around him. One day, Whiskers decided to go on an adventure to the forest. As he wandered through the trees, he came across a mysterious cave. Whiskers was intrigued and decided to explore the cave. Inside, he found a hidden treasure that had been lost for centuries. Whiskers was overjoyed and decided to share his discovery with the world.",
+		messages: {
+			plan: "Write a short story about a cat",
+			description: "Write a short story about a cat",
+		},
+		title: "Cat Story Section 1",
 	},
+	creatorNodeId: sectionNode1.id,
 	createdAt: Date.now(),
-	title: "Cat Story Section 1",
 };
 
 const section2Artifact: Artifact = {
 	id: "artf_section2",
-	type: "text",
-	content:
-		"Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
-	creatorNodeId: sectionNode2.id,
-	messages: {
-		plan: "Write a short story about a cat",
-		description: "Write a short story about a cat",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content:
+			"Whiskers was overjoyed and decided to share his discovery with the world. From that day on, Whiskers became known as the bravest cat in the land.",
+		messages: {
+			plan: "Write a short story about a cat",
+			description: "Write a short story about a cat",
+		},
+		title: "Cat Story Section 2",
 	},
+	creatorNodeId: sectionNode2.id,
 	createdAt: Date.now(),
-	title: "Cat Story Section 2",
 };
 
 const concatArtifact: Artifact = {
 	id: "artf_concat",
-	type: "text",
-	content: "Combined story sections about Whiskers the cat",
-	creatorNodeId: concatNode.id,
-	messages: {
-		plan: "Combine story sections",
-		description: "Combined text from sections",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content: "Combined story sections about Whiskers the cat",
+		title: "Combined Cat Story",
+		messages: {
+			plan: "Combine story sections",
+			description: "Combined text from sections",
+		},
 	},
+	creatorNodeId: concatNode.id,
 	createdAt: Date.now(),
-	title: "Combined Cat Story",
 };
 
 const reviewArtifact: Artifact = {
 	id: "artf_review",
-	type: "text",
-	content: "Review of cat story",
-	creatorNodeId: reviewNode.id,
-	messages: {
-		plan: "Review story",
-		description: "Review combined story",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content: "Review of cat story",
+		title: "Story Review",
+		messages: {
+			plan: "Review story",
+			description: "Review combined story",
+		},
 	},
+	creatorNodeId: reviewNode.id,
 	createdAt: Date.now(),
-	title: "Story Review",
 };
 
 const webSearchArtifact: Artifact = {
 	id: "artf_web-search",
-	type: "text",
-	content: "Web search results",
-	creatorNodeId: webSearchNode.id,
-	messages: {
-		plan: "Search web",
-		description: "Web search results",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content: "Web search results",
+		messages: {
+			plan: "Search web",
+			description: "Web search results",
+		},
+		title: "Web Search Results",
 	},
+	creatorNodeId: webSearchNode.id,
 	createdAt: Date.now(),
-	title: "Web Search Results",
 };
 
 const standAloneArtifact: Artifact = {
 	id: "artf_stand-alone",
-	type: "text",
-	content: "Standalone generated text",
-	creatorNodeId: textGenerationStandAloneNode.id,
-	messages: {
-		plan: "Generate text",
-		description: "Standalone text generation",
+	type: "generatedArtifact",
+	object: {
+		type: "text",
+		content: "Standalone generated text",
+		messages: {
+			plan: "Generate text",
+			description: "Standalone text generation",
+		},
+		title: "Standalone Text",
 	},
+	creatorNodeId: textGenerationStandAloneNode.id,
 	createdAt: Date.now(),
-	title: "Standalone Text",
 };
 
 export const artifacts = [

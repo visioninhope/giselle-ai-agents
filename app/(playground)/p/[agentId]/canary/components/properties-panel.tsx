@@ -2,6 +2,7 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	CheckIcon,
@@ -22,10 +23,12 @@ import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
+import { generateTextArtifactStream } from "../actions";
 import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import type { Node, Text, TextGenerateActionContent } from "../types";
+import { createArtifactId } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -316,6 +319,7 @@ function DialogFooter(props: HTMLAttributes<HTMLDivElement>) {
 DialogFooter.displayName = "DialogHeader";
 
 export function PropertiesPanel() {
+	const { dispatch } = useGraph();
 	const { selectedNode } = useGraphSelection();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	return (
@@ -376,7 +380,32 @@ export function PropertiesPanel() {
 								<button
 									type="button"
 									className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-									onClick={() => setTab("Result")}
+									onClick={async () => {
+										setTab("Result");
+										const stream = await generateTextArtifactStream();
+
+										const artifactId = createArtifactId();
+
+										for await (const streamContent of readStreamableValue(
+											stream,
+										)) {
+											if (streamContent === undefined) {
+												continue;
+											}
+											dispatch({
+												type: "upsertArtifact",
+												input: {
+													nodeId: selectedNode.id,
+													artifact: {
+														id: artifactId,
+														type: "streamArtifact",
+														creatorNodeId: selectedNode.id,
+														object: streamContent,
+													},
+												},
+											});
+										}
+									}}
 								>
 									Generate
 								</button>
@@ -418,7 +447,9 @@ function TabsContentPrompt({
 }: {
 	content: TextGenerateActionContent;
 }) {
-	const { nodes, connections } = useGraph();
+	const {
+		graph: { nodes, connections },
+	} = useGraph();
 	const connectableTextNodes: Text[] = nodes
 		.filter((node) => node.content.type === "text")
 		.map((node) => node as Text);
@@ -1051,37 +1082,45 @@ function TabContentGenerateTextResult({
 	if (artifact === null) {
 		return null;
 	}
+	if (artifact.object.type !== "text") {
+		return null;
+	}
 	return (
 		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
-			<div>{artifact.messages.plan}</div>
+			<div>{artifact.object.messages.plan}</div>
 
 			<Dialog>
 				<DialogTrigger>
 					<Block size="large">
 						<div className="flex items-center gap-[12px]">
 							<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
-							<div className="text-[14px]">{artifact.title}</div>
+							<div className="text-[14px]">{artifact.object.title}</div>
 						</div>
 					</Block>
 				</DialogTrigger>
 				<DialogContent>
 					<div className="sr-only">
 						<DialogHeader>
-							<DialogTitle>{artifact.title}</DialogTitle>
+							<DialogTitle>{artifact.object.title}</DialogTitle>
 						</DialogHeader>
 					</div>
-					<div className="flex-1">{artifact.content}</div>
-					<DialogFooter className="text-[14px] font-bold text-black-70">
-						Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
-					</DialogFooter>
+					<div className="flex-1">{artifact.object.content}</div>
+					{artifact.type === "generatedArtifact" && (
+						<DialogFooter className="text-[14px] font-bold text-black-70">
+							Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+						</DialogFooter>
+					)}
 				</DialogContent>
 			</Dialog>
-			<div>{artifact.messages.description}</div>
-			<div>
-				<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
-					<p className="italic">Generation completed.</p>
+			<div>{artifact.object.messages.description}</div>
+
+			{artifact.type === "generatedArtifact" && (
+				<div>
+					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
+						<p className="italic">Generation completed.</p>
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 }

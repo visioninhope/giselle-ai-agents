@@ -47,6 +47,7 @@
 		"@sentry/wizard": "^3.26.0",
 		"@supabase/ssr": "0.4.0",
 		"@supabase/supabase-js": "2.45.0",
+		"@valibot/to-json-schema": "1.0.0-beta.3",
 		"@vercel/blob": "0.23.4",
 		"@vercel/flags": "2.6.1",
 		"@vercel/functions": "1.5.0",
