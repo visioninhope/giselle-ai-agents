@@ -74,6 +74,7 @@ export const teams = pgTable("teams", {
 		.defaultNow()
 		.notNull()
 		.$onUpdate(() => new Date()),
+	isInternalTeam: boolean("is_internal_team").notNull().default(false),
 });
 
 export type UserId = `usr_${string}`;
