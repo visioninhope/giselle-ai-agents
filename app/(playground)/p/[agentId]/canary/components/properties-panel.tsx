@@ -23,7 +23,7 @@ import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
-import { generateTextArtifactStream } from "../actions";
+import { action } from "../actions";
 import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
@@ -409,8 +409,9 @@ export function PropertiesPanel() {
 												},
 											});
 											setTab("Result");
-											const stream = await generateTextArtifactStream(
-												selectedNode.content as TextGenerateActionContent,
+											const stream = await action(
+												"https://aj9qps90wwygtg5h.public.blob.vercel-storage.com/canary/mockData-sf23dFVJkNoaXv3Di56N40Pt83JBSr.json",
+												selectedNode.id,
 											);
 
 											let textArtifactObject: TextArtifactObject = {

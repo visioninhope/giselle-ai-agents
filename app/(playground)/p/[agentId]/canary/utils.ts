@@ -2,10 +2,14 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { createId } from "@paralleldrive/cuid2";
 import type { LanguageModelV1 } from "ai";
-import type { ArtifactId, TextGenerateActionContent } from "./types";
+import type { ArtifactId, GraphId, TextGenerateActionContent } from "./types";
 
 export function createArtifactId(): ArtifactId {
 	return `artf_${createId()}`;
+}
+
+export function createGraphId(): GraphId {
+	return `grph_${createId()}`;
 }
 
 export function resolveLanguageModel(

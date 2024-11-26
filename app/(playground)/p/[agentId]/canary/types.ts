@@ -65,7 +65,7 @@ export interface File extends Variable {
 }
 
 export type NodeHandleId = `ndh_${string}`;
-interface NodeHandle {
+export interface NodeHandle {
 	id: NodeHandleId;
 	label: string;
 }
@@ -119,7 +119,9 @@ interface TextStreamArtifact extends StreamAtrifact {
 }
 export type Artifact = TextArtifact | TextStreamArtifact;
 
+export type GraphId = `grph_${string}`;
 export interface Graph {
+	id: GraphId;
 	nodes: Node[];
 	connections: Connection[];
 	artifacts: Artifact[];
