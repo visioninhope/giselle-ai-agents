@@ -7,9 +7,12 @@ import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { provider: string }}) {
+export async function GET(
+	request: Request,
+	{ params }: { params: { provider: string } },
+) {
 	const { searchParams, origin } = new URL(request.url);
-        const { provider } = params;
+	const { provider } = params;
 
 	logger.debug(
 		{
@@ -92,7 +95,11 @@ async function initializeUserIfNeeded(user: User) {
 }
 
 // store accessToken and refreshToken
-async function storeProviderTokens(user: User, session: Session, provider: string) {
+async function storeProviderTokens(
+	user: User,
+	session: Session,
+	provider: string,
+) {
 	const { provider_token, provider_refresh_token } = session;
 	if (!provider_token) {
 		throw new Error("No provider token found");

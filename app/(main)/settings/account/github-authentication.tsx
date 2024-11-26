@@ -8,7 +8,7 @@ import {
 } from "@/services/external/github";
 import { TriangleAlert } from "lucide-react";
 import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
-import { GitHubConnectionButton } from "../components/github-connection-button";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGitHubIdentity,
 	disconnectGitHubIdentity,
@@ -51,32 +51,32 @@ export async function GitHubAuthentication() {
 
 function GitHubConnectButton() {
 	return (
-		<GitHubConnectionButton action={connectGitHubIdentity}>
+		<ProviderConnectionButton action={connectGitHubIdentity}>
 			Connect
-		</GitHubConnectionButton>
+		</ProviderConnectionButton>
 	);
 }
 
 function GitHubReconnectButton() {
 	return (
 		<div>
-			<GitHubConnectionButton
+			<ProviderConnectionButton
 				action={reconnectGitHubIdentity}
 				className="text-yellow-500"
 			>
 				<TriangleAlert /> Reconnect
-			</GitHubConnectionButton>
+			</ProviderConnectionButton>
 		</div>
 	);
 }
 
 function GitHubDisconnectButton() {
 	return (
-		<GitHubConnectionButton
+		<ProviderConnectionButton
 			action={disconnectGitHubIdentity}
 			className="text-red-500"
 		>
 			Disconnect
-		</GitHubConnectionButton>
+		</ProviderConnectionButton>
 	);
 }

@@ -1,8 +1,11 @@
 // https://supabase.com/docs/guides/auth/redirect-urls
-import { type Provider } from "./types";
+import type { Provider } from "./types";
 
-export function getAuthCallbackUrl({ next = "/", provider }: {next: string, provider: Provider}): string {
-        if (!provider) {
+export function getAuthCallbackUrl({
+	next = "/",
+	provider,
+}: { next: string; provider: Provider }): string {
+	if (!provider) {
 		throw new Error("Provider is required");
 	}
 	let url =

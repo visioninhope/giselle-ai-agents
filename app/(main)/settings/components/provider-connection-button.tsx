@@ -11,7 +11,7 @@ type ButtonWithActionProps = {
 	className?: string;
 };
 
-export function GoogleConnectionButton({
+export function ProviderConnectionButton({
 	action,
 	children,
 	className,

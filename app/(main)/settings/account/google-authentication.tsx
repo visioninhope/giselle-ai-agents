@@ -2,7 +2,7 @@ import { getOauthCredential } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/supabase";
 import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
-import { GoogleConnectionButton } from "../components/google-connection-button";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 
 import {
 	buildGoogleUserClient,
@@ -54,32 +54,32 @@ export async function GoogleAuthentication() {
 
 function GoogleConnectButton() {
 	return (
-		<GoogleConnectionButton action={connectGoogleIdentity}>
+		<ProviderConnectionButton action={connectGoogleIdentity}>
 			Connect
-		</GoogleConnectionButton>
+		</ProviderConnectionButton>
 	);
 }
 
 function GoogleReconnectButton() {
 	return (
 		<div>
-			<GoogleConnectionButton
+			<ProviderConnectionButton
 				action={reconnectGoogleIdentity}
 				className="text-yellow-500"
 			>
 				<TriangleAlert /> Reconnect
-			</GoogleConnectionButton>
+			</ProviderConnectionButton>
 		</div>
 	);
 }
 
 function GoogleDisconnectButton() {
 	return (
-		<GoogleConnectionButton
+		<ProviderConnectionButton
 			action={disconnectGoogleIdentity}
 			className="text-red-500"
 		>
 			Disconnect
-		</GoogleConnectionButton>
+		</ProviderConnectionButton>
 	);
 }

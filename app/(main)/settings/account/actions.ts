@@ -1,10 +1,10 @@
 "use server";
 
+import type { Provider } from "@/app/(auth)";
 import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient, getUser } from "@/lib/supabase";
 import { redirect } from "next/navigation";
-import { type Provider } from "@/app/(auth)";
 
 async function connectIdentity(provider: Provider) {
 	const supabase = await createClient();
@@ -81,25 +81,25 @@ async function disconnectIdentity(provider: Provider) {
 }
 
 export async function connectGoogleIdentity() {
-  return connectIdentity("google");
+	return connectIdentity("google");
 }
 
 export async function connectGitHubIdentity() {
-  return connectIdentity("github");
+	return connectIdentity("github");
 }
 
 export async function reconnectGoogleIdentity() {
-  return reconnectIdentity("google");
+	return reconnectIdentity("google");
 }
 
 export async function reconnectGitHubIdentity() {
-  return reconnectIdentity("github");
+	return reconnectIdentity("github");
 }
 
 export async function disconnectGoogleIdentity() {
-  return disconnectIdentity("google");
+	return disconnectIdentity("google");
 }
 
 export async function disconnectGitHubIdentity() {
-  return disconnectIdentity("github");
+	return disconnectIdentity("github");
 }
