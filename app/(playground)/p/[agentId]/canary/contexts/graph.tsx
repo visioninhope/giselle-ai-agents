@@ -7,13 +7,7 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type {
-	Artifact,
-	GeneratedArtifact,
-	Graph,
-	NodeHandleId,
-	NodeId,
-} from "../types";
+import type { Artifact, Graph, Node, NodeHandleId, NodeId } from "../types";
 
 interface UpsertArtifactActionInput {
 	nodeId: NodeId;
@@ -23,7 +17,16 @@ interface UpsertArtifactAction {
 	type: "upsertArtifact";
 	input: UpsertArtifactActionInput;
 }
-type GraphAction = UpsertArtifactAction;
+
+interface UpdateNodeActionInput {
+	nodeId: NodeId;
+	node: Node;
+}
+interface UpdateNodeAction {
+	type: "updateNode";
+	input: UpdateNodeActionInput;
+}
+type GraphAction = UpsertArtifactAction | UpdateNodeAction;
 
 export function upsertArtifact(
 	input: UpsertArtifactActionInput,
@@ -40,7 +43,7 @@ interface GraphContextValue {
 }
 const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 
-function graphReducer(graph: Graph, action: GraphAction) {
+function graphReducer(graph: Graph, action: GraphAction): Graph {
 	switch (action.type) {
 		case "upsertArtifact":
 			return {
@@ -52,6 +55,15 @@ function graphReducer(graph: Graph, action: GraphAction) {
 					action.input.artifact,
 				],
 			};
+		case "updateNode":
+			return {
+				...graph,
+				nodes: graph.nodes.map((node) =>
+					node.id === action.input.nodeId ? action.input.node : node,
+				),
+			};
+		default:
+			return graph;
 	}
 }
 
