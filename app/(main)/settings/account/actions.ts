@@ -57,7 +57,7 @@ async function reconnectIdentity(provider: Provider) {
 	}
 }
 
-export async function disconnectGitHubIdentity() {
+async function disconnectIdentity(provider: Provider) {
 	const supabaseUser = await getUser();
 	const supabase = await createClient();
 	if (!supabaseUser.identities) {
@@ -66,41 +66,18 @@ export async function disconnectGitHubIdentity() {
 	if (supabaseUser.identities.length === 1) {
 		throw new Error("Cannot unlink last identity");
 	}
-	const githubIdentity = supabaseUser.identities.find(
-		(it) => it.provider === "github",
+	const identity = supabaseUser.identities.find(
+		(it) => it.provider === provider,
 	);
-	if (!githubIdentity) {
-		throw new Error("No github identity");
+	if (!identity) {
+		throw new Error(`No ${provider} identity`);
 	}
-	const { error } = await supabase.auth.unlinkIdentity(githubIdentity);
+	const { error } = await supabase.auth.unlinkIdentity(identity);
 	if (error) {
 		throw new Error("Failed to unlink identity", { cause: error });
 	}
 
-	await deleteOauthCredential("github");
-}
-
-export async function disconnectGoogleIdentity() {
-	const supabaseUser = await getUser();
-	const supabase = await createClient();
-	if (!supabaseUser.identities) {
-		throw new Error("No identities");
-	}
-	if (supabaseUser.identities.length === 1) {
-		throw new Error("Cannot unlink last identity");
-	}
-	const googleIdentity = supabaseUser.identities.find(
-		(it) => it.provider === "google",
-	);
-	if (!googleIdentity) {
-		throw new Error("No google identity");
-	}
-	const { error } = await supabase.auth.unlinkIdentity(googleIdentity);
-	if (error) {
-		throw new Error("Failed to unlink identity", { cause: error });
-	}
-
-	await deleteOauthCredential("google");
+	await deleteOauthCredential(provider);
 }
 
 export async function connectGoogleIdentity() {
@@ -117,4 +94,12 @@ export async function reconnectGoogleIdentity() {
 
 export async function reconnectGitHubIdentity() {
   return reconnectIdentity("github");
+}
+
+export async function disconnectGoogleIdentity() {
+  return disconnectIdentity("google");
+}
+
+export async function disconnectGitHubIdentity() {
+  return disconnectIdentity("github");
 }
