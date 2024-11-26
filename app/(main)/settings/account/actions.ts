@@ -26,7 +26,7 @@ async function connectIdentity(provider: Provider) {
 	const { data, error } = await supabase.auth.linkIdentity({
 		provider,
 		options: {
-			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
+			redirectTo: getAuthCallbackUrl({ next: "/settings/account", provider }),
 		},
 	});
 
@@ -44,7 +44,7 @@ async function reconnectIdentity(provider: Provider) {
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider,
 		options: {
-			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
+			redirectTo: getAuthCallbackUrl({ next: "/settings/account", provider }),
 		},
 	});
 

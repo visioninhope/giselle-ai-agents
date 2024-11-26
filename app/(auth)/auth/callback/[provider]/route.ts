@@ -7,8 +7,10 @@ import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET(request: Request, { params }: { params: { provider: string }}) {
 	const { searchParams, origin } = new URL(request.url);
+        const { provider } = params;
+
 	logger.debug(
 		{
 			searchParams,
@@ -51,7 +53,7 @@ export async function GET(request: Request) {
 	try {
 		const { user, session } = data;
 		await initializeUserIfNeeded(user);
-		await storeProviderTokens(user, session);
+		await storeProviderTokens(user, session, provider);
 	} catch (error) {
 		if (error instanceof Error) {
 			return new Response(error.message, { status: 500 });
@@ -90,23 +92,10 @@ async function initializeUserIfNeeded(user: User) {
 }
 
 // store accessToken and refreshToken
-async function storeProviderTokens(user: User, session: Session) {
+async function storeProviderTokens(user: User, session: Session, provider: string) {
 	const { provider_token, provider_refresh_token } = session;
 	if (!provider_token) {
 		throw new Error("No provider token found");
-	}
-
-	let provider = "";
-	// https://docs.github.com/ja/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#github-%E3%81%AE%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
-	if (provider_token.startsWith("ghu_")) {
-		provider = "github";
-	}
-	if (provider_token.startsWith("ya29.")) {
-		provider = "google";
-	}
-	// TODO: add another logic for other providers
-	if (provider === "") {
-		throw new Error("No provider found");
 	}
 
 	logger.debug(`provider: '${provider}'`);
