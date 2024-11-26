@@ -39,10 +39,10 @@ async function connectIdentity(provider: Provider) {
 	}
 }
 
-export async function reconnectGitHubIdentity() {
+async function reconnectIdentity(provider: Provider) {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider: "github",
+		provider,
 		options: {
 			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
 		},
@@ -80,24 +80,6 @@ export async function disconnectGitHubIdentity() {
 	await deleteOauthCredential("github");
 }
 
-export async function reconnectGoogleIdentity() {
-	const supabase = await createClient();
-	const { data, error } = await supabase.auth.signInWithOAuth({
-		provider: "google",
-		options: {
-			redirectTo: getAuthCallbackUrl({ next: "/settings/account" }),
-		},
-	});
-
-	if (error != null) {
-		const { code, message, name, status } = error;
-		throw new Error(`${name} occurred: ${code} (${status}): ${message}`);
-	}
-	if (data.url) {
-		redirect(data.url);
-	}
-}
-
 export async function disconnectGoogleIdentity() {
 	const supabaseUser = await getUser();
 	const supabase = await createClient();
@@ -127,4 +109,12 @@ export async function connectGoogleIdentity() {
 
 export async function connectGitHubIdentity() {
   return connectIdentity("github");
+}
+
+export async function reconnectGoogleIdentity() {
+  return reconnectIdentity("google");
+}
+
+export async function reconnectGitHubIdentity() {
+  return reconnectIdentity("github");
 }
