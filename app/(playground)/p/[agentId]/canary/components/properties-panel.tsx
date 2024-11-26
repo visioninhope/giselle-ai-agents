@@ -27,7 +27,12 @@ import { generateTextArtifactStream } from "../actions";
 import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
-import type { Node, Text, TextGenerateActionContent } from "../types";
+import type {
+	Node,
+	Text,
+	TextArtifactObject,
+	TextGenerateActionContent,
+} from "../types";
 import { createArtifactId } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
@@ -381,11 +386,39 @@ export function PropertiesPanel() {
 									type="button"
 									className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
 									onClick={async () => {
+										const artifactId = createArtifactId();
+										dispatch({
+											type: "upsertArtifact",
+											input: {
+												nodeId: selectedNode.id,
+												artifact: {
+													id: artifactId,
+													type: "streamArtifact",
+													creatorNodeId: selectedNode.id,
+													object: {
+														type: "text",
+														title: "",
+														content: "",
+														messages: {
+															plan: "",
+															description: "",
+														},
+													},
+												},
+											},
+										});
 										setTab("Result");
 										const stream = await generateTextArtifactStream();
 
-										const artifactId = createArtifactId();
-
+										let textArtifactObject: TextArtifactObject = {
+											type: "text",
+											title: "",
+											content: "",
+											messages: {
+												plan: "",
+												description: "",
+											},
+										};
 										for await (const streamContent of readStreamableValue(
 											stream,
 										)) {
@@ -404,7 +437,24 @@ export function PropertiesPanel() {
 													},
 												},
 											});
+											textArtifactObject = {
+												...textArtifactObject,
+												...streamContent,
+											};
 										}
+										dispatch({
+											type: "upsertArtifact",
+											input: {
+												nodeId: selectedNode.id,
+												artifact: {
+													id: artifactId,
+													type: "generatedArtifact",
+													creatorNodeId: selectedNode.id,
+													createdAt: Date.now(),
+													object: textArtifactObject,
+												},
+											},
+										});
 									}}
 								>
 									Generate
