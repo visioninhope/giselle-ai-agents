@@ -7,7 +7,13 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { Artifact, Graph, NodeHandleId, NodeId } from "../types";
+import type {
+	Artifact,
+	GeneratedArtifact,
+	Graph,
+	NodeHandleId,
+	NodeId,
+} from "../types";
 
 interface UpsertArtifactActionInput {
 	nodeId: NodeId;
@@ -112,7 +118,6 @@ export function useArtifact(query: CreatorNode): Artifact | null {
 		const createdArtifacts = artifacts.filter(
 			(artifact) => artifact.creatorNodeId === query.creatorNodeId,
 		);
-		createdArtifacts.sort((a, b) => a.createdAt - b.createdAt);
 		return createdArtifacts[0];
 	}, [artifacts, query]);
 	return artifact;

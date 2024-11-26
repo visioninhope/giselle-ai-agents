@@ -90,7 +90,7 @@ interface ArtifactBase {
 	creatorNodeId: NodeId;
 	object: ArtifactObjectBase;
 }
-interface GeneratedArtifact extends ArtifactBase {
+export interface GeneratedArtifact extends ArtifactBase {
 	type: "generatedArtifact";
 	createdAt: number;
 }

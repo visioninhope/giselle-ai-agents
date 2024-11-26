@@ -1089,29 +1089,31 @@ function TabContentGenerateTextResult({
 		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
 			<div>{artifact.object.messages.plan}</div>
 
-			<Dialog>
-				<DialogTrigger>
-					<Block size="large">
-						<div className="flex items-center gap-[12px]">
-							<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
-							<div className="text-[14px]">{artifact.object.title}</div>
+			{artifact.object.title !== "" && (
+				<Dialog>
+					<DialogTrigger>
+						<Block size="large">
+							<div className="flex items-center gap-[12px]">
+								<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
+								<div className="text-[14px]">{artifact.object.title}</div>
+							</div>
+						</Block>
+					</DialogTrigger>
+					<DialogContent>
+						<div className="sr-only">
+							<DialogHeader>
+								<DialogTitle>{artifact.object.title}</DialogTitle>
+							</DialogHeader>
 						</div>
-					</Block>
-				</DialogTrigger>
-				<DialogContent>
-					<div className="sr-only">
-						<DialogHeader>
-							<DialogTitle>{artifact.object.title}</DialogTitle>
-						</DialogHeader>
-					</div>
-					<div className="flex-1">{artifact.object.content}</div>
-					{artifact.type === "generatedArtifact" && (
-						<DialogFooter className="text-[14px] font-bold text-black-70">
-							Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
-						</DialogFooter>
-					)}
-				</DialogContent>
-			</Dialog>
+						<div className="flex-1">{artifact.object.content}</div>
+						{artifact.type === "generatedArtifact" && (
+							<DialogFooter className="text-[14px] font-bold text-black-70">
+								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+							</DialogFooter>
+						)}
+					</DialogContent>
+				</Dialog>
+			)}
 			<div>{artifact.object.messages.description}</div>
 
 			{artifact.type === "generatedArtifact" && (
