@@ -20,7 +20,7 @@ interface ActionContentBase {
 }
 export interface TextGenerateActionContent extends ActionContentBase {
 	type: "textGeneration";
-	llm: string;
+	llm: `${string}:${string}`;
 	temperature: number;
 	topP: number;
 	instruction: string;

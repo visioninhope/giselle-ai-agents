@@ -1,11 +1,11 @@
 "use server";
 
-import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import { jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import * as v from "valibot";
-import type { TextArtifactObject } from "./types";
+import type { TextArtifactObject, TextGenerateActionContent } from "./types";
+import { resolveLanguageModel } from "./utils";
 
 const artifactSchema = v.object({
 	plan: v.pipe(
@@ -27,15 +27,20 @@ const artifactSchema = v.object({
 	),
 });
 
-export async function generateTextArtifactStream() {
+export async function generateTextArtifactStream(
+	content: TextGenerateActionContent,
+) {
 	const stream = createStreamableValue<TextArtifactObject>();
 	(async () => {
+		const model = resolveLanguageModel(content.llm);
 		const { partialObjectStream } = await streamObject({
-			model: openai("gpt-4o-mini"),
-			prompt: "Generate an answer to a question.",
+			model,
+			prompt: content.instruction,
 			schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
 				toJsonSchema(artifactSchema),
 			),
+			topP: content.topP,
+			temperature: content.temperature,
 		});
 
 		for await (const partialObject of partialObjectStream) {

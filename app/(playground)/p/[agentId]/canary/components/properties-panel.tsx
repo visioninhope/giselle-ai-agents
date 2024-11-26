@@ -381,50 +381,13 @@ export function PropertiesPanel() {
 									{selectedNode.content.type}
 								</div>
 							</div>
-							<div className="">
-								<button
-									type="button"
-									className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-									onClick={async () => {
-										const artifactId = createArtifactId();
-										dispatch({
-											type: "upsertArtifact",
-											input: {
-												nodeId: selectedNode.id,
-												artifact: {
-													id: artifactId,
-													type: "streamArtifact",
-													creatorNodeId: selectedNode.id,
-													object: {
-														type: "text",
-														title: "",
-														content: "",
-														messages: {
-															plan: "",
-															description: "",
-														},
-													},
-												},
-											},
-										});
-										setTab("Result");
-										const stream = await generateTextArtifactStream();
-
-										let textArtifactObject: TextArtifactObject = {
-											type: "text",
-											title: "",
-											content: "",
-											messages: {
-												plan: "",
-												description: "",
-											},
-										};
-										for await (const streamContent of readStreamableValue(
-											stream,
-										)) {
-											if (streamContent === undefined) {
-												continue;
-											}
+							{selectedNode.content.type === "textGeneration" && (
+								<div className="">
+									<button
+										type="button"
+										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
+										onClick={async () => {
+											const artifactId = createArtifactId();
 											dispatch({
 												type: "upsertArtifact",
 												input: {
@@ -433,33 +396,74 @@ export function PropertiesPanel() {
 														id: artifactId,
 														type: "streamArtifact",
 														creatorNodeId: selectedNode.id,
-														object: streamContent,
+														object: {
+															type: "text",
+															title: "",
+															content: "",
+															messages: {
+																plan: "",
+																description: "",
+															},
+														},
 													},
 												},
 											});
-											textArtifactObject = {
-												...textArtifactObject,
-												...streamContent,
-											};
-										}
-										dispatch({
-											type: "upsertArtifact",
-											input: {
-												nodeId: selectedNode.id,
-												artifact: {
-													id: artifactId,
-													type: "generatedArtifact",
-													creatorNodeId: selectedNode.id,
-													createdAt: Date.now(),
-													object: textArtifactObject,
+											setTab("Result");
+											const stream = await generateTextArtifactStream(
+												selectedNode.content as TextGenerateActionContent,
+											);
+
+											let textArtifactObject: TextArtifactObject = {
+												type: "text",
+												title: "",
+												content: "",
+												messages: {
+													plan: "",
+													description: "",
 												},
-											},
-										});
-									}}
-								>
-									Generate
-								</button>
-							</div>
+											};
+											for await (const streamContent of readStreamableValue(
+												stream,
+											)) {
+												if (streamContent === undefined) {
+													continue;
+												}
+												dispatch({
+													type: "upsertArtifact",
+													input: {
+														nodeId: selectedNode.id,
+														artifact: {
+															id: artifactId,
+															type: "streamArtifact",
+															creatorNodeId: selectedNode.id,
+															object: streamContent,
+														},
+													},
+												});
+												textArtifactObject = {
+													...textArtifactObject,
+													...streamContent,
+												};
+											}
+											dispatch({
+												type: "upsertArtifact",
+												input: {
+													nodeId: selectedNode.id,
+													artifact: {
+														id: artifactId,
+														type: "generatedArtifact",
+														creatorNodeId: selectedNode.id,
+														createdAt: Date.now(),
+														object: textArtifactObject,
+													},
+												},
+											});
+										}}
+									>
+										Generate
+									</button>
+								</div>
+							)}
 						</div>
 					)}
 
@@ -546,7 +550,7 @@ function TabsContentPrompt({
 								</SelectGroup>
 								<SelectGroup>
 									<SelectLabel>Anthropic </SelectLabel>
-									<SelectItem value="anthropic:claude-3.5-sonnet">
+									<SelectItem value="anthropic:claude-3-5-sonnet-latest">
 										Claude 3.5 Sonnet
 									</SelectItem>
 								</SelectGroup>
