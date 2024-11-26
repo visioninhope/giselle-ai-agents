@@ -5,14 +5,15 @@ import { createClient } from "@/lib/supabase";
 import { initializeAccount } from "@/services/accounts";
 import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import type { Provider } from "../../../lib/";
 
 export async function GET(
-	request: Request,
-	{ params }: { params: { provider: string } },
+	request: NextRequest,
+	{ params }: { params: Promise<{ provider: Provider }> },
 ) {
 	const { searchParams, origin } = new URL(request.url);
-	const { provider } = params;
+	const { provider } = await params;
 
 	logger.debug(
 		{

@@ -1,6 +1,6 @@
 "use server";
 
-import type { Provider } from "@/app/(auth)";
+import type { Provider } from "@/app/(auth)/lib";
 import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient, getUser } from "@/lib/supabase";

@@ -1,18 +1,16 @@
 "use server";
 
-import { getAuthCallbackUrl } from "@/app/(auth)/lib";
+import { type Provider, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
-type OAuthProvider = "github" | "google";
-
-async function authorizeOAuth(provider: OAuthProvider) {
+async function authorizeOAuth(provider: Provider) {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider,
 		options: {
-			redirectTo: getAuthCallbackUrl(),
+			redirectTo: getAuthCallbackUrl({ provider }),
 		},
 	});
 	logger.debug(`authorized with ${provider}`);

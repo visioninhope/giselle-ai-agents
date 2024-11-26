@@ -4,7 +4,7 @@ import type { Provider } from "./types";
 export function getAuthCallbackUrl({
 	next = "/",
 	provider,
-}: { next: string; provider: Provider }): string {
+}: { next?: string; provider: Provider }): string {
 	if (!provider) {
 		throw new Error("Provider is required");
 	}
