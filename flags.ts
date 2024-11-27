@@ -52,6 +52,18 @@ export const githubIntegrationFlag = flag<boolean>({
 	],
 });
 
+export const freePlanFlag = flag<boolean>({
+	key: "free-plan",
+	async decide() {
+		return takeLocalEnv("FREE_PLAN_FLAG");
+	},
+	description: "Enable Free Plan",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
 export const playgroundV2Flag = flag<boolean>({
 	key: "playground-v2",
 	async decide() {
