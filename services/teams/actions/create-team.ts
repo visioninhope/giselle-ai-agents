@@ -8,26 +8,35 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { isEmailFromRoute06 } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 export async function createTeam(formData: FormData) {
+	const teamName = formData.get("teamName") as string;
+	const selectedPlan = formData.get("selectedPlan") as string;
+
 	const supabaseUser = await getUser();
 	if (!supabaseUser) {
 		throw new Error("User not found");
 	}
 
-	const teamName = formData.get("teamName") as string;
-	const selectedPlan = formData.get("selectedPlan") as string;
+	const isInternalUser =
+		supabaseUser.email != null && isEmailFromRoute06(supabaseUser.email);
+	if (isInternalUser) {
+		createInternalTeam(supabaseUser, teamName);
+		// FIXME: change context to the new team
+		redirect("/settings/team");
+	}
 
-	if (selectedPlan === "pro") {
-		prepareProTeamCreation(supabaseUser, teamName);
-	} else {
+	if (selectedPlan === "free") {
 		createFreeTeam(supabaseUser, teamName);
 		// FIXME: change context to the new team
 		redirect("/settings/team");
 	}
+
+	prepareProTeamCreation(supabaseUser, teamName);
 }
 
 /**
@@ -39,11 +48,24 @@ async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 	throw new Error("Not implemented");
 }
 
+async function createInternalTeam(supabaseUser: User, teamName: string) {
+	await createTeamInDatabase(supabaseUser, teamName, true);
+}
+
 async function createFreeTeam(supabaseUser: User, teamName: string) {
+	await createTeamInDatabase(supabaseUser, teamName, false);
+}
+
+async function createTeamInDatabase(
+	supabaseUser: User,
+	teamName: string,
+	isInternal: boolean,
+) {
 	const [result] = await db
 		.insert(teams)
 		.values({
 			name: teamName,
+			isInternalTeam: isInternal,
 		})
 		.returning({ dbid: teams.dbId });
 
