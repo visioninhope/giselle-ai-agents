@@ -7,6 +7,7 @@ import {
 import clsx from "clsx/lite";
 import React, { useMemo } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
+import { useGraph } from "../contexts/graph";
 import type {
 	File,
 	Node as NodeType,
@@ -59,6 +60,14 @@ export function Node({
 		}
 		return [];
 	}, [data.node]);
+	const { graph } = useGraph();
+	const hasTarget = useMemo(
+		() =>
+			graph.connections.some(
+				(connection) => connection.sourceNodeId === data.node.id,
+			),
+		[graph, data.node.id],
+	);
 	return (
 		<div
 			data-type={data.node.type}
@@ -143,6 +152,7 @@ export function Node({
 								<Handle
 									type="source"
 									position={Position.Right}
+									data-state={hasTarget ? "connected" : "disconnected"}
 									className={clsx(
 										"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
 										"group-data-[type=action]:!border-[hsla(195,74%,21%,1)] group-data-[type=action]:data-[state=connected]:!bg-[hsla(187,71%,48%,1)] group-data-[type=action]:hover:!bg-[hsla(187,71%,48%,1)]",
