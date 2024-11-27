@@ -1,11 +1,74 @@
 import { logger as pinoLogger } from "@/lib/logger";
+import { versionInfo } from "@/version";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
+
+import type { AnyValue, Logger } from "@opentelemetry/api-logs";
+import { Resource } from "@opentelemetry/resources";
 import {
 	BatchLogRecordProcessor,
 	ConsoleLogRecordExporter,
+	type LogRecord,
 	LoggerProvider,
 } from "@opentelemetry/sdk-logs";
-import { headers } from "./base";
+import { headers, resource } from "./base";
+
+class PinoLogRecordExporter extends ConsoleLogRecordExporter {
+	onEmit(log: LogRecord) {
+		const { severityText, body, attributes } = log;
+
+		const message = body?.toString() || "";
+		const attrs = attributes ? this.convertAttributes(attributes) : undefined;
+
+		switch (severityText) {
+			case "INFO":
+				if (attrs) {
+					pinoLogger.info(attrs, message);
+				} else {
+					pinoLogger.info(message);
+				}
+				break;
+			case "ERROR":
+				if (attrs) {
+					pinoLogger.error(attrs, message);
+				} else {
+					pinoLogger.error(message);
+				}
+				break;
+			case "DEBUG":
+				if (attrs) {
+					pinoLogger.debug(attrs, message);
+				} else {
+					pinoLogger.debug(message);
+				}
+				break;
+			default:
+				if (attrs) {
+					pinoLogger.info(attrs, message);
+				} else {
+					pinoLogger.info(message);
+				}
+		}
+	}
+	private convertAttributes(
+		attributes: Record<string, AnyValue>,
+	): Record<string, unknown> {
+		const result: Record<string, unknown> = {};
+
+		for (const [key, value] of Object.entries(attributes)) {
+			if (value === null || value === undefined) {
+				continue;
+			}
+
+			if (typeof value === "object") {
+				result[key] = JSON.stringify(value);
+			} else {
+				result[key] = value;
+			}
+		}
+
+		return result;
+	}
+}
 
 const logExporter = new OTLPLogExporter({
 	url: "https://ingest.us.signoz.cloud:443/v1/logs",
@@ -13,58 +76,92 @@ const logExporter = new OTLPLogExporter({
 });
 
 export const logRecordProcessor = new BatchLogRecordProcessor(logExporter);
-
-const loggerProvider = new LoggerProvider();
-loggerProvider.addLogRecordProcessor(new BatchLogRecordProcessor(logExporter));
-loggerProvider.addLogRecordProcessor(
-	new BatchLogRecordProcessor(new ConsoleLogRecordExporter()),
+export const pinoLogRecordProcessor = new BatchLogRecordProcessor(
+	new PinoLogRecordExporter(),
 );
 
-const otelLogger = loggerProvider.getLogger("giselle");
+let sharedLoggerProvider: LoggerProvider | null = null;
+function getOrCreateLoggerProvider() {
+	if (!sharedLoggerProvider) {
+		sharedLoggerProvider = new LoggerProvider({
+			resource: resource.merge(Resource.default()),
+		});
 
-type SeverityText = "INFO" | "ERROR" | "DEBUG";
-
-function emitLog(
-	severity: SeverityText,
-	obj: object | string | Error,
-	msg?: string,
-) {
-	if (obj instanceof Error) {
-		otelLogger.emit({
-			severityText: severity,
-			body: obj.message,
-			attributes: {
-				stack: obj.stack,
-				...obj,
-			},
-		});
-	} else if (typeof obj === "string") {
-		otelLogger.emit({
-			severityText: severity,
-			body: obj,
-		});
-	} else {
-		otelLogger.emit({
-			severityText: severity,
-			body: msg || "",
-			attributes: obj,
-		});
+		sharedLoggerProvider.addLogRecordProcessor(logRecordProcessor);
+		sharedLoggerProvider.addLogRecordProcessor(pinoLogRecordProcessor);
 	}
+	return sharedLoggerProvider;
 }
 
-export const logger = {
-	info: (obj: object | string, msg?: string) => {
-		pinoLogger.info(obj, msg);
-		emitLog("INFO", obj, msg);
-	},
+type SeverityText = "INFO" | "ERROR" | "DEBUG";
+interface OtelLoggerWrapper {
+	info: (obj: object | string, msg?: string) => void;
+	error: (obj: object | string | Error, msg?: string) => void;
+	debug: (obj: object | string, msg?: string) => void;
+}
 
-	error: (obj: object | string | Error, msg?: string) => {
-		pinoLogger.error(obj, msg);
-		emitLog("ERROR", obj, msg);
-	},
+function createEmitLog(otelLogger: Logger) {
+	return function emitLog(
+		severity: SeverityText,
+		obj: object | string | Error,
+		msg?: string,
+	) {
+		if (obj instanceof Error) {
+			const errorAttributes: Record<string, string> = {
+				name: obj.name,
+				message: obj.message,
+				stack: obj.stack || "",
+			};
 
-	debug: (obj: object | string, msg?: string) => {
-		pinoLogger.debug(obj, msg);
-		emitLog("DEBUG", obj, msg);
-	},
-};
+			for (const [key, value] of Object.entries(obj)) {
+				if (
+					typeof value === "string" ||
+					typeof value === "number" ||
+					typeof value === "boolean"
+				) {
+					errorAttributes[key] = String(value);
+				}
+			}
+
+			otelLogger.emit({
+				severityText: severity,
+				body: obj.message,
+				attributes: errorAttributes,
+			});
+		} else if (typeof obj === "string") {
+			otelLogger.emit({
+				severityText: severity,
+				body: obj,
+			});
+		} else {
+			otelLogger.emit({
+				severityText: severity,
+				body: msg || "",
+				attributes: obj as Record<string, string | number | boolean>,
+			});
+		}
+	};
+}
+
+export function createLogger(name: string): OtelLoggerWrapper {
+	const loggerProvider = getOrCreateLoggerProvider();
+	const otelLogger = loggerProvider.getLogger(name, versionInfo.tag, {
+		schemaUrl:
+			process.env.NODE_ENV === "production"
+				? "https://raw.githubusercontent.com/giselles-ai/giselle/main/lib/opentelemetry/schema/log.json"
+				: "https://raw.githubusercontent.com/giselles-ai/giselle/refs/heads/main/lib/opentelemetry/schema/log.json",
+	});
+	const emitLog = createEmitLog(otelLogger);
+
+	return {
+		info: (obj: object | string, msg?: string) => {
+			emitLog("INFO", obj, msg);
+		},
+		error: (obj: object | string | Error, msg?: string) => {
+			emitLog("ERROR", obj, msg);
+		},
+		debug: (obj: object | string, msg?: string) => {
+			emitLog("DEBUG", obj, msg);
+		},
+	};
+}
