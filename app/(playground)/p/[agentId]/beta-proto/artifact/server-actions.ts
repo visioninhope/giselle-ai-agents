@@ -87,7 +87,7 @@ ${sourcesToText(sources)}
 						output: result,
 					});
 
-					logger.debug(
+					logger.info(
 						{
 							tokenConsumed: result.usage.totalTokens,
 							duration,
