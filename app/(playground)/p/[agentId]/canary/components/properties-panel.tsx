@@ -345,7 +345,7 @@ function DialogFooter(props: HTMLAttributes<HTMLDivElement>) {
 DialogFooter.displayName = "DialogHeader";
 
 export function PropertiesPanel() {
-	const { dispatch } = useGraph();
+	const { graph, dispatch } = useGraph();
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	return (
@@ -545,6 +545,37 @@ export function PropertiesPanel() {
 										},
 									]);
 								}}
+								onConnectionRemove={(sourceNode) => {
+									const connection = graph.connections.find(
+										(connection) =>
+											connection.targetNodeId === selectedNode.id &&
+											connection.targetNodeType === selectedNode.type,
+									);
+									if (connection === undefined) {
+										return;
+									}
+									dispatch([
+										{
+											type: "removeConnection",
+											input: {
+												connectionId: connection.id,
+											},
+										},
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													content: {
+														...selectedNode.content,
+														requirement: undefined,
+													},
+												},
+											},
+										},
+									]);
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -600,10 +631,12 @@ function TabsContentPrompt({
 	content,
 	onContentChange,
 	onConnectionAdd,
+	onConnectionRemove,
 }: {
 	content: TextGenerateActionContent;
 	onContentChange?: (content: TextGenerateActionContent) => void;
 	onConnectionAdd?: (sourceNode: Node) => void;
+	onConnectionRemove?: (sourceNode: Node) => void;
 }) {
 	const {
 		graph: { nodes, connections },
@@ -745,6 +778,9 @@ function TabsContentPrompt({
 									<button
 										type="button"
 										className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+										onClick={() => {
+											onConnectionRemove?.(requirementNode);
+										}}
 									>
 										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
 									</button>
