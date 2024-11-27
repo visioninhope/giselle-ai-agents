@@ -47,7 +47,7 @@ interface VariableContentBase {
 	type: string;
 }
 
-interface TextContent extends VariableContentBase {
+export interface TextContent extends VariableContentBase {
 	type: "text";
 	text: string;
 }

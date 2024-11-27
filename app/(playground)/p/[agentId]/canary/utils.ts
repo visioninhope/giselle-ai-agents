@@ -6,6 +6,7 @@ import type {
 	ArtifactId,
 	GraphId,
 	Node,
+	Text,
 	TextGenerateActionContent,
 	TextGeneration,
 } from "./types";
@@ -33,4 +34,8 @@ export function resolveLanguageModel(
 
 export function isTextGeneration(node: Node): node is TextGeneration {
 	return node.content.type === "textGeneration";
+}
+
+export function isText(node: Node): node is Text {
+	return node.content.type === "text";
 }

@@ -31,10 +31,11 @@ import type {
 	Node,
 	Text,
 	TextArtifactObject,
+	TextContent,
 	TextGenerateActionContent,
 	TextGeneration,
 } from "../types";
-import { createArtifactId, isTextGeneration } from "../utils";
+import { createArtifactId, isText, isTextGeneration } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -51,7 +52,7 @@ import { Slider } from "./slider";
 function PropertiesPanelContentBox({
 	children,
 	className,
-}: { children: ReactNode; className: string }) {
+}: { children: ReactNode; className?: string }) {
 	return (
 		<div className={clsx("px-[24px] py-[8px]", className)}>{children}</div>
 	);
@@ -366,6 +367,9 @@ export function PropertiesPanel() {
 									<TabsTrigger value="Result">Result</TabsTrigger>
 								</>
 							)}
+							{selectedNode?.content?.type === "text" && (
+								<TabsTrigger value="Text">Text</TabsTrigger>
+							)}
 						</TabsList>
 					</div>
 
@@ -480,6 +484,25 @@ export function PropertiesPanel() {
 						<TabsContent value="Prompt" className="flex-1">
 							<TabsContentPrompt
 								key={selectedNode.id}
+								content={selectedNode.content}
+								onContentChange={(content) => {
+									dispatch({
+										type: "updateNode",
+										input: {
+											nodeId: selectedNode.id,
+											node: {
+												...selectedNode,
+												content,
+											},
+										},
+									});
+								}}
+							/>
+						</TabsContent>
+					)}
+					{selectedNode && isText(selectedNode) && (
+						<TabsContent value="Text" className="flex-1">
+							<TabContentText
 								content={selectedNode.content}
 								onContentChange={(content) => {
 									dispatch({
@@ -1208,6 +1231,41 @@ function TabContentGenerateTextResult({
 					</div>
 				</div>
 			)}
+		</div>
+	);
+}
+
+function TabContentText({
+	content,
+	onContentChange,
+}: {
+	content: TextContent;
+	onContentChange?: (content: TextContent) => void;
+}) {
+	return (
+		<div className="relative z-10 flex flex-col gap-[2px] h-full">
+			<PropertiesPanelContentBox className="h-full flex">
+				<textarea
+					name="text"
+					id="text"
+					className="flex-1 text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none  my-[16px]"
+					defaultValue={content.text}
+					ref={(el) => {
+						function handleBlur() {
+							if (el?.value != null && content.text !== el.value) {
+								onContentChange?.({
+									...content,
+									text: el.value,
+								});
+							}
+						}
+						el?.addEventListener("blur", handleBlur);
+						return () => {
+							el?.removeEventListener("blur", handleBlur);
+						};
+					}}
+				/>
+			</PropertiesPanelContentBox>
 		</div>
 	);
 }
