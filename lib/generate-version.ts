@@ -3,7 +3,7 @@ import fs from "node:fs";
 import path from "node:path";
 
 const getGitInfo = () => {
-	const tag = execSync("git describe --tags").toString().trim();
+	const tag = execSync("git fetch -t && git describe --tags").toString().trim();
 	const branch = execSync("git rev-parse --abbrev-ref HEAD").toString().trim();
 	return {
 		tag,
