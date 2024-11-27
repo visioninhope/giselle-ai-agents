@@ -35,12 +35,10 @@ function Submit({
 }
 
 interface TeamCreationFormProps {
-	hasExistingFreeTeam: boolean;
+	canCreateFreeTeam: boolean;
 }
 
-export function TeamCreationForm({
-	hasExistingFreeTeam,
-}: TeamCreationFormProps) {
+export function TeamCreationForm({ canCreateFreeTeam }: TeamCreationFormProps) {
 	const [teamName, setTeamName] = useState("");
 	const [selectedPlan, setSelectedPlan] = useState("");
 
@@ -69,7 +67,7 @@ export function TeamCreationForm({
 				>
 					<Card
 						className={`bg-gray-900 border-gray-800 ${
-							hasExistingFreeTeam ? "opacity-50" : "cursor-pointer"
+							canCreateFreeTeam ? "cursor-pointer" : "opacity-50"
 						}`}
 					>
 						<label htmlFor="free">
@@ -83,7 +81,7 @@ export function TeamCreationForm({
 								<RadioGroupItem
 									value="free"
 									id="free"
-									disabled={hasExistingFreeTeam}
+									disabled={!canCreateFreeTeam}
 									className="text-blue-500"
 								/>
 								<Label htmlFor="free" className="ml-2 text-gray-300">
@@ -113,7 +111,7 @@ export function TeamCreationForm({
 						</label>
 					</Card>
 				</RadioGroup>
-				{hasExistingFreeTeam && (
+				{!canCreateFreeTeam && (
 					<Alert
 						variant="destructive"
 						className="bg-red-900/20 border-red-900 text-red-400"

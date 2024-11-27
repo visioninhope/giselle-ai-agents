@@ -13,12 +13,12 @@ import {
 	teams,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { isEmailFromRoute06 } from "@/lib/utils";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { TeamCreationForm } from "./team-creation-form";
 
-async function fetchTeams() {
-	const user = await getUser();
+async function fetchTeams(supabaseUserId: string) {
 	const result = await db
 		.select({
 			teamDbId: teams.dbId,
@@ -39,12 +39,17 @@ async function fetchTeams() {
 				eq(subscriptions.status, "active"),
 			),
 		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUserId));
 	return result;
 }
 
 export default async function TeamCreationModal() {
-	const teams = await fetchTeams();
+	const user = await getUser();
+	if (!user) {
+		throw new Error("User not found");
+	}
+	const isInternalUser = user.email != null && isEmailFromRoute06(user.email);
+	const teams = await fetchTeams(user.id);
 	const hasExistingFreeTeam = teams.some(
 		(team) => !team.activeSubscription && !team.teamIsInternal,
 	);
@@ -65,7 +70,9 @@ export default async function TeamCreationModal() {
 						Create New Team
 					</DialogTitle>
 				</DialogHeader>
-				<TeamCreationForm hasExistingFreeTeam={hasExistingFreeTeam} />
+				<TeamCreationForm
+					canCreateFreeTeam={!isInternalUser && !hasExistingFreeTeam}
+				/>
 			</DialogContent>
 		</Dialog>
 	);
