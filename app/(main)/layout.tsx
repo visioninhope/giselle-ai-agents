@@ -16,7 +16,7 @@ export default function Layout({ children }: { children: ReactNode }) {
 					<Nav />
 				</div>
 				<div className="flex items-center gap-4">
-					<TeamCreationModal hasExistingFreeTeam={false} />
+					<TeamCreationModal />
 					<UserButton />
 				</div>
 			</header>

@@ -14,15 +14,32 @@ import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { AlertCircle } from "lucide-react";
 import { useState } from "react";
+import { useFormStatus } from "react-dom";
+import { createTeam } from "../actions/create-team";
+
+function Submit({
+	selectedPlan,
+	teamName,
+}: { selectedPlan: string; teamName: string }) {
+	const { pending } = useFormStatus();
+	return (
+		<Button
+			type="submit"
+			variant="default"
+			className="transition-colors duration-200"
+			disabled={pending || !teamName || !selectedPlan}
+		>
+			{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
+		</Button>
+	);
+}
 
 interface TeamCreationFormProps {
 	hasExistingFreeTeam: boolean;
-	createTeam: (formData: FormData) => Promise<void>;
 }
 
 export function TeamCreationForm({
 	hasExistingFreeTeam,
-	createTeam,
 }: TeamCreationFormProps) {
 	const [teamName, setTeamName] = useState("");
 	const [selectedPlan, setSelectedPlan] = useState("");
@@ -109,14 +126,7 @@ export function TeamCreationForm({
 					</Alert>
 				)}
 			</div>
-			<Button
-				type="submit"
-				variant="default"
-				className="transition-colors duration-200"
-				disabled={!teamName || !selectedPlan}
-			>
-				{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
-			</Button>
+			<Submit selectedPlan={selectedPlan} teamName={teamName} />
 		</form>
 	);
 }
