@@ -1,6 +1,5 @@
 import { logger as pinoLogger } from "@/lib/logger";
 import type { TokenConsumedSchema } from "@/lib/opentelemetry/types";
-import { versionInfo } from "@/version";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 
 import type { AnyValue, Logger } from "@opentelemetry/api-logs";
@@ -11,7 +10,7 @@ import {
 	type LogRecord,
 	LoggerProvider,
 } from "@opentelemetry/sdk-logs";
-import { headers, resource } from "./base";
+import { headers } from "./base";
 
 class PinoLogRecordExporter extends ConsoleLogRecordExporter {
 	onEmit(log: LogRecord) {
@@ -85,7 +84,7 @@ let sharedLoggerProvider: LoggerProvider | null = null;
 function getOrCreateLoggerProvider() {
 	if (!sharedLoggerProvider) {
 		sharedLoggerProvider = new LoggerProvider({
-			resource: resource.merge(Resource.default()),
+			resource: Resource.default(),
 		});
 
 		sharedLoggerProvider.addLogRecordProcessor(logRecordProcessor);
@@ -158,9 +157,13 @@ function getSchemaUrl() {
 	}
 }
 
+const getVersion = () => {
+	return undefined; // to be implemented
+};
+
 export function createLogger(name: string): OtelLoggerWrapper {
 	const loggerProvider = getOrCreateLoggerProvider();
-	const otelLogger = loggerProvider.getLogger(name, versionInfo.tag, {
+	const otelLogger = loggerProvider.getLogger(name, getVersion(), {
 		schemaUrl: getSchemaUrl(),
 	});
 	const emitLog = createEmitLog(otelLogger);
