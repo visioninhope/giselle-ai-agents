@@ -16,6 +16,8 @@ import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import invariant from "tiny-invariant";
 
+export const DRAFT_TEAM_METADATA_KEY = "draftTeamDbId";
+
 export async function createTeam(formData: FormData) {
 	const teamName = formData.get("teamName") as string;
 	const selectedPlan = formData.get("selectedPlan") as string;
@@ -87,9 +89,7 @@ async function createCheckout(draftTeamDbId: number) {
 		success_url: `${siteUrl}/settings/team`,
 		cancel_url: `${serviceSiteUrl}/pricing`,
 		subscription_data: {
-			metadata: {
-				draftTeamDbId,
-			},
+			metadata: { [DRAFT_TEAM_METADATA_KEY]: draftTeamDbId.toString() },
 		},
 	});
 
