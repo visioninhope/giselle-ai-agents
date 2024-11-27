@@ -227,3 +227,18 @@ export function useArtifact(query: CreatorNode): Artifact | null {
 	}, [artifacts, query]);
 	return artifact;
 }
+
+export function useSelectedNode() {
+	const {
+		graph: { nodes },
+	} = useGraph();
+	const selectedNodes = useMemo(
+		() => nodes.filter((node) => node.selected),
+		[nodes],
+	);
+	const selectedNode = useMemo(
+		() => (selectedNodes.length === 1 ? selectedNodes[0] : null),
+		[selectedNodes],
+	);
+	return selectedNode;
+}

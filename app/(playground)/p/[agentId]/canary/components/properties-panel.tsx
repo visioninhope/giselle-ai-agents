@@ -22,13 +22,15 @@ import {
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
-import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { action } from "../actions";
-import { useArtifact, useGraph, useNode } from "../contexts/graph";
-import { useGraphSelection } from "../contexts/graph-selection";
+import {
+	useArtifact,
+	useGraph,
+	useNode,
+	useSelectedNode,
+} from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import type {
-	Connection,
 	FileContent,
 	Node,
 	NodeHandle,
@@ -37,7 +39,6 @@ import type {
 	TextArtifactObject,
 	TextContent,
 	TextGenerateActionContent,
-	TextGeneration,
 } from "../types";
 import {
 	createArtifactId,
@@ -345,7 +346,7 @@ DialogFooter.displayName = "DialogHeader";
 
 export function PropertiesPanel() {
 	const { dispatch } = useGraph();
-	const { selectedNode } = useGraphSelection();
+	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	return (
 		<div

@@ -13,10 +13,6 @@ import "@xyflow/react/dist/style.css";
 import { useEffect, useMemo } from "react";
 import { GraphContextProvider, useGraph } from "../contexts/graph";
 import {
-	GraphSelectionContextProvider,
-	useGraphSelection,
-} from "../contexts/graph-selection";
-import {
 	PropertiesPanelProvider,
 	usePropertiesPanel,
 } from "../contexts/properties-panel";
@@ -31,13 +27,11 @@ interface EditorProps {
 export function Editor(props: EditorProps) {
 	return (
 		<GraphContextProvider defaultGraph={props.graph}>
-			<GraphSelectionContextProvider>
-				<PropertiesPanelProvider>
-					<ReactFlowProvider>
-						<EditorInner />
-					</ReactFlowProvider>
-				</PropertiesPanelProvider>
-			</GraphSelectionContextProvider>
+			<PropertiesPanelProvider>
+				<ReactFlowProvider>
+					<EditorInner />
+				</ReactFlowProvider>
+			</PropertiesPanelProvider>
 		</GraphContextProvider>
 	);
 }
