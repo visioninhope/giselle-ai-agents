@@ -141,6 +141,10 @@ const fileNode: Node = {
 	type: "variable",
 	content: {
 		type: "file",
+		name: "SaaStr Tips Tricks Ebook Vol 1.pdf",
+		contentType: "application/pdf",
+		size: 4_821_663,
+		upladedAt: 1732676647496,
 	},
 };
 

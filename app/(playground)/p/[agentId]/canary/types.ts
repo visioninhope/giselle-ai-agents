@@ -51,8 +51,12 @@ export interface TextContent extends VariableContentBase {
 	type: "text";
 	text: string;
 }
-interface FileContent extends VariableContentBase {
+export interface FileContent extends VariableContentBase {
 	type: "file";
+	name: string;
+	contentType: string;
+	size: number;
+	upladedAt: number;
 }
 
 type VariableContent = TextContent | FileContent;

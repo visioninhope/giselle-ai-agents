@@ -4,6 +4,7 @@ import { createId } from "@paralleldrive/cuid2";
 import type { LanguageModelV1 } from "ai";
 import type {
 	ArtifactId,
+	File,
 	GraphId,
 	Node,
 	Text,
@@ -38,4 +39,8 @@ export function isTextGeneration(node: Node): node is TextGeneration {
 
 export function isText(node: Node): node is Text {
 	return node.content.type === "text";
+}
+
+export function isFile(node: Node): node is File {
+	return node.content.type === "file";
 }

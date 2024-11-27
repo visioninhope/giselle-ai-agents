@@ -28,14 +28,16 @@ import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import type {
+	FileContent,
 	Node,
+	NodeId,
 	Text,
 	TextArtifactObject,
 	TextContent,
 	TextGenerateActionContent,
 	TextGeneration,
 } from "../types";
-import { createArtifactId, isText, isTextGeneration } from "../utils";
+import { createArtifactId, isFile, isText, isTextGeneration } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -370,6 +372,9 @@ export function PropertiesPanel() {
 							{selectedNode?.content?.type === "text" && (
 								<TabsTrigger value="Text">Text</TabsTrigger>
 							)}
+							{selectedNode?.content?.type === "file" && (
+								<TabsTrigger value="File">File</TabsTrigger>
+							)}
 						</TabsList>
 					</div>
 
@@ -516,6 +521,14 @@ export function PropertiesPanel() {
 										},
 									});
 								}}
+							/>
+						</TabsContent>
+					)}
+					{selectedNode && isFile(selectedNode) && (
+						<TabsContent value="File" className="h-full">
+							<TabContentFile
+								nodeId={selectedNode.id}
+								content={selectedNode.content}
 							/>
 						</TabsContent>
 					)}
@@ -1265,6 +1278,115 @@ function TabContentText({
 						};
 					}}
 				/>
+			</PropertiesPanelContentBox>
+		</div>
+	);
+}
+
+function DataList({ label, children }: { label: string; children: ReactNode }) {
+	return (
+		<div>
+			<p className="text-[12px] text-black-40">{label}</p>
+			<div>{children}</div>
+		</div>
+	);
+}
+
+function formatFileSize(bytes: number): string {
+	const units = ["B", "KB", "MB", "GB", "TB"];
+	let size = bytes;
+	let unitIndex = 0;
+
+	const targetUnit =
+		size < 1024
+			? "B"
+			: size < 1024 ** 2
+				? "KB"
+				: size < 1024 ** 3
+					? "MB"
+					: size < 1024 ** 4
+						? "GB"
+						: "TB";
+
+	while (
+		size >= 1024 &&
+		unitIndex < units.length - 1 &&
+		units[unitIndex] !== targetUnit
+	) {
+		size /= 1024;
+		unitIndex++;
+	}
+
+	return `${Math.round(size * 100) / 100} ${targetUnit}`;
+}
+
+function TabContentFile({
+	nodeId,
+	content,
+}: { nodeId: NodeId; content: FileContent }) {
+	const { graph } = useGraph();
+
+	const sourcedFromNodes = useMemo(
+		() =>
+			graph.connections
+				.filter((connection) => connection.sourceNodeId === nodeId)
+				.map((connection) =>
+					graph.nodes.find((node) => node.id === connection.targetNodeId),
+				)
+				.filter((node) => node !== undefined),
+		[graph, nodeId],
+	);
+	return (
+		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
+			<PropertiesPanelContentBox>
+				<div className="my-[12px] flex flex-col gap-[8px]">
+					<DataList label="File Name">
+						<p>{content.name}</p>
+					</DataList>
+					<DataList label="Content Type">
+						<p>{content.contentType}</p>
+					</DataList>
+					<DataList label="Size">
+						<p>{formatFileSize(content.size)}</p>
+					</DataList>
+					<DataList label="Uploaded">
+						<p>{formatTimestamp.toRelativeTime(content.upladedAt)}</p>
+					</DataList>
+				</div>
+			</PropertiesPanelContentBox>
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+			<PropertiesPanelContentBox className="text-black-30 grid gap-2">
+				<div className="flex justify-between items-center">
+					<p className="font-rosart">Sourced From</p>
+				</div>
+
+				<div className="grid gap-2">
+					{sourcedFromNodes.map((node) => (
+						<HoverCard key={node.id}>
+							<HoverCardTrigger asChild>
+								<Block>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-[8px]">
+											<p className="truncate text-[14px] font-rosart">
+												{node.name}
+											</p>
+										</div>
+									</div>
+								</Block>
+							</HoverCardTrigger>
+							<HoverCardContent className="w-80">
+								<div className="flex justify-between space-x-4">
+									node type: {node.content.type}
+									{node.content.type === "text" && (
+										<div className="line-clamp-5 text-[14px]">
+											{node.content.text}
+										</div>
+									)}
+								</div>
+							</HoverCardContent>
+						</HoverCard>
+					))}
+				</div>
 			</PropertiesPanelContentBox>
 		</div>
 	);
