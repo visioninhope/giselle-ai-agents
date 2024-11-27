@@ -511,7 +511,7 @@ export function PropertiesPanel() {
 										},
 									});
 								}}
-								onConnectionAdd={(sourceNode) => {
+								onRequirementConnect={(sourceNode) => {
 									const requirement: NodeHandle = {
 										id: createNodeHandleId(),
 										label: "Requirement",
@@ -545,11 +545,11 @@ export function PropertiesPanel() {
 										},
 									]);
 								}}
-								onConnectionRemove={(sourceNode) => {
+								onRequirementRemove={(sourceNode) => {
 									const connection = graph.connections.find(
 										(connection) =>
 											connection.targetNodeId === selectedNode.id &&
-											connection.targetNodeType === selectedNode.type,
+											connection.sourceNodeId === sourceNode.id,
 									);
 									if (connection === undefined) {
 										return;
@@ -570,6 +570,74 @@ export function PropertiesPanel() {
 													content: {
 														...selectedNode.content,
 														requirement: undefined,
+													},
+												},
+											},
+										},
+									]);
+								}}
+								onSourceConnect={(sourceNode) => {
+									const source: NodeHandle = {
+										id: createNodeHandleId(),
+										label: `Source${selectedNode.content.sources.length + 1}`,
+									};
+									dispatch([
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													content: {
+														...selectedNode.content,
+														sources: [...selectedNode.content.sources, source],
+													},
+												},
+											},
+										},
+										{
+											type: "addConnection",
+											input: {
+												connection: {
+													id: createConnectionId(),
+													sourceNodeId: sourceNode.id,
+													sourceNodeType: sourceNode.type,
+													targetNodeId: selectedNode.id,
+													targetNodeType: selectedNode.type,
+													targetNodeHandleId: source.id,
+												},
+											},
+										},
+									]);
+								}}
+								onSourceRemove={(sourceNode) => {
+									const connection = graph.connections.find(
+										(connection) =>
+											connection.targetNodeId === selectedNode.id &&
+											connection.sourceNodeId === sourceNode.id,
+									);
+									if (connection === undefined) {
+										return;
+									}
+									dispatch([
+										{
+											type: "removeConnection",
+											input: {
+												connectionId: connection.id,
+											},
+										},
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													content: {
+														...selectedNode.content,
+														sources: selectedNode.content.sources.filter(
+															(source) =>
+																source.id !== connection.targetNodeHandleId,
+														),
 													},
 												},
 											},
@@ -627,16 +695,83 @@ export function PropertiesPanel() {
 	);
 }
 
+function NodeDropdown({
+	triggerLabel,
+	nodes,
+	onValueChange,
+}: {
+	triggerLabel?: string;
+	nodes: Node[];
+	onValueChange?: (node: Node) => void;
+}) {
+	const textGenerationNodes = nodes.filter(
+		(node) => node.content.type === "textGeneration",
+	);
+	const textNodes = nodes.filter((node) => node.content.type === "text");
+	const fileNodes = nodes.filter((node) => node.content.type === "file");
+
+	const handleValueChange = (value: string) => {
+		if (!onValueChange) return;
+
+		const node = nodes.find((node) => node.id === value);
+		if (node === undefined) return;
+
+		onValueChange(node);
+	};
+
+	return (
+		<DropdownMenu>
+			<DropdownMenuTrigger label={triggerLabel} />
+			<DropdownMenuContent>
+				<DropdownMenuRadioGroup onValueChange={handleValueChange}>
+					<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+					{textGenerationNodes.map((node) => (
+						<DropdownMenuRadioItem value={node.id} key={node.id}>
+							{node.name}
+						</DropdownMenuRadioItem>
+					))}
+					{textNodes.length > 0 && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel>Text</DropdownMenuLabel>
+							{textNodes.map((node) => (
+								<DropdownMenuRadioItem value={node.id} key={node.id}>
+									{node.name}
+								</DropdownMenuRadioItem>
+							))}
+						</>
+					)}
+					{fileNodes.length > 0 && (
+						<>
+							<DropdownMenuSeparator />
+							<DropdownMenuLabel>File</DropdownMenuLabel>
+							{fileNodes.map((node) => (
+								<DropdownMenuRadioItem value={node.id} key={node.id}>
+									{node.name}
+								</DropdownMenuRadioItem>
+							))}
+						</>
+					)}
+				</DropdownMenuRadioGroup>
+			</DropdownMenuContent>
+		</DropdownMenu>
+	);
+}
+
 function TabsContentPrompt({
 	content,
 	onContentChange,
-	onConnectionAdd,
-	onConnectionRemove,
+	onRequirementConnect,
+	onRequirementRemove,
+	onSourceConnect,
+	onSourceRemove,
 }: {
 	content: TextGenerateActionContent;
 	onContentChange?: (content: TextGenerateActionContent) => void;
-	onConnectionAdd?: (sourceNode: Node) => void;
-	onConnectionRemove?: (sourceNode: Node) => void;
+	onRequirementConnect?: (sourceNode: Node) => void;
+	onRequirementRemove?: (sourceNode: Node) => void;
+	onSourceConnect?: (sourceNode: Node) => void;
+	onSourceRemove?: (sourceNode: Node) => void;
 }) {
 	const {
 		graph: { nodes, connections },
@@ -736,34 +871,15 @@ function TabsContentPrompt({
 				{requirementNode === null ? (
 					<div className="flex items-center gap-[4px]">
 						<div className="py-[4px] text-[12px] flex-1">Not selected</div>
-						<DropdownMenu>
-							<DropdownMenuTrigger />
-							<DropdownMenuContent>
-								<DropdownMenuRadioGroup
-									onValueChange={(value) => {
-										const node = nodes.find((node) => node.id === value);
-										if (node === undefined) {
-											return;
-										}
-										onConnectionAdd?.(node);
-									}}
-								>
-									<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-									{connectableTextGeneratorNodes.map((node) => (
-										<DropdownMenuRadioItem value={node.id} key={node.id}>
-											{node.name}
-										</DropdownMenuRadioItem>
-									))}
-									<DropdownMenuSeparator />
-									<DropdownMenuLabel>Text</DropdownMenuLabel>
-									{connectableTextNodes.map((node) => (
-										<DropdownMenuRadioItem value={node.id} key={node.id}>
-											{node.name}
-										</DropdownMenuRadioItem>
-									))}
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<NodeDropdown
+							nodes={[
+								...connectableTextNodes,
+								...connectableTextGeneratorNodes,
+							]}
+							onValueChange={(node) => {
+								onRequirementConnect?.(node);
+							}}
+						/>
 					</div>
 				) : (
 					<HoverCard>
@@ -779,7 +895,7 @@ function TabsContentPrompt({
 										type="button"
 										className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
 										onClick={() => {
-											onConnectionRemove?.(requirementNode);
+											onRequirementRemove?.(requirementNode);
 										}}
 									>
 										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
@@ -838,26 +954,17 @@ function TabsContentPrompt({
 				{sourceNodes.length < 1 ? (
 					<div className="flex items-center gap-[4px]">
 						<div className="py-[4px] text-[12px] flex-1">Not selected</div>
-						<DropdownMenu>
-							<DropdownMenuTrigger label="Add" />
-							<DropdownMenuContent>
-								<DropdownMenuRadioGroup>
-									<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-									{connectableTextGeneratorNodes.map((node) => (
-										<DropdownMenuRadioItem value={node.id} key={node.id}>
-											{node.name}
-										</DropdownMenuRadioItem>
-									))}
-									<DropdownMenuSeparator />
-									<DropdownMenuLabel>Text</DropdownMenuLabel>
-									{connectableTextNodes.map((node) => (
-										<DropdownMenuRadioItem value={node.id} key={node.id}>
-											{node.name}
-										</DropdownMenuRadioItem>
-									))}
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-						</DropdownMenu>
+						<NodeDropdown
+							triggerLabel="add"
+							nodes={[
+								...connectableTextNodes,
+								...connectableTextGeneratorNodes,
+								...connectableFileNodes,
+							]}
+							onValueChange={(node) => {
+								onSourceConnect?.(node);
+							}}
+						/>
 					</div>
 				) : (
 					<div className="grid gap-2">
@@ -874,6 +981,9 @@ function TabsContentPrompt({
 											<button
 												type="button"
 												className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+												onClick={() => {
+													onSourceRemove?.(sourceNode);
+												}}
 											>
 												<TrashIcon className="w-[16px] h-[16px] text-black-30" />
 											</button>
@@ -894,26 +1004,17 @@ function TabsContentPrompt({
 						))}
 
 						<div className="flex items-center gap-[4px]">
-							<DropdownMenu>
-								<DropdownMenuTrigger label="Add source" />
-								<DropdownMenuContent>
-									<DropdownMenuRadioGroup>
-										<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-										{connectableTextGeneratorNodes.map((node) => (
-											<DropdownMenuRadioItem value={node.id} key={node.id}>
-												{node.name}
-											</DropdownMenuRadioItem>
-										))}
-										<DropdownMenuSeparator />
-										<DropdownMenuLabel>Text</DropdownMenuLabel>
-										{connectableTextNodes.map((node) => (
-											<DropdownMenuRadioItem value={node.id} key={node.id}>
-												{node.name}
-											</DropdownMenuRadioItem>
-										))}
-									</DropdownMenuRadioGroup>
-								</DropdownMenuContent>
-							</DropdownMenu>
+							<NodeDropdown
+								triggerLabel="add"
+								nodes={[
+									...connectableTextNodes,
+									...connectableTextGeneratorNodes,
+									...connectableFileNodes,
+								]}
+								onValueChange={(node) => {
+									onSourceConnect?.(node);
+								}}
+							/>
 						</div>
 					</div>
 				)}
