@@ -26,6 +26,7 @@ type GenerateArtifactStreamParams = {
 export async function generateArtifactStream(
 	params: GenerateArtifactStreamParams,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
@@ -71,6 +72,7 @@ ${sourcesToText(sources)}
 				prompt: params.userPrompt,
 				schema: artifactSchema,
 				onFinish: async (result) => {
+					const duration = performance.now() - startTime;
 					const meter = metrics.getMeter(params.modelConfiguration.provider);
 					const tokenCounter = meter.createCounter("token_consumed", {
 						description: "Number of OpenAI API tokens consumed by each request",
@@ -86,7 +88,10 @@ ${sourcesToText(sources)}
 					});
 
 					logger.debug(
-						{ tokenConsumed: result.usage.totalTokens },
+						{
+							tokenConsumed: result.usage.totalTokens,
+							duration,
+						},
 						"response obtained",
 					);
 
