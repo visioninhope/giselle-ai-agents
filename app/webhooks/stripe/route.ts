@@ -1,5 +1,5 @@
 import { stripe } from "@/services/external/stripe";
-import { upsertSubscription } from "@/services/external/stripe/actions";
+import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
 import type Stripe from "stripe";
 
 const relevantEvents = new Set([
@@ -46,10 +46,7 @@ export async function POST(req: Request) {
 						"The checkout session is missing a valid customer ID. Please check the session data.",
 					);
 				}
-				await upsertSubscription(
-					event.data.object.id,
-					event.data.object.customer,
-				);
+				await upsertSubscription(event.data.object.id);
 				break;
 
 			case "checkout.session.completed":
@@ -72,10 +69,7 @@ export async function POST(req: Request) {
 						"The checkout session is missing a valid customer ID. Please check the session data.",
 					);
 				}
-				await upsertSubscription(
-					event.data.object.subscription,
-					event.data.object.customer,
-				);
+				await upsertSubscription(event.data.object.subscription);
 				break;
 
 			default:
