@@ -2,6 +2,7 @@
 
 import {
 	db,
+	draftTeams,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -9,9 +10,11 @@ import {
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { isEmailFromRoute06 } from "@/lib/utils";
+import { stripe } from "@/services/external/stripe";
 import type { User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
+import invariant from "tiny-invariant";
 
 export async function createTeam(formData: FormData) {
 	const teamName = formData.get("teamName") as string;
@@ -45,7 +48,70 @@ export async function createTeam(formData: FormData) {
  * 3. Redirect to the Stripe checkout page
  */
 async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
-	throw new Error("Not implemented");
+	const draftTeamDbId = await createDraftTeam(supabaseUser, teamName);
+
+	invariant(process.env.STRIPE_PRO_PLAN_ID, "STRIPE_PRO_PLAN_ID is not set");
+	invariant(
+		process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID,
+		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
+	);
+	invariant(
+		process.env.STRIPE_USER_SEAT_PRICE_ID,
+		"STRIPE_USER_SEAT_PRICE_ID is not set",
+	);
+
+	const checkoutUrl = await createCheckout(draftTeamDbId);
+	redirect(checkoutUrl);
+}
+
+async function createCheckout(draftTeamDbId: number) {
+	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
+
+	const checkoutSession = await stripe.checkout.sessions.create({
+		mode: "subscription",
+		line_items: [
+			{
+				price: process.env.STRIPE_PRO_PLAN_ID,
+				quantity: 1,
+			},
+			{
+				price: process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID,
+			},
+			{
+				price: process.env.STRIPE_USER_SEAT_PRICE_ID,
+			},
+		],
+		automatic_tax: { enabled: true },
+		// FIXME: change context to the new team
+		success_url: `${siteUrl}/settings/team`,
+		cancel_url: `${serviceSiteUrl}/pricing`,
+		subscription_data: {
+			metadata: {
+				draftTeamDbId,
+			},
+		},
+	});
+
+	if (checkoutSession.url == null) {
+		throw new Error("checkoutSession.url is null");
+	}
+
+	return checkoutSession.url;
+}
+
+async function createDraftTeam(supabaseUser: User, teamName: string) {
+	const userDbId = await getUserDbId(supabaseUser);
+
+	const [draftTeam] = await db
+		.insert(draftTeams)
+		.values({
+			name: teamName,
+			userDbId,
+		})
+		.returning({ dbId: draftTeams.dbId });
+
+	return draftTeam.dbId;
 }
 
 async function createInternalTeam(supabaseUser: User, teamName: string) {
@@ -70,14 +136,7 @@ async function createTeamInDatabase(
 		.returning({ dbid: teams.dbId });
 
 	const teamDbId = result.dbid;
-	const [{ dbId: userDbId }] = await db
-		.select({ dbId: users.dbId })
-		.from(users)
-		.innerJoin(
-			supabaseUserMappings,
-			eq(users.dbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+	const userDbId = await getUserDbId(supabaseUser);
 
 	// add membership
 	await db.insert(teamMemberships).values({
@@ -85,4 +144,16 @@ async function createTeamInDatabase(
 		userDbId,
 		role: "admin",
 	});
+}
+
+async function getUserDbId(supabaseUser: User) {
+	const [result] = await db
+		.select()
+		.from(users)
+		.innerJoin(
+			supabaseUserMappings,
+			eq(users.dbId, supabaseUserMappings.userDbId),
+		)
+		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+	return result.users.dbId;
 }
