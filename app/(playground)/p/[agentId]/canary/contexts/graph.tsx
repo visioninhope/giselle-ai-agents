@@ -26,7 +26,6 @@ interface UpdateNodeAction {
 	type: "updateNode";
 	input: UpdateNodeActionInput;
 }
-type GraphAction = UpsertArtifactAction | UpdateNodeAction;
 
 export function upsertArtifact(
 	input: UpsertArtifactActionInput,
@@ -37,9 +36,24 @@ export function upsertArtifact(
 	};
 }
 
+type GraphActionOrActions = GraphAction | GraphAction[];
+function applyActions(
+	graph: Graph,
+	actionOrActions: GraphActionOrActions,
+): Graph {
+	const actions = Array.isArray(actionOrActions)
+		? actionOrActions
+		: [actionOrActions];
+	let currentGraph = graph;
+	for (const action of actions) {
+		currentGraph = graphReducer(currentGraph, action);
+	}
+	return currentGraph;
+}
+
 interface GraphContextValue {
 	graph: Graph;
-	dispatch: (action: GraphAction) => void;
+	dispatch: (action: GraphActionOrActions) => void;
 }
 const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 
@@ -76,8 +90,8 @@ export function GraphContextProvider({
 }) {
 	const graphRef = useRef(defaultGraph);
 	const [graph, setGraph] = useState(graphRef.current);
-	const dispatch = useCallback((action: GraphAction) => {
-		graphRef.current = graphReducer(graphRef.current, action);
+	const dispatch = useCallback((actionOrActions: GraphActionOrActions) => {
+		graphRef.current = applyActions(graphRef.current, actionOrActions);
 		setGraph(graphRef.current);
 	}, []);
 	return (
