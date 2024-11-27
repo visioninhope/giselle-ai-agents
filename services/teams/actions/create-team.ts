@@ -15,8 +15,7 @@ import type { User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import invariant from "tiny-invariant";
-
-export const DRAFT_TEAM_METADATA_KEY = "draftTeamDbId";
+import { DRAFT_TEAM_METADATA_KEY } from "../constants";
 
 export async function createTeam(formData: FormData) {
 	const teamName = formData.get("teamName") as string;

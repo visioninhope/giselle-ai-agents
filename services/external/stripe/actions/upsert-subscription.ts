@@ -1,5 +1,5 @@
 import { db, draftTeams, subscriptions, teams } from "@/drizzle";
-import { DRAFT_TEAM_METADATA_KEY } from "@/services/teams/actions/create-team";
+import { DRAFT_TEAM_METADATA_KEY } from "@/services/teams/constants";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { stripe } from "../config";
