@@ -15,7 +15,10 @@ import {
 	GraphSelectionContextProvider,
 	useGraphSelection,
 } from "../contexts/graph-selection";
-import { PropertiesPanelProvider } from "../contexts/properties-panel";
+import {
+	PropertiesPanelProvider,
+	usePropertiesPanel,
+} from "../contexts/properties-panel";
 import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
@@ -45,7 +48,7 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph } = useGraph();
-	const defaultNodes = useMemo<Node[]>(
+	const nodes = useMemo<Node[]>(
 		() =>
 			graph.nodes.map(
 				(node) =>
@@ -61,7 +64,7 @@ function EditorInner() {
 		[graph.nodes],
 	);
 
-	const defaultEdges = useMemo<Edge[]>(
+	const edges = useMemo<Edge[]>(
 		() =>
 			graph.connections.map(
 				(connection) =>
@@ -80,18 +83,41 @@ function EditorInner() {
 	);
 
 	const { selectNode } = useGraphSelection();
+	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
 				colorMode="dark"
-				defaultNodes={defaultNodes}
-				defaultEdges={defaultEdges}
+				defaultNodes={nodes}
+				defaultEdges={edges}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={(nodesChange) => {
 					nodesChange.map((nodeChange) => {
 						if (nodeChange.type === "select") {
-							selectNode(nodeChange.id as NodeId, nodeChange.selected);
+							const xyFlowNode = nodes.find(
+								(node) => node.id === nodeChange.id,
+							);
+							if (xyFlowNode === undefined) {
+								return;
+							}
+							const node = xyFlowNode.data.node;
+							selectNode(node.id, nodeChange.selected);
+							if (nodeChange.selected) {
+								switch (node.content.type) {
+									case "textGeneration":
+										setTab("Prompt");
+										break;
+									case "text":
+										setTab("Text");
+										break;
+									case "file":
+										setTab("File");
+										break;
+									default:
+										break;
+								}
+							}
 						}
 						if (nodeChange.type === "remove") {
 							console.log(nodeChange);
