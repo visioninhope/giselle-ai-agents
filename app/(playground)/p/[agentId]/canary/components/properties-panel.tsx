@@ -254,7 +254,7 @@ const TabsTrigger: FC<ComponentProps<typeof TabsPrimitive.Trigger>> = ({
 }) => (
 	<TabsPrimitive.Trigger
 		ref={ref}
-		className="font-rosart text-[16px] text-black-70 data-[state=active]:text-black-30 py-[6px] px-[2px]"
+		className="font-rosart text-[16px] text-black-70 hover:text-black-30/70 data-[state=active]:text-black-30 py-[6px] px-[2px]"
 		{...props}
 	/>
 );
@@ -369,7 +369,7 @@ export function PropertiesPanel() {
 							onClick={() => setOpen(false)}
 							className="p-[8px]"
 						>
-							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-30" />
+							<PanelCloseIcon className="w-[18px] h-[18px] fill-black-70 hover:fill-black-30" />
 						</button>
 						<TabsList>
 							{selectedNode?.content?.type === "textGeneration" && (
@@ -687,7 +687,7 @@ export function PropertiesPanel() {
 						onClick={() => setOpen(true)}
 						className="p-[16px]"
 					>
-						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-30" />
+						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-70 hover:fill-black-30" />
 					</button>
 				</div>
 			)}
