@@ -7,6 +7,7 @@ import {
 	useState,
 } from "react";
 import type { Graph, Node, NodeId } from "../types";
+import { useGraph } from "./graph";
 
 interface GraphSelectionContextValue {
 	selectedNodeIds: Set<NodeId>;
@@ -21,11 +22,10 @@ const GraphSelectionContext = createContext<
 
 export function GraphSelectionContextProvider({
 	children,
-	graph,
 }: {
 	children: ReactNode;
-	graph: Graph;
 }) {
+	const { graph } = useGraph();
 	const [selectedNodeIds, setSelectedNodeIds] = useState<Set<NodeId>>(
 		new Set(),
 	);

@@ -32,8 +32,9 @@ import type {
 	Text,
 	TextArtifactObject,
 	TextGenerateActionContent,
+	TextGeneration,
 } from "../types";
-import { createArtifactId } from "../utils";
+import { createArtifactId, isTextGeneration } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -468,11 +469,23 @@ export function PropertiesPanel() {
 						</div>
 					)}
 
-					{selectedNode?.content?.type === "textGeneration" && (
+					{selectedNode && isTextGeneration(selectedNode) && (
 						<TabsContent value="Prompt" className="flex-1">
 							<TabsContentPrompt
-								content={selectedNode.content}
 								key={selectedNode.id}
+								content={selectedNode.content}
+								onContentChange={(content) => {
+									dispatch({
+										type: "updateNode",
+										input: {
+											nodeId: selectedNode.id,
+											node: {
+												...selectedNode,
+												content,
+											},
+										},
+									});
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -499,8 +512,10 @@ export function PropertiesPanel() {
 
 function TabsContentPrompt({
 	content,
+	onContentChange,
 }: {
 	content: TextGenerateActionContent;
+	onContentChange?: (content: TextGenerateActionContent) => void;
 }) {
 	const {
 		graph: { nodes, connections },
@@ -537,7 +552,15 @@ function TabsContentPrompt({
 			<PropertiesPanelCollapsible title="LLM" glanceLabel={content.llm}>
 				<div className="flex flex-col gap-[10px]">
 					<div className="grid gap-[8px]">
-						<Select value={content.llm}>
+						<Select
+							value={content.llm}
+							onValueChange={(value) => {
+								onContentChange?.({
+									...content,
+									llm: value,
+								});
+							}}
+						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select a LLM" />
 							</SelectTrigger>

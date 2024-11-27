@@ -56,6 +56,7 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 				],
 			};
 		case "updateNode":
+			console.log(action.input.node);
 			return {
 				...graph,
 				nodes: graph.nodes.map((node) =>

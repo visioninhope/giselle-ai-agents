@@ -10,7 +10,7 @@ import {
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
 import { useMemo } from "react";
-import { GraphContextProvider } from "../contexts/graph";
+import { GraphContextProvider, useGraph } from "../contexts/graph";
 import {
 	GraphSelectionContextProvider,
 	useGraphSelection,
@@ -27,10 +27,10 @@ interface EditorProps {
 export function Editor(props: EditorProps) {
 	return (
 		<GraphContextProvider defaultGraph={props.graph}>
-			<GraphSelectionContextProvider graph={props.graph}>
+			<GraphSelectionContextProvider>
 				<PropertiesPanelProvider>
 					<ReactFlowProvider>
-						<EditorInner graph={props.graph} />
+						<EditorInner />
 					</ReactFlowProvider>
 				</PropertiesPanelProvider>
 			</GraphSelectionContextProvider>
@@ -43,13 +43,11 @@ const nodeTypes = {
 const edgeTypes = {
 	giselleEdge: Edge,
 };
-interface EditorInnerProps {
-	graph: Graph;
-}
-function EditorInner(props: EditorInnerProps) {
+function EditorInner() {
+	const { graph } = useGraph();
 	const defaultNodes = useMemo<Node[]>(
 		() =>
-			props.graph.nodes.map(
+			graph.nodes.map(
 				(node) =>
 					({
 						id: node.id,
@@ -60,12 +58,12 @@ function EditorInner(props: EditorInnerProps) {
 						},
 					}) as Node,
 			),
-		[props.graph.nodes],
+		[graph.nodes],
 	);
 
 	const defaultEdges = useMemo<Edge[]>(
 		() =>
-			props.graph.connections.map(
+			graph.connections.map(
 				(connection) =>
 					({
 						id: connection.id,
@@ -78,7 +76,7 @@ function EditorInner(props: EditorInnerProps) {
 						},
 					}) satisfies Edge,
 			),
-		[props.graph.connections],
+		[graph.connections],
 	);
 
 	const { selectNode } = useGraphSelection();
