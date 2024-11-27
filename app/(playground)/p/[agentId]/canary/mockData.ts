@@ -4,6 +4,7 @@ const outlineNode: Node = {
 	id: "nd_outline",
 	name: "Untitled Node - 1",
 	position: { x: 332.3, y: 277.5 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -28,6 +29,7 @@ const sectionNode1: Node = {
 	id: "nd_section1",
 	name: "Untitled Node - 2",
 	position: { x: 600, y: 275.0 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -57,6 +59,7 @@ const sectionNode2: Node = {
 	id: "nd_section2",
 	name: "Untitled Node - 3",
 	position: { x: 600, y: 600 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -86,6 +89,7 @@ const concatNode: Node = {
 	id: "nd_concat",
 	name: "Untitled Node - 4",
 	position: { x: 900, y: 300 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -110,6 +114,7 @@ const reviewNode: Node = {
 	id: "nd_review",
 	name: "Untitled Node - 5",
 	position: { x: 1150, y: 100 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",
@@ -138,6 +143,7 @@ const fileNode: Node = {
 	id: "nd_file",
 	name: "Untitled Node - 6",
 	position: { x: -15, y: 100 },
+	selected: false,
 	type: "variable",
 	content: {
 		type: "file",
@@ -152,6 +158,7 @@ const textNode: Node = {
 	id: "nd_text",
 	name: "Untitled Node - 7",
 	position: { x: -15, y: 300 },
+	selected: false,
 	type: "variable",
 	content: {
 		type: "text",
@@ -189,6 +196,7 @@ const webSearchNode: Node = {
 	id: "nd_web-search",
 	name: "Untitled Node - 8",
 	position: { x: -15, y: 478 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "webSearch",
@@ -199,6 +207,7 @@ const textGenerationStandAloneNode: Node = {
 	id: "nd_stand-alone",
 	name: "Untitled Node - 9",
 	position: { x: 600, y: 100 },
+	selected: false,
 	type: "action",
 	content: {
 		type: "textGeneration",

@@ -4,9 +4,10 @@ interface NodeBase {
 	name: string;
 	type: string;
 	position: Position;
+	selected: boolean;
 }
 
-interface Position {
+export interface Position {
 	x: number;
 	y: number;
 }

@@ -48,7 +48,7 @@ const edgeTypes = {
 	giselleEdge: Edge,
 };
 function EditorInner() {
-	const { graph } = useGraph();
+	const { graph, dispatch } = useGraph();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	useEffect(() => {
 		reactFlowInstance.setNodes(
@@ -57,6 +57,7 @@ function EditorInner() {
 					({
 						id: node.id,
 						position: node.position,
+						selected: node.selected,
 						type: "giselleNode",
 						data: {
 							node,
@@ -83,7 +84,6 @@ function EditorInner() {
 			),
 		);
 	}, [graph.connections, reactFlowInstance.setEdges]);
-	const { selectNode } = useGraphSelection();
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
@@ -95,32 +95,43 @@ function EditorInner() {
 				edgeTypes={edgeTypes}
 				onNodesChange={(nodesChange) => {
 					nodesChange.map((nodeChange) => {
-						if (nodeChange.type === "select") {
-							const node = graph.nodes.find(
-								(node) => node.id === nodeChange.id,
-							);
-							if (node === undefined) {
-								return;
-							}
-							selectNode(node.id, nodeChange.selected);
-							if (nodeChange.selected) {
-								switch (node.content.type) {
-									case "textGeneration":
-										setTab("Prompt");
-										break;
-									case "text":
-										setTab("Text");
-										break;
-									case "file":
-										setTab("File");
-										break;
-									default:
-										break;
+						switch (nodeChange.type) {
+							case "select": {
+								const node = graph.nodes.find(
+									(node) => node.id === nodeChange.id,
+								);
+								if (node === undefined) {
+									return;
 								}
+								// selectNode(node.id, nodeChange.selected);
+								dispatch({
+									type: "updateNodeSelection",
+									input: {
+										nodeId: node.id,
+										selected: nodeChange.selected,
+									},
+								});
+								if (nodeChange.selected) {
+									switch (node.content.type) {
+										case "textGeneration":
+											setTab("Prompt");
+											break;
+										case "text":
+											setTab("Text");
+											break;
+										case "file":
+											setTab("File");
+											break;
+										default:
+											break;
+									}
+								}
+								break;
 							}
-						}
-						if (nodeChange.type === "remove") {
-							console.log(nodeChange);
+							case "remove": {
+								console.log(nodeChange);
+								break;
+							}
 						}
 					});
 				}}
@@ -129,6 +140,17 @@ function EditorInner() {
 						if (edgeChange.type === "remove") {
 							console.log(edgeChange);
 						}
+					});
+				}}
+				onNodeDragStop={(_event, _node, nodes) => {
+					nodes.map((node) => {
+						dispatch({
+							type: "updateNodePosition",
+							input: {
+								nodeId: node.id as NodeId,
+								position: node.position,
+							},
+						});
 					});
 				}}
 			>

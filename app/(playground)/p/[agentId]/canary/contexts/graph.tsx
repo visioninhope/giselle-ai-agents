@@ -15,6 +15,7 @@ import type {
 	Node,
 	NodeHandleId,
 	NodeId,
+	Position,
 } from "../types";
 
 interface UpsertArtifactActionInput {
@@ -35,6 +36,23 @@ interface UpdateNodeAction {
 	input: UpdateNodeActionInput;
 }
 
+interface UpdateNodePositionActionInput {
+	nodeId: NodeId;
+	position: Position;
+}
+interface UpdateNodePositionAction {
+	type: "updateNodePosition";
+	input: UpdateNodePositionActionInput;
+}
+interface UpdateNodeSelectionActionInput {
+	nodeId: NodeId;
+	selected: boolean;
+}
+interface UpdateNodeSelectionAction {
+	type: "updateNodeSelection";
+	input: UpdateNodeSelectionActionInput;
+}
+
 interface AddConnectionActionInput {
 	connection: Connection;
 }
@@ -53,7 +71,9 @@ type GraphAction =
 	| UpsertArtifactAction
 	| UpdateNodeAction
 	| AddConnectionAction
-	| RemoveConnectionAction;
+	| RemoveConnectionAction
+	| UpdateNodePositionAction
+	| UpdateNodeSelectionAction;
 
 export function upsertArtifact(
 	input: UpsertArtifactActionInput,
@@ -115,6 +135,24 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 				...graph,
 				connections: graph.connections.filter(
 					(connection) => connection.id !== action.input.connectionId,
+				),
+			};
+		case "updateNodePosition":
+			return {
+				...graph,
+				nodes: graph.nodes.map((node) =>
+					node.id === action.input.nodeId
+						? { ...node, position: action.input.position }
+						: node,
+				),
+			};
+		case "updateNodeSelection":
+			return {
+				...graph,
+				nodes: graph.nodes.map((node) =>
+					node.id === action.input.nodeId
+						? { ...node, selected: action.input.selected }
+						: node,
 				),
 			};
 		default:

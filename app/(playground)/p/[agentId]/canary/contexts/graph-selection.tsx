@@ -13,7 +13,6 @@ interface GraphSelectionContextValue {
 	selectedNodeIds: Set<NodeId>;
 	selectedNodes: Node[];
 	selectedNode: Node | null;
-	selectNode: (nodeId: NodeId, selected: boolean) => void;
 }
 
 const GraphSelectionContext = createContext<
@@ -30,31 +29,9 @@ export function GraphSelectionContextProvider({
 		new Set(),
 	);
 
-	const selectNode = useCallback((nodeId: NodeId, selected: boolean) => {
-		setSelectedNodeIds((prev) => {
-			const next = new Set(prev);
-			if (selected) {
-				next.add(nodeId);
-			} else {
-				next.delete(nodeId);
-			}
-			return next;
-		});
-	}, []);
-
-	const isSelected = useCallback(
-		(nodeId: NodeId) => {
-			return selectedNodeIds.has(nodeId);
-		},
-		[selectedNodeIds],
-	);
-
 	const selectedNodes = useMemo(
-		() =>
-			Array.from(selectedNodeIds)
-				.map((id) => graph.nodes.find((node) => node.id === id))
-				.filter((node) => node !== undefined),
-		[selectedNodeIds, graph.nodes],
+		() => graph.nodes.filter((node) => node.selected),
+		[graph.nodes],
 	);
 	const selectedNode = useMemo(
 		() => (selectedNodes.length === 1 ? selectedNodes[0] : null),
@@ -67,7 +44,6 @@ export function GraphSelectionContextProvider({
 				selectedNodeIds,
 				selectedNodes,
 				selectedNode,
-				selectNode,
 			}}
 		>
 			{children}
