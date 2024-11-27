@@ -48,6 +48,15 @@ import {
 } from "./select";
 import { Slider } from "./slider";
 
+function PropertiesPanelContentBox({
+	children,
+	className,
+}: { children: ReactNode; className: string }) {
+	return (
+		<div className={clsx("px-[24px] py-[8px]", className)}>{children}</div>
+	);
+}
+
 interface PropertiesPanelCollapsible {
 	title: string;
 	glanceLabel?: string;
@@ -64,7 +73,7 @@ function PropertiesPanelCollapsible({
 	return (
 		<>
 			{isExpanded ? (
-				<div className="px-[24px] text-base text-black-30 py-[8px] grid gap-2">
+				<PropertiesPanelContentBox className="text-black-30 grid gap-2">
 					<div className="flex justify-between items-center">
 						<p className="font-rosart">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
@@ -75,23 +84,21 @@ function PropertiesPanelCollapsible({
 						</button>
 					</div>
 					{children}
-				</div>
+				</PropertiesPanelContentBox>
 			) : (
-				<button
-					type="button"
-					className="px-[24px] text-base text-black-30 flex justify-between items-center py-[8px] group"
-					onClick={() => setIsExpanded(true)}
-				>
-					<div className="flex gap-2 items-center">
-						<p className="font-rosart">{title}</p>
-						{glanceLabel && (
-							<span className="text-[10px] text-black-50">{glanceLabel}</span>
-						)}
-					</div>
-					<ChevronsUpDownIcon
-						size={16}
-						className="text-black-50 group-hover:text-black-30"
-					/>
+				<button type="button" onClick={() => setIsExpanded(true)}>
+					<PropertiesPanelContentBox className="text-black-30 flex justify-between items-center group">
+						<div className="flex gap-2 items-center">
+							<p className="font-rosart">{title}</p>
+							{glanceLabel && (
+								<span className="text-[10px] text-black-50">{glanceLabel}</span>
+							)}
+						</div>
+						<ChevronsUpDownIcon
+							size={16}
+							className="text-black-50 group-hover:text-black-30"
+						/>
+					</PropertiesPanelContentBox>
 				</button>
 			)}
 		</>
@@ -789,17 +796,17 @@ function TabsContentPrompt({
 
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 
-			<div className="flex flex-col gap-[8px] flex-1 pb-[24px] px-[24px] pt-[8px]">
+			<PropertiesPanelContentBox className="flex flex-col gap-[8px] flex-1">
 				<label htmlFor="text" className="font-rosart text-[16px] text-black-30">
 					Instruction
 				</label>
 				<textarea
 					name="text"
 					id="text"
-					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1"
+					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1 mb-[16px]"
 					defaultValue={content.instruction}
 				/>
-			</div>
+			</PropertiesPanelContentBox>
 
 			{/* <div className="grid gap-[8px]">
 				<div className="flex justify-between">
