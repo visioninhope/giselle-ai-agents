@@ -8,7 +8,6 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { isEmailFromRoute06 } from "@/lib/utils";
 import type { User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
@@ -41,14 +40,10 @@ async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 }
 
 async function createFreeTeam(supabaseUser: User, teamName: string) {
-	const isInternalTeam =
-		supabaseUser.email != null && isEmailFromRoute06(supabaseUser.email);
-
 	const [result] = await db
 		.insert(teams)
 		.values({
 			name: teamName,
-			isInternalTeam,
 		})
 		.returning({ dbid: teams.dbId });
 
