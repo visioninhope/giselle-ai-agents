@@ -557,7 +557,7 @@ function TabsContentPrompt({
 							onValueChange={(value) => {
 								onContentChange?.({
 									...content,
-									llm: value,
+									llm: value as TextGenerateActionContent["llm"],
 								});
 							}}
 						>
