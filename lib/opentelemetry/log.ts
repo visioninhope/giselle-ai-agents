@@ -1,4 +1,5 @@
 import { logger as pinoLogger } from "@/lib/logger";
+import type { TokenConsumedSchema } from "@/lib/opentelemetry/types";
 import { versionInfo } from "@/version";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 
@@ -94,10 +95,13 @@ function getOrCreateLoggerProvider() {
 }
 
 type SeverityText = "INFO" | "ERROR" | "DEBUG";
+
+type LogSchema = TokenConsumedSchema;
+
 interface OtelLoggerWrapper {
-	info: (obj: object | string, msg?: string) => void;
-	error: (obj: object | string | Error, msg?: string) => void;
-	debug: (obj: object | string, msg?: string) => void;
+	info: (obj: LogSchema, msg?: string) => void;
+	error: (obj: LogSchema | Error, msg?: string) => void;
+	debug: (obj: LogSchema, msg?: string) => void;
 }
 
 function createEmitLog(otelLogger: Logger) {
@@ -143,24 +147,32 @@ function createEmitLog(otelLogger: Logger) {
 	};
 }
 
+function getSchemaUrl() {
+	switch (process.env.NEXT_PUBLIC_VERCEL_ENV) {
+		case "production":
+			return "https://raw.githubusercontent.com/giselles-ai/giselle/main/lib/opentelemetry/types.ts";
+		case "preview":
+			return `https://raw.githubusercontent.com/giselles-ai/giselle/refs/heads/${process.env.NEXT_PUBLIC_VERCEL_GIT_COMMIT_REF}/lib/opentelemetry/types.ts`;
+		default: // development
+			return "@/lib/opentelemetry/types.ts";
+	}
+}
+
 export function createLogger(name: string): OtelLoggerWrapper {
 	const loggerProvider = getOrCreateLoggerProvider();
 	const otelLogger = loggerProvider.getLogger(name, versionInfo.tag, {
-		schemaUrl:
-			process.env.NODE_ENV === "production"
-				? "https://raw.githubusercontent.com/giselles-ai/giselle/main/lib/opentelemetry/schema/log.json"
-				: "https://raw.githubusercontent.com/giselles-ai/giselle/refs/heads/main/lib/opentelemetry/schema/log.json",
+		schemaUrl: getSchemaUrl(),
 	});
 	const emitLog = createEmitLog(otelLogger);
 
 	return {
-		info: (obj: object | string, msg?: string) => {
+		info: (obj: LogSchema, msg?: string) => {
 			emitLog("INFO", obj, msg);
 		},
-		error: (obj: object | string | Error, msg?: string) => {
+		error: (obj: LogSchema | Error, msg?: string) => {
 			emitLog("ERROR", obj, msg);
 		},
-		debug: (obj: object | string, msg?: string) => {
+		debug: (obj: LogSchema, msg?: string) => {
 			emitLog("DEBUG", obj, msg);
 		},
 	};
