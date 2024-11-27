@@ -5,12 +5,18 @@ import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import type { AnyValue, Logger } from "@opentelemetry/api-logs";
 import { Resource } from "@opentelemetry/resources";
 import {
+	type LogRecord as BaseLogRecord,
 	BatchLogRecordProcessor,
 	ConsoleLogRecordExporter,
-	type LogRecord,
 	LoggerProvider,
 } from "@opentelemetry/sdk-logs";
 import { headers } from "./base";
+
+interface LogRecord extends BaseLogRecord {
+	severityText: SeverityText;
+}
+type SeverityText = "INFO" | "ERROR" | "DEBUG";
+type LogMethod = "info" | "error" | "debug";
 
 class PinoLogRecordExporter extends ConsoleLogRecordExporter {
 	onEmit(log: LogRecord) {
@@ -19,34 +25,13 @@ class PinoLogRecordExporter extends ConsoleLogRecordExporter {
 		const message = body?.toString() || "";
 		const attrs = attributes ? this.convertAttributes(attributes) : undefined;
 
-		switch (severityText) {
-			case "INFO":
-				if (attrs) {
-					pinoLogger.info(attrs, message);
-				} else {
-					pinoLogger.info(message);
-				}
-				break;
-			case "ERROR":
-				if (attrs) {
-					pinoLogger.error(attrs, message);
-				} else {
-					pinoLogger.error(message);
-				}
-				break;
-			case "DEBUG":
-				if (attrs) {
-					pinoLogger.debug(attrs, message);
-				} else {
-					pinoLogger.debug(message);
-				}
-				break;
-			default:
-				if (attrs) {
-					pinoLogger.info(attrs, message);
-				} else {
-					pinoLogger.info(message);
-				}
+		const logMethod = this.severityToMethod(severityText);
+		const logger = pinoLogger[logMethod];
+
+		if (attrs) {
+			logger(attrs, message);
+		} else {
+			logger(message);
 		}
 	}
 	private convertAttributes(
@@ -68,6 +53,13 @@ class PinoLogRecordExporter extends ConsoleLogRecordExporter {
 
 		return result;
 	}
+
+	private severityToMethod = (
+		severity: SeverityText | undefined,
+	): LogMethod => {
+		if (!severity) return "info";
+		return severity.toLowerCase() as LogMethod;
+	};
 }
 
 const logExporter = new OTLPLogExporter({
@@ -92,8 +84,6 @@ function getOrCreateLoggerProvider() {
 	}
 	return sharedLoggerProvider;
 }
-
-type SeverityText = "INFO" | "ERROR" | "DEBUG";
 
 type LogSchema = TokenConsumedSchema;
 
