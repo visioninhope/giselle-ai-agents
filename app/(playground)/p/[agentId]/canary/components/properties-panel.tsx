@@ -685,9 +685,9 @@ export function PropertiesPanel() {
 					<button
 						type="button"
 						onClick={() => setOpen(true)}
-						className="p-[16px]"
+						className="p-[16px] group"
 					>
-						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-70 hover:fill-black-30" />
+						<PanelOpenIcon className="w-[18px] h-[18px] fill-black-70 group-hover:fill-black-30" />
 					</button>
 				</div>
 			)}
