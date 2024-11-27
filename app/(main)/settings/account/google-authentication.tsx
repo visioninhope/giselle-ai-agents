@@ -44,7 +44,7 @@ export async function GoogleAuthentication() {
 			return (
 				<GoogleAuthenticationPresentation
 					button={GoogleReconnectButton}
-					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
+					alert="Your Google access token has expired or become invalid. Please reconnect to continue using the service."
 				/>
 			);
 		}
