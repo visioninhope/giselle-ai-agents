@@ -4,9 +4,11 @@ import { createId } from "@paralleldrive/cuid2";
 import type { LanguageModelV1 } from "ai";
 import type {
 	ArtifactId,
+	ConnectionId,
 	File,
 	GraphId,
 	Node,
+	NodeHandleId,
 	Text,
 	TextGenerateActionContent,
 	TextGeneration,
@@ -18,6 +20,14 @@ export function createArtifactId(): ArtifactId {
 
 export function createGraphId(): GraphId {
 	return `grph_${createId()}`;
+}
+
+export function createNodeHandleId(): NodeHandleId {
+	return `ndh_${createId()}`;
+}
+
+export function createConnectionId(): ConnectionId {
+	return `cnnc_${createId()}`;
 }
 
 export function resolveLanguageModel(

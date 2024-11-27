@@ -76,7 +76,7 @@ export interface NodeHandle {
 
 export type Node = Action | Variable;
 
-type ConnectionId = `cnnc_${string}`;
+export type ConnectionId = `cnnc_${string}`;
 export interface Connection {
 	id: ConnectionId;
 	sourceNodeId: NodeId;

@@ -28,8 +28,10 @@ import { useArtifact, useGraph, useNode } from "../contexts/graph";
 import { useGraphSelection } from "../contexts/graph-selection";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import type {
+	Connection,
 	FileContent,
 	Node,
+	NodeHandle,
 	NodeId,
 	Text,
 	TextArtifactObject,
@@ -37,7 +39,14 @@ import type {
 	TextGenerateActionContent,
 	TextGeneration,
 } from "../types";
-import { createArtifactId, isFile, isText, isTextGeneration } from "../utils";
+import {
+	createArtifactId,
+	createConnectionId,
+	createNodeHandleId,
+	isFile,
+	isText,
+	isTextGeneration,
+} from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -501,6 +510,40 @@ export function PropertiesPanel() {
 										},
 									});
 								}}
+								onConnectionAdd={(sourceNode) => {
+									const requirement: NodeHandle = {
+										id: createNodeHandleId(),
+										label: "Requirement",
+									};
+									dispatch([
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													content: {
+														...selectedNode.content,
+														requirement,
+													},
+												},
+											},
+										},
+										{
+											type: "addConnection",
+											input: {
+												connection: {
+													id: createConnectionId(),
+													sourceNodeId: sourceNode.id,
+													sourceNodeType: sourceNode.type,
+													targetNodeId: selectedNode.id,
+													targetNodeType: selectedNode.type,
+													targetNodeHandleId: requirement.id,
+												},
+											},
+										},
+									]);
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -555,9 +598,11 @@ export function PropertiesPanel() {
 function TabsContentPrompt({
 	content,
 	onContentChange,
+	onConnectionAdd,
 }: {
 	content: TextGenerateActionContent;
 	onContentChange?: (content: TextGenerateActionContent) => void;
+	onConnectionAdd?: (sourceNode: Node) => void;
 }) {
 	const {
 		graph: { nodes, connections },
@@ -660,7 +705,15 @@ function TabsContentPrompt({
 						<DropdownMenu>
 							<DropdownMenuTrigger />
 							<DropdownMenuContent>
-								<DropdownMenuRadioGroup>
+								<DropdownMenuRadioGroup
+									onValueChange={(value) => {
+										const node = nodes.find((node) => node.id === value);
+										if (node === undefined) {
+											return;
+										}
+										onConnectionAdd?.(node);
+									}}
+								>
 									<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
 									{connectableTextGeneratorNodes.map((node) => (
 										<DropdownMenuRadioItem value={node.id} key={node.id}>

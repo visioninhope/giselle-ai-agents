@@ -6,10 +6,11 @@ import {
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
+	useReactFlow,
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { useMemo } from "react";
+import { useEffect, useMemo } from "react";
 import { GraphContextProvider, useGraph } from "../contexts/graph";
 import {
 	GraphSelectionContextProvider,
@@ -48,8 +49,9 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph } = useGraph();
-	const nodes = useMemo<Node[]>(
-		() =>
+	const reactFlowInstance = useReactFlow<Node, Edge>();
+	useEffect(() => {
+		reactFlowInstance.setNodes(
 			graph.nodes.map(
 				(node) =>
 					({
@@ -61,11 +63,11 @@ function EditorInner() {
 						},
 					}) as Node,
 			),
-		[graph.nodes],
-	);
+		);
+	}, [graph.nodes, reactFlowInstance.setNodes]);
 
-	const edges = useMemo<Edge[]>(
-		() =>
+	useEffect(() => {
+		reactFlowInstance.setEdges(
 			graph.connections.map(
 				(connection) =>
 					({
@@ -79,29 +81,27 @@ function EditorInner() {
 						},
 					}) satisfies Edge,
 			),
-		[graph.connections],
-	);
-
+		);
+	}, [graph.connections, reactFlowInstance.setEdges]);
 	const { selectNode } = useGraphSelection();
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
 				colorMode="dark"
-				defaultNodes={nodes}
-				defaultEdges={edges}
+				defaultNodes={[]}
+				defaultEdges={[]}
 				nodeTypes={nodeTypes}
 				edgeTypes={edgeTypes}
 				onNodesChange={(nodesChange) => {
 					nodesChange.map((nodeChange) => {
 						if (nodeChange.type === "select") {
-							const xyFlowNode = nodes.find(
+							const node = graph.nodes.find(
 								(node) => node.id === nodeChange.id,
 							);
-							if (xyFlowNode === undefined) {
+							if (node === undefined) {
 								return;
 							}
-							const node = xyFlowNode.data.node;
 							selectNode(node.id, nodeChange.selected);
 							if (nodeChange.selected) {
 								switch (node.content.type) {

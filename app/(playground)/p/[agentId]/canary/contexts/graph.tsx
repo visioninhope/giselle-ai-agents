@@ -7,7 +7,15 @@ import {
 	useRef,
 	useState,
 } from "react";
-import type { Artifact, Graph, Node, NodeHandleId, NodeId } from "../types";
+import type {
+	Artifact,
+	Connection,
+	ConnectionId,
+	Graph,
+	Node,
+	NodeHandleId,
+	NodeId,
+} from "../types";
 
 interface UpsertArtifactActionInput {
 	nodeId: NodeId;
@@ -27,6 +35,26 @@ interface UpdateNodeAction {
 	input: UpdateNodeActionInput;
 }
 
+interface AddConnectionActionInput {
+	connection: Connection;
+}
+interface AddConnectionAction {
+	type: "addConnection";
+	input: AddConnectionActionInput;
+}
+interface RemoveConnectionActionInput {
+	connectionId: ConnectionId;
+}
+interface RemoveConnectionAction {
+	type: "removeConnection";
+	input: RemoveConnectionActionInput;
+}
+type GraphAction =
+	| UpsertArtifactAction
+	| UpdateNodeAction
+	| AddConnectionAction
+	| RemoveConnectionAction;
+
 export function upsertArtifact(
 	input: UpsertArtifactActionInput,
 ): UpsertArtifactAction {
@@ -37,6 +65,7 @@ export function upsertArtifact(
 }
 
 type GraphActionOrActions = GraphAction | GraphAction[];
+
 function applyActions(
 	graph: Graph,
 	actionOrActions: GraphActionOrActions,
@@ -74,6 +103,18 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 				...graph,
 				nodes: graph.nodes.map((node) =>
 					node.id === action.input.nodeId ? action.input.node : node,
+				),
+			};
+		case "addConnection":
+			return {
+				...graph,
+				connections: [...graph.connections, action.input.connection],
+			};
+		case "removeConnection":
+			return {
+				...graph,
+				connections: graph.connections.filter(
+					(connection) => connection.id !== action.input.connectionId,
 				),
 			};
 		default:
