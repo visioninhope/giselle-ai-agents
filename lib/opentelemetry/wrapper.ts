@@ -26,25 +26,19 @@ export async function withMeasurement<T>(
 				logger.info(metrics, `[${externalServiceName}] response obtained`);
 			})
 			.catch((error) => {
-				logger.error(
-					{
-						duration,
-						error,
-					},
-					"failed to get user info for logging",
-				);
+				logger.error(error, "failed to get user info for logging");
 			});
 
 		return result;
 	} catch (error) {
-		const duration = performance.now() - startTime;
-		logger.error(
-			{
-				duration,
-				error,
-			},
-			`[${externalServiceName}] operation failed`,
-		);
-		throw error;
+		if (error instanceof Error) {
+			logger.error(error, `[${externalServiceName}] operation failed`);
+		} else {
+			logger.error(
+				new Error("Unknown error occurred"),
+				`[${externalServiceName}] operation failed`,
+			);
+		}
+          throw error;
 	}
 }

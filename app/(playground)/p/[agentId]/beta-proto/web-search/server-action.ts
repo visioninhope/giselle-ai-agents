@@ -16,7 +16,8 @@ import type { SourceIndex } from "../source/types";
 import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import { webSearchSchema } from "./schema";
-import { search } from "./tavily";
+import { type WebSearchResult, search } from "./tavily";
+import { type FirecrawlResponse } from "./firecrawl";
 import {
 	type WebSearch,
 	type WebSearchItemReference,
@@ -114,10 +115,12 @@ ${sourcesToText(sources)}
 		});
 
 		const searchResults = await Promise.all(
-			result.keywords.map((keyword) => withMeasurement(() => search(keyword), "tavily")),
+		  result.keywords.map((keyword) =>
+		    withMeasurement<WebSearchResult[]>(() => search(keyword), "tavily"),
+		  ),
 		)
-			.then((results) => [...new Set(results.flat())])
-			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
+			                           .then((results) => [...new Set(results.flat())] as WebSearchResult[])
+			                           .then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
 
 		webSearchSpan.end({
 			output: {
@@ -181,11 +184,13 @@ ${sourcesToText(sources)}
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
 					try {
-						const scrapeResponse = await withMeasurement(() => app.scrapeUrl(webSearchItem.url, {
-							formats: ["markdown"],
-						}),
-                                                                                             "firecrawl"
-                                                );
+						const scrapeResponse = await withMeasurement<FirecrawlResponse>(
+							() =>
+								app.scrapeUrl(webSearchItem.url, {
+									formats: ["markdown"],
+								}),
+							"firecrawl",
+						);
 
 						if (scrapeResponse.success) {
 							const blob = await put(
