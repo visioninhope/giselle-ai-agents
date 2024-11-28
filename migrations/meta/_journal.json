@@ -64,6 +64,13 @@
 			"when": 1731653081961,
 			"tag": "0008_cloudy_squadron_supreme",
 			"breakpoints": true
+		},
+		{
+			"idx": 9,
+			"version": "7",
+			"when": 1732504730844,
+			"tag": "0009_fuzzy_santa_claus",
+			"breakpoints": true
 		}
 	]
 }

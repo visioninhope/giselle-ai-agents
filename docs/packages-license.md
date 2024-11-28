@@ -1,12 +1,12 @@
 # giselle
 
-As of November 22, 2024  2:44am. 901 total
+As of November 27, 2024  8:12am. 885 total
 
 ## Summary
-* 659 MIT
-* 125 Apache 2.0
+* 651 MIT
+* 119 Apache 2.0
 * 61 ISC
-* 24 New BSD
+* 23 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
 * 3 BlueOak-1.0.0
@@ -14,7 +14,6 @@ As of November 22, 2024  2:44am. 901 total
 * 2 BSD Zero Clause License
 * 2 The Unlicense
 * 1 (MIT AND Zlib)
-* 1 BSD
 * 1 CC0 1.0 Universal
 * 1 unknown
 * 1 CC-BY-4.0
@@ -3804,17 +3803,6 @@ Support for import attributes in acorn
 
 Turn a function into an `http.Agent` instance
 
-<a name="agent-base"></a>
-### agent-base v7.1.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Turn a function into an `http.Agent` instance
-
 <a name="agentkeepalive"></a>
 ### agentkeepalive v4.5.0 (dependencies)
 #### 
@@ -4145,17 +4133,6 @@ asynchronous before/error/after hooks for internal functionality
 
 An arbitrary length integer library for Javascript
 
-<a name="bignumber.js"></a>
-### bignumber.js v9.1.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-A library for arbitrary-precision decimal and non-decimal arithmetic
-
 <a name="binary-extensions"></a>
 ### binary-extensions v2.3.0 (dependencies, devDependencies)
 #### 
@@ -4232,17 +4209,6 @@ Bash-like brace expansion, implemented in JavaScript. Safer than other brace exp
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Share target browsers between different front-end tools, like Autoprefixer, Stylelint and babel-env-preset
-
-<a name="buffer-equal-constant-time"></a>
-### buffer-equal-constant-time v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/BSD-3-Clause">New BSD</a> permitted
-
-Constant-time comparison of Buffers
 
 <a name="buffer-from"></a>
 ### buffer-from v1.1.2 (dependencies, devDependencies)
@@ -5080,17 +5046,6 @@ Drizzle ORM package for SQL databases
 
 Get East Asian Width from a character.
 
-<a name="ecdsa-sig-formatter"></a>
-### <a href="https://github.com/Brightspace/node-ecdsa-sig-formatter#readme">ecdsa-sig-formatter</a> v1.0.11 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Translate ECDSA signatures between ASN.1/DER and JOSE-style concatenation
-
 <a name="electron-to-chromium"></a>
 ### electron-to-chromium v1.5.11 (dependencies)
 #### 
@@ -5575,28 +5530,6 @@ Use node's fs.realpath, but fall back to the JS implementation if the native one
 
 Implementation of Function.prototype.bind
 
-<a name="gaxios"></a>
-### gaxios v6.7.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-A simple common HTTP client specifically for Google APIs and services.
-
-<a name="gcp-metadata"></a>
-### gcp-metadata v6.1.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Get the metadata from a Google Cloud Platform environment
-
 <a name="gensync"></a>
 ### <a href="https://github.com/loganfsmyth/gensync">gensync</a> v1.0.0-beta.2 (dependencies)
 #### 
@@ -5729,39 +5662,6 @@ Convert globs to regular expressions
 
 Global identifiers from different JavaScript environments
 
-<a name="google-auth-library"></a>
-### google-auth-library v9.15.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Google APIs Authentication Client Library for Node.js
-
-<a name="googleapis"></a>
-### googleapis v144.0.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-Google APIs Client Library for Node.js
-
-<a name="googleapis-common"></a>
-### googleapis-common v7.2.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-A common tooling library used by the googleapis npm module. You probably don't want to use this directly.
-
 <a name="gopd"></a>
 ### <a href="https://github.com/ljharb/gopd#readme">gopd</a> v1.0.1 (dependencies)
 #### 
@@ -5783,17 +5683,6 @@ A common tooling library used by the googleapis npm module. You probably don't w
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 A drop-in replacement for fs, making various improvements.
-
-<a name="gtoken"></a>
-### gtoken v7.1.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Node.js Google Authentication Service Account Tokens
 
 <a name="has-flag"></a>
 ### has-flag v3.0.0 (dependencies)
@@ -5929,17 +5818,6 @@ List of HTML void tag names
 
 <a name="https-proxy-agent"></a>
 ### https-proxy-agent v5.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-An HTTP(s) proxy `http.Agent` implementation for HTTPS
-
-<a name="https-proxy-agent"></a>
-### https-proxy-agent v7.0.5 (dependencies)
 #### 
 
 ##### Paths
@@ -6202,17 +6080,6 @@ Determine whether an AST node is a reference
 
 Determine whether an AST node is a reference
 
-<a name="is-stream"></a>
-### is-stream v2.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Check if something is a Node.js stream
-
 <a name="is-typedarray"></a>
 ### <a href="https://github.com/hughsk/is-typedarray">is-typedarray</a> v1.0.0 (dependencies)
 #### 
@@ -6367,17 +6234,6 @@ A regex that tokenizes JavaScript.
 
 Given some data, jsesc returns the shortest possible stringified & ASCII-safe representation of that data.
 
-<a name="json-bigint"></a>
-### json-bigint v1.0.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-JSON.parse with bigints support
-
 <a name="json-parse-even-better-errors"></a>
 ### json-parse-even-better-errors v2.3.1 (dependencies)
 #### 
@@ -6432,28 +6288,6 @@ JSON for Humans
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Diff & Patch for Javascript objects
-
-<a name="jwa"></a>
-### jwa v2.0.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-JWA implementation (supports all JWS algorithms)
-
-<a name="jws"></a>
-### jws v4.0.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Implementation of JSON Web Signatures
 
 <a name="langfuse"></a>
 ### langfuse v3.26.0 (dependencies)
@@ -9479,21 +9313,6 @@ CLI tool to update caniuse-lite to refresh target browsers from Browserslist con
 <a href="http://opensource.org/licenses/bsd-license">Simplified BSD</a> permitted
 
 An RFC 3986/3987 compliant, scheme extendable URI/IRI parsing/validating/resolving library for JavaScript.
-
-<a name="url-template"></a>
-### url-template v2.0.8 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="https://directory.fsf.org/wiki/License:BSD-4-Clause">BSD</a> manually approved
-
->The BSD license is ambiguous. The license is now BSD 3-Clause from url-template v3.1.0. See https://github.com/bramstein/url-template/pull/47
-
-><cite>  2024-11-22</cite>
-
-
 
 <a name="use-callback-ref"></a>
 ### use-callback-ref v1.3.2 (dependencies)
