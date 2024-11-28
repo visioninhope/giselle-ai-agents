@@ -1,10 +1,7 @@
 import { logger as pinoLogger } from "@/lib/logger";
-import type {
-	RequestCountSchema,
-	TokenConsumedSchema,
-} from "./types";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import type { RequestCountSchema, TokenConsumedSchema } from "./types";
 
 import type { AnyValue, Logger } from "@opentelemetry/api-logs";
 import { Resource } from "@opentelemetry/resources";

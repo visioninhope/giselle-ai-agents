@@ -1,6 +1,6 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { createLogger } from "./log";
-import type { RequestCountSchema, ExternalServiceName } from "./types";
+import type { ExternalServiceName, RequestCountSchema } from "./types";
 
 export async function withMeasurement<T>(
 	operation: () => Promise<T>,
@@ -16,7 +16,7 @@ export async function withMeasurement<T>(
 		Promise.all([getCurrentMeasurementScope(), isRoute06User()])
 			.then(([measurementScope, isR06User]) => {
 				const metrics: RequestCountSchema = {
-                                        externalServiceName,
+					externalServiceName,
 					requestCount: 1,
 					duration,
 					measurementScope,
@@ -39,6 +39,6 @@ export async function withMeasurement<T>(
 				`[${externalServiceName}] operation failed`,
 			);
 		}
-          throw error;
+		throw error;
 	}
 }

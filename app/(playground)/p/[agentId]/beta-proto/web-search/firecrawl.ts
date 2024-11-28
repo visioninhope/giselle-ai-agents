@@ -1,4 +1,4 @@
 export interface FirecrawlResponse {
-  success: boolean;
-  markdown?: string;
+	success: boolean;
+	markdown?: string;
 }

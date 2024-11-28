@@ -15,9 +15,9 @@ import type { GiselleNode } from "../giselle-node/types";
 import type { SourceIndex } from "../source/types";
 import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
+import type { FirecrawlResponse } from "./firecrawl";
 import { webSearchSchema } from "./schema";
 import { type WebSearchResult, search } from "./tavily";
-import { type FirecrawlResponse } from "./firecrawl";
 import {
 	type WebSearch,
 	type WebSearchItemReference,
@@ -91,13 +91,13 @@ ${sourcesToText(sources)}
 
 				logger.info(
 					{
-                                          	externalServiceName: "openai",
+						externalServiceName: "openai",
 						tokenConsumed: result.usage.totalTokens,
 						duration,
 						measurementScope,
 						isR06User,
 					},
-					"search keywords generated",
+					"[openai] search keywords generated",
 				);
 			},
 		});
@@ -115,12 +115,12 @@ ${sourcesToText(sources)}
 		});
 
 		const searchResults = await Promise.all(
-		  result.keywords.map((keyword) =>
-		    withMeasurement<WebSearchResult[]>(() => search(keyword), "tavily"),
-		  ),
+			result.keywords.map((keyword) =>
+				withMeasurement<WebSearchResult[]>(() => search(keyword), "tavily"),
+			),
 		)
-			                           .then((results) => [...new Set(results.flat())] as WebSearchResult[])
-			                           .then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
+			.then((results) => [...new Set(results.flat())] as WebSearchResult[])
+			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
 
 		webSearchSpan.end({
 			output: {
@@ -260,15 +260,13 @@ ${sourcesToText(sources)}
 		stream.done();
 	})();
 
-        waitUntil(
-                new Promise((resolve) =>
-                        setTimeout(
-                                resolve,
-                                Number.parseInt(
-                                        process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
-                                ),
-                        ),
-                ),
-        ); // wait until telemetry sent
+	waitUntil(
+		new Promise((resolve) =>
+			setTimeout(
+				resolve,
+				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000"),
+			),
+		),
+	); // wait until telemetry sent
 	return { object: stream.value };
 }

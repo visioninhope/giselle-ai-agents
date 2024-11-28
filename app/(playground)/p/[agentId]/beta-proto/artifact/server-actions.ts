@@ -80,7 +80,7 @@ ${sourcesToText(sources)}
 
 					logger.info(
 						{
-                                                        externalServiceName: "openai",
+							externalServiceName: "openai",
 							tokenConsumed: result.usage.totalTokens,
 							duration,
 							measurementScope,

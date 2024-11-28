@@ -1,12 +1,13 @@
 import { z } from "zod";
 
 const ExternalServiceName = {
-  Firecrawl: "firecrawl",
-  OpenAI: "openai",
-  Tavily: "tavily",
+	Firecrawl: "firecrawl",
+	OpenAI: "openai",
+	Tavily: "tavily",
 } as const;
 
-type ExternalServiceName = typeof ExternalServiceName[keyof typeof ExternalServiceName];
+export type ExternalServiceName =
+	(typeof ExternalServiceName)[keyof typeof ExternalServiceName];
 
 const BaseMetricsSchema = z.object({
 	externalServiceName: z.nativeEnum(ExternalServiceName), // Name of the service to which agent requests
