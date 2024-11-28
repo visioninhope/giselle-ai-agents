@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { getUserTeamId, isRoute06User } from "@/app/(auth)/lib";
 import { metrics } from "@opentelemetry/api";
 import { type RequestId, requestStatus } from "../types";
 import { revalidateGetRequest } from "./get-request";
@@ -14,10 +14,10 @@ export const startRequest = async (requestId: RequestId) => {
 		description: "Number of Agent requests",
 	});
 
-	const subscriptionId = await getUserSubscriptionId();
+	const teamId = await getUserTeamId();
 	const isR06User = await isRoute06User();
 	requestCounter.add(1, {
-		subscriptionId,
+		teamId,
 		isR06User,
 	});
 };

@@ -1,7 +1,7 @@
 "use server";
 
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
-import { db, pullMessages, requestPortMessages } from "@/drizzle";
+import { getUserTeamId, isRoute06User } from "@/app/(auth)/lib";
+import { db, pullMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { metrics } from "@opentelemetry/api";
 import { and, eq } from "drizzle-orm";
@@ -59,10 +59,10 @@ export const generateText = async ({
 		message: completion.choices[0].message.content ?? "",
 	});
 	if (completion.usage && completion.usage.total_tokens !== undefined) {
-		const subscriptionId = await getUserSubscriptionId();
+		const teamId = await getUserTeamId();
 		const isR06User = await isRoute06User();
 		tokenCounter.add(completion.usage.total_tokens, {
-			subscriptionId,
+			teamId,
 			isR06User,
 		});
 	}

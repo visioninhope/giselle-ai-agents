@@ -1,23 +1,16 @@
 "use server";
 
-import {
-	db,
-	subscriptions,
-	supabaseUserMappings,
-	teamMemberships,
-	teams,
-} from "@/drizzle";
+import { db, supabaseUserMappings, teamMemberships, teams } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
 
-export const getUserSubscriptionId = async () => {
+export const getUserTeamId = async () => {
 	const user = await getUser();
 	// TODO: When team plans are released, a user may belong to multiple teams, so we need to handle that case.
 	// e.g., fetch team id through agents or so.
-	const [subscription] = await db
-		.select({ id: subscriptions.dbId })
-		.from(subscriptions)
-		.innerJoin(teams, eq(teams.dbId, subscriptions.teamDbId))
+	const [team] = await db
+		.select({ teamId: teams.dbId })
+		.from(teams)
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(
 			supabaseUserMappings,
@@ -25,5 +18,5 @@ export const getUserSubscriptionId = async () => {
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 
-	return subscription?.id ?? "sub_hotfix";
+	return team.teamId;
 };
