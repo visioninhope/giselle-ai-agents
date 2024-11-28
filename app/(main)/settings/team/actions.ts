@@ -23,8 +23,7 @@ export async function getTeamName() {
 			supabaseUserMappings,
 			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
 		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id))
-		.execute();
+		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 
 	return _teams[0].name;
 }
@@ -42,8 +41,7 @@ export async function updateTeamName(formData: FormData) {
 				supabaseUserMappings,
 				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
 			)
-			.where(eq(supabaseUserMappings.supabaseUserId, user.id))
-			.execute();
+			.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 
 		if (team.length === 0) {
 			throw new Error("Team not found");
