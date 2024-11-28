@@ -1,5 +1,8 @@
-import { db, draftTeams, subscriptions, teams } from "@/drizzle";
-import { DRAFT_TEAM_METADATA_KEY } from "@/services/teams/constants";
+import { db, subscriptions, teams } from "@/drizzle";
+import {
+	DRAFT_TEAM_NAME_METADATA_KEY,
+	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
+} from "@/services/teams/constants";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { stripe } from "../config";
@@ -22,38 +25,31 @@ export const upsertSubscription = async (subscriptionId: string) => {
 };
 
 async function activateProTeamSubscription(subscription: Stripe.Subscription) {
-	if (!(DRAFT_TEAM_METADATA_KEY in subscription.metadata)) {
-		throw new Error("Draft team ID not found in subscription metadata");
+	// TODO: handle the case of upgrading.
+	if (
+		!(DRAFT_TEAM_NAME_METADATA_KEY in subscription.metadata) ||
+		!(DRAFT_TEAM_USER_DB_ID_METADATA_KEY in subscription.metadata)
+	) {
+		throw new Error(
+			"Draft team information is not found in subscription metadata",
+		);
 	}
-	const draftTeamDbId = Number.parseInt(
-		subscription.metadata[DRAFT_TEAM_METADATA_KEY],
+
+	const userDbId = Number.parseInt(
+		subscription.metadata[DRAFT_TEAM_USER_DB_ID_METADATA_KEY],
 		10,
 	);
-	const teamDbId = await createTeamFromDraftTeam(draftTeamDbId);
+	const teamName = subscription.metadata[DRAFT_TEAM_NAME_METADATA_KEY];
+	const teamDbId = await createTeam(userDbId, teamName);
 	await insertSubscription(subscription, teamDbId);
 }
 
-async function createTeamFromDraftTeam(draftTeamDbId: number) {
+async function createTeam(userDbId: number, teamName: string) {
 	const teamDbId = await db.transaction(async (tx) => {
-		const records = await db
-			.select()
-			.from(draftTeams)
-			.for("update")
-			.where(eq(draftTeams.dbId, draftTeamDbId));
-		if (records.length === 0) {
-			throw new Error(`Draft team with ID ${draftTeamDbId} not found`);
-		}
-
-		const [draftTeam] = records;
-		if (draftTeam.teamDbId) {
-			// team has already been created
-			return draftTeam.teamDbId;
-		}
-
 		const [team] = await db
 			.insert(teams)
 			.values({
-				name: draftTeam.name,
+				name: teamName,
 				isInternalTeam: false,
 			})
 			.returning({ dbid: teams.dbId });

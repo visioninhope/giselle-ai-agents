@@ -15,7 +15,10 @@ import type { User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 import invariant from "tiny-invariant";
-import { DRAFT_TEAM_METADATA_KEY } from "../constants";
+import {
+	DRAFT_TEAM_NAME_METADATA_KEY,
+	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
+} from "../constants";
 
 export async function createTeam(formData: FormData) {
 	const teamName = formData.get("teamName") as string;
@@ -45,16 +48,17 @@ export async function createTeam(formData: FormData) {
 
 /**
  * 1. Create a new draft team
- * 2. Set the draft team ID in metadata (https://support.stripe.com/questions/using-metadata-with-checkout-sessions)
+ * 2. Set the draft team informations in metadata (https://support.stripe.com/questions/using-metadata-with-checkout-sessions)
  * 3. Redirect to the Stripe checkout page
  */
 async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
-	const draftTeamDbId = await createDraftTeam(supabaseUser, teamName);
-	const checkoutUrl = await createCheckout(draftTeamDbId);
+	// const draftTeamDbId = await createDraftTeam(supabaseUser, teamName);
+	const userDbId = await getUserDbId(supabaseUser);
+	const checkoutUrl = await createCheckout(userDbId, teamName);
 	redirect(checkoutUrl);
 }
 
-async function createCheckout(draftTeamDbId: number) {
+async function createCheckout(userDbId: number, teamName: string) {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
 
@@ -71,6 +75,11 @@ async function createCheckout(draftTeamDbId: number) {
 		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
 	);
 	invariant(userSeatPriceId, "STRIPE_USER_SEAT_PRICE_ID is not set");
+
+	const subscriptionMetadata: Record<string, string> = {
+		[DRAFT_TEAM_USER_DB_ID_METADATA_KEY]: userDbId.toString(),
+		[DRAFT_TEAM_NAME_METADATA_KEY]: teamName,
+	};
 
 	const checkoutSession = await stripe.checkout.sessions.create({
 		mode: "subscription",
@@ -91,7 +100,7 @@ async function createCheckout(draftTeamDbId: number) {
 		success_url: `${siteUrl}/settings/team`,
 		cancel_url: `${serviceSiteUrl}/pricing`,
 		subscription_data: {
-			metadata: { [DRAFT_TEAM_METADATA_KEY]: draftTeamDbId.toString() },
+			metadata: subscriptionMetadata,
 		},
 	});
 
