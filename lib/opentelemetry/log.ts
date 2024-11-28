@@ -1,6 +1,7 @@
 import { logger as pinoLogger } from "@/lib/logger";
 import type { TokenConsumedSchema } from "@/lib/opentelemetry/types";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
+import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
 import type { AnyValue, Logger } from "@opentelemetry/api-logs";
 import { Resource } from "@opentelemetry/resources";
@@ -75,8 +76,13 @@ export const pinoLogRecordProcessor = new BatchLogRecordProcessor(
 let sharedLoggerProvider: LoggerProvider | null = null;
 function getOrCreateLoggerProvider() {
 	if (!sharedLoggerProvider) {
+		const defaultResource = Resource.default();
+		const customResource = new Resource({
+			[SemanticResourceAttributes.DEPLOYMENT_ENVIRONMENT]:
+				process.env.NEXT_PUBLIC_VERCEL_ENV ?? "development",
+		});
 		sharedLoggerProvider = new LoggerProvider({
-			resource: Resource.default(),
+			resource: defaultResource.merge(customResource),
 		});
 
 		sharedLoggerProvider.addLogRecordProcessor(logRecordProcessor);
