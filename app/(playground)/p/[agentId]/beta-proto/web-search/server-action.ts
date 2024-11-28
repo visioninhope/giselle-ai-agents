@@ -98,17 +98,6 @@ ${sourcesToText(sources)}
 					},
 					"search keywords generated",
 				);
-
-				waitUntil(
-					new Promise((resolve) =>
-						setTimeout(
-							resolve,
-							Number.parseInt(
-								process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
-							),
-						),
-					),
-				); // wait until telemetry sent
 			},
 		});
 		for await (const partialObject of partialObjectStream) {
@@ -192,9 +181,12 @@ ${sourcesToText(sources)}
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
 					try {
-						const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
+						const scrapeResponse = await withMeasurement(() => app.scrapeUrl(webSearchItem.url, {
 							formats: ["markdown"],
-						});
+						}),
+                                                                                             "firecrawl"
+                                                );
+
 						if (scrapeResponse.success) {
 							const blob = await put(
 								`webSearch/${webSearchItem.id}.md`,
@@ -263,5 +255,15 @@ ${sourcesToText(sources)}
 		stream.done();
 	})();
 
+        waitUntil(
+                new Promise((resolve) =>
+                        setTimeout(
+                                resolve,
+                                Number.parseInt(
+                                        process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+                                ),
+                        ),
+                ),
+        ); // wait until telemetry sent
 	return { object: stream.value };
 }

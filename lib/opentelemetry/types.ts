@@ -1,6 +1,7 @@
 import { z } from "zod";
 
 const ExternalServiceName = {
+  Firecrawl: "firecrawl",
   OpenAI: "openai",
   Tavily: "tavily",
 } as const;
