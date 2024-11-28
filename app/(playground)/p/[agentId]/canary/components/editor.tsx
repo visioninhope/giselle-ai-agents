@@ -21,6 +21,7 @@ import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
 import { PropertiesPanel } from "./properties-panel";
+import { Toolbar } from "./toolbar";
 
 interface EditorProps {
 	graph: Graph;
@@ -173,6 +174,9 @@ function EditorInner() {
 				/>
 				<Panel position="top-right" className="!top-0 !bottom-0 !right-0 !m-0">
 					<PropertiesPanel />
+				</Panel>
+				<Panel position={"bottom-center"}>
+					<Toolbar />
 				</Panel>
 			</ReactFlow>
 		</div>
