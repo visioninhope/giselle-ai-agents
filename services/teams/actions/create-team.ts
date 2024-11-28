@@ -50,17 +50,6 @@ export async function createTeam(formData: FormData) {
  */
 async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 	const draftTeamDbId = await createDraftTeam(supabaseUser, teamName);
-
-	invariant(process.env.STRIPE_PRO_PLAN_ID, "STRIPE_PRO_PLAN_ID is not set");
-	invariant(
-		process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID,
-		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
-	);
-	invariant(
-		process.env.STRIPE_USER_SEAT_PRICE_ID,
-		"STRIPE_USER_SEAT_PRICE_ID is not set",
-	);
-
 	const checkoutUrl = await createCheckout(draftTeamDbId);
 	redirect(checkoutUrl);
 }
@@ -69,18 +58,32 @@ async function createCheckout(draftTeamDbId: number) {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
 	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
 
+	invariant(siteUrl, "NEXT_PUBLIC_SITE_URL is not set");
+	invariant(serviceSiteUrl, "NEXT_PUBLIC_SERVICE_SITE_URL is not set");
+
+	const proPlanId = process.env.STRIPE_PRO_PLAN_ID;
+	const agentTimeChargePriceId = process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID;
+	const userSeatPriceId = process.env.STRIPE_USER_SEAT_PRICE_ID;
+
+	invariant(proPlanId, "STRIPE_PRO_PLAN_ID is not set");
+	invariant(
+		agentTimeChargePriceId,
+		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
+	);
+	invariant(userSeatPriceId, "STRIPE_USER_SEAT_PRICE_ID is not set");
+
 	const checkoutSession = await stripe.checkout.sessions.create({
 		mode: "subscription",
 		line_items: [
 			{
-				price: process.env.STRIPE_PRO_PLAN_ID,
+				price: proPlanId,
 				quantity: 1,
 			},
 			{
-				price: process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID,
+				price: agentTimeChargePriceId,
 			},
 			{
-				price: process.env.STRIPE_USER_SEAT_PRICE_ID,
+				price: userSeatPriceId,
 			},
 		],
 		automatic_tax: { enabled: true },
