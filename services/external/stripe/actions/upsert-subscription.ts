@@ -19,7 +19,7 @@ export const upsertSubscription = async (
 
 	// TODO: When team plans are released, a user may belong to multiple teams, so we need to handle that case.
 	const [team] = await db
-		.selectDistinct({ dbId: teams.dbId })
+		.select({ dbId: teams.dbId })
 		.from(teams)
 		.innerJoin(teams, eq(teams.dbId, subscriptions.teamDbId))
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
