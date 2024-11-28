@@ -23,7 +23,7 @@ export async function withMeasurement<T>(
 					isR06User,
 				};
 
-				logger.info(metrics, `${externalServiceName} completed`);
+				logger.info(metrics, `[${externalServiceName}] response obtained`);
 			})
 			.catch((error) => {
 				logger.error(
@@ -31,7 +31,7 @@ export async function withMeasurement<T>(
 						duration,
 						error,
 					},
-					"Failed to get user info for logging",
+					"failed to get user info for logging",
 				);
 			});
 
@@ -43,7 +43,7 @@ export async function withMeasurement<T>(
 				duration,
 				error,
 			},
-			"Operation failed",
+			`[${externalServiceName}] operation failed`,
 		);
 		throw error;
 	}
