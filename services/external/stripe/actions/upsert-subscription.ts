@@ -27,7 +27,7 @@ export const upsertSubscription = async (
 		.innerJoin(stripeUserMappings, eq(stripeUserMappings.userDbId, users.dbId))
 		.where(eq(stripeUserMappings.stripeCustomerId, customerId));
 	const [team] = await db
-		.selectDistinct({ dbId: teams.dbId })
+		.select({ dbId: teams.dbId })
 		.from(teams)
 		.where(eq(teams.organizationDbId, organization.dbId));
 
