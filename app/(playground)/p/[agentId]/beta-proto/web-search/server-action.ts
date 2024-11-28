@@ -2,11 +2,12 @@
 
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
+import { createLogger } from "@/lib/opentelemetry";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
-import { metrics } from "@opentelemetry/api";
 import { createId } from "@paralleldrive/cuid2";
 import { put } from "@vercel/blob";
+import { waitUntil } from "@vercel/functions";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import Langfuse from "langfuse";
@@ -33,11 +34,13 @@ interface GenerateWebSearchStreamInputs {
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
 
+	const logger = createLogger("web-search");
 	const sources = await sourceIndexesToSources({
 		input: {
 			agentId: inputs.agentId,
@@ -78,19 +81,33 @@ ${sourcesToText(sources)}
 			prompt: inputs.userPrompt,
 			schema: webSearchSchema,
 			onFinish: async (result) => {
-				const meter = metrics.getMeter("OpenAI");
-				const tokenCounter = meter.createCounter("token_consumed", {
-					description: "Number of OpenAI API tokens consumed by each request",
-				});
+				const duration = performance.now() - startTime;
 				const measurementScope = await getCurrentMeasurementScope();
 				const isR06User = await isRoute06User();
-				tokenCounter.add(result.usage.totalTokens, {
-					measurementScope,
-					isR06User,
-				});
 				generation.end({
 					output: result,
 				});
+
+				logger.info(
+					{
+						tokenConsumed: result.usage.totalTokens,
+						duration,
+						measurementScope,
+						isR06User,
+					},
+					"search keywords generated",
+				);
+
+				waitUntil(
+					new Promise((resolve) =>
+						setTimeout(
+							resolve,
+							Number.parseInt(
+								process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+							),
+						),
+					),
+				); // wait until telemetry sent
 			},
 		});
 		for await (const partialObject of partialObjectStream) {
