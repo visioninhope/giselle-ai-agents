@@ -1,7 +1,7 @@
 import { retrieveActiveStripeSubscriptionBySupabaseUserId } from "@/services/accounts/actions";
 import { NextResponse } from "next/server";
-import { freePlanFlag } from "./flags";
 import { supabaseMiddleware } from "./lib/supabase";
+import { isEmailFromRoute06 } from "./lib/utils";
 
 export default supabaseMiddleware(async (user, request) => {
 	if (user == null) {
@@ -11,12 +11,8 @@ export default supabaseMiddleware(async (user, request) => {
 		return NextResponse.redirect(url);
 	}
 
-	// Users can use giselle without subscription if the free plan is enabled
-	const freePlanEnabled = await freePlanFlag();
-	if (!freePlanEnabled) {
-		// TODO: You can remove this block after the free plan is fully released.
-
-		// Proceeding to check the user's subscription status since the email is not from the route06.co.jp
+	// Proceeding to check the user's subscription status since the email is not from the route06.co.jp
+	if (!isEmailFromRoute06(user.email ?? "")) {
 		const subscription = await retrieveActiveStripeSubscriptionBySupabaseUserId(
 			user.id,
 		);
