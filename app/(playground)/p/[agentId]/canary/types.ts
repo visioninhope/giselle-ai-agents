@@ -155,3 +155,5 @@ export interface Graph {
 	connections: Connection[];
 	artifacts: Artifact[];
 }
+
+export type Tool = "addTextNode" | "addFileNode";

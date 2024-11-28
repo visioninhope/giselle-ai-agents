@@ -11,12 +11,17 @@ import {
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GraphContextProvider, useGraph } from "../contexts/graph";
+import {
+	MousePositionProvider,
+	useMousePosition,
+} from "../contexts/mouse-position";
 import {
 	PropertiesPanelProvider,
 	usePropertiesPanel,
 } from "../contexts/properties-panel";
+import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
 import type { Graph, NodeId } from "../types";
 import { Edge } from "./edge";
 import { Node } from "./node";
@@ -31,7 +36,11 @@ export function Editor(props: EditorProps) {
 		<GraphContextProvider defaultGraph={props.graph}>
 			<PropertiesPanelProvider>
 				<ReactFlowProvider>
-					<EditorInner />
+					<ToolbarContextProvider>
+						<MousePositionProvider>
+							<EditorInner />
+						</MousePositionProvider>
+					</ToolbarContextProvider>
 				</ReactFlowProvider>
 			</PropertiesPanelProvider>
 		</GraphContextProvider>
@@ -45,6 +54,7 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
+	const { tool, setOpen, setTool, open } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -60,6 +70,8 @@ function EditorInner() {
 					type: "giselleNode",
 					position: node.position,
 					selected: node.selected,
+					selectable: !open,
+					draggable: !open,
 					data: {
 						node,
 					},
@@ -72,6 +84,7 @@ function EditorInner() {
 		reactFlowInstance.getNodes,
 		reactFlowInstance.setNodes,
 		updateNodeInternals,
+		open,
 	]);
 
 	useEffect(() => {
@@ -84,13 +97,15 @@ function EditorInner() {
 						source: connection.sourceNodeId,
 						target: connection.targetNodeId,
 						targetHandle: connection.targetNodeHandleId,
+						selectable: !open,
+						deletable: !open,
 						data: {
 							connection,
 						},
 					}) satisfies Edge,
 			),
 		);
-	}, [graph.connections, reactFlowInstance.setEdges]);
+	}, [graph.connections, reactFlowInstance.setEdges, open]);
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
@@ -179,6 +194,43 @@ function EditorInner() {
 					<Toolbar />
 				</Panel>
 			</ReactFlow>
+			{tool !== undefined && <MouseFollower />}
 		</div>
 	);
 }
+
+const MouseFollower = () => {
+	const mousePosition = useMousePosition();
+
+	return (
+		<>
+			<div className="fixed inset-0 cursor-crosshair pointer-events-auto" />
+			<div
+				className="fixed pointer-events-none inset-0"
+				style={{
+					transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+				}}
+			>
+				<div className="w-[180px]">
+					<Node
+						preview
+						id="nd_preview"
+						data={{
+							node: {
+								id: "nd_preview",
+								name: "preview",
+								type: "variable",
+								content: {
+									type: "text",
+									text: "Preview",
+								},
+								position: { x: 0, y: 0 },
+								selected: false,
+							},
+						}}
+					/>
+				</div>
+			</div>
+		</>
+	);
+};

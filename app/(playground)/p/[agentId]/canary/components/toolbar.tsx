@@ -4,10 +4,14 @@ import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { BracesIcon, FileIcon, LetterTextIcon } from "lucide-react";
 import type { ComponentProps } from "react";
+import { useToolbar } from "../contexts/toolbar";
+import type { Tool } from "../types";
 import {
 	DropdownMenu,
 	DropdownMenuCheckboxItem,
 	DropdownMenuContent,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
 	DropdownMenuTrigger,
 } from "./dropdown-menu";
 
@@ -59,31 +63,39 @@ function PopoverContent({
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export function Toolbar() {
+	const { open, setOpen, tool, setTool } = useToolbar();
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<div className="absolute z-0 rounded-[46px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
 				<div className="flex items-center px-2 z-10 h-full">
 					<div className="flex gap-[4px]">
-						<DropdownMenu>
-							<DropdownMenuTrigger>
+						<DropdownMenu open={open}>
+							<DropdownMenuTrigger onClick={() => setOpen(true)}>
 								{/* <PopoverTrigger tooltip="Variable"> */}
 								<BracesIcon className="text-black-30" />
 								{/* </PopoverTrigger> */}
 							</DropdownMenuTrigger>
 							<DropdownMenuContent align="center" sideOffset={18}>
-								<DropdownMenuCheckboxItem>
-									<div className="flex items-center gap-[4px]">
-										<LetterTextIcon className={"w-[16px] h-[16px]"} />
-										<p>Text</p>
-									</div>
-								</DropdownMenuCheckboxItem>
-								<DropdownMenuCheckboxItem>
-									<div className="flex items-center gap-[4px]">
-										<FileIcon className={"w-[16px] h-[16px]"} />
-										<p>File</p>
-									</div>
-								</DropdownMenuCheckboxItem>
+								<DropdownMenuRadioGroup
+									value={tool}
+									onValueChange={(value) => {
+										setTool(value as Tool);
+									}}
+								>
+									<DropdownMenuRadioItem value="addTextNode">
+										<div className="flex items-center gap-[4px]">
+											<LetterTextIcon className={"w-[16px] h-[16px]"} />
+											<p>Text</p>
+										</div>
+									</DropdownMenuRadioItem>
+									<DropdownMenuRadioItem value="addFileNode">
+										<div className="flex items-center gap-[4px]">
+											<FileIcon className={"w-[16px] h-[16px]"} />
+											<p>File</p>
+										</div>
+									</DropdownMenuRadioItem>
+								</DropdownMenuRadioGroup>
 							</DropdownMenuContent>
 							{/* <PopoverContent sideOffset={24}>
 								<div className="grid">
