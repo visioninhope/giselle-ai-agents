@@ -1,6 +1,6 @@
 "use server";
 
-import { getUserTeamId, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentTeam, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
@@ -82,10 +82,10 @@ ${sourcesToText(sources)}
 				const tokenCounter = meter.createCounter("token_consumed", {
 					description: "Number of OpenAI API tokens consumed by each request",
 				});
-				const teamId = await getUserTeamId();
+				const team = await getCurrentTeam();
 				const isR06User = await isRoute06User();
 				tokenCounter.add(result.usage.totalTokens, {
-					teamId,
+					teamId: team.dbId,
 					isR06User,
 				});
 				generation.end({
