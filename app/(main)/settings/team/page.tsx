@@ -1,3 +1,7 @@
+import { Skeleton } from "@/components/ui/skeleton";
+import { Suspense } from "react";
+import { TeamName } from "./team-name";
+
 export default function TeamPage() {
 	return (
 		<div className="grid gap-[16px]">
@@ -7,6 +11,16 @@ export default function TeamPage() {
 			>
 				Team
 			</h3>
+
+			<Suspense
+				fallback={
+					<div className="w-full h-24">
+						<Skeleton className="h-full w-full" />
+					</div>
+				}
+			>
+				<TeamName />
+			</Suspense>
 		</div>
 	);
 }
