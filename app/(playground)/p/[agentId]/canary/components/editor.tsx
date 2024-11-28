@@ -7,6 +7,7 @@ import {
 	ReactFlow,
 	ReactFlowProvider,
 	useReactFlow,
+	useUpdateNodeInternals,
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
@@ -44,22 +45,33 @@ const edgeTypes = {
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
+	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
+		const currentNodes = reactFlowInstance.getNodes();
 		reactFlowInstance.setNodes(
-			graph.nodes.map(
-				(node) =>
-					({
-						id: node.id,
-						position: node.position,
-						selected: node.selected,
-						type: "giselleNode",
-						data: {
-							node,
-						},
-					}) as Node,
-			),
+			graph.nodes.map((node) => {
+				const currentNode = currentNodes.find(
+					(currentNode) => currentNode.id === node.id,
+				);
+				return {
+					...currentNode,
+					id: node.id,
+					type: "giselleNode",
+					position: node.position,
+					selected: node.selected,
+					data: {
+						node,
+					},
+				} as Node;
+			}),
 		);
-	}, [graph.nodes, reactFlowInstance.setNodes]);
+		updateNodeInternals(graph.nodes.map((node) => node.id));
+	}, [
+		graph.nodes,
+		reactFlowInstance.getNodes,
+		reactFlowInstance.setNodes,
+		updateNodeInternals,
+	]);
 
 	useEffect(() => {
 		reactFlowInstance.setEdges(
