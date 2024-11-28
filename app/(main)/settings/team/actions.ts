@@ -61,3 +61,35 @@ export async function updateTeamName(formData: FormData) {
 		return { success: false, error };
 	}
 }
+
+export async function getTeamMembers() {
+	// TODO: Implement getting team members
+	return [
+		{
+			id: 1,
+			name: "foo admin",
+
+			email: "foo@exmaple.com",
+			role: "admin",
+		},
+		{ id: 2, name: "bar admin", email: "bar@example.com", role: "admin" },
+		{ id: 3, name: "baz member", email: "baz@example.com", role: "member" },
+	];
+}
+
+export async function addTeamMember(formData: FormData) {
+	try {
+		const email = formData.get("email") as string;
+		const role = formData.get("role") as string;
+
+		const user = await getUser();
+
+		// TODO: Implement adding a team member
+
+		revalidatePath("/settings/team");
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to add team member:", error);
+		return { success: false, error };
+	}
+}
