@@ -26,10 +26,15 @@ export const upsertSubscription = async (
 		.innerJoin(users, eq(users.dbId, teamMemberships.userDbId))
 		.innerJoin(stripeUserMappings, eq(stripeUserMappings.userDbId, users.dbId))
 		.where(eq(stripeUserMappings.stripeCustomerId, customerId));
+	const [team] = await db
+		.select({ dbId: teams.dbId })
+		.from(teams)
+		.where(eq(teams.organizationDbId, organization.dbId));
 
 	const upsertValues: typeof subscriptions.$inferInsert = {
 		id: subscription.id,
 		organizationDbId: organization.dbId,
+		teamDbId: team.dbId,
 		status: subscription.status,
 		cancelAtPeriodEnd: subscription.cancel_at_period_end,
 		cancelAt:

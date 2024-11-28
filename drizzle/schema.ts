@@ -1,9 +1,6 @@
 import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
 import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/beta-proto/github-integration/types";
-import {
-	type Graph,
-	playgroundModes,
-} from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
+import type { Graph } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import type {
 	FileId,
 	KnowledgeContentId,
@@ -67,6 +64,9 @@ export const subscriptions = pgTable("subscriptions", {
 	organizationDbId: integer("organization_db_id")
 		.notNull()
 		.references(() => organizations.dbId),
+	teamDbId: integer("team_db_id")
+		.notNull()
+		.references(() => teams.dbId),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
