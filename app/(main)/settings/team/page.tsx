@@ -12,7 +12,13 @@ export default function TeamPage() {
 				Team
 			</h3>
 
-			<Suspense fallback={<Skeleton className="h-full w-full" />}>
+			<Suspense
+				fallback={
+					<div className="w-full h-24">
+						<Skeleton className="h-full w-full" />
+					</div>
+				}
+			>
 				<TeamName />
 			</Suspense>
 		</div>
