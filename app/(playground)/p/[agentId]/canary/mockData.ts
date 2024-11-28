@@ -14,11 +14,11 @@ const outlineNode: Node = {
 		instruction: "Write a short story about a cat",
 		sources: [
 			{
-				id: "ndh_source1",
+				id: "ndh_outline-source1",
 				label: "Source1",
 			},
 			{
-				id: "ndh_source2",
+				id: "ndh_outline-source2",
 				label: "Source2",
 			},
 		],
@@ -40,15 +40,15 @@ const sectionNode1: Node = {
 		requirement: { id: "ndh_requirement", label: "Requirement" },
 		sources: [
 			{
-				id: "ndh_source1",
+				id: "ndh_section1-source1",
 				label: "Source1",
 			},
 			{
-				id: "ndh_source2",
+				id: "ndh_section1-source2",
 				label: "Source2",
 			},
 			{
-				id: "ndh_source3",
+				id: "ndh_section1-source3",
 				label: "Source3",
 			},
 		],
@@ -70,15 +70,15 @@ const sectionNode2: Node = {
 		requirement: { id: "ndh_requirement", label: "Requirement" },
 		sources: [
 			{
-				id: "ndh_source1",
+				id: "ndh_section2-source1",
 				label: "Source1",
 			},
 			{
-				id: "ndh_source2",
+				id: "ndh_section2-source2",
 				label: "Source2",
 			},
 			{
-				id: "ndh_source3",
+				id: "ndh_section2-source3",
 				label: "Source3",
 			},
 		],
@@ -99,11 +99,11 @@ const concatNode: Node = {
 		instruction: "Write a short story about a cat",
 		sources: [
 			{
-				id: "ndh_source1",
+				id: "ndh_concat-source1",
 				label: "Source1",
 			},
 			{
-				id: "ndh_source2",
+				id: "ndh_concat-source2",
 				label: "Source2",
 			},
 		],
@@ -121,18 +121,18 @@ const reviewNode: Node = {
 		llm: "anthropic:claude-3-5-sonnet-latest",
 		temperature: 0.7,
 		topP: 1,
-		instruction: "Write a short story about a cat",
+		instruction: "Review a short story about a cat",
 		sources: [
 			{
-				id: "ndh_source1",
+				id: "ndh_review-source1",
 				label: "Source1",
 			},
 			{
-				id: "ndh_source2",
+				id: "ndh_review-source2",
 				label: "Source2",
 			},
 			{
-				id: "ndh_source3",
+				id: "ndh_review-source3",
 				label: "Source3",
 			},
 		],
@@ -174,14 +174,14 @@ const textNode: Node = {
 		text: `Analyze the following git diff and generate a clear, concise commit message that follows these rules:
 
 1. Start with a type prefix in parentheses, choosing from:
-   - (feat): New feature
-   - (fix): Bug fix
-   - (docs): Documentation changes
-   - (style): Code style changes (formatting, etc)
-   - (refactor): Code refactoring
-   - (perf): Performance improvements
-   - (test): Adding or modifying tests
-   - (chore): Maintenance tasks
+			- (feat): New feature
+			- (fix): Bug fix
+			- (docs): Documentation changes
+			- (style): Code style changes (formatting, etc)
+			- (refactor): Code refactoring
+			- (perf): Performance improvements
+			- (test): Adding or modifying tests
+			- (chore): Maintenance tasks
 
 2. Follow with a short (50 chars or less) summary in imperative mood
 3. Add a blank line followed by more detailed description if needed
@@ -259,7 +259,7 @@ const fileOutlineConnection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: outlineNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source1",
+	targetNodeHandleId: "ndh_outline-source1",
 };
 
 const fileSection1Connection: Connection = {
@@ -268,7 +268,7 @@ const fileSection1Connection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: sectionNode1.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source1",
+	targetNodeHandleId: "ndh_section1-source1",
 };
 const fileSection2Connection: Connection = {
 	id: "cnnc_file-section2",
@@ -276,7 +276,7 @@ const fileSection2Connection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: sectionNode2.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source1",
+	targetNodeHandleId: "ndh_section2-source1",
 };
 
 const fileReviewConnection: Connection = {
@@ -285,7 +285,7 @@ const fileReviewConnection: Connection = {
 	sourceNodeType: "variable",
 	targetNodeId: reviewNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source1",
+	targetNodeHandleId: "ndh_review-source1",
 };
 
 const textSection1Connection: Connection = {
@@ -312,7 +312,7 @@ const outlineToSection1Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode1.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_section1-source2",
 };
 
 const outlineToSection2Connection: Connection = {
@@ -321,7 +321,7 @@ const outlineToSection2Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode2.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_section2-source2",
 };
 const section1ToConcatConnection: Connection = {
 	id: "cnnc_section1-concat",
@@ -329,7 +329,7 @@ const section1ToConcatConnection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: concatNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source1",
+	targetNodeHandleId: "ndh_concat-source1",
 };
 const section2ToConcatConnection: Connection = {
 	id: "cnnc_section2-concat",
@@ -337,7 +337,7 @@ const section2ToConcatConnection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: concatNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_concat-source2",
 };
 const concatToReviewConnection: Connection = {
 	id: "cnnc_concat-review",
@@ -345,7 +345,7 @@ const concatToReviewConnection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: reviewNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_review-source2",
 };
 
 const webSearchToOutlineConnection: Connection = {
@@ -354,7 +354,7 @@ const webSearchToOutlineConnection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: outlineNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source2",
+	targetNodeHandleId: "ndh_outline-source2",
 };
 const webSearchToSection1Connection: Connection = {
 	id: "cnnc_web-search-section1",
@@ -362,7 +362,7 @@ const webSearchToSection1Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode1.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source3",
+	targetNodeHandleId: "ndh_section1-source3",
 };
 const webSearchToSection2Connection: Connection = {
 	id: "cnnc_web-search-section2",
@@ -370,7 +370,7 @@ const webSearchToSection2Connection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: sectionNode2.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source3",
+	targetNodeHandleId: "ndh_section2-source3",
 };
 const webSearchToReviewConnection: Connection = {
 	id: "cnnc_web-search-review",
@@ -378,7 +378,7 @@ const webSearchToReviewConnection: Connection = {
 	sourceNodeType: "action",
 	targetNodeId: reviewNode.id,
 	targetNodeType: "action",
-	targetNodeHandleId: "ndh_source3",
+	targetNodeHandleId: "ndh_review-source3",
 };
 
 export const connections = [
