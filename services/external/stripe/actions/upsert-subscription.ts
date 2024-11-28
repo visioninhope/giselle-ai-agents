@@ -1,4 +1,4 @@
-import { db, subscriptions, teams } from "@/drizzle";
+import { db, subscriptions, teamMemberships, teams } from "@/drizzle";
 import {
 	DRAFT_TEAM_NAME_METADATA_KEY,
 	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
@@ -53,6 +53,13 @@ async function createTeam(userDbId: number, teamName: string) {
 				isInternalTeam: false,
 			})
 			.returning({ dbid: teams.dbId });
+
+		await db.insert(teamMemberships).values({
+			teamDbId,
+			userDbId,
+			role: "admin",
+		});
+
 		return team.dbid;
 	});
 
