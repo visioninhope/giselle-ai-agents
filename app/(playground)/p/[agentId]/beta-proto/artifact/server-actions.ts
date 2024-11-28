@@ -91,6 +91,8 @@ ${sourcesToText(sources)}
 						{
 							tokenConsumed: result.usage.totalTokens,
 							duration,
+							measurementScope,
+							isR06User,
 						},
 						"response obtained",
 					);
