@@ -5,6 +5,7 @@ import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
+	ArrowUpFromLineIcon,
 	CheckIcon,
 	ChevronsUpDownIcon,
 	DotIcon,
@@ -16,6 +17,7 @@ import {
 	type FC,
 	type HTMLAttributes,
 	type ReactNode,
+	useCallback,
 	useMemo,
 	useState,
 } from "react";
@@ -671,6 +673,18 @@ export function PropertiesPanel() {
 							<TabContentFile
 								nodeId={selectedNode.id}
 								content={selectedNode.content}
+								onContentChange={(content) => {
+									dispatch({
+										type: "updateNode",
+										input: {
+											nodeId: selectedNode.id,
+											node: {
+												...selectedNode,
+												content,
+											},
+										},
+									});
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -1513,7 +1527,12 @@ function formatFileSize(bytes: number): string {
 function TabContentFile({
 	nodeId,
 	content,
-}: { nodeId: NodeId; content: FileContent }) {
+	onContentChange,
+}: {
+	nodeId: NodeId;
+	content: FileContent;
+	onContentChange?: (content: FileContent) => void;
+}) {
 	const { graph } = useGraph();
 
 	const sourcedFromNodes = useMemo(
@@ -1526,58 +1545,160 @@ function TabContentFile({
 				.filter((node) => node !== undefined),
 		[graph, nodeId],
 	);
+	const [isDragging, setIsDragging] = useState(false);
+
+	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(true);
+	}, []);
+
+	const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(false);
+	}, []);
+
+	const upload = useCallback(
+		(file: File) => {
+			const fileData = new FileReader();
+
+			fileData.readAsArrayBuffer(file);
+			fileData.onload = () => {
+				if (!fileData.result) {
+					return;
+				}
+				onContentChange?.({
+					...content,
+					data: {
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+						uploadedAt: new Date().getTime(),
+					},
+				});
+			};
+		},
+		[content, onContentChange],
+	);
+
+	const onDrop = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			upload(e.dataTransfer.files[0]);
+		},
+		[upload],
+	);
+
+	const onFileChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (!e.target.files) {
+				return;
+			}
+			upload(e.target.files[0]);
+		},
+		[upload],
+	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
-			<PropertiesPanelContentBox>
-				<div className="my-[12px] flex flex-col gap-[8px]">
-					<DataList label="File Name">
-						<p>{content.name}</p>
-					</DataList>
-					<DataList label="Content Type">
-						<p>{content.contentType}</p>
-					</DataList>
-					<DataList label="Size">
-						<p>{formatFileSize(content.size)}</p>
-					</DataList>
-					<DataList label="Uploaded">
-						<p>{formatTimestamp.toRelativeTime(content.upladedAt)}</p>
-					</DataList>
-				</div>
-			</PropertiesPanelContentBox>
-			<div className="border-t border-[hsla(222,21%,40%,1)]" />
-			<PropertiesPanelContentBox className="text-black-30 grid gap-2">
-				<div className="flex justify-between items-center">
-					<p className="font-rosart">Sourced From</p>
-				</div>
-
-				<div className="grid gap-2">
-					{sourcedFromNodes.map((node) => (
-						<HoverCard key={node.id}>
-							<HoverCardTrigger asChild>
-								<Block>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-[8px]">
-											<p className="truncate text-[14px] font-rosart">
-												{node.name}
-											</p>
-										</div>
+			{content.data == null ? (
+				<div className="p-[16px]">
+					<div
+						className={clsx(
+							"h-[300px] flex flex-col gap-[16px] justify-center items-center rounded-[8px] border border-dashed text-black-70 px-[18px]",
+							isDragging ? "bg-black-80/20 border-black-50" : "border-black-70",
+						)}
+						onDragOver={onDragOver}
+						onDragLeave={onDragLeave}
+						onDrop={onDrop}
+					>
+						{isDragging ? (
+							<>
+								<DocumentIcon className="w-[30px] h-[30px] fill-black-70" />
+								<p className="text-center">Drop to upload your files</p>
+							</>
+						) : (
+							<div className="flex flex-col gap-[16px] justify-center items-center">
+								<ArrowUpFromLineIcon size={38} className="stroke-black-70" />
+								<label
+									htmlFor="file"
+									className="text-center flex flex-col gap-[16px]"
+								>
+									<p>
+										No contents added yet. Click to upload or drag and drop
+										files here (supports images, documents, and more; max 4.5MB
+										per file).
+									</p>
+									<div className="flex gap-[8px] justify-center items-center">
+										<span>or</span>
+										<span className="font-bold text-black--50 text-[14px] underline cursor-pointer">
+											Select files
+											<input
+												id="file"
+												type="file"
+												onChange={onFileChange}
+												className="hidden"
+											/>
+										</span>
 									</div>
-								</Block>
-							</HoverCardTrigger>
-							<HoverCardContent className="w-80">
-								<div className="flex justify-between space-x-4">
-									node type: {node.content.type}
-									{node.content.type === "text" && (
-										<div className="line-clamp-5 text-[14px]">
-											{node.content.text}
-										</div>
-									)}
-								</div>
-							</HoverCardContent>
-						</HoverCard>
-					))}
+								</label>
+							</div>
+						)}
+					</div>
 				</div>
-			</PropertiesPanelContentBox>
+			) : (
+				<>
+					<PropertiesPanelContentBox>
+						<div className="my-[12px] flex flex-col gap-[8px]">
+							<DataList label="File Name">
+								<p>{content.data.name}</p>
+							</DataList>
+							<DataList label="Content Type">
+								<p>{content.data.contentType}</p>
+							</DataList>
+							<DataList label="Size">
+								<p>{formatFileSize(content.data.size)}</p>
+							</DataList>
+							<DataList label="Uploaded">
+								<p>{formatTimestamp.toRelativeTime(content.data.uploadedAt)}</p>
+							</DataList>
+						</div>
+					</PropertiesPanelContentBox>
+					<div className="border-t border-[hsla(222,21%,40%,1)]" />
+					<PropertiesPanelContentBox className="text-black-30 grid gap-2">
+						<div className="flex justify-between items-center">
+							<p className="font-rosart">Sourced From</p>
+						</div>
+
+						<div className="grid gap-2">
+							{sourcedFromNodes.map((node) => (
+								<HoverCard key={node.id}>
+									<HoverCardTrigger asChild>
+										<Block>
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-[8px]">
+													<p className="truncate text-[14px] font-rosart">
+														{node.name}
+													</p>
+												</div>
+											</div>
+										</Block>
+									</HoverCardTrigger>
+									<HoverCardContent className="w-80">
+										<div className="flex justify-between space-x-4">
+											node type: {node.content.type}
+											{node.content.type === "text" && (
+												<div className="line-clamp-5 text-[14px]">
+													{node.content.text}
+												</div>
+											)}
+										</div>
+									</HoverCardContent>
+								</HoverCard>
+							))}
+						</div>
+					</PropertiesPanelContentBox>
+				</>
+			)}
 		</div>
 	);
 }

@@ -147,10 +147,12 @@ const fileNode: Node = {
 	type: "variable",
 	content: {
 		type: "file",
-		name: "SaaStr Tips Tricks Ebook Vol 1.pdf",
-		contentType: "application/pdf",
-		size: 4_821_663,
-		upladedAt: 1732676647496,
+		data: {
+			name: "SaaStr Tips Tricks Ebook Vol 1.pdf",
+			contentType: "application/pdf",
+			size: 4_821_663,
+			uploadedAt: 1732676647496,
+		},
 	},
 };
 
@@ -219,6 +221,18 @@ const textGenerationStandAloneNode: Node = {
 	},
 };
 
+const fileStandAloneNode: Node = {
+	id: "nd_file-stand-alone",
+	name: "Untitled Node - 10",
+	position: { x: 800, y: 800 },
+	selected: false,
+	type: "variable",
+	content: {
+		type: "file",
+		data: null,
+	},
+};
+
 export const nodes = [
 	outlineNode,
 	sectionNode1,
@@ -229,6 +243,7 @@ export const nodes = [
 	textNode,
 	webSearchNode,
 	textGenerationStandAloneNode,
+	fileStandAloneNode,
 ];
 
 const fileOutlineConnection: Connection = {
