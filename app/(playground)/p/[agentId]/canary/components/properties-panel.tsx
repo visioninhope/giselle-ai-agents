@@ -651,7 +651,7 @@ function NodeDropdown({
 			<DropdownMenuTrigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
 				{triggerLabel ?? "Select"}
 			</DropdownMenuTrigger>
-			<DropdownMenuContent>
+			<DropdownMenuContent align="end" sideOffset={6}>
 				<DropdownMenuRadioGroup onValueChange={handleValueChange}>
 					<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
 					{textGenerationNodes.map((node) => (
