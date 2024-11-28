@@ -25,5 +25,5 @@ export const getUserSubscriptionId = async () => {
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 
-	return subscription.id;
+	return subscription?.id ?? "sub_hotfix";
 };
