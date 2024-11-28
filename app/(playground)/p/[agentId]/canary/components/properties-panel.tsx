@@ -2,6 +2,8 @@ import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { put } from "@vercel/blob";
+import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
@@ -24,7 +26,8 @@ import {
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
-import { action } from "../actions";
+import { action, parse } from "../actions";
+import { vercelBlobFileFolder } from "../constants";
 import {
 	useArtifact,
 	useGraph,
@@ -45,10 +48,12 @@ import type {
 import {
 	createArtifactId,
 	createConnectionId,
+	createFileId,
 	createNodeHandleId,
 	isFile,
 	isText,
 	isTextGeneration,
+	pathJoin,
 } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
@@ -1557,22 +1562,63 @@ function TabContentFile({
 		setIsDragging(false);
 	}, []);
 
-	const upload = useCallback(
+	const setFile = useCallback(
 		(file: File) => {
 			const fileData = new FileReader();
 
 			fileData.readAsArrayBuffer(file);
-			fileData.onload = () => {
+			fileData.onload = async () => {
 				if (!fileData.result) {
 					return;
 				}
+				const fileId = createFileId();
 				onContentChange?.({
 					...content,
 					data: {
+						id: fileId,
+						status: "uploading",
 						name: file.name,
 						contentType: file.type,
 						size: file.size,
-						uploadedAt: new Date().getTime(),
+					},
+				});
+				const blob = await upload(
+					pathJoin(vercelBlobFileFolder, fileId, file.name),
+					file,
+					{
+						access: "public",
+						handleUploadUrl: "/api/files/upload",
+					},
+				);
+				const uploadedAt = Date.now();
+
+				onContentChange?.({
+					...content,
+					data: {
+						id: fileId,
+						status: "processing",
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+						uploadedAt,
+						fileBlobUrl: blob.url,
+					},
+				});
+
+				const parseBlob = await parse(fileId, file.name, blob.url);
+
+				onContentChange?.({
+					...content,
+					data: {
+						id: fileId,
+						status: "completed",
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+						uploadedAt,
+						fileBlobUrl: blob.url,
+						processedAt: Date.now(),
+						textDataUrl: parseBlob.url,
 					},
 				});
 			};
@@ -1584,9 +1630,9 @@ function TabContentFile({
 		(e: React.DragEvent<HTMLDivElement>) => {
 			e.preventDefault();
 			setIsDragging(false);
-			upload(e.dataTransfer.files[0]);
+			setFile(e.dataTransfer.files[0]);
 		},
-		[upload],
+		[setFile],
 	);
 
 	const onFileChange = useCallback(
@@ -1594,9 +1640,9 @@ function TabContentFile({
 			if (!e.target.files) {
 				return;
 			}
-			upload(e.target.files[0]);
+			setFile(e.target.files[0]);
 		},
-		[upload],
+		[setFile],
 	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
@@ -1658,8 +1704,15 @@ function TabContentFile({
 							<DataList label="Size">
 								<p>{formatFileSize(content.data.size)}</p>
 							</DataList>
+							<DataList label="Status">
+								<p>{content.data.status}</p>
+							</DataList>
 							<DataList label="Uploaded">
-								<p>{formatTimestamp.toRelativeTime(content.data.uploadedAt)}</p>
+								<p>
+									{content.data.status !== "completed"
+										? "---"
+										: formatTimestamp.toRelativeTime(content.data.processedAt)}
+								</p>
 							</DataList>
 						</div>
 					</PropertiesPanelContentBox>

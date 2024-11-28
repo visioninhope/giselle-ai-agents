@@ -148,10 +148,17 @@ const fileNode: Node = {
 	content: {
 		type: "file",
 		data: {
+			id: "fl_1",
+			status: "completed",
 			name: "SaaStr Tips Tricks Ebook Vol 1.pdf",
 			contentType: "application/pdf",
 			size: 4_821_663,
 			uploadedAt: 1732676647496,
+			fileBlobUrl:
+				"https://example.com/files/SaaStr_Tips_Tricks_Ebook_Vol_1.pdf",
+			processedAt: 1732676647496,
+			textDataUrl:
+				"https://example.com/files/SaaStr_Tips_Tricks_Ebook_Vol_1.pdf",
 		},
 	},
 };

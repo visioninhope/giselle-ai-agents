@@ -52,12 +52,33 @@ export interface TextContent extends VariableContentBase {
 	type: "text";
 	text: string;
 }
-interface FileData {
+export type FileId = `fl_${string}`;
+interface FileDataBase {
+	id: FileId;
 	name: string;
 	contentType: string;
 	size: number;
-	uploadedAt: number;
+	status: string;
 }
+interface UploadingFileData extends FileDataBase {
+	status: "uploading";
+}
+
+interface ProcessingFileData extends FileDataBase {
+	status: "processing";
+	uploadedAt: number;
+	fileBlobUrl: string;
+}
+
+interface CompletedFileData extends FileDataBase {
+	status: "completed";
+	uploadedAt: number;
+	fileBlobUrl: string;
+	processedAt: number;
+	textDataUrl: string;
+}
+
+type FileData = UploadingFileData | ProcessingFileData | CompletedFileData;
 export interface FileContent extends VariableContentBase {
 	type: "file";
 	data: FileData | null | undefined;
