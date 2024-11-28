@@ -1,6 +1,5 @@
 import {
 	db,
-	organizations,
 	stripeUserMappings,
 	subscriptions,
 	teamMemberships,
@@ -18,22 +17,18 @@ export const upsertSubscription = async (
 ) => {
 	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
-	const [organization] = await db
-		.selectDistinct({ dbId: organizations.dbId })
-		.from(organizations)
-		.innerJoin(teams, eq(teams.organizationDbId, organizations.dbId))
+	// TODO: When team plans are released, a user may belong to multiple teams, so we need to handle that case.
+	const [team] = await db
+		.select({ dbId: teams.dbId })
+		.from(teams)
+		.innerJoin(teams, eq(teams.dbId, subscriptions.teamDbId))
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(users, eq(users.dbId, teamMemberships.userDbId))
 		.innerJoin(stripeUserMappings, eq(stripeUserMappings.userDbId, users.dbId))
 		.where(eq(stripeUserMappings.stripeCustomerId, customerId));
-	const [team] = await db
-		.select({ dbId: teams.dbId })
-		.from(teams)
-		.where(eq(teams.organizationDbId, organization.dbId));
 
 	const upsertValues: typeof subscriptions.$inferInsert = {
 		id: subscription.id,
-		organizationDbId: organization.dbId,
 		teamDbId: team.dbId,
 		status: subscription.status,
 		cancelAtPeriodEnd: subscription.cancel_at_period_end,

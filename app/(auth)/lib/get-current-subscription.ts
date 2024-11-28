@@ -2,7 +2,7 @@
 
 import {
 	db,
-	organizations,
+	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -12,17 +12,18 @@ import { eq } from "drizzle-orm";
 
 export const getUserSubscriptionId = async () => {
 	const user = await getUser();
+	// TODO: When team plans are released, a user may belong to multiple teams, so we need to handle that case.
+	// e.g., fetch team id through agents or so.
 	const [subscription] = await db
-		.select({
-			organizationId: organizations.dbId, // todo: replace with 'subscriptionId' if subscriptions table is created in the future
-		})
-		.from(organizations)
-		.innerJoin(teams, eq(teams.organizationDbId, organizations.dbId))
+		.select({ id: subscriptions.dbId })
+		.from(subscriptions)
+		.innerJoin(teams, eq(teams.dbId, subscriptions.teamDbId))
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(
 			supabaseUserMappings,
 			eq(supabaseUserMappings.userDbId, teamMemberships.userDbId),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
-	return subscription.organizationId;
+
+	return subscription.id;
 };
