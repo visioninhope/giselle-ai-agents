@@ -2,7 +2,7 @@
 
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { createLogger } from "@/lib/opentelemetry";
+import { createLogger, withMeasurement } from "@/lib/opentelemetry";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { createId } from "@paralleldrive/cuid2";
@@ -124,7 +124,7 @@ ${sourcesToText(sources)}
 		});
 
 		const searchResults = await Promise.all(
-			result.keywords.map((keyword) => search(keyword)),
+			result.keywords.map((keyword) => withMeasurement(() => search(keyword), "web-search")),
 		)
 			.then((results) => [...new Set(results.flat())])
 			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));

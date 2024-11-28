@@ -1,5 +1,8 @@
 import { logger as pinoLogger } from "@/lib/logger";
-import type { TokenConsumedSchema } from "@/lib/opentelemetry/types";
+import type {
+	RequestCountSchema,
+	TokenConsumedSchema,
+} from "@/lib/opentelemetry/types";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
 
@@ -91,7 +94,7 @@ function getOrCreateLoggerProvider() {
 	return sharedLoggerProvider;
 }
 
-type LogSchema = TokenConsumedSchema;
+type LogSchema = TokenConsumedSchema | RequestCountSchema;
 
 interface OtelLoggerWrapper {
 	info: (obj: LogSchema, msg?: string) => void;
