@@ -1,16 +1,12 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import { put } from "@vercel/blob";
 import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
-	CheckIcon,
 	ChevronsUpDownIcon,
-	DotIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -57,6 +53,15 @@ import {
 } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./dropdown-menu";
 import {
 	Select,
 	SelectContent,
@@ -124,103 +129,6 @@ function PropertiesPanelCollapsible({
 		</>
 	);
 }
-
-const DropdownMenu = DropdownMenuPrimitive.Root;
-
-function DropdownMenuTrigger({ label = "Select" }: { label?: string }) {
-	return (
-		<DropdownMenuPrimitive.Trigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
-			{label}
-		</DropdownMenuPrimitive.Trigger>
-	);
-}
-
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
-
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
-
-function DropdownMenuContent({ children }: { children: React.ReactNode }) {
-	return (
-		<DropdownMenuPrimitive.Portal>
-			<DropdownMenuPrimitive.Content
-				sideOffset={4}
-				align="end"
-				className={clsx(
-					"z-50 min-w-[8rem] overflow-hidden rounded-[16px] border border-black-70 bg-black-100 p-[8px] text-black-30 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
-					"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-				)}
-			>
-				{children}
-			</DropdownMenuPrimitive.Content>
-		</DropdownMenuPrimitive.Portal>
-	);
-}
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
-
-function DropdownMenuCheckboxItem({
-	children,
-	checked = false,
-}: {
-	children: React.ReactNode;
-	checked?: boolean;
-}) {
-	return (
-		<DropdownMenuPrimitive.CheckboxItem
-			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-			checked={checked}
-		>
-			{children}
-			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-				<DropdownMenuPrimitive.ItemIndicator>
-					<CheckIcon className="h-4 w-4" />
-				</DropdownMenuPrimitive.ItemIndicator>
-			</span>
-		</DropdownMenuPrimitive.CheckboxItem>
-	);
-}
-DropdownMenuCheckboxItem.displayName =
-	DropdownMenuPrimitive.CheckboxItem.displayName;
-
-function DropdownMenuLabel({ children }: { children: ReactNode }) {
-	return (
-		<DropdownMenuPrimitive.Label className="px-2 py-[2px] text-[12px] text-black-70">
-			{children}
-		</DropdownMenuPrimitive.Label>
-	);
-}
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
-
-function DropdownMenuSeparator() {
-	return (
-		<DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-muted" />
-	);
-}
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
-
-function DropdownMenuRadioItem({
-	children,
-	value,
-}: {
-	children: ReactNode;
-	value: ComponentProps<typeof DropdownMenuPrimitive.RadioItem>["value"];
-}) {
-	return (
-		<DropdownMenuPrimitive.RadioItem
-			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-			value={value}
-		>
-			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-				<DropdownMenuPrimitive.ItemIndicator>
-					<DotIcon className="h-8 w-8 fill-current" />
-				</DropdownMenuPrimitive.ItemIndicator>
-			</span>
-			{children}
-		</DropdownMenuPrimitive.RadioItem>
-	);
-}
-DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const HoverCard = HoverCardPrimitive.Root;
 
@@ -740,7 +648,9 @@ function NodeDropdown({
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger label={triggerLabel} />
+			<DropdownMenuTrigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
+				{triggerLabel ?? "Select"}
+			</DropdownMenuTrigger>
 			<DropdownMenuContent>
 				<DropdownMenuRadioGroup onValueChange={handleValueChange}>
 					<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
