@@ -1,12 +1,12 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { createLogger } from "./log";
-import type { RequestCountSchema } from "./types";
+import type { RequestCountSchema, ExternalServiceName } from "./types";
 
 export async function withMeasurement<T>(
 	operation: () => Promise<T>,
-	name: string,
+	externalServiceName: ExternalServiceName,
 ) {
-	const logger = createLogger(name);
+	const logger = createLogger(externalServiceName);
 	const startTime = performance.now();
 
 	try {
@@ -16,13 +16,14 @@ export async function withMeasurement<T>(
 		Promise.all([getCurrentMeasurementScope(), isRoute06User()])
 			.then(([measurementScope, isR06User]) => {
 				const metrics: RequestCountSchema = {
+                                        externalServiceName,
 					requestCount: 1,
 					duration,
 					measurementScope,
 					isR06User,
 				};
 
-				logger.info(metrics, `${name} completed`);
+				logger.info(metrics, `${externalServiceName} completed`);
 			})
 			.catch((error) => {
 				logger.error(

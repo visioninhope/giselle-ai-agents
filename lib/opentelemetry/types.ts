@@ -1,6 +1,14 @@
 import { z } from "zod";
 
+const ExternalServiceName = {
+  OpenAI: "openai",
+  Tavily: "tavily",
+} as const;
+
+type ExternalServiceName = typeof ExternalServiceName[keyof typeof ExternalServiceName];
+
 const BaseMetricsSchema = z.object({
+	externalServiceName: z.nativeEnum(ExternalServiceName), // Name of the service to which agent requests
 	duration: z.number().min(0), // Time taken for text generation in milliseconds
 	measurementScope: z.number(), // ID of the plan usage contract to which the requester belongs
 	isR06User: z.boolean(), // Whether the requester has internal user

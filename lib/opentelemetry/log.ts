@@ -160,9 +160,9 @@ const getVersion = () => {
 	return undefined; // to be implemented
 };
 
-export function createLogger(name: string): OtelLoggerWrapper {
+export function createLogger(usecase: string): OtelLoggerWrapper {
 	const loggerProvider = getOrCreateLoggerProvider();
-	const otelLogger = loggerProvider.getLogger(name, getVersion(), {
+	const otelLogger = loggerProvider.getLogger(usecase, getVersion(), {
 		schemaUrl: getSchemaUrl(),
 	});
 	const emitLog = createEmitLog(otelLogger);

@@ -90,6 +90,7 @@ ${sourcesToText(sources)}
 
 				logger.info(
 					{
+                                          	externalServiceName: "openai",
 						tokenConsumed: result.usage.totalTokens,
 						duration,
 						measurementScope,
@@ -124,7 +125,7 @@ ${sourcesToText(sources)}
 		});
 
 		const searchResults = await Promise.all(
-			result.keywords.map((keyword) => withMeasurement(() => search(keyword), "web-search")),
+			result.keywords.map((keyword) => withMeasurement(() => search(keyword), "tavily")),
 		)
 			.then((results) => [...new Set(results.flat())])
 			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
