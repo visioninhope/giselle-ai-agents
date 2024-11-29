@@ -24,7 +24,7 @@ async function fetchTeams(supabaseUserId: string) {
 		.select({
 			teamDbId: teams.dbId,
 			teamName: teams.name,
-			teamIsInternal: teams.isInternalTeam,
+			teamType: teams.type,
 			activeSubscription: subscriptions.id,
 		})
 		.from(teams)
@@ -57,7 +57,7 @@ export default async function TeamCreationModal() {
 	const isInternalUser = user.email != null && isEmailFromRoute06(user.email);
 	const teams = await fetchTeams(user.id);
 	const hasExistingFreeTeam = teams.some(
-		(team) => !team.activeSubscription && !team.teamIsInternal,
+		(team) => team.teamType === "standard" && !team.activeSubscription,
 	);
 
 	return (

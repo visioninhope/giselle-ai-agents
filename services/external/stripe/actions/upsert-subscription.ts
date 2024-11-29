@@ -61,7 +61,6 @@ async function createTeam(
 		.insert(teams)
 		.values({
 			name: teamName,
-			isInternalTeam: false,
 		})
 		.returning({ dbid: teams.dbId });
 

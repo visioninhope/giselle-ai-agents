@@ -126,7 +126,7 @@ async function createTeamInDatabase(
 		.insert(teams)
 		.values({
 			name: teamName,
-			isInternalTeam: isInternal,
+			type: isInternal ? "internal" : "standard",
 		})
 		.returning({ dbid: teams.dbId });
 
