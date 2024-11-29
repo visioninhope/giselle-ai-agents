@@ -1,6 +1,5 @@
 import {
 	db,
-	organizations,
 	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
@@ -12,14 +11,12 @@ import { and, eq } from "drizzle-orm";
 export const retrieveActiveStripeSubscriptionBySupabaseUserId = async (
 	supabaseUserId: string,
 ) => {
+	// TODO: When team plans are released, a user may belong to multiple teams, so we need to handle that case.
+	// One supabase user can have multiple teams which have pro plan subscription.
 	const [subscription] = await db
 		.selectDistinct({ id: subscriptions.id })
 		.from(subscriptions)
-		.innerJoin(
-			organizations,
-			eq(organizations.dbId, subscriptions.organizationDbId),
-		)
-		.innerJoin(teams, eq(teams.organizationDbId, organizations.dbId))
+		.innerJoin(teams, eq(teams.dbId, subscriptions.teamDbId))
 		.innerJoin(teamMemberships, eq(teamMemberships.teamDbId, teams.dbId))
 		.innerJoin(users, eq(users.dbId, teamMemberships.userDbId))
 		.innerJoin(

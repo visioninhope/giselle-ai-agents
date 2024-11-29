@@ -1,9 +1,6 @@
 import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
 import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/beta-proto/github-integration/types";
-import {
-	type Graph,
-	playgroundModes,
-} from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
+import type { Graph } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import type {
 	FileId,
 	KnowledgeContentId,
@@ -50,23 +47,13 @@ import type { VectorStoreFile } from "openai/resources/beta/vector-stores/files"
 import type { VectorStore } from "openai/resources/beta/vector-stores/vector-stores";
 import type { Stripe } from "stripe";
 
-export const organizations = pgTable("organizations", {
-	dbId: serial("db_id").primaryKey(),
-	name: text("name").notNull(),
-	createdAt: timestamp("created_at").defaultNow().notNull(),
-	updatedAt: timestamp("updated_at")
-		.defaultNow()
-		.notNull()
-		.$onUpdate(() => new Date()),
-});
-
 export const subscriptions = pgTable("subscriptions", {
 	// Subscription ID from Stripe, e.g. sub_1234.
 	id: text("id").notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
-	organizationDbId: integer("organization_db_id")
+	teamDbId: integer("team_db_id")
 		.notNull()
-		.references(() => organizations.dbId),
+		.references(() => teams.dbId),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
@@ -81,9 +68,6 @@ export const subscriptions = pgTable("subscriptions", {
 
 export const teams = pgTable("teams", {
 	dbId: serial("db_id").primaryKey(),
-	organizationDbId: integer("organization_db_id")
-		.notNull()
-		.references(() => organizations.dbId),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
 	updatedAt: timestamp("updated_at")

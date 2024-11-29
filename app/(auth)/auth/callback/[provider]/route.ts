@@ -1,13 +1,28 @@
 // The client you created from the Server-Side Auth instructions
 import { db, oauthCredentials, supabaseUserMappings, users } from "@/drizzle";
+import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import { initializeAccount } from "@/services/accounts";
 import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
-import { NextResponse } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
+import type { Provider } from "../../../lib/";
 
-export async function GET(request: Request) {
+export async function GET(
+	request: NextRequest,
+	{ params }: { params: Promise<{ provider: Provider }> },
+) {
 	const { searchParams, origin } = new URL(request.url);
+	const { provider } = await params;
+
+	logger.debug(
+		{
+			searchParams,
+			origin,
+			url: request.url,
+		},
+		"'searchParams' and 'origin' got from request",
+	);
 	const errorMessage = checkError(searchParams);
 	if (errorMessage) {
 		return new Response(errorMessage, {
@@ -16,6 +31,7 @@ export async function GET(request: Request) {
 	}
 
 	const code = searchParams.get("code");
+	logger.debug({ code }, "code got from query param");
 	// if "next" is in param, use it as the redirect URL
 	const next = searchParams.get("next") ?? "/";
 	if (!code) {
@@ -31,10 +47,17 @@ export async function GET(request: Request) {
 		});
 	}
 
+	logger.debug(
+		{
+			provider: data.session.user.app_metadata.provider,
+			providers: data.session.user.app_metadata.providers,
+		},
+		"session data got from Supabase",
+	);
 	try {
 		const { user, session } = data;
 		await initializeUserIfNeeded(user);
-		await storeProviderTokens(user, session);
+		await storeProviderTokens(user, session, provider);
 	} catch (error) {
 		if (error instanceof Error) {
 			return new Response(error.message, { status: 500 });
@@ -73,25 +96,22 @@ async function initializeUserIfNeeded(user: User) {
 }
 
 // store accessToken and refreshToken
-async function storeProviderTokens(user: User, session: Session) {
+async function storeProviderTokens(
+	user: User,
+	session: Session,
+	provider: string,
+) {
 	const { provider_token, provider_refresh_token } = session;
 	if (!provider_token) {
 		throw new Error("No provider token found");
 	}
 
-	let provider = "";
-	// https://docs.github.com/ja/authentication/keeping-your-account-and-data-secure/about-authentication-to-github#github-%E3%81%AE%E3%83%88%E3%83%BC%E3%82%AF%E3%83%B3%E3%83%95%E3%82%A9%E3%83%BC%E3%83%9E%E3%83%83%E3%83%88
-	if (provider_token.startsWith("ghu_")) {
-		provider = "github";
-	}
-	// TODO: add another logic for other providers
-	if (provider === "") {
-		throw new Error("No provider found");
-	}
+	logger.debug(`provider: '${provider}'`);
 
 	const identity = user.identities?.find((identity) => {
 		return identity.provider === provider;
 	});
+	logger.debug({ currentProvider: provider });
 	if (!identity) {
 		throw new Error(`No identity found for provider: ${provider}`);
 	}
