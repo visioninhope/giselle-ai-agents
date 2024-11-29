@@ -40,37 +40,46 @@ async function activateProTeamSubscription(subscription: Stripe.Subscription) {
 		10,
 	);
 	const teamName = subscription.metadata[DRAFT_TEAM_NAME_METADATA_KEY];
-	const teamDbId = await createTeam(userDbId, teamName);
-	await insertSubscription(subscription, teamDbId);
+
+	// wrap operations in a transaction to prevent duplicate team and membership creation
+	await db.transaction(async (tx) => {
+		const teamDbId = await createTeam(tx, userDbId, teamName);
+		// if the race condition happens, inserting subscription will successfully raise because of the unique constraint.
+		await insertSubscription(tx, subscription, teamDbId);
+	});
 }
 
-async function createTeam(userDbId: number, teamName: string) {
-	const teamDbId = await db.transaction(async (tx) => {
-		const [team] = await db
-			.insert(teams)
-			.values({
-				name: teamName,
-				isInternalTeam: false,
-			})
-			.returning({ dbid: teams.dbId });
+// https://github.com/drizzle-team/drizzle-orm/issues/2851#issuecomment-2481083003
+type TransactionType = Parameters<Parameters<typeof db.transaction>[0]>[0];
 
-		await db.insert(teamMemberships).values({
-			teamDbId,
-			userDbId,
-			role: "admin",
-		});
+async function createTeam(
+	tx: TransactionType,
+	userDbId: number,
+	teamName: string,
+) {
+	const [team] = await tx
+		.insert(teams)
+		.values({
+			name: teamName,
+			isInternalTeam: false,
+		})
+		.returning({ dbid: teams.dbId });
 
-		return team.dbid;
+	await tx.insert(teamMemberships).values({
+		teamDbId: team.dbid,
+		userDbId,
+		role: "admin",
 	});
 
-	return teamDbId;
+	return team.dbid;
 }
 
 async function insertSubscription(
+	tx: TransactionType,
 	subscription: Stripe.Subscription,
 	teamDbId: number,
 ) {
-	await db.insert(subscriptions).values({
+	await tx.insert(subscriptions).values({
 		id: subscription.id,
 		teamDbId: teamDbId,
 		status: subscription.status,
