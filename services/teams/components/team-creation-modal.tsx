@@ -57,7 +57,7 @@ export default async function TeamCreationModal() {
 	const isInternalUser = user.email != null && isEmailFromRoute06(user.email);
 	const teams = await fetchTeams(user.id);
 	const hasExistingFreeTeam = teams.some(
-		(team) => team.teamType === "standard" && !team.activeSubscription,
+		(team) => team.teamType === "customer" && !team.activeSubscription,
 	);
 
 	return (
