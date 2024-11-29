@@ -76,7 +76,17 @@ export function Toolbar() {
 								<BracesIcon className="text-black-30" />
 								{/* </PopoverTrigger> */}
 							</DropdownMenuTrigger>
-							<DropdownMenuContent align="center" sideOffset={18}>
+							<DropdownMenuContent
+								align="center"
+								sideOffset={18}
+								onEscapeKeyDown={() => {
+									setOpen(false);
+									setTool(undefined);
+								}}
+								onCloseAutoFocus={(e) => {
+									e.preventDefault();
+								}}
+							>
 								<DropdownMenuRadioGroup
 									value={tool}
 									onValueChange={(value) => {
