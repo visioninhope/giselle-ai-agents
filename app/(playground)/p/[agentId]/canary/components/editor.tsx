@@ -22,10 +22,10 @@ import {
 	usePropertiesPanel,
 } from "../contexts/properties-panel";
 import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
-import type { Graph, NodeId, Position } from "../types";
+import type { Graph, NodeId, Position, Tool } from "../types";
 import { createNodeId } from "../utils";
 import { Edge } from "./edge";
-import { Node } from "./node";
+import { Node, PreviewNode, getNodePreviewContent } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
 
@@ -197,23 +197,45 @@ function EditorInner() {
 			</ReactFlow>
 			{tool !== undefined && (
 				<FloatingNodePreview
+					tool={tool}
 					onPlaceNode={(position) => {
-						dispatch({
-							type: "addNode",
-							input: {
-								node: {
-									id: createNodeId(),
-									name: `Untitle node - ${graph.nodes.length + 1}`,
-									position,
-									selected: false,
-									type: "variable",
-									content: {
-										type: "text",
-										text: "",
+						switch (tool) {
+							case "addTextNode":
+								dispatch({
+									type: "addNode",
+									input: {
+										node: {
+											id: createNodeId(),
+											name: `Untitle node - ${graph.nodes.length + 1}`,
+											position,
+											selected: false,
+											type: "variable",
+											content: {
+												type: "text",
+												text: "",
+											},
+										},
 									},
-								},
-							},
-						});
+								});
+								break;
+							case "addFileNode":
+								dispatch({
+									type: "addNode",
+									input: {
+										node: {
+											id: createNodeId(),
+											name: `Untitle node - ${graph.nodes.length + 1}`,
+											position,
+											selected: false,
+											type: "variable",
+											content: {
+												type: "file",
+											},
+										},
+									},
+								});
+								break;
+						}
 						setTool(undefined);
 						setOpen(false);
 					}}
@@ -224,8 +246,10 @@ function EditorInner() {
 }
 
 const FloatingNodePreview = ({
+	tool,
 	onPlaceNode,
 }: {
+	tool: Tool;
 	onPlaceNode: (position: Position) => void;
 }) => {
 	const mousePosition = useMousePosition();
@@ -248,29 +272,7 @@ const FloatingNodePreview = ({
 				}}
 			>
 				<div className="w-[180px]">
-					<Node
-						// Folowing props are required for the redner XYFlow Node Component as a preview
-						type="preview"
-						dragging={true}
-						zIndex={1}
-						isConnectable
-						positionAbsoluteX={0}
-						positionAbsoluteY={0}
-						id="nd_preview"
-						data={{
-							node: {
-								id: "nd_preview",
-								name: "preview",
-								type: "variable",
-								content: {
-									type: "text",
-									text: "Preview",
-								},
-								position: { x: 0, y: 0 },
-								selected: false,
-							},
-						}}
-					/>
+					<PreviewNode tool={tool} />
 				</div>
 			</div>
 		</>

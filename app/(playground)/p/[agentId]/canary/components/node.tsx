@@ -19,6 +19,7 @@ import type {
 	Node as NodeType,
 	Text,
 	TextGeneration,
+	Tool,
 	WebSearch,
 } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
@@ -28,6 +29,60 @@ type FileNode = XYFlowNode<{ node: File }>;
 type TextGenerationNode = XYFlowNode<{ node: TextGeneration }>;
 type WebSearchNode = XYFlowNode<{ node: WebSearch }>;
 export type Node = TextNode | FileNode | TextGenerationNode | WebSearchNode;
+
+export function PreviewNode({ tool }: { tool: Tool }) {
+	switch (tool) {
+		case "addTextNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "Text Node",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "variable",
+							content: {
+								type: "text",
+								text: "Text Preview",
+							},
+						},
+					}}
+				/>
+			);
+		case "addFileNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "File Node",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "variable",
+							content: {
+								type: "file",
+							},
+						},
+					}}
+				/>
+			);
+	}
+}
 
 function NodeHeader({
 	name,

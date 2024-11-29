@@ -81,7 +81,7 @@ interface CompletedFileData extends FileDataBase {
 type FileData = UploadingFileData | ProcessingFileData | CompletedFileData;
 export interface FileContent extends VariableContentBase {
 	type: "file";
-	data: FileData | null | undefined;
+	data?: FileData | null | undefined;
 }
 
 type VariableContent = TextContent | FileContent;
