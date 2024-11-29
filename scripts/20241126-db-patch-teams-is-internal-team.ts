@@ -2,7 +2,7 @@ import { db, supabaseUserMappings, teamMemberships, teams } from "@/drizzle";
 import { createClient } from "@supabase/supabase-js";
 import { eq, inArray } from "drizzle-orm";
 
-console.log("Updating teams to set 'isInternalTeam' property on nodes...");
+console.log("Updating teams to set 'type = internal' property on nodes...");
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 if (!supabaseUrl) {
 	throw new Error("Missing NEXT_PUBLIC_SUPABASE_URL");
@@ -21,7 +21,7 @@ const supabase = createClient(supabaseUrl, supabaseServiceRoleKey, {
 const allTeams = await db
 	.select({
 		teamDbId: teams.dbId,
-		isInternalTeam: teams.isInternalTeam,
+		type: teams.type,
 		supabaseUserId: supabaseUserMappings.supabaseUserId,
 	})
 	.from(teams)
@@ -46,7 +46,7 @@ for (const user of allSupabaseUsers) {
 
 const internalTeamIds = new Set<number>();
 for (const team of allTeams) {
-	if (team.isInternalTeam) {
+	if (team.type === "internal") {
 		continue;
 	}
 	const supabaseUserId = team.supabaseUserId;
@@ -61,6 +61,6 @@ if (internalTeamIds.size === 0) {
 }
 const result = await db
 	.update(teams)
-	.set({ isInternalTeam: true })
+	.set({ type: "internal" })
 	.where(inArray(teams.dbId, Array.from(internalTeamIds)));
 console.log("result: %o", result);

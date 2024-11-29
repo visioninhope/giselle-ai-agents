@@ -33,7 +33,9 @@ export const initializeAccount = async (
 			.insert(teams)
 			.values({
 				name: "default",
-				isInternalTeam: isEmailFromRoute06(supabaseUserEmail ?? ""),
+				type: isEmailFromRoute06(supabaseUserEmail ?? "")
+					? "internal"
+					: "standard",
 			})
 			.returning({
 				id: teams.dbId,
