@@ -2,7 +2,6 @@
 
 import {
 	db,
-	draftTeams,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -52,7 +51,6 @@ export async function createTeam(formData: FormData) {
  * 3. Redirect to the Stripe checkout page
  */
 async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
-	// const draftTeamDbId = await createDraftTeam(supabaseUser, teamName);
 	const userDbId = await getUserDbId(supabaseUser);
 	const checkoutUrl = await createCheckout(userDbId, teamName);
 	redirect(checkoutUrl);
@@ -109,20 +107,6 @@ async function createCheckout(userDbId: number, teamName: string) {
 	}
 
 	return checkoutSession.url;
-}
-
-async function createDraftTeam(supabaseUser: User, teamName: string) {
-	const userDbId = await getUserDbId(supabaseUser);
-
-	const [draftTeam] = await db
-		.insert(draftTeams)
-		.values({
-			name: teamName,
-			userDbId,
-		})
-		.returning({ dbId: draftTeams.dbId });
-
-	return draftTeam.dbId;
 }
 
 async function createInternalTeam(supabaseUser: User, teamName: string) {
