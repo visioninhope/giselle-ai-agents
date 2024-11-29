@@ -1,6 +1,6 @@
 "use server";
 
-import { getCurrentTeam, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { db, pullMessages } from "@/drizzle";
 import { openai } from "@/lib/openai";
 import { metrics } from "@opentelemetry/api";
@@ -59,10 +59,10 @@ export const generateText = async ({
 		message: completion.choices[0].message.content ?? "",
 	});
 	if (completion.usage && completion.usage.total_tokens !== undefined) {
-		const team = await getCurrentTeam();
+		const measurementScope = await getCurrentMeasurementScope();
 		const isR06User = await isRoute06User();
 		tokenCounter.add(completion.usage.total_tokens, {
-			teamId: team.dbId,
+			measurementScope,
 			isR06User,
 		});
 	}

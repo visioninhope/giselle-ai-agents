@@ -3,7 +3,7 @@
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
-import { getCurrentTeam, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { createLogger } from "@/lib/opentelemetry";
 import { metrics } from "@opentelemetry/api";
@@ -77,10 +77,10 @@ ${sourcesToText(sources)}
 					const tokenCounter = meter.createCounter("token_consumed", {
 						description: "Number of OpenAI API tokens consumed by each request",
 					});
-					const team = await getCurrentTeam();
+					const measurementScope = await getCurrentMeasurementScope();
 					const isR06User = await isRoute06User();
 					tokenCounter.add(result.usage.totalTokens, {
-						teamId: team.dbId,
+						measurementScope,
 						isR06User,
 					});
 					generation.end({

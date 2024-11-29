@@ -1,6 +1,6 @@
 "use server";
 
-import { getCurrentTeam, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { metrics } from "@opentelemetry/api";
 import { type RequestId, requestStatus } from "../types";
 import { revalidateGetRequest } from "./get-request";
@@ -14,10 +14,10 @@ export const startRequest = async (requestId: RequestId) => {
 		description: "Number of Agent requests",
 	});
 
-	const team = await getCurrentTeam();
+	const measurementScope = await getCurrentMeasurementScope();
 	const isR06User = await isRoute06User();
 	requestCounter.add(1, {
-		teamId: team.dbId,
+		measurementScope,
 		isR06User,
 	});
 };
