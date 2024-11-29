@@ -5,7 +5,7 @@ interface ToolbarContext {
 	open: boolean;
 	setOpen: (open: boolean) => void;
 	tool: Tool | undefined;
-	setTool: (tool: Tool) => void;
+	setTool: (tool: Tool | undefined) => void;
 }
 const ToolbarContext = createContext<ToolbarContext | undefined>(undefined);
 

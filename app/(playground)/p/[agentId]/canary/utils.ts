@@ -10,11 +10,15 @@ import type {
 	GraphId,
 	Node,
 	NodeHandleId,
+	NodeId,
 	Text,
 	TextGenerateActionContent,
 	TextGeneration,
 } from "./types";
 
+export function createNodeId(): NodeId {
+	return `nd_${createId()}`;
+}
 export function createArtifactId(): ArtifactId {
 	return `artf_${createId()}`;
 }

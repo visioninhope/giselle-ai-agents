@@ -22,7 +22,8 @@ import {
 	usePropertiesPanel,
 } from "../contexts/properties-panel";
 import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
-import type { Graph, NodeId } from "../types";
+import type { Graph, NodeId, Position } from "../types";
+import { createNodeId } from "../utils";
 import { Edge } from "./edge";
 import { Node } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -194,17 +195,52 @@ function EditorInner() {
 					<Toolbar />
 				</Panel>
 			</ReactFlow>
-			{tool !== undefined && <MouseFollower />}
+			{tool !== undefined && (
+				<FloatingNodePreview
+					onPlaceNode={(position) => {
+						dispatch({
+							type: "addNode",
+							input: {
+								node: {
+									id: createNodeId(),
+									name: `Untitle node - ${graph.nodes.length + 1}`,
+									position,
+									selected: false,
+									type: "variable",
+									content: {
+										type: "text",
+										text: "",
+									},
+								},
+							},
+						});
+						setTool(undefined);
+						setOpen(false);
+					}}
+				/>
+			)}
 		</div>
 	);
 }
 
-const MouseFollower = () => {
+const FloatingNodePreview = ({
+	onPlaceNode,
+}: {
+	onPlaceNode: (position: Position) => void;
+}) => {
 	const mousePosition = useMousePosition();
 
 	return (
 		<>
-			<div className="fixed inset-0 cursor-crosshair pointer-events-auto" />
+			<div
+				className="fixed inset-0 cursor-crosshair pointer-events-auto"
+				onMouseDown={(event) => {
+					onPlaceNode({
+						x: mousePosition.x,
+						y: mousePosition.y,
+					});
+				}}
+			/>
 			<div
 				className="fixed pointer-events-none inset-0"
 				style={{
@@ -213,7 +249,13 @@ const MouseFollower = () => {
 			>
 				<div className="w-[180px]">
 					<Node
-						preview
+						// Folowing props are required for the redner XYFlow Node Component as a preview
+						type="preview"
+						dragging={true}
+						zIndex={1}
+						isConnectable
+						positionAbsoluteX={0}
+						positionAbsoluteY={0}
 						id="nd_preview"
 						data={{
 							node: {
