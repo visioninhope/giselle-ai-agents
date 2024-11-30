@@ -1,69 +1,15 @@
 "use client";
 
 import { starNorth } from "@lucide/lab";
-import * as PopoverPrimitive from "@radix-ui/react-popover";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { BracesIcon, FileIcon, Icon, LetterTextIcon } from "lucide-react";
-import type { ComponentProps } from "react";
+import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import { FileUpIcon, LetterTextIcon } from "lucide-react";
+import { type ComponentProps, forwardRef } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
 import { useToolbar } from "../contexts/toolbar";
 import type { Tool } from "../types";
-import {
-	DropdownMenu,
-	DropdownMenuCheckboxItem,
-	DropdownMenuContent,
-	DropdownMenuRadioGroup,
-	DropdownMenuRadioItem,
-	DropdownMenuTrigger,
-} from "./dropdown-menu";
 
-const Popover = PopoverPrimitive.Root;
-
-function PopoverTrigger({
-	tooltip,
-	...props
-}: ComponentProps<typeof PopoverPrimitive.Trigger> & { tooltip: string }) {
-	return (
-		<TooltipPrimitive.Provider>
-			<TooltipPrimitive.Root>
-				<TooltipPrimitive.Trigger>
-					<PopoverPrimitive.Trigger {...props} />
-				</TooltipPrimitive.Trigger>
-				<TooltipPrimitive.Portal>
-					<TooltipPrimitive.Content
-						sideOffset={18}
-						className="z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-					>
-						{tooltip}
-					</TooltipPrimitive.Content>
-				</TooltipPrimitive.Portal>
-			</TooltipPrimitive.Root>
-		</TooltipPrimitive.Provider>
-	);
-}
-
-function PopoverContent({
-	className,
-	align = "center",
-	sideOffset = 4,
-	...props
-}: ComponentProps<typeof PopoverPrimitive.Content>) {
-	return (
-		<PopoverPrimitive.Portal>
-			<PopoverPrimitive.Content
-				align={align}
-				sideOffset={sideOffset}
-				className="z-50 bg-black-100 border-[0.5px] border-black-70 rounded-[16px] px-[16px] py-[8px] data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-				style={{
-					boxShadow: "0px 0px 2px 0px hsla(0, 0%, 100%, 0.1) inset",
-				}}
-				{...props}
-			/>
-		</PopoverPrimitive.Portal>
-	);
-}
-PopoverContent.displayName = PopoverPrimitive.Content.displayName;
-
+const toggleGroupItemClasses =
+	"hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80";
 export function Toolbar() {
 	const {
 		activeToolbarSection,
@@ -75,137 +21,42 @@ export function Toolbar() {
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<div className="absolute z-0 rounded-[46px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
-				<div className="flex items-center px-[16px] z-10 h-full">
-					<div className="flex gap-[8px]">
-						<DropdownMenu open={activeToolbarSection.main}>
-							<DropdownMenuTrigger onClick={() => setToolbarSection("main")}>
-								{/* <PopoverTrigger tooltip="Variable"> */}
-								<BracesIcon className="text-black-30" />
-								{/* </PopoverTrigger> */}
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="center"
-								sideOffset={18}
-								onEscapeKeyDown={() => {
-									clearToolAndSections();
-								}}
-								onCloseAutoFocus={(e) => {
-									e.preventDefault();
-								}}
-								onPointerDownOutside={() => {
-									clearToolAndSections();
-								}}
-								onFocusOutside={() => {
-									clearToolAndSections();
-								}}
-							>
-								<DropdownMenuRadioGroup
-									value={selectedTool}
-									onValueChange={(value) => {
-										selectTool(value as Tool);
-									}}
-								>
-									<DropdownMenuRadioItem value="addTextNode">
-										<div className="flex items-center gap-[4px]">
-											<LetterTextIcon className={"w-[16px] h-[16px]"} />
-											<p>Text</p>
-										</div>
-									</DropdownMenuRadioItem>
-									<DropdownMenuRadioItem value="addFileNode">
-										<div className="flex items-center gap-[4px]">
-											<FileIcon className={"w-[16px] h-[16px]"} />
-											<p>File</p>
-										</div>
-									</DropdownMenuRadioItem>
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-							{/* <PopoverContent sideOffset={24}>
-								<div className="grid">
-									 <ToolSelectOption
-										tool={{
-											type: "addGiselleNode",
-											giselleNodeBlueprint: textGeneratorBlueprint,
-										}}
-										icon={
-											<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
-										}
-										label="Text Generation"
-									/>
-									<ToolSelectOption
-										tool={{
-											type: "addGiselleNode",
-											giselleNodeBlueprint: webSearchBlueprint,
-										}}
-										icon={
-											<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
-										}
-										label="Web Search"
-								</div>
-							</PopoverContent> */}
-						</DropdownMenu>
-						<DropdownMenu open={activeToolbarSection.star}>
-							<DropdownMenuTrigger onClick={() => setToolbarSection("star")}>
-								<Icon iconNode={starNorth} className="text-black-30" />
-							</DropdownMenuTrigger>
-							<DropdownMenuContent
-								align="center"
-								sideOffset={18}
-								onEscapeKeyDown={() => {
-									clearToolAndSections();
-								}}
-								onPointerDownOutside={() => {
-									clearToolAndSections();
-								}}
-								onFocusOutside={() => {
-									clearToolAndSections();
-								}}
-								onCloseAutoFocus={(e) => {
-									e.preventDefault();
-								}}
-							>
-								<DropdownMenuRadioGroup
-									value={selectedTool}
-									onValueChange={(value) => {
-										selectTool(value as Tool);
-									}}
-								>
-									<DropdownMenuRadioItem value="addTextGenerationNode">
-										<div className="flex items-center gap-[4px]">
-											<TextGenerationIcon
-												className={"w-[16px] h-[16px] fill-current"}
-											/>
-											<p>Text Generator</p>
-										</div>
-									</DropdownMenuRadioItem>
-								</DropdownMenuRadioGroup>
-							</DropdownMenuContent>
-							{/* <PopoverContent sideOffset={24}>
-														<div className="grid">
-															 <ToolSelectOption
-																tool={{
-																	type: "addGiselleNode",
-																	giselleNodeBlueprint: textGeneratorBlueprint,
-																}}
-																icon={
-																	<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
-																}
-																label="Text Generation"
-															/>
-															<ToolSelectOption
-																tool={{
-																	type: "addGiselleNode",
-																	giselleNodeBlueprint: webSearchBlueprint,
-																}}
-																icon={
-																	<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
-																}
-																label="Web Search"
-														</div>
-													</PopoverContent> */}
-						</DropdownMenu>
+			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[8px] py-[8px]">
+				<ToggleGroup.Root
+					type="single"
+					className="flex items-center px-[16px] z-10 h-full"
+					onValueChange={(value) => {
+						selectTool(value as Tool);
+					}}
+				>
+					<div className="flex gap-[12px]">
+						<ToggleGroup.Item
+							value="addTextNode"
+							className={toggleGroupItemClasses}
+							data-state={selectedTool === "addTextNode" ? "on" : "off"}
+						>
+							<LetterTextIcon className={"w-[24px] h-[24px] text-black-30"} />
+						</ToggleGroup.Item>
+						<ToggleGroup.Item
+							value="addFileNode"
+							className={toggleGroupItemClasses}
+							data-state={selectedTool === "addFileNode" ? "on" : "off"}
+						>
+							<FileUpIcon className={"w-[24px] h-[24px] text-black-30 "} />
+						</ToggleGroup.Item>
+						<ToggleGroup.Item
+							value="addTextGenerationNode"
+							className={toggleGroupItemClasses}
+							data-state={
+								selectedTool === "addTextGenerationNode" ? "on" : "off"
+							}
+						>
+							<TextGenerationIcon
+								className={"w-[24px] h-[24px] text-black-30 fill-current"}
+							/>
+						</ToggleGroup.Item>
 					</div>
-				</div>
+				</ToggleGroup.Root>
 			</div>
 		</div>
 	);
