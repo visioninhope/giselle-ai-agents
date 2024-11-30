@@ -198,7 +198,9 @@ function EditorInner() {
 			{tool !== undefined && (
 				<FloatingNodePreview
 					tool={tool}
-					onPlaceNode={(position) => {
+					onPlaceNode={(screenPosition) => {
+						const position =
+							reactFlowInstance.screenToFlowPosition(screenPosition);
 						switch (tool) {
 							case "addTextNode":
 								dispatch({
