@@ -112,6 +112,7 @@ function EditorInner() {
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
+				className="giselle-flow"
 				colorMode="dark"
 				defaultNodes={[]}
 				defaultEdges={[]}
