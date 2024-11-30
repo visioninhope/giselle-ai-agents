@@ -93,6 +93,12 @@ export function Toolbar() {
 								onCloseAutoFocus={(e) => {
 									e.preventDefault();
 								}}
+								onPointerDownOutside={() => {
+									clearToolAndSections();
+								}}
+								onFocusOutside={() => {
+									clearToolAndSections();
+								}}
 							>
 								<DropdownMenuRadioGroup
 									value={selectedTool}
@@ -146,6 +152,12 @@ export function Toolbar() {
 								align="center"
 								sideOffset={18}
 								onEscapeKeyDown={() => {
+									clearToolAndSections();
+								}}
+								onPointerDownOutside={() => {
+									clearToolAndSections();
+								}}
+								onFocusOutside={() => {
 									clearToolAndSections();
 								}}
 								onCloseAutoFocus={(e) => {

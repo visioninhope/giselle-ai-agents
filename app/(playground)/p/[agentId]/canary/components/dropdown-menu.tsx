@@ -18,9 +18,17 @@ export function DropdownMenuContent({
 	children,
 	onEscapeKeyDown,
 	onCloseAutoFocus,
+	onPointerDownOutside,
+	onFocusOutside,
 }: Pick<
 	ComponentProps<typeof DropdownMenuPrimitive.Content>,
-	"children" | "align" | "sideOffset" | "onEscapeKeyDown" | "onCloseAutoFocus"
+	| "children"
+	| "align"
+	| "sideOffset"
+	| "onEscapeKeyDown"
+	| "onCloseAutoFocus"
+	| "onPointerDownOutside"
+	| "onFocusOutside"
 >) {
 	return (
 		<DropdownMenuPrimitive.Portal>
@@ -33,6 +41,8 @@ export function DropdownMenuContent({
 				)}
 				onEscapeKeyDown={onEscapeKeyDown}
 				onCloseAutoFocus={onCloseAutoFocus}
+				onPointerDownOutside={onPointerDownOutside}
+				onFocusOutside={onFocusOutside}
 			>
 				{children}
 			</DropdownMenuPrimitive.Content>
