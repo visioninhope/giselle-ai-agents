@@ -6,6 +6,7 @@ import {
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
+	SelectionMode,
 	useReactFlow,
 	useUpdateNodeInternals,
 } from "@xyflow/react";
@@ -55,8 +56,7 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
-	const { activeToolbarSection, selectedTool, clearToolAndSections } =
-		useToolbar();
+	const { selectedTool, clearToolAndSections } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -177,6 +177,10 @@ function EditorInner() {
 						});
 					});
 				}}
+				panOnScroll
+				selectionOnDrag
+				panOnDrag={false}
+				selectionMode={SelectionMode.Partial}
 			>
 				<Background
 					className="!bg-black-100"
