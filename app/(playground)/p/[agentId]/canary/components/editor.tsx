@@ -25,7 +25,7 @@ import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
 import type { Graph, NodeId, Position, Tool } from "../types";
 import { createNodeId } from "../utils";
 import { Edge } from "./edge";
-import { Node, PreviewNode, getNodePreviewContent } from "./node";
+import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
 
@@ -55,7 +55,8 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
-	const { tool, setOpen, setTool, open } = useToolbar();
+	const { activeToolbarSection, selectedTool, clearToolAndSections } =
+		useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -71,8 +72,8 @@ function EditorInner() {
 					type: "giselleNode",
 					position: node.position,
 					selected: node.selected,
-					selectable: !open,
-					draggable: !open,
+					selectable: !selectedTool,
+					draggable: !selectedTool,
 					data: {
 						node,
 					},
@@ -85,7 +86,7 @@ function EditorInner() {
 		reactFlowInstance.getNodes,
 		reactFlowInstance.setNodes,
 		updateNodeInternals,
-		open,
+		selectedTool,
 	]);
 
 	useEffect(() => {
@@ -98,15 +99,15 @@ function EditorInner() {
 						source: connection.sourceNodeId,
 						target: connection.targetNodeId,
 						targetHandle: connection.targetNodeHandleId,
-						selectable: !open,
-						deletable: !open,
+						selectable: !selectedTool,
+						deletable: !selectedTool,
 						data: {
 							connection,
 						},
 					}) satisfies Edge,
 			),
 		);
-	}, [graph.connections, reactFlowInstance.setEdges, open]);
+	}, [graph.connections, reactFlowInstance.setEdges, selectedTool]);
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
@@ -195,13 +196,13 @@ function EditorInner() {
 					<Toolbar />
 				</Panel>
 			</ReactFlow>
-			{tool !== undefined && (
+			{selectedTool !== undefined && (
 				<FloatingNodePreview
-					tool={tool}
+					tool={selectedTool}
 					onPlaceNode={(screenPosition) => {
 						const position =
 							reactFlowInstance.screenToFlowPosition(screenPosition);
-						switch (tool) {
+						switch (selectedTool) {
 							case "addTextNode":
 								dispatch({
 									type: "addNode",
@@ -237,9 +238,30 @@ function EditorInner() {
 									},
 								});
 								break;
+							case "addTextGenerationNode":
+								dispatch({
+									type: "addNode",
+									input: {
+										node: {
+											id: createNodeId(),
+											name: `Untitle node - ${graph.nodes.length + 1}`,
+											position,
+											selected: false,
+											type: "action",
+											content: {
+												type: "textGeneration",
+												llm: "anthropic:claude-3-5-sonnet-latest",
+												temperature: 0.7,
+												topP: 1,
+												instruction: "Write a short story about a cat",
+												sources: [],
+											},
+										},
+									},
+								});
+								break;
 						}
-						setTool(undefined);
-						setOpen(false);
+						clearToolAndSections();
 					}}
 				/>
 			)}

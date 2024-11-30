@@ -1,9 +1,11 @@
 "use client";
 
+import { starNorth } from "@lucide/lab";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { BracesIcon, FileIcon, LetterTextIcon } from "lucide-react";
+import { BracesIcon, FileIcon, Icon, LetterTextIcon } from "lucide-react";
 import type { ComponentProps } from "react";
+import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
 import { useToolbar } from "../contexts/toolbar";
 import type { Tool } from "../types";
 import {
@@ -63,15 +65,21 @@ function PopoverContent({
 PopoverContent.displayName = PopoverPrimitive.Content.displayName;
 
 export function Toolbar() {
-	const { open, setOpen, tool, setTool } = useToolbar();
+	const {
+		activeToolbarSection,
+		setToolbarSection,
+		clearToolAndSections,
+		selectedTool,
+		selectTool,
+	} = useToolbar();
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<div className="absolute z-0 rounded-[46px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center h-[46px] px-[8px]">
-				<div className="flex items-center px-2 z-10 h-full">
-					<div className="flex gap-[4px]">
-						<DropdownMenu open={open}>
-							<DropdownMenuTrigger onClick={() => setOpen(true)}>
+				<div className="flex items-center px-[16px] z-10 h-full">
+					<div className="flex gap-[8px]">
+						<DropdownMenu open={activeToolbarSection.main}>
+							<DropdownMenuTrigger onClick={() => setToolbarSection("main")}>
 								{/* <PopoverTrigger tooltip="Variable"> */}
 								<BracesIcon className="text-black-30" />
 								{/* </PopoverTrigger> */}
@@ -80,17 +88,16 @@ export function Toolbar() {
 								align="center"
 								sideOffset={18}
 								onEscapeKeyDown={() => {
-									setOpen(false);
-									setTool(undefined);
+									clearToolAndSections();
 								}}
 								onCloseAutoFocus={(e) => {
 									e.preventDefault();
 								}}
 							>
 								<DropdownMenuRadioGroup
-									value={tool}
+									value={selectedTool}
 									onValueChange={(value) => {
-										setTool(value as Tool);
+										selectTool(value as Tool);
 									}}
 								>
 									<DropdownMenuRadioItem value="addTextNode">
@@ -130,6 +137,60 @@ export function Toolbar() {
 										label="Web Search"
 								</div>
 							</PopoverContent> */}
+						</DropdownMenu>
+						<DropdownMenu open={activeToolbarSection.star}>
+							<DropdownMenuTrigger onClick={() => setToolbarSection("star")}>
+								<Icon iconNode={starNorth} className="text-black-30" />
+							</DropdownMenuTrigger>
+							<DropdownMenuContent
+								align="center"
+								sideOffset={18}
+								onEscapeKeyDown={() => {
+									clearToolAndSections();
+								}}
+								onCloseAutoFocus={(e) => {
+									e.preventDefault();
+								}}
+							>
+								<DropdownMenuRadioGroup
+									value={selectedTool}
+									onValueChange={(value) => {
+										selectTool(value as Tool);
+									}}
+								>
+									<DropdownMenuRadioItem value="addTextGenerationNode">
+										<div className="flex items-center gap-[4px]">
+											<TextGenerationIcon
+												className={"w-[16px] h-[16px] fill-current"}
+											/>
+											<p>Text Generator</p>
+										</div>
+									</DropdownMenuRadioItem>
+								</DropdownMenuRadioGroup>
+							</DropdownMenuContent>
+							{/* <PopoverContent sideOffset={24}>
+														<div className="grid">
+															 <ToolSelectOption
+																tool={{
+																	type: "addGiselleNode",
+																	giselleNodeBlueprint: textGeneratorBlueprint,
+																}}
+																icon={
+																	<TextGenerationIcon className="fill-black-30 w-[16px] h-[16px]" />
+																}
+																label="Text Generation"
+															/>
+															<ToolSelectOption
+																tool={{
+																	type: "addGiselleNode",
+																	giselleNodeBlueprint: webSearchBlueprint,
+																}}
+																icon={
+																	<GlobeIcon className="fill-black-30 w-[16px] h-[16px]" />
+																}
+																label="Web Search"
+														</div>
+													</PopoverContent> */}
 						</DropdownMenu>
 					</div>
 				</div>

@@ -156,4 +156,4 @@ export interface Graph {
 	artifacts: Artifact[];
 }
 
-export type Tool = "addTextNode" | "addFileNode";
+export type Tool = "addTextNode" | "addFileNode" | "addTextGenerationNode";

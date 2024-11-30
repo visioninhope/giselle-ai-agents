@@ -81,6 +81,35 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 					}}
 				/>
 			);
+		case "addTextGenerationNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "Text Generator",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "action",
+							content: {
+								type: "textGeneration",
+								llm: "anthropic:claude-3-5-sonnet-latest",
+								temperature: 0.7,
+								topP: 1,
+								instruction: "",
+								sources: [],
+							},
+						},
+					}}
+				/>
+			);
 	}
 }
 
