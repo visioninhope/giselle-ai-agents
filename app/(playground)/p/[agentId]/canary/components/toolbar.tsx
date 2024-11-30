@@ -1,23 +1,46 @@
 "use client";
 
-import { starNorth } from "@lucide/lab";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { FileUpIcon, LetterTextIcon } from "lucide-react";
 import { type ComponentProps, forwardRef } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
 import { useToolbar } from "../contexts/toolbar";
 import type { Tool } from "../types";
 
-const toggleGroupItemClasses =
-	"hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80";
+function ToggleGroupItem({
+	tooltip,
+	value,
+
+	...props
+}: ComponentProps<typeof ToggleGroup.Item> & { tooltip: string }) {
+	const { selectedTool } = useToolbar();
+	return (
+		<TooltipPrimitive.Provider>
+			<TooltipPrimitive.Root>
+				<TooltipPrimitive.Trigger>
+					<ToggleGroup.Item
+						value={value}
+						className="hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80"
+						data-state={selectedTool === value ? "on" : "off"}
+						{...props}
+					/>
+				</TooltipPrimitive.Trigger>
+				<TooltipPrimitive.Portal>
+					<TooltipPrimitive.Content
+						sideOffset={18}
+						className="z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+					>
+						{tooltip}
+					</TooltipPrimitive.Content>
+				</TooltipPrimitive.Portal>
+			</TooltipPrimitive.Root>
+		</TooltipPrimitive.Provider>
+	);
+}
+
 export function Toolbar() {
-	const {
-		activeToolbarSection,
-		setToolbarSection,
-		clearToolAndSections,
-		selectedTool,
-		selectTool,
-	} = useToolbar();
+	const { selectTool } = useToolbar();
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<div className="absolute z-0 rounded-[46px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -30,31 +53,20 @@ export function Toolbar() {
 					}}
 				>
 					<div className="flex gap-[12px]">
-						<ToggleGroup.Item
-							value="addTextNode"
-							className={toggleGroupItemClasses}
-							data-state={selectedTool === "addTextNode" ? "on" : "off"}
-						>
+						<ToggleGroupItem value="addTextNode" tooltip="Text">
 							<LetterTextIcon className={"w-[24px] h-[24px] text-black-30"} />
-						</ToggleGroup.Item>
-						<ToggleGroup.Item
-							value="addFileNode"
-							className={toggleGroupItemClasses}
-							data-state={selectedTool === "addFileNode" ? "on" : "off"}
-						>
+						</ToggleGroupItem>
+						<ToggleGroupItem value="addFileNode" tooltip="File">
 							<FileUpIcon className={"w-[24px] h-[24px] text-black-30 "} />
-						</ToggleGroup.Item>
-						<ToggleGroup.Item
+						</ToggleGroupItem>
+						<ToggleGroupItem
 							value="addTextGenerationNode"
-							className={toggleGroupItemClasses}
-							data-state={
-								selectedTool === "addTextGenerationNode" ? "on" : "off"
-							}
+							tooltip="Text Generator"
 						>
 							<TextGenerationIcon
 								className={"w-[24px] h-[24px] text-black-30 fill-current"}
 							/>
-						</ToggleGroup.Item>
+						</ToggleGroupItem>
 					</div>
 				</ToggleGroup.Root>
 			</div>
