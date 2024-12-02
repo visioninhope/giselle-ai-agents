@@ -31,7 +31,7 @@
 		"@opentelemetry/resources": "^1.25.1",
 		"@opentelemetry/sdk-metrics": "~1.24.1",
 		"@opentelemetry/sdk-node": "~0.51.1",
-		"@opentelemetry/semantic-conventions": "^1.26.0",
+		"@opentelemetry/semantic-conventions": "1.28.0",
 		"@paralleldrive/cuid2": "2.2.2",
 		"@radix-ui/react-accordion": "^1.2.0",
 		"@radix-ui/react-dialog": "^1.1.1",

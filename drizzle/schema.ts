@@ -130,6 +130,7 @@ export const agents = pgTable("agents", {
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
 	name: text("name"),
+	graphUrl: text("graph_url"), // // TODO: add notNull constrain when new architecture released
 	graphv2: jsonb("graphv2").$type<Graph>().notNull(),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()

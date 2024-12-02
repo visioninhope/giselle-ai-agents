@@ -3,7 +3,7 @@ interface Image {
 	description: string;
 }
 
-interface WebSearchResult {
+export interface WebSearchResult {
 	title: string;
 	url: string;
 	content: string;
@@ -69,7 +69,7 @@ function isQueryResponse(obj: unknown): obj is QueryResponse {
 	return true;
 }
 
-export async function search(query: string) {
+export async function search(query: string): Promise<WebSearchResult[]> {
 	if (process.env.TAVILY_API_KEY === undefined) {
 		throw new Error("TAVILY_API_KEY is not defined");
 	}

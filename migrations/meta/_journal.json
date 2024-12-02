@@ -92,6 +92,13 @@
 			"when": 1733113434236,
 			"tag": "0012_military_talisman",
 			"breakpoints": true
+		},
+		{
+			"idx": 13,
+			"version": "7",
+			"when": 1733117334658,
+			"tag": "0013_nosy_whiplash",
+			"breakpoints": true
 		}
 	]
 }
