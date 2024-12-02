@@ -11,7 +11,12 @@ import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import type { Graph } from "./types";
-import { buildGraphPath, createGraphId, pathJoin } from "./utils";
+import {
+	buildGraphFolderPath,
+	buildGraphPath,
+	createGraphId,
+	pathJoin,
+} from "./utils";
 
 // This page is experimental. it requires PlaygroundV2Flag to show this page
 export default async function Page({
@@ -50,7 +55,7 @@ export default async function Page({
 			})
 			.where(eq(agents.id, agentId));
 		const blobList = await list({
-			prefix: buildGraphPath(graph.id),
+			prefix: buildGraphFolderPath(graph.id),
 		});
 
 		const oldBlobUrls = blobList.blobs

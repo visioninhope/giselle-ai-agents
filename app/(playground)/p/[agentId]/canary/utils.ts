@@ -158,6 +158,9 @@ export function initGraph(): Graph {
 	};
 }
 
+export function buildGraphFolderPath(graphId: GraphId) {
+	return pathJoin(vercelBlobGraphFolder, graphId);
+}
 export function buildGraphPath(graphId: GraphId) {
-	return pathJoin(vercelBlobGraphFolder, graphId, "graph.json");
+	return pathJoin(buildGraphFolderPath(graphId), "graph.json");
 }
