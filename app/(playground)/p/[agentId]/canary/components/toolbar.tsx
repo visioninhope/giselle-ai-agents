@@ -22,7 +22,7 @@ function ToggleGroupItem({
 					<ToggleGroup.Item
 						value={value}
 						className="hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80 focus:outline-none "
-						data-state={selectedTool === value ? "on" : "off"}
+						data-state={selectedTool?.action === value ? "on" : "off"}
 						{...props}
 					/>
 				</TooltipPrimitive.Trigger>
