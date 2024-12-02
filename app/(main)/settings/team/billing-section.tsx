@@ -8,14 +8,15 @@ import {
 	teams,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { stripe } from "@/services/external/stripe";
-import { and, eq, sql } from "drizzle-orm";
+import { manageBilling } from "@/services/teams/actions/manage-billing";
+import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
+import { and, eq } from "drizzle-orm";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 
 export default async function BillingSection() {
 	const team = await fetchTeam();
-	const isProPlan = team.subscriptionId != null || team.isInternalTeam;
+	const isProPlan = team.subscriptionId != null || team.type === "internal";
 
 	return (
 		<Card title="Billing">
@@ -26,11 +27,14 @@ export default async function BillingSection() {
 						{isProPlan ? "Pro" : "Free"} Plan
 					</p>
 				</div>
-				{!team.isInternalTeam && (
+				{team.type !== "internal" && (
 					<Suspense
 						fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 					>
-						<BillingButton subscriptionId={team.subscriptionId} />
+						<BillingButton
+							subscriptionId={team.subscriptionId}
+							teamDbId={team.dbid}
+						/>
 					</Suspense>
 				)}
 			</div>
@@ -40,18 +44,25 @@ export default async function BillingSection() {
 
 type BillingButtonProps = {
 	subscriptionId: string | null;
+	teamDbId: number;
 };
 
-async function BillingButton({ subscriptionId }: BillingButtonProps) {
+async function BillingButton({ subscriptionId, teamDbId }: BillingButtonProps) {
+	const upgrateTeamWithTeamDbId = upgradeTeam.bind(null, teamDbId);
 	if (subscriptionId == null) {
-		return <Button className="w-fit">Upgrade Plan</Button>;
+		return (
+			<Button className="w-fit" formAction={upgrateTeamWithTeamDbId}>
+				Upgrade Plan
+			</Button>
+		);
 	}
 
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-	const customerId = subscription.customer;
-
+	const manageBillingWithSubscriptionId = manageBilling.bind(
+		null,
+		subscriptionId,
+	);
 	return (
-		<Button className="w-fit" formAction={() => console.log(customerId)}>
+		<Button className="w-fit" formAction={manageBillingWithSubscriptionId}>
 			Manage Billing
 		</Button>
 	);
@@ -65,8 +76,7 @@ async function fetchTeam() {
 		.select({
 			dbid: teams.dbId,
 			name: teams.name,
-			// isInternalTeam: teams.isInternalTeam,
-			isInternalTeam: sql<boolean>`false`,
+			type: teams.type,
 			subscriptionId: subscriptions.id,
 		})
 		.from(teams)
