@@ -106,6 +106,9 @@
 .giselle-flow .react-flow__pane.selection {
 	cursor: default;
 }
+.giselle-flow[data-floating-node="true"] .react-flow__pane.selection {
+	cursor: crosshair;
+}
 .giselle-flow .react-flow__node.selectable {
 	cursor: default;
 }

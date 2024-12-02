@@ -113,6 +113,7 @@ function EditorInner() {
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
 				className="giselle-flow"
+				data-floating-node={selectedTool !== undefined}
 				colorMode="dark"
 				defaultNodes={[]}
 				defaultEdges={[]}
@@ -200,76 +201,76 @@ function EditorInner() {
 				<Panel position={"bottom-center"}>
 					<Toolbar />
 				</Panel>
+				{selectedTool !== undefined && (
+					<FloatingNodePreview
+						tool={selectedTool}
+						onPlaceNode={(screenPosition) => {
+							const position =
+								reactFlowInstance.screenToFlowPosition(screenPosition);
+							switch (selectedTool) {
+								case "addTextNode":
+									dispatch({
+										type: "addNode",
+										input: {
+											node: {
+												id: createNodeId(),
+												name: `Untitle node - ${graph.nodes.length + 1}`,
+												position,
+												selected: false,
+												type: "variable",
+												content: {
+													type: "text",
+													text: "",
+												},
+											},
+										},
+									});
+									break;
+								case "addFileNode":
+									dispatch({
+										type: "addNode",
+										input: {
+											node: {
+												id: createNodeId(),
+												name: `Untitle node - ${graph.nodes.length + 1}`,
+												position,
+												selected: false,
+												type: "variable",
+												content: {
+													type: "file",
+												},
+											},
+										},
+									});
+									break;
+								case "addTextGenerationNode":
+									dispatch({
+										type: "addNode",
+										input: {
+											node: {
+												id: createNodeId(),
+												name: `Untitle node - ${graph.nodes.length + 1}`,
+												position,
+												selected: false,
+												type: "action",
+												content: {
+													type: "textGeneration",
+													llm: "anthropic:claude-3-5-sonnet-latest",
+													temperature: 0.7,
+													topP: 1,
+													instruction: "Write a short story about a cat",
+													sources: [],
+												},
+											},
+										},
+									});
+									break;
+							}
+							clearToolAndSections();
+						}}
+					/>
+				)}
 			</ReactFlow>
-			{selectedTool !== undefined && (
-				<FloatingNodePreview
-					tool={selectedTool}
-					onPlaceNode={(screenPosition) => {
-						const position =
-							reactFlowInstance.screenToFlowPosition(screenPosition);
-						switch (selectedTool) {
-							case "addTextNode":
-								dispatch({
-									type: "addNode",
-									input: {
-										node: {
-											id: createNodeId(),
-											name: `Untitle node - ${graph.nodes.length + 1}`,
-											position,
-											selected: false,
-											type: "variable",
-											content: {
-												type: "text",
-												text: "",
-											},
-										},
-									},
-								});
-								break;
-							case "addFileNode":
-								dispatch({
-									type: "addNode",
-									input: {
-										node: {
-											id: createNodeId(),
-											name: `Untitle node - ${graph.nodes.length + 1}`,
-											position,
-											selected: false,
-											type: "variable",
-											content: {
-												type: "file",
-											},
-										},
-									},
-								});
-								break;
-							case "addTextGenerationNode":
-								dispatch({
-									type: "addNode",
-									input: {
-										node: {
-											id: createNodeId(),
-											name: `Untitle node - ${graph.nodes.length + 1}`,
-											position,
-											selected: false,
-											type: "action",
-											content: {
-												type: "textGeneration",
-												llm: "anthropic:claude-3-5-sonnet-latest",
-												temperature: 0.7,
-												topP: 1,
-												instruction: "Write a short story about a cat",
-												sources: [],
-											},
-										},
-									},
-								});
-								break;
-						}
-						clearToolAndSections();
-					}}
-				/>
-			)}
 		</div>
 	);
 }
@@ -285,15 +286,6 @@ const FloatingNodePreview = ({
 
 	return (
 		<>
-			<div
-				className="fixed inset-0 cursor-crosshair pointer-events-auto"
-				onMouseDown={(event) => {
-					onPlaceNode({
-						x: mousePosition.x,
-						y: mousePosition.y,
-					});
-				}}
-			/>
 			<div
 				className="fixed pointer-events-none inset-0"
 				style={{

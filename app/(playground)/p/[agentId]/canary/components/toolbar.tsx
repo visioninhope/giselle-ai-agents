@@ -2,7 +2,7 @@
 
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import * as TooltipPrimitive from "@radix-ui/react-tooltip";
-import { FileUpIcon, LetterTextIcon } from "lucide-react";
+import { FileUpIcon, LetterTextIcon, MousePointer2Icon } from "lucide-react";
 import { type ComponentProps, forwardRef } from "react";
 import { TextGenerationIcon } from "../../beta-proto/components/icons/text-generation";
 import { useToolbar } from "../contexts/toolbar";
@@ -18,10 +18,10 @@ function ToggleGroupItem({
 	return (
 		<TooltipPrimitive.Provider>
 			<TooltipPrimitive.Root>
-				<TooltipPrimitive.Trigger>
+				<TooltipPrimitive.Trigger asChild>
 					<ToggleGroup.Item
 						value={value}
-						className="hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80"
+						className="hover:bg-white/20 p-[4px] rounded-[4px] data-[state=on]:bg-black-80 focus:outline-none "
 						data-state={selectedTool === value ? "on" : "off"}
 						{...props}
 					/>
@@ -51,8 +51,18 @@ export function Toolbar() {
 					onValueChange={(value) => {
 						selectTool(value as Tool);
 					}}
+					onKeyUp={(key) => {
+						if (key.code === "Escape") {
+							selectTool("move");
+						}
+					}}
 				>
 					<div className="flex gap-[12px]">
+						<ToggleGroupItem value="move" tooltip="Move">
+							<MousePointer2Icon
+								className={"w-[24px] h-[24px] text-black-30"}
+							/>
+						</ToggleGroupItem>
 						<ToggleGroupItem value="addTextNode" tooltip="Text">
 							<LetterTextIcon className={"w-[24px] h-[24px] text-black-30"} />
 						</ToggleGroupItem>
