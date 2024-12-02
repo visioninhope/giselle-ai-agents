@@ -1,6 +1,6 @@
 import { agents, db } from "@/drizzle";
 import { playgroundV2Flag } from "@/flags";
-import { del, list, put } from "@vercel/blob";
+import { del, list } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -12,12 +12,7 @@ import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import type { Graph } from "./types";
-import {
-	buildGraphFolderPath,
-	buildGraphPath,
-	createGraphId,
-	pathJoin,
-} from "./utils";
+import { buildGraphFolderPath } from "./utils";
 
 // This page is experimental. it requires PlaygroundV2Flag to show this page
 export default async function Page({
