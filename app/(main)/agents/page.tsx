@@ -1,8 +1,10 @@
+import { playgroundV2Flag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import { createAgent, getAgents } from "@/services/agents";
 import { CreateAgentButton } from "@/services/agents/components";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
+import { AgentListV2 } from "./v2";
 
 type AgentListProps = {
 	userId: string;
@@ -21,6 +23,10 @@ async function AgentList(props: AgentListProps) {
 	);
 }
 export default async function AgentListPage() {
+	const enableV2 = await playgroundV2Flag();
+	if (enableV2) {
+		return <AgentListV2 />;
+	}
 	const user = await getUser();
 	async function createAgentAction() {
 		"use server";
