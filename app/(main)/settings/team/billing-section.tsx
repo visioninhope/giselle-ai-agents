@@ -7,6 +7,7 @@ import {
 	teamMemberships,
 	teams,
 } from "@/drizzle";
+import { proTeamPlanFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
@@ -18,6 +19,7 @@ export default async function BillingSection() {
 	const team = await fetchTeam();
 	const isProPlan = team.subscriptionId != null || team.type === "internal";
 
+	const proTeamPlan = await proTeamPlanFlag();
 	return (
 		<Card title="Billing">
 			<div className="flex items-center justify-between">
@@ -27,7 +29,7 @@ export default async function BillingSection() {
 						{isProPlan ? "Pro" : "Free"} Plan
 					</p>
 				</div>
-				{team.type !== "internal" && (
+				{proTeamPlan && team.type !== "internal" && (
 					<Suspense
 						fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 					>
