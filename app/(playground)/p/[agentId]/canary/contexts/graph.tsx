@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	type ReactNode,
 	createContext,
@@ -178,11 +180,11 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 export function GraphContextProvider({
 	children,
 	defaultGraph,
-	onPersist,
+	onPersistAction,
 }: {
 	children: ReactNode;
 	defaultGraph: Graph;
-	onPersist: (graph: Graph) => Promise<void>;
+	onPersistAction: (graph: Graph) => Promise<void>;
 }) {
 	const graphRef = useRef(defaultGraph);
 	const [graph, setGraph] = useState(graphRef.current);
@@ -191,11 +193,11 @@ export function GraphContextProvider({
 	const persist = useCallback(async () => {
 		isPendingPersistRef.current = false;
 		try {
-			await onPersist(graphRef.current);
+			await onPersistAction(graphRef.current);
 		} catch (error) {
 			console.error("Failed to persist graph:", error);
 		}
-	}, [onPersist]);
+	}, [onPersistAction]);
 
 	const flush = useCallback(async () => {
 		if (persistTimeoutRef.current) {

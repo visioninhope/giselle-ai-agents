@@ -2,6 +2,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { createId } from "@paralleldrive/cuid2";
 import type { LanguageModelV1 } from "ai";
+import { vercelBlobGraphFolder } from "./constants";
 import type {
 	ArtifactId,
 	ConnectionId,
@@ -155,4 +156,8 @@ export function initGraph(): Graph {
 		connections: [],
 		artifacts: [],
 	};
+}
+
+export function buildGraphPath(graphId: GraphId) {
+	return pathJoin(vercelBlobGraphFolder, graphId, "graph.json");
 }
