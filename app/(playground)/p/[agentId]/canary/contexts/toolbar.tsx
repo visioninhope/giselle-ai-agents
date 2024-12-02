@@ -5,8 +5,6 @@ type ToolbarSection = "main" | "star";
 type ToolbarVisibility = Record<ToolbarSection, boolean>;
 
 interface ToolbarContext {
-	activeToolbarSection: ToolbarVisibility;
-	setToolbarSection: (section: ToolbarSection) => void;
 	selectedTool: Tool | undefined;
 	selectTool: (tool: Tool["action"] | undefined) => void;
 	clearToolAndSections: () => void;
@@ -78,8 +76,6 @@ export function ToolbarContextProvider({
 	return (
 		<ToolbarContext.Provider
 			value={{
-				activeToolbarSection,
-				setToolbarSection,
 				selectedTool,
 				selectTool,
 				clearToolAndSections,
