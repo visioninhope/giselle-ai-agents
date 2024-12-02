@@ -2,16 +2,17 @@ import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
 import { Skeleton } from "@/components/ui/skeleton";
 import { googleOauthFlag } from "@/flags";
-import { getUser } from "@/lib/supabase";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "../components/card";
+import { getAccountInfo } from "./actions";
 import { GitHubAuthentication } from "./github-authentication";
 import { GoogleAuthentication } from "./google-authentication";
 
 export default async function AccountSettingPage() {
-	const user = await getUser();
+	const { displayName, email } = await getAccountInfo();
 	const displayGoogleOauth = await googleOauthFlag();
+
 	return (
 		<div className="grid gap-[16px]">
 			<h3
@@ -21,12 +22,19 @@ export default async function AccountSettingPage() {
 				Account
 			</h3>
 			<Card title="Account Information">
-				<div className="max-w-[600px] mb-[4px]">
+				<div className="max-w-[600px] grid gap-[16px]">
+					<Field
+						label="Display Name"
+						name="displayName"
+						type="text"
+						value={displayName ?? "No name"}
+						disabled
+					/>
 					<Field
 						label="Email"
 						name="email"
 						type="email"
-						value={user.email}
+						value={email ?? "No email"}
 						disabled
 					/>
 				</div>

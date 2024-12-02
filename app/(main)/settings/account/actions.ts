@@ -2,8 +2,10 @@
 
 import type { Provider } from "@/app/(auth)/lib";
 import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
+import { db, supabaseUserMappings, users } from "@/drizzle";
 import { logger } from "@/lib/logger";
 import { createClient, getUser } from "@/lib/supabase";
+import { eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
 
 async function connectIdentity(provider: Provider) {
@@ -102,4 +104,19 @@ export async function disconnectGoogleIdentity() {
 
 export async function disconnectGitHubIdentity() {
 	return disconnectIdentity("github");
+}
+
+export async function getAccountInfo() {
+	const supabaseUser = await getUser();
+
+	const _users = await db
+		.select({ displayName: users.displayName, email: users.email })
+		.from(users)
+		.innerJoin(
+			supabaseUserMappings,
+			eq(users.dbId, supabaseUserMappings.userDbId),
+		)
+		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+
+	return _users[0];
 }
