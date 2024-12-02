@@ -58,10 +58,15 @@ export default async function Page({
 		if (oldBlobUrls.length > 0) {
 			await del(oldBlobUrls);
 		}
+		return url;
 	}
 
 	return (
-		<GraphContextProvider defaultGraph={graph} onPersistAction={persistGraph}>
+		<GraphContextProvider
+			defaultGraph={graph}
+			onPersistAction={persistGraph}
+			defaultGraphUrl={agent.graphUrl}
+		>
 			<PropertiesPanelProvider>
 				<ReactFlowProvider>
 					<ToolbarContextProvider>

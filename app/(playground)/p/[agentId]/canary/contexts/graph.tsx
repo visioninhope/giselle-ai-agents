@@ -113,8 +113,13 @@ function applyActions(
 
 interface GraphContextValue {
 	graph: Graph;
+	graphUrl: string;
 	dispatch: (action: GraphActionOrActions) => void;
-	flush: () => Promise<void>;
+	/**
+	 * Persists the current graph state to the server immediately.
+	 * Returns the new graph URL.
+	 */
+	flush: () => Promise<string>;
 }
 const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 
@@ -180,31 +185,41 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 export function GraphContextProvider({
 	children,
 	defaultGraph,
+	defaultGraphUrl,
 	onPersistAction,
 }: {
 	children: ReactNode;
 	defaultGraph: Graph;
-	onPersistAction: (graph: Graph) => Promise<void>;
+	defaultGraphUrl: string;
+	/**
+	 * Persists the graph to the server.
+	 * Returns the new graph URL.
+	 */
+	onPersistAction: (graph: Graph) => Promise<string>;
 }) {
 	const graphRef = useRef(defaultGraph);
 	const [graph, setGraph] = useState(graphRef.current);
+	const [graphUrl, setGraphUrl] = useState(defaultGraphUrl);
 	const persistTimeoutRef = useRef<Timer | null>(null);
 	const isPendingPersistRef = useRef(false);
 	const persist = useCallback(async () => {
 		isPendingPersistRef.current = false;
 		try {
-			await onPersistAction(graphRef.current);
+			const newGraphUrl = await onPersistAction(graphRef.current);
+			setGraphUrl(newGraphUrl);
+			return newGraphUrl;
 		} catch (error) {
 			console.error("Failed to persist graph:", error);
+			return graphUrl;
 		}
-	}, [onPersistAction]);
+	}, [onPersistAction, graphUrl]);
 
 	const flush = useCallback(async () => {
 		if (persistTimeoutRef.current) {
 			clearTimeout(persistTimeoutRef.current);
 			persistTimeoutRef.current = null;
 		}
-		await persist();
+		return await persist();
 	}, [persist]);
 
 	const dispatch = useCallback(
@@ -223,7 +238,7 @@ export function GraphContextProvider({
 		[persist],
 	);
 	return (
-		<GraphContext.Provider value={{ graph, dispatch, flush }}>
+		<GraphContext.Provider value={{ graph, dispatch, flush, graphUrl }}>
 			{children}
 		</GraphContext.Provider>
 	);

@@ -260,7 +260,7 @@ function DialogFooter(props: HTMLAttributes<HTMLDivElement>) {
 DialogFooter.displayName = "DialogHeader";
 
 export function PropertiesPanel() {
-	const { graph, dispatch } = useGraph();
+	const { graph, dispatch, flush } = useGraph();
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	return (
@@ -350,8 +350,10 @@ export function PropertiesPanel() {
 												},
 											});
 											setTab("Result");
+											const latestGraphUrl = await flush();
+											console.log(latestGraphUrl);
 											const stream = await action(
-												"https://aj9qps90wwygtg5h.public.blob.vercel-storage.com/canary/mockData-sf23dFVJkNoaXv3Di56N40Pt83JBSr.json",
+												latestGraphUrl,
 												selectedNode.id,
 											);
 
