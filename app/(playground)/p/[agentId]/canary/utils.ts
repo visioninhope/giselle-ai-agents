@@ -7,6 +7,7 @@ import type {
 	ConnectionId,
 	File,
 	FileId,
+	Graph,
 	GraphId,
 	Node,
 	NodeHandleId,
@@ -145,4 +146,13 @@ export function pathJoin(...parts: string[]): string {
 	});
 
 	return processedParts.join("/");
+}
+
+export function initGraph(): Graph {
+	return {
+		id: createGraphId(),
+		nodes: [],
+		connections: [],
+		artifacts: [],
+	};
 }
