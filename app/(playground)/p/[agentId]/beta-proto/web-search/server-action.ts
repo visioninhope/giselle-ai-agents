@@ -1,12 +1,13 @@
 "use server";
 
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
+import { createLogger, withMeasurement } from "@/lib/opentelemetry";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
-import { metrics } from "@opentelemetry/api";
 import { createId } from "@paralleldrive/cuid2";
 import { put } from "@vercel/blob";
+import { waitUntil } from "@vercel/functions";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import Langfuse from "langfuse";
@@ -14,10 +15,10 @@ import type { GiselleNode } from "../giselle-node/types";
 import type { SourceIndex } from "../source/types";
 import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
+import type { FirecrawlResponse } from "./firecrawl";
 import { webSearchSchema } from "./schema";
-import { search } from "./tavily";
+import { type WebSearchResult, search } from "./tavily";
 import {
-	type FailedWebSearchItemReference,
 	type WebSearch,
 	type WebSearchItemReference,
 	webSearchItemStatus,
@@ -34,11 +35,13 @@ interface GenerateWebSearchStreamInputs {
 export async function generateWebSearchStream(
 	inputs: GenerateWebSearchStreamInputs,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
 
+	const logger = createLogger("web-search");
 	const sources = await sourceIndexesToSources({
 		input: {
 			agentId: inputs.agentId,
@@ -69,6 +72,7 @@ ${sourcesToText(sources)}
 	(async () => {
 		const model = "gpt-4o-mini";
 		const generation = trace.generation({
+			name: "generate-search-keywords",
 			input: inputs.userPrompt,
 			model: langfuseModel(model),
 		});
@@ -78,20 +82,23 @@ ${sourcesToText(sources)}
 			prompt: inputs.userPrompt,
 			schema: webSearchSchema,
 			onFinish: async (result) => {
-				const meter = metrics.getMeter("OpenAI");
-				const tokenCounter = meter.createCounter("token_consumed", {
-					description: "Number of OpenAI API tokens consumed by each request",
-				});
-				const subscriptionId = await getUserSubscriptionId();
+				const duration = performance.now() - startTime;
+				const measurementScope = await getCurrentMeasurementScope();
 				const isR06User = await isRoute06User();
-				tokenCounter.add(result.usage.totalTokens, {
-					subscriptionId,
-					isR06User,
-				});
 				generation.end({
 					output: result,
 				});
-				await lf.shutdownAsync();
+
+				logger.info(
+					{
+						externalServiceName: "openai",
+						tokenConsumed: result.usage.totalTokens,
+						duration,
+						measurementScope,
+						isR06User,
+					},
+					"[openai] search keywords generated",
+				);
 			},
 		});
 		for await (const partialObject of partialObjectStream) {
@@ -100,11 +107,26 @@ ${sourcesToText(sources)}
 
 		const result = await object;
 
+		const webSearchSpan = trace.span({
+			name: "web-search",
+			input: {
+				searchKeywords: result.keywords,
+			},
+		});
+
 		const searchResults = await Promise.all(
-			result.keywords.map((keyword) => search(keyword)),
+			result.keywords.map((keyword) =>
+				withMeasurement<WebSearchResult[]>(() => search(keyword), "tavily"),
+			),
 		)
-			.then((results) => [...new Set(results.flat())])
+			.then((results) => [...new Set(results.flat())] as WebSearchResult[])
 			.then((results) => results.sort((a, b) => b.score - a.score).slice(0, 2));
+
+		webSearchSpan.end({
+			output: {
+				searchResults: searchResults,
+			},
+		});
 
 		const webSearch: WebSearch = {
 			id: `wbs_${createId()}`,
@@ -151,13 +173,25 @@ ${sourcesToText(sources)}
 			);
 		}
 
+		const webScrapeSpan = trace.span({
+			name: "web-scrape",
+			input: {
+				scrapeItems: chunkedArray,
+			},
+		});
+
 		await Promise.all(
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
 					try {
-						const scrapeResponse = await app.scrapeUrl(webSearchItem.url, {
-							formats: ["markdown"],
-						});
+						const scrapeResponse = await withMeasurement<FirecrawlResponse>(
+							() =>
+								app.scrapeUrl(webSearchItem.url, {
+									formats: ["markdown"],
+								}),
+							"firecrawl",
+						);
+
 						if (scrapeResponse.success) {
 							const blob = await put(
 								`webSearch/${webSearchItem.id}.md`,
@@ -206,6 +240,14 @@ ${sourcesToText(sources)}
 				}
 			}),
 		);
+
+		webScrapeSpan.end({
+			output: {
+				items: mutableItems,
+			},
+		});
+		await lf.shutdownAsync();
+
 		stream.update({
 			...result,
 			webSearch: {
@@ -218,5 +260,13 @@ ${sourcesToText(sources)}
 		stream.done();
 	})();
 
+	waitUntil(
+		new Promise((resolve) =>
+			setTimeout(
+				resolve,
+				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000"),
+			),
+		),
+	); // wait until telemetry sent
 	return { object: stream.value };
 }

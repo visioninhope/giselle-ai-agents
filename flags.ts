@@ -51,3 +51,42 @@ export const githubIntegrationFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const freePlanFlag = flag<boolean>({
+	key: "free-plan",
+	async decide() {
+		return takeLocalEnv("FREE_PLAN_FLAG");
+	},
+	description: "Enable Free Plan",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const playgroundV2Flag = flag<boolean>({
+	key: "playground-v2",
+	async decide() {
+		return takeLocalEnv("PLAYGROUND_V2_FLAG");
+	},
+	description: "Enable Playground V2",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const googleOauthFlag = flag<boolean>({
+	key: "google-oauth",
+	async decide() {
+		return takeLocalEnv("GOOGLE_OAUTH_FLAG");
+	},
+	description: "Enable Google OAuth",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

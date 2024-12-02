@@ -4,6 +4,7 @@ import { agents, db } from "@/drizzle";
 import {
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
+	playgroundV2Flag as getPlaygroundV2Flag,
 	viewFlag as getViewFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
@@ -25,6 +26,7 @@ import {
 	giselleNodeType,
 } from "./beta-proto/react-flow-adapter/types";
 import type { AgentId } from "./beta-proto/types";
+import PlaygroundV2Page from "./canary/page";
 
 // Extend the max duration of the server actions from this page to 5 minutes
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -131,6 +133,10 @@ export default async function AgentPlaygroundPage({
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
+	const playgroundV2Flag = await getPlaygroundV2Flag();
+	if (playgroundV2Flag) {
+		return <PlaygroundV2Page />;
+	}
 
 	const agent = await getAgent(agentId);
 	const gitHubIntegrationSetting = await getGitHubIntegrationSetting(
@@ -147,6 +153,7 @@ export default async function AgentPlaygroundPage({
 				debugFlag,
 				viewFlag,
 				gitHubIntegrationFlag,
+				playgroundV2Flag,
 			}}
 			gitHubIntegration={{
 				repositories,

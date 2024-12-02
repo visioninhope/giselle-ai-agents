@@ -102,3 +102,19 @@
 		-webkit-mask-composite: destination-out; /* レイヤーが重なっていない領域を描画対象 */
 	}
 }
+
+.giselle-flow .react-flow__pane.selection {
+	cursor: default;
+}
+.giselle-flow[data-floating-node="true"] .react-flow__pane.selection {
+	cursor: crosshair;
+}
+.giselle-flow .react-flow__node.selectable {
+	cursor: default;
+}
+.giselle-flow .react-flow__node.draggable.dragging {
+	cursor: default;
+}
+.giselle-flow .react-flow__edge.selectable {
+	cursor: default;
+}

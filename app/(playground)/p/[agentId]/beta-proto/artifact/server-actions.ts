@@ -1,13 +1,11 @@
 "use server";
 
-import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { logger } from "@/lib/logger";
-import { metrics } from "@opentelemetry/api";
+import { createLogger } from "@/lib/opentelemetry";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
@@ -26,10 +24,12 @@ type GenerateArtifactStreamParams = {
 export async function generateArtifactStream(
 	params: GenerateArtifactStreamParams,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
 	});
+	const logger = createLogger("generate-artifact");
 	const sources = await sourceIndexesToSources({
 		input: {
 			agentId: params.agentId,
@@ -54,6 +54,7 @@ ${sourcesToText(sources)}
 	(async () => {
 		const model = buildLanguageModel(params.modelConfiguration);
 		const generation = trace.generation({
+			name: "generate-text",
 			input: params.userPrompt,
 			model: langfuseModel(params.modelConfiguration.modelId),
 			modelParameters: {
@@ -70,22 +71,21 @@ ${sourcesToText(sources)}
 				prompt: params.userPrompt,
 				schema: artifactSchema,
 				onFinish: async (result) => {
-					const meter = metrics.getMeter(params.modelConfiguration.provider);
-					const tokenCounter = meter.createCounter("token_consumed", {
-						description: "Number of OpenAI API tokens consumed by each request",
-					});
-					const subscriptionId = await getUserSubscriptionId();
+					const duration = performance.now() - startTime;
+					const measurementScope = await getCurrentMeasurementScope();
 					const isR06User = await isRoute06User();
-					tokenCounter.add(result.usage.totalTokens, {
-						subscriptionId,
-						isR06User,
-					});
 					generation.end({
 						output: result,
 					});
 
-					logger.debug(
-						{ tokenConsumed: result.usage.totalTokens },
+					logger.info(
+						{
+							externalServiceName: "openai",
+							tokenConsumed: result.usage.totalTokens,
+							duration,
+							measurementScope,
+							isR06User,
+						},
 						"response obtained",
 					);
 

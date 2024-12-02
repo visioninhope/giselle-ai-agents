@@ -29,6 +29,7 @@ export type XYPosition = {
 };
 
 export const panelTabs = {
+	prompt: "prompt",
 	property: "property",
 	status: "status",
 	result: "result",

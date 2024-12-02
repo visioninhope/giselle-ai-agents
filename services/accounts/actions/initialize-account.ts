@@ -2,16 +2,19 @@
 
 import {
 	db,
-	organizations,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
 	users,
 } from "@/drizzle";
+import { isEmailFromRoute06 } from "@/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import type { User } from "@supabase/auth-js";
 
-export const initializeAccount = async (supabaseUserId: User["id"]) => {
+export const initializeAccount = async (
+	supabaseUserId: User["id"],
+	supabaseUserEmail: User["email"],
+) => {
 	const result = await db.transaction(async (tx) => {
 		const userId = `usr_${createId()}` as const;
 		const [user] = await tx
@@ -26,19 +29,13 @@ export const initializeAccount = async (supabaseUserId: User["id"]) => {
 			userDbId: user.dbId,
 			supabaseUserId,
 		});
-		const [organization] = await tx
-			.insert(organizations)
-			.values({
-				name: "default",
-			})
-			.returning({
-				id: organizations.dbId,
-			});
 		const [team] = await tx
 			.insert(teams)
 			.values({
-				organizationDbId: organization.id,
 				name: "default",
+				type: isEmailFromRoute06(supabaseUserEmail ?? "")
+					? "internal"
+					: "customer",
 			})
 			.returning({
 				id: teams.dbId,
