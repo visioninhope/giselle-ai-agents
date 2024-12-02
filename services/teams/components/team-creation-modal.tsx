@@ -36,7 +36,7 @@ async function fetchTeams(supabaseUserId: string) {
 		.leftJoin(
 			subscriptions,
 			and(
-				eq(subscriptions.teamDbId, subscriptions.teamDbId),
+				eq(subscriptions.teamDbId, teams.dbId),
 				eq(subscriptions.status, "active"),
 			),
 		)
