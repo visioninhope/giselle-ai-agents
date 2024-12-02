@@ -112,6 +112,7 @@ function applyActions(
 interface GraphContextValue {
 	graph: Graph;
 	dispatch: (action: GraphActionOrActions) => void;
+	flush: () => Promise<void>;
 }
 const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 
@@ -177,18 +178,50 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 export function GraphContextProvider({
 	children,
 	defaultGraph,
+	onPersist,
 }: {
 	children: ReactNode;
 	defaultGraph: Graph;
+	onPersist: (graph: Graph) => Promise<void>;
 }) {
 	const graphRef = useRef(defaultGraph);
 	const [graph, setGraph] = useState(graphRef.current);
-	const dispatch = useCallback((actionOrActions: GraphActionOrActions) => {
-		graphRef.current = applyActions(graphRef.current, actionOrActions);
-		setGraph(graphRef.current);
-	}, []);
+	const persistTimeoutRef = useRef<Timer | null>(null);
+	const isPendingPersistRef = useRef(false);
+	const persist = useCallback(async () => {
+		isPendingPersistRef.current = false;
+		try {
+			await onPersist(graphRef.current);
+		} catch (error) {
+			console.error("Failed to persist graph:", error);
+		}
+	}, [onPersist]);
+
+	const flush = useCallback(async () => {
+		if (persistTimeoutRef.current) {
+			clearTimeout(persistTimeoutRef.current);
+			persistTimeoutRef.current = null;
+		}
+		await persist();
+	}, [persist]);
+
+	const dispatch = useCallback(
+		(actionOrActions: GraphActionOrActions) => {
+			graphRef.current = applyActions(graphRef.current, actionOrActions);
+			setGraph(graphRef.current);
+
+			isPendingPersistRef.current = true;
+
+			if (persistTimeoutRef.current) {
+				clearTimeout(persistTimeoutRef.current);
+			}
+
+			persistTimeoutRef.current = setTimeout(persist, 500);
+		},
+		[persist],
+	);
 	return (
-		<GraphContext.Provider value={{ graph, dispatch }}>
+		<GraphContext.Provider value={{ graph, dispatch, flush }}>
 			{children}
 		</GraphContext.Provider>
 	);
