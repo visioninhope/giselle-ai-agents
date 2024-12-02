@@ -44,7 +44,12 @@ async function AgentList({
 		);
 	}
 	return (
-		<div>
+		<div className="mt-[24px] px-[16px]">
+			<div className="flex justify-end">
+				<Button type="button" onClick={createAgentAction} className="w-[200px]">
+					Create an agent
+				</Button>
+			</div>
 			{dbAgents.map((agent) => (
 				<div key={agent.id}>
 					<Link href={`/p/${agent.id}/canary`}>
