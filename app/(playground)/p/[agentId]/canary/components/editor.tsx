@@ -183,6 +183,73 @@ function EditorInner() {
 				selectionOnDrag
 				panOnDrag={false}
 				selectionMode={SelectionMode.Partial}
+				onPaneClick={(event) => {
+					event.preventDefault();
+					const position = reactFlowInstance.screenToFlowPosition({
+						x: event.clientX,
+						y: event.clientY,
+					});
+					switch (selectedTool) {
+						case "addTextNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "variable",
+										content: {
+											type: "text",
+											text: "",
+										},
+									},
+								},
+							});
+							break;
+						case "addFileNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "variable",
+										content: {
+											type: "file",
+										},
+									},
+								},
+							});
+							break;
+						case "addTextGenerationNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "action",
+										content: {
+											type: "textGeneration",
+											llm: "anthropic:claude-3-5-sonnet-latest",
+											temperature: 0.7,
+											topP: 1,
+											instruction: "Write a short story about a cat",
+											sources: [],
+										},
+									},
+								},
+							});
+							break;
+					}
+					clearToolAndSections();
+				}}
 			>
 				<Background
 					className="!bg-black-100"
@@ -202,73 +269,7 @@ function EditorInner() {
 					<Toolbar />
 				</Panel>
 				{selectedTool !== undefined && (
-					<FloatingNodePreview
-						tool={selectedTool}
-						onPlaceNode={(screenPosition) => {
-							const position =
-								reactFlowInstance.screenToFlowPosition(screenPosition);
-							switch (selectedTool) {
-								case "addTextNode":
-									dispatch({
-										type: "addNode",
-										input: {
-											node: {
-												id: createNodeId(),
-												name: `Untitle node - ${graph.nodes.length + 1}`,
-												position,
-												selected: false,
-												type: "variable",
-												content: {
-													type: "text",
-													text: "",
-												},
-											},
-										},
-									});
-									break;
-								case "addFileNode":
-									dispatch({
-										type: "addNode",
-										input: {
-											node: {
-												id: createNodeId(),
-												name: `Untitle node - ${graph.nodes.length + 1}`,
-												position,
-												selected: false,
-												type: "variable",
-												content: {
-													type: "file",
-												},
-											},
-										},
-									});
-									break;
-								case "addTextGenerationNode":
-									dispatch({
-										type: "addNode",
-										input: {
-											node: {
-												id: createNodeId(),
-												name: `Untitle node - ${graph.nodes.length + 1}`,
-												position,
-												selected: false,
-												type: "action",
-												content: {
-													type: "textGeneration",
-													llm: "anthropic:claude-3-5-sonnet-latest",
-													temperature: 0.7,
-													topP: 1,
-													instruction: "Write a short story about a cat",
-													sources: [],
-												},
-											},
-										},
-									});
-									break;
-							}
-							clearToolAndSections();
-						}}
-					/>
+					<FloatingNodePreview tool={selectedTool} />
 				)}
 			</ReactFlow>
 		</div>
@@ -277,10 +278,8 @@ function EditorInner() {
 
 const FloatingNodePreview = ({
 	tool,
-	onPlaceNode,
 }: {
 	tool: Tool;
-	onPlaceNode: (position: Position) => void;
 }) => {
 	const mousePosition = useMousePosition();
 
