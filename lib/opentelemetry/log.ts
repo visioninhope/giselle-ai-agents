@@ -1,6 +1,7 @@
 import { logger as pinoLogger } from "@/lib/logger";
 import { OTLPLogExporter } from "@opentelemetry/exporter-logs-otlp-http";
 import { SemanticResourceAttributes } from "@opentelemetry/semantic-conventions";
+import { captureException } from "@sentry/nextjs";
 import type { RequestCountSchema, TokenConsumedSchema } from "./types";
 
 import type { AnyValue, Logger } from "@opentelemetry/api-logs";
@@ -176,3 +177,16 @@ export function createLogger(usecase: string): OtelLoggerWrapper {
 		},
 	};
 }
+
+export const captureError = (
+	logger: OtelLoggerWrapper,
+	error: unknown,
+	message: string,
+) => {
+	if (error instanceof Error) {
+		logger.error(error, message);
+	} else {
+		logger.error(new Error("Unknown error occurred"), message);
+	}
+	captureException(error);
+};
