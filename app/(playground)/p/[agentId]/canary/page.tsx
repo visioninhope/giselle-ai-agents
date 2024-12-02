@@ -5,6 +5,7 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import type { AgentId } from "../beta-proto/types";
+import { putGraph } from "./actions";
 import { Editor } from "./components/editor";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
@@ -45,9 +46,7 @@ export default async function Page({
 
 	async function persistGraph(graph: Graph) {
 		"use server";
-		const { url } = await put(buildGraphPath(graph.id), JSON.stringify(graph), {
-			access: "public",
-		});
+		const { url } = await putGraph(graph);
 		await db
 			.update(agents)
 			.set({

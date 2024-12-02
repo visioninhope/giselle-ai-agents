@@ -1,4 +1,5 @@
 import { getCurrentTeam } from "@/app/(auth)/lib";
+import { putGraph } from "@/app/(playground)/p/[agentId]/canary/actions";
 import { Button } from "@/components/ui/button";
 import { agents, db, supabaseUserMappings, teamMemberships } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
@@ -68,10 +69,7 @@ export async function AgentListV2() {
 
 		const graph = initGraph();
 		const agentId = `agnt_${createId()}` as const;
-		const { url } = await put(buildGraphPath(graph.id), JSON.stringify(graph), {
-			access: "public",
-			addRandomSuffix: false,
-		});
+		const { url } = await putGraph(graph);
 		const team = await getCurrentTeam();
 		await db.insert(agents).values({
 			id: agentId,

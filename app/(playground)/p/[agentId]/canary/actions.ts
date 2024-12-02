@@ -20,7 +20,12 @@ import type {
 	TextArtifactObject,
 	TextGenerateActionContent,
 } from "./types";
-import { elementsToMarkdown, pathJoin, resolveLanguageModel } from "./utils";
+import {
+	buildGraphPath,
+	elementsToMarkdown,
+	pathJoin,
+	resolveLanguageModel,
+} from "./utils";
 
 const artifactSchema = v.object({
 	plan: v.pipe(
@@ -256,4 +261,10 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 	);
 
 	return vercelBlob;
+}
+
+export async function putGraph(graph: Graph) {
+	return await put(buildGraphPath(graph.id), JSON.stringify(graph), {
+		access: "public",
+	});
 }
