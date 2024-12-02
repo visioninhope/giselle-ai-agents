@@ -4,7 +4,7 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
-import { Tracking } from "./Tracking";
+import { Tracking } from "./tracking";
 import { rosart } from "./fonts";
 import { Analytics } from "./providers";
 
