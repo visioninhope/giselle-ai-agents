@@ -5,9 +5,9 @@ type ToolbarSection = "main" | "star";
 type ToolbarVisibility = Record<ToolbarSection, boolean>;
 
 interface ToolbarContext {
-	selectedTool: Tool | undefined;
-	selectTool: (tool: Tool["action"] | undefined) => void;
-	clearToolAndSections: () => void;
+	selectedTool: Tool;
+	selectTool: (tool: Tool["action"]) => void;
+	reset: () => void;
 }
 
 const ToolbarContext = createContext<ToolbarContext | undefined>(undefined);
@@ -24,17 +24,10 @@ export function ToolbarContextProvider({
 			star: false,
 		});
 
-	const [selectedTool, setSelectedTool] = useState<Tool | undefined>(undefined);
-
-	// Function to toggle section visibility
-	const setToolbarSection = (section: ToolbarSection) => {
-		setActiveToolbarSection((prev) => ({
-			...prev,
-			// Close other sections and toggle the selected section
-			main: section === "main" ? !prev.main : false,
-			star: section === "star" ? !prev.star : false,
-		}));
-	};
+	const [selectedTool, setSelectedTool] = useState<Tool>({
+		action: "move",
+		category: "move",
+	});
 
 	// Handle tool selection
 	const selectTool = (tool: Tool["action"] | undefined) => {
@@ -60,17 +53,16 @@ export function ToolbarContextProvider({
 					category: "move",
 				});
 			default:
-				return setSelectedTool(undefined);
+				return setSelectedTool({
+					action: "move",
+					category: "move",
+				});
 		}
 	};
 
-	// Clear tool selection and close all sections
-	const clearToolAndSections = () => {
-		setSelectedTool(undefined);
-		setActiveToolbarSection({
-			main: false,
-			star: false,
-		});
+	// Reset the toolbar
+	const reset = () => {
+		selectTool("move");
 	};
 
 	return (
@@ -78,7 +70,7 @@ export function ToolbarContextProvider({
 			value={{
 				selectedTool,
 				selectTool,
-				clearToolAndSections,
+				reset,
 			}}
 		>
 			{children}

@@ -40,7 +40,7 @@ function ToggleGroupItem({
 }
 
 export function Toolbar() {
-	const { selectTool } = useToolbar();
+	const { selectTool, selectedTool } = useToolbar();
 	return (
 		<div className="relative rounded-[46px] overflow-hidden bg-black-100">
 			<div className="absolute z-0 rounded-[46px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -48,6 +48,7 @@ export function Toolbar() {
 				<ToggleGroup.Root
 					type="single"
 					className="flex items-center px-[16px] z-10 h-full"
+					value={selectedTool?.action}
 					onValueChange={(value) => {
 						selectTool(value as Tool["action"]);
 					}}

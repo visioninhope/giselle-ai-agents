@@ -56,7 +56,7 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
-	const { selectedTool, clearToolAndSections } = useToolbar();
+	const { selectedTool, reset } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -72,8 +72,8 @@ function EditorInner() {
 					type: "giselleNode",
 					position: node.position,
 					selected: node.selected,
-					selectable: !selectedTool,
-					draggable: !selectedTool,
+					selectable: selectedTool.category === "move",
+					draggable: selectedTool.category === "move",
 					data: {
 						node,
 					},
@@ -99,8 +99,8 @@ function EditorInner() {
 						source: connection.sourceNodeId,
 						target: connection.targetNodeId,
 						targetHandle: connection.targetNodeHandleId,
-						selectable: !selectedTool,
-						deletable: !selectedTool,
+						selectable: selectedTool.category === "move",
+						deletable: selectedTool.category === "move",
 						data: {
 							connection,
 						},
@@ -248,7 +248,7 @@ function EditorInner() {
 							});
 							break;
 					}
-					clearToolAndSections();
+					reset();
 				}}
 			>
 				<Background
