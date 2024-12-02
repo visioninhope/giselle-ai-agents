@@ -66,6 +66,7 @@ export const subscriptions = pgTable("subscriptions", {
 	trialEnd: timestamp("trial_end"),
 });
 
+type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
@@ -74,6 +75,7 @@ export const teams = pgTable("teams", {
 		.defaultNow()
 		.notNull()
 		.$onUpdate(() => new Date()),
+	type: text("type").$type<TeamType>().notNull().default("customer"),
 });
 
 export type UserId = `usr_${string}`;

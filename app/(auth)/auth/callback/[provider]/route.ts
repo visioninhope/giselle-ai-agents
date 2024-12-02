@@ -91,7 +91,7 @@ async function initializeUserIfNeeded(user: User) {
 		where: eq(supabaseUserMappings.supabaseUserId, user.id),
 	});
 	if (!dbUser) {
-		await initializeAccount(user.id);
+		await initializeAccount(user.id, user.email);
 	}
 }
 
