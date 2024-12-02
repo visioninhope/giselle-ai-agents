@@ -42,18 +42,17 @@ export async function createTeam(formData: FormData) {
 		redirect("/settings/team");
 	}
 
-	prepareProTeamCreation(supabaseUser, teamName);
+	const checkoutUrl = await prepareProTeamCreation(supabaseUser, teamName);
+	redirect(checkoutUrl);
 }
 
 /**
  * 1. Create a new draft team
  * 2. Set the draft team informations in metadata (https://support.stripe.com/questions/using-metadata-with-checkout-sessions)
- * 3. Redirect to the Stripe checkout page
  */
 async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 	const userDbId = await getUserDbId(supabaseUser);
-	const checkoutUrl = await createCheckout(userDbId, teamName);
-	redirect(checkoutUrl);
+	return createCheckout(userDbId, teamName);
 }
 
 async function createCheckout(userDbId: number, teamName: string) {
