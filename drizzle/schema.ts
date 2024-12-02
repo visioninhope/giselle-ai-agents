@@ -81,6 +81,8 @@ export const teams = pgTable("teams", {
 export type UserId = `usr_${string}`;
 export const users = pgTable("users", {
 	id: text("id").$type<UserId>().notNull().unique(),
+	email: text("email").unique(), // TODO: Allow null values initially when adding schema, then change to not null after data update
+	displayName: text("display_name"),
 	dbId: serial("db_id").primaryKey(),
 });
 

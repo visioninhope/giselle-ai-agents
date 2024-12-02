@@ -4,6 +4,7 @@ import { agents, db } from "@/drizzle";
 import {
 	debugFlag as getDebugFlag,
 	githubIntegrationFlag as getGitHubIntegrationFlag,
+	playgroundV2Flag as getPlaygroundV2Flag,
 	viewFlag as getViewFlag,
 } from "@/flags";
 import { getUser } from "@/lib/supabase";
@@ -131,6 +132,7 @@ export default async function AgentPlaygroundPage({
 	const debugFlag = await getDebugFlag();
 	const viewFlag = await getViewFlag();
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
+	const playgroundV2Flag = await getPlaygroundV2Flag();
 
 	const agent = await getAgent(agentId);
 	const gitHubIntegrationSetting = await getGitHubIntegrationSetting(
@@ -147,6 +149,7 @@ export default async function AgentPlaygroundPage({
 				debugFlag,
 				viewFlag,
 				gitHubIntegrationFlag,
+				playgroundV2Flag,
 			}}
 			gitHubIntegration={{
 				repositories,

@@ -65,6 +65,19 @@ export const freePlanFlag = flag<boolean>({
 	],
 });
 
+export const playgroundV2Flag = flag<boolean>({
+	key: "playground-v2",
+	async decide() {
+		return takeLocalEnv("PLAYGROUND_V2_FLAG");
+	},
+	description: "Enable Playground V2",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
 export const googleOauthFlag = flag<boolean>({
 	key: "google-oauth",
 	async decide() {

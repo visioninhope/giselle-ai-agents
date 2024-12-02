@@ -1,10 +1,9 @@
 "use server";
 
-import { openai } from "@ai-sdk/openai";
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
-import { getUserSubscriptionId, isRoute06User } from "@/app/(auth)/lib";
+import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { createLogger } from "@/lib/opentelemetry";
 import { metrics } from "@opentelemetry/api";
@@ -78,10 +77,10 @@ ${sourcesToText(sources)}
 					const tokenCounter = meter.createCounter("token_consumed", {
 						description: "Number of OpenAI API tokens consumed by each request",
 					});
-					const subscriptionId = await getUserSubscriptionId();
+					const measurementScope = await getCurrentMeasurementScope();
 					const isR06User = await isRoute06User();
 					tokenCounter.add(result.usage.totalTokens, {
-						subscriptionId,
+						measurementScope,
 						isR06User,
 					});
 					generation.end({
