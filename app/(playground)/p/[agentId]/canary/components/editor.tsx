@@ -6,20 +6,29 @@ import {
 	Panel,
 	ReactFlow,
 	ReactFlowProvider,
+	SelectionMode,
 	useReactFlow,
+	useUpdateNodeInternals,
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { GraphContextProvider, useGraph } from "../contexts/graph";
+import {
+	MousePositionProvider,
+	useMousePosition,
+} from "../contexts/mouse-position";
 import {
 	PropertiesPanelProvider,
 	usePropertiesPanel,
 } from "../contexts/properties-panel";
-import type { Graph, NodeId } from "../types";
+import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
+import type { Graph, NodeId, Position, Tool } from "../types";
+import { createNodeId } from "../utils";
 import { Edge } from "./edge";
-import { Node } from "./node";
+import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
+import { Toolbar } from "./toolbar";
 
 interface EditorProps {
 	graph: Graph;
@@ -29,7 +38,11 @@ export function Editor(props: EditorProps) {
 		<GraphContextProvider defaultGraph={props.graph}>
 			<PropertiesPanelProvider>
 				<ReactFlowProvider>
-					<EditorInner />
+					<ToolbarContextProvider>
+						<MousePositionProvider>
+							<EditorInner />
+						</MousePositionProvider>
+					</ToolbarContextProvider>
 				</ReactFlowProvider>
 			</PropertiesPanelProvider>
 		</GraphContextProvider>
@@ -43,23 +56,38 @@ const edgeTypes = {
 };
 function EditorInner() {
 	const { graph, dispatch } = useGraph();
+	const { selectedTool, reset } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
+	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
+		const currentNodes = reactFlowInstance.getNodes();
 		reactFlowInstance.setNodes(
-			graph.nodes.map(
-				(node) =>
-					({
-						id: node.id,
-						position: node.position,
-						selected: node.selected,
-						type: "giselleNode",
-						data: {
-							node,
-						},
-					}) as Node,
-			),
+			graph.nodes.map((node) => {
+				const currentNode = currentNodes.find(
+					(currentNode) => currentNode.id === node.id,
+				);
+				return {
+					...currentNode,
+					id: node.id,
+					type: "giselleNode",
+					position: node.position,
+					selected: node.selected,
+					selectable: selectedTool.category === "move",
+					draggable: selectedTool.category === "move",
+					data: {
+						node,
+					},
+				} as Node;
+			}),
 		);
-	}, [graph.nodes, reactFlowInstance.setNodes]);
+		updateNodeInternals(graph.nodes.map((node) => node.id));
+	}, [
+		graph.nodes,
+		reactFlowInstance.getNodes,
+		reactFlowInstance.setNodes,
+		updateNodeInternals,
+		selectedTool,
+	]);
 
 	useEffect(() => {
 		reactFlowInstance.setEdges(
@@ -71,17 +99,21 @@ function EditorInner() {
 						source: connection.sourceNodeId,
 						target: connection.targetNodeId,
 						targetHandle: connection.targetNodeHandleId,
+						selectable: selectedTool.category === "move",
+						deletable: selectedTool.category === "move",
 						data: {
 							connection,
 						},
 					}) satisfies Edge,
 			),
 		);
-	}, [graph.connections, reactFlowInstance.setEdges]);
+	}, [graph.connections, reactFlowInstance.setEdges, selectedTool]);
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
+				className="giselle-flow"
+				data-floating-node={selectedTool?.category === "edit"}
 				colorMode="dark"
 				defaultNodes={[]}
 				defaultEdges={[]}
@@ -147,6 +179,77 @@ function EditorInner() {
 						});
 					});
 				}}
+				panOnScroll
+				selectionOnDrag
+				panOnDrag={false}
+				selectionMode={SelectionMode.Partial}
+				onPaneClick={(event) => {
+					event.preventDefault();
+					const position = reactFlowInstance.screenToFlowPosition({
+						x: event.clientX,
+						y: event.clientY,
+					});
+					switch (selectedTool?.action) {
+						case "addTextNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "variable",
+										content: {
+											type: "text",
+											text: "",
+										},
+									},
+								},
+							});
+							break;
+						case "addFileNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "variable",
+										content: {
+											type: "file",
+										},
+									},
+								},
+							});
+							break;
+						case "addTextGenerationNode":
+							dispatch({
+								type: "addNode",
+								input: {
+									node: {
+										id: createNodeId(),
+										name: `Untitle node - ${graph.nodes.length + 1}`,
+										position,
+										selected: false,
+										type: "action",
+										content: {
+											type: "textGeneration",
+											llm: "anthropic:claude-3-5-sonnet-latest",
+											temperature: 0.7,
+											topP: 1,
+											instruction: "Write a short story about a cat",
+											sources: [],
+										},
+									},
+								},
+							});
+							break;
+					}
+					reset();
+				}}
 			>
 				<Background
 					className="!bg-black-100"
@@ -162,7 +265,36 @@ function EditorInner() {
 				<Panel position="top-right" className="!top-0 !bottom-0 !right-0 !m-0">
 					<PropertiesPanel />
 				</Panel>
+				<Panel position={"bottom-center"}>
+					<Toolbar />
+				</Panel>
+				{selectedTool?.category === "edit" && (
+					<FloatingNodePreview tool={selectedTool} />
+				)}
 			</ReactFlow>
 		</div>
 	);
 }
+
+const FloatingNodePreview = ({
+	tool,
+}: {
+	tool: Tool;
+}) => {
+	const mousePosition = useMousePosition();
+
+	return (
+		<>
+			<div
+				className="fixed pointer-events-none inset-0"
+				style={{
+					transform: `translate(${mousePosition.x}px, ${mousePosition.y}px)`,
+				}}
+			>
+				<div className="w-[180px]">
+					<PreviewNode tool={tool} />
+				</div>
+			</div>
+		</>
+	);
+};

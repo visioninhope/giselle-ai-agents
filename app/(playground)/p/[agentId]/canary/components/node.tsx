@@ -19,6 +19,7 @@ import type {
 	Node as NodeType,
 	Text,
 	TextGeneration,
+	Tool,
 	WebSearch,
 } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
@@ -28,6 +29,89 @@ type FileNode = XYFlowNode<{ node: File }>;
 type TextGenerationNode = XYFlowNode<{ node: TextGeneration }>;
 type WebSearchNode = XYFlowNode<{ node: WebSearch }>;
 export type Node = TextNode | FileNode | TextGenerationNode | WebSearchNode;
+
+export function PreviewNode({ tool }: { tool: Tool }) {
+	switch (tool.action) {
+		case "addTextNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "Text Node",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "variable",
+							content: {
+								type: "text",
+								text: "Text Preview",
+							},
+						},
+					}}
+				/>
+			);
+		case "addFileNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "File Node",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "variable",
+							content: {
+								type: "file",
+							},
+						},
+					}}
+				/>
+			);
+		case "addTextGenerationNode":
+			return (
+				<Node
+					type="preview"
+					dragging={true}
+					zIndex={1}
+					isConnectable
+					positionAbsoluteX={0}
+					positionAbsoluteY={0}
+					id="nd_preview"
+					data={{
+						node: {
+							id: "nd_preview",
+							name: "Text Generator",
+							position: { x: 0, y: 0 },
+							selected: false,
+							type: "action",
+							content: {
+								type: "textGeneration",
+								llm: "anthropic:claude-3-5-sonnet-latest",
+								temperature: 0.7,
+								topP: 1,
+								instruction: "",
+								sources: [],
+							},
+						},
+					}}
+				/>
+			);
+	}
+}
 
 function NodeHeader({
 	name,
@@ -113,9 +197,9 @@ function NodeNameEditable({
 }
 
 export function Node({
+	type,
 	data,
 	selected,
-	preview = false,
 }: NodeProps<Node> & { preview?: boolean }) {
 	const targetHandles = useMemo(() => {
 		if (data.node.content.type === "textGeneration") {
@@ -134,10 +218,11 @@ export function Node({
 			),
 		[graph, data.node.id],
 	);
+	const isPreview = type === "preview";
 	return (
 		<div
 			data-type={data.node.type}
-			data-preview={preview}
+			data-preview={isPreview}
 			data-selected={selected}
 			className={clsx(
 				"group relative rounded-[16px] bg-gradient-to-tl min-w-[180px] backdrop-blur-[1px] transition-shadow",
@@ -154,7 +239,7 @@ export function Node({
 					"group-data-[type=variable]:from-[hsla(0,0%,91%,1)] group-data-[type=variable]:to-[hsla(0,0%,35%,1)]",
 				)}
 			/>
-			{!preview && (
+			{!isPreview && (
 				<NodeNameEditable
 					name={data.node.name}
 					onNodeNameChange={(name) => {
@@ -216,30 +301,34 @@ export function Node({
 						))}
 					</div>
 
-					<div className="grid">
-						<div className="relative flex items-center h-[28px]">
-							<div className="absolute -right-[10px] translate-x-[6px]">
-								<div
-									className={clsx(
-										"h-[28px] w-[10px]",
-										"group-data-[type=action]:bg-[hsla(195,74%,21%,1)]",
-										"group-data-[type=variable]:bg-[hsla(236,7%,39%,1)]",
-									)}
-								/>
-								<Handle
-									type="source"
-									position={Position.Right}
-									data-state={hasTarget ? "connected" : "disconnected"}
-									className={clsx(
-										"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
-										"group-data-[type=action]:!border-[hsla(195,74%,21%,1)] group-data-[type=action]:data-[state=connected]:!bg-[hsla(187,71%,48%,1)] group-data-[type=action]:hover:!bg-[hsla(187,71%,48%,1)]",
-										"group-data-[type=variable]:!border-[hsla(236,7%,39%,1)] group-data-[type=variable]:data-[state=connected]:!bg-white",
-									)}
-								/>
+					{!isPreview && (
+						<div className="grid">
+							<div className="relative flex items-center h-[28px]">
+								<div className="absolute -right-[10px] translate-x-[6px]">
+									<div
+										className={clsx(
+											"h-[28px] w-[10px]",
+											"group-data-[type=action]:bg-[hsla(195,74%,21%,1)]",
+											"group-data-[type=variable]:bg-[hsla(236,7%,39%,1)]",
+										)}
+									/>
+									<Handle
+										type="source"
+										position={Position.Right}
+										data-state={hasTarget ? "connected" : "disconnected"}
+										className={clsx(
+											"!w-[12px] !absolute !h-[12px] !rounded-full !bg-black-100 !border-[2px] !top-[50%] !-translate-y-[50%] !translate-x-[5px]",
+											"group-data-[type=action]:!border-[hsla(195,74%,21%,1)] group-data-[type=action]:data-[state=connected]:!bg-[hsla(187,71%,48%,1)] group-data-[type=action]:hover:!bg-[hsla(187,71%,48%,1)]",
+											"group-data-[type=variable]:!border-[hsla(236,7%,39%,1)] group-data-[type=variable]:data-[state=connected]:!bg-white",
+										)}
+									/>
+								</div>
+								<div className="text-[14px] text-black--30 px-[12px]">
+									Output
+								</div>
 							</div>
-							<div className="text-[14px] text-black--30 px-[12px]">Output</div>
 						</div>
-					</div>
+					)}
 				</div>
 			</div>
 		</div>

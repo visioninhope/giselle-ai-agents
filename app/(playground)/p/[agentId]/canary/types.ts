@@ -52,12 +52,36 @@ export interface TextContent extends VariableContentBase {
 	type: "text";
 	text: string;
 }
-export interface FileContent extends VariableContentBase {
-	type: "file";
+export type FileId = `fl_${string}`;
+interface FileDataBase {
+	id: FileId;
 	name: string;
 	contentType: string;
 	size: number;
-	upladedAt: number;
+	status: string;
+}
+interface UploadingFileData extends FileDataBase {
+	status: "uploading";
+}
+
+interface ProcessingFileData extends FileDataBase {
+	status: "processing";
+	uploadedAt: number;
+	fileBlobUrl: string;
+}
+
+interface CompletedFileData extends FileDataBase {
+	status: "completed";
+	uploadedAt: number;
+	fileBlobUrl: string;
+	processedAt: number;
+	textDataUrl: string;
+}
+
+type FileData = UploadingFileData | ProcessingFileData | CompletedFileData;
+export interface FileContent extends VariableContentBase {
+	type: "file";
+	data?: FileData | null | undefined;
 }
 
 type VariableContent = TextContent | FileContent;
@@ -131,3 +155,30 @@ export interface Graph {
 	connections: Connection[];
 	artifacts: Artifact[];
 }
+
+interface ToolBase {
+	category: string;
+	action: string;
+}
+
+interface AddTextNodeTool extends ToolBase {
+	category: "edit";
+	action: "addTextNode";
+}
+interface AddFileNodeTool extends ToolBase {
+	category: "edit";
+	action: "addFileNode";
+}
+interface AddTextGenerationNodeTool extends ToolBase {
+	category: "edit";
+	action: "addTextGenerationNode";
+}
+interface MoveTool extends ToolBase {
+	category: "move";
+	action: "move";
+}
+export type Tool =
+	| AddTextNodeTool
+	| AddFileNodeTool
+	| AddTextGenerationNodeTool
+	| MoveTool;

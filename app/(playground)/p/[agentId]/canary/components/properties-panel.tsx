@@ -1,13 +1,12 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as DropdownMenuPrimitive from "@radix-ui/react-dropdown-menu";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
-	CheckIcon,
+	ArrowUpFromLineIcon,
 	ChevronsUpDownIcon,
-	DotIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -16,13 +15,15 @@ import {
 	type FC,
 	type HTMLAttributes,
 	type ReactNode,
+	useCallback,
 	useMemo,
 	useState,
 } from "react";
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
-import { action } from "../actions";
+import { action, parse } from "../actions";
+import { vercelBlobFileFolder } from "../constants";
 import {
 	useArtifact,
 	useGraph,
@@ -43,13 +44,24 @@ import type {
 import {
 	createArtifactId,
 	createConnectionId,
+	createFileId,
 	createNodeHandleId,
 	isFile,
 	isText,
 	isTextGeneration,
+	pathJoin,
 } from "../utils";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuLabel,
+	DropdownMenuRadioGroup,
+	DropdownMenuRadioItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "./dropdown-menu";
 import {
 	Select,
 	SelectContent,
@@ -117,103 +129,6 @@ function PropertiesPanelCollapsible({
 		</>
 	);
 }
-
-const DropdownMenu = DropdownMenuPrimitive.Root;
-
-function DropdownMenuTrigger({ label = "Select" }: { label?: string }) {
-	return (
-		<DropdownMenuPrimitive.Trigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
-			{label}
-		</DropdownMenuPrimitive.Trigger>
-	);
-}
-
-const DropdownMenuGroup = DropdownMenuPrimitive.Group;
-
-const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
-
-const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
-
-function DropdownMenuContent({ children }: { children: React.ReactNode }) {
-	return (
-		<DropdownMenuPrimitive.Portal>
-			<DropdownMenuPrimitive.Content
-				sideOffset={4}
-				align="end"
-				className={clsx(
-					"z-50 min-w-[8rem] overflow-hidden rounded-[16px] border border-black-70 bg-black-100 p-[8px] text-black-30 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
-					"data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
-				)}
-			>
-				{children}
-			</DropdownMenuPrimitive.Content>
-		</DropdownMenuPrimitive.Portal>
-	);
-}
-DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
-
-function DropdownMenuCheckboxItem({
-	children,
-	checked = false,
-}: {
-	children: React.ReactNode;
-	checked?: boolean;
-}) {
-	return (
-		<DropdownMenuPrimitive.CheckboxItem
-			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-			checked={checked}
-		>
-			{children}
-			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-				<DropdownMenuPrimitive.ItemIndicator>
-					<CheckIcon className="h-4 w-4" />
-				</DropdownMenuPrimitive.ItemIndicator>
-			</span>
-		</DropdownMenuPrimitive.CheckboxItem>
-	);
-}
-DropdownMenuCheckboxItem.displayName =
-	DropdownMenuPrimitive.CheckboxItem.displayName;
-
-function DropdownMenuLabel({ children }: { children: ReactNode }) {
-	return (
-		<DropdownMenuPrimitive.Label className="px-2 py-[2px] text-[12px] text-black-70">
-			{children}
-		</DropdownMenuPrimitive.Label>
-	);
-}
-DropdownMenuLabel.displayName = DropdownMenuPrimitive.Label.displayName;
-
-function DropdownMenuSeparator() {
-	return (
-		<DropdownMenuPrimitive.Separator className="-mx-1 my-1 h-px bg-muted" />
-	);
-}
-DropdownMenuSeparator.displayName = DropdownMenuPrimitive.Separator.displayName;
-
-function DropdownMenuRadioItem({
-	children,
-	value,
-}: {
-	children: ReactNode;
-	value: ComponentProps<typeof DropdownMenuPrimitive.RadioItem>["value"];
-}) {
-	return (
-		<DropdownMenuPrimitive.RadioItem
-			className="relative flex cursor-default select-none items-center rounded-sm py-1.5 pl-2 pr-8 text-sm outline-none transition-colors focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
-			value={value}
-		>
-			<span className="absolute right-2 flex h-3.5 w-3.5 items-center justify-center">
-				<DropdownMenuPrimitive.ItemIndicator>
-					<DotIcon className="h-8 w-8 fill-current" />
-				</DropdownMenuPrimitive.ItemIndicator>
-			</span>
-			{children}
-		</DropdownMenuPrimitive.RadioItem>
-	);
-}
-DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
 const HoverCard = HoverCardPrimitive.Root;
 
@@ -671,6 +586,18 @@ export function PropertiesPanel() {
 							<TabContentFile
 								nodeId={selectedNode.id}
 								content={selectedNode.content}
+								onContentChange={(content) => {
+									dispatch({
+										type: "updateNode",
+										input: {
+											nodeId: selectedNode.id,
+											node: {
+												...selectedNode,
+												content,
+											},
+										},
+									});
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -721,8 +648,10 @@ function NodeDropdown({
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger label={triggerLabel} />
-			<DropdownMenuContent>
+			<DropdownMenuTrigger className="text-[12px] px-[8px] py-[0.5px] border border-black-50 rounded-[4px]">
+				{triggerLabel ?? "Select"}
+			</DropdownMenuTrigger>
+			<DropdownMenuContent align="end" sideOffset={6}>
 				<DropdownMenuRadioGroup onValueChange={handleValueChange}>
 					<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
 					{textGenerationNodes.map((node) => (
@@ -1513,7 +1442,12 @@ function formatFileSize(bytes: number): string {
 function TabContentFile({
 	nodeId,
 	content,
-}: { nodeId: NodeId; content: FileContent }) {
+	onContentChange,
+}: {
+	nodeId: NodeId;
+	content: FileContent;
+	onContentChange?: (content: FileContent) => void;
+}) {
 	const { graph } = useGraph();
 
 	const sourcedFromNodes = useMemo(
@@ -1526,58 +1460,208 @@ function TabContentFile({
 				.filter((node) => node !== undefined),
 		[graph, nodeId],
 	);
+	const [isDragging, setIsDragging] = useState(false);
+
+	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(true);
+	}, []);
+
+	const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(false);
+	}, []);
+
+	const setFile = useCallback(
+		(file: File) => {
+			const fileData = new FileReader();
+
+			fileData.readAsArrayBuffer(file);
+			fileData.onload = async () => {
+				if (!fileData.result) {
+					return;
+				}
+				const fileId = createFileId();
+				onContentChange?.({
+					...content,
+					data: {
+						id: fileId,
+						status: "uploading",
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+					},
+				});
+				const blob = await upload(
+					pathJoin(vercelBlobFileFolder, fileId, file.name),
+					file,
+					{
+						access: "public",
+						handleUploadUrl: "/api/files/upload",
+					},
+				);
+				const uploadedAt = Date.now();
+
+				onContentChange?.({
+					...content,
+					data: {
+						id: fileId,
+						status: "processing",
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+						uploadedAt,
+						fileBlobUrl: blob.url,
+					},
+				});
+
+				const parseBlob = await parse(fileId, file.name, blob.url);
+
+				onContentChange?.({
+					...content,
+					data: {
+						id: fileId,
+						status: "completed",
+						name: file.name,
+						contentType: file.type,
+						size: file.size,
+						uploadedAt,
+						fileBlobUrl: blob.url,
+						processedAt: Date.now(),
+						textDataUrl: parseBlob.url,
+					},
+				});
+			};
+		},
+		[content, onContentChange],
+	);
+
+	const onDrop = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			setFile(e.dataTransfer.files[0]);
+		},
+		[setFile],
+	);
+
+	const onFileChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (!e.target.files) {
+				return;
+			}
+			setFile(e.target.files[0]);
+		},
+		[setFile],
+	);
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
-			<PropertiesPanelContentBox>
-				<div className="my-[12px] flex flex-col gap-[8px]">
-					<DataList label="File Name">
-						<p>{content.name}</p>
-					</DataList>
-					<DataList label="Content Type">
-						<p>{content.contentType}</p>
-					</DataList>
-					<DataList label="Size">
-						<p>{formatFileSize(content.size)}</p>
-					</DataList>
-					<DataList label="Uploaded">
-						<p>{formatTimestamp.toRelativeTime(content.upladedAt)}</p>
-					</DataList>
-				</div>
-			</PropertiesPanelContentBox>
-			<div className="border-t border-[hsla(222,21%,40%,1)]" />
-			<PropertiesPanelContentBox className="text-black-30 grid gap-2">
-				<div className="flex justify-between items-center">
-					<p className="font-rosart">Sourced From</p>
-				</div>
-
-				<div className="grid gap-2">
-					{sourcedFromNodes.map((node) => (
-						<HoverCard key={node.id}>
-							<HoverCardTrigger asChild>
-								<Block>
-									<div className="flex items-center justify-between">
-										<div className="flex items-center gap-[8px]">
-											<p className="truncate text-[14px] font-rosart">
-												{node.name}
-											</p>
-										</div>
+			{content.data == null ? (
+				<div className="p-[16px]">
+					<div
+						className={clsx(
+							"h-[300px] flex flex-col gap-[16px] justify-center items-center rounded-[8px] border border-dashed text-black-70 px-[18px]",
+							isDragging ? "bg-black-80/20 border-black-50" : "border-black-70",
+						)}
+						onDragOver={onDragOver}
+						onDragLeave={onDragLeave}
+						onDrop={onDrop}
+					>
+						{isDragging ? (
+							<>
+								<DocumentIcon className="w-[30px] h-[30px] fill-black-70" />
+								<p className="text-center">Drop to upload your files</p>
+							</>
+						) : (
+							<div className="flex flex-col gap-[16px] justify-center items-center">
+								<ArrowUpFromLineIcon size={38} className="stroke-black-70" />
+								<label
+									htmlFor="file"
+									className="text-center flex flex-col gap-[16px]"
+								>
+									<p>
+										No contents added yet. Click to upload or drag and drop
+										files here (supports images, documents, and more; max 4.5MB
+										per file).
+									</p>
+									<div className="flex gap-[8px] justify-center items-center">
+										<span>or</span>
+										<span className="font-bold text-black--50 text-[14px] underline cursor-pointer">
+											Select files
+											<input
+												id="file"
+												type="file"
+												onChange={onFileChange}
+												className="hidden"
+											/>
+										</span>
 									</div>
-								</Block>
-							</HoverCardTrigger>
-							<HoverCardContent className="w-80">
-								<div className="flex justify-between space-x-4">
-									node type: {node.content.type}
-									{node.content.type === "text" && (
-										<div className="line-clamp-5 text-[14px]">
-											{node.content.text}
-										</div>
-									)}
-								</div>
-							</HoverCardContent>
-						</HoverCard>
-					))}
+								</label>
+							</div>
+						)}
+					</div>
 				</div>
-			</PropertiesPanelContentBox>
+			) : (
+				<>
+					<PropertiesPanelContentBox>
+						<div className="my-[12px] flex flex-col gap-[8px]">
+							<DataList label="File Name">
+								<p>{content.data.name}</p>
+							</DataList>
+							<DataList label="Content Type">
+								<p>{content.data.contentType}</p>
+							</DataList>
+							<DataList label="Size">
+								<p>{formatFileSize(content.data.size)}</p>
+							</DataList>
+							<DataList label="Status">
+								<p>{content.data.status}</p>
+							</DataList>
+							<DataList label="Uploaded">
+								<p>
+									{content.data.status !== "completed"
+										? "---"
+										: formatTimestamp.toRelativeTime(content.data.processedAt)}
+								</p>
+							</DataList>
+						</div>
+					</PropertiesPanelContentBox>
+					<div className="border-t border-[hsla(222,21%,40%,1)]" />
+					<PropertiesPanelContentBox className="text-black-30 grid gap-2">
+						<div className="flex justify-between items-center">
+							<p className="font-rosart">Sourced From</p>
+						</div>
+
+						<div className="grid gap-2">
+							{sourcedFromNodes.map((node) => (
+								<HoverCard key={node.id}>
+									<HoverCardTrigger asChild>
+										<Block>
+											<div className="flex items-center justify-between">
+												<div className="flex items-center gap-[8px]">
+													<p className="truncate text-[14px] font-rosart">
+														{node.name}
+													</p>
+												</div>
+											</div>
+										</Block>
+									</HoverCardTrigger>
+									<HoverCardContent className="w-80">
+										<div className="flex justify-between space-x-4">
+											node type: {node.content.type}
+											{node.content.type === "text" && (
+												<div className="line-clamp-5 text-[14px]">
+													{node.content.text}
+												</div>
+											)}
+										</div>
+									</HoverCardContent>
+								</HoverCard>
+							))}
+						</div>
+					</PropertiesPanelContentBox>
+				</>
+			)}
 		</div>
 	);
 }

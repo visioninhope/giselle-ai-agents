@@ -67,13 +67,22 @@ interface RemoveConnectionAction {
 	type: "removeConnection";
 	input: RemoveConnectionActionInput;
 }
+
+interface AddNodeActionInput {
+	node: Node;
+}
+interface AddNodeAction {
+	type: "addNode";
+	input: AddNodeActionInput;
+}
 type GraphAction =
 	| UpsertArtifactAction
 	| UpdateNodeAction
 	| AddConnectionAction
 	| RemoveConnectionAction
 	| UpdateNodePositionAction
-	| UpdateNodeSelectionAction;
+	| UpdateNodeSelectionAction
+	| AddNodeAction;
 
 export function upsertArtifact(
 	input: UpsertArtifactActionInput,
@@ -154,6 +163,11 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 						? { ...node, selected: action.input.selected }
 						: node,
 				),
+			};
+		case "addNode":
+			return {
+				...graph,
+				nodes: [...graph.nodes, action.input.node],
 			};
 		default:
 			return graph;

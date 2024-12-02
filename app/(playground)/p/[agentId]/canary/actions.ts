@@ -1,12 +1,17 @@
 "use server";
 
 import { toJsonSchema } from "@valibot/to-json-schema";
+import { put } from "@vercel/blob";
 import { jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import HandleBars from "handlebars";
+import { UnstructuredClient } from "unstructured-client";
+import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
+import { vercelBlobFileFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
+	FileId,
 	Graph,
 	GraphId,
 	NodeHandle,
@@ -15,7 +20,7 @@ import type {
 	TextArtifactObject,
 	TextGenerateActionContent,
 } from "./types";
-import { resolveLanguageModel } from "./utils";
+import { elementsToMarkdown, pathJoin, resolveLanguageModel } from "./utils";
 
 const artifactSchema = v.object({
 	plan: v.pipe(
@@ -203,4 +208,52 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 		default:
 			throw new Error("Invalid node type");
 	}
+}
+
+export async function parse(id: FileId, name: string, blobUrl: string) {
+	if (process.env.UNSTRUCTURED_API_KEY === undefined) {
+		throw new Error("UNSTRUCTURED_API_KEY is not set");
+	}
+	const client = new UnstructuredClient({
+		security: {
+			apiKeyAuth: process.env.UNSTRUCTURED_API_KEY,
+		},
+	});
+	const response = await fetch(blobUrl);
+	const content = await response.blob();
+	const partitionResponse = await client.general.partition({
+		partitionParameters: {
+			files: {
+				fileName: name,
+				content,
+			},
+			strategy: Strategy.Fast,
+			splitPdfPage: false,
+			splitPdfConcurrencyLevel: 1,
+		},
+	});
+	if (partitionResponse.statusCode !== 200) {
+		console.error(partitionResponse.rawResponse);
+		throw new Error(`Failed to parse file: ${partitionResponse.statusCode}`);
+	}
+	const jsonString = JSON.stringify(partitionResponse.elements, null, 2);
+	const blob = new Blob([jsonString], { type: "application/json" });
+
+	await put(pathJoin(vercelBlobFileFolder, id, "partition.json"), blob, {
+		access: "public",
+		contentType: blob.type,
+	});
+
+	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
+	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
+	const vercelBlob = await put(
+		pathJoin(vercelBlobFileFolder, id, "markdown.md"),
+		markdownBlob,
+		{
+			access: "public",
+			contentType: markdownBlob.type,
+		},
+	);
+
+	return vercelBlob;
 }
