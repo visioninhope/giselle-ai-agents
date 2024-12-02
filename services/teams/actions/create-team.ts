@@ -66,7 +66,7 @@ async function createCheckout(userDbId: number, teamName: string) {
 	const agentTimeChargePriceId = process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID;
 	const userSeatPriceId = process.env.STRIPE_USER_SEAT_PRICE_ID;
 
-	invariant(proPlanPriceId, "STRIPE_PRO_PLAN_ID is not set");
+	invariant(proPlanPriceId, "STRIPE_PRO_PLAN_PRICE_ID is not set");
 	invariant(
 		agentTimeChargePriceId,
 		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
