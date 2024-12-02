@@ -8,7 +8,7 @@ interface ToolbarContext {
 	activeToolbarSection: ToolbarVisibility;
 	setToolbarSection: (section: ToolbarSection) => void;
 	selectedTool: Tool | undefined;
-	selectTool: (tool: Tool | undefined) => void;
+	selectTool: (tool: Tool["action"] | undefined) => void;
 	clearToolAndSections: () => void;
 }
 
@@ -39,15 +39,31 @@ export function ToolbarContextProvider({
 	};
 
 	// Handle tool selection
-	const selectTool = (tool: Tool | undefined) => {
-		setSelectedTool(tool);
-		// Close all sections when a tool is selected
-		// if (tool) {
-		// 	setActiveToolbarSection({
-		// 		main: false,
-		// 		star: false,
-		// 	});
-		// }
+	const selectTool = (tool: Tool["action"] | undefined) => {
+		switch (tool) {
+			case "addTextNode":
+				return setSelectedTool({
+					action: "addTextNode",
+					category: "edit",
+				});
+			case "addFileNode":
+				return setSelectedTool({
+					action: "addFileNode",
+					category: "edit",
+				});
+			case "addTextGenerationNode":
+				return setSelectedTool({
+					action: "addTextGenerationNode",
+					category: "edit",
+				});
+			case "move":
+				return setSelectedTool({
+					action: "move",
+					category: "move",
+				});
+			default:
+				return setSelectedTool(undefined);
+		}
 	};
 
 	// Clear tool selection and close all sections

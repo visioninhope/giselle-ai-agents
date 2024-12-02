@@ -113,7 +113,7 @@ function EditorInner() {
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
 				className="giselle-flow"
-				data-floating-node={selectedTool !== undefined}
+				data-floating-node={selectedTool?.category === "edit"}
 				colorMode="dark"
 				defaultNodes={[]}
 				defaultEdges={[]}
@@ -189,7 +189,7 @@ function EditorInner() {
 						x: event.clientX,
 						y: event.clientY,
 					});
-					switch (selectedTool) {
+					switch (selectedTool?.action) {
 						case "addTextNode":
 							dispatch({
 								type: "addNode",
@@ -268,7 +268,7 @@ function EditorInner() {
 				<Panel position={"bottom-center"}>
 					<Toolbar />
 				</Panel>
-				{selectedTool !== undefined && (
+				{selectedTool?.category === "edit" && (
 					<FloatingNodePreview tool={selectedTool} />
 				)}
 			</ReactFlow>

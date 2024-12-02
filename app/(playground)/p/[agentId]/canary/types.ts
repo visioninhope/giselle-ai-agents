@@ -156,8 +156,29 @@ export interface Graph {
 	artifacts: Artifact[];
 }
 
+interface ToolBase {
+	category: string;
+	action: string;
+}
+
+interface AddTextNodeTool extends ToolBase {
+	category: "edit";
+	action: "addTextNode";
+}
+interface AddFileNodeTool extends ToolBase {
+	category: "edit";
+	action: "addFileNode";
+}
+interface AddTextGenerationNodeTool extends ToolBase {
+	category: "edit";
+	action: "addTextGenerationNode";
+}
+interface MoveTool extends ToolBase {
+	category: "move";
+	action: "move";
+}
 export type Tool =
-	| "addTextNode"
-	| "addFileNode"
-	| "addTextGenerationNode"
-	| "move";
+	| AddTextNodeTool
+	| AddFileNodeTool
+	| AddTextGenerationNodeTool
+	| MoveTool;

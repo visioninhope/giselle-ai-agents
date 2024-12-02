@@ -31,7 +31,7 @@ type WebSearchNode = XYFlowNode<{ node: WebSearch }>;
 export type Node = TextNode | FileNode | TextGenerationNode | WebSearchNode;
 
 export function PreviewNode({ tool }: { tool: Tool }) {
-	switch (tool) {
+	switch (tool.action) {
 		case "addTextNode":
 			return (
 				<Node

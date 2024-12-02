@@ -49,7 +49,7 @@ export function Toolbar() {
 					type="single"
 					className="flex items-center px-[16px] z-10 h-full"
 					onValueChange={(value) => {
-						selectTool(value as Tool);
+						selectTool(value as Tool["action"]);
 					}}
 					onKeyUp={(key) => {
 						if (key.code === "Escape") {
