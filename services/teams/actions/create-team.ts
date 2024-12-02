@@ -63,11 +63,11 @@ async function createCheckout(userDbId: number, teamName: string) {
 	invariant(siteUrl, "NEXT_PUBLIC_SITE_URL is not set");
 	invariant(serviceSiteUrl, "NEXT_PUBLIC_SERVICE_SITE_URL is not set");
 
-	const proPlanId = process.env.STRIPE_PRO_PLAN_ID;
+	const proPlanPriceId = process.env.STRIPE_PRO_PLAN_PRICE_ID;
 	const agentTimeChargePriceId = process.env.STRIPE_AGENT_TIME_CHARGE_PRICE_ID;
 	const userSeatPriceId = process.env.STRIPE_USER_SEAT_PRICE_ID;
 
-	invariant(proPlanId, "STRIPE_PRO_PLAN_ID is not set");
+	invariant(proPlanPriceId, "STRIPE_PRO_PLAN_ID is not set");
 	invariant(
 		agentTimeChargePriceId,
 		"STRIPE_AGENT_TIME_CHARGE_PRICE_ID is not set",
@@ -83,7 +83,7 @@ async function createCheckout(userDbId: number, teamName: string) {
 		mode: "subscription",
 		line_items: [
 			{
-				price: proPlanId,
+				price: proPlanPriceId,
 				quantity: 1,
 			},
 			{
