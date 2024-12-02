@@ -1,11 +1,10 @@
 # giselle
 
-
-As of December  2, 2024  4:57am. 913 total
+As of December  2, 2024  7:44am. 914 total
 
 ## Summary
 * 669 MIT
-* 125 Apache 2.0
+* 126 Apache 2.0
 * 62 ISC
 * 24 New BSD
 * 13 Simplified BSD
