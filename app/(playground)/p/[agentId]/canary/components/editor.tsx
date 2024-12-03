@@ -17,7 +17,7 @@ import { useMousePosition } from "../contexts/mouse-position";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToolbar } from "../contexts/toolbar";
 import type { ConnectionId, NodeId, Tool } from "../types";
-import { createNodeId } from "../utils";
+import { createNodeId, isTextGeneration } from "../utils";
 import { Edge } from "./edge";
 import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -130,10 +130,65 @@ export function Editor() {
 								break;
 							}
 							case "remove": {
+								const removeNode = graph.nodes.find(
+									(node) => node.id === nodeChange.id,
+								);
+								if (removeNode === undefined) {
+									return;
+								}
+								const incomingConnections = graph.connections.filter(
+									(connection) => connection.sourceNodeId === removeNode.id,
+								);
+								incomingConnections.map((incomingConnection) => {
+									dispatch({
+										type: "removeConnection",
+										input: {
+											connectionId: incomingConnection.id,
+										},
+									});
+								});
+								const dependentNodes = graph.nodes.filter((node) =>
+									incomingConnections.some(
+										(conn) => conn.targetNodeId === node.id,
+									),
+								);
+								dependentNodes.map((dependentNode) => {
+									const handleIds = incomingConnections
+										.filter(
+											(incomingConnection) =>
+												incomingConnection.targetNodeId === dependentNode.id,
+										)
+										.map(
+											(incomingConnection) =>
+												incomingConnection.targetNodeHandleId,
+										);
+									if (isTextGeneration(dependentNode)) {
+										dispatch({
+											type: "updateNode",
+											input: {
+												nodeId: dependentNode.id,
+												node: {
+													...dependentNode,
+													content: {
+														...dependentNode.content,
+														requirement: handleIds.includes(
+															dependentNode.content.requirement?.id,
+														)
+															? undefined
+															: dependentNode.content.requirement,
+														sources: dependentNode.content.sources.filter(
+															(source) => !handleIds.includes(source.id),
+														),
+													},
+												},
+											},
+										});
+									}
+								});
 								dispatch({
 									type: "removeNode",
 									input: {
-										nodeId: nodeChange.id as NodeId,
+										nodeId: removeNode.id,
 									},
 								});
 								break;
