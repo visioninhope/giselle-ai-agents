@@ -1,10 +1,10 @@
 # giselle
 
-As of December  2, 2024  6:53am. 913 total
+As of December  2, 2024  7:44am. 914 total
 
 ## Summary
 * 669 MIT
-* 125 Apache 2.0
+* 126 Apache 2.0
 * 62 ISC
 * 24 New BSD
 * 13 Simplified BSD
@@ -1800,6 +1800,17 @@ OpenTelemetry semantic conventions
 
 <a name="@opentelemetry/semantic-conventions"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions">@opentelemetry/semantic-conventions</a> v1.27.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry semantic conventions
+
+<a name="@opentelemetry/semantic-conventions"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/semantic-conventions">@opentelemetry/semantic-conventions</a> v1.28.0 (dependencies)
 #### 
 
 ##### Paths

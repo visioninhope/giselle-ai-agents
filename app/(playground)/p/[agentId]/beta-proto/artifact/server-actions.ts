@@ -6,7 +6,6 @@ import { createStreamableValue } from "ai/rsc";
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { createLogger } from "@/lib/opentelemetry";
-import { metrics } from "@opentelemetry/api";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
@@ -73,24 +72,19 @@ ${sourcesToText(sources)}
 				schema: artifactSchema,
 				onFinish: async (result) => {
 					const duration = performance.now() - startTime;
-					const meter = metrics.getMeter(params.modelConfiguration.provider);
-					const tokenCounter = meter.createCounter("token_consumed", {
-						description: "Number of OpenAI API tokens consumed by each request",
-					});
 					const measurementScope = await getCurrentMeasurementScope();
 					const isR06User = await isRoute06User();
-					tokenCounter.add(result.usage.totalTokens, {
-						measurementScope,
-						isR06User,
-					});
 					generation.end({
 						output: result,
 					});
 
 					logger.info(
 						{
+							externalServiceName: "openai",
 							tokenConsumed: result.usage.totalTokens,
 							duration,
+							measurementScope,
+							isR06User,
 						},
 						"response obtained",
 					);
