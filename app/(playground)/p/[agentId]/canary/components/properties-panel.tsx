@@ -1019,6 +1019,27 @@ function TabsContentPrompt({
 					id="text"
 					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1 mb-[16px]"
 					defaultValue={content.instruction}
+					ref={(ref) => {
+						if (ref === null) {
+							return;
+						}
+
+						function handleBlur() {
+							if (ref === null) {
+								return;
+							}
+							if (content.instruction !== ref.value) {
+								onContentChange?.({
+									...content,
+									instruction: ref.value,
+								});
+							}
+						}
+						ref.addEventListener("blur", handleBlur);
+						return () => {
+							ref.removeEventListener("blur", handleBlur);
+						};
+					}}
 				/>
 			</PropertiesPanelContentBox>
 
