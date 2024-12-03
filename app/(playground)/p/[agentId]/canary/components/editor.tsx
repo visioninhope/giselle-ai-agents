@@ -16,7 +16,7 @@ import { useGraph } from "../contexts/graph";
 import { useMousePosition } from "../contexts/mouse-position";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToolbar } from "../contexts/toolbar";
-import type { NodeId, Tool } from "../types";
+import type { ConnectionId, NodeId, Tool } from "../types";
 import { createNodeId } from "../utils";
 import { Edge } from "./edge";
 import { Node, PreviewNode } from "./node";
@@ -74,15 +74,15 @@ export function Editor() {
 						source: connection.sourceNodeId,
 						target: connection.targetNodeId,
 						targetHandle: connection.targetNodeHandleId,
-						selectable: selectedTool.category === "move",
-						deletable: selectedTool.category === "move",
+						selectable: false,
+						deletable: false,
 						data: {
 							connection,
 						},
 					}) satisfies Edge,
 			),
 		);
-	}, [graph.connections, reactFlowInstance.setEdges, selectedTool]);
+	}, [graph.connections, reactFlowInstance.setEdges]);
 	const { setTab } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
@@ -138,13 +138,6 @@ export function Editor() {
 								});
 								break;
 							}
-						}
-					});
-				}}
-				onEdgesChange={(edgesChange) => {
-					edgesChange.map((edgeChange) => {
-						if (edgeChange.type === "remove") {
-							console.log(edgeChange);
 						}
 					});
 				}}
