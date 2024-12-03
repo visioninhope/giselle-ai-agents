@@ -1,0 +1,6 @@
+Contact: mailto:security@giselles.ai
+Expires: 2025-11-30T23:59:59Z
+
+Preferred-Languages: en, ja
+Policy: https://github.com/giselles-ai/giselle/security/policy
+Canonical: https://studio.giselles.ai/.well-known/security.txt

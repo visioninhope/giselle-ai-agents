@@ -66,6 +66,7 @@ export const subscriptions = pgTable("subscriptions", {
 	trialEnd: timestamp("trial_end"),
 });
 
+type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
@@ -74,11 +75,14 @@ export const teams = pgTable("teams", {
 		.defaultNow()
 		.notNull()
 		.$onUpdate(() => new Date()),
+	type: text("type").$type<TeamType>().notNull().default("customer"),
 });
 
 export type UserId = `usr_${string}`;
 export const users = pgTable("users", {
 	id: text("id").$type<UserId>().notNull().unique(),
+	email: text("email").unique(), // TODO: Allow null values initially when adding schema, then change to not null after data update
+	displayName: text("display_name"),
 	dbId: serial("db_id").primaryKey(),
 });
 
@@ -126,6 +130,7 @@ export const agents = pgTable("agents", {
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
 	name: text("name"),
+	graphUrl: text("graph_url"), // // TODO: add notNull constrain when new architecture released
 	graphv2: jsonb("graphv2").$type<Graph>().notNull(),
 	graph: jsonb("graph")
 		.$type<PlaygroundGraph>()
