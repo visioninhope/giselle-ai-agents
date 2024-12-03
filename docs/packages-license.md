@@ -1,10 +1,10 @@
 # giselle
 
-As of December  2, 2024  6:18am. 913 total
+As of December  3, 2024  2:25am. 918 total
 
 ## Summary
-* 668 MIT
-* 126 Apache 2.0
+* 672 MIT
+* 127 Apache 2.0
 * 62 ISC
 * 24 New BSD
 * 13 Simplified BSD
@@ -8062,7 +8062,7 @@ Parse Postgres interval columns
 Range data type parser and serializer for PostgreSQL
 
 <a name="posthog-js"></a>
-### posthog-js v1.187.2 (dependencies)
+### posthog-js v1.194.2 (dependencies)
 #### 
 
 ##### Paths
@@ -8084,7 +8084,7 @@ Posthog-js allows you to automatically capture usage and send events to PostHog.
 Fast 3kb React-compatible Virtual DOM library.
 
 <a name="preact"></a>
-### <a href="https://preactjs.com">preact</a> v10.25.0 (dependencies)
+### <a href="https://preactjs.com">preact</a> v10.25.1 (dependencies)
 #### 
 
 ##### Paths
