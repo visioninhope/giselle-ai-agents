@@ -7,6 +7,7 @@ import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
 	ChevronsUpDownIcon,
+	CornerDownRightIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -47,6 +48,7 @@ import {
 	createConnectionId,
 	createFileId,
 	createNodeHandleId,
+	createNodeId,
 	isFile,
 	isText,
 	isTextGeneration,
@@ -352,7 +354,6 @@ export function PropertiesPanel() {
 											});
 											setTab("Result");
 											const latestGraphUrl = await flush();
-											console.log(latestGraphUrl);
 											const stream = await action(
 												latestGraphUrl,
 												selectedNode.id,
@@ -606,7 +607,62 @@ export function PropertiesPanel() {
 					)}
 					{selectedNode && (
 						<TabsContent value="Result">
-							<TabContentGenerateTextResult node={selectedNode} />
+							<TabContentGenerateTextResult
+								node={selectedNode}
+								onCreateNewTextGenerator={() => {
+									const nodeId = createNodeId();
+									const handleId = createNodeHandleId();
+									dispatch([
+										{
+											type: "addNode",
+											input: {
+												node: {
+													id: nodeId,
+													name: `Untitle node - ${graph.nodes.length + 1}`,
+													position: {
+														x: selectedNode.position.x + 400,
+														y: selectedNode.position.y + 100,
+													},
+													selected: true,
+													type: "action",
+													content: {
+														type: "textGeneration",
+														llm: "anthropic:claude-3-5-sonnet-latest",
+														temperature: 0.7,
+														topP: 1,
+														instruction: "",
+														sources: [{ id: handleId, label: "Source1" }],
+													},
+												},
+											},
+										},
+										{
+											type: "addConnection",
+											input: {
+												connection: {
+													id: createConnectionId(),
+													sourceNodeId: selectedNode.id,
+													sourceNodeType: selectedNode.type,
+													targetNodeId: nodeId,
+													targetNodeHandleId: handleId,
+													targetNodeType: "action",
+												},
+											},
+										},
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													selected: false,
+												},
+											},
+										},
+									]);
+									setTab("Prompt");
+								}}
+							/>
 						</TabsContent>
 					)}
 				</Tabs>
@@ -1318,8 +1374,10 @@ const formatTimestamp = {
 
 function TabContentGenerateTextResult({
 	node,
+	onCreateNewTextGenerator,
 }: {
 	node: Node;
+	onCreateNewTextGenerator?: () => void;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
 	if (artifact == null) {
@@ -1368,9 +1426,21 @@ function TabContentGenerateTextResult({
 			)}
 
 			{artifact.type === "generatedArtifact" && (
-				<div>
+				<div className="flex flex-col gap-[8px]">
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
+					</div>
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onCreateNewTextGenerator?.();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Create a new Text Generator with this result as Source
+						</button>
 					</div>
 				</div>
 			)}
