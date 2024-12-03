@@ -12,7 +12,6 @@ import {
 	teamMemberships,
 	teams,
 } from "@/drizzle";
-import { proTeamPlanFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import { isEmailFromRoute06 } from "@/lib/utils";
 import { formatStripePrice, stripe } from "@/services/external/stripe";
@@ -47,11 +46,6 @@ async function fetchTeams(supabaseUserId: string) {
 }
 
 export default async function TeamCreationModal() {
-	const proTeamPlan = await proTeamPlanFlag();
-	if (!proTeamPlan) {
-		return null;
-	}
-
 	const user = await getUser();
 	if (!user) {
 		throw new Error("User not found");
