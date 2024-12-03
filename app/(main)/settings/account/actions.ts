@@ -108,18 +108,23 @@ export async function disconnectGitHubIdentity() {
 }
 
 export async function getAccountInfo() {
-	const supabaseUser = await getUser();
+	try {
+		const supabaseUser = await getUser();
 
-	const _users = await db
-		.select({ displayName: users.displayName, email: users.email })
-		.from(users)
-		.innerJoin(
-			supabaseUserMappings,
-			eq(users.dbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+		const _users = await db
+			.select({ displayName: users.displayName, email: users.email })
+			.from(users)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(users.dbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
-	return _users[0];
+		return _users[0];
+	} catch (error) {
+		logger.error("Failed to get account info:", error);
+		return { success: false, error };
+	}
 }
 
 export async function updateDisplayName(formData: FormData) {
