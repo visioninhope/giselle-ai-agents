@@ -33,6 +33,7 @@ async function activateProTeamSubscription(subscription: Stripe.Subscription) {
 			10,
 		);
 		await upgradeExistingTeam(subscription, teamDbId);
+		return;
 	}
 
 	const draftTeamNameKey = DRAFT_TEAM_NAME_METADATA_KEY;
@@ -47,6 +48,7 @@ async function activateProTeamSubscription(subscription: Stripe.Subscription) {
 			10,
 		);
 		await createNewProTeam(subscription, userDbId, teamName);
+		return;
 	}
 
 	throw new Error("Invalid subscription metadata");
