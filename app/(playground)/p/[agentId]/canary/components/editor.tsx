@@ -130,7 +130,12 @@ export function Editor() {
 								break;
 							}
 							case "remove": {
-								console.log(nodeChange);
+								dispatch({
+									type: "removeNode",
+									input: {
+										nodeId: nodeChange.id as NodeId,
+									},
+								});
 								break;
 							}
 						}
