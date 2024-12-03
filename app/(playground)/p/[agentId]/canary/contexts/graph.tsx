@@ -279,7 +279,7 @@ export function useNode(query: TargetHandle) {
 interface CreatorNode {
 	creatorNodeId?: NodeId;
 }
-export function useArtifact(query: CreatorNode): Artifact | null {
+export function useArtifact(query: CreatorNode): Artifact | null | undefined {
 	const {
 		graph: { artifacts },
 	} = useGraph();

@@ -1322,7 +1322,7 @@ function TabContentGenerateTextResult({
 	node: Node;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
-	if (artifact === null) {
+	if (artifact == null) {
 		return null;
 	}
 	if (artifact.object.type !== "text") {
