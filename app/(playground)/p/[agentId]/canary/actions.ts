@@ -5,6 +5,7 @@ import { put } from "@vercel/blob";
 import { jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import HandleBars from "handlebars";
+import Langfuse from "langfuse";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
@@ -24,6 +25,7 @@ import type {
 import {
 	buildGraphPath,
 	elementsToMarkdown,
+	langfuseModel,
 	pathJoin,
 	resolveLanguageModel,
 } from "./utils";
@@ -70,6 +72,11 @@ export async function action(
 	graphUrl: string,
 	nodeId: NodeId,
 ) {
+	const lf = new Langfuse();
+	const trace = lf.trace({
+		sessionId: artifactId,
+	});
+
 	const graph = await fetch(graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
@@ -190,8 +197,18 @@ export async function action(
 			const topP = node.content.topP;
 			const temperature = node.content.temperature;
 			const stream = createStreamableValue<TextArtifactObject>();
+
+			const generationTracer = trace.generation({
+				name: "generate-text",
+				input: prompt,
+				model: langfuseModel(node.content.llm),
+				modelParameters: {
+					topP: node.content.topP,
+					temperature: node.content.temperature,
+				},
+			});
 			(async () => {
-				const { partialObjectStream } = await streamObject({
+				const { partialObjectStream, object } = await streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
@@ -212,6 +229,8 @@ export async function action(
 						},
 					});
 				}
+				const result = await object;
+				generationTracer.end({ output: result });
 				stream.done();
 			})();
 			return stream.value;
