@@ -22,6 +22,7 @@ import {
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
+import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { action, parse } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import {
@@ -1357,6 +1358,14 @@ function TabContentGenerateTextResult({
 				</Dialog>
 			)}
 			<div>{artifact.object.messages.description}</div>
+
+			{artifact.type === "streamArtifact" && (
+				<div className="flex gap-[12px]">
+					<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_infinite]" />
+					<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_0.6s_infinite]" />
+					<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_1.2s_infinite]" />
+				</div>
+			)}
 
 			{artifact.type === "generatedArtifact" && (
 				<div>
