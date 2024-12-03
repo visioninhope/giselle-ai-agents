@@ -5,14 +5,19 @@ import posthog from "posthog-js";
 import { PostHogProvider } from "posthog-js/react";
 import { useEffect } from "react";
 
-export function Analytics({
+export function PHProvider({
 	children,
 }: {
 	children: React.ReactNode;
 }) {
-	if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== "true") {
+	if (process.env.NEXT_PUBLIC_ENABLE_POSTHOG !== "true") {
 		return <>{children}</>;
 	}
+
+	return <PHProviderEnabled>{children}</PHProviderEnabled>;
+}
+
+function PHProviderEnabled({ children }: { children: React.ReactNode }) {
 	useEffect(() => {
 		try {
 			const posthog_key =
@@ -30,7 +35,7 @@ export function Analytics({
 		} catch (error) {
 			Sentry.captureException(error);
 			if (process.env.NODE_ENV !== "production") {
-				console.error("Analytics:", error);
+				console.error("PostHog:", error);
 			}
 		}
 	}, []);
