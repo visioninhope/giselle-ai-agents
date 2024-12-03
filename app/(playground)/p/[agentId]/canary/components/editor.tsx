@@ -30,31 +30,13 @@ import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
 
-interface EditorProps {
-	graph: Graph;
-}
-export function Editor(props: EditorProps) {
-	return (
-		<GraphContextProvider defaultGraph={props.graph}>
-			<PropertiesPanelProvider>
-				<ReactFlowProvider>
-					<ToolbarContextProvider>
-						<MousePositionProvider>
-							<EditorInner />
-						</MousePositionProvider>
-					</ToolbarContextProvider>
-				</ReactFlowProvider>
-			</PropertiesPanelProvider>
-		</GraphContextProvider>
-	);
-}
 const nodeTypes = {
 	giselleNode: Node,
 };
 const edgeTypes = {
 	giselleEdge: Edge,
 };
-function EditorInner() {
+export function Editor() {
 	const { graph, dispatch } = useGraph();
 	const { selectedTool, reset } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();

@@ -1,5 +1,6 @@
 import { GiselleLogo } from "@/components/giselle-logo";
 import { UserButton } from "@/services/accounts/components";
+import TeamCreationModal from "@/services/teams/components/team-creation-modal";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Nav } from "./nav";
@@ -14,7 +15,8 @@ export default function Layout({ children }: { children: ReactNode }) {
 					</Link>
 					<Nav />
 				</div>
-				<div>
+				<div className="flex items-center gap-4">
+					<TeamCreationModal />
 					<UserButton />
 				</div>
 			</header>
