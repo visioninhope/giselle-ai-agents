@@ -1,9 +1,9 @@
 # giselle
 
-As of December  2, 2024  6:18am. 913 total
+As of December  2, 2024  7:44am. 914 total
 
 ## Summary
-* 668 MIT
+* 669 MIT
 * 126 Apache 2.0
 * 62 ISC
 * 24 New BSD
@@ -2427,6 +2427,17 @@ Radix UI React Icon Set
 
 <a name="@radix-ui/react-primitive"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-primitive</a> v2.0.0 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@radix-ui/react-radio-group"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-radio-group</a> v1.2.1 (dependencies)
 #### 
 
 ##### Paths
