@@ -1,5 +1,6 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import invariant from "tiny-invariant";
 import { UPGRADING_TEAM_DB_ID_KEY } from "../constants";
 import { createCheckoutSession } from "./create-checkout-session";
@@ -18,5 +19,10 @@ export async function upgradeTeam(teamDbId: number) {
 		[UPGRADING_TEAM_DB_ID_KEY]: teamDbId.toString(),
 	};
 
-	return createCheckoutSession(subscriptionMetadata, successUrl, cancelUrl);
+	const checkoutUrl = await createCheckoutSession(
+		subscriptionMetadata,
+		successUrl,
+		cancelUrl,
+	);
+	redirect(checkoutUrl);
 }
