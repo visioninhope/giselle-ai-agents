@@ -1,10 +1,12 @@
 import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
+import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { googleOauthFlag } from "@/flags";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "../components/card";
+import { AccountDisplayNameForm } from "./account-display-name-form";
 import { getAccountInfo } from "./actions";
 import { GitHubAuthentication } from "./github-authentication";
 import { GoogleAuthentication } from "./google-authentication";
@@ -23,13 +25,11 @@ export default async function AccountSettingPage() {
 			</h3>
 			<Card title="Account Information">
 				<div className="max-w-[600px] grid gap-[16px]">
-					<Field
-						label="Display Name"
-						name="displayName"
-						type="text"
-						value={displayName ?? "No name"}
-						disabled
-					/>
+					<div className="grid gap-[4px]">
+						<Label>Display name</Label>
+						<AccountDisplayNameForm displayName={displayName} />
+					</div>
+
 					<Field
 						label="Email"
 						name="email"
