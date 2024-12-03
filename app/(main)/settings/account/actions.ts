@@ -123,7 +123,7 @@ export async function getAccountInfo() {
 		return _users[0];
 	} catch (error) {
 		logger.error("Failed to get account info:", error);
-		return { success: false, error };
+		throw error;
 	}
 }
 
