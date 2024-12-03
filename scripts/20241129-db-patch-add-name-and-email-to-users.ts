@@ -1,11 +1,11 @@
 /**
- * This script updates email addresses in the users table by synchronizing with Supabase Auth.
+ * Script to update email addresses in the users table by synchronizing with Supabase Auth.
  *
- * The script:
- * 1. Fetches users from Supabase Auth API with pagination (100 users per page)
- * 2. For each user, updates the email in the users table using supabaseUserMappings as a join table
- * 3. Handles errors gracefully and continues processing even if individual updates fail
- * 4. Logs progress and any errors that occur during the process
+ * This script:
+ * 1. Fetches all users from Supabase Auth API (up to 500 users)
+ * 2. Updates email addresses in the users table using supabaseUserMappings as a join table
+ * 3. Handles errors gracefully and logs any issues
+ * 4. Performs updates in a single batch operation
  *
  * Requirements:
  * - Supabase service role key for authentication
@@ -22,51 +22,51 @@ async function main() {
 	const key = process.env.SUPABASE_SERVICE_KEY as string;
 	const supabase = createClient(url, key);
 
-	const perPage = 100;
-	let page = 1;
-	let hasMore = true;
+	// Fetch all users from Supabase Auth (up to 500)
+	const {
+		data: { users },
+		error,
+	} = await supabase.auth.admin.listUsers({
+		perPage: 500,
+	});
 
-	while (hasMore) {
-		const {
-			data: { users },
-			error,
-		} = await supabase.auth.admin.listUsers({
-			page,
-			perPage,
-		});
-
-		if (error) {
-			throw error;
-		}
-
-		console.log(`Processing page ${page}, found ${users.length} users`);
-
-		for (const user of users) {
-			const { id: supabaseUserId, email } = user;
-			if (!email) continue;
-
-			try {
-				await db.execute(
-					sql`
-            UPDATE ${usersSchema}
-            SET email = ${email}
-            FROM ${supabaseUserMappings}
-            WHERE ${usersSchema.dbId} = ${supabaseUserMappings.userDbId}
-            AND ${supabaseUserMappings.supabaseUserId} = ${supabaseUserId}
-          `,
-				);
-
-				console.log(`Updated user ${supabaseUserId} with email ${email}`);
-			} catch (err) {
-				console.error(`Failed to update user ${supabaseUserId}:`, err);
-			}
-		}
-
-		hasMore = users.length === perPage;
-		page++;
+	if (error) {
+		throw error;
 	}
 
-	console.log("Finished processing all users");
+	console.log(`Found ${users.length} users`);
+
+	// Filter out users without email
+	const validUsers = users.filter((user) => user.email);
+
+	if (validUsers.length === 0) {
+		console.log("No users to update");
+		return;
+	}
+
+	// Perform bulk update
+	try {
+		for (const user of validUsers) {
+			const { id: supabaseUserId, email } = user;
+
+			await db.execute(
+				sql`
+          UPDATE ${usersSchema}
+          SET email = ${email}
+          FROM ${supabaseUserMappings}
+          WHERE ${usersSchema.dbId} = ${supabaseUserMappings.userDbId}
+          AND ${supabaseUserMappings.supabaseUserId} = ${supabaseUserId}
+        `,
+			);
+
+			console.log(`Updated user ${supabaseUserId} with email ${email}`);
+		}
+	} catch (err) {
+		console.error("Failed to update users:", err);
+		throw err;
+	}
+
+	console.log("Successfully finished updating all users");
 }
 
 main().catch((error) => {
