@@ -122,7 +122,7 @@ export async function action(
 						);
 						if (
 							generatedArtifact === undefined ||
-							generatedArtifact.type === "generatedArtifact"
+							generatedArtifact.type !== "generatedArtifact"
 						) {
 							return null;
 						}
@@ -185,6 +185,7 @@ export async function action(
 			const prompt = promptTemplate({
 				instruction: node.content.instruction,
 				requirement,
+				sources: actionSources,
 			});
 			const topP = node.content.topP;
 			const temperature = node.content.temperature;
