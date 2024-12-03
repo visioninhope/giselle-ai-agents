@@ -15,7 +15,7 @@ import {
 } from "@/services/external/github";
 import "@xyflow/react/dist/style.css";
 import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { Playground } from "./beta-proto/component";
 import type { Repository } from "./beta-proto/github-integration/context";
 import type { Graph } from "./beta-proto/graph/types";
@@ -135,7 +135,7 @@ export default async function AgentPlaygroundPage({
 	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
 	const playgroundV2Flag = await getPlaygroundV2Flag();
 	if (playgroundV2Flag) {
-		return <PlaygroundV2Page />;
+		return redirect(`/p/${agentId}/canary`);
 	}
 
 	const agent = await getAgent(agentId);

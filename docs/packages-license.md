@@ -2436,6 +2436,17 @@ Radix UI React Icon Set
 
 
 
+<a name="@radix-ui/react-radio-group"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-radio-group</a> v1.2.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-roving-focus"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-roving-focus</a> v1.1.0 (dependencies)
 #### 
