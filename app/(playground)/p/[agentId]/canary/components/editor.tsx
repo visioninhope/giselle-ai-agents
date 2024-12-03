@@ -5,25 +5,18 @@ import {
 	BackgroundVariant,
 	Panel,
 	ReactFlow,
-	ReactFlowProvider,
 	SelectionMode,
 	useReactFlow,
 	useUpdateNodeInternals,
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { useEffect, useMemo, useState } from "react";
-import { GraphContextProvider, useGraph } from "../contexts/graph";
-import {
-	MousePositionProvider,
-	useMousePosition,
-} from "../contexts/mouse-position";
-import {
-	PropertiesPanelProvider,
-	usePropertiesPanel,
-} from "../contexts/properties-panel";
-import { ToolbarContextProvider, useToolbar } from "../contexts/toolbar";
-import type { Graph, NodeId, Position, Tool } from "../types";
+import { useEffect } from "react";
+import { useGraph } from "../contexts/graph";
+import { useMousePosition } from "../contexts/mouse-position";
+import { usePropertiesPanel } from "../contexts/properties-panel";
+import { useToolbar } from "../contexts/toolbar";
+import type { NodeId, Tool } from "../types";
 import { createNodeId } from "../utils";
 import { Edge } from "./edge";
 import { Node, PreviewNode } from "./node";
