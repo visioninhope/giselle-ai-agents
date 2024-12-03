@@ -6,7 +6,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { rosart } from "./fonts";
 import { PHProvider } from "./providers";
-import { Tracking } from "./tracking";
+import { PostHogPageView } from "./posthog-page-view";
 
 const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
@@ -48,7 +48,7 @@ export default function RootLayout({
 						disableTransitionOnChange
 					>
 						<Suspense>
-							<Tracking />
+							<PostHogPageView />
 						</Suspense>
 						{children}
 					</ThemeProvider>

@@ -4,7 +4,7 @@ import { usePathname, useSearchParams } from "next/navigation";
 import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
 
-export function Tracking(): null {
+export function PostHogPageView(): null {
 	if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== "true") {
 		return null;
 	}
