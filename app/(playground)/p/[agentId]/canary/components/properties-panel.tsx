@@ -1,6 +1,7 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
@@ -8,6 +9,7 @@ import {
 	ArrowUpFromLineIcon,
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
+	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -355,6 +357,7 @@ export function PropertiesPanel() {
 											setTab("Result");
 											const latestGraphUrl = await flush();
 											const stream = await action(
+												artifactId,
 												latestGraphUrl,
 												selectedNode.id,
 											);
@@ -1450,6 +1453,29 @@ function TabContentGenerateTextResult({
 				<div className="flex flex-col gap-[8px]">
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
+						<TooltipPrimitive.Provider>
+							<TooltipPrimitive.Root>
+								<TooltipPrimitive.Trigger asChild>
+									<button
+										type="button"
+										onClick={() => {
+											navigator.clipboard.writeText(artifact.id);
+										}}
+									>
+										<FingerprintIcon className="w-[12px] h-[12px] text-black-30/50" />
+									</button>
+								</TooltipPrimitive.Trigger>
+								<TooltipPrimitive.Portal>
+									<TooltipPrimitive.Content
+										sideOffset={4}
+										className="z-50 overflow-hidden flex gap-[4px] rounded-[6px] bg-black-30 px-[8px] py-[2px] text-xs text-black-100 shadow-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+									>
+										<span>{artifact.id}</span>
+										<span>(Click to copy)</span>
+									</TooltipPrimitive.Content>
+								</TooltipPrimitive.Portal>
+							</TooltipPrimitive.Root>
+						</TooltipPrimitive.Provider>
 					</div>
 					<div>
 						<button

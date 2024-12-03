@@ -11,6 +11,7 @@ import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
+	ArtifactId,
 	FileId,
 	Graph,
 	GraphId,
@@ -64,7 +65,11 @@ interface TextGenerationSource extends ActionSourceBase {
 
 type ActionSource = TextSource | TextGenerationSource;
 
-export async function action(graphUrl: string, nodeId: NodeId) {
+export async function action(
+	artifactId: ArtifactId,
+	graphUrl: string,
+	nodeId: NodeId,
+) {
 	const graph = await fetch(graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
