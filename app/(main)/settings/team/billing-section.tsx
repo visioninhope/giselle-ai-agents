@@ -30,14 +30,16 @@ export default async function BillingSection() {
 					</p>
 				</div>
 				{proTeamPlan && team.type !== "internal" && (
-					<Suspense
-						fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
-					>
-						<BillingButton
-							subscriptionId={team.subscriptionId}
-							teamDbId={team.dbid}
-						/>
-					</Suspense>
+					<form>
+						<Suspense
+							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
+						>
+							<BillingButton
+								subscriptionId={team.subscriptionId}
+								teamDbId={team.dbid}
+							/>
+						</Suspense>
+					</form>
 				)}
 			</div>
 		</Card>
