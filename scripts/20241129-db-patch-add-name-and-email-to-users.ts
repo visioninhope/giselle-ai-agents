@@ -44,7 +44,7 @@ async function main() {
 		return;
 	}
 
-	// Perform bulk update
+	// Perform update for all valid users
 	try {
 		for (const user of validUsers) {
 			const { id: supabaseUserId, email } = user;
