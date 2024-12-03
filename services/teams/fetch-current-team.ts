@@ -6,7 +6,7 @@ import { and, asc, eq } from "drizzle-orm";
 export async function fetchCurrentTeam() {
 	const supabaseUser = await getUser();
 	const session = await getGiselleSession();
-	const teamDbId = session.teamDbId;
+	const teamDbId = session?.teamDbId;
 
 	if (teamDbId == null) {
 		// if the user does not have a teamDbId in their session, return the first team

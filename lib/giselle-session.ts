@@ -9,8 +9,11 @@ const GiselleSessionSchema = v.object({
 
 type GiselleSession = v.InferOutput<typeof GiselleSessionSchema>;
 
-export async function getGiselleSession(): Promise<GiselleSession> {
+export async function getGiselleSession(): Promise<GiselleSession | null> {
 	const rawSession = await getCookie(COOKIE_NAME);
+	if (rawSession == null) {
+		return null;
+	}
 	return v.parse(GiselleSessionSchema, rawSession);
 }
 
