@@ -164,3 +164,8 @@ export function buildGraphFolderPath(graphId: GraphId) {
 export function buildGraphPath(graphId: GraphId) {
 	return pathJoin(buildGraphFolderPath(graphId), "graph.json");
 }
+
+export function langfuseModel(llm: TextGenerateActionContent["llm"]) {
+	const [_, model] = llm.split(":");
+	return model;
+}

@@ -1,12 +1,15 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
 	ChevronsUpDownIcon,
+	CornerDownRightIcon,
+	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -47,6 +50,7 @@ import {
 	createConnectionId,
 	createFileId,
 	createNodeHandleId,
+	createNodeId,
 	isFile,
 	isText,
 	isTextGeneration,
@@ -352,8 +356,8 @@ export function PropertiesPanel() {
 											});
 											setTab("Result");
 											const latestGraphUrl = await flush();
-											console.log(latestGraphUrl);
 											const stream = await action(
+												artifactId,
 												latestGraphUrl,
 												selectedNode.id,
 											);
@@ -606,7 +610,62 @@ export function PropertiesPanel() {
 					)}
 					{selectedNode && (
 						<TabsContent value="Result">
-							<TabContentGenerateTextResult node={selectedNode} />
+							<TabContentGenerateTextResult
+								node={selectedNode}
+								onCreateNewTextGenerator={() => {
+									const nodeId = createNodeId();
+									const handleId = createNodeHandleId();
+									dispatch([
+										{
+											type: "addNode",
+											input: {
+												node: {
+													id: nodeId,
+													name: `Untitle node - ${graph.nodes.length + 1}`,
+													position: {
+														x: selectedNode.position.x + 400,
+														y: selectedNode.position.y + 100,
+													},
+													selected: true,
+													type: "action",
+													content: {
+														type: "textGeneration",
+														llm: "anthropic:claude-3-5-sonnet-latest",
+														temperature: 0.7,
+														topP: 1,
+														instruction: "",
+														sources: [{ id: handleId, label: "Source1" }],
+													},
+												},
+											},
+										},
+										{
+											type: "addConnection",
+											input: {
+												connection: {
+													id: createConnectionId(),
+													sourceNodeId: selectedNode.id,
+													sourceNodeType: selectedNode.type,
+													targetNodeId: nodeId,
+													targetNodeHandleId: handleId,
+													targetNodeType: "action",
+												},
+											},
+										},
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													selected: false,
+												},
+											},
+										},
+									]);
+									setTab("Prompt");
+								}}
+							/>
 						</TabsContent>
 					)}
 				</Tabs>
@@ -963,6 +1022,27 @@ function TabsContentPrompt({
 					id="text"
 					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1 mb-[16px]"
 					defaultValue={content.instruction}
+					ref={(ref) => {
+						if (ref === null) {
+							return;
+						}
+
+						function handleBlur() {
+							if (ref === null) {
+								return;
+							}
+							if (content.instruction !== ref.value) {
+								onContentChange?.({
+									...content,
+									instruction: ref.value,
+								});
+							}
+						}
+						ref.addEventListener("blur", handleBlur);
+						return () => {
+							ref.removeEventListener("blur", handleBlur);
+						};
+					}}
 				/>
 			</PropertiesPanelContentBox>
 
@@ -1318,11 +1398,13 @@ const formatTimestamp = {
 
 function TabContentGenerateTextResult({
 	node,
+	onCreateNewTextGenerator,
 }: {
 	node: Node;
+	onCreateNewTextGenerator?: () => void;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
-	if (artifact === null) {
+	if (artifact == null) {
 		return null;
 	}
 	if (artifact.object.type !== "text") {
@@ -1368,9 +1450,44 @@ function TabContentGenerateTextResult({
 			)}
 
 			{artifact.type === "generatedArtifact" && (
-				<div>
+				<div className="flex flex-col gap-[8px]">
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
+						<TooltipPrimitive.Provider>
+							<TooltipPrimitive.Root>
+								<TooltipPrimitive.Trigger asChild>
+									<button
+										type="button"
+										onClick={() => {
+											navigator.clipboard.writeText(artifact.id);
+										}}
+									>
+										<FingerprintIcon className="w-[12px] h-[12px] text-black-30/50" />
+									</button>
+								</TooltipPrimitive.Trigger>
+								<TooltipPrimitive.Portal>
+									<TooltipPrimitive.Content
+										sideOffset={4}
+										className="z-50 overflow-hidden flex gap-[4px] rounded-[6px] bg-black-30 px-[8px] py-[2px] text-xs text-black-100 shadow-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+									>
+										<span>{artifact.id}</span>
+										<span>(Click to copy)</span>
+									</TooltipPrimitive.Content>
+								</TooltipPrimitive.Portal>
+							</TooltipPrimitive.Root>
+						</TooltipPrimitive.Provider>
+					</div>
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onCreateNewTextGenerator?.();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Create a new Text Generator with this result as Source
+						</button>
 					</div>
 				</div>
 			)}

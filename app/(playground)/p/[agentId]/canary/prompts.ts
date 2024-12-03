@@ -1,3 +1,6 @@
+import HandleBars from "handlebars";
+HandleBars.registerHelper("eq", (arg1, arg2) => arg1 === arg2);
+
 export const textGenerationPrompt = `
 You are tasked with generating text based on specific instructions, requirements, and sources provided by the user. Follow these steps carefully:
 
@@ -14,7 +17,19 @@ You are tasked with generating text based on specific instructions, requirements
 {{/if}}
 
 {{#if sources}}
-{{sources}}
+<sources>
+{{#each sources}}
+{{#if (eq this.type "text")}}
+<text id="{{this.nodeId}}">
+{{this.content}}
+</text>
+{{else if (eq this.type "textGeneration")}}
+<generated id="{{this.nodeId}}" title="{{this.title}}">
+{{this.content}}
+</generated>
+{{/if}}
+{{/each}}
+</sources>
 {{/if}}
 
 2. Process the instruction:
