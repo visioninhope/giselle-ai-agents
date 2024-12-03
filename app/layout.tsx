@@ -5,8 +5,8 @@ import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
 import { rosart } from "./fonts";
-import { PHProvider } from "./providers";
 import { PostHogPageView } from "./posthog-page-view";
+import { PHProvider } from "./providers";
 
 const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
