@@ -1,10 +1,10 @@
 # giselle
 
-As of December  3, 2024 12:49am. 914 total
+As of December  3, 2024  2:35am. 919 total
 
 ## Summary
-* 669 MIT
-* 126 Apache 2.0
+* 673 MIT
+* 127 Apache 2.0
 * 62 ISC
 * 24 New BSD
 * 13 Simplified BSD
@@ -4860,6 +4860,17 @@ Converts a source-map from/to  different formats and allows adding/changing prop
 
 HTTP server cookie parsing and serialization
 
+<a name="core-js"></a>
+### core-js v3.39.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Standard library
+
 <a name="cross-spawn"></a>
 ### <a href="https://github.com/moxystudio/node-cross-spawn">cross-spawn</a> v7.0.3 (dependencies, devDependencies)
 #### 
@@ -5563,6 +5574,17 @@ Safely and quickly serialize JavaScript objects
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 Fast, in memory work queue
+
+<a name="fflate"></a>
+### <a href="https://101arrowz.github.io/fflate">fflate</a> v0.4.8 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+High performance (de)compression in an 8kB package
 
 <a name="figures"></a>
 ### figures v2.0.0 (dependencies)
@@ -8050,8 +8072,30 @@ Parse Postgres interval columns
 
 Range data type parser and serializer for PostgreSQL
 
+<a name="posthog-js"></a>
+### posthog-js v1.194.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Posthog-js allows you to automatically capture usage and send events to PostHog.
+
 <a name="preact"></a>
 ### <a href="https://preactjs.com">preact</a> v10.11.3 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Fast 3kb React-compatible Virtual DOM library.
+
+<a name="preact"></a>
+### <a href="https://preactjs.com">preact</a> v10.25.1 (dependencies)
 #### 
 
 ##### Paths
@@ -9780,6 +9824,17 @@ The progressive JavaScript framework for building modern web UI.
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Web Streams, based on the WHATWG spec reference implementation
+
+<a name="web-vitals"></a>
+### web-vitals v4.2.4 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+Easily measure performance metrics in JavaScript
 
 <a name="webidl-conversions"></a>
 ### webidl-conversions v3.0.1 (dependencies)
