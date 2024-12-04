@@ -1,3 +1,5 @@
+"use server";
+
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { getUser } from "@/lib/supabase";
 import {
@@ -5,18 +7,20 @@ import {
 	needsAuthorization,
 } from "@/services/external/github";
 import { TriangleAlert } from "lucide-react";
-import { GitHubAuthentcationPresentation } from "../components/github-authentication-presentation";
-import { GitHubConnectionButton } from "../components/github-connection-button";
+import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGitHubIdentity,
 	disconnectGitHubIdentity,
 	reconnectGitHubIdentity,
 } from "./actions";
 
+const provider = "github";
+
 export async function GitHubAuthentication() {
-	const credential = await getOauthCredential("github");
+	const credential = await getOauthCredential(provider);
 	if (!credential) {
-		return <GitHubAuthentcationPresentation button={GitHubConnectButton} />;
+		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
 
 	const gitHubClient = buildGitHubUserClient(credential);
@@ -27,7 +31,7 @@ export async function GitHubAuthentication() {
 			supabaseUser.identities && supabaseUser.identities.length > 1;
 
 		return (
-			<GitHubAuthentcationPresentation
+			<GitHubAuthenticationPresentation
 				gitHubUser={gitHubUser}
 				button={unlinkable ? GitHubDisconnectButton : undefined}
 			/>
@@ -35,7 +39,7 @@ export async function GitHubAuthentication() {
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return (
-				<GitHubAuthentcationPresentation
+				<GitHubAuthenticationPresentation
 					button={GitHubReconnectButton}
 					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
 				/>
@@ -47,32 +51,32 @@ export async function GitHubAuthentication() {
 
 function GitHubConnectButton() {
 	return (
-		<GitHubConnectionButton action={connectGitHubIdentity}>
+		<ProviderConnectionButton action={connectGitHubIdentity}>
 			Connect
-		</GitHubConnectionButton>
+		</ProviderConnectionButton>
 	);
 }
 
 function GitHubReconnectButton() {
 	return (
 		<div>
-			<GitHubConnectionButton
+			<ProviderConnectionButton
 				action={reconnectGitHubIdentity}
 				className="text-yellow-500"
 			>
 				<TriangleAlert /> Reconnect
-			</GitHubConnectionButton>
+			</ProviderConnectionButton>
 		</div>
 	);
 }
 
 function GitHubDisconnectButton() {
 	return (
-		<GitHubConnectionButton
+		<ProviderConnectionButton
 			action={disconnectGitHubIdentity}
 			className="text-red-500"
 		>
 			Disconnect
-		</GitHubConnectionButton>
+		</ProviderConnectionButton>
 	);
 }

@@ -1,8 +1,7 @@
 import { db, oauthCredentials, supabaseUserMappings, users } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { and, eq } from "drizzle-orm";
-
-type Provider = "github";
+import type { Provider } from "./types";
 
 export async function getOauthCredential(provider: Provider) {
 	const supabaseUser = await getUser();

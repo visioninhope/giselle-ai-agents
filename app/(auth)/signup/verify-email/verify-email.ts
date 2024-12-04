@@ -2,7 +2,6 @@
 
 import { type AuthError, createClient } from "@/lib/supabase";
 import { initializeAccount } from "@/services/accounts";
-import { createCheckout } from "@/services/external/stripe/actions";
 import { redirect } from "next/navigation";
 
 export const verifyEmail = async (
@@ -34,7 +33,10 @@ export const verifyEmail = async (
 		};
 	}
 
-	const user = await initializeAccount(supabaseData.user.id);
+	const user = await initializeAccount(
+		supabaseData.user.id,
+		supabaseData.user.email,
+	);
 
 	redirect("/");
 };

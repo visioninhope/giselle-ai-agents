@@ -80,3 +80,11 @@
     :why: To not conflict with Apache-2.0 license. https://creativecommons.org/licenses/by/4.0/
     :versions: []
     :when: 2024-10-22 07:23:14.573790000 Z
+- - :approve
+  - url-template
+  - :who:
+    :why: The BSD license is ambiguous. The license is now BSD 3-Clause from url-template
+      v3.1.0. See https://github.com/bramstein/url-template/pull/47
+    :versions:
+    - 2.0.8
+    :when: 2024-11-22 02:39:34.598816000 Z

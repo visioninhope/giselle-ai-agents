@@ -11,7 +11,7 @@ type ButtonWithActionProps = {
 	className?: string;
 };
 
-export function GitHubConnectionButton({
+export function ProviderConnectionButton({
 	action,
 	children,
 	className,
