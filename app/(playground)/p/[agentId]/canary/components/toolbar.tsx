@@ -11,9 +11,13 @@ import type { Tool } from "../types";
 function ToggleGroupItem({
 	tooltip,
 	value,
+	shortcut,
 
 	...props
-}: ComponentProps<typeof ToggleGroup.Item> & { tooltip: string }) {
+}: ComponentProps<typeof ToggleGroup.Item> & {
+	tooltip: string;
+	shortcut?: string;
+}) {
 	const { selectedTool } = useToolbar();
 	return (
 		<TooltipPrimitive.Provider>
@@ -29,9 +33,10 @@ function ToggleGroupItem({
 				<TooltipPrimitive.Portal>
 					<TooltipPrimitive.Content
 						sideOffset={18}
-						className="z-50 overflow-hidden rounded-md bg-primary px-3 py-1.5 text-xs text-primary-foreground animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+						className="z-50 overflow-hidden flex justify-between gap-[8px] rounded-[6px] bg-black-30 px-[8px] py-[2px] text-xs text-black-100 shadow-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
 					>
-						{tooltip}
+						<p>{tooltip}</p>
+						<p className="uppercase text-black-70">{shortcut}</p>
 					</TooltipPrimitive.Content>
 				</TooltipPrimitive.Portal>
 			</TooltipPrimitive.Root>
@@ -52,27 +57,23 @@ export function Toolbar() {
 					onValueChange={(value) => {
 						selectTool(value as Tool["action"]);
 					}}
-					onKeyUp={(key) => {
-						if (key.code === "Escape") {
-							selectTool("move");
-						}
-					}}
 				>
 					<div className="flex gap-[12px]">
-						<ToggleGroupItem value="move" tooltip="Move">
+						<ToggleGroupItem value="move" tooltip="Move" shortcut="v">
 							<MousePointer2Icon
 								className={"w-[24px] h-[24px] text-black-30"}
 							/>
 						</ToggleGroupItem>
-						<ToggleGroupItem value="addTextNode" tooltip="Text">
+						<ToggleGroupItem value="addTextNode" tooltip="Text" shortcut="t">
 							<LetterTextIcon className={"w-[24px] h-[24px] text-black-30"} />
 						</ToggleGroupItem>
-						<ToggleGroupItem value="addFileNode" tooltip="File">
+						<ToggleGroupItem value="addFileNode" tooltip="File" shortcut="f">
 							<FileUpIcon className={"w-[24px] h-[24px] text-black-30 "} />
 						</ToggleGroupItem>
 						<ToggleGroupItem
 							value="addTextGenerationNode"
 							tooltip="Text Generator"
+							shortcut="g"
 						>
 							<TextGenerationIcon
 								className={"w-[24px] h-[24px] text-black-30 fill-current"}

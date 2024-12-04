@@ -20,6 +20,7 @@ import type { NodeId, Tool } from "../types";
 import { createNodeId, isTextGeneration } from "../utils";
 import { Edge } from "./edge";
 import { NavigationPanel } from "./navigation-panel";
+import { KeyboardShortcut } from "./keyboard-shortcut";
 import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
@@ -32,7 +33,7 @@ const edgeTypes = {
 };
 export function Editor() {
 	const { graph, dispatch } = useGraph();
-	const { selectedTool, reset } = useToolbar();
+	const { selectTool, selectedTool, reset } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -306,6 +307,7 @@ export function Editor() {
 					<FloatingNodePreview tool={selectedTool} />
 				)}
 			</ReactFlow>
+			<KeyboardShortcut />
 		</div>
 	);
 }
