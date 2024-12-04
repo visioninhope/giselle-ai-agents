@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { getTeamMembers } from "./actions";
 
 export async function TeamMembersList() {
@@ -15,7 +14,7 @@ export async function TeamMembersList() {
 	const members = result.data;
 
 	return (
-		<div className="rounded-md border border-zinc-800">
+		<div className="font-avenir rounded-[16px]">
 			<div className="grid grid-cols-[1fr_1fr_200px] gap-4 border-b border-zinc-800 bg-zinc-900/50 p-4 font-medium text-zinc-200">
 				<div>Display name</div>
 				<div>Email</div>
