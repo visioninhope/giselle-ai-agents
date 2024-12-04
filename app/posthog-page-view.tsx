@@ -5,7 +5,7 @@ import { usePostHog } from "posthog-js/react";
 import { useEffect } from "react";
 
 export function PostHogPageView(): null {
-	if (process.env.NEXT_PUBLIC_ENABLE_ANALYTICS !== "true") {
+	if (process.env.NEXT_PUBLIC_ENABLE_POSTHOG !== "true") {
 		return null;
 	}
 	const pathname = usePathname();
