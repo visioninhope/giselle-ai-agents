@@ -1,9 +1,8 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { GithubIcon, XIcon } from "lucide-react";
-import { type ComponentProps, useCallback, useRef, useState } from "react";
+import { type ComponentProps, useState } from "react";
 import { LayersIcon } from "../../beta-proto/components/icons/layers";
 import { useAgentName } from "../contexts/agent-name";
-import { useGraph } from "../contexts/graph";
 
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
@@ -39,51 +38,27 @@ export function NavigationPanel() {
 				<TabsTrigger value="overview">
 					<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
 				</TabsTrigger>
-				<TabsTrigger value="github">
+				{/* <TabsTrigger value="github">
 					<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
-				</TabsTrigger>
+				</TabsTrigger> */}
 			</Tabs.List>
 			<TabsContent value="overview">
-				<Overview />
+				<Overview setTabValue={setTabValue} />
 			</TabsContent>
-			<TabsContent value="github">
+			{/* <TabsContent value="github">
 				<GitHubIntegration />
-			</TabsContent>
+			</TabsContent> */}
 		</Tabs.Root>
 	);
 }
 
-export function Overview() {
+export function Overview({
+	setTabValue,
+}: {
+	setTabValue: (value: string) => void;
+}) {
 	const [editTitle, setEditTitle] = useState(false);
 	const { agentName, updateAgentName } = useAgentName();
-	const inputRef = useRef<HTMLInputElement>(null);
-	const transitionToEditTitle = useCallback(() => {
-		setEditTitle(true);
-	}, []);
-
-	// const handleBlur = useCallback(async (newAgentName: string) => {
-	// 	setEditTitle(false);
-	// 	await updateAgentName(newAgentName);
-	// }, [updateAgentName]);
-	// useEffect(() => {
-	// 	if (inputRef.current === null) {
-	// 		return;
-	// 	}
-	// 	if (editTitle) {
-	// 		inputRef.current.focus();
-	// 		inputRef.current.select();
-	// 	}
-
-	// 	const callback = (e: KeyboardEvent) => {
-	// 		if (e.key === "Enter") {
-	// 			inputRef.current?.blur();
-	// 		}
-	// 	};
-	// 	inputRef.current.addEventListener("keydown", callback);
-	// 	return () => {
-	// 		inputRef.current?.removeEventListener("keydown", callback);
-	// 	};
-	// }, [editTitle]);
 	return (
 		<div className="grid gap-[24px] px-[24px] py-[24px]">
 			<header className="flex justify-between">
@@ -93,7 +68,7 @@ export function Overview() {
 				>
 					Overview
 				</p>
-				<button type="button">
+				<button type="button" onClick={() => setTabValue("")}>
 					<XIcon className="w-[16px] h-[16px] text-black-30" />
 				</button>
 			</header>
