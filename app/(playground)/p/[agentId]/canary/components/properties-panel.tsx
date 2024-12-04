@@ -302,8 +302,8 @@ export function PropertiesPanel() {
 					</div>
 
 					{selectedNode && (
-						<div className="bg-black-80 px-[24px] py-[8px] flex items-center justify-between">
-							<div className="flex items-center gap-[8px]">
+						<div className="bg-black-80 px-[24px] h-[36px] flex items-center justify-between">
+							<div className="flex items-center gap-[10px]">
 								<div
 									data-type={selectedNode.type}
 									className={clsx(
@@ -318,14 +318,14 @@ export function PropertiesPanel() {
 									/>
 								</div>
 								<div className="font-avenir text-[16px] text-black-30">
-									{selectedNode.content.type}
+									{selectedNode.name}
 								</div>
 							</div>
 							{selectedNode.content.type === "textGeneration" && (
 								<div className="">
 									<button
 										type="button"
-										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
+										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
 										onClick={async () => {
 											const artifactId = createArtifactId();
 											dispatch({
