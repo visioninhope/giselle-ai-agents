@@ -1,8 +1,19 @@
-import { db, supabaseUserMappings, teamMemberships, teams } from "@/drizzle";
+import {
+	db,
+	subscriptions,
+	supabaseUserMappings,
+	teamMemberships,
+	teams,
+} from "@/drizzle";
 import { getGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
 import { and, asc, eq } from "drizzle-orm";
 
+/**
+ * Fetches the current team of the user.
+ * This function uses session to get the teamDbId.
+ * If the user does not have a team, the first team is returned.
+ */
 export async function fetchCurrentTeam() {
 	const supabaseUser = await getUser();
 	const session = await getGiselleSession();
@@ -25,6 +36,8 @@ async function fetchTeam(teamDbId: number, supabaseUserId: string) {
 		.select({
 			dbId: teams.dbId,
 			name: teams.name,
+			type: teams.type,
+			activeSubscriptionId: subscriptions.id,
 		})
 		.from(teams)
 		// join teamMemberships and supabaseUserMappings to check user's membership
@@ -32,6 +45,13 @@ async function fetchTeam(teamDbId: number, supabaseUserId: string) {
 		.innerJoin(
 			supabaseUserMappings,
 			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+		)
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(subscriptions.teamDbId, teams.dbId),
+				eq(subscriptions.status, "active"),
+			),
 		)
 		.where(
 			and(
@@ -50,12 +70,21 @@ async function fetchFirstTeam(supabaseUserId: string) {
 		.select({
 			dbId: teams.dbId,
 			name: teams.name,
+			type: teams.type,
+			activeSubscriptionId: subscriptions.id,
 		})
 		.from(teams)
 		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
 		.innerJoin(
 			supabaseUserMappings,
 			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+		)
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(subscriptions.teamDbId, teams.dbId),
+				eq(subscriptions.status, "active"),
+			),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUserId))
 		.orderBy(asc(teams.dbId))

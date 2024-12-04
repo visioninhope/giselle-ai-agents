@@ -1,7 +1,7 @@
 "use server";
 
-import { updateGiselleSession } from "@/lib/giselle-session";
 import * as v from "valibot";
+import { setCurrentTeam } from "../set-current-team";
 
 export async function selectTeam(data: FormData) {
 	const schema = v.pipe(
@@ -9,5 +9,5 @@ export async function selectTeam(data: FormData) {
 		v.transform((input) => Number.parseInt(input, 10)),
 	);
 	const teamId = v.parse(schema, data.get("team"));
-	await updateGiselleSession({ teamDbId: teamId });
+	await setCurrentTeam(teamId);
 }
