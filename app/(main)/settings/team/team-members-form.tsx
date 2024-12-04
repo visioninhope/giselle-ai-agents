@@ -61,7 +61,7 @@ export function TeamMembersForm() {
 				setEmail("");
 				setRole("member");
 			} else {
-				setError("Failed to add team member");
+				setError(result.error ?? "Failed to add team member");
 			}
 		} catch (error) {
 			if (error instanceof Error) {
