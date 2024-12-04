@@ -7,6 +7,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { initGraph } from "../../(playground)/p/[agentId]/canary/utils";
 
 async function AgentList() {
@@ -47,5 +48,9 @@ async function AgentList() {
 	);
 }
 export default function AgentListV2Page() {
-	return <AgentList />;
+	return (
+		<Suspense fallback={<p>loading...</p>}>
+			<AgentList />
+		</Suspense>
+	);
 }
