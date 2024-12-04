@@ -1,7 +1,9 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { GithubIcon } from "lucide-react";
-import { type ComponentProps, useState } from "react";
+import { GithubIcon, XIcon } from "lucide-react";
+import { type ComponentProps, useCallback, useRef, useState } from "react";
 import { LayersIcon } from "../../beta-proto/components/icons/layers";
+import { useAgentName } from "../contexts/agent-name";
+import { useGraph } from "../contexts/graph";
 
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
@@ -51,8 +53,91 @@ export function NavigationPanel() {
 	);
 }
 
-function Overview() {
-	return <div>Overview</div>;
+export function Overview() {
+	const [editTitle, setEditTitle] = useState(false);
+	const { agentName, updateAgentName } = useAgentName();
+	const inputRef = useRef<HTMLInputElement>(null);
+	const transitionToEditTitle = useCallback(() => {
+		setEditTitle(true);
+	}, []);
+
+	// const handleBlur = useCallback(async (newAgentName: string) => {
+	// 	setEditTitle(false);
+	// 	await updateAgentName(newAgentName);
+	// }, [updateAgentName]);
+	// useEffect(() => {
+	// 	if (inputRef.current === null) {
+	// 		return;
+	// 	}
+	// 	if (editTitle) {
+	// 		inputRef.current.focus();
+	// 		inputRef.current.select();
+	// 	}
+
+	// 	const callback = (e: KeyboardEvent) => {
+	// 		if (e.key === "Enter") {
+	// 			inputRef.current?.blur();
+	// 		}
+	// 	};
+	// 	inputRef.current.addEventListener("keydown", callback);
+	// 	return () => {
+	// 		inputRef.current?.removeEventListener("keydown", callback);
+	// 	};
+	// }, [editTitle]);
+	return (
+		<div className="grid gap-[24px] px-[24px] py-[24px]">
+			<header className="flex justify-between">
+				<p
+					className="text-[22px] font-rosart text-black--30"
+					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				>
+					Overview
+				</p>
+				<button type="button">
+					<XIcon className="w-[16px] h-[16px] text-black-30" />
+				</button>
+			</header>
+			{editTitle ? (
+				<input
+					type="text"
+					className="text-[16px] text-black-30 p-[4px] text-left outline-black-70 rounded-[8px]"
+					defaultValue={agentName ?? "Untitled Agent"}
+					ref={(ref) => {
+						if (ref === null) {
+							return;
+						}
+						async function update() {
+							if (ref === null) {
+								return;
+							}
+							setEditTitle(false);
+							await updateAgentName(ref.value);
+						}
+						ref.focus();
+						ref.select();
+						ref.addEventListener("blur", update);
+						ref.addEventListener("keydown", (e) => {
+							if (e.key === "Enter") {
+								update();
+							}
+						});
+						return () => {
+							ref.removeEventListener("blur", update);
+							ref.removeEventListener("keydown", update);
+						};
+					}}
+				/>
+			) : (
+				<button
+					type="button"
+					onClick={() => setEditTitle(true)}
+					className="text-[16px] text-black-30 p-[4px] text-left"
+				>
+					{agentName}
+				</button>
+			)}
+		</div>
+	);
 }
 
 function GitHubIntegration() {
