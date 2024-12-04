@@ -9,7 +9,7 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 function isTeamRole(role: string): role is TeamRole {
@@ -68,18 +68,55 @@ export async function updateTeamName(formData: FormData) {
 }
 
 export async function getTeamMembers() {
-	// TODO: Implement getting team members
-	return [
-		{
-			id: 1,
-			name: "foo admin",
+	try {
+		const supabaseUser = await getUser();
 
-			email: "foo@exmaple.com",
-			role: "admin",
-		},
-		{ id: 2, name: "bar admin", email: "bar@example.com", role: "admin" },
-		{ id: 3, name: "baz member", email: "baz@example.com", role: "member" },
-	];
+		// Subquery: Get current user's team
+		// TODO: In the future, this query will be changed to retrieve from the selected team ID
+		const currentUserTeam = db
+			.select({
+				teamDbId: teams.dbId,
+			})
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+			.limit(1);
+
+		// Main query: Get team members list
+		const teamMembers = await db
+			.select({
+				userId: users.id,
+				email: users.email,
+				displayName: users.displayName, // 追加
+				role: teamMemberships.role,
+			})
+			.from(users)
+			.innerJoin(
+				teamMemberships,
+				and(
+					eq(users.dbId, teamMemberships.userDbId),
+					eq(teamMemberships.teamDbId, currentUserTeam),
+				),
+			)
+			.orderBy(asc(teamMemberships.id));
+
+		return {
+			success: true,
+			data: teamMembers,
+		};
+	} catch (error) {
+		console.error("Failed to get team members:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "Failed to get team members",
+		};
+	}
 }
 
 export async function addTeamMember(formData: FormData) {
