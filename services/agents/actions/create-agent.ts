@@ -1,8 +1,8 @@
 "use server";
 
-import { getCurrentTeam } from "@/app/(auth)/lib";
 import { playgroundModes } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
 import { agents, db } from "@/drizzle";
+import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
 import { createId } from "@paralleldrive/cuid2";
 import { revalidateGetAgents } from "./get-agent";
 
@@ -11,7 +11,7 @@ type CreateAgentArgs = {
 };
 export const createAgent = async (args: CreateAgentArgs) => {
 	const id = `agnt_${createId()}` as const;
-	const team = await getCurrentTeam();
+	const team = await fetchCurrentTeam();
 	await db.insert(agents).values({
 		id,
 		teamDbId: team.dbId,

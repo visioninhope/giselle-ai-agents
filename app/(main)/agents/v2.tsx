@@ -1,19 +1,13 @@
-import { getCurrentTeam } from "@/app/(auth)/lib";
 import { putGraph } from "@/app/(playground)/p/[agentId]/canary/actions";
 import { Button } from "@/components/ui/button";
 import { agents, db, supabaseUserMappings, teamMemberships } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
 import { createId } from "@paralleldrive/cuid2";
-import { put } from "@vercel/blob";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { vercelBlobGraphFolder } from "../../(playground)/p/[agentId]/canary/constants";
-import {
-	buildGraphPath,
-	initGraph,
-	pathJoin,
-} from "../../(playground)/p/[agentId]/canary/utils";
+import { initGraph } from "../../(playground)/p/[agentId]/canary/utils";
 
 async function AgentList({
 	userId,
@@ -70,7 +64,7 @@ export async function AgentListV2() {
 		const graph = initGraph();
 		const agentId = `agnt_${createId()}` as const;
 		const { url } = await putGraph(graph);
-		const team = await getCurrentTeam();
+		const team = await fetchCurrentTeam();
 		await db.insert(agents).values({
 			id: agentId,
 			teamDbId: team.dbId,
