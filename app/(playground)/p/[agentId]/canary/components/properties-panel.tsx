@@ -317,7 +317,7 @@ export function PropertiesPanel() {
 									/>
 								</div>
 								<div className="font-avenir text-[16px] text-black-30">
-									{selectedNode.content.type}
+									{selectedNode.name}
 								</div>
 							</div>
 							{selectedNode.content.type === "textGeneration" && (
