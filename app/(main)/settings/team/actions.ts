@@ -91,7 +91,7 @@ export async function getTeamMembers() {
 			.select({
 				userId: users.id,
 				email: users.email,
-				displayName: users.displayName, // 追加
+				displayName: users.displayName,
 				role: teamMemberships.role,
 			})
 			.from(users)
