@@ -7,6 +7,7 @@ import { notFound } from "next/navigation";
 import type { AgentId } from "../beta-proto/types";
 import { putGraph } from "./actions";
 import { Editor } from "./components/editor";
+import { AgentNameProvider } from "./contexts/agent-name";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
@@ -61,6 +62,17 @@ export default async function Page({
 		return url;
 	}
 
+	async function updateAgentName(agentName: string) {
+		"use server";
+		await db
+			.update(agents)
+			.set({
+				name: agentName,
+			})
+			.where(eq(agents.id, agentId));
+		return agentName;
+	}
+
 	return (
 		<GraphContextProvider
 			defaultGraph={graph}
@@ -71,7 +83,12 @@ export default async function Page({
 				<ReactFlowProvider>
 					<ToolbarContextProvider>
 						<MousePositionProvider>
-							<Editor />
+							<AgentNameProvider
+								defaultValue={agent.name ?? "Unnamed Agent"}
+								updateAgentNameAction={updateAgentName}
+							>
+								<Editor />
+							</AgentNameProvider>
 						</MousePositionProvider>
 					</ToolbarContextProvider>
 				</ReactFlowProvider>
