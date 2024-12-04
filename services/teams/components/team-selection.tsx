@@ -1,5 +1,4 @@
-import { fetchCurrentTeam } from "../fetch-current-team";
-import { fetchUserTeams } from "../fetch-user-teams";
+import { fetchCurrentTeam, fetchUserTeams } from "../";
 import TeamCreationModal from "./team-creation-modal";
 import { TeamSelectionForm } from "./team-selection-form";
 

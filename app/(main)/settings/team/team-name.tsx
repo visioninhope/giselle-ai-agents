@@ -1,4 +1,4 @@
-import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
+import { fetchCurrentTeam } from "@/services/teams";
 import { TeamNameForm } from "./team-name-form";
 
 export async function TeamName() {

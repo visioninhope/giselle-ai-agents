@@ -1,5 +1,5 @@
 import { updateGiselleSession } from "@/lib/giselle-session";
-import { fetchUserTeams } from "./fetch-user-teams";
+import { fetchUserTeams } from "./";
 
 export async function setCurrentTeam(teamDbId: number) {
 	const teams = await fetchUserTeams();

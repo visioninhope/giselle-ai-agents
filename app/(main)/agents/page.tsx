@@ -1,7 +1,7 @@
 import { playgroundV2Flag } from "@/flags";
 import { createAgent, getAgents } from "@/services/agents";
 import { CreateAgentButton } from "@/services/agents/components";
-import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
+import { fetchCurrentTeam } from "@/services/teams";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 import { AgentListV2 } from "./v2";

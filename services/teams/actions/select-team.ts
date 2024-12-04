@@ -1,7 +1,7 @@
 "use server";
 
 import * as v from "valibot";
-import { setCurrentTeam } from "../set-current-team";
+import { setCurrentTeam } from "../";
 
 export async function selectTeam(data: FormData) {
 	const schema = v.pipe(

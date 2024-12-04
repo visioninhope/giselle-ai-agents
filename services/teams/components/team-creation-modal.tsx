@@ -10,7 +10,7 @@ import { isEmailFromRoute06 } from "@/lib/utils";
 import { formatStripePrice, stripe } from "@/services/external/stripe";
 import Link from "next/link";
 import invariant from "tiny-invariant";
-import { fetchUserTeams } from "../fetch-user-teams";
+import { fetchUserTeams } from "../";
 import { TeamCreationForm } from "./team-creation-form";
 
 export default async function TeamCreationModal() {

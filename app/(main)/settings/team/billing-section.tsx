@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { proTeamPlanFlag } from "@/flags";
+import { fetchCurrentTeam } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
-import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 

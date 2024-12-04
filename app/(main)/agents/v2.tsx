@@ -1,7 +1,7 @@
 import { putGraph } from "@/app/(playground)/p/[agentId]/canary/actions";
 import { Button } from "@/components/ui/button";
 import { agents, db } from "@/drizzle";
-import { fetchCurrentTeam } from "@/services/teams/fetch-current-team";
+import { fetchCurrentTeam } from "@/services/teams";
 import { createId } from "@paralleldrive/cuid2";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
