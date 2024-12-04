@@ -67,6 +67,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { Markdown } from "./markdown";
 import {
 	Select,
 	SelectContent,
@@ -192,14 +193,6 @@ const TabsContent: FC<ComponentProps<typeof TabsPrimitive.Content>> = ({
 );
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-const Dialog = DialogPrimitive.Root;
-
-const DialogTrigger = DialogPrimitive.Trigger;
-
-const DialogPortal = DialogPrimitive.Portal;
-
-const DialogClose = DialogPrimitive.Close;
-
 function DialogOverlay(props: ComponentProps<typeof DialogPrimitive.Overlay>) {
 	return (
 		<DialogPrimitive.Overlay
@@ -215,7 +208,7 @@ function DialogContent({
 	...props
 }: ComponentProps<typeof DialogPrimitive.Content>) {
 	return (
-		<DialogPortal>
+		<DialogPrimitive.DialogPortal>
 			<DialogOverlay />
 			<DialogPrimitive.Content
 				className={clsx(
@@ -230,7 +223,7 @@ function DialogContent({
 				<div className="relative z-10 flex flex-col">{children}</div>
 				<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 			</DialogPrimitive.Content>
-		</DialogPortal>
+		</DialogPrimitive.DialogPortal>
 	);
 }
 DialogContent.displayName = DialogPrimitive.Content.displayName;
@@ -1415,29 +1408,34 @@ function TabContentGenerateTextResult({
 			<div>{artifact.object.messages.plan}</div>
 
 			{artifact.object.title !== "" && (
-				<Dialog>
-					<DialogTrigger>
+				<DialogPrimitive.Root>
+					<DialogPrimitive.DialogTrigger>
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
 								<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
 								<div className="text-[14px]">{artifact.object.title}</div>
 							</div>
 						</Block>
-					</DialogTrigger>
+					</DialogPrimitive.DialogTrigger>
 					<DialogContent>
 						<div className="sr-only">
 							<DialogHeader>
 								<DialogTitle>{artifact.object.title}</DialogTitle>
 							</DialogHeader>
+							<DialogPrimitive.DialogDescription>
+								{artifact.object.content}
+							</DialogPrimitive.DialogDescription>
 						</div>
-						<div className="flex-1">{artifact.object.content}</div>
+						<div className="flex-1 overflow-y-auto">
+							<Markdown>{artifact.object.content}</Markdown>
+						</div>
 						{artifact.type === "generatedArtifact" && (
-							<DialogFooter className="text-[14px] font-bold text-black-70">
+							<DialogFooter className="text-[14px] font-bold text-black-70 mt-[10px]">
 								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
 							</DialogFooter>
 						)}
 					</DialogContent>
-				</Dialog>
+				</DialogPrimitive.Root>
 			)}
 			<div>{artifact.object.messages.description}</div>
 
