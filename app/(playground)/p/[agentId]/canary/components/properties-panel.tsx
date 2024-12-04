@@ -67,6 +67,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { Markdown } from "./markdown";
 import {
 	Select,
 	SelectContent,
@@ -199,6 +200,8 @@ const DialogTrigger = DialogPrimitive.Trigger;
 const DialogPortal = DialogPrimitive.Portal;
 
 const DialogClose = DialogPrimitive.Close;
+
+const DialogDescription = DialogPrimitive.Description;
 
 function DialogOverlay(props: ComponentProps<typeof DialogPrimitive.Overlay>) {
 	return (
@@ -1429,10 +1432,13 @@ function TabContentGenerateTextResult({
 							<DialogHeader>
 								<DialogTitle>{artifact.object.title}</DialogTitle>
 							</DialogHeader>
+							<DialogDescription>{artifact.object.content}</DialogDescription>
 						</div>
-						<div className="flex-1">{artifact.object.content}</div>
+						<div className="flex-1 overflow-y-auto">
+							<Markdown>{artifact.object.content}</Markdown>
+						</div>
 						{artifact.type === "generatedArtifact" && (
-							<DialogFooter className="text-[14px] font-bold text-black-70">
+							<DialogFooter className="text-[14px] font-bold text-black-70 mt-[10px]">
 								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
 							</DialogFooter>
 						)}
