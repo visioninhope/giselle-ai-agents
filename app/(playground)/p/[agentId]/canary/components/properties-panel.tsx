@@ -659,6 +659,84 @@ export function PropertiesPanel() {
 									]);
 									setTab("Prompt");
 								}}
+								onEditPrompt={() => setTab("Prompt")}
+								onGenerateText={async () => {
+									/** @todo DRY */
+									const artifactId = createArtifactId();
+									dispatch({
+										type: "upsertArtifact",
+										input: {
+											nodeId: selectedNode.id,
+											artifact: {
+												id: artifactId,
+												type: "streamArtifact",
+												creatorNodeId: selectedNode.id,
+												object: {
+													type: "text",
+													title: "",
+													content: "",
+													messages: {
+														plan: "",
+														description: "",
+													},
+												},
+											},
+										},
+									});
+									setTab("Result");
+									const latestGraphUrl = await flush();
+									const stream = await action(
+										artifactId,
+										latestGraphUrl,
+										selectedNode.id,
+									);
+
+									let textArtifactObject: TextArtifactObject = {
+										type: "text",
+										title: "",
+										content: "",
+										messages: {
+											plan: "",
+											description: "",
+										},
+									};
+									for await (const streamContent of readStreamableValue(
+										stream,
+									)) {
+										if (streamContent === undefined) {
+											continue;
+										}
+										dispatch({
+											type: "upsertArtifact",
+											input: {
+												nodeId: selectedNode.id,
+												artifact: {
+													id: artifactId,
+													type: "streamArtifact",
+													creatorNodeId: selectedNode.id,
+													object: streamContent,
+												},
+											},
+										});
+										textArtifactObject = {
+											...textArtifactObject,
+											...streamContent,
+										};
+									}
+									dispatch({
+										type: "upsertArtifact",
+										input: {
+											nodeId: selectedNode.id,
+											artifact: {
+												id: artifactId,
+												type: "generatedArtifact",
+												creatorNodeId: selectedNode.id,
+												createdAt: Date.now(),
+												object: textArtifactObject,
+											},
+										},
+									});
+								}}
 							/>
 						</TabsContent>
 					)}
@@ -1258,16 +1336,56 @@ function TabsContentPrompt({
 function TabContentGenerateTextResult({
 	node,
 	onCreateNewTextGenerator,
+	onGenerateText,
+	onEditPrompt,
 }: {
 	node: Node;
 	onCreateNewTextGenerator?: () => void;
+	onGenerateText: () => void;
+	onEditPrompt: () => void;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
-	if (artifact == null) {
-		return null;
-	}
-	if (artifact.object.type !== "text") {
-		return null;
+	if (artifact == null || artifact.object.type !== "text") {
+		return (
+			<div className="grid gap-[12px] text-[12px] text-black-30 px-[24px] pt-[120px] relative z-10 text-center justify-center">
+				<div>
+					<p className="font-[800] text-black-30 text-[18px]">
+						Nothing is generated.
+					</p>
+					<p className="text-black-70 text-[12px] text-center leading-5 w-[220px]">
+						Generate with the current Prompt or adjust the Prompt and the
+						results will be displayed.
+					</p>
+				</div>
+
+				<div className="flex flex-col gap-[4px]">
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onGenerateText();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Generate with the current Prompt
+						</button>
+					</div>
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onEditPrompt();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Adjust the Prompt
+						</button>
+					</div>
+				</div>
+			</div>
+		);
 	}
 	return (
 		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
