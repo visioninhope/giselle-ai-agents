@@ -16,7 +16,7 @@ import { useGraph } from "../contexts/graph";
 import { useMousePosition } from "../contexts/mouse-position";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToolbar } from "../contexts/toolbar";
-import type { ConnectionId, NodeId, Tool } from "../types";
+import type { NodeId, Tool } from "../types";
 import { createNodeId, isTextGeneration } from "../utils";
 import { Edge } from "./edge";
 import { Node, PreviewNode } from "./node";
