@@ -18,10 +18,10 @@ export async function upgradeTeam(teamDbId: number) {
 		[UPGRADING_TEAM_DB_ID_KEY]: teamDbId.toString(),
 	};
 
-	const checkoutUrl = await createCheckoutSession(
+	const checkoutSession = await createCheckoutSession(
 		subscriptionMetadata,
 		successUrl,
 		cancelUrl,
 	);
-	redirect(checkoutUrl);
+	redirect(checkoutSession.url);
 }

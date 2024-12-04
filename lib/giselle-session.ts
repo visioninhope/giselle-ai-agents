@@ -4,7 +4,9 @@ import { getCookie, setCookie } from "./signed-cookie";
 const COOKIE_NAME = "giselle-session";
 
 const GiselleSessionSchema = v.object({
-	teamDbId: v.nullable(v.number()),
+	teamDbId: v.optional(v.number()),
+	// used in creating a new pro team flow
+	checkoutSessionId: v.optional(v.string()),
 });
 
 type GiselleSession = v.InferOutput<typeof GiselleSessionSchema>;
@@ -17,11 +19,15 @@ export async function getGiselleSession(): Promise<GiselleSession | null> {
 	return v.parse(GiselleSessionSchema, rawSession);
 }
 
-export async function updateGiselleSession(session: GiselleSession) {
+export async function updateGiselleSession(session: Partial<GiselleSession>) {
 	const currentSession = await getGiselleSession();
-	await setGiselleSession({ ...currentSession, ...session });
+	const values = v.parse(GiselleSessionSchema, {
+		...currentSession,
+		...session,
+	});
+	await setGiselleSession(values);
 }
 
 async function setGiselleSession(session: GiselleSession) {
-	await setCookie(COOKIE_NAME, session);
+	await setCookie(COOKIE_NAME, v.parse(GiselleSessionSchema, session));
 }
