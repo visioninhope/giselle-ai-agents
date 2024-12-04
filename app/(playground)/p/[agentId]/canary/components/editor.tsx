@@ -19,6 +19,7 @@ import { useToolbar } from "../contexts/toolbar";
 import type { NodeId, Tool } from "../types";
 import { createNodeId, isTextGeneration } from "../utils";
 import { Edge } from "./edge";
+import { NavigationPanel } from "./navigation-panel";
 import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
@@ -296,6 +297,10 @@ export function Editor() {
 				</Panel>
 				<Panel position={"bottom-center"}>
 					<Toolbar />
+				</Panel>
+
+				<Panel position="top-left" className="!top-0 !bottom-0 !left-0 !m-0">
+					<NavigationPanel />
 				</Panel>
 				{selectedTool?.category === "edit" && (
 					<FloatingNodePreview tool={selectedTool} />
