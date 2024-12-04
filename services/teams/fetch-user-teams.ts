@@ -6,7 +6,7 @@ import {
 	teams,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { and, eq } from "drizzle-orm";
+import { and, asc, eq } from "drizzle-orm";
 
 /**
  * fetch teams for the current user
@@ -33,7 +33,8 @@ export async function fetchUserTeams() {
 				eq(subscriptions.status, "active"),
 			),
 		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+		.where(eq(supabaseUserMappings.supabaseUserId, user.id))
+		.orderBy(asc(teams.dbId));
 	if (records.length === 0) {
 		throw new Error("User does not have a team");
 	}
