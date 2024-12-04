@@ -75,7 +75,7 @@ export function TeamMembersForm() {
 
 	return (
 		<Card
-			title="Add New Member"
+			title="Add new member"
 			description="Invite a new team member by entering their email address"
 		>
 			<div className="flex flex-col gap-2">
@@ -108,7 +108,7 @@ export function TeamMembersForm() {
 						</SelectContent>
 					</Select>
 					<Button type="submit" disabled={isLoading} className="w-fit">
-						Add Member
+						Add member
 					</Button>
 				</form>
 				{error && <p className="text-sm text-destructive">{error}</p>}
