@@ -5,45 +5,13 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import {
-	db,
-	subscriptions,
-	supabaseUserMappings,
-	teamMemberships,
-	teams,
-} from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { isEmailFromRoute06 } from "@/lib/utils";
 import { formatStripePrice, stripe } from "@/services/external/stripe";
-import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import invariant from "tiny-invariant";
+import { fetchUserTeams } from "../fetch-user-teams";
 import { TeamCreationForm } from "./team-creation-form";
-
-async function fetchTeams(supabaseUserId: string) {
-	const result = await db
-		.select({
-			teamDbId: teams.dbId,
-			teamName: teams.name,
-			teamType: teams.type,
-			activeSubscription: subscriptions.id,
-		})
-		.from(teams)
-		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-		.innerJoin(
-			supabaseUserMappings,
-			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-		)
-		.leftJoin(
-			subscriptions,
-			and(
-				eq(subscriptions.teamDbId, teams.dbId),
-				eq(subscriptions.status, "active"),
-			),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, supabaseUserId));
-	return result;
-}
 
 export default async function TeamCreationModal() {
 	const user = await getUser();
@@ -51,9 +19,9 @@ export default async function TeamCreationModal() {
 		throw new Error("User not found");
 	}
 	const isInternalUser = user.email != null && isEmailFromRoute06(user.email);
-	const teams = await fetchTeams(user.id);
+	const teams = await fetchUserTeams();
 	const hasExistingFreeTeam = teams.some(
-		(team) => team.teamType === "customer" && !team.activeSubscription,
+		(team) => team.type === "customer" && !team.activeSubscriptionId,
 	);
 	const proPlanPriceId = process.env.STRIPE_PRO_PLAN_PRICE_ID;
 	invariant(proPlanPriceId, "STRIPE_PRO_PLAN_PRICE_ID is not set");

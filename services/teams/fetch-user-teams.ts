@@ -1,6 +1,12 @@
-import { db, supabaseUserMappings, teamMemberships, teams } from "@/drizzle";
+import {
+	db,
+	subscriptions,
+	supabaseUserMappings,
+	teamMemberships,
+	teams,
+} from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 
 /**
  * fetch teams for the current user
@@ -11,12 +17,21 @@ export async function fetchUserTeams() {
 		.select({
 			dbId: teams.dbId,
 			name: teams.name,
+			type: teams.type,
+			activeSubscriptionId: subscriptions.id,
 		})
 		.from(teams)
 		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
 		.innerJoin(
 			supabaseUserMappings,
 			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+		)
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(subscriptions.teamDbId, teams.dbId),
+				eq(subscriptions.status, "active"),
+			),
 		)
 		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
 	if (records.length === 0) {
