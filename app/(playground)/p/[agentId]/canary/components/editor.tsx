@@ -83,7 +83,7 @@ export function Editor() {
 			),
 		);
 	}, [graph.connections, reactFlowInstance.setEdges]);
-	const { setTab } = usePropertiesPanel();
+	const { setTab, setOpen } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
@@ -113,6 +113,7 @@ export function Editor() {
 									},
 								});
 								if (nodeChange.selected) {
+									setOpen(true);
 									switch (node.content.type) {
 										case "textGeneration":
 											setTab("Prompt");
