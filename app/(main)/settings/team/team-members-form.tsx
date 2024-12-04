@@ -10,6 +10,7 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import { useState } from "react";
+import { Card } from "../components/card";
 import { addTeamMember } from "./actions";
 
 export function TeamMembersForm() {
@@ -17,16 +18,20 @@ export function TeamMembersForm() {
 	const [role, setRole] = useState("member");
 	const [isLoading, setIsLoading] = useState(false);
 
-	const handleSubmit = async () => {
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
 		if (!email) return;
 
 		setIsLoading(true);
+
 		try {
 			const formData = new FormData();
 			formData.append("email", email);
 			formData.append("role", role);
 
 			const result = await addTeamMember(formData);
+
 			if (result.success) {
 				setEmail("");
 				setRole("member");
@@ -39,35 +44,32 @@ export function TeamMembersForm() {
 	};
 
 	return (
-		<div className="rounded-md border border-zinc-800 p-4 space-y-4 bg-zinc-900/50 mb-4">
-			<h3 className="font-medium text-zinc-200">Add New Member</h3>
-			<div className="grid grid-cols-12 gap-4">
+		<Card
+			title="Add New Member"
+			description="Invite a new team member by entering their email address"
+		>
+			<form onSubmit={handleSubmit} className="flex gap-3">
 				<Input
-					placeholder="Email address"
+					type="email"
+					placeholder="member@example.com"
 					value={email}
 					onChange={(e) => setEmail(e.target.value)}
-					className="col-span-8 bg-zinc-900 border-zinc-800 text-zinc-200 placeholder:text-zinc-500"
+					className="flex-1"
 					disabled={isLoading}
 				/>
-				<div className="col-span-2">
-					<Select value={role} onValueChange={setRole} disabled={isLoading}>
-						<SelectTrigger className="bg-zinc-900 border-zinc-800 text-zinc-200">
-							<SelectValue placeholder="Role" />
-						</SelectTrigger>
-						<SelectContent className="bg-zinc-900 border-zinc-800">
-							<SelectItem value="admin">Admin</SelectItem>
-							<SelectItem value="member">Member</SelectItem>
-						</SelectContent>
-					</Select>
-				</div>
-				<Button
-					className="col-span-2"
-					onClick={handleSubmit}
-					disabled={isLoading}
-				>
+				<Select value={role} onValueChange={setRole} disabled={isLoading}>
+					<SelectTrigger className="w-[140px]">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent>
+						<SelectItem value="admin">Admin</SelectItem>
+						<SelectItem value="member">Member</SelectItem>
+					</SelectContent>
+				</Select>
+				<Button type="submit" disabled={isLoading} className="w-fit">
 					Add Member
 				</Button>
-			</div>
-		</div>
+			</form>
+		</Card>
 	);
 }
