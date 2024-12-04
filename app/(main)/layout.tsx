@@ -1,6 +1,7 @@
 import { GiselleLogo } from "@/components/giselle-logo";
 import { proTeamPlanFlag } from "@/flags";
 import { UserButton } from "@/services/accounts/components";
+import TeamCreation from "@/services/teams/components/team-creation";
 import { TeamSelection } from "@/services/teams/components/team-selection";
 import Link from "next/link";
 import type { ReactNode } from "react";
@@ -19,7 +20,11 @@ export default async function Layout({ children }: { children: ReactNode }) {
 					<Nav />
 				</div>
 				<div className="flex items-center gap-4">
-					{proTeamPlan && <TeamSelection />}
+					{proTeamPlan && (
+						<TeamSelection>
+							<TeamCreation />
+						</TeamSelection>
+					)}
 					<UserButton />
 				</div>
 			</header>

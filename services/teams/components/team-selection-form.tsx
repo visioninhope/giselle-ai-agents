@@ -7,7 +7,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { useRef } from "react";
+import { type ReactNode, useRef } from "react";
 import { selectTeam } from "../actions/select-team";
 
 type Team = {
@@ -18,13 +18,13 @@ type Team = {
 type TeamSelectionFormProps = {
 	allTeams: Team[];
 	currentTeam: Team;
-	teamCreationModal: React.ReactNode;
+	children: ReactNode;
 };
 
 export function TeamSelectionForm({
 	allTeams,
 	currentTeam,
-	teamCreationModal,
+	children,
 }: TeamSelectionFormProps) {
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -46,9 +46,7 @@ export function TeamSelectionForm({
 							{team.name}
 						</SelectItem>
 					))}
-					<div className="px-2 py-2 border-t border-black-80">
-						{teamCreationModal}
-					</div>
+					<div className="px-2 py-2 border-t border-black-80">{children}</div>
 				</SelectContent>
 			</Select>
 		</form>

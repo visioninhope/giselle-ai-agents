@@ -1,19 +1,11 @@
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
 import { getUser } from "@/lib/supabase";
 import { isEmailFromRoute06 } from "@/lib/utils";
 import { formatStripePrice, stripe } from "@/services/external/stripe";
-import Link from "next/link";
 import invariant from "tiny-invariant";
-import { fetchUserTeams } from "../";
+import { fetchUserTeams } from "..";
 import { TeamCreationForm } from "./team-creation-form";
 
-export default async function TeamCreationModal() {
+export default async function TeamCreation() {
 	const user = await getUser();
 	if (!user) {
 		throw new Error("User not found");
@@ -29,26 +21,9 @@ export default async function TeamCreationModal() {
 	const proPlanPrice = formatStripePrice(proPlan);
 
 	return (
-		<Dialog>
-			<DialogTrigger asChild>
-				<Link
-					href="#"
-					className="flex items-center text-sm text-blue-500 hover:text-blue-400"
-				>
-					+ Create New Team
-				</Link>
-			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px] bg-gray-950 text-gray-100">
-				<DialogHeader>
-					<DialogTitle className="text-2xl font-bold text-gray-100">
-						Create New Team
-					</DialogTitle>
-				</DialogHeader>
-				<TeamCreationForm
-					canCreateFreeTeam={!isInternalUser && !hasExistingFreeTeam}
-					proPlanPrice={proPlanPrice}
-				/>
-			</DialogContent>
-		</Dialog>
+		<TeamCreationForm
+			canCreateFreeTeam={!isInternalUser && !hasExistingFreeTeam}
+			proPlanPrice={proPlanPrice}
+		/>
 	);
 }
