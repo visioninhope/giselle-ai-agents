@@ -47,7 +47,7 @@ export default function Layout({
 					<Button type="submit">New Agent +</Button>
 				</form>
 			</div>
-			{children}
+			<div className="p-[24px] flex-1">{children}</div>
 		</div>
 	);
 }
