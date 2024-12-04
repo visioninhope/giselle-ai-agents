@@ -17,6 +17,7 @@ import {
 	DRAFT_TEAM_NAME_METADATA_KEY,
 	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
 } from "../constants";
+import { setCurrentTeam } from "../set-current-team";
 import { createCheckoutSession } from "./create-checkout-session";
 
 export async function createTeam(formData: FormData) {
@@ -31,14 +32,14 @@ export async function createTeam(formData: FormData) {
 	const isInternalUser =
 		supabaseUser.email != null && isEmailFromRoute06(supabaseUser.email);
 	if (isInternalUser) {
-		createInternalTeam(supabaseUser, teamName);
-		// FIXME: change context to the new team
+		const teamDbId = await createInternalTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamDbId);
 		redirect("/settings/team");
 	}
 
 	if (selectedPlan === "free") {
-		createFreeTeam(supabaseUser, teamName);
-		// FIXME: change context to the new team
+		const teamDbId = await createFreeTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamDbId);
 		redirect("/settings/team");
 	}
 
@@ -74,11 +75,11 @@ async function createCheckout(userDbId: number, teamName: string) {
 }
 
 async function createInternalTeam(supabaseUser: User, teamName: string) {
-	await createTeamInDatabase(supabaseUser, teamName, true);
+	return await createTeamInDatabase(supabaseUser, teamName, true);
 }
 
 async function createFreeTeam(supabaseUser: User, teamName: string) {
-	await createTeamInDatabase(supabaseUser, teamName, false);
+	return await createTeamInDatabase(supabaseUser, teamName, false);
 }
 
 async function createTeamInDatabase(
@@ -103,6 +104,7 @@ async function createTeamInDatabase(
 		userDbId,
 		role: "admin",
 	});
+	return teamDbId;
 }
 
 async function getUserDbId(supabaseUser: User) {
