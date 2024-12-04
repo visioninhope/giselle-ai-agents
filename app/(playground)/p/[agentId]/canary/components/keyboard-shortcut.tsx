@@ -1,11 +1,19 @@
 import { type ReactNode, useEffect } from "react";
 import { useToolbar } from "../contexts/toolbar";
 
+const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
+
 export function KeyboardShortcut() {
 	const { selectTool } = useToolbar();
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
+			const activeElement = document.activeElement;
+			const tagName = activeElement?.tagName;
+
+			if (tagName !== undefined && ignoredTags.includes(tagName)) {
+				return;
+			}
 			switch (event.key) {
 				case "v":
 					selectTool("move");
