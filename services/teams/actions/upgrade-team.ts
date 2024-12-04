@@ -11,7 +11,6 @@ export async function upgradeTeam(teamDbId: number) {
 	invariant(siteUrl, "NEXT_PUBLIC_SITE_URL is not set");
 	invariant(serviceSiteUrl, "NEXT_PUBLIC_SERVICE_SITE_URL is not set");
 
-	// FIXME: change context to the new team
 	const successUrl = `${siteUrl}/settings/team`;
 	const cancelUrl = `${serviceSiteUrl}/pricing`;
 
