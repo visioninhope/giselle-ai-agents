@@ -1,6 +1,6 @@
 # giselle
 
-As of December  5, 2024  6:33am. 920 total
+As of December  5, 2024  6:53am. 920 total
 
 ## Summary
 * 675 MIT
@@ -3509,11 +3509,7 @@ The Vercel Blob JavaScript API client
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-<a href="http://opensource.org/licenses/mit-license">MIT</a> manually approved
-
->The license is none. Check https://github.com/giselles-ai/giselle/issues/12 later
-
-><cite>  2024-10-08</cite>
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Make the Vercel Toolbar aware of your feature flags and read overrides set by it
 
