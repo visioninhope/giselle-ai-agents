@@ -11,6 +11,7 @@ import { AgentNameProvider } from "./contexts/agent-name";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
+import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import type { Graph } from "./types";
 import { buildGraphFolderPath } from "./utils";
@@ -83,12 +84,14 @@ export default async function Page({
 				<ReactFlowProvider>
 					<ToolbarContextProvider>
 						<MousePositionProvider>
-							<AgentNameProvider
-								defaultValue={agent.name ?? "Unnamed Agent"}
-								updateAgentNameAction={updateAgentName}
-							>
-								<Editor />
-							</AgentNameProvider>
+							<ToastProvider>
+								<AgentNameProvider
+									defaultValue={agent.name ?? "Unnamed Agent"}
+									updateAgentNameAction={updateAgentName}
+								>
+									<Editor />
+								</AgentNameProvider>
+							</ToastProvider>
 						</MousePositionProvider>
 					</ToolbarContextProvider>
 				</ReactFlowProvider>
