@@ -58,6 +58,7 @@ import {
 	pathJoin,
 } from "../utils";
 import { Block } from "./block";
+import ClipboardButton from "./clipboard-button";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
 	DropdownMenu,
@@ -1435,29 +1436,11 @@ function TabContentGenerateTextResult({
 				<div className="flex flex-col gap-[8px]">
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
-						<TooltipPrimitive.Provider>
-							<TooltipPrimitive.Root>
-								<TooltipPrimitive.Trigger asChild>
-									<button
-										type="button"
-										onClick={() => {
-											navigator.clipboard.writeText(artifact.id);
-										}}
-									>
-										<FingerprintIcon className="w-[12px] h-[12px] text-black-30/50" />
-									</button>
-								</TooltipPrimitive.Trigger>
-								<TooltipPrimitive.Portal>
-									<TooltipPrimitive.Content
-										sideOffset={4}
-										className="z-50 overflow-hidden flex gap-[4px] rounded-[6px] bg-black-30 px-[8px] py-[2px] text-xs text-black-100 shadow-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-									>
-										<span>{artifact.id}</span>
-										<span>(Click to copy)</span>
-									</TooltipPrimitive.Content>
-								</TooltipPrimitive.Portal>
-							</TooltipPrimitive.Root>
-						</TooltipPrimitive.Provider>
+						<ClipboardButton
+							className="w-[12px] h-[12px]"
+							text={artifact.id}
+							tooltip={`Copy the fingerprint: ${artifact.id}`}
+						/>
 					</div>
 					<div>
 						<button
