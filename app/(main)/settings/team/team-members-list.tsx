@@ -1,4 +1,5 @@
 import { getTeamMembers } from "./actions";
+import { TeamMemberListItem } from "./team-members-list-item";
 
 export async function TeamMembersList() {
 	const result = await getTeamMembers();
@@ -22,16 +23,12 @@ export async function TeamMembersList() {
 			</div>
 			<div className="divide-y divide-zinc-800">
 				{members.map((member) => (
-					<div
+					<TeamMemberListItem
 						key={member.userId}
-						className="grid grid-cols-[1fr_1fr_200px] gap-4 p-4 items-center text-zinc-200"
-					>
-						<div className="text-zinc-400">
-							{member.displayName || "No display name"}
-						</div>
-						<div className="text-zinc-400">{member.email || "No email"}</div>
-						<div className="text-zinc-400 capitalize">{member.role}</div>
-					</div>
+						displayName={member.displayName}
+						email={member.email}
+						role={member.role}
+					/>
 				))}
 			</div>
 		</div>
