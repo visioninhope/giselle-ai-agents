@@ -28,6 +28,7 @@ import {
 	langfuseModel,
 	pathJoin,
 	resolveLanguageModel,
+	toErrorWithMessage,
 } from "./utils";
 
 const artifactSchema = v.object({
@@ -260,7 +261,9 @@ export async function action(
 				const result = await object;
 				generationTracer.end({ output: result });
 				stream.done();
-			})();
+			})().catch((error) => {
+				stream.error(error);
+			});
 			return stream.value;
 		}
 		default:

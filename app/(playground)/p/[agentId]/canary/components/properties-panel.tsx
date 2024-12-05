@@ -749,6 +749,12 @@ function TabsContentPrompt({
 										Claude 3.5 Sonnet
 									</SelectItem>
 								</SelectGroup>
+								<SelectGroup>
+									<SelectLabel>Development</SelectLabel>
+									<SelectItem value="dev:error">
+										Mock(Raise an error)
+									</SelectItem>
+								</SelectGroup>
 							</SelectContent>
 						</Select>
 					</div>

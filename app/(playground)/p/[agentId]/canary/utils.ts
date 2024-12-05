@@ -2,6 +2,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { createId } from "@paralleldrive/cuid2";
 import type { LanguageModelV1 } from "ai";
+import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
 import { vercelBlobGraphFolder } from "./constants";
 import type {
 	ArtifactId,
@@ -50,6 +51,17 @@ export function resolveLanguageModel(
 	}
 	if (provider === "anthropic") {
 		return anthropic(model);
+	}
+	if (provider === "dev") {
+		return new MockLanguageModelV1({
+			defaultObjectGenerationMode: "json",
+			doStream: async () => ({
+				stream: simulateReadableStream({
+					values: [{ type: "error", error: "a" }],
+				}),
+				rawCall: { rawPrompt: null, rawSettings: {} },
+			}),
+		});
 	}
 	throw new Error("Unsupported model provider");
 }
