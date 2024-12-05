@@ -17,7 +17,10 @@ const BaseMetricsSchema = z.object({
 });
 
 const TokenConsumedSchema = BaseMetricsSchema.extend({
-	tokenConsumed: z.number(), // Number of tokens consumed by the API request
+	tokenConsumed: z.object({
+		input: z.number(), // Number of tokens used in the prompt/input sent to the model
+		output: z.number(), // Number of tokens used in the response/output received from the model
+	}),
 });
 
 const RequestCountSchema = BaseMetricsSchema.extend({
