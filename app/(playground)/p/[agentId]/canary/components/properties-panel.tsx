@@ -28,6 +28,7 @@ import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { action, parse } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
+import { useExecution } from "../contexts/execution";
 import {
 	useArtifact,
 	useGraph,
@@ -262,6 +263,7 @@ export function PropertiesPanel() {
 	const { graph, dispatch, flush } = useGraph();
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
+	const execute = useExecution();
 	return (
 		<div
 			className={clsx(
@@ -326,82 +328,7 @@ export function PropertiesPanel() {
 									<button
 										type="button"
 										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-										onClick={async () => {
-											const artifactId = createArtifactId();
-											dispatch({
-												type: "upsertArtifact",
-												input: {
-													nodeId: selectedNode.id,
-													artifact: {
-														id: artifactId,
-														type: "streamArtifact",
-														creatorNodeId: selectedNode.id,
-														object: {
-															type: "text",
-															title: "",
-															content: "",
-															messages: {
-																plan: "",
-																description: "",
-															},
-														},
-													},
-												},
-											});
-											setTab("Result");
-											const latestGraphUrl = await flush();
-											const stream = await action(
-												artifactId,
-												latestGraphUrl,
-												selectedNode.id,
-											);
-
-											let textArtifactObject: TextArtifactObject = {
-												type: "text",
-												title: "",
-												content: "",
-												messages: {
-													plan: "",
-													description: "",
-												},
-											};
-											for await (const streamContent of readStreamableValue(
-												stream,
-											)) {
-												if (streamContent === undefined) {
-													continue;
-												}
-												dispatch({
-													type: "upsertArtifact",
-													input: {
-														nodeId: selectedNode.id,
-														artifact: {
-															id: artifactId,
-															type: "streamArtifact",
-															creatorNodeId: selectedNode.id,
-															object: streamContent,
-														},
-													},
-												});
-												textArtifactObject = {
-													...textArtifactObject,
-													...streamContent,
-												};
-											}
-											dispatch({
-												type: "upsertArtifact",
-												input: {
-													nodeId: selectedNode.id,
-													artifact: {
-														id: artifactId,
-														type: "generatedArtifact",
-														creatorNodeId: selectedNode.id,
-														createdAt: Date.now(),
-														object: textArtifactObject,
-													},
-												},
-											});
-										}}
+										onClick={() => execute(selectedNode.id)}
 									>
 										Generate
 									</button>
@@ -660,83 +587,7 @@ export function PropertiesPanel() {
 									setTab("Prompt");
 								}}
 								onEditPrompt={() => setTab("Prompt")}
-								onGenerateText={async () => {
-									/** @todo DRY */
-									const artifactId = createArtifactId();
-									dispatch({
-										type: "upsertArtifact",
-										input: {
-											nodeId: selectedNode.id,
-											artifact: {
-												id: artifactId,
-												type: "streamArtifact",
-												creatorNodeId: selectedNode.id,
-												object: {
-													type: "text",
-													title: "",
-													content: "",
-													messages: {
-														plan: "",
-														description: "",
-													},
-												},
-											},
-										},
-									});
-									setTab("Result");
-									const latestGraphUrl = await flush();
-									const stream = await action(
-										artifactId,
-										latestGraphUrl,
-										selectedNode.id,
-									);
-
-									let textArtifactObject: TextArtifactObject = {
-										type: "text",
-										title: "",
-										content: "",
-										messages: {
-											plan: "",
-											description: "",
-										},
-									};
-									for await (const streamContent of readStreamableValue(
-										stream,
-									)) {
-										if (streamContent === undefined) {
-											continue;
-										}
-										dispatch({
-											type: "upsertArtifact",
-											input: {
-												nodeId: selectedNode.id,
-												artifact: {
-													id: artifactId,
-													type: "streamArtifact",
-													creatorNodeId: selectedNode.id,
-													object: streamContent,
-												},
-											},
-										});
-										textArtifactObject = {
-											...textArtifactObject,
-											...streamContent,
-										};
-									}
-									dispatch({
-										type: "upsertArtifact",
-										input: {
-											nodeId: selectedNode.id,
-											artifact: {
-												id: artifactId,
-												type: "generatedArtifact",
-												creatorNodeId: selectedNode.id,
-												createdAt: Date.now(),
-												object: textArtifactObject,
-											},
-										},
-									});
-								}}
+								onGenerateText={() => execute(selectedNode.id)}
 							/>
 						</TabsContent>
 					)}
