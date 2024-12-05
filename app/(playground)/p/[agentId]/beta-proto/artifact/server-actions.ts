@@ -84,7 +84,7 @@ ${sourcesToText(sources)}
 							tokenConsumed: {
 								input: result.usage.promptTokens,
 								output: result.usage.completionTokens,
-	                                                },
+							},
 							duration,
 							measurementScope,
 							isR06User,

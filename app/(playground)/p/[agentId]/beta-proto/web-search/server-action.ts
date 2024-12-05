@@ -95,7 +95,7 @@ ${sourcesToText(sources)}
 						tokenConsumed: {
 							input: result.usage.promptTokens,
 							output: result.usage.completionTokens,
-                                                },
+						},
 						duration,
 						measurementScope,
 						isR06User,
@@ -119,7 +119,11 @@ ${sourcesToText(sources)}
 
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) =>
-				withMeasurement<WebSearchResult[]>(logger, () => search(keyword), "tavily"),
+				withMeasurement<WebSearchResult[]>(
+					logger,
+					() => search(keyword),
+					"tavily",
+				),
 			),
 		)
 			.then((results) => [...new Set(results.flat())] as WebSearchResult[])

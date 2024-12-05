@@ -1,6 +1,10 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { captureError } from "./log";
-import type { ExternalServiceName, RequestCountSchema, OtelLoggerWrapper } from "./types";
+import type {
+	ExternalServiceName,
+	OtelLoggerWrapper,
+	RequestCountSchema,
+} from "./types";
 
 export async function withMeasurement<T>(
 	logger: OtelLoggerWrapper,
