@@ -1,15 +1,15 @@
 import { playgroundV2Flag } from "@/flags";
-import { getUser } from "@/lib/supabase";
 import { createAgent, getAgents } from "@/services/agents";
 import { CreateAgentButton } from "@/services/agents/components";
+import { fetchCurrentTeam } from "@/services/teams";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
 
 type AgentListProps = {
-	userId: string;
+	teamDbId: number;
 };
 async function AgentList(props: AgentListProps) {
-	const agents = await getAgents({ userId: props.userId });
+	const agents = await getAgents({ teamDbId: props.teamDbId });
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -26,10 +26,10 @@ export default async function AgentListPage() {
 	if (enableV2) {
 		return redirect("/agents-v2");
 	}
-	const user = await getUser();
+	const currentTeam = await fetchCurrentTeam();
 	async function createAgentAction() {
 		"use server";
-		const agent = await createAgent({ userId: user.id });
+		const agent = await createAgent({ teamDbId: currentTeam.dbId });
 		redirect(`/p/${agent.id}`);
 	}
 	return (
@@ -41,7 +41,7 @@ export default async function AgentListPage() {
 						<CreateAgentButton createAgentAction={createAgentAction} />
 					</div>
 					<Suspense fallback={<span>loading</span>}>
-						<AgentList userId={user.id} />
+						<AgentList teamDbId={currentTeam.dbId} />
 					</Suspense>
 				</div>
 			</section>

@@ -1,17 +1,9 @@
-import { getCurrentTeam } from "@/app/(auth)/lib";
-import { putGraph } from "@/app/(playground)/p/[agentId]/canary/actions";
-import { Button } from "@/components/ui/button";
-import { agents, db, supabaseUserMappings, teamMemberships } from "@/drizzle";
-import { getUser } from "@/lib/supabase";
-import { createId } from "@paralleldrive/cuid2";
+import { agents, db } from "@/drizzle";
+import { fetchCurrentTeam } from "@/services/teams";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
-import { redirect } from "next/navigation";
 import { type ReactNode, Suspense } from "react";
-import {
-	formatTimestamp,
-	initGraph,
-} from "../../(playground)/p/[agentId]/canary/utils";
+import { formatTimestamp } from "../../(playground)/p/[agentId]/canary/utils";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
@@ -23,20 +15,12 @@ function DataList({ label, children }: { label: string; children: ReactNode }) {
 }
 
 async function AgentList() {
-	const user = await getUser();
+	const currentTeam = await fetchCurrentTeam();
 	const dbAgents = await db
 		.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
 		.from(agents)
-		.innerJoin(teamMemberships, eq(agents.teamDbId, teamMemberships.teamDbId))
-		.innerJoin(
-			supabaseUserMappings,
-			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-		)
 		.where(
-			and(
-				eq(supabaseUserMappings.supabaseUserId, user.id),
-				isNotNull(agents.graphUrl),
-			),
+			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.graphUrl)),
 		);
 	if (dbAgents.length === 0) {
 		return (
