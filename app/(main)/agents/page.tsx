@@ -4,7 +4,6 @@ import { CreateAgentButton } from "@/services/agents/components";
 import { fetchCurrentTeam } from "@/services/teams";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { AgentListV2 } from "./v2";
 
 type AgentListProps = {
 	teamDbId: number;
@@ -25,7 +24,7 @@ async function AgentList(props: AgentListProps) {
 export default async function AgentListPage() {
 	const enableV2 = await playgroundV2Flag();
 	if (enableV2) {
-		return <AgentListV2 />;
+		return redirect("/agents-v2");
 	}
 	const currentTeam = await fetchCurrentTeam();
 	async function createAgentAction() {

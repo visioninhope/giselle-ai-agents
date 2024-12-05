@@ -5,12 +5,14 @@ import { put } from "@vercel/blob";
 import { jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import HandleBars from "handlebars";
+import Langfuse from "langfuse";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
+	ArtifactId,
 	FileId,
 	Graph,
 	GraphId,
@@ -23,6 +25,7 @@ import type {
 import {
 	buildGraphPath,
 	elementsToMarkdown,
+	langfuseModel,
 	pathJoin,
 	resolveLanguageModel,
 } from "./utils";
@@ -56,15 +59,29 @@ interface TextSource extends ActionSourceBase {
 	type: "text";
 	content: string;
 }
+interface FileSource extends ActionSourceBase {
+	type: "file";
+	title: string;
+	content: string;
+}
 interface TextGenerationSource extends ActionSourceBase {
 	type: "textGeneration";
 	title: string;
 	content: string;
 }
 
-type ActionSource = TextSource | TextGenerationSource;
+type ActionSource = TextSource | TextGenerationSource | FileSource;
 
-export async function action(graphUrl: string, nodeId: NodeId) {
+export async function action(
+	artifactId: ArtifactId,
+	graphUrl: string,
+	nodeId: NodeId,
+) {
+	const lf = new Langfuse();
+	const trace = lf.trace({
+		sessionId: artifactId,
+	});
+
 	const graph = await fetch(graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
@@ -100,9 +117,9 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 	 * found, it extracts the text content; if a textGeneration node
 	 * is found, it retrieves the corresponding generatedArtifact.
 	 */
-	function resolveSources(sources: NodeHandle[]) {
-		return sources
-			.map((source) => {
+	async function resolveSources(sources: NodeHandle[]) {
+		return Promise.all(
+			sources.map(async (source) => {
 				const node = findNode(source.id);
 				switch (node?.content.type) {
 					case "text":
@@ -111,13 +128,36 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 							content: node.content.text,
 							nodeId: node.id,
 						} satisfies ActionSource;
+					case "file": {
+						if (node.content.data == null) {
+							throw new Error("File not found");
+						}
+						if (node.content.data.status === "uploading") {
+							/** @todo Let user know file is uploading*/
+							throw new Error("File is uploading");
+						}
+						if (node.content.data.status === "processing") {
+							/** @todo Let user know file is processing*/
+							throw new Error("File is processing");
+						}
+						const text = await fetch(node.content.data.textDataUrl).then(
+							(res) => res.text(),
+						);
+						return {
+							type: "file",
+							title: node.content.data.name,
+							content: text,
+							nodeId: node.id,
+						} satisfies ActionSource;
+					}
+
 					case "textGeneration": {
 						const generatedArtifact = graph.artifacts.find(
 							(artifact) => artifact.creatorNodeId === node.id,
 						);
 						if (
 							generatedArtifact === undefined ||
-							generatedArtifact.type === "generatedArtifact"
+							generatedArtifact.type !== "generatedArtifact"
 						) {
 							return null;
 						}
@@ -131,8 +171,8 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 					default:
 						return null;
 				}
-			})
-			.filter((actionSource) => actionSource !== null);
+			}),
+		).then((sources) => sources.filter((source) => source !== null));
 	}
 
 	/**
@@ -173,19 +213,30 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 	// The main switch statement handles the different types of nodes
 	switch (node.content.type) {
 		case "textGeneration": {
-			const actionSources = resolveSources(node.content.sources);
+			const actionSources = await resolveSources(node.content.sources);
 			const requirement = resolveRequirement(node.content.requirement);
 			const model = resolveLanguageModel(node.content.llm);
 			const promptTemplate = HandleBars.compile(textGenerationPrompt);
 			const prompt = promptTemplate({
 				instruction: node.content.instruction,
 				requirement,
+				sources: actionSources,
 			});
 			const topP = node.content.topP;
 			const temperature = node.content.temperature;
 			const stream = createStreamableValue<TextArtifactObject>();
+
+			const generationTracer = trace.generation({
+				name: "generate-text",
+				input: prompt,
+				model: langfuseModel(node.content.llm),
+				modelParameters: {
+					topP: node.content.topP,
+					temperature: node.content.temperature,
+				},
+			});
 			(async () => {
-				const { partialObjectStream } = await streamObject({
+				const { partialObjectStream, object } = await streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
@@ -206,6 +257,8 @@ export async function action(graphUrl: string, nodeId: NodeId) {
 						},
 					});
 				}
+				const result = await object;
+				generationTracer.end({ output: result });
 				stream.done();
 			})();
 			return stream.value;

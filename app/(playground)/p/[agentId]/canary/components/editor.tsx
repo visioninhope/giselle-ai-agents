@@ -16,9 +16,11 @@ import { useGraph } from "../contexts/graph";
 import { useMousePosition } from "../contexts/mouse-position";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToolbar } from "../contexts/toolbar";
-import type { ConnectionId, NodeId, Tool } from "../types";
+import type { NodeId, Tool } from "../types";
 import { createNodeId, isTextGeneration } from "../utils";
 import { Edge } from "./edge";
+import { KeyboardShortcut } from "./keyboard-shortcut";
+import { NavigationPanel } from "./navigation-panel";
 import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { Toolbar } from "./toolbar";
@@ -31,7 +33,7 @@ const edgeTypes = {
 };
 export function Editor() {
 	const { graph, dispatch } = useGraph();
-	const { selectedTool, reset } = useToolbar();
+	const { selectTool, selectedTool, reset } = useToolbar();
 	const reactFlowInstance = useReactFlow<Node, Edge>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	useEffect(() => {
@@ -83,7 +85,7 @@ export function Editor() {
 			),
 		);
 	}, [graph.connections, reactFlowInstance.setEdges]);
-	const { setTab } = usePropertiesPanel();
+	const { setTab, setOpen } = usePropertiesPanel();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
@@ -113,6 +115,7 @@ export function Editor() {
 									},
 								});
 								if (nodeChange.selected) {
+									setOpen(true);
 									switch (node.content.type) {
 										case "textGeneration":
 											setTab("Prompt");
@@ -296,10 +299,15 @@ export function Editor() {
 				<Panel position={"bottom-center"}>
 					<Toolbar />
 				</Panel>
+
+				<Panel position="top-left" className="!top-0 !bottom-0 !left-0 !m-0">
+					<NavigationPanel />
+				</Panel>
 				{selectedTool?.category === "edit" && (
 					<FloatingNodePreview tool={selectedTool} />
 				)}
 			</ReactFlow>
+			<KeyboardShortcut />
 		</div>
 	);
 }

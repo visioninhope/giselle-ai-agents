@@ -1,12 +1,15 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
+import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
 	ChevronsUpDownIcon,
+	CornerDownRightIcon,
+	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
 } from "lucide-react";
@@ -47,6 +50,8 @@ import {
 	createConnectionId,
 	createFileId,
 	createNodeHandleId,
+	createNodeId,
+	formatTimestamp,
 	isFile,
 	isText,
 	isTextGeneration,
@@ -63,6 +68,7 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "./dropdown-menu";
+import { Markdown } from "./markdown";
 import {
 	Select,
 	SelectContent,
@@ -188,14 +194,6 @@ const TabsContent: FC<ComponentProps<typeof TabsPrimitive.Content>> = ({
 );
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
-const Dialog = DialogPrimitive.Root;
-
-const DialogTrigger = DialogPrimitive.Trigger;
-
-const DialogPortal = DialogPrimitive.Portal;
-
-const DialogClose = DialogPrimitive.Close;
-
 function DialogOverlay(props: ComponentProps<typeof DialogPrimitive.Overlay>) {
 	return (
 		<DialogPrimitive.Overlay
@@ -211,7 +209,7 @@ function DialogContent({
 	...props
 }: ComponentProps<typeof DialogPrimitive.Content>) {
 	return (
-		<DialogPortal>
+		<DialogPrimitive.DialogPortal>
 			<DialogOverlay />
 			<DialogPrimitive.Content
 				className={clsx(
@@ -226,7 +224,7 @@ function DialogContent({
 				<div className="relative z-10 flex flex-col">{children}</div>
 				<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 			</DialogPrimitive.Content>
-		</DialogPortal>
+		</DialogPrimitive.DialogPortal>
 	);
 }
 DialogContent.displayName = DialogPrimitive.Content.displayName;
@@ -304,8 +302,8 @@ export function PropertiesPanel() {
 					</div>
 
 					{selectedNode && (
-						<div className="bg-black-80 px-[24px] py-[8px] flex items-center justify-between">
-							<div className="flex items-center gap-[8px]">
+						<div className="bg-black-80 px-[24px] h-[36px] flex items-center justify-between">
+							<div className="flex items-center gap-[10px]">
 								<div
 									data-type={selectedNode.type}
 									className={clsx(
@@ -320,14 +318,14 @@ export function PropertiesPanel() {
 									/>
 								</div>
 								<div className="font-avenir text-[16px] text-black-30">
-									{selectedNode.content.type}
+									{selectedNode.name}
 								</div>
 							</div>
 							{selectedNode.content.type === "textGeneration" && (
 								<div className="">
 									<button
 										type="button"
-										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[4px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
+										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
 										onClick={async () => {
 											const artifactId = createArtifactId();
 											dispatch({
@@ -352,8 +350,8 @@ export function PropertiesPanel() {
 											});
 											setTab("Result");
 											const latestGraphUrl = await flush();
-											console.log(latestGraphUrl);
 											const stream = await action(
+												artifactId,
 												latestGraphUrl,
 												selectedNode.id,
 											);
@@ -606,7 +604,140 @@ export function PropertiesPanel() {
 					)}
 					{selectedNode && (
 						<TabsContent value="Result">
-							<TabContentGenerateTextResult node={selectedNode} />
+							<TabContentGenerateTextResult
+								node={selectedNode}
+								onCreateNewTextGenerator={() => {
+									const nodeId = createNodeId();
+									const handleId = createNodeHandleId();
+									dispatch([
+										{
+											type: "addNode",
+											input: {
+												node: {
+													id: nodeId,
+													name: `Untitle node - ${graph.nodes.length + 1}`,
+													position: {
+														x: selectedNode.position.x + 400,
+														y: selectedNode.position.y + 100,
+													},
+													selected: true,
+													type: "action",
+													content: {
+														type: "textGeneration",
+														llm: "anthropic:claude-3-5-sonnet-latest",
+														temperature: 0.7,
+														topP: 1,
+														instruction: "",
+														sources: [{ id: handleId, label: "Source1" }],
+													},
+												},
+											},
+										},
+										{
+											type: "addConnection",
+											input: {
+												connection: {
+													id: createConnectionId(),
+													sourceNodeId: selectedNode.id,
+													sourceNodeType: selectedNode.type,
+													targetNodeId: nodeId,
+													targetNodeHandleId: handleId,
+													targetNodeType: "action",
+												},
+											},
+										},
+										{
+											type: "updateNode",
+											input: {
+												nodeId: selectedNode.id,
+												node: {
+													...selectedNode,
+													selected: false,
+												},
+											},
+										},
+									]);
+									setTab("Prompt");
+								}}
+								onEditPrompt={() => setTab("Prompt")}
+								onGenerateText={async () => {
+									/** @todo DRY */
+									const artifactId = createArtifactId();
+									dispatch({
+										type: "upsertArtifact",
+										input: {
+											nodeId: selectedNode.id,
+											artifact: {
+												id: artifactId,
+												type: "streamArtifact",
+												creatorNodeId: selectedNode.id,
+												object: {
+													type: "text",
+													title: "",
+													content: "",
+													messages: {
+														plan: "",
+														description: "",
+													},
+												},
+											},
+										},
+									});
+									setTab("Result");
+									const latestGraphUrl = await flush();
+									const stream = await action(
+										artifactId,
+										latestGraphUrl,
+										selectedNode.id,
+									);
+
+									let textArtifactObject: TextArtifactObject = {
+										type: "text",
+										title: "",
+										content: "",
+										messages: {
+											plan: "",
+											description: "",
+										},
+									};
+									for await (const streamContent of readStreamableValue(
+										stream,
+									)) {
+										if (streamContent === undefined) {
+											continue;
+										}
+										dispatch({
+											type: "upsertArtifact",
+											input: {
+												nodeId: selectedNode.id,
+												artifact: {
+													id: artifactId,
+													type: "streamArtifact",
+													creatorNodeId: selectedNode.id,
+													object: streamContent,
+												},
+											},
+										});
+										textArtifactObject = {
+											...textArtifactObject,
+											...streamContent,
+										};
+									}
+									dispatch({
+										type: "upsertArtifact",
+										input: {
+											nodeId: selectedNode.id,
+											artifact: {
+												id: artifactId,
+												type: "generatedArtifact",
+												creatorNodeId: selectedNode.id,
+												createdAt: Date.now(),
+												object: textArtifactObject,
+											},
+										},
+									});
+								}}
+							/>
 						</TabsContent>
 					)}
 				</Tabs>
@@ -963,6 +1094,27 @@ function TabsContentPrompt({
 					id="text"
 					className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none flex-1 mb-[16px]"
 					defaultValue={content.instruction}
+					ref={(ref) => {
+						if (ref === null) {
+							return;
+						}
+
+						function handleBlur() {
+							if (ref === null) {
+								return;
+							}
+							if (content.instruction !== ref.value) {
+								onContentChange?.({
+									...content,
+									instruction: ref.value,
+								});
+							}
+						}
+						ref.addEventListener("blur", handleBlur);
+						return () => {
+							ref.removeEventListener("blur", handleBlur);
+						};
+					}}
 				/>
 			</PropertiesPanelContentBox>
 
@@ -1181,181 +1333,93 @@ function TabsContentPrompt({
 	);
 }
 
-/**
- * Formats a timestamp number into common English date string formats
- */
-const formatTimestamp = {
-	/**
-	 * Format: Nov 25, 2024 10:30:45 AM
-	 */
-	toLongDateTime: (timestamp: number): string => {
-		return new Date(timestamp).toLocaleString("en-US", {
-			year: "numeric",
-			month: "short",
-			day: "numeric",
-			hour: "numeric",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: true,
-		});
-	},
-
-	/**
-	 * Format: 11/25/2024 10:30 AM
-	 */
-	toShortDateTime: (timestamp: number): string => {
-		return new Date(timestamp).toLocaleString("en-US", {
-			year: "numeric",
-			month: "numeric",
-			day: "numeric",
-			hour: "numeric",
-			minute: "2-digit",
-			hour12: true,
-		});
-	},
-
-	/**
-	 * Format: November 25, 2024
-	 */
-	toLongDate: (timestamp: number): string => {
-		return new Date(timestamp).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "long",
-			day: "numeric",
-		});
-	},
-
-	/**
-	 * Format: 11/25/2024
-	 */
-	toShortDate: (timestamp: number): string => {
-		return new Date(timestamp).toLocaleDateString("en-US", {
-			year: "numeric",
-			month: "numeric",
-			day: "numeric",
-		});
-	},
-
-	/**
-	 * Format: 10:30:45 AM
-	 */
-	toTime: (timestamp: number): string => {
-		return new Date(timestamp).toLocaleTimeString("en-US", {
-			hour: "numeric",
-			minute: "2-digit",
-			second: "2-digit",
-			hour12: true,
-		});
-	},
-
-	/**
-	 * Format: ISO 8601 (2024-11-25T10:30:45Z)
-	 * Useful for APIs and database storage
-	 */
-	toISO: (timestamp: number): string => {
-		return new Date(timestamp).toISOString();
-	},
-
-	/**
-	 * Returns relative time like "2 hours ago", "in 3 days", etc.
-	 * Supports both past and future dates
-	 */
-	toRelativeTime: (timestamp: number): string => {
-		const now = Date.now();
-		const diff = timestamp - now;
-		const absMs = Math.abs(diff);
-		const isPast = diff < 0;
-
-		// Time units in milliseconds
-		const minute = 60 * 1000;
-		const hour = 60 * minute;
-		const day = 24 * hour;
-		const week = 7 * day;
-		const month = 30 * day;
-		const year = 365 * day;
-
-		// Helper function to format the time with proper pluralization
-		const formatUnit = (value: number, unit: string): string => {
-			const plural = value === 1 ? "" : "s";
-			return isPast
-				? `${value} ${unit}${plural} ago`
-				: `in ${value} ${unit}${plural}`;
-		};
-
-		if (absMs < minute) {
-			return isPast ? "just now" : "in a few seconds";
-		}
-
-		if (absMs < hour) {
-			const mins = Math.floor(absMs / minute);
-			return formatUnit(mins, "minute");
-		}
-
-		if (absMs < day) {
-			const hrs = Math.floor(absMs / hour);
-			return formatUnit(hrs, "hour");
-		}
-
-		if (absMs < week) {
-			const days = Math.floor(absMs / day);
-			return formatUnit(days, "day");
-		}
-
-		if (absMs < month) {
-			const weeks = Math.floor(absMs / week);
-			return formatUnit(weeks, "week");
-		}
-
-		if (absMs < year) {
-			const months = Math.floor(absMs / month);
-			return formatUnit(months, "month");
-		}
-
-		const years = Math.floor(absMs / year);
-		return formatUnit(years, "year");
-	},
-};
-
 function TabContentGenerateTextResult({
 	node,
+	onCreateNewTextGenerator,
+	onGenerateText,
+	onEditPrompt,
 }: {
 	node: Node;
+	onCreateNewTextGenerator?: () => void;
+	onGenerateText: () => void;
+	onEditPrompt: () => void;
 }) {
 	const artifact = useArtifact({ creatorNodeId: node.id });
-	if (artifact === null) {
-		return null;
-	}
-	if (artifact.object.type !== "text") {
-		return null;
+	if (artifact == null || artifact.object.type !== "text") {
+		return (
+			<div className="grid gap-[12px] text-[12px] text-black-30 px-[24px] pt-[120px] relative z-10 text-center justify-center">
+				<div>
+					<p className="font-[800] text-black-30 text-[18px]">
+						Nothing is generated.
+					</p>
+					<p className="text-black-70 text-[12px] text-center leading-5 w-[220px]">
+						Generate with the current Prompt or adjust the Prompt and the
+						results will be displayed.
+					</p>
+				</div>
+
+				<div className="flex flex-col gap-[4px]">
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onGenerateText();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Generate with the current Prompt
+						</button>
+					</div>
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onEditPrompt();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Adjust the Prompt
+						</button>
+					</div>
+				</div>
+			</div>
+		);
 	}
 	return (
 		<div className="grid gap-[8px] font-rosart text-[12px] text-black-30 px-[24px] py-[8px] relative z-10">
 			<div>{artifact.object.messages.plan}</div>
 
 			{artifact.object.title !== "" && (
-				<Dialog>
-					<DialogTrigger>
+				<DialogPrimitive.Root>
+					<DialogPrimitive.DialogTrigger>
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
 								<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
 								<div className="text-[14px]">{artifact.object.title}</div>
 							</div>
 						</Block>
-					</DialogTrigger>
+					</DialogPrimitive.DialogTrigger>
 					<DialogContent>
 						<div className="sr-only">
 							<DialogHeader>
 								<DialogTitle>{artifact.object.title}</DialogTitle>
 							</DialogHeader>
+							<DialogPrimitive.DialogDescription>
+								{artifact.object.content}
+							</DialogPrimitive.DialogDescription>
 						</div>
-						<div className="flex-1">{artifact.object.content}</div>
+						<div className="flex-1 overflow-y-auto">
+							<Markdown>{artifact.object.content}</Markdown>
+						</div>
 						{artifact.type === "generatedArtifact" && (
-							<DialogFooter className="text-[14px] font-bold text-black-70">
+							<DialogFooter className="text-[14px] font-bold text-black-70 mt-[10px]">
 								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
 							</DialogFooter>
 						)}
 					</DialogContent>
-				</Dialog>
+				</DialogPrimitive.Root>
 			)}
 			<div>{artifact.object.messages.description}</div>
 
@@ -1368,9 +1432,44 @@ function TabContentGenerateTextResult({
 			)}
 
 			{artifact.type === "generatedArtifact" && (
-				<div>
+				<div className="flex flex-col gap-[8px]">
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
+						<TooltipPrimitive.Provider>
+							<TooltipPrimitive.Root>
+								<TooltipPrimitive.Trigger asChild>
+									<button
+										type="button"
+										onClick={() => {
+											navigator.clipboard.writeText(artifact.id);
+										}}
+									>
+										<FingerprintIcon className="w-[12px] h-[12px] text-black-30/50" />
+									</button>
+								</TooltipPrimitive.Trigger>
+								<TooltipPrimitive.Portal>
+									<TooltipPrimitive.Content
+										sideOffset={4}
+										className="z-50 overflow-hidden flex gap-[4px] rounded-[6px] bg-black-30 px-[8px] py-[2px] text-xs text-black-100 shadow-sm animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
+									>
+										<span>{artifact.id}</span>
+										<span>(Click to copy)</span>
+									</TooltipPrimitive.Content>
+								</TooltipPrimitive.Portal>
+							</TooltipPrimitive.Root>
+						</TooltipPrimitive.Provider>
+					</div>
+					<div>
+						<button
+							type="button"
+							className="inline-flex items-center gap-[4px] bg-black hover:bg-white/20 transition-colors px-[4px] text-black-50 hover:text-black-30 rounded"
+							onClick={() => {
+								onCreateNewTextGenerator?.();
+							}}
+						>
+							<CornerDownRightIcon className="w-[12px] h-[12px]" />
+							Create a new Text Generator with this result as Source
+						</button>
 					</div>
 				</div>
 			)}
