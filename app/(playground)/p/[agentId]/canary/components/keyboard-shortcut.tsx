@@ -1,10 +1,12 @@
 import { type ReactNode, useEffect } from "react";
+import { useToast } from "../contexts/toast";
 import { useToolbar } from "../contexts/toolbar";
 
 const ignoredTags = ["INPUT", "TEXTAREA", "SELECT"];
 
 export function KeyboardShortcut() {
 	const { selectTool } = useToolbar();
+	const { addToast } = useToast();
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
@@ -27,6 +29,17 @@ export function KeyboardShortcut() {
 				case "g":
 					selectTool("addTextGenerationNode");
 					break;
+				case "a":
+					/**
+					 * Toast test
+					 * @todo remove this if not needed
+					 */
+					addToast({
+						title: "Action failed(TEST)",
+						message: "Unable to connect to server.",
+						type: "error",
+					});
+					break;
 			}
 			if (event.code === "Escape") {
 				selectTool("move");
@@ -34,7 +47,7 @@ export function KeyboardShortcut() {
 		};
 		window.addEventListener("keydown", handleKeyDown);
 		return () => window.removeEventListener("keydown", handleKeyDown);
-	}, [selectTool]);
+	}, [selectTool, addToast]);
 
 	return <></>;
 }
