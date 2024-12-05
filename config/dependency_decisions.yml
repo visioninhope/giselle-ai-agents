@@ -49,13 +49,6 @@
     :why:
     :versions: []
     :when: 2024-09-18 06:46:06.140937000 Z
-- - :approve
-  - "@vercel/flags"
-  - :who:
-    :why: The license is none. Check https://github.com/giselles-ai/giselle/issues/12
-      later
-    :versions: []
-    :when: 2024-10-08 09:38:17.316315298 Z
 - - :permit
   - Zlib
   - :who:

@@ -1,9 +1,9 @@
 # giselle
 
-As of December  4, 2024  3:26am. 919 total
+As of December  5, 2024  6:53am. 920 total
 
 ## Summary
-* 673 MIT
+* 675 MIT
 * 127 Apache 2.0
 * 62 ISC
 * 24 New BSD
@@ -16,7 +16,6 @@ As of December  4, 2024  3:26am. 919 total
 * 1 (MIT AND Zlib)
 * 1 BSD
 * 1 CC0 1.0 Universal
-* 1 unknown
 * 1 CC-BY-4.0
 * 1 (MIT OR CC0-1.0)
 * 1 (AFL-2.1 OR BSD-3-Clause)
@@ -2513,6 +2512,17 @@ Radix UI React Icon Set
 
 
 
+<a name="@radix-ui/react-toast"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-toast</a> v1.2.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-toggle"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-toggle</a> v1.1.0 (dependencies)
 #### 
@@ -3493,17 +3503,13 @@ The official JSON schema converter for Valibot
 The Vercel Blob JavaScript API client
 
 <a name="@vercel/flags"></a>
-### @vercel/flags v2.6.1 (dependencies)
+### @vercel/flags v2.6.3 (dependencies)
 #### 
 
 ##### Paths
 * /home/runner/work/giselle/giselle
 
-unknown manually approved
-
->The license is none. Check https://github.com/giselles-ai/giselle/issues/12 later
-
-><cite>  2024-10-08</cite>
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Make the Vercel Toolbar aware of your feature flags and read overrides set by it
 
