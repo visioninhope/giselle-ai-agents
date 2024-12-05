@@ -193,3 +193,68 @@ export async function addTeamMember(formData: FormData) {
 		};
 	}
 }
+
+export async function updateTeamMemberRole(formData: FormData) {
+	try {
+		const userId = formData.get("userId") as string;
+		const role = formData.get("role") as string;
+
+		if (!isTeamRole(role)) {
+			throw new Error("Invalid role");
+		}
+
+		// 1. Get current user's team
+		const supabaseUser = await getUser();
+		const team = await db
+			.select({ dbId: teams.dbId })
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+
+		if (team.length === 0) {
+			throw new Error("Team not found");
+		}
+
+		const currentTeam = team[0]; // TODO: This will need to be adjusted after implementing team switching
+
+		// 2. Get user's dbId from users table
+		const user = await db
+			.select({ dbId: users.dbId })
+			.from(users)
+			.where(eq(users.id, userId))
+			.limit(1);
+
+		if (user.length === 0) {
+			throw new Error("User not found");
+		}
+
+		// 3. Update team membership role
+		await db
+			.update(teamMemberships)
+			.set({ role })
+			.where(
+				and(
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
+					eq(teamMemberships.userDbId, user[0].dbId),
+				),
+			);
+
+		revalidatePath("/settings/team");
+
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to update team member role:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Failed to update team member role",
+		};
+	}
+}

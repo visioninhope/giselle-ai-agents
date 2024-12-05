@@ -25,6 +25,7 @@ export async function TeamMembersList() {
 				{members.map((member) => (
 					<TeamMemberListItem
 						key={member.userId}
+						userId={member.userId}
 						displayName={member.displayName}
 						email={member.email}
 						role={member.role}
