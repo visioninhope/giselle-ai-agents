@@ -21,9 +21,10 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				</div>
 				<div className="flex items-center gap-4">
 					{proTeamPlan && (
-						<TeamSelection>
+						<>
+							<TeamSelection />
 							<TeamCreation />
-						</TeamSelection>
+						</>
 					)}
 					<UserButton />
 				</div>

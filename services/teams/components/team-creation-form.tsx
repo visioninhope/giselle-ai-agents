@@ -19,8 +19,7 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { AlertCircle } from "lucide-react";
-import Link from "next/link";
+import { AlertCircle, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { createTeam } from "../actions/create-team";
@@ -57,12 +56,7 @@ export function TeamCreationForm({
 	return (
 		<Dialog>
 			<DialogTrigger asChild>
-				<Link
-					href="#"
-					className="flex items-center text-sm text-blue-500 hover:text-blue-400"
-				>
-					+ Create New Team
-				</Link>
+				<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[500px] bg-gray-950 text-gray-100">
 				<DialogHeader>
