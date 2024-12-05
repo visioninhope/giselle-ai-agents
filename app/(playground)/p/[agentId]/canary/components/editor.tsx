@@ -311,8 +311,8 @@ export function Editor() {
 				)}
 			</ReactFlow>
 			<KeyboardShortcut />
-			{toasts.map((toast) => (
-				<Toast key={toast.id} />
+			{toasts.map(({ id, ...props }) => (
+				<Toast key={id} {...props} />
 			))}
 		</div>
 	);

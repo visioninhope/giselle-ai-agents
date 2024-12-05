@@ -8,7 +8,8 @@ import { createContext, useContext, useState } from "react";
 
 interface Toast {
 	id: string;
-	message: string;
+	title?: string;
+	message?: string;
 	type?: "info" | "success" | "warning" | "error";
 	duration?: number;
 }
@@ -57,7 +58,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 		<ToastContext.Provider value={{ toasts, addToast, removeToast }}>
 			<ToastComponentProvider swipeDirection="right">
 				{children}
-				<ToastComponentViewport className="fixed bottom-0 right-0 z-[2147483647] m-0 flex w-[390px] max-w-[100vw] list-none flex-col gap-2.5 p-[var(--viewport-padding)] outline-none [--viewport-padding:_25px]" />
+				<ToastComponentViewport className="fixed bottom-0 right-0 z-[2147483647] m-0 flex w-[320px] max-w-[100vw] list-none flex-col gap-2.5 p-[40px] outline-none" />
 			</ToastComponentProvider>
 		</ToastContext.Provider>
 	);
