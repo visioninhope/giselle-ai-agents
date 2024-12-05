@@ -26,3 +26,10 @@ const RequestCountSchema = BaseMetricsSchema.extend({
 
 export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
 export type RequestCountSchema = z.infer<typeof RequestCountSchema>;
+export type LogSchema = TokenConsumedSchema | RequestCountSchema;
+
+export interface OtelLoggerWrapper {
+	info: (obj: LogSchema, msg?: string) => void;
+	error: (obj: LogSchema | Error, msg?: string) => void;
+	debug: (obj: LogSchema, msg?: string) => void;
+}
