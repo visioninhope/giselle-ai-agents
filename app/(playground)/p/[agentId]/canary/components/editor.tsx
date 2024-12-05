@@ -11,10 +11,11 @@ import {
 } from "@xyflow/react";
 import bg from "./bg.png";
 import "@xyflow/react/dist/style.css";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useGraph } from "../contexts/graph";
 import { useMousePosition } from "../contexts/mouse-position";
 import { usePropertiesPanel } from "../contexts/properties-panel";
+import { useToast } from "../contexts/toast";
 import { useToolbar } from "../contexts/toolbar";
 import type { NodeId, Tool } from "../types";
 import { createNodeId, isTextGeneration } from "../utils";
@@ -23,6 +24,7 @@ import { KeyboardShortcut } from "./keyboard-shortcut";
 import { NavigationPanel } from "./navigation-panel";
 import { Node, PreviewNode } from "./node";
 import { PropertiesPanel } from "./properties-panel";
+import { Toast } from "./toast";
 import { Toolbar } from "./toolbar";
 
 const nodeTypes = {
@@ -86,6 +88,7 @@ export function Editor() {
 		);
 	}, [graph.connections, reactFlowInstance.setEdges]);
 	const { setTab, setOpen } = usePropertiesPanel();
+	const { toasts } = useToast();
 	return (
 		<div className="w-full h-screen">
 			<ReactFlow<Node, Edge>
@@ -308,6 +311,9 @@ export function Editor() {
 				)}
 			</ReactFlow>
 			<KeyboardShortcut />
+			{toasts.map((toast) => (
+				<Toast key={toast.id} />
+			))}
 		</div>
 	);
 }
