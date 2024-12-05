@@ -5,15 +5,16 @@ import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import type { AgentId } from "../beta-proto/types";
-import { putGraph } from "./actions";
+import { action, putGraph } from "./actions";
 import { Editor } from "./components/editor";
 import { AgentNameProvider } from "./contexts/agent-name";
+import { ExecutionProvider } from "./contexts/execution";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import type { Graph } from "./types";
+import type { ArtifactId, Graph, NodeId } from "./types";
 import { buildGraphFolderPath } from "./utils";
 
 // This page is experimental. it requires PlaygroundV2Flag to show this page
@@ -74,6 +75,15 @@ export default async function Page({
 		return agentName;
 	}
 
+	async function execute(
+		artifactId: ArtifactId,
+		graphUrl: string,
+		nodeId: NodeId,
+	) {
+		"use server";
+		return await action(artifactId, graphUrl, nodeId);
+	}
+
 	return (
 		<GraphContextProvider
 			defaultGraph={graph}
@@ -89,7 +99,9 @@ export default async function Page({
 									defaultValue={agent.name ?? "Unnamed Agent"}
 									updateAgentNameAction={updateAgentName}
 								>
-									<Editor />
+									<ExecutionProvider executeAction={execute}>
+										<Editor />
+									</ExecutionProvider>
 								</AgentNameProvider>
 							</ToastProvider>
 						</MousePositionProvider>
