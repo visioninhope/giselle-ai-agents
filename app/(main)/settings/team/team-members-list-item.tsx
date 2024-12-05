@@ -27,10 +27,14 @@ export function TeamMemberListItem({
 	role: initialRole,
 }: TeamMemberListItemProps) {
 	const [isEditingRole, setIsEditingRole] = useState(false);
-	const [role, setRole] = useState(initialRole);
-	const [tempRole, setTempRole] = useState(role);
+	const [role, setRole] = useState<TeamRole>(initialRole);
+	const [tempRole, setTempRole] = useState<TeamRole>(role);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string>("");
+
+	const handleRoleChange = (value: TeamRole) => {
+		setTempRole(value);
+	};
 
 	const handleSaveRole = async () => {
 		setError("");
@@ -76,7 +80,7 @@ export function TeamMemberListItem({
 					<>
 						<Select
 							value={tempRole}
-							onValueChange={setTempRole}
+							onValueChange={handleRoleChange}
 							disabled={isLoading}
 						>
 							<SelectTrigger className="w-[100px]">
