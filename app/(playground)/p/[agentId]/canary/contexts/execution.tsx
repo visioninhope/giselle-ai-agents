@@ -3,9 +3,10 @@
 import { type StreamableValue, readStreamableValue } from "ai/rsc";
 import { type ReactNode, createContext, useCallback, useContext } from "react";
 import type { ArtifactId, NodeId, TextArtifactObject } from "../types";
-import { createArtifactId } from "../utils";
+import { createArtifactId, toErrorWithMessage } from "../utils";
 import { useGraph } from "./graph";
 import { usePropertiesPanel } from "./properties-panel";
+import { useToast } from "./toast";
 
 interface ExecutionContextType {
 	execute: (nodeId: NodeId) => Promise<void>;
@@ -30,6 +31,7 @@ export function ExecutionProvider({
 }: ExecutionProviderProps) {
 	const { dispatch, flush } = useGraph();
 	const { setTab } = usePropertiesPanel();
+	const { addToast } = useToast();
 	const execute = useCallback(
 		async (nodeId: NodeId) => {
 			const artifactId = createArtifactId();
@@ -55,20 +57,38 @@ export function ExecutionProvider({
 			});
 			setTab("Result");
 			const latestGraphUrl = await flush();
-			const stream = await executeAction(artifactId, latestGraphUrl, nodeId);
+			try {
+				const stream = await executeAction(artifactId, latestGraphUrl, nodeId);
 
-			let textArtifactObject: TextArtifactObject = {
-				type: "text",
-				title: "",
-				content: "",
-				messages: {
-					plan: "",
-					description: "",
-				},
-			};
-			for await (const streamContent of readStreamableValue(stream)) {
-				if (streamContent === undefined) {
-					continue;
+				let textArtifactObject: TextArtifactObject = {
+					type: "text",
+					title: "",
+					content: "",
+					messages: {
+						plan: "",
+						description: "",
+					},
+				};
+				for await (const streamContent of readStreamableValue(stream)) {
+					if (streamContent === undefined) {
+						continue;
+					}
+					dispatch({
+						type: "upsertArtifact",
+						input: {
+							nodeId,
+							artifact: {
+								id: artifactId,
+								type: "streamArtifact",
+								creatorNodeId: nodeId,
+								object: streamContent,
+							},
+						},
+					});
+					textArtifactObject = {
+						...textArtifactObject,
+						...streamContent,
+					};
 				}
 				dispatch({
 					type: "upsertArtifact",
@@ -76,32 +96,29 @@ export function ExecutionProvider({
 						nodeId,
 						artifact: {
 							id: artifactId,
-							type: "streamArtifact",
+							type: "generatedArtifact",
 							creatorNodeId: nodeId,
-							object: streamContent,
+							createdAt: Date.now(),
+							object: textArtifactObject,
 						},
 					},
 				});
-				textArtifactObject = {
-					...textArtifactObject,
-					...streamContent,
-				};
-			}
-			dispatch({
-				type: "upsertArtifact",
-				input: {
-					nodeId,
-					artifact: {
-						id: artifactId,
-						type: "generatedArtifact",
-						creatorNodeId: nodeId,
-						createdAt: Date.now(),
-						object: textArtifactObject,
+			} catch (error) {
+				addToast({
+					type: "error",
+					title: "Execution failed",
+					message: toErrorWithMessage(error).message,
+				});
+				dispatch({
+					type: "upsertArtifact",
+					input: {
+						nodeId,
+						artifact: null,
 					},
-				},
-			});
+				});
+			}
 		},
-		[executeAction, dispatch, flush, setTab],
+		[executeAction, dispatch, flush, setTab, addToast],
 	);
 	return (
 		<ExecutionContext.Provider value={{ execute }}>
