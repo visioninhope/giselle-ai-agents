@@ -9,6 +9,7 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { fetchCurrentTeam } from "@/services/teams";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -82,24 +83,8 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("Invalid role");
 		}
 
-		// 1. Get current user's team
-		const supabaseUser = await getUser();
-
-		const team = await db
-			.select({ dbId: teams.dbId })
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
-
-		if (team.length === 0) {
-			throw new Error("Team not found");
-		}
-
-		const currentTeam = team[0]; // TODO: This will need to be adjusted after implementing team switching
+		// 1. Get current team
+		const currentTeam = await fetchCurrentTeam();
 
 		// 2. Find user by email
 		const user = await db
@@ -129,7 +114,7 @@ export async function addTeamMember(formData: FormData) {
 
 		// 4. Create team membership
 		await db.insert(teamMemberships).values({
-			teamDbId: team[0].dbId,
+			teamDbId: currentTeam.dbId,
 			userDbId: user[0].dbId,
 			role,
 		});
