@@ -17,23 +17,6 @@ function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
 }
 
-export async function getTeamName() {
-	const user = await getUser();
-
-	// TODO: In the future, this query will be changed to retrieve from the selected team ID
-	const _teams = await db
-		.select({ dbId: teams.dbId, name: teams.name })
-		.from(teams)
-		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-		.innerJoin(
-			supabaseUserMappings,
-			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
-
-	return _teams[0].name;
-}
-
 export async function updateTeamName(teamDbId: number, formData: FormData) {
 	const newName = formData.get("name") as string;
 	const user = await getUser();
