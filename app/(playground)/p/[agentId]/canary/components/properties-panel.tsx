@@ -1258,7 +1258,7 @@ function TabContentGenerateTextResult({
 					<DialogPrimitive.DialogTrigger>
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
-								<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
+								<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
 								<div className="text-[14px]">{artifact.object.title}</div>
 							</div>
 						</Block>
