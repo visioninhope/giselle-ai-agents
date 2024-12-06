@@ -1263,7 +1263,13 @@ function TabContentGenerateTextResult({
 							</div>
 						</Block>
 					</DialogPrimitive.DialogTrigger>
-					<DialogContent>
+					<DialogContent
+						// Prevent Tooltip within popover opens automatically due to trigger receiving focus
+						// https://github.com/radix-ui/primitives/issues/2248
+						onOpenAutoFocus={(event) => {
+							event.preventDefault();
+						}}
+					>
 						<div className="sr-only">
 							<DialogHeader>
 								<DialogTitle>{artifact.object.title}</DialogTitle>
