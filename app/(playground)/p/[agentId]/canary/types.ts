@@ -26,6 +26,7 @@ export interface TextGenerateActionContent extends ActionContentBase {
 	topP: number;
 	instruction: string;
 	requirement?: NodeHandle;
+	system?: string;
 	sources: NodeHandle[];
 }
 export interface TextGeneration extends Action {

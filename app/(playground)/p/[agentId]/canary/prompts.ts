@@ -1,8 +1,7 @@
 import HandleBars from "handlebars";
 HandleBars.registerHelper("eq", (arg1, arg2) => arg1 === arg2);
 
-export const textGenerationPrompt = `
-You are tasked with generating text based on specific instructions, requirements, and sources provided by the user. Follow these steps carefully:
+export const textGenerationPrompt = `You are tasked with generating text based on specific instructions, requirements, and sources provided by the user. Follow these steps carefully:
 
 1. Read and analyze the following inputs:
 

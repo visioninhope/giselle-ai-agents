@@ -7,11 +7,14 @@ import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
+	CheckCircle,
+	CheckIcon,
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
 	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
+	UndoIcon,
 } from "lucide-react";
 import {
 	type ComponentProps,
@@ -37,6 +40,7 @@ import {
 	useSelectedNode,
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
+import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
 	Node,
@@ -96,11 +100,13 @@ interface PropertiesPanelCollapsible {
 	title: string;
 	glanceLabel?: string;
 	children: ReactNode;
+	expandedClassName?: string;
 }
 
 function PropertiesPanelCollapsible({
 	title,
 	glanceLabel,
+	expandedClassName,
 	children,
 }: PropertiesPanelCollapsible) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -108,7 +114,12 @@ function PropertiesPanelCollapsible({
 	return (
 		<>
 			{isExpanded ? (
-				<PropertiesPanelContentBox className="text-black-30 grid gap-2">
+				<PropertiesPanelContentBox
+					className={clsx(
+						"text-black-30 flex flex-col gap-2",
+						expandedClassName,
+					)}
+				>
 					<div className="flex justify-between items-center">
 						<p className="font-rosart">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
@@ -674,6 +685,45 @@ function NodeDropdown({
 	);
 }
 
+function RevertToDefaultButton({ onClick }: { onClick: () => void }) {
+	const [clicked, setClicked] = useState(false);
+
+	const handleClick = useCallback(() => {
+		onClick();
+		setClicked(true);
+		setTimeout(() => setClicked(false), 2000);
+	}, [onClick]);
+
+	return (
+		<button
+			type="button"
+			className="group flex items-center bg-black-100/30 text-white px-[8px] py-[2px] rounded-md transition-all duration-300 ease-in-out hover:bg-black-100"
+			onClick={handleClick}
+		>
+			<div className="relative h-[12px] w-[12px]">
+				<span
+					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${clicked ? "opacity-0" : "opacity-100"}`}
+				>
+					<UndoIcon className="h-[12px] w-[12px]" />
+				</span>
+				<span
+					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${clicked ? "opacity-100" : "opacity-0"}`}
+				>
+					<CheckIcon className="h-[12px] w-[12px]" />
+				</span>
+			</div>
+			<div
+				className="overflow-hidden transition-all duration-300 ease-in-out w-0 data-[clicked=false]:group-hover:w-[98px] data-[clicked=true]:group-hover:w-[40px] group-hover:ml-[4px] flex"
+				data-clicked={clicked}
+			>
+				<span className="whitespace-nowrap text-[12px]">
+					{clicked ? "Revert!" : "Revert to Default"}
+				</span>
+			</div>
+		</button>
+	);
+}
+
 function TabsContentPrompt({
 	content,
 	onContentChange,
@@ -945,6 +995,57 @@ function TabsContentPrompt({
 				)}
 			</PropertiesPanelCollapsible>
 
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+			<PropertiesPanelCollapsible
+				title="System"
+				glanceLabel={content.system === undefined ? "Default" : "Modified"}
+				expandedClassName="flex-1"
+			>
+				<div className="flex-1 flex flex-col gap-[3px]">
+					<p className="text-[11px] text-black-70">
+						System prompts combine requirements and guide you through tasks.
+						Make changes or click "Revert to Default" anytime.
+					</p>
+					<div className="relative flex-1">
+						<textarea
+							className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
+							defaultValue={content.system ?? textGenerationPrompt}
+							ref={(ref) => {
+								if (ref === null) {
+									return;
+								}
+
+								function handleBlur() {
+									if (ref === null) {
+										return;
+									}
+									if (content.system !== ref.value) {
+										onContentChange?.({
+											...content,
+											system: ref.value,
+										});
+									}
+								}
+								ref.addEventListener("blur", handleBlur);
+								return () => {
+									ref.removeEventListener("blur", handleBlur);
+								};
+							}}
+						/>
+
+						<div className="absolute bottom-[4px] right-[4px]">
+							<RevertToDefaultButton
+								onClick={() => {
+									onContentChange?.({
+										...content,
+										system: undefined,
+									});
+								}}
+							/>
+						</div>
+					</div>
+				</div>
+			</PropertiesPanelCollapsible>
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 
 			<PropertiesPanelContentBox className="flex flex-col gap-[8px] flex-1">
