@@ -1,11 +1,10 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
-import { openai } from "@ai-sdk/openai";
+import { AgentActivities } from "@/services/agents/activities";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
-import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import type { GiselleNodeId } from "../giselle-node/types";
 import type { AgentId } from "../types";
 import { type V2FlowAction, setFlow, updateStep } from "./action";
@@ -57,10 +56,13 @@ export async function executeFlow(
 				},
 			}),
 		);
+		const agentActivities = new AgentActivities(agentId);
 		const generateResults: GenerateResult[] = [];
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
+					const startTime = new Date();
+
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.running },
@@ -164,6 +166,9 @@ export async function executeFlow(
 							break;
 						}
 					}
+
+					agentActivities.collectAction(step.action, startTime, new Date());
+
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.completed },
@@ -172,6 +177,8 @@ export async function executeFlow(
 				}),
 			);
 		}
+
+		console.dir(agentActivities);
 		stream.done();
 	})();
 
