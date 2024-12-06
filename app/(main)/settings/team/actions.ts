@@ -141,3 +141,60 @@ export async function addTeamMember(formData: FormData) {
 		};
 	}
 }
+
+export async function getCurrentUserRole() {
+	try {
+		const supabaseUser = await getUser();
+
+		// Subquery: Get current user's team
+		const currentUserTeam = db
+			.select({
+				teamDbId: teams.dbId,
+			})
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+			.limit(1);
+
+		// Get current user's role in the team
+		const result = await db
+			.select({
+				role: teamMemberships.role,
+			})
+			.from(teamMemberships)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(
+				and(
+					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
+					eq(teamMemberships.teamDbId, currentUserTeam),
+				),
+			)
+			.limit(1);
+
+		if (result.length === 0) {
+			throw new Error("User role not found");
+		}
+
+		return {
+			success: true,
+			data: result[0].role,
+		};
+	} catch (error) {
+		console.error("Failed to get current user role:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Failed to get current user role",
+		};
+	}
+}
