@@ -7,6 +7,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { putGraph } from "../../(playground)/p/[agentId]/canary/actions";
 import { initGraph } from "../../(playground)/p/[agentId]/canary/utils";
+import { CreateAgentButton } from "./components";
 
 export default function Layout({
 	children,
@@ -46,7 +47,7 @@ export default function Layout({
 		<div className="flex h-full divide-x divide-black-80">
 			<div className="w-[200px] h-full p-[24px]">
 				<form action={createAgent}>
-					<Button type="submit">New Agent +</Button>
+					<CreateAgentButton />
 				</form>
 			</div>
 			<div className="p-[24px] flex-1">{children}</div>
