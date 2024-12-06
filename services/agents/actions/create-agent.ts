@@ -7,12 +7,14 @@ import { revalidateGetAgents } from "./get-agent";
 
 type CreateAgentArgs = {
 	teamDbId: number;
+	creatorDbId: number;
 };
 export const createAgent = async (args: CreateAgentArgs) => {
 	const id = `agnt_${createId()}` as const;
 	await db.insert(agents).values({
 		id,
 		teamDbId: args.teamDbId,
+		creatorDbId: args.creatorDbId,
 		graphv2: {
 			agentId: id,
 			nodes: [],

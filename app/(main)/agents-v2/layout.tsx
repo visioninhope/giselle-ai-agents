@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { agents, db } from "@/drizzle";
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { createId } from "@paralleldrive/cuid2";
 import { redirect } from "next/navigation";
@@ -17,10 +18,12 @@ export default function Layout({
 		const graph = initGraph();
 		const agentId = `agnt_${createId()}` as const;
 		const { url } = await putGraph(graph);
+		const user = await fetchCurrentUser();
 		const team = await fetchCurrentTeam();
 		await db.insert(agents).values({
 			id: agentId,
 			teamDbId: team.dbId,
+			creatorDbId: user.dbId,
 			graphUrl: url,
 			graphv2: {
 				agentId,

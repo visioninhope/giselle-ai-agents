@@ -146,6 +146,9 @@ export const agents = pgTable("agents", {
 		.defaultNow()
 		.notNull()
 		.$onUpdate(() => new Date()),
+	creatorDbId: integer("creator_db_id")
+		.notNull()
+		.references(() => users.dbId),
 });
 
 export const builds = pgTable("builds", {

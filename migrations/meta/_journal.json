@@ -99,6 +99,13 @@
 			"when": 1733117334658,
 			"tag": "0013_nosy_whiplash",
 			"breakpoints": true
+		},
+		{
+			"idx": 14,
+			"version": "7",
+			"when": 1733382854673,
+			"tag": "0014_lucky_sabretooth",
+			"breakpoints": true
 		}
 	]
 }

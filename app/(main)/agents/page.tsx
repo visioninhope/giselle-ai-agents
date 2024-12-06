@@ -1,4 +1,5 @@
 import { playgroundV2Flag } from "@/flags";
+import { fetchCurrentUser } from "@/services/accounts";
 import { createAgent, getAgents } from "@/services/agents";
 import { CreateAgentButton } from "@/services/agents/components";
 import { fetchCurrentTeam } from "@/services/teams";
@@ -26,10 +27,14 @@ export default async function AgentListPage() {
 	if (enableV2) {
 		return redirect("/agents-v2");
 	}
+	const currentUser = await fetchCurrentUser();
 	const currentTeam = await fetchCurrentTeam();
 	async function createAgentAction() {
 		"use server";
-		const agent = await createAgent({ teamDbId: currentTeam.dbId });
+		const agent = await createAgent({
+			teamDbId: currentTeam.dbId,
+			creatorDbId: currentUser.dbId,
+		});
 		redirect(`/p/${agent.id}`);
 	}
 	return (
