@@ -2,6 +2,7 @@
 
 import {
 	type TeamRole,
+	type UserId,
 	db,
 	supabaseUserMappings,
 	teamMemberships,
@@ -11,6 +12,10 @@ import {
 import { getUser } from "@/lib/supabase";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+
+function isUserId(value: string): value is UserId {
+	return value.startsWith("usr_");
+}
 
 function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
@@ -198,6 +203,10 @@ export async function updateTeamMemberRole(formData: FormData) {
 	try {
 		const userId = formData.get("userId") as string;
 		const role = formData.get("role") as string;
+
+		if (!isUserId(userId)) {
+			throw new Error("Invalid user ID");
+		}
 
 		if (!isTeamRole(role)) {
 			throw new Error("Invalid role");
