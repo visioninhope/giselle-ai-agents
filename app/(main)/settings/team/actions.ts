@@ -212,8 +212,21 @@ export async function updateTeamMemberRole(formData: FormData) {
 			throw new Error("Invalid role");
 		}
 
-		// 1. Get current user's team
+		// 1. Get current user info
 		const supabaseUser = await getUser();
+		const currentUser = await db
+			.select({ id: users.id })
+			.from(users)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(users.dbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+			.limit(1);
+
+		const isUpdatingSelf = currentUser[0].id === userId;
+
+		// 2. Get current user's team
 		const team = await db
 			.select({ dbId: teams.dbId })
 			.from(teams)
@@ -230,7 +243,7 @@ export async function updateTeamMemberRole(formData: FormData) {
 
 		const currentTeam = team[0]; // TODO: This will need to be adjusted after implementing team switching
 
-		// 2. Get user's dbId from users table
+		// 3. Get target user's dbId from users table
 		const user = await db
 			.select({ dbId: users.dbId })
 			.from(users)
@@ -241,7 +254,7 @@ export async function updateTeamMemberRole(formData: FormData) {
 			throw new Error("User not found");
 		}
 
-		// 3. Update team membership role
+		// 4. Update team membership role
 		await db
 			.update(teamMemberships)
 			.set({ role })
@@ -254,7 +267,10 @@ export async function updateTeamMemberRole(formData: FormData) {
 
 		revalidatePath("/settings/team");
 
-		return { success: true };
+		return {
+			success: true,
+			isUpdatingSelf,
+		};
 	} catch (error) {
 		console.error("Failed to update team member role:", error);
 
@@ -264,6 +280,64 @@ export async function updateTeamMemberRole(formData: FormData) {
 				error instanceof Error
 					? error.message
 					: "Failed to update team member role",
+			isUpdatingSelf: false,
+		};
+	}
+}
+
+export async function getCurrentUserRole() {
+	try {
+		const supabaseUser = await getUser();
+
+		// Subquery: Get current user's team
+		const currentUserTeam = db
+			.select({
+				teamDbId: teams.dbId,
+			})
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
+			.limit(1);
+
+		// Get current user's role in the team
+		const result = await db
+			.select({
+				role: teamMemberships.role,
+			})
+			.from(teamMemberships)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(
+				and(
+					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
+					eq(teamMemberships.teamDbId, currentUserTeam),
+				),
+			)
+			.limit(1);
+
+		if (result.length === 0) {
+			throw new Error("User role not found");
+		}
+
+		return {
+			success: true,
+			data: result[0].role,
+		};
+	} catch (error) {
+		console.error("Failed to get current user role:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error
+					? error.message
+					: "Failed to get current user role",
 		};
 	}
 }

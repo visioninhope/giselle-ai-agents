@@ -1,18 +1,24 @@
-import { getTeamMembers } from "./actions";
+"use client";
+
+import type { TeamRole } from "@/drizzle";
+import { useState } from "react";
 import { TeamMemberListItem } from "./team-members-list-item";
 
-export async function TeamMembersList() {
-	const result = await getTeamMembers();
+type TeamMembersListProps = {
+	members: {
+		userId: string;
+		displayName: string | null;
+		email: string | null;
+		role: TeamRole;
+	}[];
+	currentUserRole: TeamRole;
+};
 
-	if (!result.success || !result.data) {
-		return (
-			<div className="text-sm text-destructive">
-				Failed to load team members
-			</div>
-		);
-	}
-
-	const members = result.data;
+export function TeamMembersList({
+	members,
+	currentUserRole,
+}: TeamMembersListProps) {
+	const currentUserRoleState = useState(currentUserRole);
 
 	return (
 		<div className="font-avenir rounded-[16px]">
@@ -29,6 +35,7 @@ export async function TeamMembersList() {
 						displayName={member.displayName}
 						email={member.email}
 						role={member.role}
+						currentUserRoleState={currentUserRoleState}
 					/>
 				))}
 			</div>

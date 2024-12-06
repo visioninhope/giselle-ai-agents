@@ -18,6 +18,7 @@ type TeamMemberListItemProps = {
 	displayName: string | null;
 	email: string | null;
 	role: TeamRole;
+	currentUserRoleState: [TeamRole, (role: TeamRole) => void];
 };
 
 export function TeamMemberListItem({
@@ -25,6 +26,7 @@ export function TeamMemberListItem({
 	displayName,
 	email,
 	role: initialRole,
+	currentUserRoleState,
 }: TeamMemberListItemProps) {
 	const [isEditingRole, setIsEditingRole] = useState(false);
 	const [role, setRole] = useState<TeamRole>(initialRole);
@@ -32,6 +34,8 @@ export function TeamMemberListItem({
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string>("");
 
+	const [currentUserRole, setCurrentUserRole] = currentUserRoleState;
+	const canEditRole = currentUserRole === "admin";
 	const handleRoleChange = (value: TeamRole) => {
 		setTempRole(value);
 	};
@@ -46,11 +50,15 @@ export function TeamMemberListItem({
 			formData.append("userId", userId);
 			formData.append("role", tempRole);
 
-			const result = await updateTeamMemberRole(formData);
+			const { success, isUpdatingSelf } = await updateTeamMemberRole(formData);
 
-			if (result.success) {
-				setRole(tempRole);
+			if (success) {
 				setIsEditingRole(false);
+				setRole(tempRole);
+
+				if (isUpdatingSelf) {
+					setCurrentUserRole(tempRole);
+				}
 			} else {
 				setError("Failed to update role");
 				console.error("Failed to update role");
@@ -109,12 +117,14 @@ export function TeamMemberListItem({
 				) : (
 					<>
 						<span className="text-zinc-400 capitalize w-[100px]">{role}</span>
-						<Button
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={() => setIsEditingRole(true)}
-						>
-							<Pencil className="h-4 w-4" />
-						</Button>
+						{canEditRole && (
+							<Button
+								className="shrink-0 h-8 w-8 rounded-full p-0"
+								onClick={() => setIsEditingRole(true)}
+							>
+								<Pencil className="h-4 w-4" />
+							</Button>
+						)}
 					</>
 				)}
 				{error && <p className="text-sm text-destructive">{error}</p>}
