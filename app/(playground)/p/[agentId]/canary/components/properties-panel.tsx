@@ -218,13 +218,13 @@ function DialogContent({
 				className={clsx(
 					"fixed left-[50%] top-[50%] z-50",
 					"w-[800px] h-[90%] overflow-hidden translate-x-[-50%] translate-y-[-50%]",
-					"px-[32px] py-[32px] flex",
+					"px-[32px] py-[24px] flex",
 					"font-rosart bg-black-100 rounded-[16px] shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset,0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]",
 					"duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
 				)}
 				{...props}
 			>
-				<div className="relative z-10 flex flex-col">{children}</div>
+				<div className="relative z-10 flex flex-col w-full">{children}</div>
 				<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 			</DialogPrimitive.Content>
 		</DialogPrimitive.DialogPortal>
@@ -1280,10 +1280,10 @@ function TabContentGenerateTextResult({
 								<div className="text-[14px] font-bold text-black-70 ">
 									Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
 								</div>
-								<div>
+								<div className="text-black-30">
 									<ClipboardButton
 										text={artifact.object.content}
-										className="w-[12px] h-[12px]"
+										sizeClassName="w-[16px] h-[16px]"
 									/>
 								</div>
 							</DialogFooter>
@@ -1306,7 +1306,7 @@ function TabContentGenerateTextResult({
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
 						<ClipboardButton
-							className="w-[12px] h-[12px]"
+							sizeClassName="w-[12px] h-[12px]"
 							text={artifact.id}
 							tooltip={`Copy the fingerprint: ${artifact.id}`}
 							defaultIcon={<FingerprintIcon className="h-[12px] w-[12px]" />}
