@@ -3,7 +3,6 @@
 import {
 	type TeamRole,
 	db,
-	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
