@@ -22,7 +22,7 @@ import type {
 
 interface UpsertArtifactActionInput {
 	nodeId: NodeId;
-	artifact: Artifact;
+	artifact: Artifact | null;
 }
 interface UpsertArtifactAction {
 	type: "upsertArtifact";
@@ -134,6 +134,16 @@ const GraphContext = createContext<GraphContextValue | undefined>(undefined);
 function graphReducer(graph: Graph, action: GraphAction): Graph {
 	switch (action.type) {
 		case "upsertArtifact":
+			if (action.input.artifact === null) {
+				return {
+					...graph,
+					artifacts: [
+						...graph.artifacts.filter(
+							(artifact) => artifact.creatorNodeId !== action.input.nodeId,
+						),
+					],
+				};
+			}
 			return {
 				...graph,
 				artifacts: [

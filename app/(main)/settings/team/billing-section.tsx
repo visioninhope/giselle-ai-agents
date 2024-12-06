@@ -1,14 +1,16 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { proTeamPlanFlag } from "@/flags";
+import { fetchCurrentTeam } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import { Suspense } from "react";
 import { Card } from "../components/card";
-import { getTeam } from "./actions";
 
 export default async function BillingSection() {
-	const { team, isProPlan } = await getTeam();
+	const team = await fetchCurrentTeam();
+	const isProPlan =
+		team.activeSubscriptionId != null || team.type === "internal";
 	const proTeamPlan = await proTeamPlanFlag();
 
 	return (
@@ -26,7 +28,7 @@ export default async function BillingSection() {
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 						>
 							<BillingButton
-								subscriptionId={team.subscriptionId}
+								subscriptionId={team.activeSubscriptionId}
 								teamDbId={team.dbId}
 							/>
 						</Suspense>

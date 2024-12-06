@@ -27,6 +27,10 @@ You are tasked with generating text based on specific instructions, requirements
 <generated id="{{this.nodeId}}" title="{{this.title}}">
 {{this.content}}
 </generated>
+{{else if (eq this.type "file")}}
+<file id="{{this.nodeId}}" title="{{this.title}}">
+{{this.content}}
+</file>
 {{/if}}
 {{/each}}
 </sources>

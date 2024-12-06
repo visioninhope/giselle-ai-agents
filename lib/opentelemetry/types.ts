@@ -17,7 +17,10 @@ const BaseMetricsSchema = z.object({
 });
 
 const TokenConsumedSchema = BaseMetricsSchema.extend({
-	tokenConsumed: z.number(), // Number of tokens consumed by the API request
+	tokenConsumed: z.object({
+		input: z.number(), // Number of tokens used in the prompt/input sent to the model
+		output: z.number(), // Number of tokens used in the response/output received from the model
+	}),
 });
 
 const RequestCountSchema = BaseMetricsSchema.extend({
@@ -26,3 +29,10 @@ const RequestCountSchema = BaseMetricsSchema.extend({
 
 export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
 export type RequestCountSchema = z.infer<typeof RequestCountSchema>;
+export type LogSchema = TokenConsumedSchema | RequestCountSchema;
+
+export interface OtelLoggerWrapper {
+	info: (obj: LogSchema, msg?: string) => void;
+	error: (obj: LogSchema | Error, msg?: string) => void;
+	debug: (obj: LogSchema, msg?: string) => void;
+}

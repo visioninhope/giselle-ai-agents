@@ -1,12 +1,16 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
-import { captureError, createLogger } from "./log";
-import type { ExternalServiceName, RequestCountSchema } from "./types";
+import { captureError } from "./log";
+import type {
+	ExternalServiceName,
+	OtelLoggerWrapper,
+	RequestCountSchema,
+} from "./types";
 
 export async function withMeasurement<T>(
+	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: ExternalServiceName,
 ): Promise<T> {
-	const logger = createLogger(externalServiceName);
 	const startTime = performance.now();
 
 	try {
