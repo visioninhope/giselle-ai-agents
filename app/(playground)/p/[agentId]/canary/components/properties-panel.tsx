@@ -1276,8 +1276,16 @@ function TabContentGenerateTextResult({
 							<Markdown>{artifact.object.content}</Markdown>
 						</div>
 						{artifact.type === "generatedArtifact" && (
-							<DialogFooter className="text-[14px] font-bold text-black-70 mt-[10px]">
-								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+							<DialogFooter className="mt-[10px] flex justify-between">
+								<div className="text-[14px] font-bold text-black-70 ">
+									Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+								</div>
+								<div>
+									<ClipboardButton
+										text={artifact.object.content}
+										className="w-[12px] h-[12px]"
+									/>
+								</div>
 							</DialogFooter>
 						)}
 					</DialogContent>
@@ -1301,6 +1309,7 @@ function TabContentGenerateTextResult({
 							className="w-[12px] h-[12px]"
 							text={artifact.id}
 							tooltip={`Copy the fingerprint: ${artifact.id}`}
+							defaultIcon={<FingerprintIcon className="h-[12px] w-[12px]" />}
 						/>
 					</div>
 					<div>
