@@ -243,7 +243,9 @@ export async function action(
 			const actionSources = await resolveSources(node.content.sources);
 			const requirement = resolveRequirement(node.content.requirement);
 			const model = resolveLanguageModel(node.content.llm);
-			const promptTemplate = HandleBars.compile(textGenerationPrompt);
+			const promptTemplate = HandleBars.compile(
+				node.content.system ?? textGenerationPrompt,
+			);
 			const prompt = promptTemplate({
 				instruction: node.content.instruction,
 				requirement,
