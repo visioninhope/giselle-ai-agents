@@ -1,9 +1,12 @@
 "use server";
 
+import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import { put } from "@vercel/blob";
-import { jsonSchema, streamObject } from "ai";
+import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
+import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
 import HandleBars from "handlebars";
 import Langfuse from "langfuse";
 import { UnstructuredClient } from "unstructured-client";
@@ -27,9 +30,32 @@ import {
 	elementsToMarkdown,
 	langfuseModel,
 	pathJoin,
-	resolveLanguageModel,
 	toErrorWithMessage,
 } from "./utils";
+
+function resolveLanguageModel(
+	llm: TextGenerateActionContent["llm"],
+): LanguageModelV1 {
+	const [provider, model] = llm.split(":");
+	if (provider === "openai") {
+		return openai(model);
+	}
+	if (provider === "anthropic") {
+		return anthropic(model);
+	}
+	if (provider === "dev") {
+		return new MockLanguageModelV1({
+			defaultObjectGenerationMode: "json",
+			doStream: async () => ({
+				stream: simulateReadableStream({
+					values: [{ type: "error", error: "a" }],
+				}),
+				rawCall: { rawPrompt: null, rawSettings: {} },
+			}),
+		});
+	}
+	throw new Error("Unsupported model provider");
+}
 
 const artifactSchema = v.object({
 	plan: v.pipe(

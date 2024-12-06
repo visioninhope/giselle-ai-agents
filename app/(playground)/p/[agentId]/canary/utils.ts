@@ -1,8 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
 import { createId } from "@paralleldrive/cuid2";
-import type { LanguageModelV1 } from "ai";
-import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
 import { vercelBlobGraphFolder } from "./constants";
 import type {
 	ArtifactId,
@@ -40,30 +36,6 @@ export function createConnectionId(): ConnectionId {
 
 export function createFileId(): FileId {
 	return `fl_${createId()}`;
-}
-
-export function resolveLanguageModel(
-	llm: TextGenerateActionContent["llm"],
-): LanguageModelV1 {
-	const [provider, model] = llm.split(":");
-	if (provider === "openai") {
-		return openai(model);
-	}
-	if (provider === "anthropic") {
-		return anthropic(model);
-	}
-	if (provider === "dev") {
-		return new MockLanguageModelV1({
-			defaultObjectGenerationMode: "json",
-			doStream: async () => ({
-				stream: simulateReadableStream({
-					values: [{ type: "error", error: "a" }],
-				}),
-				rawCall: { rawPrompt: null, rawSettings: {} },
-			}),
-		});
-	}
-	throw new Error("Unsupported model provider");
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {
