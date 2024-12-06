@@ -9,7 +9,7 @@ import {
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
-import { fetchCurrentTeam } from "@/services/teams";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -85,8 +85,20 @@ export async function addTeamMember(formData: FormData) {
 
 		// 1. Get current team
 		const currentTeam = await fetchCurrentTeam();
+		if (!isProPlan(currentTeam)) {
+			throw new Error("Only pro plan teams can add members");
+		}
 
-		// 2. Find user by email
+		// 2. Get current user role and verify admin permission
+		const currentUserRoleResult = await getCurrentUserRole();
+		if (
+			!currentUserRoleResult.success ||
+			currentUserRoleResult.data !== "admin"
+		) {
+			throw new Error("Only admin users can add team members");
+		}
+
+		// 3. Find user by email
 		const user = await db
 			.select()
 			.from(users)
@@ -97,7 +109,7 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("User not found");
 		}
 
-		// 3. Check if user is already a team member
+		// 4. Check if user is already a team member
 		const existingMembership = await db
 			.select()
 			.from(teamMemberships)
@@ -112,7 +124,7 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("User is already a team member");
 		}
 
-		// 4. Create team membership
+		// 5. Create team membership
 		await db.insert(teamMemberships).values({
 			teamDbId: currentTeam.dbId,
 			userDbId: user[0].dbId,
