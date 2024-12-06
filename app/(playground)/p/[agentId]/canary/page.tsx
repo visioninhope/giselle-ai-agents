@@ -1,5 +1,5 @@
 import { agents, db } from "@/drizzle";
-import { playgroundV2Flag } from "@/flags";
+import { developerFlag, playgroundV2Flag } from "@/flags";
 import { del, list } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -8,6 +8,7 @@ import type { AgentId } from "../beta-proto/types";
 import { action, putGraph } from "./actions";
 import { Editor } from "./components/editor";
 import { AgentNameProvider } from "./contexts/agent-name";
+import { DeveloperModeProvider } from "./contexts/developer-mode";
 import { ExecutionProvider } from "./contexts/execution";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
@@ -23,8 +24,9 @@ export default async function Page({
 }: {
 	params: Promise<{ agentId: AgentId }>;
 }) {
-	const [playgroundV2, { agentId }] = await Promise.all([
+	const [playgroundV2, developerMode, { agentId }] = await Promise.all([
 		playgroundV2Flag(),
+		developerFlag(),
 		params,
 	]);
 	if (!playgroundV2) {
@@ -85,29 +87,31 @@ export default async function Page({
 	}
 
 	return (
-		<GraphContextProvider
-			defaultGraph={graph}
-			onPersistAction={persistGraph}
-			defaultGraphUrl={agent.graphUrl}
-		>
-			<PropertiesPanelProvider>
-				<ReactFlowProvider>
-					<ToolbarContextProvider>
-						<MousePositionProvider>
-							<ToastProvider>
-								<AgentNameProvider
-									defaultValue={agent.name ?? "Unnamed Agent"}
-									updateAgentNameAction={updateAgentName}
-								>
-									<ExecutionProvider executeAction={execute}>
-										<Editor />
-									</ExecutionProvider>
-								</AgentNameProvider>
-							</ToastProvider>
-						</MousePositionProvider>
-					</ToolbarContextProvider>
-				</ReactFlowProvider>
-			</PropertiesPanelProvider>
-		</GraphContextProvider>
+		<DeveloperModeProvider developerMode={developerMode}>
+			<GraphContextProvider
+				defaultGraph={graph}
+				onPersistAction={persistGraph}
+				defaultGraphUrl={agent.graphUrl}
+			>
+				<PropertiesPanelProvider>
+					<ReactFlowProvider>
+						<ToolbarContextProvider>
+							<MousePositionProvider>
+								<ToastProvider>
+									<AgentNameProvider
+										defaultValue={agent.name ?? "Unnamed Agent"}
+										updateAgentNameAction={updateAgentName}
+									>
+										<ExecutionProvider executeAction={execute}>
+											<Editor />
+										</ExecutionProvider>
+									</AgentNameProvider>
+								</ToastProvider>
+							</MousePositionProvider>
+						</ToolbarContextProvider>
+					</ReactFlowProvider>
+				</PropertiesPanelProvider>
+			</GraphContextProvider>
+		</DeveloperModeProvider>
 	);
 }

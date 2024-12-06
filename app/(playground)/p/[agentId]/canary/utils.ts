@@ -1,7 +1,4 @@
-import { anthropic } from "@ai-sdk/anthropic";
-import { openai } from "@ai-sdk/openai";
 import { createId } from "@paralleldrive/cuid2";
-import type { LanguageModelV1 } from "ai";
 import { vercelBlobGraphFolder } from "./constants";
 import type {
 	ArtifactId,
@@ -39,19 +36,6 @@ export function createConnectionId(): ConnectionId {
 
 export function createFileId(): FileId {
 	return `fl_${createId()}`;
-}
-
-export function resolveLanguageModel(
-	llm: TextGenerateActionContent["llm"],
-): LanguageModelV1 {
-	const [provider, model] = llm.split(":");
-	if (provider === "openai") {
-		return openai(model);
-	}
-	if (provider === "anthropic") {
-		return anthropic(model);
-	}
-	throw new Error("Unsupported model provider");
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {
@@ -304,3 +288,28 @@ export const formatTimestamp = {
 		return formatUnit(years, "year");
 	},
 };
+
+interface ErrorWithMessage {
+	message: string;
+}
+
+function isErrorWithMessage(error: unknown): error is ErrorWithMessage {
+	return (
+		typeof error === "object" &&
+		error !== null &&
+		"message" in error &&
+		typeof (error as Record<string, unknown>).message === "string"
+	);
+}
+
+export function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
+	if (isErrorWithMessage(maybeError)) return maybeError;
+
+	try {
+		return new Error(JSON.stringify(maybeError));
+	} catch {
+		// fallback in case there's an error stringifying the maybeError
+		// like with circular references for example.
+		return new Error(String(maybeError));
+	}
+}

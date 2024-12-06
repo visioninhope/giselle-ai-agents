@@ -116,3 +116,16 @@ export const teamCreationFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const developerFlag = flag<boolean>({
+	key: "developer",
+	async decide() {
+		return takeLocalEnv("DEVELOPER_FLAG");
+	},
+	description: "Enable Developer",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
