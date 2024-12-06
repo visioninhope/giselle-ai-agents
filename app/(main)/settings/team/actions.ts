@@ -45,7 +45,7 @@ export async function getTeam() {
 
 	return {
 		team: team,
-		isProPlan: team.subscriptionId != null || team.type === "internal",
+		isProPlan: team.subscriptionId != null || team.type === "internal", // NOTE: Pro plan or internal team
 	};
 }
 
