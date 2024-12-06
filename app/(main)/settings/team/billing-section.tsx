@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { proTeamPlanFlag } from "@/flags";
-import { fetchCurrentTeam } from "@/services/teams";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import { Suspense } from "react";
@@ -9,8 +9,6 @@ import { Card } from "../components/card";
 
 export default async function BillingSection() {
 	const team = await fetchCurrentTeam();
-	const isProPlan =
-		team.activeSubscriptionId != null || team.type === "internal";
 	const proTeamPlan = await proTeamPlanFlag();
 
 	return (
@@ -19,7 +17,7 @@ export default async function BillingSection() {
 				<div>
 					<p className="text-sm text-zinc-400">Current Plan</p>
 					<p className="text-xl font-semibold text-zinc-200">
-						{isProPlan ? "Pro" : "Free"} Plan
+						{isProPlan(team) ? "Pro" : "Free"} Plan
 					</p>
 				</div>
 				{proTeamPlan && team.type !== "internal" && (

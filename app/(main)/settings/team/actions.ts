@@ -17,38 +17,6 @@ function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
 }
 
-export async function getTeam() {
-	const user = await getUser();
-
-	// FIXME: Users may have multiple teams. fetching the team should be changed in near future.
-	const [team] = await db
-		.select({
-			dbId: teams.dbId,
-			name: teams.name,
-			type: teams.type,
-			subscriptionId: subscriptions.id,
-		})
-		.from(teams)
-		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-		.innerJoin(
-			supabaseUserMappings,
-			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-		)
-		.leftJoin(
-			subscriptions,
-			and(
-				eq(subscriptions.teamDbId, teams.dbId),
-				eq(subscriptions.status, "active"),
-			),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
-
-	return {
-		team: team,
-		isProPlan: team.subscriptionId != null || team.type === "internal", // NOTE: Pro plan or internal team
-	};
-}
-
 export async function getTeamName() {
 	const user = await getUser();
 
