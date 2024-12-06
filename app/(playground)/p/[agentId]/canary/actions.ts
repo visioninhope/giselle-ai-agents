@@ -1,9 +1,12 @@
 "use server";
 
+import { anthropic } from "@ai-sdk/anthropic";
+import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import { put } from "@vercel/blob";
-import { jsonSchema, streamObject } from "ai";
+import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
+import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
 import HandleBars from "handlebars";
 import Langfuse from "langfuse";
 import { UnstructuredClient } from "unstructured-client";
@@ -27,8 +30,32 @@ import {
 	elementsToMarkdown,
 	langfuseModel,
 	pathJoin,
-	resolveLanguageModel,
+	toErrorWithMessage,
 } from "./utils";
+
+function resolveLanguageModel(
+	llm: TextGenerateActionContent["llm"],
+): LanguageModelV1 {
+	const [provider, model] = llm.split(":");
+	if (provider === "openai") {
+		return openai(model);
+	}
+	if (provider === "anthropic") {
+		return anthropic(model);
+	}
+	if (provider === "dev") {
+		return new MockLanguageModelV1({
+			defaultObjectGenerationMode: "json",
+			doStream: async () => ({
+				stream: simulateReadableStream({
+					values: [{ type: "error", error: "a" }],
+				}),
+				rawCall: { rawPrompt: null, rawSettings: {} },
+			}),
+		});
+	}
+	throw new Error("Unsupported model provider");
+}
 
 const artifactSchema = v.object({
 	plan: v.pipe(
@@ -59,13 +86,18 @@ interface TextSource extends ActionSourceBase {
 	type: "text";
 	content: string;
 }
+interface FileSource extends ActionSourceBase {
+	type: "file";
+	title: string;
+	content: string;
+}
 interface TextGenerationSource extends ActionSourceBase {
 	type: "textGeneration";
 	title: string;
 	content: string;
 }
 
-type ActionSource = TextSource | TextGenerationSource;
+type ActionSource = TextSource | TextGenerationSource | FileSource;
 
 export async function action(
 	artifactId: ArtifactId,
@@ -112,9 +144,9 @@ export async function action(
 	 * found, it extracts the text content; if a textGeneration node
 	 * is found, it retrieves the corresponding generatedArtifact.
 	 */
-	function resolveSources(sources: NodeHandle[]) {
-		return sources
-			.map((source) => {
+	async function resolveSources(sources: NodeHandle[]) {
+		return Promise.all(
+			sources.map(async (source) => {
 				const node = findNode(source.id);
 				switch (node?.content.type) {
 					case "text":
@@ -123,6 +155,29 @@ export async function action(
 							content: node.content.text,
 							nodeId: node.id,
 						} satisfies ActionSource;
+					case "file": {
+						if (node.content.data == null) {
+							throw new Error("File not found");
+						}
+						if (node.content.data.status === "uploading") {
+							/** @todo Let user know file is uploading*/
+							throw new Error("File is uploading");
+						}
+						if (node.content.data.status === "processing") {
+							/** @todo Let user know file is processing*/
+							throw new Error("File is processing");
+						}
+						const text = await fetch(node.content.data.textDataUrl).then(
+							(res) => res.text(),
+						);
+						return {
+							type: "file",
+							title: node.content.data.name,
+							content: text,
+							nodeId: node.id,
+						} satisfies ActionSource;
+					}
+
 					case "textGeneration": {
 						const generatedArtifact = graph.artifacts.find(
 							(artifact) => artifact.creatorNodeId === node.id,
@@ -143,8 +198,8 @@ export async function action(
 					default:
 						return null;
 				}
-			})
-			.filter((actionSource) => actionSource !== null);
+			}),
+		).then((sources) => sources.filter((source) => source !== null));
 	}
 
 	/**
@@ -185,7 +240,7 @@ export async function action(
 	// The main switch statement handles the different types of nodes
 	switch (node.content.type) {
 		case "textGeneration": {
-			const actionSources = resolveSources(node.content.sources);
+			const actionSources = await resolveSources(node.content.sources);
 			const requirement = resolveRequirement(node.content.requirement);
 			const model = resolveLanguageModel(node.content.llm);
 			const promptTemplate = HandleBars.compile(textGenerationPrompt);
@@ -232,7 +287,9 @@ export async function action(
 				const result = await object;
 				generationTracer.end({ output: result });
 				stream.done();
-			})();
+			})().catch((error) => {
+				stream.error(error);
+			});
 			return stream.value;
 		}
 		default:

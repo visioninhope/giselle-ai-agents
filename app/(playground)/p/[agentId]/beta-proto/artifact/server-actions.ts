@@ -81,7 +81,10 @@ ${sourcesToText(sources)}
 					logger.info(
 						{
 							externalServiceName: "openai",
-							tokenConsumed: result.usage.totalTokens,
+							tokenConsumed: {
+								input: result.usage.promptTokens,
+								output: result.usage.completionTokens,
+							},
 							duration,
 							measurementScope,
 							isR06User,
