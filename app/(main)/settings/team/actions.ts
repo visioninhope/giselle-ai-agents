@@ -131,22 +131,8 @@ export async function addTeamMember(formData: FormData) {
 export async function getCurrentUserRole() {
 	try {
 		const supabaseUser = await getUser();
+		const currentTeam = await fetchCurrentTeam();
 
-		// Subquery: Get current user's team
-		const currentUserTeam = db
-			.select({
-				teamDbId: teams.dbId,
-			})
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
-			.limit(1);
-
-		// Get current user's role in the team
 		const result = await db
 			.select({
 				role: teamMemberships.role,
@@ -159,7 +145,7 @@ export async function getCurrentUserRole() {
 			.where(
 				and(
 					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
-					eq(teamMemberships.teamDbId, currentUserTeam),
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
 				),
 			)
 			.limit(1);
