@@ -4,6 +4,7 @@ import {
 	type TeamRole,
 	type UserId,
 	db,
+	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -38,31 +39,37 @@ export async function getTeamName() {
 	return _teams[0].name;
 }
 
-export async function updateTeamName(formData: FormData) {
+export async function updateTeamName(teamDbId: number, formData: FormData) {
 	const newName = formData.get("name") as string;
 	const user = await getUser();
 
 	try {
-		const team = await db
-			.select({ dbId: teams.dbId })
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+		await db.transaction(async (tx) => {
+			const team = await tx
+				.select({ dbId: teams.dbId })
+				.from(teams)
+				.for("update")
+				.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
+				.innerJoin(
+					supabaseUserMappings,
+					eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+				)
+				.where(
+					and(
+						eq(supabaseUserMappings.supabaseUserId, user.id),
+						eq(teams.dbId, teamDbId),
+					),
+				);
 
-		if (team.length === 0) {
-			throw new Error("Team not found");
-		}
+			if (team.length === 0) {
+				throw new Error("Team not found");
+			}
 
-		await db
-			.update(teams)
-			.set({ name: newName })
-			.where(eq(teams.dbId, team[0].dbId))
-			.execute();
-
+			await tx
+				.update(teams)
+				.set({ name: newName })
+				.where(eq(teams.dbId, team[0].dbId));
+		});
 		revalidatePath("/settings/team");
 
 		return { success: true };

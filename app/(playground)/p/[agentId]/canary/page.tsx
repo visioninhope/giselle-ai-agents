@@ -1,17 +1,21 @@
 import { agents, db } from "@/drizzle";
-import { playgroundV2Flag } from "@/flags";
+import { developerFlag, playgroundV2Flag } from "@/flags";
 import { del, list } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import type { AgentId } from "../beta-proto/types";
-import { putGraph } from "./actions";
+import { action, putGraph } from "./actions";
 import { Editor } from "./components/editor";
+import { AgentNameProvider } from "./contexts/agent-name";
+import { DeveloperModeProvider } from "./contexts/developer-mode";
+import { ExecutionProvider } from "./contexts/execution";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
+import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import type { Graph } from "./types";
+import type { ArtifactId, Graph, NodeId } from "./types";
 import { buildGraphFolderPath } from "./utils";
 
 // This page is experimental. it requires PlaygroundV2Flag to show this page
@@ -20,8 +24,9 @@ export default async function Page({
 }: {
 	params: Promise<{ agentId: AgentId }>;
 }) {
-	const [playgroundV2, { agentId }] = await Promise.all([
+	const [playgroundV2, developerMode, { agentId }] = await Promise.all([
 		playgroundV2Flag(),
+		developerFlag(),
 		params,
 	]);
 	if (!playgroundV2) {
@@ -61,21 +66,52 @@ export default async function Page({
 		return url;
 	}
 
+	async function updateAgentName(agentName: string) {
+		"use server";
+		await db
+			.update(agents)
+			.set({
+				name: agentName,
+			})
+			.where(eq(agents.id, agentId));
+		return agentName;
+	}
+
+	async function execute(
+		artifactId: ArtifactId,
+		graphUrl: string,
+		nodeId: NodeId,
+	) {
+		"use server";
+		return await action(artifactId, graphUrl, nodeId);
+	}
+
 	return (
-		<GraphContextProvider
-			defaultGraph={graph}
-			onPersistAction={persistGraph}
-			defaultGraphUrl={agent.graphUrl}
-		>
-			<PropertiesPanelProvider>
-				<ReactFlowProvider>
-					<ToolbarContextProvider>
-						<MousePositionProvider>
-							<Editor />
-						</MousePositionProvider>
-					</ToolbarContextProvider>
-				</ReactFlowProvider>
-			</PropertiesPanelProvider>
-		</GraphContextProvider>
+		<DeveloperModeProvider developerMode={developerMode}>
+			<GraphContextProvider
+				defaultGraph={graph}
+				onPersistAction={persistGraph}
+				defaultGraphUrl={agent.graphUrl}
+			>
+				<PropertiesPanelProvider>
+					<ReactFlowProvider>
+						<ToolbarContextProvider>
+							<MousePositionProvider>
+								<ToastProvider>
+									<AgentNameProvider
+										defaultValue={agent.name ?? "Unnamed Agent"}
+										updateAgentNameAction={updateAgentName}
+									>
+										<ExecutionProvider executeAction={execute}>
+											<Editor />
+										</ExecutionProvider>
+									</AgentNameProvider>
+								</ToastProvider>
+							</MousePositionProvider>
+						</ToolbarContextProvider>
+					</ReactFlowProvider>
+				</PropertiesPanelProvider>
+			</GraphContextProvider>
+		</DeveloperModeProvider>
 	);
 }

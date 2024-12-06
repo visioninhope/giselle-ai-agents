@@ -92,7 +92,10 @@ ${sourcesToText(sources)}
 				logger.info(
 					{
 						externalServiceName: "openai",
-						tokenConsumed: result.usage.totalTokens,
+						tokenConsumed: {
+							input: result.usage.promptTokens,
+							output: result.usage.completionTokens,
+						},
 						duration,
 						measurementScope,
 						isR06User,
@@ -116,7 +119,11 @@ ${sourcesToText(sources)}
 
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) =>
-				withMeasurement<WebSearchResult[]>(() => search(keyword), "tavily"),
+				withMeasurement<WebSearchResult[]>(
+					logger,
+					() => search(keyword),
+					"tavily",
+				),
 			),
 		)
 			.then((results) => [...new Set(results.flat())] as WebSearchResult[])
@@ -185,6 +192,7 @@ ${sourcesToText(sources)}
 				for (const webSearchItem of webSearchItems) {
 					try {
 						const scrapeResponse = await withMeasurement<FirecrawlResponse>(
+							logger,
 							() =>
 								app.scrapeUrl(webSearchItem.url, {
 									formats: ["markdown"],
