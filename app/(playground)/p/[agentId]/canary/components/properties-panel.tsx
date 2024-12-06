@@ -28,6 +28,7 @@ import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { action, parse } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
+import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
 import {
 	useArtifact,
@@ -691,6 +692,7 @@ function TabsContentPrompt({
 	const {
 		graph: { nodes, connections },
 	} = useGraph();
+	const developerMode = useDeveloperMode();
 	const connectableTextNodes: Text[] = nodes
 		.filter((node) => node.content.type === "text")
 		.map((node) => node as Text);
@@ -749,12 +751,14 @@ function TabsContentPrompt({
 										Claude 3.5 Sonnet
 									</SelectItem>
 								</SelectGroup>
-								<SelectGroup>
-									<SelectLabel>Development</SelectLabel>
-									<SelectItem value="dev:error">
-										Mock(Raise an error)
-									</SelectItem>
-								</SelectGroup>
+								{developerMode && (
+									<SelectGroup>
+										<SelectLabel>Development</SelectLabel>
+										<SelectItem value="dev:error">
+											Mock(Raise an error)
+										</SelectItem>
+									</SelectGroup>
+								)}
 							</SelectContent>
 						</Select>
 					</div>
