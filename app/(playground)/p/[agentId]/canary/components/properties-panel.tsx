@@ -18,10 +18,12 @@ import {
 } from "lucide-react";
 import {
 	type ComponentProps,
+	type DetailedHTMLProps,
 	type FC,
 	type HTMLAttributes,
 	type ReactNode,
 	useCallback,
+	useId,
 	useMemo,
 	useState,
 } from "react";
@@ -724,6 +726,73 @@ function RevertToDefaultButton({ onClick }: { onClick: () => void }) {
 	);
 }
 
+interface SystemPromptTextareaProps
+	extends Pick<
+		DetailedHTMLProps<
+			React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+			HTMLTextAreaElement
+		>,
+		"defaultValue" | "className"
+	> {
+	onValueChange?: (value: string) => void;
+	onRevertToDefault?: () => void;
+	revertValue?: string;
+}
+function SystemPromptTextarea({
+	defaultValue,
+	className,
+	onValueChange,
+	onRevertToDefault,
+	revertValue,
+}: SystemPromptTextareaProps) {
+	const id = useId();
+	return (
+		<div className={clsx("relative", className)}>
+			<textarea
+				className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
+				defaultValue={defaultValue}
+				ref={(ref) => {
+					if (ref === null) {
+						return;
+					}
+					ref.dataset.refId = id;
+
+					function handleBlur() {
+						if (ref === null) {
+							return;
+						}
+						if (defaultValue !== ref.value) {
+							onValueChange?.(ref.value);
+						}
+					}
+					ref.addEventListener("blur", handleBlur);
+					return () => {
+						ref.removeEventListener("blur", handleBlur);
+					};
+				}}
+			/>
+
+			<div className="absolute bottom-[4px] right-[4px]">
+				<RevertToDefaultButton
+					onClick={() => {
+						onRevertToDefault?.();
+						const textarea = document.querySelector(
+							`textarea[data-ref-id="${id}"]`,
+						);
+						if (
+							revertValue !== undefined &&
+							textarea !== null &&
+							textarea instanceof HTMLTextAreaElement
+						) {
+							textarea.value = revertValue;
+						}
+					}}
+				/>
+			</div>
+		</div>
+	);
+}
+
 function TabsContentPrompt({
 	content,
 	onContentChange,
@@ -1006,44 +1075,23 @@ function TabsContentPrompt({
 						System prompts combine requirements and guide you through tasks.
 						Make changes or click "Revert to Default" anytime.
 					</p>
-					<div className="relative flex-1">
-						<textarea
-							className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
-							defaultValue={content.system ?? textGenerationPrompt}
-							ref={(ref) => {
-								if (ref === null) {
-									return;
-								}
-
-								function handleBlur() {
-									if (ref === null) {
-										return;
-									}
-									if (content.system !== ref.value) {
-										onContentChange?.({
-											...content,
-											system: ref.value,
-										});
-									}
-								}
-								ref.addEventListener("blur", handleBlur);
-								return () => {
-									ref.removeEventListener("blur", handleBlur);
-								};
-							}}
-						/>
-
-						<div className="absolute bottom-[4px] right-[4px]">
-							<RevertToDefaultButton
-								onClick={() => {
-									onContentChange?.({
-										...content,
-										system: undefined,
-									});
-								}}
-							/>
-						</div>
-					</div>
+					<SystemPromptTextarea
+						className="flex-1"
+						defaultValue={content.system ?? textGenerationPrompt}
+						revertValue={textGenerationPrompt}
+						onValueChange={(value) => {
+							onContentChange?.({
+								...content,
+								system: value,
+							});
+						}}
+						onRevertToDefault={() => {
+							onContentChange?.({
+								...content,
+								system: undefined,
+							});
+						}}
+					/>
 				</div>
 			</PropertiesPanelCollapsible>
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
