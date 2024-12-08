@@ -28,6 +28,7 @@ import {
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
+import { SpinnerIcon } from "../../beta-proto/components/icons/spinner";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { action, parse } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
@@ -1360,7 +1361,11 @@ function TabContentGenerateTextResult({
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
 								<div className="px-[8px]">
-									<DocumentIcon className="w-[20px] h-[20px] fill-black-30 flex-shrink-0" />
+									{artifact.type === "generatedArtifact" ? (
+										<DocumentIcon className="w-[20px] h-[20px] fill-black-30 flex-shrink-0" />
+									) : (
+										<SpinnerIcon className="w-[20px] h-[20px] stroke-black-30 animate-follow-through-spin fill-transparent" />
+									)}
 								</div>
 								<div className="flex flex-col gap-[2px]">
 									<div className="text-[14px]">{artifact.object.title}</div>
