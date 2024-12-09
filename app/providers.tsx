@@ -31,6 +31,7 @@ function PHProviderEnabled({ children }: { children: React.ReactNode }) {
 				api_host: posthog_host,
 				person_profiles: "identified_only",
 				capture_pageview: false,
+				capture_pageleave: true,
 			});
 		} catch (error) {
 			Sentry.captureException(error);

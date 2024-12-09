@@ -4,13 +4,13 @@ import {
 	type TeamRole,
 	type UserId,
 	db,
-	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
 	users,
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { and, asc, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
@@ -20,23 +20,6 @@ function isUserId(value: string): value is UserId {
 
 function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
-}
-
-export async function getTeamName() {
-	const user = await getUser();
-
-	// TODO: In the future, this query will be changed to retrieve from the selected team ID
-	const _teams = await db
-		.select({ dbId: teams.dbId, name: teams.name })
-		.from(teams)
-		.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-		.innerJoin(
-			supabaseUserMappings,
-			eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
-
-	return _teams[0].name;
 }
 
 export async function updateTeamName(teamDbId: number, formData: FormData) {
@@ -140,26 +123,22 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("Invalid role");
 		}
 
-		// 1. Get current user's team
-		const supabaseUser = await getUser();
-
-		const team = await db
-			.select({ dbId: teams.dbId })
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
-
-		if (team.length === 0) {
-			throw new Error("Team not found");
+		// 1. Get current team
+		const currentTeam = await fetchCurrentTeam();
+		if (!isProPlan(currentTeam)) {
+			throw new Error("Only pro plan teams can add members");
 		}
 
-		const currentTeam = team[0]; // TODO: This will need to be adjusted after implementing team switching
+		// 2. Get current user role and verify admin permission
+		const currentUserRoleResult = await getCurrentUserRole();
+		if (
+			!currentUserRoleResult.success ||
+			currentUserRoleResult.data !== "admin"
+		) {
+			throw new Error("Only admin users can add team members");
+		}
 
-		// 2. Find user by email
+		// 3. Find user by email
 		const user = await db
 			.select()
 			.from(users)
@@ -170,7 +149,7 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("User not found");
 		}
 
-		// 3. Check if user is already a team member
+		// 4. Check if user is already a team member
 		const existingMembership = await db
 			.select()
 			.from(teamMemberships)
@@ -185,9 +164,9 @@ export async function addTeamMember(formData: FormData) {
 			throw new Error("User is already a team member");
 		}
 
-		// 4. Create team membership
+		// 5. Create team membership
 		await db.insert(teamMemberships).values({
-			teamDbId: team[0].dbId,
+			teamDbId: currentTeam.dbId,
 			userDbId: user[0].dbId,
 			role,
 		});
@@ -295,22 +274,8 @@ export async function updateTeamMemberRole(formData: FormData) {
 export async function getCurrentUserRole() {
 	try {
 		const supabaseUser = await getUser();
+		const currentTeam = await fetchCurrentTeam();
 
-		// Subquery: Get current user's team
-		const currentUserTeam = db
-			.select({
-				teamDbId: teams.dbId,
-			})
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id))
-			.limit(1);
-
-		// Get current user's role in the team
 		const result = await db
 			.select({
 				role: teamMemberships.role,
@@ -323,7 +288,7 @@ export async function getCurrentUserRole() {
 			.where(
 				and(
 					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
-					eq(teamMemberships.teamDbId, currentUserTeam),
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
 				),
 			)
 			.limit(1);

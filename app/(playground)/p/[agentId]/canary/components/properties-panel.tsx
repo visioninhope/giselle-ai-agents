@@ -7,11 +7,14 @@ import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
+	CheckCircle,
+	CheckIcon,
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
 	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
+	UndoIcon,
 } from "lucide-react";
 import {
 	type ComponentProps,
@@ -37,6 +40,7 @@ import {
 	useSelectedNode,
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
+import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
 	Node,
@@ -96,11 +100,13 @@ interface PropertiesPanelCollapsible {
 	title: string;
 	glanceLabel?: string;
 	children: ReactNode;
+	expandedClassName?: string;
 }
 
 function PropertiesPanelCollapsible({
 	title,
 	glanceLabel,
+	expandedClassName,
 	children,
 }: PropertiesPanelCollapsible) {
 	const [isExpanded, setIsExpanded] = useState(false);
@@ -108,7 +114,12 @@ function PropertiesPanelCollapsible({
 	return (
 		<>
 			{isExpanded ? (
-				<PropertiesPanelContentBox className="text-black-30 grid gap-2">
+				<PropertiesPanelContentBox
+					className={clsx(
+						"text-black-30 flex flex-col gap-2",
+						expandedClassName,
+					)}
+				>
 					<div className="flex justify-between items-center">
 						<p className="font-rosart">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
@@ -218,13 +229,13 @@ function DialogContent({
 				className={clsx(
 					"fixed left-[50%] top-[50%] z-50",
 					"w-[800px] h-[90%] overflow-hidden translate-x-[-50%] translate-y-[-50%]",
-					"px-[32px] py-[32px] flex",
+					"px-[32px] py-[24px] flex",
 					"font-rosart bg-black-100 rounded-[16px] shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset,0px_0px_8px_0px_hsla(0,_0%,_100%,_0.2)]",
 					"duration-200 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[state=closed]:slide-out-to-left-1/2 data-[state=closed]:slide-out-to-top-[48%] data-[state=open]:slide-in-from-left-1/2 data-[state=open]:slide-in-from-top-[48%]",
 				)}
 				{...props}
 			>
-				<div className="relative z-10 flex flex-col">{children}</div>
+				<div className="relative z-10 flex flex-col w-full">{children}</div>
 				<div className="absolute z-0 rounded-[16px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(233,4%,37%,1)] to-[hsla(233,62%,22%,1)]" />
 			</DialogPrimitive.Content>
 		</DialogPrimitive.DialogPortal>
@@ -674,6 +685,45 @@ function NodeDropdown({
 	);
 }
 
+function RevertToDefaultButton({ onClick }: { onClick: () => void }) {
+	const [clicked, setClicked] = useState(false);
+
+	const handleClick = useCallback(() => {
+		onClick();
+		setClicked(true);
+		setTimeout(() => setClicked(false), 2000);
+	}, [onClick]);
+
+	return (
+		<button
+			type="button"
+			className="group flex items-center bg-black-100/30 text-white px-[8px] py-[2px] rounded-md transition-all duration-300 ease-in-out hover:bg-black-100"
+			onClick={handleClick}
+		>
+			<div className="relative h-[12px] w-[12px]">
+				<span
+					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${clicked ? "opacity-0" : "opacity-100"}`}
+				>
+					<UndoIcon className="h-[12px] w-[12px]" />
+				</span>
+				<span
+					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${clicked ? "opacity-100" : "opacity-0"}`}
+				>
+					<CheckIcon className="h-[12px] w-[12px]" />
+				</span>
+			</div>
+			<div
+				className="overflow-hidden transition-all duration-300 ease-in-out w-0 data-[clicked=false]:group-hover:w-[98px] data-[clicked=true]:group-hover:w-[40px] group-hover:ml-[4px] flex"
+				data-clicked={clicked}
+			>
+				<span className="whitespace-nowrap text-[12px]">
+					{clicked ? "Revert!" : "Revert to Default"}
+				</span>
+			</div>
+		</button>
+	);
+}
+
 function TabsContentPrompt({
 	content,
 	onContentChange,
@@ -945,6 +995,57 @@ function TabsContentPrompt({
 				)}
 			</PropertiesPanelCollapsible>
 
+			<div className="border-t border-[hsla(222,21%,40%,1)]" />
+			<PropertiesPanelCollapsible
+				title="System"
+				glanceLabel={content.system === undefined ? "Default" : "Modified"}
+				expandedClassName="flex-1"
+			>
+				<div className="flex-1 flex flex-col gap-[3px]">
+					<p className="text-[11px] text-black-70">
+						System prompts combine requirements and guide you through tasks.
+						Make changes or click "Revert to Default" anytime.
+					</p>
+					<div className="relative flex-1">
+						<textarea
+							className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
+							defaultValue={content.system ?? textGenerationPrompt}
+							ref={(ref) => {
+								if (ref === null) {
+									return;
+								}
+
+								function handleBlur() {
+									if (ref === null) {
+										return;
+									}
+									if (content.system !== ref.value) {
+										onContentChange?.({
+											...content,
+											system: ref.value,
+										});
+									}
+								}
+								ref.addEventListener("blur", handleBlur);
+								return () => {
+									ref.removeEventListener("blur", handleBlur);
+								};
+							}}
+						/>
+
+						<div className="absolute bottom-[4px] right-[4px]">
+							<RevertToDefaultButton
+								onClick={() => {
+									onContentChange?.({
+										...content,
+										system: undefined,
+									});
+								}}
+							/>
+						</div>
+					</div>
+				</div>
+			</PropertiesPanelCollapsible>
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
 
 			<PropertiesPanelContentBox className="flex flex-col gap-[8px] flex-1">
@@ -1258,12 +1359,18 @@ function TabContentGenerateTextResult({
 					<DialogPrimitive.DialogTrigger>
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
-								<DocumentIcon className="w-[18px] h-[18px] fill-black-30" />
+								<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
 								<div className="text-[14px]">{artifact.object.title}</div>
 							</div>
 						</Block>
 					</DialogPrimitive.DialogTrigger>
-					<DialogContent>
+					<DialogContent
+						// Prevent Tooltip within popover opens automatically due to trigger receiving focus
+						// https://github.com/radix-ui/primitives/issues/2248
+						onOpenAutoFocus={(event) => {
+							event.preventDefault();
+						}}
+					>
 						<div className="sr-only">
 							<DialogHeader>
 								<DialogTitle>{artifact.object.title}</DialogTitle>
@@ -1276,8 +1383,16 @@ function TabContentGenerateTextResult({
 							<Markdown>{artifact.object.content}</Markdown>
 						</div>
 						{artifact.type === "generatedArtifact" && (
-							<DialogFooter className="text-[14px] font-bold text-black-70 mt-[10px]">
-								Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+							<DialogFooter className="mt-[10px] flex justify-between">
+								<div className="text-[14px] font-bold text-black-70 ">
+									Generated {formatTimestamp.toRelativeTime(artifact.createdAt)}
+								</div>
+								<div className="text-black-30">
+									<ClipboardButton
+										text={artifact.object.content}
+										sizeClassName="w-[16px] h-[16px]"
+									/>
+								</div>
 							</DialogFooter>
 						)}
 					</DialogContent>
@@ -1298,9 +1413,10 @@ function TabContentGenerateTextResult({
 					<div className="inline-flex items-center gap-[6px] text-black-30/50 font-sans">
 						<p className="italic">Generation completed.</p>
 						<ClipboardButton
-							className="w-[12px] h-[12px]"
+							sizeClassName="w-[12px] h-[12px]"
 							text={artifact.id}
 							tooltip={`Copy the fingerprint: ${artifact.id}`}
+							defaultIcon={<FingerprintIcon className="h-[12px] w-[12px]" />}
 						/>
 					</div>
 					<div>

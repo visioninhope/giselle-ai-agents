@@ -1,19 +1,23 @@
 "use client";
 
-import { CheckCircle, FingerprintIcon, Paperclip } from "lucide-react";
-import { useCallback, useState } from "react";
+import { CheckCircle, CopyIcon, FingerprintIcon } from "lucide-react";
+import { type ReactNode, useCallback, useState } from "react";
 import { Tooltip } from "./tooltip";
 
 interface ClipboardButtonProps {
 	text: string;
 	tooltip?: string;
 	className?: string;
+	sizeClassName?: string;
+	defaultIcon?: ReactNode;
 }
 
 export default function ClipboardButton({
 	tooltip = "Copy to clipboard",
 	text,
 	className = "",
+	sizeClassName = "h-[20px] w-[20px]",
+	defaultIcon,
 }: ClipboardButtonProps) {
 	const [isCopied, setIsCopied] = useState(false);
 
@@ -31,19 +35,19 @@ export default function ClipboardButton({
 		<Tooltip text={isCopied ? "Copied to clipboard" : tooltip} sideOffset={4}>
 			<button
 				type="button"
-				className={`relative ${className}`}
+				className={`relative ${sizeClassName}`}
 				onClick={handleClick}
 				aria-label={isCopied ? "Copied to clipboard" : "Copy to clipboard"}
 			>
 				<span
 					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isCopied ? "opacity-0" : "opacity-100"}`}
 				>
-					<FingerprintIcon className="h-[12px] w-[12px]" />
+					{defaultIcon ?? <CopyIcon className={sizeClassName} />}
 				</span>
 				<span
 					className={`absolute inset-0 flex items-center justify-center transition-opacity duration-300 ${isCopied ? "opacity-100" : "opacity-0"}`}
 				>
-					<CheckCircle className="h-[12px] w-[12px]" />
+					<CheckCircle className={sizeClassName} />
 				</span>
 			</button>
 		</Tooltip>
