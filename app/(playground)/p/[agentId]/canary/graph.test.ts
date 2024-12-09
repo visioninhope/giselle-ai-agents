@@ -1,6 +1,6 @@
 import { describe, expect, test } from "bun:test";
-import type { Graph } from "../types";
-import { deriveSubGraphs } from "./graph";
+import { deriveSubGraphs, isLatestVersion, migrateGraph } from "./graph";
+import type { Graph } from "./types";
 
 // graph is the following structure
 // ┌────────────────────────┐          ┌───────────────────┐
@@ -131,5 +131,26 @@ describe("deriveSubGraphs", () => {
 	test("one subgraph has two nodes while the other has three", () => {
 		expect(subGraphs[0].nodes.size).toBe(2);
 		expect(subGraphs[1].nodes.size).toBe(3);
+	});
+});
+
+describe("isLatestVersion", () => {
+	test("latest version", () => {
+		expect(isLatestVersion({ version: "2024-12-09" } as Graph)).toBe(true);
+	});
+	test("old version", () => {
+		expect(isLatestVersion({} as Graph)).toBe(false);
+	});
+});
+
+describe("migrateGraph", () => {
+	test("migrate to 2024-12-09", () => {
+		const after = migrateGraph({
+			connections: [],
+			nodes: [],
+			artifacts: [],
+		} as unknown as Graph);
+		expect(after).toContainKey("version");
+		expect(after.version).toBe("2024-12-09");
 	});
 });
