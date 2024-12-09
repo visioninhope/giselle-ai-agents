@@ -4,7 +4,7 @@ export class AgentActivity {
 	private actions: AgentActivityAction[] = [];
 	public agentId: AgentId;
 	public startedAt: Date;
-	public endedAt: Date | null;
+	public endedAt: Date | null = null;
 
 	constructor(agentId: AgentId, startedAt: Date) {
 		this.agentId = agentId;

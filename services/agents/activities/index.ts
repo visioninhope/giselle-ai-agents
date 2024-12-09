@@ -1,1 +1,1 @@
-export { AgentActivityAction, AgentActivity } from "./types";
+export { AgentActivity } from "./types";
