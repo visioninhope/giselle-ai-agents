@@ -198,7 +198,15 @@ export async function updateTeamMemberRole(formData: FormData) {
 			throw new Error("Invalid role");
 		}
 
-		// 1. Get current user info
+		// 1. Get current user info and verify admin permission
+		const currentUserRoleResult = await getCurrentUserRole();
+		if (
+			!currentUserRoleResult.success ||
+			currentUserRoleResult.data !== "admin"
+		) {
+			throw new Error("Only admin users can update member roles");
+		}
+
 		const supabaseUser = await getUser();
 		const currentUser = await db
 			.select({ id: users.id })
