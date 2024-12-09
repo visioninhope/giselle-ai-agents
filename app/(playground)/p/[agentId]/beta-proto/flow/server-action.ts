@@ -1,7 +1,7 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
-import { AgentActivities } from "@/services/agents/activities";
+import { AgentActivity } from "@/services/agents/activities";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
@@ -28,6 +28,7 @@ export async function executeFlow(
 	agentId: AgentId,
 	finalNodeId: GiselleNodeId,
 ) {
+	const agentActivity = new AgentActivity(agentId, new Date());
 	const stream = createStreamableValue<V2FlowAction>();
 	(async () => {
 		const agent = await db.query.agents.findFirst({
@@ -56,7 +57,6 @@ export async function executeFlow(
 				},
 			}),
 		);
-		const agentActivities = new AgentActivities(agentId);
 		const generateResults: GenerateResult[] = [];
 		for (const job of flow.jobs) {
 			await Promise.all(
@@ -167,7 +167,7 @@ export async function executeFlow(
 						}
 					}
 
-					agentActivities.collectAction(step.action, startTime, new Date());
+					agentActivity.collectAction(step.action, startTime, new Date());
 
 					stream.update(
 						updateStep({
@@ -178,8 +178,8 @@ export async function executeFlow(
 			);
 		}
 
-		console.dir(agentActivities);
 		stream.done();
+		agentActivity.end();
 	})();
 
 	return { streamableValue: stream.value };

@@ -1,13 +1,23 @@
 import type { AgentId } from "../types";
 
-export class AgentActivities {
+export class AgentActivity {
 	private actions: AgentActivityAction[] = [];
+	public agentId: AgentId;
+	public startedAt: Date;
+	public endedAt: Date | null;
 
-	constructor(public agentId: AgentId) {}
+	constructor(agentId: AgentId, startedAt: Date) {
+		this.agentId = agentId;
+		this.startedAt = startedAt;
+	}
 
 	collectAction(action: string, startedAt: Date, completedAt: Date) {
 		const record = new AgentActivityAction(action, startedAt, completedAt);
 		this.actions.push(record);
+	}
+
+	end(endedAt: Date = new Date()) {
+		this.endedAt = endedAt;
 	}
 
 	totalDurationMs() {
@@ -15,7 +25,7 @@ export class AgentActivities {
 	}
 }
 
-export class AgentActivityAction {
+class AgentActivityAction {
 	constructor(
 		public action: string,
 		public startedAt: Date,
