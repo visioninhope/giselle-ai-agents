@@ -18,6 +18,7 @@ import type {
 	NodeHandleId,
 	NodeId,
 	Position,
+	SubGraph,
 } from "../types";
 
 interface UpsertArtifactActionInput {
@@ -204,6 +205,10 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 		default:
 			return graph;
 	}
+}
+
+export function deriveSubGraphs(graph: Graph): SubGraph[] {
+	return [];
 }
 
 export function GraphContextProvider({
