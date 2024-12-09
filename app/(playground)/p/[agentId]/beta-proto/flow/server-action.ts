@@ -8,6 +8,7 @@ import { eq } from "drizzle-orm";
 import type { GiselleNodeId } from "../giselle-node/types";
 import type { AgentId } from "../types";
 import { type V2FlowAction, setFlow, updateStep } from "./action";
+import { saveAgentActivity } from "./save-agent-activity";
 import {
 	buildTextArtifact,
 	generateArtifactObject,
@@ -30,7 +31,7 @@ export async function executeFlow(
 ) {
 	const agentActivity = new AgentActivity(agentId, new Date());
 	const stream = createStreamableValue<V2FlowAction>();
-	(async () => {
+	await (async () => {
 		const agent = await db.query.agents.findFirst({
 			where: eq(agents.id, agentId),
 		});
@@ -181,6 +182,7 @@ export async function executeFlow(
 		stream.done();
 		agentActivity.end();
 	})();
+	await saveAgentActivity(agentActivity);
 
 	return { streamableValue: stream.value };
 }
