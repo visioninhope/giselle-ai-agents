@@ -1,5 +1,16 @@
 "use client";
 
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+	AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Select,
@@ -154,13 +165,34 @@ export function TeamMemberListItem({
 									>
 										<Pencil className="h-4 w-4" />
 									</Button>
-									<Button
-										className="shrink-0 h-8 w-8 rounded-full p-0"
-										onClick={handleDelete}
-										disabled={isLoading}
-									>
-										<Trash2 className="h-4 w-4" />
-									</Button>
+									<AlertDialog>
+										<AlertDialogTrigger asChild>
+											<Button
+												className="shrink-0 h-8 w-8 rounded-full p-0"
+												disabled={isLoading}
+											>
+												<Trash2 className="h-4 w-4" />
+											</Button>
+										</AlertDialogTrigger>
+										<AlertDialogContent>
+											<AlertDialogHeader>
+												<AlertDialogTitle>Remove team member</AlertDialogTitle>
+												<AlertDialogDescription>
+													Are you sure you want to remove {displayName || email}{" "}
+													from the team? This action cannot be undone.
+												</AlertDialogDescription>
+											</AlertDialogHeader>
+											<AlertDialogFooter>
+												<AlertDialogCancel>Cancel</AlertDialogCancel>
+												<AlertDialogAction
+													onClick={handleDelete}
+													className="bg-destructive text-destructive-foreground hover:bg-destructive/90 dark:text-white"
+												>
+													Remove
+												</AlertDialogAction>
+											</AlertDialogFooter>
+										</AlertDialogContent>
+									</AlertDialog>
 								</>
 							)}
 						</>
