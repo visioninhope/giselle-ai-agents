@@ -296,6 +296,90 @@ export async function updateTeamMemberRole(formData: FormData) {
 	}
 }
 
+export async function deleteTeamMember(formData: FormData) {
+	try {
+		const userId = formData.get("userId") as string;
+
+		if (!isUserId(userId)) {
+			throw new Error("Invalid user ID");
+		}
+
+		// 1. Get current team and verify admin permission
+		const currentTeam = await fetchCurrentTeam();
+		const currentUserRoleResult = await getCurrentUserRole();
+
+		if (
+			!currentUserRoleResult.success ||
+			currentUserRoleResult.data !== "admin"
+		) {
+			throw new Error("Only admin users can remove team members");
+		}
+
+		// 2. Get user's dbId from users table
+		const user = await db
+			.select({ dbId: users.dbId })
+			.from(users)
+			.where(eq(users.id, userId))
+			.limit(1);
+
+		if (user.length === 0) {
+			throw new Error("User not found");
+		}
+
+		// 3. Check if user is an admin and if they are the last admin
+		const targetUserRole = await db
+			.select({ role: teamMemberships.role })
+			.from(teamMemberships)
+			.where(
+				and(
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
+					eq(teamMemberships.userDbId, user[0].dbId),
+				),
+			)
+			.limit(1);
+
+		if (targetUserRole[0].role === "admin") {
+			const adminCount = await db
+				.select({
+					count: count(),
+				})
+				.from(teamMemberships)
+				.where(
+					and(
+						eq(teamMemberships.teamDbId, currentTeam.dbId),
+						eq(teamMemberships.role, "admin"),
+					),
+				);
+
+			if (adminCount[0].count === 1) {
+				throw new Error("Cannot remove the last admin from the team");
+			}
+		}
+
+		// 4. Delete team membership
+		await db
+			.delete(teamMemberships)
+			.where(
+				and(
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
+					eq(teamMemberships.userDbId, user[0].dbId),
+				),
+			);
+
+		revalidatePath("/settings/team");
+
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to delete team member:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "Failed to delete team member",
+		};
+	}
+}
+
 export async function getCurrentUserRole() {
 	try {
 		const supabaseUser = await getUser();
