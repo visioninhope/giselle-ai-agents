@@ -2,12 +2,22 @@ import { describe, expect, test } from "bun:test";
 import type { Graph } from "../types";
 import { deriveSubGraphs } from "./graph";
 
+// graph is the following structure
+// ┌────────────────────────┐          ┌───────────────────┐
+// │ [File1]                │          │ [Summary]         │
+// │ i1042-5055-29-1-1.pdf  │ ───────> │ Key takeaway...   │
+// └────────────────────────┘          └───────────────────┘
+//
+// ┌────────────────────────┐          ┌────────────────────┐          ┌────────────────────┐
+// │ [Goodday]              │          │ [Greetings]        │          │ [Translator]       │
+// │ Today is very good day │ ───────> │ Hello              │ ───────> │ Translate Japanese │
+// └────────────────────────┘          └────────────────────┘          └────────────────────┘
 const graph: Graph = {
 	id: "grph_ef00f8t2ojt65vl2a769vkmq",
 	nodes: [
 		{
 			id: "nd_i85invgzw0pgxzmjathkwhrr",
-			name: "Untitle node - 1",
+			name: "File1",
 			position: { x: 137, y: 185 },
 			selected: false,
 			type: "variable",
@@ -30,7 +40,7 @@ const graph: Graph = {
 		},
 		{
 			id: "nd_vwczcdxw0f27r7lifmi8jnk3",
-			name: "Untitle node - 2",
+			name: "Summary",
 			position: { x: 420, y: 180 },
 			selected: false,
 			type: "action",
@@ -45,7 +55,7 @@ const graph: Graph = {
 		},
 		{
 			id: "nd_ffz8hv1isj4w3r4s23a6klkz",
-			name: "Untitle node - 3",
+			name: "Greetings",
 			position: { x: 480, y: 345 },
 			selected: false,
 			type: "action",
@@ -54,13 +64,13 @@ const graph: Graph = {
 				llm: "anthropic:claude-3-5-sonnet-latest",
 				temperature: 0.7,
 				topP: 1,
-				instruction: "",
+				instruction: "Hello",
 				sources: [{ id: "ndh_n3xuz7ao5dyfusfukagbi3l7", label: "Source1" }],
 			},
 		},
 		{
 			id: "nd_h8h4uhp7kov9v7pj1yyofen8",
-			name: "Untitle node - 4",
+			name: "Goodday",
 			position: { x: 135, y: 360 },
 			selected: false,
 			type: "variable",
@@ -68,7 +78,7 @@ const graph: Graph = {
 		},
 		{
 			id: "nd_guzyxfacpt5db2n9lkjify3z",
-			name: "Untitle node - 5",
+			name: "Translator",
 			position: { x: 802, y: 403 },
 			selected: true,
 			type: "action",
@@ -114,7 +124,12 @@ const graph: Graph = {
 };
 
 describe("deriveSubGraphs", () => {
+	const subGraphs = deriveSubGraphs(graph);
 	test("two sub graphs", () => {
-		expect(deriveSubGraphs(graph)).toBeArray();
+		expect(subGraphs.length).toBe(2);
+	});
+	test("one subgraph has two nodes while the other has three", () => {
+		expect(subGraphs[0].nodes.size).toBe(2);
+		expect(subGraphs[1].nodes.size).toBe(3);
 	});
 });

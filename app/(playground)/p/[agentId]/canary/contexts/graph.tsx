@@ -20,6 +20,7 @@ import type {
 	Position,
 	SubGraph,
 } from "../types";
+import { createSubgraphId } from "../utils";
 
 interface UpsertArtifactActionInput {
 	nodeId: NodeId;
@@ -208,7 +209,99 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 }
 
 export function deriveSubGraphs(graph: Graph): SubGraph[] {
-	return [];
+	const processedNodes = new Set<NodeId>();
+	const subGraphs: SubGraph[] = [];
+	const connectionMap = new Map<NodeId, Set<NodeId>>();
+
+	for (const connection of graph.connections) {
+		if (!connectionMap.has(connection.sourceNodeId)) {
+			connectionMap.set(connection.sourceNodeId, new Set());
+		}
+		const sourceSet = connectionMap.get(connection.sourceNodeId);
+		if (sourceSet) {
+			sourceSet.add(connection.targetNodeId);
+		}
+
+		if (!connectionMap.has(connection.targetNodeId)) {
+			connectionMap.set(connection.targetNodeId, new Set());
+		}
+		const targetSet = connectionMap.get(connection.targetNodeId);
+		if (targetSet) {
+			targetSet.add(connection.sourceNodeId);
+		}
+	}
+
+	function findConnectedComponent(startNodeId: NodeId): Set<NodeId> {
+		const connectedNodes = new Set<NodeId>();
+		const stack: NodeId[] = [startNodeId];
+
+		while (stack.length > 0) {
+			const currentNodeId = stack.pop() || startNodeId;
+			if (connectedNodes.has(currentNodeId)) continue;
+
+			connectedNodes.add(currentNodeId);
+
+			const connectedNodeIds = connectionMap.get(currentNodeId);
+			if (connectedNodeIds) {
+				for (const connectedNodeId of connectedNodeIds) {
+					if (!connectedNodes.has(connectedNodeId)) {
+						stack.push(connectedNodeId);
+					}
+				}
+			}
+		}
+
+		return connectedNodes;
+	}
+	function findSubGraphConnections(nodes: Set<NodeId>): Set<ConnectionId> {
+		const subGraphConnections = new Set<ConnectionId>();
+
+		for (const connection of graph.connections) {
+			if (
+				nodes.has(connection.sourceNodeId) &&
+				nodes.has(connection.targetNodeId)
+			) {
+				subGraphConnections.add(connection.id);
+			}
+		}
+
+		return subGraphConnections;
+	}
+
+	for (const node of graph.nodes) {
+		if (processedNodes.has(node.id)) continue;
+
+		const connectedNodes = findConnectedComponent(node.id);
+
+		if (connectedNodes.size > 0) {
+			const subGraphConnections = findSubGraphConnections(connectedNodes);
+
+			const subGraph: SubGraph = {
+				id: createSubgraphId(),
+				name: `SubGraph ${subGraphs.length + 1}`,
+				nodes: connectedNodes,
+				connections: subGraphConnections,
+			};
+
+			subGraphs.push(subGraph);
+
+			for (const nodeId of connectedNodes) {
+				processedNodes.add(nodeId);
+			}
+		} else {
+			const subGraph: SubGraph = {
+				id: createSubgraphId(),
+				name: `SubGraph ${subGraphs.length + 1}`,
+				nodes: new Set([node.id]),
+				connections: new Set(),
+			};
+
+			subGraphs.push(subGraph);
+			processedNodes.add(node.id);
+		}
+	}
+
+	return subGraphs;
 }
 
 export function GraphContextProvider({

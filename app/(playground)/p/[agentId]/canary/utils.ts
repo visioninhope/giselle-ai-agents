@@ -10,6 +10,7 @@ import type {
 	Node,
 	NodeHandleId,
 	NodeId,
+	SubGraphId,
 	Text,
 	TextGenerateActionContent,
 	TextGeneration,
@@ -36,6 +37,10 @@ export function createConnectionId(): ConnectionId {
 
 export function createFileId(): FileId {
 	return `fl_${createId()}`;
+}
+
+export function createSubgraphId(): SubGraphId {
+	return `sbgrph_${createId()}`;
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {
@@ -139,6 +144,8 @@ export function initGraph(): Graph {
 		nodes: [],
 		connections: [],
 		artifacts: [],
+		version: "2024-12-09",
+		subGraphs: [],
 	};
 }
 
