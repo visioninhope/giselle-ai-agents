@@ -50,7 +50,8 @@ export function TeamMemberListItem({
 			formData.append("userId", userId);
 			formData.append("role", tempRole);
 
-			const { success, isUpdatingSelf } = await updateTeamMemberRole(formData);
+			const { success, isUpdatingSelf, error } =
+				await updateTeamMemberRole(formData);
 
 			if (success) {
 				setIsEditingRole(false);
@@ -60,8 +61,9 @@ export function TeamMemberListItem({
 					setCurrentUserRole(tempRole);
 				}
 			} else {
-				setError("Failed to update role");
-				console.error("Failed to update role");
+				const errorMsg = error || "Failed to update role";
+				setError(errorMsg);
+				console.error(errorMsg);
 			}
 		} catch (error) {
 			if (error instanceof Error) {
@@ -83,50 +85,52 @@ export function TeamMemberListItem({
 		<div className="grid grid-cols-[1fr_1fr_200px] gap-4 p-4 items-center text-zinc-200">
 			<div className="text-zinc-400">{displayName || "No display name"}</div>
 			<div className="text-zinc-400">{email || "No email"}</div>
-			<div className="flex items-center gap-2">
-				{isEditingRole ? (
-					<>
-						<Select
-							value={tempRole}
-							onValueChange={handleRoleChange}
-							disabled={isLoading}
-						>
-							<SelectTrigger className="w-[100px]">
-								<SelectValue />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="admin">Admin</SelectItem>
-								<SelectItem value="member">Member</SelectItem>
-							</SelectContent>
-						</Select>
-						<Button
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={handleSaveRole}
-							disabled={isLoading || !!error}
-						>
-							<Check className="h-4 w-4" />
-						</Button>
-						<Button
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={handleCancelRole}
-							disabled={isLoading}
-						>
-							<X className="h-4 w-4" />
-						</Button>
-					</>
-				) : (
-					<>
-						<span className="text-zinc-400 capitalize w-[100px]">{role}</span>
-						{canEditRole && (
+			<div className="flex flex-col gap-2">
+				<div className="flex items-center gap-2">
+					{isEditingRole ? (
+						<>
+							<Select
+								value={tempRole}
+								onValueChange={handleRoleChange}
+								disabled={isLoading}
+							>
+								<SelectTrigger className="w-[100px]">
+									<SelectValue />
+								</SelectTrigger>
+								<SelectContent>
+									<SelectItem value="admin">Admin</SelectItem>
+									<SelectItem value="member">Member</SelectItem>
+								</SelectContent>
+							</Select>
 							<Button
 								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={() => setIsEditingRole(true)}
+								onClick={handleSaveRole}
+								disabled={isLoading || !!error}
 							>
-								<Pencil className="h-4 w-4" />
+								<Check className="h-4 w-4" />
 							</Button>
-						)}
-					</>
-				)}
+							<Button
+								className="shrink-0 h-8 w-8 rounded-full p-0"
+								onClick={handleCancelRole}
+								disabled={isLoading}
+							>
+								<X className="h-4 w-4" />
+							</Button>
+						</>
+					) : (
+						<>
+							<span className="text-zinc-400 capitalize w-[100px]">{role}</span>
+							{canEditRole && (
+								<Button
+									className="shrink-0 h-8 w-8 rounded-full p-0"
+									onClick={() => setIsEditingRole(true)}
+								>
+									<Pencil className="h-4 w-4" />
+								</Button>
+							)}
+						</>
+					)}
+				</div>
 				{error && <p className="text-sm text-destructive">{error}</p>}
 			</div>
 		</div>

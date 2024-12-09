@@ -11,7 +11,7 @@ import {
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import { and, asc, eq } from "drizzle-orm";
+import { and, asc, count, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 function isUserId(value: string): value is UserId {
@@ -212,22 +212,8 @@ export async function updateTeamMemberRole(formData: FormData) {
 
 		const isUpdatingSelf = currentUser[0].id === userId;
 
-		// 2. Get current user's team
-		const team = await db
-			.select({ dbId: teams.dbId })
-			.from(teams)
-			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
-			.innerJoin(
-				supabaseUserMappings,
-				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
-			)
-			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
-
-		if (team.length === 0) {
-			throw new Error("Team not found");
-		}
-
-		const currentTeam = team[0]; // TODO: This will need to be adjusted after implementing team switching
+		// 2. Get current team
+		const currentTeam = await fetchCurrentTeam();
 
 		// 3. Get target user's dbId from users table
 		const user = await db
@@ -240,7 +226,38 @@ export async function updateTeamMemberRole(formData: FormData) {
 			throw new Error("User not found");
 		}
 
-		// 4. Update team membership role
+		// 4. If changing from admin to member, check if this is the last admin
+		if (role === "member") {
+			const adminCount = await db
+				.select({
+					count: count(),
+				})
+				.from(teamMemberships)
+				.where(
+					and(
+						eq(teamMemberships.teamDbId, currentTeam.dbId),
+						eq(teamMemberships.role, "admin"),
+					),
+				);
+
+			// Check if the user being updated is currently an admin
+			const targetUserRole = await db
+				.select({ role: teamMemberships.role })
+				.from(teamMemberships)
+				.where(
+					and(
+						eq(teamMemberships.teamDbId, currentTeam.dbId),
+						eq(teamMemberships.userDbId, user[0].dbId),
+					),
+				)
+				.limit(1);
+
+			if (targetUserRole[0].role === "admin" && adminCount[0].count === 1) {
+				throw new Error("Cannot remove the last admin from the team");
+			}
+		}
+
+		// 5. Update team membership role
 		await db
 			.update(teamMemberships)
 			.set({ role })
