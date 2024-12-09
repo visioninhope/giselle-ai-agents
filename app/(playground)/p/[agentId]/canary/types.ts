@@ -150,11 +150,14 @@ interface TextStreamArtifact extends StreamAtrifact {
 export type Artifact = TextArtifact | TextStreamArtifact;
 
 export type GraphId = `grph_${string}`;
+type GraphVersion = "2024-12-09";
 export interface Graph {
 	id: GraphId;
 	nodes: Node[];
 	connections: Connection[];
 	artifacts: Artifact[];
+	version: GraphVersion;
+	subGraphs: SubGraph[];
 }
 
 interface ToolBase {
@@ -183,3 +186,12 @@ export type Tool =
 	| AddFileNodeTool
 	| AddTextGenerationNodeTool
 	| MoveTool;
+
+export type SubGraphId = `sbgrph_${string}`;
+
+export interface SubGraph {
+	id: SubGraphId;
+	name: string;
+	nodes: Set<NodeId>;
+	connections: Set<ConnectionId>;
+}
