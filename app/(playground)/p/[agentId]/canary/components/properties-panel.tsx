@@ -12,6 +12,7 @@ import {
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
 	FileIcon,
+	FileXIcon,
 	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
@@ -44,6 +45,7 @@ import {
 	useSelectedNode,
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
+import { useToast } from "../contexts/toast";
 import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
@@ -69,6 +71,7 @@ import {
 	isText,
 	isTextGeneration,
 	pathJoin,
+	toErrorWithMessage,
 } from "../utils";
 import { Block } from "./block";
 import ClipboardButton from "./clipboard-button";
@@ -1827,6 +1830,8 @@ function TabsContentFiles({
 }) {
 	const [isDragging, setIsDragging] = useState(false);
 
+	const { addToast } = useToast();
+
 	const setFiles = useCallback(
 		async (files: File[]) => {
 			let contentData = content.data;
@@ -1849,63 +1854,85 @@ function TabsContentFiles({
 								size: file.size,
 							},
 						];
-						onContentChange?.({
-							...content,
-							data: contentData,
-						});
-						const blob = await upload(
-							pathJoin(vercelBlobFileFolder, fileId, file.name),
-							file,
-							{
-								access: "public",
-								handleUploadUrl: "/api/files/upload",
-							},
-						);
-						const uploadedAt = Date.now();
+						try {
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+							const blob = await upload(
+								pathJoin(vercelBlobFileFolder, fileId, file.name),
+								file,
+								{
+									access: "public",
+									handleUploadUrl: "/api/files/upload",
+								},
+							);
+							const uploadedAt = Date.now();
 
-						contentData = [
-							...contentData.filter((file) => file.id !== fileId),
-							{
-								id: fileId,
-								status: "processing",
-								name: file.name,
-								contentType: file.type,
-								size: file.size,
-								uploadedAt,
-								fileBlobUrl: blob.url,
-							},
-						];
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "processing",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+									uploadedAt,
+									fileBlobUrl: blob.url,
+								},
+							];
 
-						onContentChange?.({
-							...content,
-							data: contentData,
-						});
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
 
-						const parseBlob = await parse(fileId, file.name, blob.url);
+							const parseBlob = await parse(fileId, file.name, blob.url);
 
-						contentData = [
-							...contentData.filter((file) => file.id !== fileId),
-							{
-								id: fileId,
-								status: "completed",
-								name: file.name,
-								contentType: file.type,
-								size: file.size,
-								uploadedAt,
-								fileBlobUrl: blob.url,
-								processedAt: Date.now(),
-								textDataUrl: parseBlob.url,
-							},
-						];
-						onContentChange?.({
-							...content,
-							data: contentData,
-						});
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "completed",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+									uploadedAt,
+									fileBlobUrl: blob.url,
+									processedAt: Date.now(),
+									textDataUrl: parseBlob.url,
+								},
+							];
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+						} catch (error) {
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "failed",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+								},
+							];
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+
+							addToast({
+								type: "error",
+								message: toErrorWithMessage(error).message,
+							});
+						}
 					};
 				}),
 			);
 		},
-		[content, onContentChange],
+		[content, onContentChange, addToast],
 	);
 
 	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
@@ -2002,18 +2029,22 @@ function FileListItem({
 }) {
 	return (
 		<div className="flex items-center overflow-x-hidden">
-			<div className="relative">
-				<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
-				<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
-					<p>
-						{fileData.contentType === "application/pdf"
-							? "pdf"
-							: fileData.contentType === "text/markdown"
-								? "md"
-								: ""}
-					</p>
+			{fileData.status === "failed" ? (
+				<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+			) : (
+				<div className="relative">
+					<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+					<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
+						<p>
+							{fileData.contentType === "application/pdf"
+								? "pdf"
+								: fileData.contentType === "text/markdown"
+									? "md"
+									: ""}
+						</p>
+					</div>
 				</div>
-			</div>
+			)}
 			<div className="overflow-x-hidden">
 				<p className="truncate">{fileData.name}</p>
 				{fileData.status === "uploading" && <p>Uploading...</p>}
@@ -2023,6 +2054,7 @@ function FileListItem({
 						{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
 					</p>
 				)}
+				{fileData.status === "failed" && <p>Failed</p>}
 			</div>
 		</div>
 	);

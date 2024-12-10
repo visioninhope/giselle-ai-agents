@@ -78,11 +78,15 @@ interface CompletedFileData extends FileDataBase {
 	processedAt: number;
 	textDataUrl: string;
 }
+interface FailedFileData extends FileDataBase {
+	status: "failed";
+}
 
 export type FileData =
 	| UploadingFileData
 	| ProcessingFileData
-	| CompletedFileData;
+	| CompletedFileData
+	| FailedFileData;
 
 /** @deprecated */
 export interface FileContent extends VariableContentBase {
