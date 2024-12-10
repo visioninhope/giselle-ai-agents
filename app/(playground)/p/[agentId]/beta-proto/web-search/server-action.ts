@@ -100,7 +100,8 @@ ${sourcesToText(sources)}
 									resolve,
 									Number.parseInt(
 										process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
-									),
+									) +
+										Number.parseInt(process.env.WAITUNTIL_OFFSET_MILLIS ?? "0"),
 								),
 							),
 						); // wait until telemetry sent

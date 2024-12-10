@@ -74,11 +74,11 @@ export async function parseFile(args: ParseFileInput) {
 		new Promise((resolve) =>
 			setTimeout(
 				resolve,
-				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000"),
+				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000") +
+					Number.parseInt(process.env.WAITUNTIL_OFFSET_MILLIS ?? "0"),
 			),
 		),
 	); // wait until telemetry sent
-
 	const jsonString = JSON.stringify(partitionResponse.elements, null, 2);
 	const blob = new Blob([jsonString], { type: "application/json" });
 
