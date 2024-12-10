@@ -1,10 +1,6 @@
-import {
-	db,
-	supabaseUserMappings,
-	users,
-} from "@/drizzle";
-import { eq } from "drizzle-orm";
+import { db, supabaseUserMappings, users } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
+import { eq } from "drizzle-orm";
 
 export async function getUserId() {
 	const supabaseUser = await getUser();

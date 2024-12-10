@@ -6,6 +6,7 @@ import { createStreamableValue } from "ai/rsc";
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { createLogger } from "@/lib/opentelemetry";
+import { getUserId } from "@/lib/user";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
@@ -14,7 +15,6 @@ import type { SourceIndex } from "../source/types";
 import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import type { ModelConfiguration } from "./types";
-import { getUserId } from "@/lib/user";
 
 type GenerateArtifactStreamParams = {
 	agentId: AgentId;

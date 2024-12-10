@@ -3,6 +3,7 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
 import { createLogger, withMeasurement } from "@/lib/opentelemetry";
+import { getUserId } from "@/lib/user";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { createId } from "@paralleldrive/cuid2";
@@ -24,7 +25,6 @@ import {
 	webSearchItemStatus,
 	webSearchStatus,
 } from "./types";
-import { getUserId } from "@/lib/user";
 
 interface GenerateWebSearchStreamInputs {
 	agentId: AgentId;
