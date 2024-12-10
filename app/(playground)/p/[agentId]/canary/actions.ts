@@ -167,6 +167,9 @@ export async function action(
 							/** @todo Let user know file is processing*/
 							throw new Error("File is processing");
 						}
+						if (node.content.data.status === "failed") {
+							return null;
+						}
 						const text = await fetch(node.content.data.textDataUrl).then(
 							(res) => res.text(),
 						);
@@ -191,6 +194,9 @@ export async function action(
 								if (file.status === "processing") {
 									/** @todo Let user know file is processing*/
 									throw new Error("File is processing");
+								}
+								if (file.status === "failed") {
+									return null;
 								}
 								const text = await fetch(file.textDataUrl).then((res) =>
 									res.text(),
