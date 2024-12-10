@@ -6,8 +6,9 @@ export function AgentTimeUsageForFreePlan({
 }: { usedMinutes: number }) {
 	const includedMinutes = 60;
 	const warningMessage =
-		"Getting close to your monthly limit. Usage beyond this limit will be billed additionally";
-	const overLimitMessage = "Additional minutes are subject to extra charges";
+		"Your free plan limit is almost reached. Upgrade to Pro for unlimited usage.";
+	const overLimitMessage =
+		"You've reached your free plan limit. Please upgrade to continue using the service.";
 	return (
 		<AgentTimeUsage
 			usedMinutes={usedMinutes}
@@ -23,9 +24,9 @@ export function AgentTimeUsageForProPlan({
 }: { usedMinutes: number }) {
 	const includedMinutes = 120;
 	const warningMessage =
-		"Your free plan limit is almost reached. Upgrade to Pro for unlimited usage.";
-	const overLimitMessage =
-		"You've reached your free plan limit. Please upgrade to continue using the service.";
+		"Getting close to your monthly limit. Usage beyond this limit will be billed additionally";
+	const overLimitMessage = "Additional minutes are subject to extra charges";
+
 	return (
 		<AgentTimeUsage
 			usedMinutes={usedMinutes}
