@@ -2,7 +2,7 @@
 
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { createLogger, withMeasurement } from "@/lib/opentelemetry";
+import { ExternalServiceName, createLogger, withCountMeasurement } from "@/lib/opentelemetry";
 import { fetchCurrentUser } from "@/services/accounts/fetch-current-user";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
@@ -120,10 +120,10 @@ ${sourcesToText(sources)}
 
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) =>
-				withMeasurement<WebSearchResult[]>(
+				withCountMeasurement<WebSearchResult[]>(
 					logger,
 					() => search(keyword),
-					"tavily",
+					ExternalServiceName.Tavily,
 				),
 			),
 		)
@@ -192,13 +192,13 @@ ${sourcesToText(sources)}
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
 					try {
-						const scrapeResponse = await withMeasurement<FirecrawlResponse>(
+						const scrapeResponse = await withCountMeasurement<FirecrawlResponse>(
 							logger,
 							() =>
 								app.scrapeUrl(webSearchItem.url, {
 									formats: ["markdown"],
 								}),
-							"firecrawl",
+							ExternalServiceName.Firecrawl,
 						);
 
 						if (scrapeResponse.success) {
