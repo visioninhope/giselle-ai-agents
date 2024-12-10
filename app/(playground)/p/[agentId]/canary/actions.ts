@@ -178,6 +178,32 @@ export async function action(
 						} satisfies ActionSource;
 					}
 
+					case "files": {
+						return await Promise.all(
+							node.content.data.map(async (file) => {
+								if (file == null) {
+									throw new Error("File not found");
+								}
+								if (file.status === "uploading") {
+									/** @todo Let user know file is uploading*/
+									throw new Error("File is uploading");
+								}
+								if (file.status === "processing") {
+									/** @todo Let user know file is processing*/
+									throw new Error("File is processing");
+								}
+								const text = await fetch(file.textDataUrl).then((res) =>
+									res.text(),
+								);
+								return {
+									type: "file",
+									title: file.name,
+									content: text,
+									nodeId: node.id,
+								} satisfies ActionSource;
+							}),
+						);
+					}
 					case "textGeneration": {
 						const generatedArtifact = graph.artifacts.find(
 							(artifact) => artifact.creatorNodeId === node.id,
@@ -199,7 +225,7 @@ export async function action(
 						return null;
 				}
 			}),
-		).then((sources) => sources.filter((source) => source !== null));
+		).then((sources) => sources.filter((source) => source !== null).flat());
 	}
 
 	/**

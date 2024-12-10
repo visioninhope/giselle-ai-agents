@@ -658,7 +658,7 @@ function NodeDropdown({
 		(node) => node.content.type === "textGeneration",
 	);
 	const textNodes = nodes.filter((node) => node.content.type === "text");
-	const fileNodes = nodes.filter((node) => node.content.type === "file");
+	const fileNodes = nodes.filter((node) => node.content.type === "files");
 
 	const handleValueChange = (value: string) => {
 		if (!onValueChange) return;
@@ -842,7 +842,7 @@ function TabsContentPrompt({
 		(node) => node.content.type === "textGeneration",
 	);
 	const connectableFileNodes = nodes.filter(
-		(node) => node.content.type === "file",
+		(node) => node.content.type === "files",
 	);
 	const requirementNode = useNode({
 		targetNodeHandleId: content.requirement?.id,
