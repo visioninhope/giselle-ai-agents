@@ -460,3 +460,19 @@ export const gitHubIntegrations = pgTable(
 		};
 	},
 );
+
+export const agentActivities = pgTable(
+	"agent_activities",
+	{
+		dbId: serial("db_id").primaryKey(),
+		agentDbId: integer("agent_db_id")
+			.notNull()
+			.references(() => agents.dbId, { onDelete: "cascade" }),
+		startedAt: timestamp("started_at").notNull(),
+		endedAt: timestamp("ended_at").notNull(),
+		aggregatedExecutionTimeMs: integer("total_duration_ms").notNull(),
+	},
+	(table) => ({
+		agentDbIdIdx: index().on(table.agentDbId),
+	}),
+);
