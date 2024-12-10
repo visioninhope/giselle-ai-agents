@@ -22,7 +22,7 @@ async function withMeasurement<T>(
 	measurement: MeasurementSchema<T>,
 	measurementStartTime?: number,
 ): Promise<T> {
-	const startTime = measurementStartTime ?? performance.now();
+	const startTime = measurementStartTime ?? performance.now(); // set `startTime` for each call in parallel process
 	try {
 		// business logic: error should be thrown
 		const result = await operation();
