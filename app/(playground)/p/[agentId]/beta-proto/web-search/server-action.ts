@@ -24,6 +24,7 @@ import {
 	webSearchItemStatus,
 	webSearchStatus,
 } from "./types";
+import { getUserId } from "@/lib/user";
 
 interface GenerateWebSearchStreamInputs {
 	agentId: AgentId;
@@ -37,8 +38,10 @@ export async function generateWebSearchStream(
 ) {
 	const startTime = performance.now();
 	const lf = new Langfuse();
+	const userId = await getUserId();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
+		userId: userId,
 	});
 
 	const logger = createLogger("web-search");

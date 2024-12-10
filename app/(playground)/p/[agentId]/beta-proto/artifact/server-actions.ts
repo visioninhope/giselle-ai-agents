@@ -14,6 +14,7 @@ import type { SourceIndex } from "../source/types";
 import { sourceIndexesToSources, sourcesToText } from "../source/utils";
 import type { AgentId } from "../types";
 import type { ModelConfiguration } from "./types";
+import { getUserId } from "@/lib/user";
 
 type GenerateArtifactStreamParams = {
 	agentId: AgentId;
@@ -26,8 +27,10 @@ export async function generateArtifactStream(
 ) {
 	const startTime = performance.now();
 	const lf = new Langfuse();
+	const userId = await getUserId();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
+		userId: userId,
 	});
 	const logger = createLogger("generate-artifact");
 	const sources = await sourceIndexesToSources({
