@@ -1,10 +1,11 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { AGENT_TIME_CHARGE_LIMIT_MINUTES } from "@/services/agents/activities";
 import { AlertTriangleIcon } from "lucide-react";
 
 export function AgentTimeUsageForFreePlan({
 	usedMinutes,
 }: { usedMinutes: number }) {
-	const includedMinutes = 60;
+	const includedMinutes = AGENT_TIME_CHARGE_LIMIT_MINUTES.FREE;
 	const warningMessage =
 		"Your free plan limit is almost reached. Upgrade to Pro for unlimited usage.";
 	const overLimitMessage =
@@ -22,7 +23,7 @@ export function AgentTimeUsageForFreePlan({
 export function AgentTimeUsageForProPlan({
 	usedMinutes,
 }: { usedMinutes: number }) {
-	const includedMinutes = 120;
+	const includedMinutes = AGENT_TIME_CHARGE_LIMIT_MINUTES.PRO;
 	const warningMessage =
 		"Getting close to your monthly limit. Usage beyond this limit will be billed additionally";
 	const overLimitMessage = "Additional minutes are subject to extra charges";
@@ -41,7 +42,7 @@ type AgentTimeUsageProps = {
 	/** Minutes used */
 	usedMinutes: number;
 	/** Minutes included in the plan */
-	includedMinutes?: number;
+	includedMinutes: number;
 	/** Warning threshold ratio (decimal between 0-1) */
 	warningThreshold?: number;
 	/** Message displayed when approaching threshold */
@@ -53,7 +54,7 @@ type AgentTimeUsageProps = {
 function AgentTimeUsage(props: AgentTimeUsageProps) {
 	const {
 		usedMinutes,
-		includedMinutes = 120,
+		includedMinutes,
 		warningThreshold = 0.8,
 		warningMessage = "",
 		overLimitMessage = "",

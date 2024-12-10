@@ -1,4 +1,4 @@
-import { calculateAgentTimeUsage } from "@/services/agents/activities/agent-time-usage";
+import { calculateAgentTimeUsage } from "@/services/agents/activities";
 import { fetchCurrentTeam } from "@/services/teams";
 import {
 	AgentTimeUsageForFreePlan,
