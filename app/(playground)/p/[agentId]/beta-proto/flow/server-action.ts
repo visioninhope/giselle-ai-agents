@@ -31,7 +31,7 @@ export async function executeFlow(
 ) {
 	const agentActivity = new AgentActivity(agentId, new Date());
 	const stream = createStreamableValue<V2FlowAction>();
-	await (async () => {
+	(async () => {
 		const agent = await db.query.agents.findFirst({
 			where: eq(agents.id, agentId),
 		});
@@ -181,8 +181,8 @@ export async function executeFlow(
 
 		stream.done();
 		agentActivity.end();
+		await saveAgentActivity(agentActivity);
 	})();
-	await saveAgentActivity(agentActivity);
 
 	return { streamableValue: stream.value };
 }
