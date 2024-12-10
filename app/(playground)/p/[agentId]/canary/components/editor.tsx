@@ -253,7 +253,8 @@ export function Editor() {
 										selected: false,
 										type: "variable",
 										content: {
-											type: "file",
+											type: "files",
+											data: [],
 										},
 									},
 								},
