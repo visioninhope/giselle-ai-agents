@@ -40,7 +40,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 		const newToast = {
 			...toast,
 			id,
-			duration: toast.duration || 3000,
+			duration: toast.duration || 10000,
 		};
 
 		setToasts((prevToasts) => [...prevToasts, newToast]);

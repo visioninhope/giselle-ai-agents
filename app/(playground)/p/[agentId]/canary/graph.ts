@@ -1,4 +1,4 @@
-import type { ConnectionId, Graph, NodeId, SubGraph } from "./types";
+import type { ConnectionId, Files, Graph, NodeId, SubGraph } from "./types";
 import { createSubgraphId } from "./utils";
 
 export function deriveSubGraphs(graph: Graph): SubGraph[] {
@@ -98,7 +98,7 @@ export function deriveSubGraphs(graph: Graph): SubGraph[] {
 }
 
 export function isLatestVersion(graph: Graph): boolean {
-	return graph.version === "2024-12-09";
+	return graph.version === "2024-12-10";
 }
 
 export function migrateGraph(graph: Graph): Graph {
@@ -106,9 +106,34 @@ export function migrateGraph(graph: Graph): Graph {
 	// @ts-ignore: Old graph has no version field
 	if (typeof graph.version === "undefined") {
 		newGraph = {
-			...graph,
+			...newGraph,
 			version: "2024-12-09",
-			subGraphs: deriveSubGraphs(graph),
+			subGraphs: deriveSubGraphs(newGraph),
+		};
+	}
+
+	if (newGraph.version === "2024-12-09") {
+		newGraph = {
+			...newGraph,
+			version: "2024-12-10",
+			nodes: newGraph.nodes
+				.map((node) => {
+					if (node.content.type !== "file") {
+						return node;
+					}
+					if (node.content.data == null) {
+						return null;
+					}
+					return {
+						...node,
+						type: "variable",
+						content: {
+							type: "files",
+							data: [node.content.data],
+						},
+					} satisfies Files;
+				})
+				.filter((node) => node !== null),
 		};
 	}
 

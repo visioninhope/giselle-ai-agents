@@ -78,20 +78,36 @@ interface CompletedFileData extends FileDataBase {
 	processedAt: number;
 	textDataUrl: string;
 }
+interface FailedFileData extends FileDataBase {
+	status: "failed";
+}
 
-type FileData = UploadingFileData | ProcessingFileData | CompletedFileData;
+export type FileData =
+	| UploadingFileData
+	| ProcessingFileData
+	| CompletedFileData
+	| FailedFileData;
+
+/** @deprecated */
 export interface FileContent extends VariableContentBase {
 	type: "file";
 	data?: FileData | null | undefined;
 }
+export interface FilesContent extends VariableContentBase {
+	type: "files";
+	data: FileData[];
+}
 
-type VariableContent = TextContent | FileContent;
+type VariableContent = TextContent | FileContent | FilesContent;
 
 export interface Text extends Variable {
 	content: TextContent;
 }
 export interface File extends Variable {
 	content: FileContent;
+}
+export interface Files extends Variable {
+	content: FilesContent;
 }
 
 export type NodeHandleId = `ndh_${string}`;
@@ -150,7 +166,8 @@ interface TextStreamArtifact extends StreamAtrifact {
 export type Artifact = TextArtifact | TextStreamArtifact;
 
 export type GraphId = `grph_${string}`;
-type GraphVersion = "2024-12-09";
+type GraphVersion = "2024-12-09" | "2024-12-10";
+export type LatestGraphVersion = "2024-12-10";
 export interface Graph {
 	id: GraphId;
 	nodes: Node[];

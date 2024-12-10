@@ -136,7 +136,7 @@ describe("deriveSubGraphs", () => {
 
 describe("isLatestVersion", () => {
 	test("latest version", () => {
-		expect(isLatestVersion({ version: "2024-12-09" } as Graph)).toBe(true);
+		expect(isLatestVersion({ version: "2024-12-10" } as Graph)).toBe(true);
 	});
 	test("old version", () => {
 		expect(isLatestVersion({} as Graph)).toBe(false);
@@ -151,6 +151,38 @@ describe("migrateGraph", () => {
 			artifacts: [],
 		} as unknown as Graph);
 		expect(after).toContainKey("version");
-		expect(after.version).toBe("2024-12-09");
+	});
+	test("migrate to 2024-12-10", () => {
+		const after = migrateGraph({
+			connections: [],
+			nodes: [
+				{
+					id: "nd_i85invgzw0pgxzmjathkwhrr",
+					name: "File1",
+					position: { x: 137, y: 185 },
+					selected: false,
+					type: "variable",
+					content: {
+						type: "file",
+						data: {
+							id: "fl_j4riw5k1p5jqe3tbugtaj5oc",
+							status: "completed",
+							name: "i1042-5055-29-1-1.pdf",
+							contentType: "application/pdf",
+							size: 689064,
+							uploadedAt: 1733318593333,
+							fileBlobUrl:
+								"https://aj9qps90wwygtg5h.public.blob.vercel-storage.com/canary/files/fl_j4riw5k1p5jqe3tbugtaj5oc/i1042-5055-29-1-1-zZizzVpxjulkzHskqUJ068Qu4jQHHv.pdf",
+							processedAt: 1733318601585,
+							textDataUrl:
+								"https://aj9qps90wwygtg5h.public.blob.vercel-storage.com/canary/files/fl_j4riw5k1p5jqe3tbugtaj5oc/markdown-iYTpEtxjznsh86cN8UWqXMxAPhF8SY.md",
+						},
+					},
+				},
+			],
+			artifacts: [],
+		} as unknown as Graph);
+		expect(after.version).toBe("2024-12-10");
+		expect(after.nodes[0].content.type).toBe("files");
 	});
 });
