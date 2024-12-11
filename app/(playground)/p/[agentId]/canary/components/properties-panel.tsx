@@ -50,6 +50,7 @@ import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
 	FileData,
+	FileId,
 	FilesContent,
 	Node,
 	NodeHandle,
@@ -96,6 +97,7 @@ import {
 	SelectValue,
 } from "./select";
 import { Slider } from "./slider";
+import { Tooltip } from "./tooltip";
 
 function PropertiesPanelContentBox({
 	children,
@@ -2028,34 +2030,44 @@ function FileListItem({
 	fileData: FileData;
 }) {
 	return (
-		<div className="flex items-center overflow-x-hidden">
-			{fileData.status === "failed" ? (
-				<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
-			) : (
-				<div className="relative">
-					<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
-					<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
-						<p>
-							{fileData.contentType === "application/pdf"
-								? "pdf"
-								: fileData.contentType === "text/markdown"
-									? "md"
-									: ""}
-						</p>
+		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
+			<div className="flex items-center">
+				{fileData.status === "failed" ? (
+					<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+				) : (
+					<div className="relative">
+						<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+						<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
+							<p>
+								{fileData.contentType === "application/pdf"
+									? "pdf"
+									: fileData.contentType === "text/markdown"
+										? "md"
+										: ""}
+							</p>
+						</div>
 					</div>
-				</div>
-			)}
-			<div className="overflow-x-hidden">
-				<p className="truncate">{fileData.name}</p>
-				{fileData.status === "uploading" && <p>Uploading...</p>}
-				{fileData.status === "processing" && <p>Processing...</p>}
-				{fileData.status === "completed" && (
-					<p className="text-black-50">
-						{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
-					</p>
 				)}
-				{fileData.status === "failed" && <p>Failed</p>}
+				<div className="overflow-x-hidden">
+					<p className="truncate">{fileData.name}</p>
+					{fileData.status === "uploading" && <p>Uploading...</p>}
+					{fileData.status === "processing" && <p>Processing...</p>}
+					{fileData.status === "completed" && (
+						<p className="text-black-50">
+							{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
+						</p>
+					)}
+					{fileData.status === "failed" && <p>Failed</p>}
+				</div>
 			</div>
+			<Tooltip text="Remove">
+				<button
+					type="button"
+					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px]"
+				>
+					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
+				</button>
+			</Tooltip>
 		</div>
 	);
 }
