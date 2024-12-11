@@ -2,6 +2,16 @@ export function getMonthlyBillingCycle(
 	referenceDate: Date,
 	currentDate: Date,
 ): { start: Date; end: Date } {
+	// Add validation for invalid dates
+	if (
+		!referenceDate ||
+		!currentDate ||
+		Number.isNaN(referenceDate.getTime()) ||
+		Number.isNaN(currentDate.getTime())
+	) {
+		throw new Error("Invalid date provided");
+	}
+
 	// Get the base time and date from referenceDate
 	const refDay = referenceDate.getUTCDate();
 	const refHours = referenceDate.getUTCHours();

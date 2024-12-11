@@ -143,3 +143,76 @@ describe("getMonthlyBillingCycle environment independence", () => {
 		expect(end.toISOString()).toBe("2024-04-15T15:00:00.000Z");
 	});
 });
+
+describe("getMonthlyBillingCycle edge cases", () => {
+	test("handle leap year transition", () => {
+		const referenceDate = new Date("2024-02-29T15:00:00Z");
+		const currentDate = new Date("2024-03-15T15:00:00Z");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-02-29T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-03-29T15:00:00Z").getTime());
+	});
+
+	test("handle non-leap year February", () => {
+		const referenceDate = new Date("2023-01-31T15:00:00Z");
+		const currentDate = new Date("2023-02-15T15:00:00Z");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2023-01-31T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2023-02-28T15:00:00Z").getTime());
+	});
+
+	test("throw error for invalid date", () => {
+		const referenceDate = new Date("invalid date");
+		const currentDate = new Date("2024-02-15T15:00:00Z");
+
+		expect(() => getMonthlyBillingCycle(referenceDate, currentDate)).toThrow();
+	});
+
+	test("throw error for null dates", () => {
+		// @ts-expect-error Testing null input
+		expect(() => getMonthlyBillingCycle(null, new Date())).toThrow();
+		// @ts-expect-error Testing null input
+		expect(() => getMonthlyBillingCycle(new Date(), null)).toThrow();
+	});
+
+	test("handle month with 31 days to next month with 30 days", () => {
+		const referenceDate = new Date("2024-01-31T15:00:00Z");
+		const currentDate = new Date("2024-04-15T15:00:00Z");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-03-31T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-04-30T15:00:00Z").getTime());
+	});
+
+	test("handle transition from 30 days month to 31 days month", () => {
+		const referenceDate = new Date("2024-04-30T15:00:00Z");
+		const currentDate = new Date("2024-05-15T15:00:00Z");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-04-30T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-05-30T15:00:00Z").getTime());
+	});
+
+	test("handle the cycle change at the very end of the month", () => {
+		const referenceDate = new Date("2024-04-30T15:00:00Z");
+		const currentDateBeforeBilling = new Date("2024-05-30T14:59:59Z");
+
+		const { start, end } = getMonthlyBillingCycle(
+			referenceDate,
+			currentDateBeforeBilling,
+		);
+		expect(start.getTime()).toBe(new Date("2024-04-30T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-05-30T15:00:00Z").getTime());
+
+		const currentDateAfterBilling = new Date("2024-05-30T15:00:00Z");
+
+		const { start: start2, end: end2 } = getMonthlyBillingCycle(
+			referenceDate,
+			currentDateAfterBilling,
+		);
+		expect(start2.getTime()).toBe(new Date("2024-05-30T15:00:00Z").getTime());
+		expect(end2.getTime()).toBe(new Date("2024-06-30T15:00:00Z").getTime());
+	});
+});
