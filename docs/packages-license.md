@@ -1,6 +1,5 @@
 # giselle
 
-As of December 10, 2024  3:40am. 920 total
 
 ## Summary
 * 675 MIT
