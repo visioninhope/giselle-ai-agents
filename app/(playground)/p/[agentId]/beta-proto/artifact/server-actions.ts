@@ -4,9 +4,12 @@ import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { langfuseModel } from "@/lib/llm";
-import { createLogger, withTokenMeasurement } from "@/lib/opentelemetry";
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
 import { fetchCurrentUser } from "@/services/accounts/fetch-current-user";
-import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
 import { buildLanguageModel } from "../flow/server-actions/generate-text";
@@ -78,19 +81,7 @@ ${sourcesToText(sources)}
 						async () => {
 							generation.end({ output: result });
 							await lf.shutdownAsync();
-							waitUntil(
-								new Promise((resolve) =>
-									setTimeout(
-										resolve,
-										Number.parseInt(
-											process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
-										) +
-											Number.parseInt(
-												process.env.WAITUNTIL_OFFSET_MILLIS ?? "0",
-											),
-									),
-								),
-							); // wait until telemetry sent
+							waitForTelemetryExport();
 							return result;
 						},
 						startTime,

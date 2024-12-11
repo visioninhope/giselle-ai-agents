@@ -1,4 +1,5 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
+import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
@@ -62,6 +63,7 @@ async function withMeasurement<T>(
 
 const APICallBasedService = {
 	Unstructured: ExternalServiceName.Unstructured,
+	VercelBlob: ExternalServiceName.VercelBlob,
 	Tavily: ExternalServiceName.Tavily,
 	Firecrawl: ExternalServiceName.Firecrawl,
 } as const;
@@ -70,12 +72,21 @@ const TokenBasedService = {
 	OpenAI: ExternalServiceName.OpenAI,
 } as const;
 
+type VercelBlobOperationType = "put" | "fetch";
+
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: typeof APICallBasedService.Unstructured,
 	measurementStartTime: number | undefined,
 	strategy: Strategy,
+): Promise<T>;
+export function withCountMeasurement<T>(
+	logger: OtelLoggerWrapper,
+	operation: () => Promise<T>,
+	externalServiceName: typeof APICallBasedService.VercelBlob,
+	measurementStartTime: number | undefined,
+	operationType: VercelBlobOperationType,
 ): Promise<T>;
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
@@ -90,10 +101,10 @@ export function withCountMeasurement<T>(
 	operation: () => Promise<T>,
 	externalServiceName: (typeof APICallBasedService)[keyof typeof APICallBasedService],
 	measurementStartTime?: number,
-	strategy?: Strategy,
+	strategyOrOptions?: Strategy | VercelBlobOperationType | undefined,
 ): Promise<T> {
 	const measurement: MeasurementSchema<T> = (
-		_result,
+		result,
 		duration,
 		measurementScope,
 		isR06User,
@@ -106,7 +117,7 @@ export function withCountMeasurement<T>(
 		};
 
 		if (externalServiceName === APICallBasedService.Unstructured) {
-			if (!strategy) {
+			if (!strategyOrOptions) {
 				logger.error(
 					new Error("'strategy' is required for Unstructured service"),
 					"missing required strategy parameter",
@@ -115,8 +126,28 @@ export function withCountMeasurement<T>(
 			return {
 				...baseMetrics,
 				externalServiceName,
-				strategy: strategy as Strategy,
+				strategy: strategyOrOptions as Strategy,
 			};
+		}
+
+		if (externalServiceName === APICallBasedService.VercelBlob) {
+			const operationType = strategyOrOptions as VercelBlobOperationType;
+			switch (operationType) {
+				case "put":
+					return {
+						...baseMetrics,
+						externalServiceName,
+						operationType: "put",
+						blobSizeStored: (result as { size: number }).size,
+					};
+				case "fetch":
+					return {
+						...baseMetrics,
+						externalServiceName,
+						operationType: "fetch",
+						blobSizeTransfered: (result as { size: number }).size,
+					};
+			}
 		}
 
 		return {
@@ -148,4 +179,16 @@ export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	});
 
 	return withMeasurement(logger, operation, measurements, measurementStartTime);
+}
+
+export function waitForTelemetryExport() {
+	waitUntil(
+		new Promise((resolve) =>
+			setTimeout(
+				resolve,
+				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000") +
+					Number.parseInt(process.env.WAITUNTIL_OFFSET_MILLIS ?? "0"),
+			),
+		),
+	);
 }
