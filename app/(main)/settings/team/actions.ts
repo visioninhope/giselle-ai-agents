@@ -288,9 +288,14 @@ export async function updateTeamMemberRole(formData: FormData) {
 export async function deleteTeamMember(formData: FormData) {
 	try {
 		const userId = formData.get("userId") as string;
+		const role = formData.get("role") as string;
 
 		if (!isUserId(userId)) {
 			throw new Error("Invalid user ID");
+		}
+
+		if (!isTeamRole(role)) {
+			throw new Error("Invalid role");
 		}
 
 		// 1. Get current team and verify admin permission
@@ -330,18 +335,7 @@ export async function deleteTeamMember(formData: FormData) {
 		}
 
 		// 4. Check if user is an admin and if they are the last admin
-		const targetUserRole = await db
-			.select({ role: teamMemberships.role })
-			.from(teamMemberships)
-			.where(
-				and(
-					eq(teamMemberships.teamDbId, currentTeam.dbId),
-					eq(teamMemberships.userDbId, user[0].dbId),
-				),
-			)
-			.limit(1);
-
-		if (targetUserRole[0].role === "admin") {
+		if (role === "admin") {
 			const adminCount = await db
 				.select({
 					count: count(),

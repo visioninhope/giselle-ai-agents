@@ -100,6 +100,7 @@ export function TeamMemberListItem({
 
 			const formData = new FormData();
 			formData.append("userId", userId);
+			formData.append("role", role);
 
 			const { success, error } = await deleteTeamMember(formData);
 
