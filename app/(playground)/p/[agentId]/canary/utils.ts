@@ -5,11 +5,14 @@ import type {
 	ConnectionId,
 	File,
 	FileId,
+	Files,
 	Graph,
 	GraphId,
+	LatestGraphVersion,
 	Node,
 	NodeHandleId,
 	NodeId,
+	SubGraphId,
 	Text,
 	TextGenerateActionContent,
 	TextGeneration,
@@ -38,6 +41,10 @@ export function createFileId(): FileId {
 	return `fl_${createId()}`;
 }
 
+export function createSubgraphId(): SubGraphId {
+	return `sbgrph_${createId()}`;
+}
+
 export function isTextGeneration(node: Node): node is TextGeneration {
 	return node.content.type === "textGeneration";
 }
@@ -48,6 +55,9 @@ export function isText(node: Node): node is Text {
 
 export function isFile(node: Node): node is File {
 	return node.content.type === "file";
+}
+export function isFiles(node: Node): node is Files {
+	return node.content.type === "files";
 }
 
 interface Element {
@@ -139,6 +149,8 @@ export function initGraph(): Graph {
 		nodes: [],
 		connections: [],
 		artifacts: [],
+		version: "2024-12-10" satisfies LatestGraphVersion,
+		subGraphs: [],
 	};
 }
 

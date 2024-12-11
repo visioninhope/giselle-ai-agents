@@ -1,9 +1,10 @@
 "use server";
 
 import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { put } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
@@ -16,6 +17,7 @@ import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
 	ArtifactId,
+	FileData,
 	FileId,
 	Graph,
 	GraphId,
@@ -42,6 +44,9 @@ function resolveLanguageModel(
 	}
 	if (provider === "anthropic") {
 		return anthropic(model);
+	}
+	if (provider === "google") {
+		return google(model);
 	}
 	if (provider === "dev") {
 		return new MockLanguageModelV1({
@@ -167,6 +172,9 @@ export async function action(
 							/** @todo Let user know file is processing*/
 							throw new Error("File is processing");
 						}
+						if (node.content.data.status === "failed") {
+							return null;
+						}
 						const text = await fetch(node.content.data.textDataUrl).then(
 							(res) => res.text(),
 						);
@@ -178,6 +186,35 @@ export async function action(
 						} satisfies ActionSource;
 					}
 
+					case "files": {
+						return await Promise.all(
+							node.content.data.map(async (file) => {
+								if (file == null) {
+									throw new Error("File not found");
+								}
+								if (file.status === "uploading") {
+									/** @todo Let user know file is uploading*/
+									throw new Error("File is uploading");
+								}
+								if (file.status === "processing") {
+									/** @todo Let user know file is processing*/
+									throw new Error("File is processing");
+								}
+								if (file.status === "failed") {
+									return null;
+								}
+								const text = await fetch(file.textDataUrl).then((res) =>
+									res.text(),
+								);
+								return {
+									type: "file",
+									title: file.name,
+									content: text,
+									nodeId: node.id,
+								} satisfies ActionSource;
+							}),
+						);
+					}
 					case "textGeneration": {
 						const generatedArtifact = graph.artifacts.find(
 							(artifact) => artifact.creatorNodeId === node.id,
@@ -199,7 +236,7 @@ export async function action(
 						return null;
 				}
 			}),
-		).then((sources) => sources.filter((source) => source !== null));
+		).then((sources) => sources.filter((source) => source !== null).flat());
 	}
 
 	/**
@@ -351,4 +388,14 @@ export async function putGraph(graph: Graph) {
 	return await put(buildGraphPath(graph.id), JSON.stringify(graph), {
 		access: "public",
 	});
+}
+
+export async function remove(fileData: FileData) {
+	const blobList = await list({
+		prefix: pathJoin(vercelBlobFileFolder, fileData.id),
+	});
+
+	if (blobList.blobs.length > 0) {
+		await del(blobList.blobs.map((blob) => blob.url));
+	}
 }

@@ -1,8 +1,17 @@
 import * as Tabs from "@radix-ui/react-tabs";
-import { GithubIcon, XIcon } from "lucide-react";
-import { type ComponentProps, useState } from "react";
+import { getDownloadUrl, head } from "@vercel/blob";
+import { DownloadIcon, GithubIcon, HammerIcon, XIcon } from "lucide-react";
+import {
+	type ComponentProps,
+	type ReactNode,
+	createContext,
+	useContext,
+	useState,
+} from "react";
 import { LayersIcon } from "../../beta-proto/components/icons/layers";
 import { useAgentName } from "../contexts/agent-name";
+import { useDeveloperMode } from "../contexts/developer-mode";
+import { useGraph } from "../contexts/graph";
 
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
@@ -26,52 +35,91 @@ function TabsContent(
 	);
 }
 
+const TabValueContext = createContext<
+	| {
+			tabValue: string;
+			setTabValue: (value: string) => void;
+	  }
+	| undefined
+>(undefined);
+
+export const useTabValue = () => {
+	const context = useContext(TabValueContext);
+	if (!context) {
+		throw new Error("useTabValue must be used within a TabValueProvider");
+	}
+	return context;
+};
+
 export function NavigationPanel() {
 	const [tabValue, setTabValue] = useState("");
+	const developerMode = useDeveloperMode();
 	return (
-		<Tabs.Root
-			orientation="vertical"
-			value={tabValue}
-			onValueChange={(value) => setTabValue(value)}
-		>
-			<Tabs.List className="absolute w-[54px] rounded-full bg-[hsla(233,93%,5%,0.8)] px-[4px] py-[8px] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] top-[0px] left-[20px] mt-[60px] grid justify-center gap-[4px]">
-				<TabsTrigger value="overview">
-					<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
-				</TabsTrigger>
-				{/* <TabsTrigger value="github">
+		<TabValueContext value={{ tabValue, setTabValue }}>
+			<Tabs.Root
+				orientation="vertical"
+				value={tabValue}
+				onValueChange={(value) => setTabValue(value)}
+			>
+				<Tabs.List className="absolute w-[54px] rounded-full bg-[hsla(233,93%,5%,0.8)] px-[4px] py-[8px] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] top-[0px] left-[20px] mt-[60px] grid justify-center gap-[4px]">
+					<TabsTrigger value="overview">
+						<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
+					</TabsTrigger>
+					{/* <TabsTrigger value="github">
 					<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
 				</TabsTrigger> */}
-			</Tabs.List>
-			<TabsContent value="overview">
-				<Overview setTabValue={setTabValue} />
-			</TabsContent>
-			{/* <TabsContent value="github">
+
+					{developerMode && (
+						<TabsTrigger value="developer">
+							<HammerIcon className="w-[18px] h-[18px] stroke-black-30" />
+						</TabsTrigger>
+					)}
+				</Tabs.List>
+				<TabsContent value="overview">
+					<Overview />
+				</TabsContent>
+				{/* <TabsContent value="github">
 				<GitHubIntegration />
 			</TabsContent> */}
-		</Tabs.Root>
+				<TabsContent value="developer">
+					<Developer />
+				</TabsContent>
+			</Tabs.Root>
+		</TabValueContext>
 	);
 }
 
-export function Overview({
-	setTabValue,
+function ContentPanel({ children }: { children: ReactNode }) {
+	return <div className="grid gap-[24px] px-[24px] py-[24px]">{children}</div>;
+}
+function ContentPanelHeader({
+	children,
 }: {
-	setTabValue: (value: string) => void;
+	children: ReactNode;
 }) {
+	const { setTabValue } = useTabValue();
+	return (
+		<header className="flex justify-between">
+			<p
+				className="text-[22px] font-rosart text-black--30"
+				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+			>
+				{children}
+			</p>
+			<button type="button" onClick={() => setTabValue("")}>
+				<XIcon className="w-[16px] h-[16px] text-black-30" />
+			</button>
+		</header>
+	);
+}
+
+export function Overview() {
 	const [editTitle, setEditTitle] = useState(false);
 	const { agentName, updateAgentName } = useAgentName();
 	return (
-		<div className="grid gap-[24px] px-[24px] py-[24px]">
-			<header className="flex justify-between">
-				<p
-					className="text-[22px] font-rosart text-black--30"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
-				>
-					Overview
-				</p>
-				<button type="button" onClick={() => setTabValue("")}>
-					<XIcon className="w-[16px] h-[16px] text-black-30" />
-				</button>
-			</header>
+		<ContentPanel>
+			<ContentPanelHeader>Overview</ContentPanelHeader>
+
 			{editTitle ? (
 				<input
 					type="text"
@@ -111,10 +159,30 @@ export function Overview({
 					{agentName}
 				</button>
 			)}
-		</div>
+		</ContentPanel>
 	);
 }
 
 function GitHubIntegration() {
 	return <div>GitHub Integration</div>;
+}
+
+function Developer() {
+	const { graphUrl } = useGraph();
+	return (
+		<ContentPanel>
+			<ContentPanelHeader>Developer tools</ContentPanelHeader>
+			<div className="flex flex-col gap-[8px]">
+				<div>
+					<a
+						href={getDownloadUrl(graphUrl)}
+						className="text-black-30 hover:text-black--30 flex items-center gap-[6px]"
+					>
+						<DownloadIcon className="w-[16px] h-[16px]" />
+						Download the graph
+					</a>
+				</div>
+			</div>
+		</ContentPanel>
+	);
 }

@@ -15,6 +15,7 @@ import { MousePositionProvider } from "./contexts/mouse-position";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
+import { isLatestVersion, migrateGraph } from "./graph";
 import type { ArtifactId, Graph, NodeId } from "./types";
 import { buildGraphFolderPath } from "./utils";
 
@@ -44,7 +45,7 @@ export default async function Page({
 		throw new Error("Agent not found");
 	}
 	// TODO: Add schema validation to verify parsed graph matches expected shape
-	const graph = await fetch(agent.graphUrl).then(
+	let graph = await fetch(agent.graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
 
@@ -68,6 +69,12 @@ export default async function Page({
 			await del(oldBlobUrls);
 		}
 		return url;
+	}
+
+	let graphUrl = agent.graphUrl;
+	if (!isLatestVersion(graph)) {
+		graph = migrateGraph(graph);
+		graphUrl = await persistGraph(graph);
 	}
 
 	async function updateAgentName(agentName: string) {
@@ -95,7 +102,7 @@ export default async function Page({
 			<GraphContextProvider
 				defaultGraph={graph}
 				onPersistAction={persistGraph}
-				defaultGraphUrl={agent.graphUrl}
+				defaultGraphUrl={graphUrl}
 			>
 				<PropertiesPanelProvider>
 					<ReactFlowProvider>

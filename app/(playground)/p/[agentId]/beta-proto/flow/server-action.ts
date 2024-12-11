@@ -1,14 +1,14 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
-import { openai } from "@ai-sdk/openai";
+import { AgentActivity } from "@/services/agents/activities";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
-import { giselleNodeArchetypes } from "../giselle-node/blueprints";
 import type { GiselleNodeId } from "../giselle-node/types";
 import type { AgentId } from "../types";
 import { type V2FlowAction, setFlow, updateStep } from "./action";
+import { saveAgentActivity } from "./save-agent-activity";
 import {
 	buildTextArtifact,
 	generateArtifactObject,
@@ -29,6 +29,7 @@ export async function executeFlow(
 	agentId: AgentId,
 	finalNodeId: GiselleNodeId,
 ) {
+	const agentActivity = new AgentActivity(agentId, new Date());
 	const stream = createStreamableValue<V2FlowAction>();
 	(async () => {
 		const agent = await db.query.agents.findFirst({
@@ -61,6 +62,8 @@ export async function executeFlow(
 		for (const job of flow.jobs) {
 			await Promise.all(
 				job.steps.map(async (step) => {
+					const startTime = new Date();
+
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.running },
@@ -164,6 +167,9 @@ export async function executeFlow(
 							break;
 						}
 					}
+
+					agentActivity.collectAction(step.action, startTime, new Date());
+
 					stream.update(
 						updateStep({
 							input: { stepId: step.id, status: stepStatuses.completed },
@@ -172,7 +178,10 @@ export async function executeFlow(
 				}),
 			);
 		}
+
 		stream.done();
+		agentActivity.end();
+		await saveAgentActivity(agentActivity);
 	})();
 
 	return { streamableValue: stream.value };

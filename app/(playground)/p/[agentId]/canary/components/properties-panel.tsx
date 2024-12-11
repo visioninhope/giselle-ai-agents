@@ -11,6 +11,8 @@ import {
 	CheckIcon,
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
+	FileIcon,
+	FileXIcon,
 	FingerprintIcon,
 	Minimize2Icon,
 	TrashIcon,
@@ -18,18 +20,21 @@ import {
 } from "lucide-react";
 import {
 	type ComponentProps,
+	type DetailedHTMLProps,
 	type FC,
 	type HTMLAttributes,
 	type ReactNode,
 	useCallback,
+	useId,
 	useMemo,
 	useState,
 } from "react";
 import { DocumentIcon } from "../../beta-proto/components/icons/document";
 import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
+import { SpinnerIcon } from "../../beta-proto/components/icons/spinner";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
-import { action, parse } from "../actions";
+import { action, parse, remove } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
@@ -40,9 +45,13 @@ import {
 	useSelectedNode,
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
+import { useToast } from "../contexts/toast";
 import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
+	FileData,
+	FileId,
+	FilesContent,
 	Node,
 	NodeHandle,
 	NodeId,
@@ -59,9 +68,11 @@ import {
 	createNodeId,
 	formatTimestamp,
 	isFile,
+	isFiles,
 	isText,
 	isTextGeneration,
 	pathJoin,
+	toErrorWithMessage,
 } from "../utils";
 import { Block } from "./block";
 import ClipboardButton from "./clipboard-button";
@@ -86,6 +97,7 @@ import {
 	SelectValue,
 } from "./select";
 import { Slider } from "./slider";
+import { Tooltip } from "./tooltip";
 
 function PropertiesPanelContentBox({
 	children,
@@ -542,6 +554,24 @@ export function PropertiesPanel() {
 							/>
 						</TabsContent>
 					)}
+					{selectedNode && isFiles(selectedNode) && (
+						<TabsContentFiles
+							nodeId={selectedNode.id}
+							content={selectedNode.content}
+							onContentChange={(content) => {
+								dispatch({
+									type: "updateNode",
+									input: {
+										nodeId: selectedNode.id,
+										node: {
+											...selectedNode,
+											content,
+										},
+									},
+								});
+							}}
+						/>
+					)}
 					{selectedNode && (
 						<TabsContent value="Result">
 							<TabContentGenerateTextResult
@@ -633,7 +663,7 @@ function NodeDropdown({
 		(node) => node.content.type === "textGeneration",
 	);
 	const textNodes = nodes.filter((node) => node.content.type === "text");
-	const fileNodes = nodes.filter((node) => node.content.type === "file");
+	const fileNodes = nodes.filter((node) => node.content.type === "files");
 
 	const handleValueChange = (value: string) => {
 		if (!onValueChange) return;
@@ -724,6 +754,73 @@ function RevertToDefaultButton({ onClick }: { onClick: () => void }) {
 	);
 }
 
+interface SystemPromptTextareaProps
+	extends Pick<
+		DetailedHTMLProps<
+			React.TextareaHTMLAttributes<HTMLTextAreaElement>,
+			HTMLTextAreaElement
+		>,
+		"defaultValue" | "className"
+	> {
+	onValueChange?: (value: string) => void;
+	onRevertToDefault?: () => void;
+	revertValue?: string;
+}
+function SystemPromptTextarea({
+	defaultValue,
+	className,
+	onValueChange,
+	onRevertToDefault,
+	revertValue,
+}: SystemPromptTextareaProps) {
+	const id = useId();
+	return (
+		<div className={clsx("relative", className)}>
+			<textarea
+				className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
+				defaultValue={defaultValue}
+				ref={(ref) => {
+					if (ref === null) {
+						return;
+					}
+					ref.dataset.refId = id;
+
+					function handleBlur() {
+						if (ref === null) {
+							return;
+						}
+						if (defaultValue !== ref.value) {
+							onValueChange?.(ref.value);
+						}
+					}
+					ref.addEventListener("blur", handleBlur);
+					return () => {
+						ref.removeEventListener("blur", handleBlur);
+					};
+				}}
+			/>
+
+			<div className="absolute bottom-[4px] right-[4px]">
+				<RevertToDefaultButton
+					onClick={() => {
+						onRevertToDefault?.();
+						const textarea = document.querySelector(
+							`textarea[data-ref-id="${id}"]`,
+						);
+						if (
+							revertValue !== undefined &&
+							textarea !== null &&
+							textarea instanceof HTMLTextAreaElement
+						) {
+							textarea.value = revertValue;
+						}
+					}}
+				/>
+			</div>
+		</div>
+	);
+}
+
 function TabsContentPrompt({
 	content,
 	onContentChange,
@@ -750,7 +847,7 @@ function TabsContentPrompt({
 		(node) => node.content.type === "textGeneration",
 	);
 	const connectableFileNodes = nodes.filter(
-		(node) => node.content.type === "file",
+		(node) => node.content.type === "files",
 	);
 	const requirementNode = useNode({
 		targetNodeHandleId: content.requirement?.id,
@@ -799,6 +896,15 @@ function TabsContentPrompt({
 									<SelectLabel>Anthropic </SelectLabel>
 									<SelectItem value="anthropic:claude-3-5-sonnet-latest">
 										Claude 3.5 Sonnet
+									</SelectItem>
+								</SelectGroup>
+								<SelectGroup>
+									<SelectLabel>Google</SelectLabel>
+									<SelectItem value="google:gemini-1.5-flash">
+										Gemini 1.5 Flash
+									</SelectItem>
+									<SelectItem value="google:gemini-1.5-pro">
+										Gemini 1.5 Pro
 									</SelectItem>
 								</SelectGroup>
 								{developerMode && (
@@ -1006,44 +1112,23 @@ function TabsContentPrompt({
 						System prompts combine requirements and guide you through tasks.
 						Make changes or click "Revert to Default" anytime.
 					</p>
-					<div className="relative flex-1">
-						<textarea
-							className="w-full text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none h-full"
-							defaultValue={content.system ?? textGenerationPrompt}
-							ref={(ref) => {
-								if (ref === null) {
-									return;
-								}
-
-								function handleBlur() {
-									if (ref === null) {
-										return;
-									}
-									if (content.system !== ref.value) {
-										onContentChange?.({
-											...content,
-											system: ref.value,
-										});
-									}
-								}
-								ref.addEventListener("blur", handleBlur);
-								return () => {
-									ref.removeEventListener("blur", handleBlur);
-								};
-							}}
-						/>
-
-						<div className="absolute bottom-[4px] right-[4px]">
-							<RevertToDefaultButton
-								onClick={() => {
-									onContentChange?.({
-										...content,
-										system: undefined,
-									});
-								}}
-							/>
-						</div>
-					</div>
+					<SystemPromptTextarea
+						className="flex-1"
+						defaultValue={content.system ?? textGenerationPrompt}
+						revertValue={textGenerationPrompt}
+						onValueChange={(value) => {
+							onContentChange?.({
+								...content,
+								system: value,
+							});
+						}}
+						onRevertToDefault={() => {
+							onContentChange?.({
+								...content,
+								system: undefined,
+							});
+						}}
+					/>
 				</div>
 			</PropertiesPanelCollapsible>
 			<div className="border-t border-[hsla(222,21%,40%,1)]" />
@@ -1359,8 +1444,17 @@ function TabContentGenerateTextResult({
 					<DialogPrimitive.DialogTrigger>
 						<Block size="large">
 							<div className="flex items-center gap-[12px]">
-								<DocumentIcon className="w-[18px] h-[18px] fill-black-30 flex-shrink-0" />
-								<div className="text-[14px]">{artifact.object.title}</div>
+								<div className="px-[8px]">
+									{artifact.type === "generatedArtifact" ? (
+										<DocumentIcon className="w-[20px] h-[20px] fill-black-30 flex-shrink-0" />
+									) : (
+										<SpinnerIcon className="w-[20px] h-[20px] stroke-black-30 animate-follow-through-spin fill-transparent" />
+									)}
+								</div>
+								<div className="flex flex-col gap-[2px]">
+									<div className="text-[14px]">{artifact.object.title}</div>
+									<p className="text-black-70">Click to open</p>
+								</div>
 							</div>
 						</Block>
 					</DialogPrimitive.DialogTrigger>
@@ -1732,6 +1826,274 @@ function TabContentFile({
 					</PropertiesPanelContentBox>
 				</>
 			)}
+		</div>
+	);
+}
+
+function TabsContentFiles({
+	content,
+	onContentChange,
+}: {
+	nodeId: NodeId;
+	content: FilesContent;
+	onContentChange: (content: FilesContent) => void;
+}) {
+	const [isDragging, setIsDragging] = useState(false);
+
+	const { addToast } = useToast();
+
+	const setFiles = useCallback(
+		async (files: File[]) => {
+			let contentData = content.data;
+			await Promise.all(
+				files.map(async (file) => {
+					const fileData = new FileReader();
+					fileData.readAsArrayBuffer(file);
+					fileData.onload = async () => {
+						if (!fileData.result) {
+							return;
+						}
+						const fileId = createFileId();
+						contentData = [
+							...contentData,
+							{
+								id: fileId,
+								status: "uploading",
+								name: file.name,
+								contentType: file.type,
+								size: file.size,
+							},
+						];
+						try {
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+							const blob = await upload(
+								pathJoin(vercelBlobFileFolder, fileId, file.name),
+								file,
+								{
+									access: "public",
+									handleUploadUrl: "/api/files/upload",
+								},
+							);
+							const uploadedAt = Date.now();
+
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "processing",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+									uploadedAt,
+									fileBlobUrl: blob.url,
+								},
+							];
+
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+
+							const parseBlob = await parse(fileId, file.name, blob.url);
+
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "completed",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+									uploadedAt,
+									fileBlobUrl: blob.url,
+									processedAt: Date.now(),
+									textDataUrl: parseBlob.url,
+								},
+							];
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+						} catch (error) {
+							contentData = [
+								...contentData.filter((file) => file.id !== fileId),
+								{
+									id: fileId,
+									status: "failed",
+									name: file.name,
+									contentType: file.type,
+									size: file.size,
+								},
+							];
+							onContentChange?.({
+								...content,
+								data: contentData,
+							});
+
+							addToast({
+								type: "error",
+								message: toErrorWithMessage(error).message,
+							});
+						}
+					};
+				}),
+			);
+		},
+		[content, onContentChange, addToast],
+	);
+
+	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(true);
+	}, []);
+
+	const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+		e.preventDefault();
+		setIsDragging(false);
+	}, []);
+
+	const onDrop = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault();
+			setIsDragging(false);
+			setFiles(Array.from(e.dataTransfer.files));
+		},
+		[setFiles],
+	);
+
+	const onFileChange = useCallback(
+		(e: React.ChangeEvent<HTMLInputElement>) => {
+			if (!e.target.files) {
+				return;
+			}
+			setFiles(Array.from(e.target.files));
+		},
+		[setFiles],
+	);
+
+	const handleRemoveFile = useCallback(
+		async (fileToRemove: FileData) => {
+			onContentChange({
+				...content,
+				data: content.data.filter((file) => file.id !== fileToRemove.id),
+			});
+			await remove(fileToRemove);
+		},
+		[content, onContentChange],
+	);
+
+	return (
+		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
+			<div className="p-[16px] divide-y divide-black-50">
+				{content.data.length > 0 && (
+					<div className="pb-[16px] flex flex-col gap-[8px]">
+						{content.data.map((file) => (
+							<FileListItem
+								key={file.id}
+								fileData={file}
+								onRemove={handleRemoveFile}
+							/>
+						))}
+					</div>
+				)}
+				<div className="py-[16px]">
+					<div
+						className={clsx(
+							"h-[300px] flex flex-col gap-[16px] justify-center items-center rounded-[8px] border border-dashed text-black-70 px-[18px]",
+							isDragging ? "bg-black-80/20 border-black-50" : "border-black-70",
+						)}
+						onDragOver={onDragOver}
+						onDragLeave={onDragLeave}
+						onDrop={onDrop}
+					>
+						{isDragging ? (
+							<>
+								<DocumentIcon className="w-[30px] h-[30px] fill-black-70" />
+								<p className="text-center">Drop to upload your files</p>
+							</>
+						) : (
+							<div className="flex flex-col gap-[16px] justify-center items-center">
+								<ArrowUpFromLineIcon size={38} className="stroke-black-70" />
+								<label
+									htmlFor="file"
+									className="text-center flex flex-col gap-[16px]"
+								>
+									<p>
+										Click to upload or drag and drop files here (supports
+										images, documents, and more).
+									</p>
+									<div className="flex gap-[8px] justify-center items-center">
+										<span>or</span>
+										<span className="font-bold text-black--50 text-[14px] underline cursor-pointer">
+											Select files
+											<input
+												id="file"
+												type="file"
+												onChange={onFileChange}
+												className="hidden"
+											/>
+										</span>
+									</div>
+								</label>
+							</div>
+						)}
+					</div>
+				</div>
+			</div>
+		</div>
+	);
+}
+
+function FileListItem({
+	fileData,
+	onRemove,
+}: {
+	fileData: FileData;
+	onRemove: (file: FileData) => void;
+}) {
+	return (
+		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
+			<div className="flex items-center overflow-x-hidden">
+				{fileData.status === "failed" ? (
+					<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+				) : (
+					<div className="relative">
+						<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+						<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
+							<p>
+								{fileData.contentType === "application/pdf"
+									? "pdf"
+									: fileData.contentType === "text/markdown"
+										? "md"
+										: ""}
+							</p>
+						</div>
+					</div>
+				)}
+				<div className="overflow-x-hidden">
+					<p className="truncate">{fileData.name}</p>
+					{fileData.status === "uploading" && <p>Uploading...</p>}
+					{fileData.status === "processing" && <p>Processing...</p>}
+					{fileData.status === "completed" && (
+						<p className="text-black-50">
+							{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
+						</p>
+					)}
+					{fileData.status === "failed" && <p>Failed</p>}
+				</div>
+			</div>
+			<Tooltip text="Remove">
+				<button
+					type="button"
+					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
+					onClick={() => onRemove(fileData)}
+				>
+					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
+				</button>
+			</Tooltip>
 		</div>
 	);
 }
