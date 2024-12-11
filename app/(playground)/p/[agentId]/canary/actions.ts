@@ -351,6 +351,7 @@ export async function action(
 						waitForTelemetryExport();
 						return result;
 					},
+					model,
 					startTime,
 				);
 				stream.done();

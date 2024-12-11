@@ -1,6 +1,7 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
+import type { LanguageModelV1 } from "ai";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
 import type { LogSchema, OtelLoggerWrapper } from "./types";
@@ -9,6 +10,41 @@ import {
 	type RequestCountSchema,
 	type TokenConsumedSchema,
 } from "./types";
+
+type ModelInfo = {
+	externalServiceName: ExternalServiceName;
+	modelId: string;
+};
+
+function getModelInfo(
+	logger: OtelLoggerWrapper,
+	model: LanguageModelV1,
+): ModelInfo {
+	const modelClassName = model.constructor.name;
+
+	switch (modelClassName) {
+		case "OpenAIChatLanguageModel":
+			return {
+				externalServiceName: ExternalServiceName.OpenAI,
+				modelId: model.modelId,
+			};
+		case "AnthropicMessagesLanguageModel":
+			return {
+				externalServiceName: ExternalServiceName.Anthropic,
+				modelId: model.modelId,
+			};
+		case "GoogleGenerativeAILanguageModel":
+			return {
+				externalServiceName: ExternalServiceName.Google,
+				modelId: model.modelId,
+			};
+		default:
+			logger.error(
+				new Error("'strategy' is required for Unstructured service"),
+				"missing required strategy parameter",
+			);
+	}
+}
 
 type MeasurementSchema<T> = (
 	result: T,
@@ -66,10 +102,6 @@ const APICallBasedService = {
 	VercelBlob: ExternalServiceName.VercelBlob,
 	Tavily: ExternalServiceName.Tavily,
 	Firecrawl: ExternalServiceName.Firecrawl,
-} as const;
-
-const TokenBasedService = {
-	OpenAI: ExternalServiceName.OpenAI,
 } as const;
 
 type VercelBlobOperationType = "put" | "fetch";
@@ -162,15 +194,18 @@ export function withCountMeasurement<T>(
 export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
+	model: LanguageModelV1,
 	measurementStartTime?: number,
 ): Promise<T> {
+	const { externalServiceName, modelId } = getModelInfo(logger, model);
 	const measurements: MeasurementSchema<T> = (
 		result,
 		duration,
 		measurementScope,
 		isR06User,
 	): TokenConsumedSchema => ({
-		externalServiceName: TokenBasedService.OpenAI,
+		externalServiceName,
+		modelId,
 		tokenConsumedInput: result.usage.promptTokens,
 		tokenConsumedOutput: result.usage.completionTokens,
 		duration,

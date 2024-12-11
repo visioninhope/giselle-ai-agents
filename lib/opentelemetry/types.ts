@@ -2,7 +2,9 @@ import { Strategy } from "unstructured-client/sdk/models/shared";
 import { z } from "zod";
 
 export const ExternalServiceName = {
+	Anthropic: "anthropic",
 	Firecrawl: "firecrawl",
+	Google: "google",
 	OpenAI: "openai",
 	Tavily: "tavily",
 	Unstructured: "unstructured",
@@ -18,8 +20,20 @@ const BaseMetricsSchema = z.object({
 	isR06User: z.boolean(), // Whether the requester has internal user
 });
 
+const TokenBasedService = {
+	Anthropic: ExternalServiceName.Anthropic,
+	Google: ExternalServiceName.Google,
+	OpenAI: ExternalServiceName.OpenAI,
+} as const;
+
+type TokenBasedServiceName =
+	(typeof TokenBasedService)[keyof typeof TokenBasedService];
+
 const TokenConsumedSchema = BaseMetricsSchema.extend({
-	externalServiceName: z.literal(ExternalServiceName.OpenAI),
+	externalServiceName: z.custom<TokenBasedServiceName>((val) =>
+		Object.values(TokenBasedService).includes(val as TokenBasedServiceName),
+	),
+	modelId: z.string(), // ID of the model used for text generation
 	tokenConsumedInput: z.number(), // Number of tokens used in the prompt/input sent to the model
 	tokenConsumedOutput: z.number(), // Number of tokens used in the response/output received from the model
 });
