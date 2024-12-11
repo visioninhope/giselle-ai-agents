@@ -3,20 +3,11 @@ import { and, eq, gte, lt, sql } from "drizzle-orm";
 import { getMonthlyBillingCycle } from "./utils";
 
 /**
- * Calculates the total agent time usage in minutes for a specific team during their current billing period.
- * The result is rounded up to 1 decimal places.
- *
- * @param teamDbId - The database ID of the team to calculate usage for
- * @returns Promise that resolves to the total agent time usage in minutes
- * @example
- * const timeUsage = await calculateAgentTimeUsage(123);
- * console.log(timeUsage); // 42.8
+ * Calculates the total agent time usage in milliseconds for a specific team during their current billing period.
  */
-export async function calculateAgentTimeUsage(teamDbId: number) {
+export async function calculateAgentTimeUsageMs(teamDbId: number) {
 	const { start, end } = await getCurrentBillingPeriod(teamDbId);
-	const timeUsageMs = await agentTimeUsageMs(teamDbId, start, end);
-
-	return Math.ceil((timeUsageMs / 1000 / 60) * 10) / 10;
+	return await agentTimeUsageMs(teamDbId, start, end);
 }
 
 /**
