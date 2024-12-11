@@ -1,8 +1,9 @@
 import { db, supabaseUserMappings, users } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { eq } from "drizzle-orm";
+import { cache } from "react";
 
-export async function fetchCurrentUser() {
+async function fetchCurrentUser() {
 	const supabaseUser = await getUser();
 	const user = await db
 		.select({ dbId: users.dbId })
@@ -17,3 +18,6 @@ export async function fetchCurrentUser() {
 	}
 	return user[0];
 }
+
+const cachedFetchCurrentUser = cache(fetchCurrentUser);
+export { cachedFetchCurrentUser as fetchCurrentUser };
