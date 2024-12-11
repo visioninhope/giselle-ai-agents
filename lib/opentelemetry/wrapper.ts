@@ -1,4 +1,5 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
+import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
@@ -148,4 +149,16 @@ export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	});
 
 	return withMeasurement(logger, operation, measurements, measurementStartTime);
+}
+
+export function waitForTelemetryExport() {
+	waitUntil(
+		new Promise((resolve) =>
+			setTimeout(
+				resolve,
+				Number.parseInt(process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000") +
+					Number.parseInt(process.env.WAITUNTIL_OFFSET_MILLIS ?? "0"),
+			),
+		),
+	);
 }
