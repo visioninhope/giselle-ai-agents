@@ -5,12 +5,18 @@ type TooltipProps = {
 	children: ReactNode;
 	text: ReactNode;
 	sideOffset?: number;
+	delayDuration?: number;
 };
 
-export function Tooltip({ children, text, sideOffset = 18 }: TooltipProps) {
+export function Tooltip({
+	children,
+	text,
+	sideOffset = 4,
+	delayDuration = 300,
+}: TooltipProps) {
 	return (
 		<TooltipPrimitive.Provider>
-			<TooltipPrimitive.Root>
+			<TooltipPrimitive.Root delayDuration={delayDuration}>
 				<TooltipPrimitive.Trigger asChild>{children}</TooltipPrimitive.Trigger>
 				<TooltipPrimitive.Portal>
 					<TooltipPrimitive.Content

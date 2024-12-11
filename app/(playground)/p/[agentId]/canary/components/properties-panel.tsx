@@ -34,7 +34,7 @@ import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { SpinnerIcon } from "../../beta-proto/components/icons/spinner";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
-import { action, parse } from "../actions";
+import { action, parse, remove } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
@@ -50,6 +50,7 @@ import { textGenerationPrompt } from "../prompts";
 import type {
 	FileContent,
 	FileData,
+	FileId,
 	FilesContent,
 	Node,
 	NodeHandle,
@@ -96,6 +97,7 @@ import {
 	SelectValue,
 } from "./select";
 import { Slider } from "./slider";
+import { Tooltip } from "./tooltip";
 
 function PropertiesPanelContentBox({
 	children,
@@ -1820,7 +1822,6 @@ function TabContentFile({
 }
 
 function TabsContentFiles({
-	nodeId,
 	content,
 	onContentChange,
 }: {
@@ -1964,13 +1965,28 @@ function TabsContentFiles({
 		[setFiles],
 	);
 
+	const handleRemoveFile = useCallback(
+		async (fileToRemove: FileData) => {
+			onContentChange({
+				...content,
+				data: content.data.filter((file) => file.id !== fileToRemove.id),
+			});
+			await remove(fileToRemove);
+		},
+		[content, onContentChange],
+	);
+
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
 			<div className="p-[16px] divide-y divide-black-50">
 				{content.data.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">
 						{content.data.map((file) => (
-							<FileListItem key={file.id} fileData={file} />
+							<FileListItem
+								key={file.id}
+								fileData={file}
+								onRemove={handleRemoveFile}
+							/>
 						))}
 					</div>
 				)}
@@ -2024,38 +2040,51 @@ function TabsContentFiles({
 
 function FileListItem({
 	fileData,
+	onRemove,
 }: {
 	fileData: FileData;
+	onRemove: (file: FileData) => void;
 }) {
 	return (
-		<div className="flex items-center overflow-x-hidden">
-			{fileData.status === "failed" ? (
-				<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
-			) : (
-				<div className="relative">
-					<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
-					<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
-						<p>
-							{fileData.contentType === "application/pdf"
-								? "pdf"
-								: fileData.contentType === "text/markdown"
-									? "md"
-									: ""}
-						</p>
+		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
+			<div className="flex items-center overflow-x-hidden">
+				{fileData.status === "failed" ? (
+					<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+				) : (
+					<div className="relative">
+						<FileIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
+						<div className="uppercase absolute bottom-[8px] w-[46px] py-[2px] text-[10px] flex justify-center">
+							<p>
+								{fileData.contentType === "application/pdf"
+									? "pdf"
+									: fileData.contentType === "text/markdown"
+										? "md"
+										: ""}
+							</p>
+						</div>
 					</div>
-				</div>
-			)}
-			<div className="overflow-x-hidden">
-				<p className="truncate">{fileData.name}</p>
-				{fileData.status === "uploading" && <p>Uploading...</p>}
-				{fileData.status === "processing" && <p>Processing...</p>}
-				{fileData.status === "completed" && (
-					<p className="text-black-50">
-						{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
-					</p>
 				)}
-				{fileData.status === "failed" && <p>Failed</p>}
+				<div className="overflow-x-hidden">
+					<p className="truncate">{fileData.name}</p>
+					{fileData.status === "uploading" && <p>Uploading...</p>}
+					{fileData.status === "processing" && <p>Processing...</p>}
+					{fileData.status === "completed" && (
+						<p className="text-black-50">
+							{formatTimestamp.toRelativeTime(fileData.uploadedAt)}
+						</p>
+					)}
+					{fileData.status === "failed" && <p>Failed</p>}
+				</div>
 			</div>
+			<Tooltip text="Remove">
+				<button
+					type="button"
+					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
+					onClick={() => onRemove(fileData)}
+				>
+					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
+				</button>
+			</Tooltip>
 		</div>
 	);
 }
