@@ -69,6 +69,33 @@ describe("getMonthlyBillingCycle", () => {
 		expect(start.getTime()).toBe(new Date("2024-01-31T15:00:00Z").getTime());
 		expect(end.getTime()).toBe(new Date("2024-02-29T15:00:00Z").getTime());
 	});
+
+	test("handle different timezone input (e.g., PST)", () => {
+		const referenceDate = new Date("2024-01-15T15:00:00Z");
+		const currentDate = new Date("2024-01-15T07:00:00-08:00"); // PST
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-01-15T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-02-15T15:00:00Z").getTime());
+	});
+
+	test("handle daylight saving time transition", () => {
+		const referenceDate = new Date("2024-03-10T15:00:00Z");
+		const currentDate = new Date("2024-03-10T07:00:00-07:00"); // PDT
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-02-10T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-03-10T15:00:00Z").getTime());
+	});
+
+	test("handle month end cases", () => {
+		const referenceDate = new Date("2024-01-31T15:00:00Z");
+		const currentDate = new Date("2024-04-15T15:00:00Z");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+		expect(start.getTime()).toBe(new Date("2024-03-31T15:00:00Z").getTime());
+		expect(end.getTime()).toBe(new Date("2024-04-30T15:00:00Z").getTime());
+	});
 });
 
 describe("getMonthlyBillingCycle environment independence", () => {
@@ -98,4 +125,21 @@ describe("getMonthlyBillingCycle environment independence", () => {
 			expect(end.toISOString()).toBe("2024-02-15T15:00:00.000Z");
 		});
 	}
+
+	test("should handle DST transitions in America/Los_Angeles after DST has started", () => {
+		process.env.TZ = "America/Los_Angeles";
+
+		// referenceDate: 2024-02-15T15:00:00Z (before DST starts)
+		const referenceDate = new Date("2024-02-15T15:00:00Z");
+
+		// currentDate: 2024-03-15T08:00:00-07:00
+		// On March 15, 2024, LA is under DST (PDT, UTC-7).
+		// 08:00 PDT corresponds to 15:00 UTC, making it exactly one month apart from referenceDate.
+		const currentDate = new Date("2024-03-15T08:00:00-07:00");
+
+		const { start, end } = getMonthlyBillingCycle(referenceDate, currentDate);
+
+		expect(start.toISOString()).toBe("2024-03-15T15:00:00.000Z");
+		expect(end.toISOString()).toBe("2024-04-15T15:00:00.000Z");
+	});
 });
