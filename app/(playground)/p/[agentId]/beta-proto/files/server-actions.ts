@@ -17,15 +17,31 @@ type UploadFileInput = {
 	file: File;
 };
 export async function uploadFile({ input }: { input: UploadFileInput }) {
-	const blob = await put(
-		`files/${input.fileId}/${input.file.name}`,
-		input.file,
-		{
-			access: "public",
-			contentType: input.file.type,
+	const startTime = performance.now();
+	const logger = createLogger("files");
+	const result = await withCountMeasurement(
+		logger,
+		async () => {
+			const result = await put(
+				`files/${input.fileId}/${input.file.name}`,
+				input.file,
+				{
+					access: "public",
+					contentType: input.file.type,
+				},
+			);
+			return {
+				blob: result,
+				size: input.file.size,
+			};
 		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		"put",
 	);
-	return blob;
+	waitForTelemetryExport();
+
+	return result.blob;
 }
 
 type ParseFileInput = {
@@ -44,8 +60,22 @@ export async function parseFile(args: ParseFileInput) {
 			apiKeyAuth: process.env.UNSTRUCTURED_API_KEY,
 		},
 	});
-	const response = await fetch(args.blobUrl);
-	const content = await response.blob();
+	const response = await withCountMeasurement(
+		logger,
+		async () => {
+			const response = await fetch(args.blobUrl);
+			const blob = await response.blob();
+			return {
+				blob,
+				size: blob.size,
+			};
+		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		"fetch",
+	);
+
+	const content = await response.blob;
 	const strategy = Strategy.Fast;
 	const partitionResponse = await withCountMeasurement(
 		logger,
@@ -70,15 +100,20 @@ export async function parseFile(args: ParseFileInput) {
 		throw new Error(`Failed to parse file: ${partitionResponse.statusCode}`);
 	}
 
-	waitForTelemetryExport();
-
 	const jsonString = JSON.stringify(partitionResponse.elements, null, 2);
 	const blob = new Blob([jsonString], { type: "application/json" });
 
-	await put(`files/${args.id}/partition.json`, blob, {
-		access: "public",
-		contentType: blob.type,
-	});
+	await withCountMeasurement(
+		logger,
+		() =>
+			put(`files/${args.id}/partition.json`, blob, {
+				access: "public",
+				contentType: blob.type,
+			}),
+		ExternalServiceName.VercelBlob,
+		startTime,
+		"put",
+	);
 
 	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
 	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
@@ -86,6 +121,8 @@ export async function parseFile(args: ParseFileInput) {
 		access: "public",
 		contentType: markdownBlob.type,
 	});
+
+	waitForTelemetryExport();
 
 	return vercelBlob;
 }

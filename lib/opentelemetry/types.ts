@@ -6,6 +6,7 @@ export const ExternalServiceName = {
 	OpenAI: "openai",
 	Tavily: "tavily",
 	Unstructured: "unstructured",
+	VercelBlob: "vercel_blob",
 } as const;
 
 export type ExternalServiceName = // Name of the service to which agent requests
@@ -39,9 +40,27 @@ const UnstructuredRequestCountSchema = RequestCount.extend({
 	strategy: z.nativeEnum(Strategy),
 });
 
+const VercelBlobPutSchema = RequestCount.extend({
+	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
+	operationType: z.literal("put"),
+	blobSizeStored: z.number(),
+});
+
+const VercelBlobFetchSchema = RequestCount.extend({
+	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
+	operationType: z.literal("fetch"),
+	blobSizeTransfered: z.number(),
+});
+
+const VercelBlobRequestCountSchema = z.discriminatedUnion("operationType", [
+	VercelBlobPutSchema,
+	VercelBlobFetchSchema,
+]);
+
 const RequestCountSchema = z.union([
 	BasicRequestCountSchema,
 	UnstructuredRequestCountSchema,
+	VercelBlobRequestCountSchema,
 ]);
 
 export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
