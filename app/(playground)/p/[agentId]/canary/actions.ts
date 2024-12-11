@@ -1,5 +1,6 @@
 "use server";
 
+import { db } from "@/drizzle";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -16,6 +17,7 @@ import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
+	AgentId,
 	ArtifactId,
 	FileData,
 	FileId,
@@ -106,7 +108,7 @@ type ActionSource = TextSource | TextGenerationSource | FileSource;
 
 export async function action(
 	artifactId: ArtifactId,
-	graphUrl: string,
+	agentId: AgentId,
 	nodeId: NodeId,
 ) {
 	const lf = new Langfuse();
@@ -114,7 +116,14 @@ export async function action(
 		sessionId: artifactId,
 	});
 
-	const graph = await fetch(graphUrl).then(
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.id, agentId),
+	});
+	if (agent === undefined || agent.graphUrl === null) {
+		throw new Error(`Agent with id ${agentId} not found`);
+	}
+
+	const graph = await fetch(agent.graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
 	const node = graph.nodes.find((node) => node.id === nodeId);
