@@ -1,8 +1,13 @@
 "use server";
 
-import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { createLogger, withMeasurement } from "@/lib/opentelemetry";
+import {
+	ExternalServiceName,
+	createLogger,
+	withCountMeasurement,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
+import { fetchCurrentUser } from "@/services/accounts/fetch-current-user";
 import { openai } from "@ai-sdk/openai";
 import FirecrawlApp from "@mendable/firecrawl-js";
 import { createId } from "@paralleldrive/cuid2";
@@ -37,8 +42,10 @@ export async function generateWebSearchStream(
 ) {
 	const startTime = performance.now();
 	const lf = new Langfuse();
+	const currentUser = await fetchCurrentUser();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
+		userId: currentUser.dbId.toString(),
 	});
 
 	const logger = createLogger("web-search");
@@ -82,23 +89,25 @@ ${sourcesToText(sources)}
 			prompt: inputs.userPrompt,
 			schema: webSearchSchema,
 			onFinish: async (result) => {
-				const duration = performance.now() - startTime;
-				const measurementScope = await getCurrentMeasurementScope();
-				const isR06User = await isRoute06User();
-				generation.end({
-					output: result,
-				});
-
-				logger.info(
-					{
-						externalServiceName: "openai",
-						tokenConsumedInput: result.usage.promptTokens,
-						tokenConsumedOutput: result.usage.completionTokens,
-						duration,
-						measurementScope,
-						isR06User,
+				await withTokenMeasurement(
+					logger,
+					async () => {
+						generation.end({ output: result });
+						await lf.shutdownAsync();
+						waitUntil(
+							new Promise((resolve) =>
+								setTimeout(
+									resolve,
+									Number.parseInt(
+										process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+									) +
+										Number.parseInt(process.env.WAITUNTIL_OFFSET_MILLIS ?? "0"),
+								),
+							),
+						); // wait until telemetry sent
+						return result;
 					},
-					"[openai] search keywords generated",
+					startTime,
 				);
 			},
 		});
@@ -117,10 +126,10 @@ ${sourcesToText(sources)}
 
 		const searchResults = await Promise.all(
 			result.keywords.map((keyword) =>
-				withMeasurement<WebSearchResult[]>(
+				withCountMeasurement<WebSearchResult[]>(
 					logger,
 					() => search(keyword),
-					"tavily",
+					ExternalServiceName.Tavily,
 				),
 			),
 		)
@@ -189,14 +198,15 @@ ${sourcesToText(sources)}
 			chunkedArray.map(async (webSearchItems) => {
 				for (const webSearchItem of webSearchItems) {
 					try {
-						const scrapeResponse = await withMeasurement<FirecrawlResponse>(
-							logger,
-							() =>
-								app.scrapeUrl(webSearchItem.url, {
-									formats: ["markdown"],
-								}),
-							"firecrawl",
-						);
+						const scrapeResponse =
+							await withCountMeasurement<FirecrawlResponse>(
+								logger,
+								() =>
+									app.scrapeUrl(webSearchItem.url, {
+										formats: ["markdown"],
+									}),
+								ExternalServiceName.Firecrawl,
+							);
 
 						if (scrapeResponse.success) {
 							const blob = await put(

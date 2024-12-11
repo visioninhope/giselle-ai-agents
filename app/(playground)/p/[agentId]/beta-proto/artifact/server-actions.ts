@@ -3,9 +3,9 @@
 import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
-import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { langfuseModel } from "@/lib/llm";
-import { createLogger } from "@/lib/opentelemetry";
+import { createLogger, withTokenMeasurement } from "@/lib/opentelemetry";
+import { fetchCurrentUser } from "@/services/accounts/fetch-current-user";
 import { waitUntil } from "@vercel/functions";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
@@ -26,8 +26,10 @@ export async function generateArtifactStream(
 ) {
 	const startTime = performance.now();
 	const lf = new Langfuse();
+	const currentUser = await fetchCurrentUser();
 	const trace = lf.trace({
 		id: `giselle-${Date.now()}`,
+		userId: currentUser.dbId.toString(),
 	});
 	const logger = createLogger("generate-artifact");
 	const sources = await sourceIndexesToSources({
@@ -71,36 +73,28 @@ ${sourcesToText(sources)}
 				prompt: params.userPrompt,
 				schema: artifactSchema,
 				onFinish: async (result) => {
-					const duration = performance.now() - startTime;
-					const measurementScope = await getCurrentMeasurementScope();
-					const isR06User = await isRoute06User();
-					generation.end({
-						output: result,
-					});
-
-					logger.info(
-						{
-							externalServiceName: "openai",
-							tokenConsumedInput: result.usage.promptTokens,
-							tokenConsumedOutput: result.usage.completionTokens,
-							duration,
-							measurementScope,
-							isR06User,
-						},
-						"response obtained",
-					);
-
-					await lf.shutdownAsync();
-					waitUntil(
-						new Promise((resolve) =>
-							setTimeout(
-								resolve,
-								Number.parseInt(
-									process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+					await withTokenMeasurement(
+						logger,
+						async () => {
+							generation.end({ output: result });
+							await lf.shutdownAsync();
+							waitUntil(
+								new Promise((resolve) =>
+									setTimeout(
+										resolve,
+										Number.parseInt(
+											process.env.OTEL_EXPORT_INTERVAL_MILLIS ?? "1000",
+										) +
+											Number.parseInt(
+												process.env.WAITUNTIL_OFFSET_MILLIS ?? "0",
+											),
+									),
 								),
-							),
-						),
-					); // wait until telemetry sent
+							); // wait until telemetry sent
+							return result;
+						},
+						startTime,
+					);
 				},
 			});
 
