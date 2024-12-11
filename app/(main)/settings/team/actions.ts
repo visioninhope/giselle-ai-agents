@@ -11,7 +11,7 @@ import {
 } from "@/drizzle";
 import { getUser } from "@/lib/supabase";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import { and, asc, count, eq } from "drizzle-orm";
+import { and, asc, count, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 function isUserId(value: string): value is UserId {
@@ -234,9 +234,9 @@ export async function updateTeamMemberRole(formData: FormData) {
 			throw new Error("User not found");
 		}
 
-		// 4. If changing from admin to member, check if this is the last admin
-		if (role === "member") {
-			const adminCount = await db
+		// 4. Check if there is at least one other admin in the team
+		if (role === "member" && isUpdatingSelf) {
+			const otherAdminsCount = await db
 				.select({
 					count: count(),
 				})
@@ -245,22 +245,11 @@ export async function updateTeamMemberRole(formData: FormData) {
 					and(
 						eq(teamMemberships.teamDbId, currentTeam.dbId),
 						eq(teamMemberships.role, "admin"),
+						ne(teamMemberships.userDbId, user[0].dbId), // Exclude self
 					),
 				);
 
-			// Check if the user being updated is currently an admin
-			const targetUserRole = await db
-				.select({ role: teamMemberships.role })
-				.from(teamMemberships)
-				.where(
-					and(
-						eq(teamMemberships.teamDbId, currentTeam.dbId),
-						eq(teamMemberships.userDbId, user[0].dbId),
-					),
-				)
-				.limit(1);
-
-			if (targetUserRole[0].role === "admin" && adminCount[0].count === 1) {
+			if (otherAdminsCount[0].count === 0) {
 				throw new Error("Cannot remove the last admin from the team");
 			}
 		}
