@@ -4,7 +4,6 @@ import { del, list } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import type { AgentId } from "../beta-proto/types";
 import { action, putGraph } from "./actions";
 import { Editor } from "./components/editor";
 import { AgentNameProvider } from "./contexts/agent-name";
@@ -16,7 +15,7 @@ import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import { isLatestVersion, migrateGraph } from "./graph";
-import type { ArtifactId, Graph, NodeId } from "./types";
+import type { AgentId, ArtifactId, Graph, NodeId } from "./types";
 import { buildGraphFolderPath } from "./utils";
 
 // Extend the max duration of the server actions from this page to 5 minutes
@@ -94,7 +93,7 @@ export default async function Page({
 		nodeId: NodeId,
 	) {
 		"use server";
-		return await action(artifactId, graphUrl, nodeId);
+		return await action(artifactId, agentId, nodeId);
 	}
 
 	return (

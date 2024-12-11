@@ -212,3 +212,5 @@ export interface SubGraph {
 	nodes: Set<NodeId>;
 	connections: Set<ConnectionId>;
 }
+
+export type AgentId = `agnt_${string}`;
