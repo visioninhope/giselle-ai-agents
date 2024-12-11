@@ -898,6 +898,15 @@ function TabsContentPrompt({
 										Claude 3.5 Sonnet
 									</SelectItem>
 								</SelectGroup>
+								<SelectGroup>
+									<SelectLabel>Google</SelectLabel>
+									<SelectItem value="google:gemini-1.5-flash">
+										Gemini 1.5 Flash
+									</SelectItem>
+									<SelectItem value="google:gemini-1.5-pro">
+										Gemini 1.5 Pro
+									</SelectItem>
+								</SelectGroup>
 								{developerMode && (
 									<SelectGroup>
 										<SelectLabel>Development</SelectLabel>

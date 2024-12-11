@@ -1,6 +1,7 @@
 "use server";
 
 import { anthropic } from "@ai-sdk/anthropic";
+import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
 import { del, list, put } from "@vercel/blob";
@@ -43,6 +44,9 @@ function resolveLanguageModel(
 	}
 	if (provider === "anthropic") {
 		return anthropic(model);
+	}
+	if (provider === "google") {
+		return google(model);
 	}
 	if (provider === "dev") {
 		return new MockLanguageModelV1({
