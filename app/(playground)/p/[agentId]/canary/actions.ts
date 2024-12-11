@@ -15,6 +15,13 @@ import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
+
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
+
 import type {
 	ArtifactId,
 	FileData,
@@ -80,6 +87,14 @@ const artifactSchema = v.object({
 			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better.",
 		),
 	),
+	usage: v.pipe(
+		v.object({
+			promptTokens: v.number(),
+			completionTokens: v.number(),
+			totalTokens: v.number(),
+		}),
+		v.description("Return from 'generateObject()' from @vercel/ai"),
+	),
 });
 
 interface ActionSourceBase {
@@ -109,6 +124,7 @@ export async function action(
 	graphUrl: string,
 	nodeId: NodeId,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: artifactId,
@@ -121,6 +137,7 @@ export async function action(
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
+	const logger = createLogger(node.content.type);
 
 	/**
 	 * This function is a helper that retrieves a node from the graph
@@ -321,10 +338,21 @@ export async function action(
 							plan: partialObject.plan ?? "",
 							description: partialObject.description ?? "",
 						},
+						usage: partialObject.usage,
 					});
 				}
 				const result = await object;
-				generationTracer.end({ output: result });
+
+				await withTokenMeasurement(
+					logger,
+					async () => {
+						generationTracer.end({ output: result });
+						await lf.shutdownAsync();
+						waitForTelemetryExport();
+						return result;
+					},
+					startTime,
+				);
 				stream.done();
 			})().catch((error) => {
 				stream.error(error);
