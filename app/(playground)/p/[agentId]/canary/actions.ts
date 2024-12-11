@@ -3,7 +3,7 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { put } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
@@ -16,6 +16,7 @@ import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 import { textGenerationPrompt } from "./prompts";
 import type {
 	ArtifactId,
+	FileData,
 	FileId,
 	Graph,
 	GraphId,
@@ -383,4 +384,14 @@ export async function putGraph(graph: Graph) {
 	return await put(buildGraphPath(graph.id), JSON.stringify(graph), {
 		access: "public",
 	});
+}
+
+export async function remove(fileData: FileData) {
+	const blobList = await list({
+		prefix: pathJoin(vercelBlobFileFolder, fileData.id),
+	});
+
+	if (blobList.blobs.length > 0) {
+		await del(blobList.blobs.map((blob) => blob.url));
+	}
 }

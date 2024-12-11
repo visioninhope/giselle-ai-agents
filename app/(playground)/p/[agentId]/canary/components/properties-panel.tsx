@@ -34,7 +34,7 @@ import { PanelCloseIcon } from "../../beta-proto/components/icons/panel-close";
 import { PanelOpenIcon } from "../../beta-proto/components/icons/panel-open";
 import { SpinnerIcon } from "../../beta-proto/components/icons/spinner";
 import { WilliIcon } from "../../beta-proto/components/icons/willi";
-import { action, parse } from "../actions";
+import { action, parse, remove } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
@@ -1822,7 +1822,6 @@ function TabContentFile({
 }
 
 function TabsContentFiles({
-	nodeId,
 	content,
 	onContentChange,
 }: {
@@ -1966,12 +1965,13 @@ function TabsContentFiles({
 		[setFiles],
 	);
 
-	const removeFile = useCallback(
-		(id: FileId) => {
+	const handleRemoveFile = useCallback(
+		async (fileToRemove: FileData) => {
 			onContentChange({
 				...content,
-				data: content.data.filter((file) => file.id !== id),
+				data: content.data.filter((file) => file.id !== fileToRemove.id),
 			});
+			await remove(fileToRemove);
 		},
 		[content, onContentChange],
 	);
@@ -1985,7 +1985,7 @@ function TabsContentFiles({
 							<FileListItem
 								key={file.id}
 								fileData={file}
-								onRemove={(fileId) => removeFile(fileId)}
+								onRemove={handleRemoveFile}
 							/>
 						))}
 					</div>
@@ -2043,7 +2043,7 @@ function FileListItem({
 	onRemove,
 }: {
 	fileData: FileData;
-	onRemove: (id: FileId) => void;
+	onRemove: (file: FileData) => void;
 }) {
 	return (
 		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
@@ -2080,7 +2080,7 @@ function FileListItem({
 				<button
 					type="button"
 					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
-					onClick={() => onRemove(fileData.id)}
+					onClick={() => onRemove(fileData)}
 				>
 					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
 				</button>
