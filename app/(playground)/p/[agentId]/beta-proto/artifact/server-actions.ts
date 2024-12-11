@@ -4,7 +4,11 @@ import { streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 
 import { langfuseModel } from "@/lib/llm";
-import {createLogger, waitForTelemetryExport, withTokenMeasurement} from "@/lib/opentelemetry";
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
 import { fetchCurrentUser } from "@/services/accounts/fetch-current-user";
 import { Langfuse } from "langfuse";
 import { schema as artifactSchema } from "../artifact/schema";
