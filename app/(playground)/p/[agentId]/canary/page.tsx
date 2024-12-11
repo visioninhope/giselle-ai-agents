@@ -87,11 +87,7 @@ export default async function Page({
 		return agentName;
 	}
 
-	async function execute(
-		artifactId: ArtifactId,
-		graphUrl: string,
-		nodeId: NodeId,
-	) {
+	async function execute(artifactId: ArtifactId, nodeId: NodeId) {
 		"use server";
 		return await action(artifactId, agentId, nodeId);
 	}

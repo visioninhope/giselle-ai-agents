@@ -20,7 +20,6 @@ interface ExecutionProviderProps {
 	children: ReactNode;
 	executeAction: (
 		artifactId: ArtifactId,
-		graphUrl: string,
 		nodeId: NodeId,
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 }
@@ -56,9 +55,9 @@ export function ExecutionProvider({
 				},
 			});
 			setTab("Result");
-			const latestGraphUrl = await flush();
+			await flush();
 			try {
-				const stream = await executeAction(artifactId, latestGraphUrl, nodeId);
+				const stream = await executeAction(artifactId, nodeId);
 
 				let textArtifactObject: TextArtifactObject = {
 					type: "text",
