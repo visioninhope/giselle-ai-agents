@@ -2047,7 +2047,7 @@ function FileListItem({
 }) {
 	return (
 		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
-			<div className="flex items-center">
+			<div className="flex items-center overflow-x-hidden">
 				{fileData.status === "failed" ? (
 					<FileXIcon className="w-[46px] h-[46px] stroke-current stroke-1" />
 				) : (
@@ -2079,7 +2079,7 @@ function FileListItem({
 			<Tooltip text="Remove">
 				<button
 					type="button"
-					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px]"
+					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
 					onClick={() => onRemove(fileData.id)}
 				>
 					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
