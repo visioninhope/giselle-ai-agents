@@ -1966,13 +1966,27 @@ function TabsContentFiles({
 		[setFiles],
 	);
 
+	const removeFile = useCallback(
+		(id: FileId) => {
+			onContentChange({
+				...content,
+				data: content.data.filter((file) => file.id !== id),
+			});
+		},
+		[content, onContentChange],
+	);
+
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
 			<div className="p-[16px] divide-y divide-black-50">
 				{content.data.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">
 						{content.data.map((file) => (
-							<FileListItem key={file.id} fileData={file} />
+							<FileListItem
+								key={file.id}
+								fileData={file}
+								onRemove={(fileId) => removeFile(fileId)}
+							/>
 						))}
 					</div>
 				)}
@@ -2026,8 +2040,10 @@ function TabsContentFiles({
 
 function FileListItem({
 	fileData,
+	onRemove,
 }: {
 	fileData: FileData;
+	onRemove: (id: FileId) => void;
 }) {
 	return (
 		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors px-[4px] py-[8px] rounded-[8px]">
@@ -2064,6 +2080,7 @@ function FileListItem({
 				<button
 					type="button"
 					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px]"
+					onClick={() => onRemove(fileData.id)}
 				>
 					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
 				</button>
