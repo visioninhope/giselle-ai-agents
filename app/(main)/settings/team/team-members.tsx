@@ -6,12 +6,11 @@ import { TeamMembersList } from "./team-members-list";
 
 export async function TeamMembers() {
 	const team = await fetchCurrentTeam();
-	const { data: teamRole } = await getCurrentUserRole();
+	const { success: hasMembers, data: members } = await getTeamMembers();
+	const { success: hasCurrentUserRole, data: currentUserRole } =
+		await getCurrentUserRole();
 
-	const result = await getTeamMembers();
-	const currentUserRoleResult = await getCurrentUserRole();
-
-	if (!result.success || !result.data) {
+	if (!hasMembers || !members) {
 		return (
 			<Card title="Team members">
 				<div className="text-sm text-destructive">
@@ -21,7 +20,7 @@ export async function TeamMembers() {
 		);
 	}
 
-	if (!currentUserRoleResult.success || !currentUserRoleResult.data) {
+	if (!hasCurrentUserRole || !currentUserRole) {
 		return (
 			<Card title="Team members">
 				<div className="text-sm text-destructive">
@@ -33,11 +32,8 @@ export async function TeamMembers() {
 
 	return (
 		<Card title="Team members">
-			{isProPlan(team) && teamRole === "admin" && <TeamMembersForm />}
-			<TeamMembersList
-				members={result.data}
-				currentUserRole={currentUserRoleResult.data}
-			/>
+			{isProPlan(team) && currentUserRole === "admin" && <TeamMembersForm />}
+			<TeamMembersList members={members} currentUserRole={currentUserRole} />
 		</Card>
 	);
 }
