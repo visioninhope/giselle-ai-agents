@@ -5,7 +5,6 @@ import {
 	AgentActivity,
 	hasEnoughAgentTimeCharge,
 } from "@/services/agents/activities";
-import { fetchCurrentTeam } from "@/services/teams";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
@@ -33,8 +32,7 @@ export async function executeFlow(
 	agentId: AgentId,
 	finalNodeId: GiselleNodeId,
 ) {
-	const currentTeam = await fetchCurrentTeam();
-	const canExecute = await hasEnoughAgentTimeCharge(currentTeam.dbId);
+	const canExecute = await hasEnoughAgentTimeCharge();
 	if (!canExecute) {
 		throw new Error(
 			"Your agent time has been depleted. Please upgrade your plan to continue using this feature.",
