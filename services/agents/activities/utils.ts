@@ -3,17 +3,17 @@ export function getMonthlyBillingCycle(
 	currentDate: Date,
 ): { start: Date; end: Date } {
 	// Get the base time and date from referenceDate
-	const refDay = referenceDate.getDate();
-	const refHours = referenceDate.getHours();
-	const refMinutes = referenceDate.getMinutes();
-	const refSeconds = referenceDate.getSeconds();
-	const refMilliseconds = referenceDate.getMilliseconds();
+	const refDay = referenceDate.getUTCDate();
+	const refHours = referenceDate.getUTCHours();
+	const refMinutes = referenceDate.getUTCMinutes();
+	const refSeconds = referenceDate.getUTCSeconds();
+	const refMilliseconds = referenceDate.getUTCMilliseconds();
 
 	// Calculate the billing date for the current month based on currentDate
 	// 1. Find the billing date for the current year and month
 	let candidateBilling = createBillingDate(
-		currentDate.getFullYear(),
-		currentDate.getMonth(),
+		currentDate.getUTCFullYear(),
+		currentDate.getUTCMonth(),
 		refDay,
 		refHours,
 		refMinutes,
@@ -24,11 +24,13 @@ export function getMonthlyBillingCycle(
 	// If candidateBilling is after currentDate, go back to the previous month's billing date
 	if (candidateBilling.getTime() > currentDate.getTime()) {
 		const prevMonthYear =
-			candidateBilling.getMonth() === 0
-				? candidateBilling.getFullYear() - 1
-				: candidateBilling.getFullYear();
+			candidateBilling.getUTCMonth() === 0
+				? candidateBilling.getUTCFullYear() - 1
+				: candidateBilling.getUTCFullYear();
 		const prevMonth =
-			candidateBilling.getMonth() === 0 ? 11 : candidateBilling.getMonth() - 1;
+			candidateBilling.getUTCMonth() === 0
+				? 11
+				: candidateBilling.getUTCMonth() - 1;
 		candidateBilling = createBillingDate(
 			prevMonthYear,
 			prevMonth,
@@ -44,10 +46,10 @@ export function getMonthlyBillingCycle(
 
 	// Calculate next billing date as one month later
 	const nextMonthYear =
-		cycleStart.getMonth() === 11
-			? cycleStart.getFullYear() + 1
-			: cycleStart.getFullYear();
-	const nextMonth = (cycleStart.getMonth() + 1) % 12;
+		cycleStart.getUTCMonth() === 11
+			? cycleStart.getUTCFullYear() + 1
+			: cycleStart.getUTCFullYear();
+	const nextMonth = (cycleStart.getUTCMonth() + 1) % 12;
 	const nextBilling = createBillingDate(
 		nextMonthYear,
 		nextMonth,
@@ -75,7 +77,9 @@ function createBillingDate(
 	ms: number,
 ): Date {
 	// Check the number of days in the month
-	const lastDay = new Date(year, month + 1, 0).getDate();
+	const lastDay = new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
 	const billingDay = Math.min(day, lastDay);
-	return new Date(year, month, billingDay, hours, minutes, seconds, ms);
+	return new Date(
+		Date.UTC(year, month, billingDay, hours, minutes, seconds, ms),
+	);
 }
