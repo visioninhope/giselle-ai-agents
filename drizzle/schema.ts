@@ -37,6 +37,7 @@ import {
 	index,
 	integer,
 	jsonb,
+	numeric,
 	pgTable,
 	serial,
 	text,
@@ -476,10 +477,40 @@ export const agentActivities = pgTable(
 			.references(() => agents.dbId, { onDelete: "cascade" }),
 		startedAt: timestamp("started_at").notNull(),
 		endedAt: timestamp("ended_at").notNull(),
-		totalDurationMs: integer("total_duration_ms").notNull(),
+		// This would be greater than int32 max, but will not be greater than int64 max.
+		// so, we can safely use number type.
+		totalDurationMs: numeric("total_duration_ms").$type<number>().notNull(),
+		usageReportDbId: integer("usage_report_db_id").references(
+			() => agentTimeUsageReports.dbId,
+		),
 	},
 	(table) => ({
 		agentDbIdIdx: index().on(table.agentDbId),
 		endedAtIdx: index().on(table.endedAt),
+	}),
+);
+
+export const agentTimeUsageReports = pgTable(
+	"agent_time_usage_reports",
+	{
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		periodStart: timestamp("period_start").notNull(),
+		periodEnd: timestamp("period_end").notNull(),
+		// This would be greater than int32 max, but will not be greater than int64 max.
+		// so, we can safely use number type.
+		accumulatedDurationMs: numeric("accumulated_duration_ms")
+			.$type<number>()
+			.notNull(),
+		minutesIncrement: integer("minutes_increment").notNull(),
+		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => ({
+		teamDbIdIdx: index().on(table.teamDbId),
+		periodIdx: index().on(table.periodStart, table.periodEnd),
+		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
 	}),
 );
