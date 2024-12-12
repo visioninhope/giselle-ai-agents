@@ -312,6 +312,7 @@ export function migrateGraph(graph: Graph): Graph {
 			...newGraph,
 			version: "20241212",
 			flows: deriveFlows(newGraph),
+			executionIndexes: [],
 		};
 	}
 

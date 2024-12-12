@@ -176,6 +176,7 @@ export function initGraph(): Graph {
 		artifacts: [],
 		version: "20241212" satisfies LatestGraphVersion,
 		flows: [],
+		executionIndexes: [],
 	};
 }
 
@@ -184,6 +185,18 @@ export function buildGraphFolderPath(graphId: GraphId) {
 }
 export function buildGraphPath(graphId: GraphId) {
 	return pathJoin(buildGraphFolderPath(graphId), "graph.json");
+}
+function buildGraphExecutionFolderPath(graphId: GraphId) {
+	return pathJoin(buildGraphFolderPath(graphId), "executions");
+}
+export function buildGraphExecutionPath(
+	graphId: GraphId,
+	executionId: ExecutionId,
+) {
+	return pathJoin(
+		buildGraphExecutionFolderPath(graphId),
+		`${executionId}.json`,
+	);
 }
 
 export function langfuseModel(llm: TextGenerateActionContent["llm"]) {

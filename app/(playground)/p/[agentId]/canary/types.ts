@@ -175,6 +175,7 @@ export interface Graph {
 	artifacts: Artifact[];
 	version: GraphVersion;
 	flows: Flow[];
+	executionIndexes: ExecutionIndex[];
 }
 
 interface ToolBase {
@@ -300,3 +301,9 @@ export type Execution =
 	| PendingExecution
 	| RunningExecution
 	| CompletedExecution;
+
+interface ExecutionIndex {
+	executionId: ExecutionId;
+	blobUrl: string;
+	completedAt: number;
+}

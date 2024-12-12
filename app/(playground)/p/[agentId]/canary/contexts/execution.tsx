@@ -270,12 +270,14 @@ interface ExecutionProviderProps {
 		nodeId: NodeId,
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
+	putExecutionAction: (execution: Execution) => Promise<void>;
 }
 
 export function ExecutionProvider({
 	children,
 	executeAction,
 	executeStepAction,
+	putExecutionAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -412,19 +414,20 @@ export function ExecutionProvider({
 				totalFlowDurationMs += jobDurationMs;
 			}
 
+			currentExecution = {
+				...currentExecution,
+				status: "completed",
+				runStartedAt: flowRunStartedAt,
+				durationMs: totalFlowDurationMs,
+				resultArtifact:
+					currentExecution.artifacts[currentExecution.artifacts.length - 1],
+			};
+
 			// Complete flow execution
-			setExecution((prev) => {
-				if (!prev || prev.status !== "running") return null;
-				return {
-					...prev,
-					status: "completed",
-					runStartedAt: flowRunStartedAt,
-					durationMs: totalFlowDurationMs,
-					resultArtifact: prev.artifacts[prev.artifacts.length - 1],
-				};
-			});
+			setExecution(currentExecution);
+			putExecutionAction(currentExecution);
 		},
-		[setPlaygroundMode, graph.flows, executeStepAction],
+		[setPlaygroundMode, graph.flows, executeStepAction, putExecutionAction],
 	);
 	return (
 		<ExecutionContext.Provider value={{ execution, execute, executeFlow }}>

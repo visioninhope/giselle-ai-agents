@@ -1,6 +1,6 @@
 import { agents, db } from "@/drizzle";
 import { developerFlag, playgroundV2Flag } from "@/flags";
-import { del, list } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -17,11 +17,12 @@ import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import { executeStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
-import { buildGraphFolderPath } from "./lib/utils";
+import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
 	AgentId,
 	Artifact,
 	ArtifactId,
+	Execution,
 	ExecutionId,
 	FlowId,
 	Graph,
@@ -112,6 +113,16 @@ export default async function Page({
 		"use server";
 		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
 	}
+	async function putExecutionAction(execution: Execution) {
+		"use server";
+		await put(
+			buildGraphExecutionPath(graph.id, execution.id),
+			JSON.stringify(execution),
+			{
+				access: "public",
+			},
+		);
+	}
 
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
@@ -133,6 +144,7 @@ export default async function Page({
 											<ExecutionProvider
 												executeAction={execute}
 												executeStepAction={executeStepAction}
+												putExecutionAction={putExecutionAction}
 											>
 												<Playground />
 											</ExecutionProvider>
