@@ -18,31 +18,39 @@ type ModelInfo = {
 	modelId: string;
 };
 
+interface ModelConfig extends LanguageModelV1 {
+	modelId: string;
+	config: {
+		provider: string;
+	};
+}
+
 function getModelInfo(
 	logger: OtelLoggerWrapper,
-	model: LanguageModelV1,
+	modelConfiguration: ModelConfig,
 ): ModelInfo {
-	const modelClassName = model.constructor.name;
+	const [provider, _subtype] = modelConfiguration.config.provider.split(".");
+	const modelId = modelConfiguration.modelId;
 
-	switch (modelClassName) {
-		case "OpenAIChatLanguageModel":
+	switch (provider) {
+		case "openai":
 			return {
 				externalServiceName: ExternalServiceName.OpenAI,
-				modelId: model.modelId,
+				modelId,
 			};
-		case "AnthropicMessagesLanguageModel":
+		case "anthropic":
 			return {
 				externalServiceName: ExternalServiceName.Anthropic,
-				modelId: model.modelId,
+				modelId,
 			};
-		case "GoogleGenerativeAILanguageModel":
+		case "google":
 			return {
 				externalServiceName: ExternalServiceName.Google,
-				modelId: model.modelId,
+				modelId,
 			};
 		default:
 			logger.error(
-				new Error(`unknown model class name '${modelClassName}' obtained`),
+				new Error(`unknown provider '${provider}' passed`),
 				"consider adding to 'ExternalServiceName'",
 			);
 			return {
@@ -203,7 +211,7 @@ export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	model: LanguageModelV1,
 	measurementStartTime?: number,
 ): Promise<T> {
-	const { externalServiceName, modelId } = getModelInfo(logger, model);
+	const { externalServiceName, modelId } = getModelInfo(logger, model as ModelConfig);
 	const measurements: MeasurementSchema<T> = (
 		result,
 		duration,
