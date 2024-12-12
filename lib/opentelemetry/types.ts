@@ -11,8 +11,14 @@ export const ExternalServiceName = {
 	VercelBlob: "vercel_blob",
 } as const;
 
-export type ExternalServiceName = // Name of the service to which agent requests
-	(typeof ExternalServiceName)[keyof typeof ExternalServiceName];
+export const UnimplementedServiceName = {
+	TODO: "todo", // for type safety
+};
+
+export type ExternalServiceName =
+	// Name of the service to which agent requests
+	| (typeof ExternalServiceName)[keyof typeof ExternalServiceName]
+	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
 
 const BaseMetricsSchema = z.object({
 	duration: z.number().min(0), // Time taken for text generation in milliseconds
@@ -26,13 +32,15 @@ const TokenBasedService = {
 	OpenAI: ExternalServiceName.OpenAI,
 } as const;
 
-type TokenBasedServiceName =
-	(typeof TokenBasedService)[keyof typeof TokenBasedService];
+export type TokenBasedServiceName =
+	| (typeof TokenBasedService)[keyof typeof TokenBasedService]
+	| (typeof UnimplementedServiceName)[keyof typeof UnimplementedServiceName];
 
 const TokenConsumedSchema = BaseMetricsSchema.extend({
-	externalServiceName: z.custom<TokenBasedServiceName>((val) =>
-		Object.values(TokenBasedService).includes(val as TokenBasedServiceName),
-	),
+	externalServiceName: z.union([
+		z.enum(Object.values(TokenBasedService) as [string, ...string[]]),
+		z.enum(Object.values(UnimplementedServiceName) as [string, ...string[]]),
+	]),
 	modelId: z.string(), // ID of the model used for text generation
 	tokenConsumedInput: z.number(), // Number of tokens used in the prompt/input sent to the model
 	tokenConsumedOutput: z.number(), // Number of tokens used in the response/output received from the model

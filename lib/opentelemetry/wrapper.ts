@@ -8,11 +8,13 @@ import type { LogSchema, OtelLoggerWrapper } from "./types";
 import {
 	ExternalServiceName,
 	type RequestCountSchema,
+	type TokenBasedServiceName,
 	type TokenConsumedSchema,
+	UnimplementedServiceName,
 } from "./types";
 
 type ModelInfo = {
-	externalServiceName: ExternalServiceName;
+	externalServiceName: TokenBasedServiceName;
 	modelId: string;
 };
 
@@ -43,6 +45,10 @@ function getModelInfo(
 				new Error(`unknown model class name '${modelClassName}' obtained`),
 				"consider adding to 'ExternalServiceName'",
 			);
+			return {
+				externalServiceName: UnimplementedServiceName.TODO,
+				modelId: "unknown",
+			};
 	}
 }
 

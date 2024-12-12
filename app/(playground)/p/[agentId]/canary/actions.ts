@@ -338,7 +338,15 @@ export async function action(
 							plan: partialObject.plan ?? "",
 							description: partialObject.description ?? "",
 						},
-						usage: partialObject.usage,
+						...(partialObject.usage?.promptTokens !== undefined &&
+						partialObject.usage?.completionTokens !== undefined
+							? {
+									usage: {
+										promptTokens: partialObject.usage.promptTokens,
+										completionTokens: partialObject.usage.completionTokens,
+									},
+								}
+							: {}),
 					});
 				}
 				const result = await object;
