@@ -1,7 +1,4 @@
-"use client";
-
 import type { TeamRole } from "@/drizzle";
-import { useState } from "react";
 import { TeamMemberListItem } from "./team-members-list-item";
 
 type TeamMembersListProps = {
@@ -18,8 +15,6 @@ export function TeamMembersList({
 	members,
 	currentUserRole,
 }: TeamMembersListProps) {
-	const currentUserRoleState = useState(currentUserRole);
-
 	return (
 		<div className="font-avenir rounded-[16px]">
 			<div className="grid grid-cols-[1fr_1fr_200px] gap-4 border-b border-zinc-800 bg-zinc-900/50 p-4 font-medium text-zinc-200">
@@ -35,7 +30,7 @@ export function TeamMembersList({
 						displayName={member.displayName}
 						email={member.email}
 						role={member.role}
-						currentUserRoleState={currentUserRoleState}
+						currentUserRole={currentUserRole}
 					/>
 				))}
 			</div>
