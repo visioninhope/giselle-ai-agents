@@ -476,7 +476,7 @@ export const agentActivities = pgTable(
 			.references(() => agents.dbId, { onDelete: "cascade" }),
 		startedAt: timestamp("started_at").notNull(),
 		endedAt: timestamp("ended_at").notNull(),
-		aggregatedExecutionTimeMs: integer("total_duration_ms").notNull(),
+		totalDurationMs: integer("total_duration_ms").notNull(),
 	},
 	(table) => ({
 		agentDbIdIdx: index().on(table.agentDbId),
