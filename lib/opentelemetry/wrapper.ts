@@ -40,8 +40,8 @@ function getModelInfo(
 			};
 		default:
 			logger.error(
-				new Error("'strategy' is required for Unstructured service"),
-				"missing required strategy parameter",
+				new Error(`unknown model class name '${modelClassName}' obtained`),
+				"consider adding to 'ExternalServiceName'",
 			);
 	}
 }
