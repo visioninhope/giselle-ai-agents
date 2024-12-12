@@ -31,12 +31,6 @@
     :why:
     :versions: []
     :when: 2024-09-18 06:33:58.436978000 Z
-- - :approve
-  - gitconfiglocal
-  - :who:
-    :why: The BSD license in package.json is wrong. See https://github.com/soldair/node-gitconfiglocal/pull/13
-    :versions: []
-    :when: 2024-09-18 06:35:16.597322000 Z
 - - :permit
   - BlueOak-1.0.0
   - :who:
