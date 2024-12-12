@@ -906,6 +906,9 @@ function TabsContentPrompt({
 									<SelectItem value="google:gemini-1.5-pro">
 										Gemini 1.5 Pro
 									</SelectItem>
+									<SelectItem value="google:gemini-2.0-flash-exp">
+										Gemini 2.0 Flash Exp
+									</SelectItem>
 								</SelectGroup>
 								{developerMode && (
 									<SelectGroup>
