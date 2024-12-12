@@ -211,7 +211,10 @@ export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	model: LanguageModelV1,
 	measurementStartTime?: number,
 ): Promise<T> {
-	const { externalServiceName, modelId } = getModelInfo(logger, model as ModelConfig);
+	const { externalServiceName, modelId } = getModelInfo(
+		logger,
+		model as ModelConfig,
+	);
 	const measurements: MeasurementSchema<T> = (
 		result,
 		duration,
