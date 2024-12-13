@@ -317,7 +317,7 @@ export async function action(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = streamObject({
+				const { partialObjectStream, object, usage } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
