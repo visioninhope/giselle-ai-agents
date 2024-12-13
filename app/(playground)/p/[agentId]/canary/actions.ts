@@ -55,7 +55,7 @@ function resolveLanguageModel(
 			defaultObjectGenerationMode: "json",
 			doStream: async () => ({
 				stream: simulateReadableStream({
-					values: [{ type: "error", error: "a" }],
+					chunks: [{ type: "error", error: "a" }],
 				}),
 				rawCall: { rawPrompt: null, rawSettings: {} },
 			}),
@@ -311,7 +311,7 @@ export async function action(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = await streamObject({
+				const { partialObjectStream, object } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
