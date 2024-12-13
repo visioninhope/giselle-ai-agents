@@ -95,15 +95,6 @@ type GraphAction =
 	| AddNodeAction
 	| RemoveNodeAction;
 
-export function upsertArtifact(
-	input: UpsertArtifactActionInput,
-): UpsertArtifactAction {
-	return {
-		type: "upsertArtifact",
-		input,
-	};
-}
-
 type GraphActionOrActions = GraphAction | GraphAction[];
 
 function applyActions(
