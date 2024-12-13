@@ -121,6 +121,7 @@ const graph: Graph = {
 	artifacts: [],
 	version: "2024-12-09",
 	flows: [],
+	executionIndexes: [],
 };
 
 describe("deriveFlows", () => {
