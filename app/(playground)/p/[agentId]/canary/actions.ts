@@ -88,14 +88,6 @@ const artifactSchema = v.object({
 			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better.",
 		),
 	),
-	usage: v.pipe(
-		v.object({
-			promptTokens: v.number(),
-			completionTokens: v.number(),
-			totalTokens: v.number(),
-		}),
-		v.description("Return from 'generateObject()' from @vercel/ai"),
-	),
 });
 
 interface ActionSourceBase {
@@ -145,8 +137,6 @@ export async function action(
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
-	const logger = createLogger(node.content.type);
-
 	/**
 	 * This function is a helper that retrieves a node from the graph
 	 * based on its NodeHandleId. It looks for a connection in the
@@ -327,7 +317,7 @@ export async function action(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = streamObject({
+				const { partialObjectStream, object, usage } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
@@ -346,26 +336,17 @@ export async function action(
 							plan: partialObject.plan ?? "",
 							description: partialObject.description ?? "",
 						},
-						...(partialObject.usage?.promptTokens !== undefined &&
-						partialObject.usage?.completionTokens !== undefined
-							? {
-									usage: {
-										promptTokens: partialObject.usage.promptTokens,
-										completionTokens: partialObject.usage.completionTokens,
-									},
-								}
-							: {}),
 					});
 				}
 				const result = await object;
 
 				await withTokenMeasurement(
-					logger,
+					createLogger(node.content.type),
 					async () => {
 						generationTracer.end({ output: result });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
-						return result;
+						return { usage: await usage };
 					},
 					model,
 					startTime,
