@@ -166,15 +166,21 @@ interface TextStreamArtifact extends StreamAtrifact {
 export type Artifact = TextArtifact | TextStreamArtifact;
 
 export type GraphId = `grph_${string}`;
-type GraphVersion = "2024-12-09" | "2024-12-10";
-export type LatestGraphVersion = "2024-12-10";
+type GraphVersion =
+	| "2024-12-09"
+	| "2024-12-10"
+	| "2024-12-11"
+	| "20241212"
+	| "20241213";
+export type LatestGraphVersion = "20241213";
 export interface Graph {
 	id: GraphId;
 	nodes: Node[];
 	connections: Connection[];
 	artifacts: Artifact[];
 	version: GraphVersion;
-	subGraphs: SubGraph[];
+	flows: Flow[];
+	executionIndexes: ExecutionIndex[];
 }
 
 interface ToolBase {
@@ -204,13 +210,105 @@ export type Tool =
 	| AddTextGenerationNodeTool
 	| MoveTool;
 
-export type SubGraphId = `sbgrph_${string}`;
+export type FlowId = `flw_${string}`;
 
-export interface SubGraph {
-	id: SubGraphId;
+export type StepId = `stp_${string}`;
+export interface Step {
+	id: StepId;
+	nodeId: NodeId;
+	variableNodeIds: NodeId[];
+}
+export type JobId = `jb_${string}`;
+export interface Job {
+	id: JobId;
+	steps: Step[];
+}
+export interface Flow {
+	id: FlowId;
 	name: string;
-	nodes: Set<NodeId>;
-	connections: Set<ConnectionId>;
+	jobs: Job[];
+	nodes: NodeId[];
+	connections: ConnectionId[];
 }
 
 export type AgentId = `agnt_${string}`;
+
+export type StepExecutionId = `stex_${string}`;
+interface StepExecutionBase {
+	id: StepExecutionId;
+	stepId: StepId;
+	nodeId: NodeId;
+	status: string;
+}
+interface PendingStepExecution extends StepExecutionBase {
+	status: "pending";
+}
+
+interface RunningStepExecution extends StepExecutionBase {
+	status: "running";
+	runStartedAt: number;
+}
+
+interface CompletedStepExecution extends StepExecutionBase {
+	status: "completed";
+	runStartedAt: number;
+	durationMs: number;
+}
+export type StepExecution =
+	| PendingStepExecution
+	| RunningStepExecution
+	| CompletedStepExecution;
+
+export type JobExecutionId = `jbex_${string}`;
+interface JobExecutionBase {
+	id: JobExecutionId;
+	jobId: JobId;
+	stepExecutions: StepExecution[];
+	status: string;
+}
+interface PendingJobExecution extends JobExecutionBase {
+	status: "pending";
+}
+interface RunningJobExecution extends JobExecutionBase {
+	status: "running";
+	runStartedAt: number;
+}
+interface CompletedJobExecution extends JobExecutionBase {
+	status: "completed";
+	runStartedAt: number;
+	durationMs: number;
+}
+export type JobExecution =
+	| PendingJobExecution
+	| RunningJobExecution
+	| CompletedJobExecution;
+export type ExecutionId = `exct_${string}`;
+interface ExecutionBase {
+	id: ExecutionId;
+	flowId?: FlowId;
+	jobExecutions: JobExecution[];
+	artifacts: Artifact[];
+}
+interface PendingExecution extends ExecutionBase {
+	status: "pending";
+}
+interface RunningExecution extends ExecutionBase {
+	status: "running";
+	runStartedAt: number;
+}
+interface CompletedExecution extends ExecutionBase {
+	status: "completed";
+	runStartedAt: number;
+	durationMs: number;
+	resultArtifact: Artifact;
+}
+export type Execution =
+	| PendingExecution
+	| RunningExecution
+	| CompletedExecution;
+
+export interface ExecutionIndex {
+	executionId: ExecutionId;
+	blobUrl: string;
+	completedAt: number;
+}

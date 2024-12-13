@@ -15,7 +15,14 @@ import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
-import { textGenerationPrompt } from "./prompts";
+import { textGenerationPrompt } from "./lib/prompts";
+import {
+	buildGraphPath,
+	elementsToMarkdown,
+	langfuseModel,
+	pathJoin,
+	toErrorWithMessage,
+} from "./lib/utils";
 import type {
 	AgentId,
 	ArtifactId,
@@ -29,13 +36,6 @@ import type {
 	TextArtifactObject,
 	TextGenerateActionContent,
 } from "./types";
-import {
-	buildGraphPath,
-	elementsToMarkdown,
-	langfuseModel,
-	pathJoin,
-	toErrorWithMessage,
-} from "./utils";
 
 function resolveLanguageModel(
 	llm: TextGenerateActionContent["llm"],

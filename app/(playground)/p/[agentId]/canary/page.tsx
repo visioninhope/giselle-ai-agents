@@ -1,22 +1,34 @@
 import { agents, db } from "@/drizzle";
 import { developerFlag, playgroundV2Flag } from "@/flags";
-import { del, list } from "@vercel/blob";
+import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { action, putGraph } from "./actions";
-import { Editor } from "./components/editor";
+import { Playground } from "./components/playground";
 import { AgentNameProvider } from "./contexts/agent-name";
 import { DeveloperModeProvider } from "./contexts/developer-mode";
 import { ExecutionProvider } from "./contexts/execution";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
+import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { isLatestVersion, migrateGraph } from "./graph";
-import type { AgentId, ArtifactId, Graph, NodeId } from "./types";
-import { buildGraphFolderPath } from "./utils";
+import { executeStep } from "./lib/execution";
+import { isLatestVersion, migrateGraph } from "./lib/graph";
+import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
+import type {
+	AgentId,
+	Artifact,
+	ArtifactId,
+	Execution,
+	ExecutionId,
+	FlowId,
+	Graph,
+	NodeId,
+	StepId,
+} from "./types";
 
 // Extend the max duration of the server actions from this page to 5 minutes
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -92,6 +104,27 @@ export default async function Page({
 		return await action(artifactId, agentId, nodeId);
 	}
 
+	async function executeStepAction(
+		flowId: FlowId,
+		executionId: ExecutionId,
+		stepId: StepId,
+		artifacts: Artifact[],
+	) {
+		"use server";
+		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
+	}
+	async function putExecutionAction(execution: Execution) {
+		"use server";
+		const result = await put(
+			buildGraphExecutionPath(graph.id, execution.id),
+			JSON.stringify(execution),
+			{
+				access: "public",
+			},
+		);
+		return { blobUrl: result.url };
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -108,9 +141,15 @@ export default async function Page({
 										defaultValue={agent.name ?? "Unnamed Agent"}
 										updateAgentNameAction={updateAgentName}
 									>
-										<ExecutionProvider executeAction={execute}>
-											<Editor />
-										</ExecutionProvider>
+										<PlaygroundModeProvider>
+											<ExecutionProvider
+												executeAction={execute}
+												executeStepAction={executeStepAction}
+												putExecutionAction={putExecutionAction}
+											>
+												<Playground />
+											</ExecutionProvider>
+										</PlaygroundModeProvider>
 									</AgentNameProvider>
 								</ToastProvider>
 							</MousePositionProvider>
