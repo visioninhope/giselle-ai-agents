@@ -1,5 +1,5 @@
 import { createId } from "@paralleldrive/cuid2";
-import { vercelBlobGraphFolder } from "../constants";
+import { vercelBlobFileFolder, vercelBlobGraphFolder } from "../constants";
 import type {
 	ArtifactId,
 	ConnectionId,
@@ -180,6 +180,9 @@ export function initGraph(): Graph {
 	};
 }
 
+export function buildFileFolderPath(fileId: FileId) {
+	return pathJoin(vercelBlobFileFolder, fileId);
+}
 export function buildGraphFolderPath(graphId: GraphId) {
 	return pathJoin(vercelBlobGraphFolder, graphId);
 }
