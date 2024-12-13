@@ -88,14 +88,6 @@ const artifactSchema = v.object({
 			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better.",
 		),
 	),
-	usage: v.pipe(
-		v.object({
-			promptTokens: v.number(),
-			completionTokens: v.number(),
-			totalTokens: v.number(),
-		}),
-		v.description("Return from 'generateObject()' from @vercel/ai"),
-	),
 });
 
 interface ActionSourceBase {
@@ -346,15 +338,6 @@ export async function action(
 							plan: partialObject.plan ?? "",
 							description: partialObject.description ?? "",
 						},
-						...(partialObject.usage?.promptTokens !== undefined &&
-						partialObject.usage?.completionTokens !== undefined
-							? {
-									usage: {
-										promptTokens: partialObject.usage.promptTokens,
-										completionTokens: partialObject.usage.completionTokens,
-									},
-								}
-							: {}),
 					});
 				}
 				const result = await object;
@@ -365,7 +348,7 @@ export async function action(
 						generationTracer.end({ output: result });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
-						return result;
+						return { usage: await usage };
 					},
 					model,
 					startTime,
