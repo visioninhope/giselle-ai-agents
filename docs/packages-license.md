@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 675 MIT
-* 127 Apache 2.0
+* 677 MIT
+* 130 Apache 2.0
 * 62 ISC
 * 24 New BSD
 * 13 Simplified BSD
@@ -36,6 +36,17 @@
 
 
 
+<a name="@ai-sdk/google"></a>
+### <a href="https://sdk.vercel.ai/docs">@ai-sdk/google</a> v1.0.7 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
 <a name="@ai-sdk/openai"></a>
 ### <a href="https://sdk.vercel.ai/docs">@ai-sdk/openai</a> v0.0.72 (dependencies)
 #### 
@@ -58,8 +69,30 @@
 
 
 
+<a name="@ai-sdk/provider"></a>
+### <a href="https://sdk.vercel.ai/docs">@ai-sdk/provider</a> v1.0.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
 <a name="@ai-sdk/provider-utils"></a>
 ### <a href="https://sdk.vercel.ai/docs">@ai-sdk/provider-utils</a> v1.0.22 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/provider-utils"></a>
+### <a href="https://sdk.vercel.ai/docs">@ai-sdk/provider-utils</a> v2.0.4 (dependencies)
 #### 
 
 ##### Paths
@@ -5481,6 +5514,17 @@ Node's event emitter for all engines.
 
 Streaming, source-agnostic EventSource/Server-Sent Events parser
 
+<a name="eventsource-parser"></a>
+### <a href="https://github.com/rexxars/eventsource-parser#readme">eventsource-parser</a> v3.0.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Streaming, source-agnostic EventSource/Server-Sent Events parser
+
 <a name="extend"></a>
 ### extend v3.0.2 (dependencies)
 #### 
@@ -7364,6 +7408,17 @@ modernize node.js to current ECMAScript standards
 
 <a name="nanoid"></a>
 ### nanoid v3.3.7 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A tiny (116 bytes), secure URL-friendly unique string ID generator
+
+<a name="nanoid"></a>
+### nanoid v3.3.8 (dependencies)
 #### 
 
 ##### Paths

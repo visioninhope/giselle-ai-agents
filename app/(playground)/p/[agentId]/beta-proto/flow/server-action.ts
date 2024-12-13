@@ -1,7 +1,10 @@
 "use server";
 
 import { agents, db } from "@/drizzle";
-import { AgentActivity } from "@/services/agents/activities";
+import {
+	AgentActivity,
+	hasEnoughAgentTimeCharge,
+} from "@/services/agents/activities";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
@@ -29,6 +32,12 @@ export async function executeFlow(
 	agentId: AgentId,
 	finalNodeId: GiselleNodeId,
 ) {
+	const canExecute = await hasEnoughAgentTimeCharge();
+	if (!canExecute) {
+		throw new Error(
+			"Your agent time has been depleted. Please upgrade your plan to continue using this feature.",
+		);
+	}
 	const agentActivity = new AgentActivity(agentId, new Date());
 	const stream = createStreamableValue<V2FlowAction>();
 	(async () => {

@@ -1,5 +1,6 @@
 "use server";
 
+import { db } from "@/drizzle";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -14,15 +15,22 @@ import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
-import { textGenerationPrompt } from "./prompts";
-
 import {
 	createLogger,
 	waitForTelemetryExport,
 	withTokenMeasurement,
 } from "@/lib/opentelemetry";
 
+import { textGenerationPrompt } from "./lib/prompts";
+import {
+	buildGraphPath,
+	elementsToMarkdown,
+	langfuseModel,
+	pathJoin,
+	toErrorWithMessage,
+} from "./lib/utils";
 import type {
+	AgentId,
 	ArtifactId,
 	FileData,
 	FileId,
@@ -34,13 +42,6 @@ import type {
 	TextArtifactObject,
 	TextGenerateActionContent,
 } from "./types";
-import {
-	buildGraphPath,
-	elementsToMarkdown,
-	langfuseModel,
-	pathJoin,
-	toErrorWithMessage,
-} from "./utils";
 
 function resolveLanguageModel(
 	llm: TextGenerateActionContent["llm"],
@@ -60,7 +61,7 @@ function resolveLanguageModel(
 			defaultObjectGenerationMode: "json",
 			doStream: async () => ({
 				stream: simulateReadableStream({
-					values: [{ type: "error", error: "a" }],
+					chunks: [{ type: "error", error: "a" }],
 				}),
 				rawCall: { rawPrompt: null, rawSettings: {} },
 			}),
@@ -121,7 +122,7 @@ type ActionSource = TextSource | TextGenerationSource | FileSource;
 
 export async function action(
 	artifactId: ArtifactId,
-	graphUrl: string,
+	agentId: AgentId,
 	nodeId: NodeId,
 ) {
 	const startTime = performance.now();
@@ -130,7 +131,14 @@ export async function action(
 		sessionId: artifactId,
 	});
 
-	const graph = await fetch(graphUrl).then(
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.id, agentId),
+	});
+	if (agent === undefined || agent.graphUrl === null) {
+		throw new Error(`Agent with id ${agentId} not found`);
+	}
+
+	const graph = await fetch(agent.graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
 	const node = graph.nodes.find((node) => node.id === nodeId);
@@ -319,7 +327,7 @@ export async function action(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = await streamObject({
+				const { partialObjectStream, object } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(

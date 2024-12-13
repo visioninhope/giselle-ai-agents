@@ -1,22 +1,27 @@
 import { createId } from "@paralleldrive/cuid2";
-import { vercelBlobGraphFolder } from "./constants";
+import { vercelBlobGraphFolder } from "../constants";
 import type {
 	ArtifactId,
 	ConnectionId,
+	ExecutionId,
 	File,
 	FileId,
 	Files,
+	FlowId,
 	Graph,
 	GraphId,
+	JobExecutionId,
+	JobId,
 	LatestGraphVersion,
 	Node,
 	NodeHandleId,
 	NodeId,
-	SubGraphId,
+	StepExecutionId,
+	StepId,
 	Text,
 	TextGenerateActionContent,
 	TextGeneration,
-} from "./types";
+} from "../types";
 
 export function createNodeId(): NodeId {
 	return `nd_${createId()}`;
@@ -41,8 +46,28 @@ export function createFileId(): FileId {
 	return `fl_${createId()}`;
 }
 
-export function createSubgraphId(): SubGraphId {
-	return `sbgrph_${createId()}`;
+export function createFlowId(): FlowId {
+	return `flw_${createId()}`;
+}
+
+export function createJobId(): JobId {
+	return `jb_${createId()}`;
+}
+
+export function createStepId(): StepId {
+	return `stp_${createId()}`;
+}
+
+export function createStepExecutionId(): StepExecutionId {
+	return `stex_${createId()}`;
+}
+
+export function createJobExecutionId(): JobExecutionId {
+	return `jbex_${createId()}`;
+}
+
+export function createExecutionId(): ExecutionId {
+	return `exct_${createId()}`;
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {
@@ -149,8 +174,9 @@ export function initGraph(): Graph {
 		nodes: [],
 		connections: [],
 		artifacts: [],
-		version: "2024-12-10" satisfies LatestGraphVersion,
-		subGraphs: [],
+		version: "20241213" satisfies LatestGraphVersion,
+		flows: [],
+		executionIndexes: [],
 	};
 }
 
@@ -159,6 +185,18 @@ export function buildGraphFolderPath(graphId: GraphId) {
 }
 export function buildGraphPath(graphId: GraphId) {
 	return pathJoin(buildGraphFolderPath(graphId), "graph.json");
+}
+function buildGraphExecutionFolderPath(graphId: GraphId) {
+	return pathJoin(buildGraphFolderPath(graphId), "executions");
+}
+export function buildGraphExecutionPath(
+	graphId: GraphId,
+	executionId: ExecutionId,
+) {
+	return pathJoin(
+		buildGraphExecutionFolderPath(graphId),
+		`${executionId}.json`,
+	);
 }
 
 export function langfuseModel(llm: TextGenerateActionContent["llm"]) {

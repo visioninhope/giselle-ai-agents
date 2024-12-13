@@ -46,20 +46,7 @@ import {
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToast } from "../contexts/toast";
-import { textGenerationPrompt } from "../prompts";
-import type {
-	FileContent,
-	FileData,
-	FileId,
-	FilesContent,
-	Node,
-	NodeHandle,
-	NodeId,
-	Text,
-	TextArtifactObject,
-	TextContent,
-	TextGenerateActionContent,
-} from "../types";
+import { textGenerationPrompt } from "../lib/prompts";
 import {
 	createArtifactId,
 	createConnectionId,
@@ -73,7 +60,20 @@ import {
 	isTextGeneration,
 	pathJoin,
 	toErrorWithMessage,
-} from "../utils";
+} from "../lib/utils";
+import type {
+	FileContent,
+	FileData,
+	FileId,
+	FilesContent,
+	Node,
+	NodeHandle,
+	NodeId,
+	Text,
+	TextArtifactObject,
+	TextContent,
+	TextGenerateActionContent,
+} from "../types";
 import { Block } from "./block";
 import ClipboardButton from "./clipboard-button";
 import { ContentTypeIcon } from "./content-type-icon";
@@ -288,7 +288,7 @@ export function PropertiesPanel() {
 	const { graph, dispatch, flush } = useGraph();
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
-	const execute = useExecution();
+	const { execute } = useExecution();
 	return (
 		<div
 			className={clsx(
@@ -905,6 +905,9 @@ function TabsContentPrompt({
 									</SelectItem>
 									<SelectItem value="google:gemini-1.5-pro">
 										Gemini 1.5 Pro
+									</SelectItem>
+									<SelectItem value="google:gemini-2.0-flash-exp">
+										Gemini 2.0 Flash Exp
 									</SelectItem>
 								</SelectGroup>
 								{developerMode && (

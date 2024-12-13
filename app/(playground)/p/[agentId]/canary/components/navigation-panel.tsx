@@ -1,17 +1,29 @@
 import * as Tabs from "@radix-ui/react-tabs";
 import { getDownloadUrl, head } from "@vercel/blob";
-import { DownloadIcon, GithubIcon, HammerIcon, XIcon } from "lucide-react";
+import clsx from "clsx/lite";
+import {
+	DownloadIcon,
+	FrameIcon,
+	GithubIcon,
+	HammerIcon,
+	ListTreeIcon,
+	XIcon,
+} from "lucide-react";
 import {
 	type ComponentProps,
 	type ReactNode,
 	createContext,
 	useContext,
+	useMemo,
 	useState,
 } from "react";
 import { LayersIcon } from "../../beta-proto/components/icons/layers";
+import { WilliIcon } from "../../beta-proto/components/icons/willi";
 import { useAgentName } from "../contexts/agent-name";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useGraph } from "../contexts/graph";
+import type { Node, Step } from "../types";
+import { ContentTypeIcon } from "./content-type-icon";
 
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
@@ -68,6 +80,9 @@ export function NavigationPanel() {
 					{/* <TabsTrigger value="github">
 					<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
 				</TabsTrigger> */}
+					<TabsTrigger value="structure">
+						<ListTreeIcon className="w-[18px] h-[18px] stroke-black-30" />
+					</TabsTrigger>
 
 					{developerMode && (
 						<TabsTrigger value="developer">
@@ -81,6 +96,9 @@ export function NavigationPanel() {
 				{/* <TabsContent value="github">
 				<GitHubIntegration />
 			</TabsContent> */}
+				<TabsContent value="structure">
+					<Structure />
+				</TabsContent>
 				<TabsContent value="developer">
 					<Developer />
 				</TabsContent>
@@ -182,6 +200,122 @@ function Developer() {
 						Download the graph
 					</a>
 				</div>
+			</div>
+		</ContentPanel>
+	);
+}
+
+function StructureNodeItem({
+	node,
+	className,
+}: { node: Node; className?: string }) {
+	return (
+		<div
+			className={clsx(
+				"hover:bg-white/10 flex items-center gap-[14px] px-[4px] py-[1px] cursor-default",
+				className,
+			)}
+		>
+			<ContentTypeIcon
+				contentType={node.content.type}
+				className="w-[16px] h-[16px] fill-current"
+			/>
+			<p>{node.name}</p>
+		</div>
+	);
+}
+
+function StructureStepItem({
+	step,
+	stepClassName,
+	variableNodesClassName,
+}: {
+	step: Step & { node: Node; variableNodes: Node[] };
+	stepClassName?: string;
+	variableNodesClassName?: string;
+}) {
+	return (
+		<div>
+			<StructureNodeItem node={step.node} className={stepClassName} />
+			{step.variableNodes.map((node) => (
+				<StructureNodeItem
+					key={node.id}
+					node={node}
+					className={variableNodesClassName}
+				/>
+			))}
+		</div>
+	);
+}
+export function Structure() {
+	const { graph } = useGraph();
+	const flows = useMemo(
+		() =>
+			graph.flows.map((flow) => ({
+				...flow,
+				jobs: flow.jobs.map((job) => ({
+					...job,
+					steps: job.steps
+						.map((step) => {
+							const node = graph.nodes.find((node) => node.id === step.nodeId);
+							const variableNodes = step.variableNodeIds
+								.map((nodeId) => graph.nodes.find((node) => node.id === nodeId))
+								.filter((node) => node !== undefined);
+							if (node === undefined) {
+								return null;
+							}
+							return {
+								...step,
+								node,
+								variableNodes,
+							};
+						})
+						.filter((step) => step !== null),
+				})),
+			})),
+		[graph],
+	);
+	return (
+		<ContentPanel>
+			<ContentPanelHeader>Structure</ContentPanelHeader>
+			<div className="flex flex-col gap-[8px]">
+				{flows.map((flow) => (
+					<div key={flow.id}>
+						<div className="flex items-center gap-[14px] hover:bg-white/10 px-[4px] py-[1px] rounded-[2px]">
+							<WilliIcon className="w-[16px] h-[16px] fill-current" />
+							<p className="text-[14px]">{flow.name}</p>
+						</div>
+						<div className="pt-[4px] flex flex-col gap-[4px] text-[14px]">
+							{flow.jobs.map((job) => (
+								<div key={job.id}>
+									{job.steps.length === 1 ? (
+										<StructureStepItem
+											step={job.steps[0]}
+											stepClassName="pl-[34px]"
+											variableNodesClassName="pl-[64px]"
+										/>
+									) : (
+										<div>
+											<div className="pl-[34px] hover:bg-white/10 px-[4px] py-[1px] gap-[14px] flex items-center">
+												<FrameIcon className="w-[16px] h-[16px] fill-current" />
+												<p>Subflow</p>
+											</div>
+
+											{job.steps.map((step) => (
+												<StructureStepItem
+													step={step}
+													key={step.id}
+													stepClassName="pl-[64px]"
+													variableNodesClassName="pl-[94px]"
+												/>
+											))}
+										</div>
+									)}
+								</div>
+							))}
+						</div>
+					</div>
+				))}
 			</div>
 		</ContentPanel>
 	);
