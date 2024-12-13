@@ -497,8 +497,6 @@ export const agentTimeUsageReports = pgTable(
 		teamDbId: integer("team_db_id")
 			.notNull()
 			.references(() => teams.dbId, { onDelete: "cascade" }),
-		periodStart: timestamp("period_start").notNull(),
-		periodEnd: timestamp("period_end").notNull(),
 		// This would be greater than int32 max, but will not be greater than int64 max.
 		// so, we can safely use number type.
 		accumulatedDurationMs: numeric("accumulated_duration_ms")
@@ -506,11 +504,11 @@ export const agentTimeUsageReports = pgTable(
 			.notNull(),
 		minutesIncrement: integer("minutes_increment").notNull(),
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
-		createdAt: timestamp("created_at").defaultNow().notNull(),
+		timestamp: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => ({
 		teamDbIdIdx: index().on(table.teamDbId),
-		periodIdx: index().on(table.periodStart, table.periodEnd),
+		timestampIdx: index().on(table.timestamp),
 		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
 	}),
 );

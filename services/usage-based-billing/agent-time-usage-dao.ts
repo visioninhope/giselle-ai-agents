@@ -85,6 +85,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 	async findLastUsageReport(
 		teamDbId: number,
 		periodStart: Date,
+		periodEnd: Date,
 	): Promise<AgentTimeUsageReport | null> {
 		const reports = await this.db
 			.select()
@@ -92,10 +93,11 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			.where(
 				and(
 					eq(agentTimeUsageReports.teamDbId, teamDbId),
-					eq(agentTimeUsageReports.periodStart, periodStart),
+					gt(agentTimeUsageReports.timestamp, periodStart),
+					lte(agentTimeUsageReports.timestamp, periodEnd),
 				),
 			)
-			.orderBy(desc(agentTimeUsageReports.createdAt))
+			.orderBy(desc(agentTimeUsageReports.timestamp))
 			.limit(1);
 		if (reports.length === 0) {
 			return null;
@@ -105,21 +107,19 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 
 	async createUsageReport(params: {
 		teamDbId: number;
-		periodStart: Date;
-		periodEnd: Date;
 		accumulatedDurationMs: number;
 		minutesIncrement: number;
 		stripeMeterEventId: string;
+		timestamp: Date;
 	}): Promise<AgentTimeUsageReport> {
 		const [report] = await this.db
 			.insert(agentTimeUsageReports)
 			.values({
 				teamDbId: params.teamDbId,
-				periodStart: params.periodStart,
-				periodEnd: params.periodEnd,
 				accumulatedDurationMs: params.accumulatedDurationMs,
 				minutesIncrement: params.minutesIncrement,
 				stripeMeterEventId: params.stripeMeterEventId,
+				timestamp: params.timestamp,
 			})
 			.returning();
 		if (report == null) {

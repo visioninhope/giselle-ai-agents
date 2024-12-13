@@ -130,12 +130,10 @@ describe("processUnreportedActivities", () => {
 		createUsageReport: mock(async () => ({
 			dbId: 1,
 			teamDbId: 123,
-			periodStart: new Date("2024-01-01"),
-			periodEnd: new Date("2024-01-31"),
 			accumulatedDurationMs: 60000,
 			minutesIncrement: 1,
 			stripeMeterEventId: "meter_123",
-			createdAt: new Date(),
+			timestamp: new Date(),
 		})),
 		markActivitiesAsProcessed: mock(async () => {}),
 	};

@@ -8,12 +8,10 @@ export type AgentActivity = {
 export type AgentTimeUsageReport = {
 	dbId: number;
 	teamDbId: number;
-	periodStart: Date;
-	periodEnd: Date;
 	accumulatedDurationMs: number;
 	minutesIncrement: number;
 	stripeMeterEventId: string;
-	createdAt: Date;
+	timestamp: Date;
 };
 
 export type Subscription = {
@@ -36,15 +34,15 @@ export interface AgentTimeUsageDataAccess {
 	findLastUsageReport(
 		teamDbId: number,
 		periodStart: Date,
+		periodEnd: Date,
 	): Promise<AgentTimeUsageReport | null>;
 
 	createUsageReport(params: {
 		teamDbId: number;
-		periodStart: Date;
-		periodEnd: Date;
 		accumulatedDurationMs: number;
 		minutesIncrement: number;
 		stripeMeterEventId: string;
+		timestamp: Date;
 	}): Promise<AgentTimeUsageReport>;
 
 	markActivitiesAsProcessed(

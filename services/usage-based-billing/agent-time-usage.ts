@@ -52,8 +52,12 @@ export async function processUnreportedActivities(
 	},
 ) {
 	const { dao, stripe } = deps;
+
+	// If the billing cycle has just changed, we might miss reporting the usage of the previous cycle.
+	// Handling this case is costly and complex, so we will ignore it for now.
 	const { subscriptionId, periodStart, periodEnd } =
 		await dao.fetchCurrentSubscription(params.teamDbId);
+
 	// FIXME: if we have customer id in subscriptions table, we can use it directly
 	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 	const customerId =
@@ -62,7 +66,7 @@ export async function processUnreportedActivities(
 			: subscription.customer.id;
 
 	return await dao.transaction(async (tx) => {
-		// Retrieve unprocessed activities
+		// Retrieve unprocessed activities in the current period
 		const unprocessedActivities = await tx.findUnprocessedActivities(
 			params.teamDbId,
 			periodStart,
@@ -73,10 +77,11 @@ export async function processUnreportedActivities(
 			return { processedReportId: null };
 		}
 
-		// Retrieve the latest report
+		// Retrieve the latest report in the current period
 		const lastReport = await tx.findLastUsageReport(
 			params.teamDbId,
 			periodStart,
+			periodEnd,
 		);
 
 		// Calculate usage time
@@ -91,7 +96,13 @@ export async function processUnreportedActivities(
 		}
 
 		const meterEventId = createId();
-		const currentTimestamp = new Date().toISOString();
+
+		// Use last unprocessed activity's endedAt as the Meter Event's timestamp
+		const lastUnprocessedActivity = unprocessedActivities.at(-1);
+		if (lastUnprocessedActivity == null) {
+			throw new Error("lastUnprocessedActivity is null");
+		}
+		const timestamp = lastUnprocessedActivity.endedAt;
 
 		// Report usage to Stripe
 		const stripeEvent = await stripe.v2.billing.meterEvents.create({
@@ -101,17 +112,16 @@ export async function processUnreportedActivities(
 				stripe_customer_id: customerId,
 			},
 			identifier: meterEventId,
-			timestamp: currentTimestamp,
+			timestamp: timestamp.toISOString(),
 		});
 
 		// Create usage report
 		const report = await tx.createUsageReport({
 			teamDbId: params.teamDbId,
-			periodStart,
-			periodEnd,
 			accumulatedDurationMs,
 			minutesIncrement,
 			stripeMeterEventId: stripeEvent.identifier,
+			timestamp,
 		});
 
 		// Update activities
