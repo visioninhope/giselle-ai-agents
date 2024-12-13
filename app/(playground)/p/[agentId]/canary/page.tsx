@@ -115,13 +115,14 @@ export default async function Page({
 	}
 	async function putExecutionAction(execution: Execution) {
 		"use server";
-		await put(
+		const result = await put(
 			buildGraphExecutionPath(graph.id, execution.id),
 			JSON.stringify(execution),
 			{
 				access: "public",
 			},
 		);
+		return { blobUrl: result.url };
 	}
 
 	return (

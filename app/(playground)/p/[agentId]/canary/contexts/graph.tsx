@@ -14,6 +14,7 @@ import type {
 	Artifact,
 	Connection,
 	ConnectionId,
+	ExecutionIndex,
 	Graph,
 	Node,
 	NodeHandleId,
@@ -85,6 +86,12 @@ interface RemoveNodeAction {
 	type: "removeNode";
 	input: RemoveNoeActionInput;
 }
+
+interface AddExecutionIndexAction {
+	type: "addExecutionIndex";
+	input: { executionIndex: ExecutionIndex };
+}
+
 type GraphAction =
 	| UpsertArtifactAction
 	| UpdateNodeAction
@@ -93,7 +100,8 @@ type GraphAction =
 	| UpdateNodePositionAction
 	| UpdateNodeSelectionAction
 	| AddNodeAction
-	| RemoveNodeAction;
+	| RemoveNodeAction
+	| AddExecutionIndexAction;
 
 type GraphActionOrActions = GraphAction | GraphAction[];
 
@@ -196,6 +204,14 @@ function graphReducer(graph: Graph, action: GraphAction): Graph {
 			return {
 				...graph,
 				nodes: graph.nodes.filter((node) => node.id !== action.input.nodeId),
+			};
+		case "addExecutionIndex":
+			return {
+				...graph,
+				executionIndexes: [
+					...graph.executionIndexes,
+					action.input.executionIndex,
+				],
 			};
 		default:
 			return graph;

@@ -166,8 +166,13 @@ interface TextStreamArtifact extends StreamAtrifact {
 export type Artifact = TextArtifact | TextStreamArtifact;
 
 export type GraphId = `grph_${string}`;
-type GraphVersion = "2024-12-09" | "2024-12-10" | "2024-12-11" | "20241212";
-export type LatestGraphVersion = "20241212";
+type GraphVersion =
+	| "2024-12-09"
+	| "2024-12-10"
+	| "2024-12-11"
+	| "20241212"
+	| "20241213";
+export type LatestGraphVersion = "20241213";
 export interface Graph {
 	id: GraphId;
 	nodes: Node[];
@@ -302,7 +307,7 @@ export type Execution =
 	| RunningExecution
 	| CompletedExecution;
 
-interface ExecutionIndex {
+export interface ExecutionIndex {
 	executionId: ExecutionId;
 	blobUrl: string;
 	completedAt: number;

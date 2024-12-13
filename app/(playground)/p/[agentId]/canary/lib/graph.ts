@@ -268,7 +268,7 @@ export function deriveFlows(graph: Graph): Flow[] {
 }
 
 export function isLatestVersion(graph: Graph): boolean {
-	return graph.version === "20241212";
+	return graph.version === "20241213";
 }
 
 export function migrateGraph(graph: Graph): Graph {
@@ -307,10 +307,14 @@ export function migrateGraph(graph: Graph): Graph {
 		};
 	}
 
-	if (newGraph.version === "2024-12-10" || newGraph.version === "2024-12-11") {
+	if (
+		newGraph.version === "2024-12-10" ||
+		newGraph.version === "2024-12-11" ||
+		newGraph.version === "20241212"
+	) {
 		newGraph = {
 			...newGraph,
-			version: "20241212",
+			version: "20241213",
 			flows: deriveFlows(newGraph),
 			executionIndexes: [],
 		};

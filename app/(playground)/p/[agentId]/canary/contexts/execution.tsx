@@ -270,7 +270,7 @@ interface ExecutionProviderProps {
 		nodeId: NodeId,
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
-	putExecutionAction: (execution: Execution) => Promise<void>;
+	putExecutionAction: (execution: Execution) => Promise<{ blobUrl: string }>;
 }
 
 export function ExecutionProvider({
@@ -380,6 +380,7 @@ export function ExecutionProvider({
 			if (!flow) throw new Error("Flow not found");
 
 			setPlaygroundMode("viewer");
+			await flush();
 			const executionId = createExecutionId();
 			const jobExecutions = createInitialJobExecutions(flow);
 			const flowRunStartedAt = Date.now();
@@ -396,7 +397,6 @@ export function ExecutionProvider({
 
 			// Execute jobs sequentially
 			for (const jobExecution of jobExecutions) {
-				console.log(`job: ${jobExecution.id}`);
 				const jobDurationMs = await executeJob(
 					flowId,
 					executionId,
@@ -425,9 +425,26 @@ export function ExecutionProvider({
 
 			// Complete flow execution
 			setExecution(currentExecution);
-			putExecutionAction(currentExecution);
+			const { blobUrl } = await putExecutionAction(currentExecution);
+			dispatch({
+				type: "addExecutionIndex",
+				input: {
+					executionIndex: {
+						executionId,
+						blobUrl,
+						completedAt: Date.now(),
+					},
+				},
+			});
 		},
-		[setPlaygroundMode, graph.flows, executeStepAction, putExecutionAction],
+		[
+			setPlaygroundMode,
+			graph.flows,
+			executeStepAction,
+			putExecutionAction,
+			dispatch,
+			flush,
+		],
 	);
 	return (
 		<ExecutionContext.Provider value={{ execution, execute, executeFlow }}>
