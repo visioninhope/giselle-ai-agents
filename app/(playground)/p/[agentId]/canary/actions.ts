@@ -1,6 +1,11 @@
 "use server";
 
 import { db } from "@/drizzle";
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -15,11 +20,6 @@ import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
-import {
-	createLogger,
-	waitForTelemetryExport,
-	withTokenMeasurement,
-} from "@/lib/opentelemetry";
 
 import { textGenerationPrompt } from "./lib/prompts";
 import {
