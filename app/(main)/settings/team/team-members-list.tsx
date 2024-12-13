@@ -2,6 +2,7 @@ import type { TeamRole } from "@/drizzle";
 import { TeamMemberListItem } from "./team-members-list-item";
 
 type TeamMembersListProps = {
+	teamDbId: number;
 	members: {
 		userId: string;
 		displayName: string | null;
@@ -12,6 +13,7 @@ type TeamMembersListProps = {
 };
 
 export function TeamMembersList({
+	teamDbId,
 	members,
 	currentUserRole,
 }: TeamMembersListProps) {
@@ -25,7 +27,7 @@ export function TeamMembersList({
 			<div className="divide-y divide-zinc-800">
 				{members.map((member) => (
 					<TeamMemberListItem
-						key={`${member.userId}-${member.displayName}-${member.role}-${currentUserRole}`}
+						key={`${teamDbId}-${member.userId}`}
 						userId={member.userId}
 						displayName={member.displayName}
 						email={member.email}
