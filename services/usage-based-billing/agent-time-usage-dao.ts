@@ -68,6 +68,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 				usageReportDbId: agentActivities.usageReportDbId,
 			})
 			.from(agentActivities)
+			.for("update")
 			.innerJoin(agents, eq(agentActivities.agentDbId, agents.dbId))
 			.where(
 				and(
@@ -78,7 +79,6 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 				),
 			)
 			.orderBy(agentActivities.endedAt);
-
 		return activities;
 	}
 
@@ -97,8 +97,10 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			)
 			.orderBy(desc(agentTimeUsageReports.createdAt))
 			.limit(1);
-
-		return reports[0] || null;
+		if (reports.length === 0) {
+			return null;
+		}
+		return reports[0];
 	}
 
 	async createUsageReport(params: {
@@ -120,6 +122,9 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 				stripeMeterEventId: params.stripeMeterEventId,
 			})
 			.returning();
+		if (report == null) {
+			throw new Error("Failed to create usage report");
+		}
 		return report;
 	}
 
@@ -130,7 +135,6 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 		if (activityIds.length === 0) {
 			return;
 		}
-
 		await this.db
 			.update(agentActivities)
 			.set({
