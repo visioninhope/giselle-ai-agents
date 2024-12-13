@@ -54,7 +54,7 @@ function getModelInfo(
 				"consider adding to 'ExternalServiceName'",
 			);
 			return {
-				externalServiceName: UnimplementedServiceName.TODO,
+				externalServiceName: UnimplementedServiceName.Unknown,
 				modelId: "unknown",
 			};
 	}
