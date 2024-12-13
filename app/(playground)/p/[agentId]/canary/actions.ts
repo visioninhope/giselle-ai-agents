@@ -137,8 +137,6 @@ export async function action(
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
-	const logger = createLogger(node.content.type);
-
 	/**
 	 * This function is a helper that retrieves a node from the graph
 	 * based on its NodeHandleId. It looks for a connection in the
@@ -343,7 +341,7 @@ export async function action(
 				const result = await object;
 
 				await withTokenMeasurement(
-					logger,
+					createLogger(node.content.type),
 					async () => {
 						generationTracer.end({ output: result });
 						await lf.shutdownAsync();
