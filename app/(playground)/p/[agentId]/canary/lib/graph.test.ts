@@ -136,7 +136,7 @@ describe("deriveFlows", () => {
 
 describe("isLatestVersion", () => {
 	test("latest version", () => {
-		expect(isLatestVersion({ version: "2024-12-10" } as Graph)).toBe(true);
+		expect(isLatestVersion({ version: "20241213" } as Graph)).toBe(true);
 	});
 	test("old version", () => {
 		expect(isLatestVersion({} as Graph)).toBe(false);
@@ -182,7 +182,7 @@ describe("migrateGraph", () => {
 			],
 			artifacts: [],
 		} as unknown as Graph);
-		expect(after.version).toBe("2024-12-10");
+		expect(after.version).toBe("20241213");
 		expect(after.nodes[0].content.type).toBe("files");
 	});
 });
