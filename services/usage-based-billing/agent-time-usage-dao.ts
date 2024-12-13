@@ -28,8 +28,8 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 		const records = await this.db
 			.select({
 				id: subscriptions.id,
-				periodStart: subscriptions.currentPeriodStart,
-				periodEnd: subscriptions.currentPeriodEnd,
+				currentPeriodStart: subscriptions.currentPeriodStart,
+				currentPeriodEnd: subscriptions.currentPeriodEnd,
 			})
 			.from(subscriptions)
 			.where(
@@ -50,8 +50,8 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 		const currentSubscription = records[0];
 		return {
 			subscriptionId: currentSubscription.id,
-			periodStart: currentSubscription.periodStart,
-			periodEnd: currentSubscription.periodEnd,
+			currentPeriodStart: currentSubscription.currentPeriodStart,
+			currentPeriodEnd: currentSubscription.currentPeriodEnd,
 		};
 	}
 
@@ -78,7 +78,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 					lte(agentActivities.endedAt, periodEnd),
 				),
 			)
-			.orderBy(agentActivities.endedAt);
+			.orderBy(agentActivities.dbId);
 		return activities;
 	}
 

@@ -1,5 +1,6 @@
 import { createId } from "@paralleldrive/cuid2";
 import type Stripe from "stripe";
+import { getMonthlyBillingCycle } from "../agents/activities";
 import type { AgentTimeUsageDataAccess } from "./types";
 
 const AGENT_TIME_USAGE_METER_NAME = "agent_time_charge";
@@ -45,6 +46,7 @@ export function calculateAgentTimeUsage(
 export async function processUnreportedActivities(
 	params: {
 		teamDbId: number;
+		targetDate: Date;
 	},
 	deps: {
 		dao: AgentTimeUsageDataAccess;
@@ -53,17 +55,35 @@ export async function processUnreportedActivities(
 ) {
 	const { dao, stripe } = deps;
 
-	// If the billing cycle has just changed, we might miss reporting the usage of the previous cycle.
-	// Handling this case is costly and complex, so we will ignore it for now.
-	const { subscriptionId, periodStart, periodEnd } =
+	const { subscriptionId, currentPeriodEnd, currentPeriodStart } =
 		await dao.fetchCurrentSubscription(params.teamDbId);
+	let periodStart = currentPeriodStart;
+	let periodEnd = currentPeriodEnd;
 
-	// FIXME: if we have customer id in subscriptions table, we can use it directly
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-	const customerId =
-		typeof subscription.customer === "string"
-			? subscription.customer
-			: subscription.customer.id;
+	// If the billing cycle has just changed, we should process for the previous period
+	if (params.targetDate < currentPeriodStart) {
+		console.info(
+			`Target date ${params.targetDate} is before the current period start ${currentPeriodStart}, process as last period`,
+		);
+		const { start, end } = getMonthlyBillingCycle(
+			periodStart,
+			params.targetDate,
+		);
+		periodStart = start;
+		periodEnd = end;
+	}
+
+	let customerId: string;
+	try {
+		// FIXME: if we have customer id in subscriptions table, we can use it directly
+		const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+		customerId =
+			typeof subscription.customer === "string"
+				? subscription.customer
+				: subscription.customer.id;
+	} catch (error: unknown) {
+		throw new Error(`Failed to retrieve subscription: ${error}`);
+	}
 
 	return await dao.transaction(async (tx) => {
 		// Retrieve unprocessed activities in the current period

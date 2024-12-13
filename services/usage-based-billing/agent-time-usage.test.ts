@@ -110,38 +110,39 @@ describe("processUnreportedActivities", () => {
 		},
 	};
 
-	const mockDao = {
-		// biome-ignore lint/suspicious/noExplicitAny: mock
-		transaction: async (fn: any) => fn(mockDao),
-		fetchCurrentSubscription: mock(async () => ({
-			subscriptionId: "sub_123",
-			periodStart: new Date("2024-01-01"),
-			periodEnd: new Date("2024-01-31"),
-		})),
-		findUnprocessedActivities: mock(async () => [
-			{
-				dbId: 1,
-				totalDurationMs: 60000,
-				endedAt: new Date("2024-01-15"),
-				usageReportDbId: null,
-			},
-		]),
-		findLastUsageReport: mock(async () => null),
-		createUsageReport: mock(async () => ({
-			dbId: 1,
-			teamDbId: 123,
-			accumulatedDurationMs: 60000,
-			minutesIncrement: 1,
-			stripeMeterEventId: "meter_123",
-			timestamp: new Date(),
-		})),
-		markActivitiesAsProcessed: mock(async () => {}),
-	};
-
 	test("successful processing flow", async () => {
+		const mockDao = {
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			transaction: async (fn: any) => fn(mockDao),
+			fetchCurrentSubscription: mock(async () => ({
+				subscriptionId: "sub_123",
+				currentPeriodStart: new Date("2024-01-01"),
+				currentPeriodEnd: new Date("2024-01-31"),
+			})),
+			findUnprocessedActivities: mock(async () => [
+				{
+					dbId: 1,
+					totalDurationMs: 60000,
+					endedAt: new Date("2024-01-15"),
+					usageReportDbId: null,
+				},
+			]),
+			findLastUsageReport: mock(async () => null),
+			createUsageReport: mock(async () => ({
+				dbId: 1,
+				teamDbId: 123,
+				accumulatedDurationMs: 60000,
+				minutesIncrement: 1,
+				stripeMeterEventId: "meter_123",
+				timestamp: new Date(),
+			})),
+			markActivitiesAsProcessed: mock(async () => {}),
+		};
+
 		const result = await processUnreportedActivities(
 			{
 				teamDbId: 123,
+				targetDate: new Date("2024-01-31"),
 			},
 			{
 				dao: mockDao,
@@ -157,11 +158,31 @@ describe("processUnreportedActivities", () => {
 	});
 
 	test("when there are no unprocessed activities", async () => {
-		mockDao.findUnprocessedActivities.mockImplementation(async () => []);
+		const mockDao = {
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			transaction: async (fn: any) => fn(mockDao),
+			fetchCurrentSubscription: mock(async () => ({
+				subscriptionId: "sub_123",
+				currentPeriodStart: new Date("2024-01-01"),
+				currentPeriodEnd: new Date("2024-01-31"),
+			})),
+			findUnprocessedActivities: mock(async () => []),
+			findLastUsageReport: mock(async () => null),
+			createUsageReport: mock(async () => ({
+				dbId: 1,
+				teamDbId: 123,
+				accumulatedDurationMs: 60000,
+				minutesIncrement: 1,
+				stripeMeterEventId: "meter_123",
+				timestamp: new Date(),
+			})),
+			markActivitiesAsProcessed: mock(async () => {}),
+		};
 
 		const result = await processUnreportedActivities(
 			{
 				teamDbId: 123,
+				targetDate: new Date("2024-01-31"),
 			},
 			{
 				dao: mockDao,
@@ -171,5 +192,113 @@ describe("processUnreportedActivities", () => {
 		);
 
 		expect(result.processedReportId).toBeNull();
+	});
+
+	test("handles billing cycle transition", async () => {
+		const mockDao = {
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			transaction: async (fn: any) => fn(mockDao),
+			fetchCurrentSubscription: mock(async () => ({
+				subscriptionId: "sub_123",
+				currentPeriodStart: new Date("2024-02-01T00:00:00Z"),
+				currentPeriodEnd: new Date("2024-02-29T23:59:59Z"),
+			})),
+			// Mock the state where new billing cycle has already started
+			findUnprocessedActivities: mock(async () => [
+				{
+					dbId: 1,
+					totalDurationMs: 60000,
+					endedAt: new Date("2024-01-15"),
+					usageReportDbId: null,
+				},
+			]),
+			findLastUsageReport: mock(async () => null),
+			createUsageReport: mock(async () => ({
+				dbId: 1,
+				teamDbId: 123,
+				accumulatedDurationMs: 60000,
+				minutesIncrement: 1,
+				stripeMeterEventId: "meter_123",
+				timestamp: new Date(),
+			})),
+			markActivitiesAsProcessed: mock(async () => {}),
+		};
+
+		// Process activities from the last day of previous billing cycle
+		const result = await processUnreportedActivities(
+			{
+				teamDbId: 123,
+				targetDate: new Date("2024-01-31T23:59:59Z"), // Last day of previous period
+			},
+			{
+				dao: mockDao,
+				// biome-ignore lint/suspicious/noExplicitAny: mock
+				stripe: mockStripe as any,
+			},
+		);
+
+		expect(result.processedReportId).toBe(1);
+		expect(mockStripe.v2.billing.meterEvents.create).toHaveBeenCalledWith(
+			expect.objectContaining({
+				event_name: "agent_time_charge",
+				payload: expect.objectContaining({
+					value: "1",
+				}),
+			}),
+		);
+		expect(mockDao.findUnprocessedActivities).toHaveBeenCalledWith(
+			123,
+			new Date("2024-01-01T00:00:00Z"), // Start of previous period
+			new Date("2024-02-01T00:00:00Z"), // End of previous period
+		);
+	});
+
+	test("processes current period when target date is in current period", async () => {
+		const mockDao = {
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			transaction: async (fn: any) => fn(mockDao),
+			fetchCurrentSubscription: mock(async () => ({
+				subscriptionId: "sub_123",
+				currentPeriodStart: new Date("2024-02-01T00:00:00Z"),
+				currentPeriodEnd: new Date("2024-02-29T23:59:59Z"),
+			})),
+			findUnprocessedActivities: mock(async () => [
+				{
+					dbId: 1,
+					totalDurationMs: 60000,
+					endedAt: new Date("2024-01-15"),
+					usageReportDbId: null,
+				},
+			]),
+			findLastUsageReport: mock(async () => null),
+			createUsageReport: mock(async () => ({
+				dbId: 1,
+				teamDbId: 123,
+				accumulatedDurationMs: 60000,
+				minutesIncrement: 1,
+				stripeMeterEventId: "meter_123",
+				timestamp: new Date(),
+			})),
+			markActivitiesAsProcessed: mock(async () => {}),
+		};
+
+		const result = await processUnreportedActivities(
+			{
+				teamDbId: 123,
+				targetDate: new Date("2024-02-15T12:00:00Z"), // Date in current period
+			},
+			{
+				dao: mockDao,
+				// biome-ignore lint/suspicious/noExplicitAny: mock
+				stripe: mockStripe as any,
+			},
+		);
+
+		expect(result.processedReportId).toBe(1);
+		expect(mockDao.findUnprocessedActivities).toHaveBeenCalledWith(
+			123,
+			new Date("2024-02-01T00:00:00Z"), // Start of current period
+			new Date("2024-02-29T23:59:59Z"), // End of current period
+		);
 	});
 });

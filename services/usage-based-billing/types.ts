@@ -16,8 +16,8 @@ export type AgentTimeUsageReport = {
 
 export type Subscription = {
 	subscriptionId: string;
-	periodStart: Date;
-	periodEnd: Date;
+	currentPeriodStart: Date;
+	currentPeriodEnd: Date;
 };
 
 export interface AgentTimeUsageDataAccess {
