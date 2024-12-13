@@ -12,7 +12,7 @@ export const ExternalServiceName = {
 } as const;
 
 export const UnimplementedServiceName = {
-	TODO: "todo", // for type safety
+	Unknown: "unknown", // for type safety
 };
 
 export type ExternalServiceName =
