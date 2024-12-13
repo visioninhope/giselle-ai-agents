@@ -1,6 +1,11 @@
 "use server";
 
 import { db } from "@/drizzle";
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -15,6 +20,7 @@ import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import * as v from "valibot";
 import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
+
 import { textGenerationPrompt } from "./lib/prompts";
 import {
 	buildGraphPath,
@@ -111,6 +117,7 @@ export async function action(
 	agentId: AgentId,
 	nodeId: NodeId,
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: artifactId,
@@ -130,7 +137,6 @@ export async function action(
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
-
 	/**
 	 * This function is a helper that retrieves a node from the graph
 	 * based on its NodeHandleId. It looks for a connection in the
@@ -311,7 +317,7 @@ export async function action(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = streamObject({
+				const { partialObjectStream, object, usage } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
@@ -333,7 +339,18 @@ export async function action(
 					});
 				}
 				const result = await object;
-				generationTracer.end({ output: result });
+
+				await withTokenMeasurement(
+					createLogger(node.content.type),
+					async () => {
+						generationTracer.end({ output: result });
+						await lf.shutdownAsync();
+						waitForTelemetryExport();
+						return { usage: await usage };
+					},
+					model,
+					startTime,
+				);
 				stream.done();
 			})().catch((error) => {
 				stream.error(error);
