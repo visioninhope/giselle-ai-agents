@@ -1,6 +1,12 @@
 "use server";
 
 import { db } from "@/drizzle";
+
+import {
+	createLogger,
+	waitForTelemetryExport,
+	withTokenMeasurement,
+} from "@/lib/opentelemetry";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -229,6 +235,7 @@ export async function executeStep(
 	stepId: StepId,
 	artifacts: Artifact[],
 ) {
+	const startTime = performance.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: executionId,
@@ -316,7 +323,7 @@ export async function executeStep(
 				},
 			});
 			(async () => {
-				const { partialObjectStream, object } = streamObject({
+				const { partialObjectStream, object, usage } = streamObject({
 					model,
 					prompt,
 					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
@@ -338,7 +345,17 @@ export async function executeStep(
 					});
 				}
 				const result = await object;
-				generationTracer.end({ output: result });
+				await withTokenMeasurement(
+					createLogger(node.content.type),
+					async () => {
+						generationTracer.end({ output: result });
+						await lf.shutdownAsync();
+						waitForTelemetryExport();
+						return { usage: await usage };
+					},
+					model,
+					startTime,
+				);
 				stream.done();
 			})().catch((error) => {
 				stream.error(error);
