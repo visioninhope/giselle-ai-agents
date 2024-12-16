@@ -32,7 +32,7 @@ import type {
 	TextGenerateActionContent,
 } from "../types";
 import { textGenerationPrompt } from "./prompts";
-import { langfuseModel } from "./utils";
+import { langfuseModel, toErrorWithMessage } from "./utils";
 
 function resolveLanguageModel(
 	llm: TextGenerateActionContent["llm"],
@@ -313,6 +313,10 @@ export async function executeStep(
 			const temperature = node.content.temperature;
 			const stream = createStreamableValue<TextArtifactObject>();
 
+			trace.update({
+				input: prompt,
+			});
+
 			const generationTracer = trace.generation({
 				name: "generate-text",
 				input: prompt,
@@ -349,6 +353,7 @@ export async function executeStep(
 					createLogger(node.content.type),
 					async () => {
 						generationTracer.end({ output: result });
+						trace.update({ output: result });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
 						return { usage: await usage };
@@ -358,6 +363,10 @@ export async function executeStep(
 				);
 				stream.done();
 			})().catch((error) => {
+				generationTracer.update({
+					level: "ERROR",
+					statusMessage: toErrorWithMessage(error).message,
+				});
 				stream.error(error);
 			});
 			return stream.value;
