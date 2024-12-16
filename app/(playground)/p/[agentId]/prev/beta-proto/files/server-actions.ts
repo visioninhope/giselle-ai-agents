@@ -2,6 +2,7 @@
 
 import {
 	ExternalServiceName,
+	VercelBlobOperation,
 	createLogger,
 	waitForTelemetryExport,
 	withCountMeasurement,
@@ -37,7 +38,7 @@ export async function uploadFile({ input }: { input: UploadFileInput }) {
 		},
 		ExternalServiceName.VercelBlob,
 		startTime,
-		"put",
+		VercelBlobOperation.Put,
 	);
 	waitForTelemetryExport();
 
@@ -72,7 +73,7 @@ export async function parseFile(args: ParseFileInput) {
 		},
 		ExternalServiceName.VercelBlob,
 		startTime,
-		"fetch",
+		VercelBlobOperation.Fetch,
 	);
 
 	const content = await response.blob;
@@ -112,7 +113,7 @@ export async function parseFile(args: ParseFileInput) {
 			}),
 		ExternalServiceName.VercelBlob,
 		startTime,
-		"put",
+		VercelBlobOperation.Put,
 	);
 
 	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
