@@ -425,7 +425,9 @@ export async function getCurrentUserRole() {
 	}
 }
 
-export async function getAgentActivities() {
+export async function getAgentActivities({
+	limit = 50,
+}: { limit?: number } = {}) {
 	try {
 		const currentTeam = await fetchCurrentTeam();
 
@@ -446,7 +448,7 @@ export async function getAgentActivities() {
 				),
 			)
 			.orderBy(desc(agentActivities.startedAt))
-			.limit(5);
+			.limit(limit);
 
 		const formattedActivities = activities.map((activity) => ({
 			...activity,

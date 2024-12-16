@@ -3,7 +3,7 @@ import { formatTimestamp } from "@/app/(playground)/p/[agentId]/canary/lib/utils
 import { getAgentActivities } from "./actions";
 
 export async function AgentUsage() {
-	const result = await getAgentActivities();
+	const result = await getAgentActivities({ limit: 3 });
 
 	if (!result.success || !result.data) {
 		return (
