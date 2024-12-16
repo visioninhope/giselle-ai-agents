@@ -71,6 +71,7 @@ export default async function Page({
 
 	async function persistGraph(graph: Graph) {
 		"use server";
+		const startTime = Date.now();
 		const { url } = await putGraph(graph);
 		await db
 			.update(agents)
@@ -82,11 +83,27 @@ export default async function Page({
 			prefix: buildGraphFolderPath(graph.id),
 		});
 
-		const oldBlobUrls = blobList.blobs
+		const oldBlobs = blobList.blobs
 			.filter((blob) => blob.url !== url)
-			.map((blob) => blob.url);
-		if (oldBlobUrls.length > 0) {
-			await del(oldBlobUrls);
+			.map((blob) => ({
+				url: blob.url,
+				size: blob.size,
+			}));
+		if (oldBlobs.length > 0) {
+			await withCountMeasurement(
+				createLogger("persistGraph"),
+				async () => {
+					await del(oldBlobs.map((blob) => blob.url));
+					const totalSize = oldBlobs.reduce((sum, blob) => sum + blob.size, 0);
+					return {
+						size: totalSize,
+					};
+				},
+				ExternalServiceName.VercelBlob,
+				startTime,
+				VercelBlobOperation.Del,
+			);
+			waitForTelemetryExport();
 		}
 		return url;
 	}

@@ -467,11 +467,29 @@ export async function putGraph(graph: Graph) {
 }
 
 export async function remove(fileData: FileData) {
+	const startTime = Date.now();
 	const blobList = await list({
 		prefix: buildFileFolderPath(fileData.id),
 	});
 
 	if (blobList.blobs.length > 0) {
-		await del(blobList.blobs.map((blob) => blob.url));
+		await withCountMeasurement(
+			createLogger("remove"),
+			async () => {
+				await del(blobList.blobs.map((blob) => blob.url));
+
+				const totalSize = blobList.blobs.reduce(
+					(sum, blob) => sum + blob.size,
+					0,
+				);
+				return {
+					size: totalSize,
+				};
+			},
+			ExternalServiceName.VercelBlob,
+			startTime,
+			VercelBlobOperation.Del,
+		);
+		waitForTelemetryExport();
 	}
 }

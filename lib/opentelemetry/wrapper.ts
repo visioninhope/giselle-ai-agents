@@ -131,6 +131,12 @@ export const VercelBlobOperation = {
 			blobSizeTransfered: result.size,
 		}),
 	},
+	Del: {
+		type: "del" as const,
+		measure: (result: { size: number }) => ({
+			blobSizeStored: -result.size,
+		}),
+	},
 } as const;
 
 type VercelBlobOperationType =
