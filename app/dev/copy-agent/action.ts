@@ -9,6 +9,7 @@ import { putGraph } from "../../(playground)/p/[agentId]/canary/actions";
 import {
 	buildFileFolderPath,
 	createFileId,
+	createGraphId,
 	pathJoin,
 	pathnameToFilename,
 } from "../../(playground)/p/[agentId]/canary/lib/utils";
@@ -101,7 +102,8 @@ export async function copyAgentAction(
 			} as Node;
 		}),
 	);
-	const { url } = await putGraph({ ...graph, nodes: newNodes });
+	const newGraphId = createGraphId();
+	const { url } = await putGraph({ ...graph, id: newGraphId, nodes: newNodes });
 	const newAgentId = `agnt_${createId()}` as AgentId;
 	const newAgent = await db.insert(agents).values({
 		id: newAgentId,
