@@ -10,6 +10,7 @@ import {
 	buildFileFolderPath,
 	createFileId,
 	pathJoin,
+	pathnameToFilename,
 } from "../../(playground)/p/[agentId]/canary/lib/utils";
 import type {
 	AgentId,
@@ -66,8 +67,12 @@ export async function copyAgentAction(
 						blobList.blobs.map(async (blob) => {
 							const copyResult = await copy(
 								blob.url,
-								buildFileFolderPath(newFileId),
+								pathJoin(
+									buildFileFolderPath(newFileId),
+									pathnameToFilename(blob.pathname),
+								),
 								{
+									addRandomSuffix: true,
 									access: "public",
 								},
 							);
