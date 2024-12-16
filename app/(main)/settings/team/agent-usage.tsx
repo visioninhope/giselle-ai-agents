@@ -1,9 +1,10 @@
 import { Card } from "@/app/(main)/settings/components/card";
 import { formatTimestamp } from "@/app/(playground)/p/[agentId]/canary/lib/utils";
 import { getAgentActivities } from "./actions";
+import { AgentUsageDialog } from "./agent-usage-dialog";
 
 export async function AgentUsage() {
-	const result = await getAgentActivities({ limit: 3 });
+	const result = await getAgentActivities({ limit: 50 });
 
 	if (!result.success || !result.data) {
 		return (
@@ -14,9 +15,18 @@ export async function AgentUsage() {
 	}
 
 	const activities = result.data;
+	const recentActivities = activities.slice(0, 3);
 
 	return (
-		<Card title="Recent Agent Usage">
+		<Card
+			title="Recent Agent Usage"
+			action={{
+				component:
+					activities.length > 0 ? (
+						<AgentUsageDialog activities={activities} />
+					) : null,
+			}}
+		>
 			<div className="font-avenir rounded-[16px]">
 				<div className="grid grid-cols-4 gap-4 border-b border-zinc-800 bg-zinc-900/50 p-4 font-medium text-zinc-200">
 					<div>Agent</div>
@@ -25,8 +35,8 @@ export async function AgentUsage() {
 					<div>Charge</div>
 				</div>
 				<div className="divide-y divide-zinc-800">
-					{activities.length > 0 ? (
-						activities.map((activity) => (
+					{recentActivities.length > 0 ? (
+						recentActivities.map((activity) => (
 							<div
 								key={`${activity.agentId}-${activity.startTime}`}
 								className="grid grid-cols-4 gap-4 p-4 items-center text-zinc-200"
