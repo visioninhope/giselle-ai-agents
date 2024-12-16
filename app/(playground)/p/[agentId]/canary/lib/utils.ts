@@ -366,3 +366,7 @@ export function toErrorWithMessage(maybeError: unknown): ErrorWithMessage {
 		return new Error(String(maybeError));
 	}
 }
+
+export function pathnameToFilename(pathname: string) {
+	return pathname.split("/").pop() ?? "";
+}
