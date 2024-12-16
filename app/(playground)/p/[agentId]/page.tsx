@@ -1,6 +1,13 @@
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import { developerFlag } from "@/flags";
+import {
+	ExternalServiceName,
+	VercelBlobOperation,
+	createLogger,
+	waitForTelemetryExport,
+	withCountMeasurement,
+} from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
@@ -117,13 +124,28 @@ export default async function Page({
 	}
 	async function putExecutionAction(execution: Execution) {
 		"use server";
-		const result = await put(
-			buildGraphExecutionPath(graph.id, execution.id),
-			JSON.stringify(execution),
-			{
-				access: "public",
+		const startTime = Date.now();
+		const result = await withCountMeasurement(
+			createLogger("putExecutionAction"),
+			async () => {
+				const stringifiedExecution = JSON.stringify(execution);
+				const result = await put(
+					buildGraphExecutionPath(graph.id, execution.id),
+					stringifiedExecution,
+					{
+						access: "public",
+					},
+				);
+				return {
+					url: result.url,
+					size: new TextEncoder().encode(stringifiedExecution).length,
+				};
 			},
+			ExternalServiceName.VercelBlob,
+			startTime,
+			VercelBlobOperation.Put,
 		);
+		waitForTelemetryExport();
 		return { blobUrl: result.url };
 	}
 
