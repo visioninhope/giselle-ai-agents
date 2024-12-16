@@ -72,7 +72,7 @@ async function agentTimeUsageMs(
 ) {
 	const result = await db
 		.select({
-			value: sql<number>`sum(${agentActivities.aggregatedExecutionTimeMs})`,
+			value: sql<number>`sum(${agentActivities.totalDurationMs})`,
 		})
 		.from(agentActivities)
 		.innerJoin(agents, eq(agents.dbId, agentActivities.agentDbId))

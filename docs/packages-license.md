@@ -2,11 +2,11 @@
 
 
 ## Summary
-* 660 MIT
-* 122 Apache 2.0
-* 61 ISC
-* 23 New BSD
-* 12 Simplified BSD
+* 677 MIT
+* 130 Apache 2.0
+* 62 ISC
+* 24 New BSD
+* 13 Simplified BSD
 * 3 MIT OR Apache-2.0
 * 3 BlueOak-1.0.0
 * 2 BSD Zero Clause License
@@ -8803,7 +8803,7 @@ Strip ANSI escape codes from a string
 Strip comments from JSON. Lets you use comments in your JSON files!
 
 <a name="stripe"></a>
-### <a href="https://github.com/stripe/stripe-node">stripe</a> v16.10.0 (dependencies)
+### <a href="https://github.com/stripe/stripe-node">stripe</a> v17.4.0 (dependencies)
 #### 
 
 ##### Paths

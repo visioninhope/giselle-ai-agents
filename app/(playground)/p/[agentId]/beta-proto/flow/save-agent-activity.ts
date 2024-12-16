@@ -19,6 +19,6 @@ export async function saveAgentActivity(activity: AgentActivity) {
 		agentDbId,
 		startedAt: activity.startedAt,
 		endedAt: activity.endedAt,
-		aggregatedExecutionTimeMs: activity.totalDurationMs(),
+		totalDurationMs: activity.totalDurationMs(),
 	});
 }
