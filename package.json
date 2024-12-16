@@ -85,7 +85,7 @@
 		"react-dom": "19.0.0-rc-4d577fd2-20241104",
 		"remark": "15.0.1",
 		"remark-html": "16.0.1",
-		"stripe": "16.10.0",
+		"stripe": "17.4.0",
 		"swr": "2.2.5",
 		"tailwind-merge": "^2.4.0",
 		"tailwindcss-animate": "^1.0.7",
