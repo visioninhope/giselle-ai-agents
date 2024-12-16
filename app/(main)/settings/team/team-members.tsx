@@ -33,7 +33,11 @@ export async function TeamMembers() {
 	return (
 		<Card title="Team members">
 			{isProPlan(team) && currentUserRole === "admin" && <TeamMembersForm />}
-			<TeamMembersList members={members} currentUserRole={currentUserRole} />
+			<TeamMembersList
+				teamDbId={team.dbId}
+				members={members}
+				currentUserRole={currentUserRole}
+			/>
 		</Card>
 	);
 }
