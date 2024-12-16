@@ -1,25 +1,20 @@
 import { Card } from "@/app/(main)/settings/components/card";
+import { formatTimestamp } from "@/app/(playground)/p/[agentId]/canary/lib/utils";
+import { getAgentActivities } from "./actions";
 
-const agentLogs = [
-	{
-		agentId: "agent_1",
-		agentName: "Data Analysis Agent",
-		startTime: "2024-03-18 10:00:00",
-		endTime: "2024-03-18 10:05:00",
-		errorMessage: "",
-		usedCharge: 5,
-	},
-	{
-		agentId: "agent_2",
-		agentName: "Code Review Agent",
-		startTime: "2024-03-18 11:00:00",
-		endTime: null,
-		errorMessage: "",
-		usedCharge: 3,
-	},
-];
+export async function AgentUsage() {
+	const result = await getAgentActivities();
 
-export function AgentUsage() {
+	if (!result.success || !result.data) {
+		return (
+			<Card title="Recent Agent Usage">
+				<div className="text-zinc-400 p-4">Failed to load agent activities</div>
+			</Card>
+		);
+	}
+
+	const activities = result.data;
+
 	return (
 		<Card title="Recent Agent Usage">
 			<div className="font-avenir rounded-[16px]">
@@ -30,17 +25,31 @@ export function AgentUsage() {
 					<div>Charge</div>
 				</div>
 				<div className="divide-y divide-zinc-800">
-					{agentLogs.slice(0, 5).map((log) => (
-						<div
-							key={`${log.startTime}-${log.endTime}`}
-							className="grid grid-cols-4 gap-4 p-4 items-center text-zinc-200"
-						>
-							<div>{log.agentName}</div>
-							<div className="text-zinc-400">{log.startTime}</div>
-							<div className="text-zinc-400">{log.endTime || "-"}</div>
-							<div>{log.usedCharge} minutes</div>
-						</div>
-					))}
+					{activities.length > 0 ? (
+						activities.map((activity) => (
+							<div
+								key={`${activity.agentId}-${activity.startTime}`}
+								className="grid grid-cols-4 gap-4 p-4 items-center text-zinc-200"
+							>
+								<div>{activity.agentName ?? activity.agentId}</div>
+								<div className="text-zinc-400">
+									{formatTimestamp.toShortDateTime(
+										new Date(activity.startTime).getTime(),
+									)}
+								</div>
+								<div className="text-zinc-400">
+									{activity.endTime
+										? formatTimestamp.toShortDateTime(
+												new Date(activity.endTime).getTime(),
+											)
+										: "-"}
+								</div>
+								<div>{activity.usedCharge} seconds</div>
+							</div>
+						))
+					) : (
+						<div className="p-4 text-zinc-400">No recent agent activities</div>
+					)}
 				</div>
 			</div>
 		</Card>
