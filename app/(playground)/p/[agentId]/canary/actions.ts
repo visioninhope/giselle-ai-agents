@@ -23,6 +23,7 @@ import { vercelBlobFileFolder, vercelBlobGraphFolder } from "./constants";
 
 import { textGenerationPrompt } from "./lib/prompts";
 import {
+	buildFileFolderPath,
 	buildGraphPath,
 	elementsToMarkdown,
 	langfuseModel,
@@ -418,7 +419,7 @@ export async function putGraph(graph: Graph) {
 
 export async function remove(fileData: FileData) {
 	const blobList = await list({
-		prefix: pathJoin(vercelBlobFileFolder, fileData.id),
+		prefix: buildFileFolderPath(fileData.id),
 	});
 
 	if (blobList.blobs.length > 0) {
