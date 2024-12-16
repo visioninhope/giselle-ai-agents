@@ -2,11 +2,11 @@
 
 
 ## Summary
-* 677 MIT
-* 130 Apache 2.0
-* 62 ISC
-* 24 New BSD
-* 13 Simplified BSD
+* 660 MIT
+* 122 Apache 2.0
+* 61 ISC
+* 23 New BSD
+* 12 Simplified BSD
 * 3 MIT OR Apache-2.0
 * 3 BlueOak-1.0.0
 * 2 BSD Zero Clause License
