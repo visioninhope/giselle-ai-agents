@@ -5,6 +5,11 @@ import {
 	AgentActivity,
 	hasEnoughAgentTimeCharge,
 } from "@/services/agents/activities";
+import { stripe } from "@/services/external/stripe";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import { processUnreportedActivities } from "@/services/usage-based-billing";
+import { AgentTimeUsageDAO } from "@/services/usage-based-billing/agent-time-usage-dao";
+import { captureException } from "@sentry/nextjs";
 import { put } from "@vercel/blob";
 import { createStreamableValue } from "ai/rsc";
 import { eq } from "drizzle-orm";
@@ -191,9 +196,33 @@ export async function executeFlow(
 		stream.done();
 		agentActivity.end();
 		await saveAgentActivity(agentActivity);
-	})();
+		if (agentActivity.endedAt == null) {
+			throw new Error("Activity must be ended before reporting");
+		}
+		await reportActivityToStripe(agentActivity.endedAt);
+	})().catch((error) => {
+		console.error(error);
+		captureException(error);
+	});
 
 	return { streamableValue: stream.value };
+}
+
+async function reportActivityToStripe(targetDate: Date) {
+	const currentTeam = await fetchCurrentTeam();
+	if (!isProPlan(currentTeam)) {
+		return;
+	}
+	return processUnreportedActivities(
+		{
+			teamDbId: currentTeam.dbId,
+			targetDate: targetDate,
+		},
+		{
+			dao: new AgentTimeUsageDAO(db),
+			stripe: stripe,
+		},
+	);
 }
 
 interface PutFlowInput {
