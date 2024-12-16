@@ -313,6 +313,10 @@ export async function executeStep(
 			const temperature = node.content.temperature;
 			const stream = createStreamableValue<TextArtifactObject>();
 
+			trace.update({
+				input: prompt,
+			});
+
 			const generationTracer = trace.generation({
 				name: "generate-text",
 				input: prompt,
@@ -349,6 +353,7 @@ export async function executeStep(
 					createLogger(node.content.type),
 					async () => {
 						generationTracer.end({ output: result });
+						trace.update({ output: result });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
 						return { usage: await usage };
