@@ -33,7 +33,9 @@ export function AgentUsageTable({
 								key={`${activity.agentId}-${activity.startTime}`}
 								className="grid grid-cols-4 gap-4 p-4 items-center text-zinc-200"
 							>
-								<div>{activity.agentName ?? activity.agentId}</div>
+								<div className="break-words max-w-xs">
+									{activity.agentName ?? activity.agentId}
+								</div>
 								<div className="text-zinc-400">
 									<LocalDateTime date={new Date(activity.startTime)} />
 								</div>

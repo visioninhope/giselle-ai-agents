@@ -18,7 +18,7 @@ export function AgentUsageDialog({ activities }: AgentUsageDialogProps) {
 			<DialogTrigger asChild>
 				<Button variant="link">View all logs</Button>
 			</DialogTrigger>
-			<DialogContent className="max-w-6xl">
+			<DialogContent className="max-w-7xl">
 				<DialogHeader>
 					<DialogTitle>Agent Usage Logs</DialogTitle>
 				</DialogHeader>
