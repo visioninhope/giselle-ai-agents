@@ -1,11 +1,13 @@
 import { stripe } from "@/services/external/stripe";
 import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
 import type Stripe from "stripe";
+import { handleSubscriptionCycleInvoice } from "./handle-subscription-cycle-invoice";
 
 const relevantEvents = new Set([
 	"checkout.session.completed",
 	"customer.subscription.updated",
 	"customer.subscription.deleted",
+	"invoice.created",
 ]);
 
 export async function POST(req: Request) {
@@ -68,6 +70,14 @@ export async function POST(req: Request) {
 					);
 				}
 				await upsertSubscription(event.data.object.id);
+				break;
+
+			case "invoice.created":
+				console.log(`🔔  Invoice created: ${event.data.object.id}`);
+				console.debug(event.data.object);
+				if (event.data.object.billing_reason !== "subscription_cycle") {
+					await handleSubscriptionCycleInvoice(event.data.object);
+				}
 				break;
 
 			default:
