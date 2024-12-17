@@ -34,7 +34,7 @@ async function AgentList() {
 	return (
 		<div className="grid gap-[16px] grid-cols-3">
 			{dbAgents.map((agent) => (
-				<Link href={`/p/${agent.id}/canary`} key={agent.id}>
+				<Link href={`/p/${agent.id}`} key={agent.id}>
 					<div className="bg-gradient-to-br from-[hsla(187,79%,54%,0.2)] to-[hsla(207,100%,9%,0.2)] p-[18px] relative rounded-[8px]">
 						<div className="divide-y divide-black-70">
 							<div className="h-[60px]">
