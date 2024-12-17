@@ -506,3 +506,22 @@ export const agentTimeUsageReports = pgTable(
 		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
 	}),
 );
+
+export const userSeatUsageReports = pgTable(
+	"user_seat_usage_reports",
+	{
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		// Keep snapshot for audit purposes
+		userDbIdList: integer("user_db_id_list").array().notNull(),
+		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
+		timestamp: timestamp("created_at").defaultNow().notNull(),
+	},
+	(table) => ({
+		teamDbIdIdx: index().on(table.teamDbId),
+		timestampIdx: index().on(table.timestamp),
+		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
+	}),
+);
