@@ -79,7 +79,12 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 				),
 			)
 			.orderBy(agentActivities.dbId);
-		return activities;
+		return activities.map((activity) => ({
+			dbId: activity.dbId,
+			totalDurationMs: safeStringToNumber(activity.totalDurationMs),
+			endedAt: activity.endedAt,
+			usageReportDbId: activity.usageReportDbId,
+		}));
 	}
 
 	async findLastUsageReport(
@@ -102,7 +107,16 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 		if (reports.length === 0) {
 			return null;
 		}
-		return reports[0];
+		return {
+			dbId: reports[0].dbId,
+			teamDbId: reports[0].teamDbId,
+			accumulatedDurationMs: safeStringToNumber(
+				reports[0].accumulatedDurationMs,
+			),
+			minutesIncrement: reports[0].minutesIncrement,
+			stripeMeterEventId: reports[0].stripeMeterEventId,
+			timestamp: reports[0].timestamp,
+		};
 	}
 
 	async createUsageReport(params: {
@@ -116,7 +130,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			.insert(agentTimeUsageReports)
 			.values({
 				teamDbId: params.teamDbId,
-				accumulatedDurationMs: params.accumulatedDurationMs,
+				accumulatedDurationMs: params.accumulatedDurationMs.toString(),
 				minutesIncrement: params.minutesIncrement,
 				stripeMeterEventId: params.stripeMeterEventId,
 				timestamp: params.timestamp,
@@ -125,7 +139,14 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 		if (report == null) {
 			throw new Error("Failed to create usage report");
 		}
-		return report;
+		return {
+			dbId: report.dbId,
+			teamDbId: report.teamDbId,
+			accumulatedDurationMs: safeStringToNumber(report.accumulatedDurationMs),
+			minutesIncrement: report.minutesIncrement,
+			stripeMeterEventId: report.stripeMeterEventId,
+			timestamp: report.timestamp,
+		};
 	}
 
 	async markActivitiesAsProcessed(
@@ -142,4 +163,12 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			})
 			.where(inArray(agentActivities.dbId, activityIds));
 	}
+}
+
+function safeStringToNumber(value: string): number {
+	const num = Number(value);
+	if (num > Number.MAX_SAFE_INTEGER) {
+		throw new Error(`Value exceeds MAX_SAFE_INTEGER: ${value}`);
+	}
+	return num;
 }
