@@ -1,5 +1,5 @@
 import { agents, db } from "@/drizzle";
-import { developerFlag, playgroundV2Flag } from "@/flags";
+import { developerFlag } from "@/flags";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -40,14 +40,10 @@ export default async function Page({
 }: {
 	params: Promise<{ agentId: AgentId }>;
 }) {
-	const [playgroundV2, developerMode, { agentId }] = await Promise.all([
-		playgroundV2Flag(),
+	const [developerMode, { agentId }] = await Promise.all([
 		developerFlag(),
 		params,
 	]);
-	if (!playgroundV2) {
-		return notFound();
-	}
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, agentId),
 	});
