@@ -72,6 +72,7 @@ export default async function Page({
 	async function persistGraph(graph: Graph) {
 		"use server";
 		const startTime = Date.now();
+		const logger = createLogger("persistGraph");
 		const { url } = await putGraph(graph);
 		await db
 			.update(agents)
@@ -79,9 +80,22 @@ export default async function Page({
 				graphUrl: url,
 			})
 			.where(eq(agents.id, agentId));
-		const blobList = await list({
-			prefix: buildGraphFolderPath(graph.id),
-		});
+		const { blobList } = await withCountMeasurement(
+			logger,
+			async () => {
+				const result = await list({
+					prefix: buildGraphFolderPath(graph.id),
+				});
+				const size = result.blobs.reduce((sum, blob) => sum + blob.size, 0);
+				return {
+					blobList: result,
+					size,
+				};
+			},
+			ExternalServiceName.VercelBlob,
+			startTime,
+			VercelBlobOperation.List,
+		);
 
 		const oldBlobs = blobList.blobs
 			.filter((blob) => blob.url !== url)
@@ -91,7 +105,7 @@ export default async function Page({
 			}));
 		if (oldBlobs.length > 0) {
 			await withCountMeasurement(
-				createLogger("persistGraph"),
+				logger,
 				async () => {
 					await del(oldBlobs.map((blob) => blob.url));
 					const totalSize = oldBlobs.reduce((sum, blob) => sum + blob.size, 0);

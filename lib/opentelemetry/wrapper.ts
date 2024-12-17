@@ -137,6 +137,12 @@ export const VercelBlobOperation = {
 			blobSizeStored: -result.size,
 		}),
 	},
+	List: {
+		type: "list" as const,
+		measure: (result: { size: number }) => ({
+			blobSizeTransfered: result.size,
+		}),
+	},
 } as const;
 
 type VercelBlobOperationType =

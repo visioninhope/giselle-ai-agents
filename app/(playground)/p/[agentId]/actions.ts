@@ -13,7 +13,7 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { del, list, put } from "@vercel/blob";
+import { type ListBlobResult, del, list, put } from "@vercel/blob";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
@@ -468,26 +468,38 @@ export async function putGraph(graph: Graph) {
 
 export async function remove(fileData: FileData) {
 	const startTime = Date.now();
-	const blobList = await list({
-		prefix: buildFileFolderPath(fileData.id),
-	});
+	function calcTotalSize(blobList: ListBlobResult): number {
+		return blobList.blobs.reduce((sum, blob) => sum + blob.size, 0);
+	}
+	const { blobList } = await withCountMeasurement(
+		createLogger("remove"),
+		async () => {
+			const result = await list({
+				prefix: buildFileFolderPath(fileData.id),
+			});
+			return {
+				blobList: result,
+				size: calcTotalSize(result),
+			};
+		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		VercelBlobOperation.List,
+	);
 
+	const startTimeDel = Date.now();
 	if (blobList.blobs.length > 0) {
 		await withCountMeasurement(
 			createLogger("remove"),
 			async () => {
 				await del(blobList.blobs.map((blob) => blob.url));
 
-				const totalSize = blobList.blobs.reduce(
-					(sum, blob) => sum + blob.size,
-					0,
-				);
 				return {
-					size: totalSize,
+					size: calcTotalSize(blobList),
 				};
 			},
 			ExternalServiceName.VercelBlob,
-			startTime,
+			startTimeDel,
 			VercelBlobOperation.Del,
 		);
 		waitForTelemetryExport();
