@@ -3,7 +3,7 @@ import { fetchCurrentTeam } from "@/services/teams";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
-import { formatTimestamp } from "../../(playground)/p/[agentId]/canary/lib/utils";
+import { formatTimestamp } from "../../(playground)/p/[agentId]/lib/utils";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
