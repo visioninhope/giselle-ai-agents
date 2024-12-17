@@ -35,11 +35,11 @@ export function AgentUsageTable({
 							>
 								<div>{activity.agentName ?? activity.agentId}</div>
 								<div className="text-zinc-400">
-									<LocalDateTime utcDateTime={new Date(activity.startTime)} />
+									<LocalDateTime date={new Date(activity.startTime)} />
 								</div>
 								<div className="text-zinc-400">
 									{activity.endTime ? (
-										<LocalDateTime utcDateTime={new Date(activity.endTime)} />
+										<LocalDateTime date={new Date(activity.endTime)} />
 									) : (
 										"-"
 									)}

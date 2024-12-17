@@ -1,15 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-
-interface LocalDateTimeProps {
-	utcDateTime: Date;
-	// Optional format configuration
-	format?: Intl.DateTimeFormatOptions;
-}
-
 export function LocalDateTime({
-	utcDateTime,
+	date,
 	format = {
 		year: "numeric",
 		month: "long",
@@ -17,15 +9,13 @@ export function LocalDateTime({
 		hour: "2-digit",
 		minute: "2-digit",
 		hour12: false,
+		timeZoneName: "short",
 	},
-}: LocalDateTimeProps) {
-	// Server-side rendering will display "Loading..." until the useEffect hook runs
-	const [formattedDate, setFormattedDate] = useState("Loading...");
+}: {
+	date: Date;
+	format?: Intl.DateTimeFormatOptions;
+}) {
+	const formattedDate = new Intl.DateTimeFormat("en-US", format).format(date);
 
-	useEffect(() => {
-		// Display using browser's locale and timezone
-		setFormattedDate(utcDateTime.toLocaleString(undefined, format));
-	}, [utcDateTime, format]);
-
-	return <time dateTime={utcDateTime.toISOString()}>{formattedDate}</time>;
+	return <time dateTime={date.toISOString()}>{formattedDate}</time>;
 }
