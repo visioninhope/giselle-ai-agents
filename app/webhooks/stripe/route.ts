@@ -74,7 +74,6 @@ export async function POST(req: Request) {
 
 			case "invoice.created":
 				console.log(`🔔  Invoice created: ${event.data.object.id}`);
-				console.debug(event.data.object);
 				if (event.data.object.billing_reason === "subscription_cycle") {
 					await handleSubscriptionCycleInvoice(event.data.object);
 				}

@@ -32,7 +32,6 @@ export async function reportUserSeatUsage(
 		identifier: meterEventId,
 		timestamp: timestamp.toISOString(),
 	});
-	console.debug(stripeEvent);
 
 	// Save report to the database
 	await saveUserSeatUsage(
