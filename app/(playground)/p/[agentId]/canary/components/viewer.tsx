@@ -2,8 +2,8 @@
 
 import * as Tabs from "@radix-ui/react-tabs";
 import { type DetailedHTMLProps, useMemo } from "react";
-import { SpinnerIcon } from "../../beta-proto/components/icons/spinner";
-import { WilliIcon } from "../../beta-proto/components/icons/willi";
+import { SpinnerIcon } from "../../prev/beta-proto/components/icons/spinner";
+import { WilliIcon } from "../../prev/beta-proto/components/icons/willi";
 import { useExecution } from "../contexts/execution";
 import { useGraph } from "../contexts/graph";
 import { formatTimestamp } from "../lib/utils";

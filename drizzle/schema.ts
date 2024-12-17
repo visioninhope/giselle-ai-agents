@@ -1,6 +1,6 @@
-import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/beta-proto/giselle-node/types";
-import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/beta-proto/github-integration/types";
-import type { Graph } from "@/app/(playground)/p/[agentId]/beta-proto/graph/types";
+import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/prev/beta-proto/giselle-node/types";
+import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/prev/beta-proto/github-integration/types";
+import type { Graph } from "@/app/(playground)/p/[agentId]/prev/beta-proto/graph/types";
 import type {
 	FileId,
 	KnowledgeContentId,
