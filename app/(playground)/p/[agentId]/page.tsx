@@ -36,7 +36,6 @@ import type {
 // https://vercel.com/docs/functions/runtimes#max-duration
 export const maxDuration = 300;
 
-// This page is experimental. it requires PlaygroundV2Flag to show this page
 export default async function Page({
 	params,
 }: {
