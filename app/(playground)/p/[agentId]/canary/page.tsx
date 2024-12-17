@@ -1,5 +1,7 @@
+import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import { developerFlag } from "@/flags";
+import { getUser } from "@/lib/supabase";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -40,16 +42,21 @@ export default async function Page({
 }: {
 	params: Promise<{ agentId: AgentId }>;
 }) {
-	const [developerMode, { agentId }] = await Promise.all([
+	const [developerMode, { agentId }, user] = await Promise.all([
 		developerFlag(),
 		params,
+		getUser(),
 	]);
-	const agent = await db.query.agents.findFirst({
-		where: (agents, { eq }) => eq(agents.id, agentId),
-	});
+
+	const [agent, teamMembership] = await Promise.all([
+		db.query.agents.findFirst({
+			where: (agents, { eq }) => eq(agents.id, agentId),
+		}),
+		getTeamMembershipByAgentId(agentId, user.id),
+	]);
 	// TODO: Remove graphUrl null check when add notNull constrain to graphUrl column
-	if (agent === undefined || agent.graphUrl === null) {
-		throw new Error("Agent not found");
+	if (agent === undefined || agent.graphUrl === null || !teamMembership) {
+		notFound();
 	}
 	// TODO: Add schema validation to verify parsed graph matches expected shape
 	let graph = await fetch(agent.graphUrl).then(
