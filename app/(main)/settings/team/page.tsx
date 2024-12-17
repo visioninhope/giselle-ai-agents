@@ -2,6 +2,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
 import { AgentTimeCharge } from "./agent-time-charge";
 import BillingSection from "./billing-section";
+import { DangerZone } from "./danger-zone";
 import { TeamMembers } from "./team-members";
 import { TeamName } from "./team-name";
 
@@ -35,6 +36,7 @@ export default function TeamPage() {
 			</Suspense>
 			<TeamMembers />
 			<BillingSection />
+			<DangerZone />
 		</div>
 	);
 }
