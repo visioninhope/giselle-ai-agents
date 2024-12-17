@@ -1,3 +1,4 @@
+import { toUTCDate } from "@/lib/utils";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import type Stripe from "stripe";
 import invariant from "tiny-invariant";
@@ -25,6 +26,7 @@ export async function handleSubscriptionCycleInvoice(invoice: Stripe.Invoice) {
 	invariant(customer, "Invoice is missing a customer ID");
 	const customerId = typeof customer === "string" ? customer : customer.id;
 	const periodEnd = new Date(invoice.period_end * 1000);
+	const periodEndUTC = toUTCDate(periodEnd);
 
-	await reportUserSeatUsage(subscriptionId, customerId, periodEnd);
+	await reportUserSeatUsage(subscriptionId, customerId, periodEndUTC);
 }
