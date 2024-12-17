@@ -1,4 +1,4 @@
-import { toUTCDate } from "@/lib/utils";
+import { toUTCDate } from "@/lib/date";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import type Stripe from "stripe";
 import invariant from "tiny-invariant";

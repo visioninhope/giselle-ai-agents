@@ -93,17 +93,3 @@ export async function withRetry<T>(
 	// If all retries are exhausted, throw an error with the history of errors
 	throw new MaxRetriesExceededError(errors);
 }
-
-export function toUTCDate(date: Date): Date {
-	return new Date(
-		Date.UTC(
-			date.getUTCFullYear(),
-			date.getUTCMonth(),
-			date.getUTCDate(),
-			date.getUTCHours(),
-			date.getUTCMinutes(),
-			date.getUTCSeconds(),
-			date.getUTCMilliseconds(),
-		),
-	);
-}
