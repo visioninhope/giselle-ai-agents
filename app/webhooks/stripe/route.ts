@@ -4,7 +4,6 @@ import type Stripe from "stripe";
 
 const relevantEvents = new Set([
 	"checkout.session.completed",
-	"customer.subscription.created",
 	"customer.subscription.updated",
 	"customer.subscription.deleted",
 ]);
@@ -35,20 +34,6 @@ export async function POST(req: Request) {
 
 	try {
 		switch (event.type) {
-			case "customer.subscription.created":
-			case "customer.subscription.updated":
-			case "customer.subscription.deleted":
-				if (
-					event.data.object.customer == null ||
-					typeof event.data.object.customer !== "string"
-				) {
-					throw new Error(
-						"The checkout session is missing a valid customer ID. Please check the session data.",
-					);
-				}
-				await upsertSubscription(event.data.object.id);
-				break;
-
 			case "checkout.session.completed":
 				if (event.data.object.mode !== "subscription") {
 					throw new Error("Unhandled relevant event!");
@@ -70,6 +55,19 @@ export async function POST(req: Request) {
 					);
 				}
 				await upsertSubscription(event.data.object.subscription);
+				break;
+
+			case "customer.subscription.updated":
+			case "customer.subscription.deleted":
+				if (
+					event.data.object.customer == null ||
+					typeof event.data.object.customer !== "string"
+				) {
+					throw new Error(
+						"The checkout session is missing a valid customer ID. Please check the session data.",
+					);
+				}
+				await upsertSubscription(event.data.object.id);
 				break;
 
 			default:
