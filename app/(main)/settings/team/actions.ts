@@ -450,11 +450,19 @@ export async function getAgentActivities({
 			.orderBy(desc(agentActivities.startedAt))
 			.limit(limit);
 
-		const formattedActivities = activities.map((activity) => ({
-			...activity,
-			// Convert milliseconds to seconds and round to 2 decimal places
-			usedCharge: Math.ceil((activity.usedCharge / 1000) * 100) / 100,
-		}));
+		const formattedActivities = activities.map((activity) => {
+			const durationInSeconds = Number(activity.usedCharge) / 1000;
+
+			const validDuration = Number.isNaN(durationInSeconds)
+				? 0
+				: durationInSeconds;
+
+			return {
+				...activity,
+				// Convert milliseconds to seconds and round to 2 decimal places
+				usedCharge: Math.ceil(validDuration * 100) / 100,
+			};
+		});
 
 		return {
 			success: true,
