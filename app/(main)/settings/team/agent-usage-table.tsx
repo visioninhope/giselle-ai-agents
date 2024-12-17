@@ -1,4 +1,4 @@
-import { formatTimestamp } from "@/app/(playground)/p/[agentId]/canary/lib/utils";
+import { LocalDateTime } from "./components/local-date-time";
 
 export type AgentActivity = {
 	agentId: string;
@@ -35,16 +35,14 @@ export function AgentUsageTable({
 							>
 								<div>{activity.agentName ?? activity.agentId}</div>
 								<div className="text-zinc-400">
-									{formatTimestamp.toShortDateTime(
-										new Date(activity.startTime).getTime(),
-									)}
+									<LocalDateTime utcDateTime={new Date(activity.startTime)} />
 								</div>
 								<div className="text-zinc-400">
-									{activity.endTime
-										? formatTimestamp.toShortDateTime(
-												new Date(activity.endTime).getTime(),
-											)
-										: "-"}
+									{activity.endTime ? (
+										<LocalDateTime utcDateTime={new Date(activity.endTime)} />
+									) : (
+										"-"
+									)}
 								</div>
 								<div>{activity.usedCharge} seconds</div>
 							</div>
