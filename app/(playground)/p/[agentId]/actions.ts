@@ -121,7 +121,7 @@ export async function action(
 	agentId: AgentId,
 	nodeId: NodeId,
 ) {
-	const startTime = performance.now();
+	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: artifactId,

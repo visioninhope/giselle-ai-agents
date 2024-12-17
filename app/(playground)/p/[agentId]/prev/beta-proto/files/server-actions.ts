@@ -18,7 +18,7 @@ type UploadFileInput = {
 	file: File;
 };
 export async function uploadFile({ input }: { input: UploadFileInput }) {
-	const startTime = performance.now();
+	const startTime = Date.now();
 	const logger = createLogger("files");
 	const result = await withCountMeasurement(
 		logger,
@@ -51,7 +51,7 @@ type ParseFileInput = {
 	blobUrl: string;
 };
 export async function parseFile(args: ParseFileInput) {
-	const startTime = performance.now();
+	const startTime = Date.now();
 	const logger = createLogger("files");
 	if (process.env.UNSTRUCTURED_API_KEY === undefined) {
 		throw new Error("UNSTRUCTURED_API_KEY is not set");

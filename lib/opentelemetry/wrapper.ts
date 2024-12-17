@@ -73,14 +73,14 @@ async function withMeasurement<T>(
 	measurement: MeasurementSchema<T>,
 	measurementStartTime?: number,
 ): Promise<T> {
-	const startTime = measurementStartTime ?? performance.now(); // set `startTime` for each call in parallel process
+	const startTime = measurementStartTime ?? Date.now(); // set `startTime` for each call in parallel process
 	try {
 		// business logic: error should be thrown
 		const result = await operation();
 
 		try {
 			// instrumentation: error must not be thrown to avoid interfering with the business logic
-			const duration = performance.now() - startTime;
+			const duration = Date.now() - startTime;
 			Promise.all([getCurrentMeasurementScope(), isRoute06User()])
 				.then(([measurementScope, isR06User]) => {
 					const metrics = measurement(
