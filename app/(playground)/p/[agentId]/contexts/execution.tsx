@@ -32,12 +32,14 @@ import type {
 	FailedStepExecution,
 	Flow,
 	FlowId,
+	GeneratedArtifact,
 	JobExecution,
 	Node,
 	NodeId,
 	SkippedJobExecution,
 	StepExecution,
 	StepId,
+	TextArtifact,
 	TextArtifactObject,
 } from "../types";
 import { useGraph } from "./graph";
@@ -138,16 +140,28 @@ const processStreamContent = async (
 	return textArtifactObject;
 };
 
-const executeStep = async (
-	stepExecution: StepExecution,
+const executeStep = async ({
+	stepExecution,
+	executeStepAction,
+	updateExecution,
+	updateArtifact,
+	onStepFinish,
+	onStepFail,
+}: {
+	stepExecution: StepExecution;
 	executeStepAction: (
 		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
-	) => void,
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void,
-): Promise<CompletedStepExecution | FailedStepExecution> => {
+	) => void;
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
+	onStepFinish?: (
+		stepExecution: CompletedStepExecution,
+		artifact: TextArtifact,
+	) => void;
+	onStepFail?: (stepExecution: FailedStepExecution) => void;
+}): Promise<CompletedStepExecution | FailedStepExecution> => {
 	if (stepExecution.status === "completed") {
 		return stepExecution;
 	}
@@ -194,12 +208,19 @@ const executeStep = async (
 		// Complete step execution
 		const stepDurationMs = Date.now() - stepRunStartedAt;
 
-		const successStepExecution: CompletedStepExecution = {
+		const completedStepExecution: CompletedStepExecution = {
 			...stepExecution,
 			status: "completed",
 			runStartedAt: stepRunStartedAt,
 			durationMs: stepDurationMs,
 		};
+		const generatedArtifact = {
+			id: artifactId,
+			type: "generatedArtifact",
+			creatorNodeId: stepExecution.nodeId,
+			createdAt: Date.now(),
+			object: finalArtifact,
+		} satisfies TextArtifact;
 		updateExecution((prev) => {
 			if (!prev || prev.status !== "running") return null;
 
@@ -208,24 +229,16 @@ const executeStep = async (
 				jobExecutions: prev.jobExecutions.map((job) => ({
 					...job,
 					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? successStepExecution : step,
+						step.id === stepExecution.id ? completedStepExecution : step,
 					),
 				})),
 				artifacts: prev.artifacts.map((artifact) =>
-					artifact.id === artifactId
-						? {
-								id: artifactId,
-								type: "generatedArtifact",
-								creatorNodeId: stepExecution.nodeId,
-								createdAt: Date.now(),
-								object: finalArtifact,
-							}
-						: artifact,
+					artifact.id === artifactId ? generatedArtifact : artifact,
 				),
 			};
 		});
-
-		return successStepExecution;
+		onStepFinish?.(completedStepExecution, generatedArtifact);
+		return completedStepExecution;
 	} catch (unknownError) {
 		const error = toErrorWithMessage(unknownError).message;
 		const stepDurationMs = Date.now() - stepRunStartedAt;
@@ -252,20 +265,33 @@ const executeStep = async (
 				),
 			};
 		});
+		onStepFail?.(failedStepExecution);
 		return failedStepExecution;
 	}
 };
 
-const executeJob = async (
-	jobExecution: JobExecution,
+const executeJob = async ({
+	jobExecution,
+	executeStepAction,
+	updateArtifact,
+	updateExecution,
+	onStepFinish,
+	onStepFail,
+}: {
+	jobExecution: JobExecution;
 	executeStepAction: (
 		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
-	) => void,
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void,
-): Promise<CompletedJobExecution | FailedJobExecution> => {
+	) => void;
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
+	onStepFinish?: (
+		stepExecution: CompletedStepExecution,
+		artifact: TextArtifact,
+	) => void;
+	onStepFail?: (stepExecution: FailedStepExecution) => void;
+}): Promise<CompletedJobExecution | FailedJobExecution> => {
 	const jobRunStartedAt = Date.now();
 
 	// Start job execution
@@ -283,8 +309,15 @@ const executeJob = async (
 
 	// Execute all steps in parallel
 	const stepExecutions = await Promise.all(
-		jobExecution.stepExecutions.map((step) =>
-			executeStep(step, executeStepAction, updateExecution, updateArtifact),
+		jobExecution.stepExecutions.map((stepExecution) =>
+			executeStep({
+				stepExecution,
+				executeStepAction,
+				updateExecution,
+				updateArtifact,
+				onStepFinish,
+				onStepFail,
+			}),
 		),
 	);
 
@@ -401,6 +434,10 @@ export function ExecutionProvider({
 			artifactId: ArtifactId,
 			content: TextArtifactObject,
 		) => void;
+		onStepFinish?: (
+			stepExecution: CompletedStepExecution,
+			artifact: TextArtifact,
+		) => void;
 	}
 	const performFlowExecution = useCallback(
 		async ({
@@ -410,6 +447,7 @@ export function ExecutionProvider({
 			connections,
 			executeStepCallback,
 			updateArtifactCallback,
+			onStepFinish,
 		}: ExecuteFlowParams) => {
 			let currentExecution = initialExecution;
 			let totalFlowDurationMs = 0;
@@ -441,18 +479,25 @@ export function ExecutionProvider({
 					continue;
 				}
 
-				const executedJob = await executeJob(
+				const executedJob = await executeJob({
 					jobExecution,
-					executeStepCallback,
-					(updater) => {
+					executeStepAction: executeStepCallback,
+					updateExecution: (updater) => {
 						const updated = updater(currentExecution);
 						if (updated) {
 							currentExecution = updated;
 							setExecution(updated);
 						}
 					},
-					updateArtifactCallback,
-				);
+					updateArtifact: updateArtifactCallback,
+					onStepFinish,
+					onStepFail: (failedStep) => {
+						addToast({
+							type: "error",
+							message: failedStep.error,
+						});
+					},
+				});
 
 				totalFlowDurationMs += executedJob.durationMs;
 				if (executedJob.status === "failed") {
@@ -499,7 +544,7 @@ export function ExecutionProvider({
 
 			return currentExecution;
 		},
-		[dispatch, putExecutionAction],
+		[dispatch, putExecutionAction, addToast],
 	);
 
 	const executeFlow = useCallback(
@@ -659,6 +704,15 @@ export function ExecutionProvider({
 								creatorNodeId: nodeId,
 								object: content,
 							},
+						},
+					});
+				},
+				onStepFinish: (execution, artifact) => {
+					dispatch({
+						type: "upsertArtifact",
+						input: {
+							nodeId,
+							artifact,
 						},
 					});
 				},
