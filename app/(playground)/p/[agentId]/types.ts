@@ -344,6 +344,15 @@ export type Execution =
 	| CompletedExecution
 	| FailedExecution;
 
+export type ExecutionSnapshotId = `excs_${string}`;
+export interface ExecutionSnapshot {
+	id: ExecutionSnapshotId;
+	execution: Execution;
+	nodes: Node[];
+	connections: Connection[];
+	flow: Flow;
+}
+
 export interface ExecutionIndex {
 	executionId: ExecutionId;
 	blobUrl: string;

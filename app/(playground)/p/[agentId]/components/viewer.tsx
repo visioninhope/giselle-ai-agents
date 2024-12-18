@@ -14,6 +14,7 @@ import ClipboardButton from "./clipboard-button";
 import { ContentTypeIcon } from "./content-type-icon";
 import { Header } from "./header";
 import { Markdown } from "./markdown";
+import { Button } from "./ui/button";
 import { EmptyState } from "./ui/empty-state";
 
 interface StepExecutionButtonProps
@@ -68,6 +69,7 @@ function ExecutionViewer({
 	execution: tmpExecution,
 }: { execution: Execution }) {
 	const { graph } = useGraph();
+	const { retryFlowExecution } = useExecution();
 	const execution = useMemo(
 		() => ({
 			...tmpExecution,
@@ -79,6 +81,7 @@ function ExecutionViewer({
 							(node) => node.id === stepExecution.nodeId,
 						);
 						if (node === undefined) {
+							console.log(`${stepExecution.nodeId} not found`);
 							return null;
 						}
 						const artifact = tmpExecution.artifacts.find((artifact) => {
@@ -130,7 +133,19 @@ function ExecutionViewer({
 						<Tabs.Content key={stepExecution.id} value={stepExecution.id}>
 							{stepExecution.status === "pending" && <p>Pending</p>}
 							{stepExecution.status === "failed" && (
-								<p>{stepExecution.error}</p>
+								<div className="flex flex-col gap-[8px]">
+									<p>{stepExecution.error}</p>
+									<div>
+										<Button
+											type="button"
+											onClick={() => {
+												retryFlowExecution(execution.id);
+											}}
+										>
+											Retry
+										</Button>
+									</div>
+								</div>
 							)}
 							{stepExecution.status === "running" ||
 								(stepExecution.status === "completed" && (
