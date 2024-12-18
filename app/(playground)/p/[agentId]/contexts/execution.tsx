@@ -338,7 +338,6 @@ const executeJob = async (
 
 interface ExecutionContextType {
 	execution: Execution | null;
-	execute: (nodeId: NodeId) => Promise<void>;
 	executeNode: (nodeId: NodeId) => Promise<void>;
 	executeFlow: (flowId: FlowId) => Promise<void>;
 	retryFlowExecution: (
@@ -366,10 +365,6 @@ type RetryStepAction = (
 ) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 interface ExecutionProviderProps {
 	children: ReactNode;
-	executeAction: (
-		artifactId: ArtifactId,
-		nodeId: NodeId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
 	putExecutionAction: (
 		executionSnapshot: ExecutionSnapshot,
@@ -383,7 +378,6 @@ interface ExecutionProviderProps {
 
 export function ExecutionProvider({
 	children,
-	executeAction,
 	executeStepAction,
 	putExecutionAction,
 	retryStepAction,
@@ -394,95 +388,6 @@ export function ExecutionProvider({
 	const { addToast } = useToast();
 	const { setPlaygroundMode } = usePlaygroundMode();
 	const [execution, setExecution] = useState<Execution | null>(null);
-
-	const execute = useCallback(
-		async (nodeId: NodeId) => {
-			const artifactId = createArtifactId();
-			dispatch({
-				type: "upsertArtifact",
-				input: {
-					nodeId,
-					artifact: {
-						id: artifactId,
-						type: "streamArtifact",
-						creatorNodeId: nodeId,
-						object: {
-							type: "text",
-							title: "",
-							content: "",
-							messages: {
-								plan: "",
-								description: "",
-							},
-						},
-					},
-				},
-			});
-			setTab("Result");
-			await flush();
-			try {
-				const stream = await executeAction(artifactId, nodeId);
-
-				let textArtifactObject: TextArtifactObject = {
-					type: "text",
-					title: "",
-					content: "",
-					messages: {
-						plan: "",
-						description: "",
-					},
-				};
-				for await (const streamContent of readStreamableValue(stream)) {
-					if (streamContent === undefined) {
-						continue;
-					}
-					dispatch({
-						type: "upsertArtifact",
-						input: {
-							nodeId,
-							artifact: {
-								id: artifactId,
-								type: "streamArtifact",
-								creatorNodeId: nodeId,
-								object: streamContent,
-							},
-						},
-					});
-					textArtifactObject = {
-						...textArtifactObject,
-						...streamContent,
-					};
-				}
-				dispatch({
-					type: "upsertArtifact",
-					input: {
-						nodeId,
-						artifact: {
-							id: artifactId,
-							type: "generatedArtifact",
-							creatorNodeId: nodeId,
-							createdAt: Date.now(),
-							object: textArtifactObject,
-						},
-					},
-				});
-			} catch (error) {
-				addToast({
-					type: "error",
-					title: "Execution failed",
-					message: toErrorWithMessage(error).message,
-				});
-				dispatch({
-					type: "upsertArtifact",
-					input: {
-						nodeId,
-						artifact: null,
-					},
-				});
-			}
-		},
-		[executeAction, dispatch, flush, setTab, addToast],
-	);
 
 	interface ExecuteFlowParams {
 		initialExecution: Execution;
@@ -773,7 +678,6 @@ export function ExecutionProvider({
 		<ExecutionContext.Provider
 			value={{
 				execution,
-				execute,
 				executeFlow,
 				retryFlowExecution,
 				executeNode,

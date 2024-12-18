@@ -13,7 +13,7 @@ import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { action, putGraph } from "./actions";
+import { putGraph } from "./actions";
 import { Playground } from "./components/playground";
 import { AgentNameProvider } from "./contexts/agent-name";
 import { DeveloperModeProvider } from "./contexts/developer-mode";
@@ -141,11 +141,6 @@ export default async function Page({
 		return agentName;
 	}
 
-	async function execute(artifactId: ArtifactId, nodeId: NodeId) {
-		"use server";
-		return await action(artifactId, agentId, nodeId);
-	}
-
 	async function executeStepAction(
 		flowId: FlowId,
 		executionId: ExecutionId,
@@ -220,7 +215,6 @@ export default async function Page({
 									>
 										<PlaygroundModeProvider>
 											<ExecutionProvider
-												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
 												retryStepAction={retryStepAction}

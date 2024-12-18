@@ -29,7 +29,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { action, parse, remove } from "../actions";
+import { parse, remove } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
