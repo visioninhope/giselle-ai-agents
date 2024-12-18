@@ -150,7 +150,6 @@ describe("deriveFlows", () => {
 		expect(flows[1].nodes.length).toBe(3);
 	});
 	test("ignore ghost connectors", () => {
-		console.log(flows[1].jobs[2].steps);
 		expect(flows[1].jobs[2].steps.length).toBe(1);
 	});
 });
