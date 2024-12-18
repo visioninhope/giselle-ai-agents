@@ -86,6 +86,7 @@ export default async function Page({
 			async () => {
 				const result = await list({
 					prefix: buildGraphFolderPath(graph.id),
+					mode: "folded",
 				});
 				const size = result.blobs.reduce((sum, blob) => sum + blob.size, 0);
 				return {
