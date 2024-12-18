@@ -64,6 +64,35 @@ function resolveLanguageModel(
 	throw new Error("Unsupported model provider");
 }
 
+function nodeResolver(nodeHandleId: NodeHandleId, context: ExecutionContext) {
+	const connection = context.connections.find(
+		(connection) => connection.targetNodeHandleId === nodeHandleId,
+	);
+	const node = context.nodes.find(
+		(node) => node.id === connection?.sourceNodeId,
+	);
+	if (node === undefined) {
+		return null;
+	}
+	return node;
+}
+
+function artifactResolver(
+	artifactCreatorNodeId: NodeId,
+	context: ExecutionContext,
+) {
+	const generatedArtifact = context.artifacts.find(
+		(artifact) => artifact.creatorNodeId === artifactCreatorNodeId,
+	);
+	if (
+		generatedArtifact === undefined ||
+		generatedArtifact.type !== "generatedArtifact"
+	) {
+		return null;
+	}
+	return generatedArtifact;
+}
+
 const artifactSchema = v.object({
 	plan: v.pipe(
 		v.string(),
@@ -112,10 +141,13 @@ interface TextGenerationSource extends ExecutionSourceBase {
 }
 
 type ExecutionSource = TextSource | TextGenerationSource | FileSource;
-async function resolveSources(sources: NodeHandle[], resolver: SourceResolver) {
+async function resolveSources(
+	sources: NodeHandle[],
+	context: ExecutionContext,
+) {
 	return Promise.all(
 		sources.map(async (source) => {
-			const node = resolver.nodeResolver(source.id);
+			const node = nodeResolver(source.id, context);
 			switch (node?.content.type) {
 				case "text":
 					return {
@@ -179,7 +211,7 @@ async function resolveSources(sources: NodeHandle[], resolver: SourceResolver) {
 					);
 				}
 				case "textGeneration": {
-					const generatedArtifact = resolver.artifactResolver(node.id);
+					const generatedArtifact = artifactResolver(node.id, context);
 					if (
 						generatedArtifact === null ||
 						generatedArtifact.type !== "generatedArtifact"
@@ -200,24 +232,19 @@ async function resolveSources(sources: NodeHandle[], resolver: SourceResolver) {
 	).then((sources) => sources.filter((source) => source !== null).flat());
 }
 
-interface RequirementResolver {
-	nodeResolver: NodeResolver;
-	artifactResolver: ArtifactResolver;
-}
-
 function resolveRequirement(
 	requirement: NodeHandle | null,
-	resolver: RequirementResolver,
+	context: ExecutionContext,
 ) {
 	if (requirement === null) {
 		return null;
 	}
-	const node = resolver.nodeResolver(requirement.id);
+	const node = nodeResolver(requirement.id, context);
 	switch (node?.content.type) {
 		case "text":
 			return node.content.text;
 		case "textGeneration": {
-			const generatedArtifact = resolver.artifactResolver(node.id);
+			const generatedArtifact = artifactResolver(node.id, context);
 			if (
 				generatedArtifact === null ||
 				generatedArtifact.type === "generatedArtifact"
@@ -233,7 +260,7 @@ function resolveRequirement(
 
 interface ExecutionContext {
 	executionId: ExecutionId;
-	step: Step;
+	node: Node;
 	artifacts: Artifact[];
 	nodes: Node[];
 	connections: Connection[];
@@ -245,48 +272,15 @@ async function performFlowExecution(context: ExecutionContext) {
 	const trace = lf.trace({
 		sessionId: context.executionId,
 	});
-
-	const node = context.nodes.find((node) => node.id === context.step.nodeId);
-	if (node === undefined) {
-		throw new Error("Node not found");
-	}
-
-	function nodeResolver(nodeHandleId: NodeHandleId) {
-		const connection = context.connections.find(
-			(connection) => connection.targetNodeHandleId === nodeHandleId,
-		);
-		const node = context.nodes.find(
-			(node) => node.id === connection?.sourceNodeId,
-		);
-		if (node === undefined) {
-			return null;
-		}
-		return node;
-	}
-
-	function artifactResolver(artifactCreatorNodeId: NodeId) {
-		const generatedArtifact = context.artifacts.find(
-			(artifact) => artifact.creatorNodeId === artifactCreatorNodeId,
-		);
-		if (
-			generatedArtifact === undefined ||
-			generatedArtifact.type !== "generatedArtifact"
-		) {
-			return null;
-		}
-		return generatedArtifact;
-	}
+	const node = context.node;
 
 	switch (node.content.type) {
 		case "textGeneration": {
-			const actionSources = await resolveSources(node.content.sources, {
-				nodeResolver,
-				artifactResolver,
-			});
-			const requirement = resolveRequirement(node.content.requirement ?? null, {
-				nodeResolver,
-				artifactResolver,
-			});
+			const actionSources = await resolveSources(node.content.sources, context);
+			const requirement = resolveRequirement(
+				node.content.requirement ?? null,
+				context,
+			);
 			const model = resolveLanguageModel(node.content.llm);
 			const promptTemplate = HandleBars.compile(
 				node.content.system ?? textGenerationPrompt,
@@ -397,10 +391,14 @@ export async function executeStep(
 	if (step === undefined) {
 		throw new Error(`Step with id ${stepId} not found`);
 	}
+	const node = graph.nodes.find((node) => node.id === step.nodeId);
+	if (node === undefined) {
+		throw new Error("Node not found");
+	}
 
 	const context: ExecutionContext = {
 		executionId,
-		step,
+		node,
 		artifacts,
 		nodes: graph.nodes,
 		connections: graph.connections,
@@ -427,9 +425,14 @@ export async function retryStep(
 		throw new Error(`Step with id ${stepId} not found`);
 	}
 
+	const node = executionSnapshot.nodes.find((node) => node.id === step.nodeId);
+	if (node === undefined) {
+		throw new Error("Node not found");
+	}
+
 	const context: ExecutionContext = {
 		executionId,
-		step,
+		node,
 		artifacts,
 		nodes: executionSnapshot.nodes,
 		connections: executionSnapshot.connections,
