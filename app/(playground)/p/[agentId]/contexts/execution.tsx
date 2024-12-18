@@ -64,48 +64,42 @@ export function createExecutionSnapshot({
 	} as ExecutionSnapshot;
 }
 
-function buildExecutionsFromSnapshot({
-	executionSnapshot,
-	forceRetryStepId,
-}: { executionSnapshot: ExecutionSnapshot; forceRetryStepId?: StepId }) {
-	function buildJobExecutionsFromSnapshot(): JobExecution[] {
-		return executionSnapshot.execution.jobExecutions.map((jobExecution) => {
-			const hasForceRetryStep = jobExecution.stepExecutions.some(
-				(stepExecution) => stepExecution.stepId === forceRetryStepId,
-			);
-			if (hasForceRetryStep || jobExecution.status !== "completed") {
-				return {
-					...jobExecution,
-					status: "pending",
-					stepExecutions: jobExecution.stepExecutions.map((stepExecution) =>
-						stepExecution.stepId === forceRetryStepId ||
-						stepExecution.status !== "completed"
-							? {
-									...stepExecution,
-									status: "pending",
-								}
-							: stepExecution,
-					),
-				};
-			}
-			return jobExecution;
-		});
-	}
-	function buildArtifacts() {
-		const retryStepNodeId = executionSnapshot.flow.jobs
-			.flatMap((job) => job.steps)
-			.find((step) => step.id === forceRetryStepId)?.nodeId;
-		return executionSnapshot.execution.artifacts.filter(
-			(artifact) => artifact.creatorNodeId !== retryStepNodeId,
+function buildJobExecutionsFromSnapshot(
+	executionSnapshot: ExecutionSnapshot,
+	forceRetryStepId?: StepId,
+): JobExecution[] {
+	return executionSnapshot.execution.jobExecutions.map((jobExecution) => {
+		const hasForceRetryStep = jobExecution.stepExecutions.some(
+			(stepExecution) => stepExecution.stepId === forceRetryStepId,
 		);
-	}
-	return {
-		id: createExecutionId(),
-		flowId: executionSnapshot.flow.id,
-		status: "pending",
-		artifacts: buildArtifacts(),
-		jobExecutions: buildJobExecutionsFromSnapshot(),
-	} as Execution;
+		if (hasForceRetryStep || jobExecution.status !== "completed") {
+			return {
+				...jobExecution,
+				status: "pending",
+				stepExecutions: jobExecution.stepExecutions.map((stepExecution) =>
+					stepExecution.stepId === forceRetryStepId ||
+					stepExecution.status !== "completed"
+						? {
+								...stepExecution,
+								status: "pending",
+							}
+						: stepExecution,
+				),
+			};
+		}
+		return jobExecution;
+	});
+}
+function buildArtifactsFromSnapshot(
+	executionSnapshot: ExecutionSnapshot,
+	forceRetryStepId?: StepId,
+) {
+	const retryStepNodeId = executionSnapshot.flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === forceRetryStepId)?.nodeId;
+	return executionSnapshot.execution.artifacts.filter(
+		(artifact) => artifact.creatorNodeId !== retryStepNodeId,
+	);
 }
 
 // Helper functions for execution state management
@@ -122,19 +116,6 @@ const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
 		})),
 	}));
 };
-
-const createInitialExecution = (
-	flowId: FlowId,
-	executionId: ExecutionId,
-	jobExecutions: JobExecution[],
-): Execution => ({
-	id: executionId,
-	status: "running",
-	runStartedAt: Date.now(),
-	flowId,
-	jobExecutions,
-	artifacts: [],
-});
 
 const processStreamContent = async (
 	stream: StreamableValue<TextArtifactObject, unknown>,
@@ -504,144 +485,26 @@ export function ExecutionProvider({
 		[executeAction, dispatch, flush, setTab, addToast],
 	);
 
-	const executeFlow = useCallback(
-		async (flowId: FlowId) => {
-			const flow = graph.flows.find((flow) => flow.id === flowId);
-			if (!flow) throw new Error("Flow not found");
-
-			setPlaygroundMode("viewer");
-			await flush();
-			const executionId = createExecutionId();
-			const jobExecutions = createInitialJobExecutions(flow);
-			const flowRunStartedAt = Date.now();
-
-			// Initialize flow execution
-			let currentExecution = createInitialExecution(
-				flowId,
-				executionId,
-				jobExecutions,
-			);
-			setExecution(currentExecution);
-
-			let totalFlowDurationMs = 0;
-			let hasFailed = false;
-
-			// Execute jobs sequentially
-			for (const jobExecution of jobExecutions) {
-				if (hasFailed) {
-					const skippedJob: SkippedJobExecution = {
-						...jobExecution,
-						status: "skipped",
-						stepExecutions: jobExecution.stepExecutions.map((step) => ({
-							...step,
-							status: "skipped",
-						})),
-					};
-					currentExecution = {
-						...currentExecution,
-						jobExecutions: currentExecution.jobExecutions.map((job) =>
-							job.id === jobExecution.id ? skippedJob : job,
-						),
-					};
-					setExecution(currentExecution);
-					continue;
-				}
-				const executedJob = await executeJob(
-					jobExecution,
-					(stepExecutionId) =>
-						executeStepAction(
-							flowId,
-							executionId,
-							stepExecutionId,
-							currentExecution.artifacts,
-						),
-					(updater) => {
-						const updated = updater(currentExecution);
-						if (updated) {
-							currentExecution = updated;
-							setExecution(updated);
-						}
-					},
-				);
-				totalFlowDurationMs += executedJob.durationMs;
-				if (executedJob.status === "failed") {
-					hasFailed = true;
-				}
-			}
-			if (hasFailed) {
-				const failedExecution: FailedExecution = {
-					...currentExecution,
-					status: "failed",
-					runStartedAt: flowRunStartedAt,
-					durationMs: totalFlowDurationMs,
-				};
-				currentExecution = failedExecution;
-			} else {
-				const completedExecution: CompletedExecution = {
-					...currentExecution,
-					status: "completed",
-					runStartedAt: flowRunStartedAt,
-					durationMs: totalFlowDurationMs,
-					resultArtifact:
-						currentExecution.artifacts[currentExecution.artifacts.length - 1],
-				};
-				currentExecution = completedExecution;
-			}
-
-			setExecution(currentExecution);
-			const executionSnapshot = createExecutionSnapshot({
-				flow,
-				execution: currentExecution,
-				nodes: graph.nodes,
-				connections: graph.connections,
-			});
-			const { blobUrl } = await putExecutionAction(executionSnapshot);
-			dispatch({
-				type: "addExecutionIndex",
-				input: {
-					executionIndex: {
-						executionId,
-						blobUrl,
-						completedAt: Date.now(),
-					},
-				},
-			});
-		},
-		[
-			setPlaygroundMode,
-			executeStepAction,
-			putExecutionAction,
-			dispatch,
-			flush,
-			graph,
-		],
-	);
-
-	const retryFlowExecution = useCallback(
-		async (retryExecutionId: ExecutionId, forceRetryStepId?: StepId) => {
-			const executionIndex = graph.executionIndexes.find(
-				(executionIndex) => executionIndex.executionId === retryExecutionId,
-			);
-			if (executionIndex === undefined) {
-				throw new Error("Execution not found");
-			}
-			const retryExecutionSnapshot = (await fetch(executionIndex.blobUrl).then(
-				(res) => res.json(),
-			)) as unknown as ExecutionSnapshot;
-
-			await flush();
-			const flowRunStartedAt = Date.now();
-			let currentExecution = buildExecutionsFromSnapshot({
-				executionSnapshot: retryExecutionSnapshot,
-				forceRetryStepId,
-			});
-			currentExecution = {
-				...currentExecution,
-				status: "running",
-				runStartedAt: flowRunStartedAt,
-			};
-			setExecution(currentExecution);
-
+	interface ExecuteFlowParams {
+		flowId: FlowId;
+		initialExecution: Execution;
+		flow: Flow;
+		nodes: Node[];
+		connections: Connection[];
+		executeStepCallback: (
+			stepId: StepId,
+		) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+	}
+	const performFlowExecution = useCallback(
+		async ({
+			flowId,
+			initialExecution,
+			flow,
+			nodes,
+			connections,
+			executeStepCallback,
+		}: ExecuteFlowParams) => {
+			let currentExecution = initialExecution;
 			let totalFlowDurationMs = 0;
 			let hasFailed = false;
 
@@ -665,19 +528,15 @@ export function ExecutionProvider({
 					setExecution(currentExecution);
 					continue;
 				}
-				// if retrying, skip completed jobs
+
+				// Skip completed jobs for retry flows
 				if (jobExecution.status === "completed") {
 					continue;
 				}
+
 				const executedJob = await executeJob(
 					jobExecution,
-					(stepId) =>
-						retryStepAction(
-							executionIndex.blobUrl,
-							currentExecution.id,
-							stepId,
-							currentExecution.artifacts,
-						),
+					executeStepCallback,
 					(updater) => {
 						const updated = updater(currentExecution);
 						if (updated) {
@@ -686,37 +545,38 @@ export function ExecutionProvider({
 						}
 					},
 				);
+
 				totalFlowDurationMs += executedJob.durationMs;
 				if (executedJob.status === "failed") {
 					hasFailed = true;
 				}
 			}
+
+			// Update final execution state
 			if (hasFailed) {
-				const failedExecution: FailedExecution = {
+				currentExecution = {
 					...currentExecution,
 					status: "failed",
 					durationMs: totalFlowDurationMs,
-				};
-				currentExecution = failedExecution;
+				} as FailedExecution;
 			} else {
-				const completedExecution: CompletedExecution = {
+				currentExecution = {
 					...currentExecution,
 					status: "completed",
-					runStartedAt: flowRunStartedAt,
 					durationMs: totalFlowDurationMs,
 					resultArtifact:
 						currentExecution.artifacts[currentExecution.artifacts.length - 1],
-				};
-				currentExecution = completedExecution;
+				} as CompletedExecution;
 			}
 
-			setExecution(currentExecution);
+			// Create and store execution snapshot
 			const executionSnapshot = createExecutionSnapshot({
-				flow: retryExecutionSnapshot.flow,
+				flow,
 				execution: currentExecution,
-				nodes: retryExecutionSnapshot.nodes,
-				connections: retryExecutionSnapshot.connections,
+				nodes,
+				connections,
 			});
+
 			const { blobUrl } = await putExecutionAction(executionSnapshot);
 			dispatch({
 				type: "addExecutionIndex",
@@ -728,15 +588,98 @@ export function ExecutionProvider({
 					},
 				},
 			});
+
+			return currentExecution;
 		},
-		[
-			graph.executionIndexes,
-			dispatch,
-			graph,
-			flush,
-			putExecutionAction,
-			retryStepAction,
-		],
+		[dispatch, putExecutionAction],
+	);
+
+	const executeFlow = useCallback(
+		async (flowId: FlowId) => {
+			const flow = graph.flows.find((flow) => flow.id === flowId);
+			if (!flow) throw new Error("Flow not found");
+
+			setPlaygroundMode("viewer");
+			await flush();
+			const executionId = createExecutionId();
+			const jobExecutions = createInitialJobExecutions(flow);
+			const flowRunStartedAt = Date.now();
+
+			// Initialize flow execution
+			const initialExecution: Execution = {
+				id: executionId,
+				status: "running",
+				flowId,
+				jobExecutions,
+				artifacts: [],
+				runStartedAt: flowRunStartedAt,
+			};
+			setExecution(initialExecution);
+
+			const finalExecution = await performFlowExecution({
+				flowId,
+				initialExecution,
+				flow,
+				nodes: graph.nodes,
+				connections: graph.connections,
+				executeStepCallback: (stepId) =>
+					executeStepAction(
+						flowId,
+						executionId,
+						stepId,
+						initialExecution.artifacts,
+					),
+			});
+			setExecution(finalExecution);
+		},
+		[setPlaygroundMode, executeStepAction, flush, graph, performFlowExecution],
+	);
+
+	const retryFlowExecution = useCallback(
+		async (retryExecutionId: ExecutionId, forceRetryStepId?: StepId) => {
+			const executionIndex = graph.executionIndexes.find(
+				(executionIndex) => executionIndex.executionId === retryExecutionId,
+			);
+			if (executionIndex === undefined) {
+				throw new Error("Execution not found");
+			}
+			const retryExecutionSnapshot = (await fetch(executionIndex.blobUrl).then(
+				(res) => res.json(),
+			)) as unknown as ExecutionSnapshot;
+
+			await flush();
+			const flowRunStartedAt = Date.now();
+			const initialExecution: Execution = {
+				id: createExecutionId(),
+				flowId: retryExecutionSnapshot.flow.id,
+				jobExecutions: buildJobExecutionsFromSnapshot(
+					retryExecutionSnapshot,
+					forceRetryStepId,
+				),
+				artifacts: buildArtifactsFromSnapshot(
+					retryExecutionSnapshot,
+					forceRetryStepId,
+				),
+				status: "running",
+				runStartedAt: flowRunStartedAt,
+			};
+			const finalExecution = await performFlowExecution({
+				flowId: retryExecutionSnapshot.flow.id,
+				initialExecution,
+				flow: retryExecutionSnapshot.flow,
+				nodes: retryExecutionSnapshot.nodes,
+				connections: retryExecutionSnapshot.connections,
+				executeStepCallback: (stepId) =>
+					retryStepAction(
+						executionIndex.blobUrl,
+						initialExecution.id,
+						stepId,
+						initialExecution.artifacts,
+					),
+			});
+			setExecution(finalExecution);
+		},
+		[graph.executionIndexes, flush, retryStepAction, performFlowExecution],
 	);
 
 	return (
