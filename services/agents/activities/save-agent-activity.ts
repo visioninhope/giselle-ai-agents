@@ -1,12 +1,11 @@
 import { agentActivities, agents, db } from "@/drizzle";
-import { toUTCDate } from "@/lib/date";
 import type { AgentId } from "@/services/agents";
 import { eq } from "drizzle-orm";
 
 export async function saveAgentActivity(
 	agentId: AgentId,
-	startedAt: number,
-	endedAt: number,
+	startedAt: Date,
+	endedAt: Date,
 	totalDurationMs: number,
 ) {
 	const records = await db
@@ -20,8 +19,8 @@ export async function saveAgentActivity(
 
 	await db.insert(agentActivities).values({
 		agentDbId,
-		startedAt: toUTCDate(new Date(startedAt)),
-		endedAt: toUTCDate(new Date(endedAt)),
+		startedAt: startedAt,
+		endedAt: endedAt,
 		totalDurationMs: totalDurationMs.toString(),
 	});
 }

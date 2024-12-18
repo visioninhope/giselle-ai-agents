@@ -251,7 +251,7 @@ interface ExecutionContextType {
 	execution: Execution | null;
 	execute: (nodeId: NodeId) => Promise<void>;
 	executeFlow: (flowId: FlowId) => Promise<void>;
-	saveAgentActivityAction: (
+	recordAgentUsageAction: (
 		startedAt: number,
 		endedAt: number,
 		totalDurationMs: number,
@@ -276,7 +276,7 @@ interface ExecutionProviderProps {
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
 	putExecutionAction: (execution: Execution) => Promise<{ blobUrl: string }>;
-	saveAgentActivityAction: (
+	recordAgentUsageAction: (
 		startedAt: number,
 		endedAt: number,
 		totalDurationMs: number,
@@ -288,7 +288,7 @@ export function ExecutionProvider({
 	executeAction,
 	executeStepAction,
 	putExecutionAction,
-	saveAgentActivityAction,
+	recordAgentUsageAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -448,7 +448,7 @@ export function ExecutionProvider({
 					},
 				},
 			});
-			await saveAgentActivityAction(
+			await recordAgentUsageAction(
 				flowRunStartedAt,
 				flowRunEndedAt,
 				totalFlowDurationMs,
@@ -459,14 +459,14 @@ export function ExecutionProvider({
 			graph.flows,
 			executeStepAction,
 			putExecutionAction,
-			saveAgentActivityAction,
+			recordAgentUsageAction,
 			dispatch,
 			flush,
 		],
 	);
 	return (
 		<ExecutionContext.Provider
-			value={{ execution, execute, executeFlow, saveAgentActivityAction }}
+			value={{ execution, execute, executeFlow, recordAgentUsageAction }}
 		>
 			{children}
 		</ExecutionContext.Provider>

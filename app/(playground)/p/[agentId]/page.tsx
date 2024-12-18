@@ -9,7 +9,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
-import { saveAgentActivity } from "@/services/agents/activities";
+import { recordAgentUsage } from "@/services/agents/activities";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -145,18 +145,13 @@ export default async function Page({
 		return await action(artifactId, agentId, nodeId);
 	}
 
-	async function saveAgentActivityAction(
+	async function recordAgentUsageAction(
 		startedAt: number,
 		endedAt: number,
 		totalDurationMs: number,
 	) {
 		"use server";
-		return await saveAgentActivity(
-			agentId,
-			startedAt,
-			endedAt,
-			totalDurationMs,
-		);
+		return await recordAgentUsage(agentId, startedAt, endedAt, totalDurationMs);
 	}
 
 	async function executeStepAction(
@@ -216,7 +211,7 @@ export default async function Page({
 												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
-												saveAgentActivityAction={saveAgentActivityAction}
+												recordAgentUsageAction={recordAgentUsageAction}
 											>
 												<Playground />
 											</ExecutionProvider>
