@@ -2,15 +2,18 @@
 
 import { db } from "@/drizzle";
 import {
+	ExternalServiceName,
+	VercelBlobOperation,
 	createLogger,
 	waitForTelemetryExport,
+	withCountMeasurement,
 	withTokenMeasurement,
 } from "@/lib/opentelemetry";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { del, list, put } from "@vercel/blob";
+import { type ListBlobResult, del, list, put } from "@vercel/blob";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
@@ -118,7 +121,7 @@ export async function action(
 	agentId: AgentId,
 	nodeId: NodeId,
 ) {
-	const startTime = performance.now();
+	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: artifactId,
@@ -364,6 +367,8 @@ export async function action(
 }
 
 export async function parse(id: FileId, name: string, blobUrl: string) {
+	const startTime = Date.now();
+	const logger = createLogger("parse");
 	if (process.env.UNSTRUCTURED_API_KEY === undefined) {
 		throw new Error("UNSTRUCTURED_API_KEY is not set");
 	}
@@ -392,37 +397,111 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 	const jsonString = JSON.stringify(partitionResponse.elements, null, 2);
 	const blob = new Blob([jsonString], { type: "application/json" });
 
-	await put(pathJoin(vercelBlobFileFolder, id, "partition.json"), blob, {
-		access: "public",
-		contentType: blob.type,
-	});
-
-	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
-	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
-	const vercelBlob = await put(
-		pathJoin(vercelBlobFileFolder, id, "markdown.md"),
-		markdownBlob,
-		{
-			access: "public",
-			contentType: markdownBlob.type,
+	await withCountMeasurement(
+		logger,
+		async () => {
+			const result = await put(
+				pathJoin(vercelBlobFileFolder, id, "partition.json"),
+				blob,
+				{ access: "public", contentType: blob.type },
+			);
+			return {
+				blob: result,
+				size: blob.size,
+			};
 		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		VercelBlobOperation.Put,
 	);
 
-	return vercelBlob;
+	const startTimeConvertMarkdown = Date.now();
+	const markdown = elementsToMarkdown(partitionResponse.elements ?? []);
+	const markdownBlob = new Blob([markdown], { type: "text/markdown" });
+	const result = await withCountMeasurement(
+		logger,
+		async () => {
+			const result = await put(
+				pathJoin(vercelBlobFileFolder, id, "markdown.md"),
+				markdownBlob,
+				{
+					access: "public",
+					contentType: markdownBlob.type,
+				},
+			);
+			return {
+				vercelBlob: result,
+				size: markdownBlob.size,
+			};
+		},
+		ExternalServiceName.VercelBlob,
+		startTimeConvertMarkdown,
+		VercelBlobOperation.Put,
+	);
+
+	waitForTelemetryExport();
+	return result.vercelBlob;
 }
 
 export async function putGraph(graph: Graph) {
-	return await put(buildGraphPath(graph.id), JSON.stringify(graph), {
-		access: "public",
-	});
+	const startTime = Date.now();
+	const stringifiedGraph = JSON.stringify(graph);
+	const result = await withCountMeasurement(
+		createLogger("put-graph"),
+		async () => {
+			const result = await put(buildGraphPath(graph.id), stringifiedGraph, {
+				access: "public",
+			});
+
+			return {
+				blob: result,
+				size: new TextEncoder().encode(stringifiedGraph).length,
+			};
+		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		VercelBlobOperation.Put,
+	);
+	waitForTelemetryExport();
+	return result.blob;
 }
 
 export async function remove(fileData: FileData) {
-	const blobList = await list({
-		prefix: buildFileFolderPath(fileData.id),
-	});
+	const startTime = Date.now();
+	function calcTotalSize(blobList: ListBlobResult): number {
+		return blobList.blobs.reduce((sum, blob) => sum + blob.size, 0);
+	}
+	const { blobList } = await withCountMeasurement(
+		createLogger("remove"),
+		async () => {
+			const result = await list({
+				prefix: buildFileFolderPath(fileData.id),
+			});
+			return {
+				blobList: result,
+				size: calcTotalSize(result),
+			};
+		},
+		ExternalServiceName.VercelBlob,
+		startTime,
+		VercelBlobOperation.List,
+	);
 
+	const startTimeDel = Date.now();
 	if (blobList.blobs.length > 0) {
-		await del(blobList.blobs.map((blob) => blob.url));
+		await withCountMeasurement(
+			createLogger("remove"),
+			async () => {
+				await del(blobList.blobs.map((blob) => blob.url));
+
+				return {
+					size: calcTotalSize(blobList),
+				};
+			},
+			ExternalServiceName.VercelBlob,
+			startTimeDel,
+			VercelBlobOperation.Del,
+		);
+		waitForTelemetryExport();
 	}
 }

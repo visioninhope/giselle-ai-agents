@@ -1,6 +1,13 @@
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import { developerFlag } from "@/flags";
+import {
+	ExternalServiceName,
+	VercelBlobOperation,
+	createLogger,
+	waitForTelemetryExport,
+	withCountMeasurement,
+} from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
@@ -64,6 +71,8 @@ export default async function Page({
 
 	async function persistGraph(graph: Graph) {
 		"use server";
+		const startTime = Date.now();
+		const logger = createLogger("persistGraph");
 		const { url } = await putGraph(graph);
 		await db
 			.update(agents)
@@ -71,15 +80,44 @@ export default async function Page({
 				graphUrl: url,
 			})
 			.where(eq(agents.id, agentId));
-		const blobList = await list({
-			prefix: buildGraphFolderPath(graph.id),
-		});
+		const { blobList } = await withCountMeasurement(
+			logger,
+			async () => {
+				const result = await list({
+					prefix: buildGraphFolderPath(graph.id),
+				});
+				const size = result.blobs.reduce((sum, blob) => sum + blob.size, 0);
+				return {
+					blobList: result,
+					size,
+				};
+			},
+			ExternalServiceName.VercelBlob,
+			startTime,
+			VercelBlobOperation.List,
+		);
 
-		const oldBlobUrls = blobList.blobs
+		const oldBlobs = blobList.blobs
 			.filter((blob) => blob.url !== url)
-			.map((blob) => blob.url);
-		if (oldBlobUrls.length > 0) {
-			await del(oldBlobUrls);
+			.map((blob) => ({
+				url: blob.url,
+				size: blob.size,
+			}));
+		if (oldBlobs.length > 0) {
+			await withCountMeasurement(
+				logger,
+				async () => {
+					await del(oldBlobs.map((blob) => blob.url));
+					const totalSize = oldBlobs.reduce((sum, blob) => sum + blob.size, 0);
+					return {
+						size: totalSize,
+					};
+				},
+				ExternalServiceName.VercelBlob,
+				startTime,
+				VercelBlobOperation.Del,
+			);
+			waitForTelemetryExport();
 		}
 		return url;
 	}
@@ -117,13 +155,28 @@ export default async function Page({
 	}
 	async function putExecutionAction(execution: Execution) {
 		"use server";
-		const result = await put(
-			buildGraphExecutionPath(graph.id, execution.id),
-			JSON.stringify(execution),
-			{
-				access: "public",
+		const startTime = Date.now();
+		const result = await withCountMeasurement(
+			createLogger("putExecutionAction"),
+			async () => {
+				const stringifiedExecution = JSON.stringify(execution);
+				const result = await put(
+					buildGraphExecutionPath(graph.id, execution.id),
+					stringifiedExecution,
+					{
+						access: "public",
+					},
+				);
+				return {
+					url: result.url,
+					size: new TextEncoder().encode(stringifiedExecution).length,
+				};
 			},
+			ExternalServiceName.VercelBlob,
+			startTime,
+			VercelBlobOperation.Put,
 		);
+		waitForTelemetryExport();
 		return { blobUrl: result.url };
 	}
 

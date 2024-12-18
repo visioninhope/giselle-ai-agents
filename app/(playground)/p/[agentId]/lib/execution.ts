@@ -235,7 +235,7 @@ export async function executeStep(
 	stepId: StepId,
 	artifacts: Artifact[],
 ) {
-	const startTime = performance.now();
+	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
 		sessionId: executionId,
