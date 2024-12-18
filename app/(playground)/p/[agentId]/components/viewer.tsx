@@ -152,18 +152,28 @@ function ExecutionViewer({
 									<Markdown>{stepExecution.artifact?.object.content}</Markdown>
 								))}
 							{stepExecution.artifact?.type === "generatedArtifact" && (
-								<div className="mt-[10px] flex gap-[12px]">
+								<div className="mt-[10px] flex gap-[12px] items-center">
 									<div className="text-[14px] font-bold text-black-70 ">
 										Generated{" "}
 										{formatTimestamp.toRelativeTime(
 											stepExecution.artifact.createdAt,
 										)}
 									</div>
-									<div className="text-black-30">
+									<div className="text-black-30 flex items-center">
 										<ClipboardButton
 											text={stepExecution.artifact.object.content}
 											sizeClassName="w-[16px] h-[16px]"
 										/>
+									</div>
+									<div className="text-black-30 text-[14px]">
+										<button
+											type="button"
+											onClick={() => {
+												retryFlowExecution(execution.id, stepExecution.stepId);
+											}}
+										>
+											Retry
+										</button>
 									</div>
 								</div>
 							)}
