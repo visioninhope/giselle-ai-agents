@@ -134,6 +134,13 @@
 			"when": 1734418310592,
 			"tag": "0018_greedy_starhawk",
 			"breakpoints": true
+		},
+		{
+			"idx": 19,
+			"version": "7",
+			"when": 1734493751390,
+			"tag": "0019_oval_zaran",
+			"breakpoints": true
 		}
 	]
 }
