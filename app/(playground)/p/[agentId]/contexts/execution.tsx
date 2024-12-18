@@ -146,6 +146,7 @@ const executeStep = async (
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
 	) => void,
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void,
 ): Promise<CompletedStepExecution | FailedStepExecution> => {
 	if (stepExecution.status === "completed") {
 		return stepExecution;
@@ -186,19 +187,9 @@ const executeStep = async (
 	try {
 		// Execute step and process stream
 		const stream = await executeStepAction(stepExecution.stepId);
-		const finalArtifact = await processStreamContent(stream, (content) => {
-			updateExecution((prev) => {
-				if (!prev || prev.status !== "running") return null;
-				return {
-					...prev,
-					artifacts: prev.artifacts.map((artifact) =>
-						artifact.id === artifactId
-							? { ...artifact, object: content }
-							: artifact,
-					),
-				};
-			});
-		});
+		const finalArtifact = await processStreamContent(stream, (content) =>
+			updateArtifact(artifactId, content),
+		);
 
 		// Complete step execution
 		const stepDurationMs = Date.now() - stepRunStartedAt;
@@ -273,6 +264,7 @@ const executeJob = async (
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
 	) => void,
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void,
 ): Promise<CompletedJobExecution | FailedJobExecution> => {
 	const jobRunStartedAt = Date.now();
 
@@ -292,7 +284,7 @@ const executeJob = async (
 	// Execute all steps in parallel
 	const stepExecutions = await Promise.all(
 		jobExecution.stepExecutions.map((step) =>
-			executeStep(step, executeStepAction, updateExecution),
+			executeStep(step, executeStepAction, updateExecution, updateArtifact),
 		),
 	);
 
@@ -500,6 +492,10 @@ export function ExecutionProvider({
 		executeStepCallback: (
 			stepId: StepId,
 		) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+		updateArtifactCallback: (
+			artifactId: ArtifactId,
+			content: TextArtifactObject,
+		) => void;
 	}
 	const performFlowExecution = useCallback(
 		async ({
@@ -508,6 +504,7 @@ export function ExecutionProvider({
 			nodes,
 			connections,
 			executeStepCallback,
+			updateArtifactCallback,
 		}: ExecuteFlowParams) => {
 			let currentExecution = initialExecution;
 			let totalFlowDurationMs = 0;
@@ -549,6 +546,7 @@ export function ExecutionProvider({
 							setExecution(updated);
 						}
 					},
+					updateArtifactCallback,
 				);
 
 				totalFlowDurationMs += executedJob.durationMs;
@@ -633,6 +631,19 @@ export function ExecutionProvider({
 						stepId,
 						initialExecution.artifacts,
 					),
+				updateArtifactCallback: (artifactId, content) => {
+					setExecution((prev) => {
+						if (!prev || prev.status !== "running") return null;
+						return {
+							...prev,
+							artifacts: prev.artifacts.map((artifact) =>
+								artifact.id === artifactId
+									? { ...artifact, object: content }
+									: artifact,
+							),
+						};
+					});
+				},
 			});
 			setExecution(finalExecution);
 		},
@@ -679,6 +690,19 @@ export function ExecutionProvider({
 						stepId,
 						initialExecution.artifacts,
 					),
+				updateArtifactCallback: (artifactId, content) => {
+					setExecution((prev) => {
+						if (!prev || prev.status !== "running") return null;
+						return {
+							...prev,
+							artifacts: prev.artifacts.map((artifact) =>
+								artifact.id === artifactId
+									? { ...artifact, object: content }
+									: artifact,
+							),
+						};
+					});
+				},
 			});
 			setExecution(finalExecution);
 		},
@@ -719,10 +743,30 @@ export function ExecutionProvider({
 				connections: graph.connections,
 				executeStepCallback: (stepId) =>
 					executeNodeAction(executionId, node.id),
+				updateArtifactCallback: (artifactId, content) => {
+					dispatch({
+						type: "upsertArtifact",
+						input: {
+							nodeId,
+							artifact: {
+								id: artifactId,
+								type: "streamArtifact",
+								creatorNodeId: nodeId,
+								object: content,
+							},
+						},
+					});
+				},
 			});
 			setExecution(finalExecution);
 		},
-		[executeNodeAction, graph.connections, graph.nodes, performFlowExecution],
+		[
+			executeNodeAction,
+			graph.connections,
+			graph.nodes,
+			performFlowExecution,
+			dispatch,
+		],
 	);
 
 	return (
