@@ -64,48 +64,42 @@ export function createExecutionSnapshot({
 	} as ExecutionSnapshot;
 }
 
-function buildExecutionsFromSnapshot({
-	executionSnapshot,
-	forceRetryStepId,
-}: { executionSnapshot: ExecutionSnapshot; forceRetryStepId?: StepId }) {
-	function buildJobExecutionsFromSnapshot(): JobExecution[] {
-		return executionSnapshot.execution.jobExecutions.map((jobExecution) => {
-			const hasForceRetryStep = jobExecution.stepExecutions.some(
-				(stepExecution) => stepExecution.stepId === forceRetryStepId,
-			);
-			if (hasForceRetryStep || jobExecution.status !== "completed") {
-				return {
-					...jobExecution,
-					status: "pending",
-					stepExecutions: jobExecution.stepExecutions.map((stepExecution) =>
-						stepExecution.stepId === forceRetryStepId ||
-						stepExecution.status !== "completed"
-							? {
-									...stepExecution,
-									status: "pending",
-								}
-							: stepExecution,
-					),
-				};
-			}
-			return jobExecution;
-		});
-	}
-	function buildArtifacts() {
-		const retryStepNodeId = executionSnapshot.flow.jobs
-			.flatMap((job) => job.steps)
-			.find((step) => step.id === forceRetryStepId)?.nodeId;
-		return executionSnapshot.execution.artifacts.filter(
-			(artifact) => artifact.creatorNodeId !== retryStepNodeId,
+function buildJobExecutionsFromSnapshot(
+	executionSnapshot: ExecutionSnapshot,
+	forceRetryStepId?: StepId,
+): JobExecution[] {
+	return executionSnapshot.execution.jobExecutions.map((jobExecution) => {
+		const hasForceRetryStep = jobExecution.stepExecutions.some(
+			(stepExecution) => stepExecution.stepId === forceRetryStepId,
 		);
-	}
-	return {
-		id: createExecutionId(),
-		flowId: executionSnapshot.flow.id,
-		status: "pending",
-		artifacts: buildArtifacts(),
-		jobExecutions: buildJobExecutionsFromSnapshot(),
-	} as Execution;
+		if (hasForceRetryStep || jobExecution.status !== "completed") {
+			return {
+				...jobExecution,
+				status: "pending",
+				stepExecutions: jobExecution.stepExecutions.map((stepExecution) =>
+					stepExecution.stepId === forceRetryStepId ||
+					stepExecution.status !== "completed"
+						? {
+								...stepExecution,
+								status: "pending",
+							}
+						: stepExecution,
+				),
+			};
+		}
+		return jobExecution;
+	});
+}
+function buildArtifactsFromSnapshot(
+	executionSnapshot: ExecutionSnapshot,
+	forceRetryStepId?: StepId,
+) {
+	const retryStepNodeId = executionSnapshot.flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === forceRetryStepId)?.nodeId;
+	return executionSnapshot.execution.artifacts.filter(
+		(artifact) => artifact.creatorNodeId !== retryStepNodeId,
+	);
 }
 
 // Helper functions for execution state management
@@ -122,19 +116,6 @@ const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
 		})),
 	}));
 };
-
-const createInitialExecution = (
-	flowId: FlowId,
-	executionId: ExecutionId,
-	jobExecutions: JobExecution[],
-): Execution => ({
-	id: executionId,
-	status: "running",
-	runStartedAt: Date.now(),
-	flowId,
-	jobExecutions,
-	artifacts: [],
-});
 
 const processStreamContent = async (
 	stream: StreamableValue<TextArtifactObject, unknown>,
@@ -625,8 +606,12 @@ export function ExecutionProvider({
 			const flowRunStartedAt = Date.now();
 
 			// Initialize flow execution
-			const initialExecution = {
-				...createInitialExecution(flowId, executionId, jobExecutions),
+			const initialExecution: Execution = {
+				id: executionId,
+				status: "running",
+				flowId,
+				jobExecutions,
+				artifacts: [],
 				runStartedAt: flowRunStartedAt,
 			};
 			setExecution(initialExecution);
@@ -664,12 +649,18 @@ export function ExecutionProvider({
 
 			await flush();
 			const flowRunStartedAt = Date.now();
-			const initialExecution = {
-				...buildExecutionsFromSnapshot({
-					executionSnapshot: retryExecutionSnapshot,
+			const initialExecution: Execution = {
+				id: createExecutionId(),
+				flowId: retryExecutionSnapshot.flow.id,
+				jobExecutions: buildJobExecutionsFromSnapshot(
+					retryExecutionSnapshot,
 					forceRetryStepId,
-				}),
-				status: "running" as const,
+				),
+				artifacts: buildArtifactsFromSnapshot(
+					retryExecutionSnapshot,
+					forceRetryStepId,
+				),
+				status: "running",
 				runStartedAt: flowRunStartedAt,
 			};
 			const finalExecution = await performFlowExecution({
