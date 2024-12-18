@@ -480,3 +480,61 @@ export async function getAgentActivities({
 		};
 	}
 }
+
+export async function deleteTeam() {
+	try {
+		// Get current user's info and team
+		const currentTeam = await fetchCurrentTeam();
+		const currentUserRoleResult = await getCurrentUserRole();
+
+		// Check if user is admin
+		if (
+			!currentUserRoleResult.success ||
+			currentUserRoleResult.data !== "admin"
+		) {
+			throw new Error("Only admin users can delete teams");
+		}
+
+		// Check if team is on Free plan
+		if (isProPlan(currentTeam)) {
+			throw new Error("Only free plan teams can be deleted");
+		}
+
+		// Get current user's other teams count
+		const supabaseUser = await getUser();
+		const currentUserTeamsCount = await db
+			.select({
+				count: count(),
+			})
+			.from(teamMemberships)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
+			)
+			.where(
+				and(
+					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
+					ne(teamMemberships.teamDbId, currentTeam.dbId), // Exclude current team
+				),
+			);
+
+		// Check if user has other teams
+		if (currentUserTeamsCount[0].count === 0) {
+			throw new Error("Cannot delete your only team");
+		}
+
+		// Delete team and all related data with cascading
+		await db.delete(teams).where(eq(teams.dbId, currentTeam.dbId));
+
+		revalidatePath("/settings/team");
+
+		return { success: true };
+	} catch (error) {
+		console.error("Failed to delete team:", error);
+
+		return {
+			success: false,
+			error: error instanceof Error ? error.message : "Failed to delete team",
+		};
+	}
+}
