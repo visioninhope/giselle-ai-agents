@@ -8,6 +8,7 @@ import {
 	useContext,
 	useState,
 } from "react";
+import { deriveFlows } from "../lib/graph";
 import {
 	createArtifactId,
 	createExecutionId,
@@ -346,6 +347,7 @@ const executeJob = async (
 interface ExecutionContextType {
 	execution: Execution | null;
 	execute: (nodeId: NodeId) => Promise<void>;
+	executeNode: (nodeId: NodeId) => Promise<void>;
 	executeFlow: (flowId: FlowId) => Promise<void>;
 	retryFlowExecution: (
 		executionId: ExecutionId,
@@ -381,6 +383,10 @@ interface ExecutionProviderProps {
 		executionSnapshot: ExecutionSnapshot,
 	) => Promise<{ blobUrl: string }>;
 	retryStepAction: RetryStepAction;
+	executeNodeAction: (
+		executionId: ExecutionId,
+		nodeId: NodeId,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 }
 
 export function ExecutionProvider({
@@ -389,6 +395,7 @@ export function ExecutionProvider({
 	executeStepAction,
 	putExecutionAction,
 	retryStepAction,
+	executeNodeAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -678,9 +685,55 @@ export function ExecutionProvider({
 		[graph.executionIndexes, flush, retryStepAction, performFlowExecution],
 	);
 
+	const executeNode = useCallback(
+		async (nodeId: NodeId) => {
+			const executionId = createExecutionId();
+			const flowRunStartedAt = Date.now();
+			const node = graph.nodes.find((node) => node.id === nodeId);
+			if (node === undefined) {
+				throw new Error("Node not found");
+			}
+
+			const tmpFlows = deriveFlows({
+				nodes: [node],
+				connections: [],
+			});
+			if (tmpFlows.length !== 1) {
+				throw new Error("Unexpected number of flows");
+			}
+			const tmpFlow = tmpFlows[0];
+
+			// Initialize flow execution
+			const initialExecution: Execution = {
+				id: executionId,
+				status: "running",
+				jobExecutions: createInitialJobExecutions(tmpFlow),
+				artifacts: [],
+				runStartedAt: flowRunStartedAt,
+			};
+			setExecution(initialExecution);
+			const finalExecution = await performFlowExecution({
+				initialExecution,
+				flow: tmpFlow,
+				nodes: graph.nodes,
+				connections: graph.connections,
+				executeStepCallback: (stepId) =>
+					executeNodeAction(executionId, node.id),
+			});
+			setExecution(finalExecution);
+		},
+		[executeNodeAction, graph.connections, graph.nodes, performFlowExecution],
+	);
+
 	return (
 		<ExecutionContext.Provider
-			value={{ execution, execute, executeFlow, retryFlowExecution }}
+			value={{
+				execution,
+				execute,
+				executeFlow,
+				retryFlowExecution,
+				executeNode,
+			}}
 		>
 			{children}
 		</ExecutionContext.Provider>

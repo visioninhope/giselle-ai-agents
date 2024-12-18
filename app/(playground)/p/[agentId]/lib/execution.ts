@@ -440,3 +440,36 @@ export async function retryStep(
 
 	return performFlowExecution(context);
 }
+
+export async function executeNode(
+	agentId: AgentId,
+	executionId: ExecutionId,
+	nodeId: NodeId,
+) {
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.id, agentId),
+	});
+
+	if (agent === undefined || agent.graphUrl === null) {
+		throw new Error(`Agent with id ${agentId} not found`);
+	}
+
+	const graph = await fetch(agent.graphUrl).then(
+		(res) => res.json() as unknown as Graph,
+	);
+
+	const node = graph.nodes.find((node) => node.id === nodeId);
+	if (node === undefined) {
+		throw new Error("Node not found");
+	}
+
+	const context: ExecutionContext = {
+		executionId,
+		node,
+		artifacts: graph.artifacts,
+		nodes: graph.nodes,
+		connections: graph.connections,
+	};
+
+	return performFlowExecution(context);
+}

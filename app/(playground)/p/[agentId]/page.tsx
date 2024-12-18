@@ -24,7 +24,7 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { executeStep, retryStep } from "./lib/execution";
+import { executeNode, executeStep, retryStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
@@ -197,6 +197,11 @@ export default async function Page({
 		);
 	}
 
+	async function executeNodeAction(executionId: ExecutionId, nodeId: NodeId) {
+		"use server";
+		return await executeNode(agentId, executionId, nodeId);
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -219,6 +224,7 @@ export default async function Page({
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
 												retryStepAction={retryStepAction}
+												executeNodeAction={executeNodeAction}
 											>
 												<Playground />
 											</ExecutionProvider>
