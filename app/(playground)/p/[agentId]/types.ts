@@ -261,10 +261,24 @@ interface CompletedStepExecution extends StepExecutionBase {
 	runStartedAt: number;
 	durationMs: number;
 }
+
+interface FailedStepExecution extends StepExecutionBase {
+	status: "failed";
+	runStartedAt: number;
+	durationMs: number;
+	error: string;
+}
+
+interface SkippedStepExecution extends StepExecutionBase {
+	status: "skipped";
+}
+
 export type StepExecution =
 	| PendingStepExecution
 	| RunningStepExecution
-	| CompletedStepExecution;
+	| CompletedStepExecution
+	| FailedStepExecution
+	| SkippedStepExecution;
 
 export type JobExecutionId = `jbex_${string}`;
 interface JobExecutionBase {
@@ -285,10 +299,20 @@ interface CompletedJobExecution extends JobExecutionBase {
 	runStartedAt: number;
 	durationMs: number;
 }
+interface FailedJobExecution extends JobExecutionBase {
+	status: "failed";
+	runStartedAt: number;
+	durationMs: number;
+}
+interface SkippedJobExecution extends JobExecutionBase {
+	status: "skipped";
+}
 export type JobExecution =
 	| PendingJobExecution
 	| RunningJobExecution
-	| CompletedJobExecution;
+	| CompletedJobExecution
+	| FailedJobExecution
+	| SkippedJobExecution;
 export type ExecutionId = `exct_${string}`;
 interface ExecutionBase {
 	id: ExecutionId;
@@ -309,10 +333,16 @@ interface CompletedExecution extends ExecutionBase {
 	durationMs: number;
 	resultArtifact: Artifact;
 }
+interface FailedExecution extends ExecutionBase {
+	status: "failed";
+	runStartedAt: number;
+	durationMs: number;
+}
 export type Execution =
 	| PendingExecution
 	| RunningExecution
-	| CompletedExecution;
+	| CompletedExecution
+	| FailedExecution;
 
 export interface ExecutionIndex {
 	executionId: ExecutionId;
