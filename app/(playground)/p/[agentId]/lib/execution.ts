@@ -20,6 +20,7 @@ import * as v from "valibot";
 import type {
 	AgentId,
 	Artifact,
+	Connection,
 	ExecutionId,
 	ExecutionSnapshot,
 	FlowId,
@@ -28,6 +29,7 @@ import type {
 	NodeHandle,
 	NodeHandleId,
 	NodeId,
+	Step,
 	StepId,
 	TextArtifactObject,
 	TextGenerateActionContent,
@@ -231,11 +233,10 @@ function resolveRequirement(
 
 interface ExecutionContext {
 	executionId: ExecutionId;
-	stepId: StepId;
+	step: Step;
 	artifacts: Artifact[];
 	nodes: Node[];
-	connections: ExecutionSnapshot["connections"];
-	flow: ExecutionSnapshot["flow"];
+	connections: Connection[];
 }
 
 async function performFlowExecution(context: ExecutionContext) {
@@ -245,15 +246,7 @@ async function performFlowExecution(context: ExecutionContext) {
 		sessionId: context.executionId,
 	});
 
-	const step = context.flow.jobs
-		.flatMap((job) => job.steps)
-		.find((step) => step.id === context.stepId);
-
-	if (step === undefined) {
-		throw new Error(`Step with id ${context.stepId} not found`);
-	}
-
-	const node = context.nodes.find((node) => node.id === step.nodeId);
+	const node = context.nodes.find((node) => node.id === context.step.nodeId);
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
@@ -397,13 +390,20 @@ export async function executeStep(
 		throw new Error(`Flow with id ${flowId} not found`);
 	}
 
+	const step = flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === stepId);
+
+	if (step === undefined) {
+		throw new Error(`Step with id ${stepId} not found`);
+	}
+
 	const context: ExecutionContext = {
 		executionId,
-		stepId,
+		step,
 		artifacts,
 		nodes: graph.nodes,
 		connections: graph.connections,
-		flow,
 	};
 
 	return performFlowExecution(context);
@@ -419,13 +419,20 @@ export async function retryStep(
 		(res) => res.json() as unknown as ExecutionSnapshot,
 	);
 
+	const step = executionSnapshot.flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === stepId);
+
+	if (step === undefined) {
+		throw new Error(`Step with id ${stepId} not found`);
+	}
+
 	const context: ExecutionContext = {
 		executionId,
-		stepId,
+		step,
 		artifacts,
 		nodes: executionSnapshot.nodes,
 		connections: executionSnapshot.connections,
-		flow: executionSnapshot.flow,
 	};
 
 	return performFlowExecution(context);
