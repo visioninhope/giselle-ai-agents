@@ -21,6 +21,7 @@ import type {
 	AgentId,
 	Artifact,
 	ExecutionId,
+	ExecutionSnapshot,
 	FlowId,
 	Graph,
 	Node,
@@ -270,6 +271,142 @@ export async function executeStep(
 			(connection) => connection.targetNodeHandleId === nodeHandleId,
 		);
 		const node = graph.nodes.find(
+			(node) => node.id === connection?.sourceNodeId,
+		);
+		if (node === undefined) {
+			return null;
+		}
+		return node;
+	}
+	function artifactResolver(artifactCreatorNodeId: NodeId) {
+		const generatedArtifact = artifacts.find(
+			(artifact) => artifact.creatorNodeId === artifactCreatorNodeId,
+		);
+		if (
+			generatedArtifact === undefined ||
+			generatedArtifact.type !== "generatedArtifact"
+		) {
+			return null;
+		}
+		return generatedArtifact;
+	}
+	// The main switch statement handles the different types of nodes
+	switch (node.content.type) {
+		case "textGeneration": {
+			const actionSources = await resolveSources(node.content.sources, {
+				nodeResolver,
+				artifactResolver,
+			});
+			const requirement = resolveRequirement(node.content.requirement ?? null, {
+				nodeResolver,
+				artifactResolver,
+			});
+			const model = resolveLanguageModel(node.content.llm);
+			const promptTemplate = HandleBars.compile(
+				node.content.system ?? textGenerationPrompt,
+			);
+			const prompt = promptTemplate({
+				instruction: node.content.instruction,
+				requirement,
+				sources: actionSources,
+			});
+			const topP = node.content.topP;
+			const temperature = node.content.temperature;
+			const stream = createStreamableValue<TextArtifactObject>();
+
+			trace.update({
+				input: prompt,
+			});
+
+			const generationTracer = trace.generation({
+				name: "generate-text",
+				input: prompt,
+				model: langfuseModel(node.content.llm),
+				modelParameters: {
+					topP: node.content.topP,
+					temperature: node.content.temperature,
+				},
+			});
+			(async () => {
+				const { partialObjectStream, object, usage } = streamObject({
+					model,
+					prompt,
+					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
+						toJsonSchema(artifactSchema),
+					),
+					topP,
+					temperature,
+				});
+
+				for await (const partialObject of partialObjectStream) {
+					stream.update({
+						type: "text",
+						title: partialObject.title ?? "",
+						content: partialObject.content ?? "",
+						messages: {
+							plan: partialObject.plan ?? "",
+							description: partialObject.description ?? "",
+						},
+					});
+				}
+				const result = await object;
+				await withTokenMeasurement(
+					createLogger(node.content.type),
+					async () => {
+						generationTracer.end({ output: result });
+						trace.update({ output: result });
+						await lf.shutdownAsync();
+						waitForTelemetryExport();
+						return { usage: await usage };
+					},
+					model,
+					startTime,
+				);
+				stream.done();
+			})().catch((error) => {
+				generationTracer.update({
+					level: "ERROR",
+					statusMessage: toErrorWithMessage(error).message,
+				});
+				stream.error(error);
+			});
+			return stream.value;
+		}
+		default:
+			throw new Error("Invalid node type");
+	}
+}
+
+export async function retryStep(
+	retryExecutionSnapshotUrl: string,
+	executionId: ExecutionId,
+	stepId: StepId,
+	artifacts: Artifact[],
+) {
+	const startTime = Date.now();
+	const lf = new Langfuse();
+	const trace = lf.trace({
+		sessionId: executionId,
+	});
+	const executionSnapshot = (await fetch(retryExecutionSnapshotUrl).then(
+		(res) => res.json(),
+	)) as unknown as ExecutionSnapshot;
+	const step = executionSnapshot.flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === stepId);
+	if (step === undefined) {
+		throw new Error(`Step with id ${stepId} not found`);
+	}
+	const node = executionSnapshot.nodes.find((node) => node.id === step.nodeId);
+	if (node === undefined) {
+		throw new Error("Node not found");
+	}
+
+	function nodeResolver(nodeHandleId: NodeHandleId) {
+		const connection = executionSnapshot.connections.find(
+			(connection) => connection.targetNodeHandleId === nodeHandleId,
+		);
+		const node = executionSnapshot.nodes.find(
 			(node) => node.id === connection?.sourceNodeId,
 		);
 		if (node === undefined) {

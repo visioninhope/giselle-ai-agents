@@ -24,7 +24,7 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { executeStep } from "./lib/execution";
+import { executeStep, retryStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
@@ -182,6 +182,21 @@ export default async function Page({
 		return { blobUrl: result.url };
 	}
 
+	async function retryStepAction(
+		retryExecutionSnapshotUrl: string,
+		executionId: ExecutionId,
+		stepId: StepId,
+		artifacts: Artifact[],
+	) {
+		"use server";
+		return await retryStep(
+			retryExecutionSnapshotUrl,
+			executionId,
+			stepId,
+			artifacts,
+		);
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -203,6 +218,7 @@ export default async function Page({
 												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
+												retryStepAction={retryStepAction}
 											>
 												<Playground />
 											</ExecutionProvider>
