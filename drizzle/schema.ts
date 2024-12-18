@@ -54,7 +54,7 @@ export const subscriptions = pgTable("subscriptions", {
 	dbId: serial("db_id").primaryKey(),
 	teamDbId: integer("team_db_id")
 		.notNull()
-		.references(() => teams.dbId),
+		.references(() => teams.dbId, { onDelete: "cascade" }),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
@@ -113,7 +113,7 @@ export const teamMemberships = pgTable(
 			.references(() => users.dbId),
 		teamDbId: integer("team_db_id")
 			.notNull()
-			.references(() => teams.dbId),
+			.references(() => teams.dbId, { onDelete: "cascade" }),
 		role: text("role").notNull().$type<TeamRole>(),
 	},
 	(teamMembership) => ({
