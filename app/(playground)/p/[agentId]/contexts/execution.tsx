@@ -661,6 +661,7 @@ export function ExecutionProvider({
 
 	const executeNode = useCallback(
 		async (nodeId: NodeId) => {
+			setTab("Result");
 			const executionId = createExecutionId();
 			const flowRunStartedAt = Date.now();
 			const node = graph.nodes.find((node) => node.id === nodeId);
@@ -720,6 +721,7 @@ export function ExecutionProvider({
 			setExecution(finalExecution);
 		},
 		[
+			setTab,
 			executeNodeAction,
 			graph.connections,
 			graph.nodes,
