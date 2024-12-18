@@ -9,6 +9,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
+import { saveAgentActivity } from "@/services/agents/activities";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -24,7 +25,6 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { saveAgentActivity } from "./lib/agent-activity";
 import { executeStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
