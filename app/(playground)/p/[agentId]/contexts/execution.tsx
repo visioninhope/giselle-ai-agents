@@ -11,6 +11,7 @@ import {
 import {
 	createArtifactId,
 	createExecutionId,
+	createExecutionSnapshotId,
 	createJobExecutionId,
 	createStepExecutionId,
 	toErrorWithMessage,
@@ -23,6 +24,7 @@ import type {
 	CompletedStepExecution,
 	Execution,
 	ExecutionId,
+	ExecutionSnapshot,
 	FailedExecution,
 	FailedJobExecution,
 	FailedStepExecution,
@@ -39,6 +41,20 @@ import { useGraph } from "./graph";
 import { usePlaygroundMode } from "./playground-mode";
 import { usePropertiesPanel } from "./properties-panel";
 import { useToast } from "./toast";
+
+export function createExecutionSnapshot(graph: Graph, execution: Execution) {
+	const flow = graph.flows.find((flow) => flow.id === execution.flowId);
+	if (flow === undefined) {
+		throw new Error(`Flow with id ${execution.flowId} not found`);
+	}
+	return {
+		id: createExecutionSnapshotId(),
+		execution,
+		nodes: graph.nodes,
+		connections: graph.connections,
+		flow,
+	} as ExecutionSnapshot;
+}
 
 // Helper functions for execution state management
 const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
@@ -519,7 +535,11 @@ export function ExecutionProvider({
 			}
 
 			setExecution(currentExecution);
-			const { blobUrl } = await putExecutionAction(currentExecution);
+			const executionSnapshot = createExecutionSnapshot(
+				graph,
+				currentExecution,
+			);
+			const { blobUrl } = await putExecutionAction(executionSnapshot);
 			dispatch({
 				type: "addExecutionIndex",
 				input: {

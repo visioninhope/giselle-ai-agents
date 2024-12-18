@@ -33,6 +33,7 @@ import type {
 	ArtifactId,
 	Execution,
 	ExecutionId,
+	ExecutionSnapshot,
 	FlowId,
 	Graph,
 	NodeId,
@@ -153,15 +154,15 @@ export default async function Page({
 		"use server";
 		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
 	}
-	async function putExecutionAction(execution: Execution) {
+	async function putExecutionAction(executionSnapshot: ExecutionSnapshot) {
 		"use server";
 		const startTime = Date.now();
 		const result = await withCountMeasurement(
 			createLogger("putExecutionAction"),
 			async () => {
-				const stringifiedExecution = JSON.stringify(execution);
+				const stringifiedExecution = JSON.stringify(executionSnapshot);
 				const result = await put(
-					buildGraphExecutionPath(graph.id, execution.id),
+					buildGraphExecutionPath(graph.id, executionSnapshot.execution.id),
 					stringifiedExecution,
 					{
 						access: "public",
