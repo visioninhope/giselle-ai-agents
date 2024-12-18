@@ -238,7 +238,7 @@ interface ExecutionContext {
 	flow: ExecutionSnapshot["flow"];
 }
 
-async function generateText(context: ExecutionContext) {
+async function performFlowExecution(context: ExecutionContext) {
 	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
@@ -406,7 +406,7 @@ export async function executeStep(
 		flow,
 	};
 
-	return generateText(context);
+	return performFlowExecution(context);
 }
 
 export async function retryStep(
@@ -428,5 +428,5 @@ export async function retryStep(
 		flow: executionSnapshot.flow,
 	};
 
-	return generateText(context);
+	return performFlowExecution(context);
 }
