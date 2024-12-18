@@ -18,12 +18,19 @@ import {
 import type {
 	Artifact,
 	ArtifactId,
+	CompletedExecution,
+	CompletedJobExecution,
+	CompletedStepExecution,
 	Execution,
 	ExecutionId,
+	FailedExecution,
+	FailedJobExecution,
+	FailedStepExecution,
 	Flow,
 	FlowId,
 	JobExecution,
 	NodeId,
+	SkippedJobExecution,
 	StepExecution,
 	StepId,
 	TextArtifactObject,
@@ -90,7 +97,7 @@ const executeStep = async (
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
 	) => void,
-): Promise<number> => {
+): Promise<CompletedStepExecution | FailedStepExecution> => {
 	const stepRunStartedAt = Date.now();
 	const artifactId = createArtifactId();
 
@@ -124,64 +131,98 @@ const executeStep = async (
 		};
 	});
 
-	// Execute step and process stream
-	const stream = await executeStepAction(
-		flowId,
-		executionId,
-		stepExecution.stepId,
-		artifacts,
-	);
-	const finalArtifact = await processStreamContent(stream, (content) => {
+	try {
+		// Execute step and process stream
+		const stream = await executeStepAction(
+			flowId,
+			executionId,
+			stepExecution.stepId,
+			artifacts,
+		);
+		const finalArtifact = await processStreamContent(stream, (content) => {
+			updateExecution((prev) => {
+				if (!prev || prev.status !== "running") return null;
+				return {
+					...prev,
+					artifacts: prev.artifacts.map((artifact) =>
+						artifact.id === artifactId
+							? { ...artifact, object: content }
+							: artifact,
+					),
+				};
+			});
+		});
+
+		// Complete step execution
+		const stepDurationMs = Date.now() - stepRunStartedAt;
+
+		const successStepExecution: CompletedStepExecution = {
+			...stepExecution,
+			status: "completed",
+			runStartedAt: stepRunStartedAt,
+			durationMs: stepDurationMs,
+		};
 		updateExecution((prev) => {
 			if (!prev || prev.status !== "running") return null;
+
 			return {
 				...prev,
+				jobExecutions: prev.jobExecutions.map((job) => ({
+					...job,
+					stepExecutions: job.stepExecutions.map((step) =>
+						step.id === stepExecution.id ? successStepExecution : step,
+					),
+				})),
 				artifacts: prev.artifacts.map((artifact) =>
 					artifact.id === artifactId
-						? { ...artifact, object: content }
+						? {
+								id: artifactId,
+								type: "generatedArtifact",
+								creatorNodeId: stepExecution.nodeId,
+								createdAt: Date.now(),
+								object: finalArtifact,
+							}
 						: artifact,
 				),
 			};
 		});
-	});
 
-	// Complete step execution
-	const stepDurationMs = Date.now() - stepRunStartedAt;
-	updateExecution((prev) => {
-		if (!prev || prev.status !== "running") return null;
-
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((job) => ({
-				...job,
-				stepExecutions: job.stepExecutions.map((step) =>
-					step.id === stepExecution.id
-						? {
-								...step,
-								status: "completed",
-								runStartedAt: stepRunStartedAt,
-								durationMs: stepDurationMs,
-							}
-						: step,
-				),
-			})),
-			artifacts: prev.artifacts.map((artifact) =>
-				artifact.id === artifactId
-					? {
-							id: artifactId,
-							type: "generatedArtifact",
-							creatorNodeId: stepExecution.nodeId,
-							createdAt: Date.now(),
-							object: finalArtifact,
-						}
-					: artifact,
-			),
+		return successStepExecution;
+	} catch (unknownError) {
+		const error = toErrorWithMessage(unknownError).message;
+		const stepDurationMs = Date.now() - stepRunStartedAt;
+		const failedStepExecution: FailedStepExecution = {
+			...stepExecution,
+			status: "failed",
+			runStartedAt: stepRunStartedAt,
+			durationMs: stepDurationMs,
+			error,
 		};
-	});
+		updateExecution((prev) => {
+			if (!prev || prev.status !== "running") return null;
 
-	return stepDurationMs;
+			return {
+				...prev,
+				jobExecutions: prev.jobExecutions.map((job) => ({
+					...job,
+					stepExecutions: job.stepExecutions.map((step) =>
+						step.id === stepExecution.id ? failedStepExecution : step,
+					),
+				})),
+			};
+		});
+		return failedStepExecution;
+	}
 };
 
+class ExecuteJobError extends Error {
+	executeJob: FailedStepExecution;
+	constructor(executeJob: FailedStepExecution) {
+		super(executeJob.error);
+		this.name = "ExecuteJobError";
+		this.executeJob = executeJob;
+	}
+}
 const executeJob = async (
 	flowId: FlowId,
 	executionId: ExecutionId,
@@ -191,7 +232,7 @@ const executeJob = async (
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
 	) => void,
-): Promise<number> => {
+): Promise<CompletedJobExecution | FailedJobExecution> => {
 	const jobRunStartedAt = Date.now();
 
 	// Start job execution
@@ -208,7 +249,7 @@ const executeJob = async (
 	});
 
 	// Execute all steps in parallel
-	const stepDurations = await Promise.all(
+	const stepExecutions = await Promise.all(
 		jobExecution.stepExecutions.map((step) =>
 			executeStep(
 				flowId,
@@ -221,30 +262,52 @@ const executeJob = async (
 		),
 	);
 
-	const jobDurationMs = stepDurations.reduce(
-		(sum, duration) => sum + duration,
+	const jobDurationMs = stepExecutions.reduce(
+		(sum, duration) => sum + duration.durationMs,
 		0,
 	);
+	const allStepsCompleted = stepExecutions.every(
+		(step) => step.status === "completed",
+	);
 
-	// Complete job execution
+	if (allStepsCompleted) {
+		// Complete job execution
+		const completedJobExecution: CompletedJobExecution = {
+			...jobExecution,
+			stepExecutions,
+			status: "completed",
+			runStartedAt: jobRunStartedAt,
+			durationMs: jobDurationMs,
+		};
+		updateExecution((prev) => {
+			if (!prev) return null;
+			return {
+				...prev,
+				jobExecutions: prev.jobExecutions.map((job) =>
+					job.id === jobExecution.id ? completedJobExecution : job,
+				),
+			};
+		});
+		return completedJobExecution;
+	}
+
+	const failedJobExecution: FailedJobExecution = {
+		...jobExecution,
+		stepExecutions,
+		status: "failed",
+		runStartedAt: jobRunStartedAt,
+		durationMs: jobDurationMs,
+	};
 	updateExecution((prev) => {
 		if (!prev) return null;
 		return {
 			...prev,
 			jobExecutions: prev.jobExecutions.map((job) =>
-				job.id === jobExecution.id
-					? {
-							...job,
-							status: "completed",
-							runStartedAt: jobRunStartedAt,
-							durationMs: jobDurationMs,
-						}
-					: job,
+				job.id === jobExecution.id ? failedJobExecution : job,
 			),
 		};
 	});
-
-	return jobDurationMs;
+	return failedJobExecution;
 };
 
 interface ExecutionContextType {
@@ -394,10 +457,29 @@ export function ExecutionProvider({
 			setExecution(currentExecution);
 
 			let totalFlowDurationMs = 0;
+			let hasFailed = false;
 
 			// Execute jobs sequentially
 			for (const jobExecution of jobExecutions) {
-				const jobDurationMs = await executeJob(
+				if (hasFailed) {
+					const skippedJob: SkippedJobExecution = {
+						...jobExecution,
+						status: "skipped",
+						stepExecutions: jobExecution.stepExecutions.map((step) => ({
+							...step,
+							status: "skipped",
+						})),
+					};
+					currentExecution = {
+						...currentExecution,
+						jobExecutions: currentExecution.jobExecutions.map((job) =>
+							job.id === jobExecution.id ? skippedJob : job,
+						),
+					};
+					setExecution(currentExecution);
+					continue;
+				}
+				const executedJob = await executeJob(
 					flowId,
 					executionId,
 					jobExecution,
@@ -411,19 +493,31 @@ export function ExecutionProvider({
 						}
 					},
 				);
-				totalFlowDurationMs += jobDurationMs;
+				totalFlowDurationMs += executedJob.durationMs;
+				if (executedJob.status === "failed") {
+					hasFailed = true;
+				}
+			}
+			if (hasFailed) {
+				const failedExecution: FailedExecution = {
+					...currentExecution,
+					status: "failed",
+					runStartedAt: flowRunStartedAt,
+					durationMs: totalFlowDurationMs,
+				};
+				currentExecution = failedExecution;
+			} else {
+				const completedExecution: CompletedExecution = {
+					...currentExecution,
+					status: "completed",
+					runStartedAt: flowRunStartedAt,
+					durationMs: totalFlowDurationMs,
+					resultArtifact:
+						currentExecution.artifacts[currentExecution.artifacts.length - 1],
+				};
+				currentExecution = completedExecution;
 			}
 
-			currentExecution = {
-				...currentExecution,
-				status: "completed",
-				runStartedAt: flowRunStartedAt,
-				durationMs: totalFlowDurationMs,
-				resultArtifact:
-					currentExecution.artifacts[currentExecution.artifacts.length - 1],
-			};
-
-			// Complete flow execution
 			setExecution(currentExecution);
 			const { blobUrl } = await putExecutionAction(currentExecution);
 			dispatch({

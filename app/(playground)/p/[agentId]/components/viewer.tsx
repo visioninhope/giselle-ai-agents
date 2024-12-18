@@ -1,6 +1,7 @@
 "use client";
 
 import * as Tabs from "@radix-ui/react-tabs";
+import { CircleAlertIcon, CircleSlashIcon } from "lucide-react";
 import { type DetailedHTMLProps, useMemo } from "react";
 import { useExecution } from "../contexts/execution";
 import { useGraph } from "../contexts/graph";
@@ -36,6 +37,12 @@ function StepExecutionButton({
 		>
 			{stepExecution.status === "pending" && (
 				<SpinnerIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
+			)}
+			{stepExecution.status === "failed" && (
+				<CircleAlertIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
+			)}
+			{stepExecution.status === "skipped" && (
+				<CircleSlashIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
 			)}
 			{stepExecution.status === "running" && (
 				<SpinnerIcon className="w-[18px] h-[18px] stroke-black-30 animate-follow-through-spin fill-transparent" />
@@ -121,11 +128,14 @@ function ExecutionViewer({
 				{execution.jobExecutions.flatMap((jobExecution) =>
 					jobExecution.stepExecutions.map((stepExecution) => (
 						<Tabs.Content key={stepExecution.id} value={stepExecution.id}>
-							{stepExecution.artifact == null ? (
-								<p>Pending</p>
-							) : (
-								<Markdown>{stepExecution.artifact.object.content}</Markdown>
+							{stepExecution.status === "pending" && <p>Pending</p>}
+							{stepExecution.status === "failed" && (
+								<p>{stepExecution.error}</p>
 							)}
+							{stepExecution.status === "running" ||
+								(stepExecution.status === "completed" && (
+									<Markdown>{stepExecution.artifact?.object.content}</Markdown>
+								))}
 							{stepExecution.artifact?.type === "generatedArtifact" && (
 								<div className="mt-[10px] flex gap-[12px]">
 									<div className="text-[14px] font-bold text-black-70 ">

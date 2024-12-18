@@ -256,13 +256,13 @@ interface RunningStepExecution extends StepExecutionBase {
 	runStartedAt: number;
 }
 
-interface CompletedStepExecution extends StepExecutionBase {
+export interface CompletedStepExecution extends StepExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 }
 
-interface FailedStepExecution extends StepExecutionBase {
+export interface FailedStepExecution extends StepExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
@@ -294,17 +294,17 @@ interface RunningJobExecution extends JobExecutionBase {
 	status: "running";
 	runStartedAt: number;
 }
-interface CompletedJobExecution extends JobExecutionBase {
+export interface CompletedJobExecution extends JobExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 }
-interface FailedJobExecution extends JobExecutionBase {
+export interface FailedJobExecution extends JobExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
 }
-interface SkippedJobExecution extends JobExecutionBase {
+export interface SkippedJobExecution extends JobExecutionBase {
 	status: "skipped";
 }
 export type JobExecution =
@@ -327,13 +327,13 @@ interface RunningExecution extends ExecutionBase {
 	status: "running";
 	runStartedAt: number;
 }
-interface CompletedExecution extends ExecutionBase {
+export interface CompletedExecution extends ExecutionBase {
 	status: "completed";
 	runStartedAt: number;
 	durationMs: number;
 	resultArtifact: Artifact;
 }
-interface FailedExecution extends ExecutionBase {
+export interface FailedExecution extends ExecutionBase {
 	status: "failed";
 	runStartedAt: number;
 	durationMs: number;
