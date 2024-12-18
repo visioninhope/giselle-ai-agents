@@ -22,6 +22,7 @@ import type {
 	CompletedExecution,
 	CompletedJobExecution,
 	CompletedStepExecution,
+	Connection,
 	Execution,
 	ExecutionId,
 	ExecutionSnapshot,
@@ -30,8 +31,8 @@ import type {
 	FailedStepExecution,
 	Flow,
 	FlowId,
-	Graph,
 	JobExecution,
+	Node,
 	NodeId,
 	SkippedJobExecution,
 	StepExecution,
@@ -43,16 +44,22 @@ import { usePlaygroundMode } from "./playground-mode";
 import { usePropertiesPanel } from "./properties-panel";
 import { useToast } from "./toast";
 
-export function createExecutionSnapshot(graph: Graph, execution: Execution) {
-	const flow = graph.flows.find((flow) => flow.id === execution.flowId);
-	if (flow === undefined) {
-		throw new Error(`Flow with id ${execution.flowId} not found`);
-	}
+export function createExecutionSnapshot({
+	flow,
+	execution,
+	nodes,
+	connections,
+}: {
+	flow: Flow;
+	execution: Execution;
+	nodes: Node[];
+	connections: Connection[];
+}) {
 	return {
 		id: createExecutionSnapshotId(),
 		execution,
-		nodes: graph.nodes,
-		connections: graph.connections,
+		nodes,
+		connections,
 		flow,
 	} as ExecutionSnapshot;
 }
@@ -114,6 +121,9 @@ const executeStep = async (
 		updater: (prev: Execution | null) => Execution | null,
 	) => void,
 ): Promise<CompletedStepExecution | FailedStepExecution> => {
+	if (stepExecution.status === "completed") {
+		return stepExecution;
+	}
 	const stepRunStartedAt = Date.now();
 	const artifactId = createArtifactId();
 
@@ -122,12 +132,12 @@ const executeStep = async (
 		if (!prev) return null;
 		return {
 			...prev,
-			jobExecutions: prev.jobExecutions.map((job) => ({
-				...job,
-				stepExecutions: job.stepExecutions.map((step) =>
-					step.id === stepExecution.id
-						? { ...step, status: "running", runStartedAt: stepRunStartedAt }
-						: step,
+			jobExecutions: prev.jobExecutions.map((prevJob) => ({
+				...prevJob,
+				stepExecutions: prevJob.stepExecutions.map((prevStep) =>
+					prevStep.id === stepExecution.id
+						? { ...prevStep, status: "running", runStartedAt: stepRunStartedAt }
+						: prevStep,
 				),
 			})),
 			artifacts: [
@@ -252,9 +262,9 @@ const executeJob = async (
 
 	// Execute all steps in parallel
 	const stepExecutions = await Promise.all(
-		jobExecution.stepExecutions
-			.filter((step) => step.status === "pending")
-			.map((step) => executeStep(step, executeStepAction, updateExecution)),
+		jobExecution.stepExecutions.map((step) =>
+			executeStep(step, executeStepAction, updateExecution),
+		),
 	);
 
 	const jobDurationMs = stepExecutions.reduce(
@@ -529,10 +539,12 @@ export function ExecutionProvider({
 			}
 
 			setExecution(currentExecution);
-			const executionSnapshot = createExecutionSnapshot(
-				graph,
-				currentExecution,
-			);
+			const executionSnapshot = createExecutionSnapshot({
+				flow,
+				execution: currentExecution,
+				nodes: graph.nodes,
+				connections: graph.connections,
+			});
 			const { blobUrl } = await putExecutionAction(executionSnapshot);
 			dispatch({
 				type: "addExecutionIndex",
@@ -680,10 +692,15 @@ export function ExecutionProvider({
 			}
 
 			setExecution(currentExecution);
-			const executionSnapshot = createExecutionSnapshot(
-				graph,
-				currentExecution,
-			);
+			const executionSnapshot = createExecutionSnapshot({
+				flow: retryExecutionSnapshot.flow,
+				execution: currentExecution,
+				nodes: retryExecutionSnapshot.nodes,
+				connections: retryExecutionSnapshot.connections,
+			});
+			console.log({
+				executionSnapshot,
+			});
 			const { blobUrl } = await putExecutionAction(executionSnapshot);
 			dispatch({
 				type: "addExecutionIndex",
