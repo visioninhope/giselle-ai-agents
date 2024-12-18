@@ -486,7 +486,6 @@ export function ExecutionProvider({
 	);
 
 	interface ExecuteFlowParams {
-		flowId: FlowId;
 		initialExecution: Execution;
 		flow: Flow;
 		nodes: Node[];
@@ -497,7 +496,6 @@ export function ExecutionProvider({
 	}
 	const performFlowExecution = useCallback(
 		async ({
-			flowId,
 			initialExecution,
 			flow,
 			nodes,
@@ -617,7 +615,6 @@ export function ExecutionProvider({
 			setExecution(initialExecution);
 
 			const finalExecution = await performFlowExecution({
-				flowId,
 				initialExecution,
 				flow,
 				nodes: graph.nodes,
@@ -664,7 +661,6 @@ export function ExecutionProvider({
 				runStartedAt: flowRunStartedAt,
 			};
 			const finalExecution = await performFlowExecution({
-				flowId: retryExecutionSnapshot.flow.id,
 				initialExecution,
 				flow: retryExecutionSnapshot.flow,
 				nodes: retryExecutionSnapshot.nodes,
