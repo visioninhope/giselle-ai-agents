@@ -24,6 +24,7 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
+import { saveAgentActivity } from "./lib/agent-activity";
 import { executeStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
@@ -144,6 +145,20 @@ export default async function Page({
 		return await action(artifactId, agentId, nodeId);
 	}
 
+	async function saveAgentActivityAction(
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) {
+		"use server";
+		return await saveAgentActivity(
+			agentId,
+			startedAt,
+			endedAt,
+			totalDurationMs,
+		);
+	}
+
 	async function executeStepAction(
 		flowId: FlowId,
 		executionId: ExecutionId,
@@ -201,6 +216,7 @@ export default async function Page({
 												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
+												saveAgentActivityAction={saveAgentActivityAction}
 											>
 												<Playground />
 											</ExecutionProvider>

@@ -251,6 +251,11 @@ interface ExecutionContextType {
 	execution: Execution | null;
 	execute: (nodeId: NodeId) => Promise<void>;
 	executeFlow: (flowId: FlowId) => Promise<void>;
+	saveAgentActivityAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) => Promise<void>;
 }
 
 const ExecutionContext = createContext<ExecutionContextType | undefined>(
@@ -271,6 +276,11 @@ interface ExecutionProviderProps {
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
 	putExecutionAction: (execution: Execution) => Promise<{ blobUrl: string }>;
+	saveAgentActivityAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) => Promise<void>;
 }
 
 export function ExecutionProvider({
@@ -278,6 +288,7 @@ export function ExecutionProvider({
 	executeAction,
 	executeStepAction,
 	putExecutionAction,
+	saveAgentActivityAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -426,28 +437,37 @@ export function ExecutionProvider({
 			// Complete flow execution
 			setExecution(currentExecution);
 			const { blobUrl } = await putExecutionAction(currentExecution);
+			const flowRunEndedAt = Date.now();
 			dispatch({
 				type: "addExecutionIndex",
 				input: {
 					executionIndex: {
 						executionId,
 						blobUrl,
-						completedAt: Date.now(),
+						completedAt: flowRunEndedAt,
 					},
 				},
 			});
+			await saveAgentActivityAction(
+				flowRunStartedAt,
+				flowRunEndedAt,
+				totalFlowDurationMs,
+			);
 		},
 		[
 			setPlaygroundMode,
 			graph.flows,
 			executeStepAction,
 			putExecutionAction,
+			saveAgentActivityAction,
 			dispatch,
 			flush,
 		],
 	);
 	return (
-		<ExecutionContext.Provider value={{ execution, execute, executeFlow }}>
+		<ExecutionContext.Provider
+			value={{ execution, execute, executeFlow, saveAgentActivityAction }}
+		>
 			{children}
 		</ExecutionContext.Provider>
 	);
