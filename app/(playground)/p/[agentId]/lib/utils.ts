@@ -4,6 +4,7 @@ import type {
 	ArtifactId,
 	ConnectionId,
 	ExecutionId,
+	ExecutionSnapshotId,
 	File,
 	FileId,
 	Files,
@@ -68,6 +69,9 @@ export function createJobExecutionId(): JobExecutionId {
 
 export function createExecutionId(): ExecutionId {
 	return `exct_${createId()}`;
+}
+export function createExecutionSnapshotId(): ExecutionSnapshotId {
+	return `excs_${createId()}`;
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {

@@ -25,15 +25,15 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { executeStep } from "./lib/execution";
+import { executeStep, retryStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
 	AgentId,
 	Artifact,
 	ArtifactId,
-	Execution,
 	ExecutionId,
+	ExecutionSnapshot,
 	FlowId,
 	Graph,
 	NodeId,
@@ -86,6 +86,7 @@ export default async function Page({
 			async () => {
 				const result = await list({
 					prefix: buildGraphFolderPath(graph.id),
+					mode: "folded",
 				});
 				const size = result.blobs.reduce((sum, blob) => sum + blob.size, 0);
 				return {
@@ -163,15 +164,15 @@ export default async function Page({
 		"use server";
 		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
 	}
-	async function putExecutionAction(execution: Execution) {
+	async function putExecutionAction(executionSnapshot: ExecutionSnapshot) {
 		"use server";
 		const startTime = Date.now();
 		const result = await withCountMeasurement(
 			createLogger("putExecutionAction"),
 			async () => {
-				const stringifiedExecution = JSON.stringify(execution);
+				const stringifiedExecution = JSON.stringify(executionSnapshot);
 				const result = await put(
-					buildGraphExecutionPath(graph.id, execution.id),
+					buildGraphExecutionPath(graph.id, executionSnapshot.execution.id),
 					stringifiedExecution,
 					{
 						access: "public",
@@ -188,6 +189,21 @@ export default async function Page({
 		);
 		waitForTelemetryExport();
 		return { blobUrl: result.url };
+	}
+
+	async function retryStepAction(
+		retryExecutionSnapshotUrl: string,
+		executionId: ExecutionId,
+		stepId: StepId,
+		artifacts: Artifact[],
+	) {
+		"use server";
+		return await retryStep(
+			retryExecutionSnapshotUrl,
+			executionId,
+			stepId,
+			artifacts,
+		);
 	}
 
 	return (
@@ -211,6 +227,7 @@ export default async function Page({
 												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
+												retryStepAction={retryStepAction}
 												recordAgentUsageAction={recordAgentUsageAction}
 											>
 												<Playground />
