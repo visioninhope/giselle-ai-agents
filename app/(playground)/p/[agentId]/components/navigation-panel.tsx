@@ -129,7 +129,7 @@ export function NavigationPanel() {
 
 function ContentPanel({ children }: { children: ReactNode }) {
 	return (
-		<div className="grid gap-[24px] px-[24px] py-[24px] h-full overflow-y-hidden">
+		<div className="flex flex-col gap-[24px] px-[24px] py-[24px] h-full overflow-y-hidden">
 			{children}
 		</div>
 	);
