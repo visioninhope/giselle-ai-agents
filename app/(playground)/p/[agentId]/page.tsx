@@ -184,6 +184,7 @@ export default async function Page({
 	) {
 		"use server";
 		return await retryStep(
+			agentId,
 			retryExecutionSnapshotUrl,
 			executionId,
 			stepId,
