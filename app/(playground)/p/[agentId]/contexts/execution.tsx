@@ -32,7 +32,6 @@ import type {
 	FailedStepExecution,
 	Flow,
 	FlowId,
-	GeneratedArtifact,
 	JobExecution,
 	Node,
 	NodeId,
@@ -377,6 +376,11 @@ interface ExecutionContextType {
 		executionId: ExecutionId,
 		forceRetryStepId?: StepId,
 	) => Promise<void>;
+	recordAgentUsageAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) => Promise<void>;
 }
 
 const ExecutionContext = createContext<ExecutionContextType | undefined>(
@@ -407,6 +411,11 @@ interface ExecutionProviderProps {
 		executionId: ExecutionId,
 		nodeId: NodeId,
 	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+	recordAgentUsageAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) => Promise<void>;
 }
 
 export function ExecutionProvider({
@@ -415,6 +424,7 @@ export function ExecutionProvider({
 	putExecutionAction,
 	retryStepAction,
 	executeNodeAction,
+	recordAgentUsageAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -531,20 +541,27 @@ export function ExecutionProvider({
 			});
 
 			const { blobUrl } = await putExecutionAction(executionSnapshot);
+			const runEndedAt = Date.now();
 			dispatch({
 				type: "addExecutionIndex",
 				input: {
 					executionIndex: {
 						executionId: currentExecution.id,
 						blobUrl,
-						completedAt: Date.now(),
+						completedAt: runEndedAt,
 					},
 				},
 			});
 
+			await recordAgentUsageAction(
+				currentExecution.runStartedAt,
+				runEndedAt,
+				currentExecution.durationMs,
+			);
+
 			return currentExecution;
 		},
-		[dispatch, putExecutionAction, addToast],
+		[dispatch, putExecutionAction, addToast, recordAgentUsageAction],
 	);
 
 	const executeFlow = useCallback(
@@ -737,6 +754,7 @@ export function ExecutionProvider({
 				executeFlow,
 				retryFlowExecution,
 				executeNode,
+				recordAgentUsageAction,
 			}}
 		>
 			{children}
