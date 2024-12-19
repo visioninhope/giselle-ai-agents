@@ -70,6 +70,8 @@ function TabsContent(
 interface TabValueContextState {
 	tabValue: string;
 	setTabValue: (value: string) => void;
+	popoverOpen: boolean;
+	setPopoverOpen: (value: boolean) => void;
 }
 const TabValueContext = createContext<TabValueContextState | undefined>(
 	undefined,
@@ -85,9 +87,12 @@ export const useTabValue = () => {
 
 export function NavigationPanel() {
 	const [tabValue, setTabValue] = useState("");
+	const [popoverOpen, setPopoverOpen] = useState(false);
 	const developerMode = useDeveloperMode();
 	return (
-		<TabValueContext value={{ tabValue, setTabValue }}>
+		<TabValueContext
+			value={{ tabValue, setTabValue, popoverOpen, setPopoverOpen }}
+		>
 			<Tabs.Root
 				orientation="vertical"
 				value={tabValue}
@@ -231,7 +236,7 @@ function AssignDataForm({
 }) {
 	return (
 		<form>
-			<p>Assign Data</p>
+			<p className="font-rosart">Assign Data</p>
 			<div className="space-y-[14px]">
 				<div>
 					<Label>Issue comment data</Label>
@@ -327,6 +332,7 @@ const mockEventDataList = [
 ];
 function GitHubIntegrationForm() {
 	const { integration, repositories } = useGitHubIntegration();
+	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
 	return (
@@ -411,7 +417,7 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionFormField>
 					<Label>Assign data</Label>
 					<div className="flex justify-end">
-						<Popover.Root>
+						<Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
 							<Popover.Trigger>+</Popover.Trigger>
 							<Popover.Portal>
 								<Popover.Content
@@ -420,6 +426,12 @@ function GitHubIntegrationForm() {
 									align="end"
 									className="w-[300px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] backdrop-blur-[16px] px-[18px] py-[18px] "
 									onOpenAutoFocus={(event) => {
+										event.preventDefault();
+									}}
+									onCloseAutoFocus={(event) => {
+										event.preventDefault();
+									}}
+									onInteractOutside={(event) => {
 										event.preventDefault();
 									}}
 								>
