@@ -21,6 +21,7 @@ import type {
 	AgentId,
 	Artifact,
 	ExecutionId,
+	ExecutionSnapshot,
 	FlowId,
 	Graph,
 	Node,
@@ -228,48 +229,40 @@ function resolveRequirement(
 	}
 }
 
-export async function executeStep(
-	agentId: AgentId,
-	flowId: FlowId,
-	executionId: ExecutionId,
-	stepId: StepId,
-	artifacts: Artifact[],
-) {
+interface ExecutionContext {
+	executionId: ExecutionId;
+	stepId: StepId;
+	artifacts: Artifact[];
+	nodes: Node[];
+	connections: ExecutionSnapshot["connections"];
+	flow: ExecutionSnapshot["flow"];
+}
+
+async function performFlowExecution(context: ExecutionContext) {
 	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
-		sessionId: executionId,
+		sessionId: context.executionId,
 	});
-	const agent = await db.query.agents.findFirst({
-		where: (agents, { eq }) => eq(agents.id, agentId),
-	});
-	if (agent === undefined || agent.graphUrl === null) {
-		throw new Error(`Agent with id ${agentId} not found`);
+
+	const step = context.flow.jobs
+		.flatMap((job) => job.steps)
+		.find((step) => step.id === context.stepId);
+
+	if (step === undefined) {
+		throw new Error(`Step with id ${context.stepId} not found`);
 	}
 
-	const graph = await fetch(agent.graphUrl).then(
-		(res) => res.json() as unknown as Graph,
-	);
-	const flow = graph.flows.find((flow) => flow.id === flowId);
-	if (flow === undefined) {
-		throw new Error(`Flow with id ${flowId} not found`);
-	}
-	const step = flow.jobs
-		.flatMap((job) => job.steps)
-		.find((step) => step.id === stepId);
-	if (step === undefined) {
-		throw new Error(`Step with id ${stepId} not found`);
-	}
-	const node = graph.nodes.find((node) => node.id === step.nodeId);
+	const node = context.nodes.find((node) => node.id === step.nodeId);
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
 
 	function nodeResolver(nodeHandleId: NodeHandleId) {
-		const connection = graph.connections.find(
+		const connection = context.connections.find(
 			(connection) => connection.targetNodeHandleId === nodeHandleId,
 		);
-		const node = graph.nodes.find(
+		const node = context.nodes.find(
 			(node) => node.id === connection?.sourceNodeId,
 		);
 		if (node === undefined) {
@@ -277,8 +270,9 @@ export async function executeStep(
 		}
 		return node;
 	}
+
 	function artifactResolver(artifactCreatorNodeId: NodeId) {
-		const generatedArtifact = artifacts.find(
+		const generatedArtifact = context.artifacts.find(
 			(artifact) => artifact.creatorNodeId === artifactCreatorNodeId,
 		);
 		if (
@@ -289,7 +283,7 @@ export async function executeStep(
 		}
 		return generatedArtifact;
 	}
-	// The main switch statement handles the different types of nodes
+
 	switch (node.content.type) {
 		case "textGeneration": {
 			const actionSources = await resolveSources(node.content.sources, {
@@ -326,6 +320,7 @@ export async function executeStep(
 					temperature: node.content.temperature,
 				},
 			});
+
 			(async () => {
 				const { partialObjectStream, object, usage } = streamObject({
 					model,
@@ -348,6 +343,7 @@ export async function executeStep(
 						},
 					});
 				}
+
 				const result = await object;
 				await withTokenMeasurement(
 					createLogger(node.content.type),
@@ -369,9 +365,68 @@ export async function executeStep(
 				});
 				stream.error(error);
 			});
+
 			return stream.value;
 		}
 		default:
 			throw new Error("Invalid node type");
 	}
+}
+
+export async function executeStep(
+	agentId: AgentId,
+	flowId: FlowId,
+	executionId: ExecutionId,
+	stepId: StepId,
+	artifacts: Artifact[],
+) {
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.id, agentId),
+	});
+
+	if (agent === undefined || agent.graphUrl === null) {
+		throw new Error(`Agent with id ${agentId} not found`);
+	}
+
+	const graph = await fetch(agent.graphUrl).then(
+		(res) => res.json() as unknown as Graph,
+	);
+
+	const flow = graph.flows.find((flow) => flow.id === flowId);
+	if (flow === undefined) {
+		throw new Error(`Flow with id ${flowId} not found`);
+	}
+
+	const context: ExecutionContext = {
+		executionId,
+		stepId,
+		artifacts,
+		nodes: graph.nodes,
+		connections: graph.connections,
+		flow,
+	};
+
+	return performFlowExecution(context);
+}
+
+export async function retryStep(
+	retryExecutionSnapshotUrl: string,
+	executionId: ExecutionId,
+	stepId: StepId,
+	artifacts: Artifact[],
+) {
+	const executionSnapshot = await fetch(retryExecutionSnapshotUrl).then(
+		(res) => res.json() as unknown as ExecutionSnapshot,
+	);
+
+	const context: ExecutionContext = {
+		executionId,
+		stepId,
+		artifacts,
+		nodes: executionSnapshot.nodes,
+		connections: executionSnapshot.connections,
+		flow: executionSnapshot.flow,
+	};
+
+	return performFlowExecution(context);
 }
