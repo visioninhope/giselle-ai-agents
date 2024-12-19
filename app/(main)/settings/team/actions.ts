@@ -11,10 +11,12 @@ import {
 	teams,
 	users,
 } from "@/drizzle";
+import { updateGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
 
 function isUserId(value: string): value is UserId {
 	return value.startsWith("usr_");
@@ -481,7 +483,10 @@ export async function getAgentActivities({
 	}
 }
 
-export async function deleteTeam() {
+export async function deleteTeam(
+	prevState: { error: string },
+	formData: FormData,
+) {
 	try {
 		// Get current user's info and team
 		const currentTeam = await fetchCurrentTeam();
@@ -502,9 +507,9 @@ export async function deleteTeam() {
 
 		// Get current user's other teams count
 		const supabaseUser = await getUser();
-		const currentUserTeamsCount = await db
+		const otherTeams = await db
 			.select({
-				count: count(),
+				teamDbId: teamMemberships.teamDbId,
 			})
 			.from(teamMemberships)
 			.innerJoin(
@@ -516,25 +521,28 @@ export async function deleteTeam() {
 					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
 					ne(teamMemberships.teamDbId, currentTeam.dbId), // Exclude current team
 				),
-			);
+			)
+			.limit(1);
 
 		// Check if user has other teams
-		if (currentUserTeamsCount[0].count === 0) {
+		if (otherTeams.length === 0) {
 			throw new Error("Cannot delete your only team");
 		}
 
 		// Delete team and all related data with cascading
 		await db.delete(teams).where(eq(teams.dbId, currentTeam.dbId));
 
-		revalidatePath("/settings/team");
-
-		return { success: true };
+		// Refresh session to switch to another team after deletion
+		// This ensures that the user is redirected to a valid team context and prevents access to the deleted team's resources.
+		await updateGiselleSession({ teamDbId: otherTeams[0].teamDbId });
 	} catch (error) {
 		console.error("Failed to delete team:", error);
 
 		return {
-			success: false,
 			error: error instanceof Error ? error.message : "Failed to delete team",
 		};
 	}
+
+	// Redirect to team settings page when team is deleted
+	redirect("/settings/team");
 }
