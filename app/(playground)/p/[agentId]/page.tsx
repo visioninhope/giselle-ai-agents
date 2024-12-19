@@ -14,7 +14,7 @@ import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
-import { action, putGraph } from "./actions";
+import { putGraph } from "./actions";
 import { Playground } from "./components/playground";
 import { AgentNameProvider } from "./contexts/agent-name";
 import { DeveloperModeProvider } from "./contexts/developer-mode";
@@ -25,13 +25,12 @@ import { PlaygroundModeProvider } from "./contexts/playground-mode";
 import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
-import { executeStep, retryStep } from "./lib/execution";
+import { executeNode, executeStep, retryStep } from "./lib/execution";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
 	AgentId,
 	Artifact,
-	ArtifactId,
 	ExecutionId,
 	ExecutionSnapshot,
 	FlowId,
@@ -141,20 +140,6 @@ export default async function Page({
 		return agentName;
 	}
 
-	async function execute(artifactId: ArtifactId, nodeId: NodeId) {
-		"use server";
-		return await action(artifactId, agentId, nodeId);
-	}
-
-	async function recordAgentUsageAction(
-		startedAt: number,
-		endedAt: number,
-		totalDurationMs: number,
-	) {
-		"use server";
-		return await recordAgentUsage(agentId, startedAt, endedAt, totalDurationMs);
-	}
-
 	async function executeStepAction(
 		flowId: FlowId,
 		executionId: ExecutionId,
@@ -206,6 +191,20 @@ export default async function Page({
 		);
 	}
 
+	async function executeNodeAction(executionId: ExecutionId, nodeId: NodeId) {
+		"use server";
+		return await executeNode(agentId, executionId, nodeId);
+	}
+
+	async function recordAgentUsageAction(
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) {
+		"use server";
+		return await recordAgentUsage(agentId, startedAt, endedAt, totalDurationMs);
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -224,11 +223,11 @@ export default async function Page({
 									>
 										<PlaygroundModeProvider>
 											<ExecutionProvider
-												executeAction={execute}
 												executeStepAction={executeStepAction}
 												putExecutionAction={putExecutionAction}
 												retryStepAction={retryStepAction}
 												recordAgentUsageAction={recordAgentUsageAction}
+												executeNodeAction={executeNodeAction}
 											>
 												<Playground />
 											</ExecutionProvider>

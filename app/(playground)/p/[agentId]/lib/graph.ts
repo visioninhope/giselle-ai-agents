@@ -12,7 +12,9 @@ import type {
 } from "../types";
 import { createFlowId, createJobId, createStepId } from "./utils";
 
-export function deriveFlows(graph: Graph): Flow[] {
+export function deriveFlows(
+	graph: Pick<Graph, "nodes" | "connections">,
+): Flow[] {
 	const processedNodes = new Set<NodeId>();
 	const flows: Flow[] = [];
 	const connectionMap = new Map<NodeId, Set<NodeId>>();
