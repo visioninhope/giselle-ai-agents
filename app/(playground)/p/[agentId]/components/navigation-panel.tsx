@@ -419,6 +419,9 @@ function GitHubIntegrationForm() {
 									sideOffset={40}
 									align="end"
 									className="w-[300px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] backdrop-blur-[16px] px-[18px] py-[18px] "
+									onOpenAutoFocus={(event) => {
+										event.preventDefault();
+									}}
 								>
 									<AssignDataForm nodes={graph.nodes} />
 								</Popover.Content>
