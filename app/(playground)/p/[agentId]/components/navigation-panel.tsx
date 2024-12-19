@@ -330,7 +330,7 @@ function GitHubIntegrationForm() {
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
 	return (
-		<form className="grid gap-[16px] overflow-y-auto">
+		<form className="grid gap-[16px] overflow-y-auto mx-[-20px] px-[20px]">
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
