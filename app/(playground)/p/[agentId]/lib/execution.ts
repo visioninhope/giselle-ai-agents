@@ -1,12 +1,13 @@
 "use server";
 
-import { db } from "@/drizzle";
+import { agents, db, subscriptions, teams } from "@/drizzle";
 
 import {
 	createLogger,
 	waitForTelemetryExport,
 	withTokenMeasurement,
 } from "@/lib/opentelemetry";
+import { isAgentTimeAvailable } from "@/services/agents/activities";
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
@@ -14,6 +15,7 @@ import { toJsonSchema } from "@valibot/to-json-schema";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
+import { eq } from "drizzle-orm";
 import HandleBars from "handlebars";
 import Langfuse from "langfuse";
 import * as v from "valibot";
@@ -33,6 +35,7 @@ import type {
 	TextArtifactObject,
 	TextGenerateActionContent,
 } from "../types";
+import { AgentTimeNotAvailableError } from "./errors";
 import { textGenerationPrompt } from "./prompts";
 import { langfuseModel, toErrorWithMessage } from "./utils";
 
@@ -267,6 +270,10 @@ interface ExecutionContext {
 }
 
 async function performFlowExecution(context: ExecutionContext) {
+	const canPerform = await canPerformFlowExecution(context.agentId);
+	if (!canPerform) {
+		throw new AgentTimeNotAvailableError();
+	}
 	const startTime = Date.now();
 	const lf = new Langfuse();
 	const trace = lf.trace({
@@ -476,4 +483,27 @@ export async function executeNode(
 	};
 
 	return performFlowExecution(context);
+}
+
+async function canPerformFlowExecution(agentId: AgentId) {
+	const res = await db
+		.select({
+			dbId: teams.dbId,
+			name: teams.name,
+			type: teams.type,
+			activeSubscriptionId: subscriptions.id,
+		})
+		.from(teams)
+		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
+		.leftJoin(subscriptions, eq(subscriptions.teamDbId, teams.dbId))
+		.where(eq(agents.id, agentId));
+	if (res.length === 0) {
+		throw new Error(`Agent with id ${agentId} not found`);
+	}
+	if (res.length > 1) {
+		throw new Error(`Agent with id ${agentId} is in multiple teams`);
+	}
+
+	const team = res[0];
+	return await isAgentTimeAvailable(team);
 }
