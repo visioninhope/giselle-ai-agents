@@ -19,6 +19,7 @@ import { Playground } from "./components/playground";
 import { AgentNameProvider } from "./contexts/agent-name";
 import { DeveloperModeProvider } from "./contexts/developer-mode";
 import { ExecutionProvider } from "./contexts/execution";
+import { GitHubIntegrationProvider } from "./contexts/github-integration";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PlaygroundModeProvider } from "./contexts/playground-mode";
@@ -26,6 +27,7 @@ import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import { executeNode, executeStep, retryStep } from "./lib/execution";
+import { getGitHubIntegrationState } from "./lib/github";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
 import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
 import type {
@@ -68,6 +70,8 @@ export default async function Page({
 	let graph = await fetch(agent.graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
+
+	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
 
 	async function persistGraph(graph: Graph) {
 		"use server";
@@ -212,32 +216,34 @@ export default async function Page({
 				onPersistAction={persistGraph}
 				defaultGraphUrl={graphUrl}
 			>
-				<PropertiesPanelProvider>
-					<ReactFlowProvider>
-						<ToolbarContextProvider>
-							<MousePositionProvider>
-								<ToastProvider>
-									<AgentNameProvider
-										defaultValue={agent.name ?? "Unnamed Agent"}
-										updateAgentNameAction={updateAgentName}
-									>
-										<PlaygroundModeProvider>
-											<ExecutionProvider
-												executeStepAction={executeStepAction}
-												putExecutionAction={putExecutionAction}
-												retryStepAction={retryStepAction}
-												recordAgentUsageAction={recordAgentUsageAction}
-												executeNodeAction={executeNodeAction}
-											>
-												<Playground />
-											</ExecutionProvider>
-										</PlaygroundModeProvider>
-									</AgentNameProvider>
-								</ToastProvider>
-							</MousePositionProvider>
-						</ToolbarContextProvider>
-					</ReactFlowProvider>
-				</PropertiesPanelProvider>
+				<GitHubIntegrationProvider {...gitHubIntegrationState}>
+					<PropertiesPanelProvider>
+						<ReactFlowProvider>
+							<ToolbarContextProvider>
+								<MousePositionProvider>
+									<ToastProvider>
+										<AgentNameProvider
+											defaultValue={agent.name ?? "Unnamed Agent"}
+											updateAgentNameAction={updateAgentName}
+										>
+											<PlaygroundModeProvider>
+												<ExecutionProvider
+													executeStepAction={executeStepAction}
+													putExecutionAction={putExecutionAction}
+													retryStepAction={retryStepAction}
+													recordAgentUsageAction={recordAgentUsageAction}
+													executeNodeAction={executeNodeAction}
+												>
+													<Playground />
+												</ExecutionProvider>
+											</PlaygroundModeProvider>
+										</AgentNameProvider>
+									</ToastProvider>
+								</MousePositionProvider>
+							</ToolbarContextProvider>
+						</ReactFlowProvider>
+					</PropertiesPanelProvider>
+				</GitHubIntegrationProvider>
 			</GraphContextProvider>
 		</DeveloperModeProvider>
 	);

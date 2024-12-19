@@ -1,3 +1,8 @@
+import { Button } from "@/components/ui/button";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "@/services/external/github/types";
 import * as Tabs from "@radix-ui/react-tabs";
 import { getDownloadUrl, head } from "@vercel/blob";
 import clsx from "clsx/lite";
@@ -9,6 +14,7 @@ import {
 	ListTreeIcon,
 	XIcon,
 } from "lucide-react";
+import Link from "next/link";
 import {
 	type ComponentProps,
 	type ReactNode,
@@ -19,11 +25,21 @@ import {
 } from "react";
 import { useAgentName } from "../contexts/agent-name";
 import { useDeveloperMode } from "../contexts/developer-mode";
+import { useGitHubIntegration } from "../contexts/github-integration";
 import { useGraph } from "../contexts/graph";
 import { LayersIcon } from "../prev/beta-proto/components/icons/layers";
 import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type { Node, Step } from "../types";
 import { ContentTypeIcon } from "./content-type-icon";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "./select";
+import { Input } from "./ui/input";
+import { Label } from "./ui/label";
 
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
@@ -77,9 +93,9 @@ export function NavigationPanel() {
 					<TabsTrigger value="overview">
 						<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
 					</TabsTrigger>
-					{/* <TabsTrigger value="github">
-					<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
-				</TabsTrigger> */}
+					<TabsTrigger value="github">
+						<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
+					</TabsTrigger>
 					<TabsTrigger value="structure">
 						<ListTreeIcon className="w-[18px] h-[18px] stroke-black-30" />
 					</TabsTrigger>
@@ -93,9 +109,9 @@ export function NavigationPanel() {
 				<TabsContent value="overview">
 					<Overview />
 				</TabsContent>
-				{/* <TabsContent value="github">
-				<GitHubIntegration />
-			</TabsContent> */}
+				<TabsContent value="github">
+					<GitHubIntegration />
+				</TabsContent>
 				<TabsContent value="structure">
 					<Structure />
 				</TabsContent>
@@ -129,6 +145,25 @@ function ContentPanelHeader({
 			</button>
 		</header>
 	);
+}
+
+export function ContentPanelSectionHeader(props: { title: string }) {
+	return (
+		<div className="flex items-center">
+			<span className="flex-shrink text-black-30 text-[16px] font-rosart font-[500]">
+				{props.title}
+			</span>
+			<div className="ml-[16px] flex-grow border-t border-black-80" />
+		</div>
+	);
+}
+
+export function ContentPanelSection(props: { children: ReactNode }) {
+	return <div className="grid gap-[8px]">{props.children}</div>;
+}
+
+export function ContentPanelSectionFormField(props: { children: ReactNode }) {
+	return <div className="grid gap-[2px]">{props.children}</div>;
 }
 
 export function Overview() {
@@ -182,8 +217,309 @@ export function Overview() {
 }
 
 function GitHubIntegration() {
-	return <div>GitHub Integration</div>;
+	const { needsAuthorization } = useGitHubIntegration();
+
+	return (
+		<ContentPanel>
+			<ContentPanelHeader>GitHub Integration</ContentPanelHeader>
+			{needsAuthorization ? GoToAccountSettings() : GitHubIntegrationForm()}
+		</ContentPanel>
+	);
 }
+function GoToAccountSettings() {
+	return (
+		<div className="grid gap-[16px]">
+			<div className="text-sm text-gray-600">
+				Please connect your GitHub account to get started
+			</div>
+			<Button asChild>
+				<Link href="/settings/account">Connect GitHub</Link>
+			</Button>
+		</div>
+	);
+}
+const integrationEventList = [
+	{
+		type: "github.issue_comment.created" satisfies GitHubTriggerEvent,
+		label: "Comment on Issue",
+	},
+] as const;
+const nextActionList = [
+	{
+		type: "github.issue_comment.reply" satisfies GitHubNextAction,
+		label: "Comment on trigger issue",
+	},
+] as const;
+function GitHubIntegrationForm() {
+	const { integration, repositories } = useGitHubIntegration();
+	const { graph } = useGraph();
+	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
+	return (
+		<form className="grid gap-[16px]">
+			<ContentPanelSection>
+				<ContentPanelSectionHeader title="Repository" />
+				<Select
+					name="repository"
+					defaultValue={integration?.repositoryFullName}
+				>
+					<SelectTrigger>
+						<SelectValue placeholder="Choose repository" />
+					</SelectTrigger>
+					<SelectContent>
+						{repositories.map((repository) => (
+							<SelectItem value={repository.full_name} key={repository.id}>
+								{repository.full_name}
+							</SelectItem>
+						))}
+					</SelectContent>
+				</Select>
+			</ContentPanelSection>
+
+			<ContentPanelSection>
+				<ContentPanelSectionHeader title="Trigger" />
+				<ContentPanelSectionFormField>
+					<Label htmlFor="event">Event</Label>
+					<Select name="event" defaultValue={integration?.event}>
+						<SelectTrigger>
+							<SelectValue placeholder="Choose event" />
+						</SelectTrigger>
+						<SelectContent>
+							{integrationEventList.map((integrationEvent) => (
+								<SelectItem
+									value={integrationEvent.type}
+									key={integrationEvent.type}
+								>
+									{integrationEvent.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					<ContentPanelSectionFormField>
+						<Label htmlFor="callSign">Call sign</Label>
+						<Input
+							type="text"
+							name="callSign"
+							id="callSign"
+							placeholder="Enter call sign"
+							className="w-full"
+							value={callSign}
+							onChange={(e) => setCallSign(e.target.value)}
+						/>
+						<span className="text-black-70 text-[12px]">
+							You can call this agent by commenting{" "}
+							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
+								/giselle {callSign === "" ? "[call sign]" : callSign}
+							</span>{" "}
+							in the issue route06inc/giselle.
+						</span>
+					</ContentPanelSectionFormField>
+				</ContentPanelSectionFormField>
+			</ContentPanelSection>
+
+			<ContentPanelSection>
+				<ContentPanelSectionHeader title="Action" />
+				<ContentPanelSectionFormField>
+					<Label>Run flow</Label>
+					<Select name="flow">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose next action" />
+						</SelectTrigger>
+						<SelectContent>
+							{graph.flows.map((flow) => (
+								<SelectItem value={flow.id} key={flow.id}>
+									{flow.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</ContentPanelSectionFormField>
+			</ContentPanelSection>
+			<ContentPanelSection>
+				<ContentPanelSectionHeader title="Then" />
+				<ContentPanelSectionFormField>
+					<Select name="nextAction" defaultValue={integration?.nextAction}>
+						<SelectTrigger>
+							<SelectValue placeholder="Choose next action" />
+						</SelectTrigger>
+						<SelectContent>
+							{nextActionList.map((nextAction) => (
+								<SelectItem value={nextAction.type} key={nextAction.type}>
+									{nextAction.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</ContentPanelSectionFormField>
+			</ContentPanelSection>
+		</form>
+	);
+}
+
+// interface GitHubIntegrationFormProps {
+// 	repositories: Array<{
+// 		id: number;
+// 		full_name: string;
+// 	}>;
+// }
+// function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
+// 	interface Flow {
+// 		start: Pick<GiselleNode, "id" | "name">;
+// 		end: Pick<GiselleNode, "id" | "name">;
+// 	}
+// 	const { state } = useGraph();
+// 	const flows = useMemo(() => {
+// 		const edges = allFlowEdges(state.graph.nodes, state.graph.connectors);
+// 		const tmpFlows: Flow[] = [];
+// 		for (const edge of edges) {
+// 			const start = state.graph.nodes.find((node) => node.id === edge.start);
+// 			const end = state.graph.nodes.find((node) => node.id === edge.end);
+// 			if (start && end) {
+// 				tmpFlows.push({
+// 					start: {
+// 						id: start.id as GiselleNodeId,
+// 						name: start.name,
+// 					},
+// 					end: {
+// 						id: end.id as GiselleNodeId,
+// 						name: end.name,
+// 					},
+// 				});
+// 			}
+// 		}
+// 		return tmpFlows;
+// 	}, [state.graph]);
+
+// 	const { setting } = useGitHubIntegration();
+// 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
+// 	const [_, action, isPending] = useActionState(
+// 		async (prevState: unknown, formData: FormData) => {
+// 			const repositoryFullName = formData.get("repository") as string;
+// 			const event = formData.get("event") as GitHubTriggerEvent;
+// 			const nextAction = formData.get("nextAction") as GitHubNextAction;
+// 			const flow = formData.get("flow") as string;
+// 			const { start, end } = JSON.parse(flow) as Flow;
+// 			await save({
+// 				id: setting?.id,
+// 				agentId: state.graph.agentId,
+// 				repositoryFullName,
+// 				event,
+// 				callSign,
+// 				nextAction,
+// 				startNodeId: start.id,
+// 				endNodeId: end.id,
+// 			});
+// 		},
+// 		null,
+// 	);
+
+// 	return (
+// 		<form className="grid gap-[16px]" action={action}>
+// 			<ContentPanelSection>
+// 				<ContentPanelSectionHeader title="Repository" />
+// 				<Select name="repository" defaultValue={setting?.repositoryFullName}>
+// 					<SelectTrigger>
+// 						<SelectValue placeholder="Choose repository" />
+// 					</SelectTrigger>
+// 					<SelectContent>
+// 						{repositories.map((repository) => (
+// 							<SelectItem value={repository.full_name} key={repository.id}>
+// 								{repository.full_name}
+// 							</SelectItem>
+// 						))}
+// 					</SelectContent>
+// 				</Select>
+// 			</ContentPanelSection>
+// 			<ContentPanelSection>
+// 				<ContentPanelSectionHeader title="Trigger" />
+// 				<ContentPanelSectionFormField>
+// 					<Label htmlFor="event">Event</Label>
+// 					<Select name="event" defaultValue={setting?.event}>
+// 						<SelectTrigger>
+// 							<SelectValue placeholder="Choose event" />
+// 						</SelectTrigger>
+// 						<SelectContent>
+// 							{mockEvents.map((event) => (
+// 								<SelectItem value={event.type} key={event.type}>
+// 									{event.label}
+// 								</SelectItem>
+// 							))}
+// 						</SelectContent>
+// 					</Select>
+// 				</ContentPanelSectionFormField>
+// 				<ContentPanelSectionFormField>
+// 					<Label htmlFor="callSign">Call sign</Label>
+// 					<Input
+// 						type="text"
+// 						name="callSign"
+// 						id="callSign"
+// 						placeholder="Enter call sign"
+// 						className="w-full"
+// 						value={callSign}
+// 						onChange={(e) => setCallSign(e.target.value)}
+// 					/>
+// 					<span className="text-black-70 text-[12px]">
+// 						You can call this agent by commenting{" "}
+// 						<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
+// 							/giselle {callSign === "" ? "[call sign]" : callSign}
+// 						</span>{" "}
+// 						in the issue route06inc/giselle.
+// 					</span>
+// 				</ContentPanelSectionFormField>
+// 			</ContentPanelSection>
+// 			<ContentPanelSection>
+// 				<ContentPanelSectionHeader title="Action" />
+// 				<ContentPanelSectionFormField>
+// 					<Label>Run flow</Label>
+// 					<Select
+// 						name="flow"
+// 						defaultValue={JSON.stringify(
+// 							flows.find(
+// 								(flow) =>
+// 									flow.start.id === setting?.startNodeId &&
+// 									flow.end.id === setting?.endNodeId,
+// 							),
+// 						)}
+// 					>
+// 						<SelectTrigger>
+// 							<SelectValue placeholder="Choose flow" />
+// 						</SelectTrigger>
+// 						<SelectContent>
+// 							{flows.map((flow) => (
+// 								<SelectItem
+// 									value={JSON.stringify(flow)}
+// 									key={`${flow.start.id}-${flow.end.id}`}
+// 								>
+// 									{flow.start.name} → {flow.end.name}
+// 								</SelectItem>
+// 							))}
+// 						</SelectContent>
+// 					</Select>
+// 				</ContentPanelSectionFormField>
+// 				<ContentPanelSectionFormField>
+// 					<Label>Then</Label>
+// 					<Select name="nextAction" defaultValue={setting?.nextAction}>
+// 						<SelectTrigger>
+// 							<SelectValue placeholder="Choose next action" />
+// 						</SelectTrigger>
+// 						<SelectContent>
+// 							{mockNextActions.map((nextAction) => (
+// 								<SelectItem value={nextAction.type} key={nextAction.type}>
+// 									{nextAction.label}
+// 								</SelectItem>
+// 							))}
+// 						</SelectContent>
+// 					</Select>
+// 				</ContentPanelSectionFormField>
+// 			</ContentPanelSection>
+// 			<div>
+// 				<input type="hidden" name="agentId" value={state.graph.agentId} />
+// 				<Button type="submit" disabled={isPending} data-loading={isPending}>
+// 					Save
+// 				</Button>
+// 			</div>
+// 		</form>
+// 	);
+// }
 
 function Developer() {
 	const { graphUrl } = useGraph();

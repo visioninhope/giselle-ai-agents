@@ -1,4 +1,3 @@
-import type { GitHubUserClient } from "@/services/external/github";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
