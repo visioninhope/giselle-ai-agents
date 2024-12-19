@@ -67,13 +67,13 @@ function TabsContent(
 	);
 }
 
-const TabValueContext = createContext<
-	| {
-			tabValue: string;
-			setTabValue: (value: string) => void;
-	  }
-	| undefined
->(undefined);
+interface TabValueContextState {
+	tabValue: string;
+	setTabValue: (value: string) => void;
+}
+const TabValueContext = createContext<TabValueContextState | undefined>(
+	undefined,
+);
 
 export const useTabValue = () => {
 	const context = useContext(TabValueContext);
