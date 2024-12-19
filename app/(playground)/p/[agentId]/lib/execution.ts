@@ -15,7 +15,7 @@ import { toJsonSchema } from "@valibot/to-json-schema";
 import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
-import { eq } from "drizzle-orm";
+import { and, eq } from "drizzle-orm";
 import HandleBars from "handlebars";
 import Langfuse from "langfuse";
 import * as v from "valibot";
@@ -495,7 +495,13 @@ async function canPerformFlowExecution(agentId: AgentId) {
 		})
 		.from(teams)
 		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
-		.leftJoin(subscriptions, eq(subscriptions.teamDbId, teams.dbId))
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(subscriptions.teamDbId, teams.dbId),
+				eq(subscriptions.status, "active"),
+			),
+		)
 		.where(eq(agents.id, agentId));
 	if (res.length === 0) {
 		throw new Error(`Agent with id ${agentId} not found`);
