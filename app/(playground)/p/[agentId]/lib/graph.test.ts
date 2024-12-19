@@ -150,8 +150,31 @@ describe("deriveFlows", () => {
 		expect(flows[1].nodes.length).toBe(3);
 	});
 	test("ignore ghost connectors", () => {
-		console.log(flows[1].jobs[2].steps);
 		expect(flows[1].jobs[2].steps.length).toBe(1);
+	});
+	test("one node graph", () => {
+		const testFlows = deriveFlows({
+			nodes: [
+				{
+					id: "nd_onenode",
+					name: "Summary",
+					position: { x: 420, y: 180 },
+					selected: false,
+					type: "action",
+					content: {
+						type: "textGeneration",
+						llm: "anthropic:claude-3-5-sonnet-latest",
+						temperature: 0.7,
+						topP: 1,
+						instruction: "Please let me know key takeaway about ",
+						sources: [],
+					},
+				},
+			],
+			connections: [],
+		});
+		expect(testFlows.length).toBe(1);
+		expect(testFlows[0].jobs[0].steps[0].nodeId).toBe("nd_onenode");
 	});
 });
 

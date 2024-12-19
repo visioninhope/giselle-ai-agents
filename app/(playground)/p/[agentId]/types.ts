@@ -162,7 +162,7 @@ export interface TextArtifactObject extends ArtifactObjectBase {
 		completionTokens: number;
 	};
 }
-interface TextArtifact extends GeneratedArtifact {
+export interface TextArtifact extends GeneratedArtifact {
 	object: TextArtifactObject;
 }
 interface TextStreamArtifact extends StreamAtrifact {

@@ -8,6 +8,7 @@ import {
 	useContext,
 	useState,
 } from "react";
+import { deriveFlows } from "../lib/graph";
 import {
 	createArtifactId,
 	createExecutionId,
@@ -37,6 +38,7 @@ import type {
 	SkippedJobExecution,
 	StepExecution,
 	StepId,
+	TextArtifact,
 	TextArtifactObject,
 } from "../types";
 import { useGraph } from "./graph";
@@ -137,15 +139,28 @@ const processStreamContent = async (
 	return textArtifactObject;
 };
 
-const executeStep = async (
-	stepExecution: StepExecution,
+const executeStep = async ({
+	stepExecution,
+	executeStepAction,
+	updateExecution,
+	updateArtifact,
+	onStepFinish,
+	onStepFail,
+}: {
+	stepExecution: StepExecution;
 	executeStepAction: (
 		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
-	) => void,
-): Promise<CompletedStepExecution | FailedStepExecution> => {
+	) => void;
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
+	onStepFinish?: (
+		stepExecution: CompletedStepExecution,
+		artifact: TextArtifact,
+	) => void;
+	onStepFail?: (stepExecution: FailedStepExecution) => void;
+}): Promise<CompletedStepExecution | FailedStepExecution> => {
 	if (stepExecution.status === "completed") {
 		return stepExecution;
 	}
@@ -185,29 +200,26 @@ const executeStep = async (
 	try {
 		// Execute step and process stream
 		const stream = await executeStepAction(stepExecution.stepId);
-		const finalArtifact = await processStreamContent(stream, (content) => {
-			updateExecution((prev) => {
-				if (!prev || prev.status !== "running") return null;
-				return {
-					...prev,
-					artifacts: prev.artifacts.map((artifact) =>
-						artifact.id === artifactId
-							? { ...artifact, object: content }
-							: artifact,
-					),
-				};
-			});
-		});
+		const finalArtifact = await processStreamContent(stream, (content) =>
+			updateArtifact(artifactId, content),
+		);
 
 		// Complete step execution
 		const stepDurationMs = Date.now() - stepRunStartedAt;
 
-		const successStepExecution: CompletedStepExecution = {
+		const completedStepExecution: CompletedStepExecution = {
 			...stepExecution,
 			status: "completed",
 			runStartedAt: stepRunStartedAt,
 			durationMs: stepDurationMs,
 		};
+		const generatedArtifact = {
+			id: artifactId,
+			type: "generatedArtifact",
+			creatorNodeId: stepExecution.nodeId,
+			createdAt: Date.now(),
+			object: finalArtifact,
+		} satisfies TextArtifact;
 		updateExecution((prev) => {
 			if (!prev || prev.status !== "running") return null;
 
@@ -216,24 +228,16 @@ const executeStep = async (
 				jobExecutions: prev.jobExecutions.map((job) => ({
 					...job,
 					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? successStepExecution : step,
+						step.id === stepExecution.id ? completedStepExecution : step,
 					),
 				})),
 				artifacts: prev.artifacts.map((artifact) =>
-					artifact.id === artifactId
-						? {
-								id: artifactId,
-								type: "generatedArtifact",
-								creatorNodeId: stepExecution.nodeId,
-								createdAt: Date.now(),
-								object: finalArtifact,
-							}
-						: artifact,
+					artifact.id === artifactId ? generatedArtifact : artifact,
 				),
 			};
 		});
-
-		return successStepExecution;
+		onStepFinish?.(completedStepExecution, generatedArtifact);
+		return completedStepExecution;
 	} catch (unknownError) {
 		const error = toErrorWithMessage(unknownError).message;
 		const stepDurationMs = Date.now() - stepRunStartedAt;
@@ -260,19 +264,33 @@ const executeStep = async (
 				),
 			};
 		});
+		onStepFail?.(failedStepExecution);
 		return failedStepExecution;
 	}
 };
 
-const executeJob = async (
-	jobExecution: JobExecution,
+const executeJob = async ({
+	jobExecution,
+	executeStepAction,
+	updateArtifact,
+	updateExecution,
+	onStepFinish,
+	onStepFail,
+}: {
+	jobExecution: JobExecution;
 	executeStepAction: (
 		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	updateExecution: (
 		updater: (prev: Execution | null) => Execution | null,
-	) => void,
-): Promise<CompletedJobExecution | FailedJobExecution> => {
+	) => void;
+	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
+	onStepFinish?: (
+		stepExecution: CompletedStepExecution,
+		artifact: TextArtifact,
+	) => void;
+	onStepFail?: (stepExecution: FailedStepExecution) => void;
+}): Promise<CompletedJobExecution | FailedJobExecution> => {
 	const jobRunStartedAt = Date.now();
 
 	// Start job execution
@@ -290,8 +308,15 @@ const executeJob = async (
 
 	// Execute all steps in parallel
 	const stepExecutions = await Promise.all(
-		jobExecution.stepExecutions.map((step) =>
-			executeStep(step, executeStepAction, updateExecution),
+		jobExecution.stepExecutions.map((stepExecution) =>
+			executeStep({
+				stepExecution,
+				executeStepAction,
+				updateExecution,
+				updateArtifact,
+				onStepFinish,
+				onStepFail,
+			}),
 		),
 	);
 
@@ -345,11 +370,16 @@ const executeJob = async (
 
 interface ExecutionContextType {
 	execution: Execution | null;
-	execute: (nodeId: NodeId) => Promise<void>;
+	executeNode: (nodeId: NodeId) => Promise<void>;
 	executeFlow: (flowId: FlowId) => Promise<void>;
 	retryFlowExecution: (
 		executionId: ExecutionId,
 		forceRetryStepId?: StepId,
+	) => Promise<void>;
+	recordAgentUsageAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
 	) => Promise<void>;
 }
 
@@ -372,23 +402,29 @@ type RetryStepAction = (
 ) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 interface ExecutionProviderProps {
 	children: ReactNode;
-	executeAction: (
-		artifactId: ArtifactId,
-		nodeId: NodeId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 	executeStepAction: ExecuteStepAction;
 	putExecutionAction: (
 		executionSnapshot: ExecutionSnapshot,
 	) => Promise<{ blobUrl: string }>;
 	retryStepAction: RetryStepAction;
+	executeNodeAction: (
+		executionId: ExecutionId,
+		nodeId: NodeId,
+	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+	recordAgentUsageAction: (
+		startedAt: number,
+		endedAt: number,
+		totalDurationMs: number,
+	) => Promise<void>;
 }
 
 export function ExecutionProvider({
 	children,
-	executeAction,
 	executeStepAction,
 	putExecutionAction,
 	retryStepAction,
+	executeNodeAction,
+	recordAgentUsageAction,
 }: ExecutionProviderProps) {
 	const { dispatch, flush, graph } = useGraph();
 	const { setTab } = usePropertiesPanel();
@@ -396,97 +432,7 @@ export function ExecutionProvider({
 	const { setPlaygroundMode } = usePlaygroundMode();
 	const [execution, setExecution] = useState<Execution | null>(null);
 
-	const execute = useCallback(
-		async (nodeId: NodeId) => {
-			const artifactId = createArtifactId();
-			dispatch({
-				type: "upsertArtifact",
-				input: {
-					nodeId,
-					artifact: {
-						id: artifactId,
-						type: "streamArtifact",
-						creatorNodeId: nodeId,
-						object: {
-							type: "text",
-							title: "",
-							content: "",
-							messages: {
-								plan: "",
-								description: "",
-							},
-						},
-					},
-				},
-			});
-			setTab("Result");
-			await flush();
-			try {
-				const stream = await executeAction(artifactId, nodeId);
-
-				let textArtifactObject: TextArtifactObject = {
-					type: "text",
-					title: "",
-					content: "",
-					messages: {
-						plan: "",
-						description: "",
-					},
-				};
-				for await (const streamContent of readStreamableValue(stream)) {
-					if (streamContent === undefined) {
-						continue;
-					}
-					dispatch({
-						type: "upsertArtifact",
-						input: {
-							nodeId,
-							artifact: {
-								id: artifactId,
-								type: "streamArtifact",
-								creatorNodeId: nodeId,
-								object: streamContent,
-							},
-						},
-					});
-					textArtifactObject = {
-						...textArtifactObject,
-						...streamContent,
-					};
-				}
-				dispatch({
-					type: "upsertArtifact",
-					input: {
-						nodeId,
-						artifact: {
-							id: artifactId,
-							type: "generatedArtifact",
-							creatorNodeId: nodeId,
-							createdAt: Date.now(),
-							object: textArtifactObject,
-						},
-					},
-				});
-			} catch (error) {
-				addToast({
-					type: "error",
-					title: "Execution failed",
-					message: toErrorWithMessage(error).message,
-				});
-				dispatch({
-					type: "upsertArtifact",
-					input: {
-						nodeId,
-						artifact: null,
-					},
-				});
-			}
-		},
-		[executeAction, dispatch, flush, setTab, addToast],
-	);
-
 	interface ExecuteFlowParams {
-		flowId: FlowId;
 		initialExecution: Execution;
 		flow: Flow;
 		nodes: Node[];
@@ -494,15 +440,24 @@ export function ExecutionProvider({
 		executeStepCallback: (
 			stepId: StepId,
 		) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+		updateArtifactCallback: (
+			artifactId: ArtifactId,
+			content: TextArtifactObject,
+		) => void;
+		onStepFinish?: (
+			stepExecution: CompletedStepExecution,
+			artifact: TextArtifact,
+		) => void;
 	}
 	const performFlowExecution = useCallback(
 		async ({
-			flowId,
 			initialExecution,
 			flow,
 			nodes,
 			connections,
 			executeStepCallback,
+			updateArtifactCallback,
+			onStepFinish,
 		}: ExecuteFlowParams) => {
 			let currentExecution = initialExecution;
 			let totalFlowDurationMs = 0;
@@ -534,17 +489,25 @@ export function ExecutionProvider({
 					continue;
 				}
 
-				const executedJob = await executeJob(
+				const executedJob = await executeJob({
 					jobExecution,
-					executeStepCallback,
-					(updater) => {
+					executeStepAction: executeStepCallback,
+					updateExecution: (updater) => {
 						const updated = updater(currentExecution);
 						if (updated) {
 							currentExecution = updated;
 							setExecution(updated);
 						}
 					},
-				);
+					updateArtifact: updateArtifactCallback,
+					onStepFinish,
+					onStepFail: (failedStep) => {
+						addToast({
+							type: "error",
+							message: failedStep.error,
+						});
+					},
+				});
 
 				totalFlowDurationMs += executedJob.durationMs;
 				if (executedJob.status === "failed") {
@@ -578,20 +541,27 @@ export function ExecutionProvider({
 			});
 
 			const { blobUrl } = await putExecutionAction(executionSnapshot);
+			const runEndedAt = Date.now();
 			dispatch({
 				type: "addExecutionIndex",
 				input: {
 					executionIndex: {
 						executionId: currentExecution.id,
 						blobUrl,
-						completedAt: Date.now(),
+						completedAt: runEndedAt,
 					},
 				},
 			});
 
+			await recordAgentUsageAction(
+				currentExecution.runStartedAt,
+				runEndedAt,
+				currentExecution.durationMs,
+			);
+
 			return currentExecution;
 		},
-		[dispatch, putExecutionAction],
+		[dispatch, putExecutionAction, addToast, recordAgentUsageAction],
 	);
 
 	const executeFlow = useCallback(
@@ -617,7 +587,6 @@ export function ExecutionProvider({
 			setExecution(initialExecution);
 
 			const finalExecution = await performFlowExecution({
-				flowId,
 				initialExecution,
 				flow,
 				nodes: graph.nodes,
@@ -629,6 +598,19 @@ export function ExecutionProvider({
 						stepId,
 						initialExecution.artifacts,
 					),
+				updateArtifactCallback: (artifactId, content) => {
+					setExecution((prev) => {
+						if (!prev || prev.status !== "running") return null;
+						return {
+							...prev,
+							artifacts: prev.artifacts.map((artifact) =>
+								artifact.id === artifactId
+									? { ...artifact, object: content }
+									: artifact,
+							),
+						};
+					});
+				},
 			});
 			setExecution(finalExecution);
 		},
@@ -664,7 +646,6 @@ export function ExecutionProvider({
 				runStartedAt: flowRunStartedAt,
 			};
 			const finalExecution = await performFlowExecution({
-				flowId: retryExecutionSnapshot.flow.id,
 				initialExecution,
 				flow: retryExecutionSnapshot.flow,
 				nodes: retryExecutionSnapshot.nodes,
@@ -676,15 +657,105 @@ export function ExecutionProvider({
 						stepId,
 						initialExecution.artifacts,
 					),
+				updateArtifactCallback: (artifactId, content) => {
+					setExecution((prev) => {
+						if (!prev || prev.status !== "running") return null;
+						return {
+							...prev,
+							artifacts: prev.artifacts.map((artifact) =>
+								artifact.id === artifactId
+									? { ...artifact, object: content }
+									: artifact,
+							),
+						};
+					});
+				},
 			});
 			setExecution(finalExecution);
 		},
 		[graph.executionIndexes, flush, retryStepAction, performFlowExecution],
 	);
 
+	const executeNode = useCallback(
+		async (nodeId: NodeId) => {
+			setTab("Result");
+			const executionId = createExecutionId();
+			const flowRunStartedAt = Date.now();
+			const node = graph.nodes.find((node) => node.id === nodeId);
+			if (node === undefined) {
+				throw new Error("Node not found");
+			}
+
+			const tmpFlows = deriveFlows({
+				nodes: [node],
+				connections: [],
+			});
+			if (tmpFlows.length !== 1) {
+				throw new Error("Unexpected number of flows");
+			}
+			const tmpFlow = tmpFlows[0];
+
+			// Initialize flow execution
+			const initialExecution: Execution = {
+				id: executionId,
+				status: "running",
+				jobExecutions: createInitialJobExecutions(tmpFlow),
+				artifacts: [],
+				runStartedAt: flowRunStartedAt,
+			};
+			setExecution(initialExecution);
+			const finalExecution = await performFlowExecution({
+				initialExecution,
+				flow: tmpFlow,
+				nodes: graph.nodes,
+				connections: graph.connections,
+				executeStepCallback: (stepId) =>
+					executeNodeAction(executionId, node.id),
+				updateArtifactCallback: (artifactId, content) => {
+					dispatch({
+						type: "upsertArtifact",
+						input: {
+							nodeId,
+							artifact: {
+								id: artifactId,
+								type: "streamArtifact",
+								creatorNodeId: nodeId,
+								object: content,
+							},
+						},
+					});
+				},
+				onStepFinish: (execution, artifact) => {
+					dispatch({
+						type: "upsertArtifact",
+						input: {
+							nodeId,
+							artifact,
+						},
+					});
+				},
+			});
+			setExecution(finalExecution);
+		},
+		[
+			setTab,
+			executeNodeAction,
+			graph.connections,
+			graph.nodes,
+			performFlowExecution,
+			dispatch,
+		],
+	);
+
 	return (
 		<ExecutionContext.Provider
-			value={{ execution, execute, executeFlow, retryFlowExecution }}
+			value={{
+				execution,
+				executeFlow,
+				retryFlowExecution,
+				executeNode,
+				recordAgentUsageAction,
+			}}
 		>
 			{children}
 		</ExecutionContext.Provider>

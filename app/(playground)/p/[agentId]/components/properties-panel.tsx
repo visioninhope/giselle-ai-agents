@@ -29,7 +29,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { action, parse, remove } from "../actions";
+import { parse, remove } from "../actions";
 import { vercelBlobFileFolder } from "../constants";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useExecution } from "../contexts/execution";
@@ -288,7 +288,7 @@ export function PropertiesPanel() {
 	const { graph, dispatch, flush } = useGraph();
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
-	const { execute } = useExecution();
+	const { executeNode } = useExecution();
 	return (
 		<div
 			className={clsx(
@@ -353,7 +353,7 @@ export function PropertiesPanel() {
 									<button
 										type="button"
 										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-										onClick={() => execute(selectedNode.id)}
+										onClick={() => executeNode(selectedNode.id)}
 									>
 										Generate
 									</button>
@@ -630,7 +630,7 @@ export function PropertiesPanel() {
 									setTab("Prompt");
 								}}
 								onEditPrompt={() => setTab("Prompt")}
-								onGenerateText={() => execute(selectedNode.id)}
+								onGenerateText={() => executeNode(selectedNode.id)}
 							/>
 						</TabsContent>
 					)}
