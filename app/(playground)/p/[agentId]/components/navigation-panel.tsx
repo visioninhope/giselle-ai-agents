@@ -3,10 +3,13 @@ import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
+import * as Popover from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { getDownloadUrl, head } from "@vercel/blob";
 import clsx from "clsx/lite";
 import {
+	ArrowRightIcon,
+	CirclePlusIcon,
 	DownloadIcon,
 	FrameIcon,
 	GithubIcon,
@@ -30,6 +33,7 @@ import { useGraph } from "../contexts/graph";
 import { LayersIcon } from "../prev/beta-proto/components/icons/layers";
 import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type { Node, Step } from "../types";
+import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
 	Select,
@@ -124,7 +128,11 @@ export function NavigationPanel() {
 }
 
 function ContentPanel({ children }: { children: ReactNode }) {
-	return <div className="grid gap-[24px] px-[24px] py-[24px]">{children}</div>;
+	return (
+		<div className="grid gap-[24px] px-[24px] py-[24px] h-full overflow-y-hidden">
+			{children}
+		</div>
+	);
 }
 function ContentPanelHeader({
 	children,
@@ -216,6 +224,67 @@ export function Overview() {
 	);
 }
 
+function AssignDataForm({
+	nodes,
+}: {
+	nodes: Node[];
+}) {
+	return (
+		<form>
+			<p>Assign Data</p>
+			<div className="space-y-[14px]">
+				<div>
+					<Label>Issue comment data</Label>
+					<Select name="assignData">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose data" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="issueComment.body">Comment Body</SelectItem>
+							<SelectItem value="issueComment.issue.title">
+								Issue Title
+							</SelectItem>
+							<SelectItem value="issueComment.issue.body">
+								Issue Description
+							</SelectItem>
+						</SelectContent>
+					</Select>
+				</div>
+				<div>
+					<Label>Assign node</Label>
+					<Select name="flow">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose node" />
+						</SelectTrigger>
+						<SelectContent>
+							{nodes.map((node) => (
+								<SelectItem value={node.id} key={node.id}>
+									{node.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+				<div>
+					<Label>Assign property</Label>
+					<Select name="flow">
+						<SelectTrigger>
+							<SelectValue placeholder="Choose property" />
+						</SelectTrigger>
+						<SelectContent>
+							{nodes.map((node) => (
+								<SelectItem value={node.id} key={node.id}>
+									{node.name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</div>
+			</div>
+		</form>
+	);
+}
+
 function GitHubIntegration() {
 	const { needsAuthorization } = useGitHubIntegration();
 
@@ -250,12 +319,18 @@ const nextActionList = [
 		label: "Comment on trigger issue",
 	},
 ] as const;
+const mockEventDataList = [
+	{
+		type: "github.issue_comment.body",
+		label: "Body",
+	},
+];
 function GitHubIntegrationForm() {
 	const { integration, repositories } = useGitHubIntegration();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
 	return (
-		<form className="grid gap-[16px]">
+		<form className="grid gap-[16px] overflow-y-auto">
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
@@ -332,6 +407,73 @@ function GitHubIntegrationForm() {
 							))}
 						</SelectContent>
 					</Select>
+				</ContentPanelSectionFormField>
+				<ContentPanelSectionFormField>
+					<Label>Assign data</Label>
+					<div className="flex justify-end">
+						<Popover.Root>
+							<Popover.Trigger>+</Popover.Trigger>
+							<Popover.Portal>
+								<Popover.Content
+									side="right"
+									sideOffset={40}
+									align="end"
+									className="w-[300px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] backdrop-blur-[16px] px-[18px] py-[18px] "
+								>
+									<AssignDataForm nodes={graph.nodes} />
+								</Popover.Content>
+							</Popover.Portal>
+						</Popover.Root>
+					</div>
+					{/* <div className="space-y-[12px]">
+						<Block className="flex items-center gap-[12px] font-rosart ">
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Issue Comment</p>
+								<p>Body</p>
+							</div>
+							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Untitled node - 1</p>
+								<p>Instruction</p>
+							</div>
+						</Block>
+						<Block className="flex items-center gap-[12px] font-rosart justify-between">
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Issue Comment</p>
+								<p>Issue Description</p>
+							</div>
+							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Untitled node - 5</p>
+								<p>Text</p>
+							</div>
+						</Block>
+
+						<Block className="flex items-center gap-[12px] font-rosart justify-between">
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Issue Comment</p>
+								<div>
+									<Select>
+										<SelectTrigger>
+											<SelectValue placeholder="Choose data" />
+										</SelectTrigger>
+										<SelectContent>
+											{graph.flows.map((flow) => (
+												<SelectItem value={flow.id} key={flow.id}>
+													{flow.name}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								</div>
+							</div>
+							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
+							<div className="leading-tight flex-1">
+								<p className="text-[12px] text-black-50">Untitled node - 5</p>
+								<p>Text</p>
+							</div>
+						</Block>
+					</div> */}
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
 			<ContentPanelSection>

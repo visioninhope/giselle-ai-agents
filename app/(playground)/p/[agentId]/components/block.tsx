@@ -4,9 +4,10 @@ import type { ReactNode } from "react";
 type BlockSize = "default" | "large";
 export function Block({
 	children,
+	className,
 	size = "default",
 	...props
-}: { children: ReactNode; size?: BlockSize }) {
+}: { children: ReactNode; size?: BlockSize; className?: string }) {
 	return (
 		<div
 			data-size={size}
@@ -17,7 +18,7 @@ export function Block({
 			)}
 			{...props}
 		>
-			<div className="z-10 relative">{children}</div>
+			<div className={clsx("z-10 relative", className)}>{children}</div>
 			<div className="absolute z-0 rounded-[4px] inset-0 border mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent to-[hsla(233,4%,37%,1)] from-[hsla(233,62%,22%,1)]" />
 		</div>
 	);
