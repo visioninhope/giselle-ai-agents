@@ -29,7 +29,6 @@ import type {
 	NodeHandle,
 	NodeHandleId,
 	NodeId,
-	Step,
 	StepId,
 	TextArtifactObject,
 	TextGenerateActionContent,
@@ -259,6 +258,7 @@ function resolveRequirement(
 }
 
 interface ExecutionContext {
+	agentId: AgentId;
 	executionId: ExecutionId;
 	node: Node;
 	artifacts: Artifact[];
@@ -397,6 +397,7 @@ export async function executeStep(
 	}
 
 	const context: ExecutionContext = {
+		agentId,
 		executionId,
 		node,
 		artifacts,
@@ -408,6 +409,7 @@ export async function executeStep(
 }
 
 export async function retryStep(
+	agentId: AgentId,
 	retryExecutionSnapshotUrl: string,
 	executionId: ExecutionId,
 	stepId: StepId,
@@ -431,6 +433,7 @@ export async function retryStep(
 	}
 
 	const context: ExecutionContext = {
+		agentId,
 		executionId,
 		node,
 		artifacts,
@@ -464,6 +467,7 @@ export async function executeNode(
 	}
 
 	const context: ExecutionContext = {
+		agentId,
 		executionId,
 		node,
 		artifacts: graph.artifacts,
