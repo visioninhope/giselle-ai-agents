@@ -4,6 +4,7 @@ import type { LanguageModelUsage } from "ai";
 import type { LanguageModelV1 } from "ai";
 import type { PDFDocumentProxy } from "pdfjs-dist";
 import { getDocument } from "pdfjs-dist";
+import * as pdfWorker from "pdfjs-dist/build/pdf.worker.mjs";
 import type { UnstructuredClient } from "unstructured-client";
 import type { PartitionResponse } from "unstructured-client/sdk/models/operations/partition";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
