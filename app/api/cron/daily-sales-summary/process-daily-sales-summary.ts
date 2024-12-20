@@ -7,6 +7,7 @@ import {
 	userSeatUsageReports,
 } from "@/drizzle";
 import { stripe } from "@/services/external/stripe";
+import { createObjectCsvStringifier } from "csv-writer";
 import { and, eq, gte, lt } from "drizzle-orm";
 import type Stripe from "stripe";
 import invariant from "tiny-invariant";
@@ -15,6 +16,7 @@ import {
 	formatSubscriptionEvidence,
 	formatUserSeatEvidence,
 } from "./formatter";
+import { putCSV } from "./put-csv";
 import type {
 	SubscriptionCreateInvoiceEvidence,
 	SubscriptionCycleInvoiceEvidence,
@@ -30,10 +32,6 @@ export async function processDailySalesSummary(targetDate: Date) {
 	const periodStart = targetDate.getTime() / 1000;
 	const periodEnd = targetDate.getTime() / 1000 + 24 * 60 * 60;
 	const invoices = await fetchInvoices(periodStart, periodEnd);
-	console.log(
-		"Invoices:",
-		invoices.map((invoice) => invoice.id),
-	);
 
 	const evidences: (
 		| SubscriptionCreateInvoiceEvidence
@@ -45,21 +43,67 @@ export async function processDailySalesSummary(targetDate: Date) {
 		evidences.push(evidence);
 	}
 
+	const targetDateString = targetDate.toISOString().split("T")[0];
+	const outputPath = `daily-sales-summary/${targetDate.getUTCFullYear()}-${targetDate.getUTCMonth() + 1}`;
+
 	// output Evidences
 	const subscriptionEvidences = evidences.map((it) =>
 		formatSubscriptionEvidence(it),
 	);
-	console.log("Subscription Evidences:", subscriptionEvidences);
+	if (subscriptionEvidences.length > 0) {
+		const csvStringifier = createObjectCsvStringifier({
+			header: [
+				{ id: "invoiceId", title: "Invoice ID" },
+				{ id: "invoiceCreatedAt", title: "Invoice Created At" },
+				{ id: "subscriptionId", title: "Subscription ID" },
+				{ id: "teamDbId", title: "Team DB ID" },
+				{ id: "teamName", title: "Team Name" },
+			],
+		});
+		putCSV(
+			`${outputPath}/${targetDateString}-subscriptions.csv`,
+			csvStringifier.getHeaderString() ?? "",
+			csvStringifier.stringifyRecords(subscriptionEvidences),
+		);
+	}
 
 	const agentTimeUsageEvidences = evidences
 		.filter((it) => it.kind === "subscription_cycle")
 		.map((it) => formatAgentTimeUsageEvicence(it));
-	console.log("Agent Time Usage Evidences:", agentTimeUsageEvidences);
+	if (agentTimeUsageEvidences.length > 0) {
+		const csvStringifier = createObjectCsvStringifier({
+			header: [
+				{ id: "invoiceId", title: "Invoice ID" },
+				{ id: "agentDbId", title: "Agent DB ID" },
+				{ id: "agentName", title: "Agent Name" },
+				{ id: "startedAt", title: "Started At" },
+				{ id: "endedAt", title: "Ended At" },
+				{ id: "totalDurationMs", title: "Total Duration (ms)" },
+			],
+		});
+		putCSV(
+			`${outputPath}/${targetDateString}-agent-time-usages.csv`,
+			csvStringifier.getHeaderString() ?? "",
+			csvStringifier.stringifyRecords(agentTimeUsageEvidences),
+		);
+	}
 
 	const userSeatEvidences = evidences
 		.filter((it) => it.kind === "subscription_cycle")
 		.map((it) => formatUserSeatEvidence(it));
-	console.log("User Seat Evidences:", userSeatEvidences);
+	if (userSeatEvidences.length > 0) {
+		const csvStringifier = createObjectCsvStringifier({
+			header: [
+				{ id: "invoiceId", title: "Invoice ID" },
+				{ id: "userDbId", title: "User DB ID" },
+			],
+		});
+		putCSV(
+			`${outputPath}/${targetDateString}-user-seats.csv`,
+			csvStringifier.getHeaderString() ?? "",
+			csvStringifier.stringifyRecords(userSeatEvidences),
+		);
+	}
 }
 
 async function fetchInvoices(
@@ -73,7 +117,6 @@ async function fetchInvoices(
 		},
 		limit: 100,
 	});
-	console.log("res", res);
 	if (res.has_more) {
 		throw new Error("Too many invoices to process");
 	}
