@@ -1,7 +1,5 @@
 import * as DialogPrimitive from "@radix-ui/react-dialog";
-import * as HoverCardPrimitive from "@radix-ui/react-hover-card";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
-import * as TooltipPrimitive from "@radix-ui/react-tooltip";
 import { upload } from "@vercel/blob/client";
 import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
@@ -162,29 +160,6 @@ function PropertiesPanelCollapsible({
 		</>
 	);
 }
-
-const HoverCard = HoverCardPrimitive.Root;
-
-const HoverCardTrigger = HoverCardPrimitive.Trigger;
-
-function HoverCardContent({
-	className,
-	align = "center",
-	sideOffset = 4,
-	side = "left",
-	...props
-}: ComponentProps<typeof HoverCardPrimitive.Content>) {
-	return (
-		<HoverCardPrimitive.Content
-			align={align}
-			side={side}
-			sideOffset={sideOffset}
-			className="z-50 w-64 rounded-[16px] border border-black-70 bg-black-100 p-4 text-popover-foreground shadow-md outline-none data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2"
-			{...props}
-		/>
-	);
-}
-HoverCardContent.displayName = HoverCardPrimitive.Content.displayName;
 
 const Tabs = TabsPrimitive.Root;
 
@@ -966,28 +941,8 @@ function TabsContentPrompt({
 						/>
 					</div>
 				) : (
-					<HoverCard>
-						<HoverCardTrigger asChild>
-							<Block>
-								<div className="flex items-center justify-between">
-									<div className="flex items-center gap-[8px]">
-										<p className="truncate text-[14px] font-rosart">
-											{requirementNode.name}
-										</p>
-									</div>
-									<button
-										type="button"
-										className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
-										onClick={() => {
-											onRequirementRemove?.(requirementNode);
-										}}
-									>
-										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
-									</button>
-								</div>
-							</Block>
-						</HoverCardTrigger>
-						<HoverCardContent className="w-80">
+					<Block
+						hoverContent={
 							<div className="flex justify-between space-x-4">
 								{requirementNode.content.type === "text" && (
 									<div className="line-clamp-5 text-[14px]">
@@ -995,8 +950,25 @@ function TabsContentPrompt({
 									</div>
 								)}
 							</div>
-						</HoverCardContent>
-					</HoverCard>
+						}
+					>
+						<div className="flex items-center justify-between">
+							<div className="flex items-center gap-[8px]">
+								<p className="truncate text-[14px] font-rosart">
+									{requirementNode.name}
+								</p>
+							</div>
+							<button
+								type="button"
+								className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+								onClick={() => {
+									onRequirementRemove?.(requirementNode);
+								}}
+							>
+								<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+							</button>
+						</div>
+					</Block>
 				)}
 				{/* <div className="mb-[4px]">
 					<Select value={requirementNode?.id}>
@@ -1053,28 +1025,9 @@ function TabsContentPrompt({
 				) : (
 					<div className="grid gap-2">
 						{sourceNodes.map((sourceNode) => (
-							<HoverCard key={sourceNode.id}>
-								<HoverCardTrigger asChild>
-									<Block>
-										<div className="flex items-center justify-between">
-											<div className="flex items-center gap-[8px]">
-												<p className="truncate text-[14px] font-rosart">
-													{sourceNode.name}
-												</p>
-											</div>
-											<button
-												type="button"
-												className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
-												onClick={() => {
-													onSourceRemove?.(sourceNode);
-												}}
-											>
-												<TrashIcon className="w-[16px] h-[16px] text-black-30" />
-											</button>
-										</div>
-									</Block>
-								</HoverCardTrigger>
-								<HoverCardContent className="w-80">
+							<Block
+								key={sourceNode.id}
+								hoverContent={
 									<div className="flex justify-between space-x-4">
 										node type: {sourceNode.content.type}
 										{sourceNode.content.type === "text" && (
@@ -1083,8 +1036,25 @@ function TabsContentPrompt({
 											</div>
 										)}
 									</div>
-								</HoverCardContent>
-							</HoverCard>
+								}
+							>
+								<div className="flex items-center justify-between">
+									<div className="flex items-center gap-[8px]">
+										<p className="truncate text-[14px] font-rosart">
+											{sourceNode.name}
+										</p>
+									</div>
+									<button
+										type="button"
+										className="group-hover:block hidden p-[2px] hover:bg-black-70 rounded-[4px]"
+										onClick={() => {
+											onSourceRemove?.(sourceNode);
+										}}
+									>
+										<TrashIcon className="w-[16px] h-[16px] text-black-30" />
+									</button>
+								</div>
+							</Block>
 						))}
 
 						<div className="flex items-center gap-[4px]">
@@ -1801,19 +1771,9 @@ function TabContentFile({
 
 						<div className="grid gap-2">
 							{sourcedFromNodes.map((node) => (
-								<HoverCard key={node.id}>
-									<HoverCardTrigger asChild>
-										<Block>
-											<div className="flex items-center justify-between">
-												<div className="flex items-center gap-[8px]">
-													<p className="truncate text-[14px] font-rosart">
-														{node.name}
-													</p>
-												</div>
-											</div>
-										</Block>
-									</HoverCardTrigger>
-									<HoverCardContent className="w-80">
+								<Block
+									key={node.id}
+									hoverContent={
 										<div className="flex justify-between space-x-4">
 											node type: {node.content.type}
 											{node.content.type === "text" && (
@@ -1822,8 +1782,16 @@ function TabContentFile({
 												</div>
 											)}
 										</div>
-									</HoverCardContent>
-								</HoverCard>
+									}
+								>
+									<div className="flex items-center justify-between">
+										<div className="flex items-center gap-[8px]">
+											<p className="truncate text-[14px] font-rosart">
+												{node.name}
+											</p>
+										</div>
+									</div>
+								</Block>
 							))}
 						</div>
 					</PropertiesPanelContentBox>
