@@ -2,9 +2,7 @@ import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { LanguageModelV1 } from "ai";
-import type { PDFDocumentProxy } from "pdfjs-dist";
-import { getDocument } from "pdfjs-dist";
-import * as pdfWorker from "pdfjs-dist/build/pdf.worker.mjs";
+import { PDFDocument } from "pdf-lib";
 import type { UnstructuredClient } from "unstructured-client";
 import type { PartitionResponse } from "unstructured-client/sdk/models/operations/partition";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
@@ -155,13 +153,13 @@ type VercelBlobOperationType =
 
 interface UnstructuredOptions {
 	strategy: Strategy;
-	pdf: PDFDocumentProxy;
+	pdf: PDFDocument;
 }
 
 type ServiceOptions = UnstructuredOptions | VercelBlobOperationType | undefined;
 
-function getNumPages(pdf: PDFDocumentProxy) {
-	return pdf.numPages;
+function getNumPages(pdf: PDFDocument) {
+	return pdf.getPages().length;
 }
 
 export function withCountMeasurement<T>(
@@ -278,17 +276,14 @@ export async function wrappedPartition(
 	}: PartitionParameters,
 	{ logger, startTime }: MeasureParameters,
 ): Promise<PartitionResponse> {
-	const pdf = await getDocument(blobUrl).promise;
-	const pdfContent = new Blob([await pdf.getData()], {
-		type: "application/pdf",
-	});
+	const content = await fetch(blobUrl).then((response) => response.blob());
 
 	return withCountMeasurement(
 		logger,
 		async () =>
 			client.general.partition({
 				partitionParameters: {
-					files: { fileName, content: pdfContent },
+					files: { fileName, content },
 					strategy,
 					splitPdfPage,
 					splitPdfConcurrencyLevel,
@@ -296,7 +291,7 @@ export async function wrappedPartition(
 			}),
 		ExternalServiceName.Unstructured,
 		startTime,
-		{ strategy, pdf },
+		{ strategy, pdf: await PDFDocument.load(await content.arrayBuffer()) },
 	).finally(() => waitForTelemetryExport());
 }
 

@@ -8,7 +8,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { put } from "@vercel/blob";
-import { getDocument } from "pdfjs-dist";
+import { PDFDocument } from "pdf-lib";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { elementsToMarkdown } from "../utils/unstructured";
@@ -99,7 +99,7 @@ export async function parseFile(args: ParseFileInput) {
 		startTime,
 		{
 			strategy,
-			pdf: await getDocument(args.blobUrl).promise,
+			pdf: await PDFDocument.load(await content.arrayBuffer()),
 		},
 	);
 	if (partitionResponse.statusCode !== 200) {

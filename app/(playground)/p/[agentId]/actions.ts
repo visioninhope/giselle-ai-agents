@@ -9,7 +9,6 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { type ListBlobResult, del, list, put } from "@vercel/blob";
-import { getDocument } from "pdfjs-dist";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { vercelBlobFileFolder } from "./constants";
