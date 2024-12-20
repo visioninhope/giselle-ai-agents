@@ -1,6 +1,6 @@
-import { timingSafeEqual } from "node:crypto";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import { timingSafeEqual } from "node:crypto";
 import invariant from "tiny-invariant";
 import { processDailySalesSummary } from "./process-daily-sales-summary";
 
@@ -13,8 +13,8 @@ import { processDailySalesSummary } from "./process-daily-sales-summary";
  * - timezone: handled as UTC
  *
  * @example
- * curl http://localhost:3000/api/cron/daily-sales-summary
- * curl http://localhost:3000/api/cron/daily-sales-summary?targetDate=2022-01-01
+ * curl -H "Authorization: Bearer [CRON_SECRET]" http://localhost:3000/api/cron/daily-sales-summary
+ * curl -H "Authorization: Bearer [CRON_SECRET]" http://localhost:3000/api/cron/daily-sales-summary?targetDate=2022-01-01
  */
 export async function GET(req: NextRequest) {
 	if (!isValid(req)) {
