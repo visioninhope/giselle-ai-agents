@@ -3,7 +3,7 @@ import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
-import * as Popover from "@radix-ui/react-popover";
+import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as Tabs from "@radix-ui/react-tabs";
 import { getDownloadUrl, head } from "@vercel/blob";
 import clsx from "clsx/lite";
@@ -45,6 +45,36 @@ import {
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 
+function Popover({
+	defaultOpen,
+	open,
+	onOpenChange,
+	modal,
+	className,
+	...popoverContentProps
+}: Omit<ComponentProps<typeof PopoverPrimitive.Root>, "children"> &
+	ComponentProps<typeof PopoverPrimitive.PopoverContent>) {
+	return (
+		<PopoverPrimitive.Root
+			open={open}
+			onOpenChange={onOpenChange}
+			defaultOpen={defaultOpen}
+			modal={modal}
+		>
+			<PopoverPrimitive.Trigger>+</PopoverPrimitive.Trigger>
+			<PopoverPrimitive.Portal>
+				<PopoverPrimitive.Content
+					className={clsx(
+						"rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] backdrop-blur-[16px] px-[18px] py-[18px]",
+						className,
+					)}
+					{...popoverContentProps}
+				/>
+			</PopoverPrimitive.Portal>
+		</PopoverPrimitive.Root>
+	);
+}
+
 function TabsTrigger(
 	props: Omit<ComponentProps<typeof Tabs.Trigger>, "className">,
 ) {
@@ -61,7 +91,7 @@ function TabsContent(
 ) {
 	return (
 		<Tabs.Content
-			className="absolute w-[400px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] top-[0px] bottom-[20px] left-[84px] mt-[60px] backdrop-blur-[16px]"
+			className="absolute w-[340px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] top-[0px] bottom-[20px] left-[84px] mt-[60px] backdrop-blur-[16px]"
 			{...props}
 		/>
 	);
@@ -229,6 +259,47 @@ export function Overview() {
 	);
 }
 
+function SelectDataForm({
+	onChangeValue,
+}: {
+	onChangeValue?: (value: string) => void;
+}) {
+	return (
+		<form className="w-[200px]">
+			<p className="font-rosart">Select data</p>
+			<div className="space-y-[12px] mt-[12px]">
+				<Block
+					as="button"
+					onClick={() => onChangeValue?.("comment")}
+					className="font-rosart"
+					hoverCardProps={{ side: "right" }}
+					hoverCardContent="When you create a comment on a GitHub issue, available data is comment text, user info who left the comment, and related issue data. This data will be automatically loaded and can be used by the agent."
+				>
+					Comment
+				</Block>
+				<Block
+					as="button"
+					onClick={() => onChangeValue?.("issueTitle")}
+					className="font-rosart"
+					hoverCardProps={{ side: "right" }}
+					hoverCardContent="When you create a comment on a GitHub issue, you can access the issue title that the comment is made on. This can be useful for providing context about the issue being discussed."
+				>
+					Issue title
+				</Block>
+				<Block
+					as="button"
+					onClick={() => onChangeValue?.("issueBody")}
+					className="font-rosart"
+					hoverCardProps={{ side: "right" }}
+					hoverCardContent="When you create a comment on a GitHub issue, you can utilize the issue body. This contains the full description of the issue and can provide important context for understanding the overall discussion and requirements."
+				>
+					Issue Body
+				</Block>
+			</div>
+		</form>
+	);
+}
+
 function AssignDataForm({
 	nodes,
 }: {
@@ -240,20 +311,23 @@ function AssignDataForm({
 			<div className="space-y-[14px]">
 				<div>
 					<Label>Issue comment data</Label>
-					<Select name="assignData">
-						<SelectTrigger>
-							<SelectValue placeholder="Choose data" />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="issueComment.body">Comment Body</SelectItem>
-							<SelectItem value="issueComment.issue.title">
-								Issue Title
-							</SelectItem>
-							<SelectItem value="issueComment.issue.body">
-								Issue Description
-							</SelectItem>
-						</SelectContent>
-					</Select>
+					<div>
+						<Popover
+							side="right"
+							sideOffset={165}
+							onOpenAutoFocus={(event) => {
+								event.preventDefault();
+							}}
+							onCloseAutoFocus={(event) => {
+								event.preventDefault();
+							}}
+							onInteractOutside={(event) => {
+								event.preventDefault();
+							}}
+						>
+							<SelectDataForm />
+						</Popover>
+					</div>
 				</div>
 				<div>
 					<Label>Assign node</Label>
@@ -417,28 +491,25 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionFormField>
 					<Label>Assign data</Label>
 					<div className="flex justify-end">
-						<Popover.Root open={popoverOpen} onOpenChange={setPopoverOpen}>
-							<Popover.Trigger>+</Popover.Trigger>
-							<Popover.Portal>
-								<Popover.Content
-									side="right"
-									sideOffset={40}
-									align="end"
-									className="w-[300px] rounded-[24px] bg-[hsla(234,91%,5%,0.8)] overflow-hidden shadow-[0px_0px_3px_0px_hsla(0,_0%,_100%,_0.25)_inset] backdrop-blur-[16px] px-[18px] py-[18px] "
-									onOpenAutoFocus={(event) => {
-										event.preventDefault();
-									}}
-									onCloseAutoFocus={(event) => {
-										event.preventDefault();
-									}}
-									onInteractOutside={(event) => {
-										event.preventDefault();
-									}}
-								>
-									<AssignDataForm nodes={graph.nodes} />
-								</Popover.Content>
-							</Popover.Portal>
-						</Popover.Root>
+						<Popover
+							open={popoverOpen}
+							onOpenChange={setPopoverOpen}
+							side="right"
+							sideOffset={18}
+							align="end"
+							className="w-[200px] "
+							onOpenAutoFocus={(event) => {
+								event.preventDefault();
+							}}
+							onCloseAutoFocus={(event) => {
+								event.preventDefault();
+							}}
+							onInteractOutside={(event) => {
+								event.preventDefault();
+							}}
+						>
+							<AssignDataForm nodes={graph.nodes} />
+						</Popover>
 					</div>
 					{/* <div className="space-y-[12px]">
 						<Block className="flex items-center gap-[12px] font-rosart ">
