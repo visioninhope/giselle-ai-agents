@@ -610,16 +610,9 @@ export function ExecutionProvider({
 						};
 					});
 				},
-				onFinishPerformExecution: async (
-					endedAt: number,
-					totalDurationMs: number,
-				) => {
-					await onFinishPerformExecutionAction(
-						flowRunStartedAt,
-						endedAt,
-						totalDurationMs,
-					);
-				},
+				onFinishPerformExecution: (endedAt, durationMs) =>
+					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
+
 			});
 			setExecution(finalExecution);
 		},
@@ -686,13 +679,9 @@ export function ExecutionProvider({
 						};
 					});
 				},
-				onFinishPerformExecution: async (endedAt, durationMs) => {
-					await onFinishPerformExecutionAction(
-						flowRunStartedAt,
-						endedAt,
-						durationMs,
-					);
-				},
+				onFinishPerformExecution: (endedAt, durationMs) =>
+					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
+
 			});
 			setExecution(finalExecution);
 		},
@@ -763,13 +752,9 @@ export function ExecutionProvider({
 						},
 					});
 				},
-				onFinishPerformExecution: async (endedAt, durationMs) => {
-					await onFinishPerformExecutionAction(
-						flowRunStartedAt,
-						endedAt,
-						durationMs,
-					);
-				},
+				onFinishPerformExecution: (endedAt, durationMs) =>
+					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
+
 			});
 			setExecution(finalExecution);
 		},
