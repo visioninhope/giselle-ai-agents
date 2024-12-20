@@ -103,6 +103,7 @@
 		"@tailwindcss/typography": "0.5.15",
 		"@types/bun": "1.1.13",
 		"@types/node": "^22",
+		"@types/pdfjs-dist": "^2.10.378",
 		"@types/react": "npm:types-react@rc",
 		"@types/react-dom": "npm:types-react-dom@rc",
 		"drizzle-kit": "0.23.0",
