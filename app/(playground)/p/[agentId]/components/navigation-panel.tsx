@@ -9,12 +9,16 @@ import { getDownloadUrl, head } from "@vercel/blob";
 import clsx from "clsx/lite";
 import {
 	ArrowRightIcon,
+	ChevronsUpDownIcon,
+	CircleIcon,
 	CirclePlusIcon,
 	DownloadIcon,
 	FrameIcon,
 	GithubIcon,
 	HammerIcon,
 	ListTreeIcon,
+	PlusCircleIcon,
+	PlusIcon,
 	XIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -32,7 +36,7 @@ import { useGitHubIntegration } from "../contexts/github-integration";
 import { useGraph } from "../contexts/graph";
 import { LayersIcon } from "../prev/beta-proto/components/icons/layers";
 import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
-import type { Node, Step } from "../types";
+import type { Node, NodeId, Step } from "../types";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import {
@@ -51,9 +55,12 @@ function Popover({
 	onOpenChange,
 	modal,
 	className,
+	trigger,
 	...popoverContentProps
 }: Omit<ComponentProps<typeof PopoverPrimitive.Root>, "children"> &
-	ComponentProps<typeof PopoverPrimitive.PopoverContent>) {
+	ComponentProps<typeof PopoverPrimitive.PopoverContent> & {
+		trigger: ReactNode;
+	}) {
 	return (
 		<PopoverPrimitive.Root
 			open={open}
@@ -61,7 +68,9 @@ function Popover({
 			defaultOpen={defaultOpen}
 			modal={modal}
 		>
-			<PopoverPrimitive.Trigger>+</PopoverPrimitive.Trigger>
+			<PopoverPrimitive.Trigger className="">
+				{trigger}
+			</PopoverPrimitive.Trigger>
 			<PopoverPrimitive.Portal>
 				<PopoverPrimitive.Content
 					className={clsx(
@@ -102,6 +111,8 @@ interface TabValueContextState {
 	setTabValue: (value: string) => void;
 	popoverOpen: boolean;
 	setPopoverOpen: (value: boolean) => void;
+	subPopoverOpen: boolean;
+	setSubPopoverOpen: (value: boolean) => void;
 }
 const TabValueContext = createContext<TabValueContextState | undefined>(
 	undefined,
@@ -118,10 +129,18 @@ export const useTabValue = () => {
 export function NavigationPanel() {
 	const [tabValue, setTabValue] = useState("");
 	const [popoverOpen, setPopoverOpen] = useState(false);
+	const [subPopoverOpen, setSubPopoverOpen] = useState(false);
 	const developerMode = useDeveloperMode();
 	return (
 		<TabValueContext
-			value={{ tabValue, setTabValue, popoverOpen, setPopoverOpen }}
+			value={{
+				tabValue,
+				setTabValue,
+				popoverOpen,
+				setPopoverOpen,
+				subPopoverOpen,
+				setSubPopoverOpen,
+			}}
 		>
 			<Tabs.Root
 				orientation="vertical"
@@ -190,13 +209,17 @@ function ContentPanelHeader({
 	);
 }
 
-export function ContentPanelSectionHeader(props: { title: string }) {
+export function ContentPanelSectionHeader({
+	title,
+	action,
+}: { title: string; action?: ReactNode }) {
 	return (
 		<div className="flex items-center">
 			<span className="flex-shrink text-black-30 text-[16px] font-rosart font-[500]">
-				{props.title}
+				{title}
 			</span>
 			<div className="ml-[16px] flex-grow border-t border-black-80" />
+			{action}
 		</div>
 	);
 }
@@ -270,97 +293,118 @@ function SelectDataForm({
 			<div className="space-y-[12px] mt-[12px]">
 				<Block
 					as="button"
+					type="button"
 					onClick={() => onChangeValue?.("comment")}
 					className="font-rosart"
 					hoverCardProps={{ side: "right" }}
-					hoverCardContent="When you create a comment on a GitHub issue, available data is comment text, user info who left the comment, and related issue data. This data will be automatically loaded and can be used by the agent."
+					hoverCardContent="Contents of the issue comment"
 				>
-					Comment
+					comment.body
+				</Block>
+				<Block
+					as="button"
+					onClick={() => onChangeValue?.("commentAttachments")}
+					className="font-rosart"
+					hoverCardProps={{ side: "right" }}
+					hoverCardContent="Contents of the issue"
+				>
+					issue.body
 				</Block>
 				<Block
 					as="button"
 					onClick={() => onChangeValue?.("issueTitle")}
 					className="font-rosart"
 					hoverCardProps={{ side: "right" }}
-					hoverCardContent="When you create a comment on a GitHub issue, you can access the issue title that the comment is made on. This can be useful for providing context about the issue being discussed."
+					hoverCardContent="Title of the issue"
 				>
-					Issue title
-				</Block>
-				<Block
-					as="button"
-					onClick={() => onChangeValue?.("issueBody")}
-					className="font-rosart"
-					hoverCardProps={{ side: "right" }}
-					hoverCardContent="When you create a comment on a GitHub issue, you can utilize the issue body. This contains the full description of the issue and can provide important context for understanding the overall discussion and requirements."
-				>
-					Issue Body
+					issue.title
 				</Block>
 			</div>
 		</form>
 	);
 }
 
+interface AssignData {
+	event: string;
+	nodeId: NodeId;
+	nodeProperty: string;
+}
 function AssignDataForm({
 	nodes,
+	onCommit,
 }: {
 	nodes: Node[];
+	onCommit?: (assignData: AssignData) => void;
 }) {
+	const [assignData, setAssignData] = useState<Partial<AssignData>>({});
+	const { subPopoverOpen, setSubPopoverOpen } = useTabValue();
+
 	return (
-		<form>
+		<>
 			<p className="font-rosart">Assign Data</p>
-			<div className="space-y-[14px]">
-				<div>
-					<Label>Issue comment data</Label>
+			<form
+				className="space-y-[12px]"
+				onSubmit={(event) => {
+					event.preventDefault();
+					onCommit?.(assignData as AssignData);
+				}}
+			>
+				<div className="flex items-stretch gap-[14px]">
 					<div>
-						<Popover
-							side="right"
-							sideOffset={165}
-							onOpenAutoFocus={(event) => {
-								event.preventDefault();
-							}}
-							onCloseAutoFocus={(event) => {
-								event.preventDefault();
-							}}
-							onInteractOutside={(event) => {
-								event.preventDefault();
-							}}
-						>
-							<SelectDataForm />
-						</Popover>
+						<Label>Issue comment data</Label>
+						<div>
+							<Popover
+								open={subPopoverOpen}
+								onOpenChange={setSubPopoverOpen}
+								side="right"
+								trigger={
+									<div className="flex h-10 items-center justify-between rounded-md bg-[hsla(207,43%,91%,0.2)] px-3 py-2 text-sm focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-w-[130px]">
+										<p>{assignData.event ?? "Select data"}</p>
+										<ChevronsUpDownIcon size={16} className="text-black-30" />
+									</div>
+								}
+								sideOffset={10}
+								onOpenAutoFocus={(event) => {
+									event.preventDefault();
+								}}
+								onCloseAutoFocus={(event) => {
+									event.preventDefault();
+								}}
+								onInteractOutside={(event) => {
+									event.preventDefault();
+								}}
+							>
+								<SelectDataForm
+									onChangeValue={(value) => {
+										setAssignData({ ...assignData, event: value });
+										setSubPopoverOpen(false);
+									}}
+								/>
+							</Popover>
+						</div>
+					</div>
+
+					<div>
+						<Label>Node</Label>
+						<Select name="flow">
+							<SelectTrigger>
+								<SelectValue placeholder="Choose node" />
+							</SelectTrigger>
+							<SelectContent>
+								{nodes.map((node) => (
+									<SelectItem value={node.id} key={node.id}>
+										{node.name}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 				</div>
 				<div>
-					<Label>Assign node</Label>
-					<Select name="flow">
-						<SelectTrigger>
-							<SelectValue placeholder="Choose node" />
-						</SelectTrigger>
-						<SelectContent>
-							{nodes.map((node) => (
-								<SelectItem value={node.id} key={node.id}>
-									{node.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<Button type="submit">Add new data</Button>
 				</div>
-				<div>
-					<Label>Assign property</Label>
-					<Select name="flow">
-						<SelectTrigger>
-							<SelectValue placeholder="Choose property" />
-						</SelectTrigger>
-						<SelectContent>
-							{nodes.map((node) => (
-								<SelectItem value={node.id} key={node.id}>
-									{node.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</div>
-			</div>
-		</form>
+			</form>
+		</>
 	);
 }
 
@@ -409,6 +453,7 @@ function GitHubIntegrationForm() {
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
+	const [assignDataSet, setAssignDataSet] = useState<AssignData[]>([]);
 	return (
 		<form className="grid gap-[16px] overflow-y-auto mx-[-20px] px-[20px]">
 			<ContentPanelSection>
@@ -488,16 +533,20 @@ function GitHubIntegrationForm() {
 						</SelectContent>
 					</Select>
 				</ContentPanelSectionFormField>
-				<ContentPanelSectionFormField>
-					<Label>Assign data</Label>
-					<div className="flex justify-end">
+			</ContentPanelSection>
+			<ContentPanelSection>
+				<ContentPanelSectionHeader
+					title="Data mapping"
+					action={
 						<Popover
 							open={popoverOpen}
 							onOpenChange={setPopoverOpen}
 							side="right"
 							sideOffset={18}
 							align="end"
-							className="w-[200px] "
+							trigger={
+								<PlusIcon className="text-[12px] text-black-30 stroke-1 ml-[4px]" />
+							}
 							onOpenAutoFocus={(event) => {
 								event.preventDefault();
 							}}
@@ -508,59 +557,37 @@ function GitHubIntegrationForm() {
 								event.preventDefault();
 							}}
 						>
-							<AssignDataForm nodes={graph.nodes} />
+							<AssignDataForm
+								nodes={graph.nodes}
+								onCommit={(assignData) => {
+									setAssignDataSet((prev) => [...prev, assignData]);
+									setPopoverOpen(false);
+								}}
+							/>
 						</Popover>
-					</div>
-					{/* <div className="space-y-[12px]">
-						<Block className="flex items-center gap-[12px] font-rosart ">
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Issue Comment</p>
-								<p>Body</p>
-							</div>
-							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Untitled node - 1</p>
-								<p>Instruction</p>
-							</div>
-						</Block>
-						<Block className="flex items-center gap-[12px] font-rosart justify-between">
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Issue Comment</p>
-								<p>Issue Description</p>
-							</div>
-							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Untitled node - 5</p>
-								<p>Text</p>
-							</div>
-						</Block>
+					}
+				/>
 
-						<Block className="flex items-center gap-[12px] font-rosart justify-between">
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Issue Comment</p>
-								<div>
-									<Select>
-										<SelectTrigger>
-											<SelectValue placeholder="Choose data" />
-										</SelectTrigger>
-										<SelectContent>
-											{graph.flows.map((flow) => (
-												<SelectItem value={flow.id} key={flow.id}>
-													{flow.name}
-												</SelectItem>
-											))}
-										</SelectContent>
-									</Select>
+				{assignDataSet.length > 0 && (
+					<div className="space-y-[12px]">
+						{assignDataSet.map((assignDataSet, index) => (
+							<Block
+								className="flex items-center gap-[12px] font-rosart"
+								key={`assign-data-set-${index}`}
+							>
+								<div className="leading-tight flex-1">
+									<p className="text-[12px] text-black-50">Source</p>
+									<p>issue.body</p>
 								</div>
-							</div>
-							<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
-							<div className="leading-tight flex-1">
-								<p className="text-[12px] text-black-50">Untitled node - 5</p>
-								<p>Text</p>
-							</div>
-						</Block>
-					</div> */}
-				</ContentPanelSectionFormField>
+								<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
+								<div className="leading-tight flex-1">
+									<p className="text-[12px] text-black-50">Target</p>
+									<p className="text-[14px]">Untitled node - 1</p>
+								</div>
+							</Block>
+						))}
+					</div>
+				)}
 			</ContentPanelSection>
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Then" />
