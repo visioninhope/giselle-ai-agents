@@ -1,3 +1,4 @@
+import { timingSafeEqual } from "node:crypto";
 /**
  * Cron job handler for daily sales summary.
  *
@@ -12,10 +13,16 @@
  */
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import invariant from "tiny-invariant";
 import { processDailySalesSummary } from "./process-daily-sales-summary";
 
 export async function GET(req: NextRequest) {
-	// TODO: check authorization header
+	if (!isValid(req)) {
+		return new Response("Unauthorized", {
+			status: 401,
+		});
+	}
+
 	const params = req.nextUrl.searchParams;
 	const targetDate = parseTargetDateParam(params.get("targetDate"));
 
@@ -31,6 +38,22 @@ export async function GET(req: NextRequest) {
 
 	console.log("Daily sales summary cron job completed");
 	return new Response("ok", { status: 200 });
+}
+
+function isValid(req: NextRequest) {
+	invariant(process.env.CRON_SECRET, "CRON_SECRET is not set");
+	const cronSecret = process.env.CRON_SECRET;
+	const authHeader = req.headers.get("authorization");
+
+	if (!authHeader?.startsWith("Bearer ")) {
+		return false;
+	}
+	const providedToken = new Uint8Array(Buffer.from(authHeader.slice(7)));
+	const validToken = new Uint8Array(Buffer.from(cronSecret));
+	return (
+		providedToken.length === validToken.length &&
+		timingSafeEqual(providedToken, validToken)
+	);
 }
 
 /**
