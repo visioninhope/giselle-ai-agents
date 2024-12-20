@@ -942,7 +942,7 @@ function TabsContentPrompt({
 					</div>
 				) : (
 					<Block
-						hoverContent={
+						hoverCardContent={
 							<div className="flex justify-between space-x-4">
 								{requirementNode.content.type === "text" && (
 									<div className="line-clamp-5 text-[14px]">
@@ -1027,7 +1027,7 @@ function TabsContentPrompt({
 						{sourceNodes.map((sourceNode) => (
 							<Block
 								key={sourceNode.id}
-								hoverContent={
+								hoverCardContent={
 									<div className="flex justify-between space-x-4">
 										node type: {sourceNode.content.type}
 										{sourceNode.content.type === "text" && (
@@ -1773,7 +1773,7 @@ function TabContentFile({
 							{sourcedFromNodes.map((node) => (
 								<Block
 									key={node.id}
-									hoverContent={
+									hoverCardContent={
 										<div className="flex justify-between space-x-4">
 											node type: {node.content.type}
 											{node.content.type === "text" && (
