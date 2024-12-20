@@ -3,6 +3,9 @@ import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { LanguageModelV1 } from "ai";
 import type { PDFDocumentProxy } from "pdfjs-dist";
+import { getDocument } from "pdfjs-dist";
+import type { UnstructuredClient } from "unstructured-client";
+import type { PartitionResponse } from "unstructured-client/sdk/models/operations/partition";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
 import type { LogSchema, OtelLoggerWrapper } from "./types";
@@ -249,6 +252,51 @@ export function withCountMeasurement<T>(
 	};
 
 	return withMeasurement(logger, operation, measurement, measurementStartTime);
+}
+
+export type PartitionParameters = {
+	fileName: string;
+	strategy: Strategy;
+	splitPdfPage: boolean;
+	splitPdfConcurrencyLevel: number;
+};
+
+export type MeasureParameters = {
+	logger: OtelLoggerWrapper;
+	startTime: number;
+};
+
+export async function wrappedPartition(
+	client: UnstructuredClient,
+	blobUrl: string,
+	{
+		fileName,
+		strategy,
+		splitPdfPage,
+		splitPdfConcurrencyLevel,
+	}: PartitionParameters,
+	{ logger, startTime }: MeasureParameters,
+): Promise<PartitionResponse> {
+	const pdf = await getDocument(blobUrl).promise;
+	const pdfContent = new Blob([await pdf.getData()], {
+		type: "application/pdf",
+	});
+
+	return withCountMeasurement(
+		logger,
+		async () =>
+			client.general.partition({
+				partitionParameters: {
+					files: { fileName, content: pdfContent },
+					strategy,
+					splitPdfPage,
+					splitPdfConcurrencyLevel,
+				},
+			}),
+		ExternalServiceName.Unstructured,
+		startTime,
+		{ strategy, pdf },
+	).finally(() => waitForTelemetryExport());
 }
 
 export function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(

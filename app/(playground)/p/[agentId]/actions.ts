@@ -4,6 +4,7 @@ import {
 	ExternalServiceName,
 	VercelBlobOperation,
 	createLogger,
+	wrappedPartition as partition,
 	waitForTelemetryExport,
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
@@ -22,43 +23,31 @@ import {
 import type { FileData, FileId, Graph } from "./types";
 
 export async function parse(id: FileId, name: string, blobUrl: string) {
-	const startTime = Date.now();
 	const logger = createLogger("parse");
+
+	const measureParameters = {
+		startTime: Date.now(),
+		logger,
+	};
 	if (process.env.UNSTRUCTURED_API_KEY === undefined) {
 		throw new Error("UNSTRUCTURED_API_KEY is not set");
 	}
-	const client = new UnstructuredClient({
-		security: {
-			apiKeyAuth: process.env.UNSTRUCTURED_API_KEY,
-		},
-	});
-	const pdf = await getDocument(blobUrl).promise;
-	const content = await pdf.getData();
-	const strategy = Strategy.Fast;
-	const partitionResponse = await withCountMeasurement(
-		logger,
-		async () => {
-			const result = await client.general.partition({
-				partitionParameters: {
-					files: {
-						fileName: name,
-						content,
-					},
-					strategy,
-					splitPdfPage: false,
-					splitPdfConcurrencyLevel: 1,
-				},
-			});
-			return result;
-		},
-		ExternalServiceName.Unstructured,
-		startTime,
+	const partitionResponse = await partition(
+		new UnstructuredClient({
+			security: {
+				apiKeyAuth: process.env.UNSTRUCTURED_API_KEY,
+			},
+		}),
+		blobUrl,
 		{
-			strategy,
-			pdf,
+			fileName: name,
+			strategy: Strategy.Fast,
+			splitPdfPage: false,
+			splitPdfConcurrencyLevel: 1,
 		},
+		measureParameters,
 	);
-	const startTimePut = Date.now();
+	const startTime = Date.now();
 	if (partitionResponse.statusCode !== 200) {
 		console.error(partitionResponse.rawResponse);
 		throw new Error(`Failed to parse file: ${partitionResponse.statusCode}`);
@@ -80,7 +69,7 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 			};
 		},
 		ExternalServiceName.VercelBlob,
-		startTimePut,
+		startTime,
 		VercelBlobOperation.Put,
 	);
 
