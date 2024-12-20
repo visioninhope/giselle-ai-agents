@@ -2,6 +2,7 @@ import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { LanguageModelV1 } from "ai";
+import type { PDFDocumentProxy } from "pdfjs-dist";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
 import type { LogSchema, OtelLoggerWrapper } from "./types";
@@ -148,19 +149,30 @@ export const VercelBlobOperation = {
 type VercelBlobOperationType =
 	(typeof VercelBlobOperation)[keyof typeof VercelBlobOperation];
 
+interface UnstructuredOptions {
+	strategy: Strategy;
+	pdf: PDFDocumentProxy;
+}
+
+type ServiceOptions = UnstructuredOptions | VercelBlobOperationType | undefined;
+
+function getNumPages(pdf: PDFDocumentProxy) {
+	return pdf.numPages;
+}
+
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: typeof APICallBasedService.Unstructured,
 	measurementStartTime: number | undefined,
-	strategy: Strategy,
+	serviceOptions: UnstructuredOptions,
 ): Promise<T>;
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: typeof APICallBasedService.VercelBlob,
 	measurementStartTime: number | undefined,
-	blobOperation: VercelBlobOperationType,
+	serviceOptions: VercelBlobOperationType,
 ): Promise<T>;
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
@@ -175,7 +187,7 @@ export function withCountMeasurement<T>(
 	operation: () => Promise<T>,
 	externalServiceName: (typeof APICallBasedService)[keyof typeof APICallBasedService],
 	measurementStartTime?: number,
-	strategyOrOptions?: Strategy | VercelBlobOperationType | undefined,
+	serviceOptions?: ServiceOptions,
 ): Promise<T> {
 	const measurement: MeasurementSchema<T> = (
 		result,
@@ -189,23 +201,38 @@ export function withCountMeasurement<T>(
 			isR06User,
 			requestCount: 1,
 		};
-
 		if (externalServiceName === APICallBasedService.Unstructured) {
-			if (!strategyOrOptions) {
+			const unstructuredOptions = serviceOptions as UnstructuredOptions;
+			if (
+				!unstructuredOptions ||
+				!unstructuredOptions.strategy ||
+				!unstructuredOptions.pdf
+			) {
 				logger.error(
-					new Error("'strategy' is required for Unstructured service"),
+					new Error(
+						"'strategy' and 'numPages' are required for Unstructured service",
+					),
 					"missing required strategy parameter",
 				);
 			}
 			return {
 				...baseMetrics,
 				externalServiceName,
-				strategy: strategyOrOptions as Strategy,
+				strategy: unstructuredOptions.strategy,
+				numPages: getNumPages(unstructuredOptions.pdf),
 			};
 		}
 
 		if (externalServiceName === APICallBasedService.VercelBlob) {
-			const operation = strategyOrOptions as VercelBlobOperationType;
+			const operation = serviceOptions as VercelBlobOperationType;
+			if (!operation) {
+				logger.error(
+					new Error(
+						"'VercelBlobOperationType' is required for VercelBlob service",
+					),
+					"missing required VercelBlobOperationType parameter",
+				);
+			}
 			const operationResult = operation.measure(result as { size: number });
 			return {
 				...baseMetrics,

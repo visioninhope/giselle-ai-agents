@@ -8,6 +8,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { type ListBlobResult, del, list, put } from "@vercel/blob";
+import { getDocument } from "pdfjs-dist";
 import { UnstructuredClient } from "unstructured-client";
 import { Strategy } from "unstructured-client/sdk/models/shared";
 import { vercelBlobFileFolder } from "./constants";
@@ -31,19 +32,33 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 			apiKeyAuth: process.env.UNSTRUCTURED_API_KEY,
 		},
 	});
-	const response = await fetch(blobUrl);
-	const content = await response.blob();
-	const partitionResponse = await client.general.partition({
-		partitionParameters: {
-			files: {
-				fileName: name,
-				content,
-			},
-			strategy: Strategy.Fast,
-			splitPdfPage: false,
-			splitPdfConcurrencyLevel: 1,
+	const pdf = await getDocument(blobUrl).promise;
+	const content = await pdf.getData();
+	const strategy = Strategy.Fast;
+	const partitionResponse = await withCountMeasurement(
+		logger,
+		async () => {
+			const result = await client.general.partition({
+				partitionParameters: {
+					files: {
+						fileName: name,
+						content,
+					},
+					strategy,
+					splitPdfPage: false,
+					splitPdfConcurrencyLevel: 1,
+				},
+			});
+			return result;
 		},
-	});
+		ExternalServiceName.Unstructured,
+		startTime,
+		{
+			strategy,
+			pdf,
+		},
+	);
+	const startTimePut = Date.now();
 	if (partitionResponse.statusCode !== 200) {
 		console.error(partitionResponse.rawResponse);
 		throw new Error(`Failed to parse file: ${partitionResponse.statusCode}`);
@@ -65,7 +80,7 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 			};
 		},
 		ExternalServiceName.VercelBlob,
-		startTime,
+		startTimePut,
 		VercelBlobOperation.Put,
 	);
 
