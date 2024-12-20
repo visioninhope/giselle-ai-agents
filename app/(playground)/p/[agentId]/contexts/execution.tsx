@@ -612,7 +612,6 @@ export function ExecutionProvider({
 				},
 				onFinishPerformExecution: (endedAt, durationMs) =>
 					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
-
 			});
 			setExecution(finalExecution);
 		},
@@ -681,7 +680,6 @@ export function ExecutionProvider({
 				},
 				onFinishPerformExecution: (endedAt, durationMs) =>
 					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
-
 			});
 			setExecution(finalExecution);
 		},
@@ -754,7 +752,6 @@ export function ExecutionProvider({
 				},
 				onFinishPerformExecution: (endedAt, durationMs) =>
 					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
-
 			});
 			setExecution(finalExecution);
 		},
