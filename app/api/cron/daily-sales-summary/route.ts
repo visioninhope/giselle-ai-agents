@@ -1,3 +1,9 @@
+import { timingSafeEqual } from "node:crypto";
+import { captureException } from "@sentry/nextjs";
+import type { NextRequest } from "next/server";
+import invariant from "tiny-invariant";
+import { processDailySalesSummary } from "./process-daily-sales-summary";
+
 /**
  * Cron job handler for daily sales summary.
  *
@@ -10,12 +16,6 @@
  * curl http://localhost:3000/api/cron/daily-sales-summary
  * curl http://localhost:3000/api/cron/daily-sales-summary?targetDate=2022-01-01
  */
-import { captureException } from "@sentry/nextjs";
-import type { NextRequest } from "next/server";
-import { timingSafeEqual } from "node:crypto";
-import invariant from "tiny-invariant";
-import { processDailySalesSummary } from "./process-daily-sales-summary";
-
 export async function GET(req: NextRequest) {
 	if (!isValid(req)) {
 		return new Response("Unauthorized", {
