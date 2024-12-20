@@ -448,7 +448,7 @@ export function ExecutionProvider({
 			stepExecution: CompletedStepExecution,
 			artifact: TextArtifact,
 		) => void;
-		onFinishPerformExecution: (
+		onFinishPerformExecution?: (
 			endedAt: number,
 			durationMs: number,
 		) => Promise<void>;
@@ -557,7 +557,7 @@ export function ExecutionProvider({
 					},
 				},
 			});
-			await onFinishPerformExecution(runEndedAt, totalFlowDurationMs);
+			await onFinishPerformExecution?.(runEndedAt, totalFlowDurationMs);
 			return currentExecution;
 		},
 		[dispatch, putExecutionAction, addToast],
