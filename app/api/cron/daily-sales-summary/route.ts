@@ -1,6 +1,6 @@
+import { timingSafeEqual } from "node:crypto";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
-import { timingSafeEqual } from "node:crypto";
 import invariant from "tiny-invariant";
 import { processDailySalesSummary } from "./process-daily-sales-summary";
 
