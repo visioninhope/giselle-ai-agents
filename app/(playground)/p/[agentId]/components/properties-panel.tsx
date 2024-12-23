@@ -2025,8 +2025,9 @@ function TabsContentFiles({
 									className="text-center flex flex-col gap-[16px]"
 								>
 									<p>
-										Click to upload or drag and drop files here (supports
-										images, documents, and more).
+										Drop files here to upload. (Currently, only PDF files can be
+										uploaded. Support for other file formats will be added
+										soon.)
 									</p>
 									<div className="flex gap-[8px] justify-center items-center">
 										<span>or</span>
