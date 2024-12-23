@@ -490,29 +490,28 @@ export function Overview() {
 	);
 }
 
-interface AssignData {
+interface GitHubEventNodeMapping {
 	event: string;
 	nodeId: NodeId;
-	nodeProperty: string;
 }
-function AssignDataForm({
+function GitHubEventNodeMappingForm({
 	nodes,
 	onCommit,
 }: {
 	nodes: Node[];
-	onCommit?: (assignData: AssignData) => void;
+	onCommit?: (githubEventNodeMapping: GitHubEventNodeMapping) => void;
 }) {
-	const [assignData, setAssignData] = useState<Partial<AssignData>>({});
-	const { subPopoverOpen, setSubPopoverOpen } = useTabValue();
-
 	return (
 		<>
-			<p className="font-rosart">Assign Data</p>
+			<p className="font-rosart">Data mapping</p>
 			<form
 				className="space-y-[12px]"
 				onSubmit={(event) => {
 					event.preventDefault();
-					onCommit?.(assignData as AssignData);
+					const formData = new FormData(event.currentTarget);
+					const source = formData.get("source") as string;
+					const target = formData.get("nodeId") as NodeId;
+					onCommit?.({ event: source, nodeId: target });
 				}}
 			>
 				<div className="flex items-stretch gap-[14px]">
@@ -553,7 +552,7 @@ function AssignDataForm({
 					<div>
 						<Label>Node</Label>
 						<Select
-							name="flow"
+							name="nodeId"
 							placeholder="Select node"
 							options={nodes.map((node) => ({
 								value: node.id,
@@ -615,7 +614,28 @@ function GitHubIntegrationForm() {
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
-	const [assignDataSet, setAssignDataSet] = useState<AssignData[]>([]);
+	const [eventNodeMappings, setEventNodeMappings] = useState<
+		GitHubEventNodeMapping[]
+	>([]);
+	const processedMappings = useMemo(
+		() =>
+			eventNodeMappings
+				.map((eventNodeMapping) => {
+					const node = graph.nodes.find(
+						(node) => node.id === eventNodeMapping.nodeId,
+					);
+					if (node === undefined) {
+						return null;
+					}
+					return {
+						...eventNodeMapping,
+						id: `${eventNodeMapping.event}-${eventNodeMapping.nodeId}`,
+						node,
+					};
+				})
+				.filter((eventNodeMapping) => eventNodeMapping !== null),
+		[eventNodeMappings, graph.nodes],
+	);
 	return (
 		<form className="grid gap-[16px] overflow-y-auto mx-[-20px] px-[20px]">
 			<ContentPanelSection>
@@ -703,10 +723,10 @@ function GitHubIntegrationForm() {
 								event.preventDefault();
 							}}
 						>
-							<AssignDataForm
+							<GitHubEventNodeMappingForm
 								nodes={graph.nodes}
 								onCommit={(assignData) => {
-									setAssignDataSet((prev) => [...prev, assignData]);
+									setEventNodeMappings((prev) => [...prev, assignData]);
 									setPopoverOpen(false);
 								}}
 							/>
@@ -714,21 +734,21 @@ function GitHubIntegrationForm() {
 					}
 				/>
 
-				{assignDataSet.length > 0 && (
+				{processedMappings.length > 0 && (
 					<div className="space-y-[12px]">
-						{assignDataSet.map((assignDataSet, index) => (
+						{processedMappings.map((mapping) => (
 							<Block
 								className="flex items-center gap-[12px] font-rosart"
-								key={`assign-data-set-${index}`}
+								key={mapping.id}
 							>
 								<div className="leading-tight flex-1">
 									<p className="text-[12px] text-black-50">Source</p>
-									<p>issue.body</p>
+									<p>{mapping.event}</p>
 								</div>
 								<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
 								<div className="leading-tight flex-1">
 									<p className="text-[12px] text-black-50">Target</p>
-									<p className="text-[14px]">Untitled node - 1</p>
+									<p className="text-[14px]">{mapping.node.name}</p>
 								</div>
 							</Block>
 						))}
