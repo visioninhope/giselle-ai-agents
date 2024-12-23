@@ -1,5 +1,5 @@
 import { describe, expect, test } from "bun:test";
-import type { Graph } from "../types";
+import type { Flow, Graph } from "../types";
 import { deriveFlows, isLatestVersion, migrateGraph } from "./graph";
 
 // graph is the following structure
@@ -152,6 +152,10 @@ describe("deriveFlows", () => {
 	test("ignore ghost connectors", () => {
 		expect(flows[1].jobs[2].steps.length).toBe(1);
 	});
+	test("same flowId", () => {
+		const newFlows = deriveFlows({ ...graph, flows });
+		expect(flows[0].id).toBe(newFlows[0].id);
+	});
 	test("one node graph", () => {
 		const testFlows = deriveFlows({
 			nodes: [
@@ -172,6 +176,7 @@ describe("deriveFlows", () => {
 				},
 			],
 			connections: [],
+			flows: [],
 		});
 		expect(testFlows.length).toBe(1);
 		expect(testFlows[0].jobs[0].steps[0].nodeId).toBe("nd_onenode");
@@ -225,6 +230,7 @@ describe("migrateGraph", () => {
 				},
 			],
 			artifacts: [],
+			flows: [],
 		} as unknown as Graph);
 		expect(after.version).toBe("20241217");
 		expect(after.nodes[0].content.type).toBe("files");

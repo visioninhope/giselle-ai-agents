@@ -689,6 +689,7 @@ export function ExecutionProvider({
 			const tmpFlows = deriveFlows({
 				nodes: [node],
 				connections: [],
+				flows: [],
 			});
 			if (tmpFlows.length !== 1) {
 				throw new Error("Unexpected number of flows");
