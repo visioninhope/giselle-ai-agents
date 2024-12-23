@@ -1,5 +1,5 @@
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
-import { agents, db } from "@/drizzle";
+import { agents, db, githubIntegrationSettings } from "@/drizzle";
 import { developerFlag } from "@/flags";
 import {
 	ExternalServiceName,
@@ -10,6 +10,10 @@ import {
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
 import { recordAgentUsage } from "@/services/agents/activities";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "@/services/external/github/types";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
 import { eq } from "drizzle-orm";
@@ -27,15 +31,23 @@ import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import { executeNode, executeStep, retryStep } from "./lib/execution";
-import { getGitHubIntegrationState } from "./lib/github";
+import {
+	type CreateGitHubIntegrationSettingResult,
+	getGitHubIntegrationState,
+} from "./lib/github";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
-import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
+import {
+	buildGraphExecutionPath,
+	buildGraphFolderPath,
+	createGithubIntegrationSettingId,
+} from "./lib/utils";
 import type {
 	AgentId,
 	Artifact,
 	ExecutionId,
 	ExecutionSnapshot,
 	FlowId,
+	GitHubEventNodeMapping,
 	Graph,
 	NodeId,
 	StepId,
@@ -209,6 +221,88 @@ export default async function Page({
 		return await recordAgentUsage(agentId, startedAt, endedAt, totalDurationMs);
 	}
 
+	async function createGitHubIntegrationSettingAction(
+		_: unknown,
+		formData: FormData,
+	): Promise<CreateGitHubIntegrationSettingResult> {
+		"use server";
+
+		if (agent === undefined) {
+			throw new Error("Agent not found");
+		}
+		const repositoryFullName = formData.get("repositoryFullName");
+		const event = formData.get("event") as GitHubTriggerEvent;
+		const callSign = formData.get("callSign");
+		const flowId = formData.get("flowId") as FlowId;
+		const eventNodeMappings = formData.get("eventNodeMappings");
+		const nextAction = formData.get("nextAction") as GitHubNextAction;
+		if (
+			typeof repositoryFullName !== "string" ||
+			repositoryFullName.length === 0
+		) {
+			return {
+				result: "error",
+				message: "Please choose a repository",
+			};
+		}
+		if (typeof event !== "string" || event.length === 0) {
+			return {
+				result: "error",
+				message: "Please choose an event",
+			};
+		}
+		if (typeof callSign !== "string" || callSign.length === 0) {
+			return {
+				result: "error",
+				message: "Please enter a call sign",
+			};
+		}
+		if (typeof flowId !== "string" || flowId.length === 0) {
+			return {
+				result: "error",
+				message: "Please select a flow",
+			};
+		}
+		if (typeof eventNodeMappings !== "string") {
+			return {
+				result: "error",
+				message: "Please configure event mappings",
+			};
+		}
+		const parsedEventNodeMappings = JSON.parse(
+			eventNodeMappings,
+		) as GitHubEventNodeMapping[];
+		if (
+			!Array.isArray(parsedEventNodeMappings) ||
+			parsedEventNodeMappings.length === 0
+		) {
+			return {
+				result: "error",
+				message: "Invalid event mappings",
+			};
+		}
+		if (typeof nextAction !== "string" || nextAction.length === 0) {
+			return {
+				result: "error",
+				message: "Please select a next action",
+			};
+		}
+
+		await db.insert(githubIntegrationSettings).values({
+			id: createGithubIntegrationSettingId(),
+			agentDbId: agent.dbId,
+			repositoryFullName,
+			event,
+			callSign,
+			flowId,
+			eventNodeMappings: parsedEventNodeMappings,
+			nextAction,
+		});
+		return {
+			result: "success",
+		};
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -216,7 +310,12 @@ export default async function Page({
 				onPersistAction={persistGraph}
 				defaultGraphUrl={graphUrl}
 			>
-				<GitHubIntegrationProvider {...gitHubIntegrationState}>
+				<GitHubIntegrationProvider
+					{...gitHubIntegrationState}
+					createGitHubIntegrationSettingAction={
+						createGitHubIntegrationSettingAction
+					}
+				>
 					<PropertiesPanelProvider>
 						<ReactFlowProvider>
 							<ToolbarContextProvider>

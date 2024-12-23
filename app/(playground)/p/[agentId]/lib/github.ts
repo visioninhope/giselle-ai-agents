@@ -1,3 +1,5 @@
+"use server";
+
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { db } from "@/drizzle";
 import {
@@ -14,14 +16,14 @@ export async function getGitHubIntegrationState(
 		return {
 			needsAuthorization: true,
 			repositories: [],
-			integration: undefined,
+			setting: undefined,
 		};
 	}
 
 	try {
 		const gitHubClient = buildGitHubUserClient(credential);
 		const { installations } = await gitHubClient.getInstallations();
-		const [repositories, gitHubIntegration] = await Promise.all([
+		const [repositories, githubIntegrationSetting] = await Promise.all([
 			Promise.all(
 				installations.map(async (installation) => {
 					const { repositories: repos } = await gitHubClient.getRepositories(
@@ -32,24 +34,35 @@ export async function getGitHubIntegrationState(
 			).then((repos) =>
 				repos.flat().sort((a, b) => a.name.localeCompare(b.name)),
 			),
-			db.query.gitHubIntegrations.findFirst({
-				where: (gitHubIntegrations, { eq }) =>
-					eq(gitHubIntegrations.agentDbId, agentDbId),
+			db.query.githubIntegrationSettings.findFirst({
+				where: (githubIntegrationSettings, { eq }) =>
+					eq(githubIntegrationSettings.agentDbId, agentDbId),
 			}),
 		]);
 		return {
 			needsAuthorization: false,
 			repositories,
-			integration: gitHubIntegration,
+			setting: githubIntegrationSetting,
 		};
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return {
 				needsAuthorization: true,
 				repositories: [],
-				integration: undefined,
+				setting: undefined,
 			};
 		}
 		throw error;
 	}
 }
+
+interface CreateGitHubIntegrationSettingSuccess {
+	result: "success";
+}
+interface CreateGitHubIntegrationSettingError {
+	result: "error";
+	message: string;
+}
+export type CreateGitHubIntegrationSettingResult =
+	| CreateGitHubIntegrationSettingSuccess
+	| CreateGitHubIntegrationSettingError;

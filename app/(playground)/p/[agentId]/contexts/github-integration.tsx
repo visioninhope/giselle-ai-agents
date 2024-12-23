@@ -1,20 +1,16 @@
 "use client";
 
-import type { gitHubIntegrations } from "@/drizzle";
+import type { gitHubIntegrations, githubIntegrationSettings } from "@/drizzle";
 import type { components } from "@octokit/openapi-types";
-import { createId } from "@paralleldrive/cuid2";
 import { createContext, useContext } from "react";
+import type { CreateGitHubIntegrationSettingResult } from "../lib/github";
 
-type GitHubIntegrationId = `gthb_${string}`;
-function generateId() {
-	return `gthb_${createId()}` satisfies GitHubIntegrationId;
-}
 type Repository = components["schemas"]["repository"];
 
 export interface GitHubIntegrationState {
 	repositories: Repository[];
 	needsAuthorization: boolean;
-	integration: typeof gitHubIntegrations.$inferSelect | undefined;
+	setting: typeof githubIntegrationSettings.$inferSelect | undefined;
 }
 
 export const GitHubIntegrationContext =
@@ -25,6 +21,10 @@ export function GitHubIntegrationProvider({
 	...value
 }: GitHubIntegrationState & {
 	children: React.ReactNode;
+	createGitHubIntegrationSettingAction: (
+		_: unknown,
+		formData: FormData,
+	) => Promise<CreateGitHubIntegrationSettingResult>;
 }) {
 	return (
 		<GitHubIntegrationContext.Provider value={value}>

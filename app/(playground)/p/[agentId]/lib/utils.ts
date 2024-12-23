@@ -9,6 +9,7 @@ import type {
 	FileId,
 	Files,
 	FlowId,
+	GitHubIntegrationSettingId,
 	Graph,
 	GraphId,
 	JobExecutionId,
@@ -72,6 +73,10 @@ export function createExecutionId(): ExecutionId {
 }
 export function createExecutionSnapshotId(): ExecutionSnapshotId {
 	return `excs_${createId()}`;
+}
+
+export function createGithubIntegrationSettingId(): GitHubIntegrationSettingId {
+	return `gthbs_${createId()}`;
 }
 
 export function isTextGeneration(node: Node): node is TextGeneration {
