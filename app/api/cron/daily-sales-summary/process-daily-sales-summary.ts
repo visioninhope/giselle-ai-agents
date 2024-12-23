@@ -8,6 +8,7 @@ import {
 } from "@/drizzle";
 import { stripe } from "@/services/external/stripe";
 import * as csv from "@fast-csv/format";
+import { captureException } from "@sentry/nextjs";
 import { and, eq, gte, lt } from "drizzle-orm";
 import type Stripe from "stripe";
 import invariant from "tiny-invariant";
@@ -39,8 +40,16 @@ export async function processDailySalesSummary(targetDate: Date) {
 	)[] = [];
 
 	for (const invoice of invoices) {
-		const evidence = await collectEvidence(invoice);
-		evidences.push(evidence);
+		try {
+			const evidence = await collectEvidence(invoice);
+			evidences.push(evidence);
+		} catch (error: unknown) {
+			console.error(
+				`Failed to collect evidence for invoice: ${invoice.id}`,
+				error,
+			);
+			captureException(error);
+		}
 	}
 
 	const targetDateString = targetDate.toISOString().split("T")[0];
