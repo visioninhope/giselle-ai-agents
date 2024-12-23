@@ -614,7 +614,7 @@ function GitHubIntegrationForm() {
 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [eventNodeMappings, setEventNodeMappings] = useState<
 		GitHubEventNodeMapping[]
-	>([]);
+	>(setting?.eventNodeMappings ?? []);
 	const processedMappings = useMemo(
 		() =>
 			eventNodeMappings
