@@ -19,6 +19,7 @@ import {
 	HammerIcon,
 	ListTreeIcon,
 	PlusIcon,
+	TrashIcon,
 	XIcon,
 } from "lucide-react";
 import Link from "next/link";
@@ -743,8 +744,8 @@ function GitHubIntegrationForm() {
 				/>
 
 				{processedMappings.length > 0 && (
-					<div className="space-y-[12px]">
-						{processedMappings.map((mapping) => (
+					<div className="space-y-[12px] overflow-x-hidden">
+						{processedMappings.map((mapping, index) => (
 							<Block
 								className="flex items-center gap-[12px] font-rosart"
 								key={mapping.id}
@@ -754,9 +755,26 @@ function GitHubIntegrationForm() {
 									<p>{mapping.event}</p>
 								</div>
 								<ArrowRightIcon className="w-[16px] h-[16px] text-black-30" />
-								<div className="leading-tight flex-1">
-									<p className="text-[12px] text-black-50">Target</p>
-									<p className="text-[14px]">{mapping.node.name}</p>
+								<div className="flex flex-1 overflow-x-hidden">
+									<div className="leading-tight truncate">
+										<p className="text-[12px] text-black-50">Target</p>
+										<p className="text-[14px] truncate">{mapping.node.name}</p>
+									</div>
+									<button
+										type="button"
+										className="hidden group-hover:block px-[6px]"
+										onClick={() => {
+											setEventNodeMappings((prev) =>
+												prev.filter(
+													(p) =>
+														p.nodeId !== mapping.nodeId ||
+														p.event !== mapping.event,
+												),
+											);
+										}}
+									>
+										<TrashIcon className="w-[18px] h-[18px]" />
+									</button>
 								</div>
 							</Block>
 						))}
@@ -783,7 +801,7 @@ function GitHubIntegrationForm() {
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
 			{setting?.id && <input type="hidden" name="id" value={setting.id} />}
-			<Button type="submit" disabled={upserting}>
+			<Button type="submit" data-loading={upserting} disabled={upserting}>
 				Save
 			</Button>
 		</form>
