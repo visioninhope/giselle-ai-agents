@@ -4,20 +4,20 @@ import type {
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
+import * as SelectPrimitive from "@radix-ui/react-select";
 import * as Tabs from "@radix-ui/react-tabs";
-import { getDownloadUrl, head } from "@vercel/blob";
+import { getDownloadUrl } from "@vercel/blob";
 import clsx from "clsx/lite";
 import {
 	ArrowRightIcon,
-	ChevronsUpDownIcon,
-	CircleIcon,
-	CirclePlusIcon,
+	Check,
+	ChevronDown,
+	ChevronUp,
 	DownloadIcon,
 	FrameIcon,
 	GithubIcon,
 	HammerIcon,
 	ListTreeIcon,
-	PlusCircleIcon,
 	PlusIcon,
 	XIcon,
 } from "lucide-react";
@@ -39,15 +39,223 @@ import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type { Node, NodeId, Step } from "../types";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
-import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "./select";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
+
+function SelectLabel({
+	className,
+	...props
+}: ComponentProps<typeof SelectPrimitive.Label>) {
+	return (
+		<SelectPrimitive.Label
+			className={clsx("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
+			{...props}
+		/>
+	);
+}
+SelectLabel.displayName = SelectPrimitive.Label.displayName;
+function SelectTrigger({
+	className,
+	children,
+	...props
+}: ComponentProps<typeof SelectPrimitive.Trigger>) {
+	return (
+		<SelectPrimitive.Trigger
+			className={clsx(
+				"flex h-10 w-full items-center justify-between rounded-md bg-[hsla(207,43%,91%,0.2)] px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+				className,
+			)}
+			{...props}
+		>
+			{children}
+			<SelectPrimitive.Icon asChild>
+				<ChevronDown className="h-4 w-4 opacity-50" />
+			</SelectPrimitive.Icon>
+		</SelectPrimitive.Trigger>
+	);
+}
+SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
+
+function SelectScrollUpButton({
+	className,
+	...props
+}: ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
+	return (
+		<SelectPrimitive.ScrollUpButton
+			className={clsx(
+				"flex cursor-default items-center justify-center py-1",
+				className,
+			)}
+			{...props}
+		>
+			<ChevronUp className="h-4 w-4" />
+		</SelectPrimitive.ScrollUpButton>
+	);
+}
+
+function SelectScrollDownButton({
+	className,
+	...props
+}: ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
+	return (
+		<SelectPrimitive.ScrollDownButton
+			className={clsx(
+				"flex cursor-default items-center justify-center py-1",
+				className,
+			)}
+			{...props}
+		>
+			<ChevronDown className="h-4 w-4" />
+		</SelectPrimitive.ScrollDownButton>
+	);
+}
+SelectScrollDownButton.displayName =
+	SelectPrimitive.ScrollDownButton.displayName;
+
+function SelectContent({
+	className,
+	children,
+	position = "popper",
+	...props
+}: ComponentProps<typeof SelectPrimitive.Content>) {
+	return (
+		<SelectPrimitive.Portal>
+			<SelectPrimitive.Content
+				className={clsx(
+					"relative z-50 max-h-96 min-w-[8rem] overflow-hidden rounded-md border border-[hsla(222,21%,40%,1)] bg-black-100 text-popover-foreground shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+					position === "popper" &&
+						"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
+					className,
+				)}
+				position={position}
+				{...props}
+			>
+				<SelectScrollUpButton />
+				<SelectPrimitive.Viewport
+					className={clsx(
+						"p-1",
+						position === "popper" &&
+							"h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)]",
+					)}
+				>
+					{children}
+				</SelectPrimitive.Viewport>
+				<SelectScrollDownButton />
+			</SelectPrimitive.Content>
+		</SelectPrimitive.Portal>
+	);
+}
+SelectContent.displayName = SelectPrimitive.Content.displayName;
+
+function SelectItem({
+	children,
+	description,
+	...props
+}: React.ComponentProps<typeof SelectPrimitive.Item> & {
+	description?: string;
+}) {
+	return (
+		<SelectPrimitive.Item
+			className={clsx(
+				"relative flex w-full cursor-default select-none items-center rounded-sm py-1.5 pl-8 pr-2 text-sm outline-none focus:bg-accent focus:text-accent-foreground data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+			)}
+			{...props}
+		>
+			<span className="absolute left-2 flex h-3.5 w-3.5 items-center justify-center">
+				<SelectPrimitive.ItemIndicator>
+					<Check className="h-4 w-4" />
+				</SelectPrimitive.ItemIndicator>
+			</span>
+
+			<div>
+				<SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
+				{description && (
+					<div className="text-black-30 text-[12px]">{description}</div>
+				)}
+			</div>
+		</SelectPrimitive.Item>
+	);
+}
+SelectItem.displayName = SelectPrimitive.Item.displayName;
+
+interface SelectOption {
+	value: string;
+	label: string;
+	description?: string;
+}
+interface SelectGroup {
+	label: string;
+	options: SelectOption[];
+}
+type SelectProps = ComponentProps<typeof SelectPrimitive.Root> &
+	Pick<ComponentProps<typeof SelectPrimitive.Value>, "placeholder"> & {
+		options: SelectOption[] | SelectGroup[];
+	};
+function isSelectGroup(item: SelectOption | SelectGroup): item is SelectGroup {
+	return "options" in item;
+}
+function Select({
+	defaultValue,
+	value,
+	onValueChange,
+	defaultOpen,
+	open,
+	onOpenChange,
+	dir,
+	name,
+	disabled,
+	required,
+	placeholder,
+	options,
+}: SelectProps) {
+	return (
+		<SelectPrimitive.Root
+			defaultValue={defaultValue}
+			value={value}
+			onValueChange={onValueChange}
+			defaultOpen={defaultOpen}
+			open={open}
+			onOpenChange={onOpenChange}
+			dir={dir}
+			name={name}
+			disabled={disabled}
+			required={required}
+		>
+			<SelectTrigger>
+				<SelectPrimitive.Value placeholder={placeholder} />
+			</SelectTrigger>
+			<SelectContent>
+				{options.map((item) => {
+					if (isSelectGroup(item)) {
+						return (
+							<SelectPrimitive.Group key={item.label}>
+								<SelectLabel>{item.label}</SelectLabel>
+								{item.options.map((option) => (
+									<SelectItem
+										key={option.value}
+										value={option.value}
+										description={option.description}
+									>
+										{option.label}
+									</SelectItem>
+								))}
+							</SelectPrimitive.Group>
+						);
+					}
+					return (
+						<SelectItem
+							key={item.value}
+							value={item.value}
+							description={(item as SelectOption).description}
+						>
+							{item.label}
+						</SelectItem>
+					);
+				})}
+			</SelectContent>
+		</SelectPrimitive.Root>
+	);
+}
 
 function Popover({
 	defaultOpen,
@@ -282,48 +490,6 @@ export function Overview() {
 	);
 }
 
-function SelectDataForm({
-	onChangeValue,
-}: {
-	onChangeValue?: (value: string) => void;
-}) {
-	return (
-		<form className="w-[200px]">
-			<p className="font-rosart">Select data</p>
-			<div className="space-y-[12px] mt-[12px]">
-				<Block
-					as="button"
-					type="button"
-					onClick={() => onChangeValue?.("comment")}
-					className="font-rosart"
-					hoverCardProps={{ side: "right" }}
-					hoverCardContent="Contents of the issue comment"
-				>
-					comment.body
-				</Block>
-				<Block
-					as="button"
-					onClick={() => onChangeValue?.("commentAttachments")}
-					className="font-rosart"
-					hoverCardProps={{ side: "right" }}
-					hoverCardContent="Contents of the issue"
-				>
-					issue.body
-				</Block>
-				<Block
-					as="button"
-					onClick={() => onChangeValue?.("issueTitle")}
-					className="font-rosart"
-					hoverCardProps={{ side: "right" }}
-					hoverCardContent="Title of the issue"
-				>
-					issue.title
-				</Block>
-			</div>
-		</form>
-	);
-}
-
 interface AssignData {
 	event: string;
 	nodeId: NodeId;
@@ -352,52 +518,48 @@ function AssignDataForm({
 				<div className="flex items-stretch gap-[14px]">
 					<div>
 						<Label>Issue comment data</Label>
-						<div>
-							<Popover
-								open={subPopoverOpen}
-								onOpenChange={setSubPopoverOpen}
-								side="right"
-								trigger={
-									<div className="flex h-10 items-center justify-between rounded-md bg-[hsla(207,43%,91%,0.2)] px-3 py-2 text-sm focus:outline-none disabled:cursor-not-allowed disabled:opacity-50 min-w-[130px]">
-										<p>{assignData.event ?? "Select data"}</p>
-										<ChevronsUpDownIcon size={16} className="text-black-30" />
-									</div>
-								}
-								sideOffset={10}
-								onOpenAutoFocus={(event) => {
-									event.preventDefault();
-								}}
-								onCloseAutoFocus={(event) => {
-									event.preventDefault();
-								}}
-								onInteractOutside={(event) => {
-									event.preventDefault();
-								}}
-							>
-								<SelectDataForm
-									onChangeValue={(value) => {
-										setAssignData({ ...assignData, event: value });
-										setSubPopoverOpen(false);
-									}}
-								/>
-							</Popover>
-						</div>
+						<Select
+							name="source"
+							placeholder="Select data"
+							options={[
+								{
+									label: "comment",
+									options: [
+										{
+											value: "comment.body",
+											label: "coment.body",
+											description: "The body of the issue comment",
+										},
+									],
+								},
+								{
+									label: "issue",
+									options: [
+										{
+											value: "issue.title",
+											label: "issue.title",
+											description: "The title of the issue",
+										},
+										{
+											value: "issue.body",
+											label: "issue.body",
+											description: "The body of the issue",
+										},
+									],
+								},
+							]}
+						/>
 					</div>
-
 					<div>
 						<Label>Node</Label>
-						<Select name="flow">
-							<SelectTrigger>
-								<SelectValue placeholder="Choose node" />
-							</SelectTrigger>
-							<SelectContent>
-								{nodes.map((node) => (
-									<SelectItem value={node.id} key={node.id}>
-										{node.name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
+						<Select
+							name="flow"
+							placeholder="Select node"
+							options={nodes.map((node) => ({
+								value: node.id,
+								label: node.name,
+							}))}
+						/>
 					</div>
 				</div>
 				<div>
@@ -460,40 +622,28 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
 					name="repository"
-					defaultValue={integration?.repositoryFullName}
-				>
-					<SelectTrigger>
-						<SelectValue placeholder="Choose repository" />
-					</SelectTrigger>
-					<SelectContent>
-						{repositories.map((repository) => (
-							<SelectItem value={repository.full_name} key={repository.id}>
-								{repository.full_name}
-							</SelectItem>
-						))}
-					</SelectContent>
-				</Select>
+					placeholder="Choose repository"
+					options={repositories.map((repository) => ({
+						value: repository.full_name,
+						label: repository.full_name,
+					}))}
+				/>
 			</ContentPanelSection>
 
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Trigger" />
 				<ContentPanelSectionFormField>
 					<Label htmlFor="event">Event</Label>
-					<Select name="event" defaultValue={integration?.event}>
-						<SelectTrigger>
-							<SelectValue placeholder="Choose event" />
-						</SelectTrigger>
-						<SelectContent>
-							{integrationEventList.map((integrationEvent) => (
-								<SelectItem
-									value={integrationEvent.type}
-									key={integrationEvent.type}
-								>
-									{integrationEvent.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<Select
+						name="event"
+						defaultValue={integration?.event}
+						placeholder="Choose event"
+						options={integrationEventList.map((integrationEvent) => ({
+							value: integrationEvent.type,
+							label: integrationEvent.label,
+						}))}
+					/>
+
 					<ContentPanelSectionFormField>
 						<Label htmlFor="callSign">Call sign</Label>
 						<Input
@@ -520,18 +670,14 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionHeader title="Action" />
 				<ContentPanelSectionFormField>
 					<Label>Run flow</Label>
-					<Select name="flow">
-						<SelectTrigger>
-							<SelectValue placeholder="Choose next action" />
-						</SelectTrigger>
-						<SelectContent>
-							{graph.flows.map((flow) => (
-								<SelectItem value={flow.id} key={flow.id}>
-									{flow.name}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<Select
+						name="flow"
+						placeholder="Choose next action"
+						options={graph.flows.map((flow) => ({
+							value: flow.id,
+							label: flow.name,
+						}))}
+					/>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
 			<ContentPanelSection>
@@ -592,189 +738,20 @@ function GitHubIntegrationForm() {
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Then" />
 				<ContentPanelSectionFormField>
-					<Select name="nextAction" defaultValue={integration?.nextAction}>
-						<SelectTrigger>
-							<SelectValue placeholder="Choose next action" />
-						</SelectTrigger>
-						<SelectContent>
-							{nextActionList.map((nextAction) => (
-								<SelectItem value={nextAction.type} key={nextAction.type}>
-									{nextAction.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
+					<Select
+						name="nextAction"
+						defaultValue={integration?.nextAction}
+						placeholder="Choose next action"
+						options={nextActionList.map((nextAction) => ({
+							value: nextAction.type,
+							label: nextAction.label,
+						}))}
+					/>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
 		</form>
 	);
 }
-
-// interface GitHubIntegrationFormProps {
-// 	repositories: Array<{
-// 		id: number;
-// 		full_name: string;
-// 	}>;
-// }
-// function GithubIntegrationForm({ repositories }: GitHubIntegrationFormProps) {
-// 	interface Flow {
-// 		start: Pick<GiselleNode, "id" | "name">;
-// 		end: Pick<GiselleNode, "id" | "name">;
-// 	}
-// 	const { state } = useGraph();
-// 	const flows = useMemo(() => {
-// 		const edges = allFlowEdges(state.graph.nodes, state.graph.connectors);
-// 		const tmpFlows: Flow[] = [];
-// 		for (const edge of edges) {
-// 			const start = state.graph.nodes.find((node) => node.id === edge.start);
-// 			const end = state.graph.nodes.find((node) => node.id === edge.end);
-// 			if (start && end) {
-// 				tmpFlows.push({
-// 					start: {
-// 						id: start.id as GiselleNodeId,
-// 						name: start.name,
-// 					},
-// 					end: {
-// 						id: end.id as GiselleNodeId,
-// 						name: end.name,
-// 					},
-// 				});
-// 			}
-// 		}
-// 		return tmpFlows;
-// 	}, [state.graph]);
-
-// 	const { setting } = useGitHubIntegration();
-// 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
-// 	const [_, action, isPending] = useActionState(
-// 		async (prevState: unknown, formData: FormData) => {
-// 			const repositoryFullName = formData.get("repository") as string;
-// 			const event = formData.get("event") as GitHubTriggerEvent;
-// 			const nextAction = formData.get("nextAction") as GitHubNextAction;
-// 			const flow = formData.get("flow") as string;
-// 			const { start, end } = JSON.parse(flow) as Flow;
-// 			await save({
-// 				id: setting?.id,
-// 				agentId: state.graph.agentId,
-// 				repositoryFullName,
-// 				event,
-// 				callSign,
-// 				nextAction,
-// 				startNodeId: start.id,
-// 				endNodeId: end.id,
-// 			});
-// 		},
-// 		null,
-// 	);
-
-// 	return (
-// 		<form className="grid gap-[16px]" action={action}>
-// 			<ContentPanelSection>
-// 				<ContentPanelSectionHeader title="Repository" />
-// 				<Select name="repository" defaultValue={setting?.repositoryFullName}>
-// 					<SelectTrigger>
-// 						<SelectValue placeholder="Choose repository" />
-// 					</SelectTrigger>
-// 					<SelectContent>
-// 						{repositories.map((repository) => (
-// 							<SelectItem value={repository.full_name} key={repository.id}>
-// 								{repository.full_name}
-// 							</SelectItem>
-// 						))}
-// 					</SelectContent>
-// 				</Select>
-// 			</ContentPanelSection>
-// 			<ContentPanelSection>
-// 				<ContentPanelSectionHeader title="Trigger" />
-// 				<ContentPanelSectionFormField>
-// 					<Label htmlFor="event">Event</Label>
-// 					<Select name="event" defaultValue={setting?.event}>
-// 						<SelectTrigger>
-// 							<SelectValue placeholder="Choose event" />
-// 						</SelectTrigger>
-// 						<SelectContent>
-// 							{mockEvents.map((event) => (
-// 								<SelectItem value={event.type} key={event.type}>
-// 									{event.label}
-// 								</SelectItem>
-// 							))}
-// 						</SelectContent>
-// 					</Select>
-// 				</ContentPanelSectionFormField>
-// 				<ContentPanelSectionFormField>
-// 					<Label htmlFor="callSign">Call sign</Label>
-// 					<Input
-// 						type="text"
-// 						name="callSign"
-// 						id="callSign"
-// 						placeholder="Enter call sign"
-// 						className="w-full"
-// 						value={callSign}
-// 						onChange={(e) => setCallSign(e.target.value)}
-// 					/>
-// 					<span className="text-black-70 text-[12px]">
-// 						You can call this agent by commenting{" "}
-// 						<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
-// 							/giselle {callSign === "" ? "[call sign]" : callSign}
-// 						</span>{" "}
-// 						in the issue route06inc/giselle.
-// 					</span>
-// 				</ContentPanelSectionFormField>
-// 			</ContentPanelSection>
-// 			<ContentPanelSection>
-// 				<ContentPanelSectionHeader title="Action" />
-// 				<ContentPanelSectionFormField>
-// 					<Label>Run flow</Label>
-// 					<Select
-// 						name="flow"
-// 						defaultValue={JSON.stringify(
-// 							flows.find(
-// 								(flow) =>
-// 									flow.start.id === setting?.startNodeId &&
-// 									flow.end.id === setting?.endNodeId,
-// 							),
-// 						)}
-// 					>
-// 						<SelectTrigger>
-// 							<SelectValue placeholder="Choose flow" />
-// 						</SelectTrigger>
-// 						<SelectContent>
-// 							{flows.map((flow) => (
-// 								<SelectItem
-// 									value={JSON.stringify(flow)}
-// 									key={`${flow.start.id}-${flow.end.id}`}
-// 								>
-// 									{flow.start.name} → {flow.end.name}
-// 								</SelectItem>
-// 							))}
-// 						</SelectContent>
-// 					</Select>
-// 				</ContentPanelSectionFormField>
-// 				<ContentPanelSectionFormField>
-// 					<Label>Then</Label>
-// 					<Select name="nextAction" defaultValue={setting?.nextAction}>
-// 						<SelectTrigger>
-// 							<SelectValue placeholder="Choose next action" />
-// 						</SelectTrigger>
-// 						<SelectContent>
-// 							{mockNextActions.map((nextAction) => (
-// 								<SelectItem value={nextAction.type} key={nextAction.type}>
-// 									{nextAction.label}
-// 								</SelectItem>
-// 							))}
-// 						</SelectContent>
-// 					</Select>
-// 				</ContentPanelSectionFormField>
-// 			</ContentPanelSection>
-// 			<div>
-// 				<input type="hidden" name="agentId" value={state.graph.agentId} />
-// 				<Button type="submit" disabled={isPending} data-loading={isPending}>
-// 					Save
-// 				</Button>
-// 			</div>
-// 		</form>
-// 	);
-// }
 
 function Developer() {
 	const { graphUrl } = useGraph();
