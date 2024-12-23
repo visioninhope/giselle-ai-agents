@@ -48,6 +48,7 @@ import type {
 	ExecutionSnapshot,
 	FlowId,
 	GitHubEventNodeMapping,
+	GitHubIntegrationSettingId,
 	Graph,
 	NodeId,
 	StepId,
@@ -221,7 +222,7 @@ export default async function Page({
 		return await recordAgentUsage(agentId, startedAt, endedAt, totalDurationMs);
 	}
 
-	async function createGitHubIntegrationSettingAction(
+	async function upsertGitHubIntegrationSettingAction(
 		_: unknown,
 		formData: FormData,
 	): Promise<CreateGitHubIntegrationSettingResult> {
@@ -234,8 +235,9 @@ export default async function Page({
 		const event = formData.get("event") as GitHubTriggerEvent;
 		const callSign = formData.get("callSign");
 		const flowId = formData.get("flowId") as FlowId;
-		const eventNodeMappings = formData.get("eventNodeMappings");
+		const githubEventNodeMappings = formData.get("githubEventNodeMappings");
 		const nextAction = formData.get("nextAction") as GitHubNextAction;
+		const inputId = formData.get("id") as GitHubIntegrationSettingId;
 		if (
 			typeof repositoryFullName !== "string" ||
 			repositoryFullName.length === 0
@@ -263,14 +265,14 @@ export default async function Page({
 				message: "Please select a flow",
 			};
 		}
-		if (typeof eventNodeMappings !== "string") {
+		if (typeof githubEventNodeMappings !== "string") {
 			return {
 				result: "error",
 				message: "Please configure event mappings",
 			};
 		}
 		const parsedEventNodeMappings = JSON.parse(
-			eventNodeMappings,
+			githubEventNodeMappings,
 		) as GitHubEventNodeMapping[];
 		if (
 			!Array.isArray(parsedEventNodeMappings) ||
@@ -288,18 +290,33 @@ export default async function Page({
 			};
 		}
 
-		await db.insert(githubIntegrationSettings).values({
-			id: createGithubIntegrationSettingId(),
-			agentDbId: agent.dbId,
+		const id = inputId ?? createGithubIntegrationSettingId();
+
+		const setting = {
 			repositoryFullName,
 			event,
 			callSign,
 			flowId,
 			eventNodeMappings: parsedEventNodeMappings,
 			nextAction,
-		});
+		};
+		await db
+			.insert(githubIntegrationSettings)
+			.values({
+				agentDbId: agent.dbId,
+				id,
+				...setting,
+			})
+			.onConflictDoUpdate({
+				target: githubIntegrationSettings.id,
+				set: setting,
+			});
 		return {
 			result: "success",
+			setting: {
+				id,
+				...setting,
+			},
 		};
 	}
 
@@ -312,8 +329,8 @@ export default async function Page({
 			>
 				<GitHubIntegrationProvider
 					{...gitHubIntegrationState}
-					createGitHubIntegrationSettingAction={
-						createGitHubIntegrationSettingAction
+					upsertGitHubIntegrationSettingAction={
+						upsertGitHubIntegrationSettingAction
 					}
 				>
 					<PropertiesPanelProvider>

@@ -2,15 +2,28 @@
 
 import type { gitHubIntegrations, githubIntegrationSettings } from "@/drizzle";
 import type { components } from "@octokit/openapi-types";
-import { createContext, useContext } from "react";
-import type { CreateGitHubIntegrationSettingResult } from "../lib/github";
+import {
+	createContext,
+	useCallback,
+	useContext,
+	useOptimistic,
+	useState,
+} from "react";
+import type {
+	CreateGitHubIntegrationSettingResult,
+	GitHubIntegrationSetting,
+} from "../lib/github";
 
 type Repository = components["schemas"]["repository"];
 
 export interface GitHubIntegrationState {
 	repositories: Repository[];
 	needsAuthorization: boolean;
-	setting: typeof githubIntegrationSettings.$inferSelect | undefined;
+	setting: GitHubIntegrationSetting | undefined;
+	upsertGitHubIntegrationSettingAction: (
+		_: unknown,
+		formData: FormData,
+	) => Promise<CreateGitHubIntegrationSettingResult>;
 }
 
 export const GitHubIntegrationContext =
@@ -18,16 +31,34 @@ export const GitHubIntegrationContext =
 
 export function GitHubIntegrationProvider({
 	children,
+	setting: defaultSetting,
+	upsertGitHubIntegrationSettingAction,
 	...value
 }: GitHubIntegrationState & {
 	children: React.ReactNode;
-	createGitHubIntegrationSettingAction: (
-		_: unknown,
-		formData: FormData,
-	) => Promise<CreateGitHubIntegrationSettingResult>;
 }) {
+	const [serverSetting, setServerSetting] = useState(defaultSetting);
+
+	const handleUpsertGitHubIntegrationSettingAction = useCallback(
+		async (_: unknown, formData: FormData) => {
+			const result = await upsertGitHubIntegrationSettingAction(_, formData);
+			if (result.result === "success") {
+				setServerSetting(result.setting);
+			}
+			return result;
+		},
+		[upsertGitHubIntegrationSettingAction],
+	);
+
 	return (
-		<GitHubIntegrationContext.Provider value={value}>
+		<GitHubIntegrationContext.Provider
+			value={{
+				...value,
+				setting: serverSetting,
+				upsertGitHubIntegrationSettingAction:
+					handleUpsertGitHubIntegrationSettingAction,
+			}}
+		>
 			{children}
 		</GitHubIntegrationContext.Provider>
 	);

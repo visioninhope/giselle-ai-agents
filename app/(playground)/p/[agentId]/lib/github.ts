@@ -1,7 +1,7 @@
 "use server";
 
 import { getOauthCredential } from "@/app/(auth)/lib";
-import { db } from "@/drizzle";
+import { db, type githubIntegrationSettings } from "@/drizzle";
 import {
 	buildGitHubUserClient,
 	needsAuthorization,
@@ -10,7 +10,9 @@ import type { GitHubIntegrationState } from "../contexts/github-integration";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,
-): Promise<GitHubIntegrationState> {
+): Promise<
+	Omit<GitHubIntegrationState, "upsertGitHubIntegrationSettingAction">
+> {
 	const credential = await getOauthCredential("github");
 	if (!credential) {
 		return {
@@ -56,8 +58,14 @@ export async function getGitHubIntegrationState(
 	}
 }
 
+export type GitHubIntegrationSetting = Omit<
+	typeof githubIntegrationSettings.$inferSelect,
+	"dbId" | "agentDbId"
+>;
+
 interface CreateGitHubIntegrationSettingSuccess {
 	result: "success";
+	setting: GitHubIntegrationSetting;
 }
 interface CreateGitHubIntegrationSettingError {
 	result: "error";

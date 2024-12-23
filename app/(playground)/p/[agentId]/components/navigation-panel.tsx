@@ -26,6 +26,7 @@ import {
 	type ComponentProps,
 	type ReactNode,
 	createContext,
+	useActionState,
 	useContext,
 	useMemo,
 	useState,
@@ -36,7 +37,7 @@ import { useGitHubIntegration } from "../contexts/github-integration";
 import { useGraph } from "../contexts/graph";
 import { LayersIcon } from "../prev/beta-proto/components/icons/layers";
 import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
-import type { Node, NodeId, Step } from "../types";
+import type { GitHubEventNodeMapping, Node, NodeId, Step } from "../types";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
 import { Input } from "./ui/input";
@@ -490,10 +491,6 @@ export function Overview() {
 	);
 }
 
-interface GitHubEventNodeMapping {
-	event: string;
-	nodeId: NodeId;
-}
 function GitHubEventNodeMappingForm({
 	nodes,
 	onCommit,
@@ -610,10 +607,11 @@ const mockEventDataList = [
 	},
 ];
 function GitHubIntegrationForm() {
-	const { integration, repositories } = useGitHubIntegration();
+	const { setting, repositories, upsertGitHubIntegrationSettingAction } =
+		useGitHubIntegration();
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
-	const [callSign, setCallSign] = useState(integration?.callSign ?? "");
+	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [eventNodeMappings, setEventNodeMappings] = useState<
 		GitHubEventNodeMapping[]
 	>([]);
@@ -636,17 +634,26 @@ function GitHubIntegrationForm() {
 				.filter((eventNodeMapping) => eventNodeMapping !== null),
 		[eventNodeMappings, graph.nodes],
 	);
+	const [upsertGitHubIntegrationSettingActionResult, action, upserting] =
+		useActionState(upsertGitHubIntegrationSettingAction, null);
 	return (
-		<form className="grid gap-[16px] overflow-y-auto mx-[-20px] px-[20px]">
+		<form
+			className="grid gap-[16px] overflow-y-auto mx-[-20px] px-[20px]"
+			action={action}
+		>
+			{upsertGitHubIntegrationSettingActionResult?.result === "error" && (
+				<p>{upsertGitHubIntegrationSettingActionResult.message}</p>
+			)}
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
-					name="repository"
+					name="repositoryFullName"
 					placeholder="Choose repository"
 					options={repositories.map((repository) => ({
 						value: repository.full_name,
 						label: repository.full_name,
 					}))}
+					defaultValue={setting?.repositoryFullName}
 				/>
 			</ContentPanelSection>
 
@@ -656,7 +663,7 @@ function GitHubIntegrationForm() {
 					<Label htmlFor="event">Event</Label>
 					<Select
 						name="event"
-						defaultValue={integration?.event}
+						defaultValue={setting?.event}
 						placeholder="Choose event"
 						options={integrationEventList.map((integrationEvent) => ({
 							value: integrationEvent.type,
@@ -691,12 +698,13 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionFormField>
 					<Label>Run flow</Label>
 					<Select
-						name="flow"
+						name="flowId"
 						placeholder="Choose next action"
 						options={graph.flows.map((flow) => ({
 							value: flow.id,
 							label: flow.name,
 						}))}
+						defaultValue={setting?.flowId}
 					/>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
@@ -752,6 +760,11 @@ function GitHubIntegrationForm() {
 								</div>
 							</Block>
 						))}
+						<input
+							type="hidden"
+							name="githubEventNodeMappings"
+							defaultValue={JSON.stringify(eventNodeMappings)}
+						/>
 					</div>
 				)}
 			</ContentPanelSection>
@@ -760,7 +773,7 @@ function GitHubIntegrationForm() {
 				<ContentPanelSectionFormField>
 					<Select
 						name="nextAction"
-						defaultValue={integration?.nextAction}
+						defaultValue={setting?.nextAction}
 						placeholder="Choose next action"
 						options={nextActionList.map((nextAction) => ({
 							value: nextAction.type,
@@ -769,6 +782,10 @@ function GitHubIntegrationForm() {
 					/>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
+			{setting?.id && <input type="hidden" name="id" value={setting.id} />}
+			<Button type="submit" disabled={upserting}>
+				Save
+			</Button>
 		</form>
 	);
 }
