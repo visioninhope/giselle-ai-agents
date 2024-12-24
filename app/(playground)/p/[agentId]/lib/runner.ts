@@ -315,6 +315,7 @@ export async function performFlowExecution({
 					...currentExecution,
 					artifacts: Array.from(artifactMap.values()),
 				};
+				onExecutionChange?.(currentExecution);
 			},
 			onStepFinish,
 			onStepFail,

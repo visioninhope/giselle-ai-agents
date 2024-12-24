@@ -459,26 +459,24 @@ export function ExecutionProvider({
 				execution.runStartedAt,
 			);
 			const flow = graph.flows.find((flow) => flow.id === execution.flowId);
-			if (flow === undefined) {
-				throw new Error("Flow not found");
-			}
-
-			const snapshot = createExecutionSnapshot({
-				...graph,
-				flow,
-				execution,
-			});
-			const { blobUrl } = await putExecutionAction(snapshot);
-			dispatch({
-				type: "addExecutionIndex",
-				input: {
-					executionIndex: {
-						executionId: execution.id,
-						blobUrl,
-						completedAt: endedAt,
+			if (flow !== undefined) {
+				const snapshot = createExecutionSnapshot({
+					...graph,
+					flow,
+					execution,
+				});
+				const { blobUrl } = await putExecutionAction(snapshot);
+				dispatch({
+					type: "addExecutionIndex",
+					input: {
+						executionIndex: {
+							executionId: execution.id,
+							blobUrl,
+							completedAt: endedAt,
+						},
 					},
-				},
-			});
+				});
+			}
 		},
 	});
 
@@ -757,29 +755,25 @@ export function ExecutionProvider({
 				artifacts: [],
 				runStartedAt: flowRunStartedAt,
 			};
-			setExecution(initialExecution);
-			const finalExecution = await _performFlowExecution({
+			await performFlowExecution({
 				initialExecution,
-				flow: tmpFlow,
-				nodes: graph.nodes,
-				connections: graph.connections,
-				executeStepCallback: (stepId) =>
-					executeNodeAction(executionId, node.id),
-				updateArtifactCallback: (artifactId, content) => {
+				executeStepFn: (stepId) => executeNodeAction(executionId, node.id),
+				onExecutionChange(execution) {
+					const targetArtifact = execution.artifacts.find(
+						(artifact) => artifact.creatorNodeId === node.id,
+					);
+					if (targetArtifact === undefined) {
+						return;
+					}
 					dispatch({
 						type: "upsertArtifact",
 						input: {
 							nodeId,
-							artifact: {
-								id: artifactId,
-								type: "streamArtifact",
-								creatorNodeId: nodeId,
-								object: content,
-							},
+							artifact: targetArtifact,
 						},
 					});
 				},
-				onStepFinish: (execution, artifact) => {
+				onStepFinish: (_, artifact) => {
 					dispatch({
 						type: "upsertArtifact",
 						input: {
@@ -788,20 +782,9 @@ export function ExecutionProvider({
 						},
 					});
 				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
-			setExecution(finalExecution);
 		},
-		[
-			setTab,
-			executeNodeAction,
-			graph.connections,
-			graph.nodes,
-			_performFlowExecution,
-			dispatch,
-			onFinishPerformExecutionAction,
-		],
+		[setTab, executeNodeAction, performFlowExecution, graph.nodes, dispatch],
 	);
 
 	return (
