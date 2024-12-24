@@ -677,13 +677,13 @@ function GitHubIntegrationForm() {
 							value={callSign}
 							onChange={(e) => setCallSign(e.target.value)}
 						/>
-						<span className="text-black-70 text-[12px]">
+						{/* <span className="text-black-70 text-[12px]">
 							You can call this agent by commenting{" "}
 							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
 								/giselle {callSign === "" ? "[call sign]" : callSign}
 							</span>{" "}
 							in the issue route06inc/giselle.
-						</span>
+						</span> */}
 					</ContentPanelSectionFormField>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
