@@ -2,6 +2,11 @@ import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/prev/beta-pro
 import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/prev/beta-proto/github-integration/types";
 import type { Graph } from "@/app/(playground)/p/[agentId]/prev/beta-proto/graph/types";
 import type {
+	FlowId,
+	GitHubEventNodeMapping,
+	GitHubIntegrationSettingId,
+} from "@/app/(playground)/p/[agentId]/types";
+import type {
 	FileId,
 	KnowledgeContentId,
 	KnowledgeContentType,
@@ -446,6 +451,9 @@ export const knowledgeContentOpenaiVectorStoreFileRepresentations = pgTable(
 	},
 );
 
+/**
+ * @deprecated Please use `githubIntegrationSettings` instead.
+ */
 export const gitHubIntegrations = pgTable(
 	"github_integrations",
 	{
@@ -465,6 +473,25 @@ export const gitHubIntegrations = pgTable(
 		return {
 			repositoryFullNameIdx: index().on(table.repositoryFullName),
 		};
+	},
+);
+
+export const githubIntegrationSettings = pgTable(
+	"github_integration_settings",
+	{
+		id: text("id").$type<GitHubIntegrationSettingId>().notNull().unique(),
+		agentDbId: integer("agent_db_id")
+			.notNull()
+			.references(() => agents.dbId),
+		dbId: serial("db_id").primaryKey(),
+		repositoryFullName: text("repository_full_name").notNull(),
+		callSign: text("call_sign").notNull(),
+		event: text("event").$type<GitHubTriggerEvent>().notNull(),
+		flowId: text("flow_id").$type<FlowId>().notNull(),
+		eventNodeMappings: jsonb("event_node_mappings")
+			.$type<GitHubEventNodeMapping[]>()
+			.notNull(),
+		nextAction: text("next_action").$type<GitHubNextAction>().notNull(),
 	},
 );
 
