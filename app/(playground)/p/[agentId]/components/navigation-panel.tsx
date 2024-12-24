@@ -601,12 +601,6 @@ const nextActionList = [
 		label: "Comment on trigger issue",
 	},
 ] as const;
-const mockEventDataList = [
-	{
-		type: "github.issue_comment.body",
-		label: "Body",
-	},
-];
 function GitHubIntegrationForm() {
 	const { setting, repositories, upsertGitHubIntegrationSettingAction } =
 		useGitHubIntegration();
