@@ -86,6 +86,25 @@ export async function POST(req: Request) {
 
 			case "invoice.created":
 				console.log(`🔔  Invoice created: ${event.data.object.id}`);
+
+				// TODO: Skip for now - will be handled when implementing subscription cancellation invoice processing
+				if (
+					event.data.object.subscription &&
+					typeof event.data.object.subscription === "string"
+				) {
+					const subscriptionId = event.data.object.subscription;
+					const subscription =
+						await stripe.subscriptions.retrieve(subscriptionId);
+
+					if (subscription.status === "canceled") {
+						console.log(
+							"Skipping processing for canceled subscription invoice: ",
+							subscriptionId,
+						);
+						break;
+					}
+				}
+
 				if (event.data.object.billing_reason === "subscription_cycle") {
 					await handleSubscriptionCycleInvoice(event.data.object);
 				}
