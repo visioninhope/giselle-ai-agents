@@ -358,3 +358,9 @@ export interface ExecutionIndex {
 	blobUrl: string;
 	completedAt: number;
 }
+
+export type GitHubIntegrationSettingId = `gthbs_${string}`;
+export interface GitHubEventNodeMapping {
+	event: string;
+	nodeId: NodeId;
+}
