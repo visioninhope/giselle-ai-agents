@@ -10,6 +10,11 @@ import {
 } from "react";
 import { deriveFlows } from "../lib/graph";
 import {
+	type PerformFlowExecutionOptions,
+	createExecutionSnapshot,
+	performFlowExecution as sharedPerformFlowExecution,
+} from "../lib/runner";
+import {
 	createArtifactId,
 	createExecutionId,
 	createExecutionSnapshotId,
@@ -46,7 +51,21 @@ import { usePlaygroundMode } from "./playground-mode";
 import { usePropertiesPanel } from "./properties-panel";
 import { useToast } from "./toast";
 
-export function createExecutionSnapshot({
+export function useExecutionRunner(
+	baseOptions?: Pick<
+		PerformFlowExecutionOptions,
+		"onFinish" | "onExecutionChange"
+	>,
+) {
+	const performFlowExecution = useCallback(
+		async (options: PerformFlowExecutionOptions) =>
+			sharedPerformFlowExecution({ ...baseOptions, ...options }),
+		[baseOptions],
+	);
+	return performFlowExecution;
+}
+
+export function _createExecutionSnapshot({
 	flow,
 	execution,
 	nodes,
@@ -431,6 +450,37 @@ export function ExecutionProvider({
 	const { addToast } = useToast();
 	const { setPlaygroundMode } = usePlaygroundMode();
 	const [execution, setExecution] = useState<Execution | null>(null);
+	const performFlowExecution = useExecutionRunner({
+		onExecutionChange: setExecution,
+		onFinish: async ({ endedAt, durationMs, execution }) => {
+			await onFinishPerformExecutionAction(
+				endedAt,
+				durationMs,
+				execution.runStartedAt,
+			);
+			const flow = graph.flows.find((flow) => flow.id === execution.flowId);
+			if (flow === undefined) {
+				throw new Error("Flow not found");
+			}
+
+			const snapshot = createExecutionSnapshot({
+				...graph,
+				flow,
+				execution,
+			});
+			const { blobUrl } = await putExecutionAction(snapshot);
+			dispatch({
+				type: "addExecutionIndex",
+				input: {
+					executionIndex: {
+						executionId: execution.id,
+						blobUrl,
+						completedAt: endedAt,
+					},
+				},
+			});
+		},
+	});
 
 	interface ExecuteFlowParams {
 		initialExecution: Execution;
@@ -453,7 +503,7 @@ export function ExecutionProvider({
 			durationMs: number,
 		) => Promise<void>;
 	}
-	const performFlowExecution = useCallback(
+	const _performFlowExecution = useCallback(
 		async ({
 			initialExecution,
 			flow,
@@ -538,7 +588,7 @@ export function ExecutionProvider({
 			}
 
 			// Create and store execution snapshot
-			const executionSnapshot = createExecutionSnapshot({
+			const executionSnapshot = _createExecutionSnapshot({
 				flow,
 				execution: currentExecution,
 				nodes,
@@ -587,30 +637,17 @@ export function ExecutionProvider({
 
 			const finalExecution = await performFlowExecution({
 				initialExecution,
-				flow,
-				nodes: graph.nodes,
-				connections: graph.connections,
-				executeStepCallback: (stepId) =>
+				executeStepFn: (stepId) =>
 					executeStepAction(
 						flowId,
 						executionId,
 						stepId,
 						initialExecution.artifacts,
 					),
-				updateArtifactCallback: (artifactId, content) => {
-					setExecution((prev) => {
-						if (!prev || prev.status !== "running") return null;
-						return {
-							...prev,
-							artifacts: prev.artifacts.map((artifact) =>
-								artifact.id === artifactId
-									? { ...artifact, object: content }
-									: artifact,
-							),
-						};
-					});
+				onExecutionChange: (changedExecution) => {
+					setExecution(changedExecution);
 				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
+				onFinish: ({ endedAt, durationMs }) =>
 					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
 			setExecution(finalExecution);
@@ -653,7 +690,7 @@ export function ExecutionProvider({
 				status: "running",
 				runStartedAt: flowRunStartedAt,
 			};
-			const finalExecution = await performFlowExecution({
+			const finalExecution = await _performFlowExecution({
 				initialExecution,
 				flow: retryExecutionSnapshot.flow,
 				nodes: retryExecutionSnapshot.nodes,
@@ -687,7 +724,7 @@ export function ExecutionProvider({
 			graph.executionIndexes,
 			flush,
 			retryStepAction,
-			performFlowExecution,
+			_performFlowExecution,
 			onFinishPerformExecutionAction,
 		],
 	);
@@ -721,7 +758,7 @@ export function ExecutionProvider({
 				runStartedAt: flowRunStartedAt,
 			};
 			setExecution(initialExecution);
-			const finalExecution = await performFlowExecution({
+			const finalExecution = await _performFlowExecution({
 				initialExecution,
 				flow: tmpFlow,
 				nodes: graph.nodes,
@@ -761,7 +798,7 @@ export function ExecutionProvider({
 			executeNodeAction,
 			graph.connections,
 			graph.nodes,
-			performFlowExecution,
+			_performFlowExecution,
 			dispatch,
 			onFinishPerformExecutionAction,
 		],
