@@ -1,6 +1,6 @@
 "use client";
 
-import { type StreamableValue, readStreamableValue } from "ai/rsc";
+import type { StreamableValue } from "ai/rsc";
 import {
 	type ReactNode,
 	createContext,
@@ -15,35 +15,20 @@ import {
 	performFlowExecution as sharedPerformFlowExecution,
 } from "../lib/runner";
 import {
-	createArtifactId,
 	createExecutionId,
-	createExecutionSnapshotId,
 	createJobExecutionId,
 	createStepExecutionId,
-	toErrorWithMessage,
 } from "../lib/utils";
 import type {
 	Artifact,
-	ArtifactId,
-	CompletedExecution,
-	CompletedJobExecution,
-	CompletedStepExecution,
-	Connection,
 	Execution,
 	ExecutionId,
 	ExecutionSnapshot,
-	FailedExecution,
-	FailedJobExecution,
-	FailedStepExecution,
 	Flow,
 	FlowId,
 	JobExecution,
-	Node,
 	NodeId,
-	SkippedJobExecution,
-	StepExecution,
 	StepId,
-	TextArtifact,
 	TextArtifactObject,
 } from "../types";
 import { useGraph } from "./graph";
@@ -63,26 +48,6 @@ export function useExecutionRunner(
 		[baseOptions],
 	);
 	return performFlowExecution;
-}
-
-export function _createExecutionSnapshot({
-	flow,
-	execution,
-	nodes,
-	connections,
-}: {
-	flow: Flow;
-	execution: Execution;
-	nodes: Node[];
-	connections: Connection[];
-}) {
-	return {
-		id: createExecutionSnapshotId(),
-		execution,
-		nodes,
-		connections,
-		flow,
-	} as ExecutionSnapshot;
 }
 
 function buildJobExecutionsFromSnapshot(
@@ -136,255 +101,6 @@ const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
 			status: "pending",
 		})),
 	}));
-};
-
-const processStreamContent = async (
-	stream: StreamableValue<TextArtifactObject, unknown>,
-	updateArtifact: (content: TextArtifactObject) => void,
-): Promise<TextArtifactObject> => {
-	let textArtifactObject: TextArtifactObject = {
-		type: "text",
-		title: "",
-		content: "",
-		messages: { plan: "", description: "" },
-	};
-
-	for await (const streamContent of readStreamableValue(stream)) {
-		if (streamContent === undefined) continue;
-		textArtifactObject = { ...textArtifactObject, ...streamContent };
-		updateArtifact(textArtifactObject);
-	}
-
-	return textArtifactObject;
-};
-
-const executeStep = async ({
-	stepExecution,
-	executeStepAction,
-	updateExecution,
-	updateArtifact,
-	onStepFinish,
-	onStepFail,
-}: {
-	stepExecution: StepExecution;
-	executeStepAction: (
-		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-	updateExecution: (
-		updater: (prev: Execution | null) => Execution | null,
-	) => void;
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
-	onStepFinish?: (
-		stepExecution: CompletedStepExecution,
-		artifact: TextArtifact,
-	) => void;
-	onStepFail?: (stepExecution: FailedStepExecution) => void;
-}): Promise<CompletedStepExecution | FailedStepExecution> => {
-	if (stepExecution.status === "completed") {
-		return stepExecution;
-	}
-	const stepRunStartedAt = Date.now();
-	const artifactId = createArtifactId();
-
-	// Initialize step execution
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((prevJob) => ({
-				...prevJob,
-				stepExecutions: prevJob.stepExecutions.map((prevStep) =>
-					prevStep.id === stepExecution.id
-						? { ...prevStep, status: "running", runStartedAt: stepRunStartedAt }
-						: prevStep,
-				),
-			})),
-			artifacts: [
-				...prev.artifacts,
-				{
-					id: artifactId,
-					type: "streamArtifact",
-					creatorNodeId: stepExecution.nodeId,
-					object: {
-						type: "text",
-						title: "",
-						content: "",
-						messages: { plan: "", description: "" },
-					},
-				},
-			],
-		};
-	});
-
-	try {
-		// Execute step and process stream
-		const stream = await executeStepAction(stepExecution.stepId);
-		const finalArtifact = await processStreamContent(stream, (content) =>
-			updateArtifact(artifactId, content),
-		);
-
-		// Complete step execution
-		const stepDurationMs = Date.now() - stepRunStartedAt;
-
-		const completedStepExecution: CompletedStepExecution = {
-			...stepExecution,
-			status: "completed",
-			runStartedAt: stepRunStartedAt,
-			durationMs: stepDurationMs,
-		};
-		const generatedArtifact = {
-			id: artifactId,
-			type: "generatedArtifact",
-			creatorNodeId: stepExecution.nodeId,
-			createdAt: Date.now(),
-			object: finalArtifact,
-		} satisfies TextArtifact;
-		updateExecution((prev) => {
-			if (!prev || prev.status !== "running") return null;
-
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) => ({
-					...job,
-					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? completedStepExecution : step,
-					),
-				})),
-				artifacts: prev.artifacts.map((artifact) =>
-					artifact.id === artifactId ? generatedArtifact : artifact,
-				),
-			};
-		});
-		onStepFinish?.(completedStepExecution, generatedArtifact);
-		return completedStepExecution;
-	} catch (unknownError) {
-		const error = toErrorWithMessage(unknownError).message;
-		const stepDurationMs = Date.now() - stepRunStartedAt;
-		const failedStepExecution: FailedStepExecution = {
-			...stepExecution,
-			status: "failed",
-			runStartedAt: stepRunStartedAt,
-			durationMs: stepDurationMs,
-			error,
-		};
-		updateExecution((prev) => {
-			if (!prev || prev.status !== "running") return null;
-
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) => ({
-					...job,
-					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? failedStepExecution : step,
-					),
-				})),
-				artifacts: prev.artifacts.filter(
-					(prevArtifact) => prevArtifact.creatorNodeId !== stepExecution.nodeId,
-				),
-			};
-		});
-		onStepFail?.(failedStepExecution);
-		return failedStepExecution;
-	}
-};
-
-const executeJob = async ({
-	jobExecution,
-	executeStepAction,
-	updateArtifact,
-	updateExecution,
-	onStepFinish,
-	onStepFail,
-}: {
-	jobExecution: JobExecution;
-	executeStepAction: (
-		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-	updateExecution: (
-		updater: (prev: Execution | null) => Execution | null,
-	) => void;
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
-	onStepFinish?: (
-		stepExecution: CompletedStepExecution,
-		artifact: TextArtifact,
-	) => void;
-	onStepFail?: (stepExecution: FailedStepExecution) => void;
-}): Promise<CompletedJobExecution | FailedJobExecution> => {
-	const jobRunStartedAt = Date.now();
-
-	// Start job execution
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((job) =>
-				job.id === jobExecution.id
-					? { ...job, status: "running", runStartedAt: jobRunStartedAt }
-					: job,
-			),
-		};
-	});
-
-	// Execute all steps in parallel
-	const stepExecutions = await Promise.all(
-		jobExecution.stepExecutions.map((stepExecution) =>
-			executeStep({
-				stepExecution,
-				executeStepAction,
-				updateExecution,
-				updateArtifact,
-				onStepFinish,
-				onStepFail,
-			}),
-		),
-	);
-
-	const jobDurationMs = stepExecutions.reduce(
-		(sum, duration) => sum + duration.durationMs,
-		0,
-	);
-	const allStepsCompleted = stepExecutions.every(
-		(step) => step.status === "completed",
-	);
-
-	if (allStepsCompleted) {
-		// Complete job execution
-		const completedJobExecution: CompletedJobExecution = {
-			...jobExecution,
-			stepExecutions,
-			status: "completed",
-			runStartedAt: jobRunStartedAt,
-			durationMs: jobDurationMs,
-		};
-		updateExecution((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) =>
-					job.id === jobExecution.id ? completedJobExecution : job,
-				),
-			};
-		});
-		return completedJobExecution;
-	}
-
-	const failedJobExecution: FailedJobExecution = {
-		...jobExecution,
-		stepExecutions,
-		status: "failed",
-		runStartedAt: jobRunStartedAt,
-		durationMs: jobDurationMs,
-	};
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((job) =>
-				job.id === jobExecution.id ? failedJobExecution : job,
-			),
-		};
-	});
-	return failedJobExecution;
 };
 
 interface ExecutionContextType {
