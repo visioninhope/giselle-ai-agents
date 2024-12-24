@@ -54,7 +54,7 @@ import { useToast } from "./toast";
 export function useExecutionRunner(
 	baseOptions?: Pick<
 		PerformFlowExecutionOptions,
-		"onFinish" | "onExecutionChange"
+		"onFinish" | "onExecutionChange" | "onStepFail"
 	>,
 ) {
 	const performFlowExecution = useCallback(
@@ -452,6 +452,12 @@ export function ExecutionProvider({
 	const [execution, setExecution] = useState<Execution | null>(null);
 	const performFlowExecution = useExecutionRunner({
 		onExecutionChange: setExecution,
+		onStepFail: (stepExecution) => {
+			addToast({
+				type: "error",
+				message: stepExecution.error,
+			});
+		},
 		onFinish: async ({ endedAt, durationMs, execution }) => {
 			await onFinishPerformExecutionAction(
 				endedAt,
@@ -479,137 +485,6 @@ export function ExecutionProvider({
 			}
 		},
 	});
-
-	interface ExecuteFlowParams {
-		initialExecution: Execution;
-		flow: Flow;
-		nodes: Node[];
-		connections: Connection[];
-		executeStepCallback: (
-			stepId: StepId,
-		) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-		updateArtifactCallback: (
-			artifactId: ArtifactId,
-			content: TextArtifactObject,
-		) => void;
-		onStepFinish?: (
-			stepExecution: CompletedStepExecution,
-			artifact: TextArtifact,
-		) => void;
-		onFinishPerformExecution?: (
-			endedAt: number,
-			durationMs: number,
-		) => Promise<void>;
-	}
-	const _performFlowExecution = useCallback(
-		async ({
-			initialExecution,
-			flow,
-			nodes,
-			connections,
-			executeStepCallback,
-			updateArtifactCallback,
-			onStepFinish,
-			onFinishPerformExecution,
-		}: ExecuteFlowParams) => {
-			let currentExecution = initialExecution;
-			let totalFlowDurationMs = 0;
-			let hasFailed = false;
-
-			// Execute jobs sequentially
-			for (const jobExecution of currentExecution.jobExecutions) {
-				if (hasFailed) {
-					const skippedJob: SkippedJobExecution = {
-						...jobExecution,
-						status: "skipped",
-						stepExecutions: jobExecution.stepExecutions.map((step) => ({
-							...step,
-							status: "skipped",
-						})),
-					};
-					currentExecution = {
-						...currentExecution,
-						jobExecutions: currentExecution.jobExecutions.map((job) =>
-							job.id === jobExecution.id ? skippedJob : job,
-						),
-					};
-					setExecution(currentExecution);
-					continue;
-				}
-
-				// Skip completed jobs for retry flows
-				if (jobExecution.status === "completed") {
-					continue;
-				}
-
-				const executedJob = await executeJob({
-					jobExecution,
-					executeStepAction: executeStepCallback,
-					updateExecution: (updater) => {
-						const updated = updater(currentExecution);
-						if (updated) {
-							currentExecution = updated;
-							setExecution(updated);
-						}
-					},
-					updateArtifact: updateArtifactCallback,
-					onStepFinish,
-					onStepFail: (failedStep) => {
-						addToast({
-							type: "error",
-							message: failedStep.error,
-						});
-					},
-				});
-
-				totalFlowDurationMs += executedJob.durationMs;
-				if (executedJob.status === "failed") {
-					hasFailed = true;
-				}
-			}
-
-			// Update final execution state
-			if (hasFailed) {
-				currentExecution = {
-					...currentExecution,
-					status: "failed",
-					durationMs: totalFlowDurationMs,
-				} as FailedExecution;
-			} else {
-				currentExecution = {
-					...currentExecution,
-					status: "completed",
-					durationMs: totalFlowDurationMs,
-					resultArtifact:
-						currentExecution.artifacts[currentExecution.artifacts.length - 1],
-				} as CompletedExecution;
-			}
-
-			// Create and store execution snapshot
-			const executionSnapshot = _createExecutionSnapshot({
-				flow,
-				execution: currentExecution,
-				nodes,
-				connections,
-			});
-
-			const { blobUrl } = await putExecutionAction(executionSnapshot);
-			const runEndedAt = Date.now();
-			dispatch({
-				type: "addExecutionIndex",
-				input: {
-					executionIndex: {
-						executionId: currentExecution.id,
-						blobUrl,
-						completedAt: runEndedAt,
-					},
-				},
-			});
-			await onFinishPerformExecution?.(runEndedAt, totalFlowDurationMs);
-			return currentExecution;
-		},
-		[dispatch, putExecutionAction, addToast],
-	);
 
 	const executeFlow = useCallback(
 		async (flowId: FlowId) => {
@@ -642,22 +517,10 @@ export function ExecutionProvider({
 						stepId,
 						initialExecution.artifacts,
 					),
-				onExecutionChange: (changedExecution) => {
-					setExecution(changedExecution);
-				},
-				onFinish: ({ endedAt, durationMs }) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
 			setExecution(finalExecution);
 		},
-		[
-			setPlaygroundMode,
-			executeStepAction,
-			flush,
-			graph,
-			performFlowExecution,
-			onFinishPerformExecutionAction,
-		],
+		[setPlaygroundMode, executeStepAction, flush, graph, performFlowExecution],
 	);
 
 	const retryFlowExecution = useCallback(
@@ -688,43 +551,19 @@ export function ExecutionProvider({
 				status: "running",
 				runStartedAt: flowRunStartedAt,
 			};
-			const finalExecution = await _performFlowExecution({
+			const finalExecution = await performFlowExecution({
 				initialExecution,
-				flow: retryExecutionSnapshot.flow,
-				nodes: retryExecutionSnapshot.nodes,
-				connections: retryExecutionSnapshot.connections,
-				executeStepCallback: (stepId) =>
+				executeStepFn: (stepId) =>
 					retryStepAction(
 						executionIndex.blobUrl,
 						initialExecution.id,
 						stepId,
 						initialExecution.artifacts,
 					),
-				updateArtifactCallback: (artifactId, content) => {
-					setExecution((prev) => {
-						if (!prev || prev.status !== "running") return null;
-						return {
-							...prev,
-							artifacts: prev.artifacts.map((artifact) =>
-								artifact.id === artifactId
-									? { ...artifact, object: content }
-									: artifact,
-							),
-						};
-					});
-				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
 			setExecution(finalExecution);
 		},
-		[
-			graph.executionIndexes,
-			flush,
-			retryStepAction,
-			_performFlowExecution,
-			onFinishPerformExecutionAction,
-		],
+		[graph.executionIndexes, flush, retryStepAction, performFlowExecution],
 	);
 
 	const executeNode = useCallback(
