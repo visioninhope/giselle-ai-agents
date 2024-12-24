@@ -17,9 +17,9 @@ export async function POST(request: NextRequest) {
 	const signature = request.headers.get("X-Hub-Signature-256") ?? "";
 	const body = await request.text();
 	const verifyOK = await webhooks.verify(body, signature);
-	// if (!verifyOK) {
-	// 	return new Response("Failed to verify webhook", { status: 400 });
-	// }
+	if (!verifyOK) {
+		return new Response("Failed to verify webhook", { status: 400 });
+	}
 
 	const id = request.headers.get("X-GitHub-Delivery") ?? "";
 	const name = request.headers.get("X-GitHub-Event") as WebhookEventName;
