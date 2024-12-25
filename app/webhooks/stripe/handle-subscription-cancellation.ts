@@ -1,11 +1,11 @@
 import { db } from "@/drizzle/db";
 import { subscriptions, teamMemberships } from "@/drizzle/schema";
 import { and, eq, ne } from "drizzle-orm";
-import { stripe } from "../config";
+import type Stripe from "stripe";
 
-export async function handleSubscriptionCancellation(subscriptionId: string) {
-	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
-
+export async function handleSubscriptionCancellation(
+	subscription: Stripe.Subscription,
+) {
 	if (subscription.status !== "canceled") {
 		return;
 	}
@@ -14,12 +14,12 @@ export async function handleSubscriptionCancellation(subscriptionId: string) {
 	const [sub] = await db
 		.select({ teamDbId: subscriptions.teamDbId })
 		.from(subscriptions)
-		.where(eq(subscriptions.id, subscriptionId))
+		.where(eq(subscriptions.id, subscription.id))
 		.limit(1);
 
 	if (!sub) {
 		throw new Error(
-			`Subscription record not found in database: ${subscriptionId}`,
+			`Subscription record not found in database: ${subscription.id}`,
 		);
 	}
 
