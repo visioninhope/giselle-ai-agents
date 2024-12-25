@@ -1,5 +1,7 @@
 import { agents, db } from "@/drizzle";
+import { waitForTelemetryExport } from "@/lib/opentelemetry";
 import { fetchCurrentTeam } from "@/services/teams";
+import { metrics } from "@opentelemetry/api";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
@@ -15,14 +17,40 @@ function DataList({ label, children }: { label: string; children: ReactNode }) {
 }
 
 async function AgentList() {
+	const meter = metrics.getMeter("monitor-db-response");
+	const dbResponseTimeHistogram = meter.createHistogram("db_response_time_ms", {
+		description: "The response time of the database in milliseconds",
+	});
 	setInterval(async () => {
-		await db
-			.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
-			.from(agents)
-			.where(
-				and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.graphUrl)),
-			);
-		console.log("--- response from DB obtained");
+		const startTime = Date.now();
+		try {
+			await db
+				.select({
+					id: agents.id,
+					name: agents.name,
+					updatedAt: agents.updatedAt,
+				})
+				.from(agents)
+				.where(
+					and(
+						eq(agents.teamDbId, currentTeam.dbId),
+						isNotNull(agents.graphUrl),
+					),
+				);
+
+			console.log("--- response from DB obtained");
+		} catch (error) {
+			console.error("Error querying database:", error);
+		} finally {
+			const endTime = Date.now();
+			const responseTime = endTime - startTime;
+
+			dbResponseTimeHistogram.record(responseTime, {
+				environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
+			});
+
+			console.log(`DB response time recorded: ${responseTime} ms`);
+		}
 	}, 10000);
 	const currentTeam = await fetchCurrentTeam();
 	const dbAgents = await db
