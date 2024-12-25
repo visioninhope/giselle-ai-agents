@@ -93,12 +93,6 @@ export default async function Page({
 		const startTime = Date.now();
 		const logger = createLogger("persistGraph");
 		const { url } = await putGraph(graph);
-		await db
-			.update(agents)
-			.set({
-				graphUrl: url,
-			})
-			.where(eq(agents.id, agentId));
 		const { blobList } = await withCountMeasurement(
 			logger,
 			async () => {
@@ -123,6 +117,14 @@ export default async function Page({
 				url: blob.url,
 				size: blob.size,
 			}));
+
+		await db
+			.update(agents)
+			.set({
+				graphUrl: url,
+			})
+			.where(eq(agents.id, agentId));
+
 		if (oldBlobs.length > 0) {
 			await withCountMeasurement(
 				logger,
