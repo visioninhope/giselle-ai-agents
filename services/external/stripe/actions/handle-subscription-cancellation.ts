@@ -18,7 +18,9 @@ export async function handleSubscriptionCancellation(subscriptionId: string) {
 		.limit(1);
 
 	if (!sub) {
-		return;
+		throw new Error(
+			`Subscription record not found in database: ${subscriptionId}`,
+		);
 	}
 
 	// Get the earliest admin's membership ID
@@ -35,7 +37,7 @@ export async function handleSubscriptionCancellation(subscriptionId: string) {
 		.limit(1);
 
 	if (!earliestAdmin) {
-		return;
+		throw new Error(`No admin found for team (id: ${sub.teamDbId})`);
 	}
 
 	// Delete all team memberships except the earliest admin
