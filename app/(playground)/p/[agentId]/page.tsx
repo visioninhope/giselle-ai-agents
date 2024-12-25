@@ -166,7 +166,14 @@ export default async function Page({
 		artifacts: Artifact[],
 	) {
 		"use server";
-		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
+		return await executeStep({
+			agentId,
+			flowId,
+			executionId,
+			stepId,
+			artifacts,
+			stream: true,
+		});
 	}
 	async function putExecutionAction(executionSnapshot: ExecutionSnapshot) {
 		"use server";

@@ -411,13 +411,22 @@ async function performFlowExecution(
 	}
 }
 
-export async function executeStep(
-	agentId: AgentId,
-	flowId: FlowId,
-	executionId: ExecutionId,
-	stepId: StepId,
-	artifacts: Artifact[],
-) {
+interface ExecuteStepOptions {
+	agentId: AgentId;
+	flowId: FlowId;
+	executionId: ExecutionId;
+	stepId: StepId;
+	artifacts: Artifact[];
+	stream?: boolean;
+}
+export async function executeStep({
+	agentId,
+	flowId,
+	executionId,
+	stepId,
+	artifacts,
+	stream,
+}: ExecuteStepOptions) {
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, agentId),
 	});
@@ -454,6 +463,7 @@ export async function executeStep(
 		artifacts,
 		nodes: graph.nodes,
 		connections: graph.connections,
+		stream,
 	};
 
 	return performFlowExecution(context);
