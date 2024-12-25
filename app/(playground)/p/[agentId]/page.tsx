@@ -118,13 +118,6 @@ export default async function Page({
 				size: blob.size,
 			}));
 
-		await db
-			.update(agents)
-			.set({
-				graphUrl: url,
-			})
-			.where(eq(agents.id, agentId));
-
 		if (oldBlobs.length > 0) {
 			await withCountMeasurement(
 				logger,
@@ -141,6 +134,14 @@ export default async function Page({
 			);
 			waitForTelemetryExport();
 		}
+
+		await db
+			.update(agents)
+			.set({
+				graphUrl: url,
+			})
+			.where(eq(agents.id, agentId));
+
 		return url;
 	}
 
