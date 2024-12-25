@@ -1,6 +1,6 @@
 "use client";
 
-import type { StreamableValue } from "ai/rsc";
+import { readStreamableValue } from "ai/rsc";
 import {
 	type ReactNode,
 	createContext,
@@ -16,15 +16,15 @@ import {
 } from "../lib/runner";
 import {
 	createExecutionId,
-	createJobExecutionId,
-	createStepExecutionId,
+	createInitialJobExecutions,
+	isStreamableValue,
 } from "../lib/utils";
 import type {
 	Artifact,
+	ExecuteActionReturnValue,
 	Execution,
 	ExecutionId,
 	ExecutionSnapshot,
-	Flow,
 	FlowId,
 	JobExecution,
 	NodeId,
@@ -39,7 +39,7 @@ import { useToast } from "./toast";
 export function useExecutionRunner(
 	baseOptions?: Pick<
 		PerformFlowExecutionOptions,
-		"onFinish" | "onExecutionChange" | "onStepFail"
+		"onFinish" | "onExecutionChange" | "onStepFail" | "stepResultAdapter"
 	>,
 ) {
 	const performFlowExecution = useCallback(
@@ -88,21 +88,6 @@ function buildArtifactsFromSnapshot(
 	);
 }
 
-// Helper functions for execution state management
-const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
-	return flow.jobs.map((job) => ({
-		id: createJobExecutionId(),
-		jobId: job.id,
-		status: "pending",
-		stepExecutions: job.steps.map((step) => ({
-			id: createStepExecutionId(),
-			stepId: step.id,
-			nodeId: step.nodeId,
-			status: "pending",
-		})),
-	}));
-};
-
 interface ExecutionContextType {
 	execution: Execution | null;
 	executeNode: (nodeId: NodeId) => Promise<void>;
@@ -127,14 +112,14 @@ type ExecuteStepAction = (
 	executionId: ExecutionId,
 	stepId: StepId,
 	artifacts: Artifact[],
-) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+) => Promise<ExecuteActionReturnValue>;
 
 type RetryStepAction = (
 	retryExecutionSnapshotUrl: string,
 	executionId: ExecutionId,
 	stepId: StepId,
 	artifacts: Artifact[],
-) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+) => Promise<ExecuteActionReturnValue>;
 interface ExecutionProviderProps {
 	children: ReactNode;
 	executeStepAction: ExecuteStepAction;
@@ -145,7 +130,7 @@ interface ExecutionProviderProps {
 	executeNodeAction: (
 		executionId: ExecutionId,
 		nodeId: NodeId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+	) => Promise<ExecuteActionReturnValue>;
 	onFinishPerformExecutionAction: (
 		startedAt: number,
 		endedAt: number,
@@ -167,6 +152,24 @@ export function ExecutionProvider({
 	const { setPlaygroundMode } = usePlaygroundMode();
 	const [execution, setExecution] = useState<Execution | null>(null);
 	const performFlowExecution = useExecutionRunner({
+		stepResultAdapter: async (result, updateArtifact) => {
+			let textArtifactObject: TextArtifactObject = {
+				type: "text",
+				title: "",
+				content: "",
+				messages: { plan: "", description: "" },
+			};
+			if (isStreamableValue(result)) {
+				for await (const streamContent of readStreamableValue(result)) {
+					if (streamContent === undefined) continue;
+					textArtifactObject = { ...textArtifactObject, ...streamContent };
+					updateArtifact?.(textArtifactObject);
+				}
+			} else {
+				textArtifactObject = result;
+			}
+			return textArtifactObject;
+		},
 		onExecutionChange: setExecution,
 		onStepFail: (stepExecution) => {
 			addToast({

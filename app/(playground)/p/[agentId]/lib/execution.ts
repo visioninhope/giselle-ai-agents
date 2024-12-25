@@ -12,7 +12,13 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { toJsonSchema } from "@valibot/to-json-schema";
-import { type LanguageModelV1, jsonSchema, streamObject } from "ai";
+import { waitUntil } from "@vercel/functions";
+import {
+	type LanguageModelV1,
+	generateObject,
+	jsonSchema,
+	streamObject,
+} from "ai";
 import { createStreamableValue } from "ai/rsc";
 import { MockLanguageModelV1, simulateReadableStream } from "ai/test";
 import { and, eq } from "drizzle-orm";
@@ -23,6 +29,7 @@ import type {
 	AgentId,
 	Artifact,
 	Connection,
+	ExecuteActionReturnValue,
 	ExecutionId,
 	ExecutionSnapshot,
 	FlowId,
@@ -267,9 +274,12 @@ interface ExecutionContext {
 	artifacts: Artifact[];
 	nodes: Node[];
 	connections: Connection[];
+	stream?: boolean;
 }
 
-async function performFlowExecution(context: ExecutionContext) {
+async function performFlowExecution(
+	context: ExecutionContext,
+): Promise<ExecuteActionReturnValue> {
 	const canPerform = await canPerformFlowExecution(context.agentId);
 	if (!canPerform) {
 		throw new AgentTimeNotAvailableError();
@@ -299,7 +309,6 @@ async function performFlowExecution(context: ExecutionContext) {
 			});
 			const topP = node.content.topP;
 			const temperature = node.content.temperature;
-			const stream = createStreamableValue<TextArtifactObject>();
 
 			trace.update({
 				input: prompt,
@@ -315,52 +324,87 @@ async function performFlowExecution(context: ExecutionContext) {
 				},
 			});
 
-			(async () => {
-				const { partialObjectStream, object, usage } = streamObject({
-					model,
-					prompt,
-					schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
-						toJsonSchema(artifactSchema),
-					),
-					topP,
-					temperature,
+			if (context.stream) {
+				const streamableValue = createStreamableValue<TextArtifactObject>();
+				(async () => {
+					const { partialObjectStream, object, usage } = streamObject({
+						model,
+						prompt,
+						schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
+							toJsonSchema(artifactSchema),
+						),
+						topP,
+						temperature,
+					});
+
+					for await (const partialObject of partialObjectStream) {
+						streamableValue.update({
+							type: "text",
+							title: partialObject.title ?? "",
+							content: partialObject.content ?? "",
+							messages: {
+								plan: partialObject.plan ?? "",
+								description: partialObject.description ?? "",
+							},
+						});
+					}
+
+					const result = await object;
+					await withTokenMeasurement(
+						createLogger(node.content.type),
+						async () => {
+							generationTracer.end({ output: result });
+							trace.update({ output: result });
+							await lf.shutdownAsync();
+							waitForTelemetryExport();
+							return { usage: await usage };
+						},
+						model,
+						startTime,
+					);
+					streamableValue.done();
+				})().catch((error) => {
+					generationTracer.update({
+						level: "ERROR",
+						statusMessage: toErrorWithMessage(error).message,
+					});
+					streamableValue.error(error);
 				});
 
-				for await (const partialObject of partialObjectStream) {
-					stream.update({
-						type: "text",
-						title: partialObject.title ?? "",
-						content: partialObject.content ?? "",
-						messages: {
-							plan: partialObject.plan ?? "",
-							description: partialObject.description ?? "",
-						},
-					});
-				}
-
-				const result = await object;
-				await withTokenMeasurement(
+				return streamableValue.value;
+			}
+			const { usage, object } = await generateObject({
+				model,
+				prompt,
+				schema: jsonSchema<v.InferInput<typeof artifactSchema>>(
+					toJsonSchema(artifactSchema),
+				),
+				topP,
+				temperature,
+			});
+			waitUntil(
+				withTokenMeasurement(
 					createLogger(node.content.type),
 					async () => {
-						generationTracer.end({ output: result });
-						trace.update({ output: result });
+						generationTracer.end({ output: object });
+						trace.update({ output: object });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
-						return { usage: await usage };
+						return { usage };
 					},
 					model,
 					startTime,
-				);
-				stream.done();
-			})().catch((error) => {
-				generationTracer.update({
-					level: "ERROR",
-					statusMessage: toErrorWithMessage(error).message,
-				});
-				stream.error(error);
-			});
-
-			return stream.value;
+				),
+			);
+			return {
+				type: "text",
+				title: object.title,
+				content: object.content,
+				messages: {
+					plan: object.plan,
+					description: object.description,
+				},
+			} satisfies TextArtifactObject;
 		}
 		default:
 			throw new Error("Invalid node type");

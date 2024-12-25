@@ -22,14 +22,11 @@ import type {
 import {
 	createArtifactId,
 	createExecutionSnapshotId,
+	isStreamableValue,
 	toErrorWithMessage,
 } from "./utils";
 
 type OnArtifactChange = (artifact: Artifact) => void;
-
-type ExecuteStepFn = (
-	stepId: StepId,
-) => Promise<StreamableValue<TextArtifactObject, unknown>>;
 
 type OnExecutionChange = (execution: Execution) => void;
 type OnJobExecutionChange = (jobExecution: JobExecution) => void;
@@ -46,24 +43,29 @@ type OnPerformExecutionFinish = (payload: {
 	execution: CompletedExecution | FailedExecution;
 }) => Promise<void>;
 
-const processStreamContent = async (
-	stream: StreamableValue<TextArtifactObject, unknown>,
-	updateArtifact: (content: TextArtifactObject) => void,
-): Promise<TextArtifactObject> => {
-	let textArtifactObject: TextArtifactObject = {
+type StepResult = StreamableValue<TextArtifactObject> | TextArtifactObject;
+type ExecuteStepFn = (stepId: StepId) => Promise<StepResult>;
+type StepResultAdapter = (
+	result: StepResult,
+	updateArtifact?: (content: TextArtifactObject) => void,
+) => Promise<TextArtifactObject>;
+
+const defaultStepResultAdapter: StepResultAdapter = async (
+	result,
+	updateArtifact,
+) => {
+	const textArtifactObject: TextArtifactObject = {
 		type: "text",
 		title: "",
 		content: "",
 		messages: { plan: "", description: "" },
 	};
 
-	for await (const streamContent of readStreamableValue(stream)) {
-		if (streamContent === undefined) continue;
-		textArtifactObject = { ...textArtifactObject, ...streamContent };
-		updateArtifact(textArtifactObject);
+	if (isStreamableValue(result)) {
+		return textArtifactObject;
 	}
 
-	return textArtifactObject;
+	return result;
 };
 
 export function createExecutionSnapshot({
@@ -88,6 +90,7 @@ export function createExecutionSnapshot({
 
 interface ExecuteStepOptions {
 	stepExecution: StepExecution;
+	stepResultAdapter?: StepResultAdapter;
 	executeStepFn: ExecuteStepFn;
 	onStepExecutionChange?: OnStepExecutionChange;
 	onArtifactChange?: OnArtifactChange;
@@ -97,6 +100,7 @@ interface ExecuteStepOptions {
 async function executeStep({
 	stepExecution,
 	executeStepFn,
+	stepResultAdapter = defaultStepResultAdapter,
 	onStepExecutionChange,
 	onArtifactChange,
 	onStepFinish,
@@ -127,7 +131,7 @@ async function executeStep({
 	try {
 		// Execute step and process stream
 		const stream = await executeStepFn(stepExecution.stepId);
-		const finalArtifact = await processStreamContent(stream, (content) =>
+		const finalArtifact = await stepResultAdapter(stream, (content) =>
 			onArtifactChange?.({
 				id: artifactId,
 				type: "streamArtifact",
@@ -170,6 +174,7 @@ async function executeStep({
 
 interface ExcuteJobOptions {
 	jobExecution: JobExecution;
+	stepResultAdapter?: StepResultAdapter;
 	executeStepFn: ExecuteStepFn;
 	onJobExecutionChange?: OnJobExecutionChange;
 	onArtifactChange?: OnArtifactChange;
@@ -179,6 +184,7 @@ interface ExcuteJobOptions {
 async function executeJob({
 	jobExecution,
 	executeStepFn,
+	stepResultAdapter,
 	onArtifactChange,
 	onJobExecutionChange,
 	onStepFinish,
@@ -199,6 +205,7 @@ async function executeJob({
 			executeStep({
 				stepExecution,
 				executeStepFn,
+				stepResultAdapter,
 				onArtifactChange,
 				onStepFinish,
 				onStepFail,
@@ -252,6 +259,7 @@ async function executeJob({
 export interface PerformFlowExecutionOptions {
 	initialExecution: Execution;
 	executeStepFn: ExecuteStepFn;
+	stepResultAdapter?: StepResultAdapter;
 	onExecutionChange?: OnExecutionChange;
 	onStepFinish?: OnStepFinish;
 	onStepFail?: OnStepFail;
@@ -261,6 +269,7 @@ export async function performFlowExecution({
 	initialExecution,
 	onExecutionChange,
 	executeStepFn,
+	stepResultAdapter,
 	onStepFinish,
 	onStepFail,
 	onFinish,
@@ -297,6 +306,7 @@ export async function performFlowExecution({
 		const executedJob = await executeJob({
 			jobExecution,
 			executeStepFn,
+			stepResultAdapter,
 			onJobExecutionChange: (changedJobExecution) => {
 				currentExecution = {
 					...currentExecution,
