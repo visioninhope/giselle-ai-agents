@@ -50,6 +50,7 @@ async function AgentList() {
 			});
 
 			console.log(`DB response time recorded: ${responseTime} ms`);
+			waitForTelemetryExport();
 		}
 	}, 10000);
 	const currentTeam = await fetchCurrentTeam();
