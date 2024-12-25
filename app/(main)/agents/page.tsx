@@ -15,6 +15,15 @@ function DataList({ label, children }: { label: string; children: ReactNode }) {
 }
 
 async function AgentList() {
+	setInterval(async () => {
+		await db
+			.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
+			.from(agents)
+			.where(
+				and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.graphUrl)),
+			);
+		console.log("--- response from DB obtained");
+	}, 10000);
 	const currentTeam = await fetchCurrentTeam();
 	const dbAgents = await db
 		.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
