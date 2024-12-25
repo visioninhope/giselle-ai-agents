@@ -469,13 +469,22 @@ export async function executeStep({
 	return performFlowExecution(context);
 }
 
-export async function retryStep(
-	agentId: AgentId,
-	retryExecutionSnapshotUrl: string,
-	executionId: ExecutionId,
-	stepId: StepId,
-	artifacts: Artifact[],
-) {
+interface RetryStepParams {
+	agentId: AgentId;
+	retryExecutionSnapshotUrl: string;
+	executionId: ExecutionId;
+	stepId: StepId;
+	artifacts: Artifact[];
+	stream?: boolean;
+}
+export async function retryStep({
+	agentId,
+	retryExecutionSnapshotUrl,
+	executionId,
+	stepId,
+	artifacts,
+	stream,
+}: RetryStepParams) {
 	const executionSnapshot = await fetch(retryExecutionSnapshotUrl).then(
 		(res) => res.json() as unknown as ExecutionSnapshot,
 	);
@@ -500,16 +509,24 @@ export async function retryStep(
 		artifacts,
 		nodes: executionSnapshot.nodes,
 		connections: executionSnapshot.connections,
+		stream,
 	};
 
 	return performFlowExecution(context);
 }
 
-export async function executeNode(
-	agentId: AgentId,
-	executionId: ExecutionId,
-	nodeId: NodeId,
-) {
+interface ExecuteNodeParams {
+	agentId: AgentId;
+	executionId: ExecutionId;
+	nodeId: NodeId;
+	stream?: boolean;
+}
+export async function executeNode({
+	agentId,
+	executionId,
+	nodeId,
+	stream,
+}: ExecuteNodeParams) {
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, agentId),
 	});
@@ -534,6 +551,7 @@ export async function executeNode(
 		artifacts: graph.artifacts,
 		nodes: graph.nodes,
 		connections: graph.connections,
+		stream,
 	};
 
 	return performFlowExecution(context);

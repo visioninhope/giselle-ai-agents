@@ -209,18 +209,19 @@ export default async function Page({
 		artifacts: Artifact[],
 	) {
 		"use server";
-		return await retryStep(
+		return await retryStep({
 			agentId,
 			retryExecutionSnapshotUrl,
 			executionId,
 			stepId,
 			artifacts,
-		);
+			stream: true,
+		});
 	}
 
 	async function executeNodeAction(executionId: ExecutionId, nodeId: NodeId) {
 		"use server";
-		return await executeNode(agentId, executionId, nodeId);
+		return await executeNode({ agentId, executionId, nodeId, stream: true });
 	}
 
 	async function onFinishPerformExecutionAction(
