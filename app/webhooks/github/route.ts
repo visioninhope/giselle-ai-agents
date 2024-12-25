@@ -94,13 +94,13 @@ export async function POST(request: NextRequest) {
 				const finalExecution = await performFlowExecution({
 					initialExecution,
 					executeStepFn: (stepId) =>
-						executeStep(
-							agent.id,
-							flow.id,
-							executionId,
-							stepId,
-							initialExecution.artifacts,
-						),
+						executeStep({
+							agentId: agent.id,
+							flowId: flow.id,
+							executionId: executionId,
+							stepId: stepId,
+							artifacts: initialExecution.artifacts,
+						}),
 					onExecutionChange: (execution) => {
 						initialExecution = execution;
 					},
