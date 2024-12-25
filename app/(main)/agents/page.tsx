@@ -43,7 +43,7 @@ async function AgentList() {
 		const responseTime = endTime - startTime;
 
 		dbResponseTimeHistogram.record(responseTime, {
-			environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
+			environment: process.env.VERCEL_ENV || "development",
 		});
 
 		console.log(`DB response time recorded: ${responseTime} ms`);
