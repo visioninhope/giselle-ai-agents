@@ -21,39 +21,34 @@ async function AgentList() {
 	const dbResponseTimeHistogram = meter.createHistogram("db_response_time_ms", {
 		description: "The response time of the database in milliseconds",
 	});
-	setInterval(async () => {
-		const startTime = Date.now();
-		try {
-			await db
-				.select({
-					id: agents.id,
-					name: agents.name,
-					updatedAt: agents.updatedAt,
-				})
-				.from(agents)
-				.where(
-					and(
-						eq(agents.teamDbId, currentTeam.dbId),
-						isNotNull(agents.graphUrl),
-					),
-				);
-
-			console.log("--- response from DB obtained");
-		} catch (error) {
-			console.error("Error querying database:", error);
-		} finally {
-			const endTime = Date.now();
-			const responseTime = endTime - startTime;
-
-			dbResponseTimeHistogram.record(responseTime, {
-				environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
-			});
-
-			console.log(`DB response time recorded: ${responseTime} ms`);
-			waitForTelemetryExport();
-		}
-	}, 10000);
 	const currentTeam = await fetchCurrentTeam();
+	const startTime = Date.now();
+	try {
+		await db
+			.select({
+				id: agents.id,
+				name: agents.name,
+				updatedAt: agents.updatedAt,
+			})
+			.from(agents)
+			.where(
+				and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.graphUrl)),
+			);
+
+		console.log("--- response from DB obtained");
+	} catch (error) {
+		console.error("Error querying database:", error);
+	} finally {
+		const endTime = Date.now();
+		const responseTime = endTime - startTime;
+
+		dbResponseTimeHistogram.record(responseTime, {
+			environment: process.env.NEXT_PUBLIC_VERCEL_ENV || "development",
+		});
+
+		console.log(`DB response time recorded: ${responseTime} ms`);
+		waitForTelemetryExport();
+	}
 	const dbAgents = await db
 		.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
 		.from(agents)
