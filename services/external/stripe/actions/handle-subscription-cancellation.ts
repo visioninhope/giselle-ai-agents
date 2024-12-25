@@ -3,7 +3,7 @@ import { subscriptions, teamMemberships } from "@/drizzle/schema";
 import { and, eq, ne } from "drizzle-orm";
 import { stripe } from "../config";
 
-export async function deleteSubscription(subscriptionId: string) {
+export async function handleSubscriptionCancellation(subscriptionId: string) {
 	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
 
 	if (subscription.status === "canceled") {
