@@ -147,10 +147,10 @@ function ExecutionViewer({
 									</div>
 								</div>
 							)}
-							{stepExecution.status === "running" ||
-								(stepExecution.status === "completed" && (
-									<Markdown>{stepExecution.artifact?.object.content}</Markdown>
-								))}
+							{(stepExecution.status === "running" ||
+								stepExecution.status === "completed") && (
+								<Markdown>{stepExecution.artifact?.object.content}</Markdown>
+							)}
 							{stepExecution.artifact?.type === "generatedArtifact" && (
 								<div className="mt-[10px] flex gap-[12px] items-center">
 									<div className="text-[14px] font-bold text-black-70 ">
