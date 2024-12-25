@@ -30,9 +30,10 @@ export async function POST(request: NextRequest) {
 
 	const id = request.headers.get("X-GitHub-Delivery") ?? "";
 	const name = request.headers.get("X-GitHub-Event") as WebhookEventName;
-	const payload = JSON.parse(body);
-	const event = { id, name, payload };
+	const rawPayload = JSON.parse(body);
+	const event = { id, name, payload: rawPayload };
 	assertIssueCommentEvent(event);
+	const payload = event.payload;
 
 	const command = parseCommand(payload.comment.body);
 	if (command === null) {
@@ -91,6 +92,24 @@ export async function POST(request: NextRequest) {
 					runStartedAt: flowRunStartedAt,
 				};
 
+				const overrideData = integrationSetting.eventNodeMappings
+					.map((eventNodeMapping) => {
+						switch (eventNodeMapping.event) {
+							case "comment.body":
+								return {
+									nodeId: eventNodeMapping.nodeId,
+									data: command.content,
+								};
+							case "issue.title":
+								return {
+									nodeId: eventNodeMapping.nodeId,
+									data: payload.issue.title,
+								};
+							default:
+								return null;
+						}
+					})
+					.filter((overrideData) => overrideData !== null);
 				const finalExecution = await performFlowExecution({
 					initialExecution,
 					executeStepFn: (stepId) =>
@@ -100,6 +119,7 @@ export async function POST(request: NextRequest) {
 							executionId: executionId,
 							stepId: stepId,
 							artifacts: initialExecution.artifacts,
+							overrideData,
 						}),
 					onExecutionChange: (execution) => {
 						initialExecution = execution;

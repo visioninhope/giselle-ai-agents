@@ -411,13 +411,18 @@ async function performFlowExecution(
 	}
 }
 
-interface ExecuteStepOptions {
+interface OverrideData {
+	nodeId: NodeId;
+	data: string;
+}
+interface ExecuteStepParams {
 	agentId: AgentId;
 	flowId: FlowId;
 	executionId: ExecutionId;
 	stepId: StepId;
 	artifacts: Artifact[];
 	stream?: boolean;
+	overrideData?: OverrideData[];
 }
 export async function executeStep({
 	agentId,
@@ -426,7 +431,8 @@ export async function executeStep({
 	stepId,
 	artifacts,
 	stream,
-}: ExecuteStepOptions) {
+	overrideData,
+}: ExecuteStepParams) {
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, agentId),
 	});
@@ -455,11 +461,43 @@ export async function executeStep({
 	if (node === undefined) {
 		throw new Error("Node not found");
 	}
+	let executionNode = node;
+	const overrideDataMap = new Map(
+		overrideData?.map(({ nodeId, data }) => [nodeId, data]) ?? [],
+	);
+	if (overrideDataMap.has(executionNode.id)) {
+		switch (executionNode.content.type) {
+			case "textGeneration":
+				executionNode = {
+					...executionNode,
+					content: {
+						...executionNode.content,
+						instruction:
+							overrideDataMap.get(executionNode.id) ??
+							executionNode.content.instruction,
+					},
+				} as Node;
+				break;
+			case "text":
+				executionNode = {
+					...executeNode,
+					content: {
+						...executionNode.content,
+						text:
+							overrideDataMap.get(executionNode.id) ??
+							executionNode.content.text,
+					},
+				} as Node;
+				break;
+			default:
+				break;
+		}
+	}
 
 	const context: ExecutionContext = {
 		agentId,
 		executionId,
-		node,
+		node: executionNode,
 		artifacts,
 		nodes: graph.nodes,
 		connections: graph.connections,
