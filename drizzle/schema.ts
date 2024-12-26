@@ -75,7 +75,7 @@ export const subscriptions = pgTable("subscriptions", {
 
 type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
-	id: text("id").$type<TeamId>().unique(),
+	id: text("id").$type<TeamId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),
