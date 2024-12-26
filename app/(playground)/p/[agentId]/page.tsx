@@ -1,5 +1,5 @@
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
-import { agents, db } from "@/drizzle";
+import { agents, db, githubIntegrationSettings } from "@/drizzle";
 import { developerFlag } from "@/flags";
 import { toUTCDate } from "@/lib/date";
 import {
@@ -11,6 +11,10 @@ import {
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
 import { saveAgentActivity } from "@/services/agents/activities";
+import type {
+	GitHubNextAction,
+	GitHubTriggerEvent,
+} from "@/services/external/github/types";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing/report-agent-time-usage";
 import { del, list, put } from "@vercel/blob";
 import { ReactFlowProvider } from "@xyflow/react";
@@ -21,6 +25,7 @@ import { Playground } from "./components/playground";
 import { AgentNameProvider } from "./contexts/agent-name";
 import { DeveloperModeProvider } from "./contexts/developer-mode";
 import { ExecutionProvider } from "./contexts/execution";
+import { GitHubIntegrationProvider } from "./contexts/github-integration";
 import { GraphContextProvider } from "./contexts/graph";
 import { MousePositionProvider } from "./contexts/mouse-position";
 import { PlaygroundModeProvider } from "./contexts/playground-mode";
@@ -28,14 +33,24 @@ import { PropertiesPanelProvider } from "./contexts/properties-panel";
 import { ToastProvider } from "./contexts/toast";
 import { ToolbarContextProvider } from "./contexts/toolbar";
 import { executeNode, executeStep, retryStep } from "./lib/execution";
+import {
+	type CreateGitHubIntegrationSettingResult,
+	getGitHubIntegrationState,
+} from "./lib/github";
 import { isLatestVersion, migrateGraph } from "./lib/graph";
-import { buildGraphExecutionPath, buildGraphFolderPath } from "./lib/utils";
+import {
+	buildGraphExecutionPath,
+	buildGraphFolderPath,
+	createGithubIntegrationSettingId,
+} from "./lib/utils";
 import type {
 	AgentId,
 	Artifact,
 	ExecutionId,
 	ExecutionSnapshot,
 	FlowId,
+	GitHubEventNodeMapping,
+	GitHubIntegrationSettingId,
 	Graph,
 	NodeId,
 	StepId,
@@ -70,6 +85,8 @@ export default async function Page({
 	let graph = await fetch(agent.graphUrl).then(
 		(res) => res.json() as unknown as Graph,
 	);
+
+	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
 
 	async function persistGraph(graph: Graph) {
 		"use server";
@@ -149,7 +166,14 @@ export default async function Page({
 		artifacts: Artifact[],
 	) {
 		"use server";
-		return await executeStep(agentId, flowId, executionId, stepId, artifacts);
+		return await executeStep({
+			agentId,
+			flowId,
+			executionId,
+			stepId,
+			artifacts,
+			stream: true,
+		});
 	}
 	async function putExecutionAction(executionSnapshot: ExecutionSnapshot) {
 		"use server";
@@ -185,18 +209,19 @@ export default async function Page({
 		artifacts: Artifact[],
 	) {
 		"use server";
-		return await retryStep(
+		return await retryStep({
 			agentId,
 			retryExecutionSnapshotUrl,
 			executionId,
 			stepId,
 			artifacts,
-		);
+			stream: true,
+		});
 	}
 
 	async function executeNodeAction(executionId: ExecutionId, nodeId: NodeId) {
 		"use server";
-		return await executeNode(agentId, executionId, nodeId);
+		return await executeNode({ agentId, executionId, nodeId, stream: true });
 	}
 
 	async function onFinishPerformExecutionAction(
@@ -217,6 +242,104 @@ export default async function Page({
 		await reportAgentTimeUsage(endedAtDateUTC);
 	}
 
+	async function upsertGitHubIntegrationSettingAction(
+		_: unknown,
+		formData: FormData,
+	): Promise<CreateGitHubIntegrationSettingResult> {
+		"use server";
+
+		if (agent === undefined) {
+			throw new Error("Agent not found");
+		}
+		const repositoryFullName = formData.get("repositoryFullName");
+		const event = formData.get("event") as GitHubTriggerEvent;
+		const callSign = formData.get("callSign");
+		const flowId = formData.get("flowId") as FlowId;
+		const githubEventNodeMappings = formData.get("githubEventNodeMappings");
+		const nextAction = formData.get("nextAction") as GitHubNextAction;
+		const inputId = formData.get("id") as GitHubIntegrationSettingId;
+		if (
+			typeof repositoryFullName !== "string" ||
+			repositoryFullName.length === 0
+		) {
+			return {
+				result: "error",
+				message: "Please choose a repository",
+			};
+		}
+		if (typeof event !== "string" || event.length === 0) {
+			return {
+				result: "error",
+				message: "Please choose an event",
+			};
+		}
+		if (typeof callSign !== "string" || callSign.length === 0) {
+			return {
+				result: "error",
+				message: "Please enter a call sign",
+			};
+		}
+		if (typeof flowId !== "string" || flowId.length === 0) {
+			return {
+				result: "error",
+				message: "Please select a flow",
+			};
+		}
+		if (typeof githubEventNodeMappings !== "string") {
+			return {
+				result: "error",
+				message: "Please configure event mappings",
+			};
+		}
+		const parsedEventNodeMappings = JSON.parse(
+			githubEventNodeMappings,
+		) as GitHubEventNodeMapping[];
+		if (
+			!Array.isArray(parsedEventNodeMappings) ||
+			parsedEventNodeMappings.length === 0
+		) {
+			return {
+				result: "error",
+				message: "Invalid event mappings",
+			};
+		}
+		if (typeof nextAction !== "string" || nextAction.length === 0) {
+			return {
+				result: "error",
+				message: "Please select a next action",
+			};
+		}
+
+		const id = inputId ?? createGithubIntegrationSettingId();
+
+		const setting = {
+			repositoryFullName,
+			event,
+			callSign,
+			flowId,
+			eventNodeMappings: parsedEventNodeMappings,
+			nextAction,
+		};
+		await db
+			.insert(githubIntegrationSettings)
+			.values({
+				agentDbId: agent.dbId,
+				id,
+				...setting,
+			})
+			.onConflictDoUpdate({
+				target: githubIntegrationSettings.id,
+				set: setting,
+			});
+		return {
+			result: "success",
+			setting: {
+				id,
+				...setting,
+			},
+		};
+	}
+
 	return (
 		<DeveloperModeProvider developerMode={developerMode}>
 			<GraphContextProvider
@@ -224,34 +347,41 @@ export default async function Page({
 				onPersistAction={persistGraph}
 				defaultGraphUrl={graphUrl}
 			>
-				<PropertiesPanelProvider>
-					<ReactFlowProvider>
-						<ToolbarContextProvider>
-							<MousePositionProvider>
-								<ToastProvider>
-									<AgentNameProvider
-										defaultValue={agent.name ?? "Unnamed Agent"}
-										updateAgentNameAction={updateAgentName}
-									>
-										<PlaygroundModeProvider>
-											<ExecutionProvider
-												executeStepAction={executeStepAction}
-												putExecutionAction={putExecutionAction}
-												retryStepAction={retryStepAction}
-												executeNodeAction={executeNodeAction}
-												onFinishPerformExecutionAction={
-													onFinishPerformExecutionAction
-												}
-											>
-												<Playground />
-											</ExecutionProvider>
-										</PlaygroundModeProvider>
-									</AgentNameProvider>
-								</ToastProvider>
-							</MousePositionProvider>
-						</ToolbarContextProvider>
-					</ReactFlowProvider>
-				</PropertiesPanelProvider>
+				<GitHubIntegrationProvider
+					{...gitHubIntegrationState}
+					upsertGitHubIntegrationSettingAction={
+						upsertGitHubIntegrationSettingAction
+					}
+				>
+					<PropertiesPanelProvider>
+						<ReactFlowProvider>
+							<ToolbarContextProvider>
+								<MousePositionProvider>
+									<ToastProvider>
+										<AgentNameProvider
+											defaultValue={agent.name ?? "Unnamed Agent"}
+											updateAgentNameAction={updateAgentName}
+										>
+											<PlaygroundModeProvider>
+												<ExecutionProvider
+													executeStepAction={executeStepAction}
+													putExecutionAction={putExecutionAction}
+													retryStepAction={retryStepAction}
+													executeNodeAction={executeNodeAction}
+													onFinishPerformExecutionAction={
+														onFinishPerformExecutionAction
+													}
+												>
+													<Playground />
+												</ExecutionProvider>
+											</PlaygroundModeProvider>
+										</AgentNameProvider>
+									</ToastProvider>
+								</MousePositionProvider>
+							</ToolbarContextProvider>
+						</ReactFlowProvider>
+					</PropertiesPanelProvider>
+				</GitHubIntegrationProvider>
 			</GraphContextProvider>
 		</DeveloperModeProvider>
 	);

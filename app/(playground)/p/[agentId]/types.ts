@@ -1,3 +1,5 @@
+import type { StreamableValue } from "ai/rsc";
+
 export type NodeId = `nd_${string}`;
 interface NodeBase {
 	id: NodeId;
@@ -155,11 +157,6 @@ export interface TextArtifactObject extends ArtifactObjectBase {
 	messages: {
 		plan: string;
 		description: string;
-	};
-	usage?: {
-		// unavailable until generation is completed
-		promptTokens: number;
-		completionTokens: number;
 	};
 }
 export interface TextArtifact extends GeneratedArtifact {
@@ -358,3 +355,13 @@ export interface ExecutionIndex {
 	blobUrl: string;
 	completedAt: number;
 }
+
+export type GitHubIntegrationSettingId = `gthbs_${string}`;
+export interface GitHubEventNodeMapping {
+	event: string;
+	nodeId: NodeId;
+}
+
+export type ExecuteActionReturnValue =
+	| TextArtifactObject
+	| StreamableValue<TextArtifactObject, unknown>;

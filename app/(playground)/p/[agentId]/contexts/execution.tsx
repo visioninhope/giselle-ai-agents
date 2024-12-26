@@ -1,6 +1,6 @@
 "use client";
 
-import { type StreamableValue, readStreamableValue } from "ai/rsc";
+import { readStreamableValue } from "ai/rsc";
 import {
 	type ReactNode,
 	createContext,
@@ -10,35 +10,25 @@ import {
 } from "react";
 import { deriveFlows } from "../lib/graph";
 import {
-	createArtifactId,
+	type PerformFlowExecutionOptions,
+	createExecutionSnapshot,
+	performFlowExecution as sharedPerformFlowExecution,
+} from "../lib/runner";
+import {
 	createExecutionId,
-	createExecutionSnapshotId,
-	createJobExecutionId,
-	createStepExecutionId,
-	toErrorWithMessage,
+	createInitialJobExecutions,
+	isStreamableValue,
 } from "../lib/utils";
 import type {
 	Artifact,
-	ArtifactId,
-	CompletedExecution,
-	CompletedJobExecution,
-	CompletedStepExecution,
-	Connection,
+	ExecuteActionReturnValue,
 	Execution,
 	ExecutionId,
 	ExecutionSnapshot,
-	FailedExecution,
-	FailedJobExecution,
-	FailedStepExecution,
-	Flow,
 	FlowId,
 	JobExecution,
-	Node,
 	NodeId,
-	SkippedJobExecution,
-	StepExecution,
 	StepId,
-	TextArtifact,
 	TextArtifactObject,
 } from "../types";
 import { useGraph } from "./graph";
@@ -46,24 +36,18 @@ import { usePlaygroundMode } from "./playground-mode";
 import { usePropertiesPanel } from "./properties-panel";
 import { useToast } from "./toast";
 
-export function createExecutionSnapshot({
-	flow,
-	execution,
-	nodes,
-	connections,
-}: {
-	flow: Flow;
-	execution: Execution;
-	nodes: Node[];
-	connections: Connection[];
-}) {
-	return {
-		id: createExecutionSnapshotId(),
-		execution,
-		nodes,
-		connections,
-		flow,
-	} as ExecutionSnapshot;
+export function useExecutionRunner(
+	baseOptions?: Pick<
+		PerformFlowExecutionOptions,
+		"onFinish" | "onExecutionChange" | "onStepFail" | "stepResultAdapter"
+	>,
+) {
+	const performFlowExecution = useCallback(
+		async (options: PerformFlowExecutionOptions) =>
+			sharedPerformFlowExecution({ ...baseOptions, ...options }),
+		[baseOptions],
+	);
+	return performFlowExecution;
 }
 
 function buildJobExecutionsFromSnapshot(
@@ -104,270 +88,6 @@ function buildArtifactsFromSnapshot(
 	);
 }
 
-// Helper functions for execution state management
-const createInitialJobExecutions = (flow: Flow): JobExecution[] => {
-	return flow.jobs.map((job) => ({
-		id: createJobExecutionId(),
-		jobId: job.id,
-		status: "pending",
-		stepExecutions: job.steps.map((step) => ({
-			id: createStepExecutionId(),
-			stepId: step.id,
-			nodeId: step.nodeId,
-			status: "pending",
-		})),
-	}));
-};
-
-const processStreamContent = async (
-	stream: StreamableValue<TextArtifactObject, unknown>,
-	updateArtifact: (content: TextArtifactObject) => void,
-): Promise<TextArtifactObject> => {
-	let textArtifactObject: TextArtifactObject = {
-		type: "text",
-		title: "",
-		content: "",
-		messages: { plan: "", description: "" },
-	};
-
-	for await (const streamContent of readStreamableValue(stream)) {
-		if (streamContent === undefined) continue;
-		textArtifactObject = { ...textArtifactObject, ...streamContent };
-		updateArtifact(textArtifactObject);
-	}
-
-	return textArtifactObject;
-};
-
-const executeStep = async ({
-	stepExecution,
-	executeStepAction,
-	updateExecution,
-	updateArtifact,
-	onStepFinish,
-	onStepFail,
-}: {
-	stepExecution: StepExecution;
-	executeStepAction: (
-		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-	updateExecution: (
-		updater: (prev: Execution | null) => Execution | null,
-	) => void;
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
-	onStepFinish?: (
-		stepExecution: CompletedStepExecution,
-		artifact: TextArtifact,
-	) => void;
-	onStepFail?: (stepExecution: FailedStepExecution) => void;
-}): Promise<CompletedStepExecution | FailedStepExecution> => {
-	if (stepExecution.status === "completed") {
-		return stepExecution;
-	}
-	const stepRunStartedAt = Date.now();
-	const artifactId = createArtifactId();
-
-	// Initialize step execution
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((prevJob) => ({
-				...prevJob,
-				stepExecutions: prevJob.stepExecutions.map((prevStep) =>
-					prevStep.id === stepExecution.id
-						? { ...prevStep, status: "running", runStartedAt: stepRunStartedAt }
-						: prevStep,
-				),
-			})),
-			artifacts: [
-				...prev.artifacts,
-				{
-					id: artifactId,
-					type: "streamArtifact",
-					creatorNodeId: stepExecution.nodeId,
-					object: {
-						type: "text",
-						title: "",
-						content: "",
-						messages: { plan: "", description: "" },
-					},
-				},
-			],
-		};
-	});
-
-	try {
-		// Execute step and process stream
-		const stream = await executeStepAction(stepExecution.stepId);
-		const finalArtifact = await processStreamContent(stream, (content) =>
-			updateArtifact(artifactId, content),
-		);
-
-		// Complete step execution
-		const stepDurationMs = Date.now() - stepRunStartedAt;
-
-		const completedStepExecution: CompletedStepExecution = {
-			...stepExecution,
-			status: "completed",
-			runStartedAt: stepRunStartedAt,
-			durationMs: stepDurationMs,
-		};
-		const generatedArtifact = {
-			id: artifactId,
-			type: "generatedArtifact",
-			creatorNodeId: stepExecution.nodeId,
-			createdAt: Date.now(),
-			object: finalArtifact,
-		} satisfies TextArtifact;
-		updateExecution((prev) => {
-			if (!prev || prev.status !== "running") return null;
-
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) => ({
-					...job,
-					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? completedStepExecution : step,
-					),
-				})),
-				artifacts: prev.artifacts.map((artifact) =>
-					artifact.id === artifactId ? generatedArtifact : artifact,
-				),
-			};
-		});
-		onStepFinish?.(completedStepExecution, generatedArtifact);
-		return completedStepExecution;
-	} catch (unknownError) {
-		const error = toErrorWithMessage(unknownError).message;
-		const stepDurationMs = Date.now() - stepRunStartedAt;
-		const failedStepExecution: FailedStepExecution = {
-			...stepExecution,
-			status: "failed",
-			runStartedAt: stepRunStartedAt,
-			durationMs: stepDurationMs,
-			error,
-		};
-		updateExecution((prev) => {
-			if (!prev || prev.status !== "running") return null;
-
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) => ({
-					...job,
-					stepExecutions: job.stepExecutions.map((step) =>
-						step.id === stepExecution.id ? failedStepExecution : step,
-					),
-				})),
-				artifacts: prev.artifacts.filter(
-					(prevArtifact) => prevArtifact.creatorNodeId !== stepExecution.nodeId,
-				),
-			};
-		});
-		onStepFail?.(failedStepExecution);
-		return failedStepExecution;
-	}
-};
-
-const executeJob = async ({
-	jobExecution,
-	executeStepAction,
-	updateArtifact,
-	updateExecution,
-	onStepFinish,
-	onStepFail,
-}: {
-	jobExecution: JobExecution;
-	executeStepAction: (
-		stepId: StepId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-	updateExecution: (
-		updater: (prev: Execution | null) => Execution | null,
-	) => void;
-	updateArtifact: (artifactId: ArtifactId, content: TextArtifactObject) => void;
-	onStepFinish?: (
-		stepExecution: CompletedStepExecution,
-		artifact: TextArtifact,
-	) => void;
-	onStepFail?: (stepExecution: FailedStepExecution) => void;
-}): Promise<CompletedJobExecution | FailedJobExecution> => {
-	const jobRunStartedAt = Date.now();
-
-	// Start job execution
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((job) =>
-				job.id === jobExecution.id
-					? { ...job, status: "running", runStartedAt: jobRunStartedAt }
-					: job,
-			),
-		};
-	});
-
-	// Execute all steps in parallel
-	const stepExecutions = await Promise.all(
-		jobExecution.stepExecutions.map((stepExecution) =>
-			executeStep({
-				stepExecution,
-				executeStepAction,
-				updateExecution,
-				updateArtifact,
-				onStepFinish,
-				onStepFail,
-			}),
-		),
-	);
-
-	const jobDurationMs = stepExecutions.reduce(
-		(sum, duration) => sum + duration.durationMs,
-		0,
-	);
-	const allStepsCompleted = stepExecutions.every(
-		(step) => step.status === "completed",
-	);
-
-	if (allStepsCompleted) {
-		// Complete job execution
-		const completedJobExecution: CompletedJobExecution = {
-			...jobExecution,
-			stepExecutions,
-			status: "completed",
-			runStartedAt: jobRunStartedAt,
-			durationMs: jobDurationMs,
-		};
-		updateExecution((prev) => {
-			if (!prev) return null;
-			return {
-				...prev,
-				jobExecutions: prev.jobExecutions.map((job) =>
-					job.id === jobExecution.id ? completedJobExecution : job,
-				),
-			};
-		});
-		return completedJobExecution;
-	}
-
-	const failedJobExecution: FailedJobExecution = {
-		...jobExecution,
-		stepExecutions,
-		status: "failed",
-		runStartedAt: jobRunStartedAt,
-		durationMs: jobDurationMs,
-	};
-	updateExecution((prev) => {
-		if (!prev) return null;
-		return {
-			...prev,
-			jobExecutions: prev.jobExecutions.map((job) =>
-				job.id === jobExecution.id ? failedJobExecution : job,
-			),
-		};
-	});
-	return failedJobExecution;
-};
-
 interface ExecutionContextType {
 	execution: Execution | null;
 	executeNode: (nodeId: NodeId) => Promise<void>;
@@ -392,14 +112,14 @@ type ExecuteStepAction = (
 	executionId: ExecutionId,
 	stepId: StepId,
 	artifacts: Artifact[],
-) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+) => Promise<ExecuteActionReturnValue>;
 
 type RetryStepAction = (
 	retryExecutionSnapshotUrl: string,
 	executionId: ExecutionId,
 	stepId: StepId,
 	artifacts: Artifact[],
-) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+) => Promise<ExecuteActionReturnValue>;
 interface ExecutionProviderProps {
 	children: ReactNode;
 	executeStepAction: ExecuteStepAction;
@@ -410,7 +130,7 @@ interface ExecutionProviderProps {
 	executeNodeAction: (
 		executionId: ExecutionId,
 		nodeId: NodeId,
-	) => Promise<StreamableValue<TextArtifactObject, unknown>>;
+	) => Promise<ExecuteActionReturnValue>;
 	onFinishPerformExecutionAction: (
 		startedAt: number,
 		endedAt: number,
@@ -431,137 +151,59 @@ export function ExecutionProvider({
 	const { addToast } = useToast();
 	const { setPlaygroundMode } = usePlaygroundMode();
 	const [execution, setExecution] = useState<Execution | null>(null);
-
-	interface ExecuteFlowParams {
-		initialExecution: Execution;
-		flow: Flow;
-		nodes: Node[];
-		connections: Connection[];
-		executeStepCallback: (
-			stepId: StepId,
-		) => Promise<StreamableValue<TextArtifactObject, unknown>>;
-		updateArtifactCallback: (
-			artifactId: ArtifactId,
-			content: TextArtifactObject,
-		) => void;
-		onStepFinish?: (
-			stepExecution: CompletedStepExecution,
-			artifact: TextArtifact,
-		) => void;
-		onFinishPerformExecution?: (
-			endedAt: number,
-			durationMs: number,
-		) => Promise<void>;
-	}
-	const performFlowExecution = useCallback(
-		async ({
-			initialExecution,
-			flow,
-			nodes,
-			connections,
-			executeStepCallback,
-			updateArtifactCallback,
-			onStepFinish,
-			onFinishPerformExecution,
-		}: ExecuteFlowParams) => {
-			let currentExecution = initialExecution;
-			let totalFlowDurationMs = 0;
-			let hasFailed = false;
-
-			// Execute jobs sequentially
-			for (const jobExecution of currentExecution.jobExecutions) {
-				if (hasFailed) {
-					const skippedJob: SkippedJobExecution = {
-						...jobExecution,
-						status: "skipped",
-						stepExecutions: jobExecution.stepExecutions.map((step) => ({
-							...step,
-							status: "skipped",
-						})),
-					};
-					currentExecution = {
-						...currentExecution,
-						jobExecutions: currentExecution.jobExecutions.map((job) =>
-							job.id === jobExecution.id ? skippedJob : job,
-						),
-					};
-					setExecution(currentExecution);
-					continue;
+	const performFlowExecution = useExecutionRunner({
+		stepResultAdapter: async (result, updateArtifact) => {
+			let textArtifactObject: TextArtifactObject = {
+				type: "text",
+				title: "",
+				content: "",
+				messages: { plan: "", description: "" },
+			};
+			if (isStreamableValue(result)) {
+				for await (const streamContent of readStreamableValue(result)) {
+					if (streamContent === undefined) continue;
+					textArtifactObject = { ...textArtifactObject, ...streamContent };
+					updateArtifact?.(textArtifactObject);
 				}
-
-				// Skip completed jobs for retry flows
-				if (jobExecution.status === "completed") {
-					continue;
-				}
-
-				const executedJob = await executeJob({
-					jobExecution,
-					executeStepAction: executeStepCallback,
-					updateExecution: (updater) => {
-						const updated = updater(currentExecution);
-						if (updated) {
-							currentExecution = updated;
-							setExecution(updated);
-						}
-					},
-					updateArtifact: updateArtifactCallback,
-					onStepFinish,
-					onStepFail: (failedStep) => {
-						addToast({
-							type: "error",
-							message: failedStep.error,
-						});
+			} else {
+				textArtifactObject = result;
+			}
+			return textArtifactObject;
+		},
+		onExecutionChange: setExecution,
+		onStepFail: (stepExecution) => {
+			addToast({
+				type: "error",
+				message: stepExecution.error,
+			});
+		},
+		onFinish: async ({ endedAt, durationMs, execution }) => {
+			await onFinishPerformExecutionAction(
+				endedAt,
+				durationMs,
+				execution.runStartedAt,
+			);
+			const flow = graph.flows.find((flow) => flow.id === execution.flowId);
+			if (flow !== undefined) {
+				const snapshot = createExecutionSnapshot({
+					...graph,
+					flow,
+					execution,
+				});
+				const { blobUrl } = await putExecutionAction(snapshot);
+				dispatch({
+					type: "addExecutionIndex",
+					input: {
+						executionIndex: {
+							executionId: execution.id,
+							blobUrl,
+							completedAt: endedAt,
+						},
 					},
 				});
-
-				totalFlowDurationMs += executedJob.durationMs;
-				if (executedJob.status === "failed") {
-					hasFailed = true;
-				}
 			}
-
-			// Update final execution state
-			if (hasFailed) {
-				currentExecution = {
-					...currentExecution,
-					status: "failed",
-					durationMs: totalFlowDurationMs,
-				} as FailedExecution;
-			} else {
-				currentExecution = {
-					...currentExecution,
-					status: "completed",
-					durationMs: totalFlowDurationMs,
-					resultArtifact:
-						currentExecution.artifacts[currentExecution.artifacts.length - 1],
-				} as CompletedExecution;
-			}
-
-			// Create and store execution snapshot
-			const executionSnapshot = createExecutionSnapshot({
-				flow,
-				execution: currentExecution,
-				nodes,
-				connections,
-			});
-
-			const { blobUrl } = await putExecutionAction(executionSnapshot);
-			const runEndedAt = Date.now();
-			dispatch({
-				type: "addExecutionIndex",
-				input: {
-					executionIndex: {
-						executionId: currentExecution.id,
-						blobUrl,
-						completedAt: runEndedAt,
-					},
-				},
-			});
-			await onFinishPerformExecution?.(runEndedAt, totalFlowDurationMs);
-			return currentExecution;
 		},
-		[dispatch, putExecutionAction, addToast],
-	);
+	});
 
 	const executeFlow = useCallback(
 		async (flowId: FlowId) => {
@@ -587,42 +229,17 @@ export function ExecutionProvider({
 
 			const finalExecution = await performFlowExecution({
 				initialExecution,
-				flow,
-				nodes: graph.nodes,
-				connections: graph.connections,
-				executeStepCallback: (stepId) =>
+				executeStepFn: (stepId) =>
 					executeStepAction(
 						flowId,
 						executionId,
 						stepId,
 						initialExecution.artifacts,
 					),
-				updateArtifactCallback: (artifactId, content) => {
-					setExecution((prev) => {
-						if (!prev || prev.status !== "running") return null;
-						return {
-							...prev,
-							artifacts: prev.artifacts.map((artifact) =>
-								artifact.id === artifactId
-									? { ...artifact, object: content }
-									: artifact,
-							),
-						};
-					});
-				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
 			setExecution(finalExecution);
 		},
-		[
-			setPlaygroundMode,
-			executeStepAction,
-			flush,
-			graph,
-			performFlowExecution,
-			onFinishPerformExecutionAction,
-		],
+		[setPlaygroundMode, executeStepAction, flush, graph, performFlowExecution],
 	);
 
 	const retryFlowExecution = useCallback(
@@ -655,41 +272,17 @@ export function ExecutionProvider({
 			};
 			const finalExecution = await performFlowExecution({
 				initialExecution,
-				flow: retryExecutionSnapshot.flow,
-				nodes: retryExecutionSnapshot.nodes,
-				connections: retryExecutionSnapshot.connections,
-				executeStepCallback: (stepId) =>
+				executeStepFn: (stepId) =>
 					retryStepAction(
 						executionIndex.blobUrl,
 						initialExecution.id,
 						stepId,
 						initialExecution.artifacts,
 					),
-				updateArtifactCallback: (artifactId, content) => {
-					setExecution((prev) => {
-						if (!prev || prev.status !== "running") return null;
-						return {
-							...prev,
-							artifacts: prev.artifacts.map((artifact) =>
-								artifact.id === artifactId
-									? { ...artifact, object: content }
-									: artifact,
-							),
-						};
-					});
-				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
 			setExecution(finalExecution);
 		},
-		[
-			graph.executionIndexes,
-			flush,
-			retryStepAction,
-			performFlowExecution,
-			onFinishPerformExecutionAction,
-		],
+		[graph.executionIndexes, flush, retryStepAction, performFlowExecution],
 	);
 
 	const executeNode = useCallback(
@@ -705,6 +298,7 @@ export function ExecutionProvider({
 			const tmpFlows = deriveFlows({
 				nodes: [node],
 				connections: [],
+				flows: [],
 			});
 			if (tmpFlows.length !== 1) {
 				throw new Error("Unexpected number of flows");
@@ -719,29 +313,25 @@ export function ExecutionProvider({
 				artifacts: [],
 				runStartedAt: flowRunStartedAt,
 			};
-			setExecution(initialExecution);
-			const finalExecution = await performFlowExecution({
+			await performFlowExecution({
 				initialExecution,
-				flow: tmpFlow,
-				nodes: graph.nodes,
-				connections: graph.connections,
-				executeStepCallback: (stepId) =>
-					executeNodeAction(executionId, node.id),
-				updateArtifactCallback: (artifactId, content) => {
+				executeStepFn: (stepId) => executeNodeAction(executionId, node.id),
+				onExecutionChange(execution) {
+					const targetArtifact = execution.artifacts.find(
+						(artifact) => artifact.creatorNodeId === node.id,
+					);
+					if (targetArtifact === undefined) {
+						return;
+					}
 					dispatch({
 						type: "upsertArtifact",
 						input: {
 							nodeId,
-							artifact: {
-								id: artifactId,
-								type: "streamArtifact",
-								creatorNodeId: nodeId,
-								object: content,
-							},
+							artifact: targetArtifact,
 						},
 					});
 				},
-				onStepFinish: (execution, artifact) => {
+				onStepFinish: (_, artifact) => {
 					dispatch({
 						type: "upsertArtifact",
 						input: {
@@ -750,20 +340,9 @@ export function ExecutionProvider({
 						},
 					});
 				},
-				onFinishPerformExecution: (endedAt, durationMs) =>
-					onFinishPerformExecutionAction(flowRunStartedAt, endedAt, durationMs),
 			});
-			setExecution(finalExecution);
 		},
-		[
-			setTab,
-			executeNodeAction,
-			graph.connections,
-			graph.nodes,
-			performFlowExecution,
-			dispatch,
-			onFinishPerformExecutionAction,
-		],
+		[setTab, executeNodeAction, performFlowExecution, graph.nodes, dispatch],
 	);
 
 	return (
