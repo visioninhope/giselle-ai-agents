@@ -179,9 +179,9 @@ export function ExecutionProvider({
 		},
 		onFinish: async ({ endedAt, durationMs, execution }) => {
 			await onFinishPerformExecutionAction(
+				execution.runStartedAt,
 				endedAt,
 				durationMs,
-				execution.runStartedAt,
 			);
 			const flow = graph.flows.find((flow) => flow.id === execution.flowId);
 			if (flow !== undefined) {
