@@ -36,6 +36,7 @@ import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
+import type { TeamId } from "@/services/teams/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -74,6 +75,7 @@ export const subscriptions = pgTable("subscriptions", {
 
 type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
+	id: text("id").$type<TeamId>().unique(),
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),

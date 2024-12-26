@@ -19,6 +19,7 @@ import {
 	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
 } from "../constants";
 import { setCurrentTeam } from "../set-current-team";
+import { createTeamId } from "../utils";
 import { createCheckoutSession } from "./create-checkout-session";
 
 export async function createTeam(formData: FormData) {
@@ -98,6 +99,7 @@ async function createTeamInDatabase(
 	const [result] = await db
 		.insert(teams)
 		.values({
+			id: createTeamId(),
 			name: teamName,
 			type: isInternal ? "internal" : "customer",
 		})
