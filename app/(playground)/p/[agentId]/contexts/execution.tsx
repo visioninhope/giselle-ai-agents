@@ -217,7 +217,7 @@ export function ExecutionProvider({
 			const flowRunStartedAt = Date.now();
 
 			// Initialize flow execution
-			const initialExecution: Execution = {
+			let initialExecution: Execution = {
 				id: executionId,
 				status: "running",
 				flowId,
@@ -229,6 +229,10 @@ export function ExecutionProvider({
 
 			const finalExecution = await performFlowExecution({
 				initialExecution,
+				onExecutionChange: (execution) => {
+					setExecution(execution);
+					initialExecution = execution;
+				},
 				executeStepFn: (stepId) =>
 					executeStepAction(
 						flowId,
