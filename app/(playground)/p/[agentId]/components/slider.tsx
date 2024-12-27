@@ -30,7 +30,7 @@ interface SliderProps
 	> {
 	label: string;
 	value: number;
-	onChange?: (topP: number) => void;
+	onChange?: (value: number) => void;
 }
 export function Slider(props: SliderProps) {
 	const [value, setValue] = useState(props.value);
