@@ -907,6 +907,12 @@ function TabsContentPrompt({
 								max={2.0}
 								min={0.0}
 								step={0.01}
+								onChange={(value) => {
+									onContentChange?.({
+										...content,
+										temperature: value,
+									});
+								}}
 							/>
 						</div>
 						<Slider
@@ -915,6 +921,12 @@ function TabsContentPrompt({
 							max={1.0}
 							min={0.0}
 							step={0.01}
+							onChange={(value) => {
+								onContentChange?.({
+									...content,
+									topP: value,
+								});
+							}}
 						/>
 					</div>
 				</div>
