@@ -1,15 +1,15 @@
 import { db } from "@/drizzle";
+import { executeStep } from "@giselles-ai/lib/execution";
+import { performFlowExecution } from "@giselles-ai/lib/runner";
+import {
+	createExecutionId,
+	createInitialJobExecutions,
+} from "@giselles-ai/lib/utils";
+import type { Execution, Graph } from "@giselles-ai/types";
 import { Webhooks } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { waitUntil } from "@vercel/functions";
 import type { NextRequest } from "next/server";
-import { executeStep } from "../../(playground)/p/[agentId]/lib/execution";
-import { performFlowExecution } from "../../(playground)/p/[agentId]/lib/runner";
-import {
-	createExecutionId,
-	createInitialJobExecutions,
-} from "../../(playground)/p/[agentId]/lib/utils";
-import type { Execution, Graph } from "../../(playground)/p/[agentId]/types";
 import { parseCommand } from "./command";
 import { assertIssueCommentEvent, createOctokit } from "./utils";
 

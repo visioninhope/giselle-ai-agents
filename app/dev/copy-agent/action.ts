@@ -3,21 +3,17 @@
 import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
-import { createId } from "@paralleldrive/cuid2";
-import { copy, list } from "@vercel/blob";
-import { putGraph } from "../../(playground)/p/[agentId]/actions";
+import { putGraph } from "@giselles-ai/actions";
 import {
 	buildFileFolderPath,
 	createFileId,
 	createGraphId,
 	pathJoin,
 	pathnameToFilename,
-} from "../../(playground)/p/[agentId]/lib/utils";
-import type {
-	AgentId,
-	Graph,
-	Node,
-} from "../../(playground)/p/[agentId]/types";
+} from "@giselles-ai/lib/utils";
+import type { AgentId, Graph, Node } from "@giselles-ai/types";
+import { createId } from "@paralleldrive/cuid2";
+import { copy, list } from "@vercel/blob";
 
 interface AgentDuplicationSuccess {
 	result: "success";

@@ -2,11 +2,11 @@ import { Button } from "@/components/ui/button";
 import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
+import { putGraph } from "@giselles-ai/actions";
+import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
-import { putGraph } from "../../(playground)/p/[agentId]/actions";
-import { initGraph } from "../../(playground)/p/[agentId]/lib/utils";
 import { CreateAgentButton } from "./components";
 
 export default function Layout({

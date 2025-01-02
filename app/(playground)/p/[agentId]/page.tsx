@@ -33,20 +33,16 @@ import {
 	executeStep,
 	retryStep,
 } from "@giselles-ai/lib/execution";
-import { del, list, put } from "@vercel/blob";
-import { ReactFlowProvider } from "@xyflow/react";
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
 import {
 	type CreateGitHubIntegrationSettingResult,
 	getGitHubIntegrationState,
-} from "./lib/github";
-import { isLatestVersion, migrateGraph } from "./lib/graph";
+} from "@giselles-ai/lib/github";
+import { isLatestVersion, migrateGraph } from "@giselles-ai/lib/graph";
 import {
 	buildGraphExecutionPath,
 	buildGraphFolderPath,
 	createGithubIntegrationSettingId,
-} from "./lib/utils";
+} from "@giselles-ai/lib/utils";
 import type {
 	AgentId,
 	Artifact,
@@ -58,7 +54,11 @@ import type {
 	Graph,
 	NodeId,
 	StepId,
-} from "./types";
+} from "@giselles-ai/types";
+import { del, list, put } from "@vercel/blob";
+import { ReactFlowProvider } from "@xyflow/react";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
 // Extend the max duration of the server actions from this page to 5 minutes
 // https://vercel.com/docs/functions/runtimes#max-duration
