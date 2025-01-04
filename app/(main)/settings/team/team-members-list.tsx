@@ -10,12 +10,14 @@ type TeamMembersListProps = {
 		role: TeamRole;
 	}[];
 	currentUserRole: TeamRole;
+	isProPlan: boolean;
 };
 
 export function TeamMembersList({
 	teamDbId,
 	members,
 	currentUserRole,
+	isProPlan,
 }: TeamMembersListProps) {
 	return (
 		<div className="font-avenir rounded-[16px]">
@@ -33,6 +35,7 @@ export function TeamMembersList({
 						email={member.email}
 						role={member.role}
 						currentUserRole={currentUserRole}
+						isProPlan={isProPlan}
 					/>
 				))}
 			</div>

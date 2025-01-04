@@ -30,6 +30,7 @@ type TeamMemberListItemProps = {
 	email: string | null;
 	role: TeamRole;
 	currentUserRole: TeamRole;
+	isProPlan: boolean;
 };
 
 export function TeamMemberListItem({
@@ -38,6 +39,7 @@ export function TeamMemberListItem({
 	email,
 	role: initialRole,
 	currentUserRole,
+	isProPlan,
 }: TeamMemberListItemProps) {
 	const [isEditingRole, setIsEditingRole] = useState(false);
 	const [role, setRole] = useState<TeamRole>(initialRole);
@@ -45,7 +47,7 @@ export function TeamMemberListItem({
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string>("");
 
-	const canEditRole = currentUserRole === "admin";
+	const canEdit = currentUserRole === "admin" && isProPlan;
 	const handleRoleChange = (value: TeamRole) => {
 		setTempRole(value);
 	};
@@ -152,7 +154,7 @@ export function TeamMemberListItem({
 					) : (
 						<>
 							<span className="text-zinc-400 capitalize w-[100px]">{role}</span>
-							{canEditRole && (
+							{canEdit && (
 								<>
 									<Button
 										className="shrink-0 h-8 w-8 rounded-full p-0"
