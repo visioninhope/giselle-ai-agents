@@ -2,7 +2,6 @@ import { stripe } from "@/services/external/stripe";
 import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
 import type Stripe from "stripe";
 import { handleSubscriptionCancellation } from "./handle-subscription-cancellation";
-import { handleSubscriptionCycleInvoice } from "./handle-subscription-cycle-invoice";
 
 const relevantEvents = new Set([
 	"checkout.session.completed",
@@ -103,10 +102,6 @@ export async function POST(req: Request) {
 						);
 						break;
 					}
-				}
-
-				if (event.data.object.billing_reason === "subscription_cycle") {
-					await handleSubscriptionCycleInvoice(event.data.object);
 				}
 				break;
 
