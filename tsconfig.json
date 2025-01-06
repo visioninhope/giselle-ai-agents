@@ -19,7 +19,11 @@
 			}
 		],
 		"paths": {
-			"@/*": ["./*"]
+			"@/*": ["./*"],
+			"@giselles-ai/*": ["./packages/*"],
+			"@giselles-ai/icons/*": [
+				"./app/(playground)/p/[agentId]/prev/beta-proto/components/icons/*"
+			]
 		},
 		"target": "ES2017"
 	},

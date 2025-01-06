@@ -2,11 +2,6 @@ import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/prev/beta-pro
 import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/prev/beta-proto/github-integration/types";
 import type { Graph } from "@/app/(playground)/p/[agentId]/prev/beta-proto/graph/types";
 import type {
-	FlowId,
-	GitHubEventNodeMapping,
-	GitHubIntegrationSettingId,
-} from "@/app/(playground)/p/[agentId]/types";
-import type {
 	FileId,
 	KnowledgeContentId,
 	KnowledgeContentType,
@@ -37,6 +32,11 @@ import type {
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
 import type { TeamId } from "@/services/teams/types";
+import type {
+	FlowId,
+	GitHubEventNodeMapping,
+	GitHubIntegrationSettingId,
+} from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,

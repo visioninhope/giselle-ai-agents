@@ -1,13 +1,13 @@
 "use client";
 
+import { SpinnerIcon } from "@giselles-ai/icons/spinner";
+import { WilliIcon } from "@giselles-ai/icons/willi";
 import * as Tabs from "@radix-ui/react-tabs";
 import { CircleAlertIcon, CircleSlashIcon } from "lucide-react";
 import { type DetailedHTMLProps, useMemo } from "react";
 import { useExecution } from "../contexts/execution";
 import { useGraph } from "../contexts/graph";
 import { formatTimestamp } from "../lib/utils";
-import { SpinnerIcon } from "../prev/beta-proto/components/icons/spinner";
-import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type { Execution, Node, StepExecution } from "../types";
 import bg from "./bg.png";
 import ClipboardButton from "./clipboard-button";

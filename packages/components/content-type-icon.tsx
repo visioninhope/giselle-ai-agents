@@ -1,8 +1,8 @@
+import { DocumentIcon } from "@giselles-ai/icons/document";
+import { GlobeIcon } from "@giselles-ai/icons/globe";
+import { PromptIcon } from "@giselles-ai/icons/prompt";
+import { TextGenerationIcon } from "@giselles-ai/icons/text-generation";
 import type { SVGProps } from "react";
-import { DocumentIcon } from "../prev/beta-proto/components/icons/document";
-import { GlobeIcon } from "../prev/beta-proto/components/icons/globe";
-import { PromptIcon } from "../prev/beta-proto/components/icons/prompt";
-import { TextGenerationIcon } from "../prev/beta-proto/components/icons/text-generation";
 import type { Node } from "../types";
 
 type ContentTypeIconProps = SVGProps<SVGSVGElement> & {

@@ -1,3 +1,8 @@
+import { DocumentIcon } from "@giselles-ai/icons/document";
+import { PanelCloseIcon } from "@giselles-ai/icons/panel-close";
+import { PanelOpenIcon } from "@giselles-ai/icons/panel-open";
+import { SpinnerIcon } from "@giselles-ai/icons/spinner";
+import { WilliIcon } from "@giselles-ai/icons/willi";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { upload } from "@vercel/blob/client";
@@ -54,11 +59,6 @@ import {
 	pathJoin,
 	toErrorWithMessage,
 } from "../lib/utils";
-import { DocumentIcon } from "../prev/beta-proto/components/icons/document";
-import { PanelCloseIcon } from "../prev/beta-proto/components/icons/panel-close";
-import { PanelOpenIcon } from "../prev/beta-proto/components/icons/panel-open";
-import { SpinnerIcon } from "../prev/beta-proto/components/icons/spinner";
-import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type {
 	FileContent,
 	FileData,

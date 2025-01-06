@@ -3,6 +3,8 @@ import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
+import { LayersIcon } from "@giselles-ai/icons/layers";
+import { WilliIcon } from "@giselles-ai/icons/willi";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -36,8 +38,6 @@ import { useAgentName } from "../contexts/agent-name";
 import { useDeveloperMode } from "../contexts/developer-mode";
 import { useGitHubIntegration } from "../contexts/github-integration";
 import { useGraph } from "../contexts/graph";
-import { LayersIcon } from "../prev/beta-proto/components/icons/layers";
-import { WilliIcon } from "../prev/beta-proto/components/icons/willi";
 import type { GitHubEventNodeMapping, Node, NodeId, Step } from "../types";
 import { Block } from "./block";
 import { ContentTypeIcon } from "./content-type-icon";
