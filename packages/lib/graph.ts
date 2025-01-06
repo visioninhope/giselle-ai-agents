@@ -341,6 +341,16 @@ export function migrateGraph(graph: Graph): Graph {
 		};
 	}
 
+	// fix for migration issue
+	if (newGraph.version === "2024-12-10" && !("flows" in newGraph)) {
+		newGraph = {
+			// @ts-ignore: Old graph has no flows field
+			...newGraph,
+			// @ts-ignore: Old graph has no flows field
+			flows: deriveFlows({ ...newGraph, flows: [] }),
+		};
+	}
+
 	if (
 		newGraph.version === "2024-12-10" ||
 		newGraph.version === "2024-12-11" ||
