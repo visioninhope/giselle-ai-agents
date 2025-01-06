@@ -30,11 +30,14 @@ export async function TeamMembers() {
 		);
 	}
 
+	const hasProPlan = isProPlan(team);
+
 	return (
 		<Card title="Team members">
-			{isProPlan(team) && currentUserRole === "admin" && <TeamMembersForm />}
+			{hasProPlan && currentUserRole === "admin" && <TeamMembersForm />}
 			<TeamMembersList
 				teamDbId={team.dbId}
+				isProPlan={hasProPlan}
 				members={members}
 				currentUserRole={currentUserRole}
 			/>
