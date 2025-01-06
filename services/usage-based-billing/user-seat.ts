@@ -77,6 +77,10 @@ async function reportDeltaUserSeatUsage(
 	lastReport: typeof userSeatUsageReports.$inferSelect,
 ) {
 	const teamMembers = await listTeamMembers(teamDbId);
+	if (areNumberArraysEqualWithEvery(teamMembers, lastReport.userDbIdList)) {
+		// No change in the team members
+		return;
+	}
 	const delta = teamMembers.length - lastReport.userDbIdList.length;
 	const meterEventId = createId();
 
@@ -136,4 +140,14 @@ async function listTeamMembers(teamDbId: number) {
 		.from(teamMemberships)
 		.where(eq(teamMemberships.teamDbId, teamDbId));
 	return teamMembers.map((member) => member.userDbId);
+}
+
+function areNumberArraysEqualWithEvery(
+	arr1: number[],
+	arr2: number[],
+): boolean {
+	if (arr1.length !== arr2.length) {
+		return false;
+	}
+	return arr1.every((value, index) => value === arr2[index]);
 }
