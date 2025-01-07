@@ -169,6 +169,13 @@
 			"when": 1735191139280,
 			"tag": "0023_colossal_nuke",
 			"breakpoints": true
+		},
+		{
+			"idx": 24,
+			"version": "7",
+			"when": 1736210588971,
+			"tag": "0024_lush_night_nurse",
+			"breakpoints": true
 		}
 	]
 }
