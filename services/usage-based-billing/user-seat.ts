@@ -45,13 +45,13 @@ export async function reportUserSeatUsage(
 async function saveUserSeatUsage(
 	stripeMeterEventId: string,
 	teamDbId: number,
-	timestamp: Date,
+	createdAt: Date,
 	teamMembers: number[],
 ) {
 	await db.insert(userSeatUsageReports).values({
 		stripeMeterEventId,
 		teamDbId,
-		timestamp,
+		createdAt,
 		userDbIdList: teamMembers,
 	});
 }
