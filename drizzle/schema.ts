@@ -527,11 +527,11 @@ export const agentTimeUsageReports = pgTable(
 		accumulatedDurationMs: numeric("accumulated_duration_ms").notNull(),
 		minutesIncrement: integer("minutes_increment").notNull(),
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
-		timestamp: timestamp("created_at").defaultNow().notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => ({
 		teamDbIdIdx: index().on(table.teamDbId),
-		timestampIdx: index().on(table.timestamp),
+		createdAtIdx: index().on(table.createdAt),
 		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
 	}),
 );
@@ -546,13 +546,13 @@ export const userSeatUsageReports = pgTable(
 		// Keep snapshot for audit purposes
 		userDbIdList: integer("user_db_id_list").array().notNull(),
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
-		timestamp: timestamp("created_at").defaultNow().notNull(),
 		value: integer("value").notNull(),
 		isDelta: boolean("is_delta").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => ({
 		teamDbIdIdx: index().on(table.teamDbId),
-		timestampIdx: index().on(table.timestamp),
+		createdAtIdx: index().on(table.createdAt),
 		stripeMeterEventIdIdx: index().on(table.stripeMeterEventId),
 	}),
 );

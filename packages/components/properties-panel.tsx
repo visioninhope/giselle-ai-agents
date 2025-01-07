@@ -491,7 +491,7 @@ export function PropertiesPanel() {
 						</TabsContent>
 					)}
 					{selectedNode && isText(selectedNode) && (
-						<TabsContent value="Text" className="flex-1">
+						<TabsContent value="Text" className="flex-1" key={selectedNode.id}>
 							<TabContentText
 								content={selectedNode.content}
 								onContentChange={(content) => {

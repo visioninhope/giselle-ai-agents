@@ -39,11 +39,11 @@ export async function reportUserSeatUsage(
 		.where(
 			and(
 				eq(userSeatUsageReports.teamDbId, teamDbId),
-				gte(userSeatUsageReports.timestamp, periodStart),
-				lt(userSeatUsageReports.timestamp, periodEnd),
+				gte(userSeatUsageReports.createdAt, periodStart),
+				lt(userSeatUsageReports.createdAt, periodEnd),
 			),
 		)
-		.orderBy(desc(userSeatUsageReports.timestamp))
+		.orderBy(desc(userSeatUsageReports.createdAt))
 		.limit(1);
 
 	// If record is not exists, we will report the current count
@@ -80,7 +80,7 @@ async function reportCurrentUserSeatUsage(
 	await saveUserSeatUsage({
 		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
-		timestamp,
+		createdAt: timestamp,
 		userDbIdList: teamMembers,
 		value,
 		isDelta: false,
@@ -115,7 +115,7 @@ async function reportDeltaUserSeatUsage(
 	await saveUserSeatUsage({
 		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
-		timestamp,
+		createdAt: timestamp,
 		userDbIdList: teamMembers,
 		value: delta,
 		isDelta: true,
@@ -125,7 +125,7 @@ async function reportDeltaUserSeatUsage(
 async function saveUserSeatUsage(params: {
 	stripeMeterEventId: string;
 	teamDbId: number;
-	timestamp: Date;
+	createdAt: Date;
 	userDbIdList: number[];
 	value: number;
 	isDelta: boolean;
