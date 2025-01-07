@@ -16,33 +16,33 @@ import type {
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing/report-agent-time-usage";
-import { del, list, put } from "@vercel/blob";
-import { ReactFlowProvider } from "@xyflow/react";
-import { eq } from "drizzle-orm";
-import { notFound } from "next/navigation";
-import { putGraph } from "./actions";
-import { Playground } from "./components/playground";
-import { AgentNameProvider } from "./contexts/agent-name";
-import { DeveloperModeProvider } from "./contexts/developer-mode";
-import { ExecutionProvider } from "./contexts/execution";
-import { GitHubIntegrationProvider } from "./contexts/github-integration";
-import { GraphContextProvider } from "./contexts/graph";
-import { MousePositionProvider } from "./contexts/mouse-position";
-import { PlaygroundModeProvider } from "./contexts/playground-mode";
-import { PropertiesPanelProvider } from "./contexts/properties-panel";
-import { ToastProvider } from "./contexts/toast";
-import { ToolbarContextProvider } from "./contexts/toolbar";
-import { executeNode, executeStep, retryStep } from "./lib/execution";
+import { putGraph } from "@giselles-ai/actions";
+import { Playground } from "@giselles-ai/components/playground";
+import { AgentNameProvider } from "@giselles-ai/contexts/agent-name";
+import { DeveloperModeProvider } from "@giselles-ai/contexts/developer-mode";
+import { ExecutionProvider } from "@giselles-ai/contexts/execution";
+import { GitHubIntegrationProvider } from "@giselles-ai/contexts/github-integration";
+import { GraphContextProvider } from "@giselles-ai/contexts/graph";
+import { MousePositionProvider } from "@giselles-ai/contexts/mouse-position";
+import { PlaygroundModeProvider } from "@giselles-ai/contexts/playground-mode";
+import { PropertiesPanelProvider } from "@giselles-ai/contexts/properties-panel";
+import { ToastProvider } from "@giselles-ai/contexts/toast";
+import { ToolbarContextProvider } from "@giselles-ai/contexts/toolbar";
+import {
+	executeNode,
+	executeStep,
+	retryStep,
+} from "@giselles-ai/lib/execution";
 import {
 	type CreateGitHubIntegrationSettingResult,
 	getGitHubIntegrationState,
-} from "./lib/github";
-import { isLatestVersion, migrateGraph } from "./lib/graph";
+} from "@giselles-ai/lib/github";
+import { isLatestVersion, migrateGraph } from "@giselles-ai/lib/graph";
 import {
 	buildGraphExecutionPath,
 	buildGraphFolderPath,
 	createGithubIntegrationSettingId,
-} from "./lib/utils";
+} from "@giselles-ai/lib/utils";
 import type {
 	AgentId,
 	Artifact,
@@ -54,7 +54,11 @@ import type {
 	Graph,
 	NodeId,
 	StepId,
-} from "./types";
+} from "@giselles-ai/types";
+import { del, list, put } from "@vercel/blob";
+import { ReactFlowProvider } from "@xyflow/react";
+import { eq } from "drizzle-orm";
+import { notFound } from "next/navigation";
 
 // Extend the max duration of the server actions from this page to 5 minutes
 // https://vercel.com/docs/functions/runtimes#max-duration
@@ -93,12 +97,6 @@ export default async function Page({
 		const startTime = Date.now();
 		const logger = createLogger("persistGraph");
 		const { url } = await putGraph(graph);
-		await db
-			.update(agents)
-			.set({
-				graphUrl: url,
-			})
-			.where(eq(agents.id, agentId));
 		const { blobList } = await withCountMeasurement(
 			logger,
 			async () => {
@@ -123,6 +121,7 @@ export default async function Page({
 				url: blob.url,
 				size: blob.size,
 			}));
+
 		if (oldBlobs.length > 0) {
 			await withCountMeasurement(
 				logger,
@@ -139,6 +138,14 @@ export default async function Page({
 			);
 			waitForTelemetryExport();
 		}
+
+		await db
+			.update(agents)
+			.set({
+				graphUrl: url,
+			})
+			.where(eq(agents.id, agentId));
+
 		return url;
 	}
 

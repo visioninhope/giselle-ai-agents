@@ -6,3 +6,5 @@ export type CurrentTeam = {
 	type: typeof teams.$inferSelect.type;
 	activeSubscriptionId: typeof subscriptions.$inferInsert.id | null;
 };
+
+export type TeamId = `tm_${string}`;

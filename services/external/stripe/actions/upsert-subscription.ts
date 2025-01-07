@@ -4,6 +4,7 @@ import {
 	DRAFT_TEAM_USER_DB_ID_METADATA_KEY,
 	UPGRADING_TEAM_DB_ID_KEY,
 } from "@/services/teams/constants";
+import { createTeamId } from "@/services/teams/utils";
 import { eq } from "drizzle-orm";
 import type Stripe from "stripe";
 import { stripe } from "../config";
@@ -96,6 +97,7 @@ async function createTeam(
 	const [team] = await tx
 		.insert(teams)
 		.values({
+			id: createTeamId(),
 			name: teamName,
 		})
 		.returning({ dbid: teams.dbId });

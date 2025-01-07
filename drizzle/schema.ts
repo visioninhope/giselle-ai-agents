@@ -2,11 +2,6 @@ import type { GiselleNodeId } from "@/app/(playground)/p/[agentId]/prev/beta-pro
 import type { GitHubIntegrationId } from "@/app/(playground)/p/[agentId]/prev/beta-proto/github-integration/types";
 import type { Graph } from "@/app/(playground)/p/[agentId]/prev/beta-proto/graph/types";
 import type {
-	FlowId,
-	GitHubEventNodeMapping,
-	GitHubIntegrationSettingId,
-} from "@/app/(playground)/p/[agentId]/types";
-import type {
 	FileId,
 	KnowledgeContentId,
 	KnowledgeContentType,
@@ -36,6 +31,12 @@ import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
+import type { TeamId } from "@/services/teams/types";
+import type {
+	FlowId,
+	GitHubEventNodeMapping,
+	GitHubIntegrationSettingId,
+} from "@giselles-ai/types";
 import { relations } from "drizzle-orm";
 import {
 	boolean,
@@ -74,6 +75,7 @@ export const subscriptions = pgTable("subscriptions", {
 
 type TeamType = "customer" | "internal";
 export const teams = pgTable("teams", {
+	id: text("id").$type<TeamId>().notNull().unique(),
 	dbId: serial("db_id").primaryKey(),
 	name: text("name").notNull(),
 	createdAt: timestamp("created_at").defaultNow().notNull(),

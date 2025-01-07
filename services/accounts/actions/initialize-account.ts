@@ -8,6 +8,7 @@ import {
 	users,
 } from "@/drizzle";
 import { isEmailFromRoute06 } from "@/lib/utils";
+import { createTeamId } from "@/services/teams/utils";
 import { createId } from "@paralleldrive/cuid2";
 import type { User } from "@supabase/auth-js";
 
@@ -33,6 +34,7 @@ export const initializeAccount = async (
 		const [team] = await tx
 			.insert(teams)
 			.values({
+				id: createTeamId(),
 				name: "default",
 				type: isEmailFromRoute06(supabaseUserEmail ?? "")
 					? "internal"

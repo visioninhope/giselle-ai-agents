@@ -1,10 +1,10 @@
 "use client";
 
+import { TextGenerationIcon } from "@giselles-ai/icons/text-generation";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { FileUpIcon, LetterTextIcon, MousePointer2Icon } from "lucide-react";
 import { type ComponentProps, forwardRef } from "react";
 import { useToolbar } from "../contexts/toolbar";
-import { TextGenerationIcon } from "../prev/beta-proto/components/icons/text-generation";
 import type { Tool } from "../types";
 import { Tooltip } from "./tooltip";
 

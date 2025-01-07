@@ -6,6 +6,7 @@ import {
 	agentActivities,
 	agents,
 	db,
+	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
 	teams,
@@ -545,4 +546,33 @@ export async function deleteTeam(
 
 	// Redirect to team settings page when team is deleted
 	redirect("/settings/team");
+}
+
+export async function getSubscription(subscriptionId: string) {
+	try {
+		const [dbSubscription] = await db
+			.select({
+				cancelAtPeriodEnd: subscriptions.cancelAtPeriodEnd,
+				cancelAt: subscriptions.cancelAt,
+			})
+			.from(subscriptions)
+			.where(eq(subscriptions.id, subscriptionId));
+
+		if (!dbSubscription) {
+			throw new Error(`Subscription not found: ${subscriptionId}`);
+		}
+
+		return {
+			success: true,
+			data: dbSubscription,
+		};
+	} catch (error) {
+		console.error("Failed to fetch subscription:", error);
+
+		return {
+			success: false,
+			error:
+				error instanceof Error ? error.message : "Failed to fetch subscription",
+		};
+	}
 }

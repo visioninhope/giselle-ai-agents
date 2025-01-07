@@ -1,9 +1,9 @@
 import { agents, db } from "@/drizzle";
 import { fetchCurrentTeam } from "@/services/teams";
+import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
-import { formatTimestamp } from "../../(playground)/p/[agentId]/lib/utils";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (

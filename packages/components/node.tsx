@@ -1,3 +1,4 @@
+import { TextGenerationIcon } from "@giselles-ai/icons/text-generation";
 import {
 	Handle,
 	type NodeProps,
@@ -13,7 +14,6 @@ import React, {
 	useState,
 } from "react";
 import { useGraph } from "../contexts/graph";
-import { TextGenerationIcon } from "../prev/beta-proto/components/icons/text-generation";
 import type {
 	File,
 	Files,
