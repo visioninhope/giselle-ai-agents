@@ -547,6 +547,8 @@ export const userSeatUsageReports = pgTable(
 		userDbIdList: integer("user_db_id_list").array().notNull(),
 		stripeMeterEventId: text("stripe_meter_event_id").notNull(),
 		timestamp: timestamp("created_at").defaultNow().notNull(),
+		value: integer("value").notNull(),
+		isDelta: boolean("is_delta").notNull(),
 	},
 	(table) => ({
 		teamDbIdIdx: index().on(table.teamDbId),

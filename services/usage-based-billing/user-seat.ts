@@ -65,10 +65,11 @@ async function reportCurrentUserSeatUsage(
 	const meterEventId = createId();
 
 	const timestamp = toUTCDate(new Date());
+	const value = currentMemberCount;
 	const stripeEvent = await stripe.v2.billing.meterEvents.create({
 		event_name: USER_SEAT_METER_NAME,
 		payload: {
-			value: currentMemberCount.toString(),
+			value: value.toString(),
 			stripe_customer_id: customerId,
 		},
 		identifier: meterEventId,
@@ -76,12 +77,14 @@ async function reportCurrentUserSeatUsage(
 	});
 
 	// Save report to the database
-	await saveUserSeatUsage(
-		stripeEvent.identifier,
+	await saveUserSeatUsage({
+		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
 		timestamp,
-		teamMembers,
-	);
+		userDbIdList: teamMembers,
+		value,
+		isDelta: false,
+	});
 }
 
 async function reportDeltaUserSeatUsage(
@@ -109,26 +112,25 @@ async function reportDeltaUserSeatUsage(
 	});
 
 	// Save report to the database
-	await saveUserSeatUsage(
-		stripeEvent.identifier,
-		teamDbId,
-		timestamp,
-		teamMembers,
-	);
-}
-
-async function saveUserSeatUsage(
-	stripeMeterEventId: string,
-	teamDbId: number,
-	timestamp: Date,
-	teamMembers: number[],
-) {
-	await db.insert(userSeatUsageReports).values({
-		stripeMeterEventId,
+	await saveUserSeatUsage({
+		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
 		timestamp,
 		userDbIdList: teamMembers,
+		value: delta,
+		isDelta: true,
 	});
+}
+
+async function saveUserSeatUsage(params: {
+	stripeMeterEventId: string;
+	teamDbId: number;
+	timestamp: Date;
+	userDbIdList: number[];
+	value: number;
+	isDelta: boolean;
+}) {
+	await db.insert(userSeatUsageReports).values(params);
 }
 
 async function findSubscription(subscriptionId: string) {
