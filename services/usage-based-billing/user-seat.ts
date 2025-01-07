@@ -10,6 +10,7 @@ import { stripe } from "../external/stripe";
 
 const USER_SEAT_METER_NAME = "user_seat";
 const PERIOD_END_BUFFER_MS = 1000 * 5; // 5 seconds
+const STRIPE_TEST_CLOCK_ENABLED = false; // Set to true in development to simulate test clock
 
 export async function reportUserSeatUsage(
 	subscriptionId: string,
@@ -21,8 +22,11 @@ export async function reportUserSeatUsage(
 	const currentMemberCount = teamMembers.length;
 	const meterEventId = createId();
 
-	// Must be with the subscrtipion period, so we subtract a buffer
-	const timestamp = new Date(periodEndUTC.getTime() - PERIOD_END_BUFFER_MS);
+	// Handle timestamp differently for test clock simulation vs production
+	const timestamp = isTestClockSimulation()
+		? new Date() // Use current time for simulation
+		: new Date(periodEndUTC.getTime() - PERIOD_END_BUFFER_MS); // Use period end time minus buffer for production
+
 	const stripeEvent = await stripe.v2.billing.meterEvents.create({
 		event_name: USER_SEAT_METER_NAME,
 		payload: {
@@ -40,6 +44,11 @@ export async function reportUserSeatUsage(
 		timestamp,
 		teamMembers,
 	);
+}
+
+// Check if we're running in test clock simulation mode
+function isTestClockSimulation(): boolean {
+	return process.env.NODE_ENV === "development" && STRIPE_TEST_CLOCK_ENABLED;
 }
 
 async function saveUserSeatUsage(
