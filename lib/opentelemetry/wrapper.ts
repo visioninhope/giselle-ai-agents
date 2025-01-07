@@ -1,10 +1,10 @@
 import { getCurrentMeasurementScope, isRoute06User } from "@/app/(auth)/lib";
 import { db } from "@/drizzle";
+import type { AgentId } from "@giselles-ai/types";
 import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage } from "ai";
 import type { LanguageModelV1 } from "ai";
 import type { Strategy } from "unstructured-client/sdk/models/shared";
-import type { AgentId } from "../../app/(playground)/p/[agentId]/types";
 import { captureError } from "./log";
 import type { LogSchema, OtelLoggerWrapper } from "./types";
 import {
