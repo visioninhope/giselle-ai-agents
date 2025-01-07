@@ -453,7 +453,7 @@ export function Overview() {
 				<input
 					type="text"
 					className="text-[16px] text-black-30 p-[4px] text-left outline-black-70 rounded-[8px]"
-					defaultValue={agentName ?? "Untitled Agent"}
+					defaultValue={agentName ?? "Unnamed Agent"}
 					ref={(ref) => {
 						if (ref === null) {
 							return;
@@ -485,7 +485,7 @@ export function Overview() {
 					onClick={() => setEditTitle(true)}
 					className="text-[16px] text-black-30 p-[4px] text-left"
 				>
-					{agentName}
+					{agentName ?? "Unnamed Agent"}
 				</button>
 			)}
 		</ContentPanel>
