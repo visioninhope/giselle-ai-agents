@@ -84,31 +84,43 @@ export async function POST(req: Request) {
 				await handleSubscriptionCancellation(event.data.object);
 				break;
 
-			case "invoice.created":
+			case "invoice.created": {
 				console.log(`🔔  Invoice created: ${event.data.object.id}`);
 
-				// TODO: Skip for now - will be handled when implementing subscription cancellation invoice processing
-				if (
-					event.data.object.subscription &&
-					typeof event.data.object.subscription === "string"
-				) {
-					const subscriptionId = event.data.object.subscription;
-					const subscription =
-						await stripe.subscriptions.retrieve(subscriptionId);
+				const invoice = event.data.object;
 
-					if (subscription.status === "canceled") {
-						console.log(
-							"Skipping processing for canceled subscription invoice: ",
-							subscriptionId,
-						);
-						break;
+				if (!invoice.subscription || typeof invoice.subscription !== "string") {
+					throw new Error(
+						"Invoice is missing a subscription ID. Please check the invoice data.",
+					);
+				}
+
+				const subscription = await stripe.subscriptions.retrieve(
+					invoice.subscription,
+				);
+
+				if (subscription.status === "canceled") {
+					try {
+						await stripe.invoices.finalizeInvoice(invoice.id);
+					} catch (error) {
+						console.error(`Error finalizing invoice ${invoice.id}:`, error);
+						throw new Error("Failed to finalize invoice.");
+					}
+
+					try {
+						await stripe.invoices.pay(invoice.id);
+					} catch (error) {
+						console.error(`Error paying invoice ${invoice.id}:`, error);
+						throw new Error("Failed to pay invoice.");
 					}
 				}
 
+				// TODO: This block will be removed in the other issue.
 				if (event.data.object.billing_reason === "subscription_cycle") {
 					await handleSubscriptionCycleInvoice(event.data.object);
 				}
 				break;
+			}
 
 			default:
 				throw new Error("Unhandled relevant event!");
