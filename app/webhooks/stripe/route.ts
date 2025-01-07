@@ -83,10 +83,11 @@ export async function POST(req: Request) {
 					);
 				}
 				await handleSubscriptionCancellation(event.data.object);
+				await upsertSubscription(event.data.object.id);
 				break;
 
-			case "invoice.created": {
-				console.log(`🔔 Invoice created: ${event.data.object.id}`);
+			case "invoice.created":
+				console.log(`🔔  Invoice created: ${event.data.object.id}`);
 
 				await handleInvoiceCreation(event.data.object);
 
@@ -95,7 +96,6 @@ export async function POST(req: Request) {
 					await handleSubscriptionCycleInvoice(event.data.object);
 				}
 				break;
-			}
 
 			default:
 				throw new Error("Unhandled relevant event!");
