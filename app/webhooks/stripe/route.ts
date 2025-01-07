@@ -1,6 +1,7 @@
 import { stripe } from "@/services/external/stripe";
 import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
 import type Stripe from "stripe";
+import { handleInvoiceCreation } from "./handle-invoice-creation";
 import { handleSubscriptionCancellation } from "./handle-subscription-cancellation";
 import { handleSubscriptionCycleInvoice } from "./handle-subscription-cycle-invoice";
 
@@ -85,35 +86,9 @@ export async function POST(req: Request) {
 				break;
 
 			case "invoice.created": {
-				console.log(`🔔  Invoice created: ${event.data.object.id}`);
+				console.log(`🔔 Invoice created: ${event.data.object.id}`);
 
-				const invoice = event.data.object;
-
-				if (!invoice.subscription || typeof invoice.subscription !== "string") {
-					throw new Error(
-						"Invoice is missing a subscription ID. Please check the invoice data.",
-					);
-				}
-
-				const subscription = await stripe.subscriptions.retrieve(
-					invoice.subscription,
-				);
-
-				if (subscription.status === "canceled") {
-					try {
-						await stripe.invoices.finalizeInvoice(invoice.id);
-					} catch (error) {
-						console.error(`Error finalizing invoice ${invoice.id}:`, error);
-						throw new Error("Failed to finalize invoice.");
-					}
-
-					try {
-						await stripe.invoices.pay(invoice.id);
-					} catch (error) {
-						console.error(`Error paying invoice ${invoice.id}:`, error);
-						throw new Error("Failed to pay invoice.");
-					}
-				}
+				await handleInvoiceCreation(event.data.object);
 
 				// TODO: This block will be removed in the other issue.
 				if (event.data.object.billing_reason === "subscription_cycle") {
