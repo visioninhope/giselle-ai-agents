@@ -91,7 +91,6 @@ export async function POST(req: Request) {
 
 				await handleInvoiceCreation(event.data.object);
 
-				// TODO: This block will be removed in the other issue.
 				if (event.data.object.billing_reason === "subscription_cycle") {
 					await handleSubscriptionCycleInvoice(event.data.object);
 				}
