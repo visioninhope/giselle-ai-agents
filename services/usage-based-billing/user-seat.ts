@@ -28,39 +28,45 @@ export async function reportUserSeatUsage(
 	subscriptionId: string,
 	customerId: string,
 ): Promise<void> {
-	const subscriptionRecord = await findSubscription(subscriptionId);
-	const teamDbId = subscriptionRecord.teamDbId;
-	const periodStart = subscriptionRecord.currentPeriodStart;
-	const periodEnd = subscriptionRecord.currentPeriodEnd;
+	await db.transaction(async (tx) => {
+		const subscriptionRecord = await findSubscriptionWithLock(
+			tx,
+			subscriptionId,
+		);
+		const teamDbId = subscriptionRecord.teamDbId;
+		const periodStart = subscriptionRecord.currentPeriodStart;
+		const periodEnd = subscriptionRecord.currentPeriodEnd;
 
-	const lastReport = await db
-		.select()
-		.from(userSeatUsageReports)
-		.where(
-			and(
-				eq(userSeatUsageReports.teamDbId, teamDbId),
-				gte(userSeatUsageReports.createdAt, periodStart),
-				lt(userSeatUsageReports.createdAt, periodEnd),
-			),
-		)
-		.orderBy(desc(userSeatUsageReports.createdAt))
-		.limit(1);
+		const lastReport = await tx
+			.select()
+			.from(userSeatUsageReports)
+			.where(
+				and(
+					eq(userSeatUsageReports.teamDbId, teamDbId),
+					gte(userSeatUsageReports.createdAt, periodStart),
+					lt(userSeatUsageReports.createdAt, periodEnd),
+				),
+			)
+			.orderBy(desc(userSeatUsageReports.createdAt))
+			.limit(1);
 
-	// If record is not exists, we will report the current count
-	if (lastReport.length === 0) {
-		await reportCurrentUserSeatUsage(teamDbId, customerId);
-		return;
-	}
+		if (lastReport.length === 0) {
+			// If record is not exists, we will report the current count
+			await reportCurrentUserSeatUsage(tx, teamDbId, customerId);
+			return;
+		}
 
-	// If record is exists in the database, we will report delta
-	await reportDeltaUserSeatUsage(teamDbId, customerId, lastReport[0]);
+		// If record is exists in the database, we will report delta
+		await reportDeltaUserSeatUsage(tx, teamDbId, customerId, lastReport[0]);
+	});
 }
 
 async function reportCurrentUserSeatUsage(
+	tx: typeof db,
 	teamDbId: number,
 	customerId: string,
 ) {
-	const teamMembers = await listTeamMembers(teamDbId);
+	const teamMembers = await listTeamMembers(tx, teamDbId);
 	const currentMemberCount = teamMembers.length;
 	const meterEventId = createId();
 
@@ -77,7 +83,7 @@ async function reportCurrentUserSeatUsage(
 	});
 
 	// Save report to the database
-	await saveUserSeatUsage({
+	await saveUserSeatUsage(tx, {
 		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
 		createdAt: timestamp,
@@ -88,11 +94,12 @@ async function reportCurrentUserSeatUsage(
 }
 
 async function reportDeltaUserSeatUsage(
+	tx: typeof db,
 	teamDbId: number,
 	customerId: string,
 	lastReport: typeof userSeatUsageReports.$inferSelect,
 ) {
-	const teamMembers = await listTeamMembers(teamDbId);
+	const teamMembers = await listTeamMembers(tx, teamDbId);
 	if (areNumberArraysEqualWithEvery(teamMembers, lastReport.userDbIdList)) {
 		// No change in the team members
 		return;
@@ -112,7 +119,7 @@ async function reportDeltaUserSeatUsage(
 	});
 
 	// Save report to the database
-	await saveUserSeatUsage({
+	await saveUserSeatUsage(tx, {
 		stripeMeterEventId: stripeEvent.identifier,
 		teamDbId,
 		createdAt: timestamp,
@@ -122,19 +129,22 @@ async function reportDeltaUserSeatUsage(
 	});
 }
 
-async function saveUserSeatUsage(params: {
-	stripeMeterEventId: string;
-	teamDbId: number;
-	createdAt: Date;
-	userDbIdList: number[];
-	value: number;
-	isDelta: boolean;
-}) {
-	await db.insert(userSeatUsageReports).values(params);
+async function saveUserSeatUsage(
+	tx: typeof db,
+	params: {
+		stripeMeterEventId: string;
+		teamDbId: number;
+		createdAt: Date;
+		userDbIdList: number[];
+		value: number;
+		isDelta: boolean;
+	},
+) {
+	await tx.insert(userSeatUsageReports).values(params);
 }
 
-async function findSubscription(subscriptionId: string) {
-	const record = await db
+async function findSubscriptionWithLock(tx: typeof db, subscriptionId: string) {
+	const record = await tx
 		.select({
 			dbid: subscriptions.dbId,
 			teamDbId: subscriptions.teamDbId,
@@ -142,6 +152,7 @@ async function findSubscription(subscriptionId: string) {
 			currentPeriodStart: subscriptions.currentPeriodStart,
 		})
 		.from(subscriptions)
+		.for("update")
 		.where(eq(subscriptions.id, subscriptionId));
 	if (record.length === 0) {
 		throw new Error(`Subscription not found: ${subscriptionId}`);
@@ -149,8 +160,8 @@ async function findSubscription(subscriptionId: string) {
 	return record[0];
 }
 
-async function listTeamMembers(teamDbId: number) {
-	const teamMembers = await db
+async function listTeamMembers(tx: typeof db, teamDbId: number) {
+	const teamMembers = await tx
 		.select({ userDbId: teamMemberships.userDbId })
 		.from(teamMemberships)
 		.where(eq(teamMemberships.teamDbId, teamDbId));
