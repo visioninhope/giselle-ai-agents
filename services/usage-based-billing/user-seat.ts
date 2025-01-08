@@ -28,6 +28,9 @@ export async function reportUserSeatUsage(
 	subscriptionId: string,
 	customerId: string,
 ): Promise<void> {
+	// Reporting to Stripe is executed within a transaction to ensure data consistency between Stripe and our database.
+	// Although this includes an external API call which may slow down the transaction,
+	// it's acceptable since the lock scope is minimal (only one subscription record).
 	await db.transaction(async (tx) => {
 		const subscriptionRecord = await findSubscriptionWithLock(
 			tx,
