@@ -1,11 +1,3 @@
-export async function POST(
-	request: Request,
-	{ params }: { params: Promise<{ giselle: string[] }> },
-) {
-	const { giselle } = await params;
-	return Response.json({ command: giselle });
-}
+import { workflowEngine } from "@/workflow-engine";
 
-export async function GET() {
-	return Response.json({ getGraph: "ok" });
-}
+export const { GET, POST } = workflowEngine.handlers;
