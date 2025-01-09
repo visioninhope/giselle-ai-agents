@@ -9,23 +9,23 @@ import { getGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
 import { and, asc, eq } from "drizzle-orm";
 import { cache } from "react";
-import type { CurrentTeam } from "./types";
+import type { CurrentTeam, TeamId } from "./types";
 
 /**
  * Fetches the current team of the user.
- * This function uses session to get the teamDbId.
+ * This function uses session to get the teamId.
  * If the user does not have a team, the first team is returned.
  */
 async function fetchCurrentTeam(): Promise<CurrentTeam> {
 	const supabaseUser = await getUser();
 	const session = await getGiselleSession();
-	const teamDbId = session?.teamDbId;
+	const teamId = session?.teamId;
 
-	if (teamDbId == null) {
+	if (teamId == null) {
 		return fetchFirstTeam(supabaseUser.id);
 	}
 
-	const team = await fetchTeam(teamDbId, supabaseUser.id);
+	const team = await fetchTeam(teamId, supabaseUser.id);
 	if (team == null) {
 		// fallback to first team
 		return fetchFirstTeam(supabaseUser.id);
@@ -36,9 +36,10 @@ async function fetchCurrentTeam(): Promise<CurrentTeam> {
 const cachedFetchCurrentTeam = cache(fetchCurrentTeam);
 export { cachedFetchCurrentTeam as fetchCurrentTeam };
 
-async function fetchTeam(teamDbId: number, supabaseUserId: string) {
+async function fetchTeam(teamId: TeamId, supabaseUserId: string) {
 	const result = await db
 		.select({
+			id: teams.id,
 			dbId: teams.dbId,
 			name: teams.name,
 			type: teams.type,
@@ -61,7 +62,7 @@ async function fetchTeam(teamDbId: number, supabaseUserId: string) {
 		.where(
 			and(
 				eq(supabaseUserMappings.supabaseUserId, supabaseUserId),
-				eq(teams.dbId, teamDbId),
+				eq(teams.id, teamId),
 			),
 		);
 	if (result.length === 0) {
@@ -73,6 +74,7 @@ async function fetchTeam(teamDbId: number, supabaseUserId: string) {
 async function fetchFirstTeam(supabaseUserId: string) {
 	const team = await db
 		.select({
+			id: teams.id,
 			dbId: teams.dbId,
 			name: teams.name,
 			type: teams.type,
