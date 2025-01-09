@@ -11,7 +11,7 @@ export type AgentTimeUsageReport = {
 	accumulatedDurationMs: number;
 	minutesIncrement: number;
 	stripeMeterEventId: string;
-	timestamp: Date;
+	createdAt: Date;
 };
 
 export type Subscription = {

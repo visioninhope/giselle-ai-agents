@@ -201,8 +201,8 @@ async function fetchUserSeats(
 		.where(
 			and(
 				eq(userSeatUsageReports.teamDbId, teamDbId),
-				gte(userSeatUsageReports.timestamp, periodStartDate),
-				lt(userSeatUsageReports.timestamp, periodEndDate),
+				gte(userSeatUsageReports.createdAt, periodStartDate),
+				lt(userSeatUsageReports.createdAt, periodEndDate),
 			),
 		);
 	if (res.length === 0) {

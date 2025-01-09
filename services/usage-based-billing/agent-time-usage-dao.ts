@@ -98,11 +98,11 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			.where(
 				and(
 					eq(agentTimeUsageReports.teamDbId, teamDbId),
-					gt(agentTimeUsageReports.timestamp, periodStart),
-					lte(agentTimeUsageReports.timestamp, periodEnd),
+					gt(agentTimeUsageReports.createdAt, periodStart),
+					lte(agentTimeUsageReports.createdAt, periodEnd),
 				),
 			)
-			.orderBy(desc(agentTimeUsageReports.timestamp))
+			.orderBy(desc(agentTimeUsageReports.createdAt))
 			.limit(1);
 		if (reports.length === 0) {
 			return null;
@@ -115,7 +115,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			),
 			minutesIncrement: reports[0].minutesIncrement,
 			stripeMeterEventId: reports[0].stripeMeterEventId,
-			timestamp: reports[0].timestamp,
+			createdAt: reports[0].createdAt,
 		};
 	}
 
@@ -133,7 +133,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 				accumulatedDurationMs: params.accumulatedDurationMs.toString(),
 				minutesIncrement: params.minutesIncrement,
 				stripeMeterEventId: params.stripeMeterEventId,
-				timestamp: params.timestamp,
+				createdAt: params.timestamp,
 			})
 			.returning();
 		if (report == null) {
@@ -145,7 +145,7 @@ export class AgentTimeUsageDAO implements AgentTimeUsageDataAccess {
 			accumulatedDurationMs: safeStringToNumber(report.accumulatedDurationMs),
 			minutesIncrement: report.minutesIncrement,
 			stripeMeterEventId: report.stripeMeterEventId,
-			timestamp: report.timestamp,
+			createdAt: report.createdAt,
 		};
 	}
 

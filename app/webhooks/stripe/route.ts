@@ -1,9 +1,9 @@
 import { stripe } from "@/services/external/stripe";
 import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
+import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import type Stripe from "stripe";
 import { handleInvoiceCreation } from "./handle-invoice-creation";
 import { handleSubscriptionCancellation } from "./handle-subscription-cancellation";
-import { handleSubscriptionCycleInvoice } from "./handle-subscription-cycle-invoice";
 
 const relevantEvents = new Set([
 	"checkout.session.completed",
@@ -38,7 +38,7 @@ export async function POST(req: Request) {
 
 	try {
 		switch (event.type) {
-			case "checkout.session.completed":
+			case "checkout.session.completed": {
 				if (event.data.object.mode !== "subscription") {
 					throw new Error("Unhandled relevant event!");
 				}
@@ -59,7 +59,12 @@ export async function POST(req: Request) {
 					);
 				}
 				await upsertSubscription(event.data.object.subscription);
+				await reportUserSeatUsage(
+					event.data.object.subscription,
+					event.data.object.customer,
+				);
 				break;
+			}
 
 			case "customer.subscription.updated":
 				if (
@@ -71,6 +76,10 @@ export async function POST(req: Request) {
 					);
 				}
 				await upsertSubscription(event.data.object.id);
+				await reportUserSeatUsage(
+					event.data.object.id,
+					event.data.object.customer,
+				);
 				break;
 
 			case "customer.subscription.deleted":
@@ -90,10 +99,6 @@ export async function POST(req: Request) {
 				console.log(`🔔  Invoice created: ${event.data.object.id}`);
 
 				await handleInvoiceCreation(event.data.object);
-
-				if (event.data.object.billing_reason === "subscription_cycle") {
-					await handleSubscriptionCycleInvoice(event.data.object);
-				}
 				break;
 
 			default:

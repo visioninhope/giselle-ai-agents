@@ -14,7 +14,10 @@ import {
 } from "@/drizzle";
 import { updateGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
+import { stripe } from "@/services/external/stripe";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import type { CurrentTeam } from "@/services/teams/types";
+import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -162,6 +165,7 @@ export async function addTeamMember(formData: FormData) {
 			role,
 		});
 
+		await handleMemberChange(currentTeam);
 		revalidatePath("/settings/team");
 
 		return { success: true };
@@ -371,6 +375,7 @@ export async function deleteTeamMember(formData: FormData) {
 				),
 			);
 
+		await handleMemberChange(currentTeam);
 		revalidatePath("/settings/team");
 
 		return { success: true };
@@ -575,4 +580,20 @@ export async function getSubscription(subscriptionId: string) {
 				error instanceof Error ? error.message : "Failed to fetch subscription",
 		};
 	}
+}
+
+async function handleMemberChange(currentTeam: CurrentTeam) {
+	const subscriptionId = currentTeam.activeSubscriptionId;
+	if (subscriptionId == null) {
+		// No active subscription, nothing to do
+		return;
+	}
+
+	// FIXME: If we have customer in subscriptions table, we don't have to query to Stripe here.
+	const subscription = await stripe.subscriptions.retrieve(subscriptionId);
+	const customer =
+		typeof subscription.customer === "string"
+			? subscription.customer
+			: subscription.customer.id;
+	await reportUserSeatUsage(subscriptionId, customer);
 }

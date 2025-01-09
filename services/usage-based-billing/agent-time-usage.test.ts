@@ -134,7 +134,7 @@ describe("processUnreportedActivities", () => {
 				accumulatedDurationMs: 60000,
 				minutesIncrement: 1,
 				stripeMeterEventId: "meter_123",
-				timestamp: new Date(),
+				createdAt: new Date(),
 			})),
 			markActivitiesAsProcessed: mock(async () => {}),
 		};
@@ -174,7 +174,7 @@ describe("processUnreportedActivities", () => {
 				accumulatedDurationMs: 60000,
 				minutesIncrement: 1,
 				stripeMeterEventId: "meter_123",
-				timestamp: new Date(),
+				createdAt: new Date(),
 			})),
 			markActivitiesAsProcessed: mock(async () => {}),
 		};
@@ -219,7 +219,7 @@ describe("processUnreportedActivities", () => {
 				accumulatedDurationMs: 60000,
 				minutesIncrement: 1,
 				stripeMeterEventId: "meter_123",
-				timestamp: new Date(),
+				createdAt: new Date(),
 			})),
 			markActivitiesAsProcessed: mock(async () => {}),
 		};
@@ -277,7 +277,7 @@ describe("processUnreportedActivities", () => {
 				accumulatedDurationMs: 60000,
 				minutesIncrement: 1,
 				stripeMeterEventId: "meter_123",
-				timestamp: new Date(),
+				createdAt: new Date(),
 			})),
 			markActivitiesAsProcessed: mock(async () => {}),
 		};
