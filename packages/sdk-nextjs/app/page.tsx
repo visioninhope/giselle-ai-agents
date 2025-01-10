@@ -3,8 +3,9 @@ import { useCompletion } from "ai/react";
 
 export default function Home() {
 	const { completion, handleSubmit } = useCompletion({
-		api: "/api/g",
+		api: "/api/workflow/text-generation",
 		initialInput: "hello",
+		body: { prompt: "hi!" },
 	});
 	return (
 		<main>

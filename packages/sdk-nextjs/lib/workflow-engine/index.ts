@@ -1,40 +1,46 @@
-import { z } from "zod";
-import type { WorkflowEngineRequest } from "./types";
+import { textGeneration } from "./handlers/text-generation";
+import { WorkflowEngineAction, type WorkflowEngineRequest } from "./types";
 
-const HandlerParams = z.object({
-	command: z.string(),
-});
-type HandlerParams = z.infer<typeof HandlerParams>;
-export async function handler(
-	request: Request,
-	{ command }: HandlerParams,
-): Promise<Response> {
-	return Response.json({ command });
+export interface WorkflowEngineConfig {
+	basePath: string;
 }
 
-export async function routerHanlerAdapter(
+async function toWorkflowEngineRequest(
 	request: Request,
-	params: Promise<{ giselle: string[] }>,
-) {
-	const { giselle } = await params;
-	const handlerParams = HandlerParams.parse({ command: giselle[1] });
-	return handler(request, handlerParams);
-}
-
-type WorkflowConfig = unknown;
-
-function toWorkflowEngineRequest(request: Request): WorkflowEngineRequest {
+	config: WorkflowEngineConfig,
+): Promise<WorkflowEngineRequest> {
 	request.url;
 	const url = new URL(request.url);
+	const pathname = url.pathname;
+	const a = url.pathname.match(new RegExp(`^${config.basePath}(.+)`));
+
+	const segmentString = a?.at(-1);
+	if (segmentString == null)
+		throw new Error(`Cannot parse action at ${pathname}`);
+	const segments = segmentString.replace(/^\//, "").split("/").filter(Boolean);
+
+	if (segments.length !== 1) throw new Error(`Invalid action at ${pathname}`);
+
+	const [unsafeAction] = segments;
+
+	const action = WorkflowEngineAction.parse(unsafeAction);
+
 	return {
-		action: "get-graph",
+		action,
+		payload: await request.json(),
 	};
 }
 
 export async function WorkflowEngine(
 	request: Request,
-	workflowConfig?: WorkflowConfig,
+	config: WorkflowEngineConfig,
 ): Promise<Response> {
-	const { action } = toWorkflowEngineRequest(request);
+	const { action, payload } = await toWorkflowEngineRequest(request, config);
+	switch (action) {
+		case "get-graph":
+			return new Response("Get Graph");
+		case "text-generation":
+			return textGeneration(payload);
+	}
 	return Response.json({ workflowEngine: "true", action });
 }
