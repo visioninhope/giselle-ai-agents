@@ -1,5 +1,17 @@
+import { z } from "zod";
 import { textGeneration } from "./handlers/text-generation";
-import { WorkflowEngineAction, type WorkflowEngineRequest } from "./types";
+
+export const WorkflowEngineAction = z.enum([
+	"save-graph",
+	"get-graph",
+	"text-generation",
+]);
+type WorkflowEngineAction = z.infer<typeof WorkflowEngineAction>;
+
+export interface WorkflowEngineRequest {
+	action: WorkflowEngineAction;
+	payload: unknown;
+}
 
 export interface WorkflowEngineConfig {
 	basePath: string;
