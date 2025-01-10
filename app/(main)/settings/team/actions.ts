@@ -16,7 +16,7 @@ import { updateGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
 import { stripe } from "@/services/external/stripe";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import type { CurrentTeam } from "@/services/teams/types";
+import type { CurrentTeam, TeamId } from "@/services/teams/types";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -30,7 +30,7 @@ function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
 }
 
-export async function updateTeamName(teamDbId: number, formData: FormData) {
+export async function updateTeamName(teamId: TeamId, formData: FormData) {
 	const newName = formData.get("name") as string;
 	const user = await getUser();
 
@@ -48,7 +48,7 @@ export async function updateTeamName(teamDbId: number, formData: FormData) {
 				.where(
 					and(
 						eq(supabaseUserMappings.supabaseUserId, user.id),
-						eq(teams.dbId, teamDbId),
+						eq(teams.id, teamId),
 					),
 				);
 

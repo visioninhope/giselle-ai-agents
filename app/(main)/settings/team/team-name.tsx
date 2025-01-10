@@ -6,9 +6,9 @@ export async function TeamName() {
 	return (
 		<div>
 			<TeamNameForm
-				key={currentTeam.dbId}
+				key={currentTeam.id}
 				name={currentTeam.name}
-				teamDbId={currentTeam.dbId}
+				teamId={currentTeam.id}
 			/>
 		</div>
 	);
