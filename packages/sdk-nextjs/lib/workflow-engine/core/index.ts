@@ -1,5 +1,9 @@
+import type { WorkflowData } from "@/lib/workflow-data";
+import type { Storage } from "unstorage";
 import { z } from "zod";
+import { getGraph } from "./handlers/get-graph";
 import { textGeneration } from "./handlers/text-generation";
+import type { WorkflowEngineContext } from "./types";
 
 export const WorkflowEngineAction = z.enum([
 	"save-graph",
@@ -11,10 +15,12 @@ type WorkflowEngineAction = z.infer<typeof WorkflowEngineAction>;
 export interface WorkflowEngineRequest {
 	action: WorkflowEngineAction;
 	payload: unknown;
+	context: WorkflowEngineContext;
 }
 
 export interface WorkflowEngineConfig {
 	basePath: string;
+	storage: Storage<WorkflowData>;
 }
 
 async function toWorkflowEngineRequest(
@@ -40,6 +46,10 @@ async function toWorkflowEngineRequest(
 	return {
 		action,
 		payload: await request.json(),
+		context: {
+			storage: config.storage,
+			workflowId: "wf-test",
+		},
 	};
 }
 
@@ -47,12 +57,28 @@ export async function WorkflowEngine(
 	request: Request,
 	config: WorkflowEngineConfig,
 ): Promise<Response> {
-	const { action, payload } = await toWorkflowEngineRequest(request, config);
+	const { action, payload, context } = await toWorkflowEngineRequest(
+		request,
+		config,
+	);
 	switch (action) {
-		case "get-graph":
+		case "save-graph": {
+			return new Response("Save Graph");
+		}
+		case "get-graph": {
+			const workflowData = await getGraph({
+				context,
+			});
 			return new Response("Get Graph");
+		}
 		case "text-generation":
-			return textGeneration(payload);
+			return textGeneration({
+				context,
+				unsafeInput: payload,
+			});
+		default: {
+			const _exhaustiveCheck: never = action;
+			return _exhaustiveCheck;
+		}
 	}
-	return Response.json({ workflowEngine: "true", action });
 }

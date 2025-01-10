@@ -1,5 +1,5 @@
 import type { NextRequest } from "next/server";
-import { WorkflowEngine, type WorkflowEngineConfig } from "..";
+import { WorkflowEngine, type WorkflowEngineConfig } from "../core";
 
 type AppRouteHandlers = Record<
 	"GET" | "POST",
