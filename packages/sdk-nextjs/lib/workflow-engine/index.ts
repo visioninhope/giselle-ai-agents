@@ -1,4 +1,5 @@
 import { z } from "zod";
+import type { WorkflowEngineRequest } from "./types";
 
 const HandlerParams = z.object({
 	command: z.string(),
@@ -22,9 +23,18 @@ export async function routerHanlerAdapter(
 
 type WorkflowConfig = unknown;
 
+function toWorkflowEngineRequest(request: Request): WorkflowEngineRequest {
+	request.url;
+	const url = new URL(request.url);
+	return {
+		action: "get-graph",
+	};
+}
+
 export async function WorkflowEngine(
 	request: Request,
 	workflowConfig?: WorkflowConfig,
 ): Promise<Response> {
-	return Response.json({ workflowEngine: "true" });
+	const { action } = toWorkflowEngineRequest(request);
+	return Response.json({ workflowEngine: "true", action });
 }
