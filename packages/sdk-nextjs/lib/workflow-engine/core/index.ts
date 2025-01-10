@@ -90,11 +90,13 @@ export async function WorkflowEngine(
 			});
 			return Response.json(workflowData);
 		}
-		case "text-generation":
-			return textGeneration({
+		case "text-generation": {
+			const stream = await textGeneration({
 				context,
 				unsafeInput: payload,
 			});
+			return stream.toDataStreamResponse();
+		}
 		default: {
 			const _exhaustiveCheck: never = action;
 			return _exhaustiveCheck;

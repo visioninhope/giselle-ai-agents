@@ -16,5 +16,5 @@ export async function textGeneration({
 		model: openai("gpt-4o"),
 		prompt: input.prompt,
 	});
-	return stream.toDataStreamResponse();
+	return stream;
 }
