@@ -19,6 +19,5 @@ export async function saveGraph({
 		},
 	);
 	const meta = await context.storage.getMeta(`${context.workflowId}.json`);
-	console.log(meta);
 	return meta;
 }
