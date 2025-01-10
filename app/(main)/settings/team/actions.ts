@@ -515,9 +515,10 @@ export async function deleteTeam(
 		const supabaseUser = await getUser();
 		const otherTeams = await db
 			.select({
-				teamDbId: teamMemberships.teamDbId,
+				teamId: teams.id,
 			})
-			.from(teamMemberships)
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
 			.innerJoin(
 				supabaseUserMappings,
 				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
@@ -525,7 +526,7 @@ export async function deleteTeam(
 			.where(
 				and(
 					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
-					ne(teamMemberships.teamDbId, currentTeam.dbId), // Exclude current team
+					ne(teams.dbId, currentTeam.dbId),
 				),
 			)
 			.limit(1);
@@ -540,7 +541,7 @@ export async function deleteTeam(
 
 		// Refresh session to switch to another team after deletion
 		// This ensures that the user is redirected to a valid team context and prevents access to the deleted team's resources.
-		await updateGiselleSession({ teamDbId: otherTeams[0].teamDbId });
+		await updateGiselleSession({ teamId: otherTeams[0].teamId });
 	} catch (error) {
 		console.error("Failed to delete team:", error);
 
