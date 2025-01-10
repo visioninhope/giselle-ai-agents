@@ -10,16 +10,15 @@ export async function saveGraph({
 	unsafeInput,
 }: WorkflowEngineHandlerArgs<z.infer<typeof Input>>) {
 	const input = Input.parse(unsafeInput);
-	const result = await context.storage.setItem(
-		context.workflowId,
+	await context.storage.setItem(
+		`${context.workflowId}.json`,
 		input.workflowData,
 		{
 			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
 			cacheControlMaxAge: 0,
 		},
 	);
-	if (result === null) {
-		throw new Error("Workflow not found");
-	}
-	return result;
+	const meta = await context.storage.getMeta(`${context.workflowId}.json`);
+	console.log(meta);
+	return meta;
 }
