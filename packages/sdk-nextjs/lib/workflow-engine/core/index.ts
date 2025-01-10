@@ -44,9 +44,23 @@ async function toWorkflowEngineRequest(
 
 	const action = WorkflowEngineAction.parse(unsafeAction);
 
+	async function getBody(
+		req: Request,
+	): Promise<Record<string, unknown> | undefined> {
+		if (!("body" in req) || !req.body || req.method !== "POST") return;
+
+		const contentType = req.headers.get("content-type");
+		if (contentType?.includes("application/json")) {
+			return await req.json();
+		}
+		if (contentType?.includes("application/x-www-form-urlencoded")) {
+			const params = new URLSearchParams(await req.text());
+			return Object.fromEntries(params);
+		}
+	}
 	return {
 		action,
-		payload: await request.json(),
+		payload: request.body ? await getBody(request) : undefined,
 		context: {
 			storage: config.storage,
 			workflowId: "wf-test",
@@ -74,7 +88,7 @@ export async function WorkflowEngine(
 			const workflowData = await getGraph({
 				context,
 			});
-			return new Response("Get Graph");
+			return Response.json(workflowData);
 		}
 		case "text-generation":
 			return textGeneration({
