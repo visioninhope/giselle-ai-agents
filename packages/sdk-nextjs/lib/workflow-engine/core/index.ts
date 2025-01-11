@@ -7,6 +7,7 @@ import { textGeneration } from "./handlers/text-generation";
 import type { WorkflowEngineContext } from "./types";
 
 export const WorkflowEngineAction = z.enum([
+	"create-workflow",
 	"save-graph",
 	"get-graph",
 	"text-generation",
@@ -63,7 +64,6 @@ async function toWorkflowEngineRequest(
 		payload: request.body ? await getBody(request) : undefined,
 		context: {
 			storage: config.storage,
-			workflowId: "wf-test",
 		},
 	};
 }
@@ -86,6 +86,7 @@ export async function WorkflowEngine(
 		}
 		case "get-graph": {
 			const workflowData = await getGraph({
+				unsafeInput: payload,
 				context,
 			});
 			return Response.json(workflowData);
@@ -96,6 +97,9 @@ export async function WorkflowEngine(
 				unsafeInput: payload,
 			});
 			return stream.toDataStreamResponse();
+		}
+		case "create-workflow": {
+			return new Response("Create Workflow");
 		}
 		default: {
 			const _exhaustiveCheck: never = action;

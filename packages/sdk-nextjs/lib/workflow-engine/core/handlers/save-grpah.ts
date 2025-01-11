@@ -1,8 +1,10 @@
-import { WorkflowData } from "@/lib/workflow-data";
+import { WorkflowData, workflowId } from "@/lib/workflow-data";
 import { z } from "zod";
+import { setGraphToStorage } from "../helpers/set-graph-to-storage";
 import type { WorkflowEngineHandlerArgs } from "./types";
 
 const Input = z.object({
+	workflowId: workflowId.schema,
 	workflowData: WorkflowData,
 });
 export async function saveGraph({
@@ -10,14 +12,11 @@ export async function saveGraph({
 	unsafeInput,
 }: WorkflowEngineHandlerArgs<z.infer<typeof Input>>) {
 	const input = Input.parse(unsafeInput);
-	await context.storage.setItem(
-		`${context.workflowId}.json`,
-		input.workflowData,
-		{
-			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
-			cacheControlMaxAge: 0,
-		},
-	);
-	const meta = await context.storage.getMeta(`${context.workflowId}.json`);
+	setGraphToStorage({
+		storage: context.storage,
+		workflowId: input.workflowId,
+		workflowData: input.workflowData,
+	});
+	const meta = await context.storage.getMeta(`${input.workflowId}.json`);
 	return meta;
 }
