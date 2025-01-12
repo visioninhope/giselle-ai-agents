@@ -18,5 +18,12 @@ export default function Page() {
 	if (isLoading) {
 		return <div>Loading...</div>;
 	}
-	return <div>{JSON.stringify(data)}</div>;
+	return (
+		<div className="grid grid-cols-[250px_1fr]">
+			<div>
+				<button type="button">add node</button>
+			</div>
+			<div>{JSON.stringify(data)}</div>
+		</div>
+	);
 }
