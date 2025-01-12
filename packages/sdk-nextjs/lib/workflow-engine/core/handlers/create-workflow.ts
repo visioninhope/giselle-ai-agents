@@ -1,9 +1,13 @@
 import { createIdGenerator } from "@/lib/utils/generate-id";
 import { WorkflowData, workflowId } from "@/lib/workflow-data";
+import { z } from "zod";
 import { setGraphToStorage } from "../helpers/set-graph-to-storage";
 import type { WorkflowEngineHandlerArgs } from "./types";
 
 const workflowIdGenerator = createIdGenerator("wf");
+export const Output = z.object({
+	workflowData: WorkflowData,
+});
 
 export async function createWorkflow({ context }: WorkflowEngineHandlerArgs) {
 	const id = workflowId.generate();
@@ -16,5 +20,5 @@ export async function createWorkflow({ context }: WorkflowEngineHandlerArgs) {
 		workflowId: id,
 		workflowData,
 	});
-	return { workflowData };
+	return Output.parse({ workflowData });
 }

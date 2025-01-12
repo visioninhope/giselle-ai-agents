@@ -29,6 +29,9 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
+      swr:
+        specifier: 2.3.0
+        version: 2.3.0(react@19.0.0)
       unstorage:
         specifier: 1.14.4
         version: 1.14.4(@vercel/blob@0.27.0)

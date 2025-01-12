@@ -1,6 +1,7 @@
 import type { WorkflowData } from "@/lib/workflow-data";
 import type { Storage } from "unstorage";
 import { z } from "zod";
+import { createWorkflow } from "./handlers/create-workflow";
 import { getGraph } from "./handlers/get-graph";
 import { saveGraph } from "./handlers/save-grpah";
 import { textGeneration } from "./handlers/text-generation";
@@ -8,8 +9,8 @@ import type { WorkflowEngineContext } from "./types";
 
 export const WorkflowEngineAction = z.enum([
 	"create-workflow",
-	"save-graph",
-	"get-graph",
+	"save-workflow",
+	"get-workflow",
 	"text-generation",
 ]);
 type WorkflowEngineAction = z.infer<typeof WorkflowEngineAction>;
@@ -39,7 +40,9 @@ async function toWorkflowEngineRequest(
 		throw new Error(`Cannot parse action at ${pathname}`);
 	const segments = segmentString.replace(/^\//, "").split("/").filter(Boolean);
 
-	if (segments.length !== 1) throw new Error(`Invalid action at ${pathname}`);
+	if (segments.length !== 1) {
+		throw new Error(`Invalid action at ${pathname}`);
+	}
 
 	const [unsafeAction] = segments;
 
@@ -77,21 +80,22 @@ export async function WorkflowEngine(
 		config,
 	);
 	switch (action) {
-		case "save-graph": {
+		case "save-workflow": {
 			await saveGraph({
 				context,
 				unsafeInput: payload,
 			});
 			return new Response("Save Graph");
 		}
-		case "get-graph": {
-			const workflowData = await getGraph({
+		case "get-workflow": {
+			const result = await getGraph({
 				unsafeInput: payload,
 				context,
 			});
-			return Response.json(workflowData);
+			return Response.json(result);
 		}
 		case "text-generation": {
+			console.log(payload);
 			const stream = await textGeneration({
 				context,
 				unsafeInput: payload,
@@ -99,7 +103,8 @@ export async function WorkflowEngine(
 			return stream.toDataStreamResponse();
 		}
 		case "create-workflow": {
-			return new Response("Create Workflow");
+			const result = await createWorkflow({ context });
+			return Response.json(result);
 		}
 		default: {
 			const _exhaustiveCheck: never = action;

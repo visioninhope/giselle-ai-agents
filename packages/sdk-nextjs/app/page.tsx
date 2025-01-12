@@ -1,18 +1,19 @@
 "use client";
-import { useCompletion } from "ai/react";
+
+import { useCreateWorkflow } from "@/lib/workflow-designer/use-create-workflow";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
-	const { completion, handleSubmit } = useCompletion({
-		api: "/api/workflow/text-generation",
-		initialInput: "hello",
-		body: { prompt: "hi!" },
+	const router = useRouter();
+
+	const { createWorkflow } = useCreateWorkflow({
+		onWorkflowCreated: ({ workflowData }) => {
+			router.push(`/workflows/${workflowData.id}`);
+		},
 	});
 	return (
-		<main>
-			<p>{completion}</p>
-			<form onSubmit={handleSubmit}>
-				<button type="submit">Hello world!</button>
-			</form>
-		</main>
+		<button type="button" onClick={createWorkflow}>
+			Create workflow
+		</button>
 	);
 }
