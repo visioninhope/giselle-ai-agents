@@ -1,5 +1,5 @@
 "use client";
-import { type WorkflowId, workflowId } from "@/lib/workflow-data";
+import { workflowId } from "@/lib/workflow-data";
 import { useGetWorkflow } from "@/lib/workflow-designer/use-get-workflow";
 import { useParams } from "next/navigation";
 import { z } from "zod";
@@ -18,5 +18,5 @@ export default function Page() {
 	if (isLoading) {
 		return <div>Loading...</div>;
 	}
-	return <div>hello world</div>;
+	return <div>{JSON.stringify(data)}</div>;
 }
