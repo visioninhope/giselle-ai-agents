@@ -122,6 +122,9 @@ importers:
       '@sentry/wizard':
         specifier: ^3.26.0
         version: 3.37.0
+      '@supabase/auth-js':
+        specifier: ^2.67.3
+        version: 2.67.3
       '@supabase/ssr':
         specifier: 0.4.0
         version: 0.4.0(@supabase/supabase-js@2.45.0(bufferutil@4.0.8)(utf-8-validate@6.0.5))
@@ -2664,6 +2667,9 @@ packages:
 
   '@supabase/auth-js@2.64.4':
     resolution: {integrity: sha512-9ITagy4WP4FLl+mke1rchapOH0RQpf++DI+WSG2sO1OFOZ0rW3cwAM0nCrMOxu+Zw4vJ4zObc08uvQrXx590Tg==}
+
+  '@supabase/auth-js@2.67.3':
+    resolution: {integrity: sha512-NJDaW8yXs49xMvWVOkSIr8j46jf+tYHV0wHhrwOaLLMZSFO4g6kKAf+MfzQ2RaD06OCUkUHIzctLAxjTgEVpzw==}
 
   '@supabase/functions-js@2.4.1':
     resolution: {integrity: sha512-8sZ2ibwHlf+WkHDUZJUXqqmPvWQ3UHN0W30behOJngVh/qHHekhJLCFbh0AjkE9/FqqXtf9eoVvmYgfCLk5tNA==}
@@ -7874,6 +7880,10 @@ snapshots:
       - supports-color
 
   '@supabase/auth-js@2.64.4':
+    dependencies:
+      '@supabase/node-fetch': 2.6.15
+
+  '@supabase/auth-js@2.67.3':
     dependencies:
       '@supabase/node-fetch': 2.6.15
 
