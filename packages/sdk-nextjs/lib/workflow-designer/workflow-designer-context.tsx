@@ -14,8 +14,9 @@ import {
 	WorkflowDesigner,
 	type WorkflowDesignerOperations,
 } from "./workflow-designer";
+import type { NodeId } from "../workflow-data/node/types";
 
-interface WorkflowDesignerContextValue extends WorkflowDesignerOperations {
+interface WorkflowDesignerContextValue extends Pick<WorkflowDesignerOperations, 'addTextGenerationNode'> {
 	data: WorkflowData;
 }
 const WorkflowDesignerContext = createContext<
@@ -66,4 +67,11 @@ export function useWorkflowDesigner() {
 		);
 	}
 	return context;
+}
+
+export function useNode(nodeId: NodeId) {
+  const { data } = useWorkflowDesigner()
+
+  data.nodes.find(())
+
 }

@@ -12,26 +12,26 @@ export interface WorkflowDesignerOperations {
 	addTextGenerationNode: (
 		params: z.infer<typeof CreateTextGenerationNodeParams>,
 	) => void;
+	getData: () => WorkflowData;
 }
 
 export function WorkflowDesigner({
 	defaultValue = generateInitialWorkflowData(),
 }: {
 	defaultValue?: WorkflowData;
-}) {
-	let workflowData = defaultValue;
+}): WorkflowDesignerOperations {
+	const nodes = defaultValue.nodes;
 	function addTextGenerationNode(
 		params: z.infer<typeof CreateTextGenerationNodeParams>,
 	) {
 		const textgenerationNodeData = createTextGenerationNodeData(params);
-		workflowData = {
-			...workflowData,
-			nodes: [...workflowData.nodes, textgenerationNodeData],
-		};
+		nodes.set(textgenerationNodeData.id, textgenerationNodeData);
 	}
-
 	function getData() {
-		return workflowData;
+		return {
+			id: defaultValue.id,
+			nodes,
+		};
 	}
 
 	return {

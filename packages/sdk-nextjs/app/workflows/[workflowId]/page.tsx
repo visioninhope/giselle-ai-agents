@@ -18,7 +18,7 @@ export default function Page() {
 				<button type="button">add text node</button>
 			</div>
 			<div>
-				{data.nodes.map((node) => (
+				{Object.entries(data.nodes).map(([nodeId, node]) => (
 					<div key={node.id}>{node.name}</div>
 				))}
 			</div>
