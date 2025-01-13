@@ -10,9 +10,11 @@
 		"build": "next build",
 		"start": "next start",
 		"check": "pnpm dlx @biomejs/biome check --write .",
-		"lint": "next lint"
+		"lint": "next lint",
+		"test": "vitest"
 	},
 	"packageManager": "pnpm@10.0.0",
+	"type": "module",
 	"dependencies": {
 		"@ai-sdk/anthropic": "1.0.5",
 		"@ai-sdk/google": "1.0.10",
@@ -105,12 +107,15 @@
 		"@types/node": "^22",
 		"@types/react": "^19.0.2",
 		"@types/react-dom": "^19.0.2",
+		"@vitest/coverage-v8": "2.1.8",
 		"drizzle-kit": "0.23.0",
 		"pino-pretty": "13.0.0",
 		"postcss": "^8",
 		"tailwindcss": "^3.4.7",
 		"turbo": "2.0.9",
-		"typescript": "5.6.2"
+		"typescript": "5.6.2",
+		"vite-tsconfig-paths": "^5.1.4",
+		"vitest": "^2.1.8"
 	},
 	"trustedDependencies": ["@sentry/cli"]
 }

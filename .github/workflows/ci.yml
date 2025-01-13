@@ -19,4 +19,4 @@ jobs:
       - name: Run Biome
         run: biome ci .
       - name: Test
-        run: bun test --coverage
+        run: pnpm test --coverage

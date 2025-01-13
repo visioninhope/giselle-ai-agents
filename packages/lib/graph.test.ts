@@ -1,4 +1,4 @@
-import { describe, expect, test } from "bun:test";
+import { describe, expect, test } from "vitest";
 import type { Flow, Graph } from "../types";
 import { deriveFlows, isLatestVersion, migrateGraph } from "./graph";
 
@@ -199,7 +199,7 @@ describe("migrateGraph", () => {
 			nodes: [],
 			artifacts: [],
 		} as unknown as Graph);
-		expect(after).toContainKey("version");
+		expect(after).toHaveProperty("version");
 	});
 	test("migrate to 2024-12-10", () => {
 		const after = migrateGraph({
