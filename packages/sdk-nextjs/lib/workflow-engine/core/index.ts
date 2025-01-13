@@ -2,7 +2,7 @@ import type { WorkflowData } from "@/lib/workflow-data";
 import type { Storage } from "unstorage";
 import { z } from "zod";
 import { createWorkflow } from "./handlers/create-workflow";
-import { getGraph } from "./handlers/get-graph";
+import { getWorkflow } from "./handlers/get-workflow";
 import { saveGraph } from "./handlers/save-grpah";
 import { textGeneration } from "./handlers/text-generation";
 import type { WorkflowEngineContext } from "./types";
@@ -88,7 +88,7 @@ export async function WorkflowEngine(
 			return new Response("Save Graph");
 		}
 		case "get-workflow": {
-			const result = await getGraph({
+			const result = await getWorkflow({
 				unsafeInput: payload,
 				context,
 			});

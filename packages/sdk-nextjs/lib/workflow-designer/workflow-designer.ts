@@ -8,6 +8,12 @@ import {
 	createTextGenerationNodeData,
 } from "../workflow-data/node/text-generation";
 
+export interface WorkflowDesignerOperations {
+	addTextGenerationNode: (
+		params: z.infer<typeof CreateTextGenerationNodeParams>,
+	) => void;
+}
+
 export function WorkflowDesigner({
 	defaultValue = generateInitialWorkflowData(),
 }: {
@@ -33,4 +39,3 @@ export function WorkflowDesigner({
 		getData,
 	};
 }
-export type WorkflowDesigner = ReturnType<typeof WorkflowDesigner>;

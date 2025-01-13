@@ -10,7 +10,7 @@ export const Output = z.object({
 	workflowData: WorkflowData,
 });
 
-export async function getGraph({
+export async function getWorkflow({
 	context,
 	unsafeInput,
 }: WorkflowEngineHandlerArgs<z.infer<typeof Input>>) {

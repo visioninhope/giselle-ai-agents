@@ -2,7 +2,7 @@
 
 import useSWR from "swr";
 import type { WorkflowId } from "../workflow-data";
-import { Output } from "../workflow-engine/core/handlers/get-graph";
+import { Output } from "../workflow-engine/core/handlers/get-workflow";
 
 export function useGetWorkflow({
 	workflowId,

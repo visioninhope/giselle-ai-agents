@@ -1,6 +1,6 @@
 "use client";
 import { workflowId } from "@/lib/workflow-data";
-import { useWorkflowDesigner } from "@/lib/workflow-designer/use-workflow-designer";
+import { useWorkflowDesigner } from "@/lib/workflow-designer";
 import { useParams } from "next/navigation";
 import { z } from "zod";
 
@@ -11,14 +11,8 @@ const Params = z.object({
 export default function Page() {
 	const unsafeParams = useParams();
 	const params = Params.parse(unsafeParams);
-	const { isLoading, workflowData, addTextGenerationNode } =
-		useWorkflowDesigner({
-			workflowId: params.workflowId,
-		});
+	const { data, addTextGenerationNode } = useWorkflowDesigner();
 
-	if (isLoading) {
-		return <div>Loading...</div>;
-	}
 	return (
 		<div className="grid grid-cols-[250px_1fr]">
 			<div>
@@ -33,7 +27,7 @@ export default function Page() {
 				<button type="button">add text node</button>
 			</div>
 			<div>
-				{workflowData.nodes.map((node) => (
+				{data.nodes.map((node) => (
 					<div key={node.id}>{node.name}</div>
 				))}
 			</div>
