@@ -70,4 +70,4 @@ Contributions are welcome! Please read our [Contributing Guide](https://github.c
 
 ## License
 
-[Apache License Version 2.0](LICENSE).
+[Apache License Version 2.0](/LICENSE).
