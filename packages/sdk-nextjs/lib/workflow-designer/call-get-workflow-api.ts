@@ -1,4 +1,4 @@
-import type { WorkflowId } from "../workflow-data";
+import { WorkflowData, type WorkflowId } from "../workflow-data";
 import { Output } from "../workflow-engine/core/handlers/get-workflow";
 
 export async function callGetWorkflowApi({
@@ -17,6 +17,7 @@ export async function callGetWorkflowApi({
 		},
 		body: JSON.stringify({ workflowId }),
 	});
-	const data = await response.json();
-	return Output.parse(data);
+	const json = await response.json();
+	const output = Output.parse(json);
+	return WorkflowData.parse(output.workflowData);
 }

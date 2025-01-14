@@ -1,4 +1,8 @@
-import type { WorkflowData, WorkflowId } from "@/lib/workflow-data";
+import type {
+	WorkflowData,
+	WorkflowDataJson,
+	WorkflowId,
+} from "@/lib/workflow-data";
 import type { Storage } from "unstorage";
 import { workflowDataPath } from "./workflow-path";
 
@@ -7,9 +11,9 @@ export async function setGraphToStorage({
 	workflowId,
 	workflowData,
 }: {
-	storage: Storage<WorkflowData>;
+	storage: Storage<WorkflowDataJson>;
 	workflowId: WorkflowId;
-	workflowData: WorkflowData;
+	workflowData: WorkflowDataJson;
 }) {
 	await storage.setItem(workflowDataPath(workflowId), workflowData, {
 		// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage

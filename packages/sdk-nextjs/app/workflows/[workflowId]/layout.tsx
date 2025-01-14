@@ -16,8 +16,6 @@ export default async function Layout({
 		workflowId: workflowId.parse((await params).workflowId),
 	});
 	return (
-		<WorkflowDesignerProvider data={data.workflowData}>
-			{children}
-		</WorkflowDesignerProvider>
+		<WorkflowDesignerProvider data={data}>{children}</WorkflowDesignerProvider>
 	);
 }

@@ -12,11 +12,8 @@ import type { z } from "zod";
 import type { NodeData, WorkflowData } from "../workflow-data";
 import { createConnectionHandle as createConnectionHandleData } from "../workflow-data/node/connection";
 import type { CreateTextGenerationNodeParams } from "../workflow-data/node/text-generation";
-import type {
-	BaseNodeData,
-	ConnectionHandle,
-	NodeId,
-} from "../workflow-data/node/types";
+import type { ConnectionHandle, NodeId } from "../workflow-data/node/types";
+import { callSaveWorkflowApi } from "./call-save-workflow-api";
 import {
 	WorkflowDesigner,
 	type WorkflowDesignerOperations,
@@ -36,9 +33,11 @@ const WorkflowDesignerContext = createContext<
 export function WorkflowDesignerProvider({
 	children,
 	data,
+	saveWorkflowApi = "/api/workflow/save-workflow",
 }: {
 	children: React.ReactNode;
 	data: WorkflowData;
+	saveWorkflowApi?: string;
 }) {
 	const workflowDesignerRef = useRef(
 		WorkflowDesigner({
@@ -46,29 +45,71 @@ export function WorkflowDesignerProvider({
 		}),
 	);
 	const [workflowData, setWorkflowData] = useState(data);
+	const persistTimeoutRef = useRef<Timer | null>(null);
+	const isPendingPersistRef = useRef(false);
+
+	const saveWorkflowData = useCallback(async () => {
+		isPendingPersistRef.current = false;
+		try {
+			await callSaveWorkflowApi({
+				api: saveWorkflowApi,
+				workflowId: workflowData.id,
+				workflowData,
+			});
+		} catch (error) {
+			console.error("Failed to persist graph:", error);
+		}
+	}, [saveWorkflowApi, workflowData]);
+
+	const flush = useCallback(async () => {
+		if (persistTimeoutRef.current) {
+			clearTimeout(persistTimeoutRef.current);
+			persistTimeoutRef.current = null;
+		}
+		return await saveWorkflowData();
+	}, [saveWorkflowData]);
+
+	const setAndSaveWorkflowData = useCallback(
+		(data: WorkflowData) => {
+			setWorkflowData(data);
+
+			isPendingPersistRef.current = true;
+			if (persistTimeoutRef.current) {
+				clearTimeout(persistTimeoutRef.current);
+			}
+			persistTimeoutRef.current = setTimeout(saveWorkflowData, 500);
+		},
+		[saveWorkflowData],
+	);
+
 	const addTextGenerationNode = useCallback(
 		(params: z.infer<typeof CreateTextGenerationNodeParams>) => {
 			if (workflowDesignerRef.current === undefined) {
 				return;
 			}
 			workflowDesignerRef.current.addTextGenerationNode(params);
-			setWorkflowData(workflowDesignerRef.current.getData());
+			setAndSaveWorkflowData(workflowDesignerRef.current.getData());
 		},
-		[],
+		[setAndSaveWorkflowData],
 	);
-	const updateNodeData = useCallback((nodeId: NodeId, data: NodeData) => {
-		if (workflowDesignerRef.current === undefined) {
-			return;
-		}
-		workflowDesignerRef.current.updateNodeData(nodeId, data);
-		setWorkflowData(workflowDesignerRef.current.getData());
-	}, []);
+
+	const updateNodeData = useCallback(
+		(nodeId: NodeId, data: NodeData) => {
+			if (workflowDesignerRef.current === undefined) {
+				return;
+			}
+			workflowDesignerRef.current.updateNodeData(nodeId, data);
+			setAndSaveWorkflowData(workflowDesignerRef.current.getData());
+		},
+		[setAndSaveWorkflowData],
+	);
 
 	const addConnection = useCallback(
 		(sourceNode: NodeData, targetHandle: ConnectionHandle) => {
 			workflowDesignerRef.current?.addConnection(sourceNode, targetHandle);
+			setAndSaveWorkflowData(workflowDesignerRef.current.getData());
 		},
-		[],
+		[setAndSaveWorkflowData],
 	);
 
 	return (

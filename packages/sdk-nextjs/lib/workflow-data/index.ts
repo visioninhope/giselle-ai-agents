@@ -30,6 +30,11 @@ export const WorkflowData = z.object({
 	),
 });
 export type WorkflowData = z.infer<typeof WorkflowData>;
+export const WorkflowDataJson = WorkflowData.extend({
+	nodes: z.record(nodeId.schema, NodeData),
+	connections: z.record(connectionId.schema, Connection),
+});
+export type WorkflowDataJson = z.infer<typeof WorkflowDataJson>;
 
 export function generateInitialWorkflowData() {
 	return WorkflowData.parse({

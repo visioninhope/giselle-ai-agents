@@ -1,13 +1,18 @@
-import { WorkflowData, workflowId } from "@/lib/workflow-data";
+import { WorkflowDataJson, workflowId } from "@/lib/workflow-data";
+import type { StorageMeta } from "unstorage";
 import { z } from "zod";
 import { setGraphToStorage } from "../helpers/set-graph-to-storage";
 import type { WorkflowEngineHandlerArgs } from "./types";
 
-const Input = z.object({
+export const Input = z.object({
 	workflowId: workflowId.schema,
-	workflowData: WorkflowData,
+	workflowData: WorkflowDataJson,
 });
-export async function saveGraph({
+export const Output = z.object({
+	workflowData: WorkflowDataJson,
+	meta: z.custom<StorageMeta>(),
+});
+export async function saveWorkflow({
 	context,
 	unsafeInput,
 }: WorkflowEngineHandlerArgs<z.infer<typeof Input>>) {
@@ -18,5 +23,8 @@ export async function saveGraph({
 		workflowData: input.workflowData,
 	});
 	const meta = await context.storage.getMeta(`${input.workflowId}.json`);
-	return meta;
+	return Output.parse({
+		workflowData: input.workflowData,
+		meta,
+	});
 }

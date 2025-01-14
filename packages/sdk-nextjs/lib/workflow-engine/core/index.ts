@@ -1,9 +1,9 @@
-import type { WorkflowData } from "@/lib/workflow-data";
+import type { WorkflowDataJson } from "@/lib/workflow-data";
 import type { Storage } from "unstorage";
 import { z } from "zod";
 import { createWorkflow } from "./handlers/create-workflow";
 import { getWorkflow } from "./handlers/get-workflow";
-import { saveGraph } from "./handlers/save-grpah";
+import { saveWorkflow } from "./handlers/save-workflow";
 import { textGeneration } from "./handlers/text-generation";
 import type { WorkflowEngineContext } from "./types";
 
@@ -23,7 +23,7 @@ export interface WorkflowEngineRequest {
 
 export interface WorkflowEngineConfig {
 	basePath: string;
-	storage: Storage<WorkflowData>;
+	storage: Storage<WorkflowDataJson>;
 }
 
 async function toWorkflowEngineRequest(
@@ -81,11 +81,11 @@ export async function WorkflowEngine(
 	);
 	switch (action) {
 		case "save-workflow": {
-			await saveGraph({
+			const result = await saveWorkflow({
 				context,
 				unsafeInput: payload,
 			});
-			return new Response("Save Graph");
+			return Response.json(result);
 		}
 		case "get-workflow": {
 			const result = await getWorkflow({
