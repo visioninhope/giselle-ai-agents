@@ -15,6 +15,13 @@ type TagParams = {
 
 const getAgentsTag = (params: TagParams) => `${params.teamDbId}.getAgents`;
 
+/**
+ * Currently this function is not in use, but if it will be used client-side,
+ * we should modify it to accept teamId instead of teamDbId and retrieve teamDbId
+ * within the function to avoid exposing internal database IDs.
+ *
+ * ref: https://github.com/giselles-ai/giselle/pull/300
+ */
 export const getAgents = async (args: GetAgentsArgs) => {
 	const cachedAgents = unstable_cache(
 		async () => {
