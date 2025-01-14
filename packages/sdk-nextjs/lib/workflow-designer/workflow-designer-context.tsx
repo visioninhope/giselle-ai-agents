@@ -1,5 +1,6 @@
 "use client";
 
+import { useCompletion } from "ai/react";
 import {
 	createContext,
 	useCallback,
@@ -26,6 +27,7 @@ interface WorkflowDesignerContextValue
 		"addTextGenerationNode" | "updateNodeData" | "addConnection" | "addTextNode"
 	> {
 	data: WorkflowData;
+	textGenerationApi: string;
 }
 const WorkflowDesignerContext = createContext<
 	WorkflowDesignerContextValue | undefined
@@ -35,10 +37,12 @@ export function WorkflowDesignerProvider({
 	children,
 	data,
 	saveWorkflowApi = "/api/workflow/save-workflow",
+	textGenerationApi = "/api/workflow/text-generation",
 }: {
 	children: React.ReactNode;
 	data: WorkflowData;
 	saveWorkflowApi?: string;
+	textGenerationApi?: string;
 }) {
 	const workflowDesignerRef = useRef(
 		WorkflowDesigner({
@@ -61,14 +65,6 @@ export function WorkflowDesignerProvider({
 			console.error("Failed to persist graph:", error);
 		}
 	}, [saveWorkflowApi, workflowData]);
-
-	const flush = useCallback(async () => {
-		if (persistTimeoutRef.current) {
-			clearTimeout(persistTimeoutRef.current);
-			persistTimeoutRef.current = null;
-		}
-		return await saveWorkflowData();
-	}, [saveWorkflowData]);
 
 	const setAndSaveWorkflowData = useCallback(
 		(data: WorkflowData) => {
@@ -128,6 +124,7 @@ export function WorkflowDesignerProvider({
 		<WorkflowDesignerContext.Provider
 			value={{
 				data: workflowData,
+				textGenerationApi,
 				addTextGenerationNode,
 				addTextNode,
 				addConnection,
@@ -152,6 +149,7 @@ export function useWorkflowDesigner() {
 export function useNode(nodeId: NodeId) {
 	const {
 		data: workflowData,
+		textGenerationApi,
 		updateNodeData,
 		addConnection: addConnectionInternal,
 	} = useWorkflowDesigner();
@@ -163,6 +161,16 @@ export function useNode(nodeId: NodeId) {
 		}
 		return node;
 	}, [workflowData, nodeId]);
+
+	const { handleSubmit, completion, input, handleInputChange } = useCompletion({
+		api: textGenerationApi,
+		initialInput:
+			data.content.type === "textGeneration" ? data.content.prompt : undefined,
+		body: {
+			workflowId: workflowData.id,
+			nodeId: data.id,
+		},
+	});
 
 	const updateData = useCallback(
 		(newData: Partial<NodeData>) => {
@@ -188,5 +196,9 @@ export function useNode(nodeId: NodeId) {
 	return {
 		updateData,
 		addConnection,
+		handleGeneratingTextSubmit: handleSubmit,
+		generatedText: completion,
+		prompt: input,
+		handlePromptChange: handleInputChange,
 	};
 }

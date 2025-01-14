@@ -6,6 +6,9 @@ export default function Chat() {
 	const { completion, input, handleInputChange, handleSubmit, error } =
 		useCompletion({
 			api: "/api/workflow/text-generation",
+			onResponse: (response) => {
+				console.log(response);
+			},
 			body: {
 				test: "hello2",
 			},
