@@ -17,7 +17,6 @@ export default function Page() {
 					add text generation node
 				</button>
 				<button type="button">add text node</button>
-				<p>{data.connections.size}</p>
 			</div>
 			<div>
 				{Array.from(data.nodes).map(([nodeId, node]) => (

@@ -33,7 +33,6 @@ export function Node({ data }: { data: NodeData }) {
 	return (
 		<div>
 			<p>Hello,{data.name}</p>
-			<p>{data.content.sources.length}</p>
 			<button type="button">add source</button>
 		</div>
 	);
