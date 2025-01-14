@@ -166,6 +166,7 @@ export function useNode(nodeId: NodeId) {
 
 	const updateData = useCallback(
 		(newData: Partial<NodeData>) => {
+			// @ts-ignore zod types are not working well with partials
 			updateNodeData(nodeId, { ...data, ...newData });
 		},
 		[nodeId, updateNodeData, data],
