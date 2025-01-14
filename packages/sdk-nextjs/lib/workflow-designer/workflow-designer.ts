@@ -1,5 +1,6 @@
 import type { z } from "zod";
 import {
+	type NodeData,
 	type WorkflowData,
 	generateInitialWorkflowData,
 } from "../workflow-data";
@@ -7,12 +8,18 @@ import {
 	type CreateTextGenerationNodeParams,
 	createTextGenerationNodeData,
 } from "../workflow-data/node/text-generation";
+import type {
+	BaseNodeData,
+	ConnectionHandle,
+	NodeId,
+} from "../workflow-data/node/types";
 
 export interface WorkflowDesignerOperations {
 	addTextGenerationNode: (
 		params: z.infer<typeof CreateTextGenerationNodeParams>,
 	) => void;
 	getData: () => WorkflowData;
+	updateNodeData: (nodeId: NodeId, data: NodeData) => void;
 }
 
 export function WorkflowDesigner({
@@ -33,9 +40,13 @@ export function WorkflowDesigner({
 			nodes,
 		};
 	}
+	function updateNodeData(nodeId: NodeId, data: NodeData) {
+		nodes.set(nodeId, data);
+	}
 
 	return {
 		addTextGenerationNode,
 		getData,
+		updateNodeData,
 	};
 }

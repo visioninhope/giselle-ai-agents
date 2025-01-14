@@ -4,19 +4,24 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useMemo,
 	useRef,
 	useState,
 } from "react";
 import type { z } from "zod";
-import type { WorkflowData } from "../workflow-data";
+import type { NodeData, WorkflowData } from "../workflow-data";
 import type { CreateTextGenerationNodeParams } from "../workflow-data/node/text-generation";
+import type { NodeId } from "../workflow-data/node/types";
 import {
 	WorkflowDesigner,
 	type WorkflowDesignerOperations,
 } from "./workflow-designer";
-import type { NodeId } from "../workflow-data/node/types";
 
-interface WorkflowDesignerContextValue extends Pick<WorkflowDesignerOperations, 'addTextGenerationNode'> {
+interface WorkflowDesignerContextValue
+	extends Pick<
+		WorkflowDesignerOperations,
+		"addTextGenerationNode" | "updateNodeData"
+	> {
 	data: WorkflowData;
 }
 const WorkflowDesignerContext = createContext<
@@ -46,12 +51,20 @@ export function WorkflowDesignerProvider({
 		},
 		[],
 	);
+	const updateNodeData = useCallback((nodeId: NodeId, data: NodeData) => {
+		if (workflowDesignerRef.current === undefined) {
+			return;
+		}
+		workflowDesignerRef.current.updateNodeData(nodeId, data);
+		setWorkflowData(workflowDesignerRef.current.getData());
+	}, []);
 
 	return (
 		<WorkflowDesignerContext.Provider
 			value={{
 				data: workflowData,
 				addTextGenerationNode,
+				updateNodeData,
 			}}
 		>
 			{children}
@@ -70,8 +83,21 @@ export function useWorkflowDesigner() {
 }
 
 export function useNode(nodeId: NodeId) {
-  const { data } = useWorkflowDesigner()
+	const { data: workflowData, updateNodeData } = useWorkflowDesigner();
 
-  data.nodes.find(())
+	const data = useMemo(
+		() => workflowData.nodes.get(nodeId),
+		[workflowData, nodeId],
+	);
 
+	const updateData = useCallback(
+		(data: NodeData) => {
+			updateNodeData(nodeId, data);
+		},
+		[nodeId, updateNodeData],
+	);
+	return {
+		data,
+		updateData,
+	};
 }

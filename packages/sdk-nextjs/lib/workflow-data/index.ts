@@ -4,6 +4,7 @@ import { TextGenerationNodeData } from "./node/text-generation";
 import { nodeId } from "./node/types";
 
 const NodeData = TextGenerationNodeData;
+export type NodeData = z.infer<typeof NodeData>;
 export const workflowId = createIdGenerator("wf");
 export type WorkflowId = z.infer<typeof workflowId.schema>;
 export const WorkflowData = z.object({

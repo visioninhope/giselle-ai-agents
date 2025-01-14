@@ -25,6 +25,7 @@ export const ConnectionHandle = z.object({
 	connectedTargetNodeId: nodeId.schema,
 	label: z.string(),
 });
+export type ConnectionHandle = z.infer<typeof ConnectionHandle>;
 
 export const NodeUIState = z.object({
 	position: Position,

@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BaseNodeData, ConnectionHandle, nodeId } from "./types";
+import { type BaseNodeData, ConnectionHandle, nodeId } from "./types";
 // import type { WorkflowData } from "./workflow-state";
 
 export const TextGenerationContent = z.object({
@@ -55,5 +55,32 @@ export function createTextGenerationNodeData(
 			system: params.system ?? "",
 			sources: params.sources ?? [],
 		},
+	};
+}
+
+export function TextGenerationNode({
+	data,
+	onAddSources,
+}: {
+	data: TextGenerationNodeData;
+	onAddSources: (params: {
+		target: BaseNodeData;
+		targetHandleLabel: string;
+		source: BaseNodeData;
+	}) => void;
+}) {
+	function addSources(sourceNodes: BaseNodeData[]) {
+		const handles = sourceNodes.map((sourceNode) =>
+			onAddSources({
+				target: data,
+				targetHandleLabel: "source",
+				source: sourceNode,
+			}),
+		);
+	}
+	function removeSources() {}
+	return {
+		addSources,
+		removeSources,
 	};
 }
