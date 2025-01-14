@@ -1,6 +1,7 @@
 import { createIdGenerator } from "@/lib/utils/generate-id";
 import {
 	WorkflowData,
+	WorkflowDataJson,
 	generateInitialWorkflowData,
 	workflowId,
 } from "@/lib/workflow-data";
@@ -18,7 +19,7 @@ export async function createWorkflow({ context }: WorkflowEngineHandlerArgs) {
 	await setGraphToStorage({
 		storage: context.storage,
 		workflowId: workflowData.id,
-		workflowData,
+		workflowData: WorkflowDataJson.parse(workflowData),
 	});
 	return Output.parse({ workflowData });
 }

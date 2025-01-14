@@ -3,7 +3,7 @@ import { useNode } from "../workflow-designer-context";
 
 export function Node({ data }: { data: NodeData }) {
 	const { updateData, addConnection } = useNode(data.id);
-	if (data.content.type === "textGeneration") {
+	if (data.type === "action" && data.content.type === "textGeneration") {
 		return (
 			<div>
 				<p>Hello,{data.name}!!</p>

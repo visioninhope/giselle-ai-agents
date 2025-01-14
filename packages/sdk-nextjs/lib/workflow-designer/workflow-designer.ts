@@ -4,21 +4,21 @@ import {
 	type WorkflowData,
 	generateInitialWorkflowData,
 } from "../workflow-data";
-import { createConnection } from "../workflow-data/node/connection";
-import {
-	type CreateTextNodeParams,
-	createTextNodeData,
-} from "../workflow-data/node/text";
 import {
 	type CreateTextGenerationNodeParams,
 	createTextGenerationNodeData,
-} from "../workflow-data/node/text-generation";
+} from "../workflow-data/node/actions/text-generation";
+import { createConnection } from "../workflow-data/node/connection";
 import {
 	type BaseNodeData,
 	type ConnectionHandle,
 	type NodeId,
 	connectionId,
 } from "../workflow-data/node/types";
+import {
+	type CreateTextNodeParams,
+	createTextNodeData,
+} from "../workflow-data/node/variables/text";
 
 export interface WorkflowDesignerOperations {
 	addTextGenerationNode: (

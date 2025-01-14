@@ -1,10 +1,13 @@
 import { createIdGenerator } from "@/lib/utils/generate-id";
 import { z } from "zod";
-import { TextNodeData } from "./node/text";
-import { TextGenerationNodeData } from "./node/text-generation";
+import { ActionNodeData } from "./node/actions";
 import { Connection, connectionId, nodeId } from "./node/types";
+import { VariableNodeData } from "./node/variables";
 
-const NodeData = z.union([TextGenerationNodeData, TextNodeData]);
+const NodeData = z.discriminatedUnion("type", [
+	ActionNodeData,
+	VariableNodeData,
+]);
 export type NodeData = z.infer<typeof NodeData>;
 export const workflowId = createIdGenerator("wf");
 export type WorkflowId = z.infer<typeof workflowId.schema>;

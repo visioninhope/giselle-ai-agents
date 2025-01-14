@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { BaseNodeData, ConnectionHandle, nodeId } from "./types";
+import { BaseNodeData, ConnectionHandle, nodeId } from "../types";
 // import type { WorkflowData } from "./workflow-state";
 
 export const TextGenerationContent = z.object({

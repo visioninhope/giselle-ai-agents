@@ -10,10 +10,10 @@ import {
 } from "react";
 import type { z } from "zod";
 import type { NodeData, WorkflowData } from "../workflow-data";
+import type { CreateTextGenerationNodeParams } from "../workflow-data/node/actions/text-generation";
 import { createConnectionHandle as createConnectionHandleData } from "../workflow-data/node/connection";
-import type { CreateTextNodeParams } from "../workflow-data/node/text";
-import type { CreateTextGenerationNodeParams } from "../workflow-data/node/text-generation";
 import type { ConnectionHandle, NodeId } from "../workflow-data/node/types";
+import type { CreateTextNodeParams } from "../workflow-data/node/variables/text";
 import { callSaveWorkflowApi } from "./call-save-workflow-api";
 import {
 	WorkflowDesigner,
