@@ -19,7 +19,7 @@ export default function Page() {
 				<button type="button">add text node</button>
 			</div>
 			<div>
-				{Object.entries(data.nodes).map(([nodeId, node]) => (
+				{Array.from(data.nodes).map(([nodeId, node]) => (
 					<Node key={nodeId} data={node} />
 				))}
 			</div>

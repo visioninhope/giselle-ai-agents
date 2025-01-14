@@ -47,6 +47,7 @@ export function WorkflowDesignerProvider({
 				return;
 			}
 			workflowDesignerRef.current.addTextGenerationNode(params);
+			console.log(workflowDesignerRef.current.getData());
 			setWorkflowData(workflowDesignerRef.current.getData());
 		},
 		[],
@@ -85,19 +86,21 @@ export function useWorkflowDesigner() {
 export function useNode(nodeId: NodeId) {
 	const { data: workflowData, updateNodeData } = useWorkflowDesigner();
 
-	const data = useMemo(
-		() => workflowData.nodes.get(nodeId),
-		[workflowData, nodeId],
-	);
+	const data = useMemo(() => {
+		const node = workflowData.nodes.get(nodeId);
+		if (node === undefined) {
+			throw new Error(`Node with id ${nodeId} not found`);
+		}
+		return node;
+	}, [workflowData, nodeId]);
 
 	const updateData = useCallback(
-		(data: NodeData) => {
-			updateNodeData(nodeId, data);
+		(newData: Partial<NodeData>) => {
+			updateNodeData(nodeId, { ...data, ...newData });
 		},
-		[nodeId, updateNodeData],
+		[nodeId, updateNodeData, data],
 	);
 	return {
-		data,
 		updateData,
 	};
 }
