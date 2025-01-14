@@ -11,6 +11,7 @@ import {
 import type { z } from "zod";
 import type { NodeData, WorkflowData } from "../workflow-data";
 import { createConnectionHandle as createConnectionHandleData } from "../workflow-data/node/connection";
+import type { CreateTextNodeParams } from "../workflow-data/node/text";
 import type { CreateTextGenerationNodeParams } from "../workflow-data/node/text-generation";
 import type { ConnectionHandle, NodeId } from "../workflow-data/node/types";
 import { callSaveWorkflowApi } from "./call-save-workflow-api";
@@ -22,7 +23,7 @@ import {
 interface WorkflowDesignerContextValue
 	extends Pick<
 		WorkflowDesignerOperations,
-		"addTextGenerationNode" | "updateNodeData" | "addConnection"
+		"addTextGenerationNode" | "updateNodeData" | "addConnection" | "addTextNode"
 	> {
 	data: WorkflowData;
 }
@@ -112,11 +113,23 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkflowData],
 	);
 
+	const addTextNode = useCallback(
+		(params: z.infer<typeof CreateTextNodeParams>) => {
+			if (workflowDesignerRef.current === undefined) {
+				return;
+			}
+			workflowDesignerRef.current.addTextNode(params);
+			setAndSaveWorkflowData(workflowDesignerRef.current.getData());
+		},
+		[setAndSaveWorkflowData],
+	);
+
 	return (
 		<WorkflowDesignerContext.Provider
 			value={{
 				data: workflowData,
 				addTextGenerationNode,
+				addTextNode,
 				addConnection,
 				updateNodeData,
 			}}

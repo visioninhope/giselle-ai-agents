@@ -1,9 +1,10 @@
 import { createIdGenerator } from "@/lib/utils/generate-id";
 import { z } from "zod";
+import { TextNodeData } from "./node/text";
 import { TextGenerationNodeData } from "./node/text-generation";
 import { Connection, connectionId, nodeId } from "./node/types";
 
-const NodeData = TextGenerationNodeData;
+const NodeData = z.union([TextGenerationNodeData, TextNodeData]);
 export type NodeData = z.infer<typeof NodeData>;
 export const workflowId = createIdGenerator("wf");
 export type WorkflowId = z.infer<typeof workflowId.schema>;

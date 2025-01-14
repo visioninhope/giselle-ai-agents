@@ -57,30 +57,3 @@ export function createTextGenerationNodeData(
 		},
 	};
 }
-
-export function TextGenerationNode({
-	data,
-	onAddSources,
-}: {
-	data: TextGenerationNodeData;
-	onAddSources: (params: {
-		target: BaseNodeData;
-		targetHandleLabel: string;
-		source: BaseNodeData;
-	}) => void;
-}) {
-	function addSources(sourceNodes: BaseNodeData[]) {
-		const handles = sourceNodes.map((sourceNode) =>
-			onAddSources({
-				target: data,
-				targetHandleLabel: "source",
-				source: sourceNode,
-			}),
-		);
-	}
-	function removeSources() {}
-	return {
-		addSources,
-		removeSources,
-	};
-}

@@ -1,40 +1,45 @@
-import { BaseNode, type BaseNodeData } from "./base";
-import type { NodeId } from "./types";
-import type { WorkflowData } from "./workflow-state";
+import { z } from "zod";
+import { BaseNodeData, nodeId } from "./types";
 
-export interface TextContent {
-	type: "text";
-	text: string;
-}
+export const TextContent = z.object({
+	type: z.literal("text"),
+	text: z.string(),
+});
+type TextContent = z.infer<typeof TextContent>;
 
-export interface TextNodeData extends BaseNodeData {
-	type: "variable";
-	content: TextContent;
-}
+export const TextNodeData = BaseNodeData.extend({
+	type: z.literal("vairable"),
+	content: TextContent,
+});
+type TextNodeData = z.infer<typeof TextNodeData>;
 
-export interface CreateTextNodeParams extends Omit<TextContent, "type"> {
-	name: string;
-}
+export const CreateTextNodeParams = TextContent.omit({
+	type: true,
+})
+	.partial()
+	.extend({
+		name: z.string(),
+	});
 
-export class TextNode extends BaseNode<TextNodeData> {
-	constructor(nodeId: NodeId, workflowData: WorkflowData) {
-		super(nodeId, workflowData, isTextNode);
-	}
-
-	get type(): "variable" {
-		return "variable";
-	}
-
-	get content(): TextContent {
-		return this.getContent<TextContent>();
-	}
-}
-
-export function isTextNode(node: { type: string; content: unknown }): node is {
-	type: "variable";
-	content: TextContent;
-} {
+export function isTextNode(node: {
+	type: string;
+	content: unknown;
+}): node is { type: "variable"; content: TextContent } {
 	return (
 		node.type === "variable" && (node.content as TextContent).type === "text"
 	);
+}
+
+export function createTextNodeData(
+	params: z.infer<typeof CreateTextNodeParams>,
+): z.infer<typeof TextNodeData> {
+	return {
+		id: nodeId.generate(),
+		name: params.name,
+		type: "vairable",
+		content: {
+			type: "text",
+			text: params.text ?? "",
+		},
+	};
 }

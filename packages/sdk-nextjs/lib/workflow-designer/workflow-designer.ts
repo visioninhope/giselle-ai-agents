@@ -6,6 +6,10 @@ import {
 } from "../workflow-data";
 import { createConnection } from "../workflow-data/node/connection";
 import {
+	type CreateTextNodeParams,
+	createTextNodeData,
+} from "../workflow-data/node/text";
+import {
 	type CreateTextGenerationNodeParams,
 	createTextGenerationNodeData,
 } from "../workflow-data/node/text-generation";
@@ -20,6 +24,7 @@ export interface WorkflowDesignerOperations {
 	addTextGenerationNode: (
 		params: z.infer<typeof CreateTextGenerationNodeParams>,
 	) => void;
+	addTextNode: (params: z.infer<typeof CreateTextNodeParams>) => void;
 	getData: () => WorkflowData;
 	updateNodeData: (nodeId: NodeId, data: NodeData) => void;
 	addConnection: (
@@ -40,6 +45,10 @@ export function WorkflowDesigner({
 	) {
 		const textgenerationNodeData = createTextGenerationNodeData(params);
 		nodes.set(textgenerationNodeData.id, textgenerationNodeData);
+	}
+	function addTextNode(params: z.infer<typeof CreateTextNodeParams>) {
+		const textNodeData = createTextNodeData(params);
+		nodes.set(textNodeData.id, textNodeData);
 	}
 	function getData() {
 		return {
@@ -64,6 +73,7 @@ export function WorkflowDesigner({
 
 	return {
 		addTextGenerationNode,
+		addTextNode,
 		addConnection,
 		getData,
 		updateNodeData,
