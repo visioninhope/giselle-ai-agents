@@ -4,14 +4,16 @@ import {
 	type WorkflowData,
 	generateInitialWorkflowData,
 } from "../workflow-data";
+import { createConnection } from "../workflow-data/node/connection";
 import {
 	type CreateTextGenerationNodeParams,
 	createTextGenerationNodeData,
 } from "../workflow-data/node/text-generation";
-import type {
-	BaseNodeData,
-	ConnectionHandle,
-	NodeId,
+import {
+	type BaseNodeData,
+	type ConnectionHandle,
+	type NodeId,
+	connectionId,
 } from "../workflow-data/node/types";
 
 export interface WorkflowDesignerOperations {
@@ -20,6 +22,10 @@ export interface WorkflowDesignerOperations {
 	) => void;
 	getData: () => WorkflowData;
 	updateNodeData: (nodeId: NodeId, data: NodeData) => void;
+	addConnection: (
+		sourceNode: NodeData,
+		targetNodeHandle: ConnectionHandle,
+	) => void;
 }
 
 export function WorkflowDesigner({
@@ -28,6 +34,7 @@ export function WorkflowDesigner({
 	defaultValue?: WorkflowData;
 }): WorkflowDesignerOperations {
 	const nodes = defaultValue.nodes;
+	const connections = defaultValue.connections;
 	function addTextGenerationNode(
 		params: z.infer<typeof CreateTextGenerationNodeParams>,
 	) {
@@ -38,14 +45,26 @@ export function WorkflowDesigner({
 		return {
 			id: defaultValue.id,
 			nodes,
+			connections,
 		};
 	}
 	function updateNodeData(nodeId: NodeId, data: NodeData) {
 		nodes.set(nodeId, data);
 	}
+	function addConnection(
+		sourceNode: BaseNodeData,
+		targetNodeHandle: ConnectionHandle,
+	) {
+		const connection = createConnection({
+			sourceNode,
+			targetNodeHandle,
+		});
+		connections.set(connection.id, connection);
+	}
 
 	return {
 		addTextGenerationNode,
+		addConnection,
 		getData,
 		updateNodeData,
 	};

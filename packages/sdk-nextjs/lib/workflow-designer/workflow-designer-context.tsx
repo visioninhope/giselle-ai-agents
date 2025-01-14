@@ -10,8 +10,13 @@ import {
 } from "react";
 import type { z } from "zod";
 import type { NodeData, WorkflowData } from "../workflow-data";
+import { createConnectionHandle as createConnectionHandleData } from "../workflow-data/node/connection";
 import type { CreateTextGenerationNodeParams } from "../workflow-data/node/text-generation";
-import type { NodeId } from "../workflow-data/node/types";
+import type {
+	BaseNodeData,
+	ConnectionHandle,
+	NodeId,
+} from "../workflow-data/node/types";
 import {
 	WorkflowDesigner,
 	type WorkflowDesignerOperations,
@@ -20,7 +25,7 @@ import {
 interface WorkflowDesignerContextValue
 	extends Pick<
 		WorkflowDesignerOperations,
-		"addTextGenerationNode" | "updateNodeData"
+		"addTextGenerationNode" | "updateNodeData" | "addConnection"
 	> {
 	data: WorkflowData;
 }
@@ -47,7 +52,6 @@ export function WorkflowDesignerProvider({
 				return;
 			}
 			workflowDesignerRef.current.addTextGenerationNode(params);
-			console.log(workflowDesignerRef.current.getData());
 			setWorkflowData(workflowDesignerRef.current.getData());
 		},
 		[],
@@ -60,11 +64,19 @@ export function WorkflowDesignerProvider({
 		setWorkflowData(workflowDesignerRef.current.getData());
 	}, []);
 
+	const addConnection = useCallback(
+		(sourceNode: NodeData, targetHandle: ConnectionHandle) => {
+			workflowDesignerRef.current?.addConnection(sourceNode, targetHandle);
+		},
+		[],
+	);
+
 	return (
 		<WorkflowDesignerContext.Provider
 			value={{
 				data: workflowData,
 				addTextGenerationNode,
+				addConnection,
 				updateNodeData,
 			}}
 		>
@@ -84,7 +96,11 @@ export function useWorkflowDesigner() {
 }
 
 export function useNode(nodeId: NodeId) {
-	const { data: workflowData, updateNodeData } = useWorkflowDesigner();
+	const {
+		data: workflowData,
+		updateNodeData,
+		addConnection: addConnectionInternal,
+	} = useWorkflowDesigner();
 
 	const data = useMemo(() => {
 		const node = workflowData.nodes.get(nodeId);
@@ -100,7 +116,22 @@ export function useNode(nodeId: NodeId) {
 		},
 		[nodeId, updateNodeData, data],
 	);
+
+	const addConnection = useCallback(
+		({ sourceNode, label }: { sourceNode: NodeData; label: string }) => {
+			const connectionHandle = createConnectionHandleData({
+				label,
+				nodeId: data.id,
+				nodeType: data.type,
+			});
+			addConnectionInternal(sourceNode, connectionHandle);
+			return connectionHandle;
+		},
+		[data, addConnectionInternal],
+	);
+
 	return {
 		updateData,
+		addConnection,
 	};
 }

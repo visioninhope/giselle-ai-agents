@@ -21,8 +21,8 @@ export const Position = z.object({
 
 export const ConnectionHandle = z.object({
 	id: connectionHandleId.schema,
-	connectedSourceNodeId: nodeId.schema,
-	connectedTargetNodeId: nodeId.schema,
+	nodeId: nodeId.schema,
+	nodeType: BaseNodeData.shape.type,
 	label: z.string(),
 });
 export type ConnectionHandle = z.infer<typeof ConnectionHandle>;
@@ -32,11 +32,13 @@ export const NodeUIState = z.object({
 	selected: z.boolean(),
 });
 
+export const connectionId = createIdGenerator("cnnc");
 export const Connection = z.object({
-	id: z.string(),
+	id: connectionId.schema,
 	sourceNodeId: nodeId.schema,
 	sourceNodeType: BaseNodeData.shape.type,
 	targetNodeId: nodeId.schema,
 	targetNodeType: BaseNodeData.shape.type,
 	targetNodeHandleId: connectionHandleId.schema,
 });
+export type Connection = z.infer<typeof Connection>;
