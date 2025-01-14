@@ -95,7 +95,6 @@ export async function WorkflowEngine(
 			return Response.json(result);
 		}
 		case "text-generation": {
-			console.log(payload);
 			const stream = await textGeneration({
 				context,
 				unsafeInput: payload,
