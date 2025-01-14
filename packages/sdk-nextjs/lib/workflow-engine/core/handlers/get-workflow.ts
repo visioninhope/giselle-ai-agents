@@ -21,5 +21,6 @@ export async function getWorkflow({
 	if (result === null) {
 		throw new Error("Workflow not found");
 	}
+	console.log(JSON.stringify(result));
 	return Output.parse({ workflowData: result });
 }

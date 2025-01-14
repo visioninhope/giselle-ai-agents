@@ -7,9 +7,18 @@ const NodeData = TextGenerationNodeData;
 export type NodeData = z.infer<typeof NodeData>;
 export const workflowId = createIdGenerator("wf");
 export type WorkflowId = z.infer<typeof workflowId.schema>;
+
 export const WorkflowData = z.object({
 	id: workflowId.schema,
-	nodes: z.map(nodeId.schema, NodeData),
+	nodes: z.preprocess(
+		(args) => {
+			if (typeof args !== "object" || args === null || args instanceof Map) {
+				return args;
+			}
+			return new Map(Object.entries(args));
+		},
+		z.map(nodeId.schema, NodeData),
+	),
 });
 export type WorkflowData = z.infer<typeof WorkflowData>;
 

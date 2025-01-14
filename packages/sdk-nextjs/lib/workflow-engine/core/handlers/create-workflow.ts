@@ -14,11 +14,10 @@ export const Output = z.object({
 });
 
 export async function createWorkflow({ context }: WorkflowEngineHandlerArgs) {
-	const id = workflowId.generate();
 	const workflowData = generateInitialWorkflowData();
 	await setGraphToStorage({
 		storage: context.storage,
-		workflowId: id,
+		workflowId: workflowData.id,
 		workflowData,
 	});
 	return Output.parse({ workflowData });

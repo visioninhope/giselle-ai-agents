@@ -1,5 +1,6 @@
 "use client";
 import { useWorkflowDesigner } from "@/lib/workflow-designer";
+import { Node } from "@/lib/workflow-designer/ui";
 
 export default function Page() {
 	const { data, addTextGenerationNode } = useWorkflowDesigner();
@@ -19,7 +20,7 @@ export default function Page() {
 			</div>
 			<div>
 				{Object.entries(data.nodes).map(([nodeId, node]) => (
-					<div key={node.id}>{node.name}</div>
+					<Node key={nodeId} data={node} />
 				))}
 			</div>
 		</div>
