@@ -12,7 +12,7 @@ import {
 
 const AgentNameContext = createContext<
 	| {
-			agentName: string;
+			agentName: string | null;
 			updateAgentName: (name: string) => Promise<void>;
 			isPending: boolean;
 	  }
@@ -33,11 +33,11 @@ export function AgentNameProvider({
 	updateAgentNameAction,
 }: {
 	children: ReactNode;
-	defaultValue: string;
-	updateAgentNameAction: (name: string) => Promise<string>;
+	defaultValue: string | null;
+	updateAgentNameAction: (name: string | null) => Promise<string | null>;
 }) {
 	const [serverAgentName, setServerAgentName] = useState(defaultValue);
-	const [agentName, setAgentName] = useOptimistic<string, string>(
+	const [agentName, setAgentName] = useOptimistic<string | null, string | null>(
 		serverAgentName,
 		(_, newAgentName) => newAgentName,
 	);
@@ -48,10 +48,12 @@ export function AgentNameProvider({
 			if (agentName === newAgentName) {
 				return;
 			}
+			const nullableAgentName =
+				newAgentName.trim() === "" ? null : newAgentName;
 			startTransition(async () => {
-				setAgentName(newAgentName);
-				await updateAgentNameAction(newAgentName);
-				setServerAgentName(newAgentName);
+				setAgentName(nullableAgentName);
+				const updatedAgentName = await updateAgentNameAction(nullableAgentName);
+				setServerAgentName(nullableAgentName);
 			});
 		},
 		[agentName, setAgentName, updateAgentNameAction],
