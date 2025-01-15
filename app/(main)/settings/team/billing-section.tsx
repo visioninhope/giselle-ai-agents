@@ -76,6 +76,7 @@ type BillingButtonProps = {
 	team: CurrentTeam;
 };
 
+// NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
 async function BillingButton({ subscriptionId, team }: BillingButtonProps) {
 	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
 	if (subscriptionId == null) {
