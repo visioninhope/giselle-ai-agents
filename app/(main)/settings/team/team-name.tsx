@@ -7,8 +7,8 @@ export async function TeamName() {
 		<div>
 			<TeamNameForm
 				key={currentTeam.id}
+				id={currentTeam.id}
 				name={currentTeam.name}
-				teamId={currentTeam.id}
 			/>
 		</div>
 	);

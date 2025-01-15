@@ -24,13 +24,7 @@ const TeamNameSchema = pipe(
 
 type TeamNameSchema = InferInput<typeof TeamNameSchema>;
 
-export function TeamNameForm({
-	name,
-	teamId,
-}: {
-	name: Team["name"];
-	teamId: Team["id"];
-}) {
+export function TeamNameForm({ id: teamId, name }: Team) {
 	const [isEditingName, setIsEditingName] = useState(false);
 	const [teamName, setTeamName] = useState(name);
 	const [tempTeamName, setTempTeamName] = useState(teamName);
