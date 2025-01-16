@@ -78,20 +78,6 @@ export const googleOauthFlag = flag<boolean>({
 	],
 });
 
-export const proTeamPlanFlag = flag<boolean>({
-	key: "pro-team-plan",
-	async decide() {
-		return true;
-		// return takeLocalEnv("PRO_TEAM_PLAN_FLAG");
-	},
-	description: "Enable Pro Team Plan",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const developerFlag = flag<boolean>({
 	key: "developer",
 	async decide() {

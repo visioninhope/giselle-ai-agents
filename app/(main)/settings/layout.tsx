@@ -1,4 +1,4 @@
-import { githubIntegrationFlag, proTeamPlanFlag } from "@/flags";
+import { githubIntegrationFlag } from "@/flags";
 import { UserIcon, UsersIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { IntegrationIcon } from "./components/integration-icon";
@@ -8,7 +8,6 @@ export default async function SettingLayout({
 	children,
 }: { children: ReactNode }) {
 	const displayGitHubIntegration = await githubIntegrationFlag();
-	const displayProTeamPlan = await proTeamPlanFlag();
 
 	return (
 		<div className="flex divide-x divide-black-80 h-full">

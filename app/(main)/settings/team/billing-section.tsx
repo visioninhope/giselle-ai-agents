@@ -1,6 +1,5 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { proTeamPlanFlag } from "@/flags";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
@@ -11,7 +10,6 @@ import { LocalDateTime } from "./components/local-date-time";
 
 export default async function BillingSection() {
 	const team = await fetchCurrentTeam();
-	const proTeamPlan = await proTeamPlanFlag();
 
 	return (
 		<Card title="Billing">
@@ -29,7 +27,7 @@ export default async function BillingSection() {
 					)}
 				</div>
 
-				{proTeamPlan && team.type !== "internal" && (
+				{team.type !== "internal" && (
 					<form>
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
