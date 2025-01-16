@@ -2,12 +2,9 @@
 
 import * as v from "valibot";
 import { setCurrentTeam } from "../";
+import { teamIdSchema } from "../validations";
 
 export async function selectTeam(data: FormData) {
-	const schema = v.pipe(
-		v.string(),
-		v.transform((input) => Number.parseInt(input, 10)),
-	);
-	const teamId = v.parse(schema, data.get("team"));
+	const teamId = v.parse(teamIdSchema, data.get("teamId"));
 	await setCurrentTeam(teamId);
 }

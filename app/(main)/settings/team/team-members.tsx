@@ -36,7 +36,7 @@ export async function TeamMembers() {
 		<Card title="Team members">
 			{hasProPlan && currentUserRole === "admin" && <TeamMembersForm />}
 			<TeamMembersList
-				teamDbId={team.dbId}
+				teamId={team.id}
 				isProPlan={hasProPlan}
 				members={members}
 				currentUserRole={currentUserRole}

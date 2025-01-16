@@ -600,6 +600,7 @@ export async function executeNode({
 async function canPerformFlowExecution(agentId: AgentId) {
 	const res = await db
 		.select({
+			id: teams.id,
 			dbId: teams.dbId,
 			name: teams.name,
 			type: teams.type,

@@ -2,14 +2,14 @@
 
 
 ## Summary
-* 666 MIT
+* 665 MIT
 * 122 Apache 2.0
 * 61 ISC
 * 23 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
+* 3 BSD Zero Clause License
 * 3 BlueOak-1.0.0
-* 2 BSD Zero Clause License
 * 2 The Unlicense
 * 2 LGPL-3.0-or-later
 * 1 Apache 2.0, BSD Zero Clause License, ISC, MIT, Mozilla Public License 2.0, New BSD, Simplified BSD, The Unlicense, zlib/libpng license
@@ -707,18 +707,7 @@ JavaScript SDK for Firecrawl API
 node-postgres for serverless environments from neon.tech
 
 <a name="@next/env"></a>
-### @next/env v14.2.5 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Next.js dotenv file loading
-
-<a name="@next/env"></a>
-### @next/env v15.0.2 (dependencies)
+### @next/env v15.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -729,7 +718,7 @@ Next.js dotenv file loading
 Next.js dotenv file loading
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.0.2 (dependencies)
+### @next/swc-linux-x64-gnu v15.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -740,7 +729,7 @@ Next.js dotenv file loading
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.0.2 (dependencies)
+### @next/swc-linux-x64-musl v15.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -751,7 +740,7 @@ Next.js dotenv file loading
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v14.2.13 (dependencies)
+### @next/third-parties v15.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -916,7 +905,7 @@ Universal library to retrieve GitHubâs identity URL for the OAuth web flow
 Set of stateless request methods to create, check, reset, refresh, and delete user access tokens for OAuth and GitHub Apps
 
 <a name="@octokit/openapi-types"></a>
-### @octokit/openapi-types v22.2.0 (dependencies)
+### @octokit/openapi-types v22.2.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -3138,7 +3127,7 @@ Isomorphic Javascript client for Supabase
 Downloade counter for the swc project
 
 <a name="@swc/helpers"></a>
-### <a href="https://swc.rs">@swc/helpers</a> v0.5.13 (dependencies)
+### <a href="https://swc.rs">@swc/helpers</a> v0.5.15 (dependencies)
 #### 
 
 ##### Paths
@@ -3455,6 +3444,28 @@ TypeScript definitions for pg-pool
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 TypeScript definitions for phoenix
+
+<a name="@types/react"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react">@types/react</a> v19.0.2 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for react
+
+<a name="@types/react-dom"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react-dom">@types/react-dom</a> v19.0.2 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for react-dom
 
 <a name="@types/shimmer"></a>
 ### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/shimmer">@types/shimmer</a> v1.2.0 (dependencies)
@@ -7274,7 +7285,7 @@ A tiny (116 bytes), secure URL-friendly unique string ID generator
 Neo-Async is a drop-in replacement for Async, it almost fully covers its functionality and runs faster 
 
 <a name="next"></a>
-### <a href="https://nextjs.org">next</a> v15.0.2 (dependencies)
+### <a href="https://nextjs.org">next</a> v15.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -8121,7 +8132,7 @@ HTTP client. Spiritual successor to request.
 random bytes from browserify stand alone
 
 <a name="react"></a>
-### <a href="https://react.dev/">react</a> v19.0.0-rc-4d577fd2-20241104 (dependencies, devDependencies)
+### <a href="https://react.dev/">react</a> v19.0.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8132,7 +8143,7 @@ random bytes from browserify stand alone
 React is a JavaScript library for building user interfaces.
 
 <a name="react-dom"></a>
-### <a href="https://react.dev/">react-dom</a> v19.0.0-rc-4d577fd2-20241104 (dependencies, devDependencies)
+### <a href="https://react.dev/">react-dom</a> v19.0.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8484,7 +8495,7 @@ Modern Buffer API polyfill without footguns
 An evented streaming XML parser in JavaScript
 
 <a name="scheduler"></a>
-### <a href="https://react.dev/">scheduler</a> v0.25.0-rc-4d577fd2-20241104 (dependencies, devDependencies)
+### <a href="https://react.dev/">scheduler</a> v0.25.0 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -9209,6 +9220,17 @@ Runtime library for TypeScript helper functions
 
 Runtime library for TypeScript helper functions
 
+<a name="tslib"></a>
+### <a href="https://www.typescriptlang.org/">tslib</a> v2.8.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="https://opensource.org/licenses/0BSD">BSD Zero Clause License</a> permitted
+
+Runtime library for TypeScript helper functions
+
 <a name="turbo"></a>
 ### <a href="https://turbo.build/repo">turbo</a> v2.0.9 (devDependencies)
 #### 
@@ -9252,28 +9274,6 @@ A collection of essential TypeScript types
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Convert a typed array to a Buffer without a copy
-
-<a name="types-react"></a>
-### types-react v19.0.0-rc.1 (dependencies, devDependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="types-react-dom"></a>
-### types-react-dom v19.0.0-rc.1 (dependencies, devDependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
 
 <a name="typescript"></a>
 ### <a href="https://www.typescriptlang.org/">typescript</a> v5.6.2 (dependencies, devDependencies)

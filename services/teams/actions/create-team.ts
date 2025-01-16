@@ -34,14 +34,14 @@ export async function createTeam(formData: FormData) {
 	const isInternalUser =
 		supabaseUser.email != null && isEmailFromRoute06(supabaseUser.email);
 	if (isInternalUser) {
-		const teamDbId = await createInternalTeam(supabaseUser, teamName);
-		await setCurrentTeam(teamDbId);
+		const teamId = await createInternalTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamId);
 		redirect("/settings/team");
 	}
 
 	if (selectedPlan === "free") {
-		const teamDbId = await createFreeTeam(supabaseUser, teamName);
-		await setCurrentTeam(teamDbId);
+		const teamId = await createFreeTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamId);
 		redirect("/settings/team");
 	}
 
@@ -103,9 +103,10 @@ async function createTeamInDatabase(
 			name: teamName,
 			type: isInternal ? "internal" : "customer",
 		})
-		.returning({ dbid: teams.dbId });
+		.returning({ id: teams.id, dbId: teams.dbId });
 
-	const teamDbId = result.dbid;
+	const teamId = result.id;
+	const teamDbId = result.dbId;
 	const userDbId = await getUserDbId(supabaseUser);
 
 	// add membership
@@ -114,7 +115,7 @@ async function createTeamInDatabase(
 		userDbId,
 		role: "admin",
 	});
-	return teamDbId;
+	return teamId;
 }
 
 async function getUserDbId(supabaseUser: User) {

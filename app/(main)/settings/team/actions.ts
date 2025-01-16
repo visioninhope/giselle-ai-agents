@@ -16,7 +16,7 @@ import { updateGiselleSession } from "@/lib/giselle-session";
 import { getUser } from "@/lib/supabase";
 import { stripe } from "@/services/external/stripe";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import type { CurrentTeam } from "@/services/teams/types";
+import type { CurrentTeam, TeamId } from "@/services/teams/types";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
@@ -30,7 +30,7 @@ function isTeamRole(role: string): role is TeamRole {
 	return role === "admin" || role === "member";
 }
 
-export async function updateTeamName(teamDbId: number, formData: FormData) {
+export async function updateTeamName(teamId: TeamId, formData: FormData) {
 	const newName = formData.get("name") as string;
 	const user = await getUser();
 
@@ -48,7 +48,7 @@ export async function updateTeamName(teamDbId: number, formData: FormData) {
 				.where(
 					and(
 						eq(supabaseUserMappings.supabaseUserId, user.id),
-						eq(teams.dbId, teamDbId),
+						eq(teams.id, teamId),
 					),
 				);
 
@@ -515,9 +515,10 @@ export async function deleteTeam(
 		const supabaseUser = await getUser();
 		const otherTeams = await db
 			.select({
-				teamDbId: teamMemberships.teamDbId,
+				teamId: teams.id,
 			})
-			.from(teamMemberships)
+			.from(teams)
+			.innerJoin(teamMemberships, eq(teams.dbId, teamMemberships.teamDbId))
 			.innerJoin(
 				supabaseUserMappings,
 				eq(teamMemberships.userDbId, supabaseUserMappings.userDbId),
@@ -525,7 +526,7 @@ export async function deleteTeam(
 			.where(
 				and(
 					eq(supabaseUserMappings.supabaseUserId, supabaseUser.id),
-					ne(teamMemberships.teamDbId, currentTeam.dbId), // Exclude current team
+					ne(teams.dbId, currentTeam.dbId),
 				),
 			)
 			.limit(1);
@@ -540,7 +541,7 @@ export async function deleteTeam(
 
 		// Refresh session to switch to another team after deletion
 		// This ensures that the user is redirected to a valid team context and prevents access to the deleted team's resources.
-		await updateGiselleSession({ teamDbId: otherTeams[0].teamDbId });
+		await updateGiselleSession({ teamId: otherTeams[0].teamId });
 	} catch (error) {
 		console.error("Failed to delete team:", error);
 

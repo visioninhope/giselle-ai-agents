@@ -3,7 +3,7 @@
 import { Card } from "@/app/(main)/settings/components/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import type { teams } from "@/drizzle";
+import type { Team } from "@/services/teams/types";
 import { Check, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import {
@@ -24,13 +24,7 @@ const TeamNameSchema = pipe(
 
 type TeamNameSchema = InferInput<typeof TeamNameSchema>;
 
-export function TeamNameForm({
-	name,
-	teamDbId,
-}: {
-	name: typeof teams.$inferSelect.name;
-	teamDbId: typeof teams.$inferSelect.dbId;
-}) {
+export function TeamNameForm({ id: teamId, name }: Team) {
 	const [isEditingName, setIsEditingName] = useState(false);
 	const [teamName, setTeamName] = useState(name);
 	const [tempTeamName, setTempTeamName] = useState(teamName);
@@ -47,7 +41,7 @@ export function TeamNameForm({
 
 			const formData = new FormData();
 			formData.append("name", validatedName);
-			const formAction = updateTeamName.bind(null, teamDbId);
+			const formAction = updateTeamName.bind(null, teamId);
 			const result = await formAction(formData);
 
 			if (result.success) {
@@ -118,7 +112,7 @@ export function TeamNameForm({
 					)}
 				</div>
 
-				{error && <p className="text-sm text-destructive">{error}</p>}
+				{error && <p className="text-sm text-red-600">{error}</p>}
 			</div>
 		</Card>
 	);
