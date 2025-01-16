@@ -155,7 +155,7 @@ export default async function Page({
 		graphUrl = await persistGraph(graph);
 	}
 
-	async function updateAgentName(agentName: string) {
+	async function updateAgentName(agentName: string | null) {
 		"use server";
 		await db
 			.update(agents)
@@ -366,7 +366,7 @@ export default async function Page({
 								<MousePositionProvider>
 									<ToastProvider>
 										<AgentNameProvider
-											defaultValue={agent.name ?? "Unnamed Agent"}
+											defaultValue={agent.name}
 											updateAgentNameAction={updateAgentName}
 										>
 											<PlaygroundModeProvider>

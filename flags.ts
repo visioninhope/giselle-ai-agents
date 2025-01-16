@@ -95,7 +95,8 @@ export const googleOauthFlag = flag<boolean>({
 export const proTeamPlanFlag = flag<boolean>({
 	key: "pro-team-plan",
 	async decide() {
-		return takeLocalEnv("PRO_TEAM_PLAN_FLAG");
+		return true;
+		// return takeLocalEnv("PRO_TEAM_PLAN_FLAG");
 	},
 	description: "Enable Pro Team Plan",
 	defaultValue: false,
@@ -108,7 +109,8 @@ export const proTeamPlanFlag = flag<boolean>({
 export const teamCreationFlag = flag<boolean>({
 	key: "team-creation",
 	async decide() {
-		return takeLocalEnv("TEAM_CREATION_FLAG");
+		return true;
+		// return takeLocalEnv("TEAM_CREATION_FLAG");
 	},
 	description: "Enable Team Creation",
 	defaultValue: false,
