@@ -14,6 +14,6 @@
 		"clientKind": "git"
 	},
 	"files": {
-		"ignore": ["deprecated"]
+		"ignore": ["deprecated", "packages/sdk-nextjs"]
 	}
 }
