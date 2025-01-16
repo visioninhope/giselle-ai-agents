@@ -9,11 +9,7 @@ import {
 } from "@/components/ui/select";
 import { useRef } from "react";
 import { selectTeam } from "../actions/select-team";
-
-type Team = {
-	dbId: number;
-	name: string;
-};
+import type { Team } from "../types";
 
 type TeamSelectionFormProps = {
 	allTeams: Team[];
@@ -29,8 +25,8 @@ export function TeamSelectionForm({
 	return (
 		<form action={selectTeam} ref={formRef}>
 			<Select
-				name="team"
-				defaultValue={currentTeam.dbId.toString()}
+				name="teamId"
+				defaultValue={currentTeam.id}
 				onValueChange={() => {
 					formRef.current?.requestSubmit();
 				}}
@@ -40,7 +36,7 @@ export function TeamSelectionForm({
 				</SelectTrigger>
 				<SelectContent>
 					{allTeams.map((team) => (
-						<SelectItem key={team.dbId} value={team.dbId.toString()}>
+						<SelectItem key={team.id} value={team.id}>
 							{team.name}
 						</SelectItem>
 					))}

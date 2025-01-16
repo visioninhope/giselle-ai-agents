@@ -3,6 +3,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
+import type { CurrentTeam } from "@/services/teams/types";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 import { getSubscription } from "./actions";
@@ -34,7 +35,7 @@ export default async function BillingSection() {
 						>
 							<BillingButton
 								subscriptionId={team.activeSubscriptionId}
-								teamDbId={team.dbId}
+								team={team}
 							/>
 						</Suspense>
 					</form>
@@ -70,14 +71,15 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 
 type BillingButtonProps = {
 	subscriptionId: string | null;
-	teamDbId: number;
+	team: CurrentTeam;
 };
 
-async function BillingButton({ subscriptionId, teamDbId }: BillingButtonProps) {
-	const upgrateTeamWithTeamDbId = upgradeTeam.bind(null, teamDbId);
+// NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
+async function BillingButton({ subscriptionId, team }: BillingButtonProps) {
+	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
 	if (subscriptionId == null) {
 		return (
-			<Button className="w-fit" formAction={upgrateTeamWithTeamDbId}>
+			<Button className="w-fit" formAction={upgrateTeamWithTeam}>
 				Upgrade Plan
 			</Button>
 		);
