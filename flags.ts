@@ -52,20 +52,6 @@ export const githubIntegrationFlag = flag<boolean>({
 	],
 });
 
-export const freePlanFlag = flag<boolean>({
-	key: "free-plan",
-	async decide() {
-		return true;
-		// return takeLocalEnv("FREE_PLAN_FLAG");
-	},
-	description: "Enable Free Plan",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const playgroundV2Flag = flag<boolean>({
 	key: "playground-v2",
 	async decide() {
@@ -85,34 +71,6 @@ export const googleOauthFlag = flag<boolean>({
 		return takeLocalEnv("GOOGLE_OAUTH_FLAG");
 	},
 	description: "Enable Google OAuth",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const proTeamPlanFlag = flag<boolean>({
-	key: "pro-team-plan",
-	async decide() {
-		return true;
-		// return takeLocalEnv("PRO_TEAM_PLAN_FLAG");
-	},
-	description: "Enable Pro Team Plan",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const teamCreationFlag = flag<boolean>({
-	key: "team-creation",
-	async decide() {
-		return true;
-		// return takeLocalEnv("TEAM_CREATION_FLAG");
-	},
-	description: "Enable Team Creation",
 	defaultValue: false,
 	options: [
 		{ value: false, label: "disable" },
