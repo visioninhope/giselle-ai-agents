@@ -102,14 +102,6 @@ export const supabaseUserMappings = pgTable("supabase_user_mappings", {
 	supabaseUserId: text("supabase_user_id").notNull().unique(),
 });
 
-export const stripeUserMappings = pgTable("stripe_user_mappings", {
-	userDbId: integer("user_db_id")
-		.notNull()
-		.unique()
-		.references(() => users.dbId),
-	stripeCustomerId: text("stripe_customer_id").notNull().unique(),
-});
-
 export type TeamRole = "admin" | "member";
 export const teamMemberships = pgTable(
 	"team_memberships",
