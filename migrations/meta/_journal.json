@@ -183,6 +183,13 @@
 			"when": 1737000272132,
 			"tag": "0025_flimsy_ravenous",
 			"breakpoints": true
+		},
+		{
+			"idx": 26,
+			"version": "7",
+			"when": 1737012769271,
+			"tag": "0026_military_spirit",
+			"breakpoints": true
 		}
 	]
 }
