@@ -2,10 +2,10 @@
 
 
 ## Summary
-* 665 MIT
-* 122 Apache 2.0
-* 61 ISC
-* 23 New BSD
+* 656 MIT
+* 124 Apache 2.0
+* 58 ISC
+* 24 New BSD
 * 12 Simplified BSD
 * 3 MIT OR Apache-2.0
 * 3 BSD Zero Clause License
@@ -124,7 +124,7 @@ Simple “Least Recently Used” (LRU) cache
 Remap sequential sourcemaps through transformations to point at the original source code
 
 <a name="@auth/core"></a>
-### <a href="https://authjs.dev">@auth/core</a> v0.34.2 (dependencies)
+### <a href="https://authjs.dev">@auth/core</a> v0.37.2 (dependencies)
 #### 
 
 ##### Paths
@@ -288,17 +288,6 @@ Syntax highlight JavaScript strings for output in terminals.
 
 A JavaScript parser
 
-<a name="@babel/runtime"></a>
-### <a href="https://babel.dev/docs/en/next/babel-runtime">@babel/runtime</a> v7.25.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-babel's modular runtime helpers
-
 <a name="@babel/template"></a>
 ### <a href="https://babel.dev/docs/en/next/babel-template">@babel/template</a> v7.25.0 (dependencies)
 #### 
@@ -441,17 +430,6 @@ The Linux 64-bit binary for esbuild, a JavaScript bundler.
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 The Linux 64-bit binary for esbuild, a JavaScript bundler.
-
-<a name="@fast-csv/format"></a>
-### <a href="https://c2fo.github.io/fast-csv/docs/formatting/getting-started/">@fast-csv/format</a> v5.0.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-fast-csv formatting module
 
 <a name="@fastify/busboy"></a>
 ### @fastify/busboy v2.1.1 (dependencies)
@@ -707,7 +685,7 @@ JavaScript SDK for Firecrawl API
 node-postgres for serverless environments from neon.tech
 
 <a name="@next/env"></a>
-### @next/env v15.1.2 (dependencies)
+### @next/env v15.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -718,7 +696,7 @@ node-postgres for serverless environments from neon.tech
 Next.js dotenv file loading
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.1.2 (dependencies)
+### @next/swc-linux-x64-gnu v15.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -729,7 +707,7 @@ Next.js dotenv file loading
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.1.2 (dependencies)
+### @next/swc-linux-x64-musl v15.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -740,7 +718,7 @@ Next.js dotenv file loading
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v15.1.2 (dependencies)
+### @next/third-parties v15.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -1104,6 +1082,17 @@ OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry 
 
 <a name="@opentelemetry/core"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core">@opentelemetry/core</a> v1.27.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry Core provides constants and utilities shared by all OpenTelemetry SDK packages.
+
+<a name="@opentelemetry/core"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-core">@opentelemetry/core</a> v1.30.0 (dependencies)
 #### 
 
 ##### Paths
@@ -1619,6 +1608,17 @@ OpenTelemetry SDK resources
 
 OpenTelemetry SDK resources
 
+<a name="@opentelemetry/resources"></a>
+### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/packages/opentelemetry-resources">@opentelemetry/resources</a> v1.30.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+OpenTelemetry SDK resources
+
 <a name="@opentelemetry/sdk-logs"></a>
 ### <a href="https://github.com/open-telemetry/opentelemetry-js/tree/main/experimental/packages/sdk-logs">@opentelemetry/sdk-logs</a> v0.51.1 (dependencies)
 #### 
@@ -1994,17 +1994,6 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/primitive"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/primitive</a> v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/primitive"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/primitive</a> v1.1.0 (dependencies, devDependencies)
 #### 
 
@@ -2015,8 +2004,19 @@ A minimal UTF8 implementation for number arrays.
 
 
 
+<a name="@radix-ui/primitive"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/primitive</a> v1.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-accordion"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-accordion</a> v1.2.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-accordion</a> v1.2.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2048,8 +2048,19 @@ A minimal UTF8 implementation for number arrays.
 
 
 
+<a name="@radix-ui/react-arrow"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-arrow</a> v1.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-collapsible"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-collapsible</a> v1.1.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-collapsible</a> v1.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2070,8 +2081,8 @@ A minimal UTF8 implementation for number arrays.
 
 
 
-<a name="@radix-ui/react-compose-refs"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-compose-refs</a> v1.0.1 (dependencies)
+<a name="@radix-ui/react-collection"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-collection</a> v1.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2092,8 +2103,8 @@ A minimal UTF8 implementation for number arrays.
 
 
 
-<a name="@radix-ui/react-context"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-context</a> v1.0.1 (dependencies)
+<a name="@radix-ui/react-compose-refs"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-compose-refs</a> v1.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2126,29 +2137,18 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/react-dialog"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-dialog</a> v1.0.5 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-dialog"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-dialog</a> v1.1.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-dialog"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-dialog</a> v1.1.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@radix-ui/react-dialog"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-dialog</a> v1.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -2170,28 +2170,6 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/react-dismissable-layer"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-dismissable-layer</a> v1.0.5 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-dismissable-layer"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-dismissable-layer</a> v1.1.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-dismissable-layer"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-dismissable-layer</a> v1.1.1 (dependencies, devDependencies)
 #### 
 
@@ -2202,30 +2180,19 @@ A minimal UTF8 implementation for number arrays.
 
 
 
+<a name="@radix-ui/react-dismissable-layer"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-dismissable-layer</a> v1.1.3 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-dropdown-menu"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-dropdown-menu</a> v2.1.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-focus-guards"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-guards</a> v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-focus-guards"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-guards</a> v1.1.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-dropdown-menu</a> v2.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -2247,7 +2214,7 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/react-focus-scope"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-scope</a> v1.0.4 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-scope</a> v1.1.0 (dependencies)
 #### 
 
 ##### Paths
@@ -2258,7 +2225,7 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/react-focus-scope"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-scope</a> v1.1.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-focus-scope</a> v1.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2280,7 +2247,7 @@ A minimal UTF8 implementation for number arrays.
 
 
 <a name="@radix-ui/react-icons"></a>
-### @radix-ui/react-icons v1.3.0 (dependencies)
+### @radix-ui/react-icons v1.3.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2289,17 +2256,6 @@ A minimal UTF8 implementation for number arrays.
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Radix UI React Icon Set
-
-<a name="@radix-ui/react-id"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-id</a> v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
 
 <a name="@radix-ui/react-id"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-id</a> v1.1.0 (dependencies)
@@ -2313,7 +2269,7 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-label"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-label</a> v2.1.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-label</a> v2.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2324,7 +2280,7 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-menu"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-menu</a> v2.1.1 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-menu</a> v2.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -2335,7 +2291,7 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-popover"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-popover</a> v1.1.1 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-popover</a> v1.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -2356,19 +2312,8 @@ Radix UI React Icon Set
 
 
 
-<a name="@radix-ui/react-portal"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-portal</a> v1.0.4 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-portal"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-portal</a> v1.1.1 (dependencies)
+<a name="@radix-ui/react-popper"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-popper</a> v1.2.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2389,19 +2334,8 @@ Radix UI React Icon Set
 
 
 
-<a name="@radix-ui/react-presence"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-presence</a> v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-presence"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-presence</a> v1.1.0 (dependencies)
+<a name="@radix-ui/react-portal"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-portal</a> v1.1.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2422,8 +2356,8 @@ Radix UI React Icon Set
 
 
 
-<a name="@radix-ui/react-primitive"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-primitive</a> v1.0.3 (dependencies)
+<a name="@radix-ui/react-presence"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-presence</a> v1.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2444,8 +2378,19 @@ Radix UI React Icon Set
 
 
 
+<a name="@radix-ui/react-primitive"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-primitive</a> v2.0.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-radio-group"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-radio-group</a> v1.2.1 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-radio-group</a> v1.2.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2466,8 +2411,19 @@ Radix UI React Icon Set
 
 
 
+<a name="@radix-ui/react-roving-focus"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-roving-focus</a> v1.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-select"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-select</a> v2.1.1 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-select</a> v2.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -2489,17 +2445,6 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-slot"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-slot</a> v1.0.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-slot"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-slot</a> v1.1.0 (dependencies, devDependencies)
 #### 
 
@@ -2510,8 +2455,19 @@ Radix UI React Icon Set
 
 
 
+<a name="@radix-ui/react-slot"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-slot</a> v1.1.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@radix-ui/react-tabs"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-tabs</a> v1.1.0 (dependencies)
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-tabs</a> v1.1.2 (dependencies)
 #### 
 
 ##### Paths
@@ -2566,29 +2522,7 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-use-callback-ref"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-callback-ref</a> v1.0.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-use-callback-ref"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-callback-ref</a> v1.1.0 (dependencies, devDependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-use-controllable-state"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-controllable-state</a> v1.0.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2610,29 +2544,7 @@ Radix UI React Icon Set
 
 
 <a name="@radix-ui/react-use-escape-keydown"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-escape-keydown</a> v1.0.3 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-use-escape-keydown"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-escape-keydown</a> v1.1.0 (dependencies, devDependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@radix-ui/react-use-layout-effect"></a>
-### <a href="https://radix-ui.com/primitives">@radix-ui/react-use-layout-effect</a> v1.0.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2688,6 +2600,17 @@ Radix UI React Icon Set
 
 <a name="@radix-ui/react-visually-hidden"></a>
 ### <a href="https://radix-ui.com/primitives">@radix-ui/react-visually-hidden</a> v1.1.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@radix-ui/react-visually-hidden"></a>
+### <a href="https://radix-ui.com/primitives">@radix-ui/react-visually-hidden</a> v1.1.1 (dependencies)
 #### 
 
 ##### Paths
@@ -2786,7 +2709,7 @@ User replays for Sentry
 Replay canvas integration
 
 <a name="@sentry-internal/tracing"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/tracing-internal">@sentry-internal/tracing</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/tracing-internal">@sentry-internal/tracing</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2863,7 +2786,7 @@ A command line utility to work with Sentry. https://docs.sentry.io/hosted/learn/
 The linux x64 distribution of the Sentry CLI binary.
 
 <a name="@sentry/core"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/core">@sentry/core</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/core">@sentry/core</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2885,7 +2808,7 @@ Base implementation for all Sentry JavaScript SDKs
 Base implementation for all Sentry JavaScript SDKs
 
 <a name="@sentry/integrations"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/integrations">@sentry/integrations</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/integrations">@sentry/integrations</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2907,7 +2830,7 @@ Pluggable integrations that can be used to enhance JS SDKs
 Official Sentry SDK for Next.js
 
 <a name="@sentry/node"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/node">@sentry/node</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/node">@sentry/node</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2951,7 +2874,7 @@ Official Sentry utilities for OpenTelemetry
 Official Sentry SDK for React.js
 
 <a name="@sentry/types"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/types">@sentry/types</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/types">@sentry/types</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -2973,7 +2896,7 @@ Types for all Sentry JavaScript SDKs
 Types for all Sentry JavaScript SDKs
 
 <a name="@sentry/utils"></a>
-### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/utils">@sentry/utils</a> v7.119.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-javascript/tree/master/packages/utils">@sentry/utils</a> v7.120.3 (dependencies)
 #### 
 
 ##### Paths
@@ -3017,7 +2940,7 @@ Offical Sentry SDK for the Vercel Edge Runtime
 Official Sentry Webpack plugin
 
 <a name="@sentry/wizard"></a>
-### <a href="https://github.com/getsentry/sentry-wizard">@sentry/wizard</a> v3.26.0 (dependencies)
+### <a href="https://github.com/getsentry/sentry-wizard">@sentry/wizard</a> v3.38.0 (dependencies)
 #### 
 
 ##### Paths
@@ -3380,6 +3303,17 @@ TypeScript definitions for node
 TypeScript definitions for node
 
 <a name="@types/node"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node">@types/node</a> v22.10.5 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for node
+
+<a name="@types/node"></a>
 ### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/node">@types/node</a> v22.3.0 (dependencies, devDependencies)
 #### 
 
@@ -3446,7 +3380,7 @@ TypeScript definitions for pg-pool
 TypeScript definitions for phoenix
 
 <a name="@types/react"></a>
-### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react">@types/react</a> v19.0.2 (dependencies, devDependencies)
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/react">@types/react</a> v19.0.4 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -4095,7 +4029,7 @@ Minimal async jobs utility library, with streams support
 Zero CPU overhead, zero dependency, true event-loop blocking sleep
 
 <a name="axios"></a>
-### <a href="https://axios-http.com">axios</a> v1.6.0 (dependencies)
+### <a href="https://axios-http.com">axios</a> v1.7.4 (dependencies)
 #### 
 
 ##### Paths
@@ -4502,7 +4436,7 @@ A library to create a trace of your node app per Google's Trace Event format.
 Lexes CommonJS modules, returning their named exports metadata
 
 <a name="class-variance-authority"></a>
-### <a href="https://github.com/joe-bell/cva#readme">class-variance-authority</a> v0.7.0 (dependencies)
+### <a href="https://github.com/joe-bell/cva#readme">class-variance-authority</a> v0.7.1 (dependencies)
 #### 
 
 ##### Paths
@@ -4601,7 +4535,7 @@ A tiny (234B) utility for constructing className strings conditionally.
 A tiny (239B) utility for constructing className strings conditionally.
 
 <a name="cmdk"></a>
-### cmdk v1.0.0 (dependencies)
+### <a href="https://github.com/pacocoursey/cmdk#readme">cmdk</a> v1.0.4 (dependencies)
 #### 
 
 ##### Paths
@@ -4756,6 +4690,17 @@ Converts a source-map from/to  different formats and allows adding/changing prop
 
 <a name="cookie"></a>
 ### cookie v0.6.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+HTTP server cookie parsing and serialization
+
+<a name="cookie"></a>
+### cookie v0.7.1 (dependencies)
 #### 
 
 ##### Paths
@@ -5668,17 +5613,6 @@ Find and parse the tsconfig.json file from a directory path
 the most correct and second fastest glob implementation in JavaScript
 
 <a name="glob"></a>
-### glob v8.1.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-a little globber
-
-<a name="glob"></a>
 ### glob v9.3.5 (dependencies)
 #### 
 
@@ -6019,30 +5953,8 @@ Intercept imports in Node.js
 
 Intercept imports in Node.js
 
-<a name="inflight"></a>
-### <a href="https://github.com/isaacs/inflight">inflight</a> v1.0.6 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-Add callbacks to requests in flight to avoid async duplication
-
-<a name="inherits"></a>
-### inherits v2.0.4 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-Browser-friendly inheritance fully compatible with standard node.js inherits()
-
 <a name="input-otp"></a>
-### <a href="https://input-otp.rodz.dev/">input-otp</a> v1.2.4 (dependencies)
+### <a href="https://input-otp.rodz.dev/">input-otp</a> v1.4.2 (dependencies)
 #### 
 
 ##### Paths
@@ -6328,7 +6240,7 @@ Runtime typescript and ESM support for Node.js
 JWA, JWS, JWE, JWT, JWK, JWKS for Node.js, Browser, Cloudflare Workers, Deno, Bun, and other Web-interoperable runtimes
 
 <a name="jose"></a>
-### <a href="https://github.com/panva/jose">jose</a> v5.6.3 (dependencies)
+### <a href="https://github.com/panva/jose">jose</a> v5.9.6 (dependencies)
 #### 
 
 ##### Paths
@@ -6493,7 +6405,7 @@ Implementation of JSON Web Signatures
 A basic but performant promise implementation
 
 <a name="lilconfig"></a>
-### lilconfig v2.1.0 (dependencies, devDependencies)
+### lilconfig v3.1.2 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -6504,7 +6416,7 @@ A basic but performant promise implementation
 A zero-dependency alternative to cosmiconfig
 
 <a name="lilconfig"></a>
-### lilconfig v3.1.2 (dependencies, devDependencies)
+### lilconfig v3.1.3 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -6590,61 +6502,6 @@ The lodash method `_.camelCase` exported as a module.
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 The lodash method `_.castArray` exported as a module.
-
-<a name="lodash.escaperegexp"></a>
-### <a href="https://lodash.com/">lodash.escaperegexp</a> v4.1.2 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-The lodash method `_.escapeRegExp` exported as a module.
-
-<a name="lodash.isboolean"></a>
-### <a href="https://lodash.com/">lodash.isboolean</a> v3.0.3 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-The lodash method `_.isBoolean` exported as a module.
-
-<a name="lodash.isequal"></a>
-### <a href="https://lodash.com/">lodash.isequal</a> v4.5.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-The Lodash method `_.isEqual` exported as a module.
-
-<a name="lodash.isfunction"></a>
-### <a href="https://lodash.com/">lodash.isfunction</a> v3.0.9 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-The Lodash method `_.isFunction` exported as a module.
-
-<a name="lodash.isnil"></a>
-### <a href="https://lodash.com/">lodash.isnil</a> v4.0.0 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-The lodash method `_.isNil` exported as a module.
 
 <a name="lodash.isplainobject"></a>
 ### <a href="https://lodash.com/">lodash.isplainobject</a> v4.0.6 (devDependencies)
@@ -7086,6 +6943,17 @@ micromark utility with a couple of typescript types
 
 Glob matching for javascript/node.js. A replacement and faster alternative to minimatch and multimatch.
 
+<a name="micromatch"></a>
+### <a href="https://github.com/micromatch/micromatch">micromatch</a> v4.0.8 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Glob matching for javascript/node.js. A replacement and faster alternative to minimatch and multimatch.
+
 <a name="mime-db"></a>
 ### mime-db v1.52.0 (dependencies)
 #### 
@@ -7118,17 +6986,6 @@ The ultimate javascript content-type utility.
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Make a function mimic another one
-
-<a name="minimatch"></a>
-### minimatch v5.1.6 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
-
-a glob matcher in javascript
 
 <a name="minimatch"></a>
 ### minimatch v8.0.4 (dependencies)
@@ -7263,7 +7120,7 @@ modernize node.js to current ECMAScript standards
 A tiny (116 bytes), secure URL-friendly unique string ID generator
 
 <a name="nanoid"></a>
-### nanoid v3.3.8 (dependencies)
+### nanoid v3.3.8 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -7285,7 +7142,7 @@ A tiny (116 bytes), secure URL-friendly unique string ID generator
 Neo-Async is a drop-in replacement for Async, it almost fully covers its functionality and runs faster 
 
 <a name="next"></a>
-### <a href="https://nextjs.org">next</a> v15.1.2 (dependencies)
+### <a href="https://nextjs.org">next</a> v15.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -7296,7 +7153,7 @@ Neo-Async is a drop-in replacement for Async, it almost fully covers its functio
 The React Framework
 
 <a name="next-auth"></a>
-### <a href="https://nextjs.authjs.dev">next-auth</a> v5.0.0-beta.20 (dependencies)
+### <a href="https://nextjs.authjs.dev">next-auth</a> v5.0.0-beta.25 (dependencies)
 #### 
 
 ##### Paths
@@ -7373,7 +7230,7 @@ Node.js releases data
 Normalize slashes in a file path to be posix/unix-like forward slashes. Also condenses repeat slashes to a single slash and removes and trailing slashes, unless disabled.
 
 <a name="oauth4webapi"></a>
-### <a href="https://github.com/panva/oauth4webapi">oauth4webapi</a> v2.11.1 (dependencies)
+### <a href="https://github.com/panva/oauth4webapi">oauth4webapi</a> v3.1.4 (dependencies)
 #### 
 
 ##### Paths
@@ -7381,7 +7238,7 @@ Normalize slashes in a file path to be posix/unix-like forward slashes. Also con
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
-OAuth 2 / OpenID Connect for JavaScript Runtimes
+Low-Level OAuth 2 / OpenID Connect Client API for JavaScript Runtimes
 
 <a name="object-assign"></a>
 ### object-assign v4.1.1 (dependencies, devDependencies)
@@ -7439,7 +7296,7 @@ string representations of objects in node and the browser
 Execute a function on exit without leaking memory, allowing all objects to be garbage collected
 
 <a name="once"></a>
-### once v1.4.0 (dependencies, devDependencies)
+### once v1.4.0 (devDependencies)
 #### 
 
 ##### Paths
@@ -7658,6 +7515,17 @@ Query result type converters for node-postgres
 
 The tiniest and the fastest library for terminal output formatting with ANSI colors
 
+<a name="picocolors"></a>
+### picocolors v1.1.1 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+The tiniest and the fastest library for terminal output formatting with ANSI colors
+
 <a name="picomatch"></a>
 ### <a href="https://github.com/micromatch/picomatch">picomatch</a> v2.3.1 (dependencies, devDependencies)
 #### 
@@ -7758,7 +7626,7 @@ Apple's property list parser/builder for Node.js and browsers
 Tool for transforming styles with JS plugins
 
 <a name="postcss"></a>
-### <a href="https://postcss.org/">postcss</a> v8.4.41 (dependencies, devDependencies)
+### <a href="https://postcss.org/">postcss</a> v8.4.49 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -8165,29 +8033,18 @@ React package for working with the DOM.
 Brand checking of React Elements.
 
 <a name="react-remove-scroll"></a>
-### react-remove-scroll v2.5.5 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Disables scroll outside of `children` node.
-
-<a name="react-remove-scroll"></a>
-### react-remove-scroll v2.5.7 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Disables scroll outside of `children` node.
-
-<a name="react-remove-scroll"></a>
 ### react-remove-scroll v2.6.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Disables scroll outside of `children` node.
+
+<a name="react-remove-scroll"></a>
+### react-remove-scroll v2.6.2 (dependencies)
 #### 
 
 ##### Paths
@@ -8208,8 +8065,30 @@ Disables scroll outside of `children` node.
 
 Removes body scroll without content _shake_
 
+<a name="react-remove-scroll-bar"></a>
+### react-remove-scroll-bar v2.3.8 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Removes body scroll without content _shake_
+
 <a name="react-style-singleton"></a>
 ### <a href="https://github.com/theKashey/react-style-singleton#readme">react-style-singleton</a> v2.2.1 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+Just create a single stylesheet...
+
+<a name="react-style-singleton"></a>
+### <a href="https://github.com/theKashey/react-style-singleton#readme">react-style-singleton</a> v2.2.3 (dependencies)
 #### 
 
 ##### Paths
@@ -8273,17 +8152,6 @@ Keep require and import consistent after bundling or transpiling
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 JavaScript syntax tree transformer, nondestructive pretty-printer, and automatic source map generator
-
-<a name="regenerator-runtime"></a>
-### regenerator-runtime v0.14.1 (dependencies)
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-Runtime for Regenerator-compiled generator and async functions.
 
 <a name="remark"></a>
 ### <a href="https://remark.js.org">remark</a> v15.0.1 (dependencies)
@@ -8714,6 +8582,17 @@ Generates and consumes source maps
 
 Generates and consumes source maps
 
+<a name="source-map-js"></a>
+### <a href="https://github.com/7rulnik/source-map-js">source-map-js</a> v1.2.1 (dependencies, devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/BSD-3-Clause">New BSD</a> permitted
+
+Generates and consumes source maps
+
 <a name="source-map-support"></a>
 ### source-map-support v0.5.21 (dependencies, devDependencies)
 #### 
@@ -8968,7 +8847,7 @@ Determine if the current node version supports the `--preserve-symlinks` flag.
 React Hooks library for remote data fetching
 
 <a name="tailwind-merge"></a>
-### <a href="https://github.com/dcastil/tailwind-merge">tailwind-merge</a> v2.5.2 (dependencies)
+### <a href="https://github.com/dcastil/tailwind-merge">tailwind-merge</a> v2.6.0 (dependencies)
 #### 
 
 ##### Paths
@@ -8979,7 +8858,7 @@ React Hooks library for remote data fetching
 Merge Tailwind CSS classes without style conflicts
 
 <a name="tailwindcss"></a>
-### <a href="https://tailwindcss.com">tailwindcss</a> v3.4.10 (dependencies, devDependencies)
+### <a href="https://tailwindcss.com">tailwindcss</a> v3.4.17 (dependencies, devDependencies)
 #### 
 
 ##### Paths
@@ -9341,6 +9220,17 @@ A stand-alone types package for Undici
 
 A stand-alone types package for Undici
 
+<a name="undici-types"></a>
+### <a href="https://undici.nodejs.org">undici-types</a> v6.20.0 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+A stand-alone types package for Undici
+
 <a name="unified"></a>
 ### <a href="https://unifiedjs.com">unified</a> v11.0.5 (dependencies)
 #### 
@@ -9490,6 +9380,17 @@ An RFC 3986/3987 compliant, scheme extendable URI/IRI parsing/validating/resolvi
 
 <a name="use-callback-ref"></a>
 ### use-callback-ref v1.3.2 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+The same useRef, but with callback
+
+<a name="use-callback-ref"></a>
+### use-callback-ref v1.3.3 (dependencies)
 #### 
 
 ##### Paths
@@ -9742,7 +9643,7 @@ Wordwrap a string with ANSI escape codes
 Wordwrap a string with ANSI escape codes
 
 <a name="wrappy"></a>
-### <a href="https://github.com/npm/wrappy">wrappy</a> v1.0.2 (dependencies, devDependencies)
+### <a href="https://github.com/npm/wrappy">wrappy</a> v1.0.2 (devDependencies)
 #### 
 
 ##### Paths
