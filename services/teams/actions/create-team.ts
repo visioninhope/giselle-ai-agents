@@ -60,12 +60,10 @@ async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 
 async function createCheckout(userDbId: number, teamName: string) {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
 	invariant(siteUrl, "NEXT_PUBLIC_SITE_URL is not set");
-	invariant(serviceSiteUrl, "NEXT_PUBLIC_SERVICE_SITE_URL is not set");
 
 	const successUrl = `${siteUrl}/subscriptions/success`;
-	const cancelUrl = `${serviceSiteUrl}/pricing`;
+	const cancelUrl = `${siteUrl}/settings/team`;
 
 	const subscriptionMetadata: Record<string, string> = {
 		[DRAFT_TEAM_USER_DB_ID_METADATA_KEY]: userDbId.toString(),
