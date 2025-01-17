@@ -23,8 +23,8 @@ export async function GET(_request: Request) {
 
 		const subscriptionId =
 			typeof subscription === "string" ? subscription : subscription.id;
-		const teamDbId = await getTeamDbIdFromSubscription(subscriptionId);
-		await updateGiselleSession({ teamDbId, checkoutSessionId: undefined });
+		const teamId = await getTeamIdFromSubscription(subscriptionId);
+		await updateGiselleSession({ teamId, checkoutSessionId: undefined });
 		redirect("/settings/team");
 	} catch (error) {
 		// fallback
@@ -33,10 +33,10 @@ export async function GET(_request: Request) {
 	}
 }
 
-async function getTeamDbIdFromSubscription(subscriptionId: string) {
+async function getTeamIdFromSubscription(subscriptionId: string) {
 	const records = await db
 		.select({
-			teamDbId: teams.dbId,
+			teamId: teams.id,
 		})
 		.from(subscriptions)
 		.innerJoin(teams, eq(subscriptions.teamDbId, teams.dbId))
@@ -49,5 +49,5 @@ async function getTeamDbIdFromSubscription(subscriptionId: string) {
 	if (records.length === 0) {
 		throw new Error("Subscription not found");
 	}
-	return records[0].teamDbId;
+	return records[0].teamId;
 }

@@ -1,10 +1,11 @@
+import { teamIdSchema } from "@/services/teams/validations";
 import * as v from "valibot";
 import { getCookie, setCookie } from "./signed-cookie";
 
 const COOKIE_NAME = "giselle-session";
 
 const GiselleSessionSchema = v.object({
-	teamDbId: v.optional(v.number()),
+	teamId: v.optional(teamIdSchema),
 	// used in creating a new pro team flow
 	checkoutSessionId: v.optional(v.string()),
 });

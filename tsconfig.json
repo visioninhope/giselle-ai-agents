@@ -34,5 +34,10 @@
 		".next/types/**/*.ts",
 		"trigger.config.ts"
 	],
-	"exclude": ["node_modules", "deprecated"]
+	"exclude": [
+		"node_modules",
+		"deprecated",
+		"packages/sdk",
+		"packages/sdk-nextjs"
+	]
 }

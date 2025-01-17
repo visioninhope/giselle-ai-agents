@@ -34,14 +34,14 @@ export async function createTeam(formData: FormData) {
 	const isInternalUser =
 		supabaseUser.email != null && isEmailFromRoute06(supabaseUser.email);
 	if (isInternalUser) {
-		const teamDbId = await createInternalTeam(supabaseUser, teamName);
-		await setCurrentTeam(teamDbId);
+		const teamId = await createInternalTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamId);
 		redirect("/settings/team");
 	}
 
 	if (selectedPlan === "free") {
-		const teamDbId = await createFreeTeam(supabaseUser, teamName);
-		await setCurrentTeam(teamDbId);
+		const teamId = await createFreeTeam(supabaseUser, teamName);
+		await setCurrentTeam(teamId);
 		redirect("/settings/team");
 	}
 
@@ -60,12 +60,10 @@ async function prepareProTeamCreation(supabaseUser: User, teamName: string) {
 
 async function createCheckout(userDbId: number, teamName: string) {
 	const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-	const serviceSiteUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
 	invariant(siteUrl, "NEXT_PUBLIC_SITE_URL is not set");
-	invariant(serviceSiteUrl, "NEXT_PUBLIC_SERVICE_SITE_URL is not set");
 
 	const successUrl = `${siteUrl}/subscriptions/success`;
-	const cancelUrl = `${serviceSiteUrl}/pricing`;
+	const cancelUrl = `${siteUrl}/settings/team`;
 
 	const subscriptionMetadata: Record<string, string> = {
 		[DRAFT_TEAM_USER_DB_ID_METADATA_KEY]: userDbId.toString(),
@@ -103,9 +101,10 @@ async function createTeamInDatabase(
 			name: teamName,
 			type: isInternal ? "internal" : "customer",
 		})
-		.returning({ dbid: teams.dbId });
+		.returning({ id: teams.id, dbId: teams.dbId });
 
-	const teamDbId = result.dbid;
+	const teamId = result.id;
+	const teamDbId = result.dbId;
 	const userDbId = await getUserDbId(supabaseUser);
 
 	// add membership
@@ -114,7 +113,7 @@ async function createTeamInDatabase(
 		userDbId,
 		role: "admin",
 	});
-	return teamDbId;
+	return teamId;
 }
 
 async function getUserDbId(supabaseUser: User) {
