@@ -442,6 +442,7 @@ export function ContentPanelSectionFormField(props: { children: ReactNode }) {
 	return <div className="grid gap-[2px]">{props.children}</div>;
 }
 
+const fallbackAgentName = "Untitled Agent";
 export function Overview() {
 	const [editTitle, setEditTitle] = useState(false);
 	const { agentName, updateAgentName } = useAgentName();
@@ -453,7 +454,7 @@ export function Overview() {
 				<input
 					type="text"
 					className="text-[16px] text-black-30 p-[4px] text-left outline-black-70 rounded-[8px]"
-					defaultValue={agentName ?? "Untitled Agent"}
+					defaultValue={agentName ?? fallbackAgentName}
 					ref={(ref) => {
 						if (ref === null) {
 							return;
@@ -485,7 +486,7 @@ export function Overview() {
 					onClick={() => setEditTitle(true)}
 					className="text-[16px] text-black-30 p-[4px] text-left"
 				>
-					{agentName}
+					{agentName ?? fallbackAgentName}
 				</button>
 			)}
 		</ContentPanel>

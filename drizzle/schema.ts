@@ -61,6 +61,8 @@ export const subscriptions = pgTable("subscriptions", {
 	teamDbId: integer("team_db_id")
 		.notNull()
 		.references(() => teams.dbId, { onDelete: "cascade" }),
+	// Customer ID from Stripe, e.g. cus_xxx.
+	customerId: text("customer_id"),
 	status: text("status").$type<Stripe.Subscription.Status>().notNull(),
 	cancelAtPeriodEnd: boolean("cancel_at_period_end").notNull(),
 	cancelAt: timestamp("cancel_at"),
@@ -100,14 +102,6 @@ export const supabaseUserMappings = pgTable("supabase_user_mappings", {
 		.notNull()
 		.references(() => users.dbId),
 	supabaseUserId: text("supabase_user_id").notNull().unique(),
-});
-
-export const stripeUserMappings = pgTable("stripe_user_mappings", {
-	userDbId: integer("user_db_id")
-		.notNull()
-		.unique()
-		.references(() => users.dbId),
-	stripeCustomerId: text("stripe_customer_id").notNull().unique(),
 });
 
 export type TeamRole = "admin" | "member";

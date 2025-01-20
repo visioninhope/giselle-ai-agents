@@ -1,9 +1,9 @@
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { proTeamPlanFlag } from "@/flags";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
+import type { CurrentTeam } from "@/services/teams/types";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 import { getSubscription } from "./actions";
@@ -11,7 +11,6 @@ import { LocalDateTime } from "./components/local-date-time";
 
 export default async function BillingSection() {
 	const team = await fetchCurrentTeam();
-	const proTeamPlan = await proTeamPlanFlag();
 
 	return (
 		<Card title="Billing">
@@ -29,14 +28,14 @@ export default async function BillingSection() {
 					)}
 				</div>
 
-				{proTeamPlan && team.type !== "internal" && (
+				{team.type !== "internal" && (
 					<form>
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 						>
 							<BillingButton
 								subscriptionId={team.activeSubscriptionId}
-								teamDbId={team.dbId}
+								team={team}
 							/>
 						</Suspense>
 					</form>
@@ -72,14 +71,15 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 
 type BillingButtonProps = {
 	subscriptionId: string | null;
-	teamDbId: number;
+	team: CurrentTeam;
 };
 
-async function BillingButton({ subscriptionId, teamDbId }: BillingButtonProps) {
-	const upgrateTeamWithTeamDbId = upgradeTeam.bind(null, teamDbId);
+// NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
+async function BillingButton({ subscriptionId, team }: BillingButtonProps) {
+	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
 	if (subscriptionId == null) {
 		return (
-			<Button className="w-fit" formAction={upgrateTeamWithTeamDbId}>
+			<Button className="w-fit" formAction={upgrateTeamWithTeam}>
 				Upgrade Plan
 			</Button>
 		);
