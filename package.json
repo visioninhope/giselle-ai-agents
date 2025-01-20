@@ -116,5 +116,8 @@
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^2.1.8"
 	},
+	"overrides": {
+		"@supabase/auth-js": "2.67.3"
+	},
 	"trustedDependencies": ["@sentry/cli"]
 }
