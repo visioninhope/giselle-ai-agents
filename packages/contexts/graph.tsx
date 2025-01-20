@@ -236,7 +236,7 @@ export function GraphContextProvider({
 	const graphRef = useRef(defaultGraph);
 	const [graph, setGraph] = useState(graphRef.current);
 	const [graphUrl, setGraphUrl] = useState(defaultGraphUrl);
-	const persistTimeoutRef = useRef<Timer | null>(null);
+	const persistTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const isPendingPersistRef = useRef(false);
 	const persist = useCallback(async () => {
 		isPendingPersistRef.current = false;
