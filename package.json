@@ -51,8 +51,8 @@
 		"@radix-ui/react-toggle-group": "1.1.0",
 		"@radix-ui/react-tooltip": "1.1.4",
 		"@sentry/nextjs": "8.34.0",
-		"@supabase/auth-js": "^2.67.3",
 		"@sentry/wizard": "3.38.0",
+		"@supabase/auth-js": "2.64.4",
 		"@supabase/ssr": "0.4.0",
 		"@supabase/supabase-js": "2.45.0",
 		"@valibot/to-json-schema": "1.0.0-beta.3",
@@ -115,9 +115,6 @@
 		"typescript": "5.6.2",
 		"vite-tsconfig-paths": "^5.1.4",
 		"vitest": "^2.1.8"
-	},
-	"overrides": {
-		"@supabase/auth-js": "2.67.3"
 	},
 	"trustedDependencies": ["@sentry/cli"]
 }
