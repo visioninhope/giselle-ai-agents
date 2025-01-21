@@ -6,11 +6,13 @@ export function RetryButton({
 	executionId,
 	stepId,
 	asChild = false,
+	className = "",
 	children,
 }: {
 	executionId: ExecutionId;
 	stepId?: StepId;
 	asChild?: boolean;
+	className?: string;
 	children: React.ReactNode;
 }) {
 	const { retryFlowExecution } = useExecution();
@@ -27,7 +29,7 @@ export function RetryButton({
 	};
 
 	return (
-		<Comp type="button" onClick={handleRetry}>
+		<Comp type="button" onClick={handleRetry} className={className}>
 			{children}
 		</Comp>
 	);
