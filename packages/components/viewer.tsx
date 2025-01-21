@@ -154,19 +154,22 @@ function ExecutionViewer({
 											stepExecution.artifact.createdAt,
 										)}
 									</div>
-									<div className="text-black-30 flex items-center">
-										<ClipboardButton
-											text={stepExecution.artifact.object.content}
-											sizeClassName="w-[16px] h-[16px]"
-										/>
-									</div>
-									<div className="text-black-30 text-[14px]">
-										<RetryButton
-											executionId={execution.id}
-											stepId={stepExecution.stepId}
-										>
-											Retry
-										</RetryButton>
+									<div className="flex items-center gap-[16px]">
+										<div className="text-black-30 flex items-center">
+											<ClipboardButton
+												text={stepExecution.artifact.object.content}
+												sizeClassName="w-[16px] h-[16px]"
+											/>
+										</div>
+										<div className="text-black-30 text-[14px]">
+											<RetryButton
+												executionId={execution.id}
+												stepId={stepExecution.stepId}
+												className="hover:bg-black-80/90 px-[8px] py-[4px] rounded-[4px] bg-black-80"
+											>
+												Retry
+											</RetryButton>
+										</div>
 									</div>
 								</div>
 							)}
