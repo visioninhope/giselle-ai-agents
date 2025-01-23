@@ -1,10 +1,7 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
-import {
-	debugFlag as getDebugFlag,
-	githubIntegrationFlag as getGitHubIntegrationFlag,
-} from "@/flags";
+import { debugFlag as getDebugFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import {
 	type GitHubUserClient,
@@ -13,7 +10,7 @@ import {
 } from "@/services/external/github";
 import "@xyflow/react/dist/style.css";
 import { eq } from "drizzle-orm";
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { Playground } from "./beta-proto/component";
 import type { Repository } from "./beta-proto/github-integration/context";
 import type { Graph } from "./beta-proto/graph/types";
@@ -128,8 +125,6 @@ export default async function AgentPlaygroundPage({
 	}
 
 	const debugFlag = await getDebugFlag();
-	const gitHubIntegrationFlag = await getGitHubIntegrationFlag();
-
 	const agent = await getAgent(agentId);
 	const gitHubIntegrationSetting = await getGitHubIntegrationSetting(
 		agent.dbId,
@@ -144,7 +139,6 @@ export default async function AgentPlaygroundPage({
 			featureFlags={{
 				debugFlag,
 				viewFlag: true,
-				gitHubIntegrationFlag,
 				playgroundV2Flag: false,
 			}}
 			gitHubIntegration={{
