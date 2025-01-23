@@ -15,7 +15,7 @@ export function assertIssueCommentEvent(
 		throw new Error("Payload is missing name field");
 	}
 	if (payload.name !== "issue_comment") {
-		throw new Error("Payload name is not issue_comment");
+		throw new Error(`Payload name: ${payload.name} is not issue_comment`);
 	}
 }
 
