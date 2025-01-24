@@ -169,6 +169,10 @@ export async function handleEvent(
 						);
 						await reportAgentTimeUsage(endedAtDate);
 					},
+					onStepFail: (stepExecution) => {
+						// TODO: send email to team members.
+						console.error(stepExecution.error);
+					},
 				});
 
 				await octokit.request(
