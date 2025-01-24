@@ -1,4 +1,4 @@
-import { db } from "@/drizzle";
+import { type agents, db, teamMemberships, users } from "@/drizzle";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { executeStep } from "@giselles-ai/lib/execution";
@@ -10,6 +10,7 @@ import {
 import type { Execution, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
 import { waitUntil } from "@vercel/functions";
+import { eq } from "drizzle-orm";
 import { parseCommand } from "./command";
 import { assertIssueCommentEvent, createOctokit } from "./utils";
 
@@ -169,9 +170,9 @@ export async function handleEvent(
 						);
 						await reportAgentTimeUsage(endedAtDate);
 					},
-					onStepFail: (stepExecution) => {
-						// TODO: send email to team members.
+					onStepFail: async (stepExecution) => {
 						console.error(stepExecution.error);
+						await notifyWorkflowError(agent, stepExecution.error);
 					},
 				});
 
@@ -187,5 +188,37 @@ export async function handleEvent(
 				);
 			}),
 		),
+	);
+}
+
+// Notify workflow error to team members
+async function notifyWorkflowError(
+	agent: typeof agents.$inferSelect,
+	error: string,
+) {
+	const teamMembers = await db
+		.select({ userDisplayName: users.displayName, userEmail: users.email })
+		.from(teamMemberships)
+		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
+		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
+	for (const user of teamMembers) {
+		console.dir(user);
+	}
+
+	const subject = "[Giselle] Workflow failure";
+	const body = `
+		Workflow failed with error: ${error}
+	`;
+	const recipients = teamMembers.map(
+		(user) => `${user.userDisplayName} <${user.userEmail}>`,
+	);
+
+	// TODO: send email to teamMembers
+	await sendEmail(subject, body, recipients);
+}
+
+async function sendEmail(subject: string, body: string, recipients: string[]) {
+	console.log(
+		`[sendEmail] subject: ${subject}, body: ${body}, recipients: ${recipients}`,
 	);
 }
