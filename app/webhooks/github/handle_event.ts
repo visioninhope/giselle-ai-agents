@@ -1,4 +1,6 @@
 import { db } from "@/drizzle";
+import { saveAgentActivity } from "@/services/agents/activities";
+import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { executeStep } from "@giselles-ai/lib/execution";
 import { performFlowExecution } from "@giselles-ai/lib/runner";
 import {
@@ -155,6 +157,17 @@ export async function handleEvent(
 						}),
 					onExecutionChange: (execution) => {
 						initialExecution = execution;
+					},
+					onFinish: async ({ endedAt, durationMs, execution }) => {
+						const startedAtDate = new Date(execution.runStartedAt);
+						const endedAtDate = new Date(endedAt);
+						await saveAgentActivity(
+							agent.id,
+							startedAtDate,
+							endedAtDate,
+							durationMs,
+						);
+						await reportAgentTimeUsage(endedAtDate);
 					},
 				});
 
