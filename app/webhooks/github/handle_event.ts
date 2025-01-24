@@ -6,6 +6,7 @@ import {
 	createInitialJobExecutions,
 } from "@giselles-ai/lib/utils";
 import type { Execution, Graph } from "@giselles-ai/types";
+import type { Octokit } from "@octokit/core";
 import { waitUntil } from "@vercel/functions";
 import { parseCommand } from "./command";
 import { assertIssueCommentEvent, createOctokit } from "./utils";
@@ -18,10 +19,30 @@ export class WebhookPayloadError extends Error {
 	}
 }
 
-type HandleEventParams = {
-	id: string;
-	name: string;
-	payload: unknown;
+interface GitHubClientFactory {
+	createClient(installationId: number): Promise<Octokit>;
+}
+
+export const defaultGitHubClientFactory: GitHubClientFactory = {
+	createClient: async (installationId: number) => {
+		return await createOctokit(installationId);
+	},
+};
+
+export const mockGitHubClientFactory: GitHubClientFactory = {
+	createClient: async (installationId: number) =>
+		({
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			request: async (route: string, params?: any) => {
+				console.log("Mock GitHub API call:", { route, params });
+				return {
+					data: {
+						id: "mock-comment-id",
+						body: params?.body,
+					},
+				};
+			},
+		}) as Octokit,
 };
 
 /**
@@ -31,7 +52,12 @@ type HandleEventParams = {
  * @param event
  * @returns
  */
-export async function handleEvent(event: HandleEventParams) {
+export async function handleEvent(
+	event: { id: string; name: string; payload: unknown },
+	options?: { githubClientFactory?: GitHubClientFactory },
+): Promise<void> {
+	const githubClientFactory =
+		options?.githubClientFactory ?? defaultGitHubClientFactory;
 	assertIssueCommentEvent(event);
 	const payload = event.payload;
 
@@ -46,7 +72,9 @@ export async function handleEvent(event: HandleEventParams) {
 			`Installation not found. payload: ${JSON.stringify(payload)}`,
 		);
 	}
-	const octokit = await createOctokit(payload.installation.id);
+	const octokit = await githubClientFactory.createClient(
+		payload.installation.id,
+	);
 
 	const integrationSettings = await db.query.githubIntegrationSettings.findMany(
 		{
