@@ -1132,7 +1132,7 @@ function TabsContentPrompt({
 							return;
 						}
 
-						function handleBlur() {
+						function updateInstruction() {
 							if (ref === null) {
 								return;
 							}
@@ -1143,9 +1143,10 @@ function TabsContentPrompt({
 								});
 							}
 						}
-						ref.addEventListener("blur", handleBlur);
+						ref.addEventListener("blur", updateInstruction);
 						return () => {
-							ref.removeEventListener("blur", handleBlur);
+							ref.removeEventListener("blur", updateInstruction);
+							updateInstruction();
 						};
 					}}
 				/>
