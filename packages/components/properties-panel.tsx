@@ -1532,7 +1532,7 @@ function TabContentText({
 					className="flex-1 text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none  my-[16px]"
 					defaultValue={content.text}
 					ref={(el) => {
-						function handleBlur() {
+						function updateText() {
 							if (el?.value != null && content.text !== el.value) {
 								onContentChange?.({
 									...content,
@@ -1540,9 +1540,10 @@ function TabContentText({
 								});
 							}
 						}
-						el?.addEventListener("blur", handleBlur);
+						el?.addEventListener("blur", updateText);
 						return () => {
-							el?.removeEventListener("blur", handleBlur);
+							el?.removeEventListener("blur", updateText);
+							updateText();
 						};
 					}}
 				/>
