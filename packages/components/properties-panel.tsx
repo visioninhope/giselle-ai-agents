@@ -760,7 +760,7 @@ function SystemPromptTextarea({
 					}
 					ref.dataset.refId = id;
 
-					function handleBlur() {
+					function updateValue() {
 						if (ref === null) {
 							return;
 						}
@@ -768,9 +768,10 @@ function SystemPromptTextarea({
 							onValueChange?.(ref.value);
 						}
 					}
-					ref.addEventListener("blur", handleBlur);
+					ref.addEventListener("blur", updateValue);
 					return () => {
-						ref.removeEventListener("blur", handleBlur);
+						ref.removeEventListener("blur", updateValue);
+						updateValue();
 					};
 				}}
 			/>
