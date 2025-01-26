@@ -4,7 +4,6 @@ import {
 	teamMemberships,
 	userSeatUsageReports,
 } from "@/drizzle";
-import { toUTCDate } from "@/lib/date";
 import { createId } from "@paralleldrive/cuid2";
 import { and, desc, eq, gte, lt } from "drizzle-orm";
 import { stripe } from "../external/stripe";
@@ -73,7 +72,7 @@ async function reportCurrentUserSeatUsage(
 	const currentMemberCount = teamMembers.length;
 	const meterEventId = createId();
 
-	const timestamp = toUTCDate(new Date());
+	const timestamp = new Date();
 	const value = currentMemberCount;
 	const stripeEvent = await stripe.v2.billing.meterEvents.create({
 		event_name: USER_SEAT_METER_NAME,
@@ -110,7 +109,7 @@ async function reportDeltaUserSeatUsage(
 	const delta = teamMembers.length - lastReport.userDbIdList.length;
 	const meterEventId = createId();
 
-	const timestamp = toUTCDate(new Date());
+	const timestamp = new Date();
 	const stripeEvent = await stripe.v2.billing.meterEvents.create({
 		event_name: USER_SEAT_METER_NAME,
 		payload: {
