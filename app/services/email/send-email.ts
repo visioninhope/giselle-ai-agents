@@ -32,6 +32,9 @@ export async function sendEmail(
 	body: string,
 	recipients: EmailRecipient[],
 ): Promise<void> {
+	if (recipients.length === 0) {
+		throw new EmailSendError("No recipients found");
+	}
 	const to = recipients
 		.map((r) => `${r.userDisplayName} <${r.userEmail}>`)
 		.join(", ");

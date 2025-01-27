@@ -204,6 +204,10 @@ async function notifyWorkflowError(
 		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
 		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
 
+	if (teamMembers.length === 0) {
+		return;
+	}
+
 	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
 	const body = `Workflow failed with error:
 	${error}
