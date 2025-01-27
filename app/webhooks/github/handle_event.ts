@@ -169,7 +169,7 @@ export async function handleEvent(
 							endedAtDate,
 							durationMs,
 						);
-						await reportAgentTimeUsage(endedAtDate);
+						await reportAgentTimeUsage(agent.id, endedAtDate);
 					},
 					onStepFail: async (stepExecution) => {
 						await notifyWorkflowError(agent, stepExecution.error);
