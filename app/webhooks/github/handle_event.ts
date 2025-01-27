@@ -211,7 +211,7 @@ async function notifyWorkflowError(
 	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
 	const body = `Workflow failed with error:
 	${error}
-	`.replace("\t", "");
+	`.replaceAll("\t", "");
 
 	const recipients: EmailRecipient[] = teamMembers.map((user) => ({
 		userDisplayName: user.userDisplayName ?? "",
