@@ -17,7 +17,7 @@ To set up a development environment, please follow these steps:
 
 ### 2. Prerequisites
 
-- Bun (Version: >= 1.1.17)
+- pnpm (Version: 10.0.0)
 
 ### 3. Set up your .env file
 
@@ -27,13 +27,13 @@ To set up a development environment, please follow these steps:
 ### 4. Install dependencies
 
 ```sh
-bun install
+pnpm install
 ```
 
 ### 5. Start developing and watch for code changes
 
 ```sh
-bun dev
+pnpm dev
 ```
 
 ## Issues and feature requests

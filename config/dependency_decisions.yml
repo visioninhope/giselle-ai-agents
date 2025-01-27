@@ -77,7 +77,7 @@
     :when: 2024-11-22 02:39:34.598816000 Z
 - - :permit
   - MIT-0
-  - :who: "@satococoa"
-    :why: Compatible with MIT license. See https://opensource.org/license/MIT-0
+  - :who:
+    :why: MIT-0 is an extremely permissive license with no attribution requirements. https://github.com/aws/mit-0
     :versions: []
-    :when: 2025-01-27 06:04:55.498784000 Z
+    :when: 2025-01-20 15:39:57.858569000 Z

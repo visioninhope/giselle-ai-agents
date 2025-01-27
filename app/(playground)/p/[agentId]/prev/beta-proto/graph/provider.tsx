@@ -33,7 +33,7 @@ export const GraphProvider: FC<PropsWithChildren<GraphProviderProps>> = ({
 	const isInitialMount = useRef(true);
 	const stateRef = useRef({ graph: defaultGraph });
 	const [state, setState] = useState(stateRef.current);
-	const timeoutRef = useRef<Timer | null>(null);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
 	const enhancedDispatch: EnhancedDispatch = useCallback(
 		async (action) => {

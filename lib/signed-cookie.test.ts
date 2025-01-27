@@ -1,4 +1,4 @@
-import { beforeAll, describe, expect, mock, test } from "bun:test";
+import { beforeAll, describe, expect, test, vi } from "vitest";
 import { getCookie, setCookie } from "./signed-cookie";
 
 // Mock Next.js cookies
@@ -14,7 +14,7 @@ const mockCookieStore = {
 	},
 };
 
-mock.module("next/headers", () => ({
+vi.mock("next/headers", () => ({
 	cookies: () => mockCookieStore,
 }));
 
