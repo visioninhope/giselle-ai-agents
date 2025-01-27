@@ -175,17 +175,19 @@ export async function handleEvent(
 						await notifyWorkflowError(agent, stepExecution.error);
 					},
 				});
-
-				await octokit.request(
-					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-					{
-						owner: payload.repository.owner.login,
-						repo: payload.repository.name,
-						issue_number: payload.issue.number,
-						body: finalExecution.artifacts[finalExecution.artifacts.length - 1]
-							.object.content,
-					},
-				);
+				if (finalExecution.status === "completed") {
+					await octokit.request(
+						"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+						{
+							owner: payload.repository.owner.login,
+							repo: payload.repository.name,
+							issue_number: payload.issue.number,
+							body: finalExecution.artifacts[
+								finalExecution.artifacts.length - 1
+							].object.content,
+						},
+					);
+				}
 			}),
 		),
 	);
