@@ -1,3 +1,4 @@
+import { type EmailRecipient, sendEmail } from "@/app/services/email";
 import { type agents, db, teamMemberships, users } from "@/drizzle";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing";
@@ -171,7 +172,6 @@ export async function handleEvent(
 						await reportAgentTimeUsage(endedAtDate);
 					},
 					onStepFail: async (stepExecution) => {
-						console.error(stepExecution.error);
 						await notifyWorkflowError(agent, stepExecution.error);
 					},
 				});
@@ -201,24 +201,16 @@ async function notifyWorkflowError(
 		.from(teamMemberships)
 		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
 		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
-	for (const user of teamMembers) {
-		console.dir(user);
-	}
 
-	const subject = "[Giselle] Workflow failure";
-	const body = `
-		Workflow failed with error: ${error}
-	`;
-	const recipients = teamMembers.map(
-		(user) => `${user.userDisplayName} <${user.userEmail}>`,
-	);
+	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
+	const body = `Workflow failed with error:
+	${error}
+	`.replace("\t", "");
 
-	// TODO: send email to teamMembers
+	const recipients: EmailRecipient[] = teamMembers.map((user) => ({
+		userDisplayName: user.userDisplayName ?? "",
+		userEmail: user.userEmail ?? "",
+	}));
+
 	await sendEmail(subject, body, recipients);
-}
-
-async function sendEmail(subject: string, body: string, recipients: string[]) {
-	console.log(
-		`[sendEmail] subject: ${subject}, body: ${body}, recipients: ${recipients}`,
-	);
 }
