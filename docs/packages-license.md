@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 656 MIT
+* 657 MIT
 * 124 Apache 2.0
 * 58 ISC
 * 24 New BSD
@@ -10,14 +10,15 @@
 * 3 MIT OR Apache-2.0
 * 3 BSD Zero Clause License
 * 3 BlueOak-1.0.0
-* 2 The Unlicense
 * 2 LGPL-3.0-or-later
-* 1 Apache 2.0, BSD Zero Clause License, ISC, MIT, Mozilla Public License 2.0, New BSD, Simplified BSD, The Unlicense, zlib/libpng license
-* 1 (AFL-2.1 OR BSD-3-Clause)
-* 1 (MIT OR CC0-1.0)
-* 1 CC-BY-4.0
-* 1 BSD
+* 2 The Unlicense
 * 1 (MIT AND Zlib)
+* 1 MIT-0
+* 1 BSD
+* 1 CC-BY-4.0
+* 1 (MIT OR CC0-1.0)
+* 1 (AFL-2.1 OR BSD-3-Clause)
+* 1 Apache 2.0, BSD Zero Clause License, ISC, MIT, Mozilla Public License 2.0, New BSD, Simplified BSD, The Unlicense, zlib/libpng license
 
 
 
@@ -3334,6 +3335,17 @@ TypeScript definitions for node
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 TypeScript definitions for node-fetch
+
+<a name="@types/nodemailer"></a>
+### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/nodemailer">@types/nodemailer</a> v6.4.17 (devDependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+TypeScript definitions for nodemailer
 
 <a name="@types/pg"></a>
 ### <a href="https://github.com/DefinitelyTyped/DefinitelyTyped/tree/master/types/pg">@types/pg</a> v8.11.6 (dependencies)
@@ -7217,6 +7229,17 @@ Build tool and bindings loader for node-gyp that supports prebuilds
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 Node.js releases data
+
+<a name="nodemailer"></a>
+### <a href="https://nodemailer.com/">nodemailer</a> v6.10.0 (dependencies)
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+MIT-0 permitted
+
+Easy as cake e-mail sending from your Node.js applications
 
 <a name="normalize-path"></a>
 ### <a href="https://github.com/jonschlinkert/normalize-path">normalize-path</a> v3.0.0 (dependencies, devDependencies)
