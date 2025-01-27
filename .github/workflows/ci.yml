@@ -14,9 +14,9 @@ jobs:
         uses: biomejs/setup-biome@v2.2.1
         with:
           version: 1.9.4
-      - uses: oven-sh/setup-bun@v2
-      - run: bun install
+      - uses: pnpm/action-setup@v4
+      - run: pnpm install
       - name: Run Biome
         run: biome ci .
       - name: Test
-        run: bun test --coverage
+        run: pnpm test --coverage

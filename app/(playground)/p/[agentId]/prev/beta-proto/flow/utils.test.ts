@@ -1,4 +1,4 @@
-import { expect, test } from "bun:test";
+import { expect, test } from "vitest";
 import type { ConnectorObject } from "../connector/types";
 import type { GiselleNode } from "../giselle-node/types";
 import { allFlowEdges } from "./utils";
