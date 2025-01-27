@@ -75,3 +75,9 @@
     :versions:
     - 2.0.8
     :when: 2024-11-22 02:39:34.598816000 Z
+- - :permit
+  - MIT-0
+  - :who: "@satococoa"
+    :why: Compatible with MIT license. See https://opensource.org/license/MIT-0
+    :versions: []
+    :when: 2025-01-27 06:04:55.498784000 Z
