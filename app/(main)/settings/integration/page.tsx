@@ -1,11 +1,6 @@
-import { githubIntegrationFlag } from "@/flags";
 import { GitHubIntegration } from "./github-integration";
 
 export default async function IntegrationPage() {
-	const displayGitHubIntegration = await githubIntegrationFlag();
-	if (!displayGitHubIntegration) {
-		return null;
-	}
 	return (
 		<div className="grid gap-[16px]">
 			<h3

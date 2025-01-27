@@ -187,7 +187,10 @@ function NodeNameEditable({
 			) : (
 				<button
 					type="button"
-					className="flex items-center gap-[12px] cursor-auto"
+					className={clsx(
+						"flex items-center gap-[12px] cursor-auto min-w-[120px]",
+						name.length === 0 && "min-h-[18px] bg-black-80/80",
+					)}
 					onClick={(event) => {
 						event.stopPropagation();
 					}}

@@ -8,4 +8,3 @@ export {
 	needsAuthorization,
 	type GitHubUserClient,
 } from "./user-client";
-export { webhooks } from "./webhook";
