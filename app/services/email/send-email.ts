@@ -32,11 +32,20 @@ export async function sendEmail(
 	body: string,
 	recipients: EmailRecipient[],
 ): Promise<void> {
-	const transporter = createTransport();
 	const to = recipients
 		.map((r) => `${r.userDisplayName} <${r.userEmail}>`)
 		.join(", ");
 
+	if (process.env.SEND_EMAIL_DEBUG === "1") {
+		console.log("========= Email Debug Mode =========");
+		console.log("To:", to);
+		console.log("Subject:", subject);
+		console.log("Body:", body);
+		console.log("==================================");
+		return;
+	}
+
+	const transporter = createTransport();
 	try {
 		invariant(process.env.SMTP_FROM, "SMTP_FROM is not set");
 		const from = `${process.env.SMTP_FROM_NAME ?? ""} <${process.env.SMTP_FROM}>`;
