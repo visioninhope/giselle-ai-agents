@@ -164,6 +164,14 @@ async function handleIssueComment(
 									nodeId: eventNodeMapping.nodeId,
 									data: payload.issue.title,
 								};
+							case "issue.body":
+								if (payload.issue.body === null) {
+									return null;
+								}
+								return {
+									nodeId: eventNodeMapping.nodeId,
+									data: payload.issue.body,
+								};
 							default:
 								return null;
 						}
