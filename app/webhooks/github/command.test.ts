@@ -63,27 +63,21 @@ test("invalid command format returns null", () => {
 });
 
 test("command with multiple spaces", () => {
-	expect(
-		parseCommand("/giselle    hello   \nsome content"),
-	).toStrictEqual({
+	expect(parseCommand("/giselle    hello   \nsome content")).toStrictEqual({
 		callSign: "hello",
 		content: "some content",
 	});
 });
 
 test("command with empty content", () => {
-	expect(
-		parseCommand("/giselle hello\n"),
-	).toStrictEqual({
+	expect(parseCommand("/giselle hello\n")).toStrictEqual({
 		callSign: "hello",
 		content: "",
 	});
 });
 
 test("command with no empty line after command", () => {
-	expect(
-		parseCommand("/giselle hello content"),
-	).toStrictEqual({
+	expect(parseCommand("/giselle hello content")).toStrictEqual({
 		callSign: "hello",
 		content: "content",
 	});
