@@ -1,5 +1,4 @@
-import { type EmailRecipient, sendEmail } from "@/app/services/email";
-import { type agents, db, teamMemberships, users } from "@/drizzle";
+import { db } from "@/drizzle";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { executeStep } from "@giselles-ai/lib/execution";
@@ -11,9 +10,12 @@ import {
 import type { Execution, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
 import { waitUntil } from "@vercel/functions";
-import { eq } from "drizzle-orm";
 import { parseCommand } from "./command";
-import { assertIssueCommentEvent, createOctokit } from "./utils";
+import {
+	assertIssueCommentEvent,
+	createOctokit,
+	notifyWorkflowError,
+} from "./utils";
 
 export class WebhookPayloadError extends Error {
 	constructor(message: string) {
@@ -52,19 +54,38 @@ export const mockGitHubClientFactory: GitHubClientFactory = {
 /**
  * Handle GitHub webhook event
  * ref: https://docs.github.com/en/webhooks/webhook-events-and-payloads
- * currently only supports issue_comment
  * @param event
  * @returns
  */
 export async function handleEvent(
 	event: { id: string; name: string; payload: unknown },
-	options?: { githubClientFactory?: GitHubClientFactory },
+	options: { githubClientFactory: GitHubClientFactory },
 ): Promise<void> {
-	const githubClientFactory =
-		options?.githubClientFactory ?? defaultGitHubClientFactory;
-	assertIssueCommentEvent(event);
-	const payload = event.payload;
+	switch (event.name) {
+		case "installation":
+		case "installation_repositories":
+			// All GitHub Apps receive these events.
+			console.info(`received event: ${event.name}`);
+			break;
+		case "issue_comment":
+			await handleIssueComment(event, options);
+			break;
+		default:
+			throw new WebhookPayloadError(`Unsupported event name: ${event.name}`);
+	}
+}
 
+async function handleIssueComment(
+	event: { id: string; name: string; payload: unknown },
+	options: { githubClientFactory: GitHubClientFactory },
+) {
+	try {
+		assertIssueCommentEvent(event);
+	} catch (e: unknown) {
+		throw new WebhookPayloadError(`Invalid issue comment event: ${e}`);
+	}
+
+	const payload = event.payload;
 	const command = parseCommand(payload.comment.body);
 	if (command === null) {
 		throw new WebhookPayloadError(
@@ -76,6 +97,8 @@ export async function handleEvent(
 			`Installation not found. payload: ${JSON.stringify(payload)}`,
 		);
 	}
+
+	const githubClientFactory = options.githubClientFactory;
 	const octokit = await githubClientFactory.createClient(
 		payload.installation.id,
 	);
@@ -191,32 +214,4 @@ export async function handleEvent(
 			}),
 		),
 	);
-}
-
-// Notify workflow error to team members
-async function notifyWorkflowError(
-	agent: typeof agents.$inferSelect,
-	error: string,
-) {
-	const teamMembers = await db
-		.select({ userDisplayName: users.displayName, userEmail: users.email })
-		.from(teamMemberships)
-		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
-		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
-
-	if (teamMembers.length === 0) {
-		return;
-	}
-
-	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
-	const body = `Workflow failed with error:
-	${error}
-	`.replaceAll("\t", "");
-
-	const recipients: EmailRecipient[] = teamMembers.map((user) => ({
-		userDisplayName: user.userDisplayName ?? "",
-		userEmail: user.userEmail ?? "",
-	}));
-
-	await sendEmail(subject, body, recipients);
 }
