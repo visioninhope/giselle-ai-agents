@@ -1,4 +1,5 @@
-import { db } from "@/drizzle";
+import { type EmailRecipient, sendEmail } from "@/app/services/email";
+import { type agents, db, teamMemberships, users } from "@/drizzle";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { executeStep } from "@giselles-ai/lib/execution";
@@ -10,6 +11,7 @@ import {
 import type { Execution, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
 import { waitUntil } from "@vercel/functions";
+import { eq } from "drizzle-orm";
 import { parseCommand } from "./command";
 import { assertIssueCommentEvent, createOctokit } from "./utils";
 
@@ -167,21 +169,54 @@ export async function handleEvent(
 							endedAtDate,
 							durationMs,
 						);
-						await reportAgentTimeUsage(endedAtDate);
+						await reportAgentTimeUsage(agent.id, endedAtDate);
+					},
+					onStepFail: async (stepExecution) => {
+						await notifyWorkflowError(agent, stepExecution.error);
 					},
 				});
-
-				await octokit.request(
-					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-					{
-						owner: payload.repository.owner.login,
-						repo: payload.repository.name,
-						issue_number: payload.issue.number,
-						body: finalExecution.artifacts[finalExecution.artifacts.length - 1]
-							.object.content,
-					},
-				);
+				if (finalExecution.status === "completed") {
+					await octokit.request(
+						"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+						{
+							owner: payload.repository.owner.login,
+							repo: payload.repository.name,
+							issue_number: payload.issue.number,
+							body: finalExecution.artifacts[
+								finalExecution.artifacts.length - 1
+							].object.content,
+						},
+					);
+				}
 			}),
 		),
 	);
+}
+
+// Notify workflow error to team members
+async function notifyWorkflowError(
+	agent: typeof agents.$inferSelect,
+	error: string,
+) {
+	const teamMembers = await db
+		.select({ userDisplayName: users.displayName, userEmail: users.email })
+		.from(teamMemberships)
+		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
+		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
+
+	if (teamMembers.length === 0) {
+		return;
+	}
+
+	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
+	const body = `Workflow failed with error:
+	${error}
+	`.replaceAll("\t", "");
+
+	const recipients: EmailRecipient[] = teamMembers.map((user) => ({
+		userDisplayName: user.userDisplayName ?? "",
+		userEmail: user.userEmail ?? "",
+	}));
+
+	await sendEmail(subject, body, recipients);
 }

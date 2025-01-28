@@ -245,7 +245,7 @@ export default async function Page({
 			endedAtDate,
 			totalDurationMs,
 		);
-		await reportAgentTimeUsage(endedAtDate);
+		await reportAgentTimeUsage(agentId, endedAtDate);
 	}
 
 	async function upsertGitHubIntegrationSettingAction(
