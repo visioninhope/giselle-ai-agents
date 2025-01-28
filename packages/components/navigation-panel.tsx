@@ -5,6 +5,7 @@ import type {
 } from "@/services/external/github/types";
 import { LayersIcon } from "@giselles-ai/icons/layers";
 import { WilliIcon } from "@giselles-ai/icons/willi";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -580,12 +581,21 @@ function GitHubIntegration() {
 }
 function GoToAccountSettings() {
 	return (
-		<div className="grid gap-[16px]">
+		<div className="grid gap-[16px] text-center">
+			<WilliIcon className="w-8 h-8 fill-slate-600 mx-auto" />
 			<div className="text-sm text-gray-600">
-				Please connect your GitHub account to get started
+				You are not signed in. Please log in with GitHub using the button below
+				to get started and explore the world of Giselle.
 			</div>
-			<Button asChild>
-				<Link href="/settings/account">Connect GitHub</Link>
+			<Button
+				asChild
+				variant="link"
+				className="flex items-center gap-2 w-full justify-center text-blue-200 border-blue-200"
+			>
+				<Link href="/settings/account">
+					<SiGithub className="h-[20px] w-[20px] text-white" />
+					Continue with GitHub
+				</Link>
 			</Button>
 		</div>
 	);
