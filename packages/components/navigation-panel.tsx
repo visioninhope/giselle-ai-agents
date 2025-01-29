@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { GitHubAppConfigureButton } from "@/packages/components/github-app-configure-button";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
@@ -613,8 +614,12 @@ const nextActionList = [
 	},
 ] as const;
 function GitHubIntegrationForm() {
-	const { setting, repositories, upsertGitHubIntegrationSettingAction } =
-		useGitHubIntegration();
+	const {
+		installUrl,
+		setting,
+		repositories,
+		upsertGitHubIntegrationSettingAction,
+	} = useGitHubIntegration();
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
@@ -651,6 +656,7 @@ function GitHubIntegrationForm() {
 				<p>{upsertGitHubIntegrationSettingActionResult.message}</p>
 			)}
 			<ContentPanelSection>
+				<GitHubAppConfigureButton installationUrl={installUrl} />
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
 					name="repositoryFullName"
@@ -662,7 +668,6 @@ function GitHubIntegrationForm() {
 					defaultValue={setting?.repositoryFullName}
 				/>
 			</ContentPanelSection>
-
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Trigger" />
 				<ContentPanelSectionFormField>
@@ -698,7 +703,6 @@ function GitHubIntegrationForm() {
 					</ContentPanelSectionFormField>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
-
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Action" />
 				<ContentPanelSectionFormField>
