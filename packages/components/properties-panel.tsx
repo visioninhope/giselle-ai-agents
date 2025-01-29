@@ -760,7 +760,7 @@ function SystemPromptTextarea({
 					}
 					ref.dataset.refId = id;
 
-					function handleBlur() {
+					function updateValue() {
 						if (ref === null) {
 							return;
 						}
@@ -768,9 +768,10 @@ function SystemPromptTextarea({
 							onValueChange?.(ref.value);
 						}
 					}
-					ref.addEventListener("blur", handleBlur);
+					ref.addEventListener("blur", updateValue);
 					return () => {
-						ref.removeEventListener("blur", handleBlur);
+						ref.removeEventListener("blur", updateValue);
+						updateValue();
 					};
 				}}
 			/>
@@ -1132,7 +1133,7 @@ function TabsContentPrompt({
 							return;
 						}
 
-						function handleBlur() {
+						function updateInstruction() {
 							if (ref === null) {
 								return;
 							}
@@ -1143,9 +1144,10 @@ function TabsContentPrompt({
 								});
 							}
 						}
-						ref.addEventListener("blur", handleBlur);
+						ref.addEventListener("blur", updateInstruction);
 						return () => {
-							ref.removeEventListener("blur", handleBlur);
+							ref.removeEventListener("blur", updateInstruction);
+							updateInstruction();
 						};
 					}}
 				/>
@@ -1532,7 +1534,7 @@ function TabContentText({
 					className="flex-1 text-[14px] bg-[hsla(222,21%,40%,0.3)] rounded-[8px] text-white p-[14px] font-rosart outline-none resize-none  my-[16px]"
 					defaultValue={content.text}
 					ref={(el) => {
-						function handleBlur() {
+						function updateText() {
 							if (el?.value != null && content.text !== el.value) {
 								onContentChange?.({
 									...content,
@@ -1540,9 +1542,10 @@ function TabContentText({
 								});
 							}
 						}
-						el?.addEventListener("blur", handleBlur);
+						el?.addEventListener("blur", updateText);
 						return () => {
-							el?.removeEventListener("blur", handleBlur);
+							el?.removeEventListener("blur", updateText);
+							updateText();
 						};
 					}}
 				/>
