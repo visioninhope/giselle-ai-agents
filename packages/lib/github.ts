@@ -6,16 +6,11 @@ import {
 	buildGitHubUserClient,
 	needsAuthorization,
 } from "@/services/external/github";
-import type { GitHubIntegrationState } from "../contexts/github-integration";
+import type { components } from "@octokit/openapi-types";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,
-): Promise<
-	Omit<
-		GitHubIntegrationState,
-		"upsertGitHubIntegrationSettingAction" | "installUrl"
-	>
-> {
+): Promise<GitHubIntegrationState> {
 	const credential = await getOauthCredential("github");
 	if (!credential) {
 		return {
@@ -59,6 +54,14 @@ export async function getGitHubIntegrationState(
 		}
 		throw error;
 	}
+}
+
+type Repository = components["schemas"]["repository"];
+
+export interface GitHubIntegrationState {
+	needsAuthorization: boolean;
+	repositories: Repository[];
+	setting: GitHubIntegrationSetting | undefined;
 }
 
 export type GitHubIntegrationSetting = Omit<

@@ -1,34 +1,28 @@
 "use client";
 
-import type { components } from "@octokit/openapi-types";
 import { createContext, useCallback, useContext, useState } from "react";
 import type {
 	CreateGitHubIntegrationSettingResult,
-	GitHubIntegrationSetting,
+	GitHubIntegrationState,
 } from "../lib/github";
 
-type Repository = components["schemas"]["repository"];
-
-export interface GitHubIntegrationState {
+export type GitHubIntegrationContextType = GitHubIntegrationState & {
 	installUrl: string;
-	repositories: Repository[];
-	needsAuthorization: boolean;
-	setting: GitHubIntegrationSetting | undefined;
 	upsertGitHubIntegrationSettingAction: (
 		_: unknown,
 		formData: FormData,
 	) => Promise<CreateGitHubIntegrationSettingResult>;
-}
+};
 
 export const GitHubIntegrationContext =
-	createContext<GitHubIntegrationState | null>(null);
+	createContext<GitHubIntegrationContextType | null>(null);
 
 export function GitHubIntegrationProvider({
 	children,
 	setting: defaultSetting,
 	upsertGitHubIntegrationSettingAction,
 	...value
-}: GitHubIntegrationState & {
+}: GitHubIntegrationContextType & {
 	children: React.ReactNode;
 }) {
 	const [serverSetting, setServerSetting] = useState(defaultSetting);
