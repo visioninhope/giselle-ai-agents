@@ -4,7 +4,6 @@ import { getOauthCredential } from "@/app/(auth)/lib";
 import { db, type githubIntegrationSettings } from "@/drizzle";
 import {
 	buildGitHubUserClient,
-	gitHubAppInstallURL,
 	needsAuthorization,
 } from "@/services/external/github";
 import type { GitHubIntegrationState } from "../contexts/github-integration";
@@ -12,13 +11,14 @@ import type { GitHubIntegrationState } from "../contexts/github-integration";
 export async function getGitHubIntegrationState(
 	agentDbId: number,
 ): Promise<
-	Omit<GitHubIntegrationState, "upsertGitHubIntegrationSettingAction">
+	Omit<
+		GitHubIntegrationState,
+		"upsertGitHubIntegrationSettingAction" | "installUrl"
+	>
 > {
-	const installUrl = await gitHubAppInstallURL();
 	const credential = await getOauthCredential("github");
 	if (!credential) {
 		return {
-			installUrl,
 			needsAuthorization: true,
 			repositories: [],
 			setting: undefined,
@@ -45,7 +45,6 @@ export async function getGitHubIntegrationState(
 			}),
 		]);
 		return {
-			installUrl,
 			needsAuthorization: false,
 			repositories,
 			setting: githubIntegrationSetting,
@@ -53,7 +52,6 @@ export async function getGitHubIntegrationState(
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return {
-				installUrl,
 				needsAuthorization: true,
 				repositories: [],
 				setting: undefined,

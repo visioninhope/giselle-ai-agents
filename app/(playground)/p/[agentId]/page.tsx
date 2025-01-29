@@ -10,6 +10,7 @@ import {
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
 import { saveAgentActivity } from "@/services/agents/activities";
+import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
@@ -355,6 +356,7 @@ export default async function Page({
 			>
 				<GitHubIntegrationProvider
 					{...gitHubIntegrationState}
+					installUrl={await gitHubAppInstallURL()}
 					upsertGitHubIntegrationSettingAction={
 						upsertGitHubIntegrationSettingAction
 					}
