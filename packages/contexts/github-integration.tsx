@@ -1,14 +1,7 @@
 "use client";
 
-import type { gitHubIntegrations, githubIntegrationSettings } from "@/drizzle";
 import type { components } from "@octokit/openapi-types";
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useOptimistic,
-	useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import type {
 	CreateGitHubIntegrationSettingResult,
 	GitHubIntegrationSetting,
@@ -17,6 +10,7 @@ import type {
 type Repository = components["schemas"]["repository"];
 
 export interface GitHubIntegrationState {
+	installUrl: string;
 	repositories: Repository[];
 	needsAuthorization: boolean;
 	setting: GitHubIntegrationSetting | undefined;
