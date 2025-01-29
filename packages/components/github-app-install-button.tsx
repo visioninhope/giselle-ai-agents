@@ -9,7 +9,7 @@ type Props = {
 	installationUrl: string;
 };
 
-export function GitHubAppConfigureButton({ installationUrl }: Props) {
+export function GitHubAppInstallButton({ installationUrl }: Props) {
 	const popupRef = useRef<Window | null>(null);
 	const intervalRef = useRef<number | null>(null);
 	const router = useRouter();

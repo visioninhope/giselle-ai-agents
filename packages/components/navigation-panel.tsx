@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { GitHubAppConfigureButton } from "@/packages/components/github-app-configure-button";
+import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
@@ -656,7 +656,7 @@ function GitHubIntegrationForm() {
 				<p>{upsertGitHubIntegrationSettingActionResult.message}</p>
 			)}
 			<ContentPanelSection>
-				<GitHubAppConfigureButton installationUrl={installUrl} />
+				<GitHubAppInstallButton installationUrl={installUrl} />
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
 					name="repositoryFullName"
