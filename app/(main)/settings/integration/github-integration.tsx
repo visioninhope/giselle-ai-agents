@@ -7,8 +7,8 @@ import {
 } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Building2 } from "lucide-react";
+import { GitHubAppConfigureButton } from "../../../../packages/components/github-app-configure-button";
 import { Card } from "../components/card";
-import { GitHubAppConfigureButton } from "../components/github-app-configure-button";
 
 export async function GitHubIntegration() {
 	const credential = await getOauthCredential("github");

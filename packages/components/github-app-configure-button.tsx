@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
@@ -63,5 +64,14 @@ export function GitHubAppConfigureButton({ installationUrl }: Props) {
 		};
 	}, [router]);
 
-	return <Button onClick={handleInstall}>Configure GitHub App</Button>;
+	return (
+		<Button
+			variant="link"
+			onClick={handleInstall}
+			className="flex items-center gap-2 w-full justify-center px-6 py-3 text-sm font-medium flex-shrink text-black-30"
+		>
+			Add Giselle's GitHub App
+			<ExternalLink className="w-5 h-5" />
+		</Button>
+	);
 }
