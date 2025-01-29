@@ -1,10 +1,13 @@
-import { describe, expect, mock, test } from "bun:test";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
 	calculateAgentTimeUsage,
 	processUnreportedActivities,
 } from "./agent-time-usage";
 
 describe("calculateAgentTimeUsage", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 	test("when there are only new activities", () => {
 		const result = calculateAgentTimeUsage(
 			[{ totalDurationMs: 60 * 1000 }, { totalDurationMs: 30 * 1000 }],
@@ -93,16 +96,19 @@ describe("calculateAgentTimeUsage", () => {
 });
 
 describe("processUnreportedActivities", () => {
+	afterEach(() => {
+		vi.restoreAllMocks();
+	});
 	const mockStripe = {
 		subscriptions: {
-			retrieve: mock(async () => ({
+			retrieve: vi.fn(async () => ({
 				customer: "cust_123",
 			})),
 		},
 		v2: {
 			billing: {
 				meterEvents: {
-					create: mock(async () => ({
+					create: vi.fn(async () => ({
 						identifier: "meter_123",
 					})),
 				},
@@ -114,12 +120,12 @@ describe("processUnreportedActivities", () => {
 		const mockDao = {
 			// biome-ignore lint/suspicious/noExplicitAny: mock
 			transaction: async (fn: any) => fn(mockDao),
-			fetchCurrentSubscription: mock(async () => ({
+			fetchCurrentSubscription: vi.fn(async () => ({
 				subscriptionId: "sub_123",
 				currentPeriodStart: new Date("2024-01-01"),
 				currentPeriodEnd: new Date("2024-01-31"),
 			})),
-			findUnprocessedActivities: mock(async () => [
+			findUnprocessedActivities: vi.fn(async () => [
 				{
 					dbId: 1,
 					totalDurationMs: 60000,
@@ -127,8 +133,8 @@ describe("processUnreportedActivities", () => {
 					usageReportDbId: null,
 				},
 			]),
-			findLastUsageReport: mock(async () => null),
-			createUsageReport: mock(async () => ({
+			findLastUsageReport: vi.fn(async () => null),
+			createUsageReport: vi.fn(async () => ({
 				dbId: 1,
 				teamDbId: 123,
 				accumulatedDurationMs: 60000,
@@ -136,7 +142,7 @@ describe("processUnreportedActivities", () => {
 				stripeMeterEventId: "meter_123",
 				createdAt: new Date(),
 			})),
-			markActivitiesAsProcessed: mock(async () => {}),
+			markActivitiesAsProcessed: vi.fn(async () => {}),
 		};
 
 		const result = await processUnreportedActivities(
@@ -161,14 +167,14 @@ describe("processUnreportedActivities", () => {
 		const mockDao = {
 			// biome-ignore lint/suspicious/noExplicitAny: mock
 			transaction: async (fn: any) => fn(mockDao),
-			fetchCurrentSubscription: mock(async () => ({
+			fetchCurrentSubscription: vi.fn(async () => ({
 				subscriptionId: "sub_123",
 				currentPeriodStart: new Date("2024-01-01"),
 				currentPeriodEnd: new Date("2024-01-31"),
 			})),
-			findUnprocessedActivities: mock(async () => []),
-			findLastUsageReport: mock(async () => null),
-			createUsageReport: mock(async () => ({
+			findUnprocessedActivities: vi.fn(async () => []),
+			findLastUsageReport: vi.fn(async () => null),
+			createUsageReport: vi.fn(async () => ({
 				dbId: 1,
 				teamDbId: 123,
 				accumulatedDurationMs: 60000,
@@ -176,7 +182,7 @@ describe("processUnreportedActivities", () => {
 				stripeMeterEventId: "meter_123",
 				createdAt: new Date(),
 			})),
-			markActivitiesAsProcessed: mock(async () => {}),
+			markActivitiesAsProcessed: vi.fn(async () => {}),
 		};
 
 		const result = await processUnreportedActivities(
@@ -198,13 +204,13 @@ describe("processUnreportedActivities", () => {
 		const mockDao = {
 			// biome-ignore lint/suspicious/noExplicitAny: mock
 			transaction: async (fn: any) => fn(mockDao),
-			fetchCurrentSubscription: mock(async () => ({
+			fetchCurrentSubscription: vi.fn(async () => ({
 				subscriptionId: "sub_123",
 				currentPeriodStart: new Date("2024-02-01T00:00:00Z"),
 				currentPeriodEnd: new Date("2024-02-29T23:59:59Z"),
 			})),
 			// Mock the state where new billing cycle has already started
-			findUnprocessedActivities: mock(async () => [
+			findUnprocessedActivities: vi.fn(async () => [
 				{
 					dbId: 1,
 					totalDurationMs: 60000,
@@ -212,8 +218,8 @@ describe("processUnreportedActivities", () => {
 					usageReportDbId: null,
 				},
 			]),
-			findLastUsageReport: mock(async () => null),
-			createUsageReport: mock(async () => ({
+			findLastUsageReport: vi.fn(async () => null),
+			createUsageReport: vi.fn(async () => ({
 				dbId: 1,
 				teamDbId: 123,
 				accumulatedDurationMs: 60000,
@@ -221,7 +227,7 @@ describe("processUnreportedActivities", () => {
 				stripeMeterEventId: "meter_123",
 				createdAt: new Date(),
 			})),
-			markActivitiesAsProcessed: mock(async () => {}),
+			markActivitiesAsProcessed: vi.fn(async () => {}),
 		};
 
 		// Process activities from the last day of previous billing cycle
@@ -257,12 +263,12 @@ describe("processUnreportedActivities", () => {
 		const mockDao = {
 			// biome-ignore lint/suspicious/noExplicitAny: mock
 			transaction: async (fn: any) => fn(mockDao),
-			fetchCurrentSubscription: mock(async () => ({
+			fetchCurrentSubscription: vi.fn(async () => ({
 				subscriptionId: "sub_123",
 				currentPeriodStart: new Date("2024-02-01T00:00:00Z"),
 				currentPeriodEnd: new Date("2024-02-29T23:59:59Z"),
 			})),
-			findUnprocessedActivities: mock(async () => [
+			findUnprocessedActivities: vi.fn(async () => [
 				{
 					dbId: 1,
 					totalDurationMs: 60000,
@@ -270,8 +276,8 @@ describe("processUnreportedActivities", () => {
 					usageReportDbId: null,
 				},
 			]),
-			findLastUsageReport: mock(async () => null),
-			createUsageReport: mock(async () => ({
+			findLastUsageReport: vi.fn(async () => null),
+			createUsageReport: vi.fn(async () => ({
 				dbId: 1,
 				teamDbId: 123,
 				accumulatedDurationMs: 60000,
@@ -279,7 +285,7 @@ describe("processUnreportedActivities", () => {
 				stripeMeterEventId: "meter_123",
 				createdAt: new Date(),
 			})),
-			markActivitiesAsProcessed: mock(async () => {}),
+			markActivitiesAsProcessed: vi.fn(async () => {}),
 		};
 
 		const result = await processUnreportedActivities(

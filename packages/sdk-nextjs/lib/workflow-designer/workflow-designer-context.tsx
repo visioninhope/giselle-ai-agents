@@ -50,7 +50,7 @@ export function WorkflowDesignerProvider({
 		}),
 	);
 	const [workflowData, setWorkflowData] = useState(data);
-	const persistTimeoutRef = useRef<Timer | null>(null);
+	const persistTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 	const isPendingPersistRef = useRef(false);
 
 	const saveWorkflowData = useCallback(async () => {
