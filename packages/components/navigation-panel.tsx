@@ -25,7 +25,6 @@ import {
 	TrashIcon,
 	XIcon,
 } from "lucide-react";
-import Link from "next/link";
 import {
 	type ComponentProps,
 	type ReactNode,
@@ -579,7 +578,10 @@ function GitHubIntegration() {
 		</ContentPanel>
 	);
 }
+
 function GoToAccountSettings() {
+	const { connectGitHubIdentityAction } = useGitHubIntegration();
+
 	return (
 		<div className="grid gap-[16px] text-center">
 			<WilliIcon className="w-8 h-8 fill-slate-600 mx-auto" />
@@ -587,19 +589,31 @@ function GoToAccountSettings() {
 				You are not signed in. Please log in with GitHub using the button below
 				to get started and explore the world of Giselle.
 			</div>
-			<Button
-				asChild
-				variant="link"
-				className="flex items-center gap-2 w-full justify-center text-blue-200 border-blue-200"
-			>
-				<Link href="/settings/account">
-					<SiGithub className="h-[20px] w-[20px] text-white" />
-					Continue with GitHub
-				</Link>
-			</Button>
+			<GitHubConnectionButton action={connectGitHubIdentityAction} />
 		</div>
 	);
 }
+
+function GitHubConnectionButton({ action }: { action: () => Promise<void> }) {
+	const [_, formAction, isPending] = useActionState(async () => {
+		await action();
+	}, null);
+
+	return (
+		<form action={formAction}>
+			<Button
+				variant="link"
+				className="flex items-center gap-2 w-full justify-center text-blue-200 border-blue-200"
+				type="submit"
+				disabled={isPending}
+			>
+				<SiGithub className="h-[20px] w-[20px] text-white" />
+				Continue with GitHub
+			</Button>
+		</form>
+	);
+}
+
 const integrationEventList = [
 	{
 		type: "github.issue_comment.created" satisfies GitHubTriggerEvent,

@@ -9,6 +9,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
+import { connectIdentity } from "@/services/accounts";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
@@ -249,6 +250,11 @@ export default async function Page({
 		await reportAgentTimeUsage(agentId, endedAtDate);
 	}
 
+	async function connectGitHubIdentityAction() {
+		"use server";
+		return connectIdentity("github", `/p/${agentId}`);
+	}
+
 	async function upsertGitHubIntegrationSettingAction(
 		_: unknown,
 		formData: FormData,
@@ -360,6 +366,7 @@ export default async function Page({
 					upsertGitHubIntegrationSettingAction={
 						upsertGitHubIntegrationSettingAction
 					}
+					connectGitHubIdentityAction={connectGitHubIdentityAction}
 				>
 					<PropertiesPanelProvider>
 						<ReactFlowProvider>
