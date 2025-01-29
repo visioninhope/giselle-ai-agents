@@ -19,7 +19,6 @@ import {
 	ChevronUp,
 	DownloadIcon,
 	FrameIcon,
-	GithubIcon,
 	HammerIcon,
 	ListTreeIcon,
 	PlusIcon,
@@ -364,7 +363,7 @@ export function NavigationPanel() {
 						<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
 					</TabsTrigger>
 					<TabsTrigger value="github">
-						<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
+						<SiGithub className="w-[18px] h-[18px] stroke-black-30" />
 					</TabsTrigger>
 					<TabsTrigger value="structure">
 						<ListTreeIcon className="w-[18px] h-[18px] stroke-black-30" />
