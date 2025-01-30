@@ -1,4 +1,7 @@
+const { loadEnvConfig } = require('@next/env')
 const fs = require("node:fs").promises;
+
+loadEnvConfig(process.cwd())
 
 const fileNames = [
 	"Rosart-Regular",
