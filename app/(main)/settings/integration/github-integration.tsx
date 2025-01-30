@@ -38,6 +38,7 @@ export async function GitHubIntegration() {
 					component: (
 						<GitHubAppInstallButton
 							installationUrl={await gitHubAppInstallURL()}
+							installed={installations.length > 0}
 						/>
 					),
 				}}

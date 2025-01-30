@@ -569,17 +569,19 @@ function GitHubEventNodeMappingForm({
 }
 
 function GitHubIntegration() {
-	const { needsAuthorization } = useGitHubIntegration();
+	const { status } = useGitHubIntegration();
 
 	return (
 		<ContentPanel>
 			<ContentPanelHeader>GitHub Integration</ContentPanelHeader>
-			{needsAuthorization ? GoToAccountSettings() : GitHubIntegrationForm()}
+			{status === "unauthorized"
+				? RequireGitHubAuthorization()
+				: GitHubIntegrationForm()}
 		</ContentPanel>
 	);
 }
 
-function GoToAccountSettings() {
+function RequireGitHubAuthorization() {
 	const { connectGitHubIdentityAction } = useGitHubIntegration();
 
 	return (
@@ -627,18 +629,18 @@ const nextActionList = [
 	},
 ] as const;
 function GitHubIntegrationForm() {
-	const {
-		installUrl,
-		setting,
-		repositories,
-		upsertGitHubIntegrationSettingAction,
-	} = useGitHubIntegration();
+	const integration = useGitHubIntegration();
+	const { installUrl, setting, upsertGitHubIntegrationSettingAction } =
+		integration;
+	const repositories =
+		integration.status === "installed" ? integration.repositories : [];
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [eventNodeMappings, setEventNodeMappings] = useState<
 		GitHubEventNodeMapping[]
 	>(setting?.eventNodeMappings ?? []);
+
 	const processedMappings = useMemo(
 		() =>
 			eventNodeMappings
@@ -669,7 +671,10 @@ function GitHubIntegrationForm() {
 				<p>{upsertGitHubIntegrationSettingActionResult.message}</p>
 			)}
 			<ContentPanelSection>
-				<GitHubAppInstallButton installationUrl={installUrl} />
+				<GitHubAppInstallButton
+					installationUrl={installUrl}
+					installed={integration.status === "installed"}
+				/>
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
 					name="repositoryFullName"

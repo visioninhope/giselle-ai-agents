@@ -14,15 +14,19 @@ export async function getGitHubIntegrationState(
 	const credential = await getOauthCredential("github");
 	if (!credential) {
 		return {
-			needsAuthorization: true,
-			repositories: [],
-			setting: undefined,
+			status: "unauthorized",
 		};
 	}
 
 	try {
 		const gitHubClient = buildGitHubUserClient(credential);
 		const { installations } = await gitHubClient.getInstallations();
+		if (installations.length === 0) {
+			return {
+				status: "not-installed",
+			};
+		}
+
 		const [repositories, githubIntegrationSetting] = await Promise.all([
 			Promise.all(
 				installations.map(async (installation) => {
@@ -40,16 +44,14 @@ export async function getGitHubIntegrationState(
 			}),
 		]);
 		return {
-			needsAuthorization: false,
+			status: "installed",
 			repositories,
 			setting: githubIntegrationSetting,
 		};
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return {
-				needsAuthorization: true,
-				repositories: [],
-				setting: undefined,
+				status: "unauthorized",
 			};
 		}
 		throw error;
@@ -57,12 +59,29 @@ export async function getGitHubIntegrationState(
 }
 
 type Repository = components["schemas"]["repository"];
+export type GitHubIntegrationState = (
+	| GitHubIntegrationStateUnauthorized
+	| GitHubIntegrationStateNotInstalled
+	| GitHubIntegrationStateInstalled
+) &
+	GitHubIntegrationSettingState;
 
-export interface GitHubIntegrationState {
-	needsAuthorization: boolean;
+export type GitHubIntegrationStateUnauthorized = {
+	status: "unauthorized";
+};
+
+export type GitHubIntegrationStateNotInstalled = {
+	status: "not-installed";
+};
+
+export type GitHubIntegrationStateInstalled = {
+	status: "installed";
 	repositories: Repository[];
-	setting: GitHubIntegrationSetting | undefined;
-}
+};
+
+export type GitHubIntegrationSettingState = {
+	setting?: GitHubIntegrationSetting;
+};
 
 export type GitHubIntegrationSetting = Omit<
 	typeof githubIntegrationSettings.$inferSelect,

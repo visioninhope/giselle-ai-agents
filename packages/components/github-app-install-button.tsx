@@ -7,9 +7,10 @@ import { useEffect, useRef } from "react";
 
 type Props = {
 	installationUrl: string;
+	installed: boolean;
 };
 
-export function GitHubAppInstallButton({ installationUrl }: Props) {
+export function GitHubAppInstallButton({ installationUrl, installed }: Props) {
 	const popupRef = useRef<Window | null>(null);
 	const intervalRef = useRef<number | null>(null);
 	const router = useRouter();
@@ -70,7 +71,9 @@ export function GitHubAppInstallButton({ installationUrl }: Props) {
 			onClick={handleInstall}
 			className="flex items-center gap-2 w-full justify-center px-6 py-3 text-sm font-medium flex-shrink text-black-30"
 		>
-			Add Giselle's GitHub App
+			{installed
+				? "Configure Giselle's GitHub App"
+				: "Add Giselle's GitHub App"}
 			<ExternalLink className="w-5 h-5" />
 		</Button>
 	);
