@@ -9,7 +9,7 @@
 		"prebuild": "node prepare-font.js",
 		"build": "next build",
 		"start": "next start",
-		"check": "pnpm dlx @biomejs/biome check --write .",
+		"check": "biome check --write .",
 		"lint": "next lint",
 		"test": "vitest"
 	},
