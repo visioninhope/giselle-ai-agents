@@ -1,6 +1,9 @@
+import { type EmailRecipient, sendEmail } from "@/app/services/email";
+import { type agents, db, teamMemberships, users } from "@/drizzle";
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
+import { eq } from "drizzle-orm";
 
 export function assertIssueCommentEvent(
 	payload: unknown,
@@ -47,4 +50,32 @@ export async function createOctokit(installationId: number | string) {
 	return new Octokit({
 		auth: auth.token,
 	});
+}
+
+// Notify workflow error to team members
+export async function notifyWorkflowError(
+	agent: typeof agents.$inferSelect,
+	error: string,
+) {
+	const teamMembers = await db
+		.select({ userDisplayName: users.displayName, userEmail: users.email })
+		.from(teamMemberships)
+		.innerJoin(users, eq(teamMemberships.userDbId, users.dbId))
+		.where(eq(teamMemberships.teamDbId, agent.teamDbId));
+
+	if (teamMembers.length === 0) {
+		return;
+	}
+
+	const subject = `[Giselle] Workflow failure: ${agent.name} (ID: ${agent.id})`;
+	const body = `Workflow failed with error:
+	${error}
+	`.replaceAll("\t", "");
+
+	const recipients: EmailRecipient[] = teamMembers.map((user) => ({
+		userDisplayName: user.userDisplayName ?? "",
+		userEmail: user.userEmail ?? "",
+	}));
+
+	await sendEmail(subject, body, recipients);
 }

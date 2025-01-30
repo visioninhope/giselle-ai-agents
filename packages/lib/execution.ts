@@ -459,41 +459,10 @@ export async function executeStep({
 	if (step === undefined) {
 		throw new Error(`Step with id ${stepId} not found`);
 	}
-	const node = graph.nodes.find((node) => node.id === step.nodeId);
-	if (node === undefined) {
+	const nodes = applyOverrides(graph.nodes, overrideData);
+	const executionNode = nodes.find((node) => node.id === step.nodeId);
+	if (executionNode === undefined) {
 		throw new Error("Node not found");
-	}
-	let executionNode = node;
-	const overrideDataMap = new Map(
-		overrideData?.map(({ nodeId, data }) => [nodeId, data]) ?? [],
-	);
-	if (overrideDataMap.has(executionNode.id)) {
-		switch (executionNode.content.type) {
-			case "textGeneration":
-				executionNode = {
-					...executionNode,
-					content: {
-						...executionNode.content,
-						instruction:
-							overrideDataMap.get(executionNode.id) ??
-							executionNode.content.instruction,
-					},
-				} as Node;
-				break;
-			case "text":
-				executionNode = {
-					...executeNode,
-					content: {
-						...executionNode.content,
-						text:
-							overrideDataMap.get(executionNode.id) ??
-							executionNode.content.text,
-					},
-				} as Node;
-				break;
-			default:
-				break;
-		}
 	}
 
 	const context: ExecutionContext = {
@@ -501,7 +470,7 @@ export async function executeStep({
 		executionId,
 		node: executionNode,
 		artifacts,
-		nodes: graph.nodes,
+		nodes,
 		connections: graph.connections,
 		stream,
 	};
@@ -625,4 +594,40 @@ async function canPerformFlowExecution(agentId: AgentId) {
 
 	const team = res[0];
 	return await isAgentTimeAvailable(team);
+}
+
+function applyOverrides(nodes: Node[], overrideData?: OverrideData[]) {
+	if (overrideData == null) {
+		return nodes;
+	}
+
+	const overrideDataMap = new Map(
+		overrideData.map(({ nodeId, data }) => [nodeId, data]) ?? [],
+	);
+	return nodes.map((node) => {
+		const override = overrideDataMap.get(node.id);
+		if (override == null) {
+			return node;
+		}
+		switch (node.content.type) {
+			case "textGeneration":
+				return {
+					...node,
+					content: {
+						...node.content,
+						instruction: override,
+					},
+				} as Node;
+			case "text":
+				return {
+					...node,
+					content: {
+						...node.content,
+						text: override,
+					},
+				} as Node;
+			default:
+				throw new Error(`Unsupported override type: ${node.content.type}`);
+		}
+	});
 }

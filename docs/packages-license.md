@@ -356,7 +356,7 @@ LicenseFinder::PNPM: [32mis active for '/home/runner/work/giselle/giselle'[0m
 
 
 <a name="@bcoe/v8-coverage"></a>
-### @bcoe/v8-coverage v0.2.3
+### @bcoe/v8-coverage v1.0.2
 #### 
 
 ##### Paths
@@ -3139,7 +3139,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/coverage-v8"></a>
-### @vitest/coverage-v8 v2.1.8
+### @vitest/coverage-v8 v3.0.4
 #### 
 
 ##### Paths
@@ -5119,7 +5119,7 @@ CC-BY-4.0 permitted
 
 
 <a name="fast-uri"></a>
-### fast-uri v3.0.5
+### fast-uri v3.0.6
 #### 
 
 ##### Paths

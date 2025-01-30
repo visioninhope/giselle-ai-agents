@@ -6,7 +6,7 @@ import {
 	needsAuthorization,
 } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
-import { Building2 } from "lucide-react";
+import { Building2, Lock, Unlock } from "lucide-react";
 import { GitHubAppInstallButton } from "../../../../packages/components/github-app-install-button";
 import { Card } from "../components/card";
 
@@ -29,6 +29,15 @@ export async function GitHubIntegration() {
 	try {
 		const gitHubUser = await gitHubClient.getUser();
 		const { installations } = await gitHubClient.getInstallations();
+		const installationsWithRepos = await Promise.all(
+			installations.map(async (installation) => {
+				const repos = await gitHubClient.getRepositories(installation.id);
+				return {
+					...installation,
+					repositories: repos.repositories,
+				};
+			}),
+		);
 
 		return (
 			<Card
@@ -43,7 +52,7 @@ export async function GitHubIntegration() {
 					),
 				}}
 			>
-				{installations.map((installation) => (
+				{installationsWithRepos.map((installation) => (
 					<Installation key={installation.id} installation={installation} />
 				))}
 			</Card>
@@ -68,7 +77,11 @@ export async function GitHubIntegration() {
 type InstallationProps = {
 	installation: Awaited<
 		ReturnType<GitHubUserClient["getInstallations"]>
-	>["installations"][number];
+	>["installations"][number] & {
+		repositories: Awaited<
+			ReturnType<GitHubUserClient["getRepositories"]>
+		>["repositories"];
+	};
 };
 
 function Installation({ installation }: InstallationProps) {
@@ -78,18 +91,39 @@ function Installation({ installation }: InstallationProps) {
 	}
 
 	return (
-		<div className="flex items-center space-x-4">
-			{"login" in account ? (
-				<>
-					<SiGithub className="w-6 h-6 text-primary" size={24} />
-					<span className="font-medium">{account.login}</span>
-				</>
-			) : (
-				<>
-					<Building2 className="w-6 h-6 text-primary" size={24} />
-					<span className="font-medium">{account.name}</span>
-				</>
-			)}
+		<div className="space-y-4">
+			<div className="flex items-center space-x-4">
+				{"login" in account ? (
+					<>
+						<SiGithub className="w-6 h-6 text-primary" size={24} />
+						<span className="font-medium">{account.login}</span>
+					</>
+				) : (
+					<>
+						<Building2 className="w-6 h-6 text-primary" size={24} />
+						<span className="font-medium">{account.name}</span>
+					</>
+				)}
+			</div>
+			<div className="space-y-2 pl-10">
+				{installation.repositories.map((repo) => (
+					<div key={repo.id} className="flex items-center space-x-2">
+						{repo.private ? (
+							<Lock className="w-4 h-4 text-muted-foreground" />
+						) : (
+							<Unlock className="w-4 h-4 text-muted-foreground" />
+						)}
+						<a
+							href={repo.html_url}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-sm hover:underline"
+						>
+							{repo.name}
+						</a>
+					</div>
+				))}
+			</div>
 		</div>
 	);
 }
