@@ -12,7 +12,7 @@ const config = {
 		"./src/**/*.{ts,tsx}",
 		"./services/**/*.{ts,tsx}",
 		"./packages/**/*.{ts,tsx}",
-		"!./node_modules"
+		"!./node_modules",
 	],
 	prefix: "",
 	theme: {
