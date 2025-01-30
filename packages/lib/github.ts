@@ -6,25 +6,27 @@ import {
 	buildGitHubUserClient,
 	needsAuthorization,
 } from "@/services/external/github";
-import type { GitHubIntegrationState } from "../contexts/github-integration";
+import type { components } from "@octokit/openapi-types";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,
-): Promise<
-	Omit<GitHubIntegrationState, "upsertGitHubIntegrationSettingAction">
-> {
+): Promise<GitHubIntegrationState> {
 	const credential = await getOauthCredential("github");
 	if (!credential) {
 		return {
-			needsAuthorization: true,
-			repositories: [],
-			setting: undefined,
+			status: "unauthorized",
 		};
 	}
 
 	try {
 		const gitHubClient = buildGitHubUserClient(credential);
 		const { installations } = await gitHubClient.getInstallations();
+		if (installations.length === 0) {
+			return {
+				status: "not-installed",
+			};
+		}
+
 		const [repositories, githubIntegrationSetting] = await Promise.all([
 			Promise.all(
 				installations.map(async (installation) => {
@@ -42,21 +44,44 @@ export async function getGitHubIntegrationState(
 			}),
 		]);
 		return {
-			needsAuthorization: false,
+			status: "installed",
 			repositories,
 			setting: githubIntegrationSetting,
 		};
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return {
-				needsAuthorization: true,
-				repositories: [],
-				setting: undefined,
+				status: "unauthorized",
 			};
 		}
 		throw error;
 	}
 }
+
+type Repository = components["schemas"]["repository"];
+export type GitHubIntegrationState = (
+	| GitHubIntegrationStateUnauthorized
+	| GitHubIntegrationStateNotInstalled
+	| GitHubIntegrationStateInstalled
+) &
+	GitHubIntegrationSettingState;
+
+export type GitHubIntegrationStateUnauthorized = {
+	status: "unauthorized";
+};
+
+export type GitHubIntegrationStateNotInstalled = {
+	status: "not-installed";
+};
+
+export type GitHubIntegrationStateInstalled = {
+	status: "installed";
+	repositories: Repository[];
+};
+
+export type GitHubIntegrationSettingState = {
+	setting?: GitHubIntegrationSetting;
+};
 
 export type GitHubIntegrationSetting = Omit<
 	typeof githubIntegrationSettings.$inferSelect,

@@ -1,40 +1,29 @@
 "use client";
 
-import type { gitHubIntegrations, githubIntegrationSettings } from "@/drizzle";
-import type { components } from "@octokit/openapi-types";
-import {
-	createContext,
-	useCallback,
-	useContext,
-	useOptimistic,
-	useState,
-} from "react";
+import { createContext, useCallback, useContext, useState } from "react";
 import type {
 	CreateGitHubIntegrationSettingResult,
-	GitHubIntegrationSetting,
+	GitHubIntegrationState,
 } from "../lib/github";
 
-type Repository = components["schemas"]["repository"];
-
-export interface GitHubIntegrationState {
-	repositories: Repository[];
-	needsAuthorization: boolean;
-	setting: GitHubIntegrationSetting | undefined;
+export type GitHubIntegrationContextType = GitHubIntegrationState & {
+	installUrl: string;
+	connectGitHubIdentityAction: () => Promise<void>;
 	upsertGitHubIntegrationSettingAction: (
 		_: unknown,
 		formData: FormData,
 	) => Promise<CreateGitHubIntegrationSettingResult>;
-}
+};
 
 export const GitHubIntegrationContext =
-	createContext<GitHubIntegrationState | null>(null);
+	createContext<GitHubIntegrationContextType | null>(null);
 
 export function GitHubIntegrationProvider({
 	children,
 	setting: defaultSetting,
 	upsertGitHubIntegrationSettingAction,
 	...value
-}: GitHubIntegrationState & {
+}: GitHubIntegrationContextType & {
 	children: React.ReactNode;
 }) {
 	const [serverSetting, setServerSetting] = useState(defaultSetting);
