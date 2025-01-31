@@ -17,7 +17,12 @@ export async function GitHubAuthentication() {
 		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
 	if (identityState.state === "invalid-credential") {
-		return <GitHubAuthenticationPresentation button={GitHubReconnectButton} />;
+		return (
+			<GitHubAuthenticationPresentation
+				button={GitHubReconnectButton}
+				alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
+			/>
+		);
 	}
 
 	return (
