@@ -57,11 +57,10 @@ async function AgentList() {
 								<div className="absolute z-0 inset-0 border rounded-[8px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent from-[hsla(192,73%,84%,0.5)] to-[hsla(192,60%,33%,0.4)]" />
 							</div>
 						</Link>
-						<DuplicateAgentButton agentId={agent.id} />
+						<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
 					</div>
 				))}
 			</div>
-			<Toasts />
 		</>
 	);
 }
@@ -72,6 +71,7 @@ export default function AgentListV2Page() {
 			<Suspense fallback={<p>loading...</p>}>
 				<AgentList />
 			</Suspense>
+			<Toasts />
 		</ToastProvider>
 	);
 }

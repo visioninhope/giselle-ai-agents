@@ -27,7 +27,7 @@ type AgentDuplicationResult = AgentDuplicationSuccess | AgentDuplicationError;
 
 export async function copyAgent(
 	agentId: AgentId,
-	formData: FormData,
+	_formData: FormData,
 ): Promise<AgentDuplicationResult> {
 	if (typeof agentId !== "string" || agentId.length === 0) {
 		return { result: "error", message: "Please fill in the agent id" };
@@ -125,5 +125,9 @@ export async function copyAgent(
 			},
 		})
 		.returning({ id: agents.id });
-	return { result: "success", agentId: newAgentId };
+	if (insertResult.length === 0) {
+		return { result: "error", message: "Failed to save the duplicated agent" };
+	}
+	const newAgent = insertResult[0];
+	return { result: "success", agentId: newAgent.id };
 }
