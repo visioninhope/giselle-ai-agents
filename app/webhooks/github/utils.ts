@@ -1,5 +1,5 @@
-import { type EmailRecipient, sendEmail } from "@/app/services/email";
 import { type agents, db, teamMemberships, users } from "@/drizzle";
+import { type EmailRecipient, sendEmail } from "@/services/external/email";
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
