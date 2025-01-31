@@ -10,8 +10,6 @@ import {
 	reconnectGitHubIdentity,
 } from "./actions";
 
-const provider = "github";
-
 export async function GitHubAuthentication() {
 	const identityState = await getGitHubIdentityState();
 
