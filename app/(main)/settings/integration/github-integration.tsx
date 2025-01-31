@@ -1,27 +1,20 @@
 import { getOauthCredential } from "@/app/(auth)/lib";
+import { Button } from "@/components/ui/button";
 import {
-	type GitHubUserClient,
 	buildGitHubUserClient,
 	gitHubAppInstallURL,
 	needsAuthorization,
 } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import type { components } from "@octokit/openapi-types";
+import Link from "next/link";
 import { GitHubAppInstallButton } from "../../../../packages/components/github-app-install-button";
-import { Card } from "../components/card";
 
 export async function GitHubIntegration() {
+	const installUrl = await gitHubAppInstallURL();
 	const credential = await getOauthCredential("github");
 	if (!credential) {
-		return (
-			<Card
-				title="GitHub Integration"
-				description="Connect your GitHub account to enable additional features"
-				action={{
-					content: "Account",
-					href: "/settings/account",
-				}}
-			/>
-		);
+		return <GitHubIntegrationPresentation installationUrl={installUrl} />;
 	}
 
 	const gitHubClient = buildGitHubUserClient(credential);
@@ -39,58 +32,96 @@ export async function GitHubIntegration() {
 		);
 
 		return (
-			<div className="space-y-8 text-black-30">
-				<div className="flex items-center justify-between">
-					<div className="flex items-center space-x-3">
-						<SiGithub className="w-8 h-8" />
-						<div>
-							<h2 className="text-lg">GitHub</h2>
-							<div className="text-sm text-muted-foreground">
-								Logged in as (
-								<span className="text-blue-500">@{gitHubUser.login}</span>)
-							</div>
-						</div>
-					</div>
-					<div>
-						<GitHubAppInstallButton
-							installationUrl={await gitHubAppInstallURL()}
-							installed={installations.length > 0}
-						/>
-					</div>
-				</div>
-
-				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-					{installationsWithRepos.map((installation) => (
-						<Installation key={installation.id} installation={installation} />
-					))}
-				</div>
-			</div>
+			<GitHubIntegrationPresentation
+				account={gitHubUser.login}
+				installations={installationsWithRepos}
+				installationUrl={installUrl}
+			/>
 		);
 	} catch (error) {
 		if (needsAuthorization(error)) {
-			return (
-				<Card
-					title="GitHub Integration"
-					description="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
-					action={{
-						content: "Account",
-						href: "/settings/account",
-					}}
-				/>
-			);
+			return <GitHubIntegrationPresentation installationUrl={installUrl} />;
 		}
 		throw error;
 	}
 }
 
+type Repository = components["schemas"]["repository"];
+type Installation = components["schemas"]["installation"];
+type InstallationWithRepositories = Installation & {
+	repositories: Repository[];
+};
+
+type GitHubIntegrationPresentationProps = {
+	account?: string;
+	installations?: InstallationWithRepositories[];
+	installationUrl: string;
+};
+
+function GitHubIntegrationPresentation({
+	account,
+	installations,
+	installationUrl,
+}: GitHubIntegrationPresentationProps) {
+	const installed = installations != null && installations?.length > 0;
+	return (
+		<div className="space-y-8 text-black-30">
+			<Header
+				account={account}
+				installed={installed}
+				installationUrl={installationUrl}
+			/>
+			{installed && (
+				<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+					{installations.map((installation) => (
+						<Installation key={installation.id} installation={installation} />
+					))}
+				</div>
+			)}
+		</div>
+	);
+}
+
+type HeaderProps = {
+	account?: string;
+	installed: boolean;
+	installationUrl: string;
+};
+
+function Header({ account, installed, installationUrl }: HeaderProps) {
+	return (
+		<div className="flex items-center justify-between">
+			<div className="flex items-center space-x-3">
+				<SiGithub className="w-8 h-8" />
+				<div>
+					<h2 className="text-lg">GitHub</h2>
+					{account ? (
+						<div className="text-sm text-muted-foreground">
+							Logged in as (<span className="text-blue-500">@{account}</span>)
+						</div>
+					) : (
+						<div className="text-sm text-muted-foreground">Not connected</div>
+					)}
+				</div>
+			</div>
+			<div>
+				{account ? (
+					<GitHubAppInstallButton
+						installationUrl={installationUrl}
+						installed={installed}
+					/>
+				) : (
+					<Button asChild>
+						<Link href="/settings/account">Connect</Link>
+					</Button>
+				)}
+			</div>
+		</div>
+	);
+}
+
 type InstallationProps = {
-	installation: Awaited<
-		ReturnType<GitHubUserClient["getInstallations"]>
-	>["installations"][number] & {
-		repositories: Awaited<
-			ReturnType<GitHubUserClient["getRepositories"]>
-		>["repositories"];
-	};
+	installation: InstallationWithRepositories;
 };
 
 function Installation({ installation }: InstallationProps) {
