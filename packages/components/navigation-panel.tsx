@@ -580,7 +580,7 @@ function GitHubIntegration() {
 			case "not-installed":
 				return <GitHubIntegrationForm />;
 			default:
-				throw new Error(`Invalid GitHub integration state: ${status}`);
+				throw new Error(status satisfies never);
 		}
 	};
 	return (
