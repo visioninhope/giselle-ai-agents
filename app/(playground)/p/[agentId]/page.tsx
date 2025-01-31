@@ -9,7 +9,7 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
-import { connectIdentity } from "@/services/accounts";
+import { connectIdentity, reconnectIdentity } from "@/services/accounts";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
@@ -255,6 +255,11 @@ export default async function Page({
 		return connectIdentity("github", `/p/${agentId}`);
 	}
 
+	async function reconnectGitHubIdentityAction() {
+		"use server";
+		return reconnectIdentity("github", `/p/${agentId}`);
+	}
+
 	async function upsertGitHubIntegrationSettingAction(
 		_: unknown,
 		formData: FormData,
@@ -367,6 +372,7 @@ export default async function Page({
 						upsertGitHubIntegrationSettingAction
 					}
 					connectGitHubIdentityAction={connectGitHubIdentityAction}
+					reconnectGitHubIdentityAction={reconnectGitHubIdentityAction}
 				>
 					<PropertiesPanelProvider>
 						<ReactFlowProvider>

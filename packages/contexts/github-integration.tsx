@@ -9,6 +9,7 @@ import type {
 export type GitHubIntegrationContextType = GitHubIntegrationState & {
 	installUrl: string;
 	connectGitHubIdentityAction: () => Promise<void>;
+	reconnectGitHubIdentityAction: () => Promise<void>;
 	upsertGitHubIntegrationSettingAction: (
 		_: unknown,
 		formData: FormData,

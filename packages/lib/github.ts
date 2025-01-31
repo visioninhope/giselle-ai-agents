@@ -8,16 +8,18 @@ export async function getGitHubIntegrationState(
 	agentDbId: number,
 ): Promise<GitHubIntegrationState> {
 	const identityState = await getGitHubIdentityState();
-	if (
-		identityState.state === "unauthorized" ||
-		identityState.state === "invalid-credential" // FIXME: Add invalid credential state handling
-	) {
+	if (identityState.state === "unauthorized") {
 		return {
-			status: "unauthorized",
+			status: identityState.state,
 		};
 	}
-	const gitHubUserClient = identityState.gitHubUserClient;
+	if (identityState.state === "invalid-credential") {
+		return {
+			status: identityState.state,
+		};
+	}
 
+	const gitHubUserClient = identityState.gitHubUserClient;
 	const { installations } = await gitHubUserClient.getInstallations();
 	if (installations.length === 0) {
 		return {
@@ -51,6 +53,7 @@ export async function getGitHubIntegrationState(
 type Repository = components["schemas"]["repository"];
 export type GitHubIntegrationState = (
 	| GitHubIntegrationStateUnauthorized
+	| GitHubIntegrationStateInvalidCredential
 	| GitHubIntegrationStateNotInstalled
 	| GitHubIntegrationStateInstalled
 ) &
@@ -58,6 +61,10 @@ export type GitHubIntegrationState = (
 
 export type GitHubIntegrationStateUnauthorized = {
 	status: "unauthorized";
+};
+
+export type GitHubIntegrationStateInvalidCredential = {
+	status: "invalid-credential";
 };
 
 export type GitHubIntegrationStateNotInstalled = {
