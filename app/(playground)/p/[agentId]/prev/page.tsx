@@ -1,8 +1,8 @@
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import { debugFlag as getDebugFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
+import { getOauthCredential } from "@/services/accounts";
 import {
 	type GitHubUserClient,
 	buildGitHubUserClient,

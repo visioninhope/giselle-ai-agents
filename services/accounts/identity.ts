@@ -1,9 +1,9 @@
-import type { Provider } from "@/app/(auth)/lib";
 import { deleteOauthCredential, getAuthCallbackUrl } from "@/app/(auth)/lib";
 import { createClient, getUser } from "@/lib/supabase";
 import { redirect } from "next/navigation";
+import type { OAuthProvider } from "./oauth-credentials";
 
-export async function connectIdentity(provider: Provider, next: string) {
+export async function connectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
 
 	// Manual linking allows the user to link multiple same-provider identities.
@@ -37,7 +37,7 @@ export async function connectIdentity(provider: Provider, next: string) {
 	}
 }
 
-export async function reconnectIdentity(provider: Provider, next: string) {
+export async function reconnectIdentity(provider: OAuthProvider, next: string) {
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider,
@@ -55,7 +55,10 @@ export async function reconnectIdentity(provider: Provider, next: string) {
 	}
 }
 
-export async function disconnectIdentity(provider: Provider, next: string) {
+export async function disconnectIdentity(
+	provider: OAuthProvider,
+	next: string,
+) {
 	const supabaseUser = await getUser();
 	const supabase = await createClient();
 	if (!supabaseUser.identities) {

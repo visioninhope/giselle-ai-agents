@@ -1,7 +1,7 @@
 "use server";
 
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { getUser } from "@/lib/supabase";
+import { getOauthCredential } from "@/services/accounts";
 import {
 	buildGitHubUserClient,
 	needsAuthorization,

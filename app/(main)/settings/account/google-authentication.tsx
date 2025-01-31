@@ -1,6 +1,6 @@
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/supabase";
+import { getOauthCredential } from "@/services/accounts";
 import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
 import { ProviderConnectionButton } from "../components/provider-connection-button";
 

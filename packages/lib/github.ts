@@ -1,7 +1,7 @@
 "use server";
 
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { db, type githubIntegrationSettings } from "@/drizzle";
+import { getOauthCredential } from "@/services/accounts";
 import {
 	buildGitHubUserClient,
 	needsAuthorization,

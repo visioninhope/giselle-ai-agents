@@ -1,4 +1,4 @@
-import { getOauthCredential } from "@/app/(auth)/lib";
+import { getOauthCredential } from "@/services/accounts";
 import {
 	type GitHubUserClient,
 	buildGitHubUserClient,
