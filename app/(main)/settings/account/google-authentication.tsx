@@ -14,11 +14,11 @@ const provider = "google";
 export async function GoogleAuthentication() {
 	const identityState = await getGoogleIdentityState();
 
-	if (identityState.state === "unauthorized") {
+	if (identityState.status === "unauthorized") {
 		return <GoogleAuthenticationPresentation button={GoogleConnectButton} />;
 	}
 
-	if (identityState.state === "invalid-credential") {
+	if (identityState.status === "invalid-credential") {
 		return <GoogleAuthenticationPresentation button={GoogleReconnectButton} />;
 	}
 

@@ -13,10 +13,10 @@ import {
 export async function GitHubAuthentication() {
 	const identityState = await getGitHubIdentityState();
 
-	if (identityState.state === "unauthorized") {
+	if (identityState.status === "unauthorized") {
 		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
-	if (identityState.state === "invalid-credential") {
+	if (identityState.status === "invalid-credential") {
 		return (
 			<GitHubAuthenticationPresentation
 				button={GitHubReconnectButton}

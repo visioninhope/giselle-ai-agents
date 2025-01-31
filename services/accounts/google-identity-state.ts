@@ -13,15 +13,15 @@ type GoogleIdentityState =
 	| GoogleIdentityStateAuthorized;
 
 type GoogleIdentityStateUnauthorized = {
-	state: "unauthorized";
+	status: "unauthorized";
 };
 
 type GoogleIdentityStateInvalidCredential = {
-	state: "invalid-credential";
+	status: "invalid-credential";
 };
 
 type GoogleIdentityStateAuthorized = {
-	state: "authorized";
+	status: "authorized";
 	googleUser: GoogleUserData;
 	googleUserClient: GoogleUserClient;
 	unlinkable: boolean;
@@ -30,7 +30,7 @@ type GoogleIdentityStateAuthorized = {
 export async function getGoogleIdentityState(): Promise<GoogleIdentityState> {
 	const credential = await getOauthCredential("google");
 	if (!credential) {
-		return { state: "unauthorized" };
+		return { status: "unauthorized" };
 	}
 
 	const googleUserClient = buildGoogleUserClient(credential);
@@ -40,10 +40,10 @@ export async function getGoogleIdentityState(): Promise<GoogleIdentityState> {
 		const unlinkable =
 			(supabaseUser.identities && supabaseUser.identities.length > 1) ?? false;
 
-		return { state: "authorized", googleUser, googleUserClient, unlinkable };
+		return { status: "authorized", googleUser, googleUserClient, unlinkable };
 	} catch (error) {
 		if (needsAuthorization(error)) {
-			return { state: "invalid-credential" };
+			return { status: "invalid-credential" };
 		}
 		throw error;
 	}

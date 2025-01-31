@@ -71,8 +71,8 @@ async function fetchGitHubRepositories(): Promise<{
 }> {
 	const identityState = await getGitHubIdentityState();
 	if (
-		identityState.state === "unauthorized" ||
-		identityState.state === "invalid-credential"
+		identityState.status === "unauthorized" ||
+		identityState.status === "invalid-credential"
 	) {
 		return { needsAuthorization: true, repositories: [] };
 	}

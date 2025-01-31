@@ -10,7 +10,7 @@ import { Card } from "../components/card";
 
 export async function GitHubIntegration() {
 	const identityState = await getGitHubIdentityState();
-	if (identityState.state === "unauthorized") {
+	if (identityState.status === "unauthorized") {
 		return (
 			<Card
 				title="GitHub Integration"
@@ -22,7 +22,7 @@ export async function GitHubIntegration() {
 			/>
 		);
 	}
-	if (identityState.state === "invalid-credential") {
+	if (identityState.status === "invalid-credential") {
 		return (
 			<Card
 				title="GitHub Integration"

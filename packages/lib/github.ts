@@ -8,14 +8,14 @@ export async function getGitHubIntegrationState(
 	agentDbId: number,
 ): Promise<GitHubIntegrationState> {
 	const identityState = await getGitHubIdentityState();
-	if (identityState.state === "unauthorized") {
+	if (identityState.status === "unauthorized") {
 		return {
-			status: identityState.state,
+			status: identityState.status,
 		};
 	}
-	if (identityState.state === "invalid-credential") {
+	if (identityState.status === "invalid-credential") {
 		return {
-			status: identityState.state,
+			status: identityState.status,
 		};
 	}
 
