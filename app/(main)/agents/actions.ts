@@ -44,6 +44,12 @@ export async function copyAgent(
 		fetchCurrentTeam(),
 		fetch(agent.graphUrl).then((res) => res.json() as unknown as Graph),
 	]);
+	if (agent.teamDbId !== team.dbId) {
+		return {
+			result: "error",
+			message: "You are not allowed to duplicate this agent",
+		};
+	}
 	const newNodes = await Promise.all(
 		graph.nodes.map(async (node) => {
 			if (node.content.type !== "files") {
