@@ -1,11 +1,6 @@
 "use server";
 
-import { getUser } from "@/lib/supabase";
-import { getOauthCredential } from "@/services/accounts";
-import {
-	buildGitHubUserClient,
-	needsAuthorization,
-} from "@/services/external/github";
+import { getGitHubIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
 import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
 import { ProviderConnectionButton } from "../components/provider-connection-button";
@@ -18,35 +13,21 @@ import {
 const provider = "github";
 
 export async function GitHubAuthentication() {
-	const credential = await getOauthCredential(provider);
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+
+	if (identityState.state === "unauthorized") {
 		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
-
-	const gitHubClient = buildGitHubUserClient(credential);
-	try {
-		const gitHubUser = await gitHubClient.getUser();
-		const supabaseUser = await getUser();
-		const unlinkable =
-			supabaseUser.identities && supabaseUser.identities.length > 1;
-
-		return (
-			<GitHubAuthenticationPresentation
-				gitHubUser={gitHubUser}
-				button={unlinkable ? GitHubDisconnectButton : undefined}
-			/>
-		);
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return (
-				<GitHubAuthenticationPresentation
-					button={GitHubReconnectButton}
-					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
-				/>
-			);
-		}
-		throw error;
+	if (identityState.state === "invalid-credential") {
+		return <GitHubAuthenticationPresentation button={GitHubReconnectButton} />;
 	}
+
+	return (
+		<GitHubAuthenticationPresentation
+			gitHubUser={identityState.gitHubUser}
+			button={identityState.unlinkable ? GitHubDisconnectButton : undefined}
+		/>
+	);
 }
 
 function GitHubConnectButton() {

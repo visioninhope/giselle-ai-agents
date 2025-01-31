@@ -1,3 +1,4 @@
+import { getUser } from "@/lib/supabase";
 import type { components } from "@octokit/openapi-types";
 import {
 	type GitHubUserClient,
@@ -22,6 +23,7 @@ type GitHubIdentityStateAuthorized = {
 	state: "authorized";
 	gitHubUser: components["schemas"]["simple-user"];
 	gitHubUserClient: GitHubUserClient;
+	unlinkable: boolean;
 };
 
 export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
@@ -33,7 +35,11 @@ export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
 	const gitHubUserClient = buildGitHubUserClient(credential);
 	try {
 		const gitHubUser = await gitHubUserClient.getUser();
-		return { state: "authorized", gitHubUser, gitHubUserClient };
+		const supabaseUser = await getUser();
+		const unlinkable =
+			(supabaseUser.identities && supabaseUser.identities.length > 1) ?? false;
+
+		return { state: "authorized", gitHubUser, gitHubUserClient, unlinkable };
 	} catch (error) {
 		if (needsAuthorization(error)) {
 			return { state: "invalid-credential" };

@@ -1,61 +1,51 @@
 "use server";
 
 import { db, type githubIntegrationSettings } from "@/drizzle";
-import { getOauthCredential } from "@/services/accounts";
-import {
-	buildGitHubUserClient,
-	needsAuthorization,
-} from "@/services/external/github";
+import { getGitHubIdentityState } from "@/services/accounts";
 import type { components } from "@octokit/openapi-types";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,
 ): Promise<GitHubIntegrationState> {
-	const credential = await getOauthCredential("github");
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+	if (
+		identityState.state === "unauthorized" ||
+		identityState.state === "invalid-credential" // FIXME: Add invalid credential state handling
+	) {
 		return {
 			status: "unauthorized",
 		};
 	}
+	const gitHubUserClient = identityState.gitHubUserClient;
 
-	try {
-		const gitHubClient = buildGitHubUserClient(credential);
-		const { installations } = await gitHubClient.getInstallations();
-		if (installations.length === 0) {
-			return {
-				status: "not-installed",
-			};
-		}
-
-		const [repositories, githubIntegrationSetting] = await Promise.all([
-			Promise.all(
-				installations.map(async (installation) => {
-					const { repositories: repos } = await gitHubClient.getRepositories(
-						installation.id,
-					);
-					return repos;
-				}),
-			).then((repos) =>
-				repos.flat().sort((a, b) => a.name.localeCompare(b.name)),
-			),
-			db.query.githubIntegrationSettings.findFirst({
-				where: (githubIntegrationSettings, { eq }) =>
-					eq(githubIntegrationSettings.agentDbId, agentDbId),
-			}),
-		]);
+	const { installations } = await gitHubUserClient.getInstallations();
+	if (installations.length === 0) {
 		return {
-			status: "installed",
-			repositories,
-			setting: githubIntegrationSetting,
+			status: "not-installed",
 		};
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return {
-				status: "unauthorized",
-			};
-		}
-		throw error;
 	}
+
+	const [repositories, githubIntegrationSetting] = await Promise.all([
+		Promise.all(
+			installations.map(async (installation) => {
+				const { repositories: repos } = await gitHubUserClient.getRepositories(
+					installation.id,
+				);
+				return repos;
+			}),
+		).then((repos) =>
+			repos.flat().sort((a, b) => a.name.localeCompare(b.name)),
+		),
+		db.query.githubIntegrationSettings.findFirst({
+			where: (githubIntegrationSettings, { eq }) =>
+				eq(githubIntegrationSettings.agentDbId, agentDbId),
+		}),
+	]);
+	return {
+		status: "installed",
+		repositories,
+		setting: githubIntegrationSetting,
+	};
 }
 
 type Repository = components["schemas"]["repository"];

@@ -1,9 +1,7 @@
-import { getOauthCredential } from "@/services/accounts";
+import { getGitHubIdentityState } from "@/services/accounts";
 import {
 	type GitHubUserClient,
-	buildGitHubUserClient,
 	gitHubAppInstallURL,
-	needsAuthorization,
 } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Building2, Lock, Unlock } from "lucide-react";
@@ -11,8 +9,8 @@ import { GitHubAppInstallButton } from "../../../../packages/components/github-a
 import { Card } from "../components/card";
 
 export async function GitHubIntegration() {
-	const credential = await getOauthCredential("github");
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+	if (identityState.state === "unauthorized") {
 		return (
 			<Card
 				title="GitHub Integration"
@@ -24,54 +22,51 @@ export async function GitHubIntegration() {
 			/>
 		);
 	}
-
-	const gitHubClient = buildGitHubUserClient(credential);
-	try {
-		const gitHubUser = await gitHubClient.getUser();
-		const { installations } = await gitHubClient.getInstallations();
-		const installationsWithRepos = await Promise.all(
-			installations.map(async (installation) => {
-				const repos = await gitHubClient.getRepositories(installation.id);
-				return {
-					...installation,
-					repositories: repos.repositories,
-				};
-			}),
-		);
-
+	if (identityState.state === "invalid-credential") {
 		return (
 			<Card
 				title="GitHub Integration"
-				description={`Logged in as @${gitHubUser.login}.`}
+				description="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
 				action={{
-					component: (
-						<GitHubAppInstallButton
-							installationUrl={await gitHubAppInstallURL()}
-							installed={installations.length > 0}
-						/>
-					),
+					content: "Account",
+					href: "/settings/account",
 				}}
-			>
-				{installationsWithRepos.map((installation) => (
-					<Installation key={installation.id} installation={installation} />
-				))}
-			</Card>
+			/>
 		);
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return (
-				<Card
-					title="GitHub Integration"
-					description="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
-					action={{
-						content: "Account",
-						href: "/settings/account",
-					}}
-				/>
-			);
-		}
-		throw error;
 	}
+
+	const gitHubUserClient = identityState.gitHubUserClient;
+	const { installations } = await gitHubUserClient.getInstallations();
+	const installationsWithRepos = await Promise.all(
+		installations.map(async (installation) => {
+			const repos = await gitHubUserClient.getRepositories(installation.id);
+			return {
+				...installation,
+				repositories: repos.repositories,
+			};
+		}),
+	);
+	const gitHubUser = identityState.gitHubUser;
+	const installationUrl = await gitHubAppInstallURL();
+
+	return (
+		<Card
+			title="GitHub Integration"
+			description={`Logged in as @${gitHubUser.login}.`}
+			action={{
+				component: (
+					<GitHubAppInstallButton
+						installationUrl={installationUrl}
+						installed={installations.length > 0}
+					/>
+				),
+			}}
+		>
+			{installationsWithRepos.map((installation) => (
+				<Installation key={installation.id} installation={installation} />
+			))}
+		</Card>
+	);
 }
 
 type InstallationProps = {
