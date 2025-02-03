@@ -47,7 +47,7 @@ type InstallationWithRepositories = Installation & {
 type GitHubIntegrationPresentationProps = {
 	account?: string;
 	installations?: InstallationWithRepositories[];
-	installationUrl: string;
+	installationUrl?: string;
 };
 
 function GitHubIntegrationPresentation({
@@ -77,7 +77,7 @@ function GitHubIntegrationPresentation({
 type HeaderProps = {
 	account?: string;
 	installed: boolean;
-	installationUrl: string;
+	installationUrl?: string;
 };
 
 function Header({ account, installed, installationUrl }: HeaderProps) {
@@ -97,7 +97,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 				</div>
 			</div>
 			<div>
-				{account ? (
+				{account && installationUrl ? (
 					<GitHubAppInstallButton
 						installationUrl={installationUrl}
 						installed={installed}
