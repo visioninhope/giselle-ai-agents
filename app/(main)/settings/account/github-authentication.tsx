@@ -1,11 +1,6 @@
 "use server";
 
-import { getOauthCredential } from "@/app/(auth)/lib";
-import { getUser } from "@/lib/supabase";
-import {
-	buildGitHubUserClient,
-	needsAuthorization,
-} from "@/services/external/github";
+import { getGitHubIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
 import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
 import { ProviderConnectionButton } from "../components/provider-connection-button";
@@ -15,38 +10,27 @@ import {
 	reconnectGitHubIdentity,
 } from "./actions";
 
-const provider = "github";
-
 export async function GitHubAuthentication() {
-	const credential = await getOauthCredential(provider);
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+
+	if (identityState.status === "unauthorized") {
 		return <GitHubAuthenticationPresentation button={GitHubConnectButton} />;
 	}
-
-	const gitHubClient = buildGitHubUserClient(credential);
-	try {
-		const gitHubUser = await gitHubClient.getUser();
-		const supabaseUser = await getUser();
-		const unlinkable =
-			supabaseUser.identities && supabaseUser.identities.length > 1;
-
+	if (identityState.status === "invalid-credential") {
 		return (
 			<GitHubAuthenticationPresentation
-				gitHubUser={gitHubUser}
-				button={unlinkable ? GitHubDisconnectButton : undefined}
+				button={GitHubReconnectButton}
+				alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
 			/>
 		);
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return (
-				<GitHubAuthenticationPresentation
-					button={GitHubReconnectButton}
-					alert="Your GitHub access token has expired or become invalid. Please reconnect to continue using the service."
-				/>
-			);
-		}
-		throw error;
 	}
+
+	return (
+		<GitHubAuthenticationPresentation
+			gitHubUser={identityState.gitHubUser}
+			button={identityState.unlinkable ? GitHubDisconnectButton : undefined}
+		/>
+	);
 }
 
 function GitHubConnectButton() {

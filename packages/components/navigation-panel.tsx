@@ -570,13 +570,23 @@ function GitHubEventNodeMappingForm({
 
 function GitHubIntegration() {
 	const { status } = useGitHubIntegration();
-
+	const content = () => {
+		switch (status) {
+			case "unauthorized":
+				return <RequireGitHubAuthorization />;
+			case "invalid-credential":
+				return <RequireGitHubReAuthorization />;
+			case "installed":
+			case "not-installed":
+				return <GitHubIntegrationForm />;
+			default:
+				throw new Error(status satisfies never);
+		}
+	};
 	return (
 		<ContentPanel>
 			<ContentPanelHeader>GitHub Integration</ContentPanelHeader>
-			{status === "unauthorized"
-				? RequireGitHubAuthorization()
-				: GitHubIntegrationForm()}
+			{content()}
 		</ContentPanel>
 	);
 }
@@ -592,6 +602,21 @@ function RequireGitHubAuthorization() {
 				to get started and explore the world of Giselle.
 			</div>
 			<GitHubConnectionButton action={connectGitHubIdentityAction} />
+		</div>
+	);
+}
+
+function RequireGitHubReAuthorization() {
+	const { reconnectGitHubIdentityAction } = useGitHubIntegration();
+
+	return (
+		<div className="grid gap-[16px] text-center">
+			<WilliIcon className="w-8 h-8 fill-slate-600 mx-auto" />
+			<div className="text-sm text-gray-600">
+				Your GitHub access token has expired or become invalid. Please reconnect
+				to continue using the service.
+			</div>
+			<GitHubConnectionButton action={reconnectGitHubIdentityAction} />
 		</div>
 	);
 }

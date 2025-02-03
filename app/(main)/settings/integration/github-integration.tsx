@@ -1,10 +1,6 @@
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { Button } from "@/components/ui/button";
-import {
-	buildGitHubUserClient,
-	gitHubAppInstallURL,
-	needsAuthorization,
-} from "@/services/external/github";
+import { getGitHubIdentityState } from "@/services/accounts";
+import { gitHubAppInstallURL } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
 import Link from "next/link";
@@ -12,38 +8,34 @@ import { GitHubAppInstallButton } from "../../../../packages/components/github-a
 
 export async function GitHubIntegration() {
 	const installUrl = await gitHubAppInstallURL();
-	const credential = await getOauthCredential("github");
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+	if (
+		identityState.status === "unauthorized" ||
+		identityState.status === "invalid-credential"
+	) {
 		return <GitHubIntegrationPresentation installationUrl={installUrl} />;
 	}
 
-	const gitHubClient = buildGitHubUserClient(credential);
-	try {
-		const gitHubUser = await gitHubClient.getUser();
-		const { installations } = await gitHubClient.getInstallations();
-		const installationsWithRepos = await Promise.all(
-			installations.map(async (installation) => {
-				const repos = await gitHubClient.getRepositories(installation.id);
-				return {
-					...installation,
-					repositories: repos.repositories,
-				};
-			}),
-		);
+	const gitHubUserClient = identityState.gitHubUserClient;
+	const { installations } = await gitHubUserClient.getInstallations();
+	const installationsWithRepos = await Promise.all(
+		installations.map(async (installation) => {
+			const repos = await gitHubUserClient.getRepositories(installation.id);
+			return {
+				...installation,
+				repositories: repos.repositories,
+			};
+		}),
+	);
+	const gitHubUser = identityState.gitHubUser;
 
-		return (
-			<GitHubIntegrationPresentation
-				account={gitHubUser.login}
-				installations={installationsWithRepos}
-				installationUrl={installUrl}
-			/>
-		);
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return <GitHubIntegrationPresentation installationUrl={installUrl} />;
-		}
-		throw error;
-	}
+	return (
+		<GitHubIntegrationPresentation
+			account={gitHubUser.login}
+			installations={installationsWithRepos}
+			installationUrl={installUrl}
+		/>
+	);
 }
 
 type Repository = components["schemas"]["repository"];
@@ -55,7 +47,7 @@ type InstallationWithRepositories = Installation & {
 type GitHubIntegrationPresentationProps = {
 	account?: string;
 	installations?: InstallationWithRepositories[];
-	installationUrl: string;
+	installationUrl?: string;
 };
 
 function GitHubIntegrationPresentation({
@@ -85,7 +77,7 @@ function GitHubIntegrationPresentation({
 type HeaderProps = {
 	account?: string;
 	installed: boolean;
-	installationUrl: string;
+	installationUrl?: string;
 };
 
 function Header({ account, installed, installationUrl }: HeaderProps) {
@@ -105,7 +97,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 				</div>
 			</div>
 			<div>
-				{account ? (
+				{account && installationUrl ? (
 					<GitHubAppInstallButton
 						installationUrl={installationUrl}
 						installed={installed}

@@ -1,13 +1,9 @@
-import { getOauthCredential } from "@/app/(auth)/lib";
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db } from "@/drizzle";
 import { debugFlag as getDebugFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
-import {
-	type GitHubUserClient,
-	buildGitHubUserClient,
-	needsAuthorization,
-} from "@/services/external/github";
+import { getGitHubIdentityState } from "@/services/accounts";
+import type { GitHubUserClient } from "@/services/external/github";
 import "@xyflow/react/dist/style.css";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
@@ -73,34 +69,30 @@ async function fetchGitHubRepositories(): Promise<{
 	needsAuthorization: boolean;
 	repositories: Repository[];
 }> {
-	const credential = await getOauthCredential("github");
-	if (!credential) {
+	const identityState = await getGitHubIdentityState();
+	if (
+		identityState.status === "unauthorized" ||
+		identityState.status === "invalid-credential"
+	) {
 		return { needsAuthorization: true, repositories: [] };
 	}
 
 	const repositories: Awaited<
 		ReturnType<GitHubUserClient["getRepositories"]>
 	>["repositories"] = [];
-	const gitHubClient = buildGitHubUserClient(credential);
-	try {
-		const { installations } = await gitHubClient.getInstallations();
-		const allRepositories = await Promise.all(
-			installations.map(async (installation) => {
-				const { repositories: repos } = await gitHubClient.getRepositories(
-					installation.id,
-				);
-				return repos;
-			}),
-		);
-		repositories.push(...allRepositories.flat());
-		repositories.sort((a, b) => a.name.localeCompare(b.name));
-		return { needsAuthorization: false, repositories };
-	} catch (error) {
-		if (needsAuthorization(error)) {
-			return { needsAuthorization: true, repositories: [] };
-		}
-		throw error;
-	}
+	const gitHubClient = identityState.gitHubUserClient;
+	const { installations } = await gitHubClient.getInstallations();
+	const allRepositories = await Promise.all(
+		installations.map(async (installation) => {
+			const { repositories: repos } = await gitHubClient.getRepositories(
+				installation.id,
+			);
+			return repos;
+		}),
+	);
+	repositories.push(...allRepositories.flat());
+	repositories.sort((a, b) => a.name.localeCompare(b.name));
+	return { needsAuthorization: false, repositories };
 }
 
 async function getGitHubIntegrationSetting(agentDbId: number) {
