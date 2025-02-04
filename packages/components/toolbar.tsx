@@ -1,9 +1,10 @@
 "use client";
 
 import { TextGenerationIcon } from "@giselles-ai/icons/text-generation";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import * as ToggleGroup from "@radix-ui/react-toggle-group";
 import { FileUpIcon, LetterTextIcon, MousePointer2Icon } from "lucide-react";
-import { type ComponentProps, forwardRef } from "react";
+import type { ComponentProps } from "react";
 import { useToolbar } from "../contexts/toolbar";
 import type { Tool } from "../types";
 import { Tooltip } from "./tooltip";
@@ -73,6 +74,13 @@ export function Toolbar() {
 							<TextGenerationIcon
 								className={"w-[24px] h-[24px] text-black-30 fill-current"}
 							/>
+						</ToggleGroupItem>
+						<ToggleGroupItem
+							value="addGitHubNode"
+							tooltip="GitHub"
+							shortcut="h"
+						>
+							<SiGithub className={"w-[24px] h-[24px] text-black-30"} />
 						</ToggleGroupItem>
 					</div>
 				</ToggleGroup.Root>
