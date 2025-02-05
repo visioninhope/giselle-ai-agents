@@ -299,7 +299,10 @@ export function PropertiesPanel() {
 								<TabsTrigger value="File">File</TabsTrigger>
 							)}
 							{selectedNode?.content?.type === "github" && (
-								<TabsTrigger value="GitHub">GitHub</TabsTrigger>
+								<>
+									<TabsTrigger value="GitHub">GitHub</TabsTrigger>
+									<TabsTrigger value="Result">Result</TabsTrigger>
+								</>
 							)}
 						</TabsList>
 					</div>
@@ -332,6 +335,17 @@ export function PropertiesPanel() {
 										onClick={() => executeNode(selectedNode.id)}
 									>
 										Generate
+									</button>
+								</div>
+							)}
+							{selectedNode.content.type === "github" && (
+								<div className="">
+									<button
+										type="button"
+										className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
+										onClick={() => executeNode(selectedNode.id)}
+									>
+										Execute
 									</button>
 								</div>
 							)}

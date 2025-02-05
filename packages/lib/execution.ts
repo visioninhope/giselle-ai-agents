@@ -148,8 +148,17 @@ interface TextGenerationSource extends ExecutionSourceBase {
 	title: string;
 	content: string;
 }
+interface GitHubSource extends ExecutionSourceBase {
+	type: "github";
+	title: string;
+	content: string;
+}
 
-type ExecutionSource = TextSource | TextGenerationSource | FileSource;
+type ExecutionSource =
+	| TextSource
+	| TextGenerationSource
+	| FileSource
+	| GitHubSource;
 async function resolveSources(
 	sources: NodeHandle[],
 	context: ExecutionContext,
@@ -231,6 +240,16 @@ async function resolveSources(
 						type: "textGeneration",
 						title: generatedArtifact.object.title,
 						content: generatedArtifact.object.content,
+						nodeId: node.id,
+					} satisfies ExecutionSource;
+				}
+				case "github": {
+					// FIXME: returning sample data
+					// returns github resouce (issue, pull request, comment, etc.) is ideal
+					return {
+						type: "github",
+						title: "sample title",
+						content: "sample content",
 						nodeId: node.id,
 					} satisfies ExecutionSource;
 				}
@@ -405,6 +424,21 @@ async function performFlowExecution(
 				messages: {
 					plan: object.plan,
 					description: object.description,
+				},
+			} satisfies TextArtifactObject;
+		}
+		case "github": {
+			// FIXME: scaffold
+			console.log("========== GITHUB NODE ==========");
+			console.log({ context });
+			console.log("========== /GITHUB NODE/ ==========");
+			return {
+				type: "text",
+				title: "GitHub Issue Comment",
+				content: "This is a sample comment",
+				messages: {
+					plan: "This is a sample plan",
+					description: "This is a sample description",
 				},
 			} satisfies TextArtifactObject;
 		}
