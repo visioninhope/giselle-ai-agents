@@ -1,10 +1,18 @@
 import { buildAppInstallationClient } from "@/services/external/github";
 import { openai } from "@ai-sdk/openai";
 import type { Octokit } from "@octokit/core";
-import { generateText, tool } from "ai";
+import {
+	InvalidToolArgumentsError,
+	NoSuchToolError,
+	ToolExecutionError,
+	generateText,
+	tool,
+} from "ai";
 import { z } from "zod";
 
 export class GitHubAgent {
+	readonly MAX_STEPS = 5;
+
 	private client: Octokit;
 	private constructor(client: Octokit) {
 		this.client = client;
@@ -16,66 +24,47 @@ export class GitHubAgent {
 	}
 
 	public async execute(instruction: string) {
-		const res = await generateText({
-			// model: anthropic("claude-3-5-sonnet-latest"),
-			model: openai("gpt-4o-mini"),
-			tools: this.tools,
-			maxSteps: 5,
-			system:
-				"You are an expert of GitHub API." +
-				"Follow the instruction carefully and accurately." +
-				"Don't execute mutation, only query.",
-			prompt: instruction,
-		});
+		try {
+			const res = await generateText({
+				// model: anthropic("claude-3-5-sonnet-latest"),
+				model: openai("gpt-4o-mini"),
+				tools: this.tools,
+				maxSteps: this.MAX_STEPS,
+				toolChoice: "required",
+				system:
+					"You are an expert of GitHub API." +
+					"Follow the instruction carefully and accurately." +
+					"Schema can be introspected through introspect tool." +
+					"Don't execute mutation, only query." +
+					"If user requests to mutate GitHub data, you MUST reject the request.",
+				prompt: instruction,
+			});
 
-		return res.text;
+			const lastToolCall = res.toolCalls.at(-1);
+			if (lastToolCall != null && "steps" in lastToolCall.args) {
+				for (const step of lastToolCall.args.steps) {
+					console.log({ step });
+				}
+				console.log({ answer: lastToolCall.args.answer });
+				return lastToolCall.args.answer;
+			}
+			console.log(JSON.stringify(res.toolCalls, null, 2));
+			return res.text;
+		} catch (error: unknown) {
+			if (NoSuchToolError.isInstance(error)) {
+				return "Error: The requested tool does not exist. Please check the available tools and try again.";
+			}
+			if (InvalidToolArgumentsError.isInstance(error)) {
+				return "Error: Invalid arguments provided to tool. Please check the tool documentation and try again.";
+			}
+			if (ToolExecutionError.isInstance(error)) {
+				return "Error: An error occurred while executing the tool. Please try again.";
+			}
+			throw error;
+		}
 	}
 
 	public tools = {
-		introspectSchema: tool({
-			description:
-				"Executes a GraphQL introspection query to fetch all types defined in the schema.",
-			parameters: z.object({}),
-			execute: async () => {
-				console.log("========= introspectSchema =========");
-				const res = await this.client.request("GET /graphql/schema", {
-					query: `query {
-            __schema {
-              types {
-                name
-                kind
-                description
-                fields {
-                  name
-                }
-              }
-            }
-          }`,
-				});
-				return JSON.stringify(res.data, null, 2);
-			},
-		}),
-		introspectType: tool({
-			description:
-				"Executes a GraphQL introspection query to retrieve information about a specific type.",
-			parameters: z.object({ type: z.string() }),
-			execute: async ({ type }) => {
-				console.log("========= introspectType =========");
-				const res = await this.client.request("GET /graphql/schema", {
-					query: `query {
-            __type(name: ${type}) {
-              name
-              kind
-              description
-              fields {
-                name
-              }
-            }
-          }`,
-				});
-				return JSON.stringify(res.data, null, 2);
-			},
-		}),
 		query: tool({
 			description: "Executes a GitHub GraphQL query with optional variables.",
 			parameters: z.object({
@@ -83,61 +72,24 @@ export class GitHubAgent {
 				variables: z.record(z.any()).optional(),
 			}),
 			execute: async ({ query, variables }) => {
-				console.log("Executing GraphQL query...");
-				console.log({ query, variables });
 				const res = await this.client.request("POST /graphql", {
 					query,
 					variables,
 				});
-				return JSON.stringify(res.data, null, 2);
+				return res.data;
 			},
 		}),
-		// getRepository: tool({
-		// 	description: "Get a repository",
-		// 	parameters: z.object({ owner: z.string(), repo: z.string() }),
-		// 	execute: async ({ owner, repo }) => {
-		// 		const res = await this.client.request("GET /repos/{owner}/{repo}", {
-		// 			owner,
-		// 			repo,
-		// 		});
-		// 		return JSON.stringify(res.data, null, 2);
-		// 	},
-		// }),
-		// getIssues: tool({
-		// 	description: "List issues from a repository",
-		// 	parameters: z.object({
-		// 		owner: z.string(),
-		// 		repo: z.string(),
-		// 	}),
-		// 	execute: async ({ owner, repo }) => {
-		// 		const res = await this.client.request(
-		// 			"GET /repos/{owner}/{repo}/issues",
-		// 			{
-		// 				owner,
-		// 				repo,
-		// 			},
-		// 		);
-		// 		return JSON.stringify(res.data, null, 2);
-		// 	},
-		// }),
-		// getIssue: tool({
-		// 	description: "Get issue from a repository",
-		// 	parameters: z.object({
-		// 		owner: z.string(),
-		// 		repo: z.string(),
-		// 		issueNumber: z.number(),
-		// 	}),
-		// 	execute: async ({ owner, repo, issueNumber }) => {
-		// 		const res = await this.client.request(
-		// 			"GET /repos/{owner}/{repo}/issues/{issue_number}",
-		// 			{
-		// 				owner,
-		// 				repo,
-		// 				issue_number: issueNumber,
-		// 			},
-		// 		);
-		// 		return JSON.stringify(res.data, null, 2);
-		// 	},
-		// }),
+		answer: tool({
+			description: "Generates a response based on the provided question.",
+			parameters: z.object({
+				steps: z.array(
+					z.object({
+						reasoning: z.string(),
+						apiCallDescription: z.string(),
+					}),
+				),
+				answer: z.string(),
+			}),
+		}),
 	};
 }
