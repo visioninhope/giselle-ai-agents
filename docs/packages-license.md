@@ -3150,7 +3150,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/expect"></a>
-### @vitest/expect v2.1.8
+### @vitest/expect v2.1.9
 #### 
 
 ##### Paths
@@ -3161,7 +3161,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/mocker"></a>
-### @vitest/mocker v2.1.8
+### @vitest/mocker v2.1.9
 #### 
 
 ##### Paths
@@ -3172,7 +3172,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/pretty-format"></a>
-### @vitest/pretty-format v2.1.8
+### @vitest/pretty-format v2.1.9
 #### 
 
 ##### Paths
@@ -3183,7 +3183,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/runner"></a>
-### @vitest/runner v2.1.8
+### @vitest/runner v2.1.9
 #### 
 
 ##### Paths
@@ -3194,7 +3194,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/snapshot"></a>
-### @vitest/snapshot v2.1.8
+### @vitest/snapshot v2.1.9
 #### 
 
 ##### Paths
@@ -3205,7 +3205,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/spy"></a>
-### @vitest/spy v2.1.8
+### @vitest/spy v2.1.9
 #### 
 
 ##### Paths
@@ -3216,7 +3216,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/utils"></a>
-### @vitest/utils v2.1.8
+### @vitest/utils v2.1.9
 #### 
 
 ##### Paths
@@ -9380,7 +9380,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="vite-node"></a>
-### vite-node v2.1.8
+### vite-node v2.1.9
 #### 
 
 ##### Paths
@@ -9402,7 +9402,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="vitest"></a>
-### vitest v2.1.8
+### vitest v2.1.9
 #### 
 
 ##### Paths
