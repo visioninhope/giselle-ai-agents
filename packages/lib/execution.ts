@@ -43,6 +43,7 @@ import type {
 	TextGenerateActionContent,
 } from "../types";
 import { AgentTimeNotAvailableError } from "./errors";
+import { GitHubAgent } from "./github-agent";
 import { textGenerationPrompt } from "./prompts";
 import { langfuseModel, toErrorWithMessage } from "./utils";
 
@@ -428,14 +429,16 @@ async function performFlowExecution(
 			} satisfies TextArtifactObject;
 		}
 		case "github": {
-			// FIXME: scaffold
-			console.log("========== GITHUB NODE ==========");
-			console.log({ context });
-			console.log("========== /GITHUB NODE/ ==========");
+			const installationId = 60443388;
+			const agent = await GitHubAgent.build(installationId);
+
+			const instruction = node.content.instruction;
+			const result = await agent.execute(instruction);
+
 			return {
 				type: "text",
-				title: "GitHub Issue Comment",
-				content: "This is a sample comment",
+				title: "GitHub API Response",
+				content: result,
 				messages: {
 					plan: "This is a sample plan",
 					description: "This is a sample description",
