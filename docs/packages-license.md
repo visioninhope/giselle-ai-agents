@@ -4811,7 +4811,7 @@ CC-BY-4.0 permitted
 
 
 <a name="enhanced-resolve"></a>
-### enhanced-resolve v5.18.0
+### enhanced-resolve v5.18.1
 #### 
 
 ##### Paths
@@ -6340,7 +6340,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="loupe"></a>
-### loupe v3.1.2
+### loupe v3.1.3
 #### 
 
 ##### Paths
@@ -9369,7 +9369,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="vite"></a>
-### vite v5.4.11
+### vite v5.4.14
 #### 
 
 ##### Paths
