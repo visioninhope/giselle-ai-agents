@@ -245,12 +245,17 @@ async function resolveSources(
 					} satisfies ExecutionSource;
 				}
 				case "github": {
-					// FIXME: returning sample data
-					// returns github resouce (issue, pull request, comment, etc.) is ideal
+					const generatedArtifact = artifactResolver(node.id, context);
+					if (
+						generatedArtifact === null ||
+						generatedArtifact.type !== "generatedArtifact"
+					) {
+						return null;
+					}
 					return {
 						type: "github",
-						title: "sample title",
-						content: "sample content",
+						title: generatedArtifact.object.title,
+						content: generatedArtifact.object.content,
 						nodeId: node.id,
 					} satisfies ExecutionSource;
 				}
@@ -437,11 +442,11 @@ async function performFlowExecution(
 
 			return {
 				type: "text",
-				title: "GitHub API Response",
-				content: result,
+				title: result.title,
+				content: result.content,
 				messages: {
-					plan: "This is a sample plan",
-					description: "This is a sample description",
+					plan: result.plan,
+					description: result.description,
 				},
 			} satisfies TextArtifactObject;
 		}

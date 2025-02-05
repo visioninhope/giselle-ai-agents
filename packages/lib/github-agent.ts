@@ -4,11 +4,31 @@ import type { Octokit } from "@octokit/core";
 import {
 	InvalidToolArgumentsError,
 	NoSuchToolError,
+	Output,
 	ToolExecutionError,
 	generateText,
 	tool,
 } from "ai";
 import { z } from "zod";
+
+export const githubArtifactSchema = z.object({
+	plan: z
+		.string()
+		.describe(
+			"How do you create the artifact. It must includes what resource to retrieve and what API calls to make.",
+		),
+	title: z.string().describe("The title of the artifact"),
+	content: z
+		.string()
+		.describe("The content of the artefact formatted markdown."),
+	description: z
+		.string()
+		.describe(
+			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better.This includes what API calls are made and what resources are retrieved.",
+		),
+});
+
+export type GitHubArtifact = z.infer<typeof githubArtifactSchema>;
 
 export class GitHubAgent {
 	readonly MAX_STEPS = 5;
@@ -26,11 +46,12 @@ export class GitHubAgent {
 	public async execute(instruction: string) {
 		try {
 			const res = await generateText({
-				// model: anthropic("claude-3-5-sonnet-latest"),
 				model: openai("gpt-4o-mini"),
-				tools: this.tools,
+				tools: this.tools(),
 				maxSteps: this.MAX_STEPS,
-				toolChoice: "required",
+				experimental_output: Output.object({
+					schema: githubArtifactSchema,
+				}),
 				system:
 					"You are an expert of GitHub API." +
 					"Follow the instruction carefully and accurately." +
@@ -40,56 +61,43 @@ export class GitHubAgent {
 				prompt: instruction,
 			});
 
-			const lastToolCall = res.toolCalls.at(-1);
-			if (lastToolCall != null && "steps" in lastToolCall.args) {
-				for (const step of lastToolCall.args.steps) {
-					console.log({ step });
-				}
-				console.log({ answer: lastToolCall.args.answer });
-				return lastToolCall.args.answer;
-			}
-			console.log(JSON.stringify(res.toolCalls, null, 2));
-			return res.text;
+			return res.experimental_output;
 		} catch (error: unknown) {
 			if (NoSuchToolError.isInstance(error)) {
-				return "Error: The requested tool does not exist. Please check the available tools and try again.";
+				throw new Error(
+					"The requested tool does not exist. Please check the available tools and try again.",
+				);
 			}
 			if (InvalidToolArgumentsError.isInstance(error)) {
-				return "Error: Invalid arguments provided to tool. Please check the tool documentation and try again.";
+				throw new Error(
+					"Invalid arguments provided to tool. Please check the tool documentation and try again.",
+				);
 			}
 			if (ToolExecutionError.isInstance(error)) {
-				return "Error: An error occurred while executing the tool. Please try again.";
+				throw new Error(
+					"An error occurred while executing the tool. Please try again.",
+				);
 			}
 			throw error;
 		}
 	}
 
-	public tools = {
-		query: tool({
-			description: "Executes a GitHub GraphQL query with optional variables.",
-			parameters: z.object({
-				query: z.string(),
-				variables: z.record(z.any()).optional(),
+	private tools() {
+		return {
+			query: tool({
+				description: "Executes a GitHub GraphQL query with optional variables.",
+				parameters: z.object({
+					query: z.string(),
+					variables: z.record(z.any()).optional(),
+				}),
+				execute: async ({ query, variables }) => {
+					const res = await this.client.request("POST /graphql", {
+						query,
+						variables,
+					});
+					return res.data;
+				},
 			}),
-			execute: async ({ query, variables }) => {
-				const res = await this.client.request("POST /graphql", {
-					query,
-					variables,
-				});
-				return res.data;
-			},
-		}),
-		answer: tool({
-			description: "Generates a response based on the provided question.",
-			parameters: z.object({
-				steps: z.array(
-					z.object({
-						reasoning: z.string(),
-						apiCallDescription: z.string(),
-					}),
-				),
-				answer: z.string(),
-			}),
-		}),
-	};
+		};
+	}
 }
