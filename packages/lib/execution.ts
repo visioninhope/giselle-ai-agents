@@ -43,8 +43,12 @@ import type {
 	TextGenerateActionContent,
 } from "../types";
 import { AgentTimeNotAvailableError } from "./errors";
-import { GitHubAgent, fetchInstallationId } from "./github-agent";
-import { textGenerationPrompt } from "./prompts";
+import {
+	GitHubAgent,
+	fetchGitHubIntegrationSetting,
+	fetchInstallationId,
+} from "./github-agent";
+import { gitHubAgentPrompt, textGenerationPrompt } from "./prompts";
 import { langfuseModel, toErrorWithMessage } from "./utils";
 
 function resolveLanguageModel(
@@ -434,14 +438,18 @@ async function performFlowExecution(
 			} satisfies TextArtifactObject;
 		}
 		case "github": {
-			const installationId = await fetchInstallationId(context.agentId);
+			const integrationSetting = await fetchGitHubIntegrationSetting(
+				context.agentId,
+			);
+			const installationId = await fetchInstallationId(integrationSetting);
 			const agent = await GitHubAgent.build(installationId);
 
 			const actionSources = await resolveSources(node.content.sources, context);
-			const promptTemplate = HandleBars.compile(textGenerationPrompt);
+			const promptTemplate = HandleBars.compile(gitHubAgentPrompt);
 			const prompt = promptTemplate({
 				instruction: node.content.instruction,
 				sources: actionSources,
+				integrationSetting: integrationSetting,
 			});
 
 			const result = await agent.execute(prompt);

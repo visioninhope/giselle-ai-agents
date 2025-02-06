@@ -83,10 +83,11 @@ export const gitHubAgentPrompt = `You are a GitHub API expert tasked with analyz
 {{instruction}}
 </instruction>
 
-{{#if requirement}}
-<requirement>
-{{requirement}}
-</requirement>
+{{#if integrationSetting}}
+<integration_setting>
+Repository: {{integrationSetting.repositoryFullName}}
+Event: {{integrationSetting.event}}
+</integration_setting>
 {{/if}}
 
 ${sources}

@@ -16,10 +16,9 @@ import {
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import type { AgentId } from "../types";
+import type { GitHubIntegrationSetting } from "./github";
 
-// Fetch installation id from repository name
-// FIXME: add githubIntegrationSetting.installationId column is preferred
-export async function fetchInstallationId(agentId: AgentId) {
+export async function fetchGitHubIntegrationSetting(agentId: AgentId) {
 	const res = await db
 		.select()
 		.from(githubIntegrationSettings)
@@ -27,13 +26,18 @@ export async function fetchInstallationId(agentId: AgentId) {
 		.where(eq(agents.id, agentId))
 		.limit(1);
 	if (res.length === 0) {
-		throw new Error("Installation ID not found");
+		throw new Error("GitHub integration setting not found");
 	}
-	const setting = res[0];
+	return res[0].github_integration_settings;
+}
 
+// Fetch installation id from repository name
+// FIXME: add githubIntegrationSetting.installationId column is preferred
+export async function fetchInstallationId(
+	integrationSetting: GitHubIntegrationSetting,
+) {
 	const appClient = await buildAppClient();
-	const [owner, repo] =
-		setting.github_integration_settings.repositoryFullName.split("/");
+	const [owner, repo] = integrationSetting.repositoryFullName.split("/");
 	const { data: installation } = await appClient.request(
 		"GET /repos/{owner}/{repo}/installation",
 		{
