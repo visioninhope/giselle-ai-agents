@@ -88,9 +88,8 @@ async function handleIssueComment(
 	const payload = event.payload;
 	const command = parseCommand(payload.comment.body);
 	if (command === null) {
-		throw new WebhookPayloadError(
-			`Command not found. payload: ${JSON.stringify(payload)}`,
-		);
+		// nothing to do
+		return;
 	}
 	if (payload.installation === undefined) {
 		throw new WebhookPayloadError(
