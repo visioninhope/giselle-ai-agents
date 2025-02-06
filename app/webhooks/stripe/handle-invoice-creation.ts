@@ -16,5 +16,6 @@ export async function handleInvoiceCreation(invoice: Stripe.Invoice) {
 		return;
 	}
 
+	// When a subscription is canceled, we should charge for usage-based billing from the previous billing cycle. The final invoice, which includes these charges, will be automatically created but will not be processed for payment. Therefore, we need to handle this case manually.
 	await stripe.invoices.pay(invoice.id);
 }
