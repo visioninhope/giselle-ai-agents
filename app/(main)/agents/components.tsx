@@ -117,7 +117,9 @@ export function DuplicateAgentButton({
 					<AlertDialogCancel className="border-2 bg-background hover:bg-accent hover:text-accent-foreground">
 						Cancel
 					</AlertDialogCancel>
-					<AlertDialogAction onClick={handleConfirm}>Copy</AlertDialogAction>
+					<AlertDialogAction onClick={handleConfirm}>
+						Duplicate
+					</AlertDialogAction>
 				</AlertDialogFooter>
 			</AlertDialogContent>
 		</AlertDialog>
