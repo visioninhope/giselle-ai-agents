@@ -51,103 +51,159 @@ export async function copyAgent(
 	if (agent === undefined || agent.graphUrl === null) {
 		return { result: "error", message: `${agentId} is not found.` };
 	}
-	const [user, team, graph] = await Promise.all([
-		fetchCurrentUser(),
-		fetchCurrentTeam(),
-		fetch(agent.graphUrl).then((res) => res.json() as unknown as Graph),
-	]);
-	if (agent.teamDbId !== team.dbId) {
+
+	try {
+		const startTime = Date.now();
+		const logger = createLogger("copyAgent");
+
+		const [user, team, graph] = await Promise.all([
+			fetchCurrentUser(),
+			fetchCurrentTeam(),
+			fetch(agent.graphUrl).then((res) => res.json() as unknown as Graph),
+		]);
+		if (agent.teamDbId !== team.dbId) {
+			return {
+				result: "error",
+				message: "You are not allowed to duplicate this agent",
+			};
+		}
+
+		const newNodes = await Promise.all(
+			graph.nodes.map(async (node) => {
+				if (node.content.type !== "files") {
+					return node;
+				}
+				const newData = await Promise.all(
+					node.content.data.map(async (fileData) => {
+						if (fileData.status !== "completed") {
+							return null;
+						}
+						const newFileId = createFileId();
+						const { blobList } = await withCountMeasurement(
+							logger,
+							async () => {
+								const result = await list({
+									prefix: buildFileFolderPath(fileData.id),
+								});
+								const size = result.blobs.reduce(
+									(sum, blob) => sum + blob.size,
+									0,
+								);
+								return {
+									blobList: result,
+									size,
+								};
+							},
+							ExternalServiceName.VercelBlob,
+							startTime,
+							VercelBlobOperation.List,
+						);
+
+						let newFileBlobUrl = "";
+						let newTextDataUrl = "";
+
+						await Promise.all(
+							blobList.blobs.map(async (blob) => {
+								const { url: copyUrl } = await withCountMeasurement(
+									logger,
+									async () => {
+										const copyResult = await copy(
+											blob.url,
+											pathJoin(
+												buildFileFolderPath(newFileId),
+												pathnameToFilename(blob.pathname),
+											),
+											{
+												addRandomSuffix: true,
+												access: "public",
+											},
+										);
+										return {
+											url: copyResult.url,
+											size: blob.size,
+										};
+									},
+									ExternalServiceName.VercelBlob,
+									startTime,
+									VercelBlobOperation.Copy,
+								);
+
+								if (blob.url === fileData.fileBlobUrl) {
+									newFileBlobUrl = copyUrl;
+								}
+								if (blob.url === fileData.textDataUrl) {
+									newTextDataUrl = copyUrl;
+								}
+							}),
+						);
+
+						return {
+							...fileData,
+							id: newFileId,
+							fileBlobUrl: newFileBlobUrl,
+							textDataUrl: newTextDataUrl,
+						};
+					}),
+				).then((data) => data.filter((d) => d !== null));
+				return {
+					...node,
+					content: {
+						...node.content,
+						data: newData,
+					},
+				} as Node;
+			}),
+		);
+
+		const newGraphId = createGraphId();
+		const { url } = await putGraph({
+			...graph,
+			id: newGraphId,
+			nodes: newNodes,
+		});
+
+		const newAgentId = `agnt_${createId()}` as AgentId;
+		const insertResult = await db
+			.insert(agents)
+			.values({
+				id: newAgentId,
+				name: `Copy of ${agent.name ?? agentId}`,
+				teamDbId: team.dbId,
+				creatorDbId: user.dbId,
+				graphUrl: url,
+				graphv2: {
+					agentId: newAgentId,
+					nodes: [],
+					xyFlow: {
+						nodes: [],
+						edges: [],
+					},
+					connectors: [],
+					artifacts: [],
+					webSearches: [],
+					mode: "edit",
+					flowIndexes: [],
+				},
+			})
+			.returning({ id: agents.id });
+
+		if (insertResult.length === 0) {
+			return {
+				result: "error",
+				message: "Failed to save the duplicated agent",
+			};
+		}
+
+		waitForTelemetryExport();
+		const newAgent = insertResult[0];
+		return { result: "success", agentId: newAgent.id };
+	} catch (error) {
+		console.error("Failed to copy agent:", error);
 		return {
 			result: "error",
-			message: "You are not allowed to duplicate this agent",
+			message: `Failed to copy agent: ${error instanceof Error ? error.message : "Unknown error"}`,
 		};
 	}
-	const newNodes = await Promise.all(
-		graph.nodes.map(async (node) => {
-			if (node.content.type !== "files") {
-				return node;
-			}
-			const newData = await Promise.all(
-				node.content.data.map(async (fileData) => {
-					if (fileData.status !== "completed") {
-						return null;
-					}
-					const newFileId = createFileId();
-					const blobList = await list({
-						prefix: buildFileFolderPath(fileData.id),
-					});
-					let newFileBlobUrl = "";
-					let newTextDataUrl = "";
-					await Promise.all(
-						blobList.blobs.map(async (blob) => {
-							const copyResult = await copy(
-								blob.url,
-								pathJoin(
-									buildFileFolderPath(newFileId),
-									pathnameToFilename(blob.pathname),
-								),
-								{
-									addRandomSuffix: true,
-									access: "public",
-								},
-							);
-							if (blob.url === fileData.fileBlobUrl) {
-								newFileBlobUrl = copyResult.url;
-							}
-							if (blob.url === fileData.textDataUrl) {
-								newTextDataUrl = copyResult.url;
-							}
-						}),
-					);
-					return {
-						...fileData,
-						id: newFileId,
-						fileBlobUrl: newFileBlobUrl,
-						textDataUrl: newTextDataUrl,
-					};
-				}),
-			).then((data) => data.filter((d) => d !== null));
-			return {
-				...node,
-				content: {
-					...node.content,
-					data: newData,
-				},
-			} as Node;
-		}),
-	);
-	const newGraphId = createGraphId();
-	const { url } = await putGraph({ ...graph, id: newGraphId, nodes: newNodes });
-
-	const newAgentId = `agnt_${createId()}` as AgentId;
-	const insertResult = await db
-		.insert(agents)
-		.values({
-			id: newAgentId,
-			name: `Copy of ${agent.name ?? agentId}`,
-			teamDbId: team.dbId,
-			creatorDbId: user.dbId,
-			graphUrl: url,
-			graphv2: {
-				agentId: newAgentId,
-				nodes: [],
-				xyFlow: {
-					nodes: [],
-					edges: [],
-				},
-				connectors: [],
-				artifacts: [],
-				webSearches: [],
-				mode: "edit",
-				flowIndexes: [],
-			},
-		})
-		.returning({ id: agents.id });
-	if (insertResult.length === 0) {
-		return { result: "error", message: "Failed to save the duplicated agent" };
-	}
-	const newAgent = insertResult[0];
-	return { result: "success", agentId: newAgent.id };
 }
 
 export async function deleteAgent(
