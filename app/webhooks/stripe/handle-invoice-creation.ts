@@ -16,15 +16,5 @@ export async function handleInvoiceCreation(invoice: Stripe.Invoice) {
 		return;
 	}
 
-	await finalizeAndPayInvoice(invoice.id);
-}
-
-async function finalizeAndPayInvoice(invoiceId: string) {
-	try {
-		await stripe.invoices.finalizeInvoice(invoiceId);
-		await stripe.invoices.pay(invoiceId);
-	} catch (error) {
-		console.error(`Error processing invoice ${invoiceId}:`, error);
-		throw new Error("Failed to process invoice");
-	}
+	await stripe.invoices.pay(invoice.id);
 }
