@@ -68,7 +68,6 @@ import type {
 	Text,
 	TextContent,
 	TextGenerateActionContent,
-	TextGeneration,
 } from "../types";
 import { Block } from "./block";
 import ClipboardButton from "./clipboard-button";
@@ -759,12 +758,17 @@ function NodeDropdown({
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align="end" sideOffset={6}>
 				<DropdownMenuRadioGroup onValueChange={handleValueChange}>
-					<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
-					{textGenerationNodes.map((node) => (
-						<DropdownMenuRadioItem value={node.id} key={node.id}>
-							{node.name}
-						</DropdownMenuRadioItem>
-					))}
+					{textGenerationNodes.length > 0 && (
+						<>
+							<DropdownMenuLabel>Text Generator</DropdownMenuLabel>
+							{textGenerationNodes.map((node) => (
+								<DropdownMenuRadioItem value={node.id} key={node.id}>
+									{node.name}
+								</DropdownMenuRadioItem>
+							))}
+						</>
+					)}
+
 					{textNodes.length > 0 && (
 						<>
 							<DropdownMenuSeparator />
@@ -2218,12 +2222,15 @@ function TabContentGitHub({
 	const {
 		graph: { nodes, connections },
 	} = useGraph();
-	const connectableTextNodes: Text[] = nodes
-		.filter((node) => node.content.type === "text")
-		.map((node) => node as Text);
-	const connectableTextGenerationNodes: TextGeneration[] = nodes
-		.filter((node) => node.content.type === "textGeneration")
-		.map((node) => node as TextGeneration);
+	const connectableTextNodes = nodes.filter(
+		(node) => node.content.type === "text",
+	);
+	const connectableTextGenerationNodes = nodes.filter(
+		(node) => node.content.type === "textGeneration",
+	);
+	const connectableGitHubNodes = nodes.filter(
+		(node) => node.content.type === "github",
+	);
 	const sourceNodes = useMemo(
 		() =>
 			content.sources
@@ -2257,6 +2264,7 @@ function TabContentGitHub({
 							nodes={[
 								...connectableTextNodes,
 								...connectableTextGenerationNodes,
+								...connectableGitHubNodes,
 							]}
 							onValueChange={(node) => {
 								onSourceConnect?.(node);
@@ -2304,6 +2312,7 @@ function TabContentGitHub({
 								nodes={[
 									...connectableTextNodes,
 									...connectableTextGenerationNodes,
+									...connectableGitHubNodes,
 								]}
 								onValueChange={(node) => {
 									onSourceConnect?.(node);
