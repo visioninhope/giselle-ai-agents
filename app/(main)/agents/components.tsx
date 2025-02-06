@@ -22,7 +22,7 @@ import type { AgentId } from "@/services/agents";
 import { Toast } from "@giselles-ai/components/toast";
 import { useToast } from "@giselles-ai/contexts/toast";
 import { CopyIcon, LoaderCircleIcon, TrashIcon } from "lucide-react";
-import { redirect } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
 import { useRef, useTransition } from "react";
 import { useFormStatus } from "react-dom";
 import { copyAgent, deleteAgent } from "./actions";
@@ -137,7 +137,7 @@ export function DeleteAgentButton({
 	const { addToast } = useToast();
 	const [isPending, startTransition] = useTransition();
 	const formRef = useRef<HTMLFormElement>(null);
-
+	const router = useRouter();
 	const handleConfirm = () => {
 		formRef.current?.requestSubmit();
 	};
@@ -147,7 +147,7 @@ export function DeleteAgentButton({
 			const res = await action(formData);
 			switch (res.result) {
 				case "success":
-					addToast({ message: res.message, type: "success" });
+					router.refresh();
 					break;
 				case "error":
 					addToast({ message: res.message, type: "error" });
