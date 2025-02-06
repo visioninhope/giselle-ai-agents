@@ -25,6 +25,10 @@ interface AgentDuplicationError {
 }
 type AgentDuplicationResult = AgentDuplicationSuccess | AgentDuplicationError;
 
+type DeleteAgentResult =
+	| { result: "success"; message: string }
+	| { result: "error"; message: string };
+
 export async function copyAgent(
 	agentId: AgentId,
 	_formData: FormData,
@@ -136,4 +140,15 @@ export async function copyAgent(
 	}
 	const newAgent = insertResult[0];
 	return { result: "success", agentId: newAgent.id };
+}
+
+export async function deleteAgent(
+	agentId: string,
+	formData: FormData,
+): Promise<DeleteAgentResult> {
+	// TODO: Implement actual deletion logic
+	return {
+		result: "success" as const,
+		message: "Agent deleted successfully",
+	};
 }

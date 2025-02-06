@@ -5,7 +5,7 @@ import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { and, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
-import { DuplicateAgentButton, Toasts } from "./components";
+import { DeleteAgentButton, DuplicateAgentButton, Toasts } from "./components";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
@@ -58,6 +58,7 @@ async function AgentList() {
 							</div>
 						</Link>
 						<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
+						<DeleteAgentButton agentId={agent.id} agentName={agent.name} />
 					</div>
 				))}
 			</div>
