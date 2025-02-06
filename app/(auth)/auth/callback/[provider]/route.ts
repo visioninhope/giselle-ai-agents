@@ -2,15 +2,14 @@
 import { db, oauthCredentials, supabaseUserMappings, users } from "@/drizzle";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
-import { initializeAccount } from "@/services/accounts";
+import { type OAuthProvider, initializeAccount } from "@/services/accounts";
 import type { Session, User } from "@supabase/supabase-js";
 import { eq } from "drizzle-orm";
 import { type NextRequest, NextResponse } from "next/server";
-import type { Provider } from "../../../lib/";
 
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: Promise<{ provider: Provider }> },
+	{ params }: { params: Promise<{ provider: OAuthProvider }> },
 ) {
 	const { searchParams, origin } = new URL(request.url);
 	const { provider } = await params;

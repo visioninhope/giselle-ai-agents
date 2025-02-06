@@ -12,6 +12,16 @@
 
 Giselle is an open source AI for agentic workflows, enabling seamless human-AI collaboration.
 
+## Using Giselle
+
+### Cloud
+
+We host [Giselle](https://giselles.ai/) as a cloud service for anyone to use instantly. It has all the same features as the self-hosted version, and includes 30 minutes of free Agent time per month in the free plan.
+
+### Self-hosting
+
+Follow this [starter guide](CONTRIBUTING.md#development-environment-setup) to get Giselle running in your environment.
+
 ## Roadmap
 
 Giselle is currently still in active development. The roadmap for the public repository is currently being created, and once it's finalized, we will update this README accordingly.

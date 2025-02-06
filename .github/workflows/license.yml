@@ -23,6 +23,8 @@ jobs:
     timeout-minutes: 10
     env:
       LICENSE_REPORT: docs/packages-license.md
+    permissions:
+      contents: write
     steps:
       - name: Check if running in a fork
         id: fork-check
@@ -51,11 +53,11 @@ jobs:
         with:
           path: |
             .github/workflows/license.yml
-            bun.lockb
+            pnpm-lock.yaml
             config/dependency_decisions.yml
             config/license_finder.yml
             package.json
-          key: license-${{ runner.os }}-${{ hashFiles('.github/workflows/license.yml', 'bun.lockb', 'config/dependency_decisions.yml', 'config/license_finder.yml', 'package.json') }}
+          key: license-${{ runner.os }}-${{ hashFiles('.github/workflows/license.yml', 'pnpm-lock.yaml', 'config/dependency_decisions.yml', 'config/license_finder.yml', 'package.json') }}
       - name: Determine if files changed
         id: determine
         run: |
@@ -64,11 +66,9 @@ jobs:
           else
             echo "files_changed=true" >> "$GITHUB_OUTPUT"
           fi
-      - uses: oven-sh/setup-bun@v2
+      - uses: pnpm/action-setup@v4
         if: steps.determine.outputs.files_changed == 'true'
-        with:
-          bun-version-file: "package.json"
-      - run: bun install
+      - run: pnpm install
         if: steps.determine.outputs.files_changed == 'true'
       - uses: ruby/setup-ruby@v1
         if: steps.determine.outputs.files_changed == 'true'

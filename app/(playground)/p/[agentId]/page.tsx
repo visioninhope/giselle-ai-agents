@@ -1,7 +1,6 @@
 import { getTeamMembershipByAgentId } from "@/app/(auth)/lib/get-team-membership-by-agent-id";
 import { agents, db, githubIntegrationSettings } from "@/drizzle";
 import { developerFlag } from "@/flags";
-import { toUTCDate } from "@/lib/date";
 import {
 	ExternalServiceName,
 	VercelBlobOperation,
@@ -10,12 +9,14 @@ import {
 	withCountMeasurement,
 } from "@/lib/opentelemetry";
 import { getUser } from "@/lib/supabase";
+import { connectIdentity, reconnectIdentity } from "@/services/accounts";
 import { saveAgentActivity } from "@/services/agents/activities";
+import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
-import { reportAgentTimeUsage } from "@/services/usage-based-billing/report-agent-time-usage";
+import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { putGraph } from "@giselles-ai/actions";
 import { Playground } from "@giselles-ai/components/playground";
 import { AgentNameProvider } from "@giselles-ai/contexts/agent-name";
@@ -238,15 +239,25 @@ export default async function Page({
 	) {
 		"use server";
 
-		const startedAtDateUTC = toUTCDate(new Date(startedAt));
-		const endedAtDateUTC = toUTCDate(new Date(endedAt));
+		const startedAtDate = new Date(startedAt);
+		const endedAtDate = new Date(endedAt);
 		await saveAgentActivity(
 			agentId,
-			startedAtDateUTC,
-			endedAtDateUTC,
+			startedAtDate,
+			endedAtDate,
 			totalDurationMs,
 		);
-		await reportAgentTimeUsage(endedAtDateUTC);
+		await reportAgentTimeUsage(agentId, endedAtDate);
+	}
+
+	async function connectGitHubIdentityAction() {
+		"use server";
+		return connectIdentity("github", `/p/${agentId}`);
+	}
+
+	async function reconnectGitHubIdentityAction() {
+		"use server";
+		return reconnectIdentity("github", `/p/${agentId}`);
 	}
 
 	async function upsertGitHubIntegrationSettingAction(
@@ -356,9 +367,12 @@ export default async function Page({
 			>
 				<GitHubIntegrationProvider
 					{...gitHubIntegrationState}
+					installUrl={await gitHubAppInstallURL()}
 					upsertGitHubIntegrationSettingAction={
 						upsertGitHubIntegrationSettingAction
 					}
+					connectGitHubIdentityAction={connectGitHubIdentityAction}
+					reconnectGitHubIdentityAction={reconnectGitHubIdentityAction}
 				>
 					<PropertiesPanelProvider>
 						<ReactFlowProvider>

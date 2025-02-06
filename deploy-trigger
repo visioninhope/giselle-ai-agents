@@ -20,9 +20,9 @@ sed -i '' -e 's/"next": ".*"/"next": "'$NEXTJS_STABLE_VERSION'"/' \
 echo "Replacing package.json with stable version."
 
 rm -rf node_modules
-bun i
+pnpm i
 
-bunx trigger.dev@beta deploy --env $ENV
+pnpm dlx trigger.dev@beta deploy --env $ENV
 
 # Revert the changes to the package.json file
 sed -i '' -e 's/"next": ".*"/"next": "'$NEXTJS_BETA_VERSION'"/' \
@@ -33,4 +33,4 @@ sed -i '' -e 's/"next": ".*"/"next": "'$NEXTJS_BETA_VERSION'"/' \
 echo "Reverting package.json to beta version."
 
 rm -rf node_modules
-bun i
+pnpm i

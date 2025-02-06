@@ -14,6 +14,7 @@ import ClipboardButton from "./clipboard-button";
 import { ContentTypeIcon } from "./content-type-icon";
 import { Header } from "./header";
 import { Markdown } from "./markdown";
+import { RetryButton } from "./retry-button";
 import { Button } from "./ui/button";
 import { EmptyState } from "./ui/empty-state";
 
@@ -69,7 +70,6 @@ function ExecutionViewer({
 	execution: tmpExecution,
 }: { execution: Execution }) {
 	const { graph } = useGraph();
-	const { retryFlowExecution } = useExecution();
 	const execution = useMemo(
 		() => ({
 			...tmpExecution,
@@ -136,14 +136,9 @@ function ExecutionViewer({
 								<div className="flex flex-col gap-[8px]">
 									<p>{stepExecution.error}</p>
 									<div>
-										<Button
-											type="button"
-											onClick={() => {
-												retryFlowExecution(execution.id);
-											}}
-										>
-											Retry
-										</Button>
+										<RetryButton executionId={execution.id} asChild>
+											<Button type="button">Retry</Button>
+										</RetryButton>
 									</div>
 								</div>
 							)}
@@ -159,21 +154,22 @@ function ExecutionViewer({
 											stepExecution.artifact.createdAt,
 										)}
 									</div>
-									<div className="text-black-30 flex items-center">
-										<ClipboardButton
-											text={stepExecution.artifact.object.content}
-											sizeClassName="w-[16px] h-[16px]"
-										/>
-									</div>
-									<div className="text-black-30 text-[14px]">
-										<button
-											type="button"
-											onClick={() => {
-												retryFlowExecution(execution.id, stepExecution.stepId);
-											}}
-										>
-											Retry
-										</button>
+									<div className="flex items-center gap-[16px]">
+										<div className="text-black-30 flex items-center">
+											<ClipboardButton
+												text={stepExecution.artifact.object.content}
+												sizeClassName="w-[16px] h-[16px]"
+											/>
+										</div>
+										<div className="text-black-30 text-[14px]">
+											<RetryButton
+												executionId={execution.id}
+												stepId={stepExecution.stepId}
+												className="hover:bg-black-80/90 px-[8px] py-[4px] rounded-[4px] bg-black-80"
+											>
+												Retry
+											</RetryButton>
+										</div>
 									</div>
 								</div>
 							)}

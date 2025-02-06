@@ -1,28 +1,28 @@
 [
 	{
 		"label": "biome",
-		"command": "bunx @biomejs/biome check --write $ZED_WORKTREE_ROOT",
+		"command": "pnpm dlx @biomejs/biome check --write $ZED_WORKTREE_ROOT",
 		"allow_concurrent_runs": false
 	},
 	{
 		"label": "dev",
-		"command": "bun dev",
+		"command": "pnpm dev",
 		"allow_concurrent_runs": false
 	},
 	{
 		"label": "drizzle studio",
-		"command": "bunx drizzle-kit studio",
+		"command": "pnpm dlx drizzle-kit studio",
 		"allow_concurrent_runs": false
 	},
 	{
 		"label": "tsc",
-		"command": "bun tsc",
+		"command": "pnpm tsc",
 		"allow_concurrent_runs": false,
 		"hide": "on_success"
 	},
 	{
 		"label": "npm-check-updates",
-		"command": "bunx npm-check-updates",
+		"command": "pnpm dlx npm-check-updates",
 		"allow_concurrent_runs": false
 	},
 	{
