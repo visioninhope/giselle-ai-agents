@@ -747,7 +747,9 @@ function GitHubIntegrationForm() {
 							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
 								/giselle {callSign === "" ? "[call sign]" : callSign}
 							</span>{" "}
-							in the issue in {repositoryFullName}.
+							{repositoryFullName === ""
+								? "in the issue"
+								: `in the issue in ${repositoryFullName}`}
 						</span>
 					</ContentPanelSectionFormField>
 				</ContentPanelSectionFormField>
