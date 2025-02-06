@@ -1,4 +1,8 @@
-import { buildAppInstallationClient } from "@/services/external/github";
+import { agents, db, githubIntegrationSettings } from "@/drizzle";
+import {
+	buildAppClient,
+	buildAppInstallationClient,
+} from "@/services/external/github";
 import { openai } from "@ai-sdk/openai";
 import type { Octokit } from "@octokit/core";
 import {
@@ -9,7 +13,36 @@ import {
 	generateText,
 	tool,
 } from "ai";
+import { eq } from "drizzle-orm";
 import { z } from "zod";
+import type { AgentId } from "../types";
+
+// Fetch installation id from repository name
+// FIXME: add githubIntegrationSetting.installationId column is preferred
+export async function fetchInstallationId(agentId: AgentId) {
+	const res = await db
+		.select()
+		.from(githubIntegrationSettings)
+		.innerJoin(agents, eq(githubIntegrationSettings.agentDbId, agents.dbId))
+		.where(eq(agents.id, agentId))
+		.limit(1);
+	if (res.length === 0) {
+		throw new Error("Installation ID not found");
+	}
+	const setting = res[0];
+
+	const appClient = await buildAppClient();
+	const [owner, repo] =
+		setting.github_integration_settings.repositoryFullName.split("/");
+	const { data: installation } = await appClient.request(
+		"GET /repos/{owner}/{repo}/installation",
+		{
+			owner,
+			repo,
+		},
+	);
+	return installation.id;
+}
 
 export const githubArtifactSchema = z.object({
 	plan: z
@@ -20,11 +53,11 @@ export const githubArtifactSchema = z.object({
 	title: z.string().describe("The title of the artifact"),
 	content: z
 		.string()
-		.describe("The content of the artefact formatted markdown."),
+		.describe("The content of the artifact formatted markdown."),
 	description: z
 		.string()
 		.describe(
-			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better.This includes what API calls are made and what resources are retrieved.",
+			"Explanation of the Artifact and what the intention was in creating this Artifact. Add any suggestions for making it even better. This includes what API calls are made and what resources are retrieved.",
 		),
 });
 
@@ -43,7 +76,7 @@ export class GitHubAgent {
 		return new GitHubAgent(client);
 	}
 
-	public async execute(instruction: string) {
+	public async execute(prompt: string) {
 		try {
 			const res = await generateText({
 				model: openai("gpt-4o-mini"),
@@ -52,13 +85,26 @@ export class GitHubAgent {
 				experimental_output: Output.object({
 					schema: githubArtifactSchema,
 				}),
-				system:
-					"You are an expert of GitHub API." +
-					"Follow the instruction carefully and accurately." +
-					"Schema can be introspected through introspect tool." +
-					"Don't execute mutation, only query." +
-					"If user requests to mutate GitHub data, you MUST reject the request.",
-				prompt: instruction,
+				temperature: 0,
+				system: `You are a GitHub API expert specializing in GraphQL queries and data analysis.
+
+Key responsibilities:
+- Execute and analyze GitHub GraphQL queries accurately
+- Provide detailed insights from repository data
+- Follow security best practices and API guidelines
+- NEVER perform mutations or modify repository data
+
+If asked to modify GitHub data:
+- Politely explain that you cannot perform mutations
+- Suggest alternative read-only approaches if applicable
+- Provide clear explanations for any limitations
+
+Always prioritize:
+- Data accuracy and completeness
+- Clear and structured responses
+- Efficient query optimization
+- Rate limit consideration`,
+				prompt,
 			});
 
 			return res.experimental_output;
