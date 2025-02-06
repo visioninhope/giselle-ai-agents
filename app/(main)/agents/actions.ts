@@ -1,6 +1,6 @@
 "use server";
 
-import { agents, db } from "@/drizzle";
+import { agents, db, githubIntegrationSettings } from "@/drizzle";
 import {
 	ExternalServiceName,
 	VercelBlobOperation,
@@ -298,7 +298,12 @@ export async function deleteAgent(
 		}
 
 		// Delete the agent from database
-		await db.delete(agents).where(eq(agents.id, agentId as AgentId));
+		await db.transaction(async (tx) => {
+			await tx
+				.delete(githubIntegrationSettings)
+				.where(eq(githubIntegrationSettings.agentDbId, agent.dbId));
+			await tx.delete(agents).where(eq(agents.id, agentId as AgentId));
+		});
 
 		return {
 			result: "success",
