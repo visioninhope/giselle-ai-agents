@@ -452,7 +452,35 @@ async function performFlowExecution(
 				integrationSetting: integrationSetting,
 			});
 
-			const result = await agent.execute(prompt);
+			trace.update({
+				input: prompt,
+			});
+
+			const generationTracer = trace.generation({
+				name: "github",
+				input: prompt,
+				model: agent.MODEL.modelId,
+				modelParameters: {
+					temperature: 0.7,
+				},
+			});
+
+			const { result, usage } = await agent.execute(prompt);
+			waitUntil(
+				withTokenMeasurement(
+					createLogger(node.content.type),
+					async () => {
+						generationTracer.end({ output: result });
+						trace.update({ output: result });
+						await lf.shutdownAsync();
+						waitForTelemetryExport();
+						return { usage };
+					},
+					agent.MODEL,
+					context.agentId,
+					startTime,
+				),
+			);
 
 			return {
 				type: "text",

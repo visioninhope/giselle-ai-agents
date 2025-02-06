@@ -69,6 +69,7 @@ export type GitHubArtifact = z.infer<typeof githubArtifactSchema>;
 
 export class GitHubAgent {
 	readonly MAX_STEPS = 5;
+	readonly MODEL = openai("gpt-4o-mini");
 
 	private client: Octokit;
 	private constructor(client: Octokit) {
@@ -83,7 +84,7 @@ export class GitHubAgent {
 	public async execute(prompt: string) {
 		try {
 			const res = await generateText({
-				model: openai("gpt-4o-mini"),
+				model: this.MODEL,
 				tools: this.tools(),
 				maxSteps: this.MAX_STEPS,
 				experimental_output: Output.object({
@@ -111,7 +112,7 @@ Always prioritize:
 				prompt,
 			});
 
-			return res.experimental_output;
+			return { result: res.experimental_output, usage: res.usage };
 		} catch (error: unknown) {
 			if (NoSuchToolError.isInstance(error)) {
 				throw new Error(
