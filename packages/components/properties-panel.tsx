@@ -6,11 +6,9 @@ import { WilliIcon } from "@giselles-ai/icons/willi";
 import * as DialogPrimitive from "@radix-ui/react-dialog";
 import * as TabsPrimitive from "@radix-ui/react-tabs";
 import { upload } from "@vercel/blob/client";
-import { readStreamableValue } from "ai/rsc";
 import clsx from "clsx/lite";
 import {
 	ArrowUpFromLineIcon,
-	CheckCircle,
 	CheckIcon,
 	ChevronsUpDownIcon,
 	CornerDownRightIcon,
@@ -46,7 +44,6 @@ import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToast } from "../contexts/toast";
 import { textGenerationPrompt } from "../lib/prompts";
 import {
-	createArtifactId,
 	createConnectionId,
 	createFileId,
 	createNodeHandleId,
@@ -62,13 +59,11 @@ import {
 import type {
 	FileContent,
 	FileData,
-	FileId,
 	FilesContent,
 	Node,
 	NodeHandle,
 	NodeId,
 	Text,
-	TextArtifactObject,
 	TextContent,
 	TextGenerateActionContent,
 } from "../types";
@@ -2021,6 +2016,7 @@ function TabsContentFiles({
 												type="file"
 												onChange={onFileChange}
 												className="hidden"
+												multiple
 											/>
 										</span>
 									</div>
