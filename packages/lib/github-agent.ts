@@ -156,6 +156,42 @@ Always prioritize:
 					return res.data;
 				},
 			}),
+			getPullRequestDiff: tool({
+				description:
+					"Fetches the diff information of a pull request using REST API",
+				parameters: z.object({
+					owner: z.string().describe("Repository owner"),
+					repo: z.string().describe("Repository name"),
+					pullNumber: z.number().describe("Pull request number"),
+				}),
+				execute: async ({ owner, repo, pullNumber }) => {
+					const [prDetails, prFiles] = await Promise.all([
+						this.client.request(
+							"GET /repos/{owner}/{repo}/pulls/{pull_number}",
+							{
+								owner,
+								repo,
+								pull_number: pullNumber,
+							},
+						),
+						this.client.request(
+							"GET /repos/{owner}/{repo}/pulls/{pull_number}/files",
+							{
+								owner,
+								repo,
+								pull_number: pullNumber,
+							},
+						),
+					]);
+
+					return {
+						changedFiles: prFiles.data,
+						additions: prDetails.data.additions,
+						deletions: prDetails.data.deletions,
+						changedFilesCount: prDetails.data.changed_files,
+					};
+				},
+			}),
 		};
 	}
 }
