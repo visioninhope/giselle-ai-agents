@@ -42,9 +42,6 @@ export interface WebSearch extends Action {
 }
 interface GitHubEventBase {
 	triggerType: "github";
-	installation: {
-		id: number;
-	};
 	event: string;
 }
 // https://docs.github.com/webhooks/webhook-events-and-payloads?actionType=edited#issue_comment
@@ -55,7 +52,10 @@ interface GitHubIssueCommentEvent extends GitHubEventBase {
 		full_name: string;
 	};
 	issue: {
-		id: number;
+		number: number;
+		// GitHub's REST API considers every pull request an issue, but not every issue is a pull request. For this reason, "Issues" endpoints may return both issues and pull requests in the response. You can identify pull requests by the pull_request key.
+		// https://docs.github.com/ja/rest/issues/issues?apiVersion=2022-11-28#get-an-issue
+		is_pull_request: boolean;
 	};
 	comment: {
 		id: number;

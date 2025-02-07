@@ -123,13 +123,11 @@ async function handleIssueComment(
 			full_name: payload.repository.full_name,
 		},
 		issue: {
-			id: payload.issue.id,
+			number: payload.issue.number,
+			is_pull_request: payload.issue.pull_request != null,
 		},
 		comment: {
 			id: payload.comment.id,
-		},
-		installation: {
-			id: payload.installation.id,
 		},
 	};
 
