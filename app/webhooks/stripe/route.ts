@@ -2,6 +2,7 @@ import { stripe } from "@/services/external/stripe";
 import { upsertSubscription } from "@/services/external/stripe/actions/upsert-subscription";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
 import type Stripe from "stripe";
+import { handleInvoiceCreation } from "./handle-invoice-creation";
 import { handleSubscriptionCancellation } from "./handle-subscription-cancellation";
 
 const relevantEvents = new Set([
@@ -91,28 +92,13 @@ export async function POST(req: Request) {
 					);
 				}
 				await handleSubscriptionCancellation(event.data.object);
+				await upsertSubscription(event.data.object.id);
 				break;
 
 			case "invoice.created":
 				console.log(`🔔  Invoice created: ${event.data.object.id}`);
 
-				// TODO: Skip for now - will be handled when implementing subscription cancellation invoice processing
-				if (
-					event.data.object.subscription &&
-					typeof event.data.object.subscription === "string"
-				) {
-					const subscriptionId = event.data.object.subscription;
-					const subscription =
-						await stripe.subscriptions.retrieve(subscriptionId);
-
-					if (subscription.status === "canceled") {
-						console.log(
-							"Skipping processing for canceled subscription invoice: ",
-							subscriptionId,
-						);
-						break;
-					}
-				}
+				await handleInvoiceCreation(event.data.object);
 				break;
 
 			default:
