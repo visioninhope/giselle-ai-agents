@@ -661,6 +661,9 @@ function GitHubIntegrationForm() {
 		integration.status === "installed" ? integration.repositories : [];
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
+	const [repositoryFullName, setRepositoryFullName] = useState(
+		setting?.repositoryFullName ?? "",
+	);
 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [eventNodeMappings, setEventNodeMappings] = useState<
 		GitHubEventNodeMapping[]
@@ -709,6 +712,9 @@ function GitHubIntegrationForm() {
 						label: repository.full_name,
 					}))}
 					defaultValue={setting?.repositoryFullName}
+					onValueChange={(value) => {
+						setRepositoryFullName(value);
+					}}
 				/>
 			</ContentPanelSection>
 			<ContentPanelSection>
@@ -736,13 +742,15 @@ function GitHubIntegrationForm() {
 							value={callSign}
 							onChange={(e) => setCallSign(e.target.value)}
 						/>
-						{/* <span className="text-black-70 text-[12px]">
+						<span className="text-black-70 text-[12px]">
 							You can call this agent by commenting{" "}
 							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
 								/giselle {callSign === "" ? "[call sign]" : callSign}
 							</span>{" "}
-							in the issue route06inc/giselle.
-						</span> */}
+							{repositoryFullName === ""
+								? "in the issue"
+								: `in the issue in ${repositoryFullName}`}
+						</span>
 					</ContentPanelSectionFormField>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>

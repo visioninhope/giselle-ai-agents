@@ -2144,6 +2144,7 @@ function TabsContentFiles({
 												type="file"
 												onChange={onFileChange}
 												className="hidden"
+												multiple
 											/>
 										</span>
 									</div>
