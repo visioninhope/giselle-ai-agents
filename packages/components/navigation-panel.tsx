@@ -1,10 +1,12 @@
 import { Button } from "@/components/ui/button";
+import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import type {
 	GitHubNextAction,
 	GitHubTriggerEvent,
 } from "@/services/external/github/types";
 import { LayersIcon } from "@giselles-ai/icons/layers";
 import { WilliIcon } from "@giselles-ai/icons/willi";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import * as PopoverPrimitive from "@radix-ui/react-popover";
 import * as SelectPrimitive from "@radix-ui/react-select";
 import * as Tabs from "@radix-ui/react-tabs";
@@ -17,14 +19,12 @@ import {
 	ChevronUp,
 	DownloadIcon,
 	FrameIcon,
-	GithubIcon,
 	HammerIcon,
 	ListTreeIcon,
 	PlusIcon,
 	TrashIcon,
 	XIcon,
 } from "lucide-react";
-import Link from "next/link";
 import {
 	type ComponentProps,
 	type ReactNode,
@@ -362,7 +362,7 @@ export function NavigationPanel() {
 						<LayersIcon className="w-[18px] h-[18px] fill-black-30" />
 					</TabsTrigger>
 					<TabsTrigger value="github">
-						<GithubIcon className="w-[18px] h-[18px] stroke-black-30" />
+						<SiGithub className="w-[18px] h-[18px] stroke-black-30" />
 					</TabsTrigger>
 					<TabsTrigger value="structure">
 						<ListTreeIcon className="w-[18px] h-[18px] stroke-black-30" />
@@ -569,27 +569,78 @@ function GitHubEventNodeMappingForm({
 }
 
 function GitHubIntegration() {
-	const { needsAuthorization } = useGitHubIntegration();
-
+	const { status } = useGitHubIntegration();
+	const content = () => {
+		switch (status) {
+			case "unauthorized":
+				return <RequireGitHubAuthorization />;
+			case "invalid-credential":
+				return <RequireGitHubReAuthorization />;
+			case "installed":
+			case "not-installed":
+				return <GitHubIntegrationForm />;
+			default:
+				throw new Error(status satisfies never);
+		}
+	};
 	return (
 		<ContentPanel>
 			<ContentPanelHeader>GitHub Integration</ContentPanelHeader>
-			{needsAuthorization ? GoToAccountSettings() : GitHubIntegrationForm()}
+			{content()}
 		</ContentPanel>
 	);
 }
-function GoToAccountSettings() {
+
+function RequireGitHubAuthorization() {
+	const { connectGitHubIdentityAction } = useGitHubIntegration();
+
 	return (
-		<div className="grid gap-[16px]">
+		<div className="grid gap-[16px] text-center">
+			<WilliIcon className="w-8 h-8 fill-slate-600 mx-auto" />
 			<div className="text-sm text-gray-600">
-				Please connect your GitHub account to get started
+				You are not signed in. Please log in with GitHub using the button below
+				to get started and explore the world of Giselle.
 			</div>
-			<Button asChild>
-				<Link href="/settings/account">Connect GitHub</Link>
-			</Button>
+			<GitHubConnectionButton action={connectGitHubIdentityAction} />
 		</div>
 	);
 }
+
+function RequireGitHubReAuthorization() {
+	const { reconnectGitHubIdentityAction } = useGitHubIntegration();
+
+	return (
+		<div className="grid gap-[16px] text-center">
+			<WilliIcon className="w-8 h-8 fill-slate-600 mx-auto" />
+			<div className="text-sm text-gray-600">
+				Your GitHub access token has expired or become invalid. Please reconnect
+				to continue using the service.
+			</div>
+			<GitHubConnectionButton action={reconnectGitHubIdentityAction} />
+		</div>
+	);
+}
+
+function GitHubConnectionButton({ action }: { action: () => Promise<void> }) {
+	const [_, formAction, isPending] = useActionState(async () => {
+		await action();
+	}, null);
+
+	return (
+		<form action={formAction}>
+			<Button
+				variant="link"
+				className="flex items-center gap-2 w-full justify-center text-blue-200 border-blue-200"
+				type="submit"
+				disabled={isPending}
+			>
+				<SiGithub className="h-[20px] w-[20px] text-white" />
+				Continue with GitHub
+			</Button>
+		</form>
+	);
+}
+
 const integrationEventList = [
 	{
 		type: "github.issue_comment.created" satisfies GitHubTriggerEvent,
@@ -603,14 +654,21 @@ const nextActionList = [
 	},
 ] as const;
 function GitHubIntegrationForm() {
-	const { setting, repositories, upsertGitHubIntegrationSettingAction } =
-		useGitHubIntegration();
+	const integration = useGitHubIntegration();
+	const { installUrl, setting, upsertGitHubIntegrationSettingAction } =
+		integration;
+	const repositories =
+		integration.status === "installed" ? integration.repositories : [];
 	const { popoverOpen, setPopoverOpen } = useTabValue();
 	const { graph } = useGraph();
+	const [repositoryFullName, setRepositoryFullName] = useState(
+		setting?.repositoryFullName ?? "",
+	);
 	const [callSign, setCallSign] = useState(setting?.callSign ?? "");
 	const [eventNodeMappings, setEventNodeMappings] = useState<
 		GitHubEventNodeMapping[]
 	>(setting?.eventNodeMappings ?? []);
+
 	const processedMappings = useMemo(
 		() =>
 			eventNodeMappings
@@ -641,6 +699,10 @@ function GitHubIntegrationForm() {
 				<p>{upsertGitHubIntegrationSettingActionResult.message}</p>
 			)}
 			<ContentPanelSection>
+				<GitHubAppInstallButton
+					installationUrl={installUrl}
+					installed={integration.status === "installed"}
+				/>
 				<ContentPanelSectionHeader title="Repository" />
 				<Select
 					name="repositoryFullName"
@@ -650,9 +712,11 @@ function GitHubIntegrationForm() {
 						label: repository.full_name,
 					}))}
 					defaultValue={setting?.repositoryFullName}
+					onValueChange={(value) => {
+						setRepositoryFullName(value);
+					}}
 				/>
 			</ContentPanelSection>
-
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Trigger" />
 				<ContentPanelSectionFormField>
@@ -678,17 +742,18 @@ function GitHubIntegrationForm() {
 							value={callSign}
 							onChange={(e) => setCallSign(e.target.value)}
 						/>
-						{/* <span className="text-black-70 text-[12px]">
+						<span className="text-black-70 text-[12px]">
 							You can call this agent by commenting{" "}
 							<span className="py-[0px] px-[4px] text-black--30 bg-black-70 rounded-[2px]">
 								/giselle {callSign === "" ? "[call sign]" : callSign}
 							</span>{" "}
-							in the issue route06inc/giselle.
-						</span> */}
+							{repositoryFullName === ""
+								? "in the issue"
+								: `in the issue in ${repositoryFullName}`}
+						</span>
 					</ContentPanelSectionFormField>
 				</ContentPanelSectionFormField>
 			</ContentPanelSection>
-
 			<ContentPanelSection>
 				<ContentPanelSectionHeader title="Action" />
 				<ContentPanelSectionFormField>

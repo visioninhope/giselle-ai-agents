@@ -1,11 +1,11 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
-import type { GitHubUserClient } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import type { components } from "@octokit/openapi-types";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 
-type GitHubUser = Awaited<ReturnType<GitHubUserClient["getUser"]>>;
+type GitHubUser = components["schemas"]["simple-user"];
 
 type GitHubAuthenticationPresentationProps = {
 	gitHubUser?: GitHubUser;
