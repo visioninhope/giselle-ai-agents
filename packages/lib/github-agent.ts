@@ -165,31 +165,20 @@ Always prioritize:
 					pullNumber: z.number().describe("Pull request number"),
 				}),
 				execute: async ({ owner, repo, pullNumber }) => {
-					const [prDetails, prFiles] = await Promise.all([
-						this.client.request(
-							"GET /repos/{owner}/{repo}/pulls/{pull_number}",
-							{
-								owner,
-								repo,
-								pull_number: pullNumber,
+					const diff = await this.client.request(
+						"GET /repos/{owner}/{repo}/pulls/{pull_number}",
+						{
+							owner,
+							repo,
+							pull_number: pullNumber,
+							mediaType: {
+								format: "diff",
 							},
-						),
-						this.client.request(
-							"GET /repos/{owner}/{repo}/pulls/{pull_number}/files",
-							{
-								owner,
-								repo,
-								pull_number: pullNumber,
-							},
-						),
-					]);
-
-					return {
-						changedFiles: prFiles.data,
-						additions: prDetails.data.additions,
-						deletions: prDetails.data.deletions,
-						changedFilesCount: prDetails.data.changed_files,
-					};
+						},
+					);
+					// https://github.com/octokit/request.js/issues/463
+					const diffData = diff.data as unknown as string;
+					return diffData;
 				},
 			}),
 		};
