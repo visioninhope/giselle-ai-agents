@@ -548,7 +548,7 @@ export async function executeStep({
 		throw new Error(`Step with id ${stepId} not found`);
 	}
 	let nodes = applyOverrides(graph.nodes, overrideData);
-	nodes = addTriggerEventContext(graph.nodes, triggerEvent);
+	nodes = addTriggerEventContext(nodes, triggerEvent);
 	const executionNode = nodes.find((node) => node.id === step.nodeId);
 	if (executionNode === undefined) {
 		throw new Error("Node not found");
