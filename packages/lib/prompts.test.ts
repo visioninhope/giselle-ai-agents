@@ -1,6 +1,6 @@
 import HandleBars from "handlebars";
 import { describe, expect, test } from "vitest";
-import { textGenerationPrompt } from "./prompts";
+import { gitHubAgentPrompt, textGenerationPrompt } from "./prompts";
 
 describe("textGenerationPrompt template", () => {
 	const template = HandleBars.compile(textGenerationPrompt);
@@ -159,5 +159,124 @@ describe("textGenerationPrompt template", () => {
 		expect(result).toContain("<sources>");
 		expect(result).toContain('<text id="node1">');
 		expect(result).toContain('<generated id="node2" title="Cat Care Guide">');
+	});
+});
+
+describe("gitHubAgentPrompt template", () => {
+	const template = HandleBars.compile(gitHubAgentPrompt);
+
+	test("should render basic instruction without integration settings or trigger event", () => {
+		const result = template({
+			instruction: "Analyze repository stars",
+		});
+
+		expect(result).toContain(
+			"<instruction>\nAnalyze repository stars\n</instruction>",
+		);
+		expect(result).not.toContain("<integration-settings>");
+		expect(result).not.toContain("<trigger-event>");
+	});
+
+	test("should render instruction with integration settings", () => {
+		const result = template({
+			instruction: "Analyze pull request",
+			integrationSetting: {
+				repositoryFullName: "owner/repo",
+				event: "pull_request",
+			},
+		});
+
+		expect(result).toContain(
+			"<instruction>\nAnalyze pull request\n</instruction>",
+		);
+		expect(result).toContain("<repository>owner/repo</repository>");
+		expect(result).toContain("<event>pull_request</event>");
+	});
+
+	test("should render instruction with trigger event", () => {
+		const result = template({
+			instruction: "Analyze issue",
+			triggerEvent: {
+				action: "opened",
+				issue: {
+					number: 123,
+					title: "Bug report",
+				},
+			},
+		});
+
+		expect(result).toContain("<instruction>\nAnalyze issue\n</instruction>");
+		expect(result).toContain("<trigger-event>");
+		expect(result).toContain("<action>opened</action>");
+		expect(result).toContain(
+			"<issue><number>123</number><title>Bug report</title></issue>",
+		);
+	});
+
+	test("should render instruction with sources", () => {
+		const result = template({
+			instruction: "Analyze repository",
+			sources: [
+				{
+					type: "github",
+					nodeId: "node1",
+					title: "Repository Info",
+					content: "Repository statistics and data",
+				},
+			],
+		});
+
+		expect(result).toContain(
+			"<instruction>\nAnalyze repository\n</instruction>",
+		);
+		expect(result).toContain(
+			'<github id="node1" title="Repository Info">\nRepository statistics and data\n</github>',
+		);
+	});
+
+	test("should render all components together", () => {
+		const result = template({
+			instruction: "Analyze pull request",
+			integrationSetting: {
+				repositoryFullName: "owner/repo",
+				event: "pull_request",
+			},
+			triggerEvent: {
+				action: "opened",
+				pull_request: {
+					number: 456,
+					title: "Feature implementation",
+				},
+			},
+			sources: [
+				{
+					type: "github",
+					nodeId: "node1",
+					title: "PR Data",
+					content: "Pull request information",
+				},
+			],
+		});
+
+		expect(result).toContain("<instruction>");
+		expect(result).toContain("<integration-settings>");
+		expect(result).toContain("<trigger-event>");
+		expect(result).toContain("<sources>");
+		expect(result).toContain('<github id="node1" title="PR Data">');
+	});
+
+	test("should handle null values in trigger event", () => {
+		const result = template({
+			instruction: "Analyze PR",
+			triggerEvent: {
+				action: "opened",
+				assignee: null,
+				number: 123,
+			},
+		});
+
+		expect(result).toContain("<action>opened</action>");
+		expect(result).toContain("<number>123</number>");
+		expect(result).not.toContain("<assignee>");
 	});
 });

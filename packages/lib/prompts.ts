@@ -1,5 +1,34 @@
 import HandleBars from "handlebars";
 HandleBars.registerHelper("eq", (arg1, arg2) => arg1 === arg2);
+type TriggerEventValue =
+	| string
+	| number
+	| boolean
+	| null
+	| { [key: string]: TriggerEventValue };
+
+HandleBars.registerHelper(
+	"renderTriggerEvent",
+	(triggerEvent: Record<string, TriggerEventValue>) => {
+		const renderObject = (obj: Record<string, TriggerEventValue>): string => {
+			let result = "";
+			for (const key in obj) {
+				const value = obj[key];
+				if (value === null || value === undefined) {
+					continue;
+				}
+				if (typeof value === "object") {
+					result += `<${key}>${renderObject(value)}</${key}>`;
+				} else {
+					result += `<${key}>${value}</${key}>`;
+				}
+			}
+			return result;
+		};
+
+		return new HandleBars.SafeString(renderObject(triggerEvent));
+	},
+);
 
 const sources = `{{#if sources}}
 <sources>
@@ -84,27 +113,39 @@ export const gitHubAgentPrompt = `You are a GitHub API expert tasked with analyz
 </instruction>
 
 {{#if integrationSetting}}
-<integration_setting>
-Repository: {{integrationSetting.repositoryFullName}}
-Event: {{integrationSetting.event}}
-</integration_setting>
+<integration-settings>
+<repository>{{integrationSetting.repositoryFullName}}</repository>
+<event>{{integrationSetting.event}}</event>
+</integration-settings>
+{{/if}}
+
+{{#if triggerEvent}}
+<trigger-event>
+{{renderTriggerEvent triggerEvent}}
+</trigger-event>
 {{/if}}
 
 ${sources}
 
-2. GitHub API Guidelines:
+2. Event Context Analysis:
+    - Primary Event Source: If a trigger-event is present in the input, recognize it as the initiating event for this task
+    - Context Discovery: In the absence of a trigger-event, extract necessary context from sources and instruction
+    - Information Requirements: When critical information is missing, explicitly list the required information
+    - Context Validation: Verify that all necessary context is available before proceeding with the analysis
+
+3. GitHub API Guidelines:
     - You can ONLY perform READ operations through GraphQL queries
     - You MUST reject any requests for mutations or data modifications
     - Always respect GitHub API rate limits
     - Structure queries efficiently to minimize API calls
 
-3. Query Planning and Execution:
+4. Query Planning and Execution:
     - Break down complex requests into manageable GraphQL queries
     - Handle pagination appropriately for large datasets
     - Use aliases and fragments to optimize queries
     - Validate all query parameters before execution
 
-4. Data Analysis and Response:
+5. Data Analysis and Response:
     - Process retrieved data accurately and thoroughly
     - Provide context and explanations for technical findings
     - Include relevant metrics and statistics
@@ -121,4 +162,6 @@ Remember:
 - Accuracy: Double-check all query results
 - Clarity: Present technical information in an understandable way
 - Compliance: Follow GitHub API best practices
+- Context Awareness: Consider the full event context in your analysis
+- Documentation: Provide clear explanations for your findings and recommendations
 `;

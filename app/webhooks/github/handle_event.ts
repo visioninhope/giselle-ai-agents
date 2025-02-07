@@ -7,7 +7,7 @@ import {
 	createExecutionId,
 	createInitialJobExecutions,
 } from "@giselles-ai/lib/utils";
-import type { Execution, Graph } from "@giselles-ai/types";
+import type { Execution, GitHubEvent, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
 import { waitUntil } from "@vercel/functions";
 import { parseCommand } from "./command";
@@ -115,6 +115,24 @@ async function handleIssueComment(
 		},
 	);
 
+	const triggerEvent: GitHubEvent = {
+		triggerType: "github",
+		event: "issue_comment",
+		action: payload.action,
+		repository: {
+			full_name: payload.repository.full_name,
+		},
+		issue: {
+			id: payload.issue.id,
+		},
+		comment: {
+			id: payload.comment.id,
+		},
+		installation: {
+			id: payload.installation.id,
+		},
+	};
+
 	waitUntil(
 		Promise.all(
 			integrationSettings.map(async (integrationSetting) => {
@@ -176,6 +194,7 @@ async function handleIssueComment(
 						}
 					})
 					.filter((overrideData) => overrideData !== null);
+
 				const finalExecution = await performFlowExecution({
 					initialExecution,
 					executeStepFn: (stepId) =>
@@ -186,6 +205,7 @@ async function handleIssueComment(
 							stepId: stepId,
 							artifacts: initialExecution.artifacts,
 							overrideData,
+							triggerEvent,
 						}),
 					onExecutionChange: (execution) => {
 						initialExecution = execution;

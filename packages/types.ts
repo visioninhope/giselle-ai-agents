@@ -40,10 +40,34 @@ interface WebSearchActionContent extends ActionContentBase {
 export interface WebSearch extends Action {
 	content: WebSearchActionContent;
 }
+interface GitHubEventBase {
+	triggerType: "github";
+	installation: {
+		id: number;
+	};
+	event: string;
+}
+// https://docs.github.com/webhooks/webhook-events-and-payloads?actionType=edited#issue_comment
+interface GitHubIssueCommentEvent extends GitHubEventBase {
+	event: "issue_comment";
+	action: "created" | "deleted" | "edited";
+	repository: {
+		full_name: string;
+	};
+	issue: {
+		id: number;
+	};
+	comment: {
+		id: number;
+	};
+}
+export type GitHubEvent = GitHubIssueCommentEvent;
+export type TriggerEvent = GitHubEvent;
 export interface GitHubActionContent extends ActionContentBase {
 	type: "github";
 	instruction: string;
 	sources: NodeHandle[];
+	triggerEvent?: GitHubEvent;
 }
 export interface GitHub extends Action {
 	content: GitHubActionContent;

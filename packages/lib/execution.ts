@@ -41,6 +41,7 @@ import type {
 	StepId,
 	TextArtifactObject,
 	TextGenerateActionContent,
+	TriggerEvent,
 } from "../types";
 import { AgentTimeNotAvailableError } from "./errors";
 import {
@@ -449,7 +450,8 @@ async function performFlowExecution(
 			const prompt = promptTemplate({
 				instruction: node.content.instruction,
 				sources: actionSources,
-				integrationSetting: integrationSetting,
+				integrationSetting,
+				triggerEvent: node.content.triggerEvent,
 			});
 
 			trace.update({
@@ -509,6 +511,7 @@ interface ExecuteStepParams {
 	artifacts: Artifact[];
 	stream?: boolean;
 	overrideData?: OverrideData[];
+	triggerEvent?: TriggerEvent;
 }
 export async function executeStep({
 	agentId,
@@ -518,6 +521,7 @@ export async function executeStep({
 	artifacts,
 	stream,
 	overrideData,
+	triggerEvent,
 }: ExecuteStepParams) {
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.id, agentId),
@@ -543,7 +547,8 @@ export async function executeStep({
 	if (step === undefined) {
 		throw new Error(`Step with id ${stepId} not found`);
 	}
-	const nodes = applyOverrides(graph.nodes, overrideData);
+	let nodes = applyOverrides(graph.nodes, overrideData);
+	nodes = addTriggerEventContext(graph.nodes, triggerEvent);
 	const executionNode = nodes.find((node) => node.id === step.nodeId);
 	if (executionNode === undefined) {
 		throw new Error("Node not found");
@@ -712,6 +717,32 @@ function applyOverrides(nodes: Node[], overrideData?: OverrideData[]) {
 				} as Node;
 			default:
 				throw new Error(`Unsupported override type: ${node.content.type}`);
+		}
+	});
+}
+
+function addTriggerEventContext(nodes: Node[], triggerEvent?: TriggerEvent) {
+	if (triggerEvent == null) {
+		return nodes;
+	}
+
+	const triggerType = triggerEvent.triggerType;
+
+	return nodes.map((node) => {
+		switch (triggerType) {
+			case "github":
+				if (node.content.type !== "github") {
+					return node;
+				}
+				return {
+					...node,
+					content: {
+						...node.content,
+						triggerEvent,
+					},
+				} as Node;
+			default:
+				throw new Error(triggerType satisfies never);
 		}
 	});
 }
