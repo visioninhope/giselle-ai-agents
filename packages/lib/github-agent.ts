@@ -110,6 +110,13 @@ Always prioritize:
 - Efficient query optimization
 - Rate limit consideration`,
 				prompt,
+				onStepFinish: async (step) => {
+					for (const toolCall of step.toolCalls) {
+						console.log(`Tool called: ${toolCall.toolName}`, {
+							arguments: toolCall.args,
+						});
+					}
+				},
 			});
 
 			return { result: res.experimental_output, usage: res.usage };
