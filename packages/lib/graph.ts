@@ -11,6 +11,7 @@ import type {
 	NodeId,
 	Step,
 } from "../types";
+import { GraphError } from "./errors";
 import { createFlowId, createJobId, createStepId } from "./utils";
 
 export function deriveFlows(
@@ -34,10 +35,19 @@ export function deriveFlows(
 		// Throw error only for self-reference and circular dependencies
 		if (
 			!result.isValid &&
-			(result.error?.includes("Self-reference") ||
-				result.error?.includes("circular dependency"))
+			result.error &&
+			(result.error.code === "SELF_REFERENCE" ||
+				result.error.code === "CIRCULAR_DEPENDENCY")
 		) {
-			throw new Error(`Invalid connection ${connection.id}: ${result.error}`);
+			// TODO: Send telemetry if necessary
+			const systemMessage = `Connection ${connection.id}: ${result.error.systemMessage}`;
+			console.error(systemMessage);
+
+			throw new GraphError(
+				result.error.message,
+				systemMessage,
+				result.error.code,
+			);
 		}
 	}
 
@@ -411,19 +421,27 @@ export function validateConnection(
 	newConnection: Connection,
 	existingConnections: Connection[],
 	nodes: Node[],
-): { isValid: boolean; error?: string } {
+): { isValid: boolean; error?: GraphError } {
 	// Check if nodes exist
 	const nodeIds = new Set(nodes.map((node) => node.id));
 	if (!nodeIds.has(newConnection.sourceNodeId)) {
 		return {
 			isValid: false,
-			error: `Source node ${newConnection.sourceNodeId} does not exist`,
+			error: new GraphError(
+				"Source node not found. The node may have been deleted.",
+				`Source node ${newConnection.sourceNodeId} does not exist`,
+				"NODE_NOT_FOUND",
+			),
 		};
 	}
 	if (!nodeIds.has(newConnection.targetNodeId)) {
 		return {
 			isValid: false,
-			error: `Target node ${newConnection.targetNodeId} does not exist`,
+			error: new GraphError(
+				"Target node not found. The node may have been deleted.",
+				`Target node ${newConnection.targetNodeId} does not exist`,
+				"NODE_NOT_FOUND",
+			),
 		};
 	}
 
@@ -431,7 +449,11 @@ export function validateConnection(
 	if (newConnection.sourceNodeId === newConnection.targetNodeId) {
 		return {
 			isValid: false,
-			error: "Self-reference connections are not allowed",
+			error: new GraphError(
+				"Cannot connect a node to itself",
+				"Self-reference connections are not allowed",
+				"SELF_REFERENCE",
+			),
 		};
 	}
 
@@ -446,14 +468,22 @@ export function validateConnection(
 	if (sourceNode?.type !== newConnection.sourceNodeType) {
 		return {
 			isValid: false,
-			error: `Source node type mismatch: expected ${sourceNode?.type}, got ${newConnection.sourceNodeType}`,
+			error: new GraphError(
+				"Source node type is incompatible",
+				`Source node type mismatch: expected ${sourceNode?.type}, got ${newConnection.sourceNodeType}`,
+				"TYPE_MISMATCH",
+			),
 		};
 	}
 
 	if (targetNode?.type !== newConnection.targetNodeType) {
 		return {
 			isValid: false,
-			error: `Target node type mismatch: expected ${targetNode?.type}, got ${newConnection.targetNodeType}`,
+			error: new GraphError(
+				"Target node type is incompatible",
+				`Target node type mismatch: expected ${targetNode?.type}, got ${newConnection.targetNodeType}`,
+				"TYPE_MISMATCH",
+			),
 		};
 	}
 
@@ -504,7 +534,11 @@ export function validateConnection(
 	if (hasCycle(newConnection.sourceNodeId, visited, recursionStack)) {
 		return {
 			isValid: false,
-			error: "Adding this connection would create a circular dependency",
+			error: new GraphError(
+				"Cannot create a circular connection between nodes. Please review the connections.",
+				"Adding this connection would create a circular dependency",
+				"CIRCULAR_DEPENDENCY",
+			),
 		};
 	}
 
