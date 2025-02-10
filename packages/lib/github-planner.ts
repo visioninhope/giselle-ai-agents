@@ -5,13 +5,14 @@ import {
 	generateText,
 } from "ai";
 import { z } from "zod";
+import { AVAILABLE_REST_APIS } from "./github-fetcher";
 
 // Schema for the API plan that the LLM will generate
 export const githubApiPlanSchema = z.object({
 	plans: z.array(
-		z.discriminatedUnion('type', [
+		z.discriminatedUnion("type", [
 			z.object({
-				type: z.literal('graphql'),
+				type: z.literal("graphql"),
 				name: z.string().describe("The name of this API call."),
 				query: z.string().describe("The GitHub GraphQL query to execute."),
 				variables: z
@@ -20,10 +21,19 @@ export const githubApiPlanSchema = z.object({
 					.describe("Variables to pass to the query."),
 			}),
 			z.object({
-				type: z.literal('rest'),
+				type: z.literal("rest"),
 				name: z.string().describe("The name of this API call."),
-				method: z.enum(['GET', 'POST', 'PUT', 'DELETE']).describe("The HTTP method to use."),
-				path: z.string().describe("The REST API endpoint path."),
+				method: z.literal("GET").describe("The HTTP method to use."),
+				path: z
+					.string()
+					.describe(
+						"The REST API endpoint path with variables replaced with actual values.",
+					),
+				template: z
+					.enum(
+						AVAILABLE_REST_APIS.map((api) => api.path) as [string, ...string[]],
+					)
+					.describe("The REST API endpoint template."),
 				params: z
 					.record(z.string(), z.unknown())
 					.optional()
@@ -32,8 +42,8 @@ export const githubApiPlanSchema = z.object({
 					.record(z.string(), z.string())
 					.optional()
 					.describe("Additional headers to send with the request."),
-			})
-		])
+			}),
+		]),
 	),
 	summary: z
 		.string()
@@ -93,6 +103,7 @@ Example plan for "Get information and diff of a pull request":
       "name": "Get pull request diff",
       "method": "GET",
       "path": "/repos/octocat/hello-world/pulls/1",
+			"template": "GET /repos/{owner}/{repo}/pulls/{pull_number}",
       "headers": {
         "Accept": "application/vnd.github.v3.diff"
       }
