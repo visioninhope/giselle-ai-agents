@@ -291,6 +291,54 @@ describe("validateConnection", () => {
 		);
 	});
 
+	test("prevents self-reference in existing connections", () => {
+		const nodes: Node[] = [
+			{
+				...baseNode,
+				id: "nd_node1",
+				type: "action",
+			},
+			{
+				...baseNode,
+				id: "nd_node2",
+				type: "action",
+			},
+		];
+
+		const existingConnections: Connection[] = [
+			{
+				id: "cnnc_conn1",
+				sourceNodeId: "nd_node2",
+				targetNodeId: "nd_node2", // self-reference in existing connection
+				sourceNodeType: "action",
+				targetNodeType: "action",
+				targetNodeHandleId: "ndh_handle1",
+			},
+		];
+
+		const newConnection: Connection = {
+			id: "cnnc_conn2",
+			sourceNodeId: "nd_node1",
+			targetNodeId: "nd_node2",
+			sourceNodeType: "action",
+			targetNodeType: "action",
+			targetNodeHandleId: "ndh_handle2",
+		};
+
+		const result = validateConnection(
+			newConnection,
+			existingConnections,
+			nodes,
+		);
+		expect(result.isValid).toBe(false);
+		expect(result.error).toBeInstanceOf(GraphError);
+		expect(result.error?.code).toBe("SELF_REFERENCE");
+		expect(result.error?.message).toBe("Cannot connect a node to itself");
+		expect(result.error?.systemMessage).toBe(
+			"Self-reference connections are not allowed",
+		);
+	});
+
 	test("prevents connections to non-existent nodes", () => {
 		const nodes: Node[] = [
 			{

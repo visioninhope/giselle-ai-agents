@@ -445,8 +445,11 @@ export function validateConnection(
 		};
 	}
 
-	// Check for self-reference
-	if (newConnection.sourceNodeId === newConnection.targetNodeId) {
+	// Check for self-reference in both new and existing connections
+	if (
+		newConnection.sourceNodeId === newConnection.targetNodeId ||
+		existingConnections.some((conn) => conn.sourceNodeId === conn.targetNodeId)
+	) {
 		return {
 			isValid: false,
 			error: new GraphError(
