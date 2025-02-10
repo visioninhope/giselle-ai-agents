@@ -5,6 +5,7 @@ import type {
 	Node,
 	TextGenerateActionContent,
 } from "../types";
+import { GraphError } from "./errors";
 import {
 	deriveFlows,
 	isLatestVersion,
@@ -282,7 +283,12 @@ describe("validateConnection", () => {
 
 		const result = validateConnection(selfConnection, [], nodes);
 		expect(result.isValid).toBe(false);
-		expect(result.error).toBe("Self-reference connections are not allowed");
+		expect(result.error).toBeInstanceOf(GraphError);
+		expect(result.error?.code).toBe("SELF_REFERENCE");
+		expect(result.error?.message).toBe("Cannot connect a node to itself");
+		expect(result.error?.systemMessage).toBe(
+			"Self-reference connections are not allowed",
+		);
 	});
 
 	test("prevents connections to non-existent nodes", () => {
@@ -305,7 +311,14 @@ describe("validateConnection", () => {
 
 		const result = validateConnection(invalidConnection, [], nodes);
 		expect(result.isValid).toBe(false);
-		expect(result.error).toBe("Target node nd_nonexistent does not exist");
+		expect(result.error).toBeInstanceOf(GraphError);
+		expect(result.error?.code).toBe("NODE_NOT_FOUND");
+		expect(result.error?.message).toBe(
+			"Target node not found. The node may have been deleted.",
+		);
+		expect(result.error?.systemMessage).toBe(
+			"Target node nd_nonexistent does not exist",
+		);
 	});
 
 	test("prevents connections with mismatched source node type", () => {
@@ -333,7 +346,10 @@ describe("validateConnection", () => {
 
 		const result = validateConnection(invalidConnection, [], nodes);
 		expect(result.isValid).toBe(false);
-		expect(result.error).toBe(
+		expect(result.error).toBeInstanceOf(GraphError);
+		expect(result.error?.code).toBe("TYPE_MISMATCH");
+		expect(result.error?.message).toBe("Source node type is incompatible");
+		expect(result.error?.systemMessage).toBe(
 			"Source node type mismatch: expected action, got variable",
 		);
 	});
@@ -391,7 +407,12 @@ describe("validateConnection", () => {
 			nodes,
 		);
 		expect(result.isValid).toBe(false);
-		expect(result.error).toBe(
+		expect(result.error).toBeInstanceOf(GraphError);
+		expect(result.error?.code).toBe("CIRCULAR_DEPENDENCY");
+		expect(result.error?.message).toBe(
+			"Cannot create a circular connection between nodes. Please review the connections.",
+		);
+		expect(result.error?.systemMessage).toBe(
 			"Adding this connection would create a circular dependency",
 		);
 	});
