@@ -112,8 +112,47 @@ export class GitHubAgent {
 
 		for (const result of results) {
 			markdown += `### ${result.name} (Status: ${result.status})\n\n`;
-			markdown += "```json\n";
-			markdown += JSON.stringify(result.data, null, 2);
+
+			// Add request details based on the type
+			if (result.type === "graphql") {
+				markdown += "#### GraphQL Request\n";
+				markdown += "```graphql\n";
+				markdown += result.query;
+				markdown += "\n```\n\n";
+
+				if (result.variables) {
+					markdown += "Variables:\n";
+					markdown += "```json\n";
+					markdown += JSON.stringify(result.variables, null, 2);
+					markdown += "\n```\n\n";
+				}
+			} else {
+				markdown += "#### REST Request\n";
+				markdown += `${result.method} ${result.path}\n\n`;
+
+				if (result.headers) {
+					markdown += "Headers:\n";
+					markdown += "```json\n";
+					markdown += JSON.stringify(result.headers, null, 2);
+					markdown += "\n```\n\n";
+				}
+
+				if (result.params) {
+					markdown += "Parameters:\n";
+					markdown += "```json\n";
+					markdown += JSON.stringify(result.params, null, 2);
+					markdown += "\n```\n\n";
+				}
+			}
+
+			// Add response data
+			markdown += "#### Response\n";
+			markdown += "```\n";
+			if (typeof result.data === "object") {
+				markdown += JSON.stringify(result.data, null, 2);
+			} else {
+				markdown += result.data;
+			}
 			markdown += "\n```\n\n";
 		}
 

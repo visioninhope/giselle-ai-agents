@@ -9,14 +9,31 @@ import { z } from "zod";
 // Schema for the API plan that the LLM will generate
 export const githubApiPlanSchema = z.object({
 	plans: z.array(
-		z.object({
-			name: z.string().describe("The name of this API call."),
-			query: z.string().describe("The GitHub GraphQL query to execute."),
-			variables: z
-				.record(z.string(), z.unknown())
-				.optional()
-				.describe("Variables to pass to the query."),
-		}),
+		z.discriminatedUnion('type', [
+			z.object({
+				type: z.literal('graphql'),
+				name: z.string().describe("The name of this API call."),
+				query: z.string().describe("The GitHub GraphQL query to execute."),
+				variables: z
+					.record(z.string(), z.unknown())
+					.optional()
+					.describe("Variables to pass to the query."),
+			}),
+			z.object({
+				type: z.literal('rest'),
+				name: z.string().describe("The name of this API call."),
+				method: z.enum(['GET', 'POST', 'PUT', 'DELETE']).describe("The HTTP method to use."),
+				path: z.string().describe("The REST API endpoint path."),
+				params: z
+					.record(z.string(), z.unknown())
+					.optional()
+					.describe("Query parameters or body parameters."),
+				headers: z
+					.record(z.string(), z.string())
+					.optional()
+					.describe("Additional headers to send with the request."),
+			})
+		])
 	),
 	summary: z
 		.string()
@@ -55,11 +72,14 @@ Guidelines:
 3. Break down complex tasks into multiple queries if needed
 4. Consider rate limits and data size when planning
 5. Provide clear summaries of what each query will accomplish
+6. For pull request diffs, use the REST API endpoint instead of GraphQL:
+   GET /repos/{owner}/{repo}/pulls/{pull_number} with mediaType: { format: "diff" }
 
-Example plan for "Get information about a pull request":
+Example plan for "Get information and diff of a pull request":
 {
   "plans": [
     {
+      "type": "graphql",
       "name": "Get pull request information",
       "query": "query($owner: String!, $repo: String!, $number: Int!) { repository(owner: $owner, name: $repo) { pullRequest(number: $number) { title state author { login } createdAt } } }",
       "variables": {
@@ -67,9 +87,18 @@ Example plan for "Get information about a pull request":
         "repo": "hello-world",
         "number": 1
       }
+    },
+    {
+      "type": "rest",
+      "name": "Get pull request diff",
+      "method": "GET",
+      "path": "/repos/octocat/hello-world/pulls/1",
+      "headers": {
+        "Accept": "application/vnd.github.v3.diff"
+      }
     }
   ],
-  "summary": "Retrieve basic information about pull request #1 using GraphQL"
+  "summary": "Retrieve basic information about pull request #1 using GraphQL and its diff using REST API"
 `,
 			prompt: instruction,
 		});
