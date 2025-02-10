@@ -5,18 +5,13 @@ import {
 } from "@/services/external/github";
 import { openai } from "@ai-sdk/openai";
 import type { Octokit } from "@octokit/core";
-import {
-	InvalidToolArgumentsError,
-	NoSuchToolError,
-	Output,
-	ToolExecutionError,
-	generateText,
-	tool,
-} from "ai";
+import type { LanguageModelUsage } from "ai";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import type { AgentId } from "../types";
 import type { GitHubIntegrationSetting } from "./github";
+import { type GitHubApiResult, GitHubFetcher } from "./github-fetcher";
+import { type GitHubApiPlan, GitHubPlanner } from "./github-planner";
 
 export async function fetchGitHubIntegrationSetting(agentId: AgentId) {
 	const res = await db
@@ -68,12 +63,13 @@ export const githubArtifactSchema = z.object({
 export type GitHubArtifact = z.infer<typeof githubArtifactSchema>;
 
 export class GitHubAgent {
-	readonly MAX_STEPS = 5;
+	private readonly planner: GitHubPlanner;
+	private readonly fetcher: GitHubFetcher;
 	readonly MODEL = openai("gpt-4o-mini");
 
-	private client: Octokit;
 	private constructor(client: Octokit) {
-		this.client = client;
+		this.planner = new GitHubPlanner(this.MODEL);
+		this.fetcher = new GitHubFetcher(client);
 	}
 
 	public static async build(installationId: number) {
@@ -81,116 +77,46 @@ export class GitHubAgent {
 		return new GitHubAgent(client);
 	}
 
-	public async execute(prompt: string) {
+	public async execute(prompt: string): Promise<{
+		plan: GitHubApiPlan;
+		artifact: GitHubArtifact;
+		usage: LanguageModelUsage;
+	}> {
 		try {
-			const res = await generateText({
-				model: this.MODEL,
-				tools: this.tools(),
-				maxSteps: this.MAX_STEPS,
-				experimental_output: Output.object({
-					schema: githubArtifactSchema,
-				}),
-				temperature: 0,
-				system: `You are a GitHub API executor focused on retrieving and analyzing data through APIs.
+			// 1. Plan: Get API calls plan from LLM
+			const { plan, usage } = await this.planner.plan(prompt);
 
-Primary Goals:
-- Execute GitHub API requests precisely as specified
-- Return complete, unmodified API responses
-- Chain multiple API calls when necessary to gather comprehensive data
-- Never perform mutations or modify repository data
+			// 2. Fetch: Execute the planned API calls
+			const fetchResult = await this.fetcher.fetch(plan);
 
-Execution Rules:
-1. API Response Handling:
-   - Return raw API responses without modifications
-   - Never omit or filter response data
-   - Maintain data integrity at all times
+			// 3. Format the result as a GitHubArtifact
+			const artifact: GitHubArtifact = {
+				plan: JSON.stringify(plan, null, 2),
+				title: `GitHub API Results: ${plan.summary}`,
+				content: this.formatResults(fetchResult.results),
+				description:
+					`Executed ${plan.plans.length} GitHub API calls to ${plan.summary}. ` +
+					`The results include data from: ${plan.plans.map((p) => p.endpoint).join(", ")}`,
+			};
 
-2. Request Strategy:
-   - Execute multiple API calls if needed to fulfill the request
-   - Use efficient query patterns
-   - Consider rate limits in request planning
-
-3. Mutation Policy:
-   - Never perform mutations or data modifications
-   - If mutation is requested, explain the limitation
-   - Suggest read-only alternatives when applicable
-
-4. Error Handling:
-   - Report API errors accurately
-   - Provide clear context for any failures
-   - Suggest alternatives when original request cannot be fulfilled`,
-				prompt,
-				onStepFinish: async (step) => {
-					for (const toolCall of step.toolCalls) {
-						console.log(`Tool called: ${toolCall.toolName}`, {
-							arguments: toolCall.args,
-						});
-					}
-				},
-			});
-
-			return { result: res.experimental_output, usage: res.usage };
-		} catch (error: unknown) {
-			if (NoSuchToolError.isInstance(error)) {
-				throw new Error(
-					"The requested tool does not exist. Please check the available tools and try again.",
-				);
-			}
-			if (InvalidToolArgumentsError.isInstance(error)) {
-				throw new Error(
-					"Invalid arguments provided to tool. Please check the tool documentation and try again.",
-				);
-			}
-			if (ToolExecutionError.isInstance(error)) {
-				throw new Error(
-					"An error occurred while executing the tool. Please try again.",
-				);
-			}
-			throw error;
+			return { plan, artifact, usage };
+		} catch (error) {
+			const err = error as Error;
+			throw new Error(`GitHub API execution failed: ${err.message}`);
 		}
 	}
 
-	private tools() {
-		return {
-			query: tool({
-				description: "Executes a GitHub GraphQL query with optional variables.",
-				parameters: z.object({
-					query: z.string(),
-					variables: z.record(z.any()).optional(),
-				}),
-				execute: async ({ query, variables }) => {
-					const res = await this.client.request("POST /graphql", {
-						query,
-						variables,
-					});
-					return res.data;
-				},
-			}),
-			getPullRequestDiff: tool({
-				description:
-					"Fetches the diff information of a pull request using REST API",
-				parameters: z.object({
-					owner: z.string().describe("Repository owner"),
-					repo: z.string().describe("Repository name"),
-					pullNumber: z.number().describe("Pull request number"),
-				}),
-				execute: async ({ owner, repo, pullNumber }) => {
-					const diff = await this.client.request(
-						"GET /repos/{owner}/{repo}/pulls/{pull_number}",
-						{
-							owner,
-							repo,
-							pull_number: pullNumber,
-							mediaType: {
-								format: "diff",
-							},
-						},
-					);
-					// https://github.com/octokit/request.js/issues/463
-					const diffData = diff.data as unknown as string;
-					return diffData;
-				},
-			}),
-		};
+	private formatResults(results: GitHubApiResult[]): string {
+		// Format the results as a markdown string
+		let markdown = "";
+
+		for (const result of results) {
+			markdown += `### ${result.endpoint} (Status: ${result.status})\n\n`;
+			markdown += "```json\n";
+			markdown += JSON.stringify(result.data, null, 2);
+			markdown += "\n```\n\n";
+		}
+
+		return markdown;
 	}
 }

@@ -467,13 +467,13 @@ async function performFlowExecution(
 				},
 			});
 
-			const { result, usage } = await agent.execute(prompt);
+			const { usage, plan, artifact } = await agent.execute(prompt);
 			waitUntil(
 				withTokenMeasurement(
 					createLogger(node.content.type),
 					async () => {
-						generationTracer.end({ output: result });
-						trace.update({ output: result });
+						generationTracer.end({ output: plan });
+						trace.update({ output: plan });
 						await lf.shutdownAsync();
 						waitForTelemetryExport();
 						return { usage };
@@ -486,11 +486,11 @@ async function performFlowExecution(
 
 			return {
 				type: "text",
-				title: result.title,
-				content: result.content,
+				title: artifact.title,
+				content: artifact.content,
 				messages: {
-					plan: result.plan,
-					description: result.description,
+					plan: artifact.plan,
+					description: artifact.description,
 				},
 			} satisfies TextArtifactObject;
 		}
