@@ -91,12 +91,12 @@ export class GitHubAgent {
 
 			// 3. Format the result as a GitHubArtifact
 			const artifact: GitHubArtifact = {
-				plan: JSON.stringify(plan, null, 2),
+				plan: plan.summary,
 				title: `GitHub API Results: ${plan.summary}`,
 				content: this.formatResults(fetchResult.results),
 				description:
 					`Executed ${plan.plans.length} GitHub API calls to ${plan.summary}. ` +
-					`The results include data from: ${plan.plans.map((p) => p.endpoint).join(", ")}`,
+					`The results include data from: ${plan.plans.map((p) => p.name).join(", ")}`,
 			};
 
 			return { plan, artifact, usage };
@@ -111,7 +111,7 @@ export class GitHubAgent {
 		let markdown = "";
 
 		for (const result of results) {
-			markdown += `### ${result.endpoint} (Status: ${result.status})\n\n`;
+			markdown += `### ${result.name} (Status: ${result.status})\n\n`;
 			markdown += "```json\n";
 			markdown += JSON.stringify(result.data, null, 2);
 			markdown += "\n```\n\n";

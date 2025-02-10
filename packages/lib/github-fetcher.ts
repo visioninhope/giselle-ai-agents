@@ -2,7 +2,9 @@ import type { Octokit } from "@octokit/core";
 import type { GitHubApiPlan } from "./github-planner";
 
 export interface GitHubApiResult {
-	endpoint: string;
+	name: string;
+	query: string;
+	variables?: Record<string, unknown>;
 	data: unknown;
 	status: number;
 }
@@ -27,12 +29,14 @@ export class GitHubFetcher {
 
 		for (const apiCall of plan.plans) {
 			try {
-				const result = await this.client.request(
-					apiCall.endpoint,
-					apiCall.args,
-				);
+				const result = await this.client.request("POST /graphql", {
+					query: apiCall.query,
+					variables: apiCall.variables,
+				});
 				results.push({
-					endpoint: apiCall.endpoint,
+					name: apiCall.name,
+					query: apiCall.query,
+					variables: apiCall.variables,
 					data: result.data,
 					status: result.status,
 				});
@@ -40,7 +44,7 @@ export class GitHubFetcher {
 				// Add type information and error details
 				const apiError = error as { status?: number; message?: string };
 				throw new Error(
-					`Failed to execute GitHub API call ${apiCall.endpoint}: ${apiError.message} (Status: ${apiError.status})`,
+					`Failed to execute GitHub API call ${apiCall.name}: ${apiError.message} (Status: ${apiError.status})`,
 				);
 			}
 		}
@@ -48,38 +52,6 @@ export class GitHubFetcher {
 		return {
 			results,
 			summary: plan.summary,
-		};
-	}
-
-	// Helper method to handle large responses (e.g., PR diffs)
-	private async handleLargeResponse(
-		endpoint: string,
-		args: Record<string, unknown>,
-	): Promise<LargeResponseResult> {
-		const result = await this.client.request(endpoint, args);
-		const responseSize = JSON.stringify(result.data).length;
-
-		// If the response is too large, we might want to:
-		// 1. Save it to a temporary file
-		// 2. Return a summary or partial content
-		// 3. Provide a way to access the full content later
-
-		const isLarge = responseSize > 100000; // 100KB threshold
-		if (isLarge) {
-			// For now, we'll just return a summary
-			// TODO: Implement proper large data handling
-			return {
-				summary: `Large response from ${endpoint} (${responseSize} bytes)`,
-				isLarge: true,
-				size: responseSize,
-			};
-		}
-
-		return {
-			summary: `Response from ${endpoint}`,
-			isLarge: false,
-			size: responseSize,
-			data: result.data,
 		};
 	}
 }
