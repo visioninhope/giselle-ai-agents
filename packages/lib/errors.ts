@@ -16,11 +16,7 @@ export class GraphError extends Error {
 	constructor(
 		message: string,
 		public readonly systemMessage: string,
-		public readonly code:
-			| "CIRCULAR_DEPENDENCY"
-			| "SELF_REFERENCE"
-			| "NODE_NOT_FOUND"
-			| "TYPE_MISMATCH",
+		public readonly code: "CIRCULAR_DEPENDENCY" | "SELF_REFERENCE",
 	) {
 		super(message);
 		this.name = "GraphError";

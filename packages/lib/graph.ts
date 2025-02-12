@@ -422,29 +422,6 @@ export function validateConnection(
 	existingConnections: Connection[],
 	nodes: Node[],
 ): { isValid: boolean; error?: GraphError } {
-	// Check if nodes exist
-	const nodeIds = new Set(nodes.map((node) => node.id));
-	if (!nodeIds.has(newConnection.sourceNodeId)) {
-		return {
-			isValid: false,
-			error: new GraphError(
-				"Source node not found. The node may have been deleted.",
-				`Source node ${newConnection.sourceNodeId} does not exist`,
-				"NODE_NOT_FOUND",
-			),
-		};
-	}
-	if (!nodeIds.has(newConnection.targetNodeId)) {
-		return {
-			isValid: false,
-			error: new GraphError(
-				"Target node not found. The node may have been deleted.",
-				`Target node ${newConnection.targetNodeId} does not exist`,
-				"NODE_NOT_FOUND",
-			),
-		};
-	}
-
 	// Check for self-reference in both new and existing connections
 	if (
 		newConnection.sourceNodeId === newConnection.targetNodeId ||
@@ -456,36 +433,6 @@ export function validateConnection(
 				"Cannot connect a node to itself",
 				"Self-reference connections are not allowed",
 				"SELF_REFERENCE",
-			),
-		};
-	}
-
-	// Validate node types
-	const sourceNode = nodes.find(
-		(node) => node.id === newConnection.sourceNodeId,
-	);
-	const targetNode = nodes.find(
-		(node) => node.id === newConnection.targetNodeId,
-	);
-
-	if (sourceNode?.type !== newConnection.sourceNodeType) {
-		return {
-			isValid: false,
-			error: new GraphError(
-				"Source node type is incompatible",
-				`Source node type mismatch: expected ${sourceNode?.type}, got ${newConnection.sourceNodeType}`,
-				"TYPE_MISMATCH",
-			),
-		};
-	}
-
-	if (targetNode?.type !== newConnection.targetNodeType) {
-		return {
-			isValid: false,
-			error: new GraphError(
-				"Target node type is incompatible",
-				`Target node type mismatch: expected ${targetNode?.type}, got ${newConnection.targetNodeType}`,
-				"TYPE_MISMATCH",
 			),
 		};
 	}

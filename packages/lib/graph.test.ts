@@ -339,69 +339,6 @@ describe("validateConnection", () => {
 		);
 	});
 
-	test("prevents connections to non-existent nodes", () => {
-		const nodes: Node[] = [
-			{
-				...baseNode,
-				id: "nd_node1",
-				type: "action",
-			},
-		];
-
-		const invalidConnection: Connection = {
-			id: "cnnc_conn1",
-			sourceNodeId: "nd_node1",
-			targetNodeId: "nd_nonexistent",
-			sourceNodeType: "action",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle1",
-		};
-
-		const result = validateConnection(invalidConnection, [], nodes);
-		expect(result.isValid).toBe(false);
-		expect(result.error).toBeInstanceOf(GraphError);
-		expect(result.error?.code).toBe("NODE_NOT_FOUND");
-		expect(result.error?.message).toBe(
-			"Target node not found. The node may have been deleted.",
-		);
-		expect(result.error?.systemMessage).toBe(
-			"Target node nd_nonexistent does not exist",
-		);
-	});
-
-	test("prevents connections with mismatched source node type", () => {
-		const nodes: Node[] = [
-			{
-				...baseNode,
-				id: "nd_node1",
-				type: "action",
-			},
-			{
-				...baseNode,
-				id: "nd_node2",
-				type: "action",
-			},
-		];
-
-		const invalidConnection: Connection = {
-			id: "cnnc_conn1",
-			sourceNodeId: "nd_node1",
-			targetNodeId: "nd_node2",
-			sourceNodeType: "variable",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle1",
-		};
-
-		const result = validateConnection(invalidConnection, [], nodes);
-		expect(result.isValid).toBe(false);
-		expect(result.error).toBeInstanceOf(GraphError);
-		expect(result.error?.code).toBe("TYPE_MISMATCH");
-		expect(result.error?.message).toBe("Source node type is incompatible");
-		expect(result.error?.systemMessage).toBe(
-			"Source node type mismatch: expected action, got variable",
-		);
-	});
-
 	test("prevents circular dependencies", () => {
 		const nodes: Node[] = [
 			{
