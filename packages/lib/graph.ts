@@ -11,11 +11,46 @@ import type {
 	NodeId,
 	Step,
 } from "../types";
+import { GraphError } from "./errors";
 import { createFlowId, createJobId, createStepId } from "./utils";
 
 export function deriveFlows(
 	graph: Pick<Graph, "nodes" | "connections" | "flows">,
 ): Flow[] {
+	// Validate only active connections
+	const activeConnections = graph.connections.filter(
+		(connection) =>
+			graph.nodes.some((node) => node.id === connection.sourceNodeId) &&
+			graph.nodes.some((node) => node.id === connection.targetNodeId),
+	);
+
+	// Check active connections for self-reference and cycles
+	for (const connection of activeConnections) {
+		const result = validateConnection(
+			connection,
+			activeConnections.filter((c) => c.id !== connection.id),
+			graph.nodes,
+		);
+
+		// Throw error only for self-reference and circular dependencies
+		if (
+			!result.isValid &&
+			result.error &&
+			(result.error.code === "SELF_REFERENCE" ||
+				result.error.code === "CIRCULAR_DEPENDENCY")
+		) {
+			// TODO: Send telemetry if necessary
+			const systemMessage = `Connection ${connection.id}: ${result.error.systemMessage}`;
+			console.error(systemMessage);
+
+			throw new GraphError(
+				result.error.message,
+				systemMessage,
+				result.error.code,
+			);
+		}
+	}
+
 	const processedNodes = new Set<NodeId>();
 	const flows: Flow[] = [];
 	const connectionMap = new Map<NodeId, Set<NodeId>>();
@@ -373,4 +408,89 @@ export function migrateGraph(graph: Graph): Graph {
 	}
 
 	return newGraph;
+}
+
+/**
+ * Validates if adding a new connection would create a circular dependency in the graph
+ * @param newConnection - The connection to be added
+ * @param existingConnections - Array of existing connections in the graph
+ * @param nodes - Array of nodes in the graph
+ * @returns Object containing validation result and error message if any
+ */
+export function validateConnection(
+	newConnection: Connection,
+	existingConnections: Connection[],
+	nodes: Node[],
+): { isValid: boolean; error?: GraphError } {
+	// Check for self-reference in both new and existing connections
+	if (
+		newConnection.sourceNodeId === newConnection.targetNodeId ||
+		existingConnections.some((conn) => conn.sourceNodeId === conn.targetNodeId)
+	) {
+		return {
+			isValid: false,
+			error: new GraphError(
+				"Cannot connect a node to itself",
+				"Self-reference connections are not allowed",
+				"SELF_REFERENCE",
+			),
+		};
+	}
+
+	// Create a map of node connections for efficient lookup
+	const connectionMap = new Map<NodeId, Set<NodeId>>();
+	const allConnections = [...existingConnections, newConnection];
+
+	// Build connection map
+	for (const conn of allConnections) {
+		if (!connectionMap.has(conn.sourceNodeId)) {
+			connectionMap.set(conn.sourceNodeId, new Set());
+		}
+		const sourceSet = connectionMap.get(conn.sourceNodeId);
+		if (sourceSet) {
+			sourceSet.add(conn.targetNodeId);
+		}
+	}
+
+	// Check for cycles using DFS
+	const visited = new Set<NodeId>();
+	const recursionStack = new Set<NodeId>();
+
+	function hasCycle(
+		currentId: NodeId,
+		visited: Set<NodeId>,
+		recursionStack: Set<NodeId>,
+	): boolean {
+		visited.add(currentId);
+		recursionStack.add(currentId);
+
+		const neighbors = connectionMap.get(currentId);
+		if (neighbors) {
+			for (const nextId of neighbors) {
+				if (!visited.has(nextId)) {
+					if (hasCycle(nextId, visited, recursionStack)) {
+						return true;
+					}
+				} else if (recursionStack.has(nextId)) {
+					return true; // Cycle detected
+				}
+			}
+		}
+
+		recursionStack.delete(currentId);
+		return false;
+	}
+
+	if (hasCycle(newConnection.sourceNodeId, visited, recursionStack)) {
+		return {
+			isValid: false,
+			error: new GraphError(
+				"Cannot create a circular connection between nodes. Please review the connections.",
+				"Adding this connection would create a circular dependency",
+				"CIRCULAR_DEPENDENCY",
+			),
+		};
+	}
+
+	return { isValid: true };
 }

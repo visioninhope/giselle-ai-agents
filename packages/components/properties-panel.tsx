@@ -42,6 +42,7 @@ import {
 } from "../contexts/graph";
 import { usePropertiesPanel } from "../contexts/properties-panel";
 import { useToast } from "../contexts/toast";
+import { GraphError } from "../lib/errors";
 import { textGenerationPrompt } from "../lib/prompts";
 import {
 	createConnectionId,
@@ -259,6 +260,7 @@ export function PropertiesPanel() {
 	const selectedNode = useSelectedNode();
 	const { open, setOpen, tab, setTab } = usePropertiesPanel();
 	const { executeNode } = useExecution();
+	const { addToast } = useToast();
 	return (
 		<div
 			className={clsx(
@@ -419,34 +421,48 @@ export function PropertiesPanel() {
 										id: createNodeHandleId(),
 										label: `Source${selectedNode.content.sources.length + 1}`,
 									};
-									dispatch([
-										{
-											type: "updateNode",
-											input: {
-												nodeId: selectedNode.id,
-												node: {
-													...selectedNode,
-													content: {
-														...selectedNode.content,
-														sources: [...selectedNode.content.sources, source],
+
+									try {
+										dispatch([
+											{
+												type: "updateNode",
+												input: {
+													nodeId: selectedNode.id,
+													node: {
+														...selectedNode,
+														content: {
+															...selectedNode.content,
+															sources: [
+																...selectedNode.content.sources,
+																source,
+															],
+														},
 													},
 												},
 											},
-										},
-										{
-											type: "addConnection",
-											input: {
-												connection: {
-													id: createConnectionId(),
-													sourceNodeId: sourceNode.id,
-													sourceNodeType: sourceNode.type,
-													targetNodeId: selectedNode.id,
-													targetNodeType: selectedNode.type,
-													targetNodeHandleId: source.id,
+											{
+												type: "addConnection",
+												input: {
+													connection: {
+														id: createConnectionId(),
+														sourceNodeId: sourceNode.id,
+														sourceNodeType: sourceNode.type,
+														targetNodeId: selectedNode.id,
+														targetNodeType: selectedNode.type,
+														targetNodeHandleId: source.id,
+													},
 												},
 											},
-										},
-									]);
+										]);
+									} catch (error) {
+										addToast({
+											type: "error",
+											message:
+												error instanceof GraphError
+													? toErrorWithMessage(error).message
+													: "An unexpected error occurred",
+										});
+									}
 								}}
 								onSourceRemove={(sourceNode) => {
 									const connection = graph.connections.find(

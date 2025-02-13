@@ -11,3 +11,14 @@ export class AgentTimeNotAvailableError extends Error {
 		}
 	}
 }
+
+export class GraphError extends Error {
+	constructor(
+		message: string,
+		public readonly systemMessage: string,
+		public readonly code: "CIRCULAR_DEPENDENCY" | "SELF_REFERENCE",
+	) {
+		super(message);
+		this.name = "GraphError";
+	}
+}

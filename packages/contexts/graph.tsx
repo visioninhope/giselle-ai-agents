@@ -260,16 +260,22 @@ export function GraphContextProvider({
 
 	const dispatch = useCallback(
 		(actionOrActions: GraphActionOrActions) => {
-			graphRef.current = applyActions(graphRef.current, actionOrActions);
-			setGraph(graphRef.current);
+			try {
+				graphRef.current = applyActions(graphRef.current, actionOrActions);
+				setGraph(graphRef.current);
 
-			isPendingPersistRef.current = true;
+				isPendingPersistRef.current = true;
+			} catch (error) {
+				console.error("Failed to dispatch actions:", error);
 
-			if (persistTimeoutRef.current) {
-				clearTimeout(persistTimeoutRef.current);
+				throw error;
+			} finally {
+				if (persistTimeoutRef.current) {
+					clearTimeout(persistTimeoutRef.current);
+				}
+
+				persistTimeoutRef.current = setTimeout(persist, 500);
 			}
-
-			persistTimeoutRef.current = setTimeout(persist, 500);
 		},
 		[persist],
 	);
