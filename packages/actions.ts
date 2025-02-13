@@ -39,7 +39,7 @@ export async function parse(id: FileId, name: string, blobUrl: string) {
 				fileName: name,
 				content,
 			},
-			strategy: Strategy.Fast,
+			strategy: Strategy.Auto,
 			splitPdfPage: false,
 			splitPdfConcurrencyLevel: 1,
 		},
