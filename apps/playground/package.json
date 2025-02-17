@@ -1,0 +1,40 @@
+{
+	"name": "playground",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev --turbopack --port 6180",
+		"clean": "rm -rf .next .turbo node_modules",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"check-types": "tsc --noEmit"
+	},
+	"dependencies": {
+		"@giselle-internal/workflow-designer-ui": "workspace:*",
+		"@giselle-sdk/data-type": "workspace:*",
+		"@giselle-sdk/generation-runner": "workspace:^",
+		"@giselle-sdk/giselle-engine": "workspace:*",
+		"@giselle-sdk/run": "workspace:^",
+		"@giselle-sdk/workflow-designer": "workspace:*",
+		"@tailwindcss/postcss": "catalog:",
+		"@xyflow/react": "catalog:",
+		"giselle-sdk": "workspace:^",
+		"lucide-react": "catalog:",
+		"next": "catalog:",
+		"react": "catalog:",
+		"react-dom": "catalog:",
+		"unstorage": "catalog:"
+	},
+	"devDependencies": {
+		"@tailwindcss/typography": "catalog:",
+		"@types/node": "catalog:",
+		"@types/react": "catalog:",
+		"@types/react-dom": "catalog:",
+		"node-loader": "catalog:",
+		"postcss": "catalog:",
+		"tailwindcss": "catalog:",
+		"tailwindcss-animate": "catalog:",
+		"typescript": "catalog:"
+	}
+}

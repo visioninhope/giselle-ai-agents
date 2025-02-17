@@ -2,11 +2,22 @@
 	"name": "giselle-project",
 	"version": "0.1.0",
 	"private": true,
-	"scripts": {},
-	"packageManager": "pnpm@10.0.0",
+	"scripts": {
+		"build": "turbo build",
+		"build-sdk": "turbo build --filter '@giselle-sdk/*' --filter giselle-sdk",
+		"build-data-type": "turbo build --filter '@giselle-sdk/data-type'",
+		"check-types": "turbo check-types",
+		"clean": "turbo clean && rm -rf node_modules .turbo",
+		"dev": "turbo dev --filter playground"
+	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
-		"turbo": "2.0.9",
-		"typescript": "5.6.2"
+		"@biomejs/biome": "catalog:",
+		"@turbo/gen": "catalog:",
+		"turbo": "catalog:",
+		"typescript": "catalog:"
+	},
+	"packageManager": "pnpm@10.2.1",
+	"engines": {
+		"node": ">=22"
 	}
 }
