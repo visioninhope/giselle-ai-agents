@@ -1,4 +1,4 @@
-import { db } from "@/drizzle";
+import { db, type githubIntegrationSettings } from "@/drizzle";
 import { saveAgentActivity } from "@/services/agents/activities";
 import { reportAgentTimeUsage } from "@/services/usage-based-billing";
 import { executeStep } from "@giselles-ai/lib/execution";
@@ -9,8 +9,9 @@ import {
 } from "@giselles-ai/lib/utils";
 import type { Execution, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
+import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { waitUntil } from "@vercel/functions";
-import { parseCommand } from "./command";
+import { type Command, parseCommand } from "./command";
 import {
 	assertIssueCommentEvent,
 	createOctokit,
@@ -118,107 +119,118 @@ async function handleIssueComment(
 	waitUntil(
 		Promise.all(
 			integrationSettings.map(async (integrationSetting) => {
-				const agent = await db.query.agents.findFirst({
-					where: (agents, { eq }) =>
-						eq(agents.dbId, integrationSetting.agentDbId),
-				});
-				if (agent === undefined || agent.graphUrl === null) {
-					return;
-				}
-				const graph = await fetch(agent.graphUrl).then(
-					(res) => res.json() as unknown as Graph,
+				await executeIntegrationFlow(
+					integrationSetting,
+					command,
+					payload,
+					octokit,
 				);
-				const flow = graph.flows.find(
-					(flow) => flow.id === integrationSetting.flowId,
-				);
-				if (flow === undefined) {
-					console.warn(
-						`GitHubIntegrationSetting: ${integrationSetting.id}, flow not found`,
-					);
-					return;
-				}
-				const executionId = createExecutionId();
-				const jobExecutions = createInitialJobExecutions(flow);
-				const flowRunStartedAt = Date.now();
-
-				let initialExecution: Execution = {
-					id: executionId,
-					status: "running",
-					flowId: flow.id,
-					jobExecutions,
-					artifacts: [],
-					runStartedAt: flowRunStartedAt,
-				};
-
-				const overrideData = integrationSetting.eventNodeMappings
-					.map((eventNodeMapping) => {
-						switch (eventNodeMapping.event) {
-							case "comment.body":
-								return {
-									nodeId: eventNodeMapping.nodeId,
-									data: command.content,
-								};
-							case "issue.title":
-								return {
-									nodeId: eventNodeMapping.nodeId,
-									data: payload.issue.title,
-								};
-							case "issue.body":
-								if (payload.issue.body === null) {
-									return null;
-								}
-								return {
-									nodeId: eventNodeMapping.nodeId,
-									data: payload.issue.body,
-								};
-							default:
-								return null;
-						}
-					})
-					.filter((overrideData) => overrideData !== null);
-				const finalExecution = await performFlowExecution({
-					initialExecution,
-					executeStepFn: (stepId) =>
-						executeStep({
-							agentId: agent.id,
-							flowId: flow.id,
-							executionId: executionId,
-							stepId: stepId,
-							artifacts: initialExecution.artifacts,
-							overrideData,
-						}),
-					onExecutionChange: (execution) => {
-						initialExecution = execution;
-					},
-					onFinish: async ({ endedAt, durationMs, execution }) => {
-						const startedAtDate = new Date(execution.runStartedAt);
-						const endedAtDate = new Date(endedAt);
-						await saveAgentActivity(
-							agent.id,
-							startedAtDate,
-							endedAtDate,
-							durationMs,
-						);
-						await reportAgentTimeUsage(agent.id, endedAtDate);
-					},
-					onStepFail: async (stepExecution) => {
-						await notifyWorkflowError(agent, stepExecution.error);
-					},
-				});
-				if (finalExecution.status === "completed") {
-					await octokit.request(
-						"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-						{
-							owner: payload.repository.owner.login,
-							repo: payload.repository.name,
-							issue_number: payload.issue.number,
-							body: finalExecution.artifacts[
-								finalExecution.artifacts.length - 1
-							].object.content,
-						},
-					);
-				}
 			}),
 		),
 	);
+}
+
+async function executeIntegrationFlow(
+	integrationSetting: typeof githubIntegrationSettings.$inferSelect,
+	command: Command,
+	payload: EmitterWebhookEvent<"issue_comment">["payload"],
+	octokit: Octokit,
+) {
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.dbId, integrationSetting.agentDbId),
+	});
+	if (agent === undefined || agent.graphUrl === null) {
+		return;
+	}
+
+	const graph = await fetch(agent.graphUrl).then(
+		(res) => res.json() as unknown as Graph,
+	);
+	const flow = graph.flows.find(
+		(flow) => flow.id === integrationSetting.flowId,
+	);
+	if (flow === undefined) {
+		console.warn(
+			`GitHubIntegrationSetting: ${integrationSetting.id}, flow not found`,
+		);
+		return;
+	}
+
+	const executionId = createExecutionId();
+	const jobExecutions = createInitialJobExecutions(flow);
+	const flowRunStartedAt = Date.now();
+
+	let initialExecution: Execution = {
+		id: executionId,
+		status: "running",
+		flowId: flow.id,
+		jobExecutions,
+		artifacts: [],
+		runStartedAt: flowRunStartedAt,
+	};
+
+	const overrideData = integrationSetting.eventNodeMappings
+		.map((eventNodeMapping) => {
+			switch (eventNodeMapping.event) {
+				case "comment.body":
+					return {
+						nodeId: eventNodeMapping.nodeId,
+						data: command.content,
+					};
+				case "issue.title":
+					return {
+						nodeId: eventNodeMapping.nodeId,
+						data: payload.issue.title,
+					};
+				case "issue.body":
+					if (payload.issue.body === null) {
+						return null;
+					}
+					return {
+						nodeId: eventNodeMapping.nodeId,
+						data: payload.issue.body,
+					};
+				default:
+					return null;
+			}
+		})
+		.filter((overrideData) => overrideData !== null);
+
+	const finalExecution = await performFlowExecution({
+		initialExecution,
+		executeStepFn: (stepId) =>
+			executeStep({
+				agentId: agent.id,
+				flowId: flow.id,
+				executionId: executionId,
+				stepId: stepId,
+				artifacts: initialExecution.artifacts,
+				overrideData,
+			}),
+		onExecutionChange: (execution) => {
+			initialExecution = execution;
+		},
+		onFinish: async ({ endedAt, durationMs, execution }) => {
+			const startedAtDate = new Date(execution.runStartedAt);
+			const endedAtDate = new Date(endedAt);
+			await saveAgentActivity(agent.id, startedAtDate, endedAtDate, durationMs);
+			await reportAgentTimeUsage(agent.id, endedAtDate);
+		},
+		onStepFail: async (stepExecution) => {
+			await notifyWorkflowError(agent, stepExecution.error);
+		},
+	});
+
+	if (finalExecution.status === "completed") {
+		await octokit.request(
+			"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+			{
+				owner: payload.repository.owner.login,
+				repo: payload.repository.name,
+				issue_number: payload.issue.number,
+				body: finalExecution.artifacts[finalExecution.artifacts.length - 1]
+					.object.content,
+			},
+		);
+	}
 }
