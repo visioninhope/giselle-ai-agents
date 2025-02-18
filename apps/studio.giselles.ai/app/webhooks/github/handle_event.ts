@@ -118,7 +118,7 @@ async function handleIssueComment(
 	);
 
 	waitUntil(
-		Promise.allSettled(
+		Promise.all(
 			integrationSettings.map(async (integrationSetting) => {
 				try {
 					await executeIntegrationFlow(
