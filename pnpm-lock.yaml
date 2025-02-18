@@ -945,6 +945,9 @@ importers:
       '@giselle-sdk/generation-runner':
         specifier: workspace:^
         version: link:../generation-runner
+      '@giselle-sdk/giselle-engine':
+        specifier: workspace:^
+        version: link:../giselle-engine
       '@giselle-sdk/run':
         specifier: workspace:^
         version: link:../run

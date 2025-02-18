@@ -31,7 +31,8 @@
 
 ## Tasks
 
-- [ ] Set viewport
+- [ ] Set viewport to storage
+- [ ] Auto detect storage backend
 - [ ] Workflow View
 - [ ] Update text node icon
 - [ ] Add generate text short cut

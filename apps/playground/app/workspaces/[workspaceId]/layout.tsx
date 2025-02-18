@@ -10,8 +10,8 @@ export default async function Layout({
 	params: Promise<{ workspaceId: string }>;
 	children: ReactNode;
 }) {
-	const data = await callGetWorkspaceApi({
-		workspaceId: WorkspaceId.parse((await params).workspaceId),
-	});
-	return <WorkspaceProvider defaultValue={data}>{children}</WorkspaceProvider>;
+	const workspaceId = WorkspaceId.parse((await params).workspaceId);
+	return (
+		<WorkspaceProvider workspaceId={workspaceId}>{children}</WorkspaceProvider>
+	);
 }
