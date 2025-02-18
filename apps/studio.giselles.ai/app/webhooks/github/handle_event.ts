@@ -10,6 +10,7 @@ import {
 import type { Execution, Graph } from "@giselles-ai/types";
 import type { Octokit } from "@octokit/core";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
+import { captureException } from "@sentry/nextjs";
 import { waitUntil } from "@vercel/functions";
 import { type Command, parseCommand } from "./command";
 import {
@@ -119,12 +120,30 @@ async function handleIssueComment(
 	waitUntil(
 		Promise.allSettled(
 			integrationSettings.map(async (integrationSetting) => {
-				await executeIntegrationFlow(
-					integrationSetting,
-					command,
-					payload,
-					octokit,
-				);
+				try {
+					await executeIntegrationFlow(
+						integrationSetting,
+						command,
+						payload,
+						octokit,
+					);
+				} catch (e: unknown) {
+					console.error(
+						`Failed to execute integration flow: ${e}`,
+						integrationSetting,
+					);
+					captureException(e, {
+						contexts: {
+							integration: {
+								id: integrationSetting.id,
+								agentDbId: integrationSetting.agentDbId,
+								repositoryFullName: integrationSetting.repositoryFullName,
+								callSign: integrationSetting.callSign,
+								flowId: integrationSetting.flowId,
+							},
+						},
+					});
+				}
 			}),
 		),
 	);
