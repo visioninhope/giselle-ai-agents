@@ -2,17 +2,22 @@
 	"$schema": "https://turbo.build/schema.json",
 	"ui": "tui",
 	"tasks": {
-		"dev:next.js": {
-			"persistent": true,
-			"cache": false
+		"build": {
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"outputs": [".next/**", "!.next/cache/**"]
 		},
-		"dev:trigger.dev": {
-			"persistent": true,
-			"cache": false
+		"clean": {},
+		"lint": {
+			"dependsOn": ["^lint"]
 		},
-		"dev:drizzle": {
-			"persistent": true,
-			"cache": false
+		"check-types": {
+			"dependsOn": ["^check-types"]
+		},
+		"dev": {
+			"dependsOn": ["^build"],
+			"cache": false,
+			"persistent": true
 		}
 	}
 }

@@ -81,3 +81,17 @@
     :why: MIT-0 is an extremely permissive license with no attribution requirements. https://github.com/aws/mit-0
     :versions: []
     :when: 2025-01-20 15:39:57.858569000 Z
+- - :permit
+  - Mozilla Public License 2.0
+  - :who: OSPO @masutaka
+    :why: Compatible with Apache-2.0 license. See https://opensource.org/license/mpl-2-0
+    :versions: []
+    :when: 2025-02-17 08:52:56.670306000 Z
+- - :approve
+  - argparse
+  - :who: OSPO @masutaka
+    :why: Python 2.0 license is compatible with Apache-2.0. But License Finder does
+      not support the name "Python-2.0". See https://github.com/pivotal/LicenseFinder/pull/1053
+    :versions:
+    - 2.0.1
+    :when: 2025-02-17 09:01:39.703928000 Z
