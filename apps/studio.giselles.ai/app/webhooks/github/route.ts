@@ -8,9 +8,9 @@ import {
 	mockGitHubClientFactory,
 } from "./handle_event";
 
-// Extend the max duration of the server actions from this page to 5 minutes
+// The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
-export const maxDuration = 300;
+export const maxDuration = 800;
 
 // debug mode
 // - skip verifying webhook signature
