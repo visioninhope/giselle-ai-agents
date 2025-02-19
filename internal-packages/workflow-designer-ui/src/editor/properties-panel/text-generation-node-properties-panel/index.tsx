@@ -54,7 +54,7 @@ export function TextGenerationNodePropertiesPanel({
 					);
 					return data.nodes.find((tmpNode) =>
 						connections.some(
-							(connection) => connection.sourceNodeId === tmpNode.id,
+							(connection) => connection.outputNodeId === tmpNode.id,
 						),
 					);
 				})
@@ -82,7 +82,7 @@ export function TextGenerationNodePropertiesPanel({
 		(removeSourceNode: Node) => {
 			for (const connection of data.connections) {
 				if (
-					connection.sourceNodeId !== removeSourceNode.id ||
+					connection.outputNodeId !== removeSourceNode.id ||
 					connection.targetNodeId !== node.id
 				) {
 					continue;

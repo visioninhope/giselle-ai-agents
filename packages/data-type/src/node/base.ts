@@ -39,7 +39,7 @@ export const ConnectionId = createIdGenerator("cnnc");
 export type ConnectionId = z.infer<typeof ConnectionId.schema>;
 export const Connection = z.object({
 	id: ConnectionId.schema,
-	sourceNodeId: NodeId.schema,
+	outputNodeId: NodeId.schema,
 	sourceNodeType: NodeBase.shape.type,
 	targetNodeId: NodeId.schema,
 	targetNodeType: NodeBase.shape.type,

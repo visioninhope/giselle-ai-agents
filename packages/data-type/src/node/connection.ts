@@ -15,7 +15,7 @@ export function createConnection({
 }): Connection {
 	return {
 		id: ConnectionId.generate(),
-		sourceNodeId: sourceNode.id,
+		outputNodeId: sourceNode.id,
 		sourceNodeType: sourceNode.type,
 		targetNodeId: targetNodeHandle.nodeId,
 		targetNodeType: targetNodeHandle.nodeType,

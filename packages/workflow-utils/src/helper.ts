@@ -21,15 +21,15 @@ export function createConnectedNodeIdMap(
 	const connectionMap: ConnectedNodeIdMap = new Map();
 	for (const connection of connectionSet) {
 		if (
-			!nodeIdSet.has(connection.sourceNodeId) ||
+			!nodeIdSet.has(connection.outputNodeId) ||
 			!nodeIdSet.has(connection.targetNodeId)
 		) {
 			continue;
 		}
-		if (!connectionMap.has(connection.sourceNodeId)) {
-			connectionMap.set(connection.sourceNodeId, new Set());
+		if (!connectionMap.has(connection.outputNodeId)) {
+			connectionMap.set(connection.outputNodeId, new Set());
 		}
-		const sourceSet = connectionMap.get(connection.sourceNodeId);
+		const sourceSet = connectionMap.get(connection.outputNodeId);
 		if (sourceSet) {
 			sourceSet.add(connection.targetNodeId);
 		}
@@ -39,7 +39,7 @@ export function createConnectedNodeIdMap(
 		}
 		const targetSet = connectionMap.get(connection.targetNodeId);
 		if (targetSet) {
-			targetSet.add(connection.sourceNodeId);
+			targetSet.add(connection.outputNodeId);
 		}
 	}
 	return connectionMap;
@@ -82,7 +82,7 @@ export function findConnectedConnectionMap(
 
 	for (const connection of allConnectionSet) {
 		if (
-			connectedNodeIdSet.has(connection.sourceNodeId) &&
+			connectedNodeIdSet.has(connection.outputNodeId) &&
 			connectedNodeIdSet.has(connection.targetNodeId)
 		) {
 			connectedConnectionMap.set(connection.id, connection);
@@ -158,7 +158,7 @@ export function createJobMap(
 	): Set<NodeId> => {
 		const childNodeIdSet = new Set<NodeId>();
 		for (const connection of connectionSet) {
-			if (connection.sourceNodeId !== nodeId) {
+			if (connection.outputNodeId !== nodeId) {
 				continue;
 			}
 			childNodeIdSet.add(connection.targetNodeId);
@@ -222,7 +222,7 @@ export function createJobMap(
 				);
 				return nodeArray.find((tmpNode) =>
 					connections.some(
-						(connection) => connection.sourceNodeId === tmpNode.id,
+						(connection) => connection.outputNodeId === tmpNode.id,
 					),
 				);
 			})

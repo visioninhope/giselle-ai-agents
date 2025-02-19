@@ -58,7 +58,7 @@ export function CustomXyFlowNode({
 	const hasTarget = useMemo(
 		() =>
 			workspace.connections.some(
-				(connection) => connection.sourceNodeId === data.nodeData.id,
+				(connection) => connection.outputNodeId === data.nodeData.id,
 			),
 		[workspace, data.nodeData.id],
 	);
