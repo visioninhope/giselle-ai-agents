@@ -83,36 +83,6 @@ async function buildGenerationMessageForTextGeneration(
 	const pattern = /\{\{(nd-[a-zA-Z0-9]+)\}\}/g;
 	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => match[1]);
 
-	const pdfData = await Promise.all(
-		contextNodes
-			.filter((contextNode) => sourceKeywords.includes(contextNode.id))
-			.map(async (contextNode) => {
-				if (contextNode.content.type !== "file") {
-					return null;
-				}
-				return await Promise.all(
-					contextNode.content.files.map(async (file) => {
-						if (
-							file.status !== "uploaded" &&
-							file.contentType !== "application/pdf"
-						) {
-							return null;
-						}
-						const dataContent = await fileResolver(file);
-						return {
-							dataContent,
-							nodeId: contextNode.id,
-						};
-					}),
-				).then((result) => result.filter((dataOrNull) => dataOrNull !== null));
-			}),
-	)
-		.then((result) => result.filter((dataOrNull) => dataOrNull !== null))
-		.then((result) =>
-			result.flat().sort((a, b) => b.nodeId.localeCompare(a.nodeId)),
-		);
-	const fileIndices = createFileIndices(pdfData);
-
 	let userMessage = prompt;
 
 	if (isJsonContent(prompt)) {
