@@ -1,6 +1,10 @@
 import {
+	type Action,
+	type ActionNode,
 	type Connection,
 	type ConnectionId,
+	GenerationContext,
+	type GenerationTemplate,
 	type Job,
 	JobId,
 	type Node,
@@ -207,6 +211,28 @@ export function createJobMap(
 		return levels;
 	};
 
+	function createGenerationContext(node: ActionNode): GenerationTemplate {
+		const connectionArray = Array.from(connectionSet);
+		const nodeArray = Array.from(nodeSet);
+
+		const sourceNodes = node.content.inputs
+			.map((input) => {
+				const connections = connectionArray.filter(
+					(connection) => connection.targetNodeHandleId === input.id,
+				);
+				return nodeArray.find((tmpNode) =>
+					connections.some(
+						(connection) => connection.sourceNodeId === tmpNode.id,
+					),
+				);
+			})
+			.filter((node) => node !== undefined);
+		return {
+			actionNode: node,
+			sourceNodes,
+		};
+	}
+
 	const actionNodeIdSet = new Set<NodeId>();
 	for (const node of nodeSet) {
 		if (node.type === "action") {
@@ -227,10 +253,17 @@ export function createJobMap(
 		const nodes = Array.from(nodeSet)
 			.filter((node) => level.has(node.id))
 			.filter((node) => isActionNode(node));
+		const actions = nodes.map(
+			(node) =>
+				({
+					node,
+					generationTemplate: createGenerationContext(node),
+				}) satisfies Action,
+		);
 
 		const job = {
 			id: jobId,
-			nodes,
+			actions,
 			workflowId,
 		} satisfies Job;
 		jobMap.set(job.id, job);

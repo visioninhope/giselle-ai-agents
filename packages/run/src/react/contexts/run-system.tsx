@@ -106,18 +106,11 @@ export function RunSystemContextProvider({
 
 			for (const job of runningRun.workflow.jobs) {
 				await Promise.all(
-					job.nodes.map(async (node) => {
+					job.actions.map(async (action) => {
 						await startGeneration(
 							{
 								origin: { type: "run", id: runId },
-								actionNode: node,
-								sourceNodes: node.content.inputs
-									.map((input) =>
-										runningRun.workflow.nodes.find(
-											(node) => node.id === input.connectedNodeId,
-										),
-									)
-									.filter((nodeOrUndefined) => nodeOrUndefined !== undefined),
+								...action.generationTemplate,
 							},
 							{
 								onGenerationCreated(generation) {

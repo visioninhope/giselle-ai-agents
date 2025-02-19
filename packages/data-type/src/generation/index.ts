@@ -4,6 +4,7 @@ import { z } from "zod";
 import { NodeId } from "../node";
 import { GenerationContext, GenerationOrigin } from "./context";
 export * from "./context";
+export * from "./template";
 
 export const GenerationId = createIdGenerator("gnr");
 export type GenerationId = z.infer<typeof GenerationId.schema>;

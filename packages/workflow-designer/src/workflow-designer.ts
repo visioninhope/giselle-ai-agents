@@ -62,6 +62,7 @@ export function WorkflowDesigner({
 				new Map(connections.map((connection) => [connection.id, connection])),
 			).values(),
 		);
+		console.log(editingWorkflows);
 	}
 	function addTextGenerationNode(
 		params: CreateTextGenerationNodeParams,
@@ -150,6 +151,7 @@ export function WorkflowDesigner({
 		});
 	}
 	async function saveWorkspace() {
+		console.log({ data: getData() });
 		await callSaveWorkspaceApi({
 			api: saveWorkflowApi,
 			workspaceId: defaultValue.id,
