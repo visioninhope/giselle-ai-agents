@@ -108,9 +108,9 @@ function NodeCanvas() {
 										updateNodeData(targetNode, {
 											content: {
 												...targetNode.content,
-												sources: targetNode.content.sources.filter(
-													(source) =>
-														source.id !== connection.targetNodeHandleId,
+												inputs: targetNode.content.inputs.filter(
+													(input) =>
+													input.id !== connection.targetNodeHandleId,
 												),
 											},
 										});

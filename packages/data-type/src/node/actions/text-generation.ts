@@ -6,26 +6,26 @@ export const OpenAIContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: OpenAI,
 	prompt: z.string(),
-	sources: z.array(ConnectionHandle),
+	inputs: z.array(ConnectionHandle),
 });
 export const GoogleGenerativeAIContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: Google,
 	prompt: z.string(),
-	sources: z.array(ConnectionHandle),
+	inputs: z.array(ConnectionHandle),
 });
 export const AnthropicContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: Anthropic,
 	prompt: z.string(),
-	sources: z.array(ConnectionHandle),
+	inputs: z.array(ConnectionHandle),
 });
 
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: LLM,
 	prompt: z.string().optional(),
-	sources: z.array(ConnectionHandle),
+	inputs: z.array(ConnectionHandle),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 
@@ -71,7 +71,7 @@ export function createTextGenerationNode(
 				frequencyPenalty: 0.0,
 			},
 			prompt: params.prompt,
-			sources: params.sources ?? [],
+			inputs: params.inputs ?? [],
 		},
 	};
 }

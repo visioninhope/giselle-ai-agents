@@ -111,10 +111,10 @@ export function RunSystemContextProvider({
 							{
 								origin: { type: "run", id: runId },
 								actionNode: node,
-								sourceNodes: node.content.sources
-									.map((source) =>
+								sourceNodes: node.content.inputs
+									.map((input) =>
 										runningRun.workflow.nodes.find(
-											(node) => node.id === source.connectedNodeId,
+											(node) => node.id === input.connectedNodeId,
 										),
 									)
 									.filter((nodeOrUndefined) => nodeOrUndefined !== undefined),

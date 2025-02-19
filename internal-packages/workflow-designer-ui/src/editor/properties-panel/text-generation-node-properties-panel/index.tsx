@@ -47,12 +47,12 @@ export function TextGenerationNodePropertiesPanel({
 	);
 	const sourceNodes = useMemo(
 		() =>
-			node.content.sources
-				.map((source) =>
-					data.nodes.find((node) => node.id === source.connectedNodeId),
+			node.content.inputs
+				.map((input) =>
+					data.nodes.find((node) => node.id === input.connectedNodeId),
 				)
 				.filter((node) => node !== undefined),
-		[data, node.content.sources],
+		[data, node.content.inputs],
 	);
 	const addSource = useCallback(
 		(sourceNode: Node) => {
@@ -65,7 +65,7 @@ export function TextGenerationNodePropertiesPanel({
 			addConnection(sourceNode, connectionHandle);
 			connectionHandle;
 			updateNodeDataContent(node, {
-				sources: [...node.content.sources, connectionHandle],
+				inputs: [...node.content.inputs, connectionHandle],
 			});
 		},
 		[addConnection, node, updateNodeDataContent],
@@ -82,7 +82,7 @@ export function TextGenerationNodePropertiesPanel({
 				}
 				deleteConnection(connection.id);
 				updateNodeDataContent(node, {
-					sources: node.content.sources.filter(
+					inputs: node.content.inputs.filter(
 						({ id }) => id !== connection.targetNodeHandleId,
 					),
 				});

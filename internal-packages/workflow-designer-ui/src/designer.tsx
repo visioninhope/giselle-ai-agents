@@ -1,10 +1,6 @@
 "use client";
 
-import {
-	WorkspaceProvider,
-	type WorkspaceProviderProps,
-	useWorkflowDesigner,
-} from "giselle-sdk/react";
+import { WorkspaceProvider, useWorkflowDesigner } from "giselle-sdk/react";
 import { Editor } from "./editor";
 import { Viewer } from "./viewer";
 import "@xyflow/react/dist/style.css";
@@ -39,11 +35,6 @@ export function DesignerInternal() {
 	);
 }
 
-type DesignerProps = Pick<WorkspaceProviderProps, "defaultValue">;
-export function Designer(props: DesignerProps) {
-	return (
-		<WorkspaceProvider {...props}>
-			<DesignerInternal />
-		</WorkspaceProvider>
-	);
+export function Designer() {
+	return <DesignerInternal />;
 }

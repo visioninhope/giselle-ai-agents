@@ -51,7 +51,7 @@ export function CustomXyFlowNode({
 		if (data.nodeData.content.type !== "textGeneration") {
 			return [];
 		}
-		return [...data.nodeData.content.sources].filter(
+		return [...data.nodeData.content.inputs].filter(
 			(item) => item !== undefined,
 		);
 	}, [data]);

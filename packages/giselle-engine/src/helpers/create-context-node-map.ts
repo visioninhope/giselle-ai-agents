@@ -5,7 +5,7 @@ export function createContextNodeMap(
 	nodeMap: Map<NodeId, Node>,
 ) {
 	const contextMap = new Map<NodeId, Node>();
-	for (const sourceConnectionHandle of node.content.sources) {
+	for (const sourceConnectionHandle of node.content.inputs) {
 		const sourceNode = nodeMap.get(sourceConnectionHandle.connectedNodeId);
 		if (sourceNode !== undefined) {
 			contextMap.set(sourceNode.id, sourceNode);
