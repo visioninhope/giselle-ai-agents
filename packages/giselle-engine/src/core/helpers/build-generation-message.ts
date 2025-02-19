@@ -36,38 +36,6 @@ export async function buildMessageObject(
 	}
 }
 
-function createFileIndices(
-	dataContents: { dataContent: DataContent; nodeId: NodeId }[],
-): FileIndex[] {
-	// Group by nodeId and count positions
-	let currentPosition = 1;
-	const result: FileIndex[] = [];
-
-	// Group data by nodeId
-	const groupedData = dataContents.reduce(
-		(acc, curr) => {
-			if (!acc[curr.nodeId]) {
-				acc[curr.nodeId] = [];
-			}
-			acc[curr.nodeId].push(curr.dataContent);
-			return acc;
-		},
-		{} as { [key in NodeId]: DataContent[] },
-	);
-
-	// Create indices for each group
-	for (const [nodeId, items] of Object.entries(groupedData)) {
-		result.push({
-			nodeId: nodeId as NodeId,
-			start: currentPosition,
-			end: currentPosition + items.length - 1,
-		});
-		currentPosition += items.length;
-	}
-
-	return result;
-}
-
 async function buildGenerationMessageForTextGeneration(
 	node: TextGenerationNode,
 	contextNodes: Node[],
