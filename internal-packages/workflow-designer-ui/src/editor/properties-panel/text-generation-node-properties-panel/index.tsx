@@ -48,9 +48,16 @@ export function TextGenerationNodePropertiesPanel({
 	const sourceNodes = useMemo(
 		() =>
 			node.content.inputs
-				.map((input) =>
-					data.nodes.find((node) => node.id === input.connectedNodeId),
-				)
+				.map((input) => {
+					const connections = data.connections.filter(
+						(connection) => connection.targetNodeHandleId === input.id,
+					);
+					return data.nodes.find((tmpNode) =>
+						connections.some(
+							(connection) => connection.sourceNodeId === tmpNode.id,
+						),
+					);
+				})
 				.filter((node) => node !== undefined),
 		[data, node.content.inputs],
 	);
@@ -244,106 +251,3 @@ export function TextGenerationNodePropertiesPanel({
 		</PropertiesPanelRoot>
 	);
 }
-
-// export function TextGenerationNodePropertiesPanelOld({
-// 	node,
-// }: {
-// 	node: TextGenerationNode;
-// }) {
-// 	const { setPropertiesTab, data } = useWorkflowDesigner();
-// 	const { startGeneration } = useGenerationCont``
-// 	const { generations } = useNodeGenerations({
-// 		nodeId: node.id,
-// 		origin: { type: "workspace", id: data.id },
-// 	});
-// 	const [currentGeneration, setCurrentGeneration] = useState<
-// 		Generation | undefined
-// 	>();
-
-// 	useEffect(() => {
-// 		if (generations.length === 0) {
-// 			setCurrentGeneration(undefined);
-// 		} else {
-// 			const latestGeneration = generations[generations.length - 1];
-// 			setCurrentGeneration(latestGeneration);
-// 		}
-// 	}, [generations]);
-
-// 	const setPrevGeneration = useCallback(() => {
-// 		const currentGenerationIndex = generations.findIndex(
-// 			(generation) => generation.id === currentGeneration?.id,
-// 		);
-// 		const previousGeneration = generations[currentGenerationIndex - 1];
-// 		setCurrentGeneration(previousGeneration);
-// 	}, [generations, currentGeneration]);
-
-// 	const setNextGeneration = useCallback(() => {
-// 		const currentGenerationIndex = generations.findIndex(
-// 			(generation) => generation.id === currentGeneration?.id,
-// 		);
-// 		const nextGeneration = generations[currentGenerationIndex + 1];
-// 		setCurrentGeneration(nextGeneration);
-// 	}, [generations, currentGeneration]);
-// 	const handleSubmit = useCallback(
-// 		(event: FormEvent<HTMLFormElement>) => {
-// 			event.preventDefault();
-// 			startGeneration({
-// 				origin: {
-// 					type: "workspace",
-// 					id: data.id,
-// 				},
-// 				actionNode: node,
-// 				sourceNodes: node.content.sources
-// 					.map((source) =>
-// 						data.nodes.find((node) => node.id === source.connectedNodeId),
-// 					)
-// 					.filter((sourceNode) => sourceNode !== undefined),
-// 			});
-// 			setPropertiesTab("Result");
-// 		},
-// 		[startGeneration, node, setPropertiesTab, data],
-// 	);
-// 	return (
-// 		<Tabs>
-// 			<TabsList>
-// 				<TabsTrigger value="Prompt">Prompt</TabsTrigger>
-// 				<TabsTrigger value="Result">Result</TabsTrigger>
-// 			</TabsList>
-// 			<PropertiesPanelTitle
-// 				node={node}
-// 				action={
-// 					<form onSubmit={handleSubmit}>
-// 						<button
-// 							type="submit"
-// 							className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-// 						>
-// 							Generate
-// 						</button>
-// 					</form>
-// 				}
-// 			/>
-// 			<TabsContent value="Prompt">
-// 				<TabsContentPrompt node={node} />
-// 			</TabsContent>
-// 			<TabsContent value="Result">
-// 				{currentGeneration === undefined ? (
-// 					"No generation"
-// 				) : (
-// 					<>
-// 						<PropertiesPanelContentBox className="flex-1">
-// 							<GenerationView generation={currentGeneration} />
-// 						</PropertiesPanelContentBox>
-// 						<div className="px-[10px] py-[10px]">
-// 							<GenerationCursor
-// 								currentGenerationId={currentGeneration?.id}
-// 								generations={generations}
-// 								onPrevGenerationButtonClick={setPrevGeneration}
-// 								onNextGenerationButtonClick={setNextGeneration}
-// 							/>
-// 						</div>
-// 					</>
-// 				)}
-// 			</TabsContent>
-// 		</Tabs>
-// 	);
-// }
