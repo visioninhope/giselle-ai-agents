@@ -8,6 +8,7 @@ export const Connection = z.object({
 	id: ConnectionId.schema,
 	outputNodeId: NodeId.schema,
 	outputNodeType: NodeBase.shape.type,
+	outputPortId: PortId.schema,
 	inputNodeId: NodeId.schema,
 	inputNodeType: NodeBase.shape.type,
 	inputPortId: PortId.schema,
