@@ -114,9 +114,9 @@ export function WorkflowDesigner({
 		unsafeNodeId: string | NodeId,
 		newUiState: Partial<NodeUIState>,
 	): void {
-		const targetNodeId = NodeId.parse(unsafeNodeId);
-		const nodeState = ui.nodeState[targetNodeId];
-		ui.nodeState[targetNodeId] = NodeUIState.parse({
+		const inputNodeId = NodeId.parse(unsafeNodeId);
+		const nodeState = ui.nodeState[inputNodeId];
+		ui.nodeState[inputNodeId] = NodeUIState.parse({
 			...nodeState,
 			...newUiState,
 		});

@@ -77,8 +77,8 @@ export function Editor() {
 						id: connection.id,
 						type: "giselleEdge",
 						source: connection.sourceNodeId,
-						target: connection.targetNodeId,
-						targetHandle: connection.targetNodeHandleId,
+						target: connection.inputNodeId,
+						targetHandle: connection.inputNodeHandleId,
 						selectable: false,
 						deletable: false,
 						data: {
@@ -156,18 +156,18 @@ export function Editor() {
 								});
 								const dependentNodes = graph.nodes.filter((node) =>
 									incomingConnections.some(
-										(conn) => conn.targetNodeId === node.id,
+										(conn) => conn.inputNodeId === node.id,
 									),
 								);
 								dependentNodes.map((dependentNode) => {
 									const handleIds = incomingConnections
 										.filter(
 											(incomingConnection) =>
-												incomingConnection.targetNodeId === dependentNode.id,
+												incomingConnection.inputNodeId === dependentNode.id,
 										)
 										.map(
 											(incomingConnection) =>
-												incomingConnection.targetNodeHandleId,
+												incomingConnection.inputNodeHandleId,
 										);
 									if (isTextGeneration(dependentNode)) {
 										dispatch({

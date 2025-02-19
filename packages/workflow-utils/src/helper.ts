@@ -22,7 +22,7 @@ export function createConnectedNodeIdMap(
 	for (const connection of connectionSet) {
 		if (
 			!nodeIdSet.has(connection.outputNodeId) ||
-			!nodeIdSet.has(connection.targetNodeId)
+			!nodeIdSet.has(connection.inputNodeId)
 		) {
 			continue;
 		}
@@ -31,13 +31,13 @@ export function createConnectedNodeIdMap(
 		}
 		const sourceSet = connectionMap.get(connection.outputNodeId);
 		if (sourceSet) {
-			sourceSet.add(connection.targetNodeId);
+			sourceSet.add(connection.inputNodeId);
 		}
 
-		if (!connectionMap.has(connection.targetNodeId)) {
-			connectionMap.set(connection.targetNodeId, new Set());
+		if (!connectionMap.has(connection.inputNodeId)) {
+			connectionMap.set(connection.inputNodeId, new Set());
 		}
-		const targetSet = connectionMap.get(connection.targetNodeId);
+		const targetSet = connectionMap.get(connection.inputNodeId);
 		if (targetSet) {
 			targetSet.add(connection.outputNodeId);
 		}
@@ -83,7 +83,7 @@ export function findConnectedConnectionMap(
 	for (const connection of allConnectionSet) {
 		if (
 			connectedNodeIdSet.has(connection.outputNodeId) &&
-			connectedNodeIdSet.has(connection.targetNodeId)
+			connectedNodeIdSet.has(connection.inputNodeId)
 		) {
 			connectedConnectionMap.set(connection.id, connection);
 		}
@@ -134,8 +134,8 @@ export function createJobMap(
 		}
 
 		for (const conn of connectionSet) {
-			const currentDegree = inDegrees.get(conn.targetNodeId) || 0;
-			inDegrees.set(conn.targetNodeId, currentDegree + 1);
+			const currentDegree = inDegrees.get(conn.inputNodeId) || 0;
+			inDegrees.set(conn.inputNodeId, currentDegree + 1);
 		}
 
 		return inDegrees;
@@ -161,7 +161,7 @@ export function createJobMap(
 			if (connection.outputNodeId !== nodeId) {
 				continue;
 			}
-			childNodeIdSet.add(connection.targetNodeId);
+			childNodeIdSet.add(connection.inputNodeId);
 		}
 		return childNodeIdSet;
 	};
@@ -218,7 +218,7 @@ export function createJobMap(
 		const sourceNodes = node.content.inputs
 			.map((input) => {
 				const connections = connectionArray.filter(
-					(connection) => connection.targetNodeHandleId === input.id,
+					(connection) => connection.inputNodeHandleId === input.id,
 				);
 				return nodeArray.find((tmpNode) =>
 					connections.some(

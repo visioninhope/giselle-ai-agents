@@ -50,7 +50,7 @@ export function TextGenerationNodePropertiesPanel({
 			node.content.inputs
 				.map((input) => {
 					const connections = data.connections.filter(
-						(connection) => connection.targetNodeHandleId === input.id,
+						(connection) => connection.inputNodeHandleId === input.id,
 					);
 					return data.nodes.find((tmpNode) =>
 						connections.some(
@@ -83,14 +83,14 @@ export function TextGenerationNodePropertiesPanel({
 			for (const connection of data.connections) {
 				if (
 					connection.outputNodeId !== removeSourceNode.id ||
-					connection.targetNodeId !== node.id
+					connection.inputNodeId !== node.id
 				) {
 					continue;
 				}
 				deleteConnection(connection.id);
 				updateNodeDataContent(node, {
 					inputs: node.content.inputs.filter(
-						({ id }) => id !== connection.targetNodeHandleId,
+						({ id }) => id !== connection.inputNodeHandleId,
 					),
 				});
 				break;

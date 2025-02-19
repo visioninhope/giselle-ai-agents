@@ -83,14 +83,14 @@ export function initWorkflow(config: WorkflowConfiguration): Workflow {
 
 				const connectionsToRemove = workflowData.connections.filter(
 					(connection) =>
-						connection.targetNodeId === nodeId &&
+						connection.inputNodeId === nodeId &&
 						nodes.some((n) => n.id === connection.sourceNodeId),
 				);
 				const connectionIdsToRemove = new Set(
 					connectionsToRemove.map((c) => c.id),
 				);
 				const nodeHandleIdsToRemove = new Set(
-					connectionsToRemove.map((c) => c.targetNodeHandleId),
+					connectionsToRemove.map((c) => c.inputNodeHandleId),
 				);
 
 				workflowData = {
@@ -131,7 +131,7 @@ export function initWorkflow(config: WorkflowConfiguration): Workflow {
 		const connectionHandle: ConnectionHandle = {
 			id: `hndl_${Math.random().toString(36)}`,
 			connectedSourceNodeId: source.id,
-			connectedTargetNodeId: target.id,
+			connectedinputNodeId: target.id,
 			label: targetHandleLabel,
 		};
 		workflowData = {
@@ -142,9 +142,9 @@ export function initWorkflow(config: WorkflowConfiguration): Workflow {
 					id: `cnnc_${Math.random().toString(36)}`,
 					sourceNodeId: source.id,
 					outputNodeType: source.type,
-					targetNodeId: target.id,
-					targetNodeType: target.type,
-					targetNodeHandleId: connectionHandle.id,
+					inputNodeId: target.id,
+					inputNodeType: target.type,
+					inputNodeHandleId: connectionHandle.id,
 				},
 			],
 		};

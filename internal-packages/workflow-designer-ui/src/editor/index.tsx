@@ -72,8 +72,8 @@ function NodeCanvas() {
 			data.connections.map((connection) => ({
 				id: connection.id,
 				source: connection.outputNodeId,
-				target: connection.targetNodeId,
-				targetHandle: connection.targetNodeHandleId,
+				target: connection.inputNodeId,
+				targetHandle: connection.inputNodeHandleId,
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
@@ -98,7 +98,7 @@ function NodeCanvas() {
 								}
 								deleteConnection(connection.id);
 								const targetNode = data.nodes.find(
-									(node) => node.id === connection.targetNodeId,
+									(node) => node.id === connection.inputNodeId,
 								);
 								if (targetNode === undefined) {
 									continue;
@@ -109,8 +109,7 @@ function NodeCanvas() {
 											content: {
 												...targetNode.content,
 												inputs: targetNode.content.inputs.filter(
-													(input) =>
-													input.id !== connection.targetNodeHandleId,
+													(input) => input.id !== connection.inputNodeHandleId,
 												),
 											},
 										});

@@ -377,9 +377,9 @@ export function PropertiesPanel() {
 													id: createConnectionId(),
 													sourceNodeId: sourceNode.id,
 													outputNodeType: sourceNode.type,
-													targetNodeId: selectedNode.id,
-													targetNodeType: selectedNode.type,
-													targetNodeHandleId: requirement.id,
+													inputNodeId: selectedNode.id,
+													inputNodeType: selectedNode.type,
+													inputNodeHandleId: requirement.id,
 												},
 											},
 										},
@@ -388,7 +388,7 @@ export function PropertiesPanel() {
 								onRequirementRemove={(sourceNode) => {
 									const connection = graph.connections.find(
 										(connection) =>
-											connection.targetNodeId === selectedNode.id &&
+											connection.inputNodeId === selectedNode.id &&
 											connection.sourceNodeId === sourceNode.id,
 									);
 									if (connection === undefined) {
@@ -447,9 +447,9 @@ export function PropertiesPanel() {
 														id: createConnectionId(),
 														sourceNodeId: sourceNode.id,
 														outputNodeType: sourceNode.type,
-														targetNodeId: selectedNode.id,
-														targetNodeType: selectedNode.type,
-														targetNodeHandleId: source.id,
+														inputNodeId: selectedNode.id,
+														inputNodeType: selectedNode.type,
+														inputNodeHandleId: source.id,
 													},
 												},
 											},
@@ -467,7 +467,7 @@ export function PropertiesPanel() {
 								onSourceRemove={(sourceNode) => {
 									const connection = graph.connections.find(
 										(connection) =>
-											connection.targetNodeId === selectedNode.id &&
+											connection.inputNodeId === selectedNode.id &&
 											connection.sourceNodeId === sourceNode.id,
 									);
 									if (connection === undefined) {
@@ -490,7 +490,7 @@ export function PropertiesPanel() {
 														...selectedNode.content,
 														sources: selectedNode.content.sources.filter(
 															(source) =>
-																source.id !== connection.targetNodeHandleId,
+																source.id !== connection.inputNodeHandleId,
 														),
 													},
 												},
@@ -596,9 +596,9 @@ export function PropertiesPanel() {
 													id: createConnectionId(),
 													sourceNodeId: selectedNode.id,
 													outputNodeType: selectedNode.type,
-													targetNodeId: nodeId,
-													targetNodeHandleId: handleId,
-													targetNodeType: "action",
+													inputNodeId: nodeId,
+													inputNodeHandleId: handleId,
+													inputNodeType: "action",
 												},
 											},
 										},
@@ -837,14 +837,14 @@ function TabsContentPrompt({
 		(node) => node.content.type === "files",
 	);
 	const requirementNode = useNode({
-		targetNodeHandleId: content.requirement?.id,
+		inputNodeHandleId: content.requirement?.id,
 	});
 	const sourceNodes = useMemo(
 		() =>
 			content.sources
 				.map((source) => {
 					const connection = connections.find(
-						(connection) => connection.targetNodeHandleId === source.id,
+						(connection) => connection.inputNodeHandleId === source.id,
 					);
 					const node = nodes.find(
 						(node) => node.id === connection?.sourceNodeId,
@@ -1618,7 +1618,7 @@ function TabContentFile({
 			graph.connections
 				.filter((connection) => connection.sourceNodeId === nodeId)
 				.map((connection) =>
-					graph.nodes.find((node) => node.id === connection.targetNodeId),
+					graph.nodes.find((node) => node.id === connection.inputNodeId),
 				)
 				.filter((node) => node !== undefined),
 		[graph, nodeId],

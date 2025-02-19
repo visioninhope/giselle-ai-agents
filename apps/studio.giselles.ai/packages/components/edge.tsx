@@ -34,7 +34,7 @@ export function Edge({
 		<g
 			className="group"
 			data-source-node-type={data.connection.outputNodeType}
-			data-target-node-type={data.connection.targetNodeType}
+			data-target-node-type={data.connection.inputNodeType}
 		>
 			<BaseEdge
 				id={id}

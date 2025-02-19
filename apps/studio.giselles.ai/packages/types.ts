@@ -126,9 +126,9 @@ export interface Connection {
 	sourceNodeId: NodeId;
 	sourceNodeHandleId?: NodeHandleId;
 	outputNodeType: Node["type"];
-	targetNodeId: NodeId;
-	targetNodeHandleId?: NodeHandleId;
-	targetNodeType: Node["type"];
+	inputNodeId: NodeId;
+	inputNodeHandleId?: NodeHandleId;
+	inputNodeType: Node["type"];
 }
 
 export type ArtifactId = `artf_${string}`;

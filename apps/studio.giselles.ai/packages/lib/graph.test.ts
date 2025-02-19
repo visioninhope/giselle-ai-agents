@@ -115,34 +115,34 @@ const graph: Graph = {
 			id: "cnnc_j5gr5slzzb96unyaddc3fik6",
 			sourceNodeId: "nd_i85invgzw0pgxzmjathkwhrr",
 			outputNodeType: "variable",
-			targetNodeId: "nd_vwczcdxw0f27r7lifmi8jnk3",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_rfpzu51jfnl1k2ccq31exevk",
+			inputNodeId: "nd_vwczcdxw0f27r7lifmi8jnk3",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_rfpzu51jfnl1k2ccq31exevk",
 		},
 		{
 			id: "cnnc_x8dy20365eqk9h033a800a5a",
 			sourceNodeId: "nd_h8h4uhp7kov9v7pj1yyofen8",
 			outputNodeType: "action",
-			targetNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_n3xuz7ao5dyfusfukagbi3l7",
+			inputNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_n3xuz7ao5dyfusfukagbi3l7",
 		},
 		{
 			id: "cnnc_lxqmqyb50b0qnuvrxcpavvax",
 			sourceNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
 			outputNodeType: "action",
-			targetNodeId: "nd_guzyxfacpt5db2n9lkjify3z",
-			targetNodeHandleId: "ndh_xjlzyp1yq7vd1ih43rxuo8l9",
-			targetNodeType: "action",
+			inputNodeId: "nd_guzyxfacpt5db2n9lkjify3z",
+			inputNodeHandleId: "ndh_xjlzyp1yq7vd1ih43rxuo8l9",
+			inputNodeType: "action",
 		},
-		// Ghost connection(targetNodeId is not in nodes)
+		// Ghost connection(inputNodeId is not in nodes)
 		{
 			id: "cnnc_ghost_connection",
 			sourceNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
 			outputNodeType: "action",
-			targetNodeId: "nd_fake_node",
-			targetNodeHandleId: "ndh_fake_node_handle",
-			targetNodeType: "action",
+			inputNodeId: "nd_fake_node",
+			inputNodeHandleId: "ndh_fake_node_handle",
+			inputNodeType: "action",
 		},
 	],
 	artifacts: [],
@@ -275,10 +275,10 @@ describe("validateConnection", () => {
 		const selfConnection: Connection = {
 			id: "cnnc_conn1",
 			sourceNodeId: "nd_node1",
-			targetNodeId: "nd_node1",
+			inputNodeId: "nd_node1",
 			outputNodeType: "action",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle1",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_handle1",
 		};
 
 		const result = validateConnection(selfConnection, [], nodes);
@@ -309,20 +309,20 @@ describe("validateConnection", () => {
 			{
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node2",
-				targetNodeId: "nd_node2", // self-reference in existing connection
+				inputNodeId: "nd_node2", // self-reference in existing connection
 				outputNodeType: "action",
-				targetNodeType: "action",
-				targetNodeHandleId: "ndh_handle1",
+				inputNodeType: "action",
+				inputNodeHandleId: "ndh_handle1",
 			},
 		];
 
 		const newConnection: Connection = {
 			id: "cnnc_conn2",
 			sourceNodeId: "nd_node1",
-			targetNodeId: "nd_node2",
+			inputNodeId: "nd_node2",
 			outputNodeType: "action",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle2",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_handle2",
 		};
 
 		const result = validateConnection(
@@ -362,28 +362,28 @@ describe("validateConnection", () => {
 			{
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node1",
-				targetNodeId: "nd_node2",
+				inputNodeId: "nd_node2",
 				outputNodeType: "action",
-				targetNodeType: "action",
-				targetNodeHandleId: "ndh_handle1",
+				inputNodeType: "action",
+				inputNodeHandleId: "ndh_handle1",
 			},
 			{
 				id: "cnnc_conn2",
 				sourceNodeId: "nd_node2",
-				targetNodeId: "nd_node3",
+				inputNodeId: "nd_node3",
 				outputNodeType: "action",
-				targetNodeType: "action",
-				targetNodeHandleId: "ndh_handle2",
+				inputNodeType: "action",
+				inputNodeHandleId: "ndh_handle2",
 			},
 		];
 
 		const circularConnection: Connection = {
 			id: "cnnc_conn3",
 			sourceNodeId: "nd_node3",
-			targetNodeId: "nd_node1",
+			inputNodeId: "nd_node1",
 			outputNodeType: "action",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle3",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_handle3",
 		};
 
 		const result = validateConnection(
@@ -425,20 +425,20 @@ describe("validateConnection", () => {
 			{
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node1",
-				targetNodeId: "nd_node2",
+				inputNodeId: "nd_node2",
 				outputNodeType: "action",
-				targetNodeType: "action",
-				targetNodeHandleId: "ndh_handle1",
+				inputNodeType: "action",
+				inputNodeHandleId: "ndh_handle1",
 			},
 		];
 
 		const validConnection: Connection = {
 			id: "cnnc_conn2",
 			sourceNodeId: "nd_node2",
-			targetNodeId: "nd_node3",
+			inputNodeId: "nd_node3",
 			outputNodeType: "action",
-			targetNodeType: "action",
-			targetNodeHandleId: "ndh_handle2",
+			inputNodeType: "action",
+			inputNodeHandleId: "ndh_handle2",
 		};
 
 		const result = validateConnection(

@@ -21,7 +21,7 @@ export function deriveFlows(
 	const activeConnections = graph.connections.filter(
 		(connection) =>
 			graph.nodes.some((node) => node.id === connection.sourceNodeId) &&
-			graph.nodes.some((node) => node.id === connection.targetNodeId),
+			graph.nodes.some((node) => node.id === connection.inputNodeId),
 	);
 
 	// Check active connections for self-reference and cycles
@@ -59,7 +59,7 @@ export function deriveFlows(
 	for (const connection of graph.connections) {
 		if (
 			!nodeIds.has(connection.sourceNodeId) ||
-			!nodeIds.has(connection.targetNodeId)
+			!nodeIds.has(connection.inputNodeId)
 		) {
 			continue;
 		}
@@ -68,13 +68,13 @@ export function deriveFlows(
 		}
 		const sourceSet = connectionMap.get(connection.sourceNodeId);
 		if (sourceSet) {
-			sourceSet.add(connection.targetNodeId);
+			sourceSet.add(connection.inputNodeId);
 		}
 
-		if (!connectionMap.has(connection.targetNodeId)) {
-			connectionMap.set(connection.targetNodeId, new Set());
+		if (!connectionMap.has(connection.inputNodeId)) {
+			connectionMap.set(connection.inputNodeId, new Set());
 		}
-		const targetSet = connectionMap.get(connection.targetNodeId);
+		const targetSet = connectionMap.get(connection.inputNodeId);
 		if (targetSet) {
 			targetSet.add(connection.sourceNodeId);
 		}
@@ -108,7 +108,7 @@ export function deriveFlows(
 		for (const connection of graph.connections) {
 			if (
 				nodes.has(connection.sourceNodeId) &&
-				nodes.has(connection.targetNodeId)
+				nodes.has(connection.inputNodeId)
 			) {
 				flowConnections.add(connection.id);
 			}
@@ -157,8 +157,8 @@ export function deriveFlows(
 			}
 
 			for (const conn of connections) {
-				const currentDegree = inDegrees.get(conn.targetNodeId) || 0;
-				inDegrees.set(conn.targetNodeId, currentDegree + 1);
+				const currentDegree = inDegrees.get(conn.inputNodeId) || 0;
+				inDegrees.set(conn.inputNodeId, currentDegree + 1);
 			}
 
 			return inDegrees;
@@ -181,7 +181,7 @@ export function deriveFlows(
 		): string[] => {
 			return connections
 				.filter((conn) => conn.sourceNodeId === nodeId)
-				.map((conn) => conn.targetNodeId);
+				.map((conn) => conn.inputNodeId);
 		};
 
 		/**
@@ -234,7 +234,7 @@ export function deriveFlows(
 				connections
 					.filter(
 						(connection) =>
-							connection.targetNodeId === nodeId &&
+							connection.inputNodeId === nodeId &&
 							connection.outputNodeType === "variable",
 					)
 					.map((connection) => connection.sourceNodeId),
@@ -424,8 +424,8 @@ export function validateConnection(
 ): { isValid: boolean; error?: GraphError } {
 	// Check for self-reference in both new and existing connections
 	if (
-		newConnection.sourceNodeId === newConnection.targetNodeId ||
-		existingConnections.some((conn) => conn.sourceNodeId === conn.targetNodeId)
+		newConnection.sourceNodeId === newConnection.inputNodeId ||
+		existingConnections.some((conn) => conn.sourceNodeId === conn.inputNodeId)
 	) {
 		return {
 			isValid: false,
@@ -448,7 +448,7 @@ export function validateConnection(
 		}
 		const sourceSet = connectionMap.get(conn.sourceNodeId);
 		if (sourceSet) {
-			sourceSet.add(conn.targetNodeId);
+			sourceSet.add(conn.inputNodeId);
 		}
 	}
 

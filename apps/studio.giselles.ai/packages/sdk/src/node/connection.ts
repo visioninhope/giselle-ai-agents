@@ -4,7 +4,7 @@ export interface Connection {
 	id: string;
 	sourceNodeId: NodeId;
 	outputNodeType: NodeData["type"];
-	targetNodeId: NodeId;
-	targetNodeType: NodeData["type"];
-	targetNodeHandleId: ConnectionHandleId;
+	inputNodeId: NodeId;
+	inputNodeType: NodeData["type"];
+	inputNodeHandleId: ConnectionHandleId;
 }

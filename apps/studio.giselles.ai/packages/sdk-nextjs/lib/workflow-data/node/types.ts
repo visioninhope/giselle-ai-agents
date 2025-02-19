@@ -37,8 +37,8 @@ export const Connection = z.object({
 	id: connectionId.schema,
 	sourceNodeId: nodeId.schema,
 	outputNodeType: BaseNodeData.shape.type,
-	targetNodeId: nodeId.schema,
-	targetNodeType: BaseNodeData.shape.type,
-	targetNodeHandleId: connectionHandleId.schema,
+	inputNodeId: nodeId.schema,
+	inputNodeType: BaseNodeData.shape.type,
+	inputNodeHandleId: connectionHandleId.schema,
 });
 export type Connection = z.infer<typeof Connection>;
