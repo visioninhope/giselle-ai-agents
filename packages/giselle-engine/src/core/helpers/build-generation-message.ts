@@ -14,17 +14,12 @@ export interface FileIndex {
 	end: number;
 }
 
-interface MessageObject {
-	messages: CoreMessage[];
-	fileIndices: FileIndex[];
-}
-
 export async function buildMessageObject(
 	node: ActionNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
 	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
-): Promise<MessageObject> {
+): Promise<CoreMessage[]> {
 	switch (node.content.type) {
 		case "textGeneration": {
 			return await buildGenerationMessageForTextGeneration(
@@ -78,7 +73,7 @@ async function buildGenerationMessageForTextGeneration(
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
 	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
-): Promise<MessageObject> {
+): Promise<CoreMessage[]> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
 	if (prompt === undefined) {
@@ -189,38 +184,32 @@ async function buildGenerationMessageForTextGeneration(
 
 	switch (llmProvider) {
 		case "openai": {
-			return {
-				messages: [
-					{
-						role: "user",
-						content: [
-							{
-								type: "text",
-								text: userMessage,
-							},
-						],
-					},
-				],
-				fileIndices: [],
-			};
+			return [
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
 		}
 		case "anthropic":
 		case "google": {
-			return {
-				messages: [
-					{
-						role: "user",
-						content: [
-							...attachedFiles,
-							{
-								type: "text",
-								text: userMessage,
-							},
-						],
-					},
-				],
-				fileIndices,
-			};
+			return [
+				{
+					role: "user",
+					content: [
+						...attachedFiles,
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
 		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;
