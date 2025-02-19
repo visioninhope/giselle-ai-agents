@@ -24,11 +24,11 @@ export class DependencyResolver {
 
 		// Build connections
 		for (const connection of this.workflowData.connections) {
-			const { sourceNodeId, targetNodeId, sourceNodeType } = connection;
-			if (sourceNodeType === "variable") {
+			const { sourceNodeId, targetNodeId, outputNodeType } = connection;
+			if (outputNodeType === "variable") {
 				this.graph[targetNodeId].dependencyVariables.push(sourceNodeId);
 			}
-			if (sourceNodeType === "action") {
+			if (outputNodeType === "action") {
 				this.graph[targetNodeId].dependencyActions.push(sourceNodeId);
 				this.graph[sourceNodeId].dependents.push(targetNodeId);
 			}

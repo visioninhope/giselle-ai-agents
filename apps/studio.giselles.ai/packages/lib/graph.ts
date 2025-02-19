@@ -235,7 +235,7 @@ export function deriveFlows(
 					.filter(
 						(connection) =>
 							connection.targetNodeId === nodeId &&
-							connection.sourceNodeType === "variable",
+							connection.outputNodeType === "variable",
 					)
 					.map((connection) => connection.sourceNodeId),
 			);
@@ -251,7 +251,7 @@ export function deriveFlows(
 		const levels = topologicalSort(
 			actionNodeIds,
 			connections.filter(
-				(connection) => connection.sourceNodeType === "action",
+				(connection) => connection.outputNodeType === "action",
 			),
 		);
 		return levels.map(

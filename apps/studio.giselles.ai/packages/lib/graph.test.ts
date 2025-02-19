@@ -114,7 +114,7 @@ const graph: Graph = {
 		{
 			id: "cnnc_j5gr5slzzb96unyaddc3fik6",
 			sourceNodeId: "nd_i85invgzw0pgxzmjathkwhrr",
-			sourceNodeType: "variable",
+			outputNodeType: "variable",
 			targetNodeId: "nd_vwczcdxw0f27r7lifmi8jnk3",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_rfpzu51jfnl1k2ccq31exevk",
@@ -122,7 +122,7 @@ const graph: Graph = {
 		{
 			id: "cnnc_x8dy20365eqk9h033a800a5a",
 			sourceNodeId: "nd_h8h4uhp7kov9v7pj1yyofen8",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_n3xuz7ao5dyfusfukagbi3l7",
@@ -130,7 +130,7 @@ const graph: Graph = {
 		{
 			id: "cnnc_lxqmqyb50b0qnuvrxcpavvax",
 			sourceNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeId: "nd_guzyxfacpt5db2n9lkjify3z",
 			targetNodeHandleId: "ndh_xjlzyp1yq7vd1ih43rxuo8l9",
 			targetNodeType: "action",
@@ -139,7 +139,7 @@ const graph: Graph = {
 		{
 			id: "cnnc_ghost_connection",
 			sourceNodeId: "nd_ffz8hv1isj4w3r4s23a6klkz",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeId: "nd_fake_node",
 			targetNodeHandleId: "ndh_fake_node_handle",
 			targetNodeType: "action",
@@ -276,7 +276,7 @@ describe("validateConnection", () => {
 			id: "cnnc_conn1",
 			sourceNodeId: "nd_node1",
 			targetNodeId: "nd_node1",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_handle1",
 		};
@@ -310,7 +310,7 @@ describe("validateConnection", () => {
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node2",
 				targetNodeId: "nd_node2", // self-reference in existing connection
-				sourceNodeType: "action",
+				outputNodeType: "action",
 				targetNodeType: "action",
 				targetNodeHandleId: "ndh_handle1",
 			},
@@ -320,7 +320,7 @@ describe("validateConnection", () => {
 			id: "cnnc_conn2",
 			sourceNodeId: "nd_node1",
 			targetNodeId: "nd_node2",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_handle2",
 		};
@@ -363,7 +363,7 @@ describe("validateConnection", () => {
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node1",
 				targetNodeId: "nd_node2",
-				sourceNodeType: "action",
+				outputNodeType: "action",
 				targetNodeType: "action",
 				targetNodeHandleId: "ndh_handle1",
 			},
@@ -371,7 +371,7 @@ describe("validateConnection", () => {
 				id: "cnnc_conn2",
 				sourceNodeId: "nd_node2",
 				targetNodeId: "nd_node3",
-				sourceNodeType: "action",
+				outputNodeType: "action",
 				targetNodeType: "action",
 				targetNodeHandleId: "ndh_handle2",
 			},
@@ -381,7 +381,7 @@ describe("validateConnection", () => {
 			id: "cnnc_conn3",
 			sourceNodeId: "nd_node3",
 			targetNodeId: "nd_node1",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_handle3",
 		};
@@ -426,7 +426,7 @@ describe("validateConnection", () => {
 				id: "cnnc_conn1",
 				sourceNodeId: "nd_node1",
 				targetNodeId: "nd_node2",
-				sourceNodeType: "action",
+				outputNodeType: "action",
 				targetNodeType: "action",
 				targetNodeHandleId: "ndh_handle1",
 			},
@@ -436,7 +436,7 @@ describe("validateConnection", () => {
 			id: "cnnc_conn2",
 			sourceNodeId: "nd_node2",
 			targetNodeId: "nd_node3",
-			sourceNodeType: "action",
+			outputNodeType: "action",
 			targetNodeType: "action",
 			targetNodeHandleId: "ndh_handle2",
 		};

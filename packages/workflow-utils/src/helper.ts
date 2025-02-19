@@ -241,7 +241,7 @@ export function createJobMap(
 	}
 	const actionConnectionSet = new Set<Connection>();
 	for (const connection of connectionSet) {
-		if (connection.sourceNodeType === "action") {
+		if (connection.outputNodeType === "action") {
 			actionConnectionSet.add(connection);
 		}
 	}

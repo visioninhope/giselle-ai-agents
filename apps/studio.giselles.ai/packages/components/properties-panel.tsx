@@ -376,7 +376,7 @@ export function PropertiesPanel() {
 												connection: {
 													id: createConnectionId(),
 													sourceNodeId: sourceNode.id,
-													sourceNodeType: sourceNode.type,
+													outputNodeType: sourceNode.type,
 													targetNodeId: selectedNode.id,
 													targetNodeType: selectedNode.type,
 													targetNodeHandleId: requirement.id,
@@ -446,7 +446,7 @@ export function PropertiesPanel() {
 													connection: {
 														id: createConnectionId(),
 														sourceNodeId: sourceNode.id,
-														sourceNodeType: sourceNode.type,
+														outputNodeType: sourceNode.type,
 														targetNodeId: selectedNode.id,
 														targetNodeType: selectedNode.type,
 														targetNodeHandleId: source.id,
@@ -595,7 +595,7 @@ export function PropertiesPanel() {
 												connection: {
 													id: createConnectionId(),
 													sourceNodeId: selectedNode.id,
-													sourceNodeType: selectedNode.type,
+													outputNodeType: selectedNode.type,
 													targetNodeId: nodeId,
 													targetNodeHandleId: handleId,
 													targetNodeType: "action",

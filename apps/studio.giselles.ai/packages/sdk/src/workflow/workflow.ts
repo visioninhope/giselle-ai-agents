@@ -141,7 +141,7 @@ export function initWorkflow(config: WorkflowConfiguration): Workflow {
 				{
 					id: `cnnc_${Math.random().toString(36)}`,
 					sourceNodeId: source.id,
-					sourceNodeType: source.type,
+					outputNodeType: source.type,
 					targetNodeId: target.id,
 					targetNodeType: target.type,
 					targetNodeHandleId: connectionHandle.id,

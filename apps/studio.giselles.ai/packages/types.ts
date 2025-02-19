@@ -125,7 +125,7 @@ export interface Connection {
 	id: ConnectionId;
 	sourceNodeId: NodeId;
 	sourceNodeHandleId?: NodeHandleId;
-	sourceNodeType: Node["type"];
+	outputNodeType: Node["type"];
 	targetNodeId: NodeId;
 	targetNodeHandleId?: NodeHandleId;
 	targetNodeType: Node["type"];
