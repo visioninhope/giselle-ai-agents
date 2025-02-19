@@ -1,6 +1,7 @@
-import type { Node } from "@giselle-sdk/data-type";
+import type { Connection, Node, OutputPort } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
+import { useWorkflowDesigner } from "giselle-sdk/react";
 import { TrashIcon } from "lucide-react";
 import pluralize from "pluralize";
 import { type ReactNode, useMemo } from "react";
@@ -64,29 +65,58 @@ function SourceListItem({
 		</div>
 	);
 }
+export interface Source {
+	port: OutputPort;
+	node: Node;
+	connection: Connection;
+}
+
+function connectionToSource(
+	connection: Connection,
+	nodes: Node[],
+): Source | undefined {
+	const node = nodes.find((node) => node.id === connection.outputNodeId);
+	if (node === undefined) {
+		return undefined;
+	}
+	const port = node.outputs.find((port) => port.id === connection.outputPortId);
+	if (port === undefined) {
+		return undefined;
+	}
+	return {
+		port,
+		node,
+		connection,
+	};
+}
 
 export function SourcesPanel({
-	sourceNodes,
+	connections,
 	connectableNodes,
-	addSource,
-	removeSource,
+	addConnection: addInput,
+	removeConnection,
 }: {
-	sourceNodes: Node[];
+	connections: Connection[];
 	connectableNodes: Node[];
-	addSource: (node: Node) => void;
-	removeSource: (node: Node) => void;
+	addConnection: (connectNode: Node, connectPort: OutputPort) => void;
+	removeConnection: (connection: Connection) => void;
 }) {
-	const generatedSources = useMemo(
-		() => sourceNodes.filter((sourceNode) => sourceNode.type === "action"),
-		[sourceNodes],
+	const { data } = useWorkflowDesigner();
+	const connectedGeneratedSource = useMemo(
+		() =>
+			connections
+				.filter((connection) => connection.outputNodeType === "action")
+				.map((connection) => connectionToSource(connection, data.nodes))
+				.filter((source) => source !== undefined),
+		[connections, data.nodes],
 	);
 
 	const variableSources = useMemo(
-		() => sourceNodes.filter((sourceNode) => sourceNode.type === "variable"),
-		[sourceNodes],
+		() => connections.filter((sourceNode) => sourceNode.type === "variable"),
+		[connections],
 	);
 
-	if (sourceNodes.length === 0) {
+	if (connections.length === 0) {
 		return (
 			<div className="mt-[60px]">
 				<EmptyState
@@ -96,7 +126,7 @@ export function SourcesPanel({
 					<NodeDropdown
 						nodes={connectableNodes}
 						onValueChange={(node) => {
-							addSource(node);
+							addInput(node, node.outputs[0]);
 						}}
 					/>
 				</EmptyState>
@@ -109,27 +139,27 @@ export function SourcesPanel({
 				<NodeDropdown
 					nodes={connectableNodes}
 					onValueChange={(node) => {
-						addSource(node);
+						addInput(node, node.outputs[0]);
 					}}
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
-				{generatedSources.length > 0 && (
+				{connectedGeneratedSource.length > 0 && (
 					<SourceListRoot title="Generated Sources">
-						{generatedSources.map((source) => (
+						{connectedGeneratedSource.map((source) => (
 							<SourceListItem
 								icon={
 									<GeneratedContentIcon className="size-[24px] text-white" />
 								}
-								key={source.id}
-								title="Output"
-								subtitle={`${source.content.llm.model} - ${source.content.llm.provider}`}
-								onRemove={() => removeSource(source)}
+								key={source.port.id}
+								title={source.port.label ?? "Output"}
+								subtitle={`${source.node.content.llm.model} - ${source.node.content.llm.provider}`}
+								onRemove={() => removeConnection(source.connection)}
 							/>
 						))}
 					</SourceListRoot>
 				)}
-				{variableSources.length > 0 && (
+				{/* {variableSources.length > 0 && (
 					<SourceListRoot title="Static Contents">
 						{variableSources.map((source) => {
 							switch (source.content.type) {
@@ -146,7 +176,7 @@ export function SourcesPanel({
 											title={source.name ?? "Plain text"}
 											subtitle={text}
 											// subtitle="Sonar is insanely fast, no LLM comes even close to its speed. I just tested it out by comparing with Llama on t3 chat (fastest AI chat app). Even while having a head-start Llama lost by a huge margin. I have not seen anything this fast and this fascinates me. Further details in original post attached.g"
-											onRemove={() => removeSource(source)}
+											onRemove={() => removeInput(source)}
 										/>
 									);
 								}
@@ -158,7 +188,7 @@ export function SourcesPanel({
 											title={source.name ?? "PDF Files"}
 											subtitle={`${source.content.files.length} ${pluralize("file", source.content.files.length)}`}
 											// subtitle="Sonar is insanely fast, no LLM comes even close to its speed. I just tested it out by comparing with Llama on t3 chat (fastest AI chat app). Even while having a head-start Llama lost by a huge margin. I have not seen anything this fast and this fascinates me. Further details in original post attached.g"
-											onRemove={() => removeSource(source)}
+											onRemove={() => removeInput(source)}
 										/>
 									);
 								default: {
@@ -168,7 +198,7 @@ export function SourcesPanel({
 							}
 						})}
 					</SourceListRoot>
-				)}
+				)} */}
 			</div>
 		</div>
 	);

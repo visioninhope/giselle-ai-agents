@@ -91,25 +91,3 @@ export function isFileNode(node: {
 		node.type === "variable" && (node.content as FileContent).type === "file"
 	);
 }
-
-export const CreateFileNodeParams = z.object({
-	name: z.string().optional(),
-	category: FileCategory,
-	data: z.array(FileData),
-});
-export type CreateFileNodeParams = z.infer<typeof CreateFileNodeParams>;
-
-export function createFileNode(
-	params: z.infer<typeof CreateFileNodeParams>,
-): FileNode {
-	return {
-		id: NodeId.generate(),
-		name: params.name,
-		type: "variable",
-		content: {
-			type: "file",
-			category: params.category,
-			files: params.data,
-		},
-	};
-}

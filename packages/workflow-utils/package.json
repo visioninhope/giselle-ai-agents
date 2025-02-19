@@ -21,7 +21,6 @@
 	},
 	"devDependencies": {
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
-		"@giselle-sdk/test-utils": "workspace:*",
 		"tsup": "catalog:",
 		"vitest": "catalog:"
 	},
