@@ -1,4 +1,12 @@
-import type { Connection, Node, OutputPort } from "@giselle-sdk/data-type";
+import {
+	type Connection,
+	type Node,
+	type NodeBase,
+	type Output,
+	type TextGenerationNode,
+	isTextGenerationNode,
+	isTextNode,
+} from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
@@ -65,26 +73,36 @@ function SourceListItem({
 		</div>
 	);
 }
-export interface Source {
-	port: OutputPort;
-	node: Node;
+export interface Source<T extends NodeBase> {
+	output: Output;
+	node: T;
 	connection: Connection;
 }
 
-function connectionToSource(
-	connection: Connection,
-	nodes: Node[],
-): Source | undefined {
+function connectionToSource<T extends NodeBase>({
+	connection,
+	nodes,
+	guardFn,
+}: {
+	connection: Connection;
+	nodes: T[];
+	guardFn: (args: unknown) => args is T;
+}): Source<T> | undefined {
 	const node = nodes.find((node) => node.id === connection.outputNodeId);
 	if (node === undefined) {
 		return undefined;
 	}
-	const port = node.outputs.find((port) => port.id === connection.outputPortId);
-	if (port === undefined) {
+	if (!guardFn(node)) {
+		return undefined;
+	}
+	const output = node.outputs.find(
+		(output) => output.id === connection.outputId,
+	);
+	if (output === undefined) {
 		return undefined;
 	}
 	return {
-		port,
+		output,
 		node,
 		connection,
 	};
@@ -98,7 +116,7 @@ export function SourcesPanel({
 }: {
 	connections: Connection[];
 	connectableNodes: Node[];
-	addConnection: (connectNode: Node, connectPort: OutputPort) => void;
+	addConnection: (connectNode: Node, connectOutput: Output) => void;
 	removeConnection: (connection: Connection) => void;
 }) {
 	const { data } = useWorkflowDesigner();
@@ -106,7 +124,13 @@ export function SourcesPanel({
 		() =>
 			connections
 				.filter((connection) => connection.outputNodeType === "action")
-				.map((connection) => connectionToSource(connection, data.nodes))
+				.map((connection) =>
+					connectionToSource({
+						connection,
+						nodes: data.nodes,
+						guardFn: isTextGenerationNode,
+					}),
+				)
 				.filter((source) => source !== undefined),
 		[connections, data.nodes],
 	);

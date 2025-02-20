@@ -1,22 +1,23 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
 
-export const PortId = createIdGenerator("prt");
-export type PortId = z.infer<typeof PortId.schema>;
+export const InputId = createIdGenerator("inp");
+export type InputId = z.infer<typeof InputId.schema>;
 
-export const InputPort = z.object({
-	id: PortId.schema,
-	direction: z.literal("input"),
-	label: z.string().optional(),
+export const Input = z.object({
+	id: InputId.schema,
+	label: z.string(),
 });
-export type InputPort = z.infer<typeof InputPort>;
+export type Input = z.infer<typeof Input>;
 
-export const OutputPort = z.object({
-	id: PortId.schema,
-	direction: z.literal("output"),
-	label: z.string().optional(),
+export const OutputId = createIdGenerator("otp");
+export type OutputId = z.infer<typeof OutputId.schema>;
+
+export const Output = z.object({
+	id: OutputId.schema,
+	label: z.string(),
 });
-export type OutputPort = z.infer<typeof OutputPort>;
+export type Output = z.infer<typeof Output>;
 
 export const NodeId = createIdGenerator("nd");
 export type NodeId = z.infer<typeof NodeId.schema>;
@@ -25,8 +26,8 @@ export const NodeBase = z.object({
 	id: NodeId.schema,
 	name: z.string().optional(),
 	type: z.string(),
-	inputs: z.array(InputPort),
-	outputs: z.array(OutputPort),
+	inputs: z.array(Input),
+	outputs: z.array(Output),
 });
 export type NodeBase = z.infer<typeof NodeBase>;
 

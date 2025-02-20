@@ -1,6 +1,6 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
-import { NodeBase, NodeId, PortId } from "./base";
+import { InputId, NodeBase, NodeId, OutputId } from "./base";
 
 export const ConnectionId = createIdGenerator("cnnc");
 export type ConnectionId = z.infer<typeof ConnectionId.schema>;
@@ -8,9 +8,9 @@ export const Connection = z.object({
 	id: ConnectionId.schema,
 	outputNodeId: NodeId.schema,
 	outputNodeType: NodeBase.shape.type,
-	outputPortId: PortId.schema,
+	outputId: OutputId.schema,
 	inputNodeId: NodeId.schema,
 	inputNodeType: NodeBase.shape.type,
-	inputPortId: PortId.schema,
+	inputId: InputId.schema,
 });
 export type Connection = z.infer<typeof Connection>;

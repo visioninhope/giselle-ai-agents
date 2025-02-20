@@ -1,12 +1,11 @@
 import {
 	ConnectionId,
 	type FileId,
-	type InputPort,
+	type InputId,
 	type Node,
-	type NodeBase,
 	NodeId,
 	NodeUIState,
-	type OutputPort,
+	type OutputId,
 	type UploadedFileData,
 	type Workspace,
 	generateInitialWorkspace,
@@ -79,27 +78,30 @@ export function WorkflowDesigner({
 		updateWorkflowMap();
 	}
 	function addConnection({
-		input,
-		output,
+		outputId,
+		outputNodeId,
+		outputNodeType,
+		inputNodeId,
+		inputNodeType,
+		inputId,
 	}: {
-		input: {
-			node: NodeBase;
-			port: InputPort;
-		};
-		output: {
-			node: NodeBase;
-			port: OutputPort;
-		};
+		outputNodeId: NodeId;
+		outputNodeType: Node["type"];
+		outputId: OutputId;
+		inputNodeId: NodeId;
+		inputNodeType: Node["type"];
+		inputId: InputId;
 	}) {
 		connections = [
 			...connections,
 			{
 				id: ConnectionId.generate(),
-				outputNodeId: output.node.id,
-				outputNodeType: output.node.type,
-				inputNodeId: input.node.id,
-				inputNodeType: input.node.type,
-				inputPortId: input.port.id,
+				outputNodeId,
+				outputNodeType,
+				outputId,
+				inputNodeId,
+				inputNodeType,
+				inputId,
 			},
 		];
 	}

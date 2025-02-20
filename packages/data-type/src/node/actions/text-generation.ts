@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Anthropic, Google, LLM, OpenAI } from "../../llm";
-import { InputPort, NodeBase, OutputPort } from "../base";
+import { Input, NodeBase, Output } from "../base";
 
 export const OpenAIContent = z.object({
 	type: z.literal("textGeneration"),
@@ -31,12 +31,9 @@ export const TextGenerationNode = NodeBase.extend({
 });
 type TextGenerationNode = z.infer<typeof TextGenerationNode>;
 
-export function isTextGenerationNode(node?: {
-	type: string;
-	content: unknown;
-}): node is { type: "action"; content: TextGenerationContent } {
-	return (
-		node?.type === "action" &&
-		(node?.content as TextGenerationContent).type === "textGeneration"
-	);
+export function isTextGenerationNode(
+	args?: unknown,
+): args is TextGenerationNode {
+	const result = TextGenerationNode.safeParse(args);
+	return result.success;
 }
