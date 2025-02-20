@@ -17,7 +17,13 @@ import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, TrashIcon } from "lucide-react";
 import pluralize from "pluralize";
 import { Popover, ToggleGroup } from "radix-ui";
-import { type ReactNode, useCallback, useMemo, useState } from "react";
+import {
+	type ComponentProps,
+	type ReactNode,
+	useCallback,
+	useMemo,
+	useState,
+} from "react";
 import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import { NodeDropdown } from "../ui/node-dropdown";
@@ -85,7 +91,15 @@ function connectionToConnectedSource<T extends NodeBase>({
 function SourceSelect({
 	sources,
 	onValueChange,
-}: { sources: Source[]; onValueChange?: (value: OutputId[]) => void }) {
+	contentProps,
+}: {
+	sources: Source[];
+	onValueChange?: (value: OutputId[]) => void;
+	contentProps?: Omit<
+		ComponentProps<typeof Popover.PopoverContent>,
+		"className"
+	>;
+}) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>(
 		sources
 			.filter((source) => source.connection !== undefined)
@@ -101,7 +115,16 @@ function SourceSelect({
 	);
 	return (
 		<Popover.Root>
-			<Popover.Trigger>Select</Popover.Trigger>
+			<Popover.Trigger
+				className={clsx(
+					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
+					"border border-transparent hover:border-white-20",
+					"text-[12px] font-[700] text-white-20",
+					"transition-colors",
+				)}
+			>
+				Select Sources
+			</Popover.Trigger>
 			<Popover.Anchor />
 			<Popover.Portal>
 				<Popover.Content
@@ -110,7 +133,7 @@ function SourceSelect({
 						"rounded-[8px] border-[1px] bg-black backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
-					sideOffset={5}
+					{...contentProps}
 				>
 					<div
 						className={clsx(
@@ -411,12 +434,6 @@ export function SourcesPanel({
 						sources={sources}
 						onValueChange={handleConnectionChange}
 					/>
-					{/* <NodeDropdown
-						nodes={connectableNodes}
-						onValueChange={(node) => {
-							addInput(node, node.outputs[0]);
-						}}
-					/> */}
 				</EmptyState>
 			</div>
 		);
@@ -427,6 +444,9 @@ export function SourcesPanel({
 				<SourceSelect
 					sources={sources}
 					onValueChange={handleConnectionChange}
+					contentProps={{
+						align: "end",
+					}}
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
