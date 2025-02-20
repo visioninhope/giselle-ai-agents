@@ -23,8 +23,13 @@ import {
 } from "react";
 import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-import { type ConnectedSource, type Source, filterSources } from "./sources";
-import { useSourceCategories } from "./sources/use-source-categories";
+import {
+	type ConnectedSource,
+	type Source,
+	filterSources,
+	useConnectedSources,
+	useSourceCategories,
+} from "./sources";
 
 function SourceSelect({
 	sources,
@@ -62,7 +67,7 @@ function SourceSelect({
 				<Popover.Content
 					className={clsx(
 						"relative w-[300px] rounded py-[8px]",
-						"rounded-[8px] border-[1px] bg-black backdrop-blur-[8px]",
+						"rounded-[8px] border-[1px] backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
 					{...contentProps}
@@ -75,7 +80,7 @@ function SourceSelect({
 					/>
 					<ToggleGroup.Root
 						type="multiple"
-						className="relative  flex flex-col gap-[8px]"
+						className="relative flex flex-col gap-[8px]"
 						value={selectedOutputIds}
 						onValueChange={(unsafeValue) => {
 							const safeValue = unsafeValue
@@ -255,57 +260,7 @@ export function SourcesPanel({
 		}
 		return tmpSources;
 	}, [data.nodes, data.connections, node.id]);
-	const connectedSources = useMemo(() => {
-		const connectionsToThisNode = data.connections.filter(
-			(connection) => connection.inputNodeId === node.id,
-		);
-		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
-		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
-		for (const connection of connectionsToThisNode) {
-			const node = data.nodes.find(
-				(node) => node.id === connection.outputNodeId,
-			);
-			if (node === undefined) {
-				continue;
-			}
-			const output = node.outputs.find(
-				(output) => output.id === connection.outputId,
-			);
-			if (output === undefined) {
-				continue;
-			}
-
-			switch (node.type) {
-				case "action":
-					switch (node.content.type) {
-						case "textGeneration":
-							node;
-							connectedGeneratedSources.push({
-								output,
-								node,
-								connection,
-							});
-							break;
-					}
-					break;
-				case "variable":
-					connectedVariableSources.push({
-						output,
-						node,
-						connection,
-					});
-					break;
-				default: {
-					const _exhaustiveCheck: never = node;
-					throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
-				}
-			}
-		}
-		return {
-			generation: connectedGeneratedSources,
-			variable: connectedVariableSources,
-		};
-	}, [node.id, data.connections, data.nodes]);
+	const connectedSources = useConnectedSources(node);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {

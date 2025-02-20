@@ -27,13 +27,8 @@ export function TextGenerationNodePropertiesPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const {
-		data,
-		updateNodeDataContent,
-		deleteConnection,
-		updateNodeData,
-		setUiNodeState,
-	} = useWorkflowDesigner();
+	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
+		useWorkflowDesigner();
 	const { startGeneration } = useGenerationController();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
@@ -88,26 +83,7 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content value="prompt" className="flex-1 flex flex-col">
-								<PromptPanel
-									prompt={node.content.prompt}
-									onPromptChange={(newPrompt) => {
-										updateNodeDataContent(node, {
-											prompt: newPrompt,
-										});
-									}}
-									// sourceNodes={inputs.map((input) => input.node)}
-								/>
-								{/* <div>toolbar</div>
-							<textarea
-								name="prompt"
-								className="flex-1 border border-white rounded-[8px] resize-none w-full p-[8px] bg-black-80 text-white text-[14px] outline-none"
-								value={node.content.prompt}
-								onChange={(event) => {
-									updateNodeDataContent(node, {
-										prompt: event.target.value,
-									});
-								}}
-							/> */}
+								<PromptPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content value="model" className="flex-1 flex flex-col">
 								{node.content.llm.provider === "openai" && (
