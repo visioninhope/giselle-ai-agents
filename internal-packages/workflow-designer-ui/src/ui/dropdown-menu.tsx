@@ -76,7 +76,7 @@ DropdownMenuCheckboxItem.displayName =
 
 export function DropdownMenuLabel({ children }: { children: ReactNode }) {
 	return (
-		<DropdownMenuPrimitive.Label className="px-[16px] py-[8px] text-[10px] text-black-40">
+		<DropdownMenuPrimitive.Label className="px-[16px] py-[8px] text-[10px] text-black-400">
 			{children}
 		</DropdownMenuPrimitive.Label>
 	);

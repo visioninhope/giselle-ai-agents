@@ -18,7 +18,7 @@ export function EmptyState({
 		<div className={clsx("flex flex-col items-center gap-[8px]", className)}>
 			{icon}
 			<p className="font-[800] text-black-30">{title}</p>
-			<p className="text-black-40 text-[12px] text-center leading-5">
+			<p className="text-black-400 text-[12px] text-center leading-5">
 				{description}
 			</p>
 			{children}

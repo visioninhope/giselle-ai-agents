@@ -405,8 +405,8 @@ export function Editor() {
 
 							<PanelResizeHandle
 								className={clsx(
-									"w-[1px] bg-black-40/50 transition-colors",
-									"data-[resize-handle-state=hover]:bg-black-40 data-[resize-handle-state=drag]:bg-black-40",
+									"w-[1px] bg-black-400/50 transition-colors",
+									"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
 								)}
 							/>
 							<Panel

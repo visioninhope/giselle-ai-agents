@@ -1,11 +1,16 @@
+import clsx from "clsx/lite";
 import type { FC, SVGProps } from "react";
 
-export const WilliIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+export const WilliIcon: FC<SVGProps<SVGSVGElement>> = ({
+	className,
+	...props
+}) => (
 	<svg
 		width="16"
 		height="16"
 		viewBox="0 0 16 16"
 		xmlns="http://www.w3.org/2000/svg"
+		className={clsx("fill-current", className)}
 		{...props}
 	>
 		<title>Willis Icon</title>

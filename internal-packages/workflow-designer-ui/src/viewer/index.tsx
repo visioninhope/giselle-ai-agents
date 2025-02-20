@@ -80,20 +80,20 @@ export function Viewer() {
 								<div className="flex flex-col gap-[24px]">
 									{flow.jobs.map((job, index) => (
 										<div key={job.id} className="flex flex-col gap-[8px]">
-											<p className="text-black-40 text-[12px] font-[700]">
+											<p className="text-black-400 text-[12px] font-[700]">
 												Step {index + 1}
 											</p>
 											{job.actions.map((action) => (
 												<Tabs.Trigger
 													value={action.node.id}
-													className="[w-180px] flex p-[16px] justify-between items-center border border-black-40/50 rounded-[8px]"
+													className="[w-180px] flex p-[16px] justify-between items-center border border-black-400/50 rounded-[8px]"
 													key={action.node.id}
 												>
 													<NodeGlance
 														node={action.node}
 														iconClassName="rounded-[8px] bg-true-white text-true-black flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
 														nameClassName="text-white text-[12px] font-[700]"
-														descriptionClassName="text-black-40 text-[10px]"
+														descriptionClassName="text-black-400 text-[10px]"
 													/>
 												</Tabs.Trigger>
 											))}
@@ -126,7 +126,7 @@ export function Viewer() {
 													node={node}
 													iconClassName="rounded-[8px] bg-true-white text-true-black flex items-center justify-center p-[8px] **:data-content-type-icon:size-[26px]"
 													nameClassName="text-white text-[20px] font-[700]"
-													descriptionClassName="text-black-40 text-[12px]"
+													descriptionClassName="text-black-400 text-[12px]"
 												/>
 												{generations
 													.filter(
