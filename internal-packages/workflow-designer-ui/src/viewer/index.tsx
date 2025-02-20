@@ -1,21 +1,14 @@
 "use client";
 
-import {
-	type CompletedRun,
-	type Generation,
-	type Node,
-	type QueuedRun,
-	type RunningRun,
-	WorkflowId,
-} from "@giselle-sdk/data-type";
+import { WorkflowId } from "@giselle-sdk/data-type";
 import {
 	useRun,
 	useRunController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
 import { Tabs } from "radix-ui";
-import { type DetailedHTMLProps, useMemo, useState } from "react";
-import { SpinnerIcon, WilliIcon } from "../icons";
+import { useMemo, useState } from "react";
+import { WilliIcon } from "../icons";
 import bg from "../images/bg.png";
 import { EmptyState } from "../ui/empty-state";
 import { GenerationView } from "../ui/generation-view";
@@ -27,46 +20,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
-
-interface NodeTriggerProps
-	extends DetailedHTMLProps<
-		React.ButtonHTMLAttributes<HTMLButtonElement>,
-		HTMLButtonElement
-	> {
-	node: Node;
-	generation?: Generation;
-}
-function NodeTrigger({ node, generation, ...props }: NodeTriggerProps) {
-	return (
-		<button
-			type="button"
-			className="flex items-center gap-[8px] rounded-[4px] px-[8px] py-[4px] data-[state=active]:bg-black-80 text-white"
-			{...props}
-		>
-			{generation?.status === "queued" && (
-				<SpinnerIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
-			)}
-			{/* {stepRun.status === "failed" && (
-				<CircleAlertIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
-			)} */}
-			{/* {stepRun.status === "cancelled" && (
-				<CircleSlashIcon className="w-[18px] h-[18px] stroke-black-30 fill-transparent" />
-			)} */}
-			{generation?.status === "running" && (
-				<SpinnerIcon className="w-[18px] h-[18px] stroke-black-30 animate-follow-through-spin fill-transparent" />
-			)}
-			{generation?.status === "completed" && <p>completed</p>}
-
-			<div className="flex flex-col items-start">
-				<p className="truncate text-[14px] font-rosart">{node.content.type}</p>
-				<p className="line-clamp-1 font-rosart text-black-70 text-[8px]">
-					{node.name}
-					{/* / {stepRun.status} */}
-				</p>
-			</div>
-		</button>
-	);
-}
 
 export function Viewer() {
 	const { generations, run } = useRun();
