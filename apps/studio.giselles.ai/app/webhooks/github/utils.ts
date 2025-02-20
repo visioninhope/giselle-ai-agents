@@ -78,4 +78,7 @@ export async function notifyWorkflowError(
 	}));
 
 	await sendEmail(subject, body, recipients);
+	console.log(
+		`[notifyWorkflowError] Sent error notification for agent ${agent.id}: ${body}`,
+	);
 }
