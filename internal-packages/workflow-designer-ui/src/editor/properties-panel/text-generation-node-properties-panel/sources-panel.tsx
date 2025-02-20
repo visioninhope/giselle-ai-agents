@@ -24,6 +24,7 @@ import {
 import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import { type ConnectedSource, type Source, filterSources } from "./sources";
+import { useSourceCategories } from "./sources/use-source-categories";
 
 function SourceSelect({
 	sources,
@@ -42,18 +43,8 @@ function SourceSelect({
 			.filter((source) => source.connection !== undefined)
 			.map((source) => source.output.id),
 	);
-	const generatedSources = useMemo(
-		() => filterSources(sources, isTextGenerationNode),
-		[sources],
-	);
-	const textSources = useMemo(
-		() => filterSources(sources, isTextNode),
-		[sources],
-	);
-	const fileSources = useMemo(
-		() => filterSources(sources, isFileNode),
-		[sources],
-	);
+	const { generatedSources, textSources, fileSources } =
+		useSourceCategories(sources);
 	return (
 		<Popover.Root>
 			<Popover.Trigger
