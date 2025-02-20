@@ -1,10 +1,6 @@
 import {
-	type Connection,
 	type Input,
 	InputId,
-	type Node,
-	type NodeBase,
-	type Output,
 	OutputId,
 	type TextGenerationNode,
 	type VariableNode,
@@ -27,37 +23,7 @@ import {
 } from "react";
 import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-
-interface UnconnectedSource<T extends NodeBase = Node> {
-	output: Output;
-	node: T;
-	connection?: never;
-}
-interface ConnectedSource<T extends NodeBase = Node> {
-	output: Output;
-	node: T;
-	connection: Connection;
-}
-type Source<T extends NodeBase = Node> =
-	| UnconnectedSource<T>
-	| ConnectedSource<T>;
-
-function filterSources<T extends NodeBase>(
-	sources: Source[],
-	guardFn: (args: unknown) => args is T,
-): Source<T>[] {
-	const tmpSources: Source<T>[] = [];
-	for (const source of sources) {
-		if (!guardFn(source.node)) {
-			continue;
-		}
-		tmpSources.push({
-			...source,
-			node: source.node,
-		});
-	}
-	return tmpSources;
-}
+import { type ConnectedSource, type Source, filterSources } from "./sources";
 
 function SourceSelect({
 	sources,
