@@ -38,7 +38,6 @@
 - [ ] Add generate text short cut
 - [ ] Make fill yellow for connected file node port
 - [ ] Styling connector
-- [ ] Support multi output
 - [ ] API Middleware
 - [ ] API Auth
 - [ ] API Rate Limit
@@ -61,6 +60,8 @@
 
 ## Done
 
+- [x] animate spinner
+- [x] Support multi output
 - [x] Prompt object to html to markdown
 - [x] Add typecheck script to template of turborepo
 - [x] at removeFileHandler (packages/giselle-engine/src/core/handlers/remove-file.ts:35:53)
