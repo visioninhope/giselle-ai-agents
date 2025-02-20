@@ -2,18 +2,18 @@ import type { Generation, TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { useEffect, useState } from "react";
-import { StackBlicksIcon } from "../../../icons";
+import { StackBlicksIcon, WilliIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import { GenerationView } from "../../../ui/generation-view";
 
 function Empty() {
 	return (
-		<div className="bg-white/10 h-full rounded-[8px] flex justify-center items-center">
+		<div className="bg-white/10 h-full rounded-[8px] flex justify-center items-center text-black-400">
 			<EmptyState
 				icon={<StackBlicksIcon />}
 				title="Nothing is generated."
 				description="Generate with the current Prompt or adjust the Prompt and the results will be displayed."
-				className="text-black-40"
+				className="text-black-400"
 			/>
 		</div>
 	);
@@ -59,7 +59,7 @@ export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 				)}
 				{currentGeneration.status === "failed" && <p data-header-text>Error</p>}
 			</div>
-			<div className="py-[4px] px-[16px] overflow-y-auto h-full font-serif">
+			<div className="py-[4px] px-[16px] overflow-y-auto h-full">
 				<GenerationView generation={currentGeneration} />
 			</div>
 		</div>

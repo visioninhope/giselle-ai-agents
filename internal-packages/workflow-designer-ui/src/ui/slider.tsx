@@ -14,7 +14,7 @@ function SliderInner({
 			)}
 			{...props}
 		>
-			<SliderPrimitive.Track className="relative h-[4px] w-full grow overflow-hidden bg-black-40">
+			<SliderPrimitive.Track className="relative h-[4px] w-full grow overflow-hidden bg-black-400">
 				<SliderPrimitive.Range className="absolute h-full bg-white" />
 			</SliderPrimitive.Track>
 			<SliderPrimitive.Thumb className="block h-[12px] w-[12px] rounded-full bg-white" />

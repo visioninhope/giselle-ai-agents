@@ -10,10 +10,10 @@ import { MemoizedMarkdown } from "./memoized-markdown";
 
 function Spinner() {
 	return (
-		<div className="flex gap-[12px]">
-			<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_infinite]" />
-			<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_0.6s_infinite]" />
-			<WilliIcon className="w-[20px] h-[20px] fill-black-40 animate-[pop-pop_1.8s_steps(1)_1.2s_infinite]" />
+		<div className="flex gap-[12px] text-black-400">
+			<WilliIcon className="w-[20px] h-[20px] animate-pop-pop-1" />
+			<WilliIcon className="w-[20px] h-[20px] animate-pop-pop-2" />
+			<WilliIcon className="w-[20px] h-[20px] animate-pop-pop-3" />
 		</div>
 	);
 }
@@ -30,7 +30,11 @@ export function GenerationView({
 		return generation.error.message;
 	}
 	if (generation.status !== "running" && generation.status !== "completed") {
-		return <Spinner />;
+		return (
+			<div className="pt-[8px]">
+				<Spinner />
+			</div>
+		);
 	}
 	return (
 		<div>
@@ -65,7 +69,11 @@ export function GenerationView({
 					})}
 				</div>
 			))}
-			{generation.status !== "completed" && <Spinner />}
+			{generation.status !== "completed" && (
+				<div className="pt-[8px]">
+					<Spinner />
+				</div>
+			)}
 		</div>
 	);
 }

@@ -97,7 +97,7 @@ export function TextGenerationNodePropertiesPanel({
 									"flex gap-[16px] text-[14px]",
 									"**:p-[4px] **:border-b **:cursor-pointer",
 									"**:data-[state=active]:text-white **:data-[state=active]:border-white",
-									"**:data-[state=inactive]:text-black-40 **:data-[state=inactive]:border-transparent",
+									"**:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent",
 								)}
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
@@ -150,8 +150,8 @@ export function TextGenerationNodePropertiesPanel({
 				</Panel>
 				<PanelResizeHandle
 					className={clsx(
-						"h-[1px] bg-black-40/50 transition-colors",
-						"data-[resize-handle-state=hover]:bg-black-40 data-[resize-handle-state=drag]:bg-black-40",
+						"h-[1px] bg-black-400/50 transition-colors",
+						"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
 					)}
 				/>
 				<Panel>

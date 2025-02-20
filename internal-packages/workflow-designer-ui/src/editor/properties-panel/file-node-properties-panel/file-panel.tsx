@@ -67,7 +67,7 @@ export function FilePanel({ node }: { node: FileNode }) {
 					<div
 						className={clsx(
 							"group h-[300px] p-[8px]",
-							"border border-black-40 rounded-[8px]",
+							"border border-black-400 rounded-[8px]",
 						)}
 						onDragOver={onDragOver}
 						onDragLeave={onDragLeave}
@@ -77,19 +77,19 @@ export function FilePanel({ node }: { node: FileNode }) {
 						<div
 							className={clsx(
 								"h-full flex flex-col justify-center items-center gap-[16px] px-[24px] py-[10px]",
-								"border border-dotted rounded-[8px] border-transparent group-data-[dragging=true]:border-black-40",
+								"border border-dotted rounded-[8px] border-transparent group-data-[dragging=true]:border-black-400",
 							)}
 						>
 							{isDragging ? (
 								<>
-									<PdfFileIcon className="size-[30px] text-black-40" />
+									<PdfFileIcon className="size-[30px] text-black-400" />
 									<p className="text-center text-white-50">
 										Drop to upload your files
 									</p>
 								</>
 							) : (
 								<div className="flex flex-col gap-[16px] justify-center items-center">
-									<ArrowUpFromLineIcon size={38} className="text-black-40" />
+									<ArrowUpFromLineIcon size={38} className="text-black-400" />
 									<label
 										htmlFor="file"
 										className="text-center flex flex-col gap-[16px] text-white-50"

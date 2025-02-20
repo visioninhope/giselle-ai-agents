@@ -101,7 +101,7 @@ function SourceSelect({
 						</div>
 						<div className="flex flex-col pb-[8px] gap-[8px]">
 							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-40 text-[10px] font-[700]">
+								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 									Generated Content
 								</p>
 								{generatedSources.map((generatedSource) => (
@@ -120,7 +120,7 @@ function SourceSelect({
 								))}
 							</div>
 							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-40 text-[10px] font-[700]">
+								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 									Text
 								</p>
 								{textSources.map((textSource) => (
@@ -139,7 +139,7 @@ function SourceSelect({
 							</div>
 
 							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-40 text-[10px] font-[700]">
+								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 									File
 								</p>
 								{fileSources.map((fileSource) => (
@@ -214,7 +214,7 @@ function SourceListItem({
 			<div className="px-[16px] flex-1 flex items-center justify-between">
 				<div className="flex flex-col gap-[4px]">
 					<p className="text=[16px]">{title}</p>
-					<div className="text-[10px] text-black-40">
+					<div className="text-[10px] text-black-400">
 						<p className="line-clamp-1">{subtitle}</p>
 					</div>
 				</div>
