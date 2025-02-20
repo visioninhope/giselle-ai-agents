@@ -47,11 +47,11 @@ const playgroundNodesToReactFlowNodes = (
 	);
 const playgroundEdgesToReactFlowEdges = (playgroundEdges: PlaygroundEdge[]) =>
 	playgroundEdges.map(
-		({ id, sourceNodeId, sourcePortId, inputNodeId, targetPortId }) => ({
+		({ id, sourceNodeId, sourcePortId, targetNodeId, targetPortId }) => ({
 			id,
 			source: sourceNodeId,
 			sourceHandle: sourcePortId,
-			target: inputNodeId,
+			target: targetNodeId,
 			targetHandle: targetPortId,
 		}),
 	);
@@ -115,7 +115,7 @@ export const Inner: FC = () => {
 						id: `ed_${createId()}`,
 						sourceNodeId: source as Node["id"],
 						sourcePortId: sourceHandle as Port["id"],
-						inputNodeId: target as Node["id"],
+						targetNodeId: target as Node["id"],
 						targetPortId: targetHandle as Port["id"],
 					},
 				});
