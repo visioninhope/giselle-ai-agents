@@ -1,6 +1,24 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
 
+export const InputId = createIdGenerator("inp");
+export type InputId = z.infer<typeof InputId.schema>;
+
+export const Input = z.object({
+	id: InputId.schema,
+	label: z.string(),
+});
+export type Input = z.infer<typeof Input>;
+
+export const OutputId = createIdGenerator("otp");
+export type OutputId = z.infer<typeof OutputId.schema>;
+
+export const Output = z.object({
+	id: OutputId.schema,
+	label: z.string(),
+});
+export type Output = z.infer<typeof Output>;
+
 export const NodeId = createIdGenerator("nd");
 export type NodeId = z.infer<typeof NodeId.schema>;
 
@@ -8,25 +26,15 @@ export const NodeBase = z.object({
 	id: NodeId.schema,
 	name: z.string().optional(),
 	type: z.string(),
+	inputs: z.array(Input),
+	outputs: z.array(Output),
 });
 export type NodeBase = z.infer<typeof NodeBase>;
-
-export const connectionHandleId = createIdGenerator("hndl");
-export type ConnectionHandleId = z.infer<typeof connectionHandleId.schema>;
 
 export const Position = z.object({
 	x: z.number(),
 	y: z.number(),
 });
-
-export const ConnectionHandle = z.object({
-	id: connectionHandleId.schema,
-	nodeId: NodeId.schema,
-	nodeType: NodeBase.shape.type,
-	label: z.string(),
-	connectedNodeId: NodeId.schema,
-});
-export type ConnectionHandle = z.infer<typeof ConnectionHandle>;
 
 export const NodeUIState = z.object({
 	position: Position,
@@ -34,15 +42,3 @@ export const NodeUIState = z.object({
 	tab: z.string().optional(),
 });
 export type NodeUIState = z.infer<typeof NodeUIState>;
-
-export const ConnectionId = createIdGenerator("cnnc");
-export type ConnectionId = z.infer<typeof ConnectionId.schema>;
-export const Connection = z.object({
-	id: ConnectionId.schema,
-	sourceNodeId: NodeId.schema,
-	sourceNodeType: NodeBase.shape.type,
-	targetNodeId: NodeId.schema,
-	targetNodeType: NodeBase.shape.type,
-	targetNodeHandleId: connectionHandleId.schema,
-});
-export type Connection = z.infer<typeof Connection>;

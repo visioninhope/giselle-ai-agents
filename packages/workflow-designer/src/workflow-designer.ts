@@ -1,24 +1,16 @@
 import {
-	type ConnectionHandle,
-	type ConnectionId,
-	type CreateFileNodeParams,
-	type CreateTextGenerationNodeParams,
-	type CreateTextNodeParams,
+	ConnectionId,
 	type FileId,
+	type InputId,
 	type Node,
-	type NodeBase,
 	NodeId,
 	NodeUIState,
+	type OutputId,
 	type UploadedFileData,
 	type Workspace,
-	createConnection,
-	createFileNode,
-	createTextGenerationNode,
-	createTextNode,
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
 import {
-	callCreateOpenAiVectorStoreApi,
 	callGetLLMProvidersApi,
 	callRemoveFileApi,
 	callSaveWorkspaceApi,
@@ -26,7 +18,6 @@ import {
 } from "@giselle-sdk/giselle-engine/client";
 import { getLLMProviders } from "@giselle-sdk/giselle-engine/schema";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
-import type { z } from "zod";
 
 interface AddNodeOptions {
 	ui?: NodeUIState;
@@ -39,7 +30,6 @@ export function WorkflowDesigner({
 	saveWorkflowApi = "/api/giselle/save-workspace",
 	uploadFileApi = "/api/giselle/upload-file",
 	removeFileApi = "/api/giselle/remove-file",
-	createOpenAiVectorStoreApi = "/api/giselle/create-openai-vector-store",
 	getLLMProvidersApi = getLLMProviders.defaultApi,
 }: {
 	defaultValue?: Workspace;
@@ -63,26 +53,14 @@ export function WorkflowDesigner({
 			).values(),
 		);
 	}
-	function addTextGenerationNode(
-		params: CreateTextGenerationNodeParams,
-		options?: AddNodeOptions,
-	) {
-		const textgenerationNodeData = createTextGenerationNode(params);
-		nodes = [...nodes, textgenerationNodeData];
+	function addNode(nodeData: Omit<Node, "id">, options?: AddNodeOptions) {
+		const node = {
+			id: NodeId.generate(),
+			...nodeData,
+		} as Node;
+		nodes = [...nodes, node];
 		if (options?.ui) {
-			ui.nodeState[textgenerationNodeData.id] = options.ui;
-		}
-		updateWorkflowMap();
-		return textgenerationNodeData;
-	}
-	function addTextNode(
-		params: z.infer<typeof CreateTextNodeParams>,
-		options?: AddNodeOptions,
-	) {
-		const textNodeData = createTextNode(params);
-		nodes = [...nodes, textNodeData];
-		if (options?.ui) {
-			ui.nodeState[textNodeData.id] = options.ui;
+			ui.nodeState[node.id] = options.ui;
 		}
 		updateWorkflowMap();
 	}
@@ -99,23 +77,41 @@ export function WorkflowDesigner({
 		nodes = [...nodes.filter((n) => n.id !== node.id), { ...node, ...data }];
 		updateWorkflowMap();
 	}
-	function addConnection(
-		sourceNode: NodeBase,
-		targetNodeHandle: ConnectionHandle,
-	) {
-		const connection = createConnection({
-			sourceNode,
-			targetNodeHandle,
-		});
-		connections = [...connections, connection];
+	function addConnection({
+		outputId,
+		outputNodeId,
+		outputNodeType,
+		inputNodeId,
+		inputNodeType,
+		inputId,
+	}: {
+		outputNodeId: NodeId;
+		outputNodeType: Node["type"];
+		outputId: OutputId;
+		inputNodeId: NodeId;
+		inputNodeType: Node["type"];
+		inputId: InputId;
+	}) {
+		connections = [
+			...connections,
+			{
+				id: ConnectionId.generate(),
+				outputNodeId,
+				outputNodeType,
+				outputId,
+				inputNodeId,
+				inputNodeType,
+				inputId,
+			},
+		];
 	}
 	function setUiNodeState(
 		unsafeNodeId: string | NodeId,
 		newUiState: Partial<NodeUIState>,
 	): void {
-		const targetNodeId = NodeId.parse(unsafeNodeId);
-		const nodeState = ui.nodeState[targetNodeId];
-		ui.nodeState[targetNodeId] = NodeUIState.parse({
+		const inputNodeId = NodeId.parse(unsafeNodeId);
+		const nodeState = ui.nodeState[inputNodeId];
+		ui.nodeState[inputNodeId] = NodeUIState.parse({
 			...nodeState,
 			...newUiState,
 		});
@@ -156,28 +152,12 @@ export function WorkflowDesigner({
 			workspace: getData(),
 		});
 	}
-	function addFileNode(params: CreateFileNodeParams, options?: AddNodeOptions) {
-		const fileNodeData = createFileNode(params);
-		nodes = [...nodes, fileNodeData];
-		if (options?.ui) {
-			ui.nodeState[fileNodeData.id] = options.ui;
-		}
-		updateWorkflowMap();
-		return fileNodeData;
-	}
-	async function createOpenAiVectorStore() {
-		return await callCreateOpenAiVectorStoreApi({
-			workspaceId: defaultValue.id,
-			api: createOpenAiVectorStoreApi,
-		});
-	}
 	async function getAvailableLLMProviders() {
 		const result = await callGetLLMProvidersApi({ api: getLLMProvidersApi });
 		return result.llmProviders;
 	}
 	return {
-		addTextGenerationNode,
-		addTextNode,
+		addNode,
 		addConnection,
 		getData,
 		updateNodeData,
@@ -187,8 +167,6 @@ export function WorkflowDesigner({
 		uploadFile,
 		saveWorkspace,
 		removeFile,
-		addFileNode,
-		createOpenAiVectorStore,
 		getAvailableLLMProviders,
 	};
 }

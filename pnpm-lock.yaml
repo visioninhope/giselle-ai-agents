@@ -924,9 +924,6 @@ importers:
         specifier: workspace:*
         version: link:../data-type
     devDependencies:
-      '@giselle-sdk/test-utils':
-        specifier: workspace:*
-        version: link:../test-utils
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig

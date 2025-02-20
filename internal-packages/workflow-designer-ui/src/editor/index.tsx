@@ -20,7 +20,6 @@ import {
 	PanelResizeHandle,
 } from "react-resizable-panels";
 import bg from "../images/bg.png";
-import { Header } from "../ui/header";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -32,6 +31,7 @@ import {
 	useToolbar,
 } from "./tool";
 import "@xyflow/react/dist/style.css";
+import { OutputId } from "@giselle-sdk/data-type";
 
 function NodeCanvas() {
 	const {
@@ -40,9 +40,7 @@ function NodeCanvas() {
 		deleteNode,
 		deleteConnection,
 		updateNodeData,
-		addTextGenerationNode,
-		addFileNode,
-		addTextNode,
+		addNode,
 	} = useWorkflowDesigner();
 	const reactFlowInstance = useReactFlow();
 	const updateNodeInternals = useUpdateNodeInternals();
@@ -71,9 +69,10 @@ function NodeCanvas() {
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
-				source: connection.sourceNodeId,
-				target: connection.targetNodeId,
-				targetHandle: connection.targetNodeHandleId,
+				source: connection.outputNodeId,
+				sourceHandle: connection.outputId,
+				target: connection.inputNodeId,
+				targetHandle: connection.inputId,
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
@@ -93,26 +92,22 @@ function NodeCanvas() {
 						}
 						case "remove": {
 							for (const connection of data.connections) {
-								if (connection.sourceNodeId !== nodeChange.id) {
+								if (connection.outputNodeId !== nodeChange.id) {
 									continue;
 								}
 								deleteConnection(connection.id);
-								const targetNode = data.nodes.find(
-									(node) => node.id === connection.targetNodeId,
+								const connectedNode = data.nodes.find(
+									(node) => node.id === connection.inputNodeId,
 								);
-								if (targetNode === undefined) {
+								if (connectedNode === undefined) {
 									continue;
 								}
-								switch (targetNode.content.type) {
+								switch (connectedNode.content.type) {
 									case "textGeneration": {
-										updateNodeData(targetNode, {
-											content: {
-												...targetNode.content,
-												sources: targetNode.content.sources.filter(
-													(source) =>
-														source.id !== connection.targetNodeHandleId,
-												),
-											},
+										updateNodeData(connectedNode, {
+											inputs: connectedNode.inputs.filter(
+												(input) => input.id !== connection.inputId,
+											),
 										});
 									}
 								}
@@ -154,7 +149,24 @@ function NodeCanvas() {
 				};
 				switch (selectedTool?.action) {
 					case "addTextNode":
-						addTextNode({ name: "Text" }, options);
+						addNode(
+							{
+								name: "Text",
+								type: "variable",
+								content: {
+									type: "text",
+									text: "",
+								},
+								inputs: [],
+								outputs: [
+									{
+										id: OutputId.generate(),
+										label: "Output",
+									},
+								],
+							},
+							options,
+						);
 						break;
 					case "addFileNode":
 						if (selectedTool.fileCategory === undefined) {
@@ -162,24 +174,46 @@ function NodeCanvas() {
 						}
 						switch (selectedTool.fileCategory) {
 							case "pdf":
-								addFileNode(
+								addNode(
 									{
-										name: "PDF File",
-										category: selectedTool.fileCategory,
-										data: [],
+										name: "PDF Files",
+										type: "variable",
+										content: {
+											type: "file",
+											category: "pdf",
+											files: [],
+										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+										],
 									},
 									options,
 								);
 								break;
 							case "text":
-								addFileNode(
+								addNode(
 									{
-										name: "Text File",
-										category: selectedTool.fileCategory,
-										data: [],
+										name: "Text",
+										type: "variable",
+										content: {
+											type: "text",
+											text: "",
+										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+										],
 									},
 									options,
 								);
+
 								break;
 						}
 						break;
@@ -189,43 +223,80 @@ function NodeCanvas() {
 						}
 						switch (selectedTool.provider) {
 							case "openai":
-								addTextGenerationNode(
+								addNode(
 									{
-										llm: {
-											provider: "openai",
-											model: "gpt-4o",
-											presencePenalty: 0.0,
-											frequencyPenalty: 0.0,
-											topP: 1.0,
-											temperature: 0.7,
+										type: "action",
+										content: {
+											type: "textGeneration",
+											llm: {
+												provider: "openai",
+												model: "gpt-4o",
+												temperature: 0.7,
+												topP: 1.0,
+												presencePenalty: 0.0,
+												frequencyPenalty: 0.0,
+											},
 										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+										],
 									},
 									options,
 								);
 								break;
 							case "anthropic":
-								addTextGenerationNode(
+								addNode(
 									{
-										llm: {
-											provider: "anthropic",
-											model: "claude-3-5-sonnet-latest",
-											topP: 1.0,
-											temperature: 0.7,
+										type: "action",
+										content: {
+											type: "textGeneration",
+											llm: {
+												provider: "anthropic",
+												model: "claude-3-5-sonnet-latest",
+												temperature: 0.7,
+												topP: 1.0,
+											},
 										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+										],
 									},
 									options,
 								);
 								break;
 							case "google":
-								addTextGenerationNode(
+								addNode(
 									{
-										llm: {
-											provider: "google",
-											model: "gemini-2.0-flash-exp",
-											topP: 1.0,
-											temperature: 0.7,
-											searchGrounding: false,
+										type: "action",
+										content: {
+											type: "textGeneration",
+											llm: {
+												provider: "google",
+												model: "gemini-1.5-flash-latest",
+												temperature: 0.7,
+												topP: 1.0,
+												searchGrounding: false,
+											},
 										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+											{
+												id: OutputId.generate(),
+												label: "Search Result",
+											},
+										],
 									},
 									options,
 								);

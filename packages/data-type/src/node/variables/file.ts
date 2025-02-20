@@ -83,33 +83,7 @@ export const FileNode = NodeBase.extend({
 });
 export type FileNode = z.infer<typeof FileNode>;
 
-export function isFileNode(node: {
-	type: string;
-	content: unknown;
-}): node is FileNode {
-	return (
-		node.type === "variable" && (node.content as FileContent).type === "file"
-	);
-}
-
-export const CreateFileNodeParams = z.object({
-	name: z.string().optional(),
-	category: FileCategory,
-	data: z.array(FileData),
-});
-export type CreateFileNodeParams = z.infer<typeof CreateFileNodeParams>;
-
-export function createFileNode(
-	params: z.infer<typeof CreateFileNodeParams>,
-): FileNode {
-	return {
-		id: NodeId.generate(),
-		name: params.name,
-		type: "variable",
-		content: {
-			type: "file",
-			category: params.category,
-			files: params.data,
-		},
-	};
+export function isFileNode(args: unknown): args is FileNode {
+	const result = FileNode.safeParse(args);
+	return result.success;
 }

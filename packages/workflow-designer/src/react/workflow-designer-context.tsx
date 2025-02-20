@@ -1,19 +1,13 @@
 "use client";
 
 import {
-	type ConnectionHandle,
 	type ConnectionId,
-	type CreateFileNodeParams,
-	type CreateTextGenerationNodeParams,
-	type CreateTextNodeParams,
 	type FileNode,
 	type LLMProvider,
 	type Node,
-	type NodeBase,
 	type NodeId,
 	type NodeUIState,
 	type UploadedFileData,
-	type WorkflowId,
 	type Workspace,
 	createUploadedFileData,
 	createUploadingFileData,
@@ -22,20 +16,15 @@ import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/r
 import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
-import type { z } from "zod";
 import { WorkflowDesigner } from "../workflow-designer";
 import { usePropertiesPanel, useView } from "./state";
 
-interface CreateWorkflowRunParams {
-	workflowId: WorkflowId;
-	onBeforeWorkflowRunCreate?: () => void;
-}
 export interface WorkflowDesignerContextValue
 	extends Pick<
 			WorkflowDesigner,
+			| "addNode"
 			| "updateNodeData"
 			| "addConnection"
-			| "addTextNode"
 			| "deleteConnection"
 			| "removeFile"
 		>,
@@ -53,16 +42,6 @@ export interface WorkflowDesignerContextValue
 		node: T,
 		content: Partial<T["content"]>,
 	) => void;
-	addTextGenerationNode: (
-		params: CreateTextGenerationNodeParams,
-		options?: { ui?: NodeUIState },
-	) => void;
-	addFileNode: (
-		params: CreateFileNodeParams,
-		options?: {
-			ui?: NodeUIState;
-		},
-	) => Promise<void>;
 	uploadFile: (files: File[], node: FileNode) => Promise<void>;
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LLMProvider[];
@@ -136,12 +115,9 @@ export function WorkflowDesignerProvider({
 		[setWorkspace, saveWorkspace, defaultSaveWorkflowDelay],
 	);
 
-	const addTextGenerationNode = useCallback(
-		(
-			params: CreateTextGenerationNodeParams,
-			options?: { ui?: NodeUIState },
-		) => {
-			workflowDesignerRef.current.addTextGenerationNode(params, options);
+	const addNode = useCallback(
+		(nodeData: Omit<Node, "id">, options?: { ui?: NodeUIState }) => {
+			workflowDesignerRef.current.addNode(nodeData, options);
 			setAndSaveWorkspace();
 		},
 		[setAndSaveWorkspace],
@@ -166,28 +142,9 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace],
 	);
 
-	const addConnection = useCallback(
-		(sourceNode: NodeBase, targetHandle: ConnectionHandle) => {
-			workflowDesignerRef.current?.addConnection(sourceNode, targetHandle);
-			setAndSaveWorkspace();
-		},
-		[setAndSaveWorkspace],
-	);
-
-	const addTextNode = useCallback(
-		(
-			params: z.infer<typeof CreateTextNodeParams>,
-			options?: { ui?: NodeUIState },
-		) => {
-			workflowDesignerRef.current.addTextNode(params, options);
-			setAndSaveWorkspace();
-		},
-		[setAndSaveWorkspace],
-	);
-
-	const addFileNode = useCallback(
-		async (params: CreateFileNodeParams, options?: { ui?: NodeUIState }) => {
-			workflowDesignerRef.current.addFileNode(params, options);
+	const addConnection = useCallback<WorkflowDesigner["addConnection"]>(
+		(args) => {
+			workflowDesignerRef.current?.addConnection(args);
 			setAndSaveWorkspace();
 		},
 		[setAndSaveWorkspace],
@@ -288,8 +245,7 @@ export function WorkflowDesignerProvider({
 				data: workspace,
 				textGenerationApi,
 				runAssistantApi,
-				addTextGenerationNode,
-				addTextNode,
+				addNode,
 				addConnection,
 				updateNodeData,
 				updateNodeDataContent,
@@ -298,7 +254,6 @@ export function WorkflowDesignerProvider({
 				deleteConnection,
 				uploadFile,
 				removeFile,
-				addFileNode,
 				llmProviders,
 				isLoading,
 				...usePropertiesPanelHelper,

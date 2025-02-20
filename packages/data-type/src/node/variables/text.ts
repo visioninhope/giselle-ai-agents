@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { NodeBase, NodeId } from "../base";
+import { NodeBase } from "../base";
 
 export const TextContent = z.object({
 	type: z.literal("text"),
@@ -21,25 +21,7 @@ export const CreateTextNodeParams = TextContent.omit({
 		name: z.string(),
 	});
 
-export function isTextNode(node: {
-	type: string;
-	content: unknown;
-}): node is { type: "variable"; content: TextContent } {
-	return (
-		node.type === "variable" && (node.content as TextContent).type === "text"
-	);
-}
-
-export function createTextNode(
-	params: z.infer<typeof CreateTextNodeParams>,
-): z.infer<typeof TextNode> {
-	return {
-		id: NodeId.generate(),
-		name: params.name,
-		type: "variable",
-		content: {
-			type: "text",
-			text: params.text ?? "",
-		},
-	};
+export function isTextNode(args: unknown): args is TextNode {
+	const result = TextNode.safeParse(args);
+	return result.success;
 }

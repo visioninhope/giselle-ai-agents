@@ -107,7 +107,7 @@ export async function textGenerationHandler({
 		}
 		return assistantMessages[assistantMessages.length - 1].content;
 	}
-	const messageObject = await buildMessageObject(
+	const messages = await buildMessageObject(
 		runningGeneration.context.actionNode,
 		runningGeneration.context.sourceNodes,
 		fileResolver,
@@ -116,7 +116,7 @@ export async function textGenerationHandler({
 
 	return streamText({
 		model: generationModel(runningGeneration.context.actionNode.content.llm),
-		messages: messageObject.messages,
+		messages,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {
 				const failedGeneration = {

@@ -1,8 +1,4 @@
-import {
-	type Node,
-	type TextGenerationNode,
-	createConnectionHandle,
-} from "@giselle-sdk/data-type";
+import type { Node, TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import {
 	useGenerationController,
@@ -24,6 +20,7 @@ import {
 	OpenAIModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
+import { useConnectedSources } from "./sources";
 import { SourcesPanel } from "./sources-panel";
 
 export function TextGenerationNodePropertiesPanel({
@@ -31,66 +28,10 @@ export function TextGenerationNodePropertiesPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const {
-		data,
-		updateNodeDataContent,
-		addConnection,
-		deleteConnection,
-		updateNodeData,
-		setUiNodeState,
-	} = useWorkflowDesigner();
+	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
+		useWorkflowDesigner();
 	const { startGeneration } = useGenerationController();
-
-	const connectableNodes = useMemo(
-		() => data.nodes.filter((_node) => _node.id !== node.id),
-		[data, node.id],
-	);
-	const sourceNodes = useMemo(
-		() =>
-			node.content.sources
-				.map((source) =>
-					data.nodes.find((node) => node.id === source.connectedNodeId),
-				)
-				.filter((node) => node !== undefined),
-		[data, node.content.sources],
-	);
-	const addSource = useCallback(
-		(sourceNode: Node) => {
-			const connectionHandle = createConnectionHandle({
-				label: "Source",
-				nodeId: node.id,
-				nodeType: node.type,
-				connectedNodeId: sourceNode.id,
-			});
-			addConnection(sourceNode, connectionHandle);
-			connectionHandle;
-			updateNodeDataContent(node, {
-				sources: [...node.content.sources, connectionHandle],
-			});
-		},
-		[addConnection, node, updateNodeDataContent],
-	);
-
-	const removeSource = useCallback(
-		(removeSourceNode: Node) => {
-			for (const connection of data.connections) {
-				if (
-					connection.sourceNodeId !== removeSourceNode.id ||
-					connection.targetNodeId !== node.id
-				) {
-					continue;
-				}
-				deleteConnection(connection.id);
-				updateNodeDataContent(node, {
-					sources: node.content.sources.filter(
-						({ id }) => id !== connection.targetNodeHandleId,
-					),
-				});
-				break;
-			}
-		},
-		[deleteConnection, data, node, updateNodeDataContent],
-	);
+	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
@@ -127,7 +68,9 @@ export function TextGenerationNodePropertiesPanel({
 									id: data.id,
 								},
 								actionNode: node,
-								sourceNodes,
+								sourceNodes: connectedSources.map(
+									(connectedSource) => connectedSource.node,
+								),
 							});
 						}}
 					>
@@ -162,26 +105,7 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content value="prompt" className="flex-1 flex flex-col">
-								<PromptPanel
-									prompt={node.content.prompt}
-									onPromptChange={(newPrompt) => {
-										updateNodeDataContent(node, {
-											prompt: newPrompt,
-										});
-									}}
-									sourceNodes={sourceNodes}
-								/>
-								{/* <div>toolbar</div>
-							<textarea
-								name="prompt"
-								className="flex-1 border border-white rounded-[8px] resize-none w-full p-[8px] bg-black-80 text-white text-[14px] outline-none"
-								value={node.content.prompt}
-								onChange={(event) => {
-									updateNodeDataContent(node, {
-										prompt: event.target.value,
-									});
-								}}
-							/> */}
+								<PromptPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content value="model" className="flex-1 flex flex-col">
 								{node.content.llm.provider === "openai" && (
@@ -219,12 +143,7 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 							<Tabs.Content value="sources" className="flex-1 flex flex-col">
-								<SourcesPanel
-									sourceNodes={sourceNodes}
-									connectableNodes={connectableNodes}
-									addSource={addSource}
-									removeSource={removeSource}
-								/>
+								<SourcesPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>
@@ -244,106 +163,3 @@ export function TextGenerationNodePropertiesPanel({
 		</PropertiesPanelRoot>
 	);
 }
-
-// export function TextGenerationNodePropertiesPanelOld({
-// 	node,
-// }: {
-// 	node: TextGenerationNode;
-// }) {
-// 	const { setPropertiesTab, data } = useWorkflowDesigner();
-// 	const { startGeneration } = useGenerationCont``
-// 	const { generations } = useNodeGenerations({
-// 		nodeId: node.id,
-// 		origin: { type: "workspace", id: data.id },
-// 	});
-// 	const [currentGeneration, setCurrentGeneration] = useState<
-// 		Generation | undefined
-// 	>();
-
-// 	useEffect(() => {
-// 		if (generations.length === 0) {
-// 			setCurrentGeneration(undefined);
-// 		} else {
-// 			const latestGeneration = generations[generations.length - 1];
-// 			setCurrentGeneration(latestGeneration);
-// 		}
-// 	}, [generations]);
-
-// 	const setPrevGeneration = useCallback(() => {
-// 		const currentGenerationIndex = generations.findIndex(
-// 			(generation) => generation.id === currentGeneration?.id,
-// 		);
-// 		const previousGeneration = generations[currentGenerationIndex - 1];
-// 		setCurrentGeneration(previousGeneration);
-// 	}, [generations, currentGeneration]);
-
-// 	const setNextGeneration = useCallback(() => {
-// 		const currentGenerationIndex = generations.findIndex(
-// 			(generation) => generation.id === currentGeneration?.id,
-// 		);
-// 		const nextGeneration = generations[currentGenerationIndex + 1];
-// 		setCurrentGeneration(nextGeneration);
-// 	}, [generations, currentGeneration]);
-// 	const handleSubmit = useCallback(
-// 		(event: FormEvent<HTMLFormElement>) => {
-// 			event.preventDefault();
-// 			startGeneration({
-// 				origin: {
-// 					type: "workspace",
-// 					id: data.id,
-// 				},
-// 				actionNode: node,
-// 				sourceNodes: node.content.sources
-// 					.map((source) =>
-// 						data.nodes.find((node) => node.id === source.connectedNodeId),
-// 					)
-// 					.filter((sourceNode) => sourceNode !== undefined),
-// 			});
-// 			setPropertiesTab("Result");
-// 		},
-// 		[startGeneration, node, setPropertiesTab, data],
-// 	);
-// 	return (
-// 		<Tabs>
-// 			<TabsList>
-// 				<TabsTrigger value="Prompt">Prompt</TabsTrigger>
-// 				<TabsTrigger value="Result">Result</TabsTrigger>
-// 			</TabsList>
-// 			<PropertiesPanelTitle
-// 				node={node}
-// 				action={
-// 					<form onSubmit={handleSubmit}>
-// 						<button
-// 							type="submit"
-// 							className="relative z-10 rounded-[8px] shadow-[0px_0px_3px_0px_#FFFFFF40_inset] py-[3px] px-[8px] bg-black-80 text-black-30 font-rosart text-[14px] disabled:bg-black-40"
-// 						>
-// 							Generate
-// 						</button>
-// 					</form>
-// 				}
-// 			/>
-// 			<TabsContent value="Prompt">
-// 				<TabsContentPrompt node={node} />
-// 			</TabsContent>
-// 			<TabsContent value="Result">
-// 				{currentGeneration === undefined ? (
-// 					"No generation"
-// 				) : (
-// 					<>
-// 						<PropertiesPanelContentBox className="flex-1">
-// 							<GenerationView generation={currentGeneration} />
-// 						</PropertiesPanelContentBox>
-// 						<div className="px-[10px] py-[10px]">
-// 							<GenerationCursor
-// 								currentGenerationId={currentGeneration?.id}
-// 								generations={generations}
-// 								onPrevGenerationButtonClick={setPrevGeneration}
-// 								onNextGenerationButtonClick={setNextGeneration}
-// 							/>
-// 						</div>
-// 					</>
-// 				)}
-// 			</TabsContent>
-// 		</Tabs>
-// 	);
-// }

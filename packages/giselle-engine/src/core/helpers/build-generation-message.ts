@@ -1,9 +1,10 @@
-import type {
-	ActionNode,
-	FileData,
-	Node,
+import {
+	type ActionNode,
+	type FileData,
+	type Node,
 	NodeId,
-	TextGenerationNode,
+	OutputId,
+	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import type { CoreMessage, DataContent, FilePart } from "ai";
@@ -14,17 +15,12 @@ export interface FileIndex {
 	end: number;
 }
 
-interface MessageObject {
-	messages: CoreMessage[];
-	fileIndices: FileIndex[];
-}
-
 export async function buildMessageObject(
 	node: ActionNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
 	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
-): Promise<MessageObject> {
+): Promise<CoreMessage[]> {
 	switch (node.content.type) {
 		case "textGeneration": {
 			return await buildGenerationMessageForTextGeneration(
@@ -41,82 +37,23 @@ export async function buildMessageObject(
 	}
 }
 
-function createFileIndices(
-	dataContents: { dataContent: DataContent; nodeId: NodeId }[],
-): FileIndex[] {
-	// Group by nodeId and count positions
-	let currentPosition = 1;
-	const result: FileIndex[] = [];
-
-	// Group data by nodeId
-	const groupedData = dataContents.reduce(
-		(acc, curr) => {
-			if (!acc[curr.nodeId]) {
-				acc[curr.nodeId] = [];
-			}
-			acc[curr.nodeId].push(curr.dataContent);
-			return acc;
-		},
-		{} as { [key in NodeId]: DataContent[] },
-	);
-
-	// Create indices for each group
-	for (const [nodeId, items] of Object.entries(groupedData)) {
-		result.push({
-			nodeId: nodeId as NodeId,
-			start: currentPosition,
-			end: currentPosition + items.length - 1,
-		});
-		currentPosition += items.length;
-	}
-
-	return result;
-}
-
 async function buildGenerationMessageForTextGeneration(
 	node: TextGenerationNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
 	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
-): Promise<MessageObject> {
+): Promise<CoreMessage[]> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
 	if (prompt === undefined) {
 		throw new Error("Prompt cannot be empty");
 	}
 
-	const pattern = /\{\{(nd-[a-zA-Z0-9]+)\}\}/g;
-	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => match[1]);
-
-	const pdfData = await Promise.all(
-		contextNodes
-			.filter((contextNode) => sourceKeywords.includes(contextNode.id))
-			.map(async (contextNode) => {
-				if (contextNode.content.type !== "file") {
-					return null;
-				}
-				return await Promise.all(
-					contextNode.content.files.map(async (file) => {
-						if (
-							file.status !== "uploaded" &&
-							file.contentType !== "application/pdf"
-						) {
-							return null;
-						}
-						const dataContent = await fileResolver(file);
-						return {
-							dataContent,
-							nodeId: contextNode.id,
-						};
-					}),
-				).then((result) => result.filter((dataOrNull) => dataOrNull !== null));
-			}),
-	)
-		.then((result) => result.filter((dataOrNull) => dataOrNull !== null))
-		.then((result) =>
-			result.flat().sort((a, b) => b.nodeId.localeCompare(a.nodeId)),
-		);
-	const fileIndices = createFileIndices(pdfData);
+	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
+	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => ({
+		nodeId: NodeId.parse(match[1]),
+		outputId: OutputId.parse(match[2]),
+	}));
 
 	let userMessage = prompt;
 
@@ -126,15 +63,16 @@ async function buildGenerationMessageForTextGeneration(
 	const attachedFiles: FilePart[] = [];
 	for (const sourceKeyword of sourceKeywords) {
 		const contextNode = contextNodes.find(
-			(contextNode) => contextNode.id === sourceKeyword,
+			(contextNode) => contextNode.id === sourceKeyword.nodeId,
 		);
 		if (contextNode === undefined) {
 			continue;
 		}
+		const replaceKeyword = `{{${sourceKeyword.nodeId}:${sourceKeyword.outputId}}}`;
 		switch (contextNode.content.type) {
 			case "text": {
 				userMessage = userMessage.replace(
-					`{{${sourceKeyword}}}`,
+					replaceKeyword,
 					contextNode.content.text,
 				);
 				break;
@@ -142,7 +80,7 @@ async function buildGenerationMessageForTextGeneration(
 			case "textGeneration": {
 				const result = await textGenerationResolver(contextNode.id);
 				if (result !== undefined) {
-					userMessage = userMessage.replace(`{{${sourceKeyword}}}`, result);
+					userMessage = userMessage.replace(replaceKeyword, result);
 				}
 				break;
 			}
@@ -164,12 +102,12 @@ async function buildGenerationMessageForTextGeneration(
 						).then((results) => results.filter((result) => result !== null));
 						if (fileContents.length > 1) {
 							userMessage = userMessage.replace(
-								`{{${sourceKeyword}}}`,
+								replaceKeyword,
 								`${getOrdinal(attachedFiles.length + 1)} ~ ${getOrdinal(attachedFiles.length + fileContents.length)} attached files`,
 							);
 						} else {
 							userMessage = userMessage.replace(
-								`{{${sourceKeyword}}}`,
+								replaceKeyword,
 								`${getOrdinal(attachedFiles.length + 1)} attached file`,
 							);
 						}
@@ -189,38 +127,32 @@ async function buildGenerationMessageForTextGeneration(
 
 	switch (llmProvider) {
 		case "openai": {
-			return {
-				messages: [
-					{
-						role: "user",
-						content: [
-							{
-								type: "text",
-								text: userMessage,
-							},
-						],
-					},
-				],
-				fileIndices: [],
-			};
+			return [
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
 		}
 		case "anthropic":
 		case "google": {
-			return {
-				messages: [
-					{
-						role: "user",
-						content: [
-							...attachedFiles,
-							{
-								type: "text",
-								text: userMessage,
-							},
-						],
-					},
-				],
-				fileIndices,
-			};
+			return [
+				{
+					role: "user",
+					content: [
+						...attachedFiles,
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
 		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;

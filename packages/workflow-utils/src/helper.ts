@@ -1,6 +1,10 @@
 import {
+	type Action,
+	type ActionNode,
 	type Connection,
 	type ConnectionId,
+	GenerationContext,
+	type GenerationTemplate,
 	type Job,
 	JobId,
 	type Node,
@@ -17,25 +21,25 @@ export function createConnectedNodeIdMap(
 	const connectionMap: ConnectedNodeIdMap = new Map();
 	for (const connection of connectionSet) {
 		if (
-			!nodeIdSet.has(connection.sourceNodeId) ||
-			!nodeIdSet.has(connection.targetNodeId)
+			!nodeIdSet.has(connection.outputNodeId) ||
+			!nodeIdSet.has(connection.inputNodeId)
 		) {
 			continue;
 		}
-		if (!connectionMap.has(connection.sourceNodeId)) {
-			connectionMap.set(connection.sourceNodeId, new Set());
+		if (!connectionMap.has(connection.outputNodeId)) {
+			connectionMap.set(connection.outputNodeId, new Set());
 		}
-		const sourceSet = connectionMap.get(connection.sourceNodeId);
+		const sourceSet = connectionMap.get(connection.outputNodeId);
 		if (sourceSet) {
-			sourceSet.add(connection.targetNodeId);
+			sourceSet.add(connection.inputNodeId);
 		}
 
-		if (!connectionMap.has(connection.targetNodeId)) {
-			connectionMap.set(connection.targetNodeId, new Set());
+		if (!connectionMap.has(connection.inputNodeId)) {
+			connectionMap.set(connection.inputNodeId, new Set());
 		}
-		const targetSet = connectionMap.get(connection.targetNodeId);
+		const targetSet = connectionMap.get(connection.inputNodeId);
 		if (targetSet) {
-			targetSet.add(connection.sourceNodeId);
+			targetSet.add(connection.outputNodeId);
 		}
 	}
 	return connectionMap;
@@ -78,8 +82,8 @@ export function findConnectedConnectionMap(
 
 	for (const connection of allConnectionSet) {
 		if (
-			connectedNodeIdSet.has(connection.sourceNodeId) &&
-			connectedNodeIdSet.has(connection.targetNodeId)
+			connectedNodeIdSet.has(connection.outputNodeId) &&
+			connectedNodeIdSet.has(connection.inputNodeId)
 		) {
 			connectedConnectionMap.set(connection.id, connection);
 		}
@@ -130,8 +134,8 @@ export function createJobMap(
 		}
 
 		for (const conn of connectionSet) {
-			const currentDegree = inDegrees.get(conn.targetNodeId) || 0;
-			inDegrees.set(conn.targetNodeId, currentDegree + 1);
+			const currentDegree = inDegrees.get(conn.inputNodeId) || 0;
+			inDegrees.set(conn.inputNodeId, currentDegree + 1);
 		}
 
 		return inDegrees;
@@ -154,10 +158,10 @@ export function createJobMap(
 	): Set<NodeId> => {
 		const childNodeIdSet = new Set<NodeId>();
 		for (const connection of connectionSet) {
-			if (connection.sourceNodeId !== nodeId) {
+			if (connection.outputNodeId !== nodeId) {
 				continue;
 			}
-			childNodeIdSet.add(connection.targetNodeId);
+			childNodeIdSet.add(connection.inputNodeId);
 		}
 		return childNodeIdSet;
 	};
@@ -207,6 +211,28 @@ export function createJobMap(
 		return levels;
 	};
 
+	function createGenerationContext(node: ActionNode): GenerationTemplate {
+		const connectionArray = Array.from(connectionSet);
+		const nodeArray = Array.from(nodeSet);
+
+		const sourceNodes = node.inputs
+			.map((input) => {
+				const connections = connectionArray.filter(
+					(connection) => connection.inputId === input.id,
+				);
+				return nodeArray.find((tmpNode) =>
+					connections.some(
+						(connection) => connection.outputNodeId === tmpNode.id,
+					),
+				);
+			})
+			.filter((node) => node !== undefined);
+		return {
+			actionNode: node,
+			sourceNodes,
+		};
+	}
+
 	const actionNodeIdSet = new Set<NodeId>();
 	for (const node of nodeSet) {
 		if (node.type === "action") {
@@ -215,7 +241,7 @@ export function createJobMap(
 	}
 	const actionConnectionSet = new Set<Connection>();
 	for (const connection of connectionSet) {
-		if (connection.sourceNodeType === "action") {
+		if (connection.outputNodeType === "action") {
 			actionConnectionSet.add(connection);
 		}
 	}
@@ -227,10 +253,17 @@ export function createJobMap(
 		const nodes = Array.from(nodeSet)
 			.filter((node) => level.has(node.id))
 			.filter((node) => isActionNode(node));
+		const actions = nodes.map(
+			(node) =>
+				({
+					node,
+					generationTemplate: createGenerationContext(node),
+				}) satisfies Action,
+		);
 
 		const job = {
 			id: jobId,
-			nodes,
+			actions,
 			workflowId,
 		} satisfies Job;
 		jobMap.set(job.id, job);

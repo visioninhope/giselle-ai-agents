@@ -1,41 +1,16 @@
-import {
-	type Connection,
-	type ConnectionHandle,
-	ConnectionId,
-	type NodeBase,
-	connectionHandleId,
-} from "./base";
+import { createIdGenerator } from "@giselle-sdk/utils";
+import { z } from "zod";
+import { InputId, NodeBase, NodeId, OutputId } from "./base";
 
-export function createConnection({
-	sourceNode,
-	targetNodeHandle,
-}: {
-	sourceNode: NodeBase;
-	targetNodeHandle: ConnectionHandle;
-}): Connection {
-	return {
-		id: ConnectionId.generate(),
-		sourceNodeId: sourceNode.id,
-		sourceNodeType: sourceNode.type,
-		targetNodeId: targetNodeHandle.nodeId,
-		targetNodeType: targetNodeHandle.nodeType,
-		targetNodeHandleId: targetNodeHandle.id,
-	};
-}
-
-export function createConnectionHandle({
-	nodeId,
-	nodeType,
-	label,
-	connectedNodeId,
-}: Omit<ConnectionHandle, "id">): ConnectionHandle {
-	return {
-		id: connectionHandleId.generate(),
-		nodeId,
-		nodeType,
-		label,
-		connectedNodeId,
-	};
-}
-
-export type { ConnectionHandle };
+export const ConnectionId = createIdGenerator("cnnc");
+export type ConnectionId = z.infer<typeof ConnectionId.schema>;
+export const Connection = z.object({
+	id: ConnectionId.schema,
+	outputNodeId: NodeId.schema,
+	outputNodeType: NodeBase.shape.type,
+	outputId: OutputId.schema,
+	inputNodeId: NodeId.schema,
+	inputNodeType: NodeBase.shape.type,
+	inputId: InputId.schema,
+});
+export type Connection = z.infer<typeof Connection>;
