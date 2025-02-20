@@ -24,13 +24,13 @@ export class DependencyResolver {
 
 		// Build connections
 		for (const connection of this.workflowData.connections) {
-			const { sourceNodeId, inputNodeId, outputNodeType } = connection;
-			if (outputNodeType === "variable") {
-				this.graph[inputNodeId].dependencyVariables.push(sourceNodeId);
+			const { sourceNodeId, targetNodeId, sourceNodeType } = connection;
+			if (sourceNodeType === "variable") {
+				this.graph[targetNodeId].dependencyVariables.push(sourceNodeId);
 			}
-			if (outputNodeType === "action") {
-				this.graph[inputNodeId].dependencyActions.push(sourceNodeId);
-				this.graph[sourceNodeId].dependents.push(inputNodeId);
+			if (sourceNodeType === "action") {
+				this.graph[targetNodeId].dependencyActions.push(sourceNodeId);
+				this.graph[sourceNodeId].dependents.push(targetNodeId);
 			}
 		}
 	}

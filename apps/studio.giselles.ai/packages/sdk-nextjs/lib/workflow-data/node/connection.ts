@@ -16,10 +16,10 @@ export function createConnection({
 	return {
 		id: connectionId.generate(),
 		sourceNodeId: sourceNode.id,
-		outputNodeType: sourceNode.type,
-		inputNodeId: targetNodeHandle.nodeId,
-		inputNodeType: targetNodeHandle.nodeType,
-		inputNodeHandleId: targetNodeHandle.id,
+		sourceNodeType: sourceNode.type,
+		targetNodeId: targetNodeHandle.nodeId,
+		targetNodeType: targetNodeHandle.nodeType,
+		targetNodeHandleId: targetNodeHandle.id,
 	};
 }
 

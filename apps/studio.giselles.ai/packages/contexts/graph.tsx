@@ -297,7 +297,7 @@ export function useGraph() {
 }
 
 interface TargetHandle {
-	inputNodeHandleId?: NodeHandleId;
+	targetNodeHandleId?: NodeHandleId;
 }
 export function useNode(query: TargetHandle) {
 	const {
@@ -306,7 +306,7 @@ export function useNode(query: TargetHandle) {
 	const node = useMemo(() => {
 		const connection = connections.find(
 			(connection) =>
-				connection.inputNodeHandleId === query.inputNodeHandleId,
+				connection.targetNodeHandleId === query.targetNodeHandleId,
 		);
 		if (connection === undefined) {
 			return null;

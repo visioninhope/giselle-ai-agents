@@ -79,7 +79,7 @@ function resolveLanguageModel(
 
 function nodeResolver(nodeHandleId: NodeHandleId, context: ExecutionContext) {
 	const connection = context.connections.find(
-		(connection) => connection.inputNodeHandleId === nodeHandleId,
+		(connection) => connection.targetNodeHandleId === nodeHandleId,
 	);
 	const node = context.nodes.find(
 		(node) => node.id === connection?.sourceNodeId,

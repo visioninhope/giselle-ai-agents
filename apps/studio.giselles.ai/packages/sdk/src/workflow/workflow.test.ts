@@ -143,7 +143,7 @@ describe("Workflow", () => {
 			// Verify connection in the workflow state
 			expect(savedState.connections).toHaveLength(1);
 			expect(savedState.connections[0].sourceNodeId).toBe(sourceNode.id);
-			expect(savedState.connections[0].inputNodeId).toBe(targetNode.id);
+			expect(savedState.connections[0].targetNodeId).toBe(targetNode.id);
 
 			// Verify source in target node's content
 			const targetNodeData = savedState.nodes[targetNode.id].data;
@@ -173,7 +173,7 @@ describe("Workflow", () => {
 
 			expect(savedState.connections).toHaveLength(1);
 			expect(savedState.connections[0].sourceNodeId).toBe(textNode.id);
-			expect(savedState.connections[0].inputNodeId).toBe(genNode.id);
+			expect(savedState.connections[0].targetNodeId).toBe(genNode.id);
 
 			const genNodeData = savedState.nodes[genNode.id].data;
 

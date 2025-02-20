@@ -125,10 +125,10 @@ export interface Connection {
 	id: ConnectionId;
 	sourceNodeId: NodeId;
 	sourceNodeHandleId?: NodeHandleId;
-	outputNodeType: Node["type"];
-	inputNodeId: NodeId;
-	inputNodeHandleId?: NodeHandleId;
-	inputNodeType: Node["type"];
+	sourceNodeType: Node["type"];
+	targetNodeId: NodeId;
+	targetNodeHandleId?: NodeHandleId;
+	targetNodeType: Node["type"];
 }
 
 export type ArtifactId = `artf_${string}`;

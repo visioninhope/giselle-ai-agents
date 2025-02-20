@@ -36,9 +36,9 @@ export const connectionId = createIdGenerator("cnnc");
 export const Connection = z.object({
 	id: connectionId.schema,
 	sourceNodeId: nodeId.schema,
-	outputNodeType: BaseNodeData.shape.type,
-	inputNodeId: nodeId.schema,
-	inputNodeType: BaseNodeData.shape.type,
-	inputNodeHandleId: connectionHandleId.schema,
+	sourceNodeType: BaseNodeData.shape.type,
+	targetNodeId: nodeId.schema,
+	targetNodeType: BaseNodeData.shape.type,
+	targetNodeHandleId: connectionHandleId.schema,
 });
 export type Connection = z.infer<typeof Connection>;

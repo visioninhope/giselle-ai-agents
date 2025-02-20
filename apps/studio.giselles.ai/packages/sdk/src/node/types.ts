@@ -13,7 +13,7 @@ export interface Position {
 export interface ConnectionHandle {
 	id: ConnectionHandleId;
 	connectedSourceNodeId: NodeId;
-	connectedinputNodeId: NodeId;
+	connectedTargetNodeId: NodeId;
 	label: string;
 }
 

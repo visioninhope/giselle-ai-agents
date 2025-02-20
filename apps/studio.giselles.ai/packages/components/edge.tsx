@@ -33,8 +33,8 @@ export function Edge({
 	return (
 		<g
 			className="group"
-			data-source-node-type={data.connection.outputNodeType}
-			data-target-node-type={data.connection.inputNodeType}
+			data-source-node-type={data.connection.sourceNodeType}
+			data-target-node-type={data.connection.targetNodeType}
 		>
 			<BaseEdge
 				id={id}

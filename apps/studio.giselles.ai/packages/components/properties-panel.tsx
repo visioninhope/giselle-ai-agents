@@ -376,10 +376,10 @@ export function PropertiesPanel() {
 												connection: {
 													id: createConnectionId(),
 													sourceNodeId: sourceNode.id,
-													outputNodeType: sourceNode.type,
-													inputNodeId: selectedNode.id,
-													inputNodeType: selectedNode.type,
-													inputNodeHandleId: requirement.id,
+													sourceNodeType: sourceNode.type,
+													targetNodeId: selectedNode.id,
+													targetNodeType: selectedNode.type,
+													targetNodeHandleId: requirement.id,
 												},
 											},
 										},
@@ -388,7 +388,7 @@ export function PropertiesPanel() {
 								onRequirementRemove={(sourceNode) => {
 									const connection = graph.connections.find(
 										(connection) =>
-											connection.inputNodeId === selectedNode.id &&
+											connection.targetNodeId === selectedNode.id &&
 											connection.sourceNodeId === sourceNode.id,
 									);
 									if (connection === undefined) {
@@ -446,10 +446,10 @@ export function PropertiesPanel() {
 													connection: {
 														id: createConnectionId(),
 														sourceNodeId: sourceNode.id,
-														outputNodeType: sourceNode.type,
-														inputNodeId: selectedNode.id,
-														inputNodeType: selectedNode.type,
-														inputNodeHandleId: source.id,
+														sourceNodeType: sourceNode.type,
+														targetNodeId: selectedNode.id,
+														targetNodeType: selectedNode.type,
+														targetNodeHandleId: source.id,
 													},
 												},
 											},
@@ -467,7 +467,7 @@ export function PropertiesPanel() {
 								onSourceRemove={(sourceNode) => {
 									const connection = graph.connections.find(
 										(connection) =>
-											connection.inputNodeId === selectedNode.id &&
+											connection.targetNodeId === selectedNode.id &&
 											connection.sourceNodeId === sourceNode.id,
 									);
 									if (connection === undefined) {
@@ -490,7 +490,7 @@ export function PropertiesPanel() {
 														...selectedNode.content,
 														sources: selectedNode.content.sources.filter(
 															(source) =>
-																source.id !== connection.inputNodeHandleId,
+																source.id !== connection.targetNodeHandleId,
 														),
 													},
 												},
@@ -595,10 +595,10 @@ export function PropertiesPanel() {
 												connection: {
 													id: createConnectionId(),
 													sourceNodeId: selectedNode.id,
-													outputNodeType: selectedNode.type,
-													inputNodeId: nodeId,
-													inputNodeHandleId: handleId,
-													inputNodeType: "action",
+													sourceNodeType: selectedNode.type,
+													targetNodeId: nodeId,
+													targetNodeHandleId: handleId,
+													targetNodeType: "action",
 												},
 											},
 										},
@@ -837,14 +837,14 @@ function TabsContentPrompt({
 		(node) => node.content.type === "files",
 	);
 	const requirementNode = useNode({
-		inputNodeHandleId: content.requirement?.id,
+		targetNodeHandleId: content.requirement?.id,
 	});
 	const sourceNodes = useMemo(
 		() =>
 			content.sources
 				.map((source) => {
 					const connection = connections.find(
-						(connection) => connection.inputNodeHandleId === source.id,
+						(connection) => connection.targetNodeHandleId === source.id,
 					);
 					const node = nodes.find(
 						(node) => node.id === connection?.sourceNodeId,
@@ -1618,7 +1618,7 @@ function TabContentFile({
 			graph.connections
 				.filter((connection) => connection.sourceNodeId === nodeId)
 				.map((connection) =>
-					graph.nodes.find((node) => node.id === connection.inputNodeId),
+					graph.nodes.find((node) => node.id === connection.targetNodeId),
 				)
 				.filter((node) => node !== undefined),
 		[graph, nodeId],
