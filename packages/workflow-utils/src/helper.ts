@@ -215,10 +215,10 @@ export function createJobMap(
 		const connectionArray = Array.from(connectionSet);
 		const nodeArray = Array.from(nodeSet);
 
-		const sourceNodes = node.content.inputs
+		const sourceNodes = node.inputs
 			.map((input) => {
 				const connections = connectionArray.filter(
-					(connection) => connection.inputNodeHandleId === input.id,
+					(connection) => connection.inputId === input.id,
 				);
 				return nodeArray.find((tmpNode) =>
 					connections.some(

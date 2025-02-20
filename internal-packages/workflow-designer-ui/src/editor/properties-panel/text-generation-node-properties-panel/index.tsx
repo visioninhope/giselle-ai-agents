@@ -1,11 +1,4 @@
-import {
-	type InputPort,
-	type Node,
-	type OutputPort,
-	PortId,
-	type TextGenerationNode,
-	createConnectionHandle,
-} from "@giselle-sdk/data-type";
+import type { Node, TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import {
 	useGenerationController,
@@ -37,82 +30,11 @@ export function TextGenerationNodePropertiesPanel({
 	const {
 		data,
 		updateNodeDataContent,
-		addConnection,
 		deleteConnection,
 		updateNodeData,
 		setUiNodeState,
 	} = useWorkflowDesigner();
 	const { startGeneration } = useGenerationController();
-
-	const connectableNodes = useMemo(
-		() => data.nodes.filter((_node) => _node.id !== node.id),
-		[data, node.id],
-	);
-	const inputs = useMemo(
-		() =>
-			node.inputs
-				.map((input) => {
-					const connections = data.connections.filter(
-						(connection) => connection.inputNodeId === node.id,
-					);
-					const inputNode = data.nodes.find((tmpNode) =>
-						connections.some(
-							(connection) => connection.outputNodeId === tmpNode.id,
-						),
-					);
-					if (inputNode === undefined) {
-						return undefined;
-					}
-					return {
-						...input,
-						node,
-					};
-				})
-				.filter((node) => node !== undefined),
-		[data, node],
-	);
-	const addInput = useCallback(
-		(connectNode: Node, connectPort: OutputPort) => {
-			const connectionHandle = createConnectionHandle({
-				label: "Source",
-			});
-			const newInput: InputPort = {
-				id: PortId.generate(),
-				direction: "input",
-				label: "Source",
-			};
-			addConnection({
-				input: {
-					node,
-					port: newInput,
-				},
-				output: {
-					node: connectNode,
-					port: connectPort,
-				},
-			});
-			updateNodeData(node, {
-				inputs: [...node.inputs, newInput],
-			});
-		},
-		[addConnection, node, updateNodeData],
-	);
-
-	const removeInput = useCallback(
-		(removeInputPort: InputPort) => {
-			for (const connection of data.connections) {
-				if (connection.inputPortId !== removeInputPort.id) {
-					continue;
-				}
-				deleteConnection(connection.id);
-				updateNodeData(node, {
-					inputs: node.inputs.filter(({ id }) => id !== connection.inputPortId),
-				});
-				break;
-			}
-		},
-		[deleteConnection, data, node, updateNodeData],
-	);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
@@ -138,24 +60,6 @@ export function TextGenerationNodePropertiesPanel({
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
 				}}
-				action={
-					<button
-						type="button"
-						className="flex gap-[4px] justify-center items-center bg-blue rounded-[8px] px-[15px] py-[8px] text-white text-[14px] font-[700] cursor-pointer"
-						onClick={() => {
-							startGeneration({
-								origin: {
-									type: "workspace",
-									id: data.id,
-								},
-								actionNode: node,
-								sourceNodes: inputs.map((input) => input.node),
-							});
-						}}
-					>
-						Generate
-					</button>
-				}
 			/>
 
 			<PanelGroup
@@ -191,7 +95,7 @@ export function TextGenerationNodePropertiesPanel({
 											prompt: newPrompt,
 										});
 									}}
-									sourceNodes={inputs.map((input) => input.node)}
+									// sourceNodes={inputs.map((input) => input.node)}
 								/>
 								{/* <div>toolbar</div>
 							<textarea
@@ -241,12 +145,7 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 							<Tabs.Content value="sources" className="flex-1 flex flex-col">
-								<SourcesPanel
-									connections={inputs.map((input) => input.node)}
-									connectableNodes={connectableNodes}
-									addConnection={addInput}
-									removeConnection={removeInput}
-								/>
+								<SourcesPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>

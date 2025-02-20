@@ -31,7 +31,7 @@ import {
 	useToolbar,
 } from "./tool";
 import "@xyflow/react/dist/style.css";
-import { PortId } from "@giselle-sdk/data-type";
+import { OutputId } from "@giselle-sdk/data-type";
 
 function NodeCanvas() {
 	const {
@@ -66,12 +66,14 @@ function NodeCanvas() {
 		updateNodeInternals(Object.keys(data.ui.nodeState));
 	}, [data, reactFlowInstance.setNodes, updateNodeInternals]);
 	useEffect(() => {
+		console.log(data.connections);
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
 				source: connection.outputNodeId,
+				sourceHandle: connection.outputId,
 				target: connection.inputNodeId,
-				targetHandle: connection.inputPortId,
+				targetHandle: connection.inputId,
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
@@ -105,7 +107,7 @@ function NodeCanvas() {
 									case "textGeneration": {
 										updateNodeData(connectedNode, {
 											inputs: connectedNode.inputs.filter(
-												(input) => input.id !== connection.inputPortId,
+												(input) => input.id !== connection.inputId,
 											),
 										});
 									}
@@ -159,8 +161,7 @@ function NodeCanvas() {
 								inputs: [],
 								outputs: [
 									{
-										id: PortId.generate(),
-										direction: "output",
+										id: OutputId.generate(),
 										label: "Output",
 									},
 								],
@@ -185,8 +186,7 @@ function NodeCanvas() {
 										inputs: [],
 										outputs: [
 											{
-												id: PortId.generate(),
-												direction: "output",
+												id: OutputId.generate(),
 												label: "Output",
 											},
 										],
@@ -206,8 +206,7 @@ function NodeCanvas() {
 										inputs: [],
 										outputs: [
 											{
-												id: PortId.generate(),
-												direction: "output",
+												id: OutputId.generate(),
 												label: "Output",
 											},
 										],
@@ -241,8 +240,7 @@ function NodeCanvas() {
 										inputs: [],
 										outputs: [
 											{
-												id: PortId.generate(),
-												direction: "output",
+												id: OutputId.generate(),
 												label: "Output",
 											},
 										],
@@ -266,8 +264,7 @@ function NodeCanvas() {
 										inputs: [],
 										outputs: [
 											{
-												id: PortId.generate(),
-												direction: "output",
+												id: OutputId.generate(),
 												label: "Output",
 											},
 										],
@@ -292,9 +289,12 @@ function NodeCanvas() {
 										inputs: [],
 										outputs: [
 											{
-												id: PortId.generate(),
-												direction: "output",
+												id: OutputId.generate(),
 												label: "Output",
+											},
+											{
+												id: OutputId.generate(),
+												label: "Search Result",
 											},
 										],
 									},

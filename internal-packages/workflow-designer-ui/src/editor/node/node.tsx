@@ -1,7 +1,9 @@
 import {
-	type ConnectionHandle,
 	FileNode,
+	type Input,
 	type Node,
+	type Output,
+	type OutputId,
 	TextGenerationNode,
 	TextNode,
 } from "@giselle-sdk/data-type";
@@ -47,19 +49,18 @@ export function CustomXyFlowNode({
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
-	const targetHandles = useMemo(() => {
-		if (data.nodeData.content.type !== "textGeneration") {
-			return [];
-		}
-		return [...data.nodeData.content.inputs].filter(
-			(item) => item !== undefined,
-		);
-	}, [data]);
 	const hasTarget = useMemo(
 		() =>
 			workspace.connections.some(
 				(connection) => connection.outputNodeId === data.nodeData.id,
 			),
+		[workspace, data.nodeData.id],
+	);
+	const connectedOutputIds = useMemo(
+		() =>
+			workspace.connections
+				.filter((connection) => connection.outputNodeId === data.nodeData.id)
+				.map((connection) => connection.outputId),
 		[workspace, data.nodeData.id],
 	);
 
@@ -72,7 +73,9 @@ export function CustomXyFlowNode({
 					subtitle={data.nodeData.content.llm.provider}
 					selected={selected}
 					hasTarget={hasTarget}
-					targetHandles={targetHandles}
+					inputs={data.nodeData.inputs}
+					outputs={data.nodeData.outputs}
+					connectedOutputIds={connectedOutputIds}
 					contentType="textGeneration"
 					llmProvider={data.nodeData.content.llm.provider}
 				/>
@@ -84,7 +87,8 @@ export function CustomXyFlowNode({
 					title={data.nodeData.name}
 					selected={selected}
 					hasTarget={hasTarget}
-					targetHandles={targetHandles}
+					inputs={data.nodeData.inputs}
+					outputs={data.nodeData.outputs}
 					contentType="file"
 					fileCategory={data.nodeData.content.category}
 				/>
@@ -96,7 +100,8 @@ export function CustomXyFlowNode({
 					title={data.nodeData.name}
 					selected={selected}
 					hasTarget={hasTarget}
-					targetHandles={targetHandles}
+					inputs={data.nodeData.inputs}
+					outputs={data.nodeData.outputs}
 					contentType="text"
 				/>
 			);
@@ -110,7 +115,9 @@ export function CustomXyFlowNode({
 export function NodeComponent({
 	nodeType,
 	selected,
-	targetHandles,
+	inputs,
+	connectedOutputIds,
+	outputs,
 	title,
 	subtitle,
 	preview = false,
@@ -120,10 +127,12 @@ export function NodeComponent({
 	title?: string;
 	subtitle?: string;
 	nodeType: Node["type"];
-	targetHandles?: ConnectionHandle[];
+	inputs?: Input[];
+	outputs?: Output[];
 	selected?: boolean;
 	preview?: boolean;
 	hasTarget?: boolean;
+	connectedOutputIds?: OutputId[];
 } & ContentTypeIconProps) {
 	return (
 		<div
@@ -190,52 +199,62 @@ export function NodeComponent({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-						{targetHandles?.map((targetHandle) => (
+						{inputs?.map((input) => (
 							<div
 								className="relative flex items-center h-[28px]"
-								key={targetHandle.id}
+								key={input.id}
 							>
 								<Handle
 									type="target"
 									position={Position.Left}
-									id={targetHandle.id}
+									id={input.id}
 									className={clsx(
 										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[5px] !translate-x-[50%] !border-[1.5px]",
 										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
 									)}
 								/>
 								<div className="text-[14px] text-black--30 px-[12px] text-white">
-									{targetHandle.label}
+									{input.label}
 								</div>
 							</div>
 						))}
 					</div>
 
 					<div className="grid">
-						<div className="relative flex items-center h-[28px]">
-							<Handle
-								type="source"
-								position={Position.Right}
-								data-state={hasTarget ? "connected" : "disconnected"}
-								className={clsx(
-									"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px]",
-									"group-data-[content-type=textGeneration]:!border-generation-node-1",
-									"group-data-[content-type=text]:!border-text-node-1",
-									"group-data-[content-type=file]:!border-file-node-1",
-									"data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
-									"data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
-									"data-[state=disconnected]:!bg-black",
-								)}
-							/>
-							<div className="text-[14px] px-[16px] text-white">Output</div>
-						</div>
+						{outputs?.map((output) => (
+							<div
+								className="relative flex items-center h-[28px]"
+								key={output.id}
+							>
+								<Handle
+									id={output.id}
+									type="source"
+									position={Position.Right}
+									data-state={
+										connectedOutputIds?.some(
+											(connectedOutputId) => connectedOutputId === output.id,
+										)
+											? "connected"
+											: "disconnected"
+									}
+									className={clsx(
+										"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px]",
+										"group-data-[content-type=textGeneration]:!border-generation-node-1",
+										"group-data-[content-type=text]:!border-text-node-1",
+										"group-data-[content-type=file]:!border-file-node-1",
+										"data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
+										"data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
+										"data-[state=disconnected]:!bg-black",
+									)}
+								/>
+								<div className="text-[14px] px-[16px] text-white">
+									{output.label}
+								</div>
+							</div>
+						))}
 					</div>
 				</div>
 			)}
-			{/* <div className="py-[4px] min-h-[30px]">
-				<div className="flex justify-between h-full"> */}
-			{/* </div>
-			</div> */}
 		</div>
 	);
 }

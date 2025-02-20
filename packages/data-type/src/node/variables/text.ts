@@ -21,11 +21,7 @@ export const CreateTextNodeParams = TextContent.omit({
 		name: z.string(),
 	});
 
-export function isTextNode(node: {
-	type: string;
-	content: unknown;
-}): node is { type: "variable"; content: TextContent } {
-	return (
-		node.type === "variable" && (node.content as TextContent).type === "text"
-	);
+export function isTextNode(args: unknown): args is TextNode {
+	const result = TextNode.safeParse(args);
+	return result.success;
 }

@@ -14,6 +14,7 @@ export const VariableNode = NodeBase.extend({
 	type: z.literal("variable"),
 	content: VariableNodeContent,
 });
+export type VariableNode = z.infer<typeof VariableNode>;
 
 export const TextNode = VariableNode.extend({
 	content: TextContent,
