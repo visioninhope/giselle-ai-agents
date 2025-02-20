@@ -8,6 +8,7 @@ import {
 	OutputId,
 	type TextGenerationNode,
 	type VariableNode,
+	isFileNode,
 	isTextGenerationNode,
 	isTextNode,
 } from "@giselle-sdk/data-type";
@@ -26,7 +27,6 @@ import {
 } from "react";
 import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-import { NodeDropdown } from "../ui/node-dropdown";
 
 interface UnconnectedSource<T extends NodeBase = Node> {
 	output: Output;
@@ -59,35 +59,6 @@ function filterSources<T extends NodeBase>(
 	return tmpSources;
 }
 
-function connectionToConnectedSource<T extends NodeBase>({
-	connection,
-	nodes,
-	guardFn,
-}: {
-	connection: Connection;
-	nodes: Node[];
-	guardFn: (args: unknown) => args is T;
-}): ConnectedSource<T> | undefined {
-	const node = nodes.find((node) => node.id === connection.outputNodeId);
-	if (node === undefined) {
-		return undefined;
-	}
-	if (!guardFn(node)) {
-		return undefined;
-	}
-	const output = node.outputs.find(
-		(output) => output.id === connection.outputId,
-	);
-	if (output === undefined) {
-		return undefined;
-	}
-	return {
-		output,
-		node,
-		connection,
-	};
-}
-
 function SourceSelect({
 	sources,
 	onValueChange,
@@ -111,6 +82,10 @@ function SourceSelect({
 	);
 	const textSources = useMemo(
 		() => filterSources(sources, isTextNode),
+		[sources],
+	);
+	const fileSources = useMemo(
+		() => filterSources(sources, isFileNode),
 		[sources],
 	);
 	return (
@@ -195,6 +170,25 @@ function SourceSelect({
 										<p className="text-[12px] truncate">
 											{textSource.node.name ?? "Text"} /{" "}
 											{textSource.output.label}
+										</p>
+										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+									</ToggleGroup.Item>
+								))}
+							</div>
+
+							<div className="flex flex-col px-[8px]">
+								<p className="py-[4px] px-[8px] text-black-40 text-[10px] font-[700]">
+									File
+								</p>
+								{fileSources.map((fileSource) => (
+									<ToggleGroup.Item
+										key={fileSource.output.id}
+										value={fileSource.output.id}
+										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+									>
+										<p className="text-[12px] truncate">
+											{fileSource.node.name ?? "File"} /{" "}
+											{fileSource.output.label}
 										</p>
 										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
 									</ToggleGroup.Item>

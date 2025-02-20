@@ -66,7 +66,6 @@ function NodeCanvas() {
 		updateNodeInternals(Object.keys(data.ui.nodeState));
 	}, [data, reactFlowInstance.setNodes, updateNodeInternals]);
 	useEffect(() => {
-		console.log(data.connections);
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
@@ -177,11 +176,12 @@ function NodeCanvas() {
 							case "pdf":
 								addNode(
 									{
-										name: "Text",
+										name: "PDF Files",
 										type: "variable",
 										content: {
-											type: "text",
-											text: "",
+											type: "file",
+											category: "pdf",
+											files: [],
 										},
 										inputs: [],
 										outputs: [

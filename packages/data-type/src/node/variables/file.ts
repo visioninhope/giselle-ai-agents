@@ -83,11 +83,7 @@ export const FileNode = NodeBase.extend({
 });
 export type FileNode = z.infer<typeof FileNode>;
 
-export function isFileNode(node: {
-	type: string;
-	content: unknown;
-}): node is FileNode {
-	return (
-		node.type === "variable" && (node.content as FileContent).type === "file"
-	);
+export function isFileNode(args: unknown): args is FileNode {
+	const result = FileNode.safeParse(args);
+	return result.success;
 }
