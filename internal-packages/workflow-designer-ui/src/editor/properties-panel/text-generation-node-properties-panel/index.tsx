@@ -20,6 +20,7 @@ import {
 	OpenAIModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
+import { useConnectedSources } from "./sources";
 import { SourcesPanel } from "./sources-panel";
 
 export function TextGenerationNodePropertiesPanel({
@@ -30,6 +31,7 @@ export function TextGenerationNodePropertiesPanel({
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
 	const { startGeneration } = useGenerationController();
+	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
@@ -55,6 +57,26 @@ export function TextGenerationNodePropertiesPanel({
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
 				}}
+				action={
+					<button
+						type="button"
+						className="flex gap-[4px] justify-center items-center bg-blue rounded-[8px] px-[15px] py-[8px] text-white text-[14px] font-[700] cursor-pointer"
+						onClick={() => {
+							startGeneration({
+								origin: {
+									type: "workspace",
+									id: data.id,
+								},
+								actionNode: node,
+								sourceNodes: connectedSources.map(
+									(connectedSource) => connectedSource.node,
+								),
+							});
+						}}
+					>
+						Generate
+					</button>
+				}
 			/>
 
 			<PanelGroup

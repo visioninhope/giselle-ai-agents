@@ -7,7 +7,6 @@ import { TextEditor } from "@giselle-sdk/text-editor/react";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { BracesIcon } from "lucide-react";
-import path from "path/win32";
 import { DropdownMenu, Toolbar } from "radix-ui";
 import { type Source, useConnectedSources } from "./sources";
 
@@ -24,7 +23,7 @@ export function PromptPanel({
 	node: TextGenerationNode;
 }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
-	const connectedSources = useConnectedSources(node);
+	const { all: connectedSources } = useConnectedSources(node);
 	return (
 		<TextEditor
 			value={node.content.prompt}
@@ -75,7 +74,7 @@ export function PromptPanel({
 											return;
 										}
 										const connectionId = parsedConnectionId.data;
-										const connectedSource = connectedSources.all.find(
+										const connectedSource = connectedSources.find(
 											(connectedSource) =>
 												connectedSource.connection.id === connectionId,
 										);
@@ -93,7 +92,7 @@ export function PromptPanel({
 									}}
 								>
 									<div className="flex flex-col px-[8px]">
-										{connectedSources.all.map((source) => (
+										{connectedSources.map((source) => (
 											<DropdownMenu.RadioItem
 												key={source.connection.id}
 												className="p-[8px] rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer text-[12px] outline-none select-none"

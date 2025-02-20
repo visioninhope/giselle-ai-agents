@@ -1,9 +1,10 @@
-import type {
-	ActionNode,
-	FileData,
-	Node,
+import {
+	type ActionNode,
+	type FileData,
+	type Node,
 	NodeId,
-	TextGenerationNode,
+	OutputId,
+	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import type { CoreMessage, DataContent, FilePart } from "ai";
@@ -48,8 +49,11 @@ async function buildGenerationMessageForTextGeneration(
 		throw new Error("Prompt cannot be empty");
 	}
 
-	const pattern = /\{\{(nd-[a-zA-Z0-9]+)\}\}/g;
-	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => match[1]);
+	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
+	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => ({
+		nodeId: NodeId.parse(match[1]),
+		outputId: OutputId.parse(match[2]),
+	}));
 
 	let userMessage = prompt;
 
@@ -59,15 +63,16 @@ async function buildGenerationMessageForTextGeneration(
 	const attachedFiles: FilePart[] = [];
 	for (const sourceKeyword of sourceKeywords) {
 		const contextNode = contextNodes.find(
-			(contextNode) => contextNode.id === sourceKeyword,
+			(contextNode) => contextNode.id === sourceKeyword.nodeId,
 		);
 		if (contextNode === undefined) {
 			continue;
 		}
+		const replaceKeyword = `{{${sourceKeyword.nodeId}:${sourceKeyword.outputId}}}`;
 		switch (contextNode.content.type) {
 			case "text": {
 				userMessage = userMessage.replace(
-					`{{${sourceKeyword}}}`,
+					replaceKeyword,
 					contextNode.content.text,
 				);
 				break;
@@ -75,7 +80,7 @@ async function buildGenerationMessageForTextGeneration(
 			case "textGeneration": {
 				const result = await textGenerationResolver(contextNode.id);
 				if (result !== undefined) {
-					userMessage = userMessage.replace(`{{${sourceKeyword}}}`, result);
+					userMessage = userMessage.replace(replaceKeyword, result);
 				}
 				break;
 			}
@@ -97,12 +102,12 @@ async function buildGenerationMessageForTextGeneration(
 						).then((results) => results.filter((result) => result !== null));
 						if (fileContents.length > 1) {
 							userMessage = userMessage.replace(
-								`{{${sourceKeyword}}}`,
+								replaceKeyword,
 								`${getOrdinal(attachedFiles.length + 1)} ~ ${getOrdinal(attachedFiles.length + fileContents.length)} attached files`,
 							);
 						} else {
 							userMessage = userMessage.replace(
-								`{{${sourceKeyword}}}`,
+								replaceKeyword,
 								`${getOrdinal(attachedFiles.length + 1)} attached file`,
 							);
 						}
