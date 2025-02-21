@@ -10,6 +10,7 @@ import { Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
 import { WilliIcon } from "../icons";
 import bg from "../images/bg.png";
+import { Button } from "../ui/button";
 import { EmptyState } from "../ui/empty-state";
 import { GenerationView } from "../ui/generation-view";
 import { NodeGlance } from "../ui/node-glance";
@@ -42,67 +43,64 @@ export function Viewer() {
 						backgroundSize: "cover",
 					}}
 				>
-					<div className="flex justify-between">
-						<div className="w-[180px]">
-							<Select
-								onValueChange={(value) => {
-									setFlowId(WorkflowId.parse(value));
-								}}
-							>
-								<SelectTrigger>
-									<SelectValue placeholder="Select flow" />
-								</SelectTrigger>
-								<SelectContent>
-									{data.editingWorkflows.map((workflow, index) => (
-										<SelectItem key={workflow.id} value={workflow.id}>
-											flow {index + 1}
-										</SelectItem>
-									))}
-								</SelectContent>
-							</Select>
-						</div>
-						<div>
-							{flowId && (
-								<button
-									type="button"
-									onClick={() => {
-										perform(flowId);
+					<Tabs.Root orientation="horizontal" className="flex h-full">
+						<Tabs.List className="w-[180px] flex flex-col gap-[16px]">
+							<div className="flex flex-col gap-[8px]">
+								<Select
+									onValueChange={(value) => {
+										setFlowId(WorkflowId.parse(value));
 									}}
 								>
-									Run
-								</button>
-							)}
-						</div>
-					</div>
-					{flow && (
-						<Tabs.Root orientation="horizontal" className="flex">
-							<Tabs.List className="w-[180px] flex flex-col gap-[16px]">
-								<div className="flex flex-col gap-[24px]">
-									{flow.jobs.map((job, index) => (
-										<div key={job.id} className="flex flex-col gap-[8px]">
-											<p className="text-black-400 text-[12px] font-[700]">
-												Step {index + 1}
-											</p>
-											{job.actions.map((action) => (
-												<Tabs.Trigger
-													value={action.node.id}
-													className="[w-180px] flex p-[16px] justify-between items-center border border-black-400/50 rounded-[8px]"
-													key={action.node.id}
-												>
-													<NodeGlance
-														node={action.node}
-														iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
-														nameClassName="text-white text-[12px] font-[700]"
-														descriptionClassName="text-black-400 text-[10px]"
-													/>
-												</Tabs.Trigger>
-											))}
-										</div>
-									))}
-								</div>
-							</Tabs.List>
-							<div className="overflow-y-auto flex-1 pb-[20px]">
-								{(!run || run.status === "created") && (
+									<SelectTrigger>
+										<SelectValue placeholder="Select flow" />
+									</SelectTrigger>
+									<SelectContent>
+										{data.editingWorkflows.map((workflow, index) => (
+											<SelectItem key={workflow.id} value={workflow.id}>
+												flow {index + 1}
+											</SelectItem>
+										))}
+									</SelectContent>
+								</Select>
+
+								{flowId && (
+									<Button
+										type="button"
+										onClick={() => {
+											perform(flowId);
+										}}
+									>
+										Run
+									</Button>
+								)}
+							</div>
+							<div className="flex flex-col gap-[24px]">
+								{flow?.jobs.map((job, index) => (
+									<div key={job.id} className="flex flex-col gap-[8px]">
+										<p className="text-black-400 text-[12px] font-[700]">
+											Step {index + 1}
+										</p>
+										{job.actions.map((action) => (
+											<Tabs.Trigger
+												value={action.node.id}
+												className="[w-180px] flex p-[16px] justify-between items-center border border-black-400/50 rounded-[8px]"
+												key={action.node.id}
+											>
+												<NodeGlance
+													node={action.node}
+													iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
+													nameClassName="text-white text-[12px] font-[700]"
+													descriptionClassName="text-black-400 text-[10px]"
+												/>
+											</Tabs.Trigger>
+										))}
+									</div>
+								))}
+							</div>
+						</Tabs.List>
+						<div className="overflow-y-auto flex-1 pb-[20px]">
+							{(!run || run.status === "created") && (
+								<div className="h-full flex items-center justify-center">
 									<EmptyState
 										icon={
 											<WilliIcon className="fill-current w-[32px] h-[32px] text-black-300" />
@@ -112,40 +110,40 @@ export function Viewer() {
 													executed the node. Let's execute entire thing and create the final
 													output."
 									/>
+								</div>
+							)}
+							{run &&
+								run.status !== "created" &&
+								run?.workflow?.jobs.flatMap((job) =>
+									job.actions.map(({ node }) => (
+										<Tabs.Content
+											key={node.id}
+											value={node.id}
+											className="px-[32px] py-[16px] flex flex-col gap-[24px]"
+										>
+											<NodeGlance
+												node={node}
+												iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[26px]"
+												nameClassName="text-white text-[20px] font-[700]"
+												descriptionClassName="text-black-400 text-[12px]"
+											/>
+											{generations
+												.filter(
+													(g) =>
+														g.status !== "created" &&
+														g.context.actionNode.id === node.id,
+												)
+												.sort((a, b) => a.createdAt - b.createdAt)
+												.map((generation) => (
+													<div key={generation.id}>
+														<GenerationView generation={generation} />
+													</div>
+												))}
+										</Tabs.Content>
+									)),
 								)}
-								{run &&
-									run.status !== "created" &&
-									run?.workflow?.jobs.flatMap((job) =>
-										job.actions.map(({ node }) => (
-											<Tabs.Content
-												key={node.id}
-												value={node.id}
-												className="px-[32px] py-[16px] flex flex-col gap-[24px]"
-											>
-												<NodeGlance
-													node={node}
-													iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[26px]"
-													nameClassName="text-white text-[20px] font-[700]"
-													descriptionClassName="text-black-400 text-[12px]"
-												/>
-												{generations
-													.filter(
-														(g) =>
-															g.status !== "created" &&
-															g.context.actionNode.id === node.id,
-													)
-													.sort((a, b) => a.createdAt - b.createdAt)
-													.map((generation) => (
-														<div key={generation.id}>
-															<GenerationView generation={generation} />
-														</div>
-													))}
-											</Tabs.Content>
-										)),
-									)}
-							</div>
-						</Tabs.Root>
-					)}
+						</div>
+					</Tabs.Root>
 				</div>
 			</div>
 		</div>
