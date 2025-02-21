@@ -1,4 +1,5 @@
 import {
+	type Connection,
 	type Input,
 	InputId,
 	OutputId,
@@ -340,6 +341,18 @@ export function SourcesPanel({
 		],
 	);
 
+	const handleRemove = useCallback(
+		(connection: Connection) => {
+			deleteConnection(connection.id);
+			updateNodeData(textGenerationNode, {
+				inputs: textGenerationNode.inputs.filter(
+					(input) => input.id !== connection.inputId,
+				),
+			});
+		},
+		[textGenerationNode, deleteConnection, updateNodeData],
+	);
+
 	if (textGenerationNode.inputs.length === 0) {
 		return (
 			<div className="mt-[60px]">
@@ -377,7 +390,7 @@ export function SourcesPanel({
 								key={source.connection.id}
 								title={source.output.label}
 								subtitle={`${source.node.name ?? source.node.content.llm.model} - ${source.node.content.llm.provider}`}
-								onRemove={() => {}}
+								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
 					</SourceListRoot>
@@ -400,7 +413,7 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={source.node.name ?? "Text"}
 											subtitle={text}
-											onRemove={() => {}}
+											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								}
@@ -411,7 +424,7 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={source.node.name ?? "PDF Files"}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
-											onRemove={() => {}}
+											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								default: {
