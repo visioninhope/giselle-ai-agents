@@ -111,7 +111,7 @@ function SourceSelect({
 									{generatedSources.map((generatedSource) => (
 										<ToggleGroup.Item
 											key={generatedSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue-900/50 transition-colors cursor-pointer"
 											value={generatedSource.output.id}
 										>
 											<p className="text-[12px] truncate">
@@ -133,7 +133,7 @@ function SourceSelect({
 										<ToggleGroup.Item
 											key={textSource.output.id}
 											value={textSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue-900/50 transition-colors cursor-pointer"
 										>
 											<p className="text-[12px] truncate">
 												{textSource.node.name ?? "Text"} /{" "}
@@ -154,7 +154,7 @@ function SourceSelect({
 										<ToggleGroup.Item
 											key={fileSource.output.id}
 											value={fileSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue-900/50 transition-colors cursor-pointer"
 										>
 											<p className="text-[12px] truncate">
 												{fileSource.node.name ?? "File"} /{" "}

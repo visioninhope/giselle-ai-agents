@@ -19,8 +19,8 @@ export const Switch = ({
 		<RadixSwitch.Root
 			className={clsx(
 				"h-[15px] w-[27px] rounded-full outline-none",
-				"border border-black-300 data-[state=checked]:border-blue",
-				"bg-transparent data-[state=checked]:bg-blue",
+				"border border-black-300 data-[state=checked]:border-blue-900",
+				"bg-transparent data-[state=checked]:bg-blue-900",
 			)}
 			id={name}
 			checked={checked}

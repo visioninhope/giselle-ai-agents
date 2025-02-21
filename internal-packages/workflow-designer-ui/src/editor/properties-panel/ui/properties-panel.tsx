@@ -67,7 +67,7 @@ export function PropertiesPanelHeader({
 						type="text"
 						className={clsx(
 							"w-[200px] py-[2px] px-[4px] rounded-[8px] hidden group-data-[editing=true]:block",
-							"outline-none ring-[1px] ring-blue",
+							"outline-none ring-[1px] ring-blue-900",
 							"text-white-900 text-[14px]",
 						)}
 						ref={inputRef}

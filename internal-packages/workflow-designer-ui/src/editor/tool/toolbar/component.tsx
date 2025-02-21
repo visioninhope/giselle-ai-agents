@@ -43,7 +43,7 @@ export function Toolbar() {
 					className={clsx(
 						"flex items-center px-[16px] z-10 h-full gap-[12px] text-blue-20",
 						"**:data-tool:hover:bg-white-900/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
-						"**:data-tool:data-[state=on]:bg-blue **:data-tool:focus:outline-none",
+						"**:data-tool:data-[state=on]:bg-blue-900 **:data-tool:focus:outline-none",
 						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-black-300 ",
 					)}
 					value={selectedTool?.action}
@@ -98,7 +98,7 @@ export function Toolbar() {
 													"flex flex-col gap-[8px]",
 													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
 													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
-													"**:data-tool:data-[state=on]:bg-blue **:data-tool:focus:outline-none",
+													"**:data-tool:data-[state=on]:bg-blue-900 **:data-tool:focus:outline-none",
 												)}
 												value={selectedTool.fileCategory}
 												onValueChange={(fileCategory) => {
@@ -145,7 +145,7 @@ export function Toolbar() {
 													"flex flex-col gap-[8px]",
 													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
 													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
-													"**:data-tool:data-[state=on]:bg-blue **:data-tool:focus:outline-none",
+													"**:data-tool:data-[state=on]:bg-blue-900 **:data-tool:focus:outline-none",
 												)}
 												value={selectedTool.provider}
 												onValueChange={(provider) => {
