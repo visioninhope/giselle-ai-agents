@@ -4,16 +4,19 @@ import {
 	useGenerationController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
+import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { AnthropicIcon, GoogleIcon, OpenaiIcon } from "../../../icons";
+import { Button } from "../../../ui/button";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
+import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
 	GoogleModelPanel,
@@ -34,6 +37,19 @@ export function TextGenerationNodePropertiesPanel({
 	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
+
+	const generateText = useCallback(() => {
+		startGeneration({
+			origin: {
+				type: "workspace",
+				id: data.id,
+			},
+			actionNode: node,
+			sourceNodes: connectedSources.map(
+				(connectedSource) => connectedSource.node,
+			),
+		});
+	}, [connectedSources, data.id, node, startGeneration]);
 
 	return (
 		<PropertiesPanelRoot>
@@ -58,24 +74,18 @@ export function TextGenerationNodePropertiesPanel({
 					updateNodeData(node, { name });
 				}}
 				action={
-					<button
+					<Button
 						type="button"
-						className="flex gap-[4px] justify-center items-center bg-blue rounded-[8px] px-[15px] py-[8px] text-white text-[14px] font-[700] cursor-pointer"
 						onClick={() => {
-							startGeneration({
-								origin: {
-									type: "workspace",
-									id: data.id,
-								},
-								actionNode: node,
-								sourceNodes: connectedSources.map(
-									(connectedSource) => connectedSource.node,
-								),
-							});
+							generateText();
 						}}
 					>
-						Generate
-					</button>
+						<span>Generate</span>
+						<div className="flex items-center text-[12px]">
+							<CommandIcon className="size-[12px]" />
+							<CornerDownLeft className="size-[12px]" />
+						</div>
+					</Button>
 				}
 			/>
 
@@ -160,6 +170,11 @@ export function TextGenerationNodePropertiesPanel({
 					</PropertiesPanelContent>
 				</Panel>
 			</PanelGroup>
+			<KeyboardShortcuts
+				generate={() => {
+					generateText();
+				}}
+			/>
 		</PropertiesPanelRoot>
 	);
 }

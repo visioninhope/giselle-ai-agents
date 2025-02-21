@@ -1,4 +1,5 @@
 import {
+	type Connection,
 	type Input,
 	InputId,
 	OutputId,
@@ -100,62 +101,68 @@ function SourceSelect({
 							<div className="border-t border-black-30/20" />
 						</div>
 						<div className="flex flex-col pb-[8px] gap-[8px]">
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									Generated Content
-								</p>
-								{generatedSources.map((generatedSource) => (
-									<ToggleGroup.Item
-										key={generatedSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-										value={generatedSource.output.id}
-									>
-										<p className="text-[12px] truncate">
-											{generatedSource.node.name ??
-												generatedSource.node.content.llm.model}{" "}
-											/ {generatedSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									Text
-								</p>
-								{textSources.map((textSource) => (
-									<ToggleGroup.Item
-										key={textSource.output.id}
-										value={textSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-									>
-										<p className="text-[12px] truncate">
-											{textSource.node.name ?? "Text"} /{" "}
-											{textSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
+							{generatedSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Generated Content
+									</p>
+									{generatedSources.map((generatedSource) => (
+										<ToggleGroup.Item
+											key={generatedSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+											value={generatedSource.output.id}
+										>
+											<p className="text-[12px] truncate">
+												{generatedSource.node.name ??
+													generatedSource.node.content.llm.model}{" "}
+												/ {generatedSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
+							{textSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Text
+									</p>
+									{textSources.map((textSource) => (
+										<ToggleGroup.Item
+											key={textSource.output.id}
+											value={textSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+										>
+											<p className="text-[12px] truncate">
+												{textSource.node.name ?? "Text"} /{" "}
+												{textSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
 
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									File
-								</p>
-								{fileSources.map((fileSource) => (
-									<ToggleGroup.Item
-										key={fileSource.output.id}
-										value={fileSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-									>
-										<p className="text-[12px] truncate">
-											{fileSource.node.name ?? "File"} /{" "}
-											{fileSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
+							{fileSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										File
+									</p>
+									{fileSources.map((fileSource) => (
+										<ToggleGroup.Item
+											key={fileSource.output.id}
+											value={fileSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+										>
+											<p className="text-[12px] truncate">
+												{fileSource.node.name ?? "File"} /{" "}
+												{fileSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
 							<div className="flex flex-col py-[4px]">
 								<div className="border-t border-black-30/20" />
 							</div>
@@ -235,7 +242,7 @@ function SourceListItem({
 }
 
 export function SourcesPanel({
-	node,
+	node: textGenerationNode,
 }: {
 	node: TextGenerationNode;
 }) {
@@ -244,9 +251,12 @@ export function SourcesPanel({
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
 		const connections = data.connections.filter(
-			(connection) => connection.inputNodeId === node.id,
+			(connection) => connection.inputNodeId === textGenerationNode.id,
 		);
 		for (const node of data.nodes) {
+			if (node.id === textGenerationNode.id) {
+				continue;
+			}
 			for (const output of node.outputs) {
 				const connection = connections.find(
 					(connection) => connection.outputId === output.id,
@@ -259,13 +269,15 @@ export function SourcesPanel({
 			}
 		}
 		return tmpSources;
-	}, [data.nodes, data.connections, node.id]);
-	const connectedSources = useConnectedSources(node);
+	}, [data.nodes, data.connections, textGenerationNode.id]);
+	const connectedSources = useConnectedSources(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
 			const currentConnectedOutputIds = data.connections
-				.filter((connection) => connection.inputNodeId === node.id)
+				.filter(
+					(connection) => connection.inputNodeId === textGenerationNode.id,
+				)
 				.map((connection) => connection.outputId);
 			const newConnectOutputIdSet = new Set(connectOutputIds);
 			const currentConnectedOutputIdSet = new Set(currentConnectedOutputIds);
@@ -285,13 +297,13 @@ export function SourcesPanel({
 					label: "Source",
 				};
 
-				updateNodeData(node, {
-					inputs: [...node.inputs, newInput],
+				updateNodeData(textGenerationNode, {
+					inputs: [...textGenerationNode.inputs, newInput],
 				});
 				addConnection({
-					inputNodeId: node.id,
+					inputNodeId: textGenerationNode.id,
 					inputId: newInput.id,
-					inputNodeType: node.type,
+					inputNodeType: textGenerationNode.type,
 					outputId,
 					outputNodeId: outputNode.id,
 					outputNodeType: outputNode.type,
@@ -305,22 +317,22 @@ export function SourcesPanel({
 			for (const outputId of removedOutputIdSet) {
 				const connection = data.connections.find(
 					(connection) =>
-						connection.inputNodeId === node.id &&
+						connection.inputNodeId === textGenerationNode.id &&
 						connection.outputId === outputId,
 				);
 				if (connection === undefined) {
 					continue;
 				}
 				deleteConnection(connection.id);
-				updateNodeData(node, {
-					inputs: node.inputs.filter(
+				updateNodeData(textGenerationNode, {
+					inputs: textGenerationNode.inputs.filter(
 						(input) => input.id !== connection.inputId,
 					),
 				});
 			}
 		},
 		[
-			node,
+			textGenerationNode,
 			data.nodes,
 			data.connections,
 			addConnection,
@@ -329,7 +341,19 @@ export function SourcesPanel({
 		],
 	);
 
-	if (node.inputs.length === 0) {
+	const handleRemove = useCallback(
+		(connection: Connection) => {
+			deleteConnection(connection.id);
+			updateNodeData(textGenerationNode, {
+				inputs: textGenerationNode.inputs.filter(
+					(input) => input.id !== connection.inputId,
+				),
+			});
+		},
+		[textGenerationNode, deleteConnection, updateNodeData],
+	);
+
+	if (textGenerationNode.inputs.length === 0) {
 		return (
 			<div className="mt-[60px]">
 				<EmptyState
@@ -366,7 +390,7 @@ export function SourcesPanel({
 								key={source.connection.id}
 								title={source.output.label}
 								subtitle={`${source.node.name ?? source.node.content.llm.model} - ${source.node.content.llm.provider}`}
-								onRemove={() => {}}
+								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
 					</SourceListRoot>
@@ -389,7 +413,7 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={source.node.name ?? "Text"}
 											subtitle={text}
-											onRemove={() => {}}
+											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								}
@@ -400,7 +424,7 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={source.node.name ?? "PDF Files"}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
-											onRemove={() => {}}
+											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								default: {
