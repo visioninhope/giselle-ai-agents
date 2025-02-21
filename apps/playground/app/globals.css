@@ -5,17 +5,21 @@
 @source "../../../packages/text-editor/src/react/";
 
 @theme {
+	--color-black-950: hsl(0, 0%, 0%);
+	--color-black-900: hsl(229, 100%, 2%);
+	--color-black-850: hsl(231, 62%, 6%);
+	--color-black-800: hsl(231, 47%, 22%);
+	--color-black-400: hsl(222, 21%, 40%);
+	--color-black-30: hsl(207 19% 77%);
+	--color-black-20: hsl(231 62% 6%);
+	--color-black: hsl(229 100% 2%);
+
 	--color-true-white: hsl(0 0% 100%);
 	--color-white: hsl(220 60% 98%);
 	--color-white-20: hsl(207 43% 91%);
 	--color-white-50: hsl(207 16% 75%);
 	--color-white-900: hsl(220, 60%, 98%);
 	--color-true-black: hsl(0, 0%, 0%);
-	--color-black: hsl(229 100% 2%);
-	--color-black-20: hsl(231 62% 6%);
-	--color-black-30: hsl(207 19% 77%);
-	--color-black-400: hsl(222, 21%, 40%);
-	--color-black-900: hsl(229, 100%, 2%);
 	--color-blue: hsl(219, 90%, 52%);
 	--color-blue-20: hsl(212, 79%, 87%);
 	--color-blue-60: hsl(223, 23%, 67%);
