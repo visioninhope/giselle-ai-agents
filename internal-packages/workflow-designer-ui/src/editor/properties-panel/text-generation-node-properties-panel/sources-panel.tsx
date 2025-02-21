@@ -67,7 +67,7 @@ function SourceSelect({
 			<Popover.Portal>
 				<Popover.Content
 					className={clsx(
-						"relative w-[300px] h-[300px] overflow-y-auto py-[8px]",
+						"relative w-[300px] max-h-[300px] overflow-y-auto py-[8px]",
 						"rounded-[8px] border-[1px] backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
