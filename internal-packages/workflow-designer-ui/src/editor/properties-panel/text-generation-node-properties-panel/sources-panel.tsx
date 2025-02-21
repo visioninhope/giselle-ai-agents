@@ -100,62 +100,68 @@ function SourceSelect({
 							<div className="border-t border-black-30/20" />
 						</div>
 						<div className="flex flex-col pb-[8px] gap-[8px]">
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									Generated Content
-								</p>
-								{generatedSources.map((generatedSource) => (
-									<ToggleGroup.Item
-										key={generatedSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-										value={generatedSource.output.id}
-									>
-										<p className="text-[12px] truncate">
-											{generatedSource.node.name ??
-												generatedSource.node.content.llm.model}{" "}
-											/ {generatedSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									Text
-								</p>
-								{textSources.map((textSource) => (
-									<ToggleGroup.Item
-										key={textSource.output.id}
-										value={textSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-									>
-										<p className="text-[12px] truncate">
-											{textSource.node.name ?? "Text"} /{" "}
-											{textSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
+							{generatedSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Generated Content
+									</p>
+									{generatedSources.map((generatedSource) => (
+										<ToggleGroup.Item
+											key={generatedSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+											value={generatedSource.output.id}
+										>
+											<p className="text-[12px] truncate">
+												{generatedSource.node.name ??
+													generatedSource.node.content.llm.model}{" "}
+												/ {generatedSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
+							{textSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Text
+									</p>
+									{textSources.map((textSource) => (
+										<ToggleGroup.Item
+											key={textSource.output.id}
+											value={textSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+										>
+											<p className="text-[12px] truncate">
+												{textSource.node.name ?? "Text"} /{" "}
+												{textSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
 
-							<div className="flex flex-col px-[8px]">
-								<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-									File
-								</p>
-								{fileSources.map((fileSource) => (
-									<ToggleGroup.Item
-										key={fileSource.output.id}
-										value={fileSource.output.id}
-										className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
-									>
-										<p className="text-[12px] truncate">
-											{fileSource.node.name ?? "File"} /{" "}
-											{fileSource.output.label}
-										</p>
-										<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-									</ToggleGroup.Item>
-								))}
-							</div>
+							{fileSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										File
+									</p>
+									{fileSources.map((fileSource) => (
+										<ToggleGroup.Item
+											key={fileSource.output.id}
+											value={fileSource.output.id}
+											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+										>
+											<p className="text-[12px] truncate">
+												{fileSource.node.name ?? "File"} /{" "}
+												{fileSource.output.label}
+											</p>
+											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+										</ToggleGroup.Item>
+									))}
+								</div>
+							)}
 							<div className="flex flex-col py-[4px]">
 								<div className="border-t border-black-30/20" />
 							</div>
