@@ -128,7 +128,7 @@ function FileListItem({
 	onRemove: (file: UploadedFileData) => void;
 }) {
 	return (
-		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white/10 transition-colors p-[8px] rounded-[8px]">
+		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white-900/10 transition-colors p-[8px] rounded-[8px]">
 			<div className="flex items-center overflow-x-hidden">
 				<div className="overflow-x-hidden">
 					<p className="truncate">{fileData.name}</p>
@@ -145,7 +145,7 @@ function FileListItem({
 				<Tooltip text="Remove">
 					<button
 						type="button"
-						className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
+						className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white-900/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
 						onClick={() => onRemove(fileData)}
 					>
 						<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />

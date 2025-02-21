@@ -29,7 +29,7 @@ export const Switch = ({
 			<RadixSwitch.Thumb
 				className={clsx(
 					"block size-[11px] translate-x-[1px] rounded-full",
-					"bg-black-300 data-[state=checked]:bg-white",
+					"bg-black-300 data-[state=checked]:bg-white-900",
 					"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]",
 				)}
 			/>

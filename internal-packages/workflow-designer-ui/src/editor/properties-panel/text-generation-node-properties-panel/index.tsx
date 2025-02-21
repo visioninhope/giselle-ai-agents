@@ -106,7 +106,7 @@ export function TextGenerationNodePropertiesPanel({
 								className={clsx(
 									"flex gap-[16px] text-[14px]",
 									"**:p-[4px] **:border-b **:cursor-pointer",
-									"**:data-[state=active]:text-white **:data-[state=active]:border-white",
+									"**:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900",
 									"**:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent",
 								)}
 							>

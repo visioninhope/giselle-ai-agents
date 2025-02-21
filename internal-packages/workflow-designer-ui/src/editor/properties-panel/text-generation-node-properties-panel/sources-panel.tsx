@@ -96,7 +96,7 @@ function SourceSelect({
 							setSelectedOutputIds(safeValue);
 						}}
 					>
-						<div className="flex px-[16px] text-white">Select Sources From</div>
+						<div className="flex px-[16px] text-white-900">Select Sources From</div>
 						<div className="flex flex-col py-[4px]">
 							<div className="border-t border-black-300/20" />
 						</div>
@@ -109,7 +109,7 @@ function SourceSelect({
 									{generatedSources.map((generatedSource) => (
 										<ToggleGroup.Item
 											key={generatedSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
 											value={generatedSource.output.id}
 										>
 											<p className="text-[12px] truncate">
@@ -131,7 +131,7 @@ function SourceSelect({
 										<ToggleGroup.Item
 											key={textSource.output.id}
 											value={textSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
 										>
 											<p className="text-[12px] truncate">
 												{textSource.node.name ?? "Text"} /{" "}
@@ -152,7 +152,7 @@ function SourceSelect({
 										<ToggleGroup.Item
 											key={fileSource.output.id}
 											value={fileSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer"
+											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-blue/50 transition-colors cursor-pointer"
 										>
 											<p className="text-[12px] truncate">
 												{fileSource.node.name ?? "File"} /{" "}
@@ -171,7 +171,7 @@ function SourceSelect({
 									onClick={() => {
 										onValueChange?.(selectedOutputIds);
 									}}
-									className="h-[32px] w-full flex justify-center items-center bg-white text-black-900 rounded-[8px] cursor-pointer text-[12px]"
+									className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
 								>
 									Update
 								</Popover.Close>
@@ -213,11 +213,11 @@ function SourceListItem({
 		<div
 			className={clsx(
 				"group flex items-center",
-				"border border-white/20 rounded-[8px] h-[60px]",
+				"border border-white-900/20 rounded-[8px] h-[60px]",
 			)}
 		>
 			<div className="w-[60px] flex items-center justify-center">{icon}</div>
-			<div className="w-[1px] h-full border-l border-white/20" />
+			<div className="w-[1px] h-full border-l border-white-900/20" />
 			<div className="px-[16px] flex-1 flex items-center justify-between">
 				<div className="flex flex-col gap-[4px]">
 					<p className="text=[16px]">{title}</p>
@@ -234,7 +234,7 @@ function SourceListItem({
 					)}
 					onClick={onRemove}
 				>
-					<TrashIcon className="w-[18px] h-[18px] text-white" />
+					<TrashIcon className="w-[18px] h-[18px] text-white-900" />
 				</button>
 			</div>
 		</div>
@@ -385,7 +385,7 @@ export function SourcesPanel({
 						{connectedSources.generation.map((source) => (
 							<SourceListItem
 								icon={
-									<GeneratedContentIcon className="size-[24px] text-white" />
+									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
 								title={source.output.label}
@@ -409,7 +409,7 @@ export function SourcesPanel({
 
 									return (
 										<SourceListItem
-											icon={<PromptIcon className="size-[24px] text-white" />}
+											icon={<PromptIcon className="size-[24px] text-white-900" />}
 											key={source.connection.id}
 											title={source.node.name ?? "Text"}
 											subtitle={text}
@@ -420,7 +420,7 @@ export function SourcesPanel({
 								case "file":
 									return (
 										<SourceListItem
-											icon={<PdfFileIcon className="size-[24px] text-white" />}
+											icon={<PdfFileIcon className="size-[24px] text-white-900" />}
 											key={source.connection.id}
 											title={source.node.name ?? "PDF Files"}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}

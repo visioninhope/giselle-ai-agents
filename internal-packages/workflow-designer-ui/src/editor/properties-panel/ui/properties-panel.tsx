@@ -59,7 +59,7 @@ export function PropertiesPanelHeader({
 	return (
 		<div className="h-[48px] flex justify-between items-center px-[16px] shrink-0">
 			<div className="flex gap-[8px] items-center">
-				<div className="w-[28px] h-[28px] bg-white rounded-[4px] flex items-center justify-center">
+				<div className="w-[28px] h-[28px] bg-white-900 rounded-[4px] flex items-center justify-center">
 					{icon}
 				</div>
 				<div className="group" data-editing={edit}>
@@ -68,7 +68,7 @@ export function PropertiesPanelHeader({
 						className={clsx(
 							"w-[200px] py-[2px] px-[4px] rounded-[8px] hidden group-data-[editing=true]:block",
 							"outline-none ring-[1px] ring-blue",
-							"text-white text-[14px]",
+							"text-white-900 text-[14px]",
 						)}
 						ref={inputRef}
 						data-edit={edit}
@@ -85,8 +85,8 @@ export function PropertiesPanelHeader({
 						type="button"
 						className={clsx(
 							"py-[2px] px-[4px] rounded-[8px] group-data-[editing=true]:hidden",
-							"hover:bg-white/20",
-							"text-white text-[14px]",
+							"hover:bg-white-900/20",
+							"text-white-900 text-[14px]",
 							"cursor-default",
 						)}
 						onClick={() => setEdit(true)}
