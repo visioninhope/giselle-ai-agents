@@ -3,6 +3,7 @@ import type { ButtonHTMLAttributes, DetailedHTMLProps } from "react";
 
 export function Button({
 	className,
+	children,
 	...props
 }: DetailedHTMLProps<
 	ButtonHTMLAttributes<HTMLButtonElement>,
@@ -11,13 +12,17 @@ export function Button({
 	return (
 		<button
 			className={clsx(
-				"px-[16px] h-[36px] rounded-full flex items-center gap-[2px] font-rosart text-black-30",
+				"p-[1px] h-[34px]",
+				"rounded-[8px] text-white-900",
+				"text-[14px] cursor-pointer",
+				"bg-linear-[124deg] from-[hsl(0,_2%,_89%)]/60 from-25% via-[hsl(0,_2%,_89%)] via-75% to-[hsl(0,_0%,_36%)] to-100%",
 				className,
 			)}
-			style={{
-				boxShadow: "0px 0px 3px 0px hsla(0, 0%, 100%, 0.4) inset",
-			}}
 			{...props}
-		/>
+		>
+			<div className="px-[16px] bg-blue rounded-[8px] flex items-center gap-[4px] h-full">
+				{children}
+			</div>
+		</button>
 	);
 }
