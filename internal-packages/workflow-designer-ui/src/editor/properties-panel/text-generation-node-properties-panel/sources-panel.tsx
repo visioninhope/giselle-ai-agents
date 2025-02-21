@@ -56,8 +56,8 @@ function SourceSelect({
 			<Popover.Trigger
 				className={clsx(
 					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
-					"border border-transparent hover:border-white-20",
-					"text-[12px] font-[700] text-white-20",
+					"border border-transparent hover:border-white-800",
+					"text-[12px] font-[700] text-white-800",
 					"transition-colors",
 				)}
 			>
@@ -96,7 +96,9 @@ function SourceSelect({
 							setSelectedOutputIds(safeValue);
 						}}
 					>
-						<div className="flex px-[16px] text-white-900">Select Sources From</div>
+						<div className="flex px-[16px] text-white-900">
+							Select Sources From
+						</div>
 						<div className="flex flex-col py-[4px]">
 							<div className="border-t border-black-300/20" />
 						</div>
@@ -409,7 +411,9 @@ export function SourcesPanel({
 
 									return (
 										<SourceListItem
-											icon={<PromptIcon className="size-[24px] text-white-900" />}
+											icon={
+												<PromptIcon className="size-[24px] text-white-900" />
+											}
 											key={source.connection.id}
 											title={source.node.name ?? "Text"}
 											subtitle={text}
@@ -420,7 +424,9 @@ export function SourcesPanel({
 								case "file":
 									return (
 										<SourceListItem
-											icon={<PdfFileIcon className="size-[24px] text-white-900" />}
+											icon={
+												<PdfFileIcon className="size-[24px] text-white-900" />
+											}
 											key={source.connection.id}
 											title={source.node.name ?? "PDF Files"}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}

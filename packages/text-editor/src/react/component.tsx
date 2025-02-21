@@ -25,7 +25,7 @@ function Toolbar({
 			className={clsx(
 				"flex w-full min-w-max rounded-[4px] mb-[4px] items-center",
 				"**:data-toolbar-item:w-[28px] **:data-toolbar-item:h-[30px] **:data-toolbar-item:flex **:data-toolbar-item:items-center **:data-toolbar-item:justify-center **:data-toolbar-item:data-[state=on]:bg-black-300/30 **:data-toolbar-item:rounded-[4px] **:data-toolbar-item:data-[state=on]:text-white-900",
-				"**:data-toolbar-separator:w-[1px] **:data-toolbar-separator:h-[18px] **:data-toolbar-separator:bg-white-20 **:data-toolbar-separator:mx-[4px]",
+				"**:data-toolbar-separator:w-[1px] **:data-toolbar-separator:h-[18px] **:data-toolbar-separator:bg-white-800 **:data-toolbar-separator:mx-[4px]",
 			)}
 			aria-label="Formatting options"
 		>
