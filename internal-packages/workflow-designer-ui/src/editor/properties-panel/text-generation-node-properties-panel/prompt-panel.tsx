@@ -60,9 +60,11 @@ export function PromptPanel({
 								)}
 							/>
 							<div className="relative flex flex-col gap-[8px]">
-								<div className="flex px-[16px] text-white">Insert Sources</div>
+								<div className="flex px-[16px] text-white-900">
+									Insert Sources
+								</div>
 								<div className="flex flex-col py-[4px]">
-									<div className="border-t border-black-30/20" />
+									<div className="border-t border-black-300/20" />
 								</div>
 
 								<DropdownMenu.RadioGroup
@@ -95,7 +97,7 @@ export function PromptPanel({
 										{connectedSources.map((source) => (
 											<DropdownMenu.RadioItem
 												key={source.connection.id}
-												className="p-[8px] rounded-[8px] text-white hover:bg-blue/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
+												className="p-[8px] rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
 												value={source.connection.id}
 											>
 												{source.node.name ?? getDefaultNodeName(source)}/{" "}

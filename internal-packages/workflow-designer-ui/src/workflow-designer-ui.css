@@ -38,4 +38,24 @@
 			color: inherit;
 		}
 	}
+
+	--animate-follow-through-overlap-spin: follow-through-overlap-spin 1.75s
+		ease-out infinite;
+	@keyframes follow-through-overlap-spin {
+		0% {
+			transform: rotate(0deg);
+		}
+		40% {
+			transform: rotate(-400deg);
+		}
+		60% {
+			transform: rotate(-300deg);
+		}
+		80% {
+			transform: rotate(-370deg);
+		}
+		100% {
+			transform: rotate(-360deg);
+		}
+	}
 }
