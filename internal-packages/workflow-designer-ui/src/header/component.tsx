@@ -28,7 +28,7 @@ export function RunButton({
 			className={clsx(
 				"flex py-[8px] px-[16px] justify-center items-center gap-[4px]",
 				"rounded-[8px]",
-				"bg-blue-900 text-[14px] text-white-900",
+				"bg-primary-900 text-[14px] text-white-900",
 				"cursor-pointer",
 			)}
 		>

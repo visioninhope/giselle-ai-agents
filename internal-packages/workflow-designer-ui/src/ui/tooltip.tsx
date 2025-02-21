@@ -27,7 +27,7 @@ export function Tooltip({
 						sideOffset={sideOffset}
 						className={clsx(
 							"z-50 overflow-hidden rounded-md px-[8px] py-[2px]",
-							"bg-blue-60",
+							"bg-primary-60",
 							"text-xs text-black-900 shadow-sm",
 						)}
 					>

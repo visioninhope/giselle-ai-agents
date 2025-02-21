@@ -20,7 +20,7 @@ export function Button({
 			)}
 			{...props}
 		>
-			<div className="px-[16px] bg-blue-900 rounded-[8px] flex items-center gap-[4px] h-full text-[14px] font-[700] justify-center">
+			<div className="px-[16px] bg-primary-900 rounded-[8px] flex items-center gap-[4px] h-full text-[14px] font-[700] justify-center">
 				{children}
 			</div>
 		</button>

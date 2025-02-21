@@ -97,7 +97,7 @@ export function PromptPanel({
 										{connectedSources.map((source) => (
 											<DropdownMenu.RadioItem
 												key={source.connection.id}
-												className="p-[8px] rounded-[8px] text-white-900 hover:bg-blue-900/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
+												className="p-[8px] rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
 												value={source.connection.id}
 											>
 												{source.node.name ?? getDefaultNodeName(source)}/{" "}
