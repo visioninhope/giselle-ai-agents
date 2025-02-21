@@ -1,14 +1,16 @@
 "use client";
 
 import { WorkflowId } from "@giselle-sdk/data-type";
+import clsx from "clsx/lite";
 import {
 	useRun,
 	useRunController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
+import { CircleCheckIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
-import { WilliIcon } from "../icons";
+import { SpinnerIcon, WilliIcon } from "../icons";
 import bg from "../images/bg.png";
 import { Button } from "../ui/button";
 import { EmptyState } from "../ui/empty-state";
@@ -83,7 +85,12 @@ export function Viewer() {
 										{job.actions.map((action) => (
 											<Tabs.Trigger
 												value={action.node.id}
-												className="[w-180px] flex p-[16px] justify-between items-center border border-black-200/20 rounded-[8px]"
+												className={clsx(
+													"[w-180px] flex p-[16px] justify-between items-center border border-black-200/20 rounded-[8px]",
+													"hover:border-black-200/60",
+													"data-[state=active]:border-primary-900",
+													"transition-colors",
+												)}
 												key={action.node.id}
 											>
 												<NodeGlance
@@ -92,6 +99,38 @@ export function Viewer() {
 													nameClassName="text-white-900 text-[12px] font-[700]"
 													descriptionClassName="text-black-400 text-[10px]"
 												/>
+												{generations
+													.filter(
+														(generation) =>
+															generation.context.actionNode.id ===
+															action.node.id,
+													)
+													.map((generation) => {
+														switch (generation.status) {
+															case "created":
+															case "queued":
+															case "requested":
+															case "running":
+																return (
+																	<SpinnerIcon
+																		className="size-[22px] text-white-800 animate-follow-through-overlap-spin"
+																		key={generation.id}
+																	/>
+																);
+															case "completed":
+																return (
+																	<CircleCheckIcon className="size-[22px] text-success-900" />
+																);
+															case "failed":
+																return <div>failed</div>;
+															default: {
+																const _exhaustiveCheck: never = generation;
+																throw new Error(
+																	`Unhandled status: ${_exhaustiveCheck}`,
+																);
+															}
+														}
+													})}
 											</Tabs.Trigger>
 										))}
 									</div>

@@ -27,12 +27,16 @@
 	--color-blue-200: hsl(212, 79%, 87%);
 	--color-blue-100: hsl(192, 73%, 84%);
 
+	--color-green-900: hsl(141, 100%, 61%);
+
 	--color-primary-900: var(--color-blue-900);
 	--color-primary-800: var(--color-blue-800);
 	--color-primary-400: var(--color-blue-400);
 	--color-primary-300: var(--color-blue-300);
 	--color-primary-200: var(--color-blue-200);
 	--color-primary-100: var(--color-blue-100);
+
+	--color-success-900: var(--color-green-900);
 
 	--color-text-node-1: hsl(178, 94%, 49%);
 	--color-text-node-2: hsl(178, 95%, 25%);
