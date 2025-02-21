@@ -191,7 +191,7 @@ export function NodeComponent({
 							{title ?? "Unnamed node"}
 						</div>
 						{subtitle && (
-							<div className="text-[10px] text-white-50">{subtitle}</div>
+							<div className="text-[10px] text-white-400">{subtitle}</div>
 						)}
 					</div>
 				</div>

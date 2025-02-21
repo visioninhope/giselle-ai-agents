@@ -44,7 +44,7 @@ export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 		<div className="bg-white-900/10 h-full rounded-[8px] py-[8px]">
 			<div
 				className={clsx(
-					"border-b border-white-50/20 py-[4px] px-[16px] flex items-center gap-[8px]",
+					"border-b border-white-400/20 py-[4px] px-[16px] flex items-center gap-[8px]",
 					"**:data-header-text:font-[700]",
 				)}
 			>

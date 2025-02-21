@@ -94,7 +94,7 @@ export function PropertiesPanelHeader({
 						{name ?? fallbackName}
 					</button>
 					{description && (
-						<p className="px-[5px] text-white-50 text-[10px]">{description}</p>
+						<p className="px-[5px] text-white-400 text-[10px]">{description}</p>
 					)}
 				</div>
 			</div>

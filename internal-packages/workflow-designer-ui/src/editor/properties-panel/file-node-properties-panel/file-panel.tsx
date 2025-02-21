@@ -83,7 +83,7 @@ export function FilePanel({ node }: { node: FileNode }) {
 							{isDragging ? (
 								<>
 									<PdfFileIcon className="size-[30px] text-black-400" />
-									<p className="text-center text-white-50">
+									<p className="text-center text-white-400">
 										Drop to upload your files
 									</p>
 								</>
@@ -92,7 +92,7 @@ export function FilePanel({ node }: { node: FileNode }) {
 									<ArrowUpFromLineIcon size={38} className="text-black-400" />
 									<label
 										htmlFor="file"
-										className="text-center flex flex-col gap-[16px] text-white-50"
+										className="text-center flex flex-col gap-[16px] text-white-400"
 									>
 										<p>Drop pdf files here to upload.</p>
 										<div className="flex gap-[8px] justify-center items-center">
