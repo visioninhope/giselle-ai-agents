@@ -83,12 +83,12 @@ export function Viewer() {
 										{job.actions.map((action) => (
 											<Tabs.Trigger
 												value={action.node.id}
-												className="[w-180px] flex p-[16px] justify-between items-center border border-black-400/50 rounded-[8px]"
+												className="[w-180px] flex p-[16px] justify-between items-center border border-black-200/20 rounded-[8px]"
 												key={action.node.id}
 											>
 												<NodeGlance
 													node={action.node}
-													iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
+													iconClassName="rounded-[8px] bg-white-950 text-black-950 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
 													nameClassName="text-white text-[12px] font-[700]"
 													descriptionClassName="text-black-400 text-[10px]"
 												/>
