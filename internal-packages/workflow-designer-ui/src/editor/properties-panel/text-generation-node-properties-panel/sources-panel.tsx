@@ -235,7 +235,7 @@ function SourceListItem({
 }
 
 export function SourcesPanel({
-	node,
+	node: textGenerationNode,
 }: {
 	node: TextGenerationNode;
 }) {
@@ -244,9 +244,12 @@ export function SourcesPanel({
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
 		const connections = data.connections.filter(
-			(connection) => connection.inputNodeId === node.id,
+			(connection) => connection.inputNodeId === textGenerationNode.id,
 		);
 		for (const node of data.nodes) {
+			if (node.id === textGenerationNode.id) {
+				continue;
+			}
 			for (const output of node.outputs) {
 				const connection = connections.find(
 					(connection) => connection.outputId === output.id,
@@ -259,13 +262,15 @@ export function SourcesPanel({
 			}
 		}
 		return tmpSources;
-	}, [data.nodes, data.connections, node.id]);
-	const connectedSources = useConnectedSources(node);
+	}, [data.nodes, data.connections, textGenerationNode.id]);
+	const connectedSources = useConnectedSources(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
 			const currentConnectedOutputIds = data.connections
-				.filter((connection) => connection.inputNodeId === node.id)
+				.filter(
+					(connection) => connection.inputNodeId === textGenerationNode.id,
+				)
 				.map((connection) => connection.outputId);
 			const newConnectOutputIdSet = new Set(connectOutputIds);
 			const currentConnectedOutputIdSet = new Set(currentConnectedOutputIds);
@@ -285,13 +290,13 @@ export function SourcesPanel({
 					label: "Source",
 				};
 
-				updateNodeData(node, {
-					inputs: [...node.inputs, newInput],
+				updateNodeData(textGenerationNode, {
+					inputs: [...textGenerationNode.inputs, newInput],
 				});
 				addConnection({
-					inputNodeId: node.id,
+					inputNodeId: textGenerationNode.id,
 					inputId: newInput.id,
-					inputNodeType: node.type,
+					inputNodeType: textGenerationNode.type,
 					outputId,
 					outputNodeId: outputNode.id,
 					outputNodeType: outputNode.type,
@@ -305,22 +310,22 @@ export function SourcesPanel({
 			for (const outputId of removedOutputIdSet) {
 				const connection = data.connections.find(
 					(connection) =>
-						connection.inputNodeId === node.id &&
+						connection.inputNodeId === textGenerationNode.id &&
 						connection.outputId === outputId,
 				);
 				if (connection === undefined) {
 					continue;
 				}
 				deleteConnection(connection.id);
-				updateNodeData(node, {
-					inputs: node.inputs.filter(
+				updateNodeData(textGenerationNode, {
+					inputs: textGenerationNode.inputs.filter(
 						(input) => input.id !== connection.inputId,
 					),
 				});
 			}
 		},
 		[
-			node,
+			textGenerationNode,
 			data.nodes,
 			data.connections,
 			addConnection,
@@ -329,7 +334,7 @@ export function SourcesPanel({
 		],
 	);
 
-	if (node.inputs.length === 0) {
+	if (textGenerationNode.inputs.length === 0) {
 		return (
 			<div className="mt-[60px]">
 				<EmptyState
