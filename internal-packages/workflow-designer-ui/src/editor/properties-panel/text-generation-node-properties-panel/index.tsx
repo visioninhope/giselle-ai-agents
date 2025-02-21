@@ -114,10 +114,16 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
 							</Tabs.List>
-							<Tabs.Content value="prompt" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="prompt"
+								className="flex-1 flex flex-col overflow-y-auto"
+							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
-							<Tabs.Content value="model" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="model"
+								className="flex-1 flex flex-col overflow-y-auto"
+							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
 										openai={node.content.llm}
@@ -152,7 +158,10 @@ export function TextGenerationNodePropertiesPanel({
 									/>
 								)}
 							</Tabs.Content>
-							<Tabs.Content value="sources" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="sources"
+								className="flex-1 flex flex-col overflow-y-auto"
+							>
 								<SourcesPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
