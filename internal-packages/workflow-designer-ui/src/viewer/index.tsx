@@ -53,9 +53,9 @@ export function Viewer() {
 									<SelectValue placeholder="Select flow" />
 								</SelectTrigger>
 								<SelectContent>
-									{data.editingWorkflows.map((workflow) => (
+									{data.editingWorkflows.map((workflow, index) => (
 										<SelectItem key={workflow.id} value={workflow.id}>
-											{workflow.id}
+											flow {index + 1}
 										</SelectItem>
 									))}
 								</SelectContent>
