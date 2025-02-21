@@ -47,7 +47,6 @@
 - [ ] Undo/Redo for prompt editor
 - [ ] Telemetry
 - [ ] Animation
-- [ ] Markdown styling
 
 
 ## Backlog
@@ -58,6 +57,7 @@
 
 ## Done
 
+- [x] Markdown styling
 - [x] Add generate text short cut
 - [x] Set viewport to storage
 - [x] animate spinner
