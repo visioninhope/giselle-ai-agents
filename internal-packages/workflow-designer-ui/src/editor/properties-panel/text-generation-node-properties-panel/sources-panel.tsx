@@ -390,8 +390,8 @@ export function SourcesPanel({
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={source.output.label}
-								subtitle={`${source.node.name ?? source.node.content.llm.model} - ${source.node.content.llm.provider}`}
+								title={`${source.node.name ?? source.node.content.llm.model} / ${source.output.label}`}
+								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
@@ -415,7 +415,7 @@ export function SourcesPanel({
 												<PromptIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "Text"}
+											title={`${source.node.name ?? "Text"} / ${source.output.label}`}
 											subtitle={text}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -428,7 +428,7 @@ export function SourcesPanel({
 												<PdfFileIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "PDF Files"}
+											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
 											onRemove={() => handleRemove(source.connection)}
 										/>
