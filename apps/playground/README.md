@@ -34,7 +34,6 @@
 - [ ] Auto detect storage backend
 - [ ] Workflow View
 - [ ] Update text node icon
-- [ ] Add generate text short cut
 - [ ] Make fill yellow for connected file node port
 - [ ] Styling connector
 - [ ] API Middleware
@@ -59,6 +58,7 @@
 
 ## Done
 
+- [x] Add generate text short cut
 - [x] Set viewport to storage
 - [x] animate spinner
 - [x] Support multi output
