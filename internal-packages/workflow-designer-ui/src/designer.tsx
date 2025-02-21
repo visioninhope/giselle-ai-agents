@@ -11,7 +11,7 @@ import { GiselleLogo, ViewIcon } from "./icons";
 export function DesignerInternal() {
 	const { view } = useWorkflowDesigner();
 	return (
-		<div className="flex flex-col h-full bg-black">
+		<div className="flex flex-col h-full bg-black-900">
 			<div className="pl-[24px] pr-[16px] py-[8px] flex items-center justify-between">
 				<GiselleLogo className="fill-white w-[70px] h-auto mt-[6px]" />
 				<div className="flex items-center">

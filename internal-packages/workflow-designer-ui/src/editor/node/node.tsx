@@ -180,8 +180,8 @@ export function NodeComponent({
 							{...iconProps}
 							className={clsx(
 								"w-[16px] h-[16px] fill-current",
-								"group-data-[content-type=text]:text-black",
-								"group-data-[content-type=file]:text-black",
+								"group-data-[content-type=text]:text-black-900",
+								"group-data-[content-type=file]:text-black-900",
 								"group-data-[content-type=textGeneration]:text-white",
 							)}
 						/>
@@ -244,7 +244,7 @@ export function NodeComponent({
 										"group-data-[content-type=file]:!border-file-node-1",
 										"data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
 										"data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
-										"data-[state=disconnected]:!bg-black",
+										"data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
 								<div className="text-[14px] px-[16px] text-white">

@@ -90,7 +90,7 @@ function SelectContent({
 			<SelectPrimitive.Content
 				className={clsx(
 					"relative z-50 max-h-96 overflow-hidden rounded-[8px]",
-					"border-[2px] border-white bg-black text-white",
+					"border-[2px] border-white bg-black-900 text-white",
 					position === "popper" &&
 						"data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1",
 					className,

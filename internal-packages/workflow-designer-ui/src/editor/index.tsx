@@ -316,7 +316,7 @@ function NodeCanvas() {
 			}}
 		>
 			<Background
-				className="!bg-black-20"
+				className="!bg-black-800"
 				lineWidth={0}
 				variant={BackgroundVariant.Lines}
 				style={{
@@ -397,12 +397,12 @@ export function Editor() {
 			<ReactFlowProvider>
 				<ToolbarContextProvider>
 					<MousePositionProvider>
-						<PanelGroup direction="horizontal" className="bg-black h-full flex">
-							<Panel
-								className="flex-1 rounded-[8px] overflow-hidden px-[16px] pb-[16px]"
-								defaultSize={100}
-							>
-								<div className="flex h-full">
+						<PanelGroup
+							direction="horizontal"
+							className="bg-black-900 h-full flex"
+						>
+							<Panel className="flex-1 px-[16px] pb-[16px]" defaultSize={100}>
+								<div className="flex h-full rounded-[16px] overflow-hidden">
 									{/* <Debug /> */}
 									<NodeCanvas />
 								</div>

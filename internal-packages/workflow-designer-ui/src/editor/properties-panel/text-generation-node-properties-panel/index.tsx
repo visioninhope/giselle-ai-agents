@@ -57,10 +57,10 @@ export function TextGenerationNodePropertiesPanel({
 				icon={
 					<>
 						{node.content.llm.provider === "openai" && (
-							<OpenaiIcon className="size-[20px] text-black" />
+							<OpenaiIcon className="size-[20px] text-black-900" />
 						)}
 						{node.content.llm.provider === "anthropic" && (
-							<AnthropicIcon className="size-[20px] text-black" />
+							<AnthropicIcon className="size-[20px] text-black-900" />
 						)}
 						{node.content.llm.provider === "google" && (
 							<GoogleIcon className="size-[20px]" />

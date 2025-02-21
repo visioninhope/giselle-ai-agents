@@ -34,7 +34,7 @@ export function Viewer() {
 		<div className="w-full flex-1 px-[16px]">
 			<div className="rounded-[8px] overflow-hidden h-full">
 				<div
-					className="bg-black-20 flex flex-col h-full text-white px-[16px] py-[16px] gap-[16px]"
+					className="bg-black-800 flex flex-col h-full text-white px-[16px] py-[16px] gap-[16px]"
 					style={{
 						backgroundImage: `url(${bg.src})`,
 						backgroundPositionX: "center",
@@ -91,7 +91,7 @@ export function Viewer() {
 												>
 													<NodeGlance
 														node={action.node}
-														iconClassName="rounded-[8px] bg-true-white text-true-black flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
+														iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
 														nameClassName="text-white text-[12px] font-[700]"
 														descriptionClassName="text-black-400 text-[10px]"
 													/>
@@ -124,7 +124,7 @@ export function Viewer() {
 											>
 												<NodeGlance
 													node={node}
-													iconClassName="rounded-[8px] bg-true-white text-true-black flex items-center justify-center p-[8px] **:data-content-type-icon:size-[26px]"
+													iconClassName="rounded-[8px] bg-true-white text-true-black-900 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[26px]"
 													nameClassName="text-white text-[20px] font-[700]"
 													descriptionClassName="text-black-400 text-[12px]"
 												/>
