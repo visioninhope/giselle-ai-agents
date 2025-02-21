@@ -31,7 +31,6 @@
 
 ## Tasks
 
-- [ ] Set viewport to storage
 - [ ] Auto detect storage backend
 - [ ] Workflow View
 - [ ] Update text node icon
@@ -60,6 +59,7 @@
 
 ## Done
 
+- [x] Set viewport to storage
 - [x] animate spinner
 - [x] Support multi output
 - [x] Prompt object to html to markdown

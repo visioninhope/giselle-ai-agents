@@ -37,6 +37,7 @@ function NodeCanvas() {
 	const {
 		data,
 		setUiNodeState,
+		setUiViewport,
 		deleteNode,
 		deleteConnection,
 		updateNodeData,
@@ -83,6 +84,10 @@ function NodeCanvas() {
 			defaultNodes={[]}
 			defaultEdges={[]}
 			nodeTypes={nodeTypes}
+			viewport={data.ui.viewport}
+			onViewportChange={(viewport) => {
+				setUiViewport(viewport);
+			}}
 			onNodesChange={(nodesChange) => {
 				nodesChange.map((nodeChange) => {
 					switch (nodeChange.type) {

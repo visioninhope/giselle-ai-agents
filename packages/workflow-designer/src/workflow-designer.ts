@@ -7,6 +7,7 @@ import {
 	NodeUIState,
 	type OutputId,
 	type UploadedFileData,
+	type Viewport,
 	type Workspace,
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
@@ -71,6 +72,7 @@ export function WorkflowDesigner({
 			connections,
 			ui,
 			editingWorkflows,
+			schemaVersion: "20250221",
 		} satisfies Workspace;
 	}
 	function updateNodeData<T extends Node>(node: T, data: Partial<T>) {
@@ -115,6 +117,9 @@ export function WorkflowDesigner({
 			...nodeState,
 			...newUiState,
 		});
+	}
+	function setUiViewport(viewport: Viewport) {
+		ui.viewport = viewport;
 	}
 	function deleteConnection(connectionId: ConnectionId) {
 		connections = connections.filter(
@@ -162,6 +167,7 @@ export function WorkflowDesigner({
 		getData,
 		updateNodeData,
 		setUiNodeState,
+		setUiViewport,
 		deleteNode,
 		deleteConnection,
 		uploadFile,
