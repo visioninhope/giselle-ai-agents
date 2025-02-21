@@ -41,7 +41,7 @@ export function Toolbar() {
 				<ToggleGroup.Root
 					type="single"
 					className={clsx(
-						"flex items-center px-[16px] z-10 h-full gap-[12px] text-blue-20",
+						"flex items-center px-[16px] z-10 h-full gap-[12px] text-blue-200",
 						"**:data-tool:hover:bg-white-900/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
 						"**:data-tool:data-[state=on]:bg-blue-900 **:data-tool:focus:outline-none",
 						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-black-300 ",
