@@ -50,7 +50,7 @@ export function FilePanel({ node }: { node: FileNode }) {
 	);
 
 	return (
-		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-30">
+		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300">
 			<div className="p-[16px] divide-y divide-black-50">
 				{node.content.files.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">

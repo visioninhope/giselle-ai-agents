@@ -36,7 +36,7 @@ export function DropdownMenuContent({
 				sideOffset={sideOffset}
 				align={align}
 				className={clsx(
-					"z-50 min-w-[8rem] overflow-hidden rounded-[8px] border border-white bg-black text-black-30 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
+					"z-50 min-w-[8rem] overflow-hidden rounded-[8px] border border-white bg-black text-black-300 shadow-[0px_0px_2px_0px_hsla(0,_0%,_100%,_0.1)_inset]",
 				)}
 				onEscapeKeyDown={onEscapeKeyDown}
 				onCloseAutoFocus={onCloseAutoFocus}

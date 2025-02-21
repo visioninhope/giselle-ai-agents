@@ -62,7 +62,7 @@ export function PromptPanel({
 							<div className="relative flex flex-col gap-[8px]">
 								<div className="flex px-[16px] text-white">Insert Sources</div>
 								<div className="flex flex-col py-[4px]">
-									<div className="border-t border-black-30/20" />
+									<div className="border-t border-black-300/20" />
 								</div>
 
 								<DropdownMenu.RadioGroup

@@ -105,7 +105,7 @@ export function Viewer() {
 								{(!run || run.status === "created") && (
 									<EmptyState
 										icon={
-											<WilliIcon className="fill-current w-[32px] h-[32px] text-black-30" />
+											<WilliIcon className="fill-current w-[32px] h-[32px] text-black-300" />
 										}
 										title="This has not yet been executed"
 										description="You have not yet

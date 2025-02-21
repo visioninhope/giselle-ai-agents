@@ -98,7 +98,7 @@ function SourceSelect({
 					>
 						<div className="flex px-[16px] text-white">Select Sources From</div>
 						<div className="flex flex-col py-[4px]">
-							<div className="border-t border-black-30/20" />
+							<div className="border-t border-black-300/20" />
 						</div>
 						<div className="flex flex-col pb-[8px] gap-[8px]">
 							{generatedSources.length > 0 && (
@@ -164,7 +164,7 @@ function SourceSelect({
 								</div>
 							)}
 							<div className="flex flex-col py-[4px]">
-								<div className="border-t border-black-30/20" />
+								<div className="border-t border-black-300/20" />
 							</div>
 							<div className="flex px-[16px] pt-[4px] gap-[8px]">
 								<Popover.Close
@@ -230,7 +230,7 @@ function SourceListItem({
 					className={clsx(
 						"hidden group-hover:block",
 						"p-[4px] rounded-[4px]",
-						"bg-transparent hover:bg-black-30/50 transition-colors",
+						"bg-transparent hover:bg-black-300/50 transition-colors",
 					)}
 					onClick={onRemove}
 				>

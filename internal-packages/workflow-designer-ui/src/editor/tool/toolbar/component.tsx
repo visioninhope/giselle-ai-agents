@@ -44,7 +44,7 @@ export function Toolbar() {
 						"flex items-center px-[16px] z-10 h-full gap-[12px] text-blue-20",
 						"**:data-tool:hover:bg-white/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
 						"**:data-tool:data-[state=on]:bg-blue **:data-tool:focus:outline-none",
-						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-black-30 ",
+						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-black-300 ",
 					)}
 					value={selectedTool?.action}
 					onValueChange={(value) => {
