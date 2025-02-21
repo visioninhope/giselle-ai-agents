@@ -86,17 +86,17 @@ export function Viewer() {
 											<Tabs.Trigger
 												value={action.node.id}
 												className={clsx(
-													"[w-180px] flex p-[16px] justify-between items-center border border-black-200/20 rounded-[8px]",
+													"[w-180px] flex p-[16px] justify-between items-center border border-black-200/20 rounded-[8px] gap-[4px]",
 													"hover:border-black-200/60",
 													"data-[state=active]:border-primary-900",
 													"transition-colors",
 												)}
-												key={action.node.id}
+												key={`tabs-trigger-${action.node.id}`}
 											>
 												<NodeGlance
 													node={action.node}
 													iconClassName="rounded-[8px] bg-white-950 text-black-950 flex items-center justify-center p-[8px] **:data-content-type-icon:size-[16px]"
-													nameClassName="text-white-900 text-[12px] font-[700]"
+													nameClassName="text-white-900 text-[12px] font-[700] truncate w-full"
 													descriptionClassName="text-black-400 text-[10px]"
 												/>
 												{generations
@@ -113,16 +113,19 @@ export function Viewer() {
 															case "running":
 																return (
 																	<SpinnerIcon
-																		className="size-[22px] text-white-800 animate-follow-through-overlap-spin"
+																		className="size-[22px] text-white-800 animate-follow-through-overlap-spin shrink-0"
 																		key={generation.id}
 																	/>
 																);
 															case "completed":
 																return (
-																	<CircleCheckIcon className="size-[22px] text-success-900" />
+																	<CircleCheckIcon
+																		className="size-[22px] text-success-900 shrink-0"
+																		key={generation.id}
+																	/>
 																);
 															case "failed":
-																return <div>failed</div>;
+																return <div key={generation.id}>failed</div>;
 															default: {
 																const _exhaustiveCheck: never = generation;
 																throw new Error(
