@@ -84,8 +84,8 @@ function NodeCanvas() {
 			defaultNodes={[]}
 			defaultEdges={[]}
 			nodeTypes={nodeTypes}
-			viewport={data.ui.viewport}
-			onViewportChange={(viewport) => {
+			defaultViewport={data.ui.viewport}
+			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
 			}}
 			onNodesChange={(nodesChange) => {
