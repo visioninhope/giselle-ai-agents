@@ -177,7 +177,10 @@ export function Viewer() {
 												)
 												.sort((a, b) => a.createdAt - b.createdAt)
 												.map((generation) => (
-													<div key={generation.id}>
+													<div
+														key={generation.id}
+														className="markdown-renderer"
+													>
 														<GenerationView generation={generation} />
 													</div>
 												))}
