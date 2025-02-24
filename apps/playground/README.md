@@ -31,6 +31,8 @@
 
 ## Tasks
 
+- [ ] Show running state on run view
+- [ ] Show unable sources
 - [ ] Auto detect storage backend
 - [ ] Update text node icon
 - [ ] Make fill yellow for connected file node port
