@@ -26,13 +26,17 @@ import {
 
 export function Viewer() {
 	const { generations, run } = useRun();
-	const [flowId, setFlowId] = useState<WorkflowId | undefined>();
 	const { perform } = useRunController();
 	const { data } = useWorkflowDesigner();
-	const flow = useMemo(() => {
-		if (!flowId) return undefined;
-		return data.editingWorkflows.find((flow) => flow.id === flowId);
-	}, [flowId, data.editingWorkflows]);
+	const [flowId, setFlowId] = useState<WorkflowId | undefined>(
+		data.editingWorkflows.length === 1
+			? data.editingWorkflows[0].id
+			: undefined,
+	);
+	const flow = useMemo(
+		() => data.editingWorkflows.find((flow) => flow.id === flowId),
+		[flowId, data.editingWorkflows],
+	);
 	return (
 		<div className="w-full flex-1 px-[16px]">
 			<div className="rounded-[8px] overflow-hidden h-full">
@@ -48,22 +52,25 @@ export function Viewer() {
 					<Tabs.Root orientation="horizontal" className="flex h-full">
 						<Tabs.List className="w-[180px] flex flex-col gap-[16px]">
 							<div className="flex flex-col gap-[8px]">
-								<Select
-									onValueChange={(value) => {
-										setFlowId(WorkflowId.parse(value));
-									}}
-								>
-									<SelectTrigger>
-										<SelectValue placeholder="Select flow" />
-									</SelectTrigger>
-									<SelectContent>
-										{data.editingWorkflows.map((workflow, index) => (
-											<SelectItem key={workflow.id} value={workflow.id}>
-												flow {index + 1}
-											</SelectItem>
-										))}
-									</SelectContent>
-								</Select>
+								{data.editingWorkflows.length > 1 && (
+									<Select
+										onValueChange={(value) => {
+											setFlowId(WorkflowId.parse(value));
+										}}
+										defaultValue={flowId}
+									>
+										<SelectTrigger>
+											<SelectValue placeholder="Select flow" />
+										</SelectTrigger>
+										<SelectContent>
+											{data.editingWorkflows.map((workflow, index) => (
+												<SelectItem key={workflow.id} value={workflow.id}>
+													flow {index + 1}
+												</SelectItem>
+											))}
+										</SelectContent>
+									</Select>
+								)}
 
 								{flowId && (
 									<Button

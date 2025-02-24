@@ -31,7 +31,6 @@
 
 ## Tasks
 
-- [ ] Show flow selector if workspace has multiple flows
 - [ ] Auto detect storage backend
 - [ ] Workflow View
 - [ ] Update text node icon
@@ -58,6 +57,7 @@
 
 ## Done
 
+- [x] Show flow selector if workspace has multiple flows
 - [x] Markdown styling
 - [x] Add generate text short cut
 - [x] Set viewport to storage
