@@ -26,7 +26,7 @@ import {
 
 export function Viewer() {
 	const { generations, run } = useRun();
-	const { perform } = useRunController();
+	const { perform, isRunning } = useRunController();
 	const { data } = useWorkflowDesigner();
 	const [flowId, setFlowId] = useState<WorkflowId | undefined>(
 		data.editingWorkflows.length === 1
@@ -78,6 +78,7 @@ export function Viewer() {
 										onClick={() => {
 											perform(flowId);
 										}}
+										loading={isRunning}
 									>
 										Run
 									</Button>

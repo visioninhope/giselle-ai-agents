@@ -31,7 +31,7 @@
 
 ## Tasks
 
-- [ ] Show running state on run view
+- [ ] Show running job
 - [ ] Show unable sources
 - [ ] Auto detect storage backend
 - [ ] Update text node icon
@@ -58,6 +58,7 @@
 
 ## Done
 
+- [x] Show running state on run view
 - [x] Workflow View
 - [x] Show flow selector if workspace has multiple flows
 - [x] Markdown styling
