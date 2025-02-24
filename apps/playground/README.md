@@ -32,7 +32,6 @@
 ## Tasks
 
 - [ ] Auto detect storage backend
-- [ ] Workflow View
 - [ ] Update text node icon
 - [ ] Make fill yellow for connected file node port
 - [ ] Styling connector
@@ -57,6 +56,7 @@
 
 ## Done
 
+- [x] Workflow View
 - [x] Show flow selector if workspace has multiple flows
 - [x] Markdown styling
 - [x] Add generate text short cut
