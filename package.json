@@ -8,7 +8,10 @@
 		"build-data-type": "turbo build --filter '@giselle-sdk/data-type'",
 		"check-types": "turbo check-types",
 		"clean": "turbo clean && rm -rf node_modules .turbo",
-		"dev": "turbo dev --filter playground"
+		"dev": "turbo dev --filter playground",
+		"changeset": "changeset",
+		"version": "changeset version",
+		"release": "pnpm build && changeset publish"
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
