@@ -33,7 +33,7 @@ export function TextGenerationNodePropertiesPanel({
 }) {
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
-	const { startGeneration } = useGenerationController();
+	const { startGeneration, isGenerating } = useGenerationController();
 	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
@@ -75,16 +75,18 @@ export function TextGenerationNodePropertiesPanel({
 				}}
 				action={
 					<Button
+						loading={isGenerating}
 						type="button"
 						onClick={() => {
 							generateText();
 						}}
+						className="w-[150px]"
 					>
-						<span>Generate</span>
-						<div className="flex items-center text-[12px]">
+						<span>{isGenerating ? "Generating..." : "Generate"}</span>
+						<kbd className="flex items-center text-[12px]">
 							<CommandIcon className="size-[12px]" />
 							<CornerDownLeft className="size-[12px]" />
-						</div>
+						</kbd>
 					</Button>
 				}
 			/>

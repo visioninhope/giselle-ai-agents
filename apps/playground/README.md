@@ -31,6 +31,7 @@
 
 ## Tasks
 
+- [ ] Show flow selector if workspace has multiple flows
 - [ ] Auto detect storage backend
 - [ ] Workflow View
 - [ ] Update text node icon
