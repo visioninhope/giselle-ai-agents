@@ -108,5 +108,5 @@ export function PropertiesPanelContent({
 }: {
 	children: ReactNode;
 }) {
-	return <div className="px-[16px] h-full">{children}</div>;
+	return <div className="px-[16px] h-full overflow-hidden">{children}</div>;
 }

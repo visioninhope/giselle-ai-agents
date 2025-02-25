@@ -118,7 +118,7 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-hidden"
 							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
