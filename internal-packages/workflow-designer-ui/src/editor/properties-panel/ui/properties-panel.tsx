@@ -1,4 +1,5 @@
-import clsx from "clsx/lite";
+"use client";
+
 import {
 	type ReactNode,
 	useCallback,
