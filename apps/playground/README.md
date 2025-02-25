@@ -31,7 +31,7 @@
 
 ## Tasks
 
-- [ ] Add title
+- [ ] Add setting button to title
 - [ ] Rework node select intereaction
 - [ ] Show unable sources
 - [ ] Auto detect storage backend
@@ -59,6 +59,7 @@
 
 ## Done
 
+- [x] Add title
 - [x] Better font(base: Geist, accent: Hubot)
 - [x] Fix layout of text node
 - [x] Improve layout of gen node's prompt tab
