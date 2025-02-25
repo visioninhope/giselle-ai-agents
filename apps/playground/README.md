@@ -34,8 +34,6 @@
 - [ ] Rework node select intereaction
 - [ ] Add title
 - [ ] Show unable sources
-- [ ] Fix layout of text node
-- [ ] Improve layout of gen node's prompt tab
 - [ ] Auto detect storage backend
 - [ ] Create exention for a source
 - [ ] Update text node icon
@@ -62,6 +60,8 @@
 
 ## Done
 
+- [x] Fix layout of text node
+- [x] Improve layout of gen node's prompt tab
 - [x] Show running job
 - [x] Show running state on run view
 - [x] Workflow View

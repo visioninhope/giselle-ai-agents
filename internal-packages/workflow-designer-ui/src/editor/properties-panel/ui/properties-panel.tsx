@@ -13,7 +13,11 @@ export function PropertiesPanelRoot({
 }: {
 	children: ReactNode;
 }) {
-	return <div className="h-full flex flex-col gap-[8px]">{children}</div>;
+	return (
+		<div className="h-full w-full flex flex-col gap-[8px] overflow-hidden">
+			{children}
+		</div>
+	);
 }
 
 export function PropertiesPanelHeader({
@@ -108,5 +112,9 @@ export function PropertiesPanelContent({
 }: {
 	children: ReactNode;
 }) {
-	return <div className="px-[16px] h-full overflow-hidden">{children}</div>;
+	return (
+		<div className="px-[16px] flex-1 h-full flex flex-col overflow-hidden">
+			{children}
+		</div>
+	);
 }
