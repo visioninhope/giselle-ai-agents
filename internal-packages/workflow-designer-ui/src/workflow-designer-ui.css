@@ -59,3 +59,18 @@
 		}
 	}
 }
+
+@property --button-gradient-angle {
+	syntax: "<angle>";
+	inherits: false;
+	initial-value: 15deg;
+}
+@theme {
+	--animate-rotate-button-gradient-angle: rotate-button-gradient-angle 3s linear
+		infinite;
+	@keyframes rotate-button-gradient-angle {
+		to {
+			--button-gradient-angle: 360deg;
+		}
+	}
+}

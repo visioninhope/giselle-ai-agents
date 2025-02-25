@@ -67,7 +67,7 @@ function SourceSelect({
 			<Popover.Portal>
 				<Popover.Content
 					className={clsx(
-						"relative w-[300px] h-[300px] overflow-y-auto py-[8px]",
+						"relative w-[300px] max-h-[300px] overflow-y-auto py-[8px]",
 						"rounded-[8px] border-[1px] backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
@@ -390,8 +390,8 @@ export function SourcesPanel({
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={source.output.label}
-								subtitle={`${source.node.name ?? source.node.content.llm.model} - ${source.node.content.llm.provider}`}
+								title={`${source.node.name ?? source.node.content.llm.model} / ${source.output.label}`}
+								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
@@ -415,7 +415,7 @@ export function SourcesPanel({
 												<PromptIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "Text"}
+											title={`${source.node.name ?? "Text"} / ${source.output.label}`}
 											subtitle={text}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -428,7 +428,7 @@ export function SourcesPanel({
 												<PdfFileIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "PDF Files"}
+											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
 											onRemove={() => handleRemove(source.connection)}
 										/>
