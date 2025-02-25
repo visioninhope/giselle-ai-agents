@@ -393,7 +393,7 @@ export function Editor() {
 		}
 	});
 	return (
-		<div className="flex-1 overflow-hidden">
+		<div className="flex-1 overflow-hidden font-sans">
 			<ReactFlowProvider>
 				<ToolbarContextProvider>
 					<MousePositionProvider>

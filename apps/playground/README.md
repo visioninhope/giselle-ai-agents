@@ -31,8 +31,8 @@
 
 ## Tasks
 
-- [ ] Rework node select intereaction
 - [ ] Add title
+- [ ] Rework node select intereaction
 - [ ] Show unable sources
 - [ ] Auto detect storage backend
 - [ ] Create exention for a source
@@ -44,7 +44,6 @@
 - [ ] API Rate Limit
 - [ ] Add to do comment llmProviders property
 - [ ] Handling error in file upload
-- [ ] Better font(base: Geist, accent: Hubot)
 - [ ] Cancel button
 - [ ] LLM Provider from .env
 - [ ] Undo/Redo for prompt editor
@@ -60,6 +59,7 @@
 
 ## Done
 
+- [x] Better font(base: Geist, accent: Hubot)
 - [x] Fix layout of text node
 - [x] Improve layout of gen node's prompt tab
 - [x] Show running job
