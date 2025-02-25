@@ -9,7 +9,7 @@ const storage = createStorage({
 	// 	base: "./.storage",
 	// }),
 	driver: vercelBlobDriver({
-	access: "public",
+		access: "public",
 		base: "private-beta",
 	}),
 });
