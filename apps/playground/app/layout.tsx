@@ -6,6 +6,7 @@ import { Hubot_Sans } from "next/font/google";
 const hubot = Hubot_Sans({
 	weight: "variable",
 	variable: "--font-hubot-sans",
+	subsets: ['latin']
 });
 
 export const metadata: Metadata = {
