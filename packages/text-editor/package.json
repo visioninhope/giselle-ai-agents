@@ -10,7 +10,10 @@
 		"clean": "rm -rf dist",
 		"check-types": "tsc --noEmit"
 	},
-	"files": ["dist/**/*", "react/dist/**/*"],
+	"files": [
+		"dist/**/*",
+		"react/dist/**/*"
+	],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
@@ -33,6 +36,7 @@
 		"tsup": "catalog:"
 	},
 	"dependencies": {
+		"@giselle-sdk/data-type": "workspace:^",
 		"@tiptap/core": "catalog:",
 		"@tiptap/extension-bold": "catalog:",
 		"@tiptap/extension-bullet-list": "catalog:",

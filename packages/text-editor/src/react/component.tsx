@@ -1,3 +1,4 @@
+import type { Node } from "@giselle-sdk/data-type";
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -8,9 +9,9 @@ import {
 	StrikethroughIcon,
 } from "lucide-react";
 import { Toolbar as ToolbarPrimitive } from "radix-ui";
-import type { ReactNode } from "react";
-import { extensions } from "../extensions";
-import SourceExtension from "./source-extension";
+import { type ReactNode, useMemo } from "react";
+import { extensions as baseExtensions } from "../extensions";
+import { SourceExtensionReact } from "./source-extension-react";
 
 function Toolbar({
 	tools,
@@ -34,9 +35,6 @@ function Toolbar({
 				type="multiple"
 				aria-label="Text formatting"
 				className="flex items-center gap-[4px]"
-				onValueChange={(value) => {
-					console.log(value);
-				}}
 				value={[
 					editor.isActive("bold") ? "bold" : null,
 					editor.isActive("italic") ? "italic" : null,
@@ -104,10 +102,10 @@ function Toolbar({
 					aria-label="Bulleted list"
 					data-toolbar-item
 					onClick={() => {
-						if (editor.isActive("bulletList")) {
-							editor.chain().focus().toggleBulletList().run();
+						if (editor.isActive("orderedList")) {
+							editor.chain().focus().toggleOrderedList().run();
 						}
-						editor.chain().focus().toggleOrderedList().run();
+						editor.chain().focus().toggleBulletList().run();
 					}}
 					disabled={!editor.can().chain().focus().toggleBulletList().run()}
 				>
@@ -128,16 +126,30 @@ export function TextEditor({
 	value,
 	onValueChange,
 	tools,
+	nodes,
 }: {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
+	nodes?: Node[];
 }) {
+	const extensions = useMemo(
+		() =>
+			nodes === undefined
+				? baseExtensions
+				: [
+						...baseExtensions,
+						SourceExtensionReact.configure({
+							nodes,
+						}),
+					],
+		[nodes],
+	);
 	return (
 		<div className="flex flex-col h-full">
 			<EditorProvider
 				slotBefore={<Toolbar tools={tools} />}
-				extensions={[...extensions, SourceExtension]}
+				extensions={extensions}
 				content={
 					value === undefined
 						? undefined

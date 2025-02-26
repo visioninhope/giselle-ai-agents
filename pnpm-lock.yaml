@@ -797,6 +797,9 @@ importers:
 
   packages/text-editor:
     dependencies:
+      '@giselle-sdk/data-type':
+        specifier: workspace:^
+        version: link:../data-type
       '@tiptap/core':
         specifier: 'catalog:'
         version: 2.11.5(@tiptap/pm@2.11.5)
