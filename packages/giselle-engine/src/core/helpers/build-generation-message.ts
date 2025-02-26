@@ -49,17 +49,19 @@ async function buildGenerationMessageForTextGeneration(
 		throw new Error("Prompt cannot be empty");
 	}
 
-	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
-	const sourceKeywords = [...prompt.matchAll(pattern)].map((match) => ({
-		nodeId: NodeId.parse(match[1]),
-		outputId: OutputId.parse(match[2]),
-	}));
-
 	let userMessage = prompt;
 
 	if (isJsonContent(prompt)) {
 		userMessage = jsonContentToText(JSON.parse(prompt));
+		console.log(userMessage);
 	}
+
+	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
+	const sourceKeywords = [...userMessage.matchAll(pattern)].map((match) => ({
+		nodeId: NodeId.parse(match[1]),
+		outputId: OutputId.parse(match[2]),
+	}));
+
 	const attachedFiles: FilePart[] = [];
 	for (const sourceKeyword of sourceKeywords) {
 		const contextNode = contextNodes.find(

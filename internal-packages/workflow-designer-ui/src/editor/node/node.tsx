@@ -52,14 +52,14 @@ export function CustomXyFlowNode({
 	const hasTarget = useMemo(
 		() =>
 			workspace.connections.some(
-				(connection) => connection.outputNodeId === data.nodeData.id,
+				(connection) => connection.outputNode.id === data.nodeData.id,
 			),
 		[workspace, data.nodeData.id],
 	);
 	const connectedOutputIds = useMemo(
 		() =>
 			workspace.connections
-				.filter((connection) => connection.outputNodeId === data.nodeData.id)
+				.filter((connection) => connection.outputNode.id === data.nodeData.id)
 				.map((connection) => connection.outputId),
 		[workspace, data.nodeData.id],
 	);
