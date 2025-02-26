@@ -1,8 +1,29 @@
 import { Node as GiselleNode } from "@giselle-sdk/data-type";
 import { type NodeViewProps, NodeViewWrapper } from "@tiptap/react";
 import { ReactNodeViewRenderer } from "@tiptap/react";
+import clsx from "clsx/lite";
 import { useMemo } from "react";
 import { SourceExtension } from "../extensions/source-extension";
+
+function defaultName(node: GiselleNode) {
+	switch (node.type) {
+		case "action":
+			switch (node.content.type) {
+				case "textGeneration":
+					return node.name ?? node.content.llm.model;
+				default: {
+					const _exhaustiveCheck: never = node.content.type;
+					throw new Error(`Unhandled action content type: ${_exhaustiveCheck}`);
+				}
+			}
+		case "variable":
+			return node.name ?? node.content.type;
+		default: {
+			const _exhaustiveCheck: never = node;
+			throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+		}
+	}
+}
 
 const Component = (props: NodeViewProps) => {
 	const node = useMemo(
@@ -18,14 +39,27 @@ const Component = (props: NodeViewProps) => {
 			node?.outputs.find((output) => output.id === props.node.attrs.outputId),
 		[node, props.node.attrs.outputId],
 	);
+	if (node === undefined || output === undefined) {
+		return null;
+	}
 
 	return (
 		<NodeViewWrapper className="inline">
 			<span
 				contentEditable={false}
-				className="bg-primary-900/20 rounded-[4px] px-[4px] py-[2px] text-primary-900 text-[12px]"
+				data-selected={props.selected}
+				data-type={node.type}
+				data-content-type={node.content.type}
+				className={clsx(
+					"rounded-[4px] px-[4px] py-[2px] border-[1px] transition-colors",
+					"data-[content-type=textGeneration]:bg-primary-900/20 data-[content-type=textGeneration]:text-primary-900",
+					"data-[content-type=text]:bg-node-plaintext-900/20 data-[content-type=text]:text-node-plaintext-900",
+					"data-[content-type=file]:bg-node-data-900/20 data-[content-type=file]:text-node-data-900",
+					"border-transparent data-[selected=true]:border-primary-900",
+					"text-[12px] ",
+				)}
 			>
-				{node?.name} / {output?.label}
+				{defaultName(node)} / {output?.label}
 			</span>
 		</NodeViewWrapper>
 	);
