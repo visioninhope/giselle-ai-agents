@@ -32,6 +32,8 @@ import {
 } from "./tool";
 import "@xyflow/react/dist/style.css";
 import { OutputId } from "@giselle-sdk/data-type";
+import { edgeTypes } from "./connector";
+import { type ConnectorType, GradientDef } from "./connector/component";
 
 function NodeCanvas() {
 	const {
@@ -43,7 +45,10 @@ function NodeCanvas() {
 		updateNodeData,
 		addNode,
 	} = useWorkflowDesigner();
-	const reactFlowInstance = useReactFlow();
+	const reactFlowInstance = useReactFlow<
+		GiselleWorkflowDesignerNode,
+		ConnectorType
+	>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	useEffect(() => {
@@ -60,7 +65,7 @@ function NodeCanvas() {
 						position: { x: nodeState.position.x, y: nodeState.position.y },
 						selected: nodeState.selected,
 						data: { nodeData: nodeData },
-					};
+					} as GiselleWorkflowDesignerNode;
 				})
 				.filter((result) => result !== null),
 		);
@@ -70,20 +75,25 @@ function NodeCanvas() {
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
+				type: "giselleConnector",
 				source: connection.outputNode.id,
 				sourceHandle: connection.outputId,
 				target: connection.inputNode.id,
 				targetHandle: connection.inputId,
+				data: {
+					connection,
+				},
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
 	return (
-		<ReactFlow<GiselleWorkflowDesignerNode>
+		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
 			className="giselle-workflow-editor"
 			colorMode="dark"
 			defaultNodes={[]}
 			defaultEdges={[]}
 			nodeTypes={nodeTypes}
+			edgeTypes={edgeTypes}
 			defaultViewport={data.ui.viewport}
 			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
@@ -430,6 +440,7 @@ export function Editor() {
 						<KeyboardShortcuts />
 					</MousePositionProvider>
 				</ToolbarContextProvider>
+				<GradientDef />
 			</ReactFlowProvider>
 		</div>
 	);

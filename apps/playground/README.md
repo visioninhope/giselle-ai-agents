@@ -37,8 +37,6 @@
 - [ ] Auto detect storage backend
 - [ ] Create exention for a source
 - [ ] Update text node icon
-- [ ] Make fill yellow for connected file node port
-- [ ] Styling connector
 - [ ] API Middleware
 - [ ] API Auth
 - [ ] API Rate Limit
@@ -59,6 +57,8 @@
 
 ## Done
 
+- [x] Make fill yellow for connected file node port
+- [x] Styling connector
 - [x] Add title
 - [x] Better font(base: Geist, accent: Hubot)
 - [x] Fix layout of text node
