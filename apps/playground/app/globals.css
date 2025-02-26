@@ -40,9 +40,7 @@
 	--color-primary-200: var(--color-blue-200);
 	--color-primary-100: var(--color-blue-100);
 
-	--color-success-900: var(--color-green-900);
-
-	--color-text-node-1: hsl(178, 94%, 49%);
+	--color-text-node-1: var(--color-turquoise-900);
 	--color-text-node-2: hsl(178, 95%, 25%);
 
 	--color-file-node-1: var(--color-chartreuse-900);
