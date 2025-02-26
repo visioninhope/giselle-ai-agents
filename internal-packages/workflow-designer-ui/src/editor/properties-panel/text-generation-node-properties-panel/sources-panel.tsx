@@ -394,12 +394,15 @@ export function SourcesPanel({
 						{connectedSources.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
-									const jsonContentLikeString = JSON.parse(
-										source.node.content.text,
-									);
-									const text = isJsonContent(jsonContentLikeString)
-										? jsonContentToText(jsonContentLikeString)
-										: source.node.content.text;
+									let text = source.node.content.text;
+									if (text.length > 0) {
+										const jsonContentLikeString = JSON.parse(
+											source.node.content.text,
+										);
+										if (isJsonContent(jsonContentLikeString)) {
+											text = jsonContentToText(jsonContentLikeString);
+										}
+									}
 
 									return (
 										<SourceListItem
