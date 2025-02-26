@@ -70,9 +70,9 @@ function NodeCanvas() {
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
-				source: connection.outputNodeId,
+				source: connection.outputNode.id,
 				sourceHandle: connection.outputId,
-				target: connection.inputNodeId,
+				target: connection.inputNode.id,
 				targetHandle: connection.inputId,
 			})),
 		);
@@ -97,12 +97,12 @@ function NodeCanvas() {
 						}
 						case "remove": {
 							for (const connection of data.connections) {
-								if (connection.outputNodeId !== nodeChange.id) {
+								if (connection.outputNode.id !== nodeChange.id) {
 									continue;
 								}
 								deleteConnection(connection.id);
 								const connectedNode = data.nodes.find(
-									(node) => node.id === connection.inputNodeId,
+									(node) => node.id === connection.inputNode.id,
 								);
 								if (connectedNode === undefined) {
 									continue;

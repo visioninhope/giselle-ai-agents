@@ -1,7 +1,7 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
-import { ZodPromise } from "zod";
-import { Connection, Node, NodeId, NodeUIState } from "../node";
+import { Connection } from "../connection";
+import { Node, NodeId, NodeUIState } from "../node";
 import { OpenAIVecrtorStore } from "../openai";
 import { Workflow } from "../workflow";
 
