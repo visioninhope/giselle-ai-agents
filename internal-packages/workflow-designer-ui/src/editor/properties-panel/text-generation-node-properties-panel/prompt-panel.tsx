@@ -101,6 +101,7 @@ export function PromptPanel({
 													outputId: embedNode.outputId,
 												}),
 											)
+											.insertContent(" ")
 											.run();
 									}}
 								>
