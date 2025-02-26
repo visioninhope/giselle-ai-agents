@@ -4,16 +4,14 @@
 	"private": true,
 	"main": "./dist/index.js",
 	"module": "./dist/index.mjs",
+
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "tsup",
 		"clean": "rm -rf dist",
 		"check-types": "tsc --noEmit"
 	},
-	"files": [
-		"dist/**/*",
-		"react/dist/**/*"
-	],
+	"files": ["dist/**/*", "react/dist/**/*"],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
