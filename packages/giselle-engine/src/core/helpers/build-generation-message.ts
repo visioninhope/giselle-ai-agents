@@ -53,7 +53,6 @@ async function buildGenerationMessageForTextGeneration(
 
 	if (isJsonContent(prompt)) {
 		userMessage = jsonContentToText(JSON.parse(prompt));
-		console.log(userMessage);
 	}
 
 	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
