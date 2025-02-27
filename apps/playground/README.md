@@ -32,7 +32,6 @@
 ## Tasks
 
 - [ ] Add setting button to title
-- [ ] Show unable sources
 - [ ] Model catalog
 - [ ] Model catalog UI
 - [ ] API Middleware
@@ -55,6 +54,7 @@
 
 ## Done
 
+- [x] Show unable sources
 - [x] Update text node icon
 - [x] Auto detect storage backend
 - [x] Create exention for a source
