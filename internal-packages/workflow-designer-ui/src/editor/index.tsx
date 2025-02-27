@@ -101,10 +101,6 @@ function NodeCanvas() {
 			onNodesChange={(nodesChange) => {
 				nodesChange.map((nodeChange) => {
 					switch (nodeChange.type) {
-						case "select": {
-							setUiNodeState(nodeChange.id, { selected: nodeChange.selected });
-							break;
-						}
 						case "remove": {
 							for (const connection of data.connections) {
 								if (connection.outputNode.id !== nodeChange.id) {
@@ -133,10 +129,17 @@ function NodeCanvas() {
 					}
 				});
 			}}
-			onNodeClick={(event, node) => {
+			onNodeDoubleClick={(event, nodeDoubleClicked) => {
+				for (const node of data.nodes) {
+					if (node.id === nodeDoubleClicked.id) {
+						setUiNodeState(node.id, { selected: true });
+					} else {
+						setUiNodeState(node.id, { selected: false });
+					}
+				}
 				const viewport = reactFlowInstance.getViewport();
 				const screenPosition = reactFlowInstance.flowToScreenPosition(
-					node.position,
+					nodeDoubleClicked.position,
 				);
 				reactFlowInstance.setViewport(
 					{
@@ -154,7 +157,9 @@ function NodeCanvas() {
 				});
 			}}
 			onPaneClick={(event) => {
-				event.preventDefault();
+				for (const node of data.nodes) {
+					setUiNodeState(node.id, { selected: false });
+				}
 				const position = reactFlowInstance.screenToFlowPosition({
 					x: event.clientX,
 					y: event.clientY,
