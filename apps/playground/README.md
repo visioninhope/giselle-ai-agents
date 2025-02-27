@@ -32,7 +32,6 @@
 ## Tasks
 
 - [ ] Add setting button to title
-- [ ] Rework node select intereaction
 - [ ] Show unable sources
 - [ ] Auto detect storage backend
 - [ ] Update text node icon
@@ -57,6 +56,7 @@
 ## Done
 
 - [x] Create exention for a source
+- [x] Rework node select intereaction
 - [x] Make fill yellow for connected file node port
 - [x] Styling connector
 - [x] Add title
