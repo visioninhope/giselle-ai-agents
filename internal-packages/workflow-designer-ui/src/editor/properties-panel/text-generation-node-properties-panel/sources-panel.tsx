@@ -56,7 +56,7 @@ function SourceToggleItem({
 				className={clsx(
 					"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
 					"bg-black-200/20 text-black-200/20 text-[10px]",
-					"hidden group-data-[disabled]:block"
+					"hidden group-data-[disabled]:block",
 				)}
 			>
 				Unsupported
@@ -102,8 +102,8 @@ function SourceSelect({
 			<Popover.Portal>
 				<Popover.Content
 					className={clsx(
-						"relative w-[300px] max-h-[300px] overflow-y-auto py-[8px]",
-						"rounded-[8px] border-[1px] backdrop-blur-[8px]",
+						"relative w-[300px] h-[300px] py-[8px]",
+						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
 					{...contentProps}
@@ -116,7 +116,7 @@ function SourceSelect({
 					/>
 					<ToggleGroup.Root
 						type="multiple"
-						className="relative flex flex-col gap-[8px]"
+						className="relative h-full flex flex-col"
 						value={selectedOutputIds}
 						onValueChange={(unsafeValue) => {
 							const safeValue = unsafeValue
@@ -137,7 +137,7 @@ function SourceSelect({
 						<div className="flex flex-col py-[4px]">
 							<div className="border-t border-black-300/20" />
 						</div>
-						<div className="flex flex-col pb-[8px] gap-[8px]">
+						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto">
 							{generatedSources.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
@@ -174,25 +174,24 @@ function SourceSelect({
 										<SourceToggleItem
 											key={fileSource.output.id}
 											source={fileSource}
-											disabled={node.content.llm.provider ==='openai'}
-
+											disabled={node.content.llm.provider === "openai"}
 										/>
 									))}
 								</div>
 							)}
-							<div className="flex flex-col py-[4px]">
-								<div className="border-t border-black-300/20" />
-							</div>
-							<div className="flex px-[16px] pt-[4px] gap-[8px]">
-								<Popover.Close
-									onClick={() => {
-										onValueChange?.(selectedOutputIds);
-									}}
-									className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
-								>
-									Update
-								</Popover.Close>
-							</div>
+						</div>
+						<div className="flex flex-col py-[4px]">
+							<div className="border-t border-black-300/20" />
+						</div>
+						<div className="flex px-[16px] py-[4px] gap-[8px]">
+							<Popover.Close
+								onClick={() => {
+									onValueChange?.(selectedOutputIds);
+								}}
+								className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
+							>
+								Update
+							</Popover.Close>
 						</div>
 					</ToggleGroup.Root>
 				</Popover.Content>
