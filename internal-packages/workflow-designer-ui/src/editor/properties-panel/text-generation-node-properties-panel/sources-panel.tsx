@@ -26,7 +26,10 @@ import {
 	useSourceCategories,
 } from "./sources";
 
-function SourceToggleItem({ source }: { source: Source }) {
+function SourceToggleItem({
+	source,
+	disabled = false,
+}: { source: Source; disabled?: boolean }) {
 	const getDisplayName = () => {
 		if ("content" in source.node && "llm" in source.node.content) {
 			return source.node.name ?? source.node.content.llm.model;
@@ -37,13 +40,27 @@ function SourceToggleItem({ source }: { source: Source }) {
 	return (
 		<ToggleGroup.Item
 			key={source.output.id}
-			className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
+			className={clsx(
+				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+				"text-white-400",
+				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+			)}
 			value={source.output.id}
+			disabled={disabled}
 		>
 			<p className="text-[12px] truncate">
 				{getDisplayName()} / {source.output.label}
 			</p>
 			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+			<div
+				className={clsx(
+					"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
+					"bg-black-200/20 text-black-200/20 text-[10px]",
+					"hidden group-data-[disabled]:block"
+				)}
+			>
+				Unsupported
+			</div>
 		</ToggleGroup.Item>
 	);
 }
