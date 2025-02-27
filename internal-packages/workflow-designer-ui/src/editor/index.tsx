@@ -1,8 +1,6 @@
 "use client";
 
 import {
-	Background,
-	BackgroundVariant,
 	ReactFlow,
 	ReactFlowProvider,
 	Panel as XYFlowPanel,
@@ -32,6 +30,7 @@ import {
 } from "./tool";
 import "@xyflow/react/dist/style.css";
 import { OutputId } from "@giselle-sdk/data-type";
+import { Background } from "../ui/background";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
 
@@ -330,21 +329,10 @@ function NodeCanvas() {
 				reset();
 			}}
 		>
-			<Background
-				className="!bg-black-800"
-				lineWidth={0}
-				variant={BackgroundVariant.Lines}
-				style={{
-					backgroundImage: `url(${bg.src})`,
-					backgroundPositionX: "center",
-					backgroundPositionY: "center",
-					backgroundSize: "cover",
-				}}
-			/>
+			<Background />
 			{selectedTool?.category === "edit" && (
 				<FloatingNodePreview tool={selectedTool} />
 			)}
-
 			<XYFlowPanel position={"bottom-center"}>
 				<Toolbar />
 			</XYFlowPanel>
