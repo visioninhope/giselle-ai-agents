@@ -66,10 +66,12 @@ function SourceToggleItem({
 }
 
 function SourceSelect({
+	node,
 	sources,
 	onValueChange,
 	contentProps,
 }: {
+	node: TextGenerationNode;
 	sources: Source[];
 	onValueChange?: (value: OutputId[]) => void;
 	contentProps?: Omit<
@@ -172,6 +174,8 @@ function SourceSelect({
 										<SourceToggleItem
 											key={fileSource.output.id}
 											source={fileSource}
+											disabled={node.content.llm.provider ==='openai'}
+
 										/>
 									))}
 								</div>
@@ -372,6 +376,7 @@ export function SourcesPanel({
 					description="Select the data you want to refer to from the output and the information and knowledge you have."
 				>
 					<SourceSelect
+						node={textGenerationNode}
 						sources={sources}
 						onValueChange={handleConnectionChange}
 					/>
@@ -383,6 +388,7 @@ export function SourcesPanel({
 		<div>
 			<div className="flex justify-end">
 				<SourceSelect
+					node={textGenerationNode}
 					sources={sources}
 					onValueChange={handleConnectionChange}
 					contentProps={{
