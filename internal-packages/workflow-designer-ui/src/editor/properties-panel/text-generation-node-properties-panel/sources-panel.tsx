@@ -26,6 +26,28 @@ import {
 	useSourceCategories,
 } from "./sources";
 
+function SourceToggleItem({ source }: { source: Source }) {
+	const getDisplayName = () => {
+		if ("content" in source.node && "llm" in source.node.content) {
+			return source.node.name ?? source.node.content.llm.model;
+		}
+		return source.node.name ?? "Source";
+	};
+
+	return (
+		<ToggleGroup.Item
+			key={source.output.id}
+			className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
+			value={source.output.id}
+		>
+			<p className="text-[12px] truncate">
+				{getDisplayName()} / {source.output.label}
+			</p>
+			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+		</ToggleGroup.Item>
+	);
+}
+
 function SourceSelect({
 	sources,
 	onValueChange,
@@ -103,18 +125,10 @@ function SourceSelect({
 										Generated Content
 									</p>
 									{generatedSources.map((generatedSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={generatedSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-											value={generatedSource.output.id}
-										>
-											<p className="text-[12px] truncate">
-												{generatedSource.node.name ??
-													generatedSource.node.content.llm.model}{" "}
-												/ {generatedSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={generatedSource}
+										/>
 									))}
 								</div>
 							)}
@@ -124,17 +138,10 @@ function SourceSelect({
 										Text
 									</p>
 									{textSources.map((textSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={textSource.output.id}
-											value={textSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-										>
-											<p className="text-[12px] truncate">
-												{textSource.node.name ?? "Text"} /{" "}
-												{textSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={textSource}
+										/>
 									))}
 								</div>
 							)}
@@ -145,17 +152,10 @@ function SourceSelect({
 										File
 									</p>
 									{fileSources.map((fileSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={fileSource.output.id}
-											value={fileSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-										>
-											<p className="text-[12px] truncate">
-												{fileSource.node.name ?? "File"} /{" "}
-												{fileSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={fileSource}
+										/>
 									))}
 								</div>
 							)}
