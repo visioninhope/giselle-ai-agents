@@ -33,7 +33,6 @@
 
 - [ ] Add setting button to title
 - [ ] Show unable sources
-- [ ] Auto detect storage backend
 - [ ] Update text node icon
 - [ ] API Middleware
 - [ ] API Auth
@@ -55,6 +54,7 @@
 
 ## Done
 
+- [x] Auto detect storage backend
 - [x] Create exention for a source
 - [x] Rework node select intereaction
 - [x] Make fill yellow for connected file node port
