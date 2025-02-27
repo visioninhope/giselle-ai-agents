@@ -33,6 +33,8 @@
 
 - [ ] Add setting button to title
 - [ ] Show unable sources
+- [ ] Model catalog
+- [ ] Model catalog UI
 - [ ] API Middleware
 - [ ] API Auth
 - [ ] API Rate Limit
