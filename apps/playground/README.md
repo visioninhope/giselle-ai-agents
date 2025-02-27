@@ -33,7 +33,6 @@
 
 - [ ] Add setting button to title
 - [ ] Show unable sources
-- [ ] Update text node icon
 - [ ] API Middleware
 - [ ] API Auth
 - [ ] API Rate Limit
@@ -54,6 +53,7 @@
 
 ## Done
 
+- [x] Update text node icon
 - [x] Auto detect storage backend
 - [x] Create exention for a source
 - [x] Rework node select intereaction
