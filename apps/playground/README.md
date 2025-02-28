@@ -39,7 +39,6 @@
 - [ ] API Rate Limit
 - [ ] Add to do comment llmProviders property
 - [ ] Handling error in file upload
-- [ ] Cancel button
 - [ ] LLM Provider from .env
 - [ ] Undo/Redo for prompt editor
 - [ ] Telemetry
@@ -54,6 +53,7 @@
 
 ## Done
 
+- [x] Cancel button
 - [x] Show unable sources
 - [x] Update text node icon
 - [x] Auto detect storage backend
