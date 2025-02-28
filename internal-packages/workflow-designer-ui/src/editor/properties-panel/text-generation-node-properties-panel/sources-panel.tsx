@@ -301,6 +301,7 @@ export function SourcesPanel({
 				currentConnectedOutputIdSet,
 			);
 
+			let mutableInputs = textGenerationNode.inputs;
 			for (const outputId of addedOutputIdSet) {
 				const outputNode = data.nodes.find((node) =>
 					node.outputs.some((output) => output.id === outputId),
@@ -313,8 +314,9 @@ export function SourcesPanel({
 					label: "Source",
 				};
 
+				mutableInputs = [...mutableInputs, newInput];
 				updateNodeData(textGenerationNode, {
-					inputs: [...textGenerationNode.inputs, newInput],
+					inputs: mutableInputs,
 				});
 				addConnection({
 					inputNode: textGenerationNode,
@@ -338,10 +340,12 @@ export function SourcesPanel({
 					continue;
 				}
 				deleteConnection(connection.id);
+
+				mutableInputs = mutableInputs.filter(
+					(input) => input.id !== connection.inputId,
+				);
 				updateNodeData(textGenerationNode, {
-					inputs: textGenerationNode.inputs.filter(
-						(input) => input.id !== connection.inputId,
-					),
+					inputs: mutableInputs,
 				});
 			}
 		},
