@@ -40,6 +40,7 @@ interface StartGenerationOptions {
 	onGenerationQueued?: (generation: QueuedGeneration) => void;
 	onGenerationStarted?: (generation: RunningGeneration) => void;
 	onGenerationCompleted?: (generation: CompletedGeneration) => void;
+	onGenerationCancelled?: (generation: CancelledGeneration) => void;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
 export type StartGeneration = (
@@ -123,6 +124,7 @@ export function GenerationRunnerSystemProvider({
 				onStart?: (generation: RunningGeneration) => void;
 				onComplete?: (generation: CompletedGeneration) => void;
 				onError?: (generation: FailedGeneration) => void;
+				onCancel?: (generation: CancelledGeneration) => void;
 				onUpdateMessages?: (generation: RunningGeneration) => void;
 			},
 		) => {
@@ -148,6 +150,10 @@ export function GenerationRunnerSystemProvider({
 					}
 					if (generation.status === "failed") {
 						options?.onError?.(generation);
+						return generation;
+					}
+					if (generation.status === "cancelled") {
+						options?.onCancel?.(generation);
 						return generation;
 					}
 				}
@@ -190,6 +196,7 @@ export function GenerationRunnerSystemProvider({
 				onStart: options?.onGenerationStarted,
 				onComplete: options?.onGenerationCompleted,
 				onUpdateMessages: options?.onUpdateMessages,
+				onCancel: options?.onGenerationCancelled,
 			});
 		},
 		[waitForGeneration],
@@ -339,6 +346,13 @@ export function GenerationRunnerSystemProvider({
 					generationId,
 				});
 			}
+
+			const currentGeneration = generationListener.current[generationId];
+			generationListener.current[generationId] = {
+				...currentGeneration,
+				status: "cancelled",
+				cancelledAt: Date.now(),
+			} as CancelledGeneration;
 		},
 		[stopHandlers],
 	);
