@@ -79,15 +79,21 @@ function SourceSelect({
 		"className"
 	>;
 }) {
-	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>(
-		sources
-			.filter((source) => source.connection !== undefined)
-			.map((source) => source.output.id),
-	);
+	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
 	const { generatedSources, textSources, fileSources } =
 		useSourceCategories(sources);
 	return (
-		<Popover.Root>
+		<Popover.Root
+			onOpenChange={(open) => {
+				if (open) {
+					setSelectedOutputIds(
+						sources
+							.filter((source) => source.connection !== undefined)
+							.map((source) => source.output.id),
+					);
+				}
+			}}
+		>
 			<Popover.Trigger
 				className={clsx(
 					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
@@ -102,7 +108,7 @@ function SourceSelect({
 			<Popover.Portal>
 				<Popover.Content
 					className={clsx(
-						"relative w-[300px] h-[300px] py-[8px]",
+						"relative w-[300px] py-[8px]",
 						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
@@ -116,7 +122,7 @@ function SourceSelect({
 					/>
 					<ToggleGroup.Root
 						type="multiple"
-						className="relative h-full flex flex-col"
+						className="relative max-h-[300px] flex flex-col"
 						value={selectedOutputIds}
 						onValueChange={(unsafeValue) => {
 							const safeValue = unsafeValue
@@ -137,7 +143,7 @@ function SourceSelect({
 						<div className="flex flex-col py-[4px]">
 							<div className="border-t border-black-300/20" />
 						</div>
-						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto">
+						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
 							{generatedSources.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
