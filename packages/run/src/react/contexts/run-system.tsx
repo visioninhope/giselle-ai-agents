@@ -26,6 +26,7 @@ export type Perform = (
 	workflowId: WorkflowId,
 	options?: performOptions,
 ) => Promise<void>;
+export type Cancel = (runId: RunId) => Promise<void>;
 
 interface RunSystemContextType {
 	runs: Run[];
@@ -33,6 +34,7 @@ interface RunSystemContextType {
 	runGenerations: Record<RunId, Generation[]>;
 	perform: Perform;
 	isRunning: boolean;
+	cancel: Cancel;
 }
 
 export const RunSystemContext = createContext<RunSystemContextType | undefined>(
@@ -49,7 +51,7 @@ export function RunSystemContextProvider({
 	const [activeRunId, setActiveRunId] = useState<RunId | undefined>();
 	const [runs, setRuns] = useState<Run[]>([]);
 	const [isRunning, setIsRunning] = useState(false);
-	const { startGeneration } = useGenerationController();
+	const { startGeneration, stopGeneration } = useGenerationController();
 	const [runGenerations, setRunGenerations] = useState<
 		Record<RunId, Generation[]>
 	>({});
@@ -141,6 +143,34 @@ export function RunSystemContextProvider({
 		[workspaceId, setRunGeneration, startGeneration],
 	);
 
+	const cancel = useCallback<Cancel>(
+		async (runId) => {
+			const generations = runGenerations[runId] || [];
+
+			setIsRunning(false);
+			await Promise.all(
+				generations.map(async (generation) => {
+					if (
+						generation.status === "running" ||
+						generation.status === "queued" ||
+						generation.status === "requested" ||
+						generation.status === "created"
+					) {
+						try {
+							await stopGeneration(generation.id);
+						} catch (error) {
+							console.error(
+								`Failed to stop generation ${generation.id}:`,
+								error,
+							);
+						}
+					}
+				}),
+			);
+		},
+		[runGenerations, stopGeneration],
+	);
+
 	return (
 		<RunSystemContext.Provider
 			value={{
@@ -149,6 +179,7 @@ export function RunSystemContextProvider({
 				runGenerations,
 				perform,
 				isRunning,
+				cancel,
 			}}
 		>
 			{children}

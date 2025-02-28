@@ -80,7 +80,7 @@ interface GenerationRunnerSystemContextType {
 	updateMessages: (generationId: GenerationId, newMessages: Message[]) => void;
 	fetchNodeGenerations: FetchNodeGenerations;
 	addStopHandler: (generationId: GenerationId, handler: () => void) => void;
-	stopGeneration: (generationId: GenerationId) => void;
+	stopGeneration: (generationId: GenerationId) => Promise<void>;
 }
 
 export const GenerationRunnerSystemContext =
