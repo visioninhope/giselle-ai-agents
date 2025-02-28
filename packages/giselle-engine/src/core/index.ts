@@ -3,6 +3,7 @@ import type { Storage } from "unstorage";
 import { z } from "zod";
 import { addGenerationHandler } from "./handlers/add-generation";
 import { addRunHandler } from "./handlers/add-run";
+import { cancelGenerationHandler } from "./handlers/cancel-generation";
 import { createOpenAIVectorStoreHandler } from "./handlers/create-openai-vector-store";
 import { createWorkspaceHandler } from "./handlers/create-workspace";
 import { devHandler } from "./handlers/dev";
@@ -33,6 +34,7 @@ export const GiselleEngineAction = z.enum([
 	"add-run",
 	"start-run",
 	"get-node-generations",
+	"cancel-generation",
 	"dev",
 ]);
 type GiselleEngineAction = z.infer<typeof GiselleEngineAction>;
@@ -199,6 +201,13 @@ export async function GiselleEngine(
 				unsafeInput: payload,
 			});
 			return Response.json(response);
+		}
+		case "cancel-generation": {
+			await cancelGenerationHandler({
+				context,
+				unsafeInput: payload,
+			});
+			return Response.json({ ok: true });
 		}
 		case "dev": {
 			const res = await devHandler({ context });

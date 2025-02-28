@@ -128,6 +128,9 @@ export function RunSystemContextProvider({
 								onGenerationCompleted(generation) {
 									setRunGeneration(runId, generation);
 								},
+								onUpdateMessages(generation) {
+									setRunGeneration(runId, generation);
+								},
 							},
 						);
 					}),

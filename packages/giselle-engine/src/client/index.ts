@@ -11,3 +11,4 @@ export { callRequestGenerationApi } from "./call-request-generation-api";
 export { callAddRunApi } from "./call-add-run-api";
 export { callStartRunApi } from "./call-start-run-api";
 export { callGetNodeGenerationsApi } from "./call-get-node-generations-api";
+export { callCancelGenerationApi } from "./call-cancel-generation-api";

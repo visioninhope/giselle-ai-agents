@@ -311,10 +311,6 @@ function NodeCanvas() {
 												id: OutputId.generate(),
 												label: "Output",
 											},
-											{
-												id: OutputId.generate(),
-												label: "Search Result",
-											},
 										],
 									},
 									options,
