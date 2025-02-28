@@ -54,6 +54,7 @@
 
 ## Done
 
+- [x] Fix editing workflows
 - [x] Animation
 - [x] Cancel button
 - [x] Show unable sources
