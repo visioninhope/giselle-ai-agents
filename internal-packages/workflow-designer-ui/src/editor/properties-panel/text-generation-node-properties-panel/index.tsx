@@ -91,11 +91,17 @@ export function TextGenerationNodePropertiesPanel({
 						}}
 						className="w-[150px]"
 					>
-						<span>{isGenerating ? "Stop" : "Generate"}</span>
-						<kbd className="flex items-center text-[12px]">
-							<CommandIcon className="size-[12px]" />
-							<CornerDownLeft className="size-[12px]" />
-						</kbd>
+						{isGenerating ? (
+							<span>Stop</span>
+						) : (
+							<>
+								<span>Generate</span>
+								<kbd className="flex items-center text-[12px]">
+									<CommandIcon className="size-[12px]" />
+									<CornerDownLeft className="size-[12px]" />
+								</kbd>
+							</>
+						)}
 					</Button>
 				}
 			/>
@@ -192,7 +198,9 @@ export function TextGenerationNodePropertiesPanel({
 			</PanelGroup>
 			<KeyboardShortcuts
 				generate={() => {
-					generateText();
+					if (!isGenerating) {
+						generateText();
+					}
 				}}
 			/>
 		</PropertiesPanelRoot>
