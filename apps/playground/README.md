@@ -31,6 +31,7 @@
 
 ## Tasks
 
+- [ ] Cancel on Run
 - [ ] Add setting button to title
 - [ ] Model catalog
 - [ ] Model catalog UI
