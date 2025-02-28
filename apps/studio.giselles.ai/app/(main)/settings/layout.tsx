@@ -37,7 +37,7 @@ export default async function SettingLayout({
 			<div
 				className={cn(
 					"px-[48px] py-[32px] flex-1",
-					settingsV2Mode ? "px-[40px] py-[24px]" : "",
+					settingsV2Mode && "px-[40px] py-[24px]",
 				)}
 			>
 				{children}

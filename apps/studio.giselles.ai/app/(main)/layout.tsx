@@ -15,7 +15,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 		<div
 			className={cn(
 				"h-screen overflow-y-hidden bg-black-100 divide-y divide-black-80 flex flex-col",
-				settingsV2Mode ? "bg-black-850" : "",
+				settingsV2Mode && "bg-black-850",
 			)}
 		>
 			<header className="h-[60px] flex items-center px-[24px] justify-between">
