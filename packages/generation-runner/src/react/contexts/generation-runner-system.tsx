@@ -296,11 +296,14 @@ export function GenerationRunnerSystemProvider({
 				origin,
 				nodeId,
 			});
+			const excludeCancelled = generations.filter(
+				(generation) => generation.status !== "cancelled",
+			);
 			setGenerations((prev) => {
 				const filtered = prev.filter(
-					(p) => !generations.some((g) => g.id === p.id),
+					(p) => !excludeCancelled.some((g) => g.id === p.id),
 				);
-				return [...filtered, ...generations].sort(
+				return [...filtered, ...excludeCancelled].sort(
 					(a, b) => a.createdAt - b.createdAt,
 				);
 			});
