@@ -1,4 +1,5 @@
 import type {
+	CancelledGeneration,
 	CompletedGeneration,
 	FailedGeneration,
 	Generation,
@@ -71,7 +72,8 @@ function CompletionRunner({
 		| RequestedGeneration
 		| RunningGeneration
 		| CompletedGeneration
-		| FailedGeneration;
+		| FailedGeneration
+		| CancelledGeneration;
 }) {
 	const {
 		generateTextApi,
@@ -80,8 +82,9 @@ function CompletionRunner({
 		updateGenerationStatusToComplete,
 		updateGenerationStatusToFailure,
 		updateMessages,
+		addStopHandler,
 	} = useGenerationRunnerSystem();
-	const { messages, append } = useChat({
+	const { messages, append, stop } = useChat({
 		api: generateTextApi,
 		onFinish: async () => {
 			await updateGenerationStatusToComplete(generation.id);
@@ -103,6 +106,7 @@ function CompletionRunner({
 		if (generation.status !== "queued") {
 			return;
 		}
+		addStopHandler(generation.id, stop);
 		requestGeneration(generation).then(() => {
 			append(
 				{ role: "user", content: "hello" },

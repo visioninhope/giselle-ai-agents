@@ -134,6 +134,8 @@ export function Viewer() {
 																);
 															case "failed":
 																return <div key={generation.id}>failed</div>;
+															case "cancelled":
+																return <div key={generation.id}>cancelled</div>;
 															default: {
 																const _exhaustiveCheck: never = generation;
 																throw new Error(

@@ -2,9 +2,11 @@ import type { Node, TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import {
 	useGenerationController,
+	useNodeGenerations,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
+import { isGenerator } from "motion/react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -33,7 +35,10 @@ export function TextGenerationNodePropertiesPanel({
 }) {
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
-	const { startGeneration, isGenerating } = useGenerationController();
+	const { startGeneration, isGenerating, stopGeneration } = useNodeGenerations({
+		nodeId: node.id,
+		origin: { type: "workspace", id: data.id },
+	});
 	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
@@ -78,11 +83,15 @@ export function TextGenerationNodePropertiesPanel({
 						loading={isGenerating}
 						type="button"
 						onClick={() => {
-							generateText();
+							if (isGenerating) {
+								stopGeneration();
+							} else {
+								generateText();
+							}
 						}}
 						className="w-[150px]"
 					>
-						<span>{isGenerating ? "Generating..." : "Generate"}</span>
+						<span>{isGenerating ? "Stop" : "Generate"}</span>
 						<kbd className="flex items-center text-[12px]">
 							<CommandIcon className="size-[12px]" />
 							<CornerDownLeft className="size-[12px]" />

@@ -148,3 +148,10 @@ export const getNodeGenerations = {
 		generations: z.array(Generation),
 	}),
 };
+
+export const cancelGeneration = {
+	defaultApi: "/api/giselle/cancel-generation",
+	Input: z.object({
+		generationId: GenerationId.schema,
+	}),
+};
