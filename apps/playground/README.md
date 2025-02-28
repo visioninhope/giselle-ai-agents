@@ -32,6 +32,7 @@
 ## Tasks
 
 - [ ] Cancel on Run
+- [ ] Fix longtext layout of view
 - [ ] Add setting button to title
 - [ ] Model catalog
 - [ ] Model catalog UI
@@ -43,7 +44,6 @@
 - [ ] LLM Provider from .env
 - [ ] Undo/Redo for prompt editor
 - [ ] Telemetry
-- [ ] Animation
 
 
 ## Backlog
@@ -54,6 +54,7 @@
 
 ## Done
 
+- [x] Animation
 - [x] Cancel button
 - [x] Show unable sources
 - [x] Update text node icon
