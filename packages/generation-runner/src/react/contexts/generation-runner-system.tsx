@@ -28,6 +28,7 @@ import {
 	useState,
 } from "react";
 import {
+	arrayEquals,
 	waitAndGetGenerationCompleted,
 	waitAndGetGenerationFailed,
 	waitAndGetGenerationRunning,
@@ -39,6 +40,7 @@ interface StartGenerationOptions {
 	onGenerationQueued?: (generation: QueuedGeneration) => void;
 	onGenerationStarted?: (generation: RunningGeneration) => void;
 	onGenerationCompleted?: (generation: CompletedGeneration) => void;
+	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
 export type StartGeneration = (
 	generationContext: GenerationContext,
@@ -121,9 +123,11 @@ export function GenerationRunnerSystemProvider({
 				onStart?: (generation: RunningGeneration) => void;
 				onComplete?: (generation: CompletedGeneration) => void;
 				onError?: (generation: FailedGeneration) => void;
+				onUpdateMessages?: (generation: RunningGeneration) => void;
 			},
 		) => {
 			let status = generationListener.current[generationId].status;
+			const messages = generationListener.current[generationId].messages;
 			const timeoutDuration = options?.timeout || 1000 * 60 * 5;
 			const startTime = Date.now();
 
@@ -146,6 +150,12 @@ export function GenerationRunnerSystemProvider({
 						options?.onError?.(generation);
 						return generation;
 					}
+				}
+				if (
+					!arrayEquals(messages, generation.messages) &&
+					generation.status === "running"
+				) {
+					options?.onUpdateMessages?.(generation);
 				}
 
 				// Add small delay between checks
@@ -179,6 +189,7 @@ export function GenerationRunnerSystemProvider({
 			await waitForGeneration(generation.id, {
 				onStart: options?.onGenerationStarted,
 				onComplete: options?.onGenerationCompleted,
+				onUpdateMessages: options?.onUpdateMessages,
 			});
 		},
 		[waitForGeneration],
@@ -198,6 +209,12 @@ export function GenerationRunnerSystemProvider({
 						: prevGeneration,
 				),
 			);
+
+			const currentGeneration = generationListener.current[updateGenerationId];
+			generationListener.current[updateGenerationId] = {
+				...currentGeneration,
+				messages: newMessages,
+			} as RunningGeneration;
 		},
 		[],
 	);
