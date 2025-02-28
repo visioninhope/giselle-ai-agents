@@ -38,7 +38,7 @@ export function Viewer() {
 		[flowId, data.editingWorkflows],
 	);
 	return (
-		<div className="w-full flex-1 px-[16px]">
+		<div className="w-full flex-1 px-[16px] pb-[16px] font-sans overflow-hidden">
 			<div className="rounded-[8px] overflow-hidden h-full">
 				<div
 					className="bg-black-800 flex flex-col h-full text-white-900 px-[16px] py-[16px] gap-[16px]"

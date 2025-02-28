@@ -32,7 +32,6 @@
 ## Tasks
 
 - [ ] Cancel on Run
-- [ ] Fix longtext layout of view
 - [ ] Add setting button to title
 - [ ] Model catalog
 - [ ] Model catalog UI
@@ -54,6 +53,7 @@
 
 ## Done
 
+- [x] Fix longtext layout of view
 - [x] Fix editing workflows
 - [x] Animation
 - [x] Cancel button
