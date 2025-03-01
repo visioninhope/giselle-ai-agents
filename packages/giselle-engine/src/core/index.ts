@@ -13,7 +13,6 @@ import { getLLMProvidersHandler } from "./handlers/get-llm-providers";
 import { getNodeGenerationsHandler } from "./handlers/get-node-generations";
 import { getWorkspace } from "./handlers/get-workspace";
 import { removeFileHandler } from "./handlers/remove-file";
-import { requestGenerationHandler } from "./handlers/request-generation";
 import { saveWorkspace } from "./handlers/save-workspace";
 import { startRunHandler } from "./handlers/start-run";
 import { textGenerationHandler } from "./handlers/text-generation";
@@ -30,7 +29,6 @@ export const GiselleEngineAction = z.enum([
 	"create-openai-vector-store",
 	"get-llm-providers",
 	"add-generation",
-	"request-generation",
 	"get-generation",
 	"add-run",
 	"start-run",
@@ -167,13 +165,6 @@ export async function GiselleEngine(
 				unsafeInput: payload,
 			});
 			return Response.json(response);
-		}
-		case "request-generation": {
-			await requestGenerationHandler({
-				context,
-				unsafeInput: payload,
-			});
-			return Response.json({ ok: true });
 		}
 
 		case "get-generation": {

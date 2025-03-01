@@ -14,7 +14,6 @@ import {
 import {
 	callCancelGenerationApi,
 	callGetNodeGenerationsApi,
-	callRequestGenerationApi,
 } from "@giselle-sdk/giselle-engine/client";
 import type { Message } from "ai";
 import {
@@ -61,7 +60,6 @@ interface GenerationRunnerSystemContextType {
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
 	nodeGenerationMap: Map<NodeId, Generation[]>;
-	requestGeneration: (generation: Generation) => Promise<void>;
 	updateGenerationStatusToRunning: (
 		generationId: GenerationId,
 	) => Promise<
@@ -230,29 +228,6 @@ export function GenerationRunnerSystemProvider({
 		},
 		[],
 	);
-	const requestGeneration = useCallback(async (generation: Generation) => {
-		if (generation && generation.status === "queued") {
-			const requestedAt = Date.now();
-			setGenerations((prev) =>
-				prev.map((prevGeneration) => {
-					if (prevGeneration.id !== generation.id) {
-						return prevGeneration;
-					}
-					if (prevGeneration.status !== "queued") {
-						return prevGeneration;
-					}
-					return {
-						...prevGeneration,
-						status: "requested",
-						requestedAt,
-					};
-				}),
-			);
-			await callRequestGenerationApi({
-				generationId: generation.id,
-			});
-		}
-	}, []);
 	const updateGenerationStatusToRunning = useCallback(
 		async (generationId: GenerationId) => {
 			const generation = await waitAndGetGenerationRunning(generationId);
@@ -368,7 +343,6 @@ export function GenerationRunnerSystemProvider({
 				generateTextApi,
 				startGeneration,
 				getGeneration,
-				requestGeneration,
 				generations,
 				updateGenerationStatusToRunning,
 				updateGenerationStatusToComplete,
