@@ -7,7 +7,7 @@ import {
 	useRunController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import { CircleCheckIcon } from "lucide-react";
+import { CircleCheckIcon, CircleSlashIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
 import { SpinnerIcon, WilliIcon } from "../icons";
@@ -26,7 +26,7 @@ import {
 
 export function Viewer() {
 	const { generations, run } = useRun();
-	const { perform, isRunning } = useRunController();
+	const { perform, isRunning, cancel } = useRunController();
 	const { data } = useWorkflowDesigner();
 	const [flowId, setFlowId] = useState<WorkflowId | undefined>(
 		data.editingWorkflows.length === 1
@@ -72,17 +72,27 @@ export function Viewer() {
 									</Select>
 								)}
 
-								{flowId && (
-									<Button
-										type="button"
-										onClick={() => {
-											perform(flowId);
-										}}
-										loading={isRunning}
-									>
-										Run
-									</Button>
-								)}
+								{flowId &&
+									(isRunning ? (
+										<Button
+											type="button"
+											onClick={() => {
+												cancel();
+											}}
+											loading={true}
+										>
+											Stop
+										</Button>
+									) : (
+										<Button
+											type="button"
+											onClick={() => {
+												perform(flowId);
+											}}
+										>
+											Run
+										</Button>
+									))}
 							</div>
 							<div className="flex flex-col gap-[24px]">
 								{flow?.jobs.map((job, index) => (
@@ -135,7 +145,12 @@ export function Viewer() {
 															case "failed":
 																return <div key={generation.id}>failed</div>;
 															case "cancelled":
-																return <div key={generation.id}>cancelled</div>;
+																return (
+																	<CircleSlashIcon
+																		className="size-[22px] text-white-800 shrink-0"
+																		key={generation.id}
+																	/>
+																);
 															default: {
 																const _exhaustiveCheck: never = generation;
 																throw new Error(

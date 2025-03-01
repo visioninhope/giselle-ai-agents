@@ -1,4 +1,8 @@
-import type { WorkflowId, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	CancelledRun,
+	WorkflowId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import {
 	type CreatedRun,
 	type Generation,
@@ -16,6 +20,7 @@ import {
 	createContext,
 	useCallback,
 	useContext,
+	useRef,
 	useState,
 } from "react";
 
@@ -55,6 +60,8 @@ export function RunSystemContextProvider({
 	const [runGenerations, setRunGenerations] = useState<
 		Record<RunId, Generation[]>
 	>({});
+	const runRef = useRef<Record<RunId, Run>>({});
+
 	const setRunGeneration = useCallback(
 		(runId: RunId, newGeneration: Generation) => {
 			setRunGenerations((prev) => {
@@ -92,6 +99,7 @@ export function RunSystemContextProvider({
 				createdAt: Date.now(),
 			} satisfies CreatedRun;
 			setRuns((prev) => [...prev, createdRun]);
+			runRef.current[runId] = createdRun;
 			options?.onCreateRun?.(createdRun);
 			setActiveRunId(createdRun.id);
 			const { run: queuedRun } = await callAddRunApi({
@@ -105,6 +113,7 @@ export function RunSystemContextProvider({
 				startedAt: Date.now(),
 			} satisfies RunningRun;
 			setRuns((prev) => [...prev.filter((p) => p.id !== runId), runningRun]);
+			runRef.current[runId] = runningRun;
 			await callStartRunApi({
 				runId,
 			});
@@ -112,6 +121,13 @@ export function RunSystemContextProvider({
 			for (const job of runningRun.workflow.jobs) {
 				await Promise.all(
 					job.actions.map(async (action) => {
+						const currentRun = runRef.current[runId];
+						if (currentRun === undefined) {
+							return;
+						}
+						if (currentRun.status === "cancelled") {
+							return;
+						}
 						await startGeneration(
 							{
 								origin: { type: "run", id: runId },
@@ -133,6 +149,9 @@ export function RunSystemContextProvider({
 								onUpdateMessages(generation) {
 									setRunGeneration(runId, generation);
 								},
+								onGenerationCancelled(generation) {
+									setRunGeneration(runId, generation);
+								},
 							},
 						);
 					}),
@@ -146,6 +165,19 @@ export function RunSystemContextProvider({
 	const cancel = useCallback<Cancel>(
 		async (runId) => {
 			const generations = runGenerations[runId] || [];
+
+			const currentRun = runRef.current[runId];
+			if (currentRun === undefined) {
+				return;
+			}
+			const cancelledRun = {
+				...currentRun,
+				status: "cancelled",
+				cancelledAt: Date.now(),
+			} as CancelledRun;
+
+			setRuns((prev) => [...prev.filter((p) => p.id !== runId), cancelledRun]);
+			runRef.current[runId] = cancelledRun;
 
 			setIsRunning(false);
 			await Promise.all(
