@@ -31,7 +31,6 @@
 
 ## Tasks
 
-- [ ] Cancel on Run
 - [ ] Rework generation state management
 - [ ] Rework selected node design
 - [ ] Add setting button to title
@@ -55,6 +54,7 @@
 
 ## Done
 
+- [x] Cancel on Run
 - [x] Fix longtext layout of view
 - [x] Fix editing workflows
 - [x] Animation
