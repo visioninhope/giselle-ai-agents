@@ -37,7 +37,6 @@ export function GenerationView({
 	) {
 		return (
 			<div className="pt-[8px]">
-				{generation.status}
 				<Spinner />
 			</div>
 		);
@@ -80,9 +79,6 @@ export function GenerationView({
 						<Spinner />
 					</div>
 				)}
-			{generation.status === "cancelled" && (
-				<p className="text-[14px]">Cancelled</p>
-			)}
 		</div>
 	);
 }
