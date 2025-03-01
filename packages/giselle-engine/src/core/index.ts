@@ -7,6 +7,7 @@ import { cancelGenerationHandler } from "./handlers/cancel-generation";
 import { createOpenAIVectorStoreHandler } from "./handlers/create-openai-vector-store";
 import { createWorkspaceHandler } from "./handlers/create-workspace";
 import { devHandler } from "./handlers/dev";
+import { generateText } from "./handlers/generate-text";
 import { getGenerationHandler } from "./handlers/get-generation";
 import { getLLMProvidersHandler } from "./handlers/get-llm-providers";
 import { getNodeGenerationsHandler } from "./handlers/get-node-generations";
@@ -35,6 +36,7 @@ export const GiselleEngineAction = z.enum([
 	"start-run",
 	"get-node-generations",
 	"cancel-generation",
+	"generate-text",
 	"dev",
 ]);
 type GiselleEngineAction = z.infer<typeof GiselleEngineAction>;
@@ -212,6 +214,12 @@ export async function GiselleEngine(
 		case "dev": {
 			const res = await devHandler({ context });
 			return Response.json(res);
+		}
+		case "generate-text": {
+			return await generateText({
+				context,
+				input: payload,
+			});
 		}
 		default: {
 			const _exhaustiveCheck: never = action;

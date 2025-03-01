@@ -77,7 +77,6 @@ function CompletionRunner({
 }) {
 	const {
 		generateTextApi,
-		requestGeneration,
 		updateGenerationStatusToRunning,
 		updateGenerationStatusToComplete,
 		updateGenerationStatusToFailure,
@@ -107,16 +106,14 @@ function CompletionRunner({
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		requestGeneration(generation).then(() => {
-			append(
-				{ role: "user", content: "hello" },
-				{
-					body: {
-						generationId: generation.id,
-					},
+		append(
+			{ role: "user", content: "hello" },
+			{
+				body: {
+					generation,
 				},
-			);
-		});
+			},
+		);
 	});
 	return null;
 }
