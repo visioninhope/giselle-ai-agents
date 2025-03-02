@@ -10,7 +10,7 @@ import {
 	RunId,
 	type RunningRun,
 } from "@giselle-sdk/data-type";
-import { useGenerationController } from "@giselle-sdk/generation-runner/react";
+import { useGenerationRunnerSystem } from "@giselle-sdk/generation-runner/react";
 import {
 	callAddRunApi,
 	callStartRunApi,
@@ -56,7 +56,7 @@ export function RunSystemContextProvider({
 	const [activeRunId, setActiveRunId] = useState<RunId | undefined>();
 	const [runs, setRuns] = useState<Run[]>([]);
 	const [isRunning, setIsRunning] = useState(false);
-	const { startGeneration, stopGeneration } = useGenerationController();
+	const { startGeneration, stopGeneration } = useGenerationRunnerSystem();
 	const [runGenerations, setRunGenerations] = useState<
 		Record<RunId, Generation[]>
 	>({});
@@ -185,7 +185,6 @@ export function RunSystemContextProvider({
 					if (
 						generation.status === "running" ||
 						generation.status === "queued" ||
-						generation.status === "requested" ||
 						generation.status === "created"
 					) {
 						try {

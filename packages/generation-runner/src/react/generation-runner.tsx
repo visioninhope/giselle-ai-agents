@@ -4,7 +4,6 @@ import type {
 	FailedGeneration,
 	Generation,
 	QueuedGeneration,
-	RequestedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
 import { useChat } from "ai/react";
@@ -69,7 +68,6 @@ function CompletionRunner({
 }: {
 	generation:
 		| QueuedGeneration
-		| RequestedGeneration
 		| RunningGeneration
 		| CompletedGeneration
 		| FailedGeneration
