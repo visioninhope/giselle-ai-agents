@@ -27,12 +27,18 @@ export async function AgentUsage() {
 				action={{
 					component:
 						activities.length > 0 ? (
-							<AgentUsageDialog activities={activities} />
+							<AgentUsageDialog
+								activities={activities}
+								settingsV2Mode={settingsV2Mode}
+							/>
 						) : null,
 				}}
 				settingsV2Mode={settingsV2Mode}
 			>
-				<AgentUsageTable activities={recentActivities} />
+				<AgentUsageTable
+					activities={recentActivities}
+					settingsV2Mode={settingsV2Mode}
+				/>
 			</Card>
 		);
 	}
