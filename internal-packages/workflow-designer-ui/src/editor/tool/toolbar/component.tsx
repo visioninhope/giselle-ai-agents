@@ -1,10 +1,17 @@
 "use client";
 
 import { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
+import {
+	Capability,
+	type Model,
+	hasCapability,
+	models,
+} from "@giselle-sdk/model-catalog";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
+import { type ReactNode, useMemo } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
@@ -31,6 +38,72 @@ function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
 			<p>{text}</p>
 			{hotkey && <p className="uppercase text-black-70">{hotkey}</p>}
 		</div>
+	);
+}
+
+function CapabilityIcon({
+	children,
+}: {
+	children: ReactNode;
+}) {
+	return (
+		<span className="flex gap-[2px] rounded-[8px] border border-white-800 p-[4px] text-[10px]">
+			{children}
+		</span>
+	);
+}
+function ModelCatalog({
+	model,
+	...props
+}: ToggleGroup.ToggleGroupItemProps & { model: Model }) {
+	return (
+		<button
+			{...props}
+			className={clsx(
+				"flex gap-[8px]",
+				"hover:bg-white-850/10 p-[4px] rounded-[4px]",
+				"data-[state=on]:bg-primary-900 focus:outline-none",
+				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+			)}
+		>
+			{model.provider === "anthropic" && (
+				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			{model.provider === "openai" && (
+				<OpenaiIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			{model.provider === "google" && (
+				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			<div className="flex flex-start gap-[8px]">
+				<p className="text-[14px] text-left text-nowrap">{model.modelId}</p>
+				{model.tier === "plus" && <CapabilityIcon>Plus</CapabilityIcon>}
+				{model.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
+				{hasCapability(model, Capability.TextGeneration) && (
+					<CapabilityIcon>Generate Text</CapabilityIcon>
+				)}
+				{hasCapability(model, Capability.PdfFileInput) && (
+					<CapabilityIcon>Input PDF</CapabilityIcon>
+				)}
+				{hasCapability(model, Capability.ImageFileInput) && (
+					<CapabilityIcon>Input Image</CapabilityIcon>
+				)}
+				{hasCapability(model, Capability.SearchGrounding) && (
+					<CapabilityIcon>Web Search</CapabilityIcon>
+				)}
+				{hasCapability(model, Capability.Reasoning) && (
+					<CapabilityIcon>Reasoning</CapabilityIcon>
+				)}
+				{hasCapability(model, Capability.GenericFileInput) && (
+					<>
+						<CapabilityIcon>Input PDF</CapabilityIcon>
+						<CapabilityIcon>Input Image</CapabilityIcon>
+						<CapabilityIcon>Input Audio</CapabilityIcon>
+						<CapabilityIcon>Input Video</CapabilityIcon>
+					</>
+				)}
+			</div>
+		</button>
 	);
 }
 
@@ -134,7 +207,7 @@ export function Toolbar() {
 								<Popover.Portal>
 									<Popover.Content
 										className={clsx(
-											"relative w-[260px] rounded-[8px] px-[8px] py-[8px]",
+											"relative rounded-[8px] px-[8px] py-[8px]",
 											"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
 											"backdrop-blur-[4px]",
 										)}
@@ -144,12 +217,7 @@ export function Toolbar() {
 										<div className="relative flex flex-col gap-[8px]">
 											<ToggleGroup.Root
 												type="single"
-												className={clsx(
-													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
-													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
-												)}
+												className={clsx("flex flex-col gap-[8px]")}
 												value={selectedTool.provider}
 												onValueChange={(provider) => {
 													setSelectedTool({
@@ -158,30 +226,16 @@ export function Toolbar() {
 													});
 												}}
 											>
-												{llmProviders.some(
-													(llmProvider) => llmProvider === "openai",
-												) && (
-													<ToggleGroup.Item value="openai" data-tool>
-														<OpenaiIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">OpenAI</p>
+												{models.map((model) => (
+													<ToggleGroup.Item
+														data-tool
+														key={model.modelId}
+														value="openai"
+														asChild
+													>
+														<ModelCatalog value="openai" model={model} />
 													</ToggleGroup.Item>
-												)}
-												{llmProviders.some(
-													(llmProvider) => llmProvider === "google",
-												) && (
-													<ToggleGroup.Item value="google" data-tool>
-														<GoogleWhiteIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">Google</p>
-													</ToggleGroup.Item>
-												)}
-												{llmProviders.some(
-													(llmProvider) => llmProvider === "anthropic",
-												) && (
-													<ToggleGroup.Item value="anthropic" data-tool>
-														<AnthropicIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">Anthropic</p>
-													</ToggleGroup.Item>
-												)}
+												))}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
