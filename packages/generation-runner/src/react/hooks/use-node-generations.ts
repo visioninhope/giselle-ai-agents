@@ -62,8 +62,7 @@ export function useNodeGenerations({
 		return (
 			latestGeneration?.status === "running" ||
 			latestGeneration?.status === "created" ||
-			latestGeneration?.status === "queued" ||
-			latestGeneration?.status === "requested"
+			latestGeneration?.status === "queued"
 		);
 	}, [generations]);
 

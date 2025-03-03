@@ -25,10 +25,6 @@ export const GenerationStatusCreated = z.literal("created");
 export type GenerationStatusCreated = z.infer<typeof GenerationStatusCreated>;
 export const GenerationStatusQueued = z.literal("queued");
 export type GenerationStatusQueued = z.infer<typeof GenerationStatusQueued>;
-export const GenerationStatusRequested = z.literal("requested");
-export type GenerationStatusRequested = z.infer<
-	typeof GenerationStatusRequested
->;
 export const GenerationStatusRunning = z.literal("running");
 export type GenerationStatusRunning = z.infer<typeof GenerationStatusRunning>;
 export const GenerationStatusCompleted = z.literal("completed");
@@ -46,7 +42,6 @@ export type GenerationStatusCancelled = z.infer<
 export const GenerationStatus = z.union([
 	GenerationStatusCreated,
 	GenerationStatusQueued,
-	GenerationStatusRequested,
 	GenerationStatusRunning,
 	GenerationStatusCompleted,
 	GenerationStatusFailed,
@@ -73,15 +68,6 @@ export const QueuedGeneration = GenerationBase.extend({
 	ququedAt: z.number(),
 });
 export type QueuedGeneration = z.infer<typeof QueuedGeneration>;
-
-export const RequestedGeneration = GenerationBase.extend({
-	status: GenerationStatusRequested,
-	createdAt: z.number(),
-	messages: z.undefined(),
-	ququedAt: z.number(),
-	requestedAt: z.number(),
-});
-export type RequestedGeneration = z.infer<typeof RequestedGeneration>;
 
 export const RunningGeneration = GenerationBase.extend({
 	status: GenerationStatusRunning,
@@ -134,7 +120,6 @@ export type CancelledGeneration = z.infer<typeof CancelledGeneration>;
 export const Generation = z.discriminatedUnion("status", [
 	CreatedGeneration,
 	QueuedGeneration,
-	RequestedGeneration,
 	RunningGeneration,
 	CompletedGeneration,
 	FailedGeneration,

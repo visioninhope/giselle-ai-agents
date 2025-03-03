@@ -4,7 +4,6 @@ import type {
 	FailedGeneration,
 	Generation,
 	QueuedGeneration,
-	RequestedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
 import { useChat } from "ai/react";
@@ -69,7 +68,6 @@ function CompletionRunner({
 }: {
 	generation:
 		| QueuedGeneration
-		| RequestedGeneration
 		| RunningGeneration
 		| CompletedGeneration
 		| FailedGeneration
@@ -77,7 +75,6 @@ function CompletionRunner({
 }) {
 	const {
 		generateTextApi,
-		requestGeneration,
 		updateGenerationStatusToRunning,
 		updateGenerationStatusToComplete,
 		updateGenerationStatusToFailure,
@@ -107,16 +104,14 @@ function CompletionRunner({
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		requestGeneration(generation).then(() => {
-			append(
-				{ role: "user", content: "hello" },
-				{
-					body: {
-						generationId: generation.id,
-					},
+		append(
+			{ role: "user", content: "hello" },
+			{
+				body: {
+					generation,
 				},
-			);
-		});
+			},
+		);
 	});
 	return null;
 }

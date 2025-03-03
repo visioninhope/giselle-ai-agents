@@ -31,7 +31,8 @@
 
 ## Tasks
 
-- [ ] Cancel on Run
+- [ ] Split create generation and start generation
+- [ ] Rework selected node design
 - [ ] Add setting button to title
 - [ ] Model catalog
 - [ ] Model catalog UI
@@ -43,7 +44,6 @@
 - [ ] LLM Provider from .env
 - [ ] Undo/Redo for prompt editor
 - [ ] Telemetry
-- [ ] Animation
 
 
 ## Backlog
@@ -54,6 +54,11 @@
 
 ## Done
 
+- [x] Rework generation state management
+- [x] Cancel on Run
+- [x] Fix longtext layout of view
+- [x] Fix editing workflows
+- [x] Animation
 - [x] Cancel button
 - [x] Show unable sources
 - [x] Update text node icon

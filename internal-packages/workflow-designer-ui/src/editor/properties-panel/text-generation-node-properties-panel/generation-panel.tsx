@@ -50,7 +50,6 @@ export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 			>
 				{(currentGeneration.status === "created" ||
 					currentGeneration.status === "queued" ||
-					currentGeneration.status === "requested" ||
 					currentGeneration.status === "running") && (
 					<p data-header-text>Generating...</p>
 				)}
