@@ -231,7 +231,6 @@ export function WorkflowDesignerProvider({
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
 							Date.now(),
-							result.generatedTitle,
 						);
 						fileContents = [
 							...fileContents.filter((file) => file.id !== uploadedFileData.id),

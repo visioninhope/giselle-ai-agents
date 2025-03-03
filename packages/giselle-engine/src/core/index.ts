@@ -130,8 +130,8 @@ export async function GiselleEngine(
 			return Response.json(result);
 		}
 		case "upload-file": {
-			const result = await uploadFileHandler({ context, unsafeInput: payload });
-			return Response.json(result);
+			await uploadFileHandler({ context, unsafeInput: payload });
+			return Response.json({ ok: true });
 		}
 		case "remove-file": {
 			await removeFileHandler({ context, unsafeInput: payload });

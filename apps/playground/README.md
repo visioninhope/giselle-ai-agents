@@ -32,7 +32,6 @@
 ## Tasks
 
 - [ ] Writing getting started
-- [ ] Remove upload file name inference
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
@@ -56,6 +55,7 @@
 
 ## Done
 
+- [x] Remove upload file name inference
 - [x] Rework generation state management
 - [x] Cancel on Run
 - [x] Fix longtext layout of view

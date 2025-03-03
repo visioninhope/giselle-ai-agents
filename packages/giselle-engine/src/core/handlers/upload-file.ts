@@ -61,7 +61,7 @@ export async function generateTitle(data: DataContent) {
 export async function uploadFileHandler({
 	context,
 	unsafeInput,
-}: GiselleEngineHandlerArgs<Input>): Promise<Output> {
+}: GiselleEngineHandlerArgs<Input>) {
 	const input = Input.parse(unsafeInput);
 
 	const workspace = await getWorkspace({
@@ -85,14 +85,6 @@ export async function uploadFileHandler({
 		}),
 		fileBuffer,
 	);
-
-	const [generatedTitle] = await Promise.all([
-		// uploadToOpenAI(input.file, openaiVectorStoreId),
-		generateTitle(fileBuffer),
-	]);
-	return {
-		generatedTitle,
-	};
 }
 
 async function fileToBuffer(file: File): Promise<Buffer> {
