@@ -30,6 +30,7 @@ export async function AgentUsage() {
 							<AgentUsageDialog activities={activities} />
 						) : null,
 				}}
+				settingsV2Mode={settingsV2Mode}
 			>
 				<AgentUsageTable activities={recentActivities} />
 			</Card>

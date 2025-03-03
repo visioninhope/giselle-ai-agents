@@ -27,17 +27,17 @@ type CardProps = {
 	description?: string;
 	action?: Action;
 	className?: string;
+	settingsV2Mode?: boolean;
 };
 
-export async function Card({
+export function Card({
 	title,
 	description,
 	action,
 	children,
 	className,
+	settingsV2Mode,
 }: PropsWithChildren<CardProps>) {
-	const settingsV2Mode = await settingsV2Flag();
-
 	if (settingsV2Mode) {
 		return (
 			<div
