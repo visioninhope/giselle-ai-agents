@@ -1,8 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { settingsV2Flag } from "@/flags";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
-import type { FC, PropsWithChildren } from "react";
+import type { PropsWithChildren } from "react";
 
 type SubmitAction = {
 	href?: never;
