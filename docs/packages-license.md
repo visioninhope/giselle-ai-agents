@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 856 MIT
+* 857 MIT
 * 99 Apache 2.0
 * 56 ISC
 * 32 New BSD
@@ -448,6 +448,17 @@ MIT-0 permitted
 
 <a name="@csstools/css-tokenizer"></a>
 ### @csstools/css-tokenizer v3.0.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@edge-runtime/cookies"></a>
+### @edge-runtime/cookies v5.0.2
 #### 
 
 ##### Paths
@@ -3647,17 +3658,6 @@ LGPL-3.0-or-later permitted
 
 
 
-<a name="@vercel/flags"></a>
-### @vercel/flags v2.6.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="@vercel/functions"></a>
 ### @vercel/functions v1.5.0
 #### 
@@ -6071,6 +6071,17 @@ CC-BY-4.0 permitted
 
 
 
+<a name="flags"></a>
+### flags v3.1.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="follow-redirects"></a>
 ### follow-redirects v1.15.9
 #### 
@@ -7216,7 +7227,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="jose"></a>
-### jose v5.2.1
+### jose v5.9.6
 #### 
 
 ##### Paths
