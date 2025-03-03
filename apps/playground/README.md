@@ -10,13 +10,16 @@
     touch .env.local
     ```
 
-2. Add your API keys to the `.env.local` file.
+2. Add your API keys to the `.env.local` file. At least one API key is required, others are optional.
 
     ```.env
+    # Required (at least one of these)
     OPENAI_API_KEY="YOUR_OPENAI_API_KEY"
+    # Optional
     GOOGLE_GENERATIVE_AI_API_KEY="YOUR_GOOGLE_GENERATIVE_AI_API_KEY"
     ANTHROPIC_API_KEY="YOUR_ANTHROPIC_API_KEY"
     ```
+
 3. Install dependencies
 
     ```sh
@@ -31,7 +34,6 @@
 
 ## Tasks
 
-- [ ] Writing getting started
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
@@ -42,7 +44,6 @@
 - [ ] API Rate Limit
 - [ ] Add to do comment llmProviders property
 - [ ] Handling error in file upload
-- [ ] LLM Provider from .env
 - [ ] Undo/Redo for prompt editor
 - [ ] Telemetry
 
@@ -55,6 +56,8 @@
 
 ## Done
 
+- [x] Writing getting started
+- [x] LLM Provider from .env
 - [x] Remove upload file name inference
 - [x] Rework generation state management
 - [x] Cancel on Run

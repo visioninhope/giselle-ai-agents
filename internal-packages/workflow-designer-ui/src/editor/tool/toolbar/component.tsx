@@ -2,6 +2,7 @@
 
 import { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
+import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import {
@@ -35,6 +36,7 @@ function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
 
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
+	const { llmProviders } = useWorkflowDesigner();
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-[hsla(255,_40%,_98%,_0.04)]">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -156,18 +158,30 @@ export function Toolbar() {
 													});
 												}}
 											>
-												<ToggleGroup.Item value="openai" data-tool>
-													<OpenaiIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">OpenAI</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="google" data-tool>
-													<GoogleWhiteIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Google</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="anthropic" data-tool>
-													<AnthropicIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Anthropic</p>
-												</ToggleGroup.Item>
+												{llmProviders.some(
+													(llmProvider) => llmProvider === "openai",
+												) && (
+													<ToggleGroup.Item value="openai" data-tool>
+														<OpenaiIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">OpenAI</p>
+													</ToggleGroup.Item>
+												)}
+												{llmProviders.some(
+													(llmProvider) => llmProvider === "google",
+												) && (
+													<ToggleGroup.Item value="google" data-tool>
+														<GoogleWhiteIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Google</p>
+													</ToggleGroup.Item>
+												)}
+												{llmProviders.some(
+													(llmProvider) => llmProvider === "anthropic",
+												) && (
+													<ToggleGroup.Item value="anthropic" data-tool>
+														<AnthropicIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Anthropic</p>
+													</ToggleGroup.Item>
+												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

@@ -1,3 +1,4 @@
+import type { LLMProvider } from "@giselle-sdk/data-type";
 import { NextGiselleEngine } from "giselle-sdk/next";
 
 import { createStorage } from "unstorage";
@@ -17,8 +18,23 @@ const storage = createStorage({
 			}),
 });
 
+const llmProviders: LLMProvider[] = [];
+if (process.env.OPENAI_API_KEY) {
+	llmProviders.push("openai");
+}
+if (process.env.ANTHROPIC_API_KEY) {
+	llmProviders.push("anthropic");
+}
+if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
+	llmProviders.push("google");
+}
+
+if (llmProviders.length === 0) {
+	throw new Error("No LLM providers configured");
+}
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
-	llmProviders: ["openai", "anthropic", "google"],
+	llmProviders,
 });
