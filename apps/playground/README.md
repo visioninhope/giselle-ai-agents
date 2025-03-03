@@ -31,7 +31,7 @@
 
 ## Tasks
 
-- [ ] Rework generation state management
+- [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
 - [ ] Model catalog
@@ -54,6 +54,7 @@
 
 ## Done
 
+- [x] Rework generation state management
 - [x] Cancel on Run
 - [x] Fix longtext layout of view
 - [x] Fix editing workflows
