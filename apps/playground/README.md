@@ -31,6 +31,8 @@
 
 ## Tasks
 
+- [ ] Writing getting started
+- [ ] Remove upload file name inference
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
