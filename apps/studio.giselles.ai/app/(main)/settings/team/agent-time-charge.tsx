@@ -24,9 +24,15 @@ export async function AgentTimeCharge() {
 			)}
 		>
 			{currentTeamIsPro ? (
-				<AgentTimeUsageForProPlan usedMinutes={usedMinutes} />
+				<AgentTimeUsageForProPlan
+					usedMinutes={usedMinutes}
+					{...(settingsV2Mode && { settingsV2Mode })}
+				/>
 			) : (
-				<AgentTimeUsageForFreePlan usedMinutes={usedMinutes} />
+				<AgentTimeUsageForFreePlan
+					usedMinutes={usedMinutes}
+					{...(settingsV2Mode && { settingsV2Mode })}
+				/>
 			)}
 		</div>
 	);
