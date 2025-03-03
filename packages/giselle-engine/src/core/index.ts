@@ -15,7 +15,6 @@ import { getWorkspace } from "./handlers/get-workspace";
 import { removeFileHandler } from "./handlers/remove-file";
 import { saveWorkspace } from "./handlers/save-workspace";
 import { startRunHandler } from "./handlers/start-run";
-import { textGenerationHandler } from "./handlers/text-generation";
 import { uploadFileHandler } from "./handlers/upload-file";
 import type { GiselleEngineContext } from "./types";
 
@@ -23,7 +22,6 @@ export const GiselleEngineAction = z.enum([
 	"create-workspace",
 	"save-workspace",
 	"get-workspace",
-	"text-generation",
 	"upload-file",
 	"remove-file",
 	"create-openai-vector-store",
@@ -126,13 +124,6 @@ export async function GiselleEngine(
 				context,
 			});
 			return Response.json(result);
-		}
-		case "text-generation": {
-			const stream = await textGenerationHandler({
-				context,
-				unsafeInput: payload,
-			});
-			return stream.toDataStreamResponse();
 		}
 		case "create-workspace": {
 			const result = await createWorkspaceHandler({ context });

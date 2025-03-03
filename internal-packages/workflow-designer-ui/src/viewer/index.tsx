@@ -127,7 +127,6 @@ export function Viewer() {
 														switch (generation.status) {
 															case "created":
 															case "queued":
-															case "requested":
 															case "running":
 																return (
 																	<SpinnerIcon
