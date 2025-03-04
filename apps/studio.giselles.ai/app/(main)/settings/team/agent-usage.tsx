@@ -1,5 +1,6 @@
 import { Card } from "@/app/(main)/settings/components/card";
 import { settingsV2Flag } from "@/flags";
+import { cn } from "@/lib/utils";
 import { getAgentActivities } from "./actions";
 import { AgentUsageDialog } from "./agent-usage-dialog";
 import { AgentUsageTable } from "./agent-usage-table";
@@ -10,8 +11,14 @@ export async function AgentUsage() {
 
 	if (!result.success || !result.data) {
 		return (
-			<Card title="Recent Agent">
-				<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
+			<Card title={settingsV2Mode ? "Recent Agent" : "Recent Agent Usage"}>
+				<div
+					className={cn(
+						"text-zinc-400 p-4",
+						settingsV2Mode &&
+							"p-0 text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist",
+					)}
+				>
 					Failed to load agent activities
 				</div>
 			</Card>
