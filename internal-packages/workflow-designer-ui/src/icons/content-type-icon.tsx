@@ -1,5 +1,5 @@
 import type { FileCategory } from "@giselle-sdk/data-type";
-import type { LanguageModelProvider } from "@giselle-sdk/language-models";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { SVGProps } from "react";
 import { PromptIcon } from "../icons/prompt";
 import { AnthropicIcon } from "./anthropic";

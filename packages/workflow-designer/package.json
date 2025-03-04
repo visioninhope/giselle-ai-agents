@@ -10,10 +10,7 @@
 		"check-types": "tsc --noEmit",
 		"clean": "rm -rf .turbo dist node_modules react"
 	},
-	"files": [
-		"dist/**/*",
-		"react/dist/**/*"
-	],
+	"files": ["dist/**/*", "react/dist/**/*"],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
@@ -39,7 +36,7 @@
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/generation-runner": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:*",
-		"@giselle-sdk/language-models": "workspace:^",
+		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/run": "workspace:^",
 		"@giselle-sdk/workflow-utils": "workspace:*",
 		"react": "catalog:",

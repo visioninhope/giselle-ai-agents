@@ -1,5 +1,5 @@
 {
-	"name": "@giselle-sdk/language-models",
+	"name": "@giselle-sdk/language-model",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./dist/index.js",

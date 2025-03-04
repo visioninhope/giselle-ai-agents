@@ -1,4 +1,4 @@
-import type { LanguageModelProvider } from "@giselle-sdk/language-models";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { Storage } from "unstorage";
 import { z } from "zod";
 import { addGenerationHandler } from "./handlers/add-generation";

@@ -589,7 +589,7 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
-      '@giselle-sdk/language-models':
+      '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../../packages/language-model
       '@giselle-sdk/text-editor':
@@ -653,7 +653,7 @@ importers:
 
   packages/data-type:
     dependencies:
-      '@giselle-sdk/language-models':
+      '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
       ai:
@@ -715,7 +715,7 @@ importers:
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 1.1.9(zod@3.24.1)
-      '@giselle-sdk/language-models':
+      '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
       '@giselle-sdk/text-editor':
@@ -755,7 +755,7 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:^
         version: link:../giselle-engine
-      '@giselle-sdk/language-models':
+      '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
       '@giselle-sdk/workspace':
@@ -932,7 +932,7 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../giselle-engine
-      '@giselle-sdk/language-models':
+      '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
       '@giselle-sdk/run':

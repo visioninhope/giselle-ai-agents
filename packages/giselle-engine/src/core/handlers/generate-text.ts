@@ -9,7 +9,7 @@ import {
 	QueuedGeneration,
 	type RunningGeneration,
 } from "@giselle-sdk/data-type";
-import type { LanguageModel } from "@giselle-sdk/language-models";
+import type { LanguageModel } from "@giselle-sdk/language-model";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { z } from "zod";
 import { createHandler } from "../create-handler";

@@ -1,4 +1,4 @@
-import { LanguageModel } from "@giselle-sdk/language-models";
+import { LanguageModel } from "@giselle-sdk/language-model";
 import { z } from "zod";
 import { NodeBase } from "../base";
 

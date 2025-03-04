@@ -14,7 +14,7 @@ import {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { LanguageModelProviders } from "@giselle-sdk/language-models";
+import { LanguageModelProviders } from "@giselle-sdk/language-model";
 import { z } from "zod";
 import { Output as getWorkspaceOutput } from "../handlers/get-workspace";
 import { Output as saveWorkspaceOutput } from "../handlers/save-workspace";

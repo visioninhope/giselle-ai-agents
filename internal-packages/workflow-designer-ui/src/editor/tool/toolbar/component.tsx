@@ -6,7 +6,7 @@ import {
 	type LanguageModel,
 	hasCapability,
 	languageModels,
-} from "@giselle-sdk/language-models";
+} from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";

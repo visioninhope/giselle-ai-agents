@@ -1,7 +1,7 @@
 "use client";
 
 import type { FileCategory } from "@giselle-sdk/data-type";
-import type { LanguageModel } from "@giselle-sdk/language-models";
+import type { LanguageModel } from "@giselle-sdk/language-model";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type {
 	AddFileNodeTool,

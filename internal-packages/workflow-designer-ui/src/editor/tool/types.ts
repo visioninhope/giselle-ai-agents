@@ -1,5 +1,5 @@
 import type { FileCategory } from "@giselle-sdk/data-type";
-import type { LanguageModel } from "@giselle-sdk/language-models";
+import type { LanguageModel } from "@giselle-sdk/language-model";
 
 interface ToolBase {
 	category: string;

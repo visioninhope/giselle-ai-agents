@@ -1,7 +1,7 @@
 import {
 	OpenAILanguageModel,
 	openaiLanguageModels,
-} from "@giselle-sdk/language-models";
+} from "@giselle-sdk/language-model";
 import {
 	Select,
 	SelectContent,

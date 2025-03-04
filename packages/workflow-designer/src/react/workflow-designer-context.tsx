@@ -14,7 +14,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
 import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
-import type { LanguageModelProvider } from "@giselle-sdk/language-models";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { WorkflowDesigner } from "../workflow-designer";

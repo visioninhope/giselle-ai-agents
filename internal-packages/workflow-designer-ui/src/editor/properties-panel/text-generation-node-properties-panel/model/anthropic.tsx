@@ -1,7 +1,7 @@
 import {
 	AnthropicLanguageModel,
 	anthropicLanguageModels,
-} from "@giselle-sdk/language-models";
+} from "@giselle-sdk/language-model";
 import {
 	Select,
 	SelectContent,
