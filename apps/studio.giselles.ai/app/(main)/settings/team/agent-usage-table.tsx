@@ -53,7 +53,9 @@ export function AgentUsageTable({
 								</div>
 							))
 						) : (
-							<div className="px-2 white-400">No agent activities</div>
+							<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
+								No agent activities
+							</div>
 						)}
 					</div>
 				</div>
@@ -94,7 +96,9 @@ export function AgentUsageTable({
 							</div>
 						))
 					) : (
-						<div className="p-4 text-zinc-400">No agent activities</div>
+						<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
+							No agent activities
+						</div>
 					)}
 				</div>
 			</div>

@@ -10,8 +10,10 @@ export async function AgentUsage() {
 
 	if (!result.success || !result.data) {
 		return (
-			<Card title="Recent Agent Usage">
-				<div className="text-zinc-400 p-4">Failed to load agent activities</div>
+			<Card title="Recent Agent">
+				<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
+					Failed to load agent activities
+				</div>
 			</Card>
 		);
 	}
