@@ -47,7 +47,7 @@ export function Card({
 			>
 				<div className="flex justify-between gap-x-2.5">
 					<div className="grid gap-[3px] font-medium">
-						<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubotSans">
+						<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
 							{title}
 						</h2>
 						{description && (

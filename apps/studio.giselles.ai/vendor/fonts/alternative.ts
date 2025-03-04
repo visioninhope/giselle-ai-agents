@@ -7,7 +7,7 @@ export const rosart = Roboto_Serif({
 	subsets: ["latin"],
 });
 
-export const hubotSans = Hubot_Sans({
+export const hubot = Hubot_Sans({
 	variable: "--font-hubot-sans",
 	subsets: ["latin"],
 });

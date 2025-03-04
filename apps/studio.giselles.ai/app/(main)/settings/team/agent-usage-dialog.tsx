@@ -26,7 +26,7 @@ export function AgentUsageDialog({
 				</DialogTrigger>
 				<DialogContent className="border-[0.5px] border-black-400 px-[24px] pt-[16px] pb-[24px] bg-black-850 max-w-7xl">
 					<DialogHeader>
-						<DialogTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubotSans">
+						<DialogTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
 							Agent Usage Logs
 						</DialogTitle>
 					</DialogHeader>

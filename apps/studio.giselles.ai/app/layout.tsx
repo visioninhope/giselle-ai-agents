@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
-import { geist, hubotSans, rosart } from "./fonts";
+import { geist, hubot, rosart } from "./fonts";
 import { PostHogPageView } from "./posthog-page-view";
 import { PHProvider } from "./providers";
 
@@ -48,7 +48,7 @@ export default async function RootLayout({
 				<body
 					className={cn(
 						`${rosart.variable}  font-sans`,
-						settingsV2Mode ? `${hubotSans.variable} ${geist.variable}` : "",
+						settingsV2Mode ? `${hubot.variable} ${geist.variable}` : "",
 					)}
 				>
 					<ThemeProvider
