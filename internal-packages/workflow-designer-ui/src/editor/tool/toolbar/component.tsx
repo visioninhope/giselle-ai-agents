@@ -55,7 +55,7 @@ function CapabilityIcon({
 function ModelCatalog({
 	model,
 	...props
-}: ToggleGroup.ToggleGroupItemProps & { model: Model }) {
+}: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & { model: Model }) {
 	return (
 		<button
 			{...props}
@@ -218,11 +218,17 @@ export function Toolbar() {
 											<ToggleGroup.Root
 												type="single"
 												className={clsx("flex flex-col gap-[8px]")}
-												value={selectedTool.provider}
-												onValueChange={(provider) => {
+												value={selectedTool.model?.modelId}
+												onValueChange={(modelId) => {
+													const model = models.find(
+														(model) => model.modelId === modelId,
+													);
+													if (model === undefined) {
+														return;
+													}
 													setSelectedTool({
 														...selectedTool,
-														provider: LLMProvider.parse(provider),
+														model,
 													});
 												}}
 											>
@@ -230,10 +236,10 @@ export function Toolbar() {
 													<ToggleGroup.Item
 														data-tool
 														key={model.modelId}
-														value="openai"
+														value={model.modelId}
 														asChild
 													>
-														<ModelCatalog value="openai" model={model} />
+														<ModelCatalog model={model} />
 													</ToggleGroup.Item>
 												))}
 											</ToggleGroup.Root>

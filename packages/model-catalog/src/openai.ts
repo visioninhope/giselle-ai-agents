@@ -14,6 +14,20 @@ const gpt4oMini: Model = {
 	tier: Tier.Free,
 };
 
+const o1Preview: Model = {
+	provider: "openai",
+	modelId: "o1-preview",
+	capabilities: Capability.TextGeneration,
+	tier: Tier.Free,
+};
+
+const o1Mini: Model = {
+	provider: "openai",
+	modelId: "o1-mini",
+	capabilities: Capability.TextGeneration,
+	tier: Tier.Free,
+};
+
 const o3Mini: Model = {
 	provider: "openai",
 	modelId: "o3mini",

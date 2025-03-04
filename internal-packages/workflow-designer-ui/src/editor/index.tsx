@@ -237,10 +237,10 @@ function NodeCanvas() {
 						}
 						break;
 					case "addTextGenerationNode":
-						if (selectedTool.provider === undefined) {
+						if (selectedTool.model === undefined) {
 							break;
 						}
-						switch (selectedTool.provider) {
+						switch (selectedTool.model.provider) {
 							case "openai":
 								addNode(
 									{
@@ -249,7 +249,7 @@ function NodeCanvas() {
 											type: "textGeneration",
 											llm: {
 												provider: "openai",
-												model: "gpt-4o",
+												model: selectedTool.model.modelId,
 												temperature: 0.7,
 												topP: 1.0,
 												presencePenalty: 0.0,
@@ -275,7 +275,7 @@ function NodeCanvas() {
 											type: "textGeneration",
 											llm: {
 												provider: "anthropic",
-												model: "claude-3-5-sonnet-latest",
+												model: selectedTool.model.modelId,
 												temperature: 0.7,
 												topP: 1.0,
 											},
@@ -299,7 +299,7 @@ function NodeCanvas() {
 											type: "textGeneration",
 											llm: {
 												provider: "google",
-												model: "gemini-1.5-flash-latest",
+												model: selectedTool.model.modelId,
 												temperature: 0.7,
 												topP: 1.0,
 												searchGrounding: false,
@@ -317,7 +317,7 @@ function NodeCanvas() {
 								);
 								break;
 							default: {
-								const _exhaustiveCheck: never = selectedTool.provider;
+								const _exhaustiveCheck: never = selectedTool.model.provider;
 								throw new Error(`Unsupported provider: ${_exhaustiveCheck}`);
 							}
 						}

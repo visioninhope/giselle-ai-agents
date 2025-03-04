@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const OpenAI = z.object({
 	provider: z.literal("openai"),
-	model: z.enum(["o1-preview", "o1-mini", "gpt-4o"]),
+	model: z.enum(["o1-preview", "o1-mini", "gpt-4o", "gpt-4o-mini", "o3mini"]),
 	temperature: z.number(),
 	topP: z.number(),
 	frequencyPenalty: z.number(),

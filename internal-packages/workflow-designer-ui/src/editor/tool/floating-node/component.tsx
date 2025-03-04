@@ -70,14 +70,14 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				}
 			}
 		case "addTextGenerationNode":
-			if (tool.provider === undefined) {
+			if (tool.model === undefined) {
 				return null;
 			}
-			switch (tool.provider) {
+			switch (tool.model.provider) {
 				case "anthropic":
 					return (
 						<NodeComponent
-							title="claude-3.5-sonnet"
+							title={tool.model.modelId}
 							subtitle="anthropic"
 							nodeType="action"
 							llmProvider="anthropic"
@@ -88,7 +88,7 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				case "google":
 					return (
 						<NodeComponent
-							title="gemini-2.0-flash"
+							title={tool.model.modelId}
 							subtitle="google"
 							nodeType="action"
 							contentType="textGeneration"
@@ -99,7 +99,7 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				case "openai":
 					return (
 						<NodeComponent
-							title="gpt-4o"
+							title={tool.model.modelId}
 							subtitle="OpenAI"
 							nodeType="action"
 							contentType="textGeneration"
@@ -108,7 +108,7 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 						/>
 					);
 				default: {
-					const _exhaustiveCheck: never = tool.provider;
+					const _exhaustiveCheck: never = tool.model.provider;
 					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 				}
 			}
