@@ -3,10 +3,10 @@
 import { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
 import {
 	Capability,
-	type Model,
+	type LanguageModel,
 	hasCapability,
-	models,
-} from "@giselle-sdk/model-catalog";
+	languageModels,
+} from "@giselle-sdk/language-models";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
@@ -53,9 +53,11 @@ function CapabilityIcon({
 	);
 }
 function ModelCatalog({
-	model,
+	languageModel,
 	...props
-}: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & { model: Model }) {
+}: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
+	languageModel: LanguageModel;
+}) {
 	return (
 		<button
 			{...props}
@@ -66,35 +68,35 @@ function ModelCatalog({
 				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
 			)}
 		>
-			{model.provider === "anthropic" && (
+			{languageModel.provider === "anthropic" && (
 				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
 			)}
-			{model.provider === "openai" && (
+			{languageModel.provider === "openai" && (
 				<OpenaiIcon className="w-[20px] h-[20px]" data-icon />
 			)}
-			{model.provider === "google" && (
+			{languageModel.provider === "google" && (
 				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
 			)}
 			<div className="flex flex-start gap-[8px]">
-				<p className="text-[14px] text-left text-nowrap">{model.modelId}</p>
-				{model.tier === "plus" && <CapabilityIcon>Plus</CapabilityIcon>}
-				{model.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
-				{hasCapability(model, Capability.TextGeneration) && (
+				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
+				{languageModel.tier === "plus" && <CapabilityIcon>Plus</CapabilityIcon>}
+				{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
+				{hasCapability(languageModel, Capability.TextGeneration) && (
 					<CapabilityIcon>Generate Text</CapabilityIcon>
 				)}
-				{hasCapability(model, Capability.PdfFileInput) && (
+				{hasCapability(languageModel, Capability.PdfFileInput) && (
 					<CapabilityIcon>Input PDF</CapabilityIcon>
 				)}
-				{hasCapability(model, Capability.ImageFileInput) && (
+				{hasCapability(languageModel, Capability.ImageFileInput) && (
 					<CapabilityIcon>Input Image</CapabilityIcon>
 				)}
-				{hasCapability(model, Capability.SearchGrounding) && (
+				{hasCapability(languageModel, Capability.SearchGrounding) && (
 					<CapabilityIcon>Web Search</CapabilityIcon>
 				)}
-				{hasCapability(model, Capability.Reasoning) && (
+				{hasCapability(languageModel, Capability.Reasoning) && (
 					<CapabilityIcon>Reasoning</CapabilityIcon>
 				)}
-				{hasCapability(model, Capability.GenericFileInput) && (
+				{hasCapability(languageModel, Capability.GenericFileInput) && (
 					<>
 						<CapabilityIcon>Input PDF</CapabilityIcon>
 						<CapabilityIcon>Input Image</CapabilityIcon>
@@ -218,28 +220,28 @@ export function Toolbar() {
 											<ToggleGroup.Root
 												type="single"
 												className={clsx("flex flex-col gap-[8px]")}
-												value={selectedTool.model?.modelId}
+												value={selectedTool.languageModel?.id}
 												onValueChange={(modelId) => {
-													const model = models.find(
-														(model) => model.modelId === modelId,
+													const languageModel = languageModels.find(
+														(model) => model.id === modelId,
 													);
-													if (model === undefined) {
+													if (languageModel === undefined) {
 														return;
 													}
 													setSelectedTool({
 														...selectedTool,
-														model,
+														languageModel,
 													});
 												}}
 											>
-												{models.map((model) => (
+												{languageModels.map((languageModel) => (
 													<ToggleGroup.Item
 														data-tool
-														key={model.modelId}
-														value={model.modelId}
+														key={languageModel.id}
+														value={languageModel.id}
 														asChild
 													>
-														<ModelCatalog model={model} />
+														<ModelCatalog languageModel={languageModel} />
 													</ToggleGroup.Item>
 												))}
 											</ToggleGroup.Root>

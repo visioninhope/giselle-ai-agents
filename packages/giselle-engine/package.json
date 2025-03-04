@@ -49,6 +49,7 @@
 		"@ai-sdk/anthropic": "catalog:",
 		"@ai-sdk/google": "catalog:",
 		"@ai-sdk/openai": "catalog:",
+		"@giselle-sdk/language-models": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
 		"ai": "catalog:",
 		"next": "catalog:",

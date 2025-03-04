@@ -17,7 +17,6 @@ import {
 	PanelGroup,
 	PanelResizeHandle,
 } from "react-resizable-panels";
-import bg from "../images/bg.png";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -128,7 +127,7 @@ function NodeCanvas() {
 					}
 				});
 			}}
-			onNodeDoubleClick={(event, nodeDoubleClicked) => {
+			onNodeDoubleClick={(_event, nodeDoubleClicked) => {
 				for (const node of data.nodes) {
 					if (node.id === nodeDoubleClicked.id) {
 						setUiNodeState(node.id, { selected: true });
@@ -237,90 +236,26 @@ function NodeCanvas() {
 						}
 						break;
 					case "addTextGenerationNode":
-						if (selectedTool.model === undefined) {
+						if (selectedTool.languageModel === undefined) {
 							break;
 						}
-						switch (selectedTool.model.provider) {
-							case "openai":
-								addNode(
+						addNode(
+							{
+								type: "action",
+								content: {
+									type: "textGeneration",
+									llm: selectedTool.languageModel,
+								},
+								inputs: [],
+								outputs: [
 									{
-										type: "action",
-										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "openai",
-												model: selectedTool.model.modelId,
-												temperature: 0.7,
-												topP: 1.0,
-												presencePenalty: 0.0,
-												frequencyPenalty: 0.0,
-											},
-										},
-										inputs: [],
-										outputs: [
-											{
-												id: OutputId.generate(),
-												label: "Output",
-											},
-										],
+										id: OutputId.generate(),
+										label: "Output",
 									},
-									options,
-								);
-								break;
-							case "anthropic":
-								addNode(
-									{
-										type: "action",
-										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "anthropic",
-												model: selectedTool.model.modelId,
-												temperature: 0.7,
-												topP: 1.0,
-											},
-										},
-										inputs: [],
-										outputs: [
-											{
-												id: OutputId.generate(),
-												label: "Output",
-											},
-										],
-									},
-									options,
-								);
-								break;
-							case "google":
-								addNode(
-									{
-										type: "action",
-										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "google",
-												model: selectedTool.model.modelId,
-												temperature: 0.7,
-												topP: 1.0,
-												searchGrounding: false,
-											},
-										},
-										inputs: [],
-										outputs: [
-											{
-												id: OutputId.generate(),
-												label: "Output",
-											},
-										],
-									},
-									options,
-								);
-								break;
-							default: {
-								const _exhaustiveCheck: never = selectedTool.model.provider;
-								throw new Error(`Unsupported provider: ${_exhaustiveCheck}`);
-							}
-						}
+								],
+							},
+							options,
+						);
 				}
 				reset();
 			}}

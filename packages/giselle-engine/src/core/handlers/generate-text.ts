@@ -5,11 +5,11 @@ import {
 	type CompletedGeneration,
 	type FailedGeneration,
 	type FileData,
-	type LLM,
 	type NodeId,
 	QueuedGeneration,
 	type RunningGeneration,
 } from "@giselle-sdk/data-type";
+import type { LanguageModel } from "@giselle-sdk/language-models";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { z } from "zod";
 import { createHandler } from "../create-handler";
@@ -206,18 +206,18 @@ export const generateText = createHandler(
 	},
 );
 
-function generationModel(llm: LLM) {
-	const llmProvider = llm.provider;
+function generationModel(languageModel: LanguageModel) {
+	const llmProvider = languageModel.provider;
 	switch (llmProvider) {
 		case "anthropic": {
-			return anthropic(llm.model);
+			return anthropic(languageModel.id);
 		}
 		case "openai": {
-			return openai(llm.model);
+			return openai(languageModel.id);
 		}
 		case "google": {
-			return google(llm.model, {
-				useSearchGrounding: llm.searchGrounding,
+			return google(languageModel.id, {
+				useSearchGrounding: languageModel.configurations.searchGrounding,
 			});
 		}
 		default: {

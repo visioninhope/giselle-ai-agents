@@ -1,6 +1,7 @@
+import { LanguageModel } from "@giselle-sdk/language-models";
 import { z } from "zod";
-import { Anthropic, Google, LLM, OpenAI } from "../../llm";
-import { Input, NodeBase, NodeReferenceBase, Output } from "../base";
+import { Anthropic, Google, OpenAI } from "../../llm";
+import { NodeBase } from "../base";
 
 export const OpenAIContent = z.object({
 	type: z.literal("textGeneration"),
@@ -20,7 +21,7 @@ export const AnthropicContent = z.object({
 
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
-	llm: LLM,
+	llm: LanguageModel,
 	prompt: z.string().optional(),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
