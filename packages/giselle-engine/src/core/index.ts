@@ -1,4 +1,4 @@
-import type { LLMProvider } from "@giselle-sdk/data-type";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { Storage } from "unstorage";
 import { z } from "zod";
 import { addGenerationHandler } from "./handlers/add-generation";
@@ -46,7 +46,7 @@ export interface GiselleEngineRequest {
 export interface GiselleEngineConfig {
 	basePath: string;
 	storage: Storage;
-	llmProviders?: LLMProvider[];
+	llmProviders?: LanguageModelProvider[];
 }
 
 async function toGiselleEngineRequest(
@@ -130,8 +130,8 @@ export async function GiselleEngine(
 			return Response.json(result);
 		}
 		case "upload-file": {
-			const result = await uploadFileHandler({ context, unsafeInput: payload });
-			return Response.json(result);
+			await uploadFileHandler({ context, unsafeInput: payload });
+			return Response.json({ ok: true });
 		}
 		case "remove-file": {
 			await removeFileHandler({ context, unsafeInput: payload });

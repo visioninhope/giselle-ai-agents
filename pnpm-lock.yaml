@@ -592,6 +592,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/language-model':
+        specifier: workspace:^
+        version: link:../../packages/language-model
       '@giselle-sdk/text-editor':
         specifier: workspace:^
         version: link:../../packages/text-editor
@@ -653,6 +656,9 @@ importers:
 
   packages/data-type:
     dependencies:
+      '@giselle-sdk/language-model':
+        specifier: workspace:^
+        version: link:../language-model
       ai:
         specifier: 'catalog:'
         version: 4.1.28(react@19.0.0)(zod@3.24.1)
@@ -712,6 +718,9 @@ importers:
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 1.1.9(zod@3.24.1)
+      '@giselle-sdk/language-model':
+        specifier: workspace:^
+        version: link:../language-model
       '@giselle-sdk/text-editor':
         specifier: workspace:^
         version: link:../text-editor
@@ -749,9 +758,25 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:^
         version: link:../giselle-engine
+      '@giselle-sdk/language-model':
+        specifier: workspace:^
+        version: link:../language-model
       '@giselle-sdk/workspace':
         specifier: workspace:^
         version: link:../workspace
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+
+  packages/language-model:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.1
     devDependencies:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
@@ -910,6 +935,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../giselle-engine
+      '@giselle-sdk/language-model':
+        specifier: workspace:^
+        version: link:../language-model
       '@giselle-sdk/run':
         specifier: workspace:^
         version: link:../run

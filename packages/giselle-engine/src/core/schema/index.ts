@@ -5,7 +5,6 @@ import {
 	Generation,
 	GenerationId,
 	GenerationOrigin,
-	LLMProvider,
 	NodeId,
 	QueuedGeneration,
 	QueuedRun,
@@ -15,6 +14,7 @@ import {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { LanguageModelProviders } from "@giselle-sdk/language-model";
 import { z } from "zod";
 import { Output as getWorkspaceOutput } from "../handlers/get-workspace";
 import { Output as saveWorkspaceOutput } from "../handlers/save-workspace";
@@ -60,9 +60,6 @@ export const uploadFile = {
 		fileId: FileId.schema,
 		fileName: z.string(),
 	}),
-	Output: z.object({
-		generatedTitle: z.string(),
-	}),
 };
 
 export const removeFile = {
@@ -84,7 +81,7 @@ export const runAssistant = {
 
 export const getLLMProviders = {
 	defaultApi: "/api/giselle/get-llm-providers",
-	Output: z.object({ llmProviders: z.array(LLMProvider) }),
+	Output: z.object({ llmProviders: z.array(LanguageModelProviders) }),
 };
 
 export const createWorkspace = {

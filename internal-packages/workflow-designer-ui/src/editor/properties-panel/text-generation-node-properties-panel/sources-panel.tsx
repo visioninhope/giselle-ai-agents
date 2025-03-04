@@ -32,7 +32,7 @@ function SourceToggleItem({
 }: { source: Source; disabled?: boolean }) {
 	const getDisplayName = () => {
 		if ("content" in source.node && "llm" in source.node.content) {
-			return source.node.name ?? source.node.content.llm.model;
+			return source.node.name ?? source.node.content.llm.id;
 		}
 		return source.node.name ?? "Source";
 	};
@@ -414,7 +414,7 @@ export function SourcesPanel({
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={`${source.node.name ?? source.node.content.llm.model} / ${source.output.label}`}
+								title={`${source.node.name ?? source.node.content.llm.id} / ${source.output.label}`}
 								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>

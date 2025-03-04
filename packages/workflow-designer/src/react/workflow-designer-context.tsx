@@ -3,7 +3,6 @@
 import {
 	type ConnectionId,
 	type FileNode,
-	type LLMProvider,
 	type Node,
 	type NodeId,
 	type NodeUIState,
@@ -15,6 +14,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
 import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { WorkflowDesigner } from "../workflow-designer";
@@ -47,7 +47,7 @@ export interface WorkflowDesignerContextValue
 	) => void;
 	uploadFile: (files: File[], node: FileNode) => Promise<void>;
 	deleteNode: (nodeId: NodeId | string) => void;
-	llmProviders: LLMProvider[];
+	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 }
 export const WorkflowDesignerContext = createContext<
@@ -79,7 +79,7 @@ export function WorkflowDesignerProvider({
 	const [workspace, setWorkspaceInternal] = useState(data);
 	const persistTimeoutRef = useRef<Timer | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
-	const [llmProviders, setLLMProviders] = useState<LLMProvider[]>([]);
+	const [llmProviders, setLLMProviders] = useState<LanguageModelProvider[]>([]);
 
 	useEffect(() => {
 		workflowDesignerRef.current
@@ -231,7 +231,6 @@ export function WorkflowDesignerProvider({
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
 							Date.now(),
-							result.generatedTitle,
 						);
 						fileContents = [
 							...fileContents.filter((file) => file.id !== uploadedFileData.id),
