@@ -17,13 +17,23 @@ export function AgentTimeUsageForFreePlan({
 		"Your free plan limit is almost reached. Upgrade to Pro for unlimited usage.";
 	const overLimitMessage =
 		"You've reached your free plan limit. Please upgrade to continue using the service.";
+	if (settingsV2Mode) {
+		return (
+			<AgentTimeUsage
+				usedMinutes={usedMinutes}
+				includedMinutes={includedMinutes}
+				warningMessage={warningMessage}
+				overLimitMessage={overLimitMessage}
+				settingsV2Mode={settingsV2Mode}
+			/>
+		);
+	}
 	return (
 		<AgentTimeUsage
 			usedMinutes={usedMinutes}
 			includedMinutes={includedMinutes}
 			warningMessage={warningMessage}
 			overLimitMessage={overLimitMessage}
-			{...(settingsV2Mode && { settingsV2Mode })}
 		/>
 	);
 }
@@ -36,14 +46,23 @@ export function AgentTimeUsageForProPlan({
 	const warningMessage =
 		"Getting close to your monthly limit. Usage beyond this limit will be billed additionally";
 	const overLimitMessage = "Additional minutes are subject to extra charges";
-
+	if (settingsV2Mode) {
+		return (
+			<AgentTimeUsage
+				usedMinutes={usedMinutes}
+				includedMinutes={includedMinutes}
+				warningMessage={warningMessage}
+				overLimitMessage={overLimitMessage}
+				settingsV2Mode={settingsV2Mode}
+			/>
+		);
+	}
 	return (
 		<AgentTimeUsage
 			usedMinutes={usedMinutes}
 			includedMinutes={includedMinutes}
 			warningMessage={warningMessage}
 			overLimitMessage={overLimitMessage}
-			{...(settingsV2Mode && { settingsV2Mode })}
 		/>
 	);
 }
