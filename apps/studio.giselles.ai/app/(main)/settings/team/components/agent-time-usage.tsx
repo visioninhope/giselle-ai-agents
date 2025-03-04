@@ -101,7 +101,7 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 	if (settingsV2Mode) {
 		return (
 			<>
-				<div className="flex justify-between items-baseline font-avenir">
+				<div className="flex justify-between items-baseline">
 					<h2 className="text-white-400 font-medium text-[16px] leading-[27.2px] tracking-normal font-hubotSans">
 						Agent Time
 					</h2>
