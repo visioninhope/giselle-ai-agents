@@ -9,8 +9,6 @@ import type { GiselleEngineHandlerArgs } from "./types";
 
 const Input = uploadFile.Input;
 type Input = z.infer<typeof Input>;
-const Output = uploadFile.Output;
-type Output = z.infer<typeof Output>;
 
 async function uploadToOpenAI(fileBlob: File, openAiVectorStoreId: string) {
 	const file = await openai.files.create({

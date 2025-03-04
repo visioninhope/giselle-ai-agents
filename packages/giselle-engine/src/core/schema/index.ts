@@ -60,9 +60,6 @@ export const uploadFile = {
 		fileId: FileId.schema,
 		fileName: z.string(),
 	}),
-	Output: z.object({
-		generatedTitle: z.string(),
-	}),
 };
 
 export const removeFile = {
