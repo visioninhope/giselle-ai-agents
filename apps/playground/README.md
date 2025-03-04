@@ -37,8 +37,6 @@
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
-- [ ] Model catalog
-- [ ] Model catalog UI
 - [ ] API Middleware
 - [ ] API Auth
 - [ ] API Rate Limit
@@ -56,6 +54,8 @@
 
 ## Done
 
+- [x] Model catalog
+- [x] Model catalog UI
 - [x] Writing getting started
 - [x] LLM Provider from .env
 - [x] Remove upload file name inference
