@@ -1,4 +1,4 @@
-import type { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
+import type { FileCategory } from "@giselle-sdk/data-type";
 import type { LanguageModel } from "@giselle-sdk/language-models";
 
 interface ToolBase {

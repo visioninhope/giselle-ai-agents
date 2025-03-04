@@ -1,4 +1,4 @@
-import type { LLMProvider } from "@giselle-sdk/data-type";
+import type { LanguageModelProvider } from "@giselle-sdk/language-models";
 import type { Storage } from "unstorage";
 import { z } from "zod";
 import { addGenerationHandler } from "./handlers/add-generation";
@@ -46,7 +46,7 @@ export interface GiselleEngineRequest {
 export interface GiselleEngineConfig {
 	basePath: string;
 	storage: Storage;
-	llmProviders?: LLMProvider[];
+	llmProviders?: LanguageModelProvider[];
 }
 
 async function toGiselleEngineRequest(

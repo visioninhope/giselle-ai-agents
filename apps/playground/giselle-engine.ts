@@ -1,4 +1,4 @@
-import type { LLMProvider } from "@giselle-sdk/data-type";
+import type { LanguageModelProvider } from "giselle-sdk";
 import { NextGiselleEngine } from "giselle-sdk/next";
 
 import { createStorage } from "unstorage";
@@ -18,7 +18,7 @@ const storage = createStorage({
 			}),
 });
 
-const llmProviders: LLMProvider[] = [];
+const llmProviders: LanguageModelProvider[] = [];
 if (process.env.OPENAI_API_KEY) {
 	llmProviders.push("openai");
 }

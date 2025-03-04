@@ -755,6 +755,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:^
         version: link:../giselle-engine
+      '@giselle-sdk/language-models':
+        specifier: workspace:^
+        version: link:../language-model
       '@giselle-sdk/workspace':
         specifier: workspace:^
         version: link:../workspace
@@ -929,6 +932,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../giselle-engine
+      '@giselle-sdk/language-models':
+        specifier: workspace:^
+        version: link:../language-model
       '@giselle-sdk/run':
         specifier: workspace:^
         version: link:../run

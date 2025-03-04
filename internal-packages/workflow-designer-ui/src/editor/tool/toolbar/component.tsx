@@ -1,6 +1,6 @@
 "use client";
 
-import { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
+import { FileCategory } from "@giselle-sdk/data-type";
 import {
 	Capability,
 	type LanguageModel,
@@ -11,7 +11,7 @@ import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
-import { type ReactNode, useMemo } from "react";
+import type { ReactNode } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,

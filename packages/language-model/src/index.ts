@@ -35,3 +35,10 @@ export {
 	openaiLanguageModels,
 	googleLanguageModels,
 };
+
+export const LanguageModelProviders = z.enum([
+	AnthropicLanguageModel.shape.provider.value,
+	GoogleLanguageModel.shape.provider.value,
+	OpenAILanguageModel.shape.provider.value,
+]);
+export type LanguageModelProvider = z.infer<typeof LanguageModelProviders>;
