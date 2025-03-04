@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
+import { settingsV2Flag } from "@/flags";
+import { cn } from "@/lib/utils";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Suspense } from "react";
@@ -32,17 +34,22 @@ export const metadata: Metadata = {
 	},
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: React.ReactNode;
 }>) {
+	const settingsV2Mode = await settingsV2Flag();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<GoogleTagManager gtmId={process.env.GTM_ID ?? ""} />
 			<PHProvider>
 				<body
-					className={`${rosart.variable} ${hubotSans.variable} ${geist.variable} font-sans`}
+					className={cn(
+						`${rosart.variable}  font-sans`,
+						settingsV2Mode ? `${hubotSans.variable} ${geist.variable}` : "",
+					)}
 				>
 					<ThemeProvider
 						attribute="class"
