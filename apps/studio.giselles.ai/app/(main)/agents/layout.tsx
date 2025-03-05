@@ -5,9 +5,9 @@ import { fetchCurrentTeam } from "@/services/teams";
 import { putGraph } from "@giselles-ai/actions";
 import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
-import { callCreateWorkspaceApi } from "giselle-sdk";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
+import { giselleEngine } from "../../giselle-engine";
 import { CreateAgentButton } from "./components";
 
 export default function Layout({
@@ -24,7 +24,7 @@ export default function Layout({
 		const team = await fetchCurrentTeam();
 		const enableNewUi = await newUiFlag();
 		if (enableNewUi) {
-			const workspace = await callCreateWorkspaceApi();
+			const workspace = await giselleEngine.createWorkspace();
 			await db.insert(agents).values({
 				id: agentId,
 				teamDbId: team.dbId,
