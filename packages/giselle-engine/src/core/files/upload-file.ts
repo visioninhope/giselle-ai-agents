@@ -1,6 +1,6 @@
 import type { FileId, WorkspaceId } from "@giselle-sdk/data-type";
-import { filePath } from "../helpers/workspace-path";
 import type { GiselleEngineContext } from "../types";
+import { filePath } from "./utils";
 
 export async function uploadFile(args: {
 	context: GiselleEngineContext;

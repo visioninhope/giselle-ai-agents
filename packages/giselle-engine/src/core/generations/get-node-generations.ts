@@ -1,6 +1,6 @@
 import type { GenerationOrigin, NodeId } from "@giselle-sdk/data-type";
-import { getGeneration, getNodeGenerationIndexes } from "../helpers";
 import type { GiselleEngineContext } from "../types";
+import { getGeneration, getNodeGenerationIndexes } from "./utils";
 
 const limit = 10;
 

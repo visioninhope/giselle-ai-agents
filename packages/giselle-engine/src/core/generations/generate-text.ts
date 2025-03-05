@@ -11,16 +11,16 @@ import type {
 } from "@giselle-sdk/data-type";
 import type { LanguageModel } from "@giselle-sdk/language-model";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { filePath } from "../files/utils";
+import type { GiselleEngineContext } from "../types";
 import {
 	buildMessageObject,
-	filePath,
 	getGeneration,
 	getNodeGenerationIndexes,
 	setGeneration,
 	setGenerationIndex,
 	setNodeGenerationIndex,
-} from "../helpers";
-import type { GiselleEngineContext } from "../types";
+} from "./utils";
 
 export async function generateText(args: {
 	context: GiselleEngineContext;

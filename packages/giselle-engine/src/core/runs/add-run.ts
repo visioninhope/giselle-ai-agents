@@ -1,14 +1,15 @@
-import type {
-	CreatedRun,
-	QueuedRun,
-	RunId,
-	WorkflowId,
-	WorkspaceId,
+import {
+	type CreatedRun,
+	type QueuedRun,
+	type RunId,
+	type WorkflowId,
+	type WorkspaceId,
+	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
-import { createWorkspace, getWorkspace } from "../helpers";
-import { setRun } from "../helpers/run";
 import type { GiselleEngineContext } from "../types";
+import { getWorkspace } from "../workspaces/utils";
+import { setRun } from "./utils";
 
 export async function addRun(args: {
 	workspaceId: WorkspaceId;
@@ -31,7 +32,7 @@ export async function addRun(args: {
 		throw new Error("Workflow not found");
 	}
 
-	const runWorkspace = await createWorkspace();
+	const runWorkspace = generateInitialWorkspace();
 	/** @todo upload openai file to vector store */
 	const queuedRun = {
 		...args.run,

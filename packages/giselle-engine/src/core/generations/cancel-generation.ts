@@ -1,10 +1,6 @@
 import type { CancelledGeneration, GenerationId } from "@giselle-sdk/data-type";
-import {
-	getGeneration,
-	setGeneration,
-	setNodeGenerationIndex,
-} from "../helpers";
 import type { GiselleEngineContext } from "../types";
+import { getGeneration, setGeneration, setNodeGenerationIndex } from "./utils";
 
 export async function cancelGeneration(args: {
 	context: GiselleEngineContext;

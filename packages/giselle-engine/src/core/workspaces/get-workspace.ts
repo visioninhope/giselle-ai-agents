@@ -1,6 +1,6 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
-import { getWorkspace as getWorkspaceInternal } from "../helpers/get-workspace";
 import type { GiselleEngineContext } from "../types";
+import { getWorkspace as getWorkspaceInternal } from "./utils";
 
 export async function getWorkspace(args: {
 	context: GiselleEngineContext;

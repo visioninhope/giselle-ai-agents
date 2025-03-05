@@ -1,6 +1,6 @@
 import type { RunId, RunningRun } from "@giselle-sdk/data-type";
-import { getRun, setRun } from "../helpers/run";
 import type { GiselleEngineContext } from "../types";
+import { getRun, setRun } from "./utils";
 
 export async function startRun(args: {
 	runId: RunId;

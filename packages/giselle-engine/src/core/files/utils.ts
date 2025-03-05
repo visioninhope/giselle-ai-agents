@@ -1,12 +1,4 @@
-import type {
-	FileId,
-	GenerationOrigin,
-	WorkspaceId,
-} from "@giselle-sdk/data-type";
-
-export function workspacePath(workspaceId: WorkspaceId) {
-	return `workspaces/${workspaceId}/workspace.json`;
-}
+import type { FileId, GenerationOrigin } from "@giselle-sdk/data-type";
 
 export function filePath(
 	params: { fileId: FileId; fileName: string } & GenerationOrigin,

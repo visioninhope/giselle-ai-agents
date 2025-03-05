@@ -1,6 +1,6 @@
 import type { GenerationId } from "@giselle-sdk/data-type";
-import { getGeneration as getGenerationInternal } from "../helpers";
 import type { GiselleEngineContext } from "../types";
+import { getGeneration as getGenerationInternal } from "./utils";
 
 export async function getGeneration(args: {
 	context: GiselleEngineContext;
