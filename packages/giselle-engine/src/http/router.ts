@@ -1,4 +1,7 @@
 import {
+	GenerationId,
+	GenerationOrigin,
+	NodeId,
 	QueuedGeneration,
 	Workspace,
 	WorkspaceId,
@@ -48,6 +51,30 @@ export const createRouters = {
 			handler: async ({ input }) => {
 				const stream = await giselleEngine.generateText(input.generation);
 				return stream.toDataStreamResponse();
+			},
+		}),
+	getGeneration: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ generationId: GenerationId.schema }),
+			handler: async ({ input }) => {
+				const generation = await giselleEngine.getGeneration(
+					input.generationId,
+				);
+				return JsonResponse.json(generation);
+			},
+		}),
+	getNodeGenerations: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				origin: GenerationOrigin,
+				nodeId: NodeId.schema,
+			}),
+			handler: async ({ input }) => {
+				const generations = await giselleEngine.getNodeGenerations(
+					input.origin,
+					input.nodeId,
+				);
+				return JsonResponse.json(generations);
 			},
 		}),
 } as const;

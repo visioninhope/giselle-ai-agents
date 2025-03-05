@@ -1,10 +1,13 @@
 import type {
+	GenerationId,
+	GenerationOrigin,
+	NodeId,
 	QueuedGeneration,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { generateText } from "./generations/generate-text";
+import { generateText, getGeneration, getNodeGenerations } from "./generations";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
 export * from "./types";
@@ -32,6 +35,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 				generation,
 			});
+		},
+		getGeneration: async (generationId: GenerationId) => {
+			return await getGeneration({ context, generationId });
+		},
+		getNodeGenerations: async (origin: GenerationOrigin, nodeId: NodeId) => {
+			return await getNodeGenerations({ context, origin, nodeId });
 		},
 	};
 }
