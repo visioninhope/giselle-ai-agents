@@ -77,6 +77,16 @@ export const createRouters = {
 				return JsonResponse.json(generations);
 			},
 		}),
+	cancelGeneration: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ generationId: GenerationId.schema }),
+			handler: async ({ input }) => {
+				const generation = await giselleEngine.cancelGeneration(
+					input.generationId,
+				);
+				return JsonResponse.json(generation);
+			},
+		}),
 } as const;
 
 export const routerPaths = Object.keys(createRouters) as RouterPaths[];

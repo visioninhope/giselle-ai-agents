@@ -11,7 +11,6 @@ import {
 	type QueuedGeneration,
 	type RunningGeneration,
 } from "@giselle-sdk/data-type";
-import { callCancelGenerationApi } from "@giselle-sdk/giselle-engine/client";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import type { Message } from "ai";
 import {
@@ -329,7 +328,7 @@ export function GenerationRunnerSystemProvider({
 						} as CancelledGeneration;
 					}),
 				);
-				await callCancelGenerationApi({
+				await client.cancelGeneration({
 					generationId,
 				});
 			}
@@ -341,7 +340,7 @@ export function GenerationRunnerSystemProvider({
 				cancelledAt: Date.now(),
 			} as CancelledGeneration;
 		},
-		[stopHandlers],
+		[stopHandlers, client],
 	);
 
 	return (

@@ -7,7 +7,12 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { generateText, getGeneration, getNodeGenerations } from "./generations";
+import {
+	cancelGeneration,
+	generateText,
+	getGeneration,
+	getNodeGenerations,
+} from "./generations";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
 export * from "./types";
@@ -41,6 +46,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		getNodeGenerations: async (origin: GenerationOrigin, nodeId: NodeId) => {
 			return await getNodeGenerations({ context, origin, nodeId });
+		},
+		cancelGeneration: async (generationId: GenerationId) => {
+			return await cancelGeneration({ context, generationId });
 		},
 	};
 }
