@@ -8,7 +8,7 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist next react client node_modules schema"
+		"clean": "rm -rf .turbo dist next react node_modules"
 	},
 	"exports": {
 		"./package.json": "./package.json",
