@@ -35,6 +35,7 @@
 ## Tasks
 
 - [ ] Support server action
+- [ ] Split stream route
 - [ ] Copy button
 - [ ] Run detail route
 - [ ] Webclip Node

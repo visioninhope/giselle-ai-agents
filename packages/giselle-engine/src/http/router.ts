@@ -1,5 +1,6 @@
 import {
 	CreatedRun,
+	FileId,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
@@ -14,7 +15,7 @@ import type { GiselleEngine } from "../core";
 import { JsonResponse } from "../utils";
 import { createHandler } from "./create-handler";
 
-export const createRouters = {
+export const createJsonRouters = {
 	createWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			handler: async () => {
@@ -117,16 +118,57 @@ export const createRouters = {
 		}),
 } as const;
 
-export const routerPaths = Object.keys(createRouters) as RouterPaths[];
+export const jsonRouterPaths = Object.keys(
+	createJsonRouters,
+) as JsonRouterPaths[];
 
 // Export the types at module level
-export type RouterPaths = keyof typeof createRouters;
-export type RouterHandlers = {
-	[P in RouterPaths]: ReturnType<(typeof createRouters)[P]>;
+export type JsonRouterPaths = keyof typeof createJsonRouters;
+export type JsonRouterHandlers = {
+	[P in JsonRouterPaths]: ReturnType<(typeof createJsonRouters)[P]>;
 };
-export type RouterInput = {
-	[P in RouterPaths]: Parameters<RouterHandlers[P]>[0]["input"];
+export type JsonRouterInput = {
+	[P in JsonRouterPaths]: Parameters<JsonRouterHandlers[P]>[0]["input"];
 };
-export function isRouterPath(path: string): path is RouterPaths {
-	return path in createRouters;
+export function isJsonRouterPath(path: string): path is JsonRouterPaths {
+	return path in createJsonRouters;
+}
+
+export const createFormDataRouters = {
+	uploadFile: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				fileId: FileId.schema,
+				fileName: z.string(),
+				file: z.instanceof(File),
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.uploadFile(
+					input.file,
+					input.workspaceId,
+					input.fileId,
+					input.fileName,
+				);
+				return new Response(null, { status: 202 });
+			},
+		}),
+} as const;
+
+export const formDataRouterPaths = Object.keys(
+	createFormDataRouters,
+) as JsonRouterPaths[];
+
+// Export the types at module level
+export type FormDataRouterPaths = keyof typeof createFormDataRouters;
+export type FormDataRouterHandlers = {
+	[P in FormDataRouterPaths]: ReturnType<(typeof createFormDataRouters)[P]>;
+};
+export type FormDataRouterInput = {
+	[P in FormDataRouterPaths]: Parameters<FormDataRouterHandlers[P]>[0]["input"];
+};
+export function isFormDataRouterPath(
+	path: string,
+): path is FormDataRouterPaths {
+	return path in createFormDataRouters;
 }

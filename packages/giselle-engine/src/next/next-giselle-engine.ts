@@ -1,5 +1,12 @@
 import { GiselleEngine, type GiselleEngineConfig } from "../core";
-import { type RouterHandlers, createRouters, isRouterPath } from "../http";
+import {
+	type FormDataRouterHandlers,
+	type JsonRouterHandlers,
+	createFormDataRouters,
+	createJsonRouters,
+	isFormDataRouterPath,
+	isJsonRouterPath,
+} from "../http";
 
 interface NextGiselleEngineConfig extends GiselleEngineConfig {
 	basePath: string;
@@ -34,13 +41,18 @@ function createHttpHandler({
 	giselleEngine: GiselleEngine;
 	basePath: NextGiselleEngineConfig["basePath"];
 }) {
-	// Create the router using a for...of loop
-	const router: RouterHandlers = {} as RouterHandlers;
-
-	for (const [path, createRoute] of Object.entries(createRouters)) {
-		if (isRouterPath(path)) {
+	const jsonRouter: JsonRouterHandlers = {} as JsonRouterHandlers;
+	for (const [path, createRoute] of Object.entries(createJsonRouters)) {
+		if (isJsonRouterPath(path)) {
 			// @ts-expect-error
-			router[path] = createRoute(giselleEngine);
+			jsonRouter[path] = createRoute(giselleEngine);
+		}
+	}
+
+	const formDataRouter: FormDataRouterHandlers = {} as FormDataRouterHandlers;
+	for (const [path, createRoute] of Object.entries(createFormDataRouters)) {
+		if (isFormDataRouterPath(path)) {
+			formDataRouter[path] = createRoute(giselleEngine);
 		}
 	}
 
@@ -63,14 +75,19 @@ function createHttpHandler({
 
 		const [routerPath] = segments;
 
-		if (!isRouterPath(routerPath)) {
-			throw new Error(`Invalid router path at ${pathname}`);
+		if (isJsonRouterPath(routerPath)) {
+			return await jsonRouter[routerPath]({
+				// @ts-expect-error
+				input: await getBody(request),
+			});
 		}
-
-		return await router[routerPath]({
-			// @ts-expect-error
-			input: await getBody(request),
-		});
+		if (isFormDataRouterPath(routerPath)) {
+			return await formDataRouter[routerPath]({
+				// @ts-expect-error
+				input: await getBody(request),
+			});
+		}
+		throw new Error(`Invalid router path at ${pathname}`);
 	};
 }
 

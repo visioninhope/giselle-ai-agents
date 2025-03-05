@@ -216,10 +216,12 @@ export function WorkflowDesignerProvider({
 						updateNodeDataContent(node, {
 							files: fileContents,
 						});
-						const result = await workflowDesignerRef.current.uploadFile(
+						await client.uploadFile({
+							workspaceId: data.id,
 							file,
-							uploadingFileData.id,
-						);
+							fileId: uploadingFileData.id,
+							fileName: file.name,
+						});
 
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
@@ -236,7 +238,7 @@ export function WorkflowDesignerProvider({
 				}),
 			);
 		},
-		[updateNodeDataContent],
+		[updateNodeDataContent, client, data.id],
 	);
 
 	const removeFile = useCallback(

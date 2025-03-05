@@ -12,10 +12,7 @@ import {
 	type Workspace,
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
-import {
-	callRemoveFileApi,
-	callUploadFileApi,
-} from "@giselle-sdk/giselle-engine/client";
+import { callRemoveFileApi } from "@giselle-sdk/giselle-engine/client";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
 
 interface AddNodeOptions {
@@ -132,15 +129,6 @@ export function WorkflowDesigner({
 		updateWorkflowMap();
 		return deleteNode;
 	}
-	async function uploadFile(file: File, fileId: FileId) {
-		return await callUploadFileApi({
-			api: uploadFileApi,
-			workspaceId: defaultValue.id,
-			file,
-			fileId,
-			fileName: file.name,
-		});
-	}
 	async function removeFile(uploadedFile: UploadedFileData) {
 		await callRemoveFileApi({
 			api: removeFileApi,
@@ -161,7 +149,6 @@ export function WorkflowDesigner({
 		setUiViewport,
 		deleteNode,
 		deleteConnection,
-		uploadFile,
 		removeFile,
 		updateName,
 	};

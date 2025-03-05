@@ -1,5 +1,6 @@
 import type {
 	CreatedRun,
+	FileId,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
@@ -10,6 +11,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
+import { uploadFile } from "./files";
 import {
 	cancelGeneration,
 	generateText,
@@ -63,6 +65,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		startRun: async (runId: RunId) => {
 			return await startRun({ context, runId });
+		},
+		uploadFile: async (
+			file: File,
+			workspaceId: WorkspaceId,
+			fileId: FileId,
+			fileName: string,
+		) => {
+			return await uploadFile({ context, file, workspaceId, fileId, fileName });
 		},
 	};
 }
