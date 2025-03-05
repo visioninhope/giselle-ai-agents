@@ -1,5 +1,5 @@
 import type { z } from "zod";
-import type { GiselleEngineContext } from "./types";
+import type { GiselleEngineContext } from "../core";
 
 /**
  * Type definition for handler arguments that conditionally includes input
@@ -19,7 +19,7 @@ type HandlerArgs<TSchema> = TSchema extends z.AnyZodObject
  */
 type HandlerInputArgs<TSchema> = TSchema extends z.AnyZodObject
 	? {
-			input: unknown;
+			input: TSchema;
 			context: GiselleEngineContext;
 		}
 	: {
@@ -43,7 +43,7 @@ export function createHandler<
 	input?: TSchema;
 	handler: (args: HandlerArgs<TSchema>) => TOutput;
 }) {
-	return async (args: HandlerInputArgs<TSchema>): Promise<TOutput> => {
+	return async (args: HandlerInputArgs<TSchema>): Promise<Awaited<TOutput>> => {
 		if (input !== undefined) {
 			// Validate input against schema
 			const validatedInput = input.parse(args.input);

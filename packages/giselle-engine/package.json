@@ -43,6 +43,7 @@
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/utils": "workspace:*",
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"@types/react": "catalog:",
 		"tsup": "catalog:"
 	},
 	"dependencies": {
@@ -54,6 +55,7 @@
 		"ai": "catalog:",
 		"next": "catalog:",
 		"openai": "catalog:",
+		"react": "catalog:",
 		"unstorage": "catalog:",
 		"zod": "catalog:"
 	}

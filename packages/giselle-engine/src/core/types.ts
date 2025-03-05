@@ -5,3 +5,8 @@ export interface GiselleEngineContext {
 	storage: Storage;
 	llmProviders: LanguageModelProvider[];
 }
+
+export interface GiselleEngineConfig {
+	storage: Storage;
+	llmProviders?: LanguageModelProvider[];
+}
