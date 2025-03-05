@@ -12,7 +12,6 @@ import {
 	type Workspace,
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
-import { callRemoveFileApi } from "@giselle-sdk/giselle-engine/client";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
 
 interface AddNodeOptions {
