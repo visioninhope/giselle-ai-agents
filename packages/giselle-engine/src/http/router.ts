@@ -1,7 +1,7 @@
-import { QueuedGeneration } from "@giselle-sdk/data-type";
-import { NextResponse } from "next/server";
+import { QueuedGeneration, WorkspaceId } from "@giselle-sdk/data-type";
 import { z } from "zod";
 import type { GiselleEngine } from "../core";
+import { JsonResponse } from "../utils";
 import { createHandler } from "./create-handler";
 
 export const createRouters = {
@@ -9,7 +9,15 @@ export const createRouters = {
 		createHandler({
 			handler: async () => {
 				const workspace = await giselleEngine.createWorkspace();
-				return NextResponse.json(workspace);
+				return JsonResponse.json(workspace);
+			},
+		}),
+	getWorkspace: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ workspaceId: WorkspaceId.schema }),
+			handler: async ({ input }) => {
+				const workspace = await giselleEngine.getWorkspace(input.workspaceId);
+				return JsonResponse.json(workspace);
 			},
 		}),
 	generateText: (giselleEngine: GiselleEngine) =>

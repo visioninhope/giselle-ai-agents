@@ -8,7 +8,7 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist next node_modules schema"
+		"clean": "rm -rf .turbo dist next react client node_modules schema"
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -23,6 +23,12 @@
 			"import": "./next/dist/index.mjs",
 			"require": "./next/dist/index.js",
 			"default": "./next/dist/index.js"
+		},
+		"./react": {
+			"types": "./react/dist/index.d.ts",
+			"import": "./react/dist/index.mjs",
+			"require": "./react/dist/index.js",
+			"default": "./react/dist/index.js"
 		},
 		"./next-internal": "./src/next/index.ts",
 		"./schema": {

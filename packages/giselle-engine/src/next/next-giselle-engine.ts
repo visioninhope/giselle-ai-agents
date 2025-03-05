@@ -1,5 +1,5 @@
 import { GiselleEngine, type GiselleEngineConfig } from "../core";
-import { type RouterHandlers, createRouters, isRouterPath } from "./router";
+import { type RouterHandlers, createRouters, isRouterPath } from "../http";
 
 interface NextGiselleEngineConfig extends GiselleEngineConfig {
 	basePath: string;

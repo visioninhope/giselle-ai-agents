@@ -1,4 +1,3 @@
-import type { NextResponse } from "next/server";
 import { useCallback, useMemo } from "react";
 import type { AnyZodObject, z } from "zod";
 import {
@@ -6,13 +5,14 @@ import {
 	type RouterInput,
 	type RouterPaths,
 	routerPaths,
-} from "./router";
+} from "../http/router";
+import type { JsonResponse } from "../utils";
 
 type FetchOptions = {
 	baseUrl?: string;
 };
 
-type ExtractResponseData<T> = T extends NextResponse<infer U>
+type ExtractResponseData<T> = T extends JsonResponse<infer U>
 	? U
 	: T extends Promise<infer U>
 		? U

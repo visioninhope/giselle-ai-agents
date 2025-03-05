@@ -1,7 +1,7 @@
-import type { QueuedGeneration } from "@giselle-sdk/data-type";
+import type { QueuedGeneration, WorkspaceId } from "@giselle-sdk/data-type";
 import { generateText } from "./generations/generate-text";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
-import { createWorkspace } from "./workspaces";
+import { createWorkspace, getWorkspace } from "./workspaces";
 export * from "./types";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
@@ -12,6 +12,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 	return {
 		createWorkspace: async () => {
 			return await createWorkspace({ context });
+		},
+		getWorkspace: async (workspaceId: WorkspaceId) => {
+			return await getWorkspace({ context, workspaceId });
 		},
 		generateText: async (generation: QueuedGeneration) => {
 			return await generateText({
