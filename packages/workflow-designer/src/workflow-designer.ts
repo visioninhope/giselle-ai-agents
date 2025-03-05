@@ -22,15 +22,8 @@ export type WorkflowDesigner = ReturnType<typeof WorkflowDesigner>;
 
 export function WorkflowDesigner({
 	defaultValue = generateInitialWorkspace(),
-	uploadFileApi = "/api/giselle/upload-file",
-	removeFileApi = "/api/giselle/remove-file",
 }: {
 	defaultValue?: Workspace;
-	uploadFileApi?: string;
-	removeFileApi?: string;
-	createOpenAiVectorStoreApi?: string;
-	getNodeArtifactsApi?: string;
-	getArtifactApi?: string;
 }) {
 	let nodes = defaultValue.nodes;
 	let connections = defaultValue.connections;
@@ -128,13 +121,6 @@ export function WorkflowDesigner({
 		updateWorkflowMap();
 		return deleteNode;
 	}
-	async function removeFile(uploadedFile: UploadedFileData) {
-		await callRemoveFileApi({
-			api: removeFileApi,
-			workspaceId: defaultValue.id,
-			uploadedFile,
-		});
-	}
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
@@ -148,7 +134,6 @@ export function WorkflowDesigner({
 		setUiViewport,
 		deleteNode,
 		deleteConnection,
-		removeFile,
 		updateName,
 	};
 }

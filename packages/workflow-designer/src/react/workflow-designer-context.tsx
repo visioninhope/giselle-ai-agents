@@ -27,7 +27,6 @@ export interface WorkflowDesignerContextValue
 			| "updateNodeData"
 			| "addConnection"
 			| "deleteConnection"
-			| "removeFile"
 			| "setUiViewport"
 			| "updateName"
 		>,
@@ -45,6 +44,7 @@ export interface WorkflowDesignerContextValue
 		content: Partial<T["content"]>,
 	) => void;
 	uploadFile: (files: File[], node: FileNode) => Promise<void>;
+	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
