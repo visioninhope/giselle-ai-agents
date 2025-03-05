@@ -13,12 +13,10 @@ import {
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
 import {
-	callGetLLMProvidersApi,
 	callRemoveFileApi,
 	callSaveWorkspaceApi,
 	callUploadFileApi,
 } from "@giselle-sdk/giselle-engine/client";
-import { getLLMProviders } from "@giselle-sdk/giselle-engine/schema";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
 
 interface AddNodeOptions {
@@ -32,14 +30,12 @@ export function WorkflowDesigner({
 	saveWorkflowApi = "/api/giselle/save-workspace",
 	uploadFileApi = "/api/giselle/upload-file",
 	removeFileApi = "/api/giselle/remove-file",
-	getLLMProvidersApi = getLLMProviders.defaultApi,
 }: {
 	defaultValue?: Workspace;
 	saveWorkflowApi?: string;
 	uploadFileApi?: string;
 	removeFileApi?: string;
 	createOpenAiVectorStoreApi?: string;
-	getLLMProvidersApi?: string;
 	getNodeArtifactsApi?: string;
 	getArtifactApi?: string;
 }) {
@@ -162,11 +158,6 @@ export function WorkflowDesigner({
 			workspace: getData(),
 		});
 	}
-	async function getAvailableLLMProviders() {
-		const result = await callGetLLMProvidersApi({ api: getLLMProvidersApi });
-		return result.llmProviders;
-	}
-
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
@@ -183,7 +174,6 @@ export function WorkflowDesigner({
 		uploadFile,
 		saveWorkspace,
 		removeFile,
-		getAvailableLLMProviders,
 		updateName,
 	};
 }

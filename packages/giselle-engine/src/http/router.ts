@@ -1,6 +1,7 @@
 import { QueuedGeneration, WorkspaceId } from "@giselle-sdk/data-type";
 import { z } from "zod";
 import type { GiselleEngine } from "../core";
+import { getLanguageModelProviders } from "../core/configurations/get-language-model-providers";
 import { JsonResponse } from "../utils";
 import { createHandler } from "./create-handler";
 
@@ -18,6 +19,13 @@ export const createRouters = {
 			handler: async ({ input }) => {
 				const workspace = await giselleEngine.getWorkspace(input.workspaceId);
 				return JsonResponse.json(workspace);
+			},
+		}),
+	getLanguageModelProviders: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const providers = await giselleEngine.getLanguageModelProviders();
+				return JsonResponse.json(providers);
 			},
 		}),
 	generateText: (giselleEngine: GiselleEngine) =>

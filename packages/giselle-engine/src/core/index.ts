@@ -1,4 +1,5 @@
 import type { QueuedGeneration, WorkspaceId } from "@giselle-sdk/data-type";
+import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { generateText } from "./generations/generate-text";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace } from "./workspaces";
@@ -15,6 +16,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		getWorkspace: async (workspaceId: WorkspaceId) => {
 			return await getWorkspace({ context, workspaceId });
+		},
+		getLanguageModelProviders: async () => {
+			return await getLanguageModelProviders({ context });
 		},
 		generateText: async (generation: QueuedGeneration) => {
 			return await generateText({

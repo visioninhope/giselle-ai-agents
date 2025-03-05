@@ -13,6 +13,7 @@ import {
 	createUploadingFileData,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
@@ -76,17 +77,18 @@ export function WorkflowDesignerProvider({
 			saveWorkflowApi,
 		}),
 	);
+	const client = useGiselleEngine();
 	const [workspace, setWorkspaceInternal] = useState(data);
 	const persistTimeoutRef = useRef<Timer | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [llmProviders, setLLMProviders] = useState<LanguageModelProvider[]>([]);
 
 	useEffect(() => {
-		workflowDesignerRef.current
-			.getAvailableLLMProviders()
+		client
+			.getLanguageModelProviders()
 			.then(setLLMProviders)
 			.then(() => setIsLoading(false));
-	}, []);
+	}, [client]);
 
 	const saveWorkspace = useCallback(async () => {
 		try {
