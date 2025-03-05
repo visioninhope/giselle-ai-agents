@@ -83,11 +83,13 @@ export function WorkflowDesignerProvider({
 
 	const saveWorkspace = useCallback(async () => {
 		try {
-			await client.updateWorkspace({ workspace });
+			await client.updateWorkspace({
+				workspace: workflowDesignerRef.current.getData(),
+			});
 		} catch (error) {
 			console.error("Failed to persist graph:", error);
 		}
-	}, [client, workspace]);
+	}, [client]);
 
 	const setWorkspace = useCallback(() => {
 		const data = workflowDesignerRef.current.getData();
@@ -243,10 +245,14 @@ export function WorkflowDesignerProvider({
 
 	const removeFile = useCallback(
 		async (uploadedFile: UploadedFileData) => {
-			await workflowDesignerRef.current.removeFile(uploadedFile);
+			await client.removeFile({
+				workspaceId: data.id,
+				fileId: uploadedFile.id,
+				fileName: uploadedFile.name,
+			});
 			setAndSaveWorkspace();
 		},
-		[setAndSaveWorkspace],
+		[setAndSaveWorkspace, client, data.id],
 	);
 
 	const usePropertiesPanelHelper = usePropertiesPanel();

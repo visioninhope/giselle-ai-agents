@@ -31,19 +31,12 @@
 			"default": "./react/dist/index.js"
 		},
 		"./next-internal": "./src/next/index.ts",
-		"./schema": {
-			"types": "./schema/dist/index.d.ts",
-			"import": "./schema/dist/index.mjs",
-			"require": "./schema/dist/index.js",
-			"default": "./schema/dist/index.js"
-		},
 		"./client": {
 			"types": "./client/dist/index.d.ts",
 			"import": "./client/dist/index.mjs",
 			"require": "./client/dist/index.js",
 			"default": "./client/dist/index.js"
-		},
-		"./client-internal": "./src/client/index.ts"
+		}
 	},
 	"devDependencies": {
 		"@giselle-sdk/data-type": "workspace:*",

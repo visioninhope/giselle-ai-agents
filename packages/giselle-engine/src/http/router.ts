@@ -116,6 +116,22 @@ export const createJsonRouters = {
 				return new Response(null, { status: 202 });
 			},
 		}),
+	removeFile: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				fileId: FileId.schema,
+				fileName: z.string(),
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.removeFile(
+					input.workspaceId,
+					input.fileId,
+					input.fileName,
+				);
+				return new Response(null, { status: 204 });
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(
