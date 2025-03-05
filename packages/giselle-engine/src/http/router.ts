@@ -1,8 +1,11 @@
 import {
+	CreatedRun,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	RunId,
+	WorkflowId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -85,6 +88,31 @@ export const createRouters = {
 					input.generationId,
 				);
 				return JsonResponse.json(generation);
+			},
+		}),
+
+	addRun: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				workflowId: WorkflowId.schema,
+				run: CreatedRun,
+			}),
+			handler: async ({ input }) => {
+				const run = await giselleEngine.addRun(
+					input.workspaceId,
+					input.workflowId,
+					input.run,
+				);
+				return JsonResponse.json(run);
+			},
+		}),
+	startRun: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ runId: RunId.schema }),
+			handler: async ({ input }) => {
+				await giselleEngine.startRun(input.runId);
+				return new Response(null, { status: 202 });
 			},
 		}),
 } as const;

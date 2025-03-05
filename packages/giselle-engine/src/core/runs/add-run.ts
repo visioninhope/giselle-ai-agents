@@ -1,30 +1,31 @@
-import type { QueuedRun, RunId, WorkspaceId } from "@giselle-sdk/data-type";
+import type {
+	CreatedRun,
+	QueuedRun,
+	RunId,
+	WorkflowId,
+	WorkspaceId,
+} from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
-import type { z } from "zod";
 import { createWorkspace, getWorkspace } from "../helpers";
 import { setRun } from "../helpers/run";
-import { addRun } from "../schema";
-import type { GiselleEngineHandlerArgs } from "./types";
+import type { GiselleEngineContext } from "../types";
 
-const Input = addRun.Input;
-type Input = z.infer<typeof Input>;
-const Output = addRun.Output;
-
-export async function addRunHandler({
-	unsafeInput,
-	context,
-}: GiselleEngineHandlerArgs<Input>) {
-	const input = Input.parse(unsafeInput);
+export async function addRun(args: {
+	workspaceId: WorkspaceId;
+	workflowId: WorkflowId;
+	run: CreatedRun;
+	context: GiselleEngineContext;
+}) {
 	const workspace = await getWorkspace({
-		storage: context.storage,
-		workspaceId: input.workspaceId,
+		storage: args.context.storage,
+		workspaceId: args.workspaceId,
 	});
 
 	if (workspace === undefined) {
 		throw new Error("Workspace not found");
 	}
 	const workflow = workspace.editingWorkflows.find(
-		(editingWorkflow) => editingWorkflow.id === input.workflowId,
+		(editingWorkflow) => editingWorkflow.id === args.workflowId,
 	);
 	if (workflow === undefined) {
 		throw new Error("Workflow not found");
@@ -33,21 +34,21 @@ export async function addRunHandler({
 	const runWorkspace = await createWorkspace();
 	/** @todo upload openai file to vector store */
 	const queuedRun = {
-		...input.run,
+		...args.run,
 		status: "queued",
 		workspaceId: runWorkspace.id,
 		workflow,
 		queuedAt: Date.now(),
 	} satisfies QueuedRun;
 	await Promise.all([
-		setRun({ run: queuedRun, storage: context.storage }),
+		setRun({ run: queuedRun, storage: args.context.storage }),
 		copyFiles({
-			storage: context.storage,
-			workspaceId: input.workspaceId,
+			storage: args.context.storage,
+			workspaceId: args.workspaceId,
 			runId: queuedRun.id,
 		}),
 	]);
-	return Output.parse({ run: queuedRun });
+	return queuedRun;
 }
 
 async function copyFiles({
@@ -59,10 +60,6 @@ async function copyFiles({
 
 	await Promise.all(
 		fileKeys.map(async (fileKey) => {
-			const dest = fileKey.replace(
-				/workspaces:wrks-\w+:files:/,
-				`runs:rs-${runId}:files:`,
-			);
 			const file = await storage.getItemRaw(fileKey);
 			await storage.setItemRaw(
 				fileKey.replace(/workspaces:wrks-\w+:files:/, `runs:${runId}:files:`),

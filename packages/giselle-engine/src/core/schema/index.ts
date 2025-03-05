@@ -27,31 +27,3 @@ export const removeFile = {
 		uploadedFile: UploadedFileData,
 	}),
 };
-
-export const runAssistant = {
-	defaultApi: "/api/giselle/run-assistant",
-	Input: z.object({
-		workspaceId: WorkspaceId.schema,
-		nodeId: NodeId.schema,
-		message: z.string(),
-	}),
-};
-
-export const addRun = {
-	defaultApi: "/api/giselle/add-run",
-	Input: z.object({
-		workspaceId: WorkspaceId.schema,
-		workflowId: WorkflowId.schema,
-		run: CreatedRun,
-	}),
-	Output: z.object({
-		run: QueuedRun,
-	}),
-};
-
-export const startRun = {
-	defaultApi: "/api/giselle/start-run",
-	Input: z.object({
-		runId: RunId.schema,
-	}),
-};

@@ -1,8 +1,11 @@
 import type {
+	CreatedRun,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	RunId,
+	WorkflowId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -13,6 +16,7 @@ import {
 	getGeneration,
 	getNodeGenerations,
 } from "./generations";
+import { addRun, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
 export * from "./types";
@@ -49,6 +53,16 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		cancelGeneration: async (generationId: GenerationId) => {
 			return await cancelGeneration({ context, generationId });
+		},
+		addRun: async (
+			workspaceId: WorkspaceId,
+			workflowId: WorkflowId,
+			run: CreatedRun,
+		) => {
+			return await addRun({ context, workspaceId, workflowId, run });
+		},
+		startRun: async (runId: RunId) => {
+			return await startRun({ context, runId });
 		},
 	};
 }

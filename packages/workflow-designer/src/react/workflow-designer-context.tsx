@@ -14,7 +14,6 @@ import {
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
-import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
@@ -36,7 +35,6 @@ export interface WorkflowDesignerContextValue
 		ReturnType<typeof useView> {
 	data: Workspace;
 	textGenerationApi: string;
-	runAssistantApi: string;
 	setUiNodeState: (
 		nodeId: string | NodeId,
 		ui: Partial<NodeUIState>,
@@ -60,7 +58,6 @@ export function WorkflowDesignerProvider({
 	children,
 	data,
 	textGenerationApi = "/api/giselle/text-generation",
-	runAssistantApi = runAssistant.defaultApi,
 	saveWorkflowDelay: defaultSaveWorkflowDelay = 1000,
 }: {
 	children: React.ReactNode;
@@ -258,7 +255,6 @@ export function WorkflowDesignerProvider({
 			value={{
 				data: workspace,
 				textGenerationApi,
-				runAssistantApi,
 				addNode,
 				addConnection,
 				updateNodeData,
