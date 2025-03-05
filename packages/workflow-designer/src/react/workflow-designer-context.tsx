@@ -59,7 +59,6 @@ type Timer = ReturnType<typeof setTimeout>;
 export function WorkflowDesignerProvider({
 	children,
 	data,
-	saveWorkflowApi = "/api/giselle/save-workspace",
 	textGenerationApi = "/api/giselle/text-generation",
 	runAssistantApi = runAssistant.defaultApi,
 	saveWorkflowDelay: defaultSaveWorkflowDelay = 1000,
@@ -71,12 +70,7 @@ export function WorkflowDesignerProvider({
 	runAssistantApi?: string;
 	saveWorkflowDelay?: number;
 }) {
-	const workflowDesignerRef = useRef(
-		WorkflowDesigner({
-			defaultValue: data,
-			saveWorkflowApi,
-		}),
-	);
+	const workflowDesignerRef = useRef(WorkflowDesigner({ defaultValue: data }));
 	const client = useGiselleEngine();
 	const [workspace, setWorkspaceInternal] = useState(data);
 	const persistTimeoutRef = useRef<Timer | null>(null);
@@ -92,11 +86,11 @@ export function WorkflowDesignerProvider({
 
 	const saveWorkspace = useCallback(async () => {
 		try {
-			await workflowDesignerRef.current.saveWorkspace();
+			await client.updateWorkspace({ workspace });
 		} catch (error) {
 			console.error("Failed to persist graph:", error);
 		}
-	}, []);
+	}, [client, workspace]);
 
 	const setWorkspace = useCallback(() => {
 		const data = workflowDesignerRef.current.getData();

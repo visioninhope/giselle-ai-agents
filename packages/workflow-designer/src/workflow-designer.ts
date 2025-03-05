@@ -14,7 +14,6 @@ import {
 } from "@giselle-sdk/data-type";
 import {
 	callRemoveFileApi,
-	callSaveWorkspaceApi,
 	callUploadFileApi,
 } from "@giselle-sdk/giselle-engine/client";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
@@ -27,12 +26,10 @@ export type WorkflowDesigner = ReturnType<typeof WorkflowDesigner>;
 
 export function WorkflowDesigner({
 	defaultValue = generateInitialWorkspace(),
-	saveWorkflowApi = "/api/giselle/save-workspace",
 	uploadFileApi = "/api/giselle/upload-file",
 	removeFileApi = "/api/giselle/remove-file",
 }: {
 	defaultValue?: Workspace;
-	saveWorkflowApi?: string;
 	uploadFileApi?: string;
 	removeFileApi?: string;
 	createOpenAiVectorStoreApi?: string;
@@ -151,13 +148,6 @@ export function WorkflowDesigner({
 			uploadedFile,
 		});
 	}
-	async function saveWorkspace() {
-		await callSaveWorkspaceApi({
-			api: saveWorkflowApi,
-			workspaceId: defaultValue.id,
-			workspace: getData(),
-		});
-	}
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
@@ -172,7 +162,6 @@ export function WorkflowDesigner({
 		deleteNode,
 		deleteConnection,
 		uploadFile,
-		saveWorkspace,
 		removeFile,
 		updateName,
 	};
