@@ -1,5 +1,6 @@
 import {
 	type ActionNode,
+	type FileContent,
 	type FileData,
 	Generation,
 	type GenerationId,
@@ -93,59 +94,17 @@ async function buildGenerationMessageForTextGeneration(
 			}
 			case "file": {
 				switch (contextNode.content.category) {
+					case "text":
 					case "pdf": {
-						const fileContents = await Promise.all(
-							contextNode.content.files.map(async (file) => {
-								if (file.status !== "uploaded") {
-									return null;
-								}
-								const data = await fileResolver(file);
-								return {
-									type: "file",
-									data,
-									mimeType: "application/pdf",
-								} satisfies FilePart;
-							}),
-						).then((results) => results.filter((result) => result !== null));
-						if (fileContents.length > 1) {
-							userMessage = userMessage.replace(
-								replaceKeyword,
-								`${getOrdinal(attachedFiles.length + 1)} ~ ${getOrdinal(attachedFiles.length + fileContents.length)} attached files`,
-							);
-						} else {
-							userMessage = userMessage.replace(
-								replaceKeyword,
-								`${getOrdinal(attachedFiles.length + 1)} attached file`,
-							);
-						}
-						attachedFiles.push(...fileContents);
-						break;
-					}
-					case "text": {
-						const fileContents = await Promise.all(
-							contextNode.content.files.map(async (file) => {
-								if (file.status !== "uploaded") {
-									return null;
-								}
-								const data = await fileResolver(file);
-								return {
-									type: "file",
-									data,
-									mimeType: file.contentType,
-								} satisfies FilePart;
-							}),
-						).then((results) => results.filter((result) => result !== null));
-						if (fileContents.length > 1) {
-							userMessage = userMessage.replace(
-								replaceKeyword,
-								`${getOrdinal(attachedFiles.length + 1)} ~ ${getOrdinal(attachedFiles.length + fileContents.length)} attached files`,
-							);
-						} else {
-							userMessage = userMessage.replace(
-								replaceKeyword,
-								`${getOrdinal(attachedFiles.length + 1)} attached file`,
-							);
-						}
+						const fileContents = await getFileContents(
+							contextNode.content,
+							fileResolver,
+						);
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							getFilesDescription(attachedFiles.length, fileContents.length),
+						);
+
 						attachedFiles.push(...fileContents);
 						break;
 					}
@@ -374,4 +333,34 @@ export async function getNodeGenerationIndexes(
 		return undefined;
 	}
 	return NodeGenerationIndex.array().parse(unsafeNodeGenerationIndexData);
+}
+
+async function getFileContents(
+	fileContent: FileContent,
+	fileResolver: (file: FileData) => Promise<DataContent>,
+): Promise<FilePart[]> {
+	return await Promise.all(
+		fileContent.files.map(async (file) => {
+			if (file.status !== "uploaded") {
+				return null;
+			}
+			const data = await fileResolver(file);
+			return {
+				type: "file",
+				data,
+				mimeType: file.type,
+			} satisfies FilePart;
+		}),
+	).then((results) => results.filter((result) => result !== null));
+}
+
+// Helper function for generating the files description
+function getFilesDescription(
+	currentCount: number,
+	newFilesCount: number,
+): string {
+	if (newFilesCount > 1) {
+		return `${getOrdinal(currentCount + 1)} ~ ${getOrdinal(currentCount + newFilesCount)} attached files`;
+	}
+	return `${getOrdinal(currentCount + 1)} attached file`;
 }
