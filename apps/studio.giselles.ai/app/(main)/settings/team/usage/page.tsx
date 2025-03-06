@@ -2,8 +2,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { settingsV2Flag } from "@/flags";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { AgentUsage } from "../agent-usage";
 import { AgentTimeCharge } from "../v2/agent-time-charge";
+import { AgentUsage } from "../v2/agent-usage";
 
 export default async function TeamUsagePage() {
 	const settingsV2Mode = await settingsV2Flag();
