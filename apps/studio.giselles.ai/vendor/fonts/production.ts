@@ -1,5 +1,5 @@
-import localFont from "next/font/local";
 import { Geist, Hubot_Sans } from "next/font/google";
+import localFont from "next/font/local";
 
 export const rosart = localFont({
 	src: [
@@ -33,11 +33,11 @@ export const rosart = localFont({
 });
 
 export const hubot = Hubot_Sans({
-  variable: "--font-hubot-sans",
-  subsets: ["latin"],
+	variable: "--font-hubot-sans",
+	subsets: ["latin"],
 });
 
 export const geist = Geist({
-  variable: "--font-geist",
-  subsets: ["latin"],
+	variable: "--font-geist",
+	subsets: ["latin"],
 });
