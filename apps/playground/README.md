@@ -34,6 +34,11 @@
 
 ## Tasks
 
+- [ ] Support server action
+- [ ] Split stream route
+- [ ] Copy button
+- [ ] Run detail route
+- [ ] Webclip Node
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title

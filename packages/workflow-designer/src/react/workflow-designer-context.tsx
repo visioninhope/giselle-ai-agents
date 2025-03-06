@@ -13,7 +13,7 @@ import {
 	createUploadingFileData,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
-import { runAssistant } from "@giselle-sdk/giselle-engine/schema";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
@@ -27,7 +27,6 @@ export interface WorkflowDesignerContextValue
 			| "updateNodeData"
 			| "addConnection"
 			| "deleteConnection"
-			| "removeFile"
 			| "setUiViewport"
 			| "updateName"
 		>,
@@ -35,7 +34,6 @@ export interface WorkflowDesignerContextValue
 		ReturnType<typeof useView> {
 	data: Workspace;
 	textGenerationApi: string;
-	runAssistantApi: string;
 	setUiNodeState: (
 		nodeId: string | NodeId,
 		ui: Partial<NodeUIState>,
@@ -46,6 +44,7 @@ export interface WorkflowDesignerContextValue
 		content: Partial<T["content"]>,
 	) => void;
 	uploadFile: (files: File[], node: FileNode) => Promise<void>;
+	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
@@ -58,9 +57,7 @@ type Timer = ReturnType<typeof setTimeout>;
 export function WorkflowDesignerProvider({
 	children,
 	data,
-	saveWorkflowApi = "/api/giselle/save-workspace",
 	textGenerationApi = "/api/giselle/text-generation",
-	runAssistantApi = runAssistant.defaultApi,
 	saveWorkflowDelay: defaultSaveWorkflowDelay = 1000,
 }: {
 	children: React.ReactNode;
@@ -70,31 +67,29 @@ export function WorkflowDesignerProvider({
 	runAssistantApi?: string;
 	saveWorkflowDelay?: number;
 }) {
-	const workflowDesignerRef = useRef(
-		WorkflowDesigner({
-			defaultValue: data,
-			saveWorkflowApi,
-		}),
-	);
+	const workflowDesignerRef = useRef(WorkflowDesigner({ defaultValue: data }));
+	const client = useGiselleEngine();
 	const [workspace, setWorkspaceInternal] = useState(data);
 	const persistTimeoutRef = useRef<Timer | null>(null);
 	const [isLoading, setIsLoading] = useState(true);
 	const [llmProviders, setLLMProviders] = useState<LanguageModelProvider[]>([]);
 
 	useEffect(() => {
-		workflowDesignerRef.current
-			.getAvailableLLMProviders()
+		client
+			.getLanguageModelProviders()
 			.then(setLLMProviders)
 			.then(() => setIsLoading(false));
-	}, []);
+	}, [client]);
 
 	const saveWorkspace = useCallback(async () => {
 		try {
-			await workflowDesignerRef.current.saveWorkspace();
+			await client.updateWorkspace({
+				workspace: workflowDesignerRef.current.getData(),
+			});
 		} catch (error) {
 			console.error("Failed to persist graph:", error);
 		}
-	}, []);
+	}, [client]);
 
 	const setWorkspace = useCallback(() => {
 		const data = workflowDesignerRef.current.getData();
@@ -223,10 +218,12 @@ export function WorkflowDesignerProvider({
 						updateNodeDataContent(node, {
 							files: fileContents,
 						});
-						const result = await workflowDesignerRef.current.uploadFile(
+						await client.uploadFile({
+							workspaceId: data.id,
 							file,
-							uploadingFileData.id,
-						);
+							fileId: uploadingFileData.id,
+							fileName: file.name,
+						});
 
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
@@ -243,15 +240,19 @@ export function WorkflowDesignerProvider({
 				}),
 			);
 		},
-		[updateNodeDataContent],
+		[updateNodeDataContent, client, data.id],
 	);
 
 	const removeFile = useCallback(
 		async (uploadedFile: UploadedFileData) => {
-			await workflowDesignerRef.current.removeFile(uploadedFile);
+			await client.removeFile({
+				workspaceId: data.id,
+				fileId: uploadedFile.id,
+				fileName: uploadedFile.name,
+			});
 			setAndSaveWorkspace();
 		},
-		[setAndSaveWorkspace],
+		[setAndSaveWorkspace, client, data.id],
 	);
 
 	const usePropertiesPanelHelper = usePropertiesPanel();
@@ -262,7 +263,6 @@ export function WorkflowDesignerProvider({
 			value={{
 				data: workspace,
 				textGenerationApi,
-				runAssistantApi,
 				addNode,
 				addConnection,
 				updateNodeData,
