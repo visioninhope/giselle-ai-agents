@@ -34,6 +34,7 @@
 
 ## Tasks
 
+- [ ] Toast UI
 - [ ] Split stream route
 - [ ] Copy button
 - [ ] Run detail route
