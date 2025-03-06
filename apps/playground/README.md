@@ -34,7 +34,6 @@
 
 ## Tasks
 
-- [ ] contentType to type
 - [ ] Toast UI
 - [ ] Split stream route
 - [ ] Copy button
@@ -60,6 +59,7 @@
 
 ## Done
 
+- [x] contentType to type
 - [x] Textfile Node
 - [x] Support server action
 - [x] Model catalog
