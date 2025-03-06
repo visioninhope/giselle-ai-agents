@@ -41,7 +41,6 @@
 - [ ] Copy button
 - [ ] Run detail route
 - [ ] Webclip Node
-- [ ] Image File
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
@@ -62,6 +61,7 @@
 
 ## Done
 
+- [x] Image File
 - [x] contentType to type
 - [x] Textfile Node
 - [x] Support server action
