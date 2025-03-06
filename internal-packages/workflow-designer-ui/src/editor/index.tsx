@@ -215,11 +215,12 @@ function NodeCanvas() {
 							case "text":
 								addNode(
 									{
-										name: "Text",
+										name: "Text Files",
 										type: "variable",
 										content: {
-											type: "text",
-											text: "",
+											type: "file",
+											category: "text",
+											files: [],
 										},
 										inputs: [],
 										outputs: [
