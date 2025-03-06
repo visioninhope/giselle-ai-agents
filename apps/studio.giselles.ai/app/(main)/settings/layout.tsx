@@ -1,47 +1,15 @@
 import { settingsV2Flag } from "@/flags";
-import { cn } from "@/lib/utils";
-import { UserIcon, UsersIcon } from "lucide-react";
 import type { ReactNode } from "react";
-import { IntegrationIcon } from "./components/integration-icon";
-import { MenuLink } from "./components/menu-link";
+import SettingsLayoutV1 from "./settings-layout-v1";
+import SettingsLayoutV2 from "./settings-layout-v2";
 
-export default async function SettingLayout({
+export default async function SettingsLayout({
 	children,
 }: { children: ReactNode }) {
-	const settingsV2Mode = await settingsV2Flag();
+	const isV2 = await settingsV2Flag();
 
-	return (
-		<div className="flex divide-x divide-black-80 h-full">
-			<div className="w-[200px] p-[24px]">
-				<div className="grid gap-[16px]">
-					<MenuLink
-						href="/settings/account"
-						icon={<UserIcon className="w-4 h-4" />}
-					>
-						Account
-					</MenuLink>
-					<MenuLink
-						href="/settings/integration"
-						icon={<IntegrationIcon className="w-4 h-4" />}
-					>
-						Integration
-					</MenuLink>
-					<MenuLink
-						href="/settings/team"
-						icon={<UsersIcon className="w-4 h-4" />}
-					>
-						Team
-					</MenuLink>
-				</div>
-			</div>
-			<div
-				className={cn(
-					"px-[48px] py-[32px] flex-1",
-					settingsV2Mode && "px-[40px] py-[24px]",
-				)}
-			>
-				{children}
-			</div>
-		</div>
-	);
+	if (isV2) {
+		return <SettingsLayoutV2>{children}</SettingsLayoutV2>;
+	}
+	return <SettingsLayoutV1>{children}</SettingsLayoutV1>;
 }
