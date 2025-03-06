@@ -1,5 +1,5 @@
 {
-	"name": "web",
+	"name": "studio.giselles.ai",
 	"version": "0.1.0",
 	"engines": {
 		"node": "22.x"
@@ -21,6 +21,8 @@
 		"@ai-sdk/anthropic": "1.0.5",
 		"@ai-sdk/google": "1.0.10",
 		"@ai-sdk/openai": "1.0.8",
+		"@giselle-internal/workflow-designer-ui": "workspace:*",
+		"@giselle-sdk/data-type": "workspace:*",
 		"@icons-pack/react-simple-icons": "10.0.0",
 		"@lucide/lab": "0.1.2",
 		"@mendable/firecrawl-js": "1.6.1",
@@ -78,6 +80,7 @@
 		"flags": "3.1.1",
 		"framer-motion": "12.0.0-alpha.0",
 		"gaxios": "6.7.1",
+		"giselle-sdk": "workspace:*",
 		"google-auth-library": "9.15.0",
 		"googleapis": "144.0.0",
 		"handlebars": "4.7.8",
@@ -102,6 +105,7 @@
 		"tailwindcss-animate": "1.0.7",
 		"tiny-invariant": "1.3.3",
 		"ts-pattern": "5.2.0",
+		"unstorage": "catalog:",
 		"unstructured-client": "0.18.1",
 		"valibot": "0.37.0",
 		"zod": "3.24.1"
