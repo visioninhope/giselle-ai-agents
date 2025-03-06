@@ -34,11 +34,11 @@
 
 ## Tasks
 
-- [ ] Support server action
 - [ ] Split stream route
 - [ ] Copy button
 - [ ] Run detail route
 - [ ] Webclip Node
+- [ ] Textfile Node
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
 - [ ] Add setting button to title
@@ -59,6 +59,7 @@
 
 ## Done
 
+- [x] Support server action
 - [x] Model catalog
 - [x] Model catalog UI
 - [x] Writing getting started
