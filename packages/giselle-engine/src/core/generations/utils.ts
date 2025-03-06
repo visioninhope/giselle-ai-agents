@@ -13,7 +13,7 @@ import {
 	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
-import type { CoreMessage, DataContent, FilePart } from "ai";
+import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
 
 export interface FileIndex {
@@ -68,7 +68,7 @@ async function buildGenerationMessageForTextGeneration(
 		outputId: OutputId.parse(match[2]),
 	}));
 
-	const attachedFiles: FilePart[] = [];
+	const attachedFiles: (FilePart | ImagePart)[] = [];
 	for (const sourceKeyword of sourceKeywords) {
 		const contextNode = contextNodes.find(
 			(contextNode) => contextNode.id === sourceKeyword.nodeId,
@@ -95,6 +95,7 @@ async function buildGenerationMessageForTextGeneration(
 			case "file": {
 				switch (contextNode.content.category) {
 					case "text":
+					case "image":
 					case "pdf": {
 						const fileContents = await getFileContents(
 							contextNode.content,
@@ -338,18 +339,32 @@ export async function getNodeGenerationIndexes(
 async function getFileContents(
 	fileContent: FileContent,
 	fileResolver: (file: FileData) => Promise<DataContent>,
-): Promise<FilePart[]> {
+): Promise<(FilePart | ImagePart)[]> {
 	return await Promise.all(
 		fileContent.files.map(async (file) => {
 			if (file.status !== "uploaded") {
 				return null;
 			}
 			const data = await fileResolver(file);
-			return {
-				type: "file",
-				data,
-				mimeType: file.type,
-			} satisfies FilePart;
+			switch (fileContent.category) {
+				case "pdf":
+				case "text":
+					return {
+						type: "file",
+						data,
+						mimeType: file.type,
+					} satisfies FilePart;
+				case "image":
+					return {
+						type: "image",
+						image: data,
+						mimeType: file.type,
+					} satisfies ImagePart;
+				default: {
+					const _exhaustiveCheck: never = fileContent.category;
+					throw new Error(`Unhandled file category: ${_exhaustiveCheck}`);
+				}
+			}
 		}),
 	).then((results) => results.filter((result) => result !== null));
 }

@@ -232,8 +232,32 @@ function NodeCanvas() {
 									},
 									options,
 								);
-
 								break;
+							case "image":
+								addNode(
+									{
+										name: "Image",
+										type: "variable",
+										content: {
+											type: "file",
+											category: "image",
+											files: [],
+										},
+										inputs: [],
+										outputs: [
+											{
+												id: OutputId.generate(),
+												label: "Output",
+											},
+										],
+									},
+									options,
+								);
+								break;
+							default: {
+								const _exhaustiveCheck: never = selectedTool.fileCategory;
+								throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
+							}
 						}
 						break;
 					case "addTextGenerationNode":

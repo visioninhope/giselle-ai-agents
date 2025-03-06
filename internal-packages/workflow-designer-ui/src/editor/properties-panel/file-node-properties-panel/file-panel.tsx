@@ -13,15 +13,18 @@ import { useFileNode } from "./use-file-node";
 
 export type FileTypeConfig = {
 	accept: string[];
-	fileTypeLabel: string;
+	label: string;
+	maxSize?: number;
 };
+
+const defaultMaxSize = 1024 * 1024 * 20;
 
 type FilePanelProps = {
 	node: FileNode;
-	fileTypes: FileTypeConfig;
+	config: FileTypeConfig;
 };
 
-export function FilePanel({ node, fileTypes }: FilePanelProps) {
+export function FilePanel({ node, config }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isValidFile, setIsValidFile] = useState(true);
 	const { addFiles, removeFile } = useFileNode(node);
@@ -37,16 +40,13 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 					isValid = false;
 					break;
 				}
-				for (const accept of fileTypes.accept) {
-					if (new RegExp(accept).test(dataTransferItem.type)) {
-						break;
-					}
-					isValid = false;
-				}
+				isValid = config.accept.some((accept) =>
+					new RegExp(accept).test(dataTransferItem.type),
+				);
 			}
 			return isValid;
 		},
-		[fileTypes.accept],
+		[config.accept],
 	);
 
 	const validateFiles = useCallback(
@@ -56,16 +56,20 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 				if (!isValid) {
 					break;
 				}
-				for (const accept of fileTypes.accept) {
-					if (!new RegExp(accept).test(file.type)) {
-						isValid = false;
-						break;
-					}
+				console.log(file.size);
+				console.log(config.maxSize ?? defaultMaxSize);
+				if (file.size > (config.maxSize ?? defaultMaxSize)) {
+					isValid = false;
+					break;
 				}
+
+				isValid = config.accept.some((accept) =>
+					new RegExp(accept).test(file.type),
+				);
 			}
 			return isValid;
 		},
-		[fileTypes.accept],
+		[config],
 	);
 
 	const onDragOver = useCallback(
@@ -88,7 +92,7 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 			e.preventDefault();
 			setIsDragging(false);
 
-			const valid = validateItems(e.dataTransfer.items);
+			const valid = validateFiles(e.dataTransfer.files);
 			if (!valid) {
 				/** @todo feedback as toast */
 				setIsValidFile(true);
@@ -100,7 +104,7 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 				addFiles(Array.from(e.dataTransfer.files));
 			}
 		},
-		[addFiles, validateItems],
+		[addFiles, validateFiles],
 	);
 
 	const onFileChange = useCallback(
@@ -166,14 +170,14 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 												className="size-[30px] text-black-400"
 											/>
 											<p className="text-center text-white-400">
-												Drop to upload your {fileTypes.fileTypeLabel} files
+												Drop to upload your {config.label} files
 											</p>
 										</>
 									) : (
 										<>
 											<FileXIcon className="size-[30px] text-red-500" />
 											<p className="text-center text-red-500">
-												Only {fileTypes.fileTypeLabel} files are allowed
+												Only {config.label} files are allowed
 											</p>
 										</>
 									)}
@@ -182,7 +186,7 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 								<>
 									<FileXIcon className="size-[30px] text-red-500" />
 									<p className="text-center text-red-500">
-										Only {fileTypes.fileTypeLabel} files are allowed
+										Only {config.label} files are allowed
 									</p>
 								</>
 							) : (
@@ -192,7 +196,7 @@ export function FilePanel({ node, fileTypes }: FilePanelProps) {
 										htmlFor="file"
 										className="text-center flex flex-col gap-[16px] text-white-400"
 									>
-										<p>Drop {fileTypes.fileTypeLabel} files here to upload.</p>
+										<p>Drop {config.label} files here to upload.</p>
 										<div className="flex gap-[8px] justify-center items-center">
 											<span>or</span>
 											<span className="font-bold text-[14px] underline cursor-pointer">

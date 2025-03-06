@@ -11,11 +11,16 @@ import { FilePanel, type FileTypeConfig } from "./file-panel";
 const fileType: Record<FileCategory, FileTypeConfig> = {
 	pdf: {
 		accept: ["application/pdf"],
-		fileTypeLabel: "PDF",
+		label: "PDF",
 	},
 	text: {
 		accept: ["text/plain", "text/markdown"],
-		fileTypeLabel: "Text",
+		label: "Text",
+	},
+	image: {
+		accept: ["image/png", "image/jpeg", "image/gif", "image/svg"],
+		label: "Image",
+		maxSize: 1024 * 1024,
 	},
 };
 
@@ -33,7 +38,7 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				<FilePanel node={node} fileTypes={fileType[node.content.category]} />
+				<FilePanel node={node} config={fileType[node.content.category]} />
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);
