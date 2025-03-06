@@ -1,13 +1,23 @@
-import type { FileNode } from "@giselle-sdk/data-type";
+import type { FileCategory, FileNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { PdfFileIcon } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
-import { FilePanel } from "./file-panel";
+import { FilePanel, type FileTypeConfig } from "./file-panel";
+
+const fileType: Record<FileCategory, FileTypeConfig> = {
+	pdf: {
+		accept: ["application/pdf"],
+		fileTypeLabel: "PDF",
+	},
+	text: {
+		accept: ["text/plain", "text/markdown"],
+		fileTypeLabel: "Text",
+	},
+};
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	const { updateNodeData } = useWorkflowDesigner();
@@ -23,7 +33,7 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				<FilePanel node={node} />
+				<FilePanel node={node} fileTypes={fileType[node.content.category]} />
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);

@@ -121,8 +121,34 @@ async function buildGenerationMessageForTextGeneration(
 						attachedFiles.push(...fileContents);
 						break;
 					}
-					case "text":
-						throw new Error("Not implemented");
+					case "text": {
+						const fileContents = await Promise.all(
+							contextNode.content.files.map(async (file) => {
+								if (file.status !== "uploaded") {
+									return null;
+								}
+								const data = await fileResolver(file);
+								return {
+									type: "file",
+									data,
+									mimeType: file.contentType,
+								} satisfies FilePart;
+							}),
+						).then((results) => results.filter((result) => result !== null));
+						if (fileContents.length > 1) {
+							userMessage = userMessage.replace(
+								replaceKeyword,
+								`${getOrdinal(attachedFiles.length + 1)} ~ ${getOrdinal(attachedFiles.length + fileContents.length)} attached files`,
+							);
+						} else {
+							userMessage = userMessage.replace(
+								replaceKeyword,
+								`${getOrdinal(attachedFiles.length + 1)} attached file`,
+							);
+						}
+						attachedFiles.push(...fileContents);
+						break;
+					}
 					default: {
 						const _exhaustiveCheck: never = contextNode.content.category;
 						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);

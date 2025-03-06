@@ -7,52 +7,80 @@ import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
-import { PdfFileIcon } from "../../../icons";
+import { FileNodeIcon } from "../../../icons/node";
 import { Tooltip } from "../../../ui/tooltip";
 import { useFileNode } from "./use-file-node";
 
-export function FilePanel({ node }: { node: FileNode }) {
+export type FileTypeConfig = {
+	accept: string[];
+	fileTypeLabel: string;
+};
+
+type FilePanelProps = {
+	node: FileNode;
+	fileTypes: FileTypeConfig;
+};
+
+export function FilePanel({ node, fileTypes }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
-	const [isValidPdf, setIsValidPdf] = useState(true);
+	const [isValidFile, setIsValidFile] = useState(true);
 	const { addFiles, removeFile } = useFileNode(node);
 
-	const validatePdfFiles = useCallback((files: FileList | File[]) => {
-		for (let i = 0; i < files.length; i++) {
-			const file = files[i];
-			const isPdf =
-				file.type === "application/pdf" ||
-				file.name.toLowerCase().endsWith(".pdf");
-			if (!isPdf) {
-				return false;
-			}
-		}
-		return true;
-	}, []);
-
-	const onDragOver = useCallback((e: React.DragEvent<HTMLDivElement>) => {
-		e.preventDefault();
-		setIsDragging(true);
-
-		// Validate files during drag
-		if (e.dataTransfer.items && e.dataTransfer.items.length > 0) {
-			let allPdf = true;
-
-			for (let i = 0; i < e.dataTransfer.items.length; i++) {
-				const item = e.dataTransfer.items[i];
-				if (item.kind === "file" && item.type !== "application/pdf") {
-					allPdf = false;
+	const validateItems = useCallback(
+		(dataTransferItemList: DataTransferItemList) => {
+			let isValid = true;
+			for (const dataTransferItem of dataTransferItemList) {
+				if (!isValid) {
 					break;
 				}
+				if (dataTransferItem.kind !== "file") {
+					isValid = false;
+					break;
+				}
+				for (const accept of fileTypes.accept) {
+					if (new RegExp(accept).test(dataTransferItem.type)) {
+						break;
+					}
+					isValid = false;
+				}
 			}
+			return isValid;
+		},
+		[fileTypes.accept],
+	);
 
-			setIsValidPdf(allPdf);
-		}
-	}, []);
+	const validateFiles = useCallback(
+		(files: FileList) => {
+			let isValid = true;
+			for (const file of files) {
+				if (!isValid) {
+					break;
+				}
+				for (const accept of fileTypes.accept) {
+					if (!new RegExp(accept).test(file.type)) {
+						isValid = false;
+						break;
+					}
+				}
+			}
+			return isValid;
+		},
+		[fileTypes.accept],
+	);
+
+	const onDragOver = useCallback(
+		(e: React.DragEvent<HTMLDivElement>) => {
+			e.preventDefault();
+			setIsDragging(true);
+			setIsValidFile(validateItems(e.dataTransfer.items));
+		},
+		[validateItems],
+	);
 
 	const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
 		e.preventDefault();
 		setIsDragging(false);
-		setIsValidPdf(true); // Reset validation state
+		setIsValidFile(true);
 	}, []);
 
 	const onDrop = useCallback(
@@ -60,16 +88,19 @@ export function FilePanel({ node }: { node: FileNode }) {
 			e.preventDefault();
 			setIsDragging(false);
 
-			const files = Array.from(e.dataTransfer.files);
-			if (validatePdfFiles(files)) {
-				addFiles(files);
-			} else {
-				// Show error or feedback for invalid files
-				setIsValidPdf(false);
-				setTimeout(() => setIsValidPdf(true), 3000); // Reset validation UI after 3 seconds
+			const valid = validateItems(e.dataTransfer.items);
+			if (!valid) {
+				/** @todo feedback as toast */
+				setIsValidFile(true);
+				setIsDragging(false);
+				return;
+			}
+
+			if (valid) {
+				addFiles(Array.from(e.dataTransfer.files));
 			}
 		},
-		[addFiles, validatePdfFiles],
+		[addFiles, validateItems],
 	);
 
 	const onFileChange = useCallback(
@@ -78,20 +109,17 @@ export function FilePanel({ node }: { node: FileNode }) {
 				return;
 			}
 
-			const files = Array.from(e.target.files);
-			if (validatePdfFiles(files)) {
-				addFiles(files);
-			} else {
-				// Handle invalid files from file input
-				// This generally shouldn't happen with accept="application/pdf"
-				// But we'll keep this as a safety net
-				alert("Only PDF files are allowed");
-			}
+			const valid = validateFiles(e.target.files);
 
-			// Reset the file input to allow selecting the same files again
-			e.target.value = "";
+			if (valid) {
+				addFiles(Array.from(e.target.files));
+			} else {
+				setIsValidFile(false);
+				// Reset the input to allow selecting the same file again
+				e.target.value = "";
+			}
 		},
-		[addFiles, validatePdfFiles],
+		[addFiles, validateFiles],
 	);
 
 	return (
@@ -113,39 +141,49 @@ export function FilePanel({ node }: { node: FileNode }) {
 						className={clsx(
 							"group h-[300px] p-[8px]",
 							"border border-black-400 rounded-[8px]",
-							"data-[dragging=true]:data-[valid-pdf=false]:border-red-500",
+							"data-[dragging=true]:data-[valid=false]:border-red-500",
 						)}
 						onDragOver={onDragOver}
 						onDragLeave={onDragLeave}
 						onDrop={onDrop}
 						data-dragging={isDragging}
-						data-valid-pdf={isValidPdf}
+						data-valid={isValidFile}
 					>
 						<div
 							className={clsx(
 								"h-full flex flex-col justify-center items-center gap-[16px] px-[24px] py-[10px]",
 								"border border-dotted rounded-[8px] border-transparent",
 								"group-data-[dragging=true]:border-black-400",
-								"group-data-[dragging=true]:group-data-[valid-pdf=false]:border-red-500",
+								"group-data-[dragging=true]:group-data-[valid=false]:border-red-500",
 							)}
 						>
 							{isDragging ? (
 								<>
-									{isValidPdf ? (
+									{isValidFile ? (
 										<>
-											<PdfFileIcon className="size-[30px] text-black-400" />
+											<FileNodeIcon
+												node={node}
+												className="size-[30px] text-black-400"
+											/>
 											<p className="text-center text-white-400">
-												Drop to upload your PDF files
+												Drop to upload your {fileTypes.fileTypeLabel} files
 											</p>
 										</>
 									) : (
 										<>
 											<FileXIcon className="size-[30px] text-red-500" />
 											<p className="text-center text-red-500">
-												Only PDF files are allowed
+												Only {fileTypes.fileTypeLabel} files are allowed
 											</p>
 										</>
 									)}
+								</>
+							) : !isValidFile ? (
+								<>
+									<FileXIcon className="size-[30px] text-red-500" />
+									<p className="text-center text-red-500">
+										Only {fileTypes.fileTypeLabel} files are allowed
+									</p>
 								</>
 							) : (
 								<div className="flex flex-col gap-[16px] justify-center items-center">
@@ -154,13 +192,13 @@ export function FilePanel({ node }: { node: FileNode }) {
 										htmlFor="file"
 										className="text-center flex flex-col gap-[16px] text-white-400"
 									>
-										<p>Drop PDF files here to upload.</p>
+										<p>Drop {fileTypes.fileTypeLabel} files here to upload.</p>
 										<div className="flex gap-[8px] justify-center items-center">
 											<span>or</span>
 											<span className="font-bold text-[14px] underline cursor-pointer">
-												Select PDF files
+												Select files
 												<input
-													accept="application/pdf"
+													accept={"*"}
 													multiple
 													id="file"
 													type="file"
