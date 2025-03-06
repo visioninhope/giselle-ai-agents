@@ -7,7 +7,7 @@ export type FileId = z.infer<typeof FileId.schema>;
 export const FileDataBase = z.object({
 	id: FileId.schema,
 	name: z.string(),
-	contentType: z.string(),
+	type: z.string(),
 	size: z.number(),
 	status: z.string(),
 });
@@ -18,14 +18,12 @@ export const UploadingFileData = FileDataBase.extend({
 export type UploadingFileData = z.infer<typeof UploadingFileData>;
 export function createUploadingFileData(params: {
 	name: string;
-	contentType: string;
+	type: string;
 	size: number;
 }): UploadingFileData {
 	return {
+		...params,
 		id: FileId.generate(),
-		name: params.name,
-		contentType: params.contentType,
-		size: params.size,
 		status: "uploading",
 	};
 }
