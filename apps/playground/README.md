@@ -34,6 +34,7 @@
 
 ## Tasks
 
+- [ ] contentType to type
 - [ ] Toast UI
 - [ ] Split stream route
 - [ ] Copy button
