@@ -35,6 +35,7 @@
 ## Tasks
 
 - [ ] Improve Catalog UI
+- [ ] Add filesize limit to workspace property
 - [ ] Toast UI
 - [ ] Split stream route
 - [ ] Copy button
