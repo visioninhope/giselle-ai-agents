@@ -57,8 +57,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				if (!isValid) {
 					break;
 				}
-				console.log(file.size);
-				console.log(config.maxSize ?? defaultMaxSize);
 				if (file.size > (config.maxSize ?? defaultMaxSize)) {
 					isValid = false;
 					break;
