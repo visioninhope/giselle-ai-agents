@@ -9,6 +9,7 @@ import { useCallback, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
+import { useToasts } from "../../../ui/toast";
 import { Tooltip } from "../../../ui/tooltip";
 import { useFileNode } from "./use-file-node";
 
@@ -25,10 +26,44 @@ type FilePanelProps = {
 	config: FileTypeConfig;
 };
 
+class FileUploadError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "FileUploadError";
+	}
+}
+
+class InvalidFileTypeError extends FileUploadError {
+	constructor(message = "Invalid file type") {
+		super(message);
+		this.name = "InvalidgFileTypeError";
+	}
+}
+
+class FileSizeExceededError extends FileUploadError {
+	constructor(message = "File size exceeds maximum limit") {
+		super(message);
+		this.name = "FileSizeExceededError";
+	}
+}
+
+export function formatFileSize(size: number): string {
+	const units = ["B", "KB", "MB", "GB", "TB"];
+	let formattedSize = size;
+	let i = 0;
+	while (formattedSize >= 1024 && i < units.length - 1) {
+		formattedSize /= 1024;
+		i++;
+	}
+	return `${formattedSize} ${units[i]}`;
+}
+
 export function FilePanel({ node, config }: FilePanelProps) {
 	const [isDragging, setIsDragging] = useState(false);
 	const [isValidFile, setIsValidFile] = useState(true);
-	const { addFiles, removeFile } = useFileNode(node);
+	const { addFiles: addFilesInternal, removeFile } = useFileNode(node);
+	const toasts = useToasts();
+	const maxFileSize = config.maxSize ?? defaultMaxSize;
 
 	const validateItems = useCallback(
 		(dataTransferItemList: DataTransferItemList) => {
@@ -50,25 +85,22 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		[config.accept],
 	);
 
-	const validateFiles = useCallback(
+	const assertFiles = useCallback(
 		(files: FileList) => {
-			let isValid = true;
 			for (const file of files) {
-				if (!isValid) {
-					break;
-				}
-				if (file.size > (config.maxSize ?? defaultMaxSize)) {
-					isValid = false;
-					break;
+				if (file.size > maxFileSize) {
+					throw new FileSizeExceededError();
 				}
 
-				isValid = config.accept.some((accept) =>
+				const isValid = config.accept.some((accept) =>
 					new RegExp(accept).test(file.type),
 				);
+				if (!isValid) {
+					throw new InvalidFileTypeError();
+				}
 			}
-			return isValid;
 		},
-		[config],
+		[config, maxFileSize],
 	);
 
 	const onDragOver = useCallback(
@@ -86,24 +118,32 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		setIsValidFile(true);
 	}, []);
 
+	const addFiles = useCallback(
+		(fileList: FileList) => {
+			try {
+				assertFiles(fileList);
+				addFilesInternal(Array.from(fileList));
+			} catch (e) {
+				if (e instanceof InvalidFileTypeError) {
+					toasts.error(`This node accepts ${config.accept.join(", ")} only.`);
+				} else if (e instanceof FileSizeExceededError) {
+					toasts.error(
+						`File size exceeds the limit. Please upload a file smaller than ${formatFileSize(maxFileSize)}.`,
+					);
+				}
+			}
+		},
+		[addFilesInternal, maxFileSize, assertFiles, config, toasts],
+	);
+
 	const onDrop = useCallback(
 		(e: React.DragEvent<HTMLDivElement>) => {
 			e.preventDefault();
 			setIsDragging(false);
-
-			const valid = validateFiles(e.dataTransfer.files);
-			if (!valid) {
-				/** @todo feedback as toast */
-				setIsValidFile(true);
-				setIsDragging(false);
-				return;
-			}
-
-			if (valid) {
-				addFiles(Array.from(e.dataTransfer.files));
-			}
+			setIsValidFile(true);
+			addFiles(e.dataTransfer.files);
 		},
-		[addFiles, validateFiles],
+		[addFiles],
 	);
 
 	const onFileChange = useCallback(
@@ -111,18 +151,10 @@ export function FilePanel({ node, config }: FilePanelProps) {
 			if (!e.target.files) {
 				return;
 			}
-
-			const valid = validateFiles(e.target.files);
-
-			if (valid) {
-				addFiles(Array.from(e.target.files));
-			} else {
-				setIsValidFile(false);
-				// Reset the input to allow selecting the same file again
-				e.target.value = "";
-			}
+			addFiles(e.target.files);
+			e.target.value = "";
 		},
-		[addFiles, validateFiles],
+		[addFiles],
 	);
 
 	return (
