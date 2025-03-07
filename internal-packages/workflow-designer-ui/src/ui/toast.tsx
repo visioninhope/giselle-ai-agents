@@ -56,12 +56,20 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 					<ToastPrimitive.Root
 						key={toast.id}
 						className={clsx(
-							"relative rounded-[8px] bg-black-900/60",
+							"group relative rounded-[8px] backdrop-blur-[4px]",
+							"data-[type=info]:bg-white-900/60",
 							"data-[type=error]:bg-error-900/60",
 						)}
 						data-type={toast.type}
 						duration={toast.preserve ? Number.POSITIVE_INFINITY : undefined}
 					>
+						<div
+							className={clsx(
+								"absolute z-0 rounded-[8px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
+								"group-data-[type=info]:from-[hsl(232,_36%,_72%)]/40 to-[hsl(218,_58%,_21%)]/90",
+								"group-data-[type=error]:from-[hsl(344,_23%,_76%)]/40 to-[hsl(344,_91%,_25%)]/90",
+							)}
+						/>
 						<div className="relative text-white-900 px-[16px] py-[16px] flex justify-between items-center gap-[4px]">
 							<ToastPrimitive.Title className="text-[14px] flex items-center gap-[8px]">
 								{toast.message}
@@ -72,7 +80,7 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({
 						</div>
 					</ToastPrimitive.Root>
 				))}
-				<ToastPrimitive.Viewport className="fixed bottom-0 right-0 z-2147483647 m-0 flex w-[520px] max-w-[100vw] list-none flex-col gap-2.5 p-[40px] outline-hidden" />
+				<ToastPrimitive.Viewport className="fixed bottom-0 right-0 z-2147483647 m-0 flex w-[400px] max-w-[100vw] list-none flex-col gap-2.5 p-[40px] outline-hidden" />
 			</ToastPrimitive.Provider>
 		</ToastContext.Provider>
 	);
