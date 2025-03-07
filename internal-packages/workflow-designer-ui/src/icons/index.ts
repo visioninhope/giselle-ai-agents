@@ -25,3 +25,4 @@ export * from "./pdf-file";
 export * from "./text-file";
 export * from "./view";
 export * from "./picture";
+export * from "./triangle-alert";

@@ -7,6 +7,7 @@ import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
+import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { Tooltip } from "../../../ui/tooltip";
 import { useFileNode } from "./use-file-node";
@@ -145,7 +146,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 						className={clsx(
 							"group h-[300px] p-[8px]",
 							"border border-black-400 rounded-[8px]",
-							"data-[dragging=true]:data-[valid=false]:border-red-500",
+							"data-[dragging=true]:data-[valid=false]:border-error-900",
 						)}
 						onDragOver={onDragOver}
 						onDragLeave={onDragLeave}
@@ -158,7 +159,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 								"h-full flex flex-col justify-center items-center gap-[16px] px-[24px] py-[10px]",
 								"border border-dotted rounded-[8px] border-transparent",
 								"group-data-[dragging=true]:border-black-400",
-								"group-data-[dragging=true]:group-data-[valid=false]:border-red-500",
+								"group-data-[dragging=true]:group-data-[valid=false]:border-error-900",
 							)}
 						>
 							{isDragging ? (
@@ -175,8 +176,8 @@ export function FilePanel({ node, config }: FilePanelProps) {
 										</>
 									) : (
 										<>
-											<FileXIcon className="size-[30px] text-red-500" />
-											<p className="text-center text-red-500">
+											<TriangleAlert className="size-[30px] text-error-900" />
+											<p className="text-center text-error-900">
 												Only {config.label} files are allowed
 											</p>
 										</>
@@ -184,8 +185,8 @@ export function FilePanel({ node, config }: FilePanelProps) {
 								</>
 							) : !isValidFile ? (
 								<>
-									<FileXIcon className="size-[30px] text-red-500" />
-									<p className="text-center text-red-500">
+									<FileXIcon className="size-[30px] text-error-900" />
+									<p className="text-center text-error-900">
 										Only {config.label} files are allowed
 									</p>
 								</>
