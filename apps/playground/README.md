@@ -36,7 +36,6 @@
 
 - [ ] Improve Catalog UI
 - [ ] Add filesize limit to workspace property
-- [ ] Toast UI
 - [ ] Split stream route
 - [ ] Copy button
 - [ ] Run detail route
@@ -61,6 +60,7 @@
 
 ## Done
 
+- [x] Toast UI
 - [x] Image File
 - [x] contentType to type
 - [x] Textfile Node
