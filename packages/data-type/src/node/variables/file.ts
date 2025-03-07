@@ -72,17 +72,6 @@ export const FileContent = z.object({
 });
 export type FileContent = z.infer<typeof FileContent>;
 
-export const FileNode = NodeBase.extend({
-	type: z.literal("variable"),
-	content: FileContent,
-});
-export type FileNode = z.infer<typeof FileNode>;
-
-export function isFileNode(args: unknown): args is FileNode {
-	const result = FileNode.safeParse(args);
-	return result.success;
-}
-
 export const FileContentReference = z.object({
 	type: FileContent.shape.type,
 });

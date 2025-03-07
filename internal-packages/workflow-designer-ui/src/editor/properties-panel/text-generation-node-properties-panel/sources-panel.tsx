@@ -18,7 +18,12 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
+import {
+	GeneratedContentIcon,
+	GitHubIcon,
+	PdfFileIcon,
+	PromptIcon,
+} from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
 	type Source,
@@ -457,6 +462,18 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
+											onRemove={() => handleRemove(source.connection)}
+										/>
+									);
+								case "github":
+									return (
+										<SourceListItem
+											icon={
+												<GitHubIcon className="size-[24px] text-white-900" />
+											}
+											key={source.connection.id}
+											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
+											subtitle={source.node.content.repositoryFullName}
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);

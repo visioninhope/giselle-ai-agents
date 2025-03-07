@@ -2,6 +2,7 @@ import type { Node } from "@giselle-sdk/data-type";
 import { useMemo } from "react";
 import {
 	AnthropicIcon,
+	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
@@ -27,6 +28,7 @@ export function NodeGlance({
 				return node.name ?? node.content.llm.id;
 			case "file":
 			case "text":
+			case "github":
 				return node.name ?? "Unnamed Node";
 			default: {
 				const _exhaustiveCheck: never = node.content;
@@ -40,6 +42,7 @@ export function NodeGlance({
 				return node.content.llm.provider;
 			case "file":
 			case "text":
+			case "github":
 				return node.content.type;
 			default: {
 				const _exhaustiveCheck: never = node.content;
@@ -95,6 +98,8 @@ function ContentTypeIcon({
 					throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
 				}
 			}
+		case "github":
+			return <GitHubIcon {...props} data-content-type-icon />;
 		default: {
 			const _exhaustiveCheck: never = node.content;
 			throw new Error(`Unhandled ContentType: ${_exhaustiveCheck}`);

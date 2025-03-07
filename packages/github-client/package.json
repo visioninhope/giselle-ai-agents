@@ -1,0 +1,35 @@
+{
+	"name": "@giselle-sdk/github-client",
+	"version": "0.0.0",
+	"private": true,
+	"type": "module",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup",
+		"clean": "rm -rf dist",
+		"check-types": "tsc --noEmit",
+		"update-schema": "graphql-codegen --config codegen-schema.yml",
+		"generate": "graphql-codegen --config codegen-types.yml"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"devDependencies": {
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"@graphql-codegen/cli": "catalog:",
+		"@graphql-codegen/client-preset": "catalog:",
+		"tsup": "catalog:"
+	},
+	"dependencies": {
+		"@octokit/graphql": "catalog:",
+		"graffle": "catalog:",
+		"graphql": "catalog:"
+	}
+}
