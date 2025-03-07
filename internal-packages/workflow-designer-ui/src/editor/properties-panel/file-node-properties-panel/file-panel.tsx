@@ -34,9 +34,32 @@ class FileUploadError extends Error {
 }
 
 class InvalidFileTypeError extends FileUploadError {
-	constructor(message = "Invalid file type") {
-		super(message);
-		this.name = "InvalidgFileTypeError";
+	expectedType: string[];
+	actualType: string;
+
+	constructor(expectedType: string[], actualType: string) {
+		super(`Invalid file type: ${actualType}`);
+		this.actualType = actualType;
+		this.expectedType = expectedType;
+		this.name = "InvalidFileTypeError";
+		this.message = `This node supports ${expectedType.join(", ")}, but got ${actualType}. ${this.suggestion()}`;
+	}
+
+	suggestion() {
+		switch (this.actualType) {
+			case "image/jpeg":
+			case "image/png":
+			case "image/gif":
+			case "image/svg":
+				return "Please use Image node to upload this file.";
+			case "application/pdf":
+				return "Please use PDF node to upload this file.";
+			case "text/plain":
+			case "text/markdown":
+				return "Please use Text node to upload this file.";
+			default:
+				return `${this.actualType} is not supported.`;
+		}
 	}
 }
 
@@ -96,7 +119,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 					new RegExp(accept).test(file.type),
 				);
 				if (!isValid) {
-					throw new InvalidFileTypeError();
+					throw new InvalidFileTypeError(config.accept, file.type);
 				}
 			}
 		},
@@ -125,7 +148,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				addFilesInternal(Array.from(fileList));
 			} catch (e) {
 				if (e instanceof InvalidFileTypeError) {
-					toasts.error(`This node accepts ${config.accept.join(", ")} only.`);
+					toasts.error(e.message);
 				} else if (e instanceof FileSizeExceededError) {
 					toasts.error(
 						`File size exceeds the limit. Please upload a file smaller than ${formatFileSize(maxFileSize)}.`,
@@ -133,7 +156,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				}
 			}
 		},
-		[addFilesInternal, maxFileSize, assertFiles, config, toasts],
+		[addFilesInternal, maxFileSize, assertFiles, toasts],
 	);
 
 	const onDrop = useCallback(
