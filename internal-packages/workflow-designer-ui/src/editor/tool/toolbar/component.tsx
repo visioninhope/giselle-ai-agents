@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
+	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
@@ -198,6 +199,10 @@ export function Toolbar() {
 												<ToggleGroup.Item value="text" data-tool>
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text</p>
+												</ToggleGroup.Item>
+												<ToggleGroup.Item value="text" data-tool>
+													<GitHubIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">GitHub</p>
 												</ToggleGroup.Item>
 											</ToggleGroup.Root>
 										</div>
