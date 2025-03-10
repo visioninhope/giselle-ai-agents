@@ -15,6 +15,7 @@ import type { ReactNode } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
+	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
@@ -24,9 +25,10 @@ import {
 	TextFileIcon,
 } from "../../../icons";
 import { Tooltip } from "../../../ui/tooltip";
-import { isToolAction } from "../types";
+import { isAddGitHubNodeToolAction, isToolAction } from "../types";
 import {
 	addFileNodeTool,
+	addGitHubNodeTool,
 	addTextGenerationNodeTool,
 	addTextNodeTool,
 	moveTool,
@@ -181,10 +183,14 @@ export function Toolbar() {
 												)}
 												value={selectedTool.fileCategory}
 												onValueChange={(fileCategory) => {
-													setSelectedTool({
-														...selectedTool,
-														fileCategory: FileCategory.parse(fileCategory),
-													});
+													if (isAddGitHubNodeToolAction(fileCategory)) {
+														setSelectedTool(addGitHubNodeTool());
+													} else {
+														setSelectedTool({
+															...selectedTool,
+															fileCategory: FileCategory.parse(fileCategory),
+														});
+													}
 												}}
 											>
 												<ToggleGroup.Item value="pdf" data-tool>
@@ -199,6 +205,10 @@ export function Toolbar() {
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text</p>
 												</ToggleGroup.Item>
+												{/* <ToggleGroup.Item value="addGitHubNode" data-tool>
+													<GitHubIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">GitHub</p>
+												</ToggleGroup.Item> */}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

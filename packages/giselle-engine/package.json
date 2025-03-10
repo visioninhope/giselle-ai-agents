@@ -8,7 +8,8 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist next react node_modules"
+		"clean": "rm -rf .turbo dist next react node_modules",
+		"test": "vitest run"
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -43,12 +44,14 @@
 		"@giselle-sdk/utils": "workspace:*",
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@types/react": "catalog:",
-		"tsup": "catalog:"
+		"tsup": "catalog:",
+		"vitest": "catalog:"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "catalog:",
 		"@ai-sdk/google": "catalog:",
 		"@ai-sdk/openai": "catalog:",
+		"@giselle-sdk/github-client": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
 		"ai": "catalog:",

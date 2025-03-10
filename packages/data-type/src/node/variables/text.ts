@@ -7,12 +7,6 @@ export const TextContent = z.object({
 });
 type TextContent = z.infer<typeof TextContent>;
 
-export const TextNode = NodeBase.extend({
-	type: z.literal("variable"),
-	content: TextContent,
-});
-type TextNode = z.infer<typeof TextNode>;
-
 export const CreateTextNodeParams = TextContent.omit({
 	type: true,
 })
@@ -20,11 +14,6 @@ export const CreateTextNodeParams = TextContent.omit({
 	.extend({
 		name: z.string(),
 	});
-
-export function isTextNode(args: unknown): args is TextNode {
-	const result = TextNode.safeParse(args);
-	return result.success;
-}
 
 export const TextContentReference = z.object({
 	type: TextContent.shape.type,

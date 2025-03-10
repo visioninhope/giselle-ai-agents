@@ -132,6 +132,16 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
+	githubUrlToObjectId: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				url: z.string().url(),
+			}),
+			handler: async ({ input }) => {
+				const objectId = await giselleEngine.githubUrlToObjectId(input.url);
+				return JsonResponse.json({ objectId });
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

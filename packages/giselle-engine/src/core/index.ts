@@ -18,6 +18,7 @@ import {
 	getGeneration,
 	getNodeGenerations,
 } from "./generations";
+import { urlToObjectID } from "./github";
 import { addRun, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
@@ -80,6 +81,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			fileName: string,
 		) => {
 			return await removeFile({ context, fileId, workspaceId, fileName });
+		},
+
+		githubUrlToObjectId: async (url: string) => {
+			return await urlToObjectID(url);
 		},
 	};
 }

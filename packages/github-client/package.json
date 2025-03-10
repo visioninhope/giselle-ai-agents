@@ -1,0 +1,36 @@
+{
+	"name": "@giselle-sdk/github-client",
+	"version": "0.0.0",
+	"private": true,
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup",
+		"clean": "rm -rf dist",
+		"check-types": "tsc --noEmit",
+		"update-schema": "gql-tada generate schema https://api.github.com/graphql --header \"Authorization: Bearer ${GITHUB_TOKEN}\"",
+		"generate-output": "gql-tada generate-output"
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"devDependencies": {
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"@graphql-codegen/cli": "catalog:",
+		"@graphql-codegen/client-preset": "catalog:",
+		"tsup": "catalog:"
+	},
+	"dependencies": {
+		"@octokit/graphql": "catalog:",
+		"@urql/core": "5.1.1",
+		"gql.tada": "1.8.10",
+		"graphql": "catalog:",
+		"urql": "4.2.2"
+	}
+}

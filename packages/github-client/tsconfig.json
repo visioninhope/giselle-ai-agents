@@ -1,0 +1,14 @@
+{
+	"extends": "@giselle/giselle-sdk-tsconfig/node.json",
+	"compilerOptions": {
+		"plugins": [
+			{
+				"name": "gql.tada/ts-plugin",
+				"schema": "./schema.graphql",
+				"tadaOutputLocation": "./src/graphql-env.d.ts"
+			}
+		]
+	},
+	"include": ["."],
+	"exclude": ["node_modules"]
+}

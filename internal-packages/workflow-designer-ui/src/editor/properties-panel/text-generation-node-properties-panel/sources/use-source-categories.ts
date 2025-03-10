@@ -1,5 +1,6 @@
 import {
 	isFileNode,
+	isGitHubNode,
 	isTextGenerationNode,
 	isTextNode,
 } from "@giselle-sdk/data-type";
@@ -20,10 +21,15 @@ export function useSourceCategories(sources: Source[]) {
 		() => filterSources(sources, isFileNode),
 		[sources],
 	);
+	const githubSources = useMemo(
+		() => filterSources(sources, isGitHubNode),
+		[sources],
+	);
 
 	return {
 		generatedSources,
 		textSources,
 		fileSources,
+		githubSources,
 	};
 }

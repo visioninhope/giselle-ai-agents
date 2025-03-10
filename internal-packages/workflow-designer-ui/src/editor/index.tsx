@@ -167,6 +167,8 @@ function NodeCanvas() {
 					ui: { position },
 				};
 				switch (selectedTool?.action) {
+					case "move":
+						break;
 					case "addTextNode":
 						addNode(
 							{
@@ -282,6 +284,30 @@ function NodeCanvas() {
 							},
 							options,
 						);
+						break;
+					case "addGitHubNode":
+						addNode(
+							{
+								type: "variable",
+								content: {
+									type: "github",
+									objectReferences: [],
+								},
+								inputs: [],
+								outputs: [
+									{
+										id: OutputId.generate(),
+										label: "Output",
+									},
+								],
+							},
+							options,
+						);
+						break;
+					default: {
+						const _exhaustiveCheck: never = selectedTool;
+						throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
+					}
 				}
 				reset();
 			}}

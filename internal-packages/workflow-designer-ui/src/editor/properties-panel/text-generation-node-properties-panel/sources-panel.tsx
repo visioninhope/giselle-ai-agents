@@ -18,7 +18,12 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
+import {
+	GeneratedContentIcon,
+	GitHubIcon,
+	PdfFileIcon,
+	PromptIcon,
+} from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
 	type Source,
@@ -80,7 +85,7 @@ function SourceSelect({
 	>;
 }) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
-	const { generatedSources, textSources, fileSources } =
+	const { generatedSources, textSources, fileSources, githubSources } =
 		useSourceCategories(sources);
 	return (
 		<Popover.Root
@@ -180,6 +185,20 @@ function SourceSelect({
 										<SourceToggleItem
 											key={fileSource.output.id}
 											source={fileSource}
+											disabled={node.content.llm.provider === "openai"}
+										/>
+									))}
+								</div>
+							)}
+							{githubSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										GitHub
+									</p>
+									{githubSources.map((githubSource) => (
+										<SourceToggleItem
+											key={githubSource.output.id}
+											source={githubSource}
 											disabled={node.content.llm.provider === "openai"}
 										/>
 									))}
@@ -457,6 +476,18 @@ export function SourcesPanel({
 											key={source.connection.id}
 											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
+											onRemove={() => handleRemove(source.connection)}
+										/>
+									);
+								case "github":
+									return (
+										<SourceListItem
+											icon={
+												<GitHubIcon className="size-[24px] text-white-900" />
+											}
+											key={source.connection.id}
+											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
+											subtitle={"todo"}
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
