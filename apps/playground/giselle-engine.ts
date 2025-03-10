@@ -44,17 +44,21 @@ if (
 	process.env.GITHUB_APP_CLIENT_SECRET
 ) {
 	integrationConfigs.push({
-		provider: "github-app",
-		appId: process.env.GITHUB_APP_ID,
-		privateKey: process.env.GITHUB_APP_PRIVATE_KEY,
-		clientId: process.env.GITHUB_APP_CLIENT_ID,
-		clientSecret: process.env.GITHUB_APP_CLIENT_SECRET,
+		provider: "github",
+		auth: {
+			strategy: "github-installation",
+			appId: process.env.GITHUB_APP_ID,
+			privateKey: process.env.GITHUB_APP_PRIVATE_KEY,
+		},
 	});
 }
 if (process.env.GITHUB_TOKEN) {
 	integrationConfigs.push({
-		provider: "github-pat",
-		token: process.env.GITHUB_TOKEN,
+		provider: "github",
+		auth: {
+			strategy: "github-token",
+			token: process.env.GITHUB_TOKEN,
+		},
 	});
 }
 
