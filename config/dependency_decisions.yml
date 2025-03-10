@@ -103,7 +103,7 @@
     :versions: []
     :when: 2025-02-27 06:29:24.670306000 Z
 - - :approve
-  - spawndamnit@3.0.1
+  - spawndamnit
   - :who: sakito
     :why: See https://github.com/jamiebuilds/spawndamnit/pull/11
     :versions: 
