@@ -78,8 +78,7 @@
 - - :permit
   - MIT-0
   - :who:
-    :why: MIT-0 is an extremely permissive license with no attribution requirements.
-      https://github.com/aws/mit-0
+    :why: MIT-0 is an extremely permissive license with no attribution requirements. https://github.com/aws/mit-0
     :versions: []
     :when: 2025-01-20 15:39:57.858569000 Z
 - - :permit
