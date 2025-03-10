@@ -139,7 +139,7 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) => {
 				const objectId = await giselleEngine.githubUrlToObjectId(input.url);
-				return JsonResponse.json(objectId);
+				return JsonResponse.json({ objectId });
 			},
 		}),
 } as const;

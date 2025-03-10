@@ -48,7 +48,6 @@ export interface WorkflowDesignerContextValue
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
-	retrieveGitHubObjectIdFromUrl: (url: string) => Promise<string | undefined>;
 }
 export const WorkflowDesignerContext = createContext<
 	WorkflowDesignerContextValue | undefined
@@ -256,13 +255,6 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace, client, data.id],
 	);
 
-	const retrieveGitHubObjectIdFromUrl = useCallback(
-		async (url: string) => {
-			return await client.githubUrlToObjectId({ url });
-		},
-		[client],
-	);
-
 	const usePropertiesPanelHelper = usePropertiesPanel();
 	const useViewHelper = useView();
 
@@ -284,7 +276,6 @@ export function WorkflowDesignerProvider({
 				isLoading,
 				setUiViewport,
 				updateName,
-				retrieveGitHubObjectIdFromUrl,
 				...usePropertiesPanelHelper,
 				...useViewHelper,
 			}}

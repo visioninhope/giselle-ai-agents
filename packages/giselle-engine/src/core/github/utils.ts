@@ -37,7 +37,7 @@ export function parseGitHubUrl(url: string): GitHubUrlInfo | null {
 		const parsedUrl = new URL(url);
 
 		// Check if it's a GitHub URL
-		if (!parsedUrl.hostname.endsWith("github.com")) {
+		if (!/^(?:www\.)?github\.com$/.test(parsedUrl.hostname)) {
 			return null;
 		}
 

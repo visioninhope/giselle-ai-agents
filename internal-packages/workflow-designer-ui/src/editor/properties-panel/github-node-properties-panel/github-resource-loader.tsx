@@ -3,7 +3,7 @@
 import clsx from "clsx/lite";
 import { useGiselleEngine } from "giselle-sdk/react";
 import { ExternalLink, Github, Loader2, Trash2 } from "lucide-react";
-import { useState } from "react";
+import { type FormEvent, useCallback, useState } from "react";
 import { GitHubIcon } from "../../../icons";
 
 interface ClippedContent {
@@ -15,7 +15,6 @@ interface ClippedContent {
 }
 
 export function GitHubResourceLoader() {
-	const [url, setUrl] = useState("");
 	const [resources, setResources] = useState<ClippedContent[]>([]);
 	const [activeTab, setActiveTab] = useState("all");
 	const [isLoading, setIsLoading] = useState(false);
@@ -25,56 +24,46 @@ export function GitHubResourceLoader() {
 
 	const client = useGiselleEngine();
 
-	const handleAddUrl = async () => {
-		if (!url.trim() || !isValidUrl(url)) return;
+	const handleAddUrl = useCallback(
+		async (e: FormEvent<HTMLFormElement>) => {
+			e.preventDefault();
+			setIsLoading(true);
+			const formData = new FormData(e.currentTarget);
+			const url = formData.get("url") as string;
+			const response = await client.githubUrlToObjectId({ url });
 
-		// Check if URL is from GitHub
-		if (!url.includes("github.com")) {
-			alert("Please enter a GitHub URL");
-			return;
-		}
+			console.log(response);
+			setCurrentLoadingUrl(url);
+			setIsLoading(false);
 
-		const id = await client.githubUrlToObjectId({ url });
+			// try {
+			// 	if (result.success) {
+			// 		const newResource: ClippedContent = {
+			// 			id: Date.now().toString(),
+			// 			url: url,
+			// 			title: result.title || "No Title",
+			// 			content: result.content || "No content found",
+			// 			timestamp: Date.now(),
+			// 		};
 
-		alert(id);
-		setCurrentLoadingUrl(url);
-		setIsLoading(true);
-
-		// try {
-		// 	if (result.success) {
-		// 		const newResource: ClippedContent = {
-		// 			id: Date.now().toString(),
-		// 			url: url,
-		// 			title: result.title || "No Title",
-		// 			content: result.content || "No content found",
-		// 			timestamp: Date.now(),
-		// 		};
-
-		// 		setResources((prev) => [newResource, ...prev]);
-		// 		setUrl("");
-		// 	} else {
-		// 		alert(`Failed to fetch content: ${result.error}`);
-		// 	}
-		// } catch (error) {
-		// 	console.error("Error fetching URL:", error);
-		// 	alert("Failed to fetch content. Please try again.");
-		// } finally {
-		// 	setIsLoading(false);
-		// 	setCurrentLoadingUrl(null);
-		// }
-	};
+			// 		setResources((prev) => [newResource, ...prev]);
+			// 		setUrl("");
+			// 	} else {
+			// 		alert(`Failed to fetch content: ${result.error}`);
+			// 	}
+			// } catch (error) {
+			// 	console.error("Error fetching URL:", error);
+			// 	alert("Failed to fetch content. Please try again.");
+			// } finally {
+			// 	setIsLoading(false);
+			// 	setCurrentLoadingUrl(null);
+			// }
+		},
+		[client],
+	);
 
 	const handleRemoveResource = (id: string) => {
 		setResources((prev) => prev.filter((item) => item.id !== id));
-	};
-
-	const isValidUrl = (string: string) => {
-		try {
-			new URL(string);
-			return true;
-		} catch (_) {
-			return false;
-		}
 	};
 
 	const formatDate = (timestamp: number) => {
@@ -83,22 +72,22 @@ export function GitHubResourceLoader() {
 
 	return (
 		<div className="space-y-4">
-			<div className="flex gap-2 justify-start">
+			<form className="flex gap-2 justify-start" onSubmit={handleAddUrl}>
 				<input
 					type="url"
+					name="url"
 					placeholder="Enter GitHub URL (e.g., https://github.com/username/repo)"
 					className="border-[0.5px] border-white-900 rounded-[6px] p-[8px] outline-none focus:outline-none w-full"
-					value={url}
-					onChange={(e) => setUrl(e.target.value)}
 					onKeyDown={(e) => {
-						if (e.key === "Enter") handleAddUrl();
+						if (e.key === "Enter") {
+							e.currentTarget.form?.requestSubmit();
+						}
 					}}
 					disabled={isLoading}
 				/>
 				<button
-					type="button"
-					onClick={handleAddUrl}
-					disabled={isLoading || !url.trim() || !isValidUrl(url)}
+					type="submit"
+					disabled={isLoading}
 					className={clsx(
 						"flex py-[8px] px-[16px] justify-center items-center gap-[4px]",
 						"rounded-[8px]",
@@ -118,7 +107,7 @@ export function GitHubResourceLoader() {
 						</>
 					)}
 				</button>
-			</div>
+			</form>
 
 			{/* <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
 				<TabsList className="grid w-full grid-cols-1">
