@@ -1,11 +1,13 @@
-import type { FileCategory, LLMProvider, Node } from "@giselle-sdk/data-type";
+import type { FileCategory } from "@giselle-sdk/data-type";
+import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { SVGProps } from "react";
-import { DocumentIcon } from "../icons/document";
 import { PromptIcon } from "../icons/prompt";
 import { AnthropicIcon } from "./anthropic";
+import { GitHubIcon } from "./github";
 import { GoogleWhiteIcon } from "./google";
 import { OpenaiIcon } from "./openai";
 import { PdfFileIcon } from "./pdf-file";
+import { PictureIcon } from "./picture";
 import { TextFileIcon } from "./text-file";
 
 interface TextNodeIconProps extends SVGProps<SVGSVGElement> {
@@ -20,13 +22,19 @@ interface FileNodeIconProps extends SVGProps<SVGSVGElement> {
 }
 interface TextGenerationNodeIconProps extends SVGProps<SVGSVGElement> {
 	contentType: "textGeneration";
-	llmProvider: LLMProvider;
+	llmProvider: LanguageModelProvider;
+	fileCategory?: never;
+}
+interface GitHubNodeIconProps extends SVGProps<SVGSVGElement> {
+	contentType: "github";
+	llmProvider?: never;
 	fileCategory?: never;
 }
 export type ContentTypeIconProps =
 	| TextNodeIconProps
 	| TextGenerationNodeIconProps
-	| FileNodeIconProps;
+	| FileNodeIconProps
+	| GitHubNodeIconProps;
 
 export function ContentTypeIcon({
 	contentType,
@@ -56,11 +64,15 @@ export function ContentTypeIcon({
 					return <PdfFileIcon {...props} />;
 				case "text":
 					return <TextFileIcon {...props} />;
+				case "image":
+					return <PictureIcon {...props} />;
 				default: {
 					const _exhaustiveCheck: never = fileCategory;
 					throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
 				}
 			}
+		case "github":
+			return <GitHubIcon {...props} />;
 		default: {
 			const _exhaustiveCheck: never = contentType;
 			throw new Error(`Unhandled ContentType: ${_exhaustiveCheck}`);

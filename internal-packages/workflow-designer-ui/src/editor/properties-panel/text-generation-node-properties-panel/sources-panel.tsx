@@ -4,10 +4,6 @@ import {
 	InputId,
 	OutputId,
 	type TextGenerationNode,
-	type VariableNode,
-	isFileNode,
-	isTextGenerationNode,
-	isTextNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
@@ -22,21 +18,65 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
+import {
+	GeneratedContentIcon,
+	GitHubIcon,
+	PdfFileIcon,
+	PromptIcon,
+} from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
-	type ConnectedSource,
 	type Source,
-	filterSources,
 	useConnectedSources,
 	useSourceCategories,
 } from "./sources";
 
+function SourceToggleItem({
+	source,
+	disabled = false,
+}: { source: Source; disabled?: boolean }) {
+	const getDisplayName = () => {
+		if ("content" in source.node && "llm" in source.node.content) {
+			return source.node.name ?? source.node.content.llm.id;
+		}
+		return source.node.name ?? "Source";
+	};
+
+	return (
+		<ToggleGroup.Item
+			key={source.output.id}
+			className={clsx(
+				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+				"text-white-400",
+				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+			)}
+			value={source.output.id}
+			disabled={disabled}
+		>
+			<p className="text-[12px] truncate">
+				{getDisplayName()} / {source.output.label}
+			</p>
+			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+			<div
+				className={clsx(
+					"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
+					"bg-black-200/20 text-black-200/20 text-[10px]",
+					"hidden group-data-[disabled]:block",
+				)}
+			>
+				Unsupported
+			</div>
+		</ToggleGroup.Item>
+	);
+}
+
 function SourceSelect({
+	node,
 	sources,
 	onValueChange,
 	contentProps,
 }: {
+	node: TextGenerationNode;
 	sources: Source[];
 	onValueChange?: (value: OutputId[]) => void;
 	contentProps?: Omit<
@@ -44,15 +84,21 @@ function SourceSelect({
 		"className"
 	>;
 }) {
-	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>(
-		sources
-			.filter((source) => source.connection !== undefined)
-			.map((source) => source.output.id),
-	);
-	const { generatedSources, textSources, fileSources } =
+	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
+	const { generatedSources, textSources, fileSources, githubSources } =
 		useSourceCategories(sources);
 	return (
-		<Popover.Root>
+		<Popover.Root
+			onOpenChange={(open) => {
+				if (open) {
+					setSelectedOutputIds(
+						sources
+							.filter((source) => source.connection !== undefined)
+							.map((source) => source.output.id),
+					);
+				}
+			}}
+		>
 			<Popover.Trigger
 				className={clsx(
 					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
@@ -67,8 +113,8 @@ function SourceSelect({
 			<Popover.Portal>
 				<Popover.Content
 					className={clsx(
-						"relative w-[300px] h-[300px] overflow-y-auto py-[8px]",
-						"rounded-[8px] border-[1px] backdrop-blur-[8px]",
+						"relative w-[300px] py-[8px]",
+						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
 					{...contentProps}
@@ -81,7 +127,7 @@ function SourceSelect({
 					/>
 					<ToggleGroup.Root
 						type="multiple"
-						className="relative flex flex-col gap-[8px]"
+						className="relative max-h-[300px] flex flex-col"
 						value={selectedOutputIds}
 						onValueChange={(unsafeValue) => {
 							const safeValue = unsafeValue
@@ -102,25 +148,17 @@ function SourceSelect({
 						<div className="flex flex-col py-[4px]">
 							<div className="border-t border-black-300/20" />
 						</div>
-						<div className="flex flex-col pb-[8px] gap-[8px]">
+						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
 							{generatedSources.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										Generated Content
 									</p>
 									{generatedSources.map((generatedSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={generatedSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-											value={generatedSource.output.id}
-										>
-											<p className="text-[12px] truncate">
-												{generatedSource.node.name ??
-													generatedSource.node.content.llm.model}{" "}
-												/ {generatedSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={generatedSource}
+										/>
 									))}
 								</div>
 							)}
@@ -130,17 +168,10 @@ function SourceSelect({
 										Text
 									</p>
 									{textSources.map((textSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={textSource.output.id}
-											value={textSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-										>
-											<p className="text-[12px] truncate">
-												{textSource.node.name ?? "Text"} /{" "}
-												{textSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={textSource}
+										/>
 									))}
 								</div>
 							)}
@@ -151,33 +182,41 @@ function SourceSelect({
 										File
 									</p>
 									{fileSources.map((fileSource) => (
-										<ToggleGroup.Item
+										<SourceToggleItem
 											key={fileSource.output.id}
-											value={fileSource.output.id}
-											className="group flex p-[8px] justify-between rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer"
-										>
-											<p className="text-[12px] truncate">
-												{fileSource.node.name ?? "File"} /{" "}
-												{fileSource.output.label}
-											</p>
-											<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-										</ToggleGroup.Item>
+											source={fileSource}
+											disabled={node.content.llm.provider === "openai"}
+										/>
 									))}
 								</div>
 							)}
-							<div className="flex flex-col py-[4px]">
-								<div className="border-t border-black-300/20" />
-							</div>
-							<div className="flex px-[16px] pt-[4px] gap-[8px]">
-								<Popover.Close
-									onClick={() => {
-										onValueChange?.(selectedOutputIds);
-									}}
-									className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
-								>
-									Update
-								</Popover.Close>
-							</div>
+							{githubSources.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										GitHub
+									</p>
+									{githubSources.map((githubSource) => (
+										<SourceToggleItem
+											key={githubSource.output.id}
+											source={githubSource}
+											disabled={node.content.llm.provider === "openai"}
+										/>
+									))}
+								</div>
+							)}
+						</div>
+						<div className="flex flex-col py-[4px]">
+							<div className="border-t border-black-300/20" />
+						</div>
+						<div className="flex px-[16px] py-[4px] gap-[8px]">
+							<Popover.Close
+								onClick={() => {
+									onValueChange?.(selectedOutputIds);
+								}}
+								className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
+							>
+								Update
+							</Popover.Close>
 						</div>
 					</ToggleGroup.Root>
 				</Popover.Content>
@@ -253,7 +292,7 @@ export function SourcesPanel({
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
 		const connections = data.connections.filter(
-			(connection) => connection.inputNodeId === textGenerationNode.id,
+			(connection) => connection.inputNode.id === textGenerationNode.id,
 		);
 		for (const node of data.nodes) {
 			if (node.id === textGenerationNode.id) {
@@ -278,7 +317,7 @@ export function SourcesPanel({
 		(connectOutputIds: OutputId[]) => {
 			const currentConnectedOutputIds = data.connections
 				.filter(
-					(connection) => connection.inputNodeId === textGenerationNode.id,
+					(connection) => connection.inputNode.id === textGenerationNode.id,
 				)
 				.map((connection) => connection.outputId);
 			const newConnectOutputIdSet = new Set(connectOutputIds);
@@ -287,6 +326,7 @@ export function SourcesPanel({
 				currentConnectedOutputIdSet,
 			);
 
+			let mutableInputs = textGenerationNode.inputs;
 			for (const outputId of addedOutputIdSet) {
 				const outputNode = data.nodes.find((node) =>
 					node.outputs.some((output) => output.id === outputId),
@@ -299,16 +339,15 @@ export function SourcesPanel({
 					label: "Source",
 				};
 
+				mutableInputs = [...mutableInputs, newInput];
 				updateNodeData(textGenerationNode, {
-					inputs: [...textGenerationNode.inputs, newInput],
+					inputs: mutableInputs,
 				});
 				addConnection({
-					inputNodeId: textGenerationNode.id,
+					inputNode: textGenerationNode,
 					inputId: newInput.id,
-					inputNodeType: textGenerationNode.type,
 					outputId,
-					outputNodeId: outputNode.id,
-					outputNodeType: outputNode.type,
+					outputNode: outputNode,
 				});
 			}
 
@@ -319,17 +358,19 @@ export function SourcesPanel({
 			for (const outputId of removedOutputIdSet) {
 				const connection = data.connections.find(
 					(connection) =>
-						connection.inputNodeId === textGenerationNode.id &&
+						connection.inputNode.id === textGenerationNode.id &&
 						connection.outputId === outputId,
 				);
 				if (connection === undefined) {
 					continue;
 				}
 				deleteConnection(connection.id);
+
+				mutableInputs = mutableInputs.filter(
+					(input) => input.id !== connection.inputId,
+				);
 				updateNodeData(textGenerationNode, {
-					inputs: textGenerationNode.inputs.filter(
-						(input) => input.id !== connection.inputId,
-					),
+					inputs: mutableInputs,
 				});
 			}
 		},
@@ -363,6 +404,7 @@ export function SourcesPanel({
 					description="Select the data you want to refer to from the output and the information and knowledge you have."
 				>
 					<SourceSelect
+						node={textGenerationNode}
 						sources={sources}
 						onValueChange={handleConnectionChange}
 					/>
@@ -374,6 +416,7 @@ export function SourcesPanel({
 		<div>
 			<div className="flex justify-end">
 				<SourceSelect
+					node={textGenerationNode}
 					sources={sources}
 					onValueChange={handleConnectionChange}
 					contentProps={{
@@ -390,8 +433,8 @@ export function SourcesPanel({
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={source.output.label}
-								subtitle={`${source.node.name ?? source.node.content.llm.model} - ${source.node.content.llm.provider}`}
+								title={`${source.node.name ?? source.node.content.llm.id} / ${source.output.label}`}
+								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
@@ -402,12 +445,15 @@ export function SourcesPanel({
 						{connectedSources.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
-									const jsonContentLikeString = JSON.parse(
-										source.node.content.text,
-									);
-									const text = isJsonContent(jsonContentLikeString)
-										? jsonContentToText(jsonContentLikeString)
-										: source.node.content.text;
+									let text = source.node.content.text;
+									if (text.length > 0) {
+										const jsonContentLikeString = JSON.parse(
+											source.node.content.text,
+										);
+										if (isJsonContent(jsonContentLikeString)) {
+											text = jsonContentToText(jsonContentLikeString);
+										}
+									}
 
 									return (
 										<SourceListItem
@@ -415,7 +461,7 @@ export function SourcesPanel({
 												<PromptIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "Text"}
+											title={`${source.node.name ?? "Text"} / ${source.output.label}`}
 											subtitle={text}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -428,8 +474,20 @@ export function SourcesPanel({
 												<PdfFileIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={source.node.name ?? "PDF Files"}
+											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
+											onRemove={() => handleRemove(source.connection)}
+										/>
+									);
+								case "github":
+									return (
+										<SourceListItem
+											icon={
+												<GitHubIcon className="size-[24px] text-white-900" />
+											}
+											key={source.connection.id}
+											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
+											subtitle={"todo"}
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);

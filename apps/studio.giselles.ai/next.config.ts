@@ -16,7 +16,12 @@ const nextConfig: NextConfig = {
 			bodySizeLimit: "4.5mb",
 		},
 	},
-	serverExternalPackages: ["@opentelemetry/sdk-node", "pino", "pino-pretty"],
+	serverExternalPackages: [
+		"@opentelemetry/sdk-node",
+		"pino",
+		"pino-pretty",
+		"unstorage",
+	],
 	async redirects() {
 		return [
 			{

@@ -1,7 +1,7 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
-import { ZodPromise } from "zod";
-import { Connection, Node, NodeId, NodeUIState } from "../node";
+import { Connection } from "../connection";
+import { Node, NodeId, NodeUIState } from "../node";
 import { OpenAIVecrtorStore } from "../openai";
 import { Workflow } from "../workflow";
 
@@ -30,6 +30,7 @@ export type UIState = z.infer<typeof UIState>;
 
 export const Workspace = z.object({
 	id: WorkspaceId.schema,
+	name: z.string().optional(),
 	schemaVersion: WorkspaceSchemaVersion,
 	nodes: z.array(Node),
 	connections: z.array(Connection),

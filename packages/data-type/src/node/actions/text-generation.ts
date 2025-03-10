@@ -1,26 +1,10 @@
+import { LanguageModel } from "@giselle-sdk/language-model";
 import { z } from "zod";
-import { Anthropic, Google, LLM, OpenAI } from "../../llm";
-import { Input, NodeBase, Output } from "../base";
-
-export const OpenAIContent = z.object({
-	type: z.literal("textGeneration"),
-	llm: OpenAI,
-	prompt: z.string(),
-});
-export const GoogleGenerativeAIContent = z.object({
-	type: z.literal("textGeneration"),
-	llm: Google,
-	prompt: z.string(),
-});
-export const AnthropicContent = z.object({
-	type: z.literal("textGeneration"),
-	llm: Anthropic,
-	prompt: z.string(),
-});
+import { NodeBase } from "../base";
 
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
-	llm: LLM,
+	llm: LanguageModel,
 	prompt: z.string().optional(),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
@@ -37,3 +21,10 @@ export function isTextGenerationNode(
 	const result = TextGenerationNode.safeParse(args);
 	return result.success;
 }
+
+export const TextGenerationContentReference = z.object({
+	type: TextGenerationContent.shape.type,
+});
+export type TextGenerationContentReference = z.infer<
+	typeof TextGenerationContentReference
+>;

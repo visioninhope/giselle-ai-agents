@@ -1,9 +1,6 @@
-import type { Node, TextGenerationNode } from "@giselle-sdk/data-type";
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import {
-	useGenerationController,
-	useWorkflowDesigner,
-} from "giselle-sdk/react";
+import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
@@ -33,7 +30,10 @@ export function TextGenerationNodePropertiesPanel({
 }) {
 	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
 		useWorkflowDesigner();
-	const { startGeneration } = useGenerationController();
+	const { startGeneration, isGenerating, stopGeneration } = useNodeGenerations({
+		nodeId: node.id,
+		origin: { type: "workspace", id: data.id },
+	});
 	const { all: connectedSources } = useConnectedSources(node);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
@@ -68,23 +68,35 @@ export function TextGenerationNodePropertiesPanel({
 					</>
 				}
 				name={node.name}
-				fallbackName={node.content.llm.model}
+				fallbackName={node.content.llm.id}
 				description={node.content.llm.provider}
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
 				}}
 				action={
 					<Button
+						loading={isGenerating}
 						type="button"
 						onClick={() => {
-							generateText();
+							if (isGenerating) {
+								stopGeneration();
+							} else {
+								generateText();
+							}
 						}}
+						className="w-[150px]"
 					>
-						<span>Generate</span>
-						<div className="flex items-center text-[12px]">
-							<CommandIcon className="size-[12px]" />
-							<CornerDownLeft className="size-[12px]" />
-						</div>
+						{isGenerating ? (
+							<span>Stop</span>
+						) : (
+							<>
+								<span>Generate</span>
+								<kbd className="flex items-center text-[12px]">
+									<CommandIcon className="size-[12px]" />
+									<CornerDownLeft className="size-[12px]" />
+								</kbd>
+							</>
+						)}
 					</Button>
 				}
 			/>
@@ -104,7 +116,7 @@ export function TextGenerationNodePropertiesPanel({
 						>
 							<Tabs.List
 								className={clsx(
-									"flex gap-[16px] text-[14px]",
+									"flex gap-[16px] text-[14px] font-accent",
 									"**:p-[4px] **:border-b **:cursor-pointer",
 									"**:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900",
 									"**:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent",
@@ -114,13 +126,19 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
 							</Tabs.List>
-							<Tabs.Content value="prompt" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="prompt"
+								className="flex-1 flex flex-col overflow-hidden"
+							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
-							<Tabs.Content value="model" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="model"
+								className="flex-1 flex flex-col overflow-y-auto"
+							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
-										openai={node.content.llm}
+										openaiLanguageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
@@ -131,7 +149,7 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 								{node.content.llm.provider === "google" && (
 									<GoogleModelPanel
-										google={node.content.llm}
+										googleLanguageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
@@ -142,7 +160,7 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 								{node.content.llm.provider === "anthropic" && (
 									<AnthropicModelPanel
-										anthropic={node.content.llm}
+										anthropicLanguageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
@@ -152,7 +170,10 @@ export function TextGenerationNodePropertiesPanel({
 									/>
 								)}
 							</Tabs.Content>
-							<Tabs.Content value="sources" className="flex-1 flex flex-col">
+							<Tabs.Content
+								value="sources"
+								className="flex-1 flex flex-col overflow-y-auto"
+							>
 								<SourcesPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
@@ -172,7 +193,9 @@ export function TextGenerationNodePropertiesPanel({
 			</PanelGroup>
 			<KeyboardShortcuts
 				generate={() => {
-					generateText();
+					if (!isGenerating) {
+						generateText();
+					}
 				}}
 			/>
 		</PropertiesPanelRoot>

@@ -3,7 +3,10 @@ import {
 	type TextGenerationNode,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
-import { TextEditor } from "@giselle-sdk/text-editor/react";
+import {
+	TextEditor,
+	createSourceExtensionJSONContent,
+} from "@giselle-sdk/text-editor/react-internal";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { BracesIcon } from "lucide-react";
@@ -12,7 +15,7 @@ import { type Source, useConnectedSources } from "./sources";
 
 function getDefaultNodeName(source: Source): string {
 	if (isTextGenerationNode(source.node)) {
-		return source.node.content.llm.model;
+		return source.node.content.llm.id;
 	}
 	return source.node.type;
 }
@@ -30,6 +33,7 @@ export function PromptPanel({
 			onValueChange={(value) => {
 				updateNodeDataContent(node, { prompt: value });
 			}}
+			nodes={connectedSources.map((source) => source.node)}
 			tools={(editor) => (
 				<DropdownMenu.Root>
 					<Toolbar.Button
@@ -83,13 +87,21 @@ export function PromptPanel({
 										if (connectedSource === undefined) {
 											return;
 										}
+										const embedNode = {
+											outputId: connectedSource.connection.outputId,
+											node: connectedSource.connection.outputNode,
+										};
 										editor
 											.chain()
 											.focus()
 											.insertContentAt(
 												editor.state.selection.$anchor.pos,
-												`{{${connectedSource.connection.outputNodeId}:${connectedSource.connection.outputId}}}`,
+												createSourceExtensionJSONContent({
+													node: connectedSource.connection.outputNode,
+													outputId: embedNode.outputId,
+												}),
 											)
+											.insertContent(" ")
 											.run();
 									}}
 								>

@@ -1,6 +1,9 @@
 import { z } from "zod";
-import { NodeBase } from "../base";
-import { TextGenerationContent } from "./text-generation";
+import { NodeBase, NodeReferenceBase } from "../base";
+import {
+	TextGenerationContent,
+	TextGenerationContentReference,
+} from "./text-generation";
 export * from "./text-generation";
 
 const ActionNodeContent = z.discriminatedUnion("type", [TextGenerationContent]);
@@ -11,11 +14,15 @@ export const ActionNode = NodeBase.extend({
 });
 export type ActionNode = z.infer<typeof ActionNode>;
 
-export const TextGenerationNode = ActionNode.extend({
-	content: TextGenerationContent,
-});
-export type TextGenerationNode = z.infer<typeof TextGenerationNode>;
-
 export function isActionNode(node: NodeBase): node is ActionNode {
 	return node.type === "action";
 }
+
+const ActionNodeContentReference = z.discriminatedUnion("type", [
+	TextGenerationContentReference,
+]);
+export const ActionNodeReference = NodeReferenceBase.extend({
+	type: ActionNode.shape.type,
+	content: ActionNodeContentReference,
+});
+export type ActionNodeReference = z.infer<typeof ActionNodeReference>;

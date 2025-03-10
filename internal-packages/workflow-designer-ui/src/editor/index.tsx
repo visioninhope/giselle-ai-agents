@@ -1,8 +1,6 @@
 "use client";
 
 import {
-	Background,
-	BackgroundVariant,
 	ReactFlow,
 	ReactFlowProvider,
 	Panel as XYFlowPanel,
@@ -19,7 +17,6 @@ import {
 	PanelGroup,
 	PanelResizeHandle,
 } from "react-resizable-panels";
-import bg from "../images/bg.png";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -32,6 +29,10 @@ import {
 } from "./tool";
 import "@xyflow/react/dist/style.css";
 import { OutputId } from "@giselle-sdk/data-type";
+import { Background } from "../ui/background";
+import { ToastProvider } from "../ui/toast";
+import { edgeTypes } from "./connector";
+import { type ConnectorType, GradientDef } from "./connector/component";
 
 function NodeCanvas() {
 	const {
@@ -43,7 +44,10 @@ function NodeCanvas() {
 		updateNodeData,
 		addNode,
 	} = useWorkflowDesigner();
-	const reactFlowInstance = useReactFlow();
+	const reactFlowInstance = useReactFlow<
+		GiselleWorkflowDesignerNode,
+		ConnectorType
+	>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	useEffect(() => {
@@ -60,7 +64,7 @@ function NodeCanvas() {
 						position: { x: nodeState.position.x, y: nodeState.position.y },
 						selected: nodeState.selected,
 						data: { nodeData: nodeData },
-					};
+					} as GiselleWorkflowDesignerNode;
 				})
 				.filter((result) => result !== null),
 		);
@@ -70,20 +74,25 @@ function NodeCanvas() {
 		reactFlowInstance.setEdges(
 			data.connections.map((connection) => ({
 				id: connection.id,
-				source: connection.outputNodeId,
+				type: "giselleConnector",
+				source: connection.outputNode.id,
 				sourceHandle: connection.outputId,
-				target: connection.inputNodeId,
+				target: connection.inputNode.id,
 				targetHandle: connection.inputId,
+				data: {
+					connection,
+				},
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
 	return (
-		<ReactFlow<GiselleWorkflowDesignerNode>
+		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
 			className="giselle-workflow-editor"
 			colorMode="dark"
 			defaultNodes={[]}
 			defaultEdges={[]}
 			nodeTypes={nodeTypes}
+			edgeTypes={edgeTypes}
 			defaultViewport={data.ui.viewport}
 			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
@@ -91,18 +100,14 @@ function NodeCanvas() {
 			onNodesChange={(nodesChange) => {
 				nodesChange.map((nodeChange) => {
 					switch (nodeChange.type) {
-						case "select": {
-							setUiNodeState(nodeChange.id, { selected: nodeChange.selected });
-							break;
-						}
 						case "remove": {
 							for (const connection of data.connections) {
-								if (connection.outputNodeId !== nodeChange.id) {
+								if (connection.outputNode.id !== nodeChange.id) {
 									continue;
 								}
 								deleteConnection(connection.id);
 								const connectedNode = data.nodes.find(
-									(node) => node.id === connection.inputNodeId,
+									(node) => node.id === connection.inputNode.id,
 								);
 								if (connectedNode === undefined) {
 									continue;
@@ -123,10 +128,17 @@ function NodeCanvas() {
 					}
 				});
 			}}
-			onNodeClick={(event, node) => {
+			onNodeDoubleClick={(_event, nodeDoubleClicked) => {
+				for (const node of data.nodes) {
+					if (node.id === nodeDoubleClicked.id) {
+						setUiNodeState(node.id, { selected: true });
+					} else {
+						setUiNodeState(node.id, { selected: false });
+					}
+				}
 				const viewport = reactFlowInstance.getViewport();
 				const screenPosition = reactFlowInstance.flowToScreenPosition(
-					node.position,
+					nodeDoubleClicked.position,
 				);
 				reactFlowInstance.setViewport(
 					{
@@ -144,7 +156,9 @@ function NodeCanvas() {
 				});
 			}}
 			onPaneClick={(event) => {
-				event.preventDefault();
+				for (const node of data.nodes) {
+					setUiNodeState(node.id, { selected: false });
+				}
 				const position = reactFlowInstance.screenToFlowPosition({
 					x: event.clientX,
 					y: event.clientY,
@@ -153,6 +167,8 @@ function NodeCanvas() {
 					ui: { position },
 				};
 				switch (selectedTool?.action) {
+					case "move":
+						break;
 					case "addTextNode":
 						addNode(
 							{
@@ -202,45 +218,12 @@ function NodeCanvas() {
 							case "text":
 								addNode(
 									{
-										name: "Text",
+										name: "Text Files",
 										type: "variable",
 										content: {
-											type: "text",
-											text: "",
-										},
-										inputs: [],
-										outputs: [
-											{
-												id: OutputId.generate(),
-												label: "Output",
-											},
-										],
-									},
-									options,
-								);
-
-								break;
-						}
-						break;
-					case "addTextGenerationNode":
-						if (selectedTool.provider === undefined) {
-							break;
-						}
-						switch (selectedTool.provider) {
-							case "openai":
-								addNode(
-									{
-										type: "action",
-										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "openai",
-												model: "gpt-4o",
-												temperature: 0.7,
-												topP: 1.0,
-												presencePenalty: 0.0,
-												frequencyPenalty: 0.0,
-											},
+											type: "file",
+											category: "text",
+											files: [],
 										},
 										inputs: [],
 										outputs: [
@@ -253,53 +236,21 @@ function NodeCanvas() {
 									options,
 								);
 								break;
-							case "anthropic":
+							case "image":
 								addNode(
 									{
-										type: "action",
+										name: "Image",
+										type: "variable",
 										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "anthropic",
-												model: "claude-3-5-sonnet-latest",
-												temperature: 0.7,
-												topP: 1.0,
-											},
+											type: "file",
+											category: "image",
+											files: [],
 										},
 										inputs: [],
 										outputs: [
 											{
 												id: OutputId.generate(),
 												label: "Output",
-											},
-										],
-									},
-									options,
-								);
-								break;
-							case "google":
-								addNode(
-									{
-										type: "action",
-										content: {
-											type: "textGeneration",
-											llm: {
-												provider: "google",
-												model: "gemini-1.5-flash-latest",
-												temperature: 0.7,
-												topP: 1.0,
-												searchGrounding: false,
-											},
-										},
-										inputs: [],
-										outputs: [
-											{
-												id: OutputId.generate(),
-												label: "Output",
-											},
-											{
-												id: OutputId.generate(),
-												label: "Search Result",
 											},
 										],
 									},
@@ -307,29 +258,64 @@ function NodeCanvas() {
 								);
 								break;
 							default: {
-								const _exhaustiveCheck: never = selectedTool.provider;
-								throw new Error(`Unsupported provider: ${_exhaustiveCheck}`);
+								const _exhaustiveCheck: never = selectedTool.fileCategory;
+								throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
 							}
 						}
+						break;
+					case "addTextGenerationNode":
+						if (selectedTool.languageModel === undefined) {
+							break;
+						}
+						addNode(
+							{
+								type: "action",
+								content: {
+									type: "textGeneration",
+									llm: selectedTool.languageModel,
+								},
+								inputs: [],
+								outputs: [
+									{
+										id: OutputId.generate(),
+										label: "Output",
+									},
+								],
+							},
+							options,
+						);
+						break;
+					case "addGitHubNode":
+						addNode(
+							{
+								type: "variable",
+								content: {
+									type: "github",
+									objectReferences: [],
+								},
+								inputs: [],
+								outputs: [
+									{
+										id: OutputId.generate(),
+										label: "Output",
+									},
+								],
+							},
+							options,
+						);
+						break;
+					default: {
+						const _exhaustiveCheck: never = selectedTool;
+						throw new Error(`Unhandled FileCategory: ${_exhaustiveCheck}`);
+					}
 				}
 				reset();
 			}}
 		>
-			<Background
-				className="!bg-black-800"
-				lineWidth={0}
-				variant={BackgroundVariant.Lines}
-				style={{
-					backgroundImage: `url(${bg.src})`,
-					backgroundPositionX: "center",
-					backgroundPositionY: "center",
-					backgroundSize: "cover",
-				}}
-			/>
+			<Background />
 			{selectedTool?.category === "edit" && (
 				<FloatingNodePreview tool={selectedTool} />
 			)}
-
 			<XYFlowPanel position={"bottom-center"}>
 				<Toolbar />
 			</XYFlowPanel>
@@ -393,44 +379,47 @@ export function Editor() {
 		}
 	});
 	return (
-		<div className="flex-1">
-			<ReactFlowProvider>
-				<ToolbarContextProvider>
-					<MousePositionProvider>
-						<PanelGroup
-							direction="horizontal"
-							className="bg-black-900 h-full flex"
-						>
-							<Panel className="flex-1 px-[16px] pb-[16px]" defaultSize={100}>
-								<div className="flex h-full rounded-[16px] overflow-hidden">
-									{/* <Debug /> */}
-									<NodeCanvas />
-								</div>
-							</Panel>
-
-							<PanelResizeHandle
-								className={clsx(
-									"w-[1px] bg-black-400/50 transition-colors",
-									"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
-								)}
-							/>
-							<Panel
-								id="right-panel"
-								className="flex py-[16px]"
-								ref={rightPanelRef}
-								defaultSize={0}
+		<div className="flex-1 overflow-hidden font-sans">
+			<ToastProvider>
+				<ReactFlowProvider>
+					<ToolbarContextProvider>
+						<MousePositionProvider>
+							<PanelGroup
+								direction="horizontal"
+								className="bg-black-900 h-full flex"
 							>
-								{selectedNodes.length === 1 && (
-									<div className="flex-1">
-										<PropertiesPanel />
+								<Panel className="flex-1 px-[16px] pb-[16px]" defaultSize={100}>
+									<div className="flex h-full rounded-[16px] overflow-hidden">
+										{/* <Debug /> */}
+										<NodeCanvas />
 									</div>
-								)}
-							</Panel>
-						</PanelGroup>
-						<KeyboardShortcuts />
-					</MousePositionProvider>
-				</ToolbarContextProvider>
-			</ReactFlowProvider>
+								</Panel>
+
+								<PanelResizeHandle
+									className={clsx(
+										"w-[1px] bg-black-400/50 transition-colors",
+										"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
+									)}
+								/>
+								<Panel
+									id="right-panel"
+									className="flex py-[16px]"
+									ref={rightPanelRef}
+									defaultSize={0}
+								>
+									{selectedNodes.length === 1 && (
+										<div className="flex-1 overflow-hidden">
+											<PropertiesPanel />
+										</div>
+									)}
+								</Panel>
+							</PanelGroup>
+							<KeyboardShortcuts />
+						</MousePositionProvider>
+					</ToolbarContextProvider>
+					<GradientDef />
+				</ReactFlowProvider>
+			</ToastProvider>
 		</div>
 	);
 }

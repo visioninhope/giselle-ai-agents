@@ -1,9 +1,9 @@
 import type {
+	CancelledGeneration,
 	CompletedGeneration,
 	FailedGeneration,
 	Generation,
 	QueuedGeneration,
-	RequestedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
 import { useChat } from "ai/react";
@@ -68,20 +68,20 @@ function CompletionRunner({
 }: {
 	generation:
 		| QueuedGeneration
-		| RequestedGeneration
 		| RunningGeneration
 		| CompletedGeneration
-		| FailedGeneration;
+		| FailedGeneration
+		| CancelledGeneration;
 }) {
 	const {
 		generateTextApi,
-		requestGeneration,
 		updateGenerationStatusToRunning,
 		updateGenerationStatusToComplete,
 		updateGenerationStatusToFailure,
 		updateMessages,
+		addStopHandler,
 	} = useGenerationRunnerSystem();
-	const { messages, append } = useChat({
+	const { messages, append, stop } = useChat({
 		api: generateTextApi,
 		onFinish: async () => {
 			await updateGenerationStatusToComplete(generation.id);
@@ -103,16 +103,15 @@ function CompletionRunner({
 		if (generation.status !== "queued") {
 			return;
 		}
-		requestGeneration(generation).then(() => {
-			append(
-				{ role: "user", content: "hello" },
-				{
-					body: {
-						generationId: generation.id,
-					},
+		addStopHandler(generation.id, stop);
+		append(
+			{ role: "user", content: "hello" },
+			{
+				body: {
+					generation,
 				},
-			);
-		});
+			},
+		);
 	});
 	return null;
 }

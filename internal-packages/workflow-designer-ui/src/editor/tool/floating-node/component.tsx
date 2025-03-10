@@ -54,6 +54,16 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 							preview
 						/>
 					);
+				case "image":
+					return (
+						<NodeComponent
+							title="Image"
+							nodeType="variable"
+							contentType="file"
+							fileCategory="image"
+							preview
+						/>
+					);
 				case "text":
 					return (
 						<NodeComponent
@@ -70,14 +80,14 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				}
 			}
 		case "addTextGenerationNode":
-			if (tool.provider === undefined) {
+			if (tool.languageModel === undefined) {
 				return null;
 			}
-			switch (tool.provider) {
+			switch (tool.languageModel.provider) {
 				case "anthropic":
 					return (
 						<NodeComponent
-							title="claude-3.5-sonnet"
+							title={tool.languageModel.id}
 							subtitle="anthropic"
 							nodeType="action"
 							llmProvider="anthropic"
@@ -88,7 +98,7 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				case "google":
 					return (
 						<NodeComponent
-							title="gemini-2.0-flash"
+							title={tool.languageModel.id}
 							subtitle="google"
 							nodeType="action"
 							contentType="textGeneration"
@@ -99,7 +109,7 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 				case "openai":
 					return (
 						<NodeComponent
-							title="gpt-4o"
+							title={tool.languageModel.id}
 							subtitle="OpenAI"
 							nodeType="action"
 							contentType="textGeneration"
@@ -108,10 +118,19 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 						/>
 					);
 				default: {
-					const _exhaustiveCheck: never = tool.provider;
+					const _exhaustiveCheck: never = tool.languageModel;
 					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 				}
 			}
+		case "addGitHubNode":
+			return (
+				<NodeComponent
+					title="GitHub"
+					nodeType="variable"
+					contentType="github"
+					preview
+				/>
+			);
 		default: {
 			const _exhaustiveCheck: never = tool;
 			throw new Error(`Unhandled tool action: ${_exhaustiveCheck}`);

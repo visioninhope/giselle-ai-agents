@@ -1,22 +1,34 @@
 "use client";
 
-import { FileCategory, LLMProvider } from "@giselle-sdk/data-type";
+import { FileCategory } from "@giselle-sdk/data-type";
+import {
+	Capability,
+	type LanguageModel,
+	hasCapability,
+	languageModels,
+} from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
-import { LetterTextIcon, MousePointer2Icon } from "lucide-react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
+import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
+import type { ReactNode } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
+	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
+	PictureIcon,
+	PromptIcon,
 	StackBlicksIcon,
 	TextFileIcon,
 } from "../../../icons";
 import { Tooltip } from "../../../ui/tooltip";
-import { isToolAction } from "../types";
+import { isAddGitHubNodeToolAction, isToolAction } from "../types";
 import {
 	addFileNodeTool,
+	addGitHubNodeTool,
 	addTextGenerationNodeTool,
 	addTextNodeTool,
 	moveTool,
@@ -32,8 +44,77 @@ function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
 	);
 }
 
+function CapabilityIcon({
+	children,
+}: {
+	children: ReactNode;
+}) {
+	return (
+		<span className="flex gap-[2px] rounded-[8px] border border-white-800 p-[4px] text-[10px]">
+			{children}
+		</span>
+	);
+}
+function ModelCatalog({
+	languageModel,
+	...props
+}: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
+	languageModel: LanguageModel;
+}) {
+	return (
+		<button
+			{...props}
+			className={clsx(
+				"flex gap-[8px]",
+				"hover:bg-white-850/10 p-[4px] rounded-[4px]",
+				"data-[state=on]:bg-primary-900 focus:outline-none",
+				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+			)}
+		>
+			{languageModel.provider === "anthropic" && (
+				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			{languageModel.provider === "openai" && (
+				<OpenaiIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			{languageModel.provider === "google" && (
+				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			<div className="flex flex-start gap-[8px]">
+				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
+				{languageModel.tier === "plus" && <CapabilityIcon>Plus</CapabilityIcon>}
+				{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
+				{hasCapability(languageModel, Capability.TextGeneration) && (
+					<CapabilityIcon>Generate Text</CapabilityIcon>
+				)}
+				{hasCapability(languageModel, Capability.PdfFileInput) && (
+					<CapabilityIcon>Input PDF</CapabilityIcon>
+				)}
+				{hasCapability(languageModel, Capability.ImageFileInput) && (
+					<CapabilityIcon>Input Image</CapabilityIcon>
+				)}
+				{hasCapability(languageModel, Capability.SearchGrounding) && (
+					<CapabilityIcon>Web Search</CapabilityIcon>
+				)}
+				{hasCapability(languageModel, Capability.Reasoning) && (
+					<CapabilityIcon>Reasoning</CapabilityIcon>
+				)}
+				{hasCapability(languageModel, Capability.GenericFileInput) && (
+					<>
+						<CapabilityIcon>Input PDF</CapabilityIcon>
+						<CapabilityIcon>Input Image</CapabilityIcon>
+						<CapabilityIcon>Input Audio</CapabilityIcon>
+						<CapabilityIcon>Input Video</CapabilityIcon>
+					</>
+				)}
+			</div>
+		</button>
+	);
+}
+
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
+	const { llmProviders } = useWorkflowDesigner();
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-[hsla(255,_40%,_98%,_0.04)]">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -73,7 +154,7 @@ export function Toolbar() {
 					</ToggleGroup.Item>
 					<ToggleGroup.Item value="addTextNode" data-tool>
 						<Tooltip text={<TooltipAndHotkey text="Text" hotkey="t" />}>
-							<LetterTextIcon data-icon />
+							<PromptIcon data-icon />
 						</Tooltip>
 					</ToggleGroup.Item>
 					<ToggleGroup.Item value="addFileNode" data-tool>
@@ -102,20 +183,32 @@ export function Toolbar() {
 												)}
 												value={selectedTool.fileCategory}
 												onValueChange={(fileCategory) => {
-													setSelectedTool({
-														...selectedTool,
-														fileCategory: FileCategory.parse(fileCategory),
-													});
+													if (isAddGitHubNodeToolAction(fileCategory)) {
+														setSelectedTool(addGitHubNodeTool());
+													} else {
+														setSelectedTool({
+															...selectedTool,
+															fileCategory: FileCategory.parse(fileCategory),
+														});
+													}
 												}}
 											>
 												<ToggleGroup.Item value="pdf" data-tool>
 													<PdfFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">PDF</p>
 												</ToggleGroup.Item>
+												<ToggleGroup.Item value="image" data-tool>
+													<PictureIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">Image</p>
+												</ToggleGroup.Item>
 												<ToggleGroup.Item value="text" data-tool>
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text</p>
 												</ToggleGroup.Item>
+												{/* <ToggleGroup.Item value="addGitHubNode" data-tool>
+													<GitHubIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">GitHub</p>
+												</ToggleGroup.Item> */}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
@@ -131,7 +224,7 @@ export function Toolbar() {
 								<Popover.Portal>
 									<Popover.Content
 										className={clsx(
-											"relative w-[260px] rounded-[8px] px-[8px] py-[8px]",
+											"relative rounded-[8px] px-[8px] py-[8px]",
 											"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
 											"backdrop-blur-[4px]",
 										)}
@@ -141,32 +234,31 @@ export function Toolbar() {
 										<div className="relative flex flex-col gap-[8px]">
 											<ToggleGroup.Root
 												type="single"
-												className={clsx(
-													"flex flex-col gap-[8px]",
-													"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
-													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
-													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
-												)}
-												value={selectedTool.provider}
-												onValueChange={(provider) => {
+												className={clsx("flex flex-col gap-[8px]")}
+												value={selectedTool.languageModel?.id}
+												onValueChange={(modelId) => {
+													const languageModel = languageModels.find(
+														(model) => model.id === modelId,
+													);
+													if (languageModel === undefined) {
+														return;
+													}
 													setSelectedTool({
 														...selectedTool,
-														provider: LLMProvider.parse(provider),
+														languageModel,
 													});
 												}}
 											>
-												<ToggleGroup.Item value="openai" data-tool>
-													<OpenaiIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">OpenAI</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="google" data-tool>
-													<GoogleWhiteIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Google</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item value="anthropic" data-tool>
-													<AnthropicIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">Anthropic</p>
-												</ToggleGroup.Item>
+												{languageModels.map((languageModel) => (
+													<ToggleGroup.Item
+														data-tool
+														key={languageModel.id}
+														value={languageModel.id}
+														asChild
+													>
+														<ModelCatalog languageModel={languageModel} />
+													</ToggleGroup.Item>
+												))}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

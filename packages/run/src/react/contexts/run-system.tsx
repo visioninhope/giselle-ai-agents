@@ -1,21 +1,21 @@
-import type { WorkflowId, WorkspaceId } from "@giselle-sdk/data-type";
 import {
+	type CancelledRun,
 	type CreatedRun,
 	type Generation,
 	type Run,
 	RunId,
 	type RunningRun,
+	type WorkflowId,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { useGenerationController } from "@giselle-sdk/generation-runner/react";
-import {
-	callAddRunApi,
-	callStartRunApi,
-} from "@giselle-sdk/giselle-engine/client";
+import { useGenerationRunnerSystem } from "@giselle-sdk/generation-runner/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import {
 	type ReactNode,
 	createContext,
 	useCallback,
 	useContext,
+	useRef,
 	useState,
 } from "react";
 
@@ -26,12 +26,15 @@ export type Perform = (
 	workflowId: WorkflowId,
 	options?: performOptions,
 ) => Promise<void>;
+export type Cancel = (runId: RunId) => Promise<void>;
 
 interface RunSystemContextType {
 	runs: Run[];
 	activeRunId?: RunId;
 	runGenerations: Record<RunId, Generation[]>;
 	perform: Perform;
+	isRunning: boolean;
+	cancel: Cancel;
 }
 
 export const RunSystemContext = createContext<RunSystemContextType | undefined>(
@@ -45,12 +48,16 @@ export function RunSystemContextProvider({
 	workspaceId: WorkspaceId;
 	children: ReactNode;
 }) {
+	const client = useGiselleEngine();
 	const [activeRunId, setActiveRunId] = useState<RunId | undefined>();
 	const [runs, setRuns] = useState<Run[]>([]);
-	const { startGeneration } = useGenerationController();
+	const [isRunning, setIsRunning] = useState(false);
+	const { startGeneration, stopGeneration } = useGenerationRunnerSystem();
 	const [runGenerations, setRunGenerations] = useState<
 		Record<RunId, Generation[]>
 	>({});
+	const runRef = useRef<Record<RunId, Run>>({});
+
 	const setRunGeneration = useCallback(
 		(runId: RunId, newGeneration: Generation) => {
 			setRunGenerations((prev) => {
@@ -80,6 +87,7 @@ export function RunSystemContextProvider({
 
 	const perform = useCallback<Perform>(
 		async (workflowId, options) => {
+			setIsRunning(true);
 			const runId = RunId.generate();
 			const createdRun = {
 				id: runId,
@@ -87,9 +95,10 @@ export function RunSystemContextProvider({
 				createdAt: Date.now(),
 			} satisfies CreatedRun;
 			setRuns((prev) => [...prev, createdRun]);
+			runRef.current[runId] = createdRun;
 			options?.onCreateRun?.(createdRun);
 			setActiveRunId(createdRun.id);
-			const { run: queuedRun } = await callAddRunApi({
+			const queuedRun = await client.addRun({
 				run: createdRun,
 				workspaceId,
 				workflowId,
@@ -100,13 +109,21 @@ export function RunSystemContextProvider({
 				startedAt: Date.now(),
 			} satisfies RunningRun;
 			setRuns((prev) => [...prev.filter((p) => p.id !== runId), runningRun]);
-			await callStartRunApi({
+			runRef.current[runId] = runningRun;
+			await client.startRun({
 				runId,
 			});
 
 			for (const job of runningRun.workflow.jobs) {
 				await Promise.all(
 					job.actions.map(async (action) => {
+						const currentRun = runRef.current[runId];
+						if (currentRun === undefined) {
+							return;
+						}
+						if (currentRun.status === "cancelled") {
+							return;
+						}
 						await startGeneration(
 							{
 								origin: { type: "run", id: runId },
@@ -125,13 +142,60 @@ export function RunSystemContextProvider({
 								onGenerationCompleted(generation) {
 									setRunGeneration(runId, generation);
 								},
+								onUpdateMessages(generation) {
+									setRunGeneration(runId, generation);
+								},
+								onGenerationCancelled(generation) {
+									setRunGeneration(runId, generation);
+								},
 							},
 						);
 					}),
 				);
 			}
+			setIsRunning(false);
 		},
-		[workspaceId, setRunGeneration, startGeneration],
+		[workspaceId, setRunGeneration, startGeneration, client],
+	);
+
+	const cancel = useCallback<Cancel>(
+		async (runId) => {
+			const generations = runGenerations[runId] || [];
+
+			const currentRun = runRef.current[runId];
+			if (currentRun === undefined) {
+				return;
+			}
+			const cancelledRun = {
+				...currentRun,
+				status: "cancelled",
+				cancelledAt: Date.now(),
+			} as CancelledRun;
+
+			setRuns((prev) => [...prev.filter((p) => p.id !== runId), cancelledRun]);
+			runRef.current[runId] = cancelledRun;
+
+			setIsRunning(false);
+			await Promise.all(
+				generations.map(async (generation) => {
+					if (
+						generation.status === "running" ||
+						generation.status === "queued" ||
+						generation.status === "created"
+					) {
+						try {
+							await stopGeneration(generation.id);
+						} catch (error) {
+							console.error(
+								`Failed to stop generation ${generation.id}:`,
+								error,
+							);
+						}
+					}
+				}),
+			);
+		},
+		[runGenerations, stopGeneration],
 	);
 
 	return (
@@ -141,6 +205,8 @@ export function RunSystemContextProvider({
 				activeRunId,
 				runGenerations,
 				perform,
+				isRunning,
+				cancel,
 			}}
 		>
 			{children}
