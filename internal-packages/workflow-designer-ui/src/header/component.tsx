@@ -2,7 +2,7 @@
 
 import clsx from "clsx";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { PlayIcon } from "lucide-react";
+import { ChevronDownIcon, PlayIcon } from "lucide-react";
 import type { ReactNode } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
 import { GiselleLogo } from "../icons";
@@ -18,11 +18,19 @@ export function Header({
 			<div className="flex items-center gap-[8px] text-white-950">
 				<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
 				<Divider />
-				<EditableText
-					fallbackValue="Untitled"
-					onChange={updateName}
-					value={data.name}
-				/>
+				<div className="flex gap-[2px] group">
+					<EditableText
+						fallbackValue="Untitled"
+						onChange={updateName}
+						value={data.name}
+					/>
+					<button
+						type="button"
+						className="group-hover:bg-white-900/10 hover:bg-white-900/20 rounded-r-[4px] peer-data-[editing=true]:hidden px-[2px]"
+					>
+						<ChevronDownIcon className="size-[12px] text-white-900" />
+					</button>
+				</div>
 			</div>
 			{action && <div className="flex items-center">{action}</div>}
 		</div>
