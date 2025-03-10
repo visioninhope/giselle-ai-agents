@@ -78,7 +78,8 @@
 - - :permit
   - MIT-0
   - :who:
-    :why: MIT-0 is an extremely permissive license with no attribution requirements. https://github.com/aws/mit-0
+    :why: MIT-0 is an extremely permissive license with no attribution requirements.
+      https://github.com/aws/mit-0
     :versions: []
     :when: 2025-01-20 15:39:57.858569000 Z
 - - :permit
@@ -101,3 +102,9 @@
     :why: Compatible with Apache-2.0 license. See https://openfontlicense.org/open-font-license-official-text/
     :versions: []
     :when: 2025-02-27 06:29:24.670306000 Z
+- - :approve
+  - spawndamnit@3.0.1
+  - :who: sakito
+    :why: License verified as MIT and aligns with company OSS policy.
+    :versions: []
+    :when: 2025-03-10 07:50:01.374204000 Z
