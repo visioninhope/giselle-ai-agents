@@ -23,7 +23,7 @@ export function GitHubResourceLoader() {
 		null,
 	);
 
-	const client = useGiselleEngine()
+	const client = useGiselleEngine();
 
 	const handleAddUrl = async () => {
 		if (!url.trim() || !isValidUrl(url)) return;
@@ -34,9 +34,9 @@ export function GitHubResourceLoader() {
 			return;
 		}
 
-    const id = await client.githubUrlToObjectId({ url })
+		const id = await client.githubUrlToObjectId({ url });
 
-    alert(id)
+		alert(id);
 		setCurrentLoadingUrl(url);
 		setIsLoading(true);
 
