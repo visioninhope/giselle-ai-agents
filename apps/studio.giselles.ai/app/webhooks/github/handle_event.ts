@@ -265,15 +265,23 @@ async function executeIntegrationFlow(
 	});
 
 	if (finalExecution.status === "completed") {
-		await octokit.request(
-			"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
-			{
-				owner: payload.repository.owner.login,
-				repo: payload.repository.name,
-				issue_number: payload.issue.number,
-				body: finalExecution.artifacts[finalExecution.artifacts.length - 1]
-					.object.content,
-			},
-		);
+		switch (integrationSetting.nextAction) {
+			case "github.issue_comment.reply":
+				await octokit.request(
+					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
+					{
+						owner: payload.repository.owner.login,
+						repo: payload.repository.name,
+						issue_number: payload.issue.number,
+						body: finalExecution.artifacts[finalExecution.artifacts.length - 1]
+							.object.content,
+					},
+				);
+				break;
+			default: {
+				const _exhaustiveCheck: never = integrationSetting.nextAction;
+				throw new Error(`Unhandled next action: ${_exhaustiveCheck}`);
+			}
+		}
 	}
 }
