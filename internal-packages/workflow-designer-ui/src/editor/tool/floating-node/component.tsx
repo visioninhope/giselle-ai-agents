@@ -122,6 +122,15 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 				}
 			}
+		case "addGitHubNode":
+			return (
+				<NodeComponent
+					title="GitHub"
+					nodeType="variable"
+					contentType="github"
+					preview
+				/>
+			);
 		default: {
 			const _exhaustiveCheck: never = tool;
 			throw new Error(`Unhandled tool action: ${_exhaustiveCheck}`);

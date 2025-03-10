@@ -83,7 +83,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return await removeFile({ context, fileId, workspaceId, fileName });
 		},
 
-		urlToObjectID: async (url: string) => {
+		githubUrlToObjectId: async (url: string) => {
 			return await urlToObjectID(url);
 		},
 	};

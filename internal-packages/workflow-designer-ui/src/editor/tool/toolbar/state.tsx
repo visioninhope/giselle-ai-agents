@@ -5,6 +5,7 @@ import type { LanguageModel } from "@giselle-sdk/language-model";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type {
 	AddFileNodeTool,
+	AddGitHubNodeTool,
 	AddTextGenerationNodeTool,
 	AddTextNodeTool,
 	MoveTool,
@@ -83,4 +84,11 @@ export function addTextNodeTool() {
 		action: "addTextNode",
 		category: "edit",
 	} satisfies AddTextNodeTool;
+}
+
+export function addGitHubNodeTool() {
+	return {
+		action: "addGitHubNode",
+		category: "edit",
+	} satisfies AddGitHubNodeTool;
 }

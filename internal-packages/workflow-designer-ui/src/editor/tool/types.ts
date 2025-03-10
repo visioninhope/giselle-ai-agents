@@ -24,16 +24,22 @@ export interface MoveTool extends ToolBase {
 	category: "move";
 	action: "move";
 }
+export interface AddGitHubNodeTool extends ToolBase {
+	category: "edit";
+	action: "addGitHubNode";
+}
 export type Tool =
 	| AddTextNodeTool
 	| AddFileNodeTool
 	| AddTextGenerationNodeTool
-	| MoveTool;
+	| MoveTool
+	| AddGitHubNodeTool;
 
 type ToolAction =
 	| AddTextNodeTool["action"]
 	| AddFileNodeTool["action"]
 	| AddTextGenerationNodeTool["action"]
+	| AddGitHubNodeTool["action"]
 	| MoveTool["action"];
 
 export function isToolAction(args: unknown): args is ToolAction {
@@ -46,4 +52,10 @@ export function isToolAction(args: unknown): args is ToolAction {
 		);
 	}
 	return false;
+}
+
+export function isAddGitHubNodeToolAction(
+	action: string,
+): action is AddGitHubNodeTool["action"] {
+	return action === "addGitHubNode";
 }
