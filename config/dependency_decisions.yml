@@ -105,6 +105,7 @@
 - - :approve
   - spawndamnit@3.0.1
   - :who: sakito
-    :why: License verified as MIT and aligns with company OSS policy.
-    :versions: []
-    :when: 2025-03-10 07:50:01.374204000 Z
+    :why: See https://github.com/jamiebuilds/spawndamnit/pull/11
+    :versions: 
+    - 3.0.1
+    :when: 2025-03-10 08:02:40.655579000 Z
