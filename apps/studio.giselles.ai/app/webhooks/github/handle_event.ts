@@ -188,8 +188,8 @@ async function executeIntegrationFlow(
 		runStartedAt: flowRunStartedAt,
 	};
 
-	const overrideData = integrationSetting.eventNodeMappings
-		.map((eventNodeMapping) => {
+	const overrideData = await Promise.all(
+		integrationSetting.eventNodeMappings.map(async (eventNodeMapping) => {
 			switch (eventNodeMapping.event) {
 				case "comment.body":
 					return {
@@ -209,11 +209,35 @@ async function executeIntegrationFlow(
 						nodeId: eventNodeMapping.nodeId,
 						data: payload.issue.body,
 					};
+				case "pull_request.diff": {
+					// if `issue.pull_request` exists, it means the issue is a pull request
+					if (payload.issue.pull_request == null) {
+						return null;
+					}
+					const result = await octokit.request(
+						"GET /repos/{owner}/{repo}/pulls/{pull_number}",
+						{
+							owner: payload.repository.owner.login,
+							repo: payload.repository.name,
+							pull_number: payload.issue.number,
+							mediaType: {
+								format: "diff",
+							},
+						},
+					);
+					// need to cast the result to string
+					// https://github.com/octokit/request.js/issues/463#issuecomment-1164800010
+					const diff = result.data as unknown as string;
+					return {
+						nodeId: eventNodeMapping.nodeId,
+						data: diff,
+					};
+				}
 				default:
 					return null;
 			}
-		})
-		.filter((overrideData) => overrideData !== null);
+		}),
+	).then((results) => results.filter((overrideData) => overrideData !== null));
 
 	const finalExecution = await performFlowExecution({
 		initialExecution,
