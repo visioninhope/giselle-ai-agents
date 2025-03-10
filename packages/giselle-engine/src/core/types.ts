@@ -6,7 +6,25 @@ export interface GiselleEngineContext {
 	llmProviders: LanguageModelProvider[];
 }
 
+interface GitHubAppIntegrationConfig {
+	provider: "github-app";
+	appId: string;
+	privateKey: string;
+	clientId: string;
+	clientSecret: string;
+}
+
+interface GitHubPATIntegrationConfig {
+	provider: "github-pat";
+	token: string;
+}
+
+export type GiselleIntegrationConfig =
+	| GitHubAppIntegrationConfig
+	| GitHubPATIntegrationConfig;
+
 export interface GiselleEngineConfig {
 	storage: Storage;
 	llmProviders?: LanguageModelProvider[];
+	integrationConfigs?: GiselleIntegrationConfig[];
 }

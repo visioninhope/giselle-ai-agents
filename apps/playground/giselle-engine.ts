@@ -1,4 +1,7 @@
-import type { LanguageModelProvider } from "giselle-sdk";
+import type {
+	GiselleIntegrationConfig,
+	LanguageModelProvider,
+} from "giselle-sdk";
 import { NextGiselleEngine } from "giselle-sdk/next";
 
 import { createStorage } from "unstorage";
@@ -33,8 +36,31 @@ if (llmProviders.length === 0) {
 	throw new Error("No LLM providers configured");
 }
 
+const integrationConfigs: GiselleIntegrationConfig[] = [];
+if (
+	process.env.GITHUB_APP_ID &&
+	process.env.GITHUB_APP_PRIVATE_KEY &&
+	process.env.GITHUB_APP_CLIENT_ID &&
+	process.env.GITHUB_APP_CLIENT_SECRET
+) {
+	integrationConfigs.push({
+		provider: "github-app",
+		appId: process.env.GITHUB_APP_ID,
+		privateKey: process.env.GITHUB_APP_PRIVATE_KEY,
+		clientId: process.env.GITHUB_APP_CLIENT_ID,
+		clientSecret: process.env.GITHUB_APP_CLIENT_SECRET,
+	});
+}
+if (process.env.GITHUB_TOKEN) {
+	integrationConfigs.push({
+		provider: "github-pat",
+		token: process.env.GITHUB_TOKEN,
+	});
+}
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
 	llmProviders,
+	integrationConfigs,
 });
