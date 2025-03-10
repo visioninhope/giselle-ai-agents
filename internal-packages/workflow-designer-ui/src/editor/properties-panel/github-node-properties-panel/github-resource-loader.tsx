@@ -32,7 +32,6 @@ export function GitHubResourceLoader() {
 			const url = formData.get("url") as string;
 			const response = await client.githubUrlToObjectId({ url });
 
-			console.log(response);
 			setCurrentLoadingUrl(url);
 			setIsLoading(false);
 

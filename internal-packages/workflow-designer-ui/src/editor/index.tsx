@@ -166,7 +166,6 @@ function NodeCanvas() {
 				const options = {
 					ui: { position },
 				};
-				console.log(options);
 				switch (selectedTool?.action) {
 					case "move":
 						break;
