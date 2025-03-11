@@ -53,32 +53,32 @@ export const Form = <T extends Record<string, string | undefined>>({
 					)}
 				</div>
 				<div className="grid gap-[4px]">
-					<Label htmlFor="password">Password</Label>
-					<Input
-						id="password"
-						type="password"
-						name="password"
-						required
-						className={
-							validationError && "password" in validationError
-								? "border-red-500"
-								: ""
-						}
-					/>
+					<div className="grid gap-[4px] relative">
+						<Label htmlFor="password">Password</Label>
+						<Input
+							id="password"
+							type="password"
+							name="password"
+							required
+							className={
+								validationError && "password" in validationError
+									? "border-red-500"
+									: ""
+							}
+						/>
+						{linkToResetPassword && (
+							<Link
+								href="/password_reset"
+								className="text-[12px] text-black-70 absolute top-0 right-0"
+							>
+								Forgot your password?
+							</Link>
+						)}
+					</div>
 					{validationError && "password" in validationError && (
 						<p className="text-red-500 text-sm mt-1">
 							{validationError.password}
 						</p>
-					)}
-					{linkToResetPassword && (
-						<div className="text-right">
-							<Link
-								href="/password_reset"
-								className="ml-auto text-[12px] text-black-70"
-							>
-								Forgot your password?
-							</Link>
-						</div>
 					)}
 				</div>
 				<Button
