@@ -8,8 +8,6 @@ import {
 	ChevronsUpDownIcon,
 } from "lucide-react";
 import { Select as SelectPrimitive } from "radix-ui";
-import type * as React from "react";
-import type { ComponentProps } from "react";
 
 const Select = SelectPrimitive.Root;
 
@@ -21,7 +19,7 @@ function SelectTrigger({
 	className,
 	children,
 	...props
-}: ComponentProps<typeof SelectPrimitive.Trigger>) {
+}: SelectPrimitive.SelectTriggerProps) {
 	return (
 		<SelectPrimitive.Trigger
 			className={clsx(
@@ -45,7 +43,7 @@ SelectTrigger.displayName = SelectPrimitive.Trigger.displayName;
 function SelectScrollUpButton({
 	className,
 	...props
-}: ComponentProps<typeof SelectPrimitive.ScrollUpButton>) {
+}: SelectPrimitive.SelectScrollUpButtonProps) {
 	return (
 		<SelectPrimitive.ScrollUpButton
 			className={clsx(
@@ -63,7 +61,7 @@ SelectScrollUpButton.displayName = SelectPrimitive.ScrollUpButton.displayName;
 function SelectScrollDownButton({
 	className,
 	...props
-}: ComponentProps<typeof SelectPrimitive.ScrollDownButton>) {
+}: SelectPrimitive.SelectScrollDownButtonProps) {
 	return (
 		<SelectPrimitive.ScrollDownButton
 			className={clsx(
@@ -84,7 +82,7 @@ function SelectContent({
 	children,
 	position = "popper",
 	...props
-}: ComponentProps<typeof SelectPrimitive.Content>) {
+}: SelectPrimitive.SelectContentProps) {
 	return (
 		<SelectPrimitive.Portal>
 			<SelectPrimitive.Content
@@ -118,7 +116,7 @@ SelectContent.displayName = SelectPrimitive.Content.displayName;
 function SelectLabel({
 	className,
 	...props
-}: ComponentProps<typeof SelectPrimitive.Label>) {
+}: SelectPrimitive.SelectLabelProps) {
 	return (
 		<SelectPrimitive.Label
 			className={clsx("py-1.5 pl-8 pr-2 text-sm font-semibold", className)}
@@ -128,10 +126,7 @@ function SelectLabel({
 }
 SelectLabel.displayName = SelectPrimitive.Label.displayName;
 
-function SelectItem({
-	children,
-	...props
-}: React.ComponentProps<typeof SelectPrimitive.Item>) {
+function SelectItem({ children, ...props }: SelectPrimitive.SelectItemProps) {
 	return (
 		<SelectPrimitive.Item
 			className={clsx(
@@ -156,7 +151,7 @@ SelectItem.displayName = SelectPrimitive.Item.displayName;
 function SelectSeparator({
 	className,
 	...props
-}: React.ComponentProps<typeof SelectPrimitive.Separator>) {
+}: SelectPrimitive.SelectSeparatorProps) {
 	return (
 		<SelectPrimitive.Separator
 			className={clsx("-mx-1 my-1 h-px bg-muted", className)}

@@ -9,6 +9,7 @@
 	--color-black-900: hsl(229, 100%, 2%);
 	--color-black-850: hsl(231, 62%, 6%);
 	--color-black-800: hsl(231, 47%, 22%);
+	--color-black-750: hsl(227, 30%, 12%);
 	--color-black-400: hsl(222, 21%, 40%);
 	--color-black-300: hsl(222, 21%, 50%);
 	--color-black-200: hsl(209, 17%, 75%);
@@ -20,6 +21,7 @@
 	--color-white-800: hsl(207, 43%, 91%);
 	--color-white-400: hsl(207, 16%, 75%);
 
+	--color-blue-950: hsl(219, 90%, 52%);
 	--color-blue-900: hsl(219, 90%, 52%);
 	--color-blue-800: hsl(219, 90%, 60%);
 	--color-blue-400: hsl(224, 82%, 68%);
@@ -37,6 +39,7 @@
 
 	--color-deep-purple-900: hsl(275, 96%, 44%);
 
+	--color-primary-950: var(--color-blue-950);
 	--color-primary-900: var(--color-blue-900);
 	--color-primary-800: var(--color-blue-800);
 	--color-primary-400: var(--color-blue-400);
