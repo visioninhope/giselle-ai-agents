@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/v2/ui/button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
 import Link from "next/link";
-import { GitHubAppInstallButton } from "../../../../../packages/components/github-app-install-button";
+import { GitHubAppInstallButton } from "../../../../../packages/components/v2/github-app-install-button";
 
 export async function GitHubIntegration() {
 	const installUrl = await gitHubAppInstallURL();
@@ -82,7 +82,7 @@ type HeaderProps = {
 
 function Header({ account, installed, installationUrl }: HeaderProps) {
 	return (
-		<div className="flex items-center justify-between">
+		<div className="flex items-center justify-between p-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10">
 			<div className="flex items-center space-x-4">
 				<SiGithub className="w-8 h-8" />
 				<div>
