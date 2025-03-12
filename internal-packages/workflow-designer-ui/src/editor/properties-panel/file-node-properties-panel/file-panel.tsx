@@ -107,9 +107,9 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				let itemType = dataTransferItem.type;
 				const file = dataTransferItem.getAsFile();
 				if (!itemType && file) {
-					const extension = file.name.split('.').pop()?.toLowerCase();
-					if (extension === 'md' || extension === 'markdown') {
-						itemType = 'text/markdown';
+					const extension = file.name.split(".").pop()?.toLowerCase();
+					if (extension === "md" || extension === "markdown") {
+						itemType = "text/markdown";
 					}
 				}
 				isValid = config.accept.some((accept) =>
@@ -131,9 +131,9 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				// Determine MIME type from file extension if needed
 				let mimeType = file.type;
 				if (!mimeType) {
-					const extension = file.name.split('.').pop()?.toLowerCase();
-					if (extension === 'md' || extension === 'markdown') {
-						mimeType = 'text/markdown';
+					const extension = file.name.split(".").pop()?.toLowerCase();
+					if (extension === "md" || extension === "markdown") {
+						mimeType = "text/markdown";
 					}
 				}
 
