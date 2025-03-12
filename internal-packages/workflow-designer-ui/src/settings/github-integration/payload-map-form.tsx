@@ -1,8 +1,8 @@
 import {
-	GitHubIntegrationPayload,
-	type GitHubIntegrationPayloadMap,
 	type Node,
 	NodeId,
+	WorkspaceGitHubIntegrationPayload,
+	type WorkspaceGitHubIntegrationPayloadNodeMap,
 } from "@giselle-sdk/data-type";
 import { Pi, PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
@@ -27,21 +27,21 @@ export function PayloadMapForm({
 	currentPayloadMaps = [],
 }: {
 	nodes: Node[];
-	currentPayloadMaps?: GitHubIntegrationPayloadMap[];
+	currentPayloadMaps?: WorkspaceGitHubIntegrationPayloadNodeMap[];
 }) {
 	const [selectedNodeId, setSelectedNodeId] = useState<NodeId | string>("");
 	const [selectedPayload, setSelectedPayload] = useState<
-		GitHubIntegrationPayload | string
+		WorkspaceGitHubIntegrationPayload | string
 	>("");
 	const [payloadMaps, setPayloadMaps] =
-		useState<GitHubIntegrationPayloadMap[]>(currentPayloadMaps);
+		useState<WorkspaceGitHubIntegrationPayloadNodeMap[]>(currentPayloadMaps);
 
 	const [showNewPayloadFieldsFlag, setShowNewPayloadFieldsFlag] =
 		useState(false);
 	useEffect(() => {
 		const parseSelectedNodeId = NodeId.safeParse(selectedNodeId);
 		const parseSelectedPayload =
-			GitHubIntegrationPayload.safeParse(selectedPayload);
+			WorkspaceGitHubIntegrationPayload.safeParse(selectedPayload);
 		if (!parseSelectedNodeId.success || !parseSelectedPayload.success) {
 			return;
 		}
@@ -54,7 +54,7 @@ export function PayloadMapForm({
 		setShowNewPayloadFieldsFlag(false);
 	}, [selectedNodeId, selectedPayload]);
 	const removePayloadMap = useCallback(
-		(removePayloadMap: GitHubIntegrationPayloadMap) => {
+		(removePayloadMap: WorkspaceGitHubIntegrationPayloadNodeMap) => {
 			console.log(removePayloadMap);
 			setPayloadMaps((prev) =>
 				prev.filter(
@@ -68,7 +68,7 @@ export function PayloadMapForm({
 	);
 	const payloadMapsForRender = useMemo(() => {
 		const payloadMapsForRender: Array<
-			GitHubIntegrationPayloadMap & { nodeName: string }
+			WorkspaceGitHubIntegrationPayloadNodeMap & { nodeName: string }
 		> = [];
 		for (const payloadMap of payloadMaps) {
 			const node = nodes.find((node) => node.id === payloadMap.nodeId);
@@ -119,7 +119,9 @@ export function PayloadMapForm({
 							<Select
 								value={selectedPayload}
 								onValueChange={(value) =>
-									setSelectedPayload(GitHubIntegrationPayload.parse(value))
+									setSelectedPayload(
+										WorkspaceGitHubIntegrationPayload.parse(value),
+									)
 								}
 							>
 								<SelectTrigger>
@@ -128,14 +130,16 @@ export function PayloadMapForm({
 								<SelectContent>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum["github.issue_comment.body"]
+											WorkspaceGitHubIntegrationPayload.Enum[
+												"github.issue_comment.body"
+											]
 										}
 									>
 										issue_comment.body
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum[
+											WorkspaceGitHubIntegrationPayload.Enum[
 												"github.issue_comment.issue.title"
 											]
 										}
@@ -144,7 +148,7 @@ export function PayloadMapForm({
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum[
+											WorkspaceGitHubIntegrationPayload.Enum[
 												"github.issue_comment.issue.body"
 											]
 										}
@@ -153,21 +157,27 @@ export function PayloadMapForm({
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum["github.pull_request.title"]
+											WorkspaceGitHubIntegrationPayload.Enum[
+												"github.pull_request.title"
+											]
 										}
 									>
 										pull_request.title
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum["github.pull_request.body"]
+											WorkspaceGitHubIntegrationPayload.Enum[
+												"github.pull_request.body"
+											]
 										}
 									>
 										pull_request.body
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationPayload.Enum["github.pull_request.diff"]
+											WorkspaceGitHubIntegrationPayload.Enum[
+												"github.pull_request.diff"
+											]
 										}
 									>
 										pull_request.diff

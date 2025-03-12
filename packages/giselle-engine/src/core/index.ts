@@ -3,12 +3,12 @@ import type {
 	FileId,
 	GenerationId,
 	GenerationOrigin,
-	GitHubIntegrationSetting,
 	NodeId,
 	QueuedGeneration,
 	RunId,
 	WorkflowId,
 	Workspace,
+	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
@@ -96,11 +96,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			});
 		},
 		upsertGithubIntegrationSetting: async (
-			integrationSetting: GitHubIntegrationSetting,
+			workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
 		) => {
 			upsertGithubIntegrationSetting({
 				context,
-				integrationSetting,
+				workspaceGitHubIntegrationSetting,
 			});
 		},
 		getWorkspaceGitHubIntegrationSetting: async (workspaceId: WorkspaceId) => {

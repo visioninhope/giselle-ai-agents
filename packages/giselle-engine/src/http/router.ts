@@ -3,12 +3,12 @@ import {
 	FileId,
 	GenerationId,
 	GenerationOrigin,
-	GitHubIntegrationSetting,
 	NodeId,
 	QueuedGeneration,
 	RunId,
 	WorkflowId,
 	Workspace,
+	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod";
@@ -143,14 +143,14 @@ export const createJsonRouters = {
 				return JsonResponse.json({ objectId });
 			},
 		}),
-	upsertGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
+	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
-				integrationSetting: GitHubIntegrationSetting,
+				workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.upsertGithubIntegrationSetting(
-					input.integrationSetting,
+					input.workspaceGitHubIntegrationSetting,
 				);
 				return new Response(null, { status: 204 });
 			},
@@ -161,11 +161,13 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 			}),
 			handler: async ({ input }) => {
-				const integrationSetting =
+				const workspaceGitHubIntegrationSetting =
 					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
 						input.workspaceId,
 					);
-				return JsonResponse.json({ integrationSetting });
+				return JsonResponse.json({
+					workspaceGitHubIntegrationSetting,
+				});
 			},
 		}),
 } as const;

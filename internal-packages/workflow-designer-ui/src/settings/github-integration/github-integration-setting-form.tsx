@@ -1,11 +1,8 @@
 import {
-	GitHubIntegrationNextAction,
-	GitHubIntegrationPayload,
-	GitHubIntegrationTriggerEvent,
-	type Node,
+	WorkspaceGitHubIntegrationNextAction,
+	WorkspaceGitHubIntegrationTrigger,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { Dam } from "lucide-react";
 import {
 	Label,
 	Select,
@@ -86,7 +83,7 @@ export function GitHubIntegrationSettingForm() {
 								<SelectContent>
 									<SelectItem
 										value={
-											GitHubIntegrationTriggerEvent.Enum[
+											WorkspaceGitHubIntegrationTrigger.Enum[
 												"github.issue_comment.created"
 											]
 										}
@@ -95,7 +92,7 @@ export function GitHubIntegrationSettingForm() {
 									</SelectItem>
 									<SelectItem
 										value={
-											GitHubIntegrationTriggerEvent.Enum[
+											WorkspaceGitHubIntegrationTrigger.Enum[
 												"github.pull_request.issue_comment.created"
 											]
 										}
@@ -136,7 +133,7 @@ export function GitHubIntegrationSettingForm() {
 							<SelectContent>
 								<SelectItem
 									value={
-										GitHubIntegrationNextAction.Enum[
+										WorkspaceGitHubIntegrationNextAction.Enum[
 											"github.issue_comment.create"
 										]
 									}
@@ -145,7 +142,7 @@ export function GitHubIntegrationSettingForm() {
 								</SelectItem>
 								<SelectItem
 									value={
-										GitHubIntegrationNextAction.Enum[
+										WorkspaceGitHubIntegrationNextAction.Enum[
 											"github.pull_request.issue_comment.create"
 										]
 									}

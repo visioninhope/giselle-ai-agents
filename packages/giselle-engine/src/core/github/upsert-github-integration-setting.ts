@@ -1,22 +1,22 @@
-import type { GitHubIntegrationSetting } from "@giselle-sdk/data-type";
+import type { WorkspaceGitHubIntegrationSetting } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
 import {
-	upsertGitHubIntegrationSetting as upsertGitHubIntegrationSettingInternal,
-	upsertWorkspaceGitHubIntegrationSetting,
+	upsertWorkspaceGitHubIntegrationSetting as upsertGitHubIntegrationSettingInternal,
+	upsertWorkspcaeGitHubIntegrationResitorySetting,
 } from "./utils";
 
 export async function upsertGithubIntegrationSetting(args: {
 	context: GiselleEngineContext;
-	integrationSetting: GitHubIntegrationSetting;
+	workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting;
 }) {
 	await Promise.all([
 		await upsertGitHubIntegrationSettingInternal({
 			storage: args.context.storage,
-			integrationSetting: args.integrationSetting,
+			workspaceGitHubIntegrationSetting: args.workspaceGitHubIntegrationSetting,
 		}),
-		await upsertWorkspaceGitHubIntegrationSetting({
+		await upsertWorkspcaeGitHubIntegrationResitorySetting({
 			storage: args.context.storage,
-			integrationSetting: args.integrationSetting,
+			workspaceGitHubIntegrationSetting: args.workspaceGitHubIntegrationSetting,
 		}),
 	]);
 }
