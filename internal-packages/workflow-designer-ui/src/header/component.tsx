@@ -84,7 +84,7 @@ export function Header({
 					<Dialog.Overlay className="fixed inset-0 bg-black-900/40 data-[state=open]:animate-overlayShow" />
 					<Dialog.Content
 						className={clsx(
-							"fixed left-1/2 top-1/2 h-[600px] w-[800px] -translate-x-1/2 -translate-y-1/2",
+							"fixed left-1/2 top-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2",
 							"rounded-[8px] bg-black-850 p-[32px] border-[0.5px] border-black-400 shadow-black-300 focus:outline-none",
 						)}
 					>

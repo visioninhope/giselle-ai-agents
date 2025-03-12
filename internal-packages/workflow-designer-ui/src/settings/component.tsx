@@ -125,7 +125,7 @@ export function SettingsPanel() {
 									Data mapping
 								</h3>
 								<div>
-									<button
+									{/* <button
 										type="button"
 										className="p-[16px] flex flex-col gap-[8px] bg-black-400/10 rounded-[8px] py-[24px] px-[24px] flex items-center justify-center w-full border-[1px] border-transparent hover:border-black-400 cursor-pointer outline-none"
 									>
@@ -133,7 +133,53 @@ export function SettingsPanel() {
 										<div className="rounded-full size-[20px] bg-primary-200 flex justify-center items-center text-black-900">
 											+
 										</div>
-									</button>
+									</button> */}
+
+									<div className="grid grid-cols-[200px_20px_200px] gap-x-[8px] gap-y-[8px]">
+										<Label>Event data</Label>
+										<div />
+										<Label>Node</Label>
+										<div className="col-span-3 grid grid-cols-[200px_20px_200px] gap-[8px] items-center h-[28px] bg-black-750 rounded-[8px] text-[14px] border-[1px] border-white-950/10">
+											<p className="w-[200px] px-[12px] ">issue.comment</p>
+											<div className="w-[20px] flex justify-center text-primary-800 ">
+												→
+											</div>
+											<p className="w-[200px] px-[12px] ">Issue comment</p>
+										</div>
+
+										<fieldset className="flex flex-col gap-[4px]">
+											<Select>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a repository" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="apple">Apple</SelectItem>
+													<SelectItem value="banana">Banana</SelectItem>
+													<SelectItem value="blueberry">Blueberry</SelectItem>
+													<SelectItem value="grapes">Grapes</SelectItem>
+													<SelectItem value="pineapple">Pineapple</SelectItem>
+												</SelectContent>
+											</Select>
+										</fieldset>
+										<p className="text-primary-800 text-[16px] flex justify-center">
+											→
+										</p>
+										<fieldset className="flex flex-col gap-[4px]">
+											<Select>
+												<SelectTrigger>
+													<SelectValue placeholder="Select a repository" />
+												</SelectTrigger>
+												<SelectContent>
+													<SelectItem value="apple">Apple</SelectItem>
+													<SelectItem value="banana">Banana</SelectItem>
+													<SelectItem value="blueberry">Blueberry</SelectItem>
+													<SelectItem value="grapes">Grapes</SelectItem>
+													<SelectItem value="pineapple">Pineapple</SelectItem>
+												</SelectContent>
+											</Select>
+										</fieldset>
+									</div>
+
 									{/* <EmptyState title="Nodata mapped">
 										<Popover.Root>
 											<Popover.Trigger
