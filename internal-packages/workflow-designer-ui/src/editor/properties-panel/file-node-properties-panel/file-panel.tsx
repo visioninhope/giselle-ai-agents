@@ -38,14 +38,18 @@ class InvalidFileTypeError extends FileUploadError {
 	actualType: string;
 
 	constructor(expectedType: string[], actualType: string) {
-		super(`Invalid file type: ${actualType}`);
+		super(`Invalid file type: ${actualType || "unknown type"}`);
 		this.actualType = actualType;
 		this.expectedType = expectedType;
 		this.name = "InvalidFileTypeError";
-		this.message = `This node supports ${expectedType.join(", ")}, but got ${actualType}. ${this.suggestion()}`;
+		this.message = `This node supports ${expectedType.join(", ")}, but ${actualType ? `got ${actualType}.` : "the file type could not be determined."} ${this.suggestion()}`;
 	}
 
 	suggestion() {
+		if (!this.actualType) {
+			return "Please check if the file format is supported.";
+		}
+
 		switch (this.actualType) {
 			case "image/jpeg":
 			case "image/png":
