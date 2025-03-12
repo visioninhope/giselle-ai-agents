@@ -22,17 +22,23 @@ export async function GET(
 		},
 		"'searchParams' and 'origin' got from request",
 	);
+
+	// Get the redirect URL - always respect the next parameter
+	const next = searchParams.get("next") ?? "/";
+
+	// Check for authentication errors using existing function
 	const errorMessage = checkError(searchParams);
 	if (errorMessage) {
-		return new Response(errorMessage, {
-			status: 400,
-		});
+		// Instead of returning an error response, redirect with the error message
+		return handleRedirect(
+			request,
+			next,
+			`authError=${encodeURIComponent(errorMessage)}`,
+		);
 	}
 
 	const code = searchParams.get("code");
 	logger.debug({ code }, "code got from query param");
-	// if "next" is in param, use it as the redirect URL
-	const next = searchParams.get("next") ?? "/";
 	if (!code) {
 		return new Response("No code provided", { status: 400 });
 	}
@@ -41,9 +47,12 @@ export async function GET(
 	const { data, error } = await supabase.auth.exchangeCodeForSession(code);
 	if (error) {
 		const { code, message, name, status } = error;
-		return new Response(`${name} occurred: ${code} (${status}): ${message}`, {
-			status: 500,
-		});
+		// Redirect with error instead of showing error page
+		return handleRedirect(
+			request,
+			next,
+			`authError=${encodeURIComponent(`${name} occurred: ${code} (${status}): ${message}`)}`,
+		);
 	}
 
 	logger.debug(
@@ -53,25 +62,24 @@ export async function GET(
 		},
 		"session data got from Supabase",
 	);
+
 	try {
 		const { user, session } = data;
 		await initializeUserIfNeeded(user);
 		await storeProviderTokens(user, session, provider);
 	} catch (error) {
-		if (error instanceof Error) {
-			return new Response(error.message, { status: 500 });
-		}
-		throw new Error("Unknown error occurred", { cause: error });
+		const errorMsg =
+			error instanceof Error ? error.message : "Unknown error occurred";
+		// Redirect with error instead of showing error page
+		return handleRedirect(
+			request,
+			next,
+			`authError=${encodeURIComponent(errorMsg)}`,
+		);
 	}
 
-	// original origin before load balancer
-	const forwardedHost = request.headers.get("x-forwarded-host");
-	if (forwardedHost) {
-		// fallback to https if x-forwarded-proto is not set
-		const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
-		return NextResponse.redirect(`${forwardedProto}://${forwardedHost}${next}`);
-	}
-	return NextResponse.redirect(`${origin}${next}`);
+	// Success case - redirect to the next page without error
+	return handleRedirect(request, next);
 }
 
 function checkError(searchParams: URLSearchParams) {
@@ -83,6 +91,26 @@ function checkError(searchParams: URLSearchParams) {
 		return `Error occurred: ${errorCode} - ${errorDescription}`;
 	}
 	return "";
+}
+
+function handleRedirect(
+	request: NextRequest,
+	path: string,
+	queryString?: string,
+) {
+	const { origin } = new URL(request.url);
+	const redirectPath = queryString ? `${path}?${queryString}` : path;
+
+	// Check for forwarded host (load balancer case)
+	const forwardedHost = request.headers.get("x-forwarded-host");
+	if (forwardedHost) {
+		const forwardedProto = request.headers.get("x-forwarded-proto") ?? "https";
+		return NextResponse.redirect(
+			`${forwardedProto}://${forwardedHost}${redirectPath}`,
+		);
+	}
+
+	return NextResponse.redirect(`${origin}${redirectPath}`);
 }
 
 async function initializeUserIfNeeded(user: User) {
