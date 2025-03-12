@@ -1,16 +1,16 @@
-import { ToastProvider } from "@/packages/contexts/toast";
 import { ClickableText } from "@/components/ui/clicable-text";
 import { Field } from "@/components/ui/field";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ToastProvider } from "@/packages/contexts/toast";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Card } from "../components/card";
 import { AccountDisplayNameForm } from "./account-display-name-form";
+import { AccountToasts } from "./account-toasts";
 import { getAccountInfo } from "./actions";
 import { GitHubAuthentication } from "./github-authentication";
 import { GoogleAuthentication } from "./google-authentication";
-import { AccountToasts } from "./account-toasts";
 
 export default async function AccountSettingPage() {
 	const { displayName, email } = await getAccountInfo();

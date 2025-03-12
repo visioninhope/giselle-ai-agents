@@ -1,9 +1,9 @@
 "use client";
 
+import { Toast } from "@/packages/components/toast";
+import { useToast } from "@/packages/contexts/toast";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useRef } from "react";
-import { useToast } from "@/packages/contexts/toast";
-import { Toast } from "@/packages/components/toast";
 
 export function AccountToasts() {
 	const searchParams = useSearchParams();
