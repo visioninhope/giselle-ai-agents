@@ -2,6 +2,8 @@ import {
 	WorkspaceGitHubIntegrationNextAction,
 	WorkspaceGitHubIntegrationTrigger,
 } from "@giselle-sdk/data-type";
+import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
+import { useIntegration } from "@giselle-sdk/integration/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	Label,
@@ -14,33 +16,32 @@ import {
 import { PayloadMapForm } from "./payload-map-form";
 import { useGitHubIntegrationSetting } from "./use-github-integration-setting";
 
-const repositoriesMock = [
-	{
-		node_id: "R_kgDOMmKFmQ",
-		full_name: "giselles-ai/giselle",
-		id: 845317529,
-	},
-	{
-		node_id: "R_kgDONbDmrA",
-		full_name: "giselles-ai/docs",
-		id: 900785836,
-	},
-	{
-		node_id: "R_kgDONiCMhg",
-		full_name: "giselles-ai/erd",
-		id: 908102790,
-	},
-	{
-		node_id: "R_kgDONnSetA",
-		full_name: "giselles-ai/sdk",
-		id: 913612468,
-	},
-] as const;
-
 export function GitHubIntegrationSettingForm() {
+	const { github } = useIntegration();
+
+	switch (github.status) {
+		case "unset":
+			return "unset";
+		case "unauthorized":
+			return "unauthorized";
+		case "not-installed":
+			return "not-installed";
+		case "invalid-credential":
+			return "invalid-credential";
+		case "installed":
+			return <Installed repositories={github.repositories} />;
+		default: {
+			const _exhaustiveCheck: never = github;
+			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
+		}
+	}
+}
+
+function Installed({
+	repositories,
+}: { repositories: GitHubIntegrationRepository[] }) {
 	const { data: workspace } = useWorkflowDesigner();
 	const { isLoading, data, handleSubmit } = useGitHubIntegrationSetting();
-
 	if (isLoading) {
 		return null;
 	}
@@ -61,7 +62,7 @@ export function GitHubIntegrationSettingForm() {
 									<SelectValue placeholder="Select a repository" />
 								</SelectTrigger>
 								<SelectContent>
-									{repositoriesMock.map((repo) => (
+									{repositories.map((repo) => (
 										<SelectItem key={repo.node_id} value={repo.node_id}>
 											{repo.full_name}
 										</SelectItem>
