@@ -7,12 +7,7 @@ export function SelectValue({
 	className,
 	...props
 }: SelectPrimitive.SelectValueProps) {
-	return (
-		<SelectPrimitive.Value
-			className={clsx(className, "text-white-500")}
-			{...props}
-		/>
-	);
+	return <SelectPrimitive.Value className={className} {...props} />;
 }
 export function SelectTrigger({
 	className,
@@ -22,7 +17,7 @@ export function SelectTrigger({
 	return (
 		<SelectPrimitive.Trigger
 			className={clsx(
-				"flex h-[28px] w-full items-center justify-between whitespace-nowrap rounded-[8px] text-white-800 bg-black-750 border-[1px] border-white-950/10 px-[12px] text-[12px] data-[placeholder]:text-white-400 focus:outline-none focus:ring-1 focus:ring-white-900 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
+				"flex h-[28px] w-full items-center justify-between whitespace-nowrap rounded-[8px] text-white-800 bg-black-750 border-[1px] border-white-950/10 px-[12px] text-[12px] data-placeholder:text-white-400/70 focus:outline-none focus:ring-1 focus:ring-white-900 disabled:cursor-not-allowed disabled:opacity-50 [&>span]:line-clamp-1",
 				"data-[state=open]:rounded-b-[0px] data-[state=open]:border-b-0",
 				className,
 			)}

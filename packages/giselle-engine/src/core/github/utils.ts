@@ -1,3 +1,8 @@
+import {
+	GitHubIntegrationSetting,
+	type WorkspaceId,
+} from "@giselle-sdk/data-type";
+import type { Storage } from "unstorage";
 export type GitHubUrlInfo =
 	| { owner: string; repo: string; type: "issue"; issueNumber: number }
 	| {
@@ -152,4 +157,91 @@ export function parseGitHubUrl(url: string): GitHubUrlInfo | null {
 	} catch (error) {
 		return null;
 	}
+}
+
+export function githubIntegrationSettingsPath(repositoryNodeId: string) {
+	return `github-integrations/${repositoryNodeId}.json`;
+}
+export async function getGitHubIntegrationSttings(params: {
+	storage: Storage;
+	repositoryNodeId: string;
+}) {
+	const unsafeGitHubIntegrations = await params.storage.getItem(
+		githubIntegrationSettingsPath(params.repositoryNodeId),
+	);
+	if (unsafeGitHubIntegrations === null) {
+		return undefined;
+	}
+	return GitHubIntegrationSetting.array().parse(unsafeGitHubIntegrations);
+}
+export function workspaceGithubIntegrationSettingPath(
+	workspaceId: WorkspaceId,
+) {
+	return `workspaces/${workspaceId}/github-integration.json`;
+}
+export async function getWorkspaceGitHubIntegrationSetting(params: {
+	storage: Storage;
+	workspaceId: WorkspaceId;
+}) {
+	const unsafeGitHubIntegration = await params.storage.getItem(
+		workspaceGithubIntegrationSettingPath(params.workspaceId),
+	);
+	if (unsafeGitHubIntegration === null) {
+		return undefined;
+	}
+	return GitHubIntegrationSetting.parse(unsafeGitHubIntegration);
+}
+
+export async function upsertGitHubIntegrationSetting(params: {
+	storage: Storage;
+	integrationSetting: GitHubIntegrationSetting;
+}) {
+	const githubIntegrationSettings =
+		(await getGitHubIntegrationSttings({
+			storage: params.storage,
+			repositoryNodeId: params.integrationSetting.repositoryNodeId,
+		})) ?? [];
+	const index = githubIntegrationSettings?.findIndex(
+		(integration) =>
+			integration.workspaceId === params.integrationSetting.workspaceId,
+	);
+	if (index === -1) {
+		await params.storage.setItem(
+			githubIntegrationSettingsPath(params.integrationSetting.repositoryNodeId),
+			[...githubIntegrationSettings, params.integrationSetting],
+			{
+				// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
+				cacheControlMaxAge: 0,
+			},
+		);
+	} else {
+		await params.storage.setItem(
+			githubIntegrationSettingsPath(params.integrationSetting.repositoryNodeId),
+			[
+				...githubIntegrationSettings.slice(0, index),
+				params.integrationSetting,
+				...githubIntegrationSettings.slice(index + 1),
+			],
+			{
+				// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
+				cacheControlMaxAge: 0,
+			},
+		);
+	}
+}
+
+export async function upsertWorkspaceGitHubIntegrationSetting(params: {
+	storage: Storage;
+	integrationSetting: GitHubIntegrationSetting;
+}) {
+	await params.storage.setItem(
+		workspaceGithubIntegrationSettingPath(
+			params.integrationSetting.workspaceId,
+		),
+		params.integrationSetting,
+		{
+			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
+			cacheControlMaxAge: 0,
+		},
+	);
 }

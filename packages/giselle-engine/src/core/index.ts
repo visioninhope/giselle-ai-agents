@@ -3,6 +3,7 @@ import type {
 	FileId,
 	GenerationId,
 	GenerationOrigin,
+	GitHubIntegrationSetting,
 	NodeId,
 	QueuedGeneration,
 	RunId,
@@ -18,7 +19,11 @@ import {
 	getGeneration,
 	getNodeGenerations,
 } from "./generations";
-import { urlToObjectID } from "./github";
+import {
+	getWorkspaceGitHubIntegrationSetting,
+	upsertGithubIntegrationSetting,
+	urlToObjectID,
+} from "./github";
 import { addRun, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
@@ -88,6 +93,20 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return await urlToObjectID({
 				url,
 				context,
+			});
+		},
+		upsertGithubIntegrationSetting: async (
+			integrationSetting: GitHubIntegrationSetting,
+		) => {
+			upsertGithubIntegrationSetting({
+				context,
+				integrationSetting,
+			});
+		},
+		getWorkspaceGitHubIntegrationSetting: async (workspaceId: WorkspaceId) => {
+			return await getWorkspaceGitHubIntegrationSetting({
+				context,
+				workspaceId,
 			});
 		},
 	};

@@ -3,6 +3,7 @@ import {
 	FileId,
 	GenerationId,
 	GenerationOrigin,
+	GitHubIntegrationSetting,
 	NodeId,
 	QueuedGeneration,
 	RunId,
@@ -140,6 +141,31 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				const objectId = await giselleEngine.githubUrlToObjectId(input.url);
 				return JsonResponse.json({ objectId });
+			},
+		}),
+	upsertGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				integrationSetting: GitHubIntegrationSetting,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.upsertGithubIntegrationSetting(
+					input.integrationSetting,
+				);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	getWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) => {
+				const integrationSetting =
+					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
+						input.workspaceId,
+					);
+				return JsonResponse.json({ integrationSetting });
 			},
 		}),
 } as const;
