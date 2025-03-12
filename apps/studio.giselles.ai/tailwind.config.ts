@@ -37,6 +37,7 @@ const config = {
 				primary: {
 					DEFAULT: "hsl(var(--primary))",
 					foreground: "hsl(var(--primary-foreground))",
+					900: "hsl(var(--primary_900))",
 					200: "hsl(var(--primary_200))",
 					100: "hsl(var(--primary_100))",
 				},
@@ -71,9 +72,13 @@ const config = {
 					900: "hsl(var(--warning_900))",
 				},
 				black: {
+					900: "hsl(var(--black_900))",
 					850: "hsl(var(--black_850))",
+					820: "hsl(var(--black_820))",
 					800: "hsl(var(--black_800))",
 					400: "hsl(var(--black_400))",
+					350: "hsl(var(--black_350))",
+					300: "hsl(var(--black_300))",
 					100: "hsl(var(--black_100))",
 					80: "hsl(var(--black_80))",
 					70: "hsl(var(--black_70))",
@@ -89,6 +94,7 @@ const config = {
 					900: "hsl(var(--white_900))",
 					850: "hsl(var(--white_850))",
 					400: "hsl(var(--white_400))",
+					350: "hsl(var(--white_350))",
 				},
 				green: {
 					DEFAULT: "hsl(var(--green))",
