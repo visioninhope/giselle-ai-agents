@@ -1,4 +1,4 @@
-import { Card } from "@/app/(main)/settings/components/card";
+import { Card } from "@/app/(main)/settings/components/v2/card";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { getCurrentUserRole, getTeamMembers } from "../actions";
 import { TeamMembersForm } from "./team-members-form";
@@ -13,7 +13,7 @@ export async function TeamMembers() {
 	if (!hasMembers || !members) {
 		return (
 			<Card title="Members">
-				<div className="text-destructive text-[12px] leading-[20.4px] tracking-normal font-geist">
+				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to load team members
 				</div>
 			</Card>
@@ -23,7 +23,7 @@ export async function TeamMembers() {
 	if (!hasCurrentUserRole || !currentUserRole) {
 		return (
 			<Card title="Members">
-				<div className="text-destructive text-[12px] leading-[20.4px] tracking-normal font-geist">
+				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to get current user role
 				</div>
 			</Card>

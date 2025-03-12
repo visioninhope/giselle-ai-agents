@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -9,6 +8,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Button } from "@/components/v2/ui/button";
 import { useState } from "react";
 import {
 	type InferInput,
@@ -74,16 +74,20 @@ export function TeamMembersForm() {
 
 	return (
 		<div className="flex flex-col gap-2">
-			<form onSubmit={handleSubmit} className="flex items-center gap-[10px]" noValidate>
+			<form
+				onSubmit={handleSubmit}
+				className="flex items-center gap-[10px]"
+				noValidate
+			>
 				<Input
 					type="email"
-					placeholder="Search for a team..."
+					placeholder="member@example.com"
 					value={email}
 					onChange={(e) => {
 						setError("");
 						setEmail(e.target.value);
 					}}
-					className="flex-1 py-2 px-3 border-[0.5px] rounded-[8px] text-[14px] leading-[23.8px] font-geist placeholder:text-black-400"
+					className="flex-1 py-2 px-3 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20 text-white-900 font-medium text-[14px] leading-[23.8px] font-geist shadow-none placeholder:text-black-400"
 					disabled={isLoading}
 				/>
 				<Select
@@ -94,19 +98,33 @@ export function TeamMembersForm() {
 					}}
 					disabled={isLoading}
 				>
-					<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px]">
-						<SelectValue/>
+					<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 shadow-[inset_0_0_4px_0_#ffffff33] [&_svg]:opacity-100 cursor-pointer">
+						<SelectValue />
 					</SelectTrigger>
-					<SelectContent className="text-white-900 font-medium text-[14px] leading-[19.6px] font-hubot">
-						<SelectItem value="admin">Admin</SelectItem>
-						<SelectItem value="member">Member</SelectItem>
+					<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
+						<SelectItem
+							value="admin"
+							className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+						>
+							Admin
+						</SelectItem>
+						<SelectItem
+							value="member"
+							className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+						>
+							Member
+						</SelectItem>
 					</SelectContent>
 				</Select>
-				<Button type="submit" disabled={isLoading} className="w-fit">
+				<Button type="submit" disabled={isLoading} className="h-[40px]">
 					Invite
 				</Button>
 			</form>
-			{error && <p className="text-sm text-destructive">{error}</p>}
+			{error && (
+				<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+					{error}
+				</p>
+			)}
 		</div>
 	);
 }
