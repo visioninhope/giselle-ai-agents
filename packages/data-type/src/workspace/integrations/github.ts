@@ -9,34 +9,47 @@ export type WorkspaceGitHubIntegrationId =
 
 export const WorkspaceGitHubIntegrationTrigger = z.enum([
 	"github.issue_comment.created",
-	"github.pull_request.issue_comment.created",
+	"github.pull_request_comment.created",
 ]);
 export type WorkspaceGitHubIntegrationTrigger = z.infer<
 	typeof WorkspaceGitHubIntegrationTrigger
 >;
 
-export const WorkspaceGitHubIntegrationNextAction = z.enum([
+export const WorkspaceGitHubIntegrationNextActionIssueCommentCreate = z.literal(
 	"github.issue_comment.create",
-	"github.pull_request.issue_comment.create",
+);
+export const WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate =
+	z.literal("github.pull_request_comment.create");
+
+export const WorkspaceGitHubIntegrationNextAction = z.enum([
+	WorkspaceGitHubIntegrationNextActionIssueCommentCreate._def.value,
+	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate._def.value,
 ]);
 export type WorkspaceGitHubNextIntegrationAction = z.infer<
 	typeof WorkspaceGitHubIntegrationNextAction
 >;
 
-export const WorkspaceGitHubIntegrationPayload = z.enum([
+export const WorkspaceGitHubIntegrationPayloadField = z.enum([
+	"github.issue_comment.issue.number",
+	"github.issue_comment.issue.repository.owner",
+	"github.issue_comment.issue.repository.name",
 	"github.issue_comment.body",
 	"github.issue_comment.issue.title",
 	"github.issue_comment.issue.body",
-	"github.pull_request.title",
-	"github.pull_request.body",
-	"github.pull_request.diff",
+	"github.pull_request_comment.pull_request.number",
+	"github.pull_request_comment.pull_request.repository.owner",
+	"github.pull_request_comment.pull_request.repository.name",
+	"github.pull_request_comment.pull_request.title",
+	"github.pull_request_comment.pull_request.body",
+	"github.pull_request_comment.body",
+	"github.pull_request_comment.pull_request.diff",
 ]);
-export type WorkspaceGitHubIntegrationPayload = z.infer<
-	typeof WorkspaceGitHubIntegrationPayload
+export type WorkspaceGitHubIntegrationPayloadField = z.infer<
+	typeof WorkspaceGitHubIntegrationPayloadField
 >;
 
 export const WorkspaceGitHubIntegrationPayloadNodeMap = z.object({
-	payload: WorkspaceGitHubIntegrationPayload,
+	payload: WorkspaceGitHubIntegrationPayloadField,
 	nodeId: NodeId.schema,
 });
 export type WorkspaceGitHubIntegrationPayloadNodeMap = z.infer<

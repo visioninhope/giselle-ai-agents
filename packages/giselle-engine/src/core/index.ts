@@ -21,7 +21,9 @@ import {
 	getNodeGenerations,
 } from "./generations";
 import {
+	type HandleGitHubWebhookOptions,
 	getWorkspaceGitHubIntegrationSetting,
+	handleWebhook,
 	upsertGithubIntegrationSetting,
 	urlToObjectID,
 } from "./github";
@@ -29,6 +31,7 @@ import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
 export * from "./types";
+export { HandleGitHubWebhookResult } from "./github";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
@@ -116,6 +119,17 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			overrideNodes?: OverrideNode[];
 		}) => {
 			return await runApi({ ...args, context });
+		},
+		githubWebhook: async ({
+			options,
+			...args
+		}: {
+			event: string;
+			delivery: string;
+			payload: unknown;
+			options?: HandleGitHubWebhookOptions;
+		}) => {
+			return await handleWebhook({ context, github: args, options });
 		},
 	};
 }

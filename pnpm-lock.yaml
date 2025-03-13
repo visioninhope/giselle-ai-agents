@@ -312,6 +312,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../../packages/data-type
+      '@giselle-sdk/giselle-engine':
+        specifier: workspace:*
+        version: link:../../packages/giselle-engine
       '@icons-pack/react-simple-icons':
         specifier: 10.0.0
         version: 10.0.0(react@19.0.0)
@@ -803,6 +806,9 @@ importers:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig
+      '@octokit/webhooks-types':
+        specifier: 7.6.1
+        version: 7.6.1
       '@types/react':
         specifier: 'catalog:'
         version: 19.0.4

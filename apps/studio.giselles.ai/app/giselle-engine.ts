@@ -1,4 +1,4 @@
-import { NextGiselleEngine } from "giselle-sdk/next";
+import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
 
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
