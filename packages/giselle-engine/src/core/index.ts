@@ -24,7 +24,7 @@ import {
 	upsertGithubIntegrationSetting,
 	urlToObjectID,
 } from "./github";
-import { addRun, startRun } from "./runs";
+import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
 export * from "./types";
@@ -108,6 +108,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 				workspaceId,
 			});
+		},
+		runApi: async (args: {
+			workspaceId: WorkspaceId;
+			workflowId: WorkflowId;
+		}) => {
+			return await runApi({ ...args, context });
 		},
 	};
 }

@@ -170,6 +170,17 @@ export const createJsonRouters = {
 				});
 			},
 		}),
+	runApi: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				workflowId: WorkflowId.schema,
+			}),
+			handler: async ({ input }) => {
+				const result = await giselleEngine.runApi(input);
+				return new Response(result);
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(
