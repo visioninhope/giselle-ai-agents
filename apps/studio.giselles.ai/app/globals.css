@@ -86,6 +86,7 @@
 
 		--primary: 0 0% 98%;
 		--primary-foreground: 240 5.9% 10%;
+		--primary_900: 219, 90%, 52%;
 		--primary_200: 212, 79%, 87%;
 		--primary_100: 192, 73%, 84%;
 
@@ -109,9 +110,13 @@
 		--input: 240 3.7% 15.9%;
 		--ring: 240 4.9% 83.9%;
 
+		--black_900: 229, 100%, 2%;
 		--black_850: 231, 62%, 6%;
+		--black_820: 207, 27%, 15%;
 		--black_800: 231, 47%, 22%;
 		--black_400: 222, 21%, 40%;
+		--black_350: 207, 11%, 47%;
+		--black_300: 222, 21%, 50%;
 		--black_100: 234 91% 5%;
 		--black_80: 218 58% 21%;
 		--black_70: 222 21% 40%;
@@ -127,6 +132,7 @@
 		--white_900: 220, 60%, 98%;
 		--white_850: 0, 0%, 96%;
 		--white_400: 207, 16%, 75%;
+		--white_350: 207, 19%, 77%;
 
 		--red_50: 359 100% 66%;
 
@@ -182,6 +188,7 @@
 	--color-black-900: hsl(229, 100%, 2%);
 	--color-black-850: hsl(231, 62%, 6%);
 	--color-black-800: hsl(231, 47%, 22%);
+	--color-black-750: hsl(227, 30%, 12%);
 	--color-black-400: hsl(222, 21%, 40%);
 	--color-black-300: hsl(222, 21%, 50%);
 	--color-black-200: hsl(209, 17%, 75%);
@@ -193,6 +200,7 @@
 	--color-white-800: hsl(207, 43%, 91%);
 	--color-white-400: hsl(207, 16%, 75%);
 
+	--color-blue-950: hsl(219, 90%, 52%);
 	--color-blue-900: hsl(219, 90%, 52%);
 	--color-blue-800: hsl(219, 90%, 60%);
 	--color-blue-400: hsl(224, 82%, 68%);
@@ -206,6 +214,11 @@
 
 	--color-turquoise-900: hsl(178, 94%, 49%);
 
+	--color-red-900: hsl(344, 100%, 62%);
+
+	--color-deep-purple-900: hsl(275, 96%, 44%);
+
+	--color-primary-950: var(--color-blue-950);
 	--color-primary-900: var(--color-blue-900);
 	--color-primary-800: var(--color-blue-800);
 	--color-primary-400: var(--color-blue-400);
@@ -224,6 +237,11 @@
 
 	--color-generation-node-1: hsl(219, 90%, 52%);
 	--color-generation-node-2: hsl(219, 98%, 23%);
+
+	--color-github-node-1: var(--color-deep-purple-900);
+	--color-github-node-2: hsl(275, 91%, 26%);
+
+	--color-error-900: var(--color-red-900);
 
 	--font-sans: var(--font-geist-sans);
 	--font-accent: var(--font-hubot-sans);

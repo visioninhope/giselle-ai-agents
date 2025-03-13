@@ -69,11 +69,13 @@ export function PropertiesPanelHeader({
 					{icon}
 				</div>
 				<div>
-					<EditableText
-						onChange={(value) => onChangeName?.(value)}
-						value={name}
-						fallbackValue={fallbackName}
-					/>
+					<div>
+						<EditableText
+							onChange={(value) => onChangeName?.(value)}
+							value={name}
+							fallbackValue={fallbackName}
+						/>
+					</div>
 					{description && (
 						<p className="px-[5px] text-white-400 text-[10px]">{description}</p>
 					)}
