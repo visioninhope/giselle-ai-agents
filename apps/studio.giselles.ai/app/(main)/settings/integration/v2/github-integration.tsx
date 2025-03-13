@@ -57,7 +57,7 @@ function GitHubIntegrationPresentation({
 }: GitHubIntegrationPresentationProps) {
 	const installed = installations != null && installations?.length > 0;
 	return (
-		<div className="space-y-8 text-black-30">
+		<div className="space-y-6">
 			<Header
 				account={account}
 				installed={installed}
@@ -132,8 +132,8 @@ function Installation({ installation }: InstallationProps) {
 	const avatarUrl = "avatar_url" in account ? account.avatar_url : undefined;
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-black-70">
-			<div className="flex items-center space-x-3 border-b border-black-70 p-3 bg-black-70">
+		<div className="overflow-hidden rounded-lg border border-black-400">
+			<div className="flex items-center gap-x-2 border-b border-black-400  px-4 py-2 bg-black-400">
 				{avatarUrl && (
 					<img
 						src={avatarUrl}
@@ -141,20 +141,22 @@ function Installation({ installation }: InstallationProps) {
 						className="w-6 h-6 rounded-full"
 					/>
 				)}
-				<span>{displayName}</span>
+				<span className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
+					{displayName}
+				</span>
 			</div>
-			<div className="p-4 space-y-3">
+			<div className="py-4 space-y-2">
 				{installation.repositories.map((repo) => (
-					<div key={repo.id} className="flex items-center">
+					<div key={repo.id} className="flex items-center gap-x-2 px-4">
 						<a
 							href={repo.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-sm hover:underline"
+							className="text-white-400 font-medium text-sm leading-[19.6px] font-hubot hover:underline"
 						>
 							{repo.name}
 						</a>
-						<span className="ml-2 rounded-full px-2 py-0.5 text-xs border border-black-30">
+						<span className="rounded-full px-2 py-0.5 text-white-400 font-medium text-xs leading-[20.4px] font-geist border border-white-800">
 							{repo.private ? "Private" : "Public"}
 						</span>
 					</div>
