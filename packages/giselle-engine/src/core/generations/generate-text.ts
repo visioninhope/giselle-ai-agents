@@ -5,6 +5,7 @@ import type {
 	CompletedGeneration,
 	FailedGeneration,
 	FileData,
+	LanguageModelData,
 	NodeId,
 	QueuedGeneration,
 	RunningGeneration,
@@ -191,7 +192,7 @@ export async function generateText(args: {
 	return streamTextResult;
 }
 
-function generationModel(languageModel: LanguageModel) {
+function generationModel(languageModel: LanguageModelData) {
 	const llmProvider = languageModel.provider;
 	switch (llmProvider) {
 		case "anthropic": {

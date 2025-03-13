@@ -5,23 +5,34 @@ import {
 } from "@giselle-sdk/language-model";
 import { z } from "zod";
 
+export const AnthropicLanguageModelData = AnthropicLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type AnthropicLanguageModelData = z.infer<
+	typeof AnthropicLanguageModelData
+>;
+export const GoogleLanguageModelData = GoogleLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type GoogleLanguageModelData = z.infer<typeof GoogleLanguageModelData>;
+export const OpenAILanguageModelData = OpenAILanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type OpenAILanguageModelData = z.infer<typeof OpenAILanguageModelData>;
+
 export const LanguageModelData = z.discriminatedUnion("provider", [
-	AnthropicLanguageModel.pick({
-		provider: true,
-		id: true,
-		configurations: true,
-	}),
-	GoogleLanguageModel.pick({
-		provider: true,
-		id: true,
-		configurations: true,
-	}),
-	OpenAILanguageModel.pick({
-		provider: true,
-		id: true,
-		configurations: true,
-	}),
+	AnthropicLanguageModelData,
+	GoogleLanguageModelData,
+	OpenAILanguageModelData,
 ]);
+export type LanguageModelData = z.infer<typeof LanguageModelData>;
+
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: LanguageModelData,

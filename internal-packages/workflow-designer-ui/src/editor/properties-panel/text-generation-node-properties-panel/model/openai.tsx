@@ -1,7 +1,5 @@
-import {
-	OpenAILanguageModel,
-	openaiLanguageModels,
-} from "@giselle-sdk/language-model";
+import { OpenAILanguageModelData } from "@giselle-sdk/data-type";
+import { openaiLanguageModels } from "@giselle-sdk/language-model";
 import {
 	Select,
 	SelectContent,
@@ -16,8 +14,8 @@ export function OpenAIModelPanel({
 	openaiLanguageModel,
 	onModelChange,
 }: {
-	openaiLanguageModel: OpenAILanguageModel;
-	onModelChange: (changedValue: OpenAILanguageModel) => void;
+	openaiLanguageModel: OpenAILanguageModelData;
+	onModelChange: (changedValue: OpenAILanguageModelData) => void;
 }) {
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -25,7 +23,7 @@ export function OpenAIModelPanel({
 				value={openaiLanguageModel.id}
 				onValueChange={(value) => {
 					onModelChange(
-						OpenAILanguageModel.parse({
+						OpenAILanguageModelData.parse({
 							...openaiLanguageModel,
 							id: value,
 						}),
@@ -55,7 +53,7 @@ export function OpenAIModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								OpenAILanguageModel.parse({
+								OpenAILanguageModelData.parse({
 									...openaiLanguageModel,
 									configurations: {
 										...openaiLanguageModel.configurations,
@@ -73,7 +71,7 @@ export function OpenAIModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								OpenAILanguageModel.parse({
+								OpenAILanguageModelData.parse({
 									...openaiLanguageModel,
 									configurations: {
 										...openaiLanguageModel.configurations,
@@ -91,7 +89,7 @@ export function OpenAIModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								OpenAILanguageModel.parse({
+								OpenAILanguageModelData.parse({
 									...openaiLanguageModel,
 									configurations: {
 										...openaiLanguageModel.configurations,
@@ -109,7 +107,7 @@ export function OpenAIModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								OpenAILanguageModel.parse({
+								OpenAILanguageModelData.parse({
 									...openaiLanguageModel,
 									configurations: {
 										...openaiLanguageModel.configurations,
