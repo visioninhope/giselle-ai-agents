@@ -8,6 +8,7 @@ import type {
 	RunId,
 	WorkflowId,
 	Workspace,
+	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
@@ -18,7 +19,11 @@ import {
 	getGeneration,
 	getNodeGenerations,
 } from "./generations";
-import { urlToObjectID } from "./github";
+import {
+	getWorkspaceGitHubIntegrationSetting,
+	upsertGithubIntegrationSetting,
+	urlToObjectID,
+} from "./github";
 import { addRun, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
@@ -88,6 +93,20 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return await urlToObjectID({
 				url,
 				context,
+			});
+		},
+		upsertGithubIntegrationSetting: async (
+			workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
+		) => {
+			upsertGithubIntegrationSetting({
+				context,
+				workspaceGitHubIntegrationSetting,
+			});
+		},
+		getWorkspaceGitHubIntegrationSetting: async (workspaceId: WorkspaceId) => {
+			return await getWorkspaceGitHubIntegrationSetting({
+				context,
+				workspaceId,
 			});
 		},
 	};

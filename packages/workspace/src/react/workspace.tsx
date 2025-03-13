@@ -3,6 +3,8 @@
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import type { Integration } from "@giselle-sdk/integration";
+import { IntegrationProvider } from "@giselle-sdk/integration/react";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
@@ -10,9 +12,11 @@ import { type ReactNode, useEffect, useState } from "react";
 export function WorkspaceProvider({
 	children,
 	workspaceId,
+	integration,
 }: {
 	children: ReactNode;
 	workspaceId: WorkspaceId;
+	integration?: Integration;
 }) {
 	const client = useGiselleEngine();
 
@@ -30,12 +34,14 @@ export function WorkspaceProvider({
 		return null;
 	}
 	return (
-		<WorkflowDesignerProvider data={workspace}>
-			<GenerationRunnerSystemProvider>
-				<RunSystemContextProvider workspaceId={workspaceId}>
-					{children}
-				</RunSystemContextProvider>
-			</GenerationRunnerSystemProvider>
-		</WorkflowDesignerProvider>
+		<IntegrationProvider integration={integration}>
+			<WorkflowDesignerProvider data={workspace}>
+				<GenerationRunnerSystemProvider>
+					<RunSystemContextProvider workspaceId={workspaceId}>
+						{children}
+					</RunSystemContextProvider>
+				</GenerationRunnerSystemProvider>
+			</WorkflowDesignerProvider>
+		</IntegrationProvider>
 	);
 }

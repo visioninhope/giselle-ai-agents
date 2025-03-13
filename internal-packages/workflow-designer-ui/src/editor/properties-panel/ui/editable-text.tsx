@@ -37,16 +37,16 @@ export function EditableText({
 	}, [onChange, fallbackValue]);
 
 	return (
-		<div className="group" data-editing={edit}>
+		<>
 			<input
 				type="text"
 				className={clsx(
-					"w-[200px] py-[2px] px-[4px] rounded-[4px] hidden group-data-[editing=true]:block",
+					"w-[200px] py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
 					"outline-none ring-[1px] ring-primary-900",
 					"text-white-900 text-[14px]",
 				)}
 				ref={inputRef}
-				data-edit={edit}
+				data-editing={edit}
 				defaultValue={value ?? fallbackValue}
 				onBlur={() => updateValue()}
 				onKeyDown={(e) => {
@@ -59,15 +59,16 @@ export function EditableText({
 			<button
 				type="button"
 				className={clsx(
-					"py-[2px] px-[4px] rounded-[4px] group-data-[editing=true]:hidden",
-					"hover:bg-white-900/20",
+					"peer py-[2px] px-[4px] rounded-l-[4px] last:rounded-r-[4px] data-[editing=true]:hidden",
+					"hover:bg-white-900/20 group-hover:bg-white-900/10",
 					"text-white-900 text-[14px]",
 					"cursor-default",
 				)}
+				data-editing={edit}
 				onClick={() => setEdit(true)}
 			>
 				{value ?? fallbackValue}
 			</button>
-		</div>
+		</>
 	);
 }
