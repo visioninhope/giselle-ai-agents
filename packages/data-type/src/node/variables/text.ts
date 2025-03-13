@@ -1,5 +1,4 @@
 import { z } from "zod";
-import { NodeBase } from "../base";
 
 export const TextContent = z.object({
 	type: z.literal("text"),
@@ -14,6 +13,18 @@ export const CreateTextNodeParams = TextContent.omit({
 	.extend({
 		name: z.string(),
 	});
+
+export const OverrideTextContent = z.object({
+	type: z.literal("text"),
+	text: z.string(),
+});
+export type OverrideTextContent = z.infer<typeof OverrideTextContent>;
+
+export function isOverrideTextContent(
+	content: unknown,
+): content is OverrideTextContent {
+	return OverrideTextContent.safeParse(content).success;
+}
 
 export const TextContentReference = z.object({
 	type: TextContent.shape.type,

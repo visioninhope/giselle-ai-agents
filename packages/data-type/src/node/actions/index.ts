@@ -1,6 +1,7 @@
 import { z } from "zod";
-import { NodeBase, NodeReferenceBase } from "../base";
+import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
 import {
+	OverrideTextGenerationContent,
 	TextGenerationContent,
 	TextGenerationContentReference,
 } from "./text-generation";
@@ -30,6 +31,15 @@ export function isTextGenerationNode(
 	const result = TextGenerationNode.safeParse(args);
 	return result.success;
 }
+
+const OverrideActionNodeContent = z.discriminatedUnion("type", [
+	OverrideTextGenerationContent,
+]);
+export const OverrideActionNode = OverrideNodeBase.extend({
+	type: ActionNode.shape.type,
+	content: OverrideActionNodeContent,
+});
+export type OverrideActionNode = z.infer<typeof OverrideActionNode>;
 
 const ActionNodeContentReference = z.discriminatedUnion("type", [
 	TextGenerationContentReference,

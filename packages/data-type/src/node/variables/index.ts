@@ -1,10 +1,15 @@
 import { z } from "zod";
-import { NodeBase, NodeReferenceBase } from "../base";
-import { FileContent, FileContentReference } from "./file";
-import { GitHubContent, GitHubContentReference } from "./github";
-import { TextContent, TextContentReference } from "./text";
+import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
+import { FileContent, FileContentReference, OverrideFileContent } from "./file";
+import {
+	GitHubContent,
+	GitHubContentReference,
+	OverrideGitHubContent,
+} from "./github";
+import { OverrideTextContent, TextContent, TextContentReference } from "./text";
 export * from "./file";
 export * from "./text";
+export * from "./github";
 
 const VariableNodeContent = z.discriminatedUnion("type", [
 	TextContent,
@@ -47,6 +52,17 @@ export function isGitHubNode(args: unknown): args is GitHubNode {
 	const result = GitHubNode.safeParse(args);
 	return result.success;
 }
+
+const OverrideVariableNodeContent = z.discriminatedUnion("type", [
+	OverrideFileContent,
+	OverrideGitHubContent,
+	OverrideTextContent,
+]);
+export const OverrideVariableNode = OverrideNodeBase.extend({
+	type: VariableNode.shape.type,
+	content: OverrideVariableNodeContent,
+});
+export type OverrideVariableNode = z.infer<typeof OverrideVariableNode>;
 
 const VariableNodeContentReference = z.discriminatedUnion("type", [
 	FileContentReference,

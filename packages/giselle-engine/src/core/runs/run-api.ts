@@ -1,21 +1,135 @@
 import {
 	type CreatedRun,
+	type FileNode,
 	GenerationId,
+	type GenerationTemplate,
+	type GitHubNode,
 	type JobId,
+	type OverrideNode,
 	type QueuedGeneration,
 	RunId,
+	type TextNode,
 	type WorkflowId,
 	type WorkspaceId,
+	isOverrideFileContent,
+	isOverrideGitHubContent,
+	isOverrideTextContent,
+	isOverrideTextGenerationContent,
 } from "@giselle-sdk/data-type";
 import { generateText } from "../generations";
 import type { GiselleEngineContext } from "../types";
 import { addRun } from "./add-run";
 import { startRun } from "./start-run";
 
+function overrideGenerationTemplate(
+	template: GenerationTemplate,
+	overrideNodes: OverrideNode[],
+) {
+	let overridedTemplate = template;
+	for (const overrideNode of overrideNodes) {
+		if (overrideNode.id === template.actionNode.id) {
+			switch (template.actionNode.content.type) {
+				case "textGeneration": {
+					if (isOverrideTextGenerationContent(overrideNode.content)) {
+						overridedTemplate = {
+							...overridedTemplate,
+							actionNode: {
+								...overridedTemplate.actionNode,
+								content: {
+									...overridedTemplate.actionNode.content,
+									prompt: overrideNode.content.prompt,
+								},
+							},
+						};
+					}
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = template.actionNode.content.type;
+					throw new Error(`Unhandled action node type: ${_exhaustiveCheck}`);
+				}
+			}
+		}
+		for (const sourceNode of template.sourceNodes) {
+			if (overrideNode.id !== sourceNode.id) {
+				continue;
+			}
+			switch (sourceNode.content.type) {
+				case "file":
+					overridedTemplate = {
+						...overridedTemplate,
+						sourceNodes: overridedTemplate.sourceNodes.map((node) => {
+							if (
+								node.id === sourceNode.id &&
+								isOverrideFileContent(overrideNode.content)
+							) {
+								return {
+									...node,
+									content: {
+										...node.content,
+										files: overrideNode.content.files,
+									},
+								} as FileNode;
+							}
+							return node;
+						}),
+					};
+					break;
+				case "text":
+					overridedTemplate = {
+						...overridedTemplate,
+						sourceNodes: overridedTemplate.sourceNodes.map((node) => {
+							if (
+								node.id === sourceNode.id &&
+								isOverrideTextContent(overrideNode.content)
+							) {
+								return {
+									...node,
+									content: {
+										...node.content,
+										text: overrideNode.content.text,
+									},
+								} as TextNode;
+							}
+							return node;
+						}),
+					};
+					break;
+				case "github":
+					overridedTemplate = {
+						...overridedTemplate,
+						sourceNodes: overridedTemplate.sourceNodes.map((node) => {
+							if (
+								node.id === sourceNode.id &&
+								isOverrideGitHubContent(overrideNode.content)
+							) {
+								return {
+									...node,
+									content: {
+										...node.content,
+										objectReferences: overrideNode.content.objectReferences,
+									},
+								} as GitHubNode;
+							}
+							return node;
+						}),
+					};
+					break;
+				default: {
+					const _exhaustiveCheck: never = sourceNode.content;
+					throw new Error(`Unhandled source node type: ${_exhaustiveCheck}`);
+				}
+			}
+		}
+	}
+	return overridedTemplate;
+}
+
 export async function runApi(args: {
 	workspaceId: WorkspaceId;
 	workflowId: WorkflowId;
 	context: GiselleEngineContext;
+	overrideNodes?: OverrideNode[];
 }) {
 	const runId = RunId.generate();
 	const createdRun = {
@@ -36,7 +150,10 @@ export async function runApi(args: {
 				const generation = {
 					id: generationId,
 					context: {
-						...action.generationTemplate,
+						...overrideGenerationTemplate(
+							action.generationTemplate,
+							args.overrideNodes ?? [],
+						),
 						origin: { type: "run", id: runId },
 					},
 					status: "queued",

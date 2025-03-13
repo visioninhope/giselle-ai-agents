@@ -13,6 +13,18 @@ export const GitHubContent = z.object({
 	objectReferences: z.array(GitHubObjectReference),
 });
 
+export const OverrideGitHubContent = z.object({
+	type: z.literal("github"),
+	objectReferences: z.array(GitHubObjectReference),
+});
+export type OverrideGitHubContent = z.infer<typeof OverrideGitHubContent>;
+
+export function isOverrideGitHubContent(
+	content: unknown,
+): content is OverrideGitHubContent {
+	return OverrideGitHubContent.safeParse(content).success;
+}
+
 export const GitHubContentReference = z.object({
 	type: GitHubContent.shape.type,
 });

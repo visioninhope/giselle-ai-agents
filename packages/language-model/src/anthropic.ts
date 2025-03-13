@@ -1,4 +1,3 @@
-import { LanguageVariant } from "typescript";
 import { z } from "zod";
 import { Capability, LanguageModelBase, Tier } from "./base";
 
