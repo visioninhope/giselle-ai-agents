@@ -18,6 +18,19 @@ export function isActionNode(node: NodeBase): node is ActionNode {
 	return node.type === "action";
 }
 
+export const TextGenerationNode = ActionNode.extend({
+	type: z.literal("action"),
+	content: TextGenerationContent,
+});
+type TextGenerationNode = z.infer<typeof TextGenerationNode>;
+
+export function isTextGenerationNode(
+	args?: unknown,
+): args is TextGenerationNode {
+	const result = TextGenerationNode.safeParse(args);
+	return result.success;
+}
+
 const ActionNodeContentReference = z.discriminatedUnion("type", [
 	TextGenerationContentReference,
 ]);
