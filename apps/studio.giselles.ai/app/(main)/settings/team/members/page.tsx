@@ -13,7 +13,7 @@ export default async function TeamMembersPage() {
 				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
 				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 			>
-				Member list
+				Members
 			</h3>
 			<TeamMembers />
 		</div>
