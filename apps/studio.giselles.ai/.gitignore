@@ -44,3 +44,6 @@ next-env.d.ts
 # prepare fonts programmatically
 app/fonts/*.ts
 app/fonts/*.woff2
+
+# Filesystem storage
+.storage
