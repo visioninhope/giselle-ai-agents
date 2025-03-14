@@ -97,7 +97,9 @@ export function PayloadMapForm({
 						key={`${payloadMap.payload}-${payloadMap.nodeId}`}
 						className="group col-span-3 grid grid-cols-[200px_20px_200px] gap-[8px] items-center h-[28px] bg-black-750 rounded-[8px] text-[14px] border-[1px] border-white-950/10"
 					>
-						<p className="w-[200px] px-[12px] "> {payloadMap.payload} </p>
+						<p className="w-[200px] px-[12px]">
+							{payloadMap.payload.split(".").splice(2).join(".")}
+						</p>
 						<div className="w-[20px] flex justify-center text-primary-800">
 							→
 						</div>
