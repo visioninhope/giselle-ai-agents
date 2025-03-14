@@ -24,7 +24,7 @@ export function DeleteTeam() {
 
 	return (
 		<div className="flex justify-between items-center gap-x-[10px] bg-transparent rounded-[8px] border-[0.5px] border-error-900 px-[24px] pt-[16px] pb-[24px] w-full">
-			<div className="flex flex-col gap-y-4">
+			<div className="flex flex-col gap-y-4 max-w-[557px]">
 				<h2 className="text-error-900 font-medium text-[16px] leading-[27.2px] tracking-normal font-hubot">
 					Delete Team
 				</h2>
