@@ -48,12 +48,13 @@ export type HandleGitHubWebhookResult = z.infer<
 	typeof HandleGitHubWebhookResult
 >;
 
+type PullRequestDiffFn = (
+	owner: string,
+	repo: string,
+	number: number,
+) => Promise<string>;
 export interface HandleGitHubWebhookOptions {
-	pullRequestDiff?: (
-		owner: string,
-		repo: string,
-		number: number,
-	) => Promise<string>;
+	pullRequestDiff?: PullRequestDiffFn;
 	reaction?: (owner: string, repo: string, commentId: number) => Promise<void>;
 }
 export interface HandleGitHubWebhookArgs {
@@ -109,11 +110,12 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					if (node === undefined) {
 						continue;
 					}
-					const payloadValue = getPayloadValue(
+					const payloadValue = await getPayloadValue(
 						args.github.event,
 						args.github.payload,
 						payloadMap.payload,
 						command.content,
+						args.options?.pullRequestDiff,
 					);
 					switch (node.content.type) {
 						case "textGeneration":
@@ -178,7 +180,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 									owner: repository.owner,
 									name: repository.name,
 								},
-								number: getPayloadValue(
+								number: await getPayloadValue(
 									args.github.event,
 									args.github.payload,
 									"github.pull_request_comment.pull_request.number",
@@ -194,7 +196,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 									owner: repository.owner,
 									name: repository.name,
 								},
-								number: getPayloadValue(
+								number: await getPayloadValue(
 									args.github.event,
 									args.github.payload,
 									"github.issue_comment.issue.number",
@@ -232,20 +234,26 @@ type PayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField> =
 		? number
 		: string;
 
-function getPayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField>(
+async function getPayloadValue<
+	TField extends WorkspaceGitHubIntegrationPayloadField,
+>(
 	event: string,
 	payload: unknown,
 	field: TField,
 	command?: string,
-	diff?: string,
-): PayloadValue<TField> {
+	diff?: PullRequestDiffFn,
+): Promise<PayloadValue<TField>> {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		switch (field) {
 			case "github.pull_request_comment.pull_request.title":
 			case "github.issue_comment.issue.title":
 				return payload.issue.title as PayloadValue<TField>;
 			case "github.pull_request_comment.pull_request.diff":
-				return (diff ?? "") as PayloadValue<TField>;
+				return ((await diff?.(
+					payload.repository.owner.login,
+					payload.repository.name,
+					payload.issue.number,
+				)) ?? "") as PayloadValue<TField>;
 			case "github.pull_request_comment.pull_request.body":
 			case "github.issue_comment.issue.body":
 				return (payload.issue.body ?? "") as PayloadValue<TField>;
