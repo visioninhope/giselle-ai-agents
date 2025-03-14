@@ -98,6 +98,7 @@ const config = {
 					800: "hsl(var(--white_800))",
 					400: "hsl(var(--white_400))",
 					350: "hsl(var(--white_350))",
+					30: "hsl(var(--white_30))",
 				},
 				green: {
 					DEFAULT: "hsl(var(--green))",
