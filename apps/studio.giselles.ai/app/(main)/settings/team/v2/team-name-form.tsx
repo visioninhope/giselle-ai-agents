@@ -3,7 +3,6 @@
 import {
 	Dialog,
 	DialogContent,
-	DialogDescription,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
@@ -99,9 +98,6 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 								<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
 									Change your Profiles
 								</DialogTitle>
-								<DialogDescription className="sr-only">
-									Change your Profiles
-								</DialogDescription>
 							</DialogHeader>
 							<form className="flex flex-col gap-y-4 relative z-10">
 								<div className="flex flex-col gap-y-2">
@@ -115,7 +111,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 										id="tempTeamName"
 										value={tempTeamName}
 										onChange={handleChange}
-										className="py-2 rounded-[8px] w-full bg-white/[29%] text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none"
+										className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white"
 										disabled={isLoading}
 									/>
 									{error && (

@@ -40,15 +40,17 @@ export function DeleteTeam() {
 						Delete Team
 					</Button>
 				</DialogTrigger>
-				<DialogContent className="bg-black-850 border-black-400">
+				<DialogContent className="px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-850">
 					<DialogHeader>
-						<DialogTitle className="text-zinc-200">Delete Team</DialogTitle>
+						<DialogTitle className="text-white-800 font-bold text-[16px] leading-[16px] font-hubot">
+							Delete Team
+						</DialogTitle>
 					</DialogHeader>
 					<Alert
 						variant="destructive"
-						className="bg-rose-500/10 border-rose-500/20"
+						className="bg-error-900/5 border-error-900/20"
 					>
-						<AlertDescription>
+						<AlertDescription className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
 							This action cannot be undone. This will permanently delete the
 							team and remove all members.
 						</AlertDescription>
@@ -56,18 +58,18 @@ export function DeleteTeam() {
 					{state.error !== "" && (
 						<Alert
 							variant="destructive"
-							className="mt-2 bg-rose-500/10 border-rose-500/20"
+							className="mt-2 bg-error-900/5 border-error-900/20"
 						>
-							<AlertDescription className="text-rose-400">
+							<AlertDescription className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
 								{state.error}
 							</AlertDescription>
 						</Alert>
 					)}
-					<form action={action} className="flex justify-end space-x-2">
+					<form action={action} className="flex justify-end space-x-4">
 						<Button
 							type="button"
 							onClick={() => setShowDeleteConfirm(false)}
-							className="w-full bg-transparent border-zinc-800 text-zinc-200 hover:bg-zinc-900"
+							className="border-black-400 w-full h-[38px] bg-transparent text-black-400 font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400"
 							disabled={pending}
 						>
 							Cancel
@@ -76,7 +78,7 @@ export function DeleteTeam() {
 							type="submit"
 							variant="destructive"
 							disabled={pending}
-							className="w-full"
+							className="w-full h-[38px] font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em]"
 						>
 							{pending ? "Deleting..." : "Delete Team"}
 						</Button>
