@@ -4,6 +4,7 @@ import type {
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
+	OverrideNode,
 	QueuedGeneration,
 	RunId,
 	WorkflowId,
@@ -112,6 +113,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		runApi: async (args: {
 			workspaceId: WorkspaceId;
 			workflowId: WorkflowId;
+			overrideNodes?: OverrideNode[];
 		}) => {
 			return await runApi({ ...args, context });
 		},

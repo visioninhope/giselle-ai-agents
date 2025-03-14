@@ -1,7 +1,5 @@
-import {
-	AnthropicLanguageModel,
-	anthropicLanguageModels,
-} from "@giselle-sdk/language-model";
+import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
+import { anthropicLanguageModels } from "@giselle-sdk/language-model";
 import {
 	Select,
 	SelectContent,
@@ -16,8 +14,8 @@ export function AnthropicModelPanel({
 	anthropicLanguageModel,
 	onModelChange,
 }: {
-	anthropicLanguageModel: AnthropicLanguageModel;
-	onModelChange: (changedValue: AnthropicLanguageModel) => void;
+	anthropicLanguageModel: AnthropicLanguageModelData;
+	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -25,7 +23,7 @@ export function AnthropicModelPanel({
 				value={anthropicLanguageModel.id}
 				onValueChange={(value) => {
 					onModelChange(
-						AnthropicLanguageModel.parse({
+						AnthropicLanguageModelData.parse({
 							...anthropicLanguageModel,
 							id: value,
 						}),
@@ -58,7 +56,7 @@ export function AnthropicModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								AnthropicLanguageModel.parse({
+								AnthropicLanguageModelData.parse({
 									...anthropicLanguageModel,
 									configurations: {
 										...anthropicLanguageModel.configurations,
@@ -76,7 +74,7 @@ export function AnthropicModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								AnthropicLanguageModel.parse({
+								AnthropicLanguageModelData.parse({
 									...anthropicLanguageModel,
 									configurations: {
 										...anthropicLanguageModel.configurations,

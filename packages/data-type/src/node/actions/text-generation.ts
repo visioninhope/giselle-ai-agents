@@ -1,25 +1,57 @@
-import { LanguageModel } from "@giselle-sdk/language-model";
+import {
+	AnthropicLanguageModel,
+	GoogleLanguageModel,
+	OpenAILanguageModel,
+} from "@giselle-sdk/language-model";
 import { z } from "zod";
-import { NodeBase } from "../base";
+
+export const AnthropicLanguageModelData = AnthropicLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type AnthropicLanguageModelData = z.infer<
+	typeof AnthropicLanguageModelData
+>;
+export const GoogleLanguageModelData = GoogleLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type GoogleLanguageModelData = z.infer<typeof GoogleLanguageModelData>;
+export const OpenAILanguageModelData = OpenAILanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type OpenAILanguageModelData = z.infer<typeof OpenAILanguageModelData>;
+
+export const LanguageModelData = z.discriminatedUnion("provider", [
+	AnthropicLanguageModelData,
+	GoogleLanguageModelData,
+	OpenAILanguageModelData,
+]);
+export type LanguageModelData = z.infer<typeof LanguageModelData>;
 
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
-	llm: LanguageModel,
+	llm: LanguageModelData,
 	prompt: z.string().optional(),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 
-export const TextGenerationNode = NodeBase.extend({
-	type: z.literal("action"),
-	content: TextGenerationContent,
+export const OverrideTextGenerationContent = z.object({
+	type: z.literal("textGeneration"),
+	prompt: z.string(),
 });
-type TextGenerationNode = z.infer<typeof TextGenerationNode>;
+export type OverrideTextGenerationContent = z.infer<
+	typeof OverrideTextGenerationContent
+>;
 
-export function isTextGenerationNode(
-	args?: unknown,
-): args is TextGenerationNode {
-	const result = TextGenerationNode.safeParse(args);
-	return result.success;
+export function isOverrideTextGenerationContent(
+	content: unknown,
+): content is OverrideTextGenerationContent {
+	return OverrideTextGenerationContent.safeParse(content).success;
 }
 
 export const TextGenerationContentReference = z.object({

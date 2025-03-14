@@ -4,6 +4,7 @@ import {
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
+	OverrideNode,
 	QueuedGeneration,
 	RunId,
 	WorkflowId,
@@ -175,6 +176,7 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				workflowId: WorkflowId.schema,
+				overrideNodes: z.array(OverrideNode).optional(),
 			}),
 			handler: async ({ input }) => {
 				const result = await giselleEngine.runApi(input);

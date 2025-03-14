@@ -1,7 +1,5 @@
-import {
-	GoogleLanguageModel,
-	googleLanguageModels,
-} from "@giselle-sdk/language-model";
+import { GoogleLanguageModelData } from "@giselle-sdk/data-type";
+import { googleLanguageModels } from "@giselle-sdk/language-model";
 import {
 	Select,
 	SelectContent,
@@ -17,8 +15,8 @@ export function GoogleModelPanel({
 	googleLanguageModel,
 	onModelChange,
 }: {
-	googleLanguageModel: GoogleLanguageModel;
-	onModelChange: (changedValue: GoogleLanguageModel) => void;
+	googleLanguageModel: GoogleLanguageModelData;
+	onModelChange: (changedValue: GoogleLanguageModelData) => void;
 }) {
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -26,7 +24,7 @@ export function GoogleModelPanel({
 				value={googleLanguageModel.id}
 				onValueChange={(value) => {
 					onModelChange(
-						GoogleLanguageModel.parse({
+						GoogleLanguageModelData.parse({
 							...googleLanguageModel,
 							id: value,
 						}),
@@ -59,7 +57,7 @@ export function GoogleModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								GoogleLanguageModel.parse({
+								GoogleLanguageModelData.parse({
 									...googleLanguageModel,
 									configurations: {
 										...googleLanguageModel.configurations,
@@ -77,7 +75,7 @@ export function GoogleModelPanel({
 						step={0.01}
 						onChange={(value) => {
 							onModelChange(
-								GoogleLanguageModel.parse({
+								GoogleLanguageModelData.parse({
 									...googleLanguageModel,
 									configurations: {
 										...googleLanguageModel.configurations,
@@ -93,7 +91,7 @@ export function GoogleModelPanel({
 						checked={googleLanguageModel.configurations.searchGrounding}
 						onCheckedChange={(checked) => {
 							onModelChange(
-								GoogleLanguageModel.parse({
+								GoogleLanguageModelData.parse({
 									...googleLanguageModel,
 									configurations: {
 										...googleLanguageModel.configurations,
