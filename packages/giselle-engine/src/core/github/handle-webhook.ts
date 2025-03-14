@@ -48,12 +48,13 @@ export type HandleGitHubWebhookResult = z.infer<
 	typeof HandleGitHubWebhookResult
 >;
 
+type PullRequestDiffFn = (
+	owner: string,
+	repo: string,
+	number: number,
+) => Promise<string>;
 export interface HandleGitHubWebhookOptions {
-	pullRequestDiff?: (
-		owner: string,
-		repo: string,
-		number: number,
-	) => Promise<string>;
+	pullRequestDiff?: PullRequestDiffFn;
 	reaction?: (owner: string, repo: string, commentId: number) => Promise<void>;
 }
 export interface HandleGitHubWebhookArgs {
@@ -67,10 +68,11 @@ export interface HandleGitHubWebhookArgs {
 }
 
 export async function handleWebhook(args: HandleGitHubWebhookArgs) {
-	const repositoryNodeId = getRepositoryNodeId(
+	const repository = getRepositoryOwnerNameNodeId(
 		args.github.event,
 		args.github.payload,
 	);
+
 	const command = parseCommand(args.github.event, args.github.payload);
 	if (command === null) {
 		return;
@@ -78,7 +80,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 	const workspaceGitHubIntegrationRepositorySettings =
 		await getWorkspaceGitHubIntegrationRepositorySettings({
 			storage: args.context.storage,
-			repositoryNodeId,
+			repositoryNodeId: repository.nodeId,
 		});
 	return await Promise.all(
 		(workspaceGitHubIntegrationRepositorySettings ?? [])
@@ -108,6 +110,13 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					if (node === undefined) {
 						continue;
 					}
+					const payloadValue = await getPayloadValue(
+						args.github.event,
+						args.github.payload,
+						payloadMap.payload,
+						command.content,
+						args.options?.pullRequestDiff,
+					);
 					switch (node.content.type) {
 						case "textGeneration":
 							overrideNodes.push({
@@ -115,12 +124,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 								type: "action",
 								content: {
 									type: node.content.type,
-									prompt: `${getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										payloadMap.payload,
-										command.content,
-									)}`,
+									prompt: `${payloadMap}`,
 								},
 							});
 							break;
@@ -132,12 +136,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 								type: "variable",
 								content: {
 									type: node.content.type,
-									text: `${getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										payloadMap.payload,
-										command.content,
-									)}`,
+									text: `${payloadValue}`,
 								},
 							});
 							break;
@@ -178,24 +177,13 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 							action: "github.pull_request_comment.create",
 							pullRequest: {
 								repo: {
-									owner: getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.pull_request_comment.pull_request.repository.owner",
-										command.content,
-									),
-									name: getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.pull_request_comment.pull_request.repository.name",
-										command.content,
-									),
+									owner: repository.owner,
+									name: repository.name,
 								},
-								number: getPayloadValue(
+								number: await getPayloadValue(
 									args.github.event,
 									args.github.payload,
 									"github.pull_request_comment.pull_request.number",
-									command.content,
 								),
 							},
 							content: results.join("\n"),
@@ -205,24 +193,13 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 							action: "github.issue_comment.create",
 							issue: {
 								repo: {
-									owner: getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.issue_comment.issue.repository.owner",
-										command.content,
-									),
-									name: getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.issue_comment.issue.repository.name",
-										command.content,
-									),
+									owner: repository.owner,
+									name: repository.name,
 								},
-								number: getPayloadValue(
+								number: await getPayloadValue(
 									args.github.event,
 									args.github.payload,
 									"github.issue_comment.issue.number",
-									command?.content,
 								),
 							},
 							content: results.join("\n"),
@@ -257,26 +234,32 @@ type PayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField> =
 		? number
 		: string;
 
-function getPayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField>(
+async function getPayloadValue<
+	TField extends WorkspaceGitHubIntegrationPayloadField,
+>(
 	event: string,
 	payload: unknown,
 	field: TField,
-	command: string,
-	diff?: string,
-): PayloadValue<TField> {
+	command?: string,
+	diff?: PullRequestDiffFn,
+): Promise<PayloadValue<TField>> {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		switch (field) {
 			case "github.pull_request_comment.pull_request.title":
 			case "github.issue_comment.issue.title":
 				return payload.issue.title as PayloadValue<TField>;
 			case "github.pull_request_comment.pull_request.diff":
-				return (diff ?? "") as PayloadValue<TField>;
+				return ((await diff?.(
+					payload.repository.owner.login,
+					payload.repository.name,
+					payload.issue.number,
+				)) ?? "") as PayloadValue<TField>;
 			case "github.pull_request_comment.pull_request.body":
 			case "github.issue_comment.issue.body":
 				return (payload.issue.body ?? "") as PayloadValue<TField>;
 			case "github.issue_comment.body":
 			case "github.pull_request_comment.body":
-				return command as PayloadValue<TField>;
+				return (command ?? "") as PayloadValue<TField>;
 			case "github.issue_comment.issue.number":
 			case "github.pull_request_comment.pull_request.number":
 				return payload.issue.number as PayloadValue<TField>;
@@ -298,6 +281,16 @@ function getPayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField>(
 function getRepositoryNodeId(event: string, payload: unknown) {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		return payload.repository.node_id;
+	}
+	throw new Error(`Unhandled event type: ${event}`);
+}
+function getRepositoryOwnerNameNodeId(event: string, payload: unknown) {
+	if (isIssueCommentCreatedEvent(payload, event)) {
+		return {
+			owner: payload.repository.owner.login,
+			name: payload.repository.name,
+			nodeId: payload.repository.node_id,
+		};
 	}
 	throw new Error(`Unhandled event type: ${event}`);
 }

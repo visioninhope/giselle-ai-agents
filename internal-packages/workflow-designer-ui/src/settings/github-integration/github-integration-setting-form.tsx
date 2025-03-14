@@ -77,7 +77,7 @@ function Installed({
 					<div className="flex flex-col gap-[16px]">
 						<fieldset className="flex flex-col gap-[4px]">
 							<Label>Event</Label>
-							<Select name="event" value={data?.event}>
+							<Select name="event" defaultValue={data?.event}>
 								<SelectTrigger>
 									<SelectValue placeholder="Select a trigger" />
 								</SelectTrigger>
