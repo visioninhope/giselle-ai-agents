@@ -8,6 +8,7 @@ import {
 	type OverrideNode,
 	type QueuedGeneration,
 	RunId,
+	type TextGenerationNode,
 	type TextNode,
 	type WorkflowId,
 	type WorkspaceId,
@@ -55,6 +56,27 @@ function overrideGenerationTemplate(
 				continue;
 			}
 			switch (sourceNode.content.type) {
+				case "textGeneration": {
+					overridedTemplate = {
+						...overridedTemplate,
+						sourceNodes: overridedTemplate.sourceNodes.map((node) => {
+							if (
+								node.id === sourceNode.id &&
+								isOverrideTextGenerationContent(overrideNode.content)
+							) {
+								return {
+									...node,
+									content: {
+										...node.content,
+										prompt: overrideNode.content.prompt,
+									},
+								} as TextGenerationNode;
+							}
+							return node;
+						}),
+					};
+					break;
+				}
 				case "file":
 					overridedTemplate = {
 						...overridedTemplate,
