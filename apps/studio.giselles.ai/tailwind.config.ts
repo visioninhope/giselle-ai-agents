@@ -76,9 +76,11 @@ const config = {
 					850: "hsl(var(--black_850))",
 					820: "hsl(var(--black_820))",
 					800: "hsl(var(--black_800))",
+					600: "hsl(var(--black_600))",
 					400: "hsl(var(--black_400))",
 					350: "hsl(var(--black_350))",
 					300: "hsl(var(--black_300))",
+					250: "hsl(var(--black_250))",
 					100: "hsl(var(--black_100))",
 					80: "hsl(var(--black_80))",
 					70: "hsl(var(--black_70))",
@@ -101,6 +103,7 @@ const config = {
 					DEFAULT: "hsl(var(--green))",
 				},
 				red: {
+					900: "hsl(var(--red_900))",
 					50: "hsl(var(--red_50))",
 				},
 				blue: {
