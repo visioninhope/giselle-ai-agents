@@ -8,10 +8,9 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
-import { HoverCard, Popover, ToggleGroup } from "radix-ui";
-import { type ReactNode, useRef, useState } from "react";
+import { Popover, ToggleGroup } from "radix-ui";
+import { type ReactNode, useState } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
@@ -66,7 +65,7 @@ function LanguageModelListItem({
 			{...props}
 			className={clsx(
 				"flex gap-[8px]",
-				"hover:bg-white-850/10 p-[4px] rounded-[4px]",
+				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
 				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
 			)}
@@ -206,14 +205,12 @@ export function Toolbar() {
 								<Popover.Portal>
 									<Popover.Content
 										className={clsx(
-											"relative rounded-[8px] px-[8px] py-[8px] w-[400px]",
+											"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
 											"bg-black-900/10 text-white-900",
 											"backdrop-blur-[4px]",
 										)}
+										align="end"
 										sideOffset={42}
-										onOpenAutoFocus={(e) => {
-											e.preventDefault();
-										}}
 									>
 										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 										<div className="relative flex flex-col gap-[8px] max-h-[200px] overflow-y-auto">
@@ -242,6 +239,9 @@ export function Toolbar() {
 														onMouseEnter={() =>
 															setLanguageModelMouseHovered(languageModel)
 														}
+														onFocus={() =>
+															setLanguageModelMouseHovered(languageModel)
+														}
 														asChild
 													>
 														<LanguageModelListItem
@@ -255,16 +255,19 @@ export function Toolbar() {
 								</Popover.Portal>
 							</Popover.Root>
 						)}
-						<div className="absolute left-[550px]">
+						<div className="absolute left-[calc(var(--language-model-detail-panel-width)_+_16px)]">
 							<div className="relative">
 								{selectedTool?.action === "addTextGenerationNode" && (
 									<Popover.Root open={true}>
 										<Popover.Anchor />
 										<Popover.Portal>
 											<Popover.Content
-												className="bg-black-900/10 w-[350px] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
+												className="bg-black-900/10 w-[var(--language-model-detail-panel-width)] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
 												sideOffset={42}
 												align="center"
+												onOpenAutoFocus={(e) => {
+													e.preventDefault();
+												}}
 											>
 												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 												<div className="relative text-white-800 h-[200px] ">
