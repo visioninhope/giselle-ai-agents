@@ -94,7 +94,7 @@ function Installed({
 									<SelectItem
 										value={
 											WorkspaceGitHubIntegrationTrigger.Enum[
-												"github.pull_request.issue_comment.created"
+												"github.pull_request_comment.created"
 											]
 										}
 									>
@@ -144,7 +144,7 @@ function Installed({
 								<SelectItem
 									value={
 										WorkspaceGitHubIntegrationNextAction.Enum[
-											"github.pull_request.issue_comment.create"
+											"github.pull_request_comment.create"
 										]
 									}
 								>
