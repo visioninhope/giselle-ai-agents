@@ -10,8 +10,8 @@ import {
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
-import { Popover, ToggleGroup } from "radix-ui";
-import type { ReactNode } from "react";
+import { HoverCard, Popover, ToggleGroup } from "radix-ui";
+import { type ReactNode, useRef, useState } from "react";
 import {
 	AnthropicIcon,
 	DocumentIcon,
@@ -50,12 +50,12 @@ function CapabilityIcon({
 	children: ReactNode;
 }) {
 	return (
-		<span className="flex gap-[2px] rounded-[8px] border border-white-800 p-[4px] text-[10px]">
+		<span className="flex gap-[4px] rounded-[20px] border-[1px] border-white-800 px-[8px] py-[2px] text-[10px]">
 			{children}
 		</span>
 	);
 }
-function ModelCatalog({
+function LanguageModelListItem({
 	languageModel,
 	...props
 }: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
@@ -82,31 +82,12 @@ function ModelCatalog({
 			)}
 			<div className="flex flex-start gap-[8px]">
 				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
-				{languageModel.tier === "plus" && <CapabilityIcon>Plus</CapabilityIcon>}
-				{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
-				{hasCapability(languageModel, Capability.TextGeneration) && (
-					<CapabilityIcon>Generate Text</CapabilityIcon>
-				)}
-				{hasCapability(languageModel, Capability.PdfFileInput) && (
-					<CapabilityIcon>Input PDF</CapabilityIcon>
-				)}
-				{hasCapability(languageModel, Capability.ImageFileInput) && (
-					<CapabilityIcon>Input Image</CapabilityIcon>
-				)}
-				{hasCapability(languageModel, Capability.SearchGrounding) && (
-					<CapabilityIcon>Web Search</CapabilityIcon>
-				)}
-				{hasCapability(languageModel, Capability.Reasoning) && (
-					<CapabilityIcon>Reasoning</CapabilityIcon>
-				)}
-				{hasCapability(languageModel, Capability.GenericFileInput) && (
-					<>
-						<CapabilityIcon>Input PDF</CapabilityIcon>
-						<CapabilityIcon>Input Image</CapabilityIcon>
-						<CapabilityIcon>Input Audio</CapabilityIcon>
-						<CapabilityIcon>Input Video</CapabilityIcon>
-					</>
-				)}
+				<div>
+					{languageModel.tier === "plus" && (
+						<CapabilityIcon>Plus</CapabilityIcon>
+					)}
+					{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
+				</div>
 			</div>
 		</button>
 	);
@@ -114,9 +95,10 @@ function ModelCatalog({
 
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
-	const { llmProviders } = useWorkflowDesigner();
+	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
+		useState<LanguageModel | null>(null);
 	return (
-		<div className="relative rounded-[8px] overflow-hidden bg-[hsla(255,_40%,_98%,_0.04)]">
+		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[8px] py-[8px]">
 				<ToggleGroup.Root
@@ -157,7 +139,7 @@ export function Toolbar() {
 							<PromptIcon data-icon />
 						</Tooltip>
 					</ToggleGroup.Item>
-					<ToggleGroup.Item value="addFileNode" data-tool>
+					<ToggleGroup.Item value="addFileNode" data-tool className="relative">
 						<DocumentIcon data-icon />
 						{selectedTool?.action === "addFileNode" && (
 							<Popover.Root open={true}>
@@ -224,14 +206,17 @@ export function Toolbar() {
 								<Popover.Portal>
 									<Popover.Content
 										className={clsx(
-											"relative rounded-[8px] px-[8px] py-[8px]",
-											"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
+											"relative rounded-[8px] px-[8px] py-[8px] w-[400px]",
+											"bg-black-900/10 text-white-900",
 											"backdrop-blur-[4px]",
 										)}
 										sideOffset={42}
+										onOpenAutoFocus={(e) => {
+											e.preventDefault();
+										}}
 									>
 										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-										<div className="relative flex flex-col gap-[8px]">
+										<div className="relative flex flex-col gap-[8px] max-h-[200px] overflow-y-auto">
 											<ToggleGroup.Root
 												type="single"
 												className={clsx("flex flex-col gap-[8px]")}
@@ -252,11 +237,16 @@ export function Toolbar() {
 												{languageModels.map((languageModel) => (
 													<ToggleGroup.Item
 														data-tool
-														key={languageModel.id}
 														value={languageModel.id}
+														key={languageModel.id}
+														onMouseEnter={() =>
+															setLanguageModelMouseHovered(languageModel)
+														}
 														asChild
 													>
-														<ModelCatalog languageModel={languageModel} />
+														<LanguageModelListItem
+															languageModel={languageModel}
+														/>
 													</ToggleGroup.Item>
 												))}
 											</ToggleGroup.Root>
@@ -265,6 +255,97 @@ export function Toolbar() {
 								</Popover.Portal>
 							</Popover.Root>
 						)}
+						<div className="absolute left-[550px]">
+							<div className="relative">
+								{selectedTool?.action === "addTextGenerationNode" && (
+									<Popover.Root open={true}>
+										<Popover.Anchor />
+										<Popover.Portal>
+											<Popover.Content
+												className="bg-black-900/10 w-[350px] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
+												sideOffset={42}
+												align="center"
+											>
+												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+												<div className="relative text-white-800 h-[200px] ">
+													{languageModelMouseHovered && (
+														<div className="px-[16px] py-[24px] flex flex-col gap-[16px]">
+															<div className="flex gap-[8px] items-center">
+																<div className="shrink-0">
+																	{languageModelMouseHovered.provider ===
+																		"anthropic" && (
+																		<AnthropicIcon
+																			className="size-[20px]"
+																			data-icon
+																		/>
+																	)}
+																	{languageModelMouseHovered.provider ===
+																		"openai" && (
+																		<OpenaiIcon
+																			className="size-[20px]"
+																			data-icon
+																		/>
+																	)}
+																	{languageModelMouseHovered.provider ===
+																		"google" && (
+																		<GoogleWhiteIcon
+																			className="size-[20px]"
+																			data-icon
+																		/>
+																	)}
+																</div>
+																<p className="text-[22px] font-accent">
+																	{languageModelMouseHovered.id}
+																</p>
+															</div>
+															<div className="flex gap-[8px] flex-wrap">
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.TextGeneration,
+																) && (
+																	<CapabilityIcon>Generate Text</CapabilityIcon>
+																)}
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.PdfFileInput,
+																) && <CapabilityIcon>Input PDF</CapabilityIcon>}
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.ImageFileInput,
+																) && (
+																	<CapabilityIcon>Input Image</CapabilityIcon>
+																)}
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.SearchGrounding,
+																) && (
+																	<CapabilityIcon>Web Search</CapabilityIcon>
+																)}
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.Reasoning,
+																) && <CapabilityIcon>Reasoning</CapabilityIcon>}
+																{hasCapability(
+																	languageModelMouseHovered,
+																	Capability.GenericFileInput,
+																) && (
+																	<>
+																		<CapabilityIcon>Input PDF</CapabilityIcon>
+																		<CapabilityIcon>Input Image</CapabilityIcon>
+																		<CapabilityIcon>Input Audio</CapabilityIcon>
+																		<CapabilityIcon>Input Video</CapabilityIcon>
+																	</>
+																)}
+															</div>
+														</div>
+													)}
+												</div>
+											</Popover.Content>
+										</Popover.Portal>
+									</Popover.Root>
+								)}
+							</div>
+						</div>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>
 			</div>
