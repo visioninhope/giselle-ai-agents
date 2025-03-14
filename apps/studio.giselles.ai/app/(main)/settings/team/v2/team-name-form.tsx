@@ -125,7 +125,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 										type="button"
 										onClick={handleCancelTeamName}
 										disabled={isLoading}
-										className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent"
+										className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400"
 									>
 										Cancel
 									</Button>
