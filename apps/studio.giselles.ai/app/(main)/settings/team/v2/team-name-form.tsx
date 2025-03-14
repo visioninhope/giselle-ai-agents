@@ -32,11 +32,11 @@ const TeamNameSchema = pipe(
 type TeamNameSchema = InferInput<typeof TeamNameSchema>;
 
 export function TeamNameForm({ id: teamId, name }: Team) {
+	const [isEditingTeam, setIsEditingTeam] = useState(false);
 	const [teamName, setTeamName] = useState(name);
 	const [tempTeamName, setTempTeamName] = useState(teamName);
 	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState<string>("");
-	const [openDialog, setOpenDialog] = useState(false);
 
 	const handleSaveTeamName = async () => {
 		setError("");
@@ -53,7 +53,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 
 			if (result.success) {
 				setTeamName(validatedName);
-				setOpenDialog(false);
+				setIsEditingTeam(false);
 			} else {
 				setError("Failed to update team name");
 				console.error("Failed to update team name");
@@ -70,8 +70,8 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 
 	const handleCancelTeamName = () => {
 		setTempTeamName(teamName);
+		setIsEditingTeam(false);
 		setError("");
-		setOpenDialog(false);
 	};
 
 	const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -86,7 +86,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 					<span className="text-white-400 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot">
 						{teamName}
 					</span>
-					<Dialog open={openDialog} onOpenChange={setOpenDialog}>
+					<Dialog open={isEditingTeam} onOpenChange={setIsEditingTeam}>
 						<DialogTrigger asChild>
 							<Button>Edit</Button>
 						</DialogTrigger>
