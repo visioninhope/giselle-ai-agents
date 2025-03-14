@@ -5,6 +5,8 @@ import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 
+// FIXME: Consider integrating with apps/studio.giselles.ai/packages/components/github-app-install-button.tsx when releasing setting-v2
+
 type Props = {
 	installationUrl: string;
 	installed: boolean;
