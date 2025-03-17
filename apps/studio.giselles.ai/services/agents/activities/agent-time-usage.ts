@@ -16,7 +16,7 @@ export async function calculateAgentTimeUsageMs(teamDbId: number) {
  * - Free Team: use team's creation date as reference date and calculate monthly billing cycle
  * @param teamDbId
  */
-export async function getCurrentBillingPeriod(teamDbId: number) {
+async function getCurrentBillingPeriod(teamDbId: number) {
 	const result = await db
 		.select({
 			dbId: teams.dbId,
