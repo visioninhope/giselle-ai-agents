@@ -65,6 +65,9 @@ export function GenerationView({
 										contextNodeId={part.toolInvocation.args.contextNodeId}
 									/>
 								);
+							case "source":
+								/** @todo Source */
+								return null;
 							default: {
 								const _exhaustiveCheck: never = part;
 								throw new Error(`Unhandled part type: ${_exhaustiveCheck}`);

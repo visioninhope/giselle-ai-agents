@@ -3,8 +3,10 @@ import type { Message as AISdkMessage } from "ai";
 import { z } from "zod";
 import { NodeId } from "../node";
 import { GenerationContext, GenerationOrigin } from "./context";
+import { GenerationOutput } from "./output";
 export * from "./context";
 export * from "./template";
+export * from "./output";
 
 export const GenerationId = createIdGenerator("gnr");
 export type GenerationId = z.infer<typeof GenerationId.schema>;
@@ -87,6 +89,7 @@ export const CompletedGeneration = GenerationBase.extend({
 	requestedAt: z.number(),
 	startedAt: z.number(),
 	completedAt: z.number(),
+	outputs: z.array(GenerationOutput),
 });
 export type CompletedGeneration = z.infer<typeof CompletedGeneration>;
 

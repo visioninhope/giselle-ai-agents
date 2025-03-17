@@ -5,12 +5,12 @@ import type {
 	CompletedGeneration,
 	FailedGeneration,
 	FileData,
+	GenerationOutput,
 	LanguageModelData,
 	NodeId,
 	QueuedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
-import type { LanguageModel } from "@giselle-sdk/language-model";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
@@ -97,13 +97,10 @@ export async function generateText(args: {
 		if (generation?.status !== "completed") {
 			return undefined;
 		}
-		const assistantMessages = generation.messages.filter(
-			(m) => m.role === "assistant",
-		);
-		if (assistantMessages.length === 0) {
-			return undefined;
-		}
-		return assistantMessages[assistantMessages.length - 1].content;
+		const content = generation.outputs.find(
+			(output) => output.type === "generated-text",
+		)?.content;
+		return content;
 	}
 	const messages = await buildMessageObject(
 		runningGeneration.context.actionNode,
@@ -151,10 +148,33 @@ export async function generateText(args: {
 			}
 		},
 		async onFinish(event) {
+			const outputs: GenerationOutput[] = [];
+			outputs.push({
+				type: "generated-text",
+				content: event.text,
+			});
+			if (event.reasoning !== undefined) {
+				outputs.push({
+					type: "reasoning",
+					content: event.reasoning,
+				});
+			}
+			if (event.sources.length > 0) {
+				outputs.push({
+					type: "source",
+					sources: event.sources.map((source) => ({
+						sourceType: "url",
+						id: source.id,
+						url: source.url,
+						providerMetadata: source.providerMetadata,
+					})),
+				});
+			}
 			const completedGeneration = {
 				...runningGeneration,
 				status: "completed",
 				completedAt: Date.now(),
+				outputs,
 				messages: appendResponseMessages({
 					messages: [
 						{
