@@ -97,13 +97,10 @@ export async function generateText(args: {
 		if (generation?.status !== "completed") {
 			return undefined;
 		}
-		const assistantMessages = generation.messages.filter(
-			(m) => m.role === "assistant",
-		);
-		if (assistantMessages.length === 0) {
-			return undefined;
-		}
-		return assistantMessages[assistantMessages.length - 1].content;
+		const content = generation.outputs.find(
+			(output) => output.type === "generated-text",
+		)?.content;
+		return content;
 	}
 	const messages = await buildMessageObject(
 		runningGeneration.context.actionNode,
