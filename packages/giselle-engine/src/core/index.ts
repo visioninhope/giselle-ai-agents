@@ -30,14 +30,15 @@ import {
 import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
-export * from "./types";
 export { HandleGitHubWebhookResult } from "./github";
+export * from "./types";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
 		storage: config.storage,
 		llmProviders: config.llmProviders ?? [],
 		integrationConfigs: config.integrationConfigs ?? [],
+		onConsumeAgentTime: config.onConsumeAgentTime,
 	};
 	return {
 		createWorkspace: async () => {
