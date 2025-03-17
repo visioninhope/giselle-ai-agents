@@ -1,6 +1,6 @@
 import { OpenAILanguageModelData } from "@giselle-sdk/data-type";
 import { openaiLanguageModels } from "@giselle-sdk/language-model";
-import { useOptionalSubscription } from "giselle-sdk/react";
+import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,
@@ -19,7 +19,7 @@ export function OpenAIModelPanel({
 	openaiLanguageModel: OpenAILanguageModelData;
 	onModelChange: (changedValue: OpenAILanguageModelData) => void;
 }) {
-	const subscription = useOptionalSubscription();
+	const limits = useUsageLimits();
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -43,7 +43,7 @@ export function OpenAIModelPanel({
 							<SelectItem
 								key={model.id}
 								value={model.id}
-								disabled={!languageModelAvailable(model, subscription)}
+								disabled={!languageModelAvailable(model, limits)}
 							>
 								{model.id}
 							</SelectItem>

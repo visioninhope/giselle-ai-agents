@@ -6,8 +6,8 @@ import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import type { Integration } from "@giselle-sdk/integration";
 import { IntegrationProvider } from "@giselle-sdk/integration/react";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
-import type { Subscription } from "@giselle-sdk/subscription";
-import { SubscriptionProvider } from "@giselle-sdk/subscription/react";
+import type { UsageLimits } from "@giselle-sdk/usage-limits";
+import { UsageLimitsProvider } from "@giselle-sdk/usage-limits/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 
@@ -15,12 +15,12 @@ export function WorkspaceProvider({
 	children,
 	workspaceId,
 	integration,
-	subscription,
+	usageLimits,
 }: {
 	children: ReactNode;
 	workspaceId: WorkspaceId;
 	integration?: Integration;
-	subscription?: Subscription;
+	usageLimits?: UsageLimits;
 }) {
 	const client = useGiselleEngine();
 
@@ -38,7 +38,7 @@ export function WorkspaceProvider({
 		return null;
 	}
 	return (
-		<SubscriptionProvider subscription={subscription}>
+		<UsageLimitsProvider limits={usageLimits}>
 			<IntegrationProvider integration={integration}>
 				<WorkflowDesignerProvider data={workspace}>
 					<GenerationRunnerSystemProvider>
@@ -48,6 +48,6 @@ export function WorkspaceProvider({
 					</GenerationRunnerSystemProvider>
 				</WorkflowDesignerProvider>
 			</IntegrationProvider>
-		</SubscriptionProvider>
+		</UsageLimitsProvider>
 	);
 }

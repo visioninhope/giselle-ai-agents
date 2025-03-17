@@ -1,6 +1,6 @@
 import { GoogleLanguageModelData } from "@giselle-sdk/data-type";
 import { googleLanguageModels } from "@giselle-sdk/language-model";
-import { useOptionalSubscription } from "giselle-sdk/react";
+import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,
@@ -20,7 +20,7 @@ export function GoogleModelPanel({
 	googleLanguageModel: GoogleLanguageModelData;
 	onModelChange: (changedValue: GoogleLanguageModelData) => void;
 }) {
-	const subscription = useOptionalSubscription();
+	const limits = useUsageLimits();
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -44,9 +44,7 @@ export function GoogleModelPanel({
 							<SelectItem
 								key={googleLanguageModel.id}
 								value={googleLanguageModel.id}
-								disabled={
-									!languageModelAvailable(googleLanguageModel, subscription)
-								}
+								disabled={!languageModelAvailable(googleLanguageModel, limits)}
 							>
 								{googleLanguageModel.id}
 							</SelectItem>

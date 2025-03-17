@@ -1,12 +1,12 @@
 import { type LanguageModel, hasTierAccess } from "@giselle-sdk/language-model";
-import type { Subscription } from "@giselle-sdk/subscription";
+import type { UsageLimits } from "@giselle-sdk/usage-limits";
 
 export function languageModelAvailable(
 	languageModel: LanguageModel,
-	subscription?: Subscription,
+	limits?: UsageLimits,
 ) {
-	if (!subscription) {
+	if (!limits) {
 		return true;
 	}
-	return hasTierAccess(languageModel, subscription.languageModelTier);
+	return hasTierAccess(languageModel, limits.featureTier);
 }

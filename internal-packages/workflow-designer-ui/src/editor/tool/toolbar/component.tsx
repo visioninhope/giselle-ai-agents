@@ -9,10 +9,7 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
-import {
-	useOptionalSubscription,
-	useWorkflowDesigner,
-} from "giselle-sdk/react";
+import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
@@ -106,12 +103,12 @@ export function Toolbar() {
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
 	const { llmProviders } = useWorkflowDesigner();
-	const subscription = useOptionalSubscription();
+	const limits = useUsageLimits();
 	const languageModelAvailable = (languageModel: LanguageModel) => {
-		if (subscription === undefined) {
+		if (limits === undefined) {
 			return true;
 		}
-		return hasTierAccess(languageModel, subscription.languageModelTier);
+		return hasTierAccess(languageModel, limits.featureTier);
 	};
 
 	return (

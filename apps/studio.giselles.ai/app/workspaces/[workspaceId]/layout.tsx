@@ -1,6 +1,6 @@
 import { db } from "@/drizzle";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
-import { subscriptionFrom } from "@/packages/lib/subscription";
+import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentTeam } from "@/services/teams";
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { WorkspaceProvider } from "giselle-sdk/react";
@@ -28,7 +28,7 @@ export default async function Layout({
 	if (currentTeam.dbId !== agent.teamDbId) {
 		return notFound();
 	}
-	const subscription = await subscriptionFrom(currentTeam);
+	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 
 	return (
 		<WorkspaceProvider
@@ -36,9 +36,7 @@ export default async function Layout({
 			integration={{
 				github: gitHubIntegrationState,
 			}}
-			subscription={{
-				...subscription,
-			}}
+			usageLimits={usageLimits}
 		>
 			{children}
 		</WorkspaceProvider>
