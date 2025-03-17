@@ -1,5 +1,6 @@
 import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
 import { anthropicLanguageModels } from "@giselle-sdk/language-model";
+import { useOptionalSubscription } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,
@@ -9,6 +10,7 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
+import { languageModelAvailable } from "./utils";
 
 export function AnthropicModelPanel({
 	anthropicLanguageModel,
@@ -17,6 +19,8 @@ export function AnthropicModelPanel({
 	anthropicLanguageModel: AnthropicLanguageModelData;
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
+	const subscription = useOptionalSubscription();
+
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<Select
@@ -39,6 +43,9 @@ export function AnthropicModelPanel({
 							<SelectItem
 								key={anthropicLanguageModel.id}
 								value={anthropicLanguageModel.id}
+								disabled={
+									!languageModelAvailable(anthropicLanguageModel, subscription)
+								}
 							>
 								{anthropicLanguageModel.id}
 							</SelectItem>
