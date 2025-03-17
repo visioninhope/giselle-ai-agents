@@ -2,22 +2,23 @@
 
 
 ## Summary
-* 980 MIT
+* 1018 MIT
 * 103 Apache 2.0
 * 57 ISC
 * 34 New BSD
 * 16 Simplified BSD
 * 3 MIT OR Apache-2.0
-* 3 BlueOak-1.0.0
 * 3 Mozilla Public License 2.0
+* 3 BlueOak-1.0.0
 * 2 MIT-0
 * 2 LGPL-3.0-or-later
 * 2 The Unlicense
-* 1 BSD
-* 1 (MIT OR CC0-1.0)
-* 1 BSD Zero Clause License
-* 1 (MIT OR Apache-2.0)
 * 1 (BSD-2-Clause OR MIT OR Apache-2.0)
+* 1 (MIT OR Apache-2.0)
+* 1 Unknown
+* 1 BSD Zero Clause License
+* 1 (MIT OR CC0-1.0)
+* 1 BSD
 * 1 (MIT AND Zlib)
 * 1 (AFL-2.1 OR BSD-3-Clause)
 * 1 SIL OPEN FONT LICENSE
@@ -433,6 +434,193 @@ MIT OR Apache-2.0 permitted
 * /home/runner/work/giselle/giselle
 
 MIT OR Apache-2.0 permitted
+
+
+
+<a name="@changesets/apply-release-plan"></a>
+### @changesets/apply-release-plan v7.0.10
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/assemble-release-plan"></a>
+### @changesets/assemble-release-plan v6.0.6
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/changelog-git"></a>
+### @changesets/changelog-git v0.2.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/cli"></a>
+### @changesets/cli v2.28.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/config"></a>
+### @changesets/config v3.1.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/errors"></a>
+### @changesets/errors v0.2.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/get-dependents-graph"></a>
+### @changesets/get-dependents-graph v2.1.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/get-release-plan"></a>
+### @changesets/get-release-plan v4.0.8
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/get-version-range-type"></a>
+### @changesets/get-version-range-type v0.4.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/git"></a>
+### @changesets/git v3.0.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/logger"></a>
+### @changesets/logger v0.1.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/parse"></a>
+### @changesets/parse v0.4.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/pre"></a>
+### @changesets/pre v2.0.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/read"></a>
+### @changesets/read v0.6.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/should-skip-package"></a>
+### @changesets/should-skip-package v0.1.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/types"></a>
+### @changesets/types v4.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@changesets/write"></a>
+### @changesets/write v0.4.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -1269,6 +1457,28 @@ LGPL-3.0-or-later permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+
+
+<a name="@manypkg/find-root"></a>
+### @manypkg/find-root v1.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@manypkg/get-packages"></a>
+### @manypkg/get-packages v1.1.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -3363,7 +3573,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@tailwindcss/node"></a>
-### @tailwindcss/node v4.0.6
+### @tailwindcss/node v4.0.9
 #### 
 
 ##### Paths
@@ -3374,7 +3584,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@tailwindcss/oxide"></a>
-### @tailwindcss/oxide v4.0.6
+### @tailwindcss/oxide v4.0.9
 #### 
 
 ##### Paths
@@ -3385,7 +3595,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@tailwindcss/oxide-linux-x64-gnu"></a>
-### @tailwindcss/oxide-linux-x64-gnu v4.0.6
+### @tailwindcss/oxide-linux-x64-gnu v4.0.9
 #### 
 
 ##### Paths
@@ -3396,7 +3606,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@tailwindcss/oxide-linux-x64-musl"></a>
-### @tailwindcss/oxide-linux-x64-musl v4.0.6
+### @tailwindcss/oxide-linux-x64-musl v4.0.9
 #### 
 
 ##### Paths
@@ -3990,7 +4200,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/node"></a>
-### @types/node v18.19.71
+### @types/node v12.20.55
 #### 
 
 ##### Paths
@@ -4737,6 +4947,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="ansi-colors"></a>
+### ansi-colors v4.1.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="ansi-escapes"></a>
 ### ansi-escapes v3.2.0
 #### 
@@ -4794,6 +5015,17 @@ LGPL-3.0-or-later permitted
 
 <a name="arg"></a>
 ### arg v4.1.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="argparse"></a>
+### argparse v1.0.10
 #### 
 
 ##### Paths
@@ -5002,6 +5234,17 @@ Python-2.0 manually approved
 * /home/runner/work/giselle/giselle
 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="better-path-resolve"></a>
+### better-path-resolve v1.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -5447,6 +5690,17 @@ CC-BY-4.0 permitted
 
 <a name="chrome-trace-event"></a>
 ### chrome-trace-event v1.0.4
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="ci-info"></a>
+### ci-info v3.9.0
 #### 
 
 ##### Paths
@@ -6446,6 +6700,17 @@ CC-BY-4.0 permitted
 
 
 
+<a name="enquirer"></a>
+### enquirer v2.4.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="entities"></a>
 ### entities v4.5.0
 #### 
@@ -6710,6 +6975,17 @@ CC-BY-4.0 permitted
 
 
 
+<a name="extendable-error"></a>
+### extendable-error v0.1.7
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="external-editor"></a>
 ### external-editor v3.1.0
 #### 
@@ -6920,7 +7196,7 @@ CC-BY-4.0 permitted
 
 
 <a name="find-up"></a>
-### find-up v5.0.0
+### find-up v4.1.0
 #### 
 
 ##### Paths
@@ -7030,7 +7306,7 @@ CC-BY-4.0 permitted
 
 
 <a name="fs-extra"></a>
-### fs-extra v10.1.0
+### fs-extra v7.0.1
 #### 
 
 ##### Paths
@@ -7601,6 +7877,17 @@ SIL OPEN FONT LICENSE permitted
 
 
 
+<a name="human-id"></a>
+### human-id v4.1.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="human-signals"></a>
 ### human-signals v2.1.0
 #### 
@@ -8074,6 +8361,17 @@ SIL OPEN FONT LICENSE permitted
 
 
 
+<a name="is-subdir"></a>
+### is-subdir v1.2.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="is-typedarray"></a>
 ### is-typedarray v1.0.0
 #### 
@@ -8295,7 +8593,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="js-yaml"></a>
-### js-yaml v4.1.0
+### js-yaml v3.14.1
 #### 
 
 ##### Paths
@@ -8416,7 +8714,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="jsonfile"></a>
-### jsonfile v6.1.0
+### jsonfile v4.0.0
 #### 
 
 ##### Paths
@@ -8603,7 +8901,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="locate-path"></a>
-### locate-path v6.0.0
+### locate-path v5.0.0
 #### 
 
 ##### Paths
@@ -8681,6 +8979,17 @@ BlueOak-1.0.0 permitted
 
 <a name="lodash.sortby"></a>
 ### lodash.sortby v4.7.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="lodash.startcase"></a>
+### lodash.startcase v4.4.0
 #### 
 
 ##### Paths
@@ -9394,6 +9703,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="mri"></a>
+### mri v1.2.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="ms"></a>
 ### ms v2.1.3
 #### 
@@ -9823,8 +10143,30 @@ MIT-0 permitted
 
 
 
+<a name="outdent"></a>
+### outdent v0.5.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="p-filter"></a>
+### p-filter v2.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="p-limit"></a>
-### p-limit v3.1.0
+### p-limit v2.3.0
 #### 
 
 ##### Paths
@@ -9835,7 +10177,7 @@ MIT-0 permitted
 
 
 <a name="p-locate"></a>
-### p-locate v5.0.0
+### p-locate v4.1.0
 #### 
 
 ##### Paths
@@ -9846,7 +10188,18 @@ MIT-0 permitted
 
 
 <a name="p-map"></a>
-### p-map v3.0.0
+### p-map v2.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="p-try"></a>
+### p-try v2.2.0
 #### 
 
 ##### Paths
@@ -9886,6 +10239,17 @@ MIT-0 permitted
 * /home/runner/work/giselle/giselle
 
 BlueOak-1.0.0 permitted
+
+
+
+<a name="package-manager-detector"></a>
+### package-manager-detector v0.2.9
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 
@@ -10175,6 +10539,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="pify"></a>
+### pify v4.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="pino"></a>
 ### pino v9.5.0
 #### 
@@ -10364,6 +10739,17 @@ BlueOak-1.0.0 permitted
 
 <a name="preact-render-to-string"></a>
 ### preact-render-to-string v5.2.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="prettier"></a>
+### prettier v2.8.8
 #### 
 
 ##### Paths
@@ -10870,6 +11256,17 @@ BlueOak-1.0.0 permitted
 
 <a name="read-env"></a>
 ### read-env v1.3.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="read-yaml-file"></a>
+### read-yaml-file v1.1.0
 #### 
 
 ##### Paths
@@ -11671,6 +12068,21 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="spawndamnit"></a>
+### spawndamnit v3.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+Unknown manually approved
+
+>See https://github.com/jamiebuilds/spawndamnit/pull/11
+
+><cite> sakito 2025-03-10</cite>
+
+
+
 <a name="split2"></a>
 ### split2 v4.2.0
 #### 
@@ -11694,7 +12106,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="sprintf-js"></a>
-### sprintf-js v1.1.3
+### sprintf-js v1.0.3
 #### 
 
 ##### Paths
@@ -11805,6 +12217,17 @@ BlueOak-1.0.0 permitted
 
 <a name="strip-ansi"></a>
 ### strip-ansi v4.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="strip-bom"></a>
+### strip-bom v3.0.0
 #### 
 
 ##### Paths
@@ -11981,6 +12404,17 @@ BlueOak-1.0.0 permitted
 
 <a name="tapable"></a>
 ### tapable v2.2.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="term-size"></a>
+### term-size v2.2.1
 #### 
 
 ##### Paths
@@ -12651,7 +13085,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="universalify"></a>
-### universalify v2.0.1
+### universalify v0.1.2
 #### 
 
 ##### Paths
