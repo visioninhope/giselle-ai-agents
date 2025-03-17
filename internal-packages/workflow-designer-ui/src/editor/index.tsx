@@ -183,6 +183,7 @@ function NodeCanvas() {
 									{
 										id: OutputId.generate(),
 										label: "Output",
+										accesor: "text",
 									},
 								],
 							},
@@ -209,6 +210,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -230,6 +232,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -251,6 +254,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -279,6 +283,7 @@ function NodeCanvas() {
 									{
 										id: OutputId.generate(),
 										label: "Output",
+										accesor: "generated-text",
 									},
 								],
 							},
@@ -298,6 +303,7 @@ function NodeCanvas() {
 									{
 										id: OutputId.generate(),
 										label: "Output",
+										accesor: "github-references",
 									},
 								],
 							},

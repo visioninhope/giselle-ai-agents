@@ -1,4 +1,4 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
@@ -28,8 +28,13 @@ export function TextGenerationNodePropertiesPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
-		useWorkflowDesigner();
+	const {
+		data,
+		updateNodeDataContent,
+		updateNodeData,
+		setUiNodeState,
+		deleteConnection,
+	} = useWorkflowDesigner();
 	const { startGeneration, isGenerating, stopGeneration } = useNodeGenerations({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
@@ -150,6 +155,89 @@ export function TextGenerationNodePropertiesPanel({
 								{node.content.llm.provider === "google" && (
 									<GoogleModelPanel
 										googleLanguageModel={node.content.llm}
+										onSearchGroundingConfigurationChange={(enable) => {
+											if (node.content.llm.provider !== "google") {
+												return;
+											}
+											if (enable) {
+												updateNodeData(node, {
+													...node,
+													content: {
+														...node.content,
+														llm: {
+															...node.content.llm,
+															configurations: {
+																...node.content.llm.configurations,
+																searchGrounding: enable,
+															},
+														},
+													},
+													outputs: [
+														...node.outputs,
+														{
+															id: OutputId.generate(),
+															label: "Source",
+															accesor: "source",
+														},
+													],
+												});
+											} else {
+												const sourceOutput = node.outputs.find(
+													(output) => output.accesor === "source",
+												);
+												if (sourceOutput) {
+													for (const connection of data.connections) {
+														if (connection.outputId !== sourceOutput.id) {
+															continue;
+														}
+														deleteConnection(connection.id);
+
+														const connectedNode = data.nodes.find(
+															(node) => node.id === connection.inputNode.id,
+														);
+														if (connectedNode === undefined) {
+															continue;
+														}
+														if (connectedNode.type === "action") {
+															switch (connectedNode.content.type) {
+																case "textGeneration": {
+																	updateNodeData(connectedNode, {
+																		inputs: connectedNode.inputs.filter(
+																			(input) =>
+																				input.id !== connection.inputId,
+																		),
+																	});
+																	break;
+																}
+																default: {
+																	const _exhaustiveCheck: never =
+																		connectedNode.content.type;
+																	throw new Error(
+																		`Unhandled node type: ${_exhaustiveCheck}`,
+																	);
+																}
+															}
+														}
+													}
+												}
+												updateNodeData(node, {
+													...node,
+													content: {
+														...node.content,
+														llm: {
+															...node.content.llm,
+															configurations: {
+																...node.content.llm.configurations,
+																searchGrounding: false,
+															},
+														},
+													},
+													outputs: node.outputs.filter(
+														(output) => output.accesor !== "source",
+													),
+												});
+											}
+										}}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
