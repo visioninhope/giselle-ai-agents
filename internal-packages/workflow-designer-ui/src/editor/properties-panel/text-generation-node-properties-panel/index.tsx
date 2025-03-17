@@ -1,4 +1,4 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
@@ -150,6 +150,48 @@ export function TextGenerationNodePropertiesPanel({
 								{node.content.llm.provider === "google" && (
 									<GoogleModelPanel
 										googleLanguageModel={node.content.llm}
+										onSearchGroundingConfigurationChange={(enable) => {
+											if (enable) {
+												updateNodeData(node, {
+													...node,
+													content: {
+														...node.content,
+														llm: {
+															...node.content.llm,
+															configurations: {
+																...node.content.llm.configurations,
+																searchGrounding: enable,
+															},
+														},
+													},
+													outputs: [
+														...node.outputs,
+														{
+															id: OutputId.generate(),
+															label: "Source",
+															accesor: "source",
+														},
+													],
+												});
+											} else {
+												updateNodeData(node, {
+													...node,
+													content: {
+														...node.content,
+														llm: {
+															...node.content.llm,
+															configurations: {
+																...node.content.llm.configurations,
+																searchGrounding: false,
+															},
+														},
+													},
+													outputs: node.outputs.filter(
+														(output) => output.accesor !== "source",
+													),
+												});
+											}
+										}}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
