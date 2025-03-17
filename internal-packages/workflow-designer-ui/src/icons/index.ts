@@ -27,3 +27,4 @@ export * from "./view";
 export * from "./picture";
 export * from "./triangle-alert";
 export * from "./github";
+export * from "./perplexity";

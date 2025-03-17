@@ -15,6 +15,9 @@ catalogs:
     '@ai-sdk/openai':
       specifier: 1.2.5
       version: 1.2.5
+    '@ai-sdk/perplexity':
+      specifier: 1.0.7
+      version: 1.0.7
     '@biomejs/biome':
       specifier: 1.9.4
       version: 1.9.4
@@ -778,6 +781,9 @@ importers:
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 1.2.5(zod@3.24.1)
+      '@ai-sdk/perplexity':
+        specifier: 'catalog:'
+        version: 1.0.7(zod@3.24.1)
       '@giselle-sdk/github-client':
         specifier: workspace:^
         version: link:../github-client
@@ -911,6 +917,9 @@ importers:
 
   packages/language-model:
     dependencies:
+      '@ai-sdk/perplexity':
+        specifier: 'catalog:'
+        version: 1.0.7(zod@3.24.1)
       zod:
         specifier: 'catalog:'
         version: 3.24.1
@@ -1220,6 +1229,12 @@ packages:
 
   '@ai-sdk/openai@1.2.5':
     resolution: {integrity: sha512-COK7LzspgQQh5Yq070xfDdVMvp8WX592rXRaMaYNNqu1xpzahxDcM24aF9xgKYWuYH0UMoOw4UmWGwGxr6ygIg==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      zod: ^3.0.0
+
+  '@ai-sdk/perplexity@1.0.7':
+    resolution: {integrity: sha512-+K86L/X5gnmhu+M89RpaUliZp80updKF2rfH78OO2TBVUxQ1KFGqfc0M0Jm60O4sXNW9Z234l8z5nQbqz+r0AQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
@@ -9218,6 +9233,12 @@ snapshots:
       zod: 3.24.1
 
   '@ai-sdk/openai@1.2.5(zod@3.24.1)':
+    dependencies:
+      '@ai-sdk/provider': 1.0.11
+      '@ai-sdk/provider-utils': 2.1.13(zod@3.24.1)
+      zod: 3.24.1
+
+  '@ai-sdk/perplexity@1.0.7(zod@3.24.1)':
     dependencies:
       '@ai-sdk/provider': 1.0.11
       '@ai-sdk/provider-utils': 2.1.13(zod@3.24.1)

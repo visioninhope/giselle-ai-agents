@@ -20,6 +20,7 @@ import {
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
+	PerplexityIcon,
 	PictureIcon,
 	PromptIcon,
 	StackBlicksIcon,
@@ -84,6 +85,9 @@ function LanguageModelListItem({
 			)}
 			{languageModel.provider === "google" && (
 				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
+			)}
+			{languageModel.provider === "perplexity" && (
+				<PerplexityIcon className="w-[20px] h-[20px]" data-icon />
 			)}
 			<div className="flex flex-start gap-[8px]">
 				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
@@ -316,6 +320,13 @@ export function Toolbar() {
 																	{languageModelMouseHovered.provider ===
 																		"google" && (
 																		<GoogleWhiteIcon
+																			className="size-[20px]"
+																			data-icon
+																		/>
+																	)}
+																	{languageModelMouseHovered.provider ===
+																		"perplexity" && (
+																		<PerplexityIcon
 																			className="size-[20px]"
 																			data-icon
 																		/>

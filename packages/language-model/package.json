@@ -23,6 +23,7 @@
 		"tsup": "catalog:"
 	},
 	"dependencies": {
+		"@ai-sdk/perplexity": "catalog:",
 		"zod": "catalog:"
 	}
 }

@@ -5,7 +5,12 @@ import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { AnthropicIcon, GoogleIcon, OpenaiIcon } from "../../../icons";
+import {
+	AnthropicIcon,
+	GoogleIcon,
+	OpenaiIcon,
+	PerplexityIcon,
+} from "../../../icons";
 import { Button } from "../../../ui/button";
 import {
 	PropertiesPanelContent,
@@ -69,6 +74,9 @@ export function TextGenerationNodePropertiesPanel({
 						)}
 						{node.content.llm.provider === "google" && (
 							<GoogleIcon className="size-[20px]" />
+						)}
+						{node.content.llm.provider === "perplexity" && (
+							<PerplexityIcon className="size-[20px] text-black-900" />
 						)}
 					</>
 				}
