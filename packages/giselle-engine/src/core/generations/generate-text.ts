@@ -12,6 +12,7 @@ import type {
 	OutputId,
 	QueuedGeneration,
 	RunningGeneration,
+	UrlSource,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { filePath } from "../files/utils";
@@ -20,6 +21,7 @@ import {
 	buildMessageObject,
 	getGeneration,
 	getNodeGenerationIndexes,
+	getRedirectedUrlAndTitle,
 	setGeneration,
 	setGenerationIndex,
 	setNodeGenerationIndex,
@@ -119,7 +121,7 @@ export async function generateText(args: {
 		}
 		switch (generationOutput.type) {
 			case "source":
-				throw new Error("Generation output type is not supported");
+				return JSON.stringify(generationOutput.sources);
 			case "reasoning":
 				throw new Error("Generation output type is not supported");
 			case "generated-image":
@@ -206,15 +208,22 @@ export async function generateText(args: {
 				(output) => output.accesor === "source",
 			);
 			if (sourceOutput !== undefined && event.sources.length > 0) {
+				const sources = await Promise.all(
+					event.sources.map(async (source) => {
+						const redirected = await getRedirectedUrlAndTitle(source.url);
+						return {
+							sourceType: "url",
+							id: source.id,
+							url: redirected.redirectedUrl,
+							title: redirected.title,
+							providerMetadata: source.providerMetadata,
+						} satisfies UrlSource;
+					}),
+				);
 				generationOutputs.push({
 					type: "source",
 					outputId: sourceOutput.id,
-					sources: event.sources.map((source) => ({
-						sourceType: "url",
-						id: source.id,
-						url: source.url,
-						providerMetadata: source.providerMetadata,
-					})),
+					sources,
 				});
 			}
 			const completedGeneration = {
