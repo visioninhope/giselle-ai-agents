@@ -1,12 +1,14 @@
 import type { ProviderMetadata } from "ai";
 import { z } from "zod";
+import { OutputId } from "../node";
 
-export const OutputBase = z.object({
+export const GenerationOutputBase = z.object({
 	type: z.string(),
+	outputId: OutputId.schema,
 });
 
 export const GeneratedTextOutputType = z.literal("generated-text");
-export const GeneratedTextContentOutput = OutputBase.extend({
+export const GeneratedTextContentOutput = GenerationOutputBase.extend({
 	type: GeneratedTextOutputType,
 	content: z.string(),
 });
@@ -16,12 +18,12 @@ export const Image = z.object({
 });
 
 export const GeneratedImageOuputType = z.literal("generated-image");
-export const GeneratedImageContentOutput = OutputBase.extend({
+export const GeneratedImageContentOutput = GenerationOutputBase.extend({
 	type: GeneratedImageOuputType,
 	contents: Image.array(),
 });
 
-export const ReasoningOutput = z.object({
+export const ReasoningOutput = GenerationOutputBase.extend({
 	type: z.literal("reasoning"),
 	content: z.string(),
 });
@@ -41,7 +43,7 @@ export const UrlSource = z.object({
 
 export const Source = UrlSource;
 
-export const SourceOutput = z.object({
+export const SourceOutput = GenerationOutputBase.extend({
 	type: z.literal("source"),
 	sources: z.array(Source),
 });
