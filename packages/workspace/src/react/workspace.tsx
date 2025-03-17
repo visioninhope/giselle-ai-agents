@@ -6,6 +6,8 @@ import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import type { Integration } from "@giselle-sdk/integration";
 import { IntegrationProvider } from "@giselle-sdk/integration/react";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
+import type { Subscription } from "@giselle-sdk/subscription";
+import { SubscriptionProvider } from "@giselle-sdk/subscription/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 
@@ -13,10 +15,12 @@ export function WorkspaceProvider({
 	children,
 	workspaceId,
 	integration,
+	subscription,
 }: {
 	children: ReactNode;
 	workspaceId: WorkspaceId;
 	integration?: Integration;
+	subscription?: Subscription;
 }) {
 	const client = useGiselleEngine();
 
@@ -34,14 +38,16 @@ export function WorkspaceProvider({
 		return null;
 	}
 	return (
-		<IntegrationProvider integration={integration}>
-			<WorkflowDesignerProvider data={workspace}>
-				<GenerationRunnerSystemProvider>
-					<RunSystemContextProvider workspaceId={workspaceId}>
-						{children}
-					</RunSystemContextProvider>
-				</GenerationRunnerSystemProvider>
-			</WorkflowDesignerProvider>
-		</IntegrationProvider>
+		<SubscriptionProvider subscription={subscription}>
+			<IntegrationProvider integration={integration}>
+				<WorkflowDesignerProvider data={workspace}>
+					<GenerationRunnerSystemProvider>
+						<RunSystemContextProvider workspaceId={workspaceId}>
+							{children}
+						</RunSystemContextProvider>
+					</GenerationRunnerSystemProvider>
+				</WorkflowDesignerProvider>
+			</IntegrationProvider>
+		</SubscriptionProvider>
 	);
 }
