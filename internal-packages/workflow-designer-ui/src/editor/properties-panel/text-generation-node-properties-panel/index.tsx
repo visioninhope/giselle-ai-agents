@@ -151,6 +151,9 @@ export function TextGenerationNodePropertiesPanel({
 									<GoogleModelPanel
 										googleLanguageModel={node.content.llm}
 										onSearchGroundingConfigurationChange={(enable) => {
+											if (node.content.llm.provider !== "google") {
+												return;
+											}
 											if (enable) {
 												updateNodeData(node, {
 													...node,
