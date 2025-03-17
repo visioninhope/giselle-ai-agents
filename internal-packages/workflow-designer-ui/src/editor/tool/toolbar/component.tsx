@@ -5,12 +5,14 @@ import {
 	Capability,
 	type LanguageModel,
 	hasCapability,
+	hasTierAccess,
 	languageModels,
-
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useOptionalSubscription,
+	useWorkflowDesigner,
+} from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
@@ -35,6 +37,7 @@ import {
 	addTextNodeTool,
 	moveTool,
 	useToolbar,
+} from "./state";
 
 function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
 	return (
@@ -58,9 +61,11 @@ function CapabilityIcon({
 }
 function LanguageModelListItem({
 	languageModel,
+	disabled,
 	...props
 }: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
 	languageModel: LanguageModel;
+	disabled?: boolean;
 }) {
 	return (
 		<button
@@ -70,7 +75,9 @@ function LanguageModelListItem({
 				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
 				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+				disabled && "opacity-50 cursor-not-allowed",
 			)}
+			disabled={disabled}
 		>
 			{languageModel.provider === "anthropic" && (
 				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
@@ -99,6 +106,13 @@ export function Toolbar() {
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
 	const { llmProviders } = useWorkflowDesigner();
+	const subscription = useOptionalSubscription();
+	const languageModelAvailable = (languageModel: LanguageModel) => {
+		if (subscription === undefined) {
+			return true;
+		}
+		return hasTierAccess(languageModel, subscription.languageModelTier);
+	};
 
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
@@ -236,26 +250,32 @@ export function Toolbar() {
 												}}
 											>
 												{languageModels.map(
-												(languageModel) =>
-													llmProviders.includes(languageModel.provider) && (
-														<ToggleGroup.Item
-															data-tool
-															value={languageModel.id}
-															key={languageModel.id}
-															onMouseEnter={() =>
-																setLanguageModelMouseHovered(languageModel)
-															}
-															onFocus={() =>
-																setLanguageModelMouseHovered(languageModel)
-															}
-															asChild
-														>
-															<LanguageModelListItem
-																languageModel={languageModel}
-															/>
-														</ToggleGroup.Item>
-													),
-											)}
+													(languageModel) =>
+														llmProviders.includes(languageModel.provider) && (
+															<ToggleGroup.Item
+																data-tool
+																value={languageModel.id}
+																key={languageModel.id}
+																onMouseEnter={() =>
+																	setLanguageModelMouseHovered(languageModel)
+																}
+																onFocus={() =>
+																	setLanguageModelMouseHovered(languageModel)
+																}
+																disabled={
+																	!languageModelAvailable(languageModel)
+																}
+																asChild
+															>
+																<LanguageModelListItem
+																	languageModel={languageModel}
+																	disabled={
+																		!languageModelAvailable(languageModel)
+																	}
+																/>
+															</ToggleGroup.Item>
+														),
+												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
