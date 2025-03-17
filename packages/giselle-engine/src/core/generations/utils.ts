@@ -26,7 +26,10 @@ export async function buildMessageObject(
 	node: ActionNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
-	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
+	textGenerationResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>,
 ): Promise<CoreMessage[]> {
 	switch (node.content.type) {
 		case "textGeneration": {
@@ -48,7 +51,10 @@ async function buildGenerationMessageForTextGeneration(
 	node: TextGenerationNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
-	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
+	textGenerationResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>,
 ): Promise<CoreMessage[]> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
@@ -86,7 +92,10 @@ async function buildGenerationMessageForTextGeneration(
 				break;
 			}
 			case "textGeneration": {
-				const result = await textGenerationResolver(contextNode.id);
+				const result = await textGenerationResolver(
+					contextNode.id,
+					sourceKeyword.outputId,
+				);
 				if (result !== undefined) {
 					userMessage = userMessage.replace(replaceKeyword, result);
 				}

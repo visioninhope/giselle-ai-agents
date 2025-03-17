@@ -8,6 +8,8 @@ import type {
 	GenerationOutput,
 	LanguageModelData,
 	NodeId,
+	Output,
+	OutputId,
 	QueuedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
@@ -77,7 +79,7 @@ export async function generateText(args: {
 		return blob;
 	}
 
-	async function generationContentResolver(nodeId: NodeId) {
+	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			origin: runningGeneration.context.origin,
 			storage: args.context.storage,
@@ -97,10 +99,40 @@ export async function generateText(args: {
 		if (generation?.status !== "completed") {
 			return undefined;
 		}
-		const content = generation.outputs.find(
-			(output) => output.type === "generated-text",
-		)?.content;
-		return content;
+		let output: Output | undefined;
+		for (const sourceNode of runningGeneration.context.sourceNodes) {
+			for (const sourceOutput of sourceNode.outputs) {
+				if (sourceOutput.id === outputId) {
+					output = sourceOutput;
+					break;
+				}
+			}
+		}
+		if (output === undefined) {
+			return undefined;
+		}
+		const generationOutput = generation.outputs.find(
+			(output) => output.outputId === outputId,
+		);
+		if (generationOutput === undefined) {
+			return undefined;
+		}
+		switch (generationOutput.type) {
+			case "source":
+				throw new Error("Generation output type is not supported");
+			case "reasoning":
+				throw new Error("Generation output type is not supported");
+			case "generated-image":
+				throw new Error("Generation output type is not supported");
+			case "generated-text":
+				return generationOutput.content;
+			default: {
+				const _exhaustiveCheck: never = generationOutput;
+				throw new Error(
+					`Unhandled generation output type: ${_exhaustiveCheck}`,
+				);
+			}
+		}
 	}
 	const messages = await buildMessageObject(
 		runningGeneration.context.actionNode,
@@ -148,20 +180,35 @@ export async function generateText(args: {
 			}
 		},
 		async onFinish(event) {
-			const outputs: GenerationOutput[] = [];
-			outputs.push({
-				type: "generated-text",
-				content: event.text,
-			});
-			if (event.reasoning !== undefined) {
-				outputs.push({
-					type: "reasoning",
-					content: event.reasoning,
+			const generationOutputs: GenerationOutput[] = [];
+			const generatedTextOutput =
+				runningGeneration.context.actionNode.outputs.find(
+					(output) => output.accesor === "generated-text",
+				);
+			if (generatedTextOutput !== undefined) {
+				generationOutputs.push({
+					type: "generated-text",
+					content: event.text,
+					outputId: generatedTextOutput.id,
 				});
 			}
-			if (event.sources.length > 0) {
-				outputs.push({
+			const reasoningOutput = runningGeneration.context.actionNode.outputs.find(
+				(output) => output.accesor === "reasoning",
+			);
+			if (reasoningOutput !== undefined && event.reasoning !== undefined) {
+				generationOutputs.push({
+					type: "reasoning",
+					content: event.reasoning,
+					outputId: reasoningOutput.id,
+				});
+			}
+			const sourceOutput = runningGeneration.context.actionNode.outputs.find(
+				(output) => output.accesor === "source",
+			);
+			if (sourceOutput !== undefined && event.sources.length > 0) {
+				generationOutputs.push({
 					type: "source",
+					outputId: sourceOutput.id,
 					sources: event.sources.map((source) => ({
 						sourceType: "url",
 						id: source.id,
@@ -174,7 +221,7 @@ export async function generateText(args: {
 				...runningGeneration,
 				status: "completed",
 				completedAt: Date.now(),
-				outputs,
+				outputs: generationOutputs,
 				messages: appendResponseMessages({
 					messages: [
 						{
