@@ -35,6 +35,7 @@
 		"@types/node": "catalog:",
 		"@types/pluralize": "catalog:",
 		"@types/react": "catalog:",
+		"@giselle-sdk/usage-limits": "workspace:^",
 		"typescript": "catalog:"
 	}
 }

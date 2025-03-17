@@ -1,5 +1,6 @@
 import { OpenAILanguageModelData } from "@giselle-sdk/data-type";
 import { openaiLanguageModels } from "@giselle-sdk/language-model";
+import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,
@@ -9,6 +10,7 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
+import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
@@ -17,6 +19,8 @@ export function OpenAIModelPanel({
 	openaiLanguageModel: OpenAILanguageModelData;
 	onModelChange: (changedValue: OpenAILanguageModelData) => void;
 }) {
+	const limits = useUsageLimits();
+
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<Select
@@ -36,7 +40,11 @@ export function OpenAIModelPanel({
 				<SelectContent>
 					<SelectGroup>
 						{openaiLanguageModels.map((model) => (
-							<SelectItem key={model.id} value={model.id}>
+							<SelectItem
+								key={model.id}
+								value={model.id}
+								disabled={!languageModelAvailable(model, limits)}
+							>
 								{model.id}
 							</SelectItem>
 						))}
