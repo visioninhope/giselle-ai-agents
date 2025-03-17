@@ -1,5 +1,7 @@
 import { db } from "@/drizzle";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
+import { subscriptionFrom } from "@/packages/lib/subscription";
+import { fetchCurrentTeam } from "@/services/teams";
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { WorkspaceProvider } from "giselle-sdk/react";
 import { notFound } from "next/navigation";
@@ -21,11 +23,21 @@ export default async function Layout({
 		return notFound();
 	}
 	const gitHubIntegrationState = await getGitHubIntegrationState(agent.dbId);
+
+	const currentTeam = await fetchCurrentTeam();
+	if (currentTeam.dbId !== agent.teamDbId) {
+		return notFound();
+	}
+	const subscription = await subscriptionFrom(currentTeam);
+
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
 			integration={{
 				github: gitHubIntegrationState,
+			}}
+			subscription={{
+				...subscription,
 			}}
 		>
 			{children}
