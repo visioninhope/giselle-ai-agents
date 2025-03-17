@@ -28,8 +28,13 @@ export function TextGenerationNodePropertiesPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
-		useWorkflowDesigner();
+	const {
+		data,
+		updateNodeDataContent,
+		updateNodeData,
+		setUiNodeState,
+		deleteConnection,
+	} = useWorkflowDesigner();
 	const { startGeneration, isGenerating, stopGeneration } = useNodeGenerations({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
@@ -177,6 +182,44 @@ export function TextGenerationNodePropertiesPanel({
 													],
 												});
 											} else {
+												const sourceOutput = node.outputs.find(
+													(output) => output.accesor === "source",
+												);
+												if (sourceOutput) {
+													for (const connection of data.connections) {
+														if (connection.outputId !== sourceOutput.id) {
+															continue;
+														}
+														deleteConnection(connection.id);
+
+														const connectedNode = data.nodes.find(
+															(node) => node.id === connection.inputNode.id,
+														);
+														if (connectedNode === undefined) {
+															continue;
+														}
+														if (connectedNode.type === "action") {
+															switch (connectedNode.content.type) {
+																case "textGeneration": {
+																	updateNodeData(connectedNode, {
+																		inputs: connectedNode.inputs.filter(
+																			(input) =>
+																				input.id !== connection.inputId,
+																		),
+																	});
+																	break;
+																}
+																default: {
+																	const _exhaustiveCheck: never =
+																		connectedNode.content.type;
+																	throw new Error(
+																		`Unhandled node type: ${_exhaustiveCheck}`,
+																	);
+																}
+															}
+														}
+													}
+												}
 												updateNodeData(node, {
 													...node,
 													content: {
