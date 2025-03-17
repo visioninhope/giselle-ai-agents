@@ -6,8 +6,11 @@ import {
 	type LanguageModel,
 	hasCapability,
 	languageModels,
+
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
+import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
@@ -32,7 +35,6 @@ import {
 	addTextNodeTool,
 	moveTool,
 	useToolbar,
-} from "./state";
 
 function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
 	return (
@@ -96,6 +98,8 @@ export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
+	const { llmProviders } = useWorkflowDesigner();
+
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -231,24 +235,27 @@ export function Toolbar() {
 													});
 												}}
 											>
-												{languageModels.map((languageModel) => (
-													<ToggleGroup.Item
-														data-tool
-														value={languageModel.id}
-														key={languageModel.id}
-														onMouseEnter={() =>
-															setLanguageModelMouseHovered(languageModel)
-														}
-														onFocus={() =>
-															setLanguageModelMouseHovered(languageModel)
-														}
-														asChild
-													>
-														<LanguageModelListItem
-															languageModel={languageModel}
-														/>
-													</ToggleGroup.Item>
-												))}
+												{languageModels.map(
+												(languageModel) =>
+													llmProviders.includes(languageModel.provider) && (
+														<ToggleGroup.Item
+															data-tool
+															value={languageModel.id}
+															key={languageModel.id}
+															onMouseEnter={() =>
+																setLanguageModelMouseHovered(languageModel)
+															}
+															onFocus={() =>
+																setLanguageModelMouseHovered(languageModel)
+															}
+															asChild
+														>
+															<LanguageModelListItem
+																languageModel={languageModel}
+															/>
+														</ToggleGroup.Item>
+													),
+											)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
