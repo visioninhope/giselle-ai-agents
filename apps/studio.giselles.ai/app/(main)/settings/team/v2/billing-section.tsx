@@ -105,12 +105,8 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 	);
 }
 
-type UpgradeButtonProps = {
-	team: CurrentTeam;
-};
-
 // NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
-function UpgradeButton({ team }: UpgradeButtonProps) {
+function UpgradeButton({ team }: { team: CurrentTeam }) {
 	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
@@ -120,11 +116,7 @@ function UpgradeButton({ team }: UpgradeButtonProps) {
 	);
 }
 
-type UpdateButtonProps = {
-	subscriptionId: string;
-};
-
-function UpdateButton({ subscriptionId }: UpdateButtonProps) {
+function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 	const manageBillingWithSubscriptionId = manageBilling.bind(
 		null,
 		subscriptionId,
