@@ -92,9 +92,6 @@ function LanguageModelListItem({
 			<div className="flex flex-start gap-[8px]">
 				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
 				<div>
-					{languageModel.tier === "plus" && (
-						<CapabilityIcon>Plus</CapabilityIcon>
-					)}
 					{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
 				</div>
 			</div>
