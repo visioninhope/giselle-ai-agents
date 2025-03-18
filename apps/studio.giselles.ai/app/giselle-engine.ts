@@ -1,5 +1,5 @@
+import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
-
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
 import vercelBlobDriver from "unstorage/drivers/vercel-blob";
@@ -21,4 +21,5 @@ export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
 	llmProviders: ["openai", "anthropic", "google"],
+	onConsumeAgentTime,
 });
