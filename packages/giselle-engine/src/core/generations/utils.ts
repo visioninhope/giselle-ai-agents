@@ -208,9 +208,9 @@ export function generationPath(generationIndex: GenerationIndex) {
 	const originType = generationOrigin.type;
 	switch (originType) {
 		case "workspace":
-			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		case "run":
-			return `runs/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `runs/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		default: {
 			const _exhaustiveCheck: never = originType;
 			return _exhaustiveCheck;
