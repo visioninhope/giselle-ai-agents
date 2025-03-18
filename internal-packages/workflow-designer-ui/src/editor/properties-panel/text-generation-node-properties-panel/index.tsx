@@ -23,6 +23,7 @@ import {
 	AnthropicModelPanel,
 	GoogleModelPanel,
 	OpenAIModelPanel,
+	PerplexityModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
@@ -257,6 +258,17 @@ export function TextGenerationNodePropertiesPanel({
 								{node.content.llm.provider === "anthropic" && (
 									<AnthropicModelPanel
 										anthropicLanguageModel={node.content.llm}
+										onModelChange={(value) =>
+											updateNodeDataContent(node, {
+												...node.content,
+												llm: value,
+											})
+										}
+									/>
+								)}
+								{node.content.llm.provider === "perplexity" && (
+									<PerplexityModelPanel
+										perplexityLanguageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
