@@ -113,7 +113,7 @@ function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 
 function PaymentInfo({ team }: { team: CurrentTeam }) {
 	if (team.activeSubscriptionId === null) {
-		throw new Error("Valid subscription id not found.");
+		throw new Error("Subscription id not found");
 	}
 
 	return (
