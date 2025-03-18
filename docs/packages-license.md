@@ -3,7 +3,7 @@
 
 ## Summary
 * 1018 MIT
-* 103 Apache 2.0
+* 104 Apache 2.0
 * 57 ISC
 * 34 New BSD
 * 16 Simplified BSD
@@ -76,6 +76,17 @@
 
 <a name="@ai-sdk/openai"></a>
 ### @ai-sdk/openai v1.0.8
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/perplexity"></a>
+### @ai-sdk/perplexity v1.0.7
 #### 
 
 ##### Paths

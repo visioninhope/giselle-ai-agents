@@ -26,7 +26,10 @@ export async function buildMessageObject(
 	node: ActionNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
-	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
+	textGenerationResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>,
 ): Promise<CoreMessage[]> {
 	switch (node.content.type) {
 		case "textGeneration": {
@@ -48,7 +51,10 @@ async function buildGenerationMessageForTextGeneration(
 	node: TextGenerationNode,
 	contextNodes: Node[],
 	fileResolver: (file: FileData) => Promise<DataContent>,
-	textGenerationResolver: (nodeId: NodeId) => Promise<string | undefined>,
+	textGenerationResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>,
 ): Promise<CoreMessage[]> {
 	const llmProvider = node.content.llm.provider;
 	const prompt = node.content.prompt;
@@ -86,7 +92,10 @@ async function buildGenerationMessageForTextGeneration(
 				break;
 			}
 			case "textGeneration": {
-				const result = await textGenerationResolver(contextNode.id);
+				const result = await textGenerationResolver(
+					contextNode.id,
+					sourceKeyword.outputId,
+				);
 				if (result !== undefined) {
 					userMessage = userMessage.replace(replaceKeyword, result);
 				}
@@ -147,6 +156,19 @@ async function buildGenerationMessageForTextGeneration(
 				},
 			];
 		}
+		case "perplexity": {
+			return [
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
+		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
@@ -199,9 +221,9 @@ export function generationPath(generationIndex: GenerationIndex) {
 	const originType = generationOrigin.type;
 	switch (originType) {
 		case "workspace":
-			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		case "run":
-			return `runs/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `runs/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		default: {
 			const _exhaustiveCheck: never = originType;
 			return _exhaustiveCheck;
@@ -378,4 +400,27 @@ function getFilesDescription(
 		return `${getOrdinal(currentCount + 1)} ~ ${getOrdinal(currentCount + newFilesCount)} attached files`;
 	}
 	return `${getOrdinal(currentCount + 1)} attached file`;
+}
+
+export async function getRedirectedUrlAndTitle(url: string) {
+	// Make the request with fetch and set redirect to 'follow'
+	const response = await fetch(url, {
+		redirect: "follow", // This automatically follows redirects
+	});
+
+	// Get the final URL after redirects
+	const finalUrl = response.url;
+
+	// Get the HTML content
+	const html = await response.text();
+
+	// Extract title using a simple regex pattern
+	const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+	const title = titleMatch ? titleMatch[1].trim() : "No title found";
+
+	return {
+		originalUrl: url,
+		redirectedUrl: finalUrl,
+		title: title,
+	};
 }

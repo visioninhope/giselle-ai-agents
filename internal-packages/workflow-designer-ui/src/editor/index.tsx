@@ -183,6 +183,7 @@ function NodeCanvas() {
 									{
 										id: OutputId.generate(),
 										label: "Output",
+										accesor: "text",
 									},
 								],
 							},
@@ -209,6 +210,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -230,6 +232,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -251,6 +254,7 @@ function NodeCanvas() {
 											{
 												id: OutputId.generate(),
 												label: "Output",
+												accesor: "files",
 											},
 										],
 									},
@@ -263,9 +267,23 @@ function NodeCanvas() {
 							}
 						}
 						break;
-					case "addTextGenerationNode":
+					case "addTextGenerationNode": {
 						if (selectedTool.languageModel === undefined) {
 							break;
+						}
+						const outputs = [
+							{
+								id: OutputId.generate(),
+								label: "Output",
+								accesor: "generated-text",
+							},
+						];
+						if (selectedTool.languageModel.provider === "perplexity") {
+							outputs.push({
+								id: OutputId.generate(),
+								label: "Source",
+								accesor: "source",
+							});
 						}
 						addNode(
 							{
@@ -275,16 +293,12 @@ function NodeCanvas() {
 									llm: selectedTool.languageModel,
 								},
 								inputs: [],
-								outputs: [
-									{
-										id: OutputId.generate(),
-										label: "Output",
-									},
-								],
+								outputs,
 							},
 							options,
 						);
 						break;
+					}
 					case "addGitHubNode":
 						addNode(
 							{
@@ -298,6 +312,7 @@ function NodeCanvas() {
 									{
 										id: OutputId.generate(),
 										label: "Output",
+										accesor: "github-references",
 									},
 								],
 							},

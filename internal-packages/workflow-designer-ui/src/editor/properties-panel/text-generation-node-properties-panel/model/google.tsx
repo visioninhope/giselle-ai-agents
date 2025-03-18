@@ -1,5 +1,6 @@
 import { GoogleLanguageModelData } from "@giselle-sdk/data-type";
 import { googleLanguageModels } from "@giselle-sdk/language-model";
+import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,
@@ -10,14 +11,19 @@ import {
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
+import { languageModelAvailable } from "./utils";
 
 export function GoogleModelPanel({
 	googleLanguageModel,
 	onModelChange,
+	onSearchGroundingConfigurationChange,
 }: {
 	googleLanguageModel: GoogleLanguageModelData;
 	onModelChange: (changedValue: GoogleLanguageModelData) => void;
+	onSearchGroundingConfigurationChange: (enabled: boolean) => void;
 }) {
+	const limits = useUsageLimits();
+
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<Select
@@ -40,6 +46,7 @@ export function GoogleModelPanel({
 							<SelectItem
 								key={googleLanguageModel.id}
 								value={googleLanguageModel.id}
+								disabled={!languageModelAvailable(googleLanguageModel, limits)}
 							>
 								{googleLanguageModel.id}
 							</SelectItem>
@@ -90,15 +97,7 @@ export function GoogleModelPanel({
 						name="searchGrounding"
 						checked={googleLanguageModel.configurations.searchGrounding}
 						onCheckedChange={(checked) => {
-							onModelChange(
-								GoogleLanguageModelData.parse({
-									...googleLanguageModel,
-									configurations: {
-										...googleLanguageModel.configurations,
-										searchGrounding: checked,
-									},
-								}),
-							);
+							onSearchGroundingConfigurationChange(checked);
 						}}
 					/>
 				</div>

@@ -55,6 +55,7 @@ function TextGenerationRunner({
 		case "openai":
 		case "anthropic":
 		case "google":
+		case "perplexity":
 			return <CompletionRunner generation={generation} />;
 		default: {
 			const _exhaustiveCheck: never = content.llm;

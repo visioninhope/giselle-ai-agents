@@ -5,9 +5,11 @@ import {
 	Capability,
 	type LanguageModel,
 	hasCapability,
+	hasTierAccess,
 	languageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
+import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
 import { MousePointer2Icon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
@@ -18,6 +20,7 @@ import {
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
+	PerplexityIcon,
 	PictureIcon,
 	PromptIcon,
 	StackBlicksIcon,
@@ -56,9 +59,11 @@ function CapabilityIcon({
 }
 function LanguageModelListItem({
 	languageModel,
+	disabled,
 	...props
 }: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
 	languageModel: LanguageModel;
+	disabled?: boolean;
 }) {
 	return (
 		<button
@@ -68,7 +73,9 @@ function LanguageModelListItem({
 				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
 				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+				disabled && "opacity-50 cursor-not-allowed",
 			)}
+			disabled={disabled}
 		>
 			{languageModel.provider === "anthropic" && (
 				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
@@ -79,12 +86,12 @@ function LanguageModelListItem({
 			{languageModel.provider === "google" && (
 				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
 			)}
+			{languageModel.provider === "perplexity" && (
+				<PerplexityIcon className="w-[20px] h-[20px]" data-icon />
+			)}
 			<div className="flex flex-start gap-[8px]">
 				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
 				<div>
-					{languageModel.tier === "plus" && (
-						<CapabilityIcon>Plus</CapabilityIcon>
-					)}
 					{languageModel.tier === "pro" && <CapabilityIcon>Pro</CapabilityIcon>}
 				</div>
 			</div>
@@ -96,6 +103,15 @@ export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
+	const { llmProviders } = useWorkflowDesigner();
+	const limits = useUsageLimits();
+	const languageModelAvailable = (languageModel: LanguageModel) => {
+		if (limits === undefined) {
+			return true;
+		}
+		return hasTierAccess(languageModel, limits.featureTier);
+	};
+
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -231,24 +247,33 @@ export function Toolbar() {
 													});
 												}}
 											>
-												{languageModels.map((languageModel) => (
-													<ToggleGroup.Item
-														data-tool
-														value={languageModel.id}
-														key={languageModel.id}
-														onMouseEnter={() =>
-															setLanguageModelMouseHovered(languageModel)
-														}
-														onFocus={() =>
-															setLanguageModelMouseHovered(languageModel)
-														}
-														asChild
-													>
-														<LanguageModelListItem
-															languageModel={languageModel}
-														/>
-													</ToggleGroup.Item>
-												))}
+												{languageModels.map(
+													(languageModel) =>
+														llmProviders.includes(languageModel.provider) && (
+															<ToggleGroup.Item
+																data-tool
+																value={languageModel.id}
+																key={languageModel.id}
+																onMouseEnter={() =>
+																	setLanguageModelMouseHovered(languageModel)
+																}
+																onFocus={() =>
+																	setLanguageModelMouseHovered(languageModel)
+																}
+																disabled={
+																	!languageModelAvailable(languageModel)
+																}
+																asChild
+															>
+																<LanguageModelListItem
+																	languageModel={languageModel}
+																	disabled={
+																		!languageModelAvailable(languageModel)
+																	}
+																/>
+															</ToggleGroup.Item>
+														),
+												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
@@ -292,6 +317,13 @@ export function Toolbar() {
 																	{languageModelMouseHovered.provider ===
 																		"google" && (
 																		<GoogleWhiteIcon
+																			className="size-[20px]"
+																			data-icon
+																		/>
+																	)}
+																	{languageModelMouseHovered.provider ===
+																		"perplexity" && (
+																		<PerplexityIcon
 																			className="size-[20px]"
 																			data-icon
 																		/>

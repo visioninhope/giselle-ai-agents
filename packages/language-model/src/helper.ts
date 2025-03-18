@@ -8,5 +8,5 @@ export function hasCapability(
 }
 
 export function hasTierAccess(model: LanguageModelBase, tier: Tier): boolean {
-	return TierAccess[model.tier].includes(tier);
+	return TierAccess[tier].includes(model.tier);
 }

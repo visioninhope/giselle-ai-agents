@@ -117,6 +117,17 @@ export function PreviewNode({ tool }: { tool: Tool }) {
 							preview
 						/>
 					);
+				case "perplexity":
+					return (
+						<NodeComponent
+							title={tool.languageModel.id}
+							subtitle="Perplexity"
+							nodeType="action"
+							contentType="textGeneration"
+							llmProvider="perplexity"
+							preview
+						/>
+					);
 				default: {
 					const _exhaustiveCheck: never = tool.languageModel;
 					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);

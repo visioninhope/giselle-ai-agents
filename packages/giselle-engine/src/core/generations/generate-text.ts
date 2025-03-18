@@ -1,6 +1,7 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
+import { perplexity } from "@ai-sdk/perplexity";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
@@ -8,8 +9,11 @@ import type {
 	GenerationOutput,
 	LanguageModelData,
 	NodeId,
+	Output,
+	OutputId,
 	QueuedGeneration,
 	RunningGeneration,
+	UrlSource,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { filePath } from "../files/utils";
@@ -18,6 +22,7 @@ import {
 	buildMessageObject,
 	getGeneration,
 	getNodeGenerationIndexes,
+	getRedirectedUrlAndTitle,
 	setGeneration,
 	setGenerationIndex,
 	setNodeGenerationIndex,
@@ -77,7 +82,7 @@ export async function generateText(args: {
 		return blob;
 	}
 
-	async function generationContentResolver(nodeId: NodeId) {
+	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			origin: runningGeneration.context.origin,
 			storage: args.context.storage,
@@ -97,10 +102,40 @@ export async function generateText(args: {
 		if (generation?.status !== "completed") {
 			return undefined;
 		}
-		const content = generation.outputs.find(
-			(output) => output.type === "generated-text",
-		)?.content;
-		return content;
+		let output: Output | undefined;
+		for (const sourceNode of runningGeneration.context.sourceNodes) {
+			for (const sourceOutput of sourceNode.outputs) {
+				if (sourceOutput.id === outputId) {
+					output = sourceOutput;
+					break;
+				}
+			}
+		}
+		if (output === undefined) {
+			return undefined;
+		}
+		const generationOutput = generation.outputs.find(
+			(output) => output.outputId === outputId,
+		);
+		if (generationOutput === undefined) {
+			return undefined;
+		}
+		switch (generationOutput.type) {
+			case "source":
+				return JSON.stringify(generationOutput.sources);
+			case "reasoning":
+				throw new Error("Generation output type is not supported");
+			case "generated-image":
+				throw new Error("Generation output type is not supported");
+			case "generated-text":
+				return generationOutput.content;
+			default: {
+				const _exhaustiveCheck: never = generationOutput;
+				throw new Error(
+					`Unhandled generation output type: ${_exhaustiveCheck}`,
+				);
+			}
+		}
 	}
 	const messages = await buildMessageObject(
 		runningGeneration.context.actionNode,
@@ -148,33 +183,55 @@ export async function generateText(args: {
 			}
 		},
 		async onFinish(event) {
-			const outputs: GenerationOutput[] = [];
-			outputs.push({
-				type: "generated-text",
-				content: event.text,
-			});
-			if (event.reasoning !== undefined) {
-				outputs.push({
-					type: "reasoning",
-					content: event.reasoning,
+			const generationOutputs: GenerationOutput[] = [];
+			const generatedTextOutput =
+				runningGeneration.context.actionNode.outputs.find(
+					(output) => output.accesor === "generated-text",
+				);
+			if (generatedTextOutput !== undefined) {
+				generationOutputs.push({
+					type: "generated-text",
+					content: event.text,
+					outputId: generatedTextOutput.id,
 				});
 			}
-			if (event.sources.length > 0) {
-				outputs.push({
+			const reasoningOutput = runningGeneration.context.actionNode.outputs.find(
+				(output) => output.accesor === "reasoning",
+			);
+			if (reasoningOutput !== undefined && event.reasoning !== undefined) {
+				generationOutputs.push({
+					type: "reasoning",
+					content: event.reasoning,
+					outputId: reasoningOutput.id,
+				});
+			}
+			const sourceOutput = runningGeneration.context.actionNode.outputs.find(
+				(output) => output.accesor === "source",
+			);
+			if (sourceOutput !== undefined && event.sources.length > 0) {
+				const sources = await Promise.all(
+					event.sources.map(async (source) => {
+						const redirected = await getRedirectedUrlAndTitle(source.url);
+						return {
+							sourceType: "url",
+							id: source.id,
+							url: redirected.redirectedUrl,
+							title: redirected.title,
+							providerMetadata: source.providerMetadata,
+						} satisfies UrlSource;
+					}),
+				);
+				generationOutputs.push({
 					type: "source",
-					sources: event.sources.map((source) => ({
-						sourceType: "url",
-						id: source.id,
-						url: source.url,
-						providerMetadata: source.providerMetadata,
-					})),
+					outputId: sourceOutput.id,
+					sources,
 				});
 			}
 			const completedGeneration = {
 				...runningGeneration,
 				status: "completed",
 				completedAt: Date.now(),
-				outputs,
+				outputs: generationOutputs,
 				messages: appendResponseMessages({
 					messages: [
 						{
@@ -225,6 +282,9 @@ function generationModel(languageModel: LanguageModelData) {
 			return google(languageModel.id, {
 				useSearchGrounding: languageModel.configurations.searchGrounding,
 			});
+		}
+		case "perplexity": {
+			return perplexity(languageModel.id);
 		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;
