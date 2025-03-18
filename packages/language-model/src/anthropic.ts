@@ -38,11 +38,21 @@ const claude35Sonnet: AnthropicLanguageModel = {
 		Capability.TextGeneration |
 		Capability.PdfFileInput |
 		Capability.ImageFileInput,
-	tier: Tier.enum.plus,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+const claude35Haiku: AnthropicLanguageModel = {
+	provider: "anthropic",
+	id: "claude-3-5-haiku-20241022",
+	capabilities:
+		Capability.TextGeneration |
+		Capability.PdfFileInput |
+		Capability.ImageFileInput,
+	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
 
-export const models = [claude37Sonnet, claude35Sonnet];
+export const models = [claude37Sonnet, claude35Sonnet, claude35Haiku];
 
 export const LanguageModel = AnthropicLanguageModel;
 export type LanguageModel = AnthropicLanguageModel;

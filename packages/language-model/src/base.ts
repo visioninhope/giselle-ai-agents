@@ -10,13 +10,12 @@ export const Capability = {
 	SearchGrounding: 1 << 6,
 } as const;
 
-export const Tier = z.enum(["free", "plus", "pro"]);
+export const Tier = z.enum(["free", "pro"]);
 export type Tier = z.infer<typeof Tier>;
 
 export const TierAccess: Record<Tier, Tier[]> = {
 	[Tier.enum.free]: [Tier.enum.free],
-	[Tier.enum.plus]: [Tier.enum.free, Tier.enum.plus],
-	[Tier.enum.pro]: [Tier.enum.free, Tier.enum.plus, Tier.enum.pro],
+	[Tier.enum.pro]: [Tier.enum.free, Tier.enum.pro],
 };
 
 type Capabilities = number;
