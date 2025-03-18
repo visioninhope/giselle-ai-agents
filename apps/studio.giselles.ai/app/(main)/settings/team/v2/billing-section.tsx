@@ -45,40 +45,38 @@ export default async function BillingSection() {
 					)}
 				</div>
 
-				{!isProPlan(team) && team.type !== "internal" &&  (
+				{!isProPlan(team) && team.type !== "internal" && (
 					<form>
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 						>
-							<UpgradeButton
-								team={team}
-							/>
+							<UpgradeButton team={team} />
 						</Suspense>
 					</form>
 				)}
 			</Card>
 
-			{isProPlan(team) && team.type !== "internal" && team.activeSubscriptionId && (
-				<Card className="flex justify-between items-center px-6 pt-4 pb-6 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
-					<div className="flex flex-col gap-y-[3px]">
-						<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
-							Payment Information
-						</h2>
-						<p className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
-							Like by Stripe
-						</p>
-					</div>
-					<form>
-						<Suspense
-							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
-						>
-							<UpdateButton
-								subscriptionId={team.activeSubscriptionId}
-							/>
-						</Suspense>
-					</form>
-				</Card>
-			)}
+			{isProPlan(team) &&
+				team.type !== "internal" &&
+				team.activeSubscriptionId && (
+					<Card className="flex justify-between items-center px-6 pt-4 pb-6 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
+						<div className="flex flex-col gap-y-[3px]">
+							<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+								Payment Information
+							</h2>
+							<p className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
+								Like by Stripe
+							</p>
+						</div>
+						<form>
+							<Suspense
+								fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
+							>
+								<UpdateButton subscriptionId={team.activeSubscriptionId} />
+							</Suspense>
+						</form>
+					</Card>
+				)}
 		</div>
 	);
 }
@@ -112,7 +110,7 @@ type UpgradeButtonProps = {
 };
 
 // NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
-function UpgradeButton ({team}: UpgradeButtonProps) {
+function UpgradeButton({ team }: UpgradeButtonProps) {
 	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
@@ -126,7 +124,7 @@ type UpdateButtonProps = {
 	subscriptionId: string;
 };
 
-function UpdateButton ({subscriptionId}: UpdateButtonProps) {
+function UpdateButton({ subscriptionId }: UpdateButtonProps) {
 	const manageBillingWithSubscriptionId = manageBilling.bind(
 		null,
 		subscriptionId,
