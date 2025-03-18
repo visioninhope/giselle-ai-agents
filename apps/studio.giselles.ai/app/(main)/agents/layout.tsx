@@ -1,5 +1,4 @@
 import { agents, db } from "@/drizzle";
-import { newUiFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { putGraph } from "@giselles-ai/actions";
@@ -22,26 +21,15 @@ export default function Layout({
 		const { url } = await putGraph(graph);
 		const user = await fetchCurrentUser();
 		const team = await fetchCurrentTeam();
-		const enableNewUi = await newUiFlag();
-		if (enableNewUi) {
-			const workspace = await giselleEngine.createWorkspace();
-			await db.insert(agents).values({
-				id: agentId,
-				teamDbId: team.dbId,
-				creatorDbId: user.dbId,
-				graphUrl: url,
-				workspaceId: workspace.id,
-			});
-			redirect(`/workspaces/${workspace.id}`);
-		} else {
-			await db.insert(agents).values({
-				id: agentId,
-				teamDbId: team.dbId,
-				creatorDbId: user.dbId,
-				graphUrl: url,
-			});
-			redirect(`/p/${agentId}`);
-		}
+		const workspace = await giselleEngine.createWorkspace();
+		await db.insert(agents).values({
+			id: agentId,
+			teamDbId: team.dbId,
+			creatorDbId: user.dbId,
+			graphUrl: url,
+			workspaceId: workspace.id,
+		});
+		redirect(`/workspaces/${workspace.id}`);
 	}
 
 	return (
