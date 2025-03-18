@@ -20,5 +20,5 @@ const storage = createStorage({
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
-	llmProviders: ["openai", "anthropic", "google"],
+	llmProviders: ["openai", "anthropic", "google", "perplexity"],
 });
