@@ -45,13 +45,12 @@ export default async function BillingSection() {
 					)}
 				</div>
 
-				{team.type !== "internal" && (
+				{!isProPlan(team) && team.type !== "internal" &&  (
 					<form>
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 						>
-							<BillingButton
-								subscriptionId={team.activeSubscriptionId}
+							<UpgradeButton
 								team={team}
 							/>
 						</Suspense>
@@ -59,7 +58,7 @@ export default async function BillingSection() {
 				)}
 			</Card>
 
-			{isProPlan(team) && team.type !== "internal" && (
+			{isProPlan(team) && team.type !== "internal" && team.activeSubscriptionId && (
 				<Card className="flex justify-between items-center px-6 pt-4 pb-6 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
 					<div className="flex flex-col gap-y-[3px]">
 						<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
@@ -73,9 +72,8 @@ export default async function BillingSection() {
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
 						>
-							<BillingButton
+							<UpdateButton
 								subscriptionId={team.activeSubscriptionId}
-								team={team}
 							/>
 						</Suspense>
 					</form>
@@ -109,26 +107,31 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 	);
 }
 
-type BillingButtonProps = {
-	subscriptionId: string | null;
+type UpgradeButtonProps = {
 	team: CurrentTeam;
 };
 
 // NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
-async function BillingButton({ subscriptionId, team }: BillingButtonProps) {
+function UpgradeButton ({team}: UpgradeButtonProps) {
 	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
-	if (subscriptionId == null) {
-		return (
-			<Button className="w-fit" formAction={upgrateTeamWithTeam}>
-				Upgrade
-			</Button>
-		);
-	}
 
+	return (
+		<Button className="w-fit" formAction={upgrateTeamWithTeam}>
+			Upgrade
+		</Button>
+	);
+}
+
+type UpdateButtonProps = {
+	subscriptionId: string;
+};
+
+function UpdateButton ({subscriptionId}: UpdateButtonProps) {
 	const manageBillingWithSubscriptionId = manageBilling.bind(
 		null,
 		subscriptionId,
 	);
+
 	return (
 		<Button className="w-fit" formAction={manageBillingWithSubscriptionId}>
 			Update
