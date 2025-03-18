@@ -40,27 +40,30 @@ export const UserButton: FC = async () => {
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />
+				<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<Link
+						href="/settings/account"
+						className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
+					>
+						Account Settings
+					</Link>
+				</DropdownMenuItem>
+				<DropdownMenuSeparator className="-mx-2 my-0 p-0 bg-black-400" />
 				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<Link href="/settings/account" className="block p-2 w-full">
-							Account Settings
-						</Link>
-					</DropdownMenuItem>
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
-							className="block p-2 w-full"
+							className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
 							rel="noreferrer"
 						>
 							Home Page
 						</a>
 					</DropdownMenuItem>
+					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+						<SignOutButton className="block p-2 w-full text-left" />
+					</DropdownMenuItem>
 				</div>
-				<DropdownMenuSeparator className="-mx-2 my-0 p-0 bg-black-400" />
-				<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-					<SignOutButton className="block p-2 w-full text-left" />
-				</DropdownMenuItem>
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
