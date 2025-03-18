@@ -13,9 +13,11 @@ import type {
 	QueuedGeneration,
 	RunningGeneration,
 	UrlSource,
+	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { filePath } from "../files/utils";
+import { getRun } from "../runs/utils";
 import type { GiselleEngineContext } from "../types";
 import {
 	buildMessageObject,
@@ -263,6 +265,33 @@ export async function generateText(args: {
 					},
 				}),
 			]);
+			const onConsumeAgentTime = args.context.onConsumeAgentTime;
+
+			if (onConsumeAgentTime != null) {
+				let workspaceId: WorkspaceId;
+				if (args.generation.context.origin.type === "workspace") {
+					workspaceId = args.generation.context.origin.id;
+				} else {
+					const run = await getRun({
+						storage: args.context.storage,
+						runId: args.generation.context.origin.id,
+					});
+					// FIXME: run is still queued here
+					if (run == null || !("workspaceId" in run)) {
+						throw new Error("Run not completed");
+					}
+					workspaceId = run.workspaceId;
+				}
+
+				const totalDurationMs =
+					completedGeneration.completedAt - completedGeneration.startedAt;
+				await onConsumeAgentTime(
+					workspaceId,
+					completedGeneration.startedAt,
+					completedGeneration.completedAt,
+					totalDurationMs,
+				);
+			}
 		},
 	});
 	return streamTextResult;

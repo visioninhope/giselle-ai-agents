@@ -14,7 +14,6 @@ export async function onConsumeAgentTime(
 	const agent = await db.query.agents.findFirst({
 		where: (agents, { eq }) => eq(agents.workspaceId, workspaceId),
 	});
-	console.log("========= agent ==========", agent?.id);
 
 	if (agent == null) {
 		throw new Error("Agent not found");
