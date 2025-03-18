@@ -156,6 +156,19 @@ async function buildGenerationMessageForTextGeneration(
 				},
 			];
 		}
+		case "perplexity": {
+			return [
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
+		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);

@@ -267,9 +267,23 @@ function NodeCanvas() {
 							}
 						}
 						break;
-					case "addTextGenerationNode":
+					case "addTextGenerationNode": {
 						if (selectedTool.languageModel === undefined) {
 							break;
+						}
+						const outputs = [
+							{
+								id: OutputId.generate(),
+								label: "Output",
+								accesor: "generated-text",
+							},
+						];
+						if (selectedTool.languageModel.provider === "perplexity") {
+							outputs.push({
+								id: OutputId.generate(),
+								label: "Source",
+								accesor: "source",
+							});
 						}
 						addNode(
 							{
@@ -279,17 +293,12 @@ function NodeCanvas() {
 									llm: selectedTool.languageModel,
 								},
 								inputs: [],
-								outputs: [
-									{
-										id: OutputId.generate(),
-										label: "Output",
-										accesor: "generated-text",
-									},
-								],
+								outputs,
 							},
 							options,
 						);
 						break;
+					}
 					case "addGitHubNode":
 						addNode(
 							{

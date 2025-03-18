@@ -52,6 +52,7 @@
 		"@ai-sdk/anthropic": "catalog:",
 		"@ai-sdk/google": "catalog:",
 		"@ai-sdk/openai": "catalog:",
+		"@ai-sdk/perplexity": "catalog:",
 		"@giselle-sdk/github-client": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",

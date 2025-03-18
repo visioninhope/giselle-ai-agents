@@ -5,7 +5,12 @@ import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-import { AnthropicIcon, GoogleIcon, OpenaiIcon } from "../../../icons";
+import {
+	AnthropicIcon,
+	GoogleIcon,
+	OpenaiIcon,
+	PerplexityIcon,
+} from "../../../icons";
 import { Button } from "../../../ui/button";
 import {
 	PropertiesPanelContent,
@@ -18,6 +23,7 @@ import {
 	AnthropicModelPanel,
 	GoogleModelPanel,
 	OpenAIModelPanel,
+	PerplexityModelPanel,
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
@@ -69,6 +75,9 @@ export function TextGenerationNodePropertiesPanel({
 						)}
 						{node.content.llm.provider === "google" && (
 							<GoogleIcon className="size-[20px]" />
+						)}
+						{node.content.llm.provider === "perplexity" && (
+							<PerplexityIcon className="size-[20px] text-black-900" />
 						)}
 					</>
 				}
@@ -249,6 +258,17 @@ export function TextGenerationNodePropertiesPanel({
 								{node.content.llm.provider === "anthropic" && (
 									<AnthropicModelPanel
 										anthropicLanguageModel={node.content.llm}
+										onModelChange={(value) =>
+											updateNodeDataContent(node, {
+												...node.content,
+												llm: value,
+											})
+										}
+									/>
+								)}
+								{node.content.llm.provider === "perplexity" && (
+									<PerplexityModelPanel
+										perplexityLanguageModel={node.content.llm}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
