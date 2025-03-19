@@ -55,8 +55,8 @@ export function TeamCreationForm({
 
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
+			<DialogTrigger asChild className="block p-2 w-full text-left">
+				<Button variant="link">Create team</Button>
 			</DialogTrigger>
 			<DialogContent className="sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-900">
 				<DialogHeader>
