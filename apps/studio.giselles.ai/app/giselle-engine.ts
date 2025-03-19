@@ -1,3 +1,4 @@
+import { waitForLangfuseFlush } from "@/instrumentation.node";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
 
 import { createStorage } from "unstorage";
@@ -21,4 +22,8 @@ export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
 	llmProviders: ["openai", "anthropic", "google", "perplexity"],
+	telemetry: {
+		isEnabled: true,
+		waitForFlushFn: waitForLangfuseFlush,
+	},
 });

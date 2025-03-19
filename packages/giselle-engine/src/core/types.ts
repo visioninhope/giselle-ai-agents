@@ -10,6 +10,10 @@ export interface GiselleEngineContext {
 	storage: Storage;
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
+	telemetry?: {
+		isEnabled?: boolean;
+		waitForFlushFn?: () => Promise<unknown>;
+	};
 }
 
 export interface GitHubIntegrationConfig {
@@ -26,4 +30,8 @@ export interface GiselleEngineConfig {
 	storage: Storage;
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
+	telemetry?: {
+		isEnabled?: boolean;
+		waitForFlushFn?: () => Promise<unknown>;
+	};
 }

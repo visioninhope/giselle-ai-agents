@@ -265,6 +265,9 @@ export async function generateText(args: {
 				}),
 			]);
 		},
+		experimental_telemetry: {
+			isEnabled: args.context.telemetry?.isEnabled,
+		},
 	});
 	return streamTextResult;
 }

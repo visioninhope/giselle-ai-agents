@@ -8790,6 +8790,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="langfuse-vercel"></a>
+### langfuse-vercel v3.37.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="lie"></a>
 ### lie v3.1.1
 #### 
