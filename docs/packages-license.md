@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1018 MIT
+* 1019 MIT
 * 104 Apache 2.0
 * 57 ISC
 * 34 New BSD
@@ -3739,6 +3739,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@tiptap/extension-floating-menu"></a>
 ### @tiptap/extension-floating-menu v2.11.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@tiptap/extension-history"></a>
+### @tiptap/extension-history v2.11.5
 #### 
 
 ##### Paths
