@@ -4,7 +4,10 @@ import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
 import { signOut } from "../../../actions/sign-out";
 
-export const SignOutButton = ({ className }: { className?: string }) => {
+export const SignOutButton = ({
+	className,
+	children,
+}: { className?: string; children: React.ReactNode }) => {
 	const router = useRouter();
 
 	return (
@@ -19,7 +22,7 @@ export const SignOutButton = ({ className }: { className?: string }) => {
 				className,
 			)}
 		>
-			Log out
+			{children}
 		</button>
 	);
 };
