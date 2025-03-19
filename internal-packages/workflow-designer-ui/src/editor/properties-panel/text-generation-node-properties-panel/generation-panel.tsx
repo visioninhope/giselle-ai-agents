@@ -1,8 +1,9 @@
-import type { Generation, TextGenerationNode } from "@giselle-sdk/data-type";
+import type { CompletedGeneration, Generation, TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { StackBlicksIcon, WilliIcon } from "../../../icons";
+import ClipboardButton from "../../../ui/clipboard-button";
 import { EmptyState } from "../../../ui/empty-state";
 import { GenerationView } from "../../../ui/generation-view";
 
@@ -19,6 +20,35 @@ function Empty() {
 	);
 }
 
+// Helper function to extract text content from a generation
+function getGenerationTextContent(generation: Generation): string {
+	// For completed generations, use the outputs field
+	if (generation.status === "completed") {
+		const completedGeneration = generation as CompletedGeneration;
+		// Find all text outputs
+		const textOutputs = completedGeneration.outputs
+			.filter((output) => output.type === "generated-text")
+			.map((output) => output.type === "generated-text" ? output.content : "")
+			.join("\n\n");
+			
+		if (textOutputs) {
+			return textOutputs;
+		}
+	}
+	
+	// Fallback to extracting from messages if no outputs or not completed
+	const generatedMessages = generation.messages?.filter((m) => m.role === "assistant") ?? [];
+	
+	return generatedMessages
+		.map((message) => 
+			message.parts
+				?.filter((part) => part.type === "text")
+				.map((part) => part.type === "text" ? part.text : "")
+				.join("\n")
+		)
+		.join("\n");
+}
+
 export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 	const { data } = useWorkflowDesigner();
 	const { generations } = useNodeGenerations({
@@ -28,7 +58,7 @@ export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 	const [currentGeneration, setCurrentGeneration] = useState<
 		Generation | undefined
 	>();
-
+	
 	useEffect(() => {
 		if (generations.length === 0) {
 			setCurrentGeneration(undefined);
@@ -48,17 +78,26 @@ export function GenerationPanel({ node }: { node: TextGenerationNode }) {
 					"**:data-header-text:font-[700]",
 				)}
 			>
-				{(currentGeneration.status === "created" ||
-					currentGeneration.status === "queued" ||
-					currentGeneration.status === "running") && (
-					<p data-header-text>Generating...</p>
-				)}
-				{currentGeneration.status === "completed" && (
-					<p data-header-text>Result</p>
-				)}
-				{currentGeneration.status === "failed" && <p data-header-text>Error</p>}
-				{currentGeneration.status === "cancelled" && (
-					<p data-header-text>Result</p>
+				<div className="flex-1 flex items-center gap-[8px]">
+					{(currentGeneration.status === "created" ||
+						currentGeneration.status === "queued" ||
+						currentGeneration.status === "running") && (
+						<p data-header-text>Generating...</p>
+					)}
+					{currentGeneration.status === "completed" && (
+						<p data-header-text>Result</p>
+					)}
+					{currentGeneration.status === "failed" && <p data-header-text>Error</p>}
+					{currentGeneration.status === "cancelled" && (
+						<p data-header-text>Result</p>
+					)}
+				</div>
+				{(currentGeneration.status === "completed" || currentGeneration.status === "cancelled") && (
+					<ClipboardButton 
+						text={getGenerationTextContent(currentGeneration)}
+						tooltip="Copy to clipboard"
+						className="text-black-400 hover:text-black-300"
+					/>
 				)}
 			</div>
 			<div className="py-[4px] px-[16px] overflow-y-auto h-full">
