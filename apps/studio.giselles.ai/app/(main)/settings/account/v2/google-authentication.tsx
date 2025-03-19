@@ -43,7 +43,7 @@ function GoogleReconnectButton() {
 		<div>
 			<ProviderConnectionButton
 				action={reconnectGoogleIdentity}
-				className="text-yellow-500"
+				className="border-warning-900 bg-warning-900 hover:text-warning-900"
 			>
 				<TriangleAlert /> Reconnect
 			</ProviderConnectionButton>
