@@ -516,6 +516,9 @@ importers:
       langfuse:
         specifier: 3.26.0
         version: 3.26.0
+      langfuse-vercel:
+        specifier: 3.37.0
+        version: 3.37.0(ai@4.0.16(react@19.0.0)(zod@3.24.1))
       lucide-react:
         specifier: 0.417.0
         version: 0.417.0(react@19.0.0)
@@ -6773,8 +6776,22 @@ packages:
     resolution: {integrity: sha512-8wWnPtmhMBBgVicLR9SjQ1O29fgvTJyRDE5kaF8b908TvE0PXZmxs068GGhLCCdTMUGpU6WXqKRHTZfXAuIzXA==}
     engines: {node: '>=18'}
 
+  langfuse-core@3.37.0:
+    resolution: {integrity: sha512-7ZOFJ51u4dOeCpsQ8otNuNYeMb7xsExVQcOIBOByPFKjjd1mjf/03xF907F44dRzgf7n1U8ZYa0XgMSRgxKNoA==}
+    engines: {node: '>=18'}
+
+  langfuse-vercel@3.37.0:
+    resolution: {integrity: sha512-whRqHtKPK0icQ24cQCkmOSwaGjA0glSFJWvoQkAYnDpjV+BlVVZysvk9zcqsU7cOM62Z5tx9WJOGzYM4p1/gyw==}
+    engines: {node: '>=18'}
+    peerDependencies:
+      ai: '>=3.2.44'
+
   langfuse@3.26.0:
     resolution: {integrity: sha512-zG5BxI0NOtqxG71/fDFr6AXJ1Uggnv6768v/aZF40VH+epAysom2f9uX0ppvA4U6xFY0WyBUk9P+uF6xIFZyqw==}
+    engines: {node: '>=18'}
+
+  langfuse@3.37.0:
+    resolution: {integrity: sha512-NpemB+5i6VT9CXmBwQTE4q1DPOY/DH7OMxBJn8Rcirw+z2HYJpTRH8j48cBjzwqmYtqLdqyJMzAALa2ReQ50hQ==}
     engines: {node: '>=18'}
 
   lie@3.1.1:
@@ -15535,9 +15552,23 @@ snapshots:
     dependencies:
       mustache: 4.2.0
 
+  langfuse-core@3.37.0:
+    dependencies:
+      mustache: 4.2.0
+
+  langfuse-vercel@3.37.0(ai@4.0.16(react@19.0.0)(zod@3.24.1)):
+    dependencies:
+      ai: 4.0.16(react@19.0.0)(zod@3.24.1)
+      langfuse: 3.37.0
+      langfuse-core: 3.37.0
+
   langfuse@3.26.0:
     dependencies:
       langfuse-core: 3.32.0
+
+  langfuse@3.37.0:
+    dependencies:
+      langfuse-core: 3.37.0
 
   lie@3.1.1:
     dependencies:

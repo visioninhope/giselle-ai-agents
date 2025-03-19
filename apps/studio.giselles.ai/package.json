@@ -88,6 +88,7 @@
 		"import-in-the-middle": "1.11.0",
 		"input-otp": "1.4.2",
 		"langfuse": "3.26.0",
+		"langfuse-vercel": "3.37.0",
 		"lucide-react": "0.417.0",
 		"next": "15.1.4",
 		"next-auth": "5.0.0-beta.25",
@@ -133,7 +134,9 @@
 		"vite-tsconfig-paths": "5.1.4",
 		"vitest": "3.0.5"
 	},
-	"trustedDependencies": ["@sentry/cli"],
+	"trustedDependencies": [
+		"@sentry/cli"
+	],
 	"overrides": {
 		"cookie": "^0.7.2"
 	}
