@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1018 MIT
+* 1019 MIT
 * 104 Apache 2.0
 * 57 ISC
 * 34 New BSD
@@ -8770,6 +8770,17 @@ BlueOak-1.0.0 permitted
 
 <a name="langfuse-core"></a>
 ### langfuse-core v3.32.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="langfuse-vercel"></a>
+### langfuse-vercel v3.37.0
 #### 
 
 ##### Paths
