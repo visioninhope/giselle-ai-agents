@@ -1,3 +1,4 @@
+import { after } from "next/server";
 import { GiselleEngine, type GiselleEngineConfig } from "../core";
 import {
 	type FormDataRouterHandlers,
@@ -97,6 +98,9 @@ export function NextGiselleEngine(config: NextGiselleEngineConfig) {
 		giselleEngine,
 		basePath: config.basePath,
 	});
+	if (config?.telemetry?.isEnabled && config?.telemetry?.waitForFlushFn) {
+		after(config.telemetry.waitForFlushFn);
+	}
 	return {
 		...giselleEngine,
 		handlers: {
