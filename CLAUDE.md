@@ -9,6 +9,11 @@
 - Run tests: `pnpm -F <package> test` or `cd <directory> && vitest`
 - Run specific test: `cd <directory> && vitest <file.test.ts>`
 - Lint: `cd <directory> && biome check --write .`
+- Format modified files: `pnpm biome check --write [filename]`
+
+## Critical Requirements
+- MUST run `pnpm biome check --write [filename]` after EVERY code modification
+- All code changes must be formatted using Biome before being committed
 
 ## Code Style Guidelines
 - Use Biome for formatting with tab indentation and double quotes
