@@ -52,6 +52,7 @@ catalog:
   "@tiptap/extension-italic": 2.11.5
   "@tiptap/extension-ordered-list": 2.11.5
   "@tiptap/extension-strike": 2.11.5
+  "@tiptap/extension-history": 2.11.5
   "@tiptap/html": 2.11.5
   highlight.js: 11.11.1
   lowlight: 3.3.0

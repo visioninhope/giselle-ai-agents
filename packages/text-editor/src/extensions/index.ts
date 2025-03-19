@@ -3,6 +3,7 @@ import BulletList from "@tiptap/extension-bullet-list";
 import Code from "@tiptap/extension-code";
 import CodeBlockLowlight from "@tiptap/extension-code-block-lowlight";
 import Document from "@tiptap/extension-document";
+import History from "@tiptap/extension-history";
 import Italic from "@tiptap/extension-italic";
 import ListItem from "@tiptap/extension-list-item";
 import OrderedList from "@tiptap/extension-ordered-list";
@@ -34,4 +35,5 @@ export const extensions = [
 	OrderedList,
 	Strike,
 	Text,
+	History,
 ];
