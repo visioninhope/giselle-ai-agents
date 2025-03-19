@@ -63,6 +63,17 @@
 
 
 
+<a name="@ai-sdk/fal"></a>
+### @ai-sdk/fal v0.0.9
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
 <a name="@ai-sdk/google"></a>
 ### @ai-sdk/google v1.0.10
 #### 
