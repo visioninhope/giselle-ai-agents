@@ -37,10 +37,10 @@ async function getBody(
 
 function createHttpHandler({
 	giselleEngine,
-	basePath,
+	config,
 }: {
 	giselleEngine: GiselleEngine;
-	basePath: NextGiselleEngineConfig["basePath"];
+	config: NextGiselleEngineConfig;
 }) {
 	const jsonRouter: JsonRouterHandlers = {} as JsonRouterHandlers;
 	for (const [path, createRoute] of Object.entries(createJsonRouters)) {
@@ -60,7 +60,7 @@ function createHttpHandler({
 	return async function httpHandler(request: Request) {
 		const url = new URL(request.url);
 		const pathname = url.pathname;
-		const a = url.pathname.match(new RegExp(`^${basePath}(.+)`));
+		const a = url.pathname.match(new RegExp(`^${config.basePath}(.+)`));
 
 		const segmentString = a?.at(-1);
 		if (segmentString == null)
@@ -75,6 +75,10 @@ function createHttpHandler({
 		}
 
 		const [routerPath] = segments;
+
+		if (config?.telemetry?.isEnabled && config?.telemetry?.waitForFlushFn) {
+			after(config.telemetry.waitForFlushFn);
+		}
 
 		if (isJsonRouterPath(routerPath)) {
 			return await jsonRouter[routerPath]({
@@ -96,11 +100,8 @@ export function NextGiselleEngine(config: NextGiselleEngineConfig) {
 	const giselleEngine = GiselleEngine(config);
 	const httpHandler = createHttpHandler({
 		giselleEngine,
-		basePath: config.basePath,
+		config,
 	});
-	if (config?.telemetry?.isEnabled && config?.telemetry?.waitForFlushFn) {
-		after(config.telemetry.waitForFlushFn);
-	}
 	return {
 		...giselleEngine,
 		handlers: {
