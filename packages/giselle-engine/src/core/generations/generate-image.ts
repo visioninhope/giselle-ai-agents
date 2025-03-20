@@ -190,7 +190,7 @@ export async function generateImage(args: {
 				return {
 					contentType: imageType.contentType,
 					filename,
-					pathname: `/generations/${runningGeneration.id}/${filename}`,
+					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
 				} satisfies Image;
 			}),
 		).then((results) => results.filter((result) => result !== null));
