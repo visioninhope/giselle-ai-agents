@@ -13,7 +13,7 @@ import {
 import type { JsonResponse } from "../utils";
 
 type FetchOptions = {
-	baseUrl?: string;
+	basePath?: string;
 };
 
 type ExtractResponseData<T> = T extends JsonResponse<infer U>
@@ -67,6 +67,8 @@ type GiselleEngineClient = {
 	[P in FormDataRouterPaths]: FormDataRouterInput[P] extends AnyZodObject
 		? FormDataMethodWithInput<P>
 		: FormDataMethodWithoutInput<P>;
+} & {
+	basePath: string;
 };
 
 /**
@@ -76,7 +78,7 @@ type GiselleEngineClient = {
  * @returns A client object with methods for each GiselleEngine operation
  */
 export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
-	const baseUrl = options?.baseUrl ?? "/api/giselle";
+	const basePath = options?.basePath ?? "/api/giselle";
 
 	/**
 	 * Generic fetch function that handles API requests with proper typing
@@ -88,7 +90,7 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 			transformToFormData = false,
 		) => {
 			// Check if input is FormData
-			const response = await fetch(`${baseUrl}/${path}`, {
+			const response = await fetch(`${basePath}/${path}`, {
 				method: "POST",
 				// Don't set Content-Type header for FormData (browser will set it with boundary)
 				headers: transformToFormData
@@ -115,7 +117,7 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 
 			return response;
 		},
-		[baseUrl],
+		[basePath],
 	);
 	/**
 	 * Creates a method for a specific router path
@@ -158,8 +160,9 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 		return {
 			...jsonRouterMethods,
 			...formDataRouterMethods,
+			basePath,
 		} as GiselleEngineClient;
-	}, [createMethod]);
+	}, [createMethod, basePath]);
 
 	return client;
 }
