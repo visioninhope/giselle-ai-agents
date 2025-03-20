@@ -35,7 +35,7 @@ async function getBody(
 	}
 }
 
-function createHttpHandler({
+export function createHttpHandler({
 	giselleEngine,
 	config,
 }: {
