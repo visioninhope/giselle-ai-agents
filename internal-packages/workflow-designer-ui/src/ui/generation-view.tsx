@@ -52,7 +52,7 @@ export function GenerationView({
 						<div key={output.outputId}>
 							{output.contents.map((content) => (
 								<img
-									src={content.filename}
+									src={content.pathname}
 									alt="generated file"
 									key={content.filename}
 								/>

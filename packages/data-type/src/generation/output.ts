@@ -15,7 +15,10 @@ export const GeneratedTextContentOutput = GenerationOutputBase.extend({
 
 export const Image = z.object({
 	filename: z.string(),
+	pathname: z.string(),
+	contentType: z.string(),
 });
+export type Image = z.infer<typeof Image>;
 
 export const GeneratedImageOuputType = z.literal("generated-image");
 export const GeneratedImageContentOutput = GenerationOutputBase.extend({

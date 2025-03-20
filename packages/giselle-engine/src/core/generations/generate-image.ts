@@ -3,6 +3,7 @@ import {
 	type CompletedGeneration,
 	type FileData,
 	type GenerationOutput,
+	type Image,
 	type NodeId,
 	type Output,
 	type OutputId,
@@ -10,7 +11,10 @@ import {
 	type RunningGeneration,
 	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
-import { experimental_generateImage as generateImageAiSdk } from "ai";
+import {
+	type Experimental_GeneratedImage as GeneratedImage,
+	experimental_generateImage as generateImageAiSdk,
+} from "ai";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import {
@@ -153,18 +157,7 @@ export async function generateImage(args: {
 		size: actionNode.content.llm.configurations.size,
 		n: actionNode.content.llm.configurations.n,
 	});
-	const filenames = await Promise.all(
-		result.images.map(async (image) => {
-			const filename = `image_${Date.now()}.png`;
-			await setGeneratedImage({
-				storage: args.context.storage,
-				generation: runningGeneration,
-				generatedImage: image,
-				generatedImageFilename: filename,
-			});
-			return filename;
-		}),
-	);
+
 	const generationOutputs: GenerationOutput[] = [];
 
 	const generatedImageOutput =
@@ -172,9 +165,30 @@ export async function generateImage(args: {
 			(output) => output.accesor === "generated-image",
 		);
 	if (generatedImageOutput !== undefined) {
+		const contents = await Promise.all(
+			result.images.map(async (image) => {
+				const imageType = detectImageType(image);
+				if (imageType === null) {
+					return null;
+				}
+				const filename = `image_${Date.now()}.${imageType.ext}`;
+				await setGeneratedImage({
+					storage: args.context.storage,
+					generation: runningGeneration,
+					generatedImage: image,
+					generatedImageFilename: filename,
+				});
+				return {
+					contentType: imageType.contentType,
+					filename,
+					pathname: `/generations/${runningGeneration.id}/${filename}`,
+				} satisfies Image;
+			}),
+		).then((results) => results.filter((result) => result !== null));
+
 		generationOutputs.push({
 			type: "generated-image",
-			contents: filenames.map((filename) => ({ filename })),
+			contents,
 			outputId: generatedImageOutput.id,
 		});
 	}
@@ -210,4 +224,50 @@ export async function generateImage(args: {
 			},
 		}),
 	]);
+}
+
+/**
+ * Detects if a file is JPEG, PNG, or WebP by examining its header bytes
+ * @param file The file to check
+ * @returns Detected MIME type or null if not recognized
+ */
+function detectImageType(generatedImage: GeneratedImage) {
+	// Get the first 12 bytes of the file (enough for all our formats)
+	const bytes = generatedImage.uint8Array;
+
+	// JPEG: Starts with FF D8 FF
+	if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+		return { contentType: "image/jpeg", ext: "jpeg" };
+	}
+
+	// PNG: Starts with 89 50 4E 47 0D 0A 1A 0A (hex for \x89PNG\r\n\x1a\n)
+	if (
+		bytes[0] === 0x89 &&
+		bytes[1] === 0x50 &&
+		bytes[2] === 0x4e &&
+		bytes[3] === 0x47 &&
+		bytes[4] === 0x0d &&
+		bytes[5] === 0x0a &&
+		bytes[6] === 0x1a &&
+		bytes[7] === 0x0a
+	) {
+		return { contentType: "image/png", ext: "png" };
+	}
+
+	// WebP: Starts with RIFF....WEBP (52 49 46 46 ... 57 45 42 50)
+	if (
+		bytes[0] === 0x52 &&
+		bytes[1] === 0x49 &&
+		bytes[2] === 0x46 &&
+		bytes[3] === 0x46 &&
+		bytes[8] === 0x57 &&
+		bytes[9] === 0x45 &&
+		bytes[10] === 0x42 &&
+		bytes[11] === 0x50
+	) {
+		return { contentType: "image/webp", ext: "webp" };
+	}
+
+	// Not a recognized image format
+	return null;
 }
