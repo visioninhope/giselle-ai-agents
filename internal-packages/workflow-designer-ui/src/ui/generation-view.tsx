@@ -5,6 +5,7 @@ import type {
 	NodeId,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
+import { useGiselleEngine } from "giselle-sdk/react";
 import { useMemo } from "react";
 import { WilliIcon } from "../icons";
 import { MemoizedMarkdown } from "./memoized-markdown";
@@ -23,6 +24,7 @@ export function GenerationView({
 }: {
 	generation: Generation;
 }) {
+	const client = useGiselleEngine();
 	const generatedMessages = useMemo(
 		() => generation.messages?.filter((m) => m.role === "assistant") ?? [],
 		[generation],
@@ -52,7 +54,7 @@ export function GenerationView({
 						<div key={output.outputId}>
 							{output.contents.map((content) => (
 								<img
-									src={content.pathname}
+									src={`${client.basePath}/${content.pathname}`}
 									alt="generated file"
 									key={content.filename}
 								/>
