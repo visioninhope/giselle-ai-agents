@@ -18,6 +18,7 @@ import {
 	cancelGeneration,
 	generateImage,
 	generateText,
+	getGeneratedImage,
 	getGeneration,
 	getNodeGenerations,
 } from "./generations";
@@ -138,6 +139,13 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return await generateImage({
 				context,
 				generation,
+			});
+		},
+		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
+			return await getGeneratedImage({
+				context,
+				generationId,
+				filename,
 			});
 		},
 	};
