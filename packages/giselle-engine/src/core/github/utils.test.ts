@@ -170,7 +170,7 @@ test("parseCommand", () => {
 /giselle hello\r\n\r\nPlease write a blog.\r\nTheme is free.
 `),
 	).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "Please write a blog.\nTheme is free.",
 	});
 });
@@ -181,7 +181,7 @@ test("parseCommand2", () => {
 		/giselle hello\r\nPlease write a blog.\r\nTheme is free.
 `),
 	).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "Please write a blog.\nTheme is free.",
 	});
 });
@@ -192,7 +192,7 @@ test("parseCommand3", () => {
 /giselle hello\r\nPlease write a blog.\r\nTheme is free.\r\n\r\nText mood is ....
 `),
 	).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "Please write a blog.\nTheme is free.\n\nText mood is ....",
 	});
 });
@@ -203,7 +203,7 @@ test("parseCommand4 - with \\n line endings", () => {
 /giselle hello\n\nPlease write a blog.\nTheme is free.
 `),
 	).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "Please write a blog.\nTheme is free.",
 	});
 });
@@ -214,7 +214,7 @@ test("parseCommand5 - mixed line endings", () => {
 /giselle hello\r\n\nPlease write a blog.\r\nTheme is free.
 `),
 	).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "Please write a blog.\nTheme is free.",
 	});
 });
@@ -227,21 +227,21 @@ test("invalid command format returns null", () => {
 
 test("command with multiple spaces", () => {
 	expect(parseCommand("/giselle    hello   \nsome content")).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "some content",
 	});
 });
 
 test("command with empty content", () => {
 	expect(parseCommand("/giselle hello\n")).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "",
 	});
 });
 
 test("command with no empty line after command", () => {
 	expect(parseCommand("/giselle hello content")).toStrictEqual({
-		callSign: "hello",
+		callsign: "hello",
 		content: "content",
 	});
 });
