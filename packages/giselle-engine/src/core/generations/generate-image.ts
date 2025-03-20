@@ -150,7 +150,15 @@ export async function generateImage(args: {
 	);
 	let prompt = "";
 	for (const message of messages) {
-		prompt += message?.content ?? "";
+		if (!Array.isArray(message.content)) {
+			continue;
+		}
+		for (const content of message.content) {
+			if (content.type !== "text") {
+				continue;
+			}
+			prompt += content.text;
+		}
 	}
 	const result = await generateImageAiSdk({
 		model: fal.image(actionNode.content.llm.id),
