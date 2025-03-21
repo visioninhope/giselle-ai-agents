@@ -20,6 +20,7 @@ import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import {
 	buildMessageObject,
+	fetchUsageLimits,
 	getGeneration,
 	getNodeGenerationIndexes,
 	getRedirectedUrlAndTitle,
@@ -33,6 +34,17 @@ export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {
+	const fetchUsageLimitsFn = args.context.fetchUsageLimitsFn;
+	if (fetchUsageLimitsFn != null) {
+		const usageLimits = await fetchUsageLimits({
+			storage: args.context.storage,
+			origin: args.generation.context.origin,
+			fetchUsageLimitsFn,
+		});
+
+		console.log("=========== usageLimits", usageLimits);
+	}
+
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
