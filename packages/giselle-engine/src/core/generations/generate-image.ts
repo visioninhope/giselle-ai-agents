@@ -4,6 +4,7 @@ import {
 	type FileData,
 	type GenerationOutput,
 	type Image,
+	ImageId,
 	type NodeId,
 	type Output,
 	type OutputId,
@@ -11,10 +12,7 @@ import {
 	type RunningGeneration,
 	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
-import {
-	type Experimental_GeneratedImage as GeneratedImage,
-	experimental_generateImage as generateImageAiSdk,
-} from "ai";
+import { experimental_generateImage as generateImageAiSdk } from "ai";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import {
@@ -160,6 +158,9 @@ export async function generateImage(args: {
 			prompt += content.text;
 		}
 	}
+	console.log({
+		n: actionNode.content.llm.configurations.n,
+	});
 	const result = await generateImageAiSdk({
 		model: fal.image(actionNode.content.llm.id),
 		prompt,
@@ -180,7 +181,8 @@ export async function generateImage(args: {
 				if (imageType === null) {
 					return null;
 				}
-				const filename = `image_${Date.now()}.${imageType.ext}`;
+				const id = ImageId.generate();
+				const filename = `${id}.${imageType.ext}`;
 				await setGeneratedImage({
 					storage: args.context.storage,
 					generation: runningGeneration,
@@ -188,6 +190,7 @@ export async function generateImage(args: {
 					generatedImageFilename: filename,
 				});
 				return {
+					id,
 					contentType: imageType.contentType,
 					filename,
 					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
