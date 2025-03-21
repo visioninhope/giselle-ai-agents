@@ -1,5 +1,6 @@
 import {
 	type ActionNode,
+	type CompletedGeneration,
 	type FileContent,
 	type FileData,
 	Generation,
@@ -10,11 +11,15 @@ import {
 	NodeGenerationIndex,
 	NodeId,
 	OutputId,
+	type RunId,
 	type TextGenerationNode,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
+import { getRun } from "../runs/utils";
+import type { GiselleEngineContext } from "../types";
 
 export interface FileIndex {
 	nodeId: NodeId;
@@ -423,4 +428,38 @@ export async function getRedirectedUrlAndTitle(url: string) {
 		redirectedUrl: finalUrl,
 		title: title,
 	};
+}
+
+/**
+ * Calculates and records the time consumed by the agent
+ */
+export async function handleAgentTimeConsumption(args: {
+	storage: GiselleEngineContext["storage"];
+	generation: CompletedGeneration;
+	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
+	onConsumeAgentTime: NonNullable<GiselleEngineContext["onConsumeAgentTime"]>;
+}) {
+	let workspaceId: WorkspaceId;
+	if (args.origin.type === "workspace") {
+		workspaceId = args.origin.id;
+	} else {
+		const run = await getRun({
+			storage: args.storage,
+			runId: args.origin.id,
+		});
+		// FIXME: run is still queued here
+		if (run == null || !("workspaceId" in run)) {
+			throw new Error("Run not completed");
+		}
+		workspaceId = run.workspaceId;
+	}
+
+	const totalDurationMs =
+		args.generation.completedAt - args.generation.startedAt;
+	await args.onConsumeAgentTime(
+		workspaceId,
+		args.generation.startedAt,
+		args.generation.completedAt,
+		totalDurationMs,
+	);
 }

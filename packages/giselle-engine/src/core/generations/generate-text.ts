@@ -23,6 +23,7 @@ import {
 	getGeneration,
 	getNodeGenerationIndexes,
 	getRedirectedUrlAndTitle,
+	handleAgentTimeConsumption,
 	setGeneration,
 	setGenerationIndex,
 	setNodeGenerationIndex,
@@ -264,6 +265,16 @@ export async function generateText(args: {
 					},
 				}),
 			]);
+			const onConsumeAgentTime = args.context.onConsumeAgentTime;
+
+			if (onConsumeAgentTime != null) {
+				await handleAgentTimeConsumption({
+					storage: args.context.storage,
+					generation: completedGeneration,
+					origin: args.generation.context.origin,
+					onConsumeAgentTime,
+				});
+			}
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,

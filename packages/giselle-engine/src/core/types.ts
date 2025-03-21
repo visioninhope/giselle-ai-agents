@@ -1,3 +1,4 @@
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	GitHubAppUserAuth,
 	GitHubInstallationAppAuth,
@@ -10,6 +11,7 @@ export interface GiselleEngineContext {
 	storage: Storage;
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
+	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
@@ -25,11 +27,18 @@ export interface GitHubIntegrationConfig {
 }
 
 export type GiselleIntegrationConfig = GitHubIntegrationConfig;
+export type ConsumeAgentTimeCallback = (
+	workspaceId: WorkspaceId,
+	startedAt: number,
+	endedAt: number,
+	totalDurationMs: number,
+) => Promise<void>;
 
 export interface GiselleEngineConfig {
 	storage: Storage;
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
+	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
