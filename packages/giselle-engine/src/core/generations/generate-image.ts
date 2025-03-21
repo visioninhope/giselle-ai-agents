@@ -158,9 +158,6 @@ export async function generateImage(args: {
 			prompt += content.text;
 		}
 	}
-	console.log({
-		n: actionNode.content.llm.configurations.n,
-	});
 	const result = await generateImageAiSdk({
 		model: fal.image(actionNode.content.llm.id),
 		prompt,
