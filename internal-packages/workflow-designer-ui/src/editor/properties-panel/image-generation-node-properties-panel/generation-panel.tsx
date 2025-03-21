@@ -66,7 +66,9 @@ export function GenerationPanel({ node }: { node: ImageGenerationNode }) {
 				)}
 			</div>
 			<div className="pt-[16px] pb-[12px] px-[16px] h-full overflow-hidden">
-				<GenerationView generation={currentGeneration} />
+				<div className="h-full overflow-x-auto">
+					<GenerationView generation={currentGeneration} />
+				</div>
 			</div>
 		</div>
 	);
