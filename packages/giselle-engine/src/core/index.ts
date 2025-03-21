@@ -1,6 +1,7 @@
 import type {
 	CreatedRun,
 	FileId,
+	Generation,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
@@ -21,6 +22,7 @@ import {
 	getGeneratedImage,
 	getGeneration,
 	getNodeGenerations,
+	setGeneration,
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
@@ -146,6 +148,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 				generationId,
 				filename,
+			});
+		},
+		setGeneration: async (generation: Generation) => {
+			return await setGeneration({
+				context,
+				generation,
 			});
 		},
 	};
