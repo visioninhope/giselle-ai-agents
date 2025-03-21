@@ -8,7 +8,6 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getUser } from "@/lib/supabase";
-import TeamCreation from "@/services/teams/components/v2/team-creation";
 import Avatar from "boring-avatars";
 import Link from "next/link";
 import type { FC } from "react";
