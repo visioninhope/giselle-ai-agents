@@ -15,7 +15,9 @@ import type {
 	RunningGeneration,
 	UrlSource,
 } from "@giselle-sdk/data-type";
+import { hasTierAccess, languageModels } from "@giselle-sdk/language-model";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { AgentTimeLimitError, TierAccessError } from "../errors";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import {
@@ -42,7 +44,21 @@ export async function generateText(args: {
 			fetchUsageLimitsFn,
 		});
 
-		console.log("=========== usageLimits", usageLimits);
+		const actionNode = args.generation.context.actionNode;
+		const languageModel = languageModels.find(
+			(model) => model.id === actionNode.content.llm.id,
+		);
+		if (languageModel === undefined) {
+			throw new Error(`Language model not found: ${actionNode.content.llm.id}`);
+		}
+		if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
+			throw new TierAccessError();
+		}
+
+		const agentTimeLimits = usageLimits.resourceLimits.agentTime;
+		if (agentTimeLimits.used >= agentTimeLimits.limit) {
+			throw new AgentTimeLimitError();
+		}
 	}
 
 	const runningGeneration = {
