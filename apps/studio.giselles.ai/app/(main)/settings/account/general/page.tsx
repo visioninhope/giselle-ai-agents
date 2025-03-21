@@ -40,7 +40,7 @@ export default async function AccountGeneralPage() {
 					description="Sign out of all session"
 					className="flex flex-row justify-between items-center gap-y-6"
 				>
-					<SignOutButton className="px-[16px] py-[4px] rounded-[6.32px] border border-primary-200 w-fit bg-primary-200 text-black-800 font-bold text-[14px] font-hubot whitespace-nowrap  leading-[19.6px] tracking-normal data-[loading=true]:cursor-wait hover:bg-transparent hover:text-primary-200">
+					<SignOutButton className="px-[16px] py-[4px] rounded-[6.32px] border border-primary-200 w-fit bg-primary-200 text-black-800 font-bold text-[14px] font-hubot whitespace-nowrap leading-[19.6px] tracking-normal hover:bg-transparent hover:text-primary-200">
 						Sign out
 					</SignOutButton>
 				</Card>
