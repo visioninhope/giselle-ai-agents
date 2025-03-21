@@ -1,6 +1,7 @@
 import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
+import { perplexity } from "@ai-sdk/perplexity";
 import type {
 	CompletedGeneration,
 	FailedGeneration,
@@ -293,6 +294,9 @@ export async function generateText(args: {
 				);
 			}
 		},
+		experimental_telemetry: {
+			isEnabled: args.context.telemetry?.isEnabled,
+		},
 	});
 	return streamTextResult;
 }
@@ -310,6 +314,9 @@ function generationModel(languageModel: LanguageModelData) {
 			return google(languageModel.id, {
 				useSearchGrounding: languageModel.configurations.searchGrounding,
 			});
+		}
+		case "perplexity": {
+			return perplexity(languageModel.id);
 		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;

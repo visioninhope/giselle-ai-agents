@@ -31,6 +31,8 @@ catalog:
   "@ai-sdk/openai": 1.2.5
   "@ai-sdk/anthropic": 1.1.17
   "@ai-sdk/google": 1.1.25
+  "@ai-sdk/perplexity": 1.0.7
+  "@ai-sdk/react": 1.1.23
   "@tailwindcss/typography": 0.5.16
   tailwindcss-animate: 1.0.7
   react-resizable-panels: 2.1.7
@@ -50,6 +52,7 @@ catalog:
   "@tiptap/extension-italic": 2.11.5
   "@tiptap/extension-ordered-list": 2.11.5
   "@tiptap/extension-strike": 2.11.5
+  "@tiptap/extension-history": 2.11.5
   "@tiptap/html": 2.11.5
   highlight.js: 11.11.1
   lowlight: 3.3.0

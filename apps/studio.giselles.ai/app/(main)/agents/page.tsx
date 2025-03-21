@@ -19,10 +19,15 @@ function DataList({ label, children }: { label: string; children: ReactNode }) {
 async function AgentList() {
 	const currentTeam = await fetchCurrentTeam();
 	const dbAgents = await db
-		.select({ id: agents.id, name: agents.name, updatedAt: agents.updatedAt })
+		.select({
+			id: agents.id,
+			name: agents.name,
+			updatedAt: agents.updatedAt,
+			workspaceId: agents.workspaceId,
+		})
 		.from(agents)
 		.where(
-			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.graphUrl)),
+			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.workspaceId)),
 		);
 	if (dbAgents.length === 0) {
 		return (
@@ -38,7 +43,7 @@ async function AgentList() {
 			<div className="grid gap-[16px] grid-cols-3">
 				{dbAgents.map((agent) => (
 					<div key={agent.id} className="relative">
-						<Link href={`/p/${agent.id}`}>
+						<Link href={`/workspaces/${agent.workspaceId}`}>
 							<div className="bg-linear-to-br from-[hsla(187,79%,54%,0.2)] to-[hsla(207,100%,9%,0.2)] p-[18px] relative rounded-[8px]">
 								<div className="divide-y divide-black-70">
 									<div className="h-[60px]">

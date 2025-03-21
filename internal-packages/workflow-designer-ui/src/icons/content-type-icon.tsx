@@ -7,6 +7,7 @@ import { GitHubIcon } from "./github";
 import { GoogleWhiteIcon } from "./google";
 import { OpenaiIcon } from "./openai";
 import { PdfFileIcon } from "./pdf-file";
+import { PerplexityIcon } from "./perplexity";
 import { PictureIcon } from "./picture";
 import { TextFileIcon } from "./text-file";
 
@@ -51,6 +52,8 @@ export function ContentTypeIcon({
 					return <AnthropicIcon {...props} />;
 				case "google":
 					return <GoogleWhiteIcon {...props} />;
+				case "perplexity":
+					return <PerplexityIcon {...props} />;
 				default: {
 					const _exhaustiveCheck: never = llmProvider;
 					throw new Error(`Unhandled LLMProvider: ${_exhaustiveCheck}`);

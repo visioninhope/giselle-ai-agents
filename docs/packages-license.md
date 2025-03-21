@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 1018 MIT
-* 103 Apache 2.0
+* 1019 MIT
+* 104 Apache 2.0
 * 57 ISC
 * 34 New BSD
 * 16 Simplified BSD
@@ -76,6 +76,17 @@
 
 <a name="@ai-sdk/openai"></a>
 ### @ai-sdk/openai v1.0.8
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/perplexity"></a>
+### @ai-sdk/perplexity v1.0.7
 #### 
 
 ##### Paths
@@ -3728,6 +3739,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@tiptap/extension-floating-menu"></a>
 ### @tiptap/extension-floating-menu v2.11.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@tiptap/extension-history"></a>
+### @tiptap/extension-history v2.11.5
 #### 
 
 ##### Paths
@@ -8759,6 +8781,17 @@ BlueOak-1.0.0 permitted
 
 <a name="langfuse-core"></a>
 ### langfuse-core v3.32.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="langfuse-vercel"></a>
+### langfuse-vercel v3.37.0
 #### 
 
 ##### Paths

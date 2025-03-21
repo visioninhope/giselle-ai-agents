@@ -40,6 +40,7 @@
 		"@tiptap/extension-code": "catalog:",
 		"@tiptap/extension-code-block-lowlight": "catalog:",
 		"@tiptap/extension-document": "catalog:",
+		"@tiptap/extension-history": "catalog:",
 		"@tiptap/extension-italic": "catalog:",
 		"@tiptap/extension-list-item": "catalog:",
 		"@tiptap/extension-ordered-list": "catalog:",

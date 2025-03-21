@@ -12,6 +12,10 @@ export interface GiselleEngineContext {
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
+	telemetry?: {
+		isEnabled?: boolean;
+		waitForFlushFn?: () => Promise<unknown>;
+	};
 }
 
 export interface GitHubIntegrationConfig {
@@ -35,4 +39,8 @@ export interface GiselleEngineConfig {
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig[];
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
+	telemetry?: {
+		isEnabled?: boolean;
+		waitForFlushFn?: () => Promise<unknown>;
+	};
 }

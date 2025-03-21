@@ -39,6 +39,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		llmProviders: config.llmProviders ?? [],
 		integrationConfigs: config.integrationConfigs ?? [],
 		onConsumeAgentTime: config.onConsumeAgentTime,
+		telemetry: config.telemetry,
 	};
 	return {
 		createWorkspace: async () => {
