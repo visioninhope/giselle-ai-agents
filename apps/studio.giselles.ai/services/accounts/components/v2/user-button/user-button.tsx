@@ -20,7 +20,7 @@ export const UserButton: FC = async () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger>
+			<DropdownMenuTrigger className="cursor-pointer">
 				<Avatar
 					name={user.email}
 					variant="marble"
@@ -41,19 +41,14 @@ export const UserButton: FC = async () => {
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />
-				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<Link
-							href="/settings/account"
-							className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
-						>
-							Account Settings
-						</Link>
-					</DropdownMenuItem>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<TeamCreation />
-					</DropdownMenuItem>
-				</div>
+				<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<Link
+						href="/settings/account"
+						className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
+					>
+						Account Settings
+					</Link>
+				</DropdownMenuItem>
 				<DropdownMenuSeparator className="-mx-2 my-0 p-0 bg-black-400" />
 				<div>
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">

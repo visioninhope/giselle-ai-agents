@@ -18,6 +18,7 @@ export default async function LayoutV2({ children }: { children: ReactNode }) {
 				</div>
 				<div className="flex items-center gap-4">
 					<TeamSelection />
+					<TeamCreation />
 					<UserButton />
 				</div>
 			</header>
