@@ -1,5 +1,6 @@
 import { Field } from "@/components/v2/ui/field";
 import { settingsV2Flag } from "@/flags";
+import { SignOutButton } from "@/services/accounts/components/v2/user-button/sign-out-button";
 import { notFound } from "next/navigation";
 import { Card } from "../../components/v2/card";
 import { getAccountInfo } from "../actions";
@@ -33,6 +34,15 @@ export default async function AccountGeneralPage() {
 						value={email ?? "No email"}
 						disabled
 					/>
+				</Card>
+				<Card
+					title="Session"
+					description="Sign out of all session"
+					className="flex flex-row justify-between items-center gap-y-6"
+				>
+					<SignOutButton className="px-[16px] py-[4px] rounded-[6.32px] border border-primary-200 w-fit bg-primary-200 text-black-800 font-bold text-[14px] font-hubot whitespace-nowrap  leading-[19.6px] tracking-normal data-[loading=true]:cursor-wait hover:bg-transparent hover:text-primary-200">
+						Sign out
+					</SignOutButton>
 				</Card>
 			</div>
 		</div>
