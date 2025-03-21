@@ -51,7 +51,7 @@ export function GenerationView({
 						return null;
 					}
 					return (
-						<div key={output.outputId} className="h-full">
+						<div key={output.outputId} className="h-full flex gap-[12px]">
 							{output.contents.map((content) => (
 								<img
 									src={`${client.basePath}/${content.pathname}`}
