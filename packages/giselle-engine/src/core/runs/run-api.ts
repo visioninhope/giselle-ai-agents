@@ -217,7 +217,7 @@ export async function runApi(args: {
 					},
 					status: "queued",
 					createdAt: Date.now(),
-					ququedAt: Date.now(),
+					queuedAt: Date.now(),
 				} satisfies QueuedGeneration;
 				const streamTextResult = await generateText({
 					context: args.context,

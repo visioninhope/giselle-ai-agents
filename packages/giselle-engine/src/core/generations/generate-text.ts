@@ -43,7 +43,7 @@ export async function generateText(args: {
 		...args.generation,
 		status: "running",
 		messages: [],
-		ququedAt: Date.now(),
+		queuedAt: Date.now(),
 		requestedAt: Date.now(),
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
@@ -69,7 +69,7 @@ export async function generateText(args: {
 				nodeId: runningGeneration.context.actionNode.id,
 				status: "running",
 				createdAt: runningGeneration.createdAt,
-				ququedAt: runningGeneration.ququedAt,
+				queuedAt: runningGeneration.queuedAt,
 				requestedAt: runningGeneration.requestedAt,
 				startedAt: runningGeneration.startedAt,
 			},
