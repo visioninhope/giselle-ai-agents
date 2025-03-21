@@ -1,3 +1,4 @@
+import { useChat } from "@ai-sdk/react";
 import type {
 	CancelledGeneration,
 	CompletedGeneration,
@@ -6,7 +7,6 @@ import type {
 	QueuedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
-import { useChat } from "ai/react";
 import { useEffect, useRef } from "react";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
 
@@ -55,6 +55,7 @@ function TextGenerationRunner({
 		case "openai":
 		case "anthropic":
 		case "google":
+		case "perplexity":
 			return <CompletionRunner generation={generation} />;
 		default: {
 			const _exhaustiveCheck: never = content.llm;

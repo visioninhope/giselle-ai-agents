@@ -33,6 +33,7 @@
 		"tsup": "catalog:"
 	},
 	"dependencies": {
+		"@ai-sdk/react": "catalog:",
 		"@giselle-sdk/data-type": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:^",
 		"ai": "catalog:",

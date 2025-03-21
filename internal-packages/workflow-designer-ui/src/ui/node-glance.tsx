@@ -6,6 +6,7 @@ import {
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
+	PerplexityIcon,
 	PictureIcon,
 	PromptIcon,
 	TextFileIcon,
@@ -78,6 +79,8 @@ function ContentTypeIcon({
 					return <AnthropicIcon {...props} data-content-type-icon />;
 				case "google":
 					return <GoogleWhiteIcon {...props} data-content-type-icon />;
+				case "perplexity":
+					return <PerplexityIcon {...props} data-content-type-icon />;
 				default: {
 					const _exhaustiveCheck: never = node.content.llm;
 					throw new Error(`Unhandled LLMProvider: ${_exhaustiveCheck}`);

@@ -39,19 +39,6 @@ export const viewFlag = flag<boolean>({
 	],
 });
 
-export const playgroundV2Flag = flag<boolean>({
-	key: "playground-v2",
-	async decide() {
-		return takeLocalEnv("PLAYGROUND_V2_FLAG");
-	},
-	description: "Enable Playground V2",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const developerFlag = flag<boolean>({
 	key: "developer",
 	async decide() {
@@ -71,19 +58,6 @@ export const settingsV2Flag = flag<boolean>({
 		return takeLocalEnv("SETTINGS_V2_FLAG");
 	},
 	description: "Enable Settings V2",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const newUiFlag = flag<boolean>({
-	key: "new-ui",
-	async decide() {
-		return takeLocalEnv("NEW_UI_FLAG");
-	},
-	description: "Enable New UI",
 	defaultValue: false,
 	options: [
 		{ value: false, label: "disable" },

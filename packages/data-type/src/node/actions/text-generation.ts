@@ -2,6 +2,7 @@ import {
 	AnthropicLanguageModel,
 	GoogleLanguageModel,
 	OpenAILanguageModel,
+	PerplexityLanguageModel,
 } from "@giselle-sdk/language-model";
 import { z } from "zod";
 
@@ -26,10 +27,20 @@ export const OpenAILanguageModelData = OpenAILanguageModel.pick({
 });
 export type OpenAILanguageModelData = z.infer<typeof OpenAILanguageModelData>;
 
+export const PerplexityLanguageModelData = PerplexityLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type PerplexityLanguageModelData = z.infer<
+	typeof PerplexityLanguageModelData
+>;
+
 export const LanguageModelData = z.discriminatedUnion("provider", [
 	AnthropicLanguageModelData,
 	GoogleLanguageModelData,
 	OpenAILanguageModelData,
+	PerplexityLanguageModelData,
 ]);
 export type LanguageModelData = z.infer<typeof LanguageModelData>;
 

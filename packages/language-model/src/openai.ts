@@ -28,7 +28,7 @@ const gpt4o: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-4o",
 	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
-	tier: Tier.enum.plus,
+	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
 

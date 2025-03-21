@@ -3,6 +3,7 @@
 import clsx from "clsx";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { ChevronDownIcon, PlayIcon, View } from "lucide-react";
+import Link from "next/link";
 import { Dialog, DropdownMenu, VisuallyHidden } from "radix-ui";
 import { type ReactNode, useState } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
@@ -19,7 +20,9 @@ export function Header({
 	return (
 		<div className="h-[54px] pl-[24px] pr-[16px] flex items-center justify-between shrink-0">
 			<div className="flex items-center gap-[8px] text-white-950">
-				<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
+				<Link href="/">
+					<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
+				</Link>
 				<Divider />
 				<div className="flex gap-[2px] group">
 					<EditableText

@@ -16,9 +16,11 @@ import { languageModelAvailable } from "./utils";
 export function GoogleModelPanel({
 	googleLanguageModel,
 	onModelChange,
+	onSearchGroundingConfigurationChange,
 }: {
 	googleLanguageModel: GoogleLanguageModelData;
 	onModelChange: (changedValue: GoogleLanguageModelData) => void;
+	onSearchGroundingConfigurationChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
 
@@ -95,15 +97,7 @@ export function GoogleModelPanel({
 						name="searchGrounding"
 						checked={googleLanguageModel.configurations.searchGrounding}
 						onCheckedChange={(checked) => {
-							onModelChange(
-								GoogleLanguageModelData.parse({
-									...googleLanguageModel,
-									configurations: {
-										...googleLanguageModel.configurations,
-										searchGrounding: checked,
-									},
-								}),
-							);
+							onSearchGroundingConfigurationChange(checked);
 						}}
 					/>
 				</div>

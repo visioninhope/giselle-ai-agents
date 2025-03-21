@@ -1,5 +1,6 @@
 import {
 	type ActionNode,
+	type CompletedGeneration,
 	type FileContent,
 	type FileData,
 	Generation,
@@ -10,11 +11,15 @@ import {
 	NodeGenerationIndex,
 	NodeId,
 	OutputId,
+	type RunId,
 	type TextGenerationNode,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
+import { getRun } from "../runs/utils";
+import type { GiselleEngineContext } from "../types";
 
 export interface FileIndex {
 	nodeId: NodeId;
@@ -156,6 +161,19 @@ async function buildGenerationMessageForTextGeneration(
 				},
 			];
 		}
+		case "perplexity": {
+			return [
+				{
+					role: "user",
+					content: [
+						{
+							type: "text",
+							text: userMessage,
+						},
+					],
+				},
+			];
+		}
 		default: {
 			const _exhaustiveCheck: never = llmProvider;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
@@ -208,9 +226,9 @@ export function generationPath(generationIndex: GenerationIndex) {
 	const originType = generationOrigin.type;
 	switch (originType) {
 		case "workspace":
-			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `workspaces/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		case "run":
-			return `runs/${generationOrigin.id}/generations/${generationIndex.id}.json`;
+			return `runs/${generationOrigin.id}/generations/${generationIndex.id}/generation.json`;
 		default: {
 			const _exhaustiveCheck: never = originType;
 			return _exhaustiveCheck;
@@ -387,4 +405,61 @@ function getFilesDescription(
 		return `${getOrdinal(currentCount + 1)} ~ ${getOrdinal(currentCount + newFilesCount)} attached files`;
 	}
 	return `${getOrdinal(currentCount + 1)} attached file`;
+}
+
+export async function getRedirectedUrlAndTitle(url: string) {
+	// Make the request with fetch and set redirect to 'follow'
+	const response = await fetch(url, {
+		redirect: "follow", // This automatically follows redirects
+	});
+
+	// Get the final URL after redirects
+	const finalUrl = response.url;
+
+	// Get the HTML content
+	const html = await response.text();
+
+	// Extract title using a simple regex pattern
+	const titleMatch = html.match(/<title[^>]*>(.*?)<\/title>/i);
+	const title = titleMatch ? titleMatch[1].trim() : "No title found";
+
+	return {
+		originalUrl: url,
+		redirectedUrl: finalUrl,
+		title: title,
+	};
+}
+
+/**
+ * Calculates and records the time consumed by the agent
+ */
+export async function handleAgentTimeConsumption(args: {
+	storage: GiselleEngineContext["storage"];
+	generation: CompletedGeneration;
+	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
+	onConsumeAgentTime: NonNullable<GiselleEngineContext["onConsumeAgentTime"]>;
+}) {
+	let workspaceId: WorkspaceId;
+	if (args.origin.type === "workspace") {
+		workspaceId = args.origin.id;
+	} else {
+		const run = await getRun({
+			storage: args.storage,
+			runId: args.origin.id,
+		});
+		// FIXME: run is still queued here
+		if (run == null || !("workspaceId" in run)) {
+			throw new Error("Run not completed");
+		}
+		workspaceId = run.workspaceId;
+	}
+
+	const totalDurationMs =
+		args.generation.completedAt - args.generation.startedAt;
+	await args.onConsumeAgentTime(
+		workspaceId,
+		args.generation.startedAt,
+		args.generation.completedAt,
+		totalDurationMs,
+	);
 }

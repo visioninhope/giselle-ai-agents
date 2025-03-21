@@ -62,6 +62,10 @@ if (process.env.GITHUB_TOKEN) {
 	});
 }
 
+if (process.env.PERPLEXITY_API_KEY) {
+	llmProviders.push("perplexity");
+}
+
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
