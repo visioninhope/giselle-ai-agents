@@ -44,19 +44,20 @@ export function GenerationView({
 		);
 	}
 	return (
-		<div>
+		<>
 			{generation.status === "completed" &&
 				generation.outputs.map((output) => {
 					if (output.type !== "generated-image") {
 						return null;
 					}
 					return (
-						<div key={output.outputId}>
+						<div key={output.outputId} className="h-full">
 							{output.contents.map((content) => (
 								<img
 									src={`${client.basePath}/${content.pathname}`}
 									alt="generated file"
 									key={content.filename}
+									className="h-full"
 								/>
 							))}
 						</div>
@@ -101,7 +102,7 @@ export function GenerationView({
 						<Spinner />
 					</div>
 				)}
-		</div>
+		</>
 	);
 }
 
