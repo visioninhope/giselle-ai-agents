@@ -45,10 +45,10 @@ export function GenerationPanel({ node }: { node: ImageGenerationNode }) {
 		return <Empty />;
 	}
 	return (
-		<div className="bg-white-900/10 h-full rounded-[8px] py-[8px]">
+		<div className="bg-white-900/10 h-full rounded-[8px] flex flex-col">
 			<div
 				className={clsx(
-					"border-b border-white-400/20 py-[4px] px-[16px] flex items-center gap-[8px]",
+					"border-b border-white-400/20 py-[12px] px-[16px] flex items-center gap-[8px]",
 					"**:data-header-text:font-[700]",
 				)}
 			>
@@ -65,7 +65,7 @@ export function GenerationPanel({ node }: { node: ImageGenerationNode }) {
 					<p data-header-text>Result</p>
 				)}
 			</div>
-			<div className="py-[4px] px-[16px] overflow-y-auto h-full">
+			<div className="pt-[16px] pb-[12px] px-[16px] h-full overflow-hidden">
 				<GenerationView generation={currentGeneration} />
 			</div>
 		</div>
