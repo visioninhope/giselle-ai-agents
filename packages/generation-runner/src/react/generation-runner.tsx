@@ -1,13 +1,5 @@
 import { useChat } from "@ai-sdk/react";
-import {
-	type CancelledGeneration,
-	type CompletedGeneration,
-	type FailedGeneration,
-	type Generation,
-	type QueuedGeneration,
-	type RunningGeneration,
-	isQueuedGeneration,
-} from "@giselle-sdk/data-type";
+import { type Generation, isQueuedGeneration } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useEffect, useRef } from "react";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
