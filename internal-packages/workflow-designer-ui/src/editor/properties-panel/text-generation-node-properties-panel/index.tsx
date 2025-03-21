@@ -1,7 +1,11 @@
 import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
-import { CommandIcon, CornerDownLeft } from "lucide-react";
+import {
+	useNodeGenerations,
+	useUsageLimits,
+	useWorkflowDesigner,
+} from "giselle-sdk/react";
+import { AlertCircleIcon, CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
@@ -46,10 +50,22 @@ export function TextGenerationNodePropertiesPanel({
 		origin: { type: "workspace", id: data.id },
 	});
 	const { all: connectedSources } = useConnectedSources(node);
+	const usageLimits = useUsageLimits();
+	const usageLimitsReached = useMemo(() => {
+		if (usageLimits === undefined) {
+			return false;
+		}
+		const agentTimeLimits = usageLimits.resourceLimits.agentTime;
+		return agentTimeLimits.used >= agentTimeLimits.limit;
+	}, [usageLimits]);
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	const generateText = useCallback(() => {
+		if (usageLimitsReached) {
+			return;
+		}
+
 		startGeneration({
 			origin: {
 				type: "workspace",
@@ -60,10 +76,18 @@ export function TextGenerationNodePropertiesPanel({
 				(connectedSource) => connectedSource.node,
 			),
 		});
-	}, [connectedSources, data.id, node, startGeneration]);
+	}, [connectedSources, data.id, node, startGeneration, usageLimitsReached]);
 
 	return (
 		<PropertiesPanelRoot>
+			{usageLimitsReached && (
+				<div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 mb-2 text-sm text-yellow-900 flex items-center">
+					<AlertCircleIcon className="w-5 h-5 text-yellow-500 mr-2" />
+					<span>
+						You have reached the agent time limit. Please upgrade your plan.
+					</span>
+				</div>
+			)}
 			<PropertiesPanelHeader
 				icon={
 					<>
@@ -91,6 +115,7 @@ export function TextGenerationNodePropertiesPanel({
 					<Button
 						loading={isGenerating}
 						type="button"
+						disabled={usageLimitsReached}
 						onClick={() => {
 							if (isGenerating) {
 								stopGeneration();
@@ -98,7 +123,7 @@ export function TextGenerationNodePropertiesPanel({
 								generateText();
 							}
 						}}
-						className="w-[150px]"
+						className="w-[150px] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isGenerating ? (
 							<span>Stop</span>
