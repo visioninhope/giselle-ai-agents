@@ -1,11 +1,12 @@
 import { useChat } from "@ai-sdk/react";
-import type {
-	CancelledGeneration,
-	CompletedGeneration,
-	FailedGeneration,
-	Generation,
-	QueuedGeneration,
-	RunningGeneration,
+import {
+	type CancelledGeneration,
+	type CompletedGeneration,
+	type FailedGeneration,
+	type Generation,
+	type QueuedGeneration,
+	type RunningGeneration,
+	isQueuedGeneration,
 } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useEffect, useRef } from "react";
@@ -69,12 +70,7 @@ function TextGenerationRunner({
 function CompletionRunner({
 	generation,
 }: {
-	generation:
-		| QueuedGeneration
-		| RunningGeneration
-		| CompletedGeneration
-		| FailedGeneration
-		| CancelledGeneration;
+	generation: Generation;
 }) {
 	const {
 		generateTextApi,
@@ -131,7 +127,7 @@ function ImageGenerationRunner({
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
 	useOnce(() => {
-		if (generation.status !== "queued") {
+		if (!isQueuedGeneration(generation)) {
 			return;
 		}
 		addStopHandler(generation.id, stop);
