@@ -5,16 +5,12 @@ import clsx from "clsx/lite";
 import {
 	useRun,
 	useRunController,
-	useUsageLimits,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import {
-	AlertCircleIcon,
-	CircleCheckIcon,
-	CircleSlashIcon,
-} from "lucide-react";
+import { CircleCheckIcon, CircleSlashIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
+import { useUsageLimitsReached } from "../hooks/usage-limits";
 import { SpinnerIcon, WilliIcon } from "../icons";
 import bg from "../images/bg.png";
 import { Button } from "../ui/button";
@@ -28,19 +24,13 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../ui/select";
+import { UsageLimitWarning } from "../ui/usage-limit-warning";
 
 export function Viewer() {
 	const { generations, run } = useRun();
 	const { perform, isRunning, cancel } = useRunController();
 	const { data } = useWorkflowDesigner();
-	const usageLimits = useUsageLimits();
-	const usageLimitsReached = useMemo(() => {
-		if (usageLimits === undefined) {
-			return false;
-		}
-		const agentTimeLimits = usageLimits.resourceLimits.agentTime;
-		return agentTimeLimits.used >= agentTimeLimits.limit;
-	}, [usageLimits]);
+	const usageLimitsReached = useUsageLimitsReached();
 
 	const [flowId, setFlowId] = useState<WorkflowId | undefined>(
 		data.editingWorkflows.length === 1
@@ -86,15 +76,7 @@ export function Viewer() {
 									</Select>
 								)}
 
-								{usageLimitsReached && (
-									<div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 mb-2 text-sm text-yellow-900 flex items-center">
-										<AlertCircleIcon className="w-5 h-5 text-yellow-500 mr-2" />
-										<span>
-											You have reached the agent time limit. Please upgrade your
-											plan.
-										</span>
-									</div>
-								)}
+								{usageLimitsReached && <UsageLimitWarning />}
 
 								{flowId &&
 									(isRunning ? (

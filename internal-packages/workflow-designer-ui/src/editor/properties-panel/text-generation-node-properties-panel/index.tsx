@@ -1,14 +1,11 @@
 import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import {
-	useNodeGenerations,
-	useUsageLimits,
-	useWorkflowDesigner,
-} from "giselle-sdk/react";
-import { AlertCircleIcon, CommandIcon, CornerDownLeft } from "lucide-react";
+import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
+import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useUsageLimitsReached } from "../../../hooks/usage-limits";
 import {
 	AnthropicIcon,
 	GoogleIcon,
@@ -16,6 +13,7 @@ import {
 	PerplexityIcon,
 } from "../../../icons";
 import { Button } from "../../../ui/button";
+import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -50,14 +48,7 @@ export function TextGenerationNodePropertiesPanel({
 		origin: { type: "workspace", id: data.id },
 	});
 	const { all: connectedSources } = useConnectedSources(node);
-	const usageLimits = useUsageLimits();
-	const usageLimitsReached = useMemo(() => {
-		if (usageLimits === undefined) {
-			return false;
-		}
-		const agentTimeLimits = usageLimits.resourceLimits.agentTime;
-		return agentTimeLimits.used >= agentTimeLimits.limit;
-	}, [usageLimits]);
+	const usageLimitsReached = useUsageLimitsReached();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
@@ -80,14 +71,7 @@ export function TextGenerationNodePropertiesPanel({
 
 	return (
 		<PropertiesPanelRoot>
-			{usageLimitsReached && (
-				<div className="bg-yellow-100 border-l-4 border-yellow-500 p-2 mb-2 text-sm text-yellow-900 flex items-center">
-					<AlertCircleIcon className="w-5 h-5 text-yellow-500 mr-2" />
-					<span>
-						You have reached the agent time limit. Please upgrade your plan.
-					</span>
-				</div>
-			)}
+			{usageLimitsReached && <UsageLimitWarning />}
 			<PropertiesPanelHeader
 				icon={
 					<>
