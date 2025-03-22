@@ -39,7 +39,6 @@ export async function generateImage(args: {
 		status: "running",
 		messages: [],
 		queuedAt: Date.now(),
-		requestedAt: Date.now(),
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
 
@@ -65,7 +64,6 @@ export async function generateImage(args: {
 				status: "running",
 				createdAt: runningGeneration.createdAt,
 				queuedAt: runningGeneration.queuedAt,
-				requestedAt: runningGeneration.requestedAt,
 				startedAt: runningGeneration.startedAt,
 			},
 		}),
@@ -206,7 +204,6 @@ export async function generateImage(args: {
 		status: "completed",
 		messages: [],
 		queuedAt: Date.now(),
-		requestedAt: Date.now(),
 		startedAt: Date.now(),
 		completedAt: Date.now(),
 		outputs: generationOutputs,
@@ -227,7 +224,6 @@ export async function generateImage(args: {
 				status: "completed",
 				createdAt: completedGeneration.createdAt,
 				queuedAt: completedGeneration.queuedAt,
-				requestedAt: completedGeneration.requestedAt,
 				startedAt: completedGeneration.startedAt,
 				completedAt: completedGeneration.completedAt,
 			},

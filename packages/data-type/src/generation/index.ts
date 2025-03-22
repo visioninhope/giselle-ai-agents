@@ -70,7 +70,6 @@ export const Generation = z
 
 		// Optional timing fields
 		queuedAt: z.number().optional(),
-		requestedAt: z.number().optional(),
 		startedAt: z.number().optional(),
 		completedAt: z.number().optional(),
 		failedAt: z.number().optional(),
@@ -92,14 +91,12 @@ export const Generation = z
 				case "running":
 					return (
 						data.queuedAt !== undefined &&
-						data.requestedAt !== undefined &&
 						data.startedAt !== undefined &&
 						Array.isArray(data.messages)
 					);
 				case "completed":
 					return (
 						data.queuedAt !== undefined &&
-						data.requestedAt !== undefined &&
 						data.startedAt !== undefined &&
 						data.completedAt !== undefined &&
 						Array.isArray(data.messages) &&
@@ -108,7 +105,6 @@ export const Generation = z
 				case "failed":
 					return (
 						data.queuedAt !== undefined &&
-						data.requestedAt !== undefined &&
 						data.startedAt !== undefined &&
 						data.failedAt !== undefined &&
 						data.error !== undefined &&
@@ -174,7 +170,6 @@ export const RunningGeneration = z.object({
 	status: GenerationStatusRunning,
 	createdAt: z.number(),
 	queuedAt: z.number(),
-	requestedAt: z.number(),
 	startedAt: z.number(),
 	messages: z.array(Message),
 });
@@ -195,7 +190,6 @@ export const CompletedGeneration = z.object({
 	status: GenerationStatusCompleted,
 	createdAt: z.number(),
 	queuedAt: z.number(),
-	requestedAt: z.number(),
 	startedAt: z.number(),
 	completedAt: z.number(),
 	messages: z.array(Message),
@@ -218,7 +212,6 @@ export const FailedGeneration = z.object({
 	status: GenerationStatusFailed,
 	createdAt: z.number(),
 	queuedAt: z.number(),
-	requestedAt: z.number(),
 	startedAt: z.number(),
 	failedAt: z.number(),
 	messages: z.array(Message),
@@ -243,7 +236,6 @@ export const CancelledGeneration = z.object({
 	cancelledAt: z.number(),
 	messages: z.array(Message).optional(),
 	queuedAt: z.number().optional(),
-	requestedAt: z.number().optional(),
 	startedAt: z.number().optional(),
 });
 export type CancelledGeneration = z.infer<typeof CancelledGeneration>;
@@ -268,8 +260,7 @@ export const NodeGenerationIndex = z.object({
 	nodeId: NodeId.schema,
 	status: GenerationStatus,
 	createdAt: z.number(),
-	queuedAt: z.number(),
-	requestedAt: z.number().optional(),
+	queuedAt: z.number().optional(),
 	startedAt: z.number().optional(),
 	completedAt: z.number().optional(),
 	failedAt: z.number().optional(),

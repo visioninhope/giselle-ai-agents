@@ -123,14 +123,16 @@ function ImageGenerationRunner({
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		updateGenerationStatusToRunning(generation.id);
-		client
-			.generateImage({
-				generation,
-			})
-			.then(() => {
-				updateGenerationStatusToComplete(generation.id);
-			});
+		client.setGeneration({ generation }).then(() => {
+			updateGenerationStatusToRunning(generation.id);
+			client
+				.generateImage({
+					generation,
+				})
+				.then(() => {
+					updateGenerationStatusToComplete(generation.id);
+				});
+		});
 	});
 	return null;
 }
