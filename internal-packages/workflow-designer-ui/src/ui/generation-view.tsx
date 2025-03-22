@@ -1,9 +1,11 @@
-import type {
-	CancelledGeneration,
-	CompletedGeneration,
-	Generation,
-	NodeId,
-	RunningGeneration,
+import {
+	type CancelledGeneration,
+	type CompletedGeneration,
+	type Generation,
+	type NodeId,
+	type RunningGeneration,
+	isCompletedGeneration,
+	isFailedGeneration,
 } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "giselle-sdk/react";
 import { useMemo } from "react";
@@ -29,9 +31,10 @@ export function GenerationView({
 		() => generation.messages?.filter((m) => m.role === "assistant") ?? [],
 		[generation],
 	);
-	if (generation.status === "failed") {
+	if (isFailedGeneration(generation)) {
 		return generation.error.message;
 	}
+
 	if (
 		generation.status !== "running" &&
 		generation.status !== "completed" &&
@@ -45,7 +48,7 @@ export function GenerationView({
 	}
 	return (
 		<>
-			{generation.status === "completed" &&
+			{isCompletedGeneration(generation) &&
 				generation.outputs.map((output) => {
 					if (output.type !== "generated-image") {
 						return null;
@@ -78,13 +81,7 @@ export function GenerationView({
 								);
 							case "tool-invocation":
 								/** @todo Tool invocation */
-								return (
-									<ToolBlock
-										key={part.toolInvocation.toolCallId}
-										generation={generation}
-										contextNodeId={part.toolInvocation.args.contextNodeId}
-									/>
-								);
+								return null;
 							case "source":
 								/** @todo Source */
 								return null;

@@ -14,6 +14,7 @@ import {
 	type RunningGeneration,
 	type TextGenerationLanguageModelData,
 	type UrlSource,
+	isCompletedGeneration,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
@@ -102,7 +103,7 @@ export async function generateText(args: {
 			storage: args.context.storage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 		});
-		if (generation?.status !== "completed") {
+		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
 		}
 		let output: Output | undefined;

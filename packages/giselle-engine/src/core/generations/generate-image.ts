@@ -10,6 +10,7 @@ import {
 	type OutputId,
 	type QueuedGeneration,
 	type RunningGeneration,
+	isCompletedGeneration,
 	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
 import { experimental_generateImage as generateImageAiSdk } from "ai";
@@ -100,7 +101,7 @@ export async function generateImage(args: {
 			storage: args.context.storage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 		});
-		if (generation?.status !== "completed") {
+		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
 		}
 		let output: Output | undefined;
