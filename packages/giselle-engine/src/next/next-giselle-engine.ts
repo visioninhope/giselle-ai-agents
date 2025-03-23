@@ -64,7 +64,9 @@ export function createHttpHandler({
 
     // Check if pathname matches /generations/{generationId}/generated-images/{filename}
     const generatedImageMatch = pathname.match(
-      new RegExp(`^${basePath}/generations/([^/]+)/generated-images/([^/]+)$`),
+      new RegExp(
+        `^${config.basePath}/generations/([^/]+)/generated-images/([^/]+)$`,
+      ),
     );
     if (generatedImageMatch) {
       const generationId = generatedImageMatch[1];
@@ -81,7 +83,7 @@ export function createHttpHandler({
       });
     }
 
-    const a = url.pathname.match(new RegExp(`^${basePath}(.+)`));
+    const a = url.pathname.match(new RegExp(`^${config.basePath}(.+)`));
 
     const segmentString = a?.at(-1);
     if (segmentString == null)
