@@ -34,7 +34,6 @@
 
 ## Tasks
 
-- [ ] Improve Catalog UI
 - [ ] Add filesize limit to workspace property
 - [ ] Split stream route
 - [ ] Copy button
@@ -42,18 +41,19 @@
 - [ ] Webclip Node
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
-- [ ] Add setting button to title
-- [ ] API Middleware
-- [ ] API Auth
 - [ ] API Rate Limit
 - [ ] Add to do comment llmProviders property
 - [ ] Handling error in file upload
-- [ ] Undo/Redo for prompt editor
-- [ ] Telemetry
 
 
 ## Done
 
+- [x] Add setting button to title
+- [x] API Middleware
+- [x] API Auth
+- [x] Improve Catalog UI
+- [x] Undo/Redo for prompt editor
+- [x] Telemetry
 - [x] Toast UI
 - [x] Image File
 - [x] contentType to type
