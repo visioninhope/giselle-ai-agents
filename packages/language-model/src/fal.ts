@@ -83,9 +83,9 @@ const falStableDiffusion35Med: FalLanguageModel = {
 export const models = [
 	falFluxSchnell,
 	falFluxPro11,
-	falRecraft20b,
-	falRecraftv3,
-	falIdeogramV2Turbo,
+	// falRecraft20b,
+	// falRecraftv3,
+	// falIdeogramV2Turbo,
 	falStableDiffusion35Med,
 ];
 
