@@ -34,6 +34,8 @@
 
 ## Tasks
 
+- [ ] Rework biome config(create tools/biome and each package import it)
+- [ ] Refactoring generation logic(resolve duplication in generate-text and genrate-image)
 - [ ] Add filesize limit to workspace property
 - [ ] Split stream route
 - [ ] Copy button
