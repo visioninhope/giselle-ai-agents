@@ -23,12 +23,16 @@ describe("getImageGenerationModelProvider", () => {
 	});
 
 	test("should identify ideogram provider", () => {
-		const provider = getImageGenerationModelProvider("fal-ai/ideogram/v2/turbo");
+		const provider = getImageGenerationModelProvider(
+			"fal-ai/ideogram/v2/turbo",
+		);
 		expect(provider).toBe("ideogram");
 	});
 
 	test("should identify stable-diffusion provider", () => {
-		const provider = getImageGenerationModelProvider("fal-ai/stable-diffusion-3.5-medium");
+		const provider = getImageGenerationModelProvider(
+			"fal-ai/stable-diffusion-3.5-medium",
+		);
 		expect(provider).toBe("stable-diffusion");
 	});
 
