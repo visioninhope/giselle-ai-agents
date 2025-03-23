@@ -52,12 +52,6 @@
 - [ ] Telemetry
 
 
-## Backlog
-
-- [ ] OpenAI Assistant
-  - [ ] Migrate Vector store from Expired one
-  - [ ] Handling error in assistant
-
 ## Done
 
 - [x] Toast UI
