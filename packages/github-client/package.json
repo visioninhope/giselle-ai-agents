@@ -10,7 +10,8 @@
 		"clean": "rm -rf dist",
 		"check-types": "tsc --noEmit",
 		"update-schema": "gql-tada generate schema https://api.github.com/graphql --header \"Authorization: Bearer ${GITHUB_TOKEN}\"",
-		"generate-output": "gql-tada generate-output"
+		"generate-output": "gql-tada generate-output",
+		"format": "biome check --write ."
 	},
 	"exports": {
 		"./package.json": "./package.json",

@@ -8,7 +8,8 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist node_modules react"
+		"clean": "rm -rf .turbo dist node_modules react",
+		"format": "biome check --write ."
 	},
 	"files": ["dist/**/*", "react/dist/**/*"],
 	"exports": {
