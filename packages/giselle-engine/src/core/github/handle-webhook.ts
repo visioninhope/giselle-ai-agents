@@ -82,15 +82,15 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 			storage: args.context.storage,
 			repositoryNodeId: repository.nodeId,
 		});
-	const integrationPromises = (workspaceGitHubIntegrationRepositorySettings ?? [])
+	const integrationPromises = (
+		workspaceGitHubIntegrationRepositorySettings ?? []
+	)
 		.filter(
 			(workspaceGitHubIntegrationSetting) =>
 				workspaceGitHubIntegrationSetting.callsign === command?.callsign,
 		)
 		.map(async (workspaceGitHubIntegrationSetting) => {
-			if (
-				isIssueCommentCreatedEvent(args.github.payload, args.github.event)
-			) {
+			if (isIssueCommentCreatedEvent(args.github.payload, args.github.event)) {
 				await args.options?.reaction?.(
 					args.github.payload.repository.owner.login,
 					args.github.payload.repository.name,
@@ -222,10 +222,10 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					}
 				}
 			});
-			
+
 			return await Promise.all(responsePromises);
 		});
-	
+
 	// Execute all promises and flatten the result array
 	const results = await Promise.all(integrationPromises);
 	return results.flat();
