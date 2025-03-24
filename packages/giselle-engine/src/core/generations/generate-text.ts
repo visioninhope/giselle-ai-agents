@@ -81,20 +81,20 @@ export async function generateText(args: {
 		origin: args.generation.context.origin,
 	});
 
-	const result = await checkUsageLimits({
+	const usageLimitStatus = await checkUsageLimits({
 		workspaceId,
 		generation: args.generation,
 		fetchUsageLimitsFn: args.context.fetchUsageLimitsFn,
 	});
-	if (result.type === "error") {
+	if (usageLimitStatus.type === "error") {
 		const failedGeneration = {
 			...runningGeneration,
 			status: "failed",
 			failedAt: Date.now(),
 			error: {
-				name: result.error,
-				message: result.error,
-				dump: result,
+				name: usageLimitStatus.error,
+				message: usageLimitStatus.error,
+				dump: usageLimitStatus,
 			},
 		} satisfies FailedGeneration;
 		await Promise.all([
@@ -117,7 +117,7 @@ export async function generateText(args: {
 				},
 			}),
 		]);
-		throw new UsageLimitError(result.error);
+		throw new UsageLimitError(usageLimitStatus.error);
 	}
 
 	async function fileResolver(file: FileData) {
