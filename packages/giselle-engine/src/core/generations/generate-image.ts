@@ -25,6 +25,7 @@ import {
 	extractWorkspaceIdFromOrigin,
 	getGeneration,
 	getNodeGenerationIndexes,
+	handleAgentTimeConsumption,
 	setGeneratedImage,
 	setGeneration,
 	setGenerationIndex,
@@ -278,4 +279,10 @@ export async function generateImage(args: {
 			},
 		}),
 	]);
+
+	await handleAgentTimeConsumption({
+		workspaceId,
+		generation: completedGeneration,
+		onConsumeAgentTime: args.context.onConsumeAgentTime,
+	});
 }
