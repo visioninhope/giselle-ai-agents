@@ -30,7 +30,7 @@ export async function getUsageLimitsForTeam(
 }
 
 function agentTimeLimit(team: CurrentTeam): number {
-	const restrictedTeamIds = process.env.MODEL_USAGE_RESTRICTED_TEAM_IDS?.split(
+	const restrictedTeamIds = process.env.AGENT_TIME_RESTRICTED_TEAM_IDS?.split(
 		",",
 	)
 		.map((teamId) => (isTeamId(teamId) ? teamId : null))
