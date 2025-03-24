@@ -1,7 +1,7 @@
 import { db } from "@/drizzle";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
-import { fetchCurrentTeam } from "@/services/teams";
+import { fetchCurrentTeam, isProPlan, isInternalTeam } from "@/services/teams";
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { WorkspaceProvider } from "giselle-sdk/react";
 import { notFound } from "next/navigation";
@@ -41,6 +41,8 @@ export default async function Layout({
 			telemetry={{
 				metadata: {
 					example: "metadata",
+					isProPlan: isProPlan(currentTeam),
+					isInternalTeam: isInternalTeam(currentTeam),
 				},
 			}}
 		>
