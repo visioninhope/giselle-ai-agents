@@ -115,7 +115,6 @@ export async function generateText(args: {
 				},
 			}),
 		]);
-		// FIXME: error hanling on run system is not working properly now, so UI is not refreshed even if error happens
 		throw new UsageLimitError(result.error);
 	}
 
