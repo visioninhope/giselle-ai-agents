@@ -16,6 +16,7 @@ import type {
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { removeFile, uploadFile } from "./files";
 import {
+	type TelemetrySettings,
 	cancelGeneration,
 	generateImage,
 	generateText,
@@ -23,7 +24,6 @@ import {
 	getGeneration,
 	getNodeGenerations,
 	setGeneration,
-	type TelemetrySettings,
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
