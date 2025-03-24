@@ -82,105 +82,106 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 			storage: args.context.storage,
 			repositoryNodeId: repository.nodeId,
 		});
-	return await Promise.all(
-		(workspaceGitHubIntegrationRepositorySettings ?? [])
-			.filter(
-				(workspaceGitHubIntegrationSetting) =>
-					workspaceGitHubIntegrationSetting.callsign === command?.callsign,
-			)
-			.map(async (workspaceGitHubIntegrationSetting) => {
-				if (
-					isIssueCommentCreatedEvent(args.github.payload, args.github.event)
-				) {
-					await args.options?.reaction?.(
-						args.github.payload.repository.owner.login,
-						args.github.payload.repository.name,
-						args.github.payload.comment.id,
-					);
+	const integrationPromises = (workspaceGitHubIntegrationRepositorySettings ?? [])
+		.filter(
+			(workspaceGitHubIntegrationSetting) =>
+				workspaceGitHubIntegrationSetting.callsign === command?.callsign,
+		)
+		.map(async (workspaceGitHubIntegrationSetting) => {
+			if (
+				isIssueCommentCreatedEvent(args.github.payload, args.github.event)
+			) {
+				await args.options?.reaction?.(
+					args.github.payload.repository.owner.login,
+					args.github.payload.repository.name,
+					args.github.payload.comment.id,
+				);
+			}
+			const overrideNodes: OverrideNode[] = [];
+			const workspace = await getWorkspace({
+				context: args.context,
+				workspaceId: workspaceGitHubIntegrationSetting.workspaceId,
+			});
+			for (const payloadMap of workspaceGitHubIntegrationSetting.payloadMaps) {
+				const node = workspace.nodes.find(
+					(node) => node.id === payloadMap.nodeId,
+				);
+				if (node === undefined) {
+					continue;
 				}
-				const overrideNodes: OverrideNode[] = [];
-				const workspace = await getWorkspace({
-					context: args.context,
-					workspaceId: workspaceGitHubIntegrationSetting.workspaceId,
-				});
-				for (const payloadMap of workspaceGitHubIntegrationSetting.payloadMaps) {
-					const node = workspace.nodes.find(
-						(node) => node.id === payloadMap.nodeId,
-					);
-					if (node === undefined) {
-						continue;
-					}
-					const payloadValue = await getPayloadValue(
-						args.github.event,
-						args.github.payload,
-						payloadMap.payload,
-						command.content,
-						args.options?.pullRequestDiff,
-					);
-					switch (node.content.type) {
-						case "textGeneration":
-							overrideNodes.push({
-								id: node.id,
-								type: "action",
-								content: {
-									type: node.content.type,
-									prompt: `${payloadValue}`,
-								},
-							});
-							break;
-						case "imageGeneration":
-							overrideNodes.push({
-								id: node.id,
-								type: "action",
-								content: {
-									type: node.content.type,
-									prompt: `${payloadValue}`,
-								},
-							});
-							break;
-						case "file":
-							throw new Error("File nodes are not supported");
-						case "text":
-							overrideNodes.push({
-								id: node.id,
-								type: "variable",
-								content: {
-									type: node.content.type,
-									text: `${payloadValue}`,
-								},
-							});
-							break;
-						case "github":
-							throw new Error("GitHub nodes are not supported");
-						default: {
-							const _exhaustiveCheck: never = node.content;
-							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
-						}
+				const payloadValue = await getPayloadValue(
+					args.github.event,
+					args.github.payload,
+					payloadMap.payload,
+					command.content,
+					args.options?.pullRequestDiff,
+				);
+				switch (node.content.type) {
+					case "textGeneration":
+						overrideNodes.push({
+							id: node.id,
+							type: "action",
+							content: {
+								type: node.content.type,
+								prompt: `${payloadValue}`,
+							},
+						});
+						break;
+					case "imageGeneration":
+						overrideNodes.push({
+							id: node.id,
+							type: "action",
+							content: {
+								type: node.content.type,
+								prompt: `${payloadValue}`,
+							},
+						});
+						break;
+					case "file":
+						throw new Error("File nodes are not supported");
+					case "text":
+						overrideNodes.push({
+							id: node.id,
+							type: "variable",
+							content: {
+								type: node.content.type,
+								text: `${payloadValue}`,
+							},
+						});
+						break;
+					case "github":
+						throw new Error("GitHub nodes are not supported");
+					default: {
+						const _exhaustiveCheck: never = node.content;
+						throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
 					}
 				}
-				const workflows = workspace.editingWorkflows.filter((workflow) =>
-					workflow.jobs.some((job) =>
-						job.actions.some((action) =>
-							overrideNodes.some(
-								(overrideNode) =>
-									overrideNode.id === action.node.id ||
-									action.generationTemplate.sourceNodes.some(
-										(sourceNode) => sourceNode.id === overrideNode.id,
-									),
-							),
+			}
+			const workflows = workspace.editingWorkflows.filter((workflow) =>
+				workflow.jobs.some((job) =>
+					job.actions.some((action) =>
+						overrideNodes.some(
+							(overrideNode) =>
+								overrideNode.id === action.node.id ||
+								action.generationTemplate.sourceNodes.some(
+									(sourceNode) => sourceNode.id === overrideNode.id,
+								),
 						),
 					),
-				);
-				const results = await Promise.all(
-					workflows.map((workflow) =>
-						runApi({
-							context: args.context,
-							workspaceId: workspace.id,
-							workflowId: workflow.id,
-							overrideNodes,
-						}),
-					),
-				);
+				),
+			);
+			const results = await Promise.all(
+				workflows.map((workflow) =>
+					runApi({
+						context: args.context,
+						workspaceId: workspace.id,
+						workflowId: workflow.id,
+						overrideNodes,
+					}),
+				),
+			);
+
+			const responsePromises = results.map(async (result) => {
 				switch (workspaceGitHubIntegrationSetting.nextAction) {
 					case "github.pull_request_comment.create":
 						return {
@@ -196,7 +197,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 									"github.pull_request_comment.pull_request.number",
 								),
 							},
-							content: results.join("\n"),
+							content: result,
 						} satisfies PullRequestCommentCreateAction;
 					case "github.issue_comment.create":
 						return {
@@ -212,7 +213,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 									"github.issue_comment.issue.number",
 								),
 							},
-							content: results.join("\n"),
+							content: result,
 						} satisfies IssueCommentCreateAction;
 					default: {
 						const _exhaustiveCheck: never =
@@ -220,8 +221,14 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 						throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
 					}
 				}
-			}),
-	);
+			});
+			
+			return await Promise.all(responsePromises);
+		});
+	
+	// Execute all promises and flatten the result array
+	const results = await Promise.all(integrationPromises);
+	return results.flat();
 }
 
 function isIssueCommentCreatedEvent(
