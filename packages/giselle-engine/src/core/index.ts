@@ -138,3 +138,5 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 }
 
 export type GiselleEngine = ReturnType<typeof GiselleEngine>;
+
+export * from "./error";

@@ -16,6 +16,7 @@ import type {
 	UrlSource,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import {
@@ -115,7 +116,7 @@ export async function generateText(args: {
 			}),
 		]);
 		// FIXME: error hanling on run system is not working properly now, so UI is not refreshed even if error happens
-		throw new Error(result.error);
+		throw new UsageLimitError(result.error);
 	}
 
 	async function fileResolver(file: FileData) {

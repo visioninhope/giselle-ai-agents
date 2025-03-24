@@ -1,5 +1,6 @@
-import { type agents, db, teamMemberships, users } from "@/drizzle";
+import { db, teamMemberships, users } from "@/drizzle";
 import { type EmailRecipient, sendEmail } from "@/services/external/email";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import { createAppAuth } from "@octokit/auth-app";
 import { Octokit } from "@octokit/core";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
@@ -54,9 +55,15 @@ export async function createOctokit(installationId: number | string) {
 
 // Notify workflow error to team members
 export async function notifyWorkflowError(
-	agent: typeof agents.$inferSelect,
+	workspaceId: WorkspaceId,
 	error: string,
 ) {
+	const agent = await db.query.agents.findFirst({
+		where: (agents, { eq }) => eq(agents.workspaceId, workspaceId),
+	});
+	if (!agent) {
+		throw new Error("Agent not found");
+	}
 	const teamMembers = await db
 		.select({ userDisplayName: users.displayName, userEmail: users.email })
 		.from(teamMemberships)
