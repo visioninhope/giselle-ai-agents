@@ -6,6 +6,40 @@ import { Octokit } from "@octokit/core";
 import type { EmitterWebhookEvent } from "@octokit/webhooks";
 import { eq } from "drizzle-orm";
 
+export class WebhookPayloadError extends Error {
+	constructor(message: string) {
+		super(message);
+		this.name = "PayloadError";
+		Object.setPrototypeOf(this, WebhookPayloadError.prototype);
+	}
+}
+
+interface GitHubClientFactory {
+	createClient(installationId: number): Promise<Octokit>;
+}
+
+export const defaultGitHubClientFactory: GitHubClientFactory = {
+	createClient: async (installationId: number) => {
+		return await createOctokit(installationId);
+	},
+};
+
+export const mockGitHubClientFactory: GitHubClientFactory = {
+	createClient: async (installationId: number) =>
+		({
+			// biome-ignore lint/suspicious/noExplicitAny: mock
+			request: async (route: string, params?: any) => {
+				console.log("Mock GitHub API call:", { route, params });
+				return {
+					data: {
+						id: "mock-comment-id",
+						body: params?.body,
+					},
+				};
+			},
+		}) as Octokit,
+};
+
 export function assertIssueCommentEvent(
 	payload: unknown,
 ): asserts payload is EmitterWebhookEvent<"issue_comment"> {

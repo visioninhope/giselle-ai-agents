@@ -8,8 +8,8 @@ import {
 	WebhookPayloadError,
 	defaultGitHubClientFactory,
 	mockGitHubClientFactory,
-} from "./handle_event";
-import { notifyWorkflowError } from "./utils";
+	notifyWorkflowError,
+} from "./utils";
 
 // The maximum duration of server actions on this page is extended to 800 seconds through enabled fluid compute.
 // https://vercel.com/docs/functions/runtimes#max-duration
