@@ -15,6 +15,7 @@ import {
 	type TextGenerationNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { hasTierAccess, languageModels } from "@giselle-sdk/language-model";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
@@ -434,53 +435,82 @@ export async function getRedirectedUrlAndTitle(url: string) {
  * Calculates and records the time consumed by the agent
  */
 export async function handleAgentTimeConsumption(args: {
-	storage: GiselleEngineContext["storage"];
+	workspaceId: WorkspaceId;
 	generation: CompletedGeneration;
-	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
-	onConsumeAgentTime: NonNullable<GiselleEngineContext["onConsumeAgentTime"]>;
+	onConsumeAgentTime?: NonNullable<GiselleEngineContext["onConsumeAgentTime"]>;
 }) {
-	const workspaceId = await extractWorkspaceIdFromOrigin({
-		storage: args.storage,
-		origin: args.origin,
-	});
+	const { workspaceId, generation, onConsumeAgentTime } = args;
 
-	const totalDurationMs =
-		args.generation.completedAt - args.generation.startedAt;
-	await args.onConsumeAgentTime(
+	if (onConsumeAgentTime == null) {
+		return;
+	}
+	const totalDurationMs = generation.completedAt - generation.startedAt;
+	await onConsumeAgentTime(
 		workspaceId,
-		args.generation.startedAt,
-		args.generation.completedAt,
+		generation.startedAt,
+		generation.completedAt,
 		totalDurationMs,
 	);
 }
 
+type CheckUsageLimitsResult = { type: "ok" } | { type: "error"; error: string };
+
 /**
  * Check usage limits for the workspace
  */
-export async function fetchUsageLimits(args: {
-	storage: GiselleEngineContext["storage"];
-	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
-	fetchUsageLimitsFn: NonNullable<GiselleEngineContext["fetchUsageLimitsFn"]>;
-}) {
-	const workspaceId = await extractWorkspaceIdFromOrigin({
-		storage: args.storage,
-		origin: args.origin,
-	});
+export async function checkUsageLimits(args: {
+	workspaceId: WorkspaceId;
+	generation: Generation;
+	fetchUsageLimitsFn?: NonNullable<GiselleEngineContext["fetchUsageLimitsFn"]>;
+}): Promise<CheckUsageLimitsResult> {
+	const { workspaceId, generation, fetchUsageLimitsFn } = args;
+	if (fetchUsageLimitsFn == null) {
+		return { type: "ok" };
+	}
+	const usageLimits = await fetchUsageLimitsFn(workspaceId);
 
-	return await args.fetchUsageLimitsFn(workspaceId);
+	const actionNode = generation.context.actionNode;
+	const languageModel = languageModels.find(
+		(model) => model.id === actionNode.content.llm.id,
+	);
+	if (languageModel === undefined) {
+		return {
+			type: "error",
+			error: "Language model not found",
+		};
+	}
+	if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
+		return {
+			type: "error",
+			error:
+				"Access denied: insufficient tier for the requested language model.",
+		};
+	}
+
+	const agentTimeLimits = usageLimits.resourceLimits.agentTime;
+	if (agentTimeLimits.used >= agentTimeLimits.limit) {
+		return {
+			type: "error",
+			error:
+				"Access denied: insufficient agent time for the requested generation.",
+		};
+	}
+	return { type: "ok" };
 }
 
-async function extractWorkspaceIdFromOrigin(args: {
+export async function extractWorkspaceIdFromOrigin(args: {
 	storage: GiselleEngineContext["storage"];
 	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
 }) {
-	if (args.origin.type === "workspace") {
-		return args.origin.id;
+	const { origin, storage } = args;
+
+	if (origin.type === "workspace") {
+		return origin.id;
 	}
 
 	const run = await getRun({
-		storage: args.storage,
-		runId: args.origin.id,
+		storage: storage,
+		runId: origin.id,
 	});
 
 	if (run == null || !("workspaceId" in run)) {
