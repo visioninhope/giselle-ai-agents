@@ -1,5 +1,5 @@
 {
-	"name": "@giselle-sdk/generation-runner",
+	"name": "@giselle-sdk/telemetry",
 	"version": "0.0.0",
 	"private": true,
 	"main": "./dist/index.js",
@@ -8,24 +8,20 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf dist && rm -rf test/dist",
-		"format": "biome check --write ."
+		"format": "biome format --write ."
 	},
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
 			"types": "./dist/index.d.ts",
 			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"default": "./dist/index.js"
+			"require": "./dist/index.js"
 		},
 		"./react": {
 			"types": "./react/dist/index.d.ts",
 			"import": "./react/dist/index.mjs",
-			"require": "./react/dist/index.js",
-			"default": "./react/dist/index.js"
-		},
-		"./react-internal": "./src/react/index.ts"
+			"require": "./react/dist/index.js"
+		}
 	},
 	"devDependencies": {
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
@@ -33,12 +29,7 @@
 		"tsup": "catalog:"
 	},
 	"dependencies": {
-		"@ai-sdk/react": "catalog:",
-		"@giselle-sdk/data-type": "workspace:^",
-		"@giselle-sdk/giselle-engine": "workspace:^",
-		"@giselle-sdk/telemetry": "workspace:^",
 		"ai": "catalog:",
-		"react": "catalog:",
-		"zod": "catalog:"
+		"react": "catalog:"
 	}
 }
