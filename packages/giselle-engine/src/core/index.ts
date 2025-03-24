@@ -23,6 +23,7 @@ import {
 	getGeneration,
 	getNodeGenerations,
 	setGeneration,
+	type TelemetrySettings,
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
@@ -58,10 +59,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		getLanguageModelProviders: async () => {
 			return await getLanguageModelProviders({ context });
 		},
-		generateText: async (generation: QueuedGeneration) => {
+		generateText: async (
+			generation: QueuedGeneration,
+			telemetry?: TelemetrySettings,
+		) => {
 			return await generateText({
 				context,
 				generation,
+				telemetry,
 			});
 		},
 		getGeneration: async (generationId: GenerationId) => {
