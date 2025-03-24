@@ -36,6 +36,7 @@ interface StartGenerationOptions {
 	onGenerationStarted?: (generation: RunningGeneration) => void;
 	onGenerationCompleted?: (generation: CompletedGeneration) => void;
 	onGenerationCancelled?: (generation: CancelledGeneration) => void;
+	onGenerationFailed?: (generation: FailedGeneration) => void;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
 export type StartGeneration = (
@@ -198,6 +199,7 @@ export function GenerationRunnerSystemProvider({
 				onComplete: options?.onGenerationCompleted,
 				onUpdateMessages: options?.onUpdateMessages,
 				onCancel: options?.onGenerationCancelled,
+				onError: options?.onGenerationFailed,
 			});
 		},
 		[waitForGeneration],

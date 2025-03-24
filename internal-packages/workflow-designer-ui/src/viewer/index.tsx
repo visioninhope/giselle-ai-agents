@@ -7,7 +7,7 @@ import {
 	useRunController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import { CircleCheckIcon, CircleSlashIcon } from "lucide-react";
+import { CircleCheckIcon, CircleSlashIcon, XCircleIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
 import { useUsageLimitsReached } from "../hooks/usage-limits";
@@ -153,7 +153,12 @@ export function Viewer() {
 																	/>
 																);
 															case "failed":
-																return <div key={generation.id}>failed</div>;
+																return (
+																	<XCircleIcon
+																		className="size-[22px] text-error-900 shrink-0"
+																		key={generation.id}
+																	/>
+																);
 															case "cancelled":
 																return (
 																	<CircleSlashIcon
