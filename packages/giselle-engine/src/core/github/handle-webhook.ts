@@ -129,6 +129,16 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 								},
 							});
 							break;
+						case "imageGeneration":
+							overrideNodes.push({
+								id: node.id,
+								type: "action",
+								content: {
+									type: node.content.type,
+									prompt: `${payloadValue}`,
+								},
+							});
+							break;
 						case "file":
 							throw new Error("File nodes are not supported");
 						case "text":

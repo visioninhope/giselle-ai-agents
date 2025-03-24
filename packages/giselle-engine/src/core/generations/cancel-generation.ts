@@ -31,8 +31,7 @@ export async function cancelGeneration(args: {
 				nodeId: generation.context.actionNode.id,
 				status: "cancelled",
 				createdAt: generation.createdAt,
-				/** @todo use generation.ququedAt */
-				ququedAt: Date.now(),
+				queuedAt: Date.now(),
 				cancelledAt: Date.now(),
 			},
 		}),

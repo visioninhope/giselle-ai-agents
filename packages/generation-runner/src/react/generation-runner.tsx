@@ -1,12 +1,6 @@
 import { useChat } from "@ai-sdk/react";
-import type {
-	CancelledGeneration,
-	CompletedGeneration,
-	FailedGeneration,
-	Generation,
-	QueuedGeneration,
-	RunningGeneration,
-} from "@giselle-sdk/data-type";
+import { type Generation, isQueuedGeneration } from "@giselle-sdk/data-type";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useEffect, useRef } from "react";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
 
@@ -31,9 +25,10 @@ export function GenerationRunner({
 	switch (generation.context.actionNode.content.type) {
 		case "textGeneration":
 			return <TextGenerationRunner generation={generation} />;
+		case "imageGeneration":
+			return <ImageGenerationRunner generation={generation} />;
 		default: {
-			const _exhaustiveCheck: never =
-				generation.context.actionNode.content.type;
+			const _exhaustiveCheck: never = generation.context.actionNode.content;
 			return _exhaustiveCheck;
 		}
 	}
@@ -67,12 +62,7 @@ function TextGenerationRunner({
 function CompletionRunner({
 	generation,
 }: {
-	generation:
-		| QueuedGeneration
-		| RunningGeneration
-		| CompletedGeneration
-		| FailedGeneration
-		| CancelledGeneration;
+	generation: Generation;
 }) {
 	const {
 		generateTextApi,
@@ -113,6 +103,36 @@ function CompletionRunner({
 				},
 			},
 		);
+	});
+	return null;
+}
+
+function ImageGenerationRunner({
+	generation,
+}: {
+	generation: Generation;
+}) {
+	const {
+		updateGenerationStatusToComplete,
+		updateGenerationStatusToRunning,
+		addStopHandler,
+	} = useGenerationRunnerSystem();
+	const client = useGiselleEngine();
+	useOnce(() => {
+		if (!isQueuedGeneration(generation)) {
+			return;
+		}
+		addStopHandler(generation.id, stop);
+		client.setGeneration({ generation }).then(() => {
+			updateGenerationStatusToRunning(generation.id);
+			client
+				.generateImage({
+					generation,
+				})
+				.then(() => {
+					updateGenerationStatusToComplete(generation.id);
+				});
+		});
 	});
 	return null;
 }

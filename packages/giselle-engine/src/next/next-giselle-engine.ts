@@ -1,3 +1,4 @@
+import { GenerationId } from "@giselle-sdk/data-type";
 import { after } from "next/server";
 import { GiselleEngine, type GiselleEngineConfig } from "../core";
 import {
@@ -35,7 +36,7 @@ async function getBody(
 	}
 }
 
-function createHttpHandler({
+export function createHttpHandler({
 	giselleEngine,
 	config,
 }: {
@@ -60,6 +61,28 @@ function createHttpHandler({
 	return async function httpHandler(request: Request) {
 		const url = new URL(request.url);
 		const pathname = url.pathname;
+
+		// Check if pathname matches /generations/{generationId}/generated-images/{filename}
+		const generatedImageMatch = pathname.match(
+			new RegExp(
+				`^${config.basePath}/generations/([^/]+)/generated-images/([^/]+)$`,
+			),
+		);
+		if (generatedImageMatch) {
+			const generationId = generatedImageMatch[1];
+			const filename = generatedImageMatch[2];
+			const file = await giselleEngine.getGeneratedImage(
+				GenerationId.parse(generationId),
+				filename,
+			);
+			return new Response(file, {
+				headers: {
+					"Content-Type": file.type,
+					"Content-Disposition": `inline; filename="${file.name}"`,
+				},
+			});
+		}
+
 		const a = url.pathname.match(new RegExp(`^${config.basePath}(.+)`));
 
 		const segmentString = a?.at(-1);

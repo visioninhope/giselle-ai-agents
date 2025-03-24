@@ -1,12 +1,19 @@
 import { GiselleLogo } from "@/components/giselle-logo";
+import { settingsV2Flag } from "@/flags";
 import { UserButton } from "@/services/accounts/components";
 import TeamCreation from "@/services/teams/components/team-creation";
 import { TeamSelection } from "@/services/teams/components/team-selection";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { Nav } from "./nav";
+import LayoutV2 from "./v2/layout";
 
 export default async function Layout({ children }: { children: ReactNode }) {
+	const settingsV2Mode = await settingsV2Flag();
+	if (settingsV2Mode) {
+		return <LayoutV2>{children}</LayoutV2>;
+	}
+
 	return (
 		<div className="h-screen overflow-y-hidden bg-black-100 divide-y divide-black-80 flex flex-col">
 			<header className="h-[60px] flex items-center px-[24px] justify-between">

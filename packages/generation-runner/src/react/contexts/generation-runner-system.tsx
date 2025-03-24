@@ -11,6 +11,10 @@ import {
 	type NodeId,
 	type QueuedGeneration,
 	type RunningGeneration,
+	isCancelledGeneration,
+	isCompletedGeneration,
+	isFailedGeneration,
+	isRunningGeneration,
 } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -137,25 +141,25 @@ export function GenerationRunnerSystemProvider({
 				const generation = generationListener.current[generationId];
 				if (status !== generation.status) {
 					status = generation.status;
-					if (generation.status === "running") {
+					if (isRunningGeneration(generation)) {
 						options?.onStart?.(generation);
 					}
-					if (generation.status === "completed") {
+					if (isCompletedGeneration(generation)) {
 						options?.onComplete?.(generation);
 						return generation;
 					}
-					if (generation.status === "failed") {
+					if (isFailedGeneration(generation)) {
 						options?.onError?.(generation);
 						return generation;
 					}
-					if (generation.status === "cancelled") {
+					if (isCancelledGeneration(generation)) {
 						options?.onCancel?.(generation);
 						return generation;
 					}
 				}
 				if (
-					!arrayEquals(messages, generation.messages) &&
-					generation.status === "running"
+					isRunningGeneration(generation) &&
+					!arrayEquals(messages, generation.messages)
 				) {
 					options?.onUpdateMessages?.(generation);
 				}
@@ -184,7 +188,7 @@ export function GenerationRunnerSystemProvider({
 			const queuedGeneration = {
 				...createdGeneration,
 				status: "queued",
-				ququedAt: Date.now(),
+				queuedAt: Date.now(),
 			} satisfies QueuedGeneration;
 			options.onGenerationQueued?.(queuedGeneration);
 			setGenerations((prev) =>
