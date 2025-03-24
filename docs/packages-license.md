@@ -12931,7 +12931,7 @@ Unknown manually approved
 
 
 <a name="typescript"></a>
-### typescript v5.6.2
+### typescript v5.7.3
 #### 
 
 ##### Paths
