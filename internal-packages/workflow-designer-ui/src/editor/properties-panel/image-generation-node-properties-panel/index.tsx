@@ -8,6 +8,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useUsageLimitsReached } from "../../../hooks/usage-limits";
 import { NodeIcon } from "../../../icons/node";
 import { Button } from "../../../ui/button";
+import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import {
 	PropertiesPanelContent,
@@ -39,11 +40,13 @@ export function ImageGenerationNodePropertiesPanel({
 	});
 	const { all: connectedSources } = useConnectedSources(node);
 	const usageLimitsReached = useUsageLimitsReached();
+	const { error } = useToasts();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	const generateText = useCallback(() => {
 		if (usageLimitsReached) {
+			error("Please upgrade your plan to continue using this feature.");
 			return;
 		}
 
@@ -57,7 +60,14 @@ export function ImageGenerationNodePropertiesPanel({
 				(connectedSource) => connectedSource.node,
 			),
 		});
-	}, [connectedSources, data.id, node, startGeneration, usageLimitsReached]);
+	}, [
+		connectedSources,
+		data.id,
+		node,
+		startGeneration,
+		usageLimitsReached,
+		error,
+	]);
 
 	return (
 		<PropertiesPanelRoot>
