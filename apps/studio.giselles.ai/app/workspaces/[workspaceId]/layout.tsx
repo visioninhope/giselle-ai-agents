@@ -37,10 +37,8 @@ export default async function Layout({
 				github: gitHubIntegrationState,
 			}}
 			usageLimits={usageLimits}
-			// following settings is test. We'll replace for production.
 			telemetry={{
 				metadata: {
-					example: "metadata",
 					isProPlan: isProPlan(currentTeam),
 					isInternalTeam: isInternalTeam(currentTeam),
 				},
