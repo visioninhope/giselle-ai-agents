@@ -601,9 +601,13 @@ export async function getGeneratedImage(params: {
 	generation: Generation;
 	filename: string;
 }) {
-	const image = await params.storage.getItemRaw(
+	let image = await params.storage.getItemRaw(
 		generatedImagePath(params.generation, params.filename),
 	);
+	if (image instanceof ArrayBuffer) {
+		image = new Uint8Array(image);
+	}
+
 	assertUint8Array(image);
 	return image;
 }
