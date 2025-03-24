@@ -1,25 +1,35 @@
 "use client";
 
-import { fetchUserTeams } from "@/services/teams/fetch-user-teams";
 import { Search } from "lucide-react";
 import { useState } from "react";
 
-export default async function UserTeam() {
-	const allTeams = await fetchUserTeams();
-	const [teamName, setTeamName] = useState();
+export default function UserTeam({
+	teams,
+}: { teams: { id: string; name: string }[] }) {
+	const [teamName, setTeamName] = useState("");
+
+	const handleChangeTeamName = (e: React.ChangeEvent<HTMLInputElement>) => {
+		setTeamName(e.target.value);
+	};
+
+	const filteredTeams = teams.filter((team) =>
+		team.name.toLowerCase().includes(teamName.toLowerCase()),
+	);
 
 	return (
 		<>
 			<div className="flex items-center gap-x-[11px] py-2 px-3 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20">
 				<Search className="size-6 text-black-400" />
 				<input
+					onChange={handleChangeTeamName}
 					type="text"
+					defaultValue={teamName}
 					placeholder="Search for a team..."
 					className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400"
 				/>
 			</div>
 			<div className="border-[0.5px] border-black-400 rounded-[8px] divide-y divide-black-400">
-				{allTeams.map((team) => (
+				{filteredTeams.map((team) => (
 					<UserTeamItem key={team.id} teamName={team.name} />
 				))}
 			</div>
