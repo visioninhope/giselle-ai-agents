@@ -1,10 +1,13 @@
-import type {
-	CancelledGeneration,
-	CompletedGeneration,
-	Generation,
-	NodeId,
-	RunningGeneration,
+import {
+	type CancelledGeneration,
+	type CompletedGeneration,
+	type Generation,
+	type NodeId,
+	type RunningGeneration,
+	isCompletedGeneration,
+	isFailedGeneration,
 } from "@giselle-sdk/data-type";
+import { useGiselleEngine } from "giselle-sdk/react";
 import { useMemo } from "react";
 import { WilliIcon } from "../icons";
 import { MemoizedMarkdown } from "./memoized-markdown";
@@ -23,13 +26,15 @@ export function GenerationView({
 }: {
 	generation: Generation;
 }) {
+	const client = useGiselleEngine();
 	const generatedMessages = useMemo(
 		() => generation.messages?.filter((m) => m.role === "assistant") ?? [],
 		[generation],
 	);
-	if (generation.status === "failed") {
+	if (isFailedGeneration(generation)) {
 		return generation.error.message;
 	}
+
 	if (
 		generation.status !== "running" &&
 		generation.status !== "completed" &&
@@ -42,7 +47,25 @@ export function GenerationView({
 		);
 	}
 	return (
-		<div>
+		<>
+			{isCompletedGeneration(generation) &&
+				generation.outputs.map((output) => {
+					if (output.type !== "generated-image") {
+						return null;
+					}
+					return (
+						<div key={output.outputId} className="h-full flex gap-[12px]">
+							{output.contents.map((content) => (
+								<img
+									src={`${client.basePath}/${content.pathname}`}
+									alt="generated file"
+									key={content.filename}
+									className="h-full"
+								/>
+							))}
+						</div>
+					);
+				})}
 			{generatedMessages.map((message) => (
 				<div key={message.id}>
 					{message.parts?.map((part) => {
@@ -58,13 +81,7 @@ export function GenerationView({
 								);
 							case "tool-invocation":
 								/** @todo Tool invocation */
-								return (
-									<ToolBlock
-										key={part.toolInvocation.toolCallId}
-										generation={generation}
-										contextNodeId={part.toolInvocation.args.contextNodeId}
-									/>
-								);
+								return null;
 							case "source":
 								/** @todo Source */
 								return null;
@@ -82,7 +99,7 @@ export function GenerationView({
 						<Spinner />
 					</div>
 				)}
-		</div>
+		</>
 	);
 }
 

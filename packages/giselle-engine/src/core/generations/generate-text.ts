@@ -2,18 +2,20 @@ import { anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
-import type {
-	CompletedGeneration,
-	FailedGeneration,
-	FileData,
-	GenerationOutput,
-	LanguageModelData,
-	NodeId,
-	Output,
-	OutputId,
-	QueuedGeneration,
-	RunningGeneration,
-	UrlSource,
+import {
+	type CompletedGeneration,
+	type FailedGeneration,
+	type FileData,
+	type GenerationOutput,
+	type NodeId,
+	type Output,
+	type OutputId,
+	type QueuedGeneration,
+	type RunningGeneration,
+	type TextGenerationLanguageModelData,
+	type UrlSource,
+	isCompletedGeneration,
+	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { filePath } from "../files/utils";
@@ -33,12 +35,14 @@ export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {
+	const actionNode = args.generation.context.actionNode;
+	if (!isTextGenerationNode(actionNode)) {
+		throw new Error("Invalid generation type");
+	}
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
 		messages: [],
-		ququedAt: Date.now(),
-		requestedAt: Date.now(),
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
 
@@ -63,8 +67,7 @@ export async function generateText(args: {
 				nodeId: runningGeneration.context.actionNode.id,
 				status: "running",
 				createdAt: runningGeneration.createdAt,
-				ququedAt: runningGeneration.ququedAt,
-				requestedAt: runningGeneration.requestedAt,
+				queuedAt: runningGeneration.queuedAt,
 				startedAt: runningGeneration.startedAt,
 			},
 		}),
@@ -100,7 +103,7 @@ export async function generateText(args: {
 			storage: args.context.storage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 		});
-		if (generation?.status !== "completed") {
+		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
 		}
 		let output: Output | undefined;
@@ -139,14 +142,14 @@ export async function generateText(args: {
 		}
 	}
 	const messages = await buildMessageObject(
-		runningGeneration.context.actionNode,
+		actionNode,
 		runningGeneration.context.sourceNodes,
 		fileResolver,
 		generationContentResolver,
 	);
 
 	const streamTextResult = streamText({
-		model: generationModel(runningGeneration.context.actionNode.content.llm),
+		model: generationModel(actionNode.content.llm),
 		messages,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {
@@ -174,8 +177,7 @@ export async function generateText(args: {
 							nodeId: failedGeneration.context.actionNode.id,
 							status: "failed",
 							createdAt: failedGeneration.createdAt,
-							ququedAt: failedGeneration.ququedAt,
-							requestedAt: failedGeneration.requestedAt,
+							queuedAt: failedGeneration.queuedAt,
 							startedAt: failedGeneration.startedAt,
 							failedAt: failedGeneration.failedAt,
 						},
@@ -258,8 +260,7 @@ export async function generateText(args: {
 						nodeId: completedGeneration.context.actionNode.id,
 						status: "completed",
 						createdAt: completedGeneration.createdAt,
-						ququedAt: completedGeneration.ququedAt,
-						requestedAt: completedGeneration.requestedAt,
+						queuedAt: completedGeneration.queuedAt,
 						startedAt: completedGeneration.startedAt,
 						completedAt: completedGeneration.completedAt,
 					},
@@ -283,7 +284,7 @@ export async function generateText(args: {
 	return streamTextResult;
 }
 
-function generationModel(languageModel: LanguageModelData) {
+function generationModel(languageModel: TextGenerationLanguageModelData) {
 	const llmProvider = languageModel.provider;
 	switch (llmProvider) {
 		case "anthropic": {

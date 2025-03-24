@@ -1,6 +1,7 @@
 import {
 	CreatedRun,
 	FileId,
+	Generation,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
@@ -181,6 +182,22 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				const result = await giselleEngine.runApi(input);
 				return new Response(result);
+			},
+		}),
+	generateImage: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ generation: QueuedGeneration }),
+			handler: async ({ input }) => {
+				await giselleEngine.generateImage(input.generation);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	setGeneration: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ generation: Generation }),
+			handler: async ({ input }) => {
+				await giselleEngine.setGeneration(input.generation);
+				return new Response(null, { status: 204 });
 			},
 		}),
 } as const;

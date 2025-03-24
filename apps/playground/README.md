@@ -34,7 +34,8 @@
 
 ## Tasks
 
-- [ ] Improve Catalog UI
+- [ ] Rework biome config(create tools/biome and each package import it)
+- [ ] Refactoring generation logic(resolve duplication in generate-text and genrate-image)
 - [ ] Add filesize limit to workspace property
 - [ ] Split stream route
 - [ ] Copy button
@@ -42,24 +43,19 @@
 - [ ] Webclip Node
 - [ ] Split create generation and start generation
 - [ ] Rework selected node design
-- [ ] Add setting button to title
-- [ ] API Middleware
-- [ ] API Auth
 - [ ] API Rate Limit
 - [ ] Add to do comment llmProviders property
 - [ ] Handling error in file upload
-- [ ] Undo/Redo for prompt editor
-- [ ] Telemetry
 
-
-## Backlog
-
-- [ ] OpenAI Assistant
-  - [ ] Migrate Vector store from Expired one
-  - [ ] Handling error in assistant
 
 ## Done
 
+- [x] Add setting button to title
+- [x] API Middleware
+- [x] API Auth
+- [x] Improve Catalog UI
+- [x] Undo/Redo for prompt editor
+- [x] Telemetry
 - [x] Toast UI
 - [x] Image File
 - [x] contentType to type

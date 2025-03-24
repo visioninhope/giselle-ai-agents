@@ -2,8 +2,8 @@
 
 
 ## Summary
-* 1019 MIT
-* 104 Apache 2.0
+* 1020 MIT
+* 105 Apache 2.0
 * 57 ISC
 * 34 New BSD
 * 16 Simplified BSD
@@ -54,6 +54,17 @@
 
 <a name="@ai-sdk/anthropic"></a>
 ### @ai-sdk/anthropic v1.0.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@ai-sdk/fal"></a>
+### @ai-sdk/fal v0.0.9
 #### 
 
 ##### Paths
@@ -12920,7 +12931,7 @@ Unknown manually approved
 
 
 <a name="typescript"></a>
-### typescript v5.6.2
+### typescript v5.7.3
 #### 
 
 ##### Paths

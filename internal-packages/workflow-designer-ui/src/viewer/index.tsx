@@ -151,7 +151,8 @@ export function Viewer() {
 																	/>
 																);
 															default: {
-																const _exhaustiveCheck: never = generation;
+																const _exhaustiveCheck: never =
+																	generation.status;
 																throw new Error(
 																	`Unhandled status: ${_exhaustiveCheck}`,
 																);

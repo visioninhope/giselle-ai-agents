@@ -1,6 +1,7 @@
 import type {
 	CreatedRun,
 	FileId,
+	Generation,
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
@@ -16,9 +17,12 @@ import { getLanguageModelProviders } from "./configurations/get-language-model-p
 import { removeFile, uploadFile } from "./files";
 import {
 	cancelGeneration,
+	generateImage,
 	generateText,
+	getGeneratedImage,
 	getGeneration,
 	getNodeGenerations,
+	setGeneration,
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
@@ -132,6 +136,25 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			options?: HandleGitHubWebhookOptions;
 		}) => {
 			return await handleWebhook({ context, github: args, options });
+		},
+		generateImage: async (generation: QueuedGeneration) => {
+			return await generateImage({
+				context,
+				generation,
+			});
+		},
+		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
+			return await getGeneratedImage({
+				context,
+				generationId,
+				filename,
+			});
+		},
+		setGeneration: async (generation: Generation) => {
+			return await setGeneration({
+				context,
+				generation,
+			});
 		},
 	};
 }

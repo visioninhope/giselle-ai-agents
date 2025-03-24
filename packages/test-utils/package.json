@@ -8,7 +8,8 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist node_modules"
+		"clean": "rm -rf .turbo dist node_modules",
+		"format": "biome check --write ."
 	},
 	"exports": {
 		"./package.json": "./package.json",

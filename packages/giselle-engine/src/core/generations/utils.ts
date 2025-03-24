@@ -7,6 +7,7 @@ import {
 	type GenerationId,
 	GenerationIndex,
 	type GenerationOrigin,
+	type ImageGenerationNode,
 	type Node,
 	NodeGenerationIndex,
 	NodeId,
@@ -16,7 +17,13 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
-import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
+import type {
+	CoreMessage,
+	DataContent,
+	FilePart,
+	Experimental_GeneratedImage as GeneratedImage,
+	ImagePart,
+} from "ai";
 import type { Storage } from "unstorage";
 import { getRun } from "../runs/utils";
 import type { GiselleEngineContext } from "../types";
@@ -39,14 +46,22 @@ export async function buildMessageObject(
 	switch (node.content.type) {
 		case "textGeneration": {
 			return await buildGenerationMessageForTextGeneration(
-				node,
+				node as TextGenerationNode,
+				contextNodes,
+				fileResolver,
+				textGenerationResolver,
+			);
+		}
+		case "imageGeneration": {
+			return await buildGenerationMessageForImageGeneration(
+				node as ImageGenerationNode,
 				contextNodes,
 				fileResolver,
 				textGenerationResolver,
 			);
 		}
 		default: {
-			const _exhaustiveCheck: never = node.content.type;
+			const _exhaustiveCheck: never = node.content;
 			throw new Error(`Unhandled content type: ${_exhaustiveCheck}`);
 		}
 	}
@@ -462,4 +477,191 @@ export async function handleAgentTimeConsumption(args: {
 		args.generation.completedAt,
 		totalDurationMs,
 	);
+}
+
+async function buildGenerationMessageForImageGeneration(
+	node: ImageGenerationNode,
+	contextNodes: Node[],
+	fileResolver: (file: FileData) => Promise<DataContent>,
+	textGenerationResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>,
+): Promise<CoreMessage[]> {
+	const prompt = node.content.prompt;
+	if (prompt === undefined) {
+		throw new Error("Prompt cannot be empty");
+	}
+
+	let userMessage = prompt;
+
+	if (isJsonContent(prompt)) {
+		userMessage = jsonContentToText(JSON.parse(prompt));
+	}
+
+	const pattern = /\{\{(nd-[a-zA-Z0-9]+):(otp-[a-zA-Z0-9]+)\}\}/g;
+	const sourceKeywords = [...userMessage.matchAll(pattern)].map((match) => ({
+		nodeId: NodeId.parse(match[1]),
+		outputId: OutputId.parse(match[2]),
+	}));
+
+	const attachedFiles: (FilePart | ImagePart)[] = [];
+	for (const sourceKeyword of sourceKeywords) {
+		const contextNode = contextNodes.find(
+			(contextNode) => contextNode.id === sourceKeyword.nodeId,
+		);
+		if (contextNode === undefined) {
+			continue;
+		}
+		const replaceKeyword = `{{${sourceKeyword.nodeId}:${sourceKeyword.outputId}}}`;
+		switch (contextNode.content.type) {
+			case "text": {
+				userMessage = userMessage.replace(
+					replaceKeyword,
+					contextNode.content.text,
+				);
+				break;
+			}
+			case "textGeneration": {
+				const result = await textGenerationResolver(
+					contextNode.id,
+					sourceKeyword.outputId,
+				);
+				if (result !== undefined) {
+					userMessage = userMessage.replace(replaceKeyword, result);
+				}
+				break;
+			}
+			case "file": {
+				switch (contextNode.content.category) {
+					case "text":
+					case "image":
+					case "pdf": {
+						const fileContents = await getFileContents(
+							contextNode.content,
+							fileResolver,
+						);
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							getFilesDescription(attachedFiles.length, fileContents.length),
+						);
+
+						attachedFiles.push(...fileContents);
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = contextNode.content.category;
+						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+		}
+	}
+	return [
+		{
+			role: "user",
+			content: [
+				{
+					type: "text",
+					text: userMessage,
+				},
+			],
+		},
+	];
+}
+
+export function generatedImagePath(generation: Generation, filename: string) {
+	const originType = generation.context.origin.type;
+	switch (originType) {
+		case "workspace":
+			return `workspaces/${generation.context.origin.id}/generations/${generation.id}/${filename}`;
+		case "run":
+			return `runs/${generation.context.origin.id}/generations/${generation.id}/${filename}`;
+		default: {
+			const _exhaustiveCheck: never = originType;
+			return _exhaustiveCheck;
+		}
+	}
+}
+
+export async function setGeneratedImage(params: {
+	storage: Storage;
+	generation: Generation;
+	generatedImageFilename: string;
+	generatedImage: GeneratedImage;
+}) {
+	await params.storage.setItemRaw(
+		generatedImagePath(params.generation, params.generatedImageFilename),
+		params.generatedImage.uint8Array,
+	);
+}
+
+export async function getGeneratedImage(params: {
+	storage: Storage;
+	generation: Generation;
+	filename: string;
+}) {
+	let image = await params.storage.getItemRaw(
+		generatedImagePath(params.generation, params.filename),
+	);
+	if (image instanceof ArrayBuffer) {
+		image = new Uint8Array(image);
+	}
+
+	assertUint8Array(image);
+	return image;
+}
+
+function assertUint8Array(value: unknown): asserts value is Uint8Array {
+	if (!(value instanceof Uint8Array)) {
+		throw new TypeError(`Expected Uint8Array but got ${typeof value}`);
+	}
+}
+
+/**
+ * Detects if a file is JPEG, PNG, or WebP by examining its header bytes
+ * @param imageAsUint8Array The file to check
+ * @returns Detected MIME type or null if not recognized
+ */
+export function detectImageType(
+	imageAsUint8Array: Uint8Array<ArrayBufferLike>,
+) {
+	// Get the first 12 bytes of the file (enough for all our formats)
+	const bytes = imageAsUint8Array;
+
+	// JPEG: Starts with FF D8 FF
+	if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+		return { contentType: "image/jpeg", ext: "jpeg" };
+	}
+
+	// PNG: Starts with 89 50 4E 47 0D 0A 1A 0A (hex for \x89PNG\r\n\x1a\n)
+	if (
+		bytes[0] === 0x89 &&
+		bytes[1] === 0x50 &&
+		bytes[2] === 0x4e &&
+		bytes[3] === 0x47 &&
+		bytes[4] === 0x0d &&
+		bytes[5] === 0x0a &&
+		bytes[6] === 0x1a &&
+		bytes[7] === 0x0a
+	) {
+		return { contentType: "image/png", ext: "png" };
+	}
+
+	// WebP: Starts with RIFF....WEBP (52 49 46 46 ... 57 45 42 50)
+	if (
+		bytes[0] === 0x52 &&
+		bytes[1] === 0x49 &&
+		bytes[2] === 0x46 &&
+		bytes[3] === 0x46 &&
+		bytes[8] === 0x57 &&
+		bytes[9] === 0x45 &&
+		bytes[10] === 0x42 &&
+		bytes[11] === 0x50
+	) {
+		return { contentType: "image/webp", ext: "webp" };
+	}
+
+	// Not a recognized image format
+	return null;
 }

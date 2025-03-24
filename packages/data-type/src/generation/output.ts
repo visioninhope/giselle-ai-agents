@@ -1,3 +1,4 @@
+import { createIdGenerator } from "@giselle-sdk/utils";
 import type { ProviderMetadata } from "ai";
 import { z } from "zod";
 import { OutputId } from "../node";
@@ -13,9 +14,14 @@ export const GeneratedTextContentOutput = GenerationOutputBase.extend({
 	content: z.string(),
 });
 
+export const ImageId = createIdGenerator("img");
 export const Image = z.object({
-	url: z.string().url(),
+	id: ImageId.schema,
+	filename: z.string(),
+	pathname: z.string(),
+	contentType: z.string(),
 });
+export type Image = z.infer<typeof Image>;
 
 export const GeneratedImageOuputType = z.literal("generated-image");
 export const GeneratedImageContentOutput = GenerationOutputBase.extend({
