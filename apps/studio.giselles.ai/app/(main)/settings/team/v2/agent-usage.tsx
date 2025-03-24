@@ -8,7 +8,7 @@ export async function AgentUsage() {
 
 	if (!result.success || !result.data) {
 		return (
-			<Card title="Recent Agent">
+			<Card title="Recent Agents">
 				<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to load agent activities
 				</div>
@@ -21,7 +21,7 @@ export async function AgentUsage() {
 
 	return (
 		<Card
-			title="Recent Agent"
+			title="Recent Agents"
 			description="This is your URL namespace within Giselle. Please use 48 characters at maximum."
 			action={{
 				component:
