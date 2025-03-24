@@ -136,7 +136,7 @@ export function TextGenerationNodePropertiesPanel({
 
 			<PanelGroup
 				direction="vertical"
-				className="flex-1 flex flex-col gap-[16px]"
+				className="flex-1 flex flex-col"
 			>
 				<Panel>
 					<PropertiesPanelContent>
@@ -309,8 +309,9 @@ export function TextGenerationNodePropertiesPanel({
 				</Panel>
 				<PanelResizeHandle
 					className={clsx(
-						"h-[1px] bg-black-400/50 transition-colors",
-						"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
+						"h-[12px] flex items-center justify-center cursor-row-resize",
+						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+						"hover:after:bg-[#4a90e2]",
 					)}
 				/>
 				<Panel>

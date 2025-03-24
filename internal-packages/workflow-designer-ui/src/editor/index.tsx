@@ -257,8 +257,9 @@ export function Editor() {
 
 								<PanelResizeHandle
 									className={clsx(
-										"w-[1px] bg-black-400/50 transition-colors",
-										"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
+										"w-[12px] flex items-center justify-center cursor-col-resize",
+										"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
+										"hover:after:bg-[#4a90e2]",
 									)}
 								/>
 								<Panel
