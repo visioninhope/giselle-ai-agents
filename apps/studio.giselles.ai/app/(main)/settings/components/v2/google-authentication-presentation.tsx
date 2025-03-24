@@ -21,7 +21,7 @@ export function GoogleAuthenticationPresentation({
 	alert,
 }: GoogleAuthenticationPresentationProps) {
 	return (
-		<div className="grid gap-4 rounded-[8px] border-[0.5px] border-black-400 rounded-[8px] bg-black-900/10 py-4 px-4 w-fit">
+		<div className="grid gap-4 rounded-[8px] border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
 			{alert && (
 				<Alert variant="destructive" className="p-4">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
@@ -33,14 +33,16 @@ export function GoogleAuthenticationPresentation({
 					</AlertDescription>
 				</Alert>
 			)}
-			<div className="flex items-center gap-4">
+			<div className="flex items-center justify-between gap-4">
 				<div className="flex items-center gap-4">
-					<SiGoogle className="h-[20px] w-[20px]" />
+					<SiGoogle className="text-white-400 h-[20px] w-[20px]" />
 					<div className="flex flex-col">
-						<div>Google</div>
+						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+							Google
+						</div>
 
 						{googleUser && (
-							<div className="text-white-400 font-medium text-[12px] leading-[20.4px] font-geist">
+							<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 								{googleUser.name} ({googleUser.email})
 							</div>
 						)}
