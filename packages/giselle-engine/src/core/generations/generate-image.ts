@@ -250,11 +250,9 @@ export async function generateImage(args: {
 		});
 	}
 	const completedGeneration = {
-		...args.generation,
+		...runningGeneration,
 		status: "completed",
 		messages: [],
-		queuedAt: Date.now(),
-		startedAt: Date.now(),
 		completedAt: Date.now(),
 		outputs: generationOutputs,
 	} satisfies CompletedGeneration;
