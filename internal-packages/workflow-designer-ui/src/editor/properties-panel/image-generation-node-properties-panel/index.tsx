@@ -5,8 +5,10 @@ import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useUsageLimitsReached } from "../../../hooks/usage-limits";
 import { NodeIcon } from "../../../icons/node";
 import { Button } from "../../../ui/button";
+import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -36,10 +38,15 @@ export function ImageGenerationNodePropertiesPanel({
 		origin: { type: "workspace", id: data.id },
 	});
 	const { all: connectedSources } = useConnectedSources(node);
+	const usageLimitsReached = useUsageLimitsReached();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	const generateText = useCallback(() => {
+		if (usageLimitsReached) {
+			return;
+		}
+
 		startGeneration({
 			origin: {
 				type: "workspace",
@@ -50,10 +57,11 @@ export function ImageGenerationNodePropertiesPanel({
 				(connectedSource) => connectedSource.node,
 			),
 		});
-	}, [connectedSources, data.id, node, startGeneration]);
+	}, [connectedSources, data.id, node, startGeneration, usageLimitsReached]);
 
 	return (
 		<PropertiesPanelRoot>
+			{usageLimitsReached && <UsageLimitWarning />}
 			<PropertiesPanelHeader
 				icon={<NodeIcon node={node} className="size-[20px] text-black-900" />}
 				name={node.name}
@@ -66,6 +74,7 @@ export function ImageGenerationNodePropertiesPanel({
 					<Button
 						loading={isGenerating}
 						type="button"
+						disabled={usageLimitsReached}
 						onClick={() => {
 							if (isGenerating) {
 								stopGeneration();
@@ -73,7 +82,7 @@ export function ImageGenerationNodePropertiesPanel({
 								generateText();
 							}
 						}}
-						className="w-[150px]"
+						className="w-[150px] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isGenerating ? (
 							<span>Stop</span>
