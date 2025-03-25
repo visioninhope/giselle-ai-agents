@@ -107,7 +107,7 @@ export function DuplicateAgentButton({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						Are you sure to duplicate this agent?
+						Are you sure to duplicate this app?
 					</AlertDialogTitle>
 					{agentName && (
 						<AlertDialogDescription>{agentName}</AlertDialogDescription>
@@ -190,7 +190,7 @@ export function DeleteAgentButton({
 			<AlertDialogContent>
 				<AlertDialogHeader>
 					<AlertDialogTitle>
-						Are you sure you want to delete this agent?
+						Are you sure you want to delete this app?
 					</AlertDialogTitle>
 					{agentName && (
 						<AlertDialogDescription>
