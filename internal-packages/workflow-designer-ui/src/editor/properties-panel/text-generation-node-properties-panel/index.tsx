@@ -5,6 +5,7 @@ import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { useUsageLimitsReached } from "../../../hooks/usage-limits";
 import {
 	AnthropicIcon,
 	GoogleIcon,
@@ -12,6 +13,8 @@ import {
 	PerplexityIcon,
 } from "../../../icons";
 import { Button } from "../../../ui/button";
+import { useToasts } from "../../../ui/toast";
+import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -46,10 +49,17 @@ export function TextGenerationNodePropertiesPanel({
 		origin: { type: "workspace", id: data.id },
 	});
 	const { all: connectedSources } = useConnectedSources(node);
+	const usageLimitsReached = useUsageLimitsReached();
+	const { error } = useToasts();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
 	const generateText = useCallback(() => {
+		if (usageLimitsReached) {
+			error("Please upgrade your plan to continue using this feature.");
+			return;
+		}
+
 		startGeneration({
 			origin: {
 				type: "workspace",
@@ -60,10 +70,18 @@ export function TextGenerationNodePropertiesPanel({
 				(connectedSource) => connectedSource.node,
 			),
 		});
-	}, [connectedSources, data.id, node, startGeneration]);
+	}, [
+		connectedSources,
+		data.id,
+		node,
+		startGeneration,
+		usageLimitsReached,
+		error,
+	]);
 
 	return (
 		<PropertiesPanelRoot>
+			{usageLimitsReached && <UsageLimitWarning />}
 			<PropertiesPanelHeader
 				icon={
 					<>
@@ -91,6 +109,7 @@ export function TextGenerationNodePropertiesPanel({
 					<Button
 						loading={isGenerating}
 						type="button"
+						disabled={usageLimitsReached}
 						onClick={() => {
 							if (isGenerating) {
 								stopGeneration();
@@ -98,7 +117,7 @@ export function TextGenerationNodePropertiesPanel({
 								generateText();
 							}
 						}}
-						className="w-[150px]"
+						className="w-[150px] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isGenerating ? (
 							<span>Stop</span>
@@ -115,10 +134,7 @@ export function TextGenerationNodePropertiesPanel({
 				}
 			/>
 
-			<PanelGroup
-				direction="vertical"
-				className="flex-1 flex flex-col gap-[16px]"
-			>
+			<PanelGroup direction="vertical" className="flex-1 flex flex-col">
 				<Panel>
 					<PropertiesPanelContent>
 						<Tabs.Root
@@ -290,8 +306,9 @@ export function TextGenerationNodePropertiesPanel({
 				</Panel>
 				<PanelResizeHandle
 					className={clsx(
-						"h-[1px] bg-black-400/50 transition-colors",
-						"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
+						"h-[12px] flex items-center justify-center cursor-row-resize",
+						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+						"hover:after:bg-[#4a90e2]",
 					)}
 				/>
 				<Panel>

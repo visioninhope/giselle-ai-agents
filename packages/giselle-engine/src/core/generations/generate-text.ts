@@ -18,11 +18,14 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
+	checkUsageLimits,
+	extractWorkspaceIdFromOrigin,
 	getGeneration,
 	getNodeGenerationIndexes,
 	getRedirectedUrlAndTitle,
@@ -75,6 +78,51 @@ export async function generateText(args: {
 			},
 		}),
 	]);
+
+	const workspaceId = await extractWorkspaceIdFromOrigin({
+		storage: args.context.storage,
+		origin: args.generation.context.origin,
+	});
+
+	const usageLimitStatus = await checkUsageLimits({
+		workspaceId,
+		generation: args.generation,
+		fetchUsageLimitsFn: args.context.fetchUsageLimitsFn,
+	});
+	if (usageLimitStatus.type === "error") {
+		const failedGeneration = {
+			...runningGeneration,
+			status: "failed",
+			failedAt: Date.now(),
+			error: {
+				name: usageLimitStatus.error,
+				message: usageLimitStatus.error,
+				dump: usageLimitStatus,
+			},
+		} satisfies FailedGeneration;
+		await Promise.all([
+			setGeneration({
+				storage: args.context.storage,
+				generation: failedGeneration,
+			}),
+			setNodeGenerationIndex({
+				storage: args.context.storage,
+				nodeId: runningGeneration.context.actionNode.id,
+				origin: runningGeneration.context.origin,
+				nodeGenerationIndex: {
+					id: failedGeneration.id,
+					nodeId: failedGeneration.context.actionNode.id,
+					status: "failed",
+					createdAt: failedGeneration.createdAt,
+					queuedAt: failedGeneration.queuedAt,
+					startedAt: failedGeneration.startedAt,
+					failedAt: failedGeneration.failedAt,
+				},
+			}),
+		]);
+		throw new UsageLimitError(usageLimitStatus.error);
+	}
+
 	async function fileResolver(file: FileData) {
 		const blob = await args.context.storage.getItemRaw(
 			filePath({
@@ -269,16 +317,12 @@ export async function generateText(args: {
 					},
 				}),
 			]);
-			const onConsumeAgentTime = args.context.onConsumeAgentTime;
 
-			if (onConsumeAgentTime != null) {
-				await handleAgentTimeConsumption({
-					storage: args.context.storage,
-					generation: completedGeneration,
-					origin: args.generation.context.origin,
-					onConsumeAgentTime,
-				});
-			}
+			await handleAgentTimeConsumption({
+				workspaceId,
+				generation: completedGeneration,
+				onConsumeAgentTime: args.context.onConsumeAgentTime,
+			});
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,

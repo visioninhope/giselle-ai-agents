@@ -45,6 +45,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		integrationConfigs: config.integrationConfigs ?? [],
 		onConsumeAgentTime: config.onConsumeAgentTime,
 		telemetry: config.telemetry,
+		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
 	};
 	return {
 		createWorkspace: async () => {
@@ -165,3 +166,5 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 }
 
 export type GiselleEngine = ReturnType<typeof GiselleEngine>;
+
+export * from "./error";
