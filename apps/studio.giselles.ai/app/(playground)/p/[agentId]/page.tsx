@@ -253,7 +253,6 @@ export default async function Page({
 			endedAtDate,
 			totalDurationMs,
 		);
-		// await reportAgentTimeUsage(agentId, endedAtDate);
 	}
 
 	async function connectGitHubIdentityAction() {
