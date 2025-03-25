@@ -4,7 +4,7 @@ import { fetchUserTeams } from "@/services/teams";
 import TeamCreation from "@/services/teams/components/v2/team-creation";
 import { Card } from "../../components/v2/card";
 import { AccountToasts } from "../account-toasts";
-import UserTeam from "./user-team";
+import UserTeams from "./user-team";
 
 export default async function AccountSettingPageV2() {
 	const teams = await fetchUserTeams();
@@ -32,7 +32,7 @@ export default async function AccountSettingPageV2() {
 							),
 						}}
 					>
-						<UserTeam teams={teams} />
+						<UserTeams teams={teams} />
 					</Card>
 				</div>
 			</div>

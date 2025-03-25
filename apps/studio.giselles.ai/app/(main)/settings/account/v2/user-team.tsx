@@ -8,7 +8,7 @@ const roles = {
 	member: "Member",
 };
 
-export default function UserTeam({
+export default function UserTeams({
 	teams,
 }: { teams: { id: string; name: string; role: "admin" | "member" }[] }) {
 	const [teamName, setTeamName] = useState("");
@@ -35,7 +35,7 @@ export default function UserTeam({
 			</div>
 			<div className="border-[0.5px] border-black-400 rounded-[8px] divide-y divide-black-400">
 				{filteredTeams.map((team) => (
-					<UserTeamItem
+					<UserTeamsItem
 						key={team.id}
 						teamName={team.name}
 						role={roles[team.role]}
@@ -46,7 +46,7 @@ export default function UserTeam({
 	);
 }
 
-function UserTeamItem({ teamName, role }: { teamName: string; role: string }) {
+function UserTeamsItem({ teamName, role }: { teamName: string; role: string }) {
 	return (
 		<div className="flex items-center justify-between gap-4 p-4 bg-black-400/10">
 			<div className="flex flex-col">
