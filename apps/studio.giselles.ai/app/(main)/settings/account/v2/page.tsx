@@ -20,8 +20,8 @@ export default async function AccountSettingPageV2() {
 				</h3>
 				<div className="flex flex-col gap-y-[16px]">
 					<Card
-						title="Team"
-						description="The teams that are associated with your Giselle’s account."
+						title="Teams"
+						description="The teams that are associated with your Giselle account."
 						action={{
 							component: (
 								<div className="grid placeitems-center">
