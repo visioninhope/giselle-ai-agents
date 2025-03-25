@@ -2,7 +2,7 @@ import { agents, db } from "@/drizzle";
 import { fetchCurrentTeam } from "@/services/teams";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
-import { and, eq, isNotNull } from "drizzle-orm";
+import { and, desc, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
 import { DeleteAgentButton, DuplicateAgentButton, Toasts } from "./components";
@@ -28,7 +28,8 @@ async function AgentList() {
 		.from(agents)
 		.where(
 			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.workspaceId)),
-		);
+		)
+		.orderBy(desc(agents.updatedAt));
 	if (dbAgents.length === 0) {
 		return (
 			<div className="flex justify-center items-center h-full">
