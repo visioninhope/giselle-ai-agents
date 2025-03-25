@@ -24,7 +24,7 @@ export default async function AccountGeneralPage() {
 				<AccountDisplayNameForm displayName={displayName} />
 				<Card
 					title="Email"
-					description="Enter the email addresses you want to use to log in with Giselle. Your primary email will be used for account-related notifications."
+					description="This email will be used for account-related notifications."
 					className="gap-y-6"
 				>
 					<Field
