@@ -12,7 +12,7 @@ const menuLinkVariant = cva(
 			variant: {
 				active: "font-bold underline cursor-auto",
 				inactive:
-					"font-medium hover:bg-white-850/20 hover:shadow-[0px 0px 4px 0px hsla(0, 0%, 100%, 0.2) inset]",
+					"font-medium hover:bg-white-850/20 hover:shadow-[0px_0px_4px_0px_hsla(0,_0%,_100%,_0.2)_inset]",
 			},
 		},
 	},
