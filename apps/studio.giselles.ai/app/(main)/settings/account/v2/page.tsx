@@ -26,7 +26,7 @@ export default async function AccountSettingPageV2() {
 							component: (
 								<div className="grid placeitems-center">
 									<TeamCreation>
-										<Button>Create new team</Button>
+										<Button>Create New Team</Button>
 									</TeamCreation>
 								</div>
 							),
