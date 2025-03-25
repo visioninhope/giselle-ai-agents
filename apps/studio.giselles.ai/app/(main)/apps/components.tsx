@@ -194,8 +194,8 @@ export function DeleteAgentButton({
 					</AlertDialogTitle>
 					{agentName && (
 						<AlertDialogDescription>
-							This action cannot be undone. This will permanently delete the
-							app "{agentName}".
+							This action cannot be undone. This will permanently delete the app
+							"{agentName}".
 						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
