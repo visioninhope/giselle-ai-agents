@@ -26,6 +26,7 @@ import type {
 	Experimental_GeneratedImage as GeneratedImage,
 	ImagePart,
 } from "ai";
+import type { MediaContentType } from "langfuse-core";
 import type { Storage } from "unstorage";
 import { getRun } from "../runs/utils";
 import type { GiselleEngineContext } from "../types";
@@ -628,13 +629,13 @@ function assertUint8Array(value: unknown): asserts value is Uint8Array {
  */
 export function detectImageType(
 	imageAsUint8Array: Uint8Array<ArrayBufferLike>,
-) {
+): { contentType: MediaContentType; ext: "jpeg" | "png" | "webp" } | null {
 	// Get the first 12 bytes of the file (enough for all our formats)
 	const bytes = imageAsUint8Array;
 
 	// JPEG: Starts with FF D8 FF
 	if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
-		return { contentType: "image/jpeg", ext: "jpeg" };
+		return { contentType: "image/jpeg" as MediaContentType, ext: "jpeg" };
 	}
 
 	// PNG: Starts with 89 50 4E 47 0D 0A 1A 0A (hex for \x89PNG\r\n\x1a\n)
@@ -648,7 +649,7 @@ export function detectImageType(
 		bytes[6] === 0x1a &&
 		bytes[7] === 0x0a
 	) {
-		return { contentType: "image/png", ext: "png" };
+		return { contentType: "image/png" as MediaContentType, ext: "png" };
 	}
 
 	// WebP: Starts with RIFF....WEBP (52 49 46 46 ... 57 45 42 50)
@@ -662,7 +663,7 @@ export function detectImageType(
 		bytes[10] === 0x42 &&
 		bytes[11] === 0x50
 	) {
-		return { contentType: "image/webp", ext: "webp" };
+		return { contentType: "image/webp" as MediaContentType, ext: "webp" };
 	}
 
 	// Not a recognized image format
