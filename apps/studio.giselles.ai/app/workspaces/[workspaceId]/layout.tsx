@@ -40,7 +40,7 @@ export default async function Layout({
 			telemetry={{
 				metadata: {
 					isProPlan: isProPlan(currentTeam),
-					isInternalTeam: isInternalTeam(currentTeam),
+					teamType: currentTeam.type,
 				},
 			}}
 		>
