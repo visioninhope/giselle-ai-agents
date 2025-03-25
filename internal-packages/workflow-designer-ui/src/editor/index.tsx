@@ -248,7 +248,10 @@ export function Editor() {
 								direction="horizontal"
 								className="bg-black-900 h-full flex"
 							>
-								<Panel className="flex-1 px-[16px] pb-[16px] pr-0" defaultSize={100}>
+								<Panel
+									className="flex-1 px-[16px] pb-[16px] pr-0"
+									defaultSize={100}
+								>
 									<div className="h-full flex">
 										{/* <Debug /> */}
 										<NodeCanvas />
