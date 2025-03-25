@@ -31,7 +31,7 @@ export function CreateAgentButton() {
 	const { pending } = useFormStatus();
 	return (
 		<Button type="submit" disabled={pending} data-loading={pending}>
-			New Agent +
+			New App +
 		</Button>
 	);
 }
@@ -98,7 +98,7 @@ export function DuplicateAgentButton({
 							</TooltipTrigger>
 						</AlertDialogTrigger>
 						<TooltipContent side="top">
-							<p>Duplicate Agent</p>
+							<p>Duplicate App</p>
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
@@ -181,7 +181,7 @@ export function DeleteAgentButton({
 							</TooltipTrigger>
 						</AlertDialogTrigger>
 						<TooltipContent side="top">
-							<p>Delete Agent</p>
+							<p>Delete App</p>
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
@@ -195,7 +195,7 @@ export function DeleteAgentButton({
 					{agentName && (
 						<AlertDialogDescription>
 							This action cannot be undone. This will permanently delete the
-							agent "{agentName}".
+							app "{agentName}".
 						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
