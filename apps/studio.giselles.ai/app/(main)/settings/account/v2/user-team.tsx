@@ -3,9 +3,14 @@
 import { Search } from "lucide-react";
 import { useState } from "react";
 
+const roles = {
+	admin: "Admin",
+	member: "Member",
+};
+
 export default function UserTeam({
 	teams,
-}: { teams: { id: string; name: string }[] }) {
+}: { teams: { id: string; name: string; role: "admin" | "member" }[] }) {
 	const [teamName, setTeamName] = useState("");
 
 	const handleChangeTeamName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -30,14 +35,18 @@ export default function UserTeam({
 			</div>
 			<div className="border-[0.5px] border-black-400 rounded-[8px] divide-y divide-black-400">
 				{filteredTeams.map((team) => (
-					<UserTeamItem key={team.id} teamName={team.name} />
+					<UserTeamItem
+						key={team.id}
+						teamName={team.name}
+						role={roles[team.role]}
+					/>
 				))}
 			</div>
 		</>
 	);
 }
 
-function UserTeamItem({ teamName }: { teamName: string }) {
+function UserTeamItem({ teamName, role }: { teamName: string; role: string }) {
 	return (
 		<div className="flex items-center justify-between gap-4 p-4 bg-black-400/10">
 			<div className="flex flex-col">
@@ -45,7 +54,7 @@ function UserTeamItem({ teamName }: { teamName: string }) {
 					{teamName}
 				</div>
 				<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-					Admin
+					{role}
 				</div>
 			</div>
 		</div>
