@@ -1,12 +1,12 @@
-'use server';
+"use server";
 
-import { db, agents } from "@/drizzle";
+import { agents, db } from "@/drizzle";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import { eq } from "drizzle-orm/sql";
-import { WorkspaceId } from "@giselle-sdk/data-type";
 
 export async function updateAgentName(workspaceId: WorkspaceId, name: string) {
-  await db
-    .update(agents)
-    .set({ name })
-    .where(eq(agents.workspaceId, workspaceId));
+	await db
+		.update(agents)
+		.set({ name })
+		.where(eq(agents.workspaceId, workspaceId));
 }
