@@ -30,7 +30,7 @@ catalog:
   openai: 5.0.0-alpha.0
   "@ai-sdk/openai": 1.2.5
   "@ai-sdk/anthropic": 1.1.17
-  "@ai-sdk/google": 1.1.25
+  "@ai-sdk/google": 1.2.3
   "@ai-sdk/perplexity": 1.0.7
   "@ai-sdk/react": 1.1.23
   "@ai-sdk/fal": 0.0.9
