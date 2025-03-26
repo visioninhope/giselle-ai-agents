@@ -56,7 +56,7 @@ export function TeamCreationForm({
 	const [selectedPlan, setSelectedPlan] = useState("");
 
 	return (
-		<Dialog>
+		<Dialog modal={false}>
 			<DialogTrigger asChild className="cursor-pointer">
 				{children ?? (
 					<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
