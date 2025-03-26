@@ -38,8 +38,9 @@ export function Header({
 
 		if (onEditableTextChange) {
 			onEditableTextChange(data.id, value);
-			updateName(value);
 		}
+
+		updateName(value);
 	};
 
 	return (
