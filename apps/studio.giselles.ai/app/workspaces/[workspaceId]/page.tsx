@@ -9,7 +9,7 @@ export default function Page() {
 
 	return (
 		<div className="flex flex-col h-screen bg-black-900">
-			<Header onEditableTextChange={updateAgentName} />
+			<Header onWorkflowNameChange={updateAgentName} />
 			{view === "editor" ? <Editor /> : <Viewer />}
 		</div>
 	);
