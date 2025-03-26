@@ -14,7 +14,7 @@ import {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod";
-import type { GiselleEngine } from "../core";
+import { type GiselleEngine, UsageLimitError } from "../core";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler } from "./create-handler";
@@ -60,11 +60,18 @@ export const createJsonRouters = {
 				telemetry: z.custom<TelemetrySettings>().optional(),
 			}),
 			handler: async ({ input }) => {
-				const stream = await giselleEngine.generateText(
-					input.generation,
-					input.telemetry,
-				);
-				return stream.toDataStreamResponse();
+				try {
+					const stream = await giselleEngine.generateText(
+						input.generation,
+						input.telemetry,
+					);
+					return stream.toDataStreamResponse();
+				} catch (error) {
+					if (error instanceof UsageLimitError) {
+						return new Response(error.message, { status: 429 });
+					}
+					throw error;
+				}
 			},
 		}),
 	getGeneration: (giselleEngine: GiselleEngine) =>
@@ -195,8 +202,15 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({ generation: QueuedGeneration }),
 			handler: async ({ input }) => {
-				await giselleEngine.generateImage(input.generation);
-				return new Response(null, { status: 204 });
+				try {
+					await giselleEngine.generateImage(input.generation);
+					return new Response(null, { status: 204 });
+				} catch (error) {
+					if (error instanceof UsageLimitError) {
+						return new Response(error.message, { status: 429 });
+					}
+					throw error;
+				}
 			},
 		}),
 	setGeneration: (giselleEngine: GiselleEngine) =>
