@@ -11,7 +11,7 @@ Giselle has both a Cloud version and a Self-hosting version, which can be found 
 - Cloud: [apps/studio.giselles.ai/](apps/studio.giselles.ai/)
 - Self-hosting: [apps/playground/](apps/playground/)
 
-External contributors should contribute to the Self-hosting version. Please follow the [Getting Started](apps/playground#getting-started) guide.
+External contributors may find it easier to contribute to the Self-hosting version. Please follow the [Getting Started](apps/playground#getting-started) guide.
 
 ## Issues and feature requests
 
