@@ -14,7 +14,7 @@ type TooltipProps = Omit<
 
 export function Tooltip({
 	text,
-	sideOffset = 4,
+	sideOffset = 8,
 	delayDuration = 300,
 	...props
 }: TooltipProps) {
@@ -26,12 +26,23 @@ export function Tooltip({
 					<TooltipPrimitive.Content
 						sideOffset={sideOffset}
 						className={clsx(
-							"z-50 overflow-hidden rounded-md px-[8px] py-[2px]",
-							"bg-primary-60",
-							"text-xs text-black-900 shadow-sm",
+							"z-50 overflow-hidden rounded-[4px] px-[8px] py-[4px]",
+							"bg-[#97A2BE]",
+							"text-[12px] text-black-850",
+							"[&_code]:text-black-400",
+							"border border-[hsla(232,36%,72%,0.2)]",
+							"shadow-[0px_2px_4px_rgba(0,0,0,0.1)]",
 						)}
 					>
 						{text}
+						<TooltipPrimitive.Arrow 
+							className={clsx(
+								"fill-[#97A2BE]",
+								"border-[hsla(232,36%,72%,0.2)]",
+							)}
+							width={12}
+							height={6}
+						/>
 					</TooltipPrimitive.Content>
 				</TooltipPrimitive.Portal>
 			</TooltipPrimitive.Root>
