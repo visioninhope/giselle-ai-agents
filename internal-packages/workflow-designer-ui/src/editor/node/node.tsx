@@ -185,7 +185,7 @@ export function NodeComponent({
 										"group-data-[content-type=imageGeneration]:!bg-generation-node-1 group-data-[content-type=imageGeneration]:!border-generation-node-1",
 									)}
 								/>
-								<div className="text-[14px] text-black--30 px-[12px] text-white-900">
+								<div className="text-[14px] px-[12px] text-white-900">
 									{input.label}
 								</div>
 							</div>
