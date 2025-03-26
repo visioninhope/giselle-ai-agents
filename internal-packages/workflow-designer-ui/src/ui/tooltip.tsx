@@ -10,12 +10,14 @@ type TooltipProps = Omit<
 	text: ReactNode;
 	sideOffset?: number;
 	delayDuration?: number;
+	className?: string;
 };
 
 export function Tooltip({
 	text,
 	sideOffset = 8,
 	delayDuration = 300,
+	className,
 	...props
 }: TooltipProps) {
 	return (
@@ -24,22 +26,15 @@ export function Tooltip({
 				<TooltipPrimitive.Trigger asChild {...props} />
 				<TooltipPrimitive.Portal>
 					<TooltipPrimitive.Content
-						sideOffset={sideOffset}
 						className={clsx(
-							"z-50 overflow-hidden rounded-[4px] px-[8px] py-[4px]",
-							"bg-[#97A2BE]",
-							"text-[12px] text-black-850",
-							"[&_code]:text-black-400",
-							"border border-[hsla(232,36%,72%,0.2)]",
-							"shadow-[0px_2px_4px_rgba(0,0,0,0.1)]",
+							"z-50 overflow-hidden rounded-md bg-white-850 px-3 py-1.5 text-sm text-black-850 shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
+							className,
 						)}
+						sideOffset={sideOffset}
 					>
 						{text}
-						<TooltipPrimitive.Arrow 
-							className={clsx(
-								"fill-[#97A2BE]",
-								"border-[hsla(232,36%,72%,0.2)]",
-							)}
+						<TooltipPrimitive.Arrow
+							className="fill-white-850 border-[hsla(232,36%,72%,0.2)]"
 							width={12}
 							height={6}
 						/>
