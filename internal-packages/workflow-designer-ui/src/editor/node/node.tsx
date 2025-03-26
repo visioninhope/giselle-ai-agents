@@ -190,6 +190,23 @@ export function NodeComponent({
 								</div>
 							</div>
 						))}
+						{node.type === "action" && node.inputs.length === 0 && (
+							<div className="relative flex items-center h-[28px]" key="blank">
+								<Handle
+									type="target"
+									position={Position.Left}
+									id="blank-handle"
+									className={clsx(
+										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
+										"group-data-[content-type=textGeneration]:!border-generation-node-1",
+										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
+									)}
+								/>
+								<div className="text-[14px] px-[12px] text-white-900">
+									Input
+								</div>
+							</div>
+						)}
 					</div>
 
 					<div className="grid">
