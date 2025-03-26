@@ -177,6 +177,7 @@ export function NodeComponent({
 							>
 								<Handle
 									type="target"
+									isConnectable={false}
 									position={Position.Left}
 									id={input.id}
 									className={clsx(
@@ -194,6 +195,7 @@ export function NodeComponent({
 							<div className="relative flex items-center h-[28px]" key="blank">
 								<Handle
 									type="target"
+									isConnectable={false}
 									position={Position.Left}
 									id="blank-handle"
 									className={clsx(
@@ -218,6 +220,7 @@ export function NodeComponent({
 								<Handle
 									id={output.id}
 									type="source"
+									isConnectable={false}
 									position={Position.Right}
 									data-state={
 										connectedOutputIds?.some(
