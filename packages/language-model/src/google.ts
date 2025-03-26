@@ -73,7 +73,12 @@ const gemini20ProExp: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gemini25ProExp, gemini20Flash, gemini20FlashThinkingExp, gemini20ProExp];
+export const models = [
+	gemini25ProExp,
+	gemini20Flash,
+	gemini20FlashThinkingExp,
+	gemini20ProExp,
+];
 
 export const LanguageModel = GoogleLanguageModel;
 export type LanguageModel = GoogleLanguageModel;
