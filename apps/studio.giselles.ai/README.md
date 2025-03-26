@@ -13,8 +13,6 @@ https://studio.giselles.ai/
 2. Install dependencies
 
     ```sh
-    corepack enable
-    corepack prepare
     pnpm install
     ```
 
