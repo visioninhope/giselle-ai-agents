@@ -31,7 +31,7 @@ export function Header({
 		setView(view === "editor" ? "viewer" : "editor");
 	};
 
-	const updateAgentName = (value?: string) => {
+	const updateWorkflowName = (value?: string) => {
 		if (!value) {
 			return;
 		}
@@ -53,7 +53,7 @@ export function Header({
 				<div className="flex gap-[2px] group">
 					<EditableText
 						fallbackValue="Untitled"
-						onChange={updateAgentName}
+						onChange={updateWorkflowName}
 						value={data.name}
 					/>
 
