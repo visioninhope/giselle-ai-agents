@@ -6,6 +6,9 @@ export const GenNodeIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 		height="25"
 		viewBox="0 0 26.87 24.25"
 		xmlns="http://www.w3.org/2000/svg"
+		className="fill-current"
+		role="img"
+		aria-label="Generation"
 		{...props}
 	>
 		<title>Gen Node Icon</title>
