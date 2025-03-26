@@ -19,10 +19,10 @@ import { SettingsPanel } from "../settings";
 
 export function Header({
 	action,
-	onEditableTextChange,
+	onWorkflowNameChange,
 }: {
 	action?: ReactNode;
-	onEditableTextChange?: (workspaceId: WorkspaceId, name: string) => void;
+	onWorkflowNameChange?: (workspaceId: WorkspaceId, name: string) => void;
 }) {
 	const { data, updateName, view, setView } = useWorkflowDesigner();
 	const [openSettings, setOpenSettings] = useState(false);
@@ -36,8 +36,8 @@ export function Header({
 			return;
 		}
 
-		if (onEditableTextChange) {
-			onEditableTextChange(data.id, value);
+		if (onWorkflowNameChange) {
+			onWorkflowNameChange(data.id, value);
 		}
 
 		updateName(value);
