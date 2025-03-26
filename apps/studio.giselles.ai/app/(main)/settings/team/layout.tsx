@@ -14,7 +14,7 @@ export default async function SettingsTeamLayout({
 		<>
 			<div className="flex flex-col gap-y-4 w-[300px] p-[24px]">
 				<div className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
-					Team
+					Team Settings
 				</div>
 				<div className="grid gap-[4px]">
 					<MenuLink href="/settings/team">General</MenuLink>

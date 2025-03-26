@@ -14,7 +14,7 @@ export default async function SettingsAccountLayout({
 		<>
 			<div className="flex flex-col gap-y-4 w-[240px] p-[24px]">
 				<div className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
-					My account
+					Account Settings
 				</div>
 				<div className="grid gap-[4px]">
 					<MenuLink href="/settings/account">Overview</MenuLink>
