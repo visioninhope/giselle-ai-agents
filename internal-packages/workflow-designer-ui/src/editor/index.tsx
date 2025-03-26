@@ -1,12 +1,17 @@
 "use client";
 
+import { InputId, OutputId } from "@giselle-sdk/data-type";
 import {
+	type Connection,
+	type Edge,
+	type IsValidConnection,
 	ReactFlow,
 	ReactFlowProvider,
 	Panel as XYFlowPanel,
 	useReactFlow,
 	useUpdateNodeInternals,
 } from "@xyflow/react";
+import "@xyflow/react/dist/style.css";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
@@ -17,6 +22,10 @@ import {
 	PanelGroup,
 	PanelResizeHandle,
 } from "react-resizable-panels";
+import { Background } from "../ui/background";
+import { ToastProvider } from "../ui/toast";
+import { edgeTypes } from "./connector";
+import { type ConnectorType, GradientDef } from "./connector/component";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -27,12 +36,6 @@ import {
 	ToolbarContextProvider,
 	useToolbar,
 } from "./tool";
-import "@xyflow/react/dist/style.css";
-import { OutputId } from "@giselle-sdk/data-type";
-import { Background } from "../ui/background";
-import { ToastProvider } from "../ui/toast";
-import { edgeTypes } from "./connector";
-import { type ConnectorType, GradientDef } from "./connector/component";
 
 function NodeCanvas() {
 	const {
@@ -43,6 +46,7 @@ function NodeCanvas() {
 		deleteConnection,
 		updateNodeData,
 		addNode,
+		addConnection,
 	} = useWorkflowDesigner();
 	const reactFlowInstance = useReactFlow<
 		GiselleWorkflowDesignerNode,
@@ -85,6 +89,105 @@ function NodeCanvas() {
 			})),
 		);
 	}, [data, reactFlowInstance.setEdges]);
+
+	const handleConnect = (connection: Connection) => {
+		const outputNode = data.nodes.find((node) => node.id === connection.source);
+		const inputNode = data.nodes.find((node) => node.id === connection.target);
+		if (!outputNode || !inputNode) {
+			return;
+		}
+		if (inputNode.type !== "action") {
+			return;
+		}
+		const isAlreadyConnected = data.connections.find(
+			(conn) =>
+				conn.inputNode.id === inputNode.id &&
+				conn.outputNode.id === outputNode.id,
+		);
+		if (isAlreadyConnected) {
+			return;
+		}
+
+		const safeOutputId = OutputId.safeParse(connection.sourceHandle);
+		if (!safeOutputId.success) {
+			return;
+		}
+
+		const outputId = safeOutputId.data;
+		const newInput = {
+			id: InputId.generate(),
+			label: "Input",
+		};
+		const updatedInputs = [...inputNode.inputs, newInput];
+		updateNodeData(inputNode, {
+			inputs: updatedInputs,
+		});
+		addConnection({
+			inputNode: inputNode,
+			inputId: newInput.id,
+			outputId,
+			outputNode: outputNode,
+		});
+	};
+
+	const handleEdgesDelete = (edgesToDelete: Edge[]) => {
+		for (const edge of edgesToDelete) {
+			const connection = data.connections.find((conn) => conn.id === edge.id);
+			if (!connection) {
+				continue;
+			}
+
+			deleteConnection(connection.id);
+			const targetNode = data.nodes.find(
+				(node) => node.id === connection.inputNode.id,
+			);
+			if (targetNode && targetNode.type === "action") {
+				const updatedInputs = targetNode.inputs.filter(
+					(input) => input.id !== connection.inputId,
+				);
+				updateNodeData(targetNode, {
+					inputs: updatedInputs,
+				});
+			}
+		}
+	};
+
+	const isValidConnection: IsValidConnection<ConnectorType> = (
+		connection: Connection | ConnectorType,
+	) => {
+		const { source, target, sourceHandle, targetHandle } = connection;
+
+		if (!sourceHandle || !targetHandle) {
+			return false;
+		}
+
+		if (source === target) {
+			return false;
+		}
+
+		const outputNode = data.nodes.find((node) => node.id === source);
+		const inputNode = data.nodes.find((node) => node.id === target);
+
+		if (!outputNode || !inputNode) {
+			return false;
+		}
+
+		if (inputNode.type !== "action") {
+			return false;
+		}
+
+		const isAlreadyConnected = data.connections.find(
+			(conn) =>
+				conn.inputNode.id === inputNode.id &&
+				conn.outputNode.id === outputNode.id,
+		);
+		if (isAlreadyConnected) {
+			return false;
+		}
+
+		return true;
+	};
+
 	return (
 		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
 			className="giselle-workflow-editor"
@@ -94,6 +197,9 @@ function NodeCanvas() {
 			nodeTypes={nodeTypes}
 			edgeTypes={edgeTypes}
 			defaultViewport={data.ui.viewport}
+			onConnect={handleConnect}
+			onEdgesDelete={handleEdgesDelete}
+			isValidConnection={isValidConnection}
 			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
 			}}
