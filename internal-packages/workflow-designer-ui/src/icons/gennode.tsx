@@ -7,6 +7,7 @@ export const GenNodeIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 		viewBox="0 0 26.87 24.25"
 		xmlns="http://www.w3.org/2000/svg"
 		className="fill-current"
+		aria-label="Generation"
 		{...props}
 	>
 		<path d="M19.99,13.77c.47-3.74,3.14-6.41,6.88-6.88-3.74-.47-6.41-3.14-6.88-6.88-.47,3.74-3.14,6.41-6.88,6.88,3.74.47,6.41,3.14,6.88,6.88Z" />
