@@ -118,7 +118,7 @@ export function WorkflowDesigner({
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
-	function canConnectNodes(
+	function isSupportedConnection(
 		outputNode: Node,
 		inputNode: Node,
 	): { canConnect: true } | { canConnect: false; message: string } {
@@ -189,6 +189,6 @@ export function WorkflowDesigner({
 		deleteNode,
 		deleteConnection,
 		updateName,
-		canConnectNodes,
+		isSupportedConnection,
 	};
 }

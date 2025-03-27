@@ -87,13 +87,13 @@ function SourceSelect({
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
 	const { generatedSources, textSources, fileSources, githubSources } =
 		useSourceCategories(sources);
-	const { canConnectNodes } = useWorkflowDesigner();
-	const canConnect = useCallback(
+	const { isSupportedConnection } = useWorkflowDesigner();
+	const isSupported = useCallback(
 		(source: Source) => {
-			const { canConnect } = canConnectNodes(source.node, node);
+			const { canConnect } = isSupportedConnection(source.node, node);
 			return canConnect;
 		},
-		[canConnectNodes, node],
+		[isSupportedConnection, node],
 	);
 
 	return (
@@ -167,7 +167,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={generatedSource.output.id}
 											source={generatedSource}
-											disabled={!canConnect(generatedSource)}
+											disabled={!isSupported(generatedSource)}
 										/>
 									))}
 								</div>
@@ -181,7 +181,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={textSource.output.id}
 											source={textSource}
-											disabled={!canConnect(textSource)}
+											disabled={!isSupported(textSource)}
 										/>
 									))}
 								</div>
@@ -196,7 +196,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={fileSource.output.id}
 											source={fileSource}
-											disabled={!canConnect(fileSource)}
+											disabled={!isSupported(fileSource)}
 										/>
 									))}
 								</div>
@@ -210,7 +210,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={githubSource.output.id}
 											source={githubSource}
-											disabled={!canConnect(githubSource)}
+											disabled={!isSupported(githubSource)}
 										/>
 									))}
 								</div>
