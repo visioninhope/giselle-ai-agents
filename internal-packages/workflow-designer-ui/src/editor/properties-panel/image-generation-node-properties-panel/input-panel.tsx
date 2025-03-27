@@ -87,6 +87,15 @@ function SourceSelect({
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
 	const { generatedSources, textSources, fileSources, githubSources } =
 		useSourceCategories(sources);
+	const { canConnectNodes } = useWorkflowDesigner();
+	const canConnect = useCallback(
+		(source: Source) => {
+			const { canConnect } = canConnectNodes(source.node, node);
+			return canConnect;
+		},
+		[canConnectNodes, node],
+	);
+
 	return (
 		<Popover.Root
 			onOpenChange={(open) => {
@@ -158,6 +167,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={generatedSource.output.id}
 											source={generatedSource}
+											disabled={!canConnect(generatedSource)}
 										/>
 									))}
 								</div>
@@ -171,6 +181,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={textSource.output.id}
 											source={textSource}
+											disabled={!canConnect(textSource)}
 										/>
 									))}
 								</div>
@@ -185,7 +196,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={fileSource.output.id}
 											source={fileSource}
-											disabled={true}
+											disabled={!canConnect(fileSource)}
 										/>
 									))}
 								</div>
@@ -199,7 +210,7 @@ function SourceSelect({
 										<SourceToggleItem
 											key={githubSource.output.id}
 											source={githubSource}
-											disabled={true}
+											disabled={!canConnect(githubSource)}
 										/>
 									))}
 								</div>
