@@ -40,7 +40,6 @@ export async function generateText(args: {
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
 }) {
-	console.log({ telemetry: args.telemetry });
 	const actionNode = args.generation.context.actionNode;
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
