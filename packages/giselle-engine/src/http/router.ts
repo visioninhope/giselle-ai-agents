@@ -194,8 +194,15 @@ export const createJsonRouters = {
 				overrideNodes: z.array(OverrideNode).optional(),
 			}),
 			handler: async ({ input }) => {
-				const result = await giselleEngine.runApi(input);
-				return new Response(result);
+				try {
+					const result = await giselleEngine.runApi(input);
+					return new Response(result);
+				} catch (error) {
+					if (error instanceof UsageLimitError) {
+						return new Response(error.message, { status: 429 });
+					}
+					throw error;
+				}
 			},
 		}),
 	generateImage: (giselleEngine: GiselleEngine) =>
