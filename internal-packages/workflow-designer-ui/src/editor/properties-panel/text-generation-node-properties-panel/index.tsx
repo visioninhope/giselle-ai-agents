@@ -21,6 +21,7 @@ import {
 	PropertiesPanelRoot,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
+import { InputPanel } from "./input-panel";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
@@ -30,7 +31,6 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
-import { SourcesPanel } from "./sources-panel";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -134,10 +134,7 @@ export function TextGenerationNodePropertiesPanel({
 				}
 			/>
 
-			<PanelGroup
-				direction="vertical"
-				className="flex-1 flex flex-col gap-[16px]"
-			>
+			<PanelGroup direction="vertical" className="flex-1 flex flex-col">
 				<Panel>
 					<PropertiesPanelContent>
 						<Tabs.Root
@@ -157,7 +154,7 @@ export function TextGenerationNodePropertiesPanel({
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
-								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
+								<Tabs.Trigger value="input">Input</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
@@ -299,18 +296,19 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 							<Tabs.Content
-								value="sources"
+								value="input"
 								className="flex-1 flex flex-col overflow-y-auto"
 							>
-								<SourcesPanel node={node} />
+								<InputPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>
 				</Panel>
 				<PanelResizeHandle
 					className={clsx(
-						"h-[1px] bg-black-400/50 transition-colors",
-						"data-[resize-handle-state=hover]:bg-black-400 data-[resize-handle-state=drag]:bg-black-400",
+						"h-[12px] flex items-center justify-center cursor-row-resize",
+						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+						"hover:after:bg-[#4a90e2]",
 					)}
 				/>
 				<Panel>

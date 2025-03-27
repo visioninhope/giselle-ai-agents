@@ -21,6 +21,7 @@ import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
+import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	checkUsageLimits,
@@ -37,7 +38,9 @@ import {
 export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	telemetry?: TelemetrySettings;
 }) {
+	console.log({ telemetry: args.telemetry });
 	const actionNode = args.generation.context.actionNode;
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
@@ -323,6 +326,7 @@ export async function generateText(args: {
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,
+			metadata: args.telemetry?.metadata,
 		},
 	});
 	return streamTextResult;

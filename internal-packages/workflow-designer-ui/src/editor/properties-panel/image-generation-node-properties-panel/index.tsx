@@ -16,11 +16,11 @@ import {
 	PropertiesPanelRoot,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
+import { InputPanel } from "./input-panel";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { ImageGenerationModelPanel } from "./model-panel";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
-import { SourcesPanel } from "./sources-panel";
 
 export function ImageGenerationNodePropertiesPanel({
 	node,
@@ -132,7 +132,7 @@ export function ImageGenerationNodePropertiesPanel({
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
-								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
+								<Tabs.Trigger value="input">Input</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
@@ -155,10 +155,10 @@ export function ImageGenerationNodePropertiesPanel({
 								/>
 							</Tabs.Content>
 							<Tabs.Content
-								value="sources"
+								value="input"
 								className="flex-1 flex flex-col overflow-y-auto"
 							>
-								<SourcesPanel node={node} />
+								<InputPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>
