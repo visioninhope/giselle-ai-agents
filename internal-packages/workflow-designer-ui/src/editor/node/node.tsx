@@ -177,6 +177,7 @@ export function NodeComponent({
 							>
 								<Handle
 									type="target"
+									isConnectable={false}
 									position={Position.Left}
 									id={input.id}
 									className={clsx(
