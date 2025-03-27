@@ -1,13 +1,11 @@
 import {
 	ConnectionId,
-	type FileId,
 	type InputId,
 	type Node,
 	NodeId,
 	type NodeReference,
 	NodeUIState,
 	type OutputId,
-	type UploadedFileData,
 	type Viewport,
 	type Workspace,
 	generateInitialWorkspace,
@@ -120,6 +118,66 @@ export function WorkflowDesigner({
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
+	function canConnectNodes(
+		outputNode: Node,
+		inputNode: Node,
+	): { canConnect: true } | { canConnect: false; message: string } {
+		// FIXME: Use language model to check if the nodes can be connected
+		// For now, giselle's connecting capability is not tied with language model's capability
+		// So we need to check if the nodes can be connected by ourselves
+		if (outputNode.id === inputNode.id) {
+			return {
+				canConnect: false,
+				message: "Connecting to the same node is not allowed",
+			};
+		}
+		if (inputNode.type !== "action") {
+			return {
+				canConnect: false,
+				message: "This node does not receive inputs",
+			};
+		}
+
+		if (outputNode.content.type === "imageGeneration") {
+			return {
+				canConnect: false,
+				message: "Image generation node is not supported as an output",
+			};
+		}
+		if (outputNode.content.type === "github") {
+			return {
+				canConnect: false,
+				message: "GitHub node is not supported as an output",
+			};
+		}
+
+		if (outputNode.content.type === "file") {
+			if (inputNode.content.type === "imageGeneration") {
+				return {
+					canConnect: false,
+					message:
+						"File node is not supported as an input for Image Generation",
+				};
+			}
+
+			if (inputNode.content.llm.provider === "openai") {
+				return {
+					canConnect: false,
+					message: "File node is not supported as an input for OpenAI",
+				};
+			}
+			if (inputNode.content.llm.provider === "perplexity") {
+				return {
+					canConnect: false,
+					message: "File node is not supported as an input for Perplexity",
+				};
+			}
+		}
+
+		return {
+			canConnect: true,
+		};
+	}
 
 	return {
 		addNode,
@@ -131,5 +189,6 @@ export function WorkflowDesigner({
 		deleteNode,
 		deleteConnection,
 		updateName,
+		canConnectNodes,
 	};
 }
