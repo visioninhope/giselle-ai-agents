@@ -122,7 +122,7 @@ async function buildGenerationMessageForTextGeneration(
 				}
 				break;
 			}
-			case "file": {
+			case "file":
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
@@ -144,6 +144,15 @@ async function buildGenerationMessageForTextGeneration(
 						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);
 					}
 				}
+				break;
+
+			case "github":
+			case "imageGeneration":
+				throw new Error("Not implemented");
+
+			default: {
+				const _exhaustiveCheck: never = contextNode.content;
+				throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
 			}
 		}
 	}
@@ -499,7 +508,7 @@ async function buildGenerationMessageForImageGeneration(
 				}
 				break;
 			}
-			case "file": {
+			case "file":
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
@@ -521,6 +530,15 @@ async function buildGenerationMessageForImageGeneration(
 						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);
 					}
 				}
+				break;
+
+			case "github":
+			case "imageGeneration":
+				throw new Error("Not implemented");
+
+			default: {
+				const _exhaustiveCheck: never = contextNode.content;
+				throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
 			}
 		}
 	}

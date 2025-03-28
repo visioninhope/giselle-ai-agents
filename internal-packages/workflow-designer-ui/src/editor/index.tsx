@@ -23,7 +23,7 @@ import {
 	PanelResizeHandle,
 } from "react-resizable-panels";
 import { Background } from "../ui/background";
-import { ToastProvider } from "../ui/toast";
+import { ToastProvider, useToasts } from "../ui/toast";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
@@ -47,6 +47,7 @@ function NodeCanvas() {
 		updateNodeData,
 		addNode,
 		addConnection,
+		isSupportedConnection,
 	} = useWorkflowDesigner();
 	const reactFlowInstance = useReactFlow<
 		GiselleWorkflowDesignerNode,
@@ -54,6 +55,7 @@ function NodeCanvas() {
 	>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
+	const { error: errorToast } = useToasts();
 	useEffect(() => {
 		reactFlowInstance.setNodes(
 			Object.entries(data.ui.nodeState)
@@ -91,43 +93,48 @@ function NodeCanvas() {
 	}, [data, reactFlowInstance.setEdges]);
 
 	const handleConnect = (connection: Connection) => {
-		const outputNode = data.nodes.find((node) => node.id === connection.source);
-		const inputNode = data.nodes.find((node) => node.id === connection.target);
-		if (!outputNode || !inputNode) {
-			return;
-		}
-		if (inputNode.type !== "action") {
-			return;
-		}
-		const isAlreadyConnected = data.connections.find(
-			(conn) =>
-				conn.inputNode.id === inputNode.id &&
-				conn.outputNode.id === outputNode.id,
-		);
-		if (isAlreadyConnected) {
-			return;
-		}
+		try {
+			const outputNode = data.nodes.find(
+				(node) => node.id === connection.source,
+			);
+			const inputNode = data.nodes.find(
+				(node) => node.id === connection.target,
+			);
+			if (!outputNode || !inputNode) {
+				throw new Error("Node not found");
+			}
 
-		const safeOutputId = OutputId.safeParse(connection.sourceHandle);
-		if (!safeOutputId.success) {
-			return;
-		}
+			const isSupported = isSupportedConnection(outputNode, inputNode);
+			if (!isSupported.canConnect) {
+				throw new Error(isSupported.message);
+			}
 
-		const outputId = safeOutputId.data;
-		const newInput = {
-			id: InputId.generate(),
-			label: "Input",
-		};
-		const updatedInputs = [...inputNode.inputs, newInput];
-		updateNodeData(inputNode, {
-			inputs: updatedInputs,
-		});
-		addConnection({
-			inputNode: inputNode,
-			inputId: newInput.id,
-			outputId,
-			outputNode: outputNode,
-		});
+			const safeOutputId = OutputId.safeParse(connection.sourceHandle);
+			if (!safeOutputId.success) {
+				throw new Error("Invalid output id");
+			}
+			const outputId = safeOutputId.data;
+			const newInput = {
+				id: InputId.generate(),
+				label: "Input",
+			};
+			const updatedInputs = [...inputNode.inputs, newInput];
+			updateNodeData(inputNode, {
+				inputs: updatedInputs,
+			});
+			addConnection({
+				inputNode: inputNode,
+				inputId: newInput.id,
+				outputId,
+				outputNode: outputNode,
+			});
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				errorToast(error.message);
+			} else {
+				errorToast("Failed to connect nodes");
+			}
+		}
 	};
 
 	const handleEdgesDelete = (edgesToDelete: Edge[]) => {
@@ -156,27 +163,19 @@ function NodeCanvas() {
 		connection: Connection | ConnectorType,
 	) => {
 		const { source, target, sourceHandle, targetHandle } = connection;
-
 		if (!sourceHandle || !targetHandle) {
 			return false;
 		}
-
 		if (source === target) {
 			return false;
 		}
 
-		const outputNode = data.nodes.find((node) => node.id === source);
-		const inputNode = data.nodes.find((node) => node.id === target);
-
+		const outputNode = data.nodes.find((node) => node.id === connection.source);
+		const inputNode = data.nodes.find((node) => node.id === connection.target);
 		if (!outputNode || !inputNode) {
 			return false;
 		}
-
-		if (inputNode.type !== "action") {
-			return false;
-		}
-
-		const isAlreadyConnected = data.connections.find(
+		const isAlreadyConnected = data.connections.some(
 			(conn) =>
 				conn.inputNode.id === inputNode.id &&
 				conn.outputNode.id === outputNode.id,
