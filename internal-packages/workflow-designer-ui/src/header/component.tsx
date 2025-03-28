@@ -108,15 +108,15 @@ export function Header({
 			</div>
 
 			<div className="flex items-center gap-[12px]">
-				<div className="flex items-center overflow-hidden rounded-[8px] border border-black-400/30">
+				<div className="flex items-center py-[4px] px-[8px] rounded-[8px] overflow-hidden bg-black-200/20">
 					<button
 						type="button"
 						onClick={toggleView}
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[6px] text-[14px] transition-colors",
+							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
 							view === "editor"
-								? "bg-primary-900 text-white-900"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800",
+								? "bg-primary-950/20 text-primary-200 border-primary-900"
+								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-transparent cursor-pointer",
 						)}
 					>
 						<GanttChartIcon className="size-[16px]" />
@@ -126,10 +126,10 @@ export function Header({
 						type="button"
 						onClick={toggleView}
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[6px] text-[14px] transition-colors",
+							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
 							view === "viewer"
-								? "bg-primary-900 text-white-900"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800",
+								? "bg-primary-950/20 text-primary-200 border-primary-900"
+								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-transparent cursor-pointer",
 						)}
 					>
 						<EyeIcon className="size-[16px]" />
