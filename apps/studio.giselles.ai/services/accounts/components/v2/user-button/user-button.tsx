@@ -20,7 +20,7 @@ export const UserButton: FC = async () => {
 	const { displayName } = await getAccountInfo();
 
 	return (
-		<DropdownMenu modal={false}>
+		<DropdownMenu>
 			<DropdownMenuTrigger className="cursor-pointer">
 				<Avatar
 					name={user.email}
