@@ -12,10 +12,7 @@
 		"format": "biome check --write .",
 		"test": "vitest run"
 	},
-	"files": [
-		"dist/**/*",
-		"react/dist/**/*"
-	],
+	"files": ["dist/**/*", "react/dist/**/*"],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
