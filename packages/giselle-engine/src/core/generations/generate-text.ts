@@ -40,7 +40,6 @@ export async function generateText(args: {
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
 }) {
-	console.log({ telemetry: args.telemetry });
 	const actionNode = args.generation.context.actionNode;
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
@@ -202,6 +201,8 @@ export async function generateText(args: {
 	const streamTextResult = streamText({
 		model: generationModel(actionNode.content.llm),
 		messages,
+		maxSteps: 5, // enable multi-step calls
+		experimental_continueSteps: true,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {
 				const failedGeneration = {

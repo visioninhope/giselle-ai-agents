@@ -1,5 +1,6 @@
 "use client";
 
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import clsx from "clsx";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { ViewState } from "giselle-sdk/react";
@@ -18,14 +19,28 @@ import { SettingsPanel } from "../settings";
 
 export function Header({
 	action,
+	onWorkflowNameChange,
 }: {
 	action?: ReactNode;
+	onWorkflowNameChange?: (workspaceId: WorkspaceId, name: string) => void;
 }) {
 	const { data, updateName, view, setView } = useWorkflowDesigner();
 	const [openSettings, setOpenSettings] = useState(false);
 
 	const toggleView = () => {
 		setView(view === "editor" ? "viewer" : "editor");
+	};
+
+	const updateWorkflowName = (value?: string) => {
+		if (!value) {
+			return;
+		}
+
+		if (onWorkflowNameChange) {
+			onWorkflowNameChange(data.id, value);
+		}
+
+		updateName(value);
 	};
 
 	return (
@@ -38,7 +53,7 @@ export function Header({
 				<div className="flex gap-[2px] group">
 					<EditableText
 						fallbackValue="Untitled"
-						onChange={updateName}
+						onChange={updateWorkflowName}
 						value={data.name}
 					/>
 

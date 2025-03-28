@@ -21,6 +21,7 @@ import {
 	PropertiesPanelRoot,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
+import { InputPanel } from "./input-panel";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
@@ -30,7 +31,6 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
-import { SourcesPanel } from "./sources-panel";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -154,7 +154,7 @@ export function TextGenerationNodePropertiesPanel({
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
-								<Tabs.Trigger value="sources">Sources</Tabs.Trigger>
+								<Tabs.Trigger value="input">Input</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
@@ -296,10 +296,10 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 							<Tabs.Content
-								value="sources"
+								value="input"
 								className="flex-1 flex flex-col overflow-y-auto"
 							>
-								<SourcesPanel node={node} />
+								<InputPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>
