@@ -188,7 +188,7 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) => {
 				const result = await giselleEngine.runApi(input);
-				return new Response(result);
+				return new Response(result.join("\n"));
 			},
 		}),
 	generateImage: (giselleEngine: GiselleEngine) =>

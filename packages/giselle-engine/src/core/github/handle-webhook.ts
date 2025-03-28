@@ -189,52 +189,54 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 				),
 			);
 
-			const responsePromises = results.map(async (result) => {
-				switch (workspaceGitHubIntegrationSetting.nextAction) {
-					case "github.pull_request_comment.create":
-						return {
-							action: "github.pull_request_comment.create",
-							pullRequest: {
-								repo: {
-									owner: repository.owner,
-									name: repository.name,
+			const webhookResults: HandleGitHubWebhookResult[] = [];
+			for (const result of results) {
+				for (const resultText of result) {
+					switch (workspaceGitHubIntegrationSetting.nextAction) {
+						case "github.pull_request_comment.create":
+							webhookResults.push({
+								action: "github.pull_request_comment.create",
+								pullRequest: {
+									repo: {
+										owner: repository.owner,
+										name: repository.name,
+									},
+									number: await getPayloadValue(
+										args.github.event,
+										args.github.payload,
+										"github.pull_request_comment.pull_request.number",
+									),
 								},
-								number: await getPayloadValue(
-									args.github.event,
-									args.github.payload,
-									"github.pull_request_comment.pull_request.number",
-								),
-							},
-							content: result,
-						} satisfies PullRequestCommentCreateAction;
-					case "github.issue_comment.create":
-						return {
-							action: "github.issue_comment.create",
-							issue: {
-								repo: {
-									owner: repository.owner,
-									name: repository.name,
+								content: resultText,
+							});
+							break;
+						case "github.issue_comment.create":
+							webhookResults.push({
+								action: "github.issue_comment.create",
+								issue: {
+									repo: {
+										owner: repository.owner,
+										name: repository.name,
+									},
+									number: await getPayloadValue(
+										args.github.event,
+										args.github.payload,
+										"github.issue_comment.issue.number",
+									),
 								},
-								number: await getPayloadValue(
-									args.github.event,
-									args.github.payload,
-									"github.issue_comment.issue.number",
-								),
-							},
-							content: result,
-						} satisfies IssueCommentCreateAction;
-					default: {
-						const _exhaustiveCheck: never =
-							workspaceGitHubIntegrationSetting.nextAction;
-						throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
+								content: resultText,
+							});
+							break;
+						default: {
+							const _exhaustiveCheck: never =
+								workspaceGitHubIntegrationSetting.nextAction;
+							throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
+						}
 					}
 				}
-			});
-
-			return await Promise.all(responsePromises);
+			}
+			return webhookResults;
 		});
-
-	// Execute all promises and flatten the result array
 	const results = await Promise.all(integrationPromises);
 	return results.flat();
 }

@@ -229,7 +229,5 @@ export async function runApi(args: {
 		);
 		jobResults[job.id] = jobResult;
 	}
-	return jobResults[run.workflow.jobs[run.workflow.jobs.length - 1].id].join(
-		"/n",
-	);
+	return jobResults[run.workflow.jobs[run.workflow.jobs.length - 1].id];
 }
