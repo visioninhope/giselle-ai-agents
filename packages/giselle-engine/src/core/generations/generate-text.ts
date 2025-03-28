@@ -201,6 +201,8 @@ export async function generateText(args: {
 	const streamTextResult = streamText({
 		model: generationModel(actionNode.content.llm),
 		messages,
+		maxSteps: 5, // enable multi-step calls
+		experimental_continueSteps: true,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {
 				const failedGeneration = {
