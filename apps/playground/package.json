@@ -7,7 +7,7 @@
 	"packageManager": "pnpm@10.6.5",
 	"private": true,
 	"scripts": {
-		"dev": "next dev --turbopack --port 6180",
+		"dev": "next dev --turbopack",
 		"clean": "rm -rf .next .turbo node_modules",
 		"build": "next build",
 		"start": "next start",
