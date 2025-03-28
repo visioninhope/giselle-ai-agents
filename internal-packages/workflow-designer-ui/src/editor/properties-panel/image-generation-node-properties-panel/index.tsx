@@ -169,7 +169,7 @@ export function ImageGenerationNodePropertiesPanel({
 				/>
 				<Panel>
 					<PropertiesPanelContent>
-						<GenerationPanel node={node} />
+						<GenerationPanel node={node} onClickGenerateButton={generateText} />
 					</PropertiesPanelContent>
 				</Panel>
 			</PanelGroup>
