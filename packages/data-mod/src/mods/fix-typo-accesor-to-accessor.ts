@@ -20,7 +20,7 @@ export function fixTypoAccesorToAccessor(data: unknown, issue: ZodIssue) {
 	setValueAtPath(
 		newData,
 		issue.path,
-		// @ts-ignore previous field name for data mod: [INSERT PULL REQUEST LINK LATER]
+		// @ts-ignore previous field name for data mod: https://github.com/giselles-ai/giselle/pull/570
 		output.accesor,
 	);
 	return newData;
