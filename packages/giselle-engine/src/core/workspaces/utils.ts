@@ -21,20 +21,20 @@ export async function setWorkspace({
 	});
 }
 
-function parseAndRepairWorkspace(workspaceLike: unknown, repair = false) {
+function parseAndMod(workspaceLike: unknown, mod = false) {
 	const parseResult = Workspace.safeParse(workspaceLike);
 	if (parseResult.success) {
 		return parseResult.data;
 	}
-	if (repair) {
+	if (mod) {
 		throw new Error(`Invalid workspace: ${parseResult.error}`);
 	}
 
-	let repaired = workspaceLike;
+	let modData = workspaceLike;
 	for (const issue of parseResult.error.issues) {
-		repaired = dataMod(repaired, issue);
+		modData = dataMod(modData, issue);
 	}
-	return parseAndRepairWorkspace(repaired, true);
+	return parseAndMod(modData, true);
 }
 
 export async function getWorkspace({
@@ -45,5 +45,5 @@ export async function getWorkspace({
 	workspaceId: WorkspaceId;
 }) {
 	const result = await storage.getItem(workspacePath(workspaceId));
-	return parseAndRepairWorkspace(result);
+	return parseAndMod(result);
 }
