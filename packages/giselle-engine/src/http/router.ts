@@ -14,10 +14,10 @@ import {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod";
-import { type GiselleEngine, UsageLimitError } from "../core";
+import type { GiselleEngine } from "../core";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
-import { createHandler } from "./create-handler";
+import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 
 export const createJsonRouters = {
 	createWorkspace: (giselleEngine: GiselleEngine) =>
@@ -54,26 +54,21 @@ export const createJsonRouters = {
 			},
 		}),
 	generateText: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				generation: QueuedGeneration,
-				telemetry: z.custom<TelemetrySettings>().optional(),
-			}),
-			handler: async ({ input }) => {
-				try {
+		withUsageLimitErrorHandler(
+			createHandler({
+				input: z.object({
+					generation: QueuedGeneration,
+					telemetry: z.custom<TelemetrySettings>().optional(),
+				}),
+				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
 						input.telemetry,
 					);
 					return stream.toDataStreamResponse();
-				} catch (error) {
-					if (error instanceof UsageLimitError) {
-						return new Response(error.message, { status: 429 });
-					}
-					throw error;
-				}
-			},
-		}),
+				},
+			}),
+		),
 	getGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({ generationId: GenerationId.schema }),
@@ -187,39 +182,29 @@ export const createJsonRouters = {
 			},
 		}),
 	runApi: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-				workflowId: WorkflowId.schema,
-				overrideNodes: z.array(OverrideNode).optional(),
-			}),
-			handler: async ({ input }) => {
-				try {
+		withUsageLimitErrorHandler(
+			createHandler({
+				input: z.object({
+					workspaceId: WorkspaceId.schema,
+					workflowId: WorkflowId.schema,
+					overrideNodes: z.array(OverrideNode).optional(),
+				}),
+				handler: async ({ input }) => {
 					const result = await giselleEngine.runApi(input);
 					return new Response(result);
-				} catch (error) {
-					if (error instanceof UsageLimitError) {
-						return new Response(error.message, { status: 429 });
-					}
-					throw error;
-				}
-			},
-		}),
+				},
+			}),
+		),
 	generateImage: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({ generation: QueuedGeneration }),
-			handler: async ({ input }) => {
-				try {
+		withUsageLimitErrorHandler(
+			createHandler({
+				input: z.object({ generation: QueuedGeneration }),
+				handler: async ({ input }) => {
 					await giselleEngine.generateImage(input.generation);
 					return new Response(null, { status: 204 });
-				} catch (error) {
-					if (error instanceof UsageLimitError) {
-						return new Response(error.message, { status: 429 });
-					}
-					throw error;
-				}
-			},
-		}),
+				},
+			}),
+		),
 	setGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({ generation: Generation }),
