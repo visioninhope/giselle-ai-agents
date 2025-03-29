@@ -18,6 +18,11 @@ export function fixTypoAccesorToAccessor(
 		workspaceLike,
 		issue.path.slice(0, -1),
 	) as unknown as Output;
-	setValueAtPath(newValue, issue.path, output.accesor);
+	setValueAtPath(
+		newValue,
+		issue.path,
+		// @ts-ignore previous field name for data mod: [INSERT PULL REQUEST LINK LATER]
+		output.accesor,
+	);
 	return newValue;
 }
