@@ -1,52 +1,9 @@
-import {
-	Node,
-	type Output,
-	Workspace,
-	type WorkspaceId,
-} from "@giselle-sdk/data-type";
+import { dataMod } from "@giselle-sdk/data-mod";
+import { Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
-import type { ZodIssue } from "zod";
 
 export function workspacePath(workspaceId: WorkspaceId) {
 	return `workspaces/${workspaceId}/workspace.json`;
-}
-
-function getValueAtPath(obj: any, path: (string | number)[]) {
-	return path.reduce(
-		(acc, key) => (acc && acc[key] !== undefined ? acc[key] : undefined),
-		obj,
-	);
-}
-
-function setValueAtPath(obj: any, path: (string | number)[], value: any) {
-	if (path.length === 0) return;
-
-	const lastKey = path[path.length - 1];
-	const parentPath = path.slice(0, -1);
-
-	let parent = obj;
-	for (const key of parentPath) {
-		if (parent[key] === undefined) {
-			parent[key] = typeof key === "number" ? [] : {};
-		}
-		parent = parent[key];
-	}
-
-	parent[lastKey] = value;
-}
-
-export function repairAccessor(workspaceLike: unknown, issue: ZodIssue) {
-	const lastPath = issue.path[issue.path.length - 1];
-	if (lastPath === "accessor") {
-		const output = getValueAtPath(
-			workspaceLike,
-			issue.path.slice(0, -1),
-		) as unknown as Output;
-		// @ts-expect-error old schema key
-		setValueAtPath(workspaceLike, issue.path, output.accesor);
-		return workspaceLike;
-	}
-	return workspaceLike;
 }
 
 export async function setWorkspace({
@@ -73,9 +30,9 @@ function parseAndRepairWorkspace(workspaceLike: unknown, repair = false) {
 		throw new Error(`Invalid workspace: ${parseResult.error}`);
 	}
 
-	const repaired = workspaceLike;
+	let repaired = workspaceLike;
 	for (const issue of parseResult.error.issues) {
-		repairAccessor(repaired, issue);
+		repaired = dataMod(repaired, issue);
 	}
 	return parseAndRepairWorkspace(repaired, true);
 }
