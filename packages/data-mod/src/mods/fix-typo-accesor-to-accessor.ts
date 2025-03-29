@@ -2,27 +2,26 @@ import type { Output } from "@giselle-sdk/data-type";
 import type { ZodIssue } from "zod";
 import { getValueAtPath, isObject, setValueAtPath } from "../utils";
 
-export function fixTypoAccesorToAccessor(
-	workspaceLike: unknown,
-	issue: ZodIssue,
-) {
+export function fixTypoAccesorToAccessor(data: unknown, issue: ZodIssue) {
 	const lastPath = issue.path[issue.path.length - 1];
 	if (lastPath !== "accessor") {
-		return workspaceLike;
+		return data;
 	}
-	if (!isObject(workspaceLike)) {
-		return workspaceLike;
+	if (!isObject(data)) {
+		return data;
 	}
-	const newValue = { ...workspaceLike };
+	const newData = { ...data };
 	const output = getValueAtPath(
-		workspaceLike,
+		data,
 		issue.path.slice(0, -1),
 	) as unknown as Output;
+
+	// set data[path].accesor to data[path].accessor
 	setValueAtPath(
-		newValue,
+		newData,
 		issue.path,
 		// @ts-ignore previous field name for data mod: [INSERT PULL REQUEST LINK LATER]
 		output.accesor,
 	);
-	return newValue;
+	return newData;
 }
