@@ -75,13 +75,14 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 	return (
 		<Card title="Team name">
 			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
+				<div>
 					{isEditingName ? (
 						<form
 							onSubmit={(e) => {
 								e.preventDefault();
 								handleSaveTeamName();
 							}}
+							className="flex items-center gap-2"
 						>
 							<Input
 								value={tempTeamName}
@@ -107,7 +108,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 							</Button>
 						</form>
 					) : (
-						<>
+						<div className="flex items-center gap-2">
 							<span className="text-lg">{teamName}</span>
 							<Button
 								className="shrink-0 h-8 w-8 rounded-full p-0"
@@ -115,7 +116,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 							>
 								<Pencil className="h-4 w-4" />
 							</Button>
-						</>
+						</div>
 					)}
 				</div>
 
