@@ -77,7 +77,12 @@ export function AccountDisplayNameForm({
 		<div className="flex flex-col gap-2">
 			<div className="flex items-center gap-2">
 				{isEditingName ? (
-					<>
+					<form
+						onSubmit={(e) => {
+							e.preventDefault();
+							handleSaveDisplayName();
+						}}
+					>
 						<Input
 							value={tempDisplayName}
 							onChange={handleChange}
@@ -85,6 +90,7 @@ export function AccountDisplayNameForm({
 							disabled={isLoading}
 						/>
 						<Button
+							type="submit"
 							className="shrink-0 h-8 w-8 rounded-full p-0"
 							onClick={handleSaveDisplayName}
 							disabled={isLoading || !!error}
@@ -92,13 +98,14 @@ export function AccountDisplayNameForm({
 							<Check className="h-4 w-4" />
 						</Button>
 						<Button
+							type="button"
 							className="shrink-0 h-8 w-8 rounded-full p-0"
 							onClick={handleCancelDislayName}
 							disabled={isLoading}
 						>
 							<X className="h-4 w-4" />
 						</Button>
-					</>
+					</form>
 				) : (
 					<>
 						<span className="text-lg">{displayName}</span>
