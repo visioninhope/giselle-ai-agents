@@ -180,13 +180,18 @@ export function NodeComponent({
 									position={Position.Left}
 									id={input.id}
 									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[5px] !translate-x-[50%] !border-[1.5px]",
+										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!bg-generation-node-1 group-data-[content-type=imageGeneration]:!border-generation-node-1",
 									)}
 									data-state="connected"
 								/>
-								<div className="text-[14px] px-[12px] text-white-900">
+								<div className={clsx(
+									"text-[14px]",
+									"data-[state=connected]:px-[12px] data-[state=connected]:text-white-900",
+									"data-[state=disconnected]:absolute data-[state=disconnected]:left-[-45px] data-[state=disconnected]:text-black-400 data-[state=disconnected]:whitespace-nowrap"
+								)}
+								data-state="connected">
 									{input.label}
 								</div>
 							</div>
@@ -198,13 +203,13 @@ export function NodeComponent({
 									position={Position.Left}
 									id="blank-handle"
 									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
+										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
 									)}
 									data-state="disconnected"
 								/>
-								<div className="text-[14px] px-[12px] text-black-400">
+								<div className="absolute left-[-45px] text-[14px] text-black-400 whitespace-nowrap">
 									Input
 								</div>
 							</div>
@@ -229,7 +234,7 @@ export function NodeComponent({
 											: "disconnected"
 									}
 									className={clsx(
-										"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px]",
+										"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
 										"group-data-[content-type=github]:!border-github-node-1",
@@ -244,7 +249,9 @@ export function NodeComponent({
 									)}
 								/>
 								<div className={clsx(
-									"text-[14px] px-[16px]",
+									"text-[14px]",
+									"data-[state=connected]:px-[16px]",
+									"data-[state=disconnected]:absolute data-[state=disconnected]:right-[-60px] data-[state=disconnected]:whitespace-nowrap",
 									"data-[state=connected]:text-white-900 data-[state=disconnected]:text-black-400"
 								)}
 								data-state={
