@@ -6,213 +6,9 @@ settings:
 
 catalogs:
   default:
-    '@ai-sdk/anthropic':
-      specifier: 1.2.1
-      version: 1.2.1
-    '@ai-sdk/fal':
-      specifier: 0.1.1
-      version: 0.1.1
-    '@ai-sdk/google':
-      specifier: 1.2.3
-      version: 1.2.3
-    '@ai-sdk/openai':
-      specifier: 1.3.2
-      version: 1.3.2
-    '@ai-sdk/perplexity':
-      specifier: 1.1.1
-      version: 1.1.1
-    '@ai-sdk/react':
-      specifier: 1.2.2
-      version: 1.2.2
-    '@biomejs/biome':
-      specifier: 1.9.4
-      version: 1.9.4
-    '@graphql-codegen/cli':
-      specifier: 5.0.5
-      version: 5.0.5
-    '@graphql-codegen/client-preset':
-      specifier: 4.7.0
-      version: 4.7.0
-    '@octokit/auth-app':
-      specifier: 7.1.1
-      version: 7.1.1
-    '@octokit/core':
-      specifier: 6.1.2
-      version: 6.1.2
-    '@octokit/graphql':
-      specifier: 8.2.1
-      version: 8.2.1
-    '@octokit/openapi-types':
-      specifier: 22.2.0
-      version: 22.2.0
-    '@octokit/request-error':
-      specifier: 6.1.5
-      version: 6.1.5
-    '@tailwindcss/postcss':
-      specifier: 4.0.3
-      version: 4.0.3
-    '@tailwindcss/typography':
-      specifier: 0.5.16
-      version: 0.5.16
-    '@tiptap/core':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-bold':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-bullet-list':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-code':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-code-block-lowlight':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-document':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-history':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-italic':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-list-item':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-ordered-list':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-paragraph':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-strike':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/extension-text':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/html':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/pm':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@tiptap/react':
-      specifier: 2.11.5
-      version: 2.11.5
-    '@turbo/gen':
-      specifier: 2.3.3
-      version: 2.3.3
-    '@types/node':
-      specifier: 22.10.7
-      version: 22.10.7
-    '@types/pluralize':
-      specifier: 0.0.33
-      version: 0.0.33
-    '@types/react':
-      specifier: 19.0.4
-      version: 19.0.4
-    '@types/react-dom':
-      specifier: 19.0.2
-      version: 19.0.2
-    '@types/turndown':
-      specifier: 5.0.5
-      version: 5.0.5
-    '@urql/core':
-      specifier: 5.1.1
-      version: 5.1.1
-    '@xyflow/react':
-      specifier: 12.4.1
-      version: 12.4.1
-    ai:
-      specifier: 4.2.5
-      version: 4.2.5
-    clsx:
-      specifier: 2.1.1
-      version: 2.1.1
-    gql.tada:
-      specifier: 1.8.10
-      version: 1.8.10
-    graphql:
-      specifier: 16.10.0
-      version: 16.10.0
-    highlight.js:
-      specifier: 11.11.1
-      version: 11.11.1
-    lowlight:
-      specifier: 3.3.0
-      version: 3.3.0
-    lucide-react:
-      specifier: 0.473.0
-      version: 0.473.0
-    marked:
-      specifier: 15.0.7
-      version: 15.0.7
-    motion:
-      specifier: 12.3.1
-      version: 12.3.1
-    nanoid:
-      specifier: 5.0.9
-      version: 5.0.9
-    next:
-      specifier: 15.1.6
-      version: 15.1.6
-    node-loader:
-      specifier: 2.1.0
-      version: 2.1.0
-    openai:
-      specifier: 5.0.0-alpha.0
-      version: 5.0.0-alpha.0
-    pluralize:
-      specifier: 8.0.0
-      version: 8.0.0
-    postcss:
-      specifier: 8.5.1
-      version: 8.5.1
-    radix-ui:
-      specifier: 1.1.2
-      version: 1.1.2
-    react:
-      specifier: 19.0.0
-      version: 19.0.0
-    react-dom:
-      specifier: 19.0.0
-      version: 19.0.0
-    react-markdown:
-      specifier: 9.0.3
-      version: 9.0.3
-    react-resizable-panels:
-      specifier: 2.1.7
-      version: 2.1.7
-    tailwindcss:
-      specifier: 4.0.3
-      version: 4.0.3
-    tailwindcss-animate:
-      specifier: 1.0.7
-      version: 1.0.7
-    tsup:
-      specifier: 8.3.5
-      version: 8.3.5
-    turndown:
-      specifier: 7.2.0
-      version: 7.2.0
-    typescript:
-      specifier: 5.7.3
-      version: 5.7.3
     unstorage:
       specifier: 1.14.4
       version: 1.14.4
-    urql:
-      specifier: 4.2.2
-      version: 4.2.2
-    vitest:
-      specifier: 3.0.5
-      version: 3.0.5
-    zod:
-      specifier: 3.24.1
-      version: 3.24.1
 
 importers:
 
@@ -495,9 +291,6 @@ importers:
       flags:
         specifier: 3.1.1
         version: 3.1.1(@opentelemetry/api@1.9.0)(next@15.1.4(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.0.0(react@19.0.0))(react@19.0.0))(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
-      framer-motion:
-        specifier: 12.0.0-alpha.0
-        version: 12.0.0-alpha.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
       gaxios:
         specifier: 6.7.1
         version: 6.7.1
@@ -510,12 +303,6 @@ importers:
       googleapis:
         specifier: 144.0.0
         version: 144.0.0
-      handlebars:
-        specifier: 4.7.8
-        version: 4.7.8
-      import-in-the-middle:
-        specifier: 1.11.0
-        version: 1.11.0
       input-otp:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.0.0(react@19.0.0))(react@19.0.0)
@@ -555,12 +342,6 @@ importers:
       react-dom:
         specifier: 19.0.0
         version: 19.0.0(react@19.0.0)
-      remark:
-        specifier: 15.0.1
-        version: 15.0.1
-      remark-html:
-        specifier: 16.0.1
-        version: 16.0.1
       stripe:
         specifier: 17.4.0
         version: 17.4.0
@@ -6217,20 +5998,6 @@ packages:
   forwarded-parse@2.1.2:
     resolution: {integrity: sha512-alTFZZQDKMporBH77856pXgzhEzaUVmLCDk+egLgIgHst3Tpndzz8MnKe+GzRJRfvVdn69HhpW7cmXzvtLvJAw==}
 
-  framer-motion@12.0.0-alpha.0:
-    resolution: {integrity: sha512-rw0+O0kqsSFPrYrSnHXrZTGAKteCj9D9HzDdHjJR8GyPWADLoQstgUYeSvLxrO3P+HlBfQtmu/SOsM9eLhKXtQ==}
-    peerDependencies:
-      '@emotion/is-prop-valid': '*'
-      react: ^18.0.0
-      react-dom: ^18.0.0
-    peerDependenciesMeta:
-      '@emotion/is-prop-valid':
-        optional: true
-      react:
-        optional: true
-      react-dom:
-        optional: true
-
   framer-motion@12.4.3:
     resolution: {integrity: sha512-rsMeO7w3dKyNG09o3cGwSH49iHU+VgDmfSSfsX+wfkO3zDA6WWkh4sUsMXd155YROjZP+7FTIhDrBYfgZeHjKQ==}
     peerDependencies:
@@ -6444,12 +6211,6 @@ packages:
     resolution: {integrity: sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==}
     engines: {node: '>= 0.4'}
 
-  hast-util-sanitize@5.0.2:
-    resolution: {integrity: sha512-3yTWghByc50aGS7JlGhk61SPenfE/p1oaFeNwkOOyrscaOkMGrcW9+Cy/QAIOBpZxP1yqDIzFMR0+Np0i0+usg==}
-
-  hast-util-to-html@9.0.4:
-    resolution: {integrity: sha512-wxQzXtdbhiwGAUKrnQJXlOPmHnEehzphwkK7aluUPQ+lEc1xefC8pblMgpp2w5ldBTEfveRIrADcrhGIWrlTDA==}
-
   hast-util-to-jsx-runtime@2.3.2:
     resolution: {integrity: sha512-1ngXYb+V9UT5h+PxNRa1O1FYguZK/XL+gkeqvp7EdHlB9oHUG0eYRo/vY5inBdcqo3RkPMC58/H94HvkbfGdyg==}
 
@@ -6481,9 +6242,6 @@ packages:
 
   html-url-attributes@3.0.1:
     resolution: {integrity: sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==}
-
-  html-void-elements@3.0.0:
-    resolution: {integrity: sha512-bEqo66MRXsUGxWHV5IP0PUiAWwoEjba4VCzg0LjFJBpchPaTfyfCKTG6bc5F8ucKec3q5y6qOdGyYTSBEvhCrg==}
 
   http-proxy-agent@7.0.2:
     resolution: {integrity: sha512-T1gkAiYYDWYx3V5Bmyu7HcfcvL7mUrTWiM6yOfa3PIphViJ/gFPbvidQ+veqSOHci/PxBcDabeUNCzpOODJZig==}
@@ -8031,20 +7789,11 @@ packages:
   relay-runtime@12.0.0:
     resolution: {integrity: sha512-QU6JKr1tMsry22DXNy9Whsq5rmvwr3LSZiiWV/9+DFpuTWvp+WFhobWMc8TC4OjKFfNhEZy7mOiqUAn5atQtug==}
 
-  remark-html@16.0.1:
-    resolution: {integrity: sha512-B9JqA5i0qZe0Nsf49q3OXyGvyXuZFDzAP2iOFLEumymuYJITVpiH1IgsTEwTpdptDmZlMDMWeDmSawdaJIGCXQ==}
-
   remark-parse@11.0.0:
     resolution: {integrity: sha512-FCxlKLNGknS5ba/1lmpYijMUzX2esxW5xQqjWxw2eHFfS2MSdaHVINFmhjo+qN1WhZhNimq0dZATN9pH0IDrpA==}
 
   remark-rehype@11.1.1:
     resolution: {integrity: sha512-g/osARvjkBXb6Wo0XvAeXQohVta8i84ACbenPpoSsxTOQH/Ae0/RGP4WZgnMH5pMLpsj4FG7OHmcIcXxpza8eQ==}
-
-  remark-stringify@11.0.0:
-    resolution: {integrity: sha512-1OSmLd3awB/t8qdoEOMazZkNsfVTeY4fTsgzcQFdXNq8ToTN4ZGwrMnlda4K6smTFKD+GRV6O48i6Z4iKgPPpw==}
-
-  remark@15.0.1:
-    resolution: {integrity: sha512-Eht5w30ruCXgFmxVUSlNWQ9iiimq07URKeFS3hNc8cUWy1llX4KDWfyEDZRycMc+znsN9Ux5/tJ/BFdgdOwA3A==}
 
   remedial@1.0.8:
     resolution: {integrity: sha512-/62tYiOe6DzS5BqVsNpH/nkGlX45C/Sp6V+NtiN6JQNS1Viay7cWkazmRkrQrdFj2eshDe96SIQNIoMxqhzBOg==}
@@ -14855,13 +14604,6 @@ snapshots:
 
   forwarded-parse@2.1.2: {}
 
-  framer-motion@12.0.0-alpha.0(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
-    dependencies:
-      tslib: 2.8.1
-    optionalDependencies:
-      react: 19.0.0
-      react-dom: 19.0.0(react@19.0.0)
-
   framer-motion@12.4.3(react-dom@19.0.0(react@19.0.0))(react@19.0.0):
     dependencies:
       motion-dom: 12.0.0
@@ -15148,26 +14890,6 @@ snapshots:
     dependencies:
       function-bind: 1.1.2
 
-  hast-util-sanitize@5.0.2:
-    dependencies:
-      '@types/hast': 3.0.4
-      '@ungap/structured-clone': 1.2.1
-      unist-util-position: 5.0.0
-
-  hast-util-to-html@9.0.4:
-    dependencies:
-      '@types/hast': 3.0.4
-      '@types/unist': 3.0.3
-      ccount: 2.0.1
-      comma-separated-tokens: 2.0.3
-      hast-util-whitespace: 3.0.0
-      html-void-elements: 3.0.0
-      mdast-util-to-hast: 13.2.0
-      property-information: 6.5.0
-      space-separated-tokens: 2.0.2
-      stringify-entities: 4.0.4
-      zwitch: 2.0.4
-
   hast-util-to-jsx-runtime@2.3.2:
     dependencies:
       '@types/estree': 1.0.6
@@ -15218,8 +14940,6 @@ snapshots:
   html-escaper@2.0.2: {}
 
   html-url-attributes@3.0.1: {}
-
-  html-void-elements@3.0.0: {}
 
   http-proxy-agent@7.0.2:
     dependencies:
@@ -17031,14 +16751,6 @@ snapshots:
     transitivePeerDependencies:
       - encoding
 
-  remark-html@16.0.1:
-    dependencies:
-      '@types/mdast': 4.0.4
-      hast-util-sanitize: 5.0.2
-      hast-util-to-html: 9.0.4
-      mdast-util-to-hast: 13.2.0
-      unified: 11.0.5
-
   remark-parse@11.0.0:
     dependencies:
       '@types/mdast': 4.0.4
@@ -17055,21 +16767,6 @@ snapshots:
       mdast-util-to-hast: 13.2.0
       unified: 11.0.5
       vfile: 6.0.3
-
-  remark-stringify@11.0.0:
-    dependencies:
-      '@types/mdast': 4.0.4
-      mdast-util-to-markdown: 2.1.2
-      unified: 11.0.5
-
-  remark@15.0.1:
-    dependencies:
-      '@types/mdast': 4.0.4
-      remark-parse: 11.0.0
-      remark-stringify: 11.0.0
-      unified: 11.0.5
-    transitivePeerDependencies:
-      - supports-color
 
   remedial@1.0.8: {}
 
