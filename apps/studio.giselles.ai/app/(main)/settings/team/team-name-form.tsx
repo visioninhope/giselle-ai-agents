@@ -75,9 +75,15 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 	return (
 		<Card title="Team name">
 			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-2">
+				<div>
 					{isEditingName ? (
-						<>
+						<form
+							onSubmit={(e) => {
+								e.preventDefault();
+								handleSaveTeamName();
+							}}
+							className="flex items-center gap-2"
+						>
 							<Input
 								value={tempTeamName}
 								onChange={handleChange}
@@ -85,6 +91,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 								disabled={isLoading}
 							/>
 							<Button
+								type="submit"
 								className="shrink-0 h-8 w-8 rounded-full p-0"
 								onClick={handleSaveTeamName}
 								disabled={isLoading || !!error}
@@ -92,15 +99,16 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 								<Check className="h-4 w-4" />
 							</Button>
 							<Button
+								type="button"
 								className="shrink-0 h-8 w-8 rounded-full p-0"
 								onClick={handleCancelTeamName}
 								disabled={isLoading}
 							>
 								<X className="h-4 w-4" />
 							</Button>
-						</>
+						</form>
 					) : (
-						<>
+						<div className="flex items-center gap-2">
 							<span className="text-lg">{teamName}</span>
 							<Button
 								className="shrink-0 h-8 w-8 rounded-full p-0"
@@ -108,7 +116,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 							>
 								<Pencil className="h-4 w-4" />
 							</Button>
-						</>
+						</div>
 					)}
 				</div>
 
