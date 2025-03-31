@@ -55,12 +55,8 @@ async function AgentList() {
 						<Link href={`/workspaces/${agent.workspaceId}`}>
 							<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
 								
-								{/* ステータスバーとメニューボタン */}
-								<div className="flex justify-between items-center mb-4">
-									<div className="flex items-center gap-2">
-										<div className="w-2 h-2 rounded-full bg-green-500"></div>
-										<span className="text-green-500 text-xs">Completed</span>
-									</div>
+								{/* メニューボタン - 上部に配置 */}
+								<div className="flex justify-end items-center h-[20px] mb-1.5">
 									<div className="opacity-60 group-hover:opacity-100 transition-opacity flex">
 										<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
 										<DeleteAgentButton agentId={agent.id} agentName={agent.name} />
