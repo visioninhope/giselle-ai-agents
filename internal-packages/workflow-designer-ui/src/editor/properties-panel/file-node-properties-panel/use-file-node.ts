@@ -1,6 +1,7 @@
 import type { FileNode, UploadedFileData } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useCallback } from "react";
+import { useToasts } from "../../../ui/toast";
 
 export function useFileNode(node: FileNode) {
 	const {
@@ -8,11 +9,16 @@ export function useFileNode(node: FileNode) {
 		uploadFile,
 		removeFile: removeFileInternal,
 	} = useWorkflowDesigner();
+	const { error } = useToasts();
 	const addFiles = useCallback(
 		async (files: File[]) => {
-			await uploadFile(files, node);
+			await uploadFile(files, node, {
+				onError: (errorMessage) => {
+					error(errorMessage);
+				},
+			});
 		},
-		[node, uploadFile],
+		[node, uploadFile, error],
 	);
 
 	const removeFile = useCallback(
