@@ -184,7 +184,7 @@ export function textGenerationNode(llm: TextGenerationLanguageModelData) {
 		{
 			id: OutputId.generate(),
 			label: "Output",
-			accesor: "generated-text",
+			accessor: "generated-text",
 		},
 	];
 	const languageModel = languageModels.find(
@@ -198,7 +198,7 @@ export function textGenerationNode(llm: TextGenerationLanguageModelData) {
 		outputs.push({
 			id: OutputId.generate(),
 			label: "Source",
-			accesor: "source",
+			accessor: "source",
 		});
 	}
 
