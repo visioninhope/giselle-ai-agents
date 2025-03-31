@@ -72,7 +72,7 @@ export function Background() {
 				))}
 			</div>
 
-			<div className="absolute w-full h-full bg-radial-[31.95%_31.95%_at_50%_50%] from-[rgba(1,4,26,0.20)] to-[rgba(1,4,26,0.80)] w-full h-full" />
+			<div className="absolute w-full h-full bg-radial-[45%_45%_at_50%_50%] from-[rgba(1,20,50,0.30)] to-[rgba(1,4,26,0.90)] w-full h-full" />
 		</div>
 	);
 }
