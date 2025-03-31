@@ -11,6 +11,7 @@ import {
 	jsonRouterPaths,
 } from "../http/router";
 import type { JsonResponse } from "../utils";
+import { APICallError } from "./errors/api-call-error";
 
 type FetchOptions = {
 	basePath?: string;
@@ -105,8 +106,15 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 			});
 
 			if (!response.ok) {
-				const error = await response.text();
-				throw new Error(error || `Error in ${path} operation`);
+				const errorText = await response.text();
+				throw new APICallError({
+					message: errorText || `Error in ${path} operation`,
+					url: `${basePath}/${path}`,
+					requestBodyValues: input || {},
+					statusCode: 413,
+					responseHeaders: Object.fromEntries(response.headers.entries()),
+					responseBody: errorText,
+				});
 			}
 
 			// Handle both JSON responses and stream responses
