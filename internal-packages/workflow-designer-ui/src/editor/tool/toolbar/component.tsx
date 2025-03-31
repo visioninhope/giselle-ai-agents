@@ -242,7 +242,7 @@ export function Toolbar() {
 								</Popover.Portal>
 							</Popover.Root>
 						)}
-						<div className="absolute left-[calc(var(--language-model-detail-panel-width)_+_16px)]">
+						<div className="absolute left-[calc(var(--language-model-detail-panel-width)_+_56px)]">
 							<div className="relative">
 								{selectedTool?.action === "selectLanguageModel" && (
 									<Popover.Root open={true}>
@@ -251,7 +251,7 @@ export function Toolbar() {
 											<Popover.Content
 												className="bg-black-900/10 w-[var(--language-model-detail-panel-width)] backdrop-blur-[4px] rounded-[8px] px-[8px] py-[8px] "
 												sideOffset={42}
-												align="center"
+												align="end"
 												onOpenAutoFocus={(e) => {
 													e.preventDefault();
 												}}
