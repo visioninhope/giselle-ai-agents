@@ -62,7 +62,10 @@ async function AgentList() {
 		<>
 			<div className="flex flex-wrap gap-4">
 				{dbAgents.map((agent) => (
-					<div key={agent.id} className="relative group flex-grow basis-[280px] min-w-[280px] h-[354px]">
+					<div
+						key={agent.id}
+						className="relative group flex-grow basis-[280px] min-w-[280px] max-w-[376px] h-[354px]"
+					>
 						{/* メニューボタン - カードの上に絶対位置で配置 */}
 						<div className="absolute top-0 right-[8px] z-10 opacity-60 group-hover:opacity-100 transition-opacity flex">
 							<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
