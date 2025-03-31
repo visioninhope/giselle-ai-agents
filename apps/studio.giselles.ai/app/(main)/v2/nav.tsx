@@ -14,14 +14,16 @@ export const Nav: FC = () => {
 					? "Lobby"
 					: pathname.startsWith("/apps")
 						? "Apps"
-						: pathname.startsWith("/settings")
-							? "Settings"
-							: ""}
+						: pathname.startsWith("/settings/account")
+							? "Account"
+							: pathname.startsWith("/settings/team")
+								? "Settings"
+								: ""}
 			</p>
 			<p>/</p>
 			{/** pathname !== "/" && <Link href="/">Lobby</Link> */}
 			{!pathname.startsWith("/apps") && <Link href="/apps">Apps</Link>}
-			{!pathname.startsWith("/settings") && (
+			{!pathname.startsWith("/settings/team") && (
 				<Link href="/settings/team">Settings</Link>
 			)}
 		</div>
