@@ -9,16 +9,26 @@ import {
 	type UploadedFileData,
 	type Viewport,
 	type Workspace,
+	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import {
+	APICallError,
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { WorkflowDesigner } from "../workflow-designer";
 import { usePropertiesPanel, useView } from "./state";
+
+type UploadFileFn = (
+	files: File[],
+	node: FileNode,
+	options?: { onError?: (errorMessage: string) => void },
+) => Promise<void>;
 
 export interface WorkflowDesignerContextValue
 	extends Pick<
@@ -44,7 +54,7 @@ export interface WorkflowDesignerContextValue
 		node: T,
 		content: Partial<T["content"]>,
 	) => void;
-	uploadFile: (files: File[], node: FileNode) => Promise<void>;
+	uploadFile: UploadFileFn;
 	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LanguageModelProvider[];
@@ -207,7 +217,11 @@ export function WorkflowDesignerProvider({
 	);
 
 	const uploadFile = useCallback(
-		async (files: File[], node: FileNode) => {
+		async (
+			files: File[],
+			node: FileNode,
+			options: { onError?: (errorMessage: string) => void } | undefined,
+		) => {
 			let fileContents = node.content.files;
 
 			await Promise.all(
@@ -228,21 +242,43 @@ export function WorkflowDesignerProvider({
 						updateNodeDataContent(node, {
 							files: fileContents,
 						});
-						await client.uploadFile({
-							workspaceId: data.id,
-							file,
-							fileId: uploadingFileData.id,
-							fileName: file.name,
-						});
+						try {
+							await client.uploadFile({
+								workspaceId: data.id,
+								file,
+								fileId: uploadingFileData.id,
+								fileName: file.name,
+							});
 
-						const uploadedFileData = createUploadedFileData(
-							uploadingFileData,
-							Date.now(),
-						);
-						fileContents = [
-							...fileContents.filter((file) => file.id !== uploadedFileData.id),
-							uploadedFileData,
-						];
+							const uploadedFileData = createUploadedFileData(
+								uploadingFileData,
+								Date.now(),
+							);
+							fileContents = [
+								...fileContents.filter(
+									(file) => file.id !== uploadedFileData.id,
+								),
+								uploadedFileData,
+							];
+						} catch (error) {
+							if (APICallError.isInstance(error)) {
+								const message =
+									error.statusCode === 413
+										? "filesize too large"
+										: error.message;
+								options?.onError?.(message);
+								const failedFileData = createFailedFileData(
+									uploadingFileData,
+									message,
+								);
+								fileContents = [
+									...fileContents.filter(
+										(file) => file.id !== failedFileData.id,
+									),
+									failedFileData,
+								];
+							}
+						}
 						updateNodeDataContent(node, {
 							files: fileContents,
 						});
