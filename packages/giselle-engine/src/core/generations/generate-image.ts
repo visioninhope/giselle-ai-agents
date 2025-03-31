@@ -59,6 +59,7 @@ export async function generateImage(args: {
 
 	const trace = langfuse.trace({
 		name: runningGeneration.id,
+		metadata: args.telemetry?.metadata,
 	});
 	const generation = trace.generation({
 		model: actionNode.content.llm.id,

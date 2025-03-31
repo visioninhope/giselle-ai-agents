@@ -150,10 +150,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await handleWebhook({ context, github: args, options });
 		},
-		generateImage: async (generation: QueuedGeneration) => {
+		generateImage: async (
+			generation: QueuedGeneration,
+			telemetry?: TelemetrySettings,
+		) => {
 			return await generateImage({
 				context,
 				generation,
+				telemetry,
 			});
 		},
 		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
