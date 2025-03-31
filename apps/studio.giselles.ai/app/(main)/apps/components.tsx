@@ -104,20 +104,20 @@ export function DuplicateAgentButton({
 				</TooltipProvider>
 			</form>
 
-			<AlertDialogContent>
+			<AlertDialogContent className="text-white-800">
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Are you sure to duplicate this app?
+					<AlertDialogTitle className="font-hubot text-[20px] font-medium">
+						Are you sure to duplicate this App?
 					</AlertDialogTitle>
 					{agentName && (
-						<AlertDialogDescription>{agentName}</AlertDialogDescription>
+						<AlertDialogDescription className="text-white-800 font-hubot">{agentName}</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel className="border-2 bg-background hover:bg-accent hover:text-accent-foreground">
+				<AlertDialogFooter className="mt-6">
+					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
-					<AlertDialogAction onClick={handleConfirm}>
+					<AlertDialogAction onClick={handleConfirm} className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
 						Duplicate
 					</AlertDialogAction>
 				</AlertDialogFooter>
@@ -187,25 +187,25 @@ export function DeleteAgentButton({
 				</TooltipProvider>
 			</form>
 
-			<AlertDialogContent>
+			<AlertDialogContent className="text-white-800">
 				<AlertDialogHeader>
-					<AlertDialogTitle>
-						Are you sure you want to delete this app?
+					<AlertDialogTitle className="font-hubot text-[20px] font-medium">
+						Are you sure you want to delete this App?
 					</AlertDialogTitle>
 					{agentName && (
-						<AlertDialogDescription>
+						<AlertDialogDescription className="text-white-800 font-hubot">
 							This action cannot be undone. This will permanently delete the app
 							"{agentName}".
 						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
-				<AlertDialogFooter>
-					<AlertDialogCancel className="border-2 bg-background hover:bg-accent hover:text-accent-foreground">
+				<AlertDialogFooter className="mt-6">
+					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleConfirm}
-						className="bg-red-500 hover:bg-red-600"
+						className="bg-error-900 hover:bg-transparent hover:text-error-900 hover:border-error-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
 					>
 						Delete
 					</AlertDialogAction>
