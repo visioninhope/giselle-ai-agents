@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1020 MIT
+* 1014 MIT
 * 105 Apache 2.0
 * 57 ISC
 * 34 New BSD
@@ -3540,7 +3540,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/ssr"></a>
-### @supabase/ssr v0.4.0
+### @supabase/ssr v0.6.1
 #### 
 
 ##### Paths
@@ -6041,7 +6041,7 @@ CC-BY-4.0 permitted
 
 
 <a name="cookie"></a>
-### cookie v0.6.0
+### cookie v0.7.1
 #### 
 
 ##### Paths
@@ -7328,7 +7328,7 @@ CC-BY-4.0 permitted
 
 
 <a name="framer-motion"></a>
-### framer-motion v12.0.0-alpha.0
+### framer-motion v12.4.3
 #### 
 
 ##### Paths
@@ -7756,28 +7756,6 @@ SIL OPEN FONT LICENSE permitted
 
 
 
-<a name="hast-util-sanitize"></a>
-### hast-util-sanitize v5.0.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="hast-util-to-html"></a>
-### hast-util-to-html v9.0.4
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="hast-util-to-jsx-runtime"></a>
 ### hast-util-to-jsx-runtime v2.3.2
 #### 
@@ -7868,17 +7846,6 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="html-url-attributes"></a>
 ### html-url-attributes v3.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="html-void-elements"></a>
-### html-void-elements v3.0.0
 #### 
 
 ##### Paths
@@ -11408,28 +11375,6 @@ BlueOak-1.0.0 permitted
 
 
 
-<a name="remark"></a>
-### remark v15.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="remark-html"></a>
-### remark-html v16.0.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="remark-parse"></a>
 ### remark-parse v11.0.0
 #### 
@@ -11443,17 +11388,6 @@ BlueOak-1.0.0 permitted
 
 <a name="remark-rehype"></a>
 ### remark-rehype v11.1.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="remark-stringify"></a>
-### remark-stringify v11.0.0
 #### 
 
 ##### Paths
