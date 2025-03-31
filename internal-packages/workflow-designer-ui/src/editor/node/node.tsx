@@ -186,12 +186,14 @@ export function NodeComponent({
 									)}
 									data-state="connected"
 								/>
-								<div className={clsx(
-									"text-[14px]",
-									"data-[state=connected]:px-[12px] data-[state=connected]:text-white-900",
-									"data-[state=disconnected]:absolute data-[state=disconnected]:left-[-45px] data-[state=disconnected]:text-black-400 data-[state=disconnected]:whitespace-nowrap"
-								)}
-								data-state="connected">
+								<div
+									className={clsx(
+										"text-[14px]",
+										"data-[state=connected]:px-[12px] data-[state=connected]:text-white-900",
+										"data-[state=disconnected]:absolute data-[state=disconnected]:left-[-45px] data-[state=disconnected]:text-black-400 data-[state=disconnected]:whitespace-nowrap",
+									)}
+									data-state="connected"
+								>
 									{input.label}
 								</div>
 							</div>
@@ -248,19 +250,21 @@ export function NodeComponent({
 										"data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
-								<div className={clsx(
-									"text-[14px]",
-									"data-[state=connected]:px-[16px]",
-									"data-[state=disconnected]:absolute data-[state=disconnected]:right-[-60px] data-[state=disconnected]:whitespace-nowrap",
-									"data-[state=connected]:text-white-900 data-[state=disconnected]:text-black-400"
-								)}
-								data-state={
-									connectedOutputIds?.some(
-										(connectedOutputId) => connectedOutputId === output.id,
-									)
-										? "connected"
-										: "disconnected"
-								}>
+								<div
+									className={clsx(
+										"text-[14px]",
+										"data-[state=connected]:px-[16px]",
+										"data-[state=disconnected]:absolute data-[state=disconnected]:right-[-60px] data-[state=disconnected]:whitespace-nowrap",
+										"data-[state=connected]:text-white-900 data-[state=disconnected]:text-black-400",
+									)}
+									data-state={
+										connectedOutputIds?.some(
+											(connectedOutputId) => connectedOutputId === output.id,
+										)
+											? "connected"
+											: "disconnected"
+									}
+								>
 									{output.label}
 								</div>
 							</div>
