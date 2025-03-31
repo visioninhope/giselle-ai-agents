@@ -52,15 +52,17 @@ async function AgentList() {
 			<div className="flex flex-wrap gap-4">
 				{dbAgents.map((agent) => (
 					<div key={agent.id} className="relative group flex-grow basis-[280px] min-w-[280px] h-[354px]">
+						{/* メニューボタン - カードの上に絶対位置で配置 */}
+						<div className="absolute top-0 right-[8px] z-10 opacity-60 group-hover:opacity-100 transition-opacity flex">
+							<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
+							<DeleteAgentButton agentId={agent.id} agentName={agent.name} />
+						</div>
+						
 						<Link href={`/workspaces/${agent.workspaceId}`}>
 							<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
 								
-								{/* メニューボタン - 上部に配置 */}
-								<div className="flex justify-end items-center h-[20px] mb-1.5">
-									<div className="opacity-60 group-hover:opacity-100 transition-opacity flex">
-										<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
-										<DeleteAgentButton agentId={agent.id} agentName={agent.name} />
-									</div>
+								{/* 上部の余白エリア（メニューボタン用） */}
+								<div className="h-[20px] mb-1.5">
 								</div>
 								
 								{/* サムネイル */}
@@ -76,7 +78,7 @@ async function AgentList() {
 									<div className="border-t-[0.5px] border-black-400 my-4"></div>
 									<div className="flex justify-between items-center">
 										<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
-											Editing kaori - {formatTimestamp.toRelativeTime(
+											Edited by you - {formatTimestamp.toRelativeTime(
 												new Date(agent.updatedAt).getTime(),
 											)}
 										</span>
