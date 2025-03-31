@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const gridWidth = "0.3px";
 const gridSize = 22;
-const ellipseSize = 4;
+const ellipseSize = 2.5;
 
 export function Background() {
 	const [intersections, setIntersections] = useState<
@@ -51,8 +51,8 @@ export function Background() {
 				className="absolute inset-0"
 				style={{
 					backgroundImage: `
-          linear-gradient(to right, hsl(from var(--color-white-950) h s l / 0.3) ${gridWidth}, transparent ${gridWidth}),
-                        linear-gradient(to bottom, hsl(from var(--color-white-950) h s l / 0.3) ${gridWidth}, transparent ${gridWidth})
+          linear-gradient(to right, hsl(from var(--color-white-950) h s l / 0.1) ${gridWidth}, transparent ${gridWidth}),
+                        linear-gradient(to bottom, hsl(from var(--color-white-950) h s l / 0.1) ${gridWidth}, transparent ${gridWidth})
           `,
 					backgroundSize: `${gridSize}px ${gridSize}px`,
 				}}
@@ -61,7 +61,7 @@ export function Background() {
 					<div
 						// biome-ignore lint/suspicious/noArrayIndexKey: for internal use
 						key={index}
-						className="absolute bg-white-950/30 rounded-full transform -translate-x-1/2 -translate-y-1/2"
+						className="absolute bg-white-950/10 rounded-full transform -translate-x-1/2 -translate-y-1/2"
 						style={{
 							width: `${ellipseSize}px`,
 							height: `${ellipseSize}px`,
@@ -72,7 +72,7 @@ export function Background() {
 				))}
 			</div>
 
-			<div className="absolute w-full h-full bg-radial-[31.95%_31.95%_at_50%_50%] from-[rgba(1,4,26,0.20)] to-[rgba(1,4,26,0.80)] w-full h-full" />
+			<div className="absolute w-full h-full bg-radial-[45%_45%_at_50%_50%] from-[rgba(1,20,50,0.30)] to-[rgba(1,4,26,0.80)] w-full h-full" />
 		</div>
 	);
 }
