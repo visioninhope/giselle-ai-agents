@@ -1,11 +1,11 @@
 {
 	"$schema": "https://json.schemastore.org/tsconfig",
-	"display": "Node",
+	"display": "TypeScript Library",
 	"extends": "./base.json",
 	"compilerOptions": {
-		"module": "esnext",
-		"target": "es6",
-		"lib": ["es2020"],
-		"moduleResolution": "node"
+		"lib": ["dom", "ES2018"],
+		"module": "ESNext",
+		"target": "ES2018",
+		"stripInternal": true
 	}
 }
