@@ -184,16 +184,8 @@ export function NodeComponent({
 										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!bg-generation-node-1 group-data-[content-type=imageGeneration]:!border-generation-node-1",
 									)}
-									data-state="connected"
 								/>
-								<div
-									className={clsx(
-										"text-[14px]",
-										"data-[state=connected]:px-[12px] data-[state=connected]:text-white-900",
-										"data-[state=disconnected]:absolute data-[state=disconnected]:left-[-45px] data-[state=disconnected]:text-black-400 data-[state=disconnected]:whitespace-nowrap",
-									)}
-									data-state="connected"
-								>
+								<div className={clsx("px-[12px] text-white-900")}>
 									{input.label}
 								</div>
 							</div>
@@ -209,7 +201,6 @@ export function NodeComponent({
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
 										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
 									)}
-									data-state="disconnected"
 								/>
 								<div className="absolute left-[-45px] text-[14px] text-black-400 whitespace-nowrap">
 									Input
@@ -221,20 +212,20 @@ export function NodeComponent({
 					<div className="grid">
 						{node.outputs?.map((output) => (
 							<div
-								className="relative flex items-center h-[28px]"
+								className="relative group flex items-center h-[28px]"
 								key={output.id}
+								data-state={
+									connectedOutputIds?.some(
+										(connectedOutputId) => connectedOutputId === output.id,
+									)
+										? "connected"
+										: "disconnected"
+								}
 							>
 								<Handle
 									id={output.id}
 									type="source"
 									position={Position.Right}
-									data-state={
-										connectedOutputIds?.some(
-											(connectedOutputId) => connectedOutputId === output.id,
-										)
-											? "connected"
-											: "disconnected"
-									}
 									className={clsx(
 										"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
@@ -242,28 +233,21 @@ export function NodeComponent({
 										"group-data-[content-type=github]:!border-github-node-1",
 										"group-data-[content-type=text]:!border-text-node-1",
 										"group-data-[content-type=file]:!border-file-node-1",
-										"data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
-										"data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-generation-node-1",
-										"data-[state=connected]:group-data-[content-type=github]:!bg-cgithub-node-1",
-										"data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
-										"data-[state=connected]:group-data-[content-type=file]:!bg-file-node-1 data-[state=connected]:group-data-[content-type=file]:!border-file-node-1",
-										"data-[state=disconnected]:!bg-black-900",
+										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
+										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-generation-node-1",
+										"group-data-[state=connected]:group-data-[content-type=github]:!bg-cgithub-node-1",
+										"group-data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 group-data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
+										"group-data-[state=connected]:group-data-[content-type=file]:!bg-file-node-1 group-data-[state=connected]:group-data-[content-type=file]:!border-file-node-1",
+										"group-data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
 								<div
 									className={clsx(
 										"text-[14px]",
-										"data-[state=connected]:px-[16px]",
-										"data-[state=disconnected]:absolute data-[state=disconnected]:right-[-60px] data-[state=disconnected]:whitespace-nowrap",
-										"data-[state=connected]:text-white-900 data-[state=disconnected]:text-black-400",
+										"group-data-[state=connected]:px-[16px]",
+										"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:right-[-60px] group-data-[state=disconnected]:whitespace-nowrap",
+										"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
 									)}
-									data-state={
-										connectedOutputIds?.some(
-											(connectedOutputId) => connectedOutputId === output.id,
-										)
-											? "connected"
-											: "disconnected"
-									}
 								>
 									{output.label}
 								</div>
