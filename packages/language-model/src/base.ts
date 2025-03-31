@@ -8,6 +8,7 @@ export const Capability = {
 	PdfFileInput: 1 << 4,
 	ImageFileInput: 1 << 5,
 	SearchGrounding: 1 << 6,
+	OptionalSearchGrounding: 1 << 7,
 } as const;
 
 export const Tier = z.enum(["free", "pro"]);

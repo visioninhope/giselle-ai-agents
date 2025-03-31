@@ -28,7 +28,7 @@ const gemini25ProExp: GoogleLanguageModel = {
 	capabilities:
 		Capability.TextGeneration |
 		Capability.GenericFileInput |
-		Capability.SearchGrounding |
+		Capability.OptionalSearchGrounding |
 		Capability.Reasoning,
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
@@ -39,7 +39,7 @@ const gemini20Flash: GoogleLanguageModel = {
 	id: "gemini-2.0-flash-001",
 	capabilities:
 		Capability.TextGeneration |
-		Capability.SearchGrounding |
+		Capability.OptionalSearchGrounding |
 		Capability.GenericFileInput,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,

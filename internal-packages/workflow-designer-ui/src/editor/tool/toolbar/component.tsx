@@ -412,6 +412,12 @@ export function Toolbar() {
 																)}
 																{hasCapability(
 																	languageModelMouseHovered,
+																	Capability.OptionalSearchGrounding,
+																) && (
+																	<CapabilityIcon>Web Search</CapabilityIcon>
+																)}
+																{hasCapability(
+																	languageModelMouseHovered,
 																	Capability.Reasoning,
 																) && <CapabilityIcon>Reasoning</CapabilityIcon>}
 																{hasCapability(
