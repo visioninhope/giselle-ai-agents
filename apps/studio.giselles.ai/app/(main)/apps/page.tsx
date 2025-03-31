@@ -35,11 +35,22 @@ async function AgentList() {
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[16px] justify-center text-center">
 					<div className="p-8 rounded-lg bg-black-90/30 border border-black-80">
-						<h3 className="text-xl font-rosart mb-4 text-black-20">アプリがまだありません</h3>
-						<p className="text-black-40 mb-6">左サイドバーの「New App +」ボタンで新しいアプリを作成してください</p>
+						<h3 className="text-xl font-rosart mb-4 text-black-20">
+							アプリがまだありません
+						</h3>
+						<p className="text-black-40 mb-6">
+							左サイドバーの「New App +」ボタンで新しいアプリを作成してください
+						</p>
 						<div className="w-16 h-16 mx-auto opacity-50">
-							<svg viewBox="0 0 24 24" fill="none" className="w-full h-full">
-								<path d="M12 5V19M5 12H19" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+							<svg viewBox="0 0 24 24" fill="none" className="w-full h-full" aria-hidden="true">
+								<title>プラス記号</title>
+								<path
+									d="M12 5V19M5 12H19"
+									stroke="currentColor"
+									strokeWidth="2"
+									strokeLinecap="round"
+									strokeLinejoin="round"
+								/>
 							</svg>
 						</div>
 					</div>
@@ -66,7 +77,7 @@ async function AgentList() {
 								</div>
 								
 								{/* サムネイル */}
-								<div className="h-[150px] bg-black-80 rounded-[8px] mb-4"></div>
+								<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
 								
 								<div className="flex-grow">
 									<h3 className="font-hubot text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
@@ -75,15 +86,16 @@ async function AgentList() {
 								</div>
 								
 								<div className="mt-auto">
-									<div className="border-t-[0.5px] border-black-400 my-4"></div>
+									<div className="border-t-[0.5px] border-black-400 my-4" />
 									<div className="flex justify-between items-center">
 										<span className="text-white-400 text-xs font-geist truncate max-w-[200px]">
 											Edited by you - {formatTimestamp.toRelativeTime(
 												new Date(agent.updatedAt).getTime(),
 											)}
 										</span>
-										<button className="text-white-400 hover:text-white flex-shrink-0">
-											<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
+										<button type="button" className="text-white-400 hover:text-white flex-shrink-0">
+											<svg width="20" height="20" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2" aria-hidden="true">
+												<title>お気に入り</title>
 												<path strokeLinecap="round" strokeLinejoin="round" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
 											</svg>
 										</button>
@@ -105,7 +117,9 @@ export default function AgentListV2Page() {
 	return (
 		<ToastProvider>
 			<div className="w-full">
-				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">My created</h1>
+				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
+					My created
+				</h1>
 				<Suspense fallback={<p className="text-center py-8">読み込み中...</p>}>
 					<AgentList />
 				</Suspense>

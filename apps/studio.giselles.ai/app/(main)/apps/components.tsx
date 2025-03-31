@@ -110,14 +110,19 @@ export function DuplicateAgentButton({
 						Are you sure to duplicate this App?
 					</AlertDialogTitle>
 					{agentName && (
-						<AlertDialogDescription className="text-white-800 font-hubot">{agentName}</AlertDialogDescription>
+						<AlertDialogDescription className="text-white-800 font-hubot">
+							{agentName}
+						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter className="mt-6">
 					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
-					<AlertDialogAction onClick={handleConfirm} className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
+					<AlertDialogAction 
+						onClick={handleConfirm} 
+						className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
+					>
 						Duplicate
 					</AlertDialogAction>
 				</AlertDialogFooter>

@@ -2,10 +2,10 @@ import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { putGraph } from "@giselles-ai/actions";
-import { initGraph } from "@giselles-ai/lib/utils";
 import { WilliIcon } from "@giselles-ai/icons/willi";
+import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
-import { Clock, Star, Share2, Trash } from "lucide-react";
+import { Clock, Share2, Star, Trash } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
@@ -55,11 +55,13 @@ export default function Layout({
 				<div className="flex flex-col space-y-5">
 					{/* Non-functional menu items */}
 					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Clock className="w-5 h-5" /> <span className="text-[14px] font-hubot">Recent</span>
+						<Clock className="w-5 h-5" />{" "}
+						<span className="text-[14px] font-hubot">Recent</span>
 					</div>
 					
 					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Star className="w-5 h-5" /> <span className="text-[14px] font-hubot">Stars</span>
+						<Star className="w-5 h-5" />{" "}
+						<span className="text-[14px] font-hubot">Stars</span>
 					</div>
 					
 					{/* Functional link */}
@@ -67,16 +69,19 @@ export default function Layout({
 						href="/apps" 
 						className="flex items-center gap-2 text-white-400 hover:text-white"
 					>
-						<WilliIcon className="w-5 h-5 fill-current" /> <span className="text-[14px] font-hubot font-medium border-b border-white-400 pb-0">My created</span>
+						<WilliIcon className="w-5 h-5 fill-current" />{" "}
+						<span className="text-[14px] font-hubot font-medium border-b border-white-400 pb-0">My created</span>
 					</Link>
 					
 					{/* Non-functional menu items */}
 					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Share2 className="w-5 h-5" /> <span className="text-[14px] font-hubot">Shared</span>
+						<Share2 className="w-5 h-5" />{" "}
+						<span className="text-[14px] font-hubot">Shared</span>
 					</div>
 					
 					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Trash className="w-5 h-5" /> <span className="text-[14px] font-hubot">Trash</span>
+						<Trash className="w-5 h-5" />{" "}
+						<span className="text-[14px] font-hubot">Trash</span>
 					</div>
 				</div>
 			</div>
