@@ -111,7 +111,7 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 					message: errorText || `Error in ${path} operation`,
 					url: `${basePath}/${path}`,
 					requestBodyValues: input || {},
-					statusCode: 413,
+					statusCode: response.status,
 					responseHeaders: Object.fromEntries(response.headers.entries()),
 					responseBody: errorText,
 				});
