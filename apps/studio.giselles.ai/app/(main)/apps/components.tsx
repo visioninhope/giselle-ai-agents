@@ -119,8 +119,8 @@ export function DuplicateAgentButton({
 					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
-					<AlertDialogAction 
-						onClick={handleConfirm} 
+					<AlertDialogAction
+						onClick={handleConfirm}
 						className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
 					>
 						Duplicate
@@ -205,12 +205,12 @@ export function DeleteAgentButton({
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter className="mt-6">
-					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
+					<AlertDialogCancel className="border border-gray-200 hover:border-primary-900 hover:text-primary-900 rounded-lg py-2 px-6 font-hubot text-[16px]">
 						Cancel
 					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleConfirm}
-						className="bg-error-900 hover:bg-transparent hover:text-error-900 hover:border-error-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
+						className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
 					>
 						Delete
 					</AlertDialogAction>
