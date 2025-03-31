@@ -54,7 +54,20 @@ export function createUploadedFileData(
 
 export const FailedFileData = FileDataBase.extend({
 	status: z.literal("failed"),
+	errorMessage: z.string(),
 });
+export type FailedFileData = z.infer<typeof FailedFileData>;
+
+export function createFailedFileData(
+	uploadingFile: UploadingFileData,
+	errorMessage: string,
+): FailedFileData {
+	return {
+		...uploadingFile,
+		status: "failed",
+		errorMessage,
+	};
+}
 
 export const FileData = z.union([
 	UploadingFileData,
