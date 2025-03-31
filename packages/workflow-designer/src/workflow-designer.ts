@@ -88,6 +88,7 @@ export function WorkflowDesigner({
 				inputId,
 			},
 		];
+		updateWorkflowMap();
 	}
 	function setUiNodeState(
 		unsafeNodeId: string | NodeId,
