@@ -98,7 +98,7 @@ export function DuplicateAgentButton({
 							</TooltipTrigger>
 						</AlertDialogTrigger>
 						<TooltipContent side="top">
-							<p>Duplicate App</p>
+							<p>Duplicate</p>
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
@@ -181,7 +181,7 @@ export function DeleteAgentButton({
 							</TooltipTrigger>
 						</AlertDialogTrigger>
 						<TooltipContent side="top">
-							<p>Delete App</p>
+							<p>Delete</p>
 						</TooltipContent>
 					</Tooltip>
 				</TooltipProvider>
