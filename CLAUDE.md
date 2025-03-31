@@ -26,3 +26,8 @@
 - Use async/await for asynchronous code rather than promises
 - Error handling: use try/catch blocks and propagate errors appropriately
 - Tests should follow `*.test.ts` naming pattern and use Vitest
+
+## Language Support
+- This project's core members include non-native English speakers
+- Please correct grammar in commit messages, code comments, and pull request comments
+- Rewrite user input when necessary to ensure clear communication

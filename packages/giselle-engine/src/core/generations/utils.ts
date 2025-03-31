@@ -1,3 +1,4 @@
+import { dataMod } from "@giselle-sdk/data-mod";
 import {
 	type ActionNode,
 	type CompletedGeneration,
@@ -122,7 +123,7 @@ async function buildGenerationMessageForTextGeneration(
 				}
 				break;
 			}
-			case "file": {
+			case "file":
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
@@ -144,6 +145,15 @@ async function buildGenerationMessageForTextGeneration(
 						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);
 					}
 				}
+				break;
+
+			case "github":
+			case "imageGeneration":
+				throw new Error("Not implemented");
+
+			default: {
+				const _exhaustiveCheck: never = contextNode.content;
+				throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
 			}
 		}
 	}
@@ -287,6 +297,22 @@ export async function setGeneration(params: {
 	);
 }
 
+function parseAndMod(generationLike: unknown, mod = false) {
+	const parseResult = Generation.safeParse(generationLike);
+	if (parseResult.success) {
+		return parseResult.data;
+	}
+	if (mod) {
+		throw new Error("Invalid generation");
+	}
+
+	let modData = generationLike;
+	for (const issue of parseResult.error.issues) {
+		modData = dataMod(modData, issue);
+	}
+	return parseAndMod(modData, true);
+}
+
 export async function getGeneration(params: {
 	storage: Storage;
 	generationId: GenerationId;
@@ -301,7 +327,7 @@ export async function getGeneration(params: {
 	const unsafeGeneration = await params.storage.getItem(
 		generationPath(generationIndex),
 	);
-	return Generation.parse(unsafeGeneration);
+	return parseAndMod(unsafeGeneration);
 }
 
 export function nodeGenerationIndexPath(
@@ -499,7 +525,7 @@ async function buildGenerationMessageForImageGeneration(
 				}
 				break;
 			}
-			case "file": {
+			case "file":
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
@@ -521,6 +547,15 @@ async function buildGenerationMessageForImageGeneration(
 						throw new Error(`Unhandled category: ${_exhaustiveCheck}`);
 					}
 				}
+				break;
+
+			case "github":
+			case "imageGeneration":
+				throw new Error("Not implemented");
+
+			default: {
+				const _exhaustiveCheck: never = contextNode.content;
+				throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
 			}
 		}
 	}

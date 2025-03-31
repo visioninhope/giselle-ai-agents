@@ -1,10 +1,9 @@
 import { GiselleLogo } from "@/components/giselle-logo";
 import { TeamSelection } from "@/services/teams/components/team-selection";
-import TeamCreation from "@/services/teams/components/v2/team-creation";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { UserButton } from "../../../services/accounts/components/v2/user-button/user-button";
-import { Nav } from "../nav";
+import { Nav } from "./nav";
 
 export default async function LayoutV2({ children }: { children: ReactNode }) {
 	return (
@@ -18,7 +17,6 @@ export default async function LayoutV2({ children }: { children: ReactNode }) {
 				</div>
 				<div className="flex items-center gap-4">
 					<TeamSelection />
-					<TeamCreation />
 					<UserButton />
 				</div>
 			</header>
