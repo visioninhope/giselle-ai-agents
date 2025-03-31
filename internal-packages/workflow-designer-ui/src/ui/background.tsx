@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 
 const gridWidth = "0.3px";
 const gridSize = 22;
-const ellipseSize = 4;
+const ellipseSize = 2.5;
 
 export function Background() {
 	const [intersections, setIntersections] = useState<
