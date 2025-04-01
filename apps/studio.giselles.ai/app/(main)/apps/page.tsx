@@ -87,7 +87,7 @@ async function AgentList() {
 
 								<div className="flex-grow">
 									<h3 className="font-hubot text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
-										{agent.name}
+										agent.name ?? "Unname App"
 									</h3>
 								</div>
 
