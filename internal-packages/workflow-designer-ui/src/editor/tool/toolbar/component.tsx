@@ -103,33 +103,33 @@ function LanguageModelListItem({
 				"flex gap-[8px]",
 				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
-				"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
+				"**:data-icon:w-[16px] **:data-icon:h-[16px] **:data-icon:text-white-950 ",
 				disabled && "opacity-50 cursor-not-allowed",
 			)}
 			disabled={disabled}
 		>
-			{languageModel.provider === "anthropic" && (
-				<AnthropicIcon className="w-[20px] h-[20px]" data-icon />
-			)}
-			{languageModel.provider === "openai" && (
-				<OpenaiIcon className="w-[20px] h-[20px]" data-icon />
-			)}
-			{languageModel.provider === "google" && (
-				<GoogleWhiteIcon className="w-[20px] h-[20px]" data-icon />
-			)}
-			{languageModel.provider === "perplexity" && (
-				<PerplexityIcon className="w-[20px] h-[20px]" data-icon />
-			)}
-			{languageModel.provider === "fal" && (
-				<ImageGenerationNodeIcon
-					modelId={languageModel.id}
-					className="w-[20px] h-[20px]"
-					data-icon
-				/>
-			)}
-			<div className="flex flex-start gap-[8px]">
-				<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
-				<div>
+			<div className="flex gap-[12px] items-center">
+				{languageModel.provider === "anthropic" && (
+					<AnthropicIcon className="w-[18px] h-[18px]" data-icon />
+				)}
+				{languageModel.provider === "openai" && (
+					<OpenaiIcon className="w-[18px] h-[18px]" data-icon />
+				)}
+				{languageModel.provider === "google" && (
+					<GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />
+				)}
+				{languageModel.provider === "perplexity" && (
+					<PerplexityIcon className="w-[18px] h-[18px]" data-icon />
+				)}
+				{languageModel.provider === "fal" && (
+					<ImageGenerationNodeIcon
+						modelId={languageModel.id}
+						className="w-[18px] h-[18px]"
+						data-icon
+					/>
+				)}
+				<div className="flex items-center gap-[8px]">
+					<p className="text-[14px] text-left text-nowrap">{languageModel.id}</p>
 					{languageModel.tier === "pro" && <ProTag />}
 				</div>
 			</div>
@@ -157,7 +157,7 @@ export function Toolbar() {
 				<ToggleGroup.Root
 					type="single"
 					className={clsx(
-						"flex items-center px-[16px] z-10 h-full gap-[12px] text-white-950",
+						"flex items-center px-[8px] z-10 h-full gap-[12px] text-white-950",
 						"**:data-tool:hover:bg-white-850/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
 						"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",
@@ -283,36 +283,36 @@ export function Toolbar() {
 												}}
 											>
 												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-												<div className="relative text-white-800 h-[200px] ">
+												<div className="relative text-white-800 h-[200px]">
 													{languageModelMouseHovered && (
-														<div className="px-[16px] py-[16px] flex flex-col gap-[16px]">
-															<div className="flex gap-[8px] items-center">
-																<div className="shrink-0">
+														<div className="px-[16px] py-[16px] flex flex-col gap-[24px]">
+															<div className="flex items-start gap-[16px]">
+																<div className="flex items-center shrink-0">
 																	{languageModelMouseHovered.provider ===
 																		"anthropic" && (
 																		<AnthropicIcon
-																			className="size-[20px]"
+																			className="size-[24px]"
 																			data-icon
 																		/>
 																	)}
 																	{languageModelMouseHovered.provider ===
 																		"openai" && (
 																		<OpenaiIcon
-																			className="size-[20px]"
+																			className="size-[24px]"
 																			data-icon
 																		/>
 																	)}
 																	{languageModelMouseHovered.provider ===
 																		"google" && (
 																		<GoogleWhiteIcon
-																			className="size-[20px]"
+																			className="size-[24px]"
 																			data-icon
 																		/>
 																	)}
 																	{languageModelMouseHovered.provider ===
 																		"perplexity" && (
 																		<PerplexityIcon
-																			className="size-[20px]"
+																			className="size-[24px]"
 																			data-icon
 																		/>
 																	)}
@@ -320,16 +320,16 @@ export function Toolbar() {
 																		"fal" && (
 																		<ImageGenerationNodeIcon
 																			modelId={languageModelMouseHovered.id}
-																			className="size-[20px]"
+																			className="size-[24px]"
 																			data-icon
 																		/>
 																	)}
 																</div>
-																<p className="text-[22px] font-accent">
+																<p className="text-[22px] font-accent leading-none">
 																	{languageModelMouseHovered.id}
 																</p>
 															</div>
-															<div className="flex gap-[8px] flex-wrap">
+															<div className="flex flex-wrap gap-x-[8px] gap-y-[8px]">
 																{hasCapability(
 																	languageModelMouseHovered,
 																	Capability.TextGeneration,
