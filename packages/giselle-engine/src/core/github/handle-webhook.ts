@@ -259,7 +259,7 @@ async function processIntegration(
 	return webhookResults;
 }
 
-function isMatchingIntegrationSetting(
+export function isMatchingIntegrationSetting(
 	setting: WorkspaceGitHubIntegrationSetting,
 	event: GitHubEvent,
 	command: Command | null,
