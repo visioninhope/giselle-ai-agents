@@ -18,7 +18,10 @@ import { Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
 import {
 	AnthropicIcon,
+	CirclePlusIcon,
+	CodeIcon,
 	DocumentIcon,
+	FolderIcon,
 	GenNodeIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
@@ -27,6 +30,8 @@ import {
 	PictureIcon,
 	PromptIcon,
 	TextFileIcon,
+	UploadIcon,
+	VariableIcon,
 } from "../../../icons";
 import { ImageGenerationNodeIcon } from "../../../icons/node";
 import { Tooltip } from "../../../ui/tooltip";
@@ -372,7 +377,7 @@ export function Toolbar() {
 						className="relative"
 					>
 						<Tooltip text={<TooltipAndHotkey text="Upload" hotkey="d" />}>
-							<DocumentIcon data-icon />
+							<UploadIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectFileNodeCategory" && (
 							<Popover.Root open={true}>
@@ -429,7 +434,12 @@ export function Toolbar() {
 					</ToggleGroup.Item>
 					<ToggleGroup.Item value="addTextNode" data-tool>
 						<Tooltip text={<TooltipAndHotkey text="Source" hotkey="t" />}>
-							<PromptIcon data-icon />
+							<FolderIcon data-icon />
+						</Tooltip>
+					</ToggleGroup.Item>
+					<ToggleGroup.Item value="addCodeNode" data-tool>
+						<Tooltip text={<TooltipAndHotkey text="Code" hotkey="c" />}>
+							<CodeIcon data-icon />
 						</Tooltip>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>

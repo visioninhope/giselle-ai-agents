@@ -1,9 +1,11 @@
 export * from "./circle-check";
 export * from "./circle-plus";
 export * from "./circle-x";
+export * from "./code";
 export * from "./content-type-icon";
 export * from "./data";
 export * from "./document";
+export * from "./folder";
 export * from "./giselle-logo";
 export * from "./globe";
 export * from "./layers";
@@ -33,3 +35,5 @@ export * from "./recraft";
 export * from "./ideogram";
 export * from "./stable-diffusion";
 export * from "./gennode";
+export * from "./upload";
+export * from "./variable";
