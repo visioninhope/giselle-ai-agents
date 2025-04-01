@@ -38,6 +38,10 @@ export function PayloadMapForm({
 	const [payloadMaps, setPayloadMaps] =
 		useState<WorkspaceGitHubIntegrationPayloadNodeMap[]>(currentPayloadMaps);
 
+	useEffect(() => {
+		setPayloadMaps(currentPayloadMaps);
+	}, [currentPayloadMaps]);
+
 	const [showNewPayloadFieldsFlag, setShowNewPayloadFieldsFlag] =
 		useState(false);
 

@@ -1,6 +1,7 @@
 import type { WorkspaceGitHubNextIntegrationAction } from "@giselle-sdk/data-type";
 import {
 	WorkspaceGitHubIntegrationPayloadField,
+	type WorkspaceGitHubIntegrationPayloadNodeMap,
 	WorkspaceGitHubIntegrationTrigger,
 } from "@giselle-sdk/data-type";
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
@@ -83,12 +84,16 @@ function Installed({
 	const [selectedNextAction, setSelectedNextAction] = useState<
 		WorkspaceGitHubNextIntegrationAction | undefined
 	>(data?.nextAction);
+	const [payloadMaps, setPayloadMaps] = useState<
+		WorkspaceGitHubIntegrationPayloadNodeMap[]
+	>(data?.payloadMaps || []);
 
 	useEffect(() => {
 		if (data) {
 			setSelectedTrigger(data.event);
 			setCallsign(data.callsign || "");
 			setSelectedNextAction(data.nextAction);
+			setPayloadMaps(data.payloadMaps || []);
 		}
 	}, [data]);
 
@@ -216,6 +221,7 @@ function Installed({
 								<Label>Callsign</Label>
 								<input
 									type="text"
+									name="callsign"
 									className="bg-black-750 h-[28px] border-[1px] border-white-950/10 flex items-center px-[12px] text-[12px] rounded-[8px] outline-none placeholder:text-white-400/70"
 									value={callsign}
 									onChange={(e) => setCallsign(e.target.value)}
@@ -229,7 +235,7 @@ function Installed({
 					<div>
 						<PayloadMapForm
 							nodes={workspace.nodes}
-							currentPayloadMaps={data?.payloadMaps}
+							currentPayloadMaps={payloadMaps}
 							availablePayloadFields={availablePayloadFields}
 						/>
 					</div>

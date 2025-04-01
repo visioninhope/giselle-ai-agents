@@ -63,7 +63,7 @@ export const WorkspaceGitHubIntegrationSetting = z.object({
 	id: WorkspaceGitHubIntegrationId.schema,
 	workspaceId: WorkspaceId.schema,
 	repositoryNodeId: z.string(),
-	callsign: z.string(),
+	callsign: z.string().nullable(),
 	event: WorkspaceGitHubIntegrationTrigger,
 	payloadMaps: z.array(WorkspaceGitHubIntegrationPayloadNodeMap),
 	nextAction: WorkspaceGitHubIntegrationNextAction,
