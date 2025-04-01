@@ -89,7 +89,7 @@ export const VerifyEmailForm: FC = () => {
 
 					<div className="flex justify-center">
 						<ActionPrompt
-							prompt="Didn't receive a code?"
+							prompt="Didn’t receive a code?"
 							action={
 								<ClickableText
 									onClick={handleResend}
@@ -100,7 +100,7 @@ export const VerifyEmailForm: FC = () => {
 							}
 						/>
 					</div>
-					<Button className="w-full font-medium" type="submit" disabled={isVerifyPending}>
+					<Button className="w-full" type="submit" disabled={isVerifyPending}>
 						Verify
 					</Button>
 				</div>
