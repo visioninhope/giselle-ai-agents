@@ -36,7 +36,7 @@ export function NodeGlance({
 			case "file":
 			case "text":
 			case "github":
-				return node.name ?? "Unnamed Node";
+				return node.name ?? "Untitled Node";
 			default: {
 				const _exhaustiveCheck: never = node.content;
 				return _exhaustiveCheck;
