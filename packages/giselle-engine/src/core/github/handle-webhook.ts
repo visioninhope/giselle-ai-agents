@@ -4,7 +4,10 @@ import {
 	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate,
 	type WorkspaceGitHubIntegrationPayloadField,
 } from "@giselle-sdk/data-type";
-import type { IssueCommentCreatedEvent } from "@octokit/webhooks-types";
+import type {
+	IssueCommentCreatedEvent,
+	IssuesOpenedEvent,
+} from "@octokit/webhooks-types";
 import { z } from "zod";
 import { WorkflowError } from "../error";
 import { runApi } from "../runs";
@@ -254,6 +257,19 @@ function isIssueCommentCreatedEvent(
 	);
 }
 
+function isIssuesOpenedEvent(
+	payload: unknown,
+	event: string,
+): payload is IssuesOpenedEvent {
+	return (
+		event === "issues" &&
+		typeof payload === "object" &&
+		payload !== null &&
+		"action" in payload &&
+		payload.action === "opened"
+	);
+}
+
 type PayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField> =
 	TField extends
 		| "github.issue_comment.issue.number"
@@ -296,16 +312,22 @@ async function getPayloadValue<
 			case "github.pull_request_comment.pull_request.repository.name":
 			case "github.issue_comment.issue.repository.name":
 				return payload.repository.name as PayloadValue<TField>;
+			default:
+				throw new Error(`Unhandled field type: ${field} for ${event}`);
+		}
+	}
+
+	if (isIssuesOpenedEvent(payload, event)) {
+		switch (field) {
 			case "github.issues.title":
 				return payload.issue.title as PayloadValue<TField>;
 			case "github.issues.body":
 				return payload.issue.body as PayloadValue<TField>;
-			default: {
-				const _exhaustiveCheck: never = field;
-				throw new Error(`Unhandled field type: ${_exhaustiveCheck}`);
-			}
+			default:
+				throw new Error(`Unhandled field type: ${field} for ${event}`);
 		}
 	}
+
 	throw new Error(`Unhandled event type: ${event}`);
 }
 
