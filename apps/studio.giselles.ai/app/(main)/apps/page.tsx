@@ -56,8 +56,14 @@ async function AgentList() {
 					>
 						{/* Menu buttons - positioned absolutely on top of the card */}
 						<div className="absolute top-0 right-[8px] z-10 opacity-60 group-hover:opacity-100 transition-opacity flex">
-							<DuplicateAgentButton agentId={agent.id} agentName={agent.name || "Untitled"} />
-							<DeleteAgentButton agentId={agent.id} agentName={agent.name || "Untitled"} />
+							<DuplicateAgentButton
+								agentId={agent.id}
+								agentName={agent.name || "Untitled"}
+							/>
+							<DeleteAgentButton
+								agentId={agent.id}
+								agentName={agent.name || "Untitled"}
+							/>
 						</div>
 
 						<Link href={`/workspaces/${agent.workspaceId}`}>
