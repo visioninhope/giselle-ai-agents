@@ -55,17 +55,17 @@ export default function Layout({
 				{/* Menu Items */}
 				<div className="flex flex-col space-y-5">
 					{/* Recent menu item */}
-					<NavigationItem 
-						href="/apps" 
-						icon={<Clock className="w-5 h-5" />} 
-						label="Recent" 
+					<NavigationItem
+						href="/apps"
+						icon={<Clock className="w-5 h-5" />}
+						label="Recent"
 					/>
-					
+
 					{/* My Apps menu item */}
-					<NavigationItem 
-						href="/apps/myapps" 
-						icon={<WilliIcon className="w-5 h-5 fill-current" />} 
-						label="My Apps" 
+					<NavigationItem
+						href="/apps/myapps"
+						icon={<WilliIcon className="w-5 h-5 fill-current" />}
+						label="My Apps"
 					/>
 				</div>
 			</div>

@@ -1,6 +1,6 @@
 import { agents, db } from "@/drizzle";
-import { fetchCurrentTeam } from "@/services/teams";
 import { fetchCurrentUser } from "@/services/accounts";
+import { fetchCurrentTeam } from "@/services/teams";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
@@ -144,4 +144,4 @@ export default function MyAppsPage() {
 			</div>
 		</ToastProvider>
 	);
-} 
+}

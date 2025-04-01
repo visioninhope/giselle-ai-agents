@@ -1,4 +1,5 @@
 import { agents, db } from "@/drizzle";
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
@@ -124,7 +125,9 @@ export default function AgentListV2Page() {
 				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 					My Apps
 				</h1>
-				<Suspense fallback={<p className="text-center py-8">Loading...</p>}>
+				<Suspense
+					fallback={<p className="text-center py-8">Loading...</p>}
+				>
 					<AgentList />
 				</Suspense>
 				<Toasts />
