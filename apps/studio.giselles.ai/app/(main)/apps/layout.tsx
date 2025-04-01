@@ -5,12 +5,13 @@ import { putGraph } from "@giselles-ai/actions";
 import { WilliIcon } from "@giselles-ai/icons/willi";
 import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
-import { Clock, Share2, Star, Trash } from "lucide-react";
+import { Clock, User } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { giselleEngine } from "../../giselle-engine";
 import { CreateAgentButton } from "./components";
+import { NavigationItem } from "./components/navigation-item";
 
 export default function Layout({
 	children,
@@ -53,38 +54,19 @@ export default function Layout({
 
 				{/* Menu Items */}
 				<div className="flex flex-col space-y-5">
-					{/* Non-functional menu items */}
-					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Clock className="w-5 h-5" />{" "}
-						<span className="text-[14px] font-hubot">Recent</span>
-					</div>
-
-					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Star className="w-5 h-5" />{" "}
-						<span className="text-[14px] font-hubot">Stars</span>
-					</div>
-
-					{/* Functional link */}
-					<Link
-						href="/apps"
-						className="flex items-center gap-2 text-white-400 hover:text-white"
-					>
-						<WilliIcon className="w-5 h-5 fill-current" />{" "}
-						<span className="text-[14px] font-hubot font-medium border-b border-white-400 pb-0">
-							My Apps
-						</span>
-					</Link>
-
-					{/* Non-functional menu items */}
-					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Share2 className="w-5 h-5" />{" "}
-						<span className="text-[14px] font-hubot">Shared</span>
-					</div>
-
-					<div className="flex items-center gap-2 text-white-400 hover:text-white cursor-default">
-						<Trash className="w-5 h-5" />{" "}
-						<span className="text-[14px] font-hubot">Trash</span>
-					</div>
+					{/* Recent menu item */}
+					<NavigationItem 
+						href="/apps" 
+						icon={<Clock className="w-5 h-5" />} 
+						label="Recent" 
+					/>
+					
+					{/* My Apps menu item */}
+					<NavigationItem 
+						href="/apps/myapps" 
+						icon={<User className="w-5 h-5" />} 
+						label="My Apps" 
+					/>
 				</div>
 			</div>
 
