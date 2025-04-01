@@ -325,7 +325,7 @@ async function getPayloadValue(
 				case "github.issue_comment.issue.title":
 					return event.payload.issue.title;
 				case "github.pull_request_comment.pull_request.diff": {
-					if (!event.payload.issue?.pull_request) {
+					if (event.payload.issue.pull_request == null) {
 						throw new Error(
 							"Attempted to get diff for non-pull-request issue comment",
 						);
