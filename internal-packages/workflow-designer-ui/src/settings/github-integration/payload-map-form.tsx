@@ -42,6 +42,18 @@ export function PayloadMapForm({
 		useState(false);
 
 	useEffect(() => {
+		const validMaps = payloadMaps.filter((map) =>
+			availablePayloadFields.includes(map.payload),
+		);
+		if (validMaps.length !== payloadMaps.length) {
+			setPayloadMaps(validMaps);
+			setSelectedNodeId("");
+			setSelectedPayload("");
+			setShowNewPayloadFieldsFlag(false);
+		}
+	}, [availablePayloadFields, payloadMaps]);
+
+	useEffect(() => {
 		const parseSelectedNodeId = NodeId.safeParse(selectedNodeId);
 		const parseSelectedPayload =
 			WorkspaceGitHubIntegrationPayloadField.safeParse(selectedPayload);
