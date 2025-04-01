@@ -60,7 +60,7 @@ export function Viewer() {
 					}}
 				>
 					<Tabs.Root orientation="horizontal" className="flex h-full">
-						<Tabs.List className="w-[180px] flex flex-col gap-[16px]">
+						<Tabs.List className="w-[180px] flex flex-col gap-[16px] overflow-y-auto">
 							<div className="flex flex-col gap-[8px]">
 								{data.editingWorkflows.length > 1 && (
 									<Select
