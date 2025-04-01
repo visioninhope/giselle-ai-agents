@@ -133,7 +133,34 @@ export function GenerationRunnerSystemProvider({
 
 			while (true) {
 				if (Date.now() - startTime > timeoutDuration) {
-					throw new Error("Generation timeout");
+					const generation = generationListener.current[generationId];
+
+					const failedGeneration = {
+						id: generation.id,
+						context: generation.context,
+						createdAt: generation.createdAt,
+						queuedAt: generation.queuedAt ?? Date.now(),
+						startedAt: generation.startedAt ?? Date.now(),
+						status: "failed",
+						failedAt: Date.now(),
+						messages: generation.messages ?? [],
+						error: {
+							name: "Generation timed out",
+							message: "Generation timed out",
+							dump: "timeout",
+						},
+					} satisfies FailedGeneration;
+					options?.onError?.(failedGeneration);
+					stopHandlersRef.current[generation.id]?.();
+					setGenerations((prevGenerations) =>
+						prevGenerations.map((prevGeneration) =>
+							prevGeneration.id !== failedGeneration.id
+								? prevGeneration
+								: failedGeneration,
+						),
+					);
+					generationListener.current[generationId] = failedGeneration;
+					return;
 				}
 
 				const generation = generationListener.current[generationId];
