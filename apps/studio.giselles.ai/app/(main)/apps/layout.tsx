@@ -71,7 +71,7 @@ export default function Layout({
 					>
 						<WilliIcon className="w-5 h-5 fill-current" />{" "}
 						<span className="text-[14px] font-hubot font-medium border-b border-white-400 pb-0">
-							My created
+							My Apps
 						</span>
 					</Link>
 

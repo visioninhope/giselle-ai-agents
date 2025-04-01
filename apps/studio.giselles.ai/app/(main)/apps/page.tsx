@@ -33,32 +33,13 @@ async function AgentList() {
 	if (dbAgents.length === 0) {
 		return (
 			<div className="flex justify-center items-center h-full">
-				<div className="grid gap-[16px] justify-center text-center">
-					<div className="p-8 rounded-lg bg-black-90/30 border border-black-80">
-						<h3 className="text-xl font-rosart mb-4 text-black-20">
-							アプリがまだありません
-						</h3>
-						<p className="text-black-40 mb-6">
-							左サイドバーの「New App +」ボタンで新しいアプリを作成してください
-						</p>
-						<div className="w-16 h-16 mx-auto opacity-50">
-							<svg
-								viewBox="0 0 24 24"
-								fill="none"
-								className="w-full h-full"
-								aria-hidden="true"
-							>
-								<title>プラス記号</title>
-								<path
-									d="M12 5v14m-7-7h14"
-									stroke="currentColor"
-									strokeWidth="2"
-									strokeLinecap="round"
-									strokeLinejoin="round"
-								/>
-							</svg>
-						</div>
-					</div>
+				<div className="grid gap-[8px] justify-center text-center">
+					<h3 className="text-[18px] font-geist font-bold text-black-400">
+							No apps yet.
+					</h3>
+					<p className="text-[12px] font-geist text-black-400">
+							Please create a new app with the 'New App +' button in the left sidebar.
+					</p>
 				</div>
 			</div>
 		);
@@ -138,9 +119,9 @@ export default function AgentListV2Page() {
 		<ToastProvider>
 			<div className="w-full">
 				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
-					My created
+					My Apps
 				</h1>
-				<Suspense fallback={<p className="text-center py-8">読み込み中...</p>}>
+				<Suspense fallback={<p className="text-center py-8">Loading...</p>}>
 					<AgentList />
 				</Suspense>
 				<Toasts />
