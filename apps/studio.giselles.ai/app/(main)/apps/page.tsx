@@ -79,7 +79,6 @@ async function AgentList() {
 
 						<Link href={`/workspaces/${agent.workspaceId}`}>
 							<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
-								{/* 上部の余白エリア（メニューボタン用） */}
 								<div className="h-[20px] mb-1.5" />
 
 								{/* サムネイル */}
