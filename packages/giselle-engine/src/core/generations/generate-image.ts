@@ -1,4 +1,4 @@
-import { fal } from "@ai-sdk/fal";
+import { fal } from "@fal-ai/client";
 import {
 	type CompletedGeneration,
 	type FailedGeneration,
@@ -14,8 +14,7 @@ import {
 	isCompletedGeneration,
 	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
-import { experimental_generateImage as generateImageAiSdk } from "ai";
-import { Langfuse, LangfuseMedia } from "langfuse";
+import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
@@ -23,7 +22,6 @@ import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	checkUsageLimits,
-	detectImageType,
 	extractWorkspaceIdFromOrigin,
 	getGeneration,
 	getNodeGenerationIndexes,
@@ -37,6 +35,33 @@ import {
 type ProviderOptions = Parameters<
 	typeof generateImageAiSdk
 >[0]["providerOptions"];
+
+fal.config({
+	credentials: process.env.FAL_API_KEY,
+});
+
+interface FalImageResult {
+	data: {
+		images: Array<{
+			url: string;
+			width: number;
+			height: number;
+			content_type: string;
+		}>;
+		timings: {
+			inference: number;
+		};
+		seed: number;
+		has_nsfw_concepts: boolean[];
+		prompt: string;
+	};
+	requestId: string;
+}
+
+interface GeneratedImageData {
+	uint8Array: Uint8Array;
+	base64: string;
+}
 
 export async function generateImage(args: {
 	context: GiselleEngineContext;
@@ -224,13 +249,20 @@ export async function generateImage(args: {
 			prompt += content.text;
 		}
 	}
-	const result = await generateImageAiSdk({
-		model: fal.image(actionNode.content.llm.id),
-		prompt,
-		size: actionNode.content.llm.configurations.size,
-		n: actionNode.content.llm.configurations.n,
-		providerOptions: args.providerOptions,
-	});
+	const result = (await fal.subscribe(actionNode.content.llm.id, {
+		input: {
+			prompt,
+			image_size: {
+				width: Number.parseInt(
+					actionNode.content.llm.configurations.size.split("x")[0],
+				),
+				height: Number.parseInt(
+					actionNode.content.llm.configurations.size.split("x")[1],
+				),
+			},
+			num_images: actionNode.content.llm.configurations.n,
+		},
+	})) as unknown as FalImageResult;
 	trace.update({
 		input: { messages },
 	});
@@ -243,22 +275,33 @@ export async function generateImage(args: {
 		);
 	if (generatedImageOutput !== undefined) {
 		const contents = await Promise.all(
-			result.images.map(async (image) => {
-				const imageType = detectImageType(image.uint8Array);
+			result.data.images.map(async (image) => {
+				const imageType = image.content_type;
 				if (imageType === null) {
 					return null;
 				}
 				const id = ImageId.generate();
-				const filename = `${id}.${imageType.ext}`;
+				const ext = imageType.split("/")[1];
+				const filename = `${id}.${ext}`;
+
+				const response = await fetch(image.url);
+				const arrayBuffer = await response.arrayBuffer();
+				const uint8Array = new Uint8Array(arrayBuffer);
+				const base64 = Buffer.from(uint8Array).toString("base64");
+
 				await setGeneratedImage({
 					storage: args.context.storage,
 					generation: runningGeneration,
-					generatedImage: image,
+					generatedImage: {
+						uint8Array,
+						base64,
+					} satisfies GeneratedImageData,
 					generatedImageFilename: filename,
 				});
+
 				return {
 					id,
-					contentType: imageType.contentType,
+					contentType: imageType,
 					filename,
 					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
 				} satisfies Image;
@@ -308,17 +351,25 @@ export async function generateImage(args: {
 
 	if (args.context.telemetry?.isEnabled && generatedImageOutput) {
 		await Promise.all(
-			result.images.map(async (image) => {
+			result.data.images.map(async (image) => {
+				const response = await fetch(image.url);
+				const arrayBuffer = await response.arrayBuffer();
+				const uint8Array = new Uint8Array(arrayBuffer);
+
 				const wrappedMedia = new LangfuseMedia({
-					contentType:
-						detectImageType(image.uint8Array)?.contentType ?? undefined,
-					contentBytes: Buffer.from(image.uint8Array),
+					contentType: image.content_type as ApiMediaContentType,
+					contentBytes: Buffer.from(uint8Array),
 				});
 
 				generation.update({
 					input: { messages },
 					metadata: {
 						context: wrappedMedia,
+					},
+					usage: {
+						input: 0,
+						output: image.height * image.width,
+						unit: "IMAGES",
 					},
 				});
 			}),

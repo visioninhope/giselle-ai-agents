@@ -55,6 +55,7 @@
 		"@ai-sdk/google": "catalog:",
 		"@ai-sdk/openai": "catalog:",
 		"@ai-sdk/perplexity": "catalog:",
+		"@fal-ai/client": "^1.3.0",
 		"@giselle-sdk/data-mod": "workspace:^",
 		"@giselle-sdk/github-client": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",

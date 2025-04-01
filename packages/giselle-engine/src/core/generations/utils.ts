@@ -19,17 +19,16 @@ import {
 } from "@giselle-sdk/data-type";
 import { hasTierAccess, languageModels } from "@giselle-sdk/language-model";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
-import type {
-	CoreMessage,
-	DataContent,
-	FilePart,
-	Experimental_GeneratedImage as GeneratedImage,
-	ImagePart,
-} from "ai";
+import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { MediaContentType } from "langfuse-core";
 import type { Storage } from "unstorage";
 import { getRun } from "../runs/utils";
 import type { GiselleEngineContext } from "../types";
+
+export interface GeneratedImageData {
+	uint8Array: Uint8Array;
+	base64: string;
+}
 
 export interface FileIndex {
 	nodeId: NodeId;
@@ -592,7 +591,7 @@ export async function setGeneratedImage(params: {
 	storage: Storage;
 	generation: Generation;
 	generatedImageFilename: string;
-	generatedImage: GeneratedImage;
+	generatedImage: GeneratedImageData;
 }) {
 	await params.storage.setItemRaw(
 		generatedImagePath(params.generation, params.generatedImageFilename),
