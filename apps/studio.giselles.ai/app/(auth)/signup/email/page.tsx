@@ -4,7 +4,6 @@ import { ClickableText } from "@/components/ui/clicable-text";
 import { SendIcon } from "lucide-react";
 import { ActionPrompt } from "../../components/action-prompt";
 import { LegalConsent } from "../../components/legal-consent";
-import { PageTitle } from "../../components/page-title";
 import { SignupForm } from "./signup-form";
 
 export default function Page() {
@@ -12,7 +11,12 @@ export default function Page() {
 		<div className="min-h-screen flex items-center justify-center p-4">
 			<div className="w-[320px] space-y-8">
 				<div className="text-center">
-					<PageTitle>Sign up with Email</PageTitle>
+					<h2 
+						className="mt-6 text-[28px] font-[500] text-primary-100 font-hubot text-center"
+						style={{ textShadow: "0px 0px 20px #0087F6" }}
+					>
+						Sign up with Email
+					</h2>
 					{/* @todo Hide at the time of beta release.
 					<p className="mt-2 text-sm text-black-50">
 						Free forever. No credit card required.

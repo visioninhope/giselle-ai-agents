@@ -36,7 +36,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 			)}
 			<div className="grid gap-[16px]">
 				<div className="grid gap-[4px]">
-					<Label htmlFor="email">Email</Label>
+					<Label htmlFor="email" className="text-[14px] font-hubot text-black-70">Email</Label>
 					<Input
 						id="email"
 						type="email"
@@ -54,7 +54,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 				</div>
 				<div className="grid gap-[4px]">
 					<div className="grid gap-[4px] relative">
-						<Label htmlFor="password">Password</Label>
+						<Label htmlFor="password" className="text-[14px] font-hubot text-black-70">Password</Label>
 						<Input
 							id="password"
 							type="password"
@@ -69,7 +69,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 						{linkToResetPassword && (
 							<Link
 								href="/password_reset"
-								className="text-[12px] text-black-70 absolute top-0 right-0"
+								className="text-[14px] text-primary-100 absolute top-0 right-0 font-geist"
 							>
 								Forgot your password?
 							</Link>
@@ -82,7 +82,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 					)}
 				</div>
 				<Button
-					className="w-full"
+					className="w-full font-medium"
 					type="submit"
 					disabled={isPending}
 					data-loading={isPending}
