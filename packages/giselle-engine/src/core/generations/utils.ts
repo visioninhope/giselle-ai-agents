@@ -109,7 +109,7 @@ async function buildGenerationMessageForTextGeneration(
 			case "text": {
 				userMessage = userMessage.replace(
 					replaceKeyword,
-					contextNode.content.text,
+					jsonContentToText(JSON.parse(contextNode.content.text)),
 				);
 				break;
 			}
