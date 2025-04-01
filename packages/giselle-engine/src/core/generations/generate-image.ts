@@ -32,9 +32,14 @@ import {
 	setNodeGenerationIndex,
 } from "./utils";
 
+type ProviderOptions = Parameters<
+	typeof generateImageAiSdk
+>[0]["providerOptions"];
+
 export async function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	providerOptions?: ProviderOptions;
 }) {
 	const actionNode = args.generation.context.actionNode;
 	if (!isImageGenerationNode(actionNode)) {
@@ -211,6 +216,7 @@ export async function generateImage(args: {
 		prompt,
 		size: actionNode.content.llm.configurations.size,
 		n: actionNode.content.llm.configurations.n,
+		providerOptions: args.providerOptions,
 	});
 
 	const generationOutputs: GenerationOutput[] = [];
