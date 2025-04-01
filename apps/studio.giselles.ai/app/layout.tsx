@@ -3,14 +3,22 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GeistSans } from "geist/font/sans";
+import { Hubot_Sans } from "next/font/google";
 import { Suspense } from "react";
-import { geist, hubot, rosart } from "./fonts";
+import { rosart } from "./fonts";
 import { PostHogPageView } from "./posthog-page-view";
 import { PHProvider } from "./providers";
 
 const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
 const url = process.env.NEXT_PUBLIC_SITE_URL || "https://studio.giselles.ai";
+
+const hubot = Hubot_Sans({
+	weight: "variable",
+	variable: "--font-hubot-sans",
+	subsets: ["latin"],
+});
 
 export const metadata: Metadata = {
 	title,
@@ -38,12 +46,14 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html
+			lang="en"
+			suppressHydrationWarning
+			className={`${rosart.variable} ${hubot.variable} ${GeistSans.variable}`}
+		>
 			<GoogleTagManager gtmId={process.env.GTM_ID ?? ""} />
 			<PHProvider>
-				<body
-					className={`${rosart.variable} ${hubot.variable} ${geist.variable} font-sans`}
-				>
+				<body>
 					<ThemeProvider
 						attribute="class"
 						defaultTheme="dark"
