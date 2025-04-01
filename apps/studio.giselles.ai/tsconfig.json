@@ -22,7 +22,7 @@
 			"@/*": ["./*"],
 			"@giselles-ai/*": ["./packages/*"],
 			"@giselles-ai/icons/*": [
-				"./app/(playground)/p/[agentId]/prev/beta-proto/components/icons/*"
+				"../../internal-packages/workflow-designer-ui/src/icons/*"
 			]
 		},
 		"target": "ES2017"
