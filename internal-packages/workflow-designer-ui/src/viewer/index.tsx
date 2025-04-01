@@ -7,8 +7,13 @@ import {
 	useRunController,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import { CircleCheckIcon, CircleSlashIcon, XCircleIcon } from "lucide-react";
-import { Tabs } from "radix-ui";
+import {
+	ChevronDownIcon,
+	CircleCheckIcon,
+	CircleSlashIcon,
+	XCircleIcon,
+} from "lucide-react";
+import { Popover, Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
 import { useUsageLimitsReached } from "../hooks/usage-limits";
 import { SpinnerIcon, WilliIcon } from "../icons";
@@ -25,6 +30,7 @@ import {
 	SelectValue,
 } from "../ui/select";
 import { UsageLimitWarning } from "../ui/usage-limit-warning";
+import { RunWithOverrideParamsForm } from "./run-with-override-params-form";
 
 export function Viewer() {
 	const { generations, run } = useRun();
@@ -78,7 +84,7 @@ export function Viewer() {
 
 								{usageLimitsReached && <UsageLimitWarning />}
 
-								{flowId &&
+								{flow &&
 									(isRunning ? (
 										<Button
 											type="button"
@@ -90,19 +96,45 @@ export function Viewer() {
 											Stop
 										</Button>
 									) : (
-										<Button
-											type="button"
-											disabled={usageLimitsReached}
-											className="disabled:opacity-50 disabled:cursor-not-allowed"
-											onClick={() => {
-												if (usageLimitsReached) {
-													return;
-												}
-												perform(flowId);
-											}}
-										>
-											Run
-										</Button>
+										<div className="w-full relative">
+											<Button
+												type="button"
+												disabled={usageLimitsReached}
+												className="w-full disabled:opacity-50 disabled:cursor-not-allowed"
+												onClick={() => {
+													if (usageLimitsReached) {
+														return;
+													}
+													perform(flow.id);
+												}}
+											>
+												Run
+											</Button>
+											<div className="absolute right-0 pr-[8px] top-[50%] translate-y-[-50%] h-full flex items-center justify-center">
+												<div className="w-[1px] h-full border-l border-white-800/40 mr-[6px]" />
+												<Popover.Root>
+													<Popover.Trigger asChild>
+														<button
+															type="button"
+															className="hover:bg-black-800/20 rounded-[4px]"
+														>
+															<ChevronDownIcon className="size-[18px]" />
+														</button>
+													</Popover.Trigger>
+													<Popover.Portal>
+														<Popover.Content
+															className="w-[360px] rounded bg-black-900/20 backdrop-blur-[8px] rounded-[8px] px-[16px] py-[16px]"
+															sideOffset={12}
+															align="start"
+															alignOffset={-160}
+														>
+															<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+															<RunWithOverrideParamsForm flow={flow} />
+														</Popover.Content>
+													</Popover.Portal>
+												</Popover.Root>
+											</div>
+										</div>
 									))}
 							</div>
 							<div className="flex flex-col gap-[24px]">

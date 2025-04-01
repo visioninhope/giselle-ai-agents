@@ -146,7 +146,7 @@ export function TextEditor({
 		[nodes],
 	);
 	return (
-		<div className="flex flex-col h-full">
+		<div className="flex flex-col h-full w-full">
 			<EditorProvider
 				slotBefore={<Toolbar tools={tools} />}
 				extensions={extensions}
