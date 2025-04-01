@@ -1,5 +1,6 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
+import { OverrideNode } from "../node";
 import { Workflow } from "../workflow";
 import { WorkspaceId } from "../workspace";
 
@@ -22,6 +23,7 @@ export const QueuedRun = RunBase.extend({
 	createdAt: z.number(),
 	workspaceId: WorkspaceId.schema,
 	workflow: Workflow,
+	overrideNodes: z.array(OverrideNode),
 	queuedAt: z.number(),
 });
 export type QueuedRun = z.infer<typeof QueuedRun>;
@@ -31,6 +33,7 @@ export const RunningRun = RunBase.extend({
 	createdAt: z.number(),
 	workspaceId: WorkspaceId.schema,
 	workflow: Workflow,
+	overrideNodes: z.array(OverrideNode),
 	queuedAt: z.number(),
 	startedAt: z.number(),
 });
@@ -41,6 +44,7 @@ export const CompletedRun = RunBase.extend({
 	createdAt: z.number(),
 	workspaceId: WorkspaceId.schema,
 	workflow: Workflow,
+	overrideNodes: z.array(OverrideNode),
 	queuedAt: z.number(),
 	startedAt: z.number(),
 	completedAt: z.number(),
@@ -52,6 +56,7 @@ export const CancelledRun = RunBase.extend({
 	createdAt: z.number(),
 	workspaceId: WorkspaceId.schema,
 	workflow: Workflow,
+	overrideNodes: z.array(OverrideNode),
 	queuedAt: z.number().optional(),
 	startedAt: z.number().optional(),
 	cancelledAt: z.number(),

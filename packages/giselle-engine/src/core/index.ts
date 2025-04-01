@@ -83,8 +83,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId,
 			workflowId: WorkflowId,
 			run: CreatedRun,
+			overrideNodes?: OverrideNode[],
 		) => {
-			return await addRun({ context, workspaceId, workflowId, run });
+			return await addRun({
+				context,
+				workspaceId,
+				workflowId,
+				run,
+				overrideNodes: overrideNodes || [],
+			});
 		},
 		startRun: async (runId: RunId) => {
 			return await startRun({ context, runId });
