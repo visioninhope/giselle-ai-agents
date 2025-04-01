@@ -31,7 +31,7 @@ export const Form: FC = () => {
 					name="email"
 					ignore1password
 				/>
-				<Button type="submit" disabled={isPending} className="font-medium">
+				<Button type="submit" disabled={isPending}>
 					Reset password
 				</Button>
 			</div>
