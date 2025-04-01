@@ -64,7 +64,7 @@ export default function Layout({
 					{/* My Apps menu item */}
 					<NavigationItem 
 						href="/apps/myapps" 
-						icon={<User className="w-5 h-5" />} 
+						icon={<WilliIcon className="w-5 h-5 fill-current" />} 
 						label="My Apps" 
 					/>
 				</div>
