@@ -35,10 +35,11 @@ async function AgentList() {
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
 					<h3 className="text-[18px] font-geist font-bold text-black-400">
-							No apps yet.
+						No apps yet.
 					</h3>
 					<p className="text-[12px] font-geist text-black-400">
-							Please create a new app with the 'New App +' button in the left sidebar.
+						Please create a new app with the 'New App +' button in the left
+						sidebar.
 					</p>
 				</div>
 			</div>

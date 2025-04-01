@@ -33,9 +33,9 @@ async function MyAgentList() {
 		.from(agents)
 		.where(
 			and(
-				eq(agents.teamDbId, currentTeam.dbId), 
+				eq(agents.teamDbId, currentTeam.dbId),
 				isNotNull(agents.workspaceId),
-				eq(agents.creatorDbId, currentUser.dbId) // Filter by current user as creator
+				eq(agents.creatorDbId, currentUser.dbId), // Filter by current user as creator
 			),
 		)
 		.orderBy(desc(agents.updatedAt));
@@ -48,7 +48,8 @@ async function MyAgentList() {
 						No apps created by you yet.
 					</h3>
 					<p className="text-[12px] font-geist text-black-400">
-						Please create a new app with the 'Create new' button in the left sidebar.
+						Please create a new app with the 'Create new' button in the left
+						sidebar.
 					</p>
 				</div>
 			</div>
@@ -134,7 +135,9 @@ export default function MyAppsPage() {
 				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 					My Apps
 				</h1>
-				<Suspense fallback={<p className="text-center py-8 font-hubot">Loading...</p>}>
+				<Suspense
+					fallback={<p className="text-center py-8 font-hubot">Loading...</p>}
+				>
 					<MyAgentList />
 				</Suspense>
 				<Toasts />
