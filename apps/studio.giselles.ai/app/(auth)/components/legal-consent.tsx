@@ -1,17 +1,22 @@
-import { ClickableText } from "@/components/ui/clicable-text";
 import Link from "next/link";
 import type { FC } from "react";
 
 export const LegalConsent: FC = () => (
-	<p className="text-xs text-white-400 text-center font-hubot">
+	<p className="font-geist text-[14px] text-black-70">
 		By continuing, you agree to our{" "}
-		<ClickableText asChild>
-			<Link href="/terms">Terms of Service</Link>
-		</ClickableText>{" "}
+		<Link
+			href="https://giselles.ai/legal/terms"
+			className="font-[700] underline font-geist"
+		>
+			Terms of Service
+		</Link>{" "}
 		and{" "}
-		<ClickableText asChild>
-			<Link href="/privacy">Privacy Policy</Link>
-		</ClickableText>
+		<Link
+			href="https://giselles.ai/legal/privacy"
+			className="font-[700] underline font-geist"
+		>
+			Privacy Policy
+		</Link>
 		.
 	</p>
 );
