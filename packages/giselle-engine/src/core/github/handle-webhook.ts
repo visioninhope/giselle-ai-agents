@@ -108,6 +108,8 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					);
 				case "github.issues.opened":
 					return isIssuesOpenedEvent(args.github.payload, args.github.event);
+				case "github.issues.closed":
+					return isIssuesClosedEvent(args.github.payload, args.github.event);
 				default: {
 					const _exhaustiveCheck: never =
 						workspaceGitHubIntegrationSetting.event;
@@ -128,7 +130,10 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					args.github.payload.comment.id,
 				);
 			}
-			if (isIssuesOpenedEvent(args.github.payload, args.github.event)) {
+			if (
+				isIssuesOpenedEvent(args.github.payload, args.github.event) ||
+				isIssuesClosedEvent(args.github.payload, args.github.event)
+			) {
 				await args.options?.addReactionToIssue?.(
 					args.github.payload.repository.owner.login,
 					args.github.payload.repository.name,
@@ -304,6 +309,19 @@ function isIssuesOpenedEvent(
 	);
 }
 
+function isIssuesClosedEvent(
+	payload: unknown,
+	event: string,
+): payload is IssuesOpenedEvent {
+	return (
+		event === "issues" &&
+		typeof payload === "object" &&
+		payload !== null &&
+		"action" in payload &&
+		payload.action === "closed"
+	);
+}
+
 type PayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField> =
 	TField extends
 		| "github.issue_comment.issue.number"
@@ -351,7 +369,10 @@ async function getPayloadValue<
 		}
 	}
 
-	if (isIssuesOpenedEvent(payload, event)) {
+	if (
+		isIssuesOpenedEvent(payload, event) ||
+		isIssuesClosedEvent(payload, event)
+	) {
 		switch (field) {
 			case "github.issues.title":
 				return payload.issue.title as PayloadValue<TField>;
@@ -375,7 +396,10 @@ function getRepositoryOwnerNameNodeId(event: string, payload: unknown) {
 			nodeId: payload.repository.node_id,
 		};
 	}
-	if (isIssuesOpenedEvent(payload, event)) {
+	if (
+		isIssuesOpenedEvent(payload, event) ||
+		isIssuesClosedEvent(payload, event)
+	) {
 		return {
 			owner: payload.repository.owner.login,
 			name: payload.repository.name,
@@ -389,7 +413,10 @@ function parseCommand(event: string, payload: unknown) {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		return parseCommandInternal(payload.comment.body);
 	}
-	if (isIssuesOpenedEvent(payload, event)) {
+	if (
+		isIssuesOpenedEvent(payload, event) ||
+		isIssuesClosedEvent(payload, event)
+	) {
 		return;
 	}
 	throw new Error(`Unhandled event type: ${event}`);

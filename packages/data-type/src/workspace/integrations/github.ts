@@ -9,6 +9,7 @@ export type WorkspaceGitHubIntegrationId =
 
 export const WorkspaceGitHubIntegrationTrigger = z.enum([
 	"github.issues.opened",
+	"github.issues.closed",
 	"github.issue_comment.created",
 	"github.pull_request_comment.created",
 ]);
