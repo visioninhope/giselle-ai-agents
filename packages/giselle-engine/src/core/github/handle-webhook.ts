@@ -106,144 +106,158 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 			isMatchingIntegrationSetting(setting, gitHubEvent, command),
 		) ?? [];
 
-	const integrationPromises = matchedIntegrationSettings.map(
-		async (setting) => {
-			await handleReaction(gitHubEvent, args.options);
-
-			const overrideNodes: OverrideNode[] = [];
-			const workspace = await getWorkspace({
-				context: args.context,
-				workspaceId: setting.workspaceId,
-			});
-			for (const payloadMap of setting.payloadMaps) {
-				const node = workspace.nodes.find(
-					(node) => node.id === payloadMap.nodeId,
-				);
-				if (node === undefined) {
-					continue;
-				}
-				const payloadValue = await getPayloadValue(
-					gitHubEvent,
-					payloadMap.payload,
-					command?.content,
-					args.options?.pullRequestDiff,
-				);
-				switch (node.content.type) {
-					case "textGeneration":
-						overrideNodes.push({
-							id: node.id,
-							type: "action",
-							content: {
-								type: node.content.type,
-								prompt: `${payloadValue}`,
-							},
-						});
-						break;
-					case "imageGeneration":
-						overrideNodes.push({
-							id: node.id,
-							type: "action",
-							content: {
-								type: node.content.type,
-								prompt: `${payloadValue}`,
-							},
-						});
-						break;
-					case "file":
-						throw new Error("File nodes are not supported");
-					case "text":
-						overrideNodes.push({
-							id: node.id,
-							type: "variable",
-							content: {
-								type: node.content.type,
-								text: `${payloadValue}`,
-							},
-						});
-						break;
-					case "github":
-						throw new Error("GitHub nodes are not supported");
-					default: {
-						const _exhaustiveCheck: never = node.content;
-						throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
-					}
-				}
-			}
-			const workflows = workspace.editingWorkflows.filter((workflow) =>
-				workflow.jobs.some((job) =>
-					job.actions.some((action) =>
-						overrideNodes.some(
-							(overrideNode) =>
-								overrideNode.id === action.node.id ||
-								action.generationTemplate.sourceNodes.some(
-									(sourceNode) => sourceNode.id === overrideNode.id,
-								),
-						),
-					),
-				),
-			);
-			const results = await Promise.all(
-				workflows.map((workflow) =>
-					runApi({
-						context: args.context,
-						workspaceId: workspace.id,
-						workflowId: workflow.id,
-						overrideNodes,
-					}).catch((error: unknown) => {
-						throw new WorkflowError(
-							`Failed to run workflow: ${error}`,
-							workspace.id,
-							workflow.id,
-							{ cause: error },
-						);
-					}),
-				),
-			);
-
-			const webhookResults: HandleGitHubWebhookResult[] = [];
-			for (const result of results) {
-				for (const resultText of result) {
-					switch (setting.nextAction) {
-						case "github.pull_request_comment.create": {
-							webhookResults.push({
-								action: "github.pull_request_comment.create",
-								pullRequest: {
-									repo: {
-										owner: repository.owner,
-										name: repository.name,
-									},
-									number: gitHubEvent.payload.issue.number,
-								},
-								content: resultText,
-							});
-							break;
-						}
-						case "github.issue_comment.create": {
-							webhookResults.push({
-								action: "github.issue_comment.create",
-								issue: {
-									repo: {
-										owner: repository.owner,
-										name: repository.name,
-									},
-									number: gitHubEvent.payload.issue.number,
-								},
-								content: resultText,
-							});
-							break;
-						}
-						default: {
-							const _exhaustiveCheck: never = setting.nextAction;
-							throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
-						}
-					}
-				}
-			}
-			return webhookResults;
-		},
+	const integrationPromises = matchedIntegrationSettings.map((setting) =>
+		processIntegration(
+			setting,
+			gitHubEvent,
+			command,
+			repository,
+			args.context,
+			args.options,
+		),
 	);
 	const results = await Promise.all(integrationPromises);
 	return results.flat();
+}
+
+async function processIntegration(
+	setting: WorkspaceGitHubIntegrationSetting,
+	gitHubEvent: GitHubEvent,
+	command: Command | null,
+	repository: { owner: string; name: string; nodeId: string },
+	context: GiselleEngineContext,
+	options?: HandleGitHubWebhookOptions,
+): Promise<HandleGitHubWebhookResult[]> {
+	await handleReaction(gitHubEvent, options);
+
+	const overrideNodes: OverrideNode[] = [];
+	const workspace = await getWorkspace({
+		context: context,
+		workspaceId: setting.workspaceId,
+	});
+	for (const payloadMap of setting.payloadMaps) {
+		const node = workspace.nodes.find((node) => node.id === payloadMap.nodeId);
+		if (node === undefined) {
+			continue;
+		}
+		const payloadValue = await getPayloadValue(
+			gitHubEvent,
+			payloadMap.payload,
+			command?.content,
+			options?.pullRequestDiff,
+		);
+		switch (node.content.type) {
+			case "textGeneration":
+				overrideNodes.push({
+					id: node.id,
+					type: "action",
+					content: {
+						type: node.content.type,
+						prompt: `${payloadValue}`,
+					},
+				});
+				break;
+			case "imageGeneration":
+				overrideNodes.push({
+					id: node.id,
+					type: "action",
+					content: {
+						type: node.content.type,
+						prompt: `${payloadValue}`,
+					},
+				});
+				break;
+			case "file":
+				throw new Error("File nodes are not supported");
+			case "text":
+				overrideNodes.push({
+					id: node.id,
+					type: "variable",
+					content: {
+						type: node.content.type,
+						text: `${payloadValue}`,
+					},
+				});
+				break;
+			case "github":
+				throw new Error("GitHub nodes are not supported");
+			default: {
+				const _exhaustiveCheck: never = node.content;
+				throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	const workflows = workspace.editingWorkflows.filter((workflow) =>
+		workflow.jobs.some((job) =>
+			job.actions.some((action) =>
+				overrideNodes.some(
+					(overrideNode) =>
+						overrideNode.id === action.node.id ||
+						action.generationTemplate.sourceNodes.some(
+							(sourceNode) => sourceNode.id === overrideNode.id,
+						),
+				),
+			),
+		),
+	);
+	const results = await Promise.all(
+		workflows.map((workflow) =>
+			runApi({
+				context,
+				workspaceId: workspace.id,
+				workflowId: workflow.id,
+				overrideNodes,
+			}).catch((error: unknown) => {
+				throw new WorkflowError(
+					`Failed to run workflow: ${error}`,
+					workspace.id,
+					workflow.id,
+					{ cause: error },
+				);
+			}),
+		),
+	);
+
+	const webhookResults: HandleGitHubWebhookResult[] = [];
+	for (const result of results) {
+		for (const resultText of result) {
+			switch (setting.nextAction) {
+				case "github.pull_request_comment.create": {
+					webhookResults.push({
+						action: "github.pull_request_comment.create",
+						pullRequest: {
+							repo: {
+								owner: repository.owner,
+								name: repository.name,
+							},
+							number: gitHubEvent.payload.issue.number,
+						},
+						content: resultText,
+					});
+					break;
+				}
+				case "github.issue_comment.create": {
+					webhookResults.push({
+						action: "github.issue_comment.create",
+						issue: {
+							repo: {
+								owner: repository.owner,
+								name: repository.name,
+							},
+							number: gitHubEvent.payload.issue.number,
+						},
+						content: resultText,
+					});
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = setting.nextAction;
+					throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
+				}
+			}
+		}
+	}
+	return webhookResults;
 }
 
 function isMatchingIntegrationSetting(
