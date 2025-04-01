@@ -3,7 +3,7 @@ import type {
 	IssuesClosedEvent,
 	IssuesOpenedEvent,
 } from "@octokit/webhooks-types";
-import { GitHubEventType, type GitHubEvent } from "./types";
+import { type GitHubEvent, GitHubEventType } from "./types";
 
 function isIssueCommentCreatedPayload(
 	event: string,
