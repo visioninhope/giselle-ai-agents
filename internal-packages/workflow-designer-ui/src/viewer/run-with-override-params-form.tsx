@@ -5,10 +5,12 @@ import {
 	isTextNode,
 } from "@giselle-sdk/data-type";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
-import { useState } from "react";
+import { useRunController } from "giselle-sdk/react";
+import { type FormEventHandler, useCallback, useState } from "react";
 import { Button } from "../ui/button";
 
 export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
+	const { perform } = useRunController();
 	const [overrideVariableNodes, setOverrideVariableNodes] = useState<
 		OverrideVariableNode[]
 	>(
@@ -27,8 +29,20 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 			)
 			.filter((node) => node !== null),
 	);
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+		(e) => {
+			e.preventDefault();
+			perform(flow.id, {
+				overrideNodes: overrideVariableNodes,
+			});
+		},
+		[flow.id, perform, overrideVariableNodes],
+	);
 	return (
-		<div className="flex flex-col gap-[24px] relative text-white-800">
+		<form
+			className="flex flex-col gap-[24px] relative text-white-800"
+			onSubmit={handleSubmit}
+		>
 			<p className="font-accent text-[16px] font-bold text-white-400">
 				Run app with override parameters
 			</p>
@@ -71,7 +85,7 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 					);
 				})}
 			</div>
-			<Button type="button">Run with params</Button>
-		</div>
+			<Button type="submit">Run with params</Button>
+		</form>
 	);
 }
