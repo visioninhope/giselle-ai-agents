@@ -10,6 +10,7 @@ import { useGenerationRunnerSystem } from "../contexts";
  * Hook to fetch and manage node generations.
  * Uses object destructuring with nested destructuring in the parameters to avoid
  * reference equality issues that could cause infinite re-renders.
+ * Provides generations filtered by nodeId and origin (id and type), sorted by creation time.
  */
 export function useNodeGenerations({
 	nodeId,
@@ -30,8 +31,19 @@ export function useNodeGenerations({
 	>();
 
 	const generations = useMemo(
-		() => allGenerations.filter((g) => g.context.actionNode.id === nodeId),
-		[allGenerations, nodeId],
+		() =>
+			allGenerations
+				.filter(
+					(generation) =>
+						generation.context.actionNode.id === nodeId &&
+						generation.context.origin.type === originType &&
+						generation.context.origin.id === originId,
+				)
+				.sort(
+					(a, b) =>
+						new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+				),
+		[allGenerations, nodeId, originId, originType],
 	);
 
 	// Effect to fetch node generations
@@ -52,6 +64,7 @@ export function useNodeGenerations({
 		if (generations.length === 0) {
 			setCurrentGeneration(undefined);
 		} else {
+			// Since generations are sorted by creation time, the last one is the latest
 			const latestGeneration = generations[generations.length - 1];
 			setCurrentGeneration(latestGeneration);
 		}
