@@ -8,6 +8,7 @@ export type WorkspaceGitHubIntegrationId =
 	typeof WorkspaceGitHubIntegrationId.schema;
 
 export const WorkspaceGitHubIntegrationTrigger = z.enum([
+	"github.issues.opened",
 	"github.issue_comment.created",
 	"github.pull_request_comment.created",
 ]);
@@ -30,6 +31,8 @@ export type WorkspaceGitHubNextIntegrationAction = z.infer<
 >;
 
 export const WorkspaceGitHubIntegrationPayloadField = z.enum([
+	"github.issues.title",
+	"github.issues.body",
 	"github.issue_comment.issue.number",
 	"github.issue_comment.issue.repository.owner",
 	"github.issue_comment.issue.repository.name",

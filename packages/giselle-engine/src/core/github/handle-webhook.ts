@@ -296,6 +296,10 @@ async function getPayloadValue<
 			case "github.pull_request_comment.pull_request.repository.name":
 			case "github.issue_comment.issue.repository.name":
 				return payload.repository.name as PayloadValue<TField>;
+			case "github.issues.title":
+				return payload.issue.title as PayloadValue<TField>;
+			case "github.issues.body":
+				return payload.issue.body as PayloadValue<TField>;
 			default: {
 				const _exhaustiveCheck: never = field;
 				throw new Error(`Unhandled field type: ${_exhaustiveCheck}`);
