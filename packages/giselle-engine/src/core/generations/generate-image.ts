@@ -310,7 +310,8 @@ export async function generateImage(args: {
 		await Promise.all(
 			result.images.map(async (image) => {
 				const wrappedMedia = new LangfuseMedia({
-					contentType: detectImageType(image.uint8Array)?.contentType ?? undefined,
+					contentType:
+						detectImageType(image.uint8Array)?.contentType ?? undefined,
 					contentBytes: Buffer.from(image.uint8Array),
 				});
 
