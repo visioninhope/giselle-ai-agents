@@ -1,10 +1,12 @@
 import {
 	WorkspaceGitHubIntegrationNextAction,
+	WorkspaceGitHubIntegrationPayloadField,
 	WorkspaceGitHubIntegrationTrigger,
 } from "@giselle-sdk/data-type";
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useState } from "react";
 import {
 	Label,
 	Select,
@@ -42,9 +44,32 @@ function Installed({
 }: { repositories: GitHubIntegrationRepository[] }) {
 	const { data: workspace } = useWorkflowDesigner();
 	const { isLoading, data, handleSubmit } = useGitHubIntegrationSetting();
+	const [selectedTrigger, setSelectedTrigger] = useState<
+		WorkspaceGitHubIntegrationTrigger | undefined
+	>(data?.event);
+
 	if (isLoading) {
 		return null;
 	}
+
+	const getAvailablePayloadFields = (
+		trigger: WorkspaceGitHubIntegrationTrigger,
+	) => {
+		const fields = Object.values(WorkspaceGitHubIntegrationPayloadField.Enum);
+		const triggerParts = trigger.split(".");
+		const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
+		return fields.filter((field) => field.startsWith(triggerPrefix));
+	};
+
+	const getAvailableNextActions = (
+		trigger: WorkspaceGitHubIntegrationTrigger,
+	) => {
+		const actions = Object.values(WorkspaceGitHubIntegrationNextAction.Enum);
+		const triggerParts = trigger.split(".");
+		const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
+		return actions.filter((action) => action.startsWith(triggerPrefix));
+	};
+
 	return (
 		<div className="flex flex-col gap-[16px]">
 			<h2 className="text-[14px] font-accent font-[700] text-white-400">
@@ -77,7 +102,15 @@ function Installed({
 					<div className="flex flex-col gap-[16px]">
 						<fieldset className="flex flex-col gap-[4px]">
 							<Label>Event</Label>
-							<Select name="event" defaultValue={data?.event}>
+							<Select
+								name="event"
+								defaultValue={data?.event}
+								onValueChange={(value: string) => {
+									const trigger =
+										WorkspaceGitHubIntegrationTrigger.parse(value);
+									setSelectedTrigger(trigger);
+								}}
+							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select a trigger" />
 								</SelectTrigger>
@@ -121,6 +154,11 @@ function Installed({
 						<PayloadMapForm
 							nodes={workspace.nodes}
 							currentPayloadMaps={data?.payloadMaps}
+							availablePayloadFields={
+								selectedTrigger
+									? getAvailablePayloadFields(selectedTrigger)
+									: []
+							}
 						/>
 					</div>
 					<h3 className="font-accent text-white-400 text-[14px] font-bold">
@@ -132,24 +170,12 @@ function Installed({
 								<SelectValue placeholder="Select an action" />
 							</SelectTrigger>
 							<SelectContent>
-								<SelectItem
-									value={
-										WorkspaceGitHubIntegrationNextAction.Enum[
-											"github.issue_comment.create"
-										]
-									}
-								>
-									Create Issue Comment
-								</SelectItem>
-								<SelectItem
-									value={
-										WorkspaceGitHubIntegrationNextAction.Enum[
-											"github.pull_request_comment.create"
-										]
-									}
-								>
-									Create Pull Request Comment
-								</SelectItem>
+								{selectedTrigger != null &&
+									getAvailableNextActions(selectedTrigger).map((action) => (
+										<SelectItem key={action} value={action}>
+											{action.split(".").slice(1).join(".")}
+										</SelectItem>
+									))}
 							</SelectContent>
 						</Select>
 					</fieldset>
