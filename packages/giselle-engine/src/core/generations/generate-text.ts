@@ -266,12 +266,25 @@ export async function generateText(args: {
 			if (sourceOutput !== undefined && event.sources.length > 0) {
 				const sources = await Promise.all(
 					event.sources.map(async (source) => {
-						const redirected = await getRedirectedUrlAndTitle(source.url);
+						// When using Gemini search grounding, source provides a proxy URL
+						// We need to access and resolve this proxy URL to get the actual redirect URL
+						if (
+							source.url.startsWith("https://vertexaisearch.cloud.google.com")
+						) {
+							const redirected = await getRedirectedUrlAndTitle(source.url);
+							return {
+								sourceType: "url",
+								id: source.id,
+								url: redirected.redirectedUrl,
+								title: redirected.title,
+								providerMetadata: source.providerMetadata,
+							} satisfies UrlSource;
+						}
 						return {
 							sourceType: "url",
 							id: source.id,
-							url: redirected.redirectedUrl,
-							title: redirected.title,
+							url: source.url,
+							title: source.title ?? source.url,
 							providerMetadata: source.providerMetadata,
 						} satisfies UrlSource;
 					}),
