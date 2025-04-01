@@ -1,9 +1,11 @@
 import { giselleEngine } from "@/app/giselle-engine";
-import { isWorkflowError } from "@giselle-sdk/giselle-engine";
+import {
+	isUsageLimitError,
+	isWorkflowError,
+} from "@giselle-sdk/giselle-engine";
 import { Webhooks } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { type NextRequest, after } from "next/server";
-import { isUsageLimitError } from "../../../../../packages/giselle-engine/src/core";
 import {
 	WebhookPayloadError,
 	defaultGitHubClientFactory,
