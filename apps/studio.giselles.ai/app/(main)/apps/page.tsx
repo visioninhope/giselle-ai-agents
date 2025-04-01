@@ -81,7 +81,6 @@ async function AgentList() {
 							<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
 								<div className="h-[20px] mb-1.5" />
 
-								{/* サムネイル */}
 								<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
 
 								<div className="flex-grow">
