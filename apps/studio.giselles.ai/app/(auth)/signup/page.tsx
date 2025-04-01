@@ -26,9 +26,9 @@ export default function SignupPage() {
 				<PageHeader title="Get Started" />
 				<OAuthProviders labelPrefix="Sign up" />
 				<Divider label="or" />
-				<Button asChild className="font-medium">
+				<Button asChild>
 					<Link href="/signup/email">
-						<p className="font-hubot font-medium">Sign up for Email</p>
+						<p className="font-hubot">Sign up for Email</p>
 						<MailIcon className="h-5 w-5 mr-2" />
 					</Link>
 				</Button>
