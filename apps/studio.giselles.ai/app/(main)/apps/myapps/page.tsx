@@ -6,7 +6,7 @@ import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
-import { DeleteAgentButton, DuplicateAgentButton, Toasts } from "./components";
+import { DeleteAgentButton, DuplicateAgentButton, Toasts } from "../components";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
@@ -17,8 +17,12 @@ function DataList({ label, children }: { label: string; children: ReactNode }) {
 	);
 }
 
-async function AgentList() {
-	const currentTeam = await fetchCurrentTeam();
+async function MyAgentList() {
+	const [currentTeam, currentUser] = await Promise.all([
+		fetchCurrentTeam(),
+		fetchCurrentUser(),
+	]);
+
 	const dbAgents = await db
 		.select({
 			id: agents.id,
@@ -28,24 +32,30 @@ async function AgentList() {
 		})
 		.from(agents)
 		.where(
-			and(eq(agents.teamDbId, currentTeam.dbId), isNotNull(agents.workspaceId)),
+			and(
+				eq(agents.teamDbId, currentTeam.dbId),
+				isNotNull(agents.workspaceId),
+				eq(agents.creatorDbId, currentUser.dbId), // Filter by current user as creator
+			),
 		)
 		.orderBy(desc(agents.updatedAt));
+
 	if (dbAgents.length === 0) {
 		return (
 			<div className="flex justify-center items-center h-full">
 				<div className="grid gap-[8px] justify-center text-center">
 					<h3 className="text-[18px] font-geist font-bold text-black-400">
-						No apps yet.
+						No apps created by you yet.
 					</h3>
 					<p className="text-[12px] font-geist text-black-400">
-						Please create a new app with the 'New App +' button in the left
+						Please create a new app with the 'Create new' button in the left
 						sidebar.
 					</p>
 				</div>
 			</div>
 		);
 	}
+
 	return (
 		<>
 			<div className="flex flex-wrap gap-4">
@@ -118,15 +128,17 @@ async function AgentList() {
 	);
 }
 
-export default function AgentListV2Page() {
+export default function MyAppsPage() {
 	return (
 		<ToastProvider>
 			<div className="w-full">
 				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 					My Apps
 				</h1>
-				<Suspense fallback={<p className="text-center py-8">Loading...</p>}>
-					<AgentList />
+				<Suspense
+					fallback={<p className="text-center py-8 font-hubot">Loading...</p>}
+				>
+					<MyAgentList />
 				</Suspense>
 				<Toasts />
 			</div>

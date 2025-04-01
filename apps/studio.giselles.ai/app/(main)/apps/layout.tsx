@@ -2,12 +2,16 @@ import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { putGraph } from "@giselles-ai/actions";
+import { WilliIcon } from "@giselles-ai/icons/willi";
 import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
+import { Clock, User } from "lucide-react";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { giselleEngine } from "../../giselle-engine";
 import { CreateAgentButton } from "./components";
+import { NavigationItem } from "./components/navigation-item";
 
 export default function Layout({
 	children,
@@ -34,12 +38,40 @@ export default function Layout({
 
 	return (
 		<div className="flex h-full divide-x divide-black-80">
-			<div className="w-[200px] h-full p-[24px]">
-				<form action={createAgent}>
-					<CreateAgentButton />
-				</form>
+			{/* Left Menu */}
+			<div className="w-[240px] h-full bg-black-900 p-[24px] flex flex-col">
+				{/* New App + Button */}
+				<div className="mb-8">
+					<form action={createAgent}>
+						<button
+							type="submit"
+							className="w-full bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot"
+						>
+							Create new
+						</button>
+					</form>
+				</div>
+
+				{/* Menu Items */}
+				<div className="flex flex-col space-y-5">
+					{/* Recent menu item */}
+					<NavigationItem
+						href="/apps"
+						icon={<Clock className="w-5 h-5" />}
+						label="Recent"
+					/>
+
+					{/* My Apps menu item */}
+					<NavigationItem
+						href="/apps/myapps"
+						icon={<WilliIcon className="w-5 h-5 fill-current" />}
+						label="My Apps"
+					/>
+				</div>
 			</div>
-			<div className="p-[24px] flex-1">{children}</div>
+
+			{/* Main Content */}
+			<div className="p-[24px] flex-1 bg-black-900">{children}</div>
 		</div>
 	);
 }
