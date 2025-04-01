@@ -23,7 +23,7 @@ export function setValueAtPath(
 
 	let parent = obj;
 	for (const key of parentPath) {
-		if (key === '__proto__' || key === 'constructor' || key === 'prototype') {
+		if (key === "__proto__" || key === "constructor" || key === "prototype") {
 			return;
 		}
 		if (parent[key] === undefined) {
@@ -32,7 +32,11 @@ export function setValueAtPath(
 		parent = parent[key];
 	}
 
-	if (lastKey === '__proto__' || lastKey === 'constructor' || lastKey === 'prototype') {
+	if (
+		lastKey === "__proto__" ||
+		lastKey === "constructor" ||
+		lastKey === "prototype"
+	) {
 		return;
 	}
 	parent[lastKey] = value;
