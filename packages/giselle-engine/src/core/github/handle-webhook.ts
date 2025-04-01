@@ -305,12 +305,6 @@ async function getPayloadValue<
 	throw new Error(`Unhandled event type: ${event}`);
 }
 
-function getRepositoryNodeId(event: string, payload: unknown) {
-	if (isIssueCommentCreatedEvent(payload, event)) {
-		return payload.repository.node_id;
-	}
-	throw new Error(`Unhandled event type: ${event}`);
-}
 function getRepositoryOwnerNameNodeId(event: string, payload: unknown) {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		return {
