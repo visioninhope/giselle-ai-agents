@@ -12,7 +12,11 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 		<Button asChild variant="link">
 			<form className="flex items-center w-full relative">
 				<SiGoogle className="h-[20px] w-[20px] absolute left-[20px]" />
-				<button type="submit" formAction={authorizeGoogle} className="font-hubot w-full text-center">
+				<button
+					type="submit"
+					formAction={authorizeGoogle}
+					className="font-hubot w-full text-center"
+				>
 					{labelPrefix} with Google
 				</button>
 			</form>
@@ -21,7 +25,11 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 		<Button asChild variant="link">
 			<form className="flex items-center w-full relative">
 				<SiGithub className="h-[20px] w-[20px] absolute left-[20px]" />
-				<button type="submit" formAction={authorizeGitHub} className="font-hubot w-full text-center">
+				<button
+					type="submit"
+					formAction={authorizeGitHub}
+					className="font-hubot w-full text-center"
+				>
 					{labelPrefix} with GitHub
 				</button>
 			</form>

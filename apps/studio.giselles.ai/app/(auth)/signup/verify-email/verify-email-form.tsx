@@ -100,7 +100,11 @@ export const VerifyEmailForm: FC = () => {
 							}
 						/>
 					</div>
-					<Button className="w-full font-medium" type="submit" disabled={isVerifyPending}>
+					<Button
+						className="w-full font-medium"
+						type="submit"
+						disabled={isVerifyPending}
+					>
 						Verify
 					</Button>
 				</div>

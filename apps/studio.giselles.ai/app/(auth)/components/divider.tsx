@@ -8,7 +8,9 @@ export const Divider: FC<DividerProps> = ({ label }) => {
 		<div className="flex items-center">
 			<div className="grow border-t border-black-70" />
 			{label && (
-				<span className="shrink mx-4 text-gray-500 text-[16px] font-semibold">{label}</span>
+				<span className="shrink mx-4 text-gray-500 text-[16px] font-semibold">
+					{label}
+				</span>
 			)}
 			<div className="grow border-t border-black-70" />
 		</div>
