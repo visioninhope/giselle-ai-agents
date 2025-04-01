@@ -52,7 +52,7 @@ async function AgentList() {
 						key={agent.id}
 						className="relative group flex-grow basis-[280px] min-w-[280px] max-w-[376px] h-[354px]"
 					>
-						{/* メニューボタン - カードの上に絶対位置で配置 */}
+						{/* Menu buttons - positioned absolutely on top of the card */}
 						<div className="absolute top-0 right-[8px] z-10 opacity-60 group-hover:opacity-100 transition-opacity flex">
 							<DuplicateAgentButton agentId={agent.id} agentName={agent.name} />
 							<DeleteAgentButton agentId={agent.id} agentName={agent.name} />
@@ -60,13 +60,15 @@ async function AgentList() {
 
 						<Link href={`/workspaces/${agent.workspaceId}`}>
 							<div className="bg-white-850/10 p-[16px] relative rounded-[8px] transition-all duration-300 hover:shadow-lg h-full flex flex-col">
+								{/* Upper padding area (for menu buttons) */}
 								<div className="h-[20px] mb-1.5" />
 
+								{/* Thumbnail */}
 								<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
 
 								<div className="flex-grow">
 									<h3 className="font-hubot text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
-										agent.name ?? "Unname App"
+										{agent.name}
 									</h3>
 								</div>
 
@@ -92,7 +94,7 @@ async function AgentList() {
 												strokeWidth="2"
 												aria-hidden="true"
 											>
-												<title>お気に入り</title>
+												<title>Favorite</title>
 												<path
 													strokeLinecap="round"
 													strokeLinejoin="round"
