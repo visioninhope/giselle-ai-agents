@@ -59,7 +59,16 @@ type PullRequestDiffFn = (
 ) => Promise<string>;
 export interface HandleGitHubWebhookOptions {
 	pullRequestDiff?: PullRequestDiffFn;
-	reaction?: (owner: string, repo: string, commentId: number) => Promise<void>;
+	addReactionToComment?: (
+		owner: string,
+		repo: string,
+		commentId: number,
+	) => Promise<void>;
+	addReactionToIssue?: (
+		owner: string,
+		repo: string,
+		issueId: number,
+	) => Promise<void>;
 }
 export interface HandleGitHubWebhookArgs {
 	github: {
@@ -91,14 +100,22 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 	)
 		.filter(
 			(workspaceGitHubIntegrationSetting) =>
+				workspaceGitHubIntegrationSetting.callsign == null ||
 				workspaceGitHubIntegrationSetting.callsign === command?.callsign,
 		)
 		.map(async (workspaceGitHubIntegrationSetting) => {
 			if (isIssueCommentCreatedEvent(args.github.payload, args.github.event)) {
-				await args.options?.reaction?.(
+				await args.options?.addReactionToComment?.(
 					args.github.payload.repository.owner.login,
 					args.github.payload.repository.name,
 					args.github.payload.comment.id,
+				);
+			}
+			if (isIssuesOpenedEvent(args.github.payload, args.github.event)) {
+				await args.options?.addReactionToIssue?.(
+					args.github.payload.repository.owner.login,
+					args.github.payload.repository.name,
+					args.github.payload.issue.number,
 				);
 			}
 			const overrideNodes: OverrideNode[] = [];
@@ -117,7 +134,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 					args.github.event,
 					args.github.payload,
 					payloadMap.payload,
-					command.content,
+					command?.content,
 					args.options?.pullRequestDiff,
 				);
 				switch (node.content.type) {
@@ -323,6 +340,8 @@ async function getPayloadValue<
 				return payload.issue.title as PayloadValue<TField>;
 			case "github.issues.body":
 				return payload.issue.body as PayloadValue<TField>;
+			case "github.issue_comment.issue.number":
+				return payload.issue.number as PayloadValue<TField>;
 			default:
 				throw new Error(`Unhandled field type: ${field} for ${event}`);
 		}
@@ -339,12 +358,22 @@ function getRepositoryOwnerNameNodeId(event: string, payload: unknown) {
 			nodeId: payload.repository.node_id,
 		};
 	}
+	if (isIssuesOpenedEvent(payload, event)) {
+		return {
+			owner: payload.repository.owner.login,
+			name: payload.repository.name,
+			nodeId: payload.repository.node_id,
+		};
+	}
 	throw new Error(`Unhandled event type: ${event}`);
 }
 
 function parseCommand(event: string, payload: unknown) {
 	if (isIssueCommentCreatedEvent(payload, event)) {
 		return parseCommandInternal(payload.comment.body);
+	}
+	if (isIssuesOpenedEvent(payload, event)) {
+		return;
 	}
 	throw new Error(`Unhandled event type: ${event}`);
 }
