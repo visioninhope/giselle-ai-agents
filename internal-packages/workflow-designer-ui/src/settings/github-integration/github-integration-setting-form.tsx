@@ -1,12 +1,12 @@
+import type { WorkspaceGitHubNextIntegrationAction } from "@giselle-sdk/data-type";
 import {
-	WorkspaceGitHubIntegrationNextAction,
 	WorkspaceGitHubIntegrationPayloadField,
 	WorkspaceGitHubIntegrationTrigger,
 } from "@giselle-sdk/data-type";
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
 	Label,
 	Select,
@@ -17,6 +17,38 @@ import {
 } from "../ui";
 import { PayloadMapForm } from "./payload-map-form";
 import { useGitHubIntegrationSetting } from "./use-github-integration-setting";
+
+const NEXT_ACTION_DISPLAY_NAMES: Record<
+	WorkspaceGitHubNextIntegrationAction,
+	string
+> = {
+	"github.issue_comment.create": "Create Issue Comment",
+	"github.pull_request_comment.create": "Create Pull Request Comment",
+} as const;
+
+const TRIGGER_TO_ACTIONS: Record<
+	WorkspaceGitHubIntegrationTrigger,
+	WorkspaceGitHubNextIntegrationAction[]
+> = {
+	"github.issues.opened": ["github.issue_comment.create"],
+	"github.issue_comment.created": ["github.issue_comment.create"],
+	"github.pull_request_comment.created": ["github.pull_request_comment.create"],
+} as const;
+
+const TRIGGERS_REQUIRING_CALLSIGN = [
+	"github.issue_comment.created",
+	"github.pull_request_comment.created",
+] as const;
+
+type TriggerRequiringCallsign = (typeof TRIGGERS_REQUIRING_CALLSIGN)[number];
+
+const requiresCallsign = (
+	trigger: WorkspaceGitHubIntegrationTrigger,
+): boolean => {
+	return TRIGGERS_REQUIRING_CALLSIGN.includes(
+		trigger as TriggerRequiringCallsign,
+	);
+};
 
 export function GitHubIntegrationSettingForm() {
 	const { github } = useIntegration();
@@ -47,6 +79,18 @@ function Installed({
 	const [selectedTrigger, setSelectedTrigger] = useState<
 		WorkspaceGitHubIntegrationTrigger | undefined
 	>(data?.event);
+	const [callsign, setCallsign] = useState(data?.callsign || "");
+	const [selectedNextAction, setSelectedNextAction] = useState<
+		WorkspaceGitHubNextIntegrationAction | undefined
+	>(data?.nextAction);
+
+	useEffect(() => {
+		if (data) {
+			setSelectedTrigger(data.event);
+			setCallsign(data.callsign || "");
+			setSelectedNextAction(data.nextAction);
+		}
+	}, [data]);
 
 	if (isLoading) {
 		return null;
@@ -64,11 +108,35 @@ function Installed({
 	const getAvailableNextActions = (
 		trigger: WorkspaceGitHubIntegrationTrigger,
 	) => {
-		const actions = Object.values(WorkspaceGitHubIntegrationNextAction.Enum);
-		const triggerParts = trigger.split(".");
-		const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
-		return actions.filter((action) => action.startsWith(triggerPrefix));
+		return TRIGGER_TO_ACTIONS[trigger] ?? [];
 	};
+
+	const handleTriggerChange = (value: string) => {
+		const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
+		const currentTrigger = selectedTrigger;
+		setSelectedTrigger(newTrigger);
+
+		if (newTrigger !== currentTrigger) {
+			if (!requiresCallsign(newTrigger)) {
+				setCallsign("");
+			}
+
+			const availableActions = getAvailableNextActions(newTrigger);
+			if (
+				selectedNextAction &&
+				!availableActions.includes(selectedNextAction)
+			) {
+				setSelectedNextAction(undefined);
+			}
+		}
+	};
+
+	const availablePayloadFields = selectedTrigger
+		? getAvailablePayloadFields(selectedTrigger)
+		: [];
+	const availableNextActions = selectedTrigger
+		? getAvailableNextActions(selectedTrigger)
+		: [];
 
 	return (
 		<div className="flex flex-col gap-[16px]">
@@ -105,16 +173,21 @@ function Installed({
 							<Select
 								name="event"
 								defaultValue={data?.event}
-								onValueChange={(value: string) => {
-									const trigger =
-										WorkspaceGitHubIntegrationTrigger.parse(value);
-									setSelectedTrigger(trigger);
-								}}
+								onValueChange={handleTriggerChange}
 							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select a trigger" />
 								</SelectTrigger>
 								<SelectContent>
+									<SelectItem
+										value={
+											WorkspaceGitHubIntegrationTrigger.Enum[
+												"github.issues.opened"
+											]
+										}
+									>
+										issues.opened
+									</SelectItem>
 									<SelectItem
 										value={
 											WorkspaceGitHubIntegrationTrigger.Enum[
@@ -136,16 +209,19 @@ function Installed({
 								</SelectContent>
 							</Select>
 						</fieldset>
-						<fieldset className="flex flex-col gap-[4px]">
-							<Label>Callsign</Label>
-							<input
-								type="text"
-								className="bg-black-750 h-[28px] border-[1px] border-white-950/10 flex items-center px-[12px] text-[12px] rounded-[8px] outline-none placeholder:text-white-400/70"
-								placeholder="Enter call sign"
-								name="callsign"
-								defaultValue={data?.callsign}
-							/>
-						</fieldset>
+						{requiresCallsign(
+							selectedTrigger as WorkspaceGitHubIntegrationTrigger,
+						) && (
+							<fieldset className="flex flex-col gap-[4px]">
+								<Label>Callsign</Label>
+								<input
+									type="text"
+									className="bg-black-750 h-[28px] border-[1px] border-white-950/10 flex items-center px-[12px] text-[12px] rounded-[8px] outline-none placeholder:text-white-400/70"
+									value={callsign}
+									onChange={(e) => setCallsign(e.target.value)}
+								/>
+							</fieldset>
+						)}
 					</div>
 					<h3 className="font-accent text-white-400 text-[14px] font-bold">
 						Data mapping
@@ -154,28 +230,31 @@ function Installed({
 						<PayloadMapForm
 							nodes={workspace.nodes}
 							currentPayloadMaps={data?.payloadMaps}
-							availablePayloadFields={
-								selectedTrigger
-									? getAvailablePayloadFields(selectedTrigger)
-									: []
-							}
+							availablePayloadFields={availablePayloadFields}
 						/>
 					</div>
 					<h3 className="font-accent text-white-400 text-[14px] font-bold">
 						Then
 					</h3>
 					<fieldset className="flex flex-col gap-[4px]">
-						<Select name="nextAction" defaultValue={data?.nextAction}>
+						<Select
+							name="nextAction"
+							value={selectedNextAction}
+							onValueChange={(value) =>
+								setSelectedNextAction(
+									value as WorkspaceGitHubNextIntegrationAction,
+								)
+							}
+						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select an action" />
 							</SelectTrigger>
 							<SelectContent>
-								{selectedTrigger != null &&
-									getAvailableNextActions(selectedTrigger).map((action) => (
-										<SelectItem key={action} value={action}>
-											{action.split(".").slice(1).join(".")}
-										</SelectItem>
-									))}
+								{availableNextActions.map((action) => (
+									<SelectItem key={action} value={action}>
+										{NEXT_ACTION_DISPLAY_NAMES[action]}
+									</SelectItem>
+								))}
 							</SelectContent>
 						</Select>
 					</fieldset>
