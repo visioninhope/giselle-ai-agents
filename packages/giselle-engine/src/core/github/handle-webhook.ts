@@ -89,8 +89,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 		args.github.payload,
 	);
 	if (!gitHubEvent) {
-		console.warn(`Unsupported event: ${args.github.event}`);
-		return;
+		throw new Error("Unsupported event");
 	}
 
 	const repository = getRepositoryInfo(gitHubEvent);
@@ -327,10 +326,9 @@ async function getPayloadValue(
 					return event.payload.issue.title;
 				case "github.pull_request_comment.pull_request.diff": {
 					if (!event.payload.issue?.pull_request) {
-						console.warn(
+						throw new Error(
 							"Attempted to get diff for non-pull-request issue comment",
 						);
-						return "";
 					}
 					const diffResult = await diff?.(
 						event.payload.repository.owner.login,
