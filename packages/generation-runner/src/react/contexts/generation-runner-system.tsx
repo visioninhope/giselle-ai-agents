@@ -95,9 +95,7 @@ export function GenerationRunnerSystemProvider({
 }: GenerationRunnerSystemProviderProps) {
 	const client = useGiselleEngine();
 	const [generations, setGenerations] = useState<Generation[]>([]);
-	const [stopHandlers, setStopHandlers] = useState<
-		Record<GenerationId, () => void>
-	>({});
+	const stopHandlersRef = useRef<Record<GenerationId, () => void>>({});
 	const generationListener = useRef<Record<GenerationId, Generation>>({});
 
 	const nodeGenerationMap = useMemo(() => {
@@ -312,14 +310,14 @@ export function GenerationRunnerSystemProvider({
 
 	const addStopHandler = useCallback(
 		(generationId: GenerationId, handler: () => void) => {
-			setStopHandlers((prev) => ({ ...prev, [generationId]: handler }));
+			stopHandlersRef.current[generationId] = handler;
 		},
 		[],
 	);
 
 	const stopGeneration = useCallback(
 		async (generationId: GenerationId) => {
-			const handler = stopHandlers[generationId];
+			const handler = stopHandlersRef.current[generationId];
 			if (handler) {
 				handler();
 				setGenerations((prevGenerations) =>
@@ -346,7 +344,7 @@ export function GenerationRunnerSystemProvider({
 				cancelledAt: Date.now(),
 			} as CancelledGeneration;
 		},
-		[stopHandlers, client],
+		[client],
 	);
 
 	return (
