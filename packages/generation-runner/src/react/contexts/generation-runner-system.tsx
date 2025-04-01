@@ -95,9 +95,7 @@ export function GenerationRunnerSystemProvider({
 }: GenerationRunnerSystemProviderProps) {
 	const client = useGiselleEngine();
 	const [generations, setGenerations] = useState<Generation[]>([]);
-	const [stopHandlers, setStopHandlers] = useState<
-		Record<GenerationId, () => void>
-	>({});
+	const stopHandlersRef = useRef<Record<GenerationId, () => void>>({});
 	const generationListener = useRef<Record<GenerationId, Generation>>({});
 
 	const nodeGenerationMap = useMemo(() => {
@@ -135,7 +133,34 @@ export function GenerationRunnerSystemProvider({
 
 			while (true) {
 				if (Date.now() - startTime > timeoutDuration) {
-					throw new Error("Generation timeout");
+					const generation = generationListener.current[generationId];
+
+					const failedGeneration = {
+						id: generation.id,
+						context: generation.context,
+						createdAt: generation.createdAt,
+						queuedAt: generation.queuedAt ?? Date.now(),
+						startedAt: generation.startedAt ?? Date.now(),
+						status: "failed",
+						failedAt: Date.now(),
+						messages: generation.messages ?? [],
+						error: {
+							name: "Generation timed out",
+							message: "Generation timed out",
+							dump: "timeout",
+						},
+					} satisfies FailedGeneration;
+					options?.onError?.(failedGeneration);
+					stopHandlersRef.current[generation.id]?.();
+					setGenerations((prevGenerations) =>
+						prevGenerations.map((prevGeneration) =>
+							prevGeneration.id !== failedGeneration.id
+								? prevGeneration
+								: failedGeneration,
+						),
+					);
+					generationListener.current[generationId] = failedGeneration;
+					return;
 				}
 
 				const generation = generationListener.current[generationId];
@@ -312,14 +337,14 @@ export function GenerationRunnerSystemProvider({
 
 	const addStopHandler = useCallback(
 		(generationId: GenerationId, handler: () => void) => {
-			setStopHandlers((prev) => ({ ...prev, [generationId]: handler }));
+			stopHandlersRef.current[generationId] = handler;
 		},
 		[],
 	);
 
 	const stopGeneration = useCallback(
 		async (generationId: GenerationId) => {
-			const handler = stopHandlers[generationId];
+			const handler = stopHandlersRef.current[generationId];
 			if (handler) {
 				handler();
 				setGenerations((prevGenerations) =>
@@ -346,7 +371,7 @@ export function GenerationRunnerSystemProvider({
 				cancelledAt: Date.now(),
 			} as CancelledGeneration;
 		},
-		[stopHandlers, client],
+		[client],
 	);
 
 	return (
