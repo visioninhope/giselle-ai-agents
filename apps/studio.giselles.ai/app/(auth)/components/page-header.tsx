@@ -1,11 +1,14 @@
-import type { FC } from "react";
+import type { FC, ReactNode } from "react";
+import { PageTitle } from "./page-title";
 
-export type PageTitleProps = {
-	title: string;
+type PageHeaderProps = {
+	title: ReactNode;
+	description?: ReactNode;
 };
 
-export const PageHeader: FC<PageTitleProps> = ({ title }) => (
-	<h1 className="text-3xl text-black-30 font-hubot font-medium">
-		{title}
-	</h1>
+export const PageHeader: FC<PageHeaderProps> = ({ title, description }) => (
+	<div className="grid gap-[28px]">
+		<PageTitle>{title}</PageTitle>
+		{description && <p className="text-black-70 text-[14px]">{description}</p>}
+	</div>
 );
