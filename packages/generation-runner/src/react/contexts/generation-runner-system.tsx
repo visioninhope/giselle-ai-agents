@@ -130,7 +130,7 @@ export function GenerationRunnerSystemProvider({
 		) => {
 			let status = generationListener.current[generationId].status;
 			const messages = generationListener.current[generationId].messages;
-			const timeoutDuration = options?.timeout || 1000 * 60 * 5;
+			const timeoutDuration = options?.timeout || 1000 * 800; // The maximum duration of through enabled fluid compute. https://vercel.com/docs/functions/runtimes#max-duration
 			const startTime = Date.now();
 
 			while (true) {
