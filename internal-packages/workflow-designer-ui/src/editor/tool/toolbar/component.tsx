@@ -371,7 +371,7 @@ export function Toolbar() {
 						data-tool
 						className="relative"
 					>
-						<Tooltip text={<TooltipAndHotkey text="Document" hotkey="d" />}>
+						<Tooltip text={<TooltipAndHotkey text="Upload" hotkey="d" />}>
 							<DocumentIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectFileNodeCategory" && (
@@ -428,7 +428,7 @@ export function Toolbar() {
 						)}
 					</ToggleGroup.Item>
 					<ToggleGroup.Item value="addTextNode" data-tool>
-						<Tooltip text={<TooltipAndHotkey text="Text" hotkey="t" />}>
+						<Tooltip text={<TooltipAndHotkey text="Source" hotkey="t" />}>
 							<PromptIcon data-icon />
 						</Tooltip>
 					</ToggleGroup.Item>
