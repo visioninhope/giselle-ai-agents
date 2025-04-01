@@ -98,6 +98,23 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 	const integrationPromises = (
 		workspaceGitHubIntegrationRepositorySettings ?? []
 	)
+		.filter((workspaceGitHubIntegrationSetting) => {
+			switch (workspaceGitHubIntegrationSetting.event) {
+				case "github.pull_request_comment.created":
+				case "github.issue_comment.created":
+					return isIssueCommentCreatedEvent(
+						args.github.payload,
+						args.github.event,
+					);
+				case "github.issues.opened":
+					return isIssuesOpenedEvent(args.github.payload, args.github.event);
+				default: {
+					const _exhaustiveCheck: never =
+						workspaceGitHubIntegrationSetting.event;
+					throw new Error(`Unhandled event type: ${_exhaustiveCheck}`);
+				}
+			}
+		})
 		.filter(
 			(workspaceGitHubIntegrationSetting) =>
 				workspaceGitHubIntegrationSetting.callsign == null ||
@@ -340,7 +357,7 @@ async function getPayloadValue<
 				return payload.issue.title as PayloadValue<TField>;
 			case "github.issues.body":
 				return payload.issue.body as PayloadValue<TField>;
-			case "github.issue_comment.issue.number":
+			case "github.issue_comment.issue.number": // FIXME: fetch issue number in another logic
 				return payload.issue.number as PayloadValue<TField>;
 			default:
 				throw new Error(`Unhandled field type: ${field} for ${event}`);
