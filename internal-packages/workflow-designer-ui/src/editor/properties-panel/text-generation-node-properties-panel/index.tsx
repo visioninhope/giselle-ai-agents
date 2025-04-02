@@ -31,6 +31,7 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
+import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -79,6 +80,11 @@ export function TextGenerationNodePropertiesPanel({
 		error,
 	]);
 
+	const jsonOrText = node.content.prompt;
+	const text = isJsonContent(jsonOrText) ? jsonContentToText(JSON.parse(jsonOrText)) : jsonOrText;
+	const space = text?.replace(/[\s\u3000]+/g, "");
+	const disabled = usageLimitsReached || !text || !space;
+
 	return (
 		<PropertiesPanelRoot>
 			{usageLimitsReached && <UsageLimitWarning />}
@@ -109,7 +115,7 @@ export function TextGenerationNodePropertiesPanel({
 					<Button
 						loading={isGenerating}
 						type="button"
-						disabled={usageLimitsReached}
+						disabled={disabled}
 						onClick={() => {
 							if (isGenerating) {
 								stopGeneration();
