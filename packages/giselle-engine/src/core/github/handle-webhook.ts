@@ -229,7 +229,7 @@ async function processIntegration(
 								owner: repository.owner,
 								name: repository.name,
 							},
-							// Some GitHub events treats pull requests as issues.
+							// Some GitHub events treat pull requests as issues.
 							number:
 								"issue" in gitHubEvent.payload
 									? gitHubEvent.payload.issue.number
