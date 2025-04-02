@@ -1,4 +1,5 @@
 import { anthropic } from "@ai-sdk/anthropic";
+import { URL } from "url";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
@@ -269,7 +270,7 @@ export async function generateText(args: {
 						// When using Gemini search grounding, source provides a proxy URL
 						// We need to access and resolve this proxy URL to get the actual redirect URL
 						if (
-							source.url.startsWith("https://vertexaisearch.cloud.google.com")
+							isAllowedHost(source.url, ["vertexaisearch.cloud.google.com"])
 						) {
 							const redirected = await getRedirectedUrlAndTitle(source.url);
 							return {
@@ -367,5 +368,14 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			const _exhaustiveCheck: never = llmProvider;
 			throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
 		}
+	}
+}
+
+function isAllowedHost(urlString: string, allowedHosts: string[]): boolean {
+	try {
+		const parsedUrl = new URL(urlString);
+		return allowedHosts.includes(parsedUrl.host);
+	} catch (e) {
+		return false;
 	}
 }
