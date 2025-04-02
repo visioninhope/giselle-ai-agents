@@ -1,4 +1,5 @@
 import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
+import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
@@ -31,7 +32,6 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
-import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -81,7 +81,9 @@ export function TextGenerationNodePropertiesPanel({
 	]);
 
 	const jsonOrText = node.content.prompt;
-	const text = isJsonContent(jsonOrText) ? jsonContentToText(JSON.parse(jsonOrText)) : jsonOrText;
+	const text = isJsonContent(jsonOrText)
+		? jsonContentToText(JSON.parse(jsonOrText))
+		: jsonOrText;
 	const space = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !text || !space;
 
