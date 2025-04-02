@@ -29,111 +29,111 @@ describe("isMatchingIntegrationSetting", () => {
 			repository: {
 				id: 1,
 				node_id: "repo-node-1",
-				name: "test-repo",
-				full_name: "test-owner/test-repo",
+				name: "TEST_REPO",
+				full_name: "giselles-ai/TEST_REPO",
 				private: false,
 				owner: {
 					id: 1,
 					node_id: "user-node-1",
-					login: "test-owner",
+					login: "giselles-ai",
 					avatar_url: "https://example.com/avatar.png",
 					gravatar_id: "",
-					url: "https://api.github.com/users/test-owner",
-					html_url: "https://github.com/test-owner",
-					followers_url: "https://api.github.com/users/test-owner/followers",
+					url: "https://api.github.com/users/giselles-ai",
+					html_url: "https://github.com/giselles-ai",
+					followers_url: "https://api.github.com/users/giselles-ai/followers",
 					following_url:
-						"https://api.github.com/users/test-owner/following{/other_user}",
-					gists_url: "https://api.github.com/users/test-owner/gists{/gist_id}",
+						"https://api.github.com/users/giselles-ai/following{/other_user}",
+					gists_url: "https://api.github.com/users/giselles-ai/gists{/gist_id}",
 					starred_url:
-						"https://api.github.com/users/test-owner/starred{/owner}{/repo}",
+						"https://api.github.com/users/giselles-ai/starred{/owner}{/repo}",
 					subscriptions_url:
-						"https://api.github.com/users/test-owner/subscriptions",
-					organizations_url: "https://api.github.com/users/test-owner/orgs",
-					repos_url: "https://api.github.com/users/test-owner/repos",
+						"https://api.github.com/users/giselles-ai/subscriptions",
+					organizations_url: "https://api.github.com/users/giselles-ai/orgs",
+					repos_url: "https://api.github.com/users/giselles-ai/repos",
 					events_url:
-						"https://api.github.com/users/test-owner/events{/privacy}",
+						"https://api.github.com/users/giselles-ai/events{/privacy}",
 					received_events_url:
-						"https://api.github.com/users/test-owner/received_events",
+						"https://api.github.com/users/giselles-ai/received_events",
 					type: "User",
 					site_admin: false,
 				},
-				html_url: "https://github.com/test-owner/test-repo",
+				html_url: "https://github.com/giselles-ai/TEST_REPO",
 				description: "Test repository",
 				fork: false,
-				url: "https://api.github.com/repos/test-owner/test-repo",
-				forks_url: "https://api.github.com/repos/test-owner/test-repo/forks",
+				url: "https://api.github.com/repos/giselles-ai/TEST_REPO",
+				forks_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/forks",
 				keys_url:
-					"https://api.github.com/repos/test-owner/test-repo/keys{/key_id}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/keys{/key_id}",
 				collaborators_url:
-					"https://api.github.com/repos/test-owner/test-repo/collaborators{/collaborator}",
-				teams_url: "https://api.github.com/repos/test-owner/test-repo/teams",
-				hooks_url: "https://api.github.com/repos/test-owner/test-repo/hooks",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/collaborators{/collaborator}",
+				teams_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/teams",
+				hooks_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/hooks",
 				issue_events_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues/events{/number}",
-				events_url: "https://api.github.com/repos/test-owner/test-repo/events",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/events{/number}",
+				events_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/events",
 				assignees_url:
-					"https://api.github.com/repos/test-owner/test-repo/assignees{/user}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/assignees{/user}",
 				branches_url:
-					"https://api.github.com/repos/test-owner/test-repo/branches{/branch}",
-				tags_url: "https://api.github.com/repos/test-owner/test-repo/tags",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/branches{/branch}",
+				tags_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/tags",
 				blobs_url:
-					"https://api.github.com/repos/test-owner/test-repo/git/blobs{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/git/blobs{/sha}",
 				git_tags_url:
-					"https://api.github.com/repos/test-owner/test-repo/git/tags{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/git/tags{/sha}",
 				git_refs_url:
-					"https://api.github.com/repos/test-owner/test-repo/git/refs{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/git/refs{/sha}",
 				trees_url:
-					"https://api.github.com/repos/test-owner/test-repo/git/trees{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/git/trees{/sha}",
 				statuses_url:
-					"https://api.github.com/repos/test-owner/test-repo/statuses/{sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/statuses/{sha}",
 				languages_url:
-					"https://api.github.com/repos/test-owner/test-repo/languages",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/languages",
 				stargazers_url:
-					"https://api.github.com/repos/test-owner/test-repo/stargazers",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/stargazers",
 				contributors_url:
-					"https://api.github.com/repos/test-owner/test-repo/contributors",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/contributors",
 				subscribers_url:
-					"https://api.github.com/repos/test-owner/test-repo/subscribers",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/subscribers",
 				subscription_url:
-					"https://api.github.com/repos/test-owner/test-repo/subscription",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/subscription",
 				commits_url:
-					"https://api.github.com/repos/test-owner/test-repo/commits{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/commits{/sha}",
 				git_commits_url:
-					"https://api.github.com/repos/test-owner/test-repo/git/commits{/sha}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/git/commits{/sha}",
 				comments_url:
-					"https://api.github.com/repos/test-owner/test-repo/comments{/number}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/comments{/number}",
 				issue_comment_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues/comments{/number}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/comments{/number}",
 				contents_url:
-					"https://api.github.com/repos/test-owner/test-repo/contents/{+path}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/contents/{+path}",
 				compare_url:
-					"https://api.github.com/repos/test-owner/test-repo/compare/{base}...{head}",
-				merges_url: "https://api.github.com/repos/test-owner/test-repo/merges",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/compare/{base}...{head}",
+				merges_url: "https://api.github.com/repos/giselles-ai/TEST_REPO/merges",
 				archive_url:
-					"https://api.github.com/repos/test-owner/test-repo/{archive_format}{/ref}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/{archive_format}{/ref}",
 				downloads_url:
-					"https://api.github.com/repos/test-owner/test-repo/downloads",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/downloads",
 				issues_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues{/number}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues{/number}",
 				pulls_url:
-					"https://api.github.com/repos/test-owner/test-repo/pulls{/number}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/pulls{/number}",
 				milestones_url:
-					"https://api.github.com/repos/test-owner/test-repo/milestones{/number}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/milestones{/number}",
 				notifications_url:
-					"https://api.github.com/repos/test-owner/test-repo/notifications{?since,all,participating}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/notifications{?since,all,participating}",
 				labels_url:
-					"https://api.github.com/repos/test-owner/test-repo/labels{/name}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/labels{/name}",
 				releases_url:
-					"https://api.github.com/repos/test-owner/test-repo/releases{/id}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/releases{/id}",
 				deployments_url:
-					"https://api.github.com/repos/test-owner/test-repo/deployments",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/deployments",
 				created_at: "2024-04-01T00:00:00Z",
 				updated_at: "2024-04-01T00:00:00Z",
 				pushed_at: "2024-04-01T00:00:00Z",
-				git_url: "git://github.com/test-owner/test-repo.git",
-				ssh_url: "git@github.com:test-owner/test-repo.git",
-				clone_url: "https://github.com/test-owner/test-repo.git",
-				svn_url: "https://github.com/test-owner/test-repo",
+				git_url: "git://github.com/giselles-ai/TEST_REPO.git",
+				ssh_url: "git@github.com:giselles-ai/TEST_REPO.git",
+				clone_url: "https://github.com/giselles-ai/TEST_REPO.git",
+				svn_url: "https://github.com/giselles-ai/TEST_REPO",
 				homepage: null,
 				size: 0,
 				stargazers_count: 0,
@@ -171,39 +171,39 @@ describe("isMatchingIntegrationSetting", () => {
 				number: 1,
 				title: "Test Issue",
 				body: "Test body",
-				url: "https://api.github.com/repos/test-owner/test-repo/issues/1",
-				repository_url: "https://api.github.com/repos/test-owner/test-repo",
+				url: "https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1",
+				repository_url: "https://api.github.com/repos/giselles-ai/TEST_REPO",
 				labels_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues/1/labels{/name}",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1/labels{/name}",
 				comments_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues/1/comments",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1/comments",
 				events_url:
-					"https://api.github.com/repos/test-owner/test-repo/issues/1/events",
-				html_url: "https://github.com/test-owner/test-repo/issues/1",
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1/events",
+				html_url: "https://github.com/giselles-ai/TEST_REPO/issues/1",
 				id: 1,
 				node_id: "issue-node-1",
 				user: {
 					id: 1,
 					node_id: "user-node-1",
-					login: "test-owner",
+					login: "giselles-ai",
 					avatar_url: "https://example.com/avatar.png",
 					gravatar_id: "",
-					url: "https://api.github.com/users/test-owner",
-					html_url: "https://github.com/test-owner",
-					followers_url: "https://api.github.com/users/test-owner/followers",
+					url: "https://api.github.com/users/giselles-ai",
+					html_url: "https://github.com/giselles-ai",
+					followers_url: "https://api.github.com/users/giselles-ai/followers",
 					following_url:
-						"https://api.github.com/users/test-owner/following{/other_user}",
-					gists_url: "https://api.github.com/users/test-owner/gists{/gist_id}",
+						"https://api.github.com/users/giselles-ai/following{/other_user}",
+					gists_url: "https://api.github.com/users/giselles-ai/gists{/gist_id}",
 					starred_url:
-						"https://api.github.com/users/test-owner/starred{/owner}{/repo}",
+						"https://api.github.com/users/giselles-ai/starred{/owner}{/repo}",
 					subscriptions_url:
-						"https://api.github.com/users/test-owner/subscriptions",
-					organizations_url: "https://api.github.com/users/test-owner/orgs",
-					repos_url: "https://api.github.com/users/test-owner/repos",
+						"https://api.github.com/users/giselles-ai/subscriptions",
+					organizations_url: "https://api.github.com/users/giselles-ai/orgs",
+					repos_url: "https://api.github.com/users/giselles-ai/repos",
 					events_url:
-						"https://api.github.com/users/test-owner/events{/privacy}",
+						"https://api.github.com/users/giselles-ai/events{/privacy}",
 					received_events_url:
-						"https://api.github.com/users/test-owner/received_events",
+						"https://api.github.com/users/giselles-ai/received_events",
 					type: "User",
 					site_admin: false,
 				},
@@ -220,15 +220,15 @@ describe("isMatchingIntegrationSetting", () => {
 				active_lock_reason: null,
 				draft: false,
 				pull_request: {
-					url: "https://api.github.com/repos/test-owner/test-repo/pulls/1",
-					html_url: "https://github.com/test-owner/test-repo/pull/1",
-					diff_url: "https://github.com/test-owner/test-repo/pull/1.diff",
-					patch_url: "https://github.com/test-owner/test-repo/pull/1.patch",
+					url: "https://api.github.com/repos/giselles-ai/TEST_REPO/pulls/1",
+					html_url: "https://github.com/giselles-ai/TEST_REPO/pull/1",
+					diff_url: "https://github.com/giselles-ai/TEST_REPO/pull/1.diff",
+					patch_url: "https://github.com/giselles-ai/TEST_REPO/pull/1.patch",
 					merged_at: null,
 				},
 				labels: [],
 				reactions: {
-					url: "https://api.github.com/repos/test-owner/test-repo/issues/1/reactions",
+					url: "https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1/reactions",
 					total_count: 0,
 					"+1": 0,
 					"-1": 0,
@@ -243,41 +243,42 @@ describe("isMatchingIntegrationSetting", () => {
 			comment: {
 				id: 1,
 				node_id: "comment-node-1",
-				url: "https://api.github.com/repos/test-owner/test-repo/issues/comments/1",
+				url: "https://api.github.com/repos/giselles-ai/TEST_REPO/issues/comments/1",
 				html_url:
-					"https://github.com/test-owner/test-repo/issues/1#issuecomment-1",
+					"https://github.com/giselles-ai/TEST_REPO/issues/1#issuecomment-1",
 				body: "/giselle do something",
 				user: {
 					id: 1,
 					node_id: "user-node-1",
-					login: "test-owner",
+					login: "giselles-ai",
 					avatar_url: "https://example.com/avatar.png",
 					gravatar_id: "",
-					url: "https://api.github.com/users/test-owner",
-					html_url: "https://github.com/test-owner",
-					followers_url: "https://api.github.com/users/test-owner/followers",
+					url: "https://api.github.com/users/giselles-ai",
+					html_url: "https://github.com/giselles-ai",
+					followers_url: "https://api.github.com/users/giselles-ai/followers",
 					following_url:
-						"https://api.github.com/users/test-owner/following{/other_user}",
-					gists_url: "https://api.github.com/users/test-owner/gists{/gist_id}",
+						"https://api.github.com/users/giselles-ai/following{/other_user}",
+					gists_url: "https://api.github.com/users/giselles-ai/gists{/gist_id}",
 					starred_url:
-						"https://api.github.com/users/test-owner/starred{/owner}{/repo}",
+						"https://api.github.com/users/giselles-ai/starred{/owner}{/repo}",
 					subscriptions_url:
-						"https://api.github.com/users/test-owner/subscriptions",
-					organizations_url: "https://api.github.com/users/test-owner/orgs",
-					repos_url: "https://api.github.com/users/test-owner/repos",
+						"https://api.github.com/users/giselles-ai/subscriptions",
+					organizations_url: "https://api.github.com/users/giselles-ai/orgs",
+					repos_url: "https://api.github.com/users/giselles-ai/repos",
 					events_url:
-						"https://api.github.com/users/test-owner/events{/privacy}",
+						"https://api.github.com/users/giselles-ai/events{/privacy}",
 					received_events_url:
-						"https://api.github.com/users/test-owner/received_events",
+						"https://api.github.com/users/giselles-ai/received_events",
 					type: "User",
 					site_admin: false,
 				},
 				created_at: "2024-04-01T00:00:00Z",
 				updated_at: "2024-04-01T00:00:00Z",
-				issue_url: "https://api.github.com/repos/test-owner/test-repo/issues/1",
+				issue_url:
+					"https://api.github.com/repos/giselles-ai/TEST_REPO/issues/1",
 				author_association: "OWNER",
 				reactions: {
-					url: "https://api.github.com/repos/test-owner/test-repo/issues/comments/1/reactions",
+					url: "https://api.github.com/repos/giselles-ai/TEST_REPO/issues/comments/1/reactions",
 					total_count: 0,
 					"+1": 0,
 					"-1": 0,
@@ -293,24 +294,24 @@ describe("isMatchingIntegrationSetting", () => {
 			sender: {
 				id: 1,
 				node_id: "user-node-1",
-				login: "test-owner",
+				login: "giselles-ai",
 				avatar_url: "https://example.com/avatar.png",
 				gravatar_id: "",
-				url: "https://api.github.com/users/test-owner",
-				html_url: "https://github.com/test-owner",
-				followers_url: "https://api.github.com/users/test-owner/followers",
+				url: "https://api.github.com/users/giselles-ai",
+				html_url: "https://github.com/giselles-ai",
+				followers_url: "https://api.github.com/users/giselles-ai/followers",
 				following_url:
-					"https://api.github.com/users/test-owner/following{/other_user}",
-				gists_url: "https://api.github.com/users/test-owner/gists{/gist_id}",
+					"https://api.github.com/users/giselles-ai/following{/other_user}",
+				gists_url: "https://api.github.com/users/giselles-ai/gists{/gist_id}",
 				starred_url:
-					"https://api.github.com/users/test-owner/starred{/owner}{/repo}",
+					"https://api.github.com/users/giselles-ai/starred{/owner}{/repo}",
 				subscriptions_url:
-					"https://api.github.com/users/test-owner/subscriptions",
-				organizations_url: "https://api.github.com/users/test-owner/orgs",
-				repos_url: "https://api.github.com/users/test-owner/repos",
-				events_url: "https://api.github.com/users/test-owner/events{/privacy}",
+					"https://api.github.com/users/giselles-ai/subscriptions",
+				organizations_url: "https://api.github.com/users/giselles-ai/orgs",
+				repos_url: "https://api.github.com/users/giselles-ai/repos",
+				events_url: "https://api.github.com/users/giselles-ai/events{/privacy}",
 				received_events_url:
-					"https://api.github.com/users/test-owner/received_events",
+					"https://api.github.com/users/giselles-ai/received_events",
 				type: "User",
 				site_admin: false,
 			},
