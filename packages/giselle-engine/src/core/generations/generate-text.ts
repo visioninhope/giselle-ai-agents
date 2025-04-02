@@ -1,5 +1,5 @@
+import { URL } from "node:url";
 import { anthropic } from "@ai-sdk/anthropic";
-import { URL } from "url";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
