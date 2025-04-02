@@ -46,7 +46,7 @@ export function PropertiesPanelHeader({
 		}
 	}, [edit]);
 	const fallbackName = useMemo(
-		() => propsFallbackName ?? "Unnamed Node",
+		() => propsFallbackName ?? "Untitled Node",
 		[propsFallbackName],
 	);
 	const updateName = useCallback(() => {
