@@ -15,7 +15,7 @@ import "@xyflow/react/dist/style.css";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
-import { useEffect, useMemo, useRef } from "react";
+import { useCallback, useEffect, useMemo, useRef } from "react";
 import {
 	type ImperativePanelHandle,
 	Panel,
@@ -55,7 +55,7 @@ function NodeCanvas() {
 	>();
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
-	const { error: errorToast } = useToasts();
+	const toast = useToasts();
 	useEffect(() => {
 		reactFlowInstance.setNodes(
 			Object.entries(data.ui.nodeState)
@@ -92,50 +92,53 @@ function NodeCanvas() {
 		);
 	}, [data, reactFlowInstance.setEdges]);
 
-	const handleConnect = (connection: Connection) => {
-		try {
-			const outputNode = data.nodes.find(
-				(node) => node.id === connection.source,
-			);
-			const inputNode = data.nodes.find(
-				(node) => node.id === connection.target,
-			);
-			if (!outputNode || !inputNode) {
-				throw new Error("Node not found");
-			}
+	const handleConnect = useCallback(
+		(connection: Connection) => {
+			try {
+				const outputNode = data.nodes.find(
+					(node) => node.id === connection.source,
+				);
+				const inputNode = data.nodes.find(
+					(node) => node.id === connection.target,
+				);
+				if (!outputNode || !inputNode) {
+					throw new Error("Node not found");
+				}
 
-			const isSupported = isSupportedConnection(outputNode, inputNode);
-			if (!isSupported.canConnect) {
-				throw new Error(isSupported.message);
-			}
+				const isSupported = isSupportedConnection(outputNode, inputNode);
+				if (!isSupported.canConnect) {
+					throw new Error(isSupported.message);
+				}
 
-			const safeOutputId = OutputId.safeParse(connection.sourceHandle);
-			if (!safeOutputId.success) {
-				throw new Error("Invalid output id");
+				const safeOutputId = OutputId.safeParse(connection.sourceHandle);
+				if (!safeOutputId.success) {
+					throw new Error("Invalid output id");
+				}
+				const outputId = safeOutputId.data;
+				const newInput = {
+					id: InputId.generate(),
+					label: "Input",
+				};
+				const updatedInputs = [...inputNode.inputs, newInput];
+				updateNodeData(inputNode, {
+					inputs: updatedInputs,
+				});
+				addConnection({
+					inputNode: inputNode,
+					inputId: newInput.id,
+					outputId,
+					outputNode: outputNode,
+				});
+			} catch (error: unknown) {
+				if (error instanceof Error) {
+					toast.error(error.message);
+				} else {
+					toast.error("Failed to connect nodes");
+				}
 			}
-			const outputId = safeOutputId.data;
-			const newInput = {
-				id: InputId.generate(),
-				label: "Input",
-			};
-			const updatedInputs = [...inputNode.inputs, newInput];
-			updateNodeData(inputNode, {
-				inputs: updatedInputs,
-			});
-			addConnection({
-				inputNode: inputNode,
-				inputId: newInput.id,
-				outputId,
-				outputNode: outputNode,
-			});
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				errorToast(error.message);
-			} else {
-				errorToast("Failed to connect nodes");
-			}
-		}
-	};
+		},
+		[addConnection, data.nodes, toast, isSupportedConnection, updateNodeData],
+	);
 
 	const handleEdgesDelete = (edgesToDelete: Edge[]) => {
 		for (const edge of edgesToDelete) {
