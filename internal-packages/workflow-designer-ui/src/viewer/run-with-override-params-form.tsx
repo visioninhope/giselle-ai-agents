@@ -60,7 +60,7 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 					return (
 						<fieldset className="flex gap-[8px] w-full" key={overrideNode.id}>
 							<p className="w-[100px] text-[14px] font-bold text-white-400">
-								{originalNode.name ?? "Plain text"}
+								{originalNode.name ?? "Plain Text"}
 							</p>
 							<TextEditor
 								value={overrideNode.content.text}
