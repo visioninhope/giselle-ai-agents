@@ -1,5 +1,6 @@
 import type { WorkspaceGitHubNextIntegrationAction } from "@giselle-sdk/data-type";
 import {
+	WorkspaceGitHubIntegrationNextAction,
 	WorkspaceGitHubIntegrationPayloadField,
 	type WorkspaceGitHubIntegrationPayloadNodeMap,
 	WorkspaceGitHubIntegrationTrigger,
@@ -44,7 +45,7 @@ const TRIGGERS_REQUIRING_CALLSIGN = [
 
 type TriggerRequiringCallsign = (typeof TRIGGERS_REQUIRING_CALLSIGN)[number];
 
-const requiresCallsign = (
+const isTriggerRequiringCallsign = (
 	trigger: WorkspaceGitHubIntegrationTrigger,
 ): boolean => {
 	return TRIGGERS_REQUIRING_CALLSIGN.includes(
@@ -123,7 +124,7 @@ function Installed({
 		setSelectedTrigger(newTrigger);
 
 		if (newTrigger !== currentTrigger) {
-			if (!requiresCallsign(newTrigger)) {
+			if (!isTriggerRequiringCallsign(newTrigger)) {
 				setCallsign("");
 			}
 
@@ -224,9 +225,7 @@ function Installed({
 								</SelectContent>
 							</Select>
 						</fieldset>
-						{requiresCallsign(
-							selectedTrigger as WorkspaceGitHubIntegrationTrigger,
-						) && (
+						{selectedTrigger && isTriggerRequiringCallsign(selectedTrigger) && (
 							<fieldset className="flex flex-col gap-[4px]">
 								<Label>Callsign</Label>
 								<input
@@ -258,7 +257,7 @@ function Installed({
 							value={selectedNextAction}
 							onValueChange={(value) =>
 								setSelectedNextAction(
-									value as WorkspaceGitHubNextIntegrationAction,
+									WorkspaceGitHubIntegrationNextAction.parse(value),
 								)
 							}
 						>
