@@ -6,7 +6,7 @@ export const LegalConsent: FC = () => (
 		By continuing, you agree to our{" "}
 		<Link
 			href="https://giselles.ai/legal/terms"
-			className="font-[700] underline font-geist"
+			className="font-[700] underline"
 		>
 			Terms of Service
 		</Link>{" "}

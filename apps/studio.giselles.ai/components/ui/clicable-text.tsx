@@ -7,7 +7,7 @@ import { cn } from "@/lib/utils";
 import { forwardRef } from "react";
 
 const clickableTextVariant = cva(
-	"text-black-30 leading-[23.8px] underline hover:text-black--70 font-geist font-[700]",
+	"text-black-30 leading-[23.8px] underline hover:text-black--70 font-[700]",
 	{
 		variants: {
 			variant: {},
