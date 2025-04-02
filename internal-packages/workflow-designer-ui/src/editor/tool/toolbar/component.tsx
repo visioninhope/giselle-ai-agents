@@ -37,6 +37,7 @@ import {
 	UploadIcon,
 	VariableIcon,
 	VideoIcon,
+	WilliIcon,
 } from "../../../icons";
 import { ImageGenerationNodeIcon } from "../../../icons/node";
 import { Tooltip } from "../../../ui/tooltip";
@@ -614,6 +615,15 @@ export function Toolbar() {
 								</Popover.Portal>
 							</Popover.Root>
 						)}
+					</ToggleGroup.Item>
+					<ToggleGroup.Item
+						value="agent"
+						data-tool
+						className="relative opacity-50 cursor-not-allowed"
+					>
+						<Tooltip text={<TooltipAndHotkey text="Agent (soon)" />}>
+							<WilliIcon data-icon />
+						</Tooltip>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>
 			</div>
