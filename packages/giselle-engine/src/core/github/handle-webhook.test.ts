@@ -346,7 +346,7 @@ describe("isMatchingIntegrationSetting", () => {
 		});
 
 		it("should return false if event type is ISSUE_COMMENT_CREATED but setting.callsign is null", () => {
-			const nullCallsignSetting = { ...setting, callsign: undefined };
+			const nullCallsignSetting = { ...setting, callsign: null };
 			const event = { ...mockEventBase };
 			expect(
 				isMatchingIntegrationSetting(nullCallsignSetting, event, mockCommand),
@@ -400,7 +400,7 @@ describe("isMatchingIntegrationSetting", () => {
 		});
 
 		it("should return false if event type is ISSUE_COMMENT_CREATED but setting.callsign is null", () => {
-			const nullCallsignSetting = { ...setting, callsign: undefined };
+			const nullCallsignSetting = { ...setting, callsign: null };
 			const event = { ...mockEventBase };
 			expect(
 				isMatchingIntegrationSetting(nullCallsignSetting, event, mockCommand),
