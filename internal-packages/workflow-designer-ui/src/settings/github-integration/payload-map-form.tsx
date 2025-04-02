@@ -4,7 +4,7 @@ import {
 	WorkspaceGitHubIntegrationPayloadField,
 	type WorkspaceGitHubIntegrationPayloadNodeMap,
 } from "@giselle-sdk/data-type";
-import { Pi, PlusIcon, TrashIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Label,
@@ -25,9 +25,11 @@ const getDisplayName = (node: Node) => {
 export function PayloadMapForm({
 	nodes,
 	currentPayloadMaps = [],
+	availablePayloadFields = [],
 }: {
 	nodes: Node[];
 	currentPayloadMaps?: WorkspaceGitHubIntegrationPayloadNodeMap[];
+	availablePayloadFields?: WorkspaceGitHubIntegrationPayloadField[];
 }) {
 	const [selectedNodeId, setSelectedNodeId] = useState<NodeId | string>("");
 	const [selectedPayload, setSelectedPayload] = useState<
@@ -36,8 +38,25 @@ export function PayloadMapForm({
 	const [payloadMaps, setPayloadMaps] =
 		useState<WorkspaceGitHubIntegrationPayloadNodeMap[]>(currentPayloadMaps);
 
+	useEffect(() => {
+		setPayloadMaps(currentPayloadMaps);
+	}, [currentPayloadMaps]);
+
 	const [showNewPayloadFieldsFlag, setShowNewPayloadFieldsFlag] =
 		useState(false);
+
+	useEffect(() => {
+		const validMaps = payloadMaps.filter((map) =>
+			availablePayloadFields.includes(map.payload),
+		);
+		if (validMaps.length !== payloadMaps.length) {
+			setPayloadMaps(validMaps);
+			setSelectedNodeId("");
+			setSelectedPayload("");
+			setShowNewPayloadFieldsFlag(false);
+		}
+	}, [availablePayloadFields, payloadMaps]);
+
 	useEffect(() => {
 		const parseSelectedNodeId = NodeId.safeParse(selectedNodeId);
 		const parseSelectedPayload =
@@ -47,12 +66,16 @@ export function PayloadMapForm({
 		}
 		setPayloadMaps((prev) => [
 			...prev,
-			{ nodeId: parseSelectedNodeId.data, payload: parseSelectedPayload.data },
+			{
+				nodeId: parseSelectedNodeId.data,
+				payload: parseSelectedPayload.data,
+			},
 		]);
 		setSelectedNodeId("");
 		setSelectedPayload("");
 		setShowNewPayloadFieldsFlag(false);
 	}, [selectedNodeId, selectedPayload]);
+
 	const removePayloadMap = useCallback(
 		(removePayloadMap: WorkspaceGitHubIntegrationPayloadNodeMap) => {
 			console.log(removePayloadMap);
@@ -66,6 +89,7 @@ export function PayloadMapForm({
 		},
 		[],
 	);
+
 	const payloadMapsForRender = useMemo(() => {
 		const payloadMapsForRender: Array<
 			WorkspaceGitHubIntegrationPayloadNodeMap & { nodeName: string }
@@ -86,6 +110,7 @@ export function PayloadMapForm({
 		() => showNewPayloadFieldsFlag || payloadMaps.length === 0,
 		[showNewPayloadFieldsFlag, payloadMaps],
 	);
+
 	return (
 		<div className="flex flex-col gap-[8px]">
 			<div className="grid grid-cols-[200px_20px_200px] gap-x-[8px] gap-y-[8px]">
@@ -130,69 +155,11 @@ export function PayloadMapForm({
 									<SelectValue placeholder="Select a payload" />
 								</SelectTrigger>
 								<SelectContent>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.issue_comment.body"
-											]
-										}
-									>
-										issue_comment.body
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.issue_comment.issue.title"
-											]
-										}
-									>
-										issue_comment.issue.title
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.issue_comment.issue.body"
-											]
-										}
-									>
-										issue_comment.issue.body
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.pull_request_comment.body"
-											]
-										}
-									>
-										pull_request_comment.body
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.pull_request_comment.pull_request.title"
-											]
-										}
-									>
-										pull_request_comment.pull_request.title
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.pull_request_comment.body"
-											]
-										}
-									>
-										pull_request_comment.pull_request.body
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationPayloadField.Enum[
-												"github.pull_request_comment.pull_request.diff"
-											]
-										}
-									>
-										pull_request_comment.pull_request.diff
-									</SelectItem>
+									{availablePayloadFields.map((field) => (
+										<SelectItem key={field} value={field}>
+											{field.split(".").slice(1).join(".")}
+										</SelectItem>
+									))}
 								</SelectContent>
 							</Select>
 						</fieldset>
