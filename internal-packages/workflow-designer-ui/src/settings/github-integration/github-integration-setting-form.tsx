@@ -116,7 +116,7 @@ function Installed({
 	const handleTriggerChange = useCallback(
 		(value: string) => {
 			const newTrigger = WorkspaceGitHubIntegrationTrigger.safeParse(value);
-			if (newTrigger.error) {
+			if (!newTrigger.success) {
 				setSelectedTrigger(undefined);
 				setCallsign("");
 				setSelectedNextAction(undefined);
