@@ -43,12 +43,6 @@ export function SettingsPanel() {
 				<Tabs.List
 					className={clsx("flex flex-col gap-[10px] px-[8px] w-[240px]")}
 				>
-					<Tabs.Trigger value="agent-details" asChild>
-						<TabTrigger
-							label="Agent Details"
-							icon={<LayersIcon className="size-[16px]" />}
-						/>
-					</Tabs.Trigger>
 					<Tabs.Trigger value="github-integration" asChild>
 						<TabTrigger
 							label="GitHub Integration"
@@ -56,9 +50,6 @@ export function SettingsPanel() {
 						/>
 					</Tabs.Trigger>
 				</Tabs.List>
-				<Tabs.Content value="agent-details">
-					<p>Ae</p>
-				</Tabs.Content>
 				<Tabs.Content value="github-integration" className="flex-1">
 					<GitHubIntegrationSettingForm />
 				</Tabs.Content>
