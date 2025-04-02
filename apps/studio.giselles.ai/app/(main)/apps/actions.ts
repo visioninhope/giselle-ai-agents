@@ -1,5 +1,6 @@
 "use server";
 
+import { giselleEngine } from "@/app/giselle-engine";
 import { agents, db, githubIntegrationSettings } from "@/drizzle";
 import {
 	ExternalServiceName,
@@ -10,6 +11,7 @@ import {
 } from "@/lib/opentelemetry";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import { putGraph } from "@giselles-ai/actions";
 import {
 	buildFileFolderPath,
@@ -25,7 +27,7 @@ import { eq } from "drizzle-orm";
 
 interface AgentDuplicationSuccess {
 	result: "success";
-	agentId: AgentId;
+	workspaceId: WorkspaceId;
 }
 interface AgentDuplicationError {
 	result: "error";
@@ -163,6 +165,7 @@ export async function copyAgent(
 		});
 
 		const newAgentId = `agnt_${createId()}` as AgentId;
+		const workspace = await giselleEngine.createWorkspace();
 		const insertResult = await db
 			.insert(agents)
 			.values({
@@ -171,8 +174,9 @@ export async function copyAgent(
 				teamDbId: team.dbId,
 				creatorDbId: user.dbId,
 				graphUrl: url,
+				workspaceId: workspace.id,
 			})
-			.returning({ id: agents.id });
+			.returning({ workspaceId: agents.workspaceId });
 
 		if (insertResult.length === 0) {
 			return {
@@ -181,9 +185,16 @@ export async function copyAgent(
 			};
 		}
 
-		waitForTelemetryExport();
 		const newAgent = insertResult[0];
-		return { result: "success", agentId: newAgent.id };
+		if (newAgent.workspaceId !== workspace.id) {
+			return {
+				result: "error",
+				message: "Failed to save the duplicated agent",
+			};
+		}
+
+		waitForTelemetryExport();
+		return { result: "success", workspaceId: newAgent.workspaceId };
 	} catch (error) {
 		console.error("Failed to copy agent:", error);
 		return {
