@@ -53,6 +53,21 @@ const isTriggerRequiringCallsign = (
 	);
 };
 
+const getAvailablePayloadFields = (
+	trigger: WorkspaceGitHubIntegrationTrigger,
+) => {
+	const fields = Object.values(WorkspaceGitHubIntegrationPayloadField.Enum);
+	const triggerParts = trigger.split(".");
+	const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
+	return fields.filter((field) => field.startsWith(triggerPrefix));
+};
+
+const getAvailableNextActions = (
+	trigger: WorkspaceGitHubIntegrationTrigger,
+) => {
+	return TRIGGER_TO_ACTIONS[trigger] ?? [];
+};
+
 export function GitHubIntegrationSettingForm() {
 	const { github } = useIntegration();
 
@@ -102,21 +117,6 @@ function Installed({
 	if (isLoading) {
 		return null;
 	}
-
-	const getAvailablePayloadFields = (
-		trigger: WorkspaceGitHubIntegrationTrigger,
-	) => {
-		const fields = Object.values(WorkspaceGitHubIntegrationPayloadField.Enum);
-		const triggerParts = trigger.split(".");
-		const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
-		return fields.filter((field) => field.startsWith(triggerPrefix));
-	};
-
-	const getAvailableNextActions = (
-		trigger: WorkspaceGitHubIntegrationTrigger,
-	) => {
-		return TRIGGER_TO_ACTIONS[trigger] ?? [];
-	};
 
 	const handleTriggerChange = (value: string) => {
 		const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
