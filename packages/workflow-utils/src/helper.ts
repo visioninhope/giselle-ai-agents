@@ -128,12 +128,21 @@ export function createJobMap(
 		connectionSet: Set<Connection>,
 	): Map<string, number> => {
 		const inDegrees = new Map<NodeId, number>();
+		const processedNodeIdSet = new Map<NodeId, Set<NodeId>>();
 
 		for (const nodeId of nodeIdSet) {
 			inDegrees.set(nodeId, 0);
 		}
 
 		for (const conn of connectionSet) {
+			const processedOutputNodes =
+				processedNodeIdSet.get(conn.inputNode.id) ?? new Set();
+			if (processedOutputNodes?.has(conn.outputNode.id)) {
+				continue;
+			}
+			processedOutputNodes.add(conn.outputNode.id);
+			processedNodeIdSet.set(conn.inputNode.id, processedOutputNodes);
+
 			const currentDegree = inDegrees.get(conn.inputNode.id) || 0;
 			inDegrees.set(conn.inputNode.id, currentDegree + 1);
 		}
