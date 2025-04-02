@@ -21,7 +21,11 @@ import {
 } from "./perplexity";
 export * from "./base";
 export * from "./helper";
-export { getImageGenerationModelProvider, imageGenerationSizes, createUsageCalculator } from "./fal";
+export {
+	getImageGenerationModelProvider,
+	imageGenerationSizes,
+	createUsageCalculator,
+} from "./fal";
 export type { FalImageResult, GeneratedImageData } from "./fal";
 
 export const LanguageModel = z.discriminatedUnion("provider", [
