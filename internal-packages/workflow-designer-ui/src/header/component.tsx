@@ -3,7 +3,6 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import clsx from "clsx";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { ViewState } from "giselle-sdk/react";
 import {
 	ChevronDownIcon,
 	EyeIcon,
