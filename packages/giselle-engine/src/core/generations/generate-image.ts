@@ -19,6 +19,7 @@ import {
 	type GeneratedImageData,
 	createUsageCalculator,
 } from "@giselle-sdk/language-model";
+import type { experimental_generateImage as generateImageAiSdk } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
