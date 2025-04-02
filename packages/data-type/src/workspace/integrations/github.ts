@@ -13,6 +13,7 @@ export const WorkspaceGitHubIntegrationTrigger = z.enum([
 	"github.issue_comment.created",
 	"github.pull_request_comment.created",
 	"github.pull_request.opened",
+	"github.pull_request.ready_for_review",
 ]);
 export type WorkspaceGitHubIntegrationTrigger = z.infer<
 	typeof WorkspaceGitHubIntegrationTrigger

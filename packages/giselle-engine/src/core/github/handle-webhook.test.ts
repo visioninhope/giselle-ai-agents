@@ -662,4 +662,47 @@ describe("isMatchingIntegrationSetting", () => {
 			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(false);
 		});
 	});
+
+	// --- Tests for github.pull_request.ready_for_review ---
+	describe("when setting.event is github.pull_request.ready_for_review", () => {
+		const setting = {
+			...mockSettingBase,
+			event: "github.pull_request.ready_for_review" as const,
+		};
+
+		const pullRequestReadyForReviewEvent = {
+			type: GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW,
+			event: "pull_request",
+			payload: {
+				number: 1,
+				action: "ready_for_review",
+				repository: mockRepository,
+				pull_request: {
+					...mockPullRequest,
+					draft: false,
+				},
+				sender: mockUser,
+			},
+		} satisfies GitHubEvent;
+
+		it("should return true if event type is PULL_REQUEST_READY_FOR_REVIEW", () => {
+			const event = pullRequestReadyForReviewEvent;
+			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(true);
+		});
+
+		it("should return false if event type is not PULL_REQUEST_READY_FOR_REVIEW (using PULL_REQUEST_OPENED)", () => {
+			const event = {
+				type: GitHubEventType.PULL_REQUEST_OPENED,
+				event: "pull_request",
+				payload: {
+					number: 1,
+					action: "opened",
+					repository: mockRepository,
+					pull_request: mockPullRequest,
+					sender: mockUser,
+				},
+			} satisfies GitHubEvent;
+			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(false);
+		});
+	});
 });

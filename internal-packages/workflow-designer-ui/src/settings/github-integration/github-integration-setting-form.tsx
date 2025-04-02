@@ -37,6 +37,9 @@ const TRIGGER_TO_ACTIONS: Record<
 	"github.pull_request_comment.created": ["github.pull_request_comment.create"],
 	"github.issues.closed": ["github.issue_comment.create"],
 	"github.pull_request.opened": ["github.pull_request_comment.create"],
+	"github.pull_request.ready_for_review": [
+		"github.pull_request_comment.create",
+	],
 } as const;
 
 const TRIGGERS_REQUIRING_CALLSIGN: readonly WorkspaceGitHubIntegrationTrigger[] =
@@ -243,6 +246,15 @@ function Installed({
 										}
 									>
 										pull_request_comment.created
+									</SelectItem>
+									<SelectItem
+										value={
+											WorkspaceGitHubIntegrationTrigger.Enum[
+												"github.pull_request.ready_for_review"
+											]
+										}
+									>
+										pull_request.ready_for_review
 									</SelectItem>
 								</SelectContent>
 							</Select>
