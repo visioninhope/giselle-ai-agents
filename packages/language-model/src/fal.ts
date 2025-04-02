@@ -124,3 +124,42 @@ export function getImageGenerationModelProvider(
 
 	return undefined;
 }
+
+export interface UsageCalculator {
+	calculateUsage(images: Array<{
+		width: number;
+		height: number;
+		content_type: string;
+	}>): {
+		output: number;
+		unit: "IMAGES";
+	};
+}
+
+export class PixelBasedUsageCalculator implements UsageCalculator {
+	calculateUsage(images: Array<{ width: number; height: number }>) {
+		const totalPixels = images.reduce((sum, image) => sum + (image.height * image.width), 0);
+		return {
+			output: Math.ceil(totalPixels / 1_000_000) * 1_000_000,
+			unit: "IMAGES" as const,
+		};
+	}
+}
+
+export class ImageCountBasedUsageCalculator implements UsageCalculator {
+	calculateUsage(images: Array<{ content_type: string }>) {
+		return {
+			output: images.length,
+			unit: "IMAGES" as const,
+		};
+	}
+}
+
+export function createUsageCalculator(modelId: string): UsageCalculator {
+	switch (modelId) {
+		case "fal-ai/stable-diffusion-v3-medium":
+			return new ImageCountBasedUsageCalculator();
+		default:
+			return new PixelBasedUsageCalculator();
+	}
+}

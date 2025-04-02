@@ -19,6 +19,7 @@ import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import type { TelemetrySettings } from "./types";
+import { createUsageCalculator } from "@giselle-sdk/language-model";
 import {
 	buildMessageObject,
 	checkUsageLimits,
@@ -354,7 +355,7 @@ export async function generateImage(args: {
 	});
 
 	if (args.context.telemetry?.isEnabled && generatedImageOutput) {
-		let totalPixels = 0;
+		const usageCalculator = createUsageCalculator(actionNode.content.llm.id);
 		await Promise.all([
 			...result.data.images.map(async (image) => {
 				const response = await fetch(image.url);
@@ -366,23 +367,17 @@ export async function generateImage(args: {
 					contentBytes: Buffer.from(uint8Array),
 				});
 
-				totalPixels += image.height * image.width;
-
 				generation.update({
 					input: { messages },
 					metadata: {
 						context: wrappedMedia,
 					},
-					usage: {
-						output: totalPixels,
-					},
 				});
 			}),
 			(async () => {
+				const usage = usageCalculator.calculateUsage(result.data.images);
 				generation.update({
-					usage: {
-						output: Math.ceil(totalPixels / 1_000_000) * 1_000_000,
-					},
+					usage,
 				});
 				generation.end();
 			})(),
