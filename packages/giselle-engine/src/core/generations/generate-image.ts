@@ -230,6 +230,7 @@ export async function generateImage(args: {
 		name: "fal-ai/client.subscribe",
 		model: actionNode.content.llm.id,
 		modelParameters: actionNode.content.llm.configurations,
+		input: { messages },
 		usage: {
 			input: 0,
 			output: 0,
@@ -348,7 +349,6 @@ export async function generateImage(args: {
 				});
 
 				generation.update({
-					input: { messages },
 					metadata: {
 						context: wrappedMedia,
 					},
