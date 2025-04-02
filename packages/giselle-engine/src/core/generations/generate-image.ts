@@ -241,11 +241,12 @@ export async function generateImage(args: {
 		}
 	}
 	const trace = langfuse.trace({
-		name: runningGeneration.id,
+		name: "fal-ai/client",
 		metadata: args.telemetry?.metadata,
 		input: { messages },
 	});
 	const generation = trace.generation({
+		name: "fal-ai/client.subscribe",
 		model: actionNode.content.llm.id,
 		modelParameters: actionNode.content.llm.configurations,
 	});
