@@ -11,6 +11,7 @@ export * from "./layers";
 export * from "./panel-close";
 export * from "./panel-open";
 export * from "./prompt";
+export * from "./source-link";
 export * from "./sparkles";
 export * from "./spinner";
 export * from "./text-generation";

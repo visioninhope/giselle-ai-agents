@@ -32,6 +32,7 @@ import {
 	PictureIcon,
 	PromptIcon,
 	SearchIcon,
+	SourceLinkIcon,
 	TextFileIcon,
 	UploadIcon,
 	VariableIcon,
@@ -572,7 +573,7 @@ export function Toolbar() {
 						className="relative"
 					>
 						<Tooltip text={<TooltipAndHotkey text="Source" hotkey="t" />}>
-							<FolderIcon data-icon />
+							<SourceLinkIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectSourceCategory" && (
 							<Popover.Root open={true}>
