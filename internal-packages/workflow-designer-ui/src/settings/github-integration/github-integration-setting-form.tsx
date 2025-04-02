@@ -38,19 +38,18 @@ const TRIGGER_TO_ACTIONS: Record<
 	"github.issues.closed": ["github.issue_comment.create"],
 } as const;
 
-const TRIGGERS_REQUIRING_CALLSIGN = [
-	"github.issue_comment.created",
-	"github.pull_request_comment.created",
-] as const;
+const TRIGGERS_REQUIRING_CALLSIGN: readonly WorkspaceGitHubIntegrationTrigger[] =
+	[
+		"github.issue_comment.created",
+		"github.pull_request_comment.created",
+	] as const;
 
 type TriggerRequiringCallsign = (typeof TRIGGERS_REQUIRING_CALLSIGN)[number];
 
 const isTriggerRequiringCallsign = (
 	trigger: WorkspaceGitHubIntegrationTrigger,
-): boolean => {
-	return TRIGGERS_REQUIRING_CALLSIGN.includes(
-		trigger as TriggerRequiringCallsign,
-	);
+): trigger is TriggerRequiringCallsign => {
+	return TRIGGERS_REQUIRING_CALLSIGN.includes(trigger);
 };
 
 const getAvailablePayloadFields = (
