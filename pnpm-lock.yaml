@@ -876,6 +876,9 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
+      '@giselle-sdk/workflow-designer':
+        specifier: workspace:^
+        version: link:../workflow-designer
       '@giselle-sdk/workspace':
         specifier: workspace:^
         version: link:../workspace

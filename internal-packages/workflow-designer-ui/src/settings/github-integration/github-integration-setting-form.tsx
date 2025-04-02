@@ -1,3 +1,5 @@
+"use client";
+
 import type { WorkspaceGitHubNextIntegrationAction } from "@giselle-sdk/data-type";
 import {
 	WorkspaceGitHubIntegrationNextAction,
