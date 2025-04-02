@@ -107,10 +107,11 @@ async function buildGenerationMessageForTextGeneration(
 		const replaceKeyword = `{{${sourceKeyword.nodeId}:${sourceKeyword.outputId}}}`;
 		switch (contextNode.content.type) {
 			case "text": {
-				userMessage = userMessage.replace(
-					replaceKeyword,
-					jsonContentToText(JSON.parse(contextNode.content.text)),
-				);
+				const jsonOrText = contextNode.content.text;
+				const text = isJsonContent(jsonOrText)
+					? jsonContentToText(JSON.parse(jsonOrText))
+					: jsonOrText;
+				userMessage = userMessage.replace(replaceKeyword, text);
 				break;
 			}
 			case "textGeneration": {
