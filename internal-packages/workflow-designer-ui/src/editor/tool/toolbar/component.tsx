@@ -621,7 +621,7 @@ export function Toolbar() {
 						data-tool
 						className="relative opacity-50 cursor-not-allowed"
 					>
-						<Tooltip text={<TooltipAndHotkey text="Agent (soon)" />}>
+						<Tooltip text={<TooltipAndHotkey text="Agent (Coming Soon)" />}>
 							<WilliIcon data-icon />
 						</Tooltip>
 					</ToggleGroup.Item>
