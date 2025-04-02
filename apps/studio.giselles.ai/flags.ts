@@ -55,7 +55,7 @@ export const developerFlag = flag<boolean>({
 export const settingsV2Flag = flag<boolean>({
 	key: "settings-v2",
 	async decide() {
-		return takeLocalEnv("SETTINGS_V2_FLAG");
+		return true;
 	},
 	description: "Enable Settings V2",
 	defaultValue: false,
