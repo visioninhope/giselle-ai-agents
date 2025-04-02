@@ -13,12 +13,12 @@ export default function SignupPage() {
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex flex-col gap-[16px]">
 				<h2
-					className="text-[40px] font-[500] text-black--30 text-left font-rosart"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+					className="text-[34px] font-[500] text-primary-100 text-left font-hubot"
+					style={{ textShadow: "0px 0px 20px #0087F6" }}
 				>
 					Unleash Your Potential
 				</h2>
-				<p className="text-[18px] font-avenir leading-[30.6px] tracking-tighter text-left text-black-70">
+				<p className="text-[18px] font-hubot leading-[30.6px] tracking-normal text-left text-black-70">
 					• Easy setup, no coding required
 				</p>
 			</div>
@@ -26,9 +26,9 @@ export default function SignupPage() {
 				<PageHeader title="Get Started" />
 				<OAuthProviders labelPrefix="Sign up" />
 				<Divider label="or" />
-				<Button asChild>
+				<Button asChild className="font-medium">
 					<Link href="/signup/email">
-						<p>Sign up for Email</p>
+						<p className="font-hubot font-medium">Sign up for Email</p>
 						<MailIcon className="h-5 w-5 mr-2" />
 					</Link>
 				</Button>

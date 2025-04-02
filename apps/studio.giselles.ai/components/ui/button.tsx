@@ -7,13 +7,13 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-	"w-full flex items-center px-[20px] py-[8px] bg-transparent rounded-[8px] border shadow-xs text-[18px] font-medium font-rosart font-normal leading-[21.6px] disabled:bg-black-70 disabled:text-black-80 data-[loading=true]:cursor-wait",
+	"w-full flex items-center px-[20px] py-[8px] bg-transparent rounded-[8px] border shadow-xs text-[16px] font-medium font-hubot font-normal leading-[21.6px] disabled:bg-black-70 disabled:text-black-80 data-[loading=true]:cursor-wait",
 	{
 		variants: {
 			variant: {
 				default:
-					"justify-center text-white bg-black-70 border-black-70 gap-[8px] hover:bg-black-30 hover:text-black-80",
-				link: "flex-start gap-[40px] text-white bg-transparent border-black-30 hover:bg-black-30 hover:text-black-80",
+					"justify-center text-black-900 bg-primary-200 border-primary-200 gap-[8px] hover:bg-primary-100 hover:text-black-900",
+				link: "text-white bg-transparent border-black-30 hover:bg-primary-200 hover:text-black-900",
 				destructive:
 					"justify-center bg-destructive text-destructive-foreground hover:bg-destructive/90",
 			},
