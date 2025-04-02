@@ -19,7 +19,7 @@ import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import type { TelemetrySettings } from "./types";
-import { createUsageCalculator } from "@giselle-sdk/language-model";
+import {type FalImageResult, type GeneratedImageData, createUsageCalculator } from "@giselle-sdk/language-model";
 import {
 	buildMessageObject,
 	checkUsageLimits,
@@ -40,30 +40,6 @@ type ProviderOptions = Parameters<
 fal.config({
 	credentials: process.env.FAL_API_KEY,
 });
-
-interface FalImageResult {
-	data: {
-		images: Array<{
-			url: string;
-			width: number;
-			height: number;
-			content_type: string;
-		}>;
-		timings: {
-			inference: number;
-		};
-		seed: number;
-		has_nsfw_concepts: boolean[];
-		prompt: string;
-	};
-	requestId: string;
-}
-
-interface GeneratedImageData {
-	uint8Array: Uint8Array;
-	base64: string;
-}
-
 export async function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
