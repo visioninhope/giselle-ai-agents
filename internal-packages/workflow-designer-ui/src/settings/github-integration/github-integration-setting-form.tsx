@@ -8,7 +8,7 @@ import {
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import {
 	Label,
 	Select,
@@ -118,32 +118,36 @@ function Installed({
 		return null;
 	}
 
-	const handleTriggerChange = (value: string) => {
-		const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
-		const currentTrigger = selectedTrigger;
-		setSelectedTrigger(newTrigger);
+	const handleTriggerChange = useCallback(
+		(value: string) => {
+			const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
+			const currentTrigger = selectedTrigger;
+			setSelectedTrigger(newTrigger);
 
-		if (newTrigger !== currentTrigger) {
-			if (!isTriggerRequiringCallsign(newTrigger)) {
-				setCallsign("");
+			if (newTrigger !== currentTrigger) {
+				if (!isTriggerRequiringCallsign(newTrigger)) {
+					setCallsign("");
+				}
+
+				const availableActions = getAvailableNextActions(newTrigger);
+				if (
+					selectedNextAction &&
+					!availableActions.includes(selectedNextAction)
+				) {
+					setSelectedNextAction(undefined);
+				}
 			}
-
-			const availableActions = getAvailableNextActions(newTrigger);
-			if (
-				selectedNextAction &&
-				!availableActions.includes(selectedNextAction)
-			) {
-				setSelectedNextAction(undefined);
-			}
-		}
-	};
-
-	const availablePayloadFields = selectedTrigger
-		? getAvailablePayloadFields(selectedTrigger)
-		: [];
-	const availableNextActions = selectedTrigger
-		? getAvailableNextActions(selectedTrigger)
-		: [];
+		},
+		[selectedTrigger, selectedNextAction],
+	);
+	const availablePayloadFields = useMemo(
+		() => (selectedTrigger ? getAvailablePayloadFields(selectedTrigger) : []),
+		[selectedTrigger],
+	);
+	const availableNextActions = useMemo(
+		() => (selectedTrigger ? getAvailableNextActions(selectedTrigger) : []),
+		[selectedTrigger],
+	);
 
 	return (
 		<div className="flex flex-col gap-[16px]">
