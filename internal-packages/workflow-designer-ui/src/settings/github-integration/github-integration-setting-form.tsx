@@ -242,15 +242,6 @@ function Installed({
 									<SelectItem
 										value={
 											WorkspaceGitHubIntegrationTrigger.Enum[
-												"github.pull_request_comment.created"
-											]
-										}
-									>
-										pull_request_comment.created
-									</SelectItem>
-									<SelectItem
-										value={
-											WorkspaceGitHubIntegrationTrigger.Enum[
 												"github.pull_request.ready_for_review"
 											]
 										}
@@ -265,6 +256,15 @@ function Installed({
 										}
 									>
 										pull_request.closed
+									</SelectItem>
+									<SelectItem
+										value={
+											WorkspaceGitHubIntegrationTrigger.Enum[
+												"github.pull_request_comment.created"
+											]
+										}
+									>
+										pull_request_comment.created
 									</SelectItem>
 								</SelectContent>
 							</Select>
