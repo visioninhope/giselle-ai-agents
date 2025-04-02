@@ -249,6 +249,11 @@ export async function generateImage(args: {
 		name: "fal-ai/client.subscribe",
 		model: actionNode.content.llm.id,
 		modelParameters: actionNode.content.llm.configurations,
+		usage: {
+			input: 0,
+			output: 0,
+			unit: "IMAGES",
+		},
 	});
 
 	const result = (await fal.subscribe(actionNode.content.llm.id, {
@@ -349,8 +354,9 @@ export async function generateImage(args: {
 	});
 
 	if (args.context.telemetry?.isEnabled && generatedImageOutput) {
-		await Promise.all(
-			result.data.images.map(async (image) => {
+		let totalPixels = 0;
+		await Promise.all([
+			...result.data.images.map(async (image) => {
 				const response = await fetch(image.url);
 				const arrayBuffer = await response.arrayBuffer();
 				const uint8Array = new Uint8Array(arrayBuffer);
@@ -360,19 +366,26 @@ export async function generateImage(args: {
 					contentBytes: Buffer.from(uint8Array),
 				});
 
+				totalPixels += image.height * image.width;
+
 				generation.update({
 					input: { messages },
 					metadata: {
 						context: wrappedMedia,
 					},
 					usage: {
-						input: 0,
-						output: image.height * image.width,
-						unit: "IMAGES",
+						output: totalPixels,
+					},
+				});
+			}),
+			(async () => {
+				generation.update({
+					usage: {
+						output: Math.ceil(totalPixels / 1_000_000) * 1_000_000,
 					},
 				});
 				generation.end();
-			}),
-		);
+			})(),
+		]);
 	}
 }
