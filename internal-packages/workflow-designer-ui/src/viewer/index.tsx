@@ -220,10 +220,8 @@ export function Viewer() {
 										icon={
 											<WilliIcon className="fill-current w-[32px] h-[32px] text-black-300" />
 										}
-										title="This has not yet been executed"
-										description="You have not yet
-													executed the node. Let's execute entire thing and create the final
-													output."
+										title="No preview generated yet."
+										description="Select a Flow and click the Run button to run your nodes and create the final output."
 									/>
 								</div>
 							)}
