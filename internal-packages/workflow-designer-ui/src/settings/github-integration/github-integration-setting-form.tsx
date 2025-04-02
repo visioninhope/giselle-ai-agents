@@ -113,10 +113,6 @@ function Installed({
 		}
 	}, [data]);
 
-	if (isLoading) {
-		return null;
-	}
-
 	const handleTriggerChange = useCallback(
 		(value: string) => {
 			const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
@@ -147,6 +143,10 @@ function Installed({
 		() => (selectedTrigger ? getAvailableNextActions(selectedTrigger) : []),
 		[selectedTrigger],
 	);
+
+	if (isLoading) {
+		return null;
+	}
 
 	return (
 		<div className="flex flex-col gap-[16px]">
