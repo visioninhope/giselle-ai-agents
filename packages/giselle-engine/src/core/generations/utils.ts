@@ -303,7 +303,7 @@ function parseAndMod(generationLike: unknown, mod = false) {
 		return parseResult.data;
 	}
 	if (mod) {
-		throw new Error("Invalid generation");
+		throw parseResult.error;
 	}
 
 	let modData = generationLike;
