@@ -229,6 +229,7 @@ async function processIntegration(
 								owner: repository.owner,
 								name: repository.name,
 							},
+							// GitHub treats pull requests as issues, so we use the `issue.number` for the pull request.
 							number: gitHubEvent.payload.issue.number,
 						},
 						content: resultText,
