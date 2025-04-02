@@ -269,9 +269,7 @@ export async function generateText(args: {
 					event.sources.map(async (source) => {
 						// When using Gemini search grounding, source provides a proxy URL
 						// We need to access and resolve this proxy URL to get the actual redirect URL
-						if (
-							isAllowedHost(source.url, ["vertexaisearch.cloud.google.com"])
-						) {
+						if (isVertexAiHost(source.url)) {
 							const redirected = await getRedirectedUrlAndTitle(source.url);
 							return {
 								sourceType: "url",
@@ -371,10 +369,10 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 	}
 }
 
-function isAllowedHost(urlString: string, allowedHosts: string[]): boolean {
+function isVertexAiHost(urlString: string): boolean {
 	try {
 		const parsedUrl = new URL(urlString);
-		return allowedHosts.includes(parsedUrl.host);
+		return ["vertexaisearch.cloud.google.com"].includes(parsedUrl.host);
 	} catch (e) {
 		return false;
 	}
