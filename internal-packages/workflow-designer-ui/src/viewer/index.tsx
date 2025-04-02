@@ -70,12 +70,12 @@ export function Viewer() {
 										defaultValue={flowId}
 									>
 										<SelectTrigger>
-											<SelectValue placeholder="Select flow" />
+											<SelectValue placeholder="Select Flow" />
 										</SelectTrigger>
 										<SelectContent>
 											{data.editingWorkflows.map((workflow, index) => (
 												<SelectItem key={workflow.id} value={workflow.id}>
-													flow {index + 1}
+													Flow {index + 1}
 												</SelectItem>
 											))}
 										</SelectContent>
