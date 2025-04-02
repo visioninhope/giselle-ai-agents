@@ -1,7 +1,6 @@
 export * from "./circle-check";
 export * from "./circle-plus";
 export * from "./circle-x";
-export * from "./code";
 export * from "./content-type-icon";
 export * from "./data";
 export * from "./document";

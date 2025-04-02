@@ -20,7 +20,6 @@ import {
 	AnthropicIcon,
 	AudioIcon,
 	CirclePlusIcon,
-	CodeIcon,
 	DocumentIcon,
 	FolderIcon,
 	GenNodeIcon,
@@ -614,11 +613,6 @@ export function Toolbar() {
 								</Popover.Portal>
 							</Popover.Root>
 						)}
-					</ToggleGroup.Item>
-					<ToggleGroup.Item value="addCodeNode" data-tool>
-						<Tooltip text={<TooltipAndHotkey text="Code" hotkey="c" />}>
-							<CodeIcon data-icon />
-						</Tooltip>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>
 			</div>
