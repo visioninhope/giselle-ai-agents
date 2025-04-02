@@ -61,7 +61,7 @@ const getAvailablePayloadFields = (
 ) => {
 	const fields = Object.values(WorkspaceGitHubIntegrationPayloadField.Enum);
 	const triggerParts = trigger.split(".");
-	const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}`;
+	const triggerPrefix = `${triggerParts[0]}.${triggerParts[1]}.`;
 	return fields.filter((field) => field.startsWith(triggerPrefix));
 };
 
