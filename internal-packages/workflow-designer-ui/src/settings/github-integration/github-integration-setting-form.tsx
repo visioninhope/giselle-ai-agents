@@ -36,6 +36,7 @@ const TRIGGER_TO_ACTIONS: Record<
 	"github.issue_comment.created": ["github.issue_comment.create"],
 	"github.pull_request_comment.created": ["github.pull_request_comment.create"],
 	"github.issues.closed": ["github.issue_comment.create"],
+	"github.pull_request.opened": ["github.pull_request_comment.create"],
 } as const;
 
 const TRIGGERS_REQUIRING_CALLSIGN: readonly WorkspaceGitHubIntegrationTrigger[] =
@@ -224,6 +225,15 @@ function Installed({
 										}
 									>
 										issue_comment.created
+									</SelectItem>
+									<SelectItem
+										value={
+											WorkspaceGitHubIntegrationTrigger.Enum[
+												"github.pull_request.opened"
+											]
+										}
+									>
+										pull_request.opened
 									</SelectItem>
 									<SelectItem
 										value={

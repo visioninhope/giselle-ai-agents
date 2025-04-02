@@ -12,6 +12,7 @@ export const WorkspaceGitHubIntegrationTrigger = z.enum([
 	"github.issues.closed",
 	"github.issue_comment.created",
 	"github.pull_request_comment.created",
+	"github.pull_request.opened",
 ]);
 export type WorkspaceGitHubIntegrationTrigger = z.infer<
 	typeof WorkspaceGitHubIntegrationTrigger
@@ -47,6 +48,9 @@ export const WorkspaceGitHubIntegrationPayloadField = z.enum([
 	"github.pull_request_comment.pull_request.body",
 	"github.pull_request_comment.body",
 	"github.pull_request_comment.pull_request.diff",
+	"github.pull_request.title",
+	"github.pull_request.body",
+	"github.pull_request.diff",
 ]);
 export type WorkspaceGitHubIntegrationPayloadField = z.infer<
 	typeof WorkspaceGitHubIntegrationPayloadField
