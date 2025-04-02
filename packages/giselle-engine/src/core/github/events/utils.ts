@@ -2,6 +2,7 @@ import type {
 	IssueCommentCreatedEvent,
 	IssuesClosedEvent,
 	IssuesOpenedEvent,
+	PullRequestClosedEvent,
 	PullRequestOpenedEvent,
 	PullRequestReadyForReviewEvent,
 } from "@octokit/webhooks-types";
@@ -102,6 +103,25 @@ function isPullRequestReadyForReviewPayload(
 	);
 }
 
+function isPullRequestClosedPayload(
+	event: string,
+	payload: unknown,
+): payload is PullRequestClosedEvent {
+	return (
+		event === "pull_request" &&
+		typeof payload === "object" &&
+		payload !== null &&
+		"action" in payload &&
+		payload.action === "closed" &&
+		"pull_request" in payload &&
+		typeof payload.pull_request === "object" &&
+		payload.pull_request !== null &&
+		"repository" in payload &&
+		typeof payload.repository === "object" &&
+		payload.repository !== null
+	);
+}
+
 export function determineGitHubEvent(
 	event: string,
 	payload: unknown,
@@ -141,6 +161,14 @@ export function determineGitHubEvent(
 	if (isPullRequestReadyForReviewPayload(event, payload)) {
 		return {
 			type: GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW,
+			event: "pull_request",
+			payload,
+		};
+	}
+
+	if (isPullRequestClosedPayload(event, payload)) {
+		return {
+			type: GitHubEventType.PULL_REQUEST_CLOSED,
 			event: "pull_request",
 			payload,
 		};

@@ -288,6 +288,8 @@ export function isMatchingIntegrationSetting(
 			return event.type === GitHubEventType.PULL_REQUEST_OPENED;
 		case "github.pull_request.ready_for_review":
 			return event.type === GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW;
+		case "github.pull_request.closed":
+			return event.type === GitHubEventType.PULL_REQUEST_CLOSED;
 		default: {
 			const _exhaustiveCheck: never = setting.event;
 			throw new Error(`Unhandled setting event type: ${_exhaustiveCheck}`);
@@ -319,6 +321,7 @@ async function handleReaction(
 			break;
 		case GitHubEventType.PULL_REQUEST_OPENED:
 		case GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW:
+		case GitHubEventType.PULL_REQUEST_CLOSED:
 			if (options?.addReactionToIssue) {
 				await options.addReactionToIssue(
 					event.payload.repository.owner.login,
@@ -397,6 +400,7 @@ async function getPayloadValue(
 
 		case GitHubEventType.PULL_REQUEST_OPENED:
 		case GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW:
+		case GitHubEventType.PULL_REQUEST_CLOSED:
 			switch (field) {
 				case "github.pull_request.title":
 					return event.payload.pull_request.title;

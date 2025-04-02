@@ -705,4 +705,49 @@ describe("isMatchingIntegrationSetting", () => {
 			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(false);
 		});
 	});
+
+	// --- Tests for github.pull_request.closed ---
+	describe("when setting.event is github.pull_request.closed", () => {
+		const setting = {
+			...mockSettingBase,
+			event: "github.pull_request.closed" as const,
+		};
+
+		const pullRequestClosedEvent = {
+			type: GitHubEventType.PULL_REQUEST_CLOSED,
+			event: "pull_request",
+			payload: {
+				number: 1,
+				action: "closed",
+				repository: mockRepository,
+				pull_request: {
+					...mockPullRequest,
+					state: "closed",
+					closed_at: new Date().toISOString(),
+					merged: true,
+				},
+				sender: mockUser,
+			},
+		} satisfies GitHubEvent;
+
+		it("should return true if event type is PULL_REQUEST_CLOSED", () => {
+			const event = pullRequestClosedEvent;
+			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(true);
+		});
+
+		it("should return false if event type is not PULL_REQUEST_CLOSED (using PULL_REQUEST_OPENED)", () => {
+			const event = {
+				type: GitHubEventType.PULL_REQUEST_OPENED,
+				event: "pull_request",
+				payload: {
+					number: 1,
+					action: "opened",
+					repository: mockRepository,
+					pull_request: mockPullRequest,
+					sender: mockUser,
+				},
+			} satisfies GitHubEvent;
+			expect(isMatchingIntegrationSetting(setting, event, null)).toBe(false);
+		});
+	});
 });
