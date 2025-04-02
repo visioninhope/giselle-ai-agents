@@ -115,16 +115,25 @@ function Installed({
 
 	const handleTriggerChange = useCallback(
 		(value: string) => {
-			const newTrigger = WorkspaceGitHubIntegrationTrigger.parse(value);
-			const currentTrigger = selectedTrigger;
-			setSelectedTrigger(newTrigger);
+			const newTrigger = WorkspaceGitHubIntegrationTrigger.safeParse(value);
+			if (newTrigger.error) {
+				setSelectedTrigger(undefined);
+				setCallsign("");
+				setSelectedNextAction(undefined);
+				setPayloadMaps([]);
+				return;
+			}
 
-			if (newTrigger !== currentTrigger) {
-				if (!isTriggerRequiringCallsign(newTrigger)) {
+			const newTriggerValue = newTrigger.data;
+			const currentTrigger = selectedTrigger;
+			setSelectedTrigger(newTriggerValue);
+
+			if (newTriggerValue !== currentTrigger) {
+				if (!isTriggerRequiringCallsign(newTriggerValue)) {
 					setCallsign("");
 				}
 
-				const availableActions = getAvailableNextActions(newTrigger);
+				const availableActions = getAvailableNextActions(newTriggerValue);
 				if (
 					selectedNextAction &&
 					!availableActions.includes(selectedNextAction)
@@ -258,11 +267,15 @@ function Installed({
 						<Select
 							name="nextAction"
 							value={selectedNextAction}
-							onValueChange={(value) =>
-								setSelectedNextAction(
-									WorkspaceGitHubIntegrationNextAction.parse(value),
-								)
-							}
+							onValueChange={(value) => {
+								const nextAction =
+									WorkspaceGitHubIntegrationNextAction.safeParse(value);
+								if (nextAction.success) {
+									setSelectedNextAction(nextAction.data);
+								} else {
+									setSelectedNextAction(undefined);
+								}
+							}}
 						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select an action" />
