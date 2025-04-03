@@ -60,6 +60,7 @@
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
 		"@giselle-sdk/usage-limits": "workspace:^",
+		"@giselle-sdk/workflow-utils": "workspace:^",
 		"ai": "catalog:",
 		"next": "catalog:",
 		"openai": "catalog:",

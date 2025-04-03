@@ -827,6 +827,9 @@ importers:
       '@giselle-sdk/usage-limits':
         specifier: workspace:^
         version: link:../usage-limits
+      '@giselle-sdk/workflow-utils':
+        specifier: workspace:^
+        version: link:../workflow-utils
       ai:
         specifier: 'catalog:'
         version: 4.2.9(react@19.1.0)(zod@3.24.1)
