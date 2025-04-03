@@ -84,8 +84,8 @@ export function TextGenerationNodePropertiesPanel({
 	const text = isJsonContent(jsonOrText)
 		? jsonContentToText(JSON.parse(jsonOrText))
 		: jsonOrText;
-	const space = text?.replace(/[\s\u3000]+/g, "");
-	const disabled = usageLimitsReached || !text || !space;
+	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
+	const disabled = usageLimitsReached || !noWhitespaceText;
 
 	return (
 		<PropertiesPanelRoot>
