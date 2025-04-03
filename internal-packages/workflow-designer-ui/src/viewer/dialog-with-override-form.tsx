@@ -5,12 +5,12 @@ import type {
 } from "@giselle-sdk/data-type";
 import { PencilIcon, X } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { useCallback, useState } from "react";
+import { useCallback } from "react";
 import { Button } from "../ui/button";
 import { RunWithOverrideParamsForm } from "./run-with-override-params-form";
 
 // Global variable to store override nodes
-let currentOverrideNodes: OverrideNode[] = [];
+const currentOverrideNodes: OverrideNode[] = [];
 
 export function DialogWithOverrideForm({
 	flow,
@@ -22,36 +22,15 @@ export function DialogWithOverrideForm({
 		options?: { overrideNodes?: OverrideNode[] },
 	) => void;
 }) {
-	// Dialog open/close state
-	const [isOpen, setIsOpen] = useState(false);
-	// Override nodes state
-	const [overrideNodes, setOverrideNodes] = useState<OverrideNode[]>([]);
-
-	// Initialize state when modal opens
-	const handleOpenChange = useCallback((open: boolean) => {
-		setIsOpen(open);
-		// Set initial data when modal is opened
-		if (open) {
-			console.log("Dialog opened, initializing data...");
-		}
-	}, []);
-
-	// Function to update override nodes
-	const updateOverrideNodes = useCallback((nodes: OverrideNode[]) => {
-		setOverrideNodes(nodes);
-		currentOverrideNodes = [...nodes];
-	}, []);
-
 	// Handle Run with override button click
 	const handleRunWithOverride = useCallback(() => {
 		perform(flow.id, {
 			overrideNodes: currentOverrideNodes,
 		});
-		setIsOpen(false);
 	}, [flow.id, perform]);
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={handleOpenChange}>
+		<Dialog.Root>
 			<Dialog.Trigger asChild>
 				<button type="button" className="hover:bg-black-800/20 rounded-[4px]">
 					<PencilIcon className="size-[18px]" />
