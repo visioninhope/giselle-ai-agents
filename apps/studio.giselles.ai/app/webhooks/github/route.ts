@@ -1,9 +1,11 @@
 import { giselleEngine } from "@/app/giselle-engine";
-import { isWorkflowError } from "@giselle-sdk/giselle-engine";
+import {
+	isUsageLimitError,
+	isWorkflowError,
+} from "@giselle-sdk/giselle-engine";
 import { Webhooks } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
 import { type NextRequest, after } from "next/server";
-import { isUsageLimitError } from "../../../../../packages/giselle-engine/src/core";
 import {
 	WebhookPayloadError,
 	defaultGitHubClientFactory,
@@ -57,13 +59,24 @@ export async function POST(request: NextRequest) {
 					event: request.headers.get("X-GitHub-Event") as WebhookEventName,
 					payload,
 					options: {
-						reaction: async (owner, repo, comment_id) => {
+						addReactionToComment: async (owner, repo, comment_id) => {
 							await octokit.request(
 								"POST /repos/{owner}/{repo}/issues/comments/{comment_id}/reactions",
 								{
 									owner,
 									repo,
 									comment_id,
+									content: "eyes",
+								},
+							);
+						},
+						addReactionToIssue: async (owner, repo, issue_id) => {
+							await octokit.request(
+								"POST /repos/{owner}/{repo}/issues/{issue_number}/reactions",
+								{
+									owner,
+									repo,
+									issue_number: issue_id,
 									content: "eyes",
 								},
 							);

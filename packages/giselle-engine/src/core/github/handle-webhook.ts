@@ -3,14 +3,20 @@ import {
 	WorkspaceGitHubIntegrationNextActionIssueCommentCreate,
 	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate,
 	type WorkspaceGitHubIntegrationPayloadField,
+	type WorkspaceGitHubIntegrationSetting,
 } from "@giselle-sdk/data-type";
-import type { IssueCommentCreatedEvent } from "@octokit/webhooks-types";
 import { z } from "zod";
 import { WorkflowError } from "../error";
 import { runApi } from "../runs";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces";
 import {
+	type GitHubEvent,
+	GitHubEventType,
+	determineGitHubEvent,
+} from "./events";
+import {
+	type Command,
 	getWorkspaceGitHubIntegrationRepositorySettings,
 	parseCommand as parseCommandInternal,
 } from "./utils";
@@ -56,7 +62,16 @@ type PullRequestDiffFn = (
 ) => Promise<string>;
 export interface HandleGitHubWebhookOptions {
 	pullRequestDiff?: PullRequestDiffFn;
-	reaction?: (owner: string, repo: string, commentId: number) => Promise<void>;
+	addReactionToComment?: (
+		owner: string,
+		repo: string,
+		commentId: number,
+	) => Promise<void>;
+	addReactionToIssue?: (
+		owner: string,
+		repo: string,
+		issueId: number,
+	) => Promise<void>;
 }
 export interface HandleGitHubWebhookArgs {
 	github: {
@@ -69,262 +84,314 @@ export interface HandleGitHubWebhookArgs {
 }
 
 export async function handleWebhook(args: HandleGitHubWebhookArgs) {
-	const repository = getRepositoryOwnerNameNodeId(
+	const gitHubEvent = determineGitHubEvent(
 		args.github.event,
 		args.github.payload,
 	);
-
-	const command = parseCommand(args.github.event, args.github.payload);
-	if (command === null) {
-		return;
+	if (!gitHubEvent) {
+		throw new Error("Unsupported event");
 	}
+
+	const repository = getRepositoryInfo(gitHubEvent);
 	const workspaceGitHubIntegrationRepositorySettings =
 		await getWorkspaceGitHubIntegrationRepositorySettings({
 			storage: args.context.storage,
 			repositoryNodeId: repository.nodeId,
 		});
-	const integrationPromises = (
-		workspaceGitHubIntegrationRepositorySettings ?? []
-	)
-		.filter(
-			(workspaceGitHubIntegrationSetting) =>
-				workspaceGitHubIntegrationSetting.callsign === command?.callsign,
-		)
-		.map(async (workspaceGitHubIntegrationSetting) => {
-			if (isIssueCommentCreatedEvent(args.github.payload, args.github.event)) {
-				await args.options?.reaction?.(
-					args.github.payload.repository.owner.login,
-					args.github.payload.repository.name,
-					args.github.payload.comment.id,
-				);
-			}
-			const overrideNodes: OverrideNode[] = [];
-			const workspace = await getWorkspace({
-				context: args.context,
-				workspaceId: workspaceGitHubIntegrationSetting.workspaceId,
-			});
-			for (const payloadMap of workspaceGitHubIntegrationSetting.payloadMaps) {
-				const node = workspace.nodes.find(
-					(node) => node.id === payloadMap.nodeId,
-				);
-				if (node === undefined) {
-					continue;
-				}
-				const payloadValue = await getPayloadValue(
-					args.github.event,
-					args.github.payload,
-					payloadMap.payload,
-					command.content,
-					args.options?.pullRequestDiff,
-				);
-				switch (node.content.type) {
-					case "textGeneration":
-						overrideNodes.push({
-							id: node.id,
-							type: "action",
-							content: {
-								type: node.content.type,
-								prompt: `${payloadValue}`,
-							},
-						});
-						break;
-					case "imageGeneration":
-						overrideNodes.push({
-							id: node.id,
-							type: "action",
-							content: {
-								type: node.content.type,
-								prompt: `${payloadValue}`,
-							},
-						});
-						break;
-					case "file":
-						throw new Error("File nodes are not supported");
-					case "text":
-						overrideNodes.push({
-							id: node.id,
-							type: "variable",
-							content: {
-								type: node.content.type,
-								text: `${payloadValue}`,
-							},
-						});
-						break;
-					case "github":
-						throw new Error("GitHub nodes are not supported");
-					default: {
-						const _exhaustiveCheck: never = node.content;
-						throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
-					}
-				}
-			}
-			const workflows = workspace.editingWorkflows.filter((workflow) =>
-				workflow.jobs.some((job) =>
-					job.actions.some((action) =>
-						overrideNodes.some(
-							(overrideNode) =>
-								overrideNode.id === action.node.id ||
-								action.generationTemplate.sourceNodes.some(
-									(sourceNode) => sourceNode.id === overrideNode.id,
-								),
-						),
-					),
-				),
-			);
-			const results = await Promise.all(
-				workflows.map((workflow) =>
-					runApi({
-						context: args.context,
-						workspaceId: workspace.id,
-						workflowId: workflow.id,
-						overrideNodes,
-					}).catch((error: unknown) => {
-						throw new WorkflowError(
-							`Failed to run workflow: ${error}`,
-							workspace.id,
-							workflow.id,
-							{ cause: error },
-						);
-					}),
-				),
-			);
 
-			const webhookResults: HandleGitHubWebhookResult[] = [];
-			for (const result of results) {
-				for (const resultText of result) {
-					switch (workspaceGitHubIntegrationSetting.nextAction) {
-						case "github.pull_request_comment.create":
-							webhookResults.push({
-								action: "github.pull_request_comment.create",
-								pullRequest: {
-									repo: {
-										owner: repository.owner,
-										name: repository.name,
-									},
-									number: await getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.pull_request_comment.pull_request.number",
-									),
-								},
-								content: resultText,
-							});
-							break;
-						case "github.issue_comment.create":
-							webhookResults.push({
-								action: "github.issue_comment.create",
-								issue: {
-									repo: {
-										owner: repository.owner,
-										name: repository.name,
-									},
-									number: await getPayloadValue(
-										args.github.event,
-										args.github.payload,
-										"github.issue_comment.issue.number",
-									),
-								},
-								content: resultText,
-							});
-							break;
-						default: {
-							const _exhaustiveCheck: never =
-								workspaceGitHubIntegrationSetting.nextAction;
-							throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
-						}
-					}
-				}
-			}
-			return webhookResults;
-		});
+	const command = parseCommandFromEvent(gitHubEvent);
+	const matchedIntegrationSettings =
+		workspaceGitHubIntegrationRepositorySettings?.filter((setting) =>
+			isMatchingIntegrationSetting(setting, gitHubEvent, command),
+		) ?? [];
+
+	const integrationPromises = matchedIntegrationSettings.map((setting) =>
+		processIntegration(
+			setting,
+			gitHubEvent,
+			command,
+			repository,
+			args.context,
+			args.options,
+		),
+	);
 	const results = await Promise.all(integrationPromises);
 	return results.flat();
 }
 
-function isIssueCommentCreatedEvent(
-	payload: unknown,
-	event: string,
-): payload is IssueCommentCreatedEvent {
-	return (
-		event === "issue_comment" &&
-		typeof payload === "object" &&
-		payload !== null &&
-		"action" in payload &&
-		payload.action === "created"
-	);
-}
+async function processIntegration(
+	setting: WorkspaceGitHubIntegrationSetting,
+	gitHubEvent: GitHubEvent,
+	command: Command | null,
+	repository: { owner: string; name: string; nodeId: string },
+	context: GiselleEngineContext,
+	options?: HandleGitHubWebhookOptions,
+): Promise<HandleGitHubWebhookResult[]> {
+	await handleReaction(gitHubEvent, options);
 
-type PayloadValue<TField extends WorkspaceGitHubIntegrationPayloadField> =
-	TField extends
-		| "github.issue_comment.issue.number"
-		| "github.pull_request_comment.pull_request.number"
-		? number
-		: string;
-
-async function getPayloadValue<
-	TField extends WorkspaceGitHubIntegrationPayloadField,
->(
-	event: string,
-	payload: unknown,
-	field: TField,
-	command?: string,
-	diff?: PullRequestDiffFn,
-): Promise<PayloadValue<TField>> {
-	if (isIssueCommentCreatedEvent(payload, event)) {
-		switch (field) {
-			case "github.pull_request_comment.pull_request.title":
-			case "github.issue_comment.issue.title":
-				return payload.issue.title as PayloadValue<TField>;
-			case "github.pull_request_comment.pull_request.diff":
-				return ((await diff?.(
-					payload.repository.owner.login,
-					payload.repository.name,
-					payload.issue.number,
-				)) ?? "") as PayloadValue<TField>;
-			case "github.pull_request_comment.pull_request.body":
-			case "github.issue_comment.issue.body":
-				return (payload.issue.body ?? "") as PayloadValue<TField>;
-			case "github.issue_comment.body":
-			case "github.pull_request_comment.body":
-				return (command ?? "") as PayloadValue<TField>;
-			case "github.issue_comment.issue.number":
-			case "github.pull_request_comment.pull_request.number":
-				return payload.issue.number as PayloadValue<TField>;
-			case "github.issue_comment.issue.repository.owner":
-			case "github.pull_request_comment.pull_request.repository.owner":
-				return payload.repository.owner.login as PayloadValue<TField>;
-			case "github.pull_request_comment.pull_request.repository.name":
-			case "github.issue_comment.issue.repository.name":
-				return payload.repository.name as PayloadValue<TField>;
+	const overrideNodes: OverrideNode[] = [];
+	const workspace = await getWorkspace({
+		context: context,
+		workspaceId: setting.workspaceId,
+	});
+	for (const payloadMap of setting.payloadMaps) {
+		const node = workspace.nodes.find((node) => node.id === payloadMap.nodeId);
+		if (node === undefined) {
+			continue;
+		}
+		const payloadValue = await getPayloadValue(
+			gitHubEvent,
+			payloadMap.payload,
+			command?.content,
+			options?.pullRequestDiff,
+		);
+		switch (node.content.type) {
+			case "textGeneration":
+				overrideNodes.push({
+					id: node.id,
+					type: "action",
+					content: {
+						type: node.content.type,
+						prompt: `${payloadValue}`,
+					},
+				});
+				break;
+			case "imageGeneration":
+				overrideNodes.push({
+					id: node.id,
+					type: "action",
+					content: {
+						type: node.content.type,
+						prompt: `${payloadValue}`,
+					},
+				});
+				break;
+			case "file":
+				throw new Error("File nodes are not supported");
+			case "text":
+				overrideNodes.push({
+					id: node.id,
+					type: "variable",
+					content: {
+						type: node.content.type,
+						text: `${payloadValue}`,
+					},
+				});
+				break;
+			case "github":
+				throw new Error("GitHub nodes are not supported");
 			default: {
-				const _exhaustiveCheck: never = field;
-				throw new Error(`Unhandled field type: ${_exhaustiveCheck}`);
+				const _exhaustiveCheck: never = node.content;
+				throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
 			}
 		}
 	}
-	throw new Error(`Unhandled event type: ${event}`);
+	const workflows = workspace.editingWorkflows.filter((workflow) =>
+		workflow.jobs.some((job) =>
+			job.actions.some((action) =>
+				overrideNodes.some(
+					(overrideNode) =>
+						overrideNode.id === action.node.id ||
+						action.generationTemplate.sourceNodes.some(
+							(sourceNode) => sourceNode.id === overrideNode.id,
+						),
+				),
+			),
+		),
+	);
+	const results = await Promise.all(
+		workflows.map((workflow) =>
+			runApi({
+				context,
+				workspaceId: workspace.id,
+				workflowId: workflow.id,
+				overrideNodes,
+			}).catch((error: unknown) => {
+				throw new WorkflowError(
+					`Failed to run workflow: ${error}`,
+					workspace.id,
+					workflow.id,
+					{ cause: error },
+				);
+			}),
+		),
+	);
+
+	const webhookResults: HandleGitHubWebhookResult[] = [];
+	for (const result of results) {
+		for (const resultText of result) {
+			switch (setting.nextAction) {
+				case "github.pull_request_comment.create": {
+					webhookResults.push({
+						action: "github.pull_request_comment.create",
+						pullRequest: {
+							repo: {
+								owner: repository.owner,
+								name: repository.name,
+							},
+							// GitHub treats pull requests as issues, so we use the `issue.number` for the pull request.
+							number: gitHubEvent.payload.issue.number,
+						},
+						content: resultText,
+					});
+					break;
+				}
+				case "github.issue_comment.create": {
+					webhookResults.push({
+						action: "github.issue_comment.create",
+						issue: {
+							repo: {
+								owner: repository.owner,
+								name: repository.name,
+							},
+							number: gitHubEvent.payload.issue.number,
+						},
+						content: resultText,
+					});
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = setting.nextAction;
+					throw new Error(`Unhandled action type: ${_exhaustiveCheck}`);
+				}
+			}
+		}
+	}
+	return webhookResults;
 }
 
-function getRepositoryNodeId(event: string, payload: unknown) {
-	if (isIssueCommentCreatedEvent(payload, event)) {
-		return payload.repository.node_id;
+export function isMatchingIntegrationSetting(
+	setting: WorkspaceGitHubIntegrationSetting,
+	event: GitHubEvent,
+	command: Command | null,
+): boolean {
+	switch (setting.event) {
+		case "github.issue_comment.created":
+		case "github.pull_request_comment.created":
+			return (
+				event.type === GitHubEventType.ISSUE_COMMENT_CREATED &&
+				setting.callsign !== null &&
+				setting.callsign === command?.callsign
+			);
+		case "github.issues.opened":
+			return event.type === GitHubEventType.ISSUES_OPENED;
+		case "github.issues.closed":
+			return event.type === GitHubEventType.ISSUES_CLOSED;
+		default: {
+			const _exhaustiveCheck: never = setting.event;
+			throw new Error(`Unhandled setting event type: ${_exhaustiveCheck}`);
+		}
 	}
-	throw new Error(`Unhandled event type: ${event}`);
-}
-function getRepositoryOwnerNameNodeId(event: string, payload: unknown) {
-	if (isIssueCommentCreatedEvent(payload, event)) {
-		return {
-			owner: payload.repository.owner.login,
-			name: payload.repository.name,
-			nodeId: payload.repository.node_id,
-		};
-	}
-	throw new Error(`Unhandled event type: ${event}`);
 }
 
-function parseCommand(event: string, payload: unknown) {
-	if (isIssueCommentCreatedEvent(payload, event)) {
-		return parseCommandInternal(payload.comment.body);
+async function handleReaction(
+	event: GitHubEvent,
+	options?: HandleGitHubWebhookOptions,
+) {
+	switch (event.type) {
+		case GitHubEventType.ISSUE_COMMENT_CREATED:
+			await options?.addReactionToComment?.(
+				event.payload.repository.owner.login,
+				event.payload.repository.name,
+				event.payload.comment.id,
+			);
+			break;
+		case GitHubEventType.ISSUES_OPENED:
+		case GitHubEventType.ISSUES_CLOSED:
+			if (options?.addReactionToIssue) {
+				await options.addReactionToIssue(
+					event.payload.repository.owner.login,
+					event.payload.repository.name,
+					event.payload.issue.number,
+				);
+			}
+			break;
+		default: {
+			const _exhaustiveCheck: never = event;
+			throw new Error(`Unhandled event type for reaction: ${_exhaustiveCheck}`);
+		}
 	}
-	throw new Error(`Unhandled event type: ${event}`);
+}
+
+async function getPayloadValue(
+	event: GitHubEvent,
+	field: WorkspaceGitHubIntegrationPayloadField,
+	command?: string,
+	diff?: PullRequestDiffFn,
+): Promise<string | number> {
+	switch (event.type) {
+		case GitHubEventType.ISSUE_COMMENT_CREATED:
+			switch (field) {
+				case "github.pull_request_comment.pull_request.title":
+				case "github.issue_comment.issue.title":
+					return event.payload.issue.title;
+				case "github.pull_request_comment.pull_request.diff": {
+					if (event.payload.issue.pull_request == null) {
+						throw new Error(
+							"Attempted to get diff for non-pull-request issue comment",
+						);
+					}
+					const diffResult = await diff?.(
+						event.payload.repository.owner.login,
+						event.payload.repository.name,
+						event.payload.issue.number,
+					);
+					return diffResult ?? "";
+				}
+				case "github.pull_request_comment.pull_request.body":
+				case "github.issue_comment.issue.body":
+					return event.payload.issue.body ?? "";
+				case "github.issue_comment.body":
+				case "github.pull_request_comment.body":
+					return command ?? "";
+				case "github.issue_comment.issue.number":
+				case "github.pull_request_comment.pull_request.number":
+					return event.payload.issue.number;
+				case "github.issue_comment.issue.repository.owner":
+				case "github.pull_request_comment.pull_request.repository.owner":
+					return event.payload.repository.owner.login;
+				case "github.pull_request_comment.pull_request.repository.name":
+				case "github.issue_comment.issue.repository.name":
+					return event.payload.repository.name;
+				default: {
+					throw new Error(
+						`Unhandled field type: ${field} for event ${event.type}`,
+					);
+				}
+			}
+
+		case GitHubEventType.ISSUES_OPENED:
+		case GitHubEventType.ISSUES_CLOSED:
+			switch (field) {
+				case "github.issues.title":
+					return event.payload.issue.title;
+				case "github.issues.body":
+					return event.payload.issue.body ?? "";
+				default: {
+					throw new Error(
+						`Unhandled field type: ${field} for event ${event.type}`,
+					);
+				}
+			}
+
+		default: {
+			const _exhaustiveCheckEvent: never = event;
+			throw new Error(`Unhandled event type: ${_exhaustiveCheckEvent}`);
+		}
+	}
+}
+
+function getRepositoryInfo(event: GitHubEvent) {
+	return {
+		owner: event.payload.repository.owner.login,
+		name: event.payload.repository.name,
+		nodeId: event.payload.repository.node_id,
+	};
+}
+
+function parseCommandFromEvent(event: GitHubEvent): Command | null {
+	if (event.type !== GitHubEventType.ISSUE_COMMENT_CREATED) {
+		return null;
+	}
+	return parseCommandInternal(event.payload.comment.body);
 }

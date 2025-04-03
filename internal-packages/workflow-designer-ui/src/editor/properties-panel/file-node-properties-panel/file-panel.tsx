@@ -19,7 +19,12 @@ export type FileTypeConfig = {
 	maxSize?: number;
 };
 
-const defaultMaxSize = 1024 * 1024 * 20;
+/**
+ * Hard limit to upload file since Vercel Serverless Functions have a 4.5MB body size limit
+ * @see https://vercel.com/guides/how-to-bypass-vercel-body-size-limit-serverless-functions#measure-response-body-size
+ * @todo implement streaming or alternative solution to support larger files (up to 20MB)
+ */
+const defaultMaxSize = 1024 * 1024 * 4.5;
 
 type FilePanelProps = {
 	node: FileNode;
