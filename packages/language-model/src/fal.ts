@@ -1,3 +1,4 @@
+import type { Result } from "@fal-ai/client";
 import { z } from "zod";
 import { Capability, LanguageModelBase } from "./base";
 
@@ -170,18 +171,17 @@ export function createUsageCalculator(modelId: string): UsageCalculator {
 	}
 }
 
-export interface FalImageResult {
-	data: {
-		images: FalImage[];
-		timings: {
-			inference: number;
-		};
-		seed: number;
-		has_nsfw_concepts: boolean[];
-		prompt: string;
+interface FalImageData {
+	images: FalImage[];
+	timings: {
+		inference: number;
 	};
-	requestId: string;
+	seed: number;
+	has_nsfw_concepts: boolean[];
+	prompt: string;
 }
+
+export type FalImageResult = Result<FalImageData>;
 
 export interface GeneratedImageData {
 	uint8Array: Uint8Array;
