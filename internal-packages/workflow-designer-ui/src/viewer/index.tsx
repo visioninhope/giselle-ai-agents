@@ -128,28 +128,21 @@ export function Viewer() {
 															<Dialog.Title className="sr-only">
 																Override inputs to test workflow
 															</Dialog.Title>
-															<div className="flex justify-between items-center mb-[24px]">
-																<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
-																	Override inputs to test workflow
-																</h2>
-																<div className="flex gap-[12px]">
-																	<Dialog.Close asChild>
+															{/* <Dialog.Close asChild>
 																		<button
 																			type="button"
 																			className="text-white-400 hover:text-white-900"
 																		>
 																			<X className="size-[20px]" />
 																		</button>
-																	</Dialog.Close>
-																	{/* <Button
+																	</Dialog.Close> */}
+															{/* <Button
 																		type="button"
 																		className="bg-primary-900 hover:bg-primary-800"
 																		onClick={handleRunWithOverride}
 																	>
 																		Run with override
 																	</Button> */}
-																</div>
-															</div>
 															<RunWithOverrideParamsForm flow={flow} />
 														</Dialog.Content>
 													</Dialog.Portal>

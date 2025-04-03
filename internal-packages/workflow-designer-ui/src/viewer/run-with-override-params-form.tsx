@@ -39,53 +39,63 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 		[flow.id, perform, overrideVariableNodes],
 	);
 	return (
-		<form
-			className="flex flex-col gap-[24px] relative text-white-800"
-			onSubmit={handleSubmit}
-		>
-			<p className="font-accent text-[16px] font-bold text-white-400">
-				Run app with override parameters
-			</p>
-			<div className="flex flex-col gap-[16px]">
-				{overrideVariableNodes?.map((overrideNode) => {
-					if (!isOverrideTextContent(overrideNode.content)) {
-						return null;
-					}
-					const originalNode = flow.nodes.find(
-						(node) => node.id === overrideNode.id,
-					);
-					if (originalNode === undefined) {
-						return null;
-					}
-					return (
-						<fieldset className="flex gap-[8px] w-full" key={overrideNode.id}>
-							<p className="w-[100px] text-[14px] font-bold text-white-400">
-								{originalNode.name ?? "Plain Text"}
-							</p>
-							<TextEditor
-								value={overrideNode.content.text}
-								onValueChange={(value) => {
-									setOverrideVariableNodes((prevOverrideVariableNodes) =>
-										prevOverrideVariableNodes.map((prevOverrideVariableNode) =>
-											prevOverrideVariableNode.id === overrideNode.id
-												? {
-														id: prevOverrideVariableNode.id,
-														type: prevOverrideVariableNode.type,
-														content: {
-															type: "text",
-															text: value,
-														},
-													}
-												: prevOverrideVariableNode,
-										),
-									);
-								}}
-							/>
-						</fieldset>
-					);
-				})}
+		<div className="flex flex-col h-full">
+			<div className="flex justify-between items-center mb-[24px]">
+				<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
+					Override inputs to test workflow
+				</h2>
 			</div>
-			<Button type="submit">Run with params</Button>
-		</form>
+			<form
+				className="flex-1 flex flex-col gap-[24px] relative text-white-800"
+				onSubmit={handleSubmit}
+			>
+				<div className="flex flex-col gap-[16px] flex-1">
+					{overrideVariableNodes?.map((overrideNode) => {
+						if (!isOverrideTextContent(overrideNode.content)) {
+							return null;
+						}
+						const originalNode = flow.nodes.find(
+							(node) => node.id === overrideNode.id,
+						);
+						if (originalNode === undefined) {
+							return null;
+						}
+						return (
+							<fieldset
+								className="flex gap-[8px] w-full h-full"
+								key={overrideNode.id}
+							>
+								<p className="w-[100px] text-[14px] font-bold text-white-400">
+									{originalNode.name ?? "Plain Text"}
+								</p>
+								<TextEditor
+									value={overrideNode.content.text}
+									onValueChange={(value) => {
+										setOverrideVariableNodes((prevOverrideVariableNodes) =>
+											prevOverrideVariableNodes.map(
+												(prevOverrideVariableNode) =>
+													prevOverrideVariableNode.id === overrideNode.id
+														? {
+																id: prevOverrideVariableNode.id,
+																type: prevOverrideVariableNode.type,
+																content: {
+																	type: "text",
+																	text: value,
+																},
+															}
+														: prevOverrideVariableNode,
+											),
+										);
+									}}
+								/>
+							</fieldset>
+						);
+					})}
+				</div>
+				<div className="flex justify-end">
+					<Button type="submit">Run with params</Button>
+				</div>
+			</form>
+		</div>
 	);
 }
