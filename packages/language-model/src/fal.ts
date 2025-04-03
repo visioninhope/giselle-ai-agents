@@ -125,21 +125,22 @@ export function getImageGenerationModelProvider(
 	return undefined;
 }
 
+export interface FalImage {
+	url: string;
+	width: number;
+	height: number;
+	content_type: string;
+}
+
 export interface UsageCalculator {
-	calculateUsage(
-		images: Array<{
-			width: number;
-			height: number;
-			content_type: string;
-		}>,
-	): {
+	calculateUsage(images: FalImage[]): {
 		output: number;
 		unit: "IMAGES";
 	};
 }
 
 export class PixelBasedUsageCalculator implements UsageCalculator {
-	calculateUsage(images: Array<{ width: number; height: number }>) {
+	calculateUsage(images: FalImage[]) {
 		const totalPixels = images.reduce(
 			(sum, image) => sum + image.height * image.width,
 			0,
@@ -152,7 +153,7 @@ export class PixelBasedUsageCalculator implements UsageCalculator {
 }
 
 export class ImageCountBasedUsageCalculator implements UsageCalculator {
-	calculateUsage(images: Array<{ content_type: string }>) {
+	calculateUsage(images: FalImage[]) {
 		return {
 			output: images.length,
 			unit: "IMAGES" as const,
@@ -171,12 +172,7 @@ export function createUsageCalculator(modelId: string): UsageCalculator {
 
 export interface FalImageResult {
 	data: {
-		images: Array<{
-			url: string;
-			width: number;
-			height: number;
-			content_type: string;
-		}>;
+		images: FalImage[];
 		timings: {
 			inference: number;
 		};
