@@ -9,18 +9,24 @@ import {
 	type Output,
 	OutputId,
 	type UIState,
-	Workspace,
+	type Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
+import type { Storage } from "unstorage";
 import type { GiselleEngineContext } from "../types";
-import templateJson from "./sample.json";
-import { setWorkspace } from "./utils";
+import { getWorkspace, setWorkspace } from "./utils";
 
 export async function createSampleWorkspace(args: {
 	context: GiselleEngineContext;
 }) {
-	const templateWorkspace = Workspace.parse(templateJson);
+	if (!args.context.sampleAppWorkspaceId) {
+		throw new Error("sampleAppWorkspaceId is required");
+	}
+	const templateWorkspace = await getWorkspace({
+		storage: args.context.storage,
+		workspaceId: args.context.sampleAppWorkspaceId,
+	});
 	const idMap = new Map<string, string>();
 	const newNodes: Node[] = [];
 	for (const templateNode of templateWorkspace.nodes) {
@@ -106,17 +112,60 @@ export async function createSampleWorkspace(args: {
 	);
 	const newWorkspaceId = WorkspaceId.generate();
 	const newWorkspace = {
+		...templateWorkspace,
 		id: newWorkspaceId,
-		schemaVersion: templateWorkspace.schemaVersion,
-		nodes: newNodes,
-		connections: newConnections,
-		editingWorkflows: workflows,
-		ui: newUi,
+		//
+		// I wanted to re-assign new IDs to all copied Nodes, Inputs, Outputs, and Connections.
+		// However, doing so would require updating the information embedded in the prompt,
+		// which would be a bit complicated. So, for now, I'm leaving the IDs as they are.
+		// Since the workspace ID is different, each element can still be uniquely identified.
+		// Also, nothing is globally identified based on the node or input ID, so it shouldn't cause any problems.
+		//
+		// schemaVersion: templateWorkspace.schemaVersion,
+		// nodes: newNodes,
+		// connections: newConnections,
+		// editingWorkflows: workflows,
+		// ui: newUi,
 	} satisfies Workspace;
-	await setWorkspace({
-		storage: args.context.storage,
-		workspaceId: newWorkspaceId,
-		workspace: newWorkspace,
-	});
+	await Promise.all([
+		setWorkspace({
+			storage: args.context.storage,
+			workspaceId: newWorkspaceId,
+			workspace: newWorkspace,
+		}),
+		copyFiles({
+			storage: args.context.storage,
+			templateWorkspaceId: templateWorkspace.id,
+			newWorkspaceId,
+		}),
+	]);
 	return newWorkspace;
+}
+
+/** @todo update new fileId for each file */
+async function copyFiles({
+	storage,
+	templateWorkspaceId,
+	newWorkspaceId,
+}: {
+	storage: Storage;
+	templateWorkspaceId: WorkspaceId;
+	newWorkspaceId: WorkspaceId;
+}) {
+	const fileKeys = await storage.getKeys(
+		`workspaces/${templateWorkspaceId}/files`,
+	);
+
+	await Promise.all(
+		fileKeys.map(async (fileKey) => {
+			const file = await storage.getItemRaw(fileKey);
+			await storage.setItemRaw(
+				fileKey.replace(
+					/workspaces:wrks-\w+:files:/,
+					`workspaces:${newWorkspaceId}:files:`,
+				),
+				file,
+			);
+		}),
+	);
 }
