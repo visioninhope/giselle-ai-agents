@@ -1,7 +1,6 @@
 import {
 	type OverrideVariableNode,
 	type Workflow,
-	isOverrideTextContent,
 	isTextNode,
 } from "@giselle-sdk/data-type";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
