@@ -113,8 +113,13 @@ export const SourceExtensionReact = SourceExtension.extend<
 						return false;
 					}
 
+					const node = findRelatedNode(this.options, nodeId, outputId);
+					if (!node) {
+						return false;
+					}
+
 					return {
-						node: findRelatedNode(this.options, nodeId, outputId),
+						node,
 						outputId,
 					};
 				},
