@@ -5,12 +5,10 @@ import { putGraph } from "@giselles-ai/actions";
 import { WilliIcon } from "@giselles-ai/icons/willi";
 import { initGraph } from "@giselles-ai/lib/utils";
 import { createId } from "@paralleldrive/cuid2";
-import { Clock, User } from "lucide-react";
-import Link from "next/link";
+import { BookIcon, Clock } from "lucide-react";
 import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { giselleEngine } from "../../giselle-engine";
-import { CreateAgentButton } from "./components";
 import { NavigationItem } from "./components/navigation-item";
 
 export default function Layout({
@@ -47,7 +45,7 @@ export default function Layout({
 							type="submit"
 							className="w-full bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer"
 						>
-							Create new
+							New App +
 						</button>
 					</form>
 				</div>
@@ -66,6 +64,13 @@ export default function Layout({
 						href="/apps/myapps"
 						icon={<WilliIcon className="w-5 h-5 fill-current" />}
 						label="My Apps"
+					/>
+
+					<NavigationItem
+						href="https://docs.giselles.ai/"
+						icon={<BookIcon className="w-5 h-5" />}
+						label="Guide"
+						openInNewTab={true}
 					/>
 				</div>
 			</div>

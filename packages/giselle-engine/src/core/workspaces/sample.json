@@ -1,0 +1,760 @@
+{
+	"id": "wrks-2vtPReeTydeHhnt2",
+	"schemaVersion": "20250221",
+	"nodes": [
+		{
+			"id": "nd-YEHT9LfVCzD8ptOF",
+			"name": "Theme",
+			"type": "variable",
+			"inputs": [],
+			"outputs": [
+				{ "id": "otp-wH8Y4zRfV2J25JqN", "label": "Output", "accessor": "text" }
+			],
+			"content": {
+				"type": "text",
+				"text": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Nintend Switch 2\"}]}]}"
+			}
+		},
+		{
+			"id": "nd-yXv077tpf0Qyu2Up",
+			"name": "General",
+			"type": "action",
+			"inputs": [{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }],
+			"outputs": [
+				{
+					"id": "otp-yH6LXD6hACxefTX1",
+					"label": "Output",
+					"accessor": "generated-text"
+				},
+				{
+					"id": "otp-MtLjbdjrdsBhDPPb",
+					"label": "Source",
+					"accessor": "source"
+				}
+			],
+			"content": {
+				"type": "textGeneration",
+				"llm": {
+					"provider": "perplexity",
+					"id": "sonar",
+					"configurations": {
+						"temperature": 0.2,
+						"topP": 0.9,
+						"presencePenalty": 0,
+						"frequencyPenalty": 1
+					}
+				},
+				"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+			}
+		},
+		{
+			"id": "nd-dOwSEkCqfWQrFfVA",
+			"name": "Deep",
+			"type": "action",
+			"inputs": [{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }],
+			"outputs": [
+				{
+					"id": "otp-0j5vNfTisuDap3WX",
+					"label": "Output",
+					"accessor": "generated-text"
+				},
+				{
+					"id": "otp-LEFodQFkrDUBnADV",
+					"label": "Source",
+					"accessor": "source"
+				}
+			],
+			"content": {
+				"type": "textGeneration",
+				"llm": {
+					"provider": "perplexity",
+					"id": "sonar",
+					"configurations": {
+						"temperature": 0.2,
+						"topP": 0.9,
+						"presencePenalty": 0,
+						"frequencyPenalty": 1
+					}
+				},
+				"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+			}
+		},
+		{
+			"id": "nd-mvMUjXb2pmcQLzpu",
+			"type": "action",
+			"inputs": [
+				{ "id": "inp-JIBR0Ssn0MWzlNak", "label": "Input" },
+				{ "id": "inp-Jmtp6iHGoKaMIoBM", "label": "Input" },
+				{ "id": "inp-QvbJ0jj6n5i9hMbJ", "label": "Input" },
+				{ "id": "inp-wPrCO9FxBGfg6bVc", "label": "Input" },
+				{ "id": "inp-ZQUNirmldHpCgTze", "label": "Input" }
+			],
+			"outputs": [
+				{
+					"id": "otp-lS3pkynz3cZcuHdL",
+					"label": "Output",
+					"accessor": "generated-text"
+				}
+			],
+			"content": {
+				"type": "textGeneration",
+				"llm": {
+					"provider": "anthropic",
+					"id": "claude-3-5-haiku-20241022",
+					"configurations": { "temperature": 0.7, "topP": 1 }
+				},
+				"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\" \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について概要とディープな情報を用意しました。これらを使って \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" に関するレポートを作成してください。参照元がある場合はそれをリンクとして記載してください。\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-yH6LXD6hACxefTX1\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-MtLjbdjrdsBhDPPb\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-0j5vNfTisuDap3WX\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-LEFodQFkrDUBnADV\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報のソース>\"}]}]}"
+			}
+		}
+	],
+	"connections": [
+		{
+			"id": "cnnc-iVr5LbyEv81y7C1A",
+			"outputNode": {
+				"id": "nd-YEHT9LfVCzD8ptOF",
+				"type": "variable",
+				"content": { "type": "text" }
+			},
+			"outputId": "otp-wH8Y4zRfV2J25JqN",
+			"inputNode": {
+				"id": "nd-yXv077tpf0Qyu2Up",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-IuN21slXRRvZO3W9"
+		},
+		{
+			"id": "cnnc-BBsZkhroDPPugRJT",
+			"outputNode": {
+				"id": "nd-YEHT9LfVCzD8ptOF",
+				"type": "variable",
+				"content": { "type": "text" }
+			},
+			"outputId": "otp-wH8Y4zRfV2J25JqN",
+			"inputNode": {
+				"id": "nd-dOwSEkCqfWQrFfVA",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-mVG087TtTvAtKY4l"
+		},
+		{
+			"id": "cnnc-HV1s2Aiyj9TGoqw1",
+			"outputNode": {
+				"id": "nd-yXv077tpf0Qyu2Up",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"outputId": "otp-yH6LXD6hACxefTX1",
+			"inputNode": {
+				"id": "nd-mvMUjXb2pmcQLzpu",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-JIBR0Ssn0MWzlNak"
+		},
+		{
+			"id": "cnnc-ZEXe16Hl9V1W42En",
+			"outputNode": {
+				"id": "nd-yXv077tpf0Qyu2Up",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"outputId": "otp-MtLjbdjrdsBhDPPb",
+			"inputNode": {
+				"id": "nd-mvMUjXb2pmcQLzpu",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-Jmtp6iHGoKaMIoBM"
+		},
+		{
+			"id": "cnnc-8WPE6p0TbPiEolAj",
+			"outputNode": {
+				"id": "nd-dOwSEkCqfWQrFfVA",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"outputId": "otp-0j5vNfTisuDap3WX",
+			"inputNode": {
+				"id": "nd-mvMUjXb2pmcQLzpu",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-QvbJ0jj6n5i9hMbJ"
+		},
+		{
+			"id": "cnnc-Z2rfKB15hv0W0Q9J",
+			"outputNode": {
+				"id": "nd-dOwSEkCqfWQrFfVA",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"outputId": "otp-LEFodQFkrDUBnADV",
+			"inputNode": {
+				"id": "nd-mvMUjXb2pmcQLzpu",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-wPrCO9FxBGfg6bVc"
+		},
+		{
+			"id": "cnnc-djDBVteN8wujoG7D",
+			"outputNode": {
+				"id": "nd-YEHT9LfVCzD8ptOF",
+				"type": "variable",
+				"content": { "type": "text" }
+			},
+			"outputId": "otp-wH8Y4zRfV2J25JqN",
+			"inputNode": {
+				"id": "nd-mvMUjXb2pmcQLzpu",
+				"type": "action",
+				"content": { "type": "textGeneration" }
+			},
+			"inputId": "inp-ZQUNirmldHpCgTze"
+		}
+	],
+	"ui": {
+		"nodeState": {
+			"nd-yXv077tpf0Qyu2Up": {
+				"position": { "x": 464, "y": 186 },
+				"selected": false,
+				"tab": "prompt"
+			},
+			"nd-YEHT9LfVCzD8ptOF": {
+				"position": { "x": 132, "y": 187 },
+				"selected": false
+			},
+			"nd-dOwSEkCqfWQrFfVA": {
+				"position": { "x": 465, "y": 375 },
+				"selected": false
+			},
+			"nd-mvMUjXb2pmcQLzpu": {
+				"position": { "x": 796, "y": 184 },
+				"selected": true,
+				"tab": "prompt"
+			}
+		},
+		"viewport": { "x": -257, "y": -54, "zoom": 1 }
+	},
+	"editingWorkflows": [
+		{
+			"id": "wf-zfLVQEJrtaqFxTnU",
+			"jobs": [
+				{
+					"id": "jb-BFWDvmlm7OQDxLVW",
+					"workflowId": "wf-YIUkxpSBrKiUjIWe",
+					"actions": [
+						{
+							"node": {
+								"id": "nd-yXv077tpf0Qyu2Up",
+								"name": "General",
+								"type": "action",
+								"inputs": [{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }],
+								"outputs": [
+									{
+										"id": "otp-yH6LXD6hACxefTX1",
+										"label": "Output",
+										"accessor": "generated-text"
+									},
+									{
+										"id": "otp-MtLjbdjrdsBhDPPb",
+										"label": "Source",
+										"accessor": "source"
+									}
+								],
+								"content": {
+									"type": "textGeneration",
+									"llm": {
+										"provider": "perplexity",
+										"id": "sonar",
+										"configurations": {
+											"temperature": 0.2,
+											"topP": 0.9,
+											"presencePenalty": 0,
+											"frequencyPenalty": 1
+										}
+									},
+									"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+								}
+							},
+							"generationTemplate": {
+								"actionNode": {
+									"id": "nd-yXv077tpf0Qyu2Up",
+									"name": "General",
+									"type": "action",
+									"inputs": [
+										{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }
+									],
+									"outputs": [
+										{
+											"id": "otp-yH6LXD6hACxefTX1",
+											"label": "Output",
+											"accessor": "generated-text"
+										},
+										{
+											"id": "otp-MtLjbdjrdsBhDPPb",
+											"label": "Source",
+											"accessor": "source"
+										}
+									],
+									"content": {
+										"type": "textGeneration",
+										"llm": {
+											"provider": "perplexity",
+											"id": "sonar",
+											"configurations": {
+												"temperature": 0.2,
+												"topP": 0.9,
+												"presencePenalty": 0,
+												"frequencyPenalty": 1
+											}
+										},
+										"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+									}
+								},
+								"sourceNodes": [
+									{
+										"id": "nd-YEHT9LfVCzD8ptOF",
+										"name": "Theme",
+										"type": "variable",
+										"inputs": [],
+										"outputs": [
+											{
+												"id": "otp-wH8Y4zRfV2J25JqN",
+												"label": "Output",
+												"accessor": "text"
+											}
+										],
+										"content": {
+											"type": "text",
+											"text": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Nintend Switch 2\"}]}]}"
+										}
+									}
+								]
+							}
+						},
+						{
+							"node": {
+								"id": "nd-dOwSEkCqfWQrFfVA",
+								"name": "Deep",
+								"type": "action",
+								"inputs": [{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }],
+								"outputs": [
+									{
+										"id": "otp-0j5vNfTisuDap3WX",
+										"label": "Output",
+										"accessor": "generated-text"
+									},
+									{
+										"id": "otp-LEFodQFkrDUBnADV",
+										"label": "Source",
+										"accessor": "source"
+									}
+								],
+								"content": {
+									"type": "textGeneration",
+									"llm": {
+										"provider": "perplexity",
+										"id": "sonar",
+										"configurations": {
+											"temperature": 0.2,
+											"topP": 0.9,
+											"presencePenalty": 0,
+											"frequencyPenalty": 1
+										}
+									},
+									"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+								}
+							},
+							"generationTemplate": {
+								"actionNode": {
+									"id": "nd-dOwSEkCqfWQrFfVA",
+									"name": "Deep",
+									"type": "action",
+									"inputs": [
+										{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }
+									],
+									"outputs": [
+										{
+											"id": "otp-0j5vNfTisuDap3WX",
+											"label": "Output",
+											"accessor": "generated-text"
+										},
+										{
+											"id": "otp-LEFodQFkrDUBnADV",
+											"label": "Source",
+											"accessor": "source"
+										}
+									],
+									"content": {
+										"type": "textGeneration",
+										"llm": {
+											"provider": "perplexity",
+											"id": "sonar",
+											"configurations": {
+												"temperature": 0.2,
+												"topP": 0.9,
+												"presencePenalty": 0,
+												"frequencyPenalty": 1
+											}
+										},
+										"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+									}
+								},
+								"sourceNodes": [
+									{
+										"id": "nd-YEHT9LfVCzD8ptOF",
+										"name": "Theme",
+										"type": "variable",
+										"inputs": [],
+										"outputs": [
+											{
+												"id": "otp-wH8Y4zRfV2J25JqN",
+												"label": "Output",
+												"accessor": "text"
+											}
+										],
+										"content": {
+											"type": "text",
+											"text": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Nintend Switch 2\"}]}]}"
+										}
+									}
+								]
+							}
+						}
+					]
+				},
+				{
+					"id": "jb-R7RtVvIV45KUsweu",
+					"workflowId": "wf-YIUkxpSBrKiUjIWe",
+					"actions": [
+						{
+							"node": {
+								"id": "nd-mvMUjXb2pmcQLzpu",
+								"type": "action",
+								"inputs": [
+									{ "id": "inp-JIBR0Ssn0MWzlNak", "label": "Input" },
+									{ "id": "inp-Jmtp6iHGoKaMIoBM", "label": "Input" },
+									{ "id": "inp-QvbJ0jj6n5i9hMbJ", "label": "Input" },
+									{ "id": "inp-wPrCO9FxBGfg6bVc", "label": "Input" },
+									{ "id": "inp-ZQUNirmldHpCgTze", "label": "Input" }
+								],
+								"outputs": [
+									{
+										"id": "otp-lS3pkynz3cZcuHdL",
+										"label": "Output",
+										"accessor": "generated-text"
+									}
+								],
+								"content": {
+									"type": "textGeneration",
+									"llm": {
+										"provider": "anthropic",
+										"id": "claude-3-5-haiku-20241022",
+										"configurations": { "temperature": 0.7, "topP": 1 }
+									},
+									"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\" \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について概要とディープな情報を用意しました。これらを使って \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" に関するレポートを作成してください。参照元がある場合はそれをリンクとして記載してください。\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-yH6LXD6hACxefTX1\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-MtLjbdjrdsBhDPPb\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-0j5vNfTisuDap3WX\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-LEFodQFkrDUBnADV\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報のソース>\"}]}]}"
+								}
+							},
+							"generationTemplate": {
+								"actionNode": {
+									"id": "nd-mvMUjXb2pmcQLzpu",
+									"type": "action",
+									"inputs": [
+										{ "id": "inp-JIBR0Ssn0MWzlNak", "label": "Input" },
+										{ "id": "inp-Jmtp6iHGoKaMIoBM", "label": "Input" },
+										{ "id": "inp-QvbJ0jj6n5i9hMbJ", "label": "Input" },
+										{ "id": "inp-wPrCO9FxBGfg6bVc", "label": "Input" },
+										{ "id": "inp-ZQUNirmldHpCgTze", "label": "Input" }
+									],
+									"outputs": [
+										{
+											"id": "otp-lS3pkynz3cZcuHdL",
+											"label": "Output",
+											"accessor": "generated-text"
+										}
+									],
+									"content": {
+										"type": "textGeneration",
+										"llm": {
+											"provider": "anthropic",
+											"id": "claude-3-5-haiku-20241022",
+											"configurations": { "temperature": 0.7, "topP": 1 }
+										},
+										"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\" \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について概要とディープな情報を用意しました。これらを使って \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" に関するレポートを作成してください。参照元がある場合はそれをリンクとして記載してください。\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-yH6LXD6hACxefTX1\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-MtLjbdjrdsBhDPPb\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-0j5vNfTisuDap3WX\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-LEFodQFkrDUBnADV\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報のソース>\"}]}]}"
+									}
+								},
+								"sourceNodes": [
+									{
+										"id": "nd-yXv077tpf0Qyu2Up",
+										"name": "General",
+										"type": "action",
+										"inputs": [
+											{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }
+										],
+										"outputs": [
+											{
+												"id": "otp-yH6LXD6hACxefTX1",
+												"label": "Output",
+												"accessor": "generated-text"
+											},
+											{
+												"id": "otp-MtLjbdjrdsBhDPPb",
+												"label": "Source",
+												"accessor": "source"
+											}
+										],
+										"content": {
+											"type": "textGeneration",
+											"llm": {
+												"provider": "perplexity",
+												"id": "sonar",
+												"configurations": {
+													"temperature": 0.2,
+													"topP": 0.9,
+													"presencePenalty": 0,
+													"frequencyPenalty": 1
+												}
+											},
+											"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+										}
+									},
+									{
+										"id": "nd-yXv077tpf0Qyu2Up",
+										"name": "General",
+										"type": "action",
+										"inputs": [
+											{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }
+										],
+										"outputs": [
+											{
+												"id": "otp-yH6LXD6hACxefTX1",
+												"label": "Output",
+												"accessor": "generated-text"
+											},
+											{
+												"id": "otp-MtLjbdjrdsBhDPPb",
+												"label": "Source",
+												"accessor": "source"
+											}
+										],
+										"content": {
+											"type": "textGeneration",
+											"llm": {
+												"provider": "perplexity",
+												"id": "sonar",
+												"configurations": {
+													"temperature": 0.2,
+													"topP": 0.9,
+													"presencePenalty": 0,
+													"frequencyPenalty": 1
+												}
+											},
+											"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+										}
+									},
+									{
+										"id": "nd-dOwSEkCqfWQrFfVA",
+										"name": "Deep",
+										"type": "action",
+										"inputs": [
+											{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }
+										],
+										"outputs": [
+											{
+												"id": "otp-0j5vNfTisuDap3WX",
+												"label": "Output",
+												"accessor": "generated-text"
+											},
+											{
+												"id": "otp-LEFodQFkrDUBnADV",
+												"label": "Source",
+												"accessor": "source"
+											}
+										],
+										"content": {
+											"type": "textGeneration",
+											"llm": {
+												"provider": "perplexity",
+												"id": "sonar",
+												"configurations": {
+													"temperature": 0.2,
+													"topP": 0.9,
+													"presencePenalty": 0,
+													"frequencyPenalty": 1
+												}
+											},
+											"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+										}
+									},
+									{
+										"id": "nd-dOwSEkCqfWQrFfVA",
+										"name": "Deep",
+										"type": "action",
+										"inputs": [
+											{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }
+										],
+										"outputs": [
+											{
+												"id": "otp-0j5vNfTisuDap3WX",
+												"label": "Output",
+												"accessor": "generated-text"
+											},
+											{
+												"id": "otp-LEFodQFkrDUBnADV",
+												"label": "Source",
+												"accessor": "source"
+											}
+										],
+										"content": {
+											"type": "textGeneration",
+											"llm": {
+												"provider": "perplexity",
+												"id": "sonar",
+												"configurations": {
+													"temperature": 0.2,
+													"topP": 0.9,
+													"presencePenalty": 0,
+													"frequencyPenalty": 1
+												}
+											},
+											"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+										}
+									},
+									{
+										"id": "nd-YEHT9LfVCzD8ptOF",
+										"name": "Theme",
+										"type": "variable",
+										"inputs": [],
+										"outputs": [
+											{
+												"id": "otp-wH8Y4zRfV2J25JqN",
+												"label": "Output",
+												"accessor": "text"
+											}
+										],
+										"content": {
+											"type": "text",
+											"text": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Nintend Switch 2\"}]}]}"
+										}
+									}
+								]
+							}
+						}
+					]
+				}
+			],
+			"nodes": [
+				{
+					"id": "nd-yXv077tpf0Qyu2Up",
+					"name": "General",
+					"type": "action",
+					"inputs": [{ "id": "inp-IuN21slXRRvZO3W9", "label": "Input" }],
+					"outputs": [
+						{
+							"id": "otp-yH6LXD6hACxefTX1",
+							"label": "Output",
+							"accessor": "generated-text"
+						},
+						{
+							"id": "otp-MtLjbdjrdsBhDPPb",
+							"label": "Source",
+							"accessor": "source"
+						}
+					],
+					"content": {
+						"type": "textGeneration",
+						"llm": {
+							"provider": "perplexity",
+							"id": "sonar",
+							"configurations": {
+								"temperature": 0.2,
+								"topP": 0.9,
+								"presencePenalty": 0,
+								"frequencyPenalty": 1
+							}
+						},
+						"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について一般的な情報を網羅してください。何も知らない人に概要を3分くらいで説明できるくらいの分量がベストです。\"}]}]}"
+					}
+				},
+				{
+					"id": "nd-mvMUjXb2pmcQLzpu",
+					"type": "action",
+					"inputs": [
+						{ "id": "inp-JIBR0Ssn0MWzlNak", "label": "Input" },
+						{ "id": "inp-Jmtp6iHGoKaMIoBM", "label": "Input" },
+						{ "id": "inp-QvbJ0jj6n5i9hMbJ", "label": "Input" },
+						{ "id": "inp-wPrCO9FxBGfg6bVc", "label": "Input" },
+						{ "id": "inp-ZQUNirmldHpCgTze", "label": "Input" }
+					],
+					"outputs": [
+						{
+							"id": "otp-lS3pkynz3cZcuHdL",
+							"label": "Output",
+							"accessor": "generated-text"
+						}
+					],
+					"content": {
+						"type": "textGeneration",
+						"llm": {
+							"provider": "anthropic",
+							"id": "claude-3-5-haiku-20241022",
+							"configurations": { "temperature": 0.7, "topP": 1 }
+						},
+						"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\" \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について概要とディープな情報を用意しました。これらを使って \"},{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" に関するレポートを作成してください。参照元がある場合はそれをリンクとして記載してください。\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-yH6LXD6hACxefTX1\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-yXv077tpf0Qyu2Up\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-MtLjbdjrdsBhDPPb\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</概要のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-0j5vNfTisuDap3WX\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"<ディープな情報のソース>\"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-dOwSEkCqfWQrFfVA\",\"type\":\"action\",\"content\":{\"type\":\"textGeneration\"}},\"outputId\":\"otp-LEFodQFkrDUBnADV\"}},{\"type\":\"text\",\"text\":\" \"}]},{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"</ディープな情報のソース>\"}]}]}"
+					}
+				},
+				{
+					"id": "nd-YEHT9LfVCzD8ptOF",
+					"name": "Theme",
+					"type": "variable",
+					"inputs": [],
+					"outputs": [
+						{
+							"id": "otp-wH8Y4zRfV2J25JqN",
+							"label": "Output",
+							"accessor": "text"
+						}
+					],
+					"content": {
+						"type": "text",
+						"text": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"text\",\"text\":\"Nintend Switch 2\"}]}]}"
+					}
+				},
+				{
+					"id": "nd-dOwSEkCqfWQrFfVA",
+					"name": "Deep",
+					"type": "action",
+					"inputs": [{ "id": "inp-mVG087TtTvAtKY4l", "label": "Input" }],
+					"outputs": [
+						{
+							"id": "otp-0j5vNfTisuDap3WX",
+							"label": "Output",
+							"accessor": "generated-text"
+						},
+						{
+							"id": "otp-LEFodQFkrDUBnADV",
+							"label": "Source",
+							"accessor": "source"
+						}
+					],
+					"content": {
+						"type": "textGeneration",
+						"llm": {
+							"provider": "perplexity",
+							"id": "sonar",
+							"configurations": {
+								"temperature": 0.2,
+								"topP": 0.9,
+								"presencePenalty": 0,
+								"frequencyPenalty": 1
+							}
+						},
+						"prompt": "{\"type\":\"doc\",\"content\":[{\"type\":\"paragraph\",\"content\":[{\"type\":\"Source\",\"attrs\":{\"node\":{\"id\":\"nd-YEHT9LfVCzD8ptOF\",\"type\":\"variable\",\"content\":{\"type\":\"text\"}},\"outputId\":\"otp-wH8Y4zRfV2J25JqN\"}},{\"type\":\"text\",\"text\":\" について、Deepな観点で、調査をしてください。幅広く網羅する必要はないです。あまりニュースにはなっていないけど面白そうなトピックスについて深掘りしてください。\"}]}]}"
+					}
+				}
+			]
+		}
+	]
+}

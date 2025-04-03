@@ -36,6 +36,7 @@ import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
+	createSampleWorkspace,
 	createWorkspace,
 	getWorkspace,
 	updateWorkspace,
@@ -158,10 +159,14 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await handleWebhook({ context, github: args, options });
 		},
-		generateImage: async (generation: QueuedGeneration) => {
+		generateImage: async (
+			generation: QueuedGeneration,
+			telemetry?: TelemetrySettings,
+		) => {
 			return await generateImage({
 				context,
 				generation,
+				telemetry,
 			});
 		},
 		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
@@ -176,6 +181,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 				generation,
 			});
+		},
+		createSampleWorkspace: async () => {
+			return await createSampleWorkspace({ context });
 		},
 	};
 }
