@@ -34,7 +34,12 @@ import {
 } from "./github";
 import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
-import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
+import {
+	copyWorkspace,
+	createWorkspace,
+	getWorkspace,
+	updateWorkspace,
+} from "./workspaces";
 export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
 
@@ -48,6 +53,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
 	};
 	return {
+		copyWorkspace: async (workspaceId: WorkspaceId) => {
+			return await copyWorkspace({ context, workspaceId });
+		},
 		createWorkspace: async () => {
 			return await createWorkspace({ context });
 		},
