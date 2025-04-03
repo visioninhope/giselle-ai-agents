@@ -8,12 +8,13 @@ import {
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
 import {
-	ChevronDownIcon,
 	CircleCheckIcon,
 	CircleSlashIcon,
+	PencilIcon,
+	X,
 	XCircleIcon,
 } from "lucide-react";
-import { Popover, Tabs } from "radix-ui";
+import { Dialog, Tabs } from "radix-ui";
 import { useMemo, useState } from "react";
 import { useUsageLimitsReached } from "../hooks/usage-limits";
 import { SpinnerIcon, WilliIcon } from "../icons";
@@ -112,27 +113,36 @@ export function Viewer() {
 											</Button>
 											<div className="absolute right-0 pr-[8px] top-[50%] translate-y-[-50%] h-full flex items-center justify-center">
 												<div className="w-[1px] h-full border-l border-white-800/40 mr-[6px]" />
-												<Popover.Root>
-													<Popover.Trigger asChild>
+												<Dialog.Root>
+													<Dialog.Trigger asChild>
 														<button
 															type="button"
 															className="hover:bg-black-800/20 rounded-[4px]"
 														>
-															<ChevronDownIcon className="size-[18px]" />
+															<PencilIcon className="size-[18px]" />
 														</button>
-													</Popover.Trigger>
-													<Popover.Portal>
-														<Popover.Content
-															className="w-[360px] rounded bg-black-900/20 backdrop-blur-[8px] rounded-[8px] px-[16px] py-[16px]"
-															sideOffset={12}
-															align="start"
-															alignOffset={-160}
-														>
-															<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+													</Dialog.Trigger>
+													<Dialog.Portal>
+														<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
+														<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[900px] h-[600px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400">
+															<Dialog.Title className="sr-only">
+																Override inputs to test workflow
+															</Dialog.Title>
+															<Dialog.Close
+																asChild
+																className="absolute right-[24px] cursor-pointer"
+															>
+																<button
+																	type="button"
+																	className="text-white-400 hover:text-white-900"
+																>
+																	<X className="size-[20px]" />
+																</button>
+															</Dialog.Close>
 															<RunWithOverrideParamsForm flow={flow} />
-														</Popover.Content>
-													</Popover.Portal>
-												</Popover.Root>
+														</Dialog.Content>
+													</Dialog.Portal>
+												</Dialog.Root>
 											</div>
 										</div>
 									))}
