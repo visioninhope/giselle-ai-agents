@@ -70,6 +70,7 @@ export default function Layout({
 						href="https://docs.giselles.ai/"
 						icon={<BookIcon className="w-5 h-5" />}
 						label="Guide"
+						openInNewTab={true}
 					/>
 				</div>
 			</div>
