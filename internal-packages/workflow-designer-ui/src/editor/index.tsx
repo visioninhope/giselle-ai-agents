@@ -208,6 +208,9 @@ function NodeCanvas() {
 			onConnect={handleConnect}
 			onEdgesDelete={handleEdgesDelete}
 			isValidConnection={isValidConnection}
+			panOnScroll={true}
+			zoomOnScroll={false}
+			zoomOnPinch={true}
 			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
 			}}
@@ -242,14 +245,16 @@ function NodeCanvas() {
 					}
 				});
 			}}
-			onNodeDoubleClick={(_event, nodeDoubleClicked) => {
+			onNodeClick={(_event, nodeClicked) => {
 				for (const node of data.nodes) {
-					if (node.id === nodeDoubleClicked.id) {
+					if (node.id === nodeClicked.id) {
 						setUiNodeState(node.id, { selected: true });
 					} else {
 						setUiNodeState(node.id, { selected: false });
 					}
 				}
+			}}
+			onNodeDoubleClick={(_event, nodeDoubleClicked) => {
 				const viewport = reactFlowInstance.getViewport();
 				const screenPosition = reactFlowInstance.flowToScreenPosition(
 					nodeDoubleClicked.position,
