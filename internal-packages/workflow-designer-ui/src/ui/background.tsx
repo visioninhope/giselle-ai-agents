@@ -19,6 +19,10 @@ export function Background() {
 		const gl = canvas.getContext("webgl", { antialias: true });
 		if (!gl) return;
 
+		// Enable blending for WebGL
+		gl.enable(gl.BLEND);
+		gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
 		// Set canvas size to match container
 		const resizeCanvas = () => {
 			const { width, height } = container.getBoundingClientRect();
@@ -47,7 +51,7 @@ export function Background() {
         vec2 zeroToTwo = zeroToOne * 2.0;
         vec2 clipSpace = zeroToTwo - 1.0;
         gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
-        
+
         // Keep dot size fixed regardless of resolution
         gl_PointSize = ${dotSize} * u_pixelRatio;
       }
@@ -108,6 +112,7 @@ export function Background() {
 			vertexShader: WebGLShader,
 			fragmentShader: WebGLShader,
 		) {
+			if (!gl) return null;
 			const program = gl.createProgram();
 			if (!program) return null;
 			gl.attachShader(program, vertexShader);
