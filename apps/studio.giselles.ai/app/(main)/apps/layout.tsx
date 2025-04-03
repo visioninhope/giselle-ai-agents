@@ -33,19 +33,45 @@ export default function Layout({
 		});
 		redirect(`/workspaces/${workspace.id}`);
 	}
+	async function createSampleAgent() {
+		"use server";
+		const graph = initGraph();
+		const agentId = `agnt_${createId()}` as const;
+		const { url } = await putGraph(graph);
+		const user = await fetchCurrentUser();
+		const team = await fetchCurrentTeam();
+		const workspace = await giselleEngine.createSampleWorkspace();
+		await db.insert(agents).values({
+			id: agentId,
+			teamDbId: team.dbId,
+			creatorDbId: user.dbId,
+			graphUrl: url,
+			workspaceId: workspace.id,
+		});
+		redirect(`/workspaces/${workspace.id}`);
+	}
 
 	return (
 		<div className="flex h-full divide-x divide-black-80">
 			{/* Left Menu */}
 			<div className="w-[240px] h-full bg-black-900 p-[24px] flex flex-col">
 				{/* New App + Button */}
-				<div className="mb-8">
+				<div className="mb-8 flex flex-col gap-[8px]">
 					<form action={createAgent}>
 						<button
 							type="submit"
-							className="w-full bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer"
+							className="w-full bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-200"
 						>
 							Create new
+						</button>
+					</form>
+
+					<form action={createSampleAgent}>
+						<button
+							type="submit"
+							className="w-full text-white-800 py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-300"
+						>
+							Start with sample
 						</button>
 					</form>
 				</div>
