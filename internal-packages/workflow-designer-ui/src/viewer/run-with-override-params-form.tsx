@@ -61,7 +61,10 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 				className="flex-1 flex flex-col gap-[24px] relative text-white-800"
 				onSubmit={handleSubmit}
 			>
-				<Tabs.Root className="flex flex-row gap-[24px] flex-1 overflow-hidden h-[calc(100%-60px)]">
+				<Tabs.Root
+					className="flex flex-row gap-[24px] flex-1 overflow-hidden h-[calc(100%-60px)]"
+					defaultValue={overrideVariableNodes?.[0]?.id}
+				>
 					{/* Left side: Node list */}
 					<Tabs.List className="w-[250px] overflow-y-auto pr-[8px] h-full">
 						<h3 className="text-[12px] mb-[8px] text-black-400 font-hubot font-semibold">
@@ -81,9 +84,8 @@ export function RunWithOverrideParamsForm({ flow }: { flow: Workflow }) {
 										value={overrideNode.id}
 										className={clsx(
 											"flex items-center p-[12px] rounded-[8px] border cursor-pointer transition-all duration-200 w-full text-left",
-											activeNodeId === overrideNode.id
-												? "border-primary-900 bg-black-800/30"
-												: "border-black-400/40 hover:border-primary-900/50 hover:bg-black-800/10",
+											"data-[state=active]:border-primary-900 data-[state=active]:bg-black-800/30",
+											"data-[state=inactive]:border-black-400/40 data-[state=inactive]hover:border-primary-900/50 data-[state=inactive]:hover:bg-black-800/10",
 										)}
 										onClick={() => handleNodeSelect(overrideNode.id)}
 										aria-pressed={activeNodeId === overrideNode.id}
