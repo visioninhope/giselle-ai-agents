@@ -844,7 +844,7 @@ importers:
         version: link:../workflow-utils
       ai:
         specifier: 'catalog:'
-        version: 4.2.9(react@19.0.0)(zod@3.24.1)
+        version: 4.2.9(react@19.1.0)(zod@3.24.1)
       langfuse:
         specifier: 'catalog:'
         version: 3.37.0
