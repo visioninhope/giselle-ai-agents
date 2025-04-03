@@ -2,11 +2,11 @@
 
 
 ## Summary
-* 1014 MIT
+* 1015 MIT
 * 105 Apache 2.0
-* 57 ISC
+* 58 ISC
 * 34 New BSD
-* 16 Simplified BSD
+* 17 Simplified BSD
 * 3 MIT OR Apache-2.0
 * 3 Mozilla Public License 2.0
 * 3 BlueOak-1.0.0
@@ -811,6 +811,17 @@ MIT-0 permitted
 
 
 
+<a name="@fal-ai/client"></a>
+### @fal-ai/client v1.3.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@fastify/busboy"></a>
 ### @fastify/busboy v2.1.1
 #### 
@@ -1523,6 +1534,17 @@ LGPL-3.0-or-later permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/bsd-license">Simplified BSD</a> permitted
+
+
+
+<a name="@msgpack/msgpack"></a>
+### @msgpack/msgpack v3.1.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
@@ -6965,7 +6987,7 @@ CC-BY-4.0 permitted
 
 
 <a name="eventsource-parser"></a>
-### eventsource-parser v3.0.0
+### eventsource-parser v1.1.2
 #### 
 
 ##### Paths
@@ -8758,7 +8780,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="langfuse-core"></a>
-### langfuse-core v3.32.0
+### langfuse-core v3.37.0
 #### 
 
 ##### Paths
@@ -11548,6 +11570,17 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+
+
+<a name="robot3"></a>
+### robot3 v0.4.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/bsd-license">Simplified BSD</a> permitted
 
 
 

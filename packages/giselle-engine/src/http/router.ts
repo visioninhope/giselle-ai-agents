@@ -200,9 +200,12 @@ export const createJsonRouters = {
 	generateImage: (giselleEngine: GiselleEngine) =>
 		withUsageLimitErrorHandler(
 			createHandler({
-				input: z.object({ generation: QueuedGeneration }),
+				input: z.object({
+					generation: QueuedGeneration,
+					telemetry: z.custom<TelemetrySettings>().optional(),
+				}),
 				handler: async ({ input }) => {
-					await giselleEngine.generateImage(input.generation);
+					await giselleEngine.generateImage(input.generation, input.telemetry);
 					return new Response(null, { status: 204 });
 				},
 			}),
