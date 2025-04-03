@@ -218,6 +218,13 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
+	createSampleWorkspace: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const workspace = await giselleEngine.createSampleWorkspace();
+				return JsonResponse.json(workspace);
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

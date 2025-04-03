@@ -34,7 +34,12 @@ import {
 } from "./github";
 import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
-import { createWorkspace, getWorkspace, updateWorkspace } from "./workspaces";
+import {
+	createSampleWorkspace,
+	createWorkspace,
+	getWorkspace,
+	updateWorkspace,
+} from "./workspaces";
 export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
 
@@ -172,6 +177,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				context,
 				generation,
 			});
+		},
+		createSampleWorkspace: async () => {
+			return await createSampleWorkspace({ context });
 		},
 	};
 }
