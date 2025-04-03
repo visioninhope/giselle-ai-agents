@@ -1549,7 +1549,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.1.4
+### @next/swc-linux-x64-gnu v15.2.4
 #### 
 
 ##### Paths
@@ -1560,7 +1560,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.1.4
+### @next/swc-linux-x64-musl v15.2.4
 #### 
 
 ##### Paths
@@ -4310,7 +4310,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react"></a>
-### @types/react v19.0.4
+### @types/react v19.1.0
 #### 
 
 ##### Paths
@@ -4321,7 +4321,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react-dom"></a>
-### @types/react-dom v19.0.2
+### @types/react-dom v19.1.1
 #### 
 
 ##### Paths
@@ -9803,7 +9803,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.1.4
+### next v15.2.4
 #### 
 
 ##### Paths
@@ -11178,7 +11178,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react"></a>
-### react v19.0.0
+### react v19.1.0
 #### 
 
 ##### Paths
@@ -11189,7 +11189,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="react-dom"></a>
-### react-dom v19.0.0
+### react-dom v19.1.0
 #### 
 
 ##### Paths
@@ -11673,7 +11673,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="scheduler"></a>
-### scheduler v0.25.0
+### scheduler v0.26.0
 #### 
 
 ##### Paths
