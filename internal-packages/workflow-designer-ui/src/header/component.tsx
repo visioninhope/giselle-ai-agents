@@ -118,17 +118,31 @@ export function Header({
 								? "p-[1px]"
 								: "inline-flex h-[25px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px] hover:text-[#8990a5]",
 						)}
-						style={view === "editor" ? {
-							background: "linear-gradient(135deg, #64759B, #222835)",
-						} : undefined}
+						style={
+							view === "editor"
+								? {
+										background: "linear-gradient(135deg, #64759B, #222835)",
+									}
+								: undefined
+						}
 					>
 						{view === "editor" && (
-							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade"></span>
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade" />
 						)}
-						<span className={view === "editor" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Build</span>
+						<span
+							className={
+								view === "editor"
+									? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center"
+									: ""
+							}
+						>
+							Build
+						</span>
 					</ToggleGroup.Item>
 
-					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">,</span>
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">
+						,
+					</span>
 
 					<ToggleGroup.Item
 						value="viewer"
@@ -138,17 +152,31 @@ export function Header({
 								? "p-[1px]"
 								: "inline-flex h-[25px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px] hover:text-[#8990a5]",
 						)}
-						style={view === "viewer" ? {
-							background: "linear-gradient(135deg, #64759B, #222835)",
-						} : undefined}
+						style={
+							view === "viewer"
+								? {
+										background: "linear-gradient(135deg, #64759B, #222835)",
+									}
+								: undefined
+						}
 					>
 						{view === "viewer" && (
-							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade"></span>
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade" />
 						)}
-						<span className={view === "viewer" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Preview</span>
+						<span
+							className={
+								view === "viewer"
+									? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center"
+									: ""
+							}
+						>
+							Preview
+						</span>
 					</ToggleGroup.Item>
 
-					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">,</span>
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">
+						,
+					</span>
 
 					<ToggleGroup.Item
 						value="integrator"
@@ -158,17 +186,31 @@ export function Header({
 								? "p-[1px]"
 								: "inline-flex h-[25px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px] hover:text-[#8990a5]",
 						)}
-						style={view === "integrator" ? {
-							background: "linear-gradient(135deg, #64759B, #222835)",
-						} : undefined}
+						style={
+							view === "integrator"
+								? {
+										background: "linear-gradient(135deg, #64759B, #222835)",
+									}
+								: undefined
+						}
 					>
 						{view === "integrator" && (
-							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade"></span>
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0 animate-softFade" />
 						)}
-						<span className={view === "integrator" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Integrate</span>
+						<span
+							className={
+								view === "integrator"
+									? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center"
+									: ""
+							}
+						>
+							Integrate
+						</span>
 					</ToggleGroup.Item>
 
-					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">.</span>
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-1">
+						.
+					</span>
 				</ToggleGroup.Root>
 
 				{action && <div className="flex items-center">{action}</div>}
