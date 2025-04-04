@@ -1,20 +1,11 @@
 "use client";
 
-import {
-	Editor,
-	Header,
-	SettingsView,
-	Viewer,
-} from "@giselle-internal/workflow-designer-ui";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useState } from "react";
-import { WorkspaceTour } from "../../components/workspace-tour";
+import { WorkspaceTour } from "../components/workspace-tour";
 
-export default function Page() {
-	const { view } = useWorkflowDesigner();
-	const [isTourOpen, setIsTourOpen] = useState(true); // 最初から表示
+export default function WorkspacesPage() {
+	const [isTourOpen, setIsTourOpen] = useState(true);
 
-	// ツアーステップの定義
 	const tourSteps = [
 		{
 			title: "Welcome to Giselle",
@@ -26,7 +17,6 @@ export default function Page() {
 			content:
 				"Add Gen nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
 			placement: "right" as const,
-			target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // 下部ナビゲーションバーを正確に指定
 		},
 		{
 			title: "Node Settings",
@@ -41,8 +31,6 @@ export default function Page() {
 			placement: "right" as const,
 		},
 		{
-			target:
-				"[role='tablist'], .flex.items-center.rounded-\\[8px\\], div[role='tablist']", // モード切替タブの別セレクタ
 			title: "Workflow Modes",
 			content:
 				"Experience the complete development lifecycle with three specialized modes: Build to design your node workflows, Preview to test and validate your creations, and Integrate to connect with GitHub and deploy your solutions seamlessly.",
@@ -57,14 +45,24 @@ export default function Page() {
 	];
 
 	return (
-		<div className="flex flex-col h-screen bg-black-900">
-			<Header />
+		<div
+			className="min-h-screen text-white p-8 relative"
+			style={{
+				backgroundColor: "#0f1116",
+				backgroundImage: "radial-gradient(circle at 50% 50%, #1a1f2e, #0f1116)",
+			}}
+		>
+			<div className="max-w-6xl mx-auto relative z-10">
+				<div className="flex justify-between items-center mb-8">
+					<h1 className="text-2xl font-bold">Giselle Workspaces</h1>
+				</div>
 
-			{view === "editor" && <Editor />}
-			{view === "viewer" && <Viewer />}
-			{view === "integrator" && <SettingsView />}
+				<div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+					{/* ワークスペースのリストなどがここに表示される */}
+				</div>
+			</div>
 
-			{/* ワークスペースツアーの追加 */}
+			{/* ガイドツアーコンポーネント */}
 			<WorkspaceTour
 				steps={tourSteps}
 				isOpen={isTourOpen}
