@@ -35,6 +35,7 @@ import {
 import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
+	copyWorkspace,
 	createSampleWorkspace,
 	createWorkspace,
 	getWorkspace,
@@ -54,6 +55,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		sampleAppWorkspaceId: config.sampleAppWorkspaceId,
 	};
 	return {
+		copyWorkspace: async (workspaceId: WorkspaceId) => {
+			return await copyWorkspace({ context, workspaceId });
+		},
 		createWorkspace: async () => {
 			return await createWorkspace({ context });
 		},
