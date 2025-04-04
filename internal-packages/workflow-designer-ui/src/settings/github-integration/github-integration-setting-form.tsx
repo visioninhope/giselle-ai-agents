@@ -176,7 +176,10 @@ function Installed({
 					</h3>
 					<div>
 						<fieldset className="flex flex-col gap-[4px]">
-							<Select value={data?.repositoryNodeId} name="repositoryNodeId">
+							<Select
+								defaultValue={data?.repositoryNodeId}
+								name="repositoryNodeId"
+							>
 								<SelectTrigger>
 									<SelectValue placeholder="Select a repository" />
 								</SelectTrigger>
