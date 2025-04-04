@@ -371,8 +371,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								style={{ fontSize: "12px" }}
 							>
 								Drag to move canvas
-								<br />
-								⌘(Ctrl) + scroll to
+								<br />⌘ (Ctrl) + scroll to
 								<br />
 								zoom in/out
 							</p>
@@ -442,7 +441,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								⌘ + Enter to Run
+								⌘ + Enter to run a command
 								<br />⌘ + Shift + Enter to
 								<br />
 								run entire workflows
