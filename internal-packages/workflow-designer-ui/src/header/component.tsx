@@ -102,7 +102,7 @@ export function Header({
 			<div className="flex items-center gap-[12px]">
 				<ToggleGroup.Root
 					type="single"
-					className="flex items-center h-[33px] px-[8px] rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
+					className="flex items-center h-[33px] px-[10px] rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
 					onValueChange={(unsafeValue) => {
 						const parse = ViewState.safeParse(unsafeValue);
 						if (parse.success) {
@@ -115,7 +115,7 @@ export function Header({
 						className={clsx(
 							view === "editor"
 								? "relative p-[1px] rounded-[24px]"
-								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
+								: "inline-flex h-[25px] px-[10px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "editor" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
@@ -126,12 +126,15 @@ export function Header({
 						)}
 						<span className={view === "editor" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Builder</span>
 					</ToggleGroup.Item>
+
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-[2px]">,</span>
+
 					<ToggleGroup.Item
 						value="viewer"
 						className={clsx(
 							view === "viewer"
 								? "relative p-[1px] rounded-[24px]"
-								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
+								: "inline-flex h-[25px] px-[10px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "viewer" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
@@ -142,12 +145,15 @@ export function Header({
 						)}
 						<span className={view === "viewer" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Preview</span>
 					</ToggleGroup.Item>
+
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-[2px]">,</span>
+
 					<ToggleGroup.Item
 						value="integrator"
 						className={clsx(
 							view === "integrator"
 								? "relative p-[1px] rounded-[24px]"
-								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
+								: "inline-flex h-[25px] px-[10px] py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "integrator" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
