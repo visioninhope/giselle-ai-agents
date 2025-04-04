@@ -113,10 +113,9 @@ export function Header({
 					<ToggleGroup.Item
 						value="editor"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "editor"
 								? "relative p-[1px] rounded-[24px]"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
+								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "editor" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
@@ -125,15 +124,14 @@ export function Header({
 						{view === "editor" && (
 							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
 						)}
-						<span className={view === "editor" ? "relative z-10" : ""}>Builder</span>
+						<span className={view === "editor" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Builder</span>
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="viewer"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "viewer"
 								? "relative p-[1px] rounded-[24px]"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
+								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "viewer" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
@@ -142,15 +140,14 @@ export function Header({
 						{view === "viewer" && (
 							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
 						)}
-						<span className={view === "viewer" ? "relative z-10" : ""}>Preview</span>
+						<span className={view === "viewer" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Preview</span>
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="integrator"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "integrator"
 								? "relative p-[1px] rounded-[24px]"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
+								: "inline-flex h-[25px] px-0 py-[4px] items-center gap-[4px] flex-shrink-0 rounded-[4px] text-[#616779] font-[700] font-accent text-[12px]",
 						)}
 						style={view === "integrator" ? {
 							background: "linear-gradient(135deg, #64759B, #222835)",
@@ -159,7 +156,7 @@ export function Header({
 						{view === "integrator" && (
 							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
 						)}
-						<span className={view === "integrator" ? "relative z-10" : ""}>Integrate</span>
+						<span className={view === "integrator" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Integrate</span>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>
 
