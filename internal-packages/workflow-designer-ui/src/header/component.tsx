@@ -102,7 +102,7 @@ export function Header({
 			<div className="flex items-center gap-[12px]">
 				<ToggleGroup.Root
 					type="single"
-					className="flex items-center h-[33px] px-[10px] rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
+					className="flex h-[33px] px-[4px] py-0 items-center rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
 					onValueChange={(unsafeValue) => {
 						const parse = ViewState.safeParse(unsafeValue);
 						if (parse.success) {
@@ -164,6 +164,8 @@ export function Header({
 						)}
 						<span className={view === "integrator" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Integrate</span>
 					</ToggleGroup.Item>
+
+					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-[2px]">.</span>
 				</ToggleGroup.Root>
 
 				{action && <div className="flex items-center">{action}</div>}
