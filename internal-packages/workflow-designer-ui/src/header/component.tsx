@@ -1,7 +1,6 @@
 "use client";
 
 import type { WorkspaceId } from "@giselle-sdk/data-type";
-import { unsafe } from "bun";
 import clsx from "clsx";
 import { ViewState, useWorkflowDesigner } from "giselle-sdk/react";
 import { CableIcon, EyeIcon, GanttChartIcon, PlayIcon } from "lucide-react";
