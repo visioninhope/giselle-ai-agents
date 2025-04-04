@@ -7,7 +7,7 @@ export const tourSteps: TourStep[] = [
 		placement: "bottom" as const,
 	},
 	{
-		title: "Your command hub.",
+		title: "Command Hub",
 		content:
 			"Add Gen nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
 		placement: "right" as const,
