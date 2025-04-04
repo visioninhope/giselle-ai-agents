@@ -124,7 +124,7 @@ export function Header({
 						{view === "editor" && (
 							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
 						)}
-						<span className={view === "editor" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Builder</span>
+						<span className={view === "editor" ? "relative z-10 text-primary-200 font-[700] font-accent text-[12px] py-[4px] px-[10px] inline-flex items-center" : ""}>Build</span>
 					</ToggleGroup.Item>
 
 					<span className="text-[#616779] font-[700] font-accent text-[12px] mx-[2px]">,</span>
