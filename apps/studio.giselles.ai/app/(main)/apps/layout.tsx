@@ -66,14 +66,14 @@ export default function Layout({
 						</button>
 					</form>
 
-					<form action={createSampleAgent}>
+					{/* <form action={createSampleAgent}>
 						<button
 							type="submit"
 							className="w-full text-white-800 py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-300"
 						>
 							Start with sample
 						</button>
-					</form>
+					</form> */}
 				</div>
 
 				{/* Menu Items */}
