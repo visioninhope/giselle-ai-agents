@@ -7,16 +7,16 @@ export const tourSteps: TourStep[] = [
 		placement: "bottom" as const,
 	},
 	{
-		title: "Your command hub.",
+		title: "Command Hub",
 		content:
-			"Add Gen nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
+			"Add generation nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
 		placement: "right" as const,
 		target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // 下部ナビゲーションバーを正確に指定
 	},
 	{
 		title: "Node Settings",
 		content:
-			"Double-tap nodes to edit settings, craft prompts, configure references, and establish connections between nodes to create a seamless generation flow.",
+			"Click nodes to edit settings, craft prompts, configure references, and establish connections between nodes to create a seamless generation flow.",
 		placement: "left" as const,
 	},
 	{
@@ -36,7 +36,7 @@ export const tourSteps: TourStep[] = [
 	{
 		title: "Resources & Support",
 		content:
-			'Get help when you need it. Explore our comprehensive <a href="https://docs.giselles.ai/introduction" style="text-decoration: underline; color: #0087f6;">Docs</a> for detailed guidance and best practices whenever you encounter challenges.',
+			"Get help when you need it. Explore our comprehensive Docs for detailed guidance and best practices whenever you encounter challenges.",
 		placement: "bottom" as const,
 	},
 ];

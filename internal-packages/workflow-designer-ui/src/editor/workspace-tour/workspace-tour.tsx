@@ -370,9 +370,8 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								Drag to move canvas
-								<br />
-								⌘(Ctrl) + scroll to
+								Drag to move the canvas
+								<br />⌘ (Ctrl) + scroll to
 								<br />
 								zoom in/out
 							</p>
@@ -406,11 +405,13 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								Double-tap nodes to open
+								Click nodes to
 								<br />
-								setting Drag & drop
+								edit their settings
 								<br />
-								to connect
+								Click & drag to connect
+								<br />
+								an input and output
 							</p>
 							<div className="flex w-full mt-1 justify-center">
 								<button
@@ -422,7 +423,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 										background: "rgba(255, 255, 255, 0.1)",
 									}}
 								>
-									Double-tap
+									Click & Drag
 								</button>
 							</div>
 						</div>
@@ -442,10 +443,11 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								⌘ + Enter to Run
-								<br />⌘ + Shift + Enter to
+								⌘ + Enter to run a
 								<br />
-								run entire workflows
+								command when editing a
+								<br />
+								generation node
 							</p>
 							<div className="flex w-full mt-1 justify-center">
 								<button
@@ -457,7 +459,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 										background: "rgba(255, 255, 255, 0.1)",
 									}}
 								>
-									⌘ + ⇧ + ↵
+									⌘ + Enter
 								</button>
 							</div>
 						</div>
