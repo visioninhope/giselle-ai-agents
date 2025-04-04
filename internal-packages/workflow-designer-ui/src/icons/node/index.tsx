@@ -28,13 +28,13 @@ export function NodeIcon({
 				case "textGeneration":
 					switch (node.content.llm.provider) {
 						case "openai":
-							return <OpenaiIcon {...props} />;
+							return <OpenaiIcon {...props} data-content-type-icon />;
 						case "anthropic":
-							return <AnthropicIcon {...props} />;
+							return <AnthropicIcon {...props} data-content-type-icon />;
 						case "google":
 							return <GoogleWhiteIcon {...props} />;
 						case "perplexity":
-							return <PerplexityIcon {...props} />;
+							return <PerplexityIcon {...props} data-content-type-icon />;
 						default: {
 							const _exhaustiveCheck: never = node.content.llm;
 							throw new Error(`Unhandled LLMProvider: ${_exhaustiveCheck}`);
@@ -73,15 +73,15 @@ export function NodeIcon({
 		case "variable":
 			switch (node.content.type) {
 				case "text":
-					return <PromptIcon {...props} />;
+					return <PromptIcon {...props} data-content-type-icon />;
 				case "file":
 					switch (node.content.category) {
 						case "pdf":
-							return <PdfFileIcon {...props} />;
+							return <PdfFileIcon {...props} data-content-type-icon />;
 						case "text":
-							return <TextFileIcon {...props} />;
+							return <TextFileIcon {...props} data-content-type-icon />;
 						case "image":
-							return <PictureIcon {...props} />;
+							return <PictureIcon {...props} data-content-type-icon />;
 						default: {
 							const _exhaustiveCheck: never = node.content.category;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
