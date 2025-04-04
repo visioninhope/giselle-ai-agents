@@ -102,7 +102,7 @@ export function Header({
 			<div className="flex items-center gap-[12px]">
 				<ToggleGroup.Root
 					type="single"
-					className="flex items-center py-[4px] px-[8px] rounded-[8px] overflow-hidden bg-black-200/20"
+					className="flex items-center h-[33px] px-[8px] rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
 					onValueChange={(unsafeValue) => {
 						const parse = ViewState.safeParse(unsafeValue);
 						if (parse.success) {
@@ -113,10 +113,10 @@ export function Header({
 					<ToggleGroup.Item
 						value="editor"
 						className={clsx(
-							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
 							view === "editor"
-								? "bg-primary-950/20 text-primary-200 border-primary-900"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-transparent cursor-pointer",
+								? "bg-primary-950/20 text-primary-200 border-none"
+								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
 					>
 						<GanttChartIcon className="size-[16px]" />
@@ -125,10 +125,10 @@ export function Header({
 					<ToggleGroup.Item
 						value="viewer"
 						className={clsx(
-							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
 							view === "viewer"
-								? "bg-primary-950/20 text-primary-200 border-primary-900"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-transparent cursor-pointer",
+								? "bg-primary-950/20 text-primary-200 border-none"
+								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
 					>
 						<EyeIcon className="size-[16px]" />
@@ -137,10 +137,10 @@ export function Header({
 					<ToggleGroup.Item
 						value="integrator"
 						className={clsx(
-							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
 							view === "integrator"
-								? "bg-primary-950/20 text-primary-200 border-primary-900"
-								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-transparent cursor-pointer",
+								? "bg-primary-950/20 text-primary-200 border-none"
+								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
 					>
 						<CableIcon className="size-[16px]" />
