@@ -4,7 +4,7 @@ import type { SVGProps } from "react";
 import { AnthropicIcon } from "../anthropic";
 import { Flux1Icon } from "../flux1";
 import { GitHubIcon } from "../github";
-import { GoogleWhiteIcon } from "../google";
+import { GoogleIcon, GoogleWhiteIcon } from "../google";
 import { IdegramIcon } from "../ideogram";
 import { OpenaiIcon } from "../openai";
 import { PdfFileIcon } from "../pdf-file";
@@ -32,7 +32,12 @@ export function NodeIcon({
 						case "anthropic":
 							return <AnthropicIcon {...props} data-content-type-icon />;
 						case "google":
-							return <GoogleWhiteIcon {...props} />;
+							// Gemini brand guidelines require using either white or colored icons without modification
+							// See: https://about.google/brand-resource-center/brand-elements/
+							if (/text-white/.test(props.className ?? "")) {
+								return <GoogleWhiteIcon {...props} data-content-type-icon />;
+							}
+							return <GoogleIcon {...props} data-content-type-icon />;
 						case "perplexity":
 							return <PerplexityIcon {...props} data-content-type-icon />;
 						default: {
