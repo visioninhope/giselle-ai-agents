@@ -13,9 +13,8 @@ import {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
-import type { Storage } from "unstorage";
 import type { GiselleEngineContext } from "../types";
-import { getWorkspace, setWorkspace } from "./utils";
+import { copyFiles, getWorkspace, setWorkspace } from "./utils";
 
 export async function createSampleWorkspace(args: {
 	context: GiselleEngineContext;
@@ -140,32 +139,4 @@ export async function createSampleWorkspace(args: {
 		}),
 	]);
 	return newWorkspace;
-}
-
-/** @todo update new fileId for each file */
-async function copyFiles({
-	storage,
-	templateWorkspaceId,
-	newWorkspaceId,
-}: {
-	storage: Storage;
-	templateWorkspaceId: WorkspaceId;
-	newWorkspaceId: WorkspaceId;
-}) {
-	const fileKeys = await storage.getKeys(
-		`workspaces/${templateWorkspaceId}/files`,
-	);
-
-	await Promise.all(
-		fileKeys.map(async (fileKey) => {
-			const file = await storage.getItemRaw(fileKey);
-			await storage.setItemRaw(
-				fileKey.replace(
-					/workspaces:wrks-\w+:files:/,
-					`workspaces:${newWorkspaceId}:files:`,
-				),
-				file,
-			);
-		}),
-	);
 }
