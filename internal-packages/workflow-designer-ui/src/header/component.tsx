@@ -21,10 +21,6 @@ export function Header({
 	const { data, updateName, view, setView } = useWorkflowDesigner();
 	const [openSettings, setOpenSettings] = useState(false);
 
-	const toggleView = () => {
-		setView(view === "editor" ? "viewer" : "editor");
-	};
-
 	const updateWorkflowName = (value?: string) => {
 		if (!value) {
 			return;
@@ -107,8 +103,11 @@ export function Header({
 				<ToggleGroup.Root
 					type="single"
 					className="flex items-center py-[4px] px-[8px] rounded-[8px] overflow-hidden bg-black-200/20"
-					onValueChange={(value) => {
-						setView(ViewState.parse(value));
+					onValueChange={(unsafeValue) => {
+						const parse = ViewState.safeParse(unsafeValue);
+						if (parse.success) {
+							setView(ViewState.parse(parse.data));
+						}
 					}}
 				>
 					<ToggleGroup.Item
@@ -125,7 +124,6 @@ export function Header({
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="viewer"
-						onClick={toggleView}
 						className={clsx(
 							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
 							view === "viewer"
@@ -138,7 +136,6 @@ export function Header({
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="integrator"
-						onClick={toggleView}
 						className={clsx(
 							"flex items-center gap-[4px] px-[8px] py-[4px] text-[12px] rounded-[4px] border-[1px] transition-colors font-[700]",
 							view === "integrator"
