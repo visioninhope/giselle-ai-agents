@@ -370,7 +370,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								Drag to move canvas
+								Drag to move the canvas
 								<br />⌘ (Ctrl) + scroll to
 								<br />
 								zoom in/out
