@@ -409,9 +409,9 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								<br />
 								edit their settings
 								<br />
-								Click to connect an input
+								Click & drag to connect
 								<br />
-								and output
+								an input and output
 							</p>
 							<div className="flex w-full mt-1 justify-center">
 								<button
@@ -423,7 +423,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 										background: "rgba(255, 255, 255, 0.1)",
 									}}
 								>
-									Click
+									Click & Drag
 								</button>
 							</div>
 						</div>
