@@ -153,7 +153,7 @@ export function NodeComponent({
 					</div>
 					<div>
 						<EditableText
-							className="data-[selected=false]:pointer-events-none **:data-input:w-full"
+							className="group-data-[selected=false]:pointer-events-none **:data-input:w-full"
 							text={defaultName(node)}
 							onValueChange={(value) => {
 								if (value === defaultName(node)) {
@@ -172,7 +172,6 @@ export function NodeComponent({
 								}
 								e.stopPropagation();
 							}}
-							data-selected={selected}
 						/>
 						{node.type === "action" && (
 							<div className="text-[10px] text-white-400">
