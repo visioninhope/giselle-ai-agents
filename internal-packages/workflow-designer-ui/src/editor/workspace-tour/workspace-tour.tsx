@@ -405,11 +405,13 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								Double-tap nodes to open
+								Click nodes to
 								<br />
-								setting Drag & drop
+								edit their settings
 								<br />
-								to connect
+								Click to connect an input
+								<br />
+								and output
 							</p>
 							<div className="flex w-full mt-1 justify-center">
 								<button
@@ -421,7 +423,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 										background: "rgba(255, 255, 255, 0.1)",
 									}}
 								>
-									Double-tap
+									Click
 								</button>
 							</div>
 						</div>
@@ -441,10 +443,11 @@ const TourStep1 = (props: TourStepComponentProps) => {
 								className="text-white/40 my-2 text-center"
 								style={{ fontSize: "12px" }}
 							>
-								⌘ + Enter to run a command
-								<br />⌘ + Shift + Enter to
+								⌘ + Enter to run a
 								<br />
-								run entire workflows
+								command when editing a
+								<br />
+								generation node
 							</p>
 							<div className="flex w-full mt-1 justify-center">
 								<button

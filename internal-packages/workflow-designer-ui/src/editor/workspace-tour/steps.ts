@@ -16,7 +16,7 @@ export const tourSteps: TourStep[] = [
 	{
 		title: "Node Settings",
 		content:
-			"Double-tap nodes to edit settings, craft prompts, configure references, and establish connections between nodes to create a seamless generation flow.",
+			"Click nodes to edit settings, craft prompts, configure references, and establish connections between nodes to create a seamless generation flow.",
 		placement: "left" as const,
 	},
 	{
