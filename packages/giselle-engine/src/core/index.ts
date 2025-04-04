@@ -52,6 +52,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		onConsumeAgentTime: config.onConsumeAgentTime,
 		telemetry: config.telemetry,
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
+		sampleAppWorkspaceId: config.sampleAppWorkspaceId,
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId) => {
