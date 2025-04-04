@@ -113,38 +113,53 @@ export function Header({
 					<ToggleGroup.Item
 						value="editor"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "editor"
-								? "bg-primary-950/20 text-primary-200 border-none"
+								? "relative p-[1px] rounded-[24px]"
 								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
+						style={view === "editor" ? {
+							background: "linear-gradient(135deg, #64759B, #222835)",
+						} : undefined}
 					>
-						<GanttChartIcon className="size-[16px]" />
-						<span>Builder</span>
+						{view === "editor" && (
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
+						)}
+						<span className={view === "editor" ? "relative z-10" : ""}>Builder</span>
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="viewer"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "viewer"
-								? "bg-primary-950/20 text-primary-200 border-none"
+								? "relative p-[1px] rounded-[24px]"
 								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
+						style={view === "viewer" ? {
+							background: "linear-gradient(135deg, #64759B, #222835)",
+						} : undefined}
 					>
-						<EyeIcon className="size-[16px]" />
-						<span>Preview</span>
+						{view === "viewer" && (
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
+						)}
+						<span className={view === "viewer" ? "relative z-10" : ""}>Preview</span>
 					</ToggleGroup.Item>
 					<ToggleGroup.Item
 						value="integrator"
 						className={clsx(
-							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[500]",
+							"flex items-center gap-[4px] px-[12px] py-[2px] text-[12px] rounded-[20px] transition-colors font-[700] font-accent text-primary-200",
 							view === "integrator"
-								? "bg-primary-950/20 text-primary-200 border-none"
+								? "relative p-[1px] rounded-[24px]"
 								: "bg-transparent text-white-900/70 hover:text-white-900 hover:bg-black-800/20 border-none cursor-pointer",
 						)}
+						style={view === "integrator" ? {
+							background: "linear-gradient(135deg, #64759B, #222835)",
+						} : undefined}
 					>
-						<CableIcon className="size-[16px]" />
-						<span>Integrate</span>
+						{view === "integrator" && (
+							<span className="absolute inset-[1px] bg-[#1B2333] rounded-[23px] z-0"></span>
+						)}
+						<span className={view === "integrator" ? "relative z-10" : ""}>Integrate</span>
 					</ToggleGroup.Item>
 				</ToggleGroup.Root>
 
