@@ -19,6 +19,7 @@ import { useMemo, useState } from "react";
 import { useUsageLimitsReached } from "../hooks/usage-limits";
 import { SpinnerIcon, WilliIcon } from "../icons";
 import bg from "../images/bg.png";
+import { Background } from "../ui/background";
 import { Button } from "../ui/button";
 import { EmptyState } from "../ui/empty-state";
 import { GenerationView } from "../ui/generation-view";
@@ -49,17 +50,9 @@ export function Viewer() {
 		[flowId, data.editingWorkflows],
 	);
 	return (
-		<div className="w-full flex-1 px-[16px] pb-[16px] font-sans overflow-hidden">
-			<div className="rounded-[8px] overflow-hidden h-full">
-				<div
-					className="bg-black-800 flex flex-col h-full text-white-900 px-[16px] py-[16px] gap-[16px]"
-					style={{
-						backgroundImage: `url(${bg.src})`,
-						backgroundPositionX: "center",
-						backgroundPositionY: "center",
-						backgroundSize: "cover",
-					}}
-				>
+		<div className="w-full flex-1 px-[16px] pb-[16px] font-sans overflow-hidden bg-black-900">
+			<div className="rounded-[8px] overflow-hidden h-full relative">
+				<div className="flex flex-col h-full text-white-900 px-[16px] py-[16px] gap-[16px] z-1 relative">
 					<Tabs.Root orientation="horizontal" className="flex h-full">
 						<Tabs.List className="w-[180px] flex flex-col gap-[16px] overflow-y-auto">
 							<div className="flex flex-col gap-[8px]">
@@ -270,6 +263,9 @@ export function Viewer() {
 								)}
 						</div>
 					</Tabs.Root>
+				</div>
+				<div className="absolute h-full w-full z-0 inset-0">
+					<Background />
 				</div>
 			</div>
 		</div>
