@@ -1,5 +1,3 @@
-"use client";
-
 import type { StaticImageData } from "next/image";
 import { type ReactNode, useCallback, useEffect, useState } from "react";
 import { createPortal } from "react-dom";
@@ -9,7 +7,7 @@ import step4Gif from "./assets/04.gif";
 import step2Arrow from "./assets/step2_arrow.png";
 import step5Arror from "./assets/step5_arrow.png";
 
-type TourStep = {
+export type TourStep = {
 	target?: string; // CSS selector for the target element (optional)
 	title: string;
 	content: string;
@@ -19,7 +17,7 @@ type TourStep = {
 interface WorkspaceTourProps {
 	steps: TourStep[];
 	isOpen: boolean;
-	onClose: () => void;
+	onOpenChange: (open: boolean) => void;
 }
 
 // Common props shared by all step components
@@ -695,8 +693,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 export const WorkspaceTour = ({
 	steps,
 	isOpen,
-	/** @todo I'll resolve this warning soon */
-	onClose,
+	onOpenChange,
 }: WorkspaceTourProps) => {
 	const [currentStep, setCurrentStep] = useState(0);
 
@@ -788,7 +785,7 @@ export const WorkspaceTour = ({
 
 	const handleClose = () => {
 		setCurrentStep(0);
-		onClose();
+		onOpenChange(false);
 	};
 
 	// Bail early if conditions aren't met

@@ -7,12 +7,9 @@ import {
 	Viewer,
 } from "@giselle-internal/workflow-designer-ui";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { useState } from "react";
-import { WorkspaceTour } from "../../components/workspace-tour";
 
 export default function Page() {
 	const { view } = useWorkflowDesigner();
-	const [isTourOpen, setIsTourOpen] = useState(true); // 最初から表示
 
 	// ツアーステップの定義
 	const tourSteps = [
@@ -63,13 +60,6 @@ export default function Page() {
 			{view === "editor" && <Editor />}
 			{view === "viewer" && <Viewer />}
 			{view === "integrator" && <SettingsView />}
-
-			{/* ワークスペースツアーの追加 */}
-			<WorkspaceTour
-				steps={tourSteps}
-				isOpen={isTourOpen}
-				onClose={() => setIsTourOpen(false)}
-			/>
 		</div>
 	);
 }
