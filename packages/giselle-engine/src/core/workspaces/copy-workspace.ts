@@ -4,7 +4,7 @@ import {
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
 import type { GiselleEngineContext } from "../types";
-import { getWorkspace, setWorkspace } from "./utils";
+import { copyFiles, getWorkspace, setWorkspace } from "./utils";
 
 export async function copyWorkspace(args: {
 	context: GiselleEngineContext;
@@ -27,11 +27,18 @@ export async function copyWorkspace(args: {
 		providerOptions: sourceWorkspace.providerOptions,
 	};
 
-	await setWorkspace({
-		storage: args.context.storage,
-		workspaceId: workspaceCopy.id,
-		workspace: Workspace.parse(workspaceCopy),
-	});
+	await Promise.all([
+		setWorkspace({
+			storage: args.context.storage,
+			workspaceId: workspaceCopy.id,
+			workspace: Workspace.parse(workspaceCopy),
+		}),
+		copyFiles({
+			storage: args.context.storage,
+			templateWorkspaceId: args.workspaceId,
+			newWorkspaceId: workspaceCopy.id,
+		}),
+	]);
 
 	return workspaceCopy;
 }
