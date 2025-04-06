@@ -2,7 +2,7 @@ import { waitForLangfuseFlush } from "@/instrumentation.node";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
+import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
 import vercelBlobDriver from "unstorage/drivers/vercel-blob";
