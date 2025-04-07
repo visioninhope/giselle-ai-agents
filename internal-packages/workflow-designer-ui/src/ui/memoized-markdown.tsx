@@ -17,15 +17,15 @@ const MemoizedMarkdownBlock = memo(
 				rehypePlugins={[rehypeRaw]}
 				components={{
 					// aタグ（リンク）のカスタマイズ
-					a: ({ node,children, ...props }) => (
-						<a 
-						{...props} 
-						target="_blank" 
-						rel="noopener noreferrer"
-						className="underline"
-					  >
-						{children}
-					  </a>
+					a: ({ node, children, ...props }) => (
+						<a
+							{...props}
+							target="_blank"
+							rel="noopener noreferrer"
+							className="underline"
+						>
+							{children}
+						</a>
 					),
 				}}
 			>
