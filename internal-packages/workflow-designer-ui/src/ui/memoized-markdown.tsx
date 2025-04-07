@@ -11,7 +11,6 @@ function parseMarkdownIntoBlocks(markdown: string): string[] {
 
 const MemoizedMarkdownBlock = memo(
 	({ content }: { content: string }) => {
-		console.log(content);
 		return (
 			<ReactMarkdown
 				remarkPlugins={[remarkGfm]}
