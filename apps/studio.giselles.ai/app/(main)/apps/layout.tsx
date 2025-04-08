@@ -82,15 +82,15 @@ export default function Layout({
 					<NavigationItem
 						href="/apps"
 						icon={<Clock className="w-5 h-5" />}
-						label="Recent"
+						label="Apps"
 					/>
 
 					{/* My Apps menu item */}
-					<NavigationItem
+					{/* <NavigationItem
 						href="/apps/myapps"
 						icon={<WilliIcon className="w-5 h-5 fill-current" />}
 						label="My Apps"
-					/>
+					/> */}
 
 					<NavigationItem
 						href="https://docs.giselles.ai/"

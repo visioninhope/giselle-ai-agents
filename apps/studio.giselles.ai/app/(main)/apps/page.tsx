@@ -108,7 +108,7 @@ export default function AgentListV2Page() {
 		<ToastProvider>
 			<div className="w-full">
 				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
-					My Apps
+					Apps
 				</h1>
 				<Suspense fallback={<p className="text-center py-8">Loading...</p>}>
 					<AgentList />
