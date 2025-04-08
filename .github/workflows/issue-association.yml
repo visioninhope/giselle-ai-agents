@@ -46,26 +46,26 @@ jobs:
                   }
                 }
               `;
-              
+
               const graphqlResponse = await github.graphql(graphqlQuery, {
                 owner,
                 repo,
                 prNumber
               });
-              
+
               const closingIssues = graphqlResponse.repository?.pullRequest?.closingIssuesReferences?.nodes || [];
               for (const issue of closingIssues) {
                 const issueOwner = issue.repository?.owner?.login || owner;
                 const issueRepo = issue.repository?.name || repo;
                 const issueNumber = issue.number;
-                
+
                 // Check if this issue is already in our list
                 const isDuplicate = linkedIssues.some(
-                  existingIssue => existingIssue.owner === issueOwner && 
-                                   existingIssue.repo === issueRepo && 
+                  existingIssue => existingIssue.owner === issueOwner &&
+                                   existingIssue.repo === issueRepo &&
                                    existingIssue.number === issueNumber
                 );
-                
+
                 if (!isDuplicate) {
                   linkedIssues.push({ owner: issueOwner, repo: issueRepo, number: issueNumber });
                   console.log(`Added issue ${issueOwner}/${issueRepo}#${issueNumber} from GraphQL closing issues`);
@@ -73,85 +73,6 @@ jobs:
               }
             } catch (error) {
               console.log(`Error using GraphQL API: ${error.message}`);
-            }
-
-            // Method 2: Check for closing keywords in PR title/body
-            try {
-              // Find issues using closing keywords (like "fixes #123")
-              const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved|connect|connects|connected|linked|links|link|addresses|refs|references)\s+(#\d+|(?:[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)?#\d+)/gi;
-
-              // Check body
-              if (pr.body) {
-                let match;
-                while ((match = issueRegex.exec(pr.body)) !== null) {
-                  const issueRef = match[2];
-                  let issueOwner = owner;
-                  let issueRepo = repo;
-                  let issueNumber;
-
-                  if (issueRef.includes('/')) {
-                    // Cross-repo reference: owner/repo#123
-                    const parts = issueRef.split('#');
-                    const repoRef = parts[0];
-                    const [refOwner, refRepo] = repoRef.split('/');
-                    issueOwner = refOwner;
-                    issueRepo = refRepo;
-                    issueNumber = parseInt(parts[1], 10);
-                  } else {
-                    // Same repo reference: #123
-                    issueNumber = parseInt(issueRef.replace('#', ''), 10);
-                  }
-
-                  // Check if this issue is already in our list
-                  const isDuplicate = linkedIssues.some(
-                    issue => issue.owner === issueOwner &&
-                             issue.repo === issueRepo &&
-                             issue.number === issueNumber
-                  );
-
-                  if (!isDuplicate) {
-                    linkedIssues.push({ owner: issueOwner, repo: issueRepo, number: issueNumber });
-                    console.log(`Added issue ${issueOwner}/${issueRepo}#${issueNumber} from PR body`);
-                  }
-                }
-              }
-
-              // Check title
-              issueRegex.lastIndex = 0; // Reset regex index
-              let match;
-              while ((match = issueRegex.exec(pr.title)) !== null) {
-                const issueRef = match[2];
-                let issueOwner = owner;
-                let issueRepo = repo;
-                let issueNumber;
-
-                if (issueRef.includes('/')) {
-                  // Cross-repo reference: owner/repo#123
-                  const parts = issueRef.split('#');
-                  const repoRef = parts[0];
-                  const [refOwner, refRepo] = repoRef.split('/');
-                  issueOwner = refOwner;
-                  issueRepo = refRepo;
-                  issueNumber = parseInt(parts[1], 10);
-                } else {
-                  // Same repo reference: #123
-                  issueNumber = parseInt(issueRef.replace('#', ''), 10);
-                }
-
-                // Check if this issue is already in our list
-                const isDuplicate = linkedIssues.some(
-                  issue => issue.owner === issueOwner &&
-                           issue.repo === issueRepo &&
-                           issue.number === issueNumber
-                );
-
-                if (!isDuplicate) {
-                  linkedIssues.push({ owner: issueOwner, repo: issueRepo, number: issueNumber });
-                  console.log(`Added issue ${issueOwner}/${issueRepo}#${issueNumber} from PR title`);
-                }
-              }
-            } catch (error) {
-              console.log(`Error parsing issue references from text: ${error.message}`);
             }
 
             // If no linked issues found, comment on the PR
