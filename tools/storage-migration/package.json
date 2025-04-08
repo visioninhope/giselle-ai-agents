@@ -1,0 +1,17 @@
+{
+	"name": "@giselle/storage-migration",
+	"private": true,
+	"version": "0.0.0",
+	"description": "",
+	"type": "module",
+	"main": "index.ts",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [],
+	"license": "UNLICENSED",
+	"dependencies": {
+		"@supabase/supabase-js": "2.45.0",
+		"@vercel/blob": "0.27.3"
+	}
+}
