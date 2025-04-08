@@ -20,7 +20,7 @@ import {
 import type { Storage } from "unstorage";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces/utils";
-import { setRun } from "./utils";
+import { getWorkflow, setRun } from "./utils";
 
 export function overrideGenerationTemplate(
 	template: GenerationTemplate,
@@ -189,20 +189,11 @@ export async function addRun(args: {
 	overrideNodes: OverrideNode[];
 	context: GiselleEngineContext;
 }) {
-	const workspace = await getWorkspace({
+	const workflow = await getWorkflow({
 		storage: args.context.storage,
 		workspaceId: args.workspaceId,
+		workflowId: args.workflowId,
 	});
-
-	if (workspace === undefined) {
-		throw new Error("Workspace not found");
-	}
-	const workflow = workspace.editingWorkflows.find(
-		(editingWorkflow) => editingWorkflow.id === args.workflowId,
-	);
-	if (workflow === undefined) {
-		throw new Error("Workflow not found");
-	}
 
 	const overrideWorkflow = {
 		...workflow,
