@@ -1,0 +1,73 @@
+name: Issue Association Check
+
+on:
+  pull_request:
+    types: [opened, edited, synchronize, reopened]
+
+jobs:
+  check-issue-association:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: read
+      pull-requests: write
+    steps:
+      - name: Check issue association and assignee
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            const { owner, repo } = context.repo;
+            const pr = context.payload.pull_request;
+            const prCreator = pr.user.login;
+            
+            // Extract issue number from PR body or title
+            const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)/i;
+            const bodyMatch = pr.body ? pr.body.match(issueRegex) : null;
+            const titleMatch = pr.title.match(issueRegex);
+            
+            const match = bodyMatch || titleMatch;
+            
+            if (!match) {
+              console.log('No linked issue found in PR title or body');
+              await github.rest.issues.createComment({
+                owner,
+                repo,
+                issue_number: pr.number,
+                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #123" in the PR description or title.'
+              });
+              return;
+            }
+            
+            const issueNumber = parseInt(match[2], 10);
+            console.log(`Found linked issue: #${issueNumber}`);
+            
+            try {
+              // Get issue details
+              const { data: issue } = await github.rest.issues.get({
+                owner,
+                repo,
+                issue_number: issueNumber
+              });
+              
+              // Check if issue has assignee and it's different from PR creator
+              if (issue.assignees && issue.assignees.length > 0) {
+                const assigneeLogins = issue.assignees.map(assignee => assignee.login);
+                
+                if (!assigneeLogins.includes(prCreator)) {
+                  const assigneesList = assigneeLogins.map(login => `@${login}`).join(', ');
+                  await github.rest.issues.createComment({
+                    owner,
+                    repo,
+                    issue_number: pr.number,
+                    body: `⚠️ This PR is linked to issue #${issueNumber}, which is assigned to ${assigneesList}. The PR creator (@${prCreator}) is not assigned to the issue.`
+                  });
+                  console.log(`Posted comment: PR creator ${prCreator} is not assigned to issue ${issueNumber}`);
+                } else {
+                  console.log(`PR creator ${prCreator} is correctly assigned to issue ${issueNumber}`);
+                }
+              } else {
+                console.log(`Issue #${issueNumber} has no assignees`);
+              }
+            } catch (error) {
+              console.error(`Error checking issue #${issueNumber}:`, error);
+            }
