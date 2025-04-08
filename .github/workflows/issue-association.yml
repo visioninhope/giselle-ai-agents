@@ -18,56 +18,160 @@ jobs:
           script: |
             const { owner, repo } = context.repo;
             const pr = context.payload.pull_request;
+            const prNumber = pr.number;
             const prCreator = pr.user.login;
-            
-            // Extract issue number from PR body or title
-            const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved)\s+#(\d+)/i;
-            const bodyMatch = pr.body ? pr.body.match(issueRegex) : null;
-            const titleMatch = pr.title.match(issueRegex);
-            
-            const match = bodyMatch || titleMatch;
-            
-            if (!match) {
-              console.log('No linked issue found in PR title or body');
+
+            // Find linked issues using multiple methods
+            const linkedIssues = [];
+
+            // Method 1: Check for "Closing Reference" data from the PR API
+            try {
+              // First check if PR itself has linked issue references
+              if (pr._links && pr._links.issue && pr._links.issue.href) {
+                console.log(`Found linked issue reference in PR links: ${pr._links.issue.href}`);
+                // Extract issue number from URL which looks like: https://api.github.com/repos/owner/repo/issues/123
+                const issueUrl = new URL(pr._links.issue.href);
+                const pathParts = issueUrl.pathname.split('/');
+                const issueNumber = parseInt(pathParts[pathParts.length - 1], 10);
+
+                if (!isNaN(issueNumber)) {
+                  linkedIssues.push({ owner, repo, number: issueNumber });
+                  console.log(`Added issue #${issueNumber} from PR links`);
+                }
+              }
+            } catch (error) {
+              console.log(`Error extracting issue from PR links: ${error.message}`);
+            }
+
+            // Method 2: Check for closing keywords in PR title/body
+            try {
+              // Find issues using closing keywords (like "fixes #123")
+              const issueRegex = /(close|closes|closed|fix|fixes|fixed|resolve|resolves|resolved|connect|connects|connected|linked|links|link|addresses|refs|references)\s+(#\d+|(?:[a-zA-Z0-9_.-]+\/[a-zA-Z0-9_.-]+)?#\d+)/gi;
+
+              // Check body
+              if (pr.body) {
+                let match;
+                while ((match = issueRegex.exec(pr.body)) !== null) {
+                  const issueRef = match[2];
+                  let issueOwner = owner;
+                  let issueRepo = repo;
+                  let issueNumber;
+
+                  if (issueRef.includes('/')) {
+                    // Cross-repo reference: owner/repo#123
+                    const parts = issueRef.split('#');
+                    const repoRef = parts[0];
+                    const [refOwner, refRepo] = repoRef.split('/');
+                    issueOwner = refOwner;
+                    issueRepo = refRepo;
+                    issueNumber = parseInt(parts[1], 10);
+                  } else {
+                    // Same repo reference: #123
+                    issueNumber = parseInt(issueRef.replace('#', ''), 10);
+                  }
+
+                  // Check if this issue is already in our list
+                  const isDuplicate = linkedIssues.some(
+                    issue => issue.owner === issueOwner &&
+                             issue.repo === issueRepo &&
+                             issue.number === issueNumber
+                  );
+
+                  if (!isDuplicate) {
+                    linkedIssues.push({ owner: issueOwner, repo: issueRepo, number: issueNumber });
+                    console.log(`Added issue ${issueOwner}/${issueRepo}#${issueNumber} from PR body`);
+                  }
+                }
+              }
+
+              // Check title
+              issueRegex.lastIndex = 0; // Reset regex index
+              let match;
+              while ((match = issueRegex.exec(pr.title)) !== null) {
+                const issueRef = match[2];
+                let issueOwner = owner;
+                let issueRepo = repo;
+                let issueNumber;
+
+                if (issueRef.includes('/')) {
+                  // Cross-repo reference: owner/repo#123
+                  const parts = issueRef.split('#');
+                  const repoRef = parts[0];
+                  const [refOwner, refRepo] = repoRef.split('/');
+                  issueOwner = refOwner;
+                  issueRepo = refRepo;
+                  issueNumber = parseInt(parts[1], 10);
+                } else {
+                  // Same repo reference: #123
+                  issueNumber = parseInt(issueRef.replace('#', ''), 10);
+                }
+
+                // Check if this issue is already in our list
+                const isDuplicate = linkedIssues.some(
+                  issue => issue.owner === issueOwner &&
+                           issue.repo === issueRepo &&
+                           issue.number === issueNumber
+                );
+
+                if (!isDuplicate) {
+                  linkedIssues.push({ owner: issueOwner, repo: issueRepo, number: issueNumber });
+                  console.log(`Added issue ${issueOwner}/${issueRepo}#${issueNumber} from PR title`);
+                }
+              }
+            } catch (error) {
+              console.log(`Error parsing issue references from text: ${error.message}`);
+            }
+
+            // If no linked issues found, comment on the PR
+            if (linkedIssues.length === 0) {
+              console.log('No linked issues found');
               await github.rest.issues.createComment({
                 owner,
                 repo,
-                issue_number: pr.number,
-                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #123" in the PR description or title.'
+                issue_number: prNumber,
+                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #123" or "Closes #123" in the PR description or title.'
               });
               return;
             }
-            
-            const issueNumber = parseInt(match[2], 10);
-            console.log(`Found linked issue: #${issueNumber}`);
-            
-            try {
-              // Get issue details
-              const { data: issue } = await github.rest.issues.get({
-                owner,
-                repo,
-                issue_number: issueNumber
-              });
-              
-              // Check if issue has assignee and it's different from PR creator
-              if (issue.assignees && issue.assignees.length > 0) {
-                const assigneeLogins = issue.assignees.map(assignee => assignee.login);
-                
-                if (!assigneeLogins.includes(prCreator)) {
-                  const assigneesList = assigneeLogins.map(login => `@${login}`).join(', ');
-                  await github.rest.issues.createComment({
-                    owner,
-                    repo,
-                    issue_number: pr.number,
-                    body: `⚠️ This PR is linked to issue #${issueNumber}, which is assigned to ${assigneesList}. The PR creator (@${prCreator}) is not assigned to the issue.`
-                  });
-                  console.log(`Posted comment: PR creator ${prCreator} is not assigned to issue ${issueNumber}`);
+
+            console.log(`Found ${linkedIssues.length} linked issue(s)`);
+
+            // Process each linked issue
+            for (const issue of linkedIssues) {
+              console.log(`Checking issue ${issue.owner}/${issue.repo}#${issue.number}`);
+
+              try {
+                // Get issue details
+                const { data: issueData } = await github.rest.issues.get({
+                  owner: issue.owner,
+                  repo: issue.repo,
+                  issue_number: issue.number
+                });
+
+                // Check if issue has assignee and it's different from PR creator
+                if (issueData.assignees && issueData.assignees.length > 0) {
+                  const assigneeLogins = issueData.assignees.map(assignee => assignee.login);
+
+                  if (!assigneeLogins.includes(prCreator)) {
+                    const assigneesList = assigneeLogins.map(login => `@${login}`).join(', ');
+                    const issueRef = issue.owner === owner && issue.repo === repo
+                      ? `#${issue.number}`
+                      : `${issue.owner}/${issue.repo}#${issue.number}`;
+
+                    await github.rest.issues.createComment({
+                      owner,
+                      repo,
+                      issue_number: prNumber,
+                      body: `⚠️ This PR is linked to issue ${issueRef}, which is assigned to ${assigneesList}. The PR creator (@${prCreator}) is not assigned to the issue.`
+                    });
+                    console.log(`Posted comment: PR creator ${prCreator} is not assigned to issue ${issueRef}`);
+                  } else {
+                    console.log(`PR creator ${prCreator} is correctly assigned to issue ${issue.owner}/${issue.repo}#${issue.number}`);
+                  }
                 } else {
-                  console.log(`PR creator ${prCreator} is correctly assigned to issue ${issueNumber}`);
+                  console.log(`Issue ${issue.owner}/${issue.repo}#${issue.number} has no assignees`);
                 }
-              } else {
-                console.log(`Issue #${issueNumber} has no assignees`);
+              } catch (error) {
+                console.error(`Error checking issue ${issue.owner}/${issue.repo}#${issue.number}: ${error.message}`);
               }
-            } catch (error) {
-              console.error(`Error checking issue #${issueNumber}:`, error);
             }
