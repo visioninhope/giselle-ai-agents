@@ -82,7 +82,7 @@ jobs:
                 owner,
                 repo,
                 issue_number: prNumber,
-                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #123" or "Closes #123" in the PR description or title.'
+                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #ISSUE_NUM" or "Closes #ISSUE_NUM" in the PR description or title.'
               });
               return;
             }
