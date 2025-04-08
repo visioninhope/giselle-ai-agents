@@ -122,7 +122,7 @@ const CARD_STYLES = {
 	},
 	large: {
 		width: "483px",
-		height: "423px",
+		height: "435px",
 	},
 	wide: {
 		width: "792px",
