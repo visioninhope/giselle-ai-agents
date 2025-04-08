@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1015 MIT
+* 1014 MIT
 * 105 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -4475,7 +4475,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vercel/blob"></a>
-### @vercel/blob v0.23.4
+### @vercel/blob v0.27.3
 #### 
 
 ##### Paths
@@ -5492,17 +5492,6 @@ Python-2.0 manually approved
 
 <a name="busboy"></a>
 ### busboy v1.6.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="bytes"></a>
-### bytes v3.1.2
 #### 
 
 ##### Paths
@@ -8284,6 +8273,17 @@ SIL OPEN FONT LICENSE permitted
 
 
 
+<a name="is-node-process"></a>
+### is-node-process v1.2.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="is-number"></a>
 ### is-number v7.0.0
 #### 
@@ -8319,17 +8319,6 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="is-plain-obj"></a>
 ### is-plain-obj v4.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="is-plain-object"></a>
-### is-plain-object v5.0.0
 #### 
 
 ##### Paths
