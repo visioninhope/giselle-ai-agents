@@ -4,6 +4,7 @@ import {
 	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate,
 	type WorkspaceGitHubIntegrationPayloadField,
 	type WorkspaceGitHubIntegrationSetting,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod";
 import { WorkflowError } from "../error";
@@ -72,6 +73,13 @@ export interface HandleGitHubWebhookOptions {
 		repo: string,
 		issueId: number,
 	) => Promise<void>;
+	buildCreatorAppLink?: (workspaceId: WorkspaceId) => Promise<
+		| {
+				title: string;
+				url: string;
+		  }
+		| undefined
+	>;
 }
 export interface HandleGitHubWebhookArgs {
 	github: {
@@ -199,6 +207,7 @@ async function processIntegration(
 			),
 		),
 	);
+	const creatorAppLink = await options?.buildCreatorAppLink?.(workspace.id);
 	const results = await Promise.all(
 		workflows.map((workflow) =>
 			runApi({
@@ -206,14 +215,23 @@ async function processIntegration(
 				workspaceId: workspace.id,
 				workflowId: workflow.id,
 				overrideNodes,
-			}).catch((error: unknown) => {
-				throw new WorkflowError(
-					`Failed to run workflow: ${error}`,
-					workspace.id,
-					workflow.id,
-					{ cause: error },
-				);
-			}),
+			})
+				.then((result) => {
+					return result.map((jobResult) => {
+						if (creatorAppLink == null) {
+							return jobResult;
+						}
+						return `${jobResult}\n\n> :sparkles: Giselle App: [${creatorAppLink.title}](${creatorAppLink.url})`;
+					});
+				})
+				.catch((error: unknown) => {
+					throw new WorkflowError(
+						`Failed to run workflow: ${error}`,
+						workspace.id,
+						workflow.id,
+						{ cause: error },
+					);
+				}),
 		),
 	);
 
