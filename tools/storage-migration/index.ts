@@ -13,6 +13,7 @@
  * export SUPABASE_URL="https://your-project.supabase.co"
  * export SUPABASE_SERVICE_KEY="your-service-key"
  * export VERCEL_BLOB_KEY="your-vercel-blob-key"
+ * export DRY_RUN="true" # Optional: Set to true for dry run
  *
  * # Run the migration script
  * node --experimental-strip-types ./index.ts
@@ -24,6 +25,7 @@
  * # SUPABASE_URL=https://your-project.supabase.co
  * # SUPABASE_SERVICE_KEY=your-service-key
  * # VERCEL_BLOB_KEY=your-vercel-blob-key
+ * # DRY_RUN=true # Optional: Set to true for dry run
  *
  * # Run with built-in env file support
  * node --env-file=.env --experimental-strip-types ./index.ts
@@ -33,10 +35,11 @@
  * - SUPABASE_URL: Supabase project URL
  * - SUPABASE_SERVICE_KEY: Supabase service role key
  * - VERCEL_BLOB_KEY: Vercel Blob read access token
+ * - DRY_RUN: (Optional) Set to "true" to simulate migration without uploading
  */
 
 import { createClient } from "@supabase/supabase-js";
-import { list } from "@vercel/blob";
+import { head, list } from "@vercel/blob";
 
 // ANSI color codes for terminal output
 const colors = {
@@ -77,6 +80,7 @@ const colors = {
 const supabaseUrl = process.env.SUPABASE_URL;
 const supabaseKey = process.env.SUPABASE_SERVICE_KEY;
 const vercelBlobKey = process.env.VERCEL_BLOB_KEY;
+const isDryRun = process.env.DRY_RUN === "true";
 
 // Validate required environment variables
 if (!(supabaseUrl && supabaseKey && vercelBlobKey)) {
@@ -84,7 +88,7 @@ if (!(supabaseUrl && supabaseKey && vercelBlobKey)) {
 }
 
 console.log(
-	`${colors.bright}${colors.fg.cyan}=== Starting storage migration from Vercel Blob to Supabase ===${colors.reset}`,
+	`${colors.bright}${colors.fg.cyan}=== Starting storage migration from Vercel Blob to Supabase ${isDryRun ? "(DRY RUN)" : ""} ===${colors.reset}`,
 );
 // Initialize Supabase client
 const supabase = createClient(supabaseUrl, supabaseKey, {});
@@ -121,42 +125,68 @@ do {
 		listResult.blobs.map(async (blob) => {
 			// Extract original path and create new path (removing first segment)
 			const originalPathname = blob.pathname;
-			const newPathname = blob.pathname.split("/").slice(1).join("/");
+			let newPathname = blob.pathname.split("/").slice(1).join("/");
+
+			// Extract file ID using regex pattern
+			const fileIdPattern = /files\/(fl-[A-Za-z0-9]+)/;
+			const match = newPathname.match(fileIdPattern);
+
+			// Change filename if file ID is found in the pathname
+			if (match?.[1]) {
+				console.log("match!!!");
+				const fileId = match[1];
+				newPathname = newPathname.replace(fileIdPattern, `files/${fileId}`);
+			}
 
 			// console.log(
 			// 	`${colors.dim}Migrating: ${originalPathname} -> ${newPathname}${colors.reset}`,
 			// );
 
 			try {
+				const metadata = await head(blob.url, {
+					token: vercelBlobKey, // Vercel Blob API token
+				});
 				// Download the file from Vercel Blob
 				const file = await fetch(blob.downloadUrl).then((res) => res.blob());
 
-				// Upload the file to Supabase storage bucket
-				const { data, error } = await supabase.storage
-					.from("app") // Target bucket name
-					.upload(newPathname, file);
-
-				if (error) {
-					// Handle case where file already exists in Supabase
-					if (error.message === "The resource already exists") {
-						console.log(
-							` ├ ${colors.dim}The resource already exists: ${newPathname}${colors.reset}`,
-						);
-						alreadyCount++;
-					} else {
-						// Handle other upload errors
-						console.error(
-							` ├ ${colors.fg.red}✘ Error uploading ${newPathname}:${colors.reset}`,
-							error,
-						);
-						errorCount++;
-					}
-				} else {
-					// Log successful migration
+				if (isDryRun) {
+					// In dry run mode, log what would happen but don't actually upload
 					console.log(
-						` ├ ${colors.fg.green}✓ Successfully migrated: ${newPathname}${colors.reset}`,
+						` ├ ${colors.fg.cyan}🔍 DRY RUN: Would upload ${originalPathname} -> ${newPathname} (${metadata.size}, ${metadata.contentType})${colors.reset}`,
 					);
-					successCount++;
+					successCount++; // Count as success in dry run mode
+				} else {
+					// Upload the file to Supabase storage bucket in non-dry-run mode
+					const result = await supabase.storage
+						.from("app") // Target bucket name
+						.upload(newPathname, file, {
+							contentType: metadata.contentType,
+						});
+					const data = result.data;
+					const error = result.error;
+
+					if (error) {
+						// Handle case where file already exists in Supabase
+						if (error.message === "The resource already exists") {
+							console.log(
+								` ├ ${colors.dim}The resource already exists: ${newPathname}${colors.reset}`,
+							);
+							alreadyCount++;
+						} else {
+							// Handle other upload errors
+							console.error(
+								` ├ ${colors.fg.red}✘ Error uploading ${newPathname}:${colors.reset}`,
+								error,
+							);
+							errorCount++;
+						}
+					} else {
+						// Log successful migration
+						console.log(
+							` ├ ${colors.fg.green}✓ Successfully migrated: ${newPathname}${colors.reset}`,
+						);
+						successCount++;
+					}
 				}
 			} catch (error) {
 				// Handle unexpected errors (network issues, etc.)
@@ -183,7 +213,7 @@ do {
 	// If there are more files to process, display cursor information
 	if (cursor) {
 		console.log(
-			`${colors.fg.cyan}Continuing to next batch with cursor: ${cursor.substring(0, 20)}...${colors.reset}`,
+			`${colors.fg.cyan}Continuing to next batch with cursor: ${cursor}...${colors.reset}`,
 		);
 	}
 } while (cursor);
@@ -193,5 +223,5 @@ console.log(
 	`\n${colors.bright}${colors.fg.green}✅ Storage migration complete!${colors.reset}`,
 );
 console.log(
-	`${colors.bright}${colors.fg.cyan}Final results: ${colors.reset}${colors.fg.blue}Processed ${totalProcessed} files ${colors.reset}(${colors.fg.green}${successCount} successful${colors.reset}, ${colors.fg.red}${errorCount}, already ${alreadyCount}, failed${colors.reset})`,
+	`${colors.bright}${colors.fg.cyan}Final results: ${colors.reset}${colors.fg.blue}Processed ${totalProcessed} files ${colors.reset}(${colors.fg.green}${successCount} successful${colors.reset}, ${colors.fg.red}${errorCount} failed${colors.reset}, ${colors.dim}${alreadyCount} already existed${colors.reset})${isDryRun ? ` ${colors.bright}${colors.fg.yellow}[DRY RUN]${colors.reset}` : ""}`,
 );
