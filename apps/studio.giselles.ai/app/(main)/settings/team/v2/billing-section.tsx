@@ -87,7 +87,7 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 
 	return (
 		<Button className="w-fit" formAction={upgradeTeamWithTeam}>
-			Upgrade
+			Upgrade to Pro
 		</Button>
 	);
 }
