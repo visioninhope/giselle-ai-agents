@@ -101,20 +101,17 @@ export async function POST(request: NextRequest) {
 							const diff = result.data as unknown as string;
 							return diff;
 						},
-						buildCreatorAppLink: async (workspaceId: WorkspaceId) => {
+						buildResultFooter: async (workspaceId: WorkspaceId) => {
 							const agent = await db.query.agents.findFirst({
 								where: eq(agents.workspaceId, workspaceId),
 							});
 							if (agent === undefined) {
-								return;
+								throw new Error("Agent not found");
 							}
 							const url =
 								process.env.NEXT_PUBLIC_SITE_URL ||
 								"https://studio.giselles.ai";
-							return {
-								title: agent.name || "Untitled",
-								url: `${url}/workspaces/${workspaceId}/`,
-							};
+							return `> :sparkles: Giselle App: [${agent.name || "Untitled"}](${url}/workspaces/${workspaceId}/)`;
 						},
 					},
 				});

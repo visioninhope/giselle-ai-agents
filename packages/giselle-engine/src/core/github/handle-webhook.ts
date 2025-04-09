@@ -73,13 +73,7 @@ export interface HandleGitHubWebhookOptions {
 		repo: string,
 		issueId: number,
 	) => Promise<void>;
-	buildCreatorAppLink?: (workspaceId: WorkspaceId) => Promise<
-		| {
-				title: string;
-				url: string;
-		  }
-		| undefined
-	>;
+	buildResultFooter?: (workspaceId: WorkspaceId) => Promise<string>;
 }
 export interface HandleGitHubWebhookArgs {
 	github: {
@@ -207,7 +201,7 @@ async function processIntegration(
 			),
 		),
 	);
-	const creatorAppLink = await options?.buildCreatorAppLink?.(workspace.id);
+	const resultFooter = await options?.buildResultFooter?.(workspace.id);
 	const results = await Promise.all(
 		workflows.map((workflow) =>
 			runApi({
@@ -218,10 +212,10 @@ async function processIntegration(
 			})
 				.then((result) => {
 					return result.map((jobResult) => {
-						if (creatorAppLink == null) {
-							return jobResult;
+						if (resultFooter != null && resultFooter.length > 0) {
+							return `${jobResult}\n\n${resultFooter}`;
 						}
-						return `${jobResult}\n\n> :sparkles: Giselle App: [${creatorAppLink.title}](${creatorAppLink.url})`;
+						return jobResult;
 					});
 				})
 				.catch((error: unknown) => {
