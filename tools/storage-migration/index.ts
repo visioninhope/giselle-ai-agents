@@ -40,6 +40,7 @@
 
 import { createClient } from "@supabase/supabase-js";
 import { head, list } from "@vercel/blob";
+import { migratePathname } from "./migrate-pathname.ts";
 
 // ANSI color codes for terminal output
 const colors = {
@@ -125,21 +126,7 @@ do {
 		listResult.blobs.map(async (blob) => {
 			// Extract original path and create new path (removing first segment)
 			const originalPathname = blob.pathname;
-			let newPathname = blob.pathname.split("/").slice(1).join("/");
-
-			// Extract file ID using regex pattern
-			const fileIdPattern = /files\/(fl-[A-Za-z0-9]+)/;
-			const match = newPathname.match(fileIdPattern);
-
-			// Change filename if file ID is found in the pathname
-			if (match?.[1]) {
-				const fileId = match[1];
-				newPathname = newPathname.replace(fileIdPattern, `files/${fileId}`);
-			}
-
-			// console.log(
-			// 	`${colors.dim}Migrating: ${originalPathname} -> ${newPathname}${colors.reset}`,
-			// );
+			const newPathname = migratePathname(blob.pathname);
 
 			try {
 				const metadata = await head(blob.url, {
