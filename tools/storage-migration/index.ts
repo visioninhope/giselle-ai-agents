@@ -133,7 +133,7 @@ do {
 
 				// Upload the file to Supabase storage bucket
 				const { data, error } = await supabase.storage
-					.from("experiment") // Target bucket name
+					.from("app") // Target bucket name
 					.upload(newPathname, file);
 
 				if (error) {
