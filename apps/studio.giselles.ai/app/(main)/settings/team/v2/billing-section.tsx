@@ -83,10 +83,10 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 
 // NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
 function UpgradeButton({ team }: { team: CurrentTeam }) {
-	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
+	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
-		<Button className="w-fit" formAction={upgrateTeamWithTeam}>
+		<Button className="w-fit" formAction={upgradeTeamWithTeam}>
 			Upgrade
 		</Button>
 	);
