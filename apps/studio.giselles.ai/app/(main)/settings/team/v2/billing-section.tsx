@@ -17,14 +17,8 @@ export default async function BillingSection() {
 			<Card className="flex items-center justify-between gap-x-1 py-4 border-none bg-transparent">
 				<div className="flex flex-col gap-y-1">
 					<div className="flex flex-wrap items-center gap-x-2 text-white-800 font-medium">
-						<p className="text-[14px] leading-[23.8px] font-geist">
-							Thank you for being
-						</p>
 						<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
-							{isProPlan(team) ? "Pro" : "Free"}
-						</p>
-						<p className="text-[14px] leading-[19.6px] font-hubot">
-							, {team.name}
+							{isProPlan(team) ? "Pro Plan" : "Free Plan"}
 						</p>
 					</div>
 					<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
