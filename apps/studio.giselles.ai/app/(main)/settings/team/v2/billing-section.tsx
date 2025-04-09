@@ -117,7 +117,7 @@ function PaymentInfo({ team }: { team: CurrentTeam }) {
 					Payment Information
 				</h2>
 				<p className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
-					Like by Stripe
+					Powered by Stripe
 				</p>
 			</div>
 			<form>
