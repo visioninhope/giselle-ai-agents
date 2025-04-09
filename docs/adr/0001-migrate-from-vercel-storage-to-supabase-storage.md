@@ -21,6 +21,19 @@ We chose Supabase Storage for the following reasons:
 3. We're already using Supabase for authentication in studio.giselles.ai
 
 ## Implementation
+
+### Application
+
+Since Supabase Storage cannot handle Japanese filenames, we will change to use file IDs instead.
+
+Before|After
+-------|----
+`files/fl-abcdef/日本語.txt`|`files/fl-abcdef/fl-abcdef`
+
+By not including the file extension, the file type information is lost. However, this isn't a direct issue since fileType is already included in the file data within the workspace.
+While Supabase Storage allows specifying FileType during file upload, which we would like to use in the future, the unstorage library we currently use doesn't support this feature. For now, we will upload files without specifying FileType.
+
+### Data Migration
 The existing data migration will be handled using the tool available at [`tools/storage-migration`](../../tools/storage-migration).
 For more details, please refer to that directory.
 
