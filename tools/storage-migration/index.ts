@@ -133,7 +133,6 @@ do {
 
 			// Change filename if file ID is found in the pathname
 			if (match?.[1]) {
-				console.log("match!!!");
 				const fileId = match[1];
 				newPathname = newPathname.replace(fileIdPattern, `files/${fileId}`);
 			}
