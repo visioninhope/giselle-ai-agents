@@ -135,14 +135,9 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				fileId: FileId.schema,
-				fileName: z.string(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.removeFile(
-					input.workspaceId,
-					input.fileId,
-					input.fileName,
-				);
+				await giselleEngine.removeFile(input.workspaceId, input.fileId);
 				return new Response(null, { status: 204 });
 			},
 		}),

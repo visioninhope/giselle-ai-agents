@@ -15,7 +15,6 @@ export async function uploadFile(args: {
 			type: "workspace",
 			id: args.workspaceId,
 			fileId: args.fileId,
-			fileName: args.fileName,
 		}),
 		fileBuffer,
 	);
