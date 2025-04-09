@@ -10,12 +10,12 @@ catalog:
   nanoid: 5.0.9
   tsup: 8.3.5
   "@turbo/gen": 2.3.3
-  next: 15.2.4
+  next: 15.3.0
   unstorage: 1.14.4
   ai: 4.2.9
   "@types/node": 22.10.7
   "@types/react": 19.1.0
-  "@types/react-dom": 19.1.1
+  "@types/react-dom": 19.1.2
   postcss: 8.5.1
   tailwindcss: 4.0.3
   "@tailwindcss/postcss": 4.0.3
