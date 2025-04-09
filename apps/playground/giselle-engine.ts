@@ -17,7 +17,7 @@ const storage = createStorage({
 				accessKeyId: process.env.SUPABASE_ACCESS_KEY_ID ?? "",
 				secretAccessKey: process.env.SUPABASE_SECRET_ACCESS_KEY ?? "",
 				endpoint: process.env.SUPABASE_ENDPOINT ?? "",
-				region: "us-west-1",
+				region: process.env.SUPABASE_REGION ?? "",
 				bucket: "app",
 			})
 		: fsDriver({
