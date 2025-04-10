@@ -21,6 +21,7 @@
 		"@giselle-sdk/giselle-engine": "workspace:*",
 		"@giselle-sdk/run": "workspace:^",
 		"@giselle-sdk/workflow-designer": "workspace:*",
+		"@supabase/supabase-js": "2.45.0",
 		"@tailwindcss/postcss": "catalog:",
 		"@xyflow/react": "catalog:",
 		"aws4fetch": "catalog:",
