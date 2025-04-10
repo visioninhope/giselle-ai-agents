@@ -25,7 +25,8 @@ export const Nav: FC = () => {
 					!item.isExternal &&
 					(item.path === "/"
 						? pathname === "/"
-						: pathname.startsWith(item.path));
+						: pathname === item.path || 
+						  pathname.startsWith(`${item.path}/`));
 
 				return (
 					<Link
