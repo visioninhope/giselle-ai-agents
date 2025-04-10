@@ -3,7 +3,7 @@
 
 ## Summary
 * 1014 MIT
-* 105 Apache 2.0
+* 107 Apache 2.0
 * 58 ISC
 * 34 New BSD
 * 17 Simplified BSD
@@ -4476,6 +4476,28 @@ LGPL-3.0-or-later permitted
 
 <a name="@vercel/blob"></a>
 ### @vercel/blob v0.27.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/edge-config"></a>
+### @vercel/edge-config v1.4.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="@vercel/edge-config-fs"></a>
+### @vercel/edge-config-fs v0.1.0
 #### 
 
 ##### Paths
