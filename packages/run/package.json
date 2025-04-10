@@ -33,7 +33,6 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
-		"@giselle-sdk/generation-runner": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:^",
 		"react": "catalog:"
 	}

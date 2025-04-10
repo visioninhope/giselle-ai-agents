@@ -9,7 +9,7 @@ import {
 	type WorkflowId,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { useGenerationRunnerSystem } from "@giselle-sdk/generation-runner/react";
+import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import {
 	type ReactNode,

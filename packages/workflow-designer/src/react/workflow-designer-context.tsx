@@ -13,7 +13,7 @@ import {
 	createUploadedFileData,
 	createUploadingFileData,
 } from "@giselle-sdk/data-type";
-import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
+import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
 	APICallError,
 	useGiselleEngine,
