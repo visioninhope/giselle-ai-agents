@@ -34,21 +34,21 @@ export function TeamSelectionForm({
 				}}
 			>
 				<SelectTrigger className="w-auto min-w-[120px] max-w-[360px] [&>svg]:w-5 [&>svg]:h-5 [&>svg]:shrink-0 [&>svg]:opacity-50 border-0 hover:[&>svg]:bg-accent hover:[&>svg]:opacity-100 hover:[&>svg]:rounded-md hover:[&>svg]:p-0.5 flex justify-between items-center data-[state=open]:border-0 data-[state=open]:ring-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 outline-none focus-visible:outline-none px-1 py-1">
-					<div className="flex items-center gap-1">
-						<span className="text-base font-hubot text-primary-100">
+					<div className="flex items-center gap-2">
+						<span className="text-base font-hubot text-primary-100 truncate max-w-[240px]" title={currentTeam.name}>
 							{currentTeam.name}
 						</span>
-						{currentTeam.isPro ? <ProTag /> : <FreeTag />}
+						{currentTeam.isPro !== undefined && (currentTeam.isPro ? <ProTag /> : <FreeTag />)}
 					</div>
 				</SelectTrigger>
 				<SelectContent className="w-[240px] p-1">
 					{allTeams.map((team) => (
 						<SelectItem key={team.id} value={team.id} className="p-1 pl-8">
-							<div className="flex items-center gap-1 pr-4">
-								<span className="truncate mr-1 max-w-[150px] text-base font-hubot text-white-400" title={team.name}>
+							<div className="flex items-center gap-2 pr-4">
+								<span className="truncate mr-2 max-w-[150px] text-base font-hubot text-white-400" title={team.name}>
 									{team.name}
 								</span>
-								{team.isPro ? <ProTag /> : <FreeTag />}
+								{team.isPro !== undefined && (team.isPro ? <ProTag /> : <FreeTag />)}
 							</div>
 						</SelectItem>
 					))}
