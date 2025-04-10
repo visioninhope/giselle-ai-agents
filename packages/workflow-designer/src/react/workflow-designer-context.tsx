@@ -18,8 +18,8 @@ import {
 	APICallError,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
+import { RunSystemContextProvider } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { WorkflowDesigner } from "../workflow-designer";
 import { usePropertiesPanel, useView } from "./state";
