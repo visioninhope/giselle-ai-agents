@@ -8,7 +8,7 @@ export const Nav: FC = () => {
 	const pathname = usePathname();
 
 	return (
-		<div className="gap-[16px] text-[18px] font-hubot font-medium flex text-black-70">
+		<div className="gap-[8px] text-[18px] font-hubot font-medium flex text-primary-100">
 			<p className="text-black--30">
 				{pathname === "/"
 					? "Lobby"
@@ -20,9 +20,15 @@ export const Nav: FC = () => {
 			</p>
 			<p>/</p>
 			{/** pathname !== "/" && <Link href="/">Lobby</Link> */}
-			{!pathname.startsWith("/apps") && <Link href="/apps">Apps</Link>}
+			{!pathname.startsWith("/apps") && (
+				<Link href="/apps" className="px-1">
+					Apps
+				</Link>
+			)}
 			{!pathname.startsWith("/settings") && (
-				<Link href="/settings/account">Settings</Link>
+				<Link href="/settings/account" className="px-1">
+					Settings
+				</Link>
 			)}
 		</div>
 	);
