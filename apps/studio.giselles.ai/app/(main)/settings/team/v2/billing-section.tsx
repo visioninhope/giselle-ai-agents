@@ -17,14 +17,8 @@ export default async function BillingSection() {
 			<Card className="flex items-center justify-between gap-x-1 py-4 border-none bg-transparent">
 				<div className="flex flex-col gap-y-1">
 					<div className="flex flex-wrap items-center gap-x-2 text-white-800 font-medium">
-						<p className="text-[14px] leading-[23.8px] font-geist">
-							Thank you for being
-						</p>
 						<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
-							{isProPlan(team) ? "Pro" : "Free"}
-						</p>
-						<p className="text-[14px] leading-[19.6px] font-hubot">
-							, {team.name}
+							{isProPlan(team) ? "Pro Plan" : "Free Plan"}
 						</p>
 					</div>
 					<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
@@ -89,11 +83,11 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 
 // NOTE: If this component becomes a client component, we need to remove team.dbId to prevent exposure of internal IDs in the client bundle.
 function UpgradeButton({ team }: { team: CurrentTeam }) {
-	const upgrateTeamWithTeam = upgradeTeam.bind(null, team);
+	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
-		<Button className="w-fit" formAction={upgrateTeamWithTeam}>
-			Upgrade
+		<Button className="w-fit" formAction={upgradeTeamWithTeam}>
+			Upgrade to Pro
 		</Button>
 	);
 }
@@ -123,7 +117,7 @@ function PaymentInfo({ team }: { team: CurrentTeam }) {
 					Payment Information
 				</h2>
 				<p className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
-					Like by Stripe
+					Powered by Stripe
 				</p>
 			</div>
 			<form>

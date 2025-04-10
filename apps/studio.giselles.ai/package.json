@@ -10,7 +10,7 @@
 		"dev": "SENTRY_SUPPRESS_TURBOPACK_WARNING=1 next dev --turbopack",
 		"dev-debug": "LOGLEVEL=debug pnpm run dev",
 		"prebuild": "node prepare-font.js",
-		"build": "next build",
+		"build": "next build --turbopack",
 		"start": "next start",
 		"check": "biome check --write .",
 		"lint": "next lint",

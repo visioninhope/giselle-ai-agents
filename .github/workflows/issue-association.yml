@@ -20,6 +20,7 @@ jobs:
             const pr = context.payload.pull_request;
             const prNumber = pr.number;
             const prCreator = pr.user.login;
+            const commentMarker = "<!-- issue-association-check -->";
 
             // Find linked issues using multiple methods
             const linkedIssues = [];
@@ -42,6 +43,12 @@ jobs:
                           }
                         }
                       }
+                      comments(last: 100) {
+                        nodes {
+                          id
+                          body
+                        }
+                      }
                     }
                   }
                 }
@@ -54,6 +61,11 @@ jobs:
               });
 
               const closingIssues = graphqlResponse.repository?.pullRequest?.closingIssuesReferences?.nodes || [];
+              const comments = graphqlResponse.repository?.pullRequest?.comments?.nodes || [];
+              
+              // Find our marker comment if it exists
+              const existingComment = comments.find(comment => comment.body.includes(commentMarker));
+
               for (const issue of closingIssues) {
                 const issueOwner = issue.repository?.owner?.login || owner;
                 const issueRepo = issue.repository?.name || repo;
@@ -75,21 +87,54 @@ jobs:
               console.log(`Error using GraphQL API: ${error.message}`);
             }
 
+            // Function to post comment - either create new or update existing
+            async function postComment(body) {
+              // Add marker to help identify this comment later
+              const commentBody = `${body}\n\n${commentMarker}`;
+              
+              // Try to find existing comment with our marker
+              const { data: comments } = await github.rest.issues.listComments({
+                owner,
+                repo,
+                issue_number: prNumber
+              });
+              
+              const existingComment = comments.find(comment => comment.body.includes(commentMarker));
+              
+              if (existingComment) {
+                // Update existing comment
+                await github.rest.issues.updateComment({
+                  owner,
+                  repo,
+                  comment_id: existingComment.id,
+                  body: commentBody
+                });
+                console.log("Updated existing comment");
+              } else {
+                // Create new comment
+                await github.rest.issues.createComment({
+                  owner,
+                  repo,
+                  issue_number: prNumber,
+                  body: commentBody
+                });
+                console.log("Created new comment");
+              }
+            }
+
             // If no linked issues found, comment on the PR
             if (linkedIssues.length === 0) {
               console.log('No linked issues found');
-              await github.rest.issues.createComment({
-                owner,
-                repo,
-                issue_number: prNumber,
-                body: '⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #ISSUE_NUM" or "Closes #ISSUE_NUM" in the PR description or title.'
-              });
+              await postComment('⚠️ This PR is not linked to any issue. Please link an issue using keywords like "Fixes #ISSUE_NUM" or "Closes #ISSUE_NUM" in the PR description or title.');
               return;
             }
 
             console.log(`Found ${linkedIssues.length} linked issue(s)`);
 
             // Process each linked issue
+            let commentNeeded = false;
+            let commentText = '';
+
             for (const issue of linkedIssues) {
               console.log(`Checking issue ${issue.owner}/${issue.repo}#${issue.number}`);
 
@@ -111,13 +156,9 @@ jobs:
                       ? `#${issue.number}`
                       : `${issue.owner}/${issue.repo}#${issue.number}`;
 
-                    await github.rest.issues.createComment({
-                      owner,
-                      repo,
-                      issue_number: prNumber,
-                      body: `⚠️ This PR is linked to issue ${issueRef}, which is assigned to ${assigneesList}. The PR creator (@${prCreator}) is not assigned to the issue.`
-                    });
-                    console.log(`Posted comment: PR creator ${prCreator} is not assigned to issue ${issueRef}`);
+                    commentNeeded = true;
+                    commentText += `⚠️ This PR is linked to issue ${issueRef}, which is assigned to ${assigneesList}. The PR creator (@${prCreator}) is not assigned to the issue.\n\n`;
+                    console.log(`PR creator ${prCreator} is not assigned to issue ${issueRef}`);
                   } else {
                     console.log(`PR creator ${prCreator} is correctly assigned to issue ${issue.owner}/${issue.repo}#${issue.number}`);
                   }
@@ -126,5 +167,29 @@ jobs:
                 }
               } catch (error) {
                 console.error(`Error checking issue ${issue.owner}/${issue.repo}#${issue.number}: ${error.message}`);
+              }
+            }
+
+            // Post comment if needed
+            if (commentNeeded) {
+              await postComment(commentText);
+            } else {
+              // Check if we have a previous comment to clean up
+              const { data: comments } = await github.rest.issues.listComments({
+                owner,
+                repo,
+                issue_number: prNumber
+              });
+              
+              const existingComment = comments.find(comment => comment.body.includes(commentMarker));
+              
+              if (existingComment) {
+                // Delete the comment since it's no longer needed
+                await github.rest.issues.deleteComment({
+                  owner,
+                  repo,
+                  comment_id: existingComment.id
+                });
+                console.log("Deleted obsolete comment");
               }
             }

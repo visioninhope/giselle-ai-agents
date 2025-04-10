@@ -9,7 +9,7 @@
 	"scripts": {
 		"dev": "next dev --turbopack",
 		"clean": "rm -rf .next .turbo node_modules",
-		"build": "next build",
+		"build": "next build --turbopack",
 		"start": "next start",
 		"lint": "next lint",
 		"check-types": "tsc --noEmit"
