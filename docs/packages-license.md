@@ -1340,7 +1340,7 @@ MIT-0 permitted
 
 
 <a name="@img/sharp-libvips-linux-x64"></a>
-### @img/sharp-libvips-linux-x64 v1.0.4
+### @img/sharp-libvips-linux-x64 v1.1.0
 #### 
 
 ##### Paths
@@ -1351,7 +1351,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-libvips-linuxmusl-x64"></a>
-### @img/sharp-libvips-linuxmusl-x64 v1.0.4
+### @img/sharp-libvips-linuxmusl-x64 v1.1.0
 #### 
 
 ##### Paths
@@ -1362,7 +1362,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linux-x64"></a>
-### @img/sharp-linux-x64 v0.33.5
+### @img/sharp-linux-x64 v0.34.1
 #### 
 
 ##### Paths
@@ -1373,7 +1373,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@img/sharp-linuxmusl-x64"></a>
-### @img/sharp-linuxmusl-x64 v0.33.5
+### @img/sharp-linuxmusl-x64 v0.34.1
 #### 
 
 ##### Paths
@@ -1571,7 +1571,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.2.4
+### @next/swc-linux-x64-gnu v15.3.0
 #### 
 
 ##### Paths
@@ -1582,7 +1582,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.2.4
+### @next/swc-linux-x64-musl v15.3.0
 #### 
 
 ##### Paths
@@ -4343,7 +4343,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/react-dom"></a>
-### @types/react-dom v19.1.1
+### @types/react-dom v19.1.2
 #### 
 
 ##### Paths
@@ -9814,7 +9814,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.2.4
+### next v15.3.0
 #### 
 
 ##### Paths
@@ -11783,7 +11783,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="sharp"></a>
-### sharp v0.33.5
+### sharp v0.34.1
 #### 
 
 ##### Paths
