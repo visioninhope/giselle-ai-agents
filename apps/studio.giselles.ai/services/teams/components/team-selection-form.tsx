@@ -1,5 +1,7 @@
 "use client";
 
+import { FreeTag } from "@/components/free-tag";
+import { ProTag } from "@/components/pro-tag";
 import {
 	Select,
 	SelectContent,
@@ -7,8 +9,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ProTag } from "@/components/pro-tag";
-import { FreeTag } from "@/components/free-tag";
 import { useRef } from "react";
 import { selectTeam } from "../actions/select-team";
 import type { Team } from "../types";
