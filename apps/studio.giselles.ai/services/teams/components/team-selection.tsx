@@ -1,26 +1,27 @@
 import { fetchCurrentTeam, fetchUserTeams } from "../";
+import { isProPlan } from "../utils";
 import { TeamSelectionForm } from "./team-selection-form";
 
 export async function TeamSelection() {
-	const _allTeams = await fetchUserTeams();
-	const _currentTeam = await fetchCurrentTeam();
+	const allTeams = await fetchUserTeams();
+	const currentTeam = await fetchCurrentTeam();
 
-	const allTeams = _allTeams.map(({ id, name }) => ({
-		id,
-		name,
-		isPro: id.startsWith("tm_pro_"),
+	const formattedAllTeams = allTeams.map((team) => ({
+		id: team.id,
+		name: team.name,
+		isPro: isProPlan(team),
 	}));
 
-	const currentTeam = {
-		id: _currentTeam.id,
-		name: _currentTeam.name,
-		isPro: _currentTeam.id.startsWith("tm_pro_"),
+	const formattedCurrentTeam = {
+		id: currentTeam.id,
+		name: currentTeam.name,
+		isPro: isProPlan(currentTeam),
 	};
 
 	return (
 		<TeamSelectionForm
-			allTeams={allTeams}
-			currentTeam={currentTeam}
+			allTeams={formattedAllTeams}
+			currentTeam={formattedCurrentTeam}
 			key={currentTeam.id}
 		/>
 	);
