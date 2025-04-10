@@ -33,7 +33,7 @@ export function TeamSelectionForm({
 					formRef.current?.requestSubmit();
 				}}
 			>
-				<SelectTrigger className="w-auto min-w-[180px] max-w-[360px]">
+				<SelectTrigger className="w-auto min-w-[180px] max-w-[360px] [&>svg]:w-4 [&>svg]:h-4 [&>svg]:shrink-0 [&>svg]:opacity-50 border-0 relative [&>svg]:p-1 hover:[&>svg]:bg-gray-700 hover:[&>svg]:opacity-100 hover:[&>svg]:rounded-md">
 					<SelectValue placeholder="Select Team" />
 				</SelectTrigger>
 				<SelectContent>
