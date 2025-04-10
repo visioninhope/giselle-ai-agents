@@ -64,8 +64,8 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 	const isOverLimit = usedMinutes > includedMinutes;
 	const isNearLimit =
 		usedMinutes >= includedMinutes * warningThreshold && !isOverLimit;
-	const remainingMinutes = includedMinutes - usedMinutes;
-	const overMinutes = usedMinutes - includedMinutes;
+	const remainingMinutes = Number((includedMinutes - usedMinutes).toFixed(2));
+	const overMinutes = Number((usedMinutes - includedMinutes).toFixed(2));
 
 	return (
 		<>
