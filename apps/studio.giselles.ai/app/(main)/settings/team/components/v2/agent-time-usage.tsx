@@ -71,7 +71,7 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 		<>
 			<div className="flex justify-between items-baseline">
 				<h2 className="text-white-400 font-medium text-[16px] leading-[27.2px] tracking-normal font-hubot">
-					Agent Time
+					App Usage Time
 				</h2>
 				<div className="text-right">
 					<div
