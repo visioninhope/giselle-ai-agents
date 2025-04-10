@@ -1,5 +1,6 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { settingsV2Flag } from "@/flags";
+import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { AgentTimeCharge } from "../v2/agent-time-charge";
@@ -10,6 +11,10 @@ export default async function TeamUsagePage() {
 	if (!settingsV2Mode) {
 		return notFound();
 	}
+
+	const currentTeam = await fetchCurrentTeam();
+	const currentTeamIsFreePlan = !isProPlan(currentTeam);
+
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
@@ -19,15 +24,17 @@ export default async function TeamUsagePage() {
 				Usage
 			</h3>
 			<div className="flex flex-col gap-y-[16px]">
-				<Suspense
-					fallback={
-						<div className="w-full h-24">
-							<Skeleton className="h-full w-full" />
-						</div>
-					}
-				>
-					<AgentTimeCharge />
-				</Suspense>
+				{currentTeamIsFreePlan && (
+					<Suspense
+						fallback={
+							<div className="w-full h-24">
+								<Skeleton className="h-full w-full" />
+							</div>
+						}
+					>
+						<AgentTimeCharge />
+					</Suspense>
+				)}
 
 				<AgentUsage />
 			</div>
