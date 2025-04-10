@@ -17,6 +17,9 @@ export default defineConfig([
 	{
 		entry: ["src/react/index.ts"],
 		outDir: "react/dist",
+		banner: {
+			js: "'use client'",
+		},
 		format: ["cjs", "esm"],
 		dts: true,
 		sourcemap: true,
