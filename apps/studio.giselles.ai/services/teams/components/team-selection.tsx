@@ -8,11 +8,13 @@ export async function TeamSelection() {
 	const allTeams = _allTeams.map(({ id, name }) => ({
 		id,
 		name,
+		isPro: id.startsWith("tm_pro_"),
 	}));
 
 	const currentTeam = {
 		id: _currentTeam.id,
 		name: _currentTeam.name,
+		isPro: _currentTeam.id.startsWith("tm_pro_"),
 	};
 
 	return (
