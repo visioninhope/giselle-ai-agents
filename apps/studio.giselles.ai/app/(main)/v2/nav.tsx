@@ -15,7 +15,7 @@ export const Nav: FC = () => {
 	const pathname = usePathname();
 
 	return (
-		<div className="flex items-center gap-4">
+		<div className="flex items-center gap-2">
 			{menuItems.map((item) => {
 				const isActive = 
 					!item.isExternal && (
@@ -28,10 +28,10 @@ export const Nav: FC = () => {
 					<Link 
 						key={item.path}
 						href={item.path}
-						className={`text-[14px] font-hubot font-medium transition-colors px-2 py-1 relative
+						className={`text-[16px] font-hubot font-medium transition-colors px-3 py-2 relative rounded-md
 							${isActive 
-								? "text-primary-200" 
-								: "text-black-70 hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-black-400"
+								? "text-primary-100 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100" 
+								: "text-black-70 hover:text-white-100 hover:bg-white-950/20"
 							}`}
 						{...(item.isExternal ? { target: "_blank", rel: "noopener noreferrer" } : {})}
 					>
