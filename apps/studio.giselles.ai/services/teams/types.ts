@@ -16,4 +16,5 @@ export type CurrentTeam = {
 export type Team = {
 	id: typeof teams.$inferSelect.id;
 	name: typeof teams.$inferSelect.name;
+	isPro?: boolean;
 };

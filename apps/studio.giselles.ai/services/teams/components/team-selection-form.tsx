@@ -7,6 +7,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { ProTag } from "@/components/pro-tag";
+import { FreeTag } from "@/components/free-tag";
 import { useRef } from "react";
 import { selectTeam } from "../actions/select-team";
 import type { Team } from "../types";
@@ -37,7 +39,10 @@ export function TeamSelectionForm({
 				<SelectContent>
 					{allTeams.map((team) => (
 						<SelectItem key={team.id} value={team.id}>
-							{team.name}
+							<div className="flex items-center gap-1.5">
+								{team.name}
+								{team.isPro ? <ProTag /> : <FreeTag />}
+							</div>
 						</SelectItem>
 					))}
 				</SelectContent>
