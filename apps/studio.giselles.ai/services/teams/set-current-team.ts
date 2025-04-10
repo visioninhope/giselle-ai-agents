@@ -4,9 +4,13 @@ import type { TeamId } from "./types";
 
 export async function setCurrentTeam(teamId: TeamId) {
 	const teams = await fetchUserTeams();
-	const team = teams.find((t) => t.id === teamId);
-	if (team == null) {
-		throw new Error("Team not found");
+	if (teams.length === 0) {
+		throw new Error("No teams found");
 	}
-	await updateGiselleSession({ teamId });
+	let team = teams.find((t) => t.id === teamId);
+	if (team == null) {
+		// fallback to the first team
+		team = teams[0];
+	}
+	await updateGiselleSession({ teamId: team.id });
 }
