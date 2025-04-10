@@ -33,14 +33,16 @@ export function TeamSelectionForm({
 					formRef.current?.requestSubmit();
 				}}
 			>
-				<SelectTrigger className="w-[180px]">
+				<SelectTrigger className="w-auto min-w-[180px] max-w-[360px]">
 					<SelectValue placeholder="Select Team" />
 				</SelectTrigger>
 				<SelectContent>
 					{allTeams.map((team) => (
 						<SelectItem key={team.id} value={team.id}>
-							<div className="flex items-center gap-1.5">
-								{team.name}
+							<div className="flex items-center gap-1 pr-4">
+								<span className="truncate mr-1" title={team.name}>
+									{team.name}
+								</span>
 								{team.isPro ? <ProTag /> : <FreeTag />}
 							</div>
 						</SelectItem>
