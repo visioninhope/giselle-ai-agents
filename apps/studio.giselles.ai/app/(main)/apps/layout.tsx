@@ -33,8 +33,8 @@ export default function Layout({
 	}
 
 	return (
-		<div className="h-full bg-black-900 p-[24px]">
-			<div className="max-w-[1200px] mx-auto">
+		<div className="h-full bg-black-900">
+			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
 					<h1 className="text-[28px] font-hubot font-medium text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 						Apps
