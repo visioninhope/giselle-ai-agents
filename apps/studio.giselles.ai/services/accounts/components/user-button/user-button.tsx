@@ -1,4 +1,5 @@
 import { getAccountInfo } from "@/app/(main)/settings/account/actions";
+import { Button } from "@/app/(main)/settings/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -8,6 +9,12 @@ import {
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { getUser } from "@/lib/supabase";
+import {
+	type CurrentTeam,
+	fetchCurrentTeam,
+	isProPlan,
+} from "@/services/teams";
+import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import TeamCreation from "@/services/teams/components/team-creation";
 import Avatar from "boring-avatars";
 import { Plus } from "lucide-react";
@@ -18,6 +25,8 @@ import { SignOutButton } from "./sign-out-button";
 export const UserButton: FC = async () => {
 	const user = await getUser();
 	const { displayName } = await getAccountInfo();
+	const currentTeam = await fetchCurrentTeam();
+	const isPro = isProPlan(currentTeam);
 
 	return (
 		<DropdownMenu>
@@ -83,17 +92,29 @@ export const UserButton: FC = async () => {
 						</SignOutButton>
 					</DropdownMenuItem>
 				</div>
-				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px]">
-						<button
-							type="button"
-							className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-hubot text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
-						>
-							Upgrade to Pro
-						</button>
-					</DropdownMenuItem>
-				</div>
+				{!isPro && (
+					<div>
+						<DropdownMenuItem className="p-0 rounded-[8px]">
+							<form className="w-full">
+								<UpgradeButton team={currentTeam} />
+							</form>
+						</DropdownMenuItem>
+					</div>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
 };
+
+function UpgradeButton({ team }: { team: CurrentTeam }) {
+	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
+
+	return (
+		<Button
+			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-hubot text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
+			formAction={upgradeTeamWithTeam}
+		>
+			Upgrade to Pro
+		</Button>
+	);
+}
