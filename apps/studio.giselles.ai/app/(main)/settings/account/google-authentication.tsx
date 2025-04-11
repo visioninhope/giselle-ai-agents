@@ -1,8 +1,7 @@
-import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
-import { ProviderConnectionButton } from "../components/provider-connection-button";
-
 import { getGoogleIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
+import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGoogleIdentity,
 	disconnectGoogleIdentity,
@@ -43,7 +42,7 @@ function GoogleReconnectButton() {
 		<div>
 			<ProviderConnectionButton
 				action={reconnectGoogleIdentity}
-				className="text-yellow-500"
+				className="border-warning-900 bg-warning-900 hover:text-warning-900"
 			>
 				<TriangleAlert /> Reconnect
 			</ProviderConnectionButton>
@@ -55,7 +54,7 @@ function GoogleDisconnectButton() {
 	return (
 		<ProviderConnectionButton
 			action={disconnectGoogleIdentity}
-			className="text-red-500"
+			className="border-black-400 bg-black-400 text-black-200"
 		>
 			Disconnect
 		</ProviderConnectionButton>

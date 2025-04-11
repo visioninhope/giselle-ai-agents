@@ -1,88 +1,40 @@
-import { ClickableText } from "@/components/ui/clicable-text";
-import { Field } from "@/components/ui/field";
-import { Label } from "@/components/ui/label";
-import { Skeleton } from "@/components/ui/skeleton";
-import { settingsV2Flag } from "@/flags";
 import { ToastProvider } from "@/packages/contexts/toast";
-import Link from "next/link";
-import { Suspense } from "react";
+import { fetchUserTeams } from "@/services/teams";
+import TeamCreation from "@/services/teams/components/team-creation";
+import { Button } from "../components/button";
 import { Card } from "../components/card";
-import { AccountDisplayNameForm } from "./account-display-name-form";
-import { AccountToasts } from "./account-toasts";
-import { getAccountInfo } from "./actions";
-import { GitHubAuthentication } from "./github-authentication";
-import { GoogleAuthentication } from "./google-authentication";
-import AccountSettingPageV2 from "./v2/page";
+import UserTeams from "./user-teams";
 
 export default async function AccountSettingPage() {
-	const settingsV2Mode = await settingsV2Flag();
-	if (settingsV2Mode) {
-		return <AccountSettingPageV2 />;
-	}
-	const { displayName, email } = await getAccountInfo();
+	const teams = await fetchUserTeams();
 
 	return (
 		<ToastProvider>
-			<div className="grid gap-[16px]">
+			<div className="flex flex-col gap-[24px]">
 				<h3
-					className="text-[32px] text-black--30 font-rosart"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
-					Account
+					Overview
 				</h3>
-				<Card title="Account Information">
-					<div className="max-w-[600px] grid gap-[16px]">
-						<div className="grid gap-[4px]">
-							<Label>Display name</Label>
-							<AccountDisplayNameForm displayName={displayName} />
-						</div>
-
-						<Field
-							label="Email"
-							name="email"
-							type="email"
-							value={email ?? "No email"}
-							disabled
-						/>
-					</div>
-				</Card>
-				<Card
-					title="Authentication"
-					description="Connect your Giselle account to third-party services."
-				>
-					<Suspense
-						fallback={
-							<Skeleton className="rounded-md border border-black-70 w-full h-16" />
-						}
+				<div className="flex flex-col gap-y-[16px]">
+					<Card
+						title="Teams"
+						description="The teams that are associated with your Giselle account."
+						action={{
+							component: (
+								<div className="grid placeitems-center">
+									<TeamCreation>
+										<Button>Create New Team</Button>
+									</TeamCreation>
+								</div>
+							),
+						}}
 					>
-						<GitHubAuthentication />
-					</Suspense>
-					<Suspense
-						fallback={
-							<Skeleton className="rounded-md border border-black-70 w-full h-16" />
-						}
-					>
-						<GoogleAuthentication />
-					</Suspense>
-				</Card>
-				<Card
-					title="Reset Password"
-					action={{
-						content: "Reset Password",
-						href: "/password_reset/new_password",
-					}}
-				/>
-				<Card title="Delete Account">
-					<div className="w-[220px]">
-						<ClickableText asChild>
-							<Link href="mailto:support@giselles.ai?Subject=Please%20delete%20my%20giselle%20account">
-								Contact Support
-							</Link>
-						</ClickableText>
-					</div>
-				</Card>
+						<UserTeams teams={teams} />
+					</Card>
+				</div>
 			</div>
-			<AccountToasts />
 		</ToastProvider>
 	);
 }

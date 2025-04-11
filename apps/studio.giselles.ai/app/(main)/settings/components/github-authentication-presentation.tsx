@@ -1,9 +1,9 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { ClickableText } from "@/components/ui/clicable-text";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "./alert";
 
 type GitHubUser = components["schemas"]["simple-user"];
 
@@ -18,24 +18,35 @@ export function GitHubAuthenticationPresentation({
 	alert,
 }: GitHubAuthenticationPresentationProps) {
 	return (
-		<div className="grid gap-4 bg-transparent rounded-md border border-black-70 py-4 px-4 w-full font-avenir text-black-30">
+		<div className="grid gap-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
 			{alert && (
-				<Alert variant="destructive">
-					<TriangleAlertIcon className="w-4 h-4" />
-					<AlertTitle>Authentication Error</AlertTitle>
-					<AlertDescription>{alert}</AlertDescription>
+				<Alert variant="destructive" className="p-4">
+					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
+					<AlertTitle className="mb-0 text-error-900 font-bold text-[12px] leading-[20.4px] font-geist">
+						Authentication Error
+					</AlertTitle>
+					<AlertDescription className="text-error-900/70 font-medium text-[12px] leading-[20.4px] font-geist">
+						{alert}
+					</AlertDescription>
 				</Alert>
 			)}
-			<div className="flex items-center justify-between">
+			<div className="flex items-center justify-between gap-4">
 				<div className="flex items-center gap-4">
-					<SiGithub className="h-[20px] w-[20px]" />
+					<SiGithub className="text-white-400 h-[20px] w-[20px]" />
 					<div className="flex flex-col">
-						<div>GitHub</div>
+						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+							GitHub
+						</div>
 						{gitHubUser && (
-							<div className="text-black-70 text-[12px]">
+							<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 								{gitHubUser.name} (
 								<ClickableText asChild>
-									<Link href={gitHubUser.html_url}>@{gitHubUser.login}</Link>
+									<Link
+										href={gitHubUser.html_url}
+										className="text-primary-400 font-medium"
+									>
+										@{gitHubUser.login}
+									</Link>
 								</ClickableText>{" "}
 								)
 							</div>

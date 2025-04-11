@@ -1,18 +1,18 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import type { users } from "@/drizzle";
-import { Check, Pencil, X } from "lucide-react";
-import { useState } from "react";
 import {
-	type InferInput,
-	maxLength,
-	minLength,
-	parse,
-	pipe,
-	string,
-} from "valibot";
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import type { users } from "@/drizzle";
+import { useState } from "react";
+import { maxLength, minLength, parse, pipe, string } from "valibot";
+import { Button } from "../components/button";
 import { updateDisplayName } from "./actions";
 
 const DisplayNameSchema = pipe(
@@ -74,53 +74,69 @@ export function AccountDisplayNameForm({
 	};
 
 	return (
-		<div className="flex flex-col gap-2">
-			<div>
-				{isEditingName ? (
-					<form
-						onSubmit={(e) => {
-							e.preventDefault();
-							handleSaveDisplayName();
-						}}
-						className="flex items-center gap-2"
-					>
-						<Input
-							value={tempDisplayName}
-							onChange={handleChange}
-							className="w-full"
-							disabled={isLoading}
-						/>
-						<Button
-							type="submit"
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={handleSaveDisplayName}
-							disabled={isLoading || !!error}
-						>
-							<Check className="h-4 w-4" />
-						</Button>
-						<Button
-							type="button"
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={handleCancelDislayName}
-							disabled={isLoading}
-						>
-							<X className="h-4 w-4" />
-						</Button>
-					</form>
-				) : (
-					<div className="flex items-center gap-2">
-						<span className="text-lg">{displayName}</span>
-						<Button
-							className="shrink-0 h-8 w-8 rounded-full p-0"
-							onClick={() => setIsEditingName(true)}
-						>
-							<Pencil className="h-4 w-4" />
-						</Button>
-					</div>
-				)}
-			</div>
+		<div className="bg-transparent rounded-[8px] border-[0.5px] border-black-400 px-[24px] py-[16px] w-full">
+			<div className="flex justify-between items-center gap-2">
+				<span className="text-white-400 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot">
+					{displayName}
+				</span>
 
-			{error && <p className="text-sm text-destructive">{error}</p>}
+				<Dialog open={isEditingName} onOpenChange={setIsEditingName}>
+					<DialogTrigger asChild>
+						<Button>Edit</Button>
+					</DialogTrigger>
+					<DialogContent className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]">
+						<div
+							aria-hidden="true"
+							className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
+						/>
+						<DialogHeader className="relative z-10">
+							<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
+								Change your Profiles
+							</DialogTitle>
+						</DialogHeader>
+						<form className="flex flex-col gap-y-4 relative z-10">
+							<div className="flex flex-col gap-y-2">
+								<Label
+									htmlFor="tempDisplayName"
+									className="text-white-800 font-medium text-[12px] leading-[20.4px] font-geist"
+								>
+									Your Display Name
+								</Label>
+								<Input
+									id="tempDisplayName"
+									value={tempDisplayName}
+									onChange={handleChange}
+									className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white"
+									disabled={isLoading}
+								/>
+								{error && (
+									<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+										{error}
+									</p>
+								)}
+							</div>
+							<div className="flex justify-end space-x-4">
+								<Button
+									type="button"
+									onClick={handleCancelDislayName}
+									disabled={isLoading}
+									className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400"
+								>
+									Cancel
+								</Button>
+								<Button
+									type="submit"
+									disabled={isLoading || !!error}
+									onClick={handleSaveDisplayName}
+									className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em] "
+								>
+									Save
+								</Button>
+							</div>
+						</form>
+					</DialogContent>
+				</Dialog>
+			</div>
 		</div>
 	);
 }

@@ -1,5 +1,5 @@
-import { Card } from "@/app/(main)/settings/components/card";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import { Card } from "../components/card";
 import { getCurrentUserRole, getTeamMembers } from "./actions";
 import { TeamMembersForm } from "./team-members-form";
 import { TeamMembersList } from "./team-members-list";
@@ -12,8 +12,8 @@ export async function TeamMembers() {
 
 	if (!hasMembers || !members) {
 		return (
-			<Card title="Team members">
-				<div className="text-sm text-destructive">
+			<Card title="Members">
+				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to load team members
 				</div>
 			</Card>
@@ -22,8 +22,8 @@ export async function TeamMembers() {
 
 	if (!hasCurrentUserRole || !currentUserRole) {
 		return (
-			<Card title="Team members">
-				<div className="text-sm text-destructive">
+			<Card title="Members">
+				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to get current user role
 				</div>
 			</Card>
@@ -33,7 +33,7 @@ export async function TeamMembers() {
 	const hasProPlan = isProPlan(team);
 
 	return (
-		<Card title="Team members">
+		<Card title="Members">
 			{hasProPlan && currentUserRole === "admin" && <TeamMembersForm />}
 			<TeamMembersList
 				teamId={team.id}

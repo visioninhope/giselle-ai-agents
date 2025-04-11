@@ -6,18 +6,19 @@ import { usePathname } from "next/navigation";
 import type { FC, PropsWithChildren, ReactNode } from "react";
 
 const menuLinkVariant = cva(
-	"flex items-center rounded-[8px] px-[16px] h-[32px] gap-[16px] font-rosart text-black-30 ",
+	"flex items-center p-2 gap-[16px] rounded-[4px] font-hubot text-white-400 text-[14px] leading-[19.6px]",
 	{
 		variants: {
 			variant: {
-				active: "bg-black-70",
-				inactive: "bg-transparent",
+				active: "font-bold underline cursor-auto",
+				inactive:
+					"font-medium hover:bg-white-850/20 hover:shadow-[0px_0px_4px_0px_hsla(0,_0%,_100%,_0.2)_inset]",
 			},
 		},
 	},
 );
 type MenuItemProps = {
-	icon: ReactNode;
+	icon?: ReactNode;
 	href: string;
 };
 

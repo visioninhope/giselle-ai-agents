@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -21,13 +20,13 @@ import {
 	pipe,
 	string,
 } from "valibot";
-import { Card } from "../components/card";
+import { Button } from "../components/button";
 import { addTeamMember } from "./actions";
 
 const TeamMemberSchema = object({
 	email: pipe(
 		string(),
-		minLength(1, "Email is required"),
+		minLength(1, "Please enter an email address"),
 		maxLength(256, "Email must be 256 characters or less"),
 		email("Please enter a valid email address"),
 	),
@@ -74,45 +73,58 @@ export function TeamMembersForm() {
 	};
 
 	return (
-		<Card
-			title="Add new member"
-			description="Invite a new team member by entering their email address"
-		>
-			<div className="flex flex-col gap-2">
-				<form onSubmit={handleSubmit} className="flex gap-3" noValidate>
-					<Input
-						type="email"
-						placeholder="member@example.com"
-						value={email}
-						onChange={(e) => {
-							setError("");
-							setEmail(e.target.value);
-						}}
-						className="flex-1"
-						disabled={isLoading}
-					/>
-					<Select
-						value={role}
-						onValueChange={(value) => {
-							setError("");
-							setRole(value);
-						}}
-						disabled={isLoading}
-					>
-						<SelectTrigger className="w-[140px]">
-							<SelectValue />
-						</SelectTrigger>
-						<SelectContent>
-							<SelectItem value="admin">Admin</SelectItem>
-							<SelectItem value="member">Member</SelectItem>
-						</SelectContent>
-					</Select>
-					<Button type="submit" disabled={isLoading} className="w-fit">
-						Add member
-					</Button>
-				</form>
-				{error && <p className="text-sm text-destructive">{error}</p>}
-			</div>
-		</Card>
+		<div className="flex flex-col gap-2">
+			<form
+				onSubmit={handleSubmit}
+				className="flex items-center gap-[10px]"
+				noValidate
+			>
+				<Input
+					type="email"
+					placeholder="member@example.com"
+					value={email}
+					onChange={(e) => {
+						setError("");
+						setEmail(e.target.value);
+					}}
+					className="flex-1 py-2 px-3 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20 text-white-900 font-medium text-[14px] leading-[23.8px] font-geist shadow-none placeholder:text-black-400"
+					disabled={isLoading}
+				/>
+				<Select
+					value={role}
+					onValueChange={(value) => {
+						setError("");
+						setRole(value);
+					}}
+					disabled={isLoading}
+				>
+					<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 shadow-[inset_0_0_4px_0_#ffffff33] [&_svg]:opacity-100 cursor-pointer">
+						<SelectValue />
+					</SelectTrigger>
+					<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
+						<SelectItem
+							value="admin"
+							className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+						>
+							Admin
+						</SelectItem>
+						<SelectItem
+							value="member"
+							className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+						>
+							Member
+						</SelectItem>
+					</SelectContent>
+				</Select>
+				<Button type="submit" disabled={isLoading} className="h-[40px]">
+					Invite
+				</Button>
+			</form>
+			{error && (
+				<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+					{error}
+				</p>
+			)}
+		</div>
 	);
 }

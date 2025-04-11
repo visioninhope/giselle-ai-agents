@@ -46,7 +46,7 @@ function GitHubReconnectButton() {
 		<div>
 			<ProviderConnectionButton
 				action={reconnectGitHubIdentity}
-				className="text-yellow-500"
+				className="border-warning-900 bg-warning-900 hover:text-warning-900"
 			>
 				<TriangleAlert /> Reconnect
 			</ProviderConnectionButton>
@@ -58,7 +58,7 @@ function GitHubDisconnectButton() {
 	return (
 		<ProviderConnectionButton
 			action={disconnectGitHubIdentity}
-			className="text-red-500"
+			className="border-black-400 bg-black-400 text-black-200"
 		>
 			Disconnect
 		</ProviderConnectionButton>

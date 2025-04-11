@@ -1,10 +1,14 @@
 "use client";
 
-import { Card } from "@/app/(main)/settings/components/card";
-import { Button } from "@/components/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogHeader,
+	DialogTitle,
+	DialogTrigger,
+} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { Team } from "@/services/teams/types";
-import { Check, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import {
 	type InferInput,
@@ -14,6 +18,7 @@ import {
 	pipe,
 	string,
 } from "valibot";
+import { Button } from "../components/button";
 import { updateTeamName } from "./actions";
 
 const TeamNameSchema = pipe(
@@ -25,7 +30,7 @@ const TeamNameSchema = pipe(
 type TeamNameSchema = InferInput<typeof TeamNameSchema>;
 
 export function TeamNameForm({ id: teamId, name }: Team) {
-	const [isEditingName, setIsEditingName] = useState(false);
+	const [isEditingTeam, setIsEditingTeam] = useState(false);
 	const [teamName, setTeamName] = useState(name);
 	const [tempTeamName, setTempTeamName] = useState(teamName);
 	const [isLoading, setIsLoading] = useState(false);
@@ -46,7 +51,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 
 			if (result.success) {
 				setTeamName(validatedName);
-				setIsEditingName(false);
+				setIsEditingTeam(false);
 			} else {
 				setError("Failed to update team name");
 				console.error("Failed to update team name");
@@ -63,7 +68,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 
 	const handleCancelTeamName = () => {
 		setTempTeamName(teamName);
-		setIsEditingName(false);
+		setIsEditingTeam(false);
 		setError("");
 	};
 
@@ -73,55 +78,64 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 	};
 
 	return (
-		<Card title="Team name">
+		<div className="bg-transparent rounded-[8px] border-[0.5px] border-black-400 px-[24px] py-[16px] w-full">
 			<div className="flex flex-col gap-2">
-				<div>
-					{isEditingName ? (
-						<form
-							onSubmit={(e) => {
-								e.preventDefault();
-								handleSaveTeamName();
-							}}
-							className="flex items-center gap-2"
-						>
-							<Input
-								value={tempTeamName}
-								onChange={handleChange}
-								className="w-full"
-								disabled={isLoading}
+				<div className="flex justify-between items-center gap-2">
+					<span className="text-white-400 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot">
+						{teamName}
+					</span>
+					<Dialog open={isEditingTeam} onOpenChange={setIsEditingTeam}>
+						<DialogTrigger asChild>
+							<Button>Edit</Button>
+						</DialogTrigger>
+						<DialogContent className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]">
+							<div
+								aria-hidden="true"
+								className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
 							/>
-							<Button
-								type="submit"
-								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={handleSaveTeamName}
-								disabled={isLoading || !!error}
-							>
-								<Check className="h-4 w-4" />
-							</Button>
-							<Button
-								type="button"
-								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={handleCancelTeamName}
-								disabled={isLoading}
-							>
-								<X className="h-4 w-4" />
-							</Button>
-						</form>
-					) : (
-						<div className="flex items-center gap-2">
-							<span className="text-lg">{teamName}</span>
-							<Button
-								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={() => setIsEditingName(true)}
-							>
-								<Pencil className="h-4 w-4" />
-							</Button>
-						</div>
-					)}
+							<DialogHeader className="relative z-10">
+								<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
+									Change Your Team Name
+								</DialogTitle>
+							</DialogHeader>
+							<form className="flex flex-col gap-y-4 relative z-10">
+								<div className="flex flex-col gap-y-2">
+									<Input
+										id="tempTeamName"
+										value={tempTeamName}
+										onChange={handleChange}
+										className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white"
+										disabled={isLoading}
+									/>
+									{error && (
+										<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+											{error}
+										</p>
+									)}
+								</div>
+								<div className="flex justify-end space-x-4">
+									<Button
+										type="button"
+										onClick={handleCancelTeamName}
+										disabled={isLoading}
+										className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400"
+									>
+										Cancel
+									</Button>
+									<Button
+										type="submit"
+										disabled={isLoading || !!error}
+										onClick={handleSaveTeamName}
+										className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em] "
+									>
+										Save
+									</Button>
+								</div>
+							</form>
+						</DialogContent>
+					</Dialog>
 				</div>
-
-				{error && <p className="text-sm text-red-600">{error}</p>}
 			</div>
-		</Card>
+		</div>
 	);
 }

@@ -1,17 +1,11 @@
-import { Field } from "@/components/v2/ui/field";
-import { settingsV2Flag } from "@/flags";
-import { SignOutButton } from "@/services/accounts/components/v2/user-button/sign-out-button";
-import { notFound } from "next/navigation";
-import { Card } from "../../components/v2/card";
+import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
+import { Card } from "../../components/card";
+import { Field } from "../../components/field";
+import { AccountDisplayNameForm } from "../account-display-name-form";
 import { getAccountInfo } from "../actions";
-import { AccountDisplayNameForm } from "../v2/account-display-name-form";
 
 export default async function AccountGeneralPage() {
 	const { displayName, email } = await getAccountInfo();
-	const settingsV2Mode = await settingsV2Flag();
-	if (!settingsV2Mode) {
-		return notFound();
-	}
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
