@@ -1,5 +1,7 @@
 "use client";
 
+import { FreeTag } from "@/components/free-tag";
+import { ProTag } from "@/components/pro-tag";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -16,7 +18,14 @@ const roles = {
 
 export default function UserTeams({
 	teams,
-}: { teams: { id: string; name: string; role: "admin" | "member" }[] }) {
+}: { 
+	teams: { 
+		id: string; 
+		name: string; 
+		role: "admin" | "member";
+		isPro?: boolean;
+	}[] 
+}) {
 	const [teamName, setTeamName] = useState("");
 
 	const handleChangeTeamName = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -46,6 +55,7 @@ export default function UserTeams({
 						teamId={team.id}
 						teamName={team.name}
 						role={roles[team.role]}
+						isPro={team.isPro}
 					/>
 				))}
 			</div>
@@ -56,17 +66,22 @@ export default function UserTeams({
 function UserTeamsItem({ 
 	teamId, 
 	teamName, 
-	role 
+	role,
+	isPro = false
 }: { 
 	teamId: string; 
 	teamName: string; 
-	role: string 
+	role: string;
+	isPro?: boolean;
 }) {
 	return (
 		<div className="flex items-center justify-between gap-4 p-4 bg-black-400/10">
 			<div className="flex flex-col">
-				<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
-					{teamName}
+				<div className="flex items-center gap-2">
+					<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+						{teamName}
+					</div>
+					{isPro ? <ProTag /> : <FreeTag />}
 				</div>
 				<div className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 					{role}
