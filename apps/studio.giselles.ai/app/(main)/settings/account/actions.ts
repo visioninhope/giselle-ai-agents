@@ -1,7 +1,6 @@
 "use server";
 
 import { db, supabaseUserMappings, users } from "@/drizzle";
-import { settingsV2Flag } from "@/flags";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/supabase";
 import {
@@ -12,36 +11,28 @@ import {
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-async function returnPath() {
-	const settingsV2 = await settingsV2Flag();
-	if (settingsV2) {
-		return "/settings/account/authentication";
-	}
-	return "/settings/account";
-}
-
 export async function connectGoogleIdentity() {
-	return connectIdentity("google", await returnPath());
+	return connectIdentity("google", "/settings/account/authentication");
 }
 
 export async function connectGitHubIdentity() {
-	return connectIdentity("github", await returnPath());
+	return connectIdentity("github", "/settings/account/authentication");
 }
 
 export async function reconnectGoogleIdentity() {
-	return reconnectIdentity("google", await returnPath());
+	return reconnectIdentity("google", "/settings/account/authentication");
 }
 
 export async function reconnectGitHubIdentity() {
-	return reconnectIdentity("github", await returnPath());
+	return reconnectIdentity("github", "/settings/account/authentication");
 }
 
 export async function disconnectGoogleIdentity() {
-	return disconnectIdentity("google", await returnPath());
+	return disconnectIdentity("google", "/settings/account/authentication");
 }
 
 export async function disconnectGitHubIdentity() {
-	return disconnectIdentity("github", await returnPath());
+	return disconnectIdentity("github", "/settings/account/authentication");
 }
 
 export async function getAccountInfo() {
@@ -84,7 +75,7 @@ export async function updateDisplayName(formData: FormData) {
 			.set({ displayName })
 			.where(eq(users.dbId, userDbIdSubquery));
 
-		revalidatePath(await returnPath());
+		revalidatePath("/settings/account/authentication");
 
 		return { success: true };
 	} catch (error) {

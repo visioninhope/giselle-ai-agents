@@ -1,12 +1,6 @@
-import { settingsV2Flag } from "@/flags";
-import { notFound } from "next/navigation";
 import { GitHubIntegration } from "../../integration/v2/github-integration";
 
 export default async function TeamIntegrationsPage() {
-	const settingsV2Mode = await settingsV2Flag();
-	if (!settingsV2Mode) {
-		return notFound();
-	}
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3

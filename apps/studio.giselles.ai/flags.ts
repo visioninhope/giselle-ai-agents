@@ -51,16 +51,3 @@ export const developerFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
-
-export const settingsV2Flag = flag<boolean>({
-	key: "settings-v2",
-	async decide() {
-		return true;
-	},
-	description: "Enable Settings V2",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
