@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "../components/button";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -27,6 +26,7 @@ import {
 import type { TeamRole } from "@/drizzle";
 import { Check, Ellipsis, X } from "lucide-react";
 import { useState } from "react";
+import { Button } from "../components/button";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
 
 type TeamMemberListItemProps = {

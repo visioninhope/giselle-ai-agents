@@ -1,4 +1,3 @@
-import { Button } from "../components/button";
 import {
 	Dialog,
 	DialogContent,
@@ -6,6 +5,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { Button } from "../components/button";
 import { type AgentActivity, AgentUsageTable } from "./agent-usage-table";
 
 type AgentUsageDialogProps = {

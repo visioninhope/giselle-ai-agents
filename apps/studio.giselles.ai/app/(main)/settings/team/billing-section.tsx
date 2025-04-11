@@ -1,4 +1,3 @@
-import { Button } from "../components/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
@@ -6,6 +5,7 @@ import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import type { CurrentTeam } from "@/services/teams/types";
 import { Suspense } from "react";
+import { Button } from "../components/button";
 import { getSubscription } from "./actions";
 import { LocalDateTime } from "./components/local-date-time";
 

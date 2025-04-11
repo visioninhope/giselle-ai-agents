@@ -1,6 +1,6 @@
-import { Field } from "../../components/field";
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import { Card } from "../../components/card";
+import { Field } from "../../components/field";
 import { AccountDisplayNameForm } from "../account-display-name-form";
 import { getAccountInfo } from "../actions";
 

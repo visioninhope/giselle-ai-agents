@@ -1,6 +1,5 @@
 "use client";
 
-import { Button } from "../components/button";
 import {
 	Dialog,
 	DialogContent,
@@ -19,6 +18,7 @@ import {
 	pipe,
 	string,
 } from "valibot";
+import { Button } from "../components/button";
 import { updateTeamName } from "./actions";
 
 const TeamNameSchema = pipe(

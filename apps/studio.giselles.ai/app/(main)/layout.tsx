@@ -1,8 +1,8 @@
 import { GiselleLogo } from "@/components/giselle-logo";
+import { UserButton } from "@/services/accounts/components";
 import { TeamSelection } from "@/services/teams/components/team-selection";
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { UserButton } from "@/services/accounts/components";
 import { Nav } from "./nav";
 
 export default async function Layout({ children }: { children: ReactNode }) {

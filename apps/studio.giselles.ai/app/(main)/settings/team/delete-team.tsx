@@ -1,11 +1,6 @@
 "use client";
 
 import {
-	Alert,
-	AlertDescription,
-} from "../components/alert";
-import { Button } from "../components/button";
-import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
@@ -13,6 +8,8 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { useActionState, useState } from "react";
+import { Alert, AlertDescription } from "../components/alert";
+import { Button } from "../components/button";
 import { deleteTeam } from "./actions";
 
 export function DeleteTeam() {
