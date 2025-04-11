@@ -9,7 +9,7 @@ export default async function LayoutV2({ children }: { children: ReactNode }) {
 	return (
 		<div className="h-screen overflow-y-hidden bg-black-900 divide-y divide-black-80 flex flex-col">
 			<header className="h-[60px] flex items-center px-[24px] justify-between">
-				<div className="flex items-center gap-4">
+				<div className="flex items-center gap-2">
 					<Link href="/">
 						<GiselleLogo className="w-[70px] h-auto fill-white mt-[4px]" />
 					</Link>

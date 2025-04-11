@@ -19,7 +19,7 @@ export const Nav: FC = () => {
 	const pathname = usePathname();
 
 	return (
-		<div className="flex items-center gap-2">
+		<div className="flex items-center gap-1">
 			{menuItems.map((item) => {
 				const isActive =
 					!item.isExternal &&
@@ -31,7 +31,7 @@ export const Nav: FC = () => {
 					<Link
 						key={item.path}
 						href={item.path}
-						className={`text-[16px] font-hubot font-medium transition-colors px-3 py-2 relative rounded-md
+						className={`text-[16px] font-hubot font-medium transition-colors px-2 py-1.5 relative rounded-md
 							${
 								isActive
 									? "text-primary-100 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
