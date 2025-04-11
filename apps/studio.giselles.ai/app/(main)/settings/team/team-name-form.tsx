@@ -85,7 +85,8 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 						Team name
 					</span>
 					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist">
-						This is your team&apos;s display name in Vercel. You can use your company name or department.
+						This is your team&apos;s display name in Vercel. You can use your
+						company name or department.
 					</p>
 				</div>
 				<div className="flex justify-between items-center gap-2">
@@ -96,7 +97,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 						<DialogTrigger asChild>
 							<Button>Edit</Button>
 						</DialogTrigger>
-						<DialogContent 
+						<DialogContent
 							className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]"
 							style={{
 								animation: "fadeIn 0.2s ease-out",
