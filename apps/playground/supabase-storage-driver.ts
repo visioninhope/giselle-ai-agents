@@ -94,10 +94,15 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			return data && data.length > 0;
 		},
 
-		async getItem(key, _opts) {
+		async getItem(key, opts) {
+			let path = r(key);
+			if (opts?.bypassingCache) {
+				path = `${path}?timestamp=${Date.now()}`;
+			}
+
 			const { data, error } = await supabase.storage
 				.from(bucket)
-				.download(r(key));
+				.download(path);
 
 			if (error) {
 				return null;
