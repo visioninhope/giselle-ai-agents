@@ -194,13 +194,12 @@ export function TeamMemberListItem({
 											</DropdownMenuTrigger>
 											<DropdownMenuContent
 												align="end"
-												className="px-0 py-2 border-[0.5px] border-black-400 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
+												className="px-0 py-2 border-[0.5px] border-error-900 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
 											>
 												<AlertDialog>
 													<AlertDialogTrigger asChild>
 														<Button
-															variant="destructive"
-															className="justify-start p-2 border-none w-full bg-transparent text-error-900 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist transition duration-300 ease-out hover:bg-primary-900/50"
+															className="justify-start p-2 border-0 outline-none w-full bg-transparent text-error-900 font-medium text-[12px] leading-[20.4px] tracking-normal font-hubot transition duration-300 ease-out hover:bg-error-900/20 hover:text-error-900"
 															disabled={isLoading}
 														>
 															Remove from Team
