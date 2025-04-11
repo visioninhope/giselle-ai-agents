@@ -18,13 +18,13 @@ const roles = {
 
 export default function UserTeams({
 	teams,
-}: { 
-	teams: { 
-		id: string; 
-		name: string; 
+}: {
+	teams: {
+		id: string;
+		name: string;
 		role: "admin" | "member";
 		isPro?: boolean;
-	}[] 
+	}[];
 }) {
 	const [teamName, setTeamName] = useState("");
 
@@ -63,14 +63,14 @@ export default function UserTeams({
 	);
 }
 
-function UserTeamsItem({ 
-	teamId, 
-	teamName, 
+function UserTeamsItem({
+	teamId,
+	teamName,
 	role,
-	isPro = false
-}: { 
-	teamId: string; 
-	teamName: string; 
+	isPro = false,
+}: {
+	teamId: string;
+	teamName: string;
 	role: string;
 	isPro?: boolean;
 }) {

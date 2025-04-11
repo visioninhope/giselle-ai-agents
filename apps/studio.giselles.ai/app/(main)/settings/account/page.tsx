@@ -14,7 +14,7 @@ export default async function AccountSettingPage() {
 		id: team.id,
 		name: team.name,
 		role: team.role,
-		isPro: isProPlan(team)
+		isPro: isProPlan(team),
 	}));
 
 	return (
