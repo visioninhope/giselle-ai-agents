@@ -1,7 +1,7 @@
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { Card } from "../components/card";
 import { getCurrentUserRole, getTeamMembers } from "./actions";
-import { TeamMembersForm } from "./team-members-form";
+import { InviteMemberDialog } from "./invite-member-dialog";
 import { TeamMembersList } from "./team-members-list";
 
 export async function TeamMembers() {
@@ -12,7 +12,7 @@ export async function TeamMembers() {
 
 	if (!hasMembers || !members) {
 		return (
-			<Card title="Members">
+			<Card title="Member List">
 				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to load team members
 				</div>
@@ -22,7 +22,7 @@ export async function TeamMembers() {
 
 	if (!hasCurrentUserRole || !currentUserRole) {
 		return (
-			<Card title="Members">
+			<Card title="Member List">
 				<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to get current user role
 				</div>
@@ -33,14 +33,23 @@ export async function TeamMembers() {
 	const hasProPlan = isProPlan(team);
 
 	return (
-		<Card title="Members">
-			{hasProPlan && currentUserRole === "admin" && <TeamMembersForm />}
-			<TeamMembersList
-				teamId={team.id}
-				isProPlan={hasProPlan}
-				members={members}
-				currentUserRole={currentUserRole}
-			/>
-		</Card>
+		<div>
+			<div className="flex justify-between items-center mb-4">
+				<h1 className="text-[28px] font-hubot font-medium text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
+					Members
+				</h1>
+				{hasProPlan && currentUserRole === "admin" && (
+					<InviteMemberDialog />
+				)}
+			</div>
+			<Card title="Member List">
+				<TeamMembersList
+					teamId={team.id}
+					isProPlan={hasProPlan}
+					members={members}
+					currentUserRole={currentUserRole}
+				/>
+			</Card>
+		</div>
 	);
 }
