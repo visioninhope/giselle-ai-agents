@@ -83,7 +83,6 @@ export const UserButton: FC = async () => {
 						</SignOutButton>
 					</DropdownMenuItem>
 				</div>
-				<DropdownMenuSeparator className="-mx-2 my-0 p-0 bg-black-400" />
 				<div>
 					<DropdownMenuItem className="p-0 rounded-[8px]">
 						<button
