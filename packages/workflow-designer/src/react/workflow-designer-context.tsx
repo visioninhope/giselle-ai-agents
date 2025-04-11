@@ -294,7 +294,6 @@ export function WorkflowDesignerProvider({
 			await client.removeFile({
 				workspaceId: data.id,
 				fileId: uploadedFile.id,
-				fileName: uploadedFile.name,
 			});
 			setAndSaveWorkspace();
 		},

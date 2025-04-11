@@ -140,7 +140,6 @@ export async function generateImage(args: {
 			filePath({
 				...runningGeneration.context.origin,
 				fileId: file.id,
-				fileName: file.name,
 			}),
 		);
 		if (blob === undefined) {

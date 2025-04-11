@@ -1,14 +1,12 @@
 import type { FileId, GenerationOrigin } from "@giselle-sdk/data-type";
 
-export function filePath(
-	params: { fileId: FileId; fileName: string } & GenerationOrigin,
-) {
+export function filePath(params: { fileId: FileId } & GenerationOrigin) {
 	switch (params.type) {
 		case "workspace":
-			return `workspaces/${params.id}/files/${params.fileId}/${params.fileName}`;
+			return `workspaces/${params.id}/files/${params.fileId}/${params.fileId}`;
 
 		case "run":
-			return `runs/${params.id}/files/${params.fileId}/${params.fileName}`;
+			return `runs/${params.id}/files/${params.fileId}/${params.fileId}`;
 		default: {
 			const _exhaustiveCheck: never = params;
 			return _exhaustiveCheck;

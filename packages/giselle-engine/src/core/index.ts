@@ -114,12 +114,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		) => {
 			return await uploadFile({ context, file, workspaceId, fileId, fileName });
 		},
-		removeFile: async (
-			workspaceId: WorkspaceId,
-			fileId: FileId,
-			fileName: string,
-		) => {
-			return await removeFile({ context, fileId, workspaceId, fileName });
+		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
+			return await removeFile({ context, fileId, workspaceId });
 		},
 
 		githubUrlToObjectId: async (url: string) => {

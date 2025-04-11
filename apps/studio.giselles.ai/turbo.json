@@ -41,7 +41,9 @@
 				"SMTP_USER",
 				"SMTP_PASS",
 				"SEND_EMAIL_DEBUG",
-				"SAMPLE_APP_WORKSPACE_ID"
+				"SAMPLE_APP_WORKSPACE_ID",
+				"SUPABASE_URL",
+				"SUPABASE_SERVICE_KEY"
 			],
 			"inputs": [
 				"$TURBO_DEFAULT$",

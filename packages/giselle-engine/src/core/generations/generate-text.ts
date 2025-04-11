@@ -128,7 +128,6 @@ export async function generateText(args: {
 			filePath({
 				...runningGeneration.context.origin,
 				fileId: file.id,
-				fileName: file.name,
 			}),
 		);
 		if (blob === undefined) {

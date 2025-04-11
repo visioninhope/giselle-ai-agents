@@ -1,19 +1,20 @@
 import { waitForLangfuseFlush } from "@/instrumentation.node";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
+import supabaseStorageDriver from "@/supabase-storage-driver";
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
-import vercelBlobDriver from "unstorage/drivers/vercel-blob";
 
 const isVercelEnvironment = process.env.VERCEL === "1";
 
 const storage = createStorage({
 	driver: isVercelEnvironment
-		? vercelBlobDriver({
-				access: "public",
-				base: "private-beta",
+		? supabaseStorageDriver({
+				supabaseUrl: process.env.SUPABASE_URL ?? "",
+				supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
+				bucket: "app",
 			})
 		: fsDriver({
 				base: "./.storage",
