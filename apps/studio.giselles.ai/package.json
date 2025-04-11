@@ -117,7 +117,7 @@
 		"@radix-ui/react-hover-card": "1.1.2",
 		"@tailwindcss/postcss": "4.0.9",
 		"@tailwindcss/typography": "0.5.15",
-		"@types/node": "22.10.5",
+		"@types/node": "catalog:",
 		"@types/nodemailer": "6.4.17",
 		"@types/react": "catalog:",
 		"@types/react-dom": "catalog:",
