@@ -1,4 +1,4 @@
-import { dataMod } from "@giselle-sdk/data-mod";
+import { parseAndMod } from "@giselle-sdk/data-mod";
 import {
 	type FileNode,
 	type GenerationTemplate,
@@ -40,22 +40,6 @@ export async function setRun({
 	}
 }
 
-function parseAndMod(runLike: unknown, mod = false) {
-	const parseResult = Run.safeParse(runLike);
-	if (parseResult.success) {
-		return parseResult.data;
-	}
-	if (mod) {
-		throw parseResult.error;
-	}
-
-	let modData = runLike;
-	for (const issue of parseResult.error.issues) {
-		modData = dataMod(modData, issue);
-	}
-	return parseAndMod(modData, true);
-}
-
 export async function getRun({
 	storage,
 	runId,
@@ -67,7 +51,7 @@ export async function getRun({
 	if (run == null) {
 		return undefined;
 	}
-	return parseAndMod(run);
+	return parseAndMod(Run, run);
 }
 
 export async function getWorkflow({
