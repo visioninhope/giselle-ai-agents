@@ -1,8 +1,8 @@
 import { useChat } from "@ai-sdk/react";
 import { type Generation, isQueuedGeneration } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useTelemetry } from "@giselle-sdk/telemetry/react";
 import { useEffect, useRef } from "react";
+import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
 
 function useOnce(fn: () => void) {

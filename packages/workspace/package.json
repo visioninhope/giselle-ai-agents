@@ -33,10 +33,8 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
-		"@giselle-sdk/generation-runner": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:^",
 		"@giselle-sdk/integration": "workspace:^",
-		"@giselle-sdk/run": "workspace:^",
 		"@giselle-sdk/telemetry": "workspace:^",
 		"@giselle-sdk/usage-limits": "workspace:^",
 		"@giselle-sdk/workflow-designer": "workspace:^",

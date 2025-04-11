@@ -16,7 +16,6 @@ import {
 	isFailedGeneration,
 	isRunningGeneration,
 } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import {
 	type ReactNode,
 	createContext,
@@ -26,13 +25,14 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useGiselleEngine } from "../../use-giselle-engine";
+import { GenerationRunner } from "../generation-runner";
 import {
 	arrayEquals,
 	waitAndGetGenerationCompleted,
 	waitAndGetGenerationFailed,
 	waitAndGetGenerationRunning,
-} from "../../helpers";
-import { GenerationRunner } from "../generation-runner";
+} from "../helpers";
 
 interface StartGenerationOptions {
 	onGenerationCreated?: (generation: CreatedGeneration) => void;

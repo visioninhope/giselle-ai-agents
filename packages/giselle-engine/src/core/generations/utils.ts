@@ -241,10 +241,6 @@ export async function setGenerationIndex(params: {
 	await params.storage.setItem(
 		generationIndexPath(params.generationIndex.id),
 		GenerationIndex.parse(params.generationIndex),
-		{
-			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
-			cacheControlMaxAge: 0,
-		},
 	);
 }
 export function generationPath(generationIndex: GenerationIndex) {
@@ -325,7 +321,10 @@ export async function getGeneration(params: {
 		throw new Error("Generation not found");
 	}
 	const unsafeGeneration = await params.storage.getItem(
-		generationPath(generationIndex),
+		`${generationPath(generationIndex)}`,
+		{
+			bypassingCache: true,
+		},
 	);
 	return parseAndMod(unsafeGeneration);
 }

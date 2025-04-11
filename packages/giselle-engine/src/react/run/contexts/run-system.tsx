@@ -9,8 +9,6 @@ import {
 	type WorkflowId,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { useGenerationRunnerSystem } from "@giselle-sdk/generation-runner/react";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import {
 	type ReactNode,
 	createContext,
@@ -19,6 +17,8 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { useGenerationRunnerSystem } from "../../generations";
+import { useGiselleEngine } from "../../use-giselle-engine";
 
 export interface performOptions {
 	onCreateRun?: (run: CreatedRun) => void;

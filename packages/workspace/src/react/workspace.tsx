@@ -1,11 +1,13 @@
 "use client";
 
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import { GenerationRunnerSystemProvider } from "@giselle-sdk/generation-runner/react";
-import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import {
+	GenerationRunnerSystemProvider,
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
+import { RunSystemContextProvider } from "@giselle-sdk/giselle-engine/react";
 import type { Integration } from "@giselle-sdk/integration";
 import { IntegrationProvider } from "@giselle-sdk/integration/react";
-import { RunSystemContextProvider } from "@giselle-sdk/run/react";
 import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import { TelemetryProvider } from "@giselle-sdk/telemetry/react";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
