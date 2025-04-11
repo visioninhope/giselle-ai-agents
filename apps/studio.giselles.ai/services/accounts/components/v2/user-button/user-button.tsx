@@ -37,7 +37,7 @@ export const UserButton: FC = async () => {
 					<span className="font-bold text-[16px] leading-[16px] font-hubot">
 						{displayName || "No display name"}
 					</span>
-					<span className="font-medium leading-[20.4px] font-hubot text-white-300">
+					<span className="font-medium leading-[20.4px] font-hubot text-black-600">
 						{user.email}
 					</span>
 				</DropdownMenuLabel>
