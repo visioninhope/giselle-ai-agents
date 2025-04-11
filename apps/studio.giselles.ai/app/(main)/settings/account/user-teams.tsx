@@ -90,6 +90,7 @@ function UserTeamsItem({
 			<DropdownMenu>
 				<DropdownMenuTrigger asChild>
 					<button
+						type="button"
 						className="flex items-center justify-center p-2 rounded-[4px] hover:bg-black-300/30 focus:outline-none"
 						aria-label="Team menu"
 					>

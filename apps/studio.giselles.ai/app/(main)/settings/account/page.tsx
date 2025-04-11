@@ -10,7 +10,7 @@ export default async function AccountSettingPage() {
 	const teams = await fetchUserTeams();
 	
 	// Add isPro information to each team
-	const teamsWithProInfo = teams.map(team => ({
+	const teamsWithProInfo = teams.map((team) => ({
 		id: team.id,
 		name: team.name,
 		role: team.role,

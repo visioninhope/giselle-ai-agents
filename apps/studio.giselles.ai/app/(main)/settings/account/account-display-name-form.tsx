@@ -81,7 +81,8 @@ export function AccountDisplayNameForm({
 						Display name
 					</span>
 					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist">
-						Please provide your preferred name or display name that you're comfortable using.
+						Please provide your preferred name or display name that you're
+						comfortable using.
 					</p>
 				</div>
 				<div className="flex justify-between items-center gap-2">
@@ -93,7 +94,7 @@ export function AccountDisplayNameForm({
 						<DialogTrigger asChild>
 							<Button>Edit</Button>
 						</DialogTrigger>
-						<DialogContent 
+						<DialogContent
 							className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]"
 							style={{
 								animation: "fadeIn 0.2s ease-out",
