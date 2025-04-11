@@ -33,7 +33,7 @@ function Submit({
 		<Button
 			type="submit"
 			variant="default"
-			className="h-[38px] w-full transition-colors duration-200"
+			className="h-[38px] w-full transition-colors duration-200 disabled:border-none"
 			disabled={pending || !teamName || !selectedPlan}
 		>
 			{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
@@ -62,14 +62,23 @@ export function TeamCreationForm({
 					<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
 				)}
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-900">
-				<DialogHeader>
+			<DialogContent 
+				className="sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[16px] bg-black-850 animate-fadeIn fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2"
+				style={{
+					animation: "0.2s ease-out 0s 1 normal none running fadeIn",
+				}}
+			>
+				<div
+					aria-hidden="true"
+					className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-850 bg-clip-padding"
+				/>
+				<DialogHeader className="relative z-10">
 					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
 						Create New Team
 					</DialogTitle>
 				</DialogHeader>
 
-				<form action={createTeam} className="space-y-4">
+				<form action={createTeam} className="space-y-4 relative z-10">
 					<div className="flex flex-col gap-y-2">
 						<Label
 							htmlFor="teamName"
@@ -86,7 +95,7 @@ export function TeamCreationForm({
 							placeholder="Enter team name"
 						/>
 					</div>
-					<div className="space-y-4">
+					<div className="space-y-4 relative z-10">
 						<div className="flex flex-col gap-y-2">
 							<Label className="text-white-800 font-medium text-[12px] leading-[20.4px] font-geist">
 								Select Plan
@@ -157,7 +166,7 @@ export function TeamCreationForm({
 						{!canCreateFreeTeam && (
 							<Alert
 								variant="destructive"
-								className="bg-error-900/5 border-error-900/20"
+								className="bg-error-900/5 border-error-900/20 relative z-10"
 							>
 								<AlertCircle className="h-[18px] w-[18px] text-red-900/50" />
 								<AlertDescription className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
