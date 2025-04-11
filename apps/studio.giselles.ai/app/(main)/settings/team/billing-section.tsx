@@ -50,7 +50,7 @@ export default async function BillingSection() {
 					)}
 				</div>
 
-				{!isProPlan(team) && team.type !== "internal" && (
+				{!isProPlan(team) && (
 					<form>
 						<Suspense
 							fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
