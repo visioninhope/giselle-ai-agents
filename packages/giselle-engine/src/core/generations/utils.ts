@@ -1,4 +1,4 @@
-import { dataMod } from "@giselle-sdk/data-mod";
+import { parseAndMod } from "@giselle-sdk/data-mod";
 import {
 	type ActionNode,
 	type CompletedGeneration,
@@ -291,22 +291,6 @@ export async function setGeneration(params: {
 			cacheControlMaxAge: 0,
 		},
 	);
-}
-
-function parseAndMod(generationLike: unknown, mod = false) {
-	const parseResult = Generation.safeParse(generationLike);
-	if (parseResult.success) {
-		return parseResult.data;
-	}
-	if (mod) {
-		throw parseResult.error;
-	}
-
-	let modData = generationLike;
-	for (const issue of parseResult.error.issues) {
-		modData = dataMod(modData, issue);
-	}
-	return parseAndMod(modData, true);
 }
 
 export async function getGeneration(params: {
