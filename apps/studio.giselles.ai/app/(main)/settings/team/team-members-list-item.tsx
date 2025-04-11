@@ -11,7 +11,11 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import {
 	Select,
 	SelectContent,
@@ -20,8 +24,9 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import type { TeamRole } from "@/drizzle";
-import { Check, Pencil, Trash2, X } from "lucide-react";
+import { Check, Ellipsis, Pencil, X } from "lucide-react";
 import { useState } from "react";
+import { Button } from "../components/button";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
 
 type TeamMemberListItemProps = {
@@ -116,86 +121,126 @@ export function TeamMemberListItem({
 	};
 
 	return (
-		<div className="grid grid-cols-[1fr_1fr_200px] gap-4 p-4 items-center text-zinc-200">
-			<div className="text-zinc-400">{displayName || "No display name"}</div>
-			<div className="text-zinc-400">{email || "No email"}</div>
-			<div className="flex flex-col gap-2">
-				<div className="flex items-center gap-3">
-					{isEditingRole ? (
-						<>
-							<Select
-								value={tempRole}
-								onValueChange={handleRoleChange}
-								disabled={isLoading}
-							>
-								<SelectTrigger className="w-[100px]">
-									<SelectValue />
-								</SelectTrigger>
-								<SelectContent>
-									<SelectItem value="admin">Admin</SelectItem>
-									<SelectItem value="member">Member</SelectItem>
-								</SelectContent>
-							</Select>
-							<Button
-								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={handleSaveRole}
-								disabled={isLoading || !!error}
-							>
-								<Check className="h-4 w-4" />
-							</Button>
-							<Button
-								className="shrink-0 h-8 w-8 rounded-full p-0"
-								onClick={handleCancelRole}
-								disabled={isLoading}
-							>
-								<X className="h-4 w-4" />
-							</Button>
-						</>
-					) : (
-						<>
-							<span className="text-zinc-400 capitalize w-[100px]">{role}</span>
-							{canEdit && (
-								<>
-									<Button
-										className="shrink-0 h-8 w-8 rounded-full p-0"
-										onClick={() => setIsEditingRole(true)}
-									>
-										<Pencil className="h-4 w-4" />
-									</Button>
-									<AlertDialog>
-										<AlertDialogTrigger asChild>
-											<Button
-												className="shrink-0 h-8 w-8 rounded-full p-0"
-												disabled={isLoading}
+		<div className="px-2">
+			<div className="flex items-center justify-between items-center gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+				<div className="flex gap-x-4">
+					<div className="flex flex-col gap-y-1 font-medium text-[12px] leading-[12px]">
+						<div className="text-blue-80">
+							{displayName || "No display name"}
+						</div>
+						<div className="text-white-400">{email || "No email"}</div>
+					</div>
+				</div>
+				<div className="flex justify-between gap-2">
+					<div className="flex items-center gap-[5px]">
+						{isEditingRole ? (
+							<>
+								<Select
+									value={tempRole}
+									onValueChange={handleRoleChange}
+									disabled={isLoading}
+								>
+									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-white-900">
+										<SelectValue />
+									</SelectTrigger>
+									<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
+										<SelectItem
+											value="admin"
+											className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+										>
+											Admin
+										</SelectItem>
+										<SelectItem
+											value="member"
+											className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
+										>
+											Member
+										</SelectItem>
+									</SelectContent>
+								</Select>
+								<Button
+									className="shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center"
+									onClick={handleSaveRole}
+									disabled={isLoading || !!error}
+								>
+									<Check className="h-4 w-4" />
+								</Button>
+								<Button
+									className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 bg-error-900 flex items-center justify-center border-0 hover:bg-transparent hover:border-2 hover:border-error-900 transition-colors"
+									onClick={handleCancelRole}
+									disabled={isLoading}
+								>
+									<X className="h-4 w-4 text-white group-hover:text-error-900" />
+								</Button>
+							</>
+						) : (
+							<>
+								<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
+									{role}
+								</span>
+								{canEdit && (
+									<>
+										<Button
+											className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center bg-white-400 hover:bg-transparent hover:border hover:border-white-400 transition-colors"
+											onClick={() => setIsEditingRole(true)}
+										>
+											<Pencil className="h-4 w-4 text-black-900 group-hover:text-white-400" />
+										</Button>
+
+										<DropdownMenu modal={false}>
+											<DropdownMenuTrigger className="cursor-pointer">
+												<Ellipsis className="text-white-350" />
+											</DropdownMenuTrigger>
+											<DropdownMenuContent
+												align="end"
+												className="px-0 py-2 border-[0.5px] border-error-900 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
 											>
-												<Trash2 className="h-4 w-4" />
-											</Button>
-										</AlertDialogTrigger>
-										<AlertDialogContent>
-											<AlertDialogHeader>
-												<AlertDialogTitle>Remove team member</AlertDialogTitle>
-												<AlertDialogDescription>
-													Are you sure you want to remove {displayName || email}{" "}
-													from the team? This action cannot be undone.
-												</AlertDialogDescription>
-											</AlertDialogHeader>
-											<AlertDialogFooter>
-												<AlertDialogCancel>Cancel</AlertDialogCancel>
-												<AlertDialogAction
-													onClick={handleDelete}
-													className="bg-destructive text-destructive-foreground hover:bg-destructive/90 dark:text-white"
-												>
-													Remove
-												</AlertDialogAction>
-											</AlertDialogFooter>
-										</AlertDialogContent>
-									</AlertDialog>
-								</>
-							)}
-						</>
+												<AlertDialog>
+													<AlertDialogTrigger asChild>
+														<Button
+															className="justify-start p-2 border-0 outline-none w-full bg-transparent text-error-900 font-medium text-[12px] leading-[20.4px] tracking-normal font-hubot transition duration-300 ease-out hover:bg-error-900/20 hover:text-error-900"
+															disabled={isLoading}
+														>
+															Remove from Team
+														</Button>
+													</AlertDialogTrigger>
+													<AlertDialogContent className="px-8 py-6 border-[0.5px] border-black-400 rounded-[16px] bg-black-850">
+														<AlertDialogHeader>
+															<AlertDialogTitle className="text-white-800 font-bold text-[16px] leading-[16px] font-hubot">
+																Remove Team Member
+															</AlertDialogTitle>
+															<AlertDialogDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+																Are you sure you want to remove{" "}
+																{displayName || email} from the team? This
+																action cannot be undone.
+															</AlertDialogDescription>
+														</AlertDialogHeader>
+														<AlertDialogFooter className="sm:space-x-4">
+															<AlertDialogCancel className="px-5 py-1 border-black-400 h-[38px] bg-transparent text-black-400 font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em] font-hubot cursor-pointer hover:bg-transparent hover:text-black-400">
+																Cancel
+															</AlertDialogCancel>
+															<AlertDialogAction
+																onClick={handleDelete}
+																className="px-5 py-1 border-error-900 bg-error-900 h-[38px] text-destructive-foreground font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em] font-hubot cursor-pointer hover:bg-transparent hover:text-error-900 dark:text-white-900"
+															>
+																Remove
+															</AlertDialogAction>
+														</AlertDialogFooter>
+													</AlertDialogContent>
+												</AlertDialog>
+											</DropdownMenuContent>
+										</DropdownMenu>
+									</>
+								)}
+							</>
+						)}
+					</div>
+					{error && (
+						<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+							{error}
+						</p>
 					)}
 				</div>
-				{error && <p className="text-sm text-destructive">{error}</p>}
 			</div>
 		</div>
 	);

@@ -13,7 +13,7 @@ catalog:
   next: 15.3.0
   unstorage: 1.14.4
   ai: 4.2.9
-  "@types/node": 22.10.7
+  "@types/node": 22.14.0
   "@types/react": 19.1.0
   "@types/react-dom": 19.1.2
   postcss: 8.5.1

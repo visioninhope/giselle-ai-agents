@@ -1,10 +1,10 @@
-import { Button } from "@/components/ui/button";
+import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
 import Link from "next/link";
-import { GitHubAppInstallButton } from "../../../../packages/components/github-app-install-button";
+import { Button } from "../components/button";
 
 export async function GitHubIntegration() {
 	const installUrl = await gitHubAppInstallURL();
@@ -57,7 +57,7 @@ function GitHubIntegrationPresentation({
 }: GitHubIntegrationPresentationProps) {
 	const installed = installations != null && installations?.length > 0;
 	return (
-		<div className="space-y-8 text-black-30">
+		<div className="space-y-6">
 			<Header
 				account={account}
 				installed={installed}
@@ -82,17 +82,21 @@ type HeaderProps = {
 
 function Header({ account, installed, installationUrl }: HeaderProps) {
 	return (
-		<div className="flex items-center justify-between">
-			<div className="flex items-center space-x-3">
+		<div className="flex items-center justify-between p-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10">
+			<div className="flex items-center space-x-4">
 				<SiGithub className="w-8 h-8" />
 				<div>
-					<h2 className="text-lg">GitHub</h2>
+					<h2 className="text-white-400 text-[16px] leading-[22.4px] font-medium font-geist">
+						GitHub
+					</h2>
 					{account ? (
-						<div className="text-sm text-muted-foreground">
-							Logged in as (<span className="text-blue-500">@{account}</span>)
+						<div className="text-12px leading-[20.4px] text-black-400 font-medium font-geist">
+							Logged in as (<span className="text-blue-80">@{account}</span>)
 						</div>
 					) : (
-						<div className="text-sm text-muted-foreground">Not connected</div>
+						<div className="text-[12px] leading-[20.4px] text-black-400 font-medium font-geist">
+							Not connected
+						</div>
 					)}
 				</div>
 			</div>
@@ -104,7 +108,9 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 					/>
 				) : (
 					<Button asChild>
-						<Link href="/settings/account">Connect</Link>
+						<Link href="/settings/account/authentication">
+							Configure GitHub App
+						</Link>
 					</Button>
 				)}
 			</div>
@@ -126,8 +132,8 @@ function Installation({ installation }: InstallationProps) {
 	const avatarUrl = "avatar_url" in account ? account.avatar_url : undefined;
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-black-70">
-			<div className="flex items-center space-x-3 border-b border-black-70 p-3 bg-black-70">
+		<div className="overflow-hidden rounded-lg border border-black-400">
+			<div className="flex items-center gap-x-2 border-b border-black-400  px-4 py-2 bg-black-400">
 				{avatarUrl && (
 					<img
 						src={avatarUrl}
@@ -135,20 +141,22 @@ function Installation({ installation }: InstallationProps) {
 						className="w-6 h-6 rounded-full"
 					/>
 				)}
-				<span>{displayName}</span>
+				<span className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
+					{displayName}
+				</span>
 			</div>
-			<div className="p-4 space-y-3">
+			<div className="py-4 space-y-2">
 				{installation.repositories.map((repo) => (
-					<div key={repo.id} className="flex items-center">
+					<div key={repo.id} className="flex items-center gap-x-2 px-4">
 						<a
 							href={repo.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-sm hover:underline"
+							className="text-white-400 font-medium text-sm leading-[19.6px] font-hubot hover:underline"
 						>
 							{repo.name}
 						</a>
-						<span className="ml-2 rounded-full px-2 py-0.5 text-xs border border-black-30">
+						<span className="rounded-full px-2 py-0.5 text-white-400 font-medium text-xs leading-[20.4px] font-geist border border-white-800">
 							{repo.private ? "Private" : "Public"}
 						</span>
 					</div>

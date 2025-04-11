@@ -1,12 +1,6 @@
-import { settingsV2Flag } from "@/flags";
-import { notFound } from "next/navigation";
-import { TeamMembers } from "../v2/team-members";
+import { TeamMembers } from "../team-members";
 
 export default async function TeamMembersPage() {
-	const settingsV2Mode = await settingsV2Flag();
-	if (!settingsV2Mode) {
-		return notFound();
-	}
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3

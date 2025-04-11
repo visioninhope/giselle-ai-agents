@@ -1,7 +1,10 @@
 "use client";
 
-import { Alert, AlertDescription } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
+import {
+	Alert,
+	AlertDescription,
+} from "@/app/(main)/settings/components/alert";
+import { Button } from "@/app/(main)/settings/components/button";
 import {
 	Card,
 	CardContent,
@@ -33,7 +36,7 @@ function Submit({
 		<Button
 			type="submit"
 			variant="default"
-			className="transition-colors duration-200"
+			className="h-[38px] w-full transition-colors duration-200"
 			disabled={pending || !teamName || !selectedPlan}
 		>
 			{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
@@ -44,30 +47,37 @@ function Submit({
 interface TeamCreationFormProps {
 	canCreateFreeTeam: boolean;
 	proPlanPrice: string;
+	children?: React.ReactNode;
 }
 
 export function TeamCreationForm({
 	canCreateFreeTeam,
 	proPlanPrice,
+	children,
 }: TeamCreationFormProps) {
 	const [teamName, setTeamName] = useState("");
 	const [selectedPlan, setSelectedPlan] = useState("");
 
 	return (
 		<Dialog>
-			<DialogTrigger asChild>
-				<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
+			<DialogTrigger asChild className="cursor-pointer">
+				{children ?? (
+					<UserPlus className="h-6 w-6 text-white hover:opacity-80" />
+				)}
 			</DialogTrigger>
-			<DialogContent className="sm:max-w-[500px] bg-gray-950 text-gray-100">
+			<DialogContent className="sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-900">
 				<DialogHeader>
-					<DialogTitle className="text-2xl font-bold text-gray-100">
+					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
 						Create New Team
 					</DialogTitle>
 				</DialogHeader>
 
-				<form action={createTeam} className="space-y-6">
-					<div className="space-y-2">
-						<Label htmlFor="teamName" className="text-gray-200">
+				<form action={createTeam} className="space-y-4">
+					<div className="flex flex-col gap-y-2">
+						<Label
+							htmlFor="teamName"
+							className="text-white-800 font-medium text-[12px] leading-[20.4px] font-geist"
+						>
 							Team Name
 						</Label>
 						<Input
@@ -75,71 +85,85 @@ export function TeamCreationForm({
 							name="teamName"
 							value={teamName}
 							onChange={(e) => setTeamName(e.target.value)}
-							className="bg-gray-900 border-gray-800 text-gray-100"
+							className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white"
 							placeholder="Enter team name"
 						/>
 					</div>
 					<div className="space-y-4">
-						<Label className="text-gray-200">Select Plan</Label>
-						<RadioGroup
-							name="selectedPlan"
-							value={selectedPlan}
-							onValueChange={setSelectedPlan}
-							className="grid grid-cols-2 gap-4"
-						>
-							<Card
-								className={`bg-gray-900 border-gray-800 ${
-									canCreateFreeTeam ? "cursor-pointer" : "opacity-50"
-								}`}
+						<div className="flex flex-col gap-y-2">
+							<Label className="text-white-800 font-medium text-[12px] leading-[20.4px] font-geist">
+								Select Plan
+							</Label>
+							<RadioGroup
+								name="selectedPlan"
+								value={selectedPlan}
+								onValueChange={setSelectedPlan}
+								className="grid grid-cols-2 gap-4"
 							>
-								<label htmlFor="free">
-									<CardHeader>
-										<CardTitle className="text-gray-100">Free</CardTitle>
-										<CardDescription className="text-gray-400">
-											Basic features for small teams
-										</CardDescription>
-									</CardHeader>
-									<CardContent>
-										<RadioGroupItem
-											value="free"
-											id="free"
-											disabled={!canCreateFreeTeam}
-											className="text-blue-500"
-										/>
-										<Label htmlFor="free" className="ml-2 text-gray-300">
-											$0/month
-										</Label>
-									</CardContent>
-								</label>
-							</Card>
-							<Card className="bg-gray-900 border-gray-800 cursor-pointer">
-								<label htmlFor="pro">
-									<CardHeader>
-										<CardTitle className="text-gray-100">Pro</CardTitle>
-										<CardDescription className="text-gray-400">
-											Advanced features & support
-										</CardDescription>
-									</CardHeader>
-									<CardContent>
-										<RadioGroupItem
-											value="pro"
-											id="pro"
-											className="text-blue-500"
-										/>
-										<Label htmlFor="pro" className="ml-2 text-gray-300">
-											{proPlanPrice}/month
-										</Label>
-									</CardContent>
-								</label>
-							</Card>
-						</RadioGroup>
+								<Card
+									className={`bg-black-850 border-[0.5px] border-black-400 ${
+										canCreateFreeTeam ? "cursor-pointer" : "opacity-50"
+									}`}
+								>
+									<label htmlFor="free">
+										<CardHeader>
+											<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+												Free
+											</CardTitle>
+											<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+												Basic features for small teams
+											</CardDescription>
+										</CardHeader>
+										<CardContent className="flex items-center">
+											<RadioGroupItem
+												value="free"
+												id="free"
+												disabled={!canCreateFreeTeam}
+												className="text-blue-500"
+											/>
+											<Label
+												htmlFor="free"
+												className="ml-2 text-white-800 font-geist"
+											>
+												$0/month
+											</Label>
+										</CardContent>
+									</label>
+								</Card>
+								<Card className="bg-black-850 border-[0.5px] border-black-400 cursor-pointer">
+									<label htmlFor="pro">
+										<CardHeader>
+											<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+												Pro
+											</CardTitle>
+											<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+												Advanced features & support
+											</CardDescription>
+										</CardHeader>
+										<CardContent className="flex items-center">
+											<RadioGroupItem
+												value="pro"
+												id="pro"
+												className="text-primary-900"
+											/>
+											<Label
+												htmlFor="pro"
+												className="ml-2 text-white-800 font-geist"
+											>
+												{proPlanPrice}/month
+											</Label>
+										</CardContent>
+									</label>
+								</Card>
+							</RadioGroup>
+						</div>
 						{!canCreateFreeTeam && (
 							<Alert
 								variant="destructive"
-								className="bg-red-900/20 border-red-900 text-red-400"
+								className="bg-error-900/5 border-error-900/20"
 							>
-								<AlertCircle className="h-4 w-4" />
-								<AlertDescription>
+								<AlertCircle className="h-[18px] w-[18px] text-red-900/50" />
+								<AlertDescription className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
 									You already have a Free plan team. Please upgrade to Pro for
 									additional teams.
 								</AlertDescription>

@@ -2,10 +2,12 @@ import { getUser } from "@/lib/supabase";
 import { isEmailFromRoute06 } from "@/lib/utils";
 import { formatStripePrice, stripe } from "@/services/external/stripe";
 import invariant from "tiny-invariant";
-import { fetchUserTeams } from "..";
+import { fetchUserTeams } from "../fetch-user-teams";
 import { TeamCreationForm } from "./team-creation-form";
 
-export default async function TeamCreation() {
+export default async function TeamCreation({
+	children,
+}: { children?: React.ReactNode }) {
 	const user = await getUser();
 	if (!user) {
 		throw new Error("User not found");
@@ -24,6 +26,8 @@ export default async function TeamCreation() {
 		<TeamCreationForm
 			canCreateFreeTeam={!isInternalUser && !hasExistingFreeTeam}
 			proPlanPrice={proPlanPrice}
-		/>
+		>
+			{children}
+		</TeamCreationForm>
 	);
 }

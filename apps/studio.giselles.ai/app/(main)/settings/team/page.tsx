@@ -1,51 +1,29 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { settingsV2Flag } from "@/flags";
 import { Suspense } from "react";
-import { AgentTimeCharge } from "./agent-time-charge";
-import { AgentUsage } from "./agent-usage";
-import BillingSection from "./billing-section";
-import { DangerZone } from "./danger-zone";
-import { TeamMembers } from "./team-members";
+import { DeleteTeam } from "./delete-team";
 import { TeamName } from "./team-name";
-import TeamPageV2 from "./v2/page";
 
 export default async function TeamPage() {
-	const settingsV2Mode = await settingsV2Flag();
-	if (settingsV2Mode) {
-		return <TeamPageV2 />;
-	}
-
 	return (
-		<div className="grid gap-[16px]">
+		<div className="flex flex-col gap-[24px]">
 			<h3
-				className="text-[32px] text-black--30 font-rosart"
+				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
 				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 			>
-				Team
+				General
 			</h3>
-			<Suspense
-				fallback={
-					<div className="w-full h-24">
-						<Skeleton className="h-full w-full" />
-					</div>
-				}
-			>
-				<AgentTimeCharge />
-			</Suspense>
-
-			<Suspense
-				fallback={
-					<div className="w-full h-24">
-						<Skeleton className="h-full w-full" />
-					</div>
-				}
-			>
-				<TeamName />
-			</Suspense>
-			<TeamMembers />
-			<AgentUsage />
-			<BillingSection />
-			<DangerZone />
+			<div className="flex flex-col gap-y-[16px]">
+				<Suspense
+					fallback={
+						<div className="w-full h-24">
+							<Skeleton className="h-full w-full" />
+						</div>
+					}
+				>
+					<TeamName />
+				</Suspense>
+				<DeleteTeam />
+			</div>
 		</div>
 	);
 }

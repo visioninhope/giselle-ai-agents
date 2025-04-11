@@ -1,6 +1,6 @@
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import type { FC, HTMLInputTypeAttribute } from "react";
-import { Input } from "../../ui/input";
-import { Label } from "../../ui/label";
 
 // FIXME: Consider integrating with apps/studio.giselles.ai/components/ui/field.tsx when releasing setting-v2
 type FieldProps = {

@@ -1,16 +1,9 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import { settingsV2Flag } from "@/flags";
-import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { Card } from "../../components/v2/card";
-import { GitHubAuthentication } from "../v2/github-authentication";
-import { GoogleAuthentication } from "../v2/google-authentication";
+import { GitHubAuthentication } from "../github-authentication";
+import { GoogleAuthentication } from "../google-authentication";
 
 export default async function AccountAuthenticationPage() {
-	const settingsV2Mode = await settingsV2Flag();
-	if (!settingsV2Mode) {
-		return notFound();
-	}
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex flex-col gap-y-2">
