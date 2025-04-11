@@ -8,6 +8,7 @@ import type { CurrentTeam } from "@/services/teams/types";
 import { Suspense } from "react";
 import { getSubscription } from "../actions";
 import { LocalDateTime } from "../components/local-date-time";
+import { ProTag } from "@/components/pro-tag";
 
 export default async function BillingSection() {
 	const team = await fetchCurrentTeam();
@@ -17,9 +18,20 @@ export default async function BillingSection() {
 			<Card className="flex items-center justify-between gap-x-1 py-4 border-none bg-transparent">
 				<div className="flex flex-col gap-y-1">
 					<div className="flex flex-wrap items-center gap-x-2 text-white-800 font-medium">
-						<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
-							{isProPlan(team) ? "Pro Plan" : "Free Plan"}
-						</p>
+						{isProPlan(team) ? (
+							<div className="flex flex-col gap-1">
+								<p className="text-[14px] leading-[16px] font-medium tracking-wide font-hubot">
+									Thank you for being
+								</p>
+								<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
+									<span className="text-primary-400">Pro Plan</span>
+								</p>
+							</div>
+						) : (
+							<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
+								Free Plan
+							</p>
+						)}
 					</div>
 					<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 						Have questions about your plan?{" "}
