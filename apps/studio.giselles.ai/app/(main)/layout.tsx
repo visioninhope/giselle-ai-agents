@@ -37,7 +37,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				</div>
 				
 				{/* ナビゲーションの下の罫線 */}
-				<div className="h-[1px] w-full bg-black-800"></div>
+				<div className="h-[1px] w-full bg-black-800" />
 			</header>
 			<main className="flex-1 overflow-y-auto">{children}</main>
 		</div>

@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { ExternalLink } from "lucide-react";
 import { Suspense } from "react";
-import { DeleteTeam } from "./delete-team";
 import BillingSection from "./billing-section";
+import { DeleteTeam } from "./delete-team";
 import { TeamName } from "./team-name";
 
 export default async function TeamPage() {
@@ -15,10 +15,10 @@ export default async function TeamPage() {
 				>
 					Settings
 				</h3>
-				<a 
+				<a
 					href="https://docs.giselles.ai/guides/settings/team/billing"
 					target="_blank"
-					rel="noopener noreferrer" 
+					rel="noopener noreferrer"
 					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
 				>
 					About Setting

@@ -12,19 +12,19 @@ export default async function SettingsAccountLayout({
 				<div className="w-[240px] min-h-full bg-black-900 p-[24px] flex flex-col">
 					{/* Menu Items */}
 					<div className="flex flex-col space-y-4">
-						<Link 
+						<Link
 							href="/settings/account"
 							className="text-white-400 hover:text-white-100 text-[16px] font-hubot font-medium py-1"
 						>
 							Overview
 						</Link>
-						<Link 
+						<Link
 							href="/settings/account/general"
 							className="text-black-70 hover:text-white-100 text-[16px] font-hubot font-medium py-1"
 						>
 							General
 						</Link>
-						<Link 
+						<Link
 							href="/settings/account/authentication"
 							className="text-black-70 hover:text-white-100 text-[16px] font-hubot font-medium py-1"
 						>
@@ -34,9 +34,7 @@ export default async function SettingsAccountLayout({
 				</div>
 
 				{/* Main Content */}
-				<div className="p-[24px] flex-1 bg-black-900">
-					{children}
-				</div>
+				<div className="p-[24px] flex-1 bg-black-900">{children}</div>
 			</div>
 		</div>
 	);
