@@ -44,7 +44,7 @@ export async function setCookie<T extends JsonValue>(
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
 		maxAge: 24 * 60 * 60, // 24 hours
-		path: '/',
+		path: "/",
 	});
 }
 
@@ -57,7 +57,7 @@ export async function getCookie(cookieName: string) {
 		const value = verify(cookie.value);
 		return value ? JSON.parse(value) : null;
 	} catch (error) {
-		console.error('Cookie retrieval error:', error);
+		console.error("Cookie retrieval error:", error);
 		return null;
 	}
 }

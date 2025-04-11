@@ -53,9 +53,9 @@ export function TeamSelectionForm({
 				<SelectContent className="flex flex-col gap-y-0 p-0 border-[0.5px] border-black-400 bg-black-900">
 					<div className="p-1 space-y-1">
 						{allTeams.map((team) => (
-							<SelectItem 
-								key={team.id} 
-								value={team.id} 
+							<SelectItem
+								key={team.id}
+								value={team.id}
 								className="p-1.5 pl-10 rounded-[8px] focus:bg-primary-900/50 font-hubot"
 							>
 								<div className="flex items-center gap-1.5 pr-1">
@@ -71,9 +71,9 @@ export function TeamSelectionForm({
 							</SelectItem>
 						))}
 					</div>
-					
+
 					<SelectSeparator className="my-0 bg-black-400" />
-					
+
 					<div className="p-1">
 						<button
 							type="button"
