@@ -30,12 +30,12 @@ export default async function Layout({ children }: { children: ReactNode }) {
 						<UserButton />
 					</div>
 				</div>
-				
+
 				{/* 下の行: メインナビゲーション */}
 				<div className="flex items-center px-[24px] py-0 border-t border-black-900/50">
 					<Nav />
 				</div>
-				
+
 				{/* ナビゲーションの下の罫線 */}
 				<div className="h-[1px] w-full bg-black-800" />
 			</header>

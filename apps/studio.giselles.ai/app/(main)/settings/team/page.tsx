@@ -35,12 +35,12 @@ export default async function TeamPage() {
 				>
 					<TeamName />
 				</Suspense>
-				
+
 				{/* Billing Section */}
 				<div>
 					<BillingSection />
 				</div>
-				
+
 				{/* Delete Team Section */}
 				<div className="mt-8">
 					<h4 className="text-white-400 font-medium text-[18px] leading-[22px] tracking-normal font-hubot mb-4">
