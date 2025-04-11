@@ -7,6 +7,9 @@ import type { FC } from "react";
 // Define menu items as an array
 const menuItems = [
 	{ name: "Apps", path: "/apps" },
+	{ name: "Members", path: "/settings/team/members" },
+	{ name: "Integrations", path: "/settings/team/integrations" },
+	{ name: "Billing", path: "/settings/team/billing" },
 	{ name: "Settings", path: "/settings/team" },
 ];
 
