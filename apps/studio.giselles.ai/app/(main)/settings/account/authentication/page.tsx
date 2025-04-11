@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Suspense } from "react";
-import { GitHubAuthentication } from "../v2/github-authentication";
-import { GoogleAuthentication } from "../v2/google-authentication";
+import { GitHubAuthentication } from "../github-authentication";
+import { GoogleAuthentication } from "../google-authentication";
 
 export default async function AccountAuthenticationPage() {
 	return (

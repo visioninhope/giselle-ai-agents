@@ -1,8 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { Suspense } from "react";
-import { AgentTimeCharge } from "../v2/agent-time-charge";
-import { AgentUsage } from "../v2/agent-usage";
+import { AgentTimeCharge } from "../agent-time-charge";
+import { AgentUsage } from "../agent-usage";
 
 export default async function TeamUsagePage() {
 	const currentTeam = await fetchCurrentTeam();

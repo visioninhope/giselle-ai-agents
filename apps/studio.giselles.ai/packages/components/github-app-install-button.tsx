@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
+import { Button } from "@/components/v2/ui/button";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
@@ -67,14 +67,13 @@ export function GitHubAppInstallButton({ installationUrl, installed }: Props) {
 
 	return (
 		<Button
-			variant="link"
 			onClick={handleInstall}
-			className="flex items-center gap-2 w-full justify-center px-6 py-3 text-sm font-medium shrink text-black-30"
+			className="items-center justify-center shrink"
 		>
 			{installed
 				? "Configure Giselle's GitHub App"
 				: "Add Giselle's GitHub App"}
-			<ExternalLink className="w-5 h-5" />
+			<ExternalLink className="shrink-0 w-5 h-5" />
 		</Button>
 	);
 }

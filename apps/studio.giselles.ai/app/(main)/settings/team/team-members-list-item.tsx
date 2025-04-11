@@ -28,7 +28,7 @@ import { Button } from "@/components/v2/ui/button";
 import type { TeamRole } from "@/drizzle";
 import { Check, Ellipsis, X } from "lucide-react";
 import { useState } from "react";
-import { deleteTeamMember, updateTeamMemberRole } from "../actions";
+import { deleteTeamMember, updateTeamMemberRole } from "./actions";
 
 type TeamMemberListItemProps = {
 	userId: string;

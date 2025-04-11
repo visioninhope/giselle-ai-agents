@@ -1,4 +1,4 @@
-import { TeamMembers } from "../v2/team-members";
+import { TeamMembers } from "../team-members";
 
 export default async function TeamMembersPage() {
 	return (

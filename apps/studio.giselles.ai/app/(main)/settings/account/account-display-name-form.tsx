@@ -20,7 +20,7 @@ import {
 	pipe,
 	string,
 } from "valibot";
-import { updateDisplayName } from "../actions";
+import { updateDisplayName } from "./actions";
 
 const DisplayNameSchema = pipe(
 	string(),

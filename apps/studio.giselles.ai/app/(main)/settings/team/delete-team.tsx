@@ -10,7 +10,7 @@ import {
 import { Alert, AlertDescription } from "@/components/v2/ui/alert";
 import { Button } from "@/components/v2/ui/button";
 import { useActionState, useState } from "react";
-import { deleteTeam } from "../actions";
+import { deleteTeam } from "./actions";
 
 export function DeleteTeam() {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);

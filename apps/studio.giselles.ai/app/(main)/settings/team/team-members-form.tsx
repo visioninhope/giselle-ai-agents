@@ -21,7 +21,7 @@ import {
 	pipe,
 	string,
 } from "valibot";
-import { addTeamMember } from "../actions";
+import { addTeamMember } from "./actions";
 
 const TeamMemberSchema = object({
 	email: pipe(

@@ -1,13 +1,12 @@
-import { GoogleAuthenticationPresentation } from "../../components/v2/google-authentication-presentation";
-import { ProviderConnectionButton } from "../../components/v2/provider-connection-button";
-
 import { getGoogleIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
+import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGoogleIdentity,
 	disconnectGoogleIdentity,
 	reconnectGoogleIdentity,
-} from "../actions";
+} from "./actions";
 
 const provider = "google";
 

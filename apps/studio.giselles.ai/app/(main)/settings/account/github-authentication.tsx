@@ -2,13 +2,13 @@
 
 import { getGitHubIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
-import { GitHubAuthenticationPresentation } from "../../components/v2/github-authentication-presentation";
-import { ProviderConnectionButton } from "../../components/v2/provider-connection-button";
+import { GitHubAuthenticationPresentation } from "../components/github-authentication-presentation";
+import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGitHubIdentity,
 	disconnectGitHubIdentity,
 	reconnectGitHubIdentity,
-} from "../actions";
+} from "./actions";
 
 export async function GitHubAuthentication() {
 	const identityState = await getGitHubIdentityState();

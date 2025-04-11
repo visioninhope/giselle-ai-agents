@@ -3,7 +3,7 @@ import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import {
 	AgentTimeUsageForFreePlan,
 	AgentTimeUsageForProPlan,
-} from "../components/v2/agent-time-usage";
+} from "./components/agent-time-usage";
 
 export async function AgentTimeCharge() {
 	const currentTeam = await fetchCurrentTeam();

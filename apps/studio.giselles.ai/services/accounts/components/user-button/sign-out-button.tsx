@@ -1,10 +1,13 @@
 "use client";
 
+import { cn } from "@/lib/utils";
 import { useRouter } from "next/navigation";
-import type { FC } from "react";
 import { signOut } from "../../actions/sign-out";
 
-export const SignOutButton: FC = () => {
+export const SignOutButton = ({
+	className,
+	children,
+}: { className?: string; children: React.ReactNode }) => {
 	const router = useRouter();
 
 	return (
@@ -14,8 +17,12 @@ export const SignOutButton: FC = () => {
 				signOut();
 				router.push("/login");
 			}}
+			className={cn(
+				"text-white-900 font-medium text-[12px] leading-[20.4px] font-geist cursor-pointer",
+				className,
+			)}
 		>
-			Logout
+			{children}
 		</button>
 	);
 };

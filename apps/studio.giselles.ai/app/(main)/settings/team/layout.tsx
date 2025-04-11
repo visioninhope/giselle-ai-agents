@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import { MenuLink } from "../components/v2/menu-link";
+import { MenuLink } from "../components/menu-link";
 
 export default async function SettingsTeamLayout({
 	children,

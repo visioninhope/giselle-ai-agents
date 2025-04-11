@@ -1,8 +1,8 @@
 import { Field } from "@/components/v2/ui/field";
-import { SignOutButton } from "@/services/accounts/components/v2/user-button/sign-out-button";
-import { Card } from "../../components/v2/card";
+import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
+import { Card } from "../../components/card";
+import { AccountDisplayNameForm } from "../account-display-name-form";
 import { getAccountInfo } from "../actions";
-import { AccountDisplayNameForm } from "../v2/account-display-name-form";
 
 export default async function AccountGeneralPage() {
 	const { displayName, email } = await getAccountInfo();

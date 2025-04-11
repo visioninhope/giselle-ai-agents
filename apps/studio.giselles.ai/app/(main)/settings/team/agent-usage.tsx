@@ -1,7 +1,7 @@
-import { Card } from "@/app/(main)/settings/components/v2/card";
-import { getAgentActivities } from "../actions";
-import { AgentUsageDialog } from "../v2/agent-usage-dialog";
-import { AgentUsageTable } from "../v2/agent-usage-table";
+import { Card } from "../components/card";
+import { getAgentActivities } from "./actions";
+import { AgentUsageDialog } from "./agent-usage-dialog";
+import { AgentUsageTable } from "./agent-usage-table";
 
 export async function AgentUsage() {
 	const result = await getAgentActivities({ limit: 50 });

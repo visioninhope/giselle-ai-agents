@@ -22,7 +22,7 @@ import { Button } from "@/components/v2/ui/button";
 import { AlertCircle, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";
-import { createTeam } from "../../actions/create-team";
+import { createTeam } from "../actions/create-team";
 
 function Submit({
 	selectedPlan,

@@ -1,4 +1,4 @@
-import { LocalDateTime } from "../components/local-date-time";
+import { LocalDateTime } from "./components/local-date-time";
 
 export type AgentActivity = {
 	agentId: string;

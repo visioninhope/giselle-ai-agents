@@ -1,4 +1,4 @@
-import BillingSection from "../v2/billing-section";
+import BillingSection from "../billing-section";
 
 export default async function TeamBillingPage() {
 	return (

@@ -6,8 +6,8 @@ import { manageBilling } from "@/services/teams/actions/manage-billing";
 import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import type { CurrentTeam } from "@/services/teams/types";
 import { Suspense } from "react";
-import { getSubscription } from "../actions";
-import { LocalDateTime } from "../components/local-date-time";
+import { getSubscription } from "./actions";
+import { LocalDateTime } from "./components/local-date-time";
 
 export default async function BillingSection() {
 	const team = await fetchCurrentTeam();

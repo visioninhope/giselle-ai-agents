@@ -20,7 +20,7 @@ import {
 	pipe,
 	string,
 } from "valibot";
-import { updateTeamName } from "../actions";
+import { updateTeamName } from "./actions";
 
 const TeamNameSchema = pipe(
 	string(),

@@ -1,6 +1,6 @@
-import { Card } from "@/app/(main)/settings/components/v2/card";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import { getCurrentUserRole, getTeamMembers } from "../actions";
+import { Card } from "../components/card";
+import { getCurrentUserRole, getTeamMembers } from "./actions";
 import { TeamMembersForm } from "./team-members-form";
 import { TeamMembersList } from "./team-members-list";
 

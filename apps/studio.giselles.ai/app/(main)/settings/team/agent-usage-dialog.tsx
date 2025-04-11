@@ -6,7 +6,7 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/v2/ui/button";
-import { type AgentActivity, AgentUsageTable } from "../v2/agent-usage-table";
+import { type AgentActivity, AgentUsageTable } from "./agent-usage-table";
 
 type AgentUsageDialogProps = {
 	activities: AgentActivity[];

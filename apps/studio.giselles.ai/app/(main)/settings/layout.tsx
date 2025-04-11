@@ -1,8 +1,9 @@
 import type { ReactNode } from "react";
-import SettingsLayoutV2 from "./settings-layout-v2";
 
-export default async function SettingsLayout({
-	children,
-}: { children: ReactNode }) {
-	return <SettingsLayoutV2>{children}</SettingsLayoutV2>;
+export default async function Layout({ children }: { children: ReactNode }) {
+	return (
+		<div className="flex divide-x divide-black-800 h-full bg-black-900">
+			{children}
+		</div>
+	);
 }
