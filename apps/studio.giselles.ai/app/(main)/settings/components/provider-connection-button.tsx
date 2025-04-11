@@ -1,8 +1,8 @@
 "use client";
 
-import { Button } from "@/components/v2/ui/button";
 import { useRouter } from "next/navigation";
 import { useActionState } from "react";
+import { Button } from "./button";
 
 type ButtonWithActionProps = {
 	action: () => Promise<void>;

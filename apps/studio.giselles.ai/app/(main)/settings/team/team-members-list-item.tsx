@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "../components/button";
 import {
 	AlertDialog,
 	AlertDialogAction,
@@ -14,7 +15,6 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
-	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import {
@@ -24,7 +24,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/v2/ui/button";
 import type { TeamRole } from "@/drizzle";
 import { Check, Ellipsis, X } from "lucide-react";
 import { useState } from "react";

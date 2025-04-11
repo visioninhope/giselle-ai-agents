@@ -1,7 +1,7 @@
-import { Button } from "@/components/v2/ui/button";
 import { cn } from "@/lib/utils";
 import Link from "next/link";
 import type { FC, PropsWithChildren } from "react";
+import { Button } from "./button";
 
 type SubmitAction = {
 	href?: never;

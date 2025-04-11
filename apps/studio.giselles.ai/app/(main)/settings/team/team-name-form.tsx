@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "../components/button";
 import {
 	Dialog,
 	DialogContent,
@@ -8,8 +9,6 @@ import {
 	DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Button } from "@/components/v2/ui/button";
 import type { Team } from "@/services/teams/types";
 import { useState } from "react";
 import {

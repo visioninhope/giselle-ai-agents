@@ -1,5 +1,6 @@
 "use client";
 
+import { Button } from "../components/button";
 import { Input } from "@/components/ui/input";
 import {
 	Select,
@@ -8,7 +9,6 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Button } from "@/components/v2/ui/button";
 import { useState } from "react";
 import {
 	type InferInput,

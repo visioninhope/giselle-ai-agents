@@ -1,14 +1,17 @@
 "use client";
 
 import {
+	Alert,
+	AlertDescription,
+} from "../components/alert";
+import { Button } from "../components/button";
+import {
 	Dialog,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
-import { Alert, AlertDescription } from "@/components/v2/ui/alert";
-import { Button } from "@/components/v2/ui/button";
 import { useActionState, useState } from "react";
 import { deleteTeam } from "./actions";
 

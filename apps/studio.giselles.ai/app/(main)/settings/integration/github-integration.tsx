@@ -1,4 +1,4 @@
-import { Button } from "@/components/v2/ui/button";
+import { Button } from "../components/button";
 import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";

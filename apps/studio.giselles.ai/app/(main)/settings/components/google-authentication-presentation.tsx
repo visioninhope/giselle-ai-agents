@@ -1,12 +1,7 @@
-import { ClickableText } from "@/components/ui/clicable-text";
-import { Alert, AlertDescription, AlertTitle } from "@/components/v2/ui/alert";
-import type {
-	GoogleUserClient,
-	GoogleUserData,
-} from "@/services/external/google";
+import type { GoogleUserData } from "@/services/external/google";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
 import { TriangleAlertIcon } from "lucide-react";
-import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "./alert";
 
 type GoogleUser = Awaited<GoogleUserData>;
 
@@ -21,7 +16,7 @@ export function GoogleAuthenticationPresentation({
 	alert,
 }: GoogleAuthenticationPresentationProps) {
 	return (
-		<div className="grid gap-4 rounded-[8px] border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
+		<div className="grid gap-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
 			{alert && (
 				<Alert variant="destructive" className="p-4">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />

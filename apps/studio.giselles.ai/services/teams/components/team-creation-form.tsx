@@ -1,6 +1,11 @@
 "use client";
 
 import {
+	Alert,
+	AlertDescription,
+} from "@/app/(main)/settings/components/alert";
+import { Button } from "@/app/(main)/settings/components/button";
+import {
 	Card,
 	CardContent,
 	CardDescription,
@@ -17,8 +22,6 @@ import {
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { Alert, AlertDescription } from "@/components/v2/ui/alert";
-import { Button } from "@/components/v2/ui/button";
 import { AlertCircle, UserPlus } from "lucide-react";
 import { useState } from "react";
 import { useFormStatus } from "react-dom";

@@ -1,4 +1,4 @@
-import { Button } from "@/components/v2/ui/button";
+import { Button } from "../components/button";
 import { ToastProvider } from "@/packages/contexts/toast";
 import { fetchUserTeams } from "@/services/teams";
 import TeamCreation from "@/services/teams/components/team-creation";

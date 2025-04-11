@@ -1,6 +1,6 @@
-import { Alert, AlertDescription, AlertTitle } from "@/components/v2/ui/alert";
 import { cn } from "@/lib/utils";
 import { AGENT_TIME_CHARGE_LIMIT_MINUTES } from "@/services/agents/activities";
+import { Alert, AlertDescription, AlertTitle } from "../../components/alert";
 
 export function AgentTimeUsageForFreePlan({
 	usedMinutes,

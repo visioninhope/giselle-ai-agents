@@ -1,6 +1,6 @@
 "use client";
 
-import { Button } from "@/components/v2/ui/button";
+import { Button } from "@/app/(main)/settings/components/button";
 import { ExternalLink } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";

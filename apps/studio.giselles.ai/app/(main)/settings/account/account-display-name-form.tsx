@@ -9,17 +9,10 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Button } from "@/components/v2/ui/button";
 import type { users } from "@/drizzle";
 import { useState } from "react";
-import {
-	type InferInput,
-	maxLength,
-	minLength,
-	parse,
-	pipe,
-	string,
-} from "valibot";
+import { maxLength, minLength, parse, pipe, string } from "valibot";
+import { Button } from "../components/button";
 import { updateDisplayName } from "./actions";
 
 const DisplayNameSchema = pipe(

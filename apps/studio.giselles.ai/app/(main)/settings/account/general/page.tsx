@@ -1,4 +1,4 @@
-import { Field } from "@/components/v2/ui/field";
+import { Field } from "../../components/field";
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import { Card } from "../../components/card";
 import { AccountDisplayNameForm } from "../account-display-name-form";
