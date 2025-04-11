@@ -1,6 +1,6 @@
 import {
 	type CreatedRun,
-	type FileNode,
+	type FileId,
 	type OverrideNode,
 	type QueuedRun,
 	type WorkflowId,
@@ -8,6 +8,7 @@ import {
 	isFileNode,
 } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
+import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
 import { getWorkflow, overrideGenerationTemplate, setRun } from "./utils";
 
@@ -61,23 +62,29 @@ async function copyFiles({
 	storage,
 	queuedRun,
 }: { storage: Storage; queuedRun: QueuedRun }) {
-	const files: FileNode[] = [];
+	const fileIds: FileId[] = [];
 	for (const node of queuedRun.workflow.nodes) {
 		if (!isFileNode(node)) {
 			continue;
 		}
-		files.push(node);
+		for (const file of node.content.files) {
+			fileIds.push(file.id);
+		}
 	}
 	await Promise.all(
-		files.map(async (file) => {
-			const fileContent = await storage.getItemRaw(file.id);
-			await storage.setItemRaw(
-				file.id.replace(
-					/workspaces:wrks-\w+:files:/,
-					`runs:${queuedRun.id}:files:`,
-				),
-				fileContent,
-			);
+		fileIds.map(async (fileId) => {
+			const workspaceFilePath = filePath({
+				fileId,
+				type: "workspace",
+				id: queuedRun.workspaceId,
+			});
+			const fileContent = await storage.getItemRaw(workspaceFilePath);
+			const runFilePath = filePath({
+				fileId,
+				type: "run",
+				id: queuedRun.id,
+			});
+			await storage.setItemRaw(runFilePath, fileContent);
 		}),
 	);
 }
