@@ -8,7 +8,6 @@ import {
 	SelectItem,
 	SelectSeparator,
 	SelectTrigger,
-	SelectValue,
 } from "@/components/ui/select";
 import { ChevronsUpDown, Plus } from "lucide-react";
 import { useRef } from "react";
@@ -18,11 +17,13 @@ import type { Team } from "../types";
 type TeamSelectionFormProps = {
 	allTeams: Team[];
 	currentTeam: Team;
+	teamCreation: React.ReactNode;
 };
 
 export function TeamSelectionForm({
 	allTeams,
 	currentTeam,
+	teamCreation,
 }: TeamSelectionFormProps) {
 	const formRef = useRef<HTMLFormElement>(null);
 
@@ -74,22 +75,13 @@ export function TeamSelectionForm({
 
 					<SelectSeparator className="my-0 bg-black-400" />
 
-					<div className="p-1">
-						<button
-							type="button"
-							className="flex items-center gap-x-2 p-1.5 rounded-[8px] w-full hover:bg-primary-900/50"
-							onClick={(e) => {
-								e.preventDefault();
-								// ここでは機能を実装しない
-							}}
-						>
-							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
-								<Plus className="size-3 text-black-900" />
-							</span>
-							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
-								Create team
-							</span>
-						</button>
+					<div className="p-2.5 flex items-center gap-x-2 rounded-[8px] w-full hover:bg-primary-900/50">
+						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
+							<Plus className="size-3 text-black-900" />
+						</span>
+						<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
+							{teamCreation}
+						</span>
 					</div>
 				</SelectContent>
 			</Select>
