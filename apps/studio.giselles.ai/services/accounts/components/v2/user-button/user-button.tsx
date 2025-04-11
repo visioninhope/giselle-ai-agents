@@ -37,7 +37,7 @@ export const UserButton: FC = async () => {
 					<span className="font-bold text-[16px] leading-[16px] font-hubot">
 						{displayName || "No display name"}
 					</span>
-					<span className="font-medium leading-[20.4px] font-hubot">
+					<span className="font-medium leading-[20.4px] font-hubot text-white-300">
 						{user.email}
 					</span>
 				</DropdownMenuLabel>
@@ -46,9 +46,9 @@ export const UserButton: FC = async () => {
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
 						<Link
 							href="/settings/account"
-							className="block p-2 w-full text-white-400 font-medium text-[12px] leading-[20.4px] font-hubot"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
 						>
-							Account Settings
+							Account Reference
 						</Link>
 					</DropdownMenuItem>
 					<TeamCreation>
@@ -59,7 +59,7 @@ export const UserButton: FC = async () => {
 							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 								<Plus className="size-3 text-black-900" />
 							</span>
-							<span className="text-white-400 font-medium text-[12px] leading-[20.4px] font-hubot">
+							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
 								Create team
 							</span>
 						</button>
@@ -71,14 +71,14 @@ export const UserButton: FC = async () => {
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
-							className="block p-2 w-full text-white-400 font-medium text-[12px] leading-[20.4px] font-hubot"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
 							rel="noreferrer"
 						>
 							Home Page
 						</a>
 					</DropdownMenuItem>
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<SignOutButton className="block p-2 w-full text-left text-white-400 font-hubot">
+						<SignOutButton className="block p-2 w-full text-left text-white-400 font-hubot text-[14px] leading-[20.4px]">
 							Log Out
 						</SignOutButton>
 					</DropdownMenuItem>
