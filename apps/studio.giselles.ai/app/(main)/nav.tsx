@@ -9,20 +9,28 @@ const menuItems = [
 	{ name: "Apps", path: "/apps" },
 	{ name: "Members", path: "/settings/team/members" },
 	{ name: "Integrations", path: "/settings/team/integrations" },
-	{ name: "Billing", path: "/settings/team/billing" },
+	{ name: "Usage", path: "/settings/team/usage" },
 	{ name: "Settings", path: "/settings/team" },
 ];
 
 export const Nav: FC = () => {
 	const pathname = usePathname();
+	
+	// 現在のパスに最もマッチする項目を見つける
+	let bestMatchPath = "";
+	let bestMatchIndex = -1;
+	
+	menuItems.forEach((item, index) => {
+		if (pathname.startsWith(item.path) && item.path.length > bestMatchPath.length) {
+			bestMatchPath = item.path;
+			bestMatchIndex = index;
+		}
+	});
 
 	return (
 		<div className="flex items-center">
-			{menuItems.map((item) => {
-				const isActive =
-					item.path === "/"
-						? pathname === "/"
-						: pathname === item.path || pathname.startsWith(`${item.path}/`);
+			{menuItems.map((item, index) => {
+				const isActive = index === bestMatchIndex;
 
 				return (
 					<Link
