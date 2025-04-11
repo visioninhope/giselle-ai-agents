@@ -213,7 +213,6 @@ export async function generateText(args: {
 					error: {
 						name: error.name,
 						message: error.message,
-						dump: error,
 					},
 				} satisfies FailedGeneration;
 				await Promise.all([
