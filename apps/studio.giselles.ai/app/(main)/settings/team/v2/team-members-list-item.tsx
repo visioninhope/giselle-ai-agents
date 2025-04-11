@@ -26,7 +26,7 @@ import {
 } from "@/components/ui/select";
 import { Button } from "@/components/v2/ui/button";
 import type { TeamRole } from "@/drizzle";
-import { Check, Ellipsis, X } from "lucide-react";
+import { Check, Ellipsis, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { deleteTeamMember, updateTeamMemberRole } from "../actions";
 
@@ -133,7 +133,7 @@ export function TeamMemberListItem({
 					</div>
 				</div>
 				<div className="flex justify-between gap-2">
-					<div className="flex items-center gap-[10px]">
+					<div className="flex items-center gap-[5px]">
 						{isEditingRole ? (
 							<>
 								<Select
@@ -141,7 +141,7 @@ export function TeamMemberListItem({
 									onValueChange={handleRoleChange}
 									disabled={isLoading}
 								>
-									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer">
+									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-white-900">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
@@ -160,32 +160,32 @@ export function TeamMemberListItem({
 									</SelectContent>
 								</Select>
 								<Button
-									className="shrink-0 h-8 w-8 rounded-full p-0"
+									className="shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center"
 									onClick={handleSaveRole}
 									disabled={isLoading || !!error}
 								>
 									<Check className="h-4 w-4" />
 								</Button>
 								<Button
-									className="shrink-0 h-8 w-8 rounded-full p-0"
+									className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 bg-error-900 flex items-center justify-center border-0 hover:bg-transparent hover:border-2 hover:border-error-900 transition-colors"
 									onClick={handleCancelRole}
 									disabled={isLoading}
 								>
-									<X className="h-4 w-4" />
+									<X className="h-4 w-4 text-white group-hover:text-error-900" />
 								</Button>
 							</>
 						) : (
 							<>
-								<span className="capitalize text-black-300  font-medium text-[12px] leading-[12px] text-end font-hubot">
+								<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
 									{role}
 								</span>
 								{canEdit && (
 									<>
 										<Button
-											className="px-2 border-white-400 bg-transparent text-white-400 font-medium text-[12px] leading-[12px]"
+											className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center bg-white-400 hover:bg-transparent hover:border hover:border-white-400 transition-colors"
 											onClick={() => setIsEditingRole(true)}
 										>
-											Manage Access
+											<Pencil className="h-4 w-4 text-black-900 group-hover:text-white-400" />
 										</Button>
 
 										<DropdownMenu modal={false}>
