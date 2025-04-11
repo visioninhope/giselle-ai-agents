@@ -6,10 +6,11 @@ import {
 	Select,
 	SelectContent,
 	SelectItem,
+	SelectSeparator,
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import { useRef } from "react";
 import { selectTeam } from "../actions/select-team";
 import type { Team } from "../types";
@@ -49,25 +50,47 @@ export function TeamSelectionForm({
 						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
 					</div>
 				</SelectTrigger>
-				<SelectContent className="flex flex-col gap-y-2 p-2 border-[0.5px] border-black-400 bg-black-900">
-					{allTeams.map((team) => (
-						<SelectItem 
-							key={team.id} 
-							value={team.id} 
-							className="p-2 pl-10 rounded-[8px] focus:bg-primary-900/50 font-hubot"
+				<SelectContent className="flex flex-col gap-y-0 p-0 border-[0.5px] border-black-400 bg-black-900">
+					<div className="p-1 space-y-1">
+						{allTeams.map((team) => (
+							<SelectItem 
+								key={team.id} 
+								value={team.id} 
+								className="p-1.5 pl-10 rounded-[8px] focus:bg-primary-900/50 font-hubot"
+							>
+								<div className="flex items-center gap-1.5 pr-1">
+									<span
+										className="truncate max-w-[180px] text-base font-hubot text-white-400"
+										title={team.name}
+									>
+										{team.name}
+									</span>
+									{team.isPro !== undefined &&
+										(team.isPro ? <ProTag /> : <FreeTag />)}
+								</div>
+							</SelectItem>
+						))}
+					</div>
+					
+					<SelectSeparator className="my-0 bg-black-400" />
+					
+					<div className="p-1">
+						<button
+							type="button"
+							className="flex items-center gap-x-2 p-1.5 rounded-[8px] w-full hover:bg-primary-900/50"
+							onClick={(e) => {
+								e.preventDefault();
+								// ここでは機能を実装しない
+							}}
 						>
-							<div className="flex items-center gap-1.5 pr-1">
-								<span
-									className="truncate max-w-[180px] text-base font-hubot text-white-400"
-									title={team.name}
-								>
-									{team.name}
-								</span>
-								{team.isPro !== undefined &&
-									(team.isPro ? <ProTag /> : <FreeTag />)}
-							</div>
-						</SelectItem>
-					))}
+							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
+								<Plus className="size-3 text-black-900" />
+							</span>
+							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
+								Create team
+							</span>
+						</button>
+					</div>
 				</SelectContent>
 			</Select>
 		</form>
