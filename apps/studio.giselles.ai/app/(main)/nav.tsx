@@ -15,13 +15,16 @@ const menuItems = [
 
 export const Nav: FC = () => {
 	const pathname = usePathname();
-	
+
 	// 現在のパスに最もマッチする項目を見つける
 	let bestMatchPath = "";
 	let bestMatchIndex = -1;
-	
+
 	menuItems.forEach((item, index) => {
-		if (pathname.startsWith(item.path) && item.path.length > bestMatchPath.length) {
+		if (
+			pathname.startsWith(item.path) &&
+			item.path.length > bestMatchPath.length
+		) {
 			bestMatchPath = item.path;
 			bestMatchIndex = index;
 		}
