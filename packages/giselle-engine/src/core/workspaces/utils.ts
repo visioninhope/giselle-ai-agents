@@ -1,4 +1,4 @@
-import { dataMod } from "@giselle-sdk/data-mod";
+import { dataMod, parseAndMod } from "@giselle-sdk/data-mod";
 import { Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 
@@ -21,22 +21,6 @@ export async function setWorkspace({
 	});
 }
 
-function parseAndMod(workspaceLike: unknown, mod = false) {
-	const parseResult = Workspace.safeParse(workspaceLike);
-	if (parseResult.success) {
-		return parseResult.data;
-	}
-	if (mod) {
-		throw parseResult.error;
-	}
-
-	let modData = workspaceLike;
-	for (const issue of parseResult.error.issues) {
-		modData = dataMod(modData, issue);
-	}
-	return parseAndMod(modData, true);
-}
-
 export async function getWorkspace({
 	storage,
 	workspaceId,
@@ -45,7 +29,7 @@ export async function getWorkspace({
 	workspaceId: WorkspaceId;
 }) {
 	const result = await storage.getItem(workspacePath(workspaceId));
-	return parseAndMod(result);
+	return parseAndMod(Workspace, result);
 }
 
 /** @todo update new fileId for each file */

@@ -326,7 +326,7 @@ export async function getGeneration(params: {
 			bypassingCache: true,
 		},
 	);
-	return parseAndMod(unsafeGeneration);
+	return parseAndMod(Generation, unsafeGeneration);
 }
 
 export function nodeGenerationIndexPath(
