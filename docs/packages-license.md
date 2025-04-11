@@ -3,7 +3,7 @@
 
 ## Summary
 * 1015 MIT
-* 105 Apache 2.0
+* 107 Apache 2.0
 * 58 ISC
 * 34 New BSD
 * 17 Simplified BSD
