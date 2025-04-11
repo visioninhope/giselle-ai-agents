@@ -7,9 +7,9 @@ export default async function SettingsAccountLayout({
 }: { children: ReactNode }) {
 	return (
 		<div className="h-full bg-black-900">
-			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full flex divide-x divide-black-80">
+			<div className="px-[40px] pb-[24px] flex-1 max-w-[1200px] mx-auto w-full flex divide-x divide-black-80">
 				{/* Left Sidebar */}
-				<div className="w-[240px] min-h-full flex flex-col">
+				<div className="w-[240px] min-h-full flex flex-col pt-[24px]">
 					{/* Menu Items */}
 					<div className="flex flex-col space-y-4">
 						<Link
@@ -34,7 +34,7 @@ export default async function SettingsAccountLayout({
 				</div>
 
 				{/* Main Content */}
-				<div className="pl-[24px] flex-1">{children}</div>
+				<div className="pl-[24px] flex-1 pt-[24px]">{children}</div>
 			</div>
 		</div>
 	);
