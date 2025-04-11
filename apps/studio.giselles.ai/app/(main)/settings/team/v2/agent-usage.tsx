@@ -8,7 +8,7 @@ export async function AgentUsage() {
 
 	if (!result.success || !result.data) {
 		return (
-			<Card title="Recent Agents">
+			<Card title="Recent App Usage">
 				<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Failed to load agent activities
 				</div>
@@ -21,7 +21,7 @@ export async function AgentUsage() {
 
 	return (
 		<Card
-			title="Recent Agents"
+			title="Recent App Usage"
 			action={{
 				component:
 					activities.length > 0 ? (

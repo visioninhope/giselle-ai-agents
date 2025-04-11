@@ -20,10 +20,10 @@ export function AgentUsageTable({
 	return (
 		<div className="flex flex-col gap-y-2">
 			<div className="grid grid-cols-4 items-center gap-2 rounded-[4px] bg-white-850/20 p-2 font-bold text-white-400 text-[12px] leading-[15.6px] tracking-normal font-geist">
-				<div>Agent</div>
+				<div>App</div>
 				<div>Start Time</div>
 				<div>End Time</div>
-				<div>Charge</div>
+				<div>Usage Time</div>
 			</div>
 			<div className={containerClassName}>
 				<div className="px-2">
@@ -51,7 +51,7 @@ export function AgentUsageTable({
 						))
 					) : (
 						<div className="text-black-400 text-[12px] leading-[20.4px] tracking-normal font-geist">
-							No agent activity
+							No app usages
 						</div>
 					)}
 				</div>

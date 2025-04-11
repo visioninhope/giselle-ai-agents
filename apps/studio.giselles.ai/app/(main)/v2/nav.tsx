@@ -4,28 +4,47 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { FC } from "react";
 
+// Define menu items as an array
+const menuItems = [
+	{ name: "Apps", path: "/apps" },
+	{
+		name: "Docs",
+		path: "https://docs.giselles.ai/guides/introduction",
+		isExternal: true,
+	},
+	{ name: "Settings", path: "/settings/team" },
+];
+
 export const Nav: FC = () => {
 	const pathname = usePathname();
 
 	return (
-		<div className="gap-[16px] text-[18px] font-hubot font-medium flex text-black-70">
-			<p className="text-black--30">
-				{pathname === "/"
-					? "Lobby"
-					: pathname.startsWith("/apps")
-						? "Apps"
-						: pathname.startsWith("/settings/account")
-							? "Account"
-							: pathname.startsWith("/settings/team")
-								? "Settings"
-								: ""}
-			</p>
-			<p>/</p>
-			{/** pathname !== "/" && <Link href="/">Lobby</Link> */}
-			{!pathname.startsWith("/apps") && <Link href="/apps">Apps</Link>}
-			{!pathname.startsWith("/settings/team") && (
-				<Link href="/settings/team">Settings</Link>
-			)}
+		<div className="flex items-center gap-2">
+			{menuItems.map((item) => {
+				const isActive =
+					!item.isExternal &&
+					(item.path === "/"
+						? pathname === "/"
+						: pathname === item.path || pathname.startsWith(`${item.path}/`));
+
+				return (
+					<Link
+						key={item.path}
+						href={item.path}
+						className={`text-[16px] font-hubot font-medium transition-colors px-3 py-2 relative rounded-md
+							${
+								isActive
+									? "text-primary-100 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
+									: "text-black-70 hover:text-white-100 hover:bg-white-950/20"
+							}`}
+						{...(item.isExternal
+							? { target: "_blank", rel: "noopener noreferrer" }
+							: {})}
+					>
+						{item.name}
+					</Link>
+				);
+			})}
 		</div>
 	);
 };

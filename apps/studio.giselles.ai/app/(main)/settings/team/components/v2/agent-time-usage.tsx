@@ -64,14 +64,14 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 	const isOverLimit = usedMinutes > includedMinutes;
 	const isNearLimit =
 		usedMinutes >= includedMinutes * warningThreshold && !isOverLimit;
-	const remainingMinutes = includedMinutes - usedMinutes;
-	const overMinutes = usedMinutes - includedMinutes;
+	const remainingMinutes = Number((includedMinutes - usedMinutes).toFixed(2));
+	const overMinutes = Number((usedMinutes - includedMinutes).toFixed(2));
 
 	return (
 		<>
 			<div className="flex justify-between items-baseline">
 				<h2 className="text-white-400 font-medium text-[16px] leading-[27.2px] tracking-normal font-hubot">
-					Agent Time
+					App Usage Time
 				</h2>
 				<div className="text-right">
 					<div

@@ -126,6 +126,9 @@ catalogs:
     '@urql/core':
       specifier: 5.1.1
       version: 5.1.1
+    '@vercel/edge-config':
+      specifier: 1.4.0
+      version: 1.4.0
     '@xyflow/react':
       specifier: 12.4.1
       version: 12.4.1
@@ -468,6 +471,9 @@ importers:
       '@vercel/blob':
         specifier: 0.27.3
         version: 0.27.3
+      '@vercel/edge-config':
+        specifier: 'catalog:'
+        version: 1.4.0(@opentelemetry/api@1.9.0)
       '@vercel/functions':
         specifier: 1.5.0
         version: 1.5.0
@@ -4943,6 +4949,18 @@ packages:
   '@vercel/blob@0.27.3':
     resolution: {integrity: sha512-WizeAxzOTmv0JL7wOaxvLIU/KdBcrclM1ZUOdSlIZAxsTTTe1jsyBthStLby0Ueh7FnmKYAjLz26qRJTk5SDkQ==}
     engines: {node: '>=16.14'}
+
+  '@vercel/edge-config-fs@0.1.0':
+    resolution: {integrity: sha512-NRIBwfcS0bUoUbRWlNGetqjvLSwgYH/BqKqDN7vK1g32p7dN96k0712COgaz6VFizAm9b0g6IG6hR6+hc0KCPg==}
+
+  '@vercel/edge-config@1.4.0':
+    resolution: {integrity: sha512-69Wg5gw9DzwnyUmnjToSeLRm1nm8mCPgN0kflX8EHRHyqvzH80wPem5A8rI2LXPb2Y9tJNoqN3vXPcQhS2Wh5g==}
+    engines: {node: '>=14.6'}
+    peerDependencies:
+      '@opentelemetry/api': ^1.7.0
+    peerDependenciesMeta:
+      '@opentelemetry/api':
+        optional: true
 
   '@vercel/functions@1.5.0':
     resolution: {integrity: sha512-ub3ptVeOsx8UPgiTv9+rpQJqmF7VG8QIzguBZo0E0VRAyJliB8bt1ooB9Wrh3333dKzMNS8NMe3iFtf6OPUP3A==}
@@ -13361,6 +13379,14 @@ snapshots:
       is-node-process: 1.2.0
       throttleit: 2.1.0
       undici: 5.28.5
+
+  '@vercel/edge-config-fs@0.1.0': {}
+
+  '@vercel/edge-config@1.4.0(@opentelemetry/api@1.9.0)':
+    dependencies:
+      '@vercel/edge-config-fs': 0.1.0
+    optionalDependencies:
+      '@opentelemetry/api': 1.9.0
 
   '@vercel/functions@1.5.0': {}
 

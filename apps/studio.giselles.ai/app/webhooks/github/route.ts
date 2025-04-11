@@ -1,10 +1,13 @@
 import { giselleEngine } from "@/app/giselle-engine";
+import { agents, db } from "@/drizzle";
+import type { WorkspaceId } from "@giselle-sdk/data-type";
 import {
 	isUsageLimitError,
 	isWorkflowError,
 } from "@giselle-sdk/giselle-engine";
 import { Webhooks } from "@octokit/webhooks";
 import type { WebhookEventName } from "@octokit/webhooks-types";
+import { eq } from "drizzle-orm";
 import { type NextRequest, after } from "next/server";
 import {
 	WebhookPayloadError,
@@ -97,6 +100,18 @@ export async function POST(request: NextRequest) {
 							// https://github.com/octokit/request.js/issues/463#issuecomment-1164800010
 							const diff = result.data as unknown as string;
 							return diff;
+						},
+						buildResultFooter: async (workspaceId: WorkspaceId) => {
+							const agent = await db.query.agents.findFirst({
+								where: eq(agents.workspaceId, workspaceId),
+							});
+							if (agent === undefined) {
+								throw new Error("Agent not found");
+							}
+							const url =
+								process.env.NEXT_PUBLIC_SITE_URL ||
+								"https://studio.giselles.ai";
+							return `> :sparkles: Giselle App: [${agent.name || "Untitled"}](${url}/workspaces/${workspaceId}/)`;
 						},
 					},
 				});

@@ -7,7 +7,7 @@ export default async function SettingsLayoutV1({
 	children,
 }: { children: ReactNode }) {
 	return (
-		<div className="flex divide-x divide-black-80 h-full">
+		<div className="flex divide-x divide-black-80 h-full bg-black-900">
 			<div className="w-[200px] p-[24px]">
 				<div className="grid gap-[16px]">
 					<MenuLink
@@ -30,7 +30,7 @@ export default async function SettingsLayoutV1({
 					</MenuLink>
 				</div>
 			</div>
-			<div className="px-[48px] py-[32px] flex-1">{children}</div>
+			<div className="px-[48px] py-[32px] flex-1 bg-black-900">{children}</div>
 		</div>
 	);
 }
