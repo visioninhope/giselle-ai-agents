@@ -8,7 +8,7 @@ import UserTeams from "./user-teams";
 
 export default async function AccountSettingPage() {
 	const teams = await fetchUserTeams();
-	
+
 	// Add isPro information to each team
 	const teamsWithProInfo = teams.map((team) => ({
 		id: team.id,
