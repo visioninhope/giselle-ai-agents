@@ -48,7 +48,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
 		storage: config.storage,
 		llmProviders: config.llmProviders ?? [],
-		integrationConfigs: config.integrationConfigs ?? [],
+		integrationConfigs: config.integrationConfigs ?? {},
 		onConsumeAgentTime: config.onConsumeAgentTime,
 		telemetry: config.telemetry,
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,

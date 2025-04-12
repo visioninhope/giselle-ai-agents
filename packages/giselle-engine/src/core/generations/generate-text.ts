@@ -18,7 +18,13 @@ import {
 	isCompletedGeneration,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
-import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { githubTools, octokit } from "@giselle-sdk/github-tool";
+import {
+	AISDKError,
+	type ToolSet,
+	appendResponseMessages,
+	streamText,
+} from "ai";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
@@ -198,10 +204,46 @@ export async function generateText(args: {
 		generationContentResolver,
 	);
 
+	let tools: ToolSet = {};
+	if (
+		actionNode.content.tools?.github &&
+		args.context.integrationConfigs?.github
+	) {
+		const auth = args.context.integrationConfigs.github.auth;
+		switch (auth.strategy) {
+			case "github-installation": {
+				const installationId = await auth.resolveGitHubInstallationIdForRepo(
+					actionNode.content.tools.github.repositoryNodeId,
+				);
+				tools = {
+					...tools,
+					...githubTools(
+						octokit({
+							...auth,
+							installationId,
+						}),
+					),
+				};
+				break;
+			}
+			case "github-token":
+				tools = {
+					...tools,
+					...githubTools(octokit(auth)),
+				};
+				break;
+			default: {
+				const _exhaustiveCheck: never = auth;
+				throw new Error(`Unhandled GitHub auth strategy: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+
 	const streamTextResult = streamText({
 		model: generationModel(actionNode.content.llm),
 		messages,
 		maxSteps: 5, // enable multi-step calls
+		tools,
 		experimental_continueSteps: true,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {

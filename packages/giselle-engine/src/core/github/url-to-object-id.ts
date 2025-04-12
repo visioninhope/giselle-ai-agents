@@ -15,9 +15,7 @@ export async function urlToObjectID(args: {
 	if (githubUrlInfo === null) {
 		throw new Error("Invalid GitHub URL");
 	}
-	const githubConfig = args.context.integrationConfigs?.find(
-		(config) => config.provider === "github",
-	);
+	const githubConfig = args.context.integrationConfigs?.github;
 	if (githubConfig === undefined) {
 		throw new Error("GitHub integration not configured");
 	}
@@ -25,29 +23,19 @@ export async function urlToObjectID(args: {
 	let config: GitHubAuthConfig | undefined = undefined;
 
 	switch (githubConfig.auth.strategy) {
-		case "github-app-user":
-			config = {
-				strategy: "github-app-user",
-				clientId: githubConfig.auth.clientId,
-				clientSecret: githubConfig.auth.clientSecret,
-				token: process.env.EXPERIMENTAL_GITHUB_APP_USER_TOKEN ?? "",
-				refreshToken:
-					process.env.EXPERIMENTAL_GITHUB_APP_USER_REFRESH_TOKEN ?? "",
-			};
-			break;
-		case "github-installation":
+		case "github-installation": {
+			const installationId =
+				await githubConfig.auth.resolveGitHubInstallationIdForRepo("dummy");
 			config = {
 				strategy: "github-installation",
 				appId: githubConfig.auth.appId,
 				privateKey: githubConfig.auth.privateKey,
-				installationId: process.env.EXPERIMENTAL_GITHUB_INSTALLATION_ID ?? "",
+				installationId,
 			};
 			break;
+		}
 		case "github-token":
-			config = {
-				strategy: "github-token",
-				token: githubConfig.auth.token,
-			};
+			config = githubConfig.auth;
 			break;
 		default: {
 			const _exhaustiveCheck: never = githubConfig.auth;

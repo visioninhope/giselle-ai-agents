@@ -1,6 +1,5 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
-	GitHubAppUserAuth,
 	GitHubInstallationAppAuth,
 	GitHubTokenAuth,
 } from "@giselle-sdk/github-tool";
@@ -12,7 +11,9 @@ export interface GiselleEngineContext {
 	storage: Storage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders: LanguageModelProvider[];
-	integrationConfigs?: GiselleIntegrationConfig[];
+	integrationConfigs?: {
+		github?: GitHubIntegrationConfig;
+	};
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
 	telemetry?: {
@@ -25,8 +26,11 @@ export interface GitHubIntegrationConfig {
 	provider: "github";
 	auth:
 		| GitHubTokenAuth
-		| Omit<GitHubAppUserAuth, "token" | "refreshToken">
-		| Omit<GitHubInstallationAppAuth, "installationId">;
+		| (Omit<GitHubInstallationAppAuth, "installationId"> & {
+				resolveGitHubInstallationIdForRepo: (
+					repositoryNodeId: string,
+				) => Promise<number>;
+		  });
 }
 
 export type GiselleIntegrationConfig = GitHubIntegrationConfig;
@@ -45,7 +49,9 @@ export interface GiselleEngineConfig {
 	storage: Storage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders?: LanguageModelProvider[];
-	integrationConfigs?: GiselleIntegrationConfig[];
+	integrationConfigs?: {
+		github?: GitHubIntegrationConfig;
+	};
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	telemetry?: {
 		isEnabled?: boolean;
