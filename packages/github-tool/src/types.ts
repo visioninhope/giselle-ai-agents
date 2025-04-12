@@ -2,15 +2,7 @@ export interface GitHubInstallationAppAuth {
 	strategy: "github-installation";
 	appId: string;
 	privateKey: string;
-	installationId: string;
-}
-
-export interface GitHubAppUserAuth {
-	strategy: "github-app-user";
-	clientId: string;
-	clientSecret: string;
-	token: string;
-	refreshToken: string;
+	installationId: number;
 }
 
 export interface GitHubTokenAuth {
@@ -18,7 +10,4 @@ export interface GitHubTokenAuth {
 	token: string;
 }
 
-export type GitHubAuthConfig =
-	| GitHubInstallationAppAuth
-	| GitHubAppUserAuth
-	| GitHubTokenAuth;
+export type GitHubAuthConfig = GitHubInstallationAppAuth | GitHubTokenAuth;

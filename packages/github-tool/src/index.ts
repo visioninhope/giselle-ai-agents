@@ -49,7 +49,6 @@ export async function graphql(authConfig: GitHubAuthConfig) {
 			token = installationAcessTokenAuthentication.token;
 			break;
 		}
-		case "github-app-user":
 		case "github-token": {
 			token = authConfig.token;
 			break;
