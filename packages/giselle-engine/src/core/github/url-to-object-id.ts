@@ -2,7 +2,7 @@ import {
 	type GitHubAuthConfig,
 	IssueNodeIdQuery,
 	graphql,
-} from "@giselle-sdk/github-client";
+} from "@giselle-sdk/github-tool";
 import type { GiselleEngineContext } from "../types";
 import { NotFoundError, UnsupportedError } from "./error";
 import { parseGitHubUrl } from "./utils";

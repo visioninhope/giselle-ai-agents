@@ -805,7 +805,7 @@ importers:
       '@giselle-sdk/data-mod':
         specifier: workspace:^
         version: link:../data-mod
-      '@giselle-sdk/github-client':
+      '@giselle-sdk/github-tool':
         specifier: workspace:^
         version: link:../github-client
       '@giselle-sdk/language-model':
@@ -909,6 +909,9 @@ importers:
       '@urql/core':
         specifier: 'catalog:'
         version: 5.1.1(graphql@16.10.0)
+      ai:
+        specifier: 'catalog:'
+        version: 4.2.9(react@19.1.0)(zod@3.24.1)
       gql.tada:
         specifier: 'catalog:'
         version: 1.8.10(graphql@16.10.0)(typescript@5.7.3)
@@ -918,6 +921,9 @@ importers:
       urql:
         specifier: 'catalog:'
         version: 4.2.2(@urql/core@5.1.1(graphql@16.10.0))(react@19.1.0)
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.1
     devDependencies:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
@@ -15238,7 +15244,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.10.7
+      '@types/node': 22.14.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 

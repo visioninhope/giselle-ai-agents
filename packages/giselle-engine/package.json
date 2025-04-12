@@ -58,7 +58,7 @@
 		"@ai-sdk/react": "catalog:",
 		"@fal-ai/client": "catalog:",
 		"@giselle-sdk/data-mod": "workspace:^",
-		"@giselle-sdk/github-client": "workspace:^",
+		"@giselle-sdk/github-tool": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/telemetry": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",

@@ -3,7 +3,7 @@ import type {
 	GitHubAppUserAuth,
 	GitHubInstallationAppAuth,
 	GitHubTokenAuth,
-} from "@giselle-sdk/github-client";
+} from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
