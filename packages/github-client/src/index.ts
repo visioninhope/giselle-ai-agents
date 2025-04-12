@@ -4,6 +4,7 @@ import { graphql as gql } from "./graphql";
 import type { GitHubAuthConfig } from "./types";
 export * from "./types";
 export * from "./octokit";
+export * from "./tools";
 
 export const IssueNodeIdQuery = gql(/* GraphQL */ `
   query IssueNodeIdQuery($name: String!, $owner: String!, $issueNumber: Int!) {
