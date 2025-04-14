@@ -10,7 +10,8 @@ import {
 	SelectTrigger,
 } from "@/components/ui/select";
 import { ChevronsUpDown, Plus } from "lucide-react";
-import { useRef } from "react";
+import { usePathname } from "next/navigation";
+import { useMemo, useRef } from "react";
 import { selectTeam } from "../actions/select-team";
 import type { Team } from "../types";
 
@@ -18,34 +19,55 @@ type TeamSelectionFormProps = {
 	allTeams: Team[];
 	currentTeam: Team;
 	teamCreation: React.ReactNode;
+	currentUser: React.ReactNode;
 };
 
 export function TeamSelectionForm({
 	allTeams,
 	currentTeam,
 	teamCreation,
+	currentUser,
 }: TeamSelectionFormProps) {
+	const pathname = usePathname();
+	const isAccontSettingPage = useMemo(
+		() => pathname.startsWith("/settings/account"),
+		[pathname],
+	);
+	const action = isAccontSettingPage
+		? selectTeam.bind(null, true)
+		: selectTeam.bind(null, false);
+
 	const formRef = useRef<HTMLFormElement>(null);
 
 	return (
-		<form action={selectTeam} ref={formRef}>
+		<form
+			action={action}
+			ref={formRef}
+			key={`${currentTeam.id}-${isAccontSettingPage}`}
+		>
 			<Select
 				name="teamId"
-				defaultValue={currentTeam.id}
+				defaultValue={isAccontSettingPage ? undefined : currentTeam.id}
 				onValueChange={() => {
 					formRef.current?.requestSubmit();
 				}}
 			>
 				<SelectTrigger className="w-auto min-w-[100px] max-w-[360px] border-0 flex justify-between items-center data-[state=open]:border-0 data-[state=open]:ring-0 focus:ring-0 focus-visible:ring-0 focus:ring-offset-0 outline-none focus-visible:outline-none px-0.5 py-0.5 bg-transparent">
 					<div className="flex items-center gap-1.5">
-						<span
-							className="text-base font-hubot text-white-400 truncate max-w-[180px]"
-							title={currentTeam.name}
-						>
-							{currentTeam.name}
-						</span>
-						{currentTeam.isPro !== undefined &&
-							(currentTeam.isPro ? <ProTag /> : <FreeTag />)}
+						{isAccontSettingPage ? (
+							currentUser
+						) : (
+							<>
+								<span
+									className="text-base font-hubot text-white-400 truncate max-w-[180px]"
+									title={currentTeam.name}
+								>
+									{currentTeam.name}
+								</span>
+								{currentTeam.isPro !== undefined &&
+									(currentTeam.isPro ? <ProTag /> : <FreeTag />)}
+							</>
+						)}
 					</div>
 					<div className="pl-3">
 						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
