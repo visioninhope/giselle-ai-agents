@@ -57,7 +57,7 @@ export const UserButton: FC = async () => {
 							href="/settings/account"
 							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
 						>
-							Account Reference
+							Account Preferences
 						</Link>
 					</DropdownMenuItem>
 					<TeamCreation>
