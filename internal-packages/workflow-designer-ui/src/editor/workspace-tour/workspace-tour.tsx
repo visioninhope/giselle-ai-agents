@@ -124,7 +124,8 @@ const CARD_STYLES = {
 	},
 	large: {
 		width: "483px",
-		height: "435px",
+		height: "auto",
+		maxHeight: "520px",
 	},
 	wide: {
 		width: "792px",
@@ -146,6 +147,7 @@ interface TourCardProps {
 	footer: ReactNode;
 	children?: ReactNode;
 	additionalClassName?: string;
+	currentStep: number;
 }
 
 // Extracted reusable TourCard component
@@ -157,6 +159,7 @@ const TourCard = ({
 	footer,
 	children,
 	additionalClassName = "",
+	currentStep,
 }: TourCardProps) => {
 	const sizeStyles =
 		size === "small"
@@ -177,16 +180,19 @@ const TourCard = ({
 				<>
 					{/* Image area */}
 					<div
-						className="w-full h-[280px] flex items-center justify-center"
+						className="w-full flex items-center justify-center"
 						style={{
 							backgroundImage: BACKGROUND_GRADIENT,
+							height: currentStep === 4 ? "230px" : "280px",
+							maxHeight: currentStep === 4 ? "230px" : "280px",
+							overflow: "hidden",
 						}}
 					>
 						{imageSrc && (
 							<img
 								src={imageSrc.src}
 								alt={"Tour step tutorial"}
-								className="w-full h-full object-cover"
+								className="w-full h-full object-cover object-top"
 							/>
 						)}
 					</div>
@@ -342,6 +348,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 
 			<TourCard
 				size="wide"
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -498,6 +505,7 @@ const TourStep2 = (props: TourStepComponentProps) => {
 					title={step.title}
 					content={step.content}
 					imageSrc={step2Gif}
+					currentStep={currentStep}
 					footer={
 						<NavigationFooter
 							currentStep={currentStep}
@@ -544,6 +552,7 @@ const TourStep3 = (props: TourStepComponentProps) => {
 				title={step.title}
 				content={step.content}
 				imageSrc={step3Gif}
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -585,6 +594,7 @@ const TourStep4 = (props: TourStepComponentProps) => {
 				title={step.title}
 				content={step.content}
 				imageSrc={step4Gif}
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -627,6 +637,7 @@ const TourStep5 = (props: TourStepComponentProps) => {
 					title={step.title}
 					content={step.content}
 					imageSrc={step5Gif}
+					currentStep={currentStep}
 					footer={
 						<NavigationFooter
 							currentStep={currentStep}
@@ -642,7 +653,7 @@ const TourStep5 = (props: TourStepComponentProps) => {
 				<img
 					src={step5Arrow.src}
 					alt="Arrow pointing to tabs"
-					className="absolute top-[-110px] left-[calc(50%-130px)] z-[60] w-[150px] h-auto pointer-events-none arrow-animation"
+					className="absolute top-[-110px] left-[calc(50%-190px)] z-[60] w-[150px] h-auto pointer-events-none arrow-animation"
 				/>
 			</div>
 
@@ -674,6 +685,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 				title={step.title}
 				content={step.content}
 				imageSrc={docsImage}
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
