@@ -22,10 +22,10 @@ export default async function TeamMembersPage() {
 		await getCurrentUserRole();
 	const { success: hasMembers, data: members } = await getTeamMembers();
 	const hasProPlan = isProPlan(team);
-	
+
 	// Can only be retrieved on client side, not used here
 	// const invitedMembers = getInvitedMembers();
-	
+
 	if (!hasMembers || !members) {
 		return (
 			<div className="flex flex-col gap-[24px]">
@@ -63,7 +63,7 @@ export default async function TeamMembersPage() {
 			</div>
 		);
 	}
-	
+
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center w-full">
