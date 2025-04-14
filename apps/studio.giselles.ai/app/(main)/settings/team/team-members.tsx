@@ -38,9 +38,7 @@ export async function TeamMembers() {
 				<h1 className="text-[28px] font-hubot font-medium text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 					Members
 				</h1>
-				{hasProPlan && currentUserRole === "admin" && (
-					<InviteMemberDialog />
-				)}
+				{hasProPlan && currentUserRole === "admin" && <InviteMemberDialog />}
 			</div>
 			<Card title="Member List">
 				<TeamMembersList

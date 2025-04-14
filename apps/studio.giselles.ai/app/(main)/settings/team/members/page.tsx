@@ -73,11 +73,7 @@ export default async function TeamMembersPage() {
 				>
 					Members
 				</h3>
-				{hasProPlan && currentUserRole === "admin" && (
-					<div>
-						<InviteMemberDialog />
-					</div>
-				)}
+				{hasProPlan && currentUserRole === "admin" && <InviteMemberDialog />}
 			</div>
 			<Card title="">
 				<TitleWithBorder title="Member List" />

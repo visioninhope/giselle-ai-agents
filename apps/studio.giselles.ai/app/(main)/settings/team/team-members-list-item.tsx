@@ -222,6 +222,7 @@ export function TeamMemberListItem({
 												<AlertDialog open={open} onOpenChange={setOpen}>
 													<AlertDialogTrigger asChild>
 														<button
+															type="button"
 															className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-black-700"
 															disabled={isLoading}
 														>
