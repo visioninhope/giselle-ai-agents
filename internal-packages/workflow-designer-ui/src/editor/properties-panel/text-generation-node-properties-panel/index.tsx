@@ -21,7 +21,6 @@ import {
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
-import { GitHubToolsPanel } from "./actions";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
@@ -33,6 +32,7 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
+import { GitHubToolsPanel } from "./tools";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
