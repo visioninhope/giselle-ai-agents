@@ -4,6 +4,7 @@ import { createPortal } from "react-dom";
 import step2Gif from "./assets/02.gif";
 import step3Gif from "./assets/03.gif";
 import step4Gif from "./assets/04.gif";
+import step5Gif from "./assets/05.gif";
 import step2Arrow from "./assets/step2_arrow.png";
 import step5Arrow from "./assets/step5_arrow.png";
 
@@ -624,6 +625,7 @@ const TourStep5 = (props: TourStepComponentProps) => {
 					size="large"
 					title={step.title}
 					content={step.content}
+					imageSrc={step5Gif}
 					footer={
 						<NavigationFooter
 							currentStep={currentStep}
