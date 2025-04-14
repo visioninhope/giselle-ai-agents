@@ -25,6 +25,7 @@ import {
 import { addTeamMember } from "./actions";
 import * as Dialog from "@radix-ui/react-dialog";
 import { cn } from "@/lib/utils";
+import type { TeamRole } from "@/drizzle";
 
 const TeamMemberSchema = object({
   email: pipe(
@@ -37,6 +38,34 @@ const TeamMemberSchema = object({
 
 type TeamMemberSchema = InferInput<typeof TeamMemberSchema>;
 
+// Global variable to store invited members (for UI demo)
+// In actual implementation, this should be fetched from the server or managed with a state management library
+let invitedMembersList: { email: string; role: TeamRole }[] = [];
+
+// Function to get invited members (for UI demo)
+export function getInvitedMembers() {
+  // Try to get from localStorage first
+  try {
+    const stored = localStorage.getItem('invitedMembers');
+    if (stored) {
+      invitedMembersList = JSON.parse(stored);
+    }
+  } catch (e) {
+    console.error('Failed to load invited members from localStorage:', e);
+  }
+  return invitedMembersList;
+}
+
+// Function to save invited members (for UI demo)
+function saveInvitedMembers(list: { email: string; role: TeamRole }[]) {
+  invitedMembersList = list;
+  try {
+    localStorage.setItem('invitedMembers', JSON.stringify(list));
+  } catch (e) {
+    console.error('Failed to save invited members to localStorage:', e);
+  }
+}
+
 export function InviteMemberDialog() {
   const [open, setOpen] = useState(false);
   const [emailInput, setEmailInput] = useState("");
@@ -44,15 +73,37 @@ export function InviteMemberDialog() {
   const [role, setRole] = useState("member");
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string>("");
+  const [dialogKey, setDialogKey] = useState(Date.now()); // Key for forced re-rendering
+
+  // Reset state when dialog state changes
+  useEffect(() => {
+    if (!open) {
+      // Reset state when dialog is closed
+      setEmailInput("");
+      setEmailList([]);
+      setRole("member");
+      setError("");
+      setIsLoading(false);
+    }
+  }, [open]);
+
+  const handleOpenDialog = () => {
+    setOpen(true);
+    setDialogKey(Date.now()); // Update key to force re-rendering
+  };
+
+  const handleCloseDialog = () => {
+    setOpen(false);
+  };
 
   const addEmail = (email: string) => {
     email = email.trim();
     if (!email) return;
     
-    // メールフォーマットチェック
+    // Email format validation
     try {
       parse(pipe(string(), emailValidator()), email);
-      // 重複チェック
+      // Check for duplicates
       if (!emailList.includes(email)) {
         setEmailList(prev => [...prev, email]);
       }
@@ -99,7 +150,18 @@ export function InviteMemberDialog() {
     try {
       setIsLoading(true);
 
-      // 各メールアドレスに対して処理を実行
+      // For UI demo: Add to list without server communication
+      const newList = [...invitedMembersList];
+      emailList.forEach(email => {
+        // Check for duplicates
+        if (!newList.some(member => member.email === email)) {
+          newList.push({ email, role: role as TeamRole });
+        }
+      });
+      saveInvitedMembers(newList);
+
+      /* Actual API communication code (commented out) - to be implemented by engineers
+      // Process for each email address
       const results = await Promise.all(
         emailList.map(async (emailAddress) => {
           const formData = new FormData();
@@ -109,31 +171,44 @@ export function InviteMemberDialog() {
         })
       );
 
-      // エラーがあるか確認
+      // Check for errors
       const errors = results.filter(result => !result.success);
       if (errors.length > 0) {
         setError(`Failed to add ${errors.length} member(s). ${errors[0].error || ''}`);
       } else {
-        setEmailInput("");
-        setEmailList([]);
-        setRole("member");
-        setOpen(false); // Close dialog on success
+        handleCloseDialog(); // Close dialog on success
       }
+      */
+
+      // Always emit the event to refresh the list, even if server-side errors occurred
+      const event = new CustomEvent('invited-members-updated');
+      window.dispatchEvent(event);
+
+      // Assuming success for the demo
+      setTimeout(() => {
+        handleCloseDialog(); // Close dialog on success
+      }, 500); // Process after 0.5 seconds (for loading indicator)
+      
     } catch (error) {
       if (error instanceof Error) {
         setError(error.message);
       }
       console.error("Error:", error);
+      
+      // Even on error, try to refresh the list (the error might be with one email but others added)
+      const event = new CustomEvent('invited-members-updated');
+      window.dispatchEvent(event);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Dialog.Root open={open} onOpenChange={setOpen}>
+    <Dialog.Root open={open} onOpenChange={setOpen} key={dialogKey}>
       <Dialog.Trigger asChild>
         <button
           type="button"
+          onClick={handleOpenDialog}
           className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-200"
         >
           Invite Member +
@@ -149,6 +224,8 @@ export function InviteMemberDialog() {
             "border border-black-400 shadow-lg focus:outline-none",
             "opacity-100 scale-100"
           )}
+          onEscapeKeyDown={handleCloseDialog}
+          onPointerDownOutside={handleCloseDialog}
         >
           <div className="flex flex-col space-y-1.5 text-center sm:text-left">
             <Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-hubot">
@@ -246,14 +323,14 @@ export function InviteMemberDialog() {
               <div className="flex space-x-2">
                 <Button 
                   variant="link" 
-                  onClick={() => setOpen(false)}
+                  onClick={handleCloseDialog}
                   type="button"
                   className="bg-transparent border-[0.5px] border-black-400 text-white-400 hover:bg-black-800"
                 >
                   Cancel
                 </Button>
                 <Button type="submit" disabled={isLoading} className="px-8">
-                  {isLoading ? "Sending..." : "Send"}
+                  {isLoading ? "Sending..." : "Invite"}
                 </Button>
               </div>
             </div>
