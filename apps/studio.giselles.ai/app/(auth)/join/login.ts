@@ -15,7 +15,7 @@ export async function login(
 		const email = formData.get("email") as string;
 		const password = formData.get("password") as string;
 		const confirmPassword = formData.get("confirmPassword") as string;
-		
+
 		// Verify passwords match
 		if (password !== confirmPassword) {
 			return {
@@ -25,13 +25,13 @@ export async function login(
 				name: "PasswordMatchError",
 			};
 		}
-		
+
 		// For demo purposes, we're using the fixed email from the form
 		const credentials = {
 			email,
 			password,
 		};
-		
+
 		const { data, error } = await supabase.auth.signInWithPassword(credentials);
 
 		if (error) {
@@ -42,10 +42,10 @@ export async function login(
 				name: error.name,
 			};
 		}
-		
+
 		// For now, just redirect to the apps page after login
 		redirect("/apps");
-		
+
 		return null;
 	} catch (err) {
 		console.error("Login error:", err);

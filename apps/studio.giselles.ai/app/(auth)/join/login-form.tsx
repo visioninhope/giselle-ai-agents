@@ -12,25 +12,25 @@ export const LoginForm = () => {
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
 	const [joining, setJoining] = useState(false);
-	
+
 	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		
+
 		if (password !== confirmPassword) {
 			setError("Passwords do not match");
 			return;
 		}
-		
+
 		setJoining(true);
 		setError(null);
-		
+
 		// In actual implementation, call the team join API here
 		setTimeout(() => {
 			alert("Join team functionality would be implemented here");
 			setJoining(false);
 		}, 500);
 	};
-	
+
 	return (
 		<form onSubmit={handleSubmit} className="font-hubot">
 			<div className="grid gap-6">
@@ -38,14 +38,12 @@ export const LoginForm = () => {
 					<Alert variant="destructive">
 						<TriangleAlertIcon className="w-4 h-4" />
 						<AlertTitle>Error</AlertTitle>
-						<AlertDescription>
-							{error}
-						</AlertDescription>
+						<AlertDescription>{error}</AlertDescription>
 					</Alert>
 				)}
 				<div className="grid gap-[16px]">
 					<input type="hidden" name="email" value="you@example.com" />
-					
+
 					<div className="grid gap-[4px]">
 						<div className="grid gap-[4px] relative">
 							<Label
@@ -86,7 +84,7 @@ export const LoginForm = () => {
 						disabled={joining}
 						data-loading={joining}
 					>
-						{joining ? 'Joining...' : 'Join to team'}
+						{joining ? "Joining..." : "Join to team"}
 					</Button>
 				</div>
 			</div>

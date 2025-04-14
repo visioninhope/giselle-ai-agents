@@ -9,7 +9,7 @@ import { useState } from "react";
 export default function Page() {
 	const [joining, setJoining] = useState(false);
 	const router = useRouter();
-	
+
 	const handleSignOut = () => {
 		setJoining(true);
 		// In actual implementation, sign out the user and redirect
@@ -17,7 +17,7 @@ export default function Page() {
 			router.push("/join");
 		}, 500);
 	};
-	
+
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex items-center justify-center py-12">
@@ -41,7 +41,7 @@ export default function Page() {
 							in the invitation or create a new account using that email
 							address.
 						</div>
-						
+
 						<Button
 							className="w-full font-medium"
 							onClick={handleSignOut}
@@ -50,7 +50,7 @@ export default function Page() {
 						>
 							{joining ? "Signing out..." : "Sign out"}
 						</Button>
-						
+
 						<div className="text-xs text-center text-slate-400 mt-4">
 							By continuing, you agree to our{" "}
 							<Link href="/terms" className="text-blue-300 hover:underline">
