@@ -26,7 +26,7 @@ export const LoginForm = () => {
 		
 		// In actual implementation, call the team join API here
 		setTimeout(() => {
-			alert('Join team functionality would be implemented here');
+			alert("Join team functionality would be implemented here");
 			setJoining(false);
 		}, 500);
 	};

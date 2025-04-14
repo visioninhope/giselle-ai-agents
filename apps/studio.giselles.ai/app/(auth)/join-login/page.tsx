@@ -12,7 +12,7 @@ export default function Page() {
 		setJoining(true);
 		// In actual implementation, call the team join API here
 		setTimeout(() => {
-			alert('Join team functionality would be implemented here');
+			alert("Join team functionality would be implemented here");
 			setJoining(false);
 		}, 500);
 	};
@@ -43,7 +43,15 @@ export default function Page() {
 						</Button>
 						
 						<div className="text-sm text-center text-slate-400 mt-4">
-							By continuing, you agree to our <Link href="/terms" className="text-blue-300 hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-blue-300 hover:underline">Privacy Policy</Link>.
+							By continuing, you agree to our{" "}
+							<Link href="/terms" className="text-blue-300 hover:underline">
+								Terms of Service
+							</Link>{" "}
+							and{" "}
+							<Link href="/privacy" className="text-blue-300 hover:underline">
+								Privacy Policy
+							</Link>
+							.
 						</div>
 						
 						<div className="flex justify-center mt-4">

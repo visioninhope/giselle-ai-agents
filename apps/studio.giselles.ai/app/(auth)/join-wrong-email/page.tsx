@@ -35,8 +35,11 @@ export default function Page() {
 					</div>
 					<div className="grid gap-[16px]">
 						<div className="text-white text-center p-4 text-sm">
-							The email address you're currently using doesn't match the email this invitation was intended for.
-							To join this workspace, please sign out and then either sign in with the email address specified in the invitation or create a new account using that email address.
+							The email address you're currently using doesn't match the email
+							this invitation was intended for. To join this workspace, please
+							sign out and then either sign in with the email address specified
+							in the invitation or create a new account using that email
+							address.
 						</div>
 						
 						<Button
@@ -45,11 +48,19 @@ export default function Page() {
 							disabled={joining}
 							data-loading={joining}
 						>
-							{joining ? 'Signing out...' : 'Sign out'}
+							{joining ? "Signing out..." : "Sign out"}
 						</Button>
 						
 						<div className="text-xs text-center text-slate-400 mt-4">
-							By continuing, you agree to our <Link href="/terms" className="text-blue-300 hover:underline">Terms of Service</Link> and <Link href="/privacy" className="text-blue-300 hover:underline">Privacy Policy</Link>.
+							By continuing, you agree to our{" "}
+							<Link href="/terms" className="text-blue-300 hover:underline">
+								Terms of Service
+							</Link>{" "}
+							and{" "}
+							<Link href="/privacy" className="text-blue-300 hover:underline">
+								Privacy Policy
+							</Link>
+							.
 						</div>
 					</div>
 				</div>
