@@ -46,12 +46,12 @@ let invitedMembersList: { email: string; role: TeamRole }[] = [];
 export function getInvitedMembers() {
 	// Try to get from localStorage first
 	try {
-		const stored = localStorage.getItem('invitedMembers');
+		const stored = localStorage.getItem("invitedMembers");
 		if (stored) {
 			invitedMembersList = JSON.parse(stored);
 		}
 	} catch (e) {
-		console.error('Failed to load invited members from localStorage:', e);
+		console.error("Failed to load invited members from localStorage:", e);
 	}
 	return invitedMembersList;
 }
@@ -60,9 +60,9 @@ export function getInvitedMembers() {
 function saveInvitedMembers(list: { email: string; role: TeamRole }[]) {
 	invitedMembersList = list;
 	try {
-		localStorage.setItem('invitedMembers', JSON.stringify(list));
+		localStorage.setItem("invitedMembers", JSON.stringify(list));
 	} catch (e) {
-		console.error('Failed to save invited members to localStorage:', e);
+		console.error("Failed to save invited members to localStorage:", e);
 	}
 }
 
@@ -99,13 +99,13 @@ export function InviteMemberDialog() {
 	const addEmail = (emailToAdd: string) => {
 		const trimmedEmail = emailToAdd.trim();
 		if (!trimmedEmail) return;
-		
+
 		// Email format validation
 		try {
 			parse(pipe(string(), emailValidator()), trimmedEmail);
 			// Check for duplicates
 			if (!emailList.includes(trimmedEmail)) {
-				setEmailList(prev => [...prev, trimmedEmail]);
+				setEmailList((prev) => [...prev, trimmedEmail]);
 			}
 			setEmailInput("");
 		} catch {
@@ -114,11 +114,11 @@ export function InviteMemberDialog() {
 	};
 
 	const removeEmail = (email: string) => {
-		setEmailList(prev => prev.filter(e => e !== email));
+		setEmailList((prev) => prev.filter((e) => e !== email));
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === 'Enter' || e.key === ',') {
+		if (e.key === "Enter" || e.key === ",") {
 			e.preventDefault();
 			addEmail(emailInput);
 		}
@@ -126,9 +126,9 @@ export function InviteMemberDialog() {
 
 	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
 		e.preventDefault();
-		const pastedText = e.clipboardData.getData('text');
+		const pastedText = e.clipboardData.getData("text");
 		const emails = pastedText.split(/[,;\s]+/);
-		
+
 		for (const email of emails) {
 			if (email) addEmail(email);
 		}
@@ -154,7 +154,7 @@ export function InviteMemberDialog() {
 			const newList = [...invitedMembersList];
 			for (const email of emailList) {
 				// Check for duplicates
-				if (!newList.some(member => member.email === email)) {
+				if (!newList.some((member) => member.email === email)) {
 					newList.push({ email, role: role as TeamRole });
 				}
 			}
@@ -181,22 +181,21 @@ export function InviteMemberDialog() {
 			*/
 
 			// Always emit the event to refresh the list, even if server-side errors occurred
-			const event = new CustomEvent('invited-members-updated');
+			const event = new CustomEvent("invited-members-updated");
 			window.dispatchEvent(event);
 
 			// Assuming success for the demo
 			setTimeout(() => {
 				handleCloseDialog(); // Close dialog on success
 			}, 500); // Process after 0.5 seconds (for loading indicator)
-			
 		} catch (error) {
 			if (error instanceof Error) {
 				setError(error.message);
 			}
 			console.error("Error:", error);
-			
+
 			// Even on error, try to refresh the list (the error might be with one email but others added)
-			const event = new CustomEvent('invited-members-updated');
+			const event = new CustomEvent("invited-members-updated");
 			window.dispatchEvent(event);
 		} finally {
 			setIsLoading(false);
@@ -214,15 +213,15 @@ export function InviteMemberDialog() {
 					Invite Member +
 				</button>
 			</Dialog.Trigger>
-			
+
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/80 opacity-100" />
-				<Dialog.Content 
+				<Dialog.Content
 					className={cn(
 						"fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
 						"w-[90vw] max-w-[500px] rounded-[8px] bg-black-900 p-6",
 						"border border-black-400 shadow-lg focus:outline-none",
-						"opacity-100 scale-100"
+						"opacity-100 scale-100",
 					)}
 					onEscapeKeyDown={handleCloseDialog}
 					onPointerDownOutside={handleCloseDialog}
@@ -232,16 +231,22 @@ export function InviteMemberDialog() {
 							Invite Team Member
 						</Dialog.Title>
 						<Dialog.Description className="text-[14px] text-black-400 font-geist">
-							Each member added to your team will be charged as an additional seat ($20 per seat) on your Pro Plan subscription.
+							Each member added to your team will be charged as an additional
+							seat ($20 per seat) on your Pro Plan subscription.
 						</Dialog.Description>
 					</div>
-					
+
 					<form onSubmit={handleSubmit} className="space-y-4 mt-4" noValidate>
 						<div className="flex items-start gap-3 bg-black-900 p-4 rounded-lg border border-black-800">
 							<div className="flex-grow flex flex-wrap items-center gap-1 min-h-[40px]">
 								{emailList.map((email) => (
-									<div key={email} className="flex items-center bg-black-850 border-[0.5px] border-black-400 rounded-md px-2 py-1 mr-2 mb-1">
-										<span className="text-white-400 text-[14px] max-w-[180px] truncate">{email}</span>
+									<div
+										key={email}
+										className="flex items-center bg-black-850 border-[0.5px] border-black-400 rounded-md px-2 py-1 mr-2 mb-1"
+									>
+										<span className="text-white-400 text-[14px] max-w-[180px] truncate">
+											{email}
+										</span>
 										<button
 											type="button"
 											onClick={() => removeEmail(email)}
@@ -253,7 +258,11 @@ export function InviteMemberDialog() {
 								))}
 								<input
 									type="text"
-									placeholder={emailList.length > 0 ? "" : "Email Addresses (separate with commas)"}
+									placeholder={
+										emailList.length > 0
+											? ""
+											: "Email Addresses (separate with commas)"
+									}
 									value={emailInput}
 									onChange={(e) => {
 										setError("");
@@ -270,7 +279,7 @@ export function InviteMemberDialog() {
 									disabled={isLoading}
 								/>
 							</div>
-							
+
 							<div className="pt-1">
 								<Select
 									value={role}
@@ -280,7 +289,10 @@ export function InviteMemberDialog() {
 									}}
 									disabled={isLoading}
 								>
-									<SelectTrigger id="role" className="w-[120px] px-3 py-1.5 border-[0.5px] border-black-700 rounded-md h-9 bg-black-850 text-white-900 shadow-none [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-black-600">
+									<SelectTrigger
+										id="role"
+										className="w-[120px] px-3 py-1.5 border-[0.5px] border-black-700 rounded-md h-9 bg-black-850 text-white-900 shadow-none [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-black-600"
+									>
 										<SelectValue />
 										<ChevronDown className="h-4 w-4 opacity-50 ml-1" />
 									</SelectTrigger>
@@ -301,27 +313,29 @@ export function InviteMemberDialog() {
 								</Select>
 							</div>
 						</div>
-						
+
 						{error && (
 							<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
 								{error}
 							</p>
 						)}
-						
+
 						<div className="flex justify-between items-center mt-6">
 							<div>
-								<button 
-									type="button" 
+								<button
+									type="button"
 									className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
-									onClick={() => {/* 共有機能は空 */}}
+									onClick={() => {
+										/* Share function is empty */
+									}}
 								>
 									<LinkIcon className="h-4 w-4" />
 									<span className="text-sm font-medium">Share</span>
 								</button>
 							</div>
 							<div className="flex space-x-2">
-								<Button 
-									variant="link" 
+								<Button
+									variant="link"
 									onClick={handleCloseDialog}
 									type="button"
 									className="bg-transparent border-[0.5px] border-black-400 text-white-400 hover:bg-black-800"
@@ -334,7 +348,7 @@ export function InviteMemberDialog() {
 							</div>
 						</div>
 					</form>
-					
+
 					<Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 text-white-400 hover:opacity-100 focus:outline-none">
 						<X className="h-4 w-4" />
 						<span className="sr-only">Close</span>
@@ -343,4 +357,4 @@ export function InviteMemberDialog() {
 			</Dialog.Portal>
 		</Dialog.Root>
 	);
-} 
+}
