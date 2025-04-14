@@ -129,56 +129,61 @@ export function TeamCreationForm({
 									>
 										<label htmlFor="free">
 											<CardHeader>
-												<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
-													Free
-												</CardTitle>
-												<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-													Basic features for small teams
-												</CardDescription>
+												<div className="flex flex-col gap-2">
+													<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+														Free
+													</CardTitle>
+													<div className="flex items-center mb-2">
+														<RadioGroupItem
+															value="free"
+															id="free"
+															className="text-blue-500"
+														/>
+														<Label
+															htmlFor="free"
+															className="ml-2 text-white-800 font-geist text-[16px]"
+														>
+															$0/month
+														</Label>
+													</div>
+													<CardDescription className="text-white-400 font-semibold text-[12px] leading-[20.4px] font-geist">
+														Basic features for personal use
+													</CardDescription>
+													<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+														Includes 30 minutes of model usage time and access to basic models for your individual projects.
+													</CardDescription>
+												</div>
 											</CardHeader>
-											<CardContent className="flex items-center">
-												<RadioGroupItem
-													value="free"
-													id="free"
-													className="text-blue-500"
-												/>
-												<Label
-													htmlFor="free"
-													className="ml-2 text-white-800 font-geist"
-												>
-													$0/month
-												</Label>
-											</CardContent>
 										</label>
 									</Card>
 									<Card className="bg-black-850 border-[0.5px] border-black-400 cursor-pointer">
 										<label htmlFor="pro">
 											<CardHeader>
-												<div className="flex flex-row items-center gap-2">
-													<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+												<div className="flex flex-col gap-2">
+													<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
 														Pro
 													</CardTitle>
-													<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+													<div className="flex items-center mb-2">
+														<RadioGroupItem
+															value="pro"
+															id="pro"
+															className="text-primary-900"
+														/>
+														<Label
+															htmlFor="pro"
+															className="ml-2 text-white-800 font-geist text-[16px]"
+														>
+															{proPlanPrice}/month
+														</Label>
+													</div>
+													<CardDescription className="text-white-400 font-semibold text-[12px] leading-[20.4px] font-geist">
 														Advanced features & support
 													</CardDescription>
+													<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+														When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
+													</CardDescription>
 												</div>
-												<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] mt-2 font-geist">
-													When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
-												</CardDescription>
 											</CardHeader>
-											<CardContent className="flex items-center">
-												<RadioGroupItem
-													value="pro"
-													id="pro"
-													className="text-primary-900"
-												/>
-												<Label
-													htmlFor="pro"
-													className="ml-2 text-white-800 font-geist text-[16px]"
-												>
-													{proPlanPrice}/month
-												</Label>
-											</CardContent>
 										</label>
 									</Card>
 								</RadioGroup>
@@ -187,29 +192,29 @@ export function TeamCreationForm({
 									<input type="hidden" name="selectedPlan" value="pro" />
 									<Card className="bg-black-850 border-[0.5px] border-black-400 w-full">
 										<CardHeader>
-											<div className="flex flex-row items-center gap-2">
-												<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+											<div className="flex flex-col gap-2">
+												<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
 													Pro
 												</CardTitle>
-												<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+												<div className="flex items-center mb-2">
+													<div className="size-4 rounded-full border-[1.5px] border-primary-900 flex items-center justify-center">
+														<div className="size-2 rounded-full bg-primary-900"></div>
+													</div>
+													<Label
+														htmlFor="pro"
+														className="ml-2 text-white-800 font-geist text-[16px]"
+													>
+														{proPlanPrice}/month
+													</Label>
+												</div>
+												<CardDescription className="text-white-400 font-semibold text-[12px] leading-[20.4px] font-geist">
 													Advanced features & support
 												</CardDescription>
+												<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+													When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
+												</CardDescription>
 											</div>
-											<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] mt-2 font-geist">
-												When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
-											</CardDescription>
 										</CardHeader>
-										<CardContent className="flex items-center">
-											<div className="size-4 rounded-full border-[1.5px] border-primary-900 flex items-center justify-center">
-												<div className="size-2 rounded-full bg-primary-900"></div>
-											</div>
-											<Label
-												htmlFor="pro"
-												className="ml-2 text-white-800 font-geist text-[16px]"
-											>
-												{proPlanPrice}/month
-											</Label>
-										</CardContent>
 									</Card>
 								</div>
 							)}
