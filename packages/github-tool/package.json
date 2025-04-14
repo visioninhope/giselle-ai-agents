@@ -25,6 +25,7 @@
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@graphql-codegen/cli": "catalog:",
 		"@graphql-codegen/client-preset": "catalog:",
+		"@types/node": "catalog:",
 		"tsup": "catalog:"
 	},
 	"dependencies": {
