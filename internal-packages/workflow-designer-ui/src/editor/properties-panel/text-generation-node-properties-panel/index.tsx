@@ -16,6 +16,7 @@ import {
 import { Button } from "../../../ui/button";
 import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
+import { useBeta } from "../../beta";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -87,6 +88,7 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
+	const beta = useBeta();
 
 	return (
 		<PropertiesPanelRoot>
@@ -163,7 +165,9 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="input">Input</Tabs.Trigger>
-								<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
+								{beta.githubTools && (
+									<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
+								)}
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"

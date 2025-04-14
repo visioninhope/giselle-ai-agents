@@ -25,6 +25,7 @@ import {
 } from "react-resizable-panels";
 import { Background } from "../ui/background";
 import { ToastProvider, useToasts } from "../ui/toast";
+import { Beta } from "./beta";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
@@ -304,7 +305,11 @@ function NodeCanvas() {
 	);
 }
 
-export function Editor() {
+export function Editor({
+	githubTools = false,
+}: {
+	githubTools?: boolean;
+}) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
 		() =>
@@ -363,55 +368,57 @@ export function Editor() {
 	const [isTourOpen, setIsTourOpen] = useState(data.nodes.length === 0);
 	return (
 		<div className="flex-1 overflow-hidden font-sans">
-			<ToastProvider>
-				<ReactFlowProvider>
-					<ToolbarContextProvider>
-						<MousePositionProvider>
-							<PanelGroup
-								direction="horizontal"
-								className="bg-black-900 h-full flex"
-							>
-								<Panel
-									className="flex-1 px-[16px] pb-[16px] pr-0"
-									defaultSize={100}
+			<Beta.Provider value={{ githubTools }}>
+				<ToastProvider>
+					<ReactFlowProvider>
+						<ToolbarContextProvider>
+							<MousePositionProvider>
+								<PanelGroup
+									direction="horizontal"
+									className="bg-black-900 h-full flex"
 								>
-									<div className="h-full flex">
-										{/* <Debug /> */}
-										<NodeCanvas />
-									</div>
-								</Panel>
-
-								<PanelResizeHandle
-									className={clsx(
-										"w-[12px] flex items-center justify-center cursor-col-resize",
-										"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
-										"hover:after:bg-[#4a90e2]",
-									)}
-								/>
-								<Panel
-									id="right-panel"
-									className="flex py-[16px]"
-									ref={rightPanelRef}
-									defaultSize={0}
-								>
-									{selectedNodes.length === 1 && (
-										<div className="flex-1 overflow-hidden">
-											<PropertiesPanel />
+									<Panel
+										className="flex-1 px-[16px] pb-[16px] pr-0"
+										defaultSize={100}
+									>
+										<div className="h-full flex">
+											{/* <Debug /> */}
+											<NodeCanvas />
 										</div>
-									)}
-								</Panel>
-							</PanelGroup>
-							<KeyboardShortcuts />
-						</MousePositionProvider>
-					</ToolbarContextProvider>
-					<GradientDef />
-				</ReactFlowProvider>
-			</ToastProvider>
-			<WorkspaceTour
-				steps={tourSteps}
-				isOpen={isTourOpen}
-				onOpenChange={setIsTourOpen}
-			/>
+									</Panel>
+
+									<PanelResizeHandle
+										className={clsx(
+											"w-[12px] flex items-center justify-center cursor-col-resize",
+											"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
+											"hover:after:bg-[#4a90e2]",
+										)}
+									/>
+									<Panel
+										id="right-panel"
+										className="flex py-[16px]"
+										ref={rightPanelRef}
+										defaultSize={0}
+									>
+										{selectedNodes.length === 1 && (
+											<div className="flex-1 overflow-hidden">
+												<PropertiesPanel />
+											</div>
+										)}
+									</Panel>
+								</PanelGroup>
+								<KeyboardShortcuts />
+							</MousePositionProvider>
+						</ToolbarContextProvider>
+						<GradientDef />
+					</ReactFlowProvider>
+				</ToastProvider>
+				<WorkspaceTour
+					steps={tourSteps}
+					isOpen={isTourOpen}
+					onOpenChange={setIsTourOpen}
+				/>
+			</Beta.Provider>
 		</div>
 	);
 }
