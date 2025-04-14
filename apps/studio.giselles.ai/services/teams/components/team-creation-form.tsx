@@ -37,7 +37,7 @@ function Submit({
 		<Button
 			type="submit"
 			variant="default"
-			className="h-[38px] w-full transition-colors duration-200 border-0 disabled:border-0 disabled:bg-black-400 disabled:text-black-600"
+			className="h-[38px] w-full transition-colors duration-200 border-0 disabled:border-0 disabled:bg-black-400 disabled:text-black-600 hover:border-[1px] hover:border-white"
 			disabled={pending || !teamName || !selectedPlan}
 		>
 			{selectedPlan === "pro" ? "Proceed to Payment" : "Create Team"}
@@ -137,7 +137,7 @@ export function TeamCreationForm({
 														<RadioGroupItem
 															value="free"
 															id="free"
-															className="text-blue-500"
+															className="text-blue-500 data-[state=checked]:border-[1.5px] data-[state=checked]:border-blue-500"
 														/>
 														<Label
 															htmlFor="free"
@@ -167,7 +167,7 @@ export function TeamCreationForm({
 														<RadioGroupItem
 															value="pro"
 															id="pro"
-															className="text-primary-900"
+															className="text-primary-900 data-[state=checked]:border-[1.5px] data-[state=checked]:border-primary-900"
 														/>
 														<Label
 															htmlFor="pro"
