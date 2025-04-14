@@ -52,7 +52,10 @@ export const UserButton: FC = async () => {
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />
 				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<DropdownMenuItem
+						className="p-0 rounded-[8px] focus:bg-primary-900/50"
+						asChild
+					>
 						<Link
 							href="/settings/account"
 							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
