@@ -7,6 +7,7 @@ import step4Gif from "./assets/04.gif";
 import step5Gif from "./assets/05.gif";
 import step2Arrow from "./assets/step2_arrow.png";
 import step5Arrow from "./assets/step5_arrow.png";
+import docsImage from "./assets/docs.png";
 
 export type TourStep = {
 	target?: string; // CSS selector for the target element (optional)
@@ -672,6 +673,7 @@ const TourStep6 = (props: TourStepComponentProps) => {
 				size="small"
 				title={step.title}
 				content={step.content}
+				imageSrc={docsImage}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
