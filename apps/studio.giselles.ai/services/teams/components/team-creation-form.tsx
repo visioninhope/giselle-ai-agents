@@ -58,7 +58,9 @@ export function TeamCreationForm({
 }: TeamCreationFormProps) {
 	const [teamName, setTeamName] = useState("");
 	// If free plan is not available, set "pro" as initial value, otherwise empty string
-	const [selectedPlan, setSelectedPlan] = useState(canCreateFreeTeam ? "" : "pro");
+	const [selectedPlan, setSelectedPlan] = useState(
+		canCreateFreeTeam ? "" : "pro",
+	);
 
 	return (
 		<Dialog>
@@ -69,7 +71,7 @@ export function TeamCreationForm({
 			</DialogTrigger>
 			<DialogContent
 				className={cn(
-					"sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-900"
+					"sm:max-w-[500px] gap-y-6 px-8 py-6 border-[0.5px] border-black-400 rounded-[8px] bg-black-900",
 				)}
 				style={{
 					animation: "fadeIn 0.2s ease-out",
@@ -126,7 +128,7 @@ export function TeamCreationForm({
 									className="grid grid-cols-2 gap-4"
 								>
 									<Card
-										className={`bg-black-850 border-[0.5px] border-black-400 cursor-pointer`}
+										className={"bg-black-850 border-[0.5px] border-black-400 cursor-pointer"}
 									>
 										<label htmlFor="free">
 											<CardHeader>
@@ -151,7 +153,8 @@ export function TeamCreationForm({
 														Basic features for personal use
 													</CardDescription>
 													<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-														Includes 30 minutes of model usage time and access to basic models for your individual projects.
+														Includes 30 minutes of model usage time and access
+														to basic models for your individual projects.
 													</CardDescription>
 												</div>
 											</CardHeader>
@@ -181,7 +184,10 @@ export function TeamCreationForm({
 														Advanced features & support
 													</CardDescription>
 													<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-														When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
+														When you create a team, all member seat charges will
+														be billed to you. Share apps with multiple team
+														members and gain access to premium models, all with
+														enhanced support.
 													</CardDescription>
 												</div>
 											</CardHeader>
@@ -199,7 +205,7 @@ export function TeamCreationForm({
 												</CardTitle>
 												<div className="flex items-center mb-2">
 													<div className="size-4 rounded-full border-[1.5px] border-primary-900 flex items-center justify-center">
-														<div className="size-2 rounded-full bg-primary-900"></div>
+														<div className="size-2 rounded-full bg-primary-900" />
 													</div>
 													<Label
 														htmlFor="pro"
@@ -212,7 +218,10 @@ export function TeamCreationForm({
 													Advanced features & support
 												</CardDescription>
 												<CardDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-													When you create a team, all member seat charges will be billed to you. Share apps with multiple team members and gain access to premium models, all with enhanced support.
+													When you create a team, all member seat charges will
+													be billed to you. Share apps with multiple team
+													members and gain access to premium models, all with
+													enhanced support.
 												</CardDescription>
 											</div>
 										</CardHeader>
