@@ -96,20 +96,20 @@ export function InviteMemberDialog() {
     setOpen(false);
   };
 
-  const addEmail = (email: string) => {
-    email = email.trim();
-    if (!email) return;
+  const addEmail = (emailToAdd: string) => {
+    const trimmedEmail = emailToAdd.trim();
+    if (!trimmedEmail) return;
     
     // Email format validation
     try {
-      parse(pipe(string(), emailValidator()), email);
+      parse(pipe(string(), emailValidator()), trimmedEmail);
       // Check for duplicates
-      if (!emailList.includes(email)) {
-        setEmailList(prev => [...prev, email]);
+      if (!emailList.includes(trimmedEmail)) {
+        setEmailList(prev => [...prev, trimmedEmail]);
       }
       setEmailInput("");
     } catch {
-      setError(`Invalid email address: ${email}`);
+      setError(`Invalid email address: ${trimmedEmail}`);
     }
   };
 
@@ -129,9 +129,9 @@ export function InviteMemberDialog() {
     const pastedText = e.clipboardData.getData('text');
     const emails = pastedText.split(/[,;\s]+/);
     
-    emails.forEach(email => {
+    for (const email of emails) {
       if (email) addEmail(email);
-    });
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -152,12 +152,12 @@ export function InviteMemberDialog() {
 
       // For UI demo: Add to list without server communication
       const newList = [...invitedMembersList];
-      emailList.forEach(email => {
+      for (const email of emailList) {
         // Check for duplicates
         if (!newList.some(member => member.email === email)) {
           newList.push({ email, role: role as TeamRole });
         }
-      });
+      }
       saveInvitedMembers(newList);
 
       /* Actual API communication code (commented out) - to be implemented by engineers
@@ -239,8 +239,8 @@ export function InviteMemberDialog() {
           <form onSubmit={handleSubmit} className="space-y-4 mt-4" noValidate>
             <div className="flex items-start gap-3 bg-black-900 p-4 rounded-lg border border-black-800">
               <div className="flex-grow flex flex-wrap items-center gap-1 min-h-[40px]">
-                {emailList.map((email, index) => (
-                  <div key={index} className="flex items-center bg-black-850 border-[0.5px] border-black-400 rounded-md px-2 py-1 mr-2 mb-1">
+                {emailList.map((email) => (
+                  <div key={email} className="flex items-center bg-black-850 border-[0.5px] border-black-400 rounded-md px-2 py-1 mr-2 mb-1">
                     <span className="text-white-400 text-[14px] max-w-[180px] truncate">{email}</span>
                     <button
                       type="button"
@@ -252,7 +252,6 @@ export function InviteMemberDialog() {
                   </div>
                 ))}
                 <input
-                  autoFocus
                   type="text"
                   placeholder={emailList.length > 0 ? "" : "Email Addresses (separate with commas)"}
                   value={emailInput}

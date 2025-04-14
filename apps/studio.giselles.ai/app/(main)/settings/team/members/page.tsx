@@ -4,23 +4,27 @@ import { getCurrentUserRole, getTeamMembers } from "../actions";
 import { InviteMemberDialog } from "../invite-member-dialog";
 import { TeamMembersList } from "../team-members-list";
 
-// カスタムのタイトルコンポーネント（罫線付き）
+// Custom title component with border
 function TitleWithBorder({ title }: { title: string }) {
 	return (
 		<div className="mb-4">
 			<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot mb-3">
 				{title}
 			</h2>
-			<div className="border-t border-black-400 pb-4"></div>
+			<div className="border-t border-black-400 pb-4" />
 		</div>
 	);
 }
 
 export default async function TeamMembersPage() {
 	const team = await fetchCurrentTeam();
-	const { success: hasCurrentUserRole, data: currentUserRole } = await getCurrentUserRole();
+	const { success: hasCurrentUserRole, data: currentUserRole } =
+		await getCurrentUserRole();
 	const { success: hasMembers, data: members } = await getTeamMembers();
 	const hasProPlan = isProPlan(team);
+	
+	// Can only be retrieved on client side, not used here
+	// const invitedMembers = getInvitedMembers();
 	
 	if (!hasMembers || !members) {
 		return (

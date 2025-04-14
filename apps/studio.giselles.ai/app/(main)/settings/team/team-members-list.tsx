@@ -56,7 +56,7 @@ export function TeamMembersList({
 		return () => {
 			window.removeEventListener('invited-members-updated', handleInvitedMembersUpdated);
 		};
-	}, []);
+	}, [refreshInvitedMembers]);
 
 	return (
 		<>
