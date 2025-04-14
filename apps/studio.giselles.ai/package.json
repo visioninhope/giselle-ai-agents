@@ -132,7 +132,5 @@
 		"vite-tsconfig-paths": "5.1.4",
 		"vitest": "3.0.5"
 	},
-	"trustedDependencies": [
-		"@sentry/cli"
-	]
+	"trustedDependencies": ["@sentry/cli"]
 }
