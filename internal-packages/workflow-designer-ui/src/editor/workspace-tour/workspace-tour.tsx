@@ -389,9 +389,14 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border: "1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background: "var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									⌘ + scroll
@@ -427,9 +432,14 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border: "1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background: "var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									Click & Drag
@@ -463,9 +473,14 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border: "1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background: "var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									⌘ + Enter
