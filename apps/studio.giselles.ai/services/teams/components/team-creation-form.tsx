@@ -57,7 +57,8 @@ export function TeamCreationForm({
 	children,
 }: TeamCreationFormProps) {
 	const [teamName, setTeamName] = useState("");
-	const [selectedPlan, setSelectedPlan] = useState("");
+	// フリープランが選択できない場合は初期値で"pro"を設定、そうでなければ空文字
+	const [selectedPlan, setSelectedPlan] = useState(canCreateFreeTeam ? "" : "pro");
 
 	return (
 		<Dialog>
