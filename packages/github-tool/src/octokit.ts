@@ -4,7 +4,7 @@ import type { GitHubAuthConfig } from "./types";
 
 export function octokit(authConfig: GitHubAuthConfig) {
 	switch (authConfig.strategy) {
-		case "github-installation": {
+		case "app-installation": {
 			return new Octokit({
 				authStrategy: createAppAuth,
 				auth: {
@@ -14,8 +14,17 @@ export function octokit(authConfig: GitHubAuthConfig) {
 				},
 			});
 		}
-		case "github-token": {
-			return new Octokit({ auth: authConfig.token });
+		case "app": {
+			return new Octokit({
+				authStrategy: createOAuthUserAuth,
+				auth: {
+					appId: authConfig.appId,
+					privateKey: authConfig.privateKey,
+				},
+			});
+		}
+		case "personal-access-token": {
+			return new Octokit({ auth: authConfig.personalAccessToken });
 		}
 		default: {
 			const _exhaustiveCheck: never = authConfig;

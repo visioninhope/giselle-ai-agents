@@ -21,6 +21,7 @@ import {
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
+import { GitHubToolsPanel } from "./actions";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
@@ -162,6 +163,7 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="input">Input</Tabs.Trigger>
+								<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
@@ -307,6 +309,12 @@ export function TextGenerationNodePropertiesPanel({
 								className="flex-1 flex flex-col overflow-y-auto"
 							>
 								<InputPanel node={node} />
+							</Tabs.Content>
+							<Tabs.Content
+								value="tools"
+								className="flex-1 flex flex-col overflow-y-auto p-[16px]"
+							>
+								<GitHubToolsPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>

@@ -211,8 +211,8 @@ export async function generateText(args: {
 	) {
 		const auth = args.context.integrationConfigs.github.auth;
 		switch (auth.strategy) {
-			case "github-installation": {
-				const installationId = await auth.resolveGitHubInstallationIdForRepo(
+			case "app-installation": {
+				const installationId = await auth.resolver.installationIdForRepo(
 					actionNode.content.tools.github.repositoryNodeId,
 				);
 				tools = {
@@ -226,7 +226,7 @@ export async function generateText(args: {
 				};
 				break;
 			}
-			case "github-token":
+			case "personal-access-token":
 				tools = {
 					...tools,
 					...githubTools(octokit(auth)),

@@ -36,7 +36,7 @@ export const IssueCommentNodeIdQuery = gql(/* GraphQL */ `
 export async function graphql(authConfig: GitHubAuthConfig) {
 	let token = "";
 	switch (authConfig.strategy) {
-		case "github-installation": {
+		case "app-installation": {
 			const auth = createAppAuth({
 				appId: authConfig.appId,
 				privateKey: authConfig.privateKey,
@@ -49,8 +49,19 @@ export async function graphql(authConfig: GitHubAuthConfig) {
 			token = installationAcessTokenAuthentication.token;
 			break;
 		}
-		case "github-token": {
-			token = authConfig.token;
+		case "app": {
+			const auth = createAppAuth({
+				appId: authConfig.appId,
+				privateKey: authConfig.privateKey,
+			});
+			const appAuthentication = await auth({
+				type: "app",
+			});
+			token = appAuthentication.token;
+			break;
+		}
+		case "personal-access-token": {
+			token = authConfig.personalAccessToken;
 			break;
 		}
 		default: {

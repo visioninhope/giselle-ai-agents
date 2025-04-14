@@ -23,18 +23,18 @@ export async function urlToObjectID(args: {
 	let config: GitHubAuthConfig | undefined = undefined;
 
 	switch (githubConfig.auth.strategy) {
-		case "github-installation": {
+		case "app-installation": {
 			const installationId =
-				await githubConfig.auth.resolveGitHubInstallationIdForRepo("dummy");
+				await githubConfig.auth.resolver.installationIdForRepo("dummy");
 			config = {
-				strategy: "github-installation",
+				strategy: "app-installation",
 				appId: githubConfig.auth.appId,
 				privateKey: githubConfig.auth.privateKey,
 				installationId,
 			};
 			break;
 		}
-		case "github-token":
+		case "personal-access-token":
 			config = githubConfig.auth;
 			break;
 		default: {

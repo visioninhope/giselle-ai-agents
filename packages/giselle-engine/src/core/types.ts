@@ -1,7 +1,7 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
-	GitHubTokenAuth,
+	GitHubPersonalAccessTokenAuth,
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
@@ -22,18 +22,21 @@ export interface GiselleEngineContext {
 	};
 }
 
+interface GitHubInstalltionAppAuthResolver {
+	installationIdForRepo: (repositoryNodeId: string) => Promise<number> | number;
+	installtionIds: () => Promise<number[]> | number[];
+}
 export interface GitHubIntegrationConfig {
-	provider: "github";
 	auth:
-		| GitHubTokenAuth
+		| GitHubPersonalAccessTokenAuth
 		| (Omit<GitHubInstallationAppAuth, "installationId"> & {
-				resolveGitHubInstallationIdForRepo: (
-					repositoryNodeId: string,
-				) => Promise<number>;
+				resolver: GitHubInstalltionAppAuthResolver;
 		  });
 }
 
-export type GiselleIntegrationConfig = GitHubIntegrationConfig;
+export type GiselleIntegrationConfig = {
+	github?: GitHubIntegrationConfig;
+};
 export type ConsumeAgentTimeCallback = (
 	workspaceId: WorkspaceId,
 	startedAt: number,
@@ -49,9 +52,7 @@ export interface GiselleEngineConfig {
 	storage: Storage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders?: LanguageModelProvider[];
-	integrationConfigs?: {
-		github?: GitHubIntegrationConfig;
-	};
+	integrationConfigs?: GiselleIntegrationConfig;
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	telemetry?: {
 		isEnabled?: boolean;
