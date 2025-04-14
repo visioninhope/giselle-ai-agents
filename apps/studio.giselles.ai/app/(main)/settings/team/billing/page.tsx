@@ -23,7 +23,7 @@ export default async function TeamBillingPage() {
 	);
 }
 
-// BillingInfoコンポーネント：元のBillingSectionコンポーネントの内容を直接実装
+// BillingInfo component: Direct implementation of the original BillingSection component content
 async function BillingInfo() {
 	try {
 		const team = await fetchCurrentTeam();
@@ -69,7 +69,7 @@ async function BillingInfo() {
 		);
 	} catch (error) {
 		console.error("Error in BillingInfo:", error);
-		return <div className="text-error-900">設定の読み込みに失敗しました</div>;
+		return <div className="text-error-900">Failed to load settings</div>;
 	}
 }
 

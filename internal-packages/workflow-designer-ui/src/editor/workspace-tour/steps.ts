@@ -11,7 +11,7 @@ export const tourSteps: TourStep[] = [
 		content:
 			"Add generation nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
 		placement: "right" as const,
-		target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // 下部ナビゲーションバーを正確に指定
+		target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // Precisely specify the bottom navigation bar
 	},
 	{
 		title: "Node Settings",
@@ -27,7 +27,7 @@ export const tourSteps: TourStep[] = [
 	},
 	{
 		target:
-			"[role='tablist'], .flex.items-center.rounded-\\[8px\\], div[role='tablist']", // モード切替タブの別セレクタ
+			"[role='tablist'], .flex.items-center.rounded-\\[8px\\], div[role='tablist']", // Alternative selector for mode switching tabs
 		title: "Workflow Modes",
 		content:
 			"Experience the complete development lifecycle with three specialized modes: Build to design your node workflows, Preview to test and validate your creations, and Integrate to connect with GitHub and deploy your solutions seamlessly.",
