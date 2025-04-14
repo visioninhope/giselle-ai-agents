@@ -5,38 +5,47 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
-import { useFormState, useFormStatus } from "react-dom";
-import { login } from "./login";
+import { useState } from "react";
 
 export const LoginForm = () => {
-	const [authError, formAction] = useFormState(login, null);
-	const { pending } = useFormStatus();
+	const [password, setPassword] = useState("");
+	const [confirmPassword, setConfirmPassword] = useState("");
+	const [error, setError] = useState<string | null>(null);
+	const [joining, setJoining] = useState(false);
+	
+	const handleSubmit = (e: React.FormEvent) => {
+		e.preventDefault();
+		
+		if (password !== confirmPassword) {
+			setError("Passwords do not match");
+			return;
+		}
+		
+		setJoining(true);
+		setError(null);
+		
+		// In actual implementation, call the team join API here
+		setTimeout(() => {
+			alert('Join team functionality would be implemented here');
+			setJoining(false);
+		}, 500);
+	};
 	
 	return (
-		<form action={formAction} className="font-hubot">
+		<form onSubmit={handleSubmit} className="font-hubot">
 			<div className="grid gap-6">
-				{authError && (
+				{error && (
 					<Alert variant="destructive">
 						<TriangleAlertIcon className="w-4 h-4" />
-						<AlertTitle>Authentication Error</AlertTitle>
+						<AlertTitle>Error</AlertTitle>
 						<AlertDescription>
-							{authError.message || "An error occurred. Please try again."}
+							{error}
 						</AlertDescription>
 					</Alert>
 				)}
 				<div className="grid gap-[16px]">
-					<div className="grid gap-[4px]">
-						<Label
-							htmlFor="email"
-							className="text-[14px] font-hubot text-black-70"
-						>
-							Email
-						</Label>
-						<input type="hidden" name="email" value="you@example.com" />
-						<div className="py-2 text-white-400">
-							you@example.com
-						</div>
-					</div>
+					<input type="hidden" name="email" value="you@example.com" />
+					
 					<div className="grid gap-[4px]">
 						<div className="grid gap-[4px] relative">
 							<Label
@@ -48,9 +57,9 @@ export const LoginForm = () => {
 							<Input
 								id="password"
 								type="password"
-								name="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
 								required
-								className={authError && "password" in authError ? "border-red-500" : ""}
 							/>
 						</div>
 					</div>
@@ -65,19 +74,19 @@ export const LoginForm = () => {
 							<Input
 								id="confirmPassword"
 								type="password"
-								name="confirmPassword"
+								value={confirmPassword}
+								onChange={(e) => setConfirmPassword(e.target.value)}
 								required
-								className={authError && "confirmPassword" in authError ? "border-red-500" : ""}
 							/>
 						</div>
 					</div>
 					<Button
 						className="w-full font-medium"
 						type="submit"
-						disabled={pending}
-						data-loading={pending}
+						disabled={joining}
+						data-loading={joining}
 					>
-						Join to team
+						{joining ? 'Joining...' : 'Join to team'}
 					</Button>
 				</div>
 			</div>
