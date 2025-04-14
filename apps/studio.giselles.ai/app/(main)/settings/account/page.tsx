@@ -1,4 +1,5 @@
 import { ToastProvider } from "@/packages/contexts/toast";
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchUserTeams } from "@/services/teams";
 import TeamCreation from "@/services/teams/components/team-creation";
 import { isProPlan } from "@/services/teams/utils";
@@ -16,6 +17,8 @@ export default async function AccountSettingPage() {
 		role: team.role,
 		isPro: isProPlan(team),
 	}));
+
+	const currentUser = await fetchCurrentUser();
 
 	return (
 		<ToastProvider>
@@ -40,7 +43,10 @@ export default async function AccountSettingPage() {
 							),
 						}}
 					>
-						<UserTeams teams={teamsWithProInfo} />
+						<UserTeams
+							teams={teamsWithProInfo}
+							currentUser={{ id: currentUser.id }}
+						/>
 					</Card>
 				</div>
 			</div>
