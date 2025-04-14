@@ -18,7 +18,7 @@ import {
 	useState,
 	useTransition,
 } from "react";
-import { GitHubIcon } from "../../icons";
+import { GitHubIcon, SpinnerIcon } from "../../icons";
 import {
 	Label,
 	Select,
@@ -142,12 +142,13 @@ function Unauthorized({
 				<p>To get started you have to sign into your GitHub account</p>
 				<button
 					type="button"
-					className="cursor-pointer bg-black-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
+					className="group cursor-pointer bg-black-900 rounded-[4px] py-[4px] flex items-center justify-center gap-[8px] disabled:opacity-50 disabled:cursor-wait"
 					onClick={handleClick}
 					disabled={isPending}
 				>
 					<GitHubIcon className="size-[18px]" />
 					Continue with GitHub
+					<SpinnerIcon className="hidden group-disabled:block animate-follow-through-overlap-spin" />
 				</button>
 			</div>
 		</div>
