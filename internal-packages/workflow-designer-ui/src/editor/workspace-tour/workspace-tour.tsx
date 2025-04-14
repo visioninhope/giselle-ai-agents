@@ -5,7 +5,7 @@ import step2Gif from "./assets/02.gif";
 import step3Gif from "./assets/03.gif";
 import step4Gif from "./assets/04.gif";
 import step2Arrow from "./assets/step2_arrow.png";
-import step5Arror from "./assets/step5_arrow.png";
+import step5Arrow from "./assets/step5_arrow.png";
 
 export type TourStep = {
 	target?: string; // CSS selector for the target element (optional)
@@ -637,9 +637,9 @@ const TourStep5 = (props: TourStepComponentProps) => {
 				/>
 
 				<img
-					src={step5Arror.src}
+					src={step5Arrow.src}
 					alt="Arrow pointing to tabs"
-					className="absolute top-[-110px] left-[calc(50%-190px)] z-[60] w-[150px] h-auto pointer-events-none arrow-animation"
+					className="absolute top-[-110px] left-[calc(50%-130px)] z-[60] w-[150px] h-auto pointer-events-none arrow-animation"
 				/>
 			</div>
 
