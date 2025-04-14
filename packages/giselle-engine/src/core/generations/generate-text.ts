@@ -205,50 +205,67 @@ export async function generateText(args: {
 	);
 
 	let tools: ToolSet = {};
-	if (
-		actionNode.content.tools?.github &&
-		args.context.integrationConfigs?.github
-	) {
-		const auth = args.context.integrationConfigs.github.auth;
-		switch (auth.strategy) {
-			case "app-installation": {
-				const installationId = await auth.resolver.installationIdForRepo(
-					actionNode.content.tools.github.repositoryNodeId,
-				);
-				const allGitHubTools = githubTools(
-					octokit({
-						...auth,
-						installationId,
-					}),
-				);
-				for (const tool of actionNode.content.tools.github.tools) {
-					if (tool in allGitHubTools) {
-						tools = {
-							...tools,
-							[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
-						};
-					}
-				}
-				break;
-			}
-			case "personal-access-token": {
-				const allGitHubTools = githubTools(octokit(auth));
-				for (const tool of actionNode.content.tools.github.tools) {
-					if (tool in allGitHubTools) {
-						tools = {
-							...tools,
-							[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
-						};
-					}
-				}
-				break;
-			}
-			default: {
-				const _exhaustiveCheck: never = auth;
-				throw new Error(`Unhandled GitHub auth strategy: ${_exhaustiveCheck}`);
+	if (actionNode.content.tools?.github?.auth) {
+		const allGitHubTools = githubTools(
+			octokit({
+				strategy: "personal-access-token",
+				personalAccessToken: actionNode.content.tools.github.auth.token,
+			}),
+		);
+		for (const tool of actionNode.content.tools.github.tools) {
+			if (tool in allGitHubTools) {
+				tools = {
+					...tools,
+					[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+				};
 			}
 		}
 	}
+
+	// if (
+	// 	actionNode.content.tools?.github &&
+	// 	args.context.integrationConfigs?.github
+	// ) {
+	// 	const auth = args.context.integrationConfigs.github.auth;
+	// 	switch (auth.strategy) {
+	// 		case "app-installation": {
+	// 			const installationId = await auth.resolver.installationIdForRepo(
+	// 				actionNode.content.tools.github.repositoryNodeId,
+	// 			);
+	// 			const allGitHubTools = githubTools(
+	// 				octokit({
+	// 					...auth,
+	// 					installationId,
+	// 				}),
+	// 			);
+	// 			for (const tool of actionNode.content.tools.github.tools) {
+	// 				if (tool in allGitHubTools) {
+	// 					tools = {
+	// 						...tools,
+	// 						[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+	// 					};
+	// 				}
+	// 			}
+	// 			break;
+	// 		}
+	// 		case "personal-access-token": {
+	// 			const allGitHubTools = githubTools(octokit(auth));
+	// 			for (const tool of actionNode.content.tools.github.tools) {
+	// 				if (tool in allGitHubTools) {
+	// 					tools = {
+	// 						...tools,
+	// 						[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+	// 					};
+	// 				}
+	// 			}
+	// 			break;
+	// 		}
+	// 		default: {
+	// 			const _exhaustiveCheck: never = auth;
+	// 			throw new Error(`Unhandled GitHub auth strategy: ${_exhaustiveCheck}`);
+	// 		}
+	// 	}
+	// }
 
 	const streamTextResult = streamText({
 		model: generationModel(actionNode.content.llm),
