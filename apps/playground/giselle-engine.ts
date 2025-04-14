@@ -1,9 +1,9 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
+import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
 import type {
 	GiselleIntegrationConfig,
 	LanguageModelProvider,
 } from "giselle-sdk";
-import { NextGiselleEngine } from "giselle-sdk/next";
 
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";

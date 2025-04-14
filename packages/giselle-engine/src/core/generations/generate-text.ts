@@ -215,23 +215,34 @@ export async function generateText(args: {
 				const installationId = await auth.resolver.installationIdForRepo(
 					actionNode.content.tools.github.repositoryNodeId,
 				);
-				tools = {
-					...tools,
-					...githubTools(
-						octokit({
-							...auth,
-							installationId,
-						}),
-					),
-				};
+				const allGitHubTools = githubTools(
+					octokit({
+						...auth,
+						installationId,
+					}),
+				);
+				for (const tool of actionNode.content.tools.github.tools) {
+					if (tool in allGitHubTools) {
+						tools = {
+							...tools,
+							[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+						};
+					}
+				}
 				break;
 			}
-			case "personal-access-token":
-				tools = {
-					...tools,
-					...githubTools(octokit(auth)),
-				};
+			case "personal-access-token": {
+				const allGitHubTools = githubTools(octokit(auth));
+				for (const tool of actionNode.content.tools.github.tools) {
+					if (tool in allGitHubTools) {
+						tools = {
+							...tools,
+							[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+						};
+					}
+				}
 				break;
+			}
 			default: {
 				const _exhaustiveCheck: never = auth;
 				throw new Error(`Unhandled GitHub auth strategy: ${_exhaustiveCheck}`);

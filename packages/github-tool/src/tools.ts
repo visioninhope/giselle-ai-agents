@@ -1073,5 +1073,5 @@ export function githubTools(octokit: Octokit) {
 				return response.data;
 			},
 		}),
-	};
+	} as const;
 }
