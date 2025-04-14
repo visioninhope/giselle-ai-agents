@@ -128,7 +128,9 @@ export function TeamCreationForm({
 									className="grid grid-cols-2 gap-4"
 								>
 									<Card
-										className={"bg-black-850 border-[0.5px] border-black-400 cursor-pointer"}
+										className={
+											"bg-black-850 border-[0.5px] border-black-400 cursor-pointer"
+										}
 									>
 										<label htmlFor="free">
 											<CardHeader>
