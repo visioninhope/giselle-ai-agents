@@ -11,23 +11,37 @@ import { getUser } from "@/lib/supabase";
 import TeamCreation from "@/services/teams/components/team-creation";
 import Avatar from "boring-avatars";
 import { Plus } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
 import { SignOutButton } from "./sign-out-button";
 
 export const UserButton: FC = async () => {
-	const user = await getUser();
-	const { displayName } = await getAccountInfo();
+	// TODO: This button need to implement after users schema migrations
+	// const { displayName, email, avatarUrl } = await getAccountInfo();
+	const { displayName, email } = await getAccountInfo();
+	const alt = displayName || email || "";
+	const avatarUrl = null;
 
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger className="cursor-pointer">
-				<Avatar
-					name={user.email}
-					variant="marble"
-					size={36}
-					colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
-				/>
+				{avatarUrl ? (
+					<Image
+						src={avatarUrl}
+						alt={alt}
+						className="w-9 h-9 rounded-full"
+						width={36}
+						height={36}
+					/>
+				) : (
+					<Avatar
+						name={alt}
+						variant="marble"
+						size={36}
+						colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+					/>
+				)}
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="end"
@@ -38,7 +52,7 @@ export const UserButton: FC = async () => {
 						{displayName || "No display name"}
 					</span>
 					<span className="font-medium leading-[20.4px] font-geist">
-						{user.email}
+						{email}
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />

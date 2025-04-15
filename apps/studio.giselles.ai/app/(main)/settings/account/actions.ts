@@ -40,7 +40,12 @@ export async function getAccountInfo() {
 		const supabaseUser = await getUser();
 
 		const _users = await db
-			.select({ displayName: users.displayName, email: users.email })
+			.select({
+				displayName: users.displayName,
+				email: users.email,
+				// TODO: This field need to implement after users schema migrations
+				// avatarUrl: users.avatarUrl,
+			})
 			.from(users)
 			.innerJoin(
 				supabaseUserMappings,
