@@ -18,9 +18,6 @@
 	},
 	"packageManager": "pnpm@10.0.0",
 	"dependencies": {
-		"@ai-sdk/anthropic": "1.0.5",
-		"@ai-sdk/google": "1.0.10",
-		"@ai-sdk/openai": "1.0.8",
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
@@ -72,7 +69,7 @@
 		"@vercel/postgres": "0.9.0",
 		"@vercel/speed-insights": "1.0.12",
 		"@xyflow/react": "12.0.3",
-		"ai": "4.0.16",
+		"ai": "catalog:",
 		"boring-avatars": "1.11.1",
 		"class-variance-authority": "0.7.1",
 		"clsx": "2.1.1",
