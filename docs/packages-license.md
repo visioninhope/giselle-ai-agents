@@ -11497,7 +11497,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="require-in-the-middle"></a>
-### require-in-the-middle v7.5.0
+### require-in-the-middle v7.5.2
 #### 
 
 ##### Paths
