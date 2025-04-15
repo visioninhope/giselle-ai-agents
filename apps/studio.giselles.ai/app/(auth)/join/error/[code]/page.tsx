@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { teamInvitationViaEmailFlag } from "@/flags";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ErrorCode } from "../../utils/redirect-to-error-page";
 
@@ -10,7 +11,7 @@ const errorMessages: Record<ErrorCode, string> = {
 							sign out and then either sign in with the email address specified
 							in the invitation or create a new account using that email
 							address.`,
-	already_member: "Already member",
+	already_member: "You're already a member of this team.",
 } as const;
 
 export default async function Page({ params }: { params: { code: string } }) {
@@ -32,6 +33,9 @@ export default async function Page({ params }: { params: { code: string } }) {
 	// ここでチーム名を取得する。実際のコードでは適切なロジックで取得する必要があります
 	// この例では固定値を使用します
 	const teamName = "Team Name";
+	
+	// チームのURLとIDを設定します（実際の実装ではDBから取得）
+	const teamId = "tm_team_id"; // 例の値
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
@@ -48,15 +52,31 @@ export default async function Page({ params }: { params: { code: string } }) {
 							</h2>
 						</div>
 					)}
-					<div className="grid gap-[16px]">
-						<div className="text-white text-center p-4 text-sm">
-							{errorMessage}
+					
+					{code === "already_member" ? (
+						<div className="flex flex-col items-center justify-center gap-6">
+							<h2
+								className="text-[28px] font-[500] text-white font-hubot text-center"
+							>
+								{errorMessage}
+							</h2>
+							<Link href={`/settings/team/${teamId}`} className="w-full">
+								<Button className="w-full font-medium bg-blue-200 hover:bg-blue-300 text-black-900">
+									Go to team
+								</Button>
+							</Link>
 						</div>
+					) : (
+						<div className="grid gap-[16px]">
+							<div className="text-white text-center p-4 text-sm">
+								{errorMessage}
+							</div>
 
-						{code === "wrong_email" && (
-							<Button className="w-full font-medium">Sign out</Button>
-						)}
-					</div>
+							{code === "wrong_email" && (
+								<Button className="w-full font-medium">Sign out</Button>
+							)}
+						</div>
+					)}
 				</div>
 			</div>
 		</div>
