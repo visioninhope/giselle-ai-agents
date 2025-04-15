@@ -51,3 +51,16 @@ export const developerFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const teamInvitationViaEmailFlag = flag<boolean>({
+	key: "teamInvitationViaEmail",
+	async decide() {
+		return takeLocalEnv("TEAM_INVITATION_VIA_EMAIL_FLAG");
+	},
+	description: "Enable team invitation via email",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

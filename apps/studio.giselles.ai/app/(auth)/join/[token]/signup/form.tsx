@@ -7,7 +7,11 @@ import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState } from "react";
 
-export const LoginForm = () => {
+interface SignupFormProps {
+	email: string;
+}
+
+export const SignupForm = (props: SignupFormProps) => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
@@ -42,7 +46,24 @@ export const LoginForm = () => {
 					</Alert>
 				)}
 				<div className="grid gap-[16px]">
-					<input type="hidden" name="email" value="you@example.com" />
+					<div className="grid gap-[4px]">
+						<div className="grid gap-[4px] relative">
+							<Label
+								htmlFor="email"
+								className="text-[14px] font-hubot text-black-70"
+							>
+								Email
+							</Label>
+							<Input
+								id="email"
+								type="email"
+								value={props.email}
+								required
+								readOnly
+								className="text-white-400"
+							/>
+						</div>
+					</div>
 
 					<div className="grid gap-[4px]">
 						<div className="grid gap-[4px] relative">
