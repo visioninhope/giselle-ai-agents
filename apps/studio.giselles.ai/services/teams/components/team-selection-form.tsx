@@ -33,9 +33,10 @@ export function TeamSelectionForm({
 		() => pathname.startsWith("/settings/account"),
 		[pathname],
 	);
-	const action = isAccontSettingPage
-		? selectTeam.bind(null, true)
-		: selectTeam.bind(null, false);
+	const action = (formData: FormData) => {
+		const withRedirect = isAccontSettingPage;
+		return selectTeam(formData, withRedirect);
+	};
 
 	const formRef = useRef<HTMLFormElement>(null);
 
