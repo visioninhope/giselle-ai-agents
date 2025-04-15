@@ -37,27 +37,19 @@ export async function setCookie<T extends JsonValue>(
 	const signed = sign(value);
 	const cookieStore = await cookies();
 
-	cookieStore.set({
-		name: cookieName,
-		value: signed,
+	cookieStore.set(cookieName, signed, {
 		httpOnly: true,
 		secure: process.env.NODE_ENV === "production",
 		sameSite: "lax",
 		maxAge: 24 * 60 * 60, // 24 hours
-		path: "/",
 	});
 }
 
 export async function getCookie(cookieName: string) {
-	try {
-		const cookieStore = await cookies();
-		const cookie = await cookieStore.get(cookieName);
-		if (!cookie) return null;
+	const cookieStore = await cookies();
+	const cookie = cookieStore.get(cookieName);
+	if (!cookie) return null;
 
-		const value = verify(cookie.value);
-		return value ? JSON.parse(value) : null;
-	} catch (error) {
-		console.error("Cookie retrieval error:", error);
-		return null;
-	}
+	const value = verify(cookie.value);
+	return value ? JSON.parse(value) : null;
 }
