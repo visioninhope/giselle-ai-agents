@@ -60,7 +60,7 @@ export const SignupForm = (props: SignupFormProps) => {
 								value={props.email}
 								required
 								readOnly
-								className="text-white-400"
+								className="text-white-400 bg-transparent py-[12px] px-0 border-none"
 							/>
 						</div>
 					</div>
