@@ -189,8 +189,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			return await getGitHubRepositories({ context });
 		},
 		encryptSecret: async (plaintext: string) => {
-			if (!context.vault) {
-				throw new Error("Vault is not configured");
+			if (context.vault === undefined) {
+				console.warn("Vault is not set");
+				return plaintext;
 			}
 			return await context.vault.encrypt(plaintext);
 		},
