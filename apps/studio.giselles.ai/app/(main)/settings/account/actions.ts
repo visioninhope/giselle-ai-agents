@@ -43,8 +43,7 @@ export async function getAccountInfo() {
 			.select({
 				displayName: users.displayName,
 				email: users.email,
-				// TODO: This field need to implement after users schema migrations
-				// avatarUrl: users.avatarUrl,
+				avatarUrl: users.avatarUrl,
 			})
 			.from(users)
 			.innerJoin(

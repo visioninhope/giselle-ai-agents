@@ -24,7 +24,11 @@ const DisplayNameSchema = pipe(
 
 export function AccountDisplayNameForm({
 	displayName: _displayName,
-}: { displayName: typeof users.$inferSelect.displayName }) {
+	avatarUrl,
+}: {
+	displayName: typeof users.$inferSelect.displayName;
+	avatarUrl: typeof users.$inferSelect.avatarUrl;
+}) {
 	const [isEditingName, setIsEditingName] = useState(false);
 	const [displayName, setDisplayName] = useState(
 		_displayName ?? "No display name",
@@ -78,10 +82,7 @@ export function AccountDisplayNameForm({
 		<div className="bg-transparent rounded-[8px] border-[0.5px] border-black-400 px-[24px] py-[16px] w-full">
 			<div className="flex justify-between items-center gap-2">
 				<div className="flex items-center gap-4">
-					<AccountImageForm
-						avatarUrl={null} // TODO: Add avatarUrl from user data
-						displayName={displayName}
-					/>
+					<AccountImageForm avatarUrl={avatarUrl} displayName={displayName} />
 					<span className="text-white-400 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot">
 						{displayName}
 					</span>

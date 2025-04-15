@@ -17,11 +17,8 @@ import type { FC } from "react";
 import { SignOutButton } from "./sign-out-button";
 
 export const UserButton: FC = async () => {
-	// TODO: This button need to implement after users schema migrations
-	// const { displayName, email, avatarUrl } = await getAccountInfo();
-	const { displayName, email } = await getAccountInfo();
+	const { displayName, email, avatarUrl } = await getAccountInfo();
 	const alt = displayName || email || "";
-	const avatarUrl = null;
 
 	return (
 		<DropdownMenu>

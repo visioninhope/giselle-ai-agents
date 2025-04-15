@@ -7,8 +7,7 @@ import { useState } from "react";
 import { AvatarUpload } from "./avatar-upload";
 
 interface AccountImageFormProps {
-	// avatarUrl: typeof users.$inferSelect.avatarUrl;
-	avatarUrl: null; // TODO: Implement avatar URL to users schema like above
+	avatarUrl: typeof users.$inferSelect.avatarUrl;
 	displayName: typeof users.$inferSelect.displayName;
 }
 
