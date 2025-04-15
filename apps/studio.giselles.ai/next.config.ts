@@ -22,6 +22,18 @@ const nextConfig: NextConfig = {
 		"pino-pretty",
 		"unstorage",
 	],
+	images: {
+		remotePatterns: [
+			{
+				protocol: "https",
+				hostname: "avatars.githubusercontent.com",
+			},
+			{
+				protocol: "https",
+				hostname: "lh3.googleusercontent.com",
+			},
+		],
+	},
 	async redirects() {
 		return [
 			{
