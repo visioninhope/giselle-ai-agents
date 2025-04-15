@@ -206,10 +206,14 @@ export async function generateText(args: {
 
 	let tools: ToolSet = {};
 	if (actionNode.content.tools?.github?.auth) {
+		const token =
+			(await args.context.vault?.decrypt(
+				actionNode.content.tools.github.auth.token,
+			)) ?? actionNode.content.tools.github.auth.token;
 		const allGitHubTools = githubTools(
 			octokit({
 				strategy: "personal-access-token",
-				personalAccessToken: actionNode.content.tools.github.auth.token,
+				personalAccessToken: token,
 			}),
 		);
 		for (const tool of actionNode.content.tools.github.tools) {

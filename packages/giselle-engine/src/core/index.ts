@@ -44,6 +44,7 @@ import {
 } from "./workspaces";
 export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
+export * from "./vault";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
@@ -54,6 +55,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		telemetry: config.telemetry,
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
 		sampleAppWorkspaceId: config.sampleAppWorkspaceId,
+		vault: config.vault,
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId) => {
@@ -185,6 +187,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		getGitHubRepositories: async () => {
 			return await getGitHubRepositories({ context });
+		},
+		encryptSecret: async (plaintext: string) => {
+			if (!context.vault) {
+				throw new Error("Vault is not configured");
+			}
+			return await context.vault.encrypt(plaintext);
 		},
 	};
 }
