@@ -122,7 +122,7 @@ export function TeamMemberListItem({
 
 	return (
 		<div className="px-2">
-			<div className="flex items-center justify-between items-center gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
 				<div className="flex gap-x-4">
 					<div className="flex flex-col gap-y-1 font-medium text-[12px] leading-[12px]">
 						<div className="text-blue-80">
