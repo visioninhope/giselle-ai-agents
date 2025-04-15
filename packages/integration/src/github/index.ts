@@ -6,23 +6,36 @@ export const GitHubIntegrationUnsetState = z.object({
 });
 export const GitHubIntegrationUnauthorizedState = z.object({
 	status: z.literal("unauthorized"),
+	authUrl: z.string().url(),
 });
+export type GitHubIntegrationUnauthorizedState = z.infer<
+	typeof GitHubIntegrationUnauthorizedState
+>;
 export const GitHubIntegrationInvalidCredentialState = z.object({
 	status: z.literal("invalid-credential"),
 });
+export type GitHubIntegrationInvalidCredentialState = z.infer<
+	typeof GitHubIntegrationInvalidCredentialState
+>;
 export const GitHubIntegrationNotInstalledState = z.object({
 	status: z.literal("not-installed"),
 });
+export type GitHubIntegrationNotInstalledState = z.infer<
+	typeof GitHubIntegrationNotInstalledState
+>;
 export type GitHubIntegrationRepository = components["schemas"]["repository"];
 export const GitHubIntegrationInstalledState = z.object({
 	status: z.literal("installed"),
 	repositories: z.custom<GitHubIntegrationRepository[]>(),
 });
-export const GitHubIntegration = z.discriminatedUnion("status", [
+export type GitHubIntegrationInstalledState = z.infer<
+	typeof GitHubIntegrationInstalledState
+>;
+export const GitHubIntegrationState = z.discriminatedUnion("status", [
 	GitHubIntegrationUnsetState,
 	GitHubIntegrationUnauthorizedState,
 	GitHubIntegrationInvalidCredentialState,
 	GitHubIntegrationNotInstalledState,
 	GitHubIntegrationInstalledState,
 ]);
-export type GitHubIntegration = z.infer<typeof GitHubIntegration>;
+export type GitHubIntegration = z.infer<typeof GitHubIntegrationState>;

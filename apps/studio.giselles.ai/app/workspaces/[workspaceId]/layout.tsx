@@ -34,7 +34,13 @@ export default async function Layout({
 		<WorkspaceProvider
 			workspaceId={workspaceId}
 			integration={{
-				github: gitHubIntegrationState,
+				value: {
+					github: gitHubIntegrationState,
+				},
+				refresh: async () => {
+					"use server";
+					return { github: await getGitHubIntegrationState(agent.dbId) };
+				},
 			}}
 			usageLimits={usageLimits}
 			telemetry={{

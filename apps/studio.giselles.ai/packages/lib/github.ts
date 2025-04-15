@@ -2,7 +2,12 @@
 
 import { db, type githubIntegrationSettings } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
-import type { components } from "@octokit/openapi-types";
+import type {
+	GitHubIntegrationInstalledState,
+	GitHubIntegrationInvalidCredentialState,
+	GitHubIntegrationNotInstalledState,
+	GitHubIntegrationUnauthorizedState,
+} from "@giselle-sdk/integration";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,
@@ -11,6 +16,7 @@ export async function getGitHubIntegrationState(
 	if (identityState.status === "unauthorized") {
 		return {
 			status: identityState.status,
+			authUrl: "/auth/connect/github",
 		};
 	}
 	if (identityState.status === "invalid-credential") {
@@ -50,31 +56,13 @@ export async function getGitHubIntegrationState(
 	};
 }
 
-type Repository = components["schemas"]["repository"];
 export type GitHubIntegrationState = (
-	| GitHubIntegrationStateUnauthorized
-	| GitHubIntegrationStateInvalidCredential
-	| GitHubIntegrationStateNotInstalled
-	| GitHubIntegrationStateInstalled
+	| GitHubIntegrationUnauthorizedState
+	| GitHubIntegrationInvalidCredentialState
+	| GitHubIntegrationNotInstalledState
+	| GitHubIntegrationInstalledState
 ) &
 	GitHubIntegrationSettingState;
-
-export type GitHubIntegrationStateUnauthorized = {
-	status: "unauthorized";
-};
-
-export type GitHubIntegrationStateInvalidCredential = {
-	status: "invalid-credential";
-};
-
-export type GitHubIntegrationStateNotInstalled = {
-	status: "not-installed";
-};
-
-export type GitHubIntegrationStateInstalled = {
-	status: "installed";
-	repositories: Repository[];
-};
 
 export type GitHubIntegrationSettingState = {
 	setting?: GitHubIntegrationSetting;
