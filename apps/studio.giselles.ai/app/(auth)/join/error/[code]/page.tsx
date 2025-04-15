@@ -1,11 +1,13 @@
 import { Button } from "@/components/ui/button";
+import { ClickableText } from "@/components/ui/clicable-text";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ActionPrompt } from "../../../components/action-prompt";
 import type { ErrorCode } from "../../utils/redirect-to-error-page";
 
 const errorMessages: Record<ErrorCode, string> = {
-	expired: "Expired token",
+	expired: "This invitation has expired.",
 	wrong_email: `The email address you're currently using doesn't match the email
 							this invitation was intended for. To join this workspace, please
 							sign out and then either sign in with the email address specified
@@ -65,6 +67,39 @@ export default async function Page({ params }: { params: { code: string } }) {
 									Go to team
 								</Button>
 							</Link>
+						</div>
+					) : code === "expired" ? (
+						<div className="flex flex-col items-center justify-center gap-6">
+							<h2
+								className="text-[28px] font-[500] text-white font-hubot text-center"
+							>
+								{errorMessage}
+							</h2>
+							<p className="text-white-400 text-center">
+								Please ask the team administrator to send you a new invitation.
+							</p>
+							<div className="flex flex-col items-center justify-center gap-2 mt-4">
+								<div className="flex justify-center">
+									<ActionPrompt
+										prompt="Already have an account?"
+										action={
+											<ClickableText asChild>
+												<Link href="/login">Log in</Link>
+											</ClickableText>
+										}
+									/>
+								</div>
+								<div className="flex justify-center">
+									<ActionPrompt
+										prompt="or"
+										action={
+											<ClickableText asChild>
+												<Link href="/signup">Create account</Link>
+											</ClickableText>
+										}
+									/>
+								</div>
+							</div>
 						</div>
 					) : (
 						<div className="grid gap-[16px]">
