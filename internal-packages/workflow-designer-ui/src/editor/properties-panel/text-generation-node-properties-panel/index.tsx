@@ -16,6 +16,7 @@ import {
 import { Button } from "../../../ui/button";
 import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
+import { useBeta } from "../../beta";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -32,6 +33,7 @@ import {
 } from "./model";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";
+import { GitHubToolsPanel } from "./tools";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -86,6 +88,7 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
+	const beta = useBeta();
 
 	return (
 		<PropertiesPanelRoot>
@@ -162,6 +165,9 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="input">Input</Tabs.Trigger>
+								{beta.githubTools && (
+									<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
+								)}
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
@@ -307,6 +313,12 @@ export function TextGenerationNodePropertiesPanel({
 								className="flex-1 flex flex-col overflow-y-auto"
 							>
 								<InputPanel node={node} />
+							</Tabs.Content>
+							<Tabs.Content
+								value="tools"
+								className="flex-1 flex flex-col overflow-y-auto p-[16px]"
+							>
+								<GitHubToolsPanel node={node} />
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>

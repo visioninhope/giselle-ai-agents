@@ -1,9 +1,10 @@
-import { createAppAuth, createOAuthUserAuth } from "@octokit/auth-app";
-import { Octokit } from "@octokit/core";
+import { createAppAuth } from "@octokit/auth-app";
 import { Client, cacheExchange, fetchExchange } from "urql";
 import { graphql as gql } from "./graphql";
 import type { GitHubAuthConfig } from "./types";
 export * from "./types";
+export * from "./octokit";
+export * from "./tools";
 
 export const IssueNodeIdQuery = gql(/* GraphQL */ `
   query IssueNodeIdQuery($name: String!, $owner: String!, $issueNumber: Int!) {
@@ -35,7 +36,7 @@ export const IssueCommentNodeIdQuery = gql(/* GraphQL */ `
 export async function graphql(authConfig: GitHubAuthConfig) {
 	let token = "";
 	switch (authConfig.strategy) {
-		case "github-installation": {
+		case "app-installation": {
 			const auth = createAppAuth({
 				appId: authConfig.appId,
 				privateKey: authConfig.privateKey,
@@ -48,9 +49,19 @@ export async function graphql(authConfig: GitHubAuthConfig) {
 			token = installationAcessTokenAuthentication.token;
 			break;
 		}
-		case "github-app-user":
-		case "github-token": {
-			token = authConfig.token;
+		case "app": {
+			const auth = createAppAuth({
+				appId: authConfig.appId,
+				privateKey: authConfig.privateKey,
+			});
+			const appAuthentication = await auth({
+				type: "app",
+			});
+			token = appAuthentication.token;
+			break;
+		}
+		case "personal-access-token": {
+			token = authConfig.personalAccessToken;
 			break;
 		}
 		default: {
@@ -68,38 +79,4 @@ export async function graphql(authConfig: GitHubAuthConfig) {
 			headers: { authorization: `Bearer ${token}` },
 		},
 	});
-}
-
-export function octokit(authConfig: GitHubAuthConfig) {
-	switch (authConfig.strategy) {
-		case "github-installation": {
-			return new Octokit({
-				authStrategy: createAppAuth,
-				auth: {
-					appId: authConfig.appId,
-					privateKey: authConfig.privateKey,
-					installationId: authConfig.installationId,
-				},
-			});
-		}
-		case "github-token": {
-			return new Octokit({ auth: authConfig.token });
-		}
-		case "github-app-user": {
-			return new Octokit({
-				authStrategy: createOAuthUserAuth,
-				auth: {
-					clientId: authConfig.clientId,
-					clientSecret: authConfig.clientSecret,
-					clientType: "oauth-app",
-					token: authConfig.token,
-					refreshToken: authConfig.refreshToken,
-				},
-			});
-		}
-		default: {
-			const _exhaustiveCheck: never = authConfig;
-			throw new Error(`Unhandled authConfig strategy: ${_exhaustiveCheck}`);
-		}
-	}
 }

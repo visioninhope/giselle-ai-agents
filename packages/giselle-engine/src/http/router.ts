@@ -220,6 +220,13 @@ export const createJsonRouters = {
 				return JsonResponse.json(workspace);
 			},
 		}),
+	getGitHubRepositories: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const repositories = await giselleEngine.getGitHubRepositories();
+				return JsonResponse.json(repositories);
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(
