@@ -6,7 +6,6 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 import { GeistSans } from "geist/font/sans";
 import { Hubot_Sans } from "next/font/google";
 import { Suspense } from "react";
-import { rosart } from "./fonts";
 import { PostHogPageView } from "./posthog-page-view";
 import { PHProvider } from "./providers";
 
@@ -49,7 +48,7 @@ export default function RootLayout({
 		<html
 			lang="en"
 			suppressHydrationWarning
-			className={`${rosart.variable} ${hubot.variable} ${GeistSans.variable}`}
+			className={`${hubot.variable} ${GeistSans.variable}`}
 		>
 			<GoogleTagManager gtmId={process.env.GTM_ID ?? ""} />
 			<PHProvider>
