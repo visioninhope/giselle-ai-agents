@@ -215,9 +215,11 @@ const TourCard = ({
 							</h3>
 						)}
 						{content && (
-							<p className="text-white/40 my-2" style={{ fontSize: "12px" }}>
-								{content}
-							</p>
+							<p 
+								className="text-white/40 my-2" 
+								style={{ fontSize: "12px" }}
+								dangerouslySetInnerHTML={{ __html: content }}
+							/>
 						)}
 					</div>
 				</>
