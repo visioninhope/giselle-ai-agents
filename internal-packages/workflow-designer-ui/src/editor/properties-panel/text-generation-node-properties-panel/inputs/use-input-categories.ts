@@ -5,31 +5,25 @@ import {
 	isTextNode,
 } from "@giselle-sdk/data-type";
 import { useMemo } from "react";
-import type { Source } from "./types";
-import { filterSources } from "./utils";
+import type { Input } from "./types";
+import { filterInputs } from "./utils";
 
-export function useSourceCategories(sources: Source[]) {
-	const generatedSources = useMemo(
-		() => filterSources(sources, isTextGenerationNode),
-		[sources],
+export function useInputCategories(inputs: Input[]) {
+	const generatedInputs = useMemo(
+		() => filterInputs(inputs, isTextGenerationNode),
+		[inputs],
 	);
-	const textSources = useMemo(
-		() => filterSources(sources, isTextNode),
-		[sources],
-	);
-	const fileSources = useMemo(
-		() => filterSources(sources, isFileNode),
-		[sources],
-	);
-	const githubSources = useMemo(
-		() => filterSources(sources, isGitHubNode),
-		[sources],
+	const textInputs = useMemo(() => filterInputs(inputs, isTextNode), [inputs]);
+	const fileInputs = useMemo(() => filterInputs(inputs, isFileNode), [inputs]);
+	const githubInputs = useMemo(
+		() => filterInputs(inputs, isGitHubNode),
+		[inputs],
 	);
 
 	return {
-		generatedSources,
-		textSources,
-		fileSources,
-		githubSources,
+		generatedInputs: generatedInputs,
+		textinputs: textInputs,
+		fileInputs: fileInputs,
+		githubInputs: githubInputs,
 	};
 }

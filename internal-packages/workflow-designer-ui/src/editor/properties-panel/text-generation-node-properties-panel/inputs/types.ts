@@ -5,16 +5,16 @@ import type {
 	Output,
 } from "@giselle-sdk/data-type";
 
-export interface UnconnectedSource<T extends NodeBase = Node> {
+export interface UnconnectedInput<T extends NodeBase = Node> {
 	output: Output;
 	node: T;
 	connection?: never;
 }
-export interface ConnectedSource<T extends NodeBase = Node> {
+export interface ConnectedInput<T extends NodeBase = Node> {
 	output: Output;
 	node: T;
 	connection: Connection;
 }
-export type Source<T extends NodeBase = Node> =
-	| UnconnectedSource<T>
-	| ConnectedSource<T>;
+export type Input<T extends NodeBase = Node> =
+	| UnconnectedInput<T>
+	| ConnectedInput<T>;

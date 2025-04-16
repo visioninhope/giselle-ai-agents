@@ -11,9 +11,9 @@ import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AtSignIcon } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
-import { type Source, useConnectedSources } from "./inputs";
+import { type Input, useConnectedInputs } from "./inputs";
 
-function getDefaultNodeName(source: Source): string {
+function getDefaultNodeName(source: Input): string {
 	if (isTextGenerationNode(source.node)) {
 		return source.node.content.llm.id;
 	}
@@ -26,7 +26,7 @@ export function PromptPanel({
 	node: TextGenerationNode;
 }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
-	const { all: connectedSources } = useConnectedSources(node);
+	const { all: connectedSources } = useConnectedInputs(node);
 	return (
 		<TextEditor
 			value={node.content.prompt}

@@ -1,16 +1,16 @@
 import type { TextGenerationNode, VariableNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useMemo } from "react";
-import type { ConnectedSource } from "./types";
+import type { ConnectedInput } from "./types";
 
-export function useConnectedSources(node: TextGenerationNode) {
+export function useConnectedInputs(node: TextGenerationNode) {
 	const { data } = useWorkflowDesigner();
 	return useMemo(() => {
 		const connectionsToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === node.id,
 		);
-		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
-		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
+		const connectedGeneratedInputs: ConnectedInput<TextGenerationNode>[] = [];
+		const connectedVariableInputs: ConnectedInput<VariableNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -29,7 +29,7 @@ export function useConnectedSources(node: TextGenerationNode) {
 				case "action":
 					switch (node.content.type) {
 						case "textGeneration":
-							connectedGeneratedSources.push({
+							connectedGeneratedInputs.push({
 								output,
 								node: node as TextGenerationNode,
 								connection,
@@ -38,7 +38,7 @@ export function useConnectedSources(node: TextGenerationNode) {
 					}
 					break;
 				case "variable":
-					connectedVariableSources.push({
+					connectedVariableInputs.push({
 						output,
 						node,
 						connection,
@@ -52,9 +52,9 @@ export function useConnectedSources(node: TextGenerationNode) {
 		}
 
 		return {
-			all: [...connectedGeneratedSources, ...connectedVariableSources],
-			generation: connectedGeneratedSources,
-			variable: connectedVariableSources,
+			all: [...connectedGeneratedInputs, ...connectedVariableInputs],
+			generation: connectedGeneratedInputs,
+			variable: connectedVariableInputs,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }

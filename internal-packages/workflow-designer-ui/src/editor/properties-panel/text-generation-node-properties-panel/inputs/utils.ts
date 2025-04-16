@@ -1,19 +1,19 @@
 import type { NodeBase } from "@giselle-sdk/data-type";
-import type { Source } from "./types";
+import type { Input } from "./types";
 
-export function filterSources<T extends NodeBase>(
-	sources: Source[],
+export function filterInputs<T extends NodeBase>(
+	inputs: Input[],
 	guardFn: (args: unknown) => args is T,
-): Source<T>[] {
-	const tmpSources: Source<T>[] = [];
-	for (const source of sources) {
-		if (!guardFn(source.node)) {
+): Input<T>[] {
+	const tmpInputs: Input<T>[] = [];
+	for (const input of inputs) {
+		if (!guardFn(input.node)) {
 			continue;
 		}
-		tmpSources.push({
-			...source,
-			node: source.node,
+		tmpInputs.push({
+			...input,
+			node: input.node,
 		});
 	}
-	return tmpSources;
+	return tmpInputs;
 }

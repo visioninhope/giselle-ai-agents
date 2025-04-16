@@ -1,6 +1,6 @@
 import {
 	type Connection,
-	type Input,
+	type Input as InputData,
 	InputId,
 	OutputId,
 	type TextGenerationNode,
@@ -25,36 +25,32 @@ import {
 	PromptIcon,
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-import {
-	type Source,
-	useConnectedSources,
-	useSourceCategories,
-} from "./inputs";
+import { type Input, useConnectedInputs, useInputCategories } from "./inputs";
 
 function SourceToggleItem({
-	source,
+	input,
 	disabled = false,
-}: { source: Source; disabled?: boolean }) {
+}: { input: Input; disabled?: boolean }) {
 	const getDisplayName = () => {
-		if ("content" in source.node && "llm" in source.node.content) {
-			return source.node.name ?? source.node.content.llm.id;
+		if ("content" in input.node && "llm" in input.node.content) {
+			return input.node.name ?? input.node.content.llm.id;
 		}
-		return source.node.name ?? "Source";
+		return input.node.name ?? "Source";
 	};
 
 	return (
 		<ToggleGroup.Item
-			key={source.output.id}
+			key={input.output.id}
 			className={clsx(
 				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
 				"text-white-400",
 				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
 			)}
-			value={source.output.id}
+			value={input.output.id}
 			disabled={disabled}
 		>
 			<p className="text-[12px] truncate">
-				{getDisplayName()} / {source.output.label}
+				{getDisplayName()} / {input.output.label}
 			</p>
 			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
 			<div
@@ -72,12 +68,12 @@ function SourceToggleItem({
 
 function SourceSelect({
 	node,
-	sources,
+	inputs,
 	onValueChange,
 	contentProps,
 }: {
 	node: TextGenerationNode;
-	sources: Source[];
+	inputs: Input[];
 	onValueChange?: (value: OutputId[]) => void;
 	contentProps?: Omit<
 		ComponentProps<typeof Popover.PopoverContent>,
@@ -85,12 +81,16 @@ function SourceSelect({
 	>;
 }) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
-	const { generatedSources, textSources, fileSources, githubSources } =
-		useSourceCategories(sources);
+	const {
+		generatedInputs: generatedSources,
+		textinputs: textSources,
+		fileInputs: fileSources,
+		githubInputs: githubSources,
+	} = useInputCategories(inputs);
 	const { isSupportedConnection } = useWorkflowDesigner();
 	const isSupported = useCallback(
-		(source: Source) => {
-			const { canConnect } = isSupportedConnection(source.node, node);
+		(input: Input) => {
+			const { canConnect } = isSupportedConnection(input.node, node);
 			return canConnect;
 		},
 		[isSupportedConnection, node],
@@ -101,7 +101,7 @@ function SourceSelect({
 			onOpenChange={(open) => {
 				if (open) {
 					setSelectedOutputIds(
-						sources
+						inputs
 							.filter((source) => source.connection !== undefined)
 							.map((source) => source.output.id),
 					);
@@ -166,7 +166,7 @@ function SourceSelect({
 									{generatedSources.map((generatedSource) => (
 										<SourceToggleItem
 											key={generatedSource.output.id}
-											source={generatedSource}
+											input={generatedSource}
 											disabled={!isSupported(generatedSource)}
 										/>
 									))}
@@ -180,7 +180,7 @@ function SourceSelect({
 									{textSources.map((textSource) => (
 										<SourceToggleItem
 											key={textSource.output.id}
-											source={textSource}
+											input={textSource}
 											disabled={!isSupported(textSource)}
 										/>
 									))}
@@ -195,7 +195,7 @@ function SourceSelect({
 									{fileSources.map((fileSource) => (
 										<SourceToggleItem
 											key={fileSource.output.id}
-											source={fileSource}
+											input={fileSource}
 											disabled={!isSupported(fileSource)}
 										/>
 									))}
@@ -209,7 +209,7 @@ function SourceSelect({
 									{githubSources.map((githubSource) => (
 										<SourceToggleItem
 											key={githubSource.output.id}
-											source={githubSource}
+											input={githubSource}
 											disabled={!isSupported(githubSource)}
 										/>
 									))}
@@ -300,8 +300,8 @@ export function InputPanel({
 }) {
 	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
-	const sources = useMemo<Source[]>(() => {
-		const tmpSources: Source[] = [];
+	const sources = useMemo<Input[]>(() => {
+		const tmpSources: Input[] = [];
 		const connections = data.connections.filter(
 			(connection) => connection.inputNode.id === textGenerationNode.id,
 		);
@@ -322,7 +322,7 @@ export function InputPanel({
 		}
 		return tmpSources;
 	}, [data.nodes, data.connections, textGenerationNode.id]);
-	const connectedSources = useConnectedSources(textGenerationNode);
+	const connectedSources = useConnectedInputs(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
@@ -345,7 +345,7 @@ export function InputPanel({
 				if (outputNode === undefined) {
 					continue;
 				}
-				const newInput: Input = {
+				const newInput: InputData = {
 					id: InputId.generate(),
 					label: "Input",
 				};
@@ -416,7 +416,7 @@ export function InputPanel({
 				>
 					<SourceSelect
 						node={textGenerationNode}
-						sources={sources}
+						inputs={sources}
 						onValueChange={handleConnectionChange}
 					/>
 				</EmptyState>
@@ -428,7 +428,7 @@ export function InputPanel({
 			<div className="flex justify-end">
 				<SourceSelect
 					node={textGenerationNode}
-					sources={sources}
+					inputs={sources}
 					onValueChange={handleConnectionChange}
 					contentProps={{
 						align: "end",
