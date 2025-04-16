@@ -7,7 +7,7 @@ export function githubTools(octokit: Octokit) {
 		addIssueComment: tool({
 			description: "Add a comment to an existing issue",
 			parameters: z.object({
-				body: z.string().describe("Comment text"),
+				body: z.string().describe("Comment content"),
 				issueNumber: z.number().describe("Issue number to comment on"),
 				owner: z.string().describe("Repository owner"),
 				repo: z.string().describe("Repository name"),
@@ -21,6 +21,104 @@ export function githubTools(octokit: Octokit) {
 						repo,
 						issue_number: issueNumber,
 						body,
+					},
+				);
+				return response.data;
+			},
+		}),
+		addPullRequestReviewComment: tool({
+			description: "Add a review comment to a pull request",
+			parameters: z.object({
+				body: z.string().describe("The text of the review comment"),
+				commitId: z
+					.string()
+					.describe(
+						"The SHA of the commit to comment on. Required unless in_reply_to is specified.",
+					)
+					.optional(),
+				inReplyTo: z
+					.number()
+					.describe(
+						"The ID of the review comment to reply to. When specified, only body is required and all other parameters are ignored",
+					)
+					.optional(),
+				line: z
+					.number()
+					.describe(
+						"The line of the blob in the pull request diff that the comment applies to. For multi-line comments, the last line of the range",
+					)
+					.optional(),
+				owner: z.string().describe("Repository owner"),
+				path: z
+					.string()
+					.describe(
+						"The relative path to the file that necessitates a comment. Required unless in_reply_to is specified.",
+					)
+					.optional(),
+				pullNumber: z.number().describe("Pull request number"),
+				repo: z.string().describe("Repository name"),
+				side: z.enum(["LEFT", "RIGHT"]).optional(),
+				startLine: z
+					.number()
+					.describe(
+						"For multi-line comments, the first line of the range that the comment applies to",
+					)
+					.optional(),
+				startSide: z.enum(["LEFT", "RIGHT"]).optional(),
+				subjectType: z.enum(["line", "file"]).optional(),
+			}),
+			execute: async (params) => {
+				const {
+					body,
+					commitId,
+					inReplyTo,
+					line,
+					owner,
+					path,
+					pullNumber,
+					repo,
+					side,
+					startLine,
+					startSide,
+					subjectType,
+				} = params;
+
+				if (inReplyTo) {
+					// Reply to an existing comment
+					const response = await octokit.request(
+						"POST /repos/{owner}/{repo}/pulls/{pull_number}/comments/{comment_id}/replies",
+						{
+							owner,
+							repo,
+							pull_number: pullNumber,
+							comment_id: inReplyTo,
+							body,
+						},
+					);
+					return response.data;
+				}
+
+				if (commitId === undefined) {
+					return "No commit ID provided";
+				}
+				if (path === undefined) {
+					return "No path provided";
+				}
+				// Create a new comment
+				const response = await octokit.request(
+					"POST /repos/{owner}/{repo}/pulls/{pull_number}/comments",
+					{
+						owner,
+						repo,
+						pull_number: pullNumber,
+						body,
+						commit_id: commitId,
+						path,
+						line,
+						side,
+						start_line: startLine,
+						start_side: startSide,
+						subject_type: subjectType,
 					},
 				);
 				return response.data;
@@ -302,6 +400,41 @@ export function githubTools(octokit: Octokit) {
 				return response.data;
 			},
 		}),
+		getCommit: tool({
+			description: "Get details for a commit from a GitHub repository",
+			parameters: z.object({
+				owner: z.string().describe("Repository owner"),
+				page: z
+					.number()
+					.describe("Page number for pagination (min 1)")
+					.min(1)
+					.optional(),
+				perPage: z
+					.number()
+					.describe("Results per page for pagination (min 1, max 100)")
+					.min(1)
+					.max(100)
+					.optional(),
+				repo: z.string().describe("Repository name"),
+				sha: z.string().describe("Commit SHA, branch name, or tag name"),
+			}),
+			execute: async (params) => {
+				const { owner, page, perPage, repo, sha } = params;
+
+				const response = await octokit.request(
+					"GET /repos/{owner}/{repo}/commits/{ref}",
+					{
+						owner,
+						repo,
+						ref: sha,
+						page,
+						per_page: perPage,
+					},
+				);
+
+				return response.data;
+			},
+		}),
 		getFileContents: tool({
 			description:
 				"Get the contents of a file or directory from a GitHub repository",
@@ -330,11 +463,11 @@ export function githubTools(octokit: Octokit) {
 			},
 		}),
 		getIssue: tool({
-			description: "Get details of a specific issue in a GitHub repository.",
+			description: "Get details of a specific issue in a GitHub repository",
 			parameters: z.object({
-				issueNumber: z.number().describe("The number of the issue."),
-				owner: z.string().describe("The owner of the repository."),
-				repo: z.string().describe("The name of the repository."),
+				issueNumber: z.number().describe("The number of the issue"),
+				owner: z.string().describe("The owner of the repository"),
+				repo: z.string().describe("The name of the repository"),
 			}),
 			execute: async (params) => {
 				const { issueNumber, owner, repo } = params;
@@ -515,6 +648,39 @@ export function githubTools(octokit: Octokit) {
 				return statusResponse.data;
 			},
 		}),
+		listBranches: tool({
+			description: "List branches in a GitHub repository",
+			parameters: z.object({
+				owner: z.string().describe("Repository owner"),
+				page: z
+					.number()
+					.describe("Page number for pagination (min 1)")
+					.min(1)
+					.optional(),
+				perPage: z
+					.number()
+					.describe("Results per page for pagination (min 1, max 100)")
+					.min(1)
+					.max(100)
+					.optional(),
+				repo: z.string().describe("Repository name"),
+			}),
+			execute: async (params) => {
+				const { owner, page, perPage, repo } = params;
+
+				const response = await octokit.request(
+					"GET /repos/{owner}/{repo}/branches",
+					{
+						owner,
+						repo,
+						page,
+						per_page: perPage,
+					},
+				);
+
+				return response.data;
+			},
+		}),
 		listCodeScanningAlerts: tool({
 			description: "List code scanning alerts in a GitHub repository.",
 			parameters: z.object({
@@ -525,16 +691,20 @@ export function githubTools(octokit: Octokit) {
 					.optional(),
 				repo: z.string().describe("The name of the repository."),
 				severity: z
-					.string()
-					.describe(
-						"Only code scanning alerts with this severity will be returned. Possible values are: critical, high, medium, low, warning, note, error.",
-					)
+					.enum([
+						"critical",
+						"high",
+						"medium",
+						"low",
+						"warning",
+						"note",
+						"error",
+					])
 					.optional(),
-				state: z
-					.enum(["open", "dismissed", "fixed"])
-					.describe(
-						"State of the code scanning alerts to list. Set to closed to list only closed code scanning alerts. Default: open",
-					)
+				state: z.enum(["open", "dismissed", "fixed"]).optional(),
+				toolName: z
+					.string()
+					.describe("The name of the tool used for code scanning.")
 					.optional(),
 			}),
 			execute: async (params) => {
@@ -570,7 +740,7 @@ export function githubTools(octokit: Octokit) {
 					.max(100)
 					.optional(),
 				repo: z.string().describe("Repository name"),
-				sha: z.string().describe("Branch name").optional(),
+				sha: z.string().describe("SHA or Branch name").optional(),
 			}),
 			execute: async (params) => {
 				const { owner, page, perPage, repo, sha } = params;
@@ -649,10 +819,7 @@ export function githubTools(octokit: Octokit) {
 			description: "List and filter repository pull requests",
 			parameters: z.object({
 				base: z.string().describe("Filter by base branch").optional(),
-				direction: z
-					.enum(["asc", "desc"])
-					.describe("Sort direction ('asc', 'desc')")
-					.optional(),
+				direction: z.enum(["asc", "desc"]).optional(),
 				head: z
 					.string()
 					.describe("Filter by head user/org and branch")
@@ -672,14 +839,8 @@ export function githubTools(octokit: Octokit) {
 				repo: z.string().describe("Repository name"),
 				sort: z
 					.enum(["created", "updated", "popularity", "long-running"])
-					.describe(
-						"Sort by ('created', 'updated', 'popularity', 'long-running')",
-					)
 					.optional(),
-				state: z
-					.enum(["open", "closed", "all"])
-					.describe("Filter by state ('open', 'closed', 'all')")
-					.optional(),
+				state: z.enum(["open", "closed", "all"]).optional(),
 			}),
 			execute: async (params) => {
 				const {
@@ -720,10 +881,7 @@ export function githubTools(octokit: Octokit) {
 					.describe("Extra detail for merge commit")
 					.optional(),
 				commitTitle: z.string().describe("Title for merge commit").optional(),
-				mergeMethod: z
-					.enum(["merge", "squash", "rebase"])
-					.describe("Merge method ('merge', 'squash', 'rebase')")
-					.optional(),
+				mergeMethod: z.enum(["merge", "squash", "rebase"]).optional(),
 				owner: z.string().describe("Repository owner"),
 				pullNumber: z.number().describe("Pull request number"),
 				repo: z.string().describe("Repository name"),
@@ -1039,6 +1197,50 @@ export function githubTools(octokit: Octokit) {
 						labels,
 						milestone,
 						state,
+					},
+				);
+
+				return response.data;
+			},
+		}),
+		updatePullRequest: tool({
+			description: "Update an existing pull request in a GitHub repository",
+			parameters: z.object({
+				base: z.string().describe("New base branch name").optional(),
+				body: z.string().describe("New description").optional(),
+				maintainerCanModify: z
+					.boolean()
+					.describe("Allow maintainer edits")
+					.optional(),
+				owner: z.string().describe("Repository owner"),
+				pullNumber: z.number().describe("Pull request number to update"),
+				repo: z.string().describe("Repository name"),
+				state: z.enum(["open", "closed"]).optional(),
+				title: z.string().describe("New title").optional(),
+			}),
+			execute: async (params) => {
+				const {
+					base,
+					body,
+					maintainerCanModify,
+					owner,
+					pullNumber,
+					repo,
+					state,
+					title,
+				} = params;
+
+				const response = await octokit.request(
+					"PATCH /repos/{owner}/{repo}/pulls/{pull_number}",
+					{
+						owner,
+						repo,
+						pull_number: pullNumber,
+						title,
+						body,
+						state,
+						base,
+						maintainer_can_modify: maintainerCanModify,
 					},
 				);
 
