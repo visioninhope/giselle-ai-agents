@@ -1,5 +1,5 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, MoveUpRightIcon, TrashIcon } from "lucide-react";
 import { GitHubIcon } from "../../../../icons";
 import { Switch } from "../../../../ui/switch";
@@ -63,6 +63,7 @@ const GITHUB_TOOL_CATEGORIES = [
 
 export function GitHubToolsPanel({ node }: { node: TextGenerationNode }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
+	const client = useGiselleEngine();
 
 	const toolsEnabled = !!node.content.tools?.github;
 	const selectedTools = node.content.tools?.github?.tools || [];
@@ -139,7 +140,7 @@ export function GitHubToolsPanel({ node }: { node: TextGenerationNode }) {
 			{!toolsEnabled && (
 				<form
 					className="bg-white-800/10 text-white-800 rounded-[4px] px-[12px] py-[8px] text-[12px] flex flex-col gap-[4px]"
-					onSubmit={(e) => {
+					onSubmit={async (e) => {
 						e.preventDefault();
 						const formData = new FormData(e.currentTarget);
 						const token = formData.get("token");
@@ -147,6 +148,9 @@ export function GitHubToolsPanel({ node }: { node: TextGenerationNode }) {
 							alert("Invalid PAT");
 							return;
 						}
+						const { encrypted } = await client.encryptSecret({
+							plaintext: token,
+						});
 
 						updateNodeDataContent(node, {
 							...node.content,
@@ -156,7 +160,7 @@ export function GitHubToolsPanel({ node }: { node: TextGenerationNode }) {
 									tools: [],
 									auth: {
 										type: "pat",
-										token,
+										token: encrypted,
 									},
 								},
 							},
