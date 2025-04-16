@@ -31,8 +31,8 @@ import {
 	OpenAIModelPanel,
 	PerplexityModelPanel,
 } from "./model";
+import { useConnectedOutputs } from "./outputs";
 import { PromptPanel } from "./prompt-panel";
-import { useConnectedSources } from "./sources";
 import { GitHubToolsPanel } from "./tools";
 
 export function TextGenerationNodePropertiesPanel({
@@ -51,7 +51,7 @@ export function TextGenerationNodePropertiesPanel({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
-	const { all: connectedSources } = useConnectedSources(node);
+	const { all: connectedSources } = useConnectedOutputs(node);
 	const usageLimitsReached = useUsageLimitsReached();
 	const { error } = useToasts();
 
