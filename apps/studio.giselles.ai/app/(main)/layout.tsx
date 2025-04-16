@@ -31,10 +31,8 @@ export default async function Layout({ children }: { children: ReactNode }) {
 					</div>
 				</div>
 
-				{/* Bottom row: Main Navigation */}
-				<div className="flex items-center px-[24px] py-0 border-t border-black-900/50">
-					<Nav />
-				</div>
+				{/* 下の行: メインナビゲーション */}
+				<Nav />
 
 				{/* Border line below navigation */}
 				<div className="h-[1px] w-full bg-black-800" />

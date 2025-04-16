@@ -44,9 +44,7 @@ export default async function TeamPage() {
 				</Suspense>
 
 				{/* Billing Section */}
-				<div>
-					<BillingInfo />
-				</div>
+				<BillingInfo />
 
 				{/* Delete Team Section */}
 				<div className="mt-8">
@@ -60,54 +58,101 @@ export default async function TeamPage() {
 	);
 }
 
-// BillingInfo component: Direct implementation of the original BillingSection component content
 async function BillingInfo() {
-	try {
-		const team = await fetchCurrentTeam();
+	const team = await fetchCurrentTeam();
 
-		return (
-			<div className="flex flex-col gap-y-2">
-				<Card className="flex items-center justify-between gap-x-1 py-2 border-none bg-transparent">
-					{!isProPlan(team) && (
-						<>
-							<div className="flex flex-col gap-y-0.5">
-								<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
-									<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
-										Free Plan
-									</p>
-								</div>
-								<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-									Have questions about your plan?{" "}
-									<a
-										href="https://giselles.ai/pricing"
-										target="_blank"
-										className="text-blue-80 underline"
-										rel="noreferrer"
-									>
-										Learn about plans and pricing
-									</a>
-								</p>
-							</div>
-							<form>
-								<Suspense
-									fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
-								>
-									<UpgradeButton team={team} />
-								</Suspense>
-							</form>
-						</>
-					)}
-				</Card>
+	return (
+		<div className="flex flex-col gap-y-2">
+			<Card className="flex justify-between items-center px-6 py-4 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
+				{isProPlan(team) ? (
+					<BillingInfoForProPlan team={team} />
+				) : (
+					<BillingInfoForFreePlan team={team} />
+				)}
+			</Card>
+		</div>
+	);
+}
 
-				{isProPlan(team) && team.type !== "internal" && (
-					<PaymentInfo team={team} />
+interface BillingInfoProps {
+	team: CurrentTeam;
+}
+
+async function BillingInfoForFreePlan({ team }: BillingInfoProps) {
+	if (isProPlan(team)) {
+		return null;
+	}
+	return (
+		<>
+			<div className="flex flex-col gap-y-0.5">
+				<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
+						Free Plan
+					</p>
+				</div>
+				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+					Have questions about your plan?{" "}
+					<a
+						href="https://giselles.ai/pricing"
+						target="_blank"
+						className="text-blue-80 underline"
+						rel="noreferrer"
+					>
+						Learn about plans and pricing
+					</a>
+				</p>
+			</div>
+			<form>
+				<Suspense fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}>
+					<UpgradeButton team={team} />
+				</Suspense>
+			</form>
+		</>
+	);
+}
+async function BillingInfoForProPlan({ team }: BillingInfoProps) {
+	if (!isProPlan(team)) {
+		return null;
+	}
+	return (
+		<>
+			<div className="flex flex-col gap-y-[2px]">
+				<div className="flex flex-col gap-0.5">
+					<p className="text-[14px] leading-[16px] font-medium tracking-wide font-hubot text-white-400">
+						Thank you for being
+					</p>
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-hubot">
+						<span className="text-primary-400">Pro Plan</span>
+					</p>
+				</div>
+				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+					Have questions about your plan?{" "}
+					<a
+						href="https://giselles.ai/pricing"
+						target="_blank"
+						className="text-blue-80 underline"
+						rel="noreferrer"
+					>
+						Learn about plans and pricing
+					</a>
+				</p>
+				{team.activeSubscriptionId && (
+					<Suspense fallback={<Skeleton className="h-5 w-[300px] mt-2" />}>
+						<CancellationNotice subscriptionId={team.activeSubscriptionId} />
+					</Suspense>
 				)}
 			</div>
-		);
-	} catch (error) {
-		console.error("Error in BillingInfo:", error);
-		return <div className="text-error-900">Failed to load settings</div>;
-	}
+			{team.activeSubscriptionId && (
+				<form>
+					<Suspense
+						fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}
+					>
+						<UpdateButton subscriptionId={team.activeSubscriptionId} />
+					</Suspense>
+				</form>
+			)}
+		</>
+	);
 }
 
 function UpgradeButton({ team }: { team: CurrentTeam }) {
@@ -154,47 +199,5 @@ async function CancellationNotice({ subscriptionId }: CancellationNoticeProps) {
 		<p className="mt-2 font-medium text-sm leading-[20.4px] text-warning-900 font-geist">
 			Subscription will end on <LocalDateTime date={subscription.cancelAt} />
 		</p>
-	);
-}
-
-function PaymentInfo({ team }: { team: CurrentTeam }) {
-	if (team.activeSubscriptionId === null) {
-		throw new Error("Subscription id not found");
-	}
-
-	return (
-		<Card className="flex justify-between items-center px-6 py-4 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
-			<div className="flex flex-col gap-y-[2px]">
-				<div className="flex flex-col gap-0.5">
-					<p className="text-[14px] leading-[16px] font-medium tracking-wide font-hubot text-white-400">
-						Thank you for being
-					</p>
-					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-hubot">
-						<span className="text-primary-400">Pro Plan</span>
-					</p>
-				</div>
-				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-					Have questions about your plan?{" "}
-					<a
-						href="https://giselles.ai/pricing"
-						target="_blank"
-						className="text-blue-80 underline"
-						rel="noreferrer"
-					>
-						Learn about plans and pricing
-					</a>
-				</p>
-				{team.activeSubscriptionId && (
-					<Suspense fallback={<Skeleton className="h-5 w-[300px] mt-2" />}>
-						<CancellationNotice subscriptionId={team.activeSubscriptionId} />
-					</Suspense>
-				)}
-			</div>
-			<form>
-				<Suspense fallback={<Skeleton className="h-10 w-[120px] rounded-md" />}>
-					<UpdateButton subscriptionId={team.activeSubscriptionId} />
-				</Suspense>
-			</form>
-		</Card>
 	);
 }

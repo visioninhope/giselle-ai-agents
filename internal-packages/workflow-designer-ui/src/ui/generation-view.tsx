@@ -75,7 +75,10 @@ export function GenerationView({
 
 							case "text":
 								return (
-									<div className="markdown-renderer" key={`${message.id}-text`}>
+									<div
+										className="markdown-renderer"
+										key={`${message.id}-${part.text}`}
+									>
 										<MemoizedMarkdown content={part.text} />
 									</div>
 								);

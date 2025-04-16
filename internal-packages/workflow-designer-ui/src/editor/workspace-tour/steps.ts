@@ -11,7 +11,7 @@ export const tourSteps: TourStep[] = [
 		content:
 			"Add generation nodes, access your knowledge base, manipulate files, invoke other agents, and orchestrate your workflow.",
 		placement: "right" as const,
-		target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // Precisely specify the bottom navigation bar
+		target: ".nav, .absolute.bottom-0, nav.rounded-\\[8px\\]", // Precisely target the bottom navigation bar
 	},
 	{
 		title: "Node Settings",
@@ -36,7 +36,7 @@ export const tourSteps: TourStep[] = [
 	{
 		title: "Resources & Support",
 		content:
-			"Get help when you need it. Explore our comprehensive Docs for detailed guidance and best practices whenever you encounter challenges.",
+			"Get help when you need it. Explore our <a href='https://docs.giselles.ai' target='_blank' class='text-primary-200 hover:underline'>comprehensive Docs</a> for detailed guidance and best practices whenever you encounter challenges.",
 		placement: "bottom" as const,
 	},
 ];

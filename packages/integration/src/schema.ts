@@ -1,8 +1,8 @@
 import { z } from "zod";
-import { GitHubIntegration } from "./github";
+import { GitHubIntegrationState } from "./github";
 export * from "./github";
 
 export const Integration = z.object({
-	github: GitHubIntegration,
+	github: GitHubIntegrationState,
 });
 export type Integration = z.infer<typeof Integration>;

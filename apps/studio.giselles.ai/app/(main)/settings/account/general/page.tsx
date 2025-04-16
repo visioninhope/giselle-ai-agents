@@ -17,7 +17,7 @@ export default async function AccountGeneralPage() {
 					Settings
 				</h3>
 				<a
-					href="https://docs.giselles.ai/guides/settings/team/billing"
+					href="https://docs.giselles.ai/guides/settings/account/general"
 					target="_blank"
 					rel="noopener noreferrer"
 					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
