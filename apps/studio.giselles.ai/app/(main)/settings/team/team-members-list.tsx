@@ -17,6 +17,7 @@ type TeamMembersListProps = {
 	}[];
 	currentUserRole: TeamRole;
 	isProPlan: boolean;
+	teamInvitationViaEmailEnabled: boolean;
 };
 
 export function TeamMembersList({
@@ -24,6 +25,7 @@ export function TeamMembersList({
 	members,
 	currentUserRole,
 	isProPlan,
+	teamInvitationViaEmailEnabled,
 }: TeamMembersListProps) {
 	// Get invited members on client side
 	const [invitedMembers, setInvitedMembers] = useState<
@@ -32,6 +34,10 @@ export function TeamMembersList({
 
 	// Function to refresh invited members list wrapped in useCallback
 	const refreshInvitedMembers = useCallback(() => {
+		if (!teamInvitationViaEmailEnabled) {
+			return;
+		}
+
 		try {
 			const invited = getInvitedMembers();
 			console.log("Refreshed invited members:", invited);
@@ -39,7 +45,7 @@ export function TeamMembersList({
 		} catch (error) {
 			console.error("Error refreshing invited members:", error);
 		}
-	}, []);
+	}, [teamInvitationViaEmailEnabled]);
 
 	// Get invited members once on mount and when custom event is fired
 	useEffect(() => {

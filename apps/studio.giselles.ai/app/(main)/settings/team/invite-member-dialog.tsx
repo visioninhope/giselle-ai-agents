@@ -1,6 +1,5 @@
 "use client";
 
-import { Input } from "@/components/ui/input";
 import {
 	Select,
 	SelectContent,
@@ -11,32 +10,11 @@ import {
 import type { TeamRole } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronDown, Link as LinkIcon, Plus, X } from "lucide-react";
+import { ChevronDown, Link as LinkIcon, X } from "lucide-react";
 import { useEffect, useState } from "react";
-import {
-	type InferInput,
-	email as emailValidator,
-	maxLength,
-	minLength,
-	object,
-	parse,
-	picklist,
-	pipe,
-	string,
-} from "valibot";
+import { email as emailValidator, parse, pipe, string } from "valibot";
 import { Button } from "../components/button";
 import { addTeamMember } from "./actions";
-
-const TeamMemberSchema = object({
-	email: pipe(
-		string(),
-		minLength(1, "Please enter an email address"),
-		maxLength(256, "Email must be 256 characters or less"),
-	),
-	role: picklist(["admin", "member"] as const),
-});
-
-type TeamMemberSchema = InferInput<typeof TeamMemberSchema>;
 
 // Global variable to store invited members (for UI demo)
 // In actual implementation, this should be fetched from the server or managed with a state management library
@@ -66,7 +44,13 @@ function saveInvitedMembers(list: { email: string; role: TeamRole }[]) {
 	}
 }
 
-export function InviteMemberDialog() {
+type InviteMemberDialogProps = {
+	teamInvitationViaEmailEnabled: boolean;
+};
+
+export function InviteMemberDialog({
+	teamInvitationViaEmailEnabled,
+}: InviteMemberDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [emailInput, setEmailInput] = useState("");
 	const [emailList, setEmailList] = useState<string[]>([]);
@@ -150,35 +134,37 @@ export function InviteMemberDialog() {
 		try {
 			setIsLoading(true);
 
-			// For UI demo: Add to list without server communication
-			const newList = [...invitedMembersList];
-			for (const email of emailList) {
-				// Check for duplicates
-				if (!newList.some((member) => member.email === email)) {
-					newList.push({ email, role: role as TeamRole });
+			if (teamInvitationViaEmailEnabled) {
+				// For UI demo: Add to list without server communication
+				const newList = [...invitedMembersList];
+				for (const email of emailList) {
+					// Check for duplicates
+					if (!newList.some((member) => member.email === email)) {
+						newList.push({ email, role: role as TeamRole });
+					}
+				}
+				saveInvitedMembers(newList);
+			} else {
+				// Process for each email address
+				const results = await Promise.all(
+					emailList.map(async (emailAddress) => {
+						const formData = new FormData();
+						formData.append("email", emailAddress);
+						formData.append("role", role);
+						return addTeamMember(formData);
+					}),
+				);
+
+				// Check for errors
+				const errors = results.filter((result) => !result.success);
+				if (errors.length > 0) {
+					setError(
+						`Failed to add ${errors.length} member(s). ${errors[0].error || ""}`,
+					);
+				} else {
+					handleCloseDialog(); // Close dialog on success
 				}
 			}
-			saveInvitedMembers(newList);
-
-			/* Actual API communication code (commented out) - to be implemented by engineers
-			// Process for each email address
-			const results = await Promise.all(
-				emailList.map(async (emailAddress) => {
-					const formData = new FormData();
-					formData.append("email", emailAddress);
-					formData.append("role", role);
-					return addTeamMember(formData);
-				})
-			);
-
-			// Check for errors
-			const errors = results.filter(result => !result.success);
-			if (errors.length > 0) {
-				setError(`Failed to add ${errors.length} member(s). ${errors[0].error || ''}`);
-			} else {
-				handleCloseDialog(); // Close dialog on success
-			}
-			*/
 
 			// Always emit the event to refresh the list, even if server-side errors occurred
 			const event = new CustomEvent("invited-members-updated");

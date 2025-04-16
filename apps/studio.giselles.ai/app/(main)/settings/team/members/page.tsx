@@ -1,3 +1,4 @@
+import { teamInvitationViaEmailFlag } from "@/flags";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { Card } from "../../components/card";
 import { getCurrentUserRole, getTeamMembers } from "../actions";
@@ -22,6 +23,7 @@ export default async function TeamMembersPage() {
 		await getCurrentUserRole();
 	const { success: hasMembers, data: members } = await getTeamMembers();
 	const hasProPlan = isProPlan(team);
+	const teamInvitationViaEmailEnabled = await teamInvitationViaEmailFlag();
 
 	// Can only be retrieved on client side, not used here
 	// const invitedMembers = getInvitedMembers();
@@ -73,7 +75,11 @@ export default async function TeamMembersPage() {
 				>
 					Members
 				</h3>
-				{hasProPlan && currentUserRole === "admin" && <InviteMemberDialog />}
+				{hasProPlan && currentUserRole === "admin" && (
+					<InviteMemberDialog
+						teamInvitationViaEmailEnabled={teamInvitationViaEmailEnabled}
+					/>
+				)}
 			</div>
 			<Card title="">
 				<TitleWithBorder title="Member List" />
@@ -82,6 +88,7 @@ export default async function TeamMembersPage() {
 					isProPlan={hasProPlan}
 					members={members}
 					currentUserRole={currentUserRole}
+					teamInvitationViaEmailEnabled={teamInvitationViaEmailEnabled}
 				/>
 			</Card>
 		</div>
