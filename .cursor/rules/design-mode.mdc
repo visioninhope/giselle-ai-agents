@@ -28,16 +28,35 @@ The following runtime requirements are needed to launch design mode:
 
 # How to Start Design Mode
 
-1. Check that all requirements are met, and set up anything that is needed.
+## 1. Check Requirements
 
-2. First, run `git clean -fx -n` to check which files would be removed, then confirm with the user if it's okay to clean the workspace by removing these files.
+Verify that all necessary runtimes are installed, and that Vercel CLI is logged in and linked to your project. If any requirements are missing, complete the setup process.
 
-    It's important that your local workspace is in a clean state before starting Design Mode:
+1. Check if Node.js is installed and meets the required version.
 
-3. Once cleaned, switch to the main branch and pull to get the latest state from origin/main.
+   Refer to ./nodejs.mdc for complete setup instructions.
 
-4. Next, run `pnpm i` to install dependencies and `pnpm build-sdk` to resolve any dependencies that need building.
+2. Check if pnpm is installed.
 
-5. Since we want to start the Design Mode server on port 3000, check if any server is already running on port 3000 and suggest commands to terminate it if necessary.
+   Refer to ./nodejs.mdc for complete setup instructions.
 
-6. Run the `vercel dev` command to start the server.
+3. Check if the vercel CLI is installed and logged in.
+
+   Refer to ./vercel-cli.mdc for complete setup instructions.
+
+
+## 2. Clean Your Workspace
+
+It's important that your local workspace is in a clean state before starting Design Mode:
+
+1. First, run `git clean -fx -n` to check which files would be removed, then confirm with the user if it's okay to clean the workspace by removing these files.
+
+2. Once cleaned, switch to the main branch and pull to get the latest state from origin/main.
+
+3. Next, run `pnpm i` to install dependencies and `pnpm build-sdk` to resolve any dependencies that need building.
+
+4. Since we want to start the Design Mode server on port 3000, check if any server is already running on port 3000 and suggest commands to terminate it if necessary.
+
+## 3. Start Design Mode
+
+1. Run the `vercel dev` command to start the server.
