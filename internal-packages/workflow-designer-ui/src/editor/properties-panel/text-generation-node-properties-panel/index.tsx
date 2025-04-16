@@ -24,7 +24,6 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
-import { useConnectedOutputs } from "./outputs";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
@@ -32,6 +31,7 @@ import {
 	OpenAIModelPanel,
 	PerplexityModelPanel,
 } from "./model";
+import { useConnectedOutputs } from "./outputs";
 import { PromptPanel } from "./prompt-panel";
 import { GitHubToolsPanel } from "./tools";
 
