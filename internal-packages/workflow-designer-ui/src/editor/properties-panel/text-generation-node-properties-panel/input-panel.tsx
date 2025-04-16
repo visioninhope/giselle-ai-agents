@@ -29,7 +29,7 @@ import {
 	type Source,
 	useConnectedSources,
 	useSourceCategories,
-} from "./sources";
+} from "./inputs";
 
 function SourceToggleItem({
 	source,
