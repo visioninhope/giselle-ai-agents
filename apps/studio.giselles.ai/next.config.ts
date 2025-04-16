@@ -6,16 +6,6 @@ const nextConfig: NextConfig = {
 		// your project has ESLint errors.
 		ignoreDuringBuilds: true,
 	},
-	logging: {
-		fetches: {
-			fullUrl: true,
-		},
-	},
-	experimental: {
-		serverActions: {
-			bodySizeLimit: "4.5mb",
-		},
-	},
 	serverExternalPackages: [
 		"@opentelemetry/sdk-node",
 		"pino",
