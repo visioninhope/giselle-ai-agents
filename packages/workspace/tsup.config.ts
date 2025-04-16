@@ -13,6 +13,5 @@ export default defineConfig([
 		dts: true,
 		outDir: "react/dist",
 		sourcemap: true,
-		clean: true,
 	},
 ]);

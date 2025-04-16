@@ -7,23 +7,23 @@ settings:
 catalogs:
   default:
     '@ai-sdk/anthropic':
-      specifier: 1.2.4
-      version: 1.2.4
+      specifier: 1.2.10
+      version: 1.2.10
     '@ai-sdk/fal':
-      specifier: 0.1.1
-      version: 0.1.1
+      specifier: 0.1.8
+      version: 0.1.8
     '@ai-sdk/google':
-      specifier: 1.2.5
-      version: 1.2.5
+      specifier: 1.2.11
+      version: 1.2.11
     '@ai-sdk/openai':
-      specifier: 1.3.6
-      version: 1.3.6
+      specifier: 1.3.12
+      version: 1.3.12
     '@ai-sdk/perplexity':
-      specifier: 1.1.3
-      version: 1.1.3
+      specifier: 1.1.7
+      version: 1.1.7
     '@ai-sdk/react':
-      specifier: 1.2.5
-      version: 1.2.5
+      specifier: 1.2.9
+      version: 1.2.9
     '@biomejs/biome':
       specifier: 1.9.4
       version: 1.9.4
@@ -133,8 +133,8 @@ catalogs:
       specifier: 12.4.1
       version: 12.4.1
     ai:
-      specifier: 4.2.9
-      version: 4.2.9
+      specifier: 4.3.6
+      version: 4.3.6
     clsx:
       specifier: 2.1.1
       version: 2.1.1
@@ -254,15 +254,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../../packages/data-type
-      '@giselle-sdk/generation-runner':
-        specifier: workspace:^
-        version: link:../../packages/generation-runner
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
-      '@giselle-sdk/run':
-        specifier: workspace:^
-        version: link:../../packages/run
       '@giselle-sdk/workflow-designer':
         specifier: workspace:*
         version: link:../../packages/workflow-designer
@@ -277,7 +271,7 @@ importers:
         version: 12.4.1(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.0(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       giselle-sdk:
         specifier: workspace:^
         version: link:../../packages/giselle-sdk
@@ -327,15 +321,6 @@ importers:
 
   apps/studio.giselles.ai:
     dependencies:
-      '@ai-sdk/anthropic':
-        specifier: 1.0.5
-        version: 1.0.5(zod@3.24.1)
-      '@ai-sdk/google':
-        specifier: 1.0.10
-        version: 1.0.10(zod@3.24.1)
-      '@ai-sdk/openai':
-        specifier: 1.0.8
-        version: 1.0.8(zod@3.24.1)
       '@giselle-internal/workflow-designer-ui':
         specifier: workspace:*
         version: link:../../internal-packages/workflow-designer-ui
@@ -345,6 +330,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/integration':
+        specifier: workspace:*
+        version: link:../../packages/integration
       '@icons-pack/react-simple-icons':
         specifier: 10.0.0
         version: 10.0.0(react@19.1.0)
@@ -490,8 +478,8 @@ importers:
         specifier: 12.0.3
         version: 12.0.3(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ai:
-        specifier: 4.0.16
-        version: 4.0.16(react@19.1.0)(zod@3.24.1)
+        specifier: 'catalog:'
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       boring-avatars:
         specifier: 1.11.1
         version: 1.11.1
@@ -518,7 +506,7 @@ importers:
         version: 6.7.1
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.0(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       giselle-sdk:
         specifier: workspace:*
         version: link:../../packages/giselle-sdk
@@ -528,6 +516,9 @@ importers:
       googleapis:
         specifier: 144.0.0
         version: 144.0.0
+      import-in-the-middle:
+        specifier: 1.13.1
+        version: 1.13.1
       input-otp:
         specifier: 1.4.2
         version: 1.4.2(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -536,7 +527,7 @@ importers:
         version: 3.26.0
       langfuse-vercel:
         specifier: 3.37.0
-        version: 3.37.0(ai@4.0.16(react@19.1.0)(zod@3.24.1))
+        version: 3.37.0(ai@4.3.6(react@19.1.0)(zod@3.24.1))
       lucide-react:
         specifier: 0.417.0
         version: 0.417.0(react@19.1.0)
@@ -567,6 +558,9 @@ importers:
       react-dom:
         specifier: 'catalog:'
         version: 19.1.0(react@19.1.0)
+      require-in-the-middle:
+        specifier: 7.5.2
+        version: 7.5.2
       stripe:
         specifier: 17.4.0
         version: 17.4.0
@@ -687,7 +681,7 @@ importers:
         version: 12.4.1(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ai:
         specifier: 'catalog:'
-        version: 4.2.9(react@19.1.0)(zod@3.24.1)
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       clsx:
         specifier: 'catalog:'
         version: 2.1.1
@@ -761,13 +755,13 @@ importers:
     dependencies:
       '@ai-sdk/react':
         specifier: 'catalog:'
-        version: 1.2.5(react@19.1.0)(zod@3.24.1)
+        version: 1.2.9(react@19.1.0)(zod@3.24.1)
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
       ai:
         specifier: 'catalog:'
-        version: 4.2.9(react@19.1.0)(zod@3.24.1)
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       zod:
         specifier: 'catalog:'
         version: 3.24.1
@@ -785,69 +779,41 @@ importers:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.38.0)(yaml@2.7.0)
 
-  packages/generation-runner:
-    dependencies:
-      '@ai-sdk/react':
-        specifier: 'catalog:'
-        version: 1.2.5(react@19.1.0)(zod@3.24.1)
-      '@giselle-sdk/data-type':
-        specifier: workspace:^
-        version: link:../data-type
-      '@giselle-sdk/giselle-engine':
-        specifier: workspace:^
-        version: link:../giselle-engine
-      '@giselle-sdk/telemetry':
-        specifier: workspace:^
-        version: link:../telemetry
-      ai:
-        specifier: 'catalog:'
-        version: 4.2.9(react@19.1.0)(zod@3.24.1)
-      react:
-        specifier: 'catalog:'
-        version: 19.1.0
-      zod:
-        specifier: 'catalog:'
-        version: 3.24.1
-    devDependencies:
-      '@giselle/giselle-sdk-tsconfig':
-        specifier: workspace:*
-        version: link:../../tools/tsconfig
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.1.0
-      tsup:
-        specifier: 'catalog:'
-        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
-
   packages/giselle-engine:
     dependencies:
       '@ai-sdk/anthropic':
         specifier: 'catalog:'
-        version: 1.2.4(zod@3.24.1)
+        version: 1.2.10(zod@3.24.1)
       '@ai-sdk/fal':
         specifier: 'catalog:'
-        version: 0.1.1(zod@3.24.1)
+        version: 0.1.8(zod@3.24.1)
       '@ai-sdk/google':
         specifier: 'catalog:'
-        version: 1.2.5(zod@3.24.1)
+        version: 1.2.11(zod@3.24.1)
       '@ai-sdk/openai':
         specifier: 'catalog:'
-        version: 1.3.6(zod@3.24.1)
+        version: 1.3.12(zod@3.24.1)
       '@ai-sdk/perplexity':
         specifier: 'catalog:'
-        version: 1.1.3(zod@3.24.1)
+        version: 1.1.7(zod@3.24.1)
+      '@ai-sdk/react':
+        specifier: 'catalog:'
+        version: 1.2.9(react@19.1.0)(zod@3.24.1)
       '@fal-ai/client':
         specifier: 'catalog:'
         version: 1.3.0
       '@giselle-sdk/data-mod':
         specifier: workspace:^
         version: link:../data-mod
-      '@giselle-sdk/github-client':
+      '@giselle-sdk/github-tool':
         specifier: workspace:^
-        version: link:../github-client
+        version: link:../github-tool
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
+      '@giselle-sdk/telemetry':
+        specifier: workspace:^
+        version: link:../telemetry
       '@giselle-sdk/text-editor':
         specifier: workspace:^
         version: link:../text-editor
@@ -859,7 +825,7 @@ importers:
         version: link:../workflow-utils
       ai:
         specifier: 'catalog:'
-        version: 4.2.9(react@19.1.0)(zod@3.24.1)
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       langfuse:
         specifier: 'catalog:'
         version: 3.37.0
@@ -926,7 +892,7 @@ importers:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
 
-  packages/github-client:
+  packages/github-tool:
     dependencies:
       '@octokit/auth-app':
         specifier: 'catalog:'
@@ -943,6 +909,9 @@ importers:
       '@urql/core':
         specifier: 'catalog:'
         version: 5.1.1(graphql@16.10.0)
+      ai:
+        specifier: 'catalog:'
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       gql.tada:
         specifier: 'catalog:'
         version: 1.8.10(graphql@16.10.0)(typescript@5.7.3)
@@ -952,6 +921,9 @@ importers:
       urql:
         specifier: 'catalog:'
         version: 4.2.2(@urql/core@5.1.1(graphql@16.10.0))(react@19.1.0)
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.1
     devDependencies:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
@@ -962,6 +934,9 @@ importers:
       '@graphql-codegen/client-preset':
         specifier: 'catalog:'
         version: 4.7.0(graphql@16.10.0)
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
       tsup:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
@@ -992,7 +967,7 @@ importers:
     dependencies:
       '@ai-sdk/perplexity':
         specifier: 'catalog:'
-        version: 1.1.3(zod@3.24.1)
+        version: 1.1.7(zod@3.24.1)
       '@fal-ai/client':
         specifier: 'catalog:'
         version: 1.3.0
@@ -1010,36 +985,11 @@ importers:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.38.0)(yaml@2.7.0)
 
-  packages/run:
-    dependencies:
-      '@giselle-sdk/data-type':
-        specifier: workspace:^
-        version: link:../data-type
-      '@giselle-sdk/generation-runner':
-        specifier: workspace:^
-        version: link:../generation-runner
-      '@giselle-sdk/giselle-engine':
-        specifier: workspace:^
-        version: link:../giselle-engine
-      react:
-        specifier: 'catalog:'
-        version: 19.1.0
-    devDependencies:
-      '@giselle/giselle-sdk-tsconfig':
-        specifier: workspace:*
-        version: link:../../tools/tsconfig
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.1.0
-      tsup:
-        specifier: 'catalog:'
-        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
-
   packages/telemetry:
     dependencies:
       ai:
         specifier: 'catalog:'
-        version: 4.2.9(react@19.1.0)(zod@3.24.1)
+        version: 4.3.6(react@19.1.0)(zod@3.24.1)
       react:
         specifier: 'catalog:'
         version: 19.1.0
@@ -1195,18 +1145,12 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../data-type
-      '@giselle-sdk/generation-runner':
-        specifier: workspace:^
-        version: link:../generation-runner
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../giselle-engine
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
-      '@giselle-sdk/run':
-        specifier: workspace:^
-        version: link:../run
       '@giselle-sdk/workflow-utils':
         specifier: workspace:*
         version: link:../workflow-utils
@@ -1251,18 +1195,12 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:^
         version: link:../data-type
-      '@giselle-sdk/generation-runner':
-        specifier: workspace:^
-        version: link:../generation-runner
       '@giselle-sdk/giselle-engine':
         specifier: workspace:^
         version: link:../giselle-engine
       '@giselle-sdk/integration':
         specifier: workspace:^
         version: link:../integration
-      '@giselle-sdk/run':
-        specifier: workspace:^
-        version: link:../run
       '@giselle-sdk/telemetry':
         specifier: workspace:^
         version: link:../telemetry
@@ -1313,103 +1251,48 @@ packages:
       graphql: ^15.5.0 || ^16.0.0 || ^17.0.0
       typescript: ^5.0.0
 
-  '@ai-sdk/anthropic@1.0.5':
-    resolution: {integrity: sha512-qNEB7AYz6W0HTHbhJk/brhGZtjivcRdberD1fn3aCdvzlQ321q1EOTc2k7TvfE+PmNCZbp/uutBbWPGHHODKpw==}
+  '@ai-sdk/anthropic@1.2.10':
+    resolution: {integrity: sha512-PyE7EC2fPjs9DnzRAHDrPQmcnI2m2Eojr8pfhckOejOlDEh2w7NnSJr1W3qe5hUWzKr+6d7NG1ZKR9fhmpDdEQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/anthropic@1.2.4':
-    resolution: {integrity: sha512-dAN6MXvLffeFVAr2gz3RGvOTgX1KL/Yn5q1l4/Dt0TUeDjQgCt4AbbYxZZB2qIAYzQvoyAFPhlw0sB3nNizG/g==}
+  '@ai-sdk/fal@0.1.8':
+    resolution: {integrity: sha512-RgYYnrQyOflIJXm+SM3uhJgAxytzhW3VxCM9x40x0vAsxEiQOV86fVY2QfZShs9TotIsCtqFNGpiUeCL8oEy7w==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/fal@0.1.1':
-    resolution: {integrity: sha512-LNXlXjVmYJ3Bi8Jvn+khyua8xXHVk5dZJvB7vfu3oQvKncvFW6qR6HQ+uBKrWENVhLtEXLA/veIJ9MxgJFFiCA==}
+  '@ai-sdk/google@1.2.11':
+    resolution: {integrity: sha512-gjGcxKcRri/Jbkujs9nVwP4qOW5GI4rYQ6vQ17uLAvGMo3qnwr26Q2KUqUWuVHQYtboXVSrxC/Kb6sm3hE5WUQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/google@1.0.10':
-    resolution: {integrity: sha512-8fvwy1luTLHJmuldDp7NZM+1jo20qMhqgzmONkb2ACNwRCnHtpcLEP2j/tJ7FIFLuvl5wHQP83smKHvdyUD9qA==}
+  '@ai-sdk/openai@1.3.12':
+    resolution: {integrity: sha512-ueAP69p8a/ZR2ns+pmlr9h/nyV2/DAwzfnPUGZiLpXbxWnLXd2g3a7l38CuEhBydH/nOfDb/byMgpS8+bnJHTg==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/google@1.2.5':
-    resolution: {integrity: sha512-ykSPjYDmaDg7Qblo6Ea6n6O01NpyehZJE0j3+HCYBtUXKXP2RZWesr7XlceIfFBKHd0sumovRtX4ozHrb+1+sw==}
+  '@ai-sdk/perplexity@1.1.7':
+    resolution: {integrity: sha512-FH2zEADLU/NTuRkQXMbZkUZ0qSsJ5qhufQ+7IsFMuhhKShGt0M8gOZlnkxuolnIjDrOdD3r1r59nZKMsFHuwqw==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.0.0
 
-  '@ai-sdk/openai@1.0.8':
-    resolution: {integrity: sha512-wcTHM9qgRWGYVO3WxPSTN/RwnZ9R5/17xyo61iUCCSCZaAuJyh6fKddO0/oamwDp3BG7g+4wbfAyuTo32H+fHw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-
-  '@ai-sdk/openai@1.3.6':
-    resolution: {integrity: sha512-Lyp6W6dg+ERMJru3DI8/pWAjXLB0GbMMlXh4jxA3mVny8CJHlCAjlEJRuAdLg1/CFz4J1UDN2/4qBnIWtLFIqw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-
-  '@ai-sdk/perplexity@1.1.3':
-    resolution: {integrity: sha512-CeWCjYi+z+yxMoodqXXlh9MgtKgQi4/zBgvkDaAGEZXQRyz0lsIKa8oKNXX7znkxeSj+74t9HESwelOv5jqGnA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-
-  '@ai-sdk/provider-utils@2.0.4':
-    resolution: {integrity: sha512-GMhcQCZbwM6RoZCri0MWeEWXRt/T+uCxsmHEsTwNvEH3GDjNzchfX25C8ftry2MeEOOn6KfqCLSKomcgK6RoOg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
-  '@ai-sdk/provider-utils@2.2.1':
-    resolution: {integrity: sha512-BuExLp+NcpwsAVj1F4bgJuQkSqO/+roV9wM7RdIO+NVrcT8RBUTdXzf5arHt5T58VpK7bZyB2V9qigjaPHE+Dg==}
+  '@ai-sdk/provider-utils@2.2.7':
+    resolution: {integrity: sha512-kM0xS3GWg3aMChh9zfeM+80vEZfXzR3JEUBdycZLtbRZ2TRT8xOj3WodGHPb06sUK5yD7pAXC/P7ctsi2fvUGQ==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.23.8
 
-  '@ai-sdk/provider-utils@2.2.2':
-    resolution: {integrity: sha512-DgjbBseR6e5oRcXOF0LH9owj3eKDfZNMdyHM8HBfcfQg0IVL2KqL1lK40pQynuI3/u72YM+vvbtAZ78PRj6jCA==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.23.8
-
-  '@ai-sdk/provider-utils@2.2.3':
-    resolution: {integrity: sha512-o3fWTzkxzI5Af7U7y794MZkYNEsxbjLam2nxyoUZSScqkacb7vZ3EYHLh21+xCcSSzEC161C7pZAGHtC0hTUMw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.23.8
-
-  '@ai-sdk/provider@1.0.2':
-    resolution: {integrity: sha512-YYtP6xWQyaAf5LiWLJ+ycGTOeBLWrED7LUrvc+SQIWhGaneylqbaGsyQL7VouQUeQ4JZ1qKYZuhmi3W56HADPA==}
+  '@ai-sdk/provider@1.1.3':
+    resolution: {integrity: sha512-qZMxYJ0qqX/RfnuIaab+zp8UAeJn/ygXXAffR5I4N0n1IrvA6qBsjc8hXLmBiMV2zoXlifkacF7sEFnYnjBcqg==}
     engines: {node: '>=18'}
 
-  '@ai-sdk/provider@1.1.0':
-    resolution: {integrity: sha512-0M+qjp+clUD0R1E5eWQFhxEvWLNaOtGQRUaBn8CUABnSKredagq92hUS9VjOzGsTm37xLfpaxl97AVtbeOsHew==}
-    engines: {node: '>=18'}
-
-  '@ai-sdk/react@1.0.6':
-    resolution: {integrity: sha512-8Hkserq0Ge6AEi7N4hlv2FkfglAGbkoAXEZ8YSp255c3PbnZz6+/5fppw+aROmZMOfNwallSRuy1i/iPa2rBpQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: ^18 || ^19 || ^19.0.0-rc
-      zod: ^3.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
-      zod:
-        optional: true
-
-  '@ai-sdk/react@1.2.4':
-    resolution: {integrity: sha512-wI0o6nnGmubKFmzKus84LjxEap6gVnTFbwqtN66UEQqvd7yGMdBRXkcjba2+W1JhzBXtmxlaQKAlz54OrJt/jA==}
+  '@ai-sdk/react@1.2.9':
+    resolution: {integrity: sha512-/VYm8xifyngaqFDLXACk/1czDRCefNCdALUyp+kIX6DUIYUWTM93ISoZ+qJ8+3E+FiJAKBQz61o8lIIl+vYtzg==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
@@ -1418,33 +1301,8 @@ packages:
       zod:
         optional: true
 
-  '@ai-sdk/react@1.2.5':
-    resolution: {integrity: sha512-0jOop3S2WkDOdO4X5I+5fTGqZlNX8/h1T1eYokpkR9xh8Vmrxqw8SsovqGvrddTsZykH8uXRsvI+G4FTyy894A==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: ^18 || ^19 || ^19.0.0-rc
-      zod: ^3.23.8
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
-  '@ai-sdk/ui-utils@1.0.5':
-    resolution: {integrity: sha512-DGJSbDf+vJyWmFNexSPUsS1AAy7gtsmFmoSyNbNbJjwl9hRIf2dknfA1V0ahx6pg3NNklNYFm53L8Nphjovfvg==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.0.0
-    peerDependenciesMeta:
-      zod:
-        optional: true
-
-  '@ai-sdk/ui-utils@1.2.3':
-    resolution: {integrity: sha512-vUr+A344eEPeCZhBxuTE83On8bijQYdwbo1nfo9GvCPxfeCo5gy1XCl150je9XUe/WPw/Qvqe1OKjnijj30BBQ==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      zod: ^3.23.8
-
-  '@ai-sdk/ui-utils@1.2.4':
-    resolution: {integrity: sha512-wLTxEZrKZRyBmlVZv8nGXgLBg5tASlqXwbuhoDu0MhZa467ZFREEnosH/OC/novyEHTQXko2zC606xoVbMrUcA==}
+  '@ai-sdk/ui-utils@1.2.8':
+    resolution: {integrity: sha512-nls/IJCY+ks3Uj6G/agNhXqQeLVqhNfoJbuNgCny+nX2veY5ADB91EcZUqVeQ/ionul2SeUswPY6Q/DxteY29Q==}
     engines: {node: '>=18'}
     peerDependencies:
       zod: ^3.23.8
@@ -4876,9 +4734,6 @@ packages:
   '@types/node@18.19.71':
     resolution: {integrity: sha512-evXpcgtZm8FY4jqBSN8+DmOTcVkkvTmAayeo4Wf3m1xAruyVGzGuDh/Fb/WWX2yLItUiho42ozyJjB0dw//Tkw==}
 
-  '@types/node@22.10.7':
-    resolution: {integrity: sha512-V09KvXxFiutGp6B7XkpaDXlNadZxrzajcY50EuoLIpQ6WWYCSvf19lVIazzfIzQvhUN2HjX12spLojTnhuKlGg==}
-
   '@types/node@22.14.0':
     resolution: {integrity: sha512-Kmpl+z84ILoG+3T/zQFyAJsU6EPTmOCj8/2+83fSN6djd6I4o7uOuGIH6vq3PrjY5BGitSbFuMN18j3iknubbA==}
 
@@ -5175,20 +5030,8 @@ packages:
     resolution: {integrity: sha512-4I7Td01quW/RpocfNayFdFVk1qSuoh0E7JrbRJ16nH01HhKFQ88INq9Sd+nd72zqRySlr9BmDA8xlEJ6vJMrYA==}
     engines: {node: '>=8'}
 
-  ai@4.0.16:
-    resolution: {integrity: sha512-DdpyzTaJYwagQKkWNb1eYx/UcQoMNy+cZVRYYX3cb88r25EI46YjtjMuvDhd296FPgjJBFqbL4IvDHQBPaSwbw==}
-    engines: {node: '>=18'}
-    peerDependencies:
-      react: ^18 || ^19 || ^19.0.0-rc
-      zod: ^3.0.0
-    peerDependenciesMeta:
-      react:
-        optional: true
-      zod:
-        optional: true
-
-  ai@4.2.9:
-    resolution: {integrity: sha512-VSlgZaf86+UsQr9XRnMbEWANyR5z+ugDm3+b0fLtpsM7TRC0rW37FPIREKM2nrutmvGXRfQ6mf6BPQYeR/6Jng==}
+  ai@4.3.6:
+    resolution: {integrity: sha512-cRL/9zFfPRRfVUOk+ll5FHy08FVc692voFzXWJ2YPD9KS+mkjDPp72QT9Etr0ZD/mdlJZHYq4ZHIts7nRpdD6A==}
     engines: {node: '>=18'}
     peerDependencies:
       react: ^18 || ^19 || ^19.0.0-rc
@@ -6109,10 +5952,6 @@ packages:
     resolution: {integrity: sha512-v0eOBUbiaFojBu2s2NPBfYUoRR9GjcDNvCXVaqEf5vVfpIAh9f8RCo4vXTP8c63QRKCFwoLpMpTdPwwhEKVgzA==}
     engines: {node: '>=14.18'}
 
-  eventsource-parser@3.0.0:
-    resolution: {integrity: sha512-T1C0XCUimhxVQzW4zFipdx0SficT651NnkR0ZSH3yQwh+mFMdLfgjABVi4YtMTtaL4s168593DaoaRLMqryavA==}
-    engines: {node: '>=18.0.0'}
-
   execa@5.1.1:
     resolution: {integrity: sha512-8uSpZZocAZRBAPIEINJj3Lo9HyGitllczc27Eh5YYojjMFMn8yHMDMaUHE2Jqfq05D/wucwI4JGURyXt1vchyg==}
     engines: {node: '>=10'}
@@ -6557,11 +6396,8 @@ packages:
     resolution: {integrity: sha512-P9J71vT5nLlDeV8FHs5nNxaLbrpfAV5cF5srvbZfpwpcJoM/xZR3hiv+q+SAnuSmuGbXMWud063iIMx/V/EWZQ==}
     engines: {node: '>=12.2'}
 
-  import-in-the-middle@1.11.0:
-    resolution: {integrity: sha512-5DimNQGoe0pLUHbR9qK84iWaWjjbsxiqXnw6Qz64+azRgleqv9k2kTt5fw7QsOpmaGYtuxxursnPPsnTKEx10Q==}
-
-  import-in-the-middle@1.12.0:
-    resolution: {integrity: sha512-yAgSE7GmtRcu4ZUSFX/4v69UGXwugFFSdIQJ14LHPOPPQrWv8Y7O9PHsw8Ovk7bKCLe4sjXMbZFqGFcLHpZ89w==}
+  import-in-the-middle@1.13.1:
+    resolution: {integrity: sha512-k2V9wNm9B+ysuelDTHjI9d5KPc4l8zAZTGqj+pcynvWkypZd857ryzN8jNC7Pg2YZXNMJcHRPpaDyCBbNyVRpA==}
 
   import-in-the-middle@1.7.4:
     resolution: {integrity: sha512-Lk+qzWmiQuRPPulGQeK5qq0v32k2bHnWrRPFgqyvhw7Kkov5L6MOLOIU3pcWeujc9W4q54Cp3Q2WV16eQkc7Bg==}
@@ -8047,8 +7883,8 @@ packages:
     resolution: {integrity: sha512-Xf0nWe6RseziFMu+Ap9biiUbmplq6S9/p+7w7YXP/JBHhrUDDUhwa+vANyubuqfZWTveU//DYVGsDG7RKL/vEw==}
     engines: {node: '>=0.10.0'}
 
-  require-in-the-middle@7.5.0:
-    resolution: {integrity: sha512-/Tvpny/RVVicqlYTKwt/GtpZRsPG1CmJNhxVKGz+Sy/4MONfXCVNK69MFgGKdUt0/324q3ClI2dICcPgISrC8g==}
+  require-in-the-middle@7.5.2:
+    resolution: {integrity: sha512-gAZ+kLqBdHarXB64XpAe2VCjB7rIRv+mU8tfRWziHRJ5umKsIHN2tLLv6EtMw7WCdP19S0ERVMldNvxYCHnhSQ==}
     engines: {node: '>=8.6.0'}
 
   resolve-from@4.0.0:
@@ -8768,9 +8604,6 @@ packages:
   undici-types@5.26.5:
     resolution: {integrity: sha512-JlCMO+ehdEIKqlFxk6IfVoAUVmgz7cU7zD/h9XZ0qzeosSHmUJVOzSQvvYSYWXkFXC+IfLKSIffhv0sVZup6pA==}
 
-  undici-types@6.20.0:
-    resolution: {integrity: sha512-Ny6QZ2Nju20vw1SRHe3d9jVu6gJ+4e3+MMpqu7pqE5HT6WsTSlce++GQmK5UXS8mzV8DSYHrQH+Xrf2jVcuKNg==}
-
   undici-types@6.21.0:
     resolution: {integrity: sha512-iwDZqg0QAGrg9Rav5H4n0M64c3mkR59cJ6wQp+7C4nI0gsmExaedaYLNO44eT4AtBBwjbTiGPMlt2Md0T9H9JQ==}
 
@@ -9280,141 +9113,61 @@ snapshots:
       graphql: 16.10.0
       typescript: 5.7.3
 
-  '@ai-sdk/anthropic@1.0.5(zod@3.24.1)':
+  '@ai-sdk/anthropic@1.2.10(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.0.2
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
 
-  '@ai-sdk/anthropic@1.2.4(zod@3.24.1)':
+  '@ai-sdk/fal@0.1.8(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
 
-  '@ai-sdk/fal@0.1.1(zod@3.24.1)':
+  '@ai-sdk/google@1.2.11(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.1(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
 
-  '@ai-sdk/google@1.0.10(zod@3.24.1)':
+  '@ai-sdk/openai@1.3.12(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.0.2
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
 
-  '@ai-sdk/google@1.2.5(zod@3.24.1)':
+  '@ai-sdk/perplexity@1.1.7(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
 
-  '@ai-sdk/openai@1.0.8(zod@3.24.1)':
+  '@ai-sdk/provider-utils@2.2.7(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider': 1.0.2
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
-      zod: 3.24.1
-
-  '@ai-sdk/openai@1.3.6(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
-      zod: 3.24.1
-
-  '@ai-sdk/perplexity@1.1.3(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
-      zod: 3.24.1
-
-  '@ai-sdk/provider-utils@2.0.4(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.0.2
-      eventsource-parser: 3.0.0
-      nanoid: 3.3.8
-      secure-json-parse: 2.7.0
-    optionalDependencies:
-      zod: 3.24.1
-
-  '@ai-sdk/provider-utils@2.2.1(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
+      '@ai-sdk/provider': 1.1.3
       nanoid: 3.3.8
       secure-json-parse: 2.7.0
       zod: 3.24.1
 
-  '@ai-sdk/provider-utils@2.2.2(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      nanoid: 3.3.8
-      secure-json-parse: 2.7.0
-      zod: 3.24.1
-
-  '@ai-sdk/provider-utils@2.2.3(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      nanoid: 3.3.8
-      secure-json-parse: 2.7.0
-      zod: 3.24.1
-
-  '@ai-sdk/provider@1.0.2':
+  '@ai-sdk/provider@1.1.3':
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/provider@1.1.0':
+  '@ai-sdk/react@1.2.9(react@19.1.0)(zod@3.24.1)':
     dependencies:
-      json-schema: 0.4.0
-
-  '@ai-sdk/react@1.0.6(react@19.1.0)(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.0.5(zod@3.24.1)
-      swr: 2.2.5(react@19.1.0)
-      throttleit: 2.1.0
-    optionalDependencies:
-      react: 19.1.0
-      zod: 3.24.1
-
-  '@ai-sdk/react@1.2.4(react@19.1.0)(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider-utils': 2.2.2(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.2.3(zod@3.24.1)
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
+      '@ai-sdk/ui-utils': 1.2.8(zod@3.24.1)
       react: 19.1.0
       swr: 2.2.5(react@19.1.0)
       throttleit: 2.1.0
     optionalDependencies:
       zod: 3.24.1
 
-  '@ai-sdk/react@1.2.5(react@19.1.0)(zod@3.24.1)':
+  '@ai-sdk/ui-utils@1.2.8(zod@3.24.1)':
     dependencies:
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.2.4(zod@3.24.1)
-      react: 19.1.0
-      swr: 2.2.5(react@19.1.0)
-      throttleit: 2.1.0
-    optionalDependencies:
-      zod: 3.24.1
-
-  '@ai-sdk/ui-utils@1.0.5(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.0.2
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
-      zod-to-json-schema: 3.24.1(zod@3.24.1)
-    optionalDependencies:
-      zod: 3.24.1
-
-  '@ai-sdk/ui-utils@1.2.3(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.2(zod@3.24.1)
-      zod: 3.24.1
-      zod-to-json-schema: 3.24.1(zod@3.24.1)
-
-  '@ai-sdk/ui-utils@1.2.4(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.3(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
       zod: 3.24.1
       zod-to-json-schema: 3.24.1(zod@3.24.1)
 
@@ -11163,7 +10916,7 @@ snapshots:
       '@opentelemetry/api-logs': 0.51.1
       '@types/shimmer': 1.2.0
       import-in-the-middle: 1.7.4
-      require-in-the-middle: 7.5.0
+      require-in-the-middle: 7.5.2
       semver: 7.7.1
       shimmer: 1.2.1
     transitivePeerDependencies:
@@ -11174,8 +10927,8 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.53.0
       '@types/shimmer': 1.2.0
-      import-in-the-middle: 1.11.0
-      require-in-the-middle: 7.5.0
+      import-in-the-middle: 1.13.1
+      require-in-the-middle: 7.5.2
       semver: 7.7.1
       shimmer: 1.2.1
     transitivePeerDependencies:
@@ -11186,8 +10939,8 @@ snapshots:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/api-logs': 0.56.0
       '@types/shimmer': 1.2.0
-      import-in-the-middle: 1.11.0
-      require-in-the-middle: 7.5.0
+      import-in-the-middle: 1.13.1
+      require-in-the-middle: 7.5.2
       semver: 7.7.1
       shimmer: 1.2.1
     transitivePeerDependencies:
@@ -12836,7 +12589,7 @@ snapshots:
       '@prisma/instrumentation': 5.22.0
       '@sentry/core': 8.49.0
       '@sentry/opentelemetry': 8.49.0(@opentelemetry/api@1.9.0)(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/semantic-conventions@1.28.0)
-      import-in-the-middle: 1.12.0
+      import-in-the-middle: 1.13.1
     transitivePeerDependencies:
       - supports-color
 
@@ -13251,7 +13004,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.10.7
+      '@types/node': 22.14.0
 
   '@types/hast@3.0.4':
     dependencies:
@@ -13298,10 +13051,6 @@ snapshots:
     dependencies:
       undici-types: 5.26.5
 
-  '@types/node@22.10.7':
-    dependencies:
-      undici-types: 6.20.0
-
   '@types/node@22.14.0':
     dependencies:
       undici-types: 6.21.0
@@ -13346,7 +13095,7 @@ snapshots:
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 22.10.7
+      '@types/node': 22.14.0
 
   '@types/tinycolor2@1.4.6': {}
 
@@ -13653,25 +13402,12 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@4.0.16(react@19.1.0)(zod@3.24.1):
+  ai@4.3.6(react@19.1.0)(zod@3.24.1):
     dependencies:
-      '@ai-sdk/provider': 1.0.2
-      '@ai-sdk/provider-utils': 2.0.4(zod@3.24.1)
-      '@ai-sdk/react': 1.0.6(react@19.1.0)(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.0.5(zod@3.24.1)
-      '@opentelemetry/api': 1.9.0
-      jsondiffpatch: 0.6.0
-      zod-to-json-schema: 3.24.1(zod@3.24.1)
-    optionalDependencies:
-      react: 19.1.0
-      zod: 3.24.1
-
-  ai@4.2.9(react@19.1.0)(zod@3.24.1):
-    dependencies:
-      '@ai-sdk/provider': 1.1.0
-      '@ai-sdk/provider-utils': 2.2.2(zod@3.24.1)
-      '@ai-sdk/react': 1.2.4(react@19.1.0)(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.2.3(zod@3.24.1)
+      '@ai-sdk/provider': 1.1.3
+      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
+      '@ai-sdk/react': 1.2.9(react@19.1.0)(zod@3.24.1)
+      '@ai-sdk/ui-utils': 1.2.8(zod@3.24.1)
       '@opentelemetry/api': 1.9.0
       jsondiffpatch: 0.6.0
       zod: 3.24.1
@@ -14539,8 +14275,6 @@ snapshots:
 
   eventsource-parser@1.1.2: {}
 
-  eventsource-parser@3.0.0: {}
-
   execa@5.1.1:
     dependencies:
       cross-spawn: 7.0.6
@@ -14733,7 +14467,7 @@ snapshots:
       - encoding
       - supports-color
 
-  geist@1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
+  geist@1.3.1(next@15.3.0(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
     dependencies:
       next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
@@ -15070,14 +14804,7 @@ snapshots:
 
   import-from@4.0.0: {}
 
-  import-in-the-middle@1.11.0:
-    dependencies:
-      acorn: 8.14.0
-      acorn-import-attributes: 1.9.5(acorn@8.14.0)
-      cjs-module-lexer: 1.4.3
-      module-details-from-path: 1.0.3
-
-  import-in-the-middle@1.12.0:
+  import-in-the-middle@1.13.1:
     dependencies:
       acorn: 8.14.0
       acorn-import-attributes: 1.9.5(acorn@8.14.0)
@@ -15309,7 +15036,7 @@ snapshots:
 
   jest-worker@27.5.1:
     dependencies:
-      '@types/node': 22.10.7
+      '@types/node': 22.14.0
       merge-stream: 2.0.0
       supports-color: 8.1.1
 
@@ -15415,9 +15142,9 @@ snapshots:
     dependencies:
       mustache: 4.2.0
 
-  langfuse-vercel@3.37.0(ai@4.0.16(react@19.1.0)(zod@3.24.1)):
+  langfuse-vercel@3.37.0(ai@4.3.6(react@19.1.0)(zod@3.24.1)):
     dependencies:
-      ai: 4.0.16(react@19.1.0)(zod@3.24.1)
+      ai: 4.3.6(react@19.1.0)(zod@3.24.1)
       langfuse: 3.37.0
       langfuse-core: 3.37.0
 
@@ -16824,7 +16551,7 @@ snapshots:
 
   require-from-string@2.0.2: {}
 
-  require-in-the-middle@7.5.0:
+  require-in-the-middle@7.5.2:
     dependencies:
       debug: 4.4.0
       module-details-from-path: 1.0.3
@@ -17553,8 +17280,6 @@ snapshots:
   uncrypto@0.1.3: {}
 
   undici-types@5.26.5: {}
-
-  undici-types@6.20.0: {}
 
   undici-types@6.21.0: {}
 

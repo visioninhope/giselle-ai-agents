@@ -64,7 +64,31 @@ const o3Mini: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gpt4o, gpt4oMini, o3Mini];
+const gpt41: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-4.1",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
+const gpt41mini: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-4.1-mini",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
+const gpt41nano: OpenAILanguageModel = {
+	provider: "openai",
+	id: "gpt-4.1-nano",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
+export const models = [gpt4o, gpt4oMini, o3Mini, gpt41, gpt41mini, gpt41nano];
 
 export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;

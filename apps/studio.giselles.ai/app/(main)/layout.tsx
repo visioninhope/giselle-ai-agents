@@ -32,9 +32,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				</div>
 
 				{/* 下の行: メインナビゲーション */}
-				<div className="flex items-center px-[24px] py-0 border-t border-black-900/50">
-					<Nav />
-				</div>
+				<Nav />
 
 				{/* ナビゲーションの下の罫線 */}
 				<div className="h-[1px] w-full bg-black-800" />

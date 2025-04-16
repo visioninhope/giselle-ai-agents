@@ -7,7 +7,7 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"ignore": ["./packages/github-client/schema.graphql"]
+		"ignore": ["./packages/github-tool/schema.graphql"]
 	},
 	"formatter": { "enabled": true, "indentStyle": "tab" },
 	"organizeImports": { "enabled": true },

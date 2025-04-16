@@ -4,8 +4,10 @@ import { createPortal } from "react-dom";
 import step2Gif from "./assets/02.gif";
 import step3Gif from "./assets/03.gif";
 import step4Gif from "./assets/04.gif";
+import step5Gif from "./assets/05.gif";
+import docsImage from "./assets/docs.png";
 import step2Arrow from "./assets/step2_arrow.png";
-import step5Arror from "./assets/step5_arrow.png";
+import step5Arrow from "./assets/step5_arrow.png";
 
 export type TourStep = {
 	target?: string; // CSS selector for the target element (optional)
@@ -122,7 +124,8 @@ const CARD_STYLES = {
 	},
 	large: {
 		width: "483px",
-		height: "435px",
+		height: "auto",
+		maxHeight: "520px",
 	},
 	wide: {
 		width: "792px",
@@ -144,6 +147,7 @@ interface TourCardProps {
 	footer: ReactNode;
 	children?: ReactNode;
 	additionalClassName?: string;
+	currentStep: number;
 }
 
 // Extracted reusable TourCard component
@@ -155,6 +159,7 @@ const TourCard = ({
 	footer,
 	children,
 	additionalClassName = "",
+	currentStep,
 }: TourCardProps) => {
 	const sizeStyles =
 		size === "small"
@@ -175,16 +180,19 @@ const TourCard = ({
 				<>
 					{/* Image area */}
 					<div
-						className="w-full h-[280px] flex items-center justify-center"
+						className="w-full flex items-center justify-center"
 						style={{
 							backgroundImage: BACKGROUND_GRADIENT,
+							height: currentStep === 4 ? "230px" : "280px",
+							maxHeight: currentStep === 4 ? "230px" : "280px",
+							overflow: "hidden",
 						}}
 					>
 						{imageSrc && (
 							<img
 								src={imageSrc.src}
 								alt={"Tour step tutorial"}
-								className="w-full h-full object-cover"
+								className="w-full h-full object-cover object-top"
 							/>
 						)}
 					</div>
@@ -340,6 +348,7 @@ const TourStep1 = (props: TourStepComponentProps) => {
 
 			<TourCard
 				size="wide"
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -380,9 +389,16 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border:
+											"1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background:
+											"var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									⌘ + scroll
@@ -418,9 +434,16 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border:
+											"1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background:
+											"var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									Click & Drag
@@ -454,9 +477,16 @@ const TourStep1 = (props: TourStepComponentProps) => {
 									type="button"
 									className="text-white/85 text-xs rounded-full flex justify-center items-center gap-1"
 									style={{
-										padding: "3px 12px",
+										display: "flex",
+										padding: "4px 16px",
+										justifyContent: "center",
+										alignItems: "center",
+										gap: "10px",
 										borderRadius: "20px",
-										background: "rgba(255, 255, 255, 0.1)",
+										border:
+											"1px solid var(--white-850-10, rgba(245, 245, 245, 0.10))",
+										background:
+											"var(--white-850-10, rgba(245, 245, 245, 0.10))",
 									}}
 								>
 									⌘ + Enter
@@ -496,6 +526,7 @@ const TourStep2 = (props: TourStepComponentProps) => {
 					title={step.title}
 					content={step.content}
 					imageSrc={step2Gif}
+					currentStep={currentStep}
 					footer={
 						<NavigationFooter
 							currentStep={currentStep}
@@ -542,6 +573,7 @@ const TourStep3 = (props: TourStepComponentProps) => {
 				title={step.title}
 				content={step.content}
 				imageSrc={step3Gif}
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -583,6 +615,7 @@ const TourStep4 = (props: TourStepComponentProps) => {
 				title={step.title}
 				content={step.content}
 				imageSrc={step4Gif}
+				currentStep={currentStep}
 				footer={
 					<NavigationFooter
 						currentStep={currentStep}
@@ -624,6 +657,8 @@ const TourStep5 = (props: TourStepComponentProps) => {
 					size="large"
 					title={step.title}
 					content={step.content}
+					imageSrc={step5Gif}
+					currentStep={currentStep}
 					footer={
 						<NavigationFooter
 							currentStep={currentStep}
@@ -637,7 +672,7 @@ const TourStep5 = (props: TourStepComponentProps) => {
 				/>
 
 				<img
-					src={step5Arror.src}
+					src={step5Arrow.src}
 					alt="Arrow pointing to tabs"
 					className="absolute top-[-110px] left-[calc(50%-190px)] z-[60] w-[150px] h-auto pointer-events-none arrow-animation"
 				/>
@@ -666,22 +701,66 @@ const TourStep6 = (props: TourStepComponentProps) => {
 		<div className="fixed inset-0 z-50 pointer-events-none flex items-start justify-start">
 			<TourOverlay onClose={onClose} />
 
-			<TourCard
-				size="small"
-				title={step.title}
-				content={step.content}
-				footer={
-					<NavigationFooter
-						currentStep={currentStep}
-						totalSteps={totalSteps}
-						isFirstStep={isFirstStep}
-						isLastStep={isLastStep}
-						onPrev={onPrev}
-						onNext={onNext}
+			<div
+				className="rounded-2xl shadow-lg pointer-events-auto relative overflow-hidden flex flex-col ml-8 mb-8 mt-auto"
+				style={{
+					...CARD_STYLES.base,
+					...CARD_STYLES.small,
+				}}
+			>
+				{/* Image area */}
+				<div
+					className="w-full flex items-center justify-center"
+					style={{
+						backgroundImage: BACKGROUND_GRADIENT,
+						height: "280px",
+						maxHeight: "280px",
+						overflow: "hidden",
+					}}
+				>
+					<img
+						src={docsImage.src}
+						alt="Tour step tutorial"
+						className="w-full h-full object-cover object-top"
 					/>
-				}
-				additionalClassName="ml-8 mb-8 mt-auto"
-			/>
+				</div>
+
+				{/* Text area */}
+				<div className="flex flex-col p-4 gap-1 flex-grow">
+					<h3
+						className="text-white/80 font-semibold mb-1"
+						style={{
+							fontSize: "16px",
+							fontFamily: "var(--font-hubot-sans), system-ui, sans-serif",
+						}}
+					>
+						{step.title}
+					</h3>
+					<p className="text-white/40 my-2" style={{ fontSize: "12px" }}>
+						Get help when you need it. Explore our{" "}
+						<a
+							href="https://docs.giselles.ai"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-primary-200 hover:underline"
+						>
+							comprehensive Docs
+						</a>{" "}
+						for detailed guidance and best practices whenever you encounter
+						challenges.
+					</p>
+				</div>
+
+				{/* Footer */}
+				<NavigationFooter
+					currentStep={currentStep}
+					totalSteps={totalSteps}
+					isFirstStep={isFirstStep}
+					isLastStep={isLastStep}
+					onPrev={onPrev}
+					onNext={onNext}
+				/>
+			</div>
 
 			<TourGlobalStyles animationStyle="pulse" />
 		</div>,

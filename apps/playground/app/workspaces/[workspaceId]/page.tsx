@@ -14,7 +14,7 @@ export default function Page() {
 	return (
 		<div className="flex flex-col h-screen bg-black-900">
 			<Header />
-			{view === "editor" && <Editor />}
+			{view === "editor" && <Editor githubTools />}
 			{view === "viewer" && <Viewer />}
 			{view === "integrator" && <SettingsView />}
 		</div>

@@ -36,4 +36,25 @@ export const giselleEngine = NextGiselleEngine({
 	},
 	fetchUsageLimitsFn: fetchUsageLimits,
 	sampleAppWorkspaceId,
+	integrationConfigs: {
+		github: {
+			auth: {
+				strategy: "app-installation",
+				appId: "",
+				privateKey: "",
+				resolver: {
+					installationIdForRepo: () => 1234,
+					installtionIds: () => [1234],
+				},
+			},
+		},
+		// github: {
+		// 	provider: "github",
+		// 	auth: {
+		// 		strategy: "app-installation",
+		// 		appId: 1234,
+		// 		privateKey: "pp",
+		// 	},
+		// },
+	},
 });

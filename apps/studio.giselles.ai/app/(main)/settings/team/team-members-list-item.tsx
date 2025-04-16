@@ -25,8 +25,7 @@ import {
 } from "@/components/ui/select";
 import type { TeamRole } from "@/drizzle";
 import Avatar from "boring-avatars";
-import { Check, Ellipsis, Pencil, User, X } from "lucide-react";
-import Image from "next/image";
+import { Check, Ellipsis, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../components/button";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
@@ -125,7 +124,7 @@ export function TeamMemberListItem({
 
 	return (
 		<div className="px-2">
-			<div className="flex items-center justify-between items-center gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
 				<div className="flex gap-x-4 items-center">
 					<div className={`flex-shrink-0 ${isInvited ? "opacity-50" : ""}`}>
 						{isInvited ? (

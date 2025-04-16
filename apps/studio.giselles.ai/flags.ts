@@ -51,3 +51,16 @@ export const developerFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const githubToolsFlag = flag<boolean>({
+	key: "github-tools",
+	async decide() {
+		return takeLocalEnv("GITHUB_TOOLS_FLAG");
+	},
+	description: "Enable GitHub Tools",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
