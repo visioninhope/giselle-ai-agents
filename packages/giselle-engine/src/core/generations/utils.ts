@@ -164,6 +164,7 @@ async function buildGenerationMessageForTextGeneration(
 				{
 					role: "user",
 					content: [
+						...attachedFiles,
 						{
 							type: "text",
 							text: userMessage,
