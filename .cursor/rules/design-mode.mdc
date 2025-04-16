@@ -16,6 +16,28 @@ Design Mode is intended for users who excel in design rather than software devel
 
 ## How to Start Design Mode
 
+The specific procedures are written below. The important thing is to check these checkboxes in order.
+
+- [ ] Check Requirements
+
+    - [ ] Node.js
+    - [ ] pnpm
+    - [ ] Vercel CLI
+    - [ ] Vercel CLI Login
+    - [ ] Vercel Project link
+
+- [ ] Clean up your workspace
+
+    - [ ] Preview files that would be removed and get user approval
+    - [ ] Switch to the `main` branch, and pull the latest changes.
+    - [ ] Install dependencies
+    - [ ] Build any required SDK dependencies
+    - [ ] Ensure port 3000 is free; terminate any process using it, if necessary.
+
+- [ ] Start Dev server
+
+    - [ ] run `vercel dev`
+
 ### 1. Check Requirements
 
 Ensure that all needed runtimes are installed, that you are logged in to Vercel CLI, and that your project is linked. If any requirement is missing, complete the appropriate setup first.
