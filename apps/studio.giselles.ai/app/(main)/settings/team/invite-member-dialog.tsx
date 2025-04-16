@@ -308,16 +308,18 @@ export function InviteMemberDialog({
 
 						<div className="flex justify-between items-center mt-6">
 							<div>
-								<button
-									type="button"
-									className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
-									onClick={() => {
-										/* Share function is empty */
-									}}
-								>
-									<LinkIcon className="h-4 w-4" />
-									<span className="text-sm font-medium">Share</span>
-								</button>
+								{teamInvitationViaEmailEnabled && (
+									<button
+										type="button"
+										className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
+										onClick={() => {
+											/* Share function is empty */
+										}}
+									>
+										<LinkIcon className="h-4 w-4" />
+										<span className="text-sm font-medium">Share</span>
+									</button>
+								)}
 							</div>
 							<div className="flex space-x-2">
 								<Button
