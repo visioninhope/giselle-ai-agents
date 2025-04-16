@@ -1,9 +1,8 @@
 ---
 description: User request `design mode`, use this rule to enable design mode for all files.
-globs:
+globs: 
 alwaysApply: false
 ---
-
 # Design Mode
 
 Design Mode is intended for users who excel in design rather than software development. It enables direct application design by editing Next.js code instead of using tools like Figma.
@@ -16,112 +15,136 @@ Design Mode is intended for users who excel in design rather than software devel
 
 ## How to Start Design Mode
 
-The specific procedures are written below. The important thing is to check these checkboxes in order.
-
-- [ ] Check Requirements
-
-    - [ ] Node.js
-    - [ ] pnpm
-    - [ ] Vercel CLI
-    - [ ] Vercel CLI Login
-    - [ ] Vercel Project link
-
-- [ ] Clean up your workspace
-
-    - [ ] Preview files that would be removed and get user approval
-    - [ ] Switch to the `main` branch, and pull the latest changes.
-    - [ ] Install dependencies
-    - [ ] Build any required SDK dependencies
-    - [ ] Ensure port 3000 is free; terminate any process using it, if necessary.
-
-- [ ] Start Dev server
-
-    - [ ] run `vercel dev`
+The step-by-step procedure below **MUST** be followed in order. Each step **MUST** be completed before proceeding to the next one. No steps should be skipped.
 
 ### 1. Check Requirements
 
-Ensure that all needed runtimes are installed, that you are logged in to Vercel CLI, and that your project is linked. If any requirement is missing, complete the appropriate setup first.
+All required tools must be verified in the following order:
 
-1. **Node.js**
-   Confirm Node.js is installed and version 22.14.0 or later:
+1. **Node.js Version Check**
    ```bash
    node -v
    ```
-   See `./nodejs.mdc` for details.
+   ✅ REQUIRED: Version must be 22.14.0 or later
+   ❌ If version requirement not met: See `./nodejs.mdc` for installation instructions
 
-2. **pnpm**
-   Check that pnpm is installed and version 10.2.1 or later:
+2. **pnpm Version Check**
    ```bash
    pnpm -v
    ```
-   See `./nodejs.mdc` for details.
+   ✅ REQUIRED: Version must be 10.2.1 or later
+   ❌ If version requirement not met: See `./nodejs.mdc` for installation instructions
 
-3. **Vercel CLI**
-   Confirm Vercel CLI is installed and version 41.6.0 or later:
+3. **Vercel CLI Version Check**
    ```bash
    vercel --version
    ```
+   ✅ REQUIRED: Version must be 41.6.0 or later
+   ❌ If Vercel CLI is missing: Install with the command below
+   ```bash
+   pnpm add -g vercel
+   ```
 
-   if Vercel CLI missing, install with pnpm
-
-    ```bash
-    pnpm add -g vercel
-    ```
-
-4. **Vercel CLI Login**
-   Make sure you are logged in:
+4. **Vercel CLI Login Status**
    ```bash
    vercel whoami
    ```
-   See `./vercel-cli.mdc` for details.
+   ✅ REQUIRED: Must show a username
+   ❌ If not logged in: See `./vercel-cli.mdc` for login instructions
 
-5. **Vercel Project Link**
-   Verify the project is linked:
+5. **Vercel Project Link Check**
    ```bash
-   [ -f .vercel/project.json ] || echo 'We need to link vercel project'
+   [ -f .vercel/project.json ] && echo "Project is linked" || echo "We need to link vercel project"
    ```
-   If "We need to link vercel project" is displayed, follow these steps:
-
-   1. List available teams and ask the user which team to connect:
-      ```bash
-      vercel team list
-      ```
-   2. Use the provided team name to switch teams and list available projects, then ask the user which project to link:
-      ```bash
-      vercel team switch [team-name]
-      vercel project list
-      ```
-   3. Once the project name is known, link it:
-      ```bash
-      vercel link --yes --project [project-name]
-      ```
-
----
+   ✅ REQUIRED: Must show "Project is linked"
+   ❌ If "We need to link vercel project" is displayed:
+      a. List available teams:
+         ```bash
+         vercel team list
+         ```
+      b. Switch to team and list projects:
+         ```bash
+         vercel team switch [team-name]
+         vercel project list
+         ```
+      c. Link the project:
+         ```bash
+         vercel link --yes --project [project-name]
+         ```
 
 ### 2. Clean Your Workspace
 
-Start Design Mode with a clean local workspace:
+IMPORTANT: Complete each step in order:
 
-1. Preview files that would be removed and get user approval:
+1. **Preview Files to be Removed**
    ```bash
    git clean -fx -n
    ```
-2. Clean the workspace, switch to the `main` branch, and pull the latest changes.
-3. Install dependencies:
+   ✅ REQUIRED: Review the output and get user approval before proceeding
+   ❌ If the user doesn't want these files removed: Skip the cleaning step but note potential issues
+
+2. **Current Branch Decision**
+   Ask the user if they want to:
+   - Continue in the current branch
+   - Switch to the main branch with:
+     ```bash
+     git checkout main && git pull
+     ```
+
+3. **Install Dependencies**
    ```bash
    pnpm i
    ```
-4. Build any required SDK dependencies:
+   ✅ REQUIRED: Wait for installation to complete successfully
+
+4. **Build SDK Dependencies**
    ```bash
    pnpm build-sdk
    ```
-5. Ensure port 3000 is free; terminate any process using it, if necessary.
+   ✅ REQUIRED: Wait for build to complete successfully
 
----
+5. **Check Port 3000 Availability - CRITICAL STEP**
+   ```bash
+   lsof -i :3000 || echo "Port 3000 is available"
+   ```
+   ✅ REQUIRED: Must either:
+   - Show "Port 3000 is available" OR
+   - If a process is using port 3000, terminate it:
+     ```bash
+     kill -9 $(lsof -t -i:3000)
+     ```
+   - Verify port is free after termination:
+     ```bash
+     lsof -i :3000 || echo "Port 3000 is now available"
+     ```
 
 ### 3. Start Design Mode
 
-Run the Design Mode server with:
+After completing ALL previous steps, start the development server:
+
 ```bash
 vercel dev
 ```
+
+The server should start successfully and display:
+```
+> Ready! Available at http://localhost:3000
+```
+
+---
+
+## Design Mode Checklist Summary
+
+Use this checklist to ensure all steps are completed:
+
+- [ ] Node.js version verified (22.14.0+)
+- [ ] pnpm version verified (10.2.1+)
+- [ ] Vercel CLI version verified (41.6.0+)
+- [ ] Vercel CLI login confirmed
+- [ ] Vercel project link confirmed
+- [ ] Workspace files previewed for removal
+- [ ] Branch decision made (current or main)
+- [ ] Dependencies installed
+- [ ] SDK dependencies built
+- [ ] Port 3000 verified as available
+- [ ] Development server started with vercel dev
