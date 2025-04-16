@@ -92,7 +92,7 @@ export default async function Page({ params }: { params: { code: string } }) {
 										prompt="or"
 										action={
 											<ClickableText asChild>
-												<Link href="/signup">Create account</Link>
+												<Link href="/signup">Create an account</Link>
 											</ClickableText>
 										}
 									/>

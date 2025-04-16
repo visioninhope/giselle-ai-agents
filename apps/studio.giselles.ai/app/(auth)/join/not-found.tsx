@@ -1,4 +1,3 @@
-import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clicable-text";
 import Link from "next/link";
 import { ActionPrompt } from "../components/action-prompt";
@@ -32,7 +31,7 @@ export default function NotFound() {
 									prompt="or"
 									action={
 										<ClickableText asChild>
-											<Link href="/signup">Create account</Link>
+											<Link href="/signup">Create an account</Link>
 										</ClickableText>
 									}
 								/>
