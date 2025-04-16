@@ -11,7 +11,7 @@ import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AtSignIcon } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
-import { type Source, useConnectedSources } from "./sources";
+import { type Source, useConnectedSources } from "./inputs";
 
 function getDefaultNodeName(source: Source): string {
 	if (isTextGenerationNode(source.node)) {
