@@ -282,31 +282,48 @@ export function Toolbar() {
 									</Popover.Portal>
 								</Popover.Root>
 								<Dialog.Portal>
-									<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
+									<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
 									<Dialog.Content
-										className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[500px] h-[300px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 flex flex-col items-center justify-center gap-[16px]"
+										className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[500px] bg-black-900 rounded-[12px] p-[32px] shadow-xl z-50 overflow-hidden border border-black-400 flex flex-col items-start gap-[20px]"
 										onCloseAutoFocus={(e) => {
 											e.preventDefault();
 										}}
 									>
-										<Dialog.Title className="sr-only">
-											Upgrade plan
-										</Dialog.Title>
-										<Dialog.Description className="sr-only">
-											Upgrade to Pro to unlock this feature!
-										</Dialog.Description>
-										<p className="text-primary-400 text-[16px] font-semibold">
-											Upgrade to Pro to unlock this feature!
-										</p>
-										{/** @todo Replace link url as props */}
-										<a
-											className="bg-primary-200 text-black-900 border border-primary-200 rounded-[8px] px-4 py-2 font-semibold hover:bg-primary-100 transition-colors font-hubot"
-											href="/settings/team"
-											target="_blank"
-											rel="noopener noreferrer"
+										<Dialog.Title 
+											className="text-[20px] font-hubot font-semibold leading-[140%] text-[#B8E8F4] w-full text-center"
+											style={{ textShadow: "0px 0px 10px #0087F6" }}
 										>
-											Upgrade
-										</a>
+											Upgrade to Pro
+										</Dialog.Title>
+										<Dialog.Description className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
+											Unlock the full power of AI for your projects! With Pro, you'll get:
+										</Dialog.Description>
+										<ul className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%] list-disc pl-[20px] space-y-[12px]">
+											<li>Access to all premium AI models for smarter, faster results</li>
+											<li>$20 of AI usage included (unlimited during our special promotion!)</li>
+											<li>Seamless team collaboration with easy member invites</li>
+											<li>Priority email support when you need it</li>
+										</ul>
+										<p className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
+											Take your development to the next level with advanced AI capabilities that save time and enhance your workflow. Your ideas deserve the best tools!
+										</p>
+										<div className="w-full flex justify-center mt-[8px]">
+											<a
+												className="bg-primary-100 text-black-900 font-hubot border-none rounded-[8px] px-8 py-3 font-semibold text-[16px] hover:opacity-90 transition-opacity"
+												href="/settings/team"
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												Upgrade
+											</a>
+										</div>
+										<Dialog.Close 
+											className="absolute top-[12px] right-[12px] text-white-400 hover:text-white-100"
+										>
+											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+												<path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+											</svg>
+										</Dialog.Close>
 									</Dialog.Content>
 								</Dialog.Portal>
 							</Dialog.Root>
