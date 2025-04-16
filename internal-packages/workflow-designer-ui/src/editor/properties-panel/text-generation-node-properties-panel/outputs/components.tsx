@@ -253,7 +253,7 @@ export function ConnectedOutputListItem({
 			<div className="w-[1px] h-full border-l border-white-900/20" />
 			<div className="px-[16px] flex-1 flex items-center justify-between">
 				<div className="flex flex-col gap-[4px]">
-					<p className="text=[16px]">{title}</p>
+					<p className="text-[16px]">{title}</p>
 					<div className="text-[10px] text-black-400">
 						<p className="line-clamp-1">{subtitle}</p>
 					</div>
