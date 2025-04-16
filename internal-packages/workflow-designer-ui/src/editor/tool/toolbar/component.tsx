@@ -289,23 +289,34 @@ export function Toolbar() {
 											e.preventDefault();
 										}}
 									>
-										<Dialog.Title 
+										<Dialog.Title
 											className="text-[20px] font-hubot font-semibold leading-[140%] text-[#B8E8F4] w-full text-center"
 											style={{ textShadow: "0px 0px 10px #0087F6" }}
 										>
 											Upgrade to Pro
 										</Dialog.Title>
 										<Dialog.Description className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
-											Unlock the full power of AI for your projects! With Pro, you'll get:
+											Unlock the full power of AI for your projects! With Pro,
+											you'll get:
 										</Dialog.Description>
 										<ul className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%] list-disc pl-[20px] space-y-[12px]">
-											<li>Access to all premium AI models for smarter, faster results</li>
-											<li>$20 of AI usage included (unlimited during our special promotion!)</li>
-											<li>Seamless team collaboration with easy member invites</li>
+											<li>
+												Access to all premium AI models for smarter, faster
+												results
+											</li>
+											<li>
+												$20 of AI usage included (unlimited during our special
+												promotion!)
+											</li>
+											<li>
+												Seamless team collaboration with easy member invites
+											</li>
 											<li>Priority email support when you need it</li>
 										</ul>
 										<p className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
-											Take your development to the next level with advanced AI capabilities that save time and enhance your workflow. Your ideas deserve the best tools!
+											Take your development to the next level with advanced AI
+											capabilities that save time and enhance your workflow.
+											Your ideas deserve the best tools!
 										</p>
 										<div className="w-full flex justify-center mt-[8px]">
 											<a
@@ -317,11 +328,24 @@ export function Toolbar() {
 												Upgrade
 											</a>
 										</div>
-										<Dialog.Close 
-											className="absolute top-[12px] right-[12px] text-white-400 hover:text-white-100"
-										>
-											<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-												<path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+										<Dialog.Close className="absolute top-[12px] right-[12px] text-white-400 hover:text-white-100">
+											<svg
+												width="24"
+												height="24"
+												viewBox="0 0 24 24"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+												role="img"
+												aria-label="Close dialog"
+											>
+												<title>Close dialog</title>
+												<path
+													d="M18 6L6 18M6 6L18 18"
+													stroke="currentColor"
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
 											</svg>
 										</Dialog.Close>
 									</Dialog.Content>
