@@ -42,7 +42,10 @@ export function isSupportedConnection(
 			};
 		}
 
-		if (inputNode.content.llm.provider === "openai") {
+		if (
+			inputNode.content.llm.provider === "openai" &&
+			outputNode.content.category !== "image"
+		) {
 			return {
 				canConnect: false,
 				message: "File node is not supported as an input for OpenAI",
