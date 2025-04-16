@@ -6,57 +6,95 @@ alwaysApply: false
 
 # Design Mode
 
-Design Mode is for users who have stronger skills in design than software development. It allows them to directly design applications by editing Next.js code rather than using Figma.
+Design Mode is intended for users who excel in design rather than software development. It enables direct application design by editing Next.js code instead of using tools like Figma.
 
-Please avoid making destructive changes and limit modifications to look-and-feel or behavior changes only.
+- **Avoid destructive changes.**
+- Limit modifications to appearance or behavior only.
+- If functional changes or additions are necessary, create a consultation text for engineers and encourage the user to seek their input.
 
-If functional changes or additions are needed, please create text to consult with engineers and encourage the user to seek their advice.
+---
 
-# Requirements
+## How to Start Design Mode
 
-The following runtime requirements are needed to launch design mode:
+### 1. Check Requirements
 
-- Node.js 22.14.0 or later
-- pnpm
-- vercel cli tool
+Ensure that all needed runtimes are installed, that you are logged in to Vercel CLI, and that your project is linked. If any requirement is missing, complete the appropriate setup first.
 
-> [!NOTE]
-> If you are not familiar with Node.js, read and follow the installation instructions on the [Setup Node.js](mdc:nodejs.mdc).
+1. **Node.js**  
+   Confirm Node.js is installed and version 22.14.0 or later:  
+   ```bash
+   node -v
+   ```
+   See `./nodejs.mdc` for details.
 
-> [!NOTE]
-> If you are not familiar with vercel, read and follow the installation instructions on the [Setup vercel](mdc:vercel-cli.mdc).
+2. **pnpm**  
+   Check that pnpm is installed and version 10.2.1 or later:  
+   ```bash
+   pnpm -v
+   ```
+   See `./nodejs.mdc` for details.
 
-# How to Start Design Mode
+3. **Vercel CLI**  
+   Confirm Vercel CLI is installed and version 41.6.0 or later:  
+   ```bash
+   vercel --version
+   ```
+   See `./vercel-cli.mdc` for details.
 
-## 1. Check Requirements
+4. **Vercel CLI Login**  
+   Make sure you are logged in:
+   ```bash
+   vercel whoami
+   ```
+   See `./vercel-cli.mdc` for details.
 
-Verify that all necessary runtimes are installed, and that Vercel CLI is logged in and linked to your project. If any requirements are missing, complete the setup process.
+5. **Vercel Project Link**  
+   Verify the project is linked:
+   ```bash
+   [ -f .vercel/project.json ] || echo 'We need to link vercel project'
+   ```
+   If "We need to link vercel project" is displayed, follow these steps:
 
-1. Check if Node.js is installed and meets the required version.
+   1. List available teams and ask the user which team to connect:
+      ```bash
+      vercel team list
+      ```
+   2. Use the provided team name to switch teams and list available projects, then ask the user which project to link:
+      ```bash
+      vercel team switch [team-name]
+      vercel project list
+      ```
+   3. Once the project name is known, link it:
+      ```bash
+      vercel link --yes --project [project-name]
+      ```
 
-   Refer to ./nodejs.mdc for complete setup instructions.
+---
 
-2. Check if pnpm is installed.
+### 2. Clean Your Workspace
 
-   Refer to ./nodejs.mdc for complete setup instructions.
+Start Design Mode with a clean local workspace:
 
-3. Check if the vercel CLI is installed and logged in.
+1. Preview files that would be removed and get user approval:
+   ```bash
+   git clean -fx -n
+   ```
+2. Clean the workspace, switch to the `main` branch, and pull the latest changes.
+3. Install dependencies:
+   ```bash
+   pnpm i
+   ```
+4. Build any required SDK dependencies:
+   ```bash
+   pnpm build-sdk
+   ```
+5. Ensure port 3000 is free; terminate any process using it, if necessary.
 
-   Refer to ./vercel-cli.mdc for complete setup instructions.
+---
 
+### 3. Start Design Mode
 
-## 2. Clean Your Workspace
-
-It's important that your local workspace is in a clean state before starting Design Mode:
-
-1. First, run `git clean -fx -n` to check which files would be removed, then confirm with the user if it's okay to clean the workspace by removing these files.
-
-2. Once cleaned, switch to the main branch and pull to get the latest state from origin/main.
-
-3. Next, run `pnpm i` to install dependencies and `pnpm build-sdk` to resolve any dependencies that need building.
-
-4. Since we want to start the Design Mode server on port 3000, check if any server is already running on port 3000 and suggest commands to terminate it if necessary.
-
-## 3. Start Design Mode
-
-1. Run the `vercel dev` command to start the server.
+Run the Design Mode server with:
+```bash
+vercel dev
+```
