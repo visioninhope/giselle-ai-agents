@@ -81,12 +81,8 @@ function SourceSelect({
 	>;
 }) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
-	const {
-		generatedInputs: generatedSources,
-		textinputs: textSources,
-		fileInputs: fileSources,
-		githubInputs: githubSources,
-	} = useInputCategories(inputs);
+	const { generatedInputs, textInputs, fileInputs, githubInputs } =
+		useInputCategories(inputs);
 	const { isSupportedConnection } = useWorkflowDesigner();
 	const isSupported = useCallback(
 		(input: Input) => {
@@ -102,8 +98,8 @@ function SourceSelect({
 				if (open) {
 					setSelectedOutputIds(
 						inputs
-							.filter((source) => source.connection !== undefined)
-							.map((source) => source.output.id),
+							.filter((input) => input.connection !== undefined)
+							.map((input) => input.output.id),
 					);
 				}
 			}}
@@ -158,59 +154,59 @@ function SourceSelect({
 							<div className="border-t border-black-300/20" />
 						</div>
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
-							{generatedSources.length > 0 && (
+							{generatedInputs.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										Generated Content
 									</p>
-									{generatedSources.map((generatedSource) => (
+									{generatedInputs.map((generatedInput) => (
 										<SourceToggleItem
-											key={generatedSource.output.id}
-											input={generatedSource}
-											disabled={!isSupported(generatedSource)}
+											key={generatedInput.output.id}
+											input={generatedInput}
+											disabled={!isSupported(generatedInput)}
 										/>
 									))}
 								</div>
 							)}
-							{textSources.length > 0 && (
+							{textInputs.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										Text
 									</p>
-									{textSources.map((textSource) => (
+									{textInputs.map((textInput) => (
 										<SourceToggleItem
-											key={textSource.output.id}
-											input={textSource}
-											disabled={!isSupported(textSource)}
+											key={textInput.output.id}
+											input={textInput}
+											disabled={!isSupported(textInput)}
 										/>
 									))}
 								</div>
 							)}
 
-							{fileSources.length > 0 && (
+							{fileInputs.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										File
 									</p>
-									{fileSources.map((fileSource) => (
+									{fileInputs.map((fileInput) => (
 										<SourceToggleItem
-											key={fileSource.output.id}
-											input={fileSource}
-											disabled={!isSupported(fileSource)}
+											key={fileInput.output.id}
+											input={fileInput}
+											disabled={!isSupported(fileInput)}
 										/>
 									))}
 								</div>
 							)}
-							{githubSources.length > 0 && (
+							{githubInputs.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										GitHub
 									</p>
-									{githubSources.map((githubSource) => (
+									{githubInputs.map((githubInput) => (
 										<SourceToggleItem
-											key={githubSource.output.id}
-											input={githubSource}
-											disabled={!isSupported(githubSource)}
+											key={githubInput.output.id}
+											input={githubInput}
+											disabled={!isSupported(githubInput)}
 										/>
 									))}
 								</div>
@@ -300,8 +296,8 @@ export function InputPanel({
 }) {
 	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
-	const sources = useMemo<Input[]>(() => {
-		const tmpSources: Input[] = [];
+	const inputs = useMemo<Input[]>(() => {
+		const tmpInputs: Input[] = [];
 		const connections = data.connections.filter(
 			(connection) => connection.inputNode.id === textGenerationNode.id,
 		);
@@ -313,16 +309,16 @@ export function InputPanel({
 				const connection = connections.find(
 					(connection) => connection.outputId === output.id,
 				);
-				tmpSources.push({
+				tmpInputs.push({
 					output,
 					node,
 					connection,
 				});
 			}
 		}
-		return tmpSources;
+		return tmpInputs;
 	}, [data.nodes, data.connections, textGenerationNode.id]);
-	const connectedSources = useConnectedInputs(textGenerationNode);
+	const connectedInputs = useConnectedInputs(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
@@ -416,7 +412,7 @@ export function InputPanel({
 				>
 					<SourceSelect
 						node={textGenerationNode}
-						inputs={sources}
+						inputs={inputs}
 						onValueChange={handleConnectionChange}
 					/>
 				</EmptyState>
@@ -428,7 +424,7 @@ export function InputPanel({
 			<div className="flex justify-end">
 				<SourceSelect
 					node={textGenerationNode}
-					inputs={sources}
+					inputs={inputs}
 					onValueChange={handleConnectionChange}
 					contentProps={{
 						align: "end",
@@ -436,9 +432,9 @@ export function InputPanel({
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
-				{connectedSources.generation.length > 0 && (
+				{connectedInputs.generation.length > 0 && (
 					<SourceListRoot title="Generated Sources">
-						{connectedSources.generation.map((source) => (
+						{connectedInputs.generation.map((source) => (
 							<SourceListItem
 								icon={
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
@@ -451,9 +447,9 @@ export function InputPanel({
 						))}
 					</SourceListRoot>
 				)}
-				{connectedSources.variable.length > 0 && (
+				{connectedInputs.variable.length > 0 && (
 					<SourceListRoot title="Static Contents">
-						{connectedSources.variable.map((source) => {
+						{connectedInputs.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
 									let text = source.node.content.text;

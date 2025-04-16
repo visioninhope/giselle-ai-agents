@@ -21,9 +21,9 @@ export function useInputCategories(inputs: Input[]) {
 	);
 
 	return {
-		generatedInputs: generatedInputs,
-		textinputs: textInputs,
-		fileInputs: fileInputs,
-		githubInputs: githubInputs,
+		generatedInputs,
+		textInputs,
+		fileInputs,
+		githubInputs,
 	};
 }
