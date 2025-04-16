@@ -64,10 +64,26 @@ export function isTextGenerationLanguageModelData(
 	return TextGenerationLanguageModelData.safeParse(data).success;
 }
 
+export const ToolAuthPat = z.object({
+	type: z.literal("pat"),
+	token: z.string(),
+	userId: z.optional(z.string()),
+});
+export const GitHubTool = z.object({
+	tools: z.string().array(),
+	auth: ToolAuthPat,
+});
+export type GitHubTool = z.infer<typeof GitHubTool>;
+
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: TextGenerationLanguageModelData,
 	prompt: z.string().optional(),
+	tools: z.optional(
+		z.object({
+			github: z.optional(GitHubTool),
+		}),
+	),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 

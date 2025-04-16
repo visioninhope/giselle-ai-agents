@@ -33,6 +33,17 @@ const gemini25ProExp: GoogleLanguageModel = {
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
+const gemini25ProPreview: GoogleLanguageModel = {
+	provider: "google",
+	id: "gemini-2.5-pro-preview-03-25",
+	capabilities:
+		Capability.TextGeneration |
+		Capability.GenericFileInput |
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
 
 const gemini20Flash: GoogleLanguageModel = {
 	provider: "google",
@@ -75,6 +86,7 @@ const gemini20ProExp: GoogleLanguageModel = {
 
 export const models = [
 	gemini25ProExp,
+	gemini25ProPreview,
 	gemini20Flash,
 	gemini20FlashThinkingExp,
 	gemini20ProExp,

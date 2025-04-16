@@ -27,6 +27,7 @@ import {
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
+	getGitHubRepositories,
 	getWorkspaceGitHubIntegrationSetting,
 	handleWebhook,
 	upsertGithubIntegrationSetting,
@@ -48,7 +49,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
 		storage: config.storage,
 		llmProviders: config.llmProviders ?? [],
-		integrationConfigs: config.integrationConfigs ?? [],
+		integrationConfigs: config.integrationConfigs ?? {},
 		onConsumeAgentTime: config.onConsumeAgentTime,
 		telemetry: config.telemetry,
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
@@ -181,6 +182,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		createSampleWorkspace: async () => {
 			return await createSampleWorkspace({ context });
+		},
+		getGitHubRepositories: async () => {
+			return await getGitHubRepositories({ context });
 		},
 	};
 }

@@ -1,9 +1,9 @@
 import { useEffect } from "react";
 import {
-	addFileNodeTool,
-	addTextGenerationNodeTool,
-	addTextNodeTool,
 	moveTool,
+	selectFileNodeCategoryTool,
+	selectLanguageModelTool,
+	selectSourceCategoryTool,
 	useToolbar,
 } from "./tool/toolbar";
 
@@ -23,17 +23,14 @@ export function KeyboardShortcuts() {
 				return;
 			}
 			switch (event.key) {
-				case "v":
-					setSelectedTool(moveTool());
-					break;
-				case "t":
-					setSelectedTool(addTextNodeTool());
-					break;
-				case "f":
-					setSelectedTool(addFileNodeTool());
-					break;
 				case "g":
-					setSelectedTool(addTextGenerationNodeTool());
+					setSelectedTool(selectLanguageModelTool());
+					break;
+				case "s":
+					setSelectedTool(selectSourceCategoryTool());
+					break;
+				case "u":
+					setSelectedTool(selectFileNodeCategoryTool());
 					break;
 			}
 			if (event.code === "Escape") {

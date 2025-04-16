@@ -53,7 +53,7 @@
 
 
 <a name="@ai-sdk/anthropic"></a>
-### @ai-sdk/anthropic v1.0.5
+### @ai-sdk/anthropic v1.2.10
 #### 
 
 ##### Paths
@@ -64,7 +64,7 @@
 
 
 <a name="@ai-sdk/fal"></a>
-### @ai-sdk/fal v0.1.1
+### @ai-sdk/fal v0.1.8
 #### 
 
 ##### Paths
@@ -75,7 +75,7 @@
 
 
 <a name="@ai-sdk/google"></a>
-### @ai-sdk/google v1.0.10
+### @ai-sdk/google v1.2.11
 #### 
 
 ##### Paths
@@ -86,7 +86,7 @@
 
 
 <a name="@ai-sdk/openai"></a>
-### @ai-sdk/openai v1.0.8
+### @ai-sdk/openai v1.3.12
 #### 
 
 ##### Paths
@@ -97,7 +97,7 @@
 
 
 <a name="@ai-sdk/perplexity"></a>
-### @ai-sdk/perplexity v1.1.3
+### @ai-sdk/perplexity v1.1.7
 #### 
 
 ##### Paths
@@ -108,7 +108,7 @@
 
 
 <a name="@ai-sdk/provider"></a>
-### @ai-sdk/provider v1.0.2
+### @ai-sdk/provider v1.1.3
 #### 
 
 ##### Paths
@@ -119,7 +119,7 @@
 
 
 <a name="@ai-sdk/provider-utils"></a>
-### @ai-sdk/provider-utils v2.0.4
+### @ai-sdk/provider-utils v2.2.7
 #### 
 
 ##### Paths
@@ -130,7 +130,7 @@
 
 
 <a name="@ai-sdk/react"></a>
-### @ai-sdk/react v1.0.6
+### @ai-sdk/react v1.2.9
 #### 
 
 ##### Paths
@@ -141,7 +141,7 @@
 
 
 <a name="@ai-sdk/ui-utils"></a>
-### @ai-sdk/ui-utils v1.0.5
+### @ai-sdk/ui-utils v1.2.8
 #### 
 
 ##### Paths
@@ -4981,7 +4981,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="ai"></a>
-### ai v4.0.16
+### ai v4.3.6
 #### 
 
 ##### Paths
@@ -11497,7 +11497,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="require-in-the-middle"></a>
-### require-in-the-middle v7.5.0
+### require-in-the-middle v7.5.2
 #### 
 
 ##### Paths

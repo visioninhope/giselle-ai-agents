@@ -19,9 +19,7 @@ import { type ReactNode, useState } from "react";
 import {
 	AnthropicIcon,
 	AudioIcon,
-	CirclePlusIcon,
 	DocumentIcon,
-	FolderIcon,
 	GenNodeIcon,
 	GenerateImageIcon,
 	GenerateTextIcon,
@@ -35,7 +33,6 @@ import {
 	SourceLinkIcon,
 	TextFileIcon,
 	UploadIcon,
-	VariableIcon,
 	VideoIcon,
 	WilliIcon,
 } from "../../../icons";
@@ -44,7 +41,6 @@ import { Tooltip } from "../../../ui/tooltip";
 import { isToolAction } from "../types";
 import {
 	addNodeTool,
-	addTextGenerationNodeTool,
 	fileNode,
 	imageGenerationNode,
 	selectFileNodeCategoryTool,
@@ -190,7 +186,7 @@ export function Toolbar() {
 					}}
 				>
 					<ToggleGroup.Item value="selectLanguageModel" data-tool>
-						<Tooltip text={<TooltipAndHotkey text="Generation" hotkey="l" />}>
+						<Tooltip text={<TooltipAndHotkey text="Generation" hotkey="G" />}>
 							<GenNodeIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectLanguageModel" && (
@@ -512,7 +508,7 @@ export function Toolbar() {
 						data-tool
 						className="relative"
 					>
-						<Tooltip text={<TooltipAndHotkey text="Source" hotkey="t" />}>
+						<Tooltip text={<TooltipAndHotkey text="Source" hotkey="s" />}>
 							<SourceLinkIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectSourceCategory" && (
@@ -560,7 +556,7 @@ export function Toolbar() {
 						data-tool
 						className="relative"
 					>
-						<Tooltip text={<TooltipAndHotkey text="Upload" hotkey="d" />}>
+						<Tooltip text={<TooltipAndHotkey text="Upload" hotkey="u" />}>
 							<UploadIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectFileNodeCategory" && (

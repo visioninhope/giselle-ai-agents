@@ -1,0 +1,13 @@
+---
+description: Best practices for editing files, committing changes, and creating pull requests
+globs: "**/*"
+alwaysApply: true
+---
+# Development Best Practices
+
+### Create pull requests as Draft status first, verify your changes in the Vercel preview environment, then change to Ready for Review
+
+When you create a pull request with `gh pr create` or the `create_pull_request` command, it immediately becomes ready for review.
+Code owners are automatically assigned as reviewers and will review or potentially merge your code, even if it's still in development.
+
+To prevent this, create your pull requests in Draft status. Instead of trying to decide when to use Draft status, always create pull requests as drafts first. After checking the code diff and confirming that everything works correctly in the Vercel preview environment, click the "Ready for Review" button to change its status.

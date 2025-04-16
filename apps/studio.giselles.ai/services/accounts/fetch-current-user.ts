@@ -6,7 +6,7 @@ import { cache } from "react";
 async function fetchCurrentUser() {
 	const supabaseUser = await getUser();
 	const user = await db
-		.select({ dbId: users.dbId })
+		.select({ dbId: users.dbId, id: users.id })
 		.from(users)
 		.innerJoin(
 			supabaseUserMappings,
