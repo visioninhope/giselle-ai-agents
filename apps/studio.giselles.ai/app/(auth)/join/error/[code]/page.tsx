@@ -32,12 +32,9 @@ export default async function Page({ params }: { params: { code: string } }) {
 		return notFound();
 	}
 
-	// ここでチーム名を取得する。実際のコードでは適切なロジックで取得する必要があります
-	// この例では固定値を使用します
+	// FIXME: Fetch team name from database using the invitation token.
+	//   The invitation token should be given, this may require this pages path to be changed.
 	const teamName = "Team Name";
-
-	// チームのURLとIDを設定します（実際の実装ではDBから取得）
-	const teamId = "tm_team_id"; // 例の値
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
@@ -62,7 +59,7 @@ export default async function Page({ params }: { params: { code: string } }) {
 							<h2 className="text-[28px] font-[500] text-white font-hubot text-center">
 								{errorMessage}
 							</h2>
-							<Link href={`/settings/team/${teamId}`} className="w-full">
+							<Link href="/settings/team" className="w-full">
 								<Button className="w-full font-medium bg-blue-200 hover:bg-blue-300 text-black-900">
 									Go to team
 								</Button>
