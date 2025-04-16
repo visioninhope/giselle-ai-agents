@@ -20,35 +20,40 @@ Design Mode is intended for users who excel in design rather than software devel
 
 Ensure that all needed runtimes are installed, that you are logged in to Vercel CLI, and that your project is linked. If any requirement is missing, complete the appropriate setup first.
 
-1. **Node.js**  
-   Confirm Node.js is installed and version 22.14.0 or later:  
+1. **Node.js**
+   Confirm Node.js is installed and version 22.14.0 or later:
    ```bash
    node -v
    ```
    See `./nodejs.mdc` for details.
 
-2. **pnpm**  
-   Check that pnpm is installed and version 10.2.1 or later:  
+2. **pnpm**
+   Check that pnpm is installed and version 10.2.1 or later:
    ```bash
    pnpm -v
    ```
    See `./nodejs.mdc` for details.
 
-3. **Vercel CLI**  
-   Confirm Vercel CLI is installed and version 41.6.0 or later:  
+3. **Vercel CLI**
+   Confirm Vercel CLI is installed and version 41.6.0 or later:
    ```bash
    vercel --version
    ```
-   See `./vercel-cli.mdc` for details.
 
-4. **Vercel CLI Login**  
+   if Vercel CLI missing, install with pnpm
+
+    ```bash
+    pnpm add -g vercel
+    ```
+
+4. **Vercel CLI Login**
    Make sure you are logged in:
    ```bash
    vercel whoami
    ```
    See `./vercel-cli.mdc` for details.
 
-5. **Vercel Project Link**  
+5. **Vercel Project Link**
    Verify the project is linked:
    ```bash
    [ -f .vercel/project.json ] || echo 'We need to link vercel project'
