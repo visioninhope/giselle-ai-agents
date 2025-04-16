@@ -1,0 +1,43 @@
+---
+description: User request `design mode`, use this rule to enable design mode for all files.
+globs:
+alwaysApply: false
+---
+
+# Design Mode
+
+Design Mode is for users who have stronger skills in design than software development. It allows them to directly design applications by editing Next.js code rather than using Figma.
+
+Please avoid making destructive changes and limit modifications to look-and-feel or behavior changes only.
+
+If functional changes or additions are needed, please create text to consult with engineers and encourage the user to seek their advice.
+
+# Requirements
+
+The following runtime requirements are needed to launch design mode:
+
+- Node.js 22.14.0 or later
+- pnpm
+- vercel cli tool
+
+> [!NOTE]
+> If you are not familiar with Node.js, read and follow the installation instructions on the [Setup Node.js](mdc:nodejs.mdc).
+
+> [!NOTE]
+> If you are not familiar with vercel, read and follow the installation instructions on the [Setup vercel](mdc:vercel-cli.mdc).
+
+# How to Start Design Mode
+
+1. Check that all requirements are met, and set up anything that is needed.
+
+2. First, run `git clean -fx -n` to check which files would be removed, then confirm with the user if it's okay to clean the workspace by removing these files.
+
+    It's important that your local workspace is in a clean state before starting Design Mode:
+
+3. Once cleaned, switch to the main branch and pull to get the latest state from origin/main.
+
+4. Next, run `pnpm i` to install dependencies and `pnpm build-sdk` to resolve any dependencies that need building.
+
+5. Since we want to start the Design Mode server on port 3000, check if any server is already running on port 3000 and suggest commands to terminate it if necessary.
+
+6. Run the `vercel dev` command to start the server.
