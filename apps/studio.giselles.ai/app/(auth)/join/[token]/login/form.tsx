@@ -54,7 +54,7 @@ export const LoginForm = (props: LoginFormProps) => {
 								value={props.email}
 								required
 								readOnly
-								className="text-white-400 bg-transparent py-[12px] px-0 border-none"
+								className="text-white-400 bg-transparent py-[12px] px-0 read-only:border-none read-only:focus:outline-none read-only:focus:ring-0"
 							/>
 						</div>
 					</div>
