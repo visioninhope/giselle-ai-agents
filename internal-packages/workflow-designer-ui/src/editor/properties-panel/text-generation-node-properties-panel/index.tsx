@@ -24,7 +24,7 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
-import { useConnectedInputs } from "./inputs";
+import { useConnectedOutputs } from "./outputs";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
@@ -51,7 +51,7 @@ export function TextGenerationNodePropertiesPanel({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
-	const { all: connectedSources } = useConnectedInputs(node);
+	const { all: connectedSources } = useConnectedOutputs(node);
 	const usageLimitsReached = useUsageLimitsReached();
 	const { error } = useToasts();
 

@@ -25,12 +25,16 @@ import {
 	PromptIcon,
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-import { type Input, useConnectedInputs, useInputCategories } from "./inputs";
+import {
+	type OutputWithDetails,
+	useCategoriedOutputs,
+	useConnectedOutputs,
+} from "./outputs";
 
-function SourceToggleItem({
+function OutputToggleItem({
 	input,
 	disabled = false,
-}: { input: Input; disabled?: boolean }) {
+}: { input: OutputWithDetails; disabled?: boolean }) {
 	const getDisplayName = () => {
 		if ("content" in input.node && "llm" in input.node.content) {
 			return input.node.name ?? input.node.content.llm.id;
@@ -40,17 +44,17 @@ function SourceToggleItem({
 
 	return (
 		<ToggleGroup.Item
-			key={input.output.id}
+			key={input.id}
 			className={clsx(
 				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
 				"text-white-400",
 				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
 			)}
-			value={input.output.id}
+			value={input.id}
 			disabled={disabled}
 		>
 			<p className="text-[12px] truncate">
-				{getDisplayName()} / {input.output.label}
+				{getDisplayName()} / {input.label}
 			</p>
 			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
 			<div
@@ -66,14 +70,14 @@ function SourceToggleItem({
 	);
 }
 
-function SourceSelect({
+function SelectOutputPopover({
 	node,
-	inputs,
+	outputs,
 	onValueChange,
 	contentProps,
 }: {
 	node: TextGenerationNode;
-	inputs: Input[];
+	outputs: OutputWithDetails[];
 	onValueChange?: (value: OutputId[]) => void;
 	contentProps?: Omit<
 		ComponentProps<typeof Popover.PopoverContent>,
@@ -82,10 +86,10 @@ function SourceSelect({
 }) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
 	const { generatedInputs, textInputs, fileInputs, githubInputs } =
-		useInputCategories(inputs);
+		useCategoriedOutputs(outputs);
 	const { isSupportedConnection } = useWorkflowDesigner();
 	const isSupported = useCallback(
-		(input: Input) => {
+		(input: OutputWithDetails) => {
 			const { canConnect } = isSupportedConnection(input.node, node);
 			return canConnect;
 		},
@@ -97,9 +101,9 @@ function SourceSelect({
 			onOpenChange={(open) => {
 				if (open) {
 					setSelectedOutputIds(
-						inputs
+						outputs
 							.filter((input) => input.connection !== undefined)
-							.map((input) => input.output.id),
+							.map((input) => input.id),
 					);
 				}
 			}}
@@ -160,8 +164,8 @@ function SourceSelect({
 										Generated Content
 									</p>
 									{generatedInputs.map((generatedInput) => (
-										<SourceToggleItem
-											key={generatedInput.output.id}
+										<OutputToggleItem
+											key={generatedInput.id}
 											input={generatedInput}
 											disabled={!isSupported(generatedInput)}
 										/>
@@ -174,8 +178,8 @@ function SourceSelect({
 										Text
 									</p>
 									{textInputs.map((textInput) => (
-										<SourceToggleItem
-											key={textInput.output.id}
+										<OutputToggleItem
+											key={textInput.id}
 											input={textInput}
 											disabled={!isSupported(textInput)}
 										/>
@@ -189,8 +193,8 @@ function SourceSelect({
 										File
 									</p>
 									{fileInputs.map((fileInput) => (
-										<SourceToggleItem
-											key={fileInput.output.id}
+										<OutputToggleItem
+											key={fileInput.id}
 											input={fileInput}
 											disabled={!isSupported(fileInput)}
 										/>
@@ -203,8 +207,8 @@ function SourceSelect({
 										GitHub
 									</p>
 									{githubInputs.map((githubInput) => (
-										<SourceToggleItem
-											key={githubInput.output.id}
+										<OutputToggleItem
+											key={githubInput.id}
 											input={githubInput}
 											disabled={!isSupported(githubInput)}
 										/>
@@ -232,7 +236,7 @@ function SourceSelect({
 	);
 }
 
-function SourceListRoot({
+function ConnectedOutputListRoot({
 	title,
 	children,
 }: {
@@ -246,7 +250,7 @@ function SourceListRoot({
 		</div>
 	);
 }
-function SourceListItem({
+function ConnectedOutputListItem({
 	icon,
 	title,
 	subtitle,
@@ -296,9 +300,9 @@ export function InputPanel({
 }) {
 	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
-	const inputs = useMemo<Input[]>(() => {
-		const tmpInputs: Input[] = [];
-		const connections = data.connections.filter(
+	const outputs = useMemo<OutputWithDetails[]>(() => {
+		const tmp: OutputWithDetails[] = [];
+		const connectionToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === textGenerationNode.id,
 		);
 		for (const node of data.nodes) {
@@ -306,19 +310,19 @@ export function InputPanel({
 				continue;
 			}
 			for (const output of node.outputs) {
-				const connection = connections.find(
+				const connection = connectionToThisNode.find(
 					(connection) => connection.outputId === output.id,
 				);
-				tmpInputs.push({
-					output,
+				tmp.push({
+					...output,
 					node,
 					connection,
 				});
 			}
 		}
-		return tmpInputs;
+		return tmp;
 	}, [data.nodes, data.connections, textGenerationNode.id]);
-	const connectedInputs = useConnectedInputs(textGenerationNode);
+	const connectedOutputs = useConnectedOutputs(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
@@ -410,9 +414,9 @@ export function InputPanel({
 					title="No data referenced yet."
 					description="Select the data you want to refer to from the output and the information and knowledge you have."
 				>
-					<SourceSelect
+					<SelectOutputPopover
 						node={textGenerationNode}
-						inputs={inputs}
+						outputs={outputs}
 						onValueChange={handleConnectionChange}
 					/>
 				</EmptyState>
@@ -422,9 +426,9 @@ export function InputPanel({
 	return (
 		<div>
 			<div className="flex justify-end">
-				<SourceSelect
+				<SelectOutputPopover
 					node={textGenerationNode}
-					inputs={inputs}
+					outputs={outputs}
 					onValueChange={handleConnectionChange}
 					contentProps={{
 						align: "end",
@@ -432,24 +436,24 @@ export function InputPanel({
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
-				{connectedInputs.generation.length > 0 && (
-					<SourceListRoot title="Generated Sources">
-						{connectedInputs.generation.map((source) => (
-							<SourceListItem
+				{connectedOutputs.generation.length > 0 && (
+					<ConnectedOutputListRoot title="Generated Sources">
+						{connectedOutputs.generation.map((source) => (
+							<ConnectedOutputListItem
 								icon={
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={`${source.node.name ?? source.node.content.llm.id} / ${source.output.label}`}
+								title={`${source.node.name ?? source.node.content.llm.id} / ${source.label}`}
 								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
-					</SourceListRoot>
+					</ConnectedOutputListRoot>
 				)}
-				{connectedInputs.variable.length > 0 && (
-					<SourceListRoot title="Static Contents">
-						{connectedInputs.variable.map((source) => {
+				{connectedOutputs.variable.length > 0 && (
+					<ConnectedOutputListRoot title="Static Contents">
+						{connectedOutputs.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
 									let text = source.node.content.text;
@@ -463,12 +467,12 @@ export function InputPanel({
 									}
 
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<PromptIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "Text"} / ${source.output.label}`}
+											title={`${source.node.name ?? "Text"} / ${source.label}`}
 											subtitle={text}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -476,24 +480,24 @@ export function InputPanel({
 								}
 								case "file":
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<PdfFileIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
+											title={`${source.node.name ?? "PDF Files"} / ${source.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								case "github":
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<GitHubIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
+											title={`${source.node.name ?? "GitHub"} / ${source.label}`}
 											subtitle={"todo"}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -504,7 +508,7 @@ export function InputPanel({
 								}
 							}
 						})}
-					</SourceListRoot>
+					</ConnectedOutputListRoot>
 				)}
 			</div>
 		</div>

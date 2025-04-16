@@ -1,16 +1,18 @@
 import type { TextGenerationNode, VariableNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useMemo } from "react";
-import type { ConnectedInput } from "./types";
+import type { ConnectedOutputWithDetails } from "./types";
 
-export function useConnectedInputs(node: TextGenerationNode) {
+export function useConnectedOutputs(node: TextGenerationNode) {
 	const { data } = useWorkflowDesigner();
 	return useMemo(() => {
 		const connectionsToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === node.id,
 		);
-		const connectedGeneratedInputs: ConnectedInput<TextGenerationNode>[] = [];
-		const connectedVariableInputs: ConnectedInput<VariableNode>[] = [];
+		const connectedGeneratedInputs: ConnectedOutputWithDetails<TextGenerationNode>[] =
+			[];
+		const connectedVariableInputs: ConnectedOutputWithDetails<VariableNode>[] =
+			[];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
 				(node) => node.id === connection.outputNode.id,
@@ -30,7 +32,7 @@ export function useConnectedInputs(node: TextGenerationNode) {
 					switch (node.content.type) {
 						case "textGeneration":
 							connectedGeneratedInputs.push({
-								output,
+								...output,
 								node: node as TextGenerationNode,
 								connection,
 							});
@@ -39,7 +41,7 @@ export function useConnectedInputs(node: TextGenerationNode) {
 					break;
 				case "variable":
 					connectedVariableInputs.push({
-						output,
+						...output,
 						node,
 						connection,
 					});
