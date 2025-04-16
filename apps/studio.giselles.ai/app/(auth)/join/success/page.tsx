@@ -6,7 +6,7 @@ export default function Page() {
 		<div className="min-h-screen flex items-center justify-center p-4">
 			<div className="flex items-center justify-center py-12">
 				<div className="flex flex-col items-center justify-center gap-6 max-w-md text-center px-6">
-					<h1 
+					<h1
 						className="text-[34px] font-[500] text-primary-100 font-hubot"
 						style={{ textShadow: "0px 0px 20px #0087F6" }}
 					>
@@ -17,8 +17,8 @@ export default function Page() {
 							Setup complete!
 						</p>
 						<p className="text-white-400 text-center">
-							Head over to your team account and start creating your own unique app. 
-							We can't wait to see what you'll build!
+							Head over to your team account and start creating your own unique
+							app. We can't wait to see what you'll build!
 						</p>
 						<div className="mt-2">
 							<Link href="/apps">

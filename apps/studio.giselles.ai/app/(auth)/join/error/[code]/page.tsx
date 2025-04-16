@@ -35,7 +35,7 @@ export default async function Page({ params }: { params: { code: string } }) {
 	// ここでチーム名を取得する。実際のコードでは適切なロジックで取得する必要があります
 	// この例では固定値を使用します
 	const teamName = "Team Name";
-	
+
 	// チームのURLとIDを設定します（実際の実装ではDBから取得）
 	const teamId = "tm_team_id"; // 例の値
 
@@ -45,7 +45,9 @@ export default async function Page({ params }: { params: { code: string } }) {
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					{code === "wrong_email" && (
 						<div className="text-center">
-							<p className="text-white-400 mb-2">You have been invited to join</p>
+							<p className="text-white-400 mb-2">
+								You have been invited to join
+							</p>
 							<h2
 								className="text-[28px] font-[500] text-primary-100 font-hubot"
 								style={{ textShadow: "0px 0px 20px #0087F6" }}
@@ -54,12 +56,10 @@ export default async function Page({ params }: { params: { code: string } }) {
 							</h2>
 						</div>
 					)}
-					
+
 					{code === "already_member" ? (
 						<div className="flex flex-col items-center justify-center gap-6">
-							<h2
-								className="text-[28px] font-[500] text-white font-hubot text-center"
-							>
+							<h2 className="text-[28px] font-[500] text-white font-hubot text-center">
 								{errorMessage}
 							</h2>
 							<Link href={`/settings/team/${teamId}`} className="w-full">
@@ -70,9 +70,7 @@ export default async function Page({ params }: { params: { code: string } }) {
 						</div>
 					) : code === "expired" ? (
 						<div className="flex flex-col items-center justify-center gap-6">
-							<h2
-								className="text-[28px] font-[500] text-white font-hubot text-center"
-							>
+							<h2 className="text-[28px] font-[500] text-white font-hubot text-center">
 								{errorMessage}
 							</h2>
 							<p className="text-white-400 text-center">
