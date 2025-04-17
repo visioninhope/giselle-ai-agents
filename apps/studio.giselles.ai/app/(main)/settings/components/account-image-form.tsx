@@ -1,25 +1,24 @@
 "use client";
 
 import type { users } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { Camera } from "lucide-react";
-import Image from "next/image";
 import { useState } from "react";
 import { AvatarUpload } from "./avatar-upload";
 
 interface AccountImageFormProps {
 	avatarUrl: typeof users.$inferSelect.avatarUrl;
-	displayName: typeof users.$inferSelect.displayName;
+	alt?: string;
 }
 
-export function AccountImageForm({
-	avatarUrl,
-	displayName,
-}: AccountImageFormProps) {
+export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 	const [isUploading, setIsUploading] = useState(false);
 	const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(
 		avatarUrl,
 	);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
+
+	console.log("currentAvatarUrl", currentAvatarUrl);
 
 	const getFallbackInitials = (name: string | null) => {
 		if (!name) return "U";
@@ -59,19 +58,12 @@ export function AccountImageForm({
 				}}
 				className="group relative h-[60px] w-[60px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white-400"
 			>
-				{currentAvatarUrl ? (
-					<Image
-						src={currentAvatarUrl}
-						alt={`${displayName}'s avatar`}
-						fill
-						sizes="60px"
-						className="object-cover"
-					/>
-				) : (
-					<div className="flex h-full w-full items-center justify-center bg-black-400 text-white-800 text-[24px] font-medium">
-						{getFallbackInitials(displayName)}
-					</div>
-				)}
+				<AvatarImage
+					avatarUrl={currentAvatarUrl}
+					width={60}
+					height={60}
+					alt={alt}
+				/>
 
 				{/* Overlay with camera icon */}
 				<div className="absolute inset-0 flex items-center justify-center bg-black-900/60 opacity-0 group-hover:opacity-100 transition-opacity">

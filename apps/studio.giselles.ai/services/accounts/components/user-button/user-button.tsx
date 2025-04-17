@@ -7,13 +7,11 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { getUser } from "@/lib/supabase";
 import TeamCreation from "@/services/teams/components/team-creation";
-import Avatar from "boring-avatars";
 import { Plus } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import type { FC } from "react";
+import { AvatarImage } from "./avatar-image";
 import { SignOutButton } from "./sign-out-button";
 
 export const UserButton: FC = async () => {
@@ -23,22 +21,13 @@ export const UserButton: FC = async () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger className="cursor-pointer">
-				{avatarUrl ? (
-					<Image
-						src={avatarUrl}
-						alt={alt}
-						className="w-9 h-9 rounded-full"
-						width={36}
-						height={36}
-					/>
-				) : (
-					<Avatar
-						name={alt}
-						variant="marble"
-						size={36}
-						colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
-					/>
-				)}
+				<AvatarImage
+					className="w-9 h-9 rounded-full"
+					avatarUrl={avatarUrl}
+					width={36}
+					height={36}
+					alt={alt}
+				/>
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="end"

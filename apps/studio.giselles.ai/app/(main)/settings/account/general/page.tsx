@@ -6,6 +6,8 @@ import { getAccountInfo } from "../actions";
 
 export default async function AccountGeneralPage() {
 	const { displayName, email, avatarUrl } = await getAccountInfo();
+	const alt = displayName || email || "";
+
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
@@ -18,6 +20,7 @@ export default async function AccountGeneralPage() {
 				<AccountDisplayNameForm
 					displayName={displayName}
 					avatarUrl={avatarUrl}
+					alt={alt}
 				/>
 				<Card
 					title="Email"
