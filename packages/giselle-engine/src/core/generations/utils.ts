@@ -96,6 +96,7 @@ async function buildGenerationMessageForTextGeneration(
 	}));
 
 	const attachedFiles: (FilePart | ImagePart)[] = [];
+	const attachedFileNodeIds: NodeId[] = [];
 	for (const sourceKeyword of sourceKeywords) {
 		const contextNode = contextNodes.find(
 			(contextNode) => contextNode.id === sourceKeyword.nodeId,
@@ -104,6 +105,7 @@ async function buildGenerationMessageForTextGeneration(
 			continue;
 		}
 		const replaceKeyword = `{{${sourceKeyword.nodeId}:${sourceKeyword.outputId}}}`;
+
 		switch (contextNode.content.type) {
 			case "text": {
 				const jsonOrText = contextNode.content.text;
@@ -124,6 +126,13 @@ async function buildGenerationMessageForTextGeneration(
 				break;
 			}
 			case "file":
+				if (
+					attachedFileNodeIds.some(
+						(attachedFileNodeId) => contextNode.id === attachedFileNodeId,
+					)
+				) {
+					continue;
+				}
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
@@ -138,6 +147,7 @@ async function buildGenerationMessageForTextGeneration(
 						);
 
 						attachedFiles.push(...fileContents);
+						attachedFileNodeIds.push(contextNode.id);
 						break;
 					}
 					default: {
