@@ -220,6 +220,22 @@ export const createJsonRouters = {
 				return JsonResponse.json(workspace);
 			},
 		}),
+	getGitHubRepositories: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const repositories = await giselleEngine.getGitHubRepositories();
+				return JsonResponse.json(repositories);
+			},
+		}),
+	encryptSecret: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ plaintext: z.string() }),
+			handler: async ({ input }) => {
+				return JsonResponse.json({
+					encrypted: await giselleEngine.encryptSecret(input.plaintext),
+				});
+			},
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

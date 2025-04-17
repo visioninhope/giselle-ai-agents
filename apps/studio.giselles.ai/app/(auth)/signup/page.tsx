@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ClickableText } from "@/components/ui/clicable-text";
+import { ClickableText } from "@/components/ui/clickable-text";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
 import { ActionPrompt } from "../components/action-prompt";

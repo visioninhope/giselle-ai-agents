@@ -1,6 +1,13 @@
 "use server";
 
-import { db, supabaseUserMappings, users } from "@/drizzle";
+import {
+	type TeamRole,
+	type UserId,
+	db,
+	supabaseUserMappings,
+	users,
+} from "@/drizzle";
+import { updateGiselleSession } from "@/lib/giselle-session";
 import { logger } from "@/lib/logger";
 import { getUser } from "@/lib/supabase";
 import {
@@ -8,8 +15,11 @@ import {
 	disconnectIdentity,
 	reconnectIdentity,
 } from "@/services/accounts";
+import { isTeamId } from "@/services/teams";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
+import { redirect } from "next/navigation";
+import { deleteTeamMember } from "../team/actions";
 
 export async function connectGoogleIdentity() {
 	return connectIdentity("google", "/settings/account/authentication");
@@ -86,4 +96,52 @@ export async function updateDisplayName(formData: FormData) {
 		logger.error("Failed to update display name:", error);
 		return { success: false, error };
 	}
+}
+
+export async function navigateWithChangeTeam(rawTeamId: string, path: string) {
+	const teamId = isTeamId(rawTeamId) ? rawTeamId : null;
+	if (!teamId) {
+		throw new Error("Invalid team ID");
+	}
+	await updateGiselleSession({ teamId });
+	redirect(path);
+}
+
+export async function leaveTeam(
+	rawTeamId: string,
+	rawUserId: string,
+	rawRole: string,
+) {
+	const teamId = isTeamId(rawTeamId) ? rawTeamId : null;
+	if (!teamId) {
+		throw new Error("Invalid team ID");
+	}
+	const isUserId = (value: string): value is UserId => {
+		return value.length > 0 && value.startsWith("usr_");
+	};
+	const userId = isUserId(rawUserId) ? rawUserId : null;
+	if (!userId) {
+		throw new Error("Invalid user ID");
+	}
+
+	const isRole = (value: string): value is TeamRole => {
+		return value === "admin" || value === "member";
+	};
+	const role = isRole(rawRole.toLowerCase()) ? rawRole.toLowerCase() : null;
+	if (!role) {
+		console.error("Invalid role", rawRole);
+		throw new Error("Invalid role");
+	}
+
+	await updateGiselleSession({ teamId });
+	const formData = new FormData();
+	formData.set("userId", userId);
+	formData.set("role", role);
+	// FIXME: Current implementation requires current user to be an admin of the team. It's better to allow any user to leave the team.
+	const result = await deleteTeamMember(formData);
+
+	if (result.success) {
+		revalidatePath("/settings/account");
+	}
+	return result;
 }

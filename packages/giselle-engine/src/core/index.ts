@@ -27,6 +27,7 @@ import {
 } from "./generations";
 import {
 	type HandleGitHubWebhookOptions,
+	getGitHubRepositories,
 	getWorkspaceGitHubIntegrationSetting,
 	handleWebhook,
 	upsertGithubIntegrationSetting,
@@ -43,16 +44,18 @@ import {
 } from "./workspaces";
 export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
+export * from "./vault";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
 		storage: config.storage,
 		llmProviders: config.llmProviders ?? [],
-		integrationConfigs: config.integrationConfigs ?? [],
+		integrationConfigs: config.integrationConfigs ?? {},
 		onConsumeAgentTime: config.onConsumeAgentTime,
 		telemetry: config.telemetry,
 		fetchUsageLimitsFn: config.fetchUsageLimitsFn,
 		sampleAppWorkspaceId: config.sampleAppWorkspaceId,
+		vault: config.vault,
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId) => {
@@ -181,6 +184,16 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		createSampleWorkspace: async () => {
 			return await createSampleWorkspace({ context });
+		},
+		getGitHubRepositories: async () => {
+			return await getGitHubRepositories({ context });
+		},
+		encryptSecret: async (plaintext: string) => {
+			if (context.vault === undefined) {
+				console.warn("Vault is not set");
+				return plaintext;
+			}
+			return await context.vault.encrypt(plaintext);
 		},
 	};
 }

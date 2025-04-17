@@ -24,7 +24,8 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 import type { TeamRole } from "@/drizzle";
-import { Check, Ellipsis, X } from "lucide-react";
+import Avatar from "boring-avatars";
+import { Check, Ellipsis, Pencil, X } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../components/button";
 import { deleteTeamMember, updateTeamMemberRole } from "./actions";
@@ -36,6 +37,8 @@ type TeamMemberListItemProps = {
 	role: TeamRole;
 	currentUserRole: TeamRole;
 	isProPlan: boolean;
+	isInvited?: boolean;
+	profileImage?: string | null;
 };
 
 export function TeamMemberListItem({
@@ -45,43 +48,48 @@ export function TeamMemberListItem({
 	role: initialRole,
 	currentUserRole,
 	isProPlan,
+	isInvited = false,
+	profileImage = null,
 }: TeamMemberListItemProps) {
 	const [isEditingRole, setIsEditingRole] = useState(false);
-	const [role, setRole] = useState<TeamRole>(initialRole);
-	const [tempRole, setTempRole] = useState<TeamRole>(role);
+	const [tempRole, setTempRole] = useState(initialRole);
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string>("");
+	const [error, setError] = useState("");
+	const [open, setOpen] = useState(false);
+	const [role, setRole] = useState(initialRole);
+	const user = userId;
+	const currentUser = "current-user-id"; // should come from getUserId() or similar
 
-	const canEdit = currentUserRole === "admin" && isProPlan;
-	const handleRoleChange = (value: TeamRole) => {
-		setTempRole(value);
+	const canEdit =
+		isProPlan &&
+		currentUserRole === "admin" &&
+		user !== currentUser &&
+		!isInvited;
+
+	const handleRoleChange = (value: string) => {
+		setTempRole(value as TeamRole);
 	};
 
 	const handleSaveRole = async () => {
-		setError("");
-
 		try {
 			setIsLoading(true);
-
 			const formData = new FormData();
-			formData.append("userId", userId);
+			formData.append("userId", user);
 			formData.append("role", tempRole);
 
-			const { success, error } = await updateTeamMemberRole(formData);
-
-			if (success) {
-				setIsEditingRole(false);
+			const result = await updateTeamMemberRole(formData);
+			if (result?.success) {
+				// Update local state after successful server update
 				setRole(tempRole);
+				setIsEditingRole(false);
 			} else {
-				const errorMsg = error || "Failed to update role";
-				setError(errorMsg);
-				console.error(errorMsg);
+				setError(result?.error || "Failed to update role");
 			}
-		} catch (error) {
-			if (error instanceof Error) {
-				setError(error.message);
+		} catch (e) {
+			if (e instanceof Error) {
+				setError(e.message);
 			}
-			console.error("Error:", error);
+			console.error("Error updating role:", e);
 		} finally {
 			setIsLoading(false);
 		}
@@ -93,46 +101,61 @@ export function TeamMemberListItem({
 		setError("");
 	};
 
-	const handleDelete = async () => {
-		setError("");
-
+	const handleDeleteMember = async () => {
 		try {
 			setIsLoading(true);
-
 			const formData = new FormData();
-			formData.append("userId", userId);
+			formData.append("userId", user);
 			formData.append("role", role);
-
-			const { success, error } = await deleteTeamMember(formData);
-
-			if (!success) {
-				const errorMsg = error || "Failed to delete member";
-				setError(errorMsg);
-				console.error(errorMsg);
+			const result = await deleteTeamMember(formData);
+			if (!result?.success) {
+				setError(result?.error || "Failed to delete member");
 			}
-		} catch (error) {
-			if (error instanceof Error) {
-				setError(error.message);
+		} catch (e) {
+			if (e instanceof Error) {
+				setError(e.message);
 			}
-			console.error("Error:", error);
+			console.error("Error deleting member:", e);
 		} finally {
 			setIsLoading(false);
+			setOpen(false);
 		}
 	};
 
 	return (
 		<div className="px-2">
-			<div className="flex items-center justify-between items-center gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
-				<div className="flex gap-x-4">
-					<div className="flex flex-col gap-y-1 font-medium text-[12px] leading-[12px]">
+			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+				<div className="flex gap-x-4 items-center">
+					<div className={`flex-shrink-0 ${isInvited ? "opacity-50" : ""}`}>
+						{isInvited ? (
+							<div className="w-8 h-8 rounded-full border border-dashed border-white-400 flex items-center justify-center">
+								{/* Empty circle with dashed border */}
+							</div>
+						) : (
+							<Avatar
+								name={email || userId}
+								variant="marble"
+								size={32}
+								colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+							/>
+						)}
+					</div>
+					<div
+						className={`flex flex-col gap-y-1 font-medium text-[12px] leading-[12px] ${
+							isInvited ? "opacity-50" : ""
+						}`}
+					>
 						<div className="text-blue-80">
 							{displayName || "No display name"}
+							{isInvited && (
+								<span className="ml-2 text-white-400">(Invite sent)</span>
+							)}
 						</div>
 						<div className="text-white-400">{email || "No email"}</div>
 					</div>
 				</div>
 				<div className="flex justify-between gap-2">
-					<div className="flex items-center gap-[10px]">
+					<div className="flex items-center gap-[5px]">
 						{isEditingRole ? (
 							<>
 								<Select
@@ -140,7 +163,7 @@ export function TeamMemberListItem({
 									onValueChange={handleRoleChange}
 									disabled={isLoading}
 								>
-									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer">
+									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-white-900">
 										<SelectValue />
 									</SelectTrigger>
 									<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
@@ -159,32 +182,32 @@ export function TeamMemberListItem({
 									</SelectContent>
 								</Select>
 								<Button
-									className="shrink-0 h-8 w-8 rounded-full p-0"
+									className="shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center"
 									onClick={handleSaveRole}
 									disabled={isLoading || !!error}
 								>
 									<Check className="h-4 w-4" />
 								</Button>
 								<Button
-									className="shrink-0 h-8 w-8 rounded-full p-0"
+									className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 bg-error-900 flex items-center justify-center border-0 hover:bg-transparent hover:border-2 hover:border-error-900 transition-colors"
 									onClick={handleCancelRole}
 									disabled={isLoading}
 								>
-									<X className="h-4 w-4" />
+									<X className="h-4 w-4 text-white group-hover:text-error-900" />
 								</Button>
 							</>
 						) : (
 							<>
-								<span className="capitalize text-black-300  font-medium text-[12px] leading-[12px] text-end font-hubot">
+								<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
 									{role}
 								</span>
 								{canEdit && (
 									<>
 										<Button
-											className="px-2 border-white-400 bg-transparent text-white-400 font-medium text-[12px] leading-[12px]"
+											className="group shrink-0 h-[32px] w-[32px] rounded-full p-0 flex items-center justify-center bg-white-400 hover:bg-transparent hover:border hover:border-white-400 transition-colors"
 											onClick={() => setIsEditingRole(true)}
 										>
-											Manage Access
+											<Pencil className="h-4 w-4 text-black-900 group-hover:text-white-400" />
 										</Button>
 
 										<DropdownMenu modal={false}>
@@ -193,38 +216,41 @@ export function TeamMemberListItem({
 											</DropdownMenuTrigger>
 											<DropdownMenuContent
 												align="end"
-												className="px-0 py-2 border-[0.5px] border-black-400 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
+												className="px-0 py-2 border-[0.5px] border-error-900 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
 											>
-												<AlertDialog>
+												<AlertDialog open={open} onOpenChange={setOpen}>
 													<AlertDialogTrigger asChild>
-														<Button
-															variant="destructive"
-															className="justify-start p-2 border-none w-full bg-transparent text-error-900 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist transition duration-300 ease-out hover:bg-primary-900/50"
+														<button
+															type="button"
+															className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-black-700"
 															disabled={isLoading}
 														>
-															Remove from Team
-														</Button>
+															Delete
+														</button>
 													</AlertDialogTrigger>
-													<AlertDialogContent className="px-8 py-6 border-[0.5px] border-black-400 rounded-[16px] bg-black-850">
+													<AlertDialogContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850">
 														<AlertDialogHeader>
-															<AlertDialogTitle className="text-white-800 font-bold text-[16px] leading-[16px] font-hubot">
-																Remove Team Member
+															<AlertDialogTitle className="text-white-400 text-[20px] leading-[29px] font-geist">
+																Delete Member
 															</AlertDialogTitle>
-															<AlertDialogDescription className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-																Are you sure you want to remove{" "}
-																{displayName || email} from the team? This
-																action cannot be undone.
+															<AlertDialogDescription className="text-black-400 text-[14px] leading-[20.4px]">
+																This will permanently delete this member and
+																remove their access to your team.
 															</AlertDialogDescription>
 														</AlertDialogHeader>
-														<AlertDialogFooter className="sm:space-x-4">
-															<AlertDialogCancel className="px-5 py-1 border-black-400 h-[38px] bg-transparent text-black-400 font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em] font-hubot cursor-pointer hover:bg-transparent hover:text-black-400">
+														<AlertDialogFooter className="mt-4">
+															<AlertDialogCancel
+																className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+																disabled={isLoading}
+															>
 																Cancel
 															</AlertDialogCancel>
 															<AlertDialogAction
-																onClick={handleDelete}
-																className="px-5 py-1 border-error-900 bg-error-900 h-[38px] text-destructive-foreground font-semibold text-[16px] leading-[19.2px] tracking-[-0.04em] font-hubot cursor-pointer hover:bg-transparent hover:text-error-900 dark:text-white-900"
+																onClick={handleDeleteMember}
+																disabled={isLoading}
+																className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
 															>
-																Remove
+																Delete
 															</AlertDialogAction>
 														</AlertDialogFooter>
 													</AlertDialogContent>
@@ -236,13 +262,11 @@ export function TeamMemberListItem({
 							</>
 						)}
 					</div>
-					{error && (
-						<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-							{error}
-						</p>
-					)}
 				</div>
 			</div>
+			{error && (
+				<div className="text-error-900 text-[12px] mt-1 ml-12">{error}</div>
+			)}
 		</div>
 	);
 }

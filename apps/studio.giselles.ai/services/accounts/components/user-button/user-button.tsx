@@ -1,4 +1,5 @@
 import { getAccountInfo } from "@/app/(main)/settings/account/actions";
+import { Button } from "@/app/(main)/settings/components/button";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -7,6 +8,12 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import {
+	type CurrentTeam,
+	fetchCurrentTeam,
+	isProPlan,
+} from "@/services/teams";
+import { upgradeTeam } from "@/services/teams/actions/upgrade-team";
 import TeamCreation from "@/services/teams/components/team-creation";
 import { Plus } from "lucide-react";
 import Link from "next/link";
@@ -17,6 +24,8 @@ import { SignOutButton } from "./sign-out-button";
 export const UserButton: FC = async () => {
 	const { displayName, email, avatarUrl } = await getAccountInfo();
 	const alt = displayName || email || "";
+	const currentTeam = await fetchCurrentTeam();
+	const isPro = isProPlan(currentTeam);
 
 	return (
 		<DropdownMenu>
@@ -37,18 +46,21 @@ export const UserButton: FC = async () => {
 					<span className="font-bold text-[16px] leading-[16px] font-hubot">
 						{displayName || "No display name"}
 					</span>
-					<span className="font-medium leading-[20.4px] font-geist">
+					<span className="font-medium leading-[20.4px] font-hubot text-black-600">
 						{email}
 					</span>
 				</DropdownMenuLabel>
 				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />
 				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<DropdownMenuItem
+						className="p-0 rounded-[8px] focus:bg-primary-900/50"
+						asChild
+					>
 						<Link
 							href="/settings/account"
-							className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
 						>
-							Account Settings
+							Account Preferences
 						</Link>
 					</DropdownMenuItem>
 					<TeamCreation>
@@ -59,7 +71,7 @@ export const UserButton: FC = async () => {
 							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 								<Plus className="size-3 text-black-900" />
 							</span>
-							<span className="text-white-900 font-medium text-[12px] leading-[20.4px] font-geist">
+							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
 								Create team
 							</span>
 						</button>
@@ -71,19 +83,41 @@ export const UserButton: FC = async () => {
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
-							className="block p-2 w-full text-white-900 font-medium text-[12px] leading-[20.4px] font-geist"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
 							rel="noreferrer"
 						>
 							Home Page
 						</a>
 					</DropdownMenuItem>
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<SignOutButton className="block p-2 w-full text-left">
+						<SignOutButton className="block p-2 w-full text-left text-white-400 font-hubot text-[14px] leading-[20.4px]">
 							Log Out
 						</SignOutButton>
 					</DropdownMenuItem>
 				</div>
+				{!isPro && (
+					<div>
+						<DropdownMenuItem className="p-0 rounded-[8px]">
+							<form className="w-full">
+								<UpgradeButton team={currentTeam} />
+							</form>
+						</DropdownMenuItem>
+					</div>
+				)}
 			</DropdownMenuContent>
 		</DropdownMenu>
 	);
 };
+
+function UpgradeButton({ team }: { team: CurrentTeam }) {
+	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
+
+	return (
+		<Button
+			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-hubot text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
+			formAction={upgradeTeamWithTeam}
+		>
+			Upgrade to Pro
+		</Button>
+	);
+}

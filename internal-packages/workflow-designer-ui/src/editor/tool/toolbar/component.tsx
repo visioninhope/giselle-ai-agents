@@ -14,7 +14,7 @@ import {
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
-import { Popover, ToggleGroup } from "radix-ui";
+import { Dialog, Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
 import {
 	AnthropicIcon,
@@ -91,11 +91,9 @@ function ProTag() {
 
 function LanguageModelListItem({
 	languageModel,
-	disabled,
 	...props
 }: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
 	languageModel: LanguageModel;
-	disabled?: boolean;
 }) {
 	return (
 		<button
@@ -105,9 +103,7 @@ function LanguageModelListItem({
 				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
 				"data-[state=on]:bg-primary-900 focus:outline-none",
 				"**:data-icon:w-[16px] **:data-icon:h-[16px] **:data-icon:text-white-950 ",
-				disabled && "opacity-50 cursor-not-allowed",
 			)}
-			disabled={disabled}
 		>
 			<div className="flex gap-[12px] items-center">
 				{languageModel.provider === "anthropic" && (
@@ -152,7 +148,6 @@ export function Toolbar() {
 		}
 		return hasTierAccess(languageModel, limits.featureTier);
 	};
-
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -190,86 +185,172 @@ export function Toolbar() {
 							<GenNodeIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectLanguageModel" && (
-							<Popover.Root open={true}>
-								<Popover.Anchor />
-								<Popover.Portal>
-									<Popover.Content
-										className={clsx(
-											"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
-											"bg-black-900/10 text-white-900",
-											"backdrop-blur-[4px]",
-										)}
-										align="end"
-										sideOffset={42}
-									>
-										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-										<div className="relative flex flex-col gap-[8px] max-h-[200px] overflow-y-auto">
-											<ToggleGroup.Root
-												type="single"
-												className={clsx("flex flex-col gap-[8px]")}
-												onValueChange={(modelId) => {
-													const languageModel = languageModels.find(
-														(model) => model.id === modelId,
-													);
-													const languageModelData = {
-														id: languageModel?.id,
-														provider: languageModel?.provider,
-														configurations: languageModel?.configurations,
-													};
-													if (
-														isTextGenerationLanguageModelData(languageModelData)
-													) {
-														setSelectedTool(
-															addNodeTool(
-																textGenerationNode(languageModelData),
-															),
+							<Dialog.Root>
+								<Popover.Root open={true}>
+									<Popover.Anchor />
+									<Popover.Portal>
+										<Popover.Content
+											className={clsx(
+												"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
+												"bg-black-900/10 text-white-900",
+												"backdrop-blur-[4px]",
+											)}
+											align="end"
+											sideOffset={42}
+										>
+											<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+											<div className="relative flex flex-col gap-[8px] max-h-[200px] overflow-y-auto">
+												<ToggleGroup.Root
+													type="single"
+													className={clsx("flex flex-col gap-[8px]")}
+													onValueChange={(modelId) => {
+														const languageModel = languageModels.find(
+															(model) => model.id === modelId,
 														);
-													}
-													if (
-														isImageGenerationLanguageModelData(
-															languageModelData,
+														const languageModelData = {
+															id: languageModel?.id,
+															provider: languageModel?.provider,
+															configurations: languageModel?.configurations,
+														};
+														if (
+															isTextGenerationLanguageModelData(
+																languageModelData,
+															)
+														) {
+															setSelectedTool(
+																addNodeTool(
+																	textGenerationNode(languageModelData),
+																),
+															);
+														}
+														if (
+															isImageGenerationLanguageModelData(
+																languageModelData,
+															)
+														) {
+															setSelectedTool(
+																addNodeTool(
+																	imageGenerationNode(languageModelData),
+																),
+															);
+														}
+													}}
+												>
+													{languageModels
+														.filter((languageModel) =>
+															llmProviders.includes(languageModel.provider),
 														)
-													) {
-														setSelectedTool(
-															addNodeTool(
-																imageGenerationNode(languageModelData),
-															),
-														);
-													}
-												}}
-											>
-												{languageModels.map(
-													(languageModel) =>
-														llmProviders.includes(languageModel.provider) && (
-															<ToggleGroup.Item
-																data-tool
-																value={languageModel.id}
-																key={languageModel.id}
-																onMouseEnter={() =>
-																	setLanguageModelMouseHovered(languageModel)
-																}
-																onFocus={() =>
-																	setLanguageModelMouseHovered(languageModel)
-																}
-																disabled={
-																	!languageModelAvailable(languageModel)
-																}
-																asChild
-															>
-																<LanguageModelListItem
-																	languageModel={languageModel}
-																	disabled={
-																		!languageModelAvailable(languageModel)
+														.map((languageModel) =>
+															languageModelAvailable(languageModel) ? (
+																<ToggleGroup.Item
+																	data-tool
+																	value={languageModel.id}
+																	key={languageModel.id}
+																	onMouseEnter={() =>
+																		setLanguageModelMouseHovered(languageModel)
 																	}
-																/>
-															</ToggleGroup.Item>
-														),
-												)}
-											</ToggleGroup.Root>
+																	onFocus={() =>
+																		setLanguageModelMouseHovered(languageModel)
+																	}
+																	asChild
+																>
+																	<LanguageModelListItem
+																		languageModel={languageModel}
+																	/>
+																</ToggleGroup.Item>
+															) : (
+																<Dialog.Trigger
+																	asChild
+																	key={languageModel.id}
+																	onMouseEnter={() =>
+																		setLanguageModelMouseHovered(languageModel)
+																	}
+																	onFocus={() =>
+																		setLanguageModelMouseHovered(languageModel)
+																	}
+																	data-tool
+																>
+																	<LanguageModelListItem
+																		languageModel={languageModel}
+																	/>
+																</Dialog.Trigger>
+															),
+														)}
+												</ToggleGroup.Root>
+											</div>
+										</Popover.Content>
+									</Popover.Portal>
+								</Popover.Root>
+								<Dialog.Portal>
+									<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
+									<Dialog.Content
+										className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[500px] bg-black-900 rounded-[12px] p-[32px] shadow-xl z-50 overflow-hidden border border-black-400 flex flex-col items-start gap-[20px]"
+										onCloseAutoFocus={(e) => {
+											e.preventDefault();
+										}}
+									>
+										<Dialog.Title
+											className="text-[20px] font-hubot font-semibold leading-[140%] text-[#B8E8F4] w-full text-center"
+											style={{ textShadow: "0px 0px 10px #0087F6" }}
+										>
+											Upgrade to Pro
+										</Dialog.Title>
+										<Dialog.Description className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
+											Unlock the full power of AI for your projects! With Pro,
+											you'll get:
+										</Dialog.Description>
+										<ul className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%] list-disc pl-[20px] space-y-[12px]">
+											<li>
+												Access to all premium AI models for smarter, faster
+												results
+											</li>
+											<li>
+												$20 of AI usage included (unlimited during our special
+												promotion!)
+											</li>
+											<li>
+												Seamless team collaboration with easy member invites
+											</li>
+											<li>Priority email support when you need it</li>
+										</ul>
+										<p className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
+											Take your development to the next level with advanced AI
+											capabilities that save time and enhance your workflow.
+											Your ideas deserve the best tools!
+										</p>
+										<div className="w-full flex justify-center mt-[8px]">
+											<a
+												className="bg-primary-100 text-black-900 font-hubot border-none rounded-[8px] px-8 py-3 font-semibold text-[16px] hover:opacity-90 transition-opacity"
+												href="/settings/team"
+												target="_blank"
+												rel="noopener noreferrer"
+											>
+												Upgrade
+											</a>
 										</div>
-									</Popover.Content>
-								</Popover.Portal>
-							</Popover.Root>
+										<Dialog.Close className="absolute top-[12px] right-[12px] text-white-400 hover:text-white-100">
+											<svg
+												width="24"
+												height="24"
+												viewBox="0 0 24 24"
+												fill="none"
+												xmlns="http://www.w3.org/2000/svg"
+												role="img"
+												aria-label="Close dialog"
+											>
+												<title>Close dialog</title>
+												<path
+													d="M18 6L6 18M6 6L18 18"
+													stroke="currentColor"
+													strokeWidth="2"
+													strokeLinecap="round"
+													strokeLinejoin="round"
+												/>
+											</svg>
+										</Dialog.Close>
+									</Dialog.Content>
+								</Dialog.Portal>
+							</Dialog.Root>
 						)}
 						<div className="absolute left-[calc(var(--language-model-detail-panel-width)_+_56px)]">
 							<div className="relative">

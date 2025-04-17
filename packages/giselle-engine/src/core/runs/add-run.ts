@@ -68,6 +68,9 @@ async function copyFiles({
 			continue;
 		}
 		for (const file of node.content.files) {
+			if (file.status !== "uploaded") {
+				continue;
+			}
 			fileIds.push(file.id);
 		}
 	}

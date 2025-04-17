@@ -1,4 +1,4 @@
-import { ClickableText } from "@/components/ui/clicable-text";
+import { ClickableText } from "@/components/ui/clickable-text";
 import { ChevronLeftIcon } from "lucide-react";
 import Link from "next/link";
 import { ActionPrompt } from "../components/action-prompt";

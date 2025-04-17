@@ -1,25 +1,19 @@
 import type { ReactNode } from "react";
-import { MenuLink } from "../components/menu-link";
+import { SidebarMenu } from "./sidebar-menu";
 
 export default async function SettingsAccountLayout({
 	children,
 }: { children: ReactNode }) {
 	return (
-		<>
-			<div className="flex flex-col gap-y-4 w-[240px] p-[24px]">
-				<div className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
-					Account Settings
+		<div className="h-full bg-black-900">
+			<div className="px-[40px] flex-1 max-w-[1200px] mx-auto w-full flex min-h-[calc(100vh-64px)]">
+				{/* Left Sidebar with border */}
+				<div className="border-r border-black-80">
+					<SidebarMenu />
 				</div>
-				<div className="grid gap-[4px]">
-					<MenuLink href="/settings/account">Overview</MenuLink>
-					<MenuLink href="/settings/account/general">General</MenuLink>
-					<MenuLink href="/settings/account/authentication">
-						Authentication
-					</MenuLink>
-				</div>
+				{/* Main Content */}
+				<div className="pl-[24px] flex-1 pt-[24px]">{children}</div>
 			</div>
-
-			<div className="px-[40px] py-[24px] flex-1">{children}</div>
-		</>
+		</div>
 	);
 }

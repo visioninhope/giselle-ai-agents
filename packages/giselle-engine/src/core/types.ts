@@ -1,35 +1,44 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type {
-	GitHubAppUserAuth,
 	GitHubInstallationAppAuth,
-	GitHubTokenAuth,
-} from "@giselle-sdk/github-client";
+	GitHubPersonalAccessTokenAuth,
+} from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
+import type { Vault } from "./vault";
 
 export interface GiselleEngineContext {
 	storage: Storage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders: LanguageModelProvider[];
-	integrationConfigs?: GiselleIntegrationConfig[];
+	integrationConfigs?: {
+		github?: GitHubIntegrationConfig;
+	};
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
 	};
+	vault?: Vault;
 }
 
+interface GitHubInstalltionAppAuthResolver {
+	installationIdForRepo: (repositoryNodeId: string) => Promise<number> | number;
+	installtionIds: () => Promise<number[]> | number[];
+}
 export interface GitHubIntegrationConfig {
-	provider: "github";
 	auth:
-		| GitHubTokenAuth
-		| Omit<GitHubAppUserAuth, "token" | "refreshToken">
-		| Omit<GitHubInstallationAppAuth, "installationId">;
+		| GitHubPersonalAccessTokenAuth
+		| (Omit<GitHubInstallationAppAuth, "installationId"> & {
+				resolver: GitHubInstalltionAppAuthResolver;
+		  });
 }
 
-export type GiselleIntegrationConfig = GitHubIntegrationConfig;
+export type GiselleIntegrationConfig = {
+	github?: GitHubIntegrationConfig;
+};
 export type ConsumeAgentTimeCallback = (
 	workspaceId: WorkspaceId,
 	startedAt: number,
@@ -45,11 +54,12 @@ export interface GiselleEngineConfig {
 	storage: Storage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders?: LanguageModelProvider[];
-	integrationConfigs?: GiselleIntegrationConfig[];
+	integrationConfigs?: GiselleIntegrationConfig;
 	onConsumeAgentTime?: ConsumeAgentTimeCallback;
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
 	};
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
+	vault?: Vault;
 }
