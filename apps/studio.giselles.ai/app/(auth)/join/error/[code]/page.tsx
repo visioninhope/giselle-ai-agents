@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { ClickableText } from "@/components/ui/clicable-text";
+import { ClickableText } from "@/components/ui/clickable-text";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
