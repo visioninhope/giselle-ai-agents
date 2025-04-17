@@ -64,6 +64,7 @@ export function AccountImageForm({
 						src={currentAvatarUrl}
 						alt={`${displayName}'s avatar`}
 						fill
+						sizes="60px"
 						className="object-cover"
 					/>
 				) : (
