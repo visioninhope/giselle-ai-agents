@@ -1,6 +1,6 @@
 import Link from "next/link";
 
-import { ClickableText } from "@/components/ui/clicable-text";
+import { ClickableText } from "@/components/ui/clickable-text";
 import { SendIcon } from "lucide-react";
 import { ActionPrompt } from "../../components/action-prompt";
 import { LegalConsent } from "../../components/legal-consent";
