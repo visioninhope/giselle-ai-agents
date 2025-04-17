@@ -1,6 +1,6 @@
 ---
 description: Setup Vercel CLI
-globs: 
+globs:
 alwaysApply: false
 ---
 
@@ -13,7 +13,6 @@ To install Vercel CLI globally using pnpm (recommended for this project):
 ```bash
 pnpm i -g vercel
 ```
-
 
 ## Authentication
 
