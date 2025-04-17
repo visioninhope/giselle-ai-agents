@@ -62,7 +62,7 @@ const o3: OpenAILanguageModel = {
 	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
-+};
+};
 
 const o3Mini: OpenAILanguageModel = {
 	provider: "openai",
