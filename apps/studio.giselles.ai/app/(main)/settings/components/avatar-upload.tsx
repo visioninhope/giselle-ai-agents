@@ -78,6 +78,18 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 		onClose();
 	};
 
+	const handleUpdate = async () => {
+		if (!preview || !inputRef.current?.files?.[0]) return;
+
+		try {
+			await onUpload(inputRef.current.files[0]);
+			handleClose();
+		} catch (error) {
+			setError("Failed to upload image");
+			console.error("Upload error:", error);
+		}
+	};
+
 	return (
 		<Dialog open={isOpen} onOpenChange={onClose}>
 			<DialogContent
@@ -132,7 +144,7 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 						</Button>
 						<Button
 							type="button"
-							onClick={() => {}}
+							onClick={handleUpdate}
 							disabled={!preview || !!error}
 							className="w-full"
 						>

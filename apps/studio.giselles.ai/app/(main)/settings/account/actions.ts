@@ -1,5 +1,6 @@
 "use server";
 
+import { storage } from "@/app/giselle-engine";
 import {
 	type TeamRole,
 	type UserId,
@@ -144,4 +145,31 @@ export async function leaveTeam(
 		revalidatePath("/settings/account");
 	}
 	return result;
+}
+
+export async function updateAvatar(formData: FormData) {
+	const user = await getUser();
+
+	const file = formData.get("avatar") as File | null;
+	if (!file) {
+		throw new Error("Missing avatar file");
+	}
+
+	const filePath = `avatars/${user.id}`;
+
+	const arrayBuffer = await file.arrayBuffer();
+	const buffer = Buffer.from(arrayBuffer);
+
+	await storage.setItemRaw(filePath, buffer, {
+		contentType: file.type,
+	});
+
+	const publicUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/public/app/${filePath}`;
+
+	// TODO: need to update avatar url in users table
+
+	return {
+		success: true,
+		avatarUrl: publicUrl,
+	};
 }

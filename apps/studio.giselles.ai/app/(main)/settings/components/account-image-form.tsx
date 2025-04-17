@@ -4,6 +4,7 @@ import type { users } from "@/drizzle";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { Camera } from "lucide-react";
 import { useState } from "react";
+import { updateAvatar } from "../account/actions";
 import { AvatarUpload } from "./avatar-upload";
 
 interface AccountImageFormProps {
@@ -29,15 +30,12 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 		try {
 			setIsUploading(true);
 
-			// TODO: Implement file upload logic here
-			// const formData = new FormData();
-			// formData.append("avatar", file);
-			// const response = await fetch("/api/upload", { method: "POST", body: formData });
+			const formData = new FormData();
+			formData.append("avatar", file, file.name);
+			formData.append("avatarUrl", file.name);
 
-			// TODO: Set new URL after successful upload
-			// const { url } = await response.json();
-			// setCurrentAvatarUrl(url);
-
+			const result = await updateAvatar(formData);
+			setCurrentAvatarUrl(result.avatarUrl);
 			setIsDialogOpen(false);
 		} catch (error) {
 			console.error("Error uploading file:", error);
