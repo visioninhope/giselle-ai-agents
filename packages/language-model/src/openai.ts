@@ -56,10 +56,18 @@ const o1Mini: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
+const o3: OpenAILanguageModel = {
+	provider: "openai",
+	id: "o3",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
++};
+
 const o3Mini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "o3-mini",
-	capabilities: Capability.TextGeneration,
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
