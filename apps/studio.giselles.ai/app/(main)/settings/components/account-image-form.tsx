@@ -21,15 +21,14 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 
 	const handleUpload = async (file: File) => {
 		try {
-			setIsUploading(true);
-
 			const formData = new FormData();
 			formData.append("avatar", file, file.name);
 			formData.append("avatarUrl", file.name);
 
+			setIsDialogOpen(false);
+			setIsUploading(true);
 			const result = await updateAvatar(formData);
 			setCurrentAvatarUrl(result.avatarUrl);
-			setIsDialogOpen(false);
 		} catch (error) {
 			console.error("Error uploading file:", error);
 		} finally {
@@ -41,6 +40,7 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 		<>
 			<button
 				type="button"
+				disabled={isUploading}
 				onClick={() => setIsDialogOpen(true)}
 				onKeyDown={(e) => {
 					if (e.key === "Enter" || e.key === " ") {
@@ -57,9 +57,11 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 				/>
 
 				{/* Overlay with camera icon */}
-				<div className="absolute inset-0 flex items-center justify-center bg-black-900/60 opacity-0 group-hover:opacity-100 transition-opacity">
-					<Camera className="w-6 h-6 text-white-800" />
-				</div>
+				{!isUploading && (
+					<div className="absolute inset-0 flex items-center justify-center bg-black-900/60 opacity-0 group-hover:opacity-100 transition-opacity">
+						<Camera className="w-6 h-6 text-white-800" />
+					</div>
+				)}
 
 				{/* Loading overlay */}
 				{isUploading && (
@@ -71,7 +73,7 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 
 			<AvatarUpload
 				isOpen={isDialogOpen}
-				onClose={() => setIsDialogOpen(false)}
+				onClose={() => !isUploading && setIsDialogOpen(false)}
 				onUpload={handleUpload}
 			/>
 		</>
