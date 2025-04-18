@@ -213,6 +213,15 @@ export async function updateAvatar(formData: FormData) {
 			throw new Error("Missing avatar file");
 		}
 
+		const [currentUser] = await db
+			.select({ avatarUrl: users.avatarUrl })
+			.from(users)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(users.dbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+
 		const ext = getExtensionFromMimeType(file.type);
 		const filePath = `avatars/${user.id}.${ext}`;
 
@@ -222,6 +231,16 @@ export async function updateAvatar(formData: FormData) {
 		await storage.setItemRaw(filePath, buffer, {
 			contentType: file.type,
 		});
+
+		if (currentUser?.avatarUrl && currentUser.avatarUrl !== filePath) {
+			try {
+				await storage.removeItem(currentUser.avatarUrl);
+				logger.debug("Old avatar file removed:", currentUser.avatarUrl);
+			} catch (error) {
+				// Don't fail the update if cleanup fails
+				logger.error("Failed to remove old avatar:", error);
+			}
+		}
 
 		const userDbIdSubquery = db
 			.select({ userDbId: supabaseUserMappings.userDbId })
