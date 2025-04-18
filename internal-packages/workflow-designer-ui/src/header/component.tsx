@@ -19,10 +19,14 @@ export function Header({
 	action,
 	onWorkflowNameChange,
 	isReadOnly = false,
+	/** @todo use feature flag provider instead of props */
+	shareFeatureFlag = false,
 }: {
 	action?: ReactNode;
 	onWorkflowNameChange?: (workspaceId: WorkspaceId, name: string) => void;
 	isReadOnly?: boolean;
+	/** @todo use feature flag provider instead of props */
+	shareFeatureFlag?: boolean;
 }) {
 	const { data, updateName, view, setView } = useWorkflowDesigner();
 	const [openSettings, setOpenSettings] = useState(false);
@@ -70,9 +74,13 @@ export function Header({
 			</div>
 
 			<div className="flex items-center gap-[12px]">
-				<UserPresence />
+				{shareFeatureFlag && (
+					<>
+						<UserPresence />
 
-				<ShareButton onClick={() => setOpenShareModal(true)} />
+						<ShareButton onClick={() => setOpenShareModal(true)} />
+					</>
+				)}
 
 				<ToggleGroup.Root
 					type="single"
@@ -220,7 +228,7 @@ export function Header({
 					from { opacity: 0; }
 					to { opacity: 1; }
 				}
-				
+
 				.animate-softFade {
 					animation: softFade 0.5s ease-out;
 				}

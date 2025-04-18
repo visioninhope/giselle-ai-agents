@@ -28,7 +28,7 @@ export default function Page() {
 
 	return (
 		<div className="flex flex-col h-screen bg-black-900">
-			<Header isReadOnly={isReadOnly} />
+			<Header isReadOnly={isReadOnly} shareFeatureFlag />
 			{currentView === "editor" && <Editor githubTools />}
 			{currentView === "viewer" && (
 				<Editor githubTools isReadOnly={isReadOnly} userRole={userRole} />
