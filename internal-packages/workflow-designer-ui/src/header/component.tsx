@@ -11,9 +11,9 @@ import { EditableText } from "../editor/properties-panel/ui";
 import { GiselleLogo } from "../icons";
 import { SettingsPanel } from "../settings";
 import { ShareButton } from "../ui/button";
+import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
-import { ReadOnlyBadge } from "../ui/read-only-banner";
 
 export function Header({
 	action,
@@ -60,7 +60,7 @@ export function Header({
 						/>
 					)}
 				</div>
-				
+
 				{isReadOnly && (
 					<>
 						<Divider />
@@ -71,9 +71,9 @@ export function Header({
 
 			<div className="flex items-center gap-[12px]">
 				<UserPresence />
-				
+
 				<ShareButton onClick={() => setOpenShareModal(true)} />
-				
+
 				<ToggleGroup.Root
 					type="single"
 					className="flex h-[33px] px-[8px] py-0 items-center justify-center rounded-[29px] overflow-hidden border border-[#20222F] bg-[rgba(18,23,35,0.20)]"
@@ -208,11 +208,11 @@ export function Header({
 					</Dialog.Content>
 				</Dialog.Portal>
 			</Dialog.Root>
-			
-			<ShareModal 
-				open={openShareModal} 
-				onOpenChange={setOpenShareModal} 
-				appId={data.id} 
+
+			<ShareModal
+				open={openShareModal}
+				onOpenChange={setOpenShareModal}
+				appId={data.id}
 			/>
 
 			<style jsx global>{`
