@@ -25,6 +25,7 @@ import {
 } from "react-resizable-panels";
 import { Background } from "../ui/background";
 import { ToastProvider, useToasts } from "../ui/toast";
+import { ReadOnlyBanner } from "../ui/read-only-banner";
 import { Beta } from "./beta";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
@@ -307,8 +308,12 @@ function NodeCanvas() {
 
 export function Editor({
 	githubTools = false,
+	isReadOnly = false,
+	userRole = "viewer",
 }: {
 	githubTools?: boolean;
+	isReadOnly?: boolean;
+	userRole?: "viewer" | "guest" | "editor" | "owner";
 }) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
@@ -327,6 +332,8 @@ export function Editor({
 	});
 	const expand = useRef(false);
 	const collapse = useRef(false);
+	
+	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 
 	useEffect(() => {
 		if (!rightPanelRef.current) {
@@ -366,15 +373,28 @@ export function Editor({
 	});
 
 	const [isTourOpen, setIsTourOpen] = useState(data.nodes.length === 0);
+	
+	const handleDismissBanner = useCallback(() => {
+		setShowReadOnlyBanner(false);
+	}, []);
+
 	return (
 		<div className="flex-1 overflow-hidden font-sans">
+			{showReadOnlyBanner && isReadOnly && (
+				<ReadOnlyBanner 
+					onDismiss={handleDismissBanner} 
+					userRole={userRole}
+					className="z-50"
+				/>
+			)}
+			
 			<Beta.Provider value={{ githubTools }}>
-				<ToastProvider>
+						<ToastProvider>
 					<ReactFlowProvider>
 						<ToolbarContextProvider>
 							<MousePositionProvider>
-								<PanelGroup
-									direction="horizontal"
+												<PanelGroup
+													direction="horizontal"
 									className="bg-black-900 h-full flex"
 								>
 									<Panel
@@ -382,10 +402,9 @@ export function Editor({
 										defaultSize={100}
 									>
 										<div className="h-full flex">
-											{/* <Debug /> */}
-											<NodeCanvas />
-										</div>
-									</Panel>
+																<NodeCanvas />
+														</div>
+													</Panel>
 
 									<PanelResizeHandle
 										className={clsx(
@@ -405,14 +424,14 @@ export function Editor({
 												<PropertiesPanel />
 											</div>
 										)}
-									</Panel>
-								</PanelGroup>
-								<KeyboardShortcuts />
+													</Panel>
+												</PanelGroup>
+											<KeyboardShortcuts />
 							</MousePositionProvider>
 						</ToolbarContextProvider>
 						<GradientDef />
 					</ReactFlowProvider>
-				</ToastProvider>
+						</ToastProvider>
 				<WorkspaceTour
 					steps={tourSteps}
 					isOpen={isTourOpen}
