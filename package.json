@@ -25,5 +25,8 @@
 	"packageManager": "pnpm@10.2.1",
 	"engines": {
 		"node": ">=22"
+	},
+	"dependencies": {
+		"rehype-raw": "^7.0.0"
 	}
 }
