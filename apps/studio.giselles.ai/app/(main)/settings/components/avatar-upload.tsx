@@ -8,17 +8,7 @@ import {
 import { Input } from "@/components/ui/input";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
-
-const IMAGE_CONSTRAINTS = {
-	maxSize: 4 * 1024 * 1024,
-	formats: [
-		"image/jpeg",
-		"image/png",
-		"image/gif",
-		"image/svg+xml",
-		"image/webp",
-	],
-};
+import { IMAGE_CONSTRAINTS } from "../constants";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 

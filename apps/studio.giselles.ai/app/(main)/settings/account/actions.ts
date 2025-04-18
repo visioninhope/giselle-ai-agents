@@ -20,6 +20,7 @@ import { isTeamId } from "@/services/teams";
 import { eq } from "drizzle-orm";
 import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
 import { redirect } from "next/navigation";
+import { IMAGE_CONSTRAINTS } from "../constants";
 import { deleteTeamMember } from "../team/actions";
 
 export async function connectGoogleIdentity() {
@@ -155,13 +156,11 @@ export async function leaveTeam(
 }
 
 function getExtensionFromMimeType(mimeType: string): string {
-	const mimeToExt = {
-		"image/jpeg": "jpg",
-		"image/png": "png",
-		"image/gif": "gif",
-		"image/webp": "webp",
-	};
-	return mimeToExt[mimeType as keyof typeof mimeToExt] || "jpg";
+	return (
+		IMAGE_CONSTRAINTS.mimeToExt[
+			mimeType as keyof typeof IMAGE_CONSTRAINTS.mimeToExt
+		] || "jpg"
+	);
 }
 
 /**
