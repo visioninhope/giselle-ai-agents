@@ -30,7 +30,7 @@ export function ReadOnlyBanner({
   return (
     <div 
       className={clsx(
-        "flex items-center justify-between px-4 py-2 bg-black-800 border-b border-black-700",
+        "flex items-center justify-between px-4 py-2 bg-[rgba(255,229,81,0.20)] border-b border-black-700",
         className
       )}
     >
