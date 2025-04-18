@@ -6,6 +6,7 @@ import type {
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
+import type { Vault } from "./vault";
 
 export interface GiselleEngineContext {
 	storage: Storage;
@@ -20,6 +21,7 @@ export interface GiselleEngineContext {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
 	};
+	vault?: Vault;
 }
 
 interface GitHubInstalltionAppAuthResolver {
@@ -59,4 +61,5 @@ export interface GiselleEngineConfig {
 		waitForFlushFn?: () => Promise<unknown>;
 	};
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
+	vault?: Vault;
 }

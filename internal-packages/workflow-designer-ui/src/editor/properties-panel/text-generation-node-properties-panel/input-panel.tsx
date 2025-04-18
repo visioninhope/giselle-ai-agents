@@ -2,22 +2,13 @@ import {
 	type Connection,
 	type Input,
 	InputId,
-	OutputId,
+	type OutputId,
 	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
-import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { CheckIcon, TrashIcon } from "lucide-react";
 import pluralize from "pluralize";
-import { Popover, ToggleGroup } from "radix-ui";
-import {
-	type ComponentProps,
-	type ReactNode,
-	useCallback,
-	useMemo,
-	useState,
-} from "react";
+import { useCallback, useMemo } from "react";
 import {
 	GeneratedContentIcon,
 	GitHubIcon,
@@ -26,272 +17,12 @@ import {
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
-	type Source,
-	useConnectedSources,
-	useSourceCategories,
-} from "./sources";
-
-function SourceToggleItem({
-	source,
-	disabled = false,
-}: { source: Source; disabled?: boolean }) {
-	const getDisplayName = () => {
-		if ("content" in source.node && "llm" in source.node.content) {
-			return source.node.name ?? source.node.content.llm.id;
-		}
-		return source.node.name ?? "Source";
-	};
-
-	return (
-		<ToggleGroup.Item
-			key={source.output.id}
-			className={clsx(
-				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
-				"text-white-400",
-				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
-			)}
-			value={source.output.id}
-			disabled={disabled}
-		>
-			<p className="text-[12px] truncate">
-				{getDisplayName()} / {source.output.label}
-			</p>
-			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-			<div
-				className={clsx(
-					"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
-					"bg-black-200/20 text-black-200/20 text-[10px]",
-					"hidden group-data-[disabled]:block",
-				)}
-			>
-				Unsupported
-			</div>
-		</ToggleGroup.Item>
-	);
-}
-
-function SourceSelect({
-	node,
-	sources,
-	onValueChange,
-	contentProps,
-}: {
-	node: TextGenerationNode;
-	sources: Source[];
-	onValueChange?: (value: OutputId[]) => void;
-	contentProps?: Omit<
-		ComponentProps<typeof Popover.PopoverContent>,
-		"className"
-	>;
-}) {
-	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
-	const { generatedSources, textSources, fileSources, githubSources } =
-		useSourceCategories(sources);
-	const { isSupportedConnection } = useWorkflowDesigner();
-	const isSupported = useCallback(
-		(source: Source) => {
-			const { canConnect } = isSupportedConnection(source.node, node);
-			return canConnect;
-		},
-		[isSupportedConnection, node],
-	);
-
-	return (
-		<Popover.Root
-			onOpenChange={(open) => {
-				if (open) {
-					setSelectedOutputIds(
-						sources
-							.filter((source) => source.connection !== undefined)
-							.map((source) => source.output.id),
-					);
-				}
-			}}
-		>
-			<Popover.Trigger
-				className={clsx(
-					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
-					"border border-transparent hover:border-white-800",
-					"text-[12px] font-[700] text-white-800",
-					"transition-colors",
-				)}
-			>
-				Select Sources
-			</Popover.Trigger>
-			<Popover.Anchor />
-			<Popover.Portal>
-				<Popover.Content
-					className={clsx(
-						"relative w-[300px] py-[8px]",
-						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
-						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
-					)}
-					{...contentProps}
-				>
-					<div
-						className={clsx(
-							"absolute z-0 rounded-[8px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
-							"from-[hsl(232,_36%,_72%)]/40 to-[hsl(218,_58%,_21%)]/90",
-						)}
-					/>
-					<ToggleGroup.Root
-						type="multiple"
-						className="relative max-h-[300px] flex flex-col"
-						value={selectedOutputIds}
-						onValueChange={(unsafeValue) => {
-							const safeValue = unsafeValue
-								.map((value) => {
-									const parse = OutputId.safeParse(value);
-									if (parse.success) {
-										return parse.data;
-									}
-									return null;
-								})
-								.filter((id) => id !== null);
-							setSelectedOutputIds(safeValue);
-						}}
-					>
-						<div className="flex px-[16px] text-white-900">
-							Select Sources From
-						</div>
-						<div className="flex flex-col py-[4px]">
-							<div className="border-t border-black-300/20" />
-						</div>
-						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
-							{generatedSources.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										Generated Content
-									</p>
-									{generatedSources.map((generatedSource) => (
-										<SourceToggleItem
-											key={generatedSource.output.id}
-											source={generatedSource}
-											disabled={!isSupported(generatedSource)}
-										/>
-									))}
-								</div>
-							)}
-							{textSources.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										Text
-									</p>
-									{textSources.map((textSource) => (
-										<SourceToggleItem
-											key={textSource.output.id}
-											source={textSource}
-											disabled={!isSupported(textSource)}
-										/>
-									))}
-								</div>
-							)}
-
-							{fileSources.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										File
-									</p>
-									{fileSources.map((fileSource) => (
-										<SourceToggleItem
-											key={fileSource.output.id}
-											source={fileSource}
-											disabled={!isSupported(fileSource)}
-										/>
-									))}
-								</div>
-							)}
-							{githubSources.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										GitHub
-									</p>
-									{githubSources.map((githubSource) => (
-										<SourceToggleItem
-											key={githubSource.output.id}
-											source={githubSource}
-											disabled={!isSupported(githubSource)}
-										/>
-									))}
-								</div>
-							)}
-						</div>
-						<div className="flex flex-col py-[4px]">
-							<div className="border-t border-black-300/20" />
-						</div>
-						<div className="flex px-[16px] py-[4px] gap-[8px]">
-							<Popover.Close
-								onClick={() => {
-									onValueChange?.(selectedOutputIds);
-								}}
-								className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
-							>
-								Update
-							</Popover.Close>
-						</div>
-					</ToggleGroup.Root>
-				</Popover.Content>
-			</Popover.Portal>
-		</Popover.Root>
-	);
-}
-
-function SourceListRoot({
-	title,
-	children,
-}: {
-	title: string;
-	children: ReactNode;
-}) {
-	return (
-		<div className="flex flex-col gap-[8px]">
-			<p className="text-[14px]">{title}</p>
-			{children}
-		</div>
-	);
-}
-function SourceListItem({
-	icon,
-	title,
-	subtitle,
-	onRemove,
-}: {
-	icon: ReactNode;
-	title: string;
-	subtitle: string;
-	onRemove: () => void;
-}) {
-	return (
-		<div
-			className={clsx(
-				"group flex items-center",
-				"border border-white-900/20 rounded-[8px] h-[60px]",
-			)}
-		>
-			<div className="w-[60px] flex items-center justify-center">{icon}</div>
-			<div className="w-[1px] h-full border-l border-white-900/20" />
-			<div className="px-[16px] flex-1 flex items-center justify-between">
-				<div className="flex flex-col gap-[4px]">
-					<p className="text=[16px]">{title}</p>
-					<div className="text-[10px] text-black-400">
-						<p className="line-clamp-1">{subtitle}</p>
-					</div>
-				</div>
-				<button
-					type="button"
-					className={clsx(
-						"hidden group-hover:block",
-						"p-[4px] rounded-[4px]",
-						"bg-transparent hover:bg-black-300/50 transition-colors",
-					)}
-					onClick={onRemove}
-				>
-					<TrashIcon className="w-[18px] h-[18px] text-white-900" />
-				</button>
-			</div>
-		</div>
-	);
-}
+	ConnectedOutputListItem,
+	ConnectedOutputListRoot,
+	type OutputWithDetails,
+	SelectOutputPopover,
+	useConnectedOutputs,
+} from "./outputs";
 
 export function InputPanel({
 	node: textGenerationNode,
@@ -300,9 +31,9 @@ export function InputPanel({
 }) {
 	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
-	const sources = useMemo<Source[]>(() => {
-		const tmpSources: Source[] = [];
-		const connections = data.connections.filter(
+	const outputs = useMemo<OutputWithDetails[]>(() => {
+		const tmp: OutputWithDetails[] = [];
+		const connectionToThisNode = data.connections.filter(
 			(connection) => connection.inputNode.id === textGenerationNode.id,
 		);
 		for (const node of data.nodes) {
@@ -310,19 +41,19 @@ export function InputPanel({
 				continue;
 			}
 			for (const output of node.outputs) {
-				const connection = connections.find(
+				const connection = connectionToThisNode.find(
 					(connection) => connection.outputId === output.id,
 				);
-				tmpSources.push({
-					output,
+				tmp.push({
+					...output,
 					node,
 					connection,
 				});
 			}
 		}
-		return tmpSources;
+		return tmp;
 	}, [data.nodes, data.connections, textGenerationNode.id]);
-	const connectedSources = useConnectedSources(textGenerationNode);
+	const connectedOutputs = useConnectedOutputs(textGenerationNode);
 
 	const handleConnectionChange = useCallback(
 		(connectOutputIds: OutputId[]) => {
@@ -414,9 +145,9 @@ export function InputPanel({
 					title="No data referenced yet."
 					description="Select the data you want to refer to from the output and the information and knowledge you have."
 				>
-					<SourceSelect
+					<SelectOutputPopover
 						node={textGenerationNode}
-						sources={sources}
+						outputs={outputs}
 						onValueChange={handleConnectionChange}
 					/>
 				</EmptyState>
@@ -426,9 +157,9 @@ export function InputPanel({
 	return (
 		<div>
 			<div className="flex justify-end">
-				<SourceSelect
+				<SelectOutputPopover
 					node={textGenerationNode}
-					sources={sources}
+					outputs={outputs}
 					onValueChange={handleConnectionChange}
 					contentProps={{
 						align: "end",
@@ -436,24 +167,24 @@ export function InputPanel({
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
-				{connectedSources.generation.length > 0 && (
-					<SourceListRoot title="Generated Sources">
-						{connectedSources.generation.map((source) => (
-							<SourceListItem
+				{connectedOutputs.generation.length > 0 && (
+					<ConnectedOutputListRoot title="Generated Sources">
+						{connectedOutputs.generation.map((source) => (
+							<ConnectedOutputListItem
 								icon={
 									<GeneratedContentIcon className="size-[24px] text-white-900" />
 								}
 								key={source.connection.id}
-								title={`${source.node.name ?? source.node.content.llm.id} / ${source.output.label}`}
+								title={`${source.node.name ?? source.node.content.llm.id} / ${source.label}`}
 								subtitle={source.node.content.llm.provider}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}
-					</SourceListRoot>
+					</ConnectedOutputListRoot>
 				)}
-				{connectedSources.variable.length > 0 && (
-					<SourceListRoot title="Static Contents">
-						{connectedSources.variable.map((source) => {
+				{connectedOutputs.variable.length > 0 && (
+					<ConnectedOutputListRoot title="Static Contents">
+						{connectedOutputs.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
 									let text = source.node.content.text;
@@ -467,12 +198,12 @@ export function InputPanel({
 									}
 
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<PromptIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "Text"} / ${source.output.label}`}
+											title={`${source.node.name ?? "Text"} / ${source.label}`}
 											subtitle={text}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -480,24 +211,24 @@ export function InputPanel({
 								}
 								case "file":
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<PdfFileIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "PDF Files"} / ${source.output.label}`}
+											title={`${source.node.name ?? "PDF Files"} / ${source.label}`}
 											subtitle={`${source.node.content.files.length} ${pluralize("file", source.node.content.files.length)}`}
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
 								case "github":
 									return (
-										<SourceListItem
+										<ConnectedOutputListItem
 											icon={
 												<GitHubIcon className="size-[24px] text-white-900" />
 											}
 											key={source.connection.id}
-											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
+											title={`${source.node.name ?? "GitHub"} / ${source.label}`}
 											subtitle={"todo"}
 											onRemove={() => handleRemove(source.connection)}
 										/>
@@ -508,7 +239,7 @@ export function InputPanel({
 								}
 							}
 						})}
-					</SourceListRoot>
+					</ConnectedOutputListRoot>
 				)}
 			</div>
 		</div>
