@@ -34,7 +34,7 @@ async function getUserInfo(accessToken: string): Promise<UserInfo> {
 }
 
 async function fetchDrives(accessToken: string) {
-	// Google Drive API を使用してユーザーの共有ドライブを一覧を取得
+	// Use Google Drive API to get a list of user's shared drives
 	const url = "https://www.googleapis.com/drive/v3/drives";
 
 	const res = await fetch(url, {
@@ -54,7 +54,7 @@ async function fetchDrives(accessToken: string) {
 }
 
 async function fetchSpreadSheets(accessToken: string, driveId: string) {
-	// Google Drive APIを使用して共有ドライブ内のファイル一覧を取得
+	// Use Google Drive API to get a list of files in the shared drive
 	const res = await fetch(
 		`https://www.googleapis.com/drive/v3/files?q='${driveId}'+in+parents&includeItemsFromAllDrives=true&supportsAllDrives=true`,
 		{
@@ -82,7 +82,7 @@ async function fetchSpreadSheets(accessToken: string, driveId: string) {
 }
 
 async function fetchSheets(accessToken: string, sheetId: string) {
-	// Google Sheets APIを使用してスプレッドシートのシート一覧を取得
+	// Use Google Sheets API to get a list of sheets in the spreadsheet
 	// https://developers.google.com/sheets/api/reference/rest/v4/spreadsheets/get
 	const res = await fetch(
 		`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`,
@@ -127,7 +127,7 @@ export default async function ConnectSpreadsheetPage() {
 			}),
 		);
 
-		// drivesWithSpreadsheets に spreadsheets が含まれているので、これをループして、さらに sheets 一覧を取得する
+		// Since drivesWithSpreadsheets contains spreadsheets, loop through them to get a list of sheets
 		data = await Promise.all(
 			drivesWithSpreadsheets.map(async (driveWithSpreadsheets) => {
 				const { driveId, driveName, spreadsheets } = driveWithSpreadsheets;

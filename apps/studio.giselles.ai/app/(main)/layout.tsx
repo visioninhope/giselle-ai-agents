@@ -9,7 +9,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 	return (
 		<div className="h-screen overflow-y-hidden bg-black-900 flex flex-col">
 			<header className="flex flex-col">
-				{/* 上の行: ロゴ、チーム選択、ユーザーアイコン */}
+				{/* Top row: Logo, Team Selection, User Icon */}
 				<div className="h-[50px] flex items-center px-[24px] justify-between">
 					<div className="flex items-center gap-2">
 						<Link href="/">
@@ -34,7 +34,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				{/* 下の行: メインナビゲーション */}
 				<Nav />
 
-				{/* ナビゲーションの下の罫線 */}
+				{/* Border line below navigation */}
 				<div className="h-[1px] w-full bg-black-800" />
 			</header>
 			<main className="flex-1 overflow-y-auto">{children}</main>

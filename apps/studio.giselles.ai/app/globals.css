@@ -152,9 +152,9 @@
 
 @layer base {
 	.mask-fill {
-		-webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0); /* 2つのマスクレイヤー */
-		-webkit-mask-clip: padding-box, border-box; /* レイヤーごとの描画領域の範囲 */
-		-webkit-mask-composite: destination-out; /* レイヤーが重なっていない領域を描画対象 */
+		-webkit-mask-image: linear-gradient(#fff 0 0), linear-gradient(#fff 0 0); /* Two mask layers */
+		-webkit-mask-clip: padding-box, border-box; /* Drawing area range for each layer */
+		-webkit-mask-composite: destination-out; /* Draw areas where layers do not overlap */
 	}
 }
 
