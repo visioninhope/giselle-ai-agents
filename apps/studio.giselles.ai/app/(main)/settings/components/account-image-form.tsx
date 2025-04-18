@@ -19,13 +19,6 @@ export function AccountImageForm({ avatarUrl, alt }: AccountImageFormProps) {
 	);
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-	console.log("currentAvatarUrl", currentAvatarUrl);
-
-	const getFallbackInitials = (name: string | null) => {
-		if (!name) return "U";
-		return name.charAt(0).toUpperCase();
-	};
-
 	const handleUpload = async (file: File) => {
 		try {
 			setIsUploading(true);
