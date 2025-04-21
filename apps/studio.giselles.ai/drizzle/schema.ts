@@ -64,6 +64,7 @@ export const users = pgTable("users", {
 	id: text("id").$type<UserId>().notNull().unique(),
 	email: text("email").unique(), // TODO: Allow null values initially when adding schema, then change to not null after data update
 	displayName: text("display_name"),
+	avatarUrl: text("avatar_url"),
 	dbId: serial("db_id").primaryKey(),
 });
 
@@ -244,5 +245,26 @@ export const agentTimeRestrictions = pgTable(
 	},
 	(table) => ({
 		teamDbIdIdx: index().on(table.teamDbId),
+	}),
+);
+
+export const invitations = pgTable(
+	"invitations",
+	{
+		token: text("token").notNull().unique(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		email: text("email").notNull(),
+		role: text("role").notNull().$type<TeamRole>(),
+		inviterUserDbId: integer("inviter_user_db_id")
+			.notNull()
+			.references(() => users.dbId, { onDelete: "cascade" }),
+		expiredAt: timestamp("expired_at").notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		revokedAt: timestamp("revoked_at"),
+	},
+	(table) => ({
+		teamDbIdRevokedAtIdx: index().on(table.teamDbId, table.revokedAt),
 	}),
 );
