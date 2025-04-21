@@ -182,10 +182,17 @@ export function TextGenerationNodePropertiesPanel({
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
 										openaiLanguageModel={node.content.llm}
+										tools={node.content.tools}
 										onModelChange={(value) =>
 											updateNodeDataContent(node, {
 												...node.content,
 												llm: value,
+											})
+										}
+										onToolChange={(changedTool) =>
+											updateNodeDataContent(node, {
+												...node.content,
+												tools: changedTool,
 											})
 										}
 									/>

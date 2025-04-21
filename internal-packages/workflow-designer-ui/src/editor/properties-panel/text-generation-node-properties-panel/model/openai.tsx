@@ -1,4 +1,4 @@
-import { OpenAILanguageModelData } from "@giselle-sdk/data-type";
+import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
 import { openaiLanguageModels } from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
 import {
@@ -10,14 +10,19 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
+import { Switch } from "../../../../ui/switch";
 import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
 	onModelChange,
+	tools,
+	onToolChange,
 }: {
 	openaiLanguageModel: OpenAILanguageModelData;
 	onModelChange: (changedValue: OpenAILanguageModelData) => void;
+	tools?: ToolSet;
+	onToolChange: (changedValue: ToolSet) => void;
 }) {
 	const limits = useUsageLimits();
 
@@ -123,6 +128,37 @@ export function OpenAIModelPanel({
 									},
 								}),
 							);
+						}}
+					/>
+					<Switch
+						label="Search Grounding"
+						name="searchGrounding"
+						checked={!!tools?.openaiWebSearch}
+						onCheckedChange={(checked) => {
+							let changedTools: ToolSet = {};
+							for (const toolName of Object.keys(tools ?? {})) {
+								const tool = tools?.[toolName as keyof ToolSet];
+
+								if (
+									tool === undefined ||
+									(!checked && toolName === "openaiWebSearch")
+								) {
+									continue;
+								}
+								changedTools = {
+									...changedTools,
+									[toolName]: tool,
+								};
+							}
+							if (checked) {
+								changedTools = {
+									...tools,
+									openaiWebSearch: {
+										searchContextSize: "medium",
+									},
+								};
+							}
+							onToolChange(changedTools);
 						}}
 					/>
 				</div>
