@@ -131,8 +131,8 @@ export function OpenAIModelPanel({
 						}}
 					/>
 					<Switch
-						label="Search Grounding"
-						name="searchGrounding"
+						label="Web Search"
+						name="webSearch"
 						checked={!!tools?.openaiWebSearch}
 						onCheckedChange={(checked) => {
 							let changedTools: ToolSet = {};
