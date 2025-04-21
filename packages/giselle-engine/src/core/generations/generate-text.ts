@@ -467,7 +467,7 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			return anthropic(languageModel.id);
 		}
 		case "openai": {
-			return openai(languageModel.id);
+			return openai.responses(languageModel.id);
 		}
 		case "google": {
 			return google(languageModel.id, {
