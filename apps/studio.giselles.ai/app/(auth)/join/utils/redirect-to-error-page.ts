@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
-
-export type ErrorCode = "expired" | "wrong_email" | "already_member";
+import type { ErrorCode } from "../errors";
 
 export function redirectToErrorPage(code: ErrorCode) {
 	redirect(`/join/error/${code}`);
