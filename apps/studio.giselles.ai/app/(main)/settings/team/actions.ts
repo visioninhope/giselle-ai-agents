@@ -19,6 +19,7 @@ import { stripe } from "@/services/external/stripe";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import type { CurrentTeam, TeamId } from "@/services/teams/types";
 import { reportUserSeatUsage } from "@/services/usage-based-billing";
+import * as Sentry from "@sentry/nextjs";
 import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -658,7 +659,8 @@ export async function sendInvitationsAction(
 			if (result.status === "fulfilled") {
 				return result.value;
 			}
-			// Handle unexpected errors during the Promise execution itself
+			// Capture unexpected errors in Sentry
+			Sentry.captureException(result.reason);
 			console.error(
 				`Unexpected error processing invitation for ${emails[index]}:`,
 				result.reason,
