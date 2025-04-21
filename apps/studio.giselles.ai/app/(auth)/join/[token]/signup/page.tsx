@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 		return notFound();
 	}
 	if (token.expiredAt < new Date()) {
-		redirectToErrorPage("expired");
+		redirectToErrorPage(params.token, "expired");
 	}
 
 	return (

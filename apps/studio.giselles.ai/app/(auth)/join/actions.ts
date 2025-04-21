@@ -16,6 +16,13 @@ import { JoinError } from "./errors";
 import { fetchInvitationToken } from "./utils/invitation-token";
 import { redirectToErrorPage } from "./utils/redirect-to-error-page";
 
+export async function signoutUser(formData: FormData) {
+	const token = formData.get("token") as string;
+	const supabase = await createClient();
+	await supabase.auth.signOut();
+	redirect(`/join/${encodeURIComponent(token)}/login`);
+}
+
 export async function loginUser(formData: FormData) {
 	const email = formData.get("email") as string;
 	const password = formData.get("password") as string;
@@ -30,12 +37,12 @@ export async function loginUser(formData: FormData) {
 }
 
 export async function joinTeam(formData: FormData) {
-	const tokenVal = formData.get("token");
+	const rawToken = formData.get("token");
+	const token = typeof rawToken === "string" ? rawToken : "";
 	try {
-		if (typeof tokenVal !== "string" || tokenVal.trim() === "") {
+		if (token.trim() === "") {
 			throw new JoinError("expired");
 		}
-		const token = tokenVal;
 
 		let user: User;
 		try {
@@ -92,11 +99,11 @@ export async function joinTeam(formData: FormData) {
 		});
 	} catch (err: unknown) {
 		if (err instanceof JoinError) {
-			redirectToErrorPage(err.code);
+			redirectToErrorPage(token, err.code);
 			return;
 		}
 		console.error(err);
-		redirectToErrorPage("expired");
+		redirectToErrorPage(token, "expired");
 		return;
 	}
 

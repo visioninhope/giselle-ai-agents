@@ -1,29 +1,29 @@
+import { ActionPrompt } from "@/app/(auth)/components/action-prompt";
+import type { ErrorCode } from "@/app/(auth)/join/errors";
+import { fetchInvitationToken } from "@/app/(auth)/join/utils/invitation-token";
 import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clickable-text";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ActionPrompt } from "../../../components/action-prompt";
-import type { ErrorCode } from "../../utils/redirect-to-error-page";
+import { signoutUser } from "../../../actions";
 
 const errorMessages: Record<ErrorCode, string> = {
 	expired: "This invitation has expired.",
-	wrong_email: `The email address you're currently using doesn't match the email
-							this invitation was intended for. To join this workspace, please
-							sign out and then either sign in with the email address specified
-							in the invitation or create a new account using that email
-							address.`,
+	wrong_email: `The email address you're currently using doesn't match the email this invitation was intended for. To join this workspace, please sign out and then either sign in with the email address specified in the invitation or create a new account using that email address.`,
 	already_member: "You're already a member of this team.",
 } as const;
 
-export default async function Page({ params }: { params: { code: string } }) {
+export default async function Page({
+	params,
+}: { params: { token: string; code: string } }) {
 	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
 	if (!isTeamInvitationViaEmail) {
 		return notFound();
 	}
 
-	const code = params.code;
-	if (!code) {
+	const { token, code } = params;
+	if (!token || !code) {
 		return notFound();
 	}
 
@@ -32,9 +32,9 @@ export default async function Page({ params }: { params: { code: string } }) {
 		return notFound();
 	}
 
-	// FIXME: Fetch team name from database using the invitation token.
-	//   The invitation token should be given, this may require this pages path to be changed.
-	const teamName = "Team Name";
+	// fetch invitation token from db
+	const invitation = await fetchInvitationToken(token);
+	const teamName = invitation?.teamName ?? "Team";
 
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
@@ -103,7 +103,12 @@ export default async function Page({ params }: { params: { code: string } }) {
 							</div>
 
 							{code === "wrong_email" && (
-								<Button className="w-full font-medium">Sign out</Button>
+								<form action={signoutUser} method="post">
+									<input type="hidden" name="token" value={token} />
+									<Button type="submit" className="w-full font-medium mt-2">
+										Sign out
+									</Button>
+								</form>
 							)}
 						</div>
 					)}

@@ -21,7 +21,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 		return notFound();
 	}
 	if (token.expiredAt < new Date()) {
-		redirectToErrorPage("expired");
+		redirectToErrorPage(params.token, "expired");
 	}
 
 	let user: User | null = null;
@@ -32,7 +32,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 	}
 
 	if (user.email !== token.invitedEmail) {
-		redirectToErrorPage("wrong_email");
+		redirectToErrorPage(params.token, "wrong_email");
 	}
 
 	const userDb = await db
@@ -56,7 +56,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 			)
 			.limit(1);
 		if (membership.length > 0) {
-			redirectToErrorPage("already_member");
+			redirectToErrorPage(params.token, "already_member");
 		}
 	}
 
