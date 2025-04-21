@@ -259,7 +259,7 @@ export const invitations = pgTable(
 		role: text("role").notNull().$type<TeamRole>(),
 		inviteUserDbId: integer("invite_user_db_id")
 			.notNull()
-			.references(() => users.dbId),
+			.references(() => users.dbId, { onDelete: "cascade" }),
 		expiredAt: timestamp("expired_at").notNull(),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		revokedAt: timestamp("revoked_at"),
