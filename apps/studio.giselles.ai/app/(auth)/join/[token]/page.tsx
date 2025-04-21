@@ -1,7 +1,9 @@
 import { Button } from "@/components/ui/button";
+import { db, supabaseUserMappings, teamMemberships, users } from "@/drizzle";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import type { User } from "@supabase/auth-js";
+import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { fetchInvitationToken } from "../utils/invitation-token";
@@ -28,13 +30,33 @@ export default async function Page({ params }: { params: { token: string } }) {
 		redirect(`/join/${encodeURIComponent(params.token)}/login`);
 	}
 
-	// FIXME: stub for debugging
-	// if (user.email !== token.invitedEmail) {
-	if (token.token === "wrong-email-token") {
+	if (user.email !== token.invitedEmail) {
 		redirectToErrorPage("wrong_email");
 	}
-	if (token.token === "already-member-token") {
-		redirectToErrorPage("already_member");
+
+	const userDb = await db
+		.select({ dbId: users.dbId })
+		.from(users)
+		.innerJoin(
+			supabaseUserMappings,
+			eq(users.dbId, supabaseUserMappings.userDbId),
+		)
+		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+	const userDbId = userDb[0]?.dbId;
+	if (userDbId && typeof token.teamDbId === "number") {
+		const membership = await db
+			.select()
+			.from(teamMemberships)
+			.where(
+				and(
+					eq(teamMemberships.userDbId, userDbId),
+					eq(teamMemberships.teamDbId, token.teamDbId),
+				),
+			)
+			.limit(1);
+		if (membership.length > 0) {
+			redirectToErrorPage("already_member");
+		}
 	}
 
 	return (
