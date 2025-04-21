@@ -6,7 +6,6 @@ import {
 	agentActivities,
 	agents,
 	db,
-	type invitations,
 	subscriptions,
 	supabaseUserMappings,
 	teamMemberships,
@@ -24,6 +23,7 @@ import { and, asc, count, desc, eq, ne } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import {
+	type Invitation,
 	createInvitation,
 	listInvitations,
 	revokeInvitation,
@@ -116,9 +116,7 @@ export async function getTeamMembers() {
 	}
 }
 
-export async function addTeamMember(
-	formData: FormData,
-): Promise<{ success: boolean; error?: string }> {
+export async function addTeamMember(formData: FormData) {
 	try {
 		const email = formData.get("email") as string;
 		const role = formData.get("role") as string;
@@ -631,7 +629,7 @@ export async function sendInvitations(
 
 	const invitationPromises = emails.map(
 		async (email): Promise<InvitationResult> => {
-			let invitation: typeof invitations.$inferSelect | null = null;
+			let invitation: Invitation | null = null;
 			try {
 				invitation = await createInvitation(
 					email,
