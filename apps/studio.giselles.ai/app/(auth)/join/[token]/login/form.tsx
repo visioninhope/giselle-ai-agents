@@ -5,28 +5,30 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
-import { useState } from "react";
+import { useState, useTransition } from "react";
+import { loginUser } from "../../actions";
 
 interface LoginFormProps {
 	email: string;
+	token: string;
 }
 
 export const LoginForm = (props: LoginFormProps) => {
 	const [password, setPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
-	const [joining, setJoining] = useState(false);
+	const [isPending, startTransition] = useTransition();
 
-	const handleSubmit = (e: React.FormEvent) => {
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-
-		setJoining(true);
 		setError(null);
-
-		// In actual implementation, call the team join API here
-		setTimeout(() => {
-			alert("Join team functionality would be implemented here");
-			setJoining(false);
-		}, 500);
+		const formData = new FormData(e.currentTarget);
+		formData.set("token", props.token);
+		startTransition(async () => {
+			const result = await loginUser(formData);
+			if (result?.error) {
+				setError(result.error);
+			}
+		});
 	};
 
 	return (
@@ -50,6 +52,7 @@ export const LoginForm = (props: LoginFormProps) => {
 							</Label>
 							<Input
 								id="email"
+								name="email"
 								type="email"
 								value={props.email}
 								required
@@ -69,6 +72,7 @@ export const LoginForm = (props: LoginFormProps) => {
 							</Label>
 							<Input
 								id="password"
+								name="password"
 								type="password"
 								value={password}
 								onChange={(e) => setPassword(e.target.value)}
@@ -80,10 +84,10 @@ export const LoginForm = (props: LoginFormProps) => {
 					<Button
 						className="w-full font-medium"
 						type="submit"
-						disabled={joining}
-						data-loading={joining}
+						disabled={isPending}
+						data-loading={isPending}
 					>
-						{joining ? "Joining..." : "Join to team"}
+						{isPending ? "Joining..." : "Join to team"}
 					</Button>
 				</div>
 			</div>

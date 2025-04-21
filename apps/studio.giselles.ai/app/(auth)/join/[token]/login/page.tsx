@@ -12,11 +12,11 @@ export default async function Page({ params }: { params: { token: string } }) {
 		return notFound();
 	}
 
-	const token = await fetchInvitationToken(params.token);
-	if (!token) {
+	const tokenObj = await fetchInvitationToken(params.token);
+	if (!tokenObj) {
 		return notFound();
 	}
-	if (token.expiredAt < new Date()) {
+	if (tokenObj.expiredAt < new Date()) {
 		redirectToErrorPage("expired");
 	}
 
@@ -30,11 +30,11 @@ export default async function Page({ params }: { params: { token: string } }) {
 							className="text-[28px] font-[500] text-primary-100 font-hubot"
 							style={{ textShadow: "0px 0px 20px #0087F6" }}
 						>
-							{token.teamName}
+							{tokenObj.teamName}
 						</h2>
 					</div>
 					<div className="grid gap-[16px]">
-						<LoginForm email={token.invitedEmail} />
+						<LoginForm email={tokenObj.invitedEmail} token={params.token} />
 
 						<div className="text-center text-sm text-slate-400">
 							Don't have a Giselle account?{" "}
