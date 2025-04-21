@@ -112,25 +112,25 @@ export function GenerationView({
 	);
 }
 
-function ToolBlock({
-	generation,
-	contextNodeId,
-}: {
-	contextNodeId: NodeId;
-	generation: RunningGeneration | CompletedGeneration | CancelledGeneration;
-}) {
-	const contextNode = useMemo(
-		() =>
-			generation.context.sourceNodes.find(
-				(sourceNode) => sourceNode.id === contextNodeId,
-			),
-		[generation, contextNodeId],
-	);
-	if (contextNode === undefined) {
-		return null;
-	}
-	if (contextNode.content.type === "file") {
-		return contextNode.content.files.map((file) => file.name).join(", ");
-	}
-	return null;
-}
+// function ToolBlock({
+// 	generation,
+// 	contextNodeId,
+// }: {
+// 	contextNodeId: NodeId;
+// 	generation: RunningGeneration | CompletedGeneration | CancelledGeneration;
+// }) {
+// 	const contextNode = useMemo(
+// 		() =>
+// 			generation.context.sourceNodes.find(
+// 				(sourceNode) => sourceNode.id === contextNodeId,
+// 			),
+// 		[generation, contextNodeId],
+// 	);
+// 	if (contextNode === undefined) {
+// 		return null;
+// 	}
+// 	if (contextNode.content.type === "file") {
+// 		return contextNode.content.files.map((file) => file.name).join(", ");
+// 	}
+// 	return null;
+// }
