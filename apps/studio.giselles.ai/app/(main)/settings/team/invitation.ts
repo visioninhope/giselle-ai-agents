@@ -26,7 +26,7 @@ export async function createInvitation(
 			teamDbId: currentTeam.dbId,
 			email,
 			role,
-			inviteUserDbId: currentUser.dbId,
+			inviterUserDbId: currentUser.dbId,
 			expiredAt,
 			revokedAt: null,
 		})
@@ -35,7 +35,7 @@ export async function createInvitation(
 			teamDbId: invitations.teamDbId,
 			email: invitations.email,
 			role: invitations.role,
-			inviteUserDbId: invitations.inviteUserDbId,
+			inviterUserDbId: invitations.inviterUserDbId,
 			expiredAt: invitations.expiredAt,
 			createdAt: invitations.createdAt,
 			revokedAt: invitations.revokedAt,
@@ -50,7 +50,7 @@ export async function sendInvitationEmail(invitation: Invitation) {
 			displayName: users.displayName,
 		})
 		.from(users)
-		.where(eq(users.dbId, invitation.inviteUserDbId))
+		.where(eq(users.dbId, invitation.inviterUserDbId))
 		.limit(1);
 	if (inviter.length === 0) {
 		throw new Error("Inviter not found");
