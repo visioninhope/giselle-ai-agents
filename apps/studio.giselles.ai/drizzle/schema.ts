@@ -257,7 +257,7 @@ export const invitations = pgTable(
 			.references(() => teams.dbId, { onDelete: "cascade" }),
 		email: text("email").notNull(),
 		role: text("role").notNull().$type<TeamRole>(),
-		inviteUserDbId: integer("invite_user_db_id")
+		inviterUserDbId: integer("inviter_user_db_id")
 			.notNull()
 			.references(() => users.dbId, { onDelete: "cascade" }),
 		expiredAt: timestamp("expired_at").notNull(),
