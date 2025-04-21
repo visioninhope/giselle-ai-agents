@@ -10,7 +10,7 @@ import {
 import type { TeamRole } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronDown, Link as LinkIcon, X } from "lucide-react";
+import { ChevronDown, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { email as emailValidator, parse, pipe, string } from "valibot";
 import { Button } from "../components/button";
@@ -282,18 +282,15 @@ export function InviteMemberDialog({
 
 						<div className="flex justify-between items-center mt-6">
 							<div>
-								{teamInvitationViaEmailEnabled && (
-									<button
-										type="button"
-										className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
-										onClick={() => {
-											/* Share function is empty */
-										}}
-									>
-										<LinkIcon className="h-4 w-4" />
-										<span className="text-sm font-medium">Share</span>
-									</button>
-								)}
+								{/* We currently don't have a share function */}
+								{/* <button
+									type="button"
+									className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
+									onClick={() => { }}
+								>
+									<LinkIcon className="h-4 w-4" />
+									<span className="text-sm font-medium">Share</span>
+								</button> */}
 							</div>
 							<div className="flex space-x-2">
 								<Button
