@@ -260,6 +260,21 @@ export async function generateText(args: {
 		}
 	}
 
+	if (
+		actionNode.content.llm.provider === "openai" &&
+		actionNode.content.tools?.openaiWebSearch
+	) {
+		preparedToolSet = {
+			...preparedToolSet,
+			toolSet: {
+				...preparedToolSet.toolSet,
+				openaiWebSearch: openai.tools.webSearchPreview(
+					actionNode.content.tools.openaiWebSearch,
+				),
+			},
+		};
+	}
+
 	// if (
 	// 	actionNode.content.tools?.github &&
 	// 	args.context.integrationConfigs?.github
