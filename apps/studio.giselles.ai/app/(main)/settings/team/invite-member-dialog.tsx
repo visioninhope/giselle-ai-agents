@@ -17,7 +17,7 @@ import { Button } from "../components/button";
 import {
 	type SendInvitationsResult,
 	addTeamMember,
-	sendInvitations,
+	sendInvitationsAction,
 } from "./actions";
 
 type InviteMemberDialogProps = {
@@ -110,7 +110,7 @@ export function InviteMemberDialog({
 		setIsLoading(true);
 
 		if (teamInvitationViaEmailEnabled) {
-			const response: SendInvitationsResult = await sendInvitations(
+			const response: SendInvitationsResult = await sendInvitationsAction(
 				emailList,
 				role,
 			);

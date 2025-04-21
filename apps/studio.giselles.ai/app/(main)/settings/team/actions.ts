@@ -620,7 +620,7 @@ export type SendInvitationsResult = {
 };
 
 // Update sendInvitations function
-export async function sendInvitations(
+export async function sendInvitationsAction(
 	emails: string[],
 	role: TeamRole,
 ): Promise<SendInvitationsResult> {
