@@ -212,6 +212,18 @@ export async function updateAvatar(formData: FormData) {
 			throw new Error("Missing avatar file");
 		}
 
+		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
+			throw new Error(
+				"Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
+			);
+		}
+
+		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
+			throw new Error(
+				`File size exceeds ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB limit`,
+			);
+		}
+
 		const [currentUser] = await db
 			.select({ avatarUrl: users.avatarUrl })
 			.from(users)

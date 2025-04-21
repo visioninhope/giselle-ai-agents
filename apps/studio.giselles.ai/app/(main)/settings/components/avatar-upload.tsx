@@ -21,6 +21,7 @@ interface AvatarUploadProps {
 export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 	const [preview, setPreview] = useState<string | null>(null);
 	const [error, setError] = useState<string>("");
+	const [isUploading, setIsUploading] = useState<boolean>(false);
 	const inputRef = useRef<HTMLInputElement>(null);
 
 	useEffect(() => {
@@ -44,11 +45,21 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 
 		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
 			setError("Please select a JPG, PNG, GIF, SVG, or WebP image");
+			if (preview) {
+				URL.revokeObjectURL(preview);
+				setPreview(null);
+			}
 			return;
 		}
 
 		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
-			setError("File too large (max 4MB)");
+			setError(
+				`Please select an image under ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB in size`,
+			);
+			if (preview) {
+				URL.revokeObjectURL(preview);
+				setPreview(null);
+			}
 			return;
 		}
 
@@ -72,11 +83,17 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 		if (!preview || !inputRef.current?.files?.[0]) return;
 
 		try {
+			setIsUploading(true);
+			setError("");
 			await onUpload(inputRef.current.files[0]);
 			handleClose();
 		} catch (error) {
-			setError("Failed to upload image");
+			setError(
+				error instanceof Error ? error.message : "Failed to upload image",
+			);
 			console.error("Upload error:", error);
+		} finally {
+			setIsUploading(false);
 		}
 	};
 
@@ -120,14 +137,13 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 						</div>
 					)}
 
-					{error && (
-						<p className="text-error-900 text-sm text-center">{error}</p>
-					)}
+					{error && <p className="text-red-500 text-sm text-center">{error}</p>}
 
 					<div className="flex justify-end gap-4 w-full">
 						<Button
 							type="button"
 							onClick={onClose}
+							disabled={isUploading}
 							className="w-full bg-transparent border-black-400 text-black-400 hover:bg-transparent hover:text-black-400"
 						>
 							Cancel
@@ -135,10 +151,14 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 						<Button
 							type="button"
 							onClick={handleUpdate}
-							disabled={!preview || !!error}
+							disabled={!preview || !!error || isUploading}
 							className="w-full"
 						>
-							Upload
+							{isUploading ? (
+								<div className="h-5 w-5 animate-spin rounded-full border-2 border-white-800 border-t-transparent" />
+							) : (
+								"Upload"
+							)}
 						</Button>
 					</div>
 				</div>
