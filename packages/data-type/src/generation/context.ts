@@ -43,3 +43,10 @@ export const GenerationContext = z.object({
 	origin: GenerationOrigin,
 });
 export type GenerationContext = z.infer<typeof GenerationContext>;
+
+export const GenerationContextLike = z.object({
+	actionNode: z.any(),
+	sourceNodes: z.array(z.any()),
+	origin: z.any(),
+});
+export type GenerationContextLike = z.infer<typeof GenerationContextLike>;

@@ -5,6 +5,7 @@ import {
 	type FileContent,
 	type FileData,
 	Generation,
+	GenerationContext,
 	type GenerationId,
 	GenerationIndex,
 	type GenerationOrigin,
@@ -567,7 +568,8 @@ async function buildGenerationMessageForImageGeneration(
 }
 
 export function generatedImagePath(generation: Generation, filename: string) {
-	const originType = generation.context.origin.type;
+	const generationContext = GenerationContext.parse(generation.context);
+	const originType = generationContext.origin.type;
 	switch (originType) {
 		case "workspace":
 			return `workspaces/${generation.context.origin.id}/generations/${generation.id}/${filename}`;

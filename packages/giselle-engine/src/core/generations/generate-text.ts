@@ -7,6 +7,7 @@ import {
 	type CompletedGeneration,
 	type FailedGeneration,
 	type FileData,
+	GenerationContext,
 	type GenerationOutput,
 	type NodeId,
 	type Output,
@@ -52,6 +53,7 @@ export async function generateText(args: {
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
 	}
+	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
@@ -350,10 +352,9 @@ export async function generateText(args: {
 		},
 		async onFinish(event) {
 			const generationOutputs: GenerationOutput[] = [];
-			const generatedTextOutput =
-				runningGeneration.context.actionNode.outputs.find(
-					(output) => output.accessor === "generated-text",
-				);
+			const generatedTextOutput = generationContext.actionNode.outputs.find(
+				(output) => output.accessor === "generated-text",
+			);
 			if (generatedTextOutput !== undefined) {
 				generationOutputs.push({
 					type: "generated-text",
@@ -361,7 +362,7 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			const reasoningOutput = runningGeneration.context.actionNode.outputs.find(
+			const reasoningOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "reasoning",
 			);
 			if (reasoningOutput !== undefined && event.reasoning !== undefined) {
@@ -371,7 +372,7 @@ export async function generateText(args: {
 					outputId: reasoningOutput.id,
 				});
 			}
-			const sourceOutput = runningGeneration.context.actionNode.outputs.find(
+			const sourceOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "source",
 			);
 			if (sourceOutput !== undefined && event.sources.length > 0) {

@@ -3,6 +3,7 @@ import {
 	type CompletedGeneration,
 	type FailedGeneration,
 	type FileData,
+	GenerationContext,
 	type GenerationOutput,
 	type Image,
 	ImageId,
@@ -56,6 +57,7 @@ export async function generateImage(args: {
 		throw new Error("Invalid generation type");
 	}
 	const langfuse = new Langfuse();
+	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
@@ -255,10 +257,9 @@ export async function generateImage(args: {
 
 	const generationOutputs: GenerationOutput[] = [];
 
-	const generatedImageOutput =
-		runningGeneration.context.actionNode.outputs.find(
-			(output) => output.accessor === "generated-image",
-		);
+	const generatedImageOutput = generationContext.actionNode.outputs.find(
+		(output) => output.accessor === "generated-image",
+	);
 	if (generatedImageOutput !== undefined) {
 		const contents = await Promise.all(
 			result.data.images.map(async (image) => {
