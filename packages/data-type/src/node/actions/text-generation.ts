@@ -81,16 +81,32 @@ export const PostgresTool = z.object({
 });
 export type PostgresTool = z.infer<typeof PostgresTool>;
 
+export const OpenAIWebSearchTool = z.object({
+	searchContextSize: z.enum(["low", "medium", "high"]).default("medium"),
+	userLocation: z
+		.object({
+			type: z.literal("approximate").optional(),
+			city: z.string().optional(),
+			region: z.string().optional(),
+			country: z.string().optional(),
+			timezone: z.string().optional(),
+		})
+		.optional(),
+});
+export type OpenAIWebSearchTool = z.infer<typeof OpenAIWebSearchTool>;
+
+export const ToolSet = z.object({
+	github: z.optional(GitHubTool),
+	postgres: z.optional(PostgresTool),
+	openaiWebSearch: z.optional(OpenAIWebSearchTool),
+});
+export type ToolSet = z.infer<typeof ToolSet>;
+
 export const TextGenerationContent = z.object({
 	type: z.literal("textGeneration"),
 	llm: TextGenerationLanguageModelData,
 	prompt: z.string().optional(),
-	tools: z.optional(
-		z.object({
-			github: z.optional(GitHubTool),
-			postgres: z.optional(PostgresTool),
-		}),
-	),
+	tools: z.optional(ToolSet),
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 

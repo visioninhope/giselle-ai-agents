@@ -7,6 +7,7 @@ import {
 	type CompletedGeneration,
 	type FailedGeneration,
 	type FileData,
+	GenerationContext,
 	type GenerationOutput,
 	type NodeId,
 	type Output,
@@ -19,6 +20,11 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
+import {
+	Capability,
+	hasCapability,
+	languageModels,
+} from "@giselle-sdk/language-model";
 import {
 	AISDKError,
 	type ToolSet,
@@ -52,6 +58,13 @@ export async function generateText(args: {
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
 	}
+	const languageModel = languageModels.find(
+		(lm) => lm.id === actionNode.content.llm.id,
+	);
+	if (!languageModel) {
+		throw new Error("Invalid language model");
+	}
+	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
@@ -258,6 +271,21 @@ export async function generateText(args: {
 		}
 	}
 
+	if (
+		actionNode.content.llm.provider === "openai" &&
+		actionNode.content.tools?.openaiWebSearch &&
+		hasCapability(languageModel, Capability.SearchGrounding)
+	)
+		preparedToolSet = {
+			...preparedToolSet,
+			toolSet: {
+				...preparedToolSet.toolSet,
+				openaiWebSearch: openai.tools.webSearchPreview(
+					actionNode.content.tools.openaiWebSearch,
+				),
+			},
+		};
+
 	// if (
 	// 	actionNode.content.tools?.github &&
 	// 	args.context.integrationConfigs?.github
@@ -350,10 +378,9 @@ export async function generateText(args: {
 		},
 		async onFinish(event) {
 			const generationOutputs: GenerationOutput[] = [];
-			const generatedTextOutput =
-				runningGeneration.context.actionNode.outputs.find(
-					(output) => output.accessor === "generated-text",
-				);
+			const generatedTextOutput = generationContext.actionNode.outputs.find(
+				(output) => output.accessor === "generated-text",
+			);
 			if (generatedTextOutput !== undefined) {
 				generationOutputs.push({
 					type: "generated-text",
@@ -361,7 +388,7 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			const reasoningOutput = runningGeneration.context.actionNode.outputs.find(
+			const reasoningOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "reasoning",
 			);
 			if (reasoningOutput !== undefined && event.reasoning !== undefined) {
@@ -371,7 +398,7 @@ export async function generateText(args: {
 					outputId: reasoningOutput.id,
 				});
 			}
-			const sourceOutput = runningGeneration.context.actionNode.outputs.find(
+			const sourceOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "source",
 			);
 			if (sourceOutput !== undefined && event.sources.length > 0) {
@@ -467,7 +494,7 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			return anthropic(languageModel.id);
 		}
 		case "openai": {
-			return openai(languageModel.id);
+			return openai.responses(languageModel.id);
 		}
 		case "google": {
 			return google(languageModel.id, {

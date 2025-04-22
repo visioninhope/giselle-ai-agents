@@ -3,7 +3,7 @@ export type { Message as AISdkMessage } from "@ai-sdk/react";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod";
 import { NodeId } from "../node";
-import { GenerationContext, GenerationOrigin } from "./context";
+import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
 export * from "./context";
 export * from "./template";
@@ -65,7 +65,7 @@ export const Generation = z
 	.object({
 		// Common fields for all generations
 		id: GenerationId.schema,
-		context: GenerationContext,
+		context: GenerationContextLike,
 		status: GenerationStatus,
 		createdAt: z.number(),
 
@@ -130,7 +130,7 @@ export type Generation = z.infer<typeof Generation>;
 // Specific schema validators for each generation status
 export const CreatedGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusCreated,
 	createdAt: z.number(),
 	messages: z.undefined(),
@@ -148,7 +148,7 @@ export function isCreatedGeneration(
 
 export const QueuedGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusQueued,
 	createdAt: z.number(),
 	queuedAt: z.number(),
@@ -167,7 +167,7 @@ export function isQueuedGeneration(
 
 export const RunningGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusRunning,
 	createdAt: z.number(),
 	queuedAt: z.number(),
@@ -187,7 +187,7 @@ export function isRunningGeneration(
 
 export const CompletedGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusCompleted,
 	createdAt: z.number(),
 	queuedAt: z.number(),
@@ -209,7 +209,7 @@ export function isCompletedGeneration(
 
 export const FailedGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusFailed,
 	createdAt: z.number(),
 	queuedAt: z.number(),
@@ -231,7 +231,7 @@ export function isFailedGeneration(
 
 export const CancelledGeneration = z.object({
 	id: GenerationId.schema,
-	context: GenerationContext,
+	context: GenerationContextLike,
 	status: GenerationStatusCancelled,
 	createdAt: z.number(),
 	cancelledAt: z.number(),
