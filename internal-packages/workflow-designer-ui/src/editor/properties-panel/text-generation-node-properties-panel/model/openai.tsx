@@ -1,6 +1,11 @@
 import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
-import { openaiLanguageModels } from "@giselle-sdk/language-model";
+import {
+	Capability,
+	hasCapability,
+	openaiLanguageModels,
+} from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
+import { useMemo } from "react";
 import {
 	Select,
 	SelectContent,
@@ -27,6 +32,10 @@ export function OpenAIModelPanel({
 	onWebSearchChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
+	const languageModel = useMemo(
+		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
+		[openaiLanguageModel.id],
+	);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -163,6 +172,12 @@ export function OpenAIModelPanel({
 							onToolChange(changedTools);
 							onWebSearchChange(checked);
 						}}
+						note={
+							languageModel &&
+							tools?.openaiWebSearch &&
+							!hasCapability(languageModel, Capability.SearchGrounding) &&
+							"Web search will not use since the current model does not support web search"
+						}
 					/>
 				</div>
 			</div>

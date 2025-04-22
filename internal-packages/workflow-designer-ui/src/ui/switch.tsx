@@ -1,16 +1,19 @@
 import clsx from "clsx/lite";
 import { Switch as RadixSwitch } from "radix-ui";
+import type { ReactNode } from "react";
 
 export const Switch = ({
 	label,
 	name,
 	checked,
 	onCheckedChange,
+	note,
 }: {
 	label: string;
 	name: string;
 	checked?: boolean;
 	onCheckedChange?: (checked: boolean) => void;
+	note?: ReactNode;
 }) => (
 	<div className="flex flex-col">
 		<label className="text-[14px] py-[1.5px]" htmlFor={name}>
@@ -34,5 +37,6 @@ export const Switch = ({
 				)}
 			/>
 		</RadixSwitch.Root>
+		{note && <p className="text-[14px] text-black-200">{note}</p>}
 	</div>
 );

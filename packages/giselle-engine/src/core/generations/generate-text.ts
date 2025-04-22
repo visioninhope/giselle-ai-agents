@@ -21,6 +21,11 @@ import {
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
+	Capability,
+	hasCapability,
+	languageModels,
+} from "@giselle-sdk/language-model";
+import {
 	AISDKError,
 	type ToolSet,
 	appendResponseMessages,
@@ -52,6 +57,12 @@ export async function generateText(args: {
 	const actionNode = args.generation.context.actionNode;
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
+	}
+	const languageModel = languageModels.find(
+		(lm) => lm.id === actionNode.content.llm.id,
+	);
+	if (!languageModel) {
+		throw new Error("Invalid language model");
 	}
 	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
@@ -262,8 +273,9 @@ export async function generateText(args: {
 
 	if (
 		actionNode.content.llm.provider === "openai" &&
-		actionNode.content.tools?.openaiWebSearch
-	) {
+		actionNode.content.tools?.openaiWebSearch &&
+		hasCapability(languageModel, Capability.SearchGrounding)
+	)
 		preparedToolSet = {
 			...preparedToolSet,
 			toolSet: {
@@ -273,7 +285,6 @@ export async function generateText(args: {
 				),
 			},
 		};
-	}
 
 	// if (
 	// 	actionNode.content.tools?.github &&
