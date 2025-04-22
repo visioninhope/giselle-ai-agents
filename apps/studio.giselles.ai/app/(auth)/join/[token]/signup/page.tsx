@@ -2,7 +2,7 @@ import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
-import { fetchInvitationToken } from "../invitation-token";
+import { fetchInvitationToken } from "../invitation";
 import { SignupForm } from "./form";
 
 export default async function Page({

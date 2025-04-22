@@ -2,7 +2,8 @@ import { ActionPrompt } from "@/app/(auth)/components/action-prompt";
 import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clickable-text";
 import Link from "next/link";
-import { type ErrorCode, signoutUser } from "./actions";
+import { signoutUser } from "./actions";
+import type { ErrorCode } from "./errors";
 
 const errorMessages: Record<ErrorCode, string> = {
 	expired: "This invitation has expired.",

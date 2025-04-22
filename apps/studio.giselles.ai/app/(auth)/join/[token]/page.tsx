@@ -12,7 +12,7 @@ import {
 	ExpiredError,
 	WrongEmailError,
 } from "./error-components";
-import { fetchInvitationToken } from "./invitation-token";
+import { fetchInvitationToken } from "./invitation";
 
 export default async function Page({
 	params,

@@ -1,6 +1,6 @@
 import { teamInvitationViaEmailFlag } from "@/flags";
 import { notFound } from "next/navigation";
-import { fetchInvitationToken } from "../../invitation-token";
+import { fetchInvitationToken } from "../../invitation";
 import { JoinVerifyForm } from "./form";
 
 export default async function Page({

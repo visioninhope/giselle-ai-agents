@@ -2,7 +2,10 @@
 
 import { createClient } from "@/lib/supabase";
 import { initializeAccount } from "@/services/accounts";
+import { captureException } from "@sentry/nextjs";
 import { redirect } from "next/navigation";
+import { JoinError } from "../../errors";
+import { acceptInvitation } from "../../invitation";
 
 export async function verifyJoinEmail(formData: FormData) {
 	const invitedEmail = formData.get("invitedEmail") as string;
@@ -21,7 +24,18 @@ export async function verifyJoinEmail(formData: FormData) {
 		return { error: "No user returned" };
 	}
 	await initializeAccount(data.user.id, data.user.email);
-	redirect(`/join/${invitationToken}`);
+
+	// After successful email verification, automatically join the team
+	try {
+		await acceptInvitation(invitationToken);
+	} catch (err: unknown) {
+		if (err instanceof JoinError) {
+			redirect(`/join/${encodeURIComponent(invitationToken)}`);
+		}
+		captureException(err);
+		redirect(`/join/${encodeURIComponent(invitationToken)}`);
+	}
+	redirect("/join/success");
 }
 
 export async function resendJoinOtp(formData: FormData) {
