@@ -1,6 +1,11 @@
-import { OpenAILanguageModelData } from "@giselle-sdk/data-type";
-import { openaiLanguageModels } from "@giselle-sdk/language-model";
+import { OpenAILanguageModelData, type ToolSet } from "@giselle-sdk/data-type";
+import {
+	Capability,
+	hasCapability,
+	openaiLanguageModels,
+} from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
+import { useMemo } from "react";
 import {
 	Select,
 	SelectContent,
@@ -10,16 +15,27 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
+import { Switch } from "../../../../ui/switch";
 import { languageModelAvailable } from "./utils";
 
 export function OpenAIModelPanel({
 	openaiLanguageModel,
 	onModelChange,
+	tools,
+	onToolChange,
+	onWebSearchChange,
 }: {
 	openaiLanguageModel: OpenAILanguageModelData;
 	onModelChange: (changedValue: OpenAILanguageModelData) => void;
+	tools?: ToolSet;
+	onToolChange: (changedValue: ToolSet) => void;
+	onWebSearchChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
+	const languageModel = useMemo(
+		() => openaiLanguageModels.find((lm) => lm.id === openaiLanguageModel.id),
+		[openaiLanguageModel.id],
+	);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -124,6 +140,44 @@ export function OpenAIModelPanel({
 								}),
 							);
 						}}
+					/>
+					<Switch
+						label="Web Search"
+						name="webSearch"
+						checked={!!tools?.openaiWebSearch}
+						onCheckedChange={(checked) => {
+							let changedTools: ToolSet = {};
+							for (const toolName of Object.keys(tools ?? {})) {
+								const tool = tools?.[toolName as keyof ToolSet];
+
+								if (
+									tool === undefined ||
+									(!checked && toolName === "openaiWebSearch")
+								) {
+									continue;
+								}
+								changedTools = {
+									...changedTools,
+									[toolName]: tool,
+								};
+							}
+							if (checked) {
+								changedTools = {
+									...tools,
+									openaiWebSearch: {
+										searchContextSize: "medium",
+									},
+								};
+							}
+							onToolChange(changedTools);
+							onWebSearchChange(checked);
+						}}
+						note={
+							languageModel &&
+							tools?.openaiWebSearch &&
+							!hasCapability(languageModel, Capability.SearchGrounding) &&
+							"Web search will not use since the current model does not support web search"
+						}
 					/>
 				</div>
 			</div>

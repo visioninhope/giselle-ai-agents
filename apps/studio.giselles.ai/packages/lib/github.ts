@@ -2,6 +2,7 @@
 
 import { db, type githubIntegrationSettings } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
+import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
 	GitHubIntegrationInstalledState,
 	GitHubIntegrationInvalidCredentialState,
@@ -30,6 +31,7 @@ export async function getGitHubIntegrationState(
 	if (installations.length === 0) {
 		return {
 			status: "not-installed",
+			installationUrl: await gitHubAppInstallURL(),
 		};
 	}
 

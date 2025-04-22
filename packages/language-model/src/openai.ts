@@ -27,7 +27,10 @@ type OpenAILanguageModel = z.infer<typeof OpenAILanguageModel>;
 const gpt4o: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-4o",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.SearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -35,7 +38,10 @@ const gpt4o: OpenAILanguageModel = {
 const gpt4oMini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-4o-mini",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.SearchGrounding,
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
@@ -67,7 +73,10 @@ const o3Mini: OpenAILanguageModel = {
 const gpt41: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-4.1",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.SearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -75,7 +84,10 @@ const gpt41: OpenAILanguageModel = {
 const gpt41mini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "gpt-4.1-mini",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.SearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };

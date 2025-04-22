@@ -19,6 +19,7 @@ export type GitHubIntegrationInvalidCredentialState = z.infer<
 >;
 export const GitHubIntegrationNotInstalledState = z.object({
 	status: z.literal("not-installed"),
+	installationUrl: z.string().url(),
 });
 export type GitHubIntegrationNotInstalledState = z.infer<
 	typeof GitHubIntegrationNotInstalledState

@@ -7,6 +7,7 @@ import {
 	type CompletedGeneration,
 	type FailedGeneration,
 	type FileData,
+	GenerationContext,
 	type GenerationOutput,
 	type NodeId,
 	type Output,
@@ -20,6 +21,11 @@ import {
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
+	Capability,
+	hasCapability,
+	languageModels,
+} from "@giselle-sdk/language-model";
+import {
 	AISDKError,
 	type ToolSet,
 	appendResponseMessages,
@@ -28,7 +34,8 @@ import {
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import type { TelemetrySettings } from "./types";
+import { createPostgresTools } from "./tools/postgres";
+import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	checkUsageLimits,
@@ -51,6 +58,13 @@ export async function generateText(args: {
 	if (!isTextGenerationNode(actionNode)) {
 		throw new Error("Invalid generation type");
 	}
+	const languageModel = languageModels.find(
+		(lm) => lm.id === actionNode.content.llm.id,
+	);
+	if (!languageModel) {
+		throw new Error("Invalid language model");
+	}
+	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
 		status: "running",
@@ -204,7 +218,7 @@ export async function generateText(args: {
 		generationContentResolver,
 	);
 
-	let tools: ToolSet = {};
+	let preparedToolSet: PreparedToolSet = { toolSet: {}, cleanupFunctions: [] };
 	if (actionNode.content.tools?.github?.auth) {
 		const decryptToken = await args.context.vault?.decrypt(
 			actionNode.content.tools.github.auth.token,
@@ -218,13 +232,59 @@ export async function generateText(args: {
 		);
 		for (const tool of actionNode.content.tools.github.tools) {
 			if (tool in allGitHubTools) {
-				tools = {
-					...tools,
-					[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						[tool]: allGitHubTools[tool as keyof typeof allGitHubTools],
+					},
 				};
 			}
 		}
 	}
+
+	if (actionNode.content.tools?.postgres?.connectionString) {
+		const connectionString = await args.context.vault?.decrypt(
+			actionNode.content.tools.postgres.connectionString,
+		);
+		const postgresTool = createPostgresTools(
+			connectionString ?? actionNode.content.tools.postgres.connectionString,
+		);
+		for (const tool of actionNode.content.tools.postgres.tools) {
+			if (tool in postgresTool.toolSet) {
+				preparedToolSet = {
+					...preparedToolSet,
+					toolSet: {
+						...preparedToolSet.toolSet,
+						[tool]:
+							postgresTool.toolSet[tool as keyof typeof postgresTool.toolSet],
+					},
+				};
+			}
+			preparedToolSet = {
+				...preparedToolSet,
+				cleanupFunctions: [
+					...preparedToolSet.cleanupFunctions,
+					postgresTool.cleanup,
+				],
+			};
+		}
+	}
+
+	if (
+		actionNode.content.llm.provider === "openai" &&
+		actionNode.content.tools?.openaiWebSearch &&
+		hasCapability(languageModel, Capability.SearchGrounding)
+	)
+		preparedToolSet = {
+			...preparedToolSet,
+			toolSet: {
+				...preparedToolSet.toolSet,
+				openaiWebSearch: openai.tools.webSearchPreview(
+					actionNode.content.tools.openaiWebSearch,
+				),
+			},
+		};
 
 	// if (
 	// 	actionNode.content.tools?.github &&
@@ -275,7 +335,7 @@ export async function generateText(args: {
 		model: generationModel(actionNode.content.llm),
 		messages,
 		maxSteps: 5, // enable multi-step calls
-		tools,
+		tools: preparedToolSet.toolSet,
 		experimental_continueSteps: true,
 		onError: async ({ error }) => {
 			if (AISDKError.isInstance(error)) {
@@ -309,13 +369,18 @@ export async function generateText(args: {
 					}),
 				]);
 			}
+
+			await Promise.all(
+				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+					cleanupFunction(),
+				),
+			);
 		},
 		async onFinish(event) {
 			const generationOutputs: GenerationOutput[] = [];
-			const generatedTextOutput =
-				runningGeneration.context.actionNode.outputs.find(
-					(output) => output.accessor === "generated-text",
-				);
+			const generatedTextOutput = generationContext.actionNode.outputs.find(
+				(output) => output.accessor === "generated-text",
+			);
 			if (generatedTextOutput !== undefined) {
 				generationOutputs.push({
 					type: "generated-text",
@@ -323,7 +388,7 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			const reasoningOutput = runningGeneration.context.actionNode.outputs.find(
+			const reasoningOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "reasoning",
 			);
 			if (reasoningOutput !== undefined && event.reasoning !== undefined) {
@@ -333,7 +398,7 @@ export async function generateText(args: {
 					outputId: reasoningOutput.id,
 				});
 			}
-			const sourceOutput = runningGeneration.context.actionNode.outputs.find(
+			const sourceOutput = generationContext.actionNode.outputs.find(
 				(output) => output.accessor === "source",
 			);
 			if (sourceOutput !== undefined && event.sources.length > 0) {
@@ -408,6 +473,11 @@ export async function generateText(args: {
 				generation: completedGeneration,
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			});
+			await Promise.all(
+				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+					cleanupFunction(),
+				),
+			);
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,
@@ -424,7 +494,7 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			return anthropic(languageModel.id);
 		}
 		case "openai": {
-			return openai(languageModel.id);
+			return openai.responses(languageModel.id);
 		}
 		case "google": {
 			return google(languageModel.id, {
