@@ -1,4 +1,9 @@
-import { OutputId, type TextGenerationNode } from "@giselle-sdk/data-type";
+import {
+	type Output,
+	OutputId,
+	type TextGenerationNode,
+	type ToolSet,
+} from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
@@ -195,6 +200,80 @@ export function TextGenerationNodePropertiesPanel({
 												tools: changedTool,
 											})
 										}
+										onWebSearchChange={(enable) => {
+											if (node.content.llm.provider !== "openai") {
+												return;
+											}
+											const updateTools: ToolSet = {
+												...node.content.tools,
+												openaiWebSearch: enable
+													? {
+															searchContextSize: "medium",
+														}
+													: undefined,
+											};
+											const updateOutputs: Output[] = enable
+												? [
+														...node.outputs,
+														{
+															id: OutputId.generate(),
+															label: "Source",
+															accessor: "source",
+														},
+													]
+												: node.outputs.filter(
+														(output) => output.accessor !== "source",
+													);
+											if (!enable) {
+												const sourceOutput = node.outputs.find(
+													(output) => output.accessor === "source",
+												);
+												if (sourceOutput) {
+													for (const connection of data.connections) {
+														if (connection.outputId !== sourceOutput.id) {
+															continue;
+														}
+														deleteConnection(connection.id);
+
+														const connectedNode = data.nodes.find(
+															(node) => node.id === connection.inputNode.id,
+														);
+														if (connectedNode === undefined) {
+															continue;
+														}
+														if (connectedNode.type === "action") {
+															switch (connectedNode.content.type) {
+																case "textGeneration":
+																case "imageGeneration": {
+																	updateNodeData(connectedNode, {
+																		inputs: connectedNode.inputs.filter(
+																			(input) =>
+																				input.id !== connection.inputId,
+																		),
+																	});
+																	break;
+																}
+																default: {
+																	const _exhaustiveCheck: never =
+																		connectedNode.content;
+																	throw new Error(
+																		`Unhandled node type: ${_exhaustiveCheck}`,
+																	);
+																}
+															}
+														}
+													}
+												}
+											}
+											updateNodeData(node, {
+												...node,
+												content: {
+													...node.content,
+													tools: updateTools,
+												},
+												outputs: updateOutputs,
+											});
+										}}
 									/>
 								)}
 								{node.content.llm.provider === "google" && (

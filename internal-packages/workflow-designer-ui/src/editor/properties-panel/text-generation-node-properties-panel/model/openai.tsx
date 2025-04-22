@@ -18,11 +18,13 @@ export function OpenAIModelPanel({
 	onModelChange,
 	tools,
 	onToolChange,
+	onWebSearchChange,
 }: {
 	openaiLanguageModel: OpenAILanguageModelData;
 	onModelChange: (changedValue: OpenAILanguageModelData) => void;
 	tools?: ToolSet;
 	onToolChange: (changedValue: ToolSet) => void;
+	onWebSearchChange: (enabled: boolean) => void;
 }) {
 	const limits = useUsageLimits();
 
@@ -159,6 +161,7 @@ export function OpenAIModelPanel({
 								};
 							}
 							onToolChange(changedTools);
+							onWebSearchChange(checked);
 						}}
 					/>
 				</div>
