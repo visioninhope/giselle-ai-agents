@@ -9,7 +9,7 @@ import {
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { TriangleAlertIcon } from "lucide-react";
-import { useCallback, useRef, useState } from "react";
+import { useCallback, useRef, useState, useTransition } from "react";
 import { resendJoinOtp, verifyJoinEmail } from "./actions";
 
 export function JoinVerifyForm({
@@ -17,7 +17,7 @@ export function JoinVerifyForm({
 	invitationToken,
 }: { invitedEmail: string; invitationToken: string }) {
 	const [error, setError] = useState<string | null>(null);
-	const [isPending, setIsPending] = useState(false);
+	const [isPending, startTransition] = useTransition();
 	const [resendState, setResendState] = useState<{
 		code: string;
 		message: string;
@@ -25,16 +25,16 @@ export function JoinVerifyForm({
 	const formRef = useRef<HTMLFormElement>(null);
 
 	const handleSubmit = useCallback(
-		async (formData: FormData) => {
+		(formData: FormData) => {
 			setError(null);
-			setIsPending(true);
 			formData.set("invitedEmail", invitedEmail);
 			formData.set("invitationToken", invitationToken);
-			const result = await verifyJoinEmail(formData);
-			if (result?.error) {
-				setError(result.error);
-				setIsPending(false);
-			}
+			startTransition(async () => {
+				const result = await verifyJoinEmail(formData);
+				if (result?.error) {
+					setError(result.error);
+				}
+			});
 		},
 		[invitedEmail, invitationToken],
 	);

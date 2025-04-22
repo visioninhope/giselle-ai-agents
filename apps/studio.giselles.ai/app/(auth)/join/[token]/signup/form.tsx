@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
-import { useCallback, useState } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { signupJoin } from "./actions";
 
 interface SignupFormProps {
@@ -17,7 +17,7 @@ export const SignupForm = (props: SignupFormProps) => {
 	const [password, setPassword] = useState("");
 	const [confirmPassword, setConfirmPassword] = useState("");
 	const [error, setError] = useState<string | null>(null);
-	const [joining, setJoining] = useState(false);
+	const [isPending, startTransition] = useTransition();
 
 	const handleValidate = useCallback(() => {
 		if (password !== confirmPassword) {
@@ -29,17 +29,17 @@ export const SignupForm = (props: SignupFormProps) => {
 	}, [password, confirmPassword]);
 
 	const handleSubmit = useCallback(
-		async (formData: FormData) => {
+		(formData: FormData) => {
 			if (!handleValidate()) return;
-			setJoining(true);
 			formData.set("token", props.token);
 			formData.set("email", props.email);
 			formData.set("password", password);
-			const result = await signupJoin(formData);
-			if (result?.error) {
-				setError(result.error);
-				setJoining(false);
-			}
+			startTransition(async () => {
+				const result = await signupJoin(formData);
+				if (result?.error) {
+					setError(result.error);
+				}
+			});
 		},
 		[props.token, props.email, password, handleValidate],
 	);
@@ -113,10 +113,10 @@ export const SignupForm = (props: SignupFormProps) => {
 					<Button
 						className="w-full font-medium"
 						type="submit"
-						disabled={joining}
-						data-loading={joining}
+						disabled={isPending}
+						data-loading={isPending}
 					>
-						{joining ? "Joining..." : "Join to team"}
+						{isPending ? "Joining..." : "Join to team"}
 					</Button>
 				</div>
 			</div>
