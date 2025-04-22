@@ -34,7 +34,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 						</h2>
 					</div>
 					<div className="grid gap-[16px]">
-						<SignupForm email={token.invitedEmail} />
+						<SignupForm email={token.invitedEmail} token={params.token} />
 
 						<div className="text-center text-sm text-slate-400">
 							Already have a Giselle account?{" "}

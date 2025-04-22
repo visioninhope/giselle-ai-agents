@@ -5,10 +5,12 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useState } from "react";
+import { signupJoin } from "./actions";
 
 interface SignupFormProps {
 	email: string;
+	token: string;
 }
 
 export const SignupForm = (props: SignupFormProps) => {
@@ -17,26 +19,35 @@ export const SignupForm = (props: SignupFormProps) => {
 	const [error, setError] = useState<string | null>(null);
 	const [joining, setJoining] = useState(false);
 
-	const handleSubmit = (e: React.FormEvent) => {
-		e.preventDefault();
-
+	const handleValidate = useCallback(() => {
 		if (password !== confirmPassword) {
 			setError("Passwords do not match");
-			return;
+			return false;
 		}
-
-		setJoining(true);
 		setError(null);
+		return true;
+	}, [password, confirmPassword]);
 
-		// In actual implementation, call the team join API here
-		setTimeout(() => {
-			alert("Join team functionality would be implemented here");
-			setJoining(false);
-		}, 500);
-	};
+	const handleSubmit = useCallback(
+		async (formData: FormData) => {
+			if (!handleValidate()) return;
+			setJoining(true);
+			formData.set("token", props.token);
+			formData.set("email", props.email);
+			formData.set("password", password);
+			const result = await signupJoin(formData);
+			if (result?.error) {
+				setError(result.error);
+				setJoining(false);
+			}
+		},
+		[props.token, props.email, password, handleValidate],
+	);
 
 	return (
-		<form onSubmit={handleSubmit} className="font-hubot">
+		<form action={handleSubmit} className="font-hubot">
+			<input type="hidden" name="token" value={props.token} />
+			<input type="hidden" name="email" value={props.email} />
 			<div className="grid gap-6">
 				{error && (
 					<Alert variant="destructive">
