@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { TriangleAlertIcon } from "lucide-react";
 import { useState, useTransition } from "react";
-import { loginUser } from "../../actions";
+import { loginUser } from "./actions";
 
 interface LoginFormProps {
 	email: string;

@@ -12,9 +12,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { User } from "@supabase/supabase-js";
 import { and, eq } from "drizzle-orm";
 import { redirect } from "next/navigation";
-import { JoinError } from "./errors";
-import { fetchInvitationToken } from "./utils/invitation-token";
-import { redirectToErrorPage } from "./utils/redirect-to-error-page";
+import { fetchInvitationToken } from "./invitation-token";
 
 export async function signoutUser(formData: FormData) {
 	const token = formData.get("token") as string;
@@ -23,17 +21,14 @@ export async function signoutUser(formData: FormData) {
 	redirect(`/join/${encodeURIComponent(token)}/login`);
 }
 
-export async function loginUser(formData: FormData) {
-	const email = formData.get("email") as string;
-	const password = formData.get("password") as string;
-	const token = formData.get("token") as string;
-	const supabase = await createClient();
-	const { error } = await supabase.auth.signInWithPassword({ email, password });
-	if (error) {
-		return { error: error.message };
+export type ErrorCode = "expired" | "wrong_email" | "already_member";
+
+class JoinError extends Error {
+	code: ErrorCode;
+	constructor(code: ErrorCode, message?: string) {
+		super(message ?? code);
+		this.code = code;
 	}
-	// If success, redirect to the join page
-	redirect(`/join/${token}`);
 }
 
 export async function joinTeam(formData: FormData) {
@@ -99,11 +94,11 @@ export async function joinTeam(formData: FormData) {
 		});
 	} catch (err: unknown) {
 		if (err instanceof JoinError) {
-			redirectToErrorPage(token, err.code);
+			redirect(`/join/${encodeURIComponent(token)}`);
 			return;
 		}
 		console.error(err);
-		redirectToErrorPage(token, "expired");
+		redirect(`/join/${encodeURIComponent(token)}`);
 		return;
 	}
 

@@ -2,8 +2,7 @@ import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
-import { fetchInvitationToken } from "../../utils/invitation-token";
-import { redirectToErrorPage } from "../../utils/redirect-to-error-page";
+import { fetchInvitationToken } from "../invitation-token";
 import { LoginForm } from "./form";
 
 export default async function Page({ params }: { params: { token: string } }) {
@@ -17,7 +16,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 		return notFound();
 	}
 	if (tokenObj.expiredAt < new Date()) {
-		redirectToErrorPage("expired");
+		return notFound();
 	}
 
 	return (

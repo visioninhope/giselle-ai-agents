@@ -2,8 +2,7 @@ import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
-import { fetchInvitationToken } from "../../utils/invitation-token";
-import { redirectToErrorPage } from "../../utils/redirect-to-error-page";
+import { fetchInvitationToken } from "../invitation-token";
 import { SignupForm } from "./form";
 
 export default async function Page({
@@ -20,7 +19,7 @@ export default async function Page({
 		return notFound();
 	}
 	if (tokenObj.expiredAt < new Date()) {
-		redirectToErrorPage(token, "expired");
+		return notFound();
 	}
 
 	return (

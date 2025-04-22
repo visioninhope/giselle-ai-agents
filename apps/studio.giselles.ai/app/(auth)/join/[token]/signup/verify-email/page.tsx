@@ -1,5 +1,5 @@
 import { notFound } from "next/navigation";
-import { fetchInvitationToken } from "../../../utils/invitation-token";
+import { fetchInvitationToken } from "../../invitation-token";
 import { JoinVerifyForm } from "./form";
 
 export default async function Page({

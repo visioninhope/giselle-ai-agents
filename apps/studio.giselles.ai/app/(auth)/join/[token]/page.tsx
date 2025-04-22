@@ -6,9 +6,13 @@ import type { User } from "@supabase/auth-js";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { joinTeam } from "../actions";
-import { fetchInvitationToken } from "../utils/invitation-token";
-import { redirectToErrorPage } from "../utils/redirect-to-error-page";
+import { joinTeam } from "./actions";
+import {
+	AlreadyMemberError,
+	ExpiredError,
+	WrongEmailError,
+} from "./error-components";
+import { fetchInvitationToken } from "./invitation-token";
 
 export default async function Page({
 	params,
@@ -24,18 +28,19 @@ export default async function Page({
 		return notFound();
 	}
 	if (token.expiredAt < new Date()) {
-		redirectToErrorPage(tokenParam, "expired");
+		return <ExpiredError />;
 	}
 
 	let user: User | null = null;
 	try {
 		user = await getUser();
 	} catch (e) {
+		// redirect to login page
 		redirect(`/join/${encodeURIComponent(tokenParam)}/login`);
 	}
 
 	if (user.email !== token.invitedEmail) {
-		redirectToErrorPage(tokenParam, "wrong_email");
+		return <WrongEmailError teamName={token.teamName} token={tokenParam} />;
 	}
 
 	const userDb = await db
@@ -59,7 +64,7 @@ export default async function Page({
 			)
 			.limit(1);
 		if (membership.length > 0) {
-			redirectToErrorPage(tokenParam, "already_member");
+			return <AlreadyMemberError />;
 		}
 	}
 
