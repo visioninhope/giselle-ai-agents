@@ -1,5 +1,5 @@
 import { teamInvitationViaEmailFlag } from "@/flags";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { fetchInvitationToken } from "../../invitation";
 import { JoinVerifyForm } from "./form";
 
@@ -20,7 +20,7 @@ export default async function Page({
 	}
 
 	if (tokenObj.expiredAt < new Date()) {
-		return notFound();
+		redirect(`/join/${encodeURIComponent(token)}`);
 	}
 
 	return (

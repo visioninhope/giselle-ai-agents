@@ -1,6 +1,6 @@
 import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
 import { declineInvitation } from "../actions";
 import { fetchInvitationToken } from "../invitation";
@@ -17,7 +17,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 		return notFound();
 	}
 	if (tokenObj.expiredAt < new Date()) {
-		return notFound();
+		redirect(`/join/${encodeURIComponent(params.token)}`);
 	}
 
 	return (
