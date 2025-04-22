@@ -9,7 +9,7 @@ import {
 	InputOTPSlot,
 } from "@/components/ui/input-otp";
 import { TriangleAlertIcon } from "lucide-react";
-import { useCallback, useRef, useState, useTransition } from "react";
+import { useCallback, useState, useTransition } from "react";
 import { resendJoinOtp, verifyJoinEmail } from "./actions";
 
 export function JoinVerifyForm({
@@ -22,7 +22,6 @@ export function JoinVerifyForm({
 		code: string;
 		message: string;
 	} | null>(null);
-	const formRef = useRef<HTMLFormElement>(null);
 
 	const handleSubmit = useCallback(
 		(formData: FormData) => {
@@ -58,7 +57,7 @@ export function JoinVerifyForm({
 	);
 
 	return (
-		<form ref={formRef} action={handleSubmit} className="flex justify-center">
+		<form action={handleSubmit} className="flex justify-center">
 			<div className="grid gap-4">
 				{error && (
 					<Alert variant="destructive">
