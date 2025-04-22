@@ -95,17 +95,15 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 		},
 
 		async getItem(key, opts) {
-			if (opts?.signedUrl) {
+			if (opts?.publicURL) {
 				const path = r(key);
-				const { data, error } = await supabase.storage
-					.from(bucket)
-					.createSignedUrl(path, opts.expiresIn || 60 * 60);
+				const { data } = supabase.storage.from(bucket).getPublicUrl(path);
 
-				if (error || !data.signedUrl) {
+				if (!data.publicUrl) {
 					return null;
 				}
 
-				return data.signedUrl;
+				return data.publicUrl;
 			}
 
 			let path = r(key);

@@ -1,6 +1,6 @@
 "use server";
 
-import { storage } from "@/app/giselle-engine";
+import { publicStorage } from "@/app/giselle-engine";
 import {
 	type TeamRole,
 	type UserId,
@@ -18,7 +18,7 @@ import {
 } from "@/services/accounts";
 import { isTeamId } from "@/services/teams";
 import { eq } from "drizzle-orm";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { deleteTeamMember } from "../team/actions";
@@ -51,7 +51,7 @@ export async function getAccountInfo() {
 	try {
 		const supabaseUser = await getUser();
 
-		const _users = await db
+		const [user] = await db
 			.select({
 				displayName: users.displayName,
 				email: users.email,
@@ -64,14 +64,7 @@ export async function getAccountInfo() {
 			)
 			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
-		const user = _users[0];
-		const avatarUrl = user.avatarUrl
-			? await getAvatarUrl(user.avatarUrl)
-			: null;
-		return {
-			...user,
-			avatarUrl,
-		};
+		return user;
 	} catch (error) {
 		logger.error("Failed to get account info:", error);
 		throw error;
@@ -163,49 +156,9 @@ function getExtensionFromMimeType(mimeType: string): string {
 	);
 }
 
-/**
- * Gets a cached avatar URL, either returning an external URL directly or generating a signed URL for Supabase storage
- *
- * @param path - The path to the avatar image (full URL for external sources, storage path for Supabase)
- * @returns A URL that can be used to display the avatar
- *
- * Note on timing:
- * - Signed URL is set to expire in 1 hour (3600 seconds)
- * - Cache is set to revalidate in 55 minutes (3300 seconds)
- * This 5-minute buffer ensures we generate a new signed URL before the current one expires
- */
-const getAvatarUrl = unstable_cache(
-	async (path: string): Promise<string> => {
-		if (path.startsWith("https://")) {
-			return path;
-		}
-
-		try {
-			const signedUrl = await storage.getItem(path, {
-				signedUrl: true,
-				expiresIn: 60 * 60, // 1 hour expiry for signed URL
-			});
-
-			if (!signedUrl || typeof signedUrl !== "string") {
-				throw new Error("Failed to generate signed URL");
-			}
-
-			return signedUrl;
-		} catch (error) {
-			logger.error("Failed to generate signed URL:", error);
-			throw new Error("Failed to generate avatar URL");
-		}
-	},
-	["avatar-url"],
-	{
-		revalidate: 55 * 60, // Revalidate cache after 55 minutes
-		tags: ["avatar-url"],
-	},
-);
-
 export async function updateAvatar(formData: FormData) {
 	try {
-		const user = await getUser();
+		const supabaseUser = await getUser();
 
 		const file = formData.get("avatar") as File | null;
 		if (!file) {
@@ -231,42 +184,53 @@ export async function updateAvatar(formData: FormData) {
 				supabaseUserMappings,
 				eq(users.dbId, supabaseUserMappings.userDbId),
 			)
-			.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
 		const ext = getExtensionFromMimeType(file.type);
-		const filePath = `avatars/${user.id}.${ext}`;
+		const filePath = `avatars/${supabaseUser.id}.${ext}`;
 
 		const arrayBuffer = await file.arrayBuffer();
 		const buffer = Buffer.from(arrayBuffer);
 
-		await storage.setItemRaw(filePath, buffer, {
+		await publicStorage.setItemRaw(filePath, buffer, {
 			contentType: file.type,
 		});
 
 		if (currentUser?.avatarUrl && currentUser.avatarUrl !== filePath) {
 			try {
-				await storage.removeItem(currentUser.avatarUrl);
-				logger.debug("Old avatar file removed:", currentUser.avatarUrl);
+				// Extract file path from URL
+				// From: https://xxx.supabase.co/storage/v1/object/public/public-assets/avatars/supabase-user-id.jpg
+				// To: avatars/user-id.jpg
+				const oldPath = currentUser.avatarUrl.split("/public-assets/")[1];
+
+				if (oldPath) {
+					await publicStorage.removeItem(oldPath);
+					logger.debug("Old avatar file removed:", oldPath);
+				}
 			} catch (error) {
 				// Don't fail the update if cleanup fails
 				logger.error("Failed to remove old avatar:", error);
 			}
 		}
 
+		const avatarUrl = await publicStorage.getItem(filePath, {
+			publicURL: true,
+		});
+		if (typeof avatarUrl !== "string") {
+			throw new Error("Failed to get avatar URL");
+		}
+
 		const userDbIdSubquery = db
 			.select({ userDbId: supabaseUserMappings.userDbId })
 			.from(supabaseUserMappings)
-			.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
 		await db
 			.update(users)
-			.set({ avatarUrl: filePath })
+			.set({ avatarUrl })
 			.where(eq(users.dbId, userDbIdSubquery));
 
-		revalidateTag("avatar-url");
 		revalidatePath("/settings/account");
-
-		const avatarUrl = await getAvatarUrl(filePath);
 
 		return {
 			success: true,

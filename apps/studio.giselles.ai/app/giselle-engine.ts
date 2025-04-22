@@ -7,7 +7,15 @@ import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
 import { supabaseVaultDriver } from "@giselle-sdk/supabase-driver";
 import { createStorage } from "unstorage";
 
-export const storage = createStorage({
+export const publicStorage = createStorage({
+	driver: supabaseStorageDriver({
+		supabaseUrl: process.env.SUPABASE_URL ?? "",
+		supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
+		bucket: "public-assets",
+	}),
+});
+
+const storage = createStorage({
 	driver: supabaseStorageDriver({
 		supabaseUrl: process.env.SUPABASE_URL ?? "",
 		supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
