@@ -12,16 +12,7 @@ import { getUser } from "@/lib/supabase/get-user";
 import type { TeamId } from "@/services/teams";
 import type { User } from "@supabase/supabase-js";
 import { and, eq, isNull } from "drizzle-orm";
-
-export type ErrorCode = "expired" | "wrong_email" | "already_member";
-
-class JoinError extends Error {
-	code: ErrorCode;
-	constructor(code: ErrorCode, message?: string) {
-		super(message ?? code);
-		this.code = code;
-	}
-}
+import { JoinError } from "./errors";
 
 export type InvitationToken = {
 	token: string;
