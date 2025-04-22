@@ -1,5 +1,6 @@
 "use server";
 
+import { revokeInvitation } from "@/app/(main)/settings/team/invitation";
 import { createClient } from "@/lib/supabase/server";
 import { captureException } from "@sentry/nextjs";
 import { redirect } from "next/navigation";
@@ -26,4 +27,15 @@ export async function joinTeam(formData: FormData) {
 		redirect(`/join/${encodeURIComponent(token)}`);
 	}
 	redirect("/join/success");
+}
+
+export async function declineInvitation(formData: FormData) {
+	const rawToken = formData.get("token");
+	const token = typeof rawToken === "string" ? rawToken : "";
+	await revokeInvitation(token);
+	const serviceUrl = process.env.NEXT_PUBLIC_SERVICE_SITE_URL;
+	if (!serviceUrl) {
+		throw new Error("NEXT_PUBLIC_SERVICE_SITE_URL is not set");
+	}
+	redirect(serviceUrl);
 }

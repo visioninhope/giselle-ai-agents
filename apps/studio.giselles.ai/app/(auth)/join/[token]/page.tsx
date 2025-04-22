@@ -6,7 +6,7 @@ import type { User } from "@supabase/auth-js";
 import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { joinTeam } from "./actions";
+import { declineInvitation, joinTeam } from "./actions";
 import {
 	AlreadyMemberError,
 	ExpiredError,
@@ -102,12 +102,15 @@ export default async function Page({
 						</div>
 
 						<div className="flex justify-center mt-4">
-							<Link
-								href="#"
-								className="text-white hover:text-white/80 underline"
-							>
-								Decline
-							</Link>
+							<form action={declineInvitation} className="contents">
+								<input type="hidden" name="token" value={tokenParam} />
+								<button
+									type="submit"
+									className="text-white hover:text-white/80 underline"
+								>
+									Decline
+								</button>
+							</form>
 						</div>
 					</div>
 				</div>

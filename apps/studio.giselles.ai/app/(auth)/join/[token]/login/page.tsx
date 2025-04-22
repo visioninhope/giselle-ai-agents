@@ -2,6 +2,7 @@ import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
+import { declineInvitation } from "../actions";
 import { fetchInvitationToken } from "../invitation";
 import { LoginForm } from "./form";
 
@@ -47,12 +48,15 @@ export default async function Page({ params }: { params: { token: string } }) {
 
 						<LegalConsent />
 						<div className="flex justify-center mt-4">
-							<Link
-								href="#"
-								className="text-white hover:text-white/80 underline"
-							>
-								Decline
-							</Link>
+							<form action={declineInvitation} className="contents">
+								<input type="hidden" name="token" value={params.token} />
+								<button
+									type="submit"
+									className="text-white hover:text-white/80 underline"
+								>
+									Decline
+								</button>
+							</form>
 						</div>
 					</div>
 				</div>
