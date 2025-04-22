@@ -45,17 +45,18 @@ export async function createInvitation(
 }
 
 export async function sendInvitationEmail(invitation: Invitation) {
-	const inviter = await db
+	const result = await db
 		.select({
 			displayName: users.displayName,
+			email: users.email,
 		})
 		.from(users)
 		.where(eq(users.dbId, invitation.inviterUserDbId))
 		.limit(1);
-	if (inviter.length === 0) {
+	const inviter = result[0];
+	if (!inviter || !inviter.email) {
 		throw new Error("Inviter not found");
 	}
-	const inviterDisplayName = inviter[0].displayName;
 
 	const team = await db
 		.select({
@@ -71,7 +72,7 @@ export async function sendInvitationEmail(invitation: Invitation) {
 
 	await sendEmail(
 		"Invitation to join team",
-		`You have been invited to join the team ${teamName} by ${inviterDisplayName}.\n\n${buildJoinLink(
+		`You have been invited to join the team ${teamName} by ${inviter.email}.\n\n${buildJoinLink(
 			invitation.token,
 		)}`,
 		[
