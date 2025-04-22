@@ -16,13 +16,13 @@ const errorMessages: Record<ErrorCode, string> = {
 
 export default async function Page({
 	params,
-}: { params: { token: string; code: string } }) {
+}: { params: Promise<{ token: string; code: string }> }) {
+	const { token, code } = await params;
 	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
 	if (!isTeamInvitationViaEmail) {
 		return notFound();
 	}
 
-	const { token, code } = params;
 	if (!token || !code) {
 		return notFound();
 	}

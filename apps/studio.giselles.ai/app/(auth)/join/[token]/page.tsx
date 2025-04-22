@@ -10,29 +10,32 @@ import { joinTeam } from "../actions";
 import { fetchInvitationToken } from "../utils/invitation-token";
 import { redirectToErrorPage } from "../utils/redirect-to-error-page";
 
-export default async function Page({ params }: { params: { token: string } }) {
+export default async function Page({
+	params,
+}: { params: Promise<{ token: string }> }) {
+	const { token: tokenParam } = await params;
 	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
 	if (!isTeamInvitationViaEmail) {
 		return notFound();
 	}
 
-	const token = await fetchInvitationToken(params.token);
+	const token = await fetchInvitationToken(tokenParam);
 	if (!token) {
 		return notFound();
 	}
 	if (token.expiredAt < new Date()) {
-		redirectToErrorPage(params.token, "expired");
+		redirectToErrorPage(tokenParam, "expired");
 	}
 
 	let user: User | null = null;
 	try {
 		user = await getUser();
 	} catch (e) {
-		redirect(`/join/${encodeURIComponent(params.token)}/login`);
+		redirect(`/join/${encodeURIComponent(tokenParam)}/login`);
 	}
 
 	if (user.email !== token.invitedEmail) {
-		redirectToErrorPage(params.token, "wrong_email");
+		redirectToErrorPage(tokenParam, "wrong_email");
 	}
 
 	const userDb = await db
@@ -56,7 +59,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 			)
 			.limit(1);
 		if (membership.length > 0) {
-			redirectToErrorPage(params.token, "already_member");
+			redirectToErrorPage(tokenParam, "already_member");
 		}
 	}
 
@@ -75,7 +78,7 @@ export default async function Page({ params }: { params: { token: string } }) {
 					</div>
 					<div className="grid gap-[16px]">
 						<form action={joinTeam} className="contents">
-							<input type="hidden" name="token" value={params.token} />
+							<input type="hidden" name="token" value={tokenParam} />
 							<Button type="submit" className="w-full font-medium">
 								Join to team
 							</Button>

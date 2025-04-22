@@ -6,18 +6,21 @@ import { fetchInvitationToken } from "../../utils/invitation-token";
 import { redirectToErrorPage } from "../../utils/redirect-to-error-page";
 import { SignupForm } from "./form";
 
-export default async function Page({ params }: { params: { token: string } }) {
+export default async function Page({
+	params,
+}: { params: Promise<{ token: string }> }) {
+	const { token } = await params;
 	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
 	if (!isTeamInvitationViaEmail) {
 		return notFound();
 	}
 
-	const token = await fetchInvitationToken(params.token);
-	if (!token) {
+	const tokenObj = await fetchInvitationToken(token);
+	if (!tokenObj) {
 		return notFound();
 	}
-	if (token.expiredAt < new Date()) {
-		redirectToErrorPage(params.token, "expired");
+	if (tokenObj.expiredAt < new Date()) {
+		redirectToErrorPage(token, "expired");
 	}
 
 	return (
@@ -30,16 +33,16 @@ export default async function Page({ params }: { params: { token: string } }) {
 							className="text-[28px] font-[500] text-primary-100 font-hubot"
 							style={{ textShadow: "0px 0px 20px #0087F6" }}
 						>
-							{token.teamName}
+							{tokenObj.teamName}
 						</h2>
 					</div>
 					<div className="grid gap-[16px]">
-						<SignupForm email={token.invitedEmail} token={params.token} />
+						<SignupForm email={tokenObj.invitedEmail} token={token} />
 
 						<div className="text-center text-sm text-slate-400">
 							Already have a Giselle account?{" "}
 							<Link
-								href={`/join/${params.token}/login`}
+								href={`/join/${token}/login`}
 								className="text-blue-300 hover:underline"
 							>
 								Log in
