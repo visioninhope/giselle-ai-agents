@@ -45,14 +45,26 @@ const gemini25ProPreview: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
+const gemini25FlashPreview: GoogleLanguageModel = {
+	provider: "google",
+	id: "gemini-2.5-flash-preview-04-17",
+	capabilities:
+		Capability.TextGeneration |
+		Capability.GenericFileInput |
+		Capability.OptionalSearchGrounding |
+		Capability.Reasoning,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
 const gemini20Flash: GoogleLanguageModel = {
 	provider: "google",
-	id: "gemini-2.0-flash-001",
+	id: "gemini-2.0-flash",
 	capabilities:
 		Capability.TextGeneration |
 		Capability.OptionalSearchGrounding |
 		Capability.GenericFileInput,
-	tier: Tier.enum.pro,
+	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
 
@@ -87,6 +99,7 @@ const gemini20ProExp: GoogleLanguageModel = {
 export const models = [
 	gemini25ProExp,
 	gemini25ProPreview,
+	gemini25FlashPreview,
 	gemini20Flash,
 	gemini20FlashThinkingExp,
 	gemini20ProExp,
