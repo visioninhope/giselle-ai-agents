@@ -9,7 +9,6 @@ const errorMessages: Record<ErrorCode, string> = {
 	expired: "This invitation has expired.",
 	wrong_email:
 		"The email address you're currently using doesn't match the email this invitation was intended for. To join this workspace, please sign out and then either sign in with the email address specified in the invitation or create a new account using that email address.",
-	already_member: "You're already a member of this team.",
 } as const;
 
 function ErrorPageLayout({ children }: { children: React.ReactNode }) {
@@ -54,23 +53,6 @@ export function ExpiredError() {
 						/>
 					</div>
 				</div>
-			</div>
-		</ErrorPageLayout>
-	);
-}
-
-export function AlreadyMemberError() {
-	return (
-		<ErrorPageLayout>
-			<div className="flex flex-col items-center justify-center gap-6">
-				<h2 className="text-[28px] font-[500] text-white font-hubot text-center">
-					{errorMessages.already_member}
-				</h2>
-				<Link href="/settings/team" className="w-full">
-					<Button className="w-full font-medium bg-blue-200 hover:bg-blue-300 text-black-900">
-						Go to team
-					</Button>
-				</Link>
 			</div>
 		</ErrorPageLayout>
 	);
