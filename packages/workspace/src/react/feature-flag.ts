@@ -2,6 +2,7 @@ import { createContext, useContext } from "react";
 
 export interface FeatureFlagContextValue {
 	flowNode: boolean;
+	runV2: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined

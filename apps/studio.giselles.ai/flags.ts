@@ -90,3 +90,16 @@ export const flowNodeFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const runV2Flag = flag<boolean>({
+	key: "run-v2",
+	async decide() {
+		return takeLocalEnv("RUN_V2_FLAG");
+	},
+	description: "Enable Run v2",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
