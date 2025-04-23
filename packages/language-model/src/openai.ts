@@ -30,7 +30,7 @@ const gpt4o: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.SearchGrounding,
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -41,7 +41,7 @@ const gpt4oMini: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.SearchGrounding,
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.free,
 	configurations: defaultConfigurations,
 };
@@ -76,7 +76,7 @@ const gpt41: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.SearchGrounding,
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -87,7 +87,7 @@ const gpt41mini: OpenAILanguageModel = {
 	capabilities:
 		Capability.ImageFileInput |
 		Capability.TextGeneration |
-		Capability.SearchGrounding,
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };

@@ -274,7 +274,7 @@ export async function generateText(args: {
 	if (
 		actionNode.content.llm.provider === "openai" &&
 		actionNode.content.tools?.openaiWebSearch &&
-		hasCapability(languageModel, Capability.SearchGrounding)
+		hasCapability(languageModel, Capability.OptionalSearchGrounding)
 	)
 		preparedToolSet = {
 			...preparedToolSet,
