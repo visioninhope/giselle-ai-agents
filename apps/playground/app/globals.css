@@ -62,6 +62,18 @@
 	--color-github-node-1: var(--color-deep-purple-900);
 	--color-github-node-2: hsl(275, 91%, 26%);
 
+	--color-web-search-node-1: #3a36ff;
+	--color-web-search-node-2: color-mix(in srgb, #3a36ff, #000000 20%);
+
+	--color-image-generation-node-1: #0085e0;
+	--color-image-generation-node-2: color-mix(in srgb, #0085e0, #000000 20%);
+
+	--color-audio-generation-node-1: #084b8a;
+	--color-audio-generation-node-2: color-mix(in srgb, #084b8a, #000000 20%);
+
+	--color-video-generation-node-1: #0098b2;
+	--color-video-generation-node-2: color-mix(in srgb, #0098b2, #000000 20%);
+
 	--color-error-900: var(--color-red-900);
 
 	--font-sans: var(--font-geist-sans);
