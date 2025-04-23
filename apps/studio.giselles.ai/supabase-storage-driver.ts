@@ -95,6 +95,17 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 		},
 
 		async getItem(key, opts) {
+			if (opts?.publicURL) {
+				const path = r(key);
+				const { data } = supabase.storage.from(bucket).getPublicUrl(path);
+
+				if (!data.publicUrl) {
+					return null;
+				}
+
+				return data.publicUrl;
+			}
+
 			let path = r(key);
 			if (opts?.bypassingCache) {
 				path = `${path}?timestamp=${Date.now()}`;

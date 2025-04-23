@@ -1,5 +1,6 @@
 "use server";
 
+import { publicStorage } from "@/app/giselle-engine";
 import {
 	type TeamRole,
 	type UserId,
@@ -19,6 +20,7 @@ import { isTeamId } from "@/services/teams";
 import { eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { IMAGE_CONSTRAINTS } from "../constants";
 import { deleteTeamMember } from "../team/actions";
 
 export async function connectGoogleIdentity() {
@@ -49,8 +51,12 @@ export async function getAccountInfo() {
 	try {
 		const supabaseUser = await getUser();
 
-		const _users = await db
-			.select({ displayName: users.displayName, email: users.email })
+		const [user] = await db
+			.select({
+				displayName: users.displayName,
+				email: users.email,
+				avatarUrl: users.avatarUrl,
+			})
 			.from(users)
 			.innerJoin(
 				supabaseUserMappings,
@@ -58,7 +64,7 @@ export async function getAccountInfo() {
 			)
 			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
 
-		return _users[0];
+		return user;
 	} catch (error) {
 		logger.error("Failed to get account info:", error);
 		throw error;
@@ -140,4 +146,98 @@ export async function leaveTeam(
 		revalidatePath("/settings/account");
 	}
 	return result;
+}
+
+function getExtensionFromMimeType(mimeType: string): string {
+	return (
+		IMAGE_CONSTRAINTS.mimeToExt[
+			mimeType as keyof typeof IMAGE_CONSTRAINTS.mimeToExt
+		] || "jpg"
+	);
+}
+
+export async function updateAvatar(formData: FormData) {
+	try {
+		const supabaseUser = await getUser();
+
+		const file = formData.get("avatar") as File | null;
+		if (!file) {
+			throw new Error("Missing avatar file");
+		}
+
+		if (!IMAGE_CONSTRAINTS.formats.includes(file.type)) {
+			throw new Error(
+				"Invalid file format. Please upload a JPG, PNG, GIF, or WebP image.",
+			);
+		}
+
+		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
+			throw new Error(
+				`File size exceeds ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB limit`,
+			);
+		}
+
+		const [currentUser] = await db
+			.select({ avatarUrl: users.avatarUrl })
+			.from(users)
+			.innerJoin(
+				supabaseUserMappings,
+				eq(users.dbId, supabaseUserMappings.userDbId),
+			)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+
+		const ext = getExtensionFromMimeType(file.type);
+		const filePath = `avatars/${supabaseUser.id}.${ext}`;
+
+		const arrayBuffer = await file.arrayBuffer();
+		const buffer = Buffer.from(arrayBuffer);
+
+		await publicStorage.setItemRaw(filePath, buffer, {
+			contentType: file.type,
+		});
+
+		if (currentUser?.avatarUrl && currentUser.avatarUrl !== filePath) {
+			try {
+				// Extract file path from URL
+				// From: https://xxx.supabase.co/storage/v1/object/public/public-assets/avatars/supabase-user-id.jpg
+				// To: avatars/user-id.jpg
+				const oldPath = currentUser.avatarUrl.split("/public-assets/")[1];
+
+				if (oldPath) {
+					await publicStorage.removeItem(oldPath);
+					logger.debug("Old avatar file removed:", oldPath);
+				}
+			} catch (error) {
+				// Don't fail the update if cleanup fails
+				logger.error("Failed to remove old avatar:", error);
+			}
+		}
+
+		const avatarUrl = await publicStorage.getItem(filePath, {
+			publicURL: true,
+		});
+		if (typeof avatarUrl !== "string") {
+			throw new Error("Failed to get avatar URL");
+		}
+
+		const userDbIdSubquery = db
+			.select({ userDbId: supabaseUserMappings.userDbId })
+			.from(supabaseUserMappings)
+			.where(eq(supabaseUserMappings.supabaseUserId, supabaseUser.id));
+
+		await db
+			.update(users)
+			.set({ avatarUrl })
+			.where(eq(users.dbId, userDbIdSubquery));
+
+		revalidatePath("/settings/account");
+
+		return {
+			success: true,
+			avatarUrl,
+		};
+	} catch (error) {
+		logger.error("Failed to update avatar:", error);
+		throw error;
+	}
 }
