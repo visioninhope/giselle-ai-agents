@@ -39,3 +39,8 @@ export const TriggerContent = z.object({
 	provider: TriggerProviderLike,
 });
 export type TriggerContent = z.infer<typeof TriggerContent>;
+
+export const TriggerContentReference = z.object({
+	type: TriggerContent.shape.type,
+});
+export type TriggerContentReference = z.infer<typeof TriggerContentReference>;
