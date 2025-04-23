@@ -196,11 +196,13 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						{node.type === "action" && (
-							<div className="text-[10px] text-white-400">
-								{defaultName(node)}
-							</div>
-						)}
+						{node.type === "action" &&
+							(node.content.type === "imageGeneration" ||
+								node.content.type === "textGeneration") && (
+								<div className="text-[10px] text-white-400 pl-[4px]">
+									{node.content.llm.provider}
+								</div>
+							)}
 					</div>
 				</div>
 			</div>
