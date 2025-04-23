@@ -5,6 +5,7 @@ import {
 	isImageGenerationLanguageModelData,
 	isTextGenerationLanguageModelData,
 } from "@giselle-sdk/data-type";
+import { githubIssueCreatedTrigger, githubTriggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	type LanguageModel,
@@ -56,6 +57,7 @@ import {
 	selectTriggerTool,
 	textGenerationNode,
 	textNode,
+	triggerNode,
 	useToolbar,
 } from "./state";
 
@@ -225,31 +227,25 @@ export function Toolbar() {
 													"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
 													"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 												)}
-												onValueChange={(sourceType) => {
-													if (sourceType === "text") {
-														setSelectedTool(addNodeTool(textNode()));
-													}
+												onValueChange={(value) => {
+													/** @todo parse provider */
+													const provider = "github";
+													setSelectedTool(
+														addNodeTool(triggerNode(provider, value)),
+													);
 													// Add more source types here in the future if needed
 												}}
 											>
-												<ToggleGroup.Item
-													value="created-an-issue-comment"
-													data-tool
-												>
-													<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
-													<p className="text-[14px]">
-														Created an issue comment
-													</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item
-													value="created-github-issue-comment"
-													data-tool
-												>
-													<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
-													<p className="text-[14px]">
-														Created a pullrequest comment
-													</p>
-												</ToggleGroup.Item>
+												{githubTriggers.map((githubTrigger) => (
+													<ToggleGroup.Item
+														key={githubTrigger.id}
+														value={githubTrigger.id}
+														data-tool
+													>
+														<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
+														<p className="text-[14px]">{githubTrigger.label}</p>
+													</ToggleGroup.Item>
+												))}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
@@ -295,22 +291,16 @@ export function Toolbar() {
 													// Add more source types here in the future if needed
 												}}
 											>
-												<ToggleGroup.Item
-													value="create-github-issue-comment"
-													data-tool
-												>
-													<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
-													<p className="text-[14px]">Create an issue comment</p>
-												</ToggleGroup.Item>
-												<ToggleGroup.Item
-													value="create-github-issue-comment"
-													data-tool
-												>
-													<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
-													<p className="text-[14px]">
-														Create a pullrequest comment
-													</p>
-												</ToggleGroup.Item>
+												{githubTriggers.map((githubTrigger) => (
+													<ToggleGroup.Item
+														key={githubTrigger.id}
+														value={githubTrigger.id}
+														data-tool
+													>
+														<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
+														<p className="text-[14px]">{githubTrigger.label}</p>
+													</ToggleGroup.Item>
+												))}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

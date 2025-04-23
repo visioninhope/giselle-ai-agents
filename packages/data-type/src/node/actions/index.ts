@@ -18,6 +18,7 @@ export * from "./trigger";
 const ActionNodeContent = z.discriminatedUnion("type", [
 	TextGenerationContent,
 	ImageGenerationContent,
+	TriggerContent,
 ]);
 
 export const ActionNode = NodeBase.extend({

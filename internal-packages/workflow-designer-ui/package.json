@@ -12,6 +12,7 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:*",
+		"@giselle-sdk/flow": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:*",
 		"@giselle-sdk/integration": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",

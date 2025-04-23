@@ -3,6 +3,7 @@
 import {
 	type FileCategory,
 	type FileNode,
+	type GitHubTriggerProvider,
 	type ImageGenerationLanguageModelData,
 	type ImageGenerationNode,
 	type Node,
@@ -13,7 +14,9 @@ import {
 	type TextGenerationNode,
 	type TextNode,
 	type TriggerNode,
+	type TriggerProvider,
 } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	hasCapability,
@@ -163,18 +166,51 @@ export function textNode() {
 	} satisfies TextNode;
 }
 
-export function triggerNode() {
+function unauthenticatedGithubTriggerProvider(
+	id: string,
+): GitHubTriggerProvider {
+	return {
+		type: "github",
+		triggerId: id,
+		auth: {
+			state: "unauthenticated",
+		},
+	};
+}
+
+export function triggerNode(triggerProvider: string, triggerId: string) {
+	if (triggerProvider !== "github") {
+		throw new Error("Unsupported trigger provider");
+	}
+	const trigger = githubTriggers.find(
+		(githubTrigger) => githubTrigger.id === triggerId,
+	);
+	if (trigger === undefined) {
+		throw new Error("Unsupported trigger");
+	}
+
+	const outputs: Output[] = [];
+	trigger.payloads.keyof().options;
+	for (const payloadKey of trigger.payloads.keyof().options as Array<string>) {
+		outputs.push({
+			id: OutputId.generate(),
+			label: payloadKey,
+			accessor: payloadKey,
+		});
+	}
+
 	return {
 		id: NodeId.generate(),
 		type: "action",
+		name: trigger.label,
 		content: {
 			type: "trigger",
+			provider: unauthenticatedGithubTriggerProvider(trigger.id),
 		},
 		inputs: [],
-		outputs: [],
+		outputs,
 	} satisfies TriggerNode;
 }
-
 export function fileNode(category: FileCategory) {
 	return {
 		id: NodeId.generate(),

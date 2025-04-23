@@ -62,6 +62,9 @@ export async function buildMessageObject(
 				textGenerationResolver,
 			);
 		}
+		case "trigger": {
+			return [];
+		}
 		default: {
 			const _exhaustiveCheck: never = node.content;
 			throw new Error(`Unhandled content type: ${_exhaustiveCheck}`);
@@ -160,6 +163,7 @@ async function buildGenerationMessageForTextGeneration(
 
 			case "github":
 			case "imageGeneration":
+			case "trigger":
 				throw new Error("Not implemented");
 
 			default: {
@@ -546,6 +550,7 @@ async function buildGenerationMessageForImageGeneration(
 
 			case "github":
 			case "imageGeneration":
+			case "trigger":
 				throw new Error("Not implemented");
 
 			default: {
