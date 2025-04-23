@@ -175,7 +175,10 @@ export function OpenAIModelPanel({
 						note={
 							languageModel &&
 							tools?.openaiWebSearch &&
-							!hasCapability(languageModel, Capability.SearchGrounding) &&
+							!hasCapability(
+								languageModel,
+								Capability.OptionalSearchGrounding,
+							) &&
 							"Web search will not use since the current model does not support web search"
 						}
 					/>
