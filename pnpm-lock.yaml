@@ -676,6 +676,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../../packages/data-type
+      '@giselle-sdk/flow':
+        specifier: workspace:^
+        version: link:../../packages/flow
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
@@ -802,6 +805,19 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.38.0)(yaml@2.7.0)
+
+  packages/flow:
+    dependencies:
+      zod:
+        specifier: 'catalog:'
+        version: 3.24.1
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
 
   packages/giselle-engine:
     dependencies:

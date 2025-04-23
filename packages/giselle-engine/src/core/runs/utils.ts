@@ -117,7 +117,7 @@ export function overrideGenerationTemplate(
 	let overridedTemplate = template;
 	for (const overrideNode of overrideNodes) {
 		if (overrideNode.id === template.actionNode.id) {
-			switch (template.actionNode.content.type) {
+			switch (overridedTemplate.actionNode.content.type) {
 				case "textGeneration": {
 					if (isOverrideTextGenerationContent(overrideNode.content)) {
 						overridedTemplate = {
@@ -148,8 +148,10 @@ export function overrideGenerationTemplate(
 					}
 					break;
 				}
+				case "trigger":
+					break;
 				default: {
-					const _exhaustiveCheck: never = template.actionNode.content;
+					const _exhaustiveCheck: never = overridedTemplate.actionNode.content;
 					throw new Error(`Unhandled action node type: ${_exhaustiveCheck}`);
 				}
 			}
@@ -259,6 +261,8 @@ export function overrideGenerationTemplate(
 							return node;
 						}),
 					};
+					break;
+				case "trigger":
 					break;
 				default: {
 					const _exhaustiveCheck: never = sourceNode.content;

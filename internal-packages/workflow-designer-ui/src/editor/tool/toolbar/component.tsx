@@ -5,6 +5,7 @@ import {
 	isImageGenerationLanguageModelData,
 	isTextGenerationLanguageModelData,
 } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	type LanguageModel,
@@ -13,7 +14,13 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
+import { useFeatureFlag } from "giselle-sdk/react";
 import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	MousePointerClickIcon,
+	SquareFunctionIcon,
+	WorkflowIcon,
+} from "lucide-react";
 import { Dialog, Popover, ToggleGroup } from "radix-ui";
 import { type ReactNode, useState } from "react";
 import {
@@ -23,6 +30,7 @@ import {
 	GenNodeIcon,
 	GenerateImageIcon,
 	GenerateTextIcon,
+	GitHubIcon,
 	GoogleWhiteIcon,
 	OpenaiIcon,
 	PdfFileIcon,
@@ -43,11 +51,14 @@ import {
 	addNodeTool,
 	fileNode,
 	imageGenerationNode,
+	selectEnvironmentActionTool,
 	selectFileNodeCategoryTool,
 	selectLanguageModelTool,
 	selectSourceCategoryTool,
+	selectTriggerTool,
 	textGenerationNode,
 	textNode,
+	triggerNode,
 	useToolbar,
 } from "./state";
 
@@ -142,6 +153,7 @@ export function Toolbar() {
 		useState<LanguageModel | null>(null);
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
+	const { flowNode } = useFeatureFlag();
 	const languageModelAvailable = (languageModel: LanguageModel) => {
 		if (limits === undefined) {
 			return true;
@@ -176,10 +188,136 @@ export function Toolbar() {
 								case "selectSourceCategory":
 									setSelectedTool(selectSourceCategoryTool());
 									break;
+								case "selectTrigger":
+									setSelectedTool(selectTriggerTool());
+									break;
+								case "selectEnvironmentAction":
+									setSelectedTool(selectEnvironmentActionTool());
+									break;
 							}
 						}
 					}}
 				>
+					{flowNode && (
+						<>
+							<ToggleGroup.Item
+								value="selectTrigger"
+								data-tool
+								className="relative"
+							>
+								<Tooltip text={<TooltipAndHotkey text="Trigger" hotkey="t" />}>
+									<MousePointerClickIcon data-icon />
+								</Tooltip>
+								{selectedTool?.action === "selectTrigger" && (
+									<Popover.Root open={true}>
+										<Popover.Anchor />
+										<Popover.Portal>
+											<Popover.Content
+												className={clsx(
+													"relative rounded-[8px] px-[8px] py-[8px]",
+													"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
+													"backdrop-blur-[4px]",
+												)}
+												sideOffset={42}
+											>
+												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
+												<div className="relative flex flex-col gap-[8px]">
+													<ToggleGroup.Root
+														type="single"
+														className={clsx(
+															"flex flex-col gap-[8px]",
+															"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+															"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
+															"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
+														)}
+														onValueChange={(value) => {
+															/** @todo parse provider */
+															const provider = "github";
+															setSelectedTool(
+																addNodeTool(triggerNode(provider, value)),
+															);
+															// Add more source types here in the future if needed
+														}}
+													>
+														{githubTriggers.map((githubTrigger) => (
+															<ToggleGroup.Item
+																key={githubTrigger.id}
+																value={githubTrigger.id}
+																data-tool
+															>
+																<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
+																<p className="text-[14px]">
+																	{githubTrigger.label}
+																</p>
+															</ToggleGroup.Item>
+														))}
+													</ToggleGroup.Root>
+												</div>
+											</Popover.Content>
+										</Popover.Portal>
+									</Popover.Root>
+								)}
+							</ToggleGroup.Item>
+
+							<ToggleGroup.Item
+								value="selectEnvironmentAction"
+								data-tool
+								className="relative"
+							>
+								<Tooltip text={<TooltipAndHotkey text="Action" hotkey="a" />}>
+									<WorkflowIcon data-icon />
+								</Tooltip>
+								{selectedTool?.action === "selectEnvironmentAction" && (
+									<Popover.Root open={true}>
+										<Popover.Anchor />
+										<Popover.Portal>
+											<Popover.Content
+												className={clsx(
+													"relative rounded-[8px] px-[8px] py-[8px]",
+													"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
+													"backdrop-blur-[4px]",
+												)}
+												sideOffset={42}
+											>
+												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
+												<div className="relative flex flex-col gap-[8px]">
+													<ToggleGroup.Root
+														type="single"
+														className={clsx(
+															"flex flex-col gap-[8px]",
+															"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+															"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
+															"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
+														)}
+														onValueChange={(sourceType) => {
+															if (sourceType === "text") {
+																setSelectedTool(addNodeTool(textNode()));
+															}
+															// Add more source types here in the future if needed
+														}}
+													>
+														{githubTriggers.map((githubTrigger) => (
+															<ToggleGroup.Item
+																key={githubTrigger.id}
+																value={githubTrigger.id}
+																data-tool
+															>
+																<GitHubIcon className="w-[20px] h-[20px] shrink-0" />
+																<p className="text-[14px]">
+																	{githubTrigger.label}
+																</p>
+															</ToggleGroup.Item>
+														))}
+													</ToggleGroup.Root>
+												</div>
+											</Popover.Content>
+										</Popover.Portal>
+									</Popover.Root>
+								)}
+							</ToggleGroup.Item>
+						</>
+					)}
+
 					<ToggleGroup.Item value="selectLanguageModel" data-tool>
 						<Tooltip text={<TooltipAndHotkey text="Generation" hotkey="G" />}>
 							<GenNodeIcon data-icon />

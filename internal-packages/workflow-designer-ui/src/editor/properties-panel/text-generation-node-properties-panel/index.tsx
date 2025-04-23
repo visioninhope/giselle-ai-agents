@@ -253,6 +253,8 @@ export function TextGenerationNodePropertiesPanel({
 																	});
 																	break;
 																}
+																case "trigger":
+																	break;
 																default: {
 																	const _exhaustiveCheck: never =
 																		connectedNode.content;
@@ -334,6 +336,8 @@ export function TextGenerationNodePropertiesPanel({
 																	});
 																	break;
 																}
+																case "trigger":
+																	break;
 																default: {
 																	const _exhaustiveCheck: never =
 																		connectedNode.content;

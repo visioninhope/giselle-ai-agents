@@ -6,6 +6,7 @@ import {
 	type OutputId,
 	TextGenerationNode,
 	TextNode,
+	TriggerNode,
 } from "@giselle-sdk/data-type";
 import {
 	Handle,
@@ -41,12 +42,17 @@ type GiselleWorkflowGitHubNode = XYFlowNode<
 	{ nodeData: GitHubNode; preview?: boolean },
 	FileNode["content"]["type"]
 >;
+type GiselleWorkflowTriggerNode = XYFlowNode<
+	{ nodeData: TriggerNode; preview?: boolean },
+	TriggerNode["content"]["type"]
+>;
 export type GiselleWorkflowDesignerNode =
 	| GiselleWorkflowDesignerTextGenerationNode
 	| GiselleWorkflowDesignerImageGenerationNode
 	| GiselleWorkflowDesignerTextNode
 	| GiselleWorkflowDesignerFileNode
-	| GiselleWorkflowGitHubNode;
+	| GiselleWorkflowGitHubNode
+	| GiselleWorkflowTriggerNode;
 
 export const nodeTypes: NodeTypes = {
 	[TextGenerationNode.shape.content.shape.type.value]: CustomXyFlowNode,
@@ -54,6 +60,7 @@ export const nodeTypes: NodeTypes = {
 	[TextNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[FileNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[GitHubNode.shape.content.shape.type.value]: CustomXyFlowNode,
+	[TriggerNode.shape.content.shape.type.value]: CustomXyFlowNode,
 };
 
 export function CustomXyFlowNode({
@@ -114,7 +121,8 @@ export function NodeComponent({
 				"data-[content-type=webSearch]:from-web-search-node-1] data-[content-type=webSearch]:to-web-search-node-2 data-[content-type=webSearch]:shadow-web-search-node-1",
 				"data-[content-type=audioGeneration]:from-audio-generation-node-1] data-[content-type=audioGeneration]:to-audio-generation-node-2 data-[content-type=audioGeneration]:shadow-audio-generation-node-1",
 				"data-[content-type=videoGeneration]:from-video-generation-node-1] data-[content-type=videoGeneration]:to-video-generation-node-2 data-[content-type=videoGeneration]:shadow-video-generation-node-1",
-				"data-[selected=true]:shadow-[0px_0px_16px_0px]", // Shadow applied for selected state
+				"data-[content-type=trigger]:from-trigger-node-1] data-[content-type=trigger]:to-trigger-node-2 data-[content-type=trigger]:shadow-trigger-node-1",
+				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
 			)}
@@ -130,6 +138,7 @@ export function NodeComponent({
 					"group-data-[content-type=webSearch]:from-web-search-node-1/40 group-data-[content-type=webSearch]:to-web-search-node-1",
 					"group-data-[content-type=audioGeneration]:from-audio-generation-node-1/40 group-data-[content-type=audioGeneration]:to-audio-generation-node-1",
 					"group-data-[content-type=videoGeneration]:from-video-generation-node-1/40 group-data-[content-type=videoGeneration]:to-video-generation-node-1",
+					"group-data-[content-type=trigger]:from-trigger-node-1/40 group-data-[content-type=trigger]:to-trigger-node-1",
 				)}
 			/>
 
@@ -146,6 +155,7 @@ export function NodeComponent({
 							"group-data-[content-type=webSearch]:bg-web-search-node-1",
 							"group-data-[content-type=audioGeneration]:bg-audio-generation-node-1",
 							"group-data-[content-type=videoGeneration]:bg-video-generation-node-1",
+							"group-data-[content-type=trigger]:bg-trigger-node-1",
 						)}
 					>
 						<NodeIcon
@@ -160,6 +170,7 @@ export function NodeComponent({
 								"group-data-[content-type=webSearch]:text-white-900",
 								"group-data-[content-type=audioGeneration]:text-white-900",
 								"group-data-[content-type=videoGeneration]:text-white-900",
+								"group-data-[content-type=trigger]:text-white-900",
 							)}
 						/>
 					</div>
@@ -185,11 +196,13 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						{node.type === "action" && (
-							<div className="text-[10px] text-white-400">
-								{node.content.llm.provider}
-							</div>
-						)}
+						{node.type === "action" &&
+							(node.content.type === "imageGeneration" ||
+								node.content.type === "textGeneration") && (
+								<div className="text-[10px] text-white-400 pl-[4px]">
+									{node.content.llm.provider}
+								</div>
+							)}
 					</div>
 				</div>
 			</div>
@@ -220,7 +233,7 @@ export function NodeComponent({
 								</div>
 							</div>
 						))}
-						{node.type === "action" && (
+						{node.type === "action" && node.content.type !== "trigger" && (
 							<div className="relative flex items-center h-[28px]" key="blank">
 								<Handle
 									type="target"
@@ -269,6 +282,7 @@ export function NodeComponent({
 										"group-data-[content-type=webSearch]:!border-web-search-node-1",
 										"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+										"group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-image-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=github]:!bg-github-node-1",
@@ -277,6 +291,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[state=connected]:group-data-[content-type=webSearch]:!border-web-search-node-1",
 										"group-data-[state=connected]:group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[state=connected]:group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[state=connected]:group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+										"group-data-[state=connected]:group-data-[content-type=trigger]:!bg-trigger-node-1 group-data-[state=connected]:group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
@@ -284,7 +299,7 @@ export function NodeComponent({
 									className={clsx(
 										"text-[12px]",
 										"group-data-[state=connected]:px-[16px]",
-										"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:right-[-60px] group-data-[state=disconnected]:whitespace-nowrap",
+										"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:left-[12px] group-data-[state=disconnected]:whitespace-nowrap",
 										"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
 									)}
 								>

@@ -1,5 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { getImageGenerationModelProvider } from "@giselle-sdk/language-model";
+import { GithubIcon } from "lucide-react";
 import type { SVGProps } from "react";
 import { AnthropicIcon } from "../anthropic";
 import { Flux1Icon } from "../flux1";
@@ -65,6 +66,17 @@ export function NodeIcon({
 							const _exhaustiveCheck: never = imageModelProvider;
 							throw new Error(
 								`Unhandled ImageModelProvider: ${_exhaustiveCheck}`,
+							);
+						}
+					}
+				}
+				case "trigger": {
+					switch (node.content.provider.type) {
+						case "github":
+							return <GitHubIcon {...props} data-content-type-icon />;
+						default: {
+							throw new Error(
+								`Unhandled TriggerProviderType: ${node.content.provider.type}`,
 							);
 						}
 					}

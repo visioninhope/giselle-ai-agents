@@ -20,6 +20,11 @@ export function isSupportedConnection(
 			message: "This node does not receive inputs",
 		};
 	}
+	if (inputNode.content.type === "trigger") {
+		return {
+			canConnect: true,
+		};
+	}
 
 	if (outputNode.content.type === "imageGeneration") {
 		return {

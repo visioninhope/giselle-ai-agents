@@ -3,6 +3,7 @@
 import {
 	type FileCategory,
 	type FileNode,
+	type GitHubTriggerProvider,
 	type ImageGenerationLanguageModelData,
 	type ImageGenerationNode,
 	type Node,
@@ -12,7 +13,10 @@ import {
 	type TextGenerationLanguageModelData,
 	type TextGenerationNode,
 	type TextNode,
+	type TriggerNode,
+	type TriggerProvider,
 } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	hasCapability,
@@ -27,9 +31,11 @@ import type {
 	AddTextGenerationNodeTool,
 	AddTextNodeTool,
 	MoveTool,
+	SelectEnviromentActionTool,
 	SelectFileNodeCategoryTool,
 	SelectLanguageModelTool,
 	SelectSourceCategoryTool,
+	SelectTriggerTool,
 	Tool,
 } from "../types";
 
@@ -160,6 +166,51 @@ export function textNode() {
 	} satisfies TextNode;
 }
 
+function unauthenticatedGithubTriggerProvider(
+	id: string,
+): GitHubTriggerProvider {
+	return {
+		type: "github",
+		triggerId: id,
+		auth: {
+			state: "unauthenticated",
+		},
+	};
+}
+
+export function triggerNode(triggerProvider: string, triggerId: string) {
+	if (triggerProvider !== "github") {
+		throw new Error("Unsupported trigger provider");
+	}
+	const trigger = githubTriggers.find(
+		(githubTrigger) => githubTrigger.id === triggerId,
+	);
+	if (trigger === undefined) {
+		throw new Error("Unsupported trigger");
+	}
+
+	const outputs: Output[] = [];
+	trigger.payloads.keyof().options;
+	for (const payloadKey of trigger.payloads.keyof().options as Array<string>) {
+		outputs.push({
+			id: OutputId.generate(),
+			label: payloadKey,
+			accessor: payloadKey,
+		});
+	}
+
+	return {
+		id: NodeId.generate(),
+		type: "action",
+		name: trigger.label,
+		content: {
+			type: "trigger",
+			provider: unauthenticatedGithubTriggerProvider(trigger.id),
+		},
+		inputs: [],
+		outputs,
+	} satisfies TriggerNode;
+}
 export function fileNode(category: FileCategory) {
 	return {
 		id: NodeId.generate(),
@@ -239,4 +290,18 @@ export function selectSourceCategoryTool() {
 		action: "selectSourceCategory",
 		category: "edit",
 	} satisfies SelectSourceCategoryTool;
+}
+
+export function selectTriggerTool() {
+	return {
+		action: "selectTrigger",
+		category: "edit",
+	} satisfies SelectTriggerTool;
+}
+
+export function selectEnvironmentActionTool() {
+	return {
+		action: "selectEnvironmentAction",
+		category: "edit",
+	} satisfies SelectEnviromentActionTool;
 }

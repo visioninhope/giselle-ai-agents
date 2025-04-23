@@ -33,6 +33,8 @@ export function GenerationRunner({
 			return <TextGenerationRunner generation={generation} />;
 		case "imageGeneration":
 			return <ImageGenerationRunner generation={generation} />;
+		case "trigger":
+			return null;
 		default: {
 			const _exhaustiveCheck: never = generationContext.actionNode.content;
 			return _exhaustiveCheck;

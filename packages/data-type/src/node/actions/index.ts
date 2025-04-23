@@ -10,12 +10,15 @@ import {
 	TextGenerationContent,
 	TextGenerationContentReference,
 } from "./text-generation";
+import { TriggerContent } from "./trigger";
 export * from "./image-generation";
 export * from "./text-generation";
+export * from "./trigger";
 
 const ActionNodeContent = z.discriminatedUnion("type", [
 	TextGenerationContent,
 	ImageGenerationContent,
+	TriggerContent,
 ]);
 
 export const ActionNode = NodeBase.extend({
@@ -52,6 +55,11 @@ export function isImageGenerationNode(
 	const result = ImageGenerationNode.safeParse(args);
 	return result.success;
 }
+
+export const TriggerNode = ActionNode.extend({
+	content: TriggerContent,
+});
+export type TriggerNode = z.infer<typeof TriggerNode>;
 
 const OverrideActionNodeContent = z.discriminatedUnion("type", [
 	OverrideTextGenerationContent,

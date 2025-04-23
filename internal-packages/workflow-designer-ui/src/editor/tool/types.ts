@@ -31,6 +31,14 @@ export interface SelectSourceCategoryTool extends ToolBase {
 	category: "edit";
 	action: "selectSourceCategory";
 }
+export interface SelectTriggerTool extends ToolBase {
+	category: "edit";
+	action: "selectTrigger";
+}
+export interface SelectEnviromentActionTool extends ToolBase {
+	category: "edit";
+	action: "selectEnvironmentAction";
+}
 
 export interface AddTextNodeTool extends ToolBase {
 	category: "edit";
@@ -68,7 +76,9 @@ export type Tool =
 	| AddNodeTool
 	| SelectFileNodeCategoryTool
 	| SelectLanguageModelTool
-	| SelectSourceCategoryTool;
+	| SelectSourceCategoryTool
+	| SelectTriggerTool
+	| SelectEnviromentActionTool;
 
 type ToolAction = Tool["action"];
 
@@ -82,7 +92,9 @@ export function isToolAction(args: unknown): args is ToolAction {
 			args === "addNode" ||
 			args === "selectLanguageModel" ||
 			args === "selectFileNodeCategory" ||
-			args === "selectSourceCategory"
+			args === "selectSourceCategory" ||
+			args === "selectTrigger" ||
+			args === "selectEnvironmentAction"
 		);
 	}
 	return false;
