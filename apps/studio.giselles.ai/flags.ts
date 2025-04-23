@@ -77,3 +77,16 @@ export const teamInvitationViaEmailFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const flowNodeFlag = flag<boolean>({
+	key: "flow-node",
+	async decide() {
+		return takeLocalEnv("FLOW_NODE_FLAG");
+	},
+	description: "Enable Flow Node",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

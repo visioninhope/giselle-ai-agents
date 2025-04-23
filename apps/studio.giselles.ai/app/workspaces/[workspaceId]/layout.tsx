@@ -1,4 +1,5 @@
 import { db } from "@/drizzle";
+import { flowNodeFlag } from "@/flags";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
@@ -29,6 +30,7 @@ export default async function Layout({
 		return notFound();
 	}
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
+	const flowNode = await flowNodeFlag();
 
 	return (
 		<WorkspaceProvider
@@ -49,6 +51,9 @@ export default async function Layout({
 					teamType: currentTeam.type,
 					subscriptionId: currentTeam.activeSubscriptionId ?? "",
 				},
+			}}
+			featureFlag={{
+				flowNode,
 			}}
 		>
 			{children}

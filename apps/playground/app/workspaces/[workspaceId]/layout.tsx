@@ -11,6 +11,13 @@ export default async function Layout({
 }) {
 	const workspaceId = WorkspaceId.parse((await params).workspaceId);
 	return (
-		<WorkspaceProvider workspaceId={workspaceId}>{children}</WorkspaceProvider>
+		<WorkspaceProvider
+			workspaceId={workspaceId}
+			featureFlag={{
+				flowNode: true,
+			}}
+		>
+			{children}
+		</WorkspaceProvider>
 	);
 }

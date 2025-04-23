@@ -16,6 +16,10 @@ import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import { UsageLimitsProvider } from "@giselle-sdk/usage-limits/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
+import {
+	FeatureFlagContext,
+	type FeatureFlagContextValue,
+} from "./feature-flag";
 
 export function WorkspaceProvider({
 	children,
@@ -23,12 +27,14 @@ export function WorkspaceProvider({
 	integration,
 	usageLimits,
 	telemetry,
+	featureFlag,
 }: {
 	children: ReactNode;
 	workspaceId: WorkspaceId;
 	integration?: IntegrationProviderProps;
 	usageLimits?: UsageLimits;
 	telemetry?: TelemetrySettings;
+	featureFlag?: FeatureFlagContextValue;
 }) {
 	const client = useGiselleEngine();
 
@@ -52,7 +58,11 @@ export function WorkspaceProvider({
 					<WorkflowDesignerProvider data={workspace}>
 						<GenerationRunnerSystemProvider>
 							<RunSystemContextProvider workspaceId={workspaceId}>
-								{children}
+								<FeatureFlagContext
+									value={{ flowNode: featureFlag?.flowNode ?? false }}
+								>
+									{children}
+								</FeatureFlagContext>
 							</RunSystemContextProvider>
 						</GenerationRunnerSystemProvider>
 					</WorkflowDesignerProvider>
