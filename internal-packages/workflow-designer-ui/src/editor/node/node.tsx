@@ -105,25 +105,31 @@ export function NodeComponent({
 			data-preview={preview}
 			className={clsx(
 				"group relative flex flex-col rounded-[16px] py-[16px] gap-[16px] min-w-[180px]",
-				"bg-gradient-to-tl transition-shadow backdrop-blur-[4px]",
+				"bg-gradient-to-tl transition-all backdrop-blur-[4px]",
 				"data-[content-type=text]:from-text-node-1] data-[content-type=text]:to-text-node-2 data-[content-type=text]:shadow-text-node-1",
 				"data-[content-type=file]:from-file-node-1] data-[content-type=file]:to-file-node-2 data-[content-type=file]:shadow-file-node-1",
 				"data-[content-type=textGeneration]:from-generation-node-1] data-[content-type=textGeneration]:to-generation-node-2 data-[content-type=textGeneration]:shadow-generation-node-1",
-				"data-[content-type=imageGeneration]:from-generation-node-1] data-[content-type=imageGeneration]:to-generation-node-2 data-[content-type=imageGeneration]:shadow-generation-node-1",
+				"data-[content-type=imageGeneration]:from-image-generation-node-1] data-[content-type=imageGeneration]:to-image-generation-node-2 data-[content-type=imageGeneration]:shadow-image-generation-node-1",
 				"data-[content-type=github]:from-github-node-1] data-[content-type=github]:to-github-node-2 data-[content-type=github]:shadow-github-node-1",
-				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
+				"data-[content-type=webSearch]:from-web-search-node-1] data-[content-type=webSearch]:to-web-search-node-2 data-[content-type=webSearch]:shadow-web-search-node-1",
+				"data-[content-type=audioGeneration]:from-audio-generation-node-1] data-[content-type=audioGeneration]:to-audio-generation-node-2 data-[content-type=audioGeneration]:shadow-audio-generation-node-1",
+				"data-[content-type=videoGeneration]:from-video-generation-node-1] data-[content-type=videoGeneration]:to-video-generation-node-2 data-[content-type=videoGeneration]:shadow-video-generation-node-1",
+				"data-[selected=true]:shadow-[0px_0px_16px_0px]", // Shadow applied for selected state
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
 			)}
 		>
 			<div
 				className={clsx(
-					"absolute z-0 rounded-[16px] inset-0 border-[1.5px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
+					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
 					"group-data-[content-type=text]:from-text-node-1/40 group-data-[content-type=text]:to-text-node-1",
 					"group-data-[content-type=file]:from-file-node-1/40 group-data-[content-type=file]:to-file-node-1",
 					"group-data-[content-type=textGeneration]:from-generation-node-1/40 group-data-[content-type=textGeneration]:to-generation-node-1",
-					"group-data-[content-type=imageGeneration]:from-generation-node-1/40 group-data-[content-type=imageGeneration]:to-generation-node-1",
+					"group-data-[content-type=imageGeneration]:from-image-generation-node-1/40 group-data-[content-type=imageGeneration]:to-image-generation-node-1",
 					"group-data-[content-type=github]:from-github-node-1/40 group-data-[content-type=github]:to-github-node-1",
+					"group-data-[content-type=webSearch]:from-web-search-node-1/40 group-data-[content-type=webSearch]:to-web-search-node-1",
+					"group-data-[content-type=audioGeneration]:from-audio-generation-node-1/40 group-data-[content-type=audioGeneration]:to-audio-generation-node-1",
+					"group-data-[content-type=videoGeneration]:from-video-generation-node-1/40 group-data-[content-type=videoGeneration]:to-video-generation-node-1",
 				)}
 			/>
 
@@ -135,8 +141,11 @@ export function NodeComponent({
 							"group-data-[content-type=text]:bg-text-node-1",
 							"group-data-[content-type=file]:bg-file-node-1",
 							"group-data-[content-type=textGeneration]:bg-generation-node-1",
-							"group-data-[content-type=imageGeneration]:bg-generation-node-1",
+							"group-data-[content-type=imageGeneration]:bg-image-generation-node-1",
 							"group-data-[content-type=github]:bg-github-node-1",
+							"group-data-[content-type=webSearch]:bg-web-search-node-1",
+							"group-data-[content-type=audioGeneration]:bg-audio-generation-node-1",
+							"group-data-[content-type=videoGeneration]:bg-video-generation-node-1",
 						)}
 					>
 						<NodeIcon
@@ -148,6 +157,9 @@ export function NodeComponent({
 								"group-data-[content-type=textGeneration]:text-white-900",
 								"group-data-[content-type=imageGeneration]:text-white-900",
 								"group-data-[content-type=github]:text-white-900",
+								"group-data-[content-type=webSearch]:text-white-900",
+								"group-data-[content-type=audioGeneration]:text-white-900",
+								"group-data-[content-type=videoGeneration]:text-white-900",
 							)}
 						/>
 					</div>
@@ -197,10 +209,13 @@ export function NodeComponent({
 									className={clsx(
 										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
 										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!bg-generation-node-1 group-data-[content-type=imageGeneration]:!border-generation-node-1",
+										"group-data-[content-type=imageGeneration]:!bg-image-generation-node-1 group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
+										"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
+										"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+										"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 									)}
 								/>
-								<div className={clsx("px-[12px] text-white-900")}>
+								<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
 									{input.label}
 								</div>
 							</div>
@@ -214,10 +229,13 @@ export function NodeComponent({
 									className={clsx(
 										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
+										"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
+										"group-data-[content-type=webSearch]:!border-web-search-node-1",
+										"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 									)}
 								/>
-								<div className="absolute left-[-45px] text-[14px] text-black-400 whitespace-nowrap">
+								<div className="absolute left-[-45px] text-[12px] text-black-400 whitespace-nowrap">
 									Input
 								</div>
 							</div>
@@ -244,21 +262,27 @@ export function NodeComponent({
 									className={clsx(
 										"!absolute !w-[12px] !h-[12px] !rounded-full !border-[1.5px] !right-[-0.5px]",
 										"group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!border-generation-node-1",
+										"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
 										"group-data-[content-type=github]:!border-github-node-1",
 										"group-data-[content-type=text]:!border-text-node-1",
 										"group-data-[content-type=file]:!border-file-node-1",
+										"group-data-[content-type=webSearch]:!border-web-search-node-1",
+										"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
-										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-generation-node-1",
-										"group-data-[state=connected]:group-data-[content-type=github]:!bg-cgithub-node-1",
+										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-image-generation-node-1",
+										"group-data-[state=connected]:group-data-[content-type=github]:!bg-github-node-1",
 										"group-data-[state=connected]:group-data-[content-type=text]:!bg-text-node-1 group-data-[state=connected]:group-data-[content-type=text]:!border-text-node-1",
 										"group-data-[state=connected]:group-data-[content-type=file]:!bg-file-node-1 group-data-[state=connected]:group-data-[content-type=file]:!border-file-node-1",
+										"group-data-[state=connected]:group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[state=connected]:group-data-[content-type=webSearch]:!border-web-search-node-1",
+										"group-data-[state=connected]:group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[state=connected]:group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+										"group-data-[state=connected]:group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[state=connected]:group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
 								<div
 									className={clsx(
-										"text-[14px]",
+										"text-[12px]",
 										"group-data-[state=connected]:px-[16px]",
 										"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:right-[-60px] group-data-[state=disconnected]:whitespace-nowrap",
 										"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
