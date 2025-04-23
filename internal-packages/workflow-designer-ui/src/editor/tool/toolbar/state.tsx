@@ -12,6 +12,7 @@ import {
 	type TextGenerationLanguageModelData,
 	type TextGenerationNode,
 	type TextNode,
+	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import {
 	Capability,
@@ -27,9 +28,11 @@ import type {
 	AddTextGenerationNodeTool,
 	AddTextNodeTool,
 	MoveTool,
+	SelectEnviromentActionTool,
 	SelectFileNodeCategoryTool,
 	SelectLanguageModelTool,
 	SelectSourceCategoryTool,
+	SelectTriggerTool,
 	Tool,
 } from "../types";
 
@@ -160,6 +163,18 @@ export function textNode() {
 	} satisfies TextNode;
 }
 
+export function triggerNode() {
+	return {
+		id: NodeId.generate(),
+		type: "action",
+		content: {
+			type: "trigger",
+		},
+		inputs: [],
+		outputs: [],
+	} satisfies TriggerNode;
+}
+
 export function fileNode(category: FileCategory) {
 	return {
 		id: NodeId.generate(),
@@ -239,4 +254,18 @@ export function selectSourceCategoryTool() {
 		action: "selectSourceCategory",
 		category: "edit",
 	} satisfies SelectSourceCategoryTool;
+}
+
+export function selectTriggerTool() {
+	return {
+		action: "selectTrigger",
+		category: "edit",
+	} satisfies SelectTriggerTool;
+}
+
+export function selectEnvironmentActionTool() {
+	return {
+		action: "selectEnvironmentAction",
+		category: "edit",
+	} satisfies SelectEnviromentActionTool;
 }
