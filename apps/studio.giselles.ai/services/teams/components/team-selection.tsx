@@ -1,6 +1,5 @@
 import { getAccountInfo } from "@/app/(main)/settings/account/actions";
-import { getUser } from "@/lib/supabase";
-import Avatar from "boring-avatars";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
 import { fetchCurrentTeam, fetchUserTeams } from "../";
 import { isProPlan } from "../utils";
 import TeamCreation from "./team-creation";
@@ -9,8 +8,7 @@ import { TeamSelectionForm } from "./team-selection-form";
 export async function TeamSelection() {
 	const allTeams = await fetchUserTeams();
 	const currentTeam = await fetchCurrentTeam();
-	const user = await getUser();
-	const { displayName } = await getAccountInfo();
+	const { displayName, email, avatarUrl } = await getAccountInfo();
 
 	const formattedAllTeams = allTeams.map((team) => ({
 		id: team.id,
@@ -31,14 +29,14 @@ export async function TeamSelection() {
 			key={currentTeam.id}
 			currentUser={
 				<>
-					<Avatar
-						name={user.email}
-						variant="marble"
-						size={24}
-						colors={["#413e4a", "#73626e", "#b38184", "#f0b49e", "#f7e4be"]}
+					<AvatarImage
+						width={24}
+						height={24}
+						avatarUrl={avatarUrl}
+						alt={displayName || email || ""}
 					/>
 					<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
-						{displayName}
+						{displayName || "No display name"}
 					</span>
 				</>
 			}
