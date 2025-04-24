@@ -83,7 +83,7 @@ export default async function TeamMembersPage() {
 						teamInvitationViaEmailEnabled={teamInvitationViaEmailEnabled}
 						memberEmails={members
 							.map((member) => member.email)
-							.filter((email) => email !== null)}
+							.filter((email) => email != null)}
 						invitationEmails={invitations.map((invitation) => invitation.email)}
 					/>
 				)}
