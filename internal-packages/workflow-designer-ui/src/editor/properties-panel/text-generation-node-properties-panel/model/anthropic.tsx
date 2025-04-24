@@ -122,7 +122,7 @@ export function AnthropicModelPanel({
 							languageModel &&
 							anthropicLanguageModel.configurations.reasoning &&
 							!hasCapability(languageModel, Capability.Reasoning) &&
-							"Reasoning will not use since the current model does not support reasoning"
+							"Reasoning will not be used because the current model does not support it"
 						}
 					/>
 				</div>
