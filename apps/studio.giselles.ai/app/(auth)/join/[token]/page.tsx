@@ -1,17 +1,11 @@
 import { Button } from "@/components/ui/button";
-import { db, supabaseUserMappings, teamMemberships, users } from "@/drizzle";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import type { User } from "@supabase/auth-js";
-import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { declineInvitation, joinTeam } from "./actions";
-import {
-	AlreadyMemberError,
-	ExpiredError,
-	WrongEmailError,
-} from "./error-components";
+import { ExpiredError, WrongEmailError } from "./error-components";
 import { fetchInvitationToken } from "./invitation";
 
 export default async function Page({
@@ -41,31 +35,6 @@ export default async function Page({
 
 	if (user.email !== token.invitedEmail) {
 		return <WrongEmailError teamName={token.teamName} token={tokenParam} />;
-	}
-
-	const userDb = await db
-		.select({ dbId: users.dbId })
-		.from(users)
-		.innerJoin(
-			supabaseUserMappings,
-			eq(users.dbId, supabaseUserMappings.userDbId),
-		)
-		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
-	const userDbId = userDb[0]?.dbId;
-	if (userDbId && typeof token.teamDbId === "number") {
-		const membership = await db
-			.select()
-			.from(teamMemberships)
-			.where(
-				and(
-					eq(teamMemberships.userDbId, userDbId),
-					eq(teamMemberships.teamDbId, token.teamDbId),
-				),
-			)
-			.limit(1);
-		if (membership.length > 0) {
-			return <AlreadyMemberError />;
-		}
 	}
 
 	return (

@@ -98,25 +98,14 @@ export async function acceptInvitation(token: string) {
 			throw new JoinError("wrong_email");
 		}
 
-		const membership = await tx
-			.select()
-			.from(teamMemberships)
-			.where(
-				and(
-					eq(teamMemberships.userDbId, userDbId),
-					eq(teamMemberships.teamDbId, invitation.teamDbId),
-				),
-			)
-			.limit(1);
-		if (membership.length > 0) {
-			throw new JoinError("already_member");
-		}
-
-		await tx.insert(teamMemberships).values({
-			userDbId,
-			teamDbId: invitation.teamDbId,
-			role: invitation.role,
-		});
+		await tx
+			.insert(teamMemberships)
+			.values({
+				userDbId,
+				teamDbId: invitation.teamDbId,
+				role: invitation.role,
+			})
+			.onConflictDoNothing(); // ignore if the user is already a member of the team
 		await tx
 			.update(invitations)
 			.set({ revokedAt: new Date() })

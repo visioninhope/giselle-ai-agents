@@ -22,10 +22,14 @@ import {
 
 type InviteMemberDialogProps = {
 	teamInvitationViaEmailEnabled: boolean;
+	memberEmails: string[];
+	invitationEmails: string[];
 };
 
 export function InviteMemberDialog({
 	teamInvitationViaEmailEnabled,
+	memberEmails,
+	invitationEmails,
 }: InviteMemberDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [emailInput, setEmailInput] = useState("");
@@ -64,7 +68,11 @@ export function InviteMemberDialog({
 		try {
 			parse(pipe(string(), emailValidator()), trimmedEmail);
 			// Check for duplicates
-			if (!emailList.includes(trimmedEmail)) {
+			if (
+				!emailList.includes(trimmedEmail) &&
+				!memberEmails.includes(trimmedEmail) &&
+				!invitationEmails.includes(trimmedEmail)
+			) {
 				setEmailList((prev) => [...prev, trimmedEmail]);
 			}
 			setEmailInput("");

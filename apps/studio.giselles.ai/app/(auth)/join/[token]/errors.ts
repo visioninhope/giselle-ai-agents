@@ -1,4 +1,4 @@
-export type ErrorCode = "expired" | "wrong_email" | "already_member";
+export type ErrorCode = "expired" | "wrong_email";
 
 export class JoinError extends Error {
 	code: ErrorCode;

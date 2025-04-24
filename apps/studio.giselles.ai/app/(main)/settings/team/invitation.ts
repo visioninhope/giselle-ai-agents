@@ -1,9 +1,9 @@
 import type { TeamRole, UserId } from "@/drizzle";
 import { db } from "@/drizzle";
-import { invitations, teams, users } from "@/drizzle/schema";
+import { invitations, teamMemberships, teams, users } from "@/drizzle/schema";
 import { sendEmail } from "@/services/external/email";
 import { type CurrentTeam, fetchCurrentTeam } from "@/services/teams";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, isNull, sql } from "drizzle-orm";
 
 export type Invitation = typeof invitations.$inferSelect;
 
@@ -16,32 +16,80 @@ export async function createInvitation(
 		id: UserId;
 	},
 ): Promise<Invitation> {
+	const normalizedEmail = email.trim().toLowerCase();
 	const token = crypto.randomUUID();
-	const expiredAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
+	const expiredAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
-	const result = await db
-		.insert(invitations)
-		.values({
-			token,
-			teamDbId: currentTeam.dbId,
-			email,
-			role,
-			inviterUserDbId: currentUser.dbId,
-			expiredAt,
-			revokedAt: null,
-		})
-		.returning({
-			token: invitations.token,
-			teamDbId: invitations.teamDbId,
-			email: invitations.email,
-			role: invitations.role,
-			inviterUserDbId: invitations.inviterUserDbId,
-			expiredAt: invitations.expiredAt,
-			createdAt: invitations.createdAt,
-			revokedAt: invitations.revokedAt,
-		});
+	return db.transaction(async (tx) => {
+		// acquire advisory lock
+		await tx.execute(sql`
+        SELECT pg_advisory_xact_lock(
+          ${currentTeam.dbId},
+          hashtext(${normalizedEmail})
+        )
+      `);
 
-	return result[0];
+		// block invite if the user is already a team member
+		const existingMember = await tx
+			.select({ userDbId: users.dbId })
+			.from(users)
+			.innerJoin(
+				teamMemberships,
+				and(
+					eq(teamMemberships.userDbId, users.dbId),
+					eq(teamMemberships.teamDbId, currentTeam.dbId),
+				),
+			)
+			.where(eq(users.email, normalizedEmail))
+			.limit(1);
+
+		if (existingMember.length > 0) {
+			throw new Error("User is already a member of this team");
+		}
+
+		// block invite if an active invitation already exists
+		const existingActiveInvitation = await tx
+			.select()
+			.from(invitations)
+			.where(
+				and(
+					eq(invitations.teamDbId, currentTeam.dbId),
+					eq(invitations.email, normalizedEmail),
+					isNull(invitations.revokedAt),
+					sql`${invitations.expiredAt} > now()`, // not expired
+				),
+			)
+			.limit(1);
+
+		if (existingActiveInvitation.length > 0) {
+			throw new Error("An active invitation already exists");
+		}
+
+		// insert the invitation
+		const result = await tx
+			.insert(invitations)
+			.values({
+				token,
+				teamDbId: currentTeam.dbId,
+				email: normalizedEmail,
+				role,
+				inviterUserDbId: currentUser.dbId,
+				expiredAt,
+				revokedAt: null,
+			})
+			.returning({
+				token: invitations.token,
+				teamDbId: invitations.teamDbId,
+				email: invitations.email,
+				role: invitations.role,
+				inviterUserDbId: invitations.inviterUserDbId,
+				expiredAt: invitations.expiredAt,
+				createdAt: invitations.createdAt,
+				revokedAt: invitations.revokedAt,
+			});
+
+		return result[0];
+	});
 }
 
 export async function sendInvitationEmail(invitation: Invitation) {
