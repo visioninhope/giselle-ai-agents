@@ -523,10 +523,15 @@ function isVertexAiHost(urlString: string): boolean {
 	// }
 }
 
-function providerOptions(languageModel: TextGenerationLanguageModelData) {
+function providerOptions(languageModelData: TextGenerationLanguageModelData) {
+	const languageModel = languageModels.find(
+		(model) => model.id === languageModelData.id,
+	);
 	if (
-		languageModel.provider === "anthropic" &&
-		languageModel.configurations.reasoning
+		languageModel &&
+		languageModelData.provider === "anthropic" &&
+		languageModelData.configurations.reasoning &&
+		hasCapability(languageModel, Capability.Reasoning)
 	) {
 		return {
 			anthropic: {

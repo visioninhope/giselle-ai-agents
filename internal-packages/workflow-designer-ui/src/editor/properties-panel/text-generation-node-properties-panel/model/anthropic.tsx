@@ -1,6 +1,11 @@
 import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
-import { anthropicLanguageModels } from "@giselle-sdk/language-model";
+import {
+	Capability,
+	anthropicLanguageModels,
+	hasCapability,
+} from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
+import { useMemo } from "react";
 import {
 	Select,
 	SelectContent,
@@ -21,6 +26,11 @@ export function AnthropicModelPanel({
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
 	const limits = useUsageLimits();
+	const languageModel = useMemo(
+		() =>
+			anthropicLanguageModels.find((lm) => lm.id === anthropicLanguageModel.id),
+		[anthropicLanguageModel.id],
+	);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -108,6 +118,12 @@ export function AnthropicModelPanel({
 								}),
 							);
 						}}
+						note={
+							languageModel &&
+							anthropicLanguageModel.configurations.reasoning &&
+							!hasCapability(languageModel, Capability.Reasoning) &&
+							"Reasoning will not use since the current model does not support reasoning"
+						}
 					/>
 				</div>
 			</div>
