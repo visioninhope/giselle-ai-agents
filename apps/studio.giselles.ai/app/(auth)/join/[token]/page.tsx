@@ -1,40 +1,71 @@
 import { Button } from "@/components/ui/button";
+import { db, supabaseUserMappings, teamMemberships, users } from "@/drizzle";
 import { teamInvitationViaEmailFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import type { User } from "@supabase/auth-js";
+import { and, eq } from "drizzle-orm";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
-import { fetchInvitationToken } from "../utils/invitation-token";
-import { redirectToErrorPage } from "../utils/redirect-to-error-page";
+import { declineInvitation, joinTeam } from "./actions";
+import {
+	AlreadyMemberError,
+	ExpiredError,
+	WrongEmailError,
+} from "./error-components";
+import { fetchInvitationToken } from "./invitation";
 
-export default async function Page({ params }: { params: { token: string } }) {
+export default async function Page({
+	params,
+}: { params: Promise<{ token: string }> }) {
+	const { token: tokenParam } = await params;
 	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
 	if (!isTeamInvitationViaEmail) {
 		return notFound();
 	}
 
-	const token = await fetchInvitationToken(params.token);
+	const token = await fetchInvitationToken(tokenParam);
 	if (!token) {
 		return notFound();
 	}
 	if (token.expiredAt < new Date()) {
-		redirectToErrorPage("expired");
+		return <ExpiredError />;
 	}
 
 	let user: User | null = null;
 	try {
 		user = await getUser();
 	} catch (e) {
-		redirect(`/join/${encodeURIComponent(params.token)}/login`);
+		// redirect to signup page
+		redirect(`/join/${encodeURIComponent(tokenParam)}/signup`);
 	}
 
-	// FIXME: stub for debugging
-	// if (user.email !== token.invitedEmail) {
-	if (token.token === "wrong-email-token") {
-		redirectToErrorPage("wrong_email");
+	if (user.email !== token.invitedEmail) {
+		return <WrongEmailError teamName={token.teamName} token={tokenParam} />;
 	}
-	if (token.token === "already-member-token") {
-		redirectToErrorPage("already_member");
+
+	const userDb = await db
+		.select({ dbId: users.dbId })
+		.from(users)
+		.innerJoin(
+			supabaseUserMappings,
+			eq(users.dbId, supabaseUserMappings.userDbId),
+		)
+		.where(eq(supabaseUserMappings.supabaseUserId, user.id));
+	const userDbId = userDb[0]?.dbId;
+	if (userDbId && typeof token.teamDbId === "number") {
+		const membership = await db
+			.select()
+			.from(teamMemberships)
+			.where(
+				and(
+					eq(teamMemberships.userDbId, userDbId),
+					eq(teamMemberships.teamDbId, token.teamDbId),
+				),
+			)
+			.limit(1);
+		if (membership.length > 0) {
+			return <AlreadyMemberError />;
+		}
 	}
 
 	return (
@@ -51,7 +82,12 @@ export default async function Page({ params }: { params: { token: string } }) {
 						</h2>
 					</div>
 					<div className="grid gap-[16px]">
-						<Button className="w-full font-medium">Join to team</Button>
+						<form action={joinTeam} className="contents">
+							<input type="hidden" name="token" value={tokenParam} />
+							<Button type="submit" className="w-full font-medium">
+								Join to team
+							</Button>
+						</form>
 
 						<div className="text-sm text-center text-slate-400 mt-4">
 							By continuing, you agree to our{" "}
@@ -66,12 +102,15 @@ export default async function Page({ params }: { params: { token: string } }) {
 						</div>
 
 						<div className="flex justify-center mt-4">
-							<Link
-								href="#"
-								className="text-white hover:text-white/80 underline"
-							>
-								Decline
-							</Link>
+							<form action={declineInvitation} className="contents">
+								<input type="hidden" name="token" value={tokenParam} />
+								<button
+									type="submit"
+									className="text-white hover:text-white/80 underline"
+								>
+									Decline
+								</button>
+							</form>
 						</div>
 					</div>
 				</div>
