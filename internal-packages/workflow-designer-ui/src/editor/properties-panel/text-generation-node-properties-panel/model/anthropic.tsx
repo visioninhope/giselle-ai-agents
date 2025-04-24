@@ -1,6 +1,11 @@
 import { AnthropicLanguageModelData } from "@giselle-sdk/data-type";
-import { anthropicLanguageModels } from "@giselle-sdk/language-model";
+import {
+	Capability,
+	anthropicLanguageModels,
+	hasCapability,
+} from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
+import { useMemo } from "react";
 import {
 	Select,
 	SelectContent,
@@ -10,6 +15,7 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
+import { Switch } from "../../../../ui/switch";
 import { languageModelAvailable } from "./utils";
 
 export function AnthropicModelPanel({
@@ -20,6 +26,11 @@ export function AnthropicModelPanel({
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
 	const limits = useUsageLimits();
+	const languageModel = useMemo(
+		() =>
+			anthropicLanguageModels.find((lm) => lm.id === anthropicLanguageModel.id),
+		[anthropicLanguageModel.id],
+	);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -90,6 +101,29 @@ export function AnthropicModelPanel({
 								}),
 							);
 						}}
+					/>
+
+					<Switch
+						label="Reasoning"
+						name="reasoning"
+						checked={anthropicLanguageModel.configurations.reasoning}
+						onCheckedChange={(checked) => {
+							onModelChange(
+								AnthropicLanguageModelData.parse({
+									...anthropicLanguageModel,
+									configurations: {
+										...anthropicLanguageModel.configurations,
+										reasoning: checked,
+									},
+								}),
+							);
+						}}
+						note={
+							languageModel &&
+							anthropicLanguageModel.configurations.reasoning &&
+							!hasCapability(languageModel, Capability.Reasoning) &&
+							"Reasoning will not be used because the current model does not support it"
+						}
 					/>
 				</div>
 			</div>
