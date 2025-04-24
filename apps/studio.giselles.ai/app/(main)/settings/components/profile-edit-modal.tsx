@@ -6,6 +6,7 @@ import {
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
+	DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { users } from "@/drizzle";
@@ -15,7 +16,7 @@ import { maxLength, minLength, parse, pipe, string } from "valibot";
 import { updateAvatar, updateDisplayName } from "../account/actions";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
-import { Camera } from "lucide-react";
+import { Camera, ImageIcon } from "lucide-react";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -220,6 +221,14 @@ export function ProfileEditModal({
 					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
 						Change your Profiles
 					</DialogTitle>
+					<DialogClose 
+						className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none" 
+						onClick={onClose}
+					>
+						<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white-800">
+							<path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+						</svg>
+					</DialogClose>
 				</DialogHeader>
 
 				<div className="relative z-10 flex flex-col items-center gap-6 w-full px-[24px] pb-[30px]">
@@ -234,47 +243,54 @@ export function ProfileEditModal({
 					
 					{/* Avatar Profile Images */}
 					<div className="flex items-center justify-center gap-4 w-full">
-						{/* Current avatar */}
-						{initialAvatarUrl && !avatarPreview && (
-							<button
-								type="button"
-								onClick={handleSelectImageClick}
-								className="group relative w-[47px] h-[47px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white-400 border border-primary-100/20"
-							>
-								<AvatarImage
-									avatarUrl={initialAvatarUrl}
-									width={47}
-									height={47}
-									alt={alt}
-								/>
-								<div className="absolute inset-0 flex items-center justify-center bg-black-900/60 opacity-0 group-hover:opacity-100 transition-opacity">
-									<Camera className="w-5 h-5 text-white-800" />
+						<div className="flex flex-row gap-4">
+							{/* 左側 - クリックできるアバター */}
+							{initialAvatarUrl && !avatarPreview && (
+								<button
+									type="button"
+									onClick={handleSelectImageClick}
+									className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+								>
+									<AvatarImage
+										avatarUrl={initialAvatarUrl}
+										width={80}
+										height={80}
+										alt={alt}
+										className="object-cover w-full h-full"
+									/>
+									<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+										<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+											<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+										</div>
+									</div>
+								</button>
+							)}
+							
+							{/* 左側 - プレビュー画像 */}
+							{avatarPreview && (
+								<div className="relative w-[80px] h-[80px] rounded-full overflow-hidden border border-primary-100/30">
+									<Image
+										src={avatarPreview}
+										alt="Avatar preview"
+										fill
+										sizes="80px"
+										className="object-cover w-full h-full scale-[1.02]"
+										style={{ objectPosition: 'center' }}
+									/>
 								</div>
-							</button>
-						)}
-						
-						{/* Selected avatar preview */}
-						{avatarPreview && (
-							<div className="relative w-[47px] h-[47px] rounded-full overflow-hidden border border-primary-100/30">
-								<Image
-									src={avatarPreview}
-									alt="Avatar preview"
-									fill
-									className="object-cover"
-								/>
-							</div>
-						)}
-						
-						{/* Image placeholder */}
-						{!initialAvatarUrl && !avatarPreview && (
-							<button
-								type="button"
-								onClick={handleSelectImageClick}
-								className="group relative w-[47px] h-[47px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-2 focus:ring-white-400 bg-black-800 border border-primary-100/20 flex items-center justify-center"
-							>
-								<Camera className="w-5 h-5 text-white-600" />
-							</button>
-						)}
+							)}
+							
+							{/* 左側 - 画像アイコン（初期アバターがない場合） */}
+							{!initialAvatarUrl && !avatarPreview && (
+								<button
+									type="button"
+									onClick={handleSelectImageClick}
+									className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
+								>
+									<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+								</button>
+							)}
+						</div>
 					</div>
 					
 					{/* Display name input */}
