@@ -68,7 +68,7 @@ export const githubToolsFlag = flag<boolean>({
 export const teamInvitationViaEmailFlag = flag<boolean>({
 	key: "teamInvitationViaEmail",
 	async decide() {
-		return takeLocalEnv("TEAM_INVITATION_VIA_EMAIL_FLAG");
+		return true;
 	},
 	description: "Enable team invitation via email",
 	defaultValue: false,
