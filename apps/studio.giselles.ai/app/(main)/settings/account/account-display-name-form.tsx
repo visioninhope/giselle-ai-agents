@@ -1,11 +1,11 @@
 "use client";
 
 import type { users } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { Camera } from "lucide-react";
 import { useState } from "react";
 import { Button } from "../components/button";
 import { ProfileEditModal } from "../components/profile-edit-modal";
-import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
-import { Camera } from "lucide-react";
 
 export function AccountDisplayNameForm({
 	displayName: _displayName,
@@ -17,10 +17,10 @@ export function AccountDisplayNameForm({
 	alt?: string;
 }) {
 	const [displayName, setDisplayName] = useState(
-		_displayName ?? "No display name"
+		_displayName ?? "No display name",
 	);
 	const [currentAvatarUrl, setCurrentAvatarUrl] = useState<string | null>(
-		avatarUrl
+		avatarUrl,
 	);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
 
@@ -51,6 +51,7 @@ export function AccountDisplayNameForm({
 								width={60}
 								height={60}
 								alt={alt}
+								className="object-cover w-full h-full"
 							/>
 						</div>
 						<span className="text-primary-100 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot px-3 py-2 border-[0.5px] border-black-750 rounded-[4px] bg-black-900 w-[360px] truncate">

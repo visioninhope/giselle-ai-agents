@@ -139,34 +139,40 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 					/>
 
 					{preview ? (
-						<div className="flex flex-col items-center gap-4">
-							<div className="relative w-32 h-32 rounded-full overflow-hidden border-2 border-primary-100/30">
+						<div className="flex flex-col gap-[30px]">
+							<div className="relative w-[80px] h-[80px] mx-auto rounded-full overflow-hidden border border-primary-100/30 mb-auto">
 								<Image
 									src={preview}
-									alt="アバタープレビュー"
+									alt="Avatar preview"
 									fill
-									className="object-cover"
+									sizes="80px"
+									className="object-cover w-full h-full scale-[1.02]"
+									style={{ objectPosition: 'center' }}
 								/>
 							</div>
-							<Button 
-								type="button" 
-								onClick={handleButtonClick} 
+							<Button
+								type="button"
+								onClick={handleButtonClick}
 								className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em] bg-primary-200 text-black-800 font-bold hover:bg-transparent hover:text-primary-200 hover:border-primary-200 transition-colors disabled:border-0 disabled:bg-black-400 disabled:text-black-600"
 							>
-								Select Another Image
+								Change Image
 							</Button>
 						</div>
 					) : (
-						<Button 
-							type="button" 
-							onClick={handleButtonClick} 
+						<Button
+							type="button"
+							onClick={handleButtonClick}
 							className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em] bg-primary-200 text-black-800 font-bold hover:bg-transparent hover:text-primary-200 hover:border-primary-200 transition-colors disabled:border-0 disabled:bg-black-400 disabled:text-black-600"
 						>
 							Select Image
 						</Button>
 					)}
 
-					{error && <p className="text-error-900 text-[12px] leading-[20.4px] font-geist text-center">{error}</p>}
+					{error && (
+						<p className="text-error-900 text-[12px] leading-[20.4px] font-geist text-center">
+							{error}
+						</p>
+					)}
 
 					<div className="flex justify-end gap-4 w-full">
 						<Button
