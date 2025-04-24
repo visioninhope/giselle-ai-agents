@@ -8,6 +8,8 @@ import {
 	isFailedGeneration,
 } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "giselle-sdk/react";
+import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { Accordion } from "radix-ui";
 import { useMemo } from "react";
 import { WilliIcon } from "../icons";
 import { MemoizedMarkdown } from "./memoized-markdown";
@@ -68,10 +70,60 @@ export function GenerationView({
 				})}
 			{generatedMessages.map((message) => (
 				<div key={message.id}>
-					{message.parts?.map((part) => {
+					{message.parts?.map((part, index) => {
+						const lastPart = message.parts?.length === index + 1;
 						switch (part.type) {
 							case "reasoning":
-								return <p key={part.reasoning}>{part.reasoning}</p>;
+								if (lastPart) {
+									return (
+										<Accordion.Root
+											key={`messages.${message.id}.parts.[${index}].reasoning`}
+											type="single"
+											collapsible
+											className="my-[8px]"
+											defaultValue={`messages.${message.id}.parts.[${index}].reasoning`}
+										>
+											<Accordion.Item
+												value={`messages.${message.id}.parts.[${index}].reasoning`}
+											>
+												<Accordion.Trigger className="group text-white-400 text-[14px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none">
+													<ChevronRightIcon
+														className="size-[16px] transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-90"
+														aria-hidden
+													/>
+													Thinking
+												</Accordion.Trigger>
+												<Accordion.Content className="markdown-renderer overflow-hidden italic text-[14px] text-white-400 ml-[8px] pl-[12px] mb-[8px] data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown border-l border-l-white-400/20">
+													<MemoizedMarkdown content={part.reasoning} />
+												</Accordion.Content>
+											</Accordion.Item>
+										</Accordion.Root>
+									);
+								}
+								return (
+									<Accordion.Root
+										key={`messages.${message.id}.parts.[${index}].reason`}
+										type="single"
+										collapsible
+										className="my-[8px]"
+										defaultValue=""
+									>
+										<Accordion.Item
+											value={`messages.${message.id}.parts.[${index}].reason`}
+										>
+											<Accordion.Trigger className="group text-white-400 text-[14px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none">
+												<ChevronRightIcon
+													className="size-[16px] transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-90"
+													aria-hidden
+												/>
+												Thought Process
+											</Accordion.Trigger>
+											<Accordion.Content className="markdown-renderer overflow-hidden italic text-[14px] text-white-400 ml-[8px] pl-[12px] mb-[8px] data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown border-l border-l-white-400/20">
+												<MemoizedMarkdown content={part.reasoning} />
+											</Accordion.Content>
+										</Accordion.Item>
+									</Accordion.Root>
+								);
 
 							case "text":
 								return (

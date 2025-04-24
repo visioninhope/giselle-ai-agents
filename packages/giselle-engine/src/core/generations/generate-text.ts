@@ -1,5 +1,5 @@
 import { URL } from "node:url";
-import { anthropic } from "@ai-sdk/anthropic";
+import { type AnthropicProviderOptions, anthropic } from "@ai-sdk/anthropic";
 import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
@@ -333,6 +333,7 @@ export async function generateText(args: {
 
 	const streamTextResult = streamText({
 		model: generationModel(actionNode.content.llm),
+		providerOptions: providerOptions(actionNode.content.llm),
 		messages,
 		maxSteps: 5, // enable multi-step calls
 		tools: preparedToolSet.toolSet,
@@ -520,4 +521,21 @@ function isVertexAiHost(urlString: string): boolean {
 	// } catch (e) {
 	// 	return false;
 	// }
+}
+
+function providerOptions(languageModel: TextGenerationLanguageModelData) {
+	if (
+		languageModel.provider === "anthropic" &&
+		languageModel.configurations.reasoning
+	) {
+		return {
+			anthropic: {
+				thinking: {
+					type: "enabled",
+					// Based on Zed's configuration: https://github.com/zed-industries/zed/blob/9d10489607df700c544c48cf09fea82f5d5aacf8/crates/anthropic/src/anthropic.rs#L212
+					budgetTokens: 4096,
+				},
+			} satisfies AnthropicProviderOptions,
+		};
+	}
 }
