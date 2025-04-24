@@ -104,7 +104,16 @@ const gpt41nano: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gpt4o, gpt4oMini, o3, o3Mini, o4Mini, gpt41, gpt41mini, gpt41nano];
+export const models = [
+	gpt4o,
+	gpt4oMini,
+	o3,
+	o3Mini,
+	o4Mini,
+	gpt41,
+	gpt41mini,
+	gpt41nano,
+];
 
 export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;
