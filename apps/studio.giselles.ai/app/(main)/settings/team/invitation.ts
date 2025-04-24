@@ -47,7 +47,6 @@ export async function createInvitation(
 export async function sendInvitationEmail(invitation: Invitation) {
 	const result = await db
 		.select({
-			displayName: users.displayName,
 			email: users.email,
 		})
 		.from(users)
