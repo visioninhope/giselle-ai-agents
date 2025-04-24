@@ -35,8 +35,8 @@ export default async function Page({
 	try {
 		user = await getUser();
 	} catch (e) {
-		// redirect to login page
-		redirect(`/join/${encodeURIComponent(tokenParam)}/login`);
+		// redirect to signup page
+		redirect(`/join/${encodeURIComponent(tokenParam)}/signup`);
 	}
 
 	if (user.email !== token.invitedEmail) {
