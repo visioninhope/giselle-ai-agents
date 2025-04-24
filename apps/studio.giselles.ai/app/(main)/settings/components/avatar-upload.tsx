@@ -147,7 +147,7 @@ export function AvatarUpload({ isOpen, onClose, onUpload }: AvatarUploadProps) {
 									fill
 									sizes="80px"
 									className="object-cover w-full h-full scale-[1.02]"
-									style={{ objectPosition: 'center' }}
+									style={{ objectPosition: "center" }}
 								/>
 							</div>
 							<Button
