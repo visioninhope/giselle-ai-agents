@@ -15,6 +15,7 @@ export default async function Layout({
 			workspaceId={workspaceId}
 			featureFlag={{
 				flowNode: true,
+				runV2: true,
 			}}
 		>
 			{children}

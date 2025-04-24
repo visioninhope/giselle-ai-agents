@@ -10,7 +10,7 @@ import {
 	TextGenerationContent,
 	TextGenerationContentReference,
 } from "./text-generation";
-import { TriggerContent } from "./trigger";
+import { TriggerContent, TriggerContentReference } from "./trigger";
 export * from "./image-generation";
 export * from "./text-generation";
 export * from "./trigger";
@@ -74,6 +74,7 @@ export type OverrideActionNode = z.infer<typeof OverrideActionNode>;
 const ActionNodeContentReference = z.discriminatedUnion("type", [
 	TextGenerationContentReference,
 	ImageGenerationContentReference,
+	TriggerContentReference,
 ]);
 export const ActionNodeReference = NodeReferenceBase.extend({
 	type: ActionNode.shape.type,

@@ -59,7 +59,10 @@ export function WorkspaceProvider({
 						<GenerationRunnerSystemProvider>
 							<RunSystemContextProvider workspaceId={workspaceId}>
 								<FeatureFlagContext
-									value={{ flowNode: featureFlag?.flowNode ?? false }}
+									value={{
+										flowNode: featureFlag?.flowNode ?? false,
+										runV2: featureFlag?.runV2 ?? false,
+									}}
 								>
 									{children}
 								</FeatureFlagContext>
