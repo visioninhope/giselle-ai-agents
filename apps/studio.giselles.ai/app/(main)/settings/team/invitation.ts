@@ -21,7 +21,7 @@ export async function createInvitation(
 	const expiredAt = new Date(Date.now() + 1000 * 60 * 60 * 24); // 24 hours
 
 	return db.transaction(async (tx) => {
-		// aquire advisory lock
+		// acquire advisory lock
 		await tx.execute(sql`
         SELECT pg_advisory_xact_lock(
           ${currentTeam.dbId},
