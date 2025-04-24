@@ -3,20 +3,20 @@
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
+	DialogClose,
 	DialogContent,
 	DialogHeader,
 	DialogTitle,
-	DialogClose,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { users } from "@/drizzle";
+import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
+import { Camera, ImageIcon } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
 import { updateAvatar, updateDisplayName } from "../account/actions";
 import { IMAGE_CONSTRAINTS } from "../constants";
-import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
-import { Camera, ImageIcon } from "lucide-react";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
 
@@ -45,19 +45,22 @@ export function ProfileEditModal({
 }: ProfileEditModalProps) {
 	// Avatar state
 	const [avatarPreview, setAvatarPreview] = useState<string | null>(null);
-	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(null);
+	const [selectedAvatarFile, setSelectedAvatarFile] = useState<File | null>(
+		null,
+	);
 	const avatarInputRef = useRef<HTMLInputElement>(null);
-	
+
 	// Display name state
 	const [displayName, setDisplayName] = useState(
-		initialDisplayName ?? "No display name"
+		initialDisplayName ?? "No display name",
 	);
-	
+
 	// Shared state
 	const [error, setError] = useState<string>("");
 	const [avatarError, setAvatarError] = useState<string>("");
 	const [isLoading, setIsLoading] = useState(false);
-	const hasChanges = selectedAvatarFile !== null || displayName !== initialDisplayName;
+	const hasChanges =
+		selectedAvatarFile !== null || displayName !== initialDisplayName;
 
 	// Reset when the modal opens/closes
 	useEffect(() => {
@@ -66,14 +69,14 @@ export function ProfileEditModal({
 			if (avatarPreview) {
 				URL.revokeObjectURL(avatarPreview);
 			}
-			
+
 			// Reset state
 			setAvatarPreview(null);
 			setSelectedAvatarFile(null);
 			setDisplayName(initialDisplayName ?? "No display name");
 			setError("");
 			setAvatarError("");
-			
+
 			// Reset file input
 			if (avatarInputRef.current) {
 				avatarInputRef.current.value = "";
@@ -100,7 +103,7 @@ export function ProfileEditModal({
 
 		if (file.size > IMAGE_CONSTRAINTS.maxSize) {
 			setAvatarError(
-				`Please select an image under ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB in size`
+				`Please select an image under ${IMAGE_CONSTRAINTS.maxSize / (1024 * 1024)}MB in size`,
 			);
 			if (avatarPreview) {
 				URL.revokeObjectURL(avatarPreview);
@@ -136,7 +139,7 @@ export function ProfileEditModal({
 			setIsLoading(true);
 			setError("");
 			setAvatarError("");
-			
+
 			// Validate display name if changed
 			if (displayName !== initialDisplayName) {
 				try {
@@ -149,17 +152,17 @@ export function ProfileEditModal({
 					}
 				}
 			}
-			
+
 			// Save changes
 			const promises = [];
-			
+
 			// Update display name if changed
 			if (displayName !== initialDisplayName) {
 				const formData = new FormData();
 				formData.append("displayName", displayName);
 				promises.push(updateDisplayName(formData));
 			}
-			
+
 			// Update avatar if changed
 			if (selectedAvatarFile) {
 				const formData = new FormData();
@@ -167,18 +170,17 @@ export function ProfileEditModal({
 				formData.append("avatarUrl", selectedAvatarFile.name);
 				promises.push(updateAvatar(formData));
 			}
-			
+
 			// Wait for all updates to complete
 			await Promise.all(promises);
-			
+
 			// Call success callback if provided
 			if (onSuccess) {
 				onSuccess();
 			}
-			
+
 			// Close the modal
 			onClose();
-			
 		} catch (error) {
 			console.error("Failed to save profile changes:", error);
 			if (error instanceof Error) {
@@ -221,13 +223,25 @@ export function ProfileEditModal({
 					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
 						Change your Profiles
 					</DialogTitle>
-					<DialogClose 
-						className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none" 
+					<DialogClose
+						className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
 						onClick={onClose}
 					>
-						<svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-white-800">
+						<svg
+							width="15"
+							height="15"
+							viewBox="0 0 15 15"
+							fill="none"
+							xmlns="http://www.w3.org/2000/svg"
+							className="h-4 w-4 text-white-800"
+						>
 							<title>Close</title>
-							<path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor" fillRule="evenodd" clipRule="evenodd"></path>
+							<path
+								d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
+								fill="currentColor"
+								fillRule="evenodd"
+								clipRule="evenodd"
+							/>
 						</svg>
 					</DialogClose>
 				</DialogHeader>
@@ -241,7 +255,7 @@ export function ProfileEditModal({
 						className="hidden"
 						onChange={handleFileSelect}
 					/>
-					
+
 					{/* Avatar Profile Images */}
 					<div className="flex items-center justify-center gap-4 w-full">
 						<div className="flex flex-row gap-4">
@@ -266,7 +280,7 @@ export function ProfileEditModal({
 									</div>
 								</button>
 							)}
-							
+
 							{/* 左側 - プレビュー画像 */}
 							{avatarPreview && (
 								<div className="relative w-[80px] h-[80px] rounded-full overflow-hidden border border-primary-100/30">
@@ -276,11 +290,11 @@ export function ProfileEditModal({
 										fill
 										sizes="80px"
 										className="object-cover w-full h-full scale-[1.02]"
-										style={{ objectPosition: 'center' }}
+										style={{ objectPosition: "center" }}
 									/>
 								</div>
 							)}
-							
+
 							{/* 左側 - 画像アイコン（初期アバターがない場合） */}
 							{!initialAvatarUrl && !avatarPreview && (
 								<button
@@ -293,10 +307,10 @@ export function ProfileEditModal({
 							)}
 						</div>
 					</div>
-					
+
 					{/* Display name input */}
 					<div className="w-full">
-						<label 
+						<label
 							htmlFor="displayName"
 							className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
 						>
@@ -312,14 +326,14 @@ export function ProfileEditModal({
 							/>
 						</div>
 					</div>
-					
+
 					{/* Error message */}
 					{(error || avatarError) && (
 						<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
 							{error || avatarError}
 						</p>
 					)}
-					
+
 					{/* Action buttons */}
 					<div className="flex justify-end gap-2 w-full">
 						<Button
@@ -347,4 +361,4 @@ export function ProfileEditModal({
 			</DialogContent>
 		</Dialog>
 	);
-} 
+}
