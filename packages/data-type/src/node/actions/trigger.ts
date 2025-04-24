@@ -1,5 +1,11 @@
 import { z } from "zod";
 
+export const ManualTriggerProvider = z.object({
+	type: z.literal("manual"),
+	triggerId: z.string().describe("id of @giselle-sdk/flow/manualTrigger"),
+});
+export type ManualTriggerProvider = z.infer<typeof ManualTriggerProvider>;
+
 const GitHubTriggerProviderAuthUnauthenticated = z.object({
 	state: z.literal("unauthenticated"),
 });
@@ -24,6 +30,7 @@ export const HttpTriggerProvider = z.object({
 export type HttpTriggerProvider = z.infer<typeof HttpTriggerProvider>;
 
 export const TriggerProvider = z.discriminatedUnion("type", [
+	ManualTriggerProvider,
 	GitHubTriggerProvider,
 	HttpTriggerProvider,
 ]);
@@ -31,6 +38,7 @@ export type TriggerProvider = z.infer<typeof TriggerProvider>;
 
 export const TriggerProviderLike = z.object({
 	type: z.string(),
+	triggerId: z.string().describe("id of @giselle-sdk/flow/trigger"),
 });
 export type TriggerProviderLike = z.infer<typeof TriggerProviderLike>;
 
