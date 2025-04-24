@@ -62,10 +62,26 @@ const o1Mini: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
+const o3: OpenAILanguageModel = {
+	provider: "openai",
+	id: "o3",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
 const o3Mini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "o3-mini",
 	capabilities: Capability.TextGeneration,
+	tier: Tier.enum.pro,
+	configurations: defaultConfigurations,
+};
+
+const o4Mini: OpenAILanguageModel = {
+	provider: "openai",
+	id: "o4-mini",
+	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -100,7 +116,16 @@ const gpt41nano: OpenAILanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [gpt4o, gpt4oMini, o3Mini, gpt41, gpt41mini, gpt41nano];
+export const models = [
+	gpt4o,
+	gpt4oMini,
+	o3,
+	o3Mini,
+	o4Mini,
+	gpt41,
+	gpt41mini,
+	gpt41nano,
+];
 
 export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;
