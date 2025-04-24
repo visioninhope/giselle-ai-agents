@@ -4,10 +4,9 @@ import type { TriggerBase } from "../base";
 const provider = "github" as const;
 export interface GitHubTrigger extends TriggerBase {
 	provider: typeof provider;
-	payloads: z.AnyZodObject;
 }
 
-export const githubIssueCreatedTrigger: GitHubTrigger = {
+export const githubIssueCreatedTrigger = {
 	provider,
 	id: "github.issue.created",
 	label: "Created an issue",
@@ -17,9 +16,9 @@ export const githubIssueCreatedTrigger: GitHubTrigger = {
 		repositoryOwner: z.string(),
 		repositoryName: z.string(),
 	}),
-};
+} as const satisfies GitHubTrigger;
 
-export const githubIssueCommentCreatedTrigger: GitHubTrigger = {
+export const githubIssueCommentCreatedTrigger = {
 	provider,
 	id: "github.issue_comment.created",
 	label: "Created an issue comment",
@@ -31,9 +30,9 @@ export const githubIssueCommentCreatedTrigger: GitHubTrigger = {
 		repositoryOwner: z.string(),
 		repositoryName: z.string(),
 	}),
-};
+} as const satisfies GitHubTrigger;
 
 export const triggers = [
 	githubIssueCreatedTrigger,
 	githubIssueCommentCreatedTrigger,
-];
+] as const;

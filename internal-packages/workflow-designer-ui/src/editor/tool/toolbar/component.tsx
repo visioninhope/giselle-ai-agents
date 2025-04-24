@@ -5,7 +5,7 @@ import {
 	isImageGenerationLanguageModelData,
 	isTextGenerationLanguageModelData,
 } from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
+import { githubTriggers, manualTriggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	type LanguageModel,
@@ -231,12 +231,32 @@ export function Toolbar() {
 															"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 														)}
 														onValueChange={(value) => {
-															/** @todo parse provider */
-															const provider = "github";
-															setSelectedTool(
-																addNodeTool(triggerNode(provider, value)),
-															);
-															// Add more source types here in the future if needed
+															setSelectedTool(addNodeTool(triggerNode(value)));
+														}}
+													>
+														{manualTriggers.map((manualTrigger) => (
+															<ToggleGroup.Item
+																key={manualTrigger.id}
+																value={manualTrigger.id}
+																data-tool
+															>
+																<MousePointerClickIcon className="w-[20px] h-[20px] shrink-0" />
+																<p className="text-[14px]">
+																	{manualTrigger.label}
+																</p>
+															</ToggleGroup.Item>
+														))}
+													</ToggleGroup.Root>
+													<ToggleGroup.Root
+														type="single"
+														className={clsx(
+															"flex flex-col gap-[8px]",
+															"**:data-tool:flex **:data-tool:rounded-[8px] **:data-tool:items-center **:data-tool:w-full",
+															"**:data-tool:select-none **:data-tool:outline-none **:data-tool:px-[8px] **:data-tool:py-[4px] **:data-tool:gap-[8px] **:data-tool:hover:bg-white-900/10",
+															"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
+														)}
+														onValueChange={(value) => {
+															setSelectedTool(addNodeTool(triggerNode(value)));
 														}}
 													>
 														{githubTriggers.map((githubTrigger) => (

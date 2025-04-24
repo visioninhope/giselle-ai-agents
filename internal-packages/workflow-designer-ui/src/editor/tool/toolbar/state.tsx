@@ -6,6 +6,7 @@ import {
 	type GitHubTriggerProvider,
 	type ImageGenerationLanguageModelData,
 	type ImageGenerationNode,
+	type ManualTriggerProvider,
 	type Node,
 	NodeId,
 	type Output,
@@ -15,8 +16,9 @@ import {
 	type TextNode,
 	type TriggerNode,
 	type TriggerProvider,
+	type TriggerProviderLike,
 } from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
+import { githubTriggers, triggers } from "@giselle-sdk/flow";
 import {
 	Capability,
 	hasCapability,
@@ -166,37 +168,40 @@ export function textNode() {
 	} satisfies TextNode;
 }
 
-function unauthenticatedGithubTriggerProvider(
-	id: string,
-): GitHubTriggerProvider {
-	return {
-		type: "github",
-		triggerId: id,
-		auth: {
-			state: "unauthenticated",
-		},
-	};
-}
-
-export function triggerNode(triggerProvider: string, triggerId: string) {
-	if (triggerProvider !== "github") {
-		throw new Error("Unsupported trigger provider");
-	}
-	const trigger = githubTriggers.find(
-		(githubTrigger) => githubTrigger.id === triggerId,
-	);
+export function triggerNode(triggerId: string) {
+	const trigger = triggers.find((trigger) => trigger.id === triggerId);
 	if (trigger === undefined) {
 		throw new Error("Unsupported trigger");
 	}
 
 	const outputs: Output[] = [];
-	trigger.payloads.keyof().options;
-	for (const payloadKey of trigger.payloads.keyof().options as Array<string>) {
-		outputs.push({
-			id: OutputId.generate(),
-			label: payloadKey,
-			accessor: payloadKey,
-		});
+	if ("payloads" in trigger)
+		for (const payloadKey of trigger.payloads.keyof()
+			.options as Array<string>) {
+			outputs.push({
+				id: OutputId.generate(),
+				label: payloadKey,
+				accessor: payloadKey,
+			});
+		}
+
+	function createDefaultProvider(trigger: (typeof triggers)[number]) {
+		switch (trigger.provider) {
+			case "github":
+				return {
+					type: "github",
+					triggerId,
+					auth: {
+						state: "unauthenticated",
+					},
+				} satisfies GitHubTriggerProvider;
+			case "manual":
+				return { type: "manual", triggerId } satisfies ManualTriggerProvider;
+			default: {
+				const _exhaustiveCheck: never = trigger;
+				throw new Error(`Unsupported trigger provider: ${_exhaustiveCheck}`);
+			}
+		}
 	}
 
 	return {
@@ -205,7 +210,7 @@ export function triggerNode(triggerProvider: string, triggerId: string) {
 		name: trigger.label,
 		content: {
 			type: "trigger",
-			provider: unauthenticatedGithubTriggerProvider(trigger.id),
+			provider: createDefaultProvider(trigger),
 		},
 		inputs: [],
 		outputs,
