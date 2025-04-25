@@ -6,6 +6,7 @@ import {
 	GenerationContext,
 	type GenerationOutput,
 	type Image,
+	type ImageGenerationNode,
 	ImageId,
 	type NodeId,
 	type Output,
@@ -20,8 +21,12 @@ import {
 	type GeneratedImageData,
 	createUsageCalculator,
 } from "@giselle-sdk/language-model";
-import type { experimental_generateImage as generateImageAiSdk } from "ai";
+import type {
+	CoreMessage,
+	experimental_generateImage as generateImageAiSdk,
+} from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
+import type { Storage } from "unstorage";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
@@ -211,21 +216,83 @@ export async function generateImage(args: {
 		fileResolver,
 		generationContentResolver,
 	);
-	let prompt = "";
-	for (const message of messages) {
-		if (!Array.isArray(message.content)) {
-			continue;
-		}
-		for (const content of message.content) {
-			if (content.type !== "text") {
-				continue;
-			}
-			prompt += content.text;
+
+	let generationOutputs: GenerationOutput[] = [];
+	switch (actionNode.content.llm.provider) {
+		case "fal":
+			generationOutputs = await generateImageWithFal({
+				actionNode,
+				messages,
+				runningGeneration,
+				generationContext,
+				langfuse,
+				telemetry: args.telemetry,
+				context: args.context,
+			});
+			break;
+		case "openai":
+			break;
+		default: {
+			const _exhaustiveCheck: never = actionNode.content.llm;
+			throw new Error(`Unhandled generation output type: ${_exhaustiveCheck}`);
 		}
 	}
+	const completedGeneration = {
+		...runningGeneration,
+		status: "completed",
+		messages: [],
+		completedAt: Date.now(),
+		outputs: generationOutputs,
+	} satisfies CompletedGeneration;
+
+	await Promise.all([
+		setGeneration({
+			storage: args.context.storage,
+			generation: completedGeneration,
+		}),
+		setNodeGenerationIndex({
+			storage: args.context.storage,
+			nodeId: runningGeneration.context.actionNode.id,
+			origin: runningGeneration.context.origin,
+			nodeGenerationIndex: {
+				id: completedGeneration.id,
+				nodeId: completedGeneration.context.actionNode.id,
+				status: "completed",
+				createdAt: completedGeneration.createdAt,
+				queuedAt: completedGeneration.queuedAt,
+				startedAt: completedGeneration.startedAt,
+				completedAt: completedGeneration.completedAt,
+			},
+		}),
+	]);
+
+	await handleAgentTimeConsumption({
+		workspaceId,
+		generation: completedGeneration,
+		onConsumeAgentTime: args.context.onConsumeAgentTime,
+	});
+}
+
+async function generateImageWithFal({
+	actionNode,
+	generationContext,
+	runningGeneration,
+	messages,
+	langfuse,
+	telemetry,
+	context,
+}: {
+	actionNode: ImageGenerationNode;
+	generationContext: GenerationContext;
+	runningGeneration: RunningGeneration;
+	messages: CoreMessage[];
+	telemetry?: TelemetrySettings;
+	langfuse: Langfuse;
+	context: GiselleEngineContext;
+}) {
 	const trace = langfuse.trace({
 		name: "fal-ai/client",
-		metadata: args.telemetry?.metadata,
+		metadata: telemetry?.metadata,
 		input: { messages },
 	});
 	const generation = trace.generation({
@@ -240,6 +307,18 @@ export async function generateImage(args: {
 		},
 	});
 
+	let prompt = "";
+	for (const message of messages) {
+		if (!Array.isArray(message.content)) {
+			continue;
+		}
+		for (const content of message.content) {
+			if (content.type !== "text") {
+				continue;
+			}
+			prompt += content.text;
+		}
+	}
 	const result = (await fal.subscribe(actionNode.content.llm.id, {
 		input: {
 			prompt,
@@ -277,7 +356,7 @@ export async function generateImage(args: {
 				const base64 = Buffer.from(uint8Array).toString("base64");
 
 				await setGeneratedImage({
-					storage: args.context.storage,
+					storage: context.storage,
 					generation: runningGeneration,
 					generatedImage: {
 						uint8Array,
@@ -301,42 +380,7 @@ export async function generateImage(args: {
 			outputId: generatedImageOutput.id,
 		});
 	}
-	const completedGeneration = {
-		...runningGeneration,
-		status: "completed",
-		messages: [],
-		completedAt: Date.now(),
-		outputs: generationOutputs,
-	} satisfies CompletedGeneration;
-
-	await Promise.all([
-		setGeneration({
-			storage: args.context.storage,
-			generation: completedGeneration,
-		}),
-		setNodeGenerationIndex({
-			storage: args.context.storage,
-			nodeId: runningGeneration.context.actionNode.id,
-			origin: runningGeneration.context.origin,
-			nodeGenerationIndex: {
-				id: completedGeneration.id,
-				nodeId: completedGeneration.context.actionNode.id,
-				status: "completed",
-				createdAt: completedGeneration.createdAt,
-				queuedAt: completedGeneration.queuedAt,
-				startedAt: completedGeneration.startedAt,
-				completedAt: completedGeneration.completedAt,
-			},
-		}),
-	]);
-
-	await handleAgentTimeConsumption({
-		workspaceId,
-		generation: completedGeneration,
-		onConsumeAgentTime: args.context.onConsumeAgentTime,
-	});
-
-	if (args.context.telemetry?.isEnabled && generatedImageOutput) {
+	if (context.telemetry?.isEnabled && generatedImageOutput) {
 		const usageCalculator = createUsageCalculator(actionNode.content.llm.id);
 		await Promise.all([
 			...result.data.images.map(async (image) => {
@@ -364,4 +408,5 @@ export async function generateImage(args: {
 			})(),
 		]);
 	}
+	return generationOutputs;
 }
