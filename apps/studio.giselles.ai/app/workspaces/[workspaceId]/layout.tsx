@@ -1,5 +1,5 @@
 import { db } from "@/drizzle";
-import { flowNodeFlag, gptImage1Flag, runV2Flag } from "@/flags";
+import { flowNodeFlag, runV2Flag } from "@/flags";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
@@ -32,7 +32,6 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const flowNode = await flowNodeFlag();
 	const runV2 = await runV2Flag();
-	const gptImage1 = await gptImage1Flag();
 
 	return (
 		<WorkspaceProvider
@@ -57,7 +56,6 @@ export default async function Layout({
 			featureFlag={{
 				flowNode,
 				runV2,
-				gptImage1,
 			}}
 		>
 			{children}
