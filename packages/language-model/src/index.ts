@@ -27,10 +27,17 @@ export * from "./base";
 export * from "./helper";
 export {
 	getImageGenerationModelProvider,
-	imageGenerationSizes,
+	falImageGenerationSizes as imageGenerationSizes,
 	createUsageCalculator,
 } from "./fal";
 export type { FalImageResult, GeneratedImageData } from "./fal";
+export {
+	size as openaiImageSize,
+	quality as openaiImageQuality,
+	moderation as openaiImageModeration,
+	background as openaiImageBackground,
+	models as openaiImageModels,
+} from "./openai-image";
 
 export const LanguageModel = z.union([
 	AnthropicLanguageModel,

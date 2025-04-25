@@ -19,7 +19,7 @@ export const OpenAIImageLanguageModelData = OpenAIImageLanguageModel.pick({
 	configurations: true,
 });
 export type OpenAIImageLanguageModelData = z.infer<
-	typeof ImageGenerationLanguageModelData
+	typeof OpenAIImageLanguageModelData
 >;
 
 export const ImageGenerationLanguageModelData = z.discriminatedUnion(

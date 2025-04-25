@@ -1,20 +1,16 @@
 import { z } from "zod";
 import { Capability, LanguageModelBase } from "./base";
 
-export const size = z
-	.enum(["1024x1024", "1536x1024", "1024x1536"])
-	.default("1024x1024");
+export const size = z.enum(["1024x1024", "1536x1024", "1024x1536"]);
 
-export const quality = z
-	.enum(["auto", "high", "medium", "low"])
-	.default("auto");
+export const quality = z.enum(["auto", "high", "medium", "low"]);
 
-export const moderation = z.enum(["auto", "low"]).default("auto");
+export const moderation = z.enum(["auto", "low"]);
 
 export const background = z.enum(["transparent", "opaque", "auto"]);
 
 export const OpenAIImageModelConfigurations = z.object({
-	n: z.number().min(1).max(10).default(1),
+	n: z.number(),
 	size,
 	quality,
 	moderation,
