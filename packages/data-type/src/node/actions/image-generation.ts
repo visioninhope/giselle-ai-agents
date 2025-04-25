@@ -1,11 +1,31 @@
-import { FalLanguageModel } from "@giselle-sdk/language-model";
+import {
+	FalLanguageModel,
+	OpenAIImageLanguageModel,
+} from "@giselle-sdk/language-model";
 import { z } from "zod";
 
-export const ImageGenerationLanguageModelData = FalLanguageModel.pick({
+export const FalLanguageModelData = FalLanguageModel.pick({
 	provider: true,
 	id: true,
 	configurations: true,
 });
+export type FalLanguageModelData = z.infer<
+	typeof ImageGenerationLanguageModelData
+>;
+
+export const OpenAIImageLanguageModelData = OpenAIImageLanguageModel.pick({
+	provider: true,
+	id: true,
+	configurations: true,
+});
+export type OpenAIImageLanguageModelData = z.infer<
+	typeof OpenAIImageLanguageModelData
+>;
+
+export const ImageGenerationLanguageModelData = z.discriminatedUnion(
+	"provider",
+	[OpenAIImageLanguageModelData, FalLanguageModelData],
+);
 export type ImageGenerationLanguageModelData = z.infer<
 	typeof ImageGenerationLanguageModelData
 >;
@@ -16,7 +36,8 @@ export function isImageGenerationLanguageModelData(
 }
 
 export const ImageGenerationLanguageModelProvider = z.enum([
-	ImageGenerationLanguageModelData.shape.provider.value,
+	OpenAIImageLanguageModelData.shape.provider.value,
+	FalLanguageModelData.shape.provider.value,
 ]);
 export type ImageGenerationLanguageModelProvider = z.infer<
 	typeof ImageGenerationLanguageModelProvider

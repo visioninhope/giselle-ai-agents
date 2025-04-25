@@ -1,4 +1,4 @@
-import { ImageGenerationLanguageModelData } from "@giselle-sdk/data-type";
+import { FalLanguageModelData } from "@giselle-sdk/data-type";
 import {
 	falLanguageModels,
 	imageGenerationSizes,
@@ -11,16 +11,16 @@ import {
 	SelectItem,
 	SelectTrigger,
 	SelectValue,
-} from "../../../ui/select";
-import { Slider } from "../../../ui/slider";
-import { languageModelAvailable } from "./utils";
+} from "../../../../ui/select";
+import { Slider } from "../../../../ui/slider";
+import { languageModelAvailable } from "../utils";
 
-export function ImageGenerationModelPanel({
+export function FalModelPanel({
 	languageModel,
 	onModelChange,
 }: {
-	languageModel: ImageGenerationLanguageModelData;
-	onModelChange: (changedValue: ImageGenerationLanguageModelData) => void;
+	languageModel: FalLanguageModelData;
+	onModelChange: (changedValue: FalLanguageModelData) => void;
 }) {
 	const limits = useUsageLimits();
 
@@ -30,7 +30,7 @@ export function ImageGenerationModelPanel({
 				value={languageModel.id}
 				onValueChange={(value) => {
 					onModelChange(
-						ImageGenerationLanguageModelData.parse({
+						FalLanguageModelData.parse({
 							...languageModel,
 							id: value,
 						}),
@@ -59,7 +59,7 @@ export function ImageGenerationModelPanel({
 				value={languageModel.configurations.size}
 				onValueChange={(value) => {
 					onModelChange(
-						ImageGenerationLanguageModelData.parse({
+						FalLanguageModelData.parse({
 							...languageModel,
 							configurations: {
 								...languageModel.configurations,
@@ -92,7 +92,7 @@ export function ImageGenerationModelPanel({
 						step={1.0}
 						onChange={(value) => {
 							onModelChange(
-								ImageGenerationLanguageModelData.parse({
+								FalLanguageModelData.parse({
 									...languageModel,
 									configurations: {
 										...languageModel.configurations,
