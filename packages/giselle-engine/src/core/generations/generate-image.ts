@@ -1,3 +1,4 @@
+import { openai } from "@ai-sdk/openai";
 import { fal } from "@fal-ai/client";
 import {
 	type CompletedGeneration,
@@ -9,6 +10,7 @@ import {
 	type ImageGenerationNode,
 	ImageId,
 	type NodeId,
+	type OpenAIImageLanguageModelData,
 	type Output,
 	type OutputId,
 	type QueuedGeneration,
@@ -21,8 +23,8 @@ import {
 	type GeneratedImageData,
 	createUsageCalculator,
 } from "@giselle-sdk/language-model";
-import type {
-	CoreMessage,
+import {
+	type CoreMessage,
 	experimental_generateImage as generateImageAiSdk,
 } from "ai";
 import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
@@ -34,6 +36,7 @@ import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	checkUsageLimits,
+	detectImageType,
 	extractWorkspaceIdFromOrigin,
 	getGeneration,
 	getNodeGenerationIndexes,
@@ -231,6 +234,13 @@ export async function generateImage(args: {
 			});
 			break;
 		case "openai":
+			generationOutputs = await generateImageWithOpenAI({
+				messages,
+				runningGeneration,
+				generationContext,
+				languageModelData: actionNode.content.llm,
+				context: args.context,
+			});
 			break;
 		default: {
 			const _exhaustiveCheck: never = actionNode.content.llm;
@@ -407,6 +417,86 @@ async function generateImageWithFal({
 				generation.end();
 			})(),
 		]);
+	}
+	return generationOutputs;
+}
+
+export async function generateImageWithOpenAI({
+	messages,
+	generationContext,
+	runningGeneration,
+	languageModelData,
+	context,
+}: {
+	messages: CoreMessage[];
+	generationContext: GenerationContext;
+	runningGeneration: RunningGeneration;
+	languageModelData: OpenAIImageLanguageModelData;
+	context: GiselleEngineContext;
+}) {
+	languageModelData.configurations.size;
+	let prompt = "";
+	for (const message of messages) {
+		if (!Array.isArray(message.content)) {
+			continue;
+		}
+		for (const content of message.content) {
+			if (content.type !== "text") {
+				continue;
+			}
+			prompt += content.text;
+		}
+	}
+	const { images } = await generateImageAiSdk({
+		model: openai.image("gpt-image-1"),
+		prompt,
+		n: languageModelData.configurations.n,
+		size: languageModelData.configurations.size,
+		providerOptions: {
+			openai: {
+				...languageModelData.configurations,
+			},
+		},
+	});
+	const generationOutputs: GenerationOutput[] = [];
+
+	const generatedImageOutput = generationContext.actionNode.outputs.find(
+		(output) => output.accessor === "generated-image",
+	);
+	if (generatedImageOutput !== undefined) {
+		const contents = await Promise.all(
+			images.map(async (image) => {
+				const imageType = detectImageType(image.uint8Array);
+				if (imageType === null) {
+					return null;
+				}
+				const id = ImageId.generate();
+				const filename = `${id}.${imageType.ext}`;
+
+				await setGeneratedImage({
+					storage: context.storage,
+					generation: runningGeneration,
+					generatedImage: {
+						uint8Array: image.uint8Array,
+						base64: image.base64,
+					} satisfies GeneratedImageData,
+					generatedImageFilename: filename,
+				});
+
+				return {
+					id,
+					contentType: imageType.contentType,
+					filename,
+					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
+				} satisfies Image;
+			}),
+		).then((results) => results.filter((result) => result !== null));
+
+		generationOutputs.push({
+			type: "generated-image",
+			contents,
+			outputId: generatedImageOutput.id,
+		});
 	}
 	return generationOutputs;
 }
