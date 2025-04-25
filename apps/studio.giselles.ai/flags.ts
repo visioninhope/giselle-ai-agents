@@ -103,3 +103,16 @@ export const runV2Flag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const gptImage1Flag = flag<boolean>({
+	key: "gpt-image1",
+	async decide() {
+		return takeLocalEnv("GPT_IMAGE1_FLAG");
+	},
+	description: "Enable GPT Image 1",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
