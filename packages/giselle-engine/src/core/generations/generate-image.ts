@@ -434,7 +434,6 @@ export async function generateImageWithOpenAI({
 	languageModelData: OpenAIImageLanguageModelData;
 	context: GiselleEngineContext;
 }) {
-	languageModelData.configurations.size;
 	let prompt = "";
 	for (const message of messages) {
 		if (!Array.isArray(message.content)) {

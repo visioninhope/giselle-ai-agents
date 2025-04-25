@@ -16,7 +16,6 @@ export default async function Layout({
 			featureFlag={{
 				flowNode: true,
 				runV2: true,
-				gptImage1: true,
 			}}
 		>
 			{children}

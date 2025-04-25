@@ -62,7 +62,6 @@ export function WorkspaceProvider({
 									value={{
 										flowNode: featureFlag?.flowNode ?? false,
 										runV2: featureFlag?.runV2 ?? false,
-										gptImage1: featureFlag?.gptImage1 ?? false,
 									}}
 								>
 									{children}
