@@ -110,7 +110,7 @@
 		"zod": "3.24.1"
 	},
 	"devDependencies": {
-		"@biomejs/biome": "1.9.4",
+		"@biomejs/biome": "catalog:",
 		"@giselle-sdk/usage-limits": "workspace:*",
 		"@octokit/openapi-types": "22.2.0",
 		"@octokit/webhooks-types": "7.6.1",
