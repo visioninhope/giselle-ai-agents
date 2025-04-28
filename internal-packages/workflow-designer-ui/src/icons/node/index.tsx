@@ -97,6 +97,17 @@ export function NodeIcon({
 						}
 					}
 				}
+				case "action": {
+					switch (node.content.provider.type) {
+						case "github":
+							return <GitHubIcon {...props} data-content-type-icon />;
+						default: {
+							throw new Error(
+								`Unhandled TriggerProviderType: ${node.content.provider.type}`,
+							);
+						}
+					}
+				}
 				default: {
 					const _exhaustiveCheck: never = node.content;
 					throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
