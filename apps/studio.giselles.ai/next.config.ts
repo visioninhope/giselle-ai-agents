@@ -55,6 +55,9 @@ const nextConfig: NextConfig = {
 			},
 		];
 	},
+	experimental: {
+		typedEnv: true,
+	},
 };
 
 export default withSentryConfig(nextConfig, {
