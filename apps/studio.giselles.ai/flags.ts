@@ -1,12 +1,12 @@
 import { flag } from "flags/next";
 
-function takeLocalEnv(localEnvironemntKey: string) {
+function takeLocalEnv(localEnvironmentKey: string) {
 	if (process.env.NODE_ENV !== "development") {
 		return false;
 	}
 	if (
-		process.env[localEnvironemntKey] === undefined ||
-		process.env[localEnvironemntKey] === "false"
+		process.env[localEnvironmentKey] === undefined ||
+		process.env[localEnvironmentKey] === "false"
 	) {
 		return false;
 	}
