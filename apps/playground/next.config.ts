@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
 	serverExternalPackages: ["unstorage"],
 	experimental: {
 		typedEnv: true,
-	}
+	},
 };
 
 export default nextConfig;
