@@ -45,7 +45,9 @@ export const GenerationContext = z.object({
 export type GenerationContext = z.infer<typeof GenerationContext>;
 
 export const GenerationContextLike = z.object({
-	operationNode: z.object({ id: NodeId.schema }),
+	operationNode: OperationNode.extend({
+		content: z.any(),
+	}),
 	sourceNodes: z.array(z.any()),
 	origin: z.any(),
 });

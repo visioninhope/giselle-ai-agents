@@ -707,33 +707,44 @@ export async function checkUsageLimits(args: {
 	}
 	const usageLimits = await fetchUsageLimitsFn(workspaceId);
 
-	const operationNode = generation.context.operationNode;
-	const languageModel = languageModels.find(
-		(model) => model.id === operationNode.content.llm.id,
-	);
-	if (languageModel === undefined) {
-		return {
-			type: "error",
-			error: "Language model not found",
-		};
-	}
-	if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
-		return {
-			type: "error",
-			error:
-				"Access denied: insufficient tier for the requested language model.",
-		};
-	}
+	const generationContext = GenerationContext.parse(generation.context);
+	const operationNode = generationContext.operationNode;
+	switch (operationNode.content.type) {
+		case "imageGeneration":
+		case "textGeneration": {
+			const llm = operationNode.content.llm;
+			const languageModel = languageModels.find((model) => model.id === llm.id);
+			if (languageModel === undefined) {
+				return {
+					type: "error",
+					error: "Language model not found",
+				};
+			}
+			if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
+				return {
+					type: "error",
+					error:
+						"Access denied: insufficient tier for the requested language model.",
+				};
+			}
 
-	const agentTimeLimits = usageLimits.resourceLimits.agentTime;
-	if (agentTimeLimits.used >= agentTimeLimits.limit) {
-		return {
-			type: "error",
-			error:
-				"Access denied: insufficient agent time for the requested generation.",
-		};
+			const agentTimeLimits = usageLimits.resourceLimits.agentTime;
+			if (agentTimeLimits.used >= agentTimeLimits.limit) {
+				return {
+					type: "error",
+					error:
+						"Access denied: insufficient agent time for the requested generation.",
+				};
+			}
+			return { type: "ok" };
+		}
+		case "trigger":
+			return { type: "ok" };
+		default: {
+			const _exhaustiveCheck: never = operationNode.content;
+			throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
+		}
 	}
-	return { type: "ok" };
 }
 
 export async function extractWorkspaceIdFromOrigin(args: {

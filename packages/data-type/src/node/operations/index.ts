@@ -41,6 +41,9 @@ export function isTextGenerationNode(
 	args?: unknown,
 ): args is TextGenerationNode {
 	const result = TextGenerationNode.safeParse(args);
+	if (!result.success) {
+		console.warn(result.error.message);
+	}
 	return result.success;
 }
 
