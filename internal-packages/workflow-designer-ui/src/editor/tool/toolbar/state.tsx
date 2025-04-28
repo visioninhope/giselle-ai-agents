@@ -256,7 +256,7 @@ export function actionNode(actionId: string) {
 	return {
 		id: NodeId.generate(),
 		type: "operation",
-		name: actionId,
+		name: action.label,
 		content: {
 			type: "action",
 			provider: createDefaultProvider(action),

@@ -76,11 +76,11 @@ export function CustomXyFlowNode({
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
-	const hasTarget = useMemo(
+	const connectedInputIds = useMemo(
 		() =>
-			workspace.connections.some(
-				(connection) => connection.outputNode.id === data.nodeData.id,
-			),
+			workspace.connections
+				.filter((connection) => connection.inputNode.id === data.nodeData.id)
+				.map((connection) => connection.inputId),
 		[workspace, data.nodeData.id],
 	);
 	const connectedOutputIds = useMemo(
@@ -95,6 +95,7 @@ export function CustomXyFlowNode({
 		<NodeComponent
 			node={data.nodeData}
 			selected={selected}
+			connectedInputIds={connectedInputIds}
 			connectedOutputIds={connectedOutputIds}
 		/>
 	);
