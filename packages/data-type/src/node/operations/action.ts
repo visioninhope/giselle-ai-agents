@@ -38,6 +38,5 @@ export type ActionContent = z.infer<typeof ActionContent>;
 
 export const ActionContentReference = z.object({
 	type: z.literal("action"),
-	provider: ActionProviderLike,
 });
 export type ActionContentReference = z.infer<typeof ActionContentReference>;

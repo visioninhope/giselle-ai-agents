@@ -264,9 +264,11 @@ export function NodeComponent({
 								>
 									<Handle
 										type="target"
-										isConnectable={connectedInputIds?.some(
-											(connectedInputId) => connectedInputId === input.id,
-										)}
+										isConnectable={
+											!connectedInputIds?.some(
+												(connectedInputId) => connectedInputId === input.id,
+											)
+										}
 										position={Position.Left}
 										id={input.id}
 										className={clsx(
