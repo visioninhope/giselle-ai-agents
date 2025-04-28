@@ -3,6 +3,7 @@ import {
 	FileNode,
 	GitHubNode,
 	ImageGenerationNode,
+	type InputId,
 	type Node,
 	type OutputId,
 	TextGenerationNode,
@@ -102,12 +103,14 @@ export function CustomXyFlowNode({
 export function NodeComponent({
 	node,
 	selected,
+	connectedInputIds,
 	connectedOutputIds,
 	preview = false,
 }: {
 	node: Node;
 	selected?: boolean;
 	preview?: boolean;
+	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
 	const { updateNodeData } = useWorkflowDesigner();
@@ -220,31 +223,69 @@ export function NodeComponent({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-						{node.inputs?.map((input) => (
-							<div
-								className="relative flex items-center h-[28px]"
-								key={input.id}
-							>
-								<Handle
-									type="target"
-									isConnectable={false}
-									position={Position.Left}
-									id={input.id}
-									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
-										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!bg-image-generation-node-1 group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
-										"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
-										"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
-										"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
-										"group-data-[content-type=action]:!bg-action-node-1 group-data-[content-type=action]:!border-action-node-1",
-									)}
-								/>
-								<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
-									{input.label}
+						{node.content.type !== "action" &&
+							node.inputs?.map((input) => (
+								<div
+									className="relative flex items-center h-[28px]"
+									key={input.id}
+								>
+									<Handle
+										type="target"
+										isConnectable={false}
+										position={Position.Left}
+										id={input.id}
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
+											"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
+											"group-data-[content-type=imageGeneration]:!bg-image-generation-node-1 group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
+											"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
+											"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+											"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+										)}
+									/>
+									<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
+										{input.label}
+									</div>
 								</div>
-							</div>
-						))}
+							))}
+						{node.content.type === "action" &&
+							node.inputs.map((input) => (
+								<div
+									className="relative flex items-center h-[28px] group"
+									key={input.id}
+									data-state={
+										connectedInputIds?.some(
+											(connectedInputId) => connectedInputId === input.id,
+										)
+											? "connected"
+											: "disconnected"
+									}
+								>
+									<Handle
+										type="target"
+										isConnectable={connectedInputIds?.some(
+											(connectedInputId) => connectedInputId === input.id,
+										)}
+										position={Position.Left}
+										id={input.id}
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
+											"group-data-[content-type=action]:!bg-action-node-1 group-data-[content-type=action]:!border-action-node-1",
+											"group-data-[state=disconnected]:!bg-black-900",
+										)}
+									/>
+									<div
+										className={clsx(
+											"px-[12px] text-white-900 text-[12px]",
+											"group-data-[state=connected]:px-[16px]",
+											"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-left-[4.5px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:-translate-x-[100%]",
+											"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+										)}
+									>
+										{input.label}
+									</div>
+								</div>
+							))}
 						{node.type === "operation" &&
 							node.content.type !== "trigger" &&
 							node.content.type !== "action" && (
