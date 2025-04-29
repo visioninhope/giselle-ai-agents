@@ -18,7 +18,8 @@ import {
 	type Node as XYFlowNode,
 } from "@xyflow/react";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
+import { SquareIcon } from "lucide-react";
 import { useMemo } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
@@ -114,13 +115,18 @@ export function NodeComponent({
 	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
-	const { updateNodeData } = useWorkflowDesigner();
+	const { updateNodeData, data } = useWorkflowDesigner();
+	const { isGenerating, stopGeneration } = useNodeGenerations({
+		nodeId: node.id,
+		origin: { type: "workspace", id: data.id },
+	});
 	return (
 		<div
 			data-type={node.type}
 			data-content-type={node.content.type}
 			data-selected={selected}
 			data-preview={preview}
+			data-generating={isGenerating}
 			className={clsx(
 				"group relative flex flex-col rounded-[16px] py-[16px] gap-[16px] min-w-[180px]",
 				"bg-gradient-to-tl transition-all backdrop-blur-[4px]",
@@ -139,6 +145,23 @@ export function NodeComponent({
 				"not-data-preview:min-h-[110px]",
 			)}
 		>
+			<div className="absolute top-[-28px] left-0 right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] hidden group-data-[generating=true]:block">
+				<div className="flex items-center">
+					<p className="text-xs font-medium font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
+						Generating...
+					</p>
+					<button
+						type="button"
+						onClick={(e) => {
+							e.stopPropagation();
+							stopGeneration();
+						}}
+						className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
+					>
+						<SquareIcon className="w-2 h-2 text-white" fill="white" />
+					</button>
+				</div>
+			</div>
 			<div
 				className={clsx(
 					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
