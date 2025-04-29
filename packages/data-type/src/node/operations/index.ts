@@ -67,6 +67,11 @@ export const TriggerNode = OperationNode.extend({
 });
 export type TriggerNode = z.infer<typeof TriggerNode>;
 
+export function isTriggerNode(args?: unknown): args is TriggerNode {
+	const result = TriggerNode.safeParse(args);
+	return result.success;
+}
+
 export const ActionNode = OperationNode.extend({
 	content: ActionContent,
 });
