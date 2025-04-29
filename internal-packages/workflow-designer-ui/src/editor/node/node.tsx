@@ -116,11 +116,10 @@ export function NodeComponent({
 	connectedOutputIds?: OutputId[];
 }) {
 	const { updateNodeData, data } = useWorkflowDesigner();
-	const { isGenerating, stopGeneration, currentGeneration } =
-		useNodeGenerations({
-			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
-		});
+	const { stopGeneration, currentGeneration } = useNodeGenerations({
+		nodeId: node.id,
+		origin: { type: "workspace", id: data.id },
+	});
 	return (
 		<div
 			data-type={node.type}
