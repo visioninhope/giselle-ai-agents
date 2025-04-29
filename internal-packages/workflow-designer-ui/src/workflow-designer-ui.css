@@ -89,7 +89,7 @@
 			background-position: 0% 50%;
 		}
 	}
-	--animate-shimmer: shimmer 5s infinite;
+	--animate-shimmer: shimmer 2s infinite;
 }
 
 @property --button-gradient-angle {

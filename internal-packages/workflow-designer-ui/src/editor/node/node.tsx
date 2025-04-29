@@ -148,7 +148,7 @@ export function NodeComponent({
 		>
 			{(currentGeneration?.status === "queued" ||
 				currentGeneration?.status === "running") && (
-				<div className="absolute top-[-28px] left-0 right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
+				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
 					<div className="flex items-center">
 						<p className="text-xs font-medium font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
 							Generating...
@@ -167,7 +167,7 @@ export function NodeComponent({
 				</div>
 			)}
 			{currentGeneration?.status === "completed" && (
-				<div className="absolute top-[-28px] left-0 right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900">
+				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900">
 					<div className="flex items-center gap-[4px]">
 						<p className="text-xs font-medium font-hubot">Completed</p>
 						<CheckIcon className="w-4 h-4" />
