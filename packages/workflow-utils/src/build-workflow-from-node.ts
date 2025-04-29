@@ -18,15 +18,19 @@ import {
  * Only includes nodes that are connected to/from the starting node.
  *
  * @param startNodeId - The ID of the node to start building the workflow from
- * @param nodeMap - Map of all node IDs to their node objects
- * @param connectionMap - Map of all connection IDs to their connection objects
+ * @param nodes - Array of all node objects
+ * @param connections - Array of all connection objects
  * @returns A workflow object or null if the node doesn't exist or isn't an operation node
  */
 export function buildWorkflowFromNode(
 	startNodeId: NodeId,
-	nodeMap: Map<NodeId, Node>,
-	connectionMap: Map<ConnectionId, Connection>,
+	nodes: Node[],
+	connections: Connection[],
 ): Workflow | null {
+	const nodeMap = new Map(nodes.map((node) => [node.id, node]));
+	const connectionMap = new Map(
+		connections.map((connection) => [connection.id, connection]),
+	);
 	const startNode = nodeMap.get(startNodeId);
 
 	// Check if the node exists and is an operation node
@@ -69,48 +73,4 @@ export function buildWorkflowFromNode(
 		jobs: Array.from(jobSet.values()),
 		nodes: Array.from(connectedNodeMap.values()),
 	};
-}
-
-export function buildWorkflowMap(
-	nodeMap: Map<NodeId, Node>,
-	connectionMap: Map<ConnectionId, Connection>,
-) {
-	const workflowSet = new Set<Workflow>();
-	let processedNodes: NodeId[] = [];
-
-	const connectedNodeIdMap = createConnectedNodeIdMap(
-		new Set(connectionMap.values()),
-		new Set(nodeMap.keys()),
-	);
-	for (const [nodeId, node] of nodeMap) {
-		if (node.type !== "operation") continue;
-		if (processedNodes.includes(nodeId)) continue;
-		const connectedNodeMap = findConnectedNodeMap(
-			nodeId,
-			nodeMap,
-			connectedNodeIdMap,
-		);
-		const connectedConnectionMap = findConnectedConnectionMap(
-			new Set(connectedNodeMap.keys()),
-			new Set(connectionMap.values()),
-		);
-		const workflowId = WorkflowId.generate();
-		const jobSet = createJobMap(
-			new Set(connectedNodeMap.values()),
-			new Set(connectedConnectionMap.values()),
-			workflowId,
-		);
-		workflowSet.add({
-			id: WorkflowId.generate(),
-			jobs: Array.from(jobSet.values()),
-			nodes: Array.from(connectedNodeMap.values()),
-		});
-
-		processedNodes = [...processedNodes, ...connectedNodeMap.keys()];
-	}
-	const workflowMap = new Map<WorkflowId, Workflow>();
-	for (const workflow of workflowSet) {
-		workflowMap.set(workflow.id, workflow);
-	}
-	return workflowMap;
 }
