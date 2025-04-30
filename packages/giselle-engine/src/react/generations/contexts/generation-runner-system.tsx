@@ -18,7 +18,9 @@ import {
 	isRunningGeneration,
 } from "@giselle-sdk/data-type";
 import {
+	type Dispatch,
 	type ReactNode,
+	type SetStateAction,
 	createContext,
 	useCallback,
 	useContext,
@@ -91,9 +93,9 @@ interface GenerationRunnerSystemContextType {
 		generationId: GenerationId,
 	) => Promise<FailedGeneration>;
 	updateMessages: (generationId: GenerationId, newMessages: Message[]) => void;
-	fetchNodeGenerations: FetchNodeGenerations;
 	addStopHandler: (generationId: GenerationId, handler: () => void) => void;
 	stopGeneration: (generationId: GenerationId) => Promise<void>;
+	setGenerations: Dispatch<SetStateAction<Generation[]>>;
 }
 
 export const GenerationRunnerSystemContext =
@@ -341,30 +343,6 @@ export function GenerationRunnerSystemProvider({
 		[client],
 	);
 
-	const fetchNodeGenerations = useCallback<FetchNodeGenerations>(
-		async ({
-			nodeId,
-			origin,
-		}: { nodeId: NodeId; origin: GenerationOrigin }) => {
-			const generations = await client.getNodeGenerations({
-				origin,
-				nodeId,
-			});
-			const excludeCancelled = generations.filter(
-				(generation) => generation.status !== "cancelled",
-			);
-			setGenerations((prev) => {
-				const filtered = prev.filter(
-					(p) => !excludeCancelled.some((g) => g.id === p.id),
-				);
-				return [...filtered, ...excludeCancelled].sort(
-					(a, b) => a.createdAt - b.createdAt,
-				);
-			});
-		},
-		[client],
-	);
-
 	const addStopHandler = useCallback(
 		(generationId: GenerationId, handler: () => void) => {
 			stopHandlersRef.current[generationId] = handler;
@@ -418,9 +396,9 @@ export function GenerationRunnerSystemProvider({
 				updateGenerationStatusToFailure,
 				updateMessages,
 				nodeGenerationMap,
-				fetchNodeGenerations,
 				addStopHandler,
 				stopGeneration,
+				setGenerations,
 			}}
 		>
 			{children}
