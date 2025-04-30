@@ -76,6 +76,8 @@ type FetchNodeGenerations = (
 
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
+	createGeneration: CreateGeneration;
+	startGeneration2: StartGeneration2;
 	startGeneration: StartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
@@ -414,6 +416,8 @@ export function GenerationRunnerSystemProvider({
 		<GenerationRunnerSystemContext.Provider
 			value={{
 				generateTextApi,
+				createGeneration,
+				startGeneration2,
 				startGeneration,
 				getGeneration,
 				generations,

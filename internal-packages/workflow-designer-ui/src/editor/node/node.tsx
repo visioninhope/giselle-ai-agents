@@ -145,6 +145,15 @@ export function NodeComponent({
 				"not-data-preview:min-h-[110px]",
 			)}
 		>
+			{currentGeneration?.status === "created" && (
+				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
+					<div className="flex items-center">
+						<p className="text-xs font-medium font-hubot text-black-200">
+							Waiting...
+						</p>
+					</div>
+				</div>
+			)}
 			{(currentGeneration?.status === "queued" ||
 				currentGeneration?.status === "running") && (
 				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
