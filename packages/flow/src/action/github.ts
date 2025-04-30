@@ -4,10 +4,7 @@ import type { ActionBase } from "../base";
 const provider = "github" as const;
 
 export interface GitHubAction extends ActionBase {
-	id: string;
-	label?: string;
-	description?: string;
-	parameters?: z.AnyZodObject;
+	parameters: z.AnyZodObject;
 }
 
 export const githubCreateIssueAction = {
