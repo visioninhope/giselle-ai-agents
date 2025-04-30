@@ -5,7 +5,7 @@ import type {
 	NodeId,
 } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
-import { buildWorkflowMap } from "./build-workflow";
+import { buildWorkflowMap } from "./build-workflow-map";
 
 // Sample data for tests based on provided workflow JSON
 const sampleNodes: Node[] = [
