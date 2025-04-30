@@ -39,7 +39,7 @@ type CreateGeneration = (
 	generationContext: GenerationContext,
 ) => CreatedGeneration;
 
-interface StartGeneration2Options {
+interface StartGenerationOptions {
 	onGenerationQueued?: (generation: QueuedGeneration) => void;
 	onGenerationStarted?: (generation: RunningGeneration) => void;
 	onGenerationCompleted?: (generation: CompletedGeneration) => void;
@@ -47,23 +47,17 @@ interface StartGeneration2Options {
 	onGenerationFailed?: (generation: FailedGeneration) => void;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
-type StartGeneration2 = (
+export type StartGeneration = (
 	id: GenerationId,
-	options?: StartGeneration2Options,
+	options?: StartGenerationOptions,
 ) => Promise<void>;
 
-interface StartGenerationOptions {
+interface CreateAndStartGenerationOptions extends StartGenerationOptions {
 	onGenerationCreated?: (generation: CreatedGeneration) => void;
-	onGenerationQueued?: (generation: QueuedGeneration) => void;
-	onGenerationStarted?: (generation: RunningGeneration) => void;
-	onGenerationCompleted?: (generation: CompletedGeneration) => void;
-	onGenerationCancelled?: (generation: CancelledGeneration) => void;
-	onGenerationFailed?: (generation: FailedGeneration) => void;
-	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
 export type CreateAndStartGeneration = (
 	generationContext: GenerationContext,
-	options?: StartGenerationOptions,
+	options?: CreateAndStartGenerationOptions,
 ) => Promise<void>;
 
 export interface FetchNodeGenerationsParams {
@@ -77,7 +71,7 @@ type FetchNodeGenerations = (
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
 	createGeneration: CreateGeneration;
-	startGeneration2: StartGeneration2;
+	startGeneration: StartGeneration;
 	createAndStartGeneration: CreateAndStartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
@@ -231,8 +225,7 @@ export function GenerationRunnerSystemProvider({
 		[],
 	);
 
-	/** @todo rename startGeneration */
-	const startGeneration2 = useCallback<StartGeneration2>(
+	const startGeneration = useCallback<StartGeneration>(
 		async (id, options = {}) => {
 			const generation = generationListener.current[id];
 			if (!isCreatedGeneration(generation)) {
@@ -266,9 +259,9 @@ export function GenerationRunnerSystemProvider({
 		async (generationContext, options = {}) => {
 			const createdGeneration = createGeneration(generationContext);
 			options?.onGenerationCreated?.(createdGeneration);
-			await startGeneration2(createdGeneration.id, options);
+			await startGeneration(createdGeneration.id, options);
 		},
-		[createGeneration, startGeneration2],
+		[createGeneration, startGeneration],
 	);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
@@ -416,8 +409,8 @@ export function GenerationRunnerSystemProvider({
 			value={{
 				generateTextApi,
 				createGeneration,
-				startGeneration2,
-				createAndStartGeneration: createAndStartGeneration,
+				startGeneration,
+				createAndStartGeneration,
 				getGeneration,
 				generations,
 				updateGenerationStatusToRunning,

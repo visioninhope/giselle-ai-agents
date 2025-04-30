@@ -85,7 +85,7 @@ function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 		}
 		return null;
 	}, [triggerNode.content.provider]);
-	const { createGeneration, startGeneration2 } = useGenerationRunnerSystem();
+	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const handleClick = useCallback(async () => {
 		const flow = buildWorkflowFromNode(
 			triggerNode.id,
@@ -119,10 +119,10 @@ function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 				if (generation === undefined) {
 					continue;
 				}
-				await startGeneration2(generation.id);
+				await startGeneration(generation.id);
 			}
 		}
-	}, [triggerNode.id, data, createGeneration, startGeneration2]);
+	}, [triggerNode.id, data, createGeneration, startGeneration]);
 
 	if (triggerProvider === null) {
 		return null;
