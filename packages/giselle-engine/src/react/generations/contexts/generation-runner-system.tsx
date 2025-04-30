@@ -13,6 +13,7 @@ import {
 	type RunningGeneration,
 	isCancelledGeneration,
 	isCompletedGeneration,
+	isCreatedGeneration,
 	isFailedGeneration,
 	isRunningGeneration,
 } from "@giselle-sdk/data-type";
@@ -33,6 +34,23 @@ import {
 	waitAndGetGenerationFailed,
 	waitAndGetGenerationRunning,
 } from "../helpers";
+
+type CreateGeneration = (
+	generationContext: GenerationContext,
+) => CreatedGeneration;
+
+interface StartGeneration2Options {
+	onGenerationQueued?: (generation: QueuedGeneration) => void;
+	onGenerationStarted?: (generation: RunningGeneration) => void;
+	onGenerationCompleted?: (generation: CompletedGeneration) => void;
+	onGenerationCancelled?: (generation: CancelledGeneration) => void;
+	onGenerationFailed?: (generation: FailedGeneration) => void;
+	onUpdateMessages?: (generation: RunningGeneration) => void;
+}
+type StartGeneration2 = (
+	id: GenerationId,
+	options?: StartGeneration2Options,
+) => Promise<void>;
 
 interface StartGenerationOptions {
 	onGenerationCreated?: (generation: CreatedGeneration) => void;
@@ -195,8 +213,8 @@ export function GenerationRunnerSystemProvider({
 		},
 		[],
 	);
-	const startGeneration = useCallback<StartGeneration>(
-		async (generationContext, options = {}) => {
+	const createGeneration = useCallback<CreateGeneration>(
+		(generationContext) => {
 			const generationId = GenerationId.generate();
 			const createdGeneration = {
 				id: generationId,
@@ -206,24 +224,32 @@ export function GenerationRunnerSystemProvider({
 			} satisfies CreatedGeneration;
 			setGenerations((prev) => [...prev, createdGeneration]);
 			generationListener.current[createdGeneration.id] = createdGeneration;
-			options?.onGenerationCreated?.(createdGeneration);
+			return createdGeneration;
+		},
+		[],
+	);
 
-			/** @todo split create and start */
-
+	/** @todo rename startGeneration */
+	const startGeneration2 = useCallback<StartGeneration2>(
+		async (id, options = {}) => {
+			const generation = generationListener.current[id];
+			if (!isCreatedGeneration(generation)) {
+				return;
+			}
 			const queuedGeneration = {
-				...createdGeneration,
+				...generation,
 				status: "queued",
 				queuedAt: Date.now(),
 			} satisfies QueuedGeneration;
 			options.onGenerationQueued?.(queuedGeneration);
 			setGenerations((prev) =>
 				prev.map((prevGeneration) =>
-					prevGeneration.id === generationId
+					prevGeneration.id === generation.id
 						? queuedGeneration
 						: prevGeneration,
 				),
 			);
-			await waitForGeneration(createdGeneration.id, {
+			await waitForGeneration(generation.id, {
 				onStart: options?.onGenerationStarted,
 				onComplete: options?.onGenerationCompleted,
 				onUpdateMessages: options?.onUpdateMessages,
@@ -232,6 +258,16 @@ export function GenerationRunnerSystemProvider({
 			});
 		},
 		[waitForGeneration],
+	);
+
+	/** @todo rename createAndStartGeneration */
+	const startGeneration = useCallback<StartGeneration>(
+		async (generationContext, options = {}) => {
+			const createdGeneration = createGeneration(generationContext);
+			options?.onGenerationCreated?.(createdGeneration);
+			await startGeneration2(createdGeneration.id, options);
+		},
+		[createGeneration, startGeneration2],
 	);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
