@@ -20,7 +20,8 @@ import {
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, SquareIcon } from "lucide-react";
-import { useMemo } from "react";
+import { AnimatePresence, motion } from "motion/react";
+import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { defaultName } from "../../utils";
@@ -120,6 +121,29 @@ export function NodeComponent({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
+	const [prevGenerationStatus, setPrevGenerationStatus] = useState(
+		currentGeneration?.status,
+	);
+	const [showCompleteLabel, startTransition] = useTransition();
+	useEffect(() => {
+		if (currentGeneration === undefined) {
+			return;
+		}
+		if (
+			prevGenerationStatus === "running" &&
+			currentGeneration.status === "completed"
+		) {
+			startTransition(
+				async () =>
+					new Promise((resolve) => {
+						setTimeout(() => {
+							resolve();
+						}, 2000);
+					}),
+			);
+		}
+		setPrevGenerationStatus(currentGeneration.status);
+	}, [currentGeneration, prevGenerationStatus]);
 	return (
 		<div
 			data-type={node.type}
@@ -176,15 +200,19 @@ export function NodeComponent({
 						</div>
 					</div>
 				)}
-			{currentGeneration?.status === "completed" &&
-				node.content.type !== "trigger" && (
-					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900">
+			<AnimatePresence>
+				{showCompleteLabel && node.content.type !== "trigger" && (
+					<motion.div
+						className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900"
+						exit={{ opacity: 0 }}
+					>
 						<div className="flex items-center gap-[4px]">
 							<p className="text-xs font-medium font-hubot">Completed</p>
 							<CheckIcon className="w-4 h-4" />
 						</div>
-					</div>
+					</motion.div>
 				)}
+			</AnimatePresence>
 			<div
 				className={clsx(
 					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
