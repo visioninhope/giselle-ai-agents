@@ -145,43 +145,46 @@ export function NodeComponent({
 				"not-data-preview:min-h-[110px]",
 			)}
 		>
-			{currentGeneration?.status === "created" && (
-				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
-					<div className="flex items-center">
-						<p className="text-xs font-medium font-hubot text-black-200">
-							Waiting...
-						</p>
+			{currentGeneration?.status === "created" &&
+				node.content.type !== "trigger" && (
+					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
+						<div className="flex items-center">
+							<p className="text-xs font-medium font-hubot text-black-200">
+								Waiting...
+							</p>
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 			{(currentGeneration?.status === "queued" ||
-				currentGeneration?.status === "running") && (
-				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
-					<div className="flex items-center">
-						<p className="text-xs font-medium font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
-							Generating...
-						</p>
-						<button
-							type="button"
-							onClick={(e) => {
-								e.stopPropagation();
-								stopGeneration();
-							}}
-							className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
-						>
-							<SquareIcon className="w-2 h-2 text-white" fill="white" />
-						</button>
+				currentGeneration?.status === "running") &&
+				node.content.type !== "trigger" && (
+					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
+						<div className="flex items-center">
+							<p className="text-xs font-medium font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
+								Generating...
+							</p>
+							<button
+								type="button"
+								onClick={(e) => {
+									e.stopPropagation();
+									stopGeneration();
+								}}
+								className="ml-1 p-1 rounded-full bg-blue-500 hover:bg-blue-600 transition-colors"
+							>
+								<SquareIcon className="w-2 h-2 text-white" fill="white" />
+							</button>
+						</div>
 					</div>
-				</div>
-			)}
-			{currentGeneration?.status === "completed" && (
-				<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900">
-					<div className="flex items-center gap-[4px]">
-						<p className="text-xs font-medium font-hubot">Completed</p>
-						<CheckIcon className="w-4 h-4" />
+				)}
+			{currentGeneration?.status === "completed" &&
+				node.content.type !== "trigger" && (
+					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px] text-green-900">
+						<div className="flex items-center gap-[4px]">
+							<p className="text-xs font-medium font-hubot">Completed</p>
+							<CheckIcon className="w-4 h-4" />
+						</div>
 					</div>
-				</div>
-			)}
+				)}
 			<div
 				className={clsx(
 					"absolute z-0 rounded-[16px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
