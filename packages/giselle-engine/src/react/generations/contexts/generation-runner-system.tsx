@@ -61,7 +61,7 @@ interface StartGenerationOptions {
 	onGenerationFailed?: (generation: FailedGeneration) => void;
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
-export type StartGeneration = (
+export type CreateAndStartGeneration = (
 	generationContext: GenerationContext,
 	options?: StartGenerationOptions,
 ) => Promise<void>;
@@ -78,7 +78,7 @@ interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
 	createGeneration: CreateGeneration;
 	startGeneration2: StartGeneration2;
-	startGeneration: StartGeneration;
+	createAndStartGeneration: CreateAndStartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
 	nodeGenerationMap: Map<NodeId, Generation[]>;
@@ -262,8 +262,7 @@ export function GenerationRunnerSystemProvider({
 		[waitForGeneration],
 	);
 
-	/** @todo rename createAndStartGeneration */
-	const startGeneration = useCallback<StartGeneration>(
+	const createAndStartGeneration = useCallback<CreateAndStartGeneration>(
 		async (generationContext, options = {}) => {
 			const createdGeneration = createGeneration(generationContext);
 			options?.onGenerationCreated?.(createdGeneration);
@@ -418,7 +417,7 @@ export function GenerationRunnerSystemProvider({
 				generateTextApi,
 				createGeneration,
 				startGeneration2,
-				startGeneration,
+				createAndStartGeneration: createAndStartGeneration,
 				getGeneration,
 				generations,
 				updateGenerationStatusToRunning,
