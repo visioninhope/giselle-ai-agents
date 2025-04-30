@@ -13,6 +13,7 @@ import {
 	type RunningGeneration,
 	isCancelledGeneration,
 	isCompletedGeneration,
+	isCreatedGeneration,
 	isFailedGeneration,
 	isRunningGeneration,
 } from "@giselle-sdk/data-type";
@@ -34,8 +35,11 @@ import {
 	waitAndGetGenerationRunning,
 } from "../helpers";
 
+type CreateGeneration = (
+	generationContext: GenerationContext,
+) => CreatedGeneration;
+
 interface StartGenerationOptions {
-	onGenerationCreated?: (generation: CreatedGeneration) => void;
 	onGenerationQueued?: (generation: QueuedGeneration) => void;
 	onGenerationStarted?: (generation: RunningGeneration) => void;
 	onGenerationCompleted?: (generation: CompletedGeneration) => void;
@@ -44,8 +48,16 @@ interface StartGenerationOptions {
 	onUpdateMessages?: (generation: RunningGeneration) => void;
 }
 export type StartGeneration = (
-	generationContext: GenerationContext,
+	id: GenerationId,
 	options?: StartGenerationOptions,
+) => Promise<void>;
+
+interface CreateAndStartGenerationOptions extends StartGenerationOptions {
+	onGenerationCreated?: (generation: CreatedGeneration) => void;
+}
+export type CreateAndStartGeneration = (
+	generationContext: GenerationContext,
+	options?: CreateAndStartGenerationOptions,
 ) => Promise<void>;
 
 export interface FetchNodeGenerationsParams {
@@ -58,7 +70,9 @@ type FetchNodeGenerations = (
 
 interface GenerationRunnerSystemContextType {
 	generateTextApi: string;
+	createGeneration: CreateGeneration;
 	startGeneration: StartGeneration;
+	createAndStartGeneration: CreateAndStartGeneration;
 	getGeneration: (generationId: GenerationId) => Generation | undefined;
 	generations: Generation[];
 	nodeGenerationMap: Map<NodeId, Generation[]>;
@@ -195,8 +209,8 @@ export function GenerationRunnerSystemProvider({
 		},
 		[],
 	);
-	const startGeneration = useCallback<StartGeneration>(
-		async (generationContext, options = {}) => {
+	const createGeneration = useCallback<CreateGeneration>(
+		(generationContext) => {
 			const generationId = GenerationId.generate();
 			const createdGeneration = {
 				id: generationId,
@@ -206,24 +220,31 @@ export function GenerationRunnerSystemProvider({
 			} satisfies CreatedGeneration;
 			setGenerations((prev) => [...prev, createdGeneration]);
 			generationListener.current[createdGeneration.id] = createdGeneration;
-			options?.onGenerationCreated?.(createdGeneration);
+			return createdGeneration;
+		},
+		[],
+	);
 
-			/** @todo split create and start */
-
+	const startGeneration = useCallback<StartGeneration>(
+		async (id, options = {}) => {
+			const generation = generationListener.current[id];
+			if (!isCreatedGeneration(generation)) {
+				return;
+			}
 			const queuedGeneration = {
-				...createdGeneration,
+				...generation,
 				status: "queued",
 				queuedAt: Date.now(),
 			} satisfies QueuedGeneration;
 			options.onGenerationQueued?.(queuedGeneration);
 			setGenerations((prev) =>
 				prev.map((prevGeneration) =>
-					prevGeneration.id === generationId
+					prevGeneration.id === generation.id
 						? queuedGeneration
 						: prevGeneration,
 				),
 			);
-			await waitForGeneration(createdGeneration.id, {
+			await waitForGeneration(generation.id, {
 				onStart: options?.onGenerationStarted,
 				onComplete: options?.onGenerationCompleted,
 				onUpdateMessages: options?.onUpdateMessages,
@@ -232,6 +253,15 @@ export function GenerationRunnerSystemProvider({
 			});
 		},
 		[waitForGeneration],
+	);
+
+	const createAndStartGeneration = useCallback<CreateAndStartGeneration>(
+		async (generationContext, options = {}) => {
+			const createdGeneration = createGeneration(generationContext);
+			options?.onGenerationCreated?.(createdGeneration);
+			await startGeneration(createdGeneration.id, options);
+		},
+		[createGeneration, startGeneration],
 	);
 	const getGeneration = useCallback(
 		(generationId: GenerationId) =>
@@ -378,7 +408,9 @@ export function GenerationRunnerSystemProvider({
 		<GenerationRunnerSystemContext.Provider
 			value={{
 				generateTextApi,
+				createGeneration,
 				startGeneration,
+				createAndStartGeneration,
 				getGeneration,
 				generations,
 				updateGenerationStatusToRunning,
