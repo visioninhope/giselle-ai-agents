@@ -8,6 +8,7 @@ export function defaultName(node: Node) {
 				case "imageGeneration":
 					return node.name ?? node.content.llm.id;
 				case "trigger":
+				case "action":
 					return node.name ?? node.content.provider.type;
 				default: {
 					const _exhaustiveCheck: never = node.content;

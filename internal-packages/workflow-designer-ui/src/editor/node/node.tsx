@@ -1,7 +1,9 @@
 import {
+	ActionNode,
 	FileNode,
 	GitHubNode,
 	ImageGenerationNode,
+	type InputId,
 	type Node,
 	type OutputId,
 	TextGenerationNode,
@@ -46,13 +48,18 @@ type GiselleWorkflowTriggerNode = XYFlowNode<
 	{ nodeData: TriggerNode; preview?: boolean },
 	TriggerNode["content"]["type"]
 >;
+type GiselleWorkflowActionNode = XYFlowNode<
+	{ nodeData: ActionNode; preview?: boolean },
+	ActionNode["content"]["type"]
+>;
 export type GiselleWorkflowDesignerNode =
 	| GiselleWorkflowDesignerTextGenerationNode
 	| GiselleWorkflowDesignerImageGenerationNode
 	| GiselleWorkflowDesignerTextNode
 	| GiselleWorkflowDesignerFileNode
 	| GiselleWorkflowGitHubNode
-	| GiselleWorkflowTriggerNode;
+	| GiselleWorkflowTriggerNode
+	| GiselleWorkflowActionNode;
 
 export const nodeTypes: NodeTypes = {
 	[TextGenerationNode.shape.content.shape.type.value]: CustomXyFlowNode,
@@ -61,6 +68,7 @@ export const nodeTypes: NodeTypes = {
 	[FileNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[GitHubNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[TriggerNode.shape.content.shape.type.value]: CustomXyFlowNode,
+	[ActionNode.shape.content.shape.type.value]: CustomXyFlowNode,
 };
 
 export function CustomXyFlowNode({
@@ -68,11 +76,11 @@ export function CustomXyFlowNode({
 	selected,
 }: NodeProps<GiselleWorkflowDesignerNode>) {
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
-	const hasTarget = useMemo(
+	const connectedInputIds = useMemo(
 		() =>
-			workspace.connections.some(
-				(connection) => connection.outputNode.id === data.nodeData.id,
-			),
+			workspace.connections
+				.filter((connection) => connection.inputNode.id === data.nodeData.id)
+				.map((connection) => connection.inputId),
 		[workspace, data.nodeData.id],
 	);
 	const connectedOutputIds = useMemo(
@@ -87,6 +95,7 @@ export function CustomXyFlowNode({
 		<NodeComponent
 			node={data.nodeData}
 			selected={selected}
+			connectedInputIds={connectedInputIds}
 			connectedOutputIds={connectedOutputIds}
 		/>
 	);
@@ -95,12 +104,14 @@ export function CustomXyFlowNode({
 export function NodeComponent({
 	node,
 	selected,
+	connectedInputIds,
 	connectedOutputIds,
 	preview = false,
 }: {
 	node: Node;
 	selected?: boolean;
 	preview?: boolean;
+	connectedInputIds?: InputId[];
 	connectedOutputIds?: OutputId[];
 }) {
 	const { updateNodeData } = useWorkflowDesigner();
@@ -122,6 +133,7 @@ export function NodeComponent({
 				"data-[content-type=audioGeneration]:from-audio-generation-node-1] data-[content-type=audioGeneration]:to-audio-generation-node-2 data-[content-type=audioGeneration]:shadow-audio-generation-node-1",
 				"data-[content-type=videoGeneration]:from-video-generation-node-1] data-[content-type=videoGeneration]:to-video-generation-node-2 data-[content-type=videoGeneration]:shadow-video-generation-node-1",
 				"data-[content-type=trigger]:from-trigger-node-1] data-[content-type=trigger]:to-trigger-node-2 data-[content-type=trigger]:shadow-trigger-node-1",
+				"data-[content-type=action]:from-action-node-1] data-[content-type=action]:to-action-node-2 data-[content-type=action]:shadow-action-node-1",
 				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
@@ -139,6 +151,7 @@ export function NodeComponent({
 					"group-data-[content-type=audioGeneration]:from-audio-generation-node-1/40 group-data-[content-type=audioGeneration]:to-audio-generation-node-1",
 					"group-data-[content-type=videoGeneration]:from-video-generation-node-1/40 group-data-[content-type=videoGeneration]:to-video-generation-node-1",
 					"group-data-[content-type=trigger]:from-trigger-node-1/40 group-data-[content-type=trigger]:to-trigger-node-1",
+					"group-data-[content-type=action]:from-action-node-1/40 group-data-[content-type=action]:to-action-node-1",
 				)}
 			/>
 
@@ -156,6 +169,7 @@ export function NodeComponent({
 							"group-data-[content-type=audioGeneration]:bg-audio-generation-node-1",
 							"group-data-[content-type=videoGeneration]:bg-video-generation-node-1",
 							"group-data-[content-type=trigger]:bg-trigger-node-1",
+							"group-data-[content-type=action]:bg-action-node-1",
 						)}
 					>
 						<NodeIcon
@@ -171,6 +185,7 @@ export function NodeComponent({
 								"group-data-[content-type=audioGeneration]:text-white-900",
 								"group-data-[content-type=videoGeneration]:text-white-900",
 								"group-data-[content-type=trigger]:text-white-900",
+								"group-data-[content-type=action]:text-white-900",
 							)}
 						/>
 					</div>
@@ -209,50 +224,96 @@ export function NodeComponent({
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
-						{node.inputs?.map((input) => (
-							<div
-								className="relative flex items-center h-[28px]"
-								key={input.id}
-							>
-								<Handle
-									type="target"
-									isConnectable={false}
-									position={Position.Left}
-									id={input.id}
-									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
-										"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!bg-image-generation-node-1 group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
-										"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
-										"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
-										"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
-									)}
-								/>
-								<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
-									{input.label}
+						{node.content.type !== "action" &&
+							node.inputs?.map((input) => (
+								<div
+									className="relative flex items-center h-[28px]"
+									key={input.id}
+								>
+									<Handle
+										type="target"
+										isConnectable={false}
+										position={Position.Left}
+										id={input.id}
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
+											"group-data-[content-type=textGeneration]:!bg-generation-node-1 group-data-[content-type=textGeneration]:!border-generation-node-1",
+											"group-data-[content-type=imageGeneration]:!bg-image-generation-node-1 group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
+											"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
+											"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+											"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+										)}
+									/>
+									<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
+										{input.label}
+									</div>
 								</div>
-							</div>
-						))}
-						{node.type === "operation" && node.content.type !== "trigger" && (
-							<div className="relative flex items-center h-[28px]" key="blank">
-								<Handle
-									type="target"
-									position={Position.Left}
-									id="blank-handle"
-									className={clsx(
-										"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
-										"group-data-[content-type=textGeneration]:!border-generation-node-1",
-										"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
-										"group-data-[content-type=webSearch]:!border-web-search-node-1",
-										"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
-										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
-									)}
-								/>
-								<div className="absolute left-[-12px] text-[12px] text-black-400 whitespace-nowrap -translate-x-[100%]">
-									Input
+							))}
+						{node.content.type === "action" &&
+							node.inputs.map((input) => (
+								<div
+									className="relative flex items-center h-[28px] group"
+									key={input.id}
+									data-state={
+										connectedInputIds?.some(
+											(connectedInputId) => connectedInputId === input.id,
+										)
+											? "connected"
+											: "disconnected"
+									}
+								>
+									<Handle
+										type="target"
+										isConnectable={
+											!connectedInputIds?.some(
+												(connectedInputId) => connectedInputId === input.id,
+											)
+										}
+										position={Position.Left}
+										id={input.id}
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px]",
+											"group-data-[content-type=action]:!bg-action-node-1 group-data-[content-type=action]:!border-action-node-1",
+											"group-data-[state=disconnected]:!bg-black-900",
+										)}
+									/>
+									<div
+										className={clsx(
+											"px-[12px] text-white-900 text-[12px]",
+											"group-data-[state=connected]:px-[16px]",
+											"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-left-[4.5px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:-translate-x-[100%]",
+											"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+										)}
+									>
+										{input.label}
+									</div>
 								</div>
-							</div>
-						)}
+							))}
+						{node.type === "operation" &&
+							node.content.type !== "trigger" &&
+							node.content.type !== "action" && (
+								<div
+									className="relative flex items-center h-[28px]"
+									key="blank"
+								>
+									<Handle
+										type="target"
+										position={Position.Left}
+										id="blank-handle"
+										className={clsx(
+											"!absolute !w-[11px] !h-[11px] !rounded-full !-left-[4.5px] !translate-x-[50%] !border-[1.5px] !bg-black-900",
+											"group-data-[content-type=textGeneration]:!border-generation-node-1",
+											"group-data-[content-type=imageGeneration]:!border-image-generation-node-1",
+											"group-data-[content-type=webSearch]:!border-web-search-node-1",
+											"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
+											"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+										)}
+									/>
+									<div className="absolute left-[-12px] text-[12px] text-black-400 whitespace-nowrap -translate-x-[100%]">
+										Input
+									</div>
+								</div>
+							)}
 					</div>
 
 					<div className="grid">

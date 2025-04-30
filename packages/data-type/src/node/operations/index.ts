@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
+import { ActionContent, ActionContentReference } from "./action";
 import {
 	ImageGenerationContent,
 	ImageGenerationContentReference,
@@ -14,11 +15,13 @@ import { TriggerContent, TriggerContentReference } from "./trigger";
 export * from "./image-generation";
 export * from "./text-generation";
 export * from "./trigger";
+export * from "./action";
 
 const OperationNodeContent = z.discriminatedUnion("type", [
 	TextGenerationContent,
 	ImageGenerationContent,
 	TriggerContent,
+	ActionContent,
 ]);
 
 export const OperationNode = NodeBase.extend({
@@ -64,6 +67,11 @@ export const TriggerNode = OperationNode.extend({
 });
 export type TriggerNode = z.infer<typeof TriggerNode>;
 
+export const ActionNode = OperationNode.extend({
+	content: ActionContent,
+});
+export type ActionNode = z.infer<typeof ActionNode>;
+
 const OverrideOperationNodeContent = z.discriminatedUnion("type", [
 	OverrideTextGenerationContent,
 	OverrideImageGenerationContent,
@@ -78,6 +86,7 @@ const OperationNodeContentReference = z.discriminatedUnion("type", [
 	TextGenerationContentReference,
 	ImageGenerationContentReference,
 	TriggerContentReference,
+	ActionContentReference,
 ]);
 export const OperationNodeReference = NodeReferenceBase.extend({
 	type: OperationNode.shape.type,

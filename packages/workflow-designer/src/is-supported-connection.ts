@@ -20,7 +20,10 @@ export function isSupportedConnection(
 			message: "This node does not receive inputs",
 		};
 	}
-	if (inputNode.content.type === "trigger") {
+	if (
+		inputNode.content.type === "trigger" ||
+		inputNode.content.type === "action"
+	) {
 		return {
 			canConnect: true,
 		};

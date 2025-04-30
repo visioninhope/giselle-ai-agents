@@ -149,6 +149,7 @@ export function overrideGenerationTemplate(
 					break;
 				}
 				case "trigger":
+				case "action":
 					break;
 				default: {
 					const _exhaustiveCheck: never =
@@ -264,6 +265,7 @@ export function overrideGenerationTemplate(
 					};
 					break;
 				case "trigger":
+				case "action":
 					break;
 				default: {
 					const _exhaustiveCheck: never = sourceNode.content;

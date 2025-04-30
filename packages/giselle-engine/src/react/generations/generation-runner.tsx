@@ -35,6 +35,8 @@ export function GenerationRunner({
 			return <ImageGenerationRunner generation={generation} />;
 		case "trigger":
 			return null;
+		case "action":
+			return null;
 		default: {
 			const _exhaustiveCheck: never = generationContext.operationNode.content;
 			return _exhaustiveCheck;
