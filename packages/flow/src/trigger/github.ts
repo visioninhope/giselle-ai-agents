@@ -40,3 +40,5 @@ export const triggers = [
 	githubIssueCreatedTrigger,
 	githubIssueCommentCreatedTrigger,
 ] as const;
+
+export type TriggerEventId = (typeof triggers)[number]["event"]["id"];

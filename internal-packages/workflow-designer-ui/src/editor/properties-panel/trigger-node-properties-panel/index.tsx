@@ -42,7 +42,7 @@ function PropertiesPnael({
 	}
 	switch (node.content.source.provider) {
 		case "github":
-			return <GitHubTriggerPropertiesPanel node={node} />;
+			return <GitHubTriggerPropertiesPanel data={node.content.source} />;
 		case "manual":
 			return "manual";
 		default: {

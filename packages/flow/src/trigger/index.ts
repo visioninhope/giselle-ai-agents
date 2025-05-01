@@ -7,7 +7,10 @@ import {
 	triggers as manualTriggers,
 } from "./manual";
 
-export { triggers as githubTriggers } from "./github";
+export {
+	triggers as githubTriggers,
+	type TriggerEventId as GitHubTriggerEventId,
+} from "./github";
 export { triggers as manualTriggers } from "./manual";
 
 export type TriggerProvider = typeof manualProvider | typeof githubProvider;
