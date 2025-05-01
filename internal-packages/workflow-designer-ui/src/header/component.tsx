@@ -66,7 +66,7 @@ function Button({
 	return (
 		<button
 			type="button"
-			className="bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] cursor-pointer outline-none"
+			className="bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] cursor-pointer outline-none text-black-900"
 			{...props}
 		>
 			{LeftIcon}
