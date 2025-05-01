@@ -5,7 +5,7 @@ import {
 	hasCapability,
 } from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
-import { useMemo } from "react";
+import { useMemo, useState, useEffect, useRef } from "react";
 import {
 	Select,
 	SelectContent,
@@ -31,6 +31,30 @@ export function AnthropicModelPanel({
 			anthropicLanguageModels.find((lm) => lm.id === anthropicLanguageModel.id),
 		[anthropicLanguageModel.id],
 	);
+	
+	const supportsReasoning = languageModel && hasCapability(languageModel, Capability.Reasoning);
+	
+	// UIのスイッチ状態を追跡するための内部ステート
+	const [reasoningEnabled, setReasoningEnabled] = useState(
+		supportsReasoning ? anthropicLanguageModel.configurations.reasoning : false
+	);
+	
+	// エラーメッセージ表示用の状態
+	const [showError, setShowError] = useState(false);
+	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+	
+	// モデルまたは設定が変更されたときにUIの状態を更新
+	useEffect(() => {
+		setReasoningEnabled(
+			supportsReasoning ? anthropicLanguageModel.configurations.reasoning : false
+		);
+		
+		// モデルが変わったらエラー表示をリセット
+		setShowError(false);
+		if (timeoutRef.current) {
+			clearTimeout(timeoutRef.current);
+		}
+	}, [anthropicLanguageModel.id, anthropicLanguageModel.configurations.reasoning, supportsReasoning]);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
@@ -106,23 +130,46 @@ export function AnthropicModelPanel({
 					<Switch
 						label="Reasoning"
 						name="reasoning"
-						checked={anthropicLanguageModel.configurations.reasoning}
+						checked={reasoningEnabled}
 						onCheckedChange={(checked) => {
+							if (!supportsReasoning && checked) {
+								// 非対応モデルでONにしようとした場合
+								// 一瞬ONにして、すぐにOFFに戻す
+								setReasoningEnabled(true);
+								setShowError(true);
+								
+								// 既存のタイマーがあればクリア
+								if (timeoutRef.current) {
+									clearTimeout(timeoutRef.current);
+								}
+								
+								// 少し遅延してOFFに戻す（UXのため）
+								timeoutRef.current = setTimeout(() => {
+									setReasoningEnabled(false);
+									// エラーメッセージは表示したまま
+								}, 300);
+								
+								return;
+							}
+							
+							// サポート対応モデルの場合は通常の動作
+							setReasoningEnabled(checked);
+							setShowError(false);
+							
 							onModelChange(
 								AnthropicLanguageModelData.parse({
 									...anthropicLanguageModel,
 									configurations: {
 										...anthropicLanguageModel.configurations,
-										reasoning: checked,
+										reasoning: checked && supportsReasoning,  // サポートしていない場合は常にfalse
 									},
 								}),
 							);
 						}}
 						note={
-							languageModel &&
-							anthropicLanguageModel.configurations.reasoning &&
-							!hasCapability(languageModel, Capability.Reasoning) &&
-							"Reasoning will not be used because the current model does not support it"
+							!supportsReasoning && 
+							showError &&
+							"Current model does not support reasoning features."
 						}
 					/>
 				</div>

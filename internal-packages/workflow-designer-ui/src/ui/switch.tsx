@@ -15,15 +15,15 @@ export const Switch = ({
 	onCheckedChange?: (checked: boolean) => void;
 	note?: ReactNode;
 }) => (
-	<div className="flex flex-row items-center justify-between">
-		<label className="text-[14px]" htmlFor={name}>
-			{label}
-		</label>
-		
-		{/* 区切り線 */}
-		<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30"></div>
-		
-		<div className="flex flex-col">
+	<div className="flex flex-col">
+		<div className="flex flex-row items-center justify-between">
+			<label className="text-[14px]" htmlFor={name}>
+				{label}
+			</label>
+			
+			{/* 区切り線 */}
+			<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30"></div>
+			
 			<RadixSwitch.Root
 				className={clsx(
 					"h-[15px] w-[27px] rounded-full outline-none",
@@ -42,7 +42,7 @@ export const Switch = ({
 					)}
 				/>
 			</RadixSwitch.Root>
-			{note && <p className="text-[12px] text-black-200 mt-[2px]">{note}</p>}
 		</div>
+		{note && <p className="text-[12px] text-red-900 mt-[4px]">{note}</p>}
 	</div>
 );
