@@ -40,8 +40,3 @@ alwaysApply: false
   - For functions: `isTriggerRequiringCallsign()`, `hasActiveSubscription()` (not `requiresCallsign()` or `checkActive()`)
 - **Function Naming**: Use verbs or verb phrases that clearly indicate purpose (e.g., `calculateTotalPrice()`, not `process()`)
 - **Consistency**: Follow these conventions throughout the codebase
-
-## Language Support
-- This project's core members include non-native English speakers
-- Please correct grammar in commit messages, code comments, and pull request comments
-- Rewrite user input when necessary to ensure clear communication
