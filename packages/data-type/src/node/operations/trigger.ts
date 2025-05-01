@@ -1,9 +1,11 @@
 import { z } from "zod";
 
-export const ManualTriggerProvider = z.object({
+export const ManualTriggerProviderData = z.object({
 	provider: z.literal("manual"),
 });
-export type ManualTriggerProvider = z.infer<typeof ManualTriggerProvider>;
+export type ManualTriggerProviderData = z.infer<
+	typeof ManualTriggerProviderData
+>;
 
 const GitHubTriggerProviderUnconfigured = z.object({
 	status: z.literal("unconfigured"),
@@ -18,19 +20,23 @@ const GitHubTriggerProviderState = z.discriminatedUnion("status", [
 	GitHubTriggerProviderUnconfigured,
 	GitHubTriggerProviderConfigured,
 ]);
-export const GitHubTriggerProvider = z.object({
+export const GitHubTriggerProviderData = z.object({
 	provider: z.literal("github"),
 	state: GitHubTriggerProviderState,
 });
-export type GitHubTriggerProvider = z.infer<typeof GitHubTriggerProvider>;
+export type GitHubTriggerProviderData = z.infer<
+	typeof GitHubTriggerProviderData
+>;
 
-export const TriggerProvider = z.discriminatedUnion("provider", [
-	ManualTriggerProvider,
-	GitHubTriggerProvider,
+export const TriggerProviderData = z.discriminatedUnion("provider", [
+	ManualTriggerProviderData,
+	GitHubTriggerProviderData,
 ]);
-export type TriggerProvider = z.infer<typeof TriggerProvider>;
-export function isTriggerProvider(value: unknown): value is TriggerProvider {
-	return TriggerProvider.safeParse(value).success;
+export type TriggerProviderData = z.infer<typeof TriggerProviderData>;
+export function isTriggerProviderData(
+	value: unknown,
+): value is TriggerProviderData {
+	return TriggerProviderData.safeParse(value).success;
 }
 
 export const TriggerProviderLike = z

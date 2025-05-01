@@ -2,10 +2,10 @@
 import {
 	type Generation,
 	type TriggerNode,
-	TriggerProvider,
+	TriggerProviderData,
 	type WorkspaceId,
 	isTriggerNode,
-	isTriggerProvider,
+	isTriggerProviderData,
 } from "@giselle-sdk/data-type";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
@@ -41,8 +41,8 @@ import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
 
-function buttonLabel(triggerProvider: TriggerProvider) {
-	switch (triggerProvider.type) {
+function buttonLabel(triggerProvider: TriggerProviderData) {
+	switch (triggerProvider.provider) {
 		case "manual":
 			return "Trigger Manual flow";
 		case "github":
@@ -79,12 +79,12 @@ function Button({
 function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 	const { data } = useWorkflowDesigner();
 	const triggerProvider = useMemo(() => {
-		const parse = TriggerProvider.safeParse(triggerNode.content.provider);
+		const parse = TriggerProviderData.safeParse(triggerNode.content.source);
 		if (parse.success) {
 			return parse.data;
 		}
 		return null;
-	}, [triggerNode.content.provider]);
+	}, [triggerNode.content.source]);
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const handleClick = useCallback(async () => {
 		const flow = buildWorkflowFromNode(
@@ -164,7 +164,7 @@ function Trigger() {
 					align="end"
 				>
 					{triggerNodes.map((triggerNode) => {
-						if (!isTriggerProvider(triggerNode.content.provider)) {
+						if (!isTriggerProviderData(triggerNode.content.source)) {
 							return null;
 						}
 						return (
@@ -172,7 +172,7 @@ function Trigger() {
 								key={triggerNode.id}
 								className="text-black-900 outline-none hover:bg-black-300/20 px-[8px] cursor-pointer rounded-[4px] py-[2px]"
 							>
-								{buttonLabel(triggerNode.content.provider)}
+								{buttonLabel(triggerNode.content.source)}
 							</DropdownMenu.Item>
 						);
 					})}
