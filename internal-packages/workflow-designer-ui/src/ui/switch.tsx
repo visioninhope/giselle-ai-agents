@@ -20,10 +20,10 @@ export const Switch = ({
 			<label className="text-[14px]" htmlFor={name}>
 				{label}
 			</label>
-			
+
 			{/* 区切り線 */}
-			<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30"></div>
-			
+			<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+
 			<RadixSwitch.Root
 				className={clsx(
 					"h-[15px] w-[27px] rounded-full outline-none",
@@ -38,7 +38,7 @@ export const Switch = ({
 					className={clsx(
 						"block size-[11px] translate-x-[2px] rounded-full",
 						"bg-white-400 data-[state=checked]:bg-white-900",
-						"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]"
+						"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]",
 					)}
 				/>
 			</RadixSwitch.Root>
