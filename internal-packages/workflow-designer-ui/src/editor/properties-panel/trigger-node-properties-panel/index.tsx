@@ -9,6 +9,7 @@ import {
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
+import { GitHubTriggerPropertiesPanel } from "./github-trigger-properties-panel";
 
 export function TriggerNodePropertiesPanel({
 	node,
@@ -41,7 +42,7 @@ function PropertiesPnael({
 	}
 	switch (node.content.source.provider) {
 		case "github":
-			return "github";
+			return <GitHubTriggerPropertiesPanel node={node} />;
 		case "manual":
 			return "manual";
 		default: {
