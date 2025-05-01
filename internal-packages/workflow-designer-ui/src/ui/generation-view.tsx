@@ -94,7 +94,9 @@ export function GenerationView({
 													/>
 													<WilliIcon className="w-[16px] h-[16px] ml-[1px] mr-[2px]" />
 													<span className="mr-[2px]">{"{"}</span>
-													<span className="bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(255,_255,_255,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(255,_255,_255,_1)] text-transparent animate-shimmer">Thinking...</span>
+													<span className="bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(255,_255,_255,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(255,_255,_255,_1)] text-transparent animate-shimmer">
+														Thinking...
+													</span>
 												</Accordion.Trigger>
 												<Accordion.Content className="markdown-renderer overflow-hidden italic text-[14px] text-white-400 ml-[8px] pl-[12px] mb-[8px] data-[state=closed]:animate-slideUp data-[state=open]:animate-slideDown border-l border-l-white-400/20">
 													<MemoizedMarkdown content={part.reasoning} />
