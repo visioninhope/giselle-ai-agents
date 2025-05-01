@@ -15,28 +15,34 @@ export const Switch = ({
 	onCheckedChange?: (checked: boolean) => void;
 	note?: ReactNode;
 }) => (
-	<div className="flex flex-col">
-		<label className="text-[14px] py-[1.5px]" htmlFor={name}>
+	<div className="flex flex-row items-center justify-between">
+		<label className="text-[14px]" htmlFor={name}>
 			{label}
 		</label>
-		<RadixSwitch.Root
-			className={clsx(
-				"h-[15px] w-[27px] rounded-full outline-none",
-				"border border-black-300 data-[state=checked]:border-primary-900",
-				"bg-transparent data-[state=checked]:bg-primary-900",
-			)}
-			id={name}
-			checked={checked}
-			onCheckedChange={onCheckedChange}
-		>
-			<RadixSwitch.Thumb
+		
+		{/* 区切り線 */}
+		<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30"></div>
+		
+		<div className="flex flex-col">
+			<RadixSwitch.Root
 				className={clsx(
-					"block size-[11px] translate-x-[1px] rounded-full",
-					"bg-black-300 data-[state=checked]:bg-white-900",
-					"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]",
+					"h-[15px] w-[27px] rounded-full outline-none",
+					"border border-white-400 data-[state=checked]:border-primary-900",
+					"bg-transparent data-[state=checked]:bg-primary-900",
 				)}
-			/>
-		</RadixSwitch.Root>
-		{note && <p className="text-[14px] text-black-200">{note}</p>}
+				id={name}
+				checked={checked}
+				onCheckedChange={onCheckedChange}
+			>
+				<RadixSwitch.Thumb
+					className={clsx(
+						"block size-[11px] translate-x-[2px] rounded-full",
+						"bg-white-400 data-[state=checked]:bg-white-900",
+						"transition-transform duration-100 will-change-transform data-[state=checked]:translate-x-[13px]"
+					)}
+				/>
+			</RadixSwitch.Root>
+			{note && <p className="text-[12px] text-black-200 mt-[2px]">{note}</p>}
+		</div>
 	</div>
 );
