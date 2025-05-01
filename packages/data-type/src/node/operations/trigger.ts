@@ -1,30 +1,30 @@
 import { z } from "zod";
 
 export const ManualTriggerProvider = z.object({
-	type: z.literal("manual"),
-	triggerId: z.string().describe("id of @giselle-sdk/flow/manualTrigger"),
+	provider: z.literal("manual"),
 });
 export type ManualTriggerProvider = z.infer<typeof ManualTriggerProvider>;
 
-const GitHubTriggerProviderAuthUnauthenticated = z.object({
-	state: z.literal("unauthenticated"),
+const GitHubTriggerProviderUnconfigured = z.object({
+	status: z.literal("unconfigured"),
 });
-const GitHubTriggerProviderAuthAuthenticated = z.object({
-	state: z.literal("authenticated"),
-	installtionId: z.number(),
+const GitHubTriggerProviderConfigured = z.object({
+	status: z.literal("configured"),
+	installationId: z.number(),
+	repositoryNodeId: z.string(),
+	eventId: z.string(),
 });
-const GitHubTriggerProviderAuth = z.discriminatedUnion("state", [
-	GitHubTriggerProviderAuthUnauthenticated,
-	GitHubTriggerProviderAuthAuthenticated,
+const GitHubTriggerProviderState = z.discriminatedUnion("status", [
+	GitHubTriggerProviderUnconfigured,
+	GitHubTriggerProviderConfigured,
 ]);
 export const GitHubTriggerProvider = z.object({
-	type: z.literal("github"),
-	triggerId: z.string().describe("id of @giselle-sdk/flow/githubTriggers"),
-	auth: GitHubTriggerProviderAuth,
+	provider: z.literal("github"),
+	state: GitHubTriggerProviderState,
 });
 export type GitHubTriggerProvider = z.infer<typeof GitHubTriggerProvider>;
 
-export const TriggerProvider = z.discriminatedUnion("type", [
+export const TriggerProvider = z.discriminatedUnion("provider", [
 	ManualTriggerProvider,
 	GitHubTriggerProvider,
 ]);
@@ -35,15 +35,14 @@ export function isTriggerProvider(value: unknown): value is TriggerProvider {
 
 export const TriggerProviderLike = z
 	.object({
-		type: z.string(),
-		triggerId: z.string().describe("id of @giselle-sdk/flow/trigger"),
+		provider: z.string(),
 	})
 	.passthrough();
 export type TriggerProviderLike = z.infer<typeof TriggerProviderLike>;
 
 export const TriggerContent = z.object({
 	type: z.literal("trigger"),
-	provider: TriggerProviderLike,
+	source: TriggerProviderLike,
 });
 export type TriggerContent = z.infer<typeof TriggerContent>;
 

@@ -19,10 +19,13 @@ import {
 	type TextGenerationNode,
 	type TextNode,
 	type TriggerNode,
-	type TriggerProvider,
-	type TriggerProviderLike,
 } from "@giselle-sdk/data-type";
-import { actions, githubTriggers, triggers } from "@giselle-sdk/flow";
+import {
+	type TriggerProvider,
+	actions,
+	githubTriggers,
+	type triggers,
+} from "@giselle-sdk/flow";
 import {
 	Capability,
 	hasCapability,
@@ -172,37 +175,20 @@ export function textNode() {
 	} satisfies TextNode;
 }
 
-export function triggerNode(triggerId: string) {
-	const trigger = triggers.find((trigger) => trigger.id === triggerId);
-	if (trigger === undefined) {
-		throw new Error("Unsupported trigger");
-	}
-
-	const outputs: Output[] = [];
-	if ("payloads" in trigger)
-		for (const payloadKey of trigger.payloads.keyof()
-			.options as Array<string>) {
-			outputs.push({
-				id: OutputId.generate(),
-				label: payloadKey,
-				accessor: payloadKey,
-			});
-		}
-
-	function createDefaultProvider(trigger: (typeof triggers)[number]) {
-		switch (trigger.provider) {
+export function triggerNode(triggerProvider: TriggerProvider) {
+	function createDefaultProvider(triggerProvider: TriggerProvider) {
+		switch (triggerProvider) {
 			case "github":
 				return {
-					type: "github",
-					triggerId,
-					auth: {
-						state: "unauthenticated",
+					provider: "github",
+					state: {
+						status: "unconfigured",
 					},
 				} satisfies GitHubTriggerProvider;
 			case "manual":
-				return { type: "manual", triggerId } satisfies ManualTriggerProvider;
+				return { provider: "manual" } satisfies ManualTriggerProvider;
 			default: {
-				const _exhaustiveCheck: never = trigger;
+				const _exhaustiveCheck: never = triggerProvider;
 				throw new Error(`Unsupported trigger provider: ${_exhaustiveCheck}`);
 			}
 		}
@@ -211,13 +197,13 @@ export function triggerNode(triggerId: string) {
 	return {
 		id: NodeId.generate(),
 		type: "operation",
-		name: trigger.label,
+		name: triggerProvider,
 		content: {
 			type: "trigger",
-			provider: createDefaultProvider(trigger),
+			source: createDefaultProvider(triggerProvider),
 		},
 		inputs: [],
-		outputs,
+		outputs: [],
 	} satisfies TriggerNode;
 }
 

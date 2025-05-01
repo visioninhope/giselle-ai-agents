@@ -1,12 +1,15 @@
-import { triggers as githubTriggers } from "./github";
-import { triggers as manualTriggers } from "./manual";
-
-export {
+import {
+	provider as githubProvider,
 	triggers as githubTriggers,
-	githubIssueCreatedTrigger,
-	githubIssueCommentCreatedTrigger,
 } from "./github";
+import {
+	provider as manualProvider,
+	triggers as manualTriggers,
+} from "./manual";
 
+export { triggers as githubTriggers } from "./github";
 export { triggers as manualTriggers } from "./manual";
 
+export type TriggerProvider = typeof manualProvider | typeof githubProvider;
 export const triggers = [...manualTriggers, ...githubTriggers];
+export const triggerProviders = [manualProvider, githubProvider] as const;
