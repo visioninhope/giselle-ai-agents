@@ -4,7 +4,7 @@ import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { HelpCircleIcon } from "lucide-react";
+import { InfoIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 import {
@@ -232,83 +232,81 @@ function Installed({
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
 			<form className="w-full flex flex-col gap-[16px]">
-				<div>
-					<fieldset className="flex flex-col gap-[4px]">
-						<p className="text-[16px]">Repository</p>
-						<Select name="repositoryNodeId">
-							<SelectTrigger>
-								<SelectValue placeholder="Select a repository" />
-							</SelectTrigger>
-							<SelectContent>
-								{repositories.map((repo) => (
-									<SelectItem key={repo.node_id} value={repo.node_id}>
-										{repo.full_name}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</fieldset>
-				</div>
-				<div className="flex flex-col gap-[16px]">
-					<fieldset className="flex flex-col gap-[4px]">
-						<p className="text-[16px]">Event</p>
-						<Select
-							name="event"
-							value={eventId}
-							onValueChange={(value) =>
-								setEventId(value as GitHubTriggerEventId)
-							}
-						>
-							<SelectTrigger>
-								<SelectValue placeholder="Select an event" />
-							</SelectTrigger>
-							<SelectContent>
-								{githubTriggers.map((githubTrigger) => (
-									<SelectItem
-										key={githubTrigger.event.id}
-										value={githubTrigger.event.id}
-									>
-										{githubTrigger.event.label}
-									</SelectItem>
-								))}
-							</SelectContent>
-						</Select>
-					</fieldset>
-					{eventId === "github.issue_comment.created" && (
-						<fieldset className="flex flex-col gap-[4px]">
-							<div className="flex items-center gap-[4px]">
-								<p className="text-[16px]">Callsign</p>
-								<Tooltip
-									text={
-										<p className="w-[260px]">
-											Only comments starting with this callsign will trigger the
-											workflow, preventing unnecessary executions from unrelated
-											comments.
-										</p>
-									}
+				<fieldset className="flex flex-col gap-[4px]">
+					<p className="text-[16px]">Repository</p>
+					<Select name="repositoryNodeId">
+						<SelectTrigger>
+							<SelectValue placeholder="Select a repository" />
+						</SelectTrigger>
+						<SelectContent>
+							{repositories.map((repo) => (
+								<SelectItem key={repo.node_id} value={repo.node_id}>
+									{repo.full_name}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+					{/* <p className="text-black-300">
+						If your repository is not shown, configure repository access for the
+						Giselle app on GitHub.
+					</p> */}
+				</fieldset>
+				<fieldset className="flex flex-col gap-[4px]">
+					<p className="text-[16px]">Event</p>
+					<Select
+						name="event"
+						value={eventId}
+						onValueChange={(value) => setEventId(value as GitHubTriggerEventId)}
+					>
+						<SelectTrigger>
+							<SelectValue placeholder="Select an event" />
+						</SelectTrigger>
+						<SelectContent>
+							{githubTriggers.map((githubTrigger) => (
+								<SelectItem
+									key={githubTrigger.event.id}
+									value={githubTrigger.event.id}
 								>
-									<button type="button" className="cursor-help">
-										<HelpCircleIcon className="size-[16px]" />
-									</button>
-								</Tooltip>
-							</div>
-							<input
-								type="text"
-								name="callsign"
-								className={clsx(
-									"group w-full flex justify-between items-center rounded-[8px] py-[8px] px-[16px] outline-none focus:outline-none mb-[4px]",
-									"border-[2px] border-white-900",
-									"text-[14px]",
-								)}
-								placeholder="/code-review"
-							/>
-							<p className="text-[14px] text-black-400">
-								A callsign is required for issue comment triggers. Examples:
-								/code-review, /check-policy
-							</p>
-						</fieldset>
-					)}
-				</div>
+									{githubTrigger.event.label}
+								</SelectItem>
+							))}
+						</SelectContent>
+					</Select>
+				</fieldset>
+				{eventId === "github.issue_comment.created" && (
+					<fieldset className="flex flex-col gap-[4px]">
+						<div className="flex items-center gap-[4px]">
+							<p className="text-[16px]">Callsign</p>
+							<Tooltip
+								text={
+									<p className="w-[260px]">
+										Only comments starting with this callsign will trigger the
+										workflow, preventing unnecessary executions from unrelated
+										comments.
+									</p>
+								}
+							>
+								<button type="button">
+									<InfoIcon className="size-[16px]" />
+								</button>
+							</Tooltip>
+						</div>
+						<input
+							type="text"
+							name="callsign"
+							className={clsx(
+								"group w-full flex justify-between items-center rounded-[8px] py-[8px] px-[16px] outline-none focus:outline-none mb-[4px]",
+								"border-[2px] border-white-900",
+								"text-[14px]",
+							)}
+							placeholder="/code-review"
+						/>
+						<p className="text-[14px] text-black-400">
+							A callsign is required for issue comment triggers. Examples:
+							/code-review, /check-policy
+						</p>
+					</fieldset>
+				)}
 				<div className="flex justify-end">
 					<button
 						type="submit"
