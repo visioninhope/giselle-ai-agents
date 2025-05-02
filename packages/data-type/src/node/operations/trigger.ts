@@ -16,7 +16,7 @@ const TriggerConfiguredState = z.object({
 	status: z.literal("configured"),
 	flowTriggerId: FlowTriggerId.schema,
 });
-const TriggerState = z.discriminatedUnion("status", [
+const TriggerConfigurationState = z.discriminatedUnion("status", [
 	TriggerUnconfiguredState,
 	TriggerConfiguredState,
 ]);
@@ -24,7 +24,7 @@ const TriggerState = z.discriminatedUnion("status", [
 export const TriggerContent = z.object({
 	type: z.literal("trigger"),
 	provider: z.enum(triggerProviders),
-	state: TriggerState,
+	state: TriggerConfigurationState,
 });
 export type TriggerContent = z.infer<typeof TriggerContent>;
 

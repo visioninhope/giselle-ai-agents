@@ -15,7 +15,11 @@ import type {
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { removeFile, uploadFile } from "./files";
-import { resolveTrigger } from "./flows/resolve-trigger";
+import {
+	type ConfigureTriggerInput,
+	configureTrigger,
+	resolveTrigger,
+} from "./flows";
 import {
 	type TelemetrySettings,
 	cancelGeneration,
@@ -200,6 +204,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			generation: QueuedGeneration;
 		}) => {
 			return await resolveTrigger({ ...args, context });
+		},
+		configureTrigger: async (args: {
+			trigger: ConfigureTriggerInput;
+		}) => {
+			return await configureTrigger({ ...args, context });
 		},
 	};
 }

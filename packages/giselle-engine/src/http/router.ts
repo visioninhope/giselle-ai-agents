@@ -15,6 +15,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { z } from "zod";
 import type { GiselleEngine } from "../core";
+import { ConfigureTriggerInput } from "../core/flows";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -246,6 +247,17 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				return JsonResponse.json({
 					trigger: await giselleEngine.resolveTrigger(input),
+				});
+			},
+		}),
+	configureTrigger: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				trigger: ConfigureTriggerInput,
+			}),
+			handler: async ({ input }) => {
+				return JsonResponse.json({
+					trigger: await giselleEngine.configureTrigger(input),
 				});
 			},
 		}),
