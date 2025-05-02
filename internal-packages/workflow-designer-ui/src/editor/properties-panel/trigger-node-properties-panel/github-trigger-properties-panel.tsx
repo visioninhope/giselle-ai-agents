@@ -1,8 +1,12 @@
+import type {
+	GitHubFlowTriggerEvent,
+	TriggerNode,
+} from "@giselle-sdk/data-type";
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { InfoIcon } from "lucide-react";
 import { useCallback, useEffect, useRef, useState, useTransition } from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
@@ -14,7 +18,6 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
-import type { TriggerNode } from "@giselle-sdk/data-type";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
@@ -23,25 +26,26 @@ export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 		return "configured view";
 	}
 
-	const github = value?.github;
-	if (github === undefined) {
+	if (value?.github === undefined) {
 		return "unset";
 	}
-	switch (github.status) {
+	switch (value.github.status) {
 		case "unset":
 			return "unset";
 		case "unauthorized":
-			return <Unauthorized authUrl={github.authUrl} />;
+			return <Unauthorized authUrl={value.github.authUrl} />;
 		case "not-installed":
 			return (
-				<InstallGitHubApplication installationUrl={github.installationUrl} />
+				<InstallGitHubApplication
+					installationUrl={value.github.installationUrl}
+				/>
 			);
 		case "invalid-credential":
 			return "invalid-credential";
 		case "installed":
-			return <Installed repositories={github.repositories} />;
+			return <Installed repositories={value.github.repositories} node={node} />;
 		default: {
-			const _exhaustiveCheck: never = github;
+			const _exhaustiveCheck: never = value.github;
 			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
 		}
 	}
@@ -194,42 +198,63 @@ function InstallGitHubApplication({
 	);
 }
 
-export function GitHubIntegrationSettingForm() {
-	const { value } = useIntegration();
-
-	const github = value?.github;
-	if (github === undefined) {
-		return "unset";
-	}
-
-	switch (github.status) {
-		case "unset":
-			return "unset";
-		case "unauthorized":
-			return <Unauthorized authUrl={github.authUrl} />;
-		case "not-installed":
-			return (
-				<InstallGitHubApplication installationUrl={github.installationUrl} />
-			);
-		case "invalid-credential":
-			return "invalid-credential";
-		case "installed":
-			return <Installed repositories={github.repositories} />;
-		default: {
-			const _exhaustiveCheck: never = github;
-			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
-		}
-	}
-}
-
 function Installed({
 	repositories,
-}: { repositories: GitHubIntegrationRepository[] }) {
-	const { data: workspace } = useWorkflowDesigner();
+	node,
+}: { repositories: GitHubIntegrationRepository[]; node: TriggerNode }) {
+	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
+	const client = useGiselleEngine();
 	const [eventId, setEventId] = useState<GitHubTriggerEventId | undefined>();
+	const handleSubmit = useCallback(async () => {
+		let event: GitHubFlowTriggerEvent | undefined;
+		switch (eventId) {
+			case "github.issue.created":
+				event = {
+					id: eventId,
+				};
+				break;
+			case "github.issue_comment.created":
+				event = {
+					id: "github.issue_comment.created",
+					conditions: {
+						callsign: "hello",
+					},
+				};
+		}
+		if (event === undefined) {
+			return;
+		}
+
+		const { triggerId } = await client.configureTrigger({
+			trigger: {
+				nodeId: node.id,
+				workspaceId: workspace?.id,
+				enable: false,
+				configuration: {
+					provider: "github",
+					repositoryNodeId: "nd-",
+					installationId: 1000,
+					event,
+				},
+			},
+		});
+		updateNodeDataContent(node, {
+			state: {
+				status: "configured",
+				flowTriggerId: triggerId,
+			},
+		});
+	}, [
+		eventId,
+		workspace?.id,
+		client.configureTrigger,
+		node,
+		updateNodeDataContent,
+	]);
+
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
-			<form className="w-full flex flex-col gap-[16px]">
+			<form className="w-full flex flex-col gap-[16px]" onSubmit={handleSubmit}>
 				<fieldset className="flex flex-col gap-[4px]">
 					<p className="text-[16px]">Repository</p>
 					<Select name="repositoryNodeId">
@@ -309,6 +334,7 @@ function Installed({
 					<button
 						type="submit"
 						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent"
+						disabled={client.isLoading}
 					>
 						Save
 					</button>

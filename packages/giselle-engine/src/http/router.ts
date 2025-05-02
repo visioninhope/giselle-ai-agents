@@ -257,7 +257,7 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
-					trigger: await giselleEngine.configureTrigger(input),
+					triggerId: await giselleEngine.configureTrigger(input),
 				});
 			},
 		}),

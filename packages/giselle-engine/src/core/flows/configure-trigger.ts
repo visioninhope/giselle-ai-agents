@@ -52,4 +52,5 @@ export async function configureTrigger(args: {
 			),
 		},
 	});
+	return flowTriggerId;
 }
