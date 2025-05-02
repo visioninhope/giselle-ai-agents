@@ -1,7 +1,4 @@
-import {
-	type TriggerNode,
-	isTriggerProviderData,
-} from "@giselle-sdk/data-type";
+import type { TriggerNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { NodeIcon } from "../../../icons/node";
 import {
@@ -37,16 +34,13 @@ function PropertiesPnael({
 }: {
 	node: TriggerNode;
 }) {
-	if (!isTriggerProviderData(node.content.source)) {
-		return null;
-	}
-	switch (node.content.source.provider) {
+	switch (node.content.provider) {
 		case "github":
-			return <GitHubTriggerPropertiesPanel data={node.content.source} />;
+			return <GitHubTriggerPropertiesPanel node={node} />;
 		case "manual":
 			return "manual";
 		default: {
-			const _exhaustiveCheck: never = node.content.source;
+			const _exhaustiveCheck: never = node.content.provider;
 			throw new Error(`Unhandled action: ${_exhaustiveCheck}`);
 		}
 	}

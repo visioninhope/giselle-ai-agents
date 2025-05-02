@@ -8,8 +8,6 @@ import {
 import {
 	type TriggerProvider,
 	githubActions,
-	githubTriggers,
-	manualTriggers,
 	triggerProviders,
 } from "@giselle-sdk/flow";
 import {

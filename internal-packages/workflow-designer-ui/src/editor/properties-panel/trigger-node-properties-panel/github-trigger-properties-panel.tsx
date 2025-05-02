@@ -1,4 +1,3 @@
-import type { GitHubTriggerProviderData } from "@giselle-sdk/data-type";
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
 import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
@@ -15,13 +14,12 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
+import type { TriggerNode } from "@giselle-sdk/data-type";
 
-export function GitHubTriggerPropertiesPanel({
-	data,
-}: { data: GitHubTriggerProviderData }) {
+export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
 
-	if (data.state.status === "configured") {
+	if (node.content.state.status === "configured") {
 		return "configured view";
 	}
 

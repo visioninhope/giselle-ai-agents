@@ -5,12 +5,10 @@ import {
 	type FileCategory,
 	type FileNode,
 	type GitHubActionProvider,
-	type GitHubTriggerProvider,
 	type ImageGenerationLanguageModelData,
 	type ImageGenerationNode,
 	type Input,
 	InputId,
-	type ManualTriggerProvider,
 	type Node,
 	NodeId,
 	type Output,
@@ -20,12 +18,7 @@ import {
 	type TextNode,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import {
-	type TriggerProvider,
-	actions,
-	githubTriggers,
-	type triggers,
-} from "@giselle-sdk/flow";
+import { type TriggerProvider, actions } from "@giselle-sdk/flow";
 import {
 	Capability,
 	hasCapability,
@@ -176,31 +169,16 @@ export function textNode() {
 }
 
 export function triggerNode(triggerProvider: TriggerProvider) {
-	function createDefaultProvider(triggerProvider: TriggerProvider) {
-		switch (triggerProvider) {
-			case "github":
-				return {
-					provider: "github",
-					state: {
-						status: "unconfigured",
-					},
-				} satisfies GitHubTriggerProvider;
-			case "manual":
-				return { provider: "manual" } satisfies ManualTriggerProvider;
-			default: {
-				const _exhaustiveCheck: never = triggerProvider;
-				throw new Error(`Unsupported trigger provider: ${_exhaustiveCheck}`);
-			}
-		}
-	}
-
 	return {
 		id: NodeId.generate(),
 		type: "operation",
 		name: triggerProvider,
 		content: {
 			type: "trigger",
-			source: createDefaultProvider(triggerProvider),
+			provider: triggerProvider,
+			state: {
+				status: "unconfigured",
+			},
 		},
 		inputs: [],
 		outputs: [],

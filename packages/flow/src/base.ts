@@ -5,6 +5,7 @@ export interface TriggerEventBase {
 	label: string;
 	description?: string;
 	payloads?: z.AnyZodObject;
+	conditions?: z.AnyZodObject;
 }
 export interface TriggerBase {
 	provider: string;

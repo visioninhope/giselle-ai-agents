@@ -33,6 +33,9 @@ export const githubIssueCommentCreatedTrigger = {
 			repositoryOwner: z.string(),
 			repositoryName: z.string(),
 		}),
+		conditions: z.object({
+			callsign: z.string(),
+		}),
 	},
 } as const satisfies GitHubTrigger;
 

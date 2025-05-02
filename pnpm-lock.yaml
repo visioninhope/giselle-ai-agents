@@ -795,6 +795,9 @@ importers:
       '@ai-sdk/react':
         specifier: 'catalog:'
         version: 1.2.9(react@19.1.0)(zod@3.24.1)
+      '@giselle-sdk/flow':
+        specifier: workspace:^
+        version: link:../flow
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model

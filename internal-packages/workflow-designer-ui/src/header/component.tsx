@@ -2,11 +2,10 @@
 import {
 	type Generation,
 	type TriggerNode,
-	TriggerProviderData,
 	type WorkspaceId,
 	isTriggerNode,
-	isTriggerProviderData,
 } from "@giselle-sdk/data-type";
+import type { TriggerProvider } from "@giselle-sdk/flow";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx";
@@ -15,14 +14,7 @@ import {
 	useFeatureFlag,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import {
-	CableIcon,
-	ChevronDownIcon,
-	CirclePlayIcon,
-	EyeIcon,
-	GanttChartIcon,
-	PlayIcon,
-} from "lucide-react";
+import { ChevronDownIcon, PlayIcon } from "lucide-react";
 import Link from "next/link";
 import { DropdownMenu } from "radix-ui";
 import { Dialog, ToggleGroup, VisuallyHidden } from "radix-ui";
@@ -41,8 +33,8 @@ import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
 
-function buttonLabel(triggerProvider: TriggerProviderData) {
-	switch (triggerProvider.provider) {
+function buttonLabel(triggerProvider: TriggerProvider) {
+	switch (triggerProvider) {
 		case "manual":
 			return "Trigger Manual flow";
 		case "github":
@@ -78,13 +70,6 @@ function Button({
 
 function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 	const { data } = useWorkflowDesigner();
-	const triggerProvider = useMemo(() => {
-		const parse = TriggerProviderData.safeParse(triggerNode.content.source);
-		if (parse.success) {
-			return parse.data;
-		}
-		return null;
-	}, [triggerNode.content.source]);
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const handleClick = useCallback(async () => {
 		const flow = buildWorkflowFromNode(
@@ -123,16 +108,12 @@ function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 			}
 		}
 	}, [triggerNode.id, data, createGeneration, startGeneration]);
-
-	if (triggerProvider === null) {
-		return null;
-	}
 	return (
 		<Button
 			leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
 			onClick={handleClick}
 		>
-			{buttonLabel(triggerProvider)}
+			{buttonLabel(triggerNode.content.provider)}
 		</Button>
 	);
 }
@@ -164,15 +145,12 @@ function Trigger() {
 					align="end"
 				>
 					{triggerNodes.map((triggerNode) => {
-						if (!isTriggerProviderData(triggerNode.content.source)) {
-							return null;
-						}
 						return (
 							<DropdownMenu.Item
 								key={triggerNode.id}
 								className="text-black-900 outline-none hover:bg-black-300/20 px-[8px] cursor-pointer rounded-[4px] py-[2px]"
 							>
-								{buttonLabel(triggerNode.content.source)}
+								{buttonLabel(triggerNode.content.provider)}
 							</DropdownMenu.Item>
 						);
 					})}
