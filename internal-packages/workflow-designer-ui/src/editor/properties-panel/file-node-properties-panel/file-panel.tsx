@@ -382,7 +382,7 @@ function FileListItem({
 								Remove
 							</button>
 						</div>
-						<Dialog.Close className="hidden" />
+						<Dialog.Close className="hidden" tabIndex={-1} aria-hidden="true" />
 					</Dialog.Content>
 				</Dialog.Portal>
 			</Dialog.Root>
