@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import type { AnyZodObject, z } from "zod";
 import {
 	type FormDataRouterHandlers,
@@ -70,7 +70,6 @@ type GiselleEngineClient = {
 		: FormDataMethodWithoutInput<P>;
 } & {
 	basePath: string;
-	isLoading: boolean;
 };
 
 /**
@@ -81,7 +80,6 @@ type GiselleEngineClient = {
  */
 export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 	const basePath = options?.basePath ?? "/api/giselle";
-	const [isLoading, setIsLoading] = useState(false);
 
 	/**
 	 * Generic fetch function that handles API requests with proper typing
@@ -140,10 +138,8 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 			return (async (
 				input?: InputType extends undefined ? never : InputType,
 			) => {
-				setIsLoading(true);
 				// @ts-expect-error
 				const result = await fetchApi(path, input as unknown, transformToForm);
-				setIsLoading(false);
 				return result;
 			}) as GiselleEngineClient[TPath];
 		},
@@ -176,9 +172,8 @@ export function useGiselleEngine(options?: FetchOptions): GiselleEngineClient {
 			...jsonRouterMethods,
 			...formDataRouterMethods,
 			basePath,
-			isLoading,
 		} as GiselleEngineClient;
-	}, [createMethod, basePath, isLoading]);
+	}, [createMethod, basePath]);
 
 	return client;
 }

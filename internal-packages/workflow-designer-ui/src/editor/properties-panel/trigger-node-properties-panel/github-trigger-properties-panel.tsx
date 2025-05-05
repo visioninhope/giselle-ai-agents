@@ -3,12 +3,22 @@ import type {
 	TriggerNode,
 } from "@giselle-sdk/data-type";
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
-import type { GitHubIntegrationRepository } from "@giselle-sdk/integration";
+import type {
+	GitHubIntegrationInstallation,
+	GitHubIntegrationRepository,
+} from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { InfoIcon } from "lucide-react";
-import { useCallback, useEffect, useRef, useState, useTransition } from "react";
+import {
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+	useTransition,
+} from "react";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 import {
 	Select,
@@ -43,7 +53,14 @@ export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 		case "invalid-credential":
 			return "invalid-credential";
 		case "installed":
-			return <Installed repositories={value.github.repositories} node={node} />;
+			return (
+				<Installed
+					repositories={value.github.repositories}
+					installations={value.github.installations}
+					node={node}
+					installationUrl={value.github.installationUrl}
+				/>
+			);
 		default: {
 			const _exhaustiveCheck: never = value.github;
 			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
@@ -199,11 +216,31 @@ function InstallGitHubApplication({
 }
 
 function Installed({
-	repositories,
+	installations,
 	node,
-}: { repositories: GitHubIntegrationRepository[]; node: TriggerNode }) {
+	installationUrl,
+}: {
+	installations: GitHubIntegrationInstallation[];
+	node: TriggerNode;
+	installationUrl: string;
+}) {
 	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const client = useGiselleEngine();
+	const [installationId, setInstalltionId] = useState<string>(
+		`${installations[0].id}`,
+	);
+	const repositories = useMemo(() => {
+		if (installationId === undefined) {
+			return undefined;
+		}
+		const installation = installations.find(
+			(installation) => installation.id === Number.parseInt(installationId),
+		);
+		if (installation === undefined) {
+			return undefined;
+		}
+		return installation.repositories;
+	}, [installationId, installations]);
 	const [eventId, setEventId] = useState<GitHubTriggerEventId | undefined>();
 	const handleSubmit = useCallback(async () => {
 		let event: GitHubFlowTriggerEvent | undefined;
@@ -254,26 +291,78 @@ function Installed({
 
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
+			<p className="text-[18px]">Set up trigger for GitHub Repository</p>
 			<form className="w-full flex flex-col gap-[16px]" onSubmit={handleSubmit}>
 				<fieldset className="flex flex-col gap-[4px]">
-					<p className="text-[16px]">Repository</p>
-					<Select name="repositoryNodeId">
+					<Select
+						name="repositoryNodeId"
+						value={installationId}
+						onValueChange={(value) => setInstalltionId(value)}
+					>
 						<SelectTrigger>
 							<SelectValue placeholder="Select a repository" />
 						</SelectTrigger>
 						<SelectContent>
-							{repositories.map((repo) => (
-								<SelectItem key={repo.node_id} value={repo.node_id}>
-									{repo.full_name}
+							{installations.map((installation) => (
+								<SelectItem key={installation.id} value={`${installation.id}`}>
+									{installation.account &&
+										"login" in installation.account &&
+										installation.account.login}
+									{installation.account &&
+										"slug" in installation.account &&
+										installation.account.slug}
 								</SelectItem>
 							))}
 						</SelectContent>
 					</Select>
 					{/* <p className="text-black-300">
-						If your repository is not shown, configure repository access for the
-						Giselle app on GitHub.
-					</p> */}
+					If your repository is not shown, configure repository access for the
+					Giselle app on GitHub.
+				</p> */}
 				</fieldset>
+				{installationId && repositories && (
+					// <fieldset className="flex flex-col gap-[4px]">
+					// 	<p className="text-[16px]">Repository</p>
+					// 	<Select name="repositoryNodeId">
+					// 		<SelectTrigger>
+					// 			<SelectValue placeholder="Select a repository" />
+					// 		</SelectTrigger>
+					// 		<SelectContent>
+					// 			{repositories.map((repo) => (
+					// 				<SelectItem key={repo.node_id} value={repo.node_id}>
+					// 					{repo.full_name}
+					// 				</SelectItem>
+					// 			))}
+					// 		</SelectContent>
+					// 	</Select>
+					// 	{/* <p className="text-black-300">
+					// 	If your repository is not shown, configure repository access for the
+					// 	Giselle app on GitHub.
+					// </p> */}
+					// </fieldset>
+					<div className="flex flex-col gap-[8px]">
+						<ul className="flex flex-col border rounded-[8px] divide-y">
+							{repositories.map((repo) => (
+								<li
+									key={repo.node_id}
+									className="px-[12px] py-[12px] flex items-center justify-between"
+								>
+									{repo.name}
+									<button
+										type="button"
+										className="rounded-[4px] px-[12px] h-[30px] bg-white-900 text-black-900 cursor-pointer"
+									>
+										Set up
+									</button>
+								</li>
+							))}
+						</ul>
+						<p className="text-black-400">
+							If your repository is not shown, configure repository access for
+							the <a href={installationUrl}>Giselle app</a> on GitHub.
+						</p>
+					</div>
+				)}
 				<fieldset className="flex flex-col gap-[4px]">
 					<p className="text-[16px]">Event</p>
 					<Select
@@ -334,7 +423,6 @@ function Installed({
 					<button
 						type="submit"
 						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent"
-						disabled={client.isLoading}
 					>
 						Save
 					</button>
