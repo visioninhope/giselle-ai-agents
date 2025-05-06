@@ -55,7 +55,6 @@ export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 		case "installed":
 			return (
 				<Installed
-					repositories={value.github.repositories}
 					installations={value.github.installations}
 					node={node}
 					installationUrl={value.github.installationUrl}
