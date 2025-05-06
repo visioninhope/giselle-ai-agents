@@ -28,6 +28,7 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
+import { SelectRepository } from "./ui";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
@@ -225,21 +226,6 @@ function Installed({
 }) {
 	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const client = useGiselleEngine();
-	const [installationId, setInstalltionId] = useState<string>(
-		`${installations[0].id}`,
-	);
-	const repositories = useMemo(() => {
-		if (installationId === undefined) {
-			return undefined;
-		}
-		const installation = installations.find(
-			(installation) => installation.id === Number.parseInt(installationId),
-		);
-		if (installation === undefined) {
-			return undefined;
-		}
-		return installation.repositories;
-	}, [installationId, installations]);
 	const [eventId, setEventId] = useState<GitHubTriggerEventId | undefined>();
 	const handleSubmit = useCallback(async () => {
 		let event: GitHubFlowTriggerEvent | undefined;
@@ -288,141 +274,15 @@ function Installed({
 		updateNodeDataContent,
 	]);
 
-	const { refresh } = useIntegration();
-	const [isPending, startTransition] = useTransition();
-	const popupRef = useRef<Window | null>(null);
-
-	// Handler for installation message from popup window
-	const handleInstallationMessage = useCallback(
-		(event: MessageEvent) => {
-			if (event.data?.type === "github-app-installed") {
-				startTransition(() => {
-					refresh();
-				});
-			}
-		},
-		[refresh],
-	);
-
-	// Listen for visibility changes to refresh data when user returns to the page
-	useEffect(() => {
-		// Add event listener for installation message from popup
-		window.addEventListener("message", handleInstallationMessage);
-
-		return () => {
-			window.removeEventListener("message", handleInstallationMessage);
-
-			// Close popup if component unmounts
-			if (popupRef.current && !popupRef.current.closed) {
-				popupRef.current.close();
-			}
-		};
-	}, [handleInstallationMessage]);
-
-	const handleClick = useCallback(() => {
-		const width = 800;
-		const height = 800;
-		const left = window.screenX + (window.outerWidth - width) / 2;
-		const top = window.screenY + (window.outerHeight - height) / 2;
-
-		popupRef.current = window.open(
-			installationUrl,
-			"Configure GitHub App",
-			`width=${width},height=${height},top=${top},left=${left},popup=1`,
-		);
-
-		if (!popupRef.current) {
-			console.warn("Failed to open popup window");
-			return;
-		}
-	}, [installationUrl]);
-
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
 			<p className="text-[18px]">Set up trigger in GitHub Repository</p>
+			<SelectRepository
+				installations={installations}
+				installationUrl={installationUrl}
+				onSelectRepository={() => {}}
+			/>
 			<form className="w-full flex flex-col gap-[16px]" onSubmit={handleSubmit}>
-				<fieldset className="flex flex-col gap-[4px]">
-					<Select
-						name="repositoryNodeId"
-						value={installationId}
-						onValueChange={(value) => setInstalltionId(value)}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="Select a repository" />
-						</SelectTrigger>
-						<SelectContent>
-							{installations.map((installation) => (
-								<SelectItem key={installation.id} value={`${installation.id}`}>
-									{installation.account &&
-										"login" in installation.account &&
-										installation.account.login}
-									{installation.account &&
-										"slug" in installation.account &&
-										installation.account.slug}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-					{/* <p className="text-black-300">
-					If your repository is not shown, configure repository access for the
-					Giselle app on GitHub.
-				</p> */}
-				</fieldset>
-				{installationId && repositories && (
-					// <fieldset className="flex flex-col gap-[4px]">
-					// 	<p className="text-[16px]">Repository</p>
-					// 	<Select name="repositoryNodeId">
-					// 		<SelectTrigger>
-					// 			<SelectValue placeholder="Select a repository" />
-					// 		</SelectTrigger>
-					// 		<SelectContent>
-					// 			{repositories.map((repo) => (
-					// 				<SelectItem key={repo.node_id} value={repo.node_id}>
-					// 					{repo.full_name}
-					// 				</SelectItem>
-					// 			))}
-					// 		</SelectContent>
-					// 	</Select>
-					// 	{/* <p className="text-black-300">
-					// 	If your repository is not shown, configure repository access for the
-					// 	Giselle app on GitHub.
-					// </p> */}
-					// </fieldset>
-					<div className="flex flex-col gap-[8px]">
-						<ul className="flex flex-col border rounded-[8px] divide-y">
-							{isPending ? (
-								<li className="flex items-center justify-center h-[64px]">
-									Loading...
-								</li>
-							) : (
-								repositories.map((repo) => (
-									<li
-										key={repo.node_id}
-										className="px-[12px] py-[12px] flex items-center justify-between"
-									>
-										{repo.name}
-										<button
-											type="button"
-											className="rounded-[4px] px-[12px] h-[30px] bg-white-900 text-black-900 cursor-pointer"
-										>
-											Set up
-										</button>
-									</li>
-								))
-							)}
-						</ul>
-						<p className="text-black-400 text-[14px]">
-							Missing Git repository?
-							<button
-								type="button"
-								className="text-blue-900 px-[4px] cursor-pointer hover:underline"
-								onClick={handleClick}
-							>
-								Adjust GitHub App Permissions →
-							</button>
-						</p>
-					</div>
-				)}
 				<fieldset className="flex flex-col gap-[4px]">
 					<p className="text-[16px]">Event</p>
 					<Select
