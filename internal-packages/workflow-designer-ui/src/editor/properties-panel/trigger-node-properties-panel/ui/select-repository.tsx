@@ -21,6 +21,7 @@ interface SelectRepository {
 	installationId: number;
 	owner: string;
 	repo: string;
+	repoNodeId: string;
 }
 export function SelectRepository({
 	installations,
@@ -103,10 +104,12 @@ export function SelectRepository({
 			const installationId = formData.get("installationId");
 			const owner = formData.get("owner");
 			const repo = formData.get("repo");
+			const repoNodeId = formData.get('repoNodeId')
 			if (
 				typeof installationId !== "string" ||
 				typeof owner !== "string" ||
-				typeof repo !== "string"
+				typeof repo !== "string" ||
+				typeof repoNodeId !== 'string'
 			) {
 				throw new Error("heheh");
 			}
@@ -115,6 +118,7 @@ export function SelectRepository({
 				installationId: Number.parseInt(installationId),
 				owner,
 				repo,
+				repoNodeId:
 			});
 		},
 		[onSelectRepository],
@@ -193,6 +197,7 @@ export function SelectRepository({
 											value={repo.owner.login}
 										/>
 										<input type="hidden" name="repo" value={repo.name} />
+										<input type="hidden" name="repoNodeId" value={repo.node_id} />
 										<button
 											type="submit"
 											className="rounded-[4px] px-[12px] h-[30px] bg-white-900 text-black-900 cursor-pointer"

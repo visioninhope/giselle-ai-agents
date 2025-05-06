@@ -12,6 +12,7 @@ import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { InfoIcon } from "lucide-react";
 import {
+	type FormEventHandler,
 	useCallback,
 	useEffect,
 	useMemo,
@@ -215,6 +216,29 @@ function InstallGitHubApplication({
 	);
 }
 
+interface SelectRepositoryStep {
+	state: "select-repository";
+}
+interface SelectEventStep {
+	state: "select-event";
+	owner: string;
+	repo: string;
+	repoNodeId: string;
+	installationId: number;
+}
+interface InputCallsignStep {
+	state: "input-callsign";
+	owner: string;
+	repo: string;
+	repoNodeId: string;
+	installationId: number;
+	eventId: string;
+}
+export type GitHubTriggerSetupStep =
+	| SelectRepositoryStep
+	| SelectEventStep
+	| InputCallsignStep;
+
 function Installed({
 	installations,
 	node,
@@ -224,130 +248,172 @@ function Installed({
 	node: TriggerNode;
 	installationUrl: string;
 }) {
+	const [step, setStep] = useState<GitHubTriggerSetupStep>({
+		state: "select-repository",
+	});
 	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	const [eventId, setEventId] = useState<GitHubTriggerEventId | undefined>();
-	const handleSubmit = useCallback(async () => {
-		let event: GitHubFlowTriggerEvent | undefined;
-		switch (eventId) {
-			case "github.issue.created":
-				event = {
-					id: eventId,
-				};
-				break;
-			case "github.issue_comment.created":
-				event = {
-					id: "github.issue_comment.created",
-					conditions: {
-						callsign: "hello",
-					},
-				};
-		}
-		if (event === undefined) {
-			return;
-		}
+	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
+		async (e) => {
+			if (step.state !== "select-event") {
+				throw new Error("Unexpected state");
+			}
+			let event: GitHubFlowTriggerEvent | undefined;
+			const formData = new FormData(e.currentTarget);
+			switch (eventId) {
+				case "github.issue.created":
+					event = {
+						id: eventId,
+					};
+					break;
+				case "github.issue_comment.created": {
+					const callsign = formData.get("callsign");
+					if (typeof callsign !== "string" || callsign.length === 0) {
+						throw new Error("unexpected request");
+					}
+					event = {
+						id: "github.issue_comment.created",
+						conditions: {
+							callsign,
+						},
+					};
+				}
+			}
+			if (event === undefined) {
+				return;
+			}
 
-		const { triggerId } = await client.configureTrigger({
-			trigger: {
-				nodeId: node.id,
-				workspaceId: workspace?.id,
-				enable: false,
-				configuration: {
-					provider: "github",
-					repositoryNodeId: "nd-",
-					installationId: 1000,
-					event,
+			const { triggerId } = await client.configureTrigger({
+				trigger: {
+					nodeId: node.id,
+					workspaceId: workspace?.id,
+					enable: false,
+					configuration: {
+						provider: "github",
+						repositoryNodeId: step.repoNodeId,
+						installationId: step.installationId,
+						event,
+					},
 				},
-			},
-		});
-		updateNodeDataContent(node, {
-			state: {
-				status: "configured",
-				flowTriggerId: triggerId,
-			},
-		});
-	}, [
-		eventId,
-		workspace?.id,
-		client.configureTrigger,
-		node,
-		updateNodeDataContent,
-	]);
+			});
+			updateNodeDataContent(node, {
+				state: {
+					status: "configured",
+					flowTriggerId: triggerId,
+				},
+			});
+		},
+		[
+			eventId,
+			workspace?.id,
+			client.configureTrigger,
+			node,
+			updateNodeDataContent,
+			step,
+		],
+	);
 
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
-			<p className="text-[18px]">Set up trigger in GitHub Repository</p>
-			<SelectRepository
-				installations={installations}
-				installationUrl={installationUrl}
-				onSelectRepository={() => {}}
-			/>
-			<form className="w-full flex flex-col gap-[16px]" onSubmit={handleSubmit}>
-				<fieldset className="flex flex-col gap-[4px]">
-					<p className="text-[16px]">Event</p>
-					<Select
-						name="event"
-						value={eventId}
-						onValueChange={(value) => setEventId(value as GitHubTriggerEventId)}
-					>
-						<SelectTrigger>
-							<SelectValue placeholder="Select an event" />
-						</SelectTrigger>
-						<SelectContent>
-							{githubTriggers.map((githubTrigger) => (
-								<SelectItem
-									key={githubTrigger.event.id}
-									value={githubTrigger.event.id}
-								>
-									{githubTrigger.event.label}
-								</SelectItem>
-							))}
-						</SelectContent>
-					</Select>
-				</fieldset>
-				{eventId === "github.issue_comment.created" && (
-					<fieldset className="flex flex-col gap-[4px]">
-						<div className="flex items-center gap-[4px]">
-							<p className="text-[16px]">Callsign</p>
-							<Tooltip
-								text={
-									<p className="w-[260px]">
-										Only comments starting with this callsign will trigger the
-										workflow, preventing unnecessary executions from unrelated
-										comments.
-									</p>
-								}
-							>
-								<button type="button">
-									<InfoIcon className="size-[16px]" />
-								</button>
-							</Tooltip>
-						</div>
-						<input
-							type="text"
-							name="callsign"
-							className={clsx(
-								"group w-full flex justify-between items-center rounded-[8px] py-[8px] px-[16px] outline-none focus:outline-none mb-[4px]",
-								"border-[2px] border-white-900",
-								"text-[14px]",
-							)}
-							placeholder="/code-review"
-						/>
-						<p className="text-[14px] text-black-400">
-							A callsign is required for issue comment triggers. Examples:
-							/code-review, /check-policy
+			<p className="text-[18px]">Setup trigger in GitHub Repository</p>
+			{step.state === "select-repository" && (
+				<SelectRepository
+					installations={installations}
+					installationUrl={installationUrl}
+					onSelectRepository={(value) => {
+						setStep({
+							state: "select-event",
+							installationId: value.installationId,
+							owner: value.owner,
+							repo: value.repo,
+							repoNodeId: value.repoNodeId,
+						});
+					}}
+				/>
+			)}
+			{step.state === "select-event" && (
+				<form
+					className="w-full flex flex-col gap-[16px]"
+					onSubmit={handleSubmit}
+				>
+					<div className="flex items-center gap-[8px] bg-black-800 px-[14px] py-[10px] rounded-[4px]">
+						<GitHubIcon className="size-[20px]" />
+						<p className="space-x-[2px]">
+							<span>{step.owner}</span>
+							<span>/</span>
+							<span>{step.repo}</span>
 						</p>
+					</div>
+					<p className="text-[14px]">
+						Choose when you want to trigger the flow.
+					</p>
+					<fieldset className="flex flex-col gap-[4px]">
+						<p className="text-[16px]">Event</p>
+						<Select
+							name="event"
+							value={eventId}
+							onValueChange={(value) =>
+								setEventId(value as GitHubTriggerEventId)
+							}
+						>
+							<SelectTrigger>
+								<SelectValue placeholder="Select an event" />
+							</SelectTrigger>
+							<SelectContent>
+								{githubTriggers.map((githubTrigger) => (
+									<SelectItem
+										key={githubTrigger.event.id}
+										value={githubTrigger.event.id}
+									>
+										{githubTrigger.event.label}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</fieldset>
-				)}
-				<div className="flex justify-end">
+					{eventId === "github.issue_comment.created" && (
+						<fieldset className="flex flex-col gap-[4px]">
+							<div className="flex items-center gap-[4px]">
+								<p className="text-[16px]">Callsign</p>
+								<Tooltip
+									text={
+										<p className="w-[260px]">
+											Only comments starting with this callsign will trigger the
+											workflow, preventing unnecessary executions from unrelated
+											comments.
+										</p>
+									}
+								>
+									<button type="button">
+										<InfoIcon className="size-[16px]" />
+									</button>
+								</Tooltip>
+							</div>
+							<input
+								type="text"
+								name="callsign"
+								className={clsx(
+									"group w-full flex justify-between items-center rounded-[8px] py-[8px] px-[16px] outline-none focus:outline-none mb-[4px]",
+									"border-[2px] border-white-900",
+									"text-[14px]",
+								)}
+								placeholder="/code-review"
+							/>
+							<p className="text-[14px] text-black-400">
+								A callsign is required for issue comment triggers. Examples:
+								/code-review, /check-policy
+							</p>
+						</fieldset>
+					)}
 					<button
 						type="submit"
 						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent"
 					>
-						Save
+						Setup
 					</button>
-				</div>
-			</form>
+				</form>
+			)}
 		</div>
 	);
 }
