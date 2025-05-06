@@ -104,12 +104,12 @@ export function SelectRepository({
 			const installationId = formData.get("installationId");
 			const owner = formData.get("owner");
 			const repo = formData.get("repo");
-			const repoNodeId = formData.get('repoNodeId')
+			const repoNodeId = formData.get("repoNodeId");
 			if (
 				typeof installationId !== "string" ||
 				typeof owner !== "string" ||
 				typeof repo !== "string" ||
-				typeof repoNodeId !== 'string'
+				typeof repoNodeId !== "string"
 			) {
 				throw new Error("heheh");
 			}
@@ -118,7 +118,7 @@ export function SelectRepository({
 				installationId: Number.parseInt(installationId),
 				owner,
 				repo,
-				repoNodeId:
+				repoNodeId,
 			});
 		},
 		[onSelectRepository],
@@ -147,31 +147,8 @@ export function SelectRepository({
 						))}
 					</SelectContent>
 				</Select>
-				{/* <p className="text-black-300">
-					If your repository is not shown, configure repository access for the
-					Giselle app on GitHub.
-				</p> */}
 			</fieldset>
 			{installationId && repositories && (
-				// <fieldset className="flex flex-col gap-[4px]">
-				// 	<p className="text-[16px]">Repository</p>
-				// 	<Select name="repositoryNodeId">
-				// 		<SelectTrigger>
-				// 			<SelectValue placeholder="Select a repository" />
-				// 		</SelectTrigger>
-				// 		<SelectContent>
-				// 			{repositories.map((repo) => (
-				// 				<SelectItem key={repo.node_id} value={repo.node_id}>
-				// 					{repo.full_name}
-				// 				</SelectItem>
-				// 			))}
-				// 		</SelectContent>
-				// 	</Select>
-				// 	{/* <p className="text-black-300">
-				// 	If your repository is not shown, configure repository access for the
-				// 	Giselle app on GitHub.
-				// </p> */}
-				// </fieldset>
 				<div className="flex flex-col gap-[8px]">
 					<ul className="flex flex-col border rounded-[8px] divide-y">
 						{isPending ? (
@@ -197,7 +174,11 @@ export function SelectRepository({
 											value={repo.owner.login}
 										/>
 										<input type="hidden" name="repo" value={repo.name} />
-										<input type="hidden" name="repoNodeId" value={repo.node_id} />
+										<input
+											type="hidden"
+											name="repoNodeId"
+											value={repo.node_id}
+										/>
 										<button
 											type="submit"
 											className="rounded-[4px] px-[12px] h-[30px] bg-white-900 text-black-900 cursor-pointer"

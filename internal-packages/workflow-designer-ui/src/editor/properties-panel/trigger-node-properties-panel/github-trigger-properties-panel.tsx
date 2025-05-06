@@ -253,9 +253,13 @@ function Installed({
 	});
 	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const client = useGiselleEngine();
-	const [eventId, setEventId] = useState<GitHubTriggerEventId | undefined>();
+	const [isPending, startTransition] = useTransition();
+	const [eventId, setEventId] = useState<GitHubTriggerEventId>(
+		"github.issue.created",
+	);
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
+			e.preventDefault();
 			if (step.state !== "select-event") {
 				throw new Error("Unexpected state");
 			}
@@ -284,24 +288,26 @@ function Installed({
 				return;
 			}
 
-			const { triggerId } = await client.configureTrigger({
-				trigger: {
-					nodeId: node.id,
-					workspaceId: workspace?.id,
-					enable: false,
-					configuration: {
-						provider: "github",
-						repositoryNodeId: step.repoNodeId,
-						installationId: step.installationId,
-						event,
+			startTransition(async () => {
+				const { triggerId } = await client.configureTrigger({
+					trigger: {
+						nodeId: node.id,
+						workspaceId: workspace?.id,
+						enable: false,
+						configuration: {
+							provider: "github",
+							repositoryNodeId: step.repoNodeId,
+							installationId: step.installationId,
+							event,
+						},
 					},
-				},
-			});
-			updateNodeDataContent(node, {
-				state: {
-					status: "configured",
-					flowTriggerId: triggerId,
-				},
+				});
+				updateNodeDataContent(node, {
+					state: {
+						status: "configured",
+						flowTriggerId: triggerId,
+					},
+				});
 			});
 		},
 		[
@@ -349,7 +355,6 @@ function Installed({
 						Choose when you want to trigger the flow.
 					</p>
 					<fieldset className="flex flex-col gap-[4px]">
-						<p className="text-[16px]">Event</p>
 						<Select
 							name="event"
 							value={eventId}
@@ -408,9 +413,10 @@ function Installed({
 					)}
 					<button
 						type="submit"
-						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent"
+						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent disabled:opacity-50"
+						disabled={isPending}
 					>
-						Setup
+						{isPending ? "Setting..." : "Setup"}
 					</button>
 				</form>
 			)}
