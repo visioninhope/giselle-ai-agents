@@ -8,16 +8,44 @@ export function ConfiguredView({
 	flowTriggerId: FlowTriggerId;
 }) {
 	const client = useGiselleEngine();
-	const { isLoading, data } = useSWR(
+	const { isLoading: isLoadingFlowTriggerData, data: flowTriggerData } = useSWR(
 		[`/triggers/${flowTriggerId}`, flowTriggerId],
 		([_, flowTriggerId]) => client.getTrigger({ flowTriggerId }),
 	);
-	if (isLoading) {
+	const {
+		isLoading: isLoadingGitHubRepositoryFullname,
+		data: githubRepositoryFullnameData,
+	} = useSWR(
+		flowTriggerData &&
+			flowTriggerData.flowTrigger.configuration.provider === "github"
+			? [
+					`/github/repositories/${flowTriggerData.flowTrigger.configuration.repositoryNodeId}`,
+					flowTriggerData.flowTrigger,
+				]
+			: null,
+		([_, flowTrigger]) =>
+			client.getGitHubRepositoryFullname({
+				installationId: flowTrigger.configuration.installationId,
+				repositoryNodeId: flowTrigger.configuration.repositoryNodeId,
+			}),
+	);
+
+	if (isLoadingFlowTriggerData || isLoadingGitHubRepositoryFullname) {
 		return "loading...";
 	}
-	if (data === undefined) {
+	if (
+		flowTriggerData === undefined ||
+		githubRepositoryFullnameData === undefined
+	) {
 		return "no data";
 	}
 
-	return data.flowTrigger.id;
+	return (
+		<p>
+			{flowTriggerData.flowTrigger.id},
+			{flowTriggerData.flowTrigger.configuration.event.id},
+			{githubRepositoryFullnameData.fullname.owner},
+			{githubRepositoryFullnameData.fullname.repo}
+		</p>
+	);
 }

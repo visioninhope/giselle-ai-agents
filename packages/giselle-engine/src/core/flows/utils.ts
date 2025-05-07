@@ -1,4 +1,4 @@
-import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import { FlowTrigger, type FlowTriggerId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 
 export function flowTriggerPath(params: { flowTriggerId: FlowTriggerId }) {
@@ -25,9 +25,11 @@ export async function getFlowTrigger({
 	storage: Storage;
 	flowTriggerId: FlowTriggerId;
 }) {
-	return await storage.get(
+	const unsafe = await storage.get(
 		flowTriggerPath({
 			flowTriggerId: flowTriggerId,
 		}),
 	);
+
+	return FlowTrigger.parse(unsafe);
 }

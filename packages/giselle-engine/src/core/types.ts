@@ -1,5 +1,8 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
-import type { GitHubPersonalAccessTokenAuth } from "@giselle-sdk/github-tool";
+import type {
+	GitHubInstallationAppAuth,
+	GitHubPersonalAccessTokenAuth,
+} from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
@@ -31,6 +34,12 @@ export interface GitHubIntegrationConfig {
 		| (Omit<GitHubInstallationAppAuth, "installationId"> & {
 				resolver: GitHubInstalltionAppAuthResolver;
 		  });
+	authV2: {
+		appId: string;
+		privateKey: string;
+		clientId: string;
+		clientSecret: string;
+	};
 }
 
 export type GiselleIntegrationConfig = {
