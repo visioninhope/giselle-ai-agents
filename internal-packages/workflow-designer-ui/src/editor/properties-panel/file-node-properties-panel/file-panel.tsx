@@ -2,7 +2,7 @@ import type { FileData, FileNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { useCallback, useState } from "react";
+import { type ButtonHTMLAttributes, useCallback, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
@@ -300,6 +300,16 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	);
 }
 
+function RemoveButton({
+	...props
+}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type">) {
+	return (
+		<button type="button" {...props}>
+			<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
+		</button>
+	);
+}
+
 function FileListItem({
 	fileData,
 	onRemove,
@@ -307,27 +317,6 @@ function FileListItem({
 	fileData: FileData;
 	onRemove: (file: FileData) => void;
 }) {
-	const [isConfirmDialogOpen, setIsConfirmDialogOpen] = useState(false);
-
-	const handleRemove = useCallback(() => {
-		// Only show confirmation dialog for uploading files
-		if (fileData.status === "uploading") {
-			setIsConfirmDialogOpen(true);
-		} else {
-			onRemove(fileData);
-		}
-	}, [fileData, onRemove]);
-
-	const handleConfirmRemove = useCallback(() => {
-		onRemove(fileData);
-		setIsConfirmDialogOpen(false);
-	}, [fileData, onRemove]);
-
-	// Create a separate cancel handler for clarity
-	const handleCancelRemove = useCallback(() => {
-		setIsConfirmDialogOpen(false);
-	}, []);
-
 	return (
 		<div className="flex items-center overflow-x-hidden group justify-between bg-black-100 hover:bg-white-900/10 transition-colors p-[8px] rounded-[8px]">
 			<div className="flex items-center overflow-x-hidden">
@@ -342,50 +331,54 @@ function FileListItem({
 					{fileData.status === "failed" && <p>Failed</p>}
 				</div>
 			</div>
-			<Tooltip text="Remove">
-				<button
-					type="button"
-					className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white-900/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
-					onClick={handleRemove}
-				>
-					<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
-				</button>
-			</Tooltip>
 
-			{/* Confirmation Dialog - Only for uploading files */}
-			<Dialog.Root
-				open={isConfirmDialogOpen}
-				onOpenChange={setIsConfirmDialogOpen}
-			>
-				<Dialog.Portal>
-					<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
-					<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 border border-black-400">
-						<Dialog.Title className="text-[18px] font-semibold text-white-800 mb-4">
-							Confirm Removal
-						</Dialog.Title>
-						<Dialog.Description className="text-[14px] text-white-400 mb-6">
-							This file is still uploading. Are you sure you want to remove it?
-						</Dialog.Description>
-						<div className="flex justify-end gap-[12px]">
-							<button
-								type="button"
-								className="py-[8px] px-[16px] rounded-[8px] text-[14px] font-medium bg-transparent text-white-800 border border-black-400 hover:bg-white-900/10"
-								onClick={handleCancelRemove}
-							>
-								Cancel
-							</button>
-							<button
-								type="button"
-								className="py-[8px] px-[16px] rounded-[8px] text-[14px] font-medium bg-error-900 text-white-800 hover:bg-error-900/80"
-								onClick={handleConfirmRemove}
-							>
-								Remove
-							</button>
-						</div>
-						<Dialog.Close className="hidden" tabIndex={-1} aria-hidden="true" />
-					</Dialog.Content>
-				</Dialog.Portal>
-			</Dialog.Root>
+			{fileData.status === "failed" ? (
+				<Tooltip text="Remove">
+					<RemoveButton />
+				</Tooltip>
+			) : (
+				<Dialog.Root>
+					<Dialog.Trigger asChild>
+						<Tooltip text="Remove">
+							<RemoveButton />
+						</Tooltip>
+					</Dialog.Trigger>
+					<Dialog.Portal>
+						<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
+						<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 border border-black-400">
+							<Dialog.Title className="text-[18px] font-semibold text-white-800 mb-4">
+								Confirm Removal
+							</Dialog.Title>
+							<Dialog.Description className="text-[14px] text-white-400 mb-6">
+								This file is still uploading. Are you sure you want to remove
+								it?
+							</Dialog.Description>
+							<div className="flex justify-end gap-[12px]">
+								<Dialog.Close asChild>
+									<button
+										type="button"
+										className="py-[8px] px-[16px] rounded-[8px] text-[14px] font-medium bg-transparent text-white-800 border border-black-400 hover:bg-white-900/10"
+									>
+										Cancel
+									</button>
+								</Dialog.Close>
+								<button
+									type="button"
+									className="py-[8px] px-[16px] rounded-[8px] text-[14px] font-medium bg-error-900 text-white-800 hover:bg-error-900/80"
+									onClick={() => onRemove(fileData)}
+								>
+									Remove
+								</button>
+							</div>
+							<Dialog.Close
+								className="hidden"
+								tabIndex={-1}
+								aria-hidden="true"
+							/>
+						</Dialog.Content>
+					</Dialog.Portal>
+				</Dialog.Root>
+			)}
 		</div>
 	);
 }
