@@ -300,12 +300,16 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	);
 }
 
-function RemoveButton({ ...props }: Omit<TooltipProps, "text" | "children">) {
+function RemoveButton({
+	onClick,
+	...props
+}: Omit<TooltipProps, "text" | "children">) {
 	return (
 		<Tooltip text="Remove" {...props}>
 			<button
 				type="button"
 				className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white-900/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
+				onClick={onClick}
 			>
 				<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
 			</button>
@@ -336,7 +340,7 @@ function FileListItem({
 			</div>
 
 			{fileData.status === "failed" ? (
-				<RemoveButton />
+				<RemoveButton onClick={() => onRemove(fileData)} />
 			) : (
 				<Dialog.Root>
 					<Dialog.Trigger asChild>
