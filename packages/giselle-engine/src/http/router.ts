@@ -1,6 +1,7 @@
 import {
 	CreatedRun,
 	FileId,
+	FlowTriggerId,
 	Generation,
 	GenerationId,
 	GenerationOrigin,
@@ -258,6 +259,17 @@ export const createJsonRouters = {
 			handler: async ({ input }) => {
 				return JsonResponse.json({
 					triggerId: await giselleEngine.configureTrigger(input),
+				});
+			},
+		}),
+	getTrigger: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				flowTriggerId: FlowTriggerId.schema,
+			}),
+			handler: async ({ input }) => {
+				return JsonResponse.json({
+					flowTrigger: await giselleEngine.getTrigger(input),
 				});
 			},
 		}),

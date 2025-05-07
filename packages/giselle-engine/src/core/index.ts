@@ -1,6 +1,7 @@
 import type {
 	CreatedRun,
 	FileId,
+	FlowTriggerId,
 	Generation,
 	GenerationId,
 	GenerationOrigin,
@@ -18,6 +19,7 @@ import { removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
+	getTrigger,
 	resolveTrigger,
 } from "./flows";
 import {
@@ -209,6 +211,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			trigger: ConfigureTriggerInput;
 		}) => {
 			return await configureTrigger({ ...args, context });
+		},
+		getTrigger: async (args: {
+			flowTriggerId: FlowTriggerId;
+		}) => {
+			return await getTrigger({ ...args, context });
 		},
 	};
 }

@@ -29,13 +29,13 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
-import { SelectRepository } from "./ui";
+import { ConfiguredView, SelectRepository } from "./ui";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.state.status === "configured") {
-		return "configured view";
+		return <ConfiguredView flowTriggerId={node.content.state.flowTriggerId} />;
 	}
 
 	if (value?.github === undefined) {

@@ -17,3 +17,17 @@ export async function setFlowTrigger({
 		flowTrigger,
 	);
 }
+
+export async function getFlowTrigger({
+	storage,
+	flowTriggerId,
+}: {
+	storage: Storage;
+	flowTriggerId: FlowTriggerId;
+}) {
+	return await storage.get(
+		flowTriggerPath({
+			flowTriggerId: flowTriggerId,
+		}),
+	);
+}
