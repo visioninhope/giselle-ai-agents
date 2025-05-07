@@ -7,7 +7,7 @@ import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { useToasts } from "../../../ui/toast";
-import { Tooltip } from "../../../ui/tooltip";
+import { Tooltip, type TooltipProps } from "../../../ui/tooltip";
 import { useFileNode } from "./use-file-node";
 
 export type FileTypeConfig = {
@@ -300,13 +300,16 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	);
 }
 
-function RemoveButton({
-	...props
-}: Omit<ButtonHTMLAttributes<HTMLButtonElement>, "children" | "type">) {
+function RemoveButton({ ...props }: Omit<TooltipProps, "text" | "children">) {
 	return (
-		<button type="button" {...props}>
-			<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
-		</button>
+		<Tooltip text="Remove" {...props}>
+			<button
+				type="button"
+				className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white-900/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
+			>
+				<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
+			</button>
+		</Tooltip>
 	);
 }
 
@@ -333,15 +336,11 @@ function FileListItem({
 			</div>
 
 			{fileData.status === "failed" ? (
-				<Tooltip text="Remove">
-					<RemoveButton />
-				</Tooltip>
+				<RemoveButton />
 			) : (
 				<Dialog.Root>
 					<Dialog.Trigger asChild>
-						<Tooltip text="Remove">
-							<RemoveButton />
-						</Tooltip>
+						<RemoveButton />
 					</Dialog.Trigger>
 					<Dialog.Portal>
 						<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
