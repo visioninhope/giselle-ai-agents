@@ -28,7 +28,7 @@ export default async function TeamPage() {
 					rel="noopener noreferrer"
 					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
 				>
-					About Setting
+					About Team Settings
 					<ExternalLink size={14} />
 				</a>
 			</div>
