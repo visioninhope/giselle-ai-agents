@@ -125,7 +125,7 @@ export function SelectRepository({
 	);
 	return (
 		<div className="w-full flex flex-col gap-[16px]">
-			<fieldset className="flex flex-col gap-[4px]">
+			<fieldset className="flex flex-col gap-[8px]">
 				<Select
 					name="repositoryNodeId"
 					value={installationId}
@@ -147,6 +147,16 @@ export function SelectRepository({
 						))}
 					</SelectContent>
 				</Select>
+				<p className="text-black-400 text-[14px]">
+					Missing GitHub account?
+					<button
+						type="button"
+						className="text-blue-900 px-[4px] cursor-pointer hover:underline"
+						onClick={handleClick}
+					>
+						Adjust GitHub App Permissions →
+					</button>
+				</p>
 			</fieldset>
 			{installationId && repositories && (
 				<div className="flex flex-col gap-[8px]">
