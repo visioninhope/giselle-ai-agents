@@ -1,8 +1,16 @@
-import type {
-	GitHubFlowTriggerEvent,
-	TriggerNode,
+import {
+	type GitHubFlowTriggerEvent,
+	type Input,
+	InputId,
+	type Output,
+	OutputId,
+	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	githubTriggers,
+	triggers,
+} from "@giselle-sdk/flow";
 import type {
 	GitHubIntegrationInstallation,
 	GitHubIntegrationRepository,
@@ -251,7 +259,7 @@ function Installed({
 	const [step, setStep] = useState<GitHubTriggerSetupStep>({
 		state: "select-repository",
 	});
-	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
+	const { data: workspace, updateNodeData } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [eventId, setEventId] = useState<GitHubTriggerEventId>(
@@ -287,6 +295,21 @@ function Installed({
 			if (event === undefined) {
 				return;
 			}
+			const trigger = triggers.find(
+				(trigger) =>
+					trigger.provider === "github" && trigger.event.id === event.id,
+			);
+			if (trigger === undefined) {
+				return;
+			}
+			const outputs: Output[] = [];
+			for (const key of trigger.event.payloads.keyof().options) {
+				outputs.push({
+					id: OutputId.generate(),
+					label: key,
+					accessor: key,
+				});
+			}
 
 			startTransition(async () => {
 				const { triggerId } = await client.configureTrigger({
@@ -302,11 +325,15 @@ function Installed({
 						},
 					},
 				});
-				updateNodeDataContent(node, {
-					state: {
-						status: "configured",
-						flowTriggerId: triggerId,
+				updateNodeData(node, {
+					content: {
+						...node.content,
+						state: {
+							status: "configured",
+							flowTriggerId: triggerId,
+						},
 					},
+					outputs: [...node.outputs, ...outputs],
 				});
 			});
 		},
@@ -315,7 +342,7 @@ function Installed({
 			workspace?.id,
 			client.configureTrigger,
 			node,
-			updateNodeDataContent,
+			updateNodeData,
 			step,
 		],
 	);
