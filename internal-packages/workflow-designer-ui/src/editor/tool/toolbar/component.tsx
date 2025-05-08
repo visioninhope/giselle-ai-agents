@@ -102,6 +102,74 @@ function ProTag() {
 	);
 }
 
+function CategoryTab({ isActive, children, onClick }: { isActive: boolean; children: ReactNode; onClick: () => void }) {
+	return (
+		<button
+			onClick={onClick}
+			className={clsx(
+				"flex px-[8px] py-[6px] justify-center items-center gap-[10px] rounded-[4px] text-[14px] font-medium",
+				isActive 
+					? "bg-primary-700 text-white-100" 
+					: "bg-black-800/50 text-white-300 hover:bg-black-800/80 hover:text-white-100"
+			)}
+		>
+			{children}
+		</button>
+	);
+}
+
+function ModelProviderGroup({ 
+	provider, 
+	models, 
+	onModelSelect
+}: { 
+	provider: string; 
+	models: LanguageModel[]; 
+	onModelSelect: (model: LanguageModel) => void;
+}) {
+	const getProviderName = (provider: string) => {
+		switch (provider) {
+			case "openai":
+				return "OpenAI";
+			case "anthropic":
+				return "Claude";
+			case "google":
+				return "Google";
+			default:
+				return provider.charAt(0).toUpperCase() + provider.slice(1);
+		}
+	};
+
+	return (
+		<div className="flex flex-col gap-[8px] mb-[16px]">
+			<h3 className="text-white-400 text-[14px] px-[4px]">{getProviderName(provider)}</h3>
+			<div className="flex flex-col gap-[4px]">
+				{models.map((model) => (
+					<button
+						key={model.id}
+						className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
+						onClick={() => onModelSelect(model)}
+					>
+						<div className="flex items-center">
+							{provider === "anthropic" && <AnthropicIcon className="w-[18px] h-[18px]" data-icon />}
+							{provider === "openai" && <OpenaiIcon className="w-[18px] h-[18px]" data-icon />}
+							{provider === "google" && <GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />}
+							{provider === "perplexity" && <PerplexityIcon className="w-[18px] h-[18px]" data-icon />}
+							{provider === "fal" && (
+								<ImageGenerationNodeIcon modelId={model.id} className="w-[18px] h-[18px]" data-icon />
+							)}
+						</div>
+						<div className="flex items-center gap-[8px]">
+							<p className="text-[14px] text-left text-nowrap">{model.id}</p>
+							{model.tier === "pro" && <ProTag />}
+						</div>
+					</button>
+				))}
+			</div>
+		</div>
+	);
+}
+
 function LanguageModelListItem({
 	languageModel,
 	...props
@@ -346,172 +414,101 @@ export function Toolbar() {
 							<GenNodeIcon data-icon />
 						</Tooltip>
 						{selectedTool?.action === "selectLanguageModel" && (
-							<Dialog.Root>
-								<Popover.Root open={true}>
-									<Popover.Anchor />
-									<Popover.Portal>
-										<Popover.Content
-											className={clsx(
-												"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
-												"bg-black-900/10 text-white-900",
-												"backdrop-blur-[4px]",
-											)}
-											align="end"
-											sideOffset={42}
-										>
-											<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-											<div className="relative flex flex-col gap-[8px] max-h-[200px] overflow-y-auto">
-												<ToggleGroup.Root
-													type="single"
-													className={clsx("flex flex-col gap-[8px]")}
-													onValueChange={(modelId) => {
-														const languageModel = languageModels.find(
-															(model) => model.id === modelId,
-														);
-														const languageModelData = {
-															id: languageModel?.id,
-															provider: languageModel?.provider,
-															configurations: languageModel?.configurations,
-														};
-														if (
-															isTextGenerationLanguageModelData(
-																languageModelData,
-															)
-														) {
-															setSelectedTool(
-																addNodeTool(
-																	textGenerationNode(languageModelData),
-																),
-															);
-														}
-														if (
-															isImageGenerationLanguageModelData(
-																languageModelData,
-															)
-														) {
-															setSelectedTool(
-																addNodeTool(
-																	imageGenerationNode(languageModelData),
-																),
-															);
-														}
-													}}
-												>
-													{languageModels
-														.filter((languageModel) =>
-															llmProviders.includes(languageModel.provider),
-														)
-														.map((languageModel) =>
-															languageModelAvailable(languageModel) ? (
-																<ToggleGroup.Item
-																	data-tool
-																	value={languageModel.id}
-																	key={languageModel.id}
-																	onMouseEnter={() =>
-																		setLanguageModelMouseHovered(languageModel)
-																	}
-																	onFocus={() =>
-																		setLanguageModelMouseHovered(languageModel)
-																	}
-																	asChild
-																>
-																	<LanguageModelListItem
-																		languageModel={languageModel}
-																	/>
-																</ToggleGroup.Item>
-															) : (
-																<Dialog.Trigger
-																	asChild
-																	key={languageModel.id}
-																	onMouseEnter={() =>
-																		setLanguageModelMouseHovered(languageModel)
-																	}
-																	onFocus={() =>
-																		setLanguageModelMouseHovered(languageModel)
-																	}
-																	data-tool
-																>
-																	<LanguageModelListItem
-																		languageModel={languageModel}
-																	/>
-																</Dialog.Trigger>
-															),
-														)}
-												</ToggleGroup.Root>
-											</div>
-										</Popover.Content>
-									</Popover.Portal>
-								</Popover.Root>
-								<Dialog.Portal>
-									<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
-									<Dialog.Content
-										className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[500px] bg-black-900 rounded-[12px] p-[32px] shadow-xl z-50 overflow-hidden border border-black-400 flex flex-col items-start gap-[20px]"
-										onCloseAutoFocus={(e) => {
-											e.preventDefault();
-										}}
+							<Popover.Root open={true}>
+								<Popover.Anchor />
+								<Popover.Portal>
+									<Popover.Content
+										className={clsx(
+											"relative rounded-[8px] px-[8px] py-[8px] w-[var(--language-model-toggle-group-popover-width)]",
+											"bg-black-900/10 text-white-900",
+											"backdrop-blur-[4px]",
+										)}
+										align="end"
+										sideOffset={42}
 									>
-										<Dialog.Title
-											className="text-[20px] font-hubot font-semibold leading-[140%] text-[#B8E8F4] w-full text-center"
-											style={{ textShadow: "0px 0px 10px #0087F6" }}
-										>
-											Upgrade to Pro
-										</Dialog.Title>
-										<Dialog.Description className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
-											Unlock the full power of AI for your projects! With Pro,
-											you'll get:
-										</Dialog.Description>
-										<ul className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%] list-disc pl-[20px] space-y-[12px]">
-											<li>
-												Access to all premium AI models for smarter, faster
-												results
-											</li>
-											<li>
-												$20 of AI usage included (unlimited during our special
-												promotion!)
-											</li>
-											<li>
-												Seamless team collaboration with easy member invites
-											</li>
-											<li>Priority email support when you need it</li>
-										</ul>
-										<p className="text-[#B5C0CA] text-[14px] font-[Geist] font-medium leading-[170%]">
-											Take your development to the next level with advanced AI
-											capabilities that save time and enhance your workflow.
-											Your ideas deserve the best tools!
-										</p>
-										<div className="w-full flex justify-center mt-[8px]">
-											<a
-												className="bg-primary-100 text-black-900 font-hubot border-none rounded-[8px] px-8 py-3 font-semibold text-[16px] hover:opacity-90 transition-opacity"
-												href="/settings/team"
-												target="_blank"
-												rel="noopener noreferrer"
-											>
-												Upgrade
-											</a>
-										</div>
-										<Dialog.Close className="absolute top-[12px] right-[12px] text-white-400 hover:text-white-100">
-											<svg
-												width="24"
-												height="24"
-												viewBox="0 0 24 24"
-												fill="none"
-												xmlns="http://www.w3.org/2000/svg"
-												role="img"
-												aria-label="Close dialog"
-											>
-												<title>Close dialog</title>
-												<path
-													d="M18 6L6 18M6 6L18 18"
-													stroke="currentColor"
-													strokeWidth="2"
-													strokeLinecap="round"
-													strokeLinejoin="round"
+										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
+										<div className="relative flex flex-col gap-[8px] max-h-[280px] overflow-y-auto">
+											{/* 検索ボックス */}
+											<div className="flex h-[28px] p-[8px] items-center gap-[11px] self-stretch rounded-[8px] bg-[rgba(222,233,242,0.20)] mx-[4px] mb-[4px]">
+												<div className="text-black-800">
+													<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+														<path d="M21 21L15.5 15.5M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 6.13401 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+													</svg>
+												</div>
+												<input
+													type="text"
+													placeholder="Search LLM Model..."
+													className="w-full bg-transparent border-none text-[14px] text-black-800 placeholder:text-black-800 focus:outline-none"
 												/>
-											</svg>
-										</Dialog.Close>
-									</Dialog.Content>
-								</Dialog.Portal>
-							</Dialog.Root>
+											</div>
+											
+											{/* 検索ボックスの後にタブを配置 */}
+											<div className="mx-[4px] mb-[6px]">
+												<div className="flex items-center rounded-md gap-2">
+													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] bg-primary-600 text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">All</button>
+													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Text</button>
+													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Image</button>
+													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Video</button>
+													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Audio</button>
+												</div>
+											</div>
+											
+											<div className="mt-[0px] mx-[4px]">
+												<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">You may also choose</p>
+												
+												{/* モデルリストをフラットに表示 */}
+												<div className="flex flex-col gap-[4px]">
+													{languageModels
+														.filter((model) => llmProviders.includes(model.provider))
+														.map((model) => (
+															<button
+																key={model.id}
+																className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
+																onClick={() => {
+																	const languageModelData = {
+																		id: model.id,
+																		provider: model.provider,
+																		configurations: model.configurations,
+																	};
+																	
+																	if (isTextGenerationLanguageModelData(languageModelData)) {
+																		setSelectedTool(
+																			addNodeTool(
+																				textGenerationNode(languageModelData),
+																			),
+																		);
+																	}
+																	
+																	if (isImageGenerationLanguageModelData(languageModelData)) {
+																		setSelectedTool(
+																			addNodeTool(
+																				imageGenerationNode(languageModelData),
+																			),
+																		);
+																	}
+																}}
+															>
+																<div className="flex items-center">
+																	{model.provider === "anthropic" && <AnthropicIcon className="w-[18px] h-[18px]" data-icon />}
+																	{model.provider === "openai" && <OpenaiIcon className="w-[18px] h-[18px]" data-icon />}
+																	{model.provider === "google" && <GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />}
+																	{model.provider === "perplexity" && <PerplexityIcon className="w-[18px] h-[18px]" data-icon />}
+																	{model.provider === "fal" && (
+																		<ImageGenerationNodeIcon modelId={model.id} className="w-[18px] h-[18px]" data-icon />
+																	)}
+																</div>
+																<div className="flex items-center gap-[8px]">
+																	<p className="text-[14px] text-left text-nowrap">{model.id}</p>
+																	{model.tier === "pro" && <ProTag />}
+																</div>
+															</button>
+														))}
+												</div>
+											</div>
+										</div>
+									</Popover.Content>
+								</Popover.Portal>
+							</Popover.Root>
 						)}
 						<div className="absolute left-[calc(var(--language-model-detail-panel-width)/2_+_var(--language-model-toggle-group-popover-width)/2_-_var(--language-model-detail-panel-width)/2_+_10px)]">
 							<div className="relative">
