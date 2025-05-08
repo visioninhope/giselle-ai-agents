@@ -158,12 +158,13 @@ export function GenerationView({
 				</div>
 			))}
 			{generation.status !== "completed" &&
-				generation.status !== "cancelled" && 
+				generation.status !== "cancelled" &&
 				// reasoning部分がない場合のみSpinnerを表示
-				!generatedMessages.some(message => 
-					message.parts?.some(part => 
-						part.type === "reasoning" && generation.status === "running"
-					)
+				!generatedMessages.some((message) =>
+					message.parts?.some(
+						(part) =>
+							part.type === "reasoning" && generation.status === "running",
+					),
 				) && (
 					<div className="pt-[8px]">
 						<Spinner />
