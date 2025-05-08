@@ -534,7 +534,9 @@ function isVertexAiHost(urlString: string): boolean {
 	// }
 }
 
-function getProviderOptions(languageModelData: TextGenerationLanguageModelData) {
+function getProviderOptions(
+	languageModelData: TextGenerationLanguageModelData,
+) {
 	const languageModel = languageModels.find(
 		(model) => model.id === languageModelData.id,
 	);
