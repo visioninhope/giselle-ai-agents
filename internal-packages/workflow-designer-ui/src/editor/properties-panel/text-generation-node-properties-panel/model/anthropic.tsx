@@ -5,7 +5,7 @@ import {
 	hasCapability,
 } from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	Select,
 	SelectContent,
@@ -26,51 +26,43 @@ export function AnthropicModelPanel({
 	onModelChange: (changedValue: AnthropicLanguageModelData) => void;
 }) {
 	const limits = useUsageLimits();
-	const languageModel = useMemo(
-		() =>
-			anthropicLanguageModels.find((lm) => lm.id === anthropicLanguageModel.id),
-		[anthropicLanguageModel.id],
-	);
 
-	const supportsReasoning =
-		languageModel && hasCapability(languageModel, Capability.Reasoning);
-
-	// UIのスイッチ状態を追跡するための内部ステート
-	const [reasoningEnabled, setReasoningEnabled] = useState(
-		supportsReasoning ? anthropicLanguageModel.configurations.reasoning : false,
-	);
-
-	// エラーメッセージ表示用の状態
-	const [showError, setShowError] = useState(false);
-	const timeoutRef = useRef<NodeJS.Timeout | null>(null);
-
-	// モデルまたは設定が変更されたときにUIの状態を更新
-	useEffect(() => {
-		setReasoningEnabled(
-			supportsReasoning
-				? anthropicLanguageModel.configurations.reasoning
-				: false,
+	const hasReasoningCapability = useMemo(() => {
+		const languageModel = anthropicLanguageModels.find(
+			(lm) => lm.id === anthropicLanguageModel.id,
 		);
+		return languageModel && hasCapability(languageModel, Capability.Reasoning);
+	}, [anthropicLanguageModel.id]);
 
-		// モデルが変わったらエラー表示をリセット
-		setShowError(false);
-		if (timeoutRef.current) {
-			clearTimeout(timeoutRef.current);
-		}
-	}, [anthropicLanguageModel.configurations.reasoning, supportsReasoning]);
+	const handleModelChange = useCallback(
+		(value: string) => {
+			const newLanguageModel = anthropicLanguageModels.find(
+				(model) => model.id === value,
+			);
+			if (newLanguageModel === undefined) {
+				return;
+			}
+			onModelChange(
+				AnthropicLanguageModelData.parse({
+					...anthropicLanguageModel,
+					id: value,
+					configurations: {
+						...anthropicLanguageModel.configurations,
+						reasoning:
+							anthropicLanguageModel.configurations.reasoning &&
+							hasCapability(newLanguageModel, Capability.Reasoning),
+					},
+				}),
+			);
+		},
+		[anthropicLanguageModel, onModelChange],
+	);
 
 	return (
 		<div className="flex flex-col gap-[34px]">
 			<Select
 				value={anthropicLanguageModel.id}
-				onValueChange={(value) => {
-					onModelChange(
-						AnthropicLanguageModelData.parse({
-							...anthropicLanguageModel,
-							id: value,
-						}),
-					);
-				}}
+				onValueChange={handleModelChange}
 			>
 				<SelectTrigger>
 					<SelectValue placeholder="Select a LLM" />
@@ -130,51 +122,35 @@ export function AnthropicModelPanel({
 						}}
 					/>
 
-					<Switch
-						label="Reasoning"
-						name="reasoning"
-						checked={reasoningEnabled}
-						onCheckedChange={(checked) => {
-							if (!supportsReasoning && checked) {
-								// 非対応モデルでONにしようとした場合
-								// 一瞬ONにして、すぐにOFFに戻す
-								setReasoningEnabled(true);
-								setShowError(true);
-
-								// 既存のタイマーがあればクリア
-								if (timeoutRef.current) {
-									clearTimeout(timeoutRef.current);
-								}
-
-								// 少し遅延してOFFに戻す（UXのため）
-								timeoutRef.current = setTimeout(() => {
-									setReasoningEnabled(false);
-									// エラーメッセージは表示したまま
-								}, 300);
-
-								return;
-							}
-
-							// サポート対応モデルの場合は通常の動作
-							setReasoningEnabled(checked);
-							setShowError(false);
-
-							onModelChange(
-								AnthropicLanguageModelData.parse({
-									...anthropicLanguageModel,
-									configurations: {
-										...anthropicLanguageModel.configurations,
-										reasoning: checked && supportsReasoning, // サポートしていない場合は常にfalse
-									},
-								}),
-							);
-						}}
-						note={
-							!supportsReasoning &&
-							showError &&
-							"Current model does not support reasoning features."
-						}
-					/>
+					{hasReasoningCapability ? (
+						<Switch
+							label="Reasoning"
+							name="reasoning"
+							checked={anthropicLanguageModel.configurations.reasoning}
+							onCheckedChange={(checked) => {
+								onModelChange(
+									AnthropicLanguageModelData.parse({
+										...anthropicLanguageModel,
+										configurations: {
+											...anthropicLanguageModel.configurations,
+											reasoning: checked,
+										},
+									}),
+								);
+							}}
+						/>
+					) : (
+						<>
+							{/* Refactor this because it duplicates the Switch component */}
+							<div className="flex flex-col">
+								<div className="flex flex-row items-center justify-between">
+									<p className="text-[14px]">Reasoning</p>
+									<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+									<p className="text-[12px]">Unsuported</p>
+								</div>
+							</div>
+						</>
+					)}
 				</div>
 			</div>
 		</div>
