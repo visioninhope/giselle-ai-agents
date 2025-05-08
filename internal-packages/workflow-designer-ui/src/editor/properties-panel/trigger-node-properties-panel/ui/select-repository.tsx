@@ -112,7 +112,7 @@ export function SelectRepository({
 				typeof repoNodeId !== "string"
 			) {
 				throw new Error(
-					"Invalid form data: 'installationId', 'owner', 'repo', and 'repoNodeId' must all be strings."
+					"Invalid form data: 'installationId', 'owner', 'repo', and 'repoNodeId' must all be strings.",
 				);
 			}
 
