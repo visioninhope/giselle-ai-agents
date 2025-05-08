@@ -7,3 +7,4 @@ export * from "./workflow";
 export * from "./workspace";
 export * from "./workspace/integrations";
 export * from "./flow";
+export * from "./integrations";

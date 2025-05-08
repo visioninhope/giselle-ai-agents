@@ -4,6 +4,7 @@ import {
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import type { z } from "zod";
+import { addGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace, setWorkspace } from "../workspaces/utils";
 import { setFlowTrigger } from "./utils";
@@ -28,6 +29,13 @@ export async function configureTrigger(args: {
 				...args.trigger,
 			},
 		}),
+		args.trigger.configuration.provider === "github"
+			? await addGitHubRepositoryIntegrationIndex({
+					storage: args.context.storage,
+					flowTriggerId,
+					repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+				})
+			: Promise.resolve(),
 	]);
 	await setWorkspace({
 		storage: args.context.storage,
