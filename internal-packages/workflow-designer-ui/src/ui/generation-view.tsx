@@ -92,8 +92,6 @@ export function GenerationView({
 														className="size-[16px] transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-90"
 														aria-hidden
 													/>
-													<WilliIcon className="w-[16px] h-[16px] ml-[1px] mr-[2px]" />
-													<span className="mr-[2px]">{"{"}</span>
 													<span className="bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(255,_255,_255,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(255,_255,_255,_1)] text-transparent animate-shimmer">
 														Thinking...
 													</span>
@@ -160,7 +158,13 @@ export function GenerationView({
 				</div>
 			))}
 			{generation.status !== "completed" &&
-				generation.status !== "cancelled" && (
+				generation.status !== "cancelled" && 
+				// reasoning部分がない場合のみSpinnerを表示
+				!generatedMessages.some(message => 
+					message.parts?.some(part => 
+						part.type === "reasoning" && generation.status === "running"
+					)
+				) && (
 					<div className="pt-[8px]">
 						<Spinner />
 					</div>
