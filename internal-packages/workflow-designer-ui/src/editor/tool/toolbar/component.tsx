@@ -430,15 +430,15 @@ export function Toolbar() {
 										<div className="relative flex flex-col gap-[8px] max-h-[280px] overflow-y-auto">
 											{/* 検索ボックス */}
 											<div className="flex h-[28px] p-[8px] items-center gap-[11px] self-stretch rounded-[8px] bg-[rgba(222,233,242,0.20)] mx-[4px] mb-[4px]">
-												<div className="text-black-800">
+												<div className="text-black-400">
 													<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<path d="M21 21L15.5 15.5M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 6.13401 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+														<path d="M21 21L15.5 15.5M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
 													</svg>
 												</div>
 												<input
 													type="text"
 													placeholder="Search LLM Model..."
-													className="w-full bg-transparent border-none text-[14px] text-black-800 placeholder:text-black-800 focus:outline-none"
+													className="w-full bg-transparent border-none text-white-850 text-[12px] placeholder:text-black-400 focus:outline-none"
 												/>
 											</div>
 											
@@ -487,6 +487,8 @@ export function Toolbar() {
 																		);
 																	}
 																}}
+																onMouseEnter={() => setLanguageModelMouseHovered(model)}
+																onMouseLeave={() => setLanguageModelMouseHovered(null)}
 															>
 																<div className="flex items-center">
 																	{model.provider === "anthropic" && <AnthropicIcon className="w-[18px] h-[18px]" data-icon />}
