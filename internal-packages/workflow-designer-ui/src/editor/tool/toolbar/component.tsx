@@ -102,15 +102,20 @@ function ProTag() {
 	);
 }
 
-function CategoryTab({ isActive, children, onClick }: { isActive: boolean; children: ReactNode; onClick: () => void }) {
+function CategoryTab({
+	isActive,
+	children,
+	onClick,
+}: { isActive: boolean; children: ReactNode; onClick: () => void }) {
 	return (
 		<button
+			type="button"
 			onClick={onClick}
 			className={clsx(
 				"flex px-[8px] py-[6px] justify-center items-center gap-[10px] rounded-[4px] text-[14px] font-medium",
-				isActive 
-					? "bg-primary-700 text-white-100" 
-					: "bg-black-800/50 text-white-300 hover:bg-black-800/80 hover:text-white-100"
+				isActive
+					? "bg-primary-700 text-white-100"
+					: "bg-black-800/50 text-white-300 hover:bg-black-800/80 hover:text-white-100",
 			)}
 		>
 			{children}
@@ -118,13 +123,13 @@ function CategoryTab({ isActive, children, onClick }: { isActive: boolean; child
 	);
 }
 
-function ModelProviderGroup({ 
-	provider, 
-	models, 
-	onModelSelect
-}: { 
-	provider: string; 
-	models: LanguageModel[]; 
+function ModelProviderGroup({
+	provider,
+	models,
+	onModelSelect,
+}: {
+	provider: string;
+	models: LanguageModel[];
 	onModelSelect: (model: LanguageModel) => void;
 }) {
 	const getProviderName = (provider: string) => {
@@ -142,21 +147,36 @@ function ModelProviderGroup({
 
 	return (
 		<div className="flex flex-col gap-[8px] mb-[16px]">
-			<h3 className="text-white-400 text-[14px] px-[4px]">{getProviderName(provider)}</h3>
+			<h3 className="text-white-400 text-[14px] px-[4px]">
+				{getProviderName(provider)}
+			</h3>
 			<div className="flex flex-col gap-[4px]">
 				{models.map((model) => (
 					<button
+						type="button"
 						key={model.id}
 						className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
 						onClick={() => onModelSelect(model)}
 					>
 						<div className="flex items-center">
-							{provider === "anthropic" && <AnthropicIcon className="w-[18px] h-[18px]" data-icon />}
-							{provider === "openai" && <OpenaiIcon className="w-[18px] h-[18px]" data-icon />}
-							{provider === "google" && <GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />}
-							{provider === "perplexity" && <PerplexityIcon className="w-[18px] h-[18px]" data-icon />}
+							{provider === "anthropic" && (
+								<AnthropicIcon className="w-[18px] h-[18px]" data-icon />
+							)}
+							{provider === "openai" && (
+								<OpenaiIcon className="w-[18px] h-[18px]" data-icon />
+							)}
+							{provider === "google" && (
+								<GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />
+							)}
+							{provider === "perplexity" && (
+								<PerplexityIcon className="w-[18px] h-[18px]" data-icon />
+							)}
 							{provider === "fal" && (
-								<ImageGenerationNodeIcon modelId={model.id} className="w-[18px] h-[18px]" data-icon />
+								<ImageGenerationNodeIcon
+									modelId={model.id}
+									className="w-[18px] h-[18px]"
+									data-icon
+								/>
 							)}
 						</div>
 						<div className="flex items-center gap-[8px]">
@@ -431,8 +451,23 @@ export function Toolbar() {
 											{/* 検索ボックス */}
 											<div className="flex h-[28px] p-[8px] items-center gap-[11px] self-stretch rounded-[8px] bg-[rgba(222,233,242,0.20)] mx-[4px] mb-[4px]">
 												<div className="text-black-400">
-													<svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-														<path d="M21 21L15.5 15.5M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+													<svg
+														width="18"
+														height="18"
+														viewBox="0 0 24 24"
+														fill="none"
+														xmlns="http://www.w3.org/2000/svg"
+														role="img"
+														aria-labelledby="searchIconTitle"
+													>
+														<title id="searchIconTitle">Search Icon</title>
+														<path
+															d="M21 21L15.5 15.5M17 10C17 13.866 13.866 17 10 17C6.13401 17 3 13.866 3 10C3 6.13401 6.13401 3 10 3C13.866 3 17 6.13401 17 10Z"
+															stroke="currentColor"
+															strokeWidth="2"
+															strokeLinecap="round"
+															strokeLinejoin="round"
+														/>
 													</svg>
 												</div>
 												<input
@@ -441,27 +476,57 @@ export function Toolbar() {
 													className="w-full bg-transparent border-none text-white-850 text-[12px] placeholder:text-black-400 focus:outline-none"
 												/>
 											</div>
-											
+
 											{/* 検索ボックスの後にタブを配置 */}
 											<div className="mx-[4px] mb-[6px]">
 												<div className="flex items-center rounded-md gap-2">
-													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] bg-primary-600 text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">All</button>
-													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Text</button>
-													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Image</button>
-													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Video</button>
-													<button className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]">Audio</button>
+													<button
+														type="button"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] bg-primary-600 text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+													>
+														All
+													</button>
+													<button
+														type="button"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+													>
+														Text
+													</button>
+													<button
+														type="button"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+													>
+														Image
+													</button>
+													<button
+														type="button"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+													>
+														Video
+													</button>
+													<button
+														type="button"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+													>
+														Audio
+													</button>
 												</div>
 											</div>
-											
+
 											<div className="mt-[0px] mx-[4px]">
-												<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">You may also choose</p>
-												
+												<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">
+													You may also choose
+												</p>
+
 												{/* モデルリストをフラットに表示 */}
 												<div className="flex flex-col gap-[4px]">
 													{languageModels
-														.filter((model) => llmProviders.includes(model.provider))
+														.filter((model) =>
+															llmProviders.includes(model.provider),
+														)
 														.map((model) => (
 															<button
+																type="button"
 																key={model.id}
 																className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
 																onClick={() => {
@@ -470,16 +535,24 @@ export function Toolbar() {
 																		provider: model.provider,
 																		configurations: model.configurations,
 																	};
-																	
-																	if (isTextGenerationLanguageModelData(languageModelData)) {
+
+																	if (
+																		isTextGenerationLanguageModelData(
+																			languageModelData,
+																		)
+																	) {
 																		setSelectedTool(
 																			addNodeTool(
 																				textGenerationNode(languageModelData),
 																			),
 																		);
 																	}
-																	
-																	if (isImageGenerationLanguageModelData(languageModelData)) {
+
+																	if (
+																		isImageGenerationLanguageModelData(
+																			languageModelData,
+																		)
+																	) {
 																		setSelectedTool(
 																			addNodeTool(
 																				imageGenerationNode(languageModelData),
@@ -487,20 +560,50 @@ export function Toolbar() {
 																		);
 																	}
 																}}
-																onMouseEnter={() => setLanguageModelMouseHovered(model)}
-																onMouseLeave={() => setLanguageModelMouseHovered(null)}
+																onMouseEnter={() =>
+																	setLanguageModelMouseHovered(model)
+																}
+																onMouseLeave={() =>
+																	setLanguageModelMouseHovered(null)
+																}
 															>
 																<div className="flex items-center">
-																	{model.provider === "anthropic" && <AnthropicIcon className="w-[18px] h-[18px]" data-icon />}
-																	{model.provider === "openai" && <OpenaiIcon className="w-[18px] h-[18px]" data-icon />}
-																	{model.provider === "google" && <GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />}
-																	{model.provider === "perplexity" && <PerplexityIcon className="w-[18px] h-[18px]" data-icon />}
+																	{model.provider === "anthropic" && (
+																		<AnthropicIcon
+																			className="w-[18px] h-[18px]"
+																			data-icon
+																		/>
+																	)}
+																	{model.provider === "openai" && (
+																		<OpenaiIcon
+																			className="w-[18px] h-[18px]"
+																			data-icon
+																		/>
+																	)}
+																	{model.provider === "google" && (
+																		<GoogleWhiteIcon
+																			className="w-[18px] h-[18px]"
+																			data-icon
+																		/>
+																	)}
+																	{model.provider === "perplexity" && (
+																		<PerplexityIcon
+																			className="w-[18px] h-[18px]"
+																			data-icon
+																		/>
+																	)}
 																	{model.provider === "fal" && (
-																		<ImageGenerationNodeIcon modelId={model.id} className="w-[18px] h-[18px]" data-icon />
+																		<ImageGenerationNodeIcon
+																			modelId={model.id}
+																			className="w-[18px] h-[18px]"
+																			data-icon
+																		/>
 																	)}
 																</div>
 																<div className="flex items-center gap-[8px]">
-																	<p className="text-[14px] text-left text-nowrap">{model.id}</p>
+																	<p className="text-[14px] text-left text-nowrap">
+																		{model.id}
+																	</p>
 																	{model.tier === "pro" && <ProTag />}
 																</div>
 															</button>
