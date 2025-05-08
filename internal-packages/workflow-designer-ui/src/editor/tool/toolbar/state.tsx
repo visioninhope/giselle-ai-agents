@@ -25,6 +25,7 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import { type ReactNode, createContext, useContext, useState } from "react";
+import { triggerNodeDefaultName } from "../../../utils";
 import type {
 	AddFileNodeTool,
 	AddGitHubNodeTool,
@@ -172,7 +173,7 @@ export function triggerNode(triggerProvider: TriggerProvider) {
 	return {
 		id: NodeId.generate(),
 		type: "operation",
-		name: triggerProvider,
+		name: triggerNodeDefaultName(triggerProvider),
 		content: {
 			type: "trigger",
 			provider: triggerProvider,

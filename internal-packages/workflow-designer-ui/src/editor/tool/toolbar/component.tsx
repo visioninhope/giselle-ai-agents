@@ -47,6 +47,7 @@ import {
 } from "../../../icons";
 import { ImageGenerationNodeIcon } from "../../../icons/node";
 import { Tooltip } from "../../../ui/tooltip";
+import { triggerNodeDefaultName } from "../../../utils";
 import { isToolAction } from "../types";
 import {
 	actionNode,
@@ -253,7 +254,9 @@ export function Toolbar() {
 																	<GitHubIcon className="size-[20px] shrink-0" />
 																)}
 
-																<p className="text-[14px]">{triggerProvider}</p>
+																<p className="text-[14px]">
+																	{triggerNodeDefaultName(triggerProvider)}
+																</p>
 															</ToggleGroup.Item>
 														))}
 													</ToggleGroup.Root>
