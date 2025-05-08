@@ -10,7 +10,7 @@ export const githubIssueCreatedTrigger = {
 	provider,
 	event: {
 		id: "github.issue.created",
-		label: "Created an issue",
+		label: "Issue Created",
 		payloads: z.object({
 			title: z.string(),
 			body: z.string(),
@@ -24,7 +24,7 @@ export const githubIssueCommentCreatedTrigger = {
 	provider,
 	event: {
 		id: "github.issue_comment.created",
-		label: "Created an issue comment",
+		label: "Issue Comment Created",
 		payloads: z.object({
 			body: z.string(),
 			issueNumber: z.number(),
@@ -45,3 +45,16 @@ export const triggers = [
 ] as const;
 
 export type TriggerEventId = (typeof triggers)[number]["event"]["id"];
+
+export function triggerIdToLabel(triggerId: TriggerEventId) {
+	switch (triggerId) {
+		case "github.issue.created":
+			return githubIssueCreatedTrigger.event.label;
+		case "github.issue_comment.created":
+			return githubIssueCommentCreatedTrigger.event.label;
+		default: {
+			const exhaustiveCheck: never = triggerId;
+			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);
+		}
+	}
+}

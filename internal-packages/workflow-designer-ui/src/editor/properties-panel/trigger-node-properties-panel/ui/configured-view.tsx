@@ -1,4 +1,5 @@
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
+import { githubTriggerIdToLabel } from "@giselle-sdk/flow";
 import { useGitHubTrigger } from "../../../lib/use-github-trigger";
 import { GitHubRepositoryBlock } from "./github-repository-block";
 
@@ -30,7 +31,7 @@ export function ConfiguredView({
 			<div className="space-y-[4px]">
 				<p className="text-[14px] py-[1.5px] text-white-400">Event Type</p>
 				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
-					{data.flowTrigger.configuration.event.id}
+					{githubTriggerIdToLabel(data.flowTrigger.configuration.event.id)}
 				</div>
 			</div>
 			{data.flowTrigger.configuration.event.id ===
