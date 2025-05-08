@@ -43,10 +43,6 @@ if (
 	githubAppClientId === undefined ||
 	githubAppClientSecret === undefined
 ) {
-	console.log(`githubAppId: ${githubAppId}`);
-	console.log(`githubAppPrivateKey: ${githubAppPrivateKey}`);
-	console.log(`githubAppClientId: ${githubAppClientId}`);
-	console.log(`githubAppClientSecret: ${githubAppClientSecret}`);
 	throw new Error("missing github credentials");
 }
 
