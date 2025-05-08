@@ -22,7 +22,7 @@ import { useFeatureFlag } from "giselle-sdk/react";
 import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
 import { WorkflowIcon } from "lucide-react";
 import { Dialog, Popover, ToggleGroup } from "radix-ui";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useEffect, useState } from "react";
 import {
 	AnthropicIcon,
 	AudioIcon,
@@ -241,6 +241,8 @@ export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
 	const [languageModelMouseHovered, setLanguageModelMouseHovered] =
 		useState<LanguageModel | null>(null);
+	const [searchQuery, setSearchQuery] = useState<string>("");
+	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
 	const { flowNode } = useFeatureFlag();
@@ -250,6 +252,181 @@ export function Toolbar() {
 		}
 		return hasTierAccess(languageModel, limits.featureTier);
 	};
+
+	// モデルをカテゴリでフィルタリングする関数
+	const filterModelsByCategory = (model: LanguageModel): boolean => {
+		if (selectedCategory === "All") return true;
+		if (
+			selectedCategory === "Text" &&
+			hasCapability(model, Capability.TextGeneration)
+		)
+			return true;
+		if (
+			selectedCategory === "Image" &&
+			hasCapability(model, Capability.ImageGeneration)
+		)
+			return true;
+		if (selectedCategory === "Video") {
+			// ビデオ生成機能は現在対応するCapabilityがないため、常にfalse
+			return false;
+		}
+		if (selectedCategory === "Audio") {
+			// 音声生成機能は現在対応するCapabilityがないため、常にfalse
+			return false;
+		}
+		return false;
+	};
+
+	// モデルを検索クエリでフィルタリングする関数
+	const filterModelsBySearch = (model: LanguageModel): boolean => {
+		if (!searchQuery.trim()) return true;
+		return (
+			model.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
+			model.provider.toLowerCase().includes(searchQuery.toLowerCase())
+		);
+	};
+
+	// モデルを検索クエリでのみフィルタリング（カテゴリフィルタなし）
+	const modelsFilteredBySearchOnly = languageModels
+		.filter((model) => llmProviders.includes(model.provider))
+		.filter(filterModelsBySearch);
+
+	// 検索結果に基づいて自動的にカテゴリを更新
+	useEffect(() => {
+		if (searchQuery.trim() === "") return; // 空の検索クエリの場合は何もしない
+
+		// 検索結果のモデル機能を集計
+		const hasTextModels = modelsFilteredBySearchOnly.some((model) =>
+			hasCapability(model, Capability.TextGeneration),
+		);
+		const hasImageModels = modelsFilteredBySearchOnly.some((model) =>
+			hasCapability(model, Capability.ImageGeneration),
+		);
+
+		// 単一カテゴリのみ表示されている場合、そのカテゴリを自動選択
+		if (hasTextModels && !hasImageModels) {
+			setSelectedCategory("Text");
+		} else if (!hasTextModels && hasImageModels) {
+			setSelectedCategory("Image");
+		} else {
+			// 複数カテゴリが混在する場合はAllを選択
+			setSelectedCategory("All");
+		}
+	}, [searchQuery, modelsFilteredBySearchOnly]);
+
+	// フィルタリングされたモデルリスト - カテゴリフィルタも適用
+	const filteredModels = modelsFilteredBySearchOnly.filter(
+		filterModelsByCategory,
+	);
+
+	// 推奨モデルのリスト - 実際のIDに合わせて修正
+	const getAvailableModels = (
+		preferredModelIds: string[],
+		provider: string,
+	): LanguageModel[] => {
+		// 指定されたIDのモデルを検索
+		const models = preferredModelIds
+			.map((id) =>
+				languageModels.find(
+					(model) => model.id === id && model.provider === provider,
+				),
+			)
+			.filter(
+				(model): model is LanguageModel =>
+					!!model && llmProviders.includes(model.provider),
+			);
+
+		// 見つかったモデルがあれば返す
+		if (models.length > 0) return models;
+
+		// なければそのプロバイダの最初のモデルを返す（フォールバック）
+		const fallbackModels = languageModels
+			.filter(
+				(model) =>
+					model.provider === provider && llmProviders.includes(provider),
+			)
+			.slice(0, 1);
+
+		return fallbackModels;
+	};
+
+	// 各プロバイダの推奨モデル
+	const openaiModels = getAvailableModels(
+		["gpt-4o", "gpt-4", "gpt-4-turbo"],
+		"openai",
+	);
+	const anthropicModels = getAvailableModels(
+		["claude-3-opus-20240229", "claude-3-sonnet-20240229"],
+		"anthropic",
+	);
+	const googleModels = getAvailableModels(
+		["gemini-2.5-pro-exp-03-25", "gemini-1.5-pro-latest", "gemini-1.0-pro"],
+		"google",
+	);
+
+	// 全ての推奨モデルを結合
+	const recommendedModels = [
+		...openaiModels.slice(0, 1),
+		...anthropicModels.slice(0, 1),
+		...googleModels.slice(0, 1),
+	];
+
+	// モデルボタンのレンダリング関数
+	const renderModelButton = (model: LanguageModel) => {
+		return (
+			<button
+				type="button"
+				key={model.id}
+				className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
+				onClick={() => {
+					const languageModelData = {
+						id: model.id,
+						provider: model.provider,
+						configurations: model.configurations,
+					};
+
+					if (isTextGenerationLanguageModelData(languageModelData)) {
+						setSelectedTool(addNodeTool(textGenerationNode(languageModelData)));
+					}
+
+					if (isImageGenerationLanguageModelData(languageModelData)) {
+						setSelectedTool(
+							addNodeTool(imageGenerationNode(languageModelData)),
+						);
+					}
+				}}
+				onMouseEnter={() => setLanguageModelMouseHovered(model)}
+				onMouseLeave={() => setLanguageModelMouseHovered(null)}
+			>
+				<div className="flex items-center">
+					{model.provider === "anthropic" && (
+						<AnthropicIcon className="w-[18px] h-[18px]" data-icon />
+					)}
+					{model.provider === "openai" && (
+						<OpenaiIcon className="w-[18px] h-[18px]" data-icon />
+					)}
+					{model.provider === "google" && (
+						<GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />
+					)}
+					{model.provider === "perplexity" && (
+						<PerplexityIcon className="w-[18px] h-[18px]" data-icon />
+					)}
+					{model.provider === "fal" && (
+						<ImageGenerationNodeIcon
+							modelId={model.id}
+							className="w-[18px] h-[18px]"
+							data-icon
+						/>
+					)}
+				</div>
+				<div className="flex items-center gap-[8px]">
+					<p className="text-[14px] text-left text-nowrap">{model.id}</p>
+					{model.tier === "pro" && <ProTag />}
+				</div>
+			</button>
+		);
+	};
+
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
@@ -474,6 +651,8 @@ export function Toolbar() {
 													type="text"
 													placeholder="Search LLM Model..."
 													className="w-full bg-transparent border-none text-white-850 text-[12px] placeholder:text-black-400 focus:outline-none"
+													value={searchQuery}
+													onChange={(e) => setSearchQuery(e.target.value)}
 												/>
 											</div>
 
@@ -482,31 +661,46 @@ export function Toolbar() {
 												<div className="flex items-center rounded-md gap-2">
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] bg-primary-600 text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+														className={`flex px-[8px] py-0 justify-center items-center gap-[10px] ${
+															selectedCategory === "All"
+																? "bg-[#505D7B]"
+																: "hover:bg-[#3A425A]"
+														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														onClick={() => setSelectedCategory("All")}
 													>
 														All
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+														className={`flex px-[8px] py-0 justify-center items-center gap-[10px] ${
+															selectedCategory === "Text"
+																? "bg-[#505D7B]"
+																: "hover:bg-[#3A425A]"
+														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														onClick={() => setSelectedCategory("Text")}
 													>
 														Text
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+														className={`flex px-[8px] py-0 justify-center items-center gap-[10px] ${
+															selectedCategory === "Image"
+																? "bg-[#505D7B]"
+																: "hover:bg-[#3A425A]"
+														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														onClick={() => setSelectedCategory("Image")}
 													>
 														Image
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded font-[Geist] text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
 													>
 														Video
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] hover:bg-[#3A425A] text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded font-[Geist] text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
 													>
 														Audio
 													</button>
@@ -514,17 +708,28 @@ export function Toolbar() {
 											</div>
 
 											<div className="mt-[0px] mx-[4px]">
-												<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">
-													You may also choose
-												</p>
+												{selectedCategory === "All" &&
+													searchQuery.trim() === "" && (
+														<>
+															<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">
+																Recommended models
+															</p>
+															{/* 推奨モデルを表示 */}
+															{recommendedModels.length > 0 && (
+																<div className="flex flex-col gap-[4px] mb-[12px]">
+																	{recommendedModels.map(renderModelButton)}
+																</div>
+															)}
 
-												{/* モデルリストをフラットに表示 */}
-												<div className="flex flex-col gap-[4px]">
-													{languageModels
-														.filter((model) =>
-															llmProviders.includes(model.provider),
-														)
-														.map((model) => (
+															{/* 区切り線 */}
+															<div className="flex my-[12px] mx-auto w-[90%] py-0 flex-col items-center border-b border-[#505D7B]/20" />
+														</>
+													)}
+
+												{/* モデルリストをフラットに表示 - フィルタリング適用 */}
+												<div className="flex flex-col gap-[4px] max-h-[200px] overflow-y-auto pr-[4px]">
+													{filteredModels.length > 0 ? (
+														filteredModels.map((model) => (
 															<button
 																type="button"
 																key={model.id}
@@ -607,7 +812,12 @@ export function Toolbar() {
 																	{model.tier === "pro" && <ProTag />}
 																</div>
 															</button>
-														))}
+														))
+													) : (
+														<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] p-[8px] text-center">
+															No matching models found
+														</p>
+													)}
 												</div>
 											</div>
 										</div>
@@ -630,7 +840,7 @@ export function Toolbar() {
 											>
 												<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 												<div className="relative text-white-800 h-[200px]">
-													{languageModelMouseHovered && (
+													{languageModelMouseHovered ? (
 														<div className="px-[16px] py-[16px] flex flex-col gap-[24px]">
 															<div className="flex items-start gap-[16px]">
 																<div className="flex items-center shrink-0">
@@ -836,6 +1046,12 @@ export function Toolbar() {
 																	</>
 																)}
 															</div>
+														</div>
+													) : (
+														<div className="flex h-full items-center justify-center">
+															<p className="text-[14px] text-black-400">
+																Hover over a model to view details
+															</p>
 														</div>
 													)}
 												</div>
