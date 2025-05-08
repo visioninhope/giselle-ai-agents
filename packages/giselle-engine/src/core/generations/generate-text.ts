@@ -332,9 +332,10 @@ export async function generateText(args: {
 	// 	}
 	// }
 
+	const providerOptions = getProviderOptions(operationNode.content.llm);
 	const streamTextResult = streamText({
 		model: generationModel(operationNode.content.llm),
-		providerOptions: providerOptions(operationNode.content.llm),
+		providerOptions,
 		messages,
 		maxSteps: 5, // enable multi-step calls
 		tools: preparedToolSet.toolSet,
@@ -490,6 +491,7 @@ export async function generateText(args: {
 					languageModel,
 					toolSet: preparedToolSet.toolSet,
 					configurations: operationNode.content.llm.configurations,
+					providerOptions,
 				}),
 			},
 		},
@@ -532,7 +534,7 @@ function isVertexAiHost(urlString: string): boolean {
 	// }
 }
 
-function providerOptions(languageModelData: TextGenerationLanguageModelData) {
+function getProviderOptions(languageModelData: TextGenerationLanguageModelData) {
 	const languageModel = languageModels.find(
 		(model) => model.id === languageModelData.id,
 	);

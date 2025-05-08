@@ -1,5 +1,6 @@
 import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
+import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 
 type TelemetryTag =
 	| "web-search"
@@ -12,6 +13,9 @@ export function generateTelemetryTags(args: {
 	languageModel: LanguageModel;
 	toolSet: ToolSet;
 	configurations: Record<string, unknown>;
+	providerOptions?: {
+		anthropic?: AnthropicProviderOptions;
+	};
 }): TelemetryTag[] {
 	const tags: TelemetryTag[] = [];
 
@@ -30,7 +34,7 @@ export function generateTelemetryTags(args: {
 		if (args.configurations.reasoning) {
 			tags.push("reasoning");
 		}
-		if (args.configurations.thinking) {
+		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
 			tags.push("thinking");
 		}
 	}
