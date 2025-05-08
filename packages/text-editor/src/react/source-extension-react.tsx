@@ -13,6 +13,7 @@ function defaultName(node: GiselleNode) {
 				case "imageGeneration":
 					return node.name ?? node.content.llm.id;
 				case "trigger":
+					return node.name ?? node.content.provider;
 				case "action":
 					return node.name ?? node.content.provider.type;
 				default: {
