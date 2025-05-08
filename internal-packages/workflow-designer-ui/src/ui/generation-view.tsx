@@ -72,10 +72,9 @@ export function GenerationView({
 				<div key={message.id}>
 					{message.parts?.map((part, index) => {
 						const lastPart = message.parts?.length === index + 1;
-						const isRunning = generation.status === "running";
 						switch (part.type) {
 							case "reasoning":
-								if (lastPart && isRunning) {
+								if (lastPart) {
 									return (
 										<Accordion.Root
 											key={`messages.${message.id}.parts.[${index}].reasoning`}
