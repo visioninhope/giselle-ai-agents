@@ -34,6 +34,7 @@ import {
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
+import { generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -484,9 +485,12 @@ export async function generateText(args: {
 			isEnabled: args.context.telemetry?.isEnabled,
 			metadata: {
 				...args.telemetry?.metadata,
-				...(preparedToolSet.toolSet.openaiWebSearch
-					? { tags: ["web-search"] }
-					: {}),
+				tags: generateTelemetryTags({
+					provider: operationNode.content.llm.provider,
+					languageModel,
+					toolSet: preparedToolSet.toolSet,
+					configurations: operationNode.content.llm.configurations,
+				}),
 			},
 		},
 	});
