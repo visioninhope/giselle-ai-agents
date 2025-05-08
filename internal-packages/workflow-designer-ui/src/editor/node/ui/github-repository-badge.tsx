@@ -24,7 +24,7 @@ export const GitHubRepositoryBadge: React.FC<GitHubRepositoryLinkProps> = ({
 	}
 
 	return (
-		<div className="flex items-center gap-[6px] rounded-full bg-black-900 pl-[10px] pr-[12px] py-2 text-sm text-white-200 transition-colors hover:bg-neutral-800 text-[12px] cursor-hover">
+		<div className="flex items-center gap-[6px] rounded-full bg-black-900 pl-[10px] pr-[12px] py-2 text-sm text-white-200 transition-colors text-[12px]">
 			<GitHubIcon className="size-[18px]" />
 			<div className="space-x-[2px]">
 				<span>{data.githubRepositoryFullname.owner}</span>

@@ -37,7 +37,7 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
-import { ConfiguredView, SelectRepository } from "./ui";
+import { ConfiguredView, GitHubRepositoryBlock, SelectRepository } from "./ui";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
@@ -370,14 +370,7 @@ function Installed({
 					className="w-full flex flex-col gap-[16px]"
 					onSubmit={handleSubmit}
 				>
-					<div className="flex items-center gap-[8px] bg-black-800 px-[14px] py-[10px] rounded-[4px]">
-						<GitHubIcon className="size-[20px]" />
-						<p className="space-x-[2px]">
-							<span>{step.owner}</span>
-							<span>/</span>
-							<span>{step.repo}</span>
-						</p>
-					</div>
+					<GitHubRepositoryBlock owner={step.owner} repo={step.repo} />
 					<p className="text-[14px]">
 						Choose when you want to trigger the flow.
 					</p>
