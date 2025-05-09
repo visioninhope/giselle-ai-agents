@@ -1,4 +1,3 @@
-import type { Result } from "@fal-ai/client";
 import { z } from "zod";
 import { Capability, LanguageModelBase } from "./base";
 
@@ -126,26 +125,20 @@ export function getImageGenerationModelProvider(
 	return undefined;
 }
 
-export interface FalImage {
-	url: string;
-	width: number;
-	height: number;
-	content_type: string;
-}
-
 export interface UsageCalculator {
-	calculateUsage(images: FalImage[]): {
+	calculateUsage(params: { width: number; height: number; n: number }): {
 		output: number;
 		unit: "IMAGES";
 	};
 }
 
 export class PixelBasedUsageCalculator implements UsageCalculator {
-	calculateUsage(images: FalImage[]) {
-		const totalPixels = images.reduce(
-			(sum, image) => sum + image.height * image.width,
-			0,
-		);
+	calculateUsage({
+		width,
+		height,
+		n,
+	}: { width: number; height: number; n: number }) {
+		const totalPixels = width * height * n;
 		return {
 			output: Math.ceil(totalPixels / 1_000_000) * 1_000_000,
 			unit: "IMAGES" as const,
@@ -154,9 +147,13 @@ export class PixelBasedUsageCalculator implements UsageCalculator {
 }
 
 export class ImageCountBasedUsageCalculator implements UsageCalculator {
-	calculateUsage(images: FalImage[]) {
+	calculateUsage({
+		width,
+		height,
+		n,
+	}: { width: number; height: number; n: number }) {
 		return {
-			output: images.length,
+			output: n,
 			unit: "IMAGES" as const,
 		};
 	}
@@ -170,18 +167,6 @@ export function createUsageCalculator(modelId: string): UsageCalculator {
 			return new PixelBasedUsageCalculator();
 	}
 }
-
-interface FalImageData {
-	images: FalImage[];
-	timings: {
-		inference: number;
-	};
-	seed: number;
-	has_nsfw_concepts: boolean[];
-	prompt: string;
-}
-
-export type FalImageResult = Result<FalImageData>;
 
 export interface GeneratedImageData {
 	uint8Array: Uint8Array;

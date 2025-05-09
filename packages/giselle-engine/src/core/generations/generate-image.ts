@@ -1,5 +1,5 @@
+import { fal } from "@ai-sdk/fal";
 import { openai } from "@ai-sdk/openai";
-import { fal } from "@fal-ai/client";
 import {
 	type CompletedGeneration,
 	type FailedGeneration,
@@ -19,7 +19,6 @@ import {
 	isImageGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
-	type FalImageResult,
 	type GeneratedImageData,
 	createUsageCalculator,
 } from "@giselle-sdk/language-model";
@@ -51,9 +50,6 @@ type ProviderOptions = Parameters<
 	typeof generateImageAiSdk
 >[0]["providerOptions"];
 
-fal.config({
-	credentials: process.env.FAL_API_KEY,
-});
 export async function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
@@ -283,6 +279,14 @@ export async function generateImage(args: {
 	});
 }
 
+function imageDimStringToSize(size: string): { width: number; height: number } {
+	const [width, height] = size.split("x").map(Number);
+	if (Number.isNaN(width) || Number.isNaN(height)) {
+		throw new Error(`Invalid image size format: ${size}`);
+	}
+	return { width, height };
+}
+
 async function generateImageWithFal({
 	operationNode,
 	generationContext,
@@ -301,12 +305,12 @@ async function generateImageWithFal({
 	context: GiselleEngineContext;
 }) {
 	const trace = langfuse.trace({
-		name: "fal-ai/client",
+		name: "ai-sdk/fal",
 		metadata: telemetry?.metadata,
 		input: { messages },
 	});
 	const generation = trace.generation({
-		name: "fal-ai/client.subscribe",
+		name: "ai-sdk/fal.generateImage",
 		model: operationNode.content.llm.id,
 		modelParameters: operationNode.content.llm.configurations,
 		input: { messages },
@@ -329,20 +333,13 @@ async function generateImageWithFal({
 			prompt += content.text;
 		}
 	}
-	const result = (await fal.subscribe(operationNode.content.llm.id, {
-		input: {
-			prompt,
-			image_size: {
-				width: Number.parseInt(
-					operationNode.content.llm.configurations.size.split("x")[0],
-				),
-				height: Number.parseInt(
-					operationNode.content.llm.configurations.size.split("x")[1],
-				),
-			},
-			num_images: operationNode.content.llm.configurations.n,
-		},
-	})) as unknown as FalImageResult;
+
+	const result = await generateImageAiSdk({
+		model: fal.image(operationNode.content.llm.id),
+		prompt,
+		n: operationNode.content.llm.configurations.n,
+		size: operationNode.content.llm.configurations.size,
+	});
 
 	const generationOutputs: GenerationOutput[] = [];
 
@@ -351,33 +348,27 @@ async function generateImageWithFal({
 	);
 	if (generatedImageOutput !== undefined) {
 		const contents = await Promise.all(
-			result.data.images.map(async (image) => {
-				const imageType = image.content_type;
+			result.images.map(async (image) => {
+				const imageType = detectImageType(image.uint8Array);
 				if (imageType === null) {
 					return null;
 				}
 				const id = ImageId.generate();
-				const ext = imageType.split("/")[1];
-				const filename = `${id}.${ext}`;
-
-				const response = await fetch(image.url);
-				const arrayBuffer = await response.arrayBuffer();
-				const uint8Array = new Uint8Array(arrayBuffer);
-				const base64 = Buffer.from(uint8Array).toString("base64");
+				const filename = `${id}.${imageType.ext}`;
 
 				await setGeneratedImage({
 					storage: context.storage,
 					generation: runningGeneration,
 					generatedImage: {
-						uint8Array,
-						base64,
+						uint8Array: image.uint8Array,
+						base64: image.base64,
 					} satisfies GeneratedImageData,
 					generatedImageFilename: filename,
 				});
 
 				return {
 					id,
-					contentType: imageType,
+					contentType: imageType.contentType,
 					filename,
 					pathname: `/generations/${runningGeneration.id}/generated-images/${filename}`,
 				} satisfies Image;
@@ -390,17 +381,17 @@ async function generateImageWithFal({
 			outputId: generatedImageOutput.id,
 		});
 	}
+
 	if (context.telemetry?.isEnabled && generatedImageOutput) {
 		const usageCalculator = createUsageCalculator(operationNode.content.llm.id);
+		const imageSize = imageDimStringToSize(
+			operationNode.content.llm.configurations.size,
+		);
 		await Promise.all([
-			...result.data.images.map(async (image) => {
-				const response = await fetch(image.url);
-				const arrayBuffer = await response.arrayBuffer();
-				const uint8Array = new Uint8Array(arrayBuffer);
-
+			...result.images.map(async (image) => {
 				const wrappedMedia = new LangfuseMedia({
-					contentType: image.content_type as ApiMediaContentType,
-					contentBytes: Buffer.from(uint8Array),
+					contentType: "image/png" as ApiMediaContentType,
+					contentBytes: Buffer.from(image.uint8Array),
 				});
 
 				generation.update({
@@ -410,7 +401,10 @@ async function generateImageWithFal({
 				});
 			}),
 			(async () => {
-				const usage = usageCalculator.calculateUsage(result.data.images);
+				const usage = usageCalculator.calculateUsage({
+					...imageSize,
+					n: operationNode.content.llm.configurations.n,
+				});
 				generation.update({
 					usage,
 				});

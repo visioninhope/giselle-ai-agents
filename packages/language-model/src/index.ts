@@ -30,7 +30,7 @@ export {
 	falImageGenerationSizes as imageGenerationSizes,
 	createUsageCalculator,
 } from "./fal";
-export type { FalImageResult, GeneratedImageData } from "./fal";
+export type { GeneratedImageData } from "./fal";
 export {
 	size as openaiImageSize,
 	quality as openaiImageQuality,
