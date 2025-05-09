@@ -21,21 +21,21 @@ export function generateTelemetryTags(args: {
 
 	// OpenAI Web Search
 	if (args.provider === "openai" && args.toolSet.openaiWebSearch) {
-		tags.push("web-search");
+		tags.push("web-search", "openai:web-search");
 	}
 
 	// Google Search Grounding
 	if (args.provider === "google" && args.configurations.searchGrounding) {
-		tags.push("web-search");
+		tags.push("web-search", "google:search-grounding");
 	}
 
 	// Anthropic Reasoning/Thinking
 	if (args.provider === "anthropic") {
 		if (args.configurations.reasoning) {
-			tags.push("reasoning");
+			tags.push("anthropic:reasoning");
 		}
 		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
-			tags.push("thinking");
+			tags.push("anthropic:thinking");
 		}
 	}
 
