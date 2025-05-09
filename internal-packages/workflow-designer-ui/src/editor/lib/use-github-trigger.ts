@@ -1,23 +1,27 @@
-import type { FlowTriggerId } from "@giselle-sdk/data-type";
+import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "giselle-sdk/react";
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 
 export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 	const client = useGiselleEngine();
-	const { isLoading: isLoadingFlowTriggerData, data: flowTriggerData } = useSWR(
+	const {
+		isLoading: isLoadingFlowTriggerData,
+		data: trigger,
+		mutate,
+	} = useSWR(
 		[`/triggers/${flowTriggerId}`, flowTriggerId],
-		([_, flowTriggerId]) => client.getTrigger({ flowTriggerId }),
+		([_, flowTriggerId]) =>
+			client.getTrigger({ flowTriggerId }).then((res) => res.trigger),
 	);
 	const {
 		isLoading: isLoadingGitHubRepositoryFullname,
 		data: githubRepositoryFullnameData,
 	} = useSWR(
-		flowTriggerData &&
-			flowTriggerData.flowTrigger.configuration.provider === "github"
+		trigger && trigger.configuration.provider === "github"
 			? [
-					`/github/repositories/${flowTriggerData.flowTrigger.configuration.repositoryNodeId}`,
-					flowTriggerData.flowTrigger,
+					`/github/repositories/${trigger.configuration.repositoryNodeId}`,
+					trigger,
 				]
 			: null,
 		([_, flowTrigger]) =>
@@ -28,17 +32,49 @@ export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 	);
 	const data = useMemo(
 		() =>
-			flowTriggerData === undefined ||
-			githubRepositoryFullnameData === undefined
+			trigger === undefined || githubRepositoryFullnameData === undefined
 				? undefined
 				: {
-						flowTrigger: flowTriggerData?.flowTrigger,
+						trigger,
 						githubRepositoryFullname: githubRepositoryFullnameData.fullname,
 					},
-		[flowTriggerData, githubRepositoryFullnameData],
+		[trigger, githubRepositoryFullnameData],
 	);
+
+	const setFlowTrigger = useCallback(
+		async (newValue: Partial<FlowTrigger>) => {
+			if (trigger === undefined) {
+				return;
+			}
+			mutate(
+				async () => {
+					const newData = {
+						...trigger,
+						...newValue,
+					} satisfies FlowTrigger;
+					await client.setTrigger({ trigger: newData });
+					return newData;
+				},
+				{
+					optimisticData: () => ({
+						...trigger,
+						...newValue,
+					}),
+				},
+			);
+		},
+		[client, mutate, trigger],
+	);
+	const enableFlowTrigger = useCallback(async () => {
+		await setFlowTrigger({ enable: true });
+	}, [setFlowTrigger]);
+	const disableFlowTrigger = useCallback(async () => {
+		await setFlowTrigger({ enable: false });
+	}, [setFlowTrigger]);
 	return {
 		isLoading: isLoadingFlowTriggerData || isLoadingGitHubRepositoryFullname,
 		data,
+		enableFlowTrigger,
+		disableFlowTrigger,
 	};
 }
