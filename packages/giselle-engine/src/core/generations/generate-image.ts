@@ -236,6 +236,8 @@ export async function generateImage(args: {
 				generationContext,
 				languageModelData: operationNode.content.llm,
 				context: args.context,
+				langfuse,
+				telemetry: args.telemetry,
 			});
 			break;
 		default: {
@@ -421,13 +423,34 @@ export async function generateImageWithOpenAI({
 	runningGeneration,
 	languageModelData,
 	context,
+	langfuse,
+	telemetry,
 }: {
 	messages: CoreMessage[];
 	generationContext: GenerationContext;
 	runningGeneration: RunningGeneration;
 	languageModelData: OpenAIImageLanguageModelData;
 	context: GiselleEngineContext;
+	langfuse: Langfuse;
+	telemetry?: TelemetrySettings;
 }) {
+	const trace = langfuse.trace({
+		name: "ai-sdk/openai",
+		metadata: telemetry?.metadata,
+		input: { messages },
+	});
+	const generation = trace.generation({
+		name: "ai-sdk/openai.generateImage",
+		model: languageModelData.id,
+		modelParameters: languageModelData.configurations,
+		input: { messages },
+		usage: {
+			input: 0,
+			output: 0,
+			unit: "IMAGES",
+		},
+	});
+
 	let prompt = "";
 	for (const message of messages) {
 		if (!Array.isArray(message.content)) {
@@ -490,6 +513,37 @@ export async function generateImageWithOpenAI({
 			contents,
 			outputId: generatedImageOutput.id,
 		});
+	}
+
+	if (context.telemetry?.isEnabled && generatedImageOutput) {
+		const usageCalculator = createUsageCalculator(languageModelData.id);
+		const imageSize = imageDimStringToSize(
+			languageModelData.configurations.size,
+		);
+		await Promise.all([
+			...images.map(async (image) => {
+				const wrappedMedia = new LangfuseMedia({
+					contentType: "image/png" as ApiMediaContentType,
+					contentBytes: Buffer.from(image.uint8Array),
+				});
+
+				generation.update({
+					metadata: {
+						context: wrappedMedia,
+					},
+				});
+			}),
+			(async () => {
+				const usage = usageCalculator.calculateUsage({
+					...imageSize,
+					n: languageModelData.configurations.n,
+				});
+				generation.update({
+					usage,
+				});
+				generation.end();
+			})(),
+		]);
 	}
 	return generationOutputs;
 }
