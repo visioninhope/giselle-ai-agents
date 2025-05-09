@@ -3,10 +3,13 @@ import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
 
 type TelemetryTag =
+	// generic name
 	| "web-search"
-	| "search-grounding"
-	| "reasoning"
-	| "thinking";
+	// provider-specific function name
+	| "openai:web-search"
+	| "google:search-grounding"
+	| "anthropic:reasoning"
+	| "anthropic:thinking";
 
 export function generateTelemetryTags(args: {
 	provider: string;
