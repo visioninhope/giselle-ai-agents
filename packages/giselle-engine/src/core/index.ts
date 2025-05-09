@@ -1,6 +1,7 @@
 import type {
 	CreatedRun,
 	FileId,
+	FlowTrigger,
 	FlowTriggerId,
 	Generation,
 	GenerationId,
@@ -22,6 +23,7 @@ import {
 	configureTrigger,
 	getTrigger,
 	resolveTrigger,
+	setTrigger,
 } from "./flows";
 import {
 	type TelemetrySettings,
@@ -212,6 +214,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => {
 			return await getGitHubRepositoryFullname({ ...args, context });
 		},
+		setTrigger: async (args: { trigger: FlowTrigger }) =>
+			setTrigger({ ...args, context }),
 	};
 }
 
