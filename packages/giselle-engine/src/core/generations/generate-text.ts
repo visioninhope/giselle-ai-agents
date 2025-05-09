@@ -34,6 +34,7 @@ import {
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
+import { generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -331,9 +332,10 @@ export async function generateText(args: {
 	// 	}
 	// }
 
+	const providerOptions = getProviderOptions(operationNode.content.llm);
 	const streamTextResult = streamText({
 		model: generationModel(operationNode.content.llm),
-		providerOptions: providerOptions(operationNode.content.llm),
+		providerOptions,
 		messages,
 		maxSteps: 5, // enable multi-step calls
 		tools: preparedToolSet.toolSet,
@@ -484,9 +486,13 @@ export async function generateText(args: {
 			isEnabled: args.context.telemetry?.isEnabled,
 			metadata: {
 				...args.telemetry?.metadata,
-				...(preparedToolSet.toolSet.openaiWebSearch
-					? { tags: ["web-search"] }
-					: {}),
+				tags: generateTelemetryTags({
+					provider: operationNode.content.llm.provider,
+					languageModel,
+					toolSet: preparedToolSet.toolSet,
+					configurations: operationNode.content.llm.configurations,
+					providerOptions,
+				}),
 			},
 		},
 	});
@@ -528,7 +534,9 @@ function isVertexAiHost(urlString: string): boolean {
 	// }
 }
 
-function providerOptions(languageModelData: TextGenerationLanguageModelData) {
+function getProviderOptions(
+	languageModelData: TextGenerationLanguageModelData,
+) {
 	const languageModel = languageModels.find(
 		(model) => model.id === languageModelData.id,
 	);
