@@ -536,7 +536,7 @@ export async function generateImageWithOpenAI({
 			(async () => {
 				const usage = usageCalculator.calculateUsage({
 					...imageSize,
-					n: languageModelData.configurations.n,
+					quality: languageModelData.configurations.quality,
 				});
 				generation.update({
 					usage,
