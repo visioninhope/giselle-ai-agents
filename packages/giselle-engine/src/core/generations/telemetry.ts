@@ -26,7 +26,7 @@ export function generateTelemetryTags(args: {
 
 	// Google Search Grounding
 	if (args.provider === "google" && args.configurations.searchGrounding) {
-		tags.push("search-grounding");
+		tags.push("web-search");
 	}
 
 	// Anthropic Reasoning/Thinking
