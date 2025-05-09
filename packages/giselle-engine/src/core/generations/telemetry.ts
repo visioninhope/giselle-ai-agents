@@ -35,6 +35,8 @@ export function generateTelemetryTags(args: {
 			tags.push("anthropic:reasoning");
 		}
 		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
+			// treat as an independent tag because extended thinking is available only on specific models
+			// ref: https://docs.anthropic.com/en/docs/about-claude/models/all-models#model-comparison-table
 			tags.push("anthropic:thinking");
 		}
 	}
