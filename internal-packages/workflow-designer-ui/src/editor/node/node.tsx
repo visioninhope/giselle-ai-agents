@@ -22,12 +22,13 @@ import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
-import { GitHubIcon } from "../../icons";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { defaultName } from "../../utils";
-import { GitHubRepositoryBadge } from "./ui";
-import { GitHubRepositoryBadge2 } from "./ui/github-repository-badge2";
+import {
+	GitHubRepositoryBadgeFromRepo,
+	GitHubRepositoryBadgeFromTrigger,
+} from "./ui";
 
 type GiselleWorkflowDesignerTextGenerationNode = XYFlowNode<
 	{ nodeData: TextGenerationNode; preview?: boolean },
@@ -303,7 +304,7 @@ export function NodeComponent({
 				node.content.provider === "github" &&
 				node.content.state.status === "configured" && (
 					<div className="px-[16px] relative">
-						<GitHubRepositoryBadge
+						<GitHubRepositoryBadgeFromTrigger
 							flowTriggerId={node.content.state.flowTriggerId}
 						/>
 					</div>
@@ -313,7 +314,7 @@ export function NodeComponent({
 				node.content.command.provider === "github" &&
 				node.content.command.state.status === "configured" && (
 					<div className="px-[16px] relative">
-						<GitHubRepositoryBadge2
+						<GitHubRepositoryBadgeFromRepo
 							installationId={node.content.command.state.installationId}
 							repositoryNodeId={node.content.command.state.repositoryNodeId}
 						/>
