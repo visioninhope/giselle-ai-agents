@@ -1,7 +1,7 @@
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
 import type React from "react";
-import { GitHubIcon } from "../../../icons";
 import { useGitHubTrigger } from "../../lib/use-github-trigger";
+import { GitHubRepositoryBadgeUI } from "./github-repository-badge-ui";
 
 export interface GitHubRepositoryLinkProps
 	extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
@@ -9,11 +9,11 @@ export interface GitHubRepositoryLinkProps
 }
 
 /**
- * A component that displays a GitHub repository link with the GitHub icon
+ * A component that fetches and displays a GitHub repository badge for a flow trigger
  */
-export const GitHubRepositoryBadge: React.FC<GitHubRepositoryLinkProps> = ({
+export function GitHubRepositoryBadge({
 	flowTriggerId,
-}) => {
+}: GitHubRepositoryLinkProps) {
 	const { isLoading, data } = useGitHubTrigger(flowTriggerId);
 
 	if (isLoading) {
@@ -24,15 +24,11 @@ export const GitHubRepositoryBadge: React.FC<GitHubRepositoryLinkProps> = ({
 	}
 
 	return (
-		<div className="flex items-center gap-[6px] rounded-full bg-black-900 pl-[10px] pr-[12px] py-2 text-sm text-white-200 transition-colors text-[12px]">
-			<GitHubIcon className="size-[18px]" />
-			<div className="space-x-[2px]">
-				<span>{data.githubRepositoryFullname.owner}</span>
-				<span>/</span>
-				<span>{data.githubRepositoryFullname.repo}</span>
-			</div>
-		</div>
+		<GitHubRepositoryBadgeUI
+			owner={data.githubRepositoryFullname.owner}
+			repo={data.githubRepositoryFullname.repo}
+		/>
 	);
-};
+}
 
 export default GitHubRepositoryBadge;

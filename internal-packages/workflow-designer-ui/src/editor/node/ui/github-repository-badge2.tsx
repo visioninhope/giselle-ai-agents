@@ -1,6 +1,6 @@
 import { useGiselleEngine } from "giselle-sdk/react";
 import useSWR from "swr";
-import { GitHubIcon } from "../../../icons";
+import { GitHubRepositoryBadgeUI } from "./github-repository-badge-ui";
 
 export function GitHubRepositoryBadge2({
 	installationId,
@@ -30,13 +30,9 @@ export function GitHubRepositoryBadge2({
 	}
 
 	return (
-		<div className="flex items-center gap-[6px] rounded-full bg-black-900 pl-[10px] pr-[12px] py-2 text-sm text-white-200 transition-colors text-[12px]">
-			<GitHubIcon className="size-[18px]" />
-			<div className="space-x-[2px]">
-				<span>{data.fullname.owner}</span>
-				<span>/</span>
-				<span>{data.fullname.repo}</span>
-			</div>
-		</div>
+		<GitHubRepositoryBadgeUI
+			owner={data.fullname.owner}
+			repo={data.fullname.repo}
+		/>
 	);
 }
