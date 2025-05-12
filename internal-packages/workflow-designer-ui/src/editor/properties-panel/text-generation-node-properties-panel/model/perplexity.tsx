@@ -25,16 +25,16 @@ export function PerplexityModelPanel({
 }) {
 	const limits = useUsageLimits();
 	const [domainInput, setDomainInput] = useState("");
-	const [includeMode, setIncludeMode] = useState(true);
+	const [listMode, setListMode] = useState(true);
 	const domains = getDomains();
 
-	// includeMode: if no domains start with '-' then include mode, if all domains start with '-' then exclude mode
+	// listMode: if no domains start with '-' then allowlist, if all domains start with '-' then denylist
 	useEffect(() => {
 		if (domains.length === 0) {
 			// Do nothing if domains is empty (allow user to toggle manually)
 			return;
 		}
-		setIncludeMode(domains.every((d) => !d.startsWith("-")));
+		setListMode(domains.every((d) => !d.startsWith("-")));
 	}, [domains]);
 
 	function getDomains() {
@@ -50,8 +50,8 @@ export function PerplexityModelPanel({
 		if (domains.length >= 10) return;
 		if (domains.some((d) => d.replace(/^\-/, "") === value.replace(/^\-/, "")))
 			return;
-		// Add domain with or without '-' based on includeMode
-		const newDomain = includeMode
+		// Add domain with or without '-' based on listMode
+		const newDomain = listMode
 			? value.replace(/^\-/, "")
 			: `-${value.replace(/^\-/, "")}`;
 		const newDomains = [...domains, newDomain];
@@ -80,12 +80,12 @@ export function PerplexityModelPanel({
 		);
 	}
 
-	// When switching include/exclude mode, convert all domains accordingly
+	// When switching allowlist/denylist mode, convert all domains accordingly
 	function handleModeSwitch(checked: boolean) {
-		setIncludeMode(checked);
+		setListMode(checked);
 		const convertedDomains = checked
-			? domains.map((d) => d.replace(/^\-/, "")) // to include (remove '-')
-			: domains.map((d) => (d.startsWith("-") ? d : `-${d}`)); // to exclude (add '-')
+			? domains.map((d) => d.replace(/^\-/, "")) // to allowlist (remove '-')
+			: domains.map((d) => (d.startsWith("-") ? d : `-${d}`)); // to denylist (add '-')
 		onModelChange(
 			PerplexityLanguageModelData.parse({
 				...perplexityLanguageModel,
@@ -210,9 +210,9 @@ export function PerplexityModelPanel({
 				<div className="flex items-center gap-4">
 					<span className="text-[13px]">Mode:</span>
 					<Switch
-						label={includeMode ? "Include" : "Exclude"}
+						label={listMode ? "Allowlist" : "Denylist"}
 						name="search-domain-mode"
-						checked={includeMode}
+						checked={listMode}
 						onCheckedChange={handleModeSwitch}
 					/>
 				</div>
@@ -249,10 +249,8 @@ export function PerplexityModelPanel({
 							key={domain}
 							className="flex items-center bg-white-900/10 rounded px-2 py-1 text-[13px]"
 						>
-							{/* Display domain without '-' in exclude mode for clarity */}
-							{includeMode
-								? domain.replace(/^\-/, "")
-								: domain.replace(/^\-/, "")}
+							{/* Display domain without '-' in denylist mode for clarity */}
+							{domain.replace(/^\-/, "")}
 							<Button
 								variant="ghost"
 								size="sm"
