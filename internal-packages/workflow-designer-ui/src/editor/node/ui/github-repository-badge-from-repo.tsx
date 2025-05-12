@@ -1,14 +1,20 @@
 import { useGiselleEngine } from "giselle-sdk/react";
 import useSWR from "swr";
-import { GitHubRepositoryBadgeUI } from "./github-repository-badge-ui";
+import { GitHubRepositoryBadge } from "./github-repository-badge";
 
-export function GitHubRepositoryBadge2({
-	installationId,
-	repositoryNodeId,
-}: {
+export interface GitHubRepositoryBadgeFromRepoProps {
 	installationId: number;
 	repositoryNodeId: string;
-}) {
+}
+
+/**
+ * A component that fetches GitHub repository data by installation ID and repository node ID
+ * and displays it as a badge
+ */
+export function GitHubRepositoryBadgeFromRepo({
+	installationId,
+	repositoryNodeId,
+}: GitHubRepositoryBadgeFromRepoProps) {
 	const client = useGiselleEngine();
 	const { isLoading, data } = useSWR(
 		{
@@ -30,9 +36,11 @@ export function GitHubRepositoryBadge2({
 	}
 
 	return (
-		<GitHubRepositoryBadgeUI
+		<GitHubRepositoryBadge
 			owner={data.fullname.owner}
 			repo={data.fullname.repo}
 		/>
 	);
 }
+
+export default GitHubRepositoryBadgeFromRepo;
