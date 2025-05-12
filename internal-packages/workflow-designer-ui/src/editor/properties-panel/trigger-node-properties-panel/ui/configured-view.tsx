@@ -1,7 +1,7 @@
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
 import { githubTriggerIdToLabel } from "@giselle-sdk/flow";
 import { useGitHubTrigger } from "../../../lib/use-github-trigger";
-import { GitHubRepositoryBlock } from "./github-repository-block";
+import { GitHubRepositoryBlock } from "../../ui";
 
 export function ConfiguredView({
 	flowTriggerId,

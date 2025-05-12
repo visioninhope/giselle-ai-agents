@@ -19,7 +19,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../../ui/select";
-import { GitHubRepositoryBlock, SelectRepository } from "./ui";
+import { GitHubRepositoryBlock, SelectRepository } from "../ui";
 
 export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
