@@ -13,7 +13,13 @@ import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
-import { type ComponentProps, useCallback, useMemo, useState } from "react";
+import {
+	type ComponentProps,
+	useCallback,
+	useEffect,
+	useMemo,
+	useState,
+} from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
 import { defaultName } from "../../../../utils";
@@ -147,11 +153,13 @@ export function GitHubActionConfiguredView({
 										<span>{parameter.connectedOutput.label}</span>
 									</div>
 								) : (
-									<SelectOutputPopover
-										nodeId={nodeId}
-										parameter={parameter}
-										workflow={workflow}
-									/>
+									<div className="flex-end">
+										<SelectOutputPopover
+											nodeId={nodeId}
+											parameter={parameter}
+											workflow={workflow}
+										/>
+									</div>
 								)}
 							</li>
 						))}
@@ -179,30 +187,32 @@ function OutputToggleItem({
 	disabled = false,
 }: { output: OutputWithDetails; disabled?: boolean }) {
 	return (
-		<ToggleGroup.Item
-			key={output.id}
-			className={clsx(
-				"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
-				"text-white-400",
-				"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
-			)}
-			value={output.id}
-			disabled={disabled}
-		>
-			<p className="text-[12px] truncate">
-				{defaultName(output.node)} / {output.label}
-			</p>
-			<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-			<div
+		<Popover.Close asChild>
+			<ToggleGroup.Item
+				key={output.id}
 				className={clsx(
-					"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
-					"bg-black-200/20 text-black-200/20 text-[10px]",
-					"hidden group-data-[disabled]:block",
+					"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+					"text-white-400",
+					"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
 				)}
+				value={output.id}
+				disabled={disabled}
 			>
-				Unsupported
-			</div>
-		</ToggleGroup.Item>
+				<p className="text-[12px] truncate">
+					{defaultName(output.node)} / {output.label}
+				</p>
+				<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
+				<div
+					className={clsx(
+						"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
+						"bg-black-200/20 text-black-200/20 text-[10px]",
+						"hidden group-data-[disabled]:block",
+					)}
+				>
+					Unsupported
+				</div>
+			</ToggleGroup.Item>
+		</Popover.Close>
 	);
 }
 
@@ -282,23 +292,56 @@ function SelectOutputPopover({
 		return { textNodes, generatedNodes };
 	}, [availableOutputs]);
 
-	const handleValueChange = useCallback((selectedValue: string[]) => {
-		if (selectedValue.length === 0) {
-			setSelectedOutputId(null);
-			return;
-		}
+	const { addConnection, deleteConnection } = useWorkflowDesigner();
 
-		const outputId = selectedValue[0] as OutputId;
-		setSelectedOutputId(outputId);
+	const handleValueChange = useCallback(
+		(selectedValue: string) => {
+			if (!selectedValue || selectedValue === "") {
+				// When deselected, remove any existing connection
+				const existingConnection = workflow.connections.find(
+					(conn) =>
+						conn.inputNode.id === nodeId && conn.inputId === parameter.id,
+				);
 
-		// Here you would update the connections in the workflow
-		// This would typically be handled by a context or state manager
-	}, []);
+				if (existingConnection) {
+					deleteConnection(existingConnection.id);
+				}
+				return;
+			}
 
-	const handleUpdate = useCallback(() => {
-		// In a real implementation, this would update the workflow connections
-		console.log("Selected output:", selectedOutputId);
-	}, [selectedOutputId]);
+			const outputId = selectedValue as OutputId;
+			const selectedOutput = availableOutputs.find(
+				(output) => output.id === outputId,
+			);
+
+			if (!selectedOutput) return;
+
+			// Remove any existing connection for this input
+			const existingConnection = workflow.connections.find(
+				(conn) => conn.inputNode.id === nodeId && conn.inputId === parameter.id,
+			);
+
+			if (existingConnection) {
+				deleteConnection(existingConnection.id);
+			}
+
+			// Add the new connection
+			// addConnection({
+			// 	outputNode: { id: selectedOutput.node.id },
+			// 	outputId: selectedOutput.id,
+			// 	inputNode: { id: nodeId },
+			// 	inputId: parameter.id,
+			// });
+		},
+		[
+			nodeId,
+			parameter.id,
+			workflow.connections,
+			availableOutputs,
+			addConnection,
+			deleteConnection,
+		],
+	);
 
 	return (
 		<Popover.Root>
@@ -320,6 +363,7 @@ function SelectOutputPopover({
 						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
+					align="end"
 					{...contentProps}
 				>
 					<div
@@ -331,6 +375,8 @@ function SelectOutputPopover({
 					<ToggleGroup.Root
 						type="single"
 						className="relative max-h-[300px] flex flex-col"
+						value={selectedOutputId ?? ""}
+						onValueChange={handleValueChange}
 					>
 						<div className="flex px-[16px] text-white-900">
 							Select Source For {parameter.label}
@@ -359,17 +405,6 @@ function SelectOutputPopover({
 									))}
 								</div>
 							)}
-						</div>
-						<div className="flex flex-col py-[4px]">
-							<div className="border-t border-black-300/20" />
-						</div>
-						<div className="flex px-[16px] py-[4px] gap-[8px]">
-							<Popover.Close
-								onClick={handleUpdate}
-								className="h-[32px] w-full flex justify-center items-center bg-white-900 text-black-900 rounded-[8px] cursor-pointer text-[12px]"
-							>
-								Update
-							</Popover.Close>
 						</div>
 					</ToggleGroup.Root>
 				</Popover.Content>
