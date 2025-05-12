@@ -14,18 +14,8 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
-import { Skeleton } from "@/components/ui/skeleton";
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Button } from "../../components/button";
-
-const mockRegisterRepository = async (
-	ownerId: number,
-	repositoryId: number,
-) => {
-	console.log("ownerId", ownerId);
-	console.log("repositoryId", repositoryId);
-	return { success: true };
-};
 
 type Installation = {
 	id: number;
@@ -45,16 +35,22 @@ export type InstallationWithRepos = {
 
 type RepositoryRegistrationDialogProps = {
 	installationsWithRepos: InstallationWithRepos[];
+	registerRepositoryIndexAction: (
+		owner: string,
+		repo: string,
+		installationId: number,
+	) => Promise<void>;
 };
 
 export function RepositoryRegistrationDialog({
 	installationsWithRepos,
+	registerRepositoryIndexAction,
 }: RepositoryRegistrationDialogProps) {
 	const [isOpen, setIsOpen] = useState(false);
 	const [ownerId, setOwnerId] = useState<string>("");
 	const [repositoryId, setRepositoryId] = useState<string>("");
-	const [isLoading, setIsLoading] = useState(false);
 	const [error, setError] = useState("");
+	const [isPending, startTransition] = useTransition();
 
 	const selectedInstallation = installationsWithRepos.find(
 		(i) => String(i.installation.id) === ownerId,
@@ -74,26 +70,31 @@ export function RepositoryRegistrationDialog({
 			return;
 		}
 
-		setIsLoading(true);
-		try {
-			const result = await mockRegisterRepository(
-				Number(ownerId),
-				Number(repositoryId),
-			);
-			if (result.success) {
+		startTransition(async () => {
+			try {
+				const owner = installationsWithRepos.find(
+					(i) => String(i.installation.id) === ownerId,
+				)?.installation.name;
+				if (!owner) {
+					setError("Owner not found");
+					return;
+				}
+				const repo = repositoryOptions.find(
+					(r) => String(r.id) === repositoryId,
+				)?.name;
+				if (!repo) {
+					setError("Repository not found");
+					return;
+				}
+				await registerRepositoryIndexAction(owner, repo, Number(ownerId));
 				setIsOpen(false);
 				setOwnerId("");
 				setRepositoryId("");
-				// In actual implementation, this would re-fetch the repository list
-			} else {
-				setError("Failed to register repository");
+			} catch (error) {
+				setError("An error occurred");
+				console.error(error);
 			}
-		} catch (error) {
-			setError("An error occurred");
-			console.error(error);
-		} finally {
-			setIsLoading(false);
-		}
+		});
 	};
 
 	return (
@@ -146,7 +147,7 @@ export function RepositoryRegistrationDialog({
 								setOwnerId(val);
 								setRepositoryId("");
 							}}
-							disabled={isLoading}
+							disabled={isPending}
 						>
 							<SelectTrigger
 								id="owner"
@@ -182,7 +183,7 @@ export function RepositoryRegistrationDialog({
 						<Select
 							value={repositoryId}
 							onValueChange={setRepositoryId}
-							disabled={isLoading || !ownerId}
+							disabled={isPending || !ownerId}
 						>
 							<SelectTrigger
 								id="repo"
@@ -218,17 +219,17 @@ export function RepositoryRegistrationDialog({
 						<Button
 							type="button"
 							onClick={() => setIsOpen(false)}
-							disabled={isLoading}
+							disabled={isPending}
 							className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400 "
 						>
 							Cancel
 						</Button>
 						<Button
 							type="submit"
-							disabled={isLoading}
+							disabled={isPending}
 							className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em]"
 						>
-							{isLoading ? <Skeleton className="h-5 w-20" /> : "Register"}
+							Register
 						</Button>
 					</div>
 				</form>

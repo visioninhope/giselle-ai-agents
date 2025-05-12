@@ -3,6 +3,7 @@ import { githubVectorStoreFlag } from "@/flags";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
+import { registerRepositoryIndex } from "./actions";
 import { RepositoryItem } from "./repository-item";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
 
@@ -80,6 +81,7 @@ export default async function TeamVectorStorePage() {
 				registrationDialog={
 					<RepositoryRegistrationDialog
 						installationsWithRepos={installationsWithRepos}
+						registerRepositoryIndexAction={registerRepositoryIndex}
 					/>
 				}
 				repositories={repositoryIndexes}
