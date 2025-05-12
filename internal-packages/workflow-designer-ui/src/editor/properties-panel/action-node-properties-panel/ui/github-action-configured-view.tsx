@@ -11,8 +11,8 @@ import {
 import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { DropdownMenu, type Popover, ToggleGroup } from "radix-ui";
-import { type ComponentProps, useCallback, useMemo, useState } from "react";
+import { DropdownMenu } from "radix-ui";
+import { useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
 import { defaultName } from "../../../../utils";
@@ -179,15 +179,10 @@ function SelectOutputPopover({
 	nodeId,
 	parameter,
 	workflow,
-	contentProps,
 }: {
 	nodeId: NodeId;
 	parameter: InputWithConnectedOutput;
 	workflow: { nodes: Node[]; connections: Connection[] };
-	contentProps?: Omit<
-		ComponentProps<typeof Popover.PopoverContent>,
-		"className"
-	>;
 }) {
 	const [selectedOutputId, setSelectedOutputId] = useState<OutputId | null>(
 		parameter.connectedOutput
@@ -287,7 +282,6 @@ function SelectOutputPopover({
 						"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
 					)}
 					align="end"
-					{...contentProps}
 				>
 					<div
 						className={clsx(
