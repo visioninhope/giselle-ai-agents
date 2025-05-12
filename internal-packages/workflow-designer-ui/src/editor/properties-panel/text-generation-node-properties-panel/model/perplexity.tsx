@@ -16,6 +16,8 @@ import { Slider } from "../../../../ui/slider";
 import { Switch } from "../../../../ui/switch";
 import { languageModelAvailable } from "./utils";
 
+const DOMAIN_VALIDATION_REGEX = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+
 export function PerplexityModelPanel({
 	perplexityLanguageModel,
 	onModelChange,
@@ -58,7 +60,7 @@ export function PerplexityModelPanel({
 	function addAllowDomain() {
 		const value = allowlistInput.trim();
 		if (!value) return;
-		if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return;
+		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (allowlist.length + denylist.length >= 10) return;
 		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
@@ -69,7 +71,7 @@ export function PerplexityModelPanel({
 	function addDenyDomain() {
 		const value = denylistInput.trim();
 		if (!value) return;
-		if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return;
+		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (allowlist.length + denylist.length >= 10) return;
 		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
 		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
