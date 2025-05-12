@@ -31,6 +31,7 @@ import {
 	appendResponseMessages,
 	streamText,
 } from "ai";
+import { Langfuse } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
@@ -59,6 +60,9 @@ export async function generateText(args: {
 	if (!isTextGenerationNode(operationNode)) {
 		throw new Error("Invalid generation type");
 	}
+
+	const langfuse = new Langfuse();
+
 	const languageModel = languageModels.find(
 		(lm) => lm.id === operationNode.content.llm.id,
 	);
@@ -72,6 +76,23 @@ export async function generateText(args: {
 		messages: [],
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
+
+	const trace = langfuse.trace({
+		sessionId: runningGeneration.id,
+		name: "ai.streamText",
+		metadata: args.telemetry?.metadata,
+	});
+	const span = trace.span({
+		name: "ai.streamText",
+		startTime: new Date(runningGeneration.queuedAt),
+	});
+	const generation = span.generation({
+		name: "ai.streamText.doStream",
+		model: operationNode.content.llm.id,
+		modelParameters: operationNode.content.llm.configurations,
+		startTime: new Date(runningGeneration.createdAt),
+		completionStartTime: new Date(runningGeneration.startedAt),
+	});
 
 	await Promise.all([
 		setGeneration({
@@ -391,6 +412,18 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
+			trace.update({
+				input: { messages },
+				output: event.text,
+			});
+			span.update({
+				input: { messages },
+				output: event.text,
+			});
+			generation.update({
+				input: { messages },
+				output: event.text,
+			});
 			const tokenUsage = event.usage;
 
 			let costInfo = null;
@@ -399,7 +432,18 @@ export async function generateText(args: {
 
 			if (tokenUsage) {
 				const { calculateCost } = await import("@giselle-sdk/language-model");
-				costInfo = calculateCost(provider, modelId, tokenUsage);
+				costInfo = await calculateCost(provider, modelId, tokenUsage);
+				generation.update({
+					usage: {
+						input: tokenUsage.promptTokens,
+						output: tokenUsage.completionTokens,
+						total: tokenUsage.promptTokens + tokenUsage.completionTokens,
+						unit: "TOKENS",
+						inputCost: costInfo.inputCost,
+						outputCost: costInfo.outputCost,
+						totalCost: costInfo.totalCost,
+					},
+				});
 			}
 
 			const reasoningOutput = generationContext.operationNode.outputs.find(
@@ -461,6 +505,12 @@ export async function generateText(args: {
 					responseMessages: event.response.messages,
 				}),
 			} satisfies CompletedGeneration;
+
+			generation.end();
+			span.update({
+				endTime: new Date(completedGeneration.completedAt),
+			});
+
 			await Promise.all([
 				setGeneration({
 					storage: args.context.storage,
