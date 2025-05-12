@@ -8,6 +8,18 @@ export interface EmbeddingStore {
 	delete(key: GitHubBlobEmbeddingKey): Promise<void>;
 }
 
+export interface GitHubRepositoryIndexStore {
+	startIngestion(owner: string, repo: string): Promise<void>;
+	completeIngestion(
+		owner: string,
+		repo: string,
+		commitSha: string,
+	): Promise<void>;
+	failIngestion(owner: string, repo: string, error: string): Promise<void>;
+	// TODO: When ingestion is implemented as a queue, we need to check if the all ingestion job is completed like this:
+	// allIngestionCompleted(owner: string, repo: string): Promise<boolean>;
+}
+
 export type GitHubBlobEmbedding = {
 	owner: string;
 	repo: string;
@@ -32,15 +44,22 @@ type IngestBlobsParams = {
 	dependencies: {
 		octokit: Octokit;
 		embeddingStore: EmbeddingStore;
+		repositoryIndexStore: GitHubRepositoryIndexStore;
 	};
 };
 
 export async function ingestBlobs(params: IngestBlobsParams) {
 	const { owner, repo, lastIngestedCommitSha, dependencies } = params;
-	const { octokit, embeddingStore } = dependencies;
+	const { octokit, embeddingStore, repositoryIndexStore } = dependencies;
 
 	if (lastIngestedCommitSha == null) {
-		await fullIngest(octokit, owner, repo, embeddingStore);
+		await fullIngest(
+			octokit,
+			owner,
+			repo,
+			embeddingStore,
+			repositoryIndexStore,
+		);
 	} else {
 		await diffIngest(
 			octokit,
@@ -48,6 +67,7 @@ export async function ingestBlobs(params: IngestBlobsParams) {
 			repo,
 			lastIngestedCommitSha,
 			embeddingStore,
+			repositoryIndexStore,
 		);
 	}
 }
@@ -57,39 +77,53 @@ async function fullIngest(
 	owner: string,
 	repo: string,
 	embeddingStore: EmbeddingStore,
+	repositoryIndexStore: GitHubRepositoryIndexStore,
 	maxBlobSize: number = 1 * 1024 * 1024, // 1MiB
 ) {
 	const head = await fetchDefaultBranchHead(octokit, owner, repo);
 	const commitSha = head.sha;
-	for await (const entry of traverseTree(octokit, owner, repo, commitSha)) {
-		const { path, type, sha: fileSha, size } = entry;
+	try {
+		await repositoryIndexStore.startIngestion(owner, repo);
+		for await (const entry of traverseTree(octokit, owner, repo, commitSha)) {
+			const { path, type, sha: fileSha, size } = entry;
 
-		// only ingest blobs
-		if (type !== "blob") {
-			continue;
-		}
+			// only ingest blobs
+			if (type !== "blob") {
+				continue;
+			}
 
-		if (fileSha == null || size == null || path == null) {
-			console.warn(`Invalid entry: ${JSON.stringify(entry)}`);
-			continue;
-		}
-		if (size > maxBlobSize) {
-			console.warn(
-				`Blob size is too large: ${size} bytes, skipping: ${fileSha}`,
+			if (fileSha == null || size == null || path == null) {
+				console.warn(`Invalid entry: ${JSON.stringify(entry)}`);
+				continue;
+			}
+			if (size > maxBlobSize) {
+				console.warn(
+					`Blob size is too large: ${size} bytes, skipping: ${fileSha}`,
+				);
+				continue;
+			}
+
+			// TODO: Use queue
+			await ingestBlob(
+				octokit,
+				owner,
+				repo,
+				path,
+				fileSha,
+				commitSha,
+				embeddingStore,
+				repositoryIndexStore,
 			);
-			continue;
 		}
 
-		// TODO: Use queue
-		await ingestBlob(
-			octokit,
-			owner,
-			repo,
-			path,
-			fileSha,
-			commitSha,
-			embeddingStore,
-		);
+		// TODO: When we implement ingestion as a queue, this method should be called in an ingestBlob Job with checking if the all ingestion job is completed
+		await repositoryIndexStore.completeIngestion(owner, repo, commitSha);
+	} catch (error: unknown) {
+		if (error instanceof Error) {
+			await repositoryIndexStore.failIngestion(owner, repo, error.message);
+		} else {
+			await repositoryIndexStore.failIngestion(owner, repo, String(error));
+		}
 	}
 }
 
@@ -100,6 +134,7 @@ async function diffIngest(
 	repo: string,
 	lastIngestedCommitSha: string,
 	embeddingStore: EmbeddingStore,
+	repositoryIndexStore: GitHubRepositoryIndexStore,
 ) {
 	throw new Error("Not implemented");
 }
@@ -112,6 +147,7 @@ async function ingestBlob(
 	fileSha: string,
 	commitSha: string,
 	embeddingStore: EmbeddingStore,
+	repositoryIndexStore: GitHubRepositoryIndexStore,
 ) {
 	// fetch
 	const blob = await fetchBlob(octokit, owner, repo, fileSha);
