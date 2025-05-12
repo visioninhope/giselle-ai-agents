@@ -1,9 +1,10 @@
 import { Card } from "@/components/ui/card";
 import { githubVectorStoreFlag } from "@/flags";
+import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
-import { registerRepositoryIndex } from "./actions";
+import { deleteRepositoryIndex, registerRepositoryIndex } from "./actions";
 import { RepositoryItem } from "./repository-item";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
 
@@ -84,7 +85,7 @@ export default async function TeamVectorStorePage() {
 						registerRepositoryIndexAction={registerRepositoryIndex}
 					/>
 				}
-				repositories={repositoryIndexes}
+				repositoryIndexes={repositoryIndexes}
 			/>
 		</div>
 	);
@@ -152,12 +153,12 @@ function GitHubAppInstallRequiredCard() {
 
 type RepositoryListCardProps = {
 	registrationDialog: React.ReactNode;
-	repositories: Awaited<ReturnType<typeof getGitHubRepositoryIndexes>>;
+	repositoryIndexes: Awaited<ReturnType<typeof getGitHubRepositoryIndexes>>;
 };
 
 function RepositoryListCard({
 	registrationDialog,
-	repositories,
+	repositoryIndexes,
 }: RepositoryListCardProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -175,10 +176,14 @@ function RepositoryListCard({
 					<div className="ml-auto">{registrationDialog}</div>
 				</div>
 
-				{repositories.length > 0 ? (
+				{repositoryIndexes.length > 0 ? (
 					<div className="space-y-4">
-						{repositories.map((repo) => (
-							<RepositoryItem key={repo.id} repository={repo} />
+						{repositoryIndexes.map((index) => (
+							<RepositoryItem
+								key={index.id}
+								repositoryIndex={index}
+								deleteRepositoryIndexAction={deleteRepositoryIndex}
+							/>
 						))}
 					</div>
 				) : (
@@ -201,22 +206,22 @@ function EmptyRepositoryCard() {
 async function getGitHubRepositoryIndexes() {
 	const mockRepositories = [
 		{
-			id: 1,
+			id: "gthbi_giselles-ai_giselle" as GitHubRepositoryIndexId,
 			owner: "giselles-ai",
 			name: "giselle",
-			ingest_status: "idle",
-			last_ingested_commit_sha: "a1b2c3d4e5f6g7h8i9j0",
-			created_at: "2023-05-01T12:00:00Z",
-			updated_at: "2023-05-02T14:30:00Z",
+			ingestStatus: "idle",
+			lastIngestedCommitSha: "a1b2c3d4e5f6g7h8i9j0",
+			createdAt: "2023-05-01T12:00:00Z",
+			updatedAt: "2023-05-02T14:30:00Z",
 		},
 		{
-			id: 2,
+			id: "gthbi_giselles-ai_docs" as GitHubRepositoryIndexId,
 			owner: "giselles-ai",
-			name: "website",
-			ingest_status: "running",
-			last_ingested_commit_sha: null,
-			created_at: "2023-05-05T09:15:00Z",
-			updated_at: "2023-05-05T09:15:00Z",
+			name: "docs",
+			ingestStatus: "running",
+			lastIngestedCommitSha: null,
+			createdAt: "2023-05-05T09:15:00Z",
+			updatedAt: "2023-05-05T09:15:00Z",
 		},
 	];
 	return mockRepositories;

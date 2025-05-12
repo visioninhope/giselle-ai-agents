@@ -12,41 +12,41 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { Trash } from "lucide-react";
-import { useState } from "react";
-
-const mockDeleteRepository = async (repoId: number) => {
-	return { success: true };
-};
+import { useState, useTransition } from "react";
 
 type RepositoryItemProps = {
-	repository: {
-		id: number;
+	repositoryIndex: {
+		id: GitHubRepositoryIndexId;
 		owner: string;
 		name: string;
-		ingest_status: string;
-		last_ingested_commit_sha: string | null;
-		created_at: string;
-		updated_at: string;
+		ingestStatus: string;
+		lastIngestedCommitSha: string | null;
+		createdAt: string;
+		updatedAt: string;
 	};
+	deleteRepositoryIndexAction: (
+		indexId: GitHubRepositoryIndexId,
+	) => Promise<void>;
 };
 
-export function RepositoryItem({ repository }: RepositoryItemProps) {
-	const [ingestStatus, setIngestStatus] = useState(repository.ingest_status);
-	const [isDeleting, setIsDeleting] = useState(false);
+export function RepositoryItem({
+	repositoryIndex,
+	deleteRepositoryIndexAction,
+}: RepositoryItemProps) {
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [isPending, startTransition] = useTransition();
 
 	const handleDelete = async () => {
-		setIsDeleting(true);
-		try {
-			const result = await mockDeleteRepository(repository.id);
-			if (result.success) {
-				alert("Repository deleted.");
+		startTransition(async () => {
+			try {
+				await deleteRepositoryIndexAction(repositoryIndex.id);
+				setShowDeleteDialog(false);
+			} catch (error) {
+				console.error(error);
 			}
-		} finally {
-			setIsDeleting(false);
-			setShowDeleteDialog(false);
-		}
+		});
 	};
 
 	return (
@@ -54,14 +54,14 @@ export function RepositoryItem({ repository }: RepositoryItemProps) {
 			<div className="flex justify-between items-center">
 				<div>
 					<h5 className="text-white-400 font-medium text-[16px] leading-[19.2px] font-hubot">
-						{repository.owner}/{repository.name}
+						{repositoryIndex.owner}/{repositoryIndex.name}
 					</h5>
 					<div className="flex items-center gap-2 mt-1">
-						<StatusBadge status={ingestStatus} />
-						{repository.last_ingested_commit_sha && (
+						<StatusBadge status={repositoryIndex.ingestStatus} />
+						{repositoryIndex.lastIngestedCommitSha && (
 							<span className="text-black-400 text-[12px] leading-[20.4px] font-geist">
 								Last Ingested:{" "}
-								{repository.last_ingested_commit_sha.substring(0, 7)}
+								{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
 							</span>
 						)}
 					</div>
@@ -75,11 +75,11 @@ export function RepositoryItem({ repository }: RepositoryItemProps) {
 							<Button
 								variant="destructive"
 								className="h-8 px-3 text-[12px] flex items-center gap-1 rounded-md transition-colors duration-150"
-								disabled={isDeleting}
+								disabled={isPending}
 								onClick={() => setShowDeleteDialog(true)}
 							>
 								<Trash className="h-4 w-4 mr-1" />
-								{isDeleting ? "Deleting..." : "Delete"}
+								{isPending ? "Deleting..." : "Delete"}
 							</Button>
 						</AlertDialogTrigger>
 						<AlertDialogContent>
@@ -91,11 +91,21 @@ export function RepositoryItem({ repository }: RepositoryItemProps) {
 								</AlertDialogDescription>
 							</AlertDialogHeader>
 							<AlertDialogFooter>
-								<AlertDialogCancel disabled={isDeleting}>
+								<AlertDialogCancel
+									type="button"
+									onClick={() => setShowDeleteDialog(false)}
+									disabled={isPending}
+									className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+								>
 									Cancel
 								</AlertDialogCancel>
-								<AlertDialogAction onClick={handleDelete} disabled={isDeleting}>
-									{isDeleting ? "Deleting..." : "Delete"}
+								<AlertDialogAction
+									type="submit"
+									onClick={handleDelete}
+									disabled={isPending}
+									className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
+								>
+									{isPending ? "Deleting..." : "Delete"}
 								</AlertDialogAction>
 							</AlertDialogFooter>
 						</AlertDialogContent>

@@ -6,6 +6,7 @@ import { getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
 import { createId } from "@paralleldrive/cuid2";
+import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
 export async function registerRepositoryIndex(
@@ -54,5 +55,18 @@ export async function registerRepositoryIndex(
 		installationId,
 	});
 
+	revalidatePath("/settings/team/vector-store");
+}
+
+export async function deleteRepositoryIndex(indexId: GitHubRepositoryIndexId) {
+	const team = await fetchCurrentTeam();
+	await db
+		.delete(githubRepositoryIndex)
+		.where(
+			and(
+				eq(githubRepositoryIndex.teamDbId, team.dbId),
+				eq(githubRepositoryIndex.id, indexId),
+			),
+		);
 	revalidatePath("/settings/team/vector-store");
 }
