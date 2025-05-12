@@ -12,7 +12,10 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import type { githubRepositoryIndex } from "@/drizzle";
+import type {
+	GitHubRepositoryIndexStatus,
+	githubRepositoryIndex,
+} from "@/drizzle";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { Trash } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -109,27 +112,36 @@ export function RepositoryItem({
 	);
 }
 
-function StatusBadge({ status }: { status: string }) {
+function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
 	let bgColor = "bg-gray-500";
 	let textColor = "text-white";
 	let label = "Unknown";
 
 	switch (status) {
 		case "idle":
-			bgColor = "bg-green-500";
+			bgColor = "bg-gray-500";
 			textColor = "text-white";
-			label = "Ready";
+			label = "Waiting for ingestion";
 			break;
 		case "running":
 			bgColor = "bg-blue-500";
 			textColor = "text-white";
 			label = "Ingesting";
 			break;
-		case "error":
+		case "completed":
+			bgColor = "bg-green-500";
+			textColor = "text-white";
+			label = "Ready";
+			break;
+		case "failed":
 			bgColor = "bg-red-500";
 			textColor = "text-white";
 			label = "Error";
 			break;
+		default: {
+			const _exhaustiveCheck: never = status;
+			throw new Error(`Unknown status: ${_exhaustiveCheck}`);
+		}
 	}
 
 	return (
