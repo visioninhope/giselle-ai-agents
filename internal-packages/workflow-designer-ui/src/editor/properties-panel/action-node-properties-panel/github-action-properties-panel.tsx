@@ -290,6 +290,7 @@ function Installed({
 					},
 				},
 				name: action.command.label,
+				inputs,
 			});
 		},
 		[node, updateNodeData, step],
