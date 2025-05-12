@@ -26,7 +26,13 @@ export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.command.state.status === "configured") {
-		return <GitHubActionConfiguredView state={node.content.command.state} />;
+		return (
+			<GitHubActionConfiguredView
+				state={node.content.command.state}
+				nodeId={node.id}
+				inputs={node.inputs}
+			/>
+		);
 	}
 
 	if (value?.github === undefined) {
@@ -270,9 +276,12 @@ function Installed({
 
 			// Add inputs based on the action type
 			for (const key of action.command.parameters.keyof().options) {
+				// @ts-expect-error shape[parameter] is unreasonable but intentional
+				const schema = action.command.parameters.shape[key] as AnyZodObject;
 				inputs.push({
 					id: InputId.generate(),
 					label: key,
+					isRequired: !schema.isOptional(),
 				});
 			}
 

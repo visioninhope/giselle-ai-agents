@@ -7,6 +7,7 @@ export type InputId = z.infer<typeof InputId.schema>;
 export const Input = z.object({
 	id: InputId.schema,
 	label: z.string(),
+	isRequired: z.optional(z.boolean().default(false)),
 });
 export type Input = z.infer<typeof Input>;
 
