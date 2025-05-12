@@ -4,7 +4,6 @@ import {
 	type Input,
 	type Node,
 	type NodeId,
-	type Output,
 	type OutputId,
 	isTextGenerationNode,
 	isTextNode,
