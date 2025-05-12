@@ -1,7 +1,7 @@
 import { PerplexityLanguageModelData } from "@giselle-sdk/data-type";
 import { perplexityLanguageModels } from "@giselle-sdk/language-model";
 import { useUsageLimits } from "giselle-sdk/react";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Button } from "../../../../ui/button";
 import { Input } from "../../../../ui/input";
 import {
@@ -13,7 +13,6 @@ import {
 	SelectValue,
 } from "../../../../ui/select";
 import { Slider } from "../../../../ui/slider";
-import { Switch } from "../../../../ui/switch";
 import { languageModelAvailable } from "./utils";
 
 const DOMAIN_VALIDATION_REGEX = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
