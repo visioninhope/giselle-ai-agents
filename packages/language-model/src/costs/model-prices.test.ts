@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getValidPricing, type ModelPriceTable } from "./model-prices";
+import { type ModelPriceTable, getValidPricing } from "./model-prices";
 import type { ModelPrice } from "./pricing";
 
 describe("getValidPricing", () => {
@@ -63,7 +63,6 @@ describe("getValidPricing", () => {
 		expect(result.price.output.costPerMegaToken).toBe(4);
 	});
 
-
 	it("should throw an error when model is not found", () => {
 		const priceTable: ModelPriceTable = {};
 
@@ -123,4 +122,4 @@ describe("getValidPricing", () => {
 		expect(result.price.input.costPerMegaToken).toBe(3);
 		expect(result.price.output.costPerMegaToken).toBe(4);
 	});
-}); 
+});

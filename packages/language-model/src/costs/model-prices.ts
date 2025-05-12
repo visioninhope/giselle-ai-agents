@@ -111,7 +111,10 @@ export const openAiTokenPricing: ModelPriceTable = {
 	},
 };
 
-export function getValidPricing(modelId: string, priceTable: ModelPriceTable): ModelPrice {
+export function getValidPricing(
+	modelId: string,
+	priceTable: ModelPriceTable,
+): ModelPrice {
 	const modelPricing = priceTable[modelId];
 	if (!modelPricing) {
 		throw new Error(`No pricing found for model ${modelId}`);
@@ -120,7 +123,10 @@ export function getValidPricing(modelId: string, priceTable: ModelPriceTable): M
 	const now = new Date();
 	const validPrices = modelPricing.prices
 		.filter((price) => new Date(price.validFrom) <= now)
-		.sort((a, b) => new Date(b.validFrom).getTime() - new Date(a.validFrom).getTime());
+		.sort(
+			(a, b) =>
+				new Date(b.validFrom).getTime() - new Date(a.validFrom).getTime(),
+		);
 
 	if (validPrices.length === 0) {
 		throw new Error(`No valid pricing found for model ${modelId}`);

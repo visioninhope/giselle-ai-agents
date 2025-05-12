@@ -1,12 +1,16 @@
 export * from "./pricing";
-export { openAiTokenPricing, getValidPricing, type ModelPriceTable } from "./model-prices";
+export {
+	openAiTokenPricing,
+	getValidPricing,
+	type ModelPriceTable,
+} from "./model-prices";
 export type { TokenUsage } from "./usage";
 export { calculateTokenCost } from "./calculator";
 export type { CostCalculator, CostResult } from "./calculator";
 
+import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";
 import { DefaultCostCalculator } from "./calculator";
-import { OpenAICostCalculator } from "../openai";
 
 export function createCostCalculator(provider: string): CostCalculator {
 	switch (provider) {
