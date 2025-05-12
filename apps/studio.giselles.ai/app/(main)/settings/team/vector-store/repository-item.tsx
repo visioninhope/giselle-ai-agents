@@ -12,12 +12,8 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useState } from "react";
-
-const mockReIngesting = async (repoId: number) => {
-	return { success: true };
-};
 
 const mockDeleteRepository = async (repoId: number) => {
 	return { success: true };
@@ -36,23 +32,9 @@ type RepositoryItemProps = {
 };
 
 export function RepositoryItem({ repository }: RepositoryItemProps) {
-	const [isReIngesting, setIsReIngesting] = useState(false);
 	const [ingestStatus, setIngestStatus] = useState(repository.ingest_status);
 	const [isDeleting, setIsDeleting] = useState(false);
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
-
-	const handleReIngest = async () => {
-		setIsReIngesting(true);
-		try {
-			const result = await mockReIngesting(repository.id);
-			if (result.success) {
-				setIngestStatus("running");
-				setTimeout(() => setIngestStatus("idle"), 3000); // Mock timer
-			}
-		} finally {
-			setIsReIngesting(false);
-		}
-	};
 
 	const handleDelete = async () => {
 		setIsDeleting(true);
@@ -85,21 +67,6 @@ export function RepositoryItem({ repository }: RepositoryItemProps) {
 					</div>
 				</div>
 				<div className="ml-auto flex gap-2 items-center">
-					<Button
-						variant="link"
-						onClick={handleReIngest}
-						disabled={isReIngesting || ingestStatus === "running"}
-						className="h-8 px-2 text-[12px]"
-					>
-						{isReIngesting || ingestStatus === "running" ? (
-							<span className="flex items-center gap-2">
-								<RefreshCw className="h-3 w-3 animate-spin" />
-								Ingesting...
-							</span>
-						) : (
-							<span className="flex">Re-ingest</span>
-						)}
-					</Button>
 					<AlertDialog
 						open={showDeleteDialog}
 						onOpenChange={setShowDeleteDialog}
