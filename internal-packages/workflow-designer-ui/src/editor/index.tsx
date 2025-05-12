@@ -15,7 +15,6 @@ import "@xyflow/react/dist/style.css";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
-import { SP } from "next/dist/shared/lib/utils";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	type ImperativePanelHandle,
