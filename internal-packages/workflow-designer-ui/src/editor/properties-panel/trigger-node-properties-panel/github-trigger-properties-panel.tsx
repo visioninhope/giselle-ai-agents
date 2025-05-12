@@ -31,6 +31,7 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
+import { triggerNodeDefaultName } from "../../../utils";
 import { GitHubRepositoryBlock, SelectRepository } from "../ui";
 import { ConfiguredView } from "./ui";
 
@@ -305,7 +306,6 @@ function Installed({
 					accessor: key,
 				});
 			}
-
 			startTransition(async () => {
 				const { triggerId } = await client.configureTrigger({
 					trigger: {
@@ -329,6 +329,7 @@ function Installed({
 						},
 					},
 					outputs: [...node.outputs, ...outputs],
+					name: trigger.event.label,
 				});
 			});
 		},

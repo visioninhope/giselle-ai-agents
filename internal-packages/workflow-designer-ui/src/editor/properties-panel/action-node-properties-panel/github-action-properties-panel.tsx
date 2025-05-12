@@ -289,6 +289,7 @@ function Installed({
 						},
 					},
 				},
+				name: action.command.label,
 			});
 		},
 		[node, updateNodeData, step],
