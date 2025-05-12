@@ -1,7 +1,9 @@
 import { Card } from "@/components/ui/card";
+import { db, githubRepositoryIndex } from "@/drizzle";
 import { githubVectorStoreFlag } from "@/flags";
-import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { getGitHubIdentityState } from "@/services/accounts";
+import { fetchCurrentTeam } from "@/services/teams";
+import { desc, eq } from "drizzle-orm";
 import { ExternalLink } from "lucide-react";
 import { notFound } from "next/navigation";
 import { deleteRepositoryIndex, registerRepositoryIndex } from "./actions";
@@ -204,25 +206,11 @@ function EmptyRepositoryCard() {
 }
 
 async function getGitHubRepositoryIndexes() {
-	const mockRepositories = [
-		{
-			id: "gthbi_giselles-ai_giselle" as GitHubRepositoryIndexId,
-			owner: "giselles-ai",
-			name: "giselle",
-			ingestStatus: "idle",
-			lastIngestedCommitSha: "a1b2c3d4e5f6g7h8i9j0",
-			createdAt: "2023-05-01T12:00:00Z",
-			updatedAt: "2023-05-02T14:30:00Z",
-		},
-		{
-			id: "gthbi_giselles-ai_docs" as GitHubRepositoryIndexId,
-			owner: "giselles-ai",
-			name: "docs",
-			ingestStatus: "running",
-			lastIngestedCommitSha: null,
-			createdAt: "2023-05-05T09:15:00Z",
-			updatedAt: "2023-05-05T09:15:00Z",
-		},
-	];
-	return mockRepositories;
+	const team = await fetchCurrentTeam();
+	const records = await db
+		.select()
+		.from(githubRepositoryIndex)
+		.where(eq(githubRepositoryIndex.teamDbId, team.dbId))
+		.orderBy(desc(githubRepositoryIndex.dbId));
+	return records;
 }

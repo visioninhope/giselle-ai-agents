@@ -12,20 +12,13 @@ import {
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import type { githubRepositoryIndex } from "@/drizzle";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { Trash } from "lucide-react";
 import { useState, useTransition } from "react";
 
 type RepositoryItemProps = {
-	repositoryIndex: {
-		id: GitHubRepositoryIndexId;
-		owner: string;
-		name: string;
-		ingestStatus: string;
-		lastIngestedCommitSha: string | null;
-		createdAt: string;
-		updatedAt: string;
-	};
+	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
 	deleteRepositoryIndexAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<void>;
@@ -54,10 +47,10 @@ export function RepositoryItem({
 			<div className="flex justify-between items-center">
 				<div>
 					<h5 className="text-white-400 font-medium text-[16px] leading-[19.2px] font-hubot">
-						{repositoryIndex.owner}/{repositoryIndex.name}
+						{repositoryIndex.owner}/{repositoryIndex.repo}
 					</h5>
 					<div className="flex items-center gap-2 mt-1">
-						<StatusBadge status={repositoryIndex.ingestStatus} />
+						<StatusBadge status={repositoryIndex.status} />
 						{repositoryIndex.lastIngestedCommitSha && (
 							<span className="text-black-400 text-[12px] leading-[20.4px] font-geist">
 								Last Ingested:{" "}
