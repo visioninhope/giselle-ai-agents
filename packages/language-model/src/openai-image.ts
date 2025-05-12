@@ -50,11 +50,11 @@ export type LanguageModel = OpenAIImageLanguageModel;
 export interface OpenAIImageGenerationParams {
 	width: number;
 	height: number;
-	quality: "low" | "medium" | "high";
+	quality: "auto" | "low" | "medium" | "high";
 }
 
 const openAICostTable: Record<
-	"low" | "medium" | "high",
+	"auto" | "low" | "medium" | "high",
 	Record<string, number>
 > = {
 	low: {
@@ -71,6 +71,13 @@ const openAICostTable: Record<
 		"1024x1024": 0.167,
 		"1024x1536": 0.25,
 		"1536x1024": 0.25,
+	},
+	auto: {
+		// price is set same as "medium" because we cannot detect which quality is finaly adopted by OpenAI
+		// ref: https://platform.openai.com/docs/guides/image-generation?image-generation-model=gpt-image-1#customize-image-output
+		"1024x1024": 0.042,
+		"1024x1536": 0.063,
+		"1536x1024": 0.063,
 	},
 };
 
