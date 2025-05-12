@@ -242,7 +242,10 @@ function SelectOutputPopover({
 			}
 		}
 
-		return { textNodes, generatedNodes };
+		return [
+			{ label: "Generated Content", nodes: generatedNodes },
+			{ label: "Text", nodes: textNodes },
+		];
 	}, [availableOutputs]);
 
 	const { addConnection } = useWorkflowDesigner();
@@ -297,55 +300,35 @@ function SelectOutputPopover({
 							<div className="border-t border-black-300/20" />
 						</div>
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
-							{groupedOutputs.generatedNodes.length > 0 && (
-								<DropdownMenu.Group className="flex flex-col px-[8px]">
-									<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										Generated Content
-									</DropdownMenu.Label>
-									{groupedOutputs.generatedNodes.map((output) => (
-										<DropdownMenu.Item
-											key={output.id}
-											className={clsx(
-												"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
-												"text-white-400",
-												"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
-											)}
-											textValue={output.id}
-											onSelect={() =>
-												handleSelectOutput(output.node, output.id)
-											}
-										>
-											<p className="text-[12px] truncate">
-												{defaultName(output.node)} / {output.label}
-											</p>
-										</DropdownMenu.Item>
-									))}
-								</DropdownMenu.Group>
-							)}
-							{groupedOutputs.textNodes.length > 0 && (
-								<DropdownMenu.Group className="flex flex-col px-[8px]">
-									<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
-										Text
-									</DropdownMenu.Label>
-									{groupedOutputs.textNodes.map((output) => (
-										<DropdownMenu.Item
-											key={output.id}
-											className={clsx(
-												"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
-												"text-white-400",
-												"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
-											)}
-											textValue={output.id}
-											onSelect={() =>
-												handleSelectOutput(output.node, output.id)
-											}
-										>
-											<p className="text-[12px] truncate">
-												{defaultName(output.node)} / {output.label}
-											</p>
-										</DropdownMenu.Item>
-									))}
-								</DropdownMenu.Group>
+							{groupedOutputs.map((groupedOutput) =>
+								groupedOutput.nodes.length === 0 ? null : (
+									<DropdownMenu.Group
+										className="flex flex-col px-[8px]"
+										key={groupedOutput.label}
+									>
+										<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+											{groupedOutput.label}
+										</DropdownMenu.Label>
+										{groupedOutput.nodes.map((output) => (
+											<DropdownMenu.Item
+												key={output.id}
+												className={clsx(
+													"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+													"text-white-400",
+													"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+												)}
+												textValue={output.id}
+												onSelect={() =>
+													handleSelectOutput(output.node, output.id)
+												}
+											>
+												<p className="text-[12px] truncate">
+													{defaultName(output.node)} / {output.label}
+												</p>
+											</DropdownMenu.Item>
+										))}
+									</DropdownMenu.Group>
+								),
 							)}
 						</div>
 					</div>
