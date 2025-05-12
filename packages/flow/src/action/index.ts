@@ -3,7 +3,7 @@ import { actions as githubActions, provider as githubProvider } from "./github";
 export {
 	actions as githubActions,
 	provider as githubProvider,
-	type ActionCommandId as GitHubActionComandId,
+	type ActionCommandId as GitHubActionCommandId,
 } from "./github";
 
 export const actions = [...githubActions];
