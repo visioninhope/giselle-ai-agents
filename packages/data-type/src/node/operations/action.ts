@@ -4,7 +4,9 @@ import { z } from "zod";
 const GitHubActionCommandUnconfiguredState = z.object({
 	status: z.literal("unconfigured"),
 });
-export type GitHubActionCommandUnconfiguredState = z.infer<typeof GitHubActionCommandUnconfiguredState>;
+export type GitHubActionCommandUnconfiguredState = z.infer<
+	typeof GitHubActionCommandUnconfiguredState
+>;
 
 const GitHubActionCommandCofiguredState = z.object({
 	status: z.literal("configured"),
@@ -12,7 +14,9 @@ const GitHubActionCommandCofiguredState = z.object({
 	installationId: z.number(),
 	repositoryNodeId: z.string(),
 });
-export type GitHubActionCommandCofiguredState = z.infer<typeof GitHubActionCommandUnconfiguredState> | z.infer<typeof GitHubActionCommandCofiguredState>;
+export type GitHubActionCommandCofiguredState =
+	| z.infer<typeof GitHubActionCommandUnconfiguredState>
+	| z.infer<typeof GitHubActionCommandCofiguredState>;
 
 const GitHubActionCommandData = z.object({
 	provider: z.literal("github"),
