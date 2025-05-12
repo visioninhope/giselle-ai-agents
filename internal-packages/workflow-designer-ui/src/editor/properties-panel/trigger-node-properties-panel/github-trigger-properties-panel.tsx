@@ -305,6 +305,7 @@ function Installed({
 					accessor: key,
 				});
 			}
+
 			startTransition(async () => {
 				const { triggerId } = await client.configureTrigger({
 					trigger: {
