@@ -20,12 +20,13 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { GitHubRepositoryBlock, SelectRepository } from "../ui";
+import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 
 export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.command.state.status === "configured") {
-		return "todo";
+		return <GitHubActionConfiguredView state={node.content.command.state} />;
 	}
 
 	if (value?.github === undefined) {

@@ -1,6 +1,7 @@
 import type { ActionNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { NodeIcon } from "../../../icons/node";
+import { Button } from "../../../ui/button";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -22,6 +23,11 @@ export function ActionNodePropertiesPanel({
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
 				}}
+				action={
+					node.content.command.state.status === "unconfigured" ? null : (
+						<Button type="button">Action</Button>
+					)
+				}
 			/>
 			<PropertiesPanelContent>
 				<PropertiesPanel node={node} />
