@@ -4,6 +4,7 @@ import {
 	type Input,
 	type Node,
 	type NodeId,
+	type Output,
 	type OutputId,
 	isTextGenerationNode,
 	isTextNode,
@@ -12,7 +13,7 @@ import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon } from "lucide-react";
-import { Popover, ToggleGroup } from "radix-ui";
+import { DropdownMenu, type Popover, ToggleGroup } from "radix-ui";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
@@ -176,40 +177,6 @@ type OutputWithDetails = {
 	};
 };
 
-function OutputToggleItem({
-	output,
-	disabled = false,
-}: { output: OutputWithDetails; disabled?: boolean }) {
-	return (
-		<Popover.Close asChild>
-			<ToggleGroup.Item
-				key={output.id}
-				className={clsx(
-					"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
-					"text-white-400",
-					"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
-				)}
-				value={output.id}
-				disabled={disabled}
-			>
-				<p className="text-[12px] truncate">
-					{defaultName(output.node)} / {output.label}
-				</p>
-				<CheckIcon className="w-[16px] h-[16px] hidden group-data-[state=on]:block" />
-				<div
-					className={clsx(
-						"px-[10px] py-[4px] flex items-center justify-center rounded-[30px]",
-						"bg-black-200/20 text-black-200/20 text-[10px]",
-						"hidden group-data-[disabled]:block",
-					)}
-				>
-					Unsupported
-				</div>
-			</ToggleGroup.Item>
-		</Popover.Close>
-	);
-}
-
 function SelectOutputPopover({
 	nodeId,
 	parameter,
@@ -229,7 +196,6 @@ function SelectOutputPopover({
 			? (parameter.connectedOutput.id as OutputId)
 			: null,
 	);
-	const { isSupportedConnection } = useWorkflowDesigner();
 
 	// Get target node from context
 	const node = useMemo(
@@ -286,60 +252,26 @@ function SelectOutputPopover({
 		return { textNodes, generatedNodes };
 	}, [availableOutputs]);
 
-	const { addConnection, deleteConnection } = useWorkflowDesigner();
+	const { addConnection } = useWorkflowDesigner();
 
-	const handleValueChange = useCallback(
-		(selectedValue: string) => {
-			if (!selectedValue || selectedValue === "") {
-				// When deselected, remove any existing connection
-				const existingConnection = workflow.connections.find(
-					(conn) =>
-						conn.inputNode.id === nodeId && conn.inputId === parameter.id,
-				);
-
-				if (existingConnection) {
-					deleteConnection(existingConnection.id);
-				}
+	const handleSelectOutput = useCallback(
+		(outputNode: Node, outputId: OutputId) => {
+			if (node === undefined) {
 				return;
 			}
-
-			const outputId = selectedValue as OutputId;
-			const selectedOutput = availableOutputs.find(
-				(output) => output.id === outputId,
-			);
-
-			if (!selectedOutput) return;
-
-			// Remove any existing connection for this input
-			const existingConnection = workflow.connections.find(
-				(conn) => conn.inputNode.id === nodeId && conn.inputId === parameter.id,
-			);
-
-			if (existingConnection) {
-				deleteConnection(existingConnection.id);
-			}
-
-			// Add the new connection
-			// addConnection({
-			// 	outputNode: { id: selectedOutput.node.id },
-			// 	outputId: selectedOutput.id,
-			// 	inputNode: { id: nodeId },
-			// 	inputId: parameter.id,
-			// });
+			addConnection({
+				outputNode,
+				outputId,
+				inputNode: node,
+				inputId: parameter.id,
+			});
 		},
-		[
-			nodeId,
-			parameter.id,
-			workflow.connections,
-			availableOutputs,
-			addConnection,
-			deleteConnection,
-		],
+		[node, addConnection, parameter],
 	);
 
 	return (
-		<Popover.Root>
-			<Popover.Trigger
+		<DropdownMenu.Root>
+			<DropdownMenu.Trigger
 				className={clsx(
 					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
 					"border border-transparent hover:border-white-800",
@@ -348,10 +280,9 @@ function SelectOutputPopover({
 				)}
 			>
 				Select Source
-			</Popover.Trigger>
-			<Popover.Anchor />
-			<Popover.Portal>
-				<Popover.Content
+			</DropdownMenu.Trigger>
+			<DropdownMenu.Portal>
+				<DropdownMenu.Content
 					className={clsx(
 						"relative w-[300px] py-[8px]",
 						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
@@ -366,12 +297,7 @@ function SelectOutputPopover({
 							"from-[hsl(232,_36%,_72%)]/40 to-[hsl(218,_58%,_21%)]/90",
 						)}
 					/>
-					<ToggleGroup.Root
-						type="single"
-						className="relative max-h-[300px] flex flex-col"
-						value={selectedOutputId ?? ""}
-						onValueChange={handleValueChange}
-					>
+					<div className="relative max-h-[300px] flex flex-col">
 						<div className="flex px-[16px] text-white-900">
 							Select Source For {parameter.label}
 						</div>
@@ -380,29 +306,59 @@ function SelectOutputPopover({
 						</div>
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
 							{groupedOutputs.generatedNodes.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+								<DropdownMenu.Group className="flex flex-col px-[8px]">
+									<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										Generated Content
-									</p>
+									</DropdownMenu.Label>
 									{groupedOutputs.generatedNodes.map((output) => (
-										<OutputToggleItem key={output.id} output={output} />
+										<DropdownMenu.Item
+											key={output.id}
+											className={clsx(
+												"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+												"text-white-400",
+												"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+											)}
+											textValue={output.id}
+											onSelect={() =>
+												handleSelectOutput(output.node, output.id)
+											}
+										>
+											<p className="text-[12px] truncate">
+												{defaultName(output.node)} / {output.label}
+											</p>
+										</DropdownMenu.Item>
 									))}
-								</div>
+								</DropdownMenu.Group>
 							)}
 							{groupedOutputs.textNodes.length > 0 && (
-								<div className="flex flex-col px-[8px]">
-									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+								<DropdownMenu.Group className="flex flex-col px-[8px]">
+									<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 										Text
-									</p>
+									</DropdownMenu.Label>
 									{groupedOutputs.textNodes.map((output) => (
-										<OutputToggleItem key={output.id} output={output} />
+										<DropdownMenu.Item
+											key={output.id}
+											className={clsx(
+												"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
+												"text-white-400",
+												"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+											)}
+											textValue={output.id}
+											onSelect={() =>
+												handleSelectOutput(output.node, output.id)
+											}
+										>
+											<p className="text-[12px] truncate">
+												{defaultName(output.node)} / {output.label}
+											</p>
+										</DropdownMenu.Item>
 									))}
-								</div>
+								</DropdownMenu.Group>
 							)}
 						</div>
-					</ToggleGroup.Root>
-				</Popover.Content>
-			</Popover.Portal>
-		</Popover.Root>
+					</div>
+				</DropdownMenu.Content>
+			</DropdownMenu.Portal>
+		</DropdownMenu.Root>
 	);
 }
