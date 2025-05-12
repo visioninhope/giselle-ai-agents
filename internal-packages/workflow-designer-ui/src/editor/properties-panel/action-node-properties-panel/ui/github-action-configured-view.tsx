@@ -11,7 +11,6 @@ import {
 import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { CheckIcon } from "lucide-react";
 import { DropdownMenu, type Popover, ToggleGroup } from "radix-ui";
 import { type ComponentProps, useCallback, useMemo, useState } from "react";
 import useSWR from "swr";
