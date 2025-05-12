@@ -57,6 +57,7 @@ const openAICostTable: Record<
 	"auto" | "low" | "medium" | "high",
 	Record<string, number>
 > = {
+	// pricing table: https://platform.openai.com/docs/pricing#image-generation
 	low: {
 		"1024x1024": 0.011,
 		"1024x1536": 0.016,
