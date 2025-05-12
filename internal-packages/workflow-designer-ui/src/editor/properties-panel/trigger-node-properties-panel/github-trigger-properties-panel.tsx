@@ -329,6 +329,7 @@ function Installed({
 						},
 					},
 					outputs: [...node.outputs, ...outputs],
+					name: trigger.event.label,
 				});
 			});
 		},
