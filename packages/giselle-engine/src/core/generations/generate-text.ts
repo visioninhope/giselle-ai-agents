@@ -391,6 +391,17 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
+			const tokenUsage = event.usage;
+
+			let costInfo = null;
+			const provider = operationNode.content.llm.provider;
+			const modelId = operationNode.content.llm.id;
+
+			if (tokenUsage) {
+				const { calculateCost } = await import("@giselle-sdk/language-model");
+				costInfo = calculateCost(provider, modelId, tokenUsage);
+			}
+
 			const reasoningOutput = generationContext.operationNode.outputs.find(
 				(output) => output.accessor === "reasoning",
 			);

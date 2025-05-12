@@ -25,6 +25,9 @@ import {
 } from "./perplexity";
 export * from "./base";
 export * from "./helper";
+export * from "./costs";
+export * from "./costs/pricing";
+export * from "./costs/model-prices";
 export {
 	getImageGenerationModelProvider,
 	falImageGenerationSizes as imageGenerationSizes,

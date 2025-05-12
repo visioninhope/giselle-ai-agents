@@ -1,6 +1,10 @@
 // Model cost in USD
 export type Cost = number;
 
+export function tokensToMegaTokens(tokens: number): number {
+	return tokens / 1_000_000;
+}
+
 /**
  * Base configuration for token-based pricing (flat rate)
  * Represents the simplest form of token pricing with a fixed cost per token
@@ -18,3 +22,42 @@ export type ModelPrice = {
 	validFrom: string;
 	price: TokenBasedPricing;
 };
+
+export interface TokenUsage {
+	input: number;
+	output: number;
+}
+
+export interface CostCalculator {
+	calculateCost(
+		modelId: string,
+		usage: TokenUsage,
+	): {
+		inputCost: Cost;
+		outputCost: Cost;
+		totalCost: Cost;
+	} | null;
+}
+
+export class TokenBasedCostCalculator implements CostCalculator {
+	constructor(
+		private readonly pricing: Record<string, { prices: ModelPrice[] }>,
+	) {}
+
+	calculateCost(modelId: string, usage: TokenUsage) {
+		const pricing = this.pricing[modelId]?.prices[0]?.price;
+		if (!pricing) return null;
+
+		const inputCost =
+			tokensToMegaTokens(usage.input) * pricing.input.costPerMegaToken;
+		const outputCost =
+			tokensToMegaTokens(usage.output) * pricing.output.costPerMegaToken;
+		const totalCost = inputCost + outputCost;
+
+		return {
+			inputCost,
+			outputCost,
+			totalCost,
+		};
+	}
+}
