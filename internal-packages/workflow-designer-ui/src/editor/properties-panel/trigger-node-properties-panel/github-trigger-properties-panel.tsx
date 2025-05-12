@@ -31,7 +31,6 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
-import { triggerNodeDefaultName } from "../../../utils";
 import { GitHubRepositoryBlock, SelectRepository } from "../ui";
 import { ConfiguredView } from "./ui";
 
