@@ -24,77 +24,65 @@ export function PerplexityModelPanel({
 	onModelChange: (changedValue: PerplexityLanguageModelData) => void;
 }) {
 	const limits = useUsageLimits();
-	const [domainInput, setDomainInput] = useState("");
-	const [listMode, setListMode] = useState(true);
-	const domains = getDomains();
+	const [allowlistInput, setAllowlistInput] = useState("");
+	const [denylistInput, setDenylistInput] = useState("");
 
-	// listMode: if no domains start with '-' then allowlist, if all domains start with '-' then denylist
-	useEffect(() => {
-		if (domains.length === 0) {
-			// Do nothing if domains is empty (allow user to toggle manually)
-			return;
-		}
-		setListMode(domains.every((d) => !d.startsWith("-")));
-	}, [domains]);
+	const allowlist = useMemo(
+		() =>
+			(perplexityLanguageModel.configurations.searchDomainFilter || []).filter(
+				(d) => !d.startsWith("-"),
+			),
+		[perplexityLanguageModel.configurations.searchDomainFilter],
+	);
+	const denylist = useMemo(
+		() =>
+			(perplexityLanguageModel.configurations.searchDomainFilter || []).filter(
+				(d) => d.startsWith("-"),
+			),
+		[perplexityLanguageModel.configurations.searchDomainFilter],
+	);
 
-	function getDomains() {
-		// Always return the raw searchDomainFilter array
-		return perplexityLanguageModel.configurations.searchDomainFilter || [];
+	function updateDomainFilter(newAllow: string[], newDeny: string[]) {
+		const merged = [...newAllow, ...newDeny];
+		onModelChange(
+			PerplexityLanguageModelData.parse({
+				...perplexityLanguageModel,
+				configurations: {
+					...perplexityLanguageModel.configurations,
+					searchDomainFilter: merged,
+				},
+			}),
+		);
 	}
 
-	function addDomain() {
-		const value = domainInput.trim();
+	function addAllowDomain() {
+		const value = allowlistInput.trim();
 		if (!value) return;
-		if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value.replace(/^\-/, "")))
-			return; // simple domain validation
-		if (domains.length >= 10) return;
-		if (domains.some((d) => d.replace(/^\-/, "") === value.replace(/^\-/, "")))
+		if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return;
+		if (allowlist.length + denylist.length >= 10) return;
+		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
-		// Add domain with or without '-' based on listMode
-		const newDomain = listMode
-			? value.replace(/^\-/, "")
-			: `-${value.replace(/^\-/, "")}`;
-		const newDomains = [...domains, newDomain];
-		onModelChange(
-			PerplexityLanguageModelData.parse({
-				...perplexityLanguageModel,
-				configurations: {
-					...perplexityLanguageModel.configurations,
-					searchDomainFilter: newDomains,
-				},
-			}),
-		);
-		setDomainInput("");
+		updateDomainFilter([...allowlist, value], denylist);
+		setAllowlistInput("");
 	}
 
-	function removeDomain(idx: number) {
-		const newDomains = domains.filter((_, i) => i !== idx);
-		onModelChange(
-			PerplexityLanguageModelData.parse({
-				...perplexityLanguageModel,
-				configurations: {
-					...perplexityLanguageModel.configurations,
-					searchDomainFilter: newDomains,
-				},
-			}),
-		);
+	function addDenyDomain() {
+		const value = denylistInput.trim();
+		if (!value) return;
+		if (!/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/.test(value)) return;
+		if (allowlist.length + denylist.length >= 10) return;
+		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
+		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
+		setDenylistInput("");
 	}
 
-	// When switching allowlist/denylist mode, convert all domains accordingly
-	function handleModeSwitch(checked: boolean) {
-		setListMode(checked);
-		const convertedDomains = checked
-			? domains.map((d) => d.replace(/^\-/, "")) // to allowlist (remove '-')
-			: domains.map((d) => (d.startsWith("-") ? d : `-${d}`)); // to denylist (add '-')
-		onModelChange(
-			PerplexityLanguageModelData.parse({
-				...perplexityLanguageModel,
-				configurations: {
-					...perplexityLanguageModel.configurations,
-					searchDomainFilter: convertedDomains,
-				},
-			}),
-		);
+	function removeAllowDomain(idx: number) {
+		const newAllow = allowlist.filter((_, i) => i !== idx);
+		updateDomainFilter(newAllow, denylist);
+	}
+	function removeDenyDomain(idx: number) {
+		const newDeny = denylist.filter((_, i) => i !== idx);
+		updateDomainFilter(allowlist, newDeny);
 	}
 
 	return (
@@ -207,61 +195,99 @@ export function PerplexityModelPanel({
 			{/* --- Search Domain Filter Section --- */}
 			<div className="flex flex-col gap-2 mt-8">
 				<span className="font-bold text-[15px]">Search Domain Filter</span>
-				<div className="flex items-center gap-4">
-					<span className="text-[13px]">Mode:</span>
-					<Switch
-						label={listMode ? "Allowlist" : "Denylist"}
-						name="search-domain-mode"
-						checked={listMode}
-						onCheckedChange={handleModeSwitch}
-					/>
-				</div>
-				<div className="flex items-center gap-2 mt-2">
+				{/* Allowlist Section */}
+				<span className="text-green-600 text-[14px] font-semibold mt-2">
+					✔ Allowlist ({allowlist.length})
+				</span>
+				<div className="flex items-center gap-2 mt-1">
 					<Input
-						placeholder="Add domain (e.g. wikipedia.org)"
-						value={domainInput}
-						onChange={(e) => setDomainInput(e.target.value)}
+						placeholder="Enter domain to include (e.g., example.com)"
+						value={allowlistInput}
+						onChange={(e) => setAllowlistInput(e.target.value)}
 						onKeyDown={(e) => {
-							if (e.key === "Enter") {
-								addDomain();
-							}
+							if (e.key === "Enter") addAllowDomain();
 						}}
 						maxLength={100}
-						disabled={domains.length >= 10}
+						disabled={allowlist.length + denylist.length >= 10}
 					/>
 					<Button
 						variant="outline"
 						size="sm"
-						disabled={domains.length >= 10 || !domainInput.trim()}
-						onClick={addDomain}
+						disabled={
+							allowlist.length + denylist.length >= 10 || !allowlistInput.trim()
+						}
+						onClick={addAllowDomain}
 					>
 						Add
 					</Button>
 				</div>
-				{domains.length >= 10 && (
-					<p className="text-red-700 text-[12px]">
-						You can add up to 10 domains only.
-					</p>
-				)}
 				<ul className="flex flex-wrap gap-2 mt-2">
-					{domains.map((domain, idx) => (
+					{allowlist.map((domain, idx) => (
 						<li
 							key={domain}
 							className="flex items-center bg-white-900/10 rounded px-2 py-1 text-[13px]"
 						>
-							{/* Display domain without '-' in denylist mode for clarity */}
-							{domain.replace(/^\-/, "")}
+							{domain}
 							<Button
 								variant="ghost"
 								size="sm"
 								className="ml-1 px-1"
-								onClick={() => removeDomain(idx)}
+								onClick={() => removeAllowDomain(idx)}
 							>
 								×
 							</Button>
 						</li>
 					))}
 				</ul>
+				{/* Denylist Section */}
+				<span className="text-red-600 text-[14px] font-semibold mt-4">
+					⛔ Denylist ({denylist.length})
+				</span>
+				<div className="flex items-center gap-2 mt-1">
+					<Input
+						placeholder="Enter domain to exclude (e.g., example.com)"
+						value={denylistInput}
+						onChange={(e) => setDenylistInput(e.target.value)}
+						onKeyDown={(e) => {
+							if (e.key === "Enter") addDenyDomain();
+						}}
+						maxLength={100}
+						disabled={allowlist.length + denylist.length >= 10}
+					/>
+					<Button
+						variant="outline"
+						size="sm"
+						disabled={
+							allowlist.length + denylist.length >= 10 || !denylistInput.trim()
+						}
+						onClick={addDenyDomain}
+					>
+						Add
+					</Button>
+				</div>
+				<ul className="flex flex-wrap gap-2 mt-2">
+					{denylist.map((domain, idx) => (
+						<li
+							key={domain}
+							className="flex items-center bg-white-900/10 rounded px-2 py-1 text-[13px]"
+						>
+							{domain.replace(/^\-/, "")}
+							<Button
+								variant="ghost"
+								size="sm"
+								className="ml-1 px-1"
+								onClick={() => removeDenyDomain(idx)}
+							>
+								×
+							</Button>
+						</li>
+					))}
+				</ul>
+				{allowlist.length + denylist.length >= 10 && (
+					<p className="text-red-700 text-[12px]">
+						You can add up to 10 domains only.
+					</p>
+				)}
 			</div>
 		</div>
 	);
