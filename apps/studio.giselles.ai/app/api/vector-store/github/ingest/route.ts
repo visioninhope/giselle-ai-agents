@@ -9,8 +9,10 @@ import {
 	type EmbeddingStore,
 	type GitHubBlobEmbedding,
 	type GitHubBlobEmbeddingKey,
+	type GitHubRepositoryIndexStore,
 	ingestBlobs,
 } from "@giselle-sdk/github-vector-store";
+import { captureException } from "@sentry/nextjs";
 import { and, eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
@@ -24,6 +26,7 @@ export async function GET(request: NextRequest) {
 
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
 	const embeddingStore = new EmbeddingStoreImpl();
+	const repositoryIndexStore = new RepositoryIndexStoreImpl();
 
 	for (const targetGitHubRepository of targetGitHubRepositories) {
 		const { owner, repo, installationId, lastIngestedCommitSha } =
@@ -37,6 +40,7 @@ export async function GET(request: NextRequest) {
 			dependencies: {
 				octokit,
 				embeddingStore,
+				repositoryIndexStore,
 			},
 		});
 	}
@@ -133,5 +137,49 @@ class EmbeddingStoreImpl implements EmbeddingStore {
 	async update(data: GitHubBlobEmbedding) {
 		this.delete(data);
 		this.insert(data);
+	}
+}
+
+class RepositoryIndexStoreImpl implements GitHubRepositoryIndexStore {
+	async startIngestion(owner: string, repo: string) {
+		await db
+			.update(githubRepositoryIndex)
+			.set({ status: "running" })
+			.where(
+				and(
+					eq(githubRepositoryIndex.owner, owner),
+					eq(githubRepositoryIndex.repo, repo),
+				),
+			);
+	}
+
+	async completeIngestion(owner: string, repo: string, commitSha: string) {
+		await db
+			.update(githubRepositoryIndex)
+			.set({ status: "completed", lastIngestedCommitSha: commitSha })
+			.where(
+				and(
+					eq(githubRepositoryIndex.owner, owner),
+					eq(githubRepositoryIndex.repo, repo),
+				),
+			);
+	}
+
+	async failIngestion(owner: string, repo: string, error: string) {
+		captureException(error, {
+			extra: {
+				owner,
+				repo,
+			},
+		});
+		await db
+			.update(githubRepositoryIndex)
+			.set({ status: "failed" })
+			.where(
+				and(
+					eq(githubRepositoryIndex.owner, owner),
+					eq(githubRepositoryIndex.repo, repo),
+				),
+			);
 	}
 }
