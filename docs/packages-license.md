@@ -6833,7 +6833,7 @@ CC-BY-4.0 permitted
 
 
 <a name="es-module-lexer"></a>
-### es-module-lexer v1.6.0
+### es-module-lexer v1.7.0
 #### 
 
 ##### Paths
