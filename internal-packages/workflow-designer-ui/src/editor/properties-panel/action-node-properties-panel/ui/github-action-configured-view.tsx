@@ -1,5 +1,5 @@
 import {
-	type Connection,
+	type ConnectionId,
 	type GitHubActionCommandCofiguredState,
 	type Input,
 	type Node,
@@ -11,8 +11,9 @@ import {
 import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import { TrashIcon } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
 import { defaultName } from "../../../../utils";
@@ -21,7 +22,7 @@ import type { InputWithConnectedOutput } from "../lib";
 
 export function GitHubActionConfiguredView({
 	nodeId,
-	inputs,
+	inputs: nodeInputs,
 	state,
 }: {
 	nodeId: NodeId;
@@ -29,6 +30,7 @@ export function GitHubActionConfiguredView({
 	state: GitHubActionCommandCofiguredState;
 }) {
 	const client = useGiselleEngine();
+	const { deleteConnection } = useWorkflowDesigner();
 	const { isLoading, data } = useSWR(
 		{
 			installationId: state.installationId,
@@ -53,23 +55,27 @@ export function GitHubActionConfiguredView({
 		throw new Error(`Action with id ${state.commandId} not found`);
 	}
 
-	const { data: workflow } = useWorkflowDesigner();
-	const parameters = useMemo(() => {
+	const { data: workspace } = useWorkflowDesigner();
+	const inputs = useMemo(() => {
 		const tmp: InputWithConnectedOutput[] = [];
-		const connectionsToThisNode = workflow.connections.filter(
+		const connectionsToThisNode = workspace.connections.filter(
 			(connection) => connection.inputNode.id === nodeId,
 		);
-		for (const input of inputs) {
+		for (const input of nodeInputs) {
 			const connectedConnection = connectionsToThisNode.find(
 				(connection) => connection.inputId === input.id,
 			);
-			const connectedNode = workflow.nodes.find(
+			const connectedNode = workspace.nodes.find(
 				(node) => node.id === connectedConnection?.outputNode.id,
 			);
 			const connectedOutput = connectedNode?.outputs.find(
 				(output) => output.id === connectedConnection?.outputId,
 			);
-			if (connectedNode === undefined || connectedOutput === undefined) {
+			if (
+				connectedConnection === undefined ||
+				connectedNode === undefined ||
+				connectedOutput === undefined
+			) {
 				tmp.push(input);
 				continue;
 			}
@@ -77,12 +83,20 @@ export function GitHubActionConfiguredView({
 				...input,
 				connectedOutput: {
 					...connectedOutput,
+					connectionId: connectedConnection.id,
 					node: connectedNode,
 				},
 			});
 		}
 		return tmp;
-	}, [inputs, nodeId, workflow]);
+	}, [nodeInputs, nodeId, workspace]);
+
+	const handleClickRemoveButton = useCallback(
+		(connectionId: ConnectionId) => () => {
+			deleteConnection(connectionId);
+		},
+		[deleteConnection],
+	);
 
 	return (
 		<div className="flex flex-col gap-[17px] p-0">
@@ -111,18 +125,18 @@ export function GitHubActionConfiguredView({
 				<p className="text-[14px] py-[1.5px] text-white-400">Parameter</p>
 				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
 					<ul className="w-full border-collapse divide-y divide-black-400">
-						{parameters.map((parameter) => (
+						{inputs.map((input) => (
 							<li
-								key={parameter.id}
+								key={input.id}
 								className="py-[12px] flex items-center justify-between"
 							>
 								<div className="flex items-center gap-[4px]">
-									<p className="text-[16px]">{parameter.label}</p>
-									{parameter.isRequired ? (
+									<p className="text-[16px]">{input.label}</p>
+									{input.isRequired ? (
 										<span
 											className={clsx(
 												"px-2 py-0.5 rounded text-[12px]",
-												parameter.connectedOutput === undefined
+												input.connectedOutput === undefined
 													? "bg-red-950/30 text-red-400 border border-red-500/30"
 													: "bg-slate-800 text-slate-300",
 											)}
@@ -135,23 +149,31 @@ export function GitHubActionConfiguredView({
 										</span>
 									)}
 								</div>
-								{parameter.connectedOutput ? (
-									<div className="flex items-center border border-black-400 px-[12px] py-[8px] rounded-[4px] gap-[4px]">
-										<NodeIcon
-											node={parameter.connectedOutput.node}
-											className="size-[14px]"
-										/>
-										<span>{defaultName(parameter.connectedOutput.node)}</span>
-										<span>/</span>
-										<span>{parameter.connectedOutput.label}</span>
+								{input.connectedOutput ? (
+									<div className="group flex items-center border border-black-400 px-[12px] py-[8px] rounded-[4px] gap-[6px] justify-between w-[300px]">
+										<div className="flex items-center gap-[6px] whitespace-nowrap overflow-x-hidden flex-1 min-w-[0px]">
+											<NodeIcon
+												node={input.connectedOutput.node}
+												className="size-[14px] shrink-0"
+											/>
+											<p className="truncate">
+												{defaultName(input.connectedOutput.node)} /{" "}
+												{input.connectedOutput.label}
+											</p>
+										</div>
+										<button
+											type="button"
+											className="hidden group-hover:block px-[4px] h-[20px] bg-transparent hover:bg-white-900/20 rounded-[4px] transition-colors mr-[2px] flex-shrink-0 cursor-pointer"
+											onClick={handleClickRemoveButton(
+												input.connectedOutput.connectionId,
+											)}
+										>
+											<TrashIcon className="size-[16px] stroke-current stroke-[1px] " />
+										</button>
 									</div>
 								) : (
 									<div className="flex-end">
-										<SelectOutputPopover
-											nodeId={nodeId}
-											parameter={parameter}
-											workflow={workflow}
-										/>
+										<SelectOutputPopover nodeId={nodeId} input={input} />
 									</div>
 								)}
 							</li>
@@ -167,78 +189,36 @@ type OutputWithDetails = {
 	id: OutputId;
 	label: string;
 	node: Node;
-	connection?: {
-		inputNode: { id: NodeId };
-		outputNode: { id: NodeId };
-		inputId: string;
-		outputId: string;
-	};
 };
 
 function SelectOutputPopover({
 	nodeId,
-	parameter,
-	workflow,
+	input,
 }: {
 	nodeId: NodeId;
-	parameter: InputWithConnectedOutput;
-	workflow: { nodes: Node[]; connections: Connection[] };
+	input: InputWithConnectedOutput;
 }) {
-	const [selectedOutputId, setSelectedOutputId] = useState<OutputId | null>(
-		parameter.connectedOutput
-			? (parameter.connectedOutput.id as OutputId)
-			: null,
-	);
+	const { data } = useWorkflowDesigner();
 
-	// Get target node from context
 	const node = useMemo(
-		() => workflow.nodes.find((n) => n.id === nodeId),
-		[workflow.nodes, nodeId],
+		() => data.nodes.find((n) => n.id === nodeId),
+		[data.nodes, nodeId],
 	);
 
-	// Get available outputs from all nodes
-	const availableOutputs = useMemo(() => {
-		if (!node) return [];
-
-		const outputs: OutputWithDetails[] = [];
-
-		for (const sourceNode of workflow.nodes) {
-			if (sourceNode.id === nodeId) continue; // Skip self
-
-			if (sourceNode.outputs) {
-				for (const output of sourceNode.outputs) {
-					// Find if this output is already connected to this input
-					const connection = workflow.connections.find(
-						(conn) =>
-							conn.outputNode.id === sourceNode.id &&
-							conn.outputId === output.id &&
-							conn.inputNode.id === nodeId &&
-							conn.inputId === parameter.id,
-					);
-
-					outputs.push({
-						id: output.id as OutputId,
-						label: output.label,
-						node: sourceNode,
-						connection,
-					});
-				}
-			}
-		}
-
-		return outputs;
-	}, [workflow, nodeId, parameter.id, node]);
-
-	// Group outputs by node type
 	const groupedOutputs = useMemo(() => {
 		const textNodes: OutputWithDetails[] = [];
 		const generatedNodes: OutputWithDetails[] = [];
 
-		for (const output of availableOutputs) {
-			if (isTextGenerationNode(output.node)) {
-				generatedNodes.push(output);
-			} else if (isTextNode(output.node)) {
-				textNodes.push(output);
+		for (const node of data.nodes) {
+			if (node.id === nodeId) {
+				continue;
+			}
+			for (const output of node.outputs) {
+				if (isTextGenerationNode(node)) {
+					generatedNodes.push({ ...output, node });
+				} else if (isTextNode(node)) {
+					textNodes.push({ ...output, node });
+				}
 			}
 		}
 
@@ -246,7 +226,7 @@ function SelectOutputPopover({
 			{ label: "Generated Content", nodes: generatedNodes },
 			{ label: "Text", nodes: textNodes },
 		];
-	}, [availableOutputs]);
+	}, [data.nodes, nodeId]);
 
 	const { addConnection } = useWorkflowDesigner();
 
@@ -259,10 +239,10 @@ function SelectOutputPopover({
 				outputNode,
 				outputId,
 				inputNode: node,
-				inputId: parameter.id,
+				inputId: input.id,
 			});
 		},
-		[node, addConnection, parameter],
+		[node, addConnection, input],
 	);
 
 	return (
@@ -293,12 +273,6 @@ function SelectOutputPopover({
 						)}
 					/>
 					<div className="relative max-h-[300px] flex flex-col">
-						<div className="flex px-[16px] text-white-900">
-							Select Source For {parameter.label}
-						</div>
-						<div className="flex flex-col py-[4px]">
-							<div className="border-t border-black-300/20" />
-						</div>
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
 							{groupedOutputs.map((groupedOutput) =>
 								groupedOutput.nodes.length === 0 ? null : (
