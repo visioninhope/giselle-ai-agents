@@ -34,4 +34,22 @@ describe("calculateCost", () => {
 			});
 		});
 	});
+
+	describe("Floating point precision", () => {
+		it("should handle very small token counts precisely", async () => {
+			const result = await calculateCost("openai", "gpt-4.1", {
+				promptTokens: 1,
+				completionTokens: 1,
+			});
+
+			// 1 token = 0.000001 mega tokens
+			// input: 0.000001 * 2.0 = 0.000002
+			// output: 0.000001 * 8.0 = 0.000008
+			expect(result).toEqual({
+				inputCost: 0.000002,
+				outputCost: 0.000008,
+				totalCost: 0.000009999999999999999,
+			});
+		});
+	});
 });
