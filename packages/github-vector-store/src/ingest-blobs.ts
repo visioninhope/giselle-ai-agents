@@ -2,13 +2,7 @@ import type { Octokit } from "@octokit/core";
 import { chunkByLines } from "./chunk";
 import { embed } from "./embed";
 
-export interface EmbeddingStore {
-	insert(data: GitHubBlobEmbedding): Promise<void>;
-	update(data: GitHubBlobEmbedding): Promise<void>;
-	delete(key: GitHubBlobEmbeddingKey): Promise<void>;
-}
-
-export interface GitHubRepositoryIndexStore {
+export interface GitHubRepositoryEmbeddingStore {
 	startIngestion(owner: string, repo: string): Promise<void>;
 	completeIngestion(
 		owner: string,
@@ -18,6 +12,10 @@ export interface GitHubRepositoryIndexStore {
 	failIngestion(owner: string, repo: string, error: string): Promise<void>;
 	// TODO: When ingestion is implemented as a queue, we need to check if the all ingestion job is completed like this:
 	// allIngestionCompleted(owner: string, repo: string): Promise<boolean>;
+
+	insertBlobEmbedding(data: GitHubBlobEmbedding): Promise<void>;
+	updateBlobEmbedding(data: GitHubBlobEmbedding): Promise<void>;
+	deleteBlobEmbedding(key: GitHubBlobEmbeddingKey): Promise<void>;
 }
 
 export type GitHubBlobEmbedding = {
@@ -43,23 +41,16 @@ type IngestBlobsParams = {
 	lastIngestedCommitSha: string | null;
 	dependencies: {
 		octokit: Octokit;
-		embeddingStore: EmbeddingStore;
-		repositoryIndexStore: GitHubRepositoryIndexStore;
+		embeddingStore: GitHubRepositoryEmbeddingStore;
 	};
 };
 
 export async function ingestBlobs(params: IngestBlobsParams) {
 	const { owner, repo, lastIngestedCommitSha, dependencies } = params;
-	const { octokit, embeddingStore, repositoryIndexStore } = dependencies;
+	const { octokit, embeddingStore } = dependencies;
 
 	if (lastIngestedCommitSha == null) {
-		await fullIngest(
-			octokit,
-			owner,
-			repo,
-			embeddingStore,
-			repositoryIndexStore,
-		);
+		await fullIngest(octokit, owner, repo, embeddingStore);
 	} else {
 		await diffIngest(
 			octokit,
@@ -67,7 +58,6 @@ export async function ingestBlobs(params: IngestBlobsParams) {
 			repo,
 			lastIngestedCommitSha,
 			embeddingStore,
-			repositoryIndexStore,
 		);
 	}
 }
@@ -76,14 +66,13 @@ async function fullIngest(
 	octokit: Octokit,
 	owner: string,
 	repo: string,
-	embeddingStore: EmbeddingStore,
-	repositoryIndexStore: GitHubRepositoryIndexStore,
+	embeddingStore: GitHubRepositoryEmbeddingStore,
 	maxBlobSize: number = 1 * 1024 * 1024, // 1MiB
 ) {
 	const head = await fetchDefaultBranchHead(octokit, owner, repo);
 	const commitSha = head.sha;
 	try {
-		await repositoryIndexStore.startIngestion(owner, repo);
+		await embeddingStore.startIngestion(owner, repo);
 		for await (const entry of traverseTree(octokit, owner, repo, commitSha)) {
 			const { path, type, sha: fileSha, size } = entry;
 
@@ -112,17 +101,16 @@ async function fullIngest(
 				fileSha,
 				commitSha,
 				embeddingStore,
-				repositoryIndexStore,
 			);
 		}
 
 		// TODO: When we implement ingestion as a queue, this method should be called in an ingestBlob Job with checking if the all ingestion job is completed
-		await repositoryIndexStore.completeIngestion(owner, repo, commitSha);
+		await embeddingStore.completeIngestion(owner, repo, commitSha);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			await repositoryIndexStore.failIngestion(owner, repo, error.message);
+			await embeddingStore.failIngestion(owner, repo, error.message);
 		} else {
-			await repositoryIndexStore.failIngestion(owner, repo, String(error));
+			await embeddingStore.failIngestion(owner, repo, String(error));
 		}
 	}
 }
@@ -133,8 +121,7 @@ async function diffIngest(
 	owner: string,
 	repo: string,
 	lastIngestedCommitSha: string,
-	embeddingStore: EmbeddingStore,
-	repositoryIndexStore: GitHubRepositoryIndexStore,
+	embeddingStore: GitHubRepositoryEmbeddingStore,
 ) {
 	throw new Error("Not implemented");
 }
@@ -146,8 +133,7 @@ async function ingestBlob(
 	path: string,
 	fileSha: string,
 	commitSha: string,
-	embeddingStore: EmbeddingStore,
-	repositoryIndexStore: GitHubRepositoryIndexStore,
+	embeddingStore: GitHubRepositoryEmbeddingStore,
 ) {
 	// fetch
 	const blob = await fetchBlob(octokit, owner, repo, fileSha);
@@ -164,7 +150,7 @@ async function ingestBlob(
 		// embed
 		const embedding = await embed(chunk.content);
 		// store
-		await embeddingStore.insert({
+		await embeddingStore.insertBlobEmbedding({
 			owner,
 			repo,
 			commitSha,

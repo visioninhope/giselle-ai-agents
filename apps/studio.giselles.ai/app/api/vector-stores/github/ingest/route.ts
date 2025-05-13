@@ -5,10 +5,9 @@ import {
 } from "@/drizzle";
 import { buildAppInstallationClient } from "@/services/external/github";
 import {
-	type EmbeddingStore,
 	type GitHubBlobEmbedding,
 	type GitHubBlobEmbeddingKey,
-	type GitHubRepositoryIndexStore,
+	type GitHubRepositoryEmbeddingStore,
 	ingestBlobs,
 } from "@giselle-sdk/github-vector-store";
 import { captureException } from "@sentry/nextjs";
@@ -27,8 +26,7 @@ export async function GET(request: NextRequest) {
 	}
 
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
-	const embeddingStore = new EmbeddingStoreImpl();
-	const repositoryIndexStore = new RepositoryIndexStoreImpl();
+	const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl();
 
 	for (const targetGitHubRepository of targetGitHubRepositories) {
 		const { owner, repo, installationId, lastIngestedCommitSha } =
@@ -42,7 +40,6 @@ export async function GET(request: NextRequest) {
 			dependencies: {
 				octokit,
 				embeddingStore,
-				repositoryIndexStore,
 			},
 		});
 	}
@@ -82,7 +79,9 @@ async function fetchTargetGitHubRepositories(): Promise<
 	}));
 }
 
-class EmbeddingStoreImpl implements EmbeddingStore {
+class GitHubRepositoryEmbeddingStoreImpl
+	implements GitHubRepositoryEmbeddingStore
+{
 	private async getRepositoryIndexDbId(owner: string, repo: string) {
 		const records = await db
 			.select({ dbId: githubRepositoryIndex.dbId })
@@ -101,7 +100,7 @@ class EmbeddingStoreImpl implements EmbeddingStore {
 		return repositoryIndex.dbId;
 	}
 
-	async insert(data: GitHubBlobEmbedding) {
+	async insertBlobEmbedding(data: GitHubBlobEmbedding) {
 		const repositoryIndexDbId = await this.getRepositoryIndexDbId(
 			data.owner,
 			data.repo,
@@ -118,7 +117,7 @@ class EmbeddingStoreImpl implements EmbeddingStore {
 		});
 	}
 
-	async delete(key: GitHubBlobEmbeddingKey) {
+	async deleteBlobEmbedding(key: GitHubBlobEmbeddingKey) {
 		const repositoryIndexDbId = await this.getRepositoryIndexDbId(
 			key.owner,
 			key.repo,
@@ -136,13 +135,11 @@ class EmbeddingStoreImpl implements EmbeddingStore {
 			);
 	}
 
-	async update(data: GitHubBlobEmbedding) {
-		this.delete(data);
-		this.insert(data);
+	async updateBlobEmbedding(data: GitHubBlobEmbedding) {
+		this.deleteBlobEmbedding(data);
+		this.insertBlobEmbedding(data);
 	}
-}
 
-class RepositoryIndexStoreImpl implements GitHubRepositoryIndexStore {
 	async startIngestion(owner: string, repo: string) {
 		await db
 			.update(githubRepositoryIndex)
