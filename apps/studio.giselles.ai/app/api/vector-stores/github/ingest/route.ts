@@ -83,21 +83,23 @@ class GitHubRepositoryEmbeddingStoreImpl
 	implements GitHubRepositoryEmbeddingStore
 {
 	private async getRepositoryIndexDbId(owner: string, repo: string) {
-		const records = await db
-			.select({ dbId: githubRepositoryIndex.dbId })
-			.from(githubRepositoryIndex)
-			.where(
-				and(
-					eq(githubRepositoryIndex.owner, owner),
-					eq(githubRepositoryIndex.repo, repo),
-				),
-			)
-			.limit(1);
-		const repositoryIndex = records[0];
-		if (repositoryIndex == null) {
-			throw new Error(`Repository index not found: ${owner}/${repo}`);
-		}
-		return repositoryIndex.dbId;
+		return this.withPgRetry(async () => {
+			const records = await db
+				.select({ dbId: githubRepositoryIndex.dbId })
+				.from(githubRepositoryIndex)
+				.where(
+					and(
+						eq(githubRepositoryIndex.owner, owner),
+						eq(githubRepositoryIndex.repo, repo),
+					),
+				)
+				.limit(1);
+			const repositoryIndex = records[0];
+			if (repositoryIndex == null) {
+				throw new Error(`Repository index not found: ${owner}/${repo}`);
+			}
+			return repositoryIndex.dbId;
+		});
 	}
 
 	async insertBlobEmbedding(data: GitHubBlobEmbedding) {
@@ -105,15 +107,20 @@ class GitHubRepositoryEmbeddingStoreImpl
 			data.owner,
 			data.repo,
 		);
-		await db.insert(githubRepositoryEmbeddings).values({
-			repositoryIndexDbId,
-			commitSha: data.commitSha,
-			fileSha: data.fileSha,
-			path: data.path,
-			nodeId: data.nodeId,
-			embedding: data.embedding,
-			chunkIndex: data.chunkIndex,
-			chunkContent: data.chunkContent,
+		await this.withPgRetry(async () => {
+			await db
+				.insert(githubRepositoryEmbeddings)
+				.values({
+					repositoryIndexDbId,
+					commitSha: data.commitSha,
+					fileSha: data.fileSha,
+					path: data.path,
+					nodeId: data.nodeId,
+					embedding: data.embedding,
+					chunkIndex: data.chunkIndex,
+					chunkContent: data.chunkContent,
+				})
+				.onConflictDoNothing();
 		});
 	}
 
@@ -122,46 +129,53 @@ class GitHubRepositoryEmbeddingStoreImpl
 			key.owner,
 			key.repo,
 		);
-		await db
-			.delete(githubRepositoryEmbeddings)
-			.where(
-				and(
-					eq(
-						githubRepositoryEmbeddings.repositoryIndexDbId,
-						repositoryIndexDbId,
+		await this.withPgRetry(async () => {
+			await db
+				.delete(githubRepositoryEmbeddings)
+				.where(
+					and(
+						eq(
+							githubRepositoryEmbeddings.repositoryIndexDbId,
+							repositoryIndexDbId,
+						),
+						eq(githubRepositoryEmbeddings.path, key.path),
 					),
-					eq(githubRepositoryEmbeddings.path, key.path),
-				),
-			);
+				);
+		});
 	}
 
 	async updateBlobEmbedding(data: GitHubBlobEmbedding) {
-		this.deleteBlobEmbedding(data);
-		this.insertBlobEmbedding(data);
+		// retry is done in deleteBlobEmbedding and insertBlobEmbedding
+		await this.deleteBlobEmbedding(data);
+		await this.insertBlobEmbedding(data);
 	}
 
 	async startIngestion(owner: string, repo: string) {
-		await db
-			.update(githubRepositoryIndex)
-			.set({ status: "running" })
-			.where(
-				and(
-					eq(githubRepositoryIndex.owner, owner),
-					eq(githubRepositoryIndex.repo, repo),
-				),
-			);
+		await this.withPgRetry(async () => {
+			await db
+				.update(githubRepositoryIndex)
+				.set({ status: "running" })
+				.where(
+					and(
+						eq(githubRepositoryIndex.owner, owner),
+						eq(githubRepositoryIndex.repo, repo),
+					),
+				);
+		});
 	}
 
 	async completeIngestion(owner: string, repo: string, commitSha: string) {
-		await db
-			.update(githubRepositoryIndex)
-			.set({ status: "completed", lastIngestedCommitSha: commitSha })
-			.where(
-				and(
-					eq(githubRepositoryIndex.owner, owner),
-					eq(githubRepositoryIndex.repo, repo),
-				),
-			);
+		await this.withPgRetry(async () => {
+			await db
+				.update(githubRepositoryIndex)
+				.set({ status: "completed", lastIngestedCommitSha: commitSha })
+				.where(
+					and(
+						eq(githubRepositoryIndex.owner, owner),
+						eq(githubRepositoryIndex.repo, repo),
+					),
+				);
+		});
 	}
 
 	async failIngestion(owner: string, repo: string, error: string) {
@@ -171,14 +185,64 @@ class GitHubRepositoryEmbeddingStoreImpl
 				repo,
 			},
 		});
-		await db
-			.update(githubRepositoryIndex)
-			.set({ status: "failed" })
-			.where(
-				and(
-					eq(githubRepositoryIndex.owner, owner),
-					eq(githubRepositoryIndex.repo, repo),
-				),
-			);
+		await this.withPgRetry(async () => {
+			await db
+				.update(githubRepositoryIndex)
+				.set({ status: "failed" })
+				.where(
+					and(
+						eq(githubRepositoryIndex.owner, owner),
+						eq(githubRepositoryIndex.repo, repo),
+					),
+				);
+		});
+	}
+
+	// ingesting job may be a long running job, so it would be better to care transient errors
+	// https://www.postgresql.org/docs/16/errcodes-appendix.html
+	private TRANSIENT_CODES = new Set([
+		// Class 08 - Connection Exception
+		"08000",
+		"08003",
+		"08006",
+		"08001",
+		"08004",
+		"08007",
+		// Class 53 - Resource Exception
+		"53300", // too_many_connections
+		// Class 40 - Transaction Rollback
+		"40001", // serialization_failure
+		"40P01", // deadlock_detected
+	]);
+
+	private isTransientError(error: unknown) {
+		if (
+			typeof error === "object" &&
+			error !== null &&
+			"code" in error &&
+			typeof error.code === "string"
+		) {
+			return this.TRANSIENT_CODES.has(error.code);
+		}
+		return false;
+	}
+
+	private async withPgRetry<T>(
+		fn: () => Promise<T>,
+		attempt = 0,
+		maxAttempts = 4,
+	): Promise<T> {
+		try {
+			return await fn();
+		} catch (error: unknown) {
+			if (!this.isTransientError(error)) {
+				throw error;
+			}
+			if (attempt >= maxAttempts) {
+				throw error;
+			}
+			await new Promise((r) => setTimeout(r, 100 * 2 ** attempt));
+			return this.withPgRetry(fn, attempt + 1, maxAttempts);
+		}
 	}
 }
