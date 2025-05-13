@@ -6,8 +6,8 @@ import {
 	isActionNode,
 } from "@giselle-sdk/data-type";
 import { createIssue } from "@giselle-sdk/github-tool";
-import type { GiselleEngineContext } from "../types";
 import { setGeneration, setNodeGenerationIndex } from "../generations/utils";
+import type { GiselleEngineContext } from "../types";
 
 export async function executeAction(args: {
 	context: GiselleEngineContext;
