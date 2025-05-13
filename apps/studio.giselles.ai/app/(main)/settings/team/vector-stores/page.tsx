@@ -67,7 +67,7 @@ export default async function TeamVectorStorePage() {
 					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
-					Vector Store
+					Vector Stores
 				</h3>
 				<a
 					href="https://docs.giselles.ai/guides/settings/team/vector-store"
@@ -75,7 +75,7 @@ export default async function TeamVectorStorePage() {
 					rel="noopener noreferrer"
 					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
 				>
-					About Vector Store
+					About Vector Stores
 					<ExternalLink size={14} />
 				</a>
 			</div>

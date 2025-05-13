@@ -9,7 +9,7 @@ const menuItems = [
 	{ name: "Apps", path: "/apps" },
 	{ name: "Members", path: "/settings/team/members" },
 	{ name: "Integrations", path: "/settings/team/integrations" },
-	{ name: "Vector Store", path: "/settings/team/vector-store" },
+	{ name: "Vector Stores", path: "/settings/team/vector-stores" },
 	{ name: "Usage", path: "/settings/team/usage" },
 	{ name: "Team Settings", path: "/settings/team" },
 ];
@@ -30,7 +30,7 @@ export const Nav: FC<NavProps> = ({ githubVectorStoreFlag }) => {
 	// remove Vector Store link
 	const filteredMenuItems = githubVectorStoreFlag
 		? menuItems
-		: menuItems.filter((item) => item.name !== "Vector Store");
+		: menuItems.filter((item) => item.name !== "Vector Stores");
 
 	// find the best match path
 	let bestMatchPath = "";
