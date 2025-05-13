@@ -412,18 +412,6 @@ export async function generateText(args: {
 			if (sourceOutput !== undefined && event.sources.length > 0) {
 				const sources = await Promise.all(
 					event.sources.map(async (source) => {
-						// When using Gemini search grounding, source provides a proxy URL
-						// We need to access and resolve this proxy URL to get the actual redirect URL
-						if (isVertexAiHost(source.url)) {
-							const redirected = await getRedirectedUrlAndTitle(source.url);
-							return {
-								sourceType: "url",
-								id: source.id,
-								url: redirected.redirectedUrl,
-								title: redirected.title,
-								providerMetadata: source.providerMetadata,
-							} satisfies UrlSource;
-						}
 						return {
 							sourceType: "url",
 							id: source.id,
@@ -529,17 +517,6 @@ function generationModel(languageModel: TextGenerationLanguageModelData) {
 			throw new Error(`Unknown LLM provider: ${_exhaustiveCheck}`);
 		}
 	}
-}
-
-function isVertexAiHost(urlString: string): boolean {
-	// Disabling Vertex AI URL redirection due to frequent errors. Will monitor the impact.
-	return false;
-	// try {
-	// 	const parsedUrl = new URL(urlString);
-	// 	return ["vertexaisearch.cloud.google.com"].includes(parsedUrl.host);
-	// } catch (e) {
-	// 	return false;
-	// }
 }
 
 function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
