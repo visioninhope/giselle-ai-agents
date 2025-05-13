@@ -150,20 +150,6 @@ export class OpenAICostCalculator implements CostCalculator {
 		usage: ModelTokenUsage,
 	): Promise<CostResult> {
 		const validPrice = getValidPricing(modelId, openAiTokenPricing);
-
-		const inputCost = calculateTokenCost(
-			usage.promptTokens,
-			validPrice.price.input,
-		);
-		const outputCost = calculateTokenCost(
-			usage.completionTokens,
-			validPrice.price.output,
-		);
-
-		return {
-			input: inputCost,
-			output: outputCost,
-			total: inputCost + outputCost,
-		};
+		return calculateTokenCost(usage, validPrice.price);
 	}
 }

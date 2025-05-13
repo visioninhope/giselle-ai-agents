@@ -48,7 +48,7 @@ describe("calculateCost", () => {
 			expect(result).toEqual({
 				inputCost: 0.000002,
 				outputCost: 0.000008,
-				totalCost: 0.000009999999999999999,
+				totalCost: 0.00001,
 			});
 		});
 	});
