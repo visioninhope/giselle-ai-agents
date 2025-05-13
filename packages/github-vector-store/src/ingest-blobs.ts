@@ -183,10 +183,12 @@ async function fetchBlob(
 	owner: string,
 	repo: string,
 	fileSha: string,
+	currentAttempt = 0,
+	maxAttempt = 3,
 ) {
 	// Note This endpoint supports blobs up to 100 megabytes in size.
 	// https://docs.github.com/ja/rest/git/blobs?apiVersion=2022-11-28#get-a-blob
-	const { data: blobData } = await octokit.request(
+	const { data: blobData, status } = await octokit.request(
 		"GET /repos/{owner}/{repo}/git/blobs/{file_sha}",
 		{
 			owner,
@@ -194,6 +196,25 @@ async function fetchBlob(
 			file_sha: fileSha,
 		},
 	);
+	if (status >= 500) {
+		if (currentAttempt >= maxAttempt) {
+			throw new Error(
+				`Network error: ${status} when fetching ${owner}/${repo}/${fileSha}`,
+			);
+		}
+		// exponential backoff
+		await new Promise((resolve) =>
+			setTimeout(resolve, 2 ** currentAttempt * 100),
+		);
+		return fetchBlob(
+			octokit,
+			owner,
+			repo,
+			fileSha,
+			currentAttempt + 1,
+			maxAttempt,
+		);
+	}
 	if (blobData.encoding !== "base64") {
 		return null;
 	}
