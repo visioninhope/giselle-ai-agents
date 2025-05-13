@@ -1,18 +1,13 @@
 import { openai } from "@ai-sdk/openai";
-import { embed as embedCore } from "ai";
+import { embedMany as embedManyCore } from "ai";
 
-/**
- * Embed a text using OpenAI's embedding model
- * @param text - The text to embed
- * @returns The embedded text as an array of numbers
- */
-export async function embed(text: string): Promise<number[]> {
-	const { embedding } = await embedCore({
+export async function embedMany(chunks: string[]): Promise<number[][]> {
+	const { embeddings } = await embedManyCore({
 		model: openai.embedding("text-embedding-3-small"),
-		value: text,
+		values: chunks,
 		// we use default value (=2) for maxRetries
 		// https://ai-sdk.dev/docs/ai-sdk-core/embeddings#retries
 		// maxRetries: 2,
 	});
-	return embedding;
+	return embeddings;
 }
