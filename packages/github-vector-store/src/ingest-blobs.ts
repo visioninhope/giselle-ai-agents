@@ -9,7 +9,7 @@ export interface GitHubRepositoryEmbeddingStore {
 		repo: string,
 		commitSha: string,
 	): Promise<void>;
-	failIngestion(owner: string, repo: string, error: string): Promise<void>;
+	failIngestion(owner: string, repo: string, error: Error): Promise<void>;
 	// TODO: When ingestion is implemented as a queue, we need to check if the all ingestion job is completed like this:
 	// allIngestionCompleted(owner: string, repo: string): Promise<boolean>;
 
@@ -108,9 +108,13 @@ async function fullIngest(
 		await embeddingStore.completeIngestion(owner, repo, commitSha);
 	} catch (error: unknown) {
 		if (error instanceof Error) {
-			await embeddingStore.failIngestion(owner, repo, error.message);
+			await embeddingStore.failIngestion(owner, repo, error);
 		} else {
-			await embeddingStore.failIngestion(owner, repo, String(error));
+			await embeddingStore.failIngestion(
+				owner,
+				repo,
+				new Error(`Unknown error: ${String(error)}`),
+			);
 		}
 	}
 }
