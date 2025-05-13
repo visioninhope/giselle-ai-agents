@@ -55,7 +55,7 @@ export async function registerRepositoryIndex(
 		installationId,
 	});
 
-	revalidatePath("/settings/team/vector-store");
+	revalidatePath("/settings/team/vector-stores");
 }
 
 export async function deleteRepositoryIndex(indexId: GitHubRepositoryIndexId) {
@@ -68,5 +68,5 @@ export async function deleteRepositoryIndex(indexId: GitHubRepositoryIndexId) {
 				eq(githubRepositoryIndex.id, indexId),
 			),
 		);
-	revalidatePath("/settings/team/vector-store");
+	revalidatePath("/settings/team/vector-stores");
 }
