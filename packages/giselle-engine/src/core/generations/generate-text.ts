@@ -559,13 +559,16 @@ export async function generateText(args: {
 			isEnabled: args.context.telemetry?.isEnabled,
 			metadata: {
 				...args.telemetry?.metadata,
-				tags: generateTelemetryTags({
-					provider: operationNode.content.llm.provider,
-					languageModel,
-					toolSet: preparedToolSet.toolSet,
-					configurations: operationNode.content.llm.configurations,
-					providerOptions,
-				}),
+				tags: [
+					"auto-instrumented",
+					...generateTelemetryTags({
+						provider: operationNode.content.llm.provider,
+						languageModel,
+						toolSet: preparedToolSet.toolSet,
+						configurations: operationNode.content.llm.configurations,
+						providerOptions,
+					}),
+				],
 			},
 		},
 	});
