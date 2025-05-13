@@ -3,7 +3,6 @@ import {
 	githubRepositoryEmbeddings,
 	githubRepositoryIndex,
 } from "@/drizzle";
-import { githubVectorStoreFlag } from "@/flags";
 import { buildAppInstallationClient } from "@/services/external/github";
 import {
 	type EmbeddingStore,
@@ -16,12 +15,15 @@ import { captureException } from "@sentry/nextjs";
 import { and, eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 
+export const maxDuration = 800;
+
 // ingest GitHub Code
-// TODO: implement as a cron job
 export async function GET(request: NextRequest) {
-	const isEnabled = await githubVectorStoreFlag();
-	if (!isEnabled) {
-		return new Response("Vector store is disabled", { status: 400 });
+	const authHeader = request.headers.get("authorization");
+	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+		return new Response("Unauthorized", {
+			status: 401,
+		});
 	}
 
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
