@@ -1,7 +1,7 @@
 import {
 	type CompletedGeneration,
 	GenerationContext,
-	type GitHubActionCommandCofiguredState,
+	type GitHubActionCommandConfiguredState,
 	type QueuedGeneration,
 	isActionNode,
 } from "@giselle-sdk/data-type";
@@ -69,7 +69,7 @@ export async function executeAction(args: {
 }
 
 async function executeGitHubActionCommand(args: {
-	state: GitHubActionCommandCofiguredState;
+	state: GitHubActionCommandConfiguredState;
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {
