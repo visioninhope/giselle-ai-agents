@@ -1,6 +1,6 @@
 import type { Octokit } from "@octokit/core";
 import { chunkByLines } from "./chunk";
-import { embedMany } from "./embed";
+import { embed } from "./embed";
 
 export interface GitHubRepositoryEmbeddingStore {
 	startIngestion(owner: string, repo: string): Promise<void>;
@@ -147,14 +147,13 @@ async function ingestBlob(
 	}
 
 	// chunk
-	const chunks = chunkByLines(blob.content);
-	if (chunks.length === 0) return;
-
-	// embedMany
-	const embeddings = await embedMany(chunks);
-
-	// store
-	for (let i = 0; i < chunks.length; i++) {
+	for await (const chunk of chunkByLines(blob.content)) {
+		if (chunk.content.length === 0) {
+			continue;
+		}
+		// embed
+		const embedding = await embed(chunk.content);
+		// store
 		await embeddingStore.insertBlobEmbedding({
 			owner,
 			repo,
@@ -162,9 +161,9 @@ async function ingestBlob(
 			fileSha,
 			path,
 			nodeId: blob.nodeId,
-			chunkIndex: i,
-			chunkContent: chunks[i],
-			embedding: embeddings[i],
+			chunkIndex: chunk.index,
+			chunkContent: chunk.content,
+			embedding,
 		});
 	}
 }
