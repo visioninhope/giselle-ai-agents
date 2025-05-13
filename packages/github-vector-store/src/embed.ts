@@ -10,6 +10,9 @@ export async function embed(text: string): Promise<number[]> {
 	const { embedding } = await embedCore({
 		model: openai.embedding("text-embedding-3-small"),
 		value: text,
+		// we use default value (=2) for maxRetries
+		// https://ai-sdk.dev/docs/ai-sdk-core/embeddings#retries
+		// maxRetries: 2,
 	});
 	return embedding;
 }
