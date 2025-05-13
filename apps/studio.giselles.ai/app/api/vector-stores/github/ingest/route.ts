@@ -179,6 +179,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 	}
 
 	async failIngestion(owner: string, repo: string, error: string) {
+		console.error(error);
 		captureException(error, {
 			extra: {
 				owner,
