@@ -14,9 +14,9 @@ const GitHubActionCommandCofiguredState = z.object({
 	installationId: z.number(),
 	repositoryNodeId: z.string(),
 });
-export type GitHubActionCommandCofiguredState =
-	| z.infer<typeof GitHubActionCommandUnconfiguredState>
-	| z.infer<typeof GitHubActionCommandCofiguredState>;
+export type GitHubActionCommandCofiguredState = z.infer<
+	typeof GitHubActionCommandCofiguredState
+>;
 
 const GitHubActionCommandData = z.object({
 	provider: z.literal("github"),

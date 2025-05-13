@@ -1,19 +1,30 @@
 import type { ActionNode } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useCallback } from "react";
 import { NodeIcon } from "../../../icons/node";
+import { Button } from "../../../ui/button";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
 import { GitHubActionPropertiesPanel } from "./github-action-properties-panel";
+import { useConnectedInputs } from "./lib";
 
 export function ActionNodePropertiesPanel({
 	node,
 }: {
 	node: ActionNode;
 }) {
-	const { updateNodeData } = useWorkflowDesigner();
+	const { updateNodeData, setUiNodeState } = useWorkflowDesigner();
+	const { isValid } = useConnectedInputs(node.id, node.inputs);
+	const handleClick = useCallback(() => {
+		if (!isValid) {
+			setUiNodeState(node.id, {
+				showError: true,
+			});
+		}
+	}, [isValid, setUiNodeState, node.id]);
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
@@ -22,6 +33,13 @@ export function ActionNodePropertiesPanel({
 				onChangeName={(name) => {
 					updateNodeData(node, { name });
 				}}
+				action={
+					node.content.command.state.status === "unconfigured" ? null : (
+						<Button type="button" onClick={handleClick}>
+							Action
+						</Button>
+					)
+				}
 			/>
 			<PropertiesPanelContent>
 				<PropertiesPanel node={node} />

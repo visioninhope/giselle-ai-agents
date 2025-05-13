@@ -37,3 +37,16 @@ export const actions = [
 ] as const;
 
 export type ActionCommandId = (typeof actions)[number]["command"]["id"];
+
+export function actionIdToLabel(triggerId: ActionCommandId) {
+	switch (triggerId) {
+		case "github.create.issue":
+			return githubCreateIssueAction.command.label;
+		case "github.create.issueComment":
+			return githubCreateIssueCommentAction.command.label;
+		default: {
+			const exhaustiveCheck: never = triggerId;
+			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);
+		}
+	}
+}
