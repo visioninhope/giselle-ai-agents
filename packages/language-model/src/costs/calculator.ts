@@ -1,6 +1,6 @@
 import type { BaseTokenPrice, Cost, TokenBasedPricing } from "./pricing";
 import { tokensToMegaTokens } from "./pricing";
-import type { ModelUsage, TokenUsage } from "./usage";
+import type { ModelUsage, ModelTokenUsage } from "./usage";
 
 export interface CostResult {
 	input: Cost;
@@ -13,7 +13,7 @@ export interface CostResult {
  * All provider-specific configurations should extend this interface
  * and be defined in their respective provider files.
  */
-export interface CostCalculator<TUsage extends ModelUsage = TokenUsage> {
+export interface CostCalculator<TUsage extends ModelUsage = ModelTokenUsage> {
 	calculate(model: string, usage: TUsage): Promise<CostResult>;
 }
 

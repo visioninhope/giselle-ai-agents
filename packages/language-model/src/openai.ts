@@ -9,7 +9,7 @@ import {
 	Cost,
 	type CostCalculator,
 	type CostResult,
-	type TokenUsage,
+	type ModelTokenUsage,
 	calculateTokenCost,
 	getValidPricing,
 	openAiTokenPricing,
@@ -145,7 +145,7 @@ export const LanguageModel = OpenAILanguageModel;
 export type LanguageModel = OpenAILanguageModel;
 
 export class OpenAICostCalculator implements CostCalculator {
-	async calculate(modelId: string, usage: TokenUsage): Promise<CostResult> {
+	async calculate(modelId: string, usage: ModelTokenUsage): Promise<CostResult> {
 		const validPrice = getValidPricing(modelId, openAiTokenPricing);
 
 		const inputCost = calculateTokenCost(

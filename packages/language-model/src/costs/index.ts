@@ -4,7 +4,7 @@ export {
 	getValidPricing,
 	type ModelPriceTable,
 } from "./model-prices";
-export type { TokenUsage } from "./usage";
+export type { ModelTokenUsage } from "./usage";
 export { calculateTokenCost } from "./calculator";
 export type { CostCalculator, CostResult } from "./calculator";
 
