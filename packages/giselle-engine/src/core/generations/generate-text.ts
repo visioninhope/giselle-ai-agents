@@ -354,6 +354,19 @@ export async function generateText(args: {
 	// }
 
 	const providerOptions = getProviderOptions(operationNode.content.llm);
+
+	span.update({
+		metadata: {
+			tags: generateTelemetryTags({
+				provider: operationNode.content.llm.provider,
+				languageModel,
+				toolSet: preparedToolSet.toolSet,
+				configurations: operationNode.content.llm.configurations,
+				providerOptions,
+			}),
+		},
+	});
+
 	const streamTextResult = streamText({
 		model: generationModel(operationNode.content.llm),
 		providerOptions,
