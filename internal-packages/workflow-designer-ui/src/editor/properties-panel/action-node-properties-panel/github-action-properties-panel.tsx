@@ -1,4 +1,9 @@
-import { type ActionNode, type Input, InputId } from "@giselle-sdk/data-type";
+import {
+	type ActionNode,
+	type Input,
+	InputId,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import { actions, githubActions } from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
@@ -301,6 +306,13 @@ function Installed({
 				},
 				name: action.command.label,
 				inputs,
+				outputs: [
+					{
+						id: OutputId.generate(),
+						label: "output",
+						accessor: "text",
+					},
+				],
 			});
 		},
 		[node, updateNodeData, step],
