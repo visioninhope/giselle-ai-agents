@@ -31,11 +31,10 @@ import {
 	appendResponseMessages,
 	streamText,
 } from "ai";
-import { Langfuse } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { generateTelemetryTags } from "./telemetry";
+import { generateTelemetryTags, getLangfuseInstance } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -61,7 +60,7 @@ export async function generateText(args: {
 		throw new Error("Invalid generation type");
 	}
 
-	const langfuse = new Langfuse();
+	const langfuse = getLangfuseInstance();
 
 	const languageModel = languageModels.find(
 		(lm) => lm.id === operationNode.content.llm.id,

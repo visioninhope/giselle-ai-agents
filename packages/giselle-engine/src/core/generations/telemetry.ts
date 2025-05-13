@@ -1,6 +1,7 @@
 import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
+import { Langfuse } from "langfuse";
 
 type TelemetryTag =
 	// generic name
@@ -10,6 +11,15 @@ type TelemetryTag =
 	| "google:search-grounding"
 	| "anthropic:reasoning"
 	| "anthropic:thinking";
+
+let langfuseInstance: Langfuse | null = null;
+
+export function getLangfuseInstance(): Langfuse {
+	if (!langfuseInstance) {
+		langfuseInstance = new Langfuse();
+	}
+	return langfuseInstance;
+}
 
 export function generateTelemetryTags(args: {
 	provider: string;

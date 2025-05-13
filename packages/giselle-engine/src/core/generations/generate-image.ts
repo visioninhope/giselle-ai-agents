@@ -26,7 +26,8 @@ import {
 	type CoreMessage,
 	experimental_generateImage as generateImageAiSdk,
 } from "ai";
-import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
+import { type ApiMediaContentType, type Langfuse, LangfuseMedia } from "langfuse";
+import { getLangfuseInstance } from "./telemetry";
 import type { Storage } from "unstorage";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
@@ -60,7 +61,7 @@ export async function generateImage(args: {
 	if (!isImageGenerationNode(operationNode)) {
 		throw new Error("Invalid generation type");
 	}
-	const langfuse = new Langfuse();
+	const langfuse = getLangfuseInstance();
 	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
