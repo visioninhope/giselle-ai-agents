@@ -20,7 +20,7 @@ export interface CostCalculator<TUsage extends ModelUsage = TokenUsage> {
 export class DefaultCostCalculator implements CostCalculator {
 	constructor(private provider: string) {}
 
-	async calculate(): Promise<CostResult> {
+        async calculate(model: string, usage: ModelUsage): Promise<CostResult> {
 		console.log(`No cost calculator found for ${this.provider}`);
 		return { input: 0, output: 0, total: 0 };
 	}
