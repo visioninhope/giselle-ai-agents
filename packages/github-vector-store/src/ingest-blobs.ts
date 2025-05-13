@@ -194,6 +194,9 @@ async function fetchBlob(
 			file_sha: fileSha,
 		},
 	);
+	if (blobData.encoding !== "base64") {
+		return null;
+	}
 	const contentInBytes = Buffer.from(blobData.content, "base64");
 	// We want to know if the blob is binary or not, so we use the `fatal` option
 	const textDecoder = new TextDecoder("utf-8", { fatal: true });
