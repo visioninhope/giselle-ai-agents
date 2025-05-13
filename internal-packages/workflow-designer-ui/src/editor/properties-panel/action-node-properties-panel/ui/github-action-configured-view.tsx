@@ -11,7 +11,7 @@ import {
 import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { TrashIcon } from "lucide-react";
+import { TrashIcon, TriangleAlert } from "lucide-react";
 import { DropdownMenu } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
@@ -30,7 +30,10 @@ export function GitHubActionConfiguredView({
 	state: GitHubActionCommandCofiguredState;
 }) {
 	const client = useGiselleEngine();
-	const { deleteConnection } = useWorkflowDesigner();
+	const {
+		deleteConnection,
+		data: { ui },
+	} = useWorkflowDesigner();
 	const { isLoading, data } = useSWR(
 		{
 			installationId: state.installationId,
@@ -92,56 +95,63 @@ export function GitHubActionConfiguredView({
 				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
 					<ul className="w-full border-collapse divide-y divide-black-400">
 						{connectedInputs.map((input) => (
-							<li
-								key={input.id}
-								className="py-[12px] flex items-center justify-between"
-							>
-								<div className="flex items-center gap-[4px]">
-									<p className="text-[16px]">{input.label}</p>
-									{input.isRequired ? (
-										<span
-											className={clsx(
-												"px-2 py-0.5 rounded text-[12px]",
-												input.connectedOutput === undefined
-													? "bg-red-950/30 text-red-400 border border-red-500/30"
-													: "bg-slate-800 text-slate-300",
-											)}
-										>
-											Required
-										</span>
+							<li key={input.id} className="py-[12px]">
+								<div className=" flex items-center justify-between">
+									<div className="flex items-center gap-[4px]">
+										<p className="text-[16px]">{input.label}</p>
+										{input.isRequired ? (
+											<span
+												className={clsx(
+													"px-2 py-0.5 rounded text-[12px]",
+													input.connectedOutput === undefined
+														? "bg-error-900/30 text-error-900 border border-error-900/30"
+														: "text-green-900",
+												)}
+											>
+												Required
+											</span>
+										) : (
+											<span className="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-400">
+												Optional
+											</span>
+										)}
+									</div>
+									{input.connectedOutput ? (
+										<div className="group flex items-center border border-black-400 px-[12px] py-[8px] rounded-[4px] gap-[6px] justify-between w-[300px]">
+											<div className="flex items-center gap-[6px] whitespace-nowrap overflow-x-hidden flex-1 min-w-[0px]">
+												<NodeIcon
+													node={input.connectedOutput.node}
+													className="size-[14px] shrink-0"
+												/>
+												<p className="truncate">
+													{defaultName(input.connectedOutput.node)} /{" "}
+													{input.connectedOutput.label}
+												</p>
+											</div>
+											<button
+												type="button"
+												className="hidden group-hover:block px-[4px] h-[20px] bg-transparent hover:bg-white-900/20 rounded-[4px] transition-colors mr-[2px] flex-shrink-0 cursor-pointer"
+												onClick={handleClickRemoveButton(
+													input.connectedOutput.connectionId,
+												)}
+											>
+												<TrashIcon className="size-[16px] stroke-current stroke-[1px] " />
+											</button>
+										</div>
 									) : (
-										<span className="px-2 py-0.5 rounded text-xs bg-slate-800 text-slate-400">
-											Optional
-										</span>
+										<SelectOutputPopover nodeId={nodeId} input={input} />
 									)}
 								</div>
-								{input.connectedOutput ? (
-									<div className="group flex items-center border border-black-400 px-[12px] py-[8px] rounded-[4px] gap-[6px] justify-between w-[300px]">
-										<div className="flex items-center gap-[6px] whitespace-nowrap overflow-x-hidden flex-1 min-w-[0px]">
-											<NodeIcon
-												node={input.connectedOutput.node}
-												className="size-[14px] shrink-0"
-											/>
-											<p className="truncate">
-												{defaultName(input.connectedOutput.node)} /{" "}
-												{input.connectedOutput.label}
-											</p>
+								{ui.nodeState[nodeId]?.showError &&
+									input.isRequired &&
+									input.connectedOutput === undefined && (
+										<div className="flex justify-end">
+											<div className="text-red-900 flex items-center gap-[4px]">
+												<TriangleAlert className="size-[14px]" />
+												<span>Please choose a source</span>
+											</div>
 										</div>
-										<button
-											type="button"
-											className="hidden group-hover:block px-[4px] h-[20px] bg-transparent hover:bg-white-900/20 rounded-[4px] transition-colors mr-[2px] flex-shrink-0 cursor-pointer"
-											onClick={handleClickRemoveButton(
-												input.connectedOutput.connectionId,
-											)}
-										>
-											<TrashIcon className="size-[16px] stroke-current stroke-[1px] " />
-										</button>
-									</div>
-								) : (
-									<div className="flex-end">
-										<SelectOutputPopover nodeId={nodeId} input={input} />
-									</div>
-								)}
+									)}
 							</li>
 						))}
 					</ul>
