@@ -13,8 +13,6 @@ export const githubCreateIssueAction = {
 		id: "github.create.issue",
 		label: "Create Issue",
 		parameters: z.object({
-			repositoryOwner: z.string(),
-			repositoryName: z.string(),
 			title: z.string(),
 			body: z.string(),
 		}),
@@ -29,8 +27,6 @@ export const githubCreateIssueCommentAction = {
 		parameters: z.object({
 			issueNumber: z.number(),
 			body: z.string(),
-			repositoryOwner: z.string(),
-			repositoryName: z.string(),
 		}),
 	},
 } as const satisfies GitHubAction;

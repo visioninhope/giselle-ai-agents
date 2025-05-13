@@ -271,11 +271,7 @@ export const invitations = pgTable(
 	}),
 );
 
-export type GitHubRepositoryIndexStatus =
-	| "idle"
-	| "running"
-	| "completed"
-	| "failed";
+type GitHubRepositoryIndexStatus = "idle" | "running" | "completed" | "failed";
 export const githubRepositoryIndex = pgTable(
 	"github_repository_index",
 	{
@@ -299,7 +295,7 @@ export const githubRepositoryIndex = pgTable(
 			.$onUpdate(() => new Date()),
 	},
 	(table) => ({
-		ownerRepoIdx: index().on(table.owner, table.repo),
+		ownerRepoTeamUnique: unique().on(table.owner, table.repo, table.teamDbId),
 		teamDbIdIdx: index().on(table.teamDbId),
 		statusIdx: index().on(table.status),
 	}),
@@ -322,9 +318,10 @@ export const githubRepositoryEmbeddings = pgTable(
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 	},
 	(table) => ({
-		repositoryIndexDbIdFilePathIdx: index().on(
+		repositoryIndexDbIdFilePathChunkIndexUnique: unique().on(
 			table.repositoryIndexDbId,
 			table.path,
+			table.chunkIndex,
 		),
 		embeddingIndex: index().using(
 			"hnsw",
