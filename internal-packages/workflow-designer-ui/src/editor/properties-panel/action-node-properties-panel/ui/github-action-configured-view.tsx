@@ -18,11 +18,11 @@ import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
 import { defaultName } from "../../../../utils";
 import { GitHubRepositoryBlock } from "../../ui";
-import type { InputWithConnectedOutput } from "../lib";
+import { type InputWithConnectedOutput, useConnectedInputs } from "../lib";
 
 export function GitHubActionConfiguredView({
 	nodeId,
-	inputs: nodeInputs,
+	inputs,
 	state,
 }: {
 	nodeId: NodeId;
@@ -55,41 +55,7 @@ export function GitHubActionConfiguredView({
 		throw new Error(`Action with id ${state.commandId} not found`);
 	}
 
-	const { data: workspace } = useWorkflowDesigner();
-	const inputs = useMemo(() => {
-		const tmp: InputWithConnectedOutput[] = [];
-		const connectionsToThisNode = workspace.connections.filter(
-			(connection) => connection.inputNode.id === nodeId,
-		);
-		for (const input of nodeInputs) {
-			const connectedConnection = connectionsToThisNode.find(
-				(connection) => connection.inputId === input.id,
-			);
-			const connectedNode = workspace.nodes.find(
-				(node) => node.id === connectedConnection?.outputNode.id,
-			);
-			const connectedOutput = connectedNode?.outputs.find(
-				(output) => output.id === connectedConnection?.outputId,
-			);
-			if (
-				connectedConnection === undefined ||
-				connectedNode === undefined ||
-				connectedOutput === undefined
-			) {
-				tmp.push(input);
-				continue;
-			}
-			tmp.push({
-				...input,
-				connectedOutput: {
-					...connectedOutput,
-					connectionId: connectedConnection.id,
-					node: connectedNode,
-				},
-			});
-		}
-		return tmp;
-	}, [nodeInputs, nodeId, workspace]);
+	const { connectedInputs } = useConnectedInputs(nodeId, inputs);
 
 	const handleClickRemoveButton = useCallback(
 		(connectionId: ConnectionId) => () => {
@@ -125,7 +91,7 @@ export function GitHubActionConfiguredView({
 				<p className="text-[14px] py-[1.5px] text-white-400">Parameter</p>
 				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
 					<ul className="w-full border-collapse divide-y divide-black-400">
-						{inputs.map((input) => (
+						{connectedInputs.map((input) => (
 							<li
 								key={input.id}
 								className="py-[12px] flex items-center justify-between"
