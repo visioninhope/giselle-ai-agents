@@ -50,6 +50,11 @@ import {
 	setNodeGenerationIndex,
 } from "./utils";
 
+// PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
+export type PerplexityProviderOptions = {
+	search_domain_filter?: string[];
+};
+
 export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
@@ -491,7 +496,10 @@ export async function generateText(args: {
 					languageModel,
 					toolSet: preparedToolSet.toolSet,
 					configurations: operationNode.content.llm.configurations,
-					providerOptions,
+					providerOptions:
+						operationNode.content.llm.provider === "anthropic"
+							? providerOptions
+							: undefined,
 				}),
 			},
 		},
@@ -534,9 +542,12 @@ function isVertexAiHost(urlString: string): boolean {
 	// }
 }
 
-function getProviderOptions(
-	languageModelData: TextGenerationLanguageModelData,
-) {
+function getProviderOptions(languageModelData: TextGenerationLanguageModelData):
+	| {
+			anthropic?: AnthropicProviderOptions;
+			perplexity?: PerplexityProviderOptions;
+	  }
+	| undefined {
 	const languageModel = languageModels.find(
 		(model) => model.id === languageModelData.id,
 	);
@@ -553,7 +564,21 @@ function getProviderOptions(
 					// Based on Zed's configuration: https://github.com/zed-industries/zed/blob/9d10489607df700c544c48cf09fea82f5d5aacf8/crates/anthropic/src/anthropic.rs#L212
 					budgetTokens: 4096,
 				},
-			} satisfies AnthropicProviderOptions,
+			},
 		};
 	}
+	if (
+		languageModel &&
+		languageModelData.provider === "perplexity" &&
+		languageModelData.configurations.searchDomainFilter
+	) {
+		const { searchDomainFilter } = languageModelData.configurations;
+		return {
+			perplexity: {
+				// https://docs.perplexity.ai/guides/search-domain-filters
+				search_domain_filter: searchDomainFilter,
+			},
+		};
+	}
+	return undefined;
 }
