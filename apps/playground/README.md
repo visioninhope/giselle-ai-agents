@@ -45,3 +45,4 @@
 - [ ] Rename the output typename: generated-image to image
 - [ ] Restruct input/output resolver: text-generation panel
 - [ ] Refactor resolver: text generation resolver to operation resolver
+- [ ] Refector connectedInputs: based on connectedOutputs
