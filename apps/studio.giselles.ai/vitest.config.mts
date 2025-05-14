@@ -6,6 +6,7 @@ export default defineConfig({
 	plugins: [tsconfigPaths()],
 	test: {
 		environment: "node",
+		// Exclude E2E tests from Vitest since they are run with Playwright
 		exclude: [...configDefaults.exclude, "tests/e2e/**"],
 	},
 });
