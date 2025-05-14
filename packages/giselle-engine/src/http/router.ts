@@ -22,7 +22,7 @@ import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 
-export const workspaceRouters = {
+export const createJsonRouters = {
 	createWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			handler: async () => {
@@ -56,43 +56,6 @@ export const workspaceRouters = {
 				return JsonResponse.json(providers);
 			},
 		}),
-	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
-			}),
-			handler: async ({ input }) => {
-				await giselleEngine.upsertGithubIntegrationSetting(
-					input.workspaceGitHubIntegrationSetting,
-				);
-				return new Response(null, { status: 204 });
-			},
-		}),
-	getWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-			}),
-			handler: async ({ input }) => {
-				const workspaceGitHubIntegrationSetting =
-					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
-						input.workspaceId,
-					);
-				return JsonResponse.json({
-					workspaceGitHubIntegrationSetting,
-				});
-			},
-		}),
-	createSampleWorkspace: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			handler: async () => {
-				const workspace = await giselleEngine.createSampleWorkspace();
-				return JsonResponse.json(workspace);
-			},
-		}),
-} as const;
-
-export const generationRouters = {
 	generateText: (giselleEngine: GiselleEngine) =>
 		withUsageLimitErrorHandler(
 			createHandler({
@@ -145,40 +108,7 @@ export const generationRouters = {
 				return JsonResponse.json(generation);
 			},
 		}),
-	generateImage: (giselleEngine: GiselleEngine) =>
-		withUsageLimitErrorHandler(
-			createHandler({
-				input: z.object({
-					generation: QueuedGeneration,
-					telemetry: z.custom<TelemetrySettings>().optional(),
-				}),
-				handler: async ({ input }) => {
-					await giselleEngine.generateImage(input.generation, input.telemetry);
-					return new Response(null, { status: 204 });
-				},
-			}),
-		),
-	setGeneration: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({ generation: Generation }),
-			handler: async ({ input }) => {
-				await giselleEngine.setGeneration(input.generation);
-				return new Response(null, { status: 204 });
-			},
-		}),
-	executeAction: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				generation: QueuedGeneration,
-			}),
-			handler: async ({ input }) => {
-				await giselleEngine.executeAction(input);
-				return new Response(null, { status: 204 });
-			},
-		}),
-} as const;
 
-export const runRouters = {
 	addRun: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
@@ -205,6 +135,44 @@ export const runRouters = {
 				return new Response(null, { status: 202 });
 			},
 		}),
+	removeFile: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				fileId: FileId.schema,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.removeFile(input.workspaceId, input.fileId);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.upsertGithubIntegrationSetting(
+					input.workspaceGitHubIntegrationSetting,
+				);
+				return new Response(null, { status: 204 });
+			},
+		}),
+	getWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) => {
+				const workspaceGitHubIntegrationSetting =
+					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
+						input.workspaceId,
+					);
+				return JsonResponse.json({
+					workspaceGitHubIntegrationSetting,
+				});
+			},
+		}),
 	runApi: (giselleEngine: GiselleEngine) =>
 		withUsageLimitErrorHandler(
 			createHandler({
@@ -219,23 +187,41 @@ export const runRouters = {
 				},
 			}),
 		),
-} as const;
-
-export const fileRouters = {
-	removeFile: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-				fileId: FileId.schema,
+	generateImage: (giselleEngine: GiselleEngine) =>
+		withUsageLimitErrorHandler(
+			createHandler({
+				input: z.object({
+					generation: QueuedGeneration,
+					telemetry: z.custom<TelemetrySettings>().optional(),
+				}),
+				handler: async ({ input }) => {
+					await giselleEngine.generateImage(input.generation, input.telemetry);
+					return new Response(null, { status: 204 });
+				},
 			}),
+		),
+	setGeneration: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({ generation: Generation }),
 			handler: async ({ input }) => {
-				await giselleEngine.removeFile(input.workspaceId, input.fileId);
+				await giselleEngine.setGeneration(input.generation);
 				return new Response(null, { status: 204 });
 			},
 		}),
-} as const;
-
-export const secretRouters = {
+	createSampleWorkspace: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const workspace = await giselleEngine.createSampleWorkspace();
+				return JsonResponse.json(workspace);
+			},
+		}),
+	getGitHubRepositories: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			handler: async () => {
+				const repositories = await giselleEngine.getGitHubRepositories();
+				return JsonResponse.json(repositories);
+			},
+		}),
 	encryptSecret: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({ plaintext: z.string() }),
@@ -245,30 +231,6 @@ export const secretRouters = {
 				});
 			},
 		}),
-} as const;
-export const githubRouters = {
-	getGitHubRepositories: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			handler: async () => {
-				const repositories = await giselleEngine.getGitHubRepositories();
-				return JsonResponse.json(repositories);
-			},
-		}),
-	getGitHubRepositoryFullname: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				repositoryNodeId: z.string(),
-				installationId: z.number(),
-			}),
-			handler: async ({ input }) => {
-				return JsonResponse.json({
-					fullname: await giselleEngine.getGitHubRepositoryFullname(input),
-				});
-			},
-		}),
-} as const;
-
-export const triggerRouters = {
 	resolveTrigger: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
@@ -302,6 +264,18 @@ export const triggerRouters = {
 				});
 			},
 		}),
+	getGitHubRepositoryFullname: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				repositoryNodeId: z.string(),
+				installationId: z.number(),
+			}),
+			handler: async ({ input }) => {
+				return JsonResponse.json({
+					fullname: await giselleEngine.getGitHubRepositoryFullname(input),
+				});
+			},
+		}),
 	setTrigger: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
@@ -313,39 +287,32 @@ export const triggerRouters = {
 				});
 			},
 		}),
+	executeAction: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				generation: QueuedGeneration,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.executeAction(input);
+				return new Response(null, { status: 204 });
+			},
+		}),
 } as const;
 
-export const jsonRouter = {
-	...workspaceRouters,
-	...generationRouters,
-	...runRouters,
-	...fileRouters,
-	...secretRouters,
-	...githubRouters,
-	...triggerRouters,
-};
-
-export const jsonRouterPaths = Object.keys({
-	...jsonRouter,
-}) as JsonRouterPaths[];
+export const jsonRouterPaths = Object.keys(
+	createJsonRouters,
+) as JsonRouterPaths[];
 
 // Export the types at module level
-export type JsonRouterPaths =
-	| keyof typeof workspaceRouters
-	| keyof typeof generationRouters
-	| keyof typeof runRouters
-	| keyof typeof fileRouters
-	| keyof typeof secretRouters
-	| keyof typeof githubRouters
-	| keyof typeof triggerRouters;
+export type JsonRouterPaths = keyof typeof createJsonRouters;
 export type JsonRouterHandlers = {
-	[P in JsonRouterPaths]: ReturnType<(typeof jsonRouter)[P]>;
+	[P in JsonRouterPaths]: ReturnType<(typeof createJsonRouters)[P]>;
 };
 export type JsonRouterInput = {
 	[P in JsonRouterPaths]: Parameters<JsonRouterHandlers[P]>[0]["input"];
 };
 export function isJsonRouterPath(path: string): path is JsonRouterPaths {
-	return path in jsonRouter;
+	return path in createJsonRouters;
 }
 
 export const createFormDataRouters = {

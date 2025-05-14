@@ -5,9 +5,9 @@ import {
 	type FormDataRouterHandlers,
 	type JsonRouterHandlers,
 	createFormDataRouters,
+	createJsonRouters,
 	isFormDataRouterPath,
 	isJsonRouterPath,
-	jsonRouter,
 } from "../http";
 
 interface NextGiselleEngineConfig extends GiselleEngineConfig {
@@ -43,11 +43,11 @@ export function createHttpHandler({
 	giselleEngine: GiselleEngine;
 	config: NextGiselleEngineConfig;
 }) {
-	const jsonRouterHandlers: JsonRouterHandlers = {} as JsonRouterHandlers;
-	for (const [path, createRoute] of Object.entries(jsonRouter)) {
+	const jsonRouter: JsonRouterHandlers = {} as JsonRouterHandlers;
+	for (const [path, createRoute] of Object.entries(createJsonRouters)) {
 		if (isJsonRouterPath(path)) {
 			// @ts-expect-error
-			jsonRouterHandlers[path] = createRoute(giselleEngine);
+			jsonRouter[path] = createRoute(giselleEngine);
 		}
 	}
 
@@ -104,7 +104,7 @@ export function createHttpHandler({
 		}
 
 		if (isJsonRouterPath(routerPath)) {
-			return await jsonRouterHandlers[routerPath]({
+			return await jsonRouter[routerPath]({
 				// @ts-expect-error
 				input: await getBody(request),
 			});
