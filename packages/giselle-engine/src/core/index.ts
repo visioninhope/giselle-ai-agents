@@ -43,6 +43,7 @@ import {
 	handleWebhook,
 	upsertGithubIntegrationSetting,
 } from "./github";
+import { executeAction } from "./operations";
 import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
@@ -216,6 +217,9 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		setTrigger: async (args: { trigger: FlowTrigger }) =>
 			setTrigger({ ...args, context }),
+		executeAction: async (args: {
+			generation: QueuedGeneration;
+		}) => executeAction({ ...args, context }),
 	};
 }
 

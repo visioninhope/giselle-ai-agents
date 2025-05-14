@@ -8,21 +8,21 @@ export type GitHubActionCommandUnconfiguredState = z.infer<
 	typeof GitHubActionCommandUnconfiguredState
 >;
 
-const GitHubActionCommandCofiguredState = z.object({
+const GitHubActionCommandConfiguredState = z.object({
 	status: z.literal("configured"),
 	commandId: z.custom<GitHubActionCommandId>(),
 	installationId: z.number(),
 	repositoryNodeId: z.string(),
 });
-export type GitHubActionCommandCofiguredState =
-	| z.infer<typeof GitHubActionCommandUnconfiguredState>
-	| z.infer<typeof GitHubActionCommandCofiguredState>;
+export type GitHubActionCommandConfiguredState = z.infer<
+	typeof GitHubActionCommandConfiguredState
+>;
 
 const GitHubActionCommandData = z.object({
 	provider: z.literal("github"),
 	state: z.discriminatedUnion("status", [
 		GitHubActionCommandUnconfiguredState,
-		GitHubActionCommandCofiguredState,
+		GitHubActionCommandConfiguredState,
 	]),
 });
 export type GitHubActionCommandData = z.infer<typeof GitHubActionCommandData>;

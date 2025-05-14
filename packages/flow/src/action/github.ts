@@ -13,8 +13,6 @@ export const githubCreateIssueAction = {
 		id: "github.create.issue",
 		label: "Create Issue",
 		parameters: z.object({
-			repositoryOwner: z.string(),
-			repositoryName: z.string(),
 			title: z.string(),
 			body: z.string(),
 		}),
@@ -29,8 +27,6 @@ export const githubCreateIssueCommentAction = {
 		parameters: z.object({
 			issueNumber: z.number(),
 			body: z.string(),
-			repositoryOwner: z.string(),
-			repositoryName: z.string(),
 		}),
 	},
 } as const satisfies GitHubAction;
@@ -41,3 +37,16 @@ export const actions = [
 ] as const;
 
 export type ActionCommandId = (typeof actions)[number]["command"]["id"];
+
+export function actionIdToLabel(triggerId: ActionCommandId) {
+	switch (triggerId) {
+		case "github.create.issue":
+			return githubCreateIssueAction.command.label;
+		case "github.create.issueComment":
+			return githubCreateIssueCommentAction.command.label;
+		default: {
+			const exhaustiveCheck: never = triggerId;
+			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);
+		}
+	}
+}
