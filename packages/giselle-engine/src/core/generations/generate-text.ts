@@ -86,7 +86,6 @@ export async function generateText(args: {
 	} satisfies RunningGeneration;
 
 	const trace = langfuse.trace({
-		sessionId: runningGeneration.id,
 		name: "ai.streamText",
 		metadata: args.telemetry?.metadata,
 	});
@@ -132,6 +131,9 @@ export async function generateText(args: {
 	const workspaceId = await extractWorkspaceIdFromOrigin({
 		storage: args.context.storage,
 		origin: args.generation.context.origin,
+	});
+	trace.update({
+		sessionId: workspaceId,
 	});
 
 	const usageLimitStatus = await checkUsageLimits({
