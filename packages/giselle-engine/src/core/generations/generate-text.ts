@@ -424,12 +424,12 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			const updateObject = (object: { update: Function }, input: any, output: any) => {
-				object.update({ input, output });
+			const updateTelemetry = (telemetryObject: { update: Function }, input: any, output: any) => {
+				telemetryObject.update({ input, output });
 			};
-			updateObject(trace, { messages }, event.text);
-			updateObject(span, { messages }, event.text);
-			updateObject(generation, { messages }, event.text);
+			updateTelemetry(trace, { messages }, event.text);
+			updateTelemetry(span, { messages }, event.text);
+			updateTelemetry(generation, { messages }, event.text);
 			const tokenUsage = event.usage;
 
 			let costInfo = null;
