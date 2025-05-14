@@ -424,18 +424,12 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			trace.update({
-				input: { messages },
-				output: event.text,
-			});
-			span.update({
-				input: { messages },
-				output: event.text,
-			});
-			generation.update({
-				input: { messages },
-				output: event.text,
-			});
+			const updateObject = (object: { update: Function }, input: any, output: any) => {
+				object.update({ input, output });
+			};
+			updateObject(trace, { messages }, event.text);
+			updateObject(span, { messages }, event.text);
+			updateObject(generation, { messages }, event.text);
 			const tokenUsage = event.usage;
 
 			let costInfo = null;
