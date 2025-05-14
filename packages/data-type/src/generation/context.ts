@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { Node, NodeId, OperationNode } from "../node";
+import { Node, NodeBase, NodeId, OperationNode } from "../node";
 import { RunId } from "../run";
 import { WorkspaceId } from "../workspace";
 
@@ -45,7 +45,8 @@ export const GenerationContext = z.object({
 export type GenerationContext = z.infer<typeof GenerationContext>;
 
 export const GenerationContextLike = z.object({
-	operationNode: OperationNode.extend({
+	operationNode: NodeBase.extend({
+		type: z.literal("operation"),
 		content: z.any(),
 	}),
 	sourceNodes: z.array(z.any()),
