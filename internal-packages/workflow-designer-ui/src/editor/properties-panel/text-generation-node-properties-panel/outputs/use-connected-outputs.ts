@@ -1,4 +1,8 @@
-import type { TextGenerationNode, VariableNode } from "@giselle-sdk/data-type";
+import type {
+	ActionNode,
+	TextGenerationNode,
+	VariableNode,
+} from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useMemo } from "react";
 import type { ConnectedOutputWithDetails } from "./types";
@@ -11,6 +15,7 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 		);
 		const connectedGeneratedInputs: ConnectedOutputWithDetails<TextGenerationNode>[] =
 			[];
+		const connectedActionInputs: ConnectedOutputWithDetails<ActionNode>[] = [];
 		const connectedVariableInputs: ConnectedOutputWithDetails<VariableNode>[] =
 			[];
 		for (const connection of connectionsToThisNode) {
@@ -37,6 +42,20 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 								connection,
 							});
 							break;
+						case "action":
+							connectedActionInputs.push({
+								...output,
+								node: node as ActionNode,
+								connection,
+							});
+							break;
+						case "imageGeneration":
+						case "trigger":
+							break;
+						default: {
+							const _exhaustiveCheck: never = node.content;
+							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+						}
 					}
 					break;
 				case "variable":
@@ -54,9 +73,14 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 		}
 
 		return {
-			all: [...connectedGeneratedInputs, ...connectedVariableInputs],
+			all: [
+				...connectedGeneratedInputs,
+				...connectedActionInputs,
+				...connectedVariableInputs,
+			],
 			generation: connectedGeneratedInputs,
 			variable: connectedVariableInputs,
+			action: connectedActionInputs,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }
