@@ -32,6 +32,8 @@ export function generateTelemetryTags(args: {
 }): TelemetryTag[] {
 	const tags: TelemetryTag[] = [];
 
+	tags.push(args.provider, args.LanguageModel.id);
+
 	// OpenAI Web Search
 	if (args.provider === "openai" && args.toolSet.openaiWebSearch) {
 		tags.push("web-search", "openai:web-search");
