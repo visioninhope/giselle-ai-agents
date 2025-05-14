@@ -12,7 +12,8 @@
 		"start": "next start",
 		"format": "biome check --write .",
 		"lint": "next lint",
-		"test": "vitest run"
+		"test": "vitest run",
+		"test:e2e": "playwright test"
 	},
 	"packageManager": "pnpm@10.0.0",
 	"dependencies": {
@@ -114,6 +115,7 @@
 		"@giselle-sdk/usage-limits": "workspace:*",
 		"@octokit/openapi-types": "22.2.0",
 		"@octokit/webhooks-types": "7.6.1",
+		"@playwright/test": "1.52.0",
 		"@radix-ui/react-hover-card": "1.1.2",
 		"@tailwindcss/postcss": "4.0.9",
 		"@tailwindcss/typography": "0.5.15",
