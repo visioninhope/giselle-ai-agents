@@ -43,3 +43,5 @@
 - [ ] Raname the action's fieldname: parameters to inputs
 - [ ] Rename the output typename: generated-text to text
 - [ ] Rename the output typename: generated-image to image
+- [ ] Restruct input/output resolver: text-generation panel
+- [ ] Refactor resolver: text generation resolver to operation resolver
