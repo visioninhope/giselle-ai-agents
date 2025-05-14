@@ -1,6 +1,7 @@
 import {
 	type CompletedGeneration,
 	GenerationContext,
+	type GenerationOutput,
 	type GitHubActionCommandCofiguredState,
 	type QueuedGeneration,
 	isActionNode,
@@ -21,9 +22,10 @@ export async function executeAction(args: {
 	if (command.state.status === "unconfigured") {
 		throw new Error("Action is not configured");
 	}
+	let generationOutputs: GenerationOutput[] = [];
 	switch (command.provider) {
 		case "github":
-			await executeGitHubActionCommand({
+			generationOutputs = await executeGitHubActionCommand({
 				state: command.state,
 				context: args.context,
 				generation: args.generation,
@@ -43,7 +45,7 @@ export async function executeAction(args: {
 		queuedAt: Date.now(),
 		startedAt: Date.now(),
 		completedAt: Date.now(),
-		outputs: [],
+		outputs: generationOutputs,
 	} satisfies CompletedGeneration;
 
 	await Promise.all([
@@ -72,22 +74,40 @@ async function executeGitHubActionCommand(args: {
 	state: GitHubActionCommandCofiguredState;
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-}) {
+}): Promise<GenerationOutput[]> {
 	const authConfig = args.context.integrationConfigs?.github?.authV2;
 	if (authConfig === undefined) {
 		throw new Error("GitHub authV2 configuration is missing");
 	}
 	switch (args.state.commandId) {
-		case "github.create.issue":
-			await createIssue(args.state.repositoryNodeId, "title", "body", {
-				strategy: "app-installation",
-				appId: authConfig.appId,
-				privateKey: authConfig.privateKey,
-				installationId: args.state.installationId,
-			});
-			break;
+		case "github.create.issue": {
+			const result = await createIssue(
+				args.state.repositoryNodeId,
+				"title",
+				"body",
+				{
+					strategy: "app-installation",
+					appId: authConfig.appId,
+					privateKey: authConfig.privateKey,
+					installationId: args.state.installationId,
+				},
+			);
+			const resultOutput = args.generation.context.operationNode.outputs.find(
+				(output) => output.accessor === "action-result",
+			);
+			if (resultOutput === undefined) {
+				return [];
+			}
+			return [
+				{
+					type: "generated-text",
+					content: JSON.stringify(result),
+					outputId: resultOutput.id,
+				},
+			];
+		}
 		case "github.create.issueComment":
-			break;
+			return [];
 		default: {
 			const _exhaustiveCheck: never = args.state.commandId;
 			throw new Error(`Unhandled command: ${_exhaustiveCheck}`);

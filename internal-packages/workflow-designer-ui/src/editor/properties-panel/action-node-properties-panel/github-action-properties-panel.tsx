@@ -310,7 +310,7 @@ function Installed({
 					{
 						id: OutputId.generate(),
 						label: "output",
-						accessor: "text",
+						accessor: "action-result",
 					},
 				],
 			});
