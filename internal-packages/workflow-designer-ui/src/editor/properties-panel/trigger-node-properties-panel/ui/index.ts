@@ -1,2 +1,2 @@
-export * from "./configured-view";
-export * from "./configured-view-2";
+export * from "./github-trigger-configured-view";
+export * from "./manual-trigger-configured-view";

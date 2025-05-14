@@ -15,7 +15,7 @@ import {
 	useTransition,
 } from "react";
 import { SpinnerIcon } from "../../../icons";
-import { ConfiguredView2 } from "./ui";
+import { ManualTriggerConfiguredView } from "./ui";
 
 export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { data: workspace, updateNodeData } = useWorkflowDesigner();
@@ -101,7 +101,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	);
 
 	if (node.content.state.status === "configured") {
-		return <ConfiguredView2 flowTriggerId={node.content.state.flowTriggerId} />;
+		return <ManualTriggerConfiguredView flowTriggerId={node.content.state.flowTriggerId} />;
 	}
 
 	return (
