@@ -46,10 +46,9 @@ export async function GET(request: NextRequest) {
 	}
 
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
-	const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl();
 
 	for (const targetGitHubRepository of targetGitHubRepositories) {
-		const { owner, repo, installationId, lastIngestedCommitSha } =
+		const { owner, repo, installationId, lastIngestedCommitSha, teamDbId } =
 			targetGitHubRepository;
 
 		const appId = process.env.GITHUB_APP_ID;
@@ -86,6 +85,10 @@ export async function GET(request: NextRequest) {
 			repo,
 			commitSha,
 		};
+
+		const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl(
+			teamDbId,
+		);
 
 		try {
 			// Ingest using the RAG package
@@ -140,6 +143,7 @@ function transformGitHubEmbedding(
 type TargetGitHubRepository = {
 	owner: string;
 	repo: string;
+	teamDbId: number;
 	installationId: number;
 	lastIngestedCommitSha: string | null;
 };
@@ -153,6 +157,7 @@ async function fetchTargetGitHubRepositories(): Promise<
 			repo: githubRepositoryIndex.repo,
 			installationId: githubRepositoryIndex.installationId,
 			lastIngestedCommitSha: githubRepositoryIndex.lastIngestedCommitSha,
+			teamDbId: githubRepositoryIndex.teamDbId,
 		})
 		.from(githubRepositoryIndex)
 		.where(eq(githubRepositoryIndex.status, "idle"));
@@ -162,6 +167,7 @@ async function fetchTargetGitHubRepositories(): Promise<
 		repo: record.repo,
 		installationId: record.installationId,
 		lastIngestedCommitSha: record.lastIngestedCommitSha,
+		teamDbId: record.teamDbId,
 	}));
 }
 
@@ -169,8 +175,12 @@ async function fetchTargetGitHubRepositories(): Promise<
  * Implementation of EmbeddingStore for GitHub repositories
  */
 class GitHubRepositoryEmbeddingStoreImpl
-	implements EmbeddingStore<GitHubRepositoryEmbedding>
-{
+	implements EmbeddingStore<GitHubRepositoryEmbedding> {
+	private teamDbId: number;
+	constructor(teamDbId: number) {
+		this.teamDbId = teamDbId;
+	}
+
 	private async getRepositoryIndexDbId(owner: string, repo: string) {
 		return this.withPgRetry(async () => {
 			const records = await db
@@ -180,7 +190,8 @@ class GitHubRepositoryEmbeddingStoreImpl
 					and(
 						eq(githubRepositoryIndex.owner, owner),
 						eq(githubRepositoryIndex.repo, repo),
-					),
+						eq(githubRepositoryIndex.teamDbId, this.teamDbId),
+					)
 				)
 				.limit(1);
 			const repositoryIndex = records[0];
