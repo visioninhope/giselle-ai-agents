@@ -363,16 +363,14 @@ export async function generateText(args: {
 
 	const providerOptions = getProviderOptions(operationNode.content.llm);
 
-	span.update({
-		metadata: {
-			tags: generateTelemetryTags({
-				provider: operationNode.content.llm.provider,
-				languageModel,
-				toolSet: preparedToolSet.toolSet,
-				configurations: operationNode.content.llm.configurations,
-				providerOptions,
-			}),
-		},
+	trace.update({
+		tags: generateTelemetryTags({
+			provider: operationNode.content.llm.provider,
+			languageModel,
+			toolSet: preparedToolSet.toolSet,
+			configurations: operationNode.content.llm.configurations,
+			providerOptions,
+		}),
 	});
 
 	const streamTextResult = streamText({
