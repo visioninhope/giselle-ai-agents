@@ -1,7 +1,7 @@
 import type { FlowTriggerId } from "@giselle-sdk/data-type";
 import { useTrigger } from "../../../lib/use-trigger";
 
-export function ConfiguredView2({
+export function ManualTriggerConfiguredView({
 	flowTriggerId,
 }: {
 	flowTriggerId: FlowTriggerId;
