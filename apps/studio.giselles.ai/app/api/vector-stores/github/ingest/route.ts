@@ -4,11 +4,10 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import {
-	type GitHubBlobMetadata,
-	GitHubRepositoryLoader,
-	type GitHubRepositoryParams,
-	fetchDefaultBranchHead,
-	octokit,
+	GitHubBlobLoader,
+	GitHubBlobMetadata,
+	GithubRepositoryParams,
+	octokit
 } from "@giselle-sdk/github-tool";
 import {
 	type BaseEmbedding,
@@ -68,22 +67,13 @@ export async function GET(request: NextRequest) {
 		});
 
 		// Create GitHub repository loader
-		const loader = new GitHubRepositoryLoader(octokitClient, {
+		const loader = new GitHubBlobLoader(octokitClient, {
 			maxBlobSize: 1 * 1024 * 1024, // 1MB limit
 		});
 
-		// Define source
-		// Ingest default branch head commit
-		const defaultBranchHead = await fetchDefaultBranchHead(
-			octokitClient,
+		const source: GithubRepositoryParams = {
 			owner,
 			repo,
-		);
-		const commitSha = defaultBranchHead.sha;
-		const source: GitHubRepositoryParams = {
-			owner,
-			repo,
-			commitSha,
 		};
 
 		const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl(teamDbId);
@@ -237,7 +227,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 	}
 
 	async startIngestion(params: Record<string, unknown>): Promise<void> {
-		const source = params.source as GitHubRepositoryParams;
+		const source = params.source as GithubRepositoryParams;
 		if (!source) {
 			console.warn("startIngestion: source is missing", params);
 			return;
@@ -257,13 +247,13 @@ class GitHubRepositoryEmbeddingStoreImpl
 	}
 
 	async completeIngestion(params: Record<string, unknown>): Promise<void> {
-		const source = params.source as GitHubRepositoryParams;
+		const source = params.source as GithubRepositoryParams;
 		if (!source) {
 			console.warn("completeIngestion: source is missing", params);
 			return;
 		}
 
-		const commitSha = (params.commitSha as string) || source.commitSha;
+		const commitSha = params.commitSha as string
 		await this.withPgRetry(async () => {
 			await db
 				.update(githubRepositoryIndex)
@@ -284,7 +274,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 		params: Record<string, unknown>,
 		error: Error,
 	): Promise<void> {
-		const source = params.source as GitHubRepositoryParams;
+		const source = params.source as GithubRepositoryParams;
 		if (!source) {
 			console.warn("failIngestion: source is missing", params);
 			captureException(error);
