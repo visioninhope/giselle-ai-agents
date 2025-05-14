@@ -98,7 +98,11 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	);
 
 	if (node.content.state.status === "configured") {
-		return <ManualTriggerConfiguredView flowTriggerId={node.content.state.flowTriggerId} />;
+		return (
+			<ManualTriggerConfiguredView
+				flowTriggerId={node.content.state.flowTriggerId}
+			/>
+		);
 	}
 
 	return (

@@ -38,7 +38,11 @@ export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.state.status === "configured") {
-		return <GitHubTriggerConfiguredView flowTriggerId={node.content.state.flowTriggerId} />;
+		return (
+			<GitHubTriggerConfiguredView
+				flowTriggerId={node.content.state.flowTriggerId}
+			/>
+		);
 	}
 
 	if (value?.github === undefined) {
