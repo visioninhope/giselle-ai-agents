@@ -35,7 +35,7 @@ import type { Storage } from "unstorage";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { getLangfuseInstance } from "./telemetry";
+import { generateTelemetryTags, getLangfuseInstance } from "./telemetry";
 import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
