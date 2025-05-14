@@ -970,6 +970,9 @@ importers:
 
   packages/github-tool:
     dependencies:
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../rag
       '@octokit/auth-app':
         specifier: 'catalog:'
         version: 7.1.1
@@ -1085,6 +1088,28 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.15.3)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
+
+  packages/rag:
+    dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.24.1)
+      ai:
+        specifier: 'catalog:'
+        version: 4.3.9(react@19.1.0)(zod@3.24.1)
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
 
   packages/supabase-driver:
     dependencies:
