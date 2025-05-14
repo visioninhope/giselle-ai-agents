@@ -31,14 +31,19 @@ interface GitHubBlobParams {
  * GitHub repository loader that streams files
  */
 export class GitHubRepositoryLoader
-	implements ContentLoader<GitHubRepositoryParams, GitHubBlobMetadata>
-{
+	implements ContentLoader<GitHubRepositoryParams, GitHubBlobMetadata> {
+	private octokit: Octokit;
+	private options: { maxBlobSize: number };
+
 	constructor(
-		private octokit: Octokit,
-		private options = {
-			maxBlobSize: 1 * 1024 * 1024, // Default 1MB
+		octokit: Octokit,
+		options: {
+			maxBlobSize: number;
 		},
-	) {}
+	) {
+		this.octokit = octokit;
+		this.options = options;
+	}
 
 	/**
 	 * Load content from a repository as a stream
@@ -98,9 +103,12 @@ export class GitHubRepositoryLoader
  * Single file loader
  */
 export class GitHubFileLoader
-	implements ContentLoader<GitHubBlobParams, GitHubBlobMetadata>
-{
-	constructor(private octokit: Octokit) {}
+	implements ContentLoader<GitHubBlobParams, GitHubBlobMetadata> {
+	private octokit: Octokit;
+
+	constructor(octokit: Octokit) {
+		this.octokit = octokit;
+	}
 
 	/**
 	 * Stream a single file
