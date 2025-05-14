@@ -86,6 +86,7 @@ export async function generateText(args: {
 	} satisfies RunningGeneration;
 
 	const trace = langfuse.trace({
+		userId: String(args.telemetry?.metadata?.userId),
 		name: "ai.streamText",
 		metadata: args.telemetry?.metadata,
 	});
