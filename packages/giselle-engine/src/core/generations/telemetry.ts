@@ -59,10 +59,12 @@ export function generateTelemetryTags(args: {
 
 export function updateTelemetry(
 	telemetryObject: {
+		// trace, event, span, or generation of Langfuse telemetry
+		// see: https://langfuse.com/docs/sdk/typescript/guide#making-calls
 		update: (data: { input: unknown; output: unknown }) => void;
 	},
-	input: unknown,
-	output: unknown,
+	input: unknown, // telemetry attribute 'input'
+	output: unknown, // telemetry attribute 'output'
 ) {
 	telemetryObject.update({ input, output });
 }
