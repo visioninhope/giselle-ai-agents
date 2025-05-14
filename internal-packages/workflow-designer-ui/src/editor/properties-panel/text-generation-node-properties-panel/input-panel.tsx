@@ -16,6 +16,7 @@ import {
 	PromptIcon,
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
+import { defaultName } from "../../../utils";
 import {
 	ConnectedOutputListItem,
 	ConnectedOutputListRoot,
@@ -177,6 +178,20 @@ export function InputPanel({
 								key={source.connection.id}
 								title={`${source.node.name ?? source.node.content.llm.id} / ${source.label}`}
 								subtitle={source.node.content.llm.provider}
+								onRemove={() => handleRemove(source.connection)}
+							/>
+						))}
+					</ConnectedOutputListRoot>
+				)}
+
+				{connectedOutputs.action.length > 0 && (
+					<ConnectedOutputListRoot title="Generated Sources">
+						{connectedOutputs.action.map((source) => (
+							<ConnectedOutputListItem
+								icon={<GitHubIcon className="size-[24px] text-white-900" />}
+								key={source.connection.id}
+								title={source.node.name ?? defaultName(source.node)}
+								subtitle={""}
 								onRemove={() => handleRemove(source.connection)}
 							/>
 						))}

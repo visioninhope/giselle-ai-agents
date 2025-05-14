@@ -1,4 +1,5 @@
 import {
+	isActionNode,
 	isFileNode,
 	isGitHubNode,
 	isTextGenerationNode,
@@ -19,11 +20,16 @@ export function useCategoriedOutputs(inputs: OutputWithDetails[]) {
 		() => filterInputs(inputs, isGitHubNode),
 		[inputs],
 	);
+	const actionInputs = useMemo(
+		() => filterInputs(inputs, isActionNode),
+		[inputs],
+	);
 
 	return {
 		generatedInputs,
 		textInputs,
 		fileInputs,
 		githubInputs,
+		actionInputs,
 	};
 }
