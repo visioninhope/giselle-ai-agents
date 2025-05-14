@@ -45,7 +45,8 @@ export interface GithubRepositoryParams {
  * GitHub repository loader that streams files
  */
 export class GitHubBlobLoader
-	implements ContentLoader<GithubRepositoryParams, GitHubBlobMetadata> {
+	implements ContentLoader<GithubRepositoryParams, GitHubBlobMetadata>
+{
 	private octokit: Octokit;
 	private options: { maxBlobSize: number };
 
@@ -68,7 +69,11 @@ export class GitHubBlobLoader
 		const { owner, repo } = params;
 		let commitSha = params.commitSha;
 		if (!commitSha) {
-			const defaultBranchHead = await fetchDefaultBranchHead(this.octokit, owner, repo);
+			const defaultBranchHead = await fetchDefaultBranchHead(
+				this.octokit,
+				owner,
+				repo,
+			);
 			commitSha = defaultBranchHead.sha;
 		}
 
@@ -152,13 +157,7 @@ async function loadBlob(
 		await new Promise((resolve) =>
 			setTimeout(resolve, 2 ** currentAttempt * 100),
 		);
-		return loadBlob(
-			octokit,
-			params,
-			commitSha,
-			currentAttempt + 1,
-			maxAttempt,
-		);
+		return loadBlob(octokit, params, commitSha, currentAttempt + 1, maxAttempt);
 	}
 
 	// Only support base64 encoded content

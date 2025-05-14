@@ -5,9 +5,9 @@ import {
 } from "@/drizzle";
 import {
 	GitHubBlobLoader,
-	GitHubBlobMetadata,
-	GithubRepositoryParams,
-	octokit
+	type GitHubBlobMetadata,
+	type GithubRepositoryParams,
+	octokit,
 } from "@giselle-sdk/github-tool";
 import {
 	type BaseEmbedding,
@@ -145,7 +145,8 @@ async function fetchTargetGitHubRepositories(): Promise<
  * Implementation of EmbeddingStore for GitHub repositories
  */
 class GitHubRepositoryEmbeddingStoreImpl
-	implements EmbeddingStore<GitHubRepositoryEmbedding> {
+	implements EmbeddingStore<GitHubRepositoryEmbedding>
+{
 	private teamDbId: number;
 	constructor(teamDbId: number) {
 		this.teamDbId = teamDbId;
@@ -253,7 +254,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 			return;
 		}
 
-		const commitSha = params.commitSha as string
+		const commitSha = params.commitSha as string;
 		await this.withPgRetry(async () => {
 			await db
 				.update(githubRepositoryIndex)
