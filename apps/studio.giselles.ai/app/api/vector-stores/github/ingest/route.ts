@@ -169,7 +169,8 @@ async function fetchTargetGitHubRepositories(): Promise<
  * Implementation of EmbeddingStore for GitHub repositories
  */
 class GitHubRepositoryEmbeddingStoreImpl
-	implements EmbeddingStore<GitHubRepositoryEmbedding> {
+	implements EmbeddingStore<GitHubRepositoryEmbedding>
+{
 	private async getRepositoryIndexDbId(owner: string, repo: string) {
 		return this.withPgRetry(async () => {
 			const records = await db
