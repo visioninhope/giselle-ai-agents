@@ -9,7 +9,8 @@ type TelemetryTag =
 	| "openai:web-search"
 	| "google:search-grounding"
 	| "anthropic:reasoning"
-	| "anthropic:thinking";
+	| "anthropic:thinking"
+	| "perplexity:search-domain-filter";
 
 export function generateTelemetryTags(args: {
 	provider: string;
@@ -41,6 +42,18 @@ export function generateTelemetryTags(args: {
 			// treat as an independent tag because extended thinking is available only on specific models
 			// ref: https://docs.anthropic.com/en/docs/about-claude/models/all-models#model-comparison-table
 			tags.push("anthropic:thinking");
+		}
+	}
+
+	// Perplexity Search Domain Filter
+	if (args.provider === "perplexity") {
+		tags.push("web-search");
+
+		if (
+			Array.isArray(args.configurations.searchDomainFilter) &&
+			args.configurations.searchDomainFilter.length > 0
+		) {
+			tags.push("perplexity:search-domain-filter");
 		}
 	}
 
