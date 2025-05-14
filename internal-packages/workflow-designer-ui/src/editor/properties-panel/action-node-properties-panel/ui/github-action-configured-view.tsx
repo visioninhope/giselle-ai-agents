@@ -1,6 +1,6 @@
 import {
 	type ConnectionId,
-	type GitHubActionCommandCofiguredState,
+	type GitHubActionCommandConfiguredState,
 	type Input,
 	type Node,
 	type NodeId,
@@ -27,7 +27,7 @@ export function GitHubActionConfiguredView({
 }: {
 	nodeId: NodeId;
 	inputs: Input[];
-	state: GitHubActionCommandCofiguredState;
+	state: GitHubActionCommandConfiguredState;
 }) {
 	const client = useGiselleEngine();
 	const {
