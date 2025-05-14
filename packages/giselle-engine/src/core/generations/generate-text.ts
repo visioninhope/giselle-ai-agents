@@ -34,7 +34,7 @@ import {
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { generateTelemetryTags, getLangfuseInstance } from "./telemetry";
+import { generateTelemetryTags, getLangfuseInstance, updateTelemetry } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -424,9 +424,6 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			const updateTelemetry = (telemetryObject: { update: Function }, input: any, output: any) => {
-				telemetryObject.update({ input, output });
-			};
 			updateTelemetry(trace, { messages }, event.text);
 			updateTelemetry(span, { messages }, event.text);
 			updateTelemetry(generation, { messages }, event.text);
