@@ -157,27 +157,34 @@ function NodeCanvas() {
 		[addConnection, data.nodes, toast, isSupportedConnection, updateNodeData],
 	);
 
-	const handleEdgesDelete = (edgesToDelete: Edge[]) => {
-		for (const edge of edgesToDelete) {
-			const connection = data.connections.find((conn) => conn.id === edge.id);
-			if (!connection) {
-				continue;
-			}
+	const handleEdgesDelete = useCallback(
+		(edgesToDelete: Edge[]) => {
+			for (const edge of edgesToDelete) {
+				const connection = data.connections.find((conn) => conn.id === edge.id);
+				if (!connection) {
+					continue;
+				}
 
-			deleteConnection(connection.id);
-			const targetNode = data.nodes.find(
-				(node) => node.id === connection.inputNode.id,
-			);
-			if (targetNode && targetNode.type === "operation") {
-				const updatedInputs = targetNode.inputs.filter(
-					(input) => input.id !== connection.inputId,
+				deleteConnection(connection.id);
+				const targetNode = data.nodes.find(
+					(node) => node.id === connection.inputNode.id,
 				);
-				updateNodeData(targetNode, {
-					inputs: updatedInputs,
-				});
+				if (
+					targetNode &&
+					targetNode.type === "operation" &&
+					targetNode.content.type !== "action"
+				) {
+					const updatedInputs = targetNode.inputs.filter(
+						(input) => input.id !== connection.inputId,
+					);
+					updateNodeData(targetNode, {
+						inputs: updatedInputs,
+					});
+				}
 			}
-		}
-	};
+		},
+		[data.nodes, data.connections, deleteConnection, updateNodeData],
+	);
 
 	const isValidConnection: IsValidConnection<ConnectorType> = (connection) => {
 		if (!connection.sourceHandle || !connection.targetHandle) {

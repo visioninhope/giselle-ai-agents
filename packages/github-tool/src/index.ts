@@ -5,6 +5,7 @@ export * from "./tools";
 export * from "./repository";
 export * from "./blob-loader";
 export * from "./repository-loader";
+export * from "./issues";
 
 export const IssueNodeIdQuery = gql(/* GraphQL */ `
   query IssueNodeIdQuery($name: String!, $owner: String!, $issueNumber: Int!) {

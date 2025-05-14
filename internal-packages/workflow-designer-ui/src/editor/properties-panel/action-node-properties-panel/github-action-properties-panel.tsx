@@ -1,4 +1,9 @@
-import { type ActionNode, type Input, InputId } from "@giselle-sdk/data-type";
+import {
+	type ActionNode,
+	type Input,
+	InputId,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import { actions, githubActions } from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
@@ -20,12 +25,19 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { GitHubRepositoryBlock, SelectRepository } from "../ui";
+import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 
 export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.command.state.status === "configured") {
-		return "todo";
+		return (
+			<GitHubActionConfiguredView
+				state={node.content.command.state}
+				nodeId={node.id}
+				inputs={node.inputs}
+			/>
+		);
 	}
 
 	if (value?.github === undefined) {
@@ -269,9 +281,12 @@ function Installed({
 
 			// Add inputs based on the action type
 			for (const key of action.command.parameters.keyof().options) {
+				// @ts-expect-error shape[parameter] is unreasonable but intentional
+				const schema = action.command.parameters.shape[key] as AnyZodObject;
 				inputs.push({
 					id: InputId.generate(),
 					label: key,
+					isRequired: !schema.isOptional(),
 				});
 			}
 
@@ -291,6 +306,13 @@ function Installed({
 				},
 				name: action.command.label,
 				inputs,
+				outputs: [
+					{
+						id: OutputId.generate(),
+						label: "output",
+						accessor: "action-result",
+					},
+				],
 			});
 		},
 		[node, updateNodeData, step],
