@@ -65,8 +65,7 @@ export function GitHubTriggerConfiguredView({
 					{githubTriggerIdToLabel(data.trigger.configuration.event.id)}
 				</div>
 			</div>
-			{data.trigger.configuration.event.id ===
-				"github.issue_comment.created" && (
+			{data.trigger.configuration.event.id === "github.issue_comment.created" && (
 				<div className="space-y-[4px]">
 					<p className="text-[14px] py-[1.5px] text-white-400">Call sign</p>
 					<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">

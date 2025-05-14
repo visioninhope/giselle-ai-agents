@@ -26,7 +26,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
-			// if (newParameter.name.trim() === "") return;
 			const formData = new FormData(e.currentTarget);
 			const name = formData.get("name") as string;
 			const type = formData.get("type") as string;
@@ -60,7 +59,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				return;
 			}
 
-			// Generate outputs based on parameters
 			const outputs: Output[] = parameters.map((param) => ({
 				id: OutputId.generate(),
 				label: param.name,
@@ -83,7 +81,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 					},
 				});
 
-				// Update the node in the UI
 				updateNodeData(node, {
 					content: {
 						...node.content,
@@ -115,7 +112,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 			<div className="flex flex-col gap-[8px]">
 				<p className="text-[16px] font-medium">Parameters</p>
 
-				{/* List of configured parameters */}
 				{parameters.length > 0 ? (
 					<div className="flex flex-col gap-[8px] mb-[16px]">
 						{parameters.map((param) => (
@@ -146,7 +142,6 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 					</div>
 				)}
 
-				{/* Add new parameter form */}
 				<div className="flex flex-col gap-[8px] p-[12px] border border-white-800 rounded-[8px]">
 					<p className="text-[14px] font-medium">Add New Parameter</p>
 					<form
