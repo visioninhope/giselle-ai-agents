@@ -34,7 +34,11 @@ import {
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { generateTelemetryTags, getLangfuseInstance, updateTelemetry } from "./telemetry";
+import {
+	generateTelemetryTags,
+	getLangfuseInstance,
+	updateTelemetry,
+} from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -550,7 +554,6 @@ export async function generateText(args: {
 						languageModel,
 						toolSet: preparedToolSet.toolSet,
 						configurations: operationNode.content.llm.configurations,
-						providerOptions,
 						providerOptions:
 							operationNode.content.llm.provider === "anthropic"
 								? providerOptions
