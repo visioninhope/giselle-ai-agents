@@ -17,17 +17,6 @@ export interface GitHubRepositoryParams {
 }
 
 /**
- * File-level content loading parameters
- */
-interface GitHubBlobParams {
-	owner: string;
-	repo: string;
-	path: string;
-	fileSha: string;
-	commitSha: string;
-}
-
-/**
  * GitHub repository loader that streams files
  */
 export class GitHubRepositoryLoader
@@ -96,45 +85,5 @@ export class GitHubRepositoryLoader
 				metadata: blob.metadata,
 			};
 		}
-	}
-}
-
-/**
- * Single file loader
- */
-export class GitHubFileLoader
-	implements ContentLoader<GitHubBlobParams, GitHubBlobMetadata> {
-	private octokit: Octokit;
-
-	constructor(octokit: Octokit) {
-		this.octokit = octokit;
-	}
-
-	/**
-	 * Stream a single file
-	 */
-	async *loadStream(
-		params: GitHubBlobParams,
-	): AsyncIterable<LoaderResult<GitHubBlobMetadata>> {
-		const { owner, repo, path, fileSha, commitSha } = params;
-
-		// Load the blob
-		const blob = await loadGitHubBlob(
-			this.octokit,
-			{ owner, repo, path, fileSha },
-			commitSha,
-		);
-
-		// Skip binary files
-		if (blob === null) {
-			console.warn(`${owner}/${repo}/${path} may be binary, skipping`);
-			return;
-		}
-
-		// Yield as document
-		yield {
-			content: blob.content,
-			metadata: blob.metadata,
-		};
 	}
 }
