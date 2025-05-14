@@ -87,20 +87,13 @@ export async function GET(request: NextRequest) {
 			commitSha,
 		};
 
-		// Start ingestion process for repository
-		await embeddingStore.startIngestion({ source });
-
 		try {
 			// Ingest using the RAG package
 			await ingest({
 				source,
 				loader,
 				store: embeddingStore,
-				transformEmbedding: (baseEmbedding, metadata) =>
-					transformGitHubEmbedding(
-						baseEmbedding,
-						metadata as GitHubBlobMetadata,
-					),
+				transformEmbedding: transformGitHubEmbedding,
 			});
 
 			// Update repository status to completed
@@ -138,8 +131,8 @@ function transformGitHubEmbedding(
 		fileSha: metadata.fileSha,
 		path: metadata.path,
 		nodeId: metadata.nodeId,
-		chunkIndex: baseEmbedding.metadata.chunkIndex as number,
-		chunkContent: baseEmbedding.content,
+		chunkIndex: baseEmbedding.chunkIndex,
+		chunkContent: baseEmbedding.chunkContent,
 		embedding: baseEmbedding.embedding,
 	};
 }
@@ -253,6 +246,11 @@ class GitHubRepositoryEmbeddingStoreImpl
 
 	async startIngestion(params: Record<string, unknown>): Promise<void> {
 		const source = params.source as GitHubRepositoryParams;
+		if (!source) {
+			console.warn("startIngestion: source is missing", params);
+			return;
+		}
+
 		await this.withPgRetry(async () => {
 			await db
 				.update(githubRepositoryIndex)
@@ -268,11 +266,19 @@ class GitHubRepositoryEmbeddingStoreImpl
 
 	async completeIngestion(params: Record<string, unknown>): Promise<void> {
 		const source = params.source as GitHubRepositoryParams;
-		const commitSha = params.commitSha as string;
+		if (!source) {
+			console.warn("completeIngestion: source is missing", params);
+			return;
+		}
+
+		const commitSha = (params.commitSha as string) || source.commitSha;
 		await this.withPgRetry(async () => {
 			await db
 				.update(githubRepositoryIndex)
-				.set({ status: "completed", lastIngestedCommitSha: commitSha })
+				.set({
+					status: "completed",
+					lastIngestedCommitSha: commitSha,
+				})
 				.where(
 					and(
 						eq(githubRepositoryIndex.owner, source.owner),
@@ -287,6 +293,12 @@ class GitHubRepositoryEmbeddingStoreImpl
 		error: Error,
 	): Promise<void> {
 		const source = params.source as GitHubRepositoryParams;
+		if (!source) {
+			console.warn("failIngestion: source is missing", params);
+			captureException(error);
+			return;
+		}
+
 		captureException(error, {
 			extra: {
 				owner: source.owner,

@@ -53,7 +53,8 @@ export interface EmbeddingStore<T = unknown> {
  */
 export interface BaseEmbedding {
 	id?: string;
-	content: string;
+	chunkContent: string;
+	chunkIndex: number;
 	embedding: number[];
 	metadata: Record<string, unknown>;
 }

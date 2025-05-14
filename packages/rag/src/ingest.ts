@@ -117,7 +117,8 @@ async function processDocument<LoaderMetadataType, StoreDataType>(
 
 		// Create base embedding object
 		const baseEmbedding: BaseEmbedding = {
-			content: chunk.content,
+			chunkContent: chunk.content,
+			chunkIndex: chunk.index,
 			embedding,
 			metadata: {
 				...metadata,
