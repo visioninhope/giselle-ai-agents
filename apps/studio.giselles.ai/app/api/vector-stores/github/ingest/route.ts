@@ -86,9 +86,7 @@ export async function GET(request: NextRequest) {
 			commitSha,
 		};
 
-		const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl(
-			teamDbId,
-		);
+		const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl(teamDbId);
 
 		try {
 			// Ingest using the RAG package
@@ -175,7 +173,8 @@ async function fetchTargetGitHubRepositories(): Promise<
  * Implementation of EmbeddingStore for GitHub repositories
  */
 class GitHubRepositoryEmbeddingStoreImpl
-	implements EmbeddingStore<GitHubRepositoryEmbedding> {
+	implements EmbeddingStore<GitHubRepositoryEmbedding>
+{
 	private teamDbId: number;
 	constructor(teamDbId: number) {
 		this.teamDbId = teamDbId;
@@ -191,7 +190,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 						eq(githubRepositoryIndex.owner, owner),
 						eq(githubRepositoryIndex.repo, repo),
 						eq(githubRepositoryIndex.teamDbId, this.teamDbId),
-					)
+					),
 				)
 				.limit(1);
 			const repositoryIndex = records[0];
