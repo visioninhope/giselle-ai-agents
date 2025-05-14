@@ -351,12 +351,15 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
-      '@giselle-sdk/github-vector-store':
+      '@giselle-sdk/github-tool':
         specifier: workspace:*
-        version: link:../../packages/github-vector-store
+        version: link:../../packages/github-tool
       '@giselle-sdk/integration':
         specifier: workspace:*
         version: link:../../packages/integration
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../../packages/rag
       '@giselle-sdk/supabase-driver':
         specifier: workspace:*
         version: link:../../packages/supabase-driver
