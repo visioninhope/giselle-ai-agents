@@ -56,5 +56,12 @@ export interface BaseEmbedding {
 	chunkContent: string;
 	chunkIndex: number;
 	embedding: number[];
-	metadata: Record<string, unknown>;
 }
+
+/**
+ * Interface for transforming embeddings
+ */
+export type EmbeddingTransformer<LoaderMetadataType, StoreDataType> = (
+	baseEmbedding: BaseEmbedding,
+	metadata: LoaderMetadataType,
+) => StoreDataType;

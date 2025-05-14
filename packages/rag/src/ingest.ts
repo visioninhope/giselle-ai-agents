@@ -2,8 +2,11 @@ import { createLineChunker } from "./chunk";
 import { createOpenAIEmbedder } from "./embed";
 import type {
 	BaseEmbedding,
+	Chunker,
 	ContentLoader,
+	Embedder,
 	EmbeddingStore,
+	EmbeddingTransformer,
 	LoaderResult,
 } from "./types";
 
@@ -22,19 +25,16 @@ export async function ingest<
 	// Embedding store
 	store: EmbeddingStore<StoreDataType>;
 	// Transformation function
-	transformEmbedding?: (
-		baseEmbedding: BaseEmbedding,
-		metadata: LoaderMetadataType,
-	) => StoreDataType;
+	transformEmbedding?: EmbeddingTransformer<LoaderMetadataType, StoreDataType>;
 }): Promise<void> {
 	const {
 		source,
 		loader,
 		store,
-		transformEmbedding = defaultTransform as (
-			baseEmbedding: BaseEmbedding,
-			metadata: LoaderMetadataType,
-		) => StoreDataType,
+		transformEmbedding = defaultTransform as EmbeddingTransformer<
+			LoaderMetadataType,
+			StoreDataType
+		>,
 	} = params;
 
 	// Create chunker and embedder
@@ -80,17 +80,10 @@ export async function ingest<
 async function processDocument<LoaderMetadataType, StoreDataType>(
 	document: LoaderResult<LoaderMetadataType>,
 	params: {
-		chunker: {
-			chunk(
-				content: string,
-			): AsyncGenerator<{ content: string; index: number }>;
-		};
-		embedder: { embed(text: string): Promise<number[]> };
+		chunker: Chunker;
+		embedder: Embedder;
 		store: EmbeddingStore<StoreDataType>;
-		transformEmbedding: (
-			baseEmbedding: BaseEmbedding,
-			metadata: LoaderMetadataType,
-		) => StoreDataType;
+		transformEmbedding: EmbeddingTransformer<LoaderMetadataType, StoreDataType>;
 		maxContentSize: number;
 	},
 ): Promise<void> {
@@ -120,10 +113,6 @@ async function processDocument<LoaderMetadataType, StoreDataType>(
 			chunkContent: chunk.content,
 			chunkIndex: chunk.index,
 			embedding,
-			metadata: {
-				...metadata,
-				chunkIndex: chunk.index,
-			},
 		};
 
 		// Transform and store
@@ -132,7 +121,12 @@ async function processDocument<LoaderMetadataType, StoreDataType>(
 	}
 }
 
-// Default transformation function
-function defaultTransform<T>(baseEmbedding: BaseEmbedding): T {
-	return baseEmbedding as unknown as T;
+function defaultTransform<T>(
+	baseEmbedding: BaseEmbedding,
+	metadata: Record<string, unknown>,
+): T {
+	return {
+		...baseEmbedding,
+		metadata,
+	} as T;
 }
