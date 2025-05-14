@@ -66,8 +66,13 @@ export function SelectOutputPopover({
 	>;
 }) {
 	const [selectedOutputIds, setSelectedOutputIds] = useState<OutputId[]>([]);
-	const { generatedInputs, textInputs, fileInputs, githubInputs } =
-		useCategoriedOutputs(outputs);
+	const {
+		generatedInputs,
+		textInputs,
+		fileInputs,
+		githubInputs,
+		actionInputs,
+	} = useCategoriedOutputs(outputs);
 	const { isSupportedConnection } = useWorkflowDesigner();
 	const isSupported = useCallback(
 		(input: OutputWithDetails) => {
@@ -192,6 +197,20 @@ export function SelectOutputPopover({
 											key={githubInput.id}
 											input={githubInput}
 											disabled={!isSupported(githubInput)}
+										/>
+									))}
+								</div>
+							)}
+							{actionInputs.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Action
+									</p>
+									{actionInputs.map((actionInput) => (
+										<OutputToggleItem
+											key={actionInput.id}
+											input={actionInput}
+											disabled={!isSupported(actionInput)}
 										/>
 									))}
 								</div>
