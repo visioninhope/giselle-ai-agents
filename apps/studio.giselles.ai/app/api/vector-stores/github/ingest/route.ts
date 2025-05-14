@@ -88,31 +88,13 @@ export async function GET(request: NextRequest) {
 
 		const embeddingStore = new GitHubRepositoryEmbeddingStoreImpl(teamDbId);
 
-		try {
-			// Ingest using the RAG package
-			await ingest({
-				source,
-				loader,
-				store: embeddingStore,
-				transformEmbedding: transformGitHubEmbedding,
-			});
-
-			// Update repository status to completed
-			await embeddingStore.completeIngestion({
-				source,
-				commitSha: source.commitSha,
-			});
-		} catch (error) {
-			// Handle errors
-			if (error instanceof Error) {
-				await embeddingStore.failIngestion({ source }, error);
-			} else {
-				await embeddingStore.failIngestion(
-					{ source },
-					new Error(`Unknown error during ingestion: ${String(error)}`),
-				);
-			}
-		}
+		// Ingest using the RAG package
+		await ingest({
+			source,
+			loader,
+			store: embeddingStore,
+			transformEmbedding: transformGitHubEmbedding,
+		});
 	}
 
 	return new Response("ok", { status: 200 });
@@ -173,8 +155,7 @@ async function fetchTargetGitHubRepositories(): Promise<
  * Implementation of EmbeddingStore for GitHub repositories
  */
 class GitHubRepositoryEmbeddingStoreImpl
-	implements EmbeddingStore<GitHubRepositoryEmbedding>
-{
+	implements EmbeddingStore<GitHubRepositoryEmbedding> {
 	private teamDbId: number;
 	constructor(teamDbId: number) {
 		this.teamDbId = teamDbId;
