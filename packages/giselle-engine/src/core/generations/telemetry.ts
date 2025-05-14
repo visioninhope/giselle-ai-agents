@@ -58,9 +58,11 @@ export function generateTelemetryTags(args: {
 }
 
 export function updateTelemetry(
-	telemetryObject: { update: Function },
-	input: any,
-	output: any,
+	telemetryObject: {
+		update: (data: { input: unknown; output: unknown }) => void;
+	},
+	input: unknown,
+	output: unknown,
 ) {
 	telemetryObject.update({ input, output });
 }
