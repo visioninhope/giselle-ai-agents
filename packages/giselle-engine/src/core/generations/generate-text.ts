@@ -36,10 +36,7 @@ import { Langfuse } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import {
-	generateTelemetryTags,
-	updateTelemetry,
-} from "./telemetry";
+import { generateTelemetryTags, updateTelemetry } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
