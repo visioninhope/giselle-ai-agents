@@ -42,14 +42,14 @@ export function Button({
 	);
 }
 
-export function buttonLabel(triggerProvider: TriggerProvider) {
-	switch (triggerProvider) {
+export function buttonLabel(node: TriggerNode) {
+	switch (node.content.provider) {
 		case "manual":
 			return "Trigger Manual flow";
 		case "github":
 			return "Trigger GitHub flow";
 		default: {
-			const _exhaustiveCheck: never = triggerProvider;
+			const _exhaustiveCheck: never = node.content.provider;
 			throw new Error(`Unhandled trigger provider type: ${_exhaustiveCheck}`);
 		}
 	}
@@ -65,7 +65,7 @@ export function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 		<Dialog.Root>
 			<Dialog.Trigger asChild>
 				<Button leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}>
-					{buttonLabel(triggerNode.content.provider)}
+					{buttonLabel(triggerNode)}
 				</Button>
 			</Dialog.Trigger>
 			<Dialog.Portal>

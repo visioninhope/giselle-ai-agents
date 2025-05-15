@@ -76,7 +76,7 @@ function Trigger() {
 								key={triggerNode.id}
 								className="text-black-900 outline-none hover:bg-black-300/20 px-[8px] cursor-pointer rounded-[4px] py-[2px]"
 							>
-								{buttonLabel(triggerNode.content.provider)}
+								{buttonLabel(triggerNode)}
 							</DropdownMenu.Item>
 						);
 					})}
