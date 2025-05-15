@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tag, TagInput } from "./tag-input";
+import { type Tag, TagInput } from "./tag-input";
 
 export type SearchDomainFilterProps = {
 	onFilterChange?: (include: string[], exclude: string[]) => void;
@@ -27,10 +27,10 @@ export function SearchDomainFilter({
 	};
 
 	const [includeTags, setIncludeTags] = useState<Tag[]>(
-		createInitialTags(defaultIncludeDomains)
+		createInitialTags(defaultIncludeDomains),
 	);
 	const [excludeTags, setExcludeTags] = useState<Tag[]>(
-		createInitialTags(defaultExcludeDomains)
+		createInitialTags(defaultExcludeDomains),
 	);
 
 	// 親コンポーネントに変更を通知
@@ -116,10 +116,10 @@ export function SearchDomainFilterExample() {
 
 	return (
 		<div className="p-4 bg-gray-900 rounded">
-			<SearchDomainFilter 
+			<SearchDomainFilter
 				onFilterChange={handleFilterChange}
 				defaultIncludeDomains={["example.com"]}
 			/>
 		</div>
 	);
-} 
+}

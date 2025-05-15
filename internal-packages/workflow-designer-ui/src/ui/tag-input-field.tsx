@@ -1,5 +1,5 @@
 import { XIcon } from "lucide-react";
-import React, { KeyboardEvent, useRef, useState } from "react";
+import React, { type KeyboardEvent, useRef, useState } from "react";
 
 export type Tag = {
 	id: string;
@@ -13,6 +13,7 @@ type TagInputFieldProps = {
 	placeholder?: string;
 	className?: string;
 	label?: string;
+	inputId?: string;
 };
 
 export function TagInputField({
@@ -22,6 +23,7 @@ export function TagInputField({
 	placeholder = "タグを入力...",
 	className = "",
 	label,
+	inputId,
 }: TagInputFieldProps) {
 	const [inputValue, setInputValue] = useState("");
 	const inputRef = useRef<HTMLInputElement>(null);
@@ -45,13 +47,17 @@ export function TagInputField({
 	return (
 		<div className={`relative w-full ${className}`}>
 			{label && (
-				<label className="block text-sm font-medium mb-1 text-gray-700">
+				<label
+					htmlFor={inputId}
+					className="block text-sm font-medium mb-1 text-gray-700"
+				>
 					{label}
 				</label>
 			)}
-			<div
+			<button
+				type="button"
 				onClick={focusInput}
-				className="flex flex-wrap items-center w-full px-3 py-2 border border-gray-300 rounded-md focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-[38px]"
+				className="flex flex-wrap items-center w-full px-3 py-2 border border-gray-300 rounded-md focus-within:ring-1 focus-within:ring-indigo-500 focus-within:border-indigo-500 min-h-[38px] text-left"
 			>
 				{tags.map((tag) => (
 					<div
@@ -80,7 +86,7 @@ export function TagInputField({
 					placeholder={tags.length === 0 ? placeholder : ""}
 					className="flex-1 min-w-[80px] h-6 outline-none border-none bg-transparent text-sm"
 				/>
-			</div>
+			</button>
 		</div>
 	);
 }
@@ -88,7 +94,7 @@ export function TagInputField({
 // 使用例
 export function TagInputFieldExample() {
 	const [tags, setTags] = useState<Tag[]>([
-		{ id: "1", label: "ブランド Maison Margiela(メゾン マルジェラ)" }
+		{ id: "1", label: "ブランド Maison Margiela(メゾン マルジェラ)" },
 	]);
 
 	const handleAddTag = (value: string) => {
@@ -114,4 +120,4 @@ export function TagInputFieldExample() {
 			/>
 		</div>
 	);
-} 
+}

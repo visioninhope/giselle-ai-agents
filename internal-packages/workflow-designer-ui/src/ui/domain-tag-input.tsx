@@ -1,5 +1,5 @@
 import { XIcon } from "lucide-react";
-import React, { KeyboardEvent, useEffect, useState } from "react";
+import React, { type KeyboardEvent, useEffect, useState } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 
@@ -26,12 +26,12 @@ export function DomainTagInput({
 	label,
 }: DomainTagInputProps) {
 	const [inputValue, setInputValue] = useState("");
-	
+
 	// 初回レンダリング時にアラートを表示
 	useEffect(() => {
 		alert(`DomainTagInput mounted. Initial domains: ${domains.length}`);
-	}, []);
-	
+	}, [domains.length]);
+
 	// domainsが変更されたらアラートを表示
 	useEffect(() => {
 		alert(`Domains updated. Current count: ${domains.length}`);
@@ -40,7 +40,7 @@ export function DomainTagInput({
 	const handleAddDomain = () => {
 		const value = inputValue.trim();
 		if (!value) return;
-		
+
 		onAddDomain(value);
 		setInputValue("");
 	};
@@ -60,10 +60,10 @@ export function DomainTagInput({
 					<span className="text-[14px] text-white pl-2">{label}</span>
 				</div>
 			</div>
-			
+
 			{/* タグエリア - 入力フィールドの上 */}
 			<div className="flex flex-wrap ml-[150px] mb-4">
-				{domains.map(domain => (
+				{domains.map((domain) => (
 					<div
 						key={domain.id}
 						className="flex items-center bg-gray-800 text-white rounded-sm px-2 py-1 mr-2 mb-2"
@@ -79,12 +79,10 @@ export function DomainTagInput({
 					</div>
 				))}
 			</div>
-			
+
 			{/* 入力エリア - タグの下に配置 */}
 			<div className="flex items-center">
-				<div className="w-[150px]">
-					{/* ラベルとの整列のためのスペース */}
-				</div>
+				<div className="w-[150px]">{/* ラベルとの整列のためのスペース */}</div>
 				<div className="flex-1 flex items-center">
 					<Input
 						className="w-full h-10 bg-transparent border-[0.5px] border-white-900 rounded-md text-[14px] text-gray-300 px-3 py-2 placeholder:text-gray-500"
@@ -112,7 +110,7 @@ export function DomainTagInput({
 export function DomainTagInputTest() {
 	const [domains, setDomains] = useState<DomainTag[]>([
 		{ id: "1", domain: "example.com" },
-		{ id: "2", domain: "Brand Maison Margiela" }
+		{ id: "2", domain: "Brand Maison Margiela" },
 	]);
 
 	useEffect(() => {
@@ -129,7 +127,7 @@ export function DomainTagInputTest() {
 			id: Date.now().toString(),
 			domain,
 		};
-		
+
 		setDomains([...domains, newDomain]);
 	};
 
@@ -148,13 +146,15 @@ export function DomainTagInputTest() {
 				placeholder="Enter text to add"
 				label="Test Tags"
 			/>
-			
+
 			<div className="mt-4 p-2 bg-gray-800 rounded">
-				<h3 className="text-white text-sm mb-2">Current domains (debug view):</h3>
+				<h3 className="text-white text-sm mb-2">
+					Current domains (debug view):
+				</h3>
 				<pre className="text-gray-300 text-xs">
 					{JSON.stringify(domains, null, 2)}
 				</pre>
 			</div>
 		</div>
 	);
-} 
+}

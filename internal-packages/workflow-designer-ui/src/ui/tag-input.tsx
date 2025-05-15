@@ -1,5 +1,5 @@
 import { XIcon } from "lucide-react";
-import React, { KeyboardEvent, useState } from "react";
+import React, { type KeyboardEvent, useState } from "react";
 import { Button } from "./button";
 
 export type Tag = {
@@ -42,10 +42,14 @@ export function TagInput({
 		}
 	};
 
+	const inputId = `tag-input-${Math.random().toString(36).substr(2, 9)}`;
+
 	return (
 		<div className="w-full">
 			{label && (
-				<label className="block text-sm font-medium mb-1">{label}</label>
+				<label htmlFor={inputId} className="block text-sm font-medium mb-1">
+					{label}
+				</label>
 			)}
 			<div className={`flex flex-col gap-2 ${className}`}>
 				{/* タグ表示エリア */}
@@ -68,16 +72,17 @@ export function TagInput({
 						))}
 					</div>
 				)}
-				
+
 				{/* 入力エリア */}
 				<div className="flex w-full">
 					<input
+						id={inputId}
 						type="text"
 						value={inputValue}
 						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
 						placeholder={placeholder}
-						className="flex-1 p-2 bg-transparent border border-gray-700 rounded-l focus:outline-none focus:ring-1 focus:ring-gray-400"
+						className="flex-grow border-none focus:ring-0 focus:outline-none bg-transparent text-gray-300 p-0 text-sm"
 					/>
 					<Button
 						className="rounded-l-none"
@@ -119,4 +124,4 @@ export function TagInputExample() {
 			/>
 		</div>
 	);
-} 
+}

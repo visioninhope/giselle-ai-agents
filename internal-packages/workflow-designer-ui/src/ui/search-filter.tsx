@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Tag, TagInput } from "./tag-input";
+import { type Tag, TagInput } from "./tag-input";
 
 export type SearchFilterProps = {
 	onFilterChange?: (include: Tag[], exclude: Tag[]) => void;
@@ -87,4 +87,4 @@ export function SearchFilterExample() {
 			<SearchFilter onFilterChange={handleFilterChange} />
 		</div>
 	);
-} 
+}

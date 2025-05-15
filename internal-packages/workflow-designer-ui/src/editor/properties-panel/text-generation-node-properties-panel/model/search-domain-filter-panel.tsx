@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react";
-import { Input } from "../../../../ui/input";
 import { Button } from "../../../../ui/button";
+import { Input } from "../../../../ui/input";
 
 const DOMAIN_VALIDATION_REGEX = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const MAX_DOMAINS = 10;
@@ -82,7 +82,7 @@ export function SearchDomainFilterPanel({
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
-		
+
 		console.log("Adding to allowlist:", value);
 		updateDomainFilter([...allowlist, value], denylist);
 		setAllowlistInput("");
@@ -93,7 +93,7 @@ export function SearchDomainFilterPanel({
 		if (!value) return;
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
-		
+
 		console.log("Adding to denylist:", value);
 		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
 		setDenylistInput("");
@@ -129,7 +129,7 @@ export function SearchDomainFilterPanel({
 
 			{denylist.length > 0 && (
 				<div className="ml-[150px] mb-4 text-[13px] text-gray-400">
-					Added: {denylist.map(d => d.slice(1)).join(", ")}
+					Added: {denylist.map((d) => d.slice(1)).join(", ")}
 				</div>
 			)}
 		</div>
