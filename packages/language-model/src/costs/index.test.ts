@@ -1,12 +1,7 @@
 import { beforeEach, describe, expect, it } from "vitest";
 import { calculateCost } from "./index";
-import { clearValidPriceCache } from "./model-prices";
 
 describe("calculateCost", () => {
-	beforeEach(() => {
-		clearValidPriceCache();
-	});
-
 	describe("Basic cost calculations", () => {
 		it("should calculate cost for OpenAI model", async () => {
 			const result = await calculateCost("openai", "gpt-4.1", {
