@@ -28,7 +28,7 @@ export function BasicTagInput({
 	const [inputValue, setInputValue] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
 	const [validationError, setValidationError] = useState<string | null>(null);
-	
+
 	// Check if maximum domains limit reached
 	const isMaxReached = tags.length >= MAX_DOMAINS;
 
@@ -45,7 +45,7 @@ export function BasicTagInput({
 		if (inputValue.trim() !== "") {
 			// Check if maximum limit reached
 			if (isMaxReached) return;
-			
+
 			// Validation check
 			if (validateInput) {
 				const validationResult = validateInput(inputValue.trim());
@@ -154,11 +154,13 @@ export function BasicTagInput({
 				{/* Maximum domains warning */}
 				{isMaxReached && (
 					<div style={{ marginBottom: "8px" }}>
-						<p style={{ 
-							color: "var(--color-error-900, #FF627E)",
-							fontSize: "12px",
-							fontFamily: "var(--font-geist), system-ui, sans-serif" 
-						}}>
+						<p
+							style={{
+								color: "var(--color-error-900, #FF627E)",
+								fontSize: "12px",
+								fontFamily: "var(--font-geist), system-ui, sans-serif",
+							}}
+						>
 							You can add up to {MAX_DOMAINS} domains only.
 						</p>
 					</div>
@@ -227,7 +229,10 @@ export function BasicTagInput({
 							fontSize: "14px",
 							fontWeight: 500,
 							fontFamily: "var(--font-hubot-sans), system-ui, sans-serif",
-							cursor: inputValue.trim() === "" || isMaxReached ? "not-allowed" : "pointer",
+							cursor:
+								inputValue.trim() === "" || isMaxReached
+									? "not-allowed"
+									: "pointer",
 							opacity: inputValue.trim() === "" || isMaxReached ? 0.5 : 1,
 						}}
 					>
@@ -248,34 +253,6 @@ export function BasicTagInput({
 						{validationError}
 					</div>
 				)}
-			</div>
-		</div>
-	);
-}
-
-// Test component
-export function BasicTagInputTest() {
-	const [testTags, setTestTags] = useState<string[]>(["example", "test"]);
-
-	const handleTagsChange = (newTags: string[]) => {
-		console.log("Tags changed:", newTags);
-		setTestTags(newTags);
-	};
-
-	return (
-		<div
-			className="p-4 bg-gray-900 rounded-lg"
-			style={{ fontFamily: "var(--font-geist), system-ui, sans-serif" }}
-		>
-			<BasicTagInput
-				initialTags={testTags}
-				onTagsChange={handleTagsChange}
-				label="Test Tags"
-				placeholder="Add a test tag"
-			/>
-
-			<div className="mt-4 text-gray-400 text-sm">
-				External tags state: {testTags.join(", ") || "none"}
 			</div>
 		</div>
 	);
