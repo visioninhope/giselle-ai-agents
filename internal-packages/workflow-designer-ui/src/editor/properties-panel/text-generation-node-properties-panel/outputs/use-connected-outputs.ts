@@ -1,6 +1,7 @@
 import type {
 	ActionNode,
 	TextGenerationNode,
+	TriggerNode,
 	VariableNode,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
@@ -16,6 +17,8 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 		const connectedGeneratedInputs: ConnectedOutputWithDetails<TextGenerationNode>[] =
 			[];
 		const connectedActionInputs: ConnectedOutputWithDetails<ActionNode>[] = [];
+		const connectedTriggerInputs: ConnectedOutputWithDetails<TriggerNode>[] =
+			[];
 		const connectedVariableInputs: ConnectedOutputWithDetails<VariableNode>[] =
 			[];
 		for (const connection of connectionsToThisNode) {
@@ -49,8 +52,14 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 								connection,
 							});
 							break;
-						case "imageGeneration":
 						case "trigger":
+							connectedTriggerInputs.push({
+								...output,
+								node: node as TriggerNode,
+								connection,
+							});
+							break;
+						case "imageGeneration":
 							break;
 						default: {
 							const _exhaustiveCheck: never = node.content;
@@ -74,6 +83,7 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 
 		return {
 			all: [
+				...connectedTriggerInputs,
 				...connectedGeneratedInputs,
 				...connectedActionInputs,
 				...connectedVariableInputs,
@@ -81,6 +91,7 @@ export function useConnectedOutputs(node: TextGenerationNode) {
 			generation: connectedGeneratedInputs,
 			variable: connectedVariableInputs,
 			action: connectedActionInputs,
+			trigger: connectedTriggerInputs,
 		};
 	}, [node.id, data.connections, data.nodes]);
 }
