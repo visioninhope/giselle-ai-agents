@@ -9,16 +9,8 @@ let lastCacheResetDate = new Date();
 // Check and reset cache if it's a new UTC day
 function checkAndResetCacheIfNeeded() {
 	const now = new Date();
-	const currentUTCDate = new Date(
-		Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()),
-	);
-	const lastResetUTCDate = new Date(
-		Date.UTC(
-			lastCacheResetDate.getUTCFullYear(),
-			lastCacheResetDate.getUTCMonth(),
-			lastCacheResetDate.getUTCDate(),
-		),
-	);
+	const currentUTCDate = new Date(Date.UTC(now.getUTCFullYear(), now.getUTCMonth(), now.getUTCDate()));
+	const lastResetUTCDate = new Date(Date.UTC(lastCacheResetDate.getUTCFullYear(), lastCacheResetDate.getUTCMonth(), lastCacheResetDate.getUTCDate()));
 
 	if (currentUTCDate > lastResetUTCDate) {
 		validPriceCache.clear();

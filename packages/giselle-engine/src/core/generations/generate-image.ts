@@ -26,11 +26,8 @@ import {
 	type CoreMessage,
 	experimental_generateImage as generateImageAiSdk,
 } from "ai";
-import {
-	type ApiMediaContentType,
-	type Langfuse,
-	LangfuseMedia,
-} from "langfuse";
+import { type ApiMediaContentType, type Langfuse, LangfuseMedia } from "langfuse";
+import { getLangfuseInstance } from "./telemetry";
 import type { Storage } from "unstorage";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";

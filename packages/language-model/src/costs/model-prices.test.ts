@@ -1,10 +1,5 @@
-import { beforeEach, describe, expect, it } from "vitest";
-import {
-	type ModelPriceTable,
-	clearValidPriceCache,
-	getValidPricing,
-	openAiTokenPricing,
-} from "./model-prices";
+import { describe, expect, it, beforeEach } from "vitest";
+import { type ModelPriceTable, getValidPricing, clearValidPriceCache, openAiTokenPricing } from "./model-prices";
 import type { ModelPrice } from "./pricing";
 
 describe("getValidPricing", () => {
@@ -148,8 +143,8 @@ describe("getValidPricing", () => {
 	});
 
 	it("should throw error for non-existent model", () => {
-		expect(() =>
-			getValidPricing("non-existent-model", openAiTokenPricing),
-		).toThrow("No pricing found for model non-existent-model");
+		expect(() => getValidPricing("non-existent-model", openAiTokenPricing)).toThrow(
+			"No pricing found for model non-existent-model",
+		);
 	});
 });
