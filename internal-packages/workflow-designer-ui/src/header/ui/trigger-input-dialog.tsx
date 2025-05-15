@@ -211,11 +211,12 @@ export function TriggerInputDialog({
 				}
 			}
 			case "manual": {
-				if (!trigger.configuration.event.parameters) {
-					return [];
-				}
-
-				return [];
+				return trigger.configuration.event.parameters.map((parameter) => ({
+					name: parameter.id,
+					label: parameter.name,
+					type: parameter.type,
+					required: parameter.required,
+				}));
 			}
 			default: {
 				const _exhaustiveCheck: never = trigger.configuration;

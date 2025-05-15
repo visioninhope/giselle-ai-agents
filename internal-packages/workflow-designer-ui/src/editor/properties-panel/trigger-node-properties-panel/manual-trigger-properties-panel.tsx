@@ -59,11 +59,14 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				return;
 			}
 
-			const outputs: Output[] = parameters.map((param) => ({
-				id: OutputId.generate(),
-				label: param.name,
-				accessor: param.name.toLowerCase().replace(/\s+/g, "_"),
-			}));
+			const outputs: Output[] = parameters.map((param) => {
+				const outputId = OutputId.generate();
+				return {
+					id: outputId,
+					label: param.name,
+					accessor: outputId,
+				};
+			});
 
 			startTransition(async () => {
 				const { triggerId } = await client.configureTrigger({
