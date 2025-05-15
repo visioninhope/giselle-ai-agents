@@ -1,13 +1,13 @@
-import type { FlowTriggerId } from "@giselle-sdk/data-type";
+import type { FlowTriggerId, TriggerNode } from "@giselle-sdk/data-type";
 import { useTrigger } from "../../../../hooks/use-trigger";
 
 export function ManualTriggerConfiguredView({
-	flowTriggerId,
+	node,
 }: {
-	flowTriggerId: FlowTriggerId;
+	node: TriggerNode;
 }) {
 	const { isLoading, data, enableFlowTrigger, disableFlowTrigger } =
-		useTrigger(flowTriggerId);
+		useTrigger(node);
 	if (isLoading) {
 		return "loading...";
 	}
