@@ -2,7 +2,10 @@ import { XIcon } from "lucide-react";
 import type React from "react";
 import { useEffect, useState } from "react";
 
-// 外部からタグを管理できるようにする基本的なタグ入力コンポーネント
+// Maximum number of domains allowed
+const MAX_DOMAINS = 10;
+
+// Basic tag input component that allows managing tags externally
 export type BasicTagInputProps = {
 	initialTags?: string[];
 	onTagsChange?: (tags: string[]) => void;
@@ -20,24 +23,30 @@ export function BasicTagInput({
 	validateInput,
 	emptyStateText = "No tags added yet",
 }: BasicTagInputProps) {
-	// タグを管理するためのローカル状態
+	// Local state for managing tags
 	const [tags, setTags] = useState<string[]>(initialTags);
 	const [inputValue, setInputValue] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
 	const [validationError, setValidationError] = useState<string | null>(null);
+	
+	// Check if maximum domains limit reached
+	const isMaxReached = tags.length >= MAX_DOMAINS;
 
-	// 入力フィールド用のID生成
+	// Generate ID for input field
 	const inputId = `tag-input-${label.toLowerCase().replace(/\s+/g, "-")}`;
 
-	// initialTagsが変更された場合にローカル状態を更新
+	// Update local state when initialTags changes
 	useEffect(() => {
 		setTags(initialTags);
 	}, [initialTags]);
 
-	// タグ追加処理
+	// Tag addition process
 	const addTag = () => {
 		if (inputValue.trim() !== "") {
-			// バリデーションチェック
+			// Check if maximum limit reached
+			if (isMaxReached) return;
+			
+			// Validation check
 			if (validateInput) {
 				const validationResult = validateInput(inputValue.trim());
 				if (!validationResult.isValid) {
@@ -51,14 +60,14 @@ export function BasicTagInput({
 			setInputValue("");
 			setValidationError(null);
 
-			// 親コンポーネントに変更を通知
+			// Notify parent component of the change
 			if (onTagsChange) {
 				onTagsChange(newTags);
 			}
 		}
 	};
 
-	// 入力値の変更時にバリデーションエラーをクリア
+	// Clear validation error when input value changes
 	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
 		setInputValue(e.target.value);
 		if (validationError) {
@@ -66,25 +75,25 @@ export function BasicTagInput({
 		}
 	};
 
-	// タグ削除処理
+	// Tag removal process
 	const removeTag = (index: number) => {
 		const newTags = tags.filter((_, i) => i !== index);
 		setTags(newTags);
 
-		// 親コンポーネントに変更を通知
+		// Notify parent component of the change
 		if (onTagsChange) {
 			onTagsChange(newTags);
 		}
 	};
 
-	// 共通のGeistフォントスタイル
+	// Common Geist font style
 	const geistFontStyle = {
 		fontFamily: "var(--font-geist), system-ui, sans-serif",
 	};
 
 	return (
 		<div className="w-full mb-5 flex" style={geistFontStyle}>
-			{/* 左側：ラベル */}
+			{/* Left side: Label */}
 			<div className="w-1/4">
 				<label
 					htmlFor={inputId}
@@ -95,9 +104,9 @@ export function BasicTagInput({
 				</label>
 			</div>
 
-			{/* 右側：タグと入力フィールド */}
+			{/* Right side: Tags and input field */}
 			<div className="w-3/4 flex flex-col">
-				{/* タグを表示するエリア */}
+				{/* Area to display tags */}
 				<div className="flex flex-wrap gap-1 mb-3">
 					{tags.map((tag, index) => (
 						<div
@@ -142,7 +151,20 @@ export function BasicTagInput({
 					)}
 				</div>
 
-				{/* 入力エリア */}
+				{/* Maximum domains warning */}
+				{isMaxReached && (
+					<div style={{ marginBottom: "8px" }}>
+						<p style={{ 
+							color: "var(--color-error-900, #FF627E)",
+							fontSize: "12px",
+							fontFamily: "var(--font-geist), system-ui, sans-serif" 
+						}}>
+							You can add up to {MAX_DOMAINS} domains only.
+						</p>
+					</div>
+				)}
+
+				{/* Input area */}
 				<div
 					style={{
 						display: "flex",
@@ -189,11 +211,12 @@ export function BasicTagInput({
 							outline: "none",
 							padding: 0,
 						}}
+						disabled={isMaxReached}
 					/>
 					<button
 						type="button"
 						onClick={addTag}
-						disabled={inputValue.trim() === ""}
+						disabled={!inputValue.trim() || isMaxReached}
 						style={{
 							marginLeft: "8px",
 							padding: "4px 12px",
@@ -204,15 +227,15 @@ export function BasicTagInput({
 							fontSize: "14px",
 							fontWeight: 500,
 							fontFamily: "var(--font-hubot-sans), system-ui, sans-serif",
-							cursor: inputValue.trim() === "" ? "not-allowed" : "pointer",
-							opacity: inputValue.trim() === "" ? 0.5 : 1,
+							cursor: inputValue.trim() === "" || isMaxReached ? "not-allowed" : "pointer",
+							opacity: inputValue.trim() === "" || isMaxReached ? 0.5 : 1,
 						}}
 					>
 						Add
 					</button>
 				</div>
 
-				{/* バリデーションエラーメッセージ */}
+				{/* Validation error message */}
 				{validationError && (
 					<div
 						style={{
@@ -230,7 +253,7 @@ export function BasicTagInput({
 	);
 }
 
-// テスト用コンポーネント
+// Test component
 export function BasicTagInputTest() {
 	const [testTags, setTestTags] = useState<string[]>(["example", "test"]);
 
