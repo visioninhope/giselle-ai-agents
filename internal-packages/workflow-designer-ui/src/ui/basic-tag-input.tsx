@@ -127,7 +127,7 @@ export function BasicTagInput({
 							<span className="mr-1 text-sm">{tag}</span>
 							<button
 								type="button"
-								onClick={() => removeTag(index)}
+								onClick={() => removeTag(tags.indexOf(tag))}
 								style={{
 									padding: "0 0 0 2px",
 									color: "var(--black-400, #505D7B)",
