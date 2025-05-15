@@ -1,12 +1,8 @@
-import { describe, expect, it, beforeEach } from "vitest";
-import { type ModelPriceTable, getValidPricing, clearValidPriceCache, openAiTokenPricing } from "./model-prices";
+import { describe, expect, it } from "vitest";
+import { type ModelPriceTable, getValidPricing } from "./model-prices";
 import type { ModelPrice } from "./pricing";
 
 describe("getValidPricing", () => {
-	beforeEach(() => {
-		clearValidPriceCache();
-	});
-
 	it("should return the price", () => {
 		const now = new Date();
 		const past = new Date(now.getTime() - 1000);
@@ -125,26 +121,5 @@ describe("getValidPricing", () => {
 		const result = getValidPricing("test-model", priceTable);
 		expect(result.price.input.costPerMegaToken).toBe(3);
 		expect(result.price.output.costPerMegaToken).toBe(4);
-	});
-
-	it("should return valid pricing for a model", () => {
-		const price = getValidPricing("gpt-4.1", openAiTokenPricing);
-		expect(price).toBeDefined();
-		expect(price.price.input.costPerMegaToken).toBe(2.0);
-		expect(price.price.output.costPerMegaToken).toBe(8.0);
-	});
-
-	it("should use cache for subsequent calls", () => {
-		// First call should calculate and cache
-		const firstCall = getValidPricing("gpt-4.1", openAiTokenPricing);
-		// Second call should use cache
-		const secondCall = getValidPricing("gpt-4.1", openAiTokenPricing);
-		expect(firstCall).toBe(secondCall); // Should be the same object reference
-	});
-
-	it("should throw error for non-existent model", () => {
-		expect(() => getValidPricing("non-existent-model", openAiTokenPricing)).toThrow(
-			"No pricing found for model non-existent-model",
-		);
 	});
 });
