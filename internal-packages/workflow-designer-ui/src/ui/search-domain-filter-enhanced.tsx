@@ -18,15 +18,6 @@ export function SearchDomainFilterEnhanced({
 	defaultIncludeDomains = [],
 	defaultExcludeDomains = [],
 }: SearchDomainFilterEnhancedProps) {
-	console.log("[SearchDomainFilterEnhanced] Component rendering");
-	console.log(
-		"[SearchDomainFilterEnhanced] defaultIncludeDomains:",
-		defaultIncludeDomains,
-	);
-	console.log(
-		"[SearchDomainFilterEnhanced] defaultExcludeDomains:",
-		defaultExcludeDomains,
-	);
 
 	// Create initial tags with unique IDs
 	const createInitialTags = (domains: string[]): DomainTag[] => {
@@ -38,21 +29,11 @@ export function SearchDomainFilterEnhanced({
 
 	// Initialize state with default values
 	const [includeDomains, setIncludeDomains] = useState<DomainTag[]>(() => {
-		const initialTags = createInitialTags(defaultIncludeDomains);
-		console.log(
-			"[SearchDomainFilterEnhanced] Initial include domains:",
-			initialTags,
-		);
-		return initialTags;
+		return createInitialTags(defaultIncludeDomains);
 	});
 
 	const [excludeDomains, setExcludeDomains] = useState<DomainTag[]>(() => {
-		const initialTags = createInitialTags(defaultExcludeDomains);
-		console.log(
-			"[SearchDomainFilterEnhanced] Initial exclude domains:",
-			initialTags,
-		);
-		return initialTags;
+		return createInitialTags(defaultExcludeDomains);
 	});
 
 	// Effect to notify parent of changes
@@ -60,45 +41,18 @@ export function SearchDomainFilterEnhanced({
 		if (onFilterChange) {
 			const includeValues = includeDomains.map((tag) => tag.domain);
 			const excludeValues = excludeDomains.map((tag) => tag.domain);
-			console.log(
-				"[SearchDomainFilterEnhanced] Notifying parent of filter change:",
-				{ includeValues, excludeValues },
-			);
 			onFilterChange(includeValues, excludeValues);
 		}
 	}, [includeDomains, excludeDomains, onFilterChange]);
 
-	// Debug current state when it changes
-	useEffect(() => {
-		console.log(
-			"[SearchDomainFilterEnhanced] Current include domains:",
-			includeDomains,
-		);
-	}, [includeDomains]);
-
-	useEffect(() => {
-		console.log(
-			"[SearchDomainFilterEnhanced] Current exclude domains:",
-			excludeDomains,
-		);
-	}, [excludeDomains]);
-
 	// Add include domain
 	const handleAddIncludeDomain = (domain: string) => {
-		console.log("[SearchDomainFilterEnhanced] Adding include domain:", domain);
-
 		// Check for duplicates
 		if (includeDomains.some((d) => d.domain === domain)) {
-			console.log(
-				"[SearchDomainFilterEnhanced] Duplicate in include list, not adding",
-			);
 			return;
 		}
 		// Check if exists in exclude list
 		if (excludeDomains.some((d) => d.domain === domain)) {
-			console.log(
-				"[SearchDomainFilterEnhanced] Already in exclude list, not adding",
-			);
 			return;
 		}
 
@@ -108,21 +62,12 @@ export function SearchDomainFilterEnhanced({
 		};
 
 		setIncludeDomains((prevDomains) => {
-			const newDomains = [...prevDomains, newDomain];
-			console.log(
-				"[SearchDomainFilterEnhanced] New include domains:",
-				newDomains,
-			);
-			return newDomains;
+			return [...prevDomains, newDomain];
 		});
 	};
 
 	// Remove include domain
 	const handleRemoveIncludeDomain = (id: string) => {
-		console.log(
-			"[SearchDomainFilterEnhanced] Removing include domain with id:",
-			id,
-		);
 		setIncludeDomains((prevDomains) => {
 			return prevDomains.filter((d) => d.id !== id);
 		});
@@ -130,20 +75,12 @@ export function SearchDomainFilterEnhanced({
 
 	// Add exclude domain
 	const handleAddExcludeDomain = (domain: string) => {
-		console.log("[SearchDomainFilterEnhanced] Adding exclude domain:", domain);
-
 		// Check for duplicates
 		if (excludeDomains.some((d) => d.domain === domain)) {
-			console.log(
-				"[SearchDomainFilterEnhanced] Duplicate in exclude list, not adding",
-			);
 			return;
 		}
 		// Check if exists in include list
 		if (includeDomains.some((d) => d.domain === domain)) {
-			console.log(
-				"[SearchDomainFilterEnhanced] Already in include list, not adding",
-			);
 			return;
 		}
 
@@ -153,21 +90,12 @@ export function SearchDomainFilterEnhanced({
 		};
 
 		setExcludeDomains((prevDomains) => {
-			const newDomains = [...prevDomains, newDomain];
-			console.log(
-				"[SearchDomainFilterEnhanced] New exclude domains:",
-				newDomains,
-			);
-			return newDomains;
+			return [...prevDomains, newDomain];
 		});
 	};
 
 	// Remove exclude domain
 	const handleRemoveExcludeDomain = (id: string) => {
-		console.log(
-			"[SearchDomainFilterEnhanced] Removing exclude domain with id:",
-			id,
-		);
 		setExcludeDomains((prevDomains) => {
 			return prevDomains.filter((d) => d.id !== id);
 		});
@@ -178,14 +106,6 @@ export function SearchDomainFilterEnhanced({
 			<div className="mb-4 text-[15px] font-medium text-white">
 				Search Domain Filter
 			</div>
-
-			{/* Debug info */}
-			{process.env.NODE_ENV === "development" && (
-				<div className="mb-4 p-2 bg-gray-800 text-xs text-gray-400 rounded">
-					<div>Include count: {includeDomains.length}</div>
-					<div>Exclude count: {excludeDomains.length}</div>
-				</div>
-			)}
 
 			{/* Include domain input and tags */}
 			<DomainTagInput
@@ -208,40 +128,4 @@ export function SearchDomainFilterEnhanced({
 	);
 }
 
-// Test component to verify functionality
-export function SearchDomainFilterEnhancedTest() {
-	console.log("[SearchDomainFilterEnhancedTest] Component rendering");
-	const [includeTerms, setIncludeTerms] = useState<string[]>([]);
-	const [excludeTerms, setExcludeTerms] = useState<string[]>([]);
 
-	const handleFilterChange = (include: string[], exclude: string[]) => {
-		console.log("[SearchDomainFilterEnhancedTest] Filter changed:", {
-			include,
-			exclude,
-		});
-		setIncludeTerms(include);
-		setExcludeTerms(exclude);
-	};
-
-	return (
-		<div className="p-4 bg-gray-900 rounded">
-			<h2 className="text-white text-lg mb-4">Search Filter Test</h2>
-
-			<SearchDomainFilterEnhanced
-				onFilterChange={handleFilterChange}
-				defaultIncludeDomains={["example.com", "Brand Maison Margiela"]}
-				defaultExcludeDomains={["exclude.com"]}
-			/>
-
-			<div className="mt-4 p-2 bg-gray-800 rounded">
-				<h3 className="text-white text-sm mb-2">
-					Current filter (debug view):
-				</h3>
-				<div className="text-gray-300 text-xs">
-					<div>Include: {includeTerms.join(", ") || "(none)"}</div>
-					<div>Exclude: {excludeTerms.join(", ") || "(none)"}</div>
-				</div>
-			</div>
-		</div>
-	);
-}

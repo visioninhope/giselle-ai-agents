@@ -8,6 +8,9 @@ export type DomainTag = {
 	domain: string;
 };
 
+// Maximum number of domains allowed
+const MAX_DOMAINS = 10;
+
 type DomainTagInputProps = {
 	domains: DomainTag[];
 	onAddDomain: (domain: string) => void;
@@ -26,10 +29,16 @@ export function DomainTagInput({
 	label,
 }: DomainTagInputProps) {
 	const [inputValue, setInputValue] = useState("");
+	
+	// Check if maximum domains limit reached
+	const isMaxReached = domains.length >= MAX_DOMAINS;
 
 	const handleAddDomain = () => {
 		const value = inputValue.trim();
 		if (!value) return;
+		
+		// Prevent adding if max limit reached
+		if (isMaxReached) return;
 
 		onAddDomain(value);
 		setInputValue("");
@@ -51,7 +60,7 @@ export function DomainTagInput({
 				</div>
 			</div>
 
-			{/* タグエリア - 入力フィールドの上 */}
+			{/* Tag area - above the input field */}
 			<div className="flex flex-wrap ml-[150px] mb-4">
 				{domains.map((domain) => (
 					<div
@@ -70,9 +79,18 @@ export function DomainTagInput({
 				))}
 			</div>
 
-			{/* 入力エリア - タグの下に配置 */}
+			{/* Maximum domains warning */}
+			{isMaxReached && (
+				<div className="ml-[150px] mb-4">
+					<p className="max-domains-warning text-red-700 text-[12px]">
+						You can add up to {MAX_DOMAINS} domains only.
+					</p>
+				</div>
+			)}
+
+			{/* Input area - placed below the tags */}
 			<div className="flex items-center">
-				<div className="w-[150px]">{/* ラベルとの整列のためのスペース */}</div>
+				<div className="w-[150px]">{/* Space for alignment with the label */}</div>
 				<div className="flex-1 flex items-center">
 					<Input
 						className="w-full h-10 bg-transparent border-[0.5px] border-white-900 rounded-md text-[14px] text-gray-300 px-3 py-2 placeholder:text-gray-500"
@@ -81,12 +99,13 @@ export function DomainTagInput({
 						onChange={(e) => setInputValue(e.target.value)}
 						onKeyDown={handleKeyDown}
 						maxLength={100}
+						disabled={isMaxReached}
 					/>
 					<Button
 						className="ml-2 px-2 py-1 text-sm text-gray-300 opacity-50 hover:opacity-100"
 						variant="ghost"
 						onClick={handleAddDomain}
-						disabled={!inputValue.trim()}
+						disabled={!inputValue.trim() || isMaxReached}
 					>
 						Add
 					</Button>
@@ -96,51 +115,4 @@ export function DomainTagInput({
 	);
 }
 
-// Test component with direct rendering
-export function DomainTagInputTest() {
-	const [domains, setDomains] = useState<DomainTag[]>([
-		{ id: "1", domain: "example.com" },
-		{ id: "2", domain: "Brand Maison Margiela" },
-	]);
 
-	const handleAddDomain = (domain: string) => {
-		// 重複チェック
-		if (domains.some((d) => d.domain === domain)) {
-			return;
-		}
-
-		const newDomain: DomainTag = {
-			id: Date.now().toString(),
-			domain,
-		};
-
-		setDomains([...domains, newDomain]);
-	};
-
-	const handleRemoveDomain = (id: string) => {
-		setDomains(domains.filter((d) => d.id !== id));
-	};
-
-	// This will independently verify if the component works
-	return (
-		<div className="p-4 bg-gray-900 rounded">
-			<h2 className="text-white text-lg mb-4">DomainTagInput Test</h2>
-			<DomainTagInput
-				domains={domains}
-				onAddDomain={handleAddDomain}
-				onRemoveDomain={handleRemoveDomain}
-				placeholder="Enter text to add"
-				label="Test Tags"
-			/>
-
-			<div className="mt-4 p-2 bg-gray-800 rounded">
-				<h3 className="text-white text-sm mb-2">
-					Current domains (debug view):
-				</h3>
-				<pre className="text-gray-300 text-xs">
-					{JSON.stringify(domains, null, 2)}
-				</pre>
-			</div>
-		</div>
-	);
-}

@@ -83,7 +83,6 @@ export function SearchDomainFilterPanel({
 		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
 
-		console.log("Adding to allowlist:", value);
 		updateDomainFilter([...allowlist, value], denylist);
 		setAllowlistInput("");
 	}
@@ -94,7 +93,6 @@ export function SearchDomainFilterPanel({
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
 
-		console.log("Adding to denylist:", value);
 		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
 		setDenylistInput("");
 	}
