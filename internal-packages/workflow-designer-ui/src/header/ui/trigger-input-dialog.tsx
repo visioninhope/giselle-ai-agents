@@ -139,7 +139,7 @@ export function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 interface Input {
 	name: string;
 	label: string;
-	type: "string" | "number" | "text";
+	type: "text" | "multiline-text" | "number";
 	required: boolean;
 }
 
@@ -166,13 +166,13 @@ export function TriggerInputDialog({
 							{
 								name: "title",
 								label: "Title",
-								type: "string",
+								type: "text",
 								required: true,
 							},
 							{
 								name: "body",
 								label: "Body",
-								type: "text",
+								type: "multiline-text",
 								required: false,
 							},
 						];
@@ -188,19 +188,19 @@ export function TriggerInputDialog({
 							{
 								name: "issueTitle",
 								label: "Issue Title",
-								type: "string",
+								type: "text",
 								required: true,
 							},
 							{
 								name: "issueBody",
 								label: "Issue Body",
-								type: "text",
+								type: "multiline-text",
 								required: true,
 							},
 							{
 								name: "issueCommentBody",
 								label: "Issue Comment",
-								type: "text",
+								type: "multiline-text",
 								required: true,
 							},
 						];
@@ -245,7 +245,7 @@ export function TriggerInputDialog({
 								>
 									{input.label}
 								</label>
-								{input.type === "string" && (
+								{input.type === "text" && (
 									<input
 										type="text"
 										name={input.name}
@@ -257,7 +257,7 @@ export function TriggerInputDialog({
 										)}
 									/>
 								)}
-								{input.type === "text" && (
+								{input.type === "multiline-text" && (
 									<textarea
 										name={input.name}
 										id={input.name}

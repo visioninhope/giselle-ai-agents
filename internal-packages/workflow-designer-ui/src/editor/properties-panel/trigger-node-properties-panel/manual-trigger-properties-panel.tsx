@@ -186,9 +186,9 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									"text-[14px]",
 								)}
 							>
-								<option value="string">Text</option>
+								<option value="text">Text</option>
+								<option value="multiline-text">Text(multi-line)</option>
 								<option value="number">Number</option>
-								<option value="boolean">Yes/No</option>
 							</select>
 						</div>
 						<div className="flex items-center h-[42px] ml-[4px]">
