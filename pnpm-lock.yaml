@@ -339,6 +339,9 @@ importers:
 
   apps/studio.giselles.ai:
     dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.24.1)
       '@giselle-internal/workflow-designer-ui':
         specifier: workspace:*
         version: link:../../internal-packages/workflow-designer-ui
@@ -348,9 +351,15 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/github-tool':
+        specifier: workspace:*
+        version: link:../../packages/github-tool
       '@giselle-sdk/integration':
         specifier: workspace:*
         version: link:../../packages/integration
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../../packages/rag
       '@giselle-sdk/supabase-driver':
         specifier: workspace:*
         version: link:../../packages/supabase-driver
@@ -967,6 +976,9 @@ importers:
 
   packages/github-tool:
     dependencies:
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../rag
       '@octokit/auth-app':
         specifier: 'catalog:'
         version: 7.1.1
@@ -1057,6 +1069,28 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.15.3)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
+
+  packages/rag:
+    dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.24.1)
+      ai:
+        specifier: 'catalog:'
+        version: 4.3.9(react@19.1.0)(zod@3.24.1)
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
 
   packages/supabase-driver:
     dependencies:
@@ -5974,9 +6008,6 @@ packages:
   es-errors@1.3.0:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
-
-  es-module-lexer@1.6.0:
-    resolution: {integrity: sha512-qqnD1yMU6tk/jnaMosogGySTZP8YtUgAffA9nMN+E/rjxcfRQ6IEk7IiozUjgxKoFHBGjTLnrHB/YC45r/59EQ==}
 
   es-module-lexer@1.7.0:
     resolution: {integrity: sha512-jEQoCwk8hyb2AZziIOLhDqpm5+2ww5uIE6lkO/6jcOCusfk6LhMHpXXfBLXTZ7Ydyt0j4VoUQv6uGNYbdW+kBA==}
@@ -13228,7 +13259,7 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/cookie@0.6.0': {}
 
@@ -13280,7 +13311,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/hast@3.0.4':
     dependencies:
@@ -13314,11 +13345,11 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       form-data: 4.0.1
 
   '@types/node@12.20.55': {}
@@ -13337,7 +13368,7 @@ snapshots:
 
   '@types/nodemailer@6.4.17':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/pg-pool@2.0.6':
     dependencies:
@@ -13351,13 +13382,13 @@ snapshots:
 
   '@types/pg@8.11.6':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       pg-protocol: 1.8.0
       pg-types: 4.0.2
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       pg-protocol: 1.8.0
       pg-types: 2.2.0
 
@@ -13377,11 +13408,11 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/tinycolor2@1.4.6': {}
 
@@ -13395,7 +13426,7 @@ snapshots:
 
   '@types/ws@8.5.13':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@ungap/structured-clone@1.2.1': {}
 
@@ -14444,8 +14475,6 @@ snapshots:
 
   es-errors@1.3.0: {}
 
-  es-module-lexer@1.6.0: {}
-
   es-module-lexer@1.7.0: {}
 
   es-object-atoms@1.1.1:
@@ -14583,7 +14612,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
 
   esutils@2.0.3: {}
 
@@ -16850,7 +16879,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       long: 5.2.4
 
   proxy-agent@6.5.0:
@@ -17511,7 +17540,7 @@ snapshots:
 
   stripe@17.4.0:
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       qs: 6.14.0
 
   style-to-object@1.0.8:
@@ -18040,7 +18069,7 @@ snapshots:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      es-module-lexer: 1.6.0
+      es-module-lexer: 1.7.0
       pathe: 2.0.2
       vite: 6.0.11(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
@@ -18061,7 +18090,7 @@ snapshots:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      es-module-lexer: 1.6.0
+      es-module-lexer: 1.7.0
       pathe: 2.0.2
       vite: 6.0.11(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
