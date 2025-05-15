@@ -3,7 +3,7 @@ import { z } from "zod";
 
 export const Provider = z.literal("manual");
 
-export const ManualParameterType = z.enum(["text", "mutiline-text", "number"]);
+export const ManualParameterType = z.enum(["text", "multiline-text", "number"]);
 export type ManualParameterType = z.infer<typeof ManualParameterType>;
 
 export const ManualTriggerParameterId = createIdGenerator("mntgp");
