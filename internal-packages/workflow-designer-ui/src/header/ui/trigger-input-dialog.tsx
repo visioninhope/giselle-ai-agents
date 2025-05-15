@@ -1,9 +1,140 @@
-import type { FlowTrigger, TriggerNode } from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
+import type {
+	FlowTrigger,
+	Generation,
+	TriggerNode,
+} from "@giselle-sdk/data-type";
+import { type TriggerProvider, githubTriggers } from "@giselle-sdk/flow";
+import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
+import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
-import { useMemo } from "react";
-import type { ZodSchema } from "zod";
-import { Button } from "../../ui/button";
+import { useWorkflowDesigner } from "giselle-sdk/react";
+import { PlayIcon, XIcon } from "lucide-react";
+import { Dialog } from "radix-ui";
+import {
+	type ButtonHTMLAttributes,
+	type ReactNode,
+	useCallback,
+	useMemo,
+} from "react";
+import { useTrigger } from "../../hooks/use-trigger";
+
+export function Button({
+	leftIcon: LeftIcon,
+	rightIcon: RightIcon,
+	children,
+	...props
+}: {
+	leftIcon?: ReactNode;
+	rightIcon?: ReactNode;
+} & ButtonHTMLAttributes<HTMLButtonElement>) {
+	return (
+		<button
+			type="button"
+			className="bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] cursor-pointer outline-none text-black-900"
+			{...props}
+		>
+			{LeftIcon}
+			<div>{children}</div>
+			{RightIcon}
+		</button>
+	);
+}
+
+export function buttonLabel(triggerProvider: TriggerProvider) {
+	switch (triggerProvider) {
+		case "manual":
+			return "Trigger Manual flow";
+		case "github":
+			return "Trigger GitHub flow";
+		default: {
+			const _exhaustiveCheck: never = triggerProvider;
+			throw new Error(`Unhandled trigger provider type: ${_exhaustiveCheck}`);
+		}
+	}
+}
+
+export function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
+	const { data: workspace } = useWorkflowDesigner();
+	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
+	const { data, isLoading } = useTrigger(triggerNode);
+
+	const handleClick = useCallback(async () => {
+		const flow = buildWorkflowFromNode(
+			triggerNode.id,
+			workspace.nodes,
+			workspace.connections,
+		);
+		if (flow === null) {
+			return;
+		}
+		const generations: Generation[] = [];
+		flow.jobs.map((job) =>
+			job.operations.map((operation) => {
+				generations.push(
+					createGeneration({
+						origin: {
+							type: "workspace",
+							id: workspace.id,
+						},
+						...operation.generationTemplate,
+					}),
+				);
+			}),
+		);
+		for (const job of flow.jobs) {
+			for (const operation of job.operations) {
+				const generation = generations.find(
+					(generation) =>
+						generation.context.operationNode.id ===
+						operation.generationTemplate.operationNode.id,
+				);
+				if (generation === undefined) {
+					continue;
+				}
+				await startGeneration(generation.id);
+			}
+		}
+	}, [triggerNode.id, workspace, createGeneration, startGeneration]);
+	if (isLoading || data === undefined) {
+		return null;
+	}
+	return (
+		<Dialog.Root>
+			<Dialog.Trigger asChild>
+				<Button
+					leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
+					onClick={handleClick}
+				>
+					{buttonLabel(triggerNode.content.provider)}
+				</Button>
+			</Dialog.Trigger>
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
+				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[900px] h-[600px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 outline-none">
+					<Dialog.Title className="sr-only">
+						Override inputs to test workflow
+					</Dialog.Title>
+					<div className="flex justify-between items-center mb-[24px]">
+						<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
+							Trigger Manual Flow
+						</h2>
+						<div className="flex gap-[12px]">
+							<Dialog.Close asChild>
+								<button
+									type="button"
+									className="text-white-400 hover:text-white-900 outline-none"
+								>
+									<XIcon className="size-[20px]" />
+								</button>
+							</Dialog.Close>
+						</div>
+					</div>
+					<TriggerInputDialog node={triggerNode} trigger={data} />
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
+	);
+}
 
 interface Input {
 	name: string;
