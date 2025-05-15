@@ -1,5 +1,6 @@
 import { useMemo, useState } from "react";
 import { Input } from "../../../../ui/input";
+import { Button } from "../../../../ui/button";
 
 const DOMAIN_VALIDATION_REGEX = /^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
 const MAX_DOMAINS = 10;
@@ -23,7 +24,7 @@ function SimpleDomainInput({
 			<div className="w-[150px] flex items-center">
 				<span className="text-[14px] text-white pl-2">{label}</span>
 			</div>
-			<div className="flex-1">
+			<div className="flex-1 flex items-center">
 				<Input
 					className="w-full h-10 bg-transparent border-[0.5px] border-white-900 rounded-md text-[14px] text-gray-300 px-3 py-2 placeholder:text-gray-500"
 					placeholder={placeholder}
@@ -37,6 +38,14 @@ function SimpleDomainInput({
 					}}
 					maxLength={100}
 				/>
+				<Button
+					className="ml-2 px-2 py-1 text-sm text-gray-300 opacity-50 hover:opacity-100"
+					variant="ghost"
+					onClick={onAdd}
+					disabled={!inputValue.trim()}
+				>
+					Add
+				</Button>
 			</div>
 		</div>
 	);
@@ -73,6 +82,8 @@ export function SearchDomainFilterPanel({
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
+		
+		console.log("Adding to allowlist:", value);
 		updateDomainFilter([...allowlist, value], denylist);
 		setAllowlistInput("");
 	}
@@ -82,6 +93,8 @@ export function SearchDomainFilterPanel({
 		if (!value) return;
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
 		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
+		
+		console.log("Adding to denylist:", value);
 		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
 		setDenylistInput("");
 	}
@@ -100,6 +113,12 @@ export function SearchDomainFilterPanel({
 				placeholder="Enter domain to include(e.g.,example.com)"
 			/>
 
+			{allowlist.length > 0 && (
+				<div className="ml-[150px] mb-4 text-[13px] text-gray-400">
+					Added: {allowlist.join(", ")}
+				</div>
+			)}
+
 			<SimpleDomainInput
 				label="Deny List"
 				inputValue={denylistInput}
@@ -107,6 +126,12 @@ export function SearchDomainFilterPanel({
 				onAdd={addDenyDomain}
 				placeholder="Enter domain to exclude(e.g.,example.com)"
 			/>
+
+			{denylist.length > 0 && (
+				<div className="ml-[150px] mb-4 text-[13px] text-gray-400">
+					Added: {denylist.map(d => d.slice(1)).join(", ")}
+				</div>
+			)}
 		</div>
 	);
 }
