@@ -101,7 +101,7 @@ export function BasicTagInput({
 				<div className="flex flex-wrap gap-1 mb-3">
 					{tags.map((tag, index) => (
 						<div
-							key={tag}
+							key={`${tag}-${index}`}
 							style={{
 								display: "flex",
 								alignItems: "center",
