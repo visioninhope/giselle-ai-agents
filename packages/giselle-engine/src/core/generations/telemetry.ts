@@ -3,14 +3,23 @@ import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
 import { Langfuse } from "langfuse";
 
-type TelemetryTag =
-	// generic name
-	| "web-search"
-	// provider-specific function name
+type BaseFunctionalityTag = "web-search";
+
+type ProviderNameTag = "openai" | "anthropic" | "google" | "perplexity" | "fal";
+
+type ProviderOptionTag =
 	| "openai:web-search"
 	| "google:search-grounding"
 	| "anthropic:reasoning"
 	| "anthropic:thinking";
+
+type ModelNameTag = string;
+
+type TelemetryTag =
+	| BaseFunctionalityTag
+	| ProviderNameTag
+	| ProviderOptionTag
+	| ModelNameTag;
 
 let langfuseInstance: Langfuse | null = null;
 
@@ -31,6 +40,8 @@ export function generateTelemetryTags(args: {
 	};
 }): TelemetryTag[] {
 	const tags: TelemetryTag[] = [];
+
+	tags.push(args.provider, args.languageModel.id);
 
 	// OpenAI Web Search
 	if (args.provider === "openai" && args.toolSet.openaiWebSearch) {
