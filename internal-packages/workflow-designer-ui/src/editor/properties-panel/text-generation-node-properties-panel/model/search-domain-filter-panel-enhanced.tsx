@@ -8,7 +8,6 @@ export function SearchDomainFilterPanelEnhanced({
 	searchDomainFilter: string[];
 	onSearchDomainFilterChange: (newFilter: string[]) => void;
 }) {
-
 	// Split existing filter array into include and exclude domains
 	const allowlist = useMemo(
 		() => searchDomainFilter.filter((d) => !d.startsWith("-")),
@@ -23,8 +22,6 @@ export function SearchDomainFilterPanelEnhanced({
 		[searchDomainFilter],
 	);
 
-
-
 	// Handler for filter changes
 	const handleFilterChange = (include: string[], exclude: string[]) => {
 		// Add "-" prefix to exclude items to match existing format
@@ -37,7 +34,6 @@ export function SearchDomainFilterPanelEnhanced({
 
 	return (
 		<div className="search-domain-filter-panel-enhanced">
-
 			<SearchDomainFilterEnhanced
 				onFilterChange={handleFilterChange}
 				defaultIncludeDomains={allowlist}

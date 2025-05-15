@@ -18,7 +18,6 @@ export function SearchDomainFilterEnhanced({
 	defaultIncludeDomains = [],
 	defaultExcludeDomains = [],
 }: SearchDomainFilterEnhancedProps) {
-
 	// Create initial tags with unique IDs
 	const createInitialTags = (domains: string[]): DomainTag[] => {
 		return domains.map((domain, index) => ({
@@ -127,5 +126,3 @@ export function SearchDomainFilterEnhanced({
 		</div>
 	);
 }
-
-

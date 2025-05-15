@@ -29,14 +29,14 @@ export function DomainTagInput({
 	label,
 }: DomainTagInputProps) {
 	const [inputValue, setInputValue] = useState("");
-	
+
 	// Check if maximum domains limit reached
 	const isMaxReached = domains.length >= MAX_DOMAINS;
 
 	const handleAddDomain = () => {
 		const value = inputValue.trim();
 		if (!value) return;
-		
+
 		// Prevent adding if max limit reached
 		if (isMaxReached) return;
 
@@ -90,7 +90,9 @@ export function DomainTagInput({
 
 			{/* Input area - placed below the tags */}
 			<div className="flex items-center">
-				<div className="w-[150px]">{/* Space for alignment with the label */}</div>
+				<div className="w-[150px]">
+					{/* Space for alignment with the label */}
+				</div>
 				<div className="flex-1 flex items-center">
 					<Input
 						className="w-full h-10 bg-transparent border-[0.5px] border-white-900 rounded-md text-[14px] text-gray-300 px-3 py-2 placeholder:text-gray-500"
@@ -114,5 +116,3 @@ export function DomainTagInput({
 		</div>
 	);
 }
-
-
