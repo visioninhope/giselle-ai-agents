@@ -27,16 +27,6 @@ export function DomainTagInput({
 }: DomainTagInputProps) {
 	const [inputValue, setInputValue] = useState("");
 
-	// 初回レンダリング時にアラートを表示
-	useEffect(() => {
-		alert(`DomainTagInput mounted. Initial domains: ${domains.length}`);
-	}, [domains.length]);
-
-	// domainsが変更されたらアラートを表示
-	useEffect(() => {
-		alert(`Domains updated. Current count: ${domains.length}`);
-	}, [domains]);
-
 	const handleAddDomain = () => {
 		const value = inputValue.trim();
 		if (!value) return;
@@ -112,10 +102,6 @@ export function DomainTagInputTest() {
 		{ id: "1", domain: "example.com" },
 		{ id: "2", domain: "Brand Maison Margiela" },
 	]);
-
-	useEffect(() => {
-		alert("DomainTagInputTest mounted with example domains");
-	}, []);
 
 	const handleAddDomain = (domain: string) => {
 		// 重複チェック
