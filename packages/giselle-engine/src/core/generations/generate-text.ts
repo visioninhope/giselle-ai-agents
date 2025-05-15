@@ -20,6 +20,7 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
+import { calculateCost } from "@giselle-sdk/language-model";
 import {
 	Capability,
 	hasCapability,
@@ -444,7 +445,6 @@ export async function generateText(args: {
 			const modelId = operationNode.content.llm.id;
 
 			if (tokenUsage) {
-				const { calculateCost } = await import("@giselle-sdk/language-model");
 				costInfo = await calculateCost(provider, modelId, tokenUsage);
 				generation.update({
 					usage: {
