@@ -1,6 +1,7 @@
 import type {
 	FlowTrigger,
 	Generation,
+	GenerationInput,
 	TriggerNode,
 } from "@giselle-sdk/data-type";
 import { type TriggerProvider, githubTriggers } from "@giselle-sdk/flow";
@@ -188,7 +189,6 @@ export function TriggerInputDialog({
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
 			e.preventDefault();
-			const formData = new FormData(e.currentTarget);
 
 			const flow = buildWorkflowFromNode(node.id, data.nodes, data.connections);
 			if (flow === null) {
@@ -197,12 +197,23 @@ export function TriggerInputDialog({
 			const generations: Generation[] = [];
 			flow.jobs.map((job) =>
 				job.operations.map((operation) => {
+					const generationInputs: GenerationInput[] = [];
+					if (operation.node.content.type === "trigger") {
+						const formData = new FormData(e.currentTarget);
+						for (const [key, value] of formData.entries()) {
+							generationInputs.push({
+								name: key,
+								value: value.toString(),
+							});
+						}
+					}
 					generations.push(
 						createGeneration({
 							origin: {
 								type: "workspace",
 								id: data.id,
 							},
+							inputs: generationInputs,
 							...operation.generationTemplate,
 						}),
 					);

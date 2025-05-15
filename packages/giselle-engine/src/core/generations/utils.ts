@@ -186,8 +186,8 @@ async function buildGenerationMessageForTextGeneration(
 
 			case "github":
 			case "imageGeneration":
-			case "trigger":
 				throw new Error("Not implemented");
+			case "trigger":
 			case "action": {
 				const result = await textGenerationResolver(
 					contextNode.id,
