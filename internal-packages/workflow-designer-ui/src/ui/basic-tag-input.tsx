@@ -1,6 +1,6 @@
 import { XIcon } from "lucide-react";
 import type React from "react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 // Maximum number of domains allowed
 const MAX_DOMAINS = 10;
@@ -28,6 +28,14 @@ export function BasicTagInput({
 	const [inputValue, setInputValue] = useState("");
 	const [isFocused, setIsFocused] = useState(false);
 	const [validationError, setValidationError] = useState<string | null>(null);
+
+	// Create stable tag ids for keys
+	const tagIds = useMemo(() => {
+		return tags.map((tag) => ({
+			id: `tag-${Math.random().toString(36).substr(2, 9)}`,
+			value: tag,
+		}));
+	}, [tags]);
 
 	// Check if maximum domains limit reached
 	const isMaxReached = tags.length >= MAX_DOMAINS;
@@ -108,9 +116,9 @@ export function BasicTagInput({
 			<div className="w-3/4 flex flex-col">
 				{/* Area to display tags */}
 				<div className="flex flex-wrap gap-1 mb-3">
-					{tags.map((tag, index) => (
+					{tagIds.map((tagItem, index) => (
 						<div
-							key={`${tag}-${index}`}
+							key={tagItem.id}
 							style={{
 								display: "flex",
 								alignItems: "center",
@@ -124,10 +132,10 @@ export function BasicTagInput({
 								fontFamily: "var(--font-geist), system-ui, sans-serif",
 							}}
 						>
-							<span className="mr-1 text-sm">{tag}</span>
+							<span className="mr-1 text-sm">{tagItem.value}</span>
 							<button
 								type="button"
-								onClick={() => removeTag(tags.indexOf(tag))}
+								onClick={() => removeTag(index)}
 								style={{
 									padding: "0 0 0 2px",
 									color: "var(--black-400, #505D7B)",
