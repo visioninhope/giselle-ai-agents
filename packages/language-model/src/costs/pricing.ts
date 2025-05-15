@@ -38,26 +38,3 @@ export interface CostCalculator {
 		totalCost: Cost;
 	} | null;
 }
-
-export class TokenBasedCostCalculator implements CostCalculator {
-	constructor(
-		private readonly pricing: Record<string, { prices: ModelPrice[] }>,
-	) {}
-
-	calculateCost(modelId: string, usage: TokenUsage) {
-		const pricing = this.pricing[modelId]?.prices[0]?.price;
-		if (!pricing) return null;
-
-		const inputCost =
-			tokensToMegaTokens(usage.input) * pricing.input.costPerMegaToken;
-		const outputCost =
-			tokensToMegaTokens(usage.output) * pricing.output.costPerMegaToken;
-		const totalCost = inputCost + outputCost;
-
-		return {
-			inputCost,
-			outputCost,
-			totalCost,
-		};
-	}
-}
