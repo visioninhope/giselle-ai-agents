@@ -14,7 +14,7 @@ import {
 	useFeatureFlag,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import { ChevronDownIcon, PlayIcon } from "lucide-react";
+import { ChevronDownIcon, PlayIcon, XIcon } from "lucide-react";
 import Link from "next/link";
 import { DropdownMenu } from "radix-ui";
 import { Dialog, ToggleGroup, VisuallyHidden } from "radix-ui";
@@ -26,12 +26,14 @@ import {
 	useState,
 } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
+import { useTrigger } from "../hooks/use-trigger";
 import { GiselleLogo } from "../icons";
 import { SettingsPanel } from "../settings";
 import { ShareButton } from "../ui/button";
 import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
+import { TriggerInputDialog } from "./ui/trigger-input-dialog";
 
 function buttonLabel(triggerProvider: TriggerProvider) {
 	switch (triggerProvider) {
@@ -69,13 +71,15 @@ function Button({
 }
 
 function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
-	const { data } = useWorkflowDesigner();
+	const { data: workspace } = useWorkflowDesigner();
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
+	const { data, isLoading } = useTrigger(triggerNode);
+
 	const handleClick = useCallback(async () => {
 		const flow = buildWorkflowFromNode(
 			triggerNode.id,
-			data.nodes,
-			data.connections,
+			workspace.nodes,
+			workspace.connections,
 		);
 		if (flow === null) {
 			return;
@@ -87,7 +91,7 @@ function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 					createGeneration({
 						origin: {
 							type: "workspace",
-							id: data.id,
+							id: workspace.id,
 						},
 						...operation.generationTemplate,
 					}),
@@ -107,14 +111,45 @@ function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 				await startGeneration(generation.id);
 			}
 		}
-	}, [triggerNode.id, data, createGeneration, startGeneration]);
+	}, [triggerNode.id, workspace, createGeneration, startGeneration]);
+	if (isLoading || data === undefined) {
+		return null;
+	}
 	return (
-		<Button
-			leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
-			onClick={handleClick}
-		>
-			{buttonLabel(triggerNode.content.provider)}
-		</Button>
+		<Dialog.Root>
+			<Dialog.Trigger asChild>
+				<Button
+					leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
+					// onClick={handleClick}
+				>
+					{buttonLabel(triggerNode.content.provider)}
+				</Button>
+			</Dialog.Trigger>
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
+				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[900px] h-[600px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 outline-none">
+					<Dialog.Title className="sr-only">
+						Override inputs to test workflow
+					</Dialog.Title>
+					<div className="flex justify-between items-center mb-[24px]">
+						<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
+							Trigger Manual Flow
+						</h2>
+						<div className="flex gap-[12px]">
+							<Dialog.Close asChild>
+								<button
+									type="button"
+									className="text-white-400 hover:text-white-900 outline-none"
+								>
+									<XIcon className="size-[20px]" />
+								</button>
+							</Dialog.Close>
+						</div>
+					</div>
+					<TriggerInputDialog node={triggerNode} trigger={data} />
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }
 
