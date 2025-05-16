@@ -8,7 +8,7 @@ import {
 import type { TriggerProvider } from "@giselle-sdk/flow";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
-import clsx from "clsx";
+import clsx from "clsx/lite";
 import {
 	ViewState,
 	useFeatureFlag,
@@ -33,7 +33,7 @@ import { ShareButton } from "../ui/button";
 import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
-import { Button, TriggerButton, buttonLabel } from "./ui";
+import { Button, TriggerInputDialog, buttonLabel } from "./ui";
 
 function Trigger() {
 	const { data } = useWorkflowDesigner();
@@ -55,7 +55,27 @@ function Trigger() {
 		return null;
 	}
 	if (triggerNodes.length === 1) {
-		return <TriggerButton triggerNode={triggerNodes[0]} />;
+		return (
+			<Dialog.Root>
+				<Dialog.Trigger asChild>
+					<Button
+						leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
+						type="button"
+					>
+						{buttonLabel(triggerNodes[0])}
+					</Button>
+				</Dialog.Trigger>
+				<Dialog.Portal>
+					<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
+					<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 outline-none">
+						<Dialog.Title className="sr-only">
+							Override inputs to test workflow
+						</Dialog.Title>
+						<TriggerInputDialog node={triggerNodes[0]} />
+					</Dialog.Content>
+				</Dialog.Portal>
+			</Dialog.Root>
+		);
 	}
 	return (
 		<DropdownMenu.Root>

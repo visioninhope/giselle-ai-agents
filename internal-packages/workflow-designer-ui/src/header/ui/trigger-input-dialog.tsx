@@ -56,67 +56,6 @@ export function buttonLabel(node: TriggerNode) {
 	}
 }
 
-export function TriggerButton({
-	triggerNode,
-	onClick,
-}: {
-	triggerNode: TriggerNode;
-	onClick?: () => void;
-}) {
-	return (
-		<Button
-			leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
-			onClick={onClick}
-			type="button"
-		>
-			{buttonLabel(triggerNode)}
-		</Button>
-	);
-}
-
-export function TriggerDialog({
-	triggerNode,
-}: {
-	triggerNode: TriggerNode;
-}) {
-	const { data, isLoading } = useTrigger(triggerNode);
-
-	if (isLoading || data === undefined) {
-		return null;
-	}
-	return (
-		<Dialog.Root>
-			<Dialog.Trigger asChild>
-				<TriggerButton triggerNode={triggerNode} />
-			</Dialog.Trigger>
-			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
-				<Dialog.Content className="fixed left-[50%] top-[50%] translate-x-[-50%] translate-y-[-50%] w-[400px] bg-black-900 rounded-[12px] p-[24px] shadow-xl z-50 overflow-hidden border border-black-400 outline-none">
-					<Dialog.Title className="sr-only">
-						Override inputs to test workflow
-					</Dialog.Title>
-					<div className="flex justify-between items-center mb-[24px]">
-						<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
-							Trigger Manual Flow
-						</h2>
-						<div className="flex gap-[12px]">
-							<Dialog.Close asChild>
-								<button
-									type="button"
-									className="text-white-400 hover:text-white-900 outline-none"
-								>
-									<XIcon className="size-[20px]" />
-								</button>
-							</Dialog.Close>
-						</div>
-					</div>
-					<TriggerInputDialog node={triggerNode} trigger={data} />
-				</Dialog.Content>
-			</Dialog.Portal>
-		</Dialog.Root>
-	);
-}
-
 interface Input {
 	name: string;
 	label: string;
@@ -126,14 +65,17 @@ interface Input {
 
 export function TriggerInputDialog({
 	node,
-	trigger,
 }: {
 	node: TriggerNode;
-	trigger: FlowTrigger;
 }) {
+	const { data: trigger, isLoading } = useTrigger(node);
+
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const inputs = useMemo<Input[]>(() => {
+		if (trigger === undefined) {
+			return [];
+		}
 		switch (trigger.configuration.provider) {
 			case "github": {
 				const githubTrigger = githubTriggers.find(
@@ -256,74 +198,95 @@ export function TriggerInputDialog({
 		},
 		[node.id, data, createGeneration, startGeneration],
 	);
+
+	if (isLoading || trigger === undefined) {
+		return null;
+	}
 	return (
-		<div className="flex flex-col h-full">
-			<form
-				className="flex-1 flex flex-col gap-[24px] relative text-white-800 overflow-y-hidden"
-				onSubmit={handleSubmit}
-			>
-				<p className="text-[12px] mb-[8px] text-black-400 font-hubot font-semibold">
-					Execute this flow with custom input values
-				</p>
-				<div className="flex flex-col gap-[8px]">
-					{inputs.map((input) => {
-						return (
-							<fieldset key={input.name} className={clsx("grid gap-2")}>
-								<label
-									className="text-[14px] font-medium text-white-900"
-									htmlFor={input.name}
-								>
-									{input.label}
-								</label>
-								{input.type === "text" && (
-									<input
-										type="text"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px] border-white-900",
-											"text-[14px]",
-										)}
-									/>
-								)}
-								{input.type === "multiline-text" && (
-									<textarea
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px] border-white-900",
-											"text-[14px]",
-										)}
-										rows={4}
-									/>
-								)}
-								{input.type === "number" && (
-									<input
-										type="number"
-										name={input.name}
-										id={input.name}
-										className={clsx(
-											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-											"border-[1px] border-white-900",
-											"text-[14px]",
-										)}
-									/>
-								)}
-							</fieldset>
-						);
-					})}
+		<>
+			<div className="flex justify-between items-center mb-[24px]">
+				<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
+					Trigger Manual Flow
+				</h2>
+				<div className="flex gap-[12px]">
+					<Dialog.Close asChild>
+						<button
+							type="button"
+							className="text-white-400 hover:text-white-900 outline-none"
+						>
+							<XIcon className="size-[20px]" />
+						</button>
+					</Dialog.Close>
 				</div>
-				<div className="flex justify-end">
-					<Button
-						type="submit"
-						leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
-					>
-						Run with params
-					</Button>
-				</div>
-			</form>
-		</div>
+			</div>
+			<div className="flex flex-col h-full">
+				<form
+					className="flex-1 flex flex-col gap-[24px] relative text-white-800 overflow-y-hidden"
+					onSubmit={handleSubmit}
+				>
+					<p className="text-[12px] mb-[8px] text-black-400 font-hubot font-semibold">
+						Execute this flow with custom input values
+					</p>
+					<div className="flex flex-col gap-[8px]">
+						{inputs.map((input) => {
+							return (
+								<fieldset key={input.name} className={clsx("grid gap-2")}>
+									<label
+										className="text-[14px] font-medium text-white-900"
+										htmlFor={input.name}
+									>
+										{input.label}
+									</label>
+									{input.type === "text" && (
+										<input
+											type="text"
+											name={input.name}
+											id={input.name}
+											className={clsx(
+												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+												"border-[1px] border-white-900",
+												"text-[14px]",
+											)}
+										/>
+									)}
+									{input.type === "multiline-text" && (
+										<textarea
+											name={input.name}
+											id={input.name}
+											className={clsx(
+												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+												"border-[1px] border-white-900",
+												"text-[14px]",
+											)}
+											rows={4}
+										/>
+									)}
+									{input.type === "number" && (
+										<input
+											type="number"
+											name={input.name}
+											id={input.name}
+											className={clsx(
+												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+												"border-[1px] border-white-900",
+												"text-[14px]",
+											)}
+										/>
+									)}
+								</fieldset>
+							);
+						})}
+					</div>
+					<div className="flex justify-end">
+						<Button
+							type="submit"
+							leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
+						>
+							Run with params
+						</Button>
+					</div>
+				</form>
+			</div>
+		</>
 	);
 }
