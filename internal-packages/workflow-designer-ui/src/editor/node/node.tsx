@@ -289,13 +289,18 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						{node.type === "operation" &&
-							(node.content.type === "imageGeneration" ||
-								node.content.type === "textGeneration") && (
-								<div className="text-[10px] text-white-400 pl-[4px]">
-									{node.content.llm.provider}
-								</div>
-							)}
+						<div className="flex gap-1 pl-[4px]">
+							{node.type === "operation" &&
+								(node.content.type === "imageGeneration" ||
+									node.content.type === "textGeneration") && (
+									<div className="text-[10px] text-white-400">
+										{node.content.llm.provider}
+									</div>
+								)}
+							<div className="text-[10px] text-white-300 font-mono">
+								ID: {node.id.substring(0, 8)}
+							</div>
+						</div>
 					</div>
 				</div>
 			</div>
