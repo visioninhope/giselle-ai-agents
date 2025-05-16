@@ -85,22 +85,7 @@ function Trigger() {
 					) : (
 						<>
 							{selectedTriggerNode ? (
-								// Show selected trigger input dialog
-								<>
-									<div className="mb-4 flex items-center justify-between">
-										<h3 className="text-white-900 text-[16px] font-medium">
-											{buttonLabel(selectedTriggerNode)}
-										</h3>
-										<button
-											type="button"
-											onClick={() => setSelectedTriggerNode(null)}
-											className="text-white-500 hover:text-white-700"
-										>
-											<XIcon className="size-[16px]" />
-										</button>
-									</div>
-									<TriggerInputDialog node={selectedTriggerNode} />
-								</>
+								<TriggerInputDialog node={selectedTriggerNode} />
 							) : (
 								// Show trigger selection
 								<div className="space-y-4">

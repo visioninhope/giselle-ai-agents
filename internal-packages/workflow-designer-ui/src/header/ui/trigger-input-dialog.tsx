@@ -206,7 +206,7 @@ export function TriggerInputDialog({
 		<>
 			<div className="flex justify-between items-center mb-[24px]">
 				<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
-					Trigger Manual Flow
+					{buttonLabel(node)}
 				</h2>
 				<div className="flex gap-[12px]">
 					<Dialog.Close asChild>
