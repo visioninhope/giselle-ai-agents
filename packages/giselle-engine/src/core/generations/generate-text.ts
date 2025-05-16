@@ -32,11 +32,10 @@ import {
 	appendResponseMessages,
 	streamText,
 } from "ai";
-import { Langfuse } from "langfuse";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { generateTelemetryTags, updateTelemetry } from "./telemetry";
+import { createLangfuseTracer, generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -67,8 +66,6 @@ export async function generateText(args: {
 		throw new Error("Invalid generation type");
 	}
 
-	const langfuse = new Langfuse();
-
 	const languageModel = languageModels.find(
 		(lm) => lm.id === operationNode.content.llm.id,
 	);
@@ -82,23 +79,6 @@ export async function generateText(args: {
 		messages: [],
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
-
-	const trace = langfuse.trace({
-		userId: String(args.telemetry?.metadata?.userId),
-		name: "ai.streamText",
-		metadata: args.telemetry?.metadata,
-	});
-	const span = trace.span({
-		name: "ai.streamText",
-		startTime: new Date(runningGeneration.queuedAt),
-	});
-	const generation = span.generation({
-		name: "ai.streamText.doStream",
-		model: operationNode.content.llm.id,
-		modelParameters: operationNode.content.llm.configurations,
-		startTime: new Date(runningGeneration.createdAt),
-		completionStartTime: new Date(runningGeneration.startedAt),
-	});
 
 	await Promise.all([
 		setGeneration({
@@ -130,9 +110,6 @@ export async function generateText(args: {
 	const workspaceId = await extractWorkspaceIdFromOrigin({
 		storage: args.context.storage,
 		origin: args.generation.context.origin,
-	});
-	trace.update({
-		sessionId: workspaceId,
 	});
 
 	const usageLimitStatus = await checkUsageLimits({
@@ -364,16 +341,6 @@ export async function generateText(args: {
 
 	const providerOptions = getProviderOptions(operationNode.content.llm);
 
-	trace.update({
-		tags: generateTelemetryTags({
-			provider: operationNode.content.llm.provider,
-			languageModel,
-			toolSet: preparedToolSet.toolSet,
-			configurations: operationNode.content.llm.configurations,
-			providerOptions,
-		}),
-	});
-
 	const streamTextResult = streamText({
 		model: generationModel(operationNode.content.llm),
 		providerOptions,
@@ -432,28 +399,16 @@ export async function generateText(args: {
 					outputId: generatedTextOutput.id,
 				});
 			}
-			updateTelemetry(trace, { messages }, event.text);
-			updateTelemetry(span, { messages }, event.text);
-			updateTelemetry(generation, { messages }, event.text);
-			const tokenUsage = event.usage;
 
+			const tokenUsage = event.usage;
 			let costInfo = null;
-			const provider = operationNode.content.llm.provider;
-			const modelId = operationNode.content.llm.id;
 
 			if (tokenUsage) {
-				costInfo = await calculateCost(provider, modelId, tokenUsage);
-				generation.update({
-					usage: {
-						input: tokenUsage.promptTokens,
-						output: tokenUsage.completionTokens,
-						total: tokenUsage.promptTokens + tokenUsage.completionTokens,
-						unit: "TOKENS",
-						inputCost: costInfo.inputCost,
-						outputCost: costInfo.outputCost,
-						totalCost: costInfo.totalCost,
-					},
-				});
+				costInfo = await calculateCost(
+					operationNode.content.llm.provider,
+					operationNode.content.llm.id,
+					tokenUsage,
+				);
 			}
 
 			const reasoningOutput = generationContext.operationNode.outputs.find(
@@ -503,12 +458,6 @@ export async function generateText(args: {
 					responseMessages: event.response.messages,
 				}),
 			} satisfies CompletedGeneration;
-
-			generation.end();
-			span.update({
-				endTime: new Date(completedGeneration.completedAt),
-			});
-
 			await Promise.all([
 				setGeneration({
 					storage: args.context.storage,
@@ -535,6 +484,37 @@ export async function generateText(args: {
 				generation: completedGeneration,
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			});
+
+			console.log("before---------------");
+			const { langfuse, trace, span, generation } = createLangfuseTracer({
+				workspaceId,
+				runningGeneration,
+				tags: generateTelemetryTags({
+					provider: operationNode.content.llm.provider,
+					languageModel,
+					toolSet: preparedToolSet.toolSet,
+					configurations: operationNode.content.llm.configurations,
+					providerOptions,
+				}),
+				messages: { messages },
+				output: event.text,
+				usage: {
+					input: tokenUsage?.promptTokens ?? 0,
+					output: tokenUsage?.completionTokens ?? 0,
+					total:
+						(tokenUsage?.promptTokens ?? 0) +
+						(tokenUsage?.completionTokens ?? 0),
+					inputCost: costInfo?.inputCost ?? 0,
+					outputCost: costInfo?.outputCost ?? 0,
+					totalCost: costInfo?.totalCost ?? 0,
+				},
+				completedGeneration,
+				spanName: "ai.streamText",
+				generationName: "ai.streamText.doStream",
+				unit: "TOKENS",
+				settings: args.telemetry,
+			});
+			console.log("after---------------");
 			await Promise.all(
 				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 					cleanupFunction(),

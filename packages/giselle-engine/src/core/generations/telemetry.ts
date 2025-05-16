@@ -1,6 +1,12 @@
 import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
+import type {
+	CompletedGeneration,
+	RunningGeneration,
+} from "@giselle-sdk/data-type";
 import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
+import { Langfuse } from "langfuse";
+import type { TelemetrySettings } from "./types";
 
 type BaseFunctionalityTag = "web-search";
 
@@ -58,14 +64,92 @@ export function generateTelemetryTags(args: {
 	return tags;
 }
 
-export function updateTelemetry(
-	telemetryObject: {
-		// trace, event, span, or generation of Langfuse telemetry
-		// see: https://langfuse.com/docs/sdk/typescript/guide#making-calls
-		update: (data: { input: unknown; output: unknown }) => void;
-	},
-	input: unknown, // telemetry attribute 'input'
-	output: unknown, // telemetry attribute 'output'
-) {
-	telemetryObject.update({ input, output });
+type LangfuseUnit =
+	| "CHARACTERS"
+	| "TOKENS"
+	| "MILLISECONDS"
+	| "SECONDS"
+	| "IMAGES"
+	| "REQUESTS";
+
+export function createLangfuseTracer({
+	workspaceId,
+	runningGeneration,
+	tags,
+	messages,
+	output,
+	usage,
+	completedGeneration,
+	spanName,
+	generationName,
+	unit,
+	settings,
+}: {
+	workspaceId: string;
+	runningGeneration: RunningGeneration;
+	tags: string[];
+	messages: { messages: unknown[] };
+	output: string;
+	usage: {
+		input: number;
+		output: number;
+		total: number;
+		inputCost: number;
+		outputCost: number;
+		totalCost: number;
+	};
+	completedGeneration: CompletedGeneration;
+	spanName: string;
+	generationName: string;
+	unit: LangfuseUnit;
+	settings?: TelemetrySettings;
+}): {
+	langfuse: Langfuse;
+	trace: ReturnType<Langfuse["trace"]>;
+	span: ReturnType<ReturnType<Langfuse["trace"]>["span"]>;
+	generation: ReturnType<
+		ReturnType<ReturnType<Langfuse["trace"]>["span"]>["generation"]
+	>;
+} {
+	console.log("inside======");
+	console.log("tags:", tags);
+	console.log("settings:", settings);
+
+	const langfuse = new Langfuse();
+	const trace = langfuse.trace({
+		userId: String(settings?.metadata?.userId),
+		name: spanName,
+		metadata: settings?.metadata,
+		input: messages,
+		output,
+		tags,
+	});
+
+	const span = trace.span({
+		name: spanName,
+		startTime: new Date(runningGeneration.queuedAt),
+		output,
+		metadata: settings?.metadata,
+		endTime: new Date(completedGeneration.completedAt),
+	});
+
+	const generation = span.generation({
+		name: generationName,
+		model: runningGeneration.context.operationNode.content.llm.id,
+		modelParameters:
+			runningGeneration.context.operationNode.content.llm.configurations,
+		input: messages,
+		usage: {
+			input: usage.input,
+			output: usage.output,
+			unit,
+		},
+		startTime: new Date(runningGeneration.createdAt),
+		completionStartTime: new Date(runningGeneration.startedAt),
+		metadata: settings?.metadata,
+		output,
+		endTime: new Date(completedGeneration.completedAt),
+	});
+
+	return { langfuse, trace, span, generation };
 }
