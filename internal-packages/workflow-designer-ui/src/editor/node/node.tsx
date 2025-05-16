@@ -9,6 +9,8 @@ import {
 	TextGenerationNode,
 	TextNode,
 	TriggerNode,
+	isImageGenerationNode,
+	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
 	Handle,
@@ -148,6 +150,14 @@ export function NodeComponent({
 		}
 		setPrevGenerationStatus(currentGeneration.status);
 	}, [currentGeneration, prevGenerationStatus]);
+	const metadataTexts = useMemo(() => {
+		const tmp: string[] = [];
+		if (isTextGenerationNode(node) || isImageGenerationNode(node)) {
+			tmp.push(node.content.llm.provider);
+		}
+		tmp.push(node.id.substring(3, 11));
+		return tmp;
+	}, [node]);
 	return (
 		<div
 			data-type={node.type}
@@ -289,42 +299,16 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						{(() => {
-							const nodeMetadata = useMemo(() => {
-								const metadata: Array<{ id: string; value: string }> = [];
-
-								// Add provider for generation nodes
-								if (
-									node.type === "operation" &&
-									(node.content.type === "imageGeneration" ||
-										node.content.type === "textGeneration")
-								) {
-									metadata.push({
-										id: "provider",
-										value: node.content.llm.provider,
-									});
-								}
-
-								// Add node ID (first 8 chars)
-								metadata.push({
-									id: "nodeId",
-									value: node.id.substring(0, 8),
-								});
-
-								return metadata;
-							}, [node]);
-
-							return nodeMetadata.length > 0 ? (
-								<div className="flex items-center gap-1 pl-[4px] text-[10px] text-white-300 font-mono">
-									{nodeMetadata.map((item, index) => (
-										<React.Fragment key={`${item.id}-${item.value}`}>
-											{index > 0 && <span className="text-white-400">/</span>}
-											<span>{item.value}</span>
-										</React.Fragment>
-									))}
-								</div>
-							) : null;
-						})()}
+						<div className="flex items-center gap-1 pl-[4px] text-[10px] text-white-300 font-mono">
+							{metadataTexts.map((item, index) => (
+								<>
+									{index > 0 && <span className="text-white-400">/</span>}
+									<span key={item} className="text-[10px] text-white-400">
+										{item}
+									</span>
+								</>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
