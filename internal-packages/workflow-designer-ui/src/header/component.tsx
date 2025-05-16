@@ -33,6 +33,7 @@ import { ShareButton } from "../ui/button";
 import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { UserPresence } from "../ui/user-presence";
+import { triggerNodeDefaultName } from "../utils";
 import { Button, TriggerInputDialog, buttonLabel } from "./ui";
 
 function Trigger() {
@@ -90,7 +91,7 @@ function Trigger() {
 								// Show trigger selection
 								<div className="space-y-4">
 									<h3 className="text-white-900 text-[16px] font-medium mb-2">
-										Select a node to execute
+										Select a trigger to execute
 									</h3>
 									<div className="space-y-2">
 										{triggerNodes.map((triggerNode) => (
@@ -103,10 +104,13 @@ function Trigger() {
 												<PlayIcon className="size-[14px] shrink-0 fill-white-900" />
 												<div className="flex flex-col">
 													<span className="font-medium">
-														{buttonLabel(triggerNode)}
+														{triggerNode.name ??
+															triggerNodeDefaultName(
+																triggerNode.content.provider,
+															)}
 													</span>
 													<span className="text-white-700 text-xs">
-														Execute this node
+														{buttonLabel(triggerNode)}
 													</span>
 												</div>
 											</button>
