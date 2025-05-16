@@ -168,6 +168,21 @@ export function InputPanel({
 				/>
 			</div>
 			<div className="flex flex-col gap-[32px]">
+				{connectedOutputs.trigger.length > 0 && (
+					<ConnectedOutputListRoot title="Generated Sources">
+						{connectedOutputs.trigger.map((source) => (
+							<ConnectedOutputListItem
+								icon={
+									<GeneratedContentIcon className="size-[24px] text-white-900" />
+								}
+								key={source.connection.id}
+								title={source.node.name ?? defaultName(source.node)}
+								subtitle=""
+								onRemove={() => handleRemove(source.connection)}
+							/>
+						))}
+					</ConnectedOutputListRoot>
+				)}
 				{connectedOutputs.generation.length > 0 && (
 					<ConnectedOutputListRoot title="Generated Sources">
 						{connectedOutputs.generation.map((source) => (
@@ -183,7 +198,6 @@ export function InputPanel({
 						))}
 					</ConnectedOutputListRoot>
 				)}
-
 				{connectedOutputs.action.length > 0 && (
 					<ConnectedOutputListRoot title="Generated Sources">
 						{connectedOutputs.action.map((source) => (

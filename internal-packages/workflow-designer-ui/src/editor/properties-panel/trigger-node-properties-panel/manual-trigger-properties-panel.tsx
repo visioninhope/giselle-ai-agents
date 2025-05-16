@@ -62,7 +62,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 			const outputs: Output[] = parameters.map((param) => ({
 				id: OutputId.generate(),
 				label: param.name,
-				accessor: param.name.toLowerCase().replace(/\s+/g, "_"),
+				accessor: param.id,
 			}));
 
 			startTransition(async () => {
@@ -98,11 +98,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	);
 
 	if (node.content.state.status === "configured") {
-		return (
-			<ManualTriggerConfiguredView
-				flowTriggerId={node.content.state.flowTriggerId}
-			/>
-		);
+		return <ManualTriggerConfiguredView node={node} />;
 	}
 
 	return (
@@ -187,9 +183,9 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 									"text-[14px]",
 								)}
 							>
-								<option value="string">Text</option>
+								<option value="text">Text</option>
+								<option value="multiline-text">Text(multi-line)</option>
 								<option value="number">Number</option>
-								<option value="boolean">Yes/No</option>
 							</select>
 						</div>
 						<div className="flex items-center h-[42px] ml-[4px]">

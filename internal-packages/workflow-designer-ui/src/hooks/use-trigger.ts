@@ -1,12 +1,23 @@
-import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import type {
+	FlowTrigger,
+	FlowTriggerId,
+	TriggerNode,
+} from "@giselle-sdk/data-type";
 import { useGiselleEngine } from "giselle-sdk/react";
 import { useCallback } from "react";
 import useSWR from "swr";
 
-export function useTrigger(flowTriggerId: FlowTriggerId) {
+export function useTrigger(node: TriggerNode) {
 	const client = useGiselleEngine();
-	const { isLoading, data, mutate } = useSWR(`/triggers/${flowTriggerId}`, () =>
-		client.getTrigger({ flowTriggerId }).then((res) => res.trigger),
+	const { isLoading, data, mutate } = useSWR(
+		node.content.state.status === "unconfigured"
+			? null
+			: {
+					namespace: "getTrigger",
+					flowTriggerId: node.content.state.flowTriggerId,
+				},
+		({ flowTriggerId }) =>
+			client.getTrigger({ flowTriggerId }).then((res) => res.trigger),
 	);
 
 	const setFlowTrigger = useCallback(

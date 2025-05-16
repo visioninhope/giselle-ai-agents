@@ -72,6 +72,7 @@ export function SelectOutputPopover({
 		fileInputs,
 		githubInputs,
 		actionInputs,
+		triggerInputs,
 	} = useCategoriedOutputs(outputs);
 	const { isSupportedConnection } = useWorkflowDesigner();
 	const isSupported = useCallback(
@@ -144,6 +145,20 @@ export function SelectOutputPopover({
 							<div className="border-t border-black-300/20" />
 						</div>
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
+							{triggerInputs.length > 0 && (
+								<div className="flex flex-col px-[8px]">
+									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										Action
+									</p>
+									{triggerInputs.map((triggerInput) => (
+										<OutputToggleItem
+											key={triggerInput.id}
+											input={triggerInput}
+											disabled={!isSupported(triggerInput)}
+										/>
+									))}
+								</div>
+							)}
 							{generatedInputs.length > 0 && (
 								<div className="flex flex-col px-[8px]">
 									<p className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
