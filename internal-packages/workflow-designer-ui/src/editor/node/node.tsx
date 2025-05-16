@@ -9,6 +9,8 @@ import {
 	TextGenerationNode,
 	TextNode,
 	TriggerNode,
+	isImageGenerationNode,
+	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
 	Handle,
@@ -24,6 +26,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
+import { Tooltip } from "../../ui/tooltip";
 import { defaultName } from "../../utils";
 import {
 	GitHubRepositoryBadgeFromRepo,
@@ -148,6 +151,14 @@ export function NodeComponent({
 		}
 		setPrevGenerationStatus(currentGeneration.status);
 	}, [currentGeneration, prevGenerationStatus]);
+	const metadataTexts = useMemo(() => {
+		const tmp: { label: string; tooltip: string }[] = [];
+		if (isTextGenerationNode(node) || isImageGenerationNode(node)) {
+			tmp.push({ label: node.content.llm.provider, tooltip: "LLM Provider" });
+		}
+		tmp.push({ label: node.id.substring(3, 11), tooltip: "Node ID" });
+		return tmp;
+	}, [node]);
 	return (
 		<div
 			data-type={node.type}
@@ -289,13 +300,17 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						{node.type === "operation" &&
-							(node.content.type === "imageGeneration" ||
-								node.content.type === "textGeneration") && (
-								<div className="text-[10px] text-white-400 pl-[4px]">
-									{node.content.llm.provider}
-								</div>
-							)}
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] text-white-300 font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
+							{metadataTexts.map((item, index) => (
+								<Tooltip
+									key={item.label}
+									className="text-[10px] text-white-400"
+									text={item.tooltip}
+								>
+									<button type="button">{item.label}</button>
+								</Tooltip>
+							))}
+						</div>
 					</div>
 				</div>
 			</div>
