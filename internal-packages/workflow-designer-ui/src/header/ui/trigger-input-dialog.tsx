@@ -56,7 +56,29 @@ export function buttonLabel(node: TriggerNode) {
 	}
 }
 
-export function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
+export function TriggerButton({
+	triggerNode,
+	onClick,
+}: {
+	triggerNode: TriggerNode;
+	onClick?: () => void;
+}) {
+	return (
+		<Button
+			leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
+			onClick={onClick}
+			type="button"
+		>
+			{buttonLabel(triggerNode)}
+		</Button>
+	);
+}
+
+export function TriggerDialog({
+	triggerNode,
+}: {
+	triggerNode: TriggerNode;
+}) {
 	const { data, isLoading } = useTrigger(triggerNode);
 
 	if (isLoading || data === undefined) {
@@ -65,9 +87,7 @@ export function TriggerButton({ triggerNode }: { triggerNode: TriggerNode }) {
 	return (
 		<Dialog.Root>
 			<Dialog.Trigger asChild>
-				<Button leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}>
-					{buttonLabel(triggerNode)}
-				</Button>
+				<TriggerButton triggerNode={triggerNode} />
 			</Dialog.Trigger>
 			<Dialog.Portal>
 				<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
@@ -277,6 +297,18 @@ export function TriggerInputDialog({
 											"text-[14px]",
 										)}
 										rows={4}
+									/>
+								)}
+								{input.type === "number" && (
+									<input
+										type="number"
+										name={input.name}
+										id={input.name}
+										className={clsx(
+											"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
+											"border-[1px] border-white-900",
+											"text-[14px]",
+										)}
 									/>
 								)}
 							</fieldset>
