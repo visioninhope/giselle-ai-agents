@@ -70,7 +70,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 					trigger: {
 						nodeId: node.id,
 						workspaceId: workspace?.id,
-						enable: false,
+						enable: true,
 						configuration: {
 							provider: "manual",
 							event: {
