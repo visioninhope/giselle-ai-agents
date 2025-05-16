@@ -3,7 +3,7 @@
 
 ## Summary
 * 1048 MIT
-* 107 Apache 2.0
+* 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
 * 17 Simplified BSD
@@ -2447,6 +2447,17 @@ LGPL-3.0-or-later permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@playwright/test"></a>
+### @playwright/test v1.52.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 
 
@@ -6833,7 +6844,7 @@ CC-BY-4.0 permitted
 
 
 <a name="es-module-lexer"></a>
-### es-module-lexer v1.6.0
+### es-module-lexer v1.7.0
 #### 
 
 ##### Paths
@@ -10965,6 +10976,28 @@ BlueOak-1.0.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="playwright"></a>
+### playwright v1.52.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="playwright-core"></a>
+### playwright-core v1.52.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 
 

@@ -443,6 +443,7 @@ export function NodeComponent({
 										"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[content-type=trigger]:!border-trigger-node-1",
+										"group-data-[content-type=action]:!border-action-node-1",
 										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-image-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=github]:!bg-github-node-1",
@@ -452,6 +453,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[state=connected]:group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[state=connected]:group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=trigger]:!bg-trigger-node-1 group-data-[state=connected]:group-data-[content-type=trigger]:!border-trigger-node-1",
+										"group-data-[state=connected]:group-data-[content-type=action]:!bg-action-node-1 group-data-[state=connected]:group-data-[content-type=action]:!border-action-node-1",
 										"group-data-[state=disconnected]:!bg-black-900",
 									)}
 								/>

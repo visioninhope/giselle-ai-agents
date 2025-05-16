@@ -283,7 +283,7 @@ importers:
         version: 12.4.1(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       giselle-sdk:
         specifier: workspace:^
         version: link:../../packages/giselle-sdk
@@ -292,7 +292,7 @@ importers:
         version: 0.473.0(react@19.1.0)
       next:
         specifier: 'catalog:'
-        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pg:
         specifier: 'catalog:'
         version: 8.14.1
@@ -339,6 +339,9 @@ importers:
 
   apps/studio.giselles.ai:
     dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.24.1)
       '@giselle-internal/workflow-designer-ui':
         specifier: workspace:*
         version: link:../../internal-packages/workflow-designer-ui
@@ -348,9 +351,15 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/github-tool':
+        specifier: workspace:*
+        version: link:../../packages/github-tool
       '@giselle-sdk/integration':
         specifier: workspace:*
         version: link:../../packages/integration
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../../packages/rag
       '@giselle-sdk/supabase-driver':
         specifier: workspace:*
         version: link:../../packages/supabase-driver
@@ -368,7 +377,7 @@ importers:
         version: 15.1.4
       '@next/third-parties':
         specifier: 15.1.4
-        version: 15.1.4(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 15.1.4(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@octokit/auth-app':
         specifier: 7.1.1
         version: 7.1.1
@@ -461,7 +470,7 @@ importers:
         version: 1.1.4(@types/react-dom@19.1.2(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@sentry/nextjs':
         specifier: 8.49.0
-        version: 8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.97.1(esbuild@0.19.12))
+        version: 8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.97.1(esbuild@0.19.12))
       '@sentry/wizard':
         specifier: 3.38.0
         version: 3.38.0
@@ -494,7 +503,7 @@ importers:
         version: 0.9.0
       '@vercel/speed-insights':
         specifier: 1.0.12
-        version: 1.0.12(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
+        version: 1.0.12(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)
       '@xyflow/react':
         specifier: 12.0.3
         version: 12.0.3(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -521,13 +530,13 @@ importers:
         version: 0.32.1(@neondatabase/serverless@0.9.5)(@opentelemetry/api@1.9.0)(@types/pg@8.11.13)(@types/react@19.1.0)(@vercel/postgres@0.9.0)(pg@8.14.1)(react@19.1.0)
       flags:
         specifier: 4.0.0
-        version: 4.0.0(@opentelemetry/api@1.9.0)(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 4.0.0(@opentelemetry/api@1.9.0)(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       gaxios:
         specifier: 6.7.1
         version: 6.7.1
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       giselle-sdk:
         specifier: workspace:*
         version: link:../../packages/giselle-sdk
@@ -554,10 +563,10 @@ importers:
         version: 0.417.0(react@19.1.0)
       next:
         specifier: 'catalog:'
-        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next-auth:
         specifier: 5.0.0-beta.25
-        version: 5.0.0-beta.25(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(nodemailer@6.10.0)(react@19.1.0)
+        version: 5.0.0-beta.25(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(nodemailer@6.10.0)(react@19.1.0)
       next-themes:
         specifier: 0.3.0
         version: 0.3.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -628,6 +637,9 @@ importers:
       '@octokit/webhooks-types':
         specifier: 7.6.1
         version: 7.6.1
+      '@playwright/test':
+        specifier: 1.52.0
+        version: 1.52.0
       '@radix-ui/react-hover-card':
         specifier: 1.1.2
         version: 1.1.2(@types/react-dom@19.1.2(@types/react@19.1.0))(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -729,7 +741,7 @@ importers:
         version: 12.3.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       next:
         specifier: 'catalog:'
-        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       pluralize:
         specifier: 'catalog:'
         version: 8.0.0
@@ -866,6 +878,9 @@ importers:
       '@giselle-sdk/data-mod':
         specifier: workspace:^
         version: link:../data-mod
+      '@giselle-sdk/flow':
+        specifier: workspace:^
+        version: link:../flow
       '@giselle-sdk/github-tool':
         specifier: workspace:^
         version: link:../github-tool
@@ -895,7 +910,7 @@ importers:
         version: 3.37.0
       next:
         specifier: 'catalog:'
-        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+        version: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       openai:
         specifier: 'catalog:'
         version: 5.0.0-alpha.0(zod@3.24.1)
@@ -964,6 +979,9 @@ importers:
 
   packages/github-tool:
     dependencies:
+      '@giselle-sdk/rag':
+        specifier: workspace:*
+        version: link:../rag
       '@octokit/auth-app':
         specifier: 'catalog:'
         version: 7.1.1
@@ -1054,6 +1072,28 @@ importers:
       vitest:
         specifier: 'catalog:'
         version: 3.0.5(@types/debug@4.1.12)(@types/node@22.15.3)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
+
+  packages/rag:
+    dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.24.1)
+      ai:
+        specifier: 'catalog:'
+        version: 4.3.9(react@19.1.0)(zod@3.24.1)
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
 
   packages/supabase-driver:
     dependencies:
@@ -3183,6 +3223,11 @@ packages:
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
     engines: {node: '>=14'}
+
+  '@playwright/test@1.52.0':
+    resolution: {integrity: sha512-uh6W7sb55hl7D6vsAeA+V2p5JnlAqzhqFyF0VcJkKZXkgnFcVG9PziERRHQfPLfNGx1C292a4JqbWzhR8L4R1g==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   '@popperjs/core@2.11.8':
     resolution: {integrity: sha512-P1st0aksCrn9sGZhp8GMYwBnQsbvAWsZAX44oXNNvLHGqAOcoVxmjZiohstwQ7SqKnbR47akdNi+uleWD8+g6A==}
@@ -5967,9 +6012,6 @@ packages:
     resolution: {integrity: sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==}
     engines: {node: '>= 0.4'}
 
-  es-module-lexer@1.6.0:
-    resolution: {integrity: sha512-qqnD1yMU6tk/jnaMosogGySTZP8YtUgAffA9nMN+E/rjxcfRQ6IEk7IiozUjgxKoFHBGjTLnrHB/YC45r/59EQ==}
-
   es-module-lexer@1.7.0:
     resolution: {integrity: sha512-jEQoCwk8hyb2AZziIOLhDqpm5+2ww5uIE6lkO/6jcOCusfk6LhMHpXXfBLXTZ7Ydyt0j4VoUQv6uGNYbdW+kBA==}
 
@@ -6246,6 +6288,11 @@ packages:
 
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
+
+  fsevents@2.3.2:
+    resolution: {integrity: sha512-xiqMQR4xAeHTuB9uWm+fFRcIOgKBMiOBP+eXiyT7jsgVCq1bkVygt00oASowB7EdtpOHaaPgKt812P9ab+DDKA==}
+    engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
+    os: [darwin]
 
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
@@ -7744,6 +7791,16 @@ packages:
   pirates@4.0.6:
     resolution: {integrity: sha512-saLsH7WeYYPiD25LDuLRRY/i+6HaPYr6G1OUlN39otzkSTxKnubR9RTxS3/Kk50s1g2JTgFwWQDQyplC5/SHZg==}
     engines: {node: '>= 6'}
+
+  playwright-core@1.52.0:
+    resolution: {integrity: sha512-l2osTgLXSMeuLZOML9qYODUQoPPnUsKsb5/P6LJ2e6uPKXUdPK5WYhN4z03G+YNbWmGDY4YENauNu4ZKczreHg==}
+    engines: {node: '>=18'}
+    hasBin: true
+
+  playwright@1.52.0:
+    resolution: {integrity: sha512-JAwMNMBlxJ2oD1kce4KPtMkDeKGHQstdpFPcPH3maElAXon/QZeTvtsfXmTMRyO9TslfoYOXkSsvao2nE1ilTw==}
+    engines: {node: '>=18'}
+    hasBin: true
 
   plist@3.1.0:
     resolution: {integrity: sha512-uysumyrvkUX0rX/dEVqt8gC3sTBzd4zoWfLeS29nb53imdaXVvLINYXTI2GNqzaMuvacNx4uJQ8+b3zXR0pkgQ==}
@@ -10708,9 +10765,9 @@ snapshots:
   '@next/swc-win32-x64-msvc@15.3.0':
     optional: true
 
-  '@next/third-parties@15.1.4(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@next/third-parties@15.1.4(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
     dependencies:
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       third-party-capital: 1.0.20
 
@@ -11433,6 +11490,10 @@ snapshots:
 
   '@pkgjs/parseargs@0.11.0':
     optional: true
+
+  '@playwright/test@1.52.0':
+    dependencies:
+      playwright: 1.52.0
 
   '@popperjs/core@2.11.8': {}
 
@@ -12766,7 +12827,7 @@ snapshots:
       '@sentry/utils': 7.120.3
       localforage: 1.10.0
 
-  '@sentry/nextjs@8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.97.1(esbuild@0.19.12))':
+  '@sentry/nextjs@8.49.0(@opentelemetry/core@1.30.1(@opentelemetry/api@1.9.0))(@opentelemetry/instrumentation@0.56.0(@opentelemetry/api@1.9.0))(@opentelemetry/sdk-trace-base@1.30.1(@opentelemetry/api@1.9.0))(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)(webpack@5.97.1(esbuild@0.19.12))':
     dependencies:
       '@opentelemetry/api': 1.9.0
       '@opentelemetry/semantic-conventions': 1.28.0
@@ -12779,7 +12840,7 @@ snapshots:
       '@sentry/vercel-edge': 8.49.0
       '@sentry/webpack-plugin': 2.22.7(webpack@5.97.1(esbuild@0.19.12))
       chalk: 3.0.0
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       resolve: 1.22.8
       rollup: 3.29.5
       stacktrace-parser: 0.1.10
@@ -13201,7 +13262,7 @@ snapshots:
 
   '@types/connect@3.4.36':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/cookie@0.6.0': {}
 
@@ -13253,7 +13314,7 @@ snapshots:
   '@types/glob@7.2.0':
     dependencies:
       '@types/minimatch': 5.1.2
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/hast@3.0.4':
     dependencies:
@@ -13287,11 +13348,11 @@ snapshots:
 
   '@types/mysql@2.15.26':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/node-fetch@2.6.12':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       form-data: 4.0.1
 
   '@types/node@12.20.55': {}
@@ -13310,7 +13371,7 @@ snapshots:
 
   '@types/nodemailer@6.4.17':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/pg-pool@2.0.6':
     dependencies:
@@ -13324,13 +13385,13 @@ snapshots:
 
   '@types/pg@8.11.6':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       pg-protocol: 1.8.0
       pg-types: 4.0.2
 
   '@types/pg@8.6.1':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       pg-protocol: 1.8.0
       pg-types: 2.2.0
 
@@ -13350,11 +13411,11 @@ snapshots:
 
   '@types/tedious@4.0.14':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/through@0.0.33':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@types/tinycolor2@1.4.6': {}
 
@@ -13368,7 +13429,7 @@ snapshots:
 
   '@types/ws@8.5.13':
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
 
   '@ungap/structured-clone@1.2.1': {}
 
@@ -13418,9 +13479,9 @@ snapshots:
       utf-8-validate: 6.0.5
       ws: 8.18.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
 
-  '@vercel/speed-insights@1.0.12(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
+  '@vercel/speed-insights@1.0.12(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react@19.1.0)':
     optionalDependencies:
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
 
   '@vitest/coverage-v8@3.0.4(vitest@3.0.5(@types/debug@4.1.12)(@types/node@22.14.0)(jiti@2.4.2)(jsdom@26.0.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0))':
@@ -14417,8 +14478,6 @@ snapshots:
 
   es-errors@1.3.0: {}
 
-  es-module-lexer@1.6.0: {}
-
   es-module-lexer@1.7.0: {}
 
   es-object-atoms@1.1.1:
@@ -14556,7 +14615,7 @@ snapshots:
 
   estree-walker@3.0.3:
     dependencies:
-      '@types/estree': 1.0.6
+      '@types/estree': 1.0.7
 
   esutils@2.0.3: {}
 
@@ -14669,13 +14728,13 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  flags@4.0.0(@opentelemetry/api@1.9.0)(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  flags@4.0.0(@opentelemetry/api@1.9.0)(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@edge-runtime/cookies': 5.0.2
       jose: 5.9.6
     optionalDependencies:
       '@opentelemetry/api': 1.9.0
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
@@ -14742,6 +14801,9 @@ snapshots:
 
   fs.realpath@1.0.0: {}
 
+  fsevents@2.3.2:
+    optional: true
+
   fsevents@2.3.3:
     optional: true
 
@@ -14766,9 +14828,9 @@ snapshots:
       - encoding
       - supports-color
 
-  geist@1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
+  geist@1.3.1(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
     dependencies:
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
   gensync@1.0.0-beta.2: {}
 
@@ -16169,10 +16231,10 @@ snapshots:
 
   netmask@2.0.2: {}
 
-  next-auth@5.0.0-beta.25(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(nodemailer@6.10.0)(react@19.1.0):
+  next-auth@5.0.0-beta.25(next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(nodemailer@6.10.0)(react@19.1.0):
     dependencies:
       '@auth/core': 0.37.2(nodemailer@6.10.0)
-      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      next: 15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react: 19.1.0
     optionalDependencies:
       nodemailer: 6.10.0
@@ -16182,7 +16244,7 @@ snapshots:
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
 
-  next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
+  next@15.3.0(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.52.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0):
     dependencies:
       '@next/env': 15.3.0
       '@swc/counter': 0.1.3
@@ -16203,6 +16265,7 @@ snapshots:
       '@next/swc-win32-arm64-msvc': 15.3.0
       '@next/swc-win32-x64-msvc': 15.3.0
       '@opentelemetry/api': 1.9.0
+      '@playwright/test': 1.52.0
       sharp: 0.34.1
     transitivePeerDependencies:
       - '@babel/core'
@@ -16603,6 +16666,14 @@ snapshots:
 
   pirates@4.0.6: {}
 
+  playwright-core@1.52.0: {}
+
+  playwright@1.52.0:
+    dependencies:
+      playwright-core: 1.52.0
+    optionalDependencies:
+      fsevents: 2.3.2
+
   plist@3.1.0:
     dependencies:
       '@xmldom/xmldom': 0.8.10
@@ -16811,7 +16882,7 @@ snapshots:
       '@protobufjs/path': 1.1.2
       '@protobufjs/pool': 1.1.0
       '@protobufjs/utf8': 1.1.0
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       long: 5.2.4
 
   proxy-agent@6.5.0:
@@ -17472,7 +17543,7 @@ snapshots:
 
   stripe@17.4.0:
     dependencies:
-      '@types/node': 22.14.0
+      '@types/node': 22.15.3
       qs: 6.14.0
 
   style-to-object@1.0.8:
@@ -18001,7 +18072,7 @@ snapshots:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      es-module-lexer: 1.6.0
+      es-module-lexer: 1.7.0
       pathe: 2.0.2
       vite: 6.0.11(@types/node@22.14.0)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:
@@ -18022,7 +18093,7 @@ snapshots:
     dependencies:
       cac: 6.7.14
       debug: 4.4.0
-      es-module-lexer: 1.6.0
+      es-module-lexer: 1.7.0
       pathe: 2.0.2
       vite: 6.0.11(@types/node@22.15.3)(jiti@2.4.2)(lightningcss@1.29.1)(terser@5.39.0)(yaml@2.7.0)
     transitivePeerDependencies:

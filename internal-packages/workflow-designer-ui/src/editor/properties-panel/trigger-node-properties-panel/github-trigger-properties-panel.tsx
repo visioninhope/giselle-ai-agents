@@ -32,13 +32,17 @@ import {
 } from "../../../ui/select";
 import { Tooltip } from "../../../ui/tooltip";
 import { GitHubRepositoryBlock, SelectRepository } from "../ui";
-import { ConfiguredView } from "./ui";
+import { GitHubTriggerConfiguredView } from "./ui";
 
 export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const { value } = useIntegration();
 
 	if (node.content.state.status === "configured") {
-		return <ConfiguredView flowTriggerId={node.content.state.flowTriggerId} />;
+		return (
+			<GitHubTriggerConfiguredView
+				flowTriggerId={node.content.state.flowTriggerId}
+			/>
+		);
 	}
 
 	if (value?.github === undefined) {
@@ -329,7 +333,7 @@ function Installed({
 						},
 					},
 					outputs: [...node.outputs, ...outputs],
-					name: trigger.event.label,
+					name: `On ${trigger.event.label}`,
 				});
 			});
 		},
