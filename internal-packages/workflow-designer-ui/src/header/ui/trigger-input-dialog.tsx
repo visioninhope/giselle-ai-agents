@@ -19,6 +19,7 @@ import {
 	useMemo,
 } from "react";
 import { useTrigger } from "../../hooks/use-trigger";
+import { triggerNodeDefaultName } from "../../utils";
 
 export function Button({
 	leftIcon: LeftIcon,
@@ -45,9 +46,9 @@ export function Button({
 export function buttonLabel(node: TriggerNode) {
 	switch (node.content.provider) {
 		case "manual":
-			return "Trigger Manual flow";
+			return "Start Manual Flow";
 		case "github":
-			return "Trigger GitHub flow";
+			return "Test with dummy data";
 		default: {
 			const _exhaustiveCheck: never = node.content.provider;
 			throw new Error(`Unhandled trigger provider type: ${_exhaustiveCheck}`);
