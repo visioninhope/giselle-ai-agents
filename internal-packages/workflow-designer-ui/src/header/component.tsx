@@ -107,7 +107,10 @@ function Trigger() {
 														{triggerNode.name ??
 															triggerNodeDefaultName(
 																triggerNode.content.provider,
-															)}
+															)}{" "}
+														<span className="text-[10px] text-white-300 font-mono">
+															(id:{triggerNode.id.substring(3, 11)})
+														</span>
 													</span>
 													<span className="text-white-700 text-xs">
 														{buttonLabel(triggerNode)}
