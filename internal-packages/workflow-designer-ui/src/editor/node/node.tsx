@@ -26,6 +26,7 @@ import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
+import { Tooltip } from "../../ui/tooltip";
 import { defaultName } from "../../utils";
 import {
 	GitHubRepositoryBadgeFromRepo,
@@ -151,11 +152,11 @@ export function NodeComponent({
 		setPrevGenerationStatus(currentGeneration.status);
 	}, [currentGeneration, prevGenerationStatus]);
 	const metadataTexts = useMemo(() => {
-		const tmp: string[] = [];
+		const tmp: { label: string; tooltip: string }[] = [];
 		if (isTextGenerationNode(node) || isImageGenerationNode(node)) {
-			tmp.push(node.content.llm.provider);
+			tmp.push({ label: node.content.llm.provider, tooltip: "LLM Provider" });
 		}
-		tmp.push(node.id.substring(3, 11));
+		tmp.push({ label: node.id.substring(3, 11), tooltip: "Node ID" });
 		return tmp;
 	}, [node]);
 	return (
@@ -301,12 +302,13 @@ export function NodeComponent({
 						/>
 						<div className="flex items-center gap-1 pl-[4px] text-[10px] text-white-300 font-mono">
 							{metadataTexts.map((item, index) => (
-								<>
-									{index > 0 && <span className="text-white-400">/</span>}
-									<span key={item} className="text-[10px] text-white-400">
-										{item}
-									</span>
-								</>
+								<Tooltip
+									key={item.label}
+									className="text-[10px] text-white-400"
+									text={item.tooltip}
+								>
+									<button type="button">{item.label}</button>
+								</Tooltip>
 							))}
 						</div>
 					</div>
