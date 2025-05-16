@@ -302,13 +302,15 @@ export function NodeComponent({
 						/>
 						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] text-white-300 font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
 							{metadataTexts.map((item, index) => (
-								<Tooltip
-									key={item.label}
-									className="text-[10px] text-white-400"
-									text={item.tooltip}
-								>
-									<button type="button">{item.label}</button>
-								</Tooltip>
+								<div key={item.label} className="text-[10px] text-white-400">
+									{selected ? (
+										<Tooltip text={item.tooltip} variant="dark">
+											<button type="button">{item.label}</button>
+										</Tooltip>
+									) : (
+										item.label
+									)}
+								</div>
 							))}
 						</div>
 					</div>
