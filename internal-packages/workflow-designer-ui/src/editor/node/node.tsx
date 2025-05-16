@@ -300,7 +300,7 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						<div className="flex items-center gap-1 pl-[4px] text-[10px] text-white-300 font-mono">
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] text-white-300 font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
 							{metadataTexts.map((item, index) => (
 								<Tooltip
 									key={item.label}
