@@ -289,18 +289,42 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						<div className="flex gap-1 pl-[4px]">
-							{node.type === "operation" &&
-								(node.content.type === "imageGeneration" ||
-									node.content.type === "textGeneration") && (
-									<div className="text-[10px] text-white-400">
-										{node.content.llm.provider}
-									</div>
-								)}
-							<div className="text-[10px] text-white-300 font-mono">
-								ID: {node.id.substring(0, 8)}
-							</div>
-						</div>
+						{(() => {
+							const nodeMetadata = useMemo(() => {
+								const metadata: Array<{ id: string; value: string }> = [];
+
+								// Add provider for generation nodes
+								if (
+									node.type === "operation" &&
+									(node.content.type === "imageGeneration" ||
+										node.content.type === "textGeneration")
+								) {
+									metadata.push({
+										id: "provider",
+										value: node.content.llm.provider,
+									});
+								}
+
+								// Add node ID (first 8 chars)
+								metadata.push({
+									id: "nodeId",
+									value: node.id.substring(0, 8),
+								});
+
+								return metadata;
+							}, [node]);
+
+							return nodeMetadata.length > 0 ? (
+								<div className="flex items-center gap-1 pl-[4px] text-[10px] text-white-300 font-mono">
+									{nodeMetadata.map((item, index) => (
+										<React.Fragment key={`${item.id}-${item.value}`}>
+											{index > 0 && <span className="text-white-400">/</span>}
+											<span>{item.value}</span>
+										</React.Fragment>
+									))}
+								</div>
+							) : null;
+						})()}
 					</div>
 				</div>
 			</div>
