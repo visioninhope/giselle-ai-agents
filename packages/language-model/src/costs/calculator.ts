@@ -2,7 +2,6 @@ import type { BaseTokenPrice, Cost, TokenBasedPricing } from "./pricing";
 import { tokensToMegaTokens } from "./pricing";
 import type { ModelTokenUsage, ModelUsage } from "./usage";
 
-
 /**
  * For preliminary feedback on UI and LLM o11y platform
  * Not for billing
@@ -25,7 +24,10 @@ export interface CostCalculator<TUsage extends ModelUsage = ModelTokenUsage> {
 export class DefaultCostCalculator implements CostCalculator {
 	constructor(private provider: string) {}
 
-	async calculate(model: string, usage: ModelUsage): Promise<CostResultForDisplay> {
+	async calculate(
+		model: string,
+		usage: ModelUsage,
+	): Promise<CostResultForDisplay> {
 		console.log(`No cost calculator found for ${this.provider}`);
 		return { input: 0, output: 0, total: 0 };
 	}
