@@ -5,8 +5,8 @@ export {
 	type ModelPriceTable,
 } from "./model-prices";
 export type { ModelTokenUsage } from "./usage";
-export { calculateTokenCost } from "./calculator";
-export type { CostCalculator, CostResult } from "./calculator";
+export { calculateTokenCostForDisplay } from "./calculator";
+export type { CostCalculator, CostResultForDisplay } from "./calculator";
 
 import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";

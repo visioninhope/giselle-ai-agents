@@ -8,9 +8,9 @@ import {
 import {
 	Cost,
 	type CostCalculator,
-	type CostResult,
+	type CostResultForDisplay,
 	type ModelTokenUsage,
-	calculateTokenCost,
+	calculateTokenCostForDisplay,
 	getValidPricing,
 	openAiTokenPricing,
 } from "./costs";
@@ -148,8 +148,8 @@ export class OpenAICostCalculator implements CostCalculator {
 	async calculate(
 		modelId: string,
 		usage: ModelTokenUsage,
-	): Promise<CostResult> {
+	): Promise<CostResultForDisplay> {
 		const validPrice = getValidPricing(modelId, openAiTokenPricing);
-		return calculateTokenCost(usage, validPrice.price);
+		return calculateTokenCostForDisplay(usage, validPrice.price);
 	}
 }

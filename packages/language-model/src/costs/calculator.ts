@@ -2,7 +2,12 @@ import type { BaseTokenPrice, Cost, TokenBasedPricing } from "./pricing";
 import { tokensToMegaTokens } from "./pricing";
 import type { ModelTokenUsage, ModelUsage } from "./usage";
 
-export interface CostResult {
+
+/**
+ * For preliminary feedback on UI and LLM o11y platform
+ * Not for billing
+ */
+export interface CostResultForDisplay {
 	input: Cost;
 	output: Cost;
 	total: Cost;
@@ -14,22 +19,22 @@ export interface CostResult {
  * and be defined in their respective provider files.
  */
 export interface CostCalculator<TUsage extends ModelUsage = ModelTokenUsage> {
-	calculate(model: string, usage: TUsage): Promise<CostResult>;
+	calculate(model: string, usage: TUsage): Promise<CostResultForDisplay>;
 }
 
 export class DefaultCostCalculator implements CostCalculator {
 	constructor(private provider: string) {}
 
-	async calculate(model: string, usage: ModelUsage): Promise<CostResult> {
+	async calculate(model: string, usage: ModelUsage): Promise<CostResultForDisplay> {
 		console.log(`No cost calculator found for ${this.provider}`);
 		return { input: 0, output: 0, total: 0 };
 	}
 }
 
-export function calculateTokenCost(
+export function calculateTokenCostForDisplay(
 	usage: ModelTokenUsage,
 	pricing: TokenBasedPricing,
-): CostResult {
+): CostResultForDisplay {
 	// avoid errors related to floating points by:
 	// - executing all calculations using integer
 	// - converting back to the original unit

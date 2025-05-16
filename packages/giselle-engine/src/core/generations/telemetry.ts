@@ -94,7 +94,7 @@ export function createLangfuseTracer({
 		input: number;
 		output: number;
 		total: number;
-		inputCost: number;
+		inputCost: number; // these cost values are for preliminary analysis on Langfuse, not for billing purpose
 		outputCost: number;
 		totalCost: number;
 	};
