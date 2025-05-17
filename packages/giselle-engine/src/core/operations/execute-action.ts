@@ -83,11 +83,9 @@ async function executeGitHubActionCommand(args: {
 	switch (args.state.commandId) {
 		case "github.create.issue": {
 			// const title = connectionResolver({
-			// storage: args.context.storage,
-			// nodeId: args.generation.context.operationNode.id,
-			// inputId:
-
-			// })
+			// 	storage: args.context.storage,
+			// 	nodeId: args.generation.context.operationNode.id,
+			// });
 			const result = await createIssue(
 				args.state.repositoryNodeId,
 				"title",

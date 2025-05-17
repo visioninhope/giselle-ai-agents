@@ -285,6 +285,7 @@ function Installed({
 				const schema = action.command.parameters.shape[key] as AnyZodObject;
 				inputs.push({
 					id: InputId.generate(),
+					accessor: key,
 					label: key,
 					isRequired: !schema.isOptional(),
 				});

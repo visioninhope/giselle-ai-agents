@@ -9,7 +9,6 @@ export const Input = z.object({
 	label: z.string(),
 	accessor: z
 		.string()
-		.optional()
 		.describe(
 			"Field used for data access. When not provided, defaults to the label value.",
 		),
