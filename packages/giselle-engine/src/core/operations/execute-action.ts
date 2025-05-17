@@ -9,6 +9,7 @@ import {
 import { createIssue } from "@giselle-sdk/github-tool";
 import { setGeneration, setNodeGenerationIndex } from "../generations/utils";
 import type { GiselleEngineContext } from "../types";
+import { connectionResolver } from "./utils";
 
 export async function executeAction(args: {
 	context: GiselleEngineContext;
@@ -81,6 +82,12 @@ async function executeGitHubActionCommand(args: {
 	}
 	switch (args.state.commandId) {
 		case "github.create.issue": {
+			// const title = connectionResolver({
+			// storage: args.context.storage,
+			// nodeId: args.generation.context.operationNode.id,
+			// inputId:
+
+			// })
 			const result = await createIssue(
 				args.state.repositoryNodeId,
 				"title",

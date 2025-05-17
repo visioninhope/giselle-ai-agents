@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { Connection } from "../connection";
 import { Node, NodeBase, NodeId, OperationNode } from "../node";
 import { RunId } from "../run";
 import { WorkspaceId } from "../workspace";
@@ -45,6 +46,7 @@ export type GenerationInput = z.infer<typeof GenerationInput>;
 
 export const GenerationContext = z.object({
 	operationNode: OperationNode,
+	connections: z.array(Connection).default([]),
 	sourceNodes: z.array(Node),
 	origin: GenerationOrigin,
 	inputs: z
