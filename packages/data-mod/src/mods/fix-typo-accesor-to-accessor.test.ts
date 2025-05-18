@@ -3,46 +3,52 @@ import type { ZodIssue } from "zod";
 import { fixTypoAccesorToAccessor } from "./fix-typo-accesor-to-accessor";
 
 describe("fixTypoAccesorToAccessor", () => {
-	it("should copy accesor value to accessor field", () => {
+	it("should copy accesor value to accessor field when path contains outputs", () => {
 		const data = {
-			output: {
-				id: "out_123",
-				accesor: "fullName",
-			},
+			outputs: [
+				{
+					id: "out_123",
+					accesor: "fullName",
+				},
+			],
 		};
 
 		const issue: ZodIssue = {
 			code: "invalid_type",
 			expected: "string",
 			received: "undefined",
-			path: ["output", "accessor"],
+			path: ["outputs", 0, "accessor"],
 			message: "Required",
 		};
 
 		const result = fixTypoAccesorToAccessor(data, issue);
 
 		expect(result).toEqual({
-			output: {
-				id: "out_123",
-				accesor: "fullName",
-				accessor: "fullName",
-			},
+			outputs: [
+				{
+					id: "out_123",
+					accesor: "fullName",
+					accessor: "fullName",
+				},
+			],
 		});
 	});
 
 	it("should not modify data when issue is not related to accessor", () => {
 		const data = {
-			output: {
-				id: "out_123",
-				accesor: "fullName",
-			},
+			outputs: [
+				{
+					id: "out_123",
+					accesor: "fullName",
+				},
+			],
 		};
 
 		const issue: ZodIssue = {
 			code: "invalid_type",
 			expected: "string",
 			received: "undefined",
-			path: ["output", "someOtherField"],
+			path: ["outputs", "someOtherField"],
 			message: "Required",
 		};
 
@@ -58,7 +64,7 @@ describe("fixTypoAccesorToAccessor", () => {
 			code: "invalid_type",
 			expected: "string",
 			received: "undefined",
-			path: ["output", "accessor"],
+			path: ["outputs", "accessor"],
 			message: "Required",
 		};
 
@@ -67,7 +73,30 @@ describe("fixTypoAccesorToAccessor", () => {
 		expect(result).toBe(data);
 	});
 
-	it("should handle deeply nested objects", () => {
+	it("should not modify data when path contains input instead of outputs", () => {
+		const data = {
+			inputs: [
+				{
+					id: "inp_123",
+					accesor: "fullName",
+				},
+			],
+		};
+
+		const issue: ZodIssue = {
+			code: "invalid_type",
+			expected: "string",
+			received: "undefined",
+			path: ["inputs", 0, "accessor"],
+			message: "Required",
+		};
+
+		const result = fixTypoAccesorToAccessor(data, issue);
+
+		expect(result).toBe(data);
+	});
+
+	it("should handle deeply nested objects with outputs in path", () => {
 		const data = {
 			steps: [
 				{
@@ -106,29 +135,33 @@ describe("fixTypoAccesorToAccessor", () => {
 		});
 	});
 
-	it("should not modify data when target object doesn't have accesor field", () => {
+	it("should not modify data when target object doesn't have accesor field but path contains outputs", () => {
 		const data = {
-			output: {
-				id: "out_123",
-				// No accesor field
-			},
+			outputs: [
+				{
+					id: "out_123",
+					// No accesor field
+				},
+			],
 		};
 
 		const issue: ZodIssue = {
 			code: "invalid_type",
 			expected: "string",
 			received: "undefined",
-			path: ["output", "accessor"],
+			path: ["outputs", 0, "accessor"],
 			message: "Required",
 		};
 
 		const result = fixTypoAccesorToAccessor(data, issue);
 
 		expect(result).toEqual({
-			output: {
-				id: "out_123",
-				accessor: undefined, // Sets to undefined since no accesor exists
-			},
+			outputs: [
+				{
+					id: "out_123",
+					accessor: undefined, // Sets to undefined since no accesor exists
+				},
+			],
 		});
 	});
 });
