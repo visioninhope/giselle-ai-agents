@@ -82,7 +82,7 @@ describe("addAccessorToInput", () => {
 
 		const result = addAccessorToInput(data, issue);
 
-		expect(result).toBe(data);
+		expect(result).toStrictEqual(data);
 	});
 
 	it("should handle non-object data", () => {

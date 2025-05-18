@@ -78,13 +78,7 @@ export function TriggerInputDialog({
 		}
 		switch (trigger.configuration.provider) {
 			case "github": {
-				const githubTrigger = githubTriggers.find(
-					(githubTrigger) =>
-						githubTrigger.event.id === trigger.configuration.event.id,
-				);
-				if (githubTrigger === undefined) {
-					return [];
-				}
+				const githubTrigger = githubTriggers[trigger.configuration.event.id];
 				switch (githubTrigger.event.id) {
 					case "github.issue.created":
 						return [
