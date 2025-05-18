@@ -31,12 +31,12 @@ export const githubCreateIssueCommentAction = {
 	},
 } as const satisfies GitHubAction;
 
-export const actions = [
-	githubCreateIssueAction,
-	githubCreateIssueCommentAction,
-] as const;
+export const actions = {
+	[githubCreateIssueAction.command.id]: githubCreateIssueAction,
+	[githubCreateIssueCommentAction.command.id]: githubCreateIssueCommentAction,
+} as const;
 
-export type ActionCommandId = (typeof actions)[number]["command"]["id"];
+export type ActionCommandId = keyof typeof actions;
 
 export function actionIdToLabel(triggerId: ActionCommandId) {
 	switch (triggerId) {

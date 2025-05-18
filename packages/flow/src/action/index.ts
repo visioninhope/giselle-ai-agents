@@ -7,6 +7,5 @@ export {
 	actionIdToLabel as githubActionIdToLabel,
 } from "./github";
 
-export const actions = [...githubActions];
 export type ActionProvider = typeof githubProvider;
 export const actionProviders = [githubProvider];
