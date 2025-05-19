@@ -131,9 +131,11 @@ function NodeCanvas() {
 						outputId,
 					});
 				} else {
+					const newInputId = InputId.generate();
 					const newInput = {
-						id: InputId.generate(),
+						id: newInputId,
 						label: "Input",
+						accessor: newInputId,
 					};
 					const updatedInputs = [...inputNode.inputs, newInput];
 					updateNodeData(inputNode, {

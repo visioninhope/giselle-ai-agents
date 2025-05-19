@@ -78,13 +78,7 @@ export function TriggerInputDialog({
 		}
 		switch (trigger.configuration.provider) {
 			case "github": {
-				const githubTrigger = githubTriggers.find(
-					(githubTrigger) =>
-						githubTrigger.event.id === trigger.configuration.event.id,
-				);
-				if (githubTrigger === undefined) {
-					return [];
-				}
+				const githubTrigger = githubTriggers[trigger.configuration.event.id];
 				switch (githubTrigger.event.id) {
 					case "github.issue.created":
 						return [
@@ -183,17 +177,19 @@ export function TriggerInputDialog({
 				}),
 			);
 			for (const job of flow.jobs) {
-				for (const operation of job.operations) {
-					const generation = generations.find(
-						(generation) =>
-							generation.context.operationNode.id ===
-							operation.generationTemplate.operationNode.id,
-					);
-					if (generation === undefined) {
-						continue;
-					}
-					await startGeneration(generation.id);
-				}
+				await Promise.all(
+					job.operations.map(async (operation) => {
+						const generation = generations.find(
+							(generation) =>
+								generation.context.operationNode.id ===
+								operation.generationTemplate.operationNode.id,
+						);
+						if (generation === undefined) {
+							return;
+						}
+						await startGeneration(generation.id);
+					}),
+				);
 			}
 		},
 		[node.id, data, createGeneration, startGeneration],
