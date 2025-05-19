@@ -5,6 +5,7 @@ export {
 	provider as githubProvider,
 	type ActionCommandId as GitHubActionCommandId,
 	actionIdToLabel as githubActionIdToLabel,
+	type GitHubAction,
 } from "./github";
 
 export type ActionProvider = typeof githubProvider;

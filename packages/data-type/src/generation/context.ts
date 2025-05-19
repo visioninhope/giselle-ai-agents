@@ -64,6 +64,7 @@ export const GenerationContextLike = z.object({
 		content: z.any(),
 	}),
 	sourceNodes: z.array(z.any()),
+	connections: z.array(z.any()).default([]),
 	origin: z.any(),
 	inputs: z.array(GenerationInput).optional(),
 });
