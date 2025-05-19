@@ -12,7 +12,7 @@ import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";
 import { DefaultCostCalculator } from "./calculator";
 
-export function createCostCalculator(provider: string): CostCalculator {
+export function createDisplayCostCalculator(provider: string): CostCalculator {
 	switch (provider) {
 		case "openai":
 			return new OpenAICostCalculator();
@@ -22,19 +22,19 @@ export function createCostCalculator(provider: string): CostCalculator {
 	}
 }
 
-export async function calculateCost(
+export async function calculateDisplayCost(
 	provider: string,
 	modelId: string,
 	usage: { promptTokens: number; completionTokens: number },
 ) {
-	const calculator = createCostCalculator(provider);
+	const calculator = createDisplayCostCalculator(provider);
 	const result = await calculator.calculate(modelId, {
 		...usage,
 		totalTokens: usage.promptTokens + usage.completionTokens,
 	});
 	return {
-		inputCost: result.input,
-		outputCost: result.output,
-		totalCost: result.total,
+		inputCostForDisplay: result.input,
+		outputCostForDisplay: result.output,
+		totalCostForDisplay: result.total,
 	};
 }

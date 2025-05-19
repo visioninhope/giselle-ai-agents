@@ -20,7 +20,7 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
-import { calculateCost } from "@giselle-sdk/language-model";
+import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import {
 	Capability,
 	hasCapability,
@@ -404,7 +404,7 @@ export async function generateText(args: {
 			let costInfo = null;
 
 			if (tokenUsage) {
-				costInfo = await calculateCost(
+				costInfo = await calculateDisplayCost(
 					operationNode.content.llm.provider,
 					operationNode.content.llm.id,
 					tokenUsage,
@@ -504,9 +504,9 @@ export async function generateText(args: {
 					total:
 						(tokenUsage?.promptTokens ?? 0) +
 						(tokenUsage?.completionTokens ?? 0),
-					inputCost: costInfo?.inputCost ?? 0,
-					outputCost: costInfo?.outputCost ?? 0,
-					totalCost: costInfo?.totalCost ?? 0,
+					inputCost: costInfo?.inputCostForDisplay ?? 0,
+					outputCost: costInfo?.outputCostForDisplay ?? 0,
+					totalCost: costInfo?.totalCostForDisplay ?? 0,
 				},
 				completedGeneration,
 				spanName: "ai.streamText",
