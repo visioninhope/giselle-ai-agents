@@ -485,7 +485,8 @@ export async function generateText(args: {
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			});
 
-			const { langfuse, trace, span, generation } = createLangfuseTracer({
+			// necessary to send telemetry but not explicitly used
+			const { langfuse: _langfuse, trace: _trace, span: _span, generation: _generation } = createLangfuseTracer({
 				workspaceId,
 				runningGeneration,
 				tags: generateTelemetryTags({
