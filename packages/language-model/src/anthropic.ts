@@ -1,5 +1,13 @@
 import { z } from "zod";
 import { Capability, LanguageModelBase, Tier } from "./base";
+import {
+	type CostCalculator,
+	type CostResultForDisplay,
+	type ModelTokenUsage,
+	anthropicTokenPricing,
+	calculateTokenCostForDisplay,
+	getValidPricing,
+} from "./costs";
 
 const AnthropicLanguageModelConfigurations = z.object({
 	temperature: z.number(),
@@ -58,3 +66,13 @@ export const models = [claude37Sonnet, claude35Sonnet, claude35Haiku];
 
 export const LanguageModel = AnthropicLanguageModel;
 export type LanguageModel = AnthropicLanguageModel;
+
+export class AnthropicCostCalculator implements CostCalculator {
+	async calculate(
+		modelId: string,
+		usage: ModelTokenUsage,
+	): Promise<CostResultForDisplay> {
+		const validPrice = getValidPricing(modelId, anthropicTokenPricing);
+		return calculateTokenCostForDisplay(usage, validPrice.price);
+	}
+}
