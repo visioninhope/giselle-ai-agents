@@ -177,17 +177,19 @@ export function TriggerInputDialog({
 				}),
 			);
 			for (const job of flow.jobs) {
-				for (const operation of job.operations) {
-					const generation = generations.find(
-						(generation) =>
-							generation.context.operationNode.id ===
-							operation.generationTemplate.operationNode.id,
-					);
-					if (generation === undefined) {
-						continue;
-					}
-					await startGeneration(generation.id);
-				}
+				await Promise.all(
+					job.operations.map(async (operation) => {
+						const generation = generations.find(
+							(generation) =>
+								generation.context.operationNode.id ===
+								operation.generationTemplate.operationNode.id,
+						);
+						if (generation === undefined) {
+							return;
+						}
+						await startGeneration(generation.id);
+					}),
+				);
 			}
 		},
 		[node.id, data, createGeneration, startGeneration],
