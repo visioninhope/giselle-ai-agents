@@ -148,11 +148,7 @@ export function createLangfuseTracer({
 		modelParameters:
 			runningGeneration.context.operationNode.content.llm.configurations,
 		input: messages,
-		usage: {
-			input: usage.input,
-			output: usage.output,
-			unit,
-		},
+		usage,
 		startTime: new Date(runningGeneration.createdAt),
 		completionStartTime: new Date(runningGeneration.startedAt),
 		metadata: settings?.metadata,
