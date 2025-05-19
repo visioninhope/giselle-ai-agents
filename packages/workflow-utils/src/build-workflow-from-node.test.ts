@@ -125,4 +125,21 @@ describe("buildWorkflowFromNode with fixture/workspace1", () => {
 			expect(thirdJob.operations[0].node.content.type).toBe("action");
 		}
 	});
+
+	it("should have the first job's node included in the third job's sourceNodes", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const firstJobNodeId = "nd-qRt17h0TP7nQd4Xk";
+			const secondJobNodeId = "nd-LsNVgNj3s1xJjreL";
+			const thirdJob = result.jobs[2];
+
+			// Check if the sourceNodes of the third job include the first job's node
+			const sourceNodeIds =
+				thirdJob.operations[0].generationTemplate.sourceNodes.map(
+					(node) => node.id,
+				);
+			expect(sourceNodeIds).toContain(firstJobNodeId);
+			expect(sourceNodeIds).toContain(secondJobNodeId);
+		}
+	});
 });

@@ -219,16 +219,19 @@ export function createJobMap(
 			(connection) => connection.inputNode.id === node.id,
 		);
 
+		// Map through each input to find source nodes, preserving duplicates
 		const sourceNodes = node.inputs
 			.map((input) => {
-				const connections = connectedConnections.filter(
+				// Find connections for this specific input
+				const inputConnections = connectedConnections.filter(
 					(connection) => connection.inputId === input.id,
 				);
-				return nodeArray.find((tmpNode) =>
-					connectedConnections.some(
-						(connection) => connection.outputNode.id === tmpNode.id,
-					),
-				);
+				// For each input connection, find the corresponding source node
+				if (inputConnections.length > 0) {
+					const sourceNodeId = inputConnections[0].outputNode.id;
+					return nodeArray.find((n) => n.id === sourceNodeId);
+				}
+				return undefined;
 			})
 			.filter((node) => node !== undefined);
 		return {
