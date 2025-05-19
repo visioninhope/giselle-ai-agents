@@ -429,9 +429,6 @@ export async function getNodeGenerationIndexes(
 ) {
 	const unsafeNodeGenerationIndexData = await params.storage.getItem(
 		nodeGenerationIndexPath(params),
-		{
-			bypassingCache: true,
-		},
 	);
 	if (unsafeNodeGenerationIndexData === null) {
 		return undefined;

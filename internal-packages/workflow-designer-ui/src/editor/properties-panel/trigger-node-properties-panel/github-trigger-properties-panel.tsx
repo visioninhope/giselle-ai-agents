@@ -4,7 +4,11 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubTriggerEventId,
+	githubTriggers,
+	triggers,
+} from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/integration";
 import { useIntegration } from "@giselle-sdk/integration/react";
 import clsx from "clsx/lite";
@@ -290,7 +294,13 @@ function Installed({
 			if (event === undefined) {
 				return;
 			}
-			const trigger = githubTriggers[event.id];
+			const trigger = triggers.find(
+				(trigger) =>
+					trigger.provider === "github" && trigger.event.id === event.id,
+			);
+			if (trigger === undefined) {
+				return;
+			}
 			const outputs: Output[] = [];
 			for (const key of trigger.event.payloads.keyof().options) {
 				outputs.push({
@@ -376,8 +386,11 @@ function Installed({
 								<SelectValue placeholder="Select an event" />
 							</SelectTrigger>
 							<SelectContent>
-								{Object.entries(githubTriggers).map(([id, githubTrigger]) => (
-									<SelectItem key={id} value={id}>
+								{githubTriggers.map((githubTrigger) => (
+									<SelectItem
+										key={githubTrigger.event.id}
+										value={githubTrigger.event.id}
+									>
 										{githubTrigger.event.label}
 									</SelectItem>
 								))}

@@ -15,4 +15,5 @@ export {
 export { triggers as manualTriggers } from "./manual";
 
 export type TriggerProvider = typeof manualProvider | typeof githubProvider;
+export const triggers = [...manualTriggers, ...githubTriggers];
 export const triggerProviders = [manualProvider, githubProvider] as const;
