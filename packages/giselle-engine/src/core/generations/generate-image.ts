@@ -47,14 +47,9 @@ import {
 	setNodeGenerationIndex,
 } from "./utils";
 
-type ProviderOptions = Parameters<
-	typeof generateImageAiSdk
->[0]["providerOptions"];
-
 export async function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	providerOptions?: ProviderOptions;
 	telemetry?: TelemetrySettings;
 }) {
 	const operationNode = args.generation.context.operationNode;
