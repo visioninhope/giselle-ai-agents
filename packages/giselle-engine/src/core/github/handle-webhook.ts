@@ -7,6 +7,7 @@ import {
 	type WorkspaceGitHubIntegrationSetting,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import { z } from "zod";
 import { WorkflowError } from "../error";
 import { runFlow } from "../flows";
@@ -146,25 +147,73 @@ async function processV2(args: {
 			if (!trigger.enable || trigger.configuration.provider !== "github") {
 				return;
 			}
+			const githubTrigger = githubTriggers[trigger.configuration.event.id];
 			const triggerInputs: GenerationInput[] = [];
-			switch (trigger.configuration.event.id) {
+			switch (githubTrigger.event.id) {
 				case "github.issue.created":
 					if (args.githubEvent.type === GitHubEventType.ISSUES_OPENED) {
-						triggerInputs.push({
-							name: "title",
-							value: args.githubEvent.payload.issue.title,
-						});
-						triggerInputs.push({
-							name: "body",
-							value: args.githubEvent.payload.issue.body ?? "",
-						});
+						for (const payload of githubTrigger.event.payloads.keyof()
+							.options) {
+							switch (payload) {
+								case "title":
+									triggerInputs.push({
+										name: "title",
+										value: args.githubEvent.payload.issue.title,
+									});
+									break;
+								case "body":
+									triggerInputs.push({
+										name: "body",
+										value: args.githubEvent.payload.issue.body ?? "",
+									});
+									break;
+								default: {
+									const _exhaustiveCheck: never = payload;
+									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+								}
+							}
+						}
 					}
 					break;
 				case "github.issue_comment.created":
-					// todo
+					if (args.githubEvent.type === GitHubEventType.ISSUE_COMMENT_CREATED) {
+						for (const payload of githubTrigger.event.payloads.keyof()
+							.options) {
+							switch (payload) {
+								case "body":
+									triggerInputs.push({
+										name: "body",
+										value: args.githubEvent.payload.comment.body ?? "",
+									});
+									break;
+								case "issueBody":
+									triggerInputs.push({
+										name: "issueBody",
+										value: args.githubEvent.payload.issue.body ?? "",
+									});
+									break;
+								case "issueNumber":
+									triggerInputs.push({
+										name: "issueNumber",
+										value: args.githubEvent.payload.issue.number.toString(),
+									});
+									break;
+								case "issueTitle":
+									triggerInputs.push({
+										name: "issueTitle",
+										value: args.githubEvent.payload.issue.title,
+									});
+									break;
+								default: {
+									const _exhaustiveCheck: never = payload;
+									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+								}
+							}
+						}
+					}
 					break;
 				default: {
-					const _exhaustiveCheck: never = trigger.configuration.event;
+					const _exhaustiveCheck: never = githubTrigger.event;
 					throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
 				}
 			}
