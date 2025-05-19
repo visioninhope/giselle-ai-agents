@@ -31,13 +31,7 @@ export async function resolveTrigger(args: {
 	const outputs: GenerationOutput[] = [];
 	switch (triggerData.configuration.provider) {
 		case "github": {
-			const trigger = githubTriggers.find(
-				(githubTrigger) =>
-					githubTrigger.event.id === triggerData.configuration.event.id,
-			);
-			if (trigger === undefined) {
-				break;
-			}
+			const trigger = githubTriggers[triggerData.configuration.event.id];
 			for (const payload of trigger.event.payloads.keyof().options) {
 				const input = generationContext.inputs?.find(
 					(input) => input.name === payload,

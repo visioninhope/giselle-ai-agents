@@ -358,7 +358,15 @@ export async function getGeneration(params: {
 			bypassingCache: true,
 		},
 	);
-	return parseAndMod(Generation, unsafeGeneration);
+	const parsedGeneration = parseAndMod(Generation, unsafeGeneration);
+	const parsedGenerationContext = parseAndMod(
+		GenerationContext,
+		parsedGeneration.context,
+	);
+	return {
+		...parsedGeneration,
+		context: parsedGenerationContext,
+	};
 }
 
 export function nodeGenerationIndexPath(
@@ -429,6 +437,9 @@ export async function getNodeGenerationIndexes(
 ) {
 	const unsafeNodeGenerationIndexData = await params.storage.getItem(
 		nodeGenerationIndexPath(params),
+		{
+			bypassingCache: true,
+		},
 	);
 	if (unsafeNodeGenerationIndexData === null) {
 		return undefined;

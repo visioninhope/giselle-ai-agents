@@ -35,12 +35,12 @@ export const githubIssueCommentCreatedTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
-export const triggers = [
-	githubIssueCreatedTrigger,
-	githubIssueCommentCreatedTrigger,
-] as const;
+export const triggers = {
+	[githubIssueCreatedTrigger.event.id]: githubIssueCreatedTrigger,
+	[githubIssueCommentCreatedTrigger.event.id]: githubIssueCommentCreatedTrigger,
+} as const;
 
-export type TriggerEventId = (typeof triggers)[number]["event"]["id"];
+export type TriggerEventId = keyof typeof triggers;
 
 export function triggerIdToLabel(triggerId: TriggerEventId) {
 	switch (triggerId) {
