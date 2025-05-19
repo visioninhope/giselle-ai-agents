@@ -507,11 +507,11 @@ export async function generateText(args: {
 					inputCost: costInfo?.inputCostForDisplay ?? 0,
 					outputCost: costInfo?.outputCostForDisplay ?? 0,
 					totalCost: costInfo?.totalCostForDisplay ?? 0,
+					unit: "TOKENS",
 				},
 				completedGeneration,
 				spanName: "ai.streamText",
 				generationName: "ai.streamText.doStream",
-				unit: "TOKENS",
 				settings: args.telemetry,
 			});
 			await Promise.all(

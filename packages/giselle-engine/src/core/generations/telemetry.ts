@@ -95,7 +95,6 @@ export function createLangfuseTracer({
 	completedGeneration,
 	spanName,
 	generationName,
-	unit,
 	settings,
 }: {
 	workspaceId: string;
@@ -110,11 +109,11 @@ export function createLangfuseTracer({
 		inputCost: number; // these cost values are for preliminary analysis on Langfuse, not for billing purpose
 		outputCost: number;
 		totalCost: number;
+		unit: LangfuseUnit;
 	};
 	completedGeneration: CompletedGeneration;
 	spanName: string;
 	generationName: string;
-	unit: LangfuseUnit;
 	settings?: TelemetrySettings;
 }): {
 	langfuse: Langfuse;
