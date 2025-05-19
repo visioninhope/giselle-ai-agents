@@ -124,10 +124,6 @@ export function createLangfuseTracer({
 		ReturnType<ReturnType<Langfuse["trace"]>["span"]>["generation"]
 	>;
 } {
-	console.log("inside======");
-	console.log("tags:", tags);
-	console.log("settings:", settings);
-
 	const langfuse = new Langfuse();
 	const trace = langfuse.trace({
 		userId: String(settings?.metadata?.userId),

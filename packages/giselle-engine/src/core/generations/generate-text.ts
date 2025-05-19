@@ -485,7 +485,6 @@ export async function generateText(args: {
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			});
 
-			console.log("before---------------");
 			const { langfuse, trace, span, generation } = createLangfuseTracer({
 				workspaceId,
 				runningGeneration,
@@ -514,7 +513,6 @@ export async function generateText(args: {
 				unit: "TOKENS",
 				settings: args.telemetry,
 			});
-			console.log("after---------------");
 			await Promise.all(
 				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 					cleanupFunction(),
