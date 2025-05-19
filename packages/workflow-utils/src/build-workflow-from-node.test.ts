@@ -1,11 +1,14 @@
-import type {
-	Connection,
-	ConnectionId,
-	Node,
-	NodeId,
+import {
+	type Connection,
+	type ConnectionId,
+	type Node,
+	type NodeId,
+	type Workflow,
+	Workspace,
 } from "@giselle-sdk/data-type";
-import { describe, expect, test } from "vitest";
+import { beforeEach, describe, expect, it, test } from "vitest";
 import { buildWorkflowFromNode } from "./build-workflow-from-node";
+import workspace1 from "./test/fixtures/workspace1.json";
 import { testWorkspace1 } from "./test/test-data";
 
 describe("buildWorkflowFromNode with testWorkspace1", () => {
@@ -66,5 +69,29 @@ describe("buildWorkflowFromNode with testWorkspace1", () => {
 				"nd-7cHfwxtERI9CPAIt",
 			);
 		}
+	});
+});
+
+describe("buildWorkflowFromNode with fixture/workspace1", () => {
+	let workspaceData: Workspace;
+	let result: Workflow | null;
+
+	beforeEach(() => {
+		const workspace = Workspace.safeParse(workspace1);
+		expect(workspace.success).toBeTruthy();
+		if (!workspace.success) {
+			throw new Error("Failed to parse workspace");
+		}
+		workspaceData = workspace.data;
+
+		result = buildWorkflowFromNode(
+			"nd-qRt17h0TP7nQd4Xk",
+			workspaceData.nodes,
+			workspaceData.connections,
+		);
+	});
+
+	it("should build a workflow with 3 jobs", () => {
+		expect(result?.jobs.length).toBe(3);
 	});
 });
