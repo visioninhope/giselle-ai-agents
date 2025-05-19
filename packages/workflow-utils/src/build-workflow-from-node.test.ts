@@ -92,6 +92,37 @@ describe("buildWorkflowFromNode with fixture/workspace1", () => {
 	});
 
 	it("should build a workflow with 3 jobs", () => {
+		expect(result).not.toBeNull();
 		expect(result?.jobs.length).toBe(3);
+	});
+
+	it("should have first job with one operation that is a manualTrigger", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const firstJob = result.jobs[0];
+			expect(firstJob.operations.length).toBe(1);
+			expect(firstJob.operations[0].node.id).toBe("nd-qRt17h0TP7nQd4Xk");
+			expect(firstJob.operations[0].node.content.type).toBe("trigger");
+		}
+	});
+
+	it("should have second job with one operation that is a textGeneration", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const secondJob = result.jobs[1];
+			expect(secondJob.operations.length).toBe(1);
+			expect(secondJob.operations[0].node.id).toBe("nd-LsNVgNj3s1xJjreL");
+			expect(secondJob.operations[0].node.content.type).toBe("textGeneration");
+		}
+	});
+
+	it("should have third job with one operation that is an action", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const thirdJob = result.jobs[2];
+			expect(thirdJob.operations.length).toBe(1);
+			expect(thirdJob.operations[0].node.id).toBe("nd-c2tg86XNmMef5SUj");
+			expect(thirdJob.operations[0].node.content.type).toBe("action");
+		}
 	});
 });
