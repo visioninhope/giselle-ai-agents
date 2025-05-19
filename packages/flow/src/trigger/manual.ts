@@ -17,6 +17,4 @@ export const manualTrigger = {
 	},
 } as const satisfies ManualTrigger;
 
-export const triggers = {
-	[manualTrigger.event.id]: manualTrigger,
-} as const;
+export const triggers = [manualTrigger] as const;

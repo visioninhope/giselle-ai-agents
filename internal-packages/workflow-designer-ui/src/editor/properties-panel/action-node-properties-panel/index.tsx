@@ -43,16 +43,12 @@ export function ActionNodePropertiesPanel({
 			sourceNodes: connectedInputs
 				.map((input) => input.connectedOutput?.node as Node)
 				.filter((node) => node !== null),
-			connections: data.connections.filter(
-				(connection) => connection.inputNode.id === node.id,
-			),
 		});
 	}, [
 		isValid,
 		setUiNodeState,
 		node,
 		data.id,
-		data.connections,
 		createAndStartGeneration,
 		connectedInputs,
 	]);

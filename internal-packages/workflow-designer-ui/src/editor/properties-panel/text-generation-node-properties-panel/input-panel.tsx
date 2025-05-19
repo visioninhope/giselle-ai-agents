@@ -77,11 +77,9 @@ export function InputPanel({
 				if (outputNode === undefined) {
 					continue;
 				}
-				const newInputId = InputId.generate();
 				const newInput: Input = {
-					id: newInputId,
+					id: InputId.generate(),
 					label: "Input",
-					accessor: newInputId,
 				};
 
 				mutableInputs = [...mutableInputs, newInput];

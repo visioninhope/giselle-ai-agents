@@ -211,33 +211,28 @@ export function createJobMap(
 		return levels;
 	};
 
-	function createGenerationTemplate(node: OperationNode): GenerationTemplate {
+	/**
+	 * Creates a generation context for an operation node by finding its source nodes.
+	 */
+	function createGenerationContext(node: OperationNode): GenerationTemplate {
 		const connectionArray = Array.from(connectionSet);
 		const nodeArray = Array.from(nodeSet);
 
-		const connectedConnections = connectionArray.filter(
-			(connection) => connection.inputNode.id === node.id,
-		);
-
-		// Map through each input to find source nodes, preserving duplicates
 		const sourceNodes = node.inputs
 			.map((input) => {
-				// Find connections for this specific input
-				const inputConnections = connectedConnections.filter(
+				const connections = connectionArray.filter(
 					(connection) => connection.inputId === input.id,
 				);
-				// For each input connection, find the corresponding source node
-				if (inputConnections.length > 0) {
-					const sourceNodeId = inputConnections[0].outputNode.id;
-					return nodeArray.find((n) => n.id === sourceNodeId);
-				}
-				return undefined;
+				return nodeArray.find((tmpNode) =>
+					connections.some(
+						(connection) => connection.outputNode.id === tmpNode.id,
+					),
+				);
 			})
 			.filter((node) => node !== undefined);
 		return {
 			operationNode: node,
 			sourceNodes,
-			connections: connectedConnections,
 		};
 	}
 
@@ -267,7 +262,7 @@ export function createJobMap(
 			(node) =>
 				({
 					node,
-					generationTemplate: createGenerationTemplate(node),
+					generationTemplate: createGenerationContext(node),
 				}) satisfies Operation,
 		);
 
