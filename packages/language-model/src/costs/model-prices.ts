@@ -111,6 +111,55 @@ export const openAiTokenPricing: ModelPriceTable = {
 	},
 };
 
+export const anthropicTokenPricing: ModelPriceTable = {
+	// https://www.anthropic.com/pricing
+	"claude-3-7-sonnet-20250219": {
+		prices: [
+			{
+				validFrom: "2025-05-19T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 3.0,
+					},
+					output: {
+						costPerMegaToken: 15.0,
+					},
+				},
+			},
+		],
+	},
+	"claude-3-5-sonnet-20241022": {
+		prices: [
+			{
+				validFrom: "2025-05-19T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 3.0,
+					},
+					output: {
+						costPerMegaToken: 15.0,
+					},
+				},
+			},
+		],
+	},
+	"claude-3-5-haiku-20241022": {
+		prices: [
+			{
+				validFrom: "2025-05-19T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.8,
+					},
+					output: {
+						costPerMegaToken: 4.0,
+					},
+				},
+			},
+		],
+	},
+};
+
 export function getValidPricing(
 	modelId: string,
 	priceTable: ModelPriceTable,

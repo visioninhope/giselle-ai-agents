@@ -1,6 +1,7 @@
 export * from "./pricing";
 export {
 	openAiTokenPricing,
+	anthropicTokenPricing,
 	getValidPricing,
 	type ModelPriceTable,
 } from "./model-prices";
