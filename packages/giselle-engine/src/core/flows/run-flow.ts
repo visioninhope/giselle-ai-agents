@@ -50,7 +50,11 @@ export async function runFlow(args: {
 					id: generationId,
 					context: {
 						...operation.generationTemplate,
-						origin: { type: "run", id: runId },
+						origin: {
+							type: "run",
+							id: runId,
+							workspaceId: trigger.workspaceId,
+						},
 						inputs:
 							operationNode.content.type === "trigger"
 								? args.triggerInputs

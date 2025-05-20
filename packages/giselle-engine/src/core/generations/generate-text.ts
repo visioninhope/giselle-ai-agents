@@ -16,6 +16,7 @@ import {
 	type RunningGeneration,
 	type TextGenerationLanguageModelData,
 	type UrlSource,
+	type WorkspaceId,
 	isCompletedGeneration,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
@@ -107,10 +108,19 @@ export async function generateText(args: {
 		}),
 	]);
 
-	const workspaceId = await extractWorkspaceIdFromOrigin({
-		storage: args.context.storage,
-		origin: args.generation.context.origin,
-	});
+	let workspaceId: WorkspaceId | undefined;
+	switch (args.generation.context.origin.type) {
+		case "run":
+			workspaceId = args.generation.context.origin.workspaceId;
+			break;
+		case "workspace":
+			workspaceId = args.generation.context.origin.id;
+			break;
+		default: {
+			const _exhaustiveCheck: never = args.generation.context.origin;
+			throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
+		}
+	}
 
 	const usageLimitStatus = await checkUsageLimits({
 		workspaceId,
