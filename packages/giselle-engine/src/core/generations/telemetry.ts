@@ -95,7 +95,6 @@ export function createLangfuseTracer({
 	completedGeneration,
 	spanName,
 	generationName,
-	unit,
 	settings,
 }: {
 	workspaceId: string;
@@ -110,11 +109,11 @@ export function createLangfuseTracer({
 		inputCost: number; // these cost values are for preliminary analysis on Langfuse, not for billing purpose
 		outputCost: number;
 		totalCost: number;
+		unit: LangfuseUnit;
 	};
 	completedGeneration: CompletedGeneration;
 	spanName: string;
 	generationName: string;
-	unit: LangfuseUnit;
 	settings?: TelemetrySettings;
 }): {
 	langfuse: Langfuse;
@@ -148,11 +147,7 @@ export function createLangfuseTracer({
 		modelParameters:
 			runningGeneration.context.operationNode.content.llm.configurations,
 		input: messages,
-		usage: {
-			input: usage.input,
-			output: usage.output,
-			unit,
-		},
+		usage,
 		startTime: new Date(runningGeneration.createdAt),
 		completionStartTime: new Date(runningGeneration.startedAt),
 		metadata: settings?.metadata,
