@@ -75,7 +75,7 @@ export function GitHubTriggerConfiguredView({
 							/{data.trigger.configuration.event.conditions.callsign}
 						</div>
 					</div>
-					<div className="border border-black-800 rounded-[4px] overflow-hidden">
+					<div className="border border-black-800 rounded-[4px] overflow-hidden ml-[16px] pointer-events-none">
 						<div className="bg-black-850 p-[8px] border-b border-black-800">
 							<h3 className="text-[14px] text-black-300">
 								GitHub Usage Example
@@ -107,7 +107,7 @@ export function GitHubTriggerConfiguredView({
 										[enter your request...]
 									</div>
 
-									<div className="flex items-center justify-end p-3 bg-[#161b22]">
+									<div className="flex items-center justify-end p-[6px] bg-[#161b22]">
 										<div className="px-3 py-1.5 bg-[#238636] text-white text-sm rounded-md">
 											Comment
 										</div>
