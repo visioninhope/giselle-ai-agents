@@ -30,8 +30,20 @@ export abstract class BaseCostCalculator implements CostCalculator {
 		modelId: string,
 		usage: ModelTokenUsage,
 	): Promise<CostResultForDisplay> {
-		const validPrice = getValidPricing(modelId, this.getPricingTable());
-		return calculateTokenCostForDisplay(usage, validPrice.price);
+		try {
+			const validPrice = getValidPricing(modelId, this.getPricingTable());
+			return calculateTokenCostForDisplay(usage, validPrice.price);
+		} catch (error) {
+			console.error(
+				`Error calculating cost for model ${modelId}:`,
+				error,
+			);
+			return {
+				input: 0,
+				output: 0,
+				total: 0,
+			};
+		}
 	}
 }
 
