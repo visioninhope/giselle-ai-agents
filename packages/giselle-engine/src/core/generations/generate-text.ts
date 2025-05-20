@@ -516,7 +516,7 @@ export async function generateText(args: {
 			});
 			await Promise.all([
 				langfuse.shutdownAsync(),
-				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+				...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 					cleanupFunction(),
 				),
 			]);
