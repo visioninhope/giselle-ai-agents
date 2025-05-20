@@ -147,6 +147,9 @@ async function processV2(args: {
 			if (!trigger.enable || trigger.configuration.provider !== "github") {
 				return;
 			}
+			if (trigger.configuration.repositoryNodeId !== args.repositoryNodeId) {
+				return;
+			}
 			const githubTrigger = githubTriggers[trigger.configuration.event.id];
 			const triggerInputs: GenerationInput[] = [];
 			switch (githubTrigger.event.id) {
