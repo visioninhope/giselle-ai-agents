@@ -134,7 +134,7 @@
 		"turbo": "2.0.9",
 		"typescript": "5.7.3",
 		"vite-tsconfig-paths": "5.1.4",
-		"vitest": "3.0.5"
+		"vitest": "catalog:"
 	},
 	"trustedDependencies": ["@sentry/cli"]
 }
