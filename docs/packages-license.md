@@ -4563,7 +4563,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/coverage-v8"></a>
-### @vitest/coverage-v8 v3.0.4
+### @vitest/coverage-v8 v3.1.4
 #### 
 
 ##### Paths
@@ -4574,7 +4574,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/expect"></a>
-### @vitest/expect v3.0.5
+### @vitest/expect v3.1.4
 #### 
 
 ##### Paths
@@ -4585,7 +4585,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/mocker"></a>
-### @vitest/mocker v3.0.5
+### @vitest/mocker v3.1.4
 #### 
 
 ##### Paths
@@ -4596,7 +4596,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/pretty-format"></a>
-### @vitest/pretty-format v3.0.5
+### @vitest/pretty-format v3.1.4
 #### 
 
 ##### Paths
@@ -4607,7 +4607,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/runner"></a>
-### @vitest/runner v3.0.5
+### @vitest/runner v3.1.4
 #### 
 
 ##### Paths
@@ -4618,7 +4618,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/snapshot"></a>
-### @vitest/snapshot v3.0.5
+### @vitest/snapshot v3.1.4
 #### 
 
 ##### Paths
@@ -4629,7 +4629,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/spy"></a>
-### @vitest/spy v3.0.5
+### @vitest/spy v3.1.4
 #### 
 
 ##### Paths
@@ -4640,7 +4640,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/utils"></a>
-### @vitest/utils v3.0.5
+### @vitest/utils v3.1.4
 #### 
 
 ##### Paths
@@ -5656,7 +5656,7 @@ CC-BY-4.0 permitted
 
 
 <a name="chai"></a>
-### chai v5.1.2
+### chai v5.2.0
 #### 
 
 ##### Paths
@@ -7053,7 +7053,7 @@ CC-BY-4.0 permitted
 
 
 <a name="expect-type"></a>
-### expect-type v1.1.0
+### expect-type v1.2.1
 #### 
 
 ##### Paths
@@ -10760,7 +10760,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="pathe"></a>
-### pathe v2.0.2
+### pathe v2.0.3
 #### 
 
 ##### Paths
@@ -12546,7 +12546,7 @@ Unknown manually approved
 
 
 <a name="std-env"></a>
-### std-env v3.8.0
+### std-env v3.9.0
 #### 
 
 ##### Paths
@@ -13793,7 +13793,7 @@ Unknown manually approved
 
 
 <a name="vite-node"></a>
-### vite-node v3.0.5
+### vite-node v3.1.4
 #### 
 
 ##### Paths
@@ -13815,7 +13815,7 @@ Unknown manually approved
 
 
 <a name="vitest"></a>
-### vitest v3.0.5
+### vitest v3.1.4
 #### 
 
 ##### Paths
