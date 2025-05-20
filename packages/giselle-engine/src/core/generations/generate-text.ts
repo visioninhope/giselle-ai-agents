@@ -486,7 +486,7 @@ export async function generateText(args: {
 			});
 
 			// necessary to send telemetry but not explicitly used
-			const _langfuseTracer = createLangfuseTracer({
+			const langfuse = createLangfuseTracer({
 				workspaceId,
 				runningGeneration,
 				tags: generateTelemetryTags({
@@ -514,11 +514,16 @@ export async function generateText(args: {
 				generationName: "ai.streamText.doStream",
 				settings: args.telemetry,
 			});
-			await Promise.all(
-				preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
-					cleanupFunction(),
-				),
-			);
+			try {
+				await Promise.all([
+					langfuse.shutdownAsync(),
+					...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+						cleanupFunction(),
+					),
+				]);
+			} catch (error) {
+				console.error("Cleanup process failed:", error);
+			}
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,
