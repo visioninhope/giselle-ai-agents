@@ -138,113 +138,158 @@ async function processV2(args: {
 	if (githubRepositoryIntegration === undefined) {
 		return;
 	}
+
 	await Promise.all(
 		githubRepositoryIntegration.flowTriggerIds.map(async (flowTriggerId) => {
 			const trigger = await getFlowTrigger({
 				storage: args.context.storage,
 				flowTriggerId,
 			});
-			if (!trigger.enable || trigger.configuration.provider !== "github") {
-				return;
-			}
-			if (trigger.configuration.repositoryNodeId !== args.repositoryNodeId) {
-				return;
-			}
-			const githubTrigger = githubTriggers[trigger.configuration.event.id];
-			const triggerInputs: GenerationInput[] = [];
-			switch (githubTrigger.event.id) {
-				case "github.issue.created":
-					if (args.githubEvent.type === GitHubEventType.ISSUES_OPENED) {
-						for (const payload of githubTrigger.event.payloads.keyof()
-							.options) {
-							switch (payload) {
-								case "title":
-									triggerInputs.push({
-										name: "title",
-										value: args.githubEvent.payload.issue.title,
-									});
-									break;
-								case "body":
-									triggerInputs.push({
-										name: "body",
-										value: args.githubEvent.payload.issue.body ?? "",
-									});
-									break;
-								default: {
-									const _exhaustiveCheck: never = payload;
-									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
-								}
-							}
-						}
-					}
-					break;
-				case "github.issue_comment.created":
-					{
-						if (
-							args.githubEvent.type !== GitHubEventType.ISSUE_COMMENT_CREATED
-						) {
-							return;
-						}
-						if (
-							trigger.configuration.event.id !== "github.issue_comment.created"
-						) {
-							return;
-						}
-						const command = parseCommandFromEvent(args.githubEvent);
-						if (
-							command === null ||
-							command.callsign !==
-								trigger.configuration.event.conditions.callsign
-						) {
-							return;
-						}
-						for (const payload of githubTrigger.event.payloads.keyof()
-							.options) {
-							switch (payload) {
-								case "body":
-									triggerInputs.push({
-										name: "body",
-										value: command.content,
-									});
-									break;
-								case "issueBody":
-									triggerInputs.push({
-										name: "issueBody",
-										value: args.githubEvent.payload.issue.body ?? "",
-									});
-									break;
-								case "issueNumber":
-									triggerInputs.push({
-										name: "issueNumber",
-										value: args.githubEvent.payload.issue.number.toString(),
-									});
-									break;
-								case "issueTitle":
-									triggerInputs.push({
-										name: "issueTitle",
-										value: args.githubEvent.payload.issue.title,
-									});
-									break;
-								default: {
-									const _exhaustiveCheck: never = payload;
-									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
-								}
-							}
-						}
-					}
-					break;
-				default: {
-					const _exhaustiveCheck: never = githubTrigger.event;
-					throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
-				}
-			}
-			await runFlow({
+			await runRepositoryTrigger({
 				context: args.context,
-				triggerId: flowTriggerId,
-				triggerInputs: triggerInputs,
+				trigger,
+				githubEvent: args.githubEvent,
+				repositoryNodeId: args.repositoryNodeId,
 			});
 		}),
 	);
+}
+
+async function runRepositoryTrigger(args: {
+	context: GiselleEngineContext;
+	trigger: Awaited<ReturnType<typeof getFlowTrigger>>;
+	githubEvent: GitHubEvent;
+	repositoryNodeId: string;
+}) {
+	if (
+		!args.trigger.enable ||
+		args.trigger.configuration.provider !== "github"
+	) {
+		return;
+	}
+	if (args.trigger.configuration.repositoryNodeId !== args.repositoryNodeId) {
+		return;
+	}
+
+	const githubTrigger = githubTriggers[args.trigger.configuration.event.id];
+	const triggerInputs = buildTriggerInputs({
+		githubTrigger,
+		trigger: args.trigger,
+		githubEvent: args.githubEvent,
+	});
+	if (triggerInputs === null) {
+		return;
+	}
+
+	await runFlow({
+		context: args.context,
+		triggerId: args.trigger.id,
+		triggerInputs,
+	});
+}
+
+function buildTriggerInputs(args: {
+	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
+	trigger: Awaited<ReturnType<typeof getFlowTrigger>>;
+	githubEvent: GitHubEvent;
+}): GenerationInput[] | null {
+	const { githubTrigger, githubEvent, trigger } = args;
+	switch (githubTrigger.event.id) {
+		case "github.issue.created":
+			return buildIssueCreatedInputs(
+				githubEvent,
+				githubTrigger.event.payloads.keyof().options,
+			);
+		case "github.issue_comment.created":
+			if (trigger.configuration.event.id !== "github.issue_comment.created") {
+				return null;
+			}
+			return buildIssueCommentInputs(
+				githubEvent,
+				githubTrigger.event.payloads.keyof().options,
+				trigger.configuration.event.conditions.callsign,
+			);
+		default: {
+			const _exhaustiveCheck: never = githubTrigger.event;
+			throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
+		}
+	}
+}
+
+function buildIssueCreatedInputs(
+	githubEvent: GitHubEvent,
+	payloads: readonly ("title" | "body")[],
+): GenerationInput[] | null {
+	if (githubEvent.type !== GitHubEventType.ISSUES_OPENED) {
+		return null;
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of payloads) {
+		switch (payload) {
+			case "title":
+				inputs.push({ name: "title", value: githubEvent.payload.issue.title });
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: githubEvent.payload.issue.body ?? "",
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildIssueCommentInputs(
+	githubEvent: GitHubEvent,
+	payloads: readonly ("body" | "issueBody" | "issueNumber" | "issueTitle")[],
+	callsign: string,
+): GenerationInput[] | null {
+	if (githubEvent.type !== GitHubEventType.ISSUE_COMMENT_CREATED) {
+		return null;
+	}
+
+	const command = parseCommandFromEvent(githubEvent);
+	if (command === null || command.callsign !== callsign) {
+		return null;
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of payloads) {
+		switch (payload) {
+			case "body":
+				inputs.push({ name: "body", value: command.content });
+				break;
+			case "issueBody":
+				inputs.push({
+					name: "issueBody",
+					value: githubEvent.payload.issue.body ?? "",
+				});
+				break;
+			case "issueNumber":
+				inputs.push({
+					name: "issueNumber",
+					value: githubEvent.payload.issue.number.toString(),
+				});
+				break;
+			case "issueTitle":
+				inputs.push({
+					name: "issueTitle",
+					value: githubEvent.payload.issue.title,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
 }
 
 // Extracted for legacy parallel execution.
