@@ -8,6 +8,10 @@ import {
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { githubTriggers } from "@giselle-sdk/flow";
+import {
+	type GitHubAuthConfig,
+	addReaction as addReactionApi,
+} from "@giselle-sdk/github-tool";
 import { z } from "zod";
 import { WorkflowError } from "../error";
 import { runFlow } from "../flows";
@@ -128,6 +132,7 @@ async function processV2(args: {
 	context: GiselleEngineContext;
 	repositoryNodeId: string;
 	githubEvent: GitHubEvent;
+	options?: HandleGitHubWebhookOptions;
 }) {
 	const githubRepositoryIntegration = await getGitHubRepositoryIntegrationIndex(
 		{
@@ -181,11 +186,61 @@ async function runRepositoryTrigger(args: {
 		return;
 	}
 
-	await runFlow({
-		context: args.context,
-		triggerId: args.trigger.id,
-		triggerInputs,
-	});
+	await Promise.all([
+		addReaction(args),
+		runFlow({
+			context: args.context,
+			triggerId: args.trigger.id,
+			triggerInputs,
+		}),
+	]);
+}
+
+async function addReaction(args: {
+	githubEvent: GitHubEvent;
+	context: GiselleEngineContext;
+}) {
+	const githubAuthV2 = args.context.integrationConfigs?.github?.authV2;
+	if (githubAuthV2 === undefined) {
+		throw new Error("GitHub authV2 configuration is missing");
+	}
+	if (args.githubEvent.payload.installation?.id === undefined) {
+		throw new Error("GitHub installation ID is missing");
+	}
+	const authConfig = {
+		strategy: "app-installation",
+		appId: githubAuthV2.appId,
+		privateKey: githubAuthV2.privateKey,
+		installationId: args.githubEvent.payload.installation.id,
+	} satisfies GitHubAuthConfig;
+
+	switch (args.githubEvent.event) {
+		case "issue_comment":
+			await addReactionApi({
+				id: args.githubEvent.payload.comment.node_id,
+				content: "EYES",
+				authConfig,
+			});
+			break;
+		case "issues":
+			await addReactionApi({
+				id: args.githubEvent.payload.issue.node_id,
+				content: "EYES",
+				authConfig,
+			});
+			break;
+		case "pull_request":
+			await addReactionApi({
+				id: args.githubEvent.payload.pull_request.node_id,
+				content: "EYES",
+				authConfig,
+			});
+			break;
+		default: {
+			const _exhaustiveCheck: never = args.githubEvent;
+			throw new Error(`Unhandled event: ${_exhaustiveCheck}`);
+		}
+	}
 }
 
 function buildTriggerInputs(args: {
