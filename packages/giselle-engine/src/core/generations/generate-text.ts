@@ -190,6 +190,9 @@ export async function generateText(args: {
 			...args,
 			storage: args.context.storage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
+			options: {
+				bypassingCache: true,
+			},
 		});
 		if (generation === undefined || !isCompletedGeneration(generation)) {
 			return undefined;
