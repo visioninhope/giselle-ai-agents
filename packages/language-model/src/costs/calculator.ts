@@ -1,8 +1,8 @@
+import type { ModelPriceTable } from "./model-prices";
+import { getValidPricing } from "./model-prices";
 import type { BaseTokenPrice, Cost, TokenBasedPricing } from "./pricing";
 import { tokensToMegaTokens } from "./pricing";
 import type { ModelTokenUsage } from "./usage";
-import type { ModelPriceTable } from "./model-prices";
-import { getValidPricing } from "./model-prices";
 
 /**
  * For preliminary feedback on UI and LLM o11y platform
@@ -20,7 +20,10 @@ export interface CostResultForDisplay {
  * and be defined in their respective provider files.
  */
 export interface CostCalculator {
-	calculate(model: string, usage: ModelTokenUsage): Promise<CostResultForDisplay>;
+	calculate(
+		model: string,
+		usage: ModelTokenUsage,
+	): Promise<CostResultForDisplay>;
 }
 
 export abstract class BaseCostCalculator implements CostCalculator {
