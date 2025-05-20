@@ -402,16 +402,21 @@ function Installed({
 									</button>
 								</Tooltip>
 							</div>
-							<input
-								type="text"
-								name="callsign"
-								className={clsx(
-									"group w-full flex justify-between items-center rounded-[8px] py-[8px] px-[16px] outline-none focus:outline-none mb-[4px]",
-									"border-[2px] border-white-900",
-									"text-[14px]",
-								)}
-								placeholder="/code-review"
-							/>
+							<div className="relative">
+								<div className="absolute inset-y-0 left-0 flex items-center pl-[16px] pointer-events-none">
+									<span className="text-[14px]">/</span>
+								</div>
+								<input
+									type="text"
+									name="callsign"
+									className={clsx(
+										"group w-full flex justify-between items-center rounded-[8px] py-[8px] pl-[24px] pr-[16px] outline-none focus:outline-none",
+										"border-[2px] border-white-900",
+										"text-[14px]",
+									)}
+									placeholder="code-review"
+								/>
+							</div>
 							<p className="text-[14px] text-black-400">
 								A callsign is required for issue comment triggers. Examples:
 								/code-review, /check-policy

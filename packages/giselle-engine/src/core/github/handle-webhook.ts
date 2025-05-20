@@ -1,4 +1,5 @@
 import {
+	type GenerationInput,
 	type OverrideNode,
 	WorkspaceGitHubIntegrationNextActionIssueCommentCreate,
 	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate,
@@ -6,11 +7,15 @@ import {
 	type WorkspaceGitHubIntegrationSetting,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { githubTriggers } from "@giselle-sdk/flow";
 import { z } from "zod";
 import { WorkflowError } from "../error";
+import { runFlow } from "../flows";
+import { getFlowTrigger } from "../flows/utils";
+import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import { runApi } from "../runs";
 import type { GiselleEngineContext } from "../types";
-import { getWorkspace } from "../workspaces";
+import { getWorkspace } from "../workspaces/utils";
 import {
 	type GitHubEvent,
 	GitHubEventType,
@@ -103,6 +108,12 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 
 	const command = parseCommandFromEvent(gitHubEvent);
 
+	await processV2({
+		context: args.context,
+		repositoryNodeId: repository.nodeId,
+		githubEvent: gitHubEvent,
+	});
+
 	const results = await processMatchedIntegrationSettingsDeprecated(
 		gitHubEvent,
 		args,
@@ -111,6 +122,129 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 		workspaceGitHubIntegrationRepositorySettings,
 	);
 	return results;
+}
+
+async function processV2(args: {
+	context: GiselleEngineContext;
+	repositoryNodeId: string;
+	githubEvent: GitHubEvent;
+}) {
+	const githubRepositoryIntegration = await getGitHubRepositoryIntegrationIndex(
+		{
+			storage: args.context.storage,
+			repositoryNodeId: args.repositoryNodeId,
+		},
+	);
+	if (githubRepositoryIntegration === undefined) {
+		return;
+	}
+	await Promise.all(
+		githubRepositoryIntegration.flowTriggerIds.map(async (flowTriggerId) => {
+			const trigger = await getFlowTrigger({
+				storage: args.context.storage,
+				flowTriggerId,
+			});
+			if (!trigger.enable || trigger.configuration.provider !== "github") {
+				return;
+			}
+			if (trigger.configuration.repositoryNodeId !== args.repositoryNodeId) {
+				return;
+			}
+			const githubTrigger = githubTriggers[trigger.configuration.event.id];
+			const triggerInputs: GenerationInput[] = [];
+			switch (githubTrigger.event.id) {
+				case "github.issue.created":
+					if (args.githubEvent.type === GitHubEventType.ISSUES_OPENED) {
+						for (const payload of githubTrigger.event.payloads.keyof()
+							.options) {
+							switch (payload) {
+								case "title":
+									triggerInputs.push({
+										name: "title",
+										value: args.githubEvent.payload.issue.title,
+									});
+									break;
+								case "body":
+									triggerInputs.push({
+										name: "body",
+										value: args.githubEvent.payload.issue.body ?? "",
+									});
+									break;
+								default: {
+									const _exhaustiveCheck: never = payload;
+									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+								}
+							}
+						}
+					}
+					break;
+				case "github.issue_comment.created":
+					{
+						if (
+							args.githubEvent.type !== GitHubEventType.ISSUE_COMMENT_CREATED
+						) {
+							return;
+						}
+						if (
+							trigger.configuration.event.id !== "github.issue_comment.created"
+						) {
+							return;
+						}
+						const command = parseCommandFromEvent(args.githubEvent);
+						if (
+							command === null ||
+							command.callsign !==
+								trigger.configuration.event.conditions.callsign
+						) {
+							return;
+						}
+						for (const payload of githubTrigger.event.payloads.keyof()
+							.options) {
+							switch (payload) {
+								case "body":
+									triggerInputs.push({
+										name: "body",
+										value: command.content,
+									});
+									break;
+								case "issueBody":
+									triggerInputs.push({
+										name: "issueBody",
+										value: args.githubEvent.payload.issue.body ?? "",
+									});
+									break;
+								case "issueNumber":
+									triggerInputs.push({
+										name: "issueNumber",
+										value: args.githubEvent.payload.issue.number.toString(),
+									});
+									break;
+								case "issueTitle":
+									triggerInputs.push({
+										name: "issueTitle",
+										value: args.githubEvent.payload.issue.title,
+									});
+									break;
+								default: {
+									const _exhaustiveCheck: never = payload;
+									throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+								}
+							}
+						}
+					}
+					break;
+				default: {
+					const _exhaustiveCheck: never = githubTrigger.event;
+					throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
+				}
+			}
+			await runFlow({
+				context: args.context,
+				triggerId: flowTriggerId,
+				triggerInputs: triggerInputs,
+			});
+		}),
+	);
 }
 
 // Extracted for legacy parallel execution.
@@ -155,7 +289,7 @@ async function processIntegration(
 
 	const overrideNodes: OverrideNode[] = [];
 	const workspace = await getWorkspace({
-		context: context,
+		storage: context.storage,
 		workspaceId: setting.workspaceId,
 	});
 	for (const payloadMap of setting.payloadMaps) {
