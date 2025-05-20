@@ -514,12 +514,16 @@ export async function generateText(args: {
 				generationName: "ai.streamText.doStream",
 				settings: args.telemetry,
 			});
-			await Promise.all([
-				langfuse.shutdownAsync(),
-				...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
-					cleanupFunction(),
-				),
-			]);
+			try {
+				await Promise.all([
+					langfuse.shutdownAsync(),
+					...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+						cleanupFunction(),
+					),
+				]);
+			} catch (error) {
+				console.error("Cleanup process failed:", error);
+			}
 		},
 		experimental_telemetry: {
 			isEnabled: args.context.telemetry?.isEnabled,
