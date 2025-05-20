@@ -358,7 +358,15 @@ export async function getGeneration(params: {
 			bypassingCache: true,
 		},
 	);
-	return parseAndMod(Generation, unsafeGeneration);
+	const parsedGeneration = parseAndMod(Generation, unsafeGeneration);
+	const parsedGenerationContext = parseAndMod(
+		GenerationContext,
+		parsedGeneration.context,
+	);
+	return {
+		...parsedGeneration,
+		context: parsedGenerationContext,
+	};
 }
 
 export function nodeGenerationIndexPath(
