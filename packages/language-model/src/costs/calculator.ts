@@ -26,6 +26,10 @@ export interface CostCalculator {
 export abstract class BaseCostCalculator implements CostCalculator {
 	protected abstract getPricingTable(): ModelPriceTable;
 
+	protected getProviderName(): string {
+		return this.constructor.name.replace("CostCalculator", "");
+	}
+
 	async calculate(
 		modelId: string,
 		usage: ModelTokenUsage,
@@ -35,7 +39,7 @@ export abstract class BaseCostCalculator implements CostCalculator {
 			return calculateTokenCostForDisplay(usage, validPrice.price);
 		} catch (error) {
 			console.error(
-				`Error calculating cost for model ${modelId}:`,
+				`Error calculating cost for ${this.getProviderName()} model ${modelId}:`,
 				error,
 			);
 			return {
