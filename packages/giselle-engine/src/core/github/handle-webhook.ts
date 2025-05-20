@@ -176,14 +176,32 @@ async function processV2(args: {
 					}
 					break;
 				case "github.issue_comment.created":
-					if (args.githubEvent.type === GitHubEventType.ISSUE_COMMENT_CREATED) {
+					{
+						if (
+							args.githubEvent.type !== GitHubEventType.ISSUE_COMMENT_CREATED
+						) {
+							return;
+						}
+						if (
+							trigger.configuration.event.id !== "github.issue_comment.created"
+						) {
+							return;
+						}
+						const command = parseCommandFromEvent(args.githubEvent);
+						if (
+							command === null ||
+							command.callsign !==
+								trigger.configuration.event.conditions.callsign
+						) {
+							return;
+						}
 						for (const payload of githubTrigger.event.payloads.keyof()
 							.options) {
 							switch (payload) {
 								case "body":
 									triggerInputs.push({
 										name: "body",
-										value: args.githubEvent.payload.comment.body ?? "",
+										value: command.content,
 									});
 									break;
 								case "issueBody":
