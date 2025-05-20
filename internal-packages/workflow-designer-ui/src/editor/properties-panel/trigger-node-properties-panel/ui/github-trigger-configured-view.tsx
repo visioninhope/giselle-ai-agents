@@ -19,7 +19,7 @@ export function GitHubTriggerConfiguredView({
 	}
 
 	return (
-		<div className="flex flex-col gap-[17px] p-0">
+		<div className="flex flex-col gap-[16px] p-0 overflow-y-auto">
 			<div className="space-y-[4px]">
 				<p className="text-[14px] py-[1.5px] text-white-400">State</p>
 				<div className="px-[16px] py-[9px] w-full bg-transparent text-[14px]">
