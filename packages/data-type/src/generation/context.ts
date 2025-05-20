@@ -28,6 +28,7 @@ export type GenerationOriginWorkspace = z.infer<
 
 export const GenerationOriginRun = z.object({
 	id: RunId.schema,
+	workspaceId: WorkspaceId.schema,
 	type: GenerationOriginTypeRun,
 });
 export type GenerationOriginRun = z.infer<typeof GenerationOriginRun>;
