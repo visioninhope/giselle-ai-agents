@@ -234,16 +234,10 @@ function buildTriggerInputs(args: {
 							value: githubEvent.payload.pull_request.number.toString(),
 						});
 						break;
-					case "html_url":
+					case "pullRequesturl":
 						triggerInputs.push({
-							name: "html_url",
+							name: "pullRequesturl",
 							value: githubEvent.payload.pull_request.html_url,
-						});
-						break;
-					case "draft":
-						triggerInputs.push({
-							name: "draft",
-							value: githubEvent.payload.pull_request.draft.toString(),
 						});
 						break;
 					default: {
