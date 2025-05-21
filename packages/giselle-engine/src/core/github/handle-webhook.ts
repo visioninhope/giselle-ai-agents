@@ -256,6 +256,11 @@ function buildTriggerInputs(args: {
 				githubEvent,
 				githubTrigger.event.payloads.keyof().options,
 			);
+		case "github.issue.closed":
+			return buildIssueClosedInputs(
+				githubEvent,
+				githubTrigger.event.payloads.keyof().options,
+			);
 		case "github.issue_comment.created":
 			if (trigger.configuration.event.id !== "github.issue_comment.created") {
 				return null;
@@ -276,8 +281,86 @@ function buildTriggerInputs(args: {
 				githubTrigger.event.payloads.keyof().options,
 				trigger.configuration.event.conditions.callsign,
 			);
+		case "github.pull_request.opened": {
+			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_OPENED) {
+				return null;
+			}
+			const triggerInputs: GenerationInput[] = [];
+			for (const payload of githubTrigger.event.payloads.keyof().options) {
+				switch (payload) {
+					case "title":
+						triggerInputs.push({
+							name: "title",
+							value: githubEvent.payload.pull_request.title,
+						});
+						break;
+					case "body":
+						triggerInputs.push({
+							name: "body",
+							value: githubEvent.payload.pull_request.body ?? "",
+						});
+						break;
+					case "number":
+						triggerInputs.push({
+							name: "number",
+							value: githubEvent.payload.pull_request.number.toString(),
+						});
+						break;
+					case "pullRequestUrl":
+						triggerInputs.push({
+							name: "pullRequesturl",
+							value: githubEvent.payload.pull_request.html_url,
+						});
+						break;
+					default: {
+						const _exhaustiveCheck: never = payload;
+						throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+			return triggerInputs;
+		}
 		case "github.pull_request.ready_for_review": {
 			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW) {
+				return null;
+			}
+			const triggerInputs: GenerationInput[] = [];
+			for (const payload of githubTrigger.event.payloads.keyof().options) {
+				switch (payload) {
+					case "title":
+						triggerInputs.push({
+							name: "title",
+							value: githubEvent.payload.pull_request.title,
+						});
+						break;
+					case "body":
+						triggerInputs.push({
+							name: "body",
+							value: githubEvent.payload.pull_request.body ?? "",
+						});
+						break;
+					case "number":
+						triggerInputs.push({
+							name: "number",
+							value: githubEvent.payload.pull_request.number.toString(),
+						});
+						break;
+					case "pullRequestUrl":
+						triggerInputs.push({
+							name: "pullRequestUrl",
+							value: githubEvent.payload.pull_request.html_url,
+						});
+						break;
+					default: {
+						const _exhaustiveCheck: never = payload;
+						throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+			return triggerInputs;
+		}
+		case "github.pull_request.closed": {
+			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_CLOSED) {
 				return null;
 			}
 			const triggerInputs: GenerationInput[] = [];
@@ -327,6 +410,35 @@ function buildIssueCreatedInputs(
 	payloads: readonly ("title" | "body")[],
 ): GenerationInput[] | null {
 	if (githubEvent.type !== GitHubEventType.ISSUES_OPENED) {
+		return null;
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of payloads) {
+		switch (payload) {
+			case "title":
+				inputs.push({ name: "title", value: githubEvent.payload.issue.title });
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: githubEvent.payload.issue.body ?? "",
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildIssueClosedInputs(
+	githubEvent: GitHubEvent,
+	payloads: readonly ("title" | "body")[],
+): GenerationInput[] | null {
+	if (githubEvent.type !== GitHubEventType.ISSUES_CLOSED) {
 		return null;
 	}
 

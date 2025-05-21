@@ -86,6 +86,18 @@ const githubEventInputs: GithubEventInputMap = {
 			required: false,
 		},
 	},
+	"github.issue.closed": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+	},
 	"github.issue_comment.created": {
 		issueNumber: {
 			label: "Issue Number",
@@ -131,6 +143,50 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 	},
 	"github.pull_request.ready_for_review": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+		number: {
+			label: "Number",
+			type: "number",
+			required: true,
+		},
+		pullRequestUrl: {
+			label: "Pull request URL",
+			type: "text",
+			required: true,
+		},
+	},
+	"github.pull_request.closed": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+		number: {
+			label: "Number",
+			type: "number",
+			required: true,
+		},
+		pullRequestUrl: {
+			label: "Pull request URL",
+			type: "text",
+			required: true,
+		},
+	},
+	"github.pull_request.opened": {
 		title: {
 			label: "Title",
 			type: "text",
