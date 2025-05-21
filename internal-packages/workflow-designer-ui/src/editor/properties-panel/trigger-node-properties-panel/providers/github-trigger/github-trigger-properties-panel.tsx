@@ -141,6 +141,11 @@ function Installed({
 							callsign,
 						},
 					};
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = eventId;
+					throw new Error(`Unhandled eventId: ${_exhaustiveCheck}`);
 				}
 			}
 			if (event === undefined) {
