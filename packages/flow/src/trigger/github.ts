@@ -44,8 +44,7 @@ export const githubPullRequestReadyForReviewTrigger = {
 			title: z.string(),
 			body: z.string(),
 			number: z.number(),
-			html_url: z.string(),
-			draft: z.boolean(),
+			pullRequesturl: z.string(),
 		}),
 	},
 } as const satisfies GitHubTrigger;
