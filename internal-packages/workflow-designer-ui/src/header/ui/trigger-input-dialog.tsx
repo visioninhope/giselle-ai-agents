@@ -117,7 +117,7 @@ const githubEventInputs: GithubEventInputMap = {
 		body: {
 			label: "Body",
 			type: "multiline-text",
-			required: true,
+			required: false,
 		},
 		number: {
 			label: "Number",
