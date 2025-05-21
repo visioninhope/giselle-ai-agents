@@ -86,6 +86,18 @@ const githubEventInputs: GithubEventInputMap = {
 			required: false,
 		},
 	},
+	"github.issue.closed": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+	},
 	"github.issue_comment.created": {
 		issueNumber: {
 			label: "Issue Number",
