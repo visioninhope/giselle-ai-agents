@@ -127,6 +127,7 @@ function Installed({
 			switch (eventId) {
 				case "github.issue.created":
 				case "github.pull_request.ready_for_review":
+				case "github.pull_request.closed":
 				case "github.pull_request.opened":
 					event = {
 						id: eventId,

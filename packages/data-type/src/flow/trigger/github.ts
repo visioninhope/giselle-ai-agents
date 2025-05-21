@@ -21,11 +21,16 @@ const PullRequestReadyForReview = z.object({
 	id: z.literal("github.pull_request.ready_for_review"),
 });
 
+const PullRequestClosed = z.object({
+	id: z.literal("github.pull_request.closed"),
+});
+
 export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
 	IssueCommentCreated,
 	PullRequestOpened,
 	PullRequestReadyForReview,
+	PullRequestClosed,
 ]);
 export type GitHubFlowTriggerEvent = z.infer<typeof GitHubFlowTriggerEvent>;
 

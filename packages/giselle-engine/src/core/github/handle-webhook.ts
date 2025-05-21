@@ -343,6 +343,45 @@ function buildTriggerInputs(args: {
 			}
 			return triggerInputs;
 		}
+		case "github.pull_request.closed": {
+			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_CLOSED) {
+				return null;
+			}
+			const triggerInputs: GenerationInput[] = [];
+			for (const payload of githubTrigger.event.payloads.keyof().options) {
+				switch (payload) {
+					case "title":
+						triggerInputs.push({
+							name: "title",
+							value: githubEvent.payload.pull_request.title,
+						});
+						break;
+					case "body":
+						triggerInputs.push({
+							name: "body",
+							value: githubEvent.payload.pull_request.body ?? "",
+						});
+						break;
+					case "number":
+						triggerInputs.push({
+							name: "number",
+							value: githubEvent.payload.pull_request.number.toString(),
+						});
+						break;
+					case "pullRequestUrl":
+						triggerInputs.push({
+							name: "pullRequestUrl",
+							value: githubEvent.payload.pull_request.html_url,
+						});
+						break;
+					default: {
+						const _exhaustiveCheck: never = payload;
+						throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+			return triggerInputs;
+		}
 		default: {
 			const _exhaustiveCheck: never = githubTrigger.event;
 			throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
