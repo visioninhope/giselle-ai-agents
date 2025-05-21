@@ -131,7 +131,7 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 	},
 	"github.pull_request.closed": {
-      title: {
+		title: {
 			label: "Title",
 			type: "text",
 			required: true,
@@ -151,7 +151,7 @@ const githubEventInputs: GithubEventInputMap = {
 			type: "text",
 			required: true,
 		},
-  },
+	},
 	"github.pull_request.opened": {
 		title: {
 			label: "Title",
