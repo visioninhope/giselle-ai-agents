@@ -35,9 +35,26 @@ export const githubIssueCommentCreatedTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
+export const githubPullRequestReadyForReviewTrigger = {
+	provider,
+	event: {
+		id: "github.pull_request.ready_for_review",
+		label: "Pull Request Ready for Review",
+		payloads: z.object({
+			title: z.string(),
+			body: z.string(),
+			number: z.number(),
+			html_url: z.string(),
+			draft: z.boolean(),
+		}),
+	},
+} as const satisfies GitHubTrigger;
+
 export const triggers = {
 	[githubIssueCreatedTrigger.event.id]: githubIssueCreatedTrigger,
 	[githubIssueCommentCreatedTrigger.event.id]: githubIssueCommentCreatedTrigger,
+	[githubPullRequestReadyForReviewTrigger.event.id]:
+		githubPullRequestReadyForReviewTrigger,
 } as const;
 
 export type TriggerEventId = keyof typeof triggers;
@@ -48,6 +65,8 @@ export function triggerIdToLabel(triggerId: TriggerEventId) {
 			return githubIssueCreatedTrigger.event.label;
 		case "github.issue_comment.created":
 			return githubIssueCommentCreatedTrigger.event.label;
+		case "github.pull_request.ready_for_review":
+			return githubPullRequestReadyForReviewTrigger.event.label;
 		default: {
 			const exhaustiveCheck: never = triggerId;
 			throw new Error(`Unknown trigger ID: ${exhaustiveCheck}`);
