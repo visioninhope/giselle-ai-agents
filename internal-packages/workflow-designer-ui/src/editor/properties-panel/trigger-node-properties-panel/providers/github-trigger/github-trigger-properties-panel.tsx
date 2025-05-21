@@ -126,6 +126,7 @@ function Installed({
 			const formData = new FormData(e.currentTarget);
 			switch (eventId) {
 				case "github.issue.created":
+				case "github.pull_request.ready_for_review":
 					event = {
 						id: eventId,
 					};
