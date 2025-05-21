@@ -86,7 +86,7 @@ export function Toolbar() {
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
-	const { flowNode } = useFeatureFlag();
+	const { flowNode, githubVectorStore } = useFeatureFlag();
 	const languageModelAvailable = (languageModel: LanguageModel) => {
 		if (limits === undefined) {
 			return true;
@@ -879,10 +879,12 @@ export function Toolbar() {
 													<PromptIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Plain Text</p>
 												</ToggleGroup.Item>
-												<ToggleGroup.Item value="githubVectorStore" data-tool>
-													<GitHubIcon className="w-[20px] h-[20px]" />
-													<p className="text-[14px]">GitHub Vector Store</p>
-												</ToggleGroup.Item>
+												{githubVectorStore && (
+													<ToggleGroup.Item value="githubVectorStore" data-tool>
+														<GitHubIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">GitHub Vector Store</p>
+													</ToggleGroup.Item>
+												)}
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>
