@@ -192,7 +192,7 @@ async function runRepositoryTrigger(args: {
 		runFlow({
 			context: args.context,
 			triggerId: args.trigger.id,
-			triggerInputs,
+			payload: args.githubEvent,
 		}),
 	]);
 }
