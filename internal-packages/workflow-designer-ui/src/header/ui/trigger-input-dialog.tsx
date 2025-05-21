@@ -18,6 +18,7 @@ import {
 	useCallback,
 	useMemo,
 } from "react";
+import type { z } from "zod";
 import { useTrigger } from "../../hooks/use-trigger";
 import { triggerNodeDefaultName } from "../../utils";
 
@@ -63,19 +64,12 @@ interface Input {
 	required: boolean;
 }
 
-// Type-safe mapping of input fields for GitHub event types
-type InputFieldDefinition = Record<
-	string,
-	{
-		label: string;
-		type: "text" | "multiline-text" | "number";
-		required: boolean;
-	}
->;
-
-// Map each GitHub event ID to its input field definitions
 type GithubEventInputMap = {
-	[K in keyof typeof githubTriggers]: InputFieldDefinition;
+	[K in keyof typeof githubTriggers]: {
+		[K2 in keyof z.infer<
+			(typeof githubTriggers)[K]["event"]["payloads"]
+		>]: Omit<Input, "name">;
+	};
 };
 
 // Define the input fields for each GitHub event type
@@ -115,11 +109,6 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 	},
 	"github.pull_request.ready_for_review": {
-		number: {
-			label: "Number",
-			type: "number",
-			required: true,
-		},
 		title: {
 			label: "Title",
 			type: "text",
@@ -130,6 +119,11 @@ const githubEventInputs: GithubEventInputMap = {
 			type: "multiline-text",
 			required: true,
 		},
+		number: {
+			label: "Number",
+			type: "number",
+			required: true,
+		},
 		pullRequestUrl: {
 			label: "Pull request URL",
 			type: "text",
@@ -137,19 +131,6 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 	},
 };
-
-// Function to convert the input definition to the required format
-function getInputsForGithubEvent(
-	eventId: keyof typeof githubTriggers,
-): Input[] {
-	const inputDefs = githubEventInputs[eventId];
-	return Object.entries(inputDefs).map(([name, def]) => ({
-		name,
-		label: def.label,
-		type: def.type,
-		required: def.required,
-	}));
-}
 
 export function TriggerInputDialog({
 	node,
@@ -168,9 +149,13 @@ export function TriggerInputDialog({
 
 		switch (trigger.configuration.provider) {
 			case "github": {
-				const eventId = trigger.configuration.event
-					.id as keyof typeof githubTriggers;
-				return getInputsForGithubEvent(eventId);
+				const inputDefs = githubEventInputs[trigger.configuration.event.id];
+				return Object.entries(inputDefs).map(([name, def]) => ({
+					name,
+					label: def.label,
+					type: def.type,
+					required: def.required,
+				}));
 			}
 			case "manual": {
 				return trigger.configuration.event.parameters.map((parameter) => ({
