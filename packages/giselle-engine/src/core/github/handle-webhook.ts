@@ -1,5 +1,4 @@
 import {
-	type GenerationInput,
 	type OverrideNode,
 	WorkspaceGitHubIntegrationNextActionIssueCommentCreate,
 	WorkspaceGitHubIntegrationNextActionPullRequestCommentCreate,
@@ -7,7 +6,6 @@ import {
 	type WorkspaceGitHubIntegrationSetting,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type GitHubAuthConfig,
 	addReaction as addReactionApi,
@@ -174,16 +172,6 @@ async function runRepositoryTrigger(args: {
 		return;
 	}
 	if (args.trigger.configuration.repositoryNodeId !== args.repositoryNodeId) {
-		return;
-	}
-
-	const githubTrigger = githubTriggers[args.trigger.configuration.event.id];
-	const triggerInputs = buildTriggerInputs({
-		githubTrigger,
-		trigger: args.trigger,
-		githubEvent: args.githubEvent,
-	});
-	if (triggerInputs === null) {
 		return;
 	}
 
