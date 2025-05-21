@@ -659,7 +659,7 @@ export function Toolbar() {
 															selectedCategory === "All"
 																? "bg-[#505D7B]"
 																: "hover:bg-[#3A425A]"
-														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														} text-[#DEE9F2] rounded text-[12px] font-medium leading-[170%]`}
 														onClick={() => setSelectedCategory("All")}
 													>
 														All
@@ -670,7 +670,7 @@ export function Toolbar() {
 															selectedCategory === "Text"
 																? "bg-[#505D7B]"
 																: "hover:bg-[#3A425A]"
-														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														} text-[#DEE9F2] rounded text-[12px] font-medium leading-[170%]`}
 														onClick={() => setSelectedCategory("Text")}
 													>
 														Text
@@ -681,20 +681,20 @@ export function Toolbar() {
 															selectedCategory === "Image"
 																? "bg-[#505D7B]"
 																: "hover:bg-[#3A425A]"
-														} text-[#DEE9F2] rounded font-[Geist] text-[12px] font-medium leading-[170%]`}
+														} text-[#DEE9F2] rounded text-[12px] font-medium leading-[170%]`}
 														onClick={() => setSelectedCategory("Image")}
 													>
 														Image
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded font-[Geist] text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
 													>
 														Video
 													</button>
 													<button
 														type="button"
-														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded font-[Geist] text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
+														className="flex px-[8px] py-0 justify-center items-center gap-[10px] text-black-400 rounded text-[12px] font-medium leading-[170%] opacity-50 cursor-not-allowed"
 													>
 														Audio
 													</button>
@@ -705,7 +705,7 @@ export function Toolbar() {
 												{selectedCategory === "All" &&
 													searchQuery.trim() === "" && (
 														<>
-															<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] mb-[4px]">
+															<p className="text-[#505D7B] text-[12px] font-medium leading-[170%] mb-[4px]">
 																Recommended models
 															</p>
 															{/* 推奨モデルを表示 */}
@@ -808,7 +808,7 @@ export function Toolbar() {
 															</button>
 														))
 													) : (
-														<p className="text-[#505D7B] font-[Geist] text-[12px] font-medium leading-[170%] p-[8px] text-center">
+														<p className="text-[#505D7B] text-[12px] font-medium leading-[170%] p-[8px] text-center">
 															No matching models found
 														</p>
 													)}
