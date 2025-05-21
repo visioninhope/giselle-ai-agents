@@ -13,9 +13,14 @@ const IssueCommentCreated = z.object({
 	}),
 });
 
+const PullRequestReadyForReview = z.object({
+	id: z.literal("github.pull_request.ready_for_review"),
+});
+
 export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
 	IssueCommentCreated,
+	PullRequestReadyForReview,
 ]);
 export type GitHubFlowTriggerEvent = z.infer<typeof GitHubFlowTriggerEvent>;
 
