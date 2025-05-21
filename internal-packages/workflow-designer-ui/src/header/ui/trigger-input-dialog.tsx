@@ -4,7 +4,7 @@ import type {
 	GenerationInput,
 	TriggerNode,
 } from "@giselle-sdk/data-type";
-import { type TriggerProvider, githubTriggers } from "@giselle-sdk/flow";
+import type { TriggerProvider, githubTriggers } from "@giselle-sdk/flow";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
@@ -63,6 +63,94 @@ interface Input {
 	required: boolean;
 }
 
+// Type-safe mapping of input fields for GitHub event types
+type InputFieldDefinition = Record<
+	string,
+	{
+		label: string;
+		type: "text" | "multiline-text" | "number";
+		required: boolean;
+	}
+>;
+
+// Map each GitHub event ID to its input field definitions
+type GithubEventInputMap = {
+	[K in keyof typeof githubTriggers]: InputFieldDefinition;
+};
+
+// Define the input fields for each GitHub event type
+const githubEventInputs: GithubEventInputMap = {
+	"github.issue.created": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+	},
+	"github.issue_comment.created": {
+		issueNumber: {
+			label: "Issue Number",
+			type: "number",
+			required: true,
+		},
+		issueTitle: {
+			label: "Issue Title",
+			type: "text",
+			required: true,
+		},
+		issueBody: {
+			label: "Issue Body",
+			type: "multiline-text",
+			required: true,
+		},
+		body: {
+			label: "Issue Comment",
+			type: "multiline-text",
+			required: true,
+		},
+	},
+	"github.pull_request.ready_for_review": {
+		number: {
+			label: "Number",
+			type: "number",
+			required: true,
+		},
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: true,
+		},
+		pullRequestUrl: {
+			label: "Pull request URL",
+			type: "text",
+			required: true,
+		},
+	},
+};
+
+// Function to convert the input definition to the required format
+function getInputsForGithubEvent(
+	eventId: keyof typeof githubTriggers,
+): Input[] {
+	const inputDefs = githubEventInputs[eventId];
+	return Object.entries(inputDefs).map(([name, def]) => ({
+		name,
+		label: def.label,
+		type: def.type,
+		required: def.required,
+	}));
+}
+
 export function TriggerInputDialog({
 	node,
 }: {
@@ -72,61 +160,17 @@ export function TriggerInputDialog({
 
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
+
 	const inputs = useMemo<Input[]>(() => {
 		if (trigger === undefined) {
 			return [];
 		}
+
 		switch (trigger.configuration.provider) {
 			case "github": {
-				const githubTrigger = githubTriggers[trigger.configuration.event.id];
-				switch (githubTrigger.event.id) {
-					case "github.issue.created":
-						return [
-							{
-								name: "title",
-								label: "Title",
-								type: "text",
-								required: true,
-							},
-							{
-								name: "body",
-								label: "Body",
-								type: "multiline-text",
-								required: false,
-							},
-						];
-					case "github.issue_comment.created":
-						return [
-							{
-								name: "issueNumber",
-								label: "Issue Number",
-								type: "number",
-								required: true,
-							},
-							{
-								name: "issueTitle",
-								label: "Issue Title",
-								type: "text",
-								required: true,
-							},
-							{
-								name: "issueBody",
-								label: "Issue Body",
-								type: "multiline-text",
-								required: true,
-							},
-							{
-								name: "body",
-								label: "Issue Comment",
-								type: "multiline-text",
-								required: true,
-							},
-						];
-					default: {
-						const _exhaustiveCheck: never = githubTrigger.event;
-						throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
-					}
-				}
+				const eventId = trigger.configuration.event
+					.id as keyof typeof githubTriggers;
+				return getInputsForGithubEvent(eventId);
 			}
 			case "manual": {
 				return trigger.configuration.event.parameters.map((parameter) => ({
