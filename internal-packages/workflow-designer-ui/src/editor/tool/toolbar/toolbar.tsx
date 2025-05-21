@@ -24,33 +24,41 @@ import { useFeatureFlag } from "giselle-sdk/react";
 import { useUsageLimits, useWorkflowDesigner } from "giselle-sdk/react";
 import { WorkflowIcon } from "lucide-react";
 import { Dialog, Popover, ToggleGroup } from "radix-ui";
-import { type ReactNode, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
+import { Tooltip } from "../../../ui/tooltip";
+import { actionNodeDefaultName, triggerNodeDefaultName } from "../../../utils";
+import { isToolAction } from "../types";
 import {
 	AnthropicIcon,
 	AudioIcon,
+	CapabilityIcon,
 	DocumentIcon,
 	GenNodeIcon,
 	GenerateImageIcon,
 	GenerateTextIcon,
 	GitHubIcon,
 	GoogleWhiteIcon,
+	ImageGenerationNodeIcon,
 	OpenaiIcon,
 	PdfFileIcon,
 	PerplexityIcon,
 	PictureIcon,
+	ProTag,
 	PromptIcon,
 	SearchIcon,
 	SourceLinkIcon,
 	TextFileIcon,
+	TooltipAndHotkey,
 	TriggerIcon,
 	UploadIcon,
 	VideoIcon,
 	WilliIcon,
-} from "../../../icons";
-import { ImageGenerationNodeIcon } from "../../../icons/node";
-import { Tooltip } from "../../../ui/tooltip";
-import { actionNodeDefaultName, triggerNodeDefaultName } from "../../../utils";
-import { isToolAction } from "../types";
+} from "./components";
+import {
+	filterModelsByCategory,
+	filterModelsBySearch,
+	getAvailableModels,
+} from "./model-components";
 import {
 	actionNode,
 	addNodeTool,
@@ -66,179 +74,6 @@ import {
 	triggerNode,
 	useToolbar,
 } from "./state";
-
-function TooltipAndHotkey({ text, hotkey }: { text: string; hotkey?: string }) {
-	return (
-		<div className="flex items-center gap-1">
-			<span>{text}</span>
-			{hotkey && (
-				<span className="text-black-400 uppercase ml-1">{hotkey}</span>
-			)}
-		</div>
-	);
-}
-
-function CapabilityIcon({
-	children,
-	icon,
-}: {
-	children: ReactNode;
-	icon?: ReactNode;
-}) {
-	return (
-		<span className="flex gap-[4px] rounded-[20px] border-[1px] border-white-800 px-[8px] py-[2px] text-[12px]">
-			{icon && (
-				<span className="flex items-center scale-90 text-white-950">
-					{icon}
-				</span>
-			)}
-			{children}
-		</span>
-	);
-}
-
-function ProTag() {
-	return (
-		<span className="inline-flex justify-center items-center rounded-[4px] border border-primary-400 px-[2px] py-[0px] text-[11px] leading-tight font-accent font-semibold text-primary-400">
-			Pro
-		</span>
-	);
-}
-
-function CategoryTab({
-	isActive,
-	children,
-	onClick,
-}: { isActive: boolean; children: ReactNode; onClick: () => void }) {
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={clsx(
-				"flex px-[8px] py-[6px] justify-center items-center gap-[10px] rounded-[4px] text-[14px] font-medium",
-				isActive
-					? "bg-primary-700 text-white-100"
-					: "bg-black-800/50 text-white-300 hover:bg-black-800/80 hover:text-white-100",
-			)}
-		>
-			{children}
-		</button>
-	);
-}
-
-function ModelProviderGroup({
-	provider,
-	models,
-	onModelSelect,
-}: {
-	provider: string;
-	models: LanguageModel[];
-	onModelSelect: (model: LanguageModel) => void;
-}) {
-	const getProviderName = (provider: string) => {
-		switch (provider) {
-			case "openai":
-				return "OpenAI";
-			case "anthropic":
-				return "Claude";
-			case "google":
-				return "Google";
-			default:
-				return provider.charAt(0).toUpperCase() + provider.slice(1);
-		}
-	};
-
-	return (
-		<div className="flex flex-col gap-[8px] mb-[16px]">
-			<h3 className="text-white-400 text-[14px] px-[4px]">
-				{getProviderName(provider)}
-			</h3>
-			<div className="flex flex-col gap-[4px]">
-				{models.map((model) => (
-					<button
-						type="button"
-						key={model.id}
-						className="flex gap-[12px] items-center hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]"
-						onClick={() => onModelSelect(model)}
-					>
-						<div className="flex items-center">
-							{provider === "anthropic" && (
-								<AnthropicIcon className="w-[18px] h-[18px]" data-icon />
-							)}
-							{provider === "openai" && (
-								<OpenaiIcon className="w-[18px] h-[18px]" data-icon />
-							)}
-							{provider === "google" && (
-								<GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />
-							)}
-							{provider === "perplexity" && (
-								<PerplexityIcon className="w-[18px] h-[18px]" data-icon />
-							)}
-							{provider === "fal" && (
-								<ImageGenerationNodeIcon
-									modelId={model.id}
-									className="w-[18px] h-[18px]"
-									data-icon
-								/>
-							)}
-						</div>
-						<div className="flex items-center gap-[8px]">
-							<p className="text-[14px] text-left text-nowrap">{model.id}</p>
-							{model.tier === "pro" && <ProTag />}
-						</div>
-					</button>
-				))}
-			</div>
-		</div>
-	);
-}
-
-function LanguageModelListItem({
-	languageModel,
-	...props
-}: Omit<ToggleGroup.ToggleGroupItemProps, "value"> & {
-	languageModel: LanguageModel;
-}) {
-	return (
-		<button
-			{...props}
-			className={clsx(
-				"flex gap-[8px]",
-				"hover:bg-white-850/10 focus:bg-white-850/10 p-[4px] rounded-[4px]",
-				"data-[state=on]:bg-primary-900 focus:outline-none",
-				"**:data-icon:w-[16px] **:data-icon:h-[16px] **:data-icon:text-white-950 ",
-			)}
-		>
-			<div className="flex gap-[12px] items-center">
-				{languageModel.provider === "anthropic" && (
-					<AnthropicIcon className="w-[18px] h-[18px]" data-icon />
-				)}
-				{languageModel.provider === "openai" && (
-					<OpenaiIcon className="w-[18px] h-[18px]" data-icon />
-				)}
-				{languageModel.provider === "google" && (
-					<GoogleWhiteIcon className="w-[18px] h-[18px]" data-icon />
-				)}
-				{languageModel.provider === "perplexity" && (
-					<PerplexityIcon className="w-[18px] h-[18px]" data-icon />
-				)}
-				{languageModel.provider === "fal" && (
-					<ImageGenerationNodeIcon
-						modelId={languageModel.id}
-						className="w-[18px] h-[18px]"
-						data-icon
-					/>
-				)}
-				<div className="flex items-center gap-[8px]">
-					<p className="text-[14px] text-left text-nowrap">
-						{languageModel.id}
-					</p>
-					{languageModel.tier === "pro" && <ProTag />}
-				</div>
-			</div>
-		</button>
-	);
-}
 
 export function Toolbar() {
 	const { setSelectedTool, selectedTool } = useToolbar();
@@ -256,49 +91,15 @@ export function Toolbar() {
 		return hasTierAccess(languageModel, limits.featureTier);
 	};
 
-	// モデルをカテゴリでフィルタリングする関数
-	const filterModelsByCategory = (model: LanguageModel): boolean => {
-		if (selectedCategory === "All") return true;
-		if (
-			selectedCategory === "Text" &&
-			hasCapability(model, Capability.TextGeneration)
-		)
-			return true;
-		if (
-			selectedCategory === "Image" &&
-			hasCapability(model, Capability.ImageGeneration)
-		)
-			return true;
-		if (selectedCategory === "Video") {
-			// ビデオ生成機能は現在対応するCapabilityがないため、常にfalse
-			return false;
-		}
-		if (selectedCategory === "Audio") {
-			// 音声生成機能は現在対応するCapabilityがないため、常にfalse
-			return false;
-		}
-		return false;
-	};
-
-	// モデルを検索クエリでフィルタリングする関数
-	const filterModelsBySearch = (model: LanguageModel): boolean => {
-		if (!searchQuery.trim()) return true;
-		return (
-			model.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-			model.provider.toLowerCase().includes(searchQuery.toLowerCase())
-		);
-	};
-
-	// モデルを検索クエリでのみフィルタリング（カテゴリフィルタなし）
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
-		.filter(filterModelsBySearch);
+		.filter((model) => filterModelsBySearch(model, searchQuery));
 
-	// 検索結果に基づいて自動的にカテゴリを更新
+	// Automatically update the category based on search results
 	useEffect(() => {
-		if (searchQuery.trim() === "") return; // 空の検索クエリの場合は何もしない
+		if (searchQuery.trim() === "") return; // Do nothing for empty search queries
 
-		// 検索結果のモデル機能を集計
+		// Aggregate model capabilities from search results
 		const hasTextModels = modelsFilteredBySearchOnly.some((model) =>
 			hasCapability(model, Capability.TextGeneration),
 		);
@@ -306,75 +107,50 @@ export function Toolbar() {
 			hasCapability(model, Capability.ImageGeneration),
 		);
 
-		// 単一カテゴリのみ表示されている場合、そのカテゴリを自動選択
+		// Auto-select the category when only one is present
 		if (hasTextModels && !hasImageModels) {
 			setSelectedCategory("Text");
 		} else if (!hasTextModels && hasImageModels) {
 			setSelectedCategory("Image");
 		} else {
-			// 複数カテゴリが混在する場合はAllを選択
+			// Select All when multiple categories are present
 			setSelectedCategory("All");
 		}
 	}, [searchQuery, modelsFilteredBySearchOnly]);
 
-	// フィルタリングされたモデルリスト - カテゴリフィルタも適用
-	const filteredModels = modelsFilteredBySearchOnly.filter(
-		filterModelsByCategory,
+	// Models filtered by both search and category
+	const filteredModels = modelsFilteredBySearchOnly.filter((model) =>
+		filterModelsByCategory(model, selectedCategory),
 	);
 
-	// 推奨モデルのリスト - 実際のIDに合わせて修正
-	const getAvailableModels = (
-		preferredModelIds: string[],
-		provider: string,
-	): LanguageModel[] => {
-		// 指定されたIDのモデルを検索
-		const models = preferredModelIds
-			.map((id) =>
-				languageModels.find(
-					(model) => model.id === id && model.provider === provider,
-				),
-			)
-			.filter(
-				(model): model is LanguageModel =>
-					!!model && llmProviders.includes(model.provider),
-			);
-
-		// 見つかったモデルがあれば返す
-		if (models.length > 0) return models;
-
-		// なければそのプロバイダの最初のモデルを返す（フォールバック）
-		const fallbackModels = languageModels
-			.filter(
-				(model) =>
-					model.provider === provider && llmProviders.includes(provider),
-			)
-			.slice(0, 1);
-
-		return fallbackModels;
-	};
-
-	// 各プロバイダの推奨モデル
+	// Recommended models for each provider
 	const openaiModels = getAvailableModels(
 		["gpt-4o", "gpt-4", "gpt-4-turbo"],
 		"openai",
+		llmProviders,
+		languageModels,
 	);
 	const anthropicModels = getAvailableModels(
 		["claude-3-opus-20240229", "claude-3-sonnet-20240229"],
 		"anthropic",
+		llmProviders,
+		languageModels,
 	);
 	const googleModels = getAvailableModels(
 		["gemini-2.5-pro-exp-03-25", "gemini-1.5-pro-latest", "gemini-1.0-pro"],
 		"google",
+		llmProviders,
+		languageModels,
 	);
 
-	// 全ての推奨モデルを結合
+	// Combine all recommended models
 	const recommendedModels = [
 		...openaiModels.slice(0, 1),
 		...anthropicModels.slice(0, 1),
 		...googleModels.slice(0, 1),
 	];
 
-	// モデルボタンのレンダリング関数
+	// Rendering function for each model button
 	const renderModelButton = (model: LanguageModel) => {
 		return (
 			<button
@@ -619,7 +395,7 @@ export function Toolbar() {
 									>
 										<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
 										<div className="relative flex flex-col gap-[8px] max-h-[280px] overflow-y-auto">
-											{/* 検索ボックス */}
+											{/* Search box */}
 											<div className="flex h-[28px] p-[8px] items-center gap-[11px] self-stretch rounded-[8px] bg-[rgba(222,233,242,0.20)] mx-[4px] mb-[4px]">
 												<div className="text-black-400">
 													<svg
@@ -650,7 +426,7 @@ export function Toolbar() {
 												/>
 											</div>
 
-											{/* 検索ボックスの後にタブを配置 */}
+											{/* Tabs displayed after the search box */}
 											<div className="mx-[4px] mb-[6px]">
 												<div className="flex items-center rounded-md gap-2">
 													<button
@@ -708,19 +484,19 @@ export function Toolbar() {
 															<p className="text-[#505D7B] text-[12px] font-medium leading-[170%] mb-[4px]">
 																Recommended models
 															</p>
-															{/* 推奨モデルを表示 */}
+															{/* Display recommended models */}
 															{recommendedModels.length > 0 && (
 																<div className="flex flex-col gap-[4px] mb-[12px]">
 																	{recommendedModels.map(renderModelButton)}
 																</div>
 															)}
 
-															{/* 区切り線 */}
+															{/* Divider */}
 															<div className="flex my-[12px] mx-auto w-[90%] py-0 flex-col items-center border-b border-[#505D7B]/20" />
 														</>
 													)}
 
-												{/* モデルリストをフラットに表示 - フィルタリング適用 */}
+												{/* Flat list of models with filtering applied */}
 												<div className="flex flex-col gap-[4px] max-h-[200px] overflow-y-auto pr-[4px]">
 													{filteredModels.length > 0 ? (
 														filteredModels.map((model) => (
