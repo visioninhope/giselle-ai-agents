@@ -108,6 +108,28 @@ const githubEventInputs: GithubEventInputMap = {
 			required: true,
 		},
 	},
+	"github.pull_request_comment.created": {
+		issueNumber: {
+			label: "Pull Request Number",
+			type: "number",
+			required: true,
+		},
+		issueTitle: {
+			label: "Pull Request Title",
+			type: "text",
+			required: true,
+		},
+		issueBody: {
+			label: "Pull Request Body",
+			type: "multiline-text",
+			required: true,
+		},
+		body: {
+			label: "Pull Request Comment",
+			type: "multiline-text",
+			required: true,
+		},
+	},
 	"github.pull_request.ready_for_review": {
 		title: {
 			label: "Title",
