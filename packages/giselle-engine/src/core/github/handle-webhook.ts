@@ -265,6 +265,45 @@ function buildTriggerInputs(args: {
 				githubTrigger.event.payloads.keyof().options,
 				trigger.configuration.event.conditions.callsign,
 			);
+		case "github.pull_request.opened": {
+			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_OPENED) {
+				return null;
+			}
+			const triggerInputs: GenerationInput[] = [];
+			for (const payload of githubTrigger.event.payloads.keyof().options) {
+				switch (payload) {
+					case "title":
+						triggerInputs.push({
+							name: "title",
+							value: githubEvent.payload.pull_request.title,
+						});
+						break;
+					case "body":
+						triggerInputs.push({
+							name: "body",
+							value: githubEvent.payload.pull_request.body ?? "",
+						});
+						break;
+					case "number":
+						triggerInputs.push({
+							name: "number",
+							value: githubEvent.payload.pull_request.number.toString(),
+						});
+						break;
+					case "pullRequestUrl":
+						triggerInputs.push({
+							name: "pullRequesturl",
+							value: githubEvent.payload.pull_request.html_url,
+						});
+						break;
+					default: {
+						const _exhaustiveCheck: never = payload;
+						throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+			return triggerInputs;
+		}
 		case "github.pull_request.ready_for_review": {
 			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW) {
 				return null;
