@@ -101,6 +101,7 @@ async function resolveGitHubActionInputs(args: {
 					}
 					case "file":
 					case "github":
+					case "vectorStore":
 						throw new Error(
 							`Unsupported node type: ${sourceNode.content.type}`,
 						);
