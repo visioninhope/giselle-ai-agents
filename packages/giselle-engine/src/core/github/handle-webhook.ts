@@ -291,7 +291,7 @@ function buildTriggerInputs(args: {
 						break;
 					case "pullRequestUrl":
 						triggerInputs.push({
-							name: "pullRequesturl",
+							name: "pullRequestUrl",
 							value: githubEvent.payload.pull_request.html_url,
 						});
 						break;
