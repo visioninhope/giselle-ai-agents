@@ -62,7 +62,7 @@ export const githubPullRequestCommentCreatedTrigger = {
 			callsign: z.string(),
 		}),
 	},
-};
+} as const satisfies GitHubTrigger;
 
 export const githubPullRequestOpenedTrigger = {
 	provider,
