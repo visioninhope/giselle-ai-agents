@@ -130,6 +130,28 @@ const githubEventInputs: GithubEventInputMap = {
 			required: true,
 		},
 	},
+	"github.pull_request.closed": {
+		title: {
+			label: "Title",
+			type: "text",
+			required: true,
+		},
+		body: {
+			label: "Body",
+			type: "multiline-text",
+			required: false,
+		},
+		number: {
+			label: "Number",
+			type: "number",
+			required: true,
+		},
+		pullRequestUrl: {
+			label: "Pull request URL",
+			type: "text",
+			required: true,
+		},
+	},
 };
 
 export function TriggerInputDialog({
