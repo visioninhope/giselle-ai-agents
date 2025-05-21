@@ -100,7 +100,8 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 		args.github.payload,
 	);
 	if (!gitHubEvent) {
-		throw new Error("Unsupported event");
+		console.log(`Unsupport event: ${JSON.stringify(args.github, null, 2)}`);
+		return [];
 	}
 
 	const repository = getRepositoryInfo(gitHubEvent);
