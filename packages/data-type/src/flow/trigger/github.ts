@@ -6,6 +6,10 @@ const IssueCreated = z.object({
 	id: z.literal("github.issue.created"),
 });
 
+const IssueClosed = z.object({
+	id: z.literal("github.issue.closed"),
+});
+
 const IssueCommentCreated = z.object({
 	id: z.literal("github.issue_comment.created"),
 	conditions: z.object({
@@ -27,6 +31,7 @@ const PullRequestClosed = z.object({
 
 export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueCreated,
+	IssueClosed,
 	IssueCommentCreated,
 	PullRequestOpened,
 	PullRequestReadyForReview,

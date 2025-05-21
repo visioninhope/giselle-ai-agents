@@ -256,6 +256,11 @@ function buildTriggerInputs(args: {
 				githubEvent,
 				githubTrigger.event.payloads.keyof().options,
 			);
+		case "github.issue.closed":
+			return buildIssueClosedInputs(
+				githubEvent,
+				githubTrigger.event.payloads.keyof().options,
+			);
 		case "github.issue_comment.created":
 			if (trigger.configuration.event.id !== "github.issue_comment.created") {
 				return null;
@@ -394,6 +399,35 @@ function buildIssueCreatedInputs(
 	payloads: readonly ("title" | "body")[],
 ): GenerationInput[] | null {
 	if (githubEvent.type !== GitHubEventType.ISSUES_OPENED) {
+		return null;
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of payloads) {
+		switch (payload) {
+			case "title":
+				inputs.push({ name: "title", value: githubEvent.payload.issue.title });
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: githubEvent.payload.issue.body ?? "",
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildIssueClosedInputs(
+	githubEvent: GitHubEvent,
+	payloads: readonly ("title" | "body")[],
+): GenerationInput[] | null {
+	if (githubEvent.type !== GitHubEventType.ISSUES_CLOSED) {
 		return null;
 	}
 
