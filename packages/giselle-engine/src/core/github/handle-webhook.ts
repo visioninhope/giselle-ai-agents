@@ -100,7 +100,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 		args.github.payload,
 	);
 	if (!gitHubEvent) {
-		console.log(`Unsupport event: ${JSON.stringify(args.github, null, 2)}`);
+		console.log(`Unsupported event: ${JSON.stringify(args.github, null, 2)}`);
 		return [];
 	}
 
