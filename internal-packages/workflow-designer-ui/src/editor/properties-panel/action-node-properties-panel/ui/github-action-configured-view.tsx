@@ -17,7 +17,7 @@ import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
 import { defaultName } from "../../../../utils";
-import { GitHubRepositoryBlock } from "../../ui";
+import { GitHubRepositoryBlock } from "../../trigger-node-properties-panel/ui";
 import { type InputWithConnectedOutput, useConnectedInputs } from "../lib";
 
 export function GitHubActionConfiguredView({
