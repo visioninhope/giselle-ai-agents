@@ -270,6 +270,17 @@ function buildTriggerInputs(args: {
 				githubTrigger.event.payloads.keyof().options,
 				trigger.configuration.event.conditions.callsign,
 			);
+		case "github.pull_request_comment.created":
+			if (
+				trigger.configuration.event.id !== "github.pull_request_comment.created"
+			) {
+				return null;
+			}
+			return buildIssueCommentInputs(
+				githubEvent,
+				githubTrigger.event.payloads.keyof().options,
+				trigger.configuration.event.conditions.callsign,
+			);
 		case "github.pull_request.opened": {
 			if (githubEvent.type !== GitHubEventType.PULL_REQUEST_OPENED) {
 				return null;
