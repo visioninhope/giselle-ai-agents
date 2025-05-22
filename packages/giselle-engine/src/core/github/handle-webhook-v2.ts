@@ -123,29 +123,6 @@ async function process<TEventName extends WebhookEventName>(args: {
 			}
 		}),
 	);
-	// const githubRepositoryIntegration = await getGitHubRepositoryIntegrationIndex(
-	// 	{
-	// 		storage: args.context.storage,
-	// 		repositoryNodeId: args.repositoryNodeId,
-	// 	},
-	// );
-	// if (githubRepositoryIntegration === undefined) {
-	// 	return;
-	// }
-	// await Promise.all(
-	// 	githubRepositoryIntegration.flowTriggerIds.map(async (flowTriggerId) => {
-	// 		const trigger = await getFlowTrigger({
-	// 			storage: args.context.storage,
-	// 			flowTriggerId,
-	// 		});
-	// 		await runRepositoryTrigger({
-	// 			context: args.context,
-	// 			trigger,
-	// 			githubEvent: args.githubEvent,
-	// 			repositoryNodeId: args.repositoryNodeId,
-	// 		});
-	// 	}),
-	// );
 }
 
 // async function runRepositoryTrigger(args: {
