@@ -109,7 +109,7 @@ async function process<TEventName extends WebhookEventName>(args: {
 				trigger.configuration.event.id === "github.issue.created"
 			) {
 				run = true;
-				addReaction({
+				await addReaction({
 					id: args.event.data.payload.issue.node_id,
 					content: "EYES",
 					authConfig,
@@ -120,7 +120,7 @@ async function process<TEventName extends WebhookEventName>(args: {
 				trigger.configuration.event.id === "github.issue_comment.created"
 			) {
 				run = true;
-				addReaction({
+				await addReaction({
 					id: args.event.data.payload.comment.node_id,
 					content: "EYES",
 					authConfig,
