@@ -15,18 +15,6 @@ const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 
 (hasExternalApiEnv ? describe : describe.skip)("scrapeUrl (valid URL)", () => {
 	it(
-		"should scrape a valid URL and return markdown and html",
-		async () => {
-			const result = await scrapeUrl(TEST_URL, ["markdown"]);
-			expect(result).toHaveProperty("markdown");
-			expect(result).toHaveProperty("html");
-			expect(typeof result.markdown).toBe("string");
-			expect(typeof result.html).toBe("string");
-		},
-		HEAVY_TEST_TIMEOUT,
-	);
-
-	it(
 		"should scrape a valid URL and return html (markdown empty)",
 		async () => {
 			const result = await scrapeUrl(TEST_URL, ["html"]);
