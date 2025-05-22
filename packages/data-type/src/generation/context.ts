@@ -55,15 +55,15 @@ export const JsonValue: z.ZodType<JsonValue> = z.lazy(() =>
 	]),
 );
 
-export const KeyValuePair = z.object({
+export const KeyValueEntry = z.object({
 	name: z.string(),
 	value: z.string(),
 });
-export type KeyValuePair = z.infer<typeof KeyValuePair>;
+export type KeyValueEntry = z.infer<typeof KeyValueEntry>;
 
 export const KeyValueInput = z.object({
 	type: z.literal("keyValue"),
-	entries: z.array(KeyValuePair),
+	entries: z.array(KeyValueEntry),
 });
 export type KeyValueInput = z.infer<typeof KeyValueInput>;
 
