@@ -55,17 +55,31 @@ export const JsonValue: z.ZodType<JsonValue> = z.lazy(() =>
 	]),
 );
 
-export const KeyValueEntry = z.object({
+export const StringParameterItem = z.object({
 	name: z.string(),
+	type: z.literal("string"),
 	value: z.string(),
 });
-export type KeyValueEntry = z.infer<typeof KeyValueEntry>;
+export type StringParameterItem = z.infer<typeof StringParameterItem>;
 
-export const KeyValueInput = z.object({
-	type: z.literal("keyValue"),
-	entries: z.array(KeyValueEntry),
+export const NumberParameterItem = z.object({
+	name: z.string(),
+	type: z.literal("number"),
+	value: z.number(),
 });
-export type KeyValueInput = z.infer<typeof KeyValueInput>;
+export type NumberParameterItem = z.infer<typeof NumberParameterItem>;
+
+export const ParameterItem = z.discriminatedUnion("type", [
+	StringParameterItem,
+	NumberParameterItem,
+]);
+export type ParameterItem = z.infer<typeof ParameterItem>;
+
+export const ParametersInput = z.object({
+	type: z.literal("parameters"),
+	items: z.array(ParameterItem),
+});
+export type ParametersInput = z.infer<typeof ParametersInput>;
 
 export const PayloadInput = z.object({
 	type: z.literal("payload"),
@@ -75,7 +89,7 @@ export const PayloadInput = z.object({
 export type PayloadInput = z.infer<typeof PayloadInput>;
 
 export const GenerationContextInput = z.discriminatedUnion("type", [
-	KeyValueInput,
+	ParametersInput,
 	PayloadInput,
 ]);
 export type GenerationContextInput = z.infer<typeof GenerationContextInput>;
