@@ -94,7 +94,7 @@ export const openAiTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"o4-mini": {
+	"o3-mini": {
 		prices: [
 			{
 				validFrom: "2025-05-12T00:00:00Z",
@@ -109,7 +109,7 @@ export const openAiTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"o3-mini": {
+	"o4-mini": {
 		prices: [
 			{
 				validFrom: "2025-05-12T00:00:00Z",
