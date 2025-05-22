@@ -20,17 +20,16 @@ export async function handleGitHubWebhookV2(args: {
 	if (credentials === undefined) {
 		throw new Error("GitHub credentials not found");
 	}
-
 	await handleWebhook({
 		secret: credentials.webhookSecret,
 		request: args.request,
 		on: {
-			"issue_comment.created": (event) =>
+			"issues.opened": (event) =>
 				process({
 					event,
 					context: args.context,
 				}),
-			"issue_comment.deleted": (event) =>
+			"issue_comment.created": (event) =>
 				process({
 					event,
 					context: args.context,
@@ -117,12 +116,12 @@ async function process<TEventName extends WebhookEventName>(args: {
 				});
 			}
 			if (
-				ensureWebhookEvent(args.event, "issues.closed") &&
-				trigger.configuration.event.id === "github.issue.closed"
+				ensureWebhookEvent(args.event, "issue_comment.created") &&
+				trigger.configuration.event.id === "github.issue_comment.created"
 			) {
 				run = true;
 				addReaction({
-					id: args.event.data.payload.issue.node_id,
+					id: args.event.data.payload.comment.node_id,
 					content: "EYES",
 					authConfig,
 				});
@@ -130,8 +129,8 @@ async function process<TEventName extends WebhookEventName>(args: {
 			if (run) {
 				console.log("will run flow");
 				console.log(`+--- triggerId: ${trigger.id}`);
-				console.log(`+--- event: ${JSON.stringify(args.event.data)}`);
-				// todo next pr
+				console.log(`+--- event: ${JSON.stringify(args.event.data, null, 2)}`);
+				/** @todo next pr */
 				// runFlow({
 				// 	context: args.context,
 				// 	triggerId: trigger.id,
