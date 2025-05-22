@@ -276,6 +276,7 @@ export function TriggerInputDialog({
 						const formData = new FormData(e.currentTarget);
 						for (const [key, value] of formData.entries()) {
 							generationInputs.push({
+								type: "keyValue",
 								name: key,
 								value: value.toString(),
 							});

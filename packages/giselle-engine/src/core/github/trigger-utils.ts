@@ -47,12 +47,14 @@ function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
 				break;
 			case "body":
 				inputs.push({
+					type: "keyValue",
 					name: "body",
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
 				inputs.push({
+					type: "keyValue",
 					name: "issueNumber",
 					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});

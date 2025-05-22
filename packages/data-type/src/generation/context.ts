@@ -1,6 +1,6 @@
 import { z } from "zod";
 import { Connection } from "../connection";
-import { Node, NodeBase, NodeId, OperationNode } from "../node";
+import { Node, NodeBase, OperationNode } from "../node";
 import { RunId } from "../run";
 import { WorkspaceId } from "../workspace";
 
@@ -39,11 +39,43 @@ export const GenerationOrigin = z.discriminatedUnion("type", [
 ]);
 export type GenerationOrigin = z.infer<typeof GenerationOrigin>;
 
-export const GenerationInput = z.object({
+export type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
+export interface JsonObject {
+	[key: string]: JsonValue;
+}
+export const JsonValue: z.ZodType<JsonValue> = z.lazy(() =>
+	z.union([
+		z.string(),
+		z.number(),
+		z.boolean(),
+		z.null(),
+		z.array(JsonValue),
+		z.record(JsonValue),
+	]),
+);
+
+export const KeyValueInput = z.object({
+	type: z.literal("keyValue"),
 	name: z.string(),
 	value: z.string(),
 });
+export type KeyValueInput = z.infer<typeof KeyValueInput>;
+
+export const PayloadInput = z.object({
+	type: z.literal("payload"),
+	event: z.string(),
+	payload: JsonValue,
+});
+export type PayloadInput = z.infer<typeof PayloadInput>;
+
+export const GenerationInput = z.discriminatedUnion("type", [
+	KeyValueInput,
+	PayloadInput,
+]);
 export type GenerationInput = z.infer<typeof GenerationInput>;
+
+export type GenerationContextInputs = Array<KeyValueInput | PayloadInput>;
 
 export const GenerationContext = z.object({
 	operationNode: OperationNode,

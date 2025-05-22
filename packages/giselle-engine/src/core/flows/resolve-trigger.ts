@@ -56,7 +56,10 @@ export async function resolveTrigger(args: {
 			const trigger = githubTriggers[triggerData.configuration.event.id];
 			const inputsToUse = githubWebhookInputs ?? generationContext.inputs ?? [];
 			for (const payload of trigger.event.payloads.keyof().options) {
-				const input = inputsToUse.find((i) => i.name === payload);
+				const input = inputsToUse.find(
+					(i): i is GenerationInput & { type: "keyValue" } =>
+						i.type === "keyValue" && i.name === payload,
+				);
 				if (input === undefined) {
 					continue;
 				}
@@ -77,7 +80,8 @@ export async function resolveTrigger(args: {
 		case "manual": {
 			for (const parameter of triggerData.configuration.event.parameters) {
 				const input = generationContext.inputs?.find(
-					(input) => input.name === parameter.id,
+					(i): i is GenerationInput & { type: "keyValue" } =>
+						i.type === "keyValue" && i.name === parameter.id,
 				);
 				if (input === undefined) {
 					continue;
