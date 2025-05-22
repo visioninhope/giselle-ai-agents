@@ -5,6 +5,22 @@ import {
 	createEventHandler,
 } from "@octokit/webhooks";
 import { GitHubWebhookUnauthorizedError } from "./errors";
+export type {
+	EmitterWebhookEventName as WebhookEventName,
+	EmitterWebhookEvent,
+} from "@octokit/webhooks";
+
+export type WebhookEvent<T extends EmitterWebhookEventName> = {
+	name: T;
+	data: EmitterWebhookEvent<T>;
+};
+
+export function ensureWebhookEvent<T extends EmitterWebhookEventName>(
+	event: WebhookEvent<EmitterWebhookEventName>,
+	expectedName: T,
+): event is WebhookEvent<T> {
+	return event.name === expectedName;
+}
 
 export async function verifyRequest({
 	secret,
@@ -23,10 +39,9 @@ export async function verifyRequest({
 	}
 }
 
+// Improved handler type using TypedWebhookEvent
 type EventHandlers = {
-	[K in EmitterWebhookEventName]: (
-		event: EmitterWebhookEvent<K>,
-	) => Promise<void>;
+	[K in EmitterWebhookEventName]: (event: WebhookEvent<K>) => Promise<void>;
 };
 export async function handleWebhook(args: {
 	secret: string;
@@ -39,8 +54,16 @@ export async function handleWebhook(args: {
 	const webhookEventNames = Object.keys(args.on) as EmitterWebhookEventName[];
 	for (const webhookEventName of webhookEventNames) {
 		eventHandler.on(webhookEventName, async (event) => {
-			// biome-ignore lint: lint/suspicious/noExplicitAny: Although type inference is broken, the implementation is type-safe
-			await args.on[webhookEventName]?.(event as any);
+			const typedEvent = {
+				name: webhookEventName,
+				data: event,
+			};
+
+			await args.on[webhookEventName]?.({
+				name: webhookEventName,
+				data: event,
+				// biome-ignore lint: lint/suspicious/noExplicitAny: Although type inference is broken, the implementation is type-safe
+			} as any);
 		});
 	}
 
