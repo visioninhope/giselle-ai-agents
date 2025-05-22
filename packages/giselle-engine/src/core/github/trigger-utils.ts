@@ -8,25 +8,6 @@ import {
 import { type GitHubEvent, GitHubEventType } from "./events";
 import { parseCommand } from "./utils";
 
-export function parseCommandFromEvent(
-	event: GitHubEvent,
-): { callsign: string; content: string } | null {
-	if (event.type !== GitHubEventType.ISSUE_COMMENT_CREATED) {
-		return null;
-	}
-	return parseCommand(event.payload.comment.body);
-}
-
-// New helper function to parse command from webhook event
-export function parseCommandFromWebhookEvent(
-	event: WebhookEvent,
-): { callsign: string; content: string } | null {
-	if (event.data.name !== "issue_comment.created") {
-		return null;
-	}
-	return parseCommand(event.data.payload.comment.body);
-}
-
 interface BuildTriggerInputsArgs {
 	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
 	trigger: FlowTrigger;
@@ -119,7 +100,7 @@ function buildIssueCommentInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const command = parseCommandFromWebhookEvent(args.webhookEvent);
+	const command = parseCommand(args.webhookEvent.data.payload.comment.body);
 	if (
 		command === null ||
 		command.callsign !== args.trigger.configuration.event.conditions.callsign

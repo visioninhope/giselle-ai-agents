@@ -11,6 +11,7 @@ import { runFlow } from "../flows";
 import { getFlowTrigger } from "../flows/utils";
 import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import type { GiselleEngineContext } from "../types";
+import { parseCommand } from "./utils";
 
 export async function handleGitHubWebhookV2(args: {
 	context: GiselleEngineContext;
@@ -119,6 +120,13 @@ async function process<TEventName extends WebhookEventName>(args: {
 				ensureWebhookEvent(args.event, "issue_comment.created") &&
 				trigger.configuration.event.id === "github.issue_comment.created"
 			) {
+				const command = parseCommand(args.event.data.payload.comment.body);
+				if (
+					command?.callsign !== trigger.configuration.event.conditions.callsign
+				) {
+					return;
+				}
+
 				run = true;
 				addReaction({
 					id: args.event.data.payload.comment.node_id,

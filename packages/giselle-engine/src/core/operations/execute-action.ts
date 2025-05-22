@@ -40,6 +40,9 @@ async function resolveGeneration(args: {
 		...args,
 		storage: args.storage,
 		generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
+		options: {
+			bypassingCache: true,
+		},
 	});
 	if (generation === undefined || !isCompletedGeneration(generation)) {
 		throw new Error("Generation not completed");
