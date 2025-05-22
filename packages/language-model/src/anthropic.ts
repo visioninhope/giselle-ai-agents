@@ -1,5 +1,12 @@
 import { z } from "zod";
 import { Capability, LanguageModelBase, Tier } from "./base";
+import {
+	BaseCostCalculator,
+	type CostCalculator,
+	type CostResultForDisplay,
+} from "./costs/calculator";
+import { anthropicTokenPricing } from "./costs/model-prices";
+import type { ModelTokenUsage } from "./costs/usage";
 
 const AnthropicLanguageModelConfigurations = z.object({
 	temperature: z.number(),
@@ -58,3 +65,9 @@ export const models = [claude37Sonnet, claude35Sonnet, claude35Haiku];
 
 export const LanguageModel = AnthropicLanguageModel;
 export type LanguageModel = AnthropicLanguageModel;
+
+export class AnthropicCostCalculator extends BaseCostCalculator {
+	protected getPricingTable() {
+		return anthropicTokenPricing;
+	}
+}

@@ -1,6 +1,7 @@
 export * from "./pricing";
 export {
 	openAiTokenPricing,
+	anthropicTokenPricing,
 	getValidPricing,
 	type ModelPriceTable,
 } from "./model-prices";
@@ -8,6 +9,7 @@ export type { ModelTokenUsage } from "./usage";
 export { calculateTokenCostForDisplay } from "./calculator";
 export type { CostCalculator, CostResultForDisplay } from "./calculator";
 
+import { AnthropicCostCalculator } from "../anthropic";
 import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";
 import { DefaultCostCalculator } from "./calculator";
@@ -16,6 +18,8 @@ export function createDisplayCostCalculator(provider: string): CostCalculator {
 	switch (provider) {
 		case "openai":
 			return new OpenAICostCalculator();
+		case "anthropic":
+			return new AnthropicCostCalculator();
 		default:
 			console.log(`Unimplemented provider: ${provider}`);
 			return new DefaultCostCalculator(provider);
@@ -29,7 +33,8 @@ export async function calculateDisplayCost(
 ) {
 	const calculator = createDisplayCostCalculator(provider);
 	const result = await calculator.calculate(modelId, {
-		...usage,
+		inputTokens: usage.promptTokens,
+		outputTokens: usage.completionTokens,
 		totalTokens: usage.promptTokens + usage.completionTokens,
 	});
 	return {
