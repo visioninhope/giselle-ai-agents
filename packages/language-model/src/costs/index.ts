@@ -10,6 +10,7 @@ export { calculateTokenCostForDisplay } from "./calculator";
 export type { CostCalculator, CostResultForDisplay } from "./calculator";
 
 import { AnthropicCostCalculator } from "../anthropic";
+import { GoogleCostCalculator } from "../google";
 import { OpenAICostCalculator } from "../openai";
 import type { CostCalculator } from "./calculator";
 import { DefaultCostCalculator } from "./calculator";
@@ -20,6 +21,8 @@ export function createDisplayCostCalculator(provider: string): CostCalculator {
 			return new OpenAICostCalculator();
 		case "anthropic":
 			return new AnthropicCostCalculator();
+		case "google":
+			return new GoogleCostCalculator();
 		default:
 			console.log(`Unimplemented provider: ${provider}`);
 			return new DefaultCostCalculator(provider);
