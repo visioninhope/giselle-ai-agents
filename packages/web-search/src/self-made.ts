@@ -24,6 +24,16 @@ const turndownService = new TurndownService({
 	bulletListMarker: "*", // Use * as the bullet list marker
 });
 
+/**
+ * Scrapes the content of a given URL and returns the result in the specified formats.
+ *
+ * @param {string} url - The URL to scrape. Must be a valid URL.
+ * @param {("html" | "markdown")[]} [formats=["html"]] - An optional array specifying the desired output formats.
+ *        - "html": Includes the raw HTML content.
+ *        - "markdown": Includes the content converted to Markdown.
+ * @returns {Promise<SelfMadeScrapeResult>} A promise resolving to an object containing the scraped URL, title, HTML, and/or Markdown.
+ * @throws {Error} If the URL is invalid or if the fetch operation fails.
+ */
 export async function scrapeUrl(
 	url: string,
 	formats: ("html" | "markdown")[] = ["html"],
