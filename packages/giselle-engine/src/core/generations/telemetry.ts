@@ -123,10 +123,7 @@ export function createLangfuseTracer({
 		metadata: {
 			...settings?.metadata,
 			...(process.env.VERCEL_DEPLOYMENT_ID && {
-				deploymentId: process.env.VERCEL_DEPLOYMENT_ID.replace(
-					"dpl_",
-					"",
-				).slice(0, 9), // Convert raw deployment ID into the format shown on "Deployments" screen of vercel.com
+				deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
 			}),
 		},
 		input: messages,
