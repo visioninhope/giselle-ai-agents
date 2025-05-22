@@ -17,6 +17,16 @@ export function parseCommandFromEvent(
 	return parseCommand(event.payload.comment.body);
 }
 
+// New helper function to parse command from webhook event
+export function parseCommandFromWebhookEvent(
+	event: WebhookEvent,
+): { callsign: string; content: string } | null {
+	if (event.data.name !== "issue_comment.created") {
+		return null;
+	}
+	return parseCommand(event.data.payload.comment.body);
+}
+
 interface BuildTriggerInputsArgs {
 	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
 	trigger: FlowTrigger;
@@ -25,165 +35,16 @@ interface BuildTriggerInputsArgs {
 export function buildTriggerInputs(
 	args: BuildTriggerInputsArgs,
 ): GenerationInput[] | null {
-	return [...buildIssueCreatedInputs(args)];
-	// if (
-	// 	ensureWebhookEvent(args.webhookEvent, "issues.opened") &&
-	// 	args.githubTrigger.event.id === "github.issue.created"
-	// ) {
-	// 	return buildIssueCreatedInputs(
-	// 		,
-	// 		args.githubTrigger.event.payloads.keyof().options,
-	// 	);
-	// }
-	// switch (githubTrigger.event.id) {
-	// 	case "github.issue.created":
-	// 	case "github.issue.closed":
-	// 		return buildIssueClosedInputs(
-	// 			githubEvent,
-	// 			githubTrigger.event.payloads.keyof().options,
-	// 		);
-	// 	case "github.issue_comment.created":
-	// 		if (trigger.configuration.event.id !== "github.issue_comment.created") {
-	// 			return null;
-	// 		}
-	// 		return buildIssueCommentInputs(
-	// 			githubEvent,
-	// 			githubTrigger.event.payloads.keyof().options,
-	// 			trigger.configuration.event.conditions.callsign,
-	// 		);
-	// 	case "github.pull_request_comment.created":
-	// 		if (
-	// 			trigger.configuration.event.id !== "github.pull_request_comment.created"
-	// 		) {
-	// 			return null;
-	// 		}
-	// 		return buildIssueCommentInputs(
-	// 			githubEvent,
-	// 			githubTrigger.event.payloads.keyof().options,
-	// 			trigger.configuration.event.conditions.callsign,
-	// 		);
-	// 	case "github.pull_request.opened": {
-	// 		if (githubEvent.type !== GitHubEventType.PULL_REQUEST_OPENED) {
-	// 			return null;
-	// 		}
-	// 		const triggerInputs: GenerationInput[] = [];
-	// 		for (const payload of githubTrigger.event.payloads.keyof().options) {
-	// 			switch (payload) {
-	// 				case "title":
-	// 					triggerInputs.push({
-	// 						name: "title",
-	// 						value: githubEvent.payload.pull_request.title,
-	// 					});
-	// 					break;
-	// 				case "body":
-	// 					triggerInputs.push({
-	// 						name: "body",
-	// 						value: githubEvent.payload.pull_request.body ?? "",
-	// 					});
-	// 					break;
-	// 				case "number":
-	// 					triggerInputs.push({
-	// 						name: "number",
-	// 						value: githubEvent.payload.pull_request.number.toString(),
-	// 					});
-	// 					break;
-	// 				case "pullRequestUrl":
-	// 					triggerInputs.push({
-	// 						name: "pullRequesturl",
-	// 						value: githubEvent.payload.pull_request.html_url,
-	// 					});
-	// 					break;
-	// 				default: {
-	// 					const _exhaustiveCheck: never = payload;
-	// 					throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
-	// 				}
-	// 			}
-	// 		}
-	// 		return triggerInputs;
-	// 	}
-	// 	case "github.pull_request.ready_for_review": {
-	// 		if (githubEvent.type !== GitHubEventType.PULL_REQUEST_READY_FOR_REVIEW) {
-	// 			return null;
-	// 		}
-	// 		const triggerInputs: GenerationInput[] = [];
-	// 		for (const payload of githubTrigger.event.payloads.keyof().options) {
-	// 			switch (payload) {
-	// 				case "title":
-	// 					triggerInputs.push({
-	// 						name: "title",
-	// 						value: githubEvent.payload.pull_request.title,
-	// 					});
-	// 					break;
-	// 				case "body":
-	// 					triggerInputs.push({
-	// 						name: "body",
-	// 						value: githubEvent.payload.pull_request.body ?? "",
-	// 					});
-	// 					break;
-	// 				case "number":
-	// 					triggerInputs.push({
-	// 						name: "number",
-	// 						value: githubEvent.payload.pull_request.number.toString(),
-	// 					});
-	// 					break;
-	// 				case "pullRequestUrl":
-	// 					triggerInputs.push({
-	// 						name: "pullRequestUrl",
-	// 						value: githubEvent.payload.pull_request.html_url,
-	// 					});
-	// 					break;
-	// 				default: {
-	// 					const _exhaustiveCheck: never = payload;
-	// 					throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
-	// 				}
-	// 			}
-	// 		}
-	// 		return triggerInputs;
-	// 	}
-	// 	case "github.pull_request.closed": {
-	// 		if (githubEvent.type !== GitHubEventType.PULL_REQUEST_CLOSED) {
-	// 			return null;
-	// 		}
-	// 		const triggerInputs: GenerationInput[] = [];
-	// 		for (const payload of githubTrigger.event.payloads.keyof().options) {
-	// 			switch (payload) {
-	// 				case "title":
-	// 					triggerInputs.push({
-	// 						name: "title",
-	// 						value: githubEvent.payload.pull_request.title,
-	// 					});
-	// 					break;
-	// 				case "body":
-	// 					triggerInputs.push({
-	// 						name: "body",
-	// 						value: githubEvent.payload.pull_request.body ?? "",
-	// 					});
-	// 					break;
-	// 				case "number":
-	// 					triggerInputs.push({
-	// 						name: "number",
-	// 						value: githubEvent.payload.pull_request.number.toString(),
-	// 					});
-	// 					break;
-	// 				case "pullRequestUrl":
-	// 					triggerInputs.push({
-	// 						name: "pullRequestUrl",
-	// 						value: githubEvent.payload.pull_request.html_url,
-	// 					});
-	// 					break;
-	// 				default: {
-	// 					const _exhaustiveCheck: never = payload;
-	// 					throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
-	// 				}
-	// 			}
-	// 		}
-	// 		return triggerInputs;
-	// 	}
-	// 	default: {
-	// 		const _exhaustiveCheck: never = githubTrigger.event;
-	// 		throw new Error(`Unhandled event id: ${_exhaustiveCheck}`);
-	// 	}
-	// }
+	const inputs: GenerationInput[] = [
+		...buildIssueCreatedInputs(args),
+		...buildIssueClosedInputs(args),
+		...buildIssueCommentInputs(args),
+		...buildPullRequestOpenedInputs(args),
+		...buildPullRequestReadyForReviewInputs(args),
+		...buildPullRequestClosedInputs(args),
+	];
+
+	return inputs.length > 0 ? inputs : null;
 }
 
 function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
@@ -217,24 +78,27 @@ function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
 	return inputs;
 }
 
-function buildIssueClosedInputs(
-	githubEvent: GitHubEvent,
-	payloads: readonly ("title" | "body")[],
-): GenerationInput[] | null {
-	if (githubEvent.type !== GitHubEventType.ISSUES_CLOSED) {
-		return null;
+function buildIssueClosedInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "issues.closed") ||
+		args.githubTrigger.event.id !== "github.issue.closed"
+	) {
+		return [];
 	}
 
 	const inputs: GenerationInput[] = [];
-	for (const payload of payloads) {
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({ name: "title", value: githubEvent.payload.issue.title });
+				inputs.push({
+					name: "title",
+					value: args.webhookEvent.data.payload.issue.title,
+				});
 				break;
 			case "body":
 				inputs.push({
 					name: "body",
-					value: githubEvent.payload.issue.body ?? "",
+					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			default: {
@@ -246,42 +110,180 @@ function buildIssueClosedInputs(
 	return inputs;
 }
 
-function buildIssueCommentInputs(
-	githubEvent: GitHubEvent,
-	payloads: readonly ("body" | "issueBody" | "issueNumber" | "issueTitle")[],
-	callsign: string,
-): GenerationInput[] | null {
-	if (githubEvent.type !== GitHubEventType.ISSUE_COMMENT_CREATED) {
-		return null;
+function buildIssueCommentInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "issue_comment.created") ||
+		args.trigger.configuration.event.id !== "github.issue_comment.created" ||
+		args.githubTrigger.event.id !== "github.issue_comment.created"
+	) {
+		return [];
 	}
 
-	const command = parseCommandFromEvent(githubEvent);
-	if (command === null || command.callsign !== callsign) {
-		return null;
+	const command = parseCommandFromWebhookEvent(args.webhookEvent);
+	if (
+		command === null ||
+		command.callsign !== args.trigger.configuration.event.conditions.callsign
+	) {
+		return [];
 	}
 
 	const inputs: GenerationInput[] = [];
-	for (const payload of payloads) {
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "body":
-				inputs.push({ name: "body", value: command.content });
+				inputs.push({
+					name: "body",
+					value: command.content,
+				});
 				break;
 			case "issueBody":
 				inputs.push({
 					name: "issueBody",
-					value: githubEvent.payload.issue.body ?? "",
+					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
 				inputs.push({
 					name: "issueNumber",
-					value: githubEvent.payload.issue.number.toString(),
+					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});
 				break;
 			case "issueTitle":
 				inputs.push({
 					name: "issueTitle",
-					value: githubEvent.payload.issue.title,
+					value: args.webhookEvent.data.payload.issue.title,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildPullRequestOpenedInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "pull_request.opened") ||
+		args.githubTrigger.event.id !== "github.pull_request.opened"
+	) {
+		return [];
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "title":
+				inputs.push({
+					name: "title",
+					value: args.webhookEvent.data.payload.pull_request.title,
+				});
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: args.webhookEvent.data.payload.pull_request.body ?? "",
+				});
+				break;
+			case "number":
+				inputs.push({
+					name: "number",
+					value: args.webhookEvent.data.payload.pull_request.number.toString(),
+				});
+				break;
+			case "pullRequestUrl":
+				inputs.push({
+					name: "pullRequestUrl",
+					value: args.webhookEvent.data.payload.pull_request.html_url,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildPullRequestReadyForReviewInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "pull_request.ready_for_review") ||
+		args.githubTrigger.event.id !== "github.pull_request.ready_for_review"
+	) {
+		return [];
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "title":
+				inputs.push({
+					name: "title",
+					value: args.webhookEvent.data.payload.pull_request.title,
+				});
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: args.webhookEvent.data.payload.pull_request.body ?? "",
+				});
+				break;
+			case "number":
+				inputs.push({
+					name: "number",
+					value: args.webhookEvent.data.payload.pull_request.number.toString(),
+				});
+				break;
+			case "pullRequestUrl":
+				inputs.push({
+					name: "pullRequestUrl",
+					value: args.webhookEvent.data.payload.pull_request.html_url,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildPullRequestClosedInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "pull_request.closed") ||
+		args.githubTrigger.event.id !== "github.pull_request.closed"
+	) {
+		return [];
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "title":
+				inputs.push({
+					name: "title",
+					value: args.webhookEvent.data.payload.pull_request.title,
+				});
+				break;
+			case "body":
+				inputs.push({
+					name: "body",
+					value: args.webhookEvent.data.payload.pull_request.body ?? "",
+				});
+				break;
+			case "number":
+				inputs.push({
+					name: "number",
+					value: args.webhookEvent.data.payload.pull_request.number.toString(),
+				});
+				break;
+			case "pullRequestUrl":
+				inputs.push({
+					name: "pullRequestUrl",
+					value: args.webhookEvent.data.payload.pull_request.html_url,
 				});
 				break;
 			default: {

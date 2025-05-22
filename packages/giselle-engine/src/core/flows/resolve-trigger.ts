@@ -13,11 +13,7 @@ import {
 	setGenerationIndex,
 	setNodeGenerationIndex,
 } from "../generations/utils";
-import type { GitHubEvent } from "../github/events";
-import {
-	buildTriggerInputs,
-	parseCommandFromEvent,
-} from "../github/trigger-utils";
+import { buildTriggerInputs } from "../github/trigger-utils";
 import type { GiselleEngineContext } from "../types";
 import { getFlowTrigger } from "./utils";
 
@@ -41,13 +37,13 @@ export async function resolveTrigger(args: {
 
 	const generationContext = GenerationContext.parse(args.generation.context);
 
-	let payloadInputs: GenerationInput[] | null = null;
+	let githubWebhookInputs: GenerationInput[] | null = null;
 	if (
 		args.githubWebhookEvent !== undefined &&
 		isWebhookEvent(args.githubWebhookEvent) &&
 		triggerData.configuration.provider === "github"
 	) {
-		payloadInputs = buildTriggerInputs({
+		githubWebhookInputs = buildTriggerInputs({
 			githubTrigger: githubTriggers[triggerData.configuration.event.id],
 			trigger: triggerData,
 			webhookEvent: args.githubWebhookEvent,
@@ -58,7 +54,7 @@ export async function resolveTrigger(args: {
 	switch (triggerData.configuration.provider) {
 		case "github": {
 			const trigger = githubTriggers[triggerData.configuration.event.id];
-			const inputsToUse = payloadInputs ?? generationContext.inputs ?? [];
+			const inputsToUse = githubWebhookInputs ?? generationContext.inputs ?? [];
 			for (const payload of trigger.event.payloads.keyof().options) {
 				const input = inputsToUse.find((i) => i.name === payload);
 				if (input === undefined) {
