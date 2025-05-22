@@ -127,15 +127,11 @@ async function process<TEventName extends WebhookEventName>(args: {
 				});
 			}
 			if (run) {
-				console.log("will run flow");
-				console.log(`+--- triggerId: ${trigger.id}`);
-				console.log(`+--- event: ${JSON.stringify(args.event.data, null, 2)}`);
-				/** @todo next pr */
-				// runFlow({
-				// 	context: args.context,
-				// 	triggerId: trigger.id,
-				// 	payload: args.event,
-				// }),
+				runFlow({
+					context: args.context,
+					triggerId: trigger.id,
+					payload: args.event,
+				});
 			}
 		}),
 	);
