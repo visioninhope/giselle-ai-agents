@@ -14,10 +14,7 @@ export type FirecrawlWebSearchProvider = z.infer<
 	typeof FirecrawlWebSearchProvider
 >;
 
-const apiKey = process.env.FIRECRAWL_API_KEY;
-if (!apiKey) {
-	throw new Error("FIRECRAWL_API_KEY is not set");
-}
+const apiKey = process.env.FIRECRAWL_API_KEY || "";
 const firecrawlApp = new FirecrawlApp({ apiKey });
 
 export const ALLOWED_SCRAPE_FORMATS = ["markdown", "html"] as const;
