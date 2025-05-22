@@ -14,7 +14,7 @@ export async function verifyRequest({
 
 	const signature = request.headers.get("x-hub-signature-256") ?? "";
 
-	const body = await request.text();
+	const body = await request.clone().text();
 
 	const verified = await webhooks.verify(body, signature);
 
@@ -33,7 +33,6 @@ export async function handleWebhook(args: {
 	request: Request;
 	on: Partial<EventHandlers>;
 }) {
-	await verifyRequest(args);
 	const eventHandler = createEventHandler({
 		secret: args.secret,
 	});
@@ -44,10 +43,11 @@ export async function handleWebhook(args: {
 			await args.on[webhookEventName]?.(event as any);
 		});
 	}
+
 	await eventHandler.receive({
 		id: args.request.headers.get("x-github-delivery") ?? "",
 		// biome-ignore lint: lint/suspicious/noExplicitAny: Using 'any' is acceptable here as unexpected values won't cause issues
 		name: args.request.headers.get("x-github-event") as any,
-		payload: await args.request.json(),
+		payload: await args.request.clone().json(),
 	});
 }

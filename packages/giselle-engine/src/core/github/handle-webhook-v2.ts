@@ -1,4 +1,4 @@
-import { handleWebhook, verifyRequest } from "@giselle-sdk/github-tool";
+import { handleWebhook } from "@giselle-sdk/github-tool";
 import type { GiselleEngineContext } from "../types";
 
 export async function handleGitHubWebhookV2(args: {
@@ -14,7 +14,9 @@ export async function handleGitHubWebhookV2(args: {
 		secret: credentials.webhookSecret,
 		request: args.request,
 		on: {
-			"issue_comment.created": async (event) => {},
+			"issue_comment.created": async (event) => {
+				console.log(event);
+			},
 		},
 	});
 }
