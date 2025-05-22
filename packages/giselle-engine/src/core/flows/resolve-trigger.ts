@@ -7,6 +7,7 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { githubTriggers } from "@giselle-sdk/flow";
+import { isWebhookEvent } from "@giselle-sdk/github-tool";
 import {
 	setGeneration,
 	setGenerationIndex,
@@ -23,7 +24,8 @@ import { getFlowTrigger } from "./utils";
 export async function resolveTrigger(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	payload?: unknown;
+	/** @todo Make this more generic. Should use GenerationContextInput. */
+	githubWebhookEvent?: unknown;
 }) {
 	const operationNode = args.generation.context.operationNode;
 	if (!isTriggerNode(operationNode)) {
@@ -41,13 +43,14 @@ export async function resolveTrigger(args: {
 
 	let payloadInputs: GenerationInput[] | null = null;
 	if (
-		args.payload !== undefined &&
+		args.githubWebhookEvent !== undefined &&
+		isWebhookEvent(args.githubWebhookEvent) &&
 		triggerData.configuration.provider === "github"
 	) {
 		payloadInputs = buildTriggerInputs({
 			githubTrigger: githubTriggers[triggerData.configuration.event.id],
 			trigger: triggerData,
-			githubEvent: args.payload as GitHubEvent,
+			webhookEvent: args.githubWebhookEvent,
 		});
 	}
 

@@ -90,7 +90,7 @@ export async function runFlow(args: {
 						await resolveTrigger({
 							context: args.context,
 							generation,
-							payload: args.payload,
+							githubWebhookEvent: args.payload,
 						});
 						break;
 					default: {
