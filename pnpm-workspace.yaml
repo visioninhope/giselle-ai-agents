@@ -71,6 +71,7 @@ catalog:
   "@octokit/auth-app": 7.1.1
   "@octokit/core": 6.1.2
   "@octokit/request-error": 6.1.5
+  "@octokit/webhooks": 13.3.0
   "@urql/core": 5.1.1
   gql.tada: 1.8.10
   urql: 4.2.2
