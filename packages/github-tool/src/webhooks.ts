@@ -10,16 +10,36 @@ export type {
 	EmitterWebhookEvent,
 } from "@octokit/webhooks";
 
-export type WebhookEvent<T extends EmitterWebhookEventName> = {
+// biome-ignore lint/suspicious/noExplicitAny: Default generic parameter uses any for compatibility
+export type WebhookEvent<T extends EmitterWebhookEventName = any> = {
 	name: T;
 	data: EmitterWebhookEvent<T>;
 };
 
 export function ensureWebhookEvent<T extends EmitterWebhookEventName>(
-	event: WebhookEvent<EmitterWebhookEventName>,
+	event: WebhookEvent,
 	expectedName: T,
 ): event is WebhookEvent<T> {
 	return event.name === expectedName;
+}
+
+/**
+ * Type guard that checks if an unknown value is a WebhookEvent
+ */
+export function isWebhookEvent(value: unknown): value is WebhookEvent {
+	if (typeof value !== "object" || value === null) {
+		return false;
+	}
+
+	// Check if the object has the required properties
+	const obj = value as Record<string, unknown>;
+	return (
+		"name" in obj &&
+		typeof obj.name === "string" &&
+		"data" in obj &&
+		typeof obj.data === "object" &&
+		obj.data !== null
+	);
 }
 
 export async function verifyRequest({
