@@ -104,22 +104,39 @@ async function process<TEventName extends WebhookEventName>(args: {
 				installationId,
 			} satisfies GitHubAuthConfig;
 
+			let run = false;
 			if (
 				ensureWebhookEvent(args.event, "issues.opened") &&
 				trigger.configuration.event.id === "github.issue.created"
 			) {
-				await Promise.all([
-					addReaction({
-						id: args.event.data.payload.issue.node_id,
-						content: "EYES",
-						authConfig,
-					}),
-					runFlow({
-						context: args.context,
-						triggerId: trigger.id,
-						payload: args.event,
-					}),
-				]);
+				run = true;
+				addReaction({
+					id: args.event.data.payload.issue.node_id,
+					content: "EYES",
+					authConfig,
+				});
+			}
+			if (
+				ensureWebhookEvent(args.event, "issues.closed") &&
+				trigger.configuration.event.id === "github.issue.closed"
+			) {
+				run = true;
+				addReaction({
+					id: args.event.data.payload.issue.node_id,
+					content: "EYES",
+					authConfig,
+				});
+			}
+			if (run) {
+				console.log("will run flow");
+				console.log(`+--- triggerId: ${trigger.id}`);
+				console.log(`+--- event: ${JSON.stringify(args.event.data)}`);
+				// todo next pr
+				// runFlow({
+				// 	context: args.context,
+				// 	triggerId: trigger.id,
+				// 	payload: args.event,
+				// }),
 			}
 		}),
 	);
