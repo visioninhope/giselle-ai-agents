@@ -55,10 +55,15 @@ export const JsonValue: z.ZodType<JsonValue> = z.lazy(() =>
 	]),
 );
 
-export const KeyValueInput = z.object({
-	type: z.literal("keyValue"),
+export const KeyValuePair = z.object({
 	name: z.string(),
 	value: z.string(),
+});
+export type KeyValuePair = z.infer<typeof KeyValuePair>;
+
+export const KeyValueInput = z.object({
+	type: z.literal("keyValue"),
+	entries: z.array(KeyValuePair),
 });
 export type KeyValueInput = z.infer<typeof KeyValueInput>;
 
@@ -69,13 +74,11 @@ export const PayloadInput = z.object({
 });
 export type PayloadInput = z.infer<typeof PayloadInput>;
 
-export const GenerationInput = z.discriminatedUnion("type", [
+export const GenerationContextInput = z.discriminatedUnion("type", [
 	KeyValueInput,
 	PayloadInput,
 ]);
-export type GenerationInput = z.infer<typeof GenerationInput>;
-
-export type GenerationContextInputs = Array<KeyValueInput | PayloadInput>;
+export type GenerationContextInput = z.infer<typeof GenerationContextInput>;
 
 export const GenerationContext = z.object({
 	operationNode: OperationNode,
@@ -83,7 +86,7 @@ export const GenerationContext = z.object({
 	sourceNodes: z.array(Node),
 	origin: GenerationOrigin,
 	inputs: z
-		.array(GenerationInput)
+		.array(GenerationContextInput)
 		.optional()
 		.describe(
 			"Inputs from node connections are represented in sourceNodes, while this represents inputs from the external environment. Mainly used with Trigger nodes.",
@@ -99,6 +102,6 @@ export const GenerationContextLike = z.object({
 	sourceNodes: z.array(z.any()),
 	connections: z.array(z.any()).default([]),
 	origin: GenerationOrigin,
-	inputs: z.array(GenerationInput).optional(),
+	inputs: z.array(GenerationContextInput).optional(),
 });
 export type GenerationContextLike = z.infer<typeof GenerationContextLike>;
