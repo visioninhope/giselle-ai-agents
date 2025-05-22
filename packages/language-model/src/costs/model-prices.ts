@@ -201,7 +201,7 @@ export const googleTokenPricing: ModelPriceTable = {
 						costPerMegaToken: 0.15,
 					},
 					output: {
-						costPerMegaToken: 0.60, // will be 3.50 if "thinking" enabled
+						costPerMegaToken: 0.6, // will be 3.50 if "thinking" enabled
 						// thinking option can be controlled using "thinkingBudget" option
 						// refs:
 						// - https://ai.google.dev/gemini-api/docs/thinking#javascript
@@ -217,10 +217,10 @@ export const googleTokenPricing: ModelPriceTable = {
 				validFrom: "2025-05-20T00:00:00Z",
 				price: {
 					input: {
-						costPerMegaToken: 0.10,
+						costPerMegaToken: 0.1,
 					},
 					output: {
-						costPerMegaToken: 0.40,
+						costPerMegaToken: 0.4,
 					},
 				},
 			},
@@ -235,7 +235,7 @@ export const googleTokenPricing: ModelPriceTable = {
 						costPerMegaToken: 0.075,
 					},
 					output: {
-						costPerMegaToken: 0.30,
+						costPerMegaToken: 0.3,
 					},
 				},
 			},
