@@ -40,6 +40,7 @@ export interface GitHubIntegrationConfig {
 		privateKey: string;
 		clientId: string;
 		clientSecret: string;
+		webhookSecret: string;
 	};
 }
 

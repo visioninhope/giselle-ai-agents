@@ -42,6 +42,7 @@ import {
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
 	getWorkspaceGitHubIntegrationSetting,
+	handleGitHubWebhookV2,
 	handleWebhook,
 	upsertGithubIntegrationSetting,
 } from "./github";
@@ -226,6 +227,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			triggerId: FlowTriggerId;
 			triggerInputs: GenerationInput[];
 		}) => runFlow({ ...args, context }),
+		handleGitHubWebhookV2: async (args: { request: Request }) =>
+			handleGitHubWebhookV2({ ...args, context }),
 	};
 }
 
