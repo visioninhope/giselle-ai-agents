@@ -51,6 +51,9 @@ catalogs:
     '@octokit/request-error':
       specifier: 6.1.5
       version: 6.1.5
+    '@octokit/webhooks':
+      specifier: 13.3.0
+      version: 13.3.0
     '@supabase/supabase-js':
       specifier: 2.45.0
       version: 2.45.0
@@ -997,6 +1000,9 @@ importers:
       '@octokit/request-error':
         specifier: 'catalog:'
         version: 6.1.5
+      '@octokit/webhooks':
+        specifier: 'catalog:'
+        version: 13.3.0
       '@urql/core':
         specifier: 'catalog:'
         version: 5.1.1(graphql@16.10.0)
