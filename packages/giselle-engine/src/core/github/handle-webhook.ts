@@ -111,11 +111,11 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 
 	const command = parseCommandFromEvent(gitHubEvent);
 
-	await processV2({
-		context: args.context,
-		repositoryNodeId: repository.nodeId,
-		githubEvent: gitHubEvent,
-	});
+	// await processV2({
+	// 	context: args.context,
+	// 	repositoryNodeId: repository.nodeId,
+	// 	githubEvent: gitHubEvent,
+	// });
 
 	const results = await processMatchedIntegrationSettingsDeprecated(
 		gitHubEvent,
@@ -127,6 +127,7 @@ export async function handleWebhook(args: HandleGitHubWebhookArgs) {
 	return results;
 }
 
+// Move to v2
 async function processV2(args: {
 	context: GiselleEngineContext;
 	repositoryNodeId: string;
