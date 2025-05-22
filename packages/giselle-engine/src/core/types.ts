@@ -22,7 +22,6 @@ export interface GiselleEngineContext {
 		waitForFlushFn?: () => Promise<unknown>;
 	};
 	vault?: Vault;
-	userId?: string;
 }
 
 interface GitHubInstalltionAppAuthResolver {
