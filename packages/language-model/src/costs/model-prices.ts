@@ -109,6 +109,21 @@ export const openAiTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
+	"o4-mini": {
+		prices: [
+			{
+				validFrom: "2025-05-12T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 1.1,
+					},
+					output: {
+						costPerMegaToken: 4.4,
+					},
+				},
+			},
+		],
+	},
 };
 
 export const anthropicTokenPricing: ModelPriceTable = {
