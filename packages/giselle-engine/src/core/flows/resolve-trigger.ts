@@ -46,14 +46,10 @@ export async function resolveTrigger(args: {
 			if (githubWebhookEventInput === undefined) {
 				throw new Error("Missing github-webhook-event input");
 			}
+			if (triggerData.configuration.provider !== "github") {
+				throw new Error("Invalid provider");
+			}
 			for (const output of operationNode.outputs) {
-				if (
-					args.githubWebhookEvent === undefined ||
-					triggerData.configuration.provider !== "github"
-				) {
-					return null;
-				}
-
 				const resolveOutput = resolveGitHubTrigger({
 					output,
 					githubTrigger: githubTriggers[triggerData.configuration.event.id],
