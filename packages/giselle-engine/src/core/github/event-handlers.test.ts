@@ -13,9 +13,8 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { runFlow } from "../flows";
 import type { GiselleEngineContext } from "../types";
 import {
-	type Dependencies,
 	type EventHandlerArgs,
-	type EventPayload,
+	type EventHandlerDependencies,
 	handleIssueClosed,
 	handleIssueCommentCreated,
 	handleIssueOpened,
@@ -26,13 +25,6 @@ import {
 	processEvent,
 } from "./event-handlers";
 import { parseCommand } from "./utils";
-
-// Define test-specific types
-type TestWebhookEvent = WebhookEvent<WebhookEventName> & {
-	data: {
-		payload: EventPayload;
-	};
-};
 
 // Generate a valid test trigger ID
 const mockFlowTriggerId = FlowTriggerId.generate();
@@ -127,7 +119,7 @@ describe("GitHub Event Handlers", () => {
 							issue: { node_id: "issue-node-id" },
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "github.issue.created";
 
@@ -154,7 +146,7 @@ describe("GitHub Event Handlers", () => {
 							repository: { node_id: "repo-node-id" },
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "github.issue.created";
 			vi.mocked(ensureWebhookEvent).mockReturnValue(false);
@@ -178,7 +170,7 @@ describe("GitHub Event Handlers", () => {
 							repository: { node_id: "repo-node-id" },
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "manual";
 
@@ -204,7 +196,7 @@ describe("GitHub Event Handlers", () => {
 							issue: { node_id: "issue-node-id" },
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "github.issue.closed";
 
@@ -237,7 +229,7 @@ describe("GitHub Event Handlers", () => {
 							},
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "github.issue_comment.created";
 			vi.mocked(parseCommand).mockReturnValue({
@@ -272,7 +264,7 @@ describe("GitHub Event Handlers", () => {
 							},
 						},
 					},
-				} as TestWebhookEvent,
+				} as WebhookEvent<WebhookEventName>,
 			};
 			args.trigger.configuration.event.id = "github.issue_comment.created";
 			vi.mocked(parseCommand).mockReturnValue({
@@ -300,7 +292,7 @@ describe("GitHub Event Handlers", () => {
 						issue: { node_id: "issue-node-id" },
 					},
 				},
-			} as TestWebhookEvent;
+			} as WebhookEvent<WebhookEventName>;
 
 			const trigger = {
 				id: mockFlowTriggerId,
@@ -378,7 +370,7 @@ describe("GitHub Event Handlers", () => {
 						repository: { node_id: "repo-node-id" },
 					},
 				},
-			} as TestWebhookEvent;
+			} as WebhookEvent<WebhookEventName>;
 
 			const trigger = {
 				id: mockFlowTriggerId,
@@ -441,7 +433,7 @@ describe("GitHub Event Handlers", () => {
 						repository: { node_id: "repo-node-id" },
 					},
 				},
-			} as TestWebhookEvent;
+			} as WebhookEvent<WebhookEventName>;
 
 			const trigger = {
 				id: mockFlowTriggerId,
@@ -504,7 +496,7 @@ describe("GitHub Event Handlers", () => {
 						repository: { node_id: "repo-node-id" },
 					},
 				},
-			} as TestWebhookEvent;
+			} as WebhookEvent<WebhookEventName>;
 			const trigger = {
 				id: mockFlowTriggerId,
 				workspaceId: "wrks-test",

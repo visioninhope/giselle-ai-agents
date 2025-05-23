@@ -1,44 +1,28 @@
-import {
-	type GitHubAuthConfig,
-	type WebhookEvent,
-	type WebhookEventName,
-	addReaction as addReactionDefault,
-	ensureWebhookEvent as ensureWebhookEventDefault,
-} from "@giselle-sdk/github-tool";
-import { runFlow as runFlowDefault } from "../flows";
-import type { GiselleEngineContext } from "../types";
-import { parseCommand as parseCommandDefault } from "./utils";
-
-export interface Dependencies {
-	addReaction: typeof addReactionDefault;
-	ensureWebhookEvent: typeof ensureWebhookEventDefault;
-	runFlow: typeof runFlowDefault;
-	parseCommand: typeof parseCommandDefault;
-}
-
-// Default implementation of dependencies
-export const defaultDeps: Dependencies = {
-	addReaction: addReactionDefault,
-	ensureWebhookEvent: ensureWebhookEventDefault,
-	runFlow: runFlowDefault,
-	parseCommand: parseCommandDefault,
-};
 import type { FlowTrigger } from "@giselle-sdk/data-type";
+import type {
+	GitHubAuthConfig,
+	WebhookEvent,
+	WebhookEventName,
+	addReaction,
+	ensureWebhookEvent,
+} from "@giselle-sdk/github-tool";
+import type { runFlow } from "../flows";
+import type { GiselleEngineContext } from "../types";
+import type { parseCommand } from "./utils";
 
-export interface EventPayload {
-	installation: { id: number };
-	repository: { node_id: string };
-	issue?: { node_id: string; pull_request?: object | null };
-	comment?: { node_id: string; body: string };
-	pull_request?: { node_id: string };
+export interface EventHandlerDependencies {
+	addReaction: typeof addReaction;
+	ensureWebhookEvent: typeof ensureWebhookEvent;
+	runFlow: typeof runFlow;
+	parseCommand: typeof parseCommand;
 }
 
 export type EventHandlerArgs<TEventName extends WebhookEventName> = {
-	event: WebhookEvent<TEventName> & { data: { payload: EventPayload } };
+	event: WebhookEvent<TEventName>;
 	context: GiselleEngineContext;
 	trigger: FlowTrigger;
 	authConfig: GitHubAuthConfig;
-	deps: Dependencies;
+	deps: EventHandlerDependencies;
 };
 
 export type EventHandlerResult = {
@@ -130,26 +114,18 @@ export async function handleIssueCommentCreated<
 export async function handlePullRequestCommentCreated<
 	TEventName extends WebhookEventName,
 >(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
-	const issue = args.event.data.payload.issue;
-	const comment = args.event.data.payload.comment;
-
-	const isPrComment =
-		(args.deps.ensureWebhookEvent(args.event, "issue_comment.created") &&
-			args.trigger.configuration.event.id ===
-				"github.pull_request_comment.created" &&
-			issue?.pull_request !== null) ||
-		(args.deps.ensureWebhookEvent(
-			args.event,
-			"pull_request_review_comment.created",
-		) &&
-			args.trigger.configuration.event.id ===
-				"github.pull_request_comment.created");
-
-	if (!isPrComment || !comment) {
+	if (
+		!args.deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
+		args.trigger.configuration.event.id !==
+			"github.pull_request_comment.created"
+	) {
+		return { shouldRun: false };
+	}
+	if (args.event.data.payload.issue?.pull_request === null) {
 		return { shouldRun: false };
 	}
 
-	const command = args.deps.parseCommand(comment.body);
+	const command = args.deps.parseCommand(args.event.data.payload.comment.body);
 	const conditions =
 		args.trigger.configuration.event.id ===
 		"github.pull_request_comment.created"
@@ -161,7 +137,7 @@ export async function handlePullRequestCommentCreated<
 	}
 
 	await args.deps.addReaction({
-		id: comment.node_id,
+		id: args.event.data.payload.comment.node_id,
 		content: "EYES",
 		authConfig: args.authConfig,
 	});
@@ -262,7 +238,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 	> & {
 		trigger: EventHandlerArgs<TEventName>["trigger"];
 		createAuthConfig: (installationId: number) => GitHubAuthConfig;
-		deps?: Partial<Dependencies>;
+		deps: EventHandlerDependencies;
 	},
 ): Promise<boolean> {
 	if (
@@ -272,11 +248,11 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		return false;
 	}
 
-	const installationId = args.event.data.payload.installation.id;
+	const installationId = args.trigger.configuration.installationId;
 	const authConfig = args.createAuthConfig(installationId);
 
 	// Merge provided dependencies with defaults
-	const deps = { ...defaultDeps, ...args.deps };
+	const deps = { ...args.deps };
 
 	for (const handler of eventHandlers) {
 		const result = await handler({

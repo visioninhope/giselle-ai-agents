@@ -6,12 +6,11 @@ import {
 	ensureWebhookEvent,
 	handleWebhook,
 } from "@giselle-sdk/github-tool";
-import type { Storage } from "unstorage";
 import { runFlow } from "../flows";
 import { getFlowTrigger } from "../flows/utils";
 import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import type { GiselleEngineContext } from "../types";
-import { type Dependencies, defaultDeps, processEvent, type EventPayload } from "./event-handlers";
+import { type EventHandlerDependencies, processEvent } from "./event-handlers";
 import { parseCommand } from "./utils";
 
 const events: WebhookEventName[] = [
@@ -35,9 +34,17 @@ export async function handleGitHubWebhookV2(args: {
 	const dispatch = async (
 		event: WebhookEvent<WebhookEventName>,
 	): Promise<void> =>
-		processWebhookEvent({
+		process({
 			event,
 			context: args.context,
+			deps: {
+				getFlowTrigger,
+				getGitHubRepositoryIntegrationIndex,
+				addReaction,
+				ensureWebhookEvent,
+				runFlow,
+				parseCommand,
+			},
 		});
 
 	const handlers: Partial<
@@ -84,42 +91,14 @@ function hasRequiredPayloadProps(event: unknown): event is {
 	);
 }
 export interface ProcessDeps {
-	addReaction: typeof addReaction;
-	ensureWebhookEvent: typeof ensureWebhookEvent;
-	runFlow: typeof runFlow;
-	parseCommand: typeof parseCommand;
 	getFlowTrigger: typeof getFlowTrigger;
 	getGitHubRepositoryIntegrationIndex: typeof getGitHubRepositoryIntegrationIndex;
-}
-
-export async function processWebhookEvent<
-	TEventName extends WebhookEventName,
->(args: {
-	event: WebhookEvent<TEventName>;
-	context: GiselleEngineContext;
-	deps?: Partial<ProcessDeps>;
-}) {
-	const deps: ProcessDeps = {
-		addReaction,
-		ensureWebhookEvent,
-		runFlow,
-		parseCommand,
-		getFlowTrigger,
-		getGitHubRepositoryIntegrationIndex,
-		...args.deps,
-	};
-
-	await process({
-		event: args.event,
-		context: args.context,
-		deps,
-	});
 }
 
 async function process<TEventName extends WebhookEventName>(args: {
 	event: WebhookEvent<TEventName>;
 	context: GiselleEngineContext;
-	deps: ProcessDeps;
+	deps: ProcessDeps & EventHandlerDependencies;
 }) {
 	if (!hasRequiredPayloadProps(args.event)) {
 		return;
@@ -155,7 +134,7 @@ async function process<TEventName extends WebhookEventName>(args: {
 			});
 
 			await processEvent({
-				event: args.event as WebhookEvent<TEventName> & { data: { payload: EventPayload } },
+				event: args.event,
 				context: args.context,
 				trigger,
 				createAuthConfig,
