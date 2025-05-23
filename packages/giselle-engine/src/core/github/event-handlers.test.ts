@@ -36,10 +36,17 @@ describe("GitHub Event Handlers (Using Dependency Injection)", () => {
 	beforeEach(() => {
 		vi.resetAllMocks();
 
-		// Simple dependency mocks
+		// Simple dependency mocks with correct type implementations
 		testDeps = {
 			addReaction: vi.fn().mockResolvedValue(undefined),
-			ensureWebhookEvent: vi.fn().mockReturnValue(true),
+			ensureWebhookEvent: vi
+				.fn()
+				.mockImplementation(
+					<T extends WebhookEventName>(
+						event: WebhookEvent<WebhookEventName>,
+						expectedName: T,
+					): event is WebhookEvent<T> => true,
+				) as unknown as typeof import("@giselle-sdk/github-tool").ensureWebhookEvent,
 			runFlow: vi.fn().mockResolvedValue(undefined),
 			parseCommand: vi
 				.fn()
@@ -137,7 +144,17 @@ describe("GitHub Event Handlers (Using Dependency Injection)", () => {
 					},
 				} as TestWebhookEvent,
 			};
-			args.deps.ensureWebhookEvent = vi.fn().mockReturnValue(false);
+			args.deps = {
+				...args.deps,
+				ensureWebhookEvent: vi
+					.fn()
+					.mockImplementation(
+						<T extends WebhookEventName>(
+							event: WebhookEvent<WebhookEventName>,
+							expectedName: T,
+						): event is WebhookEvent<T> => false,
+					) as unknown as typeof import("@giselle-sdk/github-tool").ensureWebhookEvent,
+			};
 
 			// Act
 			const result = await handleIssueOpened(args);
@@ -225,10 +242,13 @@ describe("GitHub Event Handlers (Using Dependency Injection)", () => {
 				} as TestWebhookEvent,
 			};
 			args.trigger.configuration.event.id = "github.issue_comment.created";
-			args.deps.parseCommand = vi.fn().mockReturnValue({
-				callsign: "someone",
-				content: "help me",
-			});
+			args.deps = {
+				...args.deps,
+				parseCommand: vi.fn().mockReturnValue({
+					callsign: "someone",
+					content: "help me",
+				}),
+			};
 
 			// Act
 			const result = await handleIssueCommentCreated(args);
