@@ -4,6 +4,7 @@ import type {
 	GitHubAuthConfig,
 	WebhookEvent,
 	WebhookEventName,
+	ensureWebhookEvent,
 } from "@giselle-sdk/github-tool";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
@@ -28,7 +29,7 @@ type TestWebhookEvent = WebhookEvent<WebhookEventName>;
 // Generate a valid test trigger ID
 const mockFlowTriggerId = FlowTriggerId.generate();
 
-describe("GitHub Event Handlers (Using Dependency Injection)", () => {
+describe("GitHub Event Handlers", () => {
 	// Common test data
 	let testDeps: EventHandlerDependencies;
 	let baseEventArgs: Omit<EventHandlerArgs<WebhookEventName>, "event">;
@@ -46,7 +47,7 @@ describe("GitHub Event Handlers (Using Dependency Injection)", () => {
 						event: WebhookEvent<WebhookEventName>,
 						expectedName: T,
 					): event is WebhookEvent<T> => true,
-				) as unknown as typeof import("@giselle-sdk/github-tool").ensureWebhookEvent,
+				) as unknown as typeof ensureWebhookEvent,
 			runFlow: vi.fn().mockResolvedValue(undefined),
 			parseCommand: vi
 				.fn()
@@ -153,7 +154,7 @@ describe("GitHub Event Handlers (Using Dependency Injection)", () => {
 							event: WebhookEvent<WebhookEventName>,
 							expectedName: T,
 						): event is WebhookEvent<T> => false,
-					) as unknown as typeof import("@giselle-sdk/github-tool").ensureWebhookEvent,
+					) as unknown as typeof ensureWebhookEvent,
 			};
 
 			// Act
