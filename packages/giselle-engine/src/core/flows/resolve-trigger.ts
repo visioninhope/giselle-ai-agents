@@ -20,8 +20,6 @@ import { getFlowTrigger } from "./utils";
 export async function resolveTrigger(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
-	/** @todo Make this more generic. Should use GenerationContextInput. */
-	githubWebhookEvent?: unknown;
 }) {
 	const operationNode = args.generation.context.operationNode;
 	if (!isTriggerNode(operationNode)) {
