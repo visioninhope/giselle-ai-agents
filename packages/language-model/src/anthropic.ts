@@ -29,7 +29,6 @@ const AnthropicLanguageModel = LanguageModelBase.extend({
 });
 type AnthropicLanguageModel = z.infer<typeof AnthropicLanguageModel>;
 
-
 const claude40Opus: AnthropicLanguageModel = {
 	provider: "anthropic",
 	id: "claude-4-opus-20250514",
@@ -86,7 +85,13 @@ const claude35Haiku: AnthropicLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-export const models = [claude40Opus, claude40Sonnet, claude37Sonnet, claude35Sonnet, claude35Haiku];
+export const models = [
+	claude40Opus,
+	claude40Sonnet,
+	claude37Sonnet,
+	claude35Sonnet,
+	claude35Haiku
+];
 
 export const LanguageModel = AnthropicLanguageModel;
 export type LanguageModel = AnthropicLanguageModel;
