@@ -1,3 +1,4 @@
+import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod";
 import { Connection } from "../connection";
 import { Node, NodeBase, OperationNode } from "../node";
@@ -65,16 +66,15 @@ export const ParametersInput = z.object({
 });
 export type ParametersInput = z.infer<typeof ParametersInput>;
 
-export const PayloadInput = z.object({
-	type: z.literal("payload"),
-	event: z.string(),
-	payload: z.any(),
+export const GitHubWebhookEventInput = z.object({
+	type: z.literal("github-webhook-event"),
+	webhookEvent: z.custom<WebhookEvent>(),
 });
-export type PayloadInput = z.infer<typeof PayloadInput>;
+export type PayloadInput = z.infer<typeof GitHubWebhookEventInput>;
 
 export const GenerationContextInput = z.discriminatedUnion("type", [
 	ParametersInput,
-	PayloadInput,
+	GitHubWebhookEventInput,
 ]);
 export type GenerationContextInput = z.infer<typeof GenerationContextInput>;
 

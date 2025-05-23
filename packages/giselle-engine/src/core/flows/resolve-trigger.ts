@@ -13,7 +13,7 @@ import {
 	setGenerationIndex,
 	setNodeGenerationIndex,
 } from "../generations/utils";
-import { buildTriggerInputs } from "../github/trigger-utils";
+import { resolveTrigger as resolveGitHubTrigger } from "../github/trigger-utils";
 import type { GiselleEngineContext } from "../types";
 import { getFlowTrigger } from "./utils";
 
@@ -37,60 +37,36 @@ export async function resolveTrigger(args: {
 
 	const generationContext = GenerationContext.parse(args.generation.context);
 
-	let githubWebhookInputs: GenerationContextInput | null = null;
-	if (
-		args.githubWebhookEvent !== undefined &&
-		isWebhookEvent(args.githubWebhookEvent) &&
-		triggerData.configuration.provider === "github"
-	) {
-		githubWebhookInputs = buildTriggerInputs({
-			githubTrigger: githubTriggers[triggerData.configuration.event.id],
-			trigger: triggerData,
-			webhookEvent: args.githubWebhookEvent,
-		});
-	}
-
 	const outputs: GenerationOutput[] = [];
 	switch (triggerData.configuration.provider) {
 		case "github": {
-			const trigger = githubTriggers[triggerData.configuration.event.id];
-			const inputsToUse = githubWebhookInputs
-				? [githubWebhookInputs]
-				: (generationContext.inputs ?? []);
-			for (const payload of trigger.event.payloads.keyof().options) {
-				let parameterValue: string | undefined;
-
-				for (const input of inputsToUse) {
-					if (input.type === "parameters") {
-						const parameterItem = input.items.find(
-							(item) => item.name === payload,
-						);
-						if (parameterItem) {
-							parameterValue = parameterItem.value.toString();
-							break;
-						}
-					}
+			const githubWebhookEventInput = generationContext.inputs?.find(
+				(input) => input.type === "github-webhook-event",
+			);
+			if (githubWebhookEventInput === undefined) {
+				throw new Error("Missing github-webhook-event input");
+			}
+			for (const output of operationNode.outputs) {
+				if (
+					args.githubWebhookEvent === undefined ||
+					triggerData.configuration.provider !== "github"
+				) {
+					return null;
 				}
 
-				if (parameterValue === undefined) {
-					continue;
-				}
-
-				const output = operationNode.outputs.find(
-					(output) => output.accessor === payload,
-				);
-				if (output === undefined) {
-					continue;
-				}
-				outputs.push({
-					type: "generated-text",
-					outputId: output.id,
-					content: parameterValue,
+				const resolveOutput = resolveGitHubTrigger({
+					output,
+					githubTrigger: githubTriggers[triggerData.configuration.event.id],
+					trigger: triggerData,
+					webhookEvent: githubWebhookEventInput.webhookEvent,
 				});
+				if (resolveOutput !== null) {
+					outputs.push(resolveOutput);
+				}
 			}
 			break;
 		}
-		case "manual": {
+		case "manual":
 			for (const parameter of triggerData.configuration.event.parameters) {
 				let parameterValue: string | undefined;
 
@@ -127,7 +103,6 @@ export async function resolveTrigger(args: {
 				});
 			}
 			break;
-		}
 		default: {
 			const _exhaustiveCheck: never = triggerData.configuration;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
