@@ -50,6 +50,12 @@ function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
+			case "issueNumber":
+				inputs.push({
+					name: "issueNumber",
+					value: args.webhookEvent.data.payload.issue.number.toString(),
+				});
+				break;
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);

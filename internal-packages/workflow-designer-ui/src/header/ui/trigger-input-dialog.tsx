@@ -75,6 +75,11 @@ type GithubEventInputMap = {
 // Define the input fields for each GitHub event type
 const githubEventInputs: GithubEventInputMap = {
 	"github.issue.created": {
+		issueNumber: {
+			label: "Issue Number",
+			type: "number",
+			required: true,
+		},
 		title: {
 			label: "Title",
 			type: "text",
