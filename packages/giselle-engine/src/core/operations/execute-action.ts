@@ -111,10 +111,6 @@ async function resolveGitHubActionInputs(args: {
 				throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
 			}
 		}
-		if (sourceNode.type === "variable" && sourceNode.content.type === "text") {
-			result[parameter] = sourceNode.content.text;
-			continue;
-		}
 
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			origin: generationContext.origin,
