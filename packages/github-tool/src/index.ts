@@ -1,7 +1,6 @@
 import { graphql as gql } from "./graphql";
 export * from "./blob-loader";
 export * from "./issues";
-export { createPullRequestComment } from "./issues";
 export * from "./octokit";
 export * from "./repository";
 export * from "./tools";
