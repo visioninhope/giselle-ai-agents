@@ -92,6 +92,11 @@ const githubEventInputs: GithubEventInputMap = {
 		},
 	},
 	"github.issue.closed": {
+		issueNumber: {
+			label: "Issue Number",
+			type: "number",
+			required: true,
+		},
 		title: {
 			label: "Title",
 			type: "text",

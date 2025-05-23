@@ -25,6 +25,7 @@ export const githubIssueClosedTrigger = {
 		id: "github.issue.closed",
 		label: "Issue Closed",
 		payloads: z.object({
+			issueNumber: z.number(),
 			title: z.string(),
 			body: z.string(),
 		}),
