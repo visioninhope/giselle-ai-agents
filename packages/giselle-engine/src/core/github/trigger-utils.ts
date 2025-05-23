@@ -42,7 +42,7 @@ function resolveIssueCreatedTrigger(args: ResolveTriggerArgs) {
 		switch (payload) {
 			case "title":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -51,7 +51,7 @@ function resolveIssueCreatedTrigger(args: ResolveTriggerArgs) {
 				} satisfies GenerationOutput;
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -60,7 +60,7 @@ function resolveIssueCreatedTrigger(args: ResolveTriggerArgs) {
 				} satisfies GenerationOutput;
 			case "issueNumber":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -90,7 +90,7 @@ function resolveIssueClosedTrigger(
 		switch (payload) {
 			case "title":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -99,7 +99,7 @@ function resolveIssueClosedTrigger(
 				} satisfies GenerationOutput;
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -108,7 +108,7 @@ function resolveIssueClosedTrigger(
 				} satisfies GenerationOutput;
 			case "issueNumber":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -143,11 +143,13 @@ function resolveIssueCommentTrigger(
 		return null;
 	}
 
+	console.log(args.githubTrigger.event.payloads.keyof().options);
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		console.log(payload);
 		switch (payload) {
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -156,7 +158,7 @@ function resolveIssueCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueBody":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -165,7 +167,7 @@ function resolveIssueCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueNumber":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -174,7 +176,7 @@ function resolveIssueCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueTitle":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -204,7 +206,7 @@ function resolvePullRequestOpenedTrigger(
 		switch (payload) {
 			case "title":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -213,7 +215,7 @@ function resolvePullRequestOpenedTrigger(
 				} satisfies GenerationOutput;
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -222,7 +224,7 @@ function resolvePullRequestOpenedTrigger(
 				} satisfies GenerationOutput;
 			case "number":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -232,7 +234,7 @@ function resolvePullRequestOpenedTrigger(
 				} satisfies GenerationOutput;
 			case "pullRequestUrl":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -262,7 +264,7 @@ function resolvePullRequestReadyForReviewTrigger(
 		switch (payload) {
 			case "title":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -271,7 +273,7 @@ function resolvePullRequestReadyForReviewTrigger(
 				} satisfies GenerationOutput;
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -280,7 +282,7 @@ function resolvePullRequestReadyForReviewTrigger(
 				} satisfies GenerationOutput;
 			case "number":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -290,7 +292,7 @@ function resolvePullRequestReadyForReviewTrigger(
 				} satisfies GenerationOutput;
 			case "pullRequestUrl":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -320,7 +322,7 @@ function resolvePullRequestClosedTrigger(
 		switch (payload) {
 			case "title":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -329,7 +331,7 @@ function resolvePullRequestClosedTrigger(
 				} satisfies GenerationOutput;
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -338,7 +340,7 @@ function resolvePullRequestClosedTrigger(
 				} satisfies GenerationOutput;
 			case "number":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -348,7 +350,7 @@ function resolvePullRequestClosedTrigger(
 				} satisfies GenerationOutput;
 			case "pullRequestUrl":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -392,7 +394,7 @@ function resolvePullRequestCommentTrigger(
 		switch (payload) {
 			case "body":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -401,7 +403,7 @@ function resolvePullRequestCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueBody":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -410,7 +412,7 @@ function resolvePullRequestCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueNumber":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
@@ -419,7 +421,7 @@ function resolvePullRequestCommentTrigger(
 				} satisfies GenerationOutput;
 			case "issueTitle":
 				if (args.output.accessor !== payload) {
-					return null;
+					continue;
 				}
 				return {
 					type: "generated-text",
