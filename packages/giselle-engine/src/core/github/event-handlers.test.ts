@@ -23,6 +23,18 @@ import {
 	processEvent,
 } from "./event-handlers";
 
+// Helper function to create a mock implementation for ensureWebhookEvent
+function createEnsureWebhookEventMock(shouldMatch = true) {
+	return vi
+		.fn()
+		.mockImplementation(
+			<T extends WebhookEventName>(
+				event: WebhookEvent<WebhookEventName>,
+				expectedName: T,
+			): event is WebhookEvent<T> => shouldMatch,
+		) as unknown as typeof ensureWebhookEvent;
+}
+
 // Define test-specific types
 type TestWebhookEvent = WebhookEvent<WebhookEventName>;
 
@@ -40,14 +52,7 @@ describe("GitHub Event Handlers", () => {
 		// Simple dependency mocks with correct type implementations
 		testDeps = {
 			addReaction: vi.fn().mockResolvedValue(undefined),
-			ensureWebhookEvent: vi
-				.fn()
-				.mockImplementation(
-					<T extends WebhookEventName>(
-						event: WebhookEvent<WebhookEventName>,
-						expectedName: T,
-					): event is WebhookEvent<T> => true,
-				) as unknown as typeof ensureWebhookEvent,
+			ensureWebhookEvent: createEnsureWebhookEventMock(),
 			runFlow: vi.fn().mockResolvedValue(undefined),
 			parseCommand: vi
 				.fn()
@@ -147,14 +152,7 @@ describe("GitHub Event Handlers", () => {
 			};
 			args.deps = {
 				...args.deps,
-				ensureWebhookEvent: vi
-					.fn()
-					.mockImplementation(
-						<T extends WebhookEventName>(
-							event: WebhookEvent<WebhookEventName>,
-							expectedName: T,
-						): event is WebhookEvent<T> => false,
-					) as unknown as typeof ensureWebhookEvent,
+				ensureWebhookEvent: createEnsureWebhookEventMock(false),
 			};
 
 			// Act
@@ -253,6 +251,309 @@ describe("GitHub Event Handlers", () => {
 
 			// Act
 			const result = await handleIssueCommentCreated(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(false);
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handleIssueClosed", () => {
+		it("should handle issue closed event and add reaction", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "issues.closed",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							issue: { node_id: "issue-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.closed";
+
+			// Act
+			const result = await handleIssueClosed(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(true);
+			expect(args.deps.addReaction).toHaveBeenCalledWith({
+				id: "issue-node-id",
+				content: "EYES",
+				authConfig: args.authConfig,
+			});
+		});
+
+		it("should not run if trigger event ID doesn't match", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "issues.closed",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							issue: { node_id: "issue-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.created";
+
+			// Act
+			const result = await handleIssueClosed(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(false);
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handlePullRequestOpened", () => {
+		it("should handle pull request opened event and add reaction", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.opened",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.pull_request.opened";
+
+			// Act
+			const result = await handlePullRequestOpened(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(true);
+			expect(args.deps.addReaction).toHaveBeenCalledWith({
+				id: "pr-node-id",
+				content: "EYES",
+				authConfig: args.authConfig,
+			});
+		});
+
+		it("should not run if trigger event ID doesn't match", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.opened",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.created";
+
+			// Act
+			const result = await handlePullRequestOpened(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(false);
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handlePullRequestClosed", () => {
+		it("should handle pull request closed event and add reaction", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.closed",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.pull_request.closed";
+
+			// Act
+			const result = await handlePullRequestClosed(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(true);
+			expect(args.deps.addReaction).toHaveBeenCalledWith({
+				id: "pr-node-id",
+				content: "EYES",
+				authConfig: args.authConfig,
+			});
+		});
+
+		it("should not run if trigger event ID doesn't match", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.closed",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.created";
+
+			// Act
+			const result = await handlePullRequestClosed(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(false);
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handlePullRequestCommentCreated", () => {
+		it("should handle pull request comment created event with matching callsign", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "issue_comment.created",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							issue: {
+								pull_request: {},
+							},
+							comment: {
+								node_id: "comment-node-id",
+								body: "@giselle help me",
+							},
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id =
+				"github.pull_request_comment.created";
+
+			// Act
+			const result = await handlePullRequestCommentCreated(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(true);
+			expect(args.deps.parseCommand).toHaveBeenCalledWith("@giselle help me");
+			expect(args.deps.addReaction).toHaveBeenCalledWith({
+				id: "comment-node-id",
+				content: "EYES",
+				authConfig: args.authConfig,
+			});
+		});
+
+		it("should not run if callsign doesn't match", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "issue_comment.created",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							issue: {
+								pull_request: {},
+							},
+							comment: {
+								node_id: "comment-node-id",
+								body: "@someone help me",
+							},
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id =
+				"github.pull_request_comment.created";
+			args.deps = {
+				...args.deps,
+				parseCommand: vi.fn().mockReturnValue({
+					callsign: "someone",
+					content: "help me",
+				}),
+			};
+
+			// Act
+			const result = await handlePullRequestCommentCreated(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(false);
+			expect(args.deps.addReaction).not.toHaveBeenCalled();
+		});
+	});
+
+	describe("handlePullRequestReadyForReview", () => {
+		it("should handle pull request ready for review event and add reaction", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.ready_for_review",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id =
+				"github.pull_request.ready_for_review";
+
+			// Act
+			const result = await handlePullRequestReadyForReview(args);
+
+			// Assert
+			expect(result.shouldRun).toBe(true);
+			expect(args.deps.addReaction).toHaveBeenCalledWith({
+				id: "pr-node-id",
+				content: "EYES",
+				authConfig: args.authConfig,
+			});
+		});
+
+		it("should not run if trigger event ID doesn't match", async () => {
+			// Arrange
+			const args = {
+				...baseEventArgs,
+				event: {
+					name: "pull_request.ready_for_review",
+					data: {
+						payload: {
+							installation: { id: 12345 },
+							repository: { node_id: "repo-node-id" },
+							pull_request: { node_id: "pr-node-id" },
+						},
+					},
+				} as TestWebhookEvent,
+			};
+			args.trigger.configuration.event.id = "github.issue.created";
+
+			// Act
+			const result = await handlePullRequestReadyForReview(args);
 
 			// Assert
 			expect(result.shouldRun).toBe(false);
