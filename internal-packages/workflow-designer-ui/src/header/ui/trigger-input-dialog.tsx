@@ -332,7 +332,7 @@ export function TriggerInputDialog({
 				);
 			}
 		},
-		[node.id, data, createGeneration, startGeneration],
+		[node.id, data, createGeneration, startGeneration, inputs],
 	);
 
 	if (isLoading || trigger === undefined) {
