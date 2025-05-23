@@ -14,9 +14,6 @@ export type FirecrawlWebSearchProvider = z.infer<
 	typeof FirecrawlWebSearchProvider
 >;
 
-const apiKey = process.env.FIRECRAWL_API_KEY || "";
-const firecrawlApp = new FirecrawlApp({ apiKey });
-
 export const ALLOWED_SCRAPE_FORMATS = ["markdown", "html"] as const;
 
 export type AllowedScrapeFormats = (typeof ALLOWED_SCRAPE_FORMATS)[number];
@@ -30,6 +27,7 @@ export type FirecrawlScrapeResult = {
 
 export async function scrapeUrl(
 	url: string,
+	apiKey: string,
 	formats: AllowedScrapeFormats[] = [...ALLOWED_SCRAPE_FORMATS],
 ): Promise<FirecrawlScrapeResult> {
 	try {
@@ -37,6 +35,7 @@ export async function scrapeUrl(
 	} catch {
 		throw new Error(`Invalid URL: ${url}`);
 	}
+	const firecrawlApp = new FirecrawlApp({ apiKey });
 	const timeoutMs = 10000;
 	const timeoutPromise: Promise<never> = new Promise((_, reject) =>
 		setTimeout(

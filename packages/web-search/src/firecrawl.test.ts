@@ -3,10 +3,11 @@ import { scrapeUrl } from "./firecrawl";
 
 const TEST_URL = "https://example.com/";
 const HEAVY_TEST_TIMEOUT = 20000;
+const apiKey = process.env.FIRECRAWL_API_KEY || "";
 
 describe("scrapeUrl (invalid URL)", () => {
 	it("should throw on invalid URL", async () => {
-		await expect(scrapeUrl("not-a-url")).rejects.toThrow();
+		await expect(scrapeUrl("not-a-url", apiKey)).rejects.toThrow();
 	});
 });
 
@@ -17,7 +18,7 @@ const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 	it(
 		"should scrape a valid URL and return html (markdown empty)",
 		async () => {
-			const result = await scrapeUrl(TEST_URL, ["html"]);
+			const result = await scrapeUrl(TEST_URL, apiKey, ["html"]);
 			expect(result).toHaveProperty("html");
 			expect(result).toHaveProperty("markdown");
 			expect(typeof result.html).toBe("string");
@@ -29,7 +30,7 @@ const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 	it(
 		"should scrape a valid URL and return markdown (html empty)",
 		async () => {
-			const result = await scrapeUrl(TEST_URL, ["markdown"]);
+			const result = await scrapeUrl(TEST_URL, apiKey, ["markdown"]);
 			expect(result).toHaveProperty("html");
 			expect(result).toHaveProperty("markdown");
 			expect(result.html).toBe("");
@@ -42,7 +43,7 @@ const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 	it(
 		"should scrape a valid URL and return both html and markdown",
 		async () => {
-			const result = await scrapeUrl(TEST_URL, ["html", "markdown"]);
+			const result = await scrapeUrl(TEST_URL, apiKey, ["html", "markdown"]);
 			expect(result).toHaveProperty("html");
 			expect(result).toHaveProperty("markdown");
 			expect(typeof result.html).toBe("string");
