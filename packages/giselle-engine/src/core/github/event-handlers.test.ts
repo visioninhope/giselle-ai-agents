@@ -1,4 +1,5 @@
-import type { FlowTrigger, FlowTriggerId } from "@giselle-sdk/data-type";
+import type { FlowTrigger } from "@giselle-sdk/data-type";
+import { FlowTriggerId } from "@giselle-sdk/data-type";
 import {
 	type GitHubAuthConfig,
 	type WebhookEvent,
@@ -33,8 +34,8 @@ type TestWebhookEvent = WebhookEvent<WebhookEventName> & {
 	};
 };
 
-// Mock ID generators
-const mockFlowTriggerId = "fltg-test-trigger" as FlowTriggerId;
+// Generate a valid test trigger ID
+const mockFlowTriggerId = FlowTriggerId.generate();
 
 // Mock dependencies
 vi.mock("@giselle-sdk/github-tool", () => ({
