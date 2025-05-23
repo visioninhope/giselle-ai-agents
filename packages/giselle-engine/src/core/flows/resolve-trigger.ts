@@ -1,7 +1,7 @@
 import {
 	type CompletedGeneration,
 	GenerationContext,
-	type GenerationInput,
+	type GenerationContextInput,
 	type GenerationOutput,
 	type QueuedGeneration,
 	isTriggerNode,
@@ -37,7 +37,7 @@ export async function resolveTrigger(args: {
 
 	const generationContext = GenerationContext.parse(args.generation.context);
 
-	let githubWebhookInputs: GenerationInput[] | null = null;
+	let githubWebhookInputs: GenerationContextInput | null = null;
 	if (
 		args.githubWebhookEvent !== undefined &&
 		isWebhookEvent(args.githubWebhookEvent) &&
@@ -54,15 +54,28 @@ export async function resolveTrigger(args: {
 	switch (triggerData.configuration.provider) {
 		case "github": {
 			const trigger = githubTriggers[triggerData.configuration.event.id];
-			const inputsToUse = githubWebhookInputs ?? generationContext.inputs ?? [];
+			const inputsToUse = githubWebhookInputs
+				? [githubWebhookInputs]
+				: (generationContext.inputs ?? []);
 			for (const payload of trigger.event.payloads.keyof().options) {
-				const input = inputsToUse.find(
-					(i): i is GenerationInput & { type: "keyValue" } =>
-						i.type === "keyValue" && i.name === payload,
-				);
-				if (input === undefined) {
+				let parameterValue: string | undefined;
+
+				for (const input of inputsToUse) {
+					if (input.type === "parameters") {
+						const parameterItem = input.items.find(
+							(item) => item.name === payload,
+						);
+						if (parameterItem) {
+							parameterValue = parameterItem.value.toString();
+							break;
+						}
+					}
+				}
+
+				if (parameterValue === undefined) {
 					continue;
 				}
+
 				const output = operationNode.outputs.find(
 					(output) => output.accessor === payload,
 				);
@@ -72,20 +85,34 @@ export async function resolveTrigger(args: {
 				outputs.push({
 					type: "generated-text",
 					outputId: output.id,
-					content: input.value,
+					content: parameterValue,
 				});
 			}
 			break;
 		}
 		case "manual": {
 			for (const parameter of triggerData.configuration.event.parameters) {
-				const input = generationContext.inputs?.find(
-					(i): i is GenerationInput & { type: "keyValue" } =>
-						i.type === "keyValue" && i.name === parameter.id,
+				let parameterValue: string | undefined;
+
+				// Find parameter in ParametersInput
+				const parametersInput = generationContext.inputs?.find(
+					(i): i is GenerationContextInput & { type: "parameters" } =>
+						i.type === "parameters",
 				);
-				if (input === undefined) {
+
+				if (parametersInput) {
+					const parameterItem = parametersInput.items.find(
+						(item) => item.name === parameter.id,
+					);
+					if (parameterItem) {
+						parameterValue = parameterItem.value.toString();
+					}
+				}
+
+				if (parameterValue === undefined) {
 					continue;
 				}
+
 				const output = operationNode.outputs.find(
 					(output) => output.accessor === parameter.id,
 				);
@@ -96,7 +123,7 @@ export async function resolveTrigger(args: {
 				outputs.push({
 					type: "generated-text",
 					outputId: output.id,
-					content: input.value,
+					content: parameterValue,
 				});
 			}
 			break;

@@ -4,8 +4,8 @@ import {
 	FlowTrigger,
 	FlowTriggerId,
 	Generation,
+	GenerationContextInput,
 	GenerationId,
-	GenerationInput,
 	GenerationOrigin,
 	NodeId,
 	OverrideNode,
@@ -302,7 +302,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
-				triggerInputs: z.array(GenerationInput).optional(),
+				triggerInputs: GenerationContextInput.optional(),
 				payload: z.unknown().optional(),
 			}),
 			handler: async ({ input }) => {

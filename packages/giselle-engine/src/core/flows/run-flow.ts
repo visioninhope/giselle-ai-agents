@@ -1,7 +1,7 @@
 import {
 	type FlowTriggerId,
+	type GenerationContextInput,
 	GenerationId,
-	type GenerationInput,
 	type QueuedGeneration,
 	RunId,
 } from "@giselle-sdk/data-type";
@@ -17,7 +17,7 @@ import { getFlowTrigger } from "./utils";
 export async function runFlow(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
-	triggerInputs?: GenerationInput[];
+	triggerInputs?: GenerationContextInput;
 	payload?: unknown;
 }) {
 	const trigger = await getFlowTrigger({
@@ -58,7 +58,9 @@ export async function runFlow(args: {
 						},
 						inputs:
 							operationNode.content.type === "trigger"
-								? (args.triggerInputs ?? [])
+								? args.triggerInputs
+									? [args.triggerInputs]
+									: []
 								: [],
 					},
 					status: "queued",

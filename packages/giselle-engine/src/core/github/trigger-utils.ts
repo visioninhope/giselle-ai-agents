@@ -1,4 +1,8 @@
-import type { FlowTrigger, GenerationInput } from "@giselle-sdk/data-type";
+import type {
+	FlowTrigger,
+	GenerationContextInput,
+	ParameterItem,
+} from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type WebhookEvent,
@@ -15,8 +19,8 @@ interface BuildTriggerInputsArgs {
 }
 export function buildTriggerInputs(
 	args: BuildTriggerInputsArgs,
-): GenerationInput[] | null {
-	const inputs: GenerationInput[] = [
+): GenerationContextInput | null {
+	const items = [
 		...buildIssueCreatedInputs(args),
 		...buildIssueClosedInputs(args),
 		...buildIssueCommentInputs(args),
@@ -26,36 +30,44 @@ export function buildTriggerInputs(
 		...buildPullRequestCommentInputs(args),
 	];
 
-	return inputs.length > 0 ? inputs : null;
+	return items.length > 0
+		? {
+				type: "parameters",
+				items,
+			}
+		: null;
 }
 
-function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
+function buildIssueCreatedInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "issues.opened") ||
 		args.githubTrigger.event.id !== "github.issue.created"
 	) {
 		return [];
 	}
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({
+				items.push({
 					name: "title",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.title,
 				});
 				break;
 			case "body":
-				inputs.push({
-					type: "keyValue",
+				items.push({
 					name: "body",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
-				inputs.push({
-					type: "keyValue",
+				items.push({
 					name: "issueNumber",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});
 				break;
@@ -65,10 +77,10 @@ function buildIssueCreatedInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildIssueClosedInputs(args: BuildTriggerInputsArgs) {
+function buildIssueClosedInputs(args: BuildTriggerInputsArgs): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "issues.closed") ||
 		args.githubTrigger.event.id !== "github.issue.closed"
@@ -76,24 +88,27 @@ function buildIssueClosedInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({
+				items.push({
 					name: "title",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.title,
 				});
 				break;
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
-				inputs.push({
+				items.push({
 					name: "issueNumber",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});
 				break;
@@ -103,10 +118,12 @@ function buildIssueClosedInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildIssueCommentInputs(args: BuildTriggerInputsArgs) {
+function buildIssueCommentInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "issue_comment.created") ||
 		args.trigger.configuration.event.id !== "github.issue_comment.created" ||
@@ -123,30 +140,34 @@ function buildIssueCommentInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: command.content,
 				});
 				break;
 			case "issueBody":
-				inputs.push({
+				items.push({
 					name: "issueBody",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
-				inputs.push({
+				items.push({
 					name: "issueNumber",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});
 				break;
 			case "issueTitle":
-				inputs.push({
+				items.push({
 					name: "issueTitle",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.title,
 				});
 				break;
@@ -156,10 +177,12 @@ function buildIssueCommentInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildPullRequestOpenedInputs(args: BuildTriggerInputsArgs) {
+function buildPullRequestOpenedInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.opened") ||
 		args.githubTrigger.event.id !== "github.pull_request.opened"
@@ -167,30 +190,34 @@ function buildPullRequestOpenedInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({
+				items.push({
 					name: "title",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.title,
 				});
 				break;
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.body ?? "",
 				});
 				break;
 			case "number":
-				inputs.push({
+				items.push({
 					name: "number",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.number.toString(),
 				});
 				break;
 			case "pullRequestUrl":
-				inputs.push({
+				items.push({
 					name: "pullRequestUrl",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.html_url,
 				});
 				break;
@@ -200,10 +227,12 @@ function buildPullRequestOpenedInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildPullRequestReadyForReviewInputs(args: BuildTriggerInputsArgs) {
+function buildPullRequestReadyForReviewInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.ready_for_review") ||
 		args.githubTrigger.event.id !== "github.pull_request.ready_for_review"
@@ -211,30 +240,34 @@ function buildPullRequestReadyForReviewInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({
+				items.push({
 					name: "title",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.title,
 				});
 				break;
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.body ?? "",
 				});
 				break;
 			case "number":
-				inputs.push({
+				items.push({
 					name: "number",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.number.toString(),
 				});
 				break;
 			case "pullRequestUrl":
-				inputs.push({
+				items.push({
 					name: "pullRequestUrl",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.html_url,
 				});
 				break;
@@ -244,10 +277,12 @@ function buildPullRequestReadyForReviewInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildPullRequestClosedInputs(args: BuildTriggerInputsArgs) {
+function buildPullRequestClosedInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.closed") ||
 		args.githubTrigger.event.id !== "github.pull_request.closed"
@@ -255,30 +290,34 @@ function buildPullRequestClosedInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "title":
-				inputs.push({
+				items.push({
 					name: "title",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.title,
 				});
 				break;
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.body ?? "",
 				});
 				break;
 			case "number":
-				inputs.push({
+				items.push({
 					name: "number",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.number.toString(),
 				});
 				break;
 			case "pullRequestUrl":
-				inputs.push({
+				items.push({
 					name: "pullRequestUrl",
+					type: "string",
 					value: args.webhookEvent.data.payload.pull_request.html_url,
 				});
 				break;
@@ -288,10 +327,12 @@ function buildPullRequestClosedInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
 
-function buildPullRequestCommentInputs(args: BuildTriggerInputsArgs) {
+function buildPullRequestCommentInputs(
+	args: BuildTriggerInputsArgs,
+): ParameterItem[] {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "issue_comment.created") ||
 		args.trigger.configuration.event.id !==
@@ -313,30 +354,34 @@ function buildPullRequestCommentInputs(args: BuildTriggerInputsArgs) {
 		return [];
 	}
 
-	const inputs: GenerationInput[] = [];
+	const items: ParameterItem[] = [];
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
 		switch (payload) {
 			case "body":
-				inputs.push({
+				items.push({
 					name: "body",
+					type: "string",
 					value: command.content,
 				});
 				break;
 			case "issueBody":
-				inputs.push({
+				items.push({
 					name: "issueBody",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.body ?? "",
 				});
 				break;
 			case "issueNumber":
-				inputs.push({
+				items.push({
 					name: "issueNumber",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.number.toString(),
 				});
 				break;
 			case "issueTitle":
-				inputs.push({
+				items.push({
 					name: "issueTitle",
+					type: "string",
 					value: args.webhookEvent.data.payload.issue.title,
 				});
 				break;
@@ -346,5 +391,5 @@ function buildPullRequestCommentInputs(args: BuildTriggerInputsArgs) {
 			}
 		}
 	}
-	return inputs;
+	return items;
 }
