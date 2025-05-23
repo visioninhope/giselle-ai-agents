@@ -39,22 +39,6 @@ export const GenerationOrigin = z.discriminatedUnion("type", [
 ]);
 export type GenerationOrigin = z.infer<typeof GenerationOrigin>;
 
-export type JsonPrimitive = string | number | boolean | null;
-export type JsonValue = JsonPrimitive | JsonObject | JsonValue[];
-export interface JsonObject {
-	[key: string]: JsonValue;
-}
-export const JsonValue: z.ZodType<JsonValue> = z.lazy(() =>
-	z.union([
-		z.string(),
-		z.number(),
-		z.boolean(),
-		z.null(),
-		z.array(JsonValue),
-		z.record(JsonValue),
-	]),
-);
-
 export const StringParameterItem = z.object({
 	name: z.string(),
 	type: z.literal("string"),
@@ -84,7 +68,7 @@ export type ParametersInput = z.infer<typeof ParametersInput>;
 export const PayloadInput = z.object({
 	type: z.literal("payload"),
 	event: z.string(),
-	payload: JsonValue,
+	payload: z.any(),
 });
 export type PayloadInput = z.infer<typeof PayloadInput>;
 
