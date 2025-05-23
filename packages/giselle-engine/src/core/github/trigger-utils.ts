@@ -23,6 +23,7 @@ export function buildTriggerInputs(
 		...buildPullRequestOpenedInputs(args),
 		...buildPullRequestReadyForReviewInputs(args),
 		...buildPullRequestClosedInputs(args),
+		...buildPullRequestCommentInputs(args),
 	];
 
 	return inputs.length > 0 ? inputs : null;
@@ -265,6 +266,64 @@ function buildPullRequestClosedInputs(args: BuildTriggerInputsArgs) {
 				inputs.push({
 					name: "pullRequestUrl",
 					value: args.webhookEvent.data.payload.pull_request.html_url,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return inputs;
+}
+
+function buildPullRequestCommentInputs(args: BuildTriggerInputsArgs) {
+	if (
+		!ensureWebhookEvent(args.webhookEvent, "issue_comment.created") ||
+		args.trigger.configuration.event.id !==
+			"github.pull_request_comment.created" ||
+		args.githubTrigger.event.id !== "github.pull_request_comment.created"
+	) {
+		return [];
+	}
+
+	if (args.webhookEvent.data.payload.issue?.pull_request === null) {
+		return [];
+	}
+
+	const command = parseCommand(args.webhookEvent.data.payload.comment.body);
+	if (
+		command === null ||
+		command.callsign !== args.trigger.configuration.event.conditions.callsign
+	) {
+		return [];
+	}
+
+	const inputs: GenerationInput[] = [];
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "body":
+				inputs.push({
+					name: "body",
+					value: command.content,
+				});
+				break;
+			case "issueBody":
+				inputs.push({
+					name: "issueBody",
+					value: args.webhookEvent.data.payload.issue.body ?? "",
+				});
+				break;
+			case "issueNumber":
+				inputs.push({
+					name: "issueNumber",
+					value: args.webhookEvent.data.payload.issue.number.toString(),
+				});
+				break;
+			case "issueTitle":
+				inputs.push({
+					name: "issueTitle",
+					value: args.webhookEvent.data.payload.issue.title,
 				});
 				break;
 			default: {
