@@ -11,6 +11,7 @@ import { runFlow } from "../flows";
 import { getFlowTrigger } from "../flows/utils";
 import { getGitHubRepositoryIntegrationIndex } from "../integrations/utils";
 import type { GiselleEngineContext } from "../types";
+import { type Dependencies, defaultDeps, processEvent, type EventPayload } from "./event-handlers";
 import { parseCommand } from "./utils";
 
 const events: WebhookEventName[] = [
@@ -34,7 +35,7 @@ export async function handleGitHubWebhookV2(args: {
 	const dispatch = async (
 		event: WebhookEvent<WebhookEventName>,
 	): Promise<void> =>
-		process({
+		processWebhookEvent({
 			event,
 			context: args.context,
 		});
@@ -82,160 +83,89 @@ function hasRequiredPayloadProps(event: unknown): event is {
 		"id" in event.data.payload.installation
 	);
 }
+export interface ProcessDeps {
+	addReaction: typeof addReaction;
+	ensureWebhookEvent: typeof ensureWebhookEvent;
+	runFlow: typeof runFlow;
+	parseCommand: typeof parseCommand;
+	getFlowTrigger: typeof getFlowTrigger;
+	getGitHubRepositoryIntegrationIndex: typeof getGitHubRepositoryIntegrationIndex;
+}
+
+export async function processWebhookEvent<
+	TEventName extends WebhookEventName,
+>(args: {
+	event: WebhookEvent<TEventName>;
+	context: GiselleEngineContext;
+	deps?: Partial<ProcessDeps>;
+}) {
+	const deps: ProcessDeps = {
+		addReaction,
+		ensureWebhookEvent,
+		runFlow,
+		parseCommand,
+		getFlowTrigger,
+		getGitHubRepositoryIntegrationIndex,
+		...args.deps,
+	};
+
+	await process({
+		event: args.event,
+		context: args.context,
+		deps,
+	});
+}
+
 async function process<TEventName extends WebhookEventName>(args: {
 	event: WebhookEvent<TEventName>;
 	context: GiselleEngineContext;
+	deps: ProcessDeps;
 }) {
 	if (!hasRequiredPayloadProps(args.event)) {
 		return;
 	}
-	const installationId = args.event.data.payload.installation.id;
-	const githubRepositoryIntegration = await getGitHubRepositoryIntegrationIndex(
-		{
+
+	const githubRepositoryIntegration =
+		await args.deps.getGitHubRepositoryIntegrationIndex({
 			storage: args.context.storage,
 			repositoryNodeId: args.event.data.payload.repository.node_id,
-		},
-	);
+		});
 
 	if (githubRepositoryIntegration === undefined) {
 		return;
 	}
+
 	await Promise.all(
 		githubRepositoryIntegration.flowTriggerIds.map(async (flowTriggerId) => {
-			const trigger = await getFlowTrigger({
+			const trigger = await args.deps.getFlowTrigger({
 				storage: args.context.storage,
 				flowTriggerId,
 			});
-
-			if (!trigger.enable || trigger.configuration.provider !== "github") {
-				return;
-			}
 
 			const githubAuthV2 = args.context.integrationConfigs?.github?.authV2;
 			if (githubAuthV2 === undefined) {
 				throw new Error("GitHub authV2 configuration is missing");
 			}
-			const authConfig = {
+
+			const createAuthConfig = (installationId: number): GitHubAuthConfig => ({
 				strategy: "app-installation",
 				appId: githubAuthV2.appId,
 				privateKey: githubAuthV2.privateKey,
 				installationId,
-			} satisfies GitHubAuthConfig;
+			});
 
-			let run = false;
-			if (
-				ensureWebhookEvent(args.event, "issues.opened") &&
-				trigger.configuration.event.id === "github.issue.created"
-			) {
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.issue.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				ensureWebhookEvent(args.event, "issues.closed") &&
-				trigger.configuration.event.id === "github.issue.closed"
-			) {
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.issue.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				ensureWebhookEvent(args.event, "issue_comment.created") &&
-				trigger.configuration.event.id === "github.issue_comment.created"
-			) {
-				const command = parseCommand(args.event.data.payload.comment.body);
-				if (
-					command?.callsign !== trigger.configuration.event.conditions.callsign
-				) {
-					return;
-				}
-
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.comment.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				(ensureWebhookEvent(args.event, "issue_comment.created") &&
-					trigger.configuration.event.id ===
-						"github.pull_request_comment.created" &&
-					args.event.data.payload.issue.pull_request !== null) ||
-				(ensureWebhookEvent(
-					args.event,
-					"pull_request_review_comment.created",
-				) &&
-					trigger.configuration.event.id ===
-						"github.pull_request_comment.created")
-			) {
-				const command = parseCommand(args.event.data.payload.comment.body);
-				if (
-					command?.callsign !== trigger.configuration.event.conditions.callsign
-				) {
-					return;
-				}
-
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.comment.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				ensureWebhookEvent(args.event, "pull_request.opened") &&
-				trigger.configuration.event.id === "github.pull_request.opened"
-			) {
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.pull_request.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				ensureWebhookEvent(args.event, "pull_request.ready_for_review") &&
-				trigger.configuration.event.id ===
-					"github.pull_request.ready_for_review"
-			) {
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.pull_request.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-
-			if (
-				ensureWebhookEvent(args.event, "pull_request.closed") &&
-				trigger.configuration.event.id === "github.pull_request.closed"
-			) {
-				run = true;
-				await addReaction({
-					id: args.event.data.payload.pull_request.node_id,
-					content: "EYES",
-					authConfig,
-				});
-			}
-			if (run) {
-				runFlow({
-					context: args.context,
-					triggerId: trigger.id,
-					payload: args.event,
-				});
-			}
+			await processEvent({
+				event: args.event as WebhookEvent<TEventName> & { data: { payload: EventPayload } },
+				context: args.context,
+				trigger,
+				createAuthConfig,
+				deps: {
+					addReaction: args.deps.addReaction,
+					ensureWebhookEvent: args.deps.ensureWebhookEvent,
+					runFlow: args.deps.runFlow,
+					parseCommand: args.deps.parseCommand,
+				},
+			});
 		}),
 	);
 }
