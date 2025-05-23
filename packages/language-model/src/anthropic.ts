@@ -91,7 +91,6 @@ export const models = [
 	claude37Sonnet,
 	claude35Sonnet,
 	claude35Haiku,
-
 ];
 
 export const LanguageModel = AnthropicLanguageModel;
