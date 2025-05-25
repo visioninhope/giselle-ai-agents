@@ -2,14 +2,13 @@ import type { GenerationId, GenerationIndex } from "@giselle-sdk/data-type";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { parseAndMod } from "@giselle-sdk/data-mod";
 import { getGeneration, setGenerationIndex } from "./utils";
 
 // Mock parseAndMod to track when it's called
 vi.mock("@giselle-sdk/data-mod", () => ({
 	parseAndMod: vi.fn((schema, data) => {
-		// Add a marker to distinguish parseAndMod from regular parse
-		const result = schema.parse(data);
-		return { ...result, _modApplied: true };
+		return schema.parse(data);
 	}),
 }));
 
@@ -65,7 +64,8 @@ describe("getGeneration", () => {
 
 	beforeEach(async () => {
 		await storage.clear();
-
+		vi.mocked(parseAndMod).mockClear();
+		
 		// Set up generation index
 		await setGenerationIndex({
 			storage,
@@ -85,8 +85,9 @@ describe("getGeneration", () => {
 		});
 
 		expect(result).toBeDefined();
-		expect(result?._modApplied).toBe(true);
-		expect(result?.context._modApplied).toBe(true);
+		expect(vi.mocked(parseAndMod)).toHaveBeenCalledTimes(2); // Called for Generation and GenerationContext
+		expect(result?.id).toBe(generationId);
+		expect(result?.status).toBe("completed");
 	});
 
 	test("should use parseAndMod when skipMod is undefined", async () => {
@@ -96,8 +97,9 @@ describe("getGeneration", () => {
 		});
 
 		expect(result).toBeDefined();
-		expect(result?._modApplied).toBe(true);
-		expect(result?.context._modApplied).toBe(true);
+		expect(vi.mocked(parseAndMod)).toHaveBeenCalledTimes(2); // Called for Generation and GenerationContext
+		expect(result?.id).toBe(generationId);
+		expect(result?.status).toBe("completed");
 	});
 
 	test("should use regular parse when skipMod is true", async () => {
@@ -108,8 +110,7 @@ describe("getGeneration", () => {
 		});
 
 		expect(result).toBeDefined();
-		expect(result?._modApplied).toBeUndefined();
-		expect(result?.context._modApplied).toBeUndefined();
+		expect(vi.mocked(parseAndMod)).not.toHaveBeenCalled(); // parseAndMod should not be called when skipMod is true
 		expect(result?.id).toBe(generationId);
 		expect(result?.status).toBe("completed");
 	});
