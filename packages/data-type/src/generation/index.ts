@@ -55,7 +55,7 @@ export const GenerationStatus = z.union([
 export const GenerationError = z.object({
 	name: z.string(),
 	message: z.string(),
-	dump: z.any(),
+	dump: z.any().optional(),
 });
 
 /**
@@ -77,7 +77,7 @@ export const Generation = z
 		cancelledAt: z.number().optional(),
 
 		// Optional content fields
-		messages: z.array(Message).optional().or(z.undefined()),
+		messages: z.array(Message).optional(),
 		outputs: z.array(GenerationOutput).optional(),
 		error: GenerationError.optional(),
 	})
@@ -141,7 +141,7 @@ export type CreatedGeneration = z.infer<typeof CreatedGeneration>;
  * Type guard to check if a Generation is a CreatedGeneration
  */
 export function isCreatedGeneration(
-	generation: Generation,
+	generation: unknown,
 ): generation is CreatedGeneration {
 	return CreatedGeneration.safeParse(generation).success;
 }
@@ -152,17 +152,14 @@ export const QueuedGeneration = z.object({
 	status: GenerationStatusQueued,
 	createdAt: z.number(),
 	queuedAt: z.number(),
-	messages: z.undefined(),
 });
 export type QueuedGeneration = z.infer<typeof QueuedGeneration>;
 
 /**
  * Type guard to check if a Generation is a QueuedGeneration
  */
-export function isQueuedGeneration(
-	generation: Generation,
-): generation is QueuedGeneration {
-	return QueuedGeneration.safeParse(generation).success;
+export function isQueuedGeneration(data: unknown): data is QueuedGeneration {
+	return QueuedGeneration.safeParse(data).success;
 }
 
 export const RunningGeneration = z.object({
@@ -180,7 +177,7 @@ export type RunningGeneration = z.infer<typeof RunningGeneration>;
  * Type guard to check if a Generation is a RunningGeneration
  */
 export function isRunningGeneration(
-	generation: Generation,
+	generation: unknown,
 ): generation is RunningGeneration {
 	return RunningGeneration.safeParse(generation).success;
 }
@@ -202,7 +199,7 @@ export type CompletedGeneration = z.infer<typeof CompletedGeneration>;
  * Type guard to check if a Generation is a CompletedGeneration
  */
 export function isCompletedGeneration(
-	generation: Generation,
+	generation: unknown,
 ): generation is CompletedGeneration {
 	return CompletedGeneration.safeParse(generation).success;
 }
@@ -224,7 +221,7 @@ export type FailedGeneration = z.infer<typeof FailedGeneration>;
  * Type guard to check if a Generation is a FailedGeneration
  */
 export function isFailedGeneration(
-	generation: Generation,
+	generation: unknown,
 ): generation is FailedGeneration {
 	return FailedGeneration.safeParse(generation).success;
 }
