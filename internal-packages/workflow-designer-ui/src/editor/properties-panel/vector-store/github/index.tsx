@@ -1,6 +1,6 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
 import { useVectorStore, useWorkflowDesigner } from "giselle-sdk/react";
-import Link from "next/link"; // Next.jsのLinkコンポーネントをインポート
+import Link from "next/link";
 import { useMemo } from "react";
 import {
 	Select,
