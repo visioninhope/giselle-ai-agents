@@ -225,9 +225,6 @@ export function Toolbar() {
 					onValueChange={(value) => {
 						if (isToolAction(value)) {
 							switch (value) {
-								case "addTextNode":
-									setSelectedTool(addNodeTool(textNode()));
-									break;
 								case "selectLanguageModel":
 									setSelectedTool(selectLanguageModelTool());
 									break;
