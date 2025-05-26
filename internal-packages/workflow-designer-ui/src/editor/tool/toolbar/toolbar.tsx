@@ -932,7 +932,7 @@ export function Toolbar() {
 													<p className="text-[14px]">Text</p>
 												</ToggleGroup.Item>
 												{webPageFileNode && (
-													<ToggleGroup.Item value="webpage" data-tool>
+													<ToggleGroup.Item value="webPage" data-tool>
 														<WebPageFileIcon className="w-[20px] h-[20px]" />
 														<p className="text-[14px]">Web Page</p>
 													</ToggleGroup.Item>
