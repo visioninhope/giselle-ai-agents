@@ -70,7 +70,7 @@ export const GitHubWebhookEventInput = z.object({
 	type: z.literal("github-webhook-event"),
 	webhookEvent: z.custom<WebhookEvent>(),
 });
-export type PayloadInput = z.infer<typeof GitHubWebhookEventInput>;
+export type GitHubWebhookEventInput = z.infer<typeof GitHubWebhookEventInput>;
 
 export const GenerationContextInput = z.discriminatedUnion("type", [
 	ParametersInput,
