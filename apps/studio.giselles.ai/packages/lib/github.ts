@@ -4,6 +4,7 @@ import { db, type githubIntegrationSettings } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import type {
+	GitHubIntegrationErrorState,
 	GitHubIntegrationInstalledState,
 	GitHubIntegrationInvalidCredentialState,
 	GitHubIntegrationNotInstalledState,
@@ -23,6 +24,12 @@ export async function getGitHubIntegrationState(
 	if (identityState.status === "invalid-credential") {
 		return {
 			status: identityState.status,
+		};
+	}
+	if (identityState.status === "error") {
+		return {
+			status: "error",
+			error: identityState.error.message,
 		};
 	}
 
@@ -76,6 +83,7 @@ export type GitHubIntegrationState = (
 	| GitHubIntegrationInvalidCredentialState
 	| GitHubIntegrationNotInstalledState
 	| GitHubIntegrationInstalledState
+	| GitHubIntegrationErrorState
 ) &
 	GitHubIntegrationSettingState;
 

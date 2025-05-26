@@ -10,7 +10,8 @@ import { getOauthCredential } from "./oauth-credentials";
 type GitHubIdentityState =
 	| GitHubIdentityStateUnauthorized
 	| GitHubIdentityStateInvalidCredential
-	| GitHubIdentityStateAuthorized;
+	| GitHubIdentityStateAuthorized
+	| GitHubIdentityStateError;
 
 type GitHubIdentityStateUnauthorized = {
 	status: "unauthorized";
@@ -24,6 +25,11 @@ type GitHubIdentityStateAuthorized = {
 	gitHubUser: components["schemas"]["simple-user"];
 	gitHubUserClient: GitHubUserClient;
 	unlinkable: boolean;
+};
+
+type GitHubIdentityStateError = {
+	status: "error";
+	error: Error;
 };
 
 export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
@@ -40,10 +46,14 @@ export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
 			(supabaseUser.identities && supabaseUser.identities.length > 1) ?? false;
 
 		return { status: "authorized", gitHubUser, gitHubUserClient, unlinkable };
-	} catch (error) {
+	} catch (error: unknown) {
 		if (needsAuthorization(error)) {
 			return { status: "invalid-credential" };
 		}
-		throw error;
+		if (error instanceof Error) {
+			return { status: "error", error };
+		}
+
+		return { status: "error", error: new Error(String(error)) };
 	}
 }
