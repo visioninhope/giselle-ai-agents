@@ -24,12 +24,7 @@ import {
 import { type ReactNode, createContext, useContext, useState } from "react";
 import { actionNodeDefaultName, triggerNodeDefaultName } from "../../../utils";
 import type {
-	AddFileNodeTool,
-	AddImageGenerationNodeTool,
 	AddNodeTool,
-	AddTextGenerationNodeTool,
-	AddTextNodeTool,
-	AddVectorStoreNodeTool,
 	MoveTool,
 	SelectEnviromentActionTool,
 	SelectFileNodeCategoryTool,
@@ -90,34 +85,6 @@ export function moveTool() {
 	} satisfies MoveTool;
 }
 
-export function addFileNodeTool(fileCategory?: FileCategory) {
-	return {
-		action: "addFileNode",
-		category: "edit",
-		fileCategory,
-	} satisfies AddFileNodeTool;
-}
-
-export function addTextGenerationNodeTool(
-	languageModel?: TextGenerationLanguageModelData,
-) {
-	return {
-		action: "addTextGenerationNode",
-		category: "edit",
-		languageModel,
-	} satisfies AddTextGenerationNodeTool;
-}
-
-export function addImageGenerationNodeTool(
-	languageModel?: ImageGenerationLanguageModelData,
-) {
-	return {
-		action: "addImageGenerationNode",
-		category: "edit",
-		languageModel,
-	} satisfies AddImageGenerationNodeTool;
-}
-
 export function selectFileNodeCategoryTool() {
 	return {
 		action: "selectFileNodeCategory",
@@ -132,26 +99,12 @@ export function selectLanguageModelTool() {
 	} satisfies SelectLanguageModelTool;
 }
 
-export function addTextNodeTool() {
-	return {
-		action: "addTextNode",
-		category: "edit",
-	} satisfies AddTextNodeTool;
-}
-
 export function addNodeTool(node: Node) {
 	return {
 		action: "addNode",
 		category: "edit",
 		node,
 	} satisfies AddNodeTool;
-}
-
-export function addVectorStoreNodeTool() {
-	return {
-		action: "addVectorStoreNode",
-		category: "edit",
-	} satisfies AddVectorStoreNodeTool;
 }
 
 export function textNode() {
