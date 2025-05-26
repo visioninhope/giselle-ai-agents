@@ -133,7 +133,6 @@ export const CreatedGeneration = z.object({
 	context: GenerationContextLike,
 	status: GenerationStatusCreated,
 	createdAt: z.number(),
-	messages: z.undefined(),
 });
 export type CreatedGeneration = z.infer<typeof CreatedGeneration>;
 
