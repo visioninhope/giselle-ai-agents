@@ -25,13 +25,15 @@ export type VariableNode = z.infer<typeof VariableNode>;
 
 export const VariableNodeLike = NodeBase.extend({
 	type: z.literal("variable"),
-	content: z.object({
-		type: z.union([
-			TextContent.shape.type,
-			FileContent.shape.type,
-			GitHubContent.shape.type,
-		]),
-	}),
+	content: z
+		.object({
+			type: z.union([
+				TextContent.shape.type,
+				FileContent.shape.type,
+				GitHubContent.shape.type,
+			]),
+		})
+		.passthrough(),
 });
 export type VariableNodeLike = z.infer<typeof VariableNodeLike>;
 

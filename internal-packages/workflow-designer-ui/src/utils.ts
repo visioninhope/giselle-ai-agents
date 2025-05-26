@@ -40,7 +40,9 @@ export function defaultName(node: NodeLike) {
 					return node.name ?? node.content.llm.id;
 				case "trigger":
 					if (!isTriggerNode(node)) {
-						throw new Error(`Expected image generation node, got ${node.type}`);
+						throw new Error(
+							`Expected trigger node, got ${JSON.stringify(node)}`,
+						);
 					}
 					return node.name ?? triggerNodeDefaultName(node.content.provider);
 				case "action":
