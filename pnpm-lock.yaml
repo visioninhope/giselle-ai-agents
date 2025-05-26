@@ -1389,6 +1389,9 @@ importers:
       '@giselle-sdk/usage-limits':
         specifier: workspace:^
         version: link:../usage-limits
+      '@giselle-sdk/vector-store':
+        specifier: workspace:^
+        version: link:../vector-store
       '@giselle-sdk/workflow-designer':
         specifier: workspace:^
         version: link:../workflow-designer
