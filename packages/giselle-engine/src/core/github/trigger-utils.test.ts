@@ -103,10 +103,10 @@ describe("resolveTrigger", () => {
 			["title", "Issue title"],
 			["body", "Issue body"],
 			["issueNumber", "1"],
-		] as const)("resolve %s", (accessor, expected) => {
+		] as const)("resolve %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.issue.created");
 			const output = createOutput(accessor);
-			const result = resolveTrigger({
+			const result = await resolveTrigger({
 				output,
 				githubTrigger,
 				trigger,
@@ -132,10 +132,10 @@ describe("resolveTrigger", () => {
 			["title", "Closed title"],
 			["body", "Closed body"],
 			["issueNumber", "2"],
-		] as const)("resolve %s", (accessor, expected) => {
+		] as const)("resolve %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.issue.closed");
 			const output = createOutput(accessor);
-			const result = resolveTrigger({
+			const result = await resolveTrigger({
 				output,
 				githubTrigger,
 				trigger,
@@ -162,10 +162,10 @@ describe("resolveTrigger", () => {
 			["issueBody", "Issue body"],
 			["issueNumber", "3"],
 			["issueTitle", "Issue title"],
-		] as const)("resolve %s", (accessor, expected) => {
+		] as const)("resolve %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.issue_comment.created");
 			const output = createOutput(accessor);
-			const result = resolveTrigger({
+			const result = await resolveTrigger({
 				output,
 				githubTrigger,
 				trigger,
@@ -193,10 +193,10 @@ describe("resolveTrigger", () => {
 			["issueBody", "PR body"],
 			["issueNumber", "4"],
 			["issueTitle", "PR title"],
-		] as const)("resolve %s", (accessor, expected) => {
+		] as const)("resolve %s", async (accessor, expected) => {
 			const trigger = createTrigger("github.pull_request_comment.created");
 			const output = createOutput(accessor);
-			const result = resolveTrigger({
+			const result = await resolveTrigger({
 				output,
 				githubTrigger,
 				trigger,
@@ -243,10 +243,10 @@ describe("resolveTrigger", () => {
 				["body", `${title} body`],
 				["number", "5"],
 				["pullRequestUrl", "https://example.com/pr/5"],
-			] as const)("resolve %s", (accessor, expected) => {
+			] as const)("resolve %s", async (accessor, expected) => {
 				const trigger = createTrigger(id);
 				const output = createOutput(accessor);
-				const result = resolveTrigger({
+				const result = await resolveTrigger({
 					output,
 					githubTrigger,
 					trigger,
