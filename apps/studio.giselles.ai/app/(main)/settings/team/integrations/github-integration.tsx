@@ -9,16 +9,20 @@ import Link from "next/link";
 import { Button } from "../../components/button";
 
 export async function GitHubIntegration() {
-	const installUrl = await gitHubAppInstallURL();
 	const identityState = await getGitHubIdentityState();
+	if (identityState.status === "error") {
+		return <GitHubError message={identityState.errorMessage} />;
+	}
+
+	const installUrl = await gitHubAppInstallURL();
+	if (installUrl == null) {
+		return <GitHubError message="Failed to get GitHub App installation URL." />;
+	}
 	if (
 		identityState.status === "unauthorized" ||
 		identityState.status === "invalid-credential"
 	) {
 		return <GitHubIntegrationPresentation installationUrl={installUrl} />;
-	}
-	if (identityState.status === "error") {
-		return <GitHubError message={identityState.errorMessage} />;
 	}
 
 	const gitHubUserClient = identityState.gitHubUserClient;

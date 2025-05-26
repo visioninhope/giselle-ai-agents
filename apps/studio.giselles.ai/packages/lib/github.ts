@@ -38,6 +38,12 @@ export async function getGitHubIntegrationState(
 		gitHubUserClient.getInstallations(),
 		gitHubAppInstallURL(),
 	]);
+	if (installationUrl == null) {
+		return {
+			status: "error",
+			errorMessage: "Failed to get GitHub App installation URL.",
+		};
+	}
 	if (installations.length === 0) {
 		return {
 			status: "not-installed",
