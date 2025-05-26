@@ -352,6 +352,7 @@ export async function getGeneration(params: {
 	generationId: GenerationId;
 	options?: {
 		bypassingCache?: boolean;
+		skipMod?: boolean;
 	};
 }): Promise<Generation | undefined> {
 	const generationIndex = await getGenerationIndex(params);
@@ -364,6 +365,16 @@ export async function getGeneration(params: {
 			bypassingCache: params.options?.bypassingCache ?? false,
 		},
 	);
+	if (params.options?.skipMod) {
+		const parsedGeneration = Generation.parse(unsafeGeneration);
+		const parsedGenerationContext = GenerationContext.parse(
+			parsedGeneration.context,
+		);
+		return {
+			...parsedGeneration,
+			context: parsedGenerationContext,
+		};
+	}
 	const parsedGeneration = parseAndMod(Generation, unsafeGeneration);
 	const parsedGenerationContext = parseAndMod(
 		GenerationContext,
