@@ -66,7 +66,7 @@ export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 				/>
 			);
 		case "error":
-			return `GitHub integration error: ${value.github.error}`;
+			return `GitHub integration error: ${value.github.errorMessage}`;
 		default: {
 			const _exhaustiveCheck: never = value.github;
 			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);

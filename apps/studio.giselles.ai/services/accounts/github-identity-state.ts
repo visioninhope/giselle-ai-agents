@@ -29,7 +29,7 @@ type GitHubIdentityStateAuthorized = {
 
 type GitHubIdentityStateError = {
 	status: "error";
-	error: Error;
+	errorMessage: string;
 };
 
 export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
@@ -51,9 +51,9 @@ export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
 			return { status: "invalid-credential" };
 		}
 		if (error instanceof Error) {
-			return { status: "error", error };
+			return { status: "error", errorMessage: error.message };
 		}
 
-		return { status: "error", error: new Error(String(error)) };
+		return { status: "error", errorMessage: String(error) };
 	}
 }

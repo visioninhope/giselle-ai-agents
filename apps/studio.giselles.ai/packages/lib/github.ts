@@ -29,7 +29,7 @@ export async function getGitHubIntegrationState(
 	if (identityState.status === "error") {
 		return {
 			status: "error",
-			error: identityState.error.message,
+			errorMessage: identityState.errorMessage,
 		};
 	}
 

@@ -28,7 +28,7 @@ export async function GitHubAuthentication() {
 	if (identityState.status === "error") {
 		return (
 			<GitHubAuthenticationPresentation
-				alert={`GitHub integration error: ${identityState.error.message}`}
+				alert={`GitHub integration error: ${identityState.errorMessage}`}
 			/>
 		);
 	}

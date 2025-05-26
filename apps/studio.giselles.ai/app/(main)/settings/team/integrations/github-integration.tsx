@@ -4,7 +4,7 @@ import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
-import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
+import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../components/button";
 
@@ -18,7 +18,7 @@ export async function GitHubIntegration() {
 		return <GitHubIntegrationPresentation installationUrl={installUrl} />;
 	}
 	if (identityState.status === "error") {
-		return <GitHubError message={identityState.error.message} />;
+		return <GitHubError message={identityState.errorMessage} />;
 	}
 
 	const gitHubUserClient = identityState.gitHubUserClient;
@@ -49,12 +49,13 @@ type GitHubErrorProps = {
 
 function GitHubError({ message }: GitHubErrorProps) {
 	return (
-		<Alert variant="destructive" className="max-w-2xl">
-			<ExclamationTriangleIcon className="h-4 w-4" />
-			<AlertTitle>GitHub Integration Error</AlertTitle>
-			<AlertDescription className="mt-2">
-				<p className="mb-2">{message}</p>
-				<p className="text-sm">Try refreshing the page later.</p>
+		<Alert variant="destructive" className="p-4">
+			<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
+			<AlertTitle className="mb-0 text-error-900 font-bold text-[12px] leading-[20.4px] font-geist">
+				Authentication Error
+			</AlertTitle>
+			<AlertDescription className="text-error-900/70 font-medium text-[12px] leading-[20.4px] font-geist">
+				{message}
 			</AlertDescription>
 		</Alert>
 	);

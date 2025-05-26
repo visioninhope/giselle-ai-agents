@@ -65,7 +65,7 @@ export function GitHubTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				/>
 			);
 		case "error":
-			return `GitHub integration error: ${value.github.error}`;
+			return `GitHub integration error: ${value.github.errorMessage}`;
 		default: {
 			const _exhaustiveCheck: never = value.github;
 			throw new Error(`Unhandled status: ${_exhaustiveCheck}`);

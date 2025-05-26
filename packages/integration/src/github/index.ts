@@ -41,7 +41,7 @@ export type GitHubIntegrationInstalledState = z.infer<
 
 export const GitHubIntegrationErrorState = z.object({
 	status: z.literal("error"),
-	error: z.string(),
+	errorMessage: z.string(),
 });
 export type GitHubIntegrationErrorState = z.infer<
 	typeof GitHubIntegrationErrorState
