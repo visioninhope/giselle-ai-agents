@@ -1,7 +1,7 @@
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
 import { z } from "zod";
 import { Connection } from "../connection";
-import { Node, NodeBase, OperationNode } from "../node";
+import { NodeBase, NodeLike, OperationNodeLike } from "../node";
 import { RunId } from "../run";
 import { WorkspaceId } from "../workspace";
 
@@ -79,9 +79,9 @@ export const GenerationContextInput = z.discriminatedUnion("type", [
 export type GenerationContextInput = z.infer<typeof GenerationContextInput>;
 
 export const GenerationContext = z.object({
-	operationNode: OperationNode,
+	operationNode: OperationNodeLike,
 	connections: z.array(Connection).default([]),
-	sourceNodes: z.array(Node),
+	sourceNodes: z.array(NodeLike),
 	origin: GenerationOrigin,
 	inputs: z
 		.array(GenerationContextInput)
