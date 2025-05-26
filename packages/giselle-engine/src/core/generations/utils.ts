@@ -186,6 +186,7 @@ async function buildGenerationMessageForTextGeneration(
 
 			case "github":
 			case "imageGeneration":
+			case "vectorStore":
 				throw new Error("Not implemented");
 			case "trigger":
 			case "action": {
@@ -197,8 +198,6 @@ async function buildGenerationMessageForTextGeneration(
 				userMessage = userMessage.replace(replaceKeyword, result ?? "");
 				break;
 			}
-			case "vectorStore":
-				break;
 
 			default: {
 				const _exhaustiveCheck: never = contextNode.content;
@@ -615,9 +614,8 @@ async function buildGenerationMessageForImageGeneration(
 			case "imageGeneration":
 			case "trigger":
 			case "action":
-				throw new Error("Not implemented");
 			case "vectorStore":
-				break;
+				throw new Error("Not implemented");
 
 			default: {
 				const _exhaustiveCheck: never = contextNode.content;
