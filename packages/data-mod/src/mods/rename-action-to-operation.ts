@@ -1,4 +1,4 @@
-import type { ZodIssue } from "zod";
+import type { $ZodIssue } from "@zod/core";
 
 import { getValueAtPath, isObject, setValueAtPath } from "../utils";
 
@@ -55,7 +55,7 @@ function transformNodeTypes(obj: unknown): unknown {
 	return result;
 }
 
-export function renameActionToOperation(data: unknown, issue: ZodIssue) {
+export function renameActionToOperation(data: unknown, issue: $ZodIssue) {
 	// Skip if not a relevant issue
 	if (!isObject(data)) {
 		return data;
@@ -69,7 +69,7 @@ export function renameActionToOperation(data: unknown, issue: ZodIssue) {
 	if (
 		issue.code === "invalid_type" &&
 		issue.expected === "object" &&
-		issue.received === "undefined" &&
+		issue.input === "undefined" &&
 		issue.path.includes("operationNode")
 	) {
 		// biome-ignore lint/suspicious/noExplicitAny: Using any for generic deep copying
@@ -92,7 +92,7 @@ export function renameActionToOperation(data: unknown, issue: ZodIssue) {
 						transformedNode,
 					);
 					// Remove the old field properly with delete
-					const templateInNewData = getValueAtPath(newData, templatePath);
+					const templateInNwData = getValueAtPath(newData, templatePath);
 					return newData;
 				}
 
@@ -117,9 +117,14 @@ export function renameActionToOperation(data: unknown, issue: ZodIssue) {
 
 	// If this is a discriminator error related to the type field
 	if (
-		issue.code === "invalid_union_discriminator" &&
+		issue.code === "invalid_union" &&
 		issue.path.includes("type") &&
-		issue.options.includes("operation")
+		issue.errors.some((error) =>
+			error.some(
+				(e) =>
+					e.code === "invalid_value" && e.values.some((v) => v === "operation"),
+			),
+		)
 	) {
 		// Use the deep transformer to fix all node types
 		return transformNodeTypes(data);
@@ -130,8 +135,8 @@ export function renameActionToOperation(data: unknown, issue: ZodIssue) {
 
 	// Case 1: Handle node type rename from "action" to "operation"
 	if (
-		(issue.path.includes("type") && issue.code === "invalid_literal") ||
-		issue.code === "invalid_union_discriminator"
+		(issue.path.includes("type") && issue.code === "invalid_type") ||
+		issue.code === "invalid_union"
 	) {
 		// Get the path to the node
 		const nodePath = issue.path.slice(0, issue.path.indexOf("type"));
