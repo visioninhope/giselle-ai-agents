@@ -1,8 +1,10 @@
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
 import { SiGithub } from "@icons-pack/react-simple-icons";
 import type { components } from "@octokit/openapi-types";
+import { ExclamationTriangleIcon } from "@radix-ui/react-icons";
 import Link from "next/link";
 import { Button } from "../../components/button";
 
@@ -14,6 +16,9 @@ export async function GitHubIntegration() {
 		identityState.status === "invalid-credential"
 	) {
 		return <GitHubIntegrationPresentation installationUrl={installUrl} />;
+	}
+	if (identityState.status === "error") {
+		return <GitHubError message={identityState.error.message} />;
 	}
 
 	const gitHubUserClient = identityState.gitHubUserClient;
@@ -35,6 +40,23 @@ export async function GitHubIntegration() {
 			installations={installationsWithRepos}
 			installationUrl={installUrl}
 		/>
+	);
+}
+
+type GitHubErrorProps = {
+	message: string;
+};
+
+function GitHubError({ message }: GitHubErrorProps) {
+	return (
+		<Alert variant="destructive" className="max-w-2xl">
+			<ExclamationTriangleIcon className="h-4 w-4" />
+			<AlertTitle>GitHub Integration Error</AlertTitle>
+			<AlertDescription className="mt-2">
+				<p className="mb-2">{message}</p>
+				<p className="text-sm">Try refreshing the page later.</p>
+			</AlertDescription>
+		</Alert>
 	);
 }
 
