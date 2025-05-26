@@ -1,8 +1,8 @@
+import { parseAndMod } from "@giselle-sdk/data-mod";
 import type { GenerationId, GenerationIndex } from "@giselle-sdk/data-type";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { parseAndMod } from "@giselle-sdk/data-mod";
 import { getGeneration, setGenerationIndex } from "./utils";
 
 // Mock parseAndMod to track when it's called
@@ -65,7 +65,7 @@ describe("getGeneration", () => {
 	beforeEach(async () => {
 		await storage.clear();
 		vi.mocked(parseAndMod).mockClear();
-		
+
 		// Set up generation index
 		await setGenerationIndex({
 			storage,
