@@ -143,9 +143,7 @@ function resolveIssueCommentTrigger(
 		return null;
 	}
 
-	console.log(args.githubTrigger.event.payloads.keyof().options);
 	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
-		console.log(payload);
 		switch (payload) {
 			case "body":
 				if (args.output.accessor !== payload) {
