@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
 import { BasicTagInput } from "../../../../ui/basic-tag-input";
 
+const MAX_DOMAINS = 10;
+
 // Function to check if a domain name is valid
 const isValidDomain = (domain: string): boolean => {
 	// Simple domain name validation
@@ -23,6 +25,10 @@ export function SimpleDomainFilter({
 	// Add internal update flag
 	const [isInternalUpdate, setIsInternalUpdate] = useState(false);
 
+	// Calculate total domains and check if max is reached
+	const totalDomains = allowList.length + denyList.length;
+	const isMaxReached = totalDomains >= MAX_DOMAINS;
+
 	// Set initial data
 	useEffect(() => {
 		// Skip if internal update
@@ -42,12 +48,22 @@ export function SimpleDomainFilter({
 
 	// Handle Allow list changes
 	const handleAllowListChange = (newTags: string[]) => {
+		// Check if adding would exceed limit
+		const totalAfterChange = newTags.length + denyList.length;
+		if (totalAfterChange > MAX_DOMAINS) {
+			return; // Don't allow adding beyond limit
+		}
 		setAllowList(newTags);
 		updateParent(newTags, denyList);
 	};
 
 	// Handle Deny list changes
 	const handleDenyListChange = (newTags: string[]) => {
+		// Check if adding would exceed limit
+		const totalAfterChange = allowList.length + newTags.length;
+		if (totalAfterChange > MAX_DOMAINS) {
+			return; // Don't allow adding beyond limit
+		}
 		setDenyList(newTags);
 		updateParent(allowList, newTags);
 	};
@@ -70,6 +86,7 @@ export function SimpleDomainFilter({
 				message: `'${input}' is not a valid domain name (e.g., example.com)`,
 			};
 		}
+
 		return { isValid: true };
 	};
 
@@ -83,6 +100,11 @@ export function SimpleDomainFilter({
 			>
 				Search Domain Filter
 			</h2>
+
+			{/* Display domain count */}
+			<div className="mb-4 text-[13px] text-gray-400">
+				Total domains: {totalDomains}/{MAX_DOMAINS}
+			</div>
 
 			<div className="space-y-4">
 				{/* Allow list */}

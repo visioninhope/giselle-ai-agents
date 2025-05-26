@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { type DomainTag, DomainTagInput } from "./domain-tag-input";
 
+const MAX_DOMAINS = 10;
+
 export type SearchDomainFilterEnhancedProps = {
 	onFilterChange?: (include: string[], exclude: string[]) => void;
 	className?: string;
@@ -35,6 +37,10 @@ export function SearchDomainFilterEnhanced({
 		return createInitialTags(defaultExcludeDomains);
 	});
 
+	// Calculate total domains and check if max is reached
+	const totalDomains = includeDomains.length + excludeDomains.length;
+	const isMaxReached = totalDomains >= MAX_DOMAINS;
+
 	// Effect to notify parent of changes
 	useEffect(() => {
 		if (onFilterChange) {
@@ -46,6 +52,10 @@ export function SearchDomainFilterEnhanced({
 
 	// Add include domain
 	const handleAddIncludeDomain = (domain: string) => {
+		// Check if max limit is reached
+		if (isMaxReached) {
+			return;
+		}
 		// Check for duplicates
 		if (includeDomains.some((d) => d.domain === domain)) {
 			return;
@@ -74,6 +84,10 @@ export function SearchDomainFilterEnhanced({
 
 	// Add exclude domain
 	const handleAddExcludeDomain = (domain: string) => {
+		// Check if max limit is reached
+		if (isMaxReached) {
+			return;
+		}
 		// Check for duplicates
 		if (excludeDomains.some((d) => d.domain === domain)) {
 			return;
@@ -104,6 +118,11 @@ export function SearchDomainFilterEnhanced({
 		<div className={`search-domain-filter mt-8 ${className}`}>
 			<div className="mb-4 text-[15px] font-medium text-white">
 				Search Domain Filter
+			</div>
+
+			{/* Display domain count */}
+			<div className="mb-4 text-[13px] text-gray-400">
+				Total domains: {totalDomains}/{MAX_DOMAINS}
 			</div>
 
 			{/* Include domain input and tags */}

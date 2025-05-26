@@ -71,6 +71,9 @@ export function SearchDomainFilterPanel({
 		[searchDomainFilter],
 	);
 
+	const totalDomains = allowlist.length + denylist.length;
+	const isMaxReached = totalDomains >= MAX_DOMAINS;
+
 	function updateDomainFilter(newAllow: string[], newDeny: string[]) {
 		const merged = [...newAllow, ...newDeny];
 		onSearchDomainFilterChange(merged);
@@ -80,6 +83,7 @@ export function SearchDomainFilterPanel({
 		const value = allowlistInput.trim();
 		if (!value) return;
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
+		if (isMaxReached) return;
 		if (allowlist.includes(value) || denylist.some((d) => d.slice(1) === value))
 			return;
 
@@ -91,6 +95,7 @@ export function SearchDomainFilterPanel({
 		const value = denylistInput.trim();
 		if (!value) return;
 		if (!DOMAIN_VALIDATION_REGEX.test(value)) return;
+		if (isMaxReached) return;
 		if (denylist.includes(`-${value}`) || allowlist.includes(value)) return;
 
 		updateDomainFilter(allowlist, [...denylist, `-${value}`]);
@@ -101,6 +106,11 @@ export function SearchDomainFilterPanel({
 		<div className="search-domain-filter mt-8">
 			<div className="mb-4 text-[15px] font-medium text-white">
 				Search Domain Filter
+			</div>
+
+			{/* Display domain count */}
+			<div className="mb-4 text-[13px] text-gray-400">
+				Total domains: {totalDomains}/{MAX_DOMAINS}
 			</div>
 
 			<SimpleDomainInput
