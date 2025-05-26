@@ -166,6 +166,11 @@ const githubEventInputs: GithubEventInputMap = {
 			type: "number",
 			required: true,
 		},
+		diff: {
+			label: "diff",
+			type: "multiline-text",
+			required: false,
+		},
 		pullRequestUrl: {
 			label: "Pull request URL",
 			type: "text",
@@ -209,6 +214,11 @@ const githubEventInputs: GithubEventInputMap = {
 			label: "Number",
 			type: "number",
 			required: true,
+		},
+		diff: {
+			label: "diff",
+			type: "multiline-text",
+			required: false,
 		},
 		pullRequestUrl: {
 			label: "Pull request URL",
