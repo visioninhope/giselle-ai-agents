@@ -49,7 +49,7 @@ export async function resolveTrigger(args: {
 
 			if (
 				!args.context.integrationConfigs?.github?.authV2.appId ||
-				args.context.integrationConfigs?.github?.authV2.privateKey
+				!args.context.integrationConfigs?.github?.authV2.privateKey
 			) {
 				throw new Error("Missing GitHub App ID or Private Key");
 			}
