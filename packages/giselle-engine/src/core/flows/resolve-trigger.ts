@@ -60,15 +60,20 @@ export async function resolveTrigger(args: {
 			}
 			break;
 		}
-		case "manual":
+		case "manual": {
+			// Find ParametersInput once outside the loop
+			const parametersInput = generationContext.inputs?.find(
+				(i): i is GenerationContextInput & { type: "parameters" } =>
+					i.type === "parameters",
+			);
+
+			// Create Map of outputs by accessor for O(1) lookup
+			const outputsByAccessor = new Map(
+				operationNode.outputs.map((output) => [output.accessor, output]),
+			);
+
 			for (const parameter of triggerData.configuration.event.parameters) {
 				let parameterValue: string | undefined;
-
-				// Find parameter in ParametersInput
-				const parametersInput = generationContext.inputs?.find(
-					(i): i is GenerationContextInput & { type: "parameters" } =>
-						i.type === "parameters",
-				);
 
 				if (parametersInput) {
 					const parameterItem = parametersInput.items.find(
@@ -83,9 +88,7 @@ export async function resolveTrigger(args: {
 					continue;
 				}
 
-				const output = operationNode.outputs.find(
-					(output) => output.accessor === parameter.id,
-				);
+				const output = outputsByAccessor.get(parameter.id);
 				if (output === undefined) {
 					continue;
 				}
@@ -97,6 +100,7 @@ export async function resolveTrigger(args: {
 				});
 			}
 			break;
+		}
 		default: {
 			const _exhaustiveCheck: never = triggerData.configuration;
 			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
