@@ -1,6 +1,5 @@
-import { createIdGenerator } from "@giselle-sdk/utils";
-import { z } from "zod";
-import { NodeBase } from "../base";
+import { createIdGeneratorV4 as createIdGenerator } from "@giselle-sdk/utils";
+import { z } from "zod/v4";
 
 export const FileId = createIdGenerator("fl");
 export type FileId = z.infer<typeof FileId.schema>;
