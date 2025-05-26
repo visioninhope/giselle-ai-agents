@@ -7,16 +7,19 @@ import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type WebhookEvent,
 	ensureWebhookEvent,
+	getPullRequestDiff,
 } from "@giselle-sdk/github-tool";
-import { parseCommand } from "./utils";
 import type { GiselleEngineContext } from "../types";
+import { parseCommand } from "./utils";
 
 interface ResolveTriggerArgs {
 	output: Output;
 	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
 	trigger: FlowTrigger;
 	webhookEvent: WebhookEvent;
-	context: GiselleEngineContext;
+	appId: string;
+	privateKey: string;
+	installationId: number;
 }
 export async function resolveTrigger(args: ResolveTriggerArgs) {
 	return (
@@ -239,6 +242,23 @@ async function resolvePullRequestOpenedTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
+			case "diff": {
+				const diff = await getPullRequestDiff({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					pullNumber: args.webhookEvent.data.payload.pull_request.number,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: diff,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
@@ -298,6 +318,23 @@ async function resolvePullRequestReadyForReviewTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
+			case "diff": {
+				const diff = await getPullRequestDiff({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					pullNumber: args.webhookEvent.data.payload.pull_request.number,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: diff,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);

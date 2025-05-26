@@ -46,13 +46,22 @@ export async function resolveTrigger(args: {
 			if (triggerData.configuration.provider !== "github") {
 				throw new Error("Invalid provider");
 			}
+
+			if (
+				!args.context.integrationConfigs?.github?.authV2.appId ||
+				args.context.integrationConfigs?.github?.authV2.privateKey
+			) {
+				throw new Error("Missing GitHub App ID or Private Key");
+			}
 			for (const output of operationNode.outputs) {
 				const resolveOutput = await resolveGitHubTrigger({
 					output,
 					githubTrigger: githubTriggers[triggerData.configuration.event.id],
 					trigger: triggerData,
 					webhookEvent: githubWebhookEventInput.webhookEvent,
-					context: args.context,
+					appId: args.context.integrationConfigs.github.authV2.appId,
+					privateKey: args.context.integrationConfigs.github.authV2.privateKey,
+					installationId: triggerData.configuration.installationId,
 				});
 				if (resolveOutput !== null) {
 					outputs.push(resolveOutput);
