@@ -1,7 +1,7 @@
 import type { Message as AISdkMessage } from "@ai-sdk/react";
 export type { Message as AISdkMessage } from "@ai-sdk/react";
-import { createIdGenerator } from "@giselle-sdk/utils";
-import { z } from "zod";
+import { createIdGeneratorV4 as createIdGenerator } from "@giselle-sdk/utils";
+import { z } from "zod/v4";
 import { NodeId } from "../node";
 import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
@@ -245,9 +245,9 @@ export type CancelledGeneration = z.infer<typeof CancelledGeneration>;
  * Type guard to check if a Generation is a CancelledGeneration
  */
 export function isCancelledGeneration(
-	generation: Generation,
-): generation is CancelledGeneration {
-	return CancelledGeneration.safeParse(generation).success;
+	data: unknown,
+): data is CancelledGeneration {
+	return CancelledGeneration.safeParse(data).success;
 }
 
 export const GenerationIndex = z.object({
