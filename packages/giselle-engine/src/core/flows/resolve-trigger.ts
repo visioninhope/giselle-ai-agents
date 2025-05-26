@@ -7,7 +7,6 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { githubTriggers } from "@giselle-sdk/flow";
-import { isWebhookEvent } from "@giselle-sdk/github-tool";
 import {
 	setGeneration,
 	setGenerationIndex,
@@ -48,11 +47,12 @@ export async function resolveTrigger(args: {
 				throw new Error("Invalid provider");
 			}
 			for (const output of operationNode.outputs) {
-				const resolveOutput = resolveGitHubTrigger({
+				const resolveOutput = await resolveGitHubTrigger({
 					output,
 					githubTrigger: githubTriggers[triggerData.configuration.event.id],
 					trigger: triggerData,
 					webhookEvent: githubWebhookEventInput.webhookEvent,
+					context: args.context,
 				});
 				if (resolveOutput !== null) {
 					outputs.push(resolveOutput);

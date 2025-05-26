@@ -1,6 +1,5 @@
 import type {
 	FlowTrigger,
-	GenerationContextInput,
 	GenerationOutput,
 	Output,
 } from "@giselle-sdk/data-type";
@@ -8,24 +7,24 @@ import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type WebhookEvent,
 	ensureWebhookEvent,
-	isWebhookEvent,
 } from "@giselle-sdk/github-tool";
-import { type GitHubEvent, GitHubEventType } from "./events";
 import { parseCommand } from "./utils";
+import type { GiselleEngineContext } from "../types";
 
 interface ResolveTriggerArgs {
 	output: Output;
 	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
 	trigger: FlowTrigger;
 	webhookEvent: WebhookEvent;
+	context: GiselleEngineContext;
 }
-export function resolveTrigger(args: ResolveTriggerArgs) {
+export async function resolveTrigger(args: ResolveTriggerArgs) {
 	return (
 		resolveIssueCreatedTrigger(args) ||
 		resolveIssueClosedTrigger(args) ||
 		resolveIssueCommentTrigger(args) ||
-		resolvePullRequestOpenedTrigger(args) ||
-		resolvePullRequestReadyForReviewTrigger(args) ||
+		(await resolvePullRequestOpenedTrigger(args)) ||
+		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
 		resolvePullRequestCommentTrigger(args)
 	);
@@ -190,12 +189,13 @@ function resolveIssueCommentTrigger(
 	return null;
 }
 
-function resolvePullRequestOpenedTrigger(
+async function resolvePullRequestOpenedTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+): Promise<GenerationOutput | null> {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.opened") ||
-		args.githubTrigger.event.id !== "github.pull_request.opened"
+		args.githubTrigger.event.id !== "github.pull_request.opened" ||
+		args.trigger.configuration.provider !== "github"
 	) {
 		return null;
 	}
@@ -248,12 +248,13 @@ function resolvePullRequestOpenedTrigger(
 	return null;
 }
 
-function resolvePullRequestReadyForReviewTrigger(
+async function resolvePullRequestReadyForReviewTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+): Promise<GenerationOutput | null> {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.ready_for_review") ||
-		args.githubTrigger.event.id !== "github.pull_request.ready_for_review"
+		args.githubTrigger.event.id !== "github.pull_request.ready_for_review" ||
+		args.trigger.configuration.provider !== "github"
 	) {
 		return null;
 	}
