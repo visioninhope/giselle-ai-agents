@@ -810,6 +810,9 @@ importers:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig
+      '@zod/core':
+        specifier: 0.11.6
+        version: 0.11.6
       tsup:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
@@ -5179,6 +5182,9 @@ packages:
 
   '@xyflow/system@0.0.49':
     resolution: {integrity: sha512-U41XEPv0doyUrP9sgjquuB834/PhqcuE5a4gSo0itC4DjDU4RHjfqmPP1NnYiCu3Jee9MRJzU9Bq+tmh98jldQ==}
+
+  '@zod/core@0.11.6':
+    resolution: {integrity: sha512-03Bv82fFSfjDAvMfdHHdGSS6SOJs0iCcJlWJv1kJHRtoTT02hZpyip/2Lk6oo4l4FtjuwTrsEQTwg/LD8I7dJA==}
 
   abort-controller@3.0.0:
     resolution: {integrity: sha512-h8lQ8tacZYnR3vNQTgibj+tODHI5/+l06Au2Pcriv/Gmet0eaj4TwWH41sO9wnHDiQsEj19q0drzdWdeAHtweg==}
@@ -13795,6 +13801,8 @@ snapshots:
       d3-drag: 3.0.0
       d3-selection: 3.0.0
       d3-zoom: 3.0.0
+
+  '@zod/core@0.11.6': {}
 
   abort-controller@3.0.0:
     dependencies:
