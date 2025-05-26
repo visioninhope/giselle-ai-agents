@@ -50,10 +50,11 @@ export async function getGitHubIdentityState(): Promise<GitHubIdentityState> {
 		if (needsAuthorization(error)) {
 			return { status: "invalid-credential" };
 		}
-		if (error instanceof Error) {
-			return { status: "error", errorMessage: error.message };
-		}
 
-		return { status: "error", errorMessage: String(error) };
+		console.error("Error getting GitHub identity state:", error);
+		return {
+			status: "error",
+			errorMessage: "The GitHub API returned an error. Please try again later.",
+		};
 	}
 }
