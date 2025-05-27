@@ -17,6 +17,8 @@ import {
 	type RunId,
 	type TextGenerationNode,
 	type WorkspaceId,
+	isImageGenerationNode,
+	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { hasTierAccess, languageModels } from "@giselle-sdk/language-model";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
@@ -771,43 +773,37 @@ export async function checkUsageLimits(args: {
 
 	const generationContext = GenerationContext.parse(generation.context);
 	const operationNode = generationContext.operationNode;
-	switch (operationNode.content.type) {
-		case "imageGeneration":
-		case "textGeneration": {
-			const llm = operationNode.content.llm;
-			const languageModel = languageModels.find((model) => model.id === llm.id);
-			if (languageModel === undefined) {
-				return {
-					type: "error",
-					error: "Language model not found",
-				};
-			}
-			if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
-				return {
-					type: "error",
-					error:
-						"Access denied: insufficient tier for the requested language model.",
-				};
-			}
-
-			const agentTimeLimits = usageLimits.resourceLimits.agentTime;
-			if (agentTimeLimits.used >= agentTimeLimits.limit) {
-				return {
-					type: "error",
-					error:
-						"Access denied: insufficient agent time for the requested generation.",
-				};
-			}
-			return { type: "ok" };
-		}
-		case "trigger":
-		case "action":
-			return { type: "ok" };
-		default: {
-			const _exhaustiveCheck: never = operationNode.content;
-			throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
-		}
+	if (
+		!isTextGenerationNode(operationNode) &&
+		!isImageGenerationNode(operationNode)
+	) {
+		return { type: "ok" };
 	}
+	const llm = operationNode.content.llm;
+	const languageModel = languageModels.find((model) => model.id === llm.id);
+	if (languageModel === undefined) {
+		return {
+			type: "error",
+			error: "Language model not found",
+		};
+	}
+	if (!hasTierAccess(languageModel, usageLimits.featureTier)) {
+		return {
+			type: "error",
+			error:
+				"Access denied: insufficient tier for the requested language model.",
+		};
+	}
+
+	const agentTimeLimits = usageLimits.resourceLimits.agentTime;
+	if (agentTimeLimits.used >= agentTimeLimits.limit) {
+		return {
+			type: "error",
+			error:
+				"Access denied: insufficient agent time for the requested generation.",
+		};
+	}
+	return { type: "ok" };
 }
 
 export async function extractWorkspaceIdFromOrigin(args: {
