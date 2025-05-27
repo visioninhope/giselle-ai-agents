@@ -1,11 +1,11 @@
 import {
-	type Node,
 	type NodeLike,
 	isActionNode,
 	isFileNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
 	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import { getImageGenerationModelProvider } from "@giselle-sdk/language-model";
 import type { SVGProps } from "react";
@@ -162,6 +162,20 @@ export function NodeIcon({
 					}
 				case "github":
 					return <GitHubIcon {...props} />;
+				case "vectorStore":
+					if (!isVectorStoreNode(node)) {
+						throw new Error(
+							`Expected VectorStoreNode, got ${JSON.stringify(node)}`,
+						);
+					}
+					switch (node.content.source.provider) {
+						case "github":
+							return <GitHubIcon {...props} data-content-type-icon />;
+						default: {
+							const _exhaustiveCheck: never = node.content.source.provider;
+							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+						}
+					}
 				default: {
 					const _exhaustiveCheck: never = node.content.type;
 					throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);

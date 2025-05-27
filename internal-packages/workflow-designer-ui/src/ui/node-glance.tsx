@@ -1,8 +1,8 @@
 import {
-	type Node,
 	type NodeLike,
 	isImageGenerationNode,
 	isTextGenerationNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import { useMemo } from "react";
 import { NodeIcon } from "../icons/node";
@@ -36,9 +36,12 @@ export function NodeGlance({
 			case "trigger":
 			case "action":
 				return node.name ?? "Untitled Node";
+			case "vectorStore": {
+				return node.name ?? "Vector Store";
+			}
 			default: {
 				const _exhaustiveCheck: never = node.content;
-				return _exhaustiveCheck;
+				throw new Error(`Unknown node content type: ${_exhaustiveCheck}`);
 			}
 		}
 	}, [node]);
@@ -60,9 +63,27 @@ export function NodeGlance({
 			case "trigger":
 			case "action":
 				return node.content.type;
+			case "vectorStore": {
+				if (!isVectorStoreNode(node)) {
+					throw new Error("Node is not a vector store node");
+				}
+				switch (node.content.source.provider) {
+					case "github":
+						if (node.content.source.state.status === "configured") {
+							return `${node.content.source.state.owner}/${node.content.source.state.repo}`;
+						}
+						return `GitHub: ${node.content.source.state.status}`;
+					default: {
+						const _exhaustiveCheck: never = node.content.source.provider;
+						throw new Error(
+							`Unknown vector store provider: ${_exhaustiveCheck}`,
+						);
+					}
+				}
+			}
 			default: {
 				const _exhaustiveCheck: never = node.content;
-				return _exhaustiveCheck;
+				throw new Error(`Unknown node content type: ${_exhaustiveCheck}`);
 			}
 		}
 	}, [node]);

@@ -1,22 +1,21 @@
 "use client";
 
-import {
-	type ActionNode,
-	type FileCategory,
-	type FileNode,
-	type ImageGenerationLanguageModelData,
-	type ImageGenerationNode,
-	type Input,
-	InputId,
-	type Node,
-	NodeId,
-	type Output,
-	OutputId,
-	type TextGenerationLanguageModelData,
-	type TextGenerationNode,
-	type TextNode,
-	type TriggerNode,
+import type {
+	ActionNode,
+	FileCategory,
+	FileNode,
+	ImageGenerationLanguageModelData,
+	ImageGenerationNode,
+	Node,
+	Output,
+	TextGenerationLanguageModelData,
+	TextGenerationNode,
+	TextNode,
+	TriggerNode,
+	VectorStoreContent,
+	VectorStoreNode,
 } from "@giselle-sdk/data-type";
+import { NodeId, OutputId } from "@giselle-sdk/data-type";
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
 import {
 	Capability,
@@ -24,14 +23,13 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import { type ReactNode, createContext, useContext, useState } from "react";
-import { actionNodeDefaultName, triggerNodeDefaultName } from "../../../utils";
+import {
+	actionNodeDefaultName,
+	triggerNodeDefaultName,
+	vectorStoreNodeDefaultName,
+} from "../../../utils";
 import type {
-	AddFileNodeTool,
-	AddGitHubNodeTool,
-	AddImageGenerationNodeTool,
 	AddNodeTool,
-	AddTextGenerationNodeTool,
-	AddTextNodeTool,
 	MoveTool,
 	SelectEnviromentActionTool,
 	SelectFileNodeCategoryTool,
@@ -92,34 +90,6 @@ export function moveTool() {
 	} satisfies MoveTool;
 }
 
-export function addFileNodeTool(fileCategory?: FileCategory) {
-	return {
-		action: "addFileNode",
-		category: "edit",
-		fileCategory,
-	} satisfies AddFileNodeTool;
-}
-
-export function addTextGenerationNodeTool(
-	languageModel?: TextGenerationLanguageModelData,
-) {
-	return {
-		action: "addTextGenerationNode",
-		category: "edit",
-		languageModel,
-	} satisfies AddTextGenerationNodeTool;
-}
-
-export function addImageGenerationNodeTool(
-	languageModel?: ImageGenerationLanguageModelData,
-) {
-	return {
-		action: "addImageGenerationNode",
-		category: "edit",
-		languageModel,
-	} satisfies AddImageGenerationNodeTool;
-}
-
 export function selectFileNodeCategoryTool() {
 	return {
 		action: "selectFileNodeCategory",
@@ -132,13 +102,6 @@ export function selectLanguageModelTool() {
 		action: "selectLanguageModel",
 		category: "edit",
 	} satisfies SelectLanguageModelTool;
-}
-
-export function addTextNodeTool() {
-	return {
-		action: "addTextNode",
-		category: "edit",
-	} satisfies AddTextNodeTool;
 }
 
 export function addNodeTool(node: Node) {
@@ -297,4 +260,31 @@ export function selectActionTool() {
 		action: "selectAction",
 		category: "edit",
 	} satisfies SelectEnviromentActionTool;
+}
+
+export function vectorStoreNode(
+	provider: VectorStoreContent["source"]["provider"],
+): VectorStoreNode {
+	return {
+		id: NodeId.generate(),
+		type: "variable",
+		name: vectorStoreNodeDefaultName(provider),
+		content: {
+			type: "vectorStore",
+			source: {
+				provider: provider,
+				state: {
+					status: "unconfigured",
+				},
+			},
+		},
+		inputs: [],
+		outputs: [
+			{
+				id: OutputId.generate(),
+				label: "Output",
+				accessor: "source",
+			},
+		],
+	};
 }

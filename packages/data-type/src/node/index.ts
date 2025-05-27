@@ -11,9 +11,9 @@ import {
 	VariableNodeLike,
 	VariableNodeReference,
 } from "./variables";
+export * from "./base";
 export * from "./operations";
 export * from "./variables";
-export * from "./base";
 
 export const Node = z.discriminatedUnion("type", [OperationNode, VariableNode]);
 export type Node = z.infer<typeof Node>;

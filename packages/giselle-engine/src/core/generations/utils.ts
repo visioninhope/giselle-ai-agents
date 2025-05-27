@@ -189,6 +189,7 @@ async function buildGenerationMessageForTextGeneration(
 
 			case "github":
 			case "imageGeneration":
+			case "vectorStore":
 				throw new Error("Not implemented");
 			case "trigger":
 			case "action": {
@@ -618,6 +619,7 @@ async function buildGenerationMessageForImageGeneration(
 			case "imageGeneration":
 			case "trigger":
 			case "action":
+			case "vectorStore":
 				throw new Error("Not implemented");
 
 			default: {

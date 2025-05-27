@@ -3,6 +3,7 @@ import {
 	isFileNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import {
 	Capability,
@@ -38,15 +39,17 @@ export function isSupportedConnection(
 			canConnect: true,
 		};
 	}
+	if (isVectorStoreNode(outputNode)) {
+		// TODO: support vector store to connect to query node
+		return {
+			canConnect: false,
+			message: "Vector store node is not supported as an output",
+		};
+	}
 
 	if (!isTextGenerationNode(inputNode) && !isImageGenerationNode(inputNode)) {
 		throw new Error("Unexpected input node detected");
 	}
-
-	const inputNodeLLMId = inputNode.content.llm.id;
-	const inputNodeLanguageModel = languageModels.find(
-		(languageModel) => languageModel.id === inputNodeLLMId,
-	);
 
 	if (outputNode.content.type === "imageGeneration") {
 		return {
@@ -62,6 +65,11 @@ export function isSupportedConnection(
 	}
 
 	if (isFileNode(outputNode)) {
+		const inputNodeLLMId = inputNode.content.llm.id;
+		const inputNodeLanguageModel = languageModels.find(
+			(languageModel) => languageModel.id === inputNodeLLMId,
+		);
+
 		if (inputNodeLanguageModel === undefined) {
 			return {
 				canConnect: false,

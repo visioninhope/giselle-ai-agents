@@ -1,5 +1,11 @@
+import { getGitHubVectorStores } from "@/app/services/vector-store";
 import { db } from "@/drizzle";
-import { flowNodeFlag, runV2Flag, webPageFileNodeFlag } from "@/flags";
+import {
+	flowNodeFlag,
+	githubVectorStoreFlag,
+	runV2Flag,
+	webPageFileNodeFlag,
+} from "@/flags";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -35,6 +41,8 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const flowNode = await flowNodeFlag();
 	const runV2 = await runV2Flag();
+	const githubVectorStore = await githubVectorStoreFlag();
+	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
 	const webPageFileNode = await webPageFileNodeFlag();
 	return (
 		<WorkspaceProvider
@@ -48,6 +56,10 @@ export default async function Layout({
 					return { github: await getGitHubIntegrationState(agent.dbId) };
 				},
 			}}
+			vectorStore={{
+				github: gitHubVectorStores,
+				settingPath: "/settings/team/vector-stores",
+			}}
 			usageLimits={usageLimits}
 			telemetry={{
 				metadata: {
@@ -60,6 +72,7 @@ export default async function Layout({
 			featureFlag={{
 				flowNode,
 				runV2,
+				githubVectorStore,
 				webPageFileNode,
 			}}
 		>

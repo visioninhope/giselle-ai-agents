@@ -22,12 +22,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import {
-	GeneratedContentIcon,
-	GitHubIcon,
-	PdfFileIcon,
-	PromptIcon,
-} from "../../../icons";
+import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
 	type Source,
@@ -511,6 +506,10 @@ export function InputPanel({
 									);
 								case "github":
 									throw new Error("github node is deprecated");
+								case "vectorStore":
+									throw new Error(
+										"vectorStore node is not supported to connect.",
+									);
 								default: {
 									const _exhaustiveCheck: never = source.node.content.type;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);
