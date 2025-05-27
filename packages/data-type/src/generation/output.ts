@@ -1,4 +1,4 @@
-import { createIdGeneratorV4 as createIdGenerator } from "@giselle-sdk/utils";
+import { createIdGenerator } from "@giselle-sdk/utils";
 import type { ProviderMetadata } from "ai";
 import { z } from "zod/v4";
 import { OutputId } from "../node";

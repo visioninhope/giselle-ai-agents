@@ -1,6 +1,6 @@
 import type { Message as AISdkMessage } from "@ai-sdk/react";
 export type { Message as AISdkMessage } from "@ai-sdk/react";
-import { createIdGeneratorV4 as createIdGenerator } from "@giselle-sdk/utils";
+import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { NodeId } from "../node";
 import { GenerationContextLike, GenerationOrigin } from "./context";
