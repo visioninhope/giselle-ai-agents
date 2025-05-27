@@ -3,7 +3,7 @@ import clsx from "clsx/lite";
 import { Dialog } from "radix-ui";
 import { toRelativeTime } from "../../../helper/datetime";
 import { RemoveButton } from "../ui";
-import type { FilePanelProps } from "./file-panel-props";
+import type { FilePanelProps } from "./file-panel-type";
 import { useWebPageFileNode } from "./use-web-page-file-node";
 
 export function WebPageFilePanel({ node, config }: FilePanelProps) {

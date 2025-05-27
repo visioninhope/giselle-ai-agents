@@ -8,7 +8,7 @@ import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { useToasts } from "../../../ui/toast";
 import { RemoveButton } from "../ui";
-import type { FilePanelProps } from "./file-panel-props";
+import type { FilePanelProps } from "./file-panel-type";
 import { useFileNode } from "./use-file-node";
 
 /**
