@@ -1,4 +1,4 @@
-import { createIdGeneratorV4 as createIdGenerator } from "@giselle-sdk/utils";
+import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { WorkspaceId } from "..";
 import { NodeId } from "../../node";
