@@ -1,7 +1,9 @@
 import type {
+	FlowTrigger,
 	Generation,
 	ParameterItem,
 	TriggerNode,
+	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
@@ -237,6 +239,144 @@ const githubEventInputs: GithubEventInputMap = {
 	},
 };
 
+function createInputsFromTrigger(trigger: FlowTrigger | undefined): Input[] {
+	if (trigger === undefined) {
+		return [];
+	}
+
+	switch (trigger.configuration.provider) {
+		case "github": {
+			const inputDefs = githubEventInputs[trigger.configuration.event.id];
+			return Object.entries(inputDefs).map(([name, def]) => ({
+				name,
+				label: def.label,
+				type: def.type,
+				required: def.required,
+			}));
+		}
+		case "manual": {
+			return trigger.configuration.event.parameters.map((parameter) => ({
+				name: parameter.id,
+				label: parameter.name,
+				type: parameter.type,
+				required: parameter.required,
+			}));
+		}
+		default: {
+			const _exhaustiveCheck: never = trigger.configuration;
+			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+		}
+	}
+}
+function parseFormInputs(inputs: Input[], formData: FormData) {
+	const errors: Record<string, string> = {};
+	const values: Record<string, string | number> = {};
+
+	for (const input of inputs) {
+		const formDataEntryValue = formData.get(input.name);
+		const value = formDataEntryValue
+			? formDataEntryValue.toString().trim()
+			: "";
+
+		if (input.required && value === "") {
+			errors[input.name] = `${input.label} is required`;
+			continue;
+		}
+
+		if (value === "") {
+			values[input.name] = "";
+			continue;
+		}
+
+		switch (input.type) {
+			case "text":
+			case "multiline-text":
+				values[input.name] = value;
+				break;
+			case "number": {
+				const numValue = Number(value);
+				if (Number.isNaN(numValue)) {
+					errors[input.name] = `${input.label} must be a valid number`;
+				} else {
+					values[input.name] = numValue;
+				}
+				break;
+			}
+			default: {
+				const _exhaustiveCheck: never = input.type;
+				throw new Error(`Unhandled input type: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+
+	return { errors, values };
+}
+
+function toParameterItems(
+	inputs: Input[],
+	values: Record<string, string | number>,
+): ParameterItem[] {
+	const items: ParameterItem[] = [];
+	for (const input of inputs) {
+		const value = values[input.name];
+		if (value === undefined || value === "") {
+			continue;
+		}
+		switch (input.type) {
+			case "text":
+			case "multiline-text":
+				items.push({
+					type: "string",
+					name: input.name,
+					value: value as string,
+				});
+				break;
+			case "number":
+				items.push({
+					type: "number",
+					name: input.name,
+					value: value as number,
+				});
+				break;
+			default: {
+				const _exhaustiveCheck: never = input.type;
+				throw new Error(`Unhandled input type: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return items;
+}
+
+function createGenerationsForFlow(
+	flow: NonNullable<ReturnType<typeof buildWorkflowFromNode>>,
+	inputs: Input[],
+	values: Record<string, string | number>,
+	createGeneration: ReturnType<
+		typeof useGenerationRunnerSystem
+	>["createGeneration"],
+	workspaceId: WorkspaceId,
+) {
+	const map = new Map<string, Generation>();
+	for (const job of flow.jobs) {
+		for (const operation of job.operations) {
+			const parameterItems =
+				operation.node.content.type === "trigger"
+					? toParameterItems(inputs, values)
+					: [];
+			const generation = createGeneration({
+				origin: { type: "workspace", id: workspaceId },
+				inputs:
+					parameterItems.length > 0
+						? [{ type: "parameters", items: parameterItems }]
+						: [],
+				...operation.generationTemplate,
+			});
+			map.set(operation.generationTemplate.operationNode.id, generation);
+		}
+	}
+	return map;
+}
+
 export function TriggerInputDialog({
 	node,
 }: {
@@ -251,81 +391,17 @@ export function TriggerInputDialog({
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 
-	const inputs = useMemo<Input[]>(() => {
-		if (trigger === undefined) {
-			return [];
-		}
-
-		switch (trigger.configuration.provider) {
-			case "github": {
-				const inputDefs = githubEventInputs[trigger.configuration.event.id];
-				return Object.entries(inputDefs).map(([name, def]) => ({
-					name,
-					label: def.label,
-					type: def.type,
-					required: def.required,
-				}));
-			}
-			case "manual": {
-				return trigger.configuration.event.parameters.map((parameter) => ({
-					name: parameter.id,
-					label: parameter.name,
-					type: parameter.type,
-					required: parameter.required,
-				}));
-			}
-			default: {
-				const _exhaustiveCheck: never = trigger.configuration;
-				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
-			}
-		}
-	}, [trigger]);
+	const inputs = useMemo<Input[]>(
+		() => createInputsFromTrigger(trigger),
+		[trigger],
+	);
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
 			e.preventDefault();
 
 			const formData = new FormData(e.currentTarget);
-
-			const errors: Record<string, string> = {};
-			const validatedValues: Record<string, string | number> = {};
-
-			for (const input of inputs) {
-				const formDataEntryValue = formData.get(input.name);
-				const value = formDataEntryValue
-					? formDataEntryValue.toString().trim()
-					: "";
-
-				if (input.required && value === "") {
-					errors[input.name] = `${input.label} is required`;
-					continue;
-				}
-
-				if (value === "") {
-					validatedValues[input.name] = "";
-					continue;
-				}
-
-				switch (input.type) {
-					case "text":
-					case "multiline-text":
-						validatedValues[input.name] = value;
-						break;
-					case "number": {
-						const numValue = Number(value);
-						if (Number.isNaN(numValue)) {
-							errors[input.name] = `${input.label} must be a valid number`;
-						} else {
-							validatedValues[input.name] = numValue;
-						}
-						break;
-					}
-					default: {
-						const _exhaustiveCheck: never = input.type;
-						throw new Error(`Unhandled input type: ${_exhaustiveCheck}`);
-					}
-				}
-			}
+			const { errors, values } = parseFormInputs(inputs, formData);
 
 			if (Object.keys(errors).length > 0) {
 				setValidationErrors(errors);
@@ -344,62 +420,20 @@ export function TriggerInputDialog({
 				if (flow === null) {
 					return;
 				}
-				const generations: Generation[] = [];
-				flow.jobs.map((job) =>
-					job.operations.map((operation) => {
-						const parameterItems: ParameterItem[] = [];
-						if (operation.node.content.type === "trigger") {
-							for (const input of inputs) {
-								const validatedValue = validatedValues[input.name];
-								if (validatedValue !== undefined && validatedValue !== "") {
-									switch (input.type) {
-										case "text":
-										case "multiline-text":
-											parameterItems.push({
-												type: "string",
-												name: input.name,
-												value: validatedValue as string,
-											});
-											break;
-										case "number":
-											parameterItems.push({
-												type: "number",
-												name: input.name,
-												value: validatedValue as number,
-											});
-											break;
-										default: {
-											const _exhaustiveCheck: never = input.type;
-											throw new Error(
-												`Unhandled input type: ${_exhaustiveCheck}`,
-											);
-										}
-									}
-								}
-							}
-						}
-						generations.push(
-							createGeneration({
-								origin: {
-									type: "workspace",
-									id: data.id,
-								},
-								inputs:
-									parameterItems.length > 0
-										? [{ type: "parameters", items: parameterItems }]
-										: [],
-								...operation.generationTemplate,
-							}),
-						);
-					}),
+
+				const generationMap = createGenerationsForFlow(
+					flow,
+					inputs,
+					values,
+					createGeneration,
+					data.id,
 				);
+
 				for (const job of flow.jobs) {
 					await Promise.all(
 						job.operations.map(async (operation) => {
-							const generation = generations.find(
-								(generation) =>
-									generation.context.operationNode.id ===
-									operation.generationTemplate.operationNode.id,
+							const generation = generationMap.get(
+								operation.generationTemplate.operationNode.id,
 							);
 							if (generation === undefined) {
 								return;
