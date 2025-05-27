@@ -1,8 +1,8 @@
 import {
-	type Node,
 	type NodeLike,
 	isImageGenerationNode,
 	isTextGenerationNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import { useMemo } from "react";
 import { NodeIcon } from "../icons/node";
@@ -64,6 +64,9 @@ export function NodeGlance({
 			case "action":
 				return node.content.type;
 			case "vectorStore": {
+				if (!isVectorStoreNode(node)) {
+					throw new Error("Node is not a vector store node");
+				}
 				switch (node.content.source.provider) {
 					case "github":
 						if (node.content.source.state.status === "configured") {
