@@ -8,13 +8,8 @@ import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { useToasts } from "../../../ui/toast";
 import { Tooltip, type TooltipProps } from "../../../ui/tooltip";
+import type { FileTypeConfig } from "./file-type-config";
 import { useFileNode } from "./use-file-node";
-
-export type FileTypeConfig = {
-	accept: string[];
-	label: string;
-	maxSize?: number;
-};
 
 /**
  * Hard limit to upload file since Vercel Serverless Functions have a 4.5MB body size limit
