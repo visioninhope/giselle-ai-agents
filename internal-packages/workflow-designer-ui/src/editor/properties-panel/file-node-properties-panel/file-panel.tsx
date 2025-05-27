@@ -7,7 +7,7 @@ import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { useToasts } from "../../../ui/toast";
-import { Tooltip, type TooltipProps } from "../../../ui/tooltip";
+import { RemoveButton } from "../ui";
 import type { FileTypeConfig } from "./file-type-config";
 import { useFileNode } from "./use-file-node";
 
@@ -292,23 +292,6 @@ export function FilePanel({ node, config }: FilePanelProps) {
 				</div>
 			</div>
 		</div>
-	);
-}
-
-function RemoveButton({
-	onClick,
-	...props
-}: Omit<TooltipProps, "text" | "children">) {
-	return (
-		<Tooltip text="Remove" {...props}>
-			<button
-				type="button"
-				className="hidden group-hover:block px-[4px] py-[4px] bg-transparent hover:bg-white-900/10 rounded-[8px] transition-colors mr-[2px] flex-shrink-0"
-				onClick={onClick}
-			>
-				<TrashIcon className="w-[24px] h-[24px] stroke-current stroke-[1px] " />
-			</button>
-		</Tooltip>
 	);
 }
 
