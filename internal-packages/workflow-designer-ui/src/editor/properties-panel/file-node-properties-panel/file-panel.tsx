@@ -2,7 +2,7 @@ import type { FileData, FileNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { type ButtonHTMLAttributes, useCallback, useState } from "react";
+import { useCallback, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
