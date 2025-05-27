@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1048 MIT
+* 1049 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -4905,6 +4905,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@xyflow/system"></a>
 ### @xyflow/system v0.0.37
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@zod/core"></a>
+### @zod/core v0.11.6
 #### 
 
 ##### Paths
