@@ -69,7 +69,6 @@ export function renameActionToOperation(data: unknown, issue: $ZodIssue) {
 	if (
 		issue.code === "invalid_type" &&
 		issue.expected === "object" &&
-		issue.input === "undefined" &&
 		issue.path.includes("operationNode")
 	) {
 		// biome-ignore lint/suspicious/noExplicitAny: Using any for generic deep copying
@@ -112,21 +111,6 @@ export function renameActionToOperation(data: unknown, issue: $ZodIssue) {
 		}
 
 		// Fallback to deep transformer if we couldn't fix it specifically
-		return transformNodeTypes(data);
-	}
-
-	// If this is a discriminator error related to the type field
-	if (
-		issue.code === "invalid_union" &&
-		issue.path.includes("type") &&
-		issue.errors.some((error) =>
-			error.some(
-				(e) =>
-					e.code === "invalid_value" && e.values.some((v) => v === "operation"),
-			),
-		)
-	) {
-		// Use the deep transformer to fix all node types
 		return transformNodeTypes(data);
 	}
 
