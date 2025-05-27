@@ -1,4 +1,10 @@
-import type { Node } from "@giselle-sdk/data-type";
+import {
+	type NodeLike,
+	isFileNode,
+	isImageGenerationNode,
+	isTextGenerationNode,
+	isVectorStoreNode,
+} from "@giselle-sdk/data-type";
 import {
 	Capability,
 	hasCapability,
@@ -10,8 +16,8 @@ export type ConnectionValidationResult =
 	| { canConnect: false; message: string };
 
 export function isSupportedConnection(
-	outputNode: Node,
-	inputNode: Node,
+	outputNode: NodeLike,
+	inputNode: NodeLike,
 ): ConnectionValidationResult {
 	if (outputNode.id === inputNode.id) {
 		return {
@@ -33,12 +39,16 @@ export function isSupportedConnection(
 			canConnect: true,
 		};
 	}
-	if (outputNode.content.type === "vectorStore") {
+	if (isVectorStoreNode(outputNode)) {
 		// TODO: support vector store to connect to query node
 		return {
 			canConnect: false,
 			message: "Vector store node is not supported as an output",
 		};
+	}
+
+	if (!isTextGenerationNode(inputNode) && !isImageGenerationNode(inputNode)) {
+		throw new Error("Unexpected input node detected");
 	}
 
 	if (outputNode.content.type === "imageGeneration") {
@@ -54,7 +64,7 @@ export function isSupportedConnection(
 		};
 	}
 
-	if (outputNode.content.type === "file") {
+	if (isFileNode(outputNode)) {
 		const inputNodeLLMId = inputNode.content.llm.id;
 		const inputNodeLanguageModel = languageModels.find(
 			(languageModel) => languageModel.id === inputNodeLLMId,

@@ -3,6 +3,8 @@ import {
 	OutputId,
 	type TextGenerationNode,
 	type ToolSet,
+	isImageGenerationNode,
+	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
@@ -187,7 +189,7 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="model"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-y-auto px-[4px]"
 							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
@@ -250,6 +252,14 @@ export function TextGenerationNodePropertiesPanel({
 															switch (connectedNode.content.type) {
 																case "textGeneration":
 																case "imageGeneration": {
+																	if (
+																		!isTextGenerationNode(connectedNode) &&
+																		!isImageGenerationNode(connectedNode)
+																	) {
+																		throw new Error(
+																			`Expected text generation or image generation node, got ${JSON.stringify(connectedNode)}`,
+																		);
+																	}
 																	updateNodeData(connectedNode, {
 																		inputs: connectedNode.inputs.filter(
 																			(input) =>
@@ -263,7 +273,7 @@ export function TextGenerationNodePropertiesPanel({
 																	break;
 																default: {
 																	const _exhaustiveCheck: never =
-																		connectedNode.content;
+																		connectedNode.content.type;
 																	throw new Error(
 																		`Unhandled node type: ${_exhaustiveCheck}`,
 																	);
@@ -333,7 +343,24 @@ export function TextGenerationNodePropertiesPanel({
 														if (connectedNode.type === "operation") {
 															switch (connectedNode.content.type) {
 																case "textGeneration":
+																	if (!isTextGenerationNode(connectedNode)) {
+																		throw new Error(
+																			`Expected text generation node, got ${JSON.stringify(connectedNode)}`,
+																		);
+																	}
+																	updateNodeData(connectedNode, {
+																		inputs: connectedNode.inputs.filter(
+																			(input) =>
+																				input.id !== connection.inputId,
+																		),
+																	});
+																	break;
 																case "imageGeneration": {
+																	if (!isImageGenerationNode(connectedNode)) {
+																		throw new Error(
+																			`Expected image generation node, got ${JSON.stringify(connectedNode)}`,
+																		);
+																	}
 																	updateNodeData(connectedNode, {
 																		inputs: connectedNode.inputs.filter(
 																			(input) =>
@@ -347,7 +374,7 @@ export function TextGenerationNodePropertiesPanel({
 																	break;
 																default: {
 																	const _exhaustiveCheck: never =
-																		connectedNode.content;
+																		connectedNode.content.type;
 																	throw new Error(
 																		`Unhandled node type: ${_exhaustiveCheck}`,
 																	);

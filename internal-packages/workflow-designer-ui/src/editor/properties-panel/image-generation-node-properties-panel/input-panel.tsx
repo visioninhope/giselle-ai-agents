@@ -4,6 +4,10 @@ import {
 	type Input,
 	InputId,
 	OutputId,
+	isFileNode,
+	isImageGenerationNode,
+	isTextGenerationNode,
+	isTextNode,
 } from "@giselle-sdk/data-type";
 import { isJsonContent, jsonContentToText } from "@giselle-sdk/text-editor";
 import clsx from "clsx/lite";
@@ -18,12 +22,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import {
-	GeneratedContentIcon,
-	GitHubIcon,
-	PdfFileIcon,
-	PromptIcon,
-} from "../../../icons";
+import { GeneratedContentIcon, PdfFileIcon, PromptIcon } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
 	type Source,
@@ -36,7 +35,10 @@ function SourceToggleItem({
 	disabled = false,
 }: { source: Source; disabled?: boolean }) {
 	const getDisplayName = () => {
-		if ("content" in source.node && "llm" in source.node.content) {
+		if (
+			isTextGenerationNode(source.node) ||
+			isImageGenerationNode(source.node)
+		) {
 			return source.node.name ?? source.node.content.llm.id;
 		}
 		return source.node.name ?? "Source";
@@ -458,6 +460,11 @@ export function InputPanel({
 						{connectedSources.variable.map((source) => {
 							switch (source.node.content.type) {
 								case "text": {
+									if (!isTextNode(source.node)) {
+										throw new Error(
+											`Expected text node, got ${source.node.content.type}`,
+										);
+									}
 									let text = source.node.content.text;
 									if (text.length > 0) {
 										const jsonContentLikeString = JSON.parse(
@@ -481,6 +488,11 @@ export function InputPanel({
 									);
 								}
 								case "file":
+									if (!isFileNode(source.node)) {
+										throw new Error(
+											`Expected file node, got ${source.node.content.type}`,
+										);
+									}
 									return (
 										<SourceListItem
 											icon={
@@ -493,22 +505,12 @@ export function InputPanel({
 										/>
 									);
 								case "github":
-									return (
-										<SourceListItem
-											icon={
-												<GitHubIcon className="size-[24px] text-white-900" />
-											}
-											key={source.connection.id}
-											title={`${source.node.name ?? "GitHub"} / ${source.output.label}`}
-											subtitle={"todo"}
-											onRemove={() => handleRemove(source.connection)}
-										/>
-									);
+									throw new Error("github node is deprecated");
 								case "vectorStore":
 									// vector store node can not be connected directly
 									break;
 								default: {
-									const _exhaustiveCheck: never = source.node.content;
+									const _exhaustiveCheck: never = source.node.content.type;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);
 								}
 							}

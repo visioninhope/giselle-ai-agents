@@ -1,6 +1,5 @@
 import type {
 	FlowTrigger,
-	GenerationContextInput,
 	GenerationOutput,
 	Output,
 } from "@giselle-sdk/data-type";
@@ -8,9 +7,9 @@ import type { githubTriggers } from "@giselle-sdk/flow";
 import {
 	type WebhookEvent,
 	ensureWebhookEvent,
-	isWebhookEvent,
+	getPullRequestDiff,
 } from "@giselle-sdk/github-tool";
-import { type GitHubEvent, GitHubEventType } from "./events";
+import type { GiselleEngineContext } from "../types";
 import { parseCommand } from "./utils";
 
 interface ResolveTriggerArgs {
@@ -18,14 +17,17 @@ interface ResolveTriggerArgs {
 	githubTrigger: (typeof githubTriggers)[keyof typeof githubTriggers];
 	trigger: FlowTrigger;
 	webhookEvent: WebhookEvent;
+	appId: string;
+	privateKey: string;
+	installationId: number;
 }
-export function resolveTrigger(args: ResolveTriggerArgs) {
+export async function resolveTrigger(args: ResolveTriggerArgs) {
 	return (
 		resolveIssueCreatedTrigger(args) ||
 		resolveIssueClosedTrigger(args) ||
 		resolveIssueCommentTrigger(args) ||
-		resolvePullRequestOpenedTrigger(args) ||
-		resolvePullRequestReadyForReviewTrigger(args) ||
+		(await resolvePullRequestOpenedTrigger(args)) ||
+		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
 		resolvePullRequestCommentTrigger(args)
 	);
@@ -190,12 +192,13 @@ function resolveIssueCommentTrigger(
 	return null;
 }
 
-function resolvePullRequestOpenedTrigger(
+async function resolvePullRequestOpenedTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+): Promise<GenerationOutput | null> {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.opened") ||
-		args.githubTrigger.event.id !== "github.pull_request.opened"
+		args.githubTrigger.event.id !== "github.pull_request.opened" ||
+		args.trigger.configuration.provider !== "github"
 	) {
 		return null;
 	}
@@ -239,6 +242,23 @@ function resolvePullRequestOpenedTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
+			case "diff": {
+				const diff = await getPullRequestDiff({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					pullNumber: args.webhookEvent.data.payload.pull_request.number,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: diff,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
@@ -248,12 +268,13 @@ function resolvePullRequestOpenedTrigger(
 	return null;
 }
 
-function resolvePullRequestReadyForReviewTrigger(
+async function resolvePullRequestReadyForReviewTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+): Promise<GenerationOutput | null> {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "pull_request.ready_for_review") ||
-		args.githubTrigger.event.id !== "github.pull_request.ready_for_review"
+		args.githubTrigger.event.id !== "github.pull_request.ready_for_review" ||
+		args.trigger.configuration.provider !== "github"
 	) {
 		return null;
 	}
@@ -297,6 +318,23 @@ function resolvePullRequestReadyForReviewTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
+			case "diff": {
+				const diff = await getPullRequestDiff({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					pullNumber: args.webhookEvent.data.payload.pull_request.number,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: diff,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
