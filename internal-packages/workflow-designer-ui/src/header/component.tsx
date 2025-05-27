@@ -40,6 +40,7 @@ function Trigger() {
 	const { data } = useWorkflowDesigner();
 	const [selectedTriggerNode, setSelectedTriggerNode] =
 		useState<TriggerNode | null>(null);
+	const [open, setOpen] = useState(false);
 
 	const triggerNodes = useMemo(() => {
 		const tmp: TriggerNode[] = [];
@@ -59,13 +60,26 @@ function Trigger() {
 		setSelectedTriggerNode(node);
 	}, []);
 
+	const handleClose = useCallback(() => {
+		setOpen(false);
+		setSelectedTriggerNode(null);
+	}, []);
+
 	if (triggerNodes.length === 0) {
 		return null;
 	}
 
 	// Use a unified button and dialog approach for both single and multiple triggers
 	return (
-		<Dialog.Root onOpenChange={(open) => !open && setSelectedTriggerNode(null)}>
+		<Dialog.Root
+			open={open}
+			onOpenChange={(isOpen) => {
+				setOpen(isOpen);
+				if (!isOpen) {
+					setSelectedTriggerNode(null);
+				}
+			}}
+		>
 			<Dialog.Trigger asChild>
 				<Button
 					leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
@@ -82,11 +96,14 @@ function Trigger() {
 					</Dialog.Title>
 
 					{triggerNodes.length === 1 ? (
-						<TriggerInputDialog node={triggerNodes[0]} />
+						<TriggerInputDialog node={triggerNodes[0]} onClose={handleClose} />
 					) : (
 						<>
 							{selectedTriggerNode ? (
-								<TriggerInputDialog node={selectedTriggerNode} />
+								<TriggerInputDialog
+									node={selectedTriggerNode}
+									onClose={handleClose}
+								/>
 							) : (
 								// Show trigger selection
 								<div className="space-y-4">
