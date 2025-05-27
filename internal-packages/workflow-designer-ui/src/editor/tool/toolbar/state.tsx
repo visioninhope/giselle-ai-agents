@@ -13,8 +13,9 @@ import type {
 	TextNode,
 	TriggerNode,
 	VectorStoreContent,
+	VectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { NodeId, OutputId, type VectorStoreNode } from "@giselle-sdk/data-type";
+import { NodeId, OutputId } from "@giselle-sdk/data-type";
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
 import {
 	Capability,
