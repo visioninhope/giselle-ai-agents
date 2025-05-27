@@ -1,5 +1,10 @@
 import type { FileNode } from "@giselle-sdk/data-type";
-import type { FileTypeConfig } from "./file-type-config";
+
+export type FileTypeConfig = {
+	accept: string[];
+	label: string;
+	maxSize?: number;
+};
 
 export type FilePanelProps = {
 	node: FileNode;

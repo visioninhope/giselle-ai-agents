@@ -7,7 +7,7 @@ import {
 	PropertiesPanelRoot,
 } from "../ui";
 import { FilePanel } from "./file-panel";
-import type { FileTypeConfig } from "./file-type-config";
+import type { FileTypeConfig } from "./file-panel-type";
 import { WebPageFilePanel } from "./web-page-file-panel";
 
 const fileType: Record<FileCategory, FileTypeConfig> = {
