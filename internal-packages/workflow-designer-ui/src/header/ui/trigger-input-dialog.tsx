@@ -8,7 +8,7 @@ import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { PlayIcon, XIcon } from "lucide-react";
+import { LoaderIcon, PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import {
 	type ButtonHTMLAttributes,
@@ -24,21 +24,29 @@ import { useTrigger } from "../../hooks/use-trigger";
 export function Button({
 	leftIcon: LeftIcon,
 	rightIcon: RightIcon,
+	loading = false,
 	children,
 	...props
 }: {
 	leftIcon?: ReactNode;
 	rightIcon?: ReactNode;
+	loading?: boolean;
 } & ButtonHTMLAttributes<HTMLButtonElement>) {
 	return (
 		<button
 			type="button"
-			className="bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] cursor-pointer outline-none text-black-900"
+			className={clsx(
+				"bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] outline-none text-black-900",
+				"data-[loading=true]:cursor-not-allowed data-[loading-true]: opacity-60",
+				"data-[loading=false]:cursor-pointer",
+			)}
+			data-loading={loading}
+			disabled={loading}
 			{...props}
 		>
-			{LeftIcon}
+			{loading ? <LoaderIcon className="size-[14px] animate-spin" /> : LeftIcon}
 			<div>{children}</div>
-			{RightIcon}
+			{!loading && RightIcon}
 		</button>
 	);
 }
