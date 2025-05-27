@@ -16,8 +16,8 @@ export const WebPageFileIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 		aria-label="Web Page File"
 		{...props}
 	>
-		<rect width="18" height="18" x="3" y="3" rx="2" />
-		<path d="M3 9h18" />
-		<path d="M9 21V9" />
+		<rect width="18" height="18" x="3" y="3" rx="2" fill="none" />
+		<path d="M3 9h18" fill="none" />
+		<path d="M9 21V9" fill="none" />
 	</svg>
 );
