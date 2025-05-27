@@ -426,13 +426,14 @@ export function TriggerInputDialog({
 
 				for (const job of flow.jobs) {
 					await Promise.all(
-						job.operations.map((operation) => {
+						job.operations.map(async (operation) => {
 							const generation = generationMap.get(
 								operation.generationTemplate.operationNode.id,
 							);
-							return generation
-								? startGeneration(generation.id)
-								: Promise.resolve();
+							if (generation === undefined) {
+								return;
+							}
+							await startGeneration(generation.id);
 						}),
 					);
 				}
