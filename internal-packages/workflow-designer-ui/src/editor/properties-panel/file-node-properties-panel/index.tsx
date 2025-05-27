@@ -7,6 +7,7 @@ import {
 	PropertiesPanelRoot,
 } from "../ui";
 import { FilePanel, type FileTypeConfig } from "./file-panel";
+import { WebPageFilePanel } from "./web-page-file-panel";
 
 const fileType: Record<FileCategory, FileTypeConfig> = {
 	pdf: {
@@ -42,7 +43,14 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				<FilePanel node={node} config={fileType[node.content.category]} />
+				{node.content.category === "webPage" ? (
+					<WebPageFilePanel
+						node={node}
+						config={fileType[node.content.category]}
+					/>
+				) : (
+					<FilePanel node={node} config={fileType[node.content.category]} />
+				)}
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);
