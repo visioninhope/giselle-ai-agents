@@ -22,6 +22,10 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 		label: "Image",
 		maxSize: 1024 * 1024,
 	},
+	webPage: {
+		accept: ["text/html", "text/markdown"],
+		label: "Web Page",
+	},
 };
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
