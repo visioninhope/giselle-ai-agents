@@ -62,7 +62,7 @@ export function NodeIcon({
 				case "imageGeneration": {
 					if (!isImageGenerationNode(node)) {
 						throw new Error(
-							`Expected TextGenerationNode, got ${JSON.stringify(node)}`,
+							`Expected ImageGenerationNode, got ${JSON.stringify(node)}`,
 						);
 					}
 					switch (node.content.llm.provider) {

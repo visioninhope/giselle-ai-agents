@@ -27,7 +27,7 @@ export function NodeGlance({
 				return node.name ?? node.content.llm.id;
 			case "imageGeneration":
 				if (!isImageGenerationNode(node)) {
-					throw new Error("Node is not a text generation node");
+					throw new Error("Node is not a image generation node");
 				}
 				return node.name ?? node.content.llm.id;
 			case "file":
@@ -51,7 +51,7 @@ export function NodeGlance({
 				return node.name ?? node.content.llm.provider;
 			case "imageGeneration":
 				if (!isImageGenerationNode(node)) {
-					throw new Error("Node is not a text generation node");
+					throw new Error("Node is not a image generation node");
 				}
 				return node.name ?? node.content.llm.provider;
 			case "file":

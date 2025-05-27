@@ -510,7 +510,7 @@ export function InputPanel({
 										/>
 									);
 								case "github":
-									throw new Error("github node is depreacted");
+									throw new Error("github node is deprecated");
 								default: {
 									const _exhaustiveCheck: never = source.node.content.type;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);
