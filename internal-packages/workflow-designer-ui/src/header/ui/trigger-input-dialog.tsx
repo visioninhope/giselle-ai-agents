@@ -278,7 +278,6 @@ export function TriggerInputDialog({
 
 			const formData = new FormData(e.currentTarget);
 
-			// inputsを使って入力値チェック
 			const errors: Record<string, string> = {};
 			const validatedValues: Record<string, string | number> = {};
 
