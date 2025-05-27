@@ -17,6 +17,7 @@ export default async function Layout({
 				flowNode: true,
 				runV2: true,
 				githubVectorStore: true,
+				webPageFileNode: true,
 			}}
 		>
 			{children}

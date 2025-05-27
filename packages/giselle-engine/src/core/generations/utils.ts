@@ -165,7 +165,8 @@ async function buildGenerationMessageForTextGeneration(
 						break;
 					}
 					case "image":
-					case "pdf": {
+					case "pdf":
+					case "webPage": {
 						const fileContents = await getFileContents(
 							contextNode.content,
 							fileResolver,
@@ -480,6 +481,7 @@ async function getFileContents(
 			switch (fileContent.category) {
 				case "pdf":
 				case "text":
+				case "webPage":
 					return {
 						type: "file",
 						data,
@@ -592,7 +594,8 @@ async function buildGenerationMessageForImageGeneration(
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
-					case "pdf": {
+					case "pdf":
+					case "webPage": {
 						const fileContents = await getFileContents(
 							contextNode.content,
 							fileResolver,

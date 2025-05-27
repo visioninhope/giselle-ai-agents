@@ -71,6 +71,7 @@ export function WorkspaceProvider({
 											runV2: featureFlag?.runV2 ?? false,
 											githubVectorStore:
 												featureFlag?.githubVectorStore ?? false,
+											webPageFileNode: featureFlag?.webPageFileNode ?? false,
 										}}
 									>
 										{children}

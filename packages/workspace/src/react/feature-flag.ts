@@ -4,6 +4,7 @@ export interface FeatureFlagContextValue {
 	flowNode: boolean;
 	runV2: boolean;
 	githubVectorStore: boolean;
+	webPageFileNode: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined
