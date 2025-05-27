@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "zod/v4";
 import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
 import { FileContent, FileContentReference, OverrideFileContent } from "./file";
 import {
@@ -31,16 +31,14 @@ export type VariableNode = z.infer<typeof VariableNode>;
 
 export const VariableNodeLike = NodeBase.extend({
 	type: z.literal("variable"),
-	content: z
-		.object({
-			type: z.union([
-				TextContent.shape.type,
-				FileContent.shape.type,
-				GitHubContent.shape.type,
-				VectorStoreContent.shape.type,
-			]),
-		})
-		.passthrough(),
+	content: z.looseObject({
+		type: z.union([
+			TextContent.shape.type,
+			FileContent.shape.type,
+			GitHubContent.shape.type,
+			VectorStoreContent.shape.type,
+		]),
+	}),
 });
 export type VariableNodeLike = z.infer<typeof VariableNodeLike>;
 
