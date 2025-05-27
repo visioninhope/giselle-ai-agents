@@ -342,7 +342,10 @@ function Installed({
 					<GitHubRepositoryBlock owner={step.owner} repo={step.repo} />
 					<p className="text-[14px]">Choose what action you want to perform.</p>
 					<fieldset className="flex flex-col gap-[4px]">
-						<Select name="commandId">
+						<Select
+							name="commandId"
+							defaultValue={githubActions["github.create.issue"].command.id}
+						>
 							<SelectTrigger>
 								<SelectValue placeholder="Select an command" />
 							</SelectTrigger>
