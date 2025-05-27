@@ -1,4 +1,5 @@
 import type {
+	FlowTrigger,
 	Generation,
 	ParameterItem,
 	TriggerNode,
@@ -238,6 +239,35 @@ const githubEventInputs: GithubEventInputMap = {
 	},
 };
 
+function createInputsFromTrigger(trigger: FlowTrigger | undefined): Input[] {
+	if (trigger === undefined) {
+		return [];
+	}
+
+	switch (trigger.configuration.provider) {
+		case "github": {
+			const inputDefs = githubEventInputs[trigger.configuration.event.id];
+			return Object.entries(inputDefs).map(([name, def]) => ({
+				name,
+				label: def.label,
+				type: def.type,
+				required: def.required,
+			}));
+		}
+		case "manual": {
+			return trigger.configuration.event.parameters.map((parameter) => ({
+				name: parameter.id,
+				label: parameter.name,
+				type: parameter.type,
+				required: parameter.required,
+			}));
+		}
+		default: {
+			const _exhaustiveCheck: never = trigger.configuration;
+			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+		}
+	}
+}
 function parseFormInputs(inputs: Input[], formData: FormData) {
 	const errors: Record<string, string> = {};
 	const values: Record<string, string | number> = {};
@@ -361,35 +391,10 @@ export function TriggerInputDialog({
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 
-	const inputs = useMemo<Input[]>(() => {
-		if (trigger === undefined) {
-			return [];
-		}
-
-		switch (trigger.configuration.provider) {
-			case "github": {
-				const inputDefs = githubEventInputs[trigger.configuration.event.id];
-				return Object.entries(inputDefs).map(([name, def]) => ({
-					name,
-					label: def.label,
-					type: def.type,
-					required: def.required,
-				}));
-			}
-			case "manual": {
-				return trigger.configuration.event.parameters.map((parameter) => ({
-					name: parameter.id,
-					label: parameter.name,
-					type: parameter.type,
-					required: parameter.required,
-				}));
-			}
-			default: {
-				const _exhaustiveCheck: never = trigger.configuration;
-				throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
-			}
-		}
-	}, [trigger]);
+	const inputs = useMemo<Input[]>(
+		() => createInputsFromTrigger(trigger),
+		[trigger],
+	);
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
