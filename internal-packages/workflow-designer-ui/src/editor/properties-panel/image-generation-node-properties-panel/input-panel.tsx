@@ -507,8 +507,9 @@ export function InputPanel({
 								case "github":
 									throw new Error("github node is deprecated");
 								case "vectorStore":
-									// vector store node can not be connected directly
-									break;
+									throw new Error(
+										"vectorStore node is not supported to connect.",
+									);
 								default: {
 									const _exhaustiveCheck: never = source.node.content.type;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);

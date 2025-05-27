@@ -265,8 +265,9 @@ export function InputPanel({
 										/>
 									);
 								case "vectorStore":
-									// vector store node can not be connected directly
-									break;
+									throw new Error(
+										"vectorStore node is not supported to connect.",
+									);
 								default: {
 									const _exhaustiveCheck: never = source.node.content;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);
