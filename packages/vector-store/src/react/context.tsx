@@ -3,6 +3,7 @@ import type { GitHubVectorStoreInfo } from "../types";
 
 export interface VectorStoreContextValue {
 	github: GitHubVectorStoreInfo[];
+	settingPath: string;
 }
 
 export const VectorStoreContext = createContext<

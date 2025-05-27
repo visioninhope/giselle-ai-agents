@@ -53,6 +53,7 @@ export default async function Layout({
 			}}
 			vectorStore={{
 				github: gitHubVectorStores,
+				settingPath: "/settings/team/vector-stores",
 			}}
 			usageLimits={usageLimits}
 			telemetry={{

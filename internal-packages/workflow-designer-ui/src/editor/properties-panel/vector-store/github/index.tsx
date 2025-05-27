@@ -18,7 +18,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	node,
 }: GitHubVectorStoreNodePropertiesPanelProps) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
-	const { github } = useVectorStore();
+	const { github, settingPath } = useVectorStore();
 	const vectorStoreInfos = github ?? [];
 
 	const currentSelectedRepoId = useMemo(() => {
@@ -74,14 +74,17 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						))}
 					</SelectContent>
 				</Select>
-				<div className="pt-[8px]">
-					<Link
-						href="/settings/team/vector-stores"
-						className="text-blue-600 hover:text-blue-500 text-[14px] hover:underline"
-					>
-						Setup GitHub Vector Store →
-					</Link>
-				</div>
+
+				{settingPath && (
+					<div className="pt-[8px]">
+						<Link
+							href={settingPath}
+							className="text-blue-600 hover:text-blue-500 text-[14px] hover:underline"
+						>
+							Setup GitHub Vector Store →
+						</Link>
+					</div>
+				)}
 			</div>
 		</div>
 	);
