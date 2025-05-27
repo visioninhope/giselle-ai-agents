@@ -4,8 +4,10 @@ import {
 	isImageGenerationNode,
 	isTextGenerationNode,
 	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
+import type { VectorStoreSourceProvider } from "@giselle-sdk/vector-store";
 
 export const triggerProviderLabel: Record<TriggerProvider, string> = {
 	github: "GitHub",
@@ -22,6 +24,18 @@ export const actionProviderLabel: Record<ActionProvider, string> = {
 
 export function actionNodeDefaultName(triggerProvider: ActionProvider) {
 	return `${triggerProviderLabel[triggerProvider]} Action`;
+}
+
+export const vectorStoreProviderLabel: Record<
+	VectorStoreSourceProvider,
+	string
+> = {
+	github: "GitHub",
+};
+export function vectorStoreNodeDefaultName(
+	vectorStoreProvider: VectorStoreSourceProvider,
+) {
+	return `${vectorStoreProviderLabel[vectorStoreProvider]} Vector Store`;
 }
 
 export function defaultName(node: NodeLike) {
@@ -58,7 +72,20 @@ export function defaultName(node: NodeLike) {
 				}
 			}
 		case "variable":
-			return node.name ?? node.content.type;
+			switch (node.content.type) {
+				case "vectorStore":
+					if (!isVectorStoreNode(node)) {
+						throw new Error(
+							`Expected vector store node, got ${JSON.stringify(node)}`,
+						);
+					}
+					return (
+						node.name ??
+						vectorStoreNodeDefaultName(node.content.source.provider)
+					);
+				default:
+					return node.name ?? node.content.type;
+			}
 		default: {
 			const _exhaustiveCheck: never = node;
 			throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);

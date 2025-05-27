@@ -1,6 +1,11 @@
-type Provider = "github";
+export const githubProvider = "github" as const;
+export type VectorStoreSourceProvider = typeof githubProvider;
+export const vectorStoreSourceProviders = [githubProvider] as const;
 
-type VectorStoreReference<P extends Provider, I extends object> = I & {
+type VectorStoreReference<
+	P extends VectorStoreSourceProvider,
+	I extends object,
+> = I & {
 	provider: P;
 };
 
@@ -25,15 +30,16 @@ type VectorStoreReference<P extends Provider, I extends object> = I & {
   ```
  */
 
-export type VectorStoreInfo<T extends VectorStoreReference<Provider, object>> =
-	{
-		id: string;
-		name: string;
-		reference: T;
-	};
+export type VectorStoreInfo<
+	T extends VectorStoreReference<VectorStoreSourceProvider, object>,
+> = {
+	id: string;
+	name: string;
+	reference: T;
+};
 
 export type VectorStoreIdentifier<
-	T extends VectorStoreReference<Provider, object>,
+	T extends VectorStoreReference<VectorStoreSourceProvider, object>,
 > = Omit<T, "provider">;
 
 // MARK: GitHubVectorStore

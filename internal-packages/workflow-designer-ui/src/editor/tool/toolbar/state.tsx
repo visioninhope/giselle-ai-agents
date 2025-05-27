@@ -23,7 +23,11 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import { type ReactNode, createContext, useContext, useState } from "react";
-import { actionNodeDefaultName, triggerNodeDefaultName } from "../../../utils";
+import {
+	actionNodeDefaultName,
+	triggerNodeDefaultName,
+	vectorStoreNodeDefaultName,
+} from "../../../utils";
 import type {
 	AddNodeTool,
 	MoveTool,
@@ -264,7 +268,7 @@ export function vectorStoreNode(
 	return {
 		id: NodeId.generate(),
 		type: "variable",
-		name: provider === "github" ? "GitHub Vector Store" : "Vector Store",
+		name: vectorStoreNodeDefaultName(provider),
 		content: {
 			type: "vectorStore",
 			source: {
