@@ -37,7 +37,7 @@ export function Button({
 			type="button"
 			className={clsx(
 				"bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] outline-none text-black-900",
-				"data-[loading=true]:cursor-not-allowed data-[loading-true]: opacity-60",
+				"data-[loading=true]:cursor-not-allowed data-[loading=true]:opacity-60",
 				"data-[loading=false]:cursor-pointer",
 			)}
 			data-loading={loading}
