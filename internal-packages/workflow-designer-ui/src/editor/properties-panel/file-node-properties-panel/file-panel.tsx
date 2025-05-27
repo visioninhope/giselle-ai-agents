@@ -8,7 +8,7 @@ import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
 import { useToasts } from "../../../ui/toast";
 import { RemoveButton } from "../ui";
-import type { FileTypeConfig } from "./file-type-config";
+import type { FilePanelProps } from "./file-panel-props";
 import { useFileNode } from "./use-file-node";
 
 /**
@@ -17,11 +17,6 @@ import { useFileNode } from "./use-file-node";
  * @todo implement streaming or alternative solution to support larger files (up to 20MB)
  */
 const defaultMaxSize = 1024 * 1024 * 4.5;
-
-type FilePanelProps = {
-	node: FileNode;
-	config: FileTypeConfig;
-};
 
 class FileUploadError extends Error {
 	constructor(message: string) {
