@@ -91,7 +91,10 @@ export function renameActionToOperation(data: unknown, issue: $ZodIssue) {
 						transformedNode,
 					);
 					// Remove the old field properly with delete
-					const templateInNwData = getValueAtPath(newData, templatePath);
+					const templateInNewData = getValueAtPath(newData, templatePath);
+					if (templateInNewData && typeof templateInNewData === "object") {
+						delete templateInNewData.actionNode;
+					}
 					return newData;
 				}
 
