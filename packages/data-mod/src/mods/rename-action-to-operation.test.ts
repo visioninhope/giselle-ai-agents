@@ -14,7 +14,6 @@ test("rename action to operation", () => {
 	}
 	let modData: unknown = generationJson;
 	for (const issue of firstAttempt.error.issues) {
-		console.log(issue);
 		modData = renameActionToOperation(modData, issue as $ZodIssue);
 	}
 	const afterModData = Generation.safeParse(modData);
