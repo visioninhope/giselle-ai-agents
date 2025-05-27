@@ -238,9 +238,6 @@ export function TriggerInputDialog({
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
-	const [validatedInputs, setValidatedInputs] = useState<
-		Record<string, string | number>
-	>({});
 
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
@@ -328,7 +325,6 @@ export function TriggerInputDialog({
 			}
 
 			setValidationErrors({});
-			setValidatedInputs(validatedValues);
 
 			const flow = buildWorkflowFromNode(node.id, data.nodes, data.connections);
 			if (flow === null) {
