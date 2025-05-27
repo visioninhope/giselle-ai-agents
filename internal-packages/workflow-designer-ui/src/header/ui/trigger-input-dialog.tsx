@@ -379,8 +379,10 @@ function createGenerationsForFlow(
 
 export function TriggerInputDialog({
 	node,
+	onClose,
 }: {
 	node: TriggerNode;
+	onClose: () => void;
 }) {
 	const { data: trigger, isLoading } = useTrigger(node);
 	const [validationErrors, setValidationErrors] = useState<
@@ -429,7 +431,7 @@ export function TriggerInputDialog({
 					data.id,
 				);
 
-				for (const job of flow.jobs) {
+				for (const [jobIndex, job] of flow.jobs.entries()) {
 					await Promise.all(
 						job.operations.map(async (operation) => {
 							const generation = generationMap.get(
@@ -441,12 +443,17 @@ export function TriggerInputDialog({
 							await startGeneration(generation.id);
 						}),
 					);
+
+					// Close dialog after first job completes
+					if (jobIndex === 0) {
+						onClose();
+					}
 				}
 			} finally {
 				setIsSubmitting(false);
 			}
 		},
-		[node.id, data, createGeneration, startGeneration, inputs],
+		[node.id, data, createGeneration, startGeneration, inputs, onClose],
 	);
 
 	if (isLoading || trigger === undefined) {
