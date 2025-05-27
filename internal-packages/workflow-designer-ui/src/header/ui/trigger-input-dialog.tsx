@@ -246,6 +246,7 @@ export function TriggerInputDialog({
 	const [validationErrors, setValidationErrors] = useState<
 		Record<string, string>
 	>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
 
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
@@ -332,74 +333,83 @@ export function TriggerInputDialog({
 			}
 
 			setValidationErrors({});
+			setIsSubmitting(true);
 
-			const flow = buildWorkflowFromNode(node.id, data.nodes, data.connections);
-			if (flow === null) {
-				return;
-			}
-			const generations: Generation[] = [];
-			flow.jobs.map((job) =>
-				job.operations.map((operation) => {
-					const parameterItems: ParameterItem[] = [];
-					if (operation.node.content.type === "trigger") {
-						for (const input of inputs) {
-							const validatedValue = validatedValues[input.name];
-							if (validatedValue !== undefined && validatedValue !== "") {
-								switch (input.type) {
-									case "text":
-									case "multiline-text":
-										parameterItems.push({
-											type: "string",
-											name: input.name,
-											value: validatedValue as string,
-										});
-										break;
-									case "number":
-										parameterItems.push({
-											type: "number",
-											name: input.name,
-											value: validatedValue as number,
-										});
-										break;
-									default: {
-										const _exhaustiveCheck: never = input.type;
-										throw new Error(
-											`Unhandled input type: ${_exhaustiveCheck}`,
-										);
+			try {
+				const flow = buildWorkflowFromNode(
+					node.id,
+					data.nodes,
+					data.connections,
+				);
+				if (flow === null) {
+					return;
+				}
+				const generations: Generation[] = [];
+				flow.jobs.map((job) =>
+					job.operations.map((operation) => {
+						const parameterItems: ParameterItem[] = [];
+						if (operation.node.content.type === "trigger") {
+							for (const input of inputs) {
+								const validatedValue = validatedValues[input.name];
+								if (validatedValue !== undefined && validatedValue !== "") {
+									switch (input.type) {
+										case "text":
+										case "multiline-text":
+											parameterItems.push({
+												type: "string",
+												name: input.name,
+												value: validatedValue as string,
+											});
+											break;
+										case "number":
+											parameterItems.push({
+												type: "number",
+												name: input.name,
+												value: validatedValue as number,
+											});
+											break;
+										default: {
+											const _exhaustiveCheck: never = input.type;
+											throw new Error(
+												`Unhandled input type: ${_exhaustiveCheck}`,
+											);
+										}
 									}
 								}
 							}
 						}
-					}
-					generations.push(
-						createGeneration({
-							origin: {
-								type: "workspace",
-								id: data.id,
-							},
-							inputs:
-								parameterItems.length > 0
-									? [{ type: "parameters", items: parameterItems }]
-									: [],
-							...operation.generationTemplate,
-						}),
-					);
-				}),
-			);
-			for (const job of flow.jobs) {
-				await Promise.all(
-					job.operations.map(async (operation) => {
-						const generation = generations.find(
-							(generation) =>
-								generation.context.operationNode.id ===
-								operation.generationTemplate.operationNode.id,
+						generations.push(
+							createGeneration({
+								origin: {
+									type: "workspace",
+									id: data.id,
+								},
+								inputs:
+									parameterItems.length > 0
+										? [{ type: "parameters", items: parameterItems }]
+										: [],
+								...operation.generationTemplate,
+							}),
 						);
-						if (generation === undefined) {
-							return;
-						}
-						await startGeneration(generation.id);
 					}),
 				);
+				for (const job of flow.jobs) {
+					await Promise.all(
+						job.operations.map(async (operation) => {
+							const generation = generations.find(
+								(generation) =>
+									generation.context.operationNode.id ===
+									operation.generationTemplate.operationNode.id,
+							);
+							if (generation === undefined) {
+								return;
+							}
+							await startGeneration(generation.id);
+						}),
+					);
+				}
+			} finally {
+				setIsSubmitting(false);
 			}
 		},
 		[node.id, data, createGeneration, startGeneration, inputs],
@@ -503,9 +513,10 @@ export function TriggerInputDialog({
 					<div className="flex justify-end">
 						<Button
 							type="submit"
+							loading={isSubmitting}
 							leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
 						>
-							Run with params
+							{isSubmitting ? "Running..." : "Run with params"}
 						</Button>
 					</div>
 				</form>
