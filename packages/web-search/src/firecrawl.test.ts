@@ -22,6 +22,7 @@ const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 			expect(result).toHaveProperty("html");
 			expect(result).toHaveProperty("markdown");
 			expect(typeof result.html).toBe("string");
+			expect(result.html.length).toBeGreaterThan(0);
 			expect(result.markdown).toBe("");
 		},
 		HEAVY_TEST_TIMEOUT,
