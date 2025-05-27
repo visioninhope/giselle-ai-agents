@@ -16,6 +16,7 @@ import {
 	type ReactNode,
 	useCallback,
 	useMemo,
+	useState,
 } from "react";
 import type { z } from "zod";
 import { useTrigger } from "../../hooks/use-trigger";
@@ -234,6 +235,12 @@ export function TriggerInputDialog({
 	node: TriggerNode;
 }) {
 	const { data: trigger, isLoading } = useTrigger(node);
+	const [validationErrors, setValidationErrors] = useState<
+		Record<string, string>
+	>({});
+	const [validatedInputs, setValidatedInputs] = useState<
+		Record<string, string | number>
+	>({});
 
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
@@ -272,6 +279,57 @@ export function TriggerInputDialog({
 		async (e) => {
 			e.preventDefault();
 
+			const formData = new FormData(e.currentTarget);
+
+			// inputsを使って入力値チェック
+			const errors: Record<string, string> = {};
+			const validatedValues: Record<string, string | number> = {};
+
+			for (const input of inputs) {
+				const formDataEntryValue = formData.get(input.name);
+				const value = formDataEntryValue
+					? formDataEntryValue.toString().trim()
+					: "";
+
+				if (input.required && value === "") {
+					errors[input.name] = `${input.label} is required`;
+					continue;
+				}
+
+				if (value === "") {
+					validatedValues[input.name] = "";
+					continue;
+				}
+
+				switch (input.type) {
+					case "text":
+					case "multiline-text":
+						validatedValues[input.name] = value;
+						break;
+					case "number": {
+						const numValue = Number(value);
+						if (Number.isNaN(numValue)) {
+							errors[input.name] = `${input.label} must be a valid number`;
+						} else {
+							validatedValues[input.name] = numValue;
+						}
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = input.type;
+						throw new Error(`Unhandled input type: ${_exhaustiveCheck}`);
+					}
+				}
+			}
+
+			if (Object.keys(errors).length > 0) {
+				setValidationErrors(errors);
+				return;
+			}
+
+			setValidationErrors({});
+			setValidatedInputs(validatedValues);
+
 			const flow = buildWorkflowFromNode(node.id, data.nodes, data.connections);
 			if (flow === null) {
 				return;
@@ -281,24 +339,23 @@ export function TriggerInputDialog({
 				job.operations.map((operation) => {
 					const parameterItems: ParameterItem[] = [];
 					if (operation.node.content.type === "trigger") {
-						const formData = new FormData(e.currentTarget);
 						for (const input of inputs) {
-							const formDataEntryValue = formData.get(input.name);
-							if (typeof formDataEntryValue === "string") {
+							const validatedValue = validatedValues[input.name];
+							if (validatedValue !== undefined && validatedValue !== "") {
 								switch (input.type) {
 									case "text":
 									case "multiline-text":
 										parameterItems.push({
 											type: "string",
 											name: input.name,
-											value: formDataEntryValue,
+											value: validatedValue as string,
 										});
 										break;
 									case "number":
 										parameterItems.push({
 											type: "number",
 											name: input.name,
-											value: Number.parseInt(formDataEntryValue),
+											value: validatedValue as number,
 										});
 										break;
 									default: {
@@ -382,6 +439,9 @@ export function TriggerInputDialog({
 										htmlFor={input.name}
 									>
 										{input.label}
+										{input.required && (
+											<span className="text-red-500 ml-1">*</span>
+										)}
 									</label>
 									{input.type === "text" && (
 										<input
@@ -390,7 +450,10 @@ export function TriggerInputDialog({
 											id={input.name}
 											className={clsx(
 												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-												"border-[1px] border-white-900",
+												"border-[1px]",
+												validationErrors[input.name]
+													? "border-red-500"
+													: "border-white-900",
 												"text-[14px]",
 											)}
 										/>
@@ -401,7 +464,10 @@ export function TriggerInputDialog({
 											id={input.name}
 											className={clsx(
 												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-												"border-[1px] border-white-900",
+												"border-[1px]",
+												validationErrors[input.name]
+													? "border-red-500"
+													: "border-white-900",
 												"text-[14px]",
 											)}
 											rows={4}
@@ -414,10 +480,18 @@ export function TriggerInputDialog({
 											id={input.name}
 											className={clsx(
 												"w-full flex justify-between items-center rounded-[8px] py-[8px] px-[12px] outline-none focus:outline-none",
-												"border-[1px] border-white-900",
+												"border-[1px]",
+												validationErrors[input.name]
+													? "border-red-500"
+													: "border-white-900",
 												"text-[14px]",
 											)}
 										/>
+									)}
+									{validationErrors[input.name] && (
+										<span className="text-red-500 text-[12px] font-medium">
+											{validationErrors[input.name]}
+										</span>
 									)}
 								</fieldset>
 							);
