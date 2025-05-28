@@ -520,73 +520,90 @@ type CreateArgMap = {
 
 export const nodeFactories = {
 	create: <K extends NodeContentType>(type: K, arg?: CreateArgMap[K]) => {
-		if (type === "textGeneration") {
-			return factoryImplementations.textGeneration.create(
-				arg as CreateArgMap["textGeneration"],
-			);
+		switch (type) {
+			case "textGeneration":
+				return factoryImplementations.textGeneration.create(
+					arg as CreateArgMap["textGeneration"],
+				);
+			case "imageGeneration":
+				return factoryImplementations.imageGeneration.create(
+					arg as CreateArgMap["imageGeneration"],
+				);
+			case "trigger":
+				return factoryImplementations.trigger.create(
+					arg as CreateArgMap["trigger"],
+				);
+			case "action":
+				return factoryImplementations.action.create(
+					arg as CreateArgMap["action"],
+				);
+			case "text":
+				return factoryImplementations.text.create();
+			case "file":
+				return factoryImplementations.file.create(arg as CreateArgMap["file"]);
+			case "github":
+				return factoryImplementations.github.create(
+					arg as CreateArgMap["github"],
+				);
+			case "vectorStore":
+				return factoryImplementations.vectorStore.create(
+					arg as CreateArgMap["vectorStore"],
+				);
+			default: {
+				const _exhaustive: never = type;
+				throw new Error(`No create factory for content type: ${type}`);
+			}
 		}
-		if (type === "imageGeneration") {
-			return factoryImplementations.imageGeneration.create(
-				arg as CreateArgMap["imageGeneration"],
-			);
-		}
-		if (type === "trigger") {
-			return factoryImplementations.trigger.create(
-				arg as CreateArgMap["trigger"],
-			);
-		}
-		if (type === "action") {
-			return factoryImplementations.action.create(
-				arg as CreateArgMap["action"],
-			);
-		}
-		if (type === "text") {
-			return factoryImplementations.text.create();
-		}
-		if (type === "file") {
-			return factoryImplementations.file.create(arg as CreateArgMap["file"]);
-		}
-		if (type === "github") {
-			return factoryImplementations.github.create(
-				arg as CreateArgMap["github"],
-			);
-		}
-		if (type === "vectorStore") {
-			return factoryImplementations.vectorStore.create(
-				arg as CreateArgMap["vectorStore"],
-			);
-		}
-
-		throw new Error(`No create factory for content type: ${type}`);
 	},
 	clone: (sourceNode: Node) => {
-		if (isTextGenerationNode(sourceNode)) {
-			return factoryImplementations.textGeneration.clone(sourceNode);
-		}
-		if (isImageGenerationNode(sourceNode)) {
-			return factoryImplementations.imageGeneration.clone(sourceNode);
-		}
-		if (isTriggerNode(sourceNode)) {
-			return factoryImplementations.trigger.clone(sourceNode);
-		}
-		if (isActionNode(sourceNode)) {
-			return factoryImplementations.action.clone(sourceNode);
-		}
-		if (isTextNode(sourceNode)) {
-			return factoryImplementations.text.clone(sourceNode);
-		}
-		if (isFileNode(sourceNode)) {
-			return factoryImplementations.file.clone(sourceNode);
-		}
-		if (isGitHubNode(sourceNode)) {
-			return factoryImplementations.github.clone(sourceNode);
-		}
-		if (isVectorStoreNode(sourceNode)) {
-			return factoryImplementations.vectorStore.clone(sourceNode);
+		const contentType = sourceNode.content.type;
+		switch (contentType) {
+			case "textGeneration":
+				if (isTextGenerationNode(sourceNode)) {
+					return factoryImplementations.textGeneration.clone(sourceNode);
+				}
+				break;
+			case "imageGeneration":
+				if (isImageGenerationNode(sourceNode)) {
+					return factoryImplementations.imageGeneration.clone(sourceNode);
+				}
+				break;
+			case "trigger":
+				if (isTriggerNode(sourceNode)) {
+					return factoryImplementations.trigger.clone(sourceNode);
+				}
+				break;
+			case "action":
+				if (isActionNode(sourceNode)) {
+					return factoryImplementations.action.clone(sourceNode);
+				}
+				break;
+			case "text":
+				if (isTextNode(sourceNode)) {
+					return factoryImplementations.text.clone(sourceNode);
+				}
+				break;
+			case "file":
+				if (isFileNode(sourceNode)) {
+					return factoryImplementations.file.clone(sourceNode);
+				}
+				break;
+			case "github":
+				if (isGitHubNode(sourceNode)) {
+					return factoryImplementations.github.clone(sourceNode);
+				}
+				break;
+			case "vectorStore":
+				if (isVectorStoreNode(sourceNode)) {
+					return factoryImplementations.vectorStore.clone(sourceNode);
+				}
+				break;
+			default: {
+				const _exhaustive: never = contentType;
+				throw new Error(`No clone factory for content type: ${contentType}`);
+			}
 		}
 
-		throw new Error(
-			`No clone factory for content type: ${sourceNode.content.type}`,
-		);
+		throw new Error(`Invalid node structure for content type: ${contentType}`);
 	},
 };
