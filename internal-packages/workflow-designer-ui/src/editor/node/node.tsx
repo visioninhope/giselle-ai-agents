@@ -361,14 +361,21 @@ export function NodeComponent({
 					</div>
 				))}
 			{isActionNode(node, "github") &&
-				node.content.command.state.status === "configured" && (
+				(node.content.command.state.status === "configured" ? (
 					<div className="px-[16px] relative">
 						<GitHubRepositoryBadgeFromRepo
 							installationId={node.content.command.state.installationId}
 							repositoryNodeId={node.content.command.state.repositoryNodeId}
 						/>
 					</div>
-				)}
+				) : (
+					<div className="pl-[16px] relative pr-[32px]">
+						<div className="inline-flex items-center justify-center bg-[#342527] text-[#d7745a] rounded-full text-[12px] pl-[10px] pr-[12px] py-2 gap-[6px]">
+							<CircleAlertIcon className="size-[18px]" />
+							<span>REQUIRES SETUP</span>
+						</div>
+					</div>
+				))}
 			{isVectorStoreNode(node, "github") &&
 				node.content.source.state.status === "configured" && (
 					<div className="px-[16px] relative">
