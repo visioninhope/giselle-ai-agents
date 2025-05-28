@@ -25,7 +25,7 @@ import {
 } from "@xyflow/react";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
-import { CheckIcon, SquareIcon } from "lucide-react";
+import { CheckIcon, CircleAlertIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
 import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
@@ -337,13 +337,20 @@ export function NodeComponent({
 				</div>
 			</div>
 			{isTriggerNode(node, "github") &&
-				node.content.state.status === "configured" && (
+				(node.content.state.status === "configured" ? (
 					<div className="px-[16px] relative">
 						<GitHubRepositoryBadgeFromTrigger
 							flowTriggerId={node.content.state.flowTriggerId}
 						/>
 					</div>
-				)}
+				) : (
+					<div className="pl-[16px] relative pr-[32px]">
+						<div className="inline-flex items-center justify-center bg-[#342527] text-[#d7745a] rounded-full text-[12px] pl-[10px] pr-[12px] py-2 gap-[6px]">
+							<CircleAlertIcon className="size-[18px]" />
+							<span>REQUIRES SETUP</span>
+						</div>
+					</div>
+				))}
 			{isActionNode(node, "github") &&
 				node.content.command.state.status === "configured" && (
 					<div className="px-[16px] relative">
