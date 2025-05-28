@@ -77,9 +77,24 @@ export const VectorStoreNode = VariableNode.extend({
 });
 export type VectorStoreNode = z.infer<typeof VectorStoreNode>;
 
-export function isVectorStoreNode(args: unknown): args is VectorStoreNode {
+type VectorStoreSourceProvider = VectorStoreContent["source"]["provider"];
+
+export function isVectorStoreNode<
+	TVectorStoreSourceProvider extends
+		VectorStoreSourceProvider = VectorStoreSourceProvider,
+>(
+	args: unknown,
+	provider?: TVectorStoreSourceProvider,
+): args is TVectorStoreSourceProvider extends VectorStoreSourceProvider
+	? VectorStoreNode & {
+			content: { source: { provider: TVectorStoreSourceProvider } };
+		}
+	: VectorStoreNode {
 	const result = VectorStoreNode.safeParse(args);
-	return result.success;
+	return (
+		result.success &&
+		(provider === undefined || result.data.content.source.provider === provider)
+	);
 }
 
 const OverrideVariableNodeContent = z.discriminatedUnion("type", [
