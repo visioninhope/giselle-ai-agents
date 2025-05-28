@@ -1,9 +1,12 @@
-import type {
-	FlowTrigger,
-	Generation,
-	ParameterItem,
-	TriggerNode,
-	WorkspaceId,
+import {
+	type ActionNode,
+	type FlowTrigger,
+	type Generation,
+	type Input,
+	type ParameterItem,
+	type TriggerNode,
+	type WorkspaceId,
+	isActionNode,
 } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
@@ -66,7 +69,7 @@ export function buttonLabel(node: TriggerNode) {
 	}
 }
 
-interface Input {
+interface FormInput {
 	name: string;
 	label: string;
 	type: "text" | "multiline-text" | "number";
@@ -77,7 +80,7 @@ type GithubEventInputMap = {
 	[K in keyof typeof githubTriggers]: {
 		[K2 in keyof z.infer<
 			(typeof githubTriggers)[K]["event"]["payloads"]
-		>]: Omit<Input, "name">;
+		>]: Omit<FormInput, "name">;
 	};
 };
 
@@ -239,7 +242,9 @@ const githubEventInputs: GithubEventInputMap = {
 	},
 };
 
-function createInputsFromTrigger(trigger: FlowTrigger | undefined): Input[] {
+function createInputsFromTrigger(
+	trigger: FlowTrigger | undefined,
+): FormInput[] {
 	if (trigger === undefined) {
 		return [];
 	}
@@ -268,7 +273,7 @@ function createInputsFromTrigger(trigger: FlowTrigger | undefined): Input[] {
 		}
 	}
 }
-function parseFormInputs(inputs: Input[], formData: FormData) {
+function parseFormInputs(inputs: FormInput[], formData: FormData) {
 	const errors: Record<string, string> = {};
 	const values: Record<string, string | number> = {};
 
@@ -313,7 +318,7 @@ function parseFormInputs(inputs: Input[], formData: FormData) {
 }
 
 function toParameterItems(
-	inputs: Input[],
+	inputs: FormInput[],
 	values: Record<string, string | number>,
 ): ParameterItem[] {
 	const items: ParameterItem[] = [];
@@ -349,7 +354,7 @@ function toParameterItems(
 
 function createGenerationsForFlow(
 	flow: NonNullable<ReturnType<typeof buildWorkflowFromNode>>,
-	inputs: Input[],
+	inputs: FormInput[],
 	values: Record<string, string | number>,
 	createGeneration: ReturnType<
 		typeof useGenerationRunnerSystem
@@ -393,9 +398,41 @@ export function TriggerInputDialog({
 	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 
-	const inputs = useMemo<Input[]>(
+	const inputs = useMemo<FormInput[]>(
 		() => createInputsFromTrigger(trigger),
 		[trigger],
+	);
+	const flow = useMemo(
+		() => buildWorkflowFromNode(node.id, data.nodes, data.connections),
+		[node.id, data.nodes, data.connections],
+	);
+	const requiresActionNodes = useMemo(
+		() =>
+			flow === null
+				? []
+				: flow.nodes
+						.filter((node) => isActionNode(node, "github"))
+						.map((node) => {
+							const notConnectedRequiredInputs = node.inputs.filter(
+								(input) =>
+									input.isRequired &&
+									!data.connections.some(
+										(connection) => connection.inputId === input.id,
+									),
+							);
+							if (notConnectedRequiredInputs.length === 0) {
+								return null;
+							}
+							return {
+								node,
+								inputs: notConnectedRequiredInputs,
+							};
+						})
+						.filter(
+							(item): item is { node: ActionNode; inputs: Input[] } =>
+								item !== null,
+						),
+		[flow, data.connections],
 	);
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -414,11 +451,6 @@ export function TriggerInputDialog({
 			setIsSubmitting(true);
 
 			try {
-				const flow = buildWorkflowFromNode(
-					node.id,
-					data.nodes,
-					data.connections,
-				);
 				if (flow === null) {
 					return;
 				}
@@ -453,10 +485,10 @@ export function TriggerInputDialog({
 				setIsSubmitting(false);
 			}
 		},
-		[node.id, data, createGeneration, startGeneration, inputs, onClose],
+		[data, createGeneration, startGeneration, inputs, onClose, flow],
 	);
 
-	if (isLoading || trigger === undefined) {
+	if (isLoading || trigger === undefined || flow === undefined) {
 		return null;
 	}
 	return (
@@ -484,6 +516,42 @@ export function TriggerInputDialog({
 					<p className="text-[12px] mb-[8px] text-black-400 font-hubot font-semibold">
 						Execute this flow with custom input values
 					</p>
+
+					{requiresActionNodes.length > 0 && (
+						<div className="bg-red-50 border border-red-200 rounded-[8px] p-[12px] mb-[16px]">
+							<div className="flex items-start gap-[8px]">
+								<div className="text-red-500 mt-[2px]">⚠️</div>
+								<div className="flex-1">
+									<h4 className="text-red-800 font-medium text-[14px] mb-[4px]">
+										Missing Required Connections
+									</h4>
+									<p className="text-red-700 text-[12px] mb-[8px]">
+										The following action nodes have required inputs that are not
+										connected:
+									</p>
+									<ul className="space-y-[4px]">
+										{requiresActionNodes.map((item) => (
+											<li
+												key={item.node.id}
+												className="text-red-700 text-[12px]"
+											>
+												<span className="font-medium">
+													{item.node.name || "Unnamed Action"}
+												</span>
+												{" - Missing: "}
+												{item.inputs.map((input) => input.label).join(", ")}
+											</li>
+										))}
+									</ul>
+									<p className="text-red-700 text-[12px] mt-[8px]">
+										These nodes may fail during execution. Please connect all
+										required inputs before running.
+									</p>
+								</div>
+							</div>
+						</div>
+					)}
+
 					<div className="flex flex-col gap-[8px]">
 						{inputs.map((input) => {
 							return (
