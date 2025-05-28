@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1049 MIT
+* 1048 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -1516,7 +1516,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@mendable/firecrawl-js"></a>
-### @mendable/firecrawl-js v1.6.1
+### @mendable/firecrawl-js v1.25.1
 #### 
 
 ##### Paths
@@ -8616,17 +8616,6 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="isomorphic-ws"></a>
 ### isomorphic-ws v5.0.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="isows"></a>
-### isows v1.0.6
 #### 
 
 ##### Paths
