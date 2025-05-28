@@ -17,6 +17,7 @@
 		"@giselle-sdk/integration": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
+		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@giselle-sdk/usage-limits": "workspace:^",
 		"@giselle-sdk/vector-store": "workspace:^",
 		"@giselle-sdk/workflow-utils": "workspace:^",
