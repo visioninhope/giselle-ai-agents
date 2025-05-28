@@ -30,23 +30,29 @@ export function Button({
 	leftIcon: LeftIcon,
 	rightIcon: RightIcon,
 	loading = false,
+	disabled = false,
 	children,
 	...props
 }: {
 	leftIcon?: ReactNode;
 	rightIcon?: ReactNode;
 	loading?: boolean;
-} & ButtonHTMLAttributes<HTMLButtonElement>) {
+	disabled?: boolean;
+} & Omit<ButtonHTMLAttributes<HTMLButtonElement>, "disabled">) {
+	const isDisabled = loading || disabled;
+
 	return (
 		<button
 			type="button"
 			className={clsx(
 				"bg-white-900 px-[8px] rounded-[4px] py-[4px] text-[14px] flex items-center gap-[4px] outline-none text-black-900",
 				"data-[loading=true]:cursor-not-allowed data-[loading=true]:opacity-60",
-				"data-[loading=false]:cursor-pointer",
+				"data-[disabled=true]:cursor-not-allowed data-[disabled=true]:opacity-60",
+				"data-[loading=false]:data-[disabled=false]:cursor-pointer",
 			)}
 			data-loading={loading}
-			disabled={loading}
+			data-disabled={isDisabled}
+			disabled={isDisabled}
 			{...props}
 		>
 			{loading ? <LoaderIcon className="size-[14px] animate-spin" /> : LeftIcon}
@@ -546,8 +552,8 @@ export function TriggerInputDialog({
 										))}
 									</ul>
 									<p className="text-red-700 text-[12px] mt-[8px]">
-										These nodes may fail during execution. Please connect all
-										required inputs before running.
+										Please connect all required inputs in the workflow designer
+										before running this flow.
 									</p>
 								</div>
 							</div>
@@ -625,9 +631,14 @@ export function TriggerInputDialog({
 						<Button
 							type="submit"
 							loading={isSubmitting}
+							disabled={requiresActionNodes.length > 0}
 							leftIcon={<PlayIcon className="size-[14px] fill-black-900" />}
 						>
-							{isSubmitting ? "Running..." : "Run with params"}
+							{isSubmitting
+								? "Running..."
+								: requiresActionNodes.length > 0
+									? "Fix connections to run"
+									: "Run with params"}
 						</Button>
 					</div>
 				</form>
