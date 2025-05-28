@@ -6,6 +6,7 @@ import {
 	type InputId,
 	type Node,
 	type OutputId,
+	QueryNode,
 	TextGenerationNode,
 	TextNode,
 	TriggerNode,
@@ -71,6 +72,10 @@ type GiselleWorkflowActionNode = XYFlowNode<
 	{ nodeData: ActionNode; preview?: boolean },
 	ActionNode["content"]["type"]
 >;
+type GiselleWorkflowQueryNode = XYFlowNode<
+	{ nodeData: QueryNode; preview?: boolean },
+	QueryNode["content"]["type"]
+>;
 export type GiselleWorkflowDesignerNode =
 	| GiselleWorkflowDesignerTextGenerationNode
 	| GiselleWorkflowDesignerImageGenerationNode
@@ -79,7 +84,8 @@ export type GiselleWorkflowDesignerNode =
 	| GiselleWorkflowGitHubNode
 	| GiselleWorkflowVectorStoreNode
 	| GiselleWorkflowTriggerNode
-	| GiselleWorkflowActionNode;
+	| GiselleWorkflowActionNode
+	| GiselleWorkflowQueryNode;
 
 export const nodeTypes: NodeTypes = {
 	[TextGenerationNode.shape.content.shape.type.value]: CustomXyFlowNode,
@@ -90,6 +96,7 @@ export const nodeTypes: NodeTypes = {
 	[VectorStoreNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[TriggerNode.shape.content.shape.type.value]: CustomXyFlowNode,
 	[ActionNode.shape.content.shape.type.value]: CustomXyFlowNode,
+	[QueryNode.shape.content.shape.type.value]: CustomXyFlowNode,
 };
 
 export function CustomXyFlowNode({
@@ -197,6 +204,7 @@ export function NodeComponent({
 				"data-[content-type=videoGeneration]:from-video-generation-node-1] data-[content-type=videoGeneration]:to-video-generation-node-2 data-[content-type=videoGeneration]:shadow-video-generation-node-1",
 				"data-[content-type=trigger]:from-trigger-node-1] data-[content-type=trigger]:to-trigger-node-2 data-[content-type=trigger]:shadow-trigger-node-1",
 				"data-[content-type=action]:from-action-node-1] data-[content-type=action]:to-action-node-2 data-[content-type=action]:shadow-action-node-1",
+				"data-[content-type=query]:from-query-node-1] data-[content-type=query]:to-query-node-2 data-[content-type=query]:shadow-query-node-1",
 				"data-[selected=true]:shadow-[0px_0px_16px_0px]",
 				"data-[preview=true]:opacity-50",
 				"not-data-preview:min-h-[110px]",
@@ -260,6 +268,7 @@ export function NodeComponent({
 					"group-data-[content-type=videoGeneration]:from-video-generation-node-1/40 group-data-[content-type=videoGeneration]:to-video-generation-node-1",
 					"group-data-[content-type=trigger]:from-trigger-node-1/40 group-data-[content-type=trigger]:to-trigger-node-1",
 					"group-data-[content-type=action]:from-action-node-1/40 group-data-[content-type=action]:to-action-node-1",
+					"group-data-[content-type=query]:from-query-node-1/40 group-data-[content-type=query]:to-query-node-1",
 				)}
 			/>
 
@@ -287,6 +296,7 @@ export function NodeComponent({
 							"group-data-[content-type=videoGeneration]:bg-video-generation-node-1",
 							"group-data-[content-type=trigger]:bg-trigger-node-1",
 							"group-data-[content-type=action]:bg-action-node-1",
+							"group-data-[content-type=query]:bg-query-node-1",
 						)}
 					>
 						<NodeIcon
@@ -304,6 +314,7 @@ export function NodeComponent({
 								"group-data-[content-type=videoGeneration]:text-white-900",
 								"group-data-[content-type=trigger]:text-white-900",
 								"group-data-[content-type=action]:text-white-900",
+								"group-data-[content-type=query]:text-white-900",
 							)}
 						/>
 					</div>
@@ -399,6 +410,7 @@ export function NodeComponent({
 											"group-data-[content-type=webSearch]:!bg-web-search-node-1 group-data-[content-type=webSearch]:!border-web-search-node-1",
 											"group-data-[content-type=audioGeneration]:!bg-audio-generation-node-1 group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 											"group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+											"group-data-[content-type=query]:!bg-query-node-1 group-data-[content-type=query]:!border-query-node-1",
 										)}
 									/>
 									<div className={clsx("px-[12px] text-white-900 text-[12px]")}>
@@ -464,6 +476,7 @@ export function NodeComponent({
 											"group-data-[content-type=webSearch]:!border-web-search-node-1",
 											"group-data-[content-type=audioGeneration]:!border-audio-generation-node-1",
 											"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
+											"group-data-[content-type=query]:!border-query-node-1",
 										)}
 									/>
 									<div className="absolute left-[-12px] text-[12px] text-black-400 whitespace-nowrap -translate-x-[100%]">
@@ -503,6 +516,7 @@ export function NodeComponent({
 										"group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[content-type=action]:!border-action-node-1",
+										"group-data-[content-type=query]:!border-query-node-1",
 										"group-data-[state=connected]:group-data-[content-type=textGeneration]:!bg-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=imageGeneration]:!bg-image-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=github]:!bg-github-node-1",
@@ -514,6 +528,7 @@ export function NodeComponent({
 										"group-data-[state=connected]:group-data-[content-type=videoGeneration]:!bg-video-generation-node-1 group-data-[state=connected]:group-data-[content-type=videoGeneration]:!border-video-generation-node-1",
 										"group-data-[state=connected]:group-data-[content-type=trigger]:!bg-trigger-node-1 group-data-[state=connected]:group-data-[content-type=trigger]:!border-trigger-node-1",
 										"group-data-[state=connected]:group-data-[content-type=action]:!bg-action-node-1 group-data-[state=connected]:group-data-[content-type=action]:!border-action-node-1",
+										"group-data-[state=connected]:group-data-[content-type=query]:!bg-query-node-1 group-data-[state=connected]:group-data-[content-type=query]:!border-query-node-1",
 										"group-data-[state=disconnected]:!bg-black-900",
 									)}
 								/>
