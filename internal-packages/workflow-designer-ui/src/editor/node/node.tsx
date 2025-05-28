@@ -425,6 +425,7 @@ export function NodeComponent({
 											? "connected"
 											: "disconnected"
 									}
+									data-required={input.isRequired ? "true" : "false"}
 								>
 									<Handle
 										type="target"
@@ -447,6 +448,7 @@ export function NodeComponent({
 											"group-data-[state=connected]:px-[16px]",
 											"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-left-[4.5px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:-translate-x-[100%]",
 											"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+											"group-data-[state=disconnected]:group-data-[required=true]:text-red-900",
 										)}
 									>
 										{input.label}
