@@ -23,6 +23,7 @@ export interface WebSearchTool {
 	) => Promise<WebSearchResult>;
 }
 
+// The `_config` parameter is currently unused but retained for potential future functionality.
 export function webSearch(_config: WebSearchConfig): WebSearchTool {
 	return {
 		fetchUrl: (url: string, formats?: AllowedFormats[]) =>
