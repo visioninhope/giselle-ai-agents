@@ -21,6 +21,8 @@ import {
 	type TriggerContent,
 	type TriggerNode,
 	type VariableNode,
+	type VectorStoreContent,
+	type VectorStoreNode,
 	isActionNode,
 	isFileNode,
 	isGitHubNode,
@@ -28,6 +30,7 @@ import {
 	isTextGenerationNode,
 	isTextNode,
 	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import type { ActionProvider } from "@giselle-sdk/flow";
 import {
@@ -41,6 +44,7 @@ import {
 	actionNodeDefaultName,
 	defaultName,
 	triggerNodeDefaultName,
+	vectorStoreNodeDefaultName,
 } from "./default-name";
 
 export type ClonedFileDataPayload = FileData & {
@@ -442,6 +446,55 @@ const githubVariableFactoryImpl = {
 	},
 } satisfies NodeFactory<GitHubNode, GitHubContent["objectReferences"]>;
 
+const vectorStoreFactoryImpl = {
+	create: (
+		provider: VectorStoreContent["source"]["provider"],
+	): VectorStoreNode => ({
+		id: NodeId.generate(),
+		type: "variable",
+		name: vectorStoreNodeDefaultName(provider),
+		content: {
+			type: "vectorStore",
+			source: {
+				provider: provider,
+				state: {
+					status: "unconfigured",
+				},
+			},
+		},
+		inputs: [],
+		outputs: [
+			{
+				id: OutputId.generate(),
+				label: "Output",
+				accessor: "source",
+			},
+		],
+	}),
+	clone: (orig: VectorStoreNode): NodeFactoryCloneResult<VectorStoreNode> => {
+		const clonedContent = structuredClone(orig.content);
+		clonedContent.source.state = { status: "unconfigured" };
+
+		const { newIo: newInputs, idMap: inputIdMap } =
+			cloneAndRenewInputIdsWithMap(orig.inputs);
+		const { newIo: newOutputs, idMap: outputIdMap } =
+			cloneAndRenewOutputIdsWithMap(orig.outputs);
+
+		const newNode = {
+			id: NodeId.generate(),
+			type: "variable",
+			name: `Copy of ${orig.name ?? defaultName(orig)}`,
+			content: clonedContent,
+			inputs: newInputs,
+			outputs: newOutputs,
+		} satisfies VectorStoreNode;
+		return { newNode, inputIdMap, outputIdMap };
+	},
+} satisfies NodeFactory<
+	VectorStoreNode,
+	VectorStoreContent["source"]["provider"]
+>;
+
 // --- Factories Manager ---
 const factoryImplementations = {
 	textGeneration: textGenerationFactoryImpl,
@@ -451,6 +504,7 @@ const factoryImplementations = {
 	text: textVariableFactoryImpl,
 	file: fileVariableFactoryImpl,
 	github: githubVariableFactoryImpl,
+	vectorStore: vectorStoreFactoryImpl,
 } as const;
 
 type CreateArgMap = {
@@ -461,6 +515,7 @@ type CreateArgMap = {
 	text: undefined; // textVariableFactoryImpl.create is no argument
 	file: Parameters<typeof fileVariableFactoryImpl.create>[0];
 	github: Parameters<typeof githubVariableFactoryImpl.create>[0];
+	vectorStore: Parameters<typeof vectorStoreFactoryImpl.create>[0];
 };
 
 export const nodeFactories = {
@@ -496,6 +551,11 @@ export const nodeFactories = {
 				arg as CreateArgMap["github"],
 			);
 		}
+		if (type === "vectorStore") {
+			return factoryImplementations.vectorStore.create(
+				arg as CreateArgMap["vectorStore"],
+			);
+		}
 
 		throw new Error(`No create factory for content type: ${type}`);
 	},
@@ -520,6 +580,9 @@ export const nodeFactories = {
 		}
 		if (isGitHubNode(sourceNode)) {
 			return factoryImplementations.github.clone(sourceNode);
+		}
+		if (isVectorStoreNode(sourceNode)) {
+			return factoryImplementations.vectorStore.clone(sourceNode);
 		}
 
 		throw new Error(
