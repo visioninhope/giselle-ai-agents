@@ -1,12 +1,10 @@
 # @giselle-sdk/web-search
 
-A TypeScript library for scraping and extracting web page content as HTML and Markdown. Supports multiple providers, including Firecrawl (API-based) and a self-made (fetch + Turndown) implementation.
+A TypeScript library for scraping and extracting web page content as HTML and Markdown. It uses a self-made (fetch + Turndown) implementation.
 
 ## Features
 - Scrape web pages and extract content as HTML and/or Markdown
-- Two providers:
-  - **Firecrawl**: Uses the [@mendable/firecrawl-js](https://www.npmjs.com/package/@mendable/firecrawl-js) API
-  - **SelfMade**: Uses native fetch and [Turndown](https://www.npmjs.com/package/turndown) for HTML-to-Markdown conversion
+- Provider uses native fetch and [Turndown](https://www.npmjs.com/package/turndown) for HTML-to-Markdown conversion
 - Type-safe API using [zod](https://www.npmjs.com/package/zod)
 
 ## Installation
@@ -21,19 +19,18 @@ pnpm install
 
 ### Unified Interface
 
-Create a web search tool by specifying the provider. Firecrawl requires an API key.
+Create a web search tool using the self-made provider.
 
 ```ts
 import { webSearch } from "@giselle-sdk/web-search";
 
-const firecrawlTool = webSearch({ provider: "firecrawl", apiKey: "fc-..." });
-const selfMadeTool = webSearch({ provider: "self-made" });
+const tool = webSearch({ provider: "self-made" });
 
-const result = await firecrawlTool.fetchUrl("https://example.com", ["html"]);
+const result = await tool.fetchUrl("https://example.com", ["html"]);
 console.log(result.html); // HTML content
 ```
 
-Provider specific functions `firecrawlScrapeUrl` and `selfMadeScrapeUrl` are still exported if needed.
+The provider specific function `selfMadeScrapeUrl` is also exported if needed.
 
 ## API
 
@@ -52,8 +49,7 @@ Both providers return an object:
 
 ## Environment Variables
 
-- `FIRECRAWL_API_KEY`: Required for Firecrawl provider.
-- `VITEST_WITH_EXTERNAL_API=1`: (For testing) Enables tests that call the Firecrawl API.
+- `VITEST_WITH_EXTERNAL_API=1`: (For testing) Enables tests that perform network requests.
 
 ## Development
 
@@ -71,8 +67,8 @@ Uses [Vitest](https://vitest.dev/):
 pnpm test
 ```
 
-To run tests that require the Firecrawl API, set the environment variable:
+To run tests that require network access, set the environment variable:
 
 ```sh
-FIRECRAWL_API_KEY=your-key VITEST_WITH_EXTERNAL_API=1 pnpm test
+VITEST_WITH_EXTERNAL_API=1 pnpm test
 ```

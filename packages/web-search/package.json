@@ -29,7 +29,6 @@
 		"vitest": "catalog:"
 	},
 	"dependencies": {
-		"@mendable/firecrawl-js": "catalog:",
 		"turndown": "catalog:",
 		"zod": "catalog:"
 	}
