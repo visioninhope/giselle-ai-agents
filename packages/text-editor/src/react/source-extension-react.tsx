@@ -1,9 +1,9 @@
 import { Node as GiselleNode } from "@giselle-sdk/data-type";
+import { SourceExtension } from "@giselle-sdk/text-editor-utils";
 import { type NodeViewProps, NodeViewWrapper, PasteRule } from "@tiptap/react";
 import { ReactNodeViewRenderer } from "@tiptap/react";
 import clsx from "clsx/lite";
 import { useMemo } from "react";
-import { SourceExtension } from "../extensions/source-extension";
 
 function defaultName(node: GiselleNode) {
 	switch (node.type) {
