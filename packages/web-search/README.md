@@ -24,10 +24,10 @@ pnpm install
 Create a web search tool by specifying the provider. Firecrawl requires an API key.
 
 ```ts
-import { websearch } from "@giselle-sdk/web-search";
+import { webSearch } from "@giselle-sdk/web-search";
 
-const firecrawlTool = websearch({ provider: "firecrawl", apiKey: "fc-..." });
-const selfMadeTool = websearch({ provider: "self-made" });
+const firecrawlTool = webSearch({ provider: "firecrawl", apiKey: "fc-..." });
+const selfMadeTool = webSearch({ provider: "self-made" });
 
 const result = await firecrawlTool.fetchUrl("https://example.com", ["html"]);
 console.log(result.html); // HTML content

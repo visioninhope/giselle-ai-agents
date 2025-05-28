@@ -9,18 +9,18 @@ import {
 
 export type AllowedFormats = "html" | "markdown";
 
-export interface WebsearchConfigFirecrawl {
+export interface WebSearchConfigFirecrawl {
 	provider: typeof firecrawlProviderName;
 	apiKey?: string;
 }
 
-export interface WebsearchConfigSelfMade {
+export interface WebSearchConfigSelfMade {
 	provider: typeof selfMadeProviderName;
 }
 
-export type WebsearchConfig =
-	| WebsearchConfigFirecrawl
-	| WebsearchConfigSelfMade;
+export type WebSearchConfig =
+	| WebSearchConfigFirecrawl
+	| WebSearchConfigSelfMade;
 
 export type WebSearchResult = {
 	url: string;
@@ -29,14 +29,14 @@ export type WebSearchResult = {
 	markdown: string;
 };
 
-export interface WebsearchTool {
+export interface WebSearchTool {
 	fetchUrl: (
 		url: string,
 		formats?: AllowedFormats[],
 	) => Promise<WebSearchResult>;
 }
 
-export function websearch(config: WebsearchConfig): WebsearchTool {
+export function webSearch(config: WebSearchConfig): WebSearchTool {
 	if (config.provider === firecrawlProviderName) {
 		return {
 			fetchUrl: (url: string, formats?: AllowedFormats[]) =>
