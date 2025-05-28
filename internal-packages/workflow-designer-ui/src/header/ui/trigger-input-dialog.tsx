@@ -13,7 +13,7 @@ import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { LoaderIcon, PlayIcon, XIcon } from "lucide-react";
+import { AlertTriangleIcon, LoaderIcon, PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import {
 	type ButtonHTMLAttributes,
@@ -493,7 +493,7 @@ export function TriggerInputDialog({
 	}
 	return (
 		<>
-			<div className="flex justify-between items-center mb-[24px]">
+			<div className="flex justify-between items-center mb-[14px]">
 				<h2 className="font-accent text-[18px] font-bold text-primary-100 drop-shadow-[0_0_10px_#0087F6]">
 					{buttonLabel(node)}
 				</h2>
@@ -510,7 +510,7 @@ export function TriggerInputDialog({
 			</div>
 			<div className="flex flex-col h-full">
 				<form
-					className="flex-1 flex flex-col gap-[24px] relative text-white-800 overflow-y-hidden"
+					className="flex-1 flex flex-col gap-[14px] relative text-white-800 overflow-y-hidden"
 					onSubmit={handleSubmit}
 				>
 					<p className="text-[12px] mb-[8px] text-black-400 font-hubot font-semibold">
@@ -518,9 +518,11 @@ export function TriggerInputDialog({
 					</p>
 
 					{requiresActionNodes.length > 0 && (
-						<div className="bg-red-50 border border-red-200 rounded-[8px] p-[12px] mb-[16px]">
+						<div className="bg-red-50 rounded-[6px] p-[10px]">
 							<div className="flex items-start gap-[8px]">
-								<div className="text-red-500 mt-[2px]">⚠️</div>
+								<div className="text-red-500 mt-[2px]">
+									<AlertTriangleIcon className="size-[16px] text-red-700" />
+								</div>
 								<div className="flex-1">
 									<h4 className="text-red-800 font-medium text-[14px] mb-[4px]">
 										Missing Required Connections
