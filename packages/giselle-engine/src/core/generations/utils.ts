@@ -8,6 +8,7 @@ import {
 	type GenerationId,
 	GenerationIndex,
 	type GenerationOrigin,
+	type GenerationOutput,
 	type ImageGenerationNode,
 	type Node,
 	NodeGenerationIndex,
@@ -68,7 +69,8 @@ export async function buildMessageObject(
 			);
 		}
 		case "action":
-		case "trigger": {
+		case "trigger":
+		case "query": {
 			return [];
 		}
 		default: {
@@ -194,6 +196,8 @@ async function buildGenerationMessageForTextGeneration(
 			case "imageGeneration":
 			case "vectorStore":
 				throw new Error("Not implemented");
+
+			case "query":
 			case "trigger":
 			case "action": {
 				const result = await textGenerationResolver(
@@ -618,6 +622,16 @@ async function buildGenerationMessageForImageGeneration(
 				}
 				break;
 
+			case "query": {
+				const result = await textGenerationResolver(
+					contextNode.id,
+					sourceKeyword.outputId,
+				);
+				// If there is no matching Output, replace it with an empty string (remove the pattern string from userMessage)
+				userMessage = userMessage.replace(replaceKeyword, result ?? "");
+				break;
+			}
+
 			case "github":
 			case "imageGeneration":
 			case "trigger":
@@ -833,4 +847,51 @@ export async function extractWorkspaceIdFromOrigin(args: {
 		throw new Error("Run not completed");
 	}
 	return run.workspaceId;
+}
+
+export function queryResultToText(
+	queryResult: Extract<GenerationOutput, { type: "query-result" }>,
+): string | undefined {
+	if (!queryResult.content || queryResult.content.length === 0) {
+		return undefined;
+	}
+
+	const sections: string[] = [];
+
+	for (const result of queryResult.content) {
+		if (result.type === "vector-store") {
+			let sourceInfo = "## Vector Store Search Results";
+			if (
+				result.source.provider === "github" &&
+				result.source.state.status === "configured"
+			) {
+				sourceInfo += ` from ${result.source.state.owner}/${result.source.state.repo}`;
+			}
+			sections.push(sourceInfo);
+
+			if (result.records.length === 0) {
+				sections.push("No matching results found.");
+				continue;
+			}
+
+			for (let i = 0; i < result.records.length; i++) {
+				const record = result.records[i];
+				const recordSections = [
+					`### Result ${i + 1} (Relevance: ${record.score.toFixed(3)})`,
+					record.chunkContent.trim(),
+				];
+
+				if (record.metadata && Object.keys(record.metadata).length > 0) {
+					const metadataEntries = Object.entries(record.metadata)
+						.map(([key, value]) => `${key}: ${value}`)
+						.join(", ");
+					recordSections.push(`*Source: ${metadataEntries}*`);
+				}
+
+				sections.push(recordSections.join("\n\n"));
+			}
+		}
+	}
+
+	return sections.length > 0 ? sections.join("\n\n---\n\n") : undefined;
 }
