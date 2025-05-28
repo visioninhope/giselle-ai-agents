@@ -5,6 +5,7 @@ import type {
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
 import { StackBlicksIcon } from "../../../icons";
 import ClipboardButton from "../../../ui/clipboard-button";
@@ -133,37 +134,28 @@ export function GenerationPanel({
 						<p data-header-text>Result</p>
 					)}
 					{currentGeneration.status === "completed" &&
-					(currentGeneration as unknown as { usage?: unknown }).usage ? (
-						<div className="flex items-center gap-[8px] text-[11px] text-black-400/70 font-hubot font-[500] ml-[12px]">
-							<span className="flex items-center gap-[4px]">
-								<span className="text-black-400/50">↗</span>
-								{(
-									currentGeneration as unknown as {
-										usage: { promptTokens: number };
-									}
-								).usage.promptTokens.toLocaleString()}
-								t
-							</span>
-							<span className="flex items-center gap-[4px]">
-								<span className="text-black-400/50">↘</span>
-								{(
-									currentGeneration as unknown as {
-										usage: { completionTokens: number };
-									}
-								).usage.completionTokens.toLocaleString()}
-								t
-							</span>
-							<span className="flex items-center gap-[4px]">
-								<span className="text-black-400/50">Σ</span>
-								{(
-									currentGeneration as unknown as {
-										usage: { totalTokens: number };
-									}
-								).usage.totalTokens.toLocaleString()}
-								t
-							</span>
-						</div>
-					) : null}
+						currentGeneration.usage && (
+							<div className="flex items-center gap-[10px] text-[11px] text-black-400 font-hubot ml-[6px]">
+								<span className="flex items-center gap-[2px]">
+									<ArrowUpIcon className="text-black-400 size-[12px]" />
+									{(
+										currentGeneration as unknown as {
+											usage: { promptTokens: number };
+										}
+									).usage.promptTokens.toLocaleString()}
+									t
+								</span>
+								<span className="flex items-center gap-[2px]">
+									<ArrowDownIcon className="text-black-400 size-[12px]" />
+									{(
+										currentGeneration as unknown as {
+											usage: { completionTokens: number };
+										}
+									).usage.completionTokens.toLocaleString()}
+									t
+								</span>
+							</div>
+						)}
 				</div>
 				{(currentGeneration.status === "completed" ||
 					currentGeneration.status === "cancelled") && (
