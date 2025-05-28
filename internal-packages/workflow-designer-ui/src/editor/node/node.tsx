@@ -16,6 +16,7 @@ import {
 	isTriggerNode,
 	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
+import { defaultName } from "@giselle-sdk/node-utils";
 import {
 	Handle,
 	type NodeProps,
@@ -31,7 +32,6 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
-import { defaultName } from "../../utils";
 import {
 	GitHubRepositoryBadge,
 	GitHubRepositoryBadgeFromRepo,
