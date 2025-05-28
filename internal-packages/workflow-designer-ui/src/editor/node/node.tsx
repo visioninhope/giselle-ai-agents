@@ -10,8 +10,11 @@ import {
 	TextNode,
 	TriggerNode,
 	VectorStoreNode,
+	isActionNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
+	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import {
 	Handle,
@@ -333,9 +336,7 @@ export function NodeComponent({
 					</div>
 				</div>
 			</div>
-			{node.type === "operation" &&
-				node.content.type === "trigger" &&
-				node.content.provider === "github" &&
+			{isTriggerNode(node, "github") &&
 				node.content.state.status === "configured" && (
 					<div className="px-[16px] relative">
 						<GitHubRepositoryBadgeFromTrigger
@@ -343,8 +344,7 @@ export function NodeComponent({
 						/>
 					</div>
 				)}
-			{node.type === "operation" &&
-				node.content.type === "action" &&
+			{isActionNode(node) &&
 				node.content.command.provider === "github" &&
 				node.content.command.state.status === "configured" && (
 					<div className="px-[16px] relative">
@@ -354,9 +354,7 @@ export function NodeComponent({
 						/>
 					</div>
 				)}
-			{node.type === "variable" &&
-				node.content.type === "vectorStore" &&
-				node.content.source.provider === "github" &&
+			{isVectorStoreNode(node, "github") &&
 				node.content.source.state.status === "configured" && (
 					<div className="px-[16px] relative">
 						<GitHubRepositoryBadge

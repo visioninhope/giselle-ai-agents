@@ -77,9 +77,15 @@ export const VectorStoreNode = VariableNode.extend({
 });
 export type VectorStoreNode = z.infer<typeof VectorStoreNode>;
 
-export function isVectorStoreNode(args: unknown): args is VectorStoreNode {
+export function isVectorStoreNode(
+	args: unknown,
+	provider?: "github",
+): args is VectorStoreNode {
 	const result = VectorStoreNode.safeParse(args);
-	return result.success;
+	return (
+		result.success &&
+		(provider === undefined || result.data.content.source.provider === provider)
+	);
 }
 
 const OverrideVariableNodeContent = z.discriminatedUnion("type", [
