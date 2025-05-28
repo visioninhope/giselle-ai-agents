@@ -113,7 +113,7 @@ export function NodeIcon({
 						case "manual":
 							return <TriggerIcon {...props} data-content-type-icon />;
 						default: {
-							const _exhaustiveCheck: never = node.content.provider;
+							const _exhaustiveCheck: never = node.content;
 							throw new Error(
 								`Unhandled TriggerProviderType: ${_exhaustiveCheck}`,
 							);

@@ -1,3 +1,4 @@
+import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
 import { z } from "zod/v4";
 import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
 import { ActionContent, ActionContentReference } from "./action";
@@ -78,18 +79,39 @@ export const TriggerNode = OperationNode.extend({
 });
 export type TriggerNode = z.infer<typeof TriggerNode>;
 
-export function isTriggerNode(args?: unknown): args is TriggerNode {
+export function isTriggerNode<
+	TTriggerProvider extends TriggerProvider = TriggerProvider,
+>(
+	args?: unknown,
+	provider?: TTriggerProvider,
+): args is TTriggerProvider extends TriggerProvider
+	? TriggerNode & { content: { provider: TTriggerProvider } }
+	: TriggerNode {
 	const result = TriggerNode.safeParse(args);
-	return result.success;
+	return (
+		result.success &&
+		(provider === undefined || result.data.content.provider === provider)
+	);
 }
 
 export const ActionNode = OperationNode.extend({
 	content: ActionContent,
 });
 export type ActionNode = z.infer<typeof ActionNode>;
-export function isActionNode(args?: unknown): args is ActionNode {
+export function isActionNode<
+	TActionProvider extends ActionProvider = ActionProvider,
+>(
+	args?: unknown,
+	provider?: TActionProvider,
+): args is TActionProvider extends ActionProvider
+	? ActionNode & { content: { command: { provider: TActionProvider } } }
+	: ActionNode {
 	const result = ActionNode.safeParse(args);
-	return result.success;
+	return (
+		result.success &&
+		(provider === undefined ||
+			result.data.content.command.provider === provider)
+	);
 }
 
 const OverrideOperationNodeContent = z.discriminatedUnion("type", [
