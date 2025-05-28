@@ -494,7 +494,7 @@ export function TriggerInputDialog({
 		[data, createGeneration, startGeneration, inputs, onClose, flow],
 	);
 
-	if (isLoading || trigger === undefined || flow === undefined) {
+	if (isLoading || trigger === undefined || flow === null) {
 		return null;
 	}
 	return (
