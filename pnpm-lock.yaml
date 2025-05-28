@@ -1249,6 +1249,76 @@ importers:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
 
+  packages/text-editor-utils:
+    dependencies:
+      '@giselle-sdk/data-type':
+        specifier: workspace:*
+        version: link:../data-type
+      '@tiptap/core':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/pm@2.11.5)
+      '@tiptap/extension-bold':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-bullet-list':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-code':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-code-block-lowlight':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/extension-code-block@2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)(highlight.js@11.11.1)(lowlight@3.3.0)
+      '@tiptap/extension-document':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-history':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)
+      '@tiptap/extension-italic':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-list-item':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-ordered-list':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-paragraph':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-strike':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/extension-text':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))
+      '@tiptap/html':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)
+      '@tiptap/react':
+        specifier: 'catalog:'
+        version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      highlight.js:
+        specifier: 'catalog:'
+        version: 11.11.1
+      lowlight:
+        specifier: 'catalog:'
+        version: 3.3.0
+      turndown:
+        specifier: 'catalog:'
+        version: 7.2.0
+    devDependencies:
+      '@giselle/giselle-sdk-tsconfig':
+        specifier: workspace:*
+        version: link:../../tools/tsconfig
+      '@types/turndown':
+        specifier: 'catalog:'
+        version: 5.0.5
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.1)(typescript@5.7.3)(yaml@2.7.0)
+
   packages/usage-limits:
     dependencies:
       '@giselle-sdk/language-model':
