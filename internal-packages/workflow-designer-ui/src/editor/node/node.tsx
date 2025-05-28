@@ -37,6 +37,7 @@ import {
 	GitHubRepositoryBadgeFromRepo,
 	GitHubRepositoryBadgeFromTrigger,
 } from "./ui";
+import { GitHubTriggerStatusBadge } from "./ui/github-trigger/status-badge";
 
 type GiselleWorkflowDesignerTextGenerationNode = XYFlowNode<
 	{ nodeData: TextGenerationNode; preview?: boolean },
@@ -263,6 +264,14 @@ export function NodeComponent({
 			/>
 
 			<div className={clsx("px-[16px] relative")}>
+				{isTriggerNode(node, "github") &&
+					node.content.state.status === "configured" && (
+						<div className="-mt-[6px]">
+							<GitHubTriggerStatusBadge
+								flowTriggerId={node.content.state.flowTriggerId}
+							/>
+						</div>
+					)}
 				<div className="flex items-center gap-[8px]">
 					<div
 						className={clsx(
@@ -320,7 +329,7 @@ export function NodeComponent({
 								e.stopPropagation();
 							}}
 						/>
-						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] text-white-300 font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
+						<div className="flex items-center gap-[2px] pl-[4px] text-[10px] font-mono [&>*:not(:last-child)]:after:content-['/'] [&>*:not(:last-child)]:after:ml-[2px] [&>*:not(:last-child)]:after:text-white-300">
 							{metadataTexts.map((item, index) => (
 								<div key={item.label} className="text-[10px] text-white-400">
 									{selected ? (
