@@ -344,8 +344,7 @@ export function NodeComponent({
 						/>
 					</div>
 				)}
-			{isActionNode(node) &&
-				node.content.command.provider === "github" &&
+			{isActionNode(node, "github") &&
 				node.content.command.state.status === "configured" && (
 					<div className="px-[16px] relative">
 						<GitHubRepositoryBadgeFromRepo

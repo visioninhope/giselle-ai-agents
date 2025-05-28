@@ -77,10 +77,19 @@ export const VectorStoreNode = VariableNode.extend({
 });
 export type VectorStoreNode = z.infer<typeof VectorStoreNode>;
 
-export function isVectorStoreNode(
+type VectorStoreSourceProvider = VectorStoreContent["source"]["provider"];
+
+export function isVectorStoreNode<
+	TVectorStoreSourceProvider extends
+		VectorStoreSourceProvider = VectorStoreSourceProvider,
+>(
 	args: unknown,
-	provider?: "github",
-): args is VectorStoreNode {
+	provider?: TVectorStoreSourceProvider,
+): args is TVectorStoreSourceProvider extends VectorStoreSourceProvider
+	? VectorStoreNode & {
+			content: { source: { provider: TVectorStoreSourceProvider } };
+		}
+	: VectorStoreNode {
 	const result = VectorStoreNode.safeParse(args);
 	return (
 		result.success &&
