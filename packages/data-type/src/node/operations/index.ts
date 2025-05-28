@@ -79,10 +79,14 @@ export const TriggerNode = OperationNode.extend({
 });
 export type TriggerNode = z.infer<typeof TriggerNode>;
 
-export function isTriggerNode(
+export function isTriggerNode<
+	TTriggerProvider extends TriggerProvider = TriggerProvider,
+>(
 	args?: unknown,
-	provider?: TriggerProvider,
-): args is TriggerNode {
+	provider?: TTriggerProvider,
+): args is TTriggerProvider extends TriggerProvider
+	? TriggerNode & { content: { provider: TTriggerProvider } }
+	: TriggerNode {
 	const result = TriggerNode.safeParse(args);
 	return (
 		result.success &&
