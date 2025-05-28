@@ -52,11 +52,8 @@ function Empty({ onGenerate }: { onGenerate?: () => void }) {
 // Helper function to format execution time
 function formatExecutionTime(startedAt: number, completedAt: number): string {
 	const durationMs = completedAt - startedAt;
-	if (durationMs < 1000) {
-		return `${durationMs}ms`;
-	}
 	if (durationMs < 60000) {
-		return `${(durationMs / 1000).toFixed(1)}s`;
+		return `${durationMs.toLocaleString()}ms`;
 	}
 	const minutes = Math.floor(durationMs / 60000);
 	const seconds = Math.floor((durationMs % 60000) / 1000);
