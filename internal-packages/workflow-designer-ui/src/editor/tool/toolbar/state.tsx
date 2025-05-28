@@ -22,12 +22,12 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { type ReactNode, createContext, useContext, useState } from "react";
 import {
 	actionNodeDefaultName,
 	triggerNodeDefaultName,
 	vectorStoreNodeDefaultName,
-} from "../../../utils";
+} from "@giselle-sdk/node-utils";
+import { type ReactNode, createContext, useContext, useState } from "react";
 import type {
 	AddNodeTool,
 	MoveTool,

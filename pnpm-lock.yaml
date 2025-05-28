@@ -679,6 +679,9 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../../packages/language-model
+      '@giselle-sdk/node-utils':
+        specifier: workspace:^
+        version: link:../../packages/node-utils
       '@giselle-sdk/text-editor':
         specifier: workspace:^
         version: link:../../packages/text-editor
@@ -688,9 +691,6 @@ importers:
       '@giselle-sdk/usage-limits':
         specifier: workspace:^
         version: link:../../packages/usage-limits
-      '@giselle-sdk/vector-store':
-        specifier: workspace:^
-        version: link:../../packages/vector-store
       '@giselle-sdk/workflow-utils':
         specifier: workspace:^
         version: link:../../packages/workflow-utils
@@ -1155,6 +1155,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:^
         version: link:../data-type
+      '@giselle-sdk/node-utils':
+        specifier: workspace:^
+        version: link:../node-utils
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../text-editor-utils

@@ -5,6 +5,7 @@ import {
 	type OutputId,
 	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
+import { defaultName } from "@giselle-sdk/node-utils";
 import {
 	isJsonContent,
 	jsonContentToText,
@@ -19,7 +20,6 @@ import {
 	PromptIcon,
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
-import { defaultName } from "../../../utils";
 import {
 	ConnectedOutputListItem,
 	ConnectedOutputListRoot,

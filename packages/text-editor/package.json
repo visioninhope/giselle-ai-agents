@@ -29,6 +29,7 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
+		"@giselle-sdk/node-utils": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@tiptap/react": "catalog:",
 		"clsx": "catalog:",
