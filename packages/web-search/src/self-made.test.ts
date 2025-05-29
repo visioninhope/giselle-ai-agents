@@ -15,6 +15,7 @@ describe("scrapeUrl (invalid URL)", () => {
 (hasExternalApiEnv ? describe : describe.skip)("scrapeUrl (valid URL)", () => {
 	it("should fetch a valid URL and return html (markdown empty)", async () => {
 		const result = await scrapeUrl(TEST_URL, ["html"]);
+		expect(result.title).toBe("Example Domain");
 		expect(result).toHaveProperty("html");
 		expect(result).toHaveProperty("markdown");
 		expect(typeof result.html).toBe("string");
@@ -23,6 +24,7 @@ describe("scrapeUrl (invalid URL)", () => {
 
 	it("should fetch a valid URL and return markdown (html empty)", async () => {
 		const result = await scrapeUrl(TEST_URL, ["markdown"]);
+		expect(result.title).toBe("Example Domain");
 		expect(result).toHaveProperty("html");
 		expect(result).toHaveProperty("markdown");
 		expect(result.html).toBe("");
@@ -32,6 +34,7 @@ describe("scrapeUrl (invalid URL)", () => {
 
 	it("should fetch a valid URL and return both html and markdown", async () => {
 		const result = await scrapeUrl(TEST_URL, ["html", "markdown"]);
+		expect(result.title).toBe("Example Domain");
 		expect(result).toHaveProperty("html");
 		expect(result).toHaveProperty("markdown");
 		expect(typeof result.html).toBe("string");
