@@ -60,6 +60,8 @@ export function useConnectedSources(node: ImageGenerationNode) {
 					break;
 				case "variable":
 					switch (node.content.type) {
+						case "file":
+						case "github":
 						case "text":
 							connectedVariableSources.push({
 								output,
@@ -68,10 +70,8 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							});
 							break;
 
-						case "file":
-						case "github":
 						case "vectorStore":
-							throw new Error("not implemented");
+							throw new Error("vectore store can not be connected");
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
