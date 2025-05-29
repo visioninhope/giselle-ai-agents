@@ -96,7 +96,6 @@ const APICallBasedService = {
 	Unstructured: ExternalServiceName.Unstructured,
 	VercelBlob: ExternalServiceName.VercelBlob,
 	Tavily: ExternalServiceName.Tavily,
-	Firecrawl: ExternalServiceName.Firecrawl,
 } as const;
 
 export const VercelBlobOperation = {
@@ -152,9 +151,7 @@ export function withCountMeasurement<T>(
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
-	externalServiceName:
-		| typeof APICallBasedService.Tavily
-		| typeof APICallBasedService.Firecrawl,
+	externalServiceName: typeof APICallBasedService.Tavily,
 	measurementStartTime?: number,
 ): Promise<T>;
 export async function withCountMeasurement<T>(
