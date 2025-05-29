@@ -24,7 +24,6 @@ export const GoogleLanguageModelId = z
 		"gemini-2.5-flash-preview-05-20",
 		"gemini-2.0-flash",
 		"gemini-2.0-flash-lite",
-		"gemini-1.5-flash",
 	])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
@@ -92,23 +91,11 @@ const gemini20FlashLite: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-const gemini15Flash: GoogleLanguageModel = {
-	provider: "google",
-	id: "gemini-1.5-flash",
-	capabilities:
-		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding |
-		Capability.GenericFileInput,
-	tier: Tier.enum.free,
-	configurations: defaultConfigurations,
-};
-
 export const models = [
 	gemini25ProPreview,
 	gemini25FlashPreview,
 	gemini20Flash,
 	gemini20FlashLite,
-	gemini15Flash,
 ];
 
 export const LanguageModel = GoogleLanguageModel;
