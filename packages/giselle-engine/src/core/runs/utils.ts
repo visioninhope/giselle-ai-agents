@@ -14,6 +14,7 @@ import {
 	isOverrideFileContent,
 	isOverrideGitHubContent,
 	isOverrideImageGenerationContent,
+	isOverrideQueryContent,
 	isOverrideTextContent,
 	isOverrideTextGenerationContent,
 } from "@giselle-sdk/data-type";
@@ -148,6 +149,21 @@ export function overrideGenerationTemplate(
 					}
 					break;
 				}
+				case "query": {
+					if (isOverrideQueryContent(overrideNode.content)) {
+						overridedTemplate = {
+							...overridedTemplate,
+							operationNode: {
+								...overridedTemplate.operationNode,
+								content: {
+									...overridedTemplate.operationNode.content,
+									query: overrideNode.content.query,
+								},
+							},
+						};
+					}
+					break;
+				}
 				case "trigger":
 				case "action":
 					break;
@@ -267,6 +283,7 @@ export function overrideGenerationTemplate(
 				case "trigger":
 				case "action":
 				case "vectorStore":
+				case "query":
 					break;
 				default: {
 					const _exhaustiveCheck: never = sourceNode.content;
