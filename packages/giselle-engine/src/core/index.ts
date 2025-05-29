@@ -16,7 +16,9 @@ import type {
 	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
+import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
+import { CostTracker } from "./cost-tracking/tracker";
 import { copyFile, fetchWebPageFiles, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
@@ -36,6 +38,7 @@ import {
 	getNodeGenerations,
 	setGeneration,
 } from "./generations";
+import { createLangfuseTracer } from "./generations/telemetry";
 import {
 	type HandleGitHubWebhookOptions,
 	getGitHubRepositories,
@@ -65,6 +68,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		...config,
 		llmProviders: config.llmProviders ?? [],
 		integrationConfigs: config.integrationConfigs ?? {},
+		costTracker: new CostTracker({
+			calculateDisplayCost,
+			createLangfuseTracer,
+		}),
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId) => {
