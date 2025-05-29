@@ -20,7 +20,23 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 	frequencyPenalty: 0.0,
 };
 
+const OpenAILanguageModelId = z
+	.enum([
+		"gpt-4o",
+		"gpt-4o-mini",
+		"o1-preview",
+		"o1-mini",
+		"o3",
+		"o3-mini",
+		"o4-mini",
+		"gpt-4.1",
+		"gpt-4.1-mini",
+		"gpt-4.1-nano",
+	])
+	.catch("gpt-4o-mini");
+
 const OpenAILanguageModel = LanguageModelBase.extend({
+	id: OpenAILanguageModelId,
 	provider: z.literal("openai"),
 	configurations: OpenAILanguageModelConfigurations,
 });
