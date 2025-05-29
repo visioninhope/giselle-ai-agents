@@ -355,22 +355,22 @@ export function GenerationRunnerSystemProvider({
 			const handler = stopHandlersRef.current[generationId];
 			if (handler) {
 				handler();
-				setGenerations((prevGenerations) =>
-					prevGenerations.map((prevGeneration) => {
-						if (prevGeneration.id !== generationId) {
-							return prevGeneration;
-						}
-						return {
-							...prevGeneration,
-							status: "cancelled",
-							cancelledAt: Date.now(),
-						} as CancelledGeneration;
-					}),
-				);
 				await client.cancelGeneration({
 					generationId,
 				});
 			}
+			setGenerations((prevGenerations) =>
+				prevGenerations.map((prevGeneration) => {
+					if (prevGeneration.id !== generationId) {
+						return prevGeneration;
+					}
+					return {
+						...prevGeneration,
+						status: "cancelled",
+						cancelledAt: Date.now(),
+					} as CancelledGeneration;
+				}),
+			);
 
 			const currentGeneration = generationListener.current[generationId];
 			generationListener.current[generationId] = {
