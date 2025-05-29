@@ -16,6 +16,7 @@ import type {
 	SelectEnviromentActionTool,
 	SelectFileNodeCategoryTool,
 	SelectLanguageModelTool,
+	SelectRetrievalCategoryTool,
 	SelectSourceCategoryTool,
 	SelectTriggerTool,
 	Tool,
@@ -94,8 +95,19 @@ export function addNodeTool(node: Node) {
 	} satisfies AddNodeTool;
 }
 
+export function selectRetrievalCategoryTool() {
+	return {
+		action: "selectRetrievalCategory",
+		category: "edit",
+	} satisfies SelectRetrievalCategoryTool;
+}
+
 export function textNode() {
 	return nodeFactories.create("text");
+}
+
+export function queryNode() {
+	return nodeFactories.create("query");
 }
 
 export function triggerNode(triggerProvider: TriggerProvider) {

@@ -3,7 +3,6 @@ import { z } from "zod";
 
 export const ExternalServiceName = {
 	Anthropic: "anthropic",
-	Firecrawl: "firecrawl",
 	Google: "google",
 	OpenAI: "openai",
 	Tavily: "tavily",
@@ -51,10 +50,7 @@ const RequestCount = BaseMetricsSchema.extend({
 });
 
 const BasicRequestCountSchema = RequestCount.extend({
-	externalServiceName: z.enum([
-		ExternalServiceName.Tavily,
-		ExternalServiceName.Firecrawl,
-	]),
+	externalServiceName: z.enum([ExternalServiceName.Tavily]),
 });
 
 const UnstructuredRequestCountSchema = RequestCount.extend({

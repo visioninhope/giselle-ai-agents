@@ -4,6 +4,7 @@ import {
 	moveTool,
 	selectFileNodeCategoryTool,
 	selectLanguageModelTool,
+	selectRetrievalCategoryTool,
 	selectSourceCategoryTool,
 	useToolbar,
 } from "./tool/toolbar";
@@ -39,6 +40,9 @@ export function KeyboardShortcuts() {
 					break;
 				case "u":
 					setSelectedTool(selectFileNodeCategoryTool());
+					break;
+				case "r":
+					setSelectedTool(selectRetrievalCategoryTool());
 					break;
 			}
 			if (event.code === "Escape") {
