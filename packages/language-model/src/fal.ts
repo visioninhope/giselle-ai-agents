@@ -26,7 +26,16 @@ const defaultConfiguration: FalLanguageModelConfigurations = {
 	size: imageGenerationSize1x1.value,
 };
 
+const FalLanguageModelId = z
+	.enum([
+		"fal-ai/flux/schnell",
+		"fal-ai/flux-pro/v1.1",
+		"fal-ai/stable-diffusion-v3-medium",
+	])
+	.catch("fal-ai/flux/schnell");
+
 const FalLanguageModel = LanguageModelBase.extend({
+	id: FalLanguageModelId,
 	provider: z.literal("fal"),
 	configurations: FalLanguageModelConfigurations,
 });
