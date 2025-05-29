@@ -14,32 +14,6 @@ function takeLocalEnv(localEnvironmentKey: string) {
 	return true;
 }
 
-export const debugFlag = flag<boolean>({
-	key: "debug",
-	async decide() {
-		return takeLocalEnv("DEBUG_FLAG");
-	},
-	description: "Enable debug mode",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const viewFlag = flag<boolean>({
-	key: "view",
-	async decide() {
-		return takeLocalEnv("VIEW_FLAG");
-	},
-	description: "Enable view mode",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const developerFlag = flag<boolean>({
 	key: "developer",
 	async decide() {
