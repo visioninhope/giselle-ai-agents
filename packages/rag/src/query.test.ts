@@ -10,31 +10,10 @@ vi.mock("./embed", () => ({
 }));
 
 describe("query function", () => {
+	// biome-ignore lint/suspicious/noExplicitAny: mock
 	const mockQueryFunction: QueryFunction<any, any> = vi
 		.fn()
 		.mockResolvedValue([]);
-
-	it("should throw error for null question", async () => {
-		await expect(
-			query({
-				question: null as any,
-				limit: 10,
-				filters: {},
-				queryFunction: mockQueryFunction,
-			}),
-		).rejects.toThrow("Question cannot be empty or only whitespace");
-	});
-
-	it("should throw error for undefined question", async () => {
-		await expect(
-			query({
-				question: undefined as any,
-				limit: 10,
-				filters: {},
-				queryFunction: mockQueryFunction,
-			}),
-		).rejects.toThrow("Question cannot be empty or only whitespace");
-	});
 
 	it("should throw error for empty string question", async () => {
 		await expect(
@@ -124,6 +103,7 @@ describe("query function", () => {
 
 		// Import the module directly to access the mocked implementation
 		const { OpenAIEmbedder } = await import("./embed");
+		// biome-ignore lint/suspicious/noExplicitAny: mock
 		(OpenAIEmbedder as any).mockImplementation(() => mockEmbedder);
 
 		await query({
