@@ -101,10 +101,16 @@ export const flowNodeFlag = flag<boolean>({
 export const runV2Flag = flag<boolean>({
 	key: "run-v2",
 	async decide() {
-		return takeLocalEnv("RUN_V2_FLAG");
+		if (process.env.NODE_ENV !== "development") {
+			return takeLocalEnv("FLOW_NODE_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return Boolean(edgeConfig);
 	},
 	description: "Enable Run v2",
-	defaultValue: true,
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },
