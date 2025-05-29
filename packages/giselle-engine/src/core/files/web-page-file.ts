@@ -20,7 +20,7 @@ export async function fetchWebPageFiles(args: {
 			id: FileIdGenerator.generate(),
 			name: fileName,
 			type: mimeType,
-			size: content.length, // size in characters (not bytes)
+			size: new Blob([content]).size, // size in bytes
 			status: "uploading",
 		};
 		results.push({
