@@ -89,6 +89,11 @@ export async function executeQuery(args: {
 		}
 	}
 
+	// Explicit error handling for undefined workspaceId
+	if (workspaceId === undefined) {
+		throw new Error("Workspace ID is required for query execution");
+	}
+
 	try {
 		const generationContext = GenerationContext.parse(
 			initialGeneration.context,
@@ -102,7 +107,6 @@ export async function executeQuery(args: {
 
 		const vectorStoreNodes = generationContext.sourceNodes.filter(
 			(node) =>
-				node.type === "variable" &&
 				node.content.type === "vectorStore" &&
 				generationContext.connections.some(
 					(connection) => connection.outputNode.id === node.id,
