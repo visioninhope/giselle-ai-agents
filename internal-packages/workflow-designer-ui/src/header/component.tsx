@@ -1,33 +1,21 @@
 "use client";
 import {
-	type Generation,
 	type TriggerNode,
 	type WorkspaceId,
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
-import type { TriggerProvider } from "@giselle-sdk/flow";
-import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { triggerNodeDefaultName } from "@giselle-sdk/node-utils";
-import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
 import {
 	ViewState,
 	useFeatureFlag,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
-import { ChevronDownIcon, PlayIcon, XIcon } from "lucide-react";
+import { PlayIcon } from "lucide-react";
 import Link from "next/link";
-import { DropdownMenu } from "radix-ui";
 import { Dialog, ToggleGroup, VisuallyHidden } from "radix-ui";
-import {
-	type ButtonHTMLAttributes,
-	type ReactNode,
-	useCallback,
-	useMemo,
-	useState,
-} from "react";
+import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
-import { useTrigger } from "../hooks/use-trigger";
 import { GiselleLogo } from "../icons";
 import { SettingsPanel } from "../settings";
 import { ShareButton } from "../ui/button";

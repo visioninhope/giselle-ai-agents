@@ -18,17 +18,16 @@ import {
 	useRef,
 	useState,
 } from "react";
-
 import { useTrigger } from "../../../hooks/use-trigger";
 import { useToasts } from "../../../ui/toast";
 import { Button } from "./button";
 import {
 	type FormInput,
 	buttonLabel,
+	createGenerationsForFlow,
 	createInputsFromTrigger,
 	parseFormInputs,
 } from "./helpers";
-import { createGenerationsForFlow } from "./workflow";
 
 export function TriggerInputDialog({
 	node,
