@@ -70,6 +70,8 @@ function ContentPreview({
 			{shouldShowToggle && (
 				<button
 					type="button"
+					aria-expanded={isExpanded}
+					aria-controls={`content-${content.slice(0, 20).replace(/\s/g, "-")}`}
 					onClick={onToggle}
 					className="flex items-center gap-[4px] text-[12px] text-blue-400 hover:text-blue-300 transition-colors"
 				>
