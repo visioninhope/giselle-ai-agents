@@ -30,7 +30,7 @@ export async function query<
 	} = params;
 
 	// Improved input validation
-	if (question == null || question.trim().length === 0) {
+	if (question.trim().length === 0) {
 		throw new Error("Question cannot be empty or only whitespace");
 	}
 
