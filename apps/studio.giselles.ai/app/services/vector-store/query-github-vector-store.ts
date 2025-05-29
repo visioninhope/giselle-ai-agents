@@ -18,6 +18,27 @@ export async function queryGithubVectorStore(
 		filters: { workspaceId, owner, repo },
 	} = params;
 
+	// Input validation for database query parameters
+	if (!workspaceId || workspaceId.trim().length === 0) {
+		throw new Error("Workspace ID is required");
+	}
+	
+	if (!owner || owner.trim().length === 0) {
+		throw new Error("Repository owner is required");
+	}
+	
+	if (!repo || repo.trim().length === 0) {
+		throw new Error("Repository name is required");
+	}
+	
+	if (!embedding || embedding.length === 0) {
+		throw new Error("Embedding vector is required");
+	}
+	
+	if (limit <= 0) {
+		throw new Error("Limit must be greater than 0");
+	}
+
 	const records = await db
 		.select({
 			dbId: teams.dbId,

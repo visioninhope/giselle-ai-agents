@@ -28,18 +28,35 @@ export async function query<
 		similarityThreshold = 0.5,
 		queryFunction,
 	} = params;
-	if (question.length === 0) {
-		throw new Error("Question cannot be empty");
+
+	// Improved input validation
+	if (question == null || question.trim().length === 0) {
+		throw new Error("Question cannot be empty or only whitespace");
 	}
-	const embedder = new OpenAIEmbedder();
-	const qEmbedding = await embedder.embed(question);
 
-	const queryFunctionArgs: QueryFunctionParams<F> = {
-		embedding: qEmbedding,
-		limit,
-		filters,
-		similarityThreshold,
-	};
+	if (limit <= 0) {
+		throw new Error("Limit must be greater than 0");
+	}
 
-	return await queryFunction(queryFunctionArgs);
+	if (similarityThreshold < 0 || similarityThreshold > 1) {
+		throw new Error("Similarity threshold must be between 0 and 1");
+	}
+
+	try {
+		const embedder = new OpenAIEmbedder();
+		const qEmbedding = await embedder.embed(question.trim());
+
+		const queryFunctionArgs: QueryFunctionParams<F> = {
+			embedding: qEmbedding,
+			limit,
+			filters,
+			similarityThreshold,
+		};
+
+		return await queryFunction(queryFunctionArgs);
+	} catch (error) {
+		throw new Error(
+			`Query execution failed: ${error instanceof Error ? error.message : String(error)}`,
+		);
+	}
 }
