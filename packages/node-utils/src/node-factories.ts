@@ -317,6 +317,9 @@ const actionFactoryImpl = {
 			outputs: [],
 		}) satisfies ActionNode,
 	clone: (orig: ActionNode): NodeFactoryCloneResult<ActionNode> => {
+		const clonedContent = structuredClone(orig.content);
+		clonedContent.command.state = { status: "unconfigured" };
+
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);
 		const { newIo: newOutputs, idMap: outputIdMap } =
@@ -326,7 +329,7 @@ const actionFactoryImpl = {
 			id: NodeId.generate(),
 			type: "operation",
 			name: `Copy of ${orig.name ?? defaultName(orig)}`,
-			content: structuredClone(orig.content),
+			content: clonedContent,
 			inputs: newInputs,
 			outputs: newOutputs,
 		} satisfies ActionNode;
