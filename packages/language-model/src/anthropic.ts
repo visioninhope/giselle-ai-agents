@@ -18,7 +18,18 @@ const defaultConfigurations: AnthropicLanguageModelConfigurations = {
 	reasoning: false,
 };
 
+const AnthropicLanguageModelId = z
+	.enum([
+		"claude-4-opus-20250514",
+		"claude-4-sonnet-20250514",
+		"claude-3-7-sonnet-20250219",
+		"claude-3-5-sonnet-20241022",
+		"claude-3-5-haiku-20241022",
+	])
+	.catch("claude-3-5-haiku-20241022");
+
 const AnthropicLanguageModel = LanguageModelBase.extend({
+	id: AnthropicLanguageModelId,
 	provider: z.literal("anthropic"),
 	configurations: AnthropicLanguageModelConfigurations,
 });
