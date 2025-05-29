@@ -562,8 +562,20 @@ type CreateArgMap = {
 	vectorStore: Parameters<typeof vectorStoreFactoryImpl.create>[0];
 };
 
+const nodeTypesRequiringArg = (
+	Object.keys(factoryImplementations) as Array<
+		keyof typeof factoryImplementations
+	>
+).filter(
+	(type) => factoryImplementations[type].create.length > 0,
+) as NodeContentType[];
+
 export const nodeFactories = {
 	create: <K extends NodeContentType>(type: K, arg?: CreateArgMap[K]) => {
+		if (nodeTypesRequiringArg.includes(type) && arg === undefined) {
+			throw new Error(`Argument required for node type: ${type}`);
+		}
+
 		switch (type) {
 			case "textGeneration":
 				return factoryImplementations.textGeneration.create(
