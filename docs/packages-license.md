@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1056 MIT
+* 1054 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -1506,17 +1506,6 @@ LGPL-3.0-or-later permitted
 
 <a name="@manypkg/get-packages"></a>
 ### @manypkg/get-packages v1.1.3
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
-<a name="@mendable/firecrawl-js"></a>
-### @mendable/firecrawl-js v1.25.1
 #### 
 
 ##### Paths
@@ -13389,17 +13378,6 @@ Unknown manually approved
 * /home/runner/work/giselle/giselle
 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
-
-
-
-<a name="typescript-event-target"></a>
-### typescript-event-target v1.1.1
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
 
 
 

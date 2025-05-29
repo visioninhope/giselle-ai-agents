@@ -33,6 +33,7 @@ export function GenerationView({
 		() => generation.messages?.filter((m) => m.role === "assistant") ?? [],
 		[generation],
 	);
+
 	if (isFailedGeneration(generation)) {
 		return generation.error.message;
 	}
@@ -156,6 +157,7 @@ export function GenerationView({
 					})}
 				</div>
 			))}
+
 			{generation.status !== "completed" &&
 				generation.status !== "cancelled" &&
 				// Show the spinner only when there is no reasoning part
