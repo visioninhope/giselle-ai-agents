@@ -16,9 +16,6 @@ describe("google llm", () => {
 			expect(GoogleLanguageModelId.parse("gemini-2.0-flash-lite")).toBe(
 				"gemini-2.0-flash-lite",
 			);
-			expect(GoogleLanguageModelId.parse("gemini-1.5-flash")).toBe(
-				"gemini-1.5-flash",
-			);
 		});
 
 		it("should fallback gemini-2.5-pro-preview variants to gemini-2.5-pro-preview-05-20", () => {
@@ -33,6 +30,9 @@ describe("google llm", () => {
 			);
 			expect(GoogleLanguageModelId.parse("gemini-2.5-pro-preview-")).toBe(
 				"gemini-2.5-pro-preview-05-20",
+			);
+			expect(GoogleLanguageModelId.parse("gemini-1.5-flash")).toBe(
+				"gemini-2.0-flash",
 			);
 		});
 	});
