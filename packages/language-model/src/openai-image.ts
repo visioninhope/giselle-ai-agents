@@ -28,7 +28,10 @@ const defaultConfiguration: OpenAIImageModelConfiguration = {
 	background: "auto",
 };
 
+const OpenAIImageLanguageModelId = z.enum(["gpt-image-1"]).catch("gpt-image-1");
+
 const OpenAIImageLanguageModel = LanguageModelBase.extend({
+	id: OpenAIImageLanguageModelId,
 	provider: z.literal("openai"),
 	configurations: OpenAIImageModelConfigurations,
 });
