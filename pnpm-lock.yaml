@@ -685,6 +685,9 @@ importers:
       '@giselle-sdk/usage-limits':
         specifier: workspace:^
         version: link:../../packages/usage-limits
+      '@giselle-sdk/web-search':
+        specifier: workspace:^
+        version: link:../../packages/web-search
       '@giselle-sdk/workflow-utils':
         specifier: workspace:^
         version: link:../../packages/workflow-utils
