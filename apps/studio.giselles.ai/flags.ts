@@ -1,3 +1,4 @@
+import { get } from "@vercel/edge-config";
 import { flag } from "flags/next";
 
 function takeLocalEnv(localEnvironmentKey: string) {
@@ -81,10 +82,16 @@ export const teamInvitationViaEmailFlag = flag<boolean>({
 export const flowNodeFlag = flag<boolean>({
 	key: "flow-node",
 	async decide() {
-		return takeLocalEnv("FLOW_NODE_FLAG");
+		if (process.env.NODE_ENV !== "development") {
+			return takeLocalEnv("FLOW_NODE_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return Boolean(edgeConfig);
 	},
 	description: "Enable Flow Node",
-	defaultValue: false,
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },
@@ -97,7 +104,7 @@ export const runV2Flag = flag<boolean>({
 		return takeLocalEnv("RUN_V2_FLAG");
 	},
 	description: "Enable Run v2",
-	defaultValue: false,
+	defaultValue: true,
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },
