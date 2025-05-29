@@ -164,6 +164,19 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
+	fetchWebPageFiles: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				urls: z.array(z.string()),
+				format: z.enum(["html", "markdown"]),
+				provider: z.literal("self-made").optional(),
+			}),
+			handler: async ({ input }) => {
+				return JsonResponse.json({
+					webPageFiles: await giselleEngine.fetchWebPageFiles(input),
+				});
+			},
+		}),
 	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
