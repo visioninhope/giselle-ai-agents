@@ -881,6 +881,9 @@ importers:
       '@giselle-sdk/usage-limits':
         specifier: workspace:^
         version: link:../usage-limits
+      '@giselle-sdk/web-search':
+        specifier: workspace:^
+        version: link:../web-search
       '@giselle-sdk/workflow-utils':
         specifier: workspace:^
         version: link:../workflow-utils
@@ -921,9 +924,6 @@ importers:
       '@giselle-sdk/utils':
         specifier: workspace:*
         version: link:../utils
-      '@giselle-sdk/web-search':
-        specifier: workspace:*
-        version: link:../web-search
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig
