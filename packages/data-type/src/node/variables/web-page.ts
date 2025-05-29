@@ -9,3 +9,12 @@ export const WebPageContent = z.object({
 	status: z.enum(["idle", "fetching", "completed", "failed"]).default("idle"),
 });
 export type WebPageContent = z.infer<typeof WebPageContent>;
+
+export const WebPageFileResult = z.object({
+	url: z.string(),
+	content: z.string(),
+	fileName: z.string(),
+	mimeType: z.string(),
+	fileData: FileData,
+});
+export type WebPageFileResult = z.infer<typeof WebPageFileResult>;
