@@ -460,6 +460,7 @@ export async function generateText(args: {
 				status: "completed",
 				completedAt: Date.now(),
 				outputs: generationOutputs,
+				usage: tokenUsage,
 				messages: appendResponseMessages({
 					messages: [
 						{
