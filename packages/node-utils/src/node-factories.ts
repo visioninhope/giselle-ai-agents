@@ -15,6 +15,7 @@ import {
 	type OperationNode,
 	type Output,
 	OutputId,
+	type QueryNode,
 	type TextGenerationContent,
 	type TextGenerationNode,
 	type TextNode,
@@ -27,6 +28,7 @@ import {
 	isFileNode,
 	isGitHubNode,
 	isImageGenerationNode,
+	isQueryNode,
 	isTextGenerationNode,
 	isTextNode,
 	isTriggerNode,
@@ -332,6 +334,43 @@ const actionFactoryImpl = {
 	},
 } satisfies NodeFactory<ActionNode, ActionProvider>;
 
+const queryFactoryImpl = {
+	create: (): QueryNode => {
+		return {
+			id: NodeId.generate(),
+			type: "operation",
+			content: {
+				type: "query",
+				query: "",
+			},
+			inputs: [],
+			outputs: [
+				{
+					id: OutputId.generate(),
+					label: "Result",
+					accessor: "result",
+				},
+			],
+		} satisfies QueryNode;
+	},
+	clone: (orig: QueryNode): NodeFactoryCloneResult<QueryNode> => {
+		const { newIo: newInputs, idMap: inputIdMap } =
+			cloneAndRenewInputIdsWithMap(orig.inputs);
+		const { newIo: newOutputs, idMap: outputIdMap } =
+			cloneAndRenewOutputIdsWithMap(orig.outputs);
+
+		const newNode = {
+			id: NodeId.generate(),
+			type: "operation",
+			name: `Copy of ${orig.name ?? defaultName(orig)}`,
+			content: structuredClone(orig.content),
+			inputs: newInputs,
+			outputs: newOutputs,
+		} satisfies QueryNode;
+		return { newNode, inputIdMap, outputIdMap };
+	},
+} satisfies NodeFactory<QueryNode>;
+
 const textVariableFactoryImpl = {
 	create: (): TextNode =>
 		({
@@ -501,6 +540,7 @@ const factoryImplementations = {
 	imageGeneration: imageGenerationFactoryImpl,
 	trigger: triggerFactoryImpl,
 	action: actionFactoryImpl,
+	query: queryFactoryImpl,
 	text: textVariableFactoryImpl,
 	file: fileVariableFactoryImpl,
 	github: githubVariableFactoryImpl,
@@ -512,6 +552,7 @@ type CreateArgMap = {
 	imageGeneration: Parameters<typeof imageGenerationFactoryImpl.create>[0];
 	trigger: Parameters<typeof triggerFactoryImpl.create>[0];
 	action: Parameters<typeof actionFactoryImpl.create>[0];
+	query: undefined; // queryFactoryImpl.create is no argument
 	text: undefined; // textVariableFactoryImpl.create is no argument
 	file: Parameters<typeof fileVariableFactoryImpl.create>[0];
 	github: Parameters<typeof githubVariableFactoryImpl.create>[0];
@@ -537,6 +578,8 @@ export const nodeFactories = {
 				return factoryImplementations.action.create(
 					arg as CreateArgMap["action"],
 				);
+			case "query":
+				return factoryImplementations.query.create();
 			case "text":
 				return factoryImplementations.text.create();
 			case "file":
@@ -576,6 +619,11 @@ export const nodeFactories = {
 			case "action":
 				if (isActionNode(sourceNode)) {
 					return factoryImplementations.action.clone(sourceNode);
+				}
+				break;
+			case "query":
+				if (isQueryNode(sourceNode)) {
+					return factoryImplementations.query.clone(sourceNode);
 				}
 				break;
 			case "text":
