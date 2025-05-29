@@ -21,10 +21,12 @@ import {
 	type ReactNode,
 	useCallback,
 	useMemo,
+	useRef,
 	useState,
 } from "react";
 import type { z } from "zod";
 import { useTrigger } from "../../hooks/use-trigger";
+import { useToasts } from "../../ui/toast";
 
 export function Button({
 	leftIcon: LeftIcon,
@@ -367,7 +369,7 @@ function createGenerationsForFlow(
 	>["createGeneration"],
 	workspaceId: WorkspaceId,
 ) {
-	const map = new Map<string, Generation>();
+	const generations: Generation[] = [];
 	for (const job of flow.jobs) {
 		for (const operation of job.operations) {
 			const parameterItems =
@@ -382,10 +384,10 @@ function createGenerationsForFlow(
 						: [],
 				...operation.generationTemplate,
 			});
-			map.set(operation.generationTemplate.operationNode.id, generation);
+			generations.push(generation);
 		}
 	}
-	return map;
+	return generations;
 }
 
 export function TriggerInputDialog({
@@ -400,8 +402,10 @@ export function TriggerInputDialog({
 		Record<string, string>
 	>({});
 	const [isSubmitting, setIsSubmitting] = useState(false);
+	const cancelRef = useRef(false);
 
-	const { createGeneration, startGeneration } = useGenerationRunnerSystem();
+	const { createGeneration, startGeneration, stopGeneration } =
+		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 
 	const inputs = useMemo<FormInput[]>(
@@ -412,6 +416,9 @@ export function TriggerInputDialog({
 		() => buildWorkflowFromNode(node.id, data.nodes, data.connections),
 		[node.id, data.nodes, data.connections],
 	);
+	const activeGenerationsRef = useRef<Generation[]>([]);
+
+	const { info } = useToasts();
 	const requiresActionNodes = useMemo(
 		() =>
 			flow === null
@@ -457,41 +464,87 @@ export function TriggerInputDialog({
 			setIsSubmitting(true);
 
 			try {
-				if (flow === null) {
-					return;
-				}
-
-				const generationMap = createGenerationsForFlow(
-					flow,
-					inputs,
-					values,
-					createGeneration,
-					data.id,
-				);
-
-				for (const [jobIndex, job] of flow.jobs.entries()) {
-					await Promise.all(
-						job.operations.map(async (operation) => {
-							const generation = generationMap.get(
-								operation.generationTemplate.operationNode.id,
-							);
-							if (generation === undefined) {
-								return;
-							}
-							await startGeneration(generation.id);
-						}),
-					);
-
-					// Close dialog after first job completes
-					if (jobIndex === 0) {
-						onClose();
-					}
-				}
+				await startFlow(values);
 			} finally {
 				setIsSubmitting(false);
+				activeGenerationsRef.current = [];
 			}
 		},
-		[data, createGeneration, startGeneration, inputs, onClose, flow],
+		[inputs],
+	);
+
+	const stopFlow = useCallback(async () => {
+		cancelRef.current = true;
+		await Promise.all(
+			activeGenerationsRef.current.map((generation) =>
+				stopGeneration(generation.id),
+			),
+		);
+	}, [stopGeneration]);
+
+	const startFlow = useCallback(
+		async (values: Record<string, string | number>) => {
+			if (flow === null) {
+				return;
+			}
+			const generations = createGenerationsForFlow(
+				flow,
+				inputs,
+				values,
+				createGeneration,
+				data.id,
+			);
+			activeGenerationsRef.current = generations;
+
+			cancelRef.current = false;
+			info("Workflow submitted successfully", {
+				action: (
+					<button
+						type="button"
+						className="bg-white rounded-[4px] text-black-850 px-[8px] text-[14px] py-[2px] cursor-pointer"
+						onClick={async () => {
+							await stopFlow();
+						}}
+					>
+						Cancel
+					</button>
+				),
+			});
+
+			for (const [jobIndex, job] of flow.jobs.entries()) {
+				await Promise.all(
+					job.operations.map(async (operation) => {
+						const generation = generations.find(
+							(generation) =>
+								generation.context.operationNode.id ===
+								operation.generationTemplate.operationNode.id,
+						);
+						if (generation === undefined) {
+							return;
+						}
+						if (cancelRef.current) {
+							return;
+						}
+						await startGeneration(generation.id);
+					}),
+				);
+
+				// Close dialog after first job completes
+				if (jobIndex === 0) {
+					onClose();
+				}
+			}
+		},
+		[
+			createGeneration,
+			data.id,
+			flow,
+			info,
+			inputs,
+			onClose,
+			startGeneration,
+			stopFlow,
+		],
 	);
 
 	if (isLoading || trigger === undefined || flow === null) {
