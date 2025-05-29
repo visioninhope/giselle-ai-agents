@@ -32,11 +32,7 @@ import { useEffect, useMemo, useState, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
-import {
-	GitHubRepositoryBadge,
-	GitHubRepositoryBadgeFromRepo,
-	GitHubRepositoryBadgeFromTrigger,
-} from "./ui";
+import { GitHubNodeInfo } from "./ui";
 import { GitHubTriggerStatusBadge } from "./ui/github-trigger/status-badge";
 
 type GiselleWorkflowDesignerTextGenerationNode = XYFlowNode<
@@ -345,39 +341,7 @@ export function NodeComponent({
 					</div>
 				</div>
 			</div>
-			{isTriggerNode(node, "github") &&
-				(node.content.state.status === "configured" ? (
-					<div className="px-[16px] relative">
-						<GitHubRepositoryBadgeFromTrigger
-							flowTriggerId={node.content.state.flowTriggerId}
-						/>
-					</div>
-				) : (
-					<div className="pl-[16px] relative pr-[32px]">
-						<div className="inline-flex items-center justify-center bg-[#342527] text-[#d7745a] rounded-full text-[12px] pl-[10px] pr-[12px] py-2 gap-[6px]">
-							<CircleAlertIcon className="size-[18px]" />
-							<span>REQUIRES SETUP</span>
-						</div>
-					</div>
-				))}
-			{isActionNode(node, "github") &&
-				node.content.command.state.status === "configured" && (
-					<div className="px-[16px] relative">
-						<GitHubRepositoryBadgeFromRepo
-							installationId={node.content.command.state.installationId}
-							repositoryNodeId={node.content.command.state.repositoryNodeId}
-						/>
-					</div>
-				)}
-			{isVectorStoreNode(node, "github") &&
-				node.content.source.state.status === "configured" && (
-					<div className="px-[16px] relative">
-						<GitHubRepositoryBadge
-							owner={node.content.source.state.owner}
-							repo={node.content.source.state.repo}
-						/>
-					</div>
-				)}
+			<GitHubNodeInfo node={node} />
 			{!preview && (
 				<div className="flex justify-between">
 					<div className="grid">
@@ -418,6 +382,7 @@ export function NodeComponent({
 											? "connected"
 											: "disconnected"
 									}
+									data-required={input.isRequired ? "true" : "false"}
 								>
 									<Handle
 										type="target"
@@ -440,6 +405,7 @@ export function NodeComponent({
 											"group-data-[state=connected]:px-[16px]",
 											"group-data-[state=disconnected]:absolute group-data-[state=disconnected]:-left-[4.5px] group-data-[state=disconnected]:whitespace-nowrap group-data-[state=disconnected]:-translate-x-[100%]",
 											"group-data-[state=connected]:text-white-900 group-data-[state=disconnected]:text-black-400",
+											"group-data-[state=disconnected]:group-data-[required=true]:text-red-900",
 										)}
 									>
 										{input.label}

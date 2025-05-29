@@ -1,26 +1,13 @@
 import {
-	firecrawlProviderName,
-	scrapeUrl as firecrawlScrapeUrl,
-} from "./firecrawl";
-import {
 	type selfMadeProviderName,
 	scrapeUrl as selfMadeScrapeUrl,
 } from "./self-made";
 
 export type AllowedFormats = "html" | "markdown";
 
-export interface WebSearchConfigFirecrawl {
-	provider: typeof firecrawlProviderName;
-	apiKey?: string;
-}
-
-export interface WebSearchConfigSelfMade {
+export interface WebSearchConfig {
 	provider: typeof selfMadeProviderName;
 }
-
-export type WebSearchConfig =
-	| WebSearchConfigFirecrawl
-	| WebSearchConfigSelfMade;
 
 export type WebSearchResult = {
 	url: string;
@@ -36,13 +23,8 @@ export interface WebSearchTool {
 	) => Promise<WebSearchResult>;
 }
 
-export function webSearch(config: WebSearchConfig): WebSearchTool {
-	if (config.provider === firecrawlProviderName) {
-		return {
-			fetchUrl: (url: string, formats?: AllowedFormats[]) =>
-				firecrawlScrapeUrl(url, config.apiKey ?? "", formats),
-		};
-	}
+// The `_config` parameter is currently unused but retained for potential future functionality.
+export function webSearch(_config: WebSearchConfig): WebSearchTool {
 	return {
 		fetchUrl: (url: string, formats?: AllowedFormats[]) =>
 			selfMadeScrapeUrl(url, formats),

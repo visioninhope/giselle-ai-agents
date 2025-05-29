@@ -37,34 +37,71 @@ export async function resolveTrigger(args: {
 	const outputs: GenerationOutput[] = [];
 	switch (triggerData.configuration.provider) {
 		case "github": {
-			const githubWebhookEventInput = generationContext.inputs?.find(
-				(input) => input.type === "github-webhook-event",
-			);
-			if (githubWebhookEventInput === undefined) {
-				throw new Error("Missing github-webhook-event input");
-			}
-			if (triggerData.configuration.provider !== "github") {
-				throw new Error("Invalid provider");
-			}
+			switch (args.generation.context.origin.type) {
+				case "run":
+					{
+						const githubWebhookEventInput = generationContext.inputs?.find(
+							(input) => input.type === "github-webhook-event",
+						);
+						if (githubWebhookEventInput === undefined) {
+							throw new Error("Missing github-webhook-event input");
+						}
+						if (triggerData.configuration.provider !== "github") {
+							throw new Error("Invalid provider");
+						}
 
-			if (
-				!args.context.integrationConfigs?.github?.authV2.appId ||
-				!args.context.integrationConfigs?.github?.authV2.privateKey
-			) {
-				throw new Error("Missing GitHub App ID or Private Key");
-			}
-			for (const output of operationNode.outputs) {
-				const resolveOutput = await resolveGitHubTrigger({
-					output,
-					githubTrigger: githubTriggers[triggerData.configuration.event.id],
-					trigger: triggerData,
-					webhookEvent: githubWebhookEventInput.webhookEvent,
-					appId: args.context.integrationConfigs.github.authV2.appId,
-					privateKey: args.context.integrationConfigs.github.authV2.privateKey,
-					installationId: triggerData.configuration.installationId,
-				});
-				if (resolveOutput !== null) {
-					outputs.push(resolveOutput);
+						if (
+							!args.context.integrationConfigs?.github?.authV2.appId ||
+							!args.context.integrationConfigs?.github?.authV2.privateKey
+						) {
+							throw new Error("Missing GitHub App ID or Private Key");
+						}
+						for (const output of operationNode.outputs) {
+							const resolveOutput = await resolveGitHubTrigger({
+								output,
+								githubTrigger:
+									githubTriggers[triggerData.configuration.event.id],
+								trigger: triggerData,
+								webhookEvent: githubWebhookEventInput.webhookEvent,
+								appId: args.context.integrationConfigs.github.authV2.appId,
+								privateKey:
+									args.context.integrationConfigs.github.authV2.privateKey,
+								installationId: triggerData.configuration.installationId,
+							});
+							if (resolveOutput !== null) {
+								outputs.push(resolveOutput);
+							}
+						}
+					}
+
+					break;
+				case "workspace": {
+					const parameterInput = generationContext.inputs?.find(
+						(input) => input.type === "parameters",
+					);
+					if (parameterInput === undefined) {
+						throw new Error("Missing Parameters Input");
+					}
+
+					for (const output of operationNode.outputs) {
+						const inputItem = parameterInput.items.find(
+							(item) => item.name === output.accessor,
+						);
+						if (inputItem === undefined) {
+							continue;
+						}
+						outputs.push({
+							outputId: output.id,
+							type: "generated-text",
+							content: `${inputItem.value}`,
+						});
+					}
+
+					break;
+				}
+				default: {
+					const _exhaustiveCheck: never = args.generation.context.origin;
+					throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
 				}
 			}
 			break;

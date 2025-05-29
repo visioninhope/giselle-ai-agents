@@ -58,6 +58,13 @@ export const GenerationError = z.object({
 	dump: z.any().optional(),
 });
 
+export const GenerationUsage = z.object({
+	promptTokens: z.number(),
+	completionTokens: z.number(),
+	totalTokens: z.number(),
+});
+export type GenerationUsage = z.infer<typeof GenerationUsage>;
+
 /**
  * Unified Generation schema with conditional validation based on status
  */
@@ -79,6 +86,7 @@ export const Generation = z
 		// Optional content fields
 		messages: z.array(Message).optional(),
 		outputs: z.array(GenerationOutput).optional(),
+		usage: GenerationUsage.optional(),
 		error: GenerationError.optional(),
 	})
 	.refine(
@@ -191,6 +199,7 @@ export const CompletedGeneration = z.object({
 	completedAt: z.number(),
 	messages: z.array(Message),
 	outputs: z.array(GenerationOutput),
+	usage: GenerationUsage.optional(),
 });
 export type CompletedGeneration = z.infer<typeof CompletedGeneration>;
 
