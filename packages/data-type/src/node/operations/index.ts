@@ -8,21 +8,28 @@ import {
 	OverrideImageGenerationContent,
 } from "./image-generation";
 import {
+	OverrideQueryContent,
+	QueryContent,
+	QueryContentReference,
+} from "./query";
+import {
 	OverrideTextGenerationContent,
 	TextGenerationContent,
 	TextGenerationContentReference,
 } from "./text-generation";
 import { TriggerContent, TriggerContentReference } from "./trigger";
+export * from "./action";
 export * from "./image-generation";
+export * from "./query";
 export * from "./text-generation";
 export * from "./trigger";
-export * from "./action";
 
 const OperationNodeContent = z.discriminatedUnion("type", [
 	TextGenerationContent,
 	ImageGenerationContent,
 	TriggerContent,
 	ActionContent,
+	QueryContent,
 ]);
 
 export const OperationNode = NodeBase.extend({
@@ -43,6 +50,7 @@ export const OperationNodeLike = NodeBase.extend({
 			ImageGenerationContent.shape.type,
 			TriggerContent.shape.type,
 			ActionContent.shape.type,
+			QueryContent.shape.type,
 		]),
 	}),
 });
@@ -114,9 +122,19 @@ export function isActionNode<
 	);
 }
 
+export const QueryNode = OperationNode.extend({
+	content: QueryContent,
+});
+export type QueryNode = z.infer<typeof QueryNode>;
+export function isQueryNode(args?: unknown): args is QueryNode {
+	const result = QueryNode.safeParse(args);
+	return result.success;
+}
+
 const OverrideOperationNodeContent = z.discriminatedUnion("type", [
 	OverrideTextGenerationContent,
 	OverrideImageGenerationContent,
+	OverrideQueryContent,
 ]);
 export const OverrideOperationNode = OverrideNodeBase.extend({
 	type: OperationNode.shape.type,
@@ -129,6 +147,7 @@ const OperationNodeContentReference = z.discriminatedUnion("type", [
 	ImageGenerationContentReference,
 	TriggerContentReference,
 	ActionContentReference,
+	QueryContentReference,
 ]);
 export const OperationNodeReference = NodeReferenceBase.extend({
 	type: OperationNode.shape.type,
