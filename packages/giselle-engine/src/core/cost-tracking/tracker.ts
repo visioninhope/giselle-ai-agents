@@ -1,7 +1,6 @@
 import type {
 	CompletedGeneration,
 	RunningGeneration,
-	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type {
 	LanguageModel,
@@ -16,7 +15,6 @@ import {
 import type { TelemetrySettings } from "../generations/types";
 
 export type CostTrackingEvent = {
-	workspaceId: WorkspaceId;
 	generation: CompletedGeneration;
 	tokenUsage: {
 		promptTokens: number;
@@ -27,7 +25,6 @@ export type CostTrackingEvent = {
 	telemetry?: TelemetrySettings;
 	messages?: { messages: unknown[] };
 	output?: string;
-	languageModel: LanguageModel;
 	toolSet?: ToolSet;
 	configurations?: Record<string, unknown>;
 	providerOptions?: Record<string, unknown>;
@@ -53,14 +50,13 @@ export class CostTracker {
 		);
 
 		const langfuse = this.context.createLangfuseTracer({
-			workspaceId: event.workspaceId,
 			runningGeneration: {
 				...event.generation,
 				status: "running",
 			} as RunningGeneration,
 			tags: generateTelemetryTags({
 				provider: event.provider,
-				languageModel: event.languageModel,
+				modelId: event.modelId,
 				toolSet: event.toolSet ?? {},
 				configurations: event.configurations ?? {},
 				providerOptions: event.providerOptions ?? {},

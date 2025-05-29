@@ -485,7 +485,6 @@ export async function generateText(args: {
 			});
 
 			const langfuse = await args.context.costTracker.trackCost({
-				workspaceId,
 				generation: completedGeneration,
 				tokenUsage: event.usage,
 				provider: operationNode.content.llm.provider,
@@ -493,7 +492,6 @@ export async function generateText(args: {
 				telemetry: args.telemetry,
 				messages: { messages },
 				output: event.text,
-				languageModel,
 				toolSet: preparedToolSet.toolSet,
 				configurations: operationNode.content.llm.configurations,
 				providerOptions,
@@ -517,7 +515,7 @@ export async function generateText(args: {
 					"auto-instrumented",
 					...generateTelemetryTags({
 						provider: operationNode.content.llm.provider,
-						languageModel,
+						modelId: operationNode.content.llm.id,
 						toolSet: preparedToolSet.toolSet,
 						configurations: operationNode.content.llm.configurations,
 						providerOptions:
