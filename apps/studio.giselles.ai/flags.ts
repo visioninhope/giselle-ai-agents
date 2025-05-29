@@ -82,7 +82,7 @@ export const teamInvitationViaEmailFlag = flag<boolean>({
 export const flowNodeFlag = flag<boolean>({
 	key: "flow-node",
 	async decide() {
-		if (process.env.NODE_ENV !== "development") {
+		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("FLOW_NODE_FLAG");
 		}
 		const edgeConfig = await get(`flag__${this.key}`);
@@ -101,7 +101,7 @@ export const flowNodeFlag = flag<boolean>({
 export const runV2Flag = flag<boolean>({
 	key: "run-v2",
 	async decide() {
-		if (process.env.NODE_ENV !== "development") {
+		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("FLOW_NODE_FLAG");
 		}
 		const edgeConfig = await get(`flag__${this.key}`);
