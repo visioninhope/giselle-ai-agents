@@ -18,7 +18,19 @@ const defaultConfigurations: GoogleLanguageModelConfigurations = {
 	searchGrounding: false,
 };
 
+const GoogleLanguageModelId = z
+	.enum([
+		"gemini-2.5-pro-exp-03-25",
+		"gemini-2.5-pro-preview-03-25",
+		"gemini-2.5-flash-preview-04-17",
+		"gemini-2.0-flash",
+		"gemini-2.0-flash-thinking-exp-01-21",
+		"gemini-2.0-pro-exp-02-05",
+	])
+	.catch("gemini-2.0-flash");
+
 const GoogleLanguageModel = LanguageModelBase.extend({
+	id: GoogleLanguageModelId,
 	provider: z.literal("google"),
 	configurations: GoogleLanguageModelConfigurations,
 });
@@ -70,13 +82,6 @@ const gemini20Flash: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-const gemini20FlashLitePreview: GoogleLanguageModel = {
-	provider: "google",
-	id: "gemini-2.0-flash-lite-preview-02-05",
-	capabilities: Capability.TextGeneration | Capability.GenericFileInput,
-	tier: Tier.enum.free,
-	configurations: defaultConfigurations,
-};
 const gemini20FlashThinkingExp: GoogleLanguageModel = {
 	provider: "google",
 	id: "gemini-2.0-flash-thinking-exp-01-21",
