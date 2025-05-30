@@ -1,7 +1,6 @@
 import {
 	type Connection,
 	type ConnectionId,
-	type GenerationTemplate,
 	type Job,
 	JobId,
 	type NodeId,
@@ -211,36 +210,6 @@ export function createJobMap(
 		return levels;
 	};
 
-	function createGenerationTemplate(node: OperationNode): GenerationTemplate {
-		const connectionArray = Array.from(connectionSet);
-		const nodeArray = Array.from(nodeSet);
-
-		const connectedConnections = connectionArray.filter(
-			(connection) => connection.inputNode.id === node.id,
-		);
-
-		// Map through each input to find source nodes, preserving duplicates
-		const sourceNodes = node.inputs
-			.map((input) => {
-				// Find connections for this specific input
-				const inputConnections = connectedConnections.filter(
-					(connection) => connection.inputId === input.id,
-				);
-				// For each input connection, find the corresponding source node
-				if (inputConnections.length > 0) {
-					const sourceNodeId = inputConnections[0].outputNode.id;
-					return nodeArray.find((n) => n.id === sourceNodeId);
-				}
-				return undefined;
-			})
-			.filter((node) => node !== undefined);
-		return {
-			operationNode: node,
-			sourceNodes,
-			connections: connectedConnections,
-		};
-	}
-
 	// Filter for operation nodes and connections
 	const operationNodeIdSet = new Set<NodeId>();
 	for (const node of nodeSet) {
@@ -263,13 +232,35 @@ export function createJobMap(
 		const nodes = Array.from(nodeSet)
 			.filter((node) => level.has(node.id))
 			.filter((node) => isOperationNode(node));
-		const operations = nodes.map(
-			(node) =>
-				({
-					node,
-					generationTemplate: createGenerationTemplate(node),
-				}) satisfies Operation,
-		);
+		const operations = nodes.map((node) => {
+			const connectionArray = Array.from(connectionSet);
+			const nodeArray = Array.from(nodeSet);
+
+			const connectedConnections = connectionArray.filter(
+				(connection) => connection.inputNode.id === node.id,
+			);
+
+			// Map through each input to find source nodes, preserving duplicates
+			const sourceNodes = node.inputs
+				.map((input) => {
+					// Find connections for this specific input
+					const inputConnections = connectedConnections.filter(
+						(connection) => connection.inputId === input.id,
+					);
+					// For each input connection, find the corresponding source node
+					if (inputConnections.length > 0) {
+						const sourceNodeId = inputConnections[0].outputNode.id;
+						return nodeArray.find((n) => n.id === sourceNodeId);
+					}
+					return undefined;
+				})
+				.filter((node) => node !== undefined);
+			return {
+				node,
+				sourceNodes,
+				connections: connectedConnections,
+			} satisfies Operation;
+		});
 
 		const job = {
 			id: jobId,
