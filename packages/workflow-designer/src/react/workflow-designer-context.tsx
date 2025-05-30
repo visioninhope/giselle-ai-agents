@@ -9,6 +9,7 @@ import {
 	type NodeUIState,
 	type UploadedFileData,
 	type Viewport,
+	type WebPageFileResult,
 	type Workspace,
 	createFailedFileData,
 	createUploadedFileData,
@@ -56,6 +57,11 @@ export interface WorkflowDesignerContextValue
 	) => void;
 	uploadFile: UploadFileFn;
 	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
+	fetchWebPageFiles: (args: {
+		urls: string[];
+		format: "markdown" | "html";
+		provider?: "self-made";
+	}) => Promise<WebPageFileResult[]>;
 	deleteNode: (nodeId: NodeId | string) => void;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
@@ -300,6 +306,18 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace, client, data.id],
 	);
 
+	const fetchWebPageFiles = useCallback(
+		async (args: {
+			urls: string[];
+			format: "markdown" | "html";
+			provider?: "self-made";
+		}): Promise<WebPageFileResult[]> => {
+			const result = await client.fetchWebPageFiles(args);
+			return result.webPageFiles;
+		},
+		[client],
+	);
+
 	const usePropertiesPanelHelper = usePropertiesPanel();
 	const useViewHelper = useView();
 
@@ -317,6 +335,7 @@ export function WorkflowDesignerProvider({
 				deleteConnection,
 				uploadFile,
 				removeFile,
+				fetchWebPageFiles,
 				llmProviders,
 				isLoading,
 				setUiViewport,

@@ -1,5 +1,5 @@
 import { parseAndMod } from "@giselle-sdk/data-mod";
-import { Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
+import { Node, Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 
 export function workspacePath(workspaceId: WorkspaceId) {
@@ -29,7 +29,15 @@ export async function getWorkspace({
 	workspaceId: WorkspaceId;
 }) {
 	const result = await storage.getItem(workspacePath(workspaceId));
-	return parseAndMod(Workspace, result);
+	const workspace = parseAndMod(
+		Workspace,
+		result,
+	); /** @todo remove the underline if workpsace.node used Node Schema and delete editingWorkflows field */
+	const nodes = workspace.nodes.map((node) => parseAndMod(Node, node));
+	return {
+		...workspace,
+		nodes,
+	};
 }
 
 /** @todo update new fileId for each file */

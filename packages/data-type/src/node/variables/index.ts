@@ -11,6 +11,7 @@ export * from "./file";
 export * from "./github";
 export * from "./text";
 export * from "./vector-store";
+export * from "./web-page";
 
 const VariableNodeContent = z.discriminatedUnion("type", [
 	TextContent,
