@@ -28,6 +28,27 @@ export class LineChunker implements Chunker {
 	private maxChars: number;
 
 	constructor(maxLines: number, overlap: number, maxChars: number) {
+		if (maxLines < 0) {
+			throw new Error(
+				`Invalid value for maxLines: ${maxLines}. Must be non-negative.`,
+			);
+		}
+		if (overlap < 0) {
+			throw new Error(
+				`Invalid value for overlap: ${overlap}. Must be non-negative.`,
+			);
+		}
+		if (maxChars < 0) {
+			throw new Error(
+				`Invalid value for maxChars: ${maxChars}. Must be non-negative.`,
+			);
+		}
+		if (overlap >= maxLines) {
+			throw new Error(
+				`Invalid configuration: overlap (${overlap}) must be less than maxLines (${maxLines}).`,
+			);
+		}
+
 		this.maxLines = maxLines;
 		this.overlap = overlap;
 		this.maxChars = maxChars;
@@ -39,70 +60,49 @@ export class LineChunker implements Chunker {
 	 */
 	async *chunk(content: string): AsyncGenerator<ChunkResult, void, unknown> {
 		const lines = content.split(/\r?\n/);
-		const processedLines = this.splitLongLines(lines);
-		const hasLongLines = this.hasLongLinesAfterProcessing(processedLines);
 
 		let chunkIndex = 0;
+		let i = 0;
 
-		if (hasLongLines) {
-			// For content with very long lines, yield each processed segment as individual chunks
-			// Note: Overlap is not applied when dealing with long lines to ensure all content is preserved
-			for (const line of processedLines) {
-				yield this.createChunk(line, chunkIndex++);
+		while (i < lines.length) {
+			// 1. Take maxLines worth of lines
+			const chunkLines = lines.slice(i, i + this.maxLines);
+
+			// 2. Join lines with overlap
+			let chunkContent = chunkLines.join("\n");
+			let currentOverlap = this.overlap;
+
+			// 3. If exceeds limit, gradually reduce overlap
+			while (chunkContent.length > this.maxChars && currentOverlap > 0) {
+				currentOverlap = Math.floor(currentOverlap / 2);
+				const step = this.maxLines - currentOverlap;
+				const reducedOverlapLines = lines.slice(i, i + step);
+				chunkContent = reducedOverlapLines.join("\n");
 			}
-		} else {
-			// Normal line-based chunking with overlap for regular content
-			yield* this.createLineBasedChunks(processedLines, chunkIndex);
-		}
-	}
 
-	/**
-	 * Split lines that exceed the character limit into smaller segments
-	 */
-	private splitLongLines(lines: string[]): string[] {
-		const processedLines: string[] = [];
-
-		for (const line of lines) {
-			if (line.length > this.maxChars) {
-				// Split long line into maxChars-sized segments
-				for (let i = 0; i < line.length; i += this.maxChars) {
-					processedLines.push(line.substring(i, i + this.maxChars));
-				}
+			// 4. If still exceeds after removing all overlap, split by character count
+			if (chunkContent.length > this.maxChars) {
+				yield* this.splitIntoMultipleChunks(chunkContent, chunkIndex);
+				chunkIndex += Math.ceil(chunkContent.length / this.maxChars);
+				i += this.maxLines - currentOverlap;
 			} else {
-				processedLines.push(line);
+				yield this.createChunk(chunkContent, chunkIndex++);
+				i += this.maxLines - currentOverlap;
 			}
 		}
-
-		return processedLines;
 	}
 
 	/**
-	 * Check if the processed lines contain segments that are still very long
+	 * Split content into multiple chunks when it exceeds character limit
 	 */
-	private hasLongLinesAfterProcessing(processedLines: string[]): boolean {
-		return processedLines.some((line) => line.length >= this.maxChars * 0.8);
-	}
-
-	/**
-	 * Create line-based chunks with overlap for normal content
-	 */
-	private async *createLineBasedChunks(
-		processedLines: string[],
+	private async *splitIntoMultipleChunks(
+		content: string,
 		startIndex: number,
 	): AsyncGenerator<ChunkResult, void, unknown> {
-		let chunkIndex = startIndex;
-		const step = Math.max(1, this.maxLines - this.overlap);
-
-		for (let i = 0; i < processedLines.length; i += step) {
-			const chunkLines = processedLines.slice(i, i + this.maxLines);
-			let chunkContent = chunkLines.join("\n");
-
-			// Enforce character limit even for line-based chunks
-			if (chunkContent.length > this.maxChars) {
-				chunkContent = chunkContent.substring(0, this.maxChars);
-			}
-
-			yield this.createChunk(chunkContent, chunkIndex++);
+		let index = startIndex;
+		for (let i = 0; i < content.length; i += this.maxChars) {
+			const chunk = content.substring(i, i + this.maxChars);
+			yield this.createChunk(chunk, index++);
 		}
 	}
 
