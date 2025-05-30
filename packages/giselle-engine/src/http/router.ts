@@ -13,7 +13,6 @@ import {
 	RunId,
 	WorkflowId,
 	Workspace,
-	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
@@ -162,33 +161,6 @@ export const createJsonRouters = {
 				);
 
 				return new Response(null, { status: 204 });
-			},
-		}),
-	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
-			}),
-			handler: async ({ input }) => {
-				await giselleEngine.upsertGithubIntegrationSetting(
-					input.workspaceGitHubIntegrationSetting,
-				);
-				return new Response(null, { status: 204 });
-			},
-		}),
-	getWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-			}),
-			handler: async ({ input }) => {
-				const workspaceGitHubIntegrationSetting =
-					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
-						input.workspaceId,
-					);
-				return JsonResponse.json({
-					workspaceGitHubIntegrationSetting,
-				});
 			},
 		}),
 	runApi: (giselleEngine: GiselleEngine) =>

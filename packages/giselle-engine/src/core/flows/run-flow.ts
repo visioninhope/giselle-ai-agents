@@ -46,11 +46,13 @@ export async function runFlow(args: {
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
-				const operationNode = operation.generationTemplate.operationNode;
+				const operationNode = operation.node;
 				const generation = {
 					id: generationId,
 					context: {
-						...operation.generationTemplate,
+						operationNode: operation.node,
+						connections: operation.connections,
+						sourceNodes: operation.sourceNodes,
 						origin: {
 							type: "run",
 							id: runId,
@@ -99,7 +101,7 @@ export async function runFlow(args: {
 						});
 						break;
 					default: {
-						const _exhaustiveCheck: never = operationNode.content;
+						const _exhaustiveCheck: never = operationNode.content.type;
 						throw new Error(`Unhandled operation type: ${_exhaustiveCheck}`);
 					}
 				}

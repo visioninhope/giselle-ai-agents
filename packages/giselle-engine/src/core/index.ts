@@ -13,7 +13,6 @@ import type {
 	RunId,
 	WorkflowId,
 	Workspace,
-	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
@@ -37,13 +36,9 @@ import {
 	setGeneration,
 } from "./generations";
 import {
-	type HandleGitHubWebhookOptions,
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
-	getWorkspaceGitHubIntegrationSetting,
 	handleGitHubWebhookV2,
-	handleWebhook,
-	upsertGithubIntegrationSetting,
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
@@ -56,7 +51,6 @@ import {
 	getWorkspace,
 	updateWorkspace,
 } from "./workspaces";
-export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
 export * from "./vault";
 
@@ -141,37 +135,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
 			return await removeFile({ context, fileId, workspaceId });
 		},
-		upsertGithubIntegrationSetting: async (
-			workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
-		) => {
-			upsertGithubIntegrationSetting({
-				context,
-				workspaceGitHubIntegrationSetting,
-			});
-		},
-		getWorkspaceGitHubIntegrationSetting: async (workspaceId: WorkspaceId) => {
-			return await getWorkspaceGitHubIntegrationSetting({
-				context,
-				workspaceId,
-			});
-		},
 		runApi: async (args: {
 			workspaceId: WorkspaceId;
 			workflowId: WorkflowId;
 			overrideNodes?: OverrideNode[];
 		}) => {
 			return await runApi({ ...args, context });
-		},
-		githubWebhook: async ({
-			options,
-			...args
-		}: {
-			event: string;
-			delivery: string;
-			payload: unknown;
-			options?: HandleGitHubWebhookOptions;
-		}) => {
-			return await handleWebhook({ context, github: args, options });
 		},
 		generateImage: async (
 			generation: QueuedGeneration,
