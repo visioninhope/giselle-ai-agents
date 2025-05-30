@@ -1,70 +1,87 @@
 import type { FileData, FileNode } from "@giselle-sdk/data-type";
-import { useState } from "react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useCallback, useState } from "react";
 
-export function useWebPageFileNode(_node: FileNode) {
+export function useWebPageFileNode(node: FileNode) {
+	const { isLoading, updateNodeDataContent, uploadFile, fetchWebPageFiles } =
+		useWorkflowDesigner();
 	const [urls, setUrls] = useState("");
 	const [format, setFormat] = useState<"html" | "markdown">("markdown");
-	const [isFetching, setIsFetching] = useState(false);
-	const [fetchStatuses, setFetchStatuses] = useState<
-		Record<string, "fetching" | "success" | "error">
-	>({});
-	const [files, setFiles] = useState<FileData[]>([]);
 	const [urlError, setUrlError] = useState("");
 
-	const onFetch = async () => {
+	// onFetch now uploads web page content as files using uploadFile, and updates webPages metadata for display
+	const onFetch = useCallback(async () => {
 		const urlList = urls
 			.split("\n")
 			.map((u) => u.trim())
-			.filter(Boolean);
+			.filter((u: string) => Boolean(u));
 		if (urlList.length === 0) return;
-		setIsFetching(true);
 		setUrlError("");
-		setFetchStatuses(
-			Object.fromEntries(urlList.map((url) => [url, "fetching"])),
-		);
-		// Simulate async fetch for each URL
-		await Promise.all(
-			urlList.map(
-				(url, i) =>
-					new Promise<void>((resolve) => {
-						setTimeout(
-							() => {
-								setFetchStatuses((prev) => ({ ...prev, [url]: "success" }));
-								setFiles((prev) => [
-									...prev,
-									{
-										id: `fl-${url.replace(/[^a-zA-Z0-9]/g, "")}-${Date.now()}`,
-										name: url,
-										type: format === "markdown" ? "text/markdown" : "text/html",
-										size: 0,
-										status: "uploaded",
-										uploadedAt: Date.now(),
-									},
-								]);
-								resolve();
-							},
-							800 + i * 400,
-						); // staggered for effect
-					}),
-			),
-		);
-		setIsFetching(false);
-	};
 
-	const onRemoveFile = (file: FileData) => {
-		setFiles((prev) => prev.filter((f) => f.id !== file.id));
-	};
+		try {
+			const webPageFileResults = await fetchWebPageFiles({
+				urls: urlList,
+				format,
+			});
+
+			// Convert content string to File for browser upload
+			const filesToUpload = webPageFileResults.map((r) => {
+				const blob = new Blob([r.content], { type: r.mimeType });
+				return new File([blob], r.fileName, { type: r.mimeType });
+			});
+			const fileDataList = webPageFileResults.map((r) => r.fileData);
+
+			if (filesToUpload.length > 0) {
+				await uploadFile(filesToUpload, node, {
+					onError: (errorMessage) => {
+						setUrlError(errorMessage);
+					},
+				});
+			}
+
+			// Update node content for all file statuses
+			updateNodeDataContent(node, {
+				files: fileDataList,
+			});
+
+			// Remove only successfully fetched URLs from urls, keep failed URLs
+			const fetchedUrls = new Set(webPageFileResults.map((r) => r.url));
+			const failedUrls = urlList.filter((url) => !fetchedUrls.has(url));
+			setUrls(failedUrls.join("\n"));
+		} catch (error) {
+			setUrlError("Failed to fetch one or more URLs.");
+		}
+	}, [
+		urls,
+		format,
+		node,
+		updateNodeDataContent,
+		uploadFile,
+		fetchWebPageFiles,
+	]);
+
+	const onRemoveFile = useCallback(
+		(file: FileData) => {
+			if (!node.content || !Array.isArray(node.content.files)) return;
+			updateNodeDataContent(node, {
+				files: node.content.files.filter((f: FileData) => f.id !== file.id),
+			});
+		},
+		[node, updateNodeDataContent],
+	);
 
 	return {
 		urls,
 		setUrls,
 		format,
 		setFormat,
-		isFetching,
-		fetchStatuses,
-		files,
+		isLoading,
 		onFetch,
 		onRemoveFile,
+		files:
+			node.content && Array.isArray(node.content.files)
+				? node.content.files
+				: [],
 		urlError,
 	};
 }

@@ -19,7 +19,10 @@ const defaultConfigurations: PerplexityLanguageModelConfigurations = {
 	frequencyPenalty: 1.0,
 };
 
+const PerplexityLanguageModelId = z.enum(["sonar", "sonar-pro"]).catch("sonar");
+
 const PerplexityLanguageModel = LanguageModelBase.extend({
+	id: PerplexityLanguageModelId,
 	provider: z.literal("perplexity"),
 	configurations: PerplexityLanguageModelConfigurations,
 });
