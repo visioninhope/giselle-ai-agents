@@ -1,5 +1,4 @@
 import type {
-	CreatedRun,
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
@@ -8,10 +7,7 @@ import type {
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
-	OverrideNode,
 	QueuedGeneration,
-	RunId,
-	WorkflowId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -42,7 +38,6 @@ import {
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
-import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
@@ -95,23 +90,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		cancelGeneration: async (generationId: GenerationId) => {
 			return await cancelGeneration({ context, generationId });
 		},
-		addRun: async (
-			workspaceId: WorkspaceId,
-			workflowId: WorkflowId,
-			run: CreatedRun,
-			overrideNodes?: OverrideNode[],
-		) => {
-			return await addRun({
-				context,
-				workspaceId,
-				workflowId,
-				run,
-				overrideNodes: overrideNodes || [],
-			});
-		},
-		startRun: async (runId: RunId) => {
-			return await startRun({ context, runId });
-		},
 		copyFile: async (
 			workspaceId: WorkspaceId,
 			sourceFileId: FileId,
@@ -134,13 +112,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
 			return await removeFile({ context, fileId, workspaceId });
-		},
-		runApi: async (args: {
-			workspaceId: WorkspaceId;
-			workflowId: WorkflowId;
-			overrideNodes?: OverrideNode[];
-		}) => {
-			return await runApi({ ...args, context });
 		},
 		generateImage: async (
 			generation: QueuedGeneration,

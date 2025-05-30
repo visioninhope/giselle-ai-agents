@@ -108,33 +108,6 @@ export const createJsonRouters = {
 				return JsonResponse.json(generation);
 			},
 		}),
-
-	addRun: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-				workflowId: WorkflowId.schema,
-				run: CreatedRun,
-				overrideNodes: z.array(OverrideNode).optional(),
-			}),
-			handler: async ({ input }) => {
-				const run = await giselleEngine.addRun(
-					input.workspaceId,
-					input.workflowId,
-					input.run,
-					input.overrideNodes,
-				);
-				return JsonResponse.json(run);
-			},
-		}),
-	startRun: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({ runId: RunId.schema }),
-			handler: async ({ input }) => {
-				await giselleEngine.startRun(input.runId);
-				return new Response(null, { status: 202 });
-			},
-		}),
 	removeFile: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
@@ -163,20 +136,6 @@ export const createJsonRouters = {
 				return new Response(null, { status: 204 });
 			},
 		}),
-	runApi: (giselleEngine: GiselleEngine) =>
-		withUsageLimitErrorHandler(
-			createHandler({
-				input: z.object({
-					workspaceId: WorkspaceId.schema,
-					workflowId: WorkflowId.schema,
-					overrideNodes: z.array(OverrideNode).optional(),
-				}),
-				handler: async ({ input }) => {
-					const result = await giselleEngine.runApi(input);
-					return new Response(result.join("\n"));
-				},
-			}),
-		),
 	generateImage: (giselleEngine: GiselleEngine) =>
 		withUsageLimitErrorHandler(
 			createHandler({
