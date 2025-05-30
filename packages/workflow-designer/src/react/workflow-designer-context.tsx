@@ -16,6 +16,7 @@ import {
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
+	isFileNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -24,7 +25,7 @@ import {
 } from "@giselle-sdk/giselle-engine/react";
 import { RunSystemContextProvider } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import type { ClonedFileDataPayload } from "@giselle-sdk/node-utils";
+import { isClonedFileDataPayload } from "@giselle-sdk/node-utils";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import {
 	type ConnectionCloneStrategy,
@@ -149,21 +150,19 @@ export function WorkflowDesignerProvider({
 
 	const handleFileNodeCopy = useCallback(
 		async (sourceNode: Node, newNode: Node): Promise<void> => {
-			if (
-				newNode.type !== "variable" ||
-				newNode.content.type !== "file" ||
-				sourceNode.type !== "variable" ||
-				sourceNode.content.type !== "file"
-			) {
+			if (!isFileNode(newNode) || !isFileNode(sourceNode)) {
 				return;
 			}
 
-			const newFileNode = newNode as FileNode;
-
-			const fileCopyPromises = newFileNode.content.files.map(
+			const fileCopyPromises = newNode.content.files.map(
 				async (fileDataWithOriginalId) => {
-					const tempFileData = fileDataWithOriginalId as ClonedFileDataPayload;
-					const { originalFileIdForCopy, ...newFileData } = tempFileData;
+					if (!isClonedFileDataPayload(fileDataWithOriginalId)) {
+						// Already completed file data, keep as is
+						return fileDataWithOriginalId;
+					}
+
+					const { originalFileIdForCopy, ...newFileData } =
+						fileDataWithOriginalId;
 
 					if (originalFileIdForCopy) {
 						try {
@@ -173,7 +172,7 @@ export function WorkflowDesignerProvider({
 								destinationFileId: newFileData.id,
 							});
 
-							return newFileData as FileData;
+							return newFileData;
 						} catch (error) {
 							console.error(
 								`Failed to copy file for new fileId ${newFileData.id} (source: ${originalFileIdForCopy}):`,
@@ -189,17 +188,17 @@ export function WorkflowDesignerProvider({
 						}
 					}
 
-					return newFileData as FileData;
+					return newFileData;
 				},
 			);
 
 			const resolvedFiles = await Promise.all(fileCopyPromises);
 			const newContentForNode: FileContent = {
-				...newFileNode.content,
+				...newNode.content,
 				files: resolvedFiles,
 			};
 
-			workflowDesignerRef.current.updateNodeData(newFileNode, {
+			workflowDesignerRef.current.updateNodeData(newNode, {
 				content: newContentForNode,
 			});
 
