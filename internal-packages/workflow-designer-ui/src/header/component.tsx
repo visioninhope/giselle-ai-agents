@@ -13,6 +13,7 @@ import { Dialog, VisuallyHidden } from "radix-ui";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
 import { GiselleLogo } from "../icons";
+import { ShareButton } from "../ui/button";
 import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { ToastProvider } from "../ui/toast";
@@ -190,7 +191,12 @@ export function Header({
 
 				<div className="flex items-center gap-[12px]">
 					<Trigger />
-					{shareFeatureFlag && <UserPresence />}
+					{shareFeatureFlag && (
+						<>
+							<UserPresence />
+							<ShareButton onClick={() => setOpenShareModal(true)} />
+						</>
+					)}
 					{action && <div className="flex items-center">{action}</div>}
 				</div>
 
