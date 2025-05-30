@@ -4,7 +4,6 @@ import type { ContextMenuProps, ContextMenuState } from "./types";
 
 export function useContextMenu() {
 	const [contextMenu, setContextMenu] = useState<ContextMenuState | null>(null);
-
 	return {
 		contextMenu,
 		setContextMenu,
@@ -12,14 +11,21 @@ export function useContextMenu() {
 	};
 }
 
-export function ContextMenu({ contextMenu, onDuplicate }: ContextMenuProps) {
+export function ContextMenu({
+	contextMenu,
+	onDuplicate,
+	onClose,
+}: ContextMenuProps) {
 	if (!contextMenu) return null;
 
 	return (
 		<ContextMenuContent
 			x={contextMenu.x}
 			y={contextMenu.y}
-			onDuplicate={() => onDuplicate(contextMenu.nodeId)}
+			onDuplicate={() => {
+				onDuplicate(contextMenu.nodeId);
+			}}
+			onClose={onClose}
 		/>
 	);
 }

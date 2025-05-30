@@ -324,6 +324,7 @@ function NodeCanvas() {
 						addNode(selectedTool.node, options);
 					}
 					reset();
+					closeContextMenu();
 				}}
 				onNodeContextMenu={(event, node) => {
 					event.preventDefault();
@@ -350,6 +351,7 @@ function NodeCanvas() {
 					);
 					closeContextMenu();
 				}}
+				onClose={closeContextMenu}
 			/>
 		</>
 	);
