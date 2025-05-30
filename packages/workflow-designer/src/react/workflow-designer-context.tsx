@@ -159,12 +159,9 @@ export function WorkflowDesignerProvider({
 				sourceNode,
 				options,
 			);
-
 			if (!newNodeDefinition) {
 				return undefined;
 			}
-
-			workflowDesignerRef.current.addNode(newNodeDefinition);
 			setAndSaveWorkspace();
 
 			const finalNewNode = newNodeDefinition;
