@@ -25,7 +25,7 @@ export function WebPageFilePanel({ node, config }: FilePanelProps) {
 				{/* Fetched Files List */}
 				{files.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">
-						{files.map((file: FileData) => (
+						{files.map((file) => (
 							<WebPageFileListItem
 								key={file.id}
 								fileData={file}
