@@ -1,6 +1,5 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { GenerationTemplate } from "../generation/template";
 import { NodeLike } from "../node";
 
 export const JobId = createIdGenerator("jb");
@@ -10,7 +9,6 @@ export type WorkflowId = z.infer<typeof WorkflowId.schema>;
 
 export const Operation = z.object({
 	node: NodeLike,
-	generationTemplate: GenerationTemplate,
 });
 export type Operation = z.infer<typeof Operation>;
 

@@ -6,7 +6,6 @@ import { NodeId } from "../node";
 import { GenerationContextLike, GenerationOrigin } from "./context";
 import { GenerationOutput } from "./output";
 export * from "./context";
-export * from "./template";
 export * from "./output";
 
 export const GenerationId = createIdGenerator("gnr");
