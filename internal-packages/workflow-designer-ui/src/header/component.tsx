@@ -13,7 +13,6 @@ import { Dialog, VisuallyHidden } from "radix-ui";
 import { type ReactNode, useCallback, useMemo, useState } from "react";
 import { EditableText } from "../editor/properties-panel/ui";
 import { GiselleLogo } from "../icons";
-import { SettingsPanel } from "../settings";
 import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { ToastProvider } from "../ui/toast";
@@ -194,23 +193,6 @@ export function Header({
 					{shareFeatureFlag && <UserPresence />}
 					{action && <div className="flex items-center">{action}</div>}
 				</div>
-
-				<Dialog.Root open={openSettings} onOpenChange={setOpenSettings}>
-					<Dialog.Portal>
-						<Dialog.Overlay className="fixed inset-0 bg-black-900/40 data-[state=open]:animate-overlayShow" />
-						<Dialog.Content
-							className={clsx(
-								"fixed left-1/2 top-1/2 h-[600px] w-[900px] -translate-x-1/2 -translate-y-1/2",
-								"rounded-[8px] bg-black-850 p-[32px] border-[0.5px] border-black-400 shadow-black-300 focus:outline-none",
-							)}
-						>
-							<Dialog.Title className="m-0 text-[17px] font-medium text-mauve12">
-								<VisuallyHidden.Root>Agent settings dialog</VisuallyHidden.Root>
-							</Dialog.Title>
-							<SettingsPanel />
-						</Dialog.Content>
-					</Dialog.Portal>
-				</Dialog.Root>
 
 				<ShareModal
 					open={openShareModal}
