@@ -110,20 +110,6 @@ export const TextGenerationContent = z.object({
 });
 export type TextGenerationContent = z.infer<typeof TextGenerationContent>;
 
-export const OverrideTextGenerationContent = z.object({
-	type: z.literal("textGeneration"),
-	prompt: z.string(),
-});
-export type OverrideTextGenerationContent = z.infer<
-	typeof OverrideTextGenerationContent
->;
-
-export function isOverrideTextGenerationContent(
-	content: unknown,
-): content is OverrideTextGenerationContent {
-	return OverrideTextGenerationContent.safeParse(content).success;
-}
-
 export const TextGenerationContentReference = z.object({
 	type: TextGenerationContent.shape.type,
 });
