@@ -14,6 +14,7 @@ import {
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
+	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -62,7 +63,7 @@ export interface WorkflowDesignerContextValue
 		format: "markdown" | "html";
 		provider?: "self-made";
 	}) => Promise<WebPageFileResult[]>;
-	deleteNode: (nodeId: NodeId | string) => void;
+	deleteNode: (nodeId: NodeId | string) => Promise<void>;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 }
@@ -207,11 +208,24 @@ export function WorkflowDesignerProvider({
 	);
 
 	const deleteNode = useCallback(
-		(nodeId: NodeId | string) => {
-			workflowDesignerRef.current.deleteNode(nodeId);
+		async (nodeId: NodeId | string) => {
+			const deletedNode = workflowDesignerRef.current.deleteNode(nodeId);
+			if (
+				deletedNode &&
+				isTriggerNode(deletedNode) &&
+				deletedNode.content.state.status === "configured"
+			) {
+				try {
+					await client.deleteTrigger({
+						flowTriggerId: deletedNode.content.state.flowTriggerId,
+					});
+				} catch (error) {
+					console.error("Failed to delete trigger", error);
+				}
+			}
 			setAndSaveWorkspace();
 		},
-		[setAndSaveWorkspace],
+		[setAndSaveWorkspace, client],
 	);
 
 	const deleteConnection = useCallback(
