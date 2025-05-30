@@ -15,7 +15,8 @@ import {
 import type { TelemetrySettings } from "../generations/types";
 
 export type CostTrackingEvent = {
-	generation: CompletedGeneration;
+	runningGeneration: RunningGeneration;
+	completedGeneration: CompletedGeneration;
 	tokenUsage: {
 		promptTokens: number;
 		completionTokens: number;
@@ -50,10 +51,7 @@ export class CostTracker {
 		);
 
 		const langfuse = this.context.createLangfuseTracer({
-			runningGeneration: {
-				...event.generation,
-				status: "running",
-			} as RunningGeneration,
+			runningGeneration: event.runningGeneration,
 			tags: generateTelemetryTags({
 				provider: event.provider,
 				modelId: event.modelId,
@@ -73,7 +71,7 @@ export class CostTracker {
 				totalCost: costInfo?.totalCostForDisplay ?? 0,
 				unit: "TOKENS",
 			},
-			completedGeneration: event.generation,
+			completedGeneration: event.completedGeneration,
 			spanName: "ai.streamText",
 			generationName: "ai.streamText.doStream",
 			settings: event.telemetry,

@@ -485,7 +485,8 @@ export async function generateText(args: {
 			});
 
 			const langfuse = await args.context.costTracker.trackCost({
-				generation: completedGeneration,
+				runningGeneration: runningGeneration,
+				completedGeneration: completedGeneration,
 				tokenUsage: event.usage,
 				provider: operationNode.content.llm.provider,
 				modelId: operationNode.content.llm.id,
