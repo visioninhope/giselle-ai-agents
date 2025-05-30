@@ -3,10 +3,8 @@ import {
 	OperationNode,
 	OperationNodeLike,
 	OperationNodeReference,
-	OverrideOperationNode,
 } from "./operations";
 import {
-	OverrideVariableNode,
 	VariableNode,
 	VariableNodeLike,
 	VariableNodeReference,
@@ -23,12 +21,6 @@ export const NodeLike = z.discriminatedUnion("type", [
 	VariableNodeLike,
 ]);
 export type NodeLike = z.infer<typeof NodeLike>;
-
-export const OverrideNode = z.discriminatedUnion("type", [
-	OverrideOperationNode,
-	OverrideVariableNode,
-]);
-export type OverrideNode = z.infer<typeof OverrideNode>;
 
 export const NodeReference = z.discriminatedUnion("type", [
 	OperationNodeReference,

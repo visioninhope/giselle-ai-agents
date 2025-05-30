@@ -60,8 +60,3 @@ export const NodeReferenceBase = z.object({
 	type: z.string(),
 });
 export type NodeReferenceBase = z.infer<typeof NodeReferenceBase>;
-
-export const OverrideNodeBase = z.object({
-	id: NodeId.schema,
-	type: z.string(),
-});

@@ -229,7 +229,9 @@ export function createGenerationsForFlow(
 					parameterItems.length > 0
 						? [{ type: "parameters", items: parameterItems }]
 						: [],
-				...operation.generationTemplate,
+				operationNode: operation.node,
+				sourceNodes: operation.sourceNodes,
+				connections: operation.connections,
 			});
 			generations.push(generation);
 		}

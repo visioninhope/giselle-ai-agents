@@ -20,7 +20,6 @@ import {
 	APICallError,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
-import { RunSystemContextProvider } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 import { WorkflowDesigner } from "../workflow-designer";
@@ -347,9 +346,7 @@ export function WorkflowDesignerProvider({
 			}}
 		>
 			<GenerationRunnerSystemProvider>
-				<RunSystemContextProvider workspaceId={data.id}>
-					{children}
-				</RunSystemContextProvider>
+				{children}
 			</GenerationRunnerSystemProvider>
 		</WorkflowDesignerContext.Provider>
 	);

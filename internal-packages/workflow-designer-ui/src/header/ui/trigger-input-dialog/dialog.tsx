@@ -151,9 +151,7 @@ export function TriggerInputDialog({
 				await Promise.all(
 					job.operations.map(async (operation) => {
 						const generation = generations.find(
-							(g) =>
-								g.context.operationNode.id ===
-								operation.generationTemplate.operationNode.id,
+							(g) => g.context.operationNode.id === operation.node.id,
 						);
 						if (generation === undefined) {
 							return;

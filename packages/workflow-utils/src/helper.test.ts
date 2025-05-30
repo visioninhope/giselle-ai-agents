@@ -214,15 +214,11 @@ describe("createJobMap", () => {
 		expect(jobsArray[1].operations[0].node.id).toBe("nd-P2EllMigi6Tm6gij");
 
 		// Check generation templates
-		expect(
-			jobsArray[0].operations[0].generationTemplate.sourceNodes.length,
-		).toBe(0);
-		expect(
-			jobsArray[1].operations[0].generationTemplate.sourceNodes.length,
-		).toBe(1);
-		expect(
-			jobsArray[1].operations[0].generationTemplate.sourceNodes[0].id,
-		).toBe("nd-KzXeXSIffRIMwZtX");
+		expect(jobsArray[0].operations[0].sourceNodes.length).toBe(0);
+		expect(jobsArray[1].operations[0].sourceNodes.length).toBe(1);
+		expect(jobsArray[1].operations[0].sourceNodes[0].id).toBe(
+			"nd-KzXeXSIffRIMwZtX",
+		);
 	});
 
 	test("should handle empty node set", () => {
@@ -455,30 +451,22 @@ describe("Test with complex workflow", () => {
 		);
 
 		// Check generation templates for first job
-		expect(
-			jobsArray[0].operations[0].generationTemplate.sourceNodes.length,
-		).toBe(0);
+		expect(jobsArray[0].operations[0].sourceNodes.length).toBe(0);
 
 		// Check generation templates for second job nodes
 		// Find the node with id nd-ixIefYTHjZVhpEGq
 		const ixIefYTHjZVhpEGqNode = jobsArray[1].operations.find(
 			(operation) => operation.node.id === "nd-ixIefYTHjZVhpEGq",
 		);
-		expect(ixIefYTHjZVhpEGqNode?.generationTemplate.sourceNodes.length).toBe(1);
-		expect(ixIefYTHjZVhpEGqNode?.generationTemplate.sourceNodes[0].id).toBe(
-			"nd-E89xeYnFyQUGxdCL",
-		);
+		expect(ixIefYTHjZVhpEGqNode?.sourceNodes.length).toBe(1);
+		expect(ixIefYTHjZVhpEGqNode?.sourceNodes[0].id).toBe("nd-E89xeYnFyQUGxdCL");
 
 		// Find the node with id nd-daF6m8YshVoiBARi
 		const daF6m8YshVoiBARiNode = jobsArray[1].operations.find(
 			(operation) => operation.node.id === "nd-daF6m8YshVoiBARi",
 		);
-		expect(daF6m8YshVoiBARiNode?.generationTemplate.sourceNodes.length).toBe(2);
-		expect(daF6m8YshVoiBARiNode?.generationTemplate.sourceNodes[0].id).toBe(
-			"nd-E89xeYnFyQUGxdCL",
-		);
-		expect(daF6m8YshVoiBARiNode?.generationTemplate.sourceNodes[1].id).toBe(
-			"nd-E89xeYnFyQUGxdCL",
-		);
+		expect(daF6m8YshVoiBARiNode?.sourceNodes.length).toBe(2);
+		expect(daF6m8YshVoiBARiNode?.sourceNodes[0].id).toBe("nd-E89xeYnFyQUGxdCL");
+		expect(daF6m8YshVoiBARiNode?.sourceNodes[1].id).toBe("nd-E89xeYnFyQUGxdCL");
 	});
 });

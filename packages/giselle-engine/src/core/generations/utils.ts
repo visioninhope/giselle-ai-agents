@@ -28,7 +28,6 @@ import {
 } from "@giselle-sdk/text-editor-utils";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
-import { getRun } from "../runs/utils";
 import type { GiselleEngineContext } from "../types";
 
 export interface GeneratedImageData {
@@ -826,27 +825,6 @@ export async function checkUsageLimits(args: {
 		};
 	}
 	return { type: "ok" };
-}
-
-export async function extractWorkspaceIdFromOrigin(args: {
-	storage: GiselleEngineContext["storage"];
-	origin: { type: "workspace"; id: WorkspaceId } | { type: "run"; id: RunId };
-}) {
-	const { origin, storage } = args;
-
-	if (origin.type === "workspace") {
-		return origin.id;
-	}
-
-	const run = await getRun({
-		storage: storage,
-		runId: origin.id,
-	});
-
-	if (run == null || !("workspaceId" in run)) {
-		throw new Error("Run not completed");
-	}
-	return run.workspaceId;
 }
 
 export function queryResultToText(

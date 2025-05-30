@@ -1,5 +1,4 @@
 import {
-	CreatedRun,
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
@@ -8,12 +7,8 @@ import {
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
-	OverrideNode,
 	QueuedGeneration,
-	RunId,
-	WorkflowId,
 	Workspace,
-	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
@@ -109,33 +104,6 @@ export const createJsonRouters = {
 				return JsonResponse.json(generation);
 			},
 		}),
-
-	addRun: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-				workflowId: WorkflowId.schema,
-				run: CreatedRun,
-				overrideNodes: z.array(OverrideNode).optional(),
-			}),
-			handler: async ({ input }) => {
-				const run = await giselleEngine.addRun(
-					input.workspaceId,
-					input.workflowId,
-					input.run,
-					input.overrideNodes,
-				);
-				return JsonResponse.json(run);
-			},
-		}),
-	startRun: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({ runId: RunId.schema }),
-			handler: async ({ input }) => {
-				await giselleEngine.startRun(input.runId);
-				return new Response(null, { status: 202 });
-			},
-		}),
 	removeFile: (giselleEngine: GiselleEngine) =>
 		createHandler({
 			input: z.object({
@@ -177,47 +145,6 @@ export const createJsonRouters = {
 				});
 			},
 		}),
-	upsertWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
-			}),
-			handler: async ({ input }) => {
-				await giselleEngine.upsertGithubIntegrationSetting(
-					input.workspaceGitHubIntegrationSetting,
-				);
-				return new Response(null, { status: 204 });
-			},
-		}),
-	getWorkspaceGitHubIntegrationSetting: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				workspaceId: WorkspaceId.schema,
-			}),
-			handler: async ({ input }) => {
-				const workspaceGitHubIntegrationSetting =
-					await giselleEngine.getWorkspaceGitHubIntegrationSetting(
-						input.workspaceId,
-					);
-				return JsonResponse.json({
-					workspaceGitHubIntegrationSetting,
-				});
-			},
-		}),
-	runApi: (giselleEngine: GiselleEngine) =>
-		withUsageLimitErrorHandler(
-			createHandler({
-				input: z.object({
-					workspaceId: WorkspaceId.schema,
-					workflowId: WorkflowId.schema,
-					overrideNodes: z.array(OverrideNode).optional(),
-				}),
-				handler: async ({ input }) => {
-					const result = await giselleEngine.runApi(input);
-					return new Response(result.join("\n"));
-				},
-			}),
-		),
 	generateImage: (giselleEngine: GiselleEngine) =>
 		withUsageLimitErrorHandler(
 			createHandler({
