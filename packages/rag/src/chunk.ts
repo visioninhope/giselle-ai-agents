@@ -46,6 +46,7 @@ export class LineChunker implements Chunker {
 
 		if (hasLongLines) {
 			// For content with very long lines, yield each processed segment as individual chunks
+			// Note: Overlap is not applied when dealing with long lines to ensure all content is preserved
 			for (const line of processedLines) {
 				yield this.createChunk(line, chunkIndex++);
 			}
