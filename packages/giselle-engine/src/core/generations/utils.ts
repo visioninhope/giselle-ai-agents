@@ -311,10 +311,6 @@ export function generationPath(generationId: GenerationId) {
 	return `generations/${generationId}/generation.json`;
 }
 
-export function activeNodeGenerationIdPath(nodeId: NodeId) {
-	return `generations/byNode/${nodeId}/activeGenerationId.txt`;
-}
-
 export async function setGeneration(params: {
 	storage: Storage;
 	generation: Generation;
