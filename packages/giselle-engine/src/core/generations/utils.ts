@@ -281,20 +281,6 @@ export function generationPath(generationId: GenerationId) {
 	return `generations/${generationId}/generation.json`;
 }
 
-export async function setGeneration(params: {
-	storage: Storage;
-	generation: Generation;
-}) {
-	await params.storage.setItem(
-		generationPath(params.generation.id),
-		Generation.parse(params.generation),
-		{
-			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
-			cacheControlMaxAge: 0,
-		},
-	);
-}
-
 export async function getGeneration(params: {
 	storage: Storage;
 	generationId: GenerationId;
@@ -332,47 +318,6 @@ export async function getGeneration(params: {
 
 export function nodeGenerationIndexPath(nodeId: NodeId) {
 	return `generations/byNode/${nodeId}.json`;
-}
-export async function setNodeGenerationIndex(
-	params: {
-		storage: Storage;
-		nodeId: NodeId;
-		nodeGenerationIndex: NodeGenerationIndex;
-	} & { origin: GenerationOrigin },
-) {
-	let newNodeGenerationIndexes: NodeGenerationIndex[] | undefined;
-	const nodeGenerationIndexes = await getNodeGenerationIndexes({
-		storage: params.storage,
-		nodeId: params.nodeId,
-	});
-	if (nodeGenerationIndexes === undefined) {
-		newNodeGenerationIndexes = [params.nodeGenerationIndex];
-	} else {
-		const index = nodeGenerationIndexes.findIndex(
-			(nodeGenerationIndex) =>
-				nodeGenerationIndex.id === params.nodeGenerationIndex.id,
-		);
-		if (index === -1) {
-			newNodeGenerationIndexes = [
-				...nodeGenerationIndexes,
-				params.nodeGenerationIndex,
-			];
-		} else {
-			newNodeGenerationIndexes = [
-				...nodeGenerationIndexes.slice(0, index),
-				params.nodeGenerationIndex,
-				...nodeGenerationIndexes.slice(index + 1),
-			];
-		}
-	}
-	await params.storage.setItem(
-		nodeGenerationIndexPath(params.nodeId),
-		newNodeGenerationIndexes,
-		{
-			// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
-			cacheControlMaxAge: 0,
-		},
-	);
 }
 
 export async function getNodeGenerationIndexes(params: {
