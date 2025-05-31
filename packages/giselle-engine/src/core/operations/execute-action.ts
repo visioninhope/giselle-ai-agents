@@ -30,10 +30,9 @@ export async function executeAction(args: {
 		context: args.context,
 		generation: args.generation,
 		execute: async ({
-			runningGeneration,
 			generationContext,
-			setGeneration,
 			generationContentResolver,
+			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isActionNode(operationNode)) {
@@ -58,14 +57,9 @@ export async function executeAction(args: {
 					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
 				}
 			}
-			const completedGeneration = {
-				...runningGeneration,
-				status: "completed",
-				completedAt: Date.now(),
+			await completeGeneration({
 				outputs: generationOutputs,
-			} satisfies CompletedGeneration;
-
-			await setGeneration(completedGeneration);
+			});
 		},
 	});
 }
