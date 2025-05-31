@@ -25,7 +25,6 @@ import {
 	getNodeGenerationIndexes,
 	queryResultToText,
 	setGeneration,
-	setGenerationIndex,
 	setNodeGenerationIndex,
 } from "../generations/utils";
 import type { GiselleEngineContext } from "../types";
@@ -52,13 +51,6 @@ export async function executeQuery(args: {
 		setGeneration({
 			storage: context.storage,
 			generation: runningGeneration,
-		}),
-		setGenerationIndex({
-			storage: context.storage,
-			generationIndex: {
-				id: runningGeneration.id,
-				origin: runningGeneration.context.origin,
-			},
 		}),
 		setNodeGenerationIndex({
 			storage: context.storage,

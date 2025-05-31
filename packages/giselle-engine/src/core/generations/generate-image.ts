@@ -42,7 +42,6 @@ import {
 	queryResultToText,
 	setGeneratedImage,
 	setGeneration,
-	setGenerationIndex,
 	setNodeGenerationIndex,
 } from "./utils";
 
@@ -69,13 +68,6 @@ export async function generateImage(args: {
 		setGeneration({
 			storage: args.context.storage,
 			generation: runningGeneration,
-		}),
-		setGenerationIndex({
-			storage: args.context.storage,
-			generationIndex: {
-				id: runningGeneration.id,
-				origin: runningGeneration.context.origin,
-			},
 		}),
 		setNodeGenerationIndex({
 			storage: args.context.storage,

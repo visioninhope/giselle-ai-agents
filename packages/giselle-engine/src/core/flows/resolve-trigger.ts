@@ -7,11 +7,7 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { githubTriggers } from "@giselle-sdk/flow";
-import {
-	setGeneration,
-	setGenerationIndex,
-	setNodeGenerationIndex,
-} from "../generations/utils";
+import { setGeneration, setNodeGenerationIndex } from "../generations/utils";
 import { resolveTrigger as resolveGitHubTrigger } from "../github/trigger-utils";
 import type { GiselleEngineContext } from "../types";
 import { getFlowTrigger } from "./utils";
@@ -167,13 +163,6 @@ export async function resolveTrigger(args: {
 		setGeneration({
 			storage: args.context.storage,
 			generation: completedGeneration,
-		}),
-		setGenerationIndex({
-			storage: args.context.storage,
-			generationIndex: {
-				id: completedGeneration.id,
-				origin: completedGeneration.context.origin,
-			},
 		}),
 		setNodeGenerationIndex({
 			storage: args.context.storage,

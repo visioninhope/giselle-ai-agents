@@ -41,7 +41,6 @@ import {
 	handleAgentTimeConsumption,
 	queryResultToText,
 	setGeneration,
-	setGenerationIndex,
 	setNodeGenerationIndex,
 } from "./utils";
 
@@ -78,13 +77,6 @@ export async function generateText(args: {
 		setGeneration({
 			storage: args.context.storage,
 			generation: runningGeneration,
-		}),
-		setGenerationIndex({
-			storage: args.context.storage,
-			generationIndex: {
-				id: runningGeneration.id,
-				origin: runningGeneration.context.origin,
-			},
 		}),
 		setNodeGenerationIndex({
 			storage: args.context.storage,

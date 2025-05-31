@@ -277,36 +277,6 @@ function getOrdinal(n: number): string {
 	return `${n}${suffix}`;
 }
 
-function generationIndexPath(generationId: GenerationId) {
-	return `generations/${generationId}.json`;
-}
-export async function getGenerationIndex(params: {
-	storage: Storage;
-	generationId: GenerationId;
-	options?: {
-		bypassingCache?: boolean;
-	};
-}) {
-	const unsafeGenerationIndex = await params.storage.getItem(
-		generationIndexPath(params.generationId),
-		{
-			bypassingCache: params.options?.bypassingCache ?? false,
-		},
-	);
-	if (unsafeGenerationIndex === null) {
-		return undefined;
-	}
-	return GenerationIndex.parse(unsafeGenerationIndex);
-}
-export async function setGenerationIndex(params: {
-	storage: Storage;
-	generationIndex: GenerationIndex;
-}) {
-	await params.storage.setItem(
-		generationIndexPath(params.generationIndex.id),
-		GenerationIndex.parse(params.generationIndex),
-	);
-}
 export function generationPath(generationId: GenerationId) {
 	return `generations/${generationId}/generation.json`;
 }
@@ -333,12 +303,8 @@ export async function getGeneration(params: {
 		skipMod?: boolean;
 	};
 }): Promise<Generation | undefined> {
-	const generationIndex = await getGenerationIndex(params);
-	if (generationIndex == null) {
-		throw new Error("Generation not found");
-	}
 	const unsafeGeneration = await params.storage.getItem(
-		`${generationPath(generationIndex.id)}`,
+		`${generationPath(params.generationId)}`,
 		{
 			bypassingCache: params.options?.bypassingCache ?? false,
 		},
