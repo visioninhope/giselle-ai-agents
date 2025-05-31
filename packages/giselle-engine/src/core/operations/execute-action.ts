@@ -1,12 +1,12 @@
 import {
 	type CompletedGeneration,
-	type Connection,
 	GenerationContext,
 	type GenerationOutput,
 	type GitHubActionCommandConfiguredState,
+	type NodeId,
+	type OutputId,
 	type QueuedGeneration,
 	isActionNode,
-	isCompletedGeneration,
 	isTextNode,
 } from "@giselle-sdk/data-type";
 import { githubActions } from "@giselle-sdk/flow";
@@ -20,52 +20,76 @@ import {
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import type { Storage } from "unstorage";
-import { internalSetGeneration } from "../generations/internal/set-generation";
-import { getGeneration, getNodeGenerationIndexes } from "../generations/utils";
+import { useGenerationExecutor } from "../generations/internal/use-generation-executor";
 import type { GiselleEngineContext } from "../types";
 
-async function resolveGeneration(args: {
-	generationContext: GenerationContext;
-	storage: Storage;
-	connection: Connection;
+export async function executeAction(args: {
+	context: GiselleEngineContext;
+	generation: QueuedGeneration;
 }) {
-	const nodeGenerationIndexes = await getNodeGenerationIndexes({
-		storage: args.storage,
-		nodeId: args.connection.outputNode.id,
-	});
-	if (
-		nodeGenerationIndexes === undefined ||
-		nodeGenerationIndexes.length === 0
-	) {
-		throw new Error("No generation found");
-	}
-	const generation = await getGeneration({
-		...args,
-		storage: args.storage,
-		generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
-		options: {
-			bypassingCache: true,
+	return useGenerationExecutor({
+		context: args.context,
+		generation: args.generation,
+		execute: async ({
+			runningGeneration,
+			generationContext,
+			setGeneration,
+			generationContentResolver,
+		}) => {
+			const operationNode = generationContext.operationNode;
+			if (!isActionNode(operationNode)) {
+				throw new Error("Invalid generation type");
+			}
+			const command = operationNode.content.command;
+			if (command.state.status === "unconfigured") {
+				throw new Error("Action is not configured");
+			}
+			let generationOutputs: GenerationOutput[] = [];
+			switch (command.provider) {
+				case "github":
+					generationOutputs = await executeGitHubActionCommand({
+						state: command.state,
+						context: args.context,
+						generation: runningGeneration,
+						storage: args.context.storage,
+						generationContentResolver,
+					});
+					break;
+				default: {
+					const _exhaustiveCheck: never = command.provider;
+					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+				}
+			}
+			const completedGeneration = {
+				...runningGeneration,
+				status: "completed",
+				completedAt: Date.now(),
+				outputs: generationOutputs,
+			} satisfies CompletedGeneration;
+
+			await setGeneration(completedGeneration);
 		},
 	});
-	if (generation === undefined || !isCompletedGeneration(generation)) {
-		throw new Error("Generation not completed");
-	}
-	const output = generation.outputs.find(
-		(output) => output.outputId === args.connection.outputId,
-	);
-	if (output === undefined || output.type !== "generated-text") {
-		throw new Error("Output not found");
-	}
-	return output.content;
 }
 
-async function resolveGitHubActionInputs(args: {
+async function executeGitHubActionCommand(args: {
 	state: GitHubActionCommandConfiguredState;
-	generation: QueuedGeneration;
+	context: GiselleEngineContext;
+	generation: { context: GenerationContext };
 	storage: Storage;
-}) {
+	generationContentResolver: (
+		nodeId: NodeId,
+		outputId: OutputId,
+	) => Promise<string | undefined>;
+}): Promise<GenerationOutput[]> {
+	const authConfig = args.context.integrationConfigs?.github?.authV2;
+	if (authConfig === undefined) {
+		throw new Error("GitHub authV2 configuration is missing");
+	}
+
+	// Resolve GitHub action inputs
 	const githubAction = githubActions[args.state.commandId];
-	const result: Record<string, string> = {};
+	const inputs: Record<string, string> = {};
 	const generationContext = GenerationContext.parse(args.generation.context);
 	for (const parameter of githubAction.command.parameters.keyof().options) {
 		const input = generationContext.operationNode.inputs.find(
@@ -82,13 +106,17 @@ async function resolveGitHubActionInputs(args: {
 		}
 
 		switch (sourceNode.type) {
-			case "operation":
-				result[parameter] = await resolveGeneration({
-					generationContext,
-					storage: args.storage,
-					connection,
-				});
+			case "operation": {
+				const content = await args.generationContentResolver(
+					connection.outputNode.id,
+					connection.outputId,
+				);
+				if (content === undefined) {
+					continue;
+				}
+				inputs[parameter] = content;
 				break;
+			}
 			case "variable":
 				switch (sourceNode.content.type) {
 					case "text": {
@@ -96,7 +124,7 @@ async function resolveGitHubActionInputs(args: {
 							throw new Error(`Unexpected node data: ${sourceNode.id}`);
 						}
 						const jsonOrText = sourceNode.content.text;
-						result[parameter] = isJsonContent(jsonOrText)
+						inputs[parameter] = isJsonContent(jsonOrText)
 							? jsonContentToText(JSON.parse(jsonOrText))
 							: jsonOrText;
 						break;
@@ -118,98 +146,12 @@ async function resolveGitHubActionInputs(args: {
 				throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
 			}
 		}
-
-		const nodeGenerationIndexes = await getNodeGenerationIndexes({
-			storage: args.storage,
-			nodeId: connection?.outputNode.id,
-		});
-		if (
-			nodeGenerationIndexes === undefined ||
-			nodeGenerationIndexes.length === 0
-		) {
-			continue;
-		}
-		const generation = await getGeneration({
-			...args,
-			storage: args.storage,
-			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
-		});
-		if (generation === undefined || !isCompletedGeneration(generation)) {
-			continue;
-		}
-		const output = generation.outputs.find(
-			(output) => output.outputId === connection.outputId,
-		);
-		if (output === undefined || output.type !== "generated-text") {
-			continue;
-		}
-		result[parameter] = output.content;
-	}
-	return result;
-}
-
-export async function executeAction(args: {
-	context: GiselleEngineContext;
-	generation: QueuedGeneration;
-}) {
-	const operationNode = args.generation.context.operationNode;
-	if (!isActionNode(operationNode)) {
-		throw new Error("Invalid generation type");
-	}
-	const command = operationNode.content.command;
-	if (command.state.status === "unconfigured") {
-		throw new Error("Action is not configured");
-	}
-	let generationOutputs: GenerationOutput[] = [];
-	switch (command.provider) {
-		case "github":
-			generationOutputs = await executeGitHubActionCommand({
-				state: command.state,
-				context: args.context,
-				generation: args.generation,
-				inputs: await resolveGitHubActionInputs({
-					state: command.state,
-					generation: args.generation,
-					storage: args.context.storage,
-				}),
-			});
-			break;
-		default: {
-			const _exhaustiveCheck: never = command.provider;
-			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
-		}
-	}
-	const completedGeneration = {
-		...args.generation,
-		status: "completed",
-		messages: [],
-		queuedAt: Date.now(),
-		startedAt: Date.now(),
-		completedAt: Date.now(),
-		outputs: generationOutputs,
-	} satisfies CompletedGeneration;
-
-	await internalSetGeneration({
-		storage: args.context.storage,
-		generation: completedGeneration,
-	});
-}
-
-async function executeGitHubActionCommand(args: {
-	state: GitHubActionCommandConfiguredState;
-	context: GiselleEngineContext;
-	generation: QueuedGeneration;
-	inputs: Record<string, string>;
-}): Promise<GenerationOutput[]> {
-	const authConfig = args.context.integrationConfigs?.github?.authV2;
-	if (authConfig === undefined) {
-		throw new Error("GitHub authV2 configuration is missing");
 	}
 	switch (args.state.commandId) {
 		case "github.create.issue": {
 			const result = await createIssue({
 				...githubActions["github.create.issue"].command.parameters.parse(
-					args.inputs,
+					inputs,
 				),
 				repositoryNodeId: args.state.repositoryNodeId,
 				authConfig: {
@@ -236,7 +178,7 @@ async function executeGitHubActionCommand(args: {
 		case "github.create.issueComment": {
 			const result = await createIssueComment({
 				...githubActions["github.create.issueComment"].command.parameters.parse(
-					args.inputs,
+					inputs,
 				),
 				repositoryNodeId: args.state.repositoryNodeId,
 				authConfig: {
@@ -264,7 +206,7 @@ async function executeGitHubActionCommand(args: {
 			const result = await createPullRequestComment({
 				...githubActions[
 					"github.create.pullRequestComment"
-				].command.parameters.parse(args.inputs),
+				].command.parameters.parse(inputs),
 				repositoryNodeId: args.state.repositoryNodeId,
 				authConfig: {
 					strategy: "app-installation",
