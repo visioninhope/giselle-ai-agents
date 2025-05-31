@@ -41,10 +41,9 @@ export async function generateImage(args: {
 		execute: async ({
 			runningGeneration,
 			generationContext,
-			setGeneration,
 			fileResolver,
 			generationContentResolver,
-			workspaceId,
+			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isImageGenerationNode(operationNode)) {
@@ -91,15 +90,9 @@ export async function generateImage(args: {
 				}
 			}
 
-			const completedGeneration = {
-				...runningGeneration,
-				status: "completed",
-				messages: [],
-				completedAt: Date.now(),
+			await completeGeneration({
 				outputs: generationOutputs,
-			} satisfies CompletedGeneration;
-
-			await setGeneration(completedGeneration);
+			});
 		},
 	});
 }

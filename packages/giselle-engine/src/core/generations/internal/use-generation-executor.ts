@@ -46,7 +46,7 @@ export async function useGenerationExecutor<T>(args: {
 				completionTokens: number;
 				totalTokens: number;
 			};
-			messages: Message[];
+			messages?: Message[];
 		}) => Promise<CompletedGeneration>;
 	}) => Promise<T>;
 }): Promise<T> {
@@ -170,7 +170,7 @@ export async function useGenerationExecutor<T>(args: {
 			completionTokens: number;
 			totalTokens: number;
 		};
-		messages: Message[];
+		messages?: Message[];
 	}): Promise<CompletedGeneration> {
 		const completedGeneration = {
 			...runningGeneration,
@@ -178,7 +178,7 @@ export async function useGenerationExecutor<T>(args: {
 			completedAt: Date.now(),
 			outputs: args.outputs,
 			usage: args.usage,
-			messages: args.messages,
+			messages: args.messages ?? [],
 		} satisfies CompletedGeneration;
 
 		await setGeneration(completedGeneration);
