@@ -18,6 +18,7 @@ import {
 	checkUsageLimits,
 	getGeneration,
 	getNodeGenerationIndexes,
+	handleAgentTimeConsumption,
 	queryResultToText,
 } from "../utils";
 import { internalSetGeneration } from "./set-generation";
@@ -47,6 +48,15 @@ export async function useGenerationExecutor<T>(args: {
 	};
 	const setGeneration = async (generation: Generation) => {
 		await internalSetGeneration({ storage: args.context.storage, generation });
+
+		// Handle agent time consumption for completed generations
+		if (isCompletedGeneration(generation)) {
+			await handleAgentTimeConsumption({
+				workspaceId,
+				generation,
+				onConsumeAgentTime: args.context.onConsumeAgentTime,
+			});
+		}
 	};
 	await setGeneration(runningGeneration);
 	let workspaceId: WorkspaceId;

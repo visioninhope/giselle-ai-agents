@@ -27,7 +27,6 @@ import type { TelemetrySettings } from "./types";
 import {
 	buildMessageObject,
 	detectImageType,
-	handleAgentTimeConsumption,
 	setGeneratedImage,
 } from "./utils";
 
@@ -101,12 +100,6 @@ export async function generateImage(args: {
 			} satisfies CompletedGeneration;
 
 			await setGeneration(completedGeneration);
-
-			await handleAgentTimeConsumption({
-				workspaceId,
-				generation: completedGeneration,
-				onConsumeAgentTime: args.context.onConsumeAgentTime,
-			});
 		},
 	});
 }

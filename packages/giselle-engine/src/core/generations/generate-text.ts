@@ -24,7 +24,7 @@ import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createLangfuseTracer, generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
-import { buildMessageObject, handleAgentTimeConsumption } from "./utils";
+import { buildMessageObject } from "./utils";
 
 // PerplexityProviderOptions is not exported from @ai-sdk/perplexity, so we define it here based on the model configuration
 export type PerplexityProviderOptions = {
@@ -247,12 +247,6 @@ export async function generateText(args: {
 					} satisfies CompletedGeneration;
 
 					await setGeneration(completedGeneration);
-
-					await handleAgentTimeConsumption({
-						workspaceId,
-						generation: completedGeneration,
-						onConsumeAgentTime: args.context.onConsumeAgentTime,
-					});
 
 					// necessary to send telemetry but not explicitly used
 					const langfuse = createLangfuseTracer({
