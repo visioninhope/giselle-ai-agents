@@ -1,5 +1,4 @@
 import {
-	type CompletedGeneration,
 	type GenerationContext,
 	type GenerationOutput,
 	type GitHubActionCommandConfiguredState,
