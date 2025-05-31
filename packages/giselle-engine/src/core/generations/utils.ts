@@ -344,7 +344,6 @@ export async function setNodeGenerationIndex(
 	const nodeGenerationIndexes = await getNodeGenerationIndexes({
 		storage: params.storage,
 		nodeId: params.nodeId,
-		origin: params.origin,
 	});
 	if (nodeGenerationIndexes === undefined) {
 		newNodeGenerationIndexes = [params.nodeGenerationIndex];
@@ -376,12 +375,10 @@ export async function setNodeGenerationIndex(
 	);
 }
 
-export async function getNodeGenerationIndexes(
-	params: {
-		storage: Storage;
-		nodeId: NodeId;
-	} & { origin: GenerationOrigin },
-) {
+export async function getNodeGenerationIndexes(params: {
+	storage: Storage;
+	nodeId: NodeId;
+}) {
 	const unsafeNodeGenerationIndexData = await params.storage.getItem(
 		nodeGenerationIndexPath(params.nodeId),
 		{

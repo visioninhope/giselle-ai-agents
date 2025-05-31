@@ -151,7 +151,6 @@ export async function generateImage(args: {
 
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
-			origin: runningGeneration.context.origin,
 			storage: args.context.storage,
 			nodeId,
 		});

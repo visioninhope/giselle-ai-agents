@@ -197,7 +197,6 @@ async function resolveQuery(
 
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
-			origin: runningGeneration.context.origin,
 			storage,
 			nodeId,
 		});

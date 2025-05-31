@@ -34,7 +34,6 @@ async function resolveGeneration(args: {
 	connection: Connection;
 }) {
 	const nodeGenerationIndexes = await getNodeGenerationIndexes({
-		origin: args.generationContext.origin,
 		storage: args.storage,
 		nodeId: args.connection.outputNode.id,
 	});
