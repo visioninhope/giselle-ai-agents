@@ -3,7 +3,6 @@ import { google } from "@ai-sdk/google";
 import { openai } from "@ai-sdk/openai";
 import { perplexity } from "@ai-sdk/perplexity";
 import {
-	type CompletedGeneration,
 	type FailedGeneration,
 	type GenerationOutput,
 	type QueuedGeneration,
@@ -46,6 +45,7 @@ export async function generateText(args: {
 			fileResolver,
 			generationContentResolver,
 			workspaceId,
+			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
 			if (!isTextGenerationNode(operationNode)) {
@@ -228,10 +228,7 @@ export async function generateText(args: {
 							sources,
 						});
 					}
-					const completedGeneration = {
-						...runningGeneration,
-						status: "completed",
-						completedAt: Date.now(),
+					const completedGeneration = await completeGeneration({
 						outputs: generationOutputs,
 						usage: tokenUsage,
 						messages: appendResponseMessages({
@@ -244,9 +241,7 @@ export async function generateText(args: {
 							],
 							responseMessages: event.response.messages,
 						}),
-					} satisfies CompletedGeneration;
-
-					await setGeneration(completedGeneration);
+					});
 
 					// necessary to send telemetry but not explicitly used
 					const langfuse = createLangfuseTracer({

@@ -1,7 +1,10 @@
 import {
+	type CompletedGeneration,
 	type FileData,
 	type Generation,
 	GenerationContext,
+	type GenerationOutput,
+	type Message,
 	type NodeId,
 	type Output,
 	type OutputId,
@@ -36,6 +39,15 @@ export async function useGenerationExecutor<T>(args: {
 			outputId: OutputId,
 		) => Promise<string | undefined>;
 		workspaceId: WorkspaceId;
+		completeGeneration: (args: {
+			outputs: GenerationOutput[];
+			usage?: {
+				promptTokens: number;
+				completionTokens: number;
+				totalTokens: number;
+			};
+			messages: Message[];
+		}) => Promise<CompletedGeneration>;
 	}) => Promise<T>;
 }): Promise<T> {
 	const generationContext = GenerationContext.parse(args.generation.context);
@@ -150,6 +162,29 @@ export async function useGenerationExecutor<T>(args: {
 				throw new Error("Generation output type is not supported");
 		}
 	}
+
+	async function completeGeneration(args: {
+		outputs: GenerationOutput[];
+		usage?: {
+			promptTokens: number;
+			completionTokens: number;
+			totalTokens: number;
+		};
+		messages: Message[];
+	}): Promise<CompletedGeneration> {
+		const completedGeneration = {
+			...runningGeneration,
+			status: "completed",
+			completedAt: Date.now(),
+			outputs: args.outputs,
+			usage: args.usage,
+			messages: args.messages,
+		} satisfies CompletedGeneration;
+
+		await setGeneration(completedGeneration);
+		return completedGeneration;
+	}
+
 	return args.execute({
 		runningGeneration,
 		generationContext,
@@ -157,5 +192,6 @@ export async function useGenerationExecutor<T>(args: {
 		fileResolver,
 		generationContentResolver,
 		workspaceId,
+		completeGeneration,
 	});
 }
