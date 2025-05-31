@@ -295,6 +295,9 @@ export async function getGeneration(params: {
 			bypassingCache: params.options?.bypassingCache ?? false,
 		},
 	);
+	if (unsafeGeneration == null) {
+		throw new Error("Generation not found");
+	}
 	if (params.options?.skipMod) {
 		const parsedGeneration = Generation.parse(unsafeGeneration);
 		const parsedGenerationContext = GenerationContext.parse(
