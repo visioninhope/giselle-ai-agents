@@ -53,7 +53,7 @@ export async function generateImage(args: {
 			const langfuse = new Langfuse();
 			const messages = await buildMessageObject(
 				operationNode,
-				runningGeneration.context.sourceNodes,
+				generationContext.sourceNodes,
 				fileResolver,
 				generationContentResolver,
 			);

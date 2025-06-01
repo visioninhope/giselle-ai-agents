@@ -41,8 +41,7 @@ export function GenerationRunner({
 		case "query":
 			return <QueryRunner generation={generation} />;
 		default: {
-			const _exhaustiveCheck: never =
-				generationContext.operationNode.content.type;
+			const _exhaustiveCheck: never = generationContext.operationNode.content;
 			return _exhaustiveCheck;
 		}
 	}

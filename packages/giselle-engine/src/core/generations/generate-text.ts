@@ -5,7 +5,6 @@ import { perplexity } from "@ai-sdk/perplexity";
 import {
 	type FailedGeneration,
 	type GenerationOutput,
-	Node,
 	type QueuedGeneration,
 	type TextGenerationLanguageModelData,
 	type UrlSource,
@@ -62,15 +61,7 @@ export async function generateText(args: {
 
 			const messages = await buildMessageObject(
 				operationNode,
-				generationContext.sourceNodes
-					.map((sourceNode) => {
-						const parseResult = Node.safeParse(sourceNode);
-						if (parseResult.success) {
-							return parseResult.data;
-						}
-						return null;
-					})
-					.filter((data) => data !== null),
+				generationContext.sourceNodes,
 				fileResolver,
 				generationContentResolver,
 			);
