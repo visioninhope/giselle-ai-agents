@@ -16,7 +16,7 @@ function takeLocalEnv(localEnvironmentKey: string) {
 
 export const developerFlag = flag<boolean>({
 	key: "developer",
-	async decide() {
+	decide() {
 		return takeLocalEnv("DEVELOPER_FLAG");
 	},
 	description: "Enable Developer",
@@ -29,7 +29,7 @@ export const developerFlag = flag<boolean>({
 
 export const githubToolsFlag = flag<boolean>({
 	key: "github-tools",
-	async decide() {
+	decide() {
 		return takeLocalEnv("GITHUB_TOOLS_FLAG");
 	},
 	description: "Enable GitHub Tools",
@@ -42,7 +42,7 @@ export const githubToolsFlag = flag<boolean>({
 
 export const teamInvitationViaEmailFlag = flag<boolean>({
 	key: "teamInvitationViaEmail",
-	async decide() {
+	decide() {
 		return true;
 	},
 	description: "Enable team invitation via email",
@@ -93,7 +93,7 @@ export const runV2Flag = flag<boolean>({
 
 export const githubVectorStoreFlag = flag<boolean>({
 	key: "github-vector-store",
-	async decide() {
+	decide() {
 		return takeLocalEnv("GITHUB_VECTOR_STORE_FLAG");
 	},
 	description: "Enable GitHub Vector Store",
@@ -106,7 +106,7 @@ export const githubVectorStoreFlag = flag<boolean>({
 
 export const webPageFileNodeFlag = flag<boolean>({
 	key: "web-page-file-node",
-	async decide() {
+	decide() {
 		return takeLocalEnv("WEB_PAGE_FILE_NODE_FLAG");
 	},
 	description: "Enable Web Page File Node",
