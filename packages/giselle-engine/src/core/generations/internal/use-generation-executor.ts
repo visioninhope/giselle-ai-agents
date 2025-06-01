@@ -60,15 +60,6 @@ export async function useGenerationExecutor<T>(args: {
 	};
 	const setGeneration = async (generation: Generation) => {
 		await internalSetGeneration({ storage: args.context.storage, generation });
-
-		// Handle agent time consumption for completed generations
-		if (isCompletedGeneration(generation)) {
-			await handleAgentTimeConsumption({
-				workspaceId,
-				generation,
-				onConsumeAgentTime: args.context.onConsumeAgentTime,
-			});
-		}
 	};
 	await setGeneration(runningGeneration);
 	let workspaceId: WorkspaceId;
@@ -163,7 +154,11 @@ export async function useGenerationExecutor<T>(args: {
 		}
 	}
 
-	async function completeGeneration(args: {
+	async function completeGeneration({
+		outputs,
+		usage,
+		messages,
+	}: {
 		outputs: GenerationOutput[];
 		usage?: {
 			promptTokens: number;
@@ -176,12 +171,19 @@ export async function useGenerationExecutor<T>(args: {
 			...runningGeneration,
 			status: "completed",
 			completedAt: Date.now(),
-			outputs: args.outputs,
-			usage: args.usage,
-			messages: args.messages ?? [],
+			outputs: outputs,
+			usage: usage,
+			messages: messages ?? [],
 		} satisfies CompletedGeneration;
 
-		await setGeneration(completedGeneration);
+		await Promise.all([
+			setGeneration(completedGeneration),
+			handleAgentTimeConsumption({
+				workspaceId,
+				generation: completedGeneration,
+				onConsumeAgentTime: args.context.onConsumeAgentTime,
+			}),
+		]);
 		return completedGeneration;
 	}
 
