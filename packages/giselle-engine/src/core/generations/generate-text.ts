@@ -246,7 +246,6 @@ export async function generateText(args: {
 					// necessary to send telemetry but not explicitly used
 					const langfuse = createLangfuseTracer({
 						workspaceId,
-						runningGeneration,
 						tags: generateTelemetryTags({
 							provider: operationNode.content.llm.provider,
 							languageModel,
@@ -267,6 +266,7 @@ export async function generateText(args: {
 							totalCost: costInfo?.totalCostForDisplay ?? 0,
 							unit: "TOKENS",
 						},
+						textGenerationNode: operationNode,
 						completedGeneration,
 						spanName: "ai.streamText",
 						generationName: "ai.streamText.doStream",

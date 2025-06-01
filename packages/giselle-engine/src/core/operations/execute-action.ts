@@ -120,7 +120,7 @@ async function resolveActionInputs(args: {
 							`Unsupported node type: ${sourceNode.content.type}`,
 						);
 					default: {
-						const _exhaustiveCheck: never = sourceNode.content.type;
+						const _exhaustiveCheck: never = sourceNode.content;
 						throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
 					}
 				}

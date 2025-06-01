@@ -1,8 +1,10 @@
 import type {
+	FileNode,
 	ImageGenerationNode,
 	QueryNode,
 	TextGenerationNode,
-	VariableNodeLike,
+	TextNode,
+	VariableNode,
 } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useMemo } from "react";
@@ -15,7 +17,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 			(connection) => connection.inputNode.id === node.id,
 		);
 		const connectedGeneratedSources: ConnectedSource<TextGenerationNode>[] = [];
-		const connectedVariableSources: ConnectedSource<VariableNodeLike>[] = [];
+		const connectedVariableSources: ConnectedSource<VariableNode>[] = [];
 		const connectedQuerySources: ConnectedSource<QueryNode>[] = [];
 		for (const connection of connectionsToThisNode) {
 			const node = data.nodes.find(
@@ -61,16 +63,22 @@ export function useConnectedSources(node: ImageGenerationNode) {
 				case "variable":
 					switch (node.content.type) {
 						case "file":
-						case "github":
+							connectedVariableSources.push({
+								output,
+								node: node as FileNode,
+								connection,
+							});
+							break;
 						case "text":
 							connectedVariableSources.push({
 								output,
-								node,
+								node: node as TextNode,
 								connection,
 							});
 							break;
 
 						case "vectorStore":
+						case "github":
 							throw new Error("vectore store can not be connected");
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
