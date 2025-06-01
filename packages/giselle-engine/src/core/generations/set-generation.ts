@@ -6,7 +6,7 @@ export async function setGeneration(args: {
 	context: GiselleEngineContext;
 	generation: Generation;
 }) {
-	internalSetGeneration({
+	await internalSetGeneration({
 		storage: args.context.storage,
 		generation: args.generation,
 	});

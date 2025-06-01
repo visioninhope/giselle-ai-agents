@@ -46,7 +46,7 @@ export async function executeQuery(args: {
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
 
-	internalSetGeneration({
+	await internalSetGeneration({
 		storage: context.storage,
 		generation: runningGeneration,
 	});
@@ -115,7 +115,7 @@ export async function executeQuery(args: {
 			outputs,
 		} satisfies CompletedGeneration;
 
-		internalSetGeneration({
+		await internalSetGeneration({
 			storage: context.storage,
 			generation: completedGeneration,
 		});

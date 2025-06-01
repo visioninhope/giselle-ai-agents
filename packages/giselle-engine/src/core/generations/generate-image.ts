@@ -63,7 +63,7 @@ export async function generateImage(args: {
 		startedAt: Date.now(),
 	} satisfies RunningGeneration;
 
-	internalSetGeneration({
+	await internalSetGeneration({
 		storage: args.context.storage,
 		generation: runningGeneration,
 	});
@@ -97,7 +97,7 @@ export async function generateImage(args: {
 				dump: usageLimitStatus,
 			},
 		} satisfies FailedGeneration;
-		internalSetGeneration({
+		await internalSetGeneration({
 			storage: args.context.storage,
 			generation: failedGeneration,
 		});
@@ -217,7 +217,7 @@ export async function generateImage(args: {
 		outputs: generationOutputs,
 	} satisfies CompletedGeneration;
 
-	internalSetGeneration({
+	await internalSetGeneration({
 		storage: args.context.storage,
 		generation: completedGeneration,
 	});
