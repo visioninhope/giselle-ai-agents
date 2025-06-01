@@ -23,7 +23,7 @@ export interface CostCalculator {
 	calculate(
 		model: string,
 		usage: ModelTokenUsage,
-	): Promise<CostResultForDisplay>;
+	): Promise<CostResultForDisplay> | CostResultForDisplay;
 }
 
 export abstract class BaseCostCalculator implements CostCalculator {
@@ -33,10 +33,7 @@ export abstract class BaseCostCalculator implements CostCalculator {
 		return this.constructor.name.replace("CostCalculator", "");
 	}
 
-	async calculate(
-		modelId: string,
-		usage: ModelTokenUsage,
-	): Promise<CostResultForDisplay> {
+	calculate(modelId: string, usage: ModelTokenUsage) {
 		try {
 			const validPrice = getValidPricing(modelId, this.getPricingTable());
 			return calculateTokenCostForDisplay(usage, validPrice.price);
@@ -57,10 +54,7 @@ export abstract class BaseCostCalculator implements CostCalculator {
 export class DefaultCostCalculator implements CostCalculator {
 	constructor(private readonly provider: string) {}
 
-	async calculate(
-		modelId: string,
-		usage: ModelTokenUsage,
-	): Promise<CostResultForDisplay> {
+	calculate(modelId: string, usage: ModelTokenUsage): CostResultForDisplay {
 		console.log(
 			`Cost calculation not implemented for provider: ${this.provider}, model: ${modelId}`,
 		);
