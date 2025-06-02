@@ -23,27 +23,27 @@ import { redirect } from "next/navigation";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { deleteTeamMember } from "../team/actions";
 
-export async function connectGoogleIdentity() {
+export function connectGoogleIdentity() {
 	return connectIdentity("google", "/settings/account/authentication");
 }
 
-export async function connectGitHubIdentity() {
+export function connectGitHubIdentity() {
 	return connectIdentity("github", "/settings/account/authentication");
 }
 
-export async function reconnectGoogleIdentity() {
+export function reconnectGoogleIdentity() {
 	return reconnectIdentity("google", "/settings/account/authentication");
 }
 
-export async function reconnectGitHubIdentity() {
+export function reconnectGitHubIdentity() {
 	return reconnectIdentity("github", "/settings/account/authentication");
 }
 
-export async function disconnectGoogleIdentity() {
+export function disconnectGoogleIdentity() {
 	return disconnectIdentity("google", "/settings/account/authentication");
 }
 
-export async function disconnectGitHubIdentity() {
+export function disconnectGitHubIdentity() {
 	return disconnectIdentity("github", "/settings/account/authentication");
 }
 

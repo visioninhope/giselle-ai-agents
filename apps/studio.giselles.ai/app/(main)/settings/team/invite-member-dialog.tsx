@@ -144,7 +144,7 @@ export function InviteMemberDialog({
 		} else {
 			// Process for each email address
 			const results = await Promise.all(
-				emailList.map(async (emailAddress) => {
+				emailList.map((emailAddress) => {
 					const formData = new FormData();
 					formData.append("email", emailAddress);
 					formData.append("role", role);

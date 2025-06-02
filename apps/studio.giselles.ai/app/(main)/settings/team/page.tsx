@@ -12,7 +12,7 @@ import { LocalDateTime } from "./components/local-date-time";
 import { DeleteTeam } from "./delete-team";
 import { TeamName } from "./team-name";
 
-export default async function TeamPage() {
+export default function TeamPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
@@ -78,7 +78,7 @@ interface BillingInfoProps {
 	team: CurrentTeam;
 }
 
-async function BillingInfoForFreePlan({ team }: BillingInfoProps) {
+function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 	if (isProPlan(team)) {
 		return null;
 	}
@@ -110,7 +110,7 @@ async function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 		</>
 	);
 }
-async function BillingInfoForProPlan({ team }: BillingInfoProps) {
+function BillingInfoForProPlan({ team }: BillingInfoProps) {
 	if (!isProPlan(team)) {
 		return null;
 	}

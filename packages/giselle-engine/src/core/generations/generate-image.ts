@@ -205,7 +205,7 @@ async function generateImageWithFal({
 			operationNode.content.llm.configurations.size,
 		);
 		await Promise.all([
-			...result.images.map(async (image) => {
+			...result.images.map((image) => {
 				const wrappedMedia = new LangfuseMedia({
 					contentType: "image/png" as ApiMediaContentType,
 					contentBytes: Buffer.from(image.uint8Array),
@@ -217,7 +217,7 @@ async function generateImageWithFal({
 					},
 				});
 			}),
-			(async () => {
+			(() => {
 				const usage = usageCalculator.calculateUsage({
 					...imageSize,
 					n: operationNode.content.llm.configurations.n,
@@ -336,7 +336,7 @@ export async function generateImageWithOpenAI({
 			languageModelData.configurations.size,
 		);
 		await Promise.all([
-			...images.map(async (image) => {
+			...images.map((image) => {
 				const wrappedMedia = new LangfuseMedia({
 					contentType: "image/png" as ApiMediaContentType,
 					contentBytes: Buffer.from(image.uint8Array),
@@ -348,7 +348,7 @@ export async function generateImageWithOpenAI({
 					},
 				});
 			}),
-			(async () => {
+			(() => {
 				const usage = usageCalculator.calculateUsage({
 					...imageSize,
 					quality: languageModelData.configurations.quality,
