@@ -28,7 +28,8 @@ export async function resolveTrigger(args: ResolveTriggerArgs) {
 		(await resolvePullRequestOpenedTrigger(args)) ||
 		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
-		resolvePullRequestCommentTrigger(args)
+		resolvePullRequestCommentTrigger(args) ||
+		resolvePullRequestReviewCommentTrigger(args)
 	);
 }
 
@@ -462,6 +463,77 @@ function resolvePullRequestCommentTrigger(
 					type: "generated-text",
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.title,
+				} satisfies GenerationOutput;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+function resolvePullRequestReviewCommentTrigger(
+	args: ResolveTriggerArgs,
+): GenerationOutput | null {
+	if (
+		!ensureWebhookEvent(
+			args.webhookEvent,
+			"pull_request_review_comment.created",
+		) ||
+		args.trigger.configuration.event.id !==
+			"github.pull_request_review_comment.created" ||
+		args.githubTrigger.event.id !== "github.pull_request_review_comment.created"
+	) {
+		return null;
+	}
+
+	const command = parseCommand(args.webhookEvent.data.payload.comment.body);
+	if (
+		command === null ||
+		command.callsign !== args.trigger.configuration.event.conditions.callsign
+	) {
+		return null;
+	}
+
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "body":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: command.content,
+				} satisfies GenerationOutput;
+			case "pullRequestBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.body ?? "",
+				} satisfies GenerationOutput;
+			case "pullRequestNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content:
+						args.webhookEvent.data.payload.pull_request.number.toString(),
+				} satisfies GenerationOutput;
+			case "pullRequestTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.title,
 				} satisfies GenerationOutput;
 			default: {
 				const _exhaustiveCheck: never = payload;
