@@ -55,7 +55,7 @@ export async function generateImage(args: {
 	if (!isImageGenerationNode(operationNode)) {
 		throw new Error("Invalid generation type");
 	}
-	const langfuse = new Langfuse();
+	const tracer = new Langfuse();
 	const generationContext = GenerationContext.parse(args.generation.context);
 	const runningGeneration = {
 		...args.generation,
@@ -221,7 +221,7 @@ export async function generateImage(args: {
 				messages,
 				runningGeneration,
 				generationContext,
-				langfuse,
+				tracer,
 				telemetry: args.telemetry,
 				context: args.context,
 			});
@@ -233,7 +233,7 @@ export async function generateImage(args: {
 				generationContext,
 				languageModelData: operationNode.content.llm,
 				context: args.context,
-				langfuse,
+				tracer,
 				telemetry: args.telemetry,
 			});
 			break;
@@ -291,7 +291,7 @@ async function generateImageWithFal({
 	generationContext,
 	runningGeneration,
 	messages,
-	langfuse,
+	tracer,
 	telemetry,
 	context,
 }: {
@@ -300,10 +300,10 @@ async function generateImageWithFal({
 	runningGeneration: RunningGeneration;
 	messages: CoreMessage[];
 	telemetry?: TelemetrySettings;
-	langfuse: Langfuse;
+	tracer: Langfuse;
 	context: GiselleEngineContext;
 }) {
-	const trace = langfuse.trace({
+	const trace = tracer.trace({
 		name: "ai-sdk/fal",
 		metadata: telemetry?.metadata,
 		input: { messages },
@@ -420,7 +420,7 @@ export async function generateImageWithOpenAI({
 	runningGeneration,
 	languageModelData,
 	context,
-	langfuse,
+	tracer,
 	telemetry,
 }: {
 	messages: CoreMessage[];
@@ -428,10 +428,10 @@ export async function generateImageWithOpenAI({
 	runningGeneration: RunningGeneration;
 	languageModelData: OpenAIImageLanguageModelData;
 	context: GiselleEngineContext;
-	langfuse: Langfuse;
+	tracer: Langfuse;
 	telemetry?: TelemetrySettings;
 }) {
-	const trace = langfuse.trace({
+	const trace = tracer.trace({
 		name: "ai-sdk/openai",
 		metadata: telemetry?.metadata,
 		input: { messages },

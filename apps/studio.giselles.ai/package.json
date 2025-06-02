@@ -25,6 +25,7 @@
 		"@giselle-sdk/github-tool": "workspace:*",
 		"@giselle-sdk/integration": "workspace:*",
 		"@giselle-sdk/supabase-driver": "workspace:*",
+		"@giselle-sdk/telemetry": "workspace:*",
 		"@icons-pack/react-simple-icons": "10.0.0",
 		"@lucide/lab": "0.1.2",
 		"@next/env": "15.1.4",

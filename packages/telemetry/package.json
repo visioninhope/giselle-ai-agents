@@ -25,10 +25,12 @@
 	},
 	"devDependencies": {
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"@giselle-sdk/data-type": "workspace:*",
 		"@types/react": "catalog:",
 		"tsup": "catalog:"
 	},
 	"dependencies": {
+		"@ai-sdk/anthropic": "catalog:",
 		"ai": "catalog:",
 		"react": "catalog:"
 	}

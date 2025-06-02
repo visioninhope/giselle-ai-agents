@@ -22,15 +22,14 @@ import {
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
 	Capability,
-	calculateDisplayCost,
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
+import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { UsageLimitError } from "../error";
 import { filePath } from "../files/utils";
 import type { GiselleEngineContext } from "../types";
-import { generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import {
@@ -484,26 +483,39 @@ export async function generateText(args: {
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			});
 
-			const langfuse = await args.context.costTracker.trackCost({
-				runningGeneration: runningGeneration,
-				completedGeneration: completedGeneration,
-				tokenUsage: event.usage,
-				provider: operationNode.content.llm.provider,
-				modelId: operationNode.content.llm.id,
-				telemetry: args.telemetry,
-				messages: { messages },
-				output: event.text,
-				toolSet: preparedToolSet.toolSet,
-				configurations: operationNode.content.llm.configurations,
-				providerOptions,
-			});
+			if (args.context.tracer) {
+				try {
+					await args.context.tracer.createAndEmit({
+						runningGeneration,
+						completedGeneration,
+						tokenUsage: {
+							promptTokens: event.usage.promptTokens,
+							completionTokens: event.usage.completionTokens,
+							totalTokens: event.usage.totalTokens,
+						},
+						provider: operationNode.content.llm.provider,
+						modelId: operationNode.content.llm.id,
+						telemetry: args.telemetry,
+						messages: { messages },
+						output: event.text,
+						toolSet: preparedToolSet.toolSet,
+						configurations: operationNode.content.llm.configurations,
+						providerOptions:
+							operationNode.content.llm.provider === "anthropic"
+								? providerOptions
+								: undefined,
+					});
+				} catch (error) {
+					console.error("Telemetry emission failed:", error);
+				}
+			}
+
 			try {
-				await Promise.all([
-					langfuse?.shutdownAsync(),
-					...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+				await Promise.all(
+					preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 						cleanupFunction(),
 					),
-				]);
+				);
 			} catch (error) {
 				console.error("Cleanup process failed:", error);
 			}
