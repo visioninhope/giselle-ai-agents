@@ -158,6 +158,19 @@ function Installed({
 					};
 					break;
 				}
+				case "github.pull_request_review_comment.created": {
+					const callsign = formData.get("callsign");
+					if (typeof callsign !== "string" || callsign.length === 0) {
+						throw new Error("unexpected request");
+					}
+					event = {
+						id: "github.pull_request_comment.created",
+						conditions: {
+							callsign,
+						},
+					};
+					break;
+				}
 				default: {
 					const _exhaustiveCheck: never = eventId;
 					throw new Error(`Unhandled eventId: ${_exhaustiveCheck}`);
