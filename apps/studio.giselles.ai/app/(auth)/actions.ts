@@ -27,10 +27,10 @@ async function authorizeOAuth(provider: OAuthProvider) {
 	}
 }
 
-export function authorizeGitHub() {
-	return authorizeOAuth("github");
+export async function authorizeGitHub() {
+	return await authorizeOAuth("github");
 }
 
-export function authorizeGoogle() {
-	return authorizeOAuth("google");
+export async function authorizeGoogle() {
+	return await authorizeOAuth("google");
 }

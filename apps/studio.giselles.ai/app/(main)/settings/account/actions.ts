@@ -23,28 +23,28 @@ import { redirect } from "next/navigation";
 import { IMAGE_CONSTRAINTS } from "../constants";
 import { deleteTeamMember } from "../team/actions";
 
-export function connectGoogleIdentity() {
-	return connectIdentity("google", "/settings/account/authentication");
+export async function connectGoogleIdentity() {
+	return await connectIdentity("google", "/settings/account/authentication");
 }
 
-export function connectGitHubIdentity() {
-	return connectIdentity("github", "/settings/account/authentication");
+export async function connectGitHubIdentity() {
+	return await connectIdentity("github", "/settings/account/authentication");
 }
 
-export function reconnectGoogleIdentity() {
-	return reconnectIdentity("google", "/settings/account/authentication");
+export async function reconnectGoogleIdentity() {
+	return await reconnectIdentity("google", "/settings/account/authentication");
 }
 
-export function reconnectGitHubIdentity() {
-	return reconnectIdentity("github", "/settings/account/authentication");
+export async function reconnectGitHubIdentity() {
+	return await reconnectIdentity("github", "/settings/account/authentication");
 }
 
-export function disconnectGoogleIdentity() {
-	return disconnectIdentity("google", "/settings/account/authentication");
+export async function disconnectGoogleIdentity() {
+	return await disconnectIdentity("google", "/settings/account/authentication");
 }
 
-export function disconnectGitHubIdentity() {
-	return disconnectIdentity("github", "/settings/account/authentication");
+export async function disconnectGitHubIdentity() {
+	return await disconnectIdentity("github", "/settings/account/authentication");
 }
 
 export async function getAccountInfo() {
