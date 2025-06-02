@@ -535,6 +535,33 @@ function resolvePullRequestReviewCommentTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.pull_request.title,
 				} satisfies GenerationOutput;
+			case "diff":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.comment.diff_hunk,
+				} satisfies GenerationOutput;
+			case "id":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.comment.id.toString(),
+				} satisfies GenerationOutput;
+			case "previousCommentBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: "todo",
+				} satisfies GenerationOutput;
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);

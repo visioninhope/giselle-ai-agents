@@ -164,7 +164,7 @@ function Installed({
 						throw new Error("unexpected request");
 					}
 					event = {
-						id: "github.pull_request_comment.created",
+						id: "github.pull_request_review_comment.created",
 						conditions: {
 							callsign,
 						},
@@ -279,7 +279,8 @@ function Installed({
 						</Select>
 					</fieldset>
 					{(eventId === "github.issue_comment.created" ||
-						eventId === "github.pull_request_comment.created") && (
+						eventId === "github.pull_request_comment.created" ||
+						eventId === "github.pull_request_review_comment.created") && (
 						<fieldset className="flex flex-col gap-[4px]">
 							<div className="flex items-center gap-[4px]">
 								<p className="text-[16px]">Callsign</p>

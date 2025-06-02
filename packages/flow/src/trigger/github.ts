@@ -72,7 +72,10 @@ export const githubPullRequestReviewCommentCreatedTrigger = {
 		id: "github.pull_request_review_comment.created",
 		label: "Pull Request Review Comment Created",
 		payloads: z.object({
+			id: z.number(),
 			body: z.string(),
+			diff: z.string(),
+			previousCommentBody: z.string(),
 			pullRequestNumber: z.number(),
 			pullRequestTitle: z.string(),
 			pullRequestBody: z.string(),
