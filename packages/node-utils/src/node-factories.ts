@@ -24,6 +24,7 @@ import {
 	type VariableNode,
 	type VectorStoreContent,
 	type VectorStoreNode,
+	type WebPageNode,
 	isActionNode,
 	isFileNode,
 	isGitHubNode,
@@ -33,6 +34,7 @@ import {
 	isTextNode,
 	isTriggerNode,
 	isVectorStoreNode,
+	isWebPageNode,
 } from "@giselle-sdk/data-type";
 import type { ActionProvider } from "@giselle-sdk/flow";
 import {
@@ -543,6 +545,43 @@ const vectorStoreFactoryImpl = {
 	VectorStoreContent["source"]["provider"]
 >;
 
+const webPageFactoryImpl = {
+	create: (): WebPageNode => ({
+		id: NodeId.generate(),
+		type: "variable",
+		content: {
+			type: "webPage",
+			url: "",
+			provider: "fetch",
+			parse: "html",
+		},
+		inputs: [],
+		outputs: [
+			{
+				id: OutputId.generate(),
+				label: "Output",
+				accessor: "web-page",
+			},
+		],
+	}),
+	clone: (orig: WebPageNode): NodeFactoryCloneResult<WebPageNode> => {
+		const { newIo: newInputs, idMap: inputIdMap } =
+			cloneAndRenewInputIdsWithMap(orig.inputs);
+		const { newIo: newOutputs, idMap: outputIdMap } =
+			cloneAndRenewOutputIdsWithMap(orig.outputs);
+
+		const newNode = {
+			id: NodeId.generate(),
+			type: "variable",
+			name: `Copy of ${orig.name ?? defaultName(orig)}`,
+			content: structuredClone(orig.content),
+			inputs: newInputs,
+			outputs: newOutputs,
+		} satisfies WebPageNode;
+		return { newNode, inputIdMap, outputIdMap };
+	},
+} satisfies NodeFactory<WebPageNode>;
+
 // --- Factories Manager ---
 const factoryImplementations = {
 	textGeneration: textGenerationFactoryImpl,
@@ -554,6 +593,7 @@ const factoryImplementations = {
 	file: fileVariableFactoryImpl,
 	github: githubVariableFactoryImpl,
 	vectorStore: vectorStoreFactoryImpl,
+	webPage: webPageFactoryImpl,
 } as const;
 
 type CreateArgMap = {
@@ -566,6 +606,7 @@ type CreateArgMap = {
 	file: Parameters<typeof fileVariableFactoryImpl.create>[0];
 	github: Parameters<typeof githubVariableFactoryImpl.create>[0];
 	vectorStore: Parameters<typeof vectorStoreFactoryImpl.create>[0];
+	webPage: undefined;
 };
 
 const nodeTypesRequiringArg = (
@@ -613,6 +654,8 @@ export const nodeFactories = {
 				return factoryImplementations.vectorStore.create(
 					arg as CreateArgMap["vectorStore"],
 				);
+			case "webPage":
+				return factoryImplementations.webPage.create();
 			default: {
 				const _exhaustive: never = type;
 				throw new Error(`No create factory for content type: ${type}`);
@@ -665,6 +708,11 @@ export const nodeFactories = {
 			case "vectorStore":
 				if (isVectorStoreNode(sourceNode)) {
 					return factoryImplementations.vectorStore.clone(sourceNode);
+				}
+				break;
+			case "webPage":
+				if (isWebPageNode(sourceNode)) {
+					return factoryImplementations.webPage.clone(sourceNode);
 				}
 				break;
 			default: {

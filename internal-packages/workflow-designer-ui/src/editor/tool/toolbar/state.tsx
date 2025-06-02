@@ -6,6 +6,8 @@ import type {
 	Node,
 	TextGenerationLanguageModelData,
 	VectorStoreContent,
+	VectorStoreNode,
+	WebPageNode,
 } from "@giselle-sdk/data-type";
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
 import { nodeFactories } from "@giselle-sdk/node-utils";
@@ -155,4 +157,25 @@ export function vectorStoreNode(
 	provider: VectorStoreContent["source"]["provider"],
 ) {
 	return nodeFactories.create("vectorStore", provider);
+}
+
+export function webPageNode() {
+	return {
+		id: NodeId.generate(),
+		type: "variable",
+		content: {
+			type: "webPage",
+			url: "",
+			provider: "fetch",
+			parse: "html",
+		},
+		inputs: [],
+		outputs: [
+			{
+				id: OutputId.generate(),
+				label: "Output",
+				accessor: "web-page",
+			},
+		],
+	} satisfies WebPageNode;
 }
