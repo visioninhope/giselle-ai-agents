@@ -28,9 +28,9 @@ import { ToastProvider, useToasts } from "../ui/toast";
 import { Beta } from "./beta";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
-import { ContextMenu, useContextMenu } from "./context-menu";
+import { ContextMenu } from "./context-menu";
+import type { ContextMenuProps } from "./context-menu/types";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
-import { useDuplicateNode } from "./node";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import {
@@ -61,8 +61,10 @@ function NodeCanvas() {
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	const toast = useToasts();
-	const { contextMenu, setContextMenu, closeContextMenu } = useContextMenu();
-	const duplicateNode = useDuplicateNode();
+	const [menu, setMenu] = useState<Omit<ContextMenuProps, "onClose"> | null>(
+		null,
+	);
+	const reactFlowRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		reactFlowInstance.setNodes(
 			Object.entries(data.ui.nodeState)
@@ -227,133 +229,132 @@ function NodeCanvas() {
 	};
 
 	return (
-		<>
-			<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
-				className="giselle-workflow-editor"
-				colorMode="dark"
-				defaultNodes={[]}
-				defaultEdges={[]}
-				nodeTypes={nodeTypes}
-				edgeTypes={edgeTypes}
-				defaultViewport={data.ui.viewport}
-				onConnect={handleConnect}
-				onEdgesDelete={handleEdgesDelete}
-				isValidConnection={isValidConnection}
-				panOnScroll={true}
-				zoomOnScroll={false}
-				zoomOnPinch={true}
-				onMoveEnd={(_, viewport) => {
-					setUiViewport(viewport);
-				}}
-				onNodesChange={(nodesChange) => {
-					nodesChange.map((nodeChange) => {
-						switch (nodeChange.type) {
-							case "remove": {
-								for (const connection of data.connections) {
-									if (connection.outputNode.id !== nodeChange.id) {
-										continue;
-									}
-									deleteConnection(connection.id);
-									const connectedNode = data.nodes.find(
-										(node) => node.id === connection.inputNode.id,
-									);
-									if (connectedNode === undefined) {
-										continue;
-									}
-									switch (connectedNode.content.type) {
-										case "textGeneration": {
-											updateNodeData(connectedNode, {
-												inputs: connectedNode.inputs.filter(
-													(input) => input.id !== connection.inputId,
-												),
-											});
-										}
+		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
+			ref={reactFlowRef}
+			className="giselle-workflow-editor"
+			colorMode="dark"
+			defaultNodes={[]}
+			defaultEdges={[]}
+			nodeTypes={nodeTypes}
+			edgeTypes={edgeTypes}
+			defaultViewport={data.ui.viewport}
+			onConnect={handleConnect}
+			onEdgesDelete={handleEdgesDelete}
+			isValidConnection={isValidConnection}
+			panOnScroll={true}
+			zoomOnScroll={false}
+			zoomOnPinch={true}
+			onMoveEnd={(_, viewport) => {
+				setUiViewport(viewport);
+			}}
+			onNodesChange={(nodesChange) => {
+				nodesChange.map((nodeChange) => {
+					switch (nodeChange.type) {
+						case "remove": {
+							for (const connection of data.connections) {
+								if (connection.outputNode.id !== nodeChange.id) {
+									continue;
+								}
+								deleteConnection(connection.id);
+								const connectedNode = data.nodes.find(
+									(node) => node.id === connection.inputNode.id,
+								);
+								if (connectedNode === undefined) {
+									continue;
+								}
+								switch (connectedNode.content.type) {
+									case "textGeneration": {
+										updateNodeData(connectedNode, {
+											inputs: connectedNode.inputs.filter(
+												(input) => input.id !== connection.inputId,
+											),
+										});
 									}
 								}
-								deleteNode(nodeChange.id);
-								break;
 							}
-						}
-					});
-				}}
-				onNodeClick={(_event, nodeClicked) => {
-					for (const node of data.nodes) {
-						if (node.id === nodeClicked.id) {
-							setUiNodeState(node.id, { selected: true });
-						} else {
-							setUiNodeState(node.id, { selected: false });
+							deleteNode(nodeChange.id);
+							break;
 						}
 					}
-				}}
-				onNodeDoubleClick={(_event, nodeDoubleClicked) => {
-					const viewport = reactFlowInstance.getViewport();
-					const screenPosition = reactFlowInstance.flowToScreenPosition(
-						nodeDoubleClicked.position,
-					);
-					reactFlowInstance.setViewport(
-						{
-							...viewport,
-							x: viewport.x - screenPosition.x + 100,
-						},
-						{
-							duration: 300,
-						},
-					);
-				}}
-				onNodeDragStop={(_event, _node, nodes) => {
-					nodes.map((node) => {
-						setUiNodeState(
-							node.id,
-							{ position: node.position },
-							{ save: true },
-						);
-					});
-				}}
-				onPaneClick={(event) => {
-					for (const node of data.nodes) {
+				});
+			}}
+			onNodeClick={(_event, nodeClicked) => {
+				for (const node of data.nodes) {
+					if (node.id === nodeClicked.id) {
+						setUiNodeState(node.id, { selected: true });
+					} else {
 						setUiNodeState(node.id, { selected: false });
 					}
-					const position = reactFlowInstance.screenToFlowPosition({
-						x: event.clientX,
-						y: event.clientY,
-					});
-					const options = {
-						ui: { position },
-					};
-					if (selectedTool?.action === "addNode") {
-						addNode(selectedTool.node, options);
-					}
-					reset();
-					closeContextMenu();
-				}}
-				onNodeContextMenu={(event, node) => {
-					event.preventDefault();
-					setContextMenu({
-						x: event.clientX,
-						y: event.clientY,
-						nodeId: node.id,
-					});
-				}}
-			>
-				<Background />
-				{selectedTool?.action === "addNode" && (
-					<FloatingNodePreview node={selectedTool.node} />
-				)}
-				<XYFlowPanel position={"bottom-center"}>
-					<Toolbar />
-				</XYFlowPanel>
-			</ReactFlow>
-			<ContextMenu
-				contextMenu={contextMenu}
-				onDuplicate={(nodeId) => {
-					duplicateNode(nodeId, () =>
-						toast.error("No node selected to duplicate"),
-					);
-					closeContextMenu();
-				}}
-				onClose={closeContextMenu}
-			/>
-		</>
+				}
+			}}
+			onNodeDoubleClick={(_event, nodeDoubleClicked) => {
+				const viewport = reactFlowInstance.getViewport();
+				const screenPosition = reactFlowInstance.flowToScreenPosition(
+					nodeDoubleClicked.position,
+				);
+				reactFlowInstance.setViewport(
+					{
+						...viewport,
+						x: viewport.x - screenPosition.x + 100,
+					},
+					{
+						duration: 300,
+					},
+				);
+			}}
+			onNodeDragStop={(_event, _node, nodes) => {
+				nodes.map((node) => {
+					setUiNodeState(node.id, { position: node.position }, { save: true });
+				});
+			}}
+			onPaneClick={(event) => {
+				setMenu(null);
+
+				for (const node of data.nodes) {
+					setUiNodeState(node.id, { selected: false });
+				}
+				const position = reactFlowInstance.screenToFlowPosition({
+					x: event.clientX,
+					y: event.clientY,
+				});
+				const options = {
+					ui: { position },
+				};
+				if (selectedTool?.action === "addNode") {
+					addNode(selectedTool.node, options);
+				}
+				reset();
+			}}
+			onNodeContextMenu={(event, node) => {
+				event.preventDefault();
+
+				const pane = reactFlowRef.current?.getBoundingClientRect();
+				if (!pane) return;
+
+				setMenu({
+					id: node.id,
+					top: event.clientY < pane.height - 200 ? event.clientY : undefined,
+					left: event.clientX < pane.width - 200 ? event.clientX : undefined,
+					right:
+						event.clientX >= pane.width - 200
+							? pane.width - event.clientX
+							: undefined,
+					bottom:
+						event.clientY >= pane.height - 200
+							? pane.height - event.clientY
+							: undefined,
+				});
+			}}
+		>
+			<Background />
+			{selectedTool?.action === "addNode" && (
+				<FloatingNodePreview node={selectedTool.node} />
+			)}
+			<XYFlowPanel position={"bottom-center"}>
+				<Toolbar />
+			</XYFlowPanel>
+			{menu && <ContextMenu {...menu} onClose={() => setMenu(null)} />}
+		</ReactFlow>
 	);
 }
 
