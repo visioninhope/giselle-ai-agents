@@ -1,6 +1,6 @@
 import { Form } from "./form";
 
-export default async function LoginPage() {
+export default function LoginPage() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex items-center justify-center py-12">

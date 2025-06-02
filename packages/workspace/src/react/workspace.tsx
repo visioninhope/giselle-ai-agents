@@ -3,7 +3,6 @@
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
 import {
 	GenerationRunnerSystemProvider,
-	RunSystemContextProvider,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -64,19 +63,16 @@ export function WorkspaceProvider({
 					<VectorStoreProvider value={vectorStore}>
 						<WorkflowDesignerProvider data={workspace}>
 							<GenerationRunnerSystemProvider>
-								<RunSystemContextProvider workspaceId={workspaceId}>
-									<FeatureFlagContext
-										value={{
-											flowNode: featureFlag?.flowNode ?? false,
-											runV2: featureFlag?.runV2 ?? false,
-											githubVectorStore:
-												featureFlag?.githubVectorStore ?? false,
-											webPageFileNode: featureFlag?.webPageFileNode ?? false,
-										}}
-									>
-										{children}
-									</FeatureFlagContext>
-								</RunSystemContextProvider>
+								<FeatureFlagContext
+									value={{
+										flowNode: featureFlag?.flowNode ?? false,
+										runV2: featureFlag?.runV2 ?? false,
+										githubVectorStore: featureFlag?.githubVectorStore ?? false,
+										webPageFileNode: featureFlag?.webPageFileNode ?? false,
+									}}
+								>
+									{children}
+								</FeatureFlagContext>
 							</GenerationRunnerSystemProvider>
 						</WorkflowDesignerProvider>
 					</VectorStoreProvider>

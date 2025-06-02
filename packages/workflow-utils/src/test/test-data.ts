@@ -1,4 +1,4 @@
-import type { Connection, Node, Workspace } from "@giselle-sdk/data-type";
+import type { Connection, Node } from "@giselle-sdk/data-type";
 
 export const testWorkspace1 = {
 	id: "wrks-y9HldH2r4OzHlKhd",
@@ -7,7 +7,9 @@ export const testWorkspace1 = {
 		{
 			id: "nd-1aXA3izp1yV48mPH",
 			type: "operation",
-			inputs: [{ id: "inp-ToOWmAN6dIhY1Qxa", label: "Input" }],
+			inputs: [
+				{ id: "inp-ToOWmAN6dIhY1Qxa", label: "Input", accessor: "Input" },
+			],
 			outputs: [
 				{
 					id: "otp-ohaEJR2OU3n8vool",
@@ -42,16 +44,18 @@ export const testWorkspace1 = {
 			],
 			content: {
 				type: "trigger",
-				provider: {
-					type: "manual",
-					triggerId: "manual",
+				provider: "manual",
+				state: {
+					status: "unconfigured",
 				},
 			},
 		},
 		{
 			id: "nd-7cHfwxtERI9CPAIt",
 			type: "operation",
-			inputs: [{ id: "inp-kSYSroXpYCjVx4VL", label: "Input" }],
+			inputs: [
+				{ id: "inp-kSYSroXpYCjVx4VL", label: "Input", accessor: "Input" },
+			],
 			outputs: [
 				{
 					id: "otp-4G1uIyUg1OzinQas",
@@ -89,7 +93,7 @@ export const testWorkspace1 = {
 				type: "textGeneration",
 				llm: {
 					provider: "google",
-					id: "gemini-2.5-pro-preview-03-25",
+					id: "gemini-2.5-pro-preview-05-06",
 					configurations: {
 						temperature: 0.7,
 						topP: 1,
@@ -101,7 +105,9 @@ export const testWorkspace1 = {
 		{
 			id: "nd-d4TuvXgSOSkY5zQQ",
 			type: "operation",
-			inputs: [{ id: "inp-ZODlnwVgQhZ0VTWT", label: "Input" }],
+			inputs: [
+				{ id: "inp-ZODlnwVgQhZ0VTWT", label: "Input", accessor: "Input" },
+			],
 			outputs: [
 				{
 					id: "otp-DUX9IRy7YDPTNWGC",
@@ -143,17 +149,18 @@ export const testWorkspace1 = {
 			],
 			content: {
 				type: "trigger",
-				provider: {
-					type: "github",
-					triggerId: "github.issue.created",
-					auth: { state: "unauthenticated" },
+				provider: "github",
+				state: {
+					status: "unconfigured",
 				},
 			},
 		},
 		{
 			id: "nd-4KPG1AiUA0mGN94i",
 			type: "operation",
-			inputs: [{ id: "inp-76KjIOKSj4XNuN7w", label: "Input" }],
+			inputs: [
+				{ id: "inp-76KjIOKSj4XNuN7w", label: "Input", accessor: "Input" },
+			],
 			outputs: [
 				{
 					id: "otp-fYw3FbHY116UcPIE",

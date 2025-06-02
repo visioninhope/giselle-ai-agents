@@ -1,6 +1,6 @@
 import { GitHubIntegration } from "./github-integration";
 
-export default async function TeamIntegrationsPage() {
+export default function TeamIntegrationsPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3

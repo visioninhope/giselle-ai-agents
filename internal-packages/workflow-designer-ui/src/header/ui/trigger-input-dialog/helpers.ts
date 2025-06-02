@@ -1,10 +1,11 @@
-import type {
-	FlowTrigger,
-	Generation,
-	Input,
-	ParameterItem,
-	TriggerNode,
-	WorkspaceId,
+import {
+	type FlowTrigger,
+	type Generation,
+	type Input,
+	OperationNode,
+	type ParameterItem,
+	type TriggerNode,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import type { githubTriggers } from "@giselle-sdk/flow";
 import type { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
@@ -229,7 +230,9 @@ export function createGenerationsForFlow(
 					parameterItems.length > 0
 						? [{ type: "parameters", items: parameterItems }]
 						: [],
-				...operation.generationTemplate,
+				operationNode: operation.node,
+				sourceNodes: operation.sourceNodes,
+				connections: operation.connections,
 			});
 			generations.push(generation);
 		}

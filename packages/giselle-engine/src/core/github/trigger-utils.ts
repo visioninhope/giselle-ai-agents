@@ -9,7 +9,6 @@ import {
 	ensureWebhookEvent,
 	getPullRequestDiff,
 } from "@giselle-sdk/github-tool";
-import type { GiselleEngineContext } from "../types";
 import { parseCommand } from "./utils";
 
 interface ResolveTriggerArgs {

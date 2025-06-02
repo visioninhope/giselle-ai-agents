@@ -50,19 +50,6 @@ export const ImageGenerationContent = z.object({
 });
 export type ImageGenerationContent = z.infer<typeof ImageGenerationContent>;
 
-export const OverrideImageGenerationContent = z.object({
-	type: z.literal("imageGeneration"),
-	prompt: z.string(),
-});
-export type OverrideImageGenerationContent = z.infer<
-	typeof OverrideImageGenerationContent
->;
-export function isOverrideImageGenerationContent(
-	content: unknown,
-): content is OverrideImageGenerationContent {
-	return OverrideImageGenerationContent.safeParse(content).success;
-}
-
 export const ImageGenerationContentReference = z.object({
 	type: ImageGenerationContent.shape.type,
 });

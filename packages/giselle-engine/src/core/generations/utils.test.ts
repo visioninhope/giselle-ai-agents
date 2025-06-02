@@ -1,9 +1,9 @@
 import { parseAndMod } from "@giselle-sdk/data-mod";
-import type { GenerationId, GenerationIndex } from "@giselle-sdk/data-type";
+import type { GenerationId } from "@giselle-sdk/data-type";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
-import { getGeneration, setGenerationIndex } from "./utils";
+import { getGeneration } from "./utils";
 
 // Mock parseAndMod to track when it's called
 vi.mock("@giselle-sdk/data-mod", () => ({
@@ -15,14 +15,6 @@ vi.mock("@giselle-sdk/data-mod", () => ({
 describe("getGeneration", () => {
 	const storage = createStorage({ driver: memoryDriver() });
 	const generationId: GenerationId = "gnr-1234567890abcdef";
-
-	const mockGenerationIndex: GenerationIndex = {
-		id: generationId,
-		origin: {
-			type: "workspace",
-			id: "wrks-1234567890abcdef",
-		},
-	};
 
 	const mockGeneration = {
 		id: generationId,
@@ -66,14 +58,8 @@ describe("getGeneration", () => {
 		await storage.clear();
 		vi.mocked(parseAndMod).mockClear();
 
-		// Set up generation index
-		await setGenerationIndex({
-			storage,
-			generationIndex: mockGenerationIndex,
-		});
-
 		// Set up generation data
-		const generationPath = `workspaces/${mockGenerationIndex.origin.id}/generations/${generationId}/generation.json`;
+		const generationPath = `generations/${generationId}/generation.json`;
 		await storage.setItem(generationPath, mockGeneration);
 	});
 

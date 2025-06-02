@@ -152,7 +152,7 @@ class GitHubRepositoryEmbeddingStoreImpl
 		this.teamDbId = teamDbId;
 	}
 
-	private async getRepositoryIndexDbId(owner: string, repo: string) {
+	private getRepositoryIndexDbId(owner: string, repo: string) {
 		return this.withPgRetry(async () => {
 			const records = await db
 				.select({ dbId: githubRepositoryIndex.dbId })

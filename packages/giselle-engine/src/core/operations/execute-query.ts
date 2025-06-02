@@ -1,6 +1,4 @@
 import {
-	type CompletedGeneration,
-	type FailedGeneration,
 	GenerationContext,
 	type GenerationOutput,
 	NodeId,
@@ -20,13 +18,11 @@ import {
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import type { Storage } from "unstorage";
+import { useGenerationExecutor } from "../generations/internal/use-generation-executor";
 import {
 	getGeneration,
 	getNodeGenerationIndexes,
 	queryResultToText,
-	setGeneration,
-	setGenerationIndex,
-	setNodeGenerationIndex,
 } from "../generations/utils";
 import type { GiselleEngineContext } from "../types";
 
@@ -34,166 +30,59 @@ export async function executeQuery(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {
-	const { context, generation: initialGeneration } = args;
-
-	const operationNode = initialGeneration.context.operationNode;
-	if (!isQueryNode(operationNode)) {
-		throw new Error("Invalid generation type for executeQuery");
-	}
-
-	const runningGeneration = {
-		...initialGeneration,
-		status: "running",
-		messages: [],
-		startedAt: Date.now(),
-	} satisfies RunningGeneration;
-
-	await Promise.all([
-		setGeneration({
-			storage: context.storage,
-			generation: runningGeneration,
-		}),
-		setGenerationIndex({
-			storage: context.storage,
-			generationIndex: {
-				id: runningGeneration.id,
-				origin: runningGeneration.context.origin,
-			},
-		}),
-		setNodeGenerationIndex({
-			storage: context.storage,
-			nodeId: runningGeneration.context.operationNode.id,
-			origin: runningGeneration.context.origin,
-			nodeGenerationIndex: {
-				id: runningGeneration.id,
-				nodeId: runningGeneration.context.operationNode.id,
-				status: "running",
-				createdAt: runningGeneration.createdAt,
-				queuedAt: runningGeneration.queuedAt,
-				startedAt: runningGeneration.startedAt,
-			},
-		}),
-	]);
-
-	let workspaceId: WorkspaceId | undefined;
-	switch (initialGeneration.context.origin.type) {
-		case "run":
-			workspaceId = initialGeneration.context.origin.workspaceId;
-			break;
-		case "workspace":
-			workspaceId = initialGeneration.context.origin.id;
-			break;
-		default: {
-			const _exhaustiveCheck: never = initialGeneration.context.origin;
-			throw new Error(`Unhandled origin type: ${_exhaustiveCheck}`);
-		}
-	}
-
-	// Explicit error handling for undefined workspaceId
-	if (workspaceId === undefined) {
-		throw new Error("Workspace ID is required for query execution");
-	}
-
-	try {
-		const generationContext = GenerationContext.parse(
-			initialGeneration.context,
-		);
-
-		const query = await resolveQuery(
-			operationNode.content.query,
+	return useGenerationExecutor({
+		context: args.context,
+		generation: args.generation,
+		execute: async ({
 			runningGeneration,
-			context.storage,
-		);
-
-		const vectorStoreNodes = generationContext.sourceNodes.filter(
-			(node) =>
-				node.content.type === "vectorStore" &&
-				generationContext.connections.some(
-					(connection) => connection.outputNode.id === node.id,
-				),
-		);
-		const queryResults = await queryVectorStore(
+			generationContext,
+			completeGeneration,
 			workspaceId,
-			query,
-			context,
-			vectorStoreNodes as VectorStoreNode[],
-		);
+		}) => {
+			const operationNode = generationContext.operationNode;
+			if (!isQueryNode(operationNode)) {
+				throw new Error("Invalid generation type for executeQuery");
+			}
 
-		const outputId = initialGeneration.context.operationNode.outputs.find(
-			(output) => output.accessor === "result",
-		)?.id;
-		if (outputId === undefined) {
-			throw new Error("query-results output not found in operation node");
-		}
-		const outputs: GenerationOutput[] = [
-			{
-				type: "query-result",
-				content: queryResults,
-				outputId,
-			},
-		];
+			const query = await resolveQuery(
+				operationNode.content.query,
+				runningGeneration,
+				args.context.storage,
+			);
 
-		const completedGeneration = {
-			...runningGeneration,
-			status: "completed",
-			completedAt: Date.now(),
-			outputs,
-		} satisfies CompletedGeneration;
+			const vectorStoreNodes = generationContext.sourceNodes.filter(
+				(node) =>
+					node.content.type === "vectorStore" &&
+					generationContext.connections.some(
+						(connection) => connection.outputNode.id === node.id,
+					),
+			);
+			const queryResults = await queryVectorStore(
+				workspaceId,
+				query,
+				args.context,
+				vectorStoreNodes as VectorStoreNode[],
+			);
 
-		await Promise.all([
-			setGeneration({
-				storage: context.storage,
-				generation: completedGeneration,
-			}),
-			setNodeGenerationIndex({
-				storage: context.storage,
-				nodeId: runningGeneration.context.operationNode.id,
-				origin: runningGeneration.context.origin,
-				nodeGenerationIndex: {
-					id: completedGeneration.id,
-					nodeId: completedGeneration.context.operationNode.id,
-					status: "completed",
-					createdAt: completedGeneration.createdAt,
-					queuedAt: completedGeneration.queuedAt,
-					startedAt: completedGeneration.startedAt,
-					completedAt: completedGeneration.completedAt,
+			const outputId = generationContext.operationNode.outputs.find(
+				(output) => output.accessor === "result",
+			)?.id;
+			if (outputId === undefined) {
+				throw new Error("query-results output not found in operation node");
+			}
+			const outputs: GenerationOutput[] = [
+				{
+					type: "query-result",
+					content: queryResults,
+					outputId,
 				},
-			}),
-		]);
-	} catch (error) {
-		const err = error instanceof Error ? error : new Error(String(error));
-		const failedGeneration = {
-			...runningGeneration,
-			status: "failed",
-			failedAt: Date.now(),
-			error: {
-				name: err.name,
-				message: err.message,
-			},
-		} satisfies FailedGeneration;
+			];
 
-		await Promise.all([
-			setGeneration({
-				storage: context.storage,
-				generation: failedGeneration,
-			}),
-			setNodeGenerationIndex({
-				storage: context.storage,
-				nodeId: runningGeneration.context.operationNode.id,
-				origin: runningGeneration.context.origin,
-				nodeGenerationIndex: {
-					id: failedGeneration.id,
-					nodeId: failedGeneration.context.operationNode.id,
-					status: "failed",
-					createdAt: failedGeneration.createdAt,
-					queuedAt: failedGeneration.queuedAt,
-					startedAt: failedGeneration.startedAt,
-					failedAt: failedGeneration.failedAt,
-				},
-			}),
-		]);
-		throw error;
-	}
+			await completeGeneration({
+				outputs,
+			});
+		},
+	});
 }
 
 async function resolveQuery(
@@ -205,7 +94,6 @@ async function resolveQuery(
 
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
-			origin: runningGeneration.context.origin,
 			storage,
 			nodeId,
 		});

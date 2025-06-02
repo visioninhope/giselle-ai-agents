@@ -7,7 +7,7 @@
 	"types": "./dist/index.d.ts",
 	"scripts": {
 		"build": "tsup",
-		"typecheck": "tsc --noEmit",
+		"check-types": "tsc --noEmit",
 		"clean": "rm -rf .turbo dist node_modules",
 		"format": "biome check --write .",
 		"test": "vitest run"

@@ -115,7 +115,7 @@ function Installed({
 		"github.issue.created",
 	);
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-		async (e) => {
+		(e) => {
 			e.preventDefault();
 			if (step.state !== "select-event") {
 				throw new Error("Unexpected state");

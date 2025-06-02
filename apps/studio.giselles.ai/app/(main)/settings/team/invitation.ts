@@ -7,7 +7,7 @@ import { and, eq, isNull, sql } from "drizzle-orm";
 
 export type Invitation = typeof invitations.$inferSelect;
 
-export async function createInvitation(
+export function createInvitation(
 	email: string,
 	role: TeamRole,
 	currentTeam: CurrentTeam,

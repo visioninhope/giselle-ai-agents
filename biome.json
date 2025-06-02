@@ -13,7 +13,12 @@
 	"organizeImports": { "enabled": true },
 	"linter": {
 		"enabled": true,
-		"rules": { "recommended": true }
+		"rules": {
+			"recommended": true,
+			"suspicious": {
+				"useAwait": "error"
+			}
+		}
 	},
 	"javascript": { "formatter": { "quoteStyle": "double" } }
 }

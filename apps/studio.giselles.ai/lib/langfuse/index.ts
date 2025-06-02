@@ -130,7 +130,10 @@ export class LangfuseTracer implements LLMTracer {
 			anthropic?: Record<string, unknown>;
 		};
 	}): Promise<void> {
-		const metadata: Record<string, string | number | boolean | string[] | null | undefined> = {
+		const metadata: Record<
+			string,
+			string | number | boolean | string[] | null | undefined
+		> = {
 			...(args.telemetry?.metadata ?? {}),
 			...(process.env.VERCEL_DEPLOYMENT_ID && {
 				deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
@@ -154,7 +157,10 @@ export class LangfuseTracer implements LLMTracer {
 			endTime: new Date(args.completedGeneration.completedAt),
 		});
 
-		const modelParameters: Record<string, string | number | boolean | string[] | null | undefined> = {};
+		const modelParameters: Record<
+			string,
+			string | number | boolean | string[] | null | undefined
+		> = {};
 		for (const [key, value] of Object.entries(args.configurations)) {
 			if (
 				typeof value === "string" ||
@@ -164,9 +170,17 @@ export class LangfuseTracer implements LLMTracer {
 				value === null ||
 				value === undefined
 			) {
-				modelParameters[key] = value as string | number | boolean | string[] | null | undefined;
+				modelParameters[key] = value as
+					| string
+					| number
+					| boolean
+					| string[]
+					| null
+					| undefined;
 			} else if (Array.isArray(value)) {
-				modelParameters[key] = (value as unknown[]).filter(v => typeof v === "string") as string[];
+				modelParameters[key] = (value as unknown[]).filter(
+					(v) => typeof v === "string",
+				) as string[];
 			} else {
 				modelParameters[key] = String(value);
 			}

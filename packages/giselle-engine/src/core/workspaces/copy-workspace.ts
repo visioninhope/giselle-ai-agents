@@ -23,7 +23,6 @@ export async function copyWorkspace(args: {
 		nodes: sourceWorkspace.nodes,
 		connections: sourceWorkspace.connections,
 		ui: sourceWorkspace.ui,
-		editingWorkflows: sourceWorkspace.editingWorkflows,
 	};
 
 	await Promise.all([

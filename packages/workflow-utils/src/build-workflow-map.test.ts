@@ -125,12 +125,10 @@ describe("buildWorkflowMap", () => {
 
 		// Check dependency relationship in generation templates
 		const secondNodeJob = jobsWithSecondNode[0];
-		expect(
-			secondNodeJob.operations[0].generationTemplate.sourceNodes.length,
-		).toBe(1);
-		expect(
-			secondNodeJob.operations[0].generationTemplate.sourceNodes[0].id,
-		).toBe("nd-KzXeXSIffRIMwZtX");
+		expect(secondNodeJob.operations[0].sourceNodes.length).toBe(1);
+		expect(secondNodeJob.operations[0].sourceNodes[0].id).toBe(
+			"nd-KzXeXSIffRIMwZtX",
+		);
 	});
 
 	test("should handle empty maps", () => {
@@ -349,22 +347,16 @@ describe("buildWorkflowMap", () => {
 
 				if (nodeId === "nd-E89xeYnFyQUGxdCL") {
 					// Source node has no dependencies
-					expect(operation.generationTemplate.sourceNodes.length).toBe(0);
+					expect(operation.sourceNodes.length).toBe(0);
 				} else if (nodeId === "nd-daF6m8YshVoiBARi") {
 					// This node has two inputs connected to the source node
-					expect(operation.generationTemplate.sourceNodes.length).toBe(2);
-					expect(operation.generationTemplate.sourceNodes[0].id).toBe(
-						"nd-E89xeYnFyQUGxdCL",
-					);
-					expect(operation.generationTemplate.sourceNodes[1].id).toBe(
-						"nd-E89xeYnFyQUGxdCL",
-					);
+					expect(operation.sourceNodes.length).toBe(2);
+					expect(operation.sourceNodes[0].id).toBe("nd-E89xeYnFyQUGxdCL");
+					expect(operation.sourceNodes[1].id).toBe("nd-E89xeYnFyQUGxdCL");
 				} else if (nodeId === "nd-ixIefYTHjZVhpEGq") {
 					// This node has one input connected to the source node
-					expect(operation.generationTemplate.sourceNodes.length).toBe(1);
-					expect(operation.generationTemplate.sourceNodes[0].id).toBe(
-						"nd-E89xeYnFyQUGxdCL",
-					);
+					expect(operation.sourceNodes.length).toBe(1);
+					expect(operation.sourceNodes[0].id).toBe("nd-E89xeYnFyQUGxdCL");
 				}
 			}
 		}
