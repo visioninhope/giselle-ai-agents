@@ -1,14 +1,13 @@
 import {
-	type Connection,
-	type ConnectionId,
-	type Node,
 	type NodeId,
 	type Workflow,
 	Workspace,
+	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, test } from "vitest";
 import { buildWorkflowFromNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
+import workspace2 from "./test/fixtures/workspace2.json";
 import { testWorkspace1 } from "./test/test-data";
 
 describe("buildWorkflowFromNode with testWorkspace1", () => {
@@ -49,25 +48,21 @@ describe("buildWorkflowFromNode with testWorkspace1", () => {
 			const job1 = result.jobs[0];
 			expect(job1.operations.length).toBe(1);
 			expect(job1.operations[0].node.id).toBe("nd-y7lLktmBplRvcSov");
-			expect(job1.operations[0].generationTemplate.sourceNodes.length).toBe(0);
+			expect(job1.operations[0].sourceNodes.length).toBe(0);
 
 			// Second job should be the first Text Generation node
 			const job2 = result.jobs[1];
 			expect(job2.operations.length).toBe(1);
 			expect(job2.operations[0].node.id).toBe("nd-7cHfwxtERI9CPAIt");
-			expect(job2.operations[0].generationTemplate.sourceNodes.length).toBe(1);
-			expect(job2.operations[0].generationTemplate.sourceNodes[0].id).toBe(
-				"nd-y7lLktmBplRvcSov",
-			);
+			expect(job2.operations[0].sourceNodes.length).toBe(1);
+			expect(job2.operations[0].sourceNodes[0].id).toBe("nd-y7lLktmBplRvcSov");
 
 			// Third job should be the second Text Generation node
 			const job3 = result.jobs[2];
 			expect(job3.operations.length).toBe(1);
 			expect(job3.operations[0].node.id).toBe("nd-1aXA3izp1yV48mPH");
-			expect(job3.operations[0].generationTemplate.sourceNodes.length).toBe(1);
-			expect(job3.operations[0].generationTemplate.sourceNodes[0].id).toBe(
-				"nd-7cHfwxtERI9CPAIt",
-			);
+			expect(job3.operations[0].sourceNodes.length).toBe(1);
+			expect(job3.operations[0].sourceNodes[0].id).toBe("nd-7cHfwxtERI9CPAIt");
 		}
 	});
 });
@@ -134,12 +129,129 @@ describe("buildWorkflowFromNode with fixture/workspace1", () => {
 			const thirdJob = result.jobs[2];
 
 			// Check if the sourceNodes of the third job include the first job's node
-			const sourceNodeIds =
-				thirdJob.operations[0].generationTemplate.sourceNodes.map(
-					(node) => node.id,
-				);
+			const sourceNodeIds = thirdJob.operations[0].sourceNodes.map(
+				(node) => node.id,
+			);
 			expect(sourceNodeIds).toContain(firstJobNodeId);
 			expect(sourceNodeIds).toContain(secondJobNodeId);
+		}
+	});
+});
+
+describe("buildWorkflowFromNode with testWorkspace2", () => {
+	let workspaceData: Workspace;
+	let result: Workflow | null;
+
+	beforeEach(() => {
+		const workspace = Workspace.safeParse(workspace2);
+		expect(workspace.success).toBeTruthy();
+		if (!workspace.success) {
+			throw new Error("Failed to parse workspace2");
+		}
+		workspaceData = workspace.data;
+
+		// Start from the GitHub trigger node "On Issue Comment Created"
+		result = buildWorkflowFromNode(
+			"nd-Z6YHBDO456UNY6N4",
+			workspaceData.nodes,
+			workspaceData.connections,
+		);
+	});
+
+	it("should build a workflow with 3 jobs", () => {
+		expect(result).not.toBeNull();
+		expect(result?.jobs.length).toBe(3);
+	});
+
+	it("should have first job with one operation that is a GitHub trigger", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const firstJob = result.jobs[0];
+			expect(firstJob.operations.length).toBe(1);
+			expect(firstJob.operations[0].node.id).toBe("nd-Z6YHBDO456UNY6N4");
+			expect(firstJob.operations[0].node.content.type).toBe("trigger");
+			if (isTriggerNode(firstJob.operations[0].node)) {
+				expect(firstJob.operations[0].node.content.provider).toBe("github");
+			}
+			expect(firstJob.operations[0].sourceNodes.length).toBe(0);
+		}
+	});
+
+	it("should have second job with one operation that is a text generation", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const secondJob = result.jobs[1];
+			expect(secondJob.operations.length).toBe(1);
+			expect(secondJob.operations[0].node.id).toBe("nd-Q68VP2EDCXck0DZg");
+			expect(secondJob.operations[0].node.content.type).toBe("textGeneration");
+			expect(secondJob.operations[0].sourceNodes.length).toBe(1);
+			expect(secondJob.operations[0].sourceNodes[0].id).toBe(
+				"nd-Z6YHBDO456UNY6N4",
+			);
+		}
+	});
+
+	it("should have third job with one operation that is a GitHub action", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const thirdJob = result.jobs[2];
+			expect(thirdJob.operations.length).toBe(1);
+			expect(thirdJob.operations[0].node.id).toBe("nd-9erM0USHKLZVTMsL");
+			expect(thirdJob.operations[0].node.content.type).toBe("action");
+		}
+	});
+
+	it("should have the third job's sourceNodes include both trigger and text generation nodes", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const triggerNodeId = "nd-Z6YHBDO456UNY6N4";
+			const textGenNodeId = "nd-Q68VP2EDCXck0DZg";
+			const thirdJob = result.jobs[2];
+
+			const sourceNodeIds = thirdJob.operations[0].sourceNodes.map(
+				(node) => node.id,
+			);
+			expect(sourceNodeIds).toContain(triggerNodeId);
+			expect(sourceNodeIds).toContain(textGenNodeId);
+			expect(sourceNodeIds.length).toBe(2);
+		}
+	});
+
+	it("should include all 3 nodes in the workflow", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			expect(result.nodes.length).toBe(3);
+
+			const nodeIds = result.nodes.map((node) => node.id).sort();
+			expect(nodeIds).toContain("nd-Z6YHBDO456UNY6N4"); // GitHub trigger
+			expect(nodeIds).toContain("nd-Q68VP2EDCXck0DZg"); // Text generation
+			expect(nodeIds).toContain("nd-9erM0USHKLZVTMsL"); // GitHub action
+		}
+	});
+
+	it("should have text generation node in the workflow", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const textGenNode = result.nodes.find(
+				(node) => node.id === "nd-Q68VP2EDCXck0DZg",
+			);
+			expect(textGenNode).toBeDefined();
+			expect(textGenNode?.content.type).toBe("textGeneration");
+		}
+	});
+
+	it("should have proper node names", () => {
+		expect(result).not.toBeNull();
+		if (result) {
+			const triggerNode = result.nodes.find(
+				(node) => node.id === "nd-Z6YHBDO456UNY6N4",
+			);
+			const actionNode = result.nodes.find(
+				(node) => node.id === "nd-9erM0USHKLZVTMsL",
+			);
+
+			expect(triggerNode?.name).toBe("On Issue Comment Created");
+			expect(actionNode?.name).toBe("Create Issue Comment");
 		}
 	});
 });

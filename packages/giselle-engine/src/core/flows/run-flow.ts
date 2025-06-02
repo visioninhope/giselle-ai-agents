@@ -46,11 +46,13 @@ export async function runFlow(args: {
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
-				const operationNode = operation.generationTemplate.operationNode;
+				const operationNode = operation.node;
 				const generation = {
 					id: generationId,
 					context: {
-						...operation.generationTemplate,
+						operationNode: operation.node,
+						connections: operation.connections,
+						sourceNodes: operation.sourceNodes,
 						origin: {
 							type: "run",
 							id: runId,

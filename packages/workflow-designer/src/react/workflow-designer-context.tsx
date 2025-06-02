@@ -4,7 +4,6 @@ import {
 	type ConnectionId,
 	type FailedFileData,
 	type FileContent,
-	type FileData,
 	type FileNode,
 	type Node,
 	type NodeBase,
@@ -18,13 +17,13 @@ import {
 	createUploadedFileData,
 	createUploadingFileData,
 	isFileNode,
+	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
 	APICallError,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
-import { RunSystemContextProvider } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { isClonedFileDataPayload } from "@giselle-sdk/node-utils";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
@@ -78,7 +77,7 @@ export interface WorkflowDesignerContextValue
 		format: "markdown" | "html";
 		provider?: "self-made";
 	}) => Promise<WebPageFileResult[]>;
-	deleteNode: (nodeId: NodeId | string) => void;
+	deleteNode: (nodeId: NodeId | string) => Promise<void>;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 }
@@ -304,11 +303,24 @@ export function WorkflowDesignerProvider({
 	);
 
 	const deleteNode = useCallback(
-		(nodeId: NodeId | string) => {
-			workflowDesignerRef.current.deleteNode(nodeId);
+		async (nodeId: NodeId | string) => {
+			const deletedNode = workflowDesignerRef.current.deleteNode(nodeId);
+			if (
+				deletedNode &&
+				isTriggerNode(deletedNode) &&
+				deletedNode.content.state.status === "configured"
+			) {
+				try {
+					await client.deleteTrigger({
+						flowTriggerId: deletedNode.content.state.flowTriggerId,
+					});
+				} catch (error) {
+					console.error("Failed to delete trigger", error);
+				}
+			}
 			setAndSaveWorkspace();
 		},
-		[setAndSaveWorkspace],
+		[setAndSaveWorkspace, client],
 	);
 
 	const deleteConnection = useCallback(
@@ -444,9 +456,7 @@ export function WorkflowDesignerProvider({
 			}}
 		>
 			<GenerationRunnerSystemProvider>
-				<RunSystemContextProvider workspaceId={data.id}>
-					{children}
-				</RunSystemContextProvider>
+				{children}
 			</GenerationRunnerSystemProvider>
 		</WorkflowDesignerContext.Provider>
 	);

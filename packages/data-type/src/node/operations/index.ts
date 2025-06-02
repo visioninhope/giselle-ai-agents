@@ -1,19 +1,13 @@
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
 import { z } from "zod/v4";
-import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
+import { NodeBase, NodeReferenceBase } from "../base";
 import { ActionContent, ActionContentReference } from "./action";
 import {
 	ImageGenerationContent,
 	ImageGenerationContentReference,
-	OverrideImageGenerationContent,
 } from "./image-generation";
+import { QueryContent, QueryContentReference } from "./query";
 import {
-	OverrideQueryContent,
-	QueryContent,
-	QueryContentReference,
-} from "./query";
-import {
-	OverrideTextGenerationContent,
 	TextGenerationContent,
 	TextGenerationContentReference,
 } from "./text-generation";
@@ -130,17 +124,6 @@ export function isQueryNode(args?: unknown): args is QueryNode {
 	const result = QueryNode.safeParse(args);
 	return result.success;
 }
-
-const OverrideOperationNodeContent = z.discriminatedUnion("type", [
-	OverrideTextGenerationContent,
-	OverrideImageGenerationContent,
-	OverrideQueryContent,
-]);
-export const OverrideOperationNode = OverrideNodeBase.extend({
-	type: OperationNode.shape.type,
-	content: OverrideOperationNodeContent,
-});
-export type OverrideOperationNode = z.infer<typeof OverrideOperationNode>;
 
 const OperationNodeContentReference = z.discriminatedUnion("type", [
 	TextGenerationContentReference,

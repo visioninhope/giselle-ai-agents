@@ -247,36 +247,38 @@ function NodeCanvas() {
 			onMoveEnd={(_, viewport) => {
 				setUiViewport(viewport);
 			}}
-			onNodesChange={(nodesChange) => {
-				nodesChange.map((nodeChange) => {
-					switch (nodeChange.type) {
-						case "remove": {
-							for (const connection of data.connections) {
-								if (connection.outputNode.id !== nodeChange.id) {
-									continue;
-								}
-								deleteConnection(connection.id);
-								const connectedNode = data.nodes.find(
-									(node) => node.id === connection.inputNode.id,
-								);
-								if (connectedNode === undefined) {
-									continue;
-								}
-								switch (connectedNode.content.type) {
-									case "textGeneration": {
-										updateNodeData(connectedNode, {
-											inputs: connectedNode.inputs.filter(
-												(input) => input.id !== connection.inputId,
-											),
-										});
+			onNodesChange={async (nodesChange) => {
+				await Promise.all(
+					nodesChange.map(async (nodeChange) => {
+						switch (nodeChange.type) {
+							case "remove": {
+								for (const connection of data.connections) {
+									if (connection.outputNode.id !== nodeChange.id) {
+										continue;
+									}
+									deleteConnection(connection.id);
+									const connectedNode = data.nodes.find(
+										(node) => node.id === connection.inputNode.id,
+									);
+									if (connectedNode === undefined) {
+										continue;
+									}
+									switch (connectedNode.content.type) {
+										case "textGeneration": {
+											updateNodeData(connectedNode, {
+												inputs: connectedNode.inputs.filter(
+													(input) => input.id !== connection.inputId,
+												),
+											});
+										}
 									}
 								}
+								await deleteNode(nodeChange.id);
+								break;
 							}
-							deleteNode(nodeChange.id);
-							break;
 						}
-					}
-				});
+					}),
+				);
 			}}
 			onNodeClick={(_event, nodeClicked) => {
 				for (const node of data.nodes) {

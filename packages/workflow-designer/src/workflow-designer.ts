@@ -13,7 +13,6 @@ import {
 	generateInitialWorkspace,
 } from "@giselle-sdk/data-type";
 import { nodeFactories } from "@giselle-sdk/node-utils";
-import { buildWorkflowMap } from "@giselle-sdk/workflow-utils";
 import { isSupportedConnection } from "./is-supported-connection";
 
 interface AddNodeOptions {
@@ -38,22 +37,12 @@ export function WorkflowDesigner({
 	let nodes = defaultValue.nodes;
 	let connections = defaultValue.connections;
 	const ui = defaultValue.ui;
-	let editingWorkflows = defaultValue.editingWorkflows;
 	let name = defaultValue.name;
-	function updateWorkflowMap() {
-		editingWorkflows = Array.from(
-			buildWorkflowMap(
-				new Map(nodes.map((node) => [node.id, node])),
-				new Map(connections.map((connection) => [connection.id, connection])),
-			).values(),
-		);
-	}
 	function addNode(node: Node, options?: AddNodeOptions) {
 		nodes = [...nodes, node];
 		if (options?.ui) {
 			ui.nodeState[node.id] = options.ui;
 		}
-		updateWorkflowMap();
 	}
 	function copyNode(
 		sourceNode: Node,
@@ -174,13 +163,11 @@ export function WorkflowDesigner({
 			connections,
 			name,
 			ui,
-			editingWorkflows,
 			schemaVersion: "20250221",
 		} satisfies Workspace;
 	}
 	function updateNodeData<T extends NodeBase>(node: T, data: Partial<T>) {
 		nodes = nodes.map((n) => (n.id !== node.id ? n : { ...n, ...data }));
-		updateWorkflowMap();
 	}
 	function addConnection({
 		outputId,
@@ -211,7 +198,6 @@ export function WorkflowDesigner({
 				inputId,
 			},
 		];
-		updateWorkflowMap();
 	}
 	function setUiNodeState(
 		unsafeNodeId: string | NodeId,
@@ -237,7 +223,6 @@ export function WorkflowDesigner({
 		const deleteNode = nodes.find((node) => node.id === deleteNodeId);
 		delete ui.nodeState[deleteNodeId];
 		nodes = nodes.filter((node) => node.id !== deleteNodeId);
-		updateWorkflowMap();
 		return deleteNode;
 	}
 	function updateName(newName: string | undefined) {

@@ -6,4 +6,3 @@ export * from "./node";
 export * from "./run";
 export * from "./workflow";
 export * from "./workspace";
-export * from "./workspace/integrations";

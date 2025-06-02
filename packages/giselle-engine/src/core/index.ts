@@ -1,5 +1,4 @@
 import type {
-	CreatedRun,
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
@@ -8,12 +7,8 @@ import type {
 	GenerationId,
 	GenerationOrigin,
 	NodeId,
-	OverrideNode,
 	QueuedGeneration,
-	RunId,
-	WorkflowId,
 	Workspace,
-	WorkspaceGitHubIntegrationSetting,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
@@ -21,6 +16,7 @@ import { copyFile, fetchWebPageFiles, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
+	deleteTrigger,
 	getTrigger,
 	resolveTrigger,
 	runFlow,
@@ -37,17 +33,12 @@ import {
 	setGeneration,
 } from "./generations";
 import {
-	type HandleGitHubWebhookOptions,
 	getGitHubRepositories,
 	getGitHubRepositoryFullname,
-	getWorkspaceGitHubIntegrationSetting,
 	handleGitHubWebhookV2,
-	handleWebhook,
-	upsertGithubIntegrationSetting,
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
-import { addRun, runApi, startRun } from "./runs";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
@@ -56,7 +47,6 @@ import {
 	getWorkspace,
 	updateWorkspace,
 } from "./workspaces";
-export { HandleGitHubWebhookResult } from "./github";
 export * from "./types";
 export * from "./vault";
 
@@ -101,23 +91,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		cancelGeneration: async (generationId: GenerationId) => {
 			return await cancelGeneration({ context, generationId });
 		},
-		addRun: async (
-			workspaceId: WorkspaceId,
-			workflowId: WorkflowId,
-			run: CreatedRun,
-			overrideNodes?: OverrideNode[],
-		) => {
-			return await addRun({
-				context,
-				workspaceId,
-				workflowId,
-				run,
-				overrideNodes: overrideNodes || [],
-			});
-		},
-		startRun: async (runId: RunId) => {
-			return await startRun({ context, runId });
-		},
 		copyFile: async (
 			workspaceId: WorkspaceId,
 			sourceFileId: FileId,
@@ -147,38 +120,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			provider?: "self-made";
 		}) => {
 			return await fetchWebPageFiles(args);
-		},
-		upsertGithubIntegrationSetting: async (
-			workspaceGitHubIntegrationSetting: WorkspaceGitHubIntegrationSetting,
-		) => {
-			upsertGithubIntegrationSetting({
-				context,
-				workspaceGitHubIntegrationSetting,
-			});
-		},
-		getWorkspaceGitHubIntegrationSetting: async (workspaceId: WorkspaceId) => {
-			return await getWorkspaceGitHubIntegrationSetting({
-				context,
-				workspaceId,
-			});
-		},
-		runApi: async (args: {
-			workspaceId: WorkspaceId;
-			workflowId: WorkflowId;
-			overrideNodes?: OverrideNode[];
-		}) => {
-			return await runApi({ ...args, context });
-		},
-		githubWebhook: async ({
-			options,
-			...args
-		}: {
-			event: string;
-			delivery: string;
-			payload: unknown;
-			options?: HandleGitHubWebhookOptions;
-		}) => {
-			return await handleWebhook({ context, github: args, options });
 		},
 		generateImage: async (
 			generation: QueuedGeneration,
@@ -239,6 +180,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		setTrigger: async (args: { trigger: FlowTrigger }) =>
 			setTrigger({ ...args, context }),
+		deleteTrigger: async (args: { flowTriggerId: FlowTriggerId }) =>
+			deleteTrigger({ ...args, context }),
 		executeAction: async (args: {
 			generation: QueuedGeneration;
 		}) => executeAction({ ...args, context }),

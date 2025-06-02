@@ -2,7 +2,6 @@ import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { Connection } from "../connection";
 import { NodeId, NodeLike, NodeUIState } from "../node";
-import { Workflow } from "../workflow";
 
 export const WorkspaceId = createIdGenerator("wrks");
 export type WorkspaceId = z.infer<typeof WorkspaceId.schema>;
@@ -27,7 +26,6 @@ export const Workspace = z.object({
 	nodes: z.array(NodeLike),
 	connections: z.array(Connection),
 	ui: UIState,
-	editingWorkflows: z.array(Workflow),
 });
 export type Workspace = z.infer<typeof Workspace>;
 
@@ -45,6 +43,5 @@ export function generateInitialWorkspace() {
 				zoom: 1,
 			},
 		},
-		editingWorkflows: [],
 	} satisfies Workspace;
 }

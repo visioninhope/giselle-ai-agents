@@ -1,12 +1,8 @@
 import { z } from "zod/v4";
-import { NodeBase, NodeReferenceBase, OverrideNodeBase } from "../base";
-import { FileContent, FileContentReference, OverrideFileContent } from "./file";
-import {
-	GitHubContent,
-	GitHubContentReference,
-	OverrideGitHubContent,
-} from "./github";
-import { OverrideTextContent, TextContent, TextContentReference } from "./text";
+import { NodeBase, NodeReferenceBase } from "../base";
+import { FileContent, FileContentReference } from "./file";
+import { GitHubContent, GitHubContentReference } from "./github";
+import { TextContent, TextContentReference } from "./text";
 import {
 	VectorStoreContent,
 	VectorStoreContentReference,
@@ -97,17 +93,6 @@ export function isVectorStoreNode<
 		(provider === undefined || result.data.content.source.provider === provider)
 	);
 }
-
-const OverrideVariableNodeContent = z.discriminatedUnion("type", [
-	OverrideFileContent,
-	OverrideGitHubContent,
-	OverrideTextContent,
-]);
-export const OverrideVariableNode = OverrideNodeBase.extend({
-	type: VariableNode.shape.type,
-	content: OverrideVariableNodeContent,
-});
-export type OverrideVariableNode = z.infer<typeof OverrideVariableNode>;
 
 const VariableNodeContentReference = z.discriminatedUnion("type", [
 	FileContentReference,

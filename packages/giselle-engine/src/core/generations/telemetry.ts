@@ -1,7 +1,9 @@
 import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
-import type {
-	CompletedGeneration,
-	RunningGeneration,
+import {
+	type CompletedGeneration,
+	GenerationContext,
+	type RunningGeneration,
+	type TextGenerationNode,
 } from "@giselle-sdk/data-type";
 import type { LanguageModel } from "@giselle-sdk/language-model";
 import type { ToolSet } from "ai";
@@ -87,18 +89,17 @@ type LangfuseUnit =
 
 export function createLangfuseTracer({
 	workspaceId,
-	runningGeneration,
 	tags,
 	messages,
 	output,
 	usage,
+	textGenerationNode,
 	completedGeneration,
 	spanName,
 	generationName,
 	settings,
 }: {
 	workspaceId: string;
-	runningGeneration: RunningGeneration;
 	tags: string[];
 	messages: { messages: unknown[] };
 	output: string;
@@ -111,6 +112,7 @@ export function createLangfuseTracer({
 		totalCost: number;
 		unit: LangfuseUnit;
 	};
+	textGenerationNode: TextGenerationNode;
 	completedGeneration: CompletedGeneration;
 	spanName: string;
 	generationName: string;
@@ -133,7 +135,7 @@ export function createLangfuseTracer({
 
 	const span = trace.span({
 		name: spanName,
-		startTime: new Date(runningGeneration.queuedAt),
+		startTime: new Date(completedGeneration.queuedAt),
 		output,
 		metadata: settings?.metadata,
 		endTime: new Date(completedGeneration.completedAt),
@@ -141,13 +143,12 @@ export function createLangfuseTracer({
 
 	const generation = span.generation({
 		name: generationName,
-		model: runningGeneration.context.operationNode.content.llm.id,
-		modelParameters:
-			runningGeneration.context.operationNode.content.llm.configurations,
+		model: textGenerationNode.content.llm.id,
+		modelParameters: textGenerationNode.content.llm.configurations,
 		input: messages,
 		usage,
-		startTime: new Date(runningGeneration.createdAt),
-		completionStartTime: new Date(runningGeneration.startedAt),
+		startTime: new Date(completedGeneration.createdAt),
+		completionStartTime: new Date(completedGeneration.startedAt),
 		metadata: settings?.metadata,
 		output,
 		endTime: new Date(completedGeneration.completedAt),

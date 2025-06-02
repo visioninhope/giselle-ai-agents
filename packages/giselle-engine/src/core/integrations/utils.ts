@@ -56,3 +56,36 @@ export async function addGitHubRepositoryIntegrationIndex(args: {
 		},
 	});
 }
+
+export async function removeGitHubRepositoryIntegrationIndex(args: {
+	storage: Storage;
+	flowTriggerId: FlowTriggerId;
+	repositoryNodeId: string;
+}) {
+	const githubRepositoryIntegrationIndex =
+		await getGitHubRepositoryIntegrationIndex({
+			storage: args.storage,
+			repositoryNodeId: args.repositoryNodeId,
+		});
+	if (githubRepositoryIntegrationIndex === undefined) {
+		return;
+	}
+	const remainingFlowTriggerIds =
+		githubRepositoryIntegrationIndex.flowTriggerIds.filter(
+			(id) => id !== args.flowTriggerId,
+		);
+	if (remainingFlowTriggerIds.length === 0) {
+		await args.storage.removeItem(
+			getGitHubRepositoryIntegrationPath(args.repositoryNodeId),
+		);
+		return;
+	}
+	await setGitHubRepositoryIntegrationIndex({
+		storage: args.storage,
+		repositoryNodeId: args.repositoryNodeId,
+		index: {
+			repositoryNodeId: args.repositoryNodeId,
+			flowTriggerIds: remainingFlowTriggerIds,
+		},
+	});
+}
