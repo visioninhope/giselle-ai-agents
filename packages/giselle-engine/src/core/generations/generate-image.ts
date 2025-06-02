@@ -1,7 +1,6 @@
 import { fal } from "@ai-sdk/fal";
 import { openai } from "@ai-sdk/openai";
 import {
-	type CompletedGeneration,
 	type GenerationContext,
 	type GenerationOutput,
 	type Image,
