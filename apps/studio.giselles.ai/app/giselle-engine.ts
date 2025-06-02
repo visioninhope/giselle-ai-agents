@@ -1,4 +1,5 @@
 import { waitForLangfuseFlush } from "@/instrumentation.node";
+import { createLangfuseTracer } from "@/lib/langfuse";
 import { fetchUsageLimits } from "@/packages/lib/fetch-usage-limits";
 import { onConsumeAgentTime } from "@/packages/lib/on-consume-agent-time";
 import supabaseStorageDriver from "@/supabase-storage-driver";
@@ -58,6 +59,7 @@ export const giselleEngine = NextGiselleEngine({
 		isEnabled: true,
 		waitForFlushFn: waitForLangfuseFlush,
 	},
+	tracer: createLangfuseTracer(),
 	fetchUsageLimitsFn: fetchUsageLimits,
 	sampleAppWorkspaceId,
 	integrationConfigs: {

@@ -26,30 +26,38 @@ export type LLMUsage = {
 
 export class LangfuseSpan implements LLMSpan {
 	constructor(
-		private readonly span: any,
+		private readonly span: unknown,
 		public readonly name: string,
 		public readonly startTime: number,
 		public readonly endTime: number,
 		public readonly attributes: Record<string, unknown>,
 	) {}
-
-	update(update: {
-		metadata?: Record<string, unknown>;
-		usage?: LLMUsage;
-	}): void {
-		this.span.update({
-			metadata: update.metadata,
-			usage: update.usage,
-		});
-	}
-
-	end(): void {
-		this.span.end();
-	}
 }
 
+type LangfuseTraceType = {
+	span: (args: {
+		name: string;
+		metadata?: Record<string, unknown>;
+		startTime: Date;
+		endTime: Date;
+		output: string;
+	}) => unknown;
+	generation: (args: {
+		name: string;
+		model: string;
+		modelParameters: Record<string, unknown>;
+		metadata?: Record<string, unknown>;
+		input: { messages: unknown[] };
+		startTime: Date;
+		completionStartTime: Date;
+		endTime: Date;
+		output: string;
+		usage: LLMUsage;
+	}) => unknown;
+};
+
 export class LangfuseTrace {
-	constructor(private readonly trace: any) {}
+	constructor(private readonly trace: LangfuseTraceType) {}
 
 	span(args: {
 		name: string;
@@ -130,76 +138,80 @@ export class LangfuseTracer implements LLMTracer {
 			anthropic?: Record<string, unknown>;
 		};
 	}): Promise<void> {
-		const metadata: Record<
-			string,
-			string | number | boolean | string[] | null | undefined
-		> = {
-			...(args.telemetry?.metadata ?? {}),
-			...(process.env.VERCEL_DEPLOYMENT_ID && {
-				deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
-			}),
-		};
+		try {
+			const metadata: Record<
+				string,
+				string | number | boolean | string[] | null | undefined
+			> = {
+				...(args.telemetry?.metadata ?? {}),
+				...(process.env.VERCEL_DEPLOYMENT_ID && {
+					deploymentId: process.env.VERCEL_DEPLOYMENT_ID,
+				}),
+			};
 
-		const trace = this.langfuse.trace({
-			userId: String(metadata.userId ?? ""),
-			name: "llm-generation",
-			metadata,
-			input: args.messages,
-			output: args.output,
-			tags: [args.provider, args.modelId],
-		});
+			const trace = this.langfuse.trace({
+				userId: String(metadata.userId ?? ""),
+				name: "llm-generation",
+				metadata,
+				input: args.messages,
+				output: args.output,
+				tags: [args.provider, args.modelId],
+			});
 
-		const span = trace.span({
-			name: "llm-generation",
-			startTime: new Date(args.runningGeneration.queuedAt),
-			output: args.output,
-			metadata,
-			endTime: new Date(args.completedGeneration.completedAt),
-		});
+			const span = trace.span({
+				name: "llm-generation",
+				startTime: new Date(args.runningGeneration.queuedAt),
+				output: args.output,
+				metadata,
+				endTime: new Date(args.completedGeneration.completedAt),
+			});
 
-		const modelParameters: Record<
-			string,
-			string | number | boolean | string[] | null | undefined
-		> = {};
-		for (const [key, value] of Object.entries(args.configurations)) {
-			if (
-				typeof value === "string" ||
-				typeof value === "number" ||
-				typeof value === "boolean" ||
-				Array.isArray(value) ||
-				value === null ||
-				value === undefined
-			) {
-				modelParameters[key] = value as
-					| string
-					| number
-					| boolean
-					| string[]
-					| null
-					| undefined;
-			} else if (Array.isArray(value)) {
-				modelParameters[key] = (value as unknown[]).filter(
-					(v) => typeof v === "string",
-				) as string[];
-			} else {
-				modelParameters[key] = String(value);
+			const modelParameters: Record<
+				string,
+				string | number | boolean | string[] | null | undefined
+			> = {};
+			for (const [key, value] of Object.entries(args.configurations)) {
+				if (
+					typeof value === "string" ||
+					typeof value === "number" ||
+					typeof value === "boolean" ||
+					Array.isArray(value) ||
+					value === null ||
+					value === undefined
+				) {
+					modelParameters[key] = value as
+						| string
+						| number
+						| boolean
+						| string[]
+						| null
+						| undefined;
+				} else if (Array.isArray(value)) {
+					modelParameters[key] = (value as unknown[]).filter(
+						(v) => typeof v === "string",
+					) as string[];
+				} else {
+					modelParameters[key] = String(value);
+				}
 			}
+
+			span.generation({
+				name: "llm-generation",
+				model: args.modelId,
+				modelParameters,
+				input: args.messages,
+				usage: args.completedGeneration.usage,
+				startTime: new Date(args.runningGeneration.createdAt),
+				completionStartTime: new Date(args.runningGeneration.startedAt),
+				metadata,
+				output: args.output,
+				endTime: new Date(args.completedGeneration.completedAt),
+			});
+
+			await this.langfuse.shutdownAsync();
+		} catch (error) {
+			console.error("Telemetry emission failed:", error);
 		}
-
-		span.generation({
-			name: "llm-generation",
-			model: args.modelId,
-			modelParameters,
-			input: args.messages,
-			usage: args.completedGeneration.usage,
-			startTime: new Date(args.runningGeneration.createdAt),
-			completionStartTime: new Date(args.runningGeneration.startedAt),
-			metadata,
-			output: args.output,
-			endTime: new Date(args.completedGeneration.completedAt),
-		});
-
-		await this.langfuse.shutdownAsync();
 	}
 }
 
