@@ -3,7 +3,9 @@ import type {
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
 import type { LLMGeneration, LLMSpan, LLMTracer } from "@giselle-sdk/telemetry";
+import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import type { AttributeValue } from "@opentelemetry/api";
+import type { ToolSet } from "ai";
 import { Langfuse } from "langfuse";
 
 export type UsageUnit =
@@ -135,7 +137,7 @@ export class LangfuseTracer implements LLMTracer {
 		};
 		messages: { messages: unknown[] };
 		output: string;
-		toolSet: Record<string, unknown>;
+		toolSet: ToolSet;
 		configurations: Record<string, unknown>;
 		providerOptions?: {
 			anthropic?: Record<string, unknown>;
@@ -161,7 +163,13 @@ export class LangfuseTracer implements LLMTracer {
 				metadata,
 				input: args.messages,
 				output: args.output,
-				tags: [args.provider, args.modelId],
+				tags: generateTelemetryTags({
+					provider: args.provider,
+					modelId: args.modelId,
+					toolSet: args.toolSet,
+					configurations: args.configurations,
+					providerOptions: args.providerOptions,
+				}),
 			});
 
 			const span = trace.span({
