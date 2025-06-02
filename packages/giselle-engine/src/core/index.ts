@@ -52,12 +52,6 @@ export * from "./types";
 export * from "./vault";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
-	console.log("[GiselleEngine] Initializing with config:", {
-		hasTelemetry: !!config.telemetry,
-		telemetryEnabled: config.telemetry?.isEnabled,
-		hasWaitForFlushFn: !!config.telemetry?.waitForFlushFn,
-	});
-
 	const context: GiselleEngineContext = {
 		...config,
 		llmProviders: config.llmProviders ?? [],
