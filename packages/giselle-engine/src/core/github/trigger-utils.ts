@@ -8,6 +8,7 @@ import {
 	type WebhookEvent,
 	ensureWebhookEvent,
 	getPullRequestDiff,
+	getPullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
 import { parseCommand } from "./utils";
 
@@ -28,7 +29,8 @@ export async function resolveTrigger(args: ResolveTriggerArgs) {
 		(await resolvePullRequestOpenedTrigger(args)) ||
 		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
-		resolvePullRequestCommentTrigger(args)
+		resolvePullRequestCommentTrigger(args) ||
+		resolvePullRequestReviewCommentTrigger(args)
 	);
 }
 
@@ -463,6 +465,124 @@ function resolvePullRequestCommentTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.title,
 				} satisfies GenerationOutput;
+			default: {
+				const _exhaustiveCheck: never = payload;
+				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
+			}
+		}
+	}
+	return null;
+}
+
+async function resolvePullRequestReviewCommentTrigger(
+	args: ResolveTriggerArgs,
+) {
+	if (
+		!ensureWebhookEvent(
+			args.webhookEvent,
+			"pull_request_review_comment.created",
+		) ||
+		args.trigger.configuration.event.id !==
+			"github.pull_request_review_comment.created" ||
+		args.githubTrigger.event.id !== "github.pull_request_review_comment.created"
+	) {
+		return null;
+	}
+
+	const command = parseCommand(args.webhookEvent.data.payload.comment.body);
+	if (
+		command === null ||
+		command.callsign !== args.trigger.configuration.event.conditions.callsign
+	) {
+		return null;
+	}
+
+	for (const payload of args.githubTrigger.event.payloads.keyof().options) {
+		switch (payload) {
+			case "body":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: command.content,
+				} satisfies GenerationOutput;
+			case "pullRequestBody":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.body ?? "",
+				} satisfies GenerationOutput;
+			case "pullRequestNumber":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content:
+						args.webhookEvent.data.payload.pull_request.number.toString(),
+				} satisfies GenerationOutput;
+			case "pullRequestTitle":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.pull_request.title,
+				} satisfies GenerationOutput;
+			case "diff":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.comment.diff_hunk,
+				} satisfies GenerationOutput;
+			case "id":
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: args.webhookEvent.data.payload.comment.id.toString(),
+				} satisfies GenerationOutput;
+			case "previousCommentBody": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
+				if (
+					args.webhookEvent.data.payload.comment.in_reply_to_id === undefined
+				) {
+					return {
+						type: "generated-text",
+						outputId: args.output.id,
+						content: "",
+					} satisfies GenerationOutput;
+				}
+				const comment = await getPullRequestReviewComment({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					commentId: args.webhookEvent.data.payload.comment.in_reply_to_id,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: comment.body,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);

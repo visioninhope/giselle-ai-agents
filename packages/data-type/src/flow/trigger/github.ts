@@ -23,6 +23,13 @@ const PullRequestCommentCreated = z.object({
 		callsign: z.string(),
 	}),
 });
+
+const PullRequestReviewCommentCreated = z.object({
+	id: z.literal("github.pull_request_review_comment.created"),
+	conditions: z.object({
+		callsign: z.string(),
+	}),
+});
 const PullRequestOpened = z.object({
 	id: z.literal("github.pull_request.opened"),
 });
@@ -40,6 +47,7 @@ export const GitHubFlowTriggerEvent = z.discriminatedUnion("id", [
 	IssueClosed,
 	IssueCommentCreated,
 	PullRequestCommentCreated,
+	PullRequestReviewCommentCreated,
 	PullRequestOpened,
 	PullRequestReadyForReview,
 	PullRequestClosed,

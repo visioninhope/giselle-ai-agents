@@ -66,6 +66,26 @@ export const githubPullRequestCommentCreatedTrigger = {
 	},
 } as const satisfies GitHubTrigger;
 
+export const githubPullRequestReviewCommentCreatedTrigger = {
+	provider,
+	event: {
+		id: "github.pull_request_review_comment.created",
+		label: "Pull Request Review Comment Created",
+		payloads: z.object({
+			id: z.number(),
+			body: z.string(),
+			diff: z.string(),
+			previousCommentBody: z.string(),
+			pullRequestNumber: z.number(),
+			pullRequestTitle: z.string(),
+			pullRequestBody: z.string(),
+		}),
+		conditions: z.object({
+			callsign: z.string(),
+		}),
+	},
+} as const satisfies GitHubTrigger;
+
 export const githubPullRequestOpenedTrigger = {
 	provider,
 	event: {
@@ -116,6 +136,8 @@ export const triggers = {
 	[githubIssueCommentCreatedTrigger.event.id]: githubIssueCommentCreatedTrigger,
 	[githubPullRequestCommentCreatedTrigger.event.id]:
 		githubPullRequestCommentCreatedTrigger,
+	[githubPullRequestReviewCommentCreatedTrigger.event.id]:
+		githubPullRequestReviewCommentCreatedTrigger,
 	[githubPullRequestOpenedTrigger.event.id]: githubPullRequestOpenedTrigger,
 	[githubPullRequestReadyForReviewTrigger.event.id]:
 		githubPullRequestReadyForReviewTrigger,
@@ -134,6 +156,8 @@ export function triggerIdToLabel(triggerId: TriggerEventId) {
 			return githubIssueCommentCreatedTrigger.event.label;
 		case "github.pull_request_comment.created":
 			return githubPullRequestCommentCreatedTrigger.event.label;
+		case "github.pull_request_review_comment.created":
+			return githubPullRequestReviewCommentCreatedTrigger.event.label;
 		case "github.pull_request.opened":
 			return githubPullRequestOpenedTrigger.event.label;
 		case "github.pull_request.ready_for_review":

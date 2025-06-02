@@ -95,6 +95,19 @@ export const githubEventInputs: GithubEventInputMap = {
 		diff: { label: "diff", type: "multiline-text", required: false },
 		pullRequestUrl: { label: "Pull request URL", type: "text", required: true },
 	},
+	"github.pull_request_review_comment.created": {
+		body: { label: "Body", type: "multiline-text", required: true },
+		pullRequestNumber: { label: "Number", type: "number", required: true },
+		pullRequestTitle: { label: "Title", type: "text", required: true },
+		pullRequestBody: { label: "Body", type: "multiline-text", required: false },
+		previousCommentBody: {
+			label: "Previous comment body",
+			type: "multiline-text",
+			required: false,
+		},
+		diff: { label: "diff", type: "multiline-text", required: true },
+		id: { label: "ID", type: "number", required: true },
+	},
 };
 
 export function createInputsFromTrigger(

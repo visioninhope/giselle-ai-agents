@@ -120,6 +120,9 @@ async function process<TEventName extends WebhookEventName>(args: {
 				storage: args.context.storage,
 				flowTriggerId,
 			});
+			if (trigger === undefined) {
+				return;
+			}
 
 			const githubAuthV2 = args.context.integrationConfigs?.github?.authV2;
 			if (githubAuthV2 === undefined) {

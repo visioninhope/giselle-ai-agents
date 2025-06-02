@@ -16,7 +16,8 @@ function createOutput(accessor: string): Output {
 function createTrigger(eventId: GitHubTriggerEventId): FlowTrigger {
 	const event =
 		eventId === "github.issue_comment.created" ||
-		eventId === "github.pull_request_comment.created"
+		eventId === "github.pull_request_comment.created" ||
+		eventId === "github.pull_request_review_comment.created"
 			? { id: eventId, conditions: { callsign: "giselle" } }
 			: { id: eventId };
 	return {
@@ -66,6 +67,23 @@ function createPullRequestEvent(
 		name,
 		data: { payload: { pull_request: pr, repository: { node_id: "r_1234" } } },
 	} as WebhookEvent<typeof name>;
+}
+
+function createPullRequestReviewCommentEvent(pr: {
+	title: string;
+	body: string | null;
+	number: number;
+}): WebhookEvent {
+	return {
+		name: "pull_request_review_comment.created",
+		data: {
+			payload: {
+				pull_request: pr,
+				repository: { node_id: "r_1234" },
+				comment: { body: "/giselle hi" },
+			},
+		},
+	} as WebhookEvent<"pull_request_review_comment.created">;
 }
 
 const appAuth = {
@@ -190,6 +208,39 @@ describe("resolveTrigger", () => {
 				type: "generated-text",
 				outputId: output.id,
 				content: expected,
+			});
+		});
+
+		describe("pull request review comment", () => {
+			const webhookEvent = createPullRequestReviewCommentEvent({
+				title: "PR title",
+				body: "PR body",
+				number: 6,
+			});
+			const githubTrigger =
+				githubTriggers["github.pull_request_review_comment.created"];
+			test.each([
+				["body", "hi"],
+				["pullRequestBody", "PR body"],
+				["pullRequestNumber", "6"],
+				["pullRequestTitle", "PR title"],
+			] as const)("resolve %s", async (accessor, expected) => {
+				const trigger = createTrigger(
+					"github.pull_request_review_comment.created",
+				);
+				const output = createOutput(accessor);
+				const result = await resolveTrigger({
+					output,
+					githubTrigger,
+					trigger,
+					webhookEvent,
+					...appAuth,
+				});
+				expect(result).toEqual({
+					type: "generated-text",
+					outputId: output.id,
+					content: expected,
+				});
 			});
 		});
 	});

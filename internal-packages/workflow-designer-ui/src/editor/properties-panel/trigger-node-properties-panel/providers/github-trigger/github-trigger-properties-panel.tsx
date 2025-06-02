@@ -158,6 +158,19 @@ function Installed({
 					};
 					break;
 				}
+				case "github.pull_request_review_comment.created": {
+					const callsign = formData.get("callsign");
+					if (typeof callsign !== "string" || callsign.length === 0) {
+						throw new Error("unexpected request");
+					}
+					event = {
+						id: "github.pull_request_review_comment.created",
+						conditions: {
+							callsign,
+						},
+					};
+					break;
+				}
 				default: {
 					const _exhaustiveCheck: never = eventId;
 					throw new Error(`Unhandled eventId: ${_exhaustiveCheck}`);
@@ -266,7 +279,8 @@ function Installed({
 						</Select>
 					</fieldset>
 					{(eventId === "github.issue_comment.created" ||
-						eventId === "github.pull_request_comment.created") && (
+						eventId === "github.pull_request_comment.created" ||
+						eventId === "github.pull_request_review_comment.created") && (
 						<fieldset className="flex flex-col gap-[4px]">
 							<div className="flex items-center gap-[4px]">
 								<p className="text-[16px]">Callsign</p>

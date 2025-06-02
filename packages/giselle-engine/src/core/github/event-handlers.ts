@@ -125,6 +125,42 @@ export function handlePullRequestCommentCreated<
 	};
 }
 
+export function handlePullRequestReviewCommentCreated<
+	TEventName extends WebhookEventName,
+>(args: EventHandlerArgs<TEventName>): EventHandlerResult {
+	if (
+		!args.deps.ensureWebhookEvent(
+			args.event,
+			"pull_request_review_comment.created",
+		) ||
+		args.trigger.configuration.event.id !==
+			"github.pull_request_review_comment.created"
+	) {
+		return { shouldRun: false };
+	}
+
+	const comment = args.event.data.payload.comment;
+	if (!comment) {
+		return { shouldRun: false };
+	}
+
+	const command = args.deps.parseCommand(comment.body);
+	const conditions =
+		args.trigger.configuration.event.id ===
+		"github.pull_request_review_comment.created"
+			? args.trigger.configuration.event.conditions
+			: undefined;
+
+	if (command?.callsign !== conditions?.callsign) {
+		return { shouldRun: false };
+	}
+
+	return {
+		shouldRun: true,
+		reactionNodeId: comment.node_id,
+	};
+}
+
 export function handlePullRequestOpened<TEventName extends WebhookEventName>(
 	args: EventHandlerArgs<TEventName>,
 ): EventHandlerResult {
@@ -188,6 +224,7 @@ export const eventHandlers = [
 	handleIssueClosed,
 	handleIssueCommentCreated,
 	handlePullRequestCommentCreated,
+	handlePullRequestReviewCommentCreated,
 	handlePullRequestOpened,
 	handlePullRequestReadyForReview,
 	handlePullRequestClosed,

@@ -34,6 +34,9 @@ export async function getFlowTrigger({
 			bypassingCache: true,
 		},
 	);
+	if (unsafe === null) {
+		return undefined;
+	}
 
 	return FlowTrigger.parse(unsafe);
 }
@@ -46,6 +49,9 @@ export async function deleteFlowTrigger({
 	flowTriggerId: FlowTriggerId;
 }) {
 	const trigger = await getFlowTrigger({ storage, flowTriggerId });
+	if (trigger === undefined) {
+		throw new Error(`Flow trigger with ID ${flowTriggerId} not found`);
+	}
 	await storage.removeItem(flowTriggerPath({ flowTriggerId }));
 	if (trigger.configuration.provider === "github") {
 		await removeGitHubRepositoryIntegrationIndex({
