@@ -28,6 +28,8 @@ import { ToastProvider, useToasts } from "../ui/toast";
 import { Beta } from "./beta";
 import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
+import { ContextMenu } from "./context-menu";
+import type { ContextMenuProps } from "./context-menu/types";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -59,6 +61,10 @@ function NodeCanvas() {
 	const updateNodeInternals = useUpdateNodeInternals();
 	const { selectedTool, reset } = useToolbar();
 	const toast = useToasts();
+	const [menu, setMenu] = useState<Omit<ContextMenuProps, "onClose"> | null>(
+		null,
+	);
+	const reactFlowRef = useRef<HTMLDivElement>(null);
 	useEffect(() => {
 		reactFlowInstance.setNodes(
 			Object.entries(data.ui.nodeState)
@@ -224,6 +230,7 @@ function NodeCanvas() {
 
 	return (
 		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
+			ref={reactFlowRef}
 			className="giselle-workflow-editor"
 			colorMode="dark"
 			defaultNodes={[]}
@@ -303,6 +310,8 @@ function NodeCanvas() {
 				});
 			}}
 			onPaneClick={(event) => {
+				setMenu(null);
+
 				for (const node of data.nodes) {
 					setUiNodeState(node.id, { selected: false });
 				}
@@ -318,6 +327,26 @@ function NodeCanvas() {
 				}
 				reset();
 			}}
+			onNodeContextMenu={(event, node) => {
+				event.preventDefault();
+
+				const pane = reactFlowRef.current?.getBoundingClientRect();
+				if (!pane) return;
+
+				setMenu({
+					id: node.id,
+					top: event.clientY < pane.height - 200 ? event.clientY : undefined,
+					left: event.clientX < pane.width - 200 ? event.clientX : undefined,
+					right:
+						event.clientX >= pane.width - 200
+							? pane.width - event.clientX
+							: undefined,
+					bottom:
+						event.clientY >= pane.height - 200
+							? pane.height - event.clientY
+							: undefined,
+				});
+			}}
 		>
 			<Background />
 			{selectedTool?.action === "addNode" && (
@@ -326,6 +355,7 @@ function NodeCanvas() {
 			<XYFlowPanel position={"bottom-center"}>
 				<Toolbar />
 			</XYFlowPanel>
+			{menu && <ContextMenu {...menu} onClose={() => setMenu(null)} />}
 		</ReactFlow>
 	);
 }
