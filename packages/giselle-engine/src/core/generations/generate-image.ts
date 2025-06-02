@@ -29,7 +29,7 @@ import {
 	setGeneratedImage,
 } from "./utils";
 
-export async function generateImage(args: {
+export function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
