@@ -137,6 +137,9 @@ export class LangfuseTracer implements LLMTracer {
 		providerOptions?: {
 			anthropic?: Record<string, unknown>;
 		};
+		traceName?: string;
+		spanName?: string;
+		generationName?: string;
 	}): Promise<void> {
 		try {
 			const metadata: Record<
@@ -151,7 +154,7 @@ export class LangfuseTracer implements LLMTracer {
 
 			const trace = this.langfuse.trace({
 				userId: String(metadata.userId ?? ""),
-				name: "llm-generation",
+				name: args.traceName ?? "llm-generation",
 				metadata,
 				input: args.messages,
 				output: args.output,
@@ -159,7 +162,7 @@ export class LangfuseTracer implements LLMTracer {
 			});
 
 			const span = trace.span({
-				name: "llm-generation",
+				name: args.spanName ?? "llm-generation",
 				startTime: new Date(args.runningGeneration.queuedAt),
 				output: args.output,
 				metadata,
@@ -196,7 +199,7 @@ export class LangfuseTracer implements LLMTracer {
 			}
 
 			span.generation({
-				name: "llm-generation",
+				name: args.generationName ?? "llm-generation",
 				model: args.modelId,
 				modelParameters,
 				input: args.messages,

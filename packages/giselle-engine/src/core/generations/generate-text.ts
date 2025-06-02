@@ -252,6 +252,9 @@ export async function generateText(args: {
 									operationNode.content.llm.provider === "anthropic"
 										? providerOptions
 										: undefined,
+								traceName: "ai.streamText",
+								spanName: "ai.streamText",
+								generationName: "ai.streamText.doStream",
 							});
 						} catch (error) {
 							console.error("Telemetry emission failed:", error);

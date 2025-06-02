@@ -87,5 +87,8 @@ export interface LLMTracer {
 		providerOptions?: {
 			anthropic?: AnthropicProviderOptions;
 		};
+		traceName: string;
+		spanName: string;
+		generationName: string;
 	}) => Promise<void>;
 }
