@@ -28,8 +28,8 @@ export class LangfuseSpan implements LLMSpan {
 	constructor(
 		private readonly span: unknown,
 		public readonly name: string,
-		public readonly startTime: number,
-		public readonly endTime: number,
+		public readonly startTime: Date,
+		public readonly endTime: Date,
 		public readonly attributes: Record<string, unknown>,
 	) {}
 }
@@ -76,8 +76,8 @@ export class LangfuseTrace {
 		return new LangfuseSpan(
 			span,
 			args.name,
-			args.startTime.getTime(),
-			args.endTime.getTime(),
+			args.startTime,
+			args.endTime,
 			args.metadata ?? {},
 		);
 	}

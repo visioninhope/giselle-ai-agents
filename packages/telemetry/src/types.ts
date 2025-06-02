@@ -45,8 +45,8 @@ export type LLMGeneration = {
 
 export type LLMSpan = {
 	name: string;
-	startTime: number;
-	endTime: number;
+	startTime: Date;
+	endTime: Date;
 	attributes: Record<string, unknown>;
 };
 
