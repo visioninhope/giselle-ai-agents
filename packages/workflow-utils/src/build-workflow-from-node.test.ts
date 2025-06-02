@@ -1,4 +1,9 @@
-import { type NodeId, type Workflow, Workspace } from "@giselle-sdk/data-type";
+import {
+	type NodeId,
+	type Workflow,
+	Workspace,
+	isTriggerNode,
+} from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, test } from "vitest";
 import { buildWorkflowFromNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
@@ -165,7 +170,9 @@ describe("buildWorkflowFromNode with testWorkspace2", () => {
 			expect(firstJob.operations.length).toBe(1);
 			expect(firstJob.operations[0].node.id).toBe("nd-Z6YHBDO456UNY6N4");
 			expect(firstJob.operations[0].node.content.type).toBe("trigger");
-			expect(firstJob.operations[0].node.content.provider).toBe("github");
+			if (isTriggerNode(firstJob.operations[0].node)) {
+				expect(firstJob.operations[0].node.content.provider).toBe("github");
+			}
 			expect(firstJob.operations[0].sourceNodes.length).toBe(0);
 		}
 	});
