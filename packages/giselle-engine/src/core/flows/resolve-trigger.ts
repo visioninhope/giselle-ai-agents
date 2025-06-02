@@ -27,6 +27,9 @@ export async function resolveTrigger(args: {
 		storage: args.context.storage,
 		flowTriggerId: operationNode.content.state.flowTriggerId,
 	});
+	if (triggerData === undefined) {
+		throw new Error("Trigger data not found");
+	}
 
 	const generationContext = GenerationContext.parse(args.generation.context);
 
