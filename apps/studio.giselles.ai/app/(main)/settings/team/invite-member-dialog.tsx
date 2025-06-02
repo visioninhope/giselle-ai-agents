@@ -14,20 +14,14 @@ import { ChevronDown, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { email as emailValidator, parse, pipe, string } from "valibot";
 import { Button } from "../components/button";
-import {
-	type SendInvitationsResult,
-	addTeamMember,
-	sendInvitationsAction,
-} from "./actions";
+import { type SendInvitationsResult, sendInvitationsAction } from "./actions";
 
 type InviteMemberDialogProps = {
-	teamInvitationViaEmailEnabled: boolean;
 	memberEmails: string[];
 	invitationEmails: string[];
 };
 
 export function InviteMemberDialog({
-	teamInvitationViaEmailEnabled,
 	memberEmails,
 	invitationEmails,
 }: InviteMemberDialogProps) {
@@ -117,50 +111,28 @@ export function InviteMemberDialog({
 
 		setIsLoading(true);
 
-		if (teamInvitationViaEmailEnabled) {
-			const response: SendInvitationsResult = await sendInvitationsAction(
-				emailList,
-				role,
-			);
+		const response: SendInvitationsResult = await sendInvitationsAction(
+			emailList,
+			role,
+		);
 
-			if (response.overallStatus === "success") {
-				handleCloseDialog();
-			} else {
-				const failedInvites = response.results.filter(
-					(r) => r.status !== "success",
-				);
-				const errorMessages = failedInvites
-					.map((r) => `${r.email}: ${r.error || r.status}`)
-					.join(", ");
-				let message = `Failed to send ${failedInvites.length} invitation(s).`;
-				if (response.overallStatus === "partial_success") {
-					const successCount = emailList.length - failedInvites.length;
-					message = `${successCount} invitation(s) sent successfully. Failed to send ${failedInvites.length}: ${errorMessages}`;
-				} else {
-					message = `Failed to send all ${failedInvites.length} invitation(s): ${errorMessages}`;
-				}
-				setError(message);
-			}
+		if (response.overallStatus === "success") {
+			handleCloseDialog();
 		} else {
-			// Process for each email address
-			const results = await Promise.all(
-				emailList.map(async (emailAddress) => {
-					const formData = new FormData();
-					formData.append("email", emailAddress);
-					formData.append("role", role);
-					return addTeamMember(formData);
-				}),
+			const failedInvites = response.results.filter(
+				(r) => r.status !== "success",
 			);
-
-			// Check for errors
-			const errors = results.filter((result) => !result.success);
-			if (errors.length > 0) {
-				setError(
-					`Failed to add ${errors.length} member(s). ${errors[0].error || ""}`,
-				);
+			const errorMessages = failedInvites
+				.map((r) => `${r.email}: ${r.error || r.status}`)
+				.join(", ");
+			let message = `Failed to send ${failedInvites.length} invitation(s).`;
+			if (response.overallStatus === "partial_success") {
+				const successCount = emailList.length - failedInvites.length;
+				message = `${successCount} invitation(s) sent successfully. Failed to send ${failedInvites.length}: ${errorMessages}`;
 			} else {
-				handleCloseDialog(); // Close dialog on success
+				message = `Failed to send all ${failedInvites.length} invitation(s): ${errorMessages}`;
 			}
+			setError(message);
 		}
 		setIsLoading(false);
 	};

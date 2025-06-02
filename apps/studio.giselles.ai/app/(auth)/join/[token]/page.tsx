@@ -1,5 +1,4 @@
 import { Button } from "@/components/ui/button";
-import { teamInvitationViaEmailFlag } from "@/flags";
 import { getUser } from "@/lib/supabase";
 import type { User } from "@supabase/auth-js";
 import Link from "next/link";
@@ -12,10 +11,6 @@ export default async function Page({
 	params,
 }: { params: Promise<{ token: string }> }) {
 	const { token: tokenParam } = await params;
-	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
-	if (!isTeamInvitationViaEmail) {
-		return notFound();
-	}
 
 	const token = await fetchInvitationToken(tokenParam);
 	if (!token) {
