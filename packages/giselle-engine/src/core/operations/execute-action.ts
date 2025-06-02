@@ -21,7 +21,7 @@ import {
 import { useGenerationExecutor } from "../generations/internal/use-generation-executor";
 import type { GiselleEngineContext } from "../types";
 
-export async function executeAction(args: {
+export function executeAction(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {

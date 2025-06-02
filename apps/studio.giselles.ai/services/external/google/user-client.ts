@@ -107,7 +107,7 @@ class GoogleUserClient {
 		}
 	}
 
-	private async buildClient() {
+	private buildClient() {
 		const client = new google.auth.OAuth2(
 			this.clientId,
 			this.clientSecret,

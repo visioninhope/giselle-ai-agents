@@ -18,7 +18,11 @@ export interface LoaderResult<MetadataType = Record<string, unknown>> {
  * Interface for chunking strategies
  */
 export interface Chunker {
-	chunk(content: string): AsyncGenerator<ChunkResult, void, unknown>;
+	chunk(
+		content: string,
+	):
+		| Generator<ChunkResult, void, unknown>
+		| AsyncGenerator<ChunkResult, void, unknown>;
 }
 
 /**

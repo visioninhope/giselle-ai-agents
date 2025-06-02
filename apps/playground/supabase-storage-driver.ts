@@ -166,7 +166,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			}
 		},
 
-		async getKeys(base, opts) {
+		getKeys(base, opts) {
 			const level = opts?.level || 2;
 			return getNestedList(base, level);
 		},

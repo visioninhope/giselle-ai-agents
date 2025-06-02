@@ -1,6 +1,6 @@
 import type { ReactNode } from "react";
 
-export default async function SettingsTeamLayout({
+export default function SettingsTeamLayout({
 	children,
 }: { children: ReactNode }) {
 	return (

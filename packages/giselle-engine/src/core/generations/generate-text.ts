@@ -212,7 +212,7 @@ export async function generateText(args: {
 					);
 					if (sourceOutput !== undefined && event.sources.length > 0) {
 						const sources = await Promise.all(
-							event.sources.map(async (source) => {
+							event.sources.map((source) => {
 								return {
 									sourceType: "url",
 									id: source.id,
