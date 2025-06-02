@@ -39,6 +39,7 @@ type LangfuseTraceType = {
 		name: string;
 		metadata?: Record<string, unknown>;
 		startTime: Date;
+		input: { messages: unknown[] };
 		endTime: Date;
 		output: string;
 	}) => unknown;
@@ -62,6 +63,7 @@ export class LangfuseTrace {
 	span(args: {
 		name: string;
 		startTime: Date;
+		input: { messages: unknown[] };
 		output: string;
 		metadata?: Record<string, unknown>;
 		endTime: Date;
@@ -70,6 +72,7 @@ export class LangfuseTrace {
 			name: args.name,
 			metadata: args.metadata,
 			startTime: args.startTime,
+			input: args.input,
 			endTime: args.endTime,
 			output: args.output,
 		});
@@ -164,6 +167,7 @@ export class LangfuseTracer implements LLMTracer {
 			const span = trace.span({
 				name: args.spanName ?? "llm-generation",
 				startTime: new Date(args.runningGeneration.queuedAt),
+				input: args.messages,
 				output: args.output,
 				metadata,
 				endTime: new Date(args.completedGeneration.completedAt),

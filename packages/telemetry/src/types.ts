@@ -55,6 +55,7 @@ export type LLMTrace = {
 		name: string;
 		metadata?: Record<string, unknown>;
 		startTime: Date;
+		input: { messages: unknown[] };
 		endTime: Date;
 		output: string;
 	}) => LLMSpan;
