@@ -60,7 +60,7 @@ export function DuplicateAgentButton({
 		formRef.current?.requestSubmit();
 	};
 
-	const formAction = async (formData: FormData) => {
+	const formAction = (formData: FormData) => {
 		startTransition(async () => {
 			const res = await action(formData);
 			switch (res.result) {
@@ -147,7 +147,7 @@ export function DeleteAgentButton({
 		formRef.current?.requestSubmit();
 	};
 
-	const formAction = async (formData: FormData) => {
+	const formAction = (formData: FormData) => {
 		startTransition(async () => {
 			const res = await action(formData);
 			switch (res.result) {

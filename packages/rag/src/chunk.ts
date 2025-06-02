@@ -58,7 +58,7 @@ export class LineChunker implements Chunker {
 	 * Split document string into chunks by lines with character limit enforcement
 	 * @param content - document string to be chunked
 	 */
-	async *chunk(content: string): AsyncGenerator<ChunkResult, void, unknown> {
+	*chunk(content: string) {
 		const lines = content.split(/\r?\n/);
 
 		let chunkIndex = 0;
@@ -95,10 +95,7 @@ export class LineChunker implements Chunker {
 	/**
 	 * Split content into multiple chunks when it exceeds character limit
 	 */
-	private async *splitIntoMultipleChunks(
-		content: string,
-		startIndex: number,
-	): AsyncGenerator<ChunkResult, void, unknown> {
+	private *splitIntoMultipleChunks(content: string, startIndex: number) {
 		let index = startIndex;
 		for (let i = 0; i < content.length; i += this.maxChars) {
 			const chunk = content.substring(i, i + this.maxChars);
@@ -127,6 +124,6 @@ export function createLineChunker(
 	maxLines = DEFAULT_MAX_LINES,
 	overlap = DEFAULT_OVERLAP,
 	maxChars = DEFAULT_MAX_CHARS,
-): Chunker {
+) {
 	return new LineChunker(maxLines, overlap, maxChars);
 }

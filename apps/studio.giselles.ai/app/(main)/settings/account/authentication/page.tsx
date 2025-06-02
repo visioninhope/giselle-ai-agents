@@ -3,7 +3,7 @@ import { Suspense } from "react";
 import { GitHubAuthentication } from "../github-authentication";
 import { GoogleAuthentication } from "../google-authentication";
 
-export default async function AccountAuthenticationPage() {
+export default function AccountAuthenticationPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex flex-col gap-y-2">

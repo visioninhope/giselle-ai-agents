@@ -28,9 +28,9 @@ async function authorizeOAuth(provider: OAuthProvider) {
 }
 
 export async function authorizeGitHub() {
-	return authorizeOAuth("github");
+	return await authorizeOAuth("github");
 }
 
 export async function authorizeGoogle() {
-	return authorizeOAuth("google");
+	return await authorizeOAuth("google");
 }

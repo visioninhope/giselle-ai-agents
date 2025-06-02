@@ -30,9 +30,9 @@ export type EventHandlerResult = {
 	reactionNodeId?: string;
 };
 
-export async function handleIssueOpened<TEventName extends WebhookEventName>(
+export function handleIssueOpened<TEventName extends WebhookEventName>(
 	args: EventHandlerArgs<TEventName>,
-): Promise<EventHandlerResult> {
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "issues.opened") ||
 		args.trigger.configuration.event.id !== "github.issue.created"
@@ -48,9 +48,9 @@ export async function handleIssueOpened<TEventName extends WebhookEventName>(
 	return { shouldRun: true, reactionNodeId: issue.node_id };
 }
 
-export async function handleIssueClosed<TEventName extends WebhookEventName>(
+export function handleIssueClosed<TEventName extends WebhookEventName>(
 	args: EventHandlerArgs<TEventName>,
-): Promise<EventHandlerResult> {
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "issues.closed") ||
 		args.trigger.configuration.event.id !== "github.issue.closed"
@@ -66,9 +66,9 @@ export async function handleIssueClosed<TEventName extends WebhookEventName>(
 	return { shouldRun: true, reactionNodeId: issue.node_id };
 }
 
-export async function handleIssueCommentCreated<
-	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
+export function handleIssueCommentCreated<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 		args.trigger.configuration.event.id !== "github.issue_comment.created"
@@ -94,9 +94,9 @@ export async function handleIssueCommentCreated<
 	return { shouldRun: true, reactionNodeId: comment.node_id };
 }
 
-export async function handlePullRequestCommentCreated<
+export function handlePullRequestCommentCreated<
 	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
+>(args: EventHandlerArgs<TEventName>): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
 		args.trigger.configuration.event.id !==
@@ -125,9 +125,9 @@ export async function handlePullRequestCommentCreated<
 	};
 }
 
-export async function handlePullRequestOpened<
-	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
+export function handlePullRequestOpened<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "pull_request.opened") ||
 		args.trigger.configuration.event.id !== "github.pull_request.opened"
@@ -143,9 +143,9 @@ export async function handlePullRequestOpened<
 	return { shouldRun: true, reactionNodeId: pullRequest.node_id };
 }
 
-export async function handlePullRequestReadyForReview<
+export function handlePullRequestReadyForReview<
 	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
+>(args: EventHandlerArgs<TEventName>): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(
 			args.event,
@@ -165,9 +165,9 @@ export async function handlePullRequestReadyForReview<
 	return { shouldRun: true, reactionNodeId: pullRequest.node_id };
 }
 
-export async function handlePullRequestClosed<
-	TEventName extends WebhookEventName,
->(args: EventHandlerArgs<TEventName>): Promise<EventHandlerResult> {
+export function handlePullRequestClosed<TEventName extends WebhookEventName>(
+	args: EventHandlerArgs<TEventName>,
+): EventHandlerResult {
 	if (
 		!args.deps.ensureWebhookEvent(args.event, "pull_request.closed") ||
 		args.trigger.configuration.event.id !== "github.pull_request.closed"
@@ -217,7 +217,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 	const deps = { ...args.deps };
 
 	for (const handler of eventHandlers) {
-		const result = await handler({
+		const result = handler({
 			...args,
 			authConfig,
 			deps,

@@ -34,7 +34,7 @@ export function RepositoryItem({
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
-	const handleDelete = async () => {
+	const handleDelete = () => {
 		startTransition(async () => {
 			try {
 				await deleteRepositoryIndexAction(repositoryIndex.id);

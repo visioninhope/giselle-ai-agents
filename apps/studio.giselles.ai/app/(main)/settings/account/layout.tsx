@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 import { SidebarMenu } from "./sidebar-menu";
 
-export default async function SettingsAccountLayout({
+export default function SettingsAccountLayout({
 	children,
 }: { children: ReactNode }) {
 	return (

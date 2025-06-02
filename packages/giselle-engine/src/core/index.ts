@@ -16,6 +16,7 @@ import { copyFile, fetchWebPageFiles, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
+	deleteTrigger,
 	getTrigger,
 	resolveTrigger,
 	runFlow,
@@ -179,6 +180,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		setTrigger: async (args: { trigger: FlowTrigger }) =>
 			setTrigger({ ...args, context }),
+		deleteTrigger: async (args: { flowTriggerId: FlowTriggerId }) =>
+			deleteTrigger({ ...args, context }),
 		executeAction: async (args: {
 			generation: QueuedGeneration;
 		}) => executeAction({ ...args, context }),

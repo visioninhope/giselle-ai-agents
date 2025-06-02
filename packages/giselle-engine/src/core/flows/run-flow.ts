@@ -101,7 +101,7 @@ export async function runFlow(args: {
 						});
 						break;
 					default: {
-						const _exhaustiveCheck: never = operationNode.content.type;
+						const _exhaustiveCheck: never = operationNode.content;
 						throw new Error(`Unhandled operation type: ${_exhaustiveCheck}`);
 					}
 				}

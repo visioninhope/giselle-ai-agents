@@ -2,6 +2,8 @@
 
 import {
 	type ConnectionId,
+	type FailedFileData,
+	type FileContent,
 	type FileNode,
 	type Node,
 	type NodeBase,
@@ -14,6 +16,8 @@ import {
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
+	isFileNode,
+	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -21,8 +25,12 @@ import {
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
+import { isClonedFileDataPayload } from "@giselle-sdk/node-utils";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
-import { WorkflowDesigner } from "../workflow-designer";
+import {
+	type ConnectionCloneStrategy,
+	WorkflowDesigner,
+} from "../workflow-designer";
 import { usePropertiesPanel, useView } from "./state";
 
 type UploadFileFn = (
@@ -57,12 +65,19 @@ export interface WorkflowDesignerContextValue
 	) => void;
 	uploadFile: UploadFileFn;
 	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;
+	copyNode: (
+		sourceNode: Node,
+		options?: {
+			ui?: NodeUIState;
+			connectionCloneStrategy?: ConnectionCloneStrategy;
+		},
+	) => Promise<Node | undefined>;
 	fetchWebPageFiles: (args: {
 		urls: string[];
 		format: "markdown" | "html";
 		provider?: "self-made";
 	}) => Promise<WebPageFileResult[]>;
-	deleteNode: (nodeId: NodeId | string) => void;
+	deleteNode: (nodeId: NodeId | string) => Promise<void>;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 }
@@ -138,6 +153,87 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace],
 	);
 
+	const handleFileNodeCopy = useCallback(
+		async (sourceNode: Node, newNode: Node): Promise<void> => {
+			if (!isFileNode(newNode) || !isFileNode(sourceNode)) {
+				return;
+			}
+
+			const fileCopyPromises = newNode.content.files.map(
+				async (fileDataWithOriginalId) => {
+					if (!isClonedFileDataPayload(fileDataWithOriginalId)) {
+						// Already completed file data, keep as is
+						return fileDataWithOriginalId;
+					}
+
+					const { originalFileIdForCopy, ...newFileData } =
+						fileDataWithOriginalId;
+
+					if (originalFileIdForCopy) {
+						try {
+							await client.copyFile({
+								workspaceId: data.id,
+								sourceFileId: originalFileIdForCopy,
+								destinationFileId: newFileData.id,
+							});
+
+							return newFileData;
+						} catch (error) {
+							console.error(
+								`Failed to copy file for new fileId ${newFileData.id} (source: ${originalFileIdForCopy}):`,
+								error,
+							);
+
+							return {
+								...newFileData,
+								status: "failed",
+								errorMessage:
+									error instanceof Error ? error.message : "Unknown error",
+							} as FailedFileData;
+						}
+					}
+
+					return newFileData;
+				},
+			);
+
+			const resolvedFiles = await Promise.all(fileCopyPromises);
+			const newContentForNode: FileContent = {
+				...newNode.content,
+				files: resolvedFiles,
+			};
+
+			workflowDesignerRef.current.updateNodeData(newNode, {
+				content: newContentForNode,
+			});
+
+			setAndSaveWorkspace();
+		},
+		[client, data.id, setAndSaveWorkspace],
+	);
+
+	const copyNode = useCallback(
+		async (
+			sourceNode: Node,
+			options?: {
+				ui?: NodeUIState;
+				connectionCloneStrategy?: ConnectionCloneStrategy;
+			},
+		): Promise<Node | undefined> => {
+			const newNodeDefinition = workflowDesignerRef.current.copyNode(
+				sourceNode,
+				options,
+			);
+			if (!newNodeDefinition) {
+				return undefined;
+			}
+			setAndSaveWorkspace();
+			await handleFileNodeCopy(sourceNode, newNodeDefinition);
+			return newNodeDefinition;
+		},
+		[setAndSaveWorkspace, handleFileNodeCopy],
+	);
+
 	const updateNodeData = useCallback(
 		<T extends NodeBase>(node: T, data: Partial<T>) => {
 			workflowDesignerRef.current.updateNodeData(node, data);
@@ -207,11 +303,24 @@ export function WorkflowDesignerProvider({
 	);
 
 	const deleteNode = useCallback(
-		(nodeId: NodeId | string) => {
-			workflowDesignerRef.current.deleteNode(nodeId);
+		async (nodeId: NodeId | string) => {
+			const deletedNode = workflowDesignerRef.current.deleteNode(nodeId);
+			if (
+				deletedNode &&
+				isTriggerNode(deletedNode) &&
+				deletedNode.content.state.status === "configured"
+			) {
+				try {
+					await client.deleteTrigger({
+						flowTriggerId: deletedNode.content.state.flowTriggerId,
+					});
+				} catch (error) {
+					console.error("Failed to delete trigger", error);
+				}
+			}
 			setAndSaveWorkspace();
 		},
-		[setAndSaveWorkspace],
+		[setAndSaveWorkspace, client],
 	);
 
 	const deleteConnection = useCallback(
@@ -327,6 +436,7 @@ export function WorkflowDesignerProvider({
 				data: workspace,
 				textGenerationApi,
 				addNode,
+				copyNode,
 				addConnection,
 				updateNodeData,
 				updateNodeDataContent,

@@ -3,6 +3,7 @@ import {
 	type ConnectionId,
 	type Job,
 	JobId,
+	Node,
 	type NodeId,
 	type NodeLike,
 	type Operation,
@@ -250,7 +251,12 @@ export function createJobMap(
 					// For each input connection, find the corresponding source node
 					if (inputConnections.length > 0) {
 						const sourceNodeId = inputConnections[0].outputNode.id;
-						return nodeArray.find((n) => n.id === sourceNodeId);
+						const node = nodeArray.find((n) => n.id === sourceNodeId);
+						const parseResult = Node.safeParse(node);
+						if (parseResult.success) {
+							return parseResult.data;
+						}
+						return undefined;
 					}
 					return undefined;
 				})

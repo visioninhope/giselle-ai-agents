@@ -258,7 +258,7 @@ function Installed({
 	});
 	const { updateNodeData } = useWorkflowDesigner();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-		async (e) => {
+		(e) => {
 			e.preventDefault();
 			if (step.state !== "select-action") {
 				throw new Error("Unexpected state");
