@@ -1,14 +1,7 @@
 import { Button } from "@/components/ui/button";
-import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
-export default async function Page() {
-	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
-	if (!isTeamInvitationViaEmail) {
-		return notFound();
-	}
-
+export default function Page() {
 	return (
 		<div className="min-h-screen flex items-center justify-center p-4">
 			<div className="flex items-center justify-center py-12">

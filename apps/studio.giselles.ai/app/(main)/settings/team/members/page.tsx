@@ -1,4 +1,3 @@
-import { teamInvitationViaEmailFlag } from "@/flags";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { Card } from "../../components/card";
 import { getCurrentUserRole, getTeamMembers } from "../actions";
@@ -24,12 +23,7 @@ export default async function TeamMembersPage() {
 		await getCurrentUserRole();
 	const { success: hasMembers, data: members } = await getTeamMembers();
 	const hasProPlan = isProPlan(team);
-	const teamInvitationViaEmailEnabled = await teamInvitationViaEmailFlag();
-
-	let invitations: Invitation[] = [];
-	if (teamInvitationViaEmailEnabled) {
-		invitations = await listInvitations();
-	}
+	const invitations = await listInvitations();
 
 	if (!hasMembers || !members) {
 		return (
@@ -80,7 +74,6 @@ export default async function TeamMembersPage() {
 				</h3>
 				{hasProPlan && currentUserRole === "admin" && (
 					<InviteMemberDialog
-						teamInvitationViaEmailEnabled={teamInvitationViaEmailEnabled}
 						memberEmails={members
 							.map((member) => member.email)
 							.filter((email) => email != null)}

@@ -40,19 +40,6 @@ export const githubToolsFlag = flag<boolean>({
 	],
 });
 
-export const teamInvitationViaEmailFlag = flag<boolean>({
-	key: "teamInvitationViaEmail",
-	decide() {
-		return true;
-	},
-	description: "Enable team invitation via email",
-	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const flowNodeFlag = flag<boolean>({
 	key: "flow-node",
 	async decide() {

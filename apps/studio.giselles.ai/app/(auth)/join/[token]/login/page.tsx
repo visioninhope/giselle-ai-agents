@@ -1,4 +1,3 @@
-import { teamInvitationViaEmailFlag } from "@/flags";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { LegalConsent } from "../../../components/legal-consent";
@@ -10,10 +9,6 @@ export default async function Page({
 	params,
 }: { params: Promise<{ token: string }> }) {
 	const { token } = await params;
-	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
-	if (!isTeamInvitationViaEmail) {
-		return notFound();
-	}
 
 	const tokenObj = await fetchInvitationToken(token);
 	if (!tokenObj) {

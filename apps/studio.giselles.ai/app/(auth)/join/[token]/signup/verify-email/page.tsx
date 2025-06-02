@@ -1,4 +1,3 @@
-import { teamInvitationViaEmailFlag } from "@/flags";
 import { notFound, redirect } from "next/navigation";
 import { fetchInvitationToken } from "../../invitation";
 import { JoinVerifyForm } from "./form";
@@ -8,11 +7,6 @@ export default async function Page({
 }: {
 	params: Promise<{ token: string }>;
 }) {
-	const isTeamInvitationViaEmail = await teamInvitationViaEmailFlag();
-	if (!isTeamInvitationViaEmail) {
-		return notFound();
-	}
-
 	const { token } = await params;
 	const tokenObj = await fetchInvitationToken(token);
 	if (!tokenObj) {
