@@ -8,6 +8,7 @@ import {
 	type WebhookEvent,
 	ensureWebhookEvent,
 	getPullRequestDiff,
+	getPullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
 import { parseCommand } from "./utils";
 
@@ -473,9 +474,9 @@ function resolvePullRequestCommentTrigger(
 	return null;
 }
 
-function resolvePullRequestReviewCommentTrigger(
+async function resolvePullRequestReviewCommentTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+) {
 	if (
 		!ensureWebhookEvent(
 			args.webhookEvent,
@@ -553,15 +554,35 @@ function resolvePullRequestReviewCommentTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.comment.id.toString(),
 				} satisfies GenerationOutput;
-			case "previousCommentBody":
+			case "previousCommentBody": {
 				if (args.output.accessor !== payload) {
 					continue;
 				}
+				if (
+					args.webhookEvent.data.payload.comment.in_reply_to_id === undefined
+				) {
+					return {
+						type: "generated-text",
+						outputId: args.output.id,
+						content: "",
+					} satisfies GenerationOutput;
+				}
+				const comment = await getPullRequestReviewComment({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					commentId: args.webhookEvent.data.payload.comment.in_reply_to_id,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
 				return {
 					type: "generated-text",
 					outputId: args.output.id,
-					content: "todo",
+					content: comment.body,
 				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
