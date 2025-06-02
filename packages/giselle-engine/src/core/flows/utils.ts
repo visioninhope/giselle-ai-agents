@@ -34,6 +34,9 @@ export async function getFlowTrigger({
 			bypassingCache: true,
 		},
 	);
+	if (unsafe === null) {
+		return undefined;
+	}
 
 	return FlowTrigger.parse(unsafe);
 }
