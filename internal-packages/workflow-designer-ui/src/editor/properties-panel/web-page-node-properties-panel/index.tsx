@@ -31,6 +31,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 				return;
 			}
 
+			e.currentTarget.reset();
 			let webpages: WebPage[] = node.content.webpages;
 			startTransition(async () => {
 				await Promise.all(
