@@ -15,11 +15,18 @@ import {
 	Capability,
 	type LanguageModel,
 	hasCapability,
-	hasTierAccess,
 	languageModels,
 } from "@giselle-sdk/language-model";
 import {
 	actionNodeDefaultName,
+	createActionNode,
+	createFileNode,
+	createImageGenerationNode,
+	createQueryNode,
+	createTextGenerationNode,
+	createTextNode,
+	createTriggerNode,
+	createVectorStoreNode,
 	triggerNodeDefaultName,
 } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
@@ -66,22 +73,14 @@ import {
 	getAvailableModels,
 } from "./model-components";
 import {
-	actionNode,
 	addNodeTool,
-	fileNode,
-	imageGenerationNode,
-	queryNode,
 	selectActionTool,
 	selectFileNodeCategoryTool,
 	selectLanguageModelTool,
 	selectRetrievalCategoryTool,
 	selectSourceCategoryTool,
 	selectTriggerTool,
-	textGenerationNode,
-	textNode,
-	triggerNode,
 	useToolbar,
-	vectorStoreNode,
 } from "./state";
 
 export function Toolbar() {
@@ -93,12 +92,6 @@ export function Toolbar() {
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
 	const { flowNode, webPageFileNode, githubVectorStore } = useFeatureFlag();
-	const languageModelAvailable = (languageModel: LanguageModel) => {
-		if (limits === undefined) {
-			return true;
-		}
-		return hasTierAccess(languageModel, limits.featureTier);
-	};
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -174,12 +167,14 @@ export function Toolbar() {
 					};
 
 					if (isTextGenerationLanguageModelData(languageModelData)) {
-						setSelectedTool(addNodeTool(textGenerationNode(languageModelData)));
+						setSelectedTool(
+							addNodeTool(createTextGenerationNode(languageModelData)),
+						);
 					}
 
 					if (isImageGenerationLanguageModelData(languageModelData)) {
 						setSelectedTool(
-							addNodeTool(imageGenerationNode(languageModelData)),
+							addNodeTool(createImageGenerationNode(languageModelData)),
 						);
 					}
 				}}
@@ -288,7 +283,7 @@ export function Toolbar() {
 														onValueChange={(value) => {
 															setSelectedTool(
 																addNodeTool(
-																	triggerNode(value as TriggerProvider),
+																	createTriggerNode(value as TriggerProvider),
 																),
 															);
 														}}
@@ -352,7 +347,7 @@ export function Toolbar() {
 														onValueChange={(value) => {
 															setSelectedTool(
 																addNodeTool(
-																	actionNode(value as ActionProvider),
+																	createActionNode(value as ActionProvider),
 																),
 															);
 														}}
@@ -527,7 +522,9 @@ export function Toolbar() {
 																	) {
 																		setSelectedTool(
 																			addNodeTool(
-																				textGenerationNode(languageModelData),
+																				createTextGenerationNode(
+																					languageModelData,
+																				),
 																			),
 																		);
 																	}
@@ -539,7 +536,9 @@ export function Toolbar() {
 																	) {
 																		setSelectedTool(
 																			addNodeTool(
-																				imageGenerationNode(languageModelData),
+																				createImageGenerationNode(
+																					languageModelData,
+																				),
 																			),
 																		);
 																	}
@@ -876,7 +875,7 @@ export function Toolbar() {
 													onValueChange={(sourceType) => {
 														switch (sourceType) {
 															case "query":
-																setSelectedTool(addNodeTool(queryNode()));
+																setSelectedTool(addNodeTool(createQueryNode()));
 																break;
 														}
 													}}
@@ -926,10 +925,10 @@ export function Toolbar() {
 												)}
 												onValueChange={(sourceType) => {
 													if (sourceType === "text") {
-														setSelectedTool(addNodeTool(textNode()));
+														setSelectedTool(addNodeTool(createTextNode()));
 													} else if (sourceType === "githubVectorStore") {
 														setSelectedTool(
-															addNodeTool(vectorStoreNode("github")),
+															addNodeTool(createVectorStoreNode("github")),
 														);
 													}
 												}}
@@ -984,7 +983,7 @@ export function Toolbar() {
 												onValueChange={(fileCategory) => {
 													setSelectedTool(
 														addNodeTool(
-															fileNode(FileCategory.parse(fileCategory)),
+															createFileNode(FileCategory.parse(fileCategory)),
 														),
 													);
 												}}
