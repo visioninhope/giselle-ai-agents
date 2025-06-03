@@ -255,6 +255,7 @@ export async function generateText(args: {
 								traceName: "ai.streamText",
 								spanName: "ai.streamText",
 								generationName: "ai.streamText.doStream",
+								unit: "TOKENS",
 							});
 						} catch (error) {
 							console.error("Telemetry emission failed:", error);

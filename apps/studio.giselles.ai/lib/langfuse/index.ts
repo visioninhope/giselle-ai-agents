@@ -9,13 +9,24 @@ import type { AttributeValue } from "@opentelemetry/api";
 import type { ToolSet } from "ai";
 import { Langfuse } from "langfuse";
 
-export type UsageUnit =
-	| "CHARACTERS"
-	| "TOKENS"
-	| "MILLISECONDS"
-	| "SECONDS"
-	| "IMAGES"
-	| "REQUESTS";
+export const USAGE_UNITS = [
+	"CHARACTERS",
+	"TOKENS",
+	"MILLISECONDS",
+	"SECONDS",
+	"IMAGES",
+	"REQUESTS",
+] as const;
+
+type ValidUsageUnit = (typeof USAGE_UNITS)[number];
+
+function validateUsageUnit(unit: string): ValidUsageUnit {
+	const normalizedUnit = unit.toUpperCase();
+	if (USAGE_UNITS.includes(normalizedUnit as ValidUsageUnit)) {
+		return normalizedUnit as ValidUsageUnit;
+	}
+	return "TOKENS";
+}
 
 export type LLMUsage = {
 	input: number;
@@ -24,7 +35,7 @@ export type LLMUsage = {
 	inputCost: number;
 	outputCost: number;
 	totalCost: number;
-	unit: UsageUnit;
+	unit: string;
 };
 
 export class LangfuseSpan implements LLMSpan {
@@ -146,6 +157,7 @@ export class LangfuseTracer implements LLMTracer {
 		traceName?: string;
 		spanName?: string;
 		generationName?: string;
+		unit: string;
 	}): Promise<void> {
 		try {
 			const metadata: Record<
@@ -210,6 +222,7 @@ export class LangfuseTracer implements LLMTracer {
 					modelParameters[key] = String(value);
 				}
 			}
+
 			const displayCost = await calculateDisplayCost(
 				args.provider,
 				args.modelId,
@@ -228,7 +241,7 @@ export class LangfuseTracer implements LLMTracer {
 					inputCost: displayCost.inputCostForDisplay ?? 0,
 					outputCost: displayCost.outputCostForDisplay ?? 0,
 					totalCost: displayCost.totalCostForDisplay ?? 0,
-					unit: "TOKENS",
+					unit: validateUsageUnit(args.unit),
 				},
 				startTime: new Date(args.runningGeneration.createdAt),
 				completionStartTime: new Date(args.runningGeneration.startedAt),

@@ -70,6 +70,7 @@ export type LLMTrace = {
 		endTime: Date;
 		output: string;
 		usage: LLMUsage;
+		unit: string;
 	}) => LLMGeneration;
 };
 
@@ -91,5 +92,6 @@ export interface LLMTracer {
 		traceName: string;
 		spanName: string;
 		generationName: string;
+		unit: string;
 	}) => Promise<void>;
 }
