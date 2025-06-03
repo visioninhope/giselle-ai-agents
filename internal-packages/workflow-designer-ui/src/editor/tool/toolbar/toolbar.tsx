@@ -932,6 +932,8 @@ export function Toolbar() {
 														setSelectedTool(
 															addNodeTool(vectorStoreNode("github")),
 														);
+													} else if (sourceType === "webPage") {
+														setSelectedTool(addNodeTool(webPageNode()));
 													}
 												}}
 											>
@@ -943,6 +945,12 @@ export function Toolbar() {
 													<ToggleGroup.Item value="githubVectorStore" data-tool>
 														<GitHubIcon className="w-[20px] h-[20px]" />
 														<p className="text-[14px]">GitHub Vector Store</p>
+													</ToggleGroup.Item>
+												)}
+												{webPageFileNode && (
+													<ToggleGroup.Item value="webPage" data-tool>
+														<WebPageFileIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Web Page</p>
 													</ToggleGroup.Item>
 												)}
 											</ToggleGroup.Root>
@@ -1013,16 +1021,6 @@ export function Toolbar() {
 							</Popover.Root>
 						)}
 					</ToggleGroup.Item>
-					{webPageFileNode && (
-						<ToggleGroup.Item
-							value="webPageNode"
-							data-tool
-							onClick={() => setSelectedTool(addNodeTool(webPageNode()))}
-						>
-							<WebPageFileIcon className="w-[20px] h-[20px]" />
-							<p className="text-[14px]">Web Page</p>
-						</ToggleGroup.Item>
-					)}
 					<ToggleGroup.Item
 						value="agent"
 						data-tool
