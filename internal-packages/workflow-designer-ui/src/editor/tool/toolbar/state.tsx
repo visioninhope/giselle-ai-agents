@@ -160,20 +160,5 @@ export function vectorStoreNode(
 }
 
 export function webPageNode() {
-	return {
-		id: NodeId.generate(),
-		type: "variable",
-		content: {
-			type: "webPage",
-			webpages: [],
-		},
-		inputs: [],
-		outputs: [
-			{
-				id: OutputId.generate(),
-				label: "Output",
-				accessor: "web-page",
-			},
-		],
-	} satisfies WebPageNode;
+	return nodeFactories.create("webPage");
 }
