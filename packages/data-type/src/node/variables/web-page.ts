@@ -1,19 +1,36 @@
+import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
+import { FileId } from "./file";
 
-export const WebPageProvider = z.enum(["fetch", "exa"]);
-export type WebPageProvider = z.infer<typeof WebPageProvider>;
+export const WebPageId = createIdGenerator("wbpg");
+const WebPageBase = z.object({
+	id: WebPageId.schema,
+	url: z.url(),
+	status: z.string(),
+});
 
-export const WebPageParseMethod = z.enum(["html", "json"]);
-export type WebPageParseMethod = z.infer<typeof WebPageParseMethod>;
+export const FetchingWebPage = WebPageBase.extend({
+	status: z.literal("fetching"),
+});
+export type FetchingWebPage = z.infer<typeof FetchingWebPage>;
+
+const FetchedWebPage = WebPageBase.extend({
+	status: z.literal("fetched"),
+	favicon: z.string(),
+	title: z.string(),
+	fileId: FileId.schema,
+});
+export type FetchedWebPage = z.infer<typeof FetchedWebPage>;
+
+export const WebPage = z.discriminatedUnion("status", [
+	FetchingWebPage,
+	FetchedWebPage,
+]);
+export type WebPage = z.infer<typeof WebPage>;
 
 export const WebPageContent = z.object({
 	type: z.literal("webPage"),
-	url: z.string(),
-	provider: WebPageProvider.default("fetch"),
-	parse: WebPageParseMethod.default("html"),
-	title: z.string().optional(),
-	contentType: z.string().optional(),
-	content: z.string().optional(),
+	webpages: z.array(WebPage),
 });
 export type WebPageContent = z.infer<typeof WebPageContent>;
 
@@ -21,11 +38,3 @@ export const WebPageContentReference = z.object({
 	type: WebPageContent.shape.type,
 });
 export type WebPageContentReference = z.infer<typeof WebPageContentReference>;
-
-export const WebPageFileResult = z.object({
-	url: z.string(),
-	title: z.string().optional(),
-	contentType: z.string().optional(),
-	content: z.string(),
-});
-export type WebPageFileResult = z.infer<typeof WebPageFileResult>;

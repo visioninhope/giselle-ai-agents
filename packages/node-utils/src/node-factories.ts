@@ -551,9 +551,7 @@ const webPageFactoryImpl = {
 		type: "variable",
 		content: {
 			type: "webPage",
-			url: "",
-			provider: "fetch",
-			parse: "html",
+			webpages: [],
 		},
 		inputs: [],
 		outputs: [

@@ -165,9 +165,7 @@ export function webPageNode() {
 		type: "variable",
 		content: {
 			type: "webPage",
-			url: "",
-			provider: "fetch",
-			parse: "html",
+			webpages: [],
 		},
 		inputs: [],
 		outputs: [
