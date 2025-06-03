@@ -27,6 +27,7 @@ import {
 	createTextNode,
 	createTriggerNode,
 	createVectorStoreNode,
+	createWebPageNode,
 	triggerNodeDefaultName,
 } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
@@ -931,7 +932,7 @@ export function Toolbar() {
 															addNodeTool(createVectorStoreNode("github")),
 														);
 													} else if (sourceType === "webPage") {
-														setSelectedTool(addNodeTool(webPageNode()));
+														setSelectedTool(addNodeTool(createWebPageNode()));
 													}
 												}}
 											>

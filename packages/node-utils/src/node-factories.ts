@@ -661,6 +661,10 @@ export function createVectorStoreNode(
 	return vectorStoreFactoryImpl.create(provider);
 }
 
+export function createWebPageNode(): WebPageNode {
+	return webPageFactoryImpl.create();
+}
+
 export function cloneNode<N extends Node>(
 	sourceNode: N,
 ): NodeFactoryCloneResult<N> {
@@ -782,7 +786,7 @@ export const nodeFactories = {
 				return factoryImplementations.webPage.create();
 			default: {
 				const _exhaustive: never = type;
-				throw new Error(`No create factory for content type: ${type}`);
+				throw new Error(`No create factory for content type: ${_exhaustive}`);
 			}
 		}
 	},
@@ -841,7 +845,7 @@ export const nodeFactories = {
 				break;
 			default: {
 				const _exhaustive: never = contentType;
-				throw new Error(`No clone factory for content type: ${contentType}`);
+				throw new Error(`No clone factory for content type: ${_exhaustive}`);
 			}
 		}
 
