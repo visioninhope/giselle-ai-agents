@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1054 MIT
+* 1058 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -6590,6 +6590,17 @@ CC-BY-4.0 permitted
 
 
 
+<a name="defuddle"></a>
+### defuddle v0.6.4
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="degenerator"></a>
 ### degenerator v5.0.1
 #### 
@@ -7868,6 +7879,17 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="handlebars"></a>
 ### handlebars v4.7.8
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="happy-dom"></a>
+### happy-dom v17.6.1
 #### 
 
 ##### Paths
@@ -9441,6 +9463,17 @@ BlueOak-1.0.0 permitted
 
 <a name="math-intrinsics"></a>
 ### math-intrinsics v1.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="mathml-to-latex"></a>
+### mathml-to-latex v1.5.0
 #### 
 
 ##### Paths
@@ -12897,6 +12930,17 @@ Unknown manually approved
 
 
 
+<a name="temml"></a>
+### temml v0.11.7
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="term-size"></a>
 ### term-size v2.2.1
 #### 
@@ -14024,7 +14068,7 @@ Unknown manually approved
 
 
 <a name="whatwg-mimetype"></a>
-### whatwg-mimetype v4.0.0
+### whatwg-mimetype v3.0.0
 #### 
 
 ##### Paths
