@@ -17,18 +17,19 @@ export function KeyboardShortcuts() {
 
 	useEffect(() => {
 		const handleKeyDown = (event: KeyboardEvent) => {
-			if ((event.metaKey || event.ctrlKey) && event.key === "d") {
-				event.preventDefault();
-				duplicateNode();
+			const activeElement = document.activeElement as HTMLElement | null;
+
+			if (
+				activeElement &&
+				(ignoredTags.includes(activeElement.tagName) ||
+					activeElement.isContentEditable)
+			) {
 				return;
 			}
 
-			const activeElement = document.activeElement;
-
-			if (
-				ignoredTags.includes(activeElement?.tagName ?? "") ||
-				activeElement?.getAttribute("contenteditable") === "true"
-			) {
+			if ((event.metaKey || event.ctrlKey) && event.key === "d") {
+				event.preventDefault();
+				duplicateNode();
 				return;
 			}
 			switch (event.key) {

@@ -1,15 +1,6 @@
 "use client";
 
-import type {
-	FileCategory,
-	ImageGenerationLanguageModelData,
-	Node,
-	TextGenerationLanguageModelData,
-	VectorStoreContent,
-	VectorStoreNode,
-	WebPageNode,
-} from "@giselle-sdk/data-type";
-import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
+import type { Node, VectorStoreContent } from "@giselle-sdk/data-type";
 import { nodeFactories } from "@giselle-sdk/node-utils";
 import { type ReactNode, createContext, useContext, useState } from "react";
 import type {
@@ -102,34 +93,6 @@ export function selectRetrievalCategoryTool() {
 		action: "selectRetrievalCategory",
 		category: "edit",
 	} satisfies SelectRetrievalCategoryTool;
-}
-
-export function textNode() {
-	return nodeFactories.create("text");
-}
-
-export function queryNode() {
-	return nodeFactories.create("query");
-}
-
-export function triggerNode(triggerProvider: TriggerProvider) {
-	return nodeFactories.create("trigger", triggerProvider);
-}
-
-export function actionNode(actionProvider: ActionProvider) {
-	return nodeFactories.create("action", actionProvider);
-}
-
-export function fileNode(category: FileCategory) {
-	return nodeFactories.create("file", category);
-}
-
-export function textGenerationNode(llm: TextGenerationLanguageModelData) {
-	return nodeFactories.create("textGeneration", llm);
-}
-
-export function imageGenerationNode(llm: ImageGenerationLanguageModelData) {
-	return nodeFactories.create("imageGeneration", llm);
 }
 
 export function selectSourceCategoryTool() {

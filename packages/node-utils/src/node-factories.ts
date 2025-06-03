@@ -112,7 +112,7 @@ function cloneAndRenewInputIdsWithMap(
 }
 
 // --- Node Factory Interface and Result Type ---
-interface NodeFactoryCloneResult<N extends Node> {
+export interface NodeFactoryCloneResult<N extends Node> {
 	newNode: N;
 	inputIdMap: InputIdMap;
 	outputIdMap: OutputIdMap;
@@ -614,6 +614,125 @@ const nodeTypesRequiringArg = (
 ).filter(
 	(type) => factoryImplementations[type].create.length > 0,
 ) as NodeContentType[];
+
+export function createTextGenerationNode(
+	llm: TextGenerationContent["llm"],
+): TextGenerationNode {
+	return textGenerationFactoryImpl.create(llm);
+}
+
+export function createImageGenerationNode(
+	llm: ImageGenerationContent["llm"],
+): ImageGenerationNode {
+	return imageGenerationFactoryImpl.create(llm);
+}
+
+export function createTriggerNode(
+	provider: TriggerContent["provider"],
+): TriggerNode {
+	return triggerFactoryImpl.create(provider);
+}
+
+export function createActionNode(provider: ActionProvider): ActionNode {
+	return actionFactoryImpl.create(provider);
+}
+
+export function createQueryNode(): QueryNode {
+	return queryFactoryImpl.create();
+}
+
+export function createTextNode(): TextNode {
+	return textVariableFactoryImpl.create();
+}
+
+export function createFileNode(category: FileContent["category"]): FileNode {
+	return fileVariableFactoryImpl.create(category);
+}
+
+export function createGitHubNode(
+	objectReferences: GitHubContent["objectReferences"] = [],
+): GitHubNode {
+	return githubVariableFactoryImpl.create(objectReferences);
+}
+
+export function createVectorStoreNode(
+	provider: VectorStoreContent["source"]["provider"],
+): VectorStoreNode {
+	return vectorStoreFactoryImpl.create(provider);
+}
+
+export function cloneNode<N extends Node>(
+	sourceNode: N,
+): NodeFactoryCloneResult<N> {
+	const contentType = sourceNode.content.type;
+	switch (contentType) {
+		case "textGeneration":
+			if (isTextGenerationNode(sourceNode)) {
+				return textGenerationFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "imageGeneration":
+			if (isImageGenerationNode(sourceNode)) {
+				return imageGenerationFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "trigger":
+			if (isTriggerNode(sourceNode)) {
+				return triggerFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "action":
+			if (isActionNode(sourceNode)) {
+				return actionFactoryImpl.clone(sourceNode) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "query":
+			if (isQueryNode(sourceNode)) {
+				return queryFactoryImpl.clone(sourceNode) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "text":
+			if (isTextNode(sourceNode)) {
+				return textVariableFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "file":
+			if (isFileNode(sourceNode)) {
+				return fileVariableFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "github":
+			if (isGitHubNode(sourceNode)) {
+				return githubVariableFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		case "vectorStore":
+			if (isVectorStoreNode(sourceNode)) {
+				return vectorStoreFactoryImpl.clone(
+					sourceNode,
+				) as NodeFactoryCloneResult<N>;
+			}
+			break;
+		default: {
+			const _exhaustive: never = contentType;
+			throw new Error(`No clone factory for content type: ${contentType}`);
+		}
+	}
+
+	throw new Error(`Invalid node structure for content type: ${contentType}`);
+}
 
 export const nodeFactories = {
 	create: <K extends NodeContentType>(type: K, arg?: CreateArgMap[K]) => {
