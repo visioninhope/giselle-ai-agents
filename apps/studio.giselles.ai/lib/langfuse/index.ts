@@ -248,7 +248,7 @@ export class LangfuseTracer implements LLMTracer {
 				endTime: new Date(args.completedGeneration.completedAt),
 			});
 
-			await this.langfuse.shutdownAsync();
+			await this.langfuse.flushAsync();
 		} catch (error) {
 			console.error("Telemetry emission failed:", error);
 		}
