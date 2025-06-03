@@ -78,6 +78,7 @@ export function useConnectedSources(node: ImageGenerationNode) {
 							break;
 
 						case "vectorStore":
+						case "webPage":
 						case "github":
 							throw new Error("vectore store can not be connected");
 						default: {

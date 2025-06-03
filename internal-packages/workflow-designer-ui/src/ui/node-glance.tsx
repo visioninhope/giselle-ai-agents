@@ -31,6 +31,7 @@ export function NodeGlance({
 				}
 				return node.name ?? node.content.llm.id;
 			case "file":
+			case "webPage":
 			case "text":
 			case "github":
 			case "trigger":
@@ -75,6 +76,7 @@ export function NodeGlance({
 				}
 			}
 			case "file":
+			case "webPage":
 			case "text":
 			case "github":
 			case "trigger":

@@ -156,8 +156,6 @@ export function NodeIcon({
 							return <TextFileIcon {...props} data-content-type-icon />;
 						case "image":
 							return <PictureIcon {...props} data-content-type-icon />;
-						case "webPage":
-							return <WebPageFileIcon {...props} data-content-type-icon />;
 						default: {
 							const _exhaustiveCheck: never = node.content.category;
 							throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);

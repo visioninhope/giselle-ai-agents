@@ -532,6 +532,8 @@ export function InputPanel({
 									throw new Error(
 										"vectorStore node is not supported to connect.",
 									);
+								case "webPage":
+									throw new Error("webPage node is not supported to connect.");
 								default: {
 									const _exhaustiveCheck: never = source.node.content;
 									throw new Error(`Unhandled source type: ${_exhaustiveCheck}`);

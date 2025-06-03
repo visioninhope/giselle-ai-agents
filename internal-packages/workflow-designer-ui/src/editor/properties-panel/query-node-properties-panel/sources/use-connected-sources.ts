@@ -89,6 +89,7 @@ export function useConnectedSources(node: QueryNode) {
 							});
 							break;
 						case "file":
+						case "webPage":
 							break;
 						default: {
 							const _exhaustiveCheck: never = node.content.type;
