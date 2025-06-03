@@ -15,8 +15,10 @@ export async function addWebPage(args: {
 	context: GiselleEngineContext;
 }) {
 	const search = webSearch({ provider: args.provider ?? "self-made" });
-	const result = await search.fetchUrl(args.webpage.url);
-	const file = new File([result.html], "webpage.html", { type: "text/html" });
+	const result = await search.fetchUrl(args.webpage.url, ["markdown"]);
+	const file = new File([result.markdown], "webpage.md", {
+		type: "text/markdown",
+	});
 
 	const fileId = FileId.generate();
 
@@ -28,7 +30,7 @@ export async function addWebPage(args: {
 		}),
 		file,
 		{
-			contentType: "text/html",
+			contentType: "text/markdown",
 		},
 	);
 	const webpage: FetchedWebPage = {
