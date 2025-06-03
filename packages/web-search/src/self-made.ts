@@ -1,3 +1,5 @@
+import { Defuddle } from "defuddle/node";
+import { Window } from "happy-dom";
 import TurndownService from "turndown";
 import { z } from "zod";
 
@@ -54,7 +56,12 @@ export async function scrapeUrl(
 
 	let markdown = "";
 	if (formats.includes("markdown")) {
-		markdown = turndownService.turndown(html);
+		const window = new Window({ url });
+		window.document.body.innerHTML = html;
+		const result = await Defuddle(window, url, {
+			markdown: true,
+		});
+		markdown = result.content;
 	}
 
 	return {
