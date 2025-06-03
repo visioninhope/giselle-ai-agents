@@ -203,7 +203,6 @@ export class LangfuseTracer implements LLMTracer {
 					typeof value === "string" ||
 					typeof value === "number" ||
 					typeof value === "boolean" ||
-					Array.isArray(value) ||
 					value === null ||
 					value === undefined
 				) {
@@ -211,13 +210,12 @@ export class LangfuseTracer implements LLMTracer {
 						| string
 						| number
 						| boolean
-						| string[]
 						| null
 						| undefined;
 				} else if (Array.isArray(value)) {
-					modelParameters[key] = (value as unknown[]).filter(
-						(v) => typeof v === "string",
-					) as string[];
+					modelParameters[key] = value.filter(
+						(v): v is string => typeof v === "string",
+					);
 				} else {
 					modelParameters[key] = String(value);
 				}
