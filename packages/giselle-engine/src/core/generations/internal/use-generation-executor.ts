@@ -1,6 +1,7 @@
 import {
 	type CompletedGeneration,
 	type FileData,
+	type FileId,
 	type Generation,
 	GenerationContext,
 	type GenerationOutput,
@@ -33,7 +34,7 @@ export async function useGenerationExecutor<T>(args: {
 		runningGeneration: RunningGeneration;
 		generationContext: GenerationContext;
 		setGeneration: (generation: Generation) => Promise<void>;
-		fileResolver: (file: FileData) => Promise<DataContent>;
+		fileResolver: (fileId: FileId) => Promise<DataContent>;
 		generationContentResolver: (
 			nodeId: NodeId,
 			outputId: OutputId,
@@ -94,11 +95,11 @@ export async function useGenerationExecutor<T>(args: {
 		await setGeneration(failedGeneration);
 		throw new UsageLimitError(usageLimitStatus.error);
 	}
-	async function fileResolver(file: FileData): Promise<DataContent> {
+	async function fileResolver(fileId: FileId): Promise<DataContent> {
 		const blob = await args.context.storage.getItemRaw(
 			filePath({
 				...runningGeneration.context.origin,
-				fileId: file.id,
+				fileId,
 			}),
 		);
 		if (blob === undefined) {
