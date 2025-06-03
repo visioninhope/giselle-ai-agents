@@ -734,7 +734,7 @@ export function cloneNode<N extends Node>(
 			break;
 		default: {
 			const _exhaustive: never = contentType;
-			throw new Error(`No clone factory for content type: ${contentType}`);
+			throw new Error(`No clone factory for content type: ${_exhaustive}`);
 		}
 	}
 
