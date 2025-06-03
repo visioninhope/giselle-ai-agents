@@ -71,7 +71,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 			/>
 			<PropertiesPanelContent>
 				<div>
-					<ul>
+					<ul className="flex flex-col gap-[8px]">
 						{node.content.webpages.map((webpage) => (
 							<li
 								key={webpage.id}
@@ -93,6 +93,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 							</li>
 						))}
 					</ul>
+
 					<form
 						className="p-[4px] flex flex-col gap-[8px]"
 						onSubmit={handleSubmit}
