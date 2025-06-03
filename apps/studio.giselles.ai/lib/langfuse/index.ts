@@ -2,6 +2,7 @@ import type {
 	CompletedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
+import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import type { LLMGeneration, LLMSpan, LLMTracer } from "@giselle-sdk/telemetry";
 import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import type { AttributeValue } from "@opentelemetry/api";
@@ -209,13 +210,26 @@ export class LangfuseTracer implements LLMTracer {
 					modelParameters[key] = String(value);
 				}
 			}
+			const displayCost = await calculateDisplayCost(
+				args.provider,
+				args.modelId,
+				args.tokenUsage,
+			);
 
 			span.generation({
 				name: args.generationName ?? "llm-generation",
 				model: args.modelId,
 				modelParameters,
 				input: args.messages,
-				usage: args.completedGeneration.usage,
+				usage: {
+					input: args.tokenUsage.promptTokens,
+					output: args.tokenUsage.completionTokens,
+					total: args.tokenUsage.totalTokens,
+					inputCost: displayCost.inputCostForDisplay ?? 0,
+					outputCost: displayCost.outputCostForDisplay ?? 0,
+					totalCost: displayCost.totalCostForDisplay ?? 0,
+					unit: "TOKENS",
+				},
 				startTime: new Date(args.runningGeneration.createdAt),
 				completionStartTime: new Date(args.runningGeneration.startedAt),
 				metadata,

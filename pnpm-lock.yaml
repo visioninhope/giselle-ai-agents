@@ -327,6 +327,9 @@ importers:
       '@giselle-sdk/integration':
         specifier: workspace:*
         version: link:../../packages/integration
+      '@giselle-sdk/language-model':
+        specifier: workspace:*
+        version: link:../../packages/language-model
       '@giselle-sdk/rag':
         specifier: workspace:*
         version: link:../../packages/rag
