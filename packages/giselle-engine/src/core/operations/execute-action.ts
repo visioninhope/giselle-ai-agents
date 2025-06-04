@@ -13,6 +13,8 @@ import {
 	createIssue,
 	createIssueComment,
 	createPullRequestComment,
+	getDiscussion,
+	getRepositoryFullname,
 	replyPullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
 import {
@@ -222,6 +224,29 @@ async function executeGitHubActionCommand(args: {
 				authConfig: commonAuthConfig,
 			});
 			return createActionOutput(result, args.generationContext);
+		}
+		case "github.get.discussion": {
+			const { discussionNumber } =
+				githubActions["github.get.discussion"].command.parameters.parse(inputs);
+			const repo = await getRepositoryFullname(
+				args.state.repositoryNodeId,
+				commonAuthConfig,
+			);
+			if (repo.error || repo.data === undefined) {
+				throw new Error(`Failed to get repository information: ${repo.error}`);
+			}
+			if (repo.data.node?.__typename !== "Repository") {
+				throw new Error(
+					`Invalid repository type: ${repo.data.node?.__typename}`,
+				);
+			}
+			const result = await getDiscussion({
+				owner: repo.data.node.owner.login,
+				name: repo.data.node.name,
+				number: discussionNumber,
+				authConfig: commonAuthConfig,
+			});
+			return createActionOutput(result.data, args.generationContext);
 		}
 		default: {
 			const _exhaustiveCheck: never = args.state.commandId;
