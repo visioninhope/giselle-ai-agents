@@ -65,8 +65,6 @@ export function WorkspaceProvider({
 							<GenerationRunnerSystemProvider>
 								<FeatureFlagContext
 									value={{
-										flowNode: featureFlag?.flowNode ?? false,
-										runV2: featureFlag?.runV2 ?? false,
 										githubVectorStore: featureFlag?.githubVectorStore ?? false,
 										webPageFileNode: featureFlag?.webPageFileNode ?? false,
 									}}
