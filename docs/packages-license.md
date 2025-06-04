@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1058 MIT
+* 1056 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -6964,17 +6964,6 @@ CC-BY-4.0 permitted
 
 
 
-<a name="es-set-tostringtag"></a>
-### es-set-tostringtag v2.1.0
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="esbuild"></a>
 ### esbuild v0.18.20
 #### 
@@ -7921,17 +7910,6 @@ SIL OPEN FONT LICENSE permitted
 
 
 
-<a name="has-tostringtag"></a>
-### has-tostringtag v1.0.2
-#### 
-
-##### Paths
-* /home/runner/work/giselle/giselle
-
-<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
-
-
-
 <a name="hasown"></a>
 ### hasown v2.0.2
 #### 
@@ -8857,7 +8835,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="jsdom"></a>
-### jsdom v26.0.0
+### jsdom v26.1.0
 #### 
 
 ##### Paths
@@ -10749,7 +10727,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="parse5"></a>
-### parse5 v7.2.1
+### parse5 v7.3.0
 #### 
 
 ##### Paths
