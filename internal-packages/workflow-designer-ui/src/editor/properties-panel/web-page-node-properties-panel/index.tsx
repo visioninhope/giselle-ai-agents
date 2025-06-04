@@ -17,8 +17,6 @@ import {
 export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 	const client = useGiselleEngine();
 	const { data, updateName, updateNodeDataContent } = useWorkflowDesigner();
-	// const { url, setUrl, provider, setProvider, parse, setParse } =
-	// 	useWebPageNode(node);
 	const [isPending, startTransition] = useTransition();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
