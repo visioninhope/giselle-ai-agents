@@ -1,4 +1,3 @@
-import { get } from "@vercel/edge-config";
 import { flag } from "flags/next";
 
 function takeLocalEnv(localEnvironmentKey: string) {
@@ -34,44 +33,6 @@ export const githubToolsFlag = flag<boolean>({
 	},
 	description: "Enable GitHub Tools",
 	defaultValue: false,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const flowNodeFlag = flag<boolean>({
-	key: "flow-node",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("FLOW_NODE_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return false;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable Flow Node",
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
-export const runV2Flag = flag<boolean>({
-	key: "run-v2",
-	async decide() {
-		if (process.env.NODE_ENV === "development") {
-			return takeLocalEnv("RUN_V2_FLAG");
-		}
-		const edgeConfig = await get(`flag__${this.key}`);
-		if (edgeConfig === undefined) {
-			return false;
-		}
-		return edgeConfig === true || edgeConfig === "true";
-	},
-	description: "Enable Run v2",
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },

@@ -1,8 +1,6 @@
 import { createContext, useContext } from "react";
 
 export interface FeatureFlagContextValue {
-	flowNode: boolean;
-	runV2: boolean;
 	githubVectorStore: boolean;
 	webPageFileNode: boolean;
 }

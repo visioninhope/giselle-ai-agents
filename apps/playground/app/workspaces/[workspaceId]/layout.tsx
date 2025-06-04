@@ -14,8 +14,6 @@ export default async function Layout({
 		<WorkspaceProvider
 			workspaceId={workspaceId}
 			featureFlag={{
-				flowNode: true,
-				runV2: true,
 				githubVectorStore: true,
 				webPageFileNode: true,
 			}}
