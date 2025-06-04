@@ -16,6 +16,7 @@ import {
 	useState,
 	useTransition,
 } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 import {
 	Select,
@@ -26,18 +27,33 @@ import {
 } from "../../../ui/select";
 import { GitHubRepositoryBlock } from "../trigger-node-properties-panel/ui";
 import { SelectRepository } from "../ui";
+import { GenerationPanel } from "./generation-panel";
 import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 
-export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
+export function GitHubActionPropertiesPanel({
+	node,
+	onRun,
+}: {
+	node: ActionNode;
+	onRun?: () => void;
+}) {
 	const { value } = useIntegration();
 
 	if (node.content.command.state.status === "configured") {
 		return (
-			<GitHubActionConfiguredView
-				state={node.content.command.state}
-				nodeId={node.id}
-				inputs={node.inputs}
-			/>
+			<PanelGroup direction="vertical" className="flex-1 flex flex-col">
+				<Panel defaultSize={50} minSize={20}>
+					<GitHubActionConfiguredView
+						state={node.content.command.state}
+						nodeId={node.id}
+						inputs={node.inputs}
+					/>
+				</Panel>
+				<PanelResizeHandle className="h-[1px] bg-black-700/50 data-[resize-handle-state=drag]:bg-black-600 transition-colors duration-100 ease-in-out" />
+				<Panel>
+					<GenerationPanel node={node} onRun={onRun} />
+				</Panel>
+			</PanelGroup>
 		);
 	}
 
