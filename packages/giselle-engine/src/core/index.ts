@@ -1,4 +1,5 @@
 import type {
+	FetchingWebPage,
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
@@ -12,7 +13,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { copyFile, fetchWebPageFiles, removeFile, uploadFile } from "./files";
+import { copyFile, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
@@ -39,6 +40,7 @@ import {
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
+import { addWebPage } from "./sources";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
 	copyWorkspace,
@@ -114,13 +116,6 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
 			return await removeFile({ context, fileId, workspaceId });
 		},
-		fetchWebPageFiles: async (args: {
-			urls: string[];
-			format: "html" | "markdown";
-			provider?: "self-made";
-		}) => {
-			return await fetchWebPageFiles(args);
-		},
 		generateImage: async (
 			generation: QueuedGeneration,
 			telemetry?: TelemetrySettings,
@@ -194,6 +189,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		executeQuery: async (args: {
 			generation: QueuedGeneration;
 		}) => executeQuery({ ...args, context }),
+		addWebPage: async (args: {
+			workspaceId: WorkspaceId;
+			webpage: FetchingWebPage;
+		}) => addWebPage({ ...args, context }),
 	};
 }
 

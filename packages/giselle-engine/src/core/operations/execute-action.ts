@@ -115,6 +115,7 @@ async function resolveActionInputs(args: {
 						break;
 					}
 					case "file":
+					case "webPage":
 					case "github":
 					case "vectorStore":
 						throw new Error(

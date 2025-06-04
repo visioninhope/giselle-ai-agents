@@ -596,6 +596,7 @@ export function InputPanel({
 										/>
 									);
 								case "file":
+								case "webPage":
 									break;
 								default: {
 									const _exhaustiveCheck: never = source.node.content;

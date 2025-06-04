@@ -2,12 +2,10 @@ import { parseAndMod } from "@giselle-sdk/data-mod";
 import {
 	type CompletedGeneration,
 	type FileContent,
-	type FileData,
+	type FileId,
 	Generation,
 	GenerationContext,
 	type GenerationId,
-	GenerationIndex,
-	type GenerationOrigin,
 	type GenerationOutput,
 	type ImageGenerationNode,
 	type Node,
@@ -15,8 +13,8 @@ import {
 	NodeId,
 	type OperationNode,
 	OutputId,
-	type RunId,
 	type TextGenerationNode,
+	type WebPageContent,
 	type WorkspaceId,
 	isImageGenerationNode,
 	isTextGenerationNode,
@@ -44,7 +42,7 @@ export interface FileIndex {
 export async function buildMessageObject(
 	node: OperationNode,
 	contextNodes: Node[],
-	fileResolver: (file: FileData) => Promise<DataContent>,
+	fileResolver: (fileId: FileId) => Promise<DataContent>,
 	textGenerationResolver: (
 		nodeId: NodeId,
 		outputId: OutputId,
@@ -82,7 +80,7 @@ export async function buildMessageObject(
 async function buildGenerationMessageForTextGeneration(
 	node: TextGenerationNode,
 	contextNodes: Node[],
-	fileResolver: (file: FileData) => Promise<DataContent>,
+	fileResolver: (fileId: FileId) => Promise<DataContent>,
 	textGenerationResolver: (
 		nodeId: NodeId,
 		outputId: OutputId,
@@ -169,8 +167,7 @@ async function buildGenerationMessageForTextGeneration(
 						break;
 					}
 					case "image":
-					case "pdf":
-					case "webPage": {
+					case "pdf": {
 						const fileContents = await getFileContents(
 							contextNode.content,
 							fileResolver,
@@ -195,6 +192,21 @@ async function buildGenerationMessageForTextGeneration(
 			case "imageGeneration":
 			case "vectorStore":
 				throw new Error("Not implemented");
+
+			case "webPage": {
+				const fileContents = await geWebPageContents(
+					contextNode.content,
+					fileResolver,
+				);
+				userMessage = userMessage.replace(
+					replaceKeyword,
+					getFilesDescription(attachedFiles.length, fileContents.length),
+				);
+
+				attachedFiles.push(...fileContents);
+				attachedFileNodeIds.push(contextNode.id);
+				break;
+			}
 
 			case "query":
 			case "trigger":
@@ -339,20 +351,39 @@ export async function getNodeGenerationIndexes(params: {
 	return NodeGenerationIndex.array().parse(unsafeNodeGenerationIndexData);
 }
 
+async function geWebPageContents(
+	webpageContent: WebPageContent,
+	fileResolver: (fileId: FileId) => Promise<DataContent>,
+) {
+	return await Promise.all(
+		webpageContent.webpages.map(async (webpage) => {
+			if (webpage.status !== "fetched") {
+				return null;
+			}
+			const data = await fileResolver(webpage.fileId);
+			return {
+				type: "file",
+				data,
+				filename: webpage.title,
+				mimeType: "text/markdown",
+			} satisfies FilePart;
+		}),
+	).then((result) => result.filter((data) => data !== null));
+}
+
 async function getFileContents(
 	fileContent: FileContent,
-	fileResolver: (file: FileData) => Promise<DataContent>,
+	fileResolver: (fileId: FileId) => Promise<DataContent>,
 ): Promise<(FilePart | ImagePart)[]> {
 	return await Promise.all(
 		fileContent.files.map(async (file) => {
 			if (file.status !== "uploaded") {
 				return null;
 			}
-			const data = await fileResolver(file);
+			const data = await fileResolver(file.id);
 			switch (fileContent.category) {
 				case "pdf":
 				case "text":
-				case "webPage":
 					return {
 						type: "file",
 						data,
@@ -411,7 +442,7 @@ export async function getRedirectedUrlAndTitle(url: string) {
 async function buildGenerationMessageForImageGeneration(
 	node: ImageGenerationNode,
 	contextNodes: Node[],
-	fileResolver: (file: FileData) => Promise<DataContent>,
+	fileResolver: (fileId: FileId) => Promise<DataContent>,
 	textGenerationResolver: (
 		nodeId: NodeId,
 		outputId: OutputId,
@@ -465,8 +496,7 @@ async function buildGenerationMessageForImageGeneration(
 				switch (contextNode.content.category) {
 					case "text":
 					case "image":
-					case "pdf":
-					case "webPage": {
+					case "pdf": {
 						const fileContents = await getFileContents(
 							contextNode.content,
 							fileResolver,
@@ -485,6 +515,21 @@ async function buildGenerationMessageForImageGeneration(
 					}
 				}
 				break;
+
+			case "webPage": {
+				const fileContents = await geWebPageContents(
+					contextNode.content,
+					fileResolver,
+				);
+
+				userMessage = userMessage.replace(
+					replaceKeyword,
+					getFilesDescription(attachedFiles.length, fileContents.length),
+				);
+
+				attachedFiles.push(...fileContents);
+				break;
+			}
 
 			case "query": {
 				const result = await textGenerationResolver(

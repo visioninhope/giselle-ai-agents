@@ -121,3 +121,7 @@ export function vectorStoreNode(
 ) {
 	return nodeFactories.create("vectorStore", provider);
 }
+
+export function webPageNode() {
+	return nodeFactories.create("webPage");
+}

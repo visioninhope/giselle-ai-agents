@@ -19,6 +19,7 @@ import {
 	GitHubIcon,
 	PdfFileIcon,
 	PromptIcon,
+	WebPageFileIcon,
 } from "../../../icons";
 import { EmptyState } from "../../../ui/empty-state";
 import {
@@ -268,6 +269,19 @@ export function InputPanel({
 											onRemove={() => handleRemove(source.connection)}
 										/>
 									);
+								case "webPage":
+									return (
+										<ConnectedOutputListItem
+											icon={
+												<WebPageFileIcon className="size-[24px] text-white-900" />
+											}
+											key={source.connection.id}
+											title={`${source.node.name ?? "WebPage"} / ${source.label}`}
+											subtitle={""}
+											onRemove={() => handleRemove(source.connection)}
+										/>
+									);
+
 								case "vectorStore":
 									throw new Error(
 										"vectorStore node is not supported to connect.",

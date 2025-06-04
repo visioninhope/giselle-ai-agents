@@ -195,6 +195,7 @@ async function resolveQuery(
 				break;
 			}
 			case "file":
+			case "webPage":
 			case "github":
 			case "imageGeneration":
 				throw new Error("Not implemented");

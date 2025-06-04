@@ -29,6 +29,8 @@
 		"vitest": "catalog:"
 	},
 	"dependencies": {
+		"defuddle": "catalog:",
+		"happy-dom": "catalog:",
 		"turndown": "catalog:",
 		"zod": "catalog:"
 	}

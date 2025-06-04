@@ -27,6 +27,7 @@ import {
 	createTextNode,
 	createTriggerNode,
 	createVectorStoreNode,
+	createWebPageNode,
 	triggerNodeDefaultName,
 } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
@@ -928,6 +929,8 @@ export function Toolbar() {
 														setSelectedTool(
 															addNodeTool(createVectorStoreNode("github")),
 														);
+													} else if (sourceType === "webPage") {
+														setSelectedTool(addNodeTool(createWebPageNode()));
 													}
 												}}
 											>
@@ -939,6 +942,12 @@ export function Toolbar() {
 													<ToggleGroup.Item value="githubVectorStore" data-tool>
 														<GitHubIcon className="w-[20px] h-[20px]" />
 														<p className="text-[14px]">GitHub Vector Store</p>
+													</ToggleGroup.Item>
+												)}
+												{webPageFileNode && (
+													<ToggleGroup.Item value="webPage" data-tool>
+														<WebPageFileIcon className="w-[20px] h-[20px]" />
+														<p className="text-[14px]">Web Page</p>
 													</ToggleGroup.Item>
 												)}
 											</ToggleGroup.Root>
@@ -998,12 +1007,6 @@ export function Toolbar() {
 													<TextFileIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Text</p>
 												</ToggleGroup.Item>
-												{webPageFileNode && (
-													<ToggleGroup.Item value="webPage" data-tool>
-														<WebPageFileIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">Web Page</p>
-													</ToggleGroup.Item>
-												)}
 												{/* <ToggleGroup.Item value="addGitHubNode" data-tool>
 													<GitHubIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">GitHub</p>

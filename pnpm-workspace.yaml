@@ -74,3 +74,5 @@ catalog:
   pg: 8.14.1
   "@types/pg": 8.11.13
   swr: 2.2.5
+  defuddle: 0.6.4
+  "happy-dom": 17.6.1

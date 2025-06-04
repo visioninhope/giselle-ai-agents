@@ -8,3 +8,4 @@ export const WebSearchProviderSchema = SelfMadeWebSearchProvider;
 export type WebSearchProvider = z.infer<typeof WebSearchProviderSchema>;
 
 export const WebSearchProviders = z.enum([selfMadeProviderName]);
+export type WebSearchProviders = z.infer<typeof WebSearchProviders>;

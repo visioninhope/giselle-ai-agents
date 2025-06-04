@@ -1,4 +1,5 @@
 import {
+	FetchingWebPage,
 	FileId,
 	FlowTrigger,
 	FlowTriggerId,
@@ -130,19 +131,6 @@ export const createJsonRouters = {
 				);
 
 				return new Response(null, { status: 204 });
-			},
-		}),
-	fetchWebPageFiles: (giselleEngine: GiselleEngine) =>
-		createHandler({
-			input: z.object({
-				urls: z.array(z.string()),
-				format: z.enum(["html", "markdown"]),
-				provider: z.literal("self-made").optional(),
-			}),
-			handler: async ({ input }) => {
-				return JsonResponse.json({
-					webPageFiles: await giselleEngine.fetchWebPageFiles(input),
-				});
 			},
 		}),
 	generateImage: (giselleEngine: GiselleEngine) =>
@@ -283,6 +271,15 @@ export const createJsonRouters = {
 				await giselleEngine.executeQuery(input);
 				return new Response(null, { status: 204 });
 			},
+		}),
+	addWebPage: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				webpage: FetchingWebPage,
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json(await giselleEngine.addWebPage(input)),
 		}),
 } as const;
 
