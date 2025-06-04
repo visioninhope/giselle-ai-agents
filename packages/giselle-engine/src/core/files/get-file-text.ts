@@ -7,11 +7,15 @@ export async function getFileText(args: {
 	workspaceId: WorkspaceId;
 	fileId: FileId;
 }) {
-	return await args.context.storage.getItem(
+	const textLike = await args.context.storage.getItem(
 		filePath({
 			type: "workspace",
 			id: args.workspaceId,
 			fileId: args.fileId,
 		}),
 	);
+	if (typeof textLike !== "string") {
+		return "";
+	}
+	return textLike;
 }
