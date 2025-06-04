@@ -13,7 +13,7 @@ import type {
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { copyFile, removeFile, uploadFile } from "./files";
+import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
@@ -193,6 +193,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
 		}) => addWebPage({ ...args, context }),
+		async getFileText(args: {
+			workspaceId: WorkspaceId;
+			fileId: FileId;
+		}) {
+			return await getFileText({ ...args, context });
+		},
 	};
 }
 
