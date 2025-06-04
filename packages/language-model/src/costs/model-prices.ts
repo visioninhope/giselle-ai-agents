@@ -1,6 +1,9 @@
+import type { LanguageModel } from "../google";
 import type { ModelPrice } from "./pricing";
 
 export type ModelPriceTable = Record<string, { prices: ModelPrice[] }>;
+
+type GoogleModelId = LanguageModel["id"];
 
 export const openAiTokenPricing: ModelPriceTable = {
 	// https://platform.openai.com/docs/pricing#latest-models
@@ -207,50 +210,32 @@ export const anthropicTokenPricing: ModelPriceTable = {
 
 export const googleTokenPricing: ModelPriceTable = {
 	// https://ai.google.dev/gemini-api/docs/pricing
-	"gemini-2.5-pro-exp-03-25": {
+	"gemini-2.5-flash-preview-05-20": {
 		prices: [
 			{
-				validFrom: "2025-05-20T00:00:00Z",
+				validFrom: "2025-06-01T00:00:00Z",
 				price: {
 					input: {
-						costPerMegaToken: 0.0,
+						costPerMegaToken: 0.15,
 					},
 					output: {
-						costPerMegaToken: 0.0,
+						costPerMegaToken: 3.5, // Use price of "thinking" option because we use it when available
+						// ref: https://github.com/giselles-ai/giselle/pull/1039#discussion_r2125411214
 					},
 				},
 			},
 		],
 	},
-	"gemini-2.5-pro-preview-03-25": {
+	"gemini-2.5-pro-preview-05-06": {
 		prices: [
 			{
-				validFrom: "2025-05-20T00:00:00Z",
+				validFrom: "2025-06-01T00:00:00Z",
 				price: {
 					input: {
 						costPerMegaToken: 1.25,
 					},
 					output: {
 						costPerMegaToken: 10.0,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.5-flash-preview-04-17": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.15,
-					},
-					output: {
-						costPerMegaToken: 0.6, // will be 3.50 if "thinking" enabled
-						// thinking option can be controlled using "thinkingBudget" option
-						// refs:
-						// - https://ai.google.dev/gemini-api/docs/thinking#javascript
-						// - https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai
 					},
 				},
 			},
@@ -271,10 +256,10 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"gemini-2.0-flash-lite-preview-02-05": {
+	"gemini-2.0-flash-lite": {
 		prices: [
 			{
-				validFrom: "2025-05-20T00:00:00Z",
+				validFrom: "2025-06-01T00:00:00Z",
 				price: {
 					input: {
 						costPerMegaToken: 0.075,
@@ -286,37 +271,7 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"gemini-2.0-flash-thinking-exp-01-21": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.0,
-					},
-					output: {
-						costPerMegaToken: 0.0,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.0-pro-exp-02-05": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.0,
-					},
-					output: {
-						costPerMegaToken: 0.0,
-					},
-				},
-			},
-		],
-	},
-};
+} as const satisfies Record<GoogleModelId, { prices: ModelPrice[] }>;
 
 export function getValidPricing(
 	modelId: string,
