@@ -207,6 +207,36 @@ export const anthropicTokenPricing: ModelPriceTable = {
 
 export const googleTokenPricing: ModelPriceTable = {
 	// https://ai.google.dev/gemini-api/docs/pricing
+	"gemini-2.5-flash-preview-05-20": {
+		prices: [
+			{
+				validFrom: "2025-06-01T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.15,
+					},
+					output: {
+						costPerMegaToken: 3.5,
+					},
+				},
+			},
+		],
+	},
+	"gemini-2.5-pro-preview-05-06": {
+		prices: [
+			{
+				validFrom: "2025-06-01T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 1.25,
+					},
+					output: {
+						costPerMegaToken: 10.0,
+					},
+				},
+			},
+		],
+	},
 	"gemini-2.0-flash": {
 		prices: [
 			{
@@ -217,6 +247,21 @@ export const googleTokenPricing: ModelPriceTable = {
 					},
 					output: {
 						costPerMegaToken: 0.4,
+					},
+				},
+			},
+		],
+	},
+	"gemini-2.0-flash-lite": {
+		prices: [
+			{
+				validFrom: "2025-06-01T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.075,
+					},
+					output: {
+						costPerMegaToken: 0.3,
 					},
 				},
 			},
