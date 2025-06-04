@@ -45,19 +45,40 @@ function WebPageListItem({
 	return (
 		<li
 			key={webpage.id}
-			className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between"
+			className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between gap-[8px] hover:bg-black-800 transition-colors"
 		>
 			{webpage.status === "fetched" && (
 				<Dialog.Root open={open} onOpenChange={setOpen}>
 					<Dialog.Trigger asChild>
-						<button type="button" className="text-left">
-							<p>{webpage.title}</p>
-							<span className="text-[14px] underline">{webpage.url}</span>
+						<button
+							type="button"
+							className="text-left overflow-x-hidden cursor-pointer flex-1 outline-none"
+						>
+							<p className="truncate">{webpage.title}</p>
+							<a
+								className="text-[14px] underline truncate block"
+								href={webpage.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
+							>
+								{webpage.url}
+							</a>
 						</button>
 					</Dialog.Trigger>
 					<Dialog.Portal>
 						<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
-						<Dialog.Content className="fixed left-[50%] top-[50%] max-h-[80vh] w-[600px] translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-[12px] bg-black-900 p-[24px] shadow-xl z-50 border border-black-400">
+						<Dialog.Content
+							className="fixed left-[50%] top-[50%] max-h-[80vh] w-[600px] translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-[12px] bg-black-900 p-[24px] shadow-xl z-50 border border-black-400"
+							onOpenAutoFocus={(e) => {
+								e.preventDefault();
+							}}
+							onCloseAutoFocus={(e) => {
+								e.preventDefault();
+							}}
+						>
 							<Dialog.Title className="text-[18px] font-semibold text-white-800 mb-4">
 								{webpage.title}
 							</Dialog.Title>
