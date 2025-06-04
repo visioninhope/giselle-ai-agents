@@ -76,3 +76,4 @@ catalog:
   swr: 2.2.5
   defuddle: 0.6.4
   "happy-dom": 17.6.1
+  jsdom: 26.1.0
