@@ -365,7 +365,7 @@ async function geWebPageContents(
 				type: "file",
 				data,
 				filename: webpage.title,
-				mimeType: "text/html",
+				mimeType: "text/markdown",
 			} satisfies FilePart;
 		}),
 	).then((result) => result.filter((data) => data !== null));
