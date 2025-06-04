@@ -3,6 +3,8 @@ import { z } from "zod/v4";
 import { FileId } from "./file";
 
 export const WebPageId = createIdGenerator("wbpg");
+export type WebPageId = z.infer<typeof WebPageId.schema>;
+
 const WebPageBase = z.object({
 	id: WebPageId.schema,
 	url: z.url(),

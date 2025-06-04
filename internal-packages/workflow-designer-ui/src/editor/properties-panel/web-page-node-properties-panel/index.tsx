@@ -61,6 +61,29 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 		[client, data.id, node, updateNodeDataContent],
 	);
 
+	const removeWebPage = useCallback(
+		(webpageId: WebPageId) => async () => {
+			const webpage = node.content.webpages.find(
+				(webpage) => webpage.id === webpageId,
+			);
+			if (webpage === undefined) {
+				return;
+			}
+			updateNodeDataContent(node, {
+				webpages: node.content.webpages.filter(
+					(webpage) => webpage.id !== webpageId,
+				),
+			});
+			if (webpage.status === "fetched") {
+				await client.removeFile({
+					workspaceId: data.id,
+					fileId: webpage.fileId,
+				});
+			}
+		},
+		[updateNodeDataContent, node, client, data.id],
+	);
+
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
@@ -74,7 +97,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						{node.content.webpages.map((webpage) => (
 							<li
 								key={webpage.id}
-								className="bg-black-750 px-[8px] py-[4px] flex items-center justify-between"
+								className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between"
 							>
 								{webpage.status === "fetched" && (
 									<div>
@@ -89,6 +112,13 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 										</a>
 									</div>
 								)}
+								<button
+									type="button"
+									onClick={removeWebPage(webpage.id)}
+									className="cursor-pointer hidden group-hover:block"
+								>
+									Delete
+								</button>
 							</li>
 						))}
 					</ul>
