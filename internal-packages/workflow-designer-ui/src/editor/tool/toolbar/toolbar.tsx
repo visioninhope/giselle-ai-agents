@@ -92,7 +92,7 @@ export function Toolbar() {
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
-	const { webPageFileNode, githubVectorStore } = useFeatureFlag();
+	const { githubVectorStore } = useFeatureFlag();
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -944,12 +944,10 @@ export function Toolbar() {
 														<p className="text-[14px]">GitHub Vector Store</p>
 													</ToggleGroup.Item>
 												)}
-												{webPageFileNode && (
-													<ToggleGroup.Item value="webPage" data-tool>
-														<WebPageFileIcon className="w-[20px] h-[20px]" />
-														<p className="text-[14px]">Web Page</p>
-													</ToggleGroup.Item>
-												)}
+												<ToggleGroup.Item value="webPage" data-tool>
+													<WebPageFileIcon className="w-[20px] h-[20px]" />
+													<p className="text-[14px]">Web Page</p>
+												</ToggleGroup.Item>
 											</ToggleGroup.Root>
 										</div>
 									</Popover.Content>

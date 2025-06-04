@@ -66,7 +66,6 @@ export function WorkspaceProvider({
 								<FeatureFlagContext
 									value={{
 										githubVectorStore: featureFlag?.githubVectorStore ?? false,
-										webPageFileNode: featureFlag?.webPageFileNode ?? false,
 									}}
 								>
 									{children}
