@@ -281,6 +281,15 @@ export const createJsonRouters = {
 			handler: async ({ input }) =>
 				JsonResponse.json(await giselleEngine.addWebPage(input)),
 		}),
+	getFileText: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				fileId: FileId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({ text: await giselleEngine.getFileText(input) }),
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

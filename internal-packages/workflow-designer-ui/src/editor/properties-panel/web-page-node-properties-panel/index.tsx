@@ -2,16 +2,122 @@ import {
 	type WebPage,
 	WebPageId,
 	type WebPageNode,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { type FormEventHandler, useCallback } from "react";
+import { Dialog } from "radix-ui";
+import { type FormEventHandler, useCallback, useState } from "react";
+import useSWR from "swr";
 import { WebPageFileIcon } from "../../../icons";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
 } from "../ui";
+
+function WebPageListItem({
+	webpage,
+	workspaceId,
+	onRemove,
+}: {
+	webpage: WebPage;
+	workspaceId: WorkspaceId;
+	onRemove: () => void;
+}) {
+	const [open, setOpen] = useState(false);
+	const client = useGiselleEngine();
+	const { isLoading, data } = useSWR(
+		webpage.status !== "fetched"
+			? null
+			: {
+					namespace: "get-file",
+					workspaceId,
+					fileId: webpage.fileId,
+				},
+		({ workspaceId, fileId }) =>
+			client.getFileText({
+				workspaceId,
+				fileId,
+			}),
+	);
+
+	return (
+		<li
+			key={webpage.id}
+			className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between gap-[8px] hover:bg-black-800 transition-colors"
+		>
+			{webpage.status === "fetched" && (
+				<Dialog.Root open={open} onOpenChange={setOpen}>
+					<Dialog.Trigger asChild>
+						<button
+							type="button"
+							className="text-left overflow-x-hidden cursor-pointer flex-1 outline-none"
+						>
+							<p className="truncate">{webpage.title}</p>
+							<a
+								className="text-[14px] underline truncate block"
+								href={webpage.url}
+								target="_blank"
+								rel="noopener noreferrer"
+								onClick={(e) => {
+									e.stopPropagation();
+								}}
+							>
+								{webpage.url}
+							</a>
+						</button>
+					</Dialog.Trigger>
+					<Dialog.Portal>
+						<Dialog.Overlay className="fixed inset-0 bg-black/60 backdrop-blur-[2px] z-50" />
+						<Dialog.Content
+							className="fixed left-[50%] top-[50%] max-h-[80vh] w-[600px] translate-x-[-50%] translate-y-[-50%] overflow-y-auto rounded-[12px] bg-black-900 p-[24px] shadow-xl z-50 border border-black-400"
+							onOpenAutoFocus={(e) => {
+								e.preventDefault();
+							}}
+							onCloseAutoFocus={(e) => {
+								e.preventDefault();
+							}}
+						>
+							<Dialog.Title className="text-[18px] font-semibold text-white-800 mb-4">
+								{webpage.title}
+							</Dialog.Title>
+							{isLoading ? (
+								<p className="text-white-400">Loading...</p>
+							) : (
+								<div className="whitespace-pre-wrap text-white">
+									{data?.text}
+								</div>
+							)}
+						</Dialog.Content>
+					</Dialog.Portal>
+				</Dialog.Root>
+			)}
+			{webpage.status === "fetching" && (
+				<div>
+					<p className="font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(200,200,200,_1)] via-[rgba(100,100,100,_0.5)] to-[rgba(200,200,200,_1)] text-transparent animate-shimmer">
+						Fetching...
+					</p>
+					<a
+						href={webpage.url}
+						target="_blank"
+						rel="noreferrer"
+						className="text-[14px] underline"
+					>
+						{webpage.url}
+					</a>
+				</div>
+			)}
+			<button
+				type="button"
+				onClick={onRemove}
+				className="cursor-pointer hidden group-hover:block"
+			>
+				Delete
+			</button>
+		</li>
+	);
+}
 
 export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 	const client = useGiselleEngine();
@@ -91,46 +197,12 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 				<div>
 					<ul className="flex flex-col gap-[8px]">
 						{node.content.webpages.map((webpage) => (
-							<li
+							<WebPageListItem
 								key={webpage.id}
-								className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between"
-							>
-								{webpage.status === "fetched" && (
-									<div>
-										<p>{webpage.title}</p>
-										<a
-											href={webpage.url}
-											target="_blank"
-											rel="noreferrer"
-											className="text-[14px] underline"
-										>
-											{webpage.url}
-										</a>
-									</div>
-								)}
-								{webpage.status === "fetching" && (
-									<div>
-										<p className="font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(200,200,200,_1)] via-[rgba(100,100,100,_0.5)] to-[rgba(200,200,200,_1)] text-transparent animate-shimmer">
-											Fetching...
-										</p>
-										<a
-											href={webpage.url}
-											target="_blank"
-											rel="noreferrer"
-											className="text-[14px] underline"
-										>
-											{webpage.url}
-										</a>
-									</div>
-								)}
-								<button
-									type="button"
-									onClick={removeWebPage(webpage.id)}
-									className="cursor-pointer hidden group-hover:block"
-								>
-									Delete
-								</button>
-							</li>
+								webpage={webpage}
+								workspaceId={data.id}
+								onRemove={removeWebPage(webpage.id)}
+							/>
 						))}
 					</ul>
 
