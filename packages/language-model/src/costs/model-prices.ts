@@ -207,55 +207,6 @@ export const anthropicTokenPricing: ModelPriceTable = {
 
 export const googleTokenPricing: ModelPriceTable = {
 	// https://ai.google.dev/gemini-api/docs/pricing
-	"gemini-2.5-pro-exp-03-25": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.0,
-					},
-					output: {
-						costPerMegaToken: 0.0,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.5-pro-preview-03-25": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 1.25,
-					},
-					output: {
-						costPerMegaToken: 10.0,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.5-flash-preview-04-17": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.15,
-					},
-					output: {
-						costPerMegaToken: 0.6, // will be 3.50 if "thinking" enabled
-						// thinking option can be controlled using "thinkingBudget" option
-						// refs:
-						// - https://ai.google.dev/gemini-api/docs/thinking#javascript
-						// - https://ai-sdk.dev/providers/ai-sdk-providers/google-generative-ai
-					},
-				},
-			},
-		],
-	},
 	"gemini-2.0-flash": {
 		prices: [
 			{
@@ -266,51 +217,6 @@ export const googleTokenPricing: ModelPriceTable = {
 					},
 					output: {
 						costPerMegaToken: 0.4,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.0-flash-lite-preview-02-05": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.075,
-					},
-					output: {
-						costPerMegaToken: 0.3,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.0-flash-thinking-exp-01-21": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.0,
-					},
-					output: {
-						costPerMegaToken: 0.0,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.0-pro-exp-02-05": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.0,
-					},
-					output: {
-						costPerMegaToken: 0.0,
 					},
 				},
 			},
