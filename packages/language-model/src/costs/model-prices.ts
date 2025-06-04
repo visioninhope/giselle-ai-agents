@@ -1,6 +1,9 @@
+import type { LanguageModel } from "../google";
 import type { ModelPrice } from "./pricing";
 
 export type ModelPriceTable = Record<string, { prices: ModelPrice[] }>;
+
+type GoogleModelId = LanguageModel["id"];
 
 export const openAiTokenPricing: ModelPriceTable = {
 	// https://platform.openai.com/docs/pricing#latest-models
@@ -267,7 +270,7 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-};
+} as const satisfies Record<GoogleModelId, { prices: ModelPrice[] }>;
 
 export function getValidPricing(
 	modelId: string,
