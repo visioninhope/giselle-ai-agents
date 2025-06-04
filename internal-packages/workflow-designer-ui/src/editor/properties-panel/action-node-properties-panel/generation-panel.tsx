@@ -45,10 +45,8 @@ function Empty({ onRun }: { onRun?: () => void }) {
 
 export function GenerationPanel({
 	node,
-	onRun,
 }: {
 	node: ActionNode;
-	onRun?: () => void;
 }) {
 	const { data } = useWorkflowDesigner();
 	const { generations } = useNodeGenerations({
@@ -68,14 +66,8 @@ export function GenerationPanel({
 		}
 	}, [generations]);
 
-	const handleRun = useCallback(() => {
-		if (onRun) {
-			onRun();
-		}
-	}, [onRun]);
-
 	if (currentGeneration === undefined) {
-		return <Empty onRun={handleRun} />;
+		return null;
 	}
 
 	return (
@@ -93,7 +85,7 @@ export function GenerationPanel({
 						<p data-header-text>Running...</p>
 					)}
 					{currentGeneration.status === "completed" && (
-						<p data-header-text>Result</p>
+						<p data-header-text>Result(Beta)</p>
 					)}
 					{currentGeneration.status === "failed" && (
 						<p data-header-text>Error</p>
@@ -104,7 +96,12 @@ export function GenerationPanel({
 				</div>
 			</div>
 			<div className="flex-1 py-[4px] px-[16px] overflow-y-auto">
-				<GenerationView generation={currentGeneration} />
+				{currentGeneration.outputs?.map((output) => {
+					if (output.type !== "generated-text") {
+						return null;
+					}
+					return output.content;
+				})}
 			</div>
 		</div>
 	);

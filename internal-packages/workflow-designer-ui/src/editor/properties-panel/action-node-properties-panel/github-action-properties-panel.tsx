@@ -51,7 +51,7 @@ export function GitHubActionPropertiesPanel({
 				</Panel>
 				<PanelResizeHandle className="h-[1px] bg-black-700/50 data-[resize-handle-state=drag]:bg-black-600 transition-colors duration-100 ease-in-out" />
 				<Panel>
-					<GenerationPanel node={node} onRun={onRun} />
+					<GenerationPanel node={node} />
 				</Panel>
 			</PanelGroup>
 		);
