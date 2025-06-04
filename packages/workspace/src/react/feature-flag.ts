@@ -2,7 +2,6 @@ import { createContext, useContext } from "react";
 
 export interface FeatureFlagContextValue {
 	githubVectorStore: boolean;
-	webPageFileNode: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined
