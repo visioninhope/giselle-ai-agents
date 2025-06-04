@@ -64,7 +64,9 @@ function WebPageListItem({
 							{isLoading ? (
 								<p className="text-white-400">Loading...</p>
 							) : (
-								<div className="markdown-renderer">{data?.text}</div>
+								<div className="whitespace-pre-wrap text-white">
+									{data?.text}
+								</div>
 							)}
 						</Dialog.Content>
 					</Dialog.Portal>
