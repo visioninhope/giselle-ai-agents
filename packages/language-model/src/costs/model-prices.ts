@@ -219,7 +219,8 @@ export const googleTokenPricing: ModelPriceTable = {
 						costPerMegaToken: 0.15,
 					},
 					output: {
-						costPerMegaToken: 3.5,
+						costPerMegaToken: 3.5, // Use price of "thinking" option because we use it when available
+						// ref: https://github.com/giselles-ai/giselle/pull/1039#discussion_r2125411214
 					},
 				},
 			},
