@@ -5,8 +5,7 @@ import {
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { LoaderIcon } from "lucide-react";
-import { type FormEventHandler, useCallback, useTransition } from "react";
+import { type FormEventHandler, useCallback } from "react";
 import { WebPageFileIcon } from "../../../icons";
 import {
 	PropertiesPanelContent,
@@ -17,9 +16,8 @@ import {
 export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 	const client = useGiselleEngine();
 	const { data, updateName, updateNodeDataContent } = useWorkflowDesigner();
-	const [isPending, startTransition] = useTransition();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
-		(e) => {
+		async (e) => {
 			e.preventDefault();
 
 			const formData = new FormData(e.currentTarget);
@@ -31,32 +29,30 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 
 			e.currentTarget.reset();
 			let webpages: WebPage[] = node.content.webpages;
-			startTransition(async () => {
-				await Promise.all(
-					urls.map(async (url) => {
-						const newWebPage: WebPage = {
-							id: WebPageId.generate(),
-							status: "fetching",
-							url,
-						};
-						webpages = [...webpages, newWebPage];
-						updateNodeDataContent(node, {
-							webpages,
-						});
-						const addedWebPage = await client.addWebPage({
-							webpage: newWebPage,
-							workspaceId: data.id,
-						});
-						webpages = [
-							...webpages.filter((webpage) => webpage.id !== addedWebPage.id),
-							addedWebPage,
-						];
-						updateNodeDataContent(node, {
-							webpages,
-						});
-					}),
-				);
-			});
+			await Promise.all(
+				urls.map(async (url) => {
+					const newWebPage: WebPage = {
+						id: WebPageId.generate(),
+						status: "fetching",
+						url,
+					};
+					webpages = [...webpages, newWebPage];
+					updateNodeDataContent(node, {
+						webpages,
+					});
+					const addedWebPage = await client.addWebPage({
+						webpage: newWebPage,
+						workspaceId: data.id,
+					});
+					webpages = [
+						...webpages.filter((webpage) => webpage.id !== addedWebPage.id),
+						addedWebPage,
+					];
+					updateNodeDataContent(node, {
+						webpages,
+					});
+				}),
+			);
 		},
 		[client, data.id, node, updateNodeDataContent],
 	);
@@ -112,6 +108,21 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 										</a>
 									</div>
 								)}
+								{webpage.status === "fetching" && (
+									<div>
+										<p className="font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(200,200,200,_1)] via-[rgba(100,100,100,_0.5)] to-[rgba(200,200,200,_1)] text-transparent animate-shimmer">
+											Fetching...
+										</p>
+										<a
+											href={webpage.url}
+											target="_blank"
+											rel="noreferrer"
+											className="text-[14px] underline"
+										>
+											{webpage.url}
+										</a>
+									</div>
+								)}
 								<button
 									type="button"
 									onClick={removeWebPage(webpage.id)}
@@ -152,11 +163,9 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						</div>
 						<button
 							type="submit"
-							className="w-fit flex items-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 disabled:bg-black-400 cursor-pointer transition-colors"
-							disabled={isPending}
+							className="w-fit flex items-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
 						>
-							{isPending && <LoaderIcon className="size-[14px] animate-spin" />}
-							{isPending ? "Inserting" : "Insert"}
+							Insert
 						</button>
 					</form>
 				</div>
