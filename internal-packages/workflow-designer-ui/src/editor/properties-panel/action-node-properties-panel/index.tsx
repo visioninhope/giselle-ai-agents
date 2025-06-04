@@ -73,7 +73,7 @@ export function ActionNodePropertiesPanel({
 				}
 			/>
 			<PropertiesPanelContent>
-				<PropertiesPanel node={node} />
+				<PropertiesPanel node={node} onRunAction={handleClick} />
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);
@@ -81,12 +81,14 @@ export function ActionNodePropertiesPanel({
 
 function PropertiesPanel({
 	node,
+	onRunAction,
 }: {
 	node: ActionNode;
+	onRunAction: () => void;
 }) {
 	switch (node.content.command.provider) {
 		case "github":
-			return <GitHubActionPropertiesPanel node={node} />;
+			return <GitHubActionPropertiesPanel node={node} onRun={onRunAction} />;
 		default: {
 			const _exhaustiveCheck: never = node.content.command.provider;
 			throw new Error(`Unhandled action provider: ${_exhaustiveCheck}`);
