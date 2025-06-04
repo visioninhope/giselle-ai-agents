@@ -18,6 +18,7 @@ import { ReadOnlyBadge } from "../ui/read-only-banner";
 import { ShareModal } from "../ui/share-modal";
 import { ToastProvider } from "../ui/toast";
 import { UserPresence } from "../ui/user-presence";
+import { RunButton } from "./run-button";
 import { Button, TriggerInputDialog, buttonLabel } from "./ui";
 
 function Trigger() {
@@ -190,14 +191,15 @@ export function Header({
 				</div>
 
 				<div className="flex items-center gap-[12px]">
-					<Trigger />
-					{shareFeatureFlag && (
+					{/* <Trigger /> */}
+					{/* {shareFeatureFlag && (
 						<>
 							<UserPresence />
 							<ShareButton onClick={() => setOpenShareModal(true)} />
 						</>
 					)}
-					{action && <div className="flex items-center">{action}</div>}
+					{action && <div className="flex items-center">{action}</div>} */}
+					<RunButton />
 				</div>
 
 				<ShareModal
@@ -225,24 +227,24 @@ function Divider() {
 	return <div className="text-[24px] font-[250]">/</div>;
 }
 
-export function RunButton({
-	onClick,
-}: {
-	onClick?: () => void;
-}) {
-	return (
-		<button
-			type="button"
-			onClick={onClick}
-			className={clsx(
-				"flex py-[8px] px-[16px] justify-center items-center gap-[4px]",
-				"rounded-[8px]",
-				"bg-primary-900 text-[14px] text-white-900",
-				"cursor-pointer",
-			)}
-		>
-			<PlayIcon className="size-[16px] fill-white-900" />
-			<p>Run</p>
-		</button>
-	);
-}
+// export function RunButton({
+// 	onClick,
+// }: {
+// 	onClick?: () => void;
+// }) {
+// 	return (
+// 		<button
+// 			type="button"
+// 			onClick={onClick}
+// 			className={clsx(
+// 				"flex py-[8px] px-[16px] justify-center items-center gap-[4px]",
+// 				"rounded-[8px]",
+// 				"bg-primary-900 text-[14px] text-white-900",
+// 				"cursor-pointer",
+// 			)}
+// 		>
+// 			<PlayIcon className="size-[16px] fill-white-900" />
+// 			<p>Run</p>
+// 		</button>
+// 	);
+// }
