@@ -1,6 +1,7 @@
 export * from "./types";
 import type { CompletedGeneration } from "@giselle-sdk/data-type";
 import type { TextGenerationLanguageModelData } from "@giselle-sdk/data-type";
+import { GenerationContext, isTextGenerationNode } from "@giselle-sdk/data-type";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import { Langfuse } from "langfuse";
 import type { AnthropicProviderOptions, TelemetryTag, ToolSet } from "./types";
@@ -69,13 +70,23 @@ export async function emitTelemetry(
 			content: msg.content,
 		}));
 
+		const toolSet: ToolSet = {};
+		if (isTextGenerationNode(generation.context.operationNode)) {
+			if (
+				generation.context.operationNode.content.llm.provider === "openai" &&
+				generation.context.operationNode.content.tools?.openaiWebSearch
+			) {
+				toolSet.openaiWebSearch = true;
+			}
+		}
+
 		const trace = langfuse.trace({
 			name: "llm-generation",
 			input: { messages },
 			tags: generateTelemetryTags({
 				provider: llm.provider,
 				modelId: llm.id,
-				toolSet: {}, // TODO: set toolSet
+				toolSet,
 				configurations: llm.configurations ?? {},
 			}),
 			metadata,
