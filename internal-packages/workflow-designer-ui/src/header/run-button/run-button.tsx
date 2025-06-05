@@ -2,6 +2,7 @@ import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
+import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";
 import { useMemo, useState } from "react";
 import { NodeIcon } from "../../icons/node";
@@ -32,7 +33,9 @@ export function RunButton() {
 	return (
 		<DropdownMenu.Root open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
 			<DropdownMenu.Trigger asChild>
-				<Button>Run</Button>
+				<Button leftIcon={<CirclePlayIcon className="size-[15px]" />}>
+					Run
+				</Button>
 			</DropdownMenu.Trigger>
 			<DropdownMenu.Portal>
 				<DropdownMenu.Content
