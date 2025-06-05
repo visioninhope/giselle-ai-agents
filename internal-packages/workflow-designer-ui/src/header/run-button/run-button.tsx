@@ -1,4 +1,8 @@
-import { isOperationNode, isTriggerNode } from "@giselle-sdk/data-type";
+import {
+	type NodeLike,
+	isOperationNode,
+	isTriggerNode,
+} from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
@@ -8,6 +12,23 @@ import { useMemo, useState } from "react";
 import { NodeIcon } from "../../icons/node";
 import { TriggerInputDialog } from "../ui";
 import { Button } from "./ui/button";
+
+const menuItemClass =
+	"group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full";
+
+function NodeItemContent({ node }: { node: NodeLike }) {
+	return (
+		<>
+			<div className="p-[12px] bg-black-800 rounded-[8px]">
+				<NodeIcon node={node} className="size-[16px] text-white-900" />
+			</div>
+			<div className="flex flex-col gap-[0px] text-white-900 items-start">
+				<div className="text-[13px]">{node.name ?? defaultName(node)}</div>
+				<div className="text-[12px] text-white-400">{node.id}</div>
+			</div>
+		</>
+	);
+}
 
 export function RunButton() {
 	const { data } = useWorkflowDesigner();
@@ -57,23 +78,8 @@ export function RunButton() {
 										setIsDialogOpen(isOpen);
 									}}
 								>
-									<Dialog.Trigger className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full">
-										<>
-											<div className="p-[12px] bg-black-800 rounded-[8px]">
-												<NodeIcon
-													node={startingNode}
-													className="size-[16px] text-white-900"
-												/>
-											</div>
-											<div className="flex flex-col gap-[0px] text-white-900 items-start">
-												<div className="text-[13px]">
-													{startingNode.name ?? defaultName(startingNode)}
-												</div>
-												<div className="text-[12px] text-white-400">
-													{startingNode.id}
-												</div>
-											</div>
-										</>
+									<Dialog.Trigger className={menuItemClass}>
+										<NodeItemContent node={startingNode} />
 									</Dialog.Trigger>
 									<Dialog.Portal>
 										<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
@@ -93,24 +99,8 @@ export function RunButton() {
 									</Dialog.Portal>
 								</Dialog.Root>
 							) : (
-								<button
-									type="button"
-									className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full"
-								>
-									<div className="p-[12px] bg-black-800 rounded-[8px]">
-										<NodeIcon
-											node={startingNode}
-											className="size-[16px] text-white-900"
-										/>
-									</div>
-									<div className="flex flex-col gap-[0px] text-white-900 items-start">
-										<div className="text-[13px]">
-											{startingNode.name ?? defaultName(startingNode)}
-										</div>
-										<div className="text-[12px] text-white-400">
-											{startingNode.id}
-										</div>
-									</div>
+								<button type="button" className={menuItemClass}>
+									<NodeItemContent node={startingNode} />
 								</button>
 							)}
 						</DropdownMenu.Item>
