@@ -8,17 +8,20 @@ import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";
-import { useMemo, useState } from "react";
+import { type ButtonHTMLAttributes, useMemo, useState } from "react";
 import { NodeIcon } from "../../icons/node";
 import { TriggerInputDialog } from "../ui";
 import { Button } from "./ui/button";
 
-const menuItemClass =
-	"group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full";
-
-function NodeItemContent({ node }: { node: NodeLike }) {
+function NodeSelectItem({
+	node,
+	...props
+}: { node: NodeLike } & ButtonHTMLAttributes<HTMLButtonElement>) {
 	return (
-		<>
+		<button
+			className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full"
+			{...props}
+		>
 			<div className="p-[12px] bg-black-800 rounded-[8px]">
 				<NodeIcon node={node} className="size-[16px] text-white-900" />
 			</div>
@@ -26,7 +29,7 @@ function NodeItemContent({ node }: { node: NodeLike }) {
 				<div className="text-[13px]">{node.name ?? defaultName(node)}</div>
 				<div className="text-[12px] text-white-400">{node.id}</div>
 			</div>
-		</>
+		</button>
 	);
 }
 
@@ -78,8 +81,8 @@ export function RunButton() {
 										setIsDialogOpen(isOpen);
 									}}
 								>
-									<Dialog.Trigger className={menuItemClass}>
-										<NodeItemContent node={startingNode} />
+									<Dialog.Trigger asChild>
+										<NodeSelectItem node={startingNode} />
 									</Dialog.Trigger>
 									<Dialog.Portal>
 										<Dialog.Overlay className="fixed inset-0 bg-black/25 z-50" />
@@ -99,9 +102,7 @@ export function RunButton() {
 									</Dialog.Portal>
 								</Dialog.Root>
 							) : (
-								<button type="button" className={menuItemClass}>
-									<NodeItemContent node={startingNode} />
-								</button>
+								<NodeSelectItem node={startingNode} />
 							)}
 						</DropdownMenu.Item>
 					))}
