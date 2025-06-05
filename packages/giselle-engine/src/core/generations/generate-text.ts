@@ -37,6 +37,7 @@ export async function generateText(args: {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
+		telemetry: args.telemetry,
 		execute: async ({
 			runningGeneration,
 			generationContext,

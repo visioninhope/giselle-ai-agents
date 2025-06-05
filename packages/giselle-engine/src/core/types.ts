@@ -6,6 +6,7 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryFunction, QueryFunctionParams } from "@giselle-sdk/rag";
+import type { TelemetrySettings, GenerationCompleteOption } from "@giselle-sdk/telemetry";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
 import type { Vault } from "./vault";
@@ -22,13 +23,17 @@ export interface GiselleEngineContext {
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
+		metadata?: TelemetrySettings["metadata"];
 	};
 	vault?: Vault;
 	vectorStoreQueryFunctions?: {
 		github?: GitHubVectorStoreQueryFunction;
 	};
 	callbacks?: {
-		generationComplete: (generation: CompletedGeneration) => Promise<void>;
+		generationComplete: (
+			generation: CompletedGeneration,
+			options: GenerationCompleteOption,
+		) => Promise<void>;
 	};
 }
 
@@ -92,6 +97,7 @@ export interface GiselleEngineConfig {
 	telemetry?: {
 		isEnabled?: boolean;
 		waitForFlushFn?: () => Promise<unknown>;
+		metadata?: TelemetrySettings["metadata"];
 	};
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
 	vault?: Vault;
@@ -99,6 +105,9 @@ export interface GiselleEngineConfig {
 		github?: GitHubVectorStoreQueryFunction;
 	};
 	callbacks?: {
-		generationComplete: (generation: CompletedGeneration) => Promise<void>;
+		generationComplete: (
+			generation: CompletedGeneration,
+			options: GenerationCompleteOption,
+		) => Promise<void>;
 	};
 }

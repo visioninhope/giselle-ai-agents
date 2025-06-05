@@ -13,6 +13,7 @@ import {
 	type WorkspaceId,
 	isCompletedGeneration,
 } from "@giselle-sdk/data-type";
+import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import type { DataContent } from "ai";
 import { UsageLimitError } from "../../error";
 import { filePath } from "../../files/utils";
@@ -29,6 +30,7 @@ import { internalSetGeneration } from "./set-generation";
 export async function useGenerationExecutor<T>(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	telemetry?: TelemetrySettings;
 	execute: (utils: {
 		runningGeneration: RunningGeneration;
 		generationContext: GenerationContext;
@@ -39,6 +41,7 @@ export async function useGenerationExecutor<T>(args: {
 			outputId: OutputId,
 		) => Promise<string | undefined>;
 		workspaceId: WorkspaceId;
+		telemetry?: TelemetrySettings;
 		completeGeneration: (args: {
 			outputs: GenerationOutput[];
 			usage?: {
@@ -183,7 +186,15 @@ export async function useGenerationExecutor<T>(args: {
 				generation: completedGeneration,
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			}),
-			args.context.callbacks?.generationComplete?.(completedGeneration),
+			(async () => {
+				const result = await args.context.callbacks?.generationComplete?.(
+					completedGeneration,
+					{
+						telemetry: args.telemetry?.metadata,
+					},
+				);
+				return result;
+			})(),
 		]);
 		return completedGeneration;
 	}
@@ -195,6 +206,7 @@ export async function useGenerationExecutor<T>(args: {
 		fileResolver,
 		generationContentResolver,
 		workspaceId,
+		telemetry: args.telemetry,
 		completeGeneration,
 	});
 }

@@ -124,11 +124,10 @@ export const giselleEngine = NextGiselleEngine({
 	integrationConfigs,
 	sampleAppWorkspaceId,
 	callbacks: {
-		generationComplete: async (generation) => {
-			await emitTelemetry(
-				generation,
-				// todo: set metadata
-			);
+		generationComplete: async (generation, options) => {
+			await emitTelemetry(generation, {
+				telemetry: options?.telemetry,
+			});
 		},
 	},
 });

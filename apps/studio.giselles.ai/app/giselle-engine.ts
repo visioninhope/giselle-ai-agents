@@ -7,6 +7,7 @@ import type { CompletedGeneration } from "@giselle-sdk/data-type";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
 import { supabaseVaultDriver } from "@giselle-sdk/supabase-driver";
 import { emitTelemetry } from "@giselle-sdk/telemetry";
+import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import { createStorage } from "unstorage";
 import { queryGithubVectorStore } from "./services/vector-store/";
 
@@ -51,10 +52,6 @@ if (
 	throw new Error("missing github credentials");
 }
 
-async function onGenerationComplete(generation: CompletedGeneration) {
-	await emitTelemetry(generation);
-}
-
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
@@ -63,6 +60,12 @@ export const giselleEngine = NextGiselleEngine({
 	telemetry: {
 		isEnabled: true,
 		waitForFlushFn: waitForLangfuseFlush,
+		metadata: {
+			isProPlan: true,
+			teamType: "pro",
+			userId: "system",
+			subscriptionId: "system",
+		},
 	},
 	fetchUsageLimitsFn: fetchUsageLimits,
 	sampleAppWorkspaceId,
@@ -91,11 +94,13 @@ export const giselleEngine = NextGiselleEngine({
 		github: queryGithubVectorStore,
 	},
 	callbacks: {
-		generationComplete: async (generation) => {
-			await emitTelemetry(
-				generation,
-				// todo: set metadata
-			);
+		generationComplete: async (
+			generation,
+			options: { telemetry: TelemetrySettings["metadata"] },
+		) => {
+			await emitTelemetry(generation, {
+				telemetry: options.telemetry,
+			});
 		},
 	},
 });

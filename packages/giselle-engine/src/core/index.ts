@@ -56,6 +56,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		...config,
 		llmProviders: config.llmProviders ?? [],
 		integrationConfigs: config.integrationConfigs ?? {},
+		callbacks: config.callbacks,
 	};
 	return {
 		copyWorkspace: async (workspaceId: WorkspaceId) => {

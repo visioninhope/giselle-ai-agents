@@ -4,7 +4,11 @@ import type { TextGenerationLanguageModelData } from "@giselle-sdk/data-type";
 import { GenerationContext, isTextGenerationNode } from "@giselle-sdk/data-type";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import { Langfuse } from "langfuse";
-import type { AnthropicProviderOptions, TelemetryTag, ToolSet } from "./types";
+import type { AnthropicProviderOptions, TelemetrySettings, TelemetryTag, ToolSet } from "./types";
+
+export interface GenerationCompleteOption {
+	telemetry: TelemetrySettings["metadata"];
+}
 
 export function generateTelemetryTags(args: {
 	provider: string;
@@ -58,7 +62,7 @@ export function generateTelemetryTags(args: {
 
 export async function emitTelemetry(
 	generation: CompletedGeneration,
-	metadata?: Record<string, string>,
+	options: GenerationCompleteOption,
 ) {
 	try {
 		const langfuse = new Langfuse();
@@ -89,7 +93,7 @@ export async function emitTelemetry(
 				toolSet,
 				configurations: llm.configurations ?? {},
 			}),
-			metadata,
+			metadata: options?.telemetry,
 		});
 
 		const span = trace.span({
@@ -97,7 +101,7 @@ export async function emitTelemetry(
 			startTime: new Date(generation.queuedAt ?? generation.createdAt),
 			input: { messages },
 			endTime: new Date(generation.completedAt),
-			metadata,
+			metadata: options?.telemetry,
 		});
 
 		const displayCost = await calculateDisplayCost(
@@ -127,7 +131,7 @@ export async function emitTelemetry(
 			startTime: new Date(generation.createdAt),
 			completionStartTime: new Date(generation.startedAt),
 			endTime: new Date(generation.completedAt),
-			metadata,
+			metadata: options?.telemetry,
 		});
 
 		await langfuse.flushAsync();
