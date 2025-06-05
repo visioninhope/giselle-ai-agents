@@ -125,9 +125,11 @@ export const giselleEngine = NextGiselleEngine({
 	sampleAppWorkspaceId,
 	callbacks: {
 		generationComplete: async (generation, options) => {
-			await emitTelemetry(generation, {
-				telemetry: options?.telemetry,
-			});
+			try {
+				await emitTelemetry(generation, telemetry: options?.telemetry);
+			} catch (error) {
+				console.error("Telemetry emission failed:", error);
+			}
 		},
 	},
 });
