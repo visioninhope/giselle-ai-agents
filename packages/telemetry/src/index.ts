@@ -75,7 +75,7 @@ export async function emitTelemetry(
 			tags: generateTelemetryTags({
 				provider: llm.provider,
 				modelId: llm.id,
-				toolSet: {},
+				toolSet: {}, // TODO: set toolSet
 				configurations: llm.configurations ?? {},
 			}),
 			metadata,
