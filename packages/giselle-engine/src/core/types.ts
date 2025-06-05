@@ -6,7 +6,10 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryFunction, QueryFunctionParams } from "@giselle-sdk/rag";
-import type { TelemetrySettings, GenerationCompleteOption } from "@giselle-sdk/telemetry";
+import type {
+	GenerationCompleteOption,
+	TelemetrySettings,
+} from "@giselle-sdk/telemetry";
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
 import type { Vault } from "./vault";
