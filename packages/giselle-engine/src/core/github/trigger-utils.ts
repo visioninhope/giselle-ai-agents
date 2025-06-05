@@ -29,8 +29,8 @@ export async function resolveTrigger(args: ResolveTriggerArgs) {
 		(await resolvePullRequestOpenedTrigger(args)) ||
 		(await resolvePullRequestReadyForReviewTrigger(args)) ||
 		resolvePullRequestClosedTrigger(args) ||
-		resolvePullRequestCommentTrigger(args) ||
-		resolvePullRequestReviewCommentTrigger(args)
+		(await resolvePullRequestCommentTrigger(args)) ||
+		(await resolvePullRequestReviewCommentTrigger(args))
 	);
 }
 
