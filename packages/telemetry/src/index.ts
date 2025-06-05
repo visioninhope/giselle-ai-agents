@@ -1,7 +1,9 @@
 export * from "./types";
-import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
-import type { ToolSet } from "ai";
-import type { TelemetryTag } from "./types";
+import type { CompletedGeneration } from "@giselle-sdk/data-type";
+import type { TextGenerationLanguageModelData } from "@giselle-sdk/data-type";
+import { calculateDisplayCost } from "@giselle-sdk/language-model";
+import { Langfuse } from "langfuse";
+import type { AnthropicProviderOptions, TelemetryTag, ToolSet } from "./types";
 
 export function generateTelemetryTags(args: {
 	provider: string;
@@ -51,4 +53,68 @@ export function generateTelemetryTags(args: {
 	}
 
 	return tags;
+}
+
+export async function emitTelemetry(generation: CompletedGeneration) {
+	try {
+		const langfuse = new Langfuse();
+
+		const llm = generation.context.operationNode.content
+			.llm as TextGenerationLanguageModelData;
+		const messages = generation.messages.map((msg) => ({
+			role: msg.role,
+			content: msg.content,
+		}));
+
+		const trace = langfuse.trace({
+			name: "llm-generation",
+			input: { messages },
+			tags: generateTelemetryTags({
+				provider: llm.provider,
+				modelId: llm.id,
+				toolSet: {},
+				configurations: llm.configurations ?? {},
+			}),
+		});
+
+		const span = trace.span({
+			name: "llm-generation",
+			startTime: new Date(generation.queuedAt ?? generation.createdAt),
+			input: { messages },
+			endTime: new Date(generation.completedAt),
+		});
+
+		const displayCost = await calculateDisplayCost(
+			llm.provider,
+			llm.id,
+			generation.usage ?? {
+				promptTokens: 0,
+				completionTokens: 0,
+				totalTokens: 0,
+			},
+		);
+
+		span.generation({
+			name: "llm-generation",
+			model: llm.id,
+			modelParameters: llm.configurations ?? {},
+			input: { messages },
+			usage: {
+				input: generation.usage?.promptTokens ?? 0,
+				output: generation.usage?.completionTokens ?? 0,
+				total: generation.usage?.totalTokens ?? 0,
+				inputCost: displayCost.inputCostForDisplay ?? 0,
+				outputCost: displayCost.outputCostForDisplay ?? 0,
+				totalCost: displayCost.totalCostForDisplay ?? 0,
+				unit: "TOKENS",
+			},
+			startTime: new Date(generation.createdAt),
+			completionStartTime: new Date(generation.startedAt),
+			endTime: new Date(generation.completedAt),
+		});
+
+		await langfuse.flushAsync();
+	} catch (error) {
+		console.error("Telemetry emission failed:", error);
+	}
 }

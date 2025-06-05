@@ -2,6 +2,7 @@ import type {
 	CompletedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
+import type { TextGenerationLanguageModelData } from "@giselle-sdk/data-type";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import type { LLMGeneration, LLMSpan, LLMTracer } from "@giselle-sdk/telemetry";
 import { generateTelemetryTags } from "@giselle-sdk/telemetry";

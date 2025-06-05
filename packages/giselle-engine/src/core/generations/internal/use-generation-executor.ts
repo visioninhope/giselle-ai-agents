@@ -183,6 +183,7 @@ export async function useGenerationExecutor<T>(args: {
 				generation: completedGeneration,
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			}),
+			args.context.callbacks?.generationComplete?.(completedGeneration),
 		]);
 		return completedGeneration;
 	}

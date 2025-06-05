@@ -31,7 +31,9 @@
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "catalog:",
+		"@giselle-sdk/language-model": "workspace:*",
 		"ai": "catalog:",
+		"langfuse": "catalog:",
 		"react": "catalog:"
 	}
 }

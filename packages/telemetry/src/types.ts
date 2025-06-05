@@ -1,10 +1,8 @@
-import type { AnthropicProviderOptions } from "@ai-sdk/anthropic";
 import type {
 	CompletedGeneration,
 	RunningGeneration,
 } from "@giselle-sdk/data-type";
 import type { TelemetrySettings as AI_TelemetrySettings } from "ai";
-import type { ToolSet } from "ai";
 
 export interface TelemetrySettings {
 	metadata?: AI_TelemetrySettings["metadata"];
@@ -29,13 +27,17 @@ export type TokenUsage = {
 	totalTokens: number;
 };
 
-export type LLMUsage = unknown;
+export type LLMUsage = {
+	input: number;
+	output: number;
+	total: number;
+	inputCost: number;
+	outputCost: number;
+	totalCost: number;
+	unit: string;
+};
 
-export type TelemetryTag =
-	| BaseFunctionalityTag
-	| ProviderNameTag
-	| ProviderOptionTag
-	| ModelNameTag;
+export type TelemetryTag = string;
 
 export type LLMGeneration = {
 	messages: unknown[];
@@ -95,3 +97,13 @@ export interface LLMTracer {
 		unit: string;
 	}) => Promise<void>;
 }
+
+export type AnthropicProviderOptions = {
+	thinking?: {
+		type: "enabled" | "disabled";
+	};
+};
+
+export type ToolSet = {
+	openaiWebSearch?: boolean;
+};

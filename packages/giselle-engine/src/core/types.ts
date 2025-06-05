@@ -1,4 +1,5 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
+import type { CompletedGeneration } from "@giselle-sdk/data-type";
 import type {
 	GitHubInstallationAppAuth,
 	GitHubPersonalAccessTokenAuth,
@@ -27,7 +28,9 @@ export interface GiselleEngineContext {
 	vectorStoreQueryFunctions?: {
 		github?: GitHubVectorStoreQueryFunction;
 	};
-	tracer?: LLMTracer;
+	callbacks?: {
+		generationComplete: (generation: CompletedGeneration) => Promise<void>;
+	};
 }
 
 interface GitHubInstalltionAppAuthResolver {
@@ -96,5 +99,7 @@ export interface GiselleEngineConfig {
 	vectorStoreQueryFunctions?: {
 		github?: GitHubVectorStoreQueryFunction;
 	};
-	tracer?: LLMTracer;
+	callbacks?: {
+		generationComplete: (generation: CompletedGeneration) => Promise<void>;
+	};
 }

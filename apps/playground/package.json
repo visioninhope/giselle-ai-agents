@@ -19,6 +19,7 @@
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
+		"@giselle-sdk/telemetry": "workspace:*",
 		"@giselle-sdk/workflow-designer": "workspace:*",
 		"@supabase/supabase-js": "2.45.0",
 		"@tailwindcss/postcss": "catalog:",

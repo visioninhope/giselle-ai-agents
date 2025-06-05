@@ -224,43 +224,17 @@ export async function generateText(args: {
 								{
 									id: "id",
 									role: "user",
-									content: "",
+									content: Array.isArray(messages[0].content)
+										? messages[0].content
+												.filter((part) => part.type === "text")
+												.map((part) => part.text)
+												.join("")
+										: messages[0].content,
 								},
 							],
 							responseMessages: event.response.messages,
 						}),
 					});
-
-					if (args.context.tracer) {
-						try {
-							await args.context.tracer.createAndEmit({
-								runningGeneration,
-								completedGeneration,
-								tokenUsage: {
-									promptTokens: event.usage.promptTokens,
-									completionTokens: event.usage.completionTokens,
-									totalTokens: event.usage.totalTokens,
-								},
-								provider: operationNode.content.llm.provider,
-								modelId: operationNode.content.llm.id,
-								telemetry: args.telemetry,
-								messages: { messages },
-								output: event.text,
-								toolSet: preparedToolSet.toolSet,
-								configurations: operationNode.content.llm.configurations,
-								providerOptions:
-									operationNode.content.llm.provider === "anthropic"
-										? providerOptions
-										: undefined,
-								traceName: "ai.streamText",
-								spanName: "ai.streamText",
-								generationName: "ai.streamText.doStream",
-								unit: "TOKENS",
-							});
-						} catch (error) {
-							console.error("Telemetry emission failed:", error);
-						}
-					}
 
 					try {
 						await Promise.all(

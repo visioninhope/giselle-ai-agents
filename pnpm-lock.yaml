@@ -239,6 +239,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/telemetry':
+        specifier: workspace:*
+        version: link:../../packages/telemetry
       '@giselle-sdk/workflow-designer':
         specifier: workspace:*
         version: link:../../packages/workflow-designer
@@ -1138,9 +1141,15 @@ importers:
       '@ai-sdk/anthropic':
         specifier: 'catalog:'
         version: 1.2.10(zod@3.25.28)
+      '@giselle-sdk/language-model':
+        specifier: workspace:*
+        version: link:../language-model
       ai:
         specifier: 'catalog:'
         version: 4.3.9(react@19.1.0)(zod@3.25.28)
+      langfuse:
+        specifier: 'catalog:'
+        version: 3.37.0
       react:
         specifier: 'catalog:'
         version: 19.1.0
