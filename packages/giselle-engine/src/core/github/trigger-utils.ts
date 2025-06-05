@@ -466,6 +466,9 @@ async function resolvePullRequestCommentTrigger(
 					content: args.webhookEvent.data.payload.issue.title,
 				} satisfies GenerationOutput;
 			case "diff": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				const diff = await getPullRequestDiff({
 					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
 					pullNumber: args.webhookEvent.data.payload.issue.number,
