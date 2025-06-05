@@ -526,8 +526,10 @@ const vectorStoreFactoryImpl = {
 		],
 	}),
 	clone: (orig: VectorStoreNode): NodeFactoryCloneResult<VectorStoreNode> => {
+		console.log("[DEBUG] Cloning VectorStore Node");
+		console.log("[DEBUG] Original state:", orig.content.source.state);
 		const clonedContent = structuredClone(orig.content);
-		clonedContent.source.state = { status: "unconfigured" };
+		console.log("[DEBUG] Cloned state:", clonedContent.source.state);
 
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);
