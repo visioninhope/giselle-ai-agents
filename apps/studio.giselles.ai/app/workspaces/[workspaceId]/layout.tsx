@@ -1,6 +1,6 @@
 import { getGitHubVectorStores } from "@/app/services/vector-store";
 import { db } from "@/drizzle";
-import { githubVectorStoreFlag } from "@/flags";
+import { githubVectorStoreFlag, runV3Flag } from "@/flags";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
@@ -36,6 +36,7 @@ export default async function Layout({
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
 	const githubVectorStore = await githubVectorStoreFlag();
 	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
+	const runV3 = await runV3Flag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -63,6 +64,7 @@ export default async function Layout({
 			}}
 			featureFlag={{
 				githubVectorStore,
+				runV3,
 			}}
 		>
 			{children}

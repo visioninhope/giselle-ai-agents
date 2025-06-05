@@ -6,7 +6,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { triggerNodeDefaultName } from "@giselle-sdk/node-utils";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlayIcon } from "lucide-react";
 import Link from "next/link";
 import { Dialog, VisuallyHidden } from "radix-ui";
@@ -147,6 +147,7 @@ export function Header({
 	const { data, updateName } = useWorkflowDesigner();
 	const [openSettings, setOpenSettings] = useState(false);
 	const [openShareModal, setOpenShareModal] = useState(false);
+	const { runV3 } = useFeatureFlag();
 
 	const updateWorkflowName = (value?: string) => {
 		if (!value) {
@@ -191,15 +192,20 @@ export function Header({
 				</div>
 
 				<div className="flex items-center gap-[12px]">
-					{/* <Trigger /> */}
-					{/* {shareFeatureFlag && (
+					{runV3 ? (
+						<RunButton />
+					) : (
 						<>
-							<UserPresence />
-							<ShareButton onClick={() => setOpenShareModal(true)} />
+							<Trigger />
+							{shareFeatureFlag && (
+								<>
+									<UserPresence />
+									<ShareButton onClick={() => setOpenShareModal(true)} />
+								</>
+							)}
+							{action && <div className="flex items-center">{action}</div>}
 						</>
 					)}
-					{action && <div className="flex items-center">{action}</div>} */}
-					<RunButton />
 				</div>
 
 				<ShareModal
