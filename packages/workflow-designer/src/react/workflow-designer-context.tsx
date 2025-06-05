@@ -206,6 +206,88 @@ export function WorkflowDesignerProvider({
 		[client, data.id, setAndSaveWorkspace],
 	);
 
+	const handleTriggerNodeCopy = useCallback(
+		async (sourceNode: Node, newNode: Node): Promise<void> => {
+			if (
+				!isTriggerNode(sourceNode) ||
+				!isTriggerNode(newNode) ||
+				sourceNode.content.state.status !== "configured"
+			) {
+				return;
+			}
+
+			try {
+				console.log("[DEBUG] Duplicating trigger configuration");
+				const originalTriggerId = sourceNode.content.state.flowTriggerId;
+
+				const originalTriggerResult = await client.getTrigger({
+					flowTriggerId: originalTriggerId,
+				});
+
+				if (originalTriggerResult?.trigger) {
+					console.log(
+						"[DEBUG] Original trigger found, creating new configuration",
+					);
+					const originalTrigger = originalTriggerResult.trigger;
+					const result = await client.configureTrigger({
+						trigger: {
+							workspaceId: originalTrigger.workspaceId,
+							nodeId: newNode.id,
+							enable: originalTrigger.enable,
+							configuration: originalTrigger.configuration,
+						},
+					});
+
+					if (result?.triggerId) {
+						const provider = newNode.content.provider;
+
+						switch (provider) {
+							case "github": {
+								workflowDesignerRef.current.updateNodeData(newNode, {
+									content: {
+										type: "trigger",
+										provider: "github",
+										state: {
+											status: "configured",
+											flowTriggerId: result.triggerId,
+										},
+									},
+								});
+								break;
+							}
+							case "manual": {
+								workflowDesignerRef.current.updateNodeData(newNode, {
+									content: {
+										type: "trigger",
+										provider: "manual",
+										state: {
+											status: "configured",
+											flowTriggerId: result.triggerId,
+										},
+									},
+								});
+								break;
+							}
+							default: {
+								const _exhaustiveCheck: never = provider;
+								console.error(`Unsupported provider: ${String(provider)}`);
+								return;
+							}
+						}
+
+						console.log(
+							"[DEBUG] Trigger configuration duplicated successfully",
+						);
+						setAndSaveWorkspace();
+					}
+				}
+			} catch (error) {
+				console.error("Failed to duplicate trigger configuration:", error);
+			}
+		},
+		[client, setAndSaveWorkspace],
+	);
+
 	const copyNode = useCallback(
 		async (
 			sourceNode: Node,
@@ -223,9 +305,15 @@ export function WorkflowDesignerProvider({
 			}
 			setAndSaveWorkspace();
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
+			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
 			return newNodeDefinition;
 		},
 		[setAndSaveWorkspace, handleFileNodeCopy],
+		[
+			setAndSaveWorkspace,
+			handleFileNodeCopy,
+			handleTriggerNodeCopy,
+		],
 	);
 
 	const updateNodeData = useCallback(
