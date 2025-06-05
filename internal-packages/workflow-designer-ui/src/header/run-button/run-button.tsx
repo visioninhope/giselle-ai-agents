@@ -27,7 +27,7 @@ function NodeSelectItem({
 }: { node: NodeLike } & ButtonHTMLAttributes<HTMLButtonElement>) {
 	return (
 		<button
-			className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/20 rounded-[6px] w-full"
+			className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/30 rounded-[6px] w-full"
 			{...props}
 		>
 			<div className="p-[12px] bg-black-800 rounded-[8px]">
@@ -77,6 +77,10 @@ export function RunButton() {
 		[startFlow, data.nodes, data.connections],
 	);
 
+	if (startingNodes.length === 0) {
+		return null;
+	}
+
 	return (
 		<DropdownMenu.Root open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
 			<DropdownMenu.Trigger asChild>
@@ -88,7 +92,7 @@ export function RunButton() {
 				<DropdownMenu.Content
 					className={clsx(
 						"relative rounded-[8px] px-[8px] py-[8px] min-w-[200px]",
-						"bg-[hsla(255,_40%,_98%,_0.04)] text-white-900",
+						"bg-[rgba(0,0,0,_0.8)] text-white-900",
 						"backdrop-blur-[4px]",
 					)}
 					sideOffset={5}
