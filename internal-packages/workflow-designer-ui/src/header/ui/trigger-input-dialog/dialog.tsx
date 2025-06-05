@@ -1,30 +1,21 @@
 import {
 	type ActionNode,
-	type Generation,
 	type Input,
 	type TriggerNode,
 	isActionNode,
 } from "@giselle-sdk/data-type";
-import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AlertTriangleIcon, PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
-import {
-	type FormEventHandler,
-	useCallback,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import { type FormEventHandler, useCallback, useMemo, useState } from "react";
+import { useFlowController } from "../../../hooks/use-flow-controller";
 import { useTrigger } from "../../../hooks/use-trigger";
-import { useToasts } from "../../../ui/toast";
 import { Button } from "./button";
 import {
 	type FormInput,
 	buttonLabel,
-	createGenerationsForFlow,
 	createInputsFromTrigger,
 	parseFormInputs,
 } from "./helpers";
@@ -34,27 +25,18 @@ export function TriggerInputDialog({
 	onClose,
 }: { node: TriggerNode; onClose: () => void }) {
 	const { data: trigger, isLoading } = useTrigger(node);
-	const [validationErrors, setValidationErrors] = useState<
-		Record<string, string>
-	>({});
-	const [isSubmitting, setIsSubmitting] = useState(false);
-	const cancelRef = useRef(false);
-
-	const { createGeneration, startGeneration, stopGeneration } =
-		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 
 	const inputs = useMemo<FormInput[]>(
 		() => createInputsFromTrigger(trigger),
 		[trigger],
 	);
+
 	const flow = useMemo(
 		() => buildWorkflowFromNode(node.id, data.nodes, data.connections),
 		[node.id, data.nodes, data.connections],
 	);
-	const activeGenerationsRef = useRef<Generation[]>([]);
 
-	const { info } = useToasts();
 	const requiresActionNodes = useMemo(
 		() =>
 			flow === null
@@ -83,6 +65,12 @@ export function TriggerInputDialog({
 						),
 		[flow, data.connections],
 	);
+	const [validationErrors, setValidationErrors] = useState<
+		Record<string, string>
+	>({});
+	const [isSubmitting, setIsSubmitting] = useState(false);
+
+	const { startFlow } = useFlowController();
 
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
@@ -100,87 +88,15 @@ export function TriggerInputDialog({
 			setIsSubmitting(true);
 
 			try {
-				await startFlow(values);
+				await startFlow(flow, inputs, values, onClose);
 			} finally {
 				setIsSubmitting(false);
-				activeGenerationsRef.current = [];
 			}
 		},
-		[inputs],
+		[inputs, onClose, flow, startFlow],
 	);
 
-	const stopFlow = useCallback(async () => {
-		cancelRef.current = true;
-		await Promise.all(
-			activeGenerationsRef.current.map((generation) =>
-				stopGeneration(generation.id),
-			),
-		);
-	}, [stopGeneration]);
-
-	const startFlow = useCallback(
-		async (values: Record<string, string | number>) => {
-			if (flow === null) {
-				return;
-			}
-			const generations = createGenerationsForFlow(
-				flow,
-				inputs,
-				values,
-				createGeneration,
-				data.id,
-			);
-			activeGenerationsRef.current = generations;
-
-			cancelRef.current = false;
-			info("Workflow submitted successfully", {
-				action: (
-					<button
-						type="button"
-						className="bg-white rounded-[4px] text-black-850 px-[8px] text-[14px] py-[2px] cursor-pointer"
-						onClick={async () => {
-							await stopFlow();
-						}}
-					>
-						Cancel
-					</button>
-				),
-			});
-
-			for (const [jobIndex, job] of flow.jobs.entries()) {
-				await Promise.all(
-					job.operations.map(async (operation) => {
-						const generation = generations.find(
-							(g) => g.context.operationNode.id === operation.node.id,
-						);
-						if (generation === undefined) {
-							return;
-						}
-						if (cancelRef.current) {
-							return;
-						}
-						await startGeneration(generation.id);
-					}),
-				);
-
-				if (jobIndex === 0) {
-					onClose();
-				}
-			}
-		},
-		[
-			createGeneration,
-			data.id,
-			flow,
-			info,
-			inputs,
-			onClose,
-			startGeneration,
-			stopFlow,
-		],
-	);
-
-	if (isLoading || trigger === undefined || flow === null) {
+	if (isLoading || flow === null) {
 		return null;
 	}
 
