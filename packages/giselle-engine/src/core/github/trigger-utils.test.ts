@@ -2,8 +2,21 @@ import type { FlowTrigger, Output } from "@giselle-sdk/data-type";
 import { FlowTriggerId, OutputId } from "@giselle-sdk/data-type";
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
-import { describe, expect, test } from "vitest";
+import { describe, expect, test, vi } from "vitest";
 import { resolveTrigger } from "./trigger-utils";
+
+vi.mock("@giselle-sdk/github-tool", async () => {
+	const actual = await vi.importActual<
+		typeof import("@giselle-sdk/github-tool")
+	>("@giselle-sdk/github-tool");
+	return {
+		...actual,
+		getPullRequestDiff: vi.fn().mockResolvedValue("diff"),
+		getPullRequestReviewComment: vi
+			.fn()
+			.mockResolvedValue({ body: "previous" }),
+	};
+});
 
 function createOutput(accessor: string): Output {
 	return {
@@ -52,7 +65,13 @@ function createIssueCommentEvent(issue: {
 }): WebhookEvent {
 	return {
 		name: "issue_comment.created",
-		data: { payload: { comment: { body: "/giselle hi" }, issue } },
+		data: {
+			payload: {
+				comment: { body: "/giselle hi" },
+				issue,
+				repository: { node_id: "r_1234" },
+			},
+		},
 	} as WebhookEvent<"issue_comment.created">;
 }
 
@@ -80,7 +99,11 @@ function createPullRequestReviewCommentEvent(pr: {
 			payload: {
 				pull_request: pr,
 				repository: { node_id: "r_1234" },
-				comment: { body: "/giselle hi" },
+				comment: {
+					body: "/giselle hi",
+					diff_hunk: "@@ -1 +1 @@\n+diff",
+					id: 1,
+				},
 			},
 		},
 	} as WebhookEvent<"pull_request_review_comment.created">;
@@ -181,7 +204,7 @@ describe("resolveTrigger", () => {
 		});
 	});
 
-	describe.skip("pull request comment", () => {
+	describe("pull request comment", () => {
 		const webhookEvent = createIssueCommentEvent({
 			title: "PR title",
 			body: "PR body",
@@ -264,7 +287,7 @@ describe("resolveTrigger", () => {
 	];
 
 	for (const { id, name, title } of prCases) {
-		describe.skip(id, () => {
+		describe(id, () => {
 			const webhookEvent = createPullRequestEvent(name, {
 				title,
 				body: `${title} body`,

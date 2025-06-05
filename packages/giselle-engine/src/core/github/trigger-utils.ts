@@ -244,6 +244,9 @@ async function resolvePullRequestOpenedTrigger(
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
 			case "diff": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				const diff = await getPullRequestDiff({
 					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
 					pullNumber: args.webhookEvent.data.payload.pull_request.number,
@@ -320,6 +323,9 @@ async function resolvePullRequestReadyForReviewTrigger(
 					content: args.webhookEvent.data.payload.pull_request.html_url,
 				} satisfies GenerationOutput;
 			case "diff": {
+				if (args.output.accessor !== payload) {
+					continue;
+				}
 				const diff = await getPullRequestDiff({
 					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
 					pullNumber: args.webhookEvent.data.payload.pull_request.number,
