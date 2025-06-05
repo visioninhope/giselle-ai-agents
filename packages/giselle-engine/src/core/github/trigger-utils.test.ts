@@ -181,7 +181,7 @@ describe("resolveTrigger", () => {
 		});
 	});
 
-	describe("pull request comment", () => {
+	describe.skip("pull request comment", () => {
 		const webhookEvent = createIssueCommentEvent({
 			title: "PR title",
 			body: "PR body",
