@@ -74,6 +74,11 @@ export const githubEventInputs: GithubEventInputMap = {
 			type: "multiline-text",
 			required: true,
 		},
+		diff: {
+			label: "diff",
+			type: "multiline-text",
+			required: false,
+		},
 	},
 	"github.pull_request.ready_for_review": {
 		title: { label: "Title", type: "text", required: true },

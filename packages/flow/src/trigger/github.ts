@@ -59,6 +59,7 @@ export const githubPullRequestCommentCreatedTrigger = {
 			issueNumber: z.number(),
 			issueTitle: z.string(),
 			issueBody: z.string(),
+			diff: z.string(),
 		}),
 		conditions: z.object({
 			callsign: z.string(),

@@ -403,9 +403,9 @@ function resolvePullRequestClosedTrigger(
 	return null;
 }
 
-function resolvePullRequestCommentTrigger(
+async function resolvePullRequestCommentTrigger(
 	args: ResolveTriggerArgs,
-): GenerationOutput | null {
+): Promise<GenerationOutput | null> {
 	if (
 		!ensureWebhookEvent(args.webhookEvent, "issue_comment.created") ||
 		args.trigger.configuration.event.id !==
@@ -465,6 +465,23 @@ function resolvePullRequestCommentTrigger(
 					outputId: args.output.id,
 					content: args.webhookEvent.data.payload.issue.title,
 				} satisfies GenerationOutput;
+			case "diff": {
+				const diff = await getPullRequestDiff({
+					repositoryNodeId: args.webhookEvent.data.payload.repository.node_id,
+					pullNumber: args.webhookEvent.data.payload.issue.number,
+					authConfig: {
+						strategy: "app-installation",
+						appId: args.appId,
+						privateKey: args.privateKey,
+						installationId: args.installationId,
+					},
+				});
+				return {
+					type: "generated-text",
+					outputId: args.output.id,
+					content: diff,
+				} satisfies GenerationOutput;
+			}
 			default: {
 				const _exhaustiveCheck: never = payload;
 				throw new Error(`Unhandled payload id: ${_exhaustiveCheck}`);
