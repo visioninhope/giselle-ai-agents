@@ -6,7 +6,6 @@ import {
 	verifyRequest as verifyRequestAsGitHubWebook,
 } from "@giselle-sdk/github-tool";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
-import { emitTelemetry, generateTelemetryTags } from "@giselle-sdk/telemetry";
 import { after } from "next/server";
 import { GiselleEngine, type GiselleEngineConfig } from "../core";
 import {
