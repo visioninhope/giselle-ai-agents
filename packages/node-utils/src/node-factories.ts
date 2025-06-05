@@ -327,8 +327,10 @@ const actionFactoryImpl = {
 			outputs: [],
 		}) satisfies ActionNode,
 	clone: (orig: ActionNode): NodeFactoryCloneResult<ActionNode> => {
+		console.log("[DEBUG] Cloning Action Node");
+		console.log("[DEBUG] Original state:", orig.content.command.state);
 		const clonedContent = structuredClone(orig.content);
-		clonedContent.command.state = { status: "unconfigured" };
+		console.log("[DEBUG] Cloned state:", clonedContent.command.state);
 
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);
