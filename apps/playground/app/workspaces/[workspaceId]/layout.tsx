@@ -15,6 +15,7 @@ export default async function Layout({
 			workspaceId={workspaceId}
 			featureFlag={{
 				githubVectorStore: true,
+				runV3: true,
 			}}
 		>
 			{children}
