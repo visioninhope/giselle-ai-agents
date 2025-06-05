@@ -64,8 +64,14 @@ export const GenerationUsage = z.object({
 });
 export type GenerationUsage = z.infer<typeof GenerationUsage>;
 
+export const GenerationBase = z.object({
+	id: GenerationId.schema,
+	context: GenerationContextLike,
+	status: z.string(),
+});
+
 // Specific schema validators for each generation status
-export const CreatedGeneration = z.object({
+export const CreatedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCreated,
@@ -82,7 +88,7 @@ export function isCreatedGeneration(
 	return CreatedGeneration.safeParse(generation).success;
 }
 
-export const QueuedGeneration = z.object({
+export const QueuedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusQueued,
@@ -98,7 +104,7 @@ export function isQueuedGeneration(data: unknown): data is QueuedGeneration {
 	return QueuedGeneration.safeParse(data).success;
 }
 
-export const RunningGeneration = z.object({
+export const RunningGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusRunning,
@@ -118,7 +124,7 @@ export function isRunningGeneration(
 	return RunningGeneration.safeParse(generation).success;
 }
 
-export const CompletedGeneration = z.object({
+export const CompletedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCompleted,
@@ -141,7 +147,7 @@ export function isCompletedGeneration(
 	return CompletedGeneration.safeParse(generation).success;
 }
 
-export const FailedGeneration = z.object({
+export const FailedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusFailed,
@@ -163,7 +169,7 @@ export function isFailedGeneration(
 	return FailedGeneration.safeParse(generation).success;
 }
 
-export const CancelledGeneration = z.object({
+export const CancelledGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCancelled,
