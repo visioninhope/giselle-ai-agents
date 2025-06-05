@@ -55,7 +55,10 @@ export function generateTelemetryTags(args: {
 	return tags;
 }
 
-export async function emitTelemetry(generation: CompletedGeneration) {
+export async function emitTelemetry(
+	generation: CompletedGeneration,
+	metadata?: Record<string, string>,
+) {
 	try {
 		const langfuse = new Langfuse();
 
@@ -75,6 +78,7 @@ export async function emitTelemetry(generation: CompletedGeneration) {
 				toolSet: {},
 				configurations: llm.configurations ?? {},
 			}),
+			metadata,
 		});
 
 		const span = trace.span({
@@ -82,6 +86,7 @@ export async function emitTelemetry(generation: CompletedGeneration) {
 			startTime: new Date(generation.queuedAt ?? generation.createdAt),
 			input: { messages },
 			endTime: new Date(generation.completedAt),
+			metadata,
 		});
 
 		const displayCost = await calculateDisplayCost(
@@ -111,6 +116,7 @@ export async function emitTelemetry(generation: CompletedGeneration) {
 			startTime: new Date(generation.createdAt),
 			completionStartTime: new Date(generation.startedAt),
 			endTime: new Date(generation.completedAt),
+			metadata,
 		});
 
 		await langfuse.flushAsync();

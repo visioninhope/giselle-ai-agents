@@ -125,7 +125,10 @@ export const giselleEngine = NextGiselleEngine({
 	sampleAppWorkspaceId,
 	callbacks: {
 		generationComplete: async (generation) => {
-			await emitTelemetry(generation);
+			await emitTelemetry(
+				generation,
+				// todo: set metadata
+			);
 		},
 	},
 });
