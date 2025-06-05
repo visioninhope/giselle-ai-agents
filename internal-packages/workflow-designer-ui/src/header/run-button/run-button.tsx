@@ -1,14 +1,23 @@
 import {
+	type Node,
 	type NodeLike,
+	type OperationNode,
 	isOperationNode,
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/node-utils";
+import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";
-import { type ButtonHTMLAttributes, useMemo, useState } from "react";
+import {
+	type ButtonHTMLAttributes,
+	useCallback,
+	useMemo,
+	useState,
+} from "react";
+import { useFlowController } from "../../hooks/use-flow-controller";
 import { NodeIcon } from "../../icons/node";
 import { TriggerInputDialog } from "../ui";
 import { Button } from "./ui/button";
@@ -35,6 +44,7 @@ function NodeSelectItem({
 
 export function RunButton() {
 	const { data } = useWorkflowDesigner();
+	const { startFlow } = useFlowController();
 
 	const [isDialogOpen, setIsDialogOpen] = useState(false);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -54,6 +64,20 @@ export function RunButton() {
 		});
 		return [...triggerNodes, ...startingOperationNodes];
 	}, [data.nodes]);
+
+	const startOperationFlow = useCallback(
+		async (startingNode: OperationNode) => {
+			const flow = buildWorkflowFromNode(
+				startingNode.id,
+				data.nodes,
+				data.connections,
+			);
+
+			await startFlow(flow, [], {});
+		},
+		[startFlow, data.nodes, data.connections],
+	);
+
 	return (
 		<DropdownMenu.Root open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
 			<DropdownMenu.Trigger asChild>
@@ -73,7 +97,15 @@ export function RunButton() {
 				>
 					<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
 					{startingNodes.map((startingNode) => (
-						<DropdownMenu.Item key={startingNode.id} asChild>
+						<DropdownMenu.Item
+							key={startingNode.id}
+							asChild
+							onSelect={async () => {
+								if (isOperationNode(startingNode)) {
+									await startOperationFlow(startingNode);
+								}
+							}}
+						>
 							{isTriggerNode(startingNode) ? (
 								<Dialog.Root
 									open={isDialogOpen}
