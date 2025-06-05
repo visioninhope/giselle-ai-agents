@@ -55,10 +55,12 @@ export function toNodeGenerationIndex(
 		nodeId: generation.context.operationNode.id,
 		status: generation.status,
 		createdAt: generation.createdAt,
-		queuedAt: generation.queuedAt,
-		startedAt: generation.startedAt,
-		completedAt: generation.completedAt,
-		failedAt: generation.failedAt,
-		cancelledAt: generation.cancelledAt,
+		queuedAt: "queuedAt" in generation ? generation.queuedAt : undefined,
+		startedAt: "startedAt" in generation ? generation.startedAt : undefined,
+		completedAt:
+			"completedAt" in generation ? generation.completedAt : undefined,
+		failedAt: "failedAt" in generation ? generation.failedAt : undefined,
+		cancelledAt:
+			"cancelledAt" in generation ? generation.cancelledAt : undefined,
 	};
 }

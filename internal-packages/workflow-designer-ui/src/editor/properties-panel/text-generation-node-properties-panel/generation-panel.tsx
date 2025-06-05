@@ -78,7 +78,9 @@ function getGenerationTextContent(generation: Generation): string {
 
 	// Fallback to extracting from messages if no outputs or not completed
 	const generatedMessages =
-		generation.messages?.filter((m) => m.role === "assistant") ?? [];
+		"messages" in generation
+			? (generation.messages?.filter((m) => m.role === "assistant") ?? [])
+			: [];
 
 	return generatedMessages
 		.map((message) =>

@@ -142,8 +142,12 @@ export function GenerationRunnerSystemProvider({
 				onUpdateMessages?: (generation: RunningGeneration) => void;
 			},
 		) => {
-			let status = generationListener.current[generationId].status;
-			const messages = generationListener.current[generationId].messages;
+			const currentGeneration = generationListener.current[generationId];
+			let status = currentGeneration.status;
+			let messages =
+				"messages" in currentGeneration
+					? (currentGeneration.messages ?? [])
+					: [];
 			const timeoutDuration = options?.timeout || 1000 * 800; // The maximum duration of through enabled fluid compute. https://vercel.com/docs/functions/runtimes#max-duration
 			const startTime = Date.now();
 
@@ -155,11 +159,17 @@ export function GenerationRunnerSystemProvider({
 						id: generation.id,
 						context: generation.context,
 						createdAt: generation.createdAt,
-						queuedAt: generation.queuedAt ?? Date.now(),
-						startedAt: generation.startedAt ?? Date.now(),
+						queuedAt:
+							"queuedAt" in generation
+								? (generation.queuedAt ?? Date.now())
+								: Date.now(),
+						startedAt:
+							"startedAt" in generation
+								? (generation.startedAt ?? Date.now())
+								: Date.now(),
 						status: "failed",
 						failedAt: Date.now(),
-						messages: generation.messages ?? [],
+						messages,
 						error: {
 							name: "Generation timed out",
 							message: "Generation timed out",
@@ -202,6 +212,7 @@ export function GenerationRunnerSystemProvider({
 					isRunningGeneration(generation) &&
 					!arrayEquals(messages, generation.messages)
 				) {
+					messages = generation.messages;
 					options?.onUpdateMessages?.(generation);
 				}
 

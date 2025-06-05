@@ -212,69 +212,14 @@ export type NodeGenerationIndex = z.infer<typeof NodeGenerationIndex>;
 /**
  * Unified Generation schema with conditional validation based on status
  */
-export const Generation = z
-	.object({
-		// Common fields for all generations
-		id: GenerationId.schema,
-		context: GenerationContextLike,
-		status: GenerationStatus,
-		createdAt: z.number(),
-
-		// Optional timing fields
-		queuedAt: z.number().optional(),
-		startedAt: z.number().optional(),
-		completedAt: z.number().optional(),
-		failedAt: z.number().optional(),
-		cancelledAt: z.number().optional(),
-
-		// Optional content fields
-		messages: z.array(Message).optional(),
-		outputs: z.array(GenerationOutput).optional(),
-		usage: GenerationUsage.optional(),
-		error: GenerationError.optional(),
-	})
-	.refine(
-		(data) => {
-			// Required fields based on status
-			switch (data.status) {
-				case "created":
-					return data.messages === undefined;
-				case "queued":
-					return data.queuedAt !== undefined && data.messages === undefined;
-				case "running":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						Array.isArray(data.messages)
-					);
-				case "completed":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						data.completedAt !== undefined &&
-						Array.isArray(data.messages) &&
-						Array.isArray(data.outputs)
-					);
-				case "failed":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						data.failedAt !== undefined &&
-						data.error !== undefined &&
-						Array.isArray(data.messages)
-					);
-				case "cancelled":
-					return data.cancelledAt !== undefined;
-				default:
-					return false;
-			}
-		},
-		{
-			message:
-				"Generation fields don't match required fields for the specified status",
-			path: ["status"],
-		},
-	);
+export const Generation = z.discriminatedUnion("status", [
+	CreatedGeneration,
+	QueuedGeneration,
+	RunningGeneration,
+	CompletedGeneration,
+	FailedGeneration,
+	CancelledGeneration,
+]);
 
 // Export the Generation type
 export type Generation = z.infer<typeof Generation>;

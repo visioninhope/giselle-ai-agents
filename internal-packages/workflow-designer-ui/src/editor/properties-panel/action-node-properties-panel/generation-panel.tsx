@@ -96,12 +96,13 @@ export function GenerationPanel({
 				</div>
 			</div>
 			<div className="flex-1 py-[4px] px-[16px] overflow-y-auto">
-				{currentGeneration.outputs?.map((output) => {
-					if (output.type !== "generated-text") {
-						return null;
-					}
-					return output.content;
-				})}
+				{currentGeneration.status === "completed" &&
+					currentGeneration.outputs.map((output) => {
+						if (output.type !== "generated-text") {
+							return null;
+						}
+						return output.content;
+					})}
 			</div>
 		</div>
 	);
