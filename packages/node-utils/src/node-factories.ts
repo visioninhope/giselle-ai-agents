@@ -286,13 +286,10 @@ const triggerFactoryImpl = {
 			outputs: [],
 		}) satisfies TriggerNode,
 	clone: (orig: TriggerNode): NodeFactoryCloneResult<TriggerNode> => {
-		console.log("[DEBUG] Cloning Trigger Node");
-		console.log("[DEBUG] Original state:", orig.content.state);
 		const clonedContent = structuredClone(orig.content);
 		// Reset trigger state to unconfigured - actual configuration duplication
-		// is handled at higher level in useDuplicateNode
+		// is handled at higher level in handleTriggerNodeCopy
 		clonedContent.state = { status: "unconfigured" };
-		console.log("[DEBUG] Cloned state:", clonedContent.state);
 
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);

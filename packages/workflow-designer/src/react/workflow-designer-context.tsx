@@ -218,7 +218,6 @@ export function WorkflowDesignerProvider({
 			}
 
 			try {
-				console.log("[DEBUG] Duplicating trigger configuration");
 				const originalTriggerId = sourceNode.content.state.flowTriggerId;
 
 				const originalTriggerResult = await client.getTrigger({
@@ -226,9 +225,6 @@ export function WorkflowDesignerProvider({
 				});
 
 				if (originalTriggerResult?.trigger) {
-					console.log(
-						"[DEBUG] Original trigger found, creating new configuration",
-					);
 					const originalTrigger = originalTriggerResult.trigger;
 					const result = await client.configureTrigger({
 						trigger: {
@@ -250,9 +246,6 @@ export function WorkflowDesignerProvider({
 							},
 						} as Partial<TriggerNode>);
 
-						console.log(
-							"[DEBUG] Trigger configuration duplicated successfully",
-						);
 						setAndSaveWorkspace();
 					}
 				}
@@ -280,7 +273,6 @@ export function WorkflowDesignerProvider({
 			}
 			setAndSaveWorkspace();
 
-			// Handle different node types - following existing pattern
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
 			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
 
