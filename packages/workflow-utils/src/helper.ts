@@ -7,7 +7,6 @@ import {
 	type NodeId,
 	type NodeLike,
 	type Operation,
-	type OperationNode,
 	type WorkflowId,
 	isOperationNode,
 } from "@giselle-sdk/data-type";
@@ -211,7 +210,7 @@ export function createJobMap(
 		return levels;
 	};
 
-	// Filter for operation nodes and connections
+	// Filter for operation nodes and connections between operation nodes only
 	const operationNodeIdSet = new Set<NodeId>();
 	for (const node of nodeSet) {
 		if (node.type === "operation") {
@@ -220,7 +219,10 @@ export function createJobMap(
 	}
 	const operationConnectionSet = new Set<Connection>();
 	for (const connection of connectionSet) {
-		if (connection.outputNode.type === "operation") {
+		if (
+			connection.outputNode.type === "operation" &&
+			connection.inputNode.type === "operation"
+		) {
 			operationConnectionSet.add(connection);
 		}
 	}
