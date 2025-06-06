@@ -19,6 +19,9 @@ export async function runFlow(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
 	triggerInputs?: GenerationContextInput[];
+	callbacks?: {
+		jobComplete?: (args: { jobIndex: number }) => void | Promise<void>;
+	};
 }) {
 	const trigger = await getFlowTrigger({
 		storage: args.context.storage,
@@ -42,7 +45,7 @@ export async function runFlow(args: {
 	}
 
 	const runId = RunId.generate();
-	for (const job of flow.jobs) {
+	for (const [index, job] of flow.jobs.entries()) {
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
@@ -107,5 +110,8 @@ export async function runFlow(args: {
 				}
 			}),
 		);
+		if (args.callbacks?.jobComplete) {
+			await args.callbacks.jobComplete({ jobIndex: index });
+		}
 	}
 }
