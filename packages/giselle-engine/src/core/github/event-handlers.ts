@@ -21,11 +21,40 @@ import type { parseCommand } from "./utils";
 
 type ProgressTableRow = Job & {
 	status: "queued" | "running" | "complete" | "failed";
+	updatedAt: Date | undefined;
 };
 type ProgressTableData = ProgressTableRow[];
+function formatDateTime(date: Date): string {
+	const months = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	];
+	const month = months[date.getUTCMonth()];
+	const day = date.getUTCDate();
+	const year = date.getUTCFullYear();
+	const hours = date.getUTCHours();
+	const minutes = date.getUTCMinutes();
+
+	const period = hours >= 12 ? "pm" : "am";
+	const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+	const displayMinutes = minutes.toString().padStart(2, "0");
+
+	return `${month} ${day}, ${year} ${displayHours}:${displayMinutes}${period}`;
+}
+
 function buildProgressTable(data: ProgressTableData) {
-	const header = "| Step | Nodes | Status |";
-	const separator = "| --- | --- | --- |";
+	const header = "| Step | Nodes | Status | Updated(UTC) |";
+	const separator = "| --- | --- | --- | --- |";
 	const rows = data.map((row, i) => {
 		const names = row.operations
 			.map((op) => op.node.name ?? op.node.id)
@@ -50,7 +79,7 @@ function buildProgressTable(data: ProgressTableData) {
 			}
 		}
 
-		return `| ${i + 1} | ${names} | ${status} |`;
+		return `| ${i + 1} | ${names} | ${status} | ${row.updatedAt ? formatDateTime(row.updatedAt) : "--"} |`;
 	});
 	return [header, separator, ...rows].join("\n");
 }
@@ -324,7 +353,6 @@ export async function processEvent<TEventName extends WebhookEventName>(
 
 		let createdComment: { id: number; type: "issue" | "review" } | undefined;
 		const updateComment = async (body: string) => {
-			console.log(createdComment);
 			if (!createdComment) return;
 			if (createdComment.type === "issue") {
 				await deps.updateIssueComment({
@@ -363,7 +391,11 @@ export async function processEvent<TEventName extends WebhookEventName>(
 									isTriggerNode(operation.node),
 								),
 						)
-						.map((job) => ({ ...job, status: "queued" }));
+						.map((job) => ({
+							...job,
+							status: "queued",
+							updatedAt: undefined,
+						}));
 
 					const body = `Running flow...\n\n${buildProgressTable(progressTableData)}`;
 
@@ -415,16 +447,19 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				},
 				jobStart: async ({ job }) => {
 					progressTableData = progressTableData.map((row) =>
-						row.id === job.id ? { ...row, status: "running" } : row,
+						row.id === job.id
+							? { ...row, status: "running", updatedAt: new Date() }
+							: row,
 					);
 					await updateComment(
 						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
 					);
 				},
 				jobComplete: async ({ job }) => {
-					console.log("jobComplete", job.id);
 					progressTableData = progressTableData.map((row) =>
-						row.id === job.id ? { ...row, status: "complete" } : row,
+						row.id === job.id
+							? { ...row, status: "complete", updatedAt: new Date() }
+							: row,
 					);
 					await updateComment(
 						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
