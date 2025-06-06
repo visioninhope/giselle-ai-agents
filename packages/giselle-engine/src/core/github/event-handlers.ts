@@ -267,7 +267,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		createAuthConfig: (installationId: number) => GitHubAuthConfig;
 		deps: EventHandlerDependencies;
 	},
-): Promise<boolean> {
+) {
 	if (
 		!args.trigger.enable ||
 		args.trigger.configuration.provider !== "github"
@@ -275,6 +275,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		return false;
 	}
 
+	const repositoryNodeId = args.trigger.configuration.repositoryNodeId;
 	const installationId = args.trigger.configuration.installationId;
 	const authConfig = args.createAuthConfig(installationId);
 
@@ -287,6 +288,9 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			authConfig,
 			deps,
 		});
+		if (!result.shouldRun) {
+			continue;
+		}
 
 		if (result.reactionNodeId) {
 			await deps.addReaction({
@@ -296,148 +300,101 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			});
 		}
 
-		if (result.shouldRun) {
-			let flow: ReturnType<typeof buildWorkflowFromNode> | null = null;
-			try {
-				const workspace = await getWorkspace({
-					storage: args.context.storage,
-					workspaceId: args.trigger.workspaceId,
-				});
+		const workspace = await getWorkspace({
+			storage: args.context.storage,
+			workspaceId: args.trigger.workspaceId,
+		});
 
-				flow = buildWorkflowFromNode(
-					args.trigger.nodeId,
-					workspace.nodes,
-					workspace.connections,
-				);
-			} catch {
-				flow = null;
-			}
+		const flow = buildWorkflowFromNode(
+			args.trigger.nodeId,
+			workspace.nodes,
+			workspace.connections,
+		);
+		if (flow === null) {
+			continue;
+		}
 
-			let createdComment: { id: number; type: "issue" | "review" } | undefined;
+		let createdComment: { id: number; type: "issue" | "review" } | undefined;
 
-			if (flow) {
-				const table = buildProgressTable(flow.jobs, -1);
-				const body = `Running flow...\n\n${table}`;
+		const table = buildProgressTable(flow.jobs, -1);
+		const body = `Running flow...\n\n${table}`;
 
-				if (
-					deps.ensureWebhookEvent(args.event, "issue_comment.created") &&
-					args.event.data.payload.issue?.pull_request === null
-				) {
-					const issueNumber = args.event.data.payload.issue.number;
-					const comment = await deps.createIssueComment({
-						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-						issueNumber,
-						body,
-						authConfig,
-					});
-					createdComment = { id: comment.id, type: "issue" };
-				} else if (
-					deps.ensureWebhookEvent(args.event, "issue_comment.created")
-				) {
-					const pullNumber = args.event.data.payload.issue.number;
-					const comment = await deps.createPullRequestComment({
-						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-						pullNumber,
-						body,
-						authConfig,
-					});
-					createdComment = { id: comment.id, type: "issue" };
-				} else if (
-					deps.ensureWebhookEvent(
-						args.event,
-						"pull_request_review_comment.created",
-					)
-				) {
-					const pullNumber = args.event.data.payload.pull_request.number;
-					const comment = await deps.replyPullRequestReviewComment({
-						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-						pullNumber,
-						commentId: args.event.data.payload.comment.id,
-						body,
-						authConfig,
-					});
-					createdComment = { id: comment.id, type: "review" };
-				} else if (
-					deps.ensureWebhookEvent(args.event, "issues.opened") ||
-					deps.ensureWebhookEvent(args.event, "issues.closed")
-				) {
-					const issueNumber = args.event.data.payload.issue.number;
-					const comment = await deps.createIssueComment({
-						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-						issueNumber,
-						body,
-						authConfig,
-					});
-					createdComment = { id: comment.id, type: "issue" };
-				} else if (
-					deps.ensureWebhookEvent(args.event, "pull_request.opened") ||
-					deps.ensureWebhookEvent(
-						args.event,
-						"pull_request.ready_for_review",
-					) ||
-					deps.ensureWebhookEvent(args.event, "pull_request.closed")
-				) {
-					const pullNumber = args.event.data.payload.pull_request.number;
-					const comment = await deps.createPullRequestComment({
-						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-						pullNumber,
-						body,
-						authConfig,
-					});
-					createdComment = { id: comment.id, type: "issue" };
-				}
-
-				const updateComment = async (index: number) => {
-					if (!createdComment) return;
-					const nextBody = `Running flow...\n\n${buildProgressTable(
-						flow.jobs,
-						index,
-					)}`;
-					if (createdComment.type === "issue") {
-						await deps.updateIssueComment({
-							repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-							commentId: createdComment.id,
-							body: nextBody,
-							authConfig,
-						});
-					} else {
-						await deps.updatePullRequestReviewComment({
-							repositoryNodeId: args.trigger.configuration.repositoryNodeId,
-							commentId: createdComment.id,
-							body: nextBody,
-							authConfig,
-						});
-					}
-				};
-
-				await deps.runFlow({
-					context: args.context,
-					triggerId: args.trigger.id,
-					triggerInputs: [
-						{
-							type: "github-webhook-event",
-							webhookEvent: args.event,
-						},
-					],
-					onStep: async ({ stepIndex }) => {
-						await updateComment(stepIndex);
-					},
+		if (
+			deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
+			deps.ensureWebhookEvent(args.event, "issues.opened") ||
+			deps.ensureWebhookEvent(args.event, "issues.closed")
+		) {
+			const issueNumber = args.event.data.payload.issue.number;
+			const comment = await deps.createIssueComment({
+				repositoryNodeId,
+				issueNumber,
+				body,
+				authConfig,
+			});
+			createdComment = { id: comment.id, type: "issue" };
+		} else if (
+			deps.ensureWebhookEvent(args.event, "pull_request.opened") ||
+			deps.ensureWebhookEvent(args.event, "pull_request.ready_for_review") ||
+			deps.ensureWebhookEvent(args.event, "pull_request.closed")
+		) {
+			const pullNumber = args.event.data.payload.pull_request.number;
+			const comment = await deps.createPullRequestComment({
+				repositoryNodeId,
+				pullNumber,
+				body,
+				authConfig,
+			});
+			createdComment = { id: comment.id, type: "issue" };
+		} else if (
+			deps.ensureWebhookEvent(args.event, "pull_request_review_comment.created")
+		) {
+			const pullNumber = args.event.data.payload.pull_request.number;
+			const comment = await deps.replyPullRequestReviewComment({
+				repositoryNodeId,
+				pullNumber,
+				commentId: args.event.data.payload.comment.id,
+				body,
+				authConfig,
+			});
+			createdComment = { id: comment.id, type: "review" };
+		}
+		const updateComment = async (index: number) => {
+			if (!createdComment) return;
+			const nextBody = `Running flow...\n\n${buildProgressTable(
+				flow.jobs,
+				index,
+			)}`;
+			if (createdComment.type === "issue") {
+				await deps.updateIssueComment({
+					repositoryNodeId,
+					commentId: createdComment.id,
+					body: nextBody,
+					authConfig,
 				});
 			} else {
-				await deps.runFlow({
-					context: args.context,
-					triggerId: args.trigger.id,
-					triggerInputs: [
-						{
-							type: "github-webhook-event",
-							webhookEvent: args.event,
-						},
-					],
+				await deps.updatePullRequestReviewComment({
+					repositoryNodeId,
+					commentId: createdComment.id,
+					body: nextBody,
+					authConfig,
 				});
 			}
-			return true;
-		}
-	}
+		};
 
-	return false;
+		await deps.runFlow({
+			context: args.context,
+			triggerId: args.trigger.id,
+			triggerInputs: [
+				{
+					type: "github-webhook-event",
+					webhookEvent: args.event,
+				},
+			],
+			callbacks: {
+				jobComplete: async ({ jobIndex }) => {
+					await updateComment(jobIndex);
+				},
+			},
+		});
+	}
 }
