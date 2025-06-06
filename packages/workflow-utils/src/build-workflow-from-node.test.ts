@@ -8,6 +8,7 @@ import { beforeEach, describe, expect, it, test } from "vitest";
 import { buildWorkflowFromNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
 import workspace2 from "./test/fixtures/workspace2.json";
+import workspace3 from "./test/fixtures/workspace3.json";
 import { testWorkspace1 } from "./test/test-data";
 
 describe("buildWorkflowFromNode with testWorkspace1", () => {
@@ -253,5 +254,31 @@ describe("buildWorkflowFromNode with testWorkspace2", () => {
 			expect(triggerNode?.name).toBe("On Issue Comment Created");
 			expect(actionNode?.name).toBe("Create Issue Comment");
 		}
+	});
+});
+
+describe("buildWorkflowFromNode with testWorkspace3", () => {
+	let workspaceData: Workspace;
+	let result: Workflow | null;
+
+	beforeEach(() => {
+		const workspace = Workspace.safeParse(workspace3);
+		expect(workspace.success).toBeTruthy();
+		if (!workspace.success) {
+			throw new Error("Failed to parse workspace3");
+		}
+		workspaceData = workspace.data;
+
+		// Start from the GitHub trigger node "On Issue Comment Created"
+		result = buildWorkflowFromNode(
+			"nd-3k5o1XHYgJIuVE9z",
+			workspaceData.nodes,
+			workspaceData.connections,
+		);
+	});
+
+	it("should build a workflow with 2 jobs", () => {
+		expect(result).not.toBeNull();
+		expect(result?.jobs.length).toBe(2);
 	});
 });
