@@ -119,7 +119,7 @@ function CompletionRunner({
 			{
 				body: {
 					generation,
-					telemetry: telemetrySettings,
+					telemetry,
 				},
 			},
 		);
