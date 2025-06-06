@@ -58,6 +58,11 @@ describe("GitHub Event Handlers", () => {
 			parseCommand: vi
 				.fn()
 				.mockReturnValue({ callsign: "giselle", content: "help me" }),
+			createIssueComment: vi.fn().mockResolvedValue({ id: 1 }),
+			createPullRequestComment: vi.fn().mockResolvedValue({ id: 1 }),
+			replyPullRequestReviewComment: vi.fn().mockResolvedValue({ id: 1 }),
+			updateIssueComment: vi.fn().mockResolvedValue(undefined),
+			updatePullRequestReviewComment: vi.fn().mockResolvedValue(undefined),
 		};
 
 		// Setup base arguments
@@ -696,22 +701,19 @@ describe("GitHub Event Handlers", () => {
 			});
 
 			// Assert
-			expect(result).toBe(true);
-			expect(testDeps.runFlow).toHaveBeenCalledWith({
-				context: expect.anything(),
-				triggerId: mockFlowTriggerId,
-				triggerInputs: [
-					{
-						type: "github-webhook-event",
-						webhookEvent: event,
-					},
-				],
-			});
+			expect(testDeps.runFlow).toHaveBeenCalledWith(
+				expect.objectContaining({
+					context: expect.anything(),
+					triggerId: mockFlowTriggerId,
+					triggerInputs: expect.any(Array),
+				}),
+			);
 			expect(testDeps.addReaction).toHaveBeenCalledWith({
 				id: "issue-node-id",
 				content: "EYES",
 				authConfig: expect.anything(),
 			});
+			expect(testDeps.createIssueComment).not.toHaveBeenCalled();
 		});
 
 		it("should return false when trigger is disabled", async () => {

@@ -1,20 +1,99 @@
-import type { FlowTrigger } from "@giselle-sdk/data-type";
+import {
+	type FlowTrigger,
+	type Job,
+	isTriggerNode,
+} from "@giselle-sdk/data-type";
 import type {
 	GitHubAuthConfig,
 	WebhookEvent,
 	WebhookEventName,
 	addReaction,
+	createIssueComment,
+	createPullRequestComment,
 	ensureWebhookEvent,
+	replyPullRequestReviewComment,
+	updateIssueComment,
+	updatePullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
 import type { runFlow } from "../flows";
 import type { GiselleEngineContext } from "../types";
 import type { parseCommand } from "./utils";
+
+type ProgressTableRow = Job & {
+	status: "queued" | "running" | "complete" | "failed";
+	updatedAt: Date | undefined;
+};
+type ProgressTableData = ProgressTableRow[];
+function formatDateTime(date: Date): string {
+	const months = [
+		"Jan",
+		"Feb",
+		"Mar",
+		"Apr",
+		"May",
+		"Jun",
+		"Jul",
+		"Aug",
+		"Sep",
+		"Oct",
+		"Nov",
+		"Dec",
+	];
+	const month = months[date.getUTCMonth()];
+	const day = date.getUTCDate();
+	const year = date.getUTCFullYear();
+	const hours = date.getUTCHours();
+	const minutes = date.getUTCMinutes();
+
+	const period = hours >= 12 ? "pm" : "am";
+	const displayHours = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+	const displayMinutes = minutes.toString().padStart(2, "0");
+
+	return `${month} ${day}, ${year} ${displayHours}:${displayMinutes}${period}`;
+}
+
+function buildProgressTable(data: ProgressTableData) {
+	const header = "| Step | Nodes | Status | Updated(UTC) |";
+	const separator = "| --- | --- | --- | --- |";
+	const rows = data.map((row, i) => {
+		const names = row.operations
+			.map((op) => op.node.name ?? op.node.id)
+			.join(", ");
+		let status = "";
+		switch (row.status) {
+			case "queued":
+				status = "--";
+				break;
+			case "running":
+				status = "⏳";
+				break;
+			case "complete":
+				status = "✅";
+				break;
+			case "failed":
+				status = "❌";
+				break;
+			default: {
+				const _exhaustiveCheck: never = row.status;
+				throw new Error(`Unhandled status: ${_exhaustiveCheck}`);
+			}
+		}
+
+		return `| ${i + 1} | ${names} | ${status} | ${row.updatedAt ? formatDateTime(row.updatedAt) : "--"} |`;
+	});
+	return [header, separator, ...rows].join("\n");
+}
 
 export interface EventHandlerDependencies {
 	addReaction: typeof addReaction;
 	ensureWebhookEvent: typeof ensureWebhookEvent;
 	runFlow: typeof runFlow;
 	parseCommand: typeof parseCommand;
+	createIssueComment: typeof createIssueComment;
+	createPullRequestComment: typeof createPullRequestComment;
+	replyPullRequestReviewComment: typeof replyPullRequestReviewComment;
+	updateIssueComment: typeof updateIssueComment;
+	updatePullRequestReviewComment: typeof updatePullRequestReviewComment;
 }
 
 export type EventHandlerArgs<TEventName extends WebhookEventName> = {
@@ -239,7 +318,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		createAuthConfig: (installationId: number) => GitHubAuthConfig;
 		deps: EventHandlerDependencies;
 	},
-): Promise<boolean> {
+) {
 	if (
 		!args.trigger.enable ||
 		args.trigger.configuration.provider !== "github"
@@ -247,6 +326,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		return false;
 	}
 
+	const repositoryNodeId = args.trigger.configuration.repositoryNodeId;
 	const installationId = args.trigger.configuration.installationId;
 	const authConfig = args.createAuthConfig(installationId);
 
@@ -259,6 +339,9 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			authConfig,
 			deps,
 		});
+		if (!result.shouldRun) {
+			continue;
+		}
 
 		if (result.reactionNodeId) {
 			await deps.addReaction({
@@ -268,20 +351,124 @@ export async function processEvent<TEventName extends WebhookEventName>(
 			});
 		}
 
-		if (result.shouldRun) {
-			await deps.runFlow({
-				context: args.context,
-				triggerId: args.trigger.id,
-				triggerInputs: [
-					{
-						type: "github-webhook-event",
-						webhookEvent: args.event,
-					},
-				],
-			});
-			return true;
-		}
-	}
+		let createdComment: { id: number; type: "issue" | "review" } | undefined;
+		const updateComment = async (body: string) => {
+			if (!createdComment) return;
+			if (createdComment.type === "issue") {
+				await deps.updateIssueComment({
+					repositoryNodeId,
+					commentId: createdComment.id,
+					body,
+					authConfig,
+				});
+			} else {
+				await deps.updatePullRequestReviewComment({
+					repositoryNodeId,
+					commentId: createdComment.id,
+					body,
+					authConfig,
+				});
+			}
+		};
 
-	return false;
+		let progressTableData: ProgressTableData = [];
+
+		await deps.runFlow({
+			context: args.context,
+			triggerId: args.trigger.id,
+			triggerInputs: [
+				{
+					type: "github-webhook-event",
+					webhookEvent: args.event,
+				},
+			],
+			callbacks: {
+				flowCreate: async ({ flow }) => {
+					progressTableData = flow.jobs
+						.filter(
+							(job) =>
+								!job.operations.some((operation) =>
+									isTriggerNode(operation.node),
+								),
+						)
+						.map((job) => ({
+							...job,
+							status: "queued",
+							updatedAt: undefined,
+						}));
+
+					const body = `Running flow...\n\n${buildProgressTable(progressTableData)}`;
+
+					if (
+						deps.ensureWebhookEvent(args.event, "issue_comment.created") ||
+						deps.ensureWebhookEvent(args.event, "issues.opened") ||
+						deps.ensureWebhookEvent(args.event, "issues.closed")
+					) {
+						const issueNumber = args.event.data.payload.issue.number;
+						const comment = await deps.createIssueComment({
+							repositoryNodeId,
+							issueNumber,
+							body,
+							authConfig,
+						});
+						createdComment = { id: comment.id, type: "issue" };
+					} else if (
+						deps.ensureWebhookEvent(args.event, "pull_request.opened") ||
+						deps.ensureWebhookEvent(
+							args.event,
+							"pull_request.ready_for_review",
+						) ||
+						deps.ensureWebhookEvent(args.event, "pull_request.closed")
+					) {
+						const pullNumber = args.event.data.payload.pull_request.number;
+						const comment = await deps.createPullRequestComment({
+							repositoryNodeId,
+							pullNumber,
+							body,
+							authConfig,
+						});
+						createdComment = { id: comment.id, type: "issue" };
+					} else if (
+						deps.ensureWebhookEvent(
+							args.event,
+							"pull_request_review_comment.created",
+						)
+					) {
+						const pullNumber = args.event.data.payload.pull_request.number;
+						const comment = await deps.replyPullRequestReviewComment({
+							repositoryNodeId,
+							pullNumber,
+							commentId: args.event.data.payload.comment.id,
+							body,
+							authConfig,
+						});
+						createdComment = { id: comment.id, type: "review" };
+					}
+				},
+				jobStart: async ({ job }) => {
+					progressTableData = progressTableData.map((row) =>
+						row.id === job.id
+							? { ...row, status: "running", updatedAt: new Date() }
+							: row,
+					);
+					await updateComment(
+						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
+					);
+				},
+				jobComplete: async ({ job }) => {
+					progressTableData = progressTableData.map((row) =>
+						row.id === job.id
+							? { ...row, status: "complete", updatedAt: new Date() }
+							: row,
+					);
+					await updateComment(
+						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
+					);
+				},
+			},
+		});
+		await updateComment(
+			`Finished running flow.\n\n${buildProgressTable(progressTableData)}`,
+		);
+	}
 }

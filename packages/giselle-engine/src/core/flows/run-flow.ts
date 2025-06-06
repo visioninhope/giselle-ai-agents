@@ -2,8 +2,10 @@ import {
 	type FlowTriggerId,
 	type GenerationContextInput,
 	GenerationId,
+	type Job,
 	type QueuedGeneration,
 	RunId,
+	type Workflow,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { generateImage, generateText } from "../generations";
@@ -19,6 +21,11 @@ export async function runFlow(args: {
 	triggerId: FlowTriggerId;
 	context: GiselleEngineContext;
 	triggerInputs?: GenerationContextInput[];
+	callbacks?: {
+		flowCreate?: (args: { flow: Workflow }) => void | Promise<void>;
+		jobStart?: (args: { job: Job }) => void | Promise<void>;
+		jobComplete?: (args: { job: Job }) => void | Promise<void>;
+	};
 }) {
 	const trigger = await getFlowTrigger({
 		storage: args.context.storage,
@@ -41,8 +48,13 @@ export async function runFlow(args: {
 		return;
 	}
 
+	await args.callbacks?.flowCreate?.({ flow });
+
 	const runId = RunId.generate();
-	for (const job of flow.jobs) {
+	for (const job of flow.jobs.values()) {
+		if (args.callbacks?.jobStart) {
+			await args.callbacks.jobStart({ job });
+		}
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
@@ -107,5 +119,8 @@ export async function runFlow(args: {
 				}
 			}),
 		);
+		if (args.callbacks?.jobComplete) {
+			await args.callbacks.jobComplete({ job });
+		}
 	}
 }
