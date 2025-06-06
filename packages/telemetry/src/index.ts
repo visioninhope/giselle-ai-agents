@@ -5,7 +5,7 @@ import {
 	GenerationContext,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
-import { calculateDisplayCost } from "@giselle-sdk/language-model";
+import { calculateDisplayCost, hasCapability, languageModels, Capability } from "@giselle-sdk/language-model";
 import { Langfuse } from "langfuse";
 import type {
 	AnthropicProviderOptions,
@@ -16,6 +16,9 @@ import type {
 
 export interface GenerationCompleteOption {
 	telemetry: TelemetrySettings["metadata"];
+	providerOptions?: {
+		anthropic?: AnthropicProviderOptions;
+	};
 }
 
 export function generateTelemetryTags(args: {
@@ -94,6 +97,22 @@ export async function emitTelemetry(
 			toolSet.openaiWebSearch = true;
 		}
 
+		const languageModel = languageModels.find((model) => model.id === llm.id);
+
+		const providerOptions: { anthropic?: AnthropicProviderOptions } = {};
+		if (
+			languageModel &&
+			llm.provider === "anthropic" &&
+			llm.configurations?.reasoning &&
+			hasCapability(languageModel, Capability.Reasoning)
+		) {
+			providerOptions.anthropic = {
+				thinking: {
+					type: "enabled",
+				},
+			};
+		}
+
 		const trace = langfuse.trace({
 			name: "llm-generation",
 			input: { messages },
@@ -102,6 +121,7 @@ export async function emitTelemetry(
 				modelId: llm.id,
 				toolSet,
 				configurations: llm.configurations ?? {},
+				providerOptions,
 			}),
 			metadata: options?.telemetry,
 		});
