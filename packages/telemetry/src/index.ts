@@ -37,13 +37,13 @@ export function generateTelemetryTags(args: {
 	}
 
 	// Google Search Grounding
-	if (args.provider === "google" && args.configurations.searchGrounding) {
+	if (args.provider === "google" && args.configurations?.searchGrounding) {
 		tags.push("web-search", "google:search-grounding");
 	}
 
 	// Anthropic Reasoning/Thinking
 	if (args.provider === "anthropic") {
-		if (args.configurations.reasoning) {
+		if (args.configurations?.reasoning) {
 			tags.push("anthropic:reasoning");
 		}
 		if (args.providerOptions?.anthropic?.thinking?.type === "enabled") {
@@ -58,8 +58,8 @@ export function generateTelemetryTags(args: {
 		tags.push("web-search");
 
 		if (
-			Array.isArray(args.configurations.searchDomainFilter) &&
-			args.configurations.searchDomainFilter.length > 0
+			Array.isArray(args.configurations?.searchDomainFilter) &&
+			args.configurations?.searchDomainFilter.length > 0
 		) {
 			tags.push("perplexity:search-domain-filter");
 		}
