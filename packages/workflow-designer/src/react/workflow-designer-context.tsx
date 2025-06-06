@@ -9,6 +9,7 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	type TriggerNode,
 	type UploadedFileData,
 	type Viewport,
 	type Workspace,
@@ -206,6 +207,55 @@ export function WorkflowDesignerProvider({
 		[client, data.id, setAndSaveWorkspace],
 	);
 
+	const handleTriggerNodeCopy = useCallback(
+		async (sourceNode: Node, newNode: Node): Promise<void> => {
+			if (
+				!isTriggerNode(sourceNode) ||
+				!isTriggerNode(newNode) ||
+				sourceNode.content.state.status !== "configured"
+			) {
+				return;
+			}
+
+			try {
+				const originalTriggerId = sourceNode.content.state.flowTriggerId;
+
+				const originalTriggerResult = await client.getTrigger({
+					flowTriggerId: originalTriggerId,
+				});
+
+				if (originalTriggerResult?.trigger) {
+					const originalTrigger = originalTriggerResult.trigger;
+					const result = await client.configureTrigger({
+						trigger: {
+							workspaceId: originalTrigger.workspaceId,
+							nodeId: newNode.id,
+							enable: originalTrigger.enable,
+							configuration: originalTrigger.configuration,
+						},
+					});
+
+					if (result?.triggerId) {
+						workflowDesignerRef.current.updateNodeData(newNode, {
+							content: {
+								...newNode.content,
+								state: {
+									status: "configured",
+									flowTriggerId: result.triggerId,
+								},
+							},
+						} as Partial<TriggerNode>);
+
+						setAndSaveWorkspace();
+					}
+				}
+			} catch (error) {
+				console.error("Failed to duplicate trigger configuration:", error);
+			}
+		},
+		[client, setAndSaveWorkspace],
+	);
+
 	const copyNode = useCallback(
 		async (
 			sourceNode: Node,
@@ -222,10 +272,13 @@ export function WorkflowDesignerProvider({
 				return undefined;
 			}
 			setAndSaveWorkspace();
+
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
+			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
+
 			return newNodeDefinition;
 		},
-		[setAndSaveWorkspace, handleFileNodeCopy],
+		[setAndSaveWorkspace, handleFileNodeCopy, handleTriggerNodeCopy],
 	);
 
 	const updateNodeData = useCallback(
