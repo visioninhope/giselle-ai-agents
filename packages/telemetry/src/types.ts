@@ -31,4 +31,6 @@ export type AnthropicProviderOptions = {
 
 export type ToolSet = {
 	openaiWebSearch?: boolean;
+	github?: string[];
+	postgres?: string[];
 };

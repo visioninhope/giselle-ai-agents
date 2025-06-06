@@ -118,11 +118,17 @@ export async function emitTelemetry(
 		const output = assistantMessage?.content ?? "";
 
 		const toolSet: ToolSet = {};
-		if (
-			llm.provider === "openai" &&
-			generation.context.operationNode.content.tools?.openaiWebSearch
-		) {
-			toolSet.openaiWebSearch = true;
+		const tools = generation.context.operationNode.content.tools;
+		if (tools) {
+			if (tools.openaiWebSearch) {
+				toolSet.openaiWebSearch = true;
+			}
+			if (tools.github?.tools) {
+				toolSet.github = tools.github.tools;
+			}
+			if (tools.postgres?.tools) {
+				toolSet.postgres = tools.postgres.tools;
+			}
 		}
 
 		const languageModel = languageModels.find((model) => model.id === llm.id);
