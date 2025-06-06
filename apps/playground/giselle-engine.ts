@@ -1,5 +1,6 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
+import { emitTelemetry } from "@giselle-sdk/telemetry";
 import type {
 	GiselleIntegrationConfig,
 	LanguageModelProvider,
@@ -122,4 +123,15 @@ export const giselleEngine = NextGiselleEngine({
 	llmProviders,
 	integrationConfigs,
 	sampleAppWorkspaceId,
+	callbacks: {
+		generationComplete: async (generation, options) => {
+			try {
+				await emitTelemetry(generation, {
+					telemetry: options?.telemetry,
+				});
+			} catch (error) {
+				console.error("Telemetry emission failed:", error);
+			}
+		},
+	},
 });

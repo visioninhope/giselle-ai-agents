@@ -13,14 +13,13 @@ import {
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
 	Capability,
-	calculateDisplayCost,
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
+import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
-import { createLangfuseTracer, generateTelemetryTags } from "./telemetry";
 import { createPostgresTools } from "./tools/postgres";
 import type { PreparedToolSet, TelemetrySettings } from "./types";
 import { buildMessageObject } from "./utils";
@@ -38,6 +37,7 @@ export async function generateText(args: {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
+		telemetry: args.telemetry,
 		execute: async ({
 			runningGeneration,
 			generationContext,
@@ -186,17 +186,6 @@ export async function generateText(args: {
 						});
 					}
 
-					const tokenUsage = event.usage;
-					let costInfo = null;
-
-					if (tokenUsage) {
-						costInfo = await calculateDisplayCost(
-							operationNode.content.llm.provider,
-							operationNode.content.llm.id,
-							tokenUsage,
-						);
-					}
-
 					const reasoningOutput = generationContext.operationNode.outputs.find(
 						(output) => output.accessor === "reasoning",
 					);
@@ -230,7 +219,7 @@ export async function generateText(args: {
 					}
 					const completedGeneration = await completeGeneration({
 						outputs: generationOutputs,
-						usage: tokenUsage,
+						usage: event.usage,
 						messages: appendResponseMessages({
 							messages: [
 								{
@@ -243,42 +232,12 @@ export async function generateText(args: {
 						}),
 					});
 
-					// necessary to send telemetry but not explicitly used
-					const langfuse = createLangfuseTracer({
-						workspaceId,
-						tags: generateTelemetryTags({
-							provider: operationNode.content.llm.provider,
-							languageModel,
-							toolSet: preparedToolSet.toolSet,
-							configurations: operationNode.content.llm.configurations,
-							providerOptions,
-						}),
-						messages: { messages },
-						output: event.text,
-						usage: {
-							input: tokenUsage?.promptTokens ?? 0,
-							output: tokenUsage?.completionTokens ?? 0,
-							total:
-								(tokenUsage?.promptTokens ?? 0) +
-								(tokenUsage?.completionTokens ?? 0),
-							inputCost: costInfo?.inputCostForDisplay ?? 0,
-							outputCost: costInfo?.outputCostForDisplay ?? 0,
-							totalCost: costInfo?.totalCostForDisplay ?? 0,
-							unit: "TOKENS",
-						},
-						textGenerationNode: operationNode,
-						completedGeneration,
-						spanName: "ai.streamText",
-						generationName: "ai.streamText.doStream",
-						settings: args.telemetry,
-					});
 					try {
-						await Promise.all([
-							langfuse.shutdownAsync(),
-							...preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
+						await Promise.all(
+							preparedToolSet.cleanupFunctions.map((cleanupFunction) =>
 								cleanupFunction(),
 							),
-						]);
+						);
 					} catch (error) {
 						console.error("Cleanup process failed:", error);
 					}
@@ -291,7 +250,7 @@ export async function generateText(args: {
 							"auto-instrumented",
 							...generateTelemetryTags({
 								provider: operationNode.content.llm.provider,
-								languageModel,
+								modelId: operationNode.content.llm.id,
 								toolSet: preparedToolSet.toolSet,
 								configurations: operationNode.content.llm.configurations,
 								providerOptions:
