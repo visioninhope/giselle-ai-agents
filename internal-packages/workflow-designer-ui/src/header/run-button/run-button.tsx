@@ -45,7 +45,7 @@ export function RunButton() {
 	const { data } = useWorkflowDesigner();
 	const { startFlow } = useFlowController();
 
-	const [isDialogOpen, setIsDialogOpen] = useState(false);
+	const [openDialogNodeId, setOpenDialogNodeId] = useState<string | null>(null);
 	const [isDropdownOpen, setIsDropdownOpen] = useState(false);
 	const startingNodes = useMemo(() => {
 		const triggerNodes = data.nodes.filter((node) => isTriggerNode(node));
@@ -111,9 +111,9 @@ export function RunButton() {
 						>
 							{isTriggerNode(startingNode) ? (
 								<Dialog.Root
-									open={isDialogOpen}
+									open={openDialogNodeId === startingNode.id}
 									onOpenChange={(isOpen) => {
-										setIsDialogOpen(isOpen);
+										setOpenDialogNodeId(isOpen ? startingNode.id : null);
 									}}
 								>
 									<Dialog.Trigger asChild>
@@ -130,7 +130,7 @@ export function RunButton() {
 												node={startingNode}
 												onClose={() => {
 													setIsDropdownOpen(false);
-													setIsDialogOpen(false);
+													setOpenDialogNodeId(null);
 												}}
 											/>
 										</Dialog.Content>
