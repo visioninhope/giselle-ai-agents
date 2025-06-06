@@ -94,10 +94,7 @@ export const giselleEngine = NextGiselleEngine({
 		github: queryGithubVectorStore,
 	},
 	callbacks: {
-		generationComplete: async (
-			generation,
-			options: { telemetry: TelemetrySettings["metadata"] },
-		) => {
+		generationComplete: async (generation, options) => {
 			try {
 				await emitTelemetry(generation, {
 					telemetry: options.telemetry,
