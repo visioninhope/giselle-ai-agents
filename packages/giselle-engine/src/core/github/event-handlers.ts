@@ -4,17 +4,45 @@ import type {
 	WebhookEvent,
 	WebhookEventName,
 	addReaction,
+	createIssueComment,
+	createPullRequestComment,
 	ensureWebhookEvent,
+	replyPullRequestReviewComment,
+	updateIssueComment,
+	updatePullRequestReviewComment,
 } from "@giselle-sdk/github-tool";
+import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { runFlow } from "../flows";
 import type { GiselleEngineContext } from "../types";
+import { getWorkspace } from "../workspaces/utils";
 import type { parseCommand } from "./utils";
+
+function buildProgressTable(
+	jobs: { operations: { node: { id: string; name?: string } }[] }[],
+	index: number,
+) {
+	const header = "| Step | Nodes | Status |";
+	const separator = "| --- | --- | --- |";
+	const rows = jobs.map((job, i) => {
+		const names = job.operations
+			.map((op) => op.node.name ?? op.node.id)
+			.join(", ");
+		const status = i < index ? "✅" : i === index ? "⏳" : "";
+		return `| ${i + 1} | ${names} | ${status} |`;
+	});
+	return [header, separator, ...rows].join("\n");
+}
 
 export interface EventHandlerDependencies {
 	addReaction: typeof addReaction;
 	ensureWebhookEvent: typeof ensureWebhookEvent;
 	runFlow: typeof runFlow;
 	parseCommand: typeof parseCommand;
+	createIssueComment: typeof createIssueComment;
+	createPullRequestComment: typeof createPullRequestComment;
+	replyPullRequestReviewComment: typeof replyPullRequestReviewComment;
+	updateIssueComment: typeof updateIssueComment;
+	updatePullRequestReviewComment: typeof updatePullRequestReviewComment;
 }
 
 export type EventHandlerArgs<TEventName extends WebhookEventName> = {
@@ -269,16 +297,144 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		}
 
 		if (result.shouldRun) {
-			await deps.runFlow({
-				context: args.context,
-				triggerId: args.trigger.id,
-				triggerInputs: [
-					{
-						type: "github-webhook-event",
-						webhookEvent: args.event,
+			let flow: ReturnType<typeof buildWorkflowFromNode> | null = null;
+			try {
+				const workspace = await getWorkspace({
+					storage: args.context.storage,
+					workspaceId: args.trigger.workspaceId,
+				});
+
+				flow = buildWorkflowFromNode(
+					args.trigger.nodeId,
+					workspace.nodes,
+					workspace.connections,
+				);
+			} catch {
+				flow = null;
+			}
+
+			let createdComment: { id: number; type: "issue" | "review" } | undefined;
+
+			if (flow) {
+				const table = buildProgressTable(flow.jobs, -1);
+				const body = `Running flow...\n\n${table}`;
+
+				if (
+					deps.ensureWebhookEvent(args.event, "issue_comment.created") &&
+					args.event.data.payload.issue?.pull_request === null
+				) {
+					const issueNumber = args.event.data.payload.issue.number;
+					const comment = await deps.createIssueComment({
+						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+						issueNumber,
+						body,
+						authConfig,
+					});
+					createdComment = { id: comment.id, type: "issue" };
+				} else if (
+					deps.ensureWebhookEvent(args.event, "issue_comment.created")
+				) {
+					const pullNumber = args.event.data.payload.issue.number;
+					const comment = await deps.createPullRequestComment({
+						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+						pullNumber,
+						body,
+						authConfig,
+					});
+					createdComment = { id: comment.id, type: "issue" };
+				} else if (
+					deps.ensureWebhookEvent(
+						args.event,
+						"pull_request_review_comment.created",
+					)
+				) {
+					const pullNumber = args.event.data.payload.pull_request.number;
+					const comment = await deps.replyPullRequestReviewComment({
+						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+						pullNumber,
+						commentId: args.event.data.payload.comment.id,
+						body,
+						authConfig,
+					});
+					createdComment = { id: comment.id, type: "review" };
+				} else if (
+					deps.ensureWebhookEvent(args.event, "issues.opened") ||
+					deps.ensureWebhookEvent(args.event, "issues.closed")
+				) {
+					const issueNumber = args.event.data.payload.issue.number;
+					const comment = await deps.createIssueComment({
+						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+						issueNumber,
+						body,
+						authConfig,
+					});
+					createdComment = { id: comment.id, type: "issue" };
+				} else if (
+					deps.ensureWebhookEvent(args.event, "pull_request.opened") ||
+					deps.ensureWebhookEvent(
+						args.event,
+						"pull_request.ready_for_review",
+					) ||
+					deps.ensureWebhookEvent(args.event, "pull_request.closed")
+				) {
+					const pullNumber = args.event.data.payload.pull_request.number;
+					const comment = await deps.createPullRequestComment({
+						repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+						pullNumber,
+						body,
+						authConfig,
+					});
+					createdComment = { id: comment.id, type: "issue" };
+				}
+
+				const updateComment = async (index: number) => {
+					if (!createdComment) return;
+					const nextBody = `Running flow...\n\n${buildProgressTable(
+						flow.jobs,
+						index,
+					)}`;
+					if (createdComment.type === "issue") {
+						await deps.updateIssueComment({
+							repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+							commentId: createdComment.id,
+							body: nextBody,
+							authConfig,
+						});
+					} else {
+						await deps.updatePullRequestReviewComment({
+							repositoryNodeId: args.trigger.configuration.repositoryNodeId,
+							commentId: createdComment.id,
+							body: nextBody,
+							authConfig,
+						});
+					}
+				};
+
+				await deps.runFlow({
+					context: args.context,
+					triggerId: args.trigger.id,
+					triggerInputs: [
+						{
+							type: "github-webhook-event",
+							webhookEvent: args.event,
+						},
+					],
+					onStep: async ({ stepIndex }) => {
+						await updateComment(stepIndex);
 					},
-				],
-			});
+				});
+			} else {
+				await deps.runFlow({
+					context: args.context,
+					triggerId: args.trigger.id,
+					triggerInputs: [
+						{
+							type: "github-webhook-event",
+							webhookEvent: args.event,
+						},
+					],
+				});
+			}
 			return true;
 		}
 	}
