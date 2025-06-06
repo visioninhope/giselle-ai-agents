@@ -110,10 +110,6 @@ function CompletionRunner({
 			return;
 		}
 		addStopHandler(generation.id, stop);
-		const telemetrySettings = {
-			isEnabled: true,
-			metadata: telemetry?.metadata ?? {},
-		};
 		append(
 			{ role: "user", content: "hello" },
 			{
