@@ -44,7 +44,7 @@ export function buildWorkflowFromNode(
 	);
 
 	// Find all downstream nodes from the starting node
-	const connectedNodeMap = findDownstreamNodeMap(
+	const downstreamNodeMap = findDownstreamNodeMap(
 		startNodeId,
 		nodeMap,
 		downstreamNodeIdMap,
@@ -52,7 +52,7 @@ export function buildWorkflowFromNode(
 
 	// Find all connections between the connected nodes
 	const connectedConnectionMap = findConnectedConnectionMap(
-		new Set(connectedNodeMap.keys()),
+		new Set(downstreamNodeMap.keys()),
 		new Set(connectionMap.values()),
 	);
 
@@ -61,7 +61,7 @@ export function buildWorkflowFromNode(
 
 	// Create jobs based on the connected nodes and connections
 	const jobSet = createJobMap(
-		new Set(connectedNodeMap.values()),
+		new Set(downstreamNodeMap.values()),
 		new Set(connectedConnectionMap.values()),
 		workflowId,
 	);
@@ -70,6 +70,6 @@ export function buildWorkflowFromNode(
 	return {
 		id: workflowId,
 		jobs: Array.from(jobSet.values()),
-		nodes: Array.from(connectedNodeMap.values()),
+		nodes: Array.from(downstreamNodeMap.values()),
 	};
 }
