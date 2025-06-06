@@ -90,14 +90,32 @@ export async function emitTelemetry(
 
 		const llm = generation.context.operationNode.content.llm;
 
-		const promptJson =
-			typeof generation.context.operationNode.content.prompt === "string"
-				? JSON.parse(generation.context.operationNode.content.prompt)
-				: { content: [] };
-		const input = promptJson.content?.[0]?.content?.[0]?.text ?? "";
-		const output =
-			generation.messages.find((msg) => msg.role === "assistant")?.content ??
-			"";
+		const promptJson = (() => {
+			if (typeof generation.context.operationNode.content.prompt === "string") {
+				try {
+					return JSON.parse(generation.context.operationNode.content.prompt);
+				} catch (error) {
+					console.warn("Failed to parse prompt JSON for telemetry:", error);
+					return { content: [] };
+				}
+			}
+			return { content: [] };
+		})();
+		const input = (() => {
+			// Handle various prompt formats more robustly
+			if (promptJson.content?.[0]?.content?.[0]?.text) {
+				return promptJson.content[0].content[0].text;
+			}
+			if (typeof promptJson.content === "string") {
+				return promptJson.content;
+			}
+			return promptJson.text || "";
+		})();
+
+		const assistantMessage = generation.messages.find(
+			(msg) => msg.role === "assistant",
+		);
+		const output = assistantMessage?.content ?? "";
 
 		const toolSet: ToolSet = {};
 		if (
