@@ -112,7 +112,7 @@ export async function emitTelemetry(
 			return promptJson.text || "";
 		})();
 
-		const assistantMessage = generation.messages.find(
+		const assistantMessage = generation.messages?.find(
 			(msg) => msg.role === "assistant",
 		);
 		const output = assistantMessage?.content ?? "";
