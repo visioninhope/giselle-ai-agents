@@ -279,16 +279,14 @@ export function WorkflowDesignerProvider({
 				return undefined;
 			}
 			setAndSaveWorkspace();
+
+			// Handle different node types - following existing pattern
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
 			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
+
 			return newNodeDefinition;
 		},
-		[setAndSaveWorkspace, handleFileNodeCopy],
-		[
-			setAndSaveWorkspace,
-			handleFileNodeCopy,
-			handleTriggerNodeCopy,
-		],
+		[setAndSaveWorkspace, handleFileNodeCopy, handleTriggerNodeCopy],
 	);
 
 	const updateNodeData = useCallback(

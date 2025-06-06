@@ -289,7 +289,7 @@ const triggerFactoryImpl = {
 		console.log("[DEBUG] Cloning Trigger Node");
 		console.log("[DEBUG] Original state:", orig.content.state);
 		const clonedContent = structuredClone(orig.content);
-		// Reset trigger state to unconfigured - actual configuration duplication 
+		// Reset trigger state to unconfigured - actual configuration duplication
 		// is handled at higher level in useDuplicateNode
 		clonedContent.state = { status: "unconfigured" };
 		console.log("[DEBUG] Cloned state:", clonedContent.state);
@@ -330,10 +330,8 @@ const actionFactoryImpl = {
 			outputs: [],
 		}) satisfies ActionNode,
 	clone: (orig: ActionNode): NodeFactoryCloneResult<ActionNode> => {
-		console.log("[DEBUG] Cloning Action Node");
-		console.log("[DEBUG] Original state:", orig.content.command.state);
 		const clonedContent = structuredClone(orig.content);
-		console.log("[DEBUG] Cloned state:", clonedContent.command.state);
+		clonedContent.command.state = { status: "unconfigured" };
 
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);
@@ -529,10 +527,8 @@ const vectorStoreFactoryImpl = {
 		],
 	}),
 	clone: (orig: VectorStoreNode): NodeFactoryCloneResult<VectorStoreNode> => {
-		console.log("[DEBUG] Cloning VectorStore Node");
-		console.log("[DEBUG] Original state:", orig.content.source.state);
 		const clonedContent = structuredClone(orig.content);
-		console.log("[DEBUG] Cloned state:", clonedContent.source.state);
+		clonedContent.source.state = { status: "unconfigured" };
 
 		const { newIo: newInputs, idMap: inputIdMap } =
 			cloneAndRenewInputIdsWithMap(orig.inputs);
