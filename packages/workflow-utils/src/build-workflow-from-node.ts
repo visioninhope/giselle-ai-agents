@@ -6,10 +6,10 @@ import {
 	WorkflowId,
 } from "@giselle-sdk/data-type";
 import {
-	createConnectedNodeIdMap,
+	createDownstreamNodeIdMap,
 	createJobMap,
 	findConnectedConnectionMap,
-	findConnectedNodeMap,
+	findDownstreamNodeMap,
 } from "./helper";
 
 /**
@@ -37,17 +37,17 @@ export function buildWorkflowFromNode(
 		return null;
 	}
 
-	// Create a map of connected node IDs
-	const connectedNodeIdMap = createConnectedNodeIdMap(
+	// Create a map of downstream node IDs (output direction only)
+	const downstreamNodeIdMap = createDownstreamNodeIdMap(
 		new Set(connectionMap.values()),
 		new Set(nodeMap.keys()),
 	);
 
-	// Find all nodes connected to the starting node
-	const connectedNodeMap = findConnectedNodeMap(
+	// Find all downstream nodes from the starting node
+	const connectedNodeMap = findDownstreamNodeMap(
 		startNodeId,
 		nodeMap,
-		connectedNodeIdMap,
+		downstreamNodeIdMap,
 	);
 
 	// Find all connections between the connected nodes

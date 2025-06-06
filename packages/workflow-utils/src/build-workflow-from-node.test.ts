@@ -281,4 +281,9 @@ describe("buildWorkflowFromNode with testWorkspace3", () => {
 		expect(result).not.toBeNull();
 		expect(result?.jobs.length).toBe(2);
 	});
+
+	it("should build a workflow with first job has one operation", () => {
+		expect(result).not.toBeNull();
+		expect(result?.jobs[0].operations).toHaveLength(1);
+	});
 });

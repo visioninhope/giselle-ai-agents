@@ -49,6 +49,66 @@ export function createConnectedNodeIdMap(
 }
 
 /**
+ * Creates a map of node IDs to their downstream node IDs (output direction only).
+ */
+export function createDownstreamNodeIdMap(
+	connectionSet: Set<Connection>,
+	nodeIdSet: Set<NodeId>,
+) {
+	const downstreamMap = new Map<NodeId, Set<NodeId>>();
+	for (const connection of connectionSet) {
+		if (
+			!nodeIdSet.has(connection.outputNode.id) ||
+			!nodeIdSet.has(connection.inputNode.id)
+		) {
+			continue;
+		}
+		if (!downstreamMap.has(connection.outputNode.id)) {
+			downstreamMap.set(connection.outputNode.id, new Set());
+		}
+		const downstreamSet = downstreamMap.get(connection.outputNode.id);
+		if (downstreamSet) {
+			downstreamSet.add(connection.inputNode.id);
+		}
+	}
+	return downstreamMap;
+}
+
+/**
+ * Finds all downstream nodes from a starting node using breadth-first search.
+ * Only follows output direction connections.
+ * Returns a map of node IDs to their node objects.
+ */
+export function findDownstreamNodeMap(
+	startNodeId: NodeId,
+	nodeMap: Map<NodeId, NodeLike>,
+	downstreamMap: Map<NodeId, Set<NodeId>>,
+): Map<NodeId, NodeLike> {
+	const connectedNodeMap = new Map<NodeId, NodeLike>();
+	const stack: NodeId[] = [startNodeId];
+
+	while (stack.length > 0) {
+		const currentNodeId = stack.pop() || startNodeId;
+		if (connectedNodeMap.has(currentNodeId)) continue;
+		const currentNode = nodeMap.get(currentNodeId);
+		if (currentNode === undefined) continue;
+
+		connectedNodeMap.set(currentNodeId, currentNode);
+
+		const downstreamNodeIdSet = downstreamMap.get(currentNodeId);
+		if (downstreamNodeIdSet) {
+			for (const downstreamNodeId of downstreamNodeIdSet) {
+				if (!connectedNodeMap.has(downstreamNodeId)) {
+					stack.push(downstreamNodeId);
+				}
+			}
+		}
+	}
+
+	return connectedNodeMap;
+}
+
+/**
  * Finds all nodes connected to a starting node using breadth-first search.
  * Returns a map of node IDs to their node objects.
  */
