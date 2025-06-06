@@ -9,6 +9,7 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	type TriggerNode,
 	type UploadedFileData,
 	type Viewport,
 	type Workspace,
@@ -239,41 +240,15 @@ export function WorkflowDesignerProvider({
 					});
 
 					if (result?.triggerId) {
-						const provider = newNode.content.provider;
-
-						switch (provider) {
-							case "github": {
-								workflowDesignerRef.current.updateNodeData(newNode, {
-									content: {
-										type: "trigger",
-										provider: "github",
-										state: {
-											status: "configured",
-											flowTriggerId: result.triggerId,
-										},
-									},
-								});
-								break;
-							}
-							case "manual": {
-								workflowDesignerRef.current.updateNodeData(newNode, {
-									content: {
-										type: "trigger",
-										provider: "manual",
-										state: {
-											status: "configured",
-											flowTriggerId: result.triggerId,
-										},
-									},
-								});
-								break;
-							}
-							default: {
-								const _exhaustiveCheck: never = provider;
-								console.error(`Unsupported provider: ${String(provider)}`);
-								return;
-							}
-						}
+						workflowDesignerRef.current.updateNodeData(newNode, {
+							content: {
+								...newNode.content,
+								state: {
+									status: "configured",
+									flowTriggerId: result.triggerId,
+								},
+							},
+						} as Partial<TriggerNode>);
 
 						console.log(
 							"[DEBUG] Trigger configuration duplicated successfully",
