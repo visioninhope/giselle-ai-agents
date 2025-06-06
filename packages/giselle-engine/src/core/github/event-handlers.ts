@@ -414,15 +414,8 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					}
 				},
 				jobStart: async ({ job }) => {
-					console.log("jobStart", job.id);
 					progressTableData = progressTableData.map((row) =>
 						row.id === job.id ? { ...row, status: "running" } : row,
-					);
-					console.log(
-						progressTableData.map((row) => ({
-							id: row.id,
-							status: row.status,
-						})),
 					);
 					await updateComment(
 						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
@@ -432,12 +425,6 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					console.log("jobComplete", job.id);
 					progressTableData = progressTableData.map((row) =>
 						row.id === job.id ? { ...row, status: "complete" } : row,
-					);
-					console.log(
-						progressTableData.map((row) => ({
-							id: row.id,
-							status: row.status,
-						})),
 					);
 					await updateComment(
 						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
