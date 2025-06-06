@@ -30,7 +30,10 @@ export function GenerationView({
 }) {
 	const client = useGiselleEngine();
 	const generatedMessages = useMemo(
-		() => generation.messages?.filter((m) => m.role === "assistant") ?? [],
+		() =>
+			"messages" in generation
+				? (generation.messages?.filter((m) => m.role === "assistant") ?? [])
+				: [],
 		[generation],
 	);
 

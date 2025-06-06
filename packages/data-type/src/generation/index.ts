@@ -64,78 +64,14 @@ export const GenerationUsage = z.object({
 });
 export type GenerationUsage = z.infer<typeof GenerationUsage>;
 
-/**
- * Unified Generation schema with conditional validation based on status
- */
-export const Generation = z
-	.object({
-		// Common fields for all generations
-		id: GenerationId.schema,
-		context: GenerationContextLike,
-		status: GenerationStatus,
-		createdAt: z.number(),
-
-		// Optional timing fields
-		queuedAt: z.number().optional(),
-		startedAt: z.number().optional(),
-		completedAt: z.number().optional(),
-		failedAt: z.number().optional(),
-		cancelledAt: z.number().optional(),
-
-		// Optional content fields
-		messages: z.array(Message).optional(),
-		outputs: z.array(GenerationOutput).optional(),
-		usage: GenerationUsage.optional(),
-		error: GenerationError.optional(),
-	})
-	.refine(
-		(data) => {
-			// Required fields based on status
-			switch (data.status) {
-				case "created":
-					return data.messages === undefined;
-				case "queued":
-					return data.queuedAt !== undefined && data.messages === undefined;
-				case "running":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						Array.isArray(data.messages)
-					);
-				case "completed":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						data.completedAt !== undefined &&
-						Array.isArray(data.messages) &&
-						Array.isArray(data.outputs)
-					);
-				case "failed":
-					return (
-						data.queuedAt !== undefined &&
-						data.startedAt !== undefined &&
-						data.failedAt !== undefined &&
-						data.error !== undefined &&
-						Array.isArray(data.messages)
-					);
-				case "cancelled":
-					return data.cancelledAt !== undefined;
-				default:
-					return false;
-			}
-		},
-		{
-			message:
-				"Generation fields don't match required fields for the specified status",
-			path: ["status"],
-		},
-	);
-
-// Export the Generation type
-export type Generation = z.infer<typeof Generation>;
+export const GenerationBase = z.object({
+	id: GenerationId.schema,
+	context: GenerationContextLike,
+	status: z.string(),
+});
 
 // Specific schema validators for each generation status
-export const CreatedGeneration = z.object({
+export const CreatedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCreated,
@@ -152,7 +88,7 @@ export function isCreatedGeneration(
 	return CreatedGeneration.safeParse(generation).success;
 }
 
-export const QueuedGeneration = z.object({
+export const QueuedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusQueued,
@@ -168,7 +104,7 @@ export function isQueuedGeneration(data: unknown): data is QueuedGeneration {
 	return QueuedGeneration.safeParse(data).success;
 }
 
-export const RunningGeneration = z.object({
+export const RunningGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusRunning,
@@ -188,7 +124,7 @@ export function isRunningGeneration(
 	return RunningGeneration.safeParse(generation).success;
 }
 
-export const CompletedGeneration = z.object({
+export const CompletedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCompleted,
@@ -211,7 +147,7 @@ export function isCompletedGeneration(
 	return CompletedGeneration.safeParse(generation).success;
 }
 
-export const FailedGeneration = z.object({
+export const FailedGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusFailed,
@@ -233,7 +169,7 @@ export function isFailedGeneration(
 	return FailedGeneration.safeParse(generation).success;
 }
 
-export const CancelledGeneration = z.object({
+export const CancelledGeneration = GenerationBase.extend({
 	id: GenerationId.schema,
 	context: GenerationContextLike,
 	status: GenerationStatusCancelled,
@@ -272,3 +208,18 @@ export const NodeGenerationIndex = z.object({
 	cancelledAt: z.number().optional(),
 });
 export type NodeGenerationIndex = z.infer<typeof NodeGenerationIndex>;
+
+/**
+ * Unified Generation schema with conditional validation based on status
+ */
+export const Generation = z.discriminatedUnion("status", [
+	CreatedGeneration,
+	QueuedGeneration,
+	RunningGeneration,
+	CompletedGeneration,
+	FailedGeneration,
+	CancelledGeneration,
+]);
+
+// Export the Generation type
+export type Generation = z.infer<typeof Generation>;
