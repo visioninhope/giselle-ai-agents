@@ -75,21 +75,23 @@ export async function emitTelemetry(
 	try {
 		const langfuse = new Langfuse();
 
-		const llm = generation.context.operationNode.content
-			.llm as TextGenerationLanguageModelData;
+		if (!isTextGenerationNode(generation.context.operationNode)) {
+			console.warn("Skipping telemetry for non-text generation");
+			return;
+		}
+
+		const llm = generation.context.operationNode.content.llm;
 		const messages = generation.messages.map((msg) => ({
 			role: msg.role,
 			content: msg.content,
 		}));
 
 		const toolSet: ToolSet = {};
-		if (isTextGenerationNode(generation.context.operationNode)) {
-			if (
-				generation.context.operationNode.content.llm.provider === "openai" &&
-				generation.context.operationNode.content.tools?.openaiWebSearch
-			) {
-				toolSet.openaiWebSearch = true;
-			}
+		if (
+			llm.provider === "openai" &&
+			generation.context.operationNode.content.tools?.openaiWebSearch
+		) {
+			toolSet.openaiWebSearch = true;
 		}
 
 		const trace = langfuse.trace({
