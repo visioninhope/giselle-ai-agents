@@ -126,7 +126,9 @@ export const giselleEngine = NextGiselleEngine({
 	callbacks: {
 		generationComplete: async (generation, options) => {
 			try {
-				await emitTelemetry(generation, telemetry: options?.telemetry);
+				await emitTelemetry(generation, {
+					telemetry: options?.telemetry,
+				});
 			} catch (error) {
 				console.error("Telemetry emission failed:", error);
 			}
