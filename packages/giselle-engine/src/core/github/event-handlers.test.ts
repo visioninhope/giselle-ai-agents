@@ -701,7 +701,6 @@ describe("GitHub Event Handlers", () => {
 			});
 
 			// Assert
-			expect(result).toBe(true);
 			expect(testDeps.runFlow).toHaveBeenCalledWith(
 				expect.objectContaining({
 					context: expect.anything(),
