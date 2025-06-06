@@ -89,10 +89,15 @@ export async function emitTelemetry(
 		}
 
 		const llm = generation.context.operationNode.content.llm;
-		const messages = generation.messages.map((msg) => ({
-			role: msg.role,
-			content: msg.content,
-		}));
+
+		const promptJson =
+			typeof generation.context.operationNode.content.prompt === "string"
+				? JSON.parse(generation.context.operationNode.content.prompt)
+				: { content: [] };
+		const input = promptJson.content?.[0]?.content?.[0]?.text ?? "";
+		const output =
+			generation.messages.find((msg) => msg.role === "assistant")?.content ??
+			"";
 
 		const toolSet: ToolSet = {};
 		if (
@@ -120,7 +125,7 @@ export async function emitTelemetry(
 
 		const trace = langfuse.trace({
 			name: "llm-generation",
-			input: { messages },
+			input,
 			tags: generateTelemetryTags({
 				provider: llm.provider,
 				modelId: llm.id,
@@ -129,14 +134,16 @@ export async function emitTelemetry(
 				providerOptions,
 			}),
 			metadata: options?.telemetry,
+			output,
 		});
 
 		const span = trace.span({
 			name: "llm-generation",
 			startTime: new Date(generation.queuedAt ?? generation.createdAt),
-			input: { messages },
+			input,
 			endTime: new Date(generation.completedAt),
 			metadata: options?.telemetry,
+			output,
 		});
 
 		const displayCost = await calculateDisplayCost(
@@ -153,7 +160,7 @@ export async function emitTelemetry(
 			name: "llm-generation",
 			model: llm.id,
 			modelParameters: llm.configurations ?? {},
-			input: { messages },
+			input,
 			usage: {
 				input: generation.usage?.promptTokens ?? 0,
 				output: generation.usage?.completionTokens ?? 0,
@@ -167,6 +174,7 @@ export async function emitTelemetry(
 			completionStartTime: new Date(generation.startedAt),
 			endTime: new Date(generation.completedAt),
 			metadata: options?.telemetry,
+			output,
 		});
 
 		await langfuse.flushAsync();

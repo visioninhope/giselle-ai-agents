@@ -221,29 +221,13 @@ export async function generateText(args: {
 						outputs: generationOutputs,
 						usage: event.usage,
 						messages: appendResponseMessages({
-							messages:
-								messages.length > 0
-									? [
-											{
-												id: "id",
-												role: "user",
-												content: Array.isArray(messages[0].content)
-													? messages[0].content
-															.filter(
-																(part) =>
-																	typeof part === "object" &&
-																	part !== null &&
-																	"type" in part &&
-																	part.type === "text",
-															)
-															.map((part) => (part as { text: string }).text)
-															.join("")
-													: typeof messages[0].content === "string"
-														? messages[0].content
-														: "",
-											},
-										]
-									: [],
+							messages: [
+								{
+									id: "id",
+									role: "user",
+									content: "",
+								},
+							],
 							responseMessages: event.response.messages,
 						}),
 					});
