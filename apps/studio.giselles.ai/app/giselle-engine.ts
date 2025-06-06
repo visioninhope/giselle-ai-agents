@@ -60,12 +60,6 @@ export const giselleEngine = NextGiselleEngine({
 	telemetry: {
 		isEnabled: true,
 		waitForFlushFn: waitForLangfuseFlush,
-		metadata: {
-			isProPlan: true,
-			teamType: "pro",
-			userId: "system",
-			subscriptionId: "system",
-		},
 	},
 	fetchUsageLimitsFn: fetchUsageLimits,
 	sampleAppWorkspaceId,
