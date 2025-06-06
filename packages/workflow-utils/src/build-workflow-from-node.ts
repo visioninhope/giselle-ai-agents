@@ -6,10 +6,10 @@ import {
 	WorkflowId,
 } from "@giselle-sdk/data-type";
 import {
-	createConnectedNodeIdMap,
+	createDownstreamNodeIdMap,
 	createJobMap,
 	findConnectedConnectionMap,
-	findConnectedNodeMap,
+	findDownstreamNodeMap,
 } from "./helper";
 
 /**
@@ -37,22 +37,22 @@ export function buildWorkflowFromNode(
 		return null;
 	}
 
-	// Create a map of connected node IDs
-	const connectedNodeIdMap = createConnectedNodeIdMap(
+	// Create a map of downstream node IDs (output direction only)
+	const downstreamNodeIdMap = createDownstreamNodeIdMap(
 		new Set(connectionMap.values()),
 		new Set(nodeMap.keys()),
 	);
 
-	// Find all nodes connected to the starting node
-	const connectedNodeMap = findConnectedNodeMap(
+	// Find all downstream nodes from the starting node
+	const downstreamNodeMap = findDownstreamNodeMap(
 		startNodeId,
 		nodeMap,
-		connectedNodeIdMap,
+		downstreamNodeIdMap,
 	);
 
 	// Find all connections between the connected nodes
 	const connectedConnectionMap = findConnectedConnectionMap(
-		new Set(connectedNodeMap.keys()),
+		new Set(downstreamNodeMap.keys()),
 		new Set(connectionMap.values()),
 	);
 
@@ -61,7 +61,7 @@ export function buildWorkflowFromNode(
 
 	// Create jobs based on the connected nodes and connections
 	const jobSet = createJobMap(
-		new Set(connectedNodeMap.values()),
+		new Set(downstreamNodeMap.values()),
 		new Set(connectedConnectionMap.values()),
 		workflowId,
 	);
@@ -70,6 +70,6 @@ export function buildWorkflowFromNode(
 	return {
 		id: workflowId,
 		jobs: Array.from(jobSet.values()),
-		nodes: Array.from(connectedNodeMap.values()),
+		nodes: Array.from(downstreamNodeMap.values()),
 	};
 }
