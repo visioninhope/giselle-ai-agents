@@ -1,4 +1,4 @@
-Contact: mailto:oss@giselles.dev
+Contact: mailto:security@giselles.ai
 Expires: 2026-05-06T23:59:59Z
 
 Preferred-Languages: en, ja
