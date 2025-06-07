@@ -33,6 +33,7 @@ import type { ContextMenuProps } from "./context-menu/types";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
+import { SideMenu } from "./side-menu";
 import {
 	FloatingNodePreview,
 	MousePositionProvider,
@@ -451,10 +452,18 @@ export function Editor({
 									direction="horizontal"
 									className="bg-black-900 h-full flex"
 								>
-									<Panel
-										className="flex-1 px-[16px] pb-[16px] pr-0"
-										defaultSize={100}
+									<Panel defaultSize={10} className="flex py-[16px]">
+										<SideMenu />
+									</Panel>
+
+									<PanelResizeHandle
+										className={clsx(
+											"group pt-[16px] pb-[32px] h-full px-[5px]",
+										)}
 									>
+										<div className="w-[3px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
+									</PanelResizeHandle>
+									<Panel className="flex-1 pb-[16px] pr-0">
 										<div className="h-full flex">
 											<NodeCanvas />
 										</div>
@@ -464,7 +473,7 @@ export function Editor({
 										className={clsx(
 											"w-[12px] flex items-center justify-center cursor-col-resize",
 											"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
-											"hover:after:bg-[#4a90e2]",
+											"data-[resize-handle-state=hover]:after:bg-[#4a90e2]",
 										)}
 									/>
 									<Panel
