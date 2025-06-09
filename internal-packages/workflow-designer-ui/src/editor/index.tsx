@@ -450,7 +450,7 @@ export function Editor({
 							<MousePositionProvider>
 								<PanelGroup
 									direction="horizontal"
-									className="bg-black-900 h-full flex"
+									className="bg-black-900 h-full flex pr-[16px] pb-[16px]"
 								>
 									<Panel defaultSize={10} className="flex py-[16px]">
 										<SideMenu />
@@ -463,30 +463,37 @@ export function Editor({
 									>
 										<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
 									</PanelResizeHandle>
-									<Panel className="flex-1 pb-[16px] pr-0">
-										<div className="h-full flex">
-											<NodeCanvas />
-										</div>
-									</Panel>
-
-									<PanelResizeHandle
-										className={clsx(
-											"w-[12px] flex items-center justify-center cursor-col-resize",
-											"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
-											"data-[resize-handle-state=hover]:after:bg-[#4a90e2]",
-										)}
-									/>
-									<Panel
-										id="right-panel"
-										className="flex py-[16px]"
-										ref={rightPanelRef}
-										defaultSize={0}
-									>
-										{selectedNodes.length === 1 && (
-											<div className="flex-1 overflow-hidden">
-												<PropertiesPanel />
-											</div>
-										)}
+									<Panel className="flex-1 border border-black-400 rounded-[12px]">
+										<PanelGroup direction="horizontal">
+											<Panel>
+												<NodeCanvas />
+											</Panel>
+											<PanelResizeHandle
+												className={clsx(
+													"w-[1px] bg-black-400 cursor-col-resize",
+													"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+													"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
+												)}
+												data-right-panel={
+													selectedNodes.length === 1 ? "show" : "hide"
+												}
+											/>
+											<Panel
+												id="right-panel"
+												className="flex"
+												ref={rightPanelRef}
+												defaultSize={0}
+												data-right-panel={
+													selectedNodes.length === 1 ? "show" : "hide"
+												}
+											>
+												{selectedNodes.length === 1 && (
+													<div className="flex-1 overflow-hidden p-[16px]">
+														<PropertiesPanel />
+													</div>
+												)}
+											</Panel>
+										</PanelGroup>
 									</Panel>
 								</PanelGroup>
 								<KeyboardShortcuts />
