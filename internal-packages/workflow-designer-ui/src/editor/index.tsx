@@ -33,6 +33,7 @@ import type { ContextMenuProps } from "./context-menu/types";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
+import { RunButton } from "./run-button";
 import { SideMenu } from "./side-menu";
 import {
 	FloatingNodePreview,
@@ -355,6 +356,9 @@ function NodeCanvas() {
 			)}
 			<XYFlowPanel position={"bottom-center"}>
 				<Toolbar />
+			</XYFlowPanel>
+			<XYFlowPanel position="top-right">
+				<RunButton />
 			</XYFlowPanel>
 			{menu && <ContextMenu {...menu} onClose={() => setMenu(null)} />}
 		</ReactFlow>

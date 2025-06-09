@@ -192,9 +192,7 @@ export function Header({
 				</div>
 
 				<div className="flex items-center gap-[12px]">
-					{runV3 ? (
-						<RunButton />
-					) : (
+					{runV3 ? null : (
 						<>
 							<Trigger />
 							{shareFeatureFlag && (
