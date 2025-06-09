@@ -434,7 +434,7 @@ export function Editor({
 	}, []);
 
 	return (
-		<div className="flex-1 overflow-hidden font-sans">
+		<div className="flex-1 overflow-hidden font-sans pl-[16px]">
 			{showReadOnlyBanner && isReadOnly && (
 				<ReadOnlyBanner
 					onDismiss={handleDismissBanner}
@@ -458,10 +458,10 @@ export function Editor({
 
 									<PanelResizeHandle
 										className={clsx(
-											"group pt-[16px] pb-[32px] h-full px-[5px]",
+											"group pt-[16px] pb-[32px] h-full pl-[3px]",
 										)}
 									>
-										<div className="w-[3px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
+										<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
 									</PanelResizeHandle>
 									<Panel className="flex-1 pb-[16px] pr-0">
 										<div className="h-full flex">
