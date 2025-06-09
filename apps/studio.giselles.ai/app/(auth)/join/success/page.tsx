@@ -7,7 +7,7 @@ export default function Page() {
 			<div className="flex items-center justify-center py-12">
 				<div className="flex flex-col items-center justify-center gap-6 max-w-md text-center px-6">
 					<h1
-						className="text-[34px] font-[500] text-primary-100 font-hubot"
+						className="text-[34px] font-[500] text-primary-100 font-sans"
 						style={{ textShadow: "0px 0px 20px #0087F6" }}
 					>
 						Welcome to Giselle!

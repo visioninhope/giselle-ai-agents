@@ -21,7 +21,7 @@ export const Field: FC<FieldProps> = ({
 	disabled = false,
 }) => (
 	<div className="grid gap-[4px]">
-		<Label htmlFor={name} className="text-[14px] font-hubot text-black-70">
+		<Label htmlFor={name} className="text-[14px] font-sans text-black-70">
 			{label}
 		</Label>
 		<Input

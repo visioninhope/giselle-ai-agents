@@ -56,7 +56,7 @@ export const Nav: FC<NavProps> = ({ githubVectorStoreFlag }) => {
 						<Link
 							key={item.path}
 							href={item.path}
-							className={`text-[16px] font-hubot font-medium transition-colors px-2 py-2 relative rounded-md
+							className={`text-[16px] font-sans font-medium transition-colors px-2 py-2 relative rounded-md
 							${
 								isActive
 									? "text-primary-100 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"

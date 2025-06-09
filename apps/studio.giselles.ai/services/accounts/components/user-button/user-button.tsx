@@ -43,10 +43,10 @@ export const UserButton: FC = async () => {
 				className="flex flex-col gap-y-2 p-2 border-[0.5px] border-black-400 bg-black-900"
 			>
 				<DropdownMenuLabel className="flex flex-col px-2 pt-2 text-white-400">
-					<span className="font-bold text-[16px] leading-[16px] font-hubot">
+					<span className="font-bold text-[16px] leading-[16px] font-sans">
 						{displayName || "No display name"}
 					</span>
-					<span className="font-medium leading-[20.4px] font-hubot text-black-600">
+					<span className="font-medium leading-[20.4px] font-sans text-black-600">
 						{email}
 					</span>
 				</DropdownMenuLabel>
@@ -58,7 +58,7 @@ export const UserButton: FC = async () => {
 					>
 						<Link
 							href="/settings/account"
-							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
 						>
 							Account Settings
 						</Link>
@@ -71,7 +71,7 @@ export const UserButton: FC = async () => {
 							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 								<Plus className="size-3 text-black-900" />
 							</span>
-							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
+							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-sans">
 								Create team
 							</span>
 						</button>
@@ -83,14 +83,14 @@ export const UserButton: FC = async () => {
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
-							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
+							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
 							rel="noreferrer"
 						>
 							Home Page
 						</a>
 					</DropdownMenuItem>
 					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<SignOutButton className="block p-2 w-full text-left text-white-400 font-hubot text-[14px] leading-[20.4px]">
+						<SignOutButton className="block p-2 w-full text-left text-white-400 font-sans text-[14px] leading-[20.4px]">
 							Log Out
 						</SignOutButton>
 					</DropdownMenuItem>
@@ -114,7 +114,7 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 
 	return (
 		<Button
-			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-hubot text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
+			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-sans text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
 			formAction={upgradeTeamWithTeam}
 		>
 			Upgrade to Pro

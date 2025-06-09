@@ -126,7 +126,7 @@ export function RepositoryRegistrationDialog({
 					className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
 				/>
 				<DialogHeader className="relative z-10">
-					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
+					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-sans text-center">
 						Register GitHub Repository
 					</DialogTitle>
 				</DialogHeader>
@@ -137,7 +137,7 @@ export function RepositoryRegistrationDialog({
 					<div className="flex flex-col gap-y-2">
 						<label
 							htmlFor="owner"
-							className="text-white-400 text-[14px] leading-[16.8px] font-hubot"
+							className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 						>
 							Owner
 						</label>
@@ -176,7 +176,7 @@ export function RepositoryRegistrationDialog({
 					<div className="flex flex-col gap-y-2">
 						<label
 							htmlFor="repo"
-							className="text-white-400 text-[14px] leading-[16.8px] font-hubot"
+							className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 						>
 							Repository Name
 						</label>

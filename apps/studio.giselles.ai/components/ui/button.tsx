@@ -7,7 +7,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-	"w-full flex items-center px-[20px] py-[8px] bg-transparent rounded-[8px] border shadow-xs text-[16px] font-medium font-hubot font-normal leading-[21.6px] disabled:bg-black-70 disabled:text-black-80 data-[loading=true]:cursor-wait",
+	"w-full flex items-center px-[20px] py-[8px] bg-transparent rounded-[8px] border shadow-xs text-[16px] font-medium font-sans font-normal leading-[21.6px] disabled:bg-black-70 disabled:text-black-80 data-[loading=true]:cursor-wait",
 	{
 		variants: {
 			variant: {

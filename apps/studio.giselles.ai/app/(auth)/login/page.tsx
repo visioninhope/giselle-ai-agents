@@ -12,7 +12,7 @@ export default function Page() {
 			<div className="flex items-center justify-center py-12">
 				<div className="mx-auto grid w-[350px] gap-[24px]">
 					<h2
-						className="mt-6 text-[28px] font-[500] text-primary-100 font-hubot text-center"
+						className="mt-6 text-[28px] font-[500] text-primary-100 font-sans text-center"
 						style={{ textShadow: "0px 0px 20px #0087F6" }}
 					>
 						Log in to Giselle

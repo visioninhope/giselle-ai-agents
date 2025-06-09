@@ -143,7 +143,7 @@ export function InviteMemberDialog({
 				<button
 					type="button"
 					onClick={handleOpenDialog}
-					className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-200"
+					className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-sans cursor-pointer border border-primary-200"
 				>
 					Invite Member +
 				</button>
@@ -162,7 +162,7 @@ export function InviteMemberDialog({
 					onPointerDownOutside={handleCloseDialog}
 				>
 					<div className="flex flex-col space-y-1.5 text-center sm:text-left">
-						<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-hubot">
+						<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
 							Invite Team Member
 						</Dialog.Title>
 						<Dialog.Description className="text-[14px] text-black-400 font-geist">
@@ -236,7 +236,7 @@ export function InviteMemberDialog({
 										<SelectValue />
 										<ChevronDown className="h-4 w-4 opacity-50 ml-1" />
 									</SelectTrigger>
-									<SelectContent className="border-[0.5px] border-black-700 rounded-md bg-black-850 text-white-900 font-hubot">
+									<SelectContent className="border-[0.5px] border-black-700 rounded-md bg-black-850 text-white-900 font-sans">
 										<SelectItem
 											value="admin"
 											className="py-2 pr-2 font-medium text-[14px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-black-700"

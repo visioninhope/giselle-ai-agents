@@ -21,7 +21,7 @@ export function SidebarMenu() {
 						href={link.href}
 						className={`${
 							pathname === link.href ? "text-white-400" : "text-black-70"
-						} text-[16px] font-hubot font-medium py-1`}
+						} text-[16px] font-sans font-medium py-1`}
 					>
 						{link.label}
 					</Link>

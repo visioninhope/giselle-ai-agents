@@ -117,7 +117,7 @@ export function InvitationListItem({
 
 	return (
 		<div className="px-2">
-			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-sans">
 				<div className="flex gap-x-4 items-center">
 					<div className="flex-shrink-0 opacity-50">
 						<div className="w-8 h-8 rounded-full border border-dashed border-white-400 flex items-center justify-center">
@@ -137,7 +137,7 @@ export function InvitationListItem({
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
-					<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
+					<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-sans">
 						{role}
 					</span>
 					<DropdownMenu
@@ -212,7 +212,7 @@ export function InvitationListItem({
 									</AlertDialogHeader>
 									<AlertDialogFooter className="mt-4">
 										<AlertDialogCancel
-											className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+											className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
 											disabled={revokePending}
 										>
 											Cancel
@@ -222,7 +222,7 @@ export function InvitationListItem({
 											<AlertDialogAction
 												type="submit"
 												disabled={revokePending}
-												className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
+												className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
 											>
 												Revoke
 											</AlertDialogAction>

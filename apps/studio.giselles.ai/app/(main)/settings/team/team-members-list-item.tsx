@@ -119,7 +119,7 @@ export function TeamMemberListItem({
 
 	return (
 		<div className="px-2">
-			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
+			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-sans">
 				<div className="flex gap-x-4 items-center">
 					<div className="flex-shrink-0">
 						<Avatar
@@ -148,7 +148,7 @@ export function TeamMemberListItem({
 									<SelectTrigger className="px-4 py-2 border border-white-900 rounded-[8px] h-[40px] w-[123px] bg-transparent text-white-900 [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-white-900">
 										<SelectValue />
 									</SelectTrigger>
-									<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
+									<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-sans">
 										<SelectItem
 											value="admin"
 											className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
@@ -180,7 +180,7 @@ export function TeamMemberListItem({
 							</>
 						) : (
 							<>
-								<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
+								<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-sans">
 									{role}
 								</span>
 								{canEdit && (
@@ -222,7 +222,7 @@ export function TeamMemberListItem({
 														</AlertDialogHeader>
 														<AlertDialogFooter className="mt-4">
 															<AlertDialogCancel
-																className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+																className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
 																disabled={isLoading}
 															>
 																Cancel
@@ -230,7 +230,7 @@ export function TeamMemberListItem({
 															<AlertDialogAction
 																onClick={handleDeleteMember}
 																disabled={isLoading}
-																className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
+																className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
 															>
 																Delete
 															</AlertDialogAction>

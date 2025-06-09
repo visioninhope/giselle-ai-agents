@@ -25,7 +25,7 @@ function Empty({ onGenerate }: { onGenerate?: () => void }) {
 					<button
 						type="button"
 						onClick={onGenerate}
-						className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-white-900/15 transition-all hover:bg-[#1e1f26] hover:border-white-900/25 hover:translate-y-[-1px] cursor-pointer font-hubot font-[500] text-[14px]"
+						className="flex items-center justify-center px-[24px] py-[12px] mt-[16px] bg-[#141519] text-white rounded-[9999px] border border-white-900/15 transition-all hover:bg-[#1e1f26] hover:border-white-900/25 hover:translate-y-[-1px] cursor-pointer font-sans font-[500] text-[14px]"
 					>
 						<span className="mr-[8px] generate-star">✦</span>
 						Generate with the Current Prompt
@@ -148,7 +148,7 @@ export function GenerationPanel({
 					)}
 					{currentGeneration.status === "completed" &&
 						currentGeneration.usage && (
-							<div className="flex items-center gap-[10px] text-[11px] text-black-400 font-hubot ml-[6px]">
+							<div className="flex items-center gap-[10px] text-[11px] text-black-400 font-sans ml-[6px]">
 								{currentGeneration.startedAt &&
 									currentGeneration.completedAt && (
 										<span className="flex items-center gap-[2px]">

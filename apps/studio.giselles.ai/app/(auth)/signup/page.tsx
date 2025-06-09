@@ -13,7 +13,7 @@ export default function SignupPage() {
 		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
 			<div className="flex flex-col gap-[16px]">
 				<h2
-					className="text-[34px] font-[500] text-primary-100 text-left font-hubot"
+					className="text-[34px] font-[500] text-primary-100 text-left font-sans"
 					style={{ textShadow: "0px 0px 20px #0087F6" }}
 				>
 					Unleash Your Potential
@@ -25,7 +25,7 @@ export default function SignupPage() {
 				<Divider label="or" />
 				<Button asChild className="font-medium">
 					<Link href="/signup/email">
-						<p className="font-hubot font-medium">Sign up for Email</p>
+						<p className="font-sans font-medium">Sign up for Email</p>
 						<MailIcon className="h-5 w-5 mr-2" />
 					</Link>
 				</Button>

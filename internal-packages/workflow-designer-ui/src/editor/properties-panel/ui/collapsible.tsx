@@ -28,7 +28,7 @@ export function PropertiesPanelCollapsible({
 					)}
 				>
 					<div className="flex justify-between items-center">
-						<p className="font-rosart">{title}</p>
+						<p className="font-sans">{title}</p>
 						<button type="button" onClick={() => setIsExpanded(false)}>
 							<Minimize2Icon
 								size={16}
@@ -42,7 +42,7 @@ export function PropertiesPanelCollapsible({
 				<button type="button" onClick={() => setIsExpanded(true)}>
 					<PropertiesPanelContentBox className="text-black-300 flex justify-between items-center group">
 						<div className="flex gap-2 items-center">
-							<p className="font-rosart">{title}</p>
+							<p className="font-sans">{title}</p>
 							{glanceLabel && (
 								<span className="text-[10px] text-black-50">{glanceLabel}</span>
 							)}

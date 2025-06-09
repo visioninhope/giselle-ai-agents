@@ -70,7 +70,7 @@ export default async function TeamVectorStorePage() {
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
 				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Vector Stores
@@ -79,7 +79,7 @@ export default async function TeamVectorStorePage() {
 					href="https://docs.giselles.ai/guides/settings/team/vector-store"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 				>
 					About Vector Stores
 					<ExternalLink size={14} />
@@ -103,14 +103,14 @@ function GitHubAuthRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 			>
 				Vector Store
 			</h3>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-hubot mb-2">
+					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
 						You need to authenticate your GitHub account.
 					</h4>
 					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist text-center mb-4">
@@ -119,7 +119,7 @@ function GitHubAuthRequiredCard() {
 					</p>
 					<a
 						href="/settings/account/authentication"
-						className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-4 py-2 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+						className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-4 py-2 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 					>
 						Open Authentication Settings
 					</a>
@@ -133,7 +133,7 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 			>
 				Vector Store
@@ -142,7 +142,7 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 				<div className="flex flex-col items-center justify-center py-8">
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="text-red-400" size={24} />
-						<h4 className="text-red-200 font-medium text-[18px] leading-[21.6px] font-hubot">
+						<h4 className="text-red-200 font-medium text-[18px] leading-[21.6px] font-sans">
 							GitHub authentication error occurred.
 						</h4>
 					</div>
@@ -159,14 +159,14 @@ function GitHubAppInstallRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 			>
 				Vector Store
 			</h3>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-hubot mb-2">
+					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
 						You need to install Giselle's GitHub App.
 					</h4>
 					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist text-center mb-4">
@@ -175,7 +175,7 @@ function GitHubAppInstallRequiredCard() {
 					</p>
 					<a
 						href="/settings/team/integrations"
-						className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-4 py-2 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+						className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-4 py-2 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 					>
 						Open Integrations Settings
 					</a>
@@ -199,7 +199,7 @@ function RepositoryListCard({
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex items-center mb-4">
 					<div>
-						<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-hubot">
+						<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans">
 							GitHub Repositories
 						</h4>
 						<p className="text-black-400 text-[14px] leading-[20.4px] font-geist mt-1">

@@ -38,7 +38,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 				<div className="grid gap-[4px]">
 					<Label
 						htmlFor="email"
-						className="text-[14px] font-hubot text-black-70"
+						className="text-[14px] font-sans text-black-70"
 					>
 						Email
 					</Label>
@@ -61,7 +61,7 @@ export const Form = <T extends Record<string, string | undefined>>({
 					<div className="grid gap-[4px] relative">
 						<Label
 							htmlFor="password"
-							className="text-[14px] font-hubot text-black-70"
+							className="text-[14px] font-sans text-black-70"
 						>
 							Password
 						</Label>
