@@ -1,4 +1,4 @@
-import { ChevronRight, Clock, Database } from "lucide-react";
+import { ChevronRight, Database } from "lucide-react";
 import { GitHubIcon } from "../../../tool";
 
 export function ToolsPanel() {
