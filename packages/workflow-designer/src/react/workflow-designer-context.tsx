@@ -12,6 +12,7 @@ import {
 	type NodeUIState,
 	type TriggerNode,
 	type UploadedFileData,
+	type VectorStoreNode,
 	type Viewport,
 	type Workspace,
 	createFailedFileData,
@@ -20,6 +21,7 @@ import {
 	isActionNode,
 	isFileNode,
 	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -282,6 +284,30 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace],
 	);
 
+	const handleVectorStoreNodeCopy = useCallback(
+		(sourceNode: Node, newNode: Node): void => {
+			if (
+				!isVectorStoreNode(sourceNode) ||
+				!isVectorStoreNode(newNode) ||
+				sourceNode.content.source.state.status !== "configured"
+			) {
+				return;
+			}
+
+			workflowDesignerRef.current.updateNodeData(newNode, {
+				content: {
+					...newNode.content,
+					source: {
+						...newNode.content.source,
+						state: structuredClone(sourceNode.content.source.state),
+					},
+				},
+			});
+			setAndSaveWorkspace();
+		},
+		[setAndSaveWorkspace],
+	);
+
 	const copyNode = useCallback(
 		async (
 			sourceNode: Node,
@@ -299,9 +325,11 @@ export function WorkflowDesignerProvider({
 			}
 			setAndSaveWorkspace();
 
+			// Handle different node types - following existing pattern
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
 			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
 			handleActionNodeCopy(sourceNode, newNodeDefinition);
+			handleVectorStoreNodeCopy(sourceNode, newNodeDefinition);
 
 			return newNodeDefinition;
 		},
@@ -310,6 +338,7 @@ export function WorkflowDesignerProvider({
 			handleFileNodeCopy,
 			handleTriggerNodeCopy,
 			handleActionNodeCopy,
+			handleVectorStoreNodeCopy,
 		],
 	);
 
