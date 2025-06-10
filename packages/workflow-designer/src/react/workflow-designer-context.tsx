@@ -273,7 +273,7 @@ export function WorkflowDesignerProvider({
 					...newNode.content,
 					command: {
 						...newNode.content.command,
-						state: sourceNode.content.command.state,
+						state: structuredClone(sourceNode.content.command.state),
 					},
 				},
 			});
