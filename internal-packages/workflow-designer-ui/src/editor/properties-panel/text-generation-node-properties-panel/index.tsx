@@ -451,7 +451,7 @@ export function TextGenerationNodePropertiesPanel({
 								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px]"
 							>
 								{sidemenu ? (
-									<ToolsPanel />
+									<ToolsPanel node={node} />
 								) : (
 									<div className="p-[8px]">
 										<GitHubToolsPanel node={node} />
