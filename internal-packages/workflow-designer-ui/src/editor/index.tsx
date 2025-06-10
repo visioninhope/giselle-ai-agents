@@ -371,11 +371,9 @@ function NodeCanvas() {
 }
 
 export function Editor({
-	githubTools = false,
 	isReadOnly = false,
 	userRole = "viewer",
 }: {
-	githubTools?: boolean;
 	isReadOnly?: boolean;
 	userRole?: "viewer" | "guest" | "editor" | "owner";
 }) {
