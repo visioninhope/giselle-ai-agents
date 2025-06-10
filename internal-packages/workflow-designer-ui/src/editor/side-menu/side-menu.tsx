@@ -23,13 +23,12 @@ export function SideMenu() {
 				<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
 			</Link>
 
-			<div className="w-full">
-				<EditableText
-					fallbackValue="Untitled"
-					onChange={handleChange}
-					value={data.name}
-				/>
-			</div>
+			<EditableText
+				fallbackValue="Untitled"
+				onChange={handleChange}
+				value={data.name}
+				size="large"
+			/>
 			<ul
 				className={clsx(
 					"flex flex-col w-full text-white-800 text-[14px]",
