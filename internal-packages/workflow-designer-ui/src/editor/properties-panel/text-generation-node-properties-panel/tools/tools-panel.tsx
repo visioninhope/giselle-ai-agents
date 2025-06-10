@@ -1,7 +1,9 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { ChevronRightIcon, DatabaseIcon } from "lucide-react";
-import { type SVGProps, useMemo } from "react";
+import { ChevronLeftIcon, ChevronRightIcon, DatabaseIcon } from "lucide-react";
+import { type SVGProps, useMemo, useState } from "react";
 import { GitHubIcon } from "../../../tool";
+import { GitHubToolsPanel } from "./github-tools";
+import { PostgresToolsPanel } from "./postgres-tools";
 
 type UIToolName = "GitHub" | "PostgreSQL";
 interface UITool {
@@ -29,10 +31,12 @@ function ToolsSection({
 	title,
 	tools,
 	description,
+	onToolClick,
 }: {
 	title: string;
 	tools: UITool[];
 	description: (tool: UITool) => string;
+	onToolClick?: (tool: UITool) => void;
 }) {
 	if (tools.length === 0) return null;
 	return (
@@ -40,9 +44,11 @@ function ToolsSection({
 			<h2 className="text-[15px] font-accent">{title}</h2>
 			<div className="space-y-[6px]">
 				{tools.map((tool) => (
-					<div
+					<button
 						key={tool.name}
-						className="border border-black-400 rounded-[8px] p-[6px] flex items-center justify-between hover:bg-black-800/50 transition-all duration-200 cursor-pointer h-[52px]"
+						type="button"
+						className="border border-black-400 rounded-[8px] p-[6px] w-full flex items-center justify-between hover:bg-black-800/50 transition-all duration-200 cursor-pointer h-[52px]"
+						onClick={onToolClick ? () => onToolClick(tool) : undefined}
 					>
 						<div className="flex gap-[8px]">
 							<div className="rounded-[6px] size-[38px] flex items-center justify-center bg-white-400/40">
@@ -58,7 +64,7 @@ function ToolsSection({
 							</div>
 						</div>
 						<ChevronRightIcon className="w-5 h-5 text-gray-400" />
-					</div>
+					</button>
 				))}
 			</div>
 		</div>
@@ -70,6 +76,7 @@ export function ToolsPanel({
 }: {
 	node: TextGenerationNode;
 }) {
+	const [selectedTool, setSelectedTool] = useState<UIToolName>();
 	const { enableTools, availableTools } = useMemo(() => {
 		const enableTools: UITool[] = [];
 		const availableTools: UITool[] = [];
@@ -101,6 +108,23 @@ export function ToolsPanel({
 		};
 	}, [node.content.tools]);
 
+	if (selectedTool) {
+		return (
+			<div className="text-white-400 space-y-[16px]">
+				<button
+					type="button"
+					className="flex items-center gap-[4px] text-[13px] text-white-800 cursor-pointer"
+					onClick={() => setSelectedTool(undefined)}
+				>
+					<ChevronLeftIcon className="size-[16px]" />
+					Back
+				</button>
+				{selectedTool === "GitHub" && <GitHubToolsPanel node={node} />}
+				{selectedTool === "PostgreSQL" && <PostgresToolsPanel node={node} />}
+			</div>
+		);
+	}
+
 	return (
 		<div className="text-white-400 space-y-[16px]">
 			<ToolsSection
@@ -114,6 +138,7 @@ export function ToolsPanel({
 				title="Available Tools"
 				tools={availableTools}
 				description={(tool) => `Add ${tool.name} tool`}
+				onToolClick={(tool) => setSelectedTool(tool.name)}
 			/>
 		</div>
 	);
