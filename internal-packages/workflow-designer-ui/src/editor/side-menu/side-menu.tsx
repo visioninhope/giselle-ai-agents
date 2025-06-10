@@ -1,10 +1,5 @@
 import clsx from "clsx/lite";
-import {
-	DraftingCompassIcon,
-	FileKey2Icon,
-	HistoryIcon,
-	MessageSquareIcon,
-} from "lucide-react";
+import { DraftingCompassIcon, FileKey2Icon, HistoryIcon } from "lucide-react";
 
 export function SideMenu() {
 	return (
