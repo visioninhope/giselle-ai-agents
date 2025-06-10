@@ -57,12 +57,12 @@ catalog:
   "@graphql-codegen/cli": 5.0.5
   "@graphql-codegen/client-preset": 4.7.0
   graffle: 8.0.0-next.157
-  "@octokit/auth-app": 7.1.1
-  "@octokit/core": 6.1.2
-  "@octokit/graphql": 8.2.1
-  "@octokit/openapi-types": 22.2.0
-  "@octokit/request-error": 6.1.5
-  "@octokit/webhooks": 13.3.0
+  "@octokit/auth-app": 8.0.1
+  "@octokit/core": 7.0.2
+  "@octokit/graphql": 9.0.1
+  "@octokit/openapi-types": 25.1.0
+  "@octokit/request-error": 7.0.0
+  "@octokit/webhooks": 14.0.2
   "@urql/core": 5.1.1
   gql.tada: 1.8.10
   urql: 4.2.2
