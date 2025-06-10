@@ -90,10 +90,6 @@
 
 	--font-accent: var(--font-dm-sans);
 	--font-sans: var(--font-dm-sans);
-	/* Alias old font variables to DM Sans */
-	--font-hubot-sans: var(--font-dm-sans);
-	--font-geist-sans: var(--font-dm-sans);
-	--font-rosart: var(--font-dm-sans);
 }
 
 @layer components {
