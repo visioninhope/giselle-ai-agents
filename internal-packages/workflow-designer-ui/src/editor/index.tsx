@@ -500,7 +500,7 @@ export function Editor({
 														}
 													>
 														{selectedNodes.length === 1 && (
-															<div className="flex-1 overflow-hidden p-[16px]">
+															<div className="flex-1 overflow-hidden pl-[16px] pt-[8px] pb-[16px]">
 																<PropertiesPanel />
 															</div>
 														)}

@@ -46,7 +46,7 @@ import {
 } from "./model";
 import { useConnectedOutputs } from "./outputs";
 import { PromptPanel } from "./prompt-panel";
-import { GitHubToolsPanel, PostgresToolsPanel } from "./tools";
+import { GitHubToolsPanel, PostgresToolsPanel, ToolsPanel } from "./tools";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -106,7 +106,7 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
-	const { githubTools } = useFeatureFlag();
+	const { githubTools, sidemenu } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -448,10 +448,16 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="tools"
-								className="flex-1 flex flex-col overflow-y-auto p-[16px] gap-[16px]"
+								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px]"
 							>
-								<GitHubToolsPanel node={node} />
-								<PostgresToolsPanel node={node} />
+								{sidemenu ? (
+									<ToolsPanel node={node} />
+								) : (
+									<div className="p-[8px]">
+										<GitHubToolsPanel node={node} />
+										<PostgresToolsPanel node={node} />
+									</div>
+								)}
 							</Tabs.Content>
 						</Tabs.Root>
 					</PropertiesPanelContent>
