@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1056 MIT
+* 1057 MIT
 * 110 Apache 2.0
 * 58 ISC
 * 34 New BSD
@@ -1637,7 +1637,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/auth-app"></a>
-### @octokit/auth-app v7.1.1
+### @octokit/auth-app v8.0.1
 #### 
 
 ##### Paths
@@ -1648,7 +1648,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/auth-oauth-app"></a>
-### @octokit/auth-oauth-app v8.1.2
+### @octokit/auth-oauth-app v9.0.1
 #### 
 
 ##### Paths
@@ -1659,7 +1659,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/auth-oauth-device"></a>
-### @octokit/auth-oauth-device v7.1.2
+### @octokit/auth-oauth-device v8.0.1
 #### 
 
 ##### Paths
@@ -1670,7 +1670,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/auth-oauth-user"></a>
-### @octokit/auth-oauth-user v5.1.2
+### @octokit/auth-oauth-user v6.0.0
 #### 
 
 ##### Paths
@@ -1681,7 +1681,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/auth-token"></a>
-### @octokit/auth-token v5.1.1
+### @octokit/auth-token v6.0.0
 #### 
 
 ##### Paths
@@ -1692,7 +1692,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/core"></a>
-### @octokit/core v6.1.2
+### @octokit/core v7.0.2
 #### 
 
 ##### Paths
@@ -1703,7 +1703,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/endpoint"></a>
-### @octokit/endpoint v10.1.3
+### @octokit/endpoint v11.0.0
 #### 
 
 ##### Paths
@@ -1714,7 +1714,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/graphql"></a>
-### @octokit/graphql v8.2.1
+### @octokit/graphql v9.0.1
 #### 
 
 ##### Paths
@@ -1725,7 +1725,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/oauth-authorization-url"></a>
-### @octokit/oauth-authorization-url v7.1.1
+### @octokit/oauth-authorization-url v8.0.0
 #### 
 
 ##### Paths
@@ -1736,7 +1736,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/oauth-methods"></a>
-### @octokit/oauth-methods v5.1.3
+### @octokit/oauth-methods v6.0.0
 #### 
 
 ##### Paths
@@ -1747,7 +1747,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/openapi-types"></a>
-### @octokit/openapi-types v22.2.0
+### @octokit/openapi-types v25.1.0
 #### 
 
 ##### Paths
@@ -1758,7 +1758,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/openapi-webhooks-types"></a>
-### @octokit/openapi-webhooks-types v8.3.0
+### @octokit/openapi-webhooks-types v12.0.3
 #### 
 
 ##### Paths
@@ -1769,7 +1769,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/request"></a>
-### @octokit/request v9.2.2
+### @octokit/request v10.0.2
 #### 
 
 ##### Paths
@@ -1780,7 +1780,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/request-error"></a>
-### @octokit/request-error v6.1.5
+### @octokit/request-error v7.0.0
 #### 
 
 ##### Paths
@@ -1791,7 +1791,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/types"></a>
-### @octokit/types v13.8.0
+### @octokit/types v14.1.0
 #### 
 
 ##### Paths
@@ -1802,7 +1802,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/webhooks"></a>
-### @octokit/webhooks v13.3.0
+### @octokit/webhooks v14.0.2
 #### 
 
 ##### Paths
@@ -1813,7 +1813,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@octokit/webhooks-methods"></a>
-### @octokit/webhooks-methods v5.1.0
+### @octokit/webhooks-methods v6.0.0
 #### 
 
 ##### Paths
@@ -5414,7 +5414,7 @@ Python-2.0 manually approved
 
 
 <a name="before-after-hook"></a>
-### before-after-hook v3.0.2
+### before-after-hook v4.0.0
 #### 
 
 ##### Paths
@@ -7196,7 +7196,7 @@ CC-BY-4.0 permitted
 
 
 <a name="fast-content-type-parse"></a>
-### fast-content-type-parse v2.0.1
+### fast-content-type-parse v3.0.0
 #### 
 
 ##### Paths
@@ -13196,6 +13196,17 @@ Unknown manually approved
 
 <a name="to-regex-range"></a>
 ### to-regex-range v5.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="toad-cache"></a>
+### toad-cache v3.7.0
 #### 
 
 ##### Paths
