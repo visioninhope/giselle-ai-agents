@@ -34,6 +34,7 @@ const GITHUB_TOOL_CATEGORIES = [
 			"getPullRequest",
 			"updatePullRequest",
 			"listPullRequests",
+			"searchPullRequests",
 			"getPullRequestComments",
 			"getPullRequestFiles",
 			"getPullRequestReviews",
@@ -57,7 +58,13 @@ const GITHUB_TOOL_CATEGORIES = [
 	},
 	{
 		label: "Search",
-		tools: ["searchCode", "searchIssues", "searchRepositories", "searchUsers"],
+		tools: [
+			"searchCode",
+			"searchIssues",
+			"searchPullRequests",
+			"searchRepositories",
+			"searchUsers",
+		],
 	},
 	{
 		label: "User",

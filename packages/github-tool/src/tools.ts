@@ -1099,6 +1099,54 @@ export function githubTools(octokit: Octokit) {
 				return response.data;
 			},
 		}),
+		searchPullRequests: tool({
+			description: "Search for pull requests across GitHub repositories",
+			parameters: z.object({
+				order: z.enum(["asc", "desc"]).optional(),
+				page: z
+					.number()
+					.describe("Page number for pagination (min 1)")
+					.min(1)
+					.optional(),
+				perPage: z
+					.number()
+					.describe("Results per page for pagination (min 1, max 100)")
+					.min(1)
+					.max(100)
+					.optional(),
+				q: z
+					.string()
+					.describe("Search query using GitHub issues search syntax"),
+				sort: z
+					.enum([
+						"comments",
+						"reactions",
+						"reactions-+1",
+						"reactions--1",
+						"reactions-smile",
+						"reactions-thinking_face",
+						"reactions-heart",
+						"reactions-tada",
+						"interactions",
+						"created",
+						"updated",
+					])
+					.optional(),
+			}),
+			execute: async (params) => {
+				const { order, page, perPage, q, sort } = params;
+
+				const response = await octokit.request("GET /search/issues", {
+					q: `${q} type:pr`,
+					sort,
+					order,
+					page,
+					per_page: perPage,
+				});
+
+				return response.data;
+			},
+		}),
 		searchRepositories: tool({
 			description: "Search for GitHub repositories",
 			parameters: z.object({
