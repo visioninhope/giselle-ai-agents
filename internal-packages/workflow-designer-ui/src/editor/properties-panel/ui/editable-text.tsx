@@ -41,7 +41,7 @@ export function EditableText({
 			<input
 				type="text"
 				className={clsx(
-					"w-[200px] py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
+					"w-full py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
 					"outline-none ring-[1px] ring-primary-900",
 					"text-white-900 text-[14px]",
 				)}
@@ -59,10 +59,10 @@ export function EditableText({
 			<button
 				type="button"
 				className={clsx(
-					"peer py-[2px] px-[4px] rounded-l-[4px] last:rounded-r-[4px] data-[editing=true]:hidden",
+					"py-[2px] px-[4px] rounded-l-[4px] last:rounded-r-[4px] data-[editing=true]:hidden text-left",
 					"hover:bg-white-900/20 group-hover:bg-white-900/10",
 					"text-white-900 text-[14px]",
-					"cursor-default",
+					"cursor-default w-full",
 				)}
 				data-editing={edit}
 				onClick={() => setEdit(true)}
