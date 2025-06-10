@@ -15,6 +15,7 @@ import "@xyflow/react/dist/style.css";
 import clsx from "clsx/lite";
 import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
+import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
 	type ImperativePanelHandle,
@@ -457,54 +458,58 @@ export function Editor({
 					<ReactFlowProvider>
 						<ToolbarContextProvider>
 							<MousePositionProvider>
-								<PanelGroup
-									direction="horizontal"
-									className="bg-black-900 h-full flex pr-[16px] py-[16px]"
-								>
-									<Panel defaultSize={10}>
-										<SideMenu />
-									</Panel>
-
-									<PanelResizeHandle
-										className={clsx(
-											"group pt-[16px] pb-[32px] h-full pl-[3px]",
-										)}
+								<Tabs.Root defaultValue="builder" asChild>
+									<PanelGroup
+										direction="horizontal"
+										className="bg-black-900 h-full flex pr-[16px] py-[16px]"
 									>
-										<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
-									</PanelResizeHandle>
-									<Panel className="flex-1 border border-black-400 rounded-[12px]">
-										<PanelGroup direction="horizontal">
-											<Panel>
-												<NodeCanvas />
-											</Panel>
-											<PanelResizeHandle
-												className={clsx(
-													"w-[1px] bg-black-400 cursor-col-resize",
-													"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-													"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
-												)}
-												data-right-panel={
-													selectedNodes.length === 1 ? "show" : "hide"
-												}
-											/>
-											<Panel
-												id="right-panel"
-												className="flex"
-												ref={rightPanelRef}
-												defaultSize={0}
-												data-right-panel={
-													selectedNodes.length === 1 ? "show" : "hide"
-												}
-											>
-												{selectedNodes.length === 1 && (
-													<div className="flex-1 overflow-hidden p-[16px]">
-														<PropertiesPanel />
-													</div>
-												)}
-											</Panel>
-										</PanelGroup>
-									</Panel>
-								</PanelGroup>
+										<Panel defaultSize={10}>
+											<SideMenu />
+										</Panel>
+
+										<PanelResizeHandle
+											className={clsx(
+												"group pt-[16px] pb-[32px] h-full pl-[3px]",
+											)}
+										>
+											<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
+										</PanelResizeHandle>
+										<Panel className="flex-1 border border-black-400 rounded-[12px]">
+											<Tabs.Content value="builder" className="h-full">
+												<PanelGroup direction="horizontal">
+													<Panel>
+														<NodeCanvas />
+													</Panel>
+													<PanelResizeHandle
+														className={clsx(
+															"w-[1px] bg-black-400 cursor-col-resize",
+															"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+															"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
+														)}
+														data-right-panel={
+															selectedNodes.length === 1 ? "show" : "hide"
+														}
+													/>
+													<Panel
+														id="right-panel"
+														className="flex"
+														ref={rightPanelRef}
+														defaultSize={0}
+														data-right-panel={
+															selectedNodes.length === 1 ? "show" : "hide"
+														}
+													>
+														{selectedNodes.length === 1 && (
+															<div className="flex-1 overflow-hidden p-[16px]">
+																<PropertiesPanel />
+															</div>
+														)}
+													</Panel>
+												</PanelGroup>
+											</Tabs.Content>
+										</Panel>
+									</PanelGroup>
+								</Tabs.Root>
 								<KeyboardShortcuts />
 							</MousePositionProvider>
 						</ToolbarContextProvider>

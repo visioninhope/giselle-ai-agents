@@ -2,6 +2,7 @@ import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { DraftingCompassIcon, FileKey2Icon, HistoryIcon } from "lucide-react";
 import Link from "next/link";
+import { Tabs } from "radix-ui";
 import { useCallback } from "react";
 import { GiselleLogo } from "../../icons";
 import { EditableText } from "../properties-panel/ui";
@@ -29,7 +30,7 @@ export function SideMenu() {
 				value={data.name}
 				size="large"
 			/>
-			<ul
+			<Tabs.List
 				className={clsx(
 					"flex flex-col w-full text-white-800 text-[14px]",
 					"**:data-list-wrapper:py-[1px] **:data-list-wrapper:cursor-pointer ",
@@ -44,25 +45,25 @@ export function SideMenu() {
 					"**:data-icon:transition-colors",
 				)}
 			>
-				<li data-state="active" className="group" data-list-wrapper>
+				<Tabs.Trigger value="builder" className="group" data-list-wrapper>
 					<div data-list>
 						<DraftingCompassIcon data-icon />
 						<p>Builder</p>
 					</div>
-				</li>
-				<li className="group" data-list-wrapper>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="run-history" className="group" data-list-wrapper>
 					<div data-list>
 						<HistoryIcon data-icon />
 						<p>Run History</p>
 					</div>
-				</li>
-				<li className="group" data-list-wrapper>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="credentials" className="group" data-list-wrapper>
 					<div data-list>
 						<FileKey2Icon data-icon />
 						<p>Credentials</p>
 					</div>
-				</li>
-			</ul>
+				</Tabs.Trigger>
+			</Tabs.List>
 		</div>
 	);
 }
