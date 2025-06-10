@@ -42,12 +42,6 @@ export function SideMenu() {
 						<p>Credentials</p>
 					</div>
 				</li>
-				<li className="group" data-list-wrapper>
-					<div data-list>
-						<MessageSquareIcon data-icon />
-						<p>Chat</p>
-					</div>
-				</li>
 			</ul>
 		</div>
 	);

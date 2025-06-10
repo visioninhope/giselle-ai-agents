@@ -13,7 +13,7 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -230,10 +230,14 @@ function NodeCanvas() {
 		return true;
 	};
 
+	const { sidemenu } = useFeatureFlag();
+
 	return (
 		<ReactFlow<GiselleWorkflowDesignerNode, ConnectorType>
 			ref={reactFlowRef}
-			className="giselle-workflow-editor"
+			className={clsx(
+				sidemenu ? "giselle-workflow-editor-v3" : "giselle-workflow-editor",
+			)}
 			colorMode="dark"
 			defaultNodes={[]}
 			defaultEdges={[]}
@@ -357,9 +361,11 @@ function NodeCanvas() {
 			<XYFlowPanel position={"bottom-center"}>
 				<Toolbar />
 			</XYFlowPanel>
-			<XYFlowPanel position="top-right">
-				<RunButton />
-			</XYFlowPanel>
+			{sidemenu && (
+				<XYFlowPanel position="top-right">
+					<RunButton />
+				</XYFlowPanel>
+			)}
 			{menu && <ContextMenu {...menu} onClose={() => setMenu(null)} />}
 		</ReactFlow>
 	);
@@ -437,8 +443,89 @@ export function Editor({
 		setShowReadOnlyBanner(false);
 	}, []);
 
+	const { sidemenu } = useFeatureFlag();
+
+	if (sidemenu) {
+		return (
+			<div className="flex-1 overflow-hidden font-sans pl-[16px]">
+				{showReadOnlyBanner && isReadOnly && (
+					<ReadOnlyBanner
+						onDismiss={handleDismissBanner}
+						userRole={userRole}
+						className="z-50"
+					/>
+				)}
+
+				<Beta.Provider value={{ githubTools }}>
+					<ToastProvider>
+						<ReactFlowProvider>
+							<ToolbarContextProvider>
+								<MousePositionProvider>
+									<PanelGroup
+										direction="horizontal"
+										className="bg-black-900 h-full flex pr-[16px] py-[16px]"
+									>
+										<Panel defaultSize={10} className="flex py-[16px]">
+											<SideMenu />
+										</Panel>
+
+										<PanelResizeHandle
+											className={clsx(
+												"group pt-[16px] pb-[32px] h-full pl-[3px]",
+											)}
+										>
+											<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
+										</PanelResizeHandle>
+										<Panel className="flex-1 border border-black-400 rounded-[12px]">
+											<PanelGroup direction="horizontal">
+												<Panel>
+													<NodeCanvas />
+												</Panel>
+												<PanelResizeHandle
+													className={clsx(
+														"w-[1px] bg-black-400 cursor-col-resize",
+														"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+														"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
+													)}
+													data-right-panel={
+														selectedNodes.length === 1 ? "show" : "hide"
+													}
+												/>
+												<Panel
+													id="right-panel"
+													className="flex"
+													ref={rightPanelRef}
+													defaultSize={0}
+													data-right-panel={
+														selectedNodes.length === 1 ? "show" : "hide"
+													}
+												>
+													{selectedNodes.length === 1 && (
+														<div className="flex-1 overflow-hidden p-[16px]">
+															<PropertiesPanel />
+														</div>
+													)}
+												</Panel>
+											</PanelGroup>
+										</Panel>
+									</PanelGroup>
+									<KeyboardShortcuts />
+								</MousePositionProvider>
+							</ToolbarContextProvider>
+							<GradientDef />
+						</ReactFlowProvider>
+					</ToastProvider>
+					<WorkspaceTour
+						steps={tourSteps}
+						isOpen={isTourOpen}
+						onOpenChange={setIsTourOpen}
+					/>
+				</Beta.Provider>
+			</div>
+		);
+	}
 	return (
-		<div className="flex-1 overflow-hidden font-sans pl-[16px]">
+		<div className="flex-1 overflow-hidden font-sans">
 			{showReadOnlyBanner && isReadOnly && (
 				<ReadOnlyBanner
 					onDismiss={handleDismissBanner}
@@ -454,50 +541,35 @@ export function Editor({
 							<MousePositionProvider>
 								<PanelGroup
 									direction="horizontal"
-									className="bg-black-900 h-full flex pr-[16px] py-[16px]"
+									className="bg-black-900 h-full flex"
 								>
-									<Panel defaultSize={10} className="flex py-[16px]">
-										<SideMenu />
+									<Panel
+										className="flex-1 px-[16px] pb-[16px] pr-0"
+										defaultSize={100}
+									>
+										<div className="h-full flex">
+											<NodeCanvas />
+										</div>
 									</Panel>
 
 									<PanelResizeHandle
 										className={clsx(
-											"group pt-[16px] pb-[32px] h-full pl-[3px]",
+											"w-[12px] flex items-center justify-center cursor-col-resize",
+											"after:content-[''] after:w-[3px] after:h-[32px] after:bg-[#3a3f44] after:rounded-full",
+											"hover:after:bg-[#4a90e2]",
 										)}
+									/>
+									<Panel
+										id="right-panel"
+										className="flex py-[16px]"
+										ref={rightPanelRef}
+										defaultSize={0}
 									>
-										<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
-									</PanelResizeHandle>
-									<Panel className="flex-1 border border-black-400 rounded-[12px]">
-										<PanelGroup direction="horizontal">
-											<Panel>
-												<NodeCanvas />
-											</Panel>
-											<PanelResizeHandle
-												className={clsx(
-													"w-[1px] bg-black-400 cursor-col-resize",
-													"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-													"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
-												)}
-												data-right-panel={
-													selectedNodes.length === 1 ? "show" : "hide"
-												}
-											/>
-											<Panel
-												id="right-panel"
-												className="flex"
-												ref={rightPanelRef}
-												defaultSize={0}
-												data-right-panel={
-													selectedNodes.length === 1 ? "show" : "hide"
-												}
-											>
-												{selectedNodes.length === 1 && (
-													<div className="flex-1 overflow-hidden p-[16px]">
-														<PropertiesPanel />
-													</div>
-												)}
-											</Panel>
-										</PanelGroup>
+										{selectedNodes.length === 1 && (
+											<div className="flex-1 overflow-hidden">
+												<PropertiesPanel />
+											</div>
+										)}
 									</Panel>
 								</PanelGroup>
 								<KeyboardShortcuts />
