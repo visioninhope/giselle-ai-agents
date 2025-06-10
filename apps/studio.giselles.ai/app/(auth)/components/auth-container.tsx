@@ -17,7 +17,7 @@ export const AuthContainer: FC<AuthContainerProps> = ({
 		</h1>
 
 		{/* Frosted-glass container */}
-		<div className="auth-glass-container relative w-full max-w-[360px] rounded-2xl pt-15 pb-7.5 px-10 flex flex-col shadow-lg shadow-black/30">
+		<div className="relative w-full max-w-[360px] rounded-2xl pt-15 pb-7.5 px-10 flex flex-col shadow-lg shadow-black/30 border border-transparent bg-clip-padding backdrop-blur-[8px] bg-[linear-gradient(to_bottom,rgba(255,255,255,0.05)_80%,rgba(255,255,255,0)_100%)]">
 			{/* Gradient border */}
 			<div className="auth-gradient-border" />
 
