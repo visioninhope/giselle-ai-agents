@@ -1,5 +1,10 @@
 import clsx from "clsx/lite";
-import { DraftingCompassIcon, FileKey2Icon, HistoryIcon } from "lucide-react";
+import {
+	DraftingCompassIcon,
+	FileKey2Icon,
+	HistoryIcon,
+	MessageSquareIcon,
+} from "lucide-react";
 
 export function SideMenu() {
 	return (
@@ -35,6 +40,12 @@ export function SideMenu() {
 					<div data-list>
 						<FileKey2Icon data-icon />
 						<p>Credentials</p>
+					</div>
+				</li>
+				<li className="group" data-list-wrapper>
+					<div data-list>
+						<MessageSquareIcon data-icon />
+						<p>Chat</p>
 					</div>
 				</li>
 			</ul>

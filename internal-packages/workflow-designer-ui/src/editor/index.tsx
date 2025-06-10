@@ -454,7 +454,7 @@ export function Editor({
 							<MousePositionProvider>
 								<PanelGroup
 									direction="horizontal"
-									className="bg-black-900 h-full flex pr-[16px] pb-[16px]"
+									className="bg-black-900 h-full flex pr-[16px] py-[16px]"
 								>
 									<Panel defaultSize={10} className="flex py-[16px]">
 										<SideMenu />

@@ -71,3 +71,22 @@ export const runV3Flag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const sidemenuFlag = flag<boolean>({
+	key: "sidemenu",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("SIDEMENU_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable Side Menu",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

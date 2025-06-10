@@ -1,6 +1,7 @@
 "use client";
 
 import { Editor, Header } from "@giselle-internal/workflow-designer-ui";
+import { useFeatureFlag } from "giselle-sdk/react";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {
@@ -16,9 +17,11 @@ export default function Page() {
 		| "editor"
 		| "owner";
 
+	const { sidemenu } = useFeatureFlag();
+
 	return (
 		<div className="flex flex-col h-screen bg-black-900">
-			<Header isReadOnly={isReadOnly} shareFeatureFlag />
+			{!sidemenu && <Header isReadOnly={isReadOnly} shareFeatureFlag />}
 			<Editor githubTools isReadOnly={isReadOnly} userRole={userRole} />
 		</div>
 	);

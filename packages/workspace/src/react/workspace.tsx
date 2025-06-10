@@ -67,6 +67,7 @@ export function WorkspaceProvider({
 									value={{
 										githubVectorStore: featureFlag?.githubVectorStore ?? false,
 										runV3: featureFlag?.runV3 ?? false,
+										sidemenu: featureFlag?.sidemenu ?? false,
 									}}
 								>
 									{children}
