@@ -27,7 +27,7 @@ export const Form: FC = () => {
 				)}
 				<Field
 					type="email"
-					label="Enter your account's email address and we will send you a password reset link."
+					label="Email"
 					name="email"
 					ignore1password
 				/>

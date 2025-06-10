@@ -2,45 +2,51 @@ import { Button } from "@/components/ui/button";
 import { ClickableText } from "@/components/ui/clickable-text";
 import { MailIcon } from "lucide-react";
 import Link from "next/link";
+import { AuthContainer, AuthContainerHeader } from "../components";
 import { ActionPrompt } from "../components/action-prompt";
 import { Divider } from "../components/divider";
 import { LegalConsent } from "../components/legal-consent";
 import { OAuthProviders } from "../components/oauth-providers";
-import { PageHeader } from "../components/page-header";
 
 export default function SignupPage() {
 	return (
-		<div className="min-h-screen flex items-center justify-center p-4 gap-16">
-			<div className="flex flex-col gap-[16px]">
-				<h2
-					className="text-[34px] font-[500] text-primary-100 text-left font-sans"
-					style={{ textShadow: "0px 0px 20px #0087F6" }}
-				>
-					Unleash Your Potential
-				</h2>
-			</div>
-			<div className="mt-8 space-y-6 w-[320px]">
-				<PageHeader title="Get Started" />
+		<AuthContainer title="Unleash Your Potential">
+			<AuthContainerHeader title="Get Started" />
+
+			<div className="auth-form-section">
 				<OAuthProviders labelPrefix="Sign up" />
+			</div>
+
+			<div className="auth-divider-section">
 				<Divider label="or" />
-				<Button asChild className="font-medium">
-					<Link href="/signup/email">
-						<p className="font-sans font-medium">Sign up for Email</p>
-						<MailIcon className="h-5 w-5 mr-2" />
+			</div>
+
+			<div className="auth-form-section">
+				<Button asChild className="font-medium w-full justify-center">
+					<Link
+						href="/signup/email"
+						className="flex items-center justify-center gap-2"
+					>
+						<MailIcon className="h-5 w-5" />
+						<p className="font-sans font-medium">Sign up with Email</p>
 					</Link>
 				</Button>
-				<LegalConsent />
-				<div className="flex justify-center">
-					<ActionPrompt
-						prompt="Already have an account?"
-						action={
-							<ClickableText asChild>
-								<Link href="/login">Log in</Link>
-							</ClickableText>
-						}
-					/>
-				</div>
 			</div>
-		</div>
+
+			<div className="auth-legal-section">
+				<LegalConsent />
+			</div>
+
+			<div className="auth-action-section">
+				<ActionPrompt
+					prompt="Already have an account?"
+					action={
+						<ClickableText asChild>
+							<Link href="/login">Log in</Link>
+						</ClickableText>
+					}
+				/>
+			</div>
+		</AuthContainer>
 	);
 }
