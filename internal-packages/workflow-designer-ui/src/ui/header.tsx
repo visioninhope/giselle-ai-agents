@@ -73,7 +73,7 @@ export function Header() {
 				<Link href="/">
 					<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
 				</Link>
-				<div className="font-sans text-[18px] text-black--30">Playground</div>
+				<div className="font-sans text-[18px] text-black-30">Playground</div>
 			</div>
 			<div className="flex items-center gap-[10px] flex-1 justify-center">
 				<ViewSwitch view="editor">edit</ViewSwitch>
