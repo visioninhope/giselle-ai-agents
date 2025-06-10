@@ -297,10 +297,7 @@ export function WorkflowDesignerProvider({
 			workflowDesignerRef.current.updateNodeData(newNode, {
 				content: {
 					...newNode.content,
-					source: {
-						...newNode.content.source,
-						state: structuredClone(sourceNode.content.source.state),
-					},
+					source: structuredClone(sourceNode.content.source),
 				},
 			});
 			setAndSaveWorkspace();
