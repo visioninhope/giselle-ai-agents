@@ -125,6 +125,7 @@ async function generateImageWithFal({
 		name: "ai-sdk/fal",
 		metadata: telemetry?.metadata,
 		input: { messages },
+		tags: ["deprecated"],
 	});
 	const generation = trace.generation({
 		name: "ai-sdk/fal.generateImage",
@@ -253,6 +254,7 @@ export async function generateImageWithOpenAI({
 		name: "ai-sdk/openai",
 		metadata: telemetry?.metadata,
 		input: { messages },
+		tags: ["deprecated"],
 	});
 	const generation = trace.generation({
 		name: "ai-sdk/openai.generateImage",
