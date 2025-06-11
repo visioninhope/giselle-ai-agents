@@ -10,14 +10,16 @@ export default async function AccountGeneralPage() {
 	const alt = displayName || email || "";
 
 	return (
-		<div className="flex flex-col gap-[24px]">
+		<div className="flex flex-col gap-[12px]">
 			<div className="flex justify-between items-center">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<h1
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Account Settings
-				</h3>
+				</h1>
 				<a
 					href="https://docs.giselles.ai/guides/settings/account/general"
 					target="_blank"

@@ -70,8 +70,10 @@ export default async function TeamVectorStorePage() {
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
 				<h1
-					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Vector Stores
 				</h1>
@@ -103,8 +105,10 @@ function GitHubAuthRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h1
-				className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
 			</h1>
@@ -133,8 +137,10 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h1
-				className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
 			</h1>
@@ -159,8 +165,10 @@ function GitHubAppInstallRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<h1
-				className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
 			</h1>

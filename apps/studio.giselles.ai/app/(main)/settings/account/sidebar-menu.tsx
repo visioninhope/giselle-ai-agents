@@ -13,7 +13,7 @@ export function SidebarMenu() {
 	];
 
 	return (
-		<div className="w-[240px] min-h-full flex flex-col pt-[24px]">
+		<div className="w-[240px] min-h-full flex flex-col pt-0">
 			<div className="flex flex-col space-y-4">
 				{links.map((link) => (
 					<Link

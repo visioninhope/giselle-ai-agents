@@ -29,8 +29,10 @@ export default async function TeamMembersPage() {
 		return (
 			<div className="flex flex-col gap-[24px]">
 				<h1
-					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Members
 				</h1>
@@ -48,8 +50,10 @@ export default async function TeamMembersPage() {
 		return (
 			<div className="flex flex-col gap-[24px]">
 				<h1
-					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Members
 				</h1>
@@ -67,8 +71,10 @@ export default async function TeamMembersPage() {
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center w-full">
 				<h1
-					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Members
 				</h1>
