@@ -38,13 +38,9 @@ function ToolIcon({
 function ToolsSection({
 	title,
 	tools,
-	description,
-	onToolClick,
 }: {
 	title: string;
 	tools: UITool[];
-	description: (tool: UITool) => string;
-	onToolClick?: (tool: UITool) => void;
 }) {
 	if (tools.length === 0) return null;
 	return (
@@ -72,7 +68,6 @@ function ToolsSection({
 							<PlusIcon className="size-[14px]" />
 							<span>Add</span>
 						</button>
-						{/* <ChevronRightIcon className="w-5 h-5 text-gray-400" /> */}
 					</div>
 				))}
 			</div>
@@ -343,19 +338,8 @@ export function ToolsPanel({
 
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolsSection
-				title="Enabled Tools"
-				tools={enableTools}
-				description={(tool) =>
-					`${tool.commands.length} ${tool.commands.length > 1 ? "tools" : "tool"} enabled`
-				}
-			/>
-			<ToolsSection
-				title="Available Tools"
-				tools={availableTools}
-				description={(tool) => `Add ${tool.name} tool`}
-				onToolClick={(tool) => setSelectedTool(tool.name)}
-			/>
+			<ToolsSection title="Enabled Tools" tools={enableTools} />
+			<ToolsSection title="Available Tools" tools={availableTools} />
 		</div>
 	);
 }
