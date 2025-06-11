@@ -474,7 +474,7 @@ export function Editor({
 										>
 											<div className="w-[2px] h-full bg-transparent group-data-[resize-handle-state=hover]:bg-black-400 group-data-[resize-handle-state=drag]:bg-black-400 transition-colors" />
 										</PanelResizeHandle>
-										<Panel className="flex-1 border border-black-400 rounded-[12px]">
+										<Panel className="flex-1 border border-border rounded-[12px]">
 											<Tabs.Content value="builder" className="h-full">
 												<PanelGroup direction="horizontal">
 													<Panel>
@@ -482,7 +482,7 @@ export function Editor({
 													</Panel>
 													<PanelResizeHandle
 														className={clsx(
-															"w-[1px] bg-black-400 cursor-col-resize",
+															"w-[1px] bg-border cursor-col-resize",
 															"data-[resize-handle-state=hover]:bg-[#4a90e2]",
 															"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
 														)}
@@ -492,7 +492,7 @@ export function Editor({
 													/>
 													<Panel
 														id="right-panel"
-														className="flex bg-panel-background"
+														className="flex bg-surface-background"
 														ref={rightPanelRef}
 														defaultSize={0}
 														data-right-panel={
@@ -500,7 +500,7 @@ export function Editor({
 														}
 													>
 														{selectedNodes.length === 1 && (
-															<div className="flex-1 overflow-hidden pl-[16px] pt-[8px] pb-[16px]">
+															<div className="flex-1 overflow-hidden">
 																<PropertiesPanel />
 															</div>
 														)}
