@@ -27,6 +27,7 @@
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
 		"@types/react": "catalog:",
+		"@types/node": "catalog:",
 		"tsup": "catalog:"
 	},
 	"dependencies": {

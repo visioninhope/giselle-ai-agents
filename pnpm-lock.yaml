@@ -1178,6 +1178,9 @@ importers:
       '@giselle/giselle-sdk-tsconfig':
         specifier: workspace:*
         version: link:../../tools/tsconfig
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
       '@types/react':
         specifier: 'catalog:'
         version: 19.1.0

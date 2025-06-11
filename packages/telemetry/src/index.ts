@@ -13,7 +13,7 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { Langfuse } from "langfuse";
+import { type ApiMediaContentType, Langfuse, LangfuseMedia } from "langfuse";
 import type {
 	AnthropicProviderOptions,
 	TelemetrySettings,
@@ -321,6 +321,65 @@ async function createLangfuseParams(
 			endTime: new Date(generation.completedAt),
 		},
 	};
+}
+
+/**
+ * Create LangfuseMedia objects from generated images if storage is available
+ */
+async function createImageMediaObjects(
+	generation: CompletedGeneration,
+	storage?: {
+		getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
+	},
+): Promise<{ [key: string]: LangfuseMedia } | undefined> {
+	if (!storage) {
+		return undefined;
+	}
+
+	const generatedImageOutputs = generation.outputs.filter(
+		(output) => output.type === "generated-image",
+	);
+
+	if (generatedImageOutputs.length === 0) {
+		return undefined;
+	}
+
+	const imageMediaObjects: { [key: string]: LangfuseMedia } = {};
+
+	for (const output of generatedImageOutputs) {
+		for (const image of output.contents) {
+			try {
+				const imagePath = `generations/${generation.id}/generated-images/${image.filename}`;
+				const imageData = await storage.getItemRaw(imagePath);
+
+				if (imageData) {
+					// Convert imageData to Buffer safely
+					let buffer: Buffer;
+					try {
+						buffer = Buffer.from(imageData);
+					} catch (error) {
+						console.warn(`Error converting imageData to Buffer:`, error);
+						continue;
+					}
+
+					const mediaKey = `${output.outputId}_${image.id}`;
+					imageMediaObjects[mediaKey] = new LangfuseMedia({
+						contentType: image.contentType as ApiMediaContentType,
+						contentBytes: buffer,
+					});
+				}
+			} catch (error) {
+				console.warn(
+					`Failed to load image ${image.filename} for telemetry:`,
+					error,
+				);
+			}
+		}
+	}
+
+	return Object.keys(imageMediaObjects).length > 0
+		? imageMediaObjects
+		: undefined;
 }
 
 export async function emitTelemetry(
