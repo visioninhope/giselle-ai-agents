@@ -222,6 +222,107 @@ function getProviderOptions(
 	return providerOptions;
 }
 
+async function createLangfuseParams(
+	generation: CompletedGeneration,
+	options: GenerationCompleteOption,
+	type: "text" | "image",
+): Promise<LangfuseParams> {
+	const operationNode = generation.context.operationNode;
+	const llm = operationNode.content.llm as {
+		provider: string;
+		id: string;
+		configurations?: Record<
+			string,
+			string | number | boolean | string[] | null
+		>;
+	};
+	const { input, output } =
+		type === "text"
+			? extractInputOutputForTextGeneration(
+					generation,
+					operationNode as TextGenerationNode,
+				)
+			: extractInputForImageGeneration(
+					generation,
+					operationNode as ImageGenerationNode,
+				);
+
+	// Use the same metadata format for both text and image generation
+	const enhancedMetadata = { ...options?.telemetry };
+	const baseParams = {
+		name: type === "text" ? "llm-generation" : "image-generation",
+		input,
+		output,
+		metadata: enhancedMetadata,
+	};
+
+	const displayCost =
+		type === "text"
+			? await calculateDisplayCost(
+					llm.provider,
+					llm.id,
+					generation.usage ?? {
+						promptTokens: 0,
+						completionTokens: 0,
+						totalTokens: 0,
+					},
+				)
+			: null;
+
+	return {
+		traceParams: {
+			...(options?.telemetry?.userId && {
+				userId: String(options.telemetry.userId),
+			}),
+			...baseParams,
+			tags:
+				type === "text"
+					? generateTelemetryTags({
+							provider: llm.provider,
+							modelId: llm.id,
+							toolSet: extractToolSet(operationNode as TextGenerationNode),
+							configurations: llm.configurations ?? {},
+							providerOptions: getProviderOptions(
+								llm.provider,
+								llm.configurations ?? {},
+								llm.id,
+							),
+						})
+					: [llm.provider, llm.id],
+		},
+		spanParams: {
+			...baseParams,
+			startTime: new Date(generation.queuedAt ?? generation.createdAt),
+			endTime: new Date(generation.completedAt),
+		},
+		generationParams: {
+			...baseParams,
+			model: llm.id,
+			modelParameters: llm.configurations ?? {},
+			usage:
+				type === "text"
+					? {
+							input: generation.usage?.promptTokens ?? 0,
+							output: generation.usage?.completionTokens ?? 0,
+							total: generation.usage?.totalTokens ?? 0,
+							unit: "TOKENS",
+							inputCost: displayCost?.inputCostForDisplay ?? 0,
+							outputCost: displayCost?.outputCostForDisplay ?? 0,
+							totalCost: displayCost?.totalCostForDisplay ?? 0,
+						}
+					: {
+							input: 0,
+							output: 0,
+							total: 0,
+							unit: "IMAGES",
+						},
+			startTime: new Date(generation.createdAt),
+			completionStartTime: new Date(generation.startedAt),
+			endTime: new Date(generation.completedAt),
+		},
+	};
+}
+
 export async function emitTelemetry(
 	generation: CompletedGeneration,
 	options: GenerationCompleteOption,
