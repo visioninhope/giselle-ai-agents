@@ -1094,6 +1094,7 @@ export function githubTools(octokit: Octokit) {
 					order,
 					page,
 					per_page: perPage,
+					advanced_search: "true",
 				});
 
 				return response.data;
@@ -1142,6 +1143,7 @@ export function githubTools(octokit: Octokit) {
 					order,
 					page,
 					per_page: perPage,
+					advanced_search: "true",
 				});
 
 				return response.data;
