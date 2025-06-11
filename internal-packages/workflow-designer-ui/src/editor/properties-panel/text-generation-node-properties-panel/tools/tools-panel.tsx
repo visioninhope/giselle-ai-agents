@@ -6,6 +6,7 @@ import {
 	ChevronRightIcon,
 	DatabaseIcon,
 	MoveUpRightIcon,
+	PlusIcon,
 } from "lucide-react";
 import { DropdownMenu, Tabs } from "radix-ui";
 import { type SVGProps, useMemo, useState } from "react";
@@ -48,30 +49,31 @@ function ToolsSection({
 	if (tools.length === 0) return null;
 	return (
 		<div className="space-y-[8px]">
-			<h2 className="text-[15px] font-accent text-white-800">{title}</h2>
+			<h2 className="text-[15px] font-accent text-text ">{title}</h2>
 			<div className="space-y-[6px]">
 				{tools.map((tool) => (
-					<button
+					<div
 						key={tool.name}
-						type="button"
-						className="border border-black-400 rounded-[8px] p-[6px] w-full flex items-center justify-between hover:bg-black-800/50 transition-all duration-200 cursor-pointer h-[52px]"
-						onClick={onToolClick ? () => onToolClick(tool) : undefined}
+						className="border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]"
+						// onClick={onToolClick ? () => onToolClick(tool) : undefined}
 					>
-						<div className="flex gap-[8px]">
-							<div className="rounded-[6px] size-[38px] flex items-center justify-center bg-white-400/40">
-								<ToolIcon name={tool.name} className="size-[24px] text-white" />
-							</div>
-							<div>
-								<div className="flex items-center gap-2">
-									<h3 className="text-[15px]">{tool.name}</h3>
-								</div>
-								<p className="text-black-300 text-[11px]">
-									{description(tool)}
-								</p>
-							</div>
+						<div className="flex gap-[10px] items-center">
+							<ToolIcon
+								name={tool.name}
+								className="size-[20px] text-text-muted"
+							/>
+							<h3 className="text-[14px]">{tool.name}</h3>
 						</div>
-						<ChevronRightIcon className="w-5 h-5 text-gray-400" />
-					</button>
+
+						<button
+							type="button"
+							className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] py-[2px] rounded-[2px] cursor-pointer"
+						>
+							<PlusIcon className="size-[14px]" />
+							<span>Add</span>
+						</button>
+						{/* <ChevronRightIcon className="w-5 h-5 text-gray-400" /> */}
+					</div>
 				))}
 			</div>
 		</div>
