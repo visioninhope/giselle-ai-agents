@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "../../../internal-packages/workflow-designer-ui/src/workflow-designer-ui.css";
+@import "../../../internal-packages/workflow-designer-ui/src/app/workflow-designer-ui.css";
 
 @source "../../../internal-packages/workflow-designer-ui/src";
 @source "../../../packages/text-editor/src/react/";
