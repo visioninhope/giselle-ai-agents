@@ -5,6 +5,7 @@ import {
 	GenerationContext,
 	type ImageGenerationNode,
 	type TextGenerationNode,
+	isImageGenerationNode,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
@@ -22,9 +23,12 @@ import type {
 } from "./types";
 
 export interface GenerationCompleteOption {
-	telemetry: TelemetrySettings["metadata"];
+	telemetry?: TelemetrySettings;
 	providerOptions?: {
 		anthropic?: AnthropicProviderOptions;
+	};
+	storage?: {
+		getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
 	};
 }
 
@@ -247,13 +251,11 @@ async function createLangfuseParams(
 					operationNode as ImageGenerationNode,
 				);
 
-	// Use the same metadata format for both text and image generation
-	const enhancedMetadata = { ...options?.telemetry };
 	const baseParams = {
 		name: type === "text" ? "llm-generation" : "image-generation",
 		input,
 		output,
-		metadata: enhancedMetadata,
+		metadata: options?.telemetry?.metadata,
 	};
 
 	const displayCost =
@@ -271,8 +273,8 @@ async function createLangfuseParams(
 
 	return {
 		traceParams: {
-			...(options?.telemetry?.userId && {
-				userId: String(options.telemetry.userId),
+			...((options?.telemetry?.metadata as any)?.userId && {
+				userId: String((options.telemetry?.metadata as any).userId),
 			}),
 			...baseParams,
 			tags:
@@ -387,125 +389,48 @@ export async function emitTelemetry(
 	options: GenerationCompleteOption,
 ) {
 	try {
-		const langfuse = new Langfuse();
+		const operationNode = generation.context.operationNode;
+		const nodeType = operationNode.content.type;
 
-		if (!isTextGenerationNode(generation.context.operationNode)) {
-			console.warn("Skipping telemetry for non-text generation");
-			return;
-		}
-
-		const llm = generation.context.operationNode.content.llm;
-
-		const promptJson = (() => {
-			if (typeof generation.context.operationNode.content.prompt === "string") {
-				try {
-					return JSON.parse(generation.context.operationNode.content.prompt);
-				} catch (error) {
-					console.warn("Failed to parse prompt JSON for telemetry:", error);
-					return { content: [] };
-				}
-			}
-			return { content: [] };
-		})();
-		const input = (() => {
-			// Handle various prompt formats more robustly
-			if (promptJson.content?.[0]?.content?.[0]?.text) {
-				return promptJson.content[0].content[0].text;
-			}
-			if (typeof promptJson.content === "string") {
-				return promptJson.content;
-			}
-			return promptJson.text || "";
-		})();
-
-		const assistantMessage = generation.messages?.find(
-			(msg) => msg.role === "assistant",
-		);
-		const output = assistantMessage?.content ?? "";
-
-		const toolSet: ToolSet = {};
-		const tools = generation.context.operationNode.content.tools;
-		if (tools) {
-			if (tools.openaiWebSearch) {
-				toolSet.openaiWebSearch = true;
-			}
-			if (tools.github?.tools) {
-				toolSet.github = tools.github.tools;
-			}
-			if (tools.postgres?.tools) {
-				toolSet.postgres = tools.postgres.tools;
-			}
-		}
-
-		const languageModel = languageModels.find((model) => model.id === llm.id);
-
-		const providerOptions: { anthropic?: AnthropicProviderOptions } = {};
 		if (
-			languageModel &&
-			llm.provider === "anthropic" &&
-			llm.configurations?.reasoning &&
-			hasCapability(languageModel, Capability.Reasoning)
+			!isTextGenerationNode(operationNode) &&
+			!isImageGenerationNode(operationNode)
 		) {
-			providerOptions.anthropic = {
-				thinking: {
-					type: "enabled",
-				},
-			};
+			throw new Error(`Unsupported generation type: ${nodeType}`);
 		}
 
-		const trace = langfuse.trace({
-			name: "llm-generation",
-			input,
-			tags: generateTelemetryTags({
-				provider: llm.provider,
-				modelId: llm.id,
-				toolSet,
-				configurations: llm.configurations ?? {},
-				providerOptions,
-			}),
-			metadata: options?.telemetry,
-			output,
-		});
+		const isImageGeneration = isImageGenerationNode(operationNode);
 
-		const span = trace.span({
-			name: "llm-generation",
-			startTime: new Date(generation.queuedAt ?? generation.createdAt),
-			input,
-			endTime: new Date(generation.completedAt),
-			metadata: options?.telemetry,
-			output,
-		});
+		const { traceParams, spanParams, generationParams } =
+			await createLangfuseParams(
+				generation,
+				options,
+				isImageGeneration ? "image" : "text",
+			);
 
-		const displayCost = await calculateDisplayCost(
-			llm.provider,
-			llm.id,
-			generation.usage ?? {
-				promptTokens: 0,
-				completionTokens: 0,
-				totalTokens: 0,
-			},
-		);
+		const langfuse = new Langfuse();
+		const trace = langfuse.trace(traceParams);
+		const span = trace.span(spanParams);
+		const langfuseGeneration = span.generation(generationParams);
 
-		span.generation({
-			name: "llm-generation",
-			model: llm.id,
-			modelParameters: llm.configurations ?? {},
-			input,
-			usage: {
-				input: generation.usage?.promptTokens ?? 0,
-				output: generation.usage?.completionTokens ?? 0,
-				total: generation.usage?.totalTokens ?? 0,
-				inputCost: displayCost.inputCostForDisplay ?? 0,
-				outputCost: displayCost.outputCostForDisplay ?? 0,
-				totalCost: displayCost.totalCostForDisplay ?? 0,
-				unit: "TOKENS",
-			},
-			startTime: new Date(generation.createdAt),
-			completionStartTime: new Date(generation.startedAt),
-			endTime: new Date(generation.completedAt),
-			metadata: options?.telemetry,
-			output,
-		});
+		if (isImageGeneration) {
+			const imageMediaObjects = options.storage
+				? await createImageMediaObjects(generation, options.storage)
+				: undefined;
+
+			if (imageMediaObjects) {
+				const imageMediaArray = Object.values(imageMediaObjects);
+				trace.update({
+					output: imageMediaArray,
+				});
+				span.update({
+					output: imageMediaArray,
+				});
+				langfuseGeneration.update({
+					output: imageMediaArray,
+				});
+			}
+		}
 
 		await langfuse.flushAsync();
 	} catch (error) {
