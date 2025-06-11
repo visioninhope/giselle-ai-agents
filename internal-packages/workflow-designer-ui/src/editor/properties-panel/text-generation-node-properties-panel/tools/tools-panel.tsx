@@ -154,7 +154,53 @@ export function ToolsPanel({
 								Use Existing Token
 							</Tabs.Trigger>
 						</Tabs.List>
-						<Tabs.Content value="create">Create new token</Tabs.Content>
+						<Tabs.Content value="create">
+							<form className="space-y-[6px] mt-[8px]">
+								<fieldset className="flex flex-col">
+									<label
+										htmlFor="label"
+										className="text-text text-[13px] mb-[2px]"
+									>
+										Label
+									</label>
+									<input
+										type="text"
+										id="label"
+										name="label"
+										className={clsx(
+											"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
+											"focus:border-border-focused",
+										)}
+									/>
+									<p className="text-[12px] text-text-muted">
+										Once registered, this PAT can be referenced from other
+										nodes. Enter a label to identify this PAT when referencing
+										it.
+									</p>
+								</fieldset>
+								<fieldset className="flex flex-col">
+									<label
+										htmlFor="pat"
+										className="text-text text-[13px] mb-[2px]"
+									>
+										PAT
+									</label>
+									<input
+										type="text"
+										id="pat"
+										name="pat"
+										className={clsx(
+											"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
+											"focus:border-border-focused",
+										)}
+									/>
+									<p className="text-[12px] text-text-muted">
+										The entered PAT will be encrypted and stored using
+										authenticated encryption.
+									</p>
+								</fieldset>
+							</form>
+						</Tabs.Content>
 						<Tabs.Content value="select">Select existing token</Tabs.Content>
 					</Tabs.Root>
 					{/* <div className="pt-[8px]">
