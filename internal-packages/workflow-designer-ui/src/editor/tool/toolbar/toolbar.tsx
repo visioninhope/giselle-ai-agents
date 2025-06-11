@@ -92,7 +92,7 @@ export function Toolbar() {
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
-	const { githubVectorStore } = useFeatureFlag();
+	const { githubVectorStore, webSearchAction } = useFeatureFlag();
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -352,20 +352,31 @@ export function Toolbar() {
 														);
 													}}
 												>
-													{actionProviders.map((actionProvider) => (
-														<ToggleGroup.Item
-															key={actionProvider}
-															value={actionProvider}
-															data-tool
-														>
-															{actionProvider === "github" && (
-																<GitHubIcon className="size-[20px] shrink-0" />
-															)}
-															<p className="text-[14px]">
-																{actionNodeDefaultName(actionProvider)}
-															</p>{" "}
-														</ToggleGroup.Item>
-													))}
+													{actionProviders
+														.filter((actionProvider) => {
+															// Filter based on feature flags
+															if (actionProvider === "web-search") {
+																return webSearchAction;
+															}
+															return true; // Show other providers by default
+														})
+														.map((actionProvider) => (
+															<ToggleGroup.Item
+																key={actionProvider}
+																value={actionProvider}
+																data-tool
+															>
+																{actionProvider === "github" && (
+																	<GitHubIcon className="size-[20px] shrink-0" />
+																)}
+																{actionProvider === "web-search" && (
+																	<SearchIcon className="size-[20px] shrink-0" />
+																)}
+																<p className="text-[14px]">
+																	{actionNodeDefaultName(actionProvider)}
+																</p>
+															</ToggleGroup.Item>
+														))}
 												</ToggleGroup.Root>
 											</div>
 										</Popover.Content>

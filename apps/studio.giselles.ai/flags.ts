@@ -53,6 +53,19 @@ export const githubVectorStoreFlag = flag<boolean>({
 	],
 });
 
+export const webSearchActionFlag = flag<boolean>({
+	key: "web-search-action",
+	decide() {
+		return takeLocalEnv("WEB_SEARCH_ACTION_FLAG");
+	},
+	description: "Enable Web Search Action",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
 export const runV3Flag = flag<boolean>({
 	key: "run-v3",
 	async decide() {
