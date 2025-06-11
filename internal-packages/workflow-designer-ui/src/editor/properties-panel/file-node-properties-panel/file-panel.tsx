@@ -2,7 +2,7 @@ import type { FileData, FileNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
@@ -83,6 +83,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	const { addFiles: addFilesInternal, removeFile } = useFileNode(node);
 	const toasts = useToasts();
 	const maxFileSize = config.maxSize ?? defaultMaxSize;
+	const panelRef = useRef<HTMLDivElement>(null);
 
 	const validateItems = useCallback(
 		(dataTransferItemList: DataTransferItemList) => {
@@ -233,16 +234,23 @@ export function FilePanel({ node, config }: FilePanelProps) {
 
 	useEffect(() => {
 		// Only add paste listener for image file nodes
-		if (node.content.category === "image") {
-			document.addEventListener("paste", handlePaste);
+		if (node.content.category === "image" && panelRef.current) {
+			const panelEl = panelRef.current;
+			// Focus the panel when it's mounted to enable paste without clicking
+			panelEl.focus();
+			panelEl.addEventListener("paste", handlePaste);
 			return () => {
-				document.removeEventListener("paste", handlePaste);
+				panelEl.removeEventListener("paste", handlePaste);
 			};
 		}
 	}, [handlePaste, node.content.category]);
 
 	return (
-		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300">
+		<div
+			ref={panelRef}
+			className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300 outline-none"
+			tabIndex={-1}
+		>
 			<div className="p-[16px] divide-y divide-black-50">
 				{node.content.files.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">
