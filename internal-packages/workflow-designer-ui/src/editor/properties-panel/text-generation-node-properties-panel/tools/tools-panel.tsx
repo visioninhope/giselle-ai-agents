@@ -117,7 +117,7 @@ export function ToolsPanel({
 
 	if (selectedTool) {
 		return (
-			<div className="text-white-400 space-y-[8px]">
+			<div className="text-text space-y-[8px]">
 				<button
 					type="button"
 					className="flex items-center gap-[4px] text-[15px] font-accent text-white-800 cursor-pointer"
@@ -126,7 +126,7 @@ export function ToolsPanel({
 					<ChevronLeftIcon className="size-[16px]" />
 					Add GitHub tool
 				</button>
-				<div className="border text border-black-400 rounded-[8px] p-[6px] ">
+				<div className="bg-editor-background border text border-border rounded-[8px] p-[6px] ">
 					<div className="flex gap-[8px] mb-[8px]">
 						<div className="rounded-[6px] size-[38px] flex items-center justify-center bg-white-400/40">
 							<ToolIcon name="GitHub" className="size-[24px] text-white" />
