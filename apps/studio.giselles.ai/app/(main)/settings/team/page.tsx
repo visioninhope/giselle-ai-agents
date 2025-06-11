@@ -48,7 +48,7 @@ export default function TeamPage() {
 
 				{/* Delete Team Section */}
 				<div className="mt-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[22px] tracking-normal font-sans mb-4">
+					<h4 className="text-error-900 font-medium text-[18px] leading-[22px] tracking-normal font-sans mb-4">
 						Danger Zone
 					</h4>
 					<DeleteTeam />
@@ -63,7 +63,7 @@ async function BillingInfo() {
 
 	return (
 		<div className="flex flex-col gap-y-2">
-			<Card title="" className="flex justify-between items-center px-6 py-4">
+			<Card title="" className="px-6 py-4">
 				{isProPlan(team) ? (
 					<BillingInfoForProPlan team={team} />
 				) : (
@@ -83,7 +83,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 		return null;
 	}
 	return (
-		<>
+		<div className="flex justify-between items-center">
 			<div className="flex flex-col gap-y-0.5">
 				<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
 					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-sans">
@@ -107,7 +107,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 					<UpgradeButton team={team} />
 				</Suspense>
 			</form>
-		</>
+		</div>
 	);
 }
 function BillingInfoForProPlan({ team }: BillingInfoProps) {
@@ -115,7 +115,7 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 		return null;
 	}
 	return (
-		<>
+		<div className="flex justify-between items-center">
 			<div className="flex flex-col gap-y-[2px]">
 				<div className="flex flex-col gap-0.5">
 					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-sans">
@@ -148,7 +148,7 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 					</Suspense>
 				</form>
 			)}
-		</>
+		</div>
 	);
 }
 
@@ -156,7 +156,16 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
-		<Button className="w-fit" formAction={upgradeTeamWithTeam}>
+		<Button
+			formAction={upgradeTeamWithTeam}
+			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			style={{
+				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+				border: "1px solid rgba(0,0,0,0.7)",
+				boxShadow:
+					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+			}}
+		>
 			Upgrade to Pro
 		</Button>
 	);
@@ -169,8 +178,17 @@ function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 	);
 
 	return (
-		<Button className="w-fit" formAction={manageBillingWithSubscriptionId}>
-			Update
+		<Button
+			formAction={manageBillingWithSubscriptionId}
+			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			style={{
+				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+				border: "1px solid rgba(0,0,0,0.7)",
+				boxShadow:
+					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+			}}
+		>
+			Upgrade to Pro
 		</Button>
 	);
 }
