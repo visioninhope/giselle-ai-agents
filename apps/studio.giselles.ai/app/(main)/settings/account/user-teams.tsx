@@ -8,6 +8,7 @@ import {
 	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { cn } from "@/lib/utils";
 import { Toast } from "@/packages/components/toast";
 import { useToast } from "@/packages/contexts/toast";
 import { MoreHorizontal, Search } from "lucide-react";
@@ -46,27 +47,40 @@ export default function UserTeams({
 
 	return (
 		<>
-			<div className="flex items-center gap-x-[11px] py-2 px-3 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20">
-				<Search className="size-6 text-black-400" />
-				<input
-					onChange={handleChangeTeamName}
-					type="text"
-					defaultValue={teamName}
-					placeholder="Search for a team..."
-					className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400"
-				/>
-			</div>
-			<div className="border-[0.5px] border-black-400 rounded-[8px] divide-y divide-black-400">
-				{filteredTeams.map((team) => (
-					<UserTeamsItem
-						key={team.id}
-						teamId={team.id}
-						teamName={team.name}
-						role={roles[team.role]}
-						isPro={team.isPro}
-						currentUserId={currentUser.id}
+			<div className="relative overflow-hidden rounded-[12px] backdrop-blur-md bg-white/[0.02] border-[0.5px] border-white/15 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none py-2">
+				<div
+					className="flex items-center gap-x-[11px] mt-4 mb-2 mx-4 py-2 px-3 rounded-[8px]"
+					style={{
+						background: "#00020A",
+						boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
+						border: "0.5px solid rgba(255,255,255,0.05)",
+					}}
+				>
+					<Search className="size-6 text-black-400" />
+					<input
+						onChange={handleChangeTeamName}
+						type="text"
+						defaultValue={teamName}
+						placeholder="Search for a team..."
+						className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
 					/>
-				))}
+				</div>
+				<div>
+					{filteredTeams.map((team, idx) => (
+						<UserTeamsItem
+							className={cn(
+								"border-t border-white/5 mx-4",
+								idx === 0 && "border-t-0",
+							)}
+							key={team.id}
+							teamId={team.id}
+							teamName={team.name}
+							role={roles[team.role]}
+							isPro={team.isPro}
+							currentUserId={currentUser.id}
+						/>
+					))}
+				</div>
 			</div>
 			{toasts.map((toast) => (
 				<Toast
@@ -86,12 +100,14 @@ function UserTeamsItem({
 	role,
 	isPro = false,
 	currentUserId,
+	className,
 }: {
 	teamId: string;
 	teamName: string;
 	role: string;
 	isPro?: boolean;
 	currentUserId: string;
+	className?: string;
 }) {
 	const { addToast } = useToast();
 
@@ -106,7 +122,9 @@ function UserTeamsItem({
 		}
 	}, [addToast, currentUserId, role, teamId]);
 	return (
-		<div className="flex items-center justify-between gap-4 p-4 bg-black-400/10">
+		<div
+			className={cn("flex items-center justify-between gap-4 p-4", className)}
+		>
 			<div className="flex flex-col">
 				<div className="flex items-center gap-2">
 					<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
@@ -118,11 +136,11 @@ function UserTeamsItem({
 					{role}
 				</div>
 			</div>
-			<DropdownMenu>
+			<DropdownMenu modal={false}>
 				<DropdownMenuTrigger asChild>
 					<button
 						type="button"
-						className="flex items-center justify-center p-2 rounded-[4px] hover:bg-black-300/30 focus:outline-none"
+						className="flex items-center justify-center p-2 rounded-[4px] hover:bg-white/5 focus:outline-none"
 						aria-label="Team menu"
 					>
 						<MoreHorizontal className="size-5 text-black-600" />
@@ -130,9 +148,9 @@ function UserTeamsItem({
 				</DropdownMenuTrigger>
 				<DropdownMenuContent
 					align="end"
-					className="p-2 border-[0.5px] border-black-400 bg-black-900"
+					className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
 				>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
 							teamId={teamId}
 							userId={currentUserId}
@@ -140,7 +158,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md"
 									disabled={isPending}
 								>
 									Apps
@@ -149,7 +167,7 @@ function UserTeamsItem({
 							action={() => navigateWithChangeTeam(teamId, "/apps")}
 						/>
 					</DropdownMenuItem>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
 							teamId={teamId}
 							userId={currentUserId}
@@ -157,7 +175,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
+									className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 rounded-md"
 									disabled={isPending}
 								>
 									Settings
@@ -166,7 +184,8 @@ function UserTeamsItem({
 							action={() => navigateWithChangeTeam(teamId, "/settings/team")}
 						/>
 					</DropdownMenuItem>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+					<div className="my-2 h-px bg-white/10" />
+					<DropdownMenuItem className="p-0">
 						<ChangeTeamAndAction
 							teamId={teamId}
 							userId={currentUserId}
@@ -174,7 +193,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-error-900 font-medium text-[14px] leading-[20.4px] font-sans"
+									className="flex items-center w-full px-3 py-2 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
 									disabled={isPending}
 								>
 									Leave team
