@@ -492,7 +492,7 @@ export function Editor({
 													/>
 													<Panel
 														id="right-panel"
-														className="flex"
+														className="flex bg-panel-background"
 														ref={rightPanelRef}
 														defaultSize={0}
 														data-right-panel={

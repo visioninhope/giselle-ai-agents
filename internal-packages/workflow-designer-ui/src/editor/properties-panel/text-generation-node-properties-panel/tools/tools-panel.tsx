@@ -1,12 +1,13 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import {
+	ChevronDownIcon,
 	ChevronLeftIcon,
 	ChevronRightIcon,
 	DatabaseIcon,
 	MoveUpRightIcon,
 } from "lucide-react";
-import { Tabs } from "radix-ui";
+import { DropdownMenu, Tabs } from "radix-ui";
 import { type SVGProps, useMemo, useState } from "react";
 import { GitHubIcon } from "../../../tool";
 import { PostgresToolsPanel } from "./postgres-tools";
@@ -226,7 +227,50 @@ export function ToolsPanel({
 								</div>
 							</form>
 						</Tabs.Content>
-						<Tabs.Content value="select">Select existing token</Tabs.Content>
+						<Tabs.Content value="select" className="outline-none">
+							<form>
+								<p className="text-[12px] text-text-muted">
+									Select from your saved secrets
+								</p>
+								<DropdownMenu.Root>
+									<DropdownMenu.Trigger asChild>
+										<button
+											type="button"
+											className={clsx(
+												"flex items-center justify-between gap-[2px] bg-background",
+												"text-text text-[14px] border border-border rounded-[2px] w-full",
+												"px-[8px] py-[4px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
+												"outline-none",
+											)}
+										>
+											<span>Choose a saved token..</span>
+											<ChevronDownIcon className="size-[13px]" />
+										</button>
+									</DropdownMenu.Trigger>
+									<DropdownMenu.Portal>
+										<DropdownMenu.Content
+											sideOffset={2}
+											className={clsx(
+												"rounded-[2px] w-[var(--radix-dropdown-menu-trigger-width)] bg-panel-background",
+												"p-[4px] border border-border-variant shadow",
+												"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
+												"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
+											)}
+										>
+											<DropdownMenu.Item data-item>
+												<span>Item 1</span>
+											</DropdownMenu.Item>
+											<DropdownMenu.Item data-item>
+												<span>Item 2</span>
+											</DropdownMenu.Item>
+											<DropdownMenu.Item data-item>
+												<span>Item 3</span>
+											</DropdownMenu.Item>
+										</DropdownMenu.Content>
+									</DropdownMenu.Portal>
+								</DropdownMenu.Root>
+							</form>
+						</Tabs.Content>
 					</Tabs.Root>
 					{/* <div className="pt-[8px]">
 						<div className=" bg-white-800/10 text-white-800 rounded-[4px] px-[12px] py-[8px] text-[12px] flex flex-col gap-[4px]">
