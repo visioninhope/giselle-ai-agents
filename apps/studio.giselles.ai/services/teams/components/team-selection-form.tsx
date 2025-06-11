@@ -66,7 +66,7 @@ export function TeamSelectionForm({
 						) : (
 							<>
 								<span
-									className="text-base font-sans text-white-400 truncate max-w-[180px]"
+									className="text-[14px] font-geist text-white-400 truncate max-w-[180px]"
 									title={currentTeam.name}
 								>
 									{currentTeam.name}
@@ -80,17 +80,17 @@ export function TeamSelectionForm({
 						<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50 hover:bg-accent hover:opacity-100 hover:rounded-md hover:p-0.5" />
 					</div>
 				</SelectTrigger>
-				<SelectContent className="flex flex-col gap-y-0 p-0 border-[0.5px] border-black-400 bg-black-900">
-					<div className="p-1 space-y-1">
+				<SelectContent className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md">
+					<div className="py-1">
 						{allTeams.map((team) => (
 							<SelectItem
 								key={team.id}
 								value={team.id}
-								className="p-1.5 pl-10 rounded-[8px] focus:bg-primary-900/50 font-sans"
+								className="p-1.5 pl-10 rounded-lg focus:bg-white/5 font-geist"
 							>
 								<div className="flex items-center gap-1.5 pr-1">
 									<span
-										className="truncate max-w-[180px] text-base font-sans text-white-400"
+										className="truncate max-w-[180px] text-[14px] font-geist text-white-400"
 										title={team.name}
 									>
 										{team.name}
@@ -102,13 +102,13 @@ export function TeamSelectionForm({
 						))}
 					</div>
 
-					<SelectSeparator className="my-0 bg-black-400" />
+					<SelectSeparator className="bg-white/10" />
 
-					<div className="p-2.5 flex items-center gap-x-2 rounded-[8px] w-full hover:bg-primary-900/50">
+					<div className="p-2.5 flex items-center gap-x-2 rounded-lg w-full hover:bg-white/5">
 						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 							<Plus className="size-3 text-black-900" />
 						</span>
-						<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-sans">
+						<span className="text-white-400 font-medium text-[14px] leading-[14px] font-geist">
 							{teamCreation}
 						</span>
 					</div>

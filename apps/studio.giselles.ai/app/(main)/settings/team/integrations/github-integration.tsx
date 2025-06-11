@@ -1,5 +1,4 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Card } from "../../components/card";
 import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
@@ -8,6 +7,7 @@ import type { components } from "@octokit/openapi-types";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { Button } from "../../components/button";
+import { Card } from "../../components/card";
 
 export async function GitHubIntegration() {
 	const identityState = await getGitHubIdentityState();
@@ -140,8 +140,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 							asChild
 							className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
 							style={{
-								background:
-									"linear-gradient(180deg, #202530 0%, #12151f 100%)",
+								background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
 								border: "1px solid rgba(0,0,0,0.7)",
 								boxShadow:
 									"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
@@ -172,8 +171,15 @@ function Installation({ installation }: InstallationProps) {
 	const avatarUrl = "avatar_url" in account ? account.avatar_url : undefined;
 
 	return (
-		<div className="overflow-hidden rounded-lg border border-black-400">
-			<div className="flex items-center gap-x-2 border-b border-black-400  px-4 py-2 bg-black-400">
+		<div
+			className="rounded-lg px-4 pt-4 pb-6 flex flex-col"
+			style={{
+				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+				border: "0.5px solid rgba(255, 255, 255, 0.15)",
+				boxShadow: "0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+			}}
+		>
+			<div className="flex items-center gap-x-2">
 				{avatarUrl && (
 					<img
 						src={avatarUrl}
@@ -181,22 +187,23 @@ function Installation({ installation }: InstallationProps) {
 						className="w-6 h-6 rounded-full"
 					/>
 				)}
-				<span className="text-white-400 font-medium text-[12px] leading-[12px] font-sans">
+				<span className="text-white-400 font-medium text-[14px] leading-[14px] font-geist">
 					{displayName}
 				</span>
 			</div>
-			<div className="py-4 space-y-2">
+			<div className="h-px w-full bg-white/10 my-4" />
+			<div className="space-y-5">
 				{installation.repositories.map((repo) => (
-					<div key={repo.id} className="flex items-center gap-x-2 px-4">
+					<div key={repo.id} className="flex items-center gap-x-2">
 						<a
 							href={repo.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-white-400 font-medium text-sm leading-[19.6px] font-sans hover:underline"
+							className="text-white-400 font-medium text-[14px] leading-[19.6px] font-geist hover:underline"
 						>
 							{repo.name}
 						</a>
-						<span className="rounded-full px-2 py-0.5 text-white-400 font-medium text-xs leading-[20.4px] font-geist border border-white-800">
+						<span className="rounded-full px-1.5 py-px text-black-300 font-medium text-[10px] leading-normal font-geist border-[0.5px] border-black-400">
 							{repo.private ? "Private" : "Public"}
 						</span>
 					</div>

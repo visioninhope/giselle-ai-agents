@@ -60,7 +60,7 @@ export function DeleteTeam() {
 									Delete Team
 								</Dialog.Title>
 							</div>
-							<p className="text-error-900 font-medium text-[14px] leading-[24px] text-center">
+							<p className="text-error-900 font-medium text-[14px] leading-[24px] text-left">
 								This action cannot be undone. This will permanently delete the team
 								and remove all members.
 							</p>

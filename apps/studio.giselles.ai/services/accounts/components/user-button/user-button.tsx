@@ -40,25 +40,22 @@ export const UserButton: FC = async () => {
 			</DropdownMenuTrigger>
 			<DropdownMenuContent
 				align="end"
-				className="flex flex-col gap-y-2 p-2 border-[0.5px] border-black-400 bg-black-900"
+				className="p-2 border-[0.5px] border-white/10 rounded-xl shadow-[0_2px_8px_rgba(5,10,20,0.4),0_1px_2px_rgba(0,0,0,0.3)] bg-black-900/50 backdrop-blur-md"
 			>
-				<DropdownMenuLabel className="flex flex-col px-2 pt-2 text-white-400">
-					<span className="font-bold text-[16px] leading-[16px] font-sans">
+				<DropdownMenuLabel className="flex flex-col px-2 pt-2 pb-1 text-white-400">
+					<span className="font-bold text-[16px] leading-[16px] font-geist">
 						{displayName || "No display name"}
 					</span>
-					<span className="font-medium leading-[20.4px] font-sans text-black-600">
+					<span className="font-medium leading-[20.4px] font-geist text-black-600">
 						{email}
 					</span>
 				</DropdownMenuLabel>
-				<DropdownMenuSeparator className="-mx-2 my-0 bg-black-400" />
-				<div>
-					<DropdownMenuItem
-						className="p-0 rounded-[8px] focus:bg-primary-900/50"
-						asChild
-					>
+				<DropdownMenuSeparator className="bg-white/10" />
+				<div className="py-1 space-y-1">
+					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5" asChild>
 						<Link
 							href="/settings/account"
-							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
+							className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
 						>
 							Account Settings
 						</Link>
@@ -66,38 +63,38 @@ export const UserButton: FC = async () => {
 					<TeamCreation>
 						<button
 							type="button"
-							className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50"
+							className="flex items-center gap-x-2 px-2 py-1.5 rounded-lg w-full hover:bg-white/5"
 						>
 							<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 								<Plus className="size-3 text-black-900" />
 							</span>
-							<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-sans">
+							<span className="text-white-400 font-medium text-[14px] leading-[14px] font-geist">
 								Create team
 							</span>
 						</button>
 					</TeamCreation>
 				</div>
-				<DropdownMenuSeparator className="-mx-2 my-0 p-0 bg-black-400" />
-				<div>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
+				<DropdownMenuSeparator className="bg-white/10" />
+				<div className="py-1 space-y-1">
+					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
 						<a
 							href="https://giselles.ai/"
 							target="_blank"
-							className="block p-2 w-full text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
+							className="block px-2 py-1.5 w-full text-white-400 font-medium text-[14px] leading-[14px] font-geist"
 							rel="noreferrer"
 						>
 							Home Page
 						</a>
 					</DropdownMenuItem>
-					<DropdownMenuItem className="p-0 rounded-[8px] focus:bg-primary-900/50">
-						<SignOutButton className="block p-2 w-full text-left text-white-400 font-sans text-[14px] leading-[20.4px]">
+					<DropdownMenuItem className="p-0 rounded-lg focus:bg-white/5">
+						<SignOutButton className="block px-2 py-1.5 w-full text-left text-white-400 font-geist text-[14px] leading-[14px]">
 							Log Out
 						</SignOutButton>
 					</DropdownMenuItem>
 				</div>
 				{!isPro && (
 					<div>
-						<DropdownMenuItem className="p-0 rounded-[8px]">
+						<DropdownMenuItem className="p-0 rounded-lg">
 							<form className="w-full">
 								<UpgradeButton team={currentTeam} />
 							</form>
@@ -114,7 +111,7 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 
 	return (
 		<Button
-			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-sans text-white bg-primary-900 hover:bg-primary-900/80 rounded-[8px] transition-colors"
+			className="block p-2 w-full text-center font-medium text-[14px] leading-[20.4px] font-geist text-white bg-primary-900 hover:bg-primary-900/80 rounded-lg transition-colors"
 			formAction={upgradeTeamWithTeam}
 		>
 			Upgrade to Pro
