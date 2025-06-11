@@ -8,7 +8,7 @@ import {
 	MoveUpRightIcon,
 	PlusIcon,
 } from "lucide-react";
-import { DropdownMenu, Tabs } from "radix-ui";
+import { Dialog, DropdownMenu, Tabs } from "radix-ui";
 import { type SVGProps, useMemo, useState } from "react";
 import { GitHubIcon } from "../../../tool";
 import { PostgresToolsPanel } from "./postgres-tools";
@@ -61,13 +61,184 @@ function ToolsSection({
 							<h3 className="text-[14px]">{tool.name}</h3>
 						</div>
 
-						<button
-							type="button"
-							className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] py-[2px] rounded-[2px] cursor-pointer"
-						>
-							<PlusIcon className="size-[14px]" />
-							<span>Add</span>
-						</button>
+						<Dialog.Root>
+							<Dialog.Trigger asChild>
+								<button
+									type="button"
+									className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] py-[2px] rounded-[2px] cursor-pointer"
+								>
+									<PlusIcon className="size-[14px]" />
+									<span>Add</span>
+								</button>
+							</Dialog.Trigger>
+							<Dialog.Portal>
+								<Dialog.Content
+									className={clsx(
+										"fixed left-[50%] top-[15%] translate-x-[-50%] w-[400px] z-20 overflow-hidden outline-none",
+										"rounded-[10px] bg-panel-background",
+										"border border-border-variant shadow-lg text-text",
+									)}
+								>
+									<div className="h-[12px]" />
+									<Dialog.Title className="px-[12px] text-[14px]">
+										Add {tool.name} tool
+									</Dialog.Title>
+									<Dialog.Description className="px-[12px] text-[13px] text-text-muted">
+										Choose how you want to provide your GitHub Personal Access
+										Token
+									</Dialog.Description>
+
+									<div className="h-[12px]" />
+									<Tabs.Root defaultValue="create">
+										<div className="px-[12px]">
+											<Tabs.List
+												className={clsx(
+													"border border-border px-[4px] py-[4px] rounded-[4px] flex justify-center items-center gap-[4px]",
+													"**:data-trigger:flex-1 **:data-trigger:rounded-[4px] **:data-trigger:border **:data-trigger:border-transparent",
+													"**:data-trigger:outline-none **:data-trigger:text-text-muted **:data-trigger:font-accent",
+													"**:data-trigger:text-[13px] **:data-trigger:tracking-wider **:data-trigger:py-[2px]",
+													"**:data-trigger:data-[state=active]:bg-tab-active-background **:data-trigger:data-[state=active]:text-text",
+													"**:data-trigger:data-[state=inactive]:cursor-pointer",
+													"**:data-trigger:hover:bg-ghost-element-hover",
+												)}
+											>
+												<Tabs.Trigger value="create" data-trigger>
+													Add New Token
+												</Tabs.Trigger>
+												<Tabs.Trigger value="select" data-trigger>
+													Use Existing Token
+												</Tabs.Trigger>
+											</Tabs.List>
+										</div>
+										<div className="h-[12px]" />
+										<Tabs.Content value="create" className="outline-none">
+											<form>
+												<div className="flex flex-col gap-[12px] px-[12px]">
+													<fieldset className="flex flex-col">
+														<label
+															htmlFor="label"
+															className="text-text text-[13px] mb-[2px]"
+														>
+															Label
+														</label>
+														<input
+															type="text"
+															id="label"
+															name="label"
+															className={clsx(
+																"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+																"focus:border-border-focused",
+															)}
+														/>
+														<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+															Once registered, this PAT can be referenced from
+															other nodes. Enter a label to identify this PAT
+															when referencing it.
+														</p>
+													</fieldset>
+													<fieldset className="flex flex-col">
+														<div className="flex justify-between mb-[2px]">
+															<label
+																htmlFor="pat"
+																className="text-text text-[13px]"
+															>
+																PAT
+															</label>
+															<a
+																href="https://github.com/settings/personal-access-tokens"
+																className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+																target="_blank"
+																rel="noreferrer"
+															>
+																<span>GitHub</span>
+																<MoveUpRightIcon className="size-[13px]" />
+															</a>
+														</div>
+														<input
+															type="text"
+															id="pat"
+															name="pat"
+															className={clsx(
+																"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+																"focus:border-border-focused",
+															)}
+														/>
+														<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+															The entered PAT will be encrypted and stored using
+															authenticated encryption.
+														</p>
+													</fieldset>
+												</div>
+												<div className="h-[12px]" />
+												<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+													<button
+														type="submit"
+														className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+													>
+														Add tool
+													</button>
+												</div>
+											</form>
+										</Tabs.Content>
+										<Tabs.Content value="select" className="outline-none">
+											<form>
+												<div className="px-[12px]">
+													<p className="text-[12px] text-text-muted">
+														Select from your saved secrets
+													</p>
+													<DropdownMenu.Root>
+														<DropdownMenu.Trigger asChild>
+															<button
+																type="button"
+																className={clsx(
+																	"flex items-center justify-between gap-[2px] bg-background",
+																	"text-text text-[14px] border border-border rounded-[2px] w-full",
+																	"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
+																	"outline-none",
+																)}
+															>
+																<span>Choose a saved token..</span>
+																<ChevronDownIcon className="size-[13px]" />
+															</button>
+														</DropdownMenu.Trigger>
+														<DropdownMenu.Portal>
+															<DropdownMenu.Content
+																sideOffset={2}
+																className={clsx(
+																	"rounded-[2px] w-(--radix-dropdown-menu-trigger-width) bg-panel-background z-50",
+																	"p-[4px] border border-border-variant shadow-md",
+																	"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
+																	"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
+																)}
+															>
+																<DropdownMenu.Item data-item>
+																	<span>Item 1</span>
+																</DropdownMenu.Item>
+																<DropdownMenu.Item data-item>
+																	<span>Item 2</span>
+																</DropdownMenu.Item>
+																<DropdownMenu.Item data-item>
+																	<span>Item 3</span>
+																</DropdownMenu.Item>
+															</DropdownMenu.Content>
+														</DropdownMenu.Portal>
+													</DropdownMenu.Root>
+												</div>
+												<div className="h-[12px]" />
+												<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+													<button
+														type="submit"
+														className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+													>
+														Add tool
+													</button>
+												</div>
+											</form>
+										</Tabs.Content>
+									</Tabs.Root>
+								</Dialog.Content>
+							</Dialog.Portal>
+						</Dialog.Root>
 					</div>
 				))}
 			</div>
