@@ -3,6 +3,8 @@ import type { CompletedGeneration } from "@giselle-sdk/data-type";
 import type { TextGenerationLanguageModelData } from "@giselle-sdk/data-type";
 import {
 	GenerationContext,
+	type ImageGenerationNode,
+	type TextGenerationNode,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
@@ -125,6 +127,99 @@ export function generateTelemetryTags(args: {
 	}
 
 	return tags;
+}
+
+function extractPromptInput(
+	operationNode: TextGenerationNode | ImageGenerationNode,
+): string {
+	const promptJson = (() => {
+		if (typeof operationNode.content.prompt === "string") {
+			try {
+				return JSON.parse(operationNode.content.prompt) as PromptJson;
+			} catch (error) {
+				console.warn("Failed to parse prompt JSON for telemetry:", error);
+				return { content: [] };
+			}
+		}
+		return { content: [] };
+	})();
+
+	if (promptJson.content?.[0]?.content?.[0]?.text) {
+		return promptJson.content[0].content[0].text;
+	}
+	if (typeof promptJson.content === "string") {
+		return promptJson.content;
+	}
+	return promptJson.text || "";
+}
+
+function extractInputOutputForTextGeneration(
+	generation: CompletedGeneration,
+	operationNode: TextGenerationNode,
+) {
+	const input = extractPromptInput(operationNode);
+	const assistantMessage = generation.messages?.find(
+		(msg) => msg.role === "assistant",
+	);
+	const output = assistantMessage?.content ?? "";
+
+	return { input, output };
+}
+
+function extractInputForImageGeneration(
+	generation: CompletedGeneration,
+	operationNode: ImageGenerationNode,
+) {
+	const input = extractPromptInput(operationNode);
+
+	// For image generation, we don't need output in telemetry
+	return { input, output: undefined };
+}
+
+function extractToolSet(operationNode: TextGenerationNode): ToolSet {
+	const toolSet: ToolSet = {};
+	const tools = operationNode.content.tools as {
+		openaiWebSearch?: boolean;
+		github?: { tools: string[] };
+		postgres?: { tools: string[] };
+	};
+	if (tools) {
+		if (tools.openaiWebSearch) {
+			toolSet.openaiWebSearch = true;
+		}
+		if (tools.github?.tools) {
+			toolSet.github = tools.github.tools;
+		}
+		if (tools.postgres?.tools) {
+			toolSet.postgres = tools.postgres.tools;
+		}
+	}
+	return toolSet;
+}
+
+function getProviderOptions(
+	provider: string,
+	configurations: Record<string, unknown>,
+	modelId: string,
+): { anthropic?: AnthropicProviderOptions } {
+	const providerOptions: { anthropic?: AnthropicProviderOptions } = {};
+	const languageModel = languageModels.find((model) => model.id === modelId);
+
+	if (
+		languageModel &&
+		provider === "anthropic" &&
+		"reasoning" in configurations &&
+		configurations.reasoning &&
+		hasCapability(languageModel, Capability.Reasoning)
+	) {
+		providerOptions.anthropic = {
+			thinking: {
+				type: "enabled",
+			},
+		};
+	}
+
+	return providerOptions;
 }
 
 export async function emitTelemetry(
