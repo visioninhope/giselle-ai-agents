@@ -2,6 +2,7 @@ import type { GoogleUserData } from "@/services/external/google";
 import { SiGoogle } from "@icons-pack/react-simple-icons";
 import { TriangleAlertIcon } from "lucide-react";
 import { Alert, AlertDescription, AlertTitle } from "./alert";
+import { Card } from "./card";
 
 type GoogleUser = Awaited<GoogleUserData>;
 
@@ -16,7 +17,7 @@ export function GoogleAuthenticationPresentation({
 	alert,
 }: GoogleAuthenticationPresentationProps) {
 	return (
-		<div className="grid gap-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
+		<Card title="" className="py-4">
 			{alert && (
 				<Alert variant="destructive" className="p-4">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
@@ -45,6 +46,6 @@ export function GoogleAuthenticationPresentation({
 				</div>
 				{button?.()}
 			</div>
-		</div>
+		</Card>
 	);
 }

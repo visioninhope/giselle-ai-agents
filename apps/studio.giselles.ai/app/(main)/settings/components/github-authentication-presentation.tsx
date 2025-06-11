@@ -4,6 +4,7 @@ import type { components } from "@octokit/openapi-types";
 import { TriangleAlertIcon } from "lucide-react";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "./alert";
+import { Card } from "./card";
 
 type GitHubUser = components["schemas"]["simple-user"];
 
@@ -18,7 +19,7 @@ export function GitHubAuthenticationPresentation({
 	alert,
 }: GitHubAuthenticationPresentationProps) {
 	return (
-		<div className="grid gap-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10 py-4 px-4 w-full">
+		<Card title="" className="py-4">
 			{alert && (
 				<Alert variant="destructive" className="p-4">
 					<TriangleAlertIcon className="w-[18px] h-[18px] text-error-900/80" />
@@ -55,6 +56,6 @@ export function GitHubAuthenticationPresentation({
 				</div>
 				{button?.()}
 			</div>
-		</div>
+		</Card>
 	);
 }
