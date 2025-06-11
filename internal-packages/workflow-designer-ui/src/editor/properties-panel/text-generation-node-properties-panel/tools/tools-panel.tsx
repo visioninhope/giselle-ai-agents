@@ -176,7 +176,7 @@ export function ToolsPanel({
 											id="label"
 											name="label"
 											className={clsx(
-												"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
+												"border border-border rounded-[2px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
 												"focus:border-border-focused",
 											)}
 										/>
@@ -220,7 +220,7 @@ export function ToolsPanel({
 								<div className="flex justify-end">
 									<button
 										type="submit"
-										className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px] cursor-pointer"
+										className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
 									>
 										Add token
 									</button>
@@ -239,7 +239,7 @@ export function ToolsPanel({
 											className={clsx(
 												"flex items-center justify-between gap-[2px] bg-background",
 												"text-text text-[14px] border border-border rounded-[2px] w-full",
-												"px-[8px] py-[4px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
+												"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
 												"outline-none",
 											)}
 										>
@@ -251,8 +251,8 @@ export function ToolsPanel({
 										<DropdownMenu.Content
 											sideOffset={2}
 											className={clsx(
-												"rounded-[2px] w-[var(--radix-dropdown-menu-trigger-width)] bg-panel-background",
-												"p-[4px] border border-border-variant shadow",
+												"rounded-[2px] w-(--radix-dropdown-menu-trigger-width) bg-panel-background",
+												"p-[4px] border border-border-variant shadow-md",
 												"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
 												"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
 											)}
