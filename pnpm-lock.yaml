@@ -257,9 +257,6 @@ importers:
       '@supabase/supabase-js':
         specifier: 2.45.0
         version: 2.45.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
-      '@tailwindcss/postcss':
-        specifier: 'catalog:'
-        version: 4.0.3
       '@xyflow/react':
         specifier: 'catalog:'
         version: 12.4.1(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -294,6 +291,9 @@ importers:
       '@biomejs/biome':
         specifier: 'catalog:'
         version: 1.9.4
+      '@tailwindcss/postcss':
+        specifier: 'catalog:'
+        version: 4.0.3
       '@tailwindcss/typography':
         specifier: 'catalog:'
         version: 0.5.16(tailwindcss@4.0.3)
