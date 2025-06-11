@@ -1,0 +1,2 @@
+/* globals.css をappで読み込むとworkflow-designer-uiでtailwind-language-serverが動かなくなるので、workaroundとしてこのファイルで読み込んでいます。 */
+@import "globals.css";
