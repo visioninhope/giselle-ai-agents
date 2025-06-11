@@ -1,8 +1,9 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import clsx from "clsx/lite";
 import { ChevronLeftIcon, ChevronRightIcon, DatabaseIcon } from "lucide-react";
+import { Tabs } from "radix-ui";
 import { type SVGProps, useMemo, useState } from "react";
 import { GitHubIcon } from "../../../tool";
-import { GitHubToolsPanel } from "./github-tools";
 import { PostgresToolsPanel } from "./postgres-tools";
 
 type UIToolName = "GitHub" | "PostgreSQL";
@@ -41,7 +42,7 @@ function ToolsSection({
 	if (tools.length === 0) return null;
 	return (
 		<div className="space-y-[8px]">
-			<h2 className="text-[15px] font-accent">{title}</h2>
+			<h2 className="text-[15px] font-accent text-white-800">{title}</h2>
 			<div className="space-y-[6px]">
 				{tools.map((tool) => (
 					<button
@@ -110,16 +111,114 @@ export function ToolsPanel({
 
 	if (selectedTool) {
 		return (
-			<div className="text-white-400 space-y-[16px]">
+			<div className="text-white-400 space-y-[8px]">
 				<button
 					type="button"
-					className="flex items-center gap-[4px] text-[13px] text-white-800 cursor-pointer"
+					className="flex items-center gap-[4px] text-[15px] font-accent text-white-800 cursor-pointer"
 					onClick={() => setSelectedTool(undefined)}
 				>
 					<ChevronLeftIcon className="size-[16px]" />
-					Back
+					Add GitHub tool
 				</button>
-				{selectedTool === "GitHub" && <GitHubToolsPanel node={node} />}
+				<div className="border text border-black-400 rounded-[8px] p-[6px] ">
+					<div className="flex gap-[8px] mb-[8px]">
+						<div className="rounded-[6px] size-[38px] flex items-center justify-center bg-white-400/40">
+							<ToolIcon name="GitHub" className="size-[24px] text-white" />
+						</div>
+						<div>
+							<div className="flex items-center gap-2">
+								<h3 className="text-[15px] text-xs">GitHub</h3>
+							</div>
+							<p className="text-black-300 text-[11px]">Add GitHub tool</p>
+						</div>
+					</div>
+
+					<p className="text-text text-[14px] mb-[6px]">
+						Choose how you want to provide your GitHub Personal Access Token
+					</p>
+					<Tabs.Root defaultValue="create">
+						<Tabs.List
+							className={clsx(
+								"bg-tab-inactive-background px-[4px] py-[3px] rounded-[2px] flex justify-center items-center",
+								"**:data-trigger:flex-1 **:data-trigger:rounded-[2px] **:data-trigger:border **:data-trigger:border-transparent",
+								"**:data-trigger:outline-none **:data-trigger:text-text-mute **:data-trigger:font-accent",
+								"**:data-trigger:text-[13px] **:data-trigger:tracking-wider **:data-trigger:py-[2px]",
+								"**:data-trigger:data-[state=active]:bg-tab-active-background **:data-trigger:data-[state=active]:border-border **:data-trigger:data-[state=active]:text-text",
+								"**:data-trigger:data-[state=inactive]:cursor-pointer",
+							)}
+						>
+							<Tabs.Trigger value="create" data-trigger>
+								Create New Token
+							</Tabs.Trigger>
+							<Tabs.Trigger value="select" data-trigger>
+								Use Existing Token
+							</Tabs.Trigger>
+						</Tabs.List>
+						<Tabs.Content value="create">Create new token</Tabs.Content>
+						<Tabs.Content value="select">Select existing token</Tabs.Content>
+					</Tabs.Root>
+					{/* <div className="pt-[8px]">
+						<div className=" bg-white-800/10 text-white-800 rounded-[4px] px-[12px] py-[8px] text-[12px] flex flex-col gap-[4px]">
+							<p>
+								To use the GitHub Tool, you need a Personal Access Token (PAT):
+							</p>
+							<ul className="list-disc list-inside">
+								<li>
+									Choose an existing PAT from your secrets or create a new one.
+								</li>
+								<li>
+									To create a new PAT, click "Create new Secret" and obtain your
+									token from GitHub's settings page.
+									<a
+										href="https://github.com/settings/personal-access-tokens"
+										className="inline-flex items-center"
+										target="_blank"
+										rel="noreferrer"
+									>
+										<MoveUpRightIcon className="size-[12px] ml-[4px]" />
+									</a>
+								</li>
+								<li>
+									Enter your PAT in the field below and press enter to activate
+									the GitHub Tools.
+								</li>
+							</ul>
+						</div>
+						<label htmlFor="auth-token">Auth Token</label>
+						<DropdownMenu.Root>
+							<DropdownMenu.Trigger
+								className={clsx(
+									"flex items-center cursor-pointer p-[10px] rounded-[8px]",
+									"border border-black-200 hover:border-white-400 hover:bg-black-400/40",
+									"text-black-200 outline-none",
+									"transition-colors gap-[8px]",
+								)}
+							>
+								<span>Select from Secrets</span>
+								<ChevronDownIcon className="size-[14px]" />
+							</DropdownMenu.Trigger>
+							<DropdownMenu.Portal>
+								<DropdownMenu.Content
+									className={clsx(
+										"py-[8px]",
+										"rounded-[8px] border-[1px] border-white-800 bg-black-900/20 backdrop-blur-[8px]",
+									)}
+									sideOffset={4}
+								>
+									<DropdownMenu.Item
+										className={clsx(
+											"group flex p-[8px] justify-between rounded-[8px] hover:bg-black-400/50 transition-colors cursor-pointer outline-none",
+											"text-white-400",
+											"data-[disabled]:text-white-850/30 data-[disabled]:pointer-events-none",
+										)}
+									>
+										Create new Secret
+									</DropdownMenu.Item>
+								</DropdownMenu.Content>
+							</DropdownMenu.Portal>
+						</DropdownMenu.Root>
+					</div> */}
+				</div>
 				{selectedTool === "PostgreSQL" && <PostgresToolsPanel node={node} />}
 			</div>
 		);
