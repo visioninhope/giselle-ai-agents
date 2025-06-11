@@ -1,5 +1,6 @@
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import { ExternalLink } from "lucide-react";
+import { Button } from "../../components/button";
 import { Card } from "../../components/card";
 import { Field } from "../../components/field";
 import { AccountDisplayNameForm } from "../account-display-name-form";
@@ -10,16 +11,14 @@ export default async function AccountGeneralPage() {
 	const alt = displayName || email || "";
 
 	return (
-		<div className="flex flex-col gap-[12px]">
+		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
+				<h3
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
+					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Account Settings
-				</h1>
+				</h3>
 				<a
 					href="https://docs.giselles.ai/guides/settings/account/general"
 					target="_blank"
@@ -54,8 +53,8 @@ export default async function AccountGeneralPage() {
 					description="Log out of all sessions."
 					className="flex flex-row justify-between items-center gap-y-6"
 				>
-					<SignOutButton className="px-[16px] py-[4px] rounded-[6.32px] border border-primary-200 w-fit bg-primary-200 text-black-800 font-bold text-[14px] font-sans whitespace-nowrap leading-[19.6px] tracking-normal hover:bg-transparent hover:text-primary-200">
-						Log Out
+					<SignOutButton asChild>
+						<Button variant="link">Log Out</Button>
 					</SignOutButton>
 				</Card>
 			</div>
