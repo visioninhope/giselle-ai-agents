@@ -26,6 +26,57 @@ export interface GenerationCompleteOption {
 	};
 }
 
+interface LangfuseParams {
+	traceParams: {
+		userId?: string;
+		name: string;
+		input: string;
+		tags: TelemetryTag[];
+		metadata?: TelemetrySettings["metadata"];
+		output?: string;
+	};
+	spanParams: {
+		name: string;
+		startTime: Date;
+		input: string;
+		endTime: Date;
+		metadata?: TelemetrySettings["metadata"];
+		output?: string;
+	};
+	generationParams: {
+		name: string;
+		model: string;
+		modelParameters: Record<
+			string,
+			string | number | boolean | string[] | null
+		>;
+		input: string;
+		usage: {
+			input: number;
+			output: number;
+			total: number;
+			unit: "TOKENS" | "IMAGES";
+			inputCost?: number;
+			outputCost?: number;
+			totalCost?: number;
+		};
+		startTime: Date;
+		completionStartTime: Date;
+		endTime: Date;
+		metadata?: TelemetrySettings["metadata"];
+		output?: string;
+	};
+}
+
+interface PromptJson {
+	content?: Array<{
+		content?: Array<{
+			text?: string;
+		}>;
+	}>;
+	text?: string;
+}
+
 export function generateTelemetryTags(args: {
 	provider: string;
 	modelId: string;
