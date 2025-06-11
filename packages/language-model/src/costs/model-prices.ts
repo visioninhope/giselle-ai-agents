@@ -95,6 +95,17 @@ export const openAiTokenPricing: ModelPriceTable = {
 					},
 				},
 			},
+			{
+				validFrom: "2025-06-11T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 2.0,
+					},
+					output: {
+						costPerMegaToken: 8.0,
+					},
+				},
+			},
 		],
 	},
 	"o3-mini": {
