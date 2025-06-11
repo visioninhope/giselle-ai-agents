@@ -10,12 +10,14 @@ export default async function TeamUsagePage() {
 
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[33.6px] tracking-[-0.011em] font-sans"
-				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
-			>
-				Usage
-			</h3>
+			<div className="flex justify-between items-center">
+				<h1
+					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+				>
+					Usage
+				</h1>
+			</div>
 			<div className="flex flex-col gap-y-[16px]">
 				{currentTeamIsFreePlan && (
 					<Suspense

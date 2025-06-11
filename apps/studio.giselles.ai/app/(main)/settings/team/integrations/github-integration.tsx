@@ -1,4 +1,5 @@
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Card } from "../../components/card";
 import { GitHubAppInstallButton } from "@/packages/components/github-app-install-button";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { gitHubAppInstallURL } from "@/services/external/github";
@@ -109,7 +110,7 @@ type HeaderProps = {
 
 function Header({ account, installed, installationUrl }: HeaderProps) {
 	return (
-		<div className="flex items-center justify-between p-4 border-[0.5px] border-black-400 rounded-[8px] bg-black-400/10">
+		<Card title="" className="flex items-center justify-between p-4">
 			<div className="flex items-center space-x-4">
 				<SiGithub className="w-8 h-8" />
 				<div>
@@ -141,7 +142,7 @@ function Header({ account, installed, installationUrl }: HeaderProps) {
 					</Button>
 				)}
 			</div>
-		</div>
+		</Card>
 	);
 }
 

@@ -11,6 +11,7 @@ import { useActionState, useState } from "react";
 import { Alert, AlertDescription } from "../components/alert";
 import { Button } from "../components/button";
 import { deleteTeam } from "./actions";
+import { Card } from "../components/card";
 
 export function DeleteTeam() {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -23,7 +24,7 @@ export function DeleteTeam() {
 	};
 
 	return (
-		<div className="flex justify-between items-center gap-x-[10px] bg-transparent rounded-[8px] border-[0.5px] border-error-900 px-[24px] pt-[16px] pb-[24px] w-full">
+		<Card title="" className="flex justify-between items-center gap-x-[10px] px-[24px] pt-[16px] pb-[24px] w-full border-[0.5px] border-error-900">
 			<div className="flex flex-col gap-y-4 max-w-[557px]">
 				<h2 className="text-error-900 font-medium text-[16px] leading-[27.2px] tracking-normal font-sans">
 					Delete Team
@@ -92,6 +93,6 @@ export function DeleteTeam() {
 					</form>
 				</DialogContent>
 			</Dialog>
-		</div>
+		</Card>
 	);
 }

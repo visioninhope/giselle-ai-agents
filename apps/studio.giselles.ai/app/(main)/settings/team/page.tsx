@@ -1,4 +1,4 @@
-import { Card } from "@/components/ui/card";
+import { Card } from "../components/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
@@ -16,12 +16,12 @@ export default function TeamPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<h1
+					className="text-[34px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
 				>
 					Team Settings
-				</h3>
+				</h1>
 				<a
 					href="https://docs.giselles.ai/guides/settings/team/billing"
 					target="_blank"
@@ -63,7 +63,7 @@ async function BillingInfo() {
 
 	return (
 		<div className="flex flex-col gap-y-2">
-			<Card className="flex justify-between items-center px-6 py-4 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
+			<Card title="" className="flex justify-between items-center px-6 py-4">
 				{isProPlan(team) ? (
 					<BillingInfoForProPlan team={team} />
 				) : (
