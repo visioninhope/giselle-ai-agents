@@ -1,6 +1,11 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { ChevronLeftIcon, ChevronRightIcon, DatabaseIcon } from "lucide-react";
+import {
+	ChevronLeftIcon,
+	ChevronRightIcon,
+	DatabaseIcon,
+	MoveUpRightIcon,
+} from "lucide-react";
 import { Tabs } from "radix-ui";
 import { type SVGProps, useMemo, useState } from "react";
 import { GitHubIcon } from "../../../tool";
@@ -148,57 +153,77 @@ export function ToolsPanel({
 							)}
 						>
 							<Tabs.Trigger value="create" data-trigger>
-								Create New Token
+								Add New Token
 							</Tabs.Trigger>
 							<Tabs.Trigger value="select" data-trigger>
 								Use Existing Token
 							</Tabs.Trigger>
 						</Tabs.List>
+						<div className="h-[12px]" />
 						<Tabs.Content value="create">
-							<form className="space-y-[6px] mt-[8px]">
-								<fieldset className="flex flex-col">
-									<label
-										htmlFor="label"
-										className="text-text text-[13px] mb-[2px]"
+							<form>
+								<div className="flex flex-col gap-[6px]">
+									<fieldset className="flex flex-col">
+										<label
+											htmlFor="label"
+											className="text-text text-[13px] mb-[2px]"
+										>
+											Label
+										</label>
+										<input
+											type="text"
+											id="label"
+											name="label"
+											className={clsx(
+												"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
+												"focus:border-border-focused",
+											)}
+										/>
+										<p className="text-[12px] text-text-muted">
+											Once registered, this PAT can be referenced from other
+											nodes. Enter a label to identify this PAT when referencing
+											it.
+										</p>
+									</fieldset>
+									<fieldset className="flex flex-col">
+										<div className="flex justify-between mb-[2px]">
+											<label htmlFor="pat" className="text-text text-[13px]">
+												PAT
+											</label>
+											<a
+												href="https://github.com/settings/personal-access-tokens"
+												className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+												target="_blank"
+												rel="noreferrer"
+											>
+												<span>GitHub</span>
+												<MoveUpRightIcon className="size-[13px]" />
+											</a>
+										</div>
+										<input
+											type="text"
+											id="pat"
+											name="pat"
+											className={clsx(
+												"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
+												"focus:border-border-focused",
+											)}
+										/>
+										<p className="text-[12px] text-text-muted">
+											The entered PAT will be encrypted and stored using
+											authenticated encryption.
+										</p>
+									</fieldset>
+								</div>
+								<div className="h-[12px]" />
+								<div className="flex justify-end">
+									<button
+										type="submit"
+										className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px] cursor-pointer"
 									>
-										Label
-									</label>
-									<input
-										type="text"
-										id="label"
-										name="label"
-										className={clsx(
-											"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
-											"focus:border-border-focused",
-										)}
-									/>
-									<p className="text-[12px] text-text-muted">
-										Once registered, this PAT can be referenced from other
-										nodes. Enter a label to identify this PAT when referencing
-										it.
-									</p>
-								</fieldset>
-								<fieldset className="flex flex-col">
-									<label
-										htmlFor="pat"
-										className="text-text text-[13px] mb-[2px]"
-									>
-										PAT
-									</label>
-									<input
-										type="text"
-										id="pat"
-										name="pat"
-										className={clsx(
-											"border border-border rounded-[2px] bg-editor-background outline-none px-[4px] py-[2px] text-[14px]",
-											"focus:border-border-focused",
-										)}
-									/>
-									<p className="text-[12px] text-text-muted">
-										The entered PAT will be encrypted and stored using
-										authenticated encryption.
-									</p>
-								</fieldset>
+										Add token
+									</button>
+								</div>
 							</form>
 						</Tabs.Content>
 						<Tabs.Content value="select">Select existing token</Tabs.Content>
