@@ -90,6 +90,13 @@
 	--color-editor-document-highlight-read-background: #74ade8;
 	--color-editor-document-highlight-write-background: #555a63;
 
+	/* ghost */
+	--color-ghost-element-background: #000000;
+	--color-ghost-element-hover: #363c46;
+	--color-ghost-element-active: #454a56;
+	--color-ghost-element-selected: #454a56;
+	--color-ghost-element-disabled: #2e343e;
+
 	--animate-pop-pop-1: pop-pop 2.1s steps(1) infinite;
 	--animate-pop-pop-2: pop-pop 2.1s steps(1) 0.7s infinite;
 	--animate-pop-pop-3: pop-pop 2.1s steps(1) 1.4s infinite;
