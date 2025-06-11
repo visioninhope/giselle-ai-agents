@@ -2,7 +2,7 @@ import type { FileData, FileNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toRelativeTime } from "../../../helper/datetime";
 import { TriangleAlert } from "../../../icons";
 import { FileNodeIcon } from "../../../icons/node";
@@ -194,6 +194,53 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		[addFiles],
 	);
 
+	const handlePaste = useCallback(
+		(e: ClipboardEvent) => {
+			const items = e.clipboardData?.items;
+			if (!items) return;
+
+			const imageItems: DataTransferItem[] = [];
+			for (const item of items) {
+				if (item.type.startsWith("image/")) {
+					imageItems.push(item);
+				}
+			}
+
+			if (imageItems.length === 0) return;
+
+			// Prevent default paste behavior
+			e.preventDefault();
+
+			const files: File[] = [];
+			for (const item of imageItems) {
+				const file = item.getAsFile();
+				if (file) {
+					files.push(file);
+				}
+			}
+
+			if (files.length > 0) {
+				// Create a DataTransfer object to create a FileList
+				const dataTransfer = new DataTransfer();
+				for (const file of files) {
+					dataTransfer.items.add(file);
+				}
+				addFiles(dataTransfer.files);
+			}
+		},
+		[addFiles],
+	);
+
+	useEffect(() => {
+		// Only add paste listener for image file nodes
+		if (node.content.category === "image") {
+			document.addEventListener("paste", handlePaste);
+			return () => {
+				document.removeEventListener("paste", handlePaste);
+			};
+		}
+	}, [handlePaste, node.content.category]);
+
 	return (
 		<div className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300">
 			<div className="p-[16px] divide-y divide-black-50">
@@ -265,6 +312,11 @@ export function FilePanel({ node, config }: FilePanelProps) {
 										className="text-center flex flex-col gap-[16px] text-white-400"
 									>
 										<p>Drop {config.label} files here to upload.</p>
+										{node.content.category === "image" && (
+											<p className="text-[12px] text-black-400">
+												You can also paste images from clipboard (Ctrl/Cmd + V)
+											</p>
+										)}
 										<div className="flex gap-[8px] justify-center items-center">
 											<span>or</span>
 											<span className="font-bold text-[14px] underline cursor-pointer">
