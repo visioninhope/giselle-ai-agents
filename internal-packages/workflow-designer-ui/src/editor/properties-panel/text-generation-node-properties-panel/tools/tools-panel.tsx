@@ -1,5 +1,6 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	ChevronDownIcon,
 	ChevronLeftIcon,
@@ -9,7 +10,14 @@ import {
 	PlusIcon,
 } from "lucide-react";
 import { Dialog, DropdownMenu, Tabs } from "radix-ui";
-import { type SVGProps, useMemo, useState } from "react";
+import {
+	type FormEventHandler,
+	type SVGProps,
+	useCallback,
+	useMemo,
+	useState,
+} from "react";
+import z from "zod/v4";
 import { GitHubIcon } from "../../../tool";
 import { PostgresToolsPanel } from "./postgres-tools";
 
@@ -35,6 +43,22 @@ function ToolIcon({
 	}
 }
 
+const GitHubToolSetupSecretType = {
+	create: "create",
+	select: "select",
+} as const;
+const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.create),
+		label: z.string().min(1),
+		value: z.string().min(1),
+	}),
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.select),
+		secretId: SecretId.schema,
+	}),
+]);
+
 function ToolsSection({
 	title,
 	tools,
@@ -42,10 +66,48 @@ function ToolsSection({
 	title: string;
 	tools: UITool[];
 }) {
+	const client = useGiselleEngine();
+	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
+		async (e) => {
+			e.preventDefault();
+			const formData = new FormData(e.currentTarget);
+			const secretType = formData.get("secretType");
+			const label = formData.get("label");
+			const value = formData.get("value");
+			const secretId = formData.get("secretId");
+			const parse = GitHubToolSetupPayload.safeParse({
+				secretType,
+				label,
+				value,
+				secretId,
+			});
+			if (!parse.success) {
+				/** @todo Implement error handling */
+				return;
+			}
+			switch (parse.data.secretType) {
+				case "create":
+					{
+						const result = await client.encryptSecret({
+							plaintext: parse.data.value,
+						});
+					}
+					break;
+				case "select":
+					break;
+				default: {
+					const _exhaustiveCheck: never = parse.data;
+					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
+				}
+			}
+			console.log(parse.data);
+		},
+		[client],
+	);
 	if (tools.length === 0) return null;
 	return (
 		<div className="space-y-[8px]">
-			<h2 className="text-[15px] font-accent text-text ">{title}</h2>
+			<h2 className="text-[15px] font-accent text-text">{title}</h2>
 			<div className="space-y-[6px]">
 				{tools.map((tool) => (
 					<div
@@ -112,7 +174,12 @@ function ToolsSection({
 										</div>
 										<div className="h-[12px]" />
 										<Tabs.Content value="create" className="outline-none">
-											<form>
+											<form onSubmit={setupGitHubTool}>
+												<input
+													type="hidden"
+													name="secretType"
+													value={GitHubToolSetupSecretType.create}
+												/>
 												<div className="flex flex-col gap-[12px] px-[12px]">
 													<fieldset className="flex flex-col">
 														<label
@@ -157,7 +224,7 @@ function ToolsSection({
 														<input
 															type="text"
 															id="pat"
-															name="pat"
+															name="value"
 															className={clsx(
 																"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
 																"focus:border-border-focused",
@@ -181,7 +248,12 @@ function ToolsSection({
 											</form>
 										</Tabs.Content>
 										<Tabs.Content value="select" className="outline-none">
-											<form>
+											<form onSubmit={setupGitHubTool}>
+												<input
+													type="hidden"
+													name="secretType"
+													value={GitHubToolSetupSecretType.create}
+												/>
 												<div className="px-[12px]">
 													<fieldset className="flex flex-col">
 														<label

@@ -1,7 +1,7 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 
-const SecretId = createIdGenerator("scrt");
+export const SecretId = createIdGenerator("scrt");
 
 export const Secret = z.object({
 	id: SecretId.schema,
