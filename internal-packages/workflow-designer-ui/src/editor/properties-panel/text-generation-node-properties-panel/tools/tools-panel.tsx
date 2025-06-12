@@ -7,7 +7,7 @@ import {
 	PlusIcon,
 	Settings2Icon,
 } from "lucide-react";
-import { Tabs } from "radix-ui";
+import { Tabs as RadixTabs } from "radix-ui";
 import {
 	type ComponentProps,
 	type FormEventHandler,
@@ -28,6 +28,7 @@ import {
 	DialogTrigger,
 } from "./ui/dialog";
 import { DropdownMenu } from "./ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const GitHubToolSetupSecretType = {
 	create: "create",
@@ -115,29 +116,12 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 				title="Add GitHub tool"
 				description="Choose how you want to provide your GitHub Personal Access Token"
 			/>
-			<Tabs.Root defaultValue="create">
-				<div className="px-[12px]">
-					<Tabs.List
-						className={clsx(
-							"border border-border px-[4px] py-[4px] rounded-[4px] flex justify-center items-center gap-[4px]",
-							"**:data-trigger:flex-1 **:data-trigger:rounded-[4px] **:data-trigger:border **:data-trigger:border-transparent",
-							"**:data-trigger:outline-none **:data-trigger:text-text-muted **:data-trigger:font-accent",
-							"**:data-trigger:text-[13px] **:data-trigger:tracking-wider **:data-trigger:py-[2px]",
-							"**:data-trigger:data-[state=active]:bg-tab-active-background **:data-trigger:data-[state=active]:text-text",
-							"**:data-trigger:data-[state=inactive]:cursor-pointer",
-							"**:data-trigger:hover:bg-ghost-element-hover",
-						)}
-					>
-						<Tabs.Trigger value="create" data-trigger>
-							Add New Token
-						</Tabs.Trigger>
-						<Tabs.Trigger value="select" data-trigger>
-							Use Existing Token
-						</Tabs.Trigger>
-					</Tabs.List>
-				</div>
-				<div className="h-[12px]" />
-				<Tabs.Content value="create" className="outline-none">
+			<Tabs defaultValue="create">
+				<TabsList className="mx-[12px] mb-[12px]">
+					<TabsTrigger value="create">Add New Token</TabsTrigger>
+					<TabsTrigger value="select">Use Existing Token</TabsTrigger>
+				</TabsList>
+				<TabsContent value="create">
 					<form onSubmit={setupGitHubTool}>
 						<input
 							type="hidden"
@@ -176,6 +160,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 										className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
 										target="_blank"
 										rel="noreferrer"
+										tabIndex={-1}
 									>
 										<span>GitHub</span>
 										<MoveUpRightIcon className="size-[13px]" />
@@ -207,47 +192,42 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 							</button>
 						</div>
 					</form>
-				</Tabs.Content>
-				<Tabs.Content value="select" className="outline-none">
-					<form onSubmit={setupGitHubTool}>
-						<input
-							type="hidden"
-							name="secretType"
-							value={GitHubToolSetupSecretType.create}
-						/>
-						<div className="px-[12px]">
-							<fieldset className="flex flex-col">
-								<label
-									htmlFor="label"
-									className="text-text text-[13px] mb-[2px]"
-								>
-									Select from your saved secrets
-								</label>
-								<div>
-									<DropdownMenu
-										placeholder="Choose a saved token"
-										items={[
-											{ id: "token1", label: "Token 1" },
-											{ id: "token2", label: "Token 2" },
-											{ id: "token3", label: "Token 3" },
-										]}
-										renderItem={(item) => item.label}
-									/>
-								</div>
-							</fieldset>
-						</div>
-						<div className="h-[12px]" />
-						<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
-							<button
-								type="submit"
-								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
-							>
-								Add tool
-							</button>
-						</div>
-					</form>
-				</Tabs.Content>
-			</Tabs.Root>
+				</TabsContent>
+				<TabsContent value="select">
+					<input
+						type="hidden"
+						name="secretType"
+						value={GitHubToolSetupSecretType.create}
+					/>
+					<div className="px-[12px]">
+						<fieldset className="flex flex-col">
+							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
+								Select from your saved secrets
+							</label>
+							<div>
+								<DropdownMenu
+									placeholder="Choose a saved token"
+									items={[
+										{ id: "token1", label: "Token 1" },
+										{ id: "token2", label: "Token 2" },
+										{ id: "token3", label: "Token 3" },
+									]}
+									renderItem={(item) => item.label}
+								/>
+							</div>
+						</fieldset>
+					</div>
+					<div className="h-[12px]" />
+					<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+						<button
+							type="submit"
+							className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+						>
+							Add tool
+						</button>
+					</div>
+				</TabsContent>
+			</Tabs>
 		</ToolList.Dialog>
 	);
 }
