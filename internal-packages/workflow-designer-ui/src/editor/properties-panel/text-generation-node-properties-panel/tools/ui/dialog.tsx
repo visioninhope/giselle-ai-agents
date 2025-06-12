@@ -4,26 +4,7 @@ import type { PropsWithChildren, ReactNode } from "react";
 
 export const Dialog = DialogPrimitive.Root;
 export const DialogPortal = DialogPrimitive.Portal;
-
-export function DialogTrigger({
-	icon,
-	children,
-}: PropsWithChildren<{ icon: ReactNode }>) {
-	return (
-		<DialogPrimitive.Trigger asChild>
-			<button
-				type="button"
-				className={clsx(
-					"flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] py-[2px] rounded-[2px] cursor-pointer outline-none",
-					"**:data-dialog-trigger-icon:size-[14px]",
-				)}
-			>
-				{icon}
-				<span>{children}</span>
-			</button>
-		</DialogPrimitive.Trigger>
-	);
-}
+export const DialogTrigger = DialogPrimitive.Trigger;
 
 export function DialogContent({ children }: PropsWithChildren) {
 	return (

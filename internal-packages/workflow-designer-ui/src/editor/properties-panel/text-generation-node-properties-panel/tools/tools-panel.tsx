@@ -1,26 +1,20 @@
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import {
-	ChevronDownIcon,
-	DatabaseIcon,
-	MoveUpRightIcon,
-	PlusIcon,
-} from "lucide-react";
+import { ChevronDownIcon, MoveUpRightIcon, PlusIcon } from "lucide-react";
 import { DropdownMenu, Tabs } from "radix-ui";
 import {
 	type ComponentProps,
 	type FormEventHandler,
 	type PropsWithChildren,
 	type ReactNode,
-	type SVGProps,
 	useCallback,
-	useMemo,
 	useState,
 	useTransition,
 } from "react";
 import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
+import { Button } from "./ui/button";
 import {
 	Dialog,
 	DialogContent,
@@ -320,6 +314,7 @@ const ToolList = {
 				className={clsx(
 					"border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]",
 					"**:data-tool-icon:size-[20px] **:data-tool-icon:text-text-muted",
+					"**:data-dialog-trigger-icon:size-[14px]",
 				)}
 			>
 				<div className="flex gap-[10px] items-center">
@@ -338,8 +333,13 @@ const ToolList = {
 	}: PropsWithChildren<ToolListDialogProps>) {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
-				<DialogTrigger icon={<PlusIcon data-dialog-trigger-icon />}>
-					Add
+				<DialogTrigger asChild>
+					<Button
+						type="button"
+						leftIcon={<PlusIcon data-dialog-trigger-icon />}
+					>
+						Add
+					</Button>
 				</DialogTrigger>
 				<DialogContent>{children}</DialogContent>
 			</Dialog>
