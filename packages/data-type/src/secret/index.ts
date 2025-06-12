@@ -1,6 +1,6 @@
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { WorkspaceId } from "../workspace";
+import { WorkspaceId } from "../workspace/id";
 
 export const SecretId = createIdGenerator("scrt");
 export type SecretId = z.infer<typeof SecretId.schema>;

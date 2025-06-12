@@ -72,7 +72,7 @@ export const ToolAuthPat = z.object({
 });
 const ToolAuthSecret = z.object({
 	type: z.literal("secret"),
-	secretId: SecretId,
+	secretId: SecretId.schema,
 	userId: z.optional(z.string()),
 });
 export const GitHubTool = z.object({
