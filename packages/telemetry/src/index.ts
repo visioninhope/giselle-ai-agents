@@ -273,8 +273,8 @@ async function createLangfuseParams(
 
 	return {
 		traceParams: {
-			...((options?.telemetry?.metadata as any)?.userId && {
-				userId: String((options.telemetry?.metadata as any).userId),
+			...(options?.telemetry?.metadata?.userId && {
+				userId: String(options.telemetry?.metadata.userId),
 			}),
 			...baseParams,
 			tags:
@@ -360,7 +360,7 @@ async function createImageMediaObjects(
 					try {
 						buffer = Buffer.from(imageData);
 					} catch (error) {
-						console.warn(`Error converting imageData to Buffer:`, error);
+						console.warn("Error converting imageData to Buffer:", error);
 						continue;
 					}
 
