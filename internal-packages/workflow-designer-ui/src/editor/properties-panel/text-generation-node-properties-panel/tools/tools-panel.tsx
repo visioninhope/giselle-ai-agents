@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import { DropdownMenu, Tabs } from "radix-ui";
 import {
+	type ComponentProps,
 	type FormEventHandler,
 	type PropsWithChildren,
 	type ReactNode,
@@ -415,189 +416,171 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 		[node, updateNodeDataContent, client, data.id],
 	);
 	return (
-		<ToolList.ToolListItem
-			icon={<ToolIcon name="GitHub" />}
-			configurationPanel={
-				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
-					<DialogTrigger icon={<PlusIcon data-dialog-trigger-icon />}>
-						Add
-					</DialogTrigger>
-					<DialogContent>
-						<div className="h-[12px]" />
-						<DialogTitle>Add GitHub tool</DialogTitle>
-						<DialogDescription>
-							Choose how you want to provide your GitHub Personal Access Token
-						</DialogDescription>
-
-						<div className="h-[12px]" />
-						<Tabs.Root defaultValue="create">
-							<div className="px-[12px]">
-								<Tabs.List
-									className={clsx(
-										"border border-border px-[4px] py-[4px] rounded-[4px] flex justify-center items-center gap-[4px]",
-										"**:data-trigger:flex-1 **:data-trigger:rounded-[4px] **:data-trigger:border **:data-trigger:border-transparent",
-										"**:data-trigger:outline-none **:data-trigger:text-text-muted **:data-trigger:font-accent",
-										"**:data-trigger:text-[13px] **:data-trigger:tracking-wider **:data-trigger:py-[2px]",
-										"**:data-trigger:data-[state=active]:bg-tab-active-background **:data-trigger:data-[state=active]:text-text",
-										"**:data-trigger:data-[state=inactive]:cursor-pointer",
-										"**:data-trigger:hover:bg-ghost-element-hover",
-									)}
+		<ToolList.Dialog open={presentDialog} onOpenChange={setPresentDialog}>
+			<ToolList.DialogHeader
+				title="Add GitHub tool"
+				description="Choose how you want to provide your GitHub Personal Access Token"
+			/>
+			<Tabs.Root defaultValue="create">
+				<div className="px-[12px]">
+					<Tabs.List
+						className={clsx(
+							"border border-border px-[4px] py-[4px] rounded-[4px] flex justify-center items-center gap-[4px]",
+							"**:data-trigger:flex-1 **:data-trigger:rounded-[4px] **:data-trigger:border **:data-trigger:border-transparent",
+							"**:data-trigger:outline-none **:data-trigger:text-text-muted **:data-trigger:font-accent",
+							"**:data-trigger:text-[13px] **:data-trigger:tracking-wider **:data-trigger:py-[2px]",
+							"**:data-trigger:data-[state=active]:bg-tab-active-background **:data-trigger:data-[state=active]:text-text",
+							"**:data-trigger:data-[state=inactive]:cursor-pointer",
+							"**:data-trigger:hover:bg-ghost-element-hover",
+						)}
+					>
+						<Tabs.Trigger value="create" data-trigger>
+							Add New Token
+						</Tabs.Trigger>
+						<Tabs.Trigger value="select" data-trigger>
+							Use Existing Token
+						</Tabs.Trigger>
+					</Tabs.List>
+				</div>
+				<div className="h-[12px]" />
+				<Tabs.Content value="create" className="outline-none">
+					<form onSubmit={setupGitHubTool}>
+						<input
+							type="hidden"
+							name="secretType"
+							value={GitHubToolSetupSecretType.create}
+						/>
+						<div className="flex flex-col gap-[12px] px-[12px]">
+							<fieldset className="flex flex-col">
+								<label
+									htmlFor="label"
+									className="text-text text-[13px] mb-[2px]"
 								>
-									<Tabs.Trigger value="create" data-trigger>
-										Add New Token
-									</Tabs.Trigger>
-									<Tabs.Trigger value="select" data-trigger>
-										Use Existing Token
-									</Tabs.Trigger>
-								</Tabs.List>
-							</div>
-							<div className="h-[12px]" />
-							<Tabs.Content value="create" className="outline-none">
-								<form onSubmit={setupGitHubTool}>
-									<input
-										type="hidden"
-										name="secretType"
-										value={GitHubToolSetupSecretType.create}
-									/>
-									<div className="flex flex-col gap-[12px] px-[12px]">
-										<fieldset className="flex flex-col">
-											<label
-												htmlFor="label"
-												className="text-text text-[13px] mb-[2px]"
-											>
-												Label
-											</label>
-											<input
-												type="text"
-												id="label"
-												name="label"
-												className={clsx(
-													"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-													"focus:border-border-focused",
-												)}
-											/>
-											<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-												Once registered, this PAT can be referenced from other
-												nodes. Enter a label to identify this PAT when
-												referencing it.
-											</p>
-										</fieldset>
-										<fieldset className="flex flex-col">
-											<div className="flex justify-between mb-[2px]">
-												<label htmlFor="pat" className="text-text text-[13px]">
-													PAT
-												</label>
-												<a
-													href="https://github.com/settings/personal-access-tokens"
-													className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
-													target="_blank"
-													rel="noreferrer"
-												>
-													<span>GitHub</span>
-													<MoveUpRightIcon className="size-[13px]" />
-												</a>
-											</div>
-											<input
-												type="text"
-												id="pat"
-												name="value"
-												className={clsx(
-													"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-													"focus:border-border-focused",
-												)}
-											/>
-											<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-												The entered PAT will be encrypted and stored using
-												authenticated encryption.
-											</p>
-										</fieldset>
-									</div>
-									<div className="h-[12px]" />
-									<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+									Label
+								</label>
+								<input
+									type="text"
+									id="label"
+									name="label"
+									className={clsx(
+										"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+										"focus:border-border-focused",
+									)}
+								/>
+								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+									Once registered, this PAT can be referenced from other nodes.
+									Enter a label to identify this PAT when referencing it.
+								</p>
+							</fieldset>
+							<fieldset className="flex flex-col">
+								<div className="flex justify-between mb-[2px]">
+									<label htmlFor="pat" className="text-text text-[13px]">
+										PAT
+									</label>
+									<a
+										href="https://github.com/settings/personal-access-tokens"
+										className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+										target="_blank"
+										rel="noreferrer"
+									>
+										<span>GitHub</span>
+										<MoveUpRightIcon className="size-[13px]" />
+									</a>
+								</div>
+								<input
+									type="text"
+									id="pat"
+									name="value"
+									className={clsx(
+										"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+										"focus:border-border-focused",
+									)}
+								/>
+								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+									The entered PAT will be encrypted and stored using
+									authenticated encryption.
+								</p>
+							</fieldset>
+						</div>
+						<div className="h-[12px]" />
+						<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+							<button
+								type="submit"
+								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+								disabled={isPending}
+							>
+								{isPending ? "Adding..." : "Add tool"}
+							</button>
+						</div>
+					</form>
+				</Tabs.Content>
+				<Tabs.Content value="select" className="outline-none">
+					<form onSubmit={setupGitHubTool}>
+						<input
+							type="hidden"
+							name="secretType"
+							value={GitHubToolSetupSecretType.create}
+						/>
+						<div className="px-[12px]">
+							<fieldset className="flex flex-col">
+								<label
+									htmlFor="label"
+									className="text-text text-[13px] mb-[2px]"
+								>
+									Select from your saved secrets
+								</label>
+								<DropdownMenu.Root>
+									<DropdownMenu.Trigger asChild>
 										<button
-											type="submit"
-											className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
-											disabled={isPending}
+											type="button"
+											className={clsx(
+												"flex items-center justify-between gap-[2px] bg-background",
+												"text-text text-[14px] border border-border rounded-[2px] w-full",
+												"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
+												"outline-none",
+											)}
 										>
-											{isPending ? "Adding..." : "Add tool"}
+											<span>Choose a saved token..</span>
+											<ChevronDownIcon className="size-[13px]" />
 										</button>
-									</div>
-								</form>
-							</Tabs.Content>
-							<Tabs.Content value="select" className="outline-none">
-								<form onSubmit={setupGitHubTool}>
-									<input
-										type="hidden"
-										name="secretType"
-										value={GitHubToolSetupSecretType.create}
-									/>
-									<div className="px-[12px]">
-										<fieldset className="flex flex-col">
-											<label
-												htmlFor="label"
-												className="text-text text-[13px] mb-[2px]"
-											>
-												Select from your saved secrets
-											</label>
-											<DropdownMenu.Root>
-												<DropdownMenu.Trigger asChild>
-													<button
-														type="button"
-														className={clsx(
-															"flex items-center justify-between gap-[2px] bg-background",
-															"text-text text-[14px] border border-border rounded-[2px] w-full",
-															"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
-															"outline-none",
-														)}
-													>
-														<span>Choose a saved token..</span>
-														<ChevronDownIcon className="size-[13px]" />
-													</button>
-												</DropdownMenu.Trigger>
-												<DropdownMenu.Portal>
-													<DropdownMenu.Content
-														sideOffset={4}
-														className={clsx(
-															"rounded-[2px] w-(--radix-dropdown-menu-trigger-width) bg-panel-background z-50",
-															"p-[4px] border border-border-variant shadow-md",
-															"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
-															"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
-														)}
-													>
-														<DropdownMenu.Item data-item>
-															<span>Item 1</span>
-														</DropdownMenu.Item>
-														<DropdownMenu.Item data-item>
-															<span>Item 2</span>
-														</DropdownMenu.Item>
-														<DropdownMenu.Item data-item>
-															<span>No secret</span>
-														</DropdownMenu.Item>
-													</DropdownMenu.Content>
-												</DropdownMenu.Portal>
-											</DropdownMenu.Root>
-										</fieldset>
-									</div>
-									<div className="h-[12px]" />
-									<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
-										<button
-											type="submit"
-											className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+									</DropdownMenu.Trigger>
+									<DropdownMenu.Portal>
+										<DropdownMenu.Content
+											sideOffset={4}
+											className={clsx(
+												"rounded-[2px] w-(--radix-dropdown-menu-trigger-width) bg-panel-background z-50",
+												"p-[4px] border border-border-variant shadow-md",
+												"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
+												"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
+											)}
 										>
-											Add tool
-										</button>
-									</div>
-								</form>
-							</Tabs.Content>
-						</Tabs.Root>
-					</DialogContent>
-				</Dialog>
-			}
-		>
-			<div className="flex gap-[10px] items-center">
-				<h3 className="text-[14px]">GitHub</h3>
-			</div>
-		</ToolList.ToolListItem>
+											<DropdownMenu.Item data-item>
+												<span>Item 1</span>
+											</DropdownMenu.Item>
+											<DropdownMenu.Item data-item>
+												<span>Item 2</span>
+											</DropdownMenu.Item>
+											<DropdownMenu.Item data-item>
+												<span>No secret</span>
+											</DropdownMenu.Item>
+										</DropdownMenu.Content>
+									</DropdownMenu.Portal>
+								</DropdownMenu.Root>
+							</fieldset>
+						</div>
+						<div className="h-[12px]" />
+						<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
+							<button
+								type="submit"
+								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+							>
+								Add tool
+							</button>
+						</div>
+					</form>
+				</Tabs.Content>
+			</Tabs.Root>
+		</ToolList.Dialog>
 	);
 }
 
@@ -606,46 +589,16 @@ export function ToolsPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const { enableTools, availableTools } = useMemo(() => {
-		const enableTools: UITool[] = [];
-		const availableTools: UITool[] = [];
-		if (node.content.tools?.github === undefined) {
-			availableTools.push({
-				name: "GitHub",
-				commands: [],
-			});
-		} else {
-			enableTools.push({
-				name: "GitHub",
-				commands: node.content.tools.github.tools,
-			});
-		}
-		if (node.content.tools?.postgres === undefined) {
-			availableTools.push({
-				name: "PostgreSQL",
-				commands: [],
-			});
-		} else {
-			enableTools.push({
-				name: "PostgreSQL",
-				commands: node.content.tools.postgres.tools,
-			});
-		}
-		return {
-			enableTools,
-			availableTools,
-		};
-	}, [node.content.tools]);
-
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			{/* <ToolsSection title="Enabled Tools" tools={enableTools} node={node} />
-			<ToolsSection
-				title="Available Tools"
-				tools={availableTools}
-				node={node}
-			/> */}
-			<GitHubToolSetting node={node} />
+			<ToolList.Item
+				icon={<ToolIcon name="GitHub" />}
+				configurationPanel={<GitHubToolSetting node={node} />}
+			>
+				<div className="flex gap-[10px] items-center">
+					<h3 className="text-[14px]">GitHub</h3>
+				</div>
+			</ToolList.Item>
 		</div>
 	);
 }
@@ -654,8 +607,14 @@ interface ToolListItemProps {
 	icon: ReactNode;
 	configurationPanel: ReactNode;
 }
+interface ToolListDialogProps
+	extends Omit<ComponentProps<typeof Dialog>, "children"> {}
+interface ToolListDialogHeaderProps {
+	title: string;
+	description: string;
+}
 const ToolList = {
-	ToolListItem({
+	Item({
 		children,
 		icon,
 		configurationPanel,
@@ -675,11 +634,26 @@ const ToolList = {
 			</div>
 		);
 	},
-	ListItem({ icon, name }: { icon: ReactNode; name: string }) {
+	Dialog({
+		open,
+		onOpenChange,
+		defaultOpen,
+		children,
+	}: PropsWithChildren<ToolListDialogProps>) {
 		return (
-			<div className="flex gap-[10px] items-center">
-				{icon}
-				<h3 className="text-[14px]">{name}</h3>
+			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
+				<DialogTrigger icon={<PlusIcon data-dialog-trigger-icon />}>
+					Add
+				</DialogTrigger>
+				<DialogContent>{children}</DialogContent>
+			</Dialog>
+		);
+	},
+	DialogHeader({ title, description }: ToolListDialogHeaderProps) {
+		return (
+			<div className="py-[12px]">
+				<DialogTitle>{title}</DialogTitle>
+				<DialogDescription>{description}</DialogDescription>
 			</div>
 		);
 	},
