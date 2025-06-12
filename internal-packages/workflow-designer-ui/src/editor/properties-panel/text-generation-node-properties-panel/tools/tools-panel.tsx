@@ -68,6 +68,7 @@ function ToolsSection({
 	tools: UITool[];
 	node: TextGenerationNode;
 }) {
+	const [presentDialog, setPresentDialog] = useState(false);
 	const { updateNodeDataContent, data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
@@ -112,6 +113,7 @@ function ToolsSection({
 									},
 								},
 							});
+							setPresentDialog(false);
 						});
 					}
 					break;
@@ -144,7 +146,7 @@ function ToolsSection({
 							<h3 className="text-[14px]">{tool.name}</h3>
 						</div>
 
-						<Dialog.Root>
+						<Dialog.Root open={presentDialog} onOpenChange={setPresentDialog}>
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
