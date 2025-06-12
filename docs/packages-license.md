@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1058 MIT
+* 1059 MIT
 * 110 Apache 2.0
 * 60 ISC
 * 34 New BSD
@@ -11003,6 +11003,17 @@ BlueOak-1.0.0 permitted
 
 <a name="pgpass"></a>
 ### pgpass v1.0.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="pgvector"></a>
+### pgvector v0.2.1
 #### 
 
 ##### Paths
