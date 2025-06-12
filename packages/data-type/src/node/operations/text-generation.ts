@@ -5,6 +5,7 @@ import {
 	PerplexityLanguageModel,
 } from "@giselle-sdk/language-model";
 import { z } from "zod/v4";
+import { SecretId } from "../../secret";
 
 export const AnthropicLanguageModelData = AnthropicLanguageModel.pick({
 	provider: true,
@@ -69,9 +70,14 @@ export const ToolAuthPat = z.object({
 	token: z.string(),
 	userId: z.optional(z.string()),
 });
+const ToolAuthSecret = z.object({
+	type: z.literal("secret"),
+	secretId: SecretId,
+	userId: z.optional(z.string()),
+});
 export const GitHubTool = z.object({
 	tools: z.string().array(),
-	auth: ToolAuthPat,
+	auth: z.discriminatedUnion("type", [ToolAuthPat, ToolAuthSecret]),
 });
 export type GitHubTool = z.infer<typeof GitHubTool>;
 

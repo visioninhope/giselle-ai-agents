@@ -1,10 +1,9 @@
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	ChevronDownIcon,
 	ChevronLeftIcon,
-	ChevronRightIcon,
 	DatabaseIcon,
 	MoveUpRightIcon,
 	PlusIcon,
@@ -17,7 +16,7 @@ import {
 	useMemo,
 	useState,
 } from "react";
-import z from "zod/v4";
+import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
 import { PostgresToolsPanel } from "./postgres-tools";
 
@@ -62,11 +61,13 @@ const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
 function ToolsSection({
 	title,
 	tools,
+	node,
 }: {
 	title: string;
 	tools: UITool[];
+	node: TextGenerationNode;
 }) {
-	const client = useGiselleEngine();
+	const { addSecret, updateNodeDataContent } = useWorkflowDesigner();
 	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
 			e.preventDefault();
@@ -88,8 +89,23 @@ function ToolsSection({
 			switch (parse.data.secretType) {
 				case "create":
 					{
-						const result = await client.encryptSecret({
-							plaintext: parse.data.value,
+						const secretId = await addSecret(
+							parse.data.label,
+							parse.data.value,
+						);
+
+						updateNodeDataContent(node, {
+							...node.content,
+							tools: {
+								...node.content.tools,
+								github: {
+									tools: [],
+									auth: {
+										type: "secret",
+										secretId,
+									},
+								},
+							},
 						});
 					}
 					break;
@@ -100,9 +116,8 @@ function ToolsSection({
 					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
 				}
 			}
-			console.log(parse.data);
 		},
-		[client],
+		[node, updateNodeDataContent, addSecret],
 	);
 	if (tools.length === 0) return null;
 	return (
@@ -586,8 +601,12 @@ export function ToolsPanel({
 
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolsSection title="Enabled Tools" tools={enableTools} />
-			<ToolsSection title="Available Tools" tools={availableTools} />
+			<ToolsSection title="Enabled Tools" tools={enableTools} node={node} />
+			<ToolsSection
+				title="Available Tools"
+				tools={availableTools}
+				node={node}
+			/>
 		</div>
 	);
 }

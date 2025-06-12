@@ -10,6 +10,8 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	Secret,
+	SecretId,
 	type TriggerNode,
 	type UploadedFileData,
 	type VectorStoreNode,
@@ -53,6 +55,7 @@ export interface WorkflowDesignerContextValue
 			| "setUiViewport"
 			| "updateName"
 			| "isSupportedConnection"
+			| "removeSecret"
 		>,
 		ReturnType<typeof usePropertiesPanel>,
 		ReturnType<typeof useView> {
@@ -79,6 +82,7 @@ export interface WorkflowDesignerContextValue
 	deleteNode: (nodeId: NodeId | string) => Promise<void>;
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
+	addSecret: (label: string, value: string) => Promise<SecretId>;
 }
 export const WorkflowDesignerContext = createContext<
 	WorkflowDesignerContextValue | undefined
@@ -520,6 +524,32 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace, client, data.id],
 	);
 
+	const addSecret = useCallback(
+		async (label: string, value: string) => {
+			const result = await client.encryptSecret({
+				plaintext: value,
+			});
+			const secretId = SecretId.generate();
+			workflowDesignerRef.current?.addSecret({
+				id: secretId,
+				label,
+				value: result.encrypted,
+				createdAt: Date.now(),
+			});
+			setAndSaveWorkspace();
+			return secretId;
+		},
+		[setAndSaveWorkspace, client],
+	);
+
+	const removeSecret = useCallback(
+		(secretId: SecretId) => {
+			workflowDesignerRef.current?.removeSecret(secretId);
+			setAndSaveWorkspace();
+		},
+		[setAndSaveWorkspace],
+	);
+
 	const usePropertiesPanelHelper = usePropertiesPanel();
 	const useViewHelper = useView();
 
@@ -543,6 +573,8 @@ export function WorkflowDesignerProvider({
 				setUiViewport,
 				updateName,
 				isSupportedConnection,
+				addSecret,
+				removeSecret,
 				...usePropertiesPanelHelper,
 				...useViewHelper,
 			}}
