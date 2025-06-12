@@ -3,12 +3,11 @@ import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	CheckIcon,
-	ChevronDownIcon,
 	MoveUpRightIcon,
 	PlusIcon,
 	Settings2Icon,
 } from "lucide-react";
-import { DropdownMenu, Tabs } from "radix-ui";
+import { Tabs } from "radix-ui";
 import {
 	type ComponentProps,
 	type FormEventHandler,
@@ -28,6 +27,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
+import { DropdownMenu } from "./ui/dropdown-menu";
 
 type UIToolName = "GitHub" | "PostgreSQL";
 interface UITool {
@@ -229,43 +229,15 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 								>
 									Select from your saved secrets
 								</label>
-								<DropdownMenu.Root>
-									<DropdownMenu.Trigger asChild>
-										<button
-											type="button"
-											className={clsx(
-												"flex items-center justify-between gap-[2px] bg-background",
-												"text-text text-[14px] border border-border rounded-[2px] w-full",
-												"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
-												"outline-none",
-											)}
-										>
-											<span>Choose a saved token..</span>
-											<ChevronDownIcon className="size-[13px]" />
-										</button>
-									</DropdownMenu.Trigger>
-									<DropdownMenu.Portal>
-										<DropdownMenu.Content
-											sideOffset={4}
-											className={clsx(
-												"rounded-[2px] w-(--radix-dropdown-menu-trigger-width) bg-panel-background z-50",
-												"p-[4px] border border-border-variant shadow-md",
-												"**:data-item:text-text **:data-item:outline-none **:data-item:cursor-pointer **:data-item:hover:bg-ghost-element-hover",
-												"**:data-item:rounded-[2px] **:data-item:px-[8px] **:data-item:py-[4px] **:data-item:text-[14px]",
-											)}
-										>
-											<DropdownMenu.Item data-item>
-												<span>Item 1</span>
-											</DropdownMenu.Item>
-											<DropdownMenu.Item data-item>
-												<span>Item 2</span>
-											</DropdownMenu.Item>
-											<DropdownMenu.Item data-item>
-												<span>No secret</span>
-											</DropdownMenu.Item>
-										</DropdownMenu.Content>
-									</DropdownMenu.Portal>
-								</DropdownMenu.Root>
+								<DropdownMenu
+									placeholder="Choose a saved token"
+									items={[
+										{ id: "token1", label: "Token 1" },
+										{ id: "token2", label: "Token 2" },
+										{ id: "token3", label: "Token 3" },
+									]}
+									renderItem={(item) => item.label}
+								/>
 							</fieldset>
 						</div>
 						<div className="h-[12px]" />

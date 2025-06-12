@@ -2,12 +2,14 @@ import clsx from "clsx/lite";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 	leftIcon?: React.ReactNode;
+	rightIcon?: React.ReactNode;
 }
 
 export function Button({
 	className,
 	children,
 	leftIcon,
+	rightIcon,
 	...props
 }: ButtonProps) {
 	return (
@@ -20,6 +22,7 @@ export function Button({
 		>
 			{leftIcon}
 			<div className="text-[13px] text-text">{children}</div>
+			{rightIcon}
 		</button>
 	);
 }
