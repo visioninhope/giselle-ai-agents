@@ -6,10 +6,7 @@ import {
 	teams,
 } from "@/drizzle";
 import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
-import {
-	type DatabaseConfig,
-	createQueryService,
-} from "@giselle-sdk/rag2";
+import { type DatabaseConfig, createQueryService } from "@giselle-sdk/rag2";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
 

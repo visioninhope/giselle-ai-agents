@@ -3,9 +3,7 @@
  */
 
 // Re-export types
-export type {
-	QueryServiceConfig,
-} from "./types";
+export type { QueryServiceConfig } from "./types";
 
 // Re-export constants and utilities
 export {
@@ -15,6 +13,4 @@ export {
 } from "./utils";
 
 // Re-export factory functions
-export {
-	createQueryService,
-} from "./factories";
+export { createQueryService } from "./factories";

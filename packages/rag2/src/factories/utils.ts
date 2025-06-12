@@ -158,4 +158,3 @@ export function createDefaultEmbedder() {
 		model: FACTORY_DEFAULTS.OPENAI_MODEL,
 	});
 }
-

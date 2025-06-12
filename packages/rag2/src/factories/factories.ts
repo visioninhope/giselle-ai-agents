@@ -59,7 +59,6 @@ function validateDatabaseConfig(database: {
 	return database;
 }
 
-
 /**
  * create query service
  */
@@ -91,4 +90,3 @@ export function createQueryService<
 
 	return new PostgresQueryService(config);
 }
-
