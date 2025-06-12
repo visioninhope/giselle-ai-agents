@@ -1,6 +1,6 @@
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	ChevronDownIcon,
 	ChevronLeftIcon,
@@ -67,7 +67,8 @@ function ToolsSection({
 	tools: UITool[];
 	node: TextGenerationNode;
 }) {
-	const { addSecret, updateNodeDataContent } = useWorkflowDesigner();
+	const { updateNodeDataContent, data } = useWorkflowDesigner();
+	const client = useGiselleEngine();
 	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
 			e.preventDefault();
@@ -89,11 +90,11 @@ function ToolsSection({
 			switch (parse.data.secretType) {
 				case "create":
 					{
-						const secretId = await addSecret(
-							parse.data.label,
-							parse.data.value,
-						);
-
+						const secretId = await client.addSecret({
+							workspaceId: data.id,
+							label: parse.data.label,
+							value: parse.data.value,
+						});
 						updateNodeDataContent(node, {
 							...node.content,
 							tools: {
@@ -117,7 +118,7 @@ function ToolsSection({
 				}
 			}
 		},
-		[node, updateNodeDataContent, addSecret],
+		[node, updateNodeDataContent, client, data.id],
 	);
 	if (tools.length === 0) return null;
 	return (

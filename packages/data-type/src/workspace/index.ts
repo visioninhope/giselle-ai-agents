@@ -2,7 +2,6 @@ import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { Connection } from "../connection";
 import { NodeId, NodeLike, NodeUIState } from "../node";
-import { Secret } from "../secret";
 
 export const WorkspaceId = createIdGenerator("wrks");
 export type WorkspaceId = z.infer<typeof WorkspaceId.schema>;
@@ -27,12 +26,11 @@ export const Workspace = z.object({
 	nodes: z.array(NodeLike),
 	connections: z.array(Connection),
 	ui: UIState,
-	secrets: z.array(Secret).optional().default([]),
 });
 export type Workspace = z.infer<typeof Workspace>;
 
 export function generateInitialWorkspace() {
-	const data = {
+	return {
 		id: WorkspaceId.generate(),
 		schemaVersion: "20250221",
 		nodes: [],
@@ -45,6 +43,5 @@ export function generateInitialWorkspace() {
 				zoom: 1,
 			},
 		},
-	} satisfies z.input<typeof Workspace>;
-	return Workspace.parse(data);
+	} satisfies Workspace;
 }

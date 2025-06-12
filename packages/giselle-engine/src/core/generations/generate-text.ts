@@ -72,14 +72,26 @@ export async function generateText(args: {
 			};
 
 			if (operationNode.content.tools?.github?.auth) {
-				const decryptToken = await args.context.vault?.decrypt(
-					operationNode.content.tools.github.auth.token,
-				);
+				let decryptToken: string | undefined;
+				switch (operationNode.content.tools?.github?.auth.type) {
+					case "pat":
+						decryptToken = await args.context.vault?.decrypt(
+							operationNode.content.tools.github.auth.token,
+						);
+						break;
+					case "secret":
+						decryptToken = await args.context.vault?.decrypt("todo");
+						break;
+					default: {
+						const _exhaustiveCheck: never =
+							operationNode.content.tools?.github?.auth;
+						throw new Error(`Unhandled auth type: ${_exhaustiveCheck}`);
+					}
+				}
 				const allGitHubTools = githubTools(
 					octokit({
 						strategy: "personal-access-token",
-						personalAccessToken:
-							decryptToken ?? operationNode.content.tools.github.auth.token,
+						personalAccessToken: decryptToken ?? "token",
 					}),
 				);
 				for (const tool of operationNode.content.tools.github.tools) {

@@ -8,8 +8,6 @@ import {
 	type NodeReference,
 	NodeUIState,
 	type OutputId,
-	type Secret,
-	type SecretId,
 	type Viewport,
 	type Workspace,
 	generateInitialWorkspace,
@@ -40,7 +38,6 @@ export function WorkflowDesigner({
 	let connections = defaultValue.connections;
 	const ui = defaultValue.ui;
 	let name = defaultValue.name;
-	let secrets = defaultValue.secrets;
 	function addNode(node: Node, options?: AddNodeOptions) {
 		nodes = [...nodes, node];
 		if (options?.ui) {
@@ -167,7 +164,6 @@ export function WorkflowDesigner({
 			name,
 			ui,
 			schemaVersion: "20250221",
-			secrets,
 		} satisfies Workspace;
 	}
 	function updateNodeData<T extends NodeBase>(node: T, data: Partial<T>) {
@@ -232,12 +228,6 @@ export function WorkflowDesigner({
 	function updateName(newName: string | undefined) {
 		name = newName;
 	}
-	function addSecret(secret: Secret) {
-		secrets = [...secrets, secret];
-	}
-	function removeSecret(secretId: SecretId) {
-		secrets = secrets.filter((secret) => secret.id !== secretId);
-	}
 
 	return {
 		addNode,
@@ -251,7 +241,5 @@ export function WorkflowDesigner({
 		deleteConnection,
 		updateName,
 		isSupportedConnection,
-		addSecret,
-		removeSecret,
 	};
 }
