@@ -15,6 +15,7 @@ import {
 	useCallback,
 	useMemo,
 	useState,
+	useTransition,
 } from "react";
 import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
@@ -69,8 +70,9 @@ function ToolsSection({
 }) {
 	const { updateNodeDataContent, data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
+	const [isPending, startTransition] = useTransition();
 	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
-		async (e) => {
+		(e) => {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
 			const secretType = formData.get("secretType");
@@ -87,33 +89,36 @@ function ToolsSection({
 				/** @todo Implement error handling */
 				return;
 			}
-			switch (parse.data.secretType) {
+			const payload = parse.data;
+			switch (payload.secretType) {
 				case "create":
 					{
-						const secretId = await client.addSecret({
-							workspaceId: data.id,
-							label: parse.data.label,
-							value: parse.data.value,
-						});
-						updateNodeDataContent(node, {
-							...node.content,
-							tools: {
-								...node.content.tools,
-								github: {
-									tools: [],
-									auth: {
-										type: "secret",
-										secretId,
+						startTransition(async () => {
+							const result = await client.addSecret({
+								workspaceId: data.id,
+								label: payload.label,
+								value: payload.value,
+							});
+							updateNodeDataContent(node, {
+								...node.content,
+								tools: {
+									...node.content.tools,
+									github: {
+										tools: [],
+										auth: {
+											type: "secret",
+											secretId: result.secretId,
+										},
 									},
 								},
-							},
+							});
 						});
 					}
 					break;
 				case "select":
 					break;
 				default: {
-					const _exhaustiveCheck: never = parse.data;
+					const _exhaustiveCheck: never = payload;
 					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
 				}
 			}
@@ -257,8 +262,9 @@ function ToolsSection({
 													<button
 														type="submit"
 														className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+														disabled={isPending}
 													>
-														Add tool
+														{isPending ? "Adding..." : "Add tool"}
 													</button>
 												</div>
 											</form>
