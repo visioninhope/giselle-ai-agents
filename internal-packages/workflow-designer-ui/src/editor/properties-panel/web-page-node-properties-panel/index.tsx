@@ -95,7 +95,7 @@ function WebPageListItem({
 			)}
 			{webpage.status === "fetching" && (
 				<div>
-					<p className="font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(200,200,200,_1)] via-[rgba(100,100,100,_0.5)] to-[rgba(200,200,200,_1)] text-transparent animate-shimmer">
+					<p className="font-sans bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(200,200,200,_1)] via-[rgba(100,100,100,_0.5)] to-[rgba(200,200,200,_1)] text-transparent animate-shimmer">
 						Fetching...
 					</p>
 					<a

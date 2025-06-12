@@ -3,8 +3,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 import { GoogleTagManager } from "@next/third-parties/google";
 import { SpeedInsights } from "@vercel/speed-insights/next";
-import { GeistSans } from "geist/font/sans";
-import { Hubot_Sans } from "next/font/google";
+import { DM_Sans } from "next/font/google";
 import { Suspense } from "react";
 import { PostHogPageView } from "./posthog-page-view";
 import { PHProvider } from "./providers";
@@ -13,9 +12,9 @@ const title = "Giselle";
 const description = "AI for Agentic Workflows. Human-AI Collaboration";
 const url = process.env.NEXT_PUBLIC_SITE_URL || "https://studio.giselles.ai";
 
-const hubot = Hubot_Sans({
+const dmSans = DM_Sans({
 	weight: "variable",
-	variable: "--font-hubot-sans",
+	variable: "--font-dm-sans",
 	subsets: ["latin"],
 });
 
@@ -45,11 +44,7 @@ export default function RootLayout({
 	children: React.ReactNode;
 }>) {
 	return (
-		<html
-			lang="en"
-			suppressHydrationWarning
-			className={`${hubot.variable} ${GeistSans.variable}`}
-		>
+		<html lang="en" suppressHydrationWarning className={dmSans.variable}>
 			<GoogleTagManager gtmId={process.env.GTM_ID ?? ""} />
 			<PHProvider>
 				<body>

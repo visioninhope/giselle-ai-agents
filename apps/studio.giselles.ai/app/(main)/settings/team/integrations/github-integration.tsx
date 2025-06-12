@@ -168,7 +168,7 @@ function Installation({ installation }: InstallationProps) {
 						className="w-6 h-6 rounded-full"
 					/>
 				)}
-				<span className="text-white-400 font-medium text-[12px] leading-[12px] font-hubot">
+				<span className="text-white-400 font-medium text-[12px] leading-[12px] font-sans">
 					{displayName}
 				</span>
 			</div>
@@ -179,7 +179,7 @@ function Installation({ installation }: InstallationProps) {
 							href={repo.html_url}
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-white-400 font-medium text-sm leading-[19.6px] font-hubot hover:underline"
+							className="text-white-400 font-medium text-sm leading-[19.6px] font-sans hover:underline"
 						>
 							{repo.name}
 						</a>

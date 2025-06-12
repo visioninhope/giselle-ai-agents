@@ -45,7 +45,7 @@ export const SignupForm = (props: SignupFormProps) => {
 	);
 
 	return (
-		<form action={handleSubmit} className="font-hubot">
+		<form action={handleSubmit} className="font-sans">
 			<input type="hidden" name="token" value={props.token} />
 			<input type="hidden" name="email" value={props.email} />
 			<div className="grid gap-6">
@@ -61,7 +61,7 @@ export const SignupForm = (props: SignupFormProps) => {
 						<div className="grid gap-[4px] relative">
 							<Label
 								htmlFor="email"
-								className="text-[14px] font-hubot text-black-70"
+								className="text-[14px] font-sans text-black-70"
 							>
 								Email
 							</Label>
@@ -80,7 +80,7 @@ export const SignupForm = (props: SignupFormProps) => {
 						<div className="grid gap-[4px] relative">
 							<Label
 								htmlFor="password"
-								className="text-[14px] font-hubot text-black-70"
+								className="text-[14px] font-sans text-black-70"
 							>
 								Password
 							</Label>
@@ -97,7 +97,7 @@ export const SignupForm = (props: SignupFormProps) => {
 						<div className="grid gap-[4px] relative">
 							<Label
 								htmlFor="confirmPassword"
-								className="text-[14px] font-hubot text-black-70"
+								className="text-[14px] font-sans text-black-70"
 							>
 								Confirm Password
 							</Label>

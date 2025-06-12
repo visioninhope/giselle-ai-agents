@@ -66,7 +66,7 @@ export function TeamSelectionForm({
 						) : (
 							<>
 								<span
-									className="text-base font-hubot text-white-400 truncate max-w-[180px]"
+									className="text-base font-sans text-white-400 truncate max-w-[180px]"
 									title={currentTeam.name}
 								>
 									{currentTeam.name}
@@ -86,11 +86,11 @@ export function TeamSelectionForm({
 							<SelectItem
 								key={team.id}
 								value={team.id}
-								className="p-1.5 pl-10 rounded-[8px] focus:bg-primary-900/50 font-hubot"
+								className="p-1.5 pl-10 rounded-[8px] focus:bg-primary-900/50 font-sans"
 							>
 								<div className="flex items-center gap-1.5 pr-1">
 									<span
-										className="truncate max-w-[180px] text-base font-hubot text-white-400"
+										className="truncate max-w-[180px] text-base font-sans text-white-400"
 										title={team.name}
 									>
 										{team.name}
@@ -108,7 +108,7 @@ export function TeamSelectionForm({
 						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 							<Plus className="size-3 text-black-900" />
 						</span>
-						<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot">
+						<span className="text-white-400 font-medium text-[14px] leading-[20.4px] font-sans">
 							{teamCreation}
 						</span>
 					</div>

@@ -91,7 +91,7 @@ export function TeamCreationForm({
 					}
 				`}</style>
 				<DialogHeader>
-					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
+					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-sans text-center">
 						Create New Team
 					</DialogTitle>
 				</DialogHeader>
@@ -135,7 +135,7 @@ export function TeamCreationForm({
 										<label htmlFor="free">
 											<CardHeader>
 												<div className="flex flex-col gap-2">
-													<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+													<CardTitle className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
 														Free
 													</CardTitle>
 													<div className="flex items-center mb-2">
@@ -166,7 +166,7 @@ export function TeamCreationForm({
 										<label htmlFor="pro">
 											<CardHeader>
 												<div className="flex flex-col gap-2">
-													<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+													<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
 														Pro
 													</CardTitle>
 													<div className="flex items-center mb-2">
@@ -202,7 +202,7 @@ export function TeamCreationForm({
 									<Card className="bg-black-850 border-[0.5px] border-black-400 w-full">
 										<CardHeader>
 											<div className="flex flex-col gap-2">
-												<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-hubot">
+												<CardTitle className="text-primary-400 text-[16px] leading-[27.2px] tracking-normal font-sans">
 													Pro
 												</CardTitle>
 												<div className="flex items-center mb-2">

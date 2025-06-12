@@ -213,7 +213,7 @@ export function NodeComponent({
 				node.content.type !== "trigger" && (
 					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
 						<div className="flex items-center">
-							<p className="text-xs font-medium font-hubot text-black-200">
+							<p className="text-xs font-medium font-sans text-black-200">
 								Waiting...
 							</p>
 						</div>
@@ -224,7 +224,7 @@ export function NodeComponent({
 				node.content.type !== "trigger" && (
 					<div className="absolute top-[-28px] right-0 py-1 px-3 z-10 flex items-center justify-between rounded-t-[16px]">
 						<div className="flex items-center">
-							<p className="text-xs font-medium font-hubot bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
+							<p className="text-xs font-medium font-sans bg-[length:200%_100%] bg-clip-text bg-gradient-to-r from-[rgba(59,_130,_246,_1)] via-[rgba(255,_255,_255,_0.5)] to-[rgba(59,_130,_246,_1)] text-transparent animate-shimmer">
 								Generating...
 							</p>
 							<button
@@ -247,7 +247,7 @@ export function NodeComponent({
 						exit={{ opacity: 0 }}
 					>
 						<div className="flex items-center gap-[4px]">
-							<p className="text-xs font-medium font-hubot">Completed</p>
+							<p className="text-xs font-medium font-sans">Completed</p>
 							<CheckIcon className="w-4 h-4" />
 						</div>
 					</motion.div>

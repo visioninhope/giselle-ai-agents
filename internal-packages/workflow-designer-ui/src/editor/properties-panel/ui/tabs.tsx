@@ -67,7 +67,7 @@ export const TabsTrigger: FC<ComponentProps<typeof Trigger>> = ({
 }) => (
 	<Trigger
 		ref={ref}
-		className="font-rosart text-[16px] text-black-70 hover:text-black-300/70 data-[state=active]:text-black-300 py-[6px] px-[2px]"
+		className="font-sans text-[16px] text-black-70 hover:text-black-300/70 data-[state=active]:text-black-300 py-[6px] px-[2px]"
 		{...props}
 	/>
 );
