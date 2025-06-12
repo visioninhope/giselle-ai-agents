@@ -115,13 +115,13 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 			onSubmit={setupGitHubTool}
 		>
 			<ToolList.DialogHeader
-				title="Add GitHub tool"
-				description="Choose how you want to provide your GitHub Personal Access Token"
+				title="Conenct to GitHub"
+				description="How would you like to add your Personal Access Token (PAT)? "
 			/>
 			<Tabs defaultValue="create">
 				<TabsList className="mb-[12px]">
-					<TabsTrigger value="create">Add New Token</TabsTrigger>
-					<TabsTrigger value="select">Use Existing Token</TabsTrigger>
+					<TabsTrigger value="create">Paste New Token</TabsTrigger>
+					<TabsTrigger value="select">Use Saved Token</TabsTrigger>
 				</TabsList>
 				<TabsContent value="create">
 					<input
@@ -132,7 +132,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 					<div className="flex flex-col gap-[12px]">
 						<fieldset className="flex flex-col">
 							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
-								Label
+								Token Name
 							</label>
 							<input
 								type="text"
@@ -144,14 +144,14 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 								)}
 							/>
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								Once registered, this PAT can be referenced from other nodes.
-								Enter a label to identify this PAT when referencing it.
+								Give this token a short name (e.g. “Prod-bot”). You’ll use it
+								when linking other nodes.
 							</p>
 						</fieldset>
 						<fieldset className="flex flex-col">
 							<div className="flex justify-between mb-[2px]">
 								<label htmlFor="pat" className="text-text text-[13px]">
-									PAT
+									Personal Access Token (PAT)
 								</label>
 								<a
 									href="https://github.com/settings/personal-access-tokens"
@@ -174,13 +174,16 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 								)}
 							/>
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								The entered PAT will be encrypted and stored using authenticated
-								encryption.
+								We’ll encrypt the token with authenticated encryption before
+								saving it.
 							</p>
 						</fieldset>
 					</div>
 				</TabsContent>
 				<TabsContent value="select">
+					<p className="text-[11px] text-text-muted my-[4px]">
+						Pick one of your encrypted tokens to connect.
+					</p>
 					<input
 						type="hidden"
 						name="secretType"
@@ -188,11 +191,11 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 					/>
 					<fieldset className="flex flex-col">
 						<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
-							Select from your saved secrets
+							Select a saved token
 						</label>
 						<div>
 							<DropdownMenu
-								placeholder="Choose a saved token"
+								placeholder="Choose a token… "
 								items={[
 									{ id: "token1", label: "Token 1" },
 									{ id: "token2", label: "Token 2" },
@@ -286,7 +289,7 @@ const ToolList = {
 							)
 						}
 					>
-						{enable ? "Configure" : "Add"}
+						{enable ? "Configure" : "Connect"}
 					</Button>
 				</DialogTrigger>
 				<DialogContent>
@@ -297,7 +300,7 @@ const ToolList = {
 								type="submit"
 								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
 							>
-								Add tool
+								Save & Connect
 							</button>
 						</DialogFooter>
 					</form>
