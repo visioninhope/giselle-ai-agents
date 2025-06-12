@@ -295,7 +295,12 @@ async function queryVectorStore(
 									chunkContent: result.chunk.content,
 									chunkIndex: result.chunk.index,
 									score: result.similarity,
-									metadata: result.metadata,
+									metadata: Object.fromEntries(
+										Object.entries(result.metadata ?? {}).map(([k, v]) => [
+											k,
+											String(v),
+										]),
+									),
 								})),
 							};
 						}
@@ -323,7 +328,12 @@ async function queryVectorStore(
 									chunkContent: record.chunk.content,
 									chunkIndex: record.chunk.index,
 									score: record.score,
-									metadata: record.metadata,
+									metadata: Object.fromEntries(
+										Object.entries(record.metadata ?? {}).map(([k, v]) => [
+											k,
+											String(v),
+										]),
+									),
 								})),
 							};
 						}
