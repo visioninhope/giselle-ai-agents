@@ -20,7 +20,7 @@ import {
 import type { TeamRole } from "@/drizzle";
 import { useToast } from "@/packages/contexts/toast";
 import { Copy, Ellipsis, RefreshCw, Trash2 } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { resendInvitationAction, revokeInvitationAction } from "./actions";
 import { LocalDateTime } from "./components/local-date-time";
 
@@ -41,6 +41,7 @@ export function InvitationListItem({
 	const [error, setError] = useState("");
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const resendFormRef = useRef<HTMLFormElement>(null);
 
 	// server actions
 	const [revokeState, revoke, revokePending] = useActionState(
@@ -165,30 +166,37 @@ export function InvitationListItem({
 							>
 								<Copy className="h-4 w-4 mr-2" /> Copy invite link
 							</DropdownMenuItem>
-							<form action={resend} className="contents">
+							<form
+								action={resend}
+								ref={resendFormRef}
+								className="contents"
+							>
 								<input type="hidden" name="token" value={token} />
-								<button
-									type="submit"
-									disabled={resendPending}
-									className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
-									title="Resend invitation"
-								>
-									{resendPending ? (
-										<>
-											<RefreshCw className="h-4 w-4 animate-spin mr-2" />{" "}
-											Processing...
-										</>
-									) : (
-										<>
-											<RefreshCw className="h-4 w-4 mr-2" /> Resend invitation
-										</>
-									)}
-								</button>
 							</form>
+							<DropdownMenuItem
+								onSelect={(e) => {
+									e.preventDefault();
+									resendFormRef.current?.requestSubmit();
+								}}
+								disabled={resendPending}
+								className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
+								title="Resend invitation"
+							>
+								{resendPending ? (
+									<>
+										<RefreshCw className="h-4 w-4 animate-spin mr-2" />{" "}
+										Processing...
+									</>
+								) : (
+									<>
+										<RefreshCw className="h-4 w-4 mr-2" /> Resend invitation
+									</>
+								)}
+							</DropdownMenuItem>
 							<AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
 								<AlertDialogTrigger asChild>
-									<button
-										type="button"
+									<DropdownMenuItem
+										onSelect={(e) => e.preventDefault()}
 										disabled={revokePending}
 										className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
 										title="Revoke invitation"
@@ -203,7 +211,7 @@ export function InvitationListItem({
 												<Trash2 className="h-4 w-4 mr-2" /> Revoke invitation
 											</>
 										)}
-									</button>
+									</DropdownMenuItem>
 								</AlertDialogTrigger>
 								<AlertDialogContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850">
 									<AlertDialogHeader>
