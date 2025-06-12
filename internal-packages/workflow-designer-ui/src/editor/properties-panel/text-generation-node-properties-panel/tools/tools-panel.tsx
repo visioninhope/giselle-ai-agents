@@ -76,7 +76,7 @@ function ToolsSection({
 									className={clsx(
 										"fixed left-[50%] top-[15%] translate-x-[-50%] w-[400px] z-20 overflow-hidden outline-none",
 										"rounded-[10px] bg-panel-background",
-										"border border-border-variant shadow-lg text-text",
+										"border border-border-variant shadow-2xl/50 text-text",
 									)}
 								>
 									<div className="h-[12px]" />
