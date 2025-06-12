@@ -1,7 +1,13 @@
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { ChevronDownIcon, MoveUpRightIcon, PlusIcon } from "lucide-react";
+import {
+	CheckIcon,
+	ChevronDownIcon,
+	MoveUpRightIcon,
+	PlusIcon,
+	Settings2Icon,
+} from "lucide-react";
 import { DropdownMenu, Tabs } from "radix-ui";
 import {
 	type ComponentProps,
@@ -106,7 +112,11 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 		[node, updateNodeDataContent, client, data.id],
 	);
 	return (
-		<ToolList.Dialog open={presentDialog} onOpenChange={setPresentDialog}>
+		<ToolList.Dialog
+			open={presentDialog}
+			onOpenChange={setPresentDialog}
+			enable={!!node.content.tools?.github}
+		>
 			<ToolList.DialogHeader
 				title="Add GitHub tool"
 				description="Choose how you want to provide your GitHub Personal Access Token"
@@ -286,7 +296,10 @@ export function ToolsPanel({
 				configurationPanel={<GitHubToolSetting node={node} />}
 			>
 				<div className="flex gap-[10px] items-center">
-					<h3 className="text-[14px]">GitHub</h3>
+					<h3 className="text-text text-[14px]">GitHub</h3>
+					{node.content.tools?.github && (
+						<CheckIcon className="size-[14px] text-success" />
+					)}
 				</div>
 			</ToolList.Item>
 		</div>
@@ -298,7 +311,9 @@ interface ToolListItemProps {
 	configurationPanel: ReactNode;
 }
 interface ToolListDialogProps
-	extends Omit<ComponentProps<typeof Dialog>, "children"> {}
+	extends Omit<ComponentProps<typeof Dialog>, "children"> {
+	enable: boolean;
+}
 interface ToolListDialogHeaderProps {
 	title: string;
 	description: string;
@@ -330,15 +345,22 @@ const ToolList = {
 		onOpenChange,
 		defaultOpen,
 		children,
+		enable,
 	}: PropsWithChildren<ToolListDialogProps>) {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
 				<DialogTrigger asChild>
 					<Button
 						type="button"
-						leftIcon={<PlusIcon data-dialog-trigger-icon />}
+						leftIcon={
+							enable ? (
+								<Settings2Icon data-dialog-trigger-icon />
+							) : (
+								<PlusIcon data-dialog-trigger-icon />
+							)
+						}
 					>
-						Add
+						{enable ? "Configure" : "Add"}
 					</Button>
 				</DialogTrigger>
 				<DialogContent>{children}</DialogContent>
