@@ -24,6 +24,7 @@ import {
 	Dialog,
 	DialogContent,
 	DialogDescription,
+	DialogFooter,
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
@@ -51,7 +52,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 	const { updateNodeDataContent, data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
-	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
+	const setupGitHubTool = useCallback<React.FormEventHandler<HTMLFormElement>>(
 		(e) => {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
@@ -111,87 +112,73 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 			open={presentDialog}
 			onOpenChange={setPresentDialog}
 			enable={!!node.content.tools?.github}
+			onSubmit={setupGitHubTool}
 		>
 			<ToolList.DialogHeader
 				title="Add GitHub tool"
 				description="Choose how you want to provide your GitHub Personal Access Token"
 			/>
 			<Tabs defaultValue="create">
-				<TabsList className="mx-[12px] mb-[12px]">
+				<TabsList className="mb-[12px]">
 					<TabsTrigger value="create">Add New Token</TabsTrigger>
 					<TabsTrigger value="select">Use Existing Token</TabsTrigger>
 				</TabsList>
 				<TabsContent value="create">
-					<form onSubmit={setupGitHubTool}>
-						<input
-							type="hidden"
-							name="secretType"
-							value={GitHubToolSetupSecretType.create}
-						/>
-						<div className="flex flex-col gap-[12px] px-[12px]">
-							<fieldset className="flex flex-col">
-								<label
-									htmlFor="label"
-									className="text-text text-[13px] mb-[2px]"
-								>
-									Label
+					<input
+						type="hidden"
+						name="secretType"
+						value={GitHubToolSetupSecretType.create}
+					/>
+					<div className="flex flex-col gap-[12px]">
+						<fieldset className="flex flex-col">
+							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
+								Label
+							</label>
+							<input
+								type="text"
+								id="label"
+								name="label"
+								className={clsx(
+									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+									"focus:border-border-focused",
+								)}
+							/>
+							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+								Once registered, this PAT can be referenced from other nodes.
+								Enter a label to identify this PAT when referencing it.
+							</p>
+						</fieldset>
+						<fieldset className="flex flex-col">
+							<div className="flex justify-between mb-[2px]">
+								<label htmlFor="pat" className="text-text text-[13px]">
+									PAT
 								</label>
-								<input
-									type="text"
-									id="label"
-									name="label"
-									className={clsx(
-										"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-										"focus:border-border-focused",
-									)}
-								/>
-								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-									Once registered, this PAT can be referenced from other nodes.
-									Enter a label to identify this PAT when referencing it.
-								</p>
-							</fieldset>
-							<fieldset className="flex flex-col">
-								<div className="flex justify-between mb-[2px]">
-									<label htmlFor="pat" className="text-text text-[13px]">
-										PAT
-									</label>
-									<a
-										href="https://github.com/settings/personal-access-tokens"
-										className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
-										target="_blank"
-										rel="noreferrer"
-										tabIndex={-1}
-									>
-										<span>GitHub</span>
-										<MoveUpRightIcon className="size-[13px]" />
-									</a>
-								</div>
-								<input
-									type="text"
-									id="pat"
-									name="value"
-									className={clsx(
-										"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-										"focus:border-border-focused",
-									)}
-								/>
-								<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-									The entered PAT will be encrypted and stored using
-									authenticated encryption.
-								</p>
-							</fieldset>
-						</div>
-						<div className="h-[12px]" />
-						<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
-							<button
-								type="submit"
-								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
-								disabled={isPending}
-							>
-								{isPending ? "Adding..." : "Add tool"}
-							</button>
-						</div>
-					</form>
+								<a
+									href="https://github.com/settings/personal-access-tokens"
+									className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+									target="_blank"
+									rel="noreferrer"
+									tabIndex={-1}
+								>
+									<span>GitHub</span>
+									<MoveUpRightIcon className="size-[13px]" />
+								</a>
+							</div>
+							<input
+								type="text"
+								id="pat"
+								name="value"
+								className={clsx(
+									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+									"focus:border-border-focused",
+								)}
+							/>
+							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+								The entered PAT will be encrypted and stored using authenticated
+								encryption.
+							</p>
+						</fieldset>
+					</div>
 				</TabsContent>
 				<TabsContent value="select">
 					<input
@@ -199,33 +186,22 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 						name="secretType"
 						value={GitHubToolSetupSecretType.create}
 					/>
-					<div className="px-[12px]">
-						<fieldset className="flex flex-col">
-							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
-								Select from your saved secrets
-							</label>
-							<div>
-								<DropdownMenu
-									placeholder="Choose a saved token"
-									items={[
-										{ id: "token1", label: "Token 1" },
-										{ id: "token2", label: "Token 2" },
-										{ id: "token3", label: "Token 3" },
-									]}
-									renderItem={(item) => item.label}
-								/>
-							</div>
-						</fieldset>
-					</div>
-					<div className="h-[12px]" />
-					<div className="border-t border-border px-[4px] py-[6px] flex justify-end">
-						<button
-							type="submit"
-							className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
-						>
-							Add tool
-						</button>
-					</div>
+					<fieldset className="flex flex-col">
+						<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
+							Select from your saved secrets
+						</label>
+						<div>
+							<DropdownMenu
+								placeholder="Choose a saved token"
+								items={[
+									{ id: "token1", label: "Token 1" },
+									{ id: "token2", label: "Token 2" },
+									{ id: "token3", label: "Token 3" },
+								]}
+								renderItem={(item) => item.label}
+							/>
+						</div>
+					</fieldset>
 				</TabsContent>
 			</Tabs>
 		</ToolList.Dialog>
@@ -261,6 +237,7 @@ interface ToolListItemProps {
 interface ToolListDialogProps
 	extends Omit<ComponentProps<typeof Dialog>, "children"> {
 	enable: boolean;
+	onSubmit: React.FormEventHandler<HTMLFormElement>;
 }
 interface ToolListDialogHeaderProps {
 	title: string;
@@ -294,6 +271,7 @@ const ToolList = {
 		defaultOpen,
 		children,
 		enable,
+		onSubmit,
 	}: PropsWithChildren<ToolListDialogProps>) {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
@@ -311,7 +289,19 @@ const ToolList = {
 						{enable ? "Configure" : "Add"}
 					</Button>
 				</DialogTrigger>
-				<DialogContent>{children}</DialogContent>
+				<DialogContent>
+					<form onSubmit={onSubmit}>
+						{children}
+						<DialogFooter>
+							<button
+								type="submit"
+								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+							>
+								Add tool
+							</button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
 			</Dialog>
 		);
 	},
