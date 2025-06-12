@@ -21,6 +21,7 @@ export function DropdownMenu<T extends Identifiable>({
 			<DropdownMenuPrimitive.Trigger asChild>
 				<Button
 					type="button"
+					variant="filled"
 					rightIcon={<ChevronDownIcon className="size-[13px]" />}
 				>
 					{placeholder}

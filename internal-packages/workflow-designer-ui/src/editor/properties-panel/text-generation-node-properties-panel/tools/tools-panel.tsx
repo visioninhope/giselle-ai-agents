@@ -229,15 +229,17 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 								>
 									Select from your saved secrets
 								</label>
-								<DropdownMenu
-									placeholder="Choose a saved token"
-									items={[
-										{ id: "token1", label: "Token 1" },
-										{ id: "token2", label: "Token 2" },
-										{ id: "token3", label: "Token 3" },
-									]}
-									renderItem={(item) => item.label}
-								/>
+								<div>
+									<DropdownMenu
+										placeholder="Choose a saved token"
+										items={[
+											{ id: "token1", label: "Token 1" },
+											{ id: "token2", label: "Token 2" },
+											{ id: "token3", label: "Token 3" },
+										]}
+										renderItem={(item) => item.label}
+									/>
+								</div>
 							</fieldset>
 						</div>
 						<div className="h-[12px]" />
