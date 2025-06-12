@@ -1,4 +1,5 @@
 import type { z } from "zod/v4";
+import { LineChunker } from "../chunker";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
 import { OpenAIEmbedder } from "../embedder";
 
@@ -10,6 +11,15 @@ const FACTORY_DEFAULTS = {
 	 * Default OpenAI embedding model
 	 */
 	OPENAI_MODEL: "text-embedding-3-small",
+
+	/**
+	 * Default line chunker configuration
+	 */
+	CHUNKER: {
+		MAX_LINES: 150,
+		OVERLAP: 30,
+		MAX_CHARS: 10000,
+	},
 } as const;
 
 /**
@@ -153,5 +163,16 @@ export function createDefaultEmbedder() {
 	return new OpenAIEmbedder({
 		apiKey,
 		model: FACTORY_DEFAULTS.OPENAI_MODEL,
+	});
+}
+
+/**
+ * create default chunker
+ */
+export function createDefaultChunker() {
+	return new LineChunker({
+		maxLines: FACTORY_DEFAULTS.CHUNKER.MAX_LINES,
+		overlap: FACTORY_DEFAULTS.CHUNKER.OVERLAP,
+		maxChars: FACTORY_DEFAULTS.CHUNKER.MAX_CHARS,
 	});
 }
