@@ -28,9 +28,6 @@ export interface ReadOnlyStorage {
 
 export interface GenerationCompleteOption {
 	telemetry?: TelemetrySettings;
-	providerOptions?: {
-		anthropic?: AnthropicProviderOptions;
-	};
 	storage?: ReadOnlyStorage;
 }
 
