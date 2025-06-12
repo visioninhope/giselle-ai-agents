@@ -1,4 +1,3 @@
-import { Card } from "../components/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
@@ -7,6 +6,7 @@ import type { CurrentTeam } from "@/services/teams/types";
 import { ExternalLink } from "lucide-react";
 import { Suspense } from "react";
 import { Button } from "../components/button";
+import { Card } from "../components/card";
 import { getSubscription } from "./actions";
 import { LocalDateTime } from "./components/local-date-time";
 import { DeleteTeam } from "./delete-team";
@@ -18,7 +18,9 @@ export default function TeamPage() {
 			<div className="flex justify-between items-center">
 				<h1
 					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{ textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6" }}
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Team Settings
 				</h1>

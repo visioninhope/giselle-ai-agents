@@ -1,10 +1,10 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
 import { useActionState, useState } from "react";
 import { Alert, AlertDescription } from "../components/alert";
 import { Button } from "../components/button";
 import { deleteTeam } from "./actions";
-import * as Dialog from "@radix-ui/react-dialog";
 
 export function DeleteTeam() {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -24,9 +24,9 @@ export function DeleteTeam() {
 						Delete Team
 					</h2>
 					<p className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
-						Permanently remove your Team Account and all of its contents from the
-						Giselle platform. This action is not reversible, so please continue
-						with caution.
+						Permanently remove your Team Account and all of its contents from
+						the Giselle platform. This action is not reversible, so please
+						continue with caution.
 					</p>
 				</div>
 				<Dialog.Trigger asChild>
@@ -61,8 +61,8 @@ export function DeleteTeam() {
 								</Dialog.Title>
 							</div>
 							<p className="text-error-900 font-medium text-[14px] leading-[24px] text-left">
-								This action cannot be undone. This will permanently delete the team
-								and remove all members.
+								This action cannot be undone. This will permanently delete the
+								team and remove all members.
 							</p>
 							{state.error !== "" && (
 								<Alert
@@ -83,11 +83,7 @@ export function DeleteTeam() {
 								>
 									Cancel
 								</Button>
-								<Button
-									type="submit"
-									variant="destructive"
-									disabled={pending}
-								>
+								<Button type="submit" variant="destructive" disabled={pending}>
 									{pending ? "Deleting..." : "Delete Team"}
 								</Button>
 							</form>

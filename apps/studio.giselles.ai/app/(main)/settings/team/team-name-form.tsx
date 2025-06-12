@@ -83,7 +83,8 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 							<Button
 								className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
 								style={{
-									background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+									background:
+										"linear-gradient(180deg, #202530 0%, #12151f 100%)",
 									border: "1px solid rgba(0,0,0,0.7)",
 									boxShadow:
 										"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
@@ -152,10 +153,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 												>
 													Cancel
 												</Button>
-												<Button
-													type="submit"
-													disabled={isLoading || !!error}
-												>
+												<Button type="submit" disabled={isLoading || !!error}>
 													{isLoading ? "Saving..." : "Save"}
 												</Button>
 											</div>

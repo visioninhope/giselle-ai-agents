@@ -132,7 +132,9 @@ export function TeamMemberListItem({
 						<div className="text-white-900 text-[14px] leading-[20.4px]">
 							{displayName || "No display name"}
 						</div>
-						<div className="text-white-400 text-[12px] leading-[16px]">{email || "No email"}</div>
+						<div className="text-white-400 text-[12px] leading-[16px]">
+							{email || "No email"}
+						</div>
 					</div>
 				</div>
 				<div className="flex justify-between gap-2">

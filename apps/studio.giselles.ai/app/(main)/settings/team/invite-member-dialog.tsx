@@ -10,14 +10,14 @@ import type { TeamRole } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
 import {
+	Check,
 	ChevronDown,
-	X,
 	Copy,
 	Ellipsis,
+	Plus,
 	RefreshCw,
 	Trash2,
-	Plus,
-	Check,
+	X,
 } from "lucide-react";
 import { useEffect, useState } from "react";
 import { email as emailValidator, parse, pipe, string } from "valibot";
@@ -183,7 +183,9 @@ export function InviteMemberDialog({
 						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 							<Plus className="size-3 text-black-900" />
 						</span>
-						<span className="text-[14px] leading-[20px] font-medium">Invite Member</span>
+						<span className="text-[14px] leading-[20px] font-medium">
+							Invite Member
+						</span>
 					</span>
 
 					{/* Hover overlay */}
@@ -228,7 +230,11 @@ export function InviteMemberDialog({
 								seat ($20 per seat) on your Pro Plan subscription.
 							</Dialog.Description>
 
-							<form onSubmit={handleSubmit} className="space-y-4 mt-4" noValidate>
+							<form
+								onSubmit={handleSubmit}
+								className="space-y-4 mt-4"
+								noValidate
+							>
 								<div className="flex items-start gap-3 bg-black/80 p-1 rounded-lg">
 									<div className="flex-grow flex flex-wrap items-center gap-1 min-h-[40px]">
 										{emailList.map((email) => (
