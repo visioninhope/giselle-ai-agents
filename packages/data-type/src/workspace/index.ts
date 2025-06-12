@@ -32,7 +32,7 @@ export const Workspace = z.object({
 export type Workspace = z.infer<typeof Workspace>;
 
 export function generateInitialWorkspace() {
-	return {
+	const data = {
 		id: WorkspaceId.generate(),
 		schemaVersion: "20250221",
 		nodes: [],
@@ -46,4 +46,5 @@ export function generateInitialWorkspace() {
 			},
 		},
 	} satisfies z.input<typeof Workspace>;
+	return Workspace.parse(data);
 }

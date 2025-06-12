@@ -164,6 +164,7 @@ export function WorkflowDesigner({
 			name,
 			ui,
 			schemaVersion: "20250221",
+			secrets: defaultValue.secrets,
 		} satisfies Workspace;
 	}
 	function updateNodeData<T extends NodeBase>(node: T, data: Partial<T>) {
