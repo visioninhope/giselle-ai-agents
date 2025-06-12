@@ -33,7 +33,7 @@ export interface GiselleEngineContext {
 		github?: GitHubVectorStoreQueryFunction;
 	};
 	vectorStoreQueryServices?: {
-		github?: GitHubVectorStoreQueryService;
+		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete: (
@@ -102,7 +102,7 @@ export interface GitHubQueryContext {
 }
 
 export type GitHubVectorStoreQueryService<
-	M extends Record<string, unknown> = GithubEmbeddingMetadata,
+	M extends Record<string, unknown> = Record<string, never>,
 > = QueryService<GitHubQueryContext, M>;
 
 export interface GiselleEngineConfig {
@@ -122,7 +122,7 @@ export interface GiselleEngineConfig {
 		github?: GitHubVectorStoreQueryFunction;
 	};
 	vectorStoreQueryServices?: {
-		github?: GitHubVectorStoreQueryService;
+		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
 	callbacks?: {
 		generationComplete: (
