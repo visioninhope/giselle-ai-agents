@@ -76,7 +76,7 @@ export default async function Layout({
 				runV3,
 				sidemenu,
 				githubTools,
-				webSearchAction,
+				webSearchAction: true,
 			}}
 		>
 			{children}
