@@ -189,13 +189,13 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
-								className="flex-1 flex flex-col overflow-hidden"
+								className="flex-1 flex flex-col overflow-hidden outline-none"
 							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="model"
-								className="flex-1 flex flex-col overflow-y-auto px-[4px]"
+								className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
 							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
@@ -442,13 +442,13 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="input"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-y-auto outline-none"
 							>
 								<InputPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="tools"
-								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px]"
+								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px] outline-none"
 							>
 								{sidemenu ? (
 									<ToolsPanel node={node} />
