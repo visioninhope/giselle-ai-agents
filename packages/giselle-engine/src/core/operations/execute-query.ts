@@ -251,7 +251,10 @@ async function queryVectorStore(
 	}
 
 	const { vectorStoreQueryFunctions, vectorStoreQueryServices } = context;
-	if (vectorStoreQueryFunctions === undefined && vectorStoreQueryServices === undefined) {
+	if (
+		vectorStoreQueryFunctions === undefined &&
+		vectorStoreQueryServices === undefined
+	) {
 		throw new Error("No vector store query function or service provided");
 	}
 
@@ -271,7 +274,7 @@ async function queryVectorStore(
 				switch (provider) {
 					case "github": {
 						const { owner, repo } = state;
-						
+
 						// Try rag2 service first (preferred)
 						if (vectorStoreQueryServices?.github) {
 							console.log("Using rag2 QueryService for GitHub vector store");
@@ -296,10 +299,12 @@ async function queryVectorStore(
 								})),
 							};
 						}
-						
+
 						// Fallback to legacy rag function
 						if (vectorStoreQueryFunctions?.github) {
-							console.log("Using legacy rag QueryFunction for GitHub vector store");
+							console.log(
+								"Using legacy rag QueryFunction for GitHub vector store",
+							);
 							const res = await queryRag({
 								question: query,
 								limit: LIMIT,
@@ -322,8 +327,10 @@ async function queryVectorStore(
 								})),
 							};
 						}
-						
-						throw new Error("No github vector store query function or service provided");
+
+						throw new Error(
+							"No github vector store query function or service provided",
+						);
 					}
 					default: {
 						const _exhaustiveCheck: never = provider;
