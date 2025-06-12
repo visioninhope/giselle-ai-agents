@@ -29,12 +29,6 @@ import {
 } from "./ui/dialog";
 import { DropdownMenu } from "./ui/dropdown-menu";
 
-type UIToolName = "GitHub" | "PostgreSQL";
-interface UITool {
-	name: UIToolName;
-	commands: string[];
-}
-
 const GitHubToolSetupSecretType = {
 	create: "create",
 	select: "select",
