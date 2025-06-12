@@ -10,7 +10,6 @@ import {
 import { getImageGenerationModelProvider } from "@giselle-sdk/language-model";
 import { DatabaseZapIcon } from "lucide-react";
 import type { SVGProps } from "react";
-import { SearchIcon } from "..";
 import { AnthropicIcon } from "../anthropic";
 import { Flux1Icon } from "../flux1";
 import { GitHubIcon } from "../github";
@@ -129,13 +128,8 @@ export function NodeIcon({
 					switch (node.content.command.provider) {
 						case "github":
 							return <GitHubIcon {...props} data-content-type-icon />;
-						case "web-search":
-							return <SearchIcon {...props} data-content-type-icon />;
 						default: {
-							const _exhaustiveCheck: never = node.content.command;
-							throw new Error(
-								`Unhandled TriggerProviderType: ${_exhaustiveCheck}`,
-							);
+							throw new Error(`Unhandled TriggerProviderType: ${node.content}`);
 						}
 					}
 				}
