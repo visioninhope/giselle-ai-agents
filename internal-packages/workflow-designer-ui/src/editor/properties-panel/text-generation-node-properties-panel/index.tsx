@@ -460,18 +460,42 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 						</Tabs.Root>
+						<div className="h-[16px]" />
 					</PropertiesPanelContent>
 				</Panel>
-				<PanelResizeHandle
-					className={clsx(
-						"h-[12px] flex items-center justify-center cursor-row-resize",
-						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
-						"hover:after:bg-[#4a90e2]",
-					)}
-				/>
+				{sidemenu ? (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[1px] bg-border cursor-col-resize",
+							"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+						)}
+					/>
+				) : (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[12px] flex items-center justify-center cursor-row-resize",
+							"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+							"hover:after:bg-[#4a90e2]",
+						)}
+					/>
+				)}
 				<Panel>
 					<PropertiesPanelContent>
-						<GenerationPanel node={node} onClickGenerateButton={generateText} />
+						{sidemenu ? (
+							<>
+								<div className="h-[16px]" />
+								<GenerationPanel
+									node={node}
+									onClickGenerateButton={generateText}
+								/>
+								<div className="h-[16px]" />
+							</>
+						) : (
+							<GenerationPanel
+								node={node}
+								onClickGenerateButton={generateText}
+							/>
+						)}
 					</PropertiesPanelContent>
 				</Panel>
 			</PanelGroup>
