@@ -7,9 +7,11 @@ import {
 	MoveUpRightIcon,
 	PlusIcon,
 } from "lucide-react";
-import { Dialog, DropdownMenu, Tabs } from "radix-ui";
+import { DropdownMenu, Tabs } from "radix-ui";
 import {
 	type FormEventHandler,
+	type PropsWithChildren,
+	type ReactNode,
 	type SVGProps,
 	useCallback,
 	useMemo,
@@ -18,6 +20,13 @@ import {
 } from "react";
 import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogTitle,
+	DialogTrigger,
+} from "./ui/dialog";
 
 type UIToolName = "GitHub" | "PostgreSQL";
 interface UITool {
@@ -31,9 +40,9 @@ function ToolIcon({
 }: { name: UIToolName } & SVGProps<SVGSVGElement>) {
 	switch (name) {
 		case "GitHub":
-			return <GitHubIcon {...props} />;
+			return <GitHubIcon {...props} data-tool-icon />;
 		case "PostgreSQL":
-			return <DatabaseIcon {...props} />;
+			return <DatabaseIcon {...props} data-tool-icon />;
 		default: {
 			const _exhaustiveCheck: never = name;
 			throw new Error(`Unhandled tool name: ${_exhaustiveCheck}`);
@@ -406,37 +415,19 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 		[node, updateNodeDataContent, client, data.id],
 	);
 	return (
-		<div className="border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]">
-			<div className="flex gap-[10px] items-center">
-				<ToolIcon name="GitHub" className="size-[20px] text-text-muted" />
-				<h3 className="text-[14px]">GitHub</h3>
-			</div>
-
-			<Dialog.Root open={presentDialog} onOpenChange={setPresentDialog}>
-				<Dialog.Trigger asChild>
-					<button
-						type="button"
-						className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] py-[2px] rounded-[2px] cursor-pointer outline-none"
-					>
-						<PlusIcon className="size-[14px]" />
-						<span>Add</span>
-					</button>
-				</Dialog.Trigger>
-				<Dialog.Portal>
-					<Dialog.Content
-						className={clsx(
-							"fixed left-[50%] top-[15%] translate-x-[-50%] w-[400px] z-20 overflow-hidden outline-none",
-							"rounded-[10px] bg-panel-background",
-							"border border-border-variant shadow-2xl/50 text-text",
-						)}
-					>
+		<ToolList.ToolListItem
+			icon={<ToolIcon name="GitHub" />}
+			configurationPanel={
+				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
+					<DialogTrigger icon={<PlusIcon data-dialog-trigger-icon />}>
+						Add
+					</DialogTrigger>
+					<DialogContent>
 						<div className="h-[12px]" />
-						<Dialog.Title className="px-[12px] text-[14px]">
-							Add GitHub tool
-						</Dialog.Title>
-						<Dialog.Description className="px-[12px] text-[13px] text-text-muted">
+						<DialogTitle>Add GitHub tool</DialogTitle>
+						<DialogDescription>
 							Choose how you want to provide your GitHub Personal Access Token
-						</Dialog.Description>
+						</DialogDescription>
 
 						<div className="h-[12px]" />
 						<Tabs.Root defaultValue="create">
@@ -599,10 +590,14 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 								</form>
 							</Tabs.Content>
 						</Tabs.Root>
-					</Dialog.Content>
-				</Dialog.Portal>
-			</Dialog.Root>
-		</div>
+					</DialogContent>
+				</Dialog>
+			}
+		>
+			<div className="flex gap-[10px] items-center">
+				<h3 className="text-[14px]">GitHub</h3>
+			</div>
+		</ToolList.ToolListItem>
 	);
 }
 
@@ -644,13 +639,48 @@ export function ToolsPanel({
 
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolsSection title="Enabled Tools" tools={enableTools} node={node} />
+			{/* <ToolsSection title="Enabled Tools" tools={enableTools} node={node} />
 			<ToolsSection
 				title="Available Tools"
 				tools={availableTools}
 				node={node}
-			/>
+			/> */}
 			<GitHubToolSetting node={node} />
 		</div>
 	);
 }
+
+interface ToolListItemProps {
+	icon: ReactNode;
+	configurationPanel: ReactNode;
+}
+const ToolList = {
+	ToolListItem({
+		children,
+		icon,
+		configurationPanel,
+	}: PropsWithChildren<ToolListItemProps>) {
+		return (
+			<div
+				className={clsx(
+					"border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]",
+					"**:data-tool-icon:size-[20px] **:data-tool-icon:text-text-muted",
+				)}
+			>
+				<div className="flex gap-[10px] items-center">
+					{icon}
+					{children}
+				</div>
+				{configurationPanel}
+			</div>
+		);
+	},
+	ListItem({ icon, name }: { icon: ReactNode; name: string }) {
+		return (
+			<div className="flex gap-[10px] items-center">
+				{icon}
+				<h3 className="text-[14px]">{name}</h3>
+			</div>
+		);
+	},
+};
