@@ -274,6 +274,25 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 	);
 }
 
+export function ToolsPanel({
+	node,
+}: {
+	node: TextGenerationNode;
+}) {
+	return (
+		<div className="text-white-400 space-y-[16px]">
+			<ToolList.Item
+				icon={<GitHubIcon data-tool-icon />}
+				configurationPanel={<GitHubToolSetting node={node} />}
+			>
+				<div className="flex gap-[10px] items-center">
+					<h3 className="text-[14px]">GitHub</h3>
+				</div>
+			</ToolList.Item>
+		</div>
+	);
+}
+
 interface ToolListItemProps {
 	icon: ReactNode;
 	configurationPanel: ReactNode;
