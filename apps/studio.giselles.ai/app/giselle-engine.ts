@@ -10,6 +10,7 @@ import { emitTelemetry } from "@giselle-sdk/telemetry";
 import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import { createStorage } from "unstorage";
 import { queryGithubVectorStore } from "./services/vector-store/";
+import { gitHubQueryService } from "../lib/vector-stores/github-blob-stores";
 
 export const publicStorage = createStorage({
 	driver: supabaseStorageDriver({
@@ -86,6 +87,9 @@ export const giselleEngine = NextGiselleEngine({
 	vault,
 	vectorStoreQueryFunctions: {
 		github: queryGithubVectorStore,
+	},
+	vectorStoreQueryServices: {
+		github: gitHubQueryService,
 	},
 	callbacks: {
 		generationComplete: async (generation, options) => {
