@@ -22,14 +22,16 @@ import type {
 	ToolSet,
 } from "./types";
 
+export interface ReadOnlyStorage {
+	getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
+}
+
 export interface GenerationCompleteOption {
 	telemetry?: TelemetrySettings;
 	providerOptions?: {
 		anthropic?: AnthropicProviderOptions;
 	};
-	storage?: {
-		getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
-	};
+	storage?: ReadOnlyStorage;
 }
 
 interface LangfuseParams {
@@ -330,9 +332,7 @@ async function createLangfuseParams(
  */
 async function createImageMediaObjects(
 	generation: CompletedGeneration,
-	storage?: {
-		getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
-	},
+	storage?: ReadOnlyStorage,
 ): Promise<{ [key: string]: LangfuseMedia } | undefined> {
 	if (!storage) {
 		return undefined;
