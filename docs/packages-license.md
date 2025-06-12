@@ -14387,7 +14387,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="zod"></a>
-### zod v3.24.1
+### zod v3.25.28
 #### 
 
 ##### Paths
