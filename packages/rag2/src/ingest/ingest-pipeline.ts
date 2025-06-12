@@ -112,7 +112,7 @@ export class IngestPipeline<
 		try {
 			// Collect documents into batches for more efficient processing
 			const documentBatch: Array<Document<TSourceMetadata>> = [];
-			
+
 			// process documents in batches
 			for await (const document of this.documentLoader.load(
 				params as DocumentLoaderParams,
@@ -155,7 +155,7 @@ export class IngestPipeline<
 		// while grouping documents for better overall efficiency
 		for (const document of documents) {
 			progress.currentDocument = this.getDocumentKey(document);
-			
+
 			try {
 				await this.processDocument(document);
 				result.successfulDocuments++;

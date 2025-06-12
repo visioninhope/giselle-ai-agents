@@ -13,7 +13,7 @@ describe("IngestPipeline", () => {
 
 	beforeEach(() => {
 		mockDocumentLoader = {
-			async *load() {
+			*load() {
 				yield { content: "doc1", metadata: { path: "file1.txt" } };
 				yield { content: "doc2", metadata: { path: "file2.txt" } };
 			},
