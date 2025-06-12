@@ -1,15 +1,23 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	ChevronDownIcon,
 	ChevronLeftIcon,
-	ChevronRightIcon,
 	DatabaseIcon,
 	MoveUpRightIcon,
 	PlusIcon,
 } from "lucide-react";
 import { Dialog, DropdownMenu, Tabs } from "radix-ui";
-import { type SVGProps, useMemo, useState } from "react";
+import {
+	type FormEventHandler,
+	type SVGProps,
+	useCallback,
+	useMemo,
+	useState,
+	useTransition,
+} from "react";
+import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
 import { PostgresToolsPanel } from "./postgres-tools";
 
@@ -35,17 +43,94 @@ function ToolIcon({
 	}
 }
 
+const GitHubToolSetupSecretType = {
+	create: "create",
+	select: "select",
+} as const;
+const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.create),
+		label: z.string().min(1),
+		value: z.string().min(1),
+	}),
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.select),
+		secretId: SecretId.schema,
+	}),
+]);
+
 function ToolsSection({
 	title,
 	tools,
+	node,
 }: {
 	title: string;
 	tools: UITool[];
+	node: TextGenerationNode;
 }) {
+	const [presentDialog, setPresentDialog] = useState(false);
+	const { updateNodeDataContent, data } = useWorkflowDesigner();
+	const client = useGiselleEngine();
+	const [isPending, startTransition] = useTransition();
+	const setupGitHubTool = useCallback<FormEventHandler<HTMLFormElement>>(
+		(e) => {
+			e.preventDefault();
+			const formData = new FormData(e.currentTarget);
+			const secretType = formData.get("secretType");
+			const label = formData.get("label");
+			const value = formData.get("value");
+			const secretId = formData.get("secretId");
+			const parse = GitHubToolSetupPayload.safeParse({
+				secretType,
+				label,
+				value,
+				secretId,
+			});
+			if (!parse.success) {
+				/** @todo Implement error handling */
+				return;
+			}
+			const payload = parse.data;
+			switch (payload.secretType) {
+				case "create":
+					{
+						startTransition(async () => {
+							const result = await client.addSecret({
+								workspaceId: data.id,
+								label: payload.label,
+								value: payload.value,
+							});
+							updateNodeDataContent(node, {
+								...node.content,
+								tools: {
+									...node.content.tools,
+									github: {
+										tools: [],
+										auth: {
+											type: "secret",
+											secretId: result.secretId,
+										},
+									},
+								},
+							});
+							setPresentDialog(false);
+						});
+					}
+					break;
+				case "select":
+					break;
+				default: {
+					const _exhaustiveCheck: never = payload;
+					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
+				}
+			}
+		},
+		[node, updateNodeDataContent, client, data.id],
+	);
 	if (tools.length === 0) return null;
 	return (
 		<div className="space-y-[8px]">
-			<h2 className="text-[15px] font-accent text-text ">{title}</h2>
+			<h2 className="text-[15px] font-accent text-text">{title}</h2>
 			<div className="space-y-[6px]">
 				{tools.map((tool) => (
 					<div
@@ -61,7 +146,7 @@ function ToolsSection({
 							<h3 className="text-[14px]">{tool.name}</h3>
 						</div>
 
-						<Dialog.Root>
+						<Dialog.Root open={presentDialog} onOpenChange={setPresentDialog}>
 							<Dialog.Trigger asChild>
 								<button
 									type="button"
@@ -112,7 +197,12 @@ function ToolsSection({
 										</div>
 										<div className="h-[12px]" />
 										<Tabs.Content value="create" className="outline-none">
-											<form>
+											<form onSubmit={setupGitHubTool}>
+												<input
+													type="hidden"
+													name="secretType"
+													value={GitHubToolSetupSecretType.create}
+												/>
 												<div className="flex flex-col gap-[12px] px-[12px]">
 													<fieldset className="flex flex-col">
 														<label
@@ -157,7 +247,7 @@ function ToolsSection({
 														<input
 															type="text"
 															id="pat"
-															name="pat"
+															name="value"
 															className={clsx(
 																"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
 																"focus:border-border-focused",
@@ -174,14 +264,20 @@ function ToolsSection({
 													<button
 														type="submit"
 														className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+														disabled={isPending}
 													>
-														Add tool
+														{isPending ? "Adding..." : "Add tool"}
 													</button>
 												</div>
 											</form>
 										</Tabs.Content>
 										<Tabs.Content value="select" className="outline-none">
-											<form>
+											<form onSubmit={setupGitHubTool}>
+												<input
+													type="hidden"
+													name="secretType"
+													value={GitHubToolSetupSecretType.create}
+												/>
 												<div className="px-[12px]">
 													<fieldset className="flex flex-col">
 														<label
@@ -514,8 +610,12 @@ export function ToolsPanel({
 
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolsSection title="Enabled Tools" tools={enableTools} />
-			<ToolsSection title="Available Tools" tools={availableTools} />
+			<ToolsSection title="Enabled Tools" tools={enableTools} node={node} />
+			<ToolsSection
+				title="Available Tools"
+				tools={availableTools}
+				node={node}
+			/>
 		</div>
 	);
 }

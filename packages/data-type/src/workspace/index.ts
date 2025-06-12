@@ -1,10 +1,8 @@
-import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { Connection } from "../connection";
 import { NodeId, NodeLike, NodeUIState } from "../node";
-
-export const WorkspaceId = createIdGenerator("wrks");
-export type WorkspaceId = z.infer<typeof WorkspaceId.schema>;
+import { WorkspaceId } from "./id";
+export { WorkspaceId } from "./id";
 
 export const WorkspaceSchemaVersion = z.enum(["20250221"]);
 export const Viewport = z.object({
