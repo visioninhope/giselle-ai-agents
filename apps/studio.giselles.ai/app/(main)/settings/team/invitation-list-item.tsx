@@ -166,11 +166,7 @@ export function InvitationListItem({
 							>
 								<Copy className="h-4 w-4 mr-2" /> Copy invite link
 							</DropdownMenuItem>
-							<form
-								action={resend}
-								ref={resendFormRef}
-								className="contents"
-							>
+							<form action={resend} ref={resendFormRef} className="contents">
 								<input type="hidden" name="token" value={token} />
 							</form>
 							<DropdownMenuItem
