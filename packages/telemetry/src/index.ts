@@ -141,7 +141,7 @@ function extractPromptInput(
 				return JSON.parse(operationNode.content.prompt) as PromptJson;
 			} catch (error) {
 				console.warn("Failed to parse prompt JSON for telemetry:", error);
-				return { content: [] };
+				return { text: operationNode.content.prompt };
 			}
 		}
 		return { content: [] };
