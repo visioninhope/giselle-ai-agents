@@ -5,6 +5,20 @@ import { type Invitation, listInvitations } from "../invitation";
 import { InviteMemberDialog } from "../invite-member-dialog";
 import { TeamMembersList } from "../team-members-list";
 
+// Reusable page title component (h1)
+function PageTitle({ children }: { children: React.ReactNode }) {
+	return (
+		<h1
+			className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+			style={{
+				textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+			}}
+		>
+			{children}
+		</h1>
+	);
+}
+
 // Custom title component with border
 function TitleWithBorder({ title }: { title: string }) {
 	return (
@@ -28,14 +42,7 @@ export default async function TeamMembersPage() {
 	if (!hasMembers || !members) {
 		return (
 			<div className="flex flex-col gap-[24px]">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
-					Members
-				</h1>
+				<PageTitle>Members</PageTitle>
 				<Card title="" className="gap-0">
 					<TitleWithBorder title="Member List" />
 					<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
@@ -49,14 +56,7 @@ export default async function TeamMembersPage() {
 	if (!hasCurrentUserRole || !currentUserRole) {
 		return (
 			<div className="flex flex-col gap-[24px]">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
-					Members
-				</h1>
+				<PageTitle>Members</PageTitle>
 				<Card title="" className="gap-0">
 					<TitleWithBorder title="Member List" />
 					<div className="text-error-900 text-[12px] leading-[20.4px] tracking-normal font-geist">
@@ -70,14 +70,7 @@ export default async function TeamMembersPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center w-full">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
-					Members
-				</h1>
+				<PageTitle>Members</PageTitle>
 				{hasProPlan && currentUserRole === "admin" && (
 					<InviteMemberDialog
 						memberEmails={members

@@ -60,7 +60,7 @@ export default function UserTeams({
 					<input
 						onChange={handleChangeTeamName}
 						type="text"
-						defaultValue={teamName}
+						value={teamName}
 						placeholder="Search for a team..."
 						className="w-full text-white-900 font-medium text-[14px] leading-[23.8px] font-geist placeholder:text-black-400 bg-transparent outline-none"
 					/>

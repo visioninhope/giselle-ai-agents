@@ -2,7 +2,6 @@ import { getGoogleIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
 import { Button } from "../components/button";
 import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
-import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGoogleIdentity,
 	disconnectGoogleIdentity,

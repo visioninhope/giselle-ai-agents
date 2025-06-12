@@ -14,6 +14,7 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TeamRole } from "@/drizzle";
@@ -154,14 +155,16 @@ export function InvitationListItem({
 							align="end"
 							className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
 						>
-							<button
-								type="button"
-								onClick={handleCopy}
-								className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
+							<DropdownMenuItem
+								onSelect={(e) => {
+									e.preventDefault();
+									handleCopy();
+								}}
+								className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md focus:outline-none"
 								title="Copy invite link"
 							>
 								<Copy className="h-4 w-4 mr-2" /> Copy invite link
-							</button>
+							</DropdownMenuItem>
 							<form action={resend} className="contents">
 								<input type="hidden" name="token" value={token} />
 								<button

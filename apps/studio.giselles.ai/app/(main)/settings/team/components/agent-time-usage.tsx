@@ -69,6 +69,7 @@ function AgentTimeUsage(props: AgentTimeUsageProps) {
 
 	return (
 		<>
+			<h2 className="sr-only">Agent Time Usage</h2>
 			<div className="flex justify-between items-baseline">
 				<div />
 				<div className="text-right">
