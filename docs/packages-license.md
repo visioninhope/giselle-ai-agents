@@ -2451,7 +2451,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@playwright/test"></a>
-### @playwright/test v1.52.0
+### @playwright/test v1.53.0
 #### 
 
 ##### Paths
@@ -11101,7 +11101,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="playwright"></a>
-### playwright v1.52.0
+### playwright v1.53.0
 #### 
 
 ##### Paths
@@ -11112,7 +11112,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="playwright-core"></a>
-### playwright-core v1.52.0
+### playwright-core v1.53.0
 #### 
 
 ##### Paths
