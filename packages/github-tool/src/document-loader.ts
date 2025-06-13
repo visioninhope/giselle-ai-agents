@@ -4,7 +4,6 @@ import type {
 	DocumentLoaderParams,
 } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
-import { fetchDefaultBranchHead } from "./blob-loader";
 
 /**
  * GitHub repository loading parameters
@@ -12,7 +11,7 @@ import { fetchDefaultBranchHead } from "./blob-loader";
 export interface GitHubDocumentLoaderParams extends DocumentLoaderParams {
 	owner: string;
 	repo: string;
-	commitSha?: string;
+	commitSha: string;
 }
 
 /**
@@ -53,17 +52,7 @@ export class GitHubDocumentLoader
 		// Type assertion to GitHubDocumentLoaderParams
 		const githubParams = params as GitHubDocumentLoaderParams;
 		const { owner, repo } = githubParams;
-		let commitSha = githubParams.commitSha;
-
-		// If no commit SHA provided, get the default branch HEAD
-		if (!commitSha) {
-			const defaultBranchHead = await fetchDefaultBranchHead(
-				this.octokit,
-				owner,
-				repo,
-			);
-			commitSha = defaultBranchHead.sha;
-		}
+		const commitSha = githubParams.commitSha;
 
 		console.log(`Loading repository ${owner}/${repo} at commit ${commitSha}`);
 
