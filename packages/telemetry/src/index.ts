@@ -21,6 +21,7 @@ import type {
 	TelemetryTag,
 	ToolSet,
 } from "./types";
+import type { Storage } from "unstorage";
 
 export interface ReadOnlyStorage {
 	getItemRaw: (key: string) => Promise<Uint8Array | null | undefined>;
@@ -28,7 +29,7 @@ export interface ReadOnlyStorage {
 
 export interface GenerationCompleteOption {
 	telemetry?: TelemetrySettings;
-	storage?: ReadOnlyStorage;
+	storage?: Storage;
 }
 
 interface LangfuseParams {

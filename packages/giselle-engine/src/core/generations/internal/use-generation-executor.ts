@@ -188,20 +188,10 @@ export async function useGenerationExecutor<T>(args: {
 				onConsumeAgentTime: args.context.onConsumeAgentTime,
 			}),
 			(async () => {
-				// Create a read-only storage wrapper that only exposes getItemRaw
-				// to prevent unintended write or delete operations while maintaining
-				// compatibility with emitTelemetry and createImageMediaObjects
-				const readOnlyStorage = {
-					getItemRaw: args.context.storage.getItemRaw.bind(
-						args.context.storage,
-					),
-				};
-
 				const result = await args.context.callbacks?.generationComplete?.(
 					completedGeneration,
 					{
 						telemetry: args.telemetry,
-						storage: readOnlyStorage,
 					},
 				);
 				return result;
