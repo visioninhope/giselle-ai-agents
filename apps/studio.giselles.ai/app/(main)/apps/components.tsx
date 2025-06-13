@@ -1,16 +1,5 @@
 "use client";
 
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
 	Tooltip,
@@ -20,16 +9,31 @@ import {
 } from "@/components/ui/tooltip";
 import type { AgentId } from "@/services/agents";
 import { Toast } from "@giselles-ai/components/toast";
+import * as Dialog from "@radix-ui/react-dialog";
 import { useToast } from "@giselles-ai/contexts/toast";
+import { formatTimestamp } from "@giselles-ai/lib/utils";
+import { gsap } from "gsap";
 import { CopyIcon, LoaderCircleIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
-import { useRef, useTransition } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useFormStatus } from "react-dom";
+import {
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "../settings/team/components/glass-dialog-content";
 import { copyAgent, deleteAgent } from "./actions";
-import { formatTimestamp } from "@giselles-ai/lib/utils";
-import { gsap } from "gsap";
-import { useEffect } from "react";
+import {
+	AlertDialog,
+	AlertDialogAction,
+	AlertDialogCancel,
+	AlertDialogContent,
+	AlertDialogDescription,
+	AlertDialogFooter,
+	AlertDialogHeader,
+	AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export function CreateAgentButton() {
 	const { pending } = useFormStatus();
@@ -267,78 +271,63 @@ export function DuplicateAgentButton({
 	agentId,
 	agentName,
 }: { agentId: AgentId; agentName: string | null }) {
-	const action = copyAgent.bind(null, agentId);
-	const { addToast } = useToast();
+	const [isOpen, setIsOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
-	const formRef = useRef<HTMLFormElement>(null);
+	const { addToast } = useToast();
 
 	const handleConfirm = () => {
-		formRef.current?.requestSubmit();
-	};
-
-	const formAction = (formData: FormData) => {
 		startTransition(async () => {
-			const res = await action(formData);
-			switch (res.result) {
-				case "success":
-					return redirect(`/workspaces/${res.workspaceId}`);
-
-				case "error":
-					addToast({ message: res.message, type: "error" });
+			const formData = new FormData();
+			const res = await copyAgent(agentId, formData);
+			if (res.result === "success") {
+				redirect(`/workspaces/${res.workspaceId}`);
+			} else {
+				addToast({ message: res.message, type: "error" });
+				setIsOpen(false);
 			}
 		});
 	};
 
 	return (
-		<form ref={formRef} action={formAction}>
-			<AlertDialog>
-				<TooltipProvider delayDuration={0}>
-					<Tooltip>
-						<AlertDialogTrigger asChild>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									className="text-black-30 hover:text-black--30"
-									disabled={isPending}
-								>
-									{isPending ? (
-										<LoaderCircleIcon className="w-[16px] h-[16px] animate-spin" />
-									) : (
-										<CopyIcon className="w-[16px] h-[16px]" />
-									)}
-								</button>
-							</TooltipTrigger>
-						</AlertDialogTrigger>
-						<TooltipContent side="top">
-							<p>Duplicate</p>
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-				<AlertDialogContent className="text-white-800">
-					<AlertDialogHeader>
-						<AlertDialogTitle className="font-sans text-[20px] font-medium">
-							Are you sure to duplicate this App?
-						</AlertDialogTitle>
-						{agentName && (
-							<AlertDialogDescription className="text-white-800 font-sans">
-								{agentName}
-							</AlertDialogDescription>
-						)}
-					</AlertDialogHeader>
-					<AlertDialogFooter className="mt-6">
-						<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors">
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={handleConfirm}
-							className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors"
-						>
-							Duplicate
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</form>
+		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+			<TooltipProvider delayDuration={0}>
+				<Tooltip>
+					<Dialog.Trigger asChild>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								className="text-black-30 hover:text-black--30"
+								disabled={isPending}
+							>
+								{isPending ? (
+									<LoaderCircleIcon className="h-[16px] w-[16px] animate-spin" />
+								) : (
+									<CopyIcon className="h-[16px] w-[16px]" />
+								)}
+							</button>
+						</TooltipTrigger>
+					</Dialog.Trigger>
+					<TooltipContent side="top">
+						<p>Duplicate</p>
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+			<GlassDialogContent>
+				<GlassDialogHeader
+					title="Duplicate App"
+					description={`Are you sure you want to duplicate "${
+						agentName || "Untitled"
+					}"?`}
+					onClose={() => setIsOpen(false)}
+				/>
+				<GlassDialogFooter
+					onCancel={() => setIsOpen(false)}
+					onConfirm={handleConfirm}
+					confirmLabel="Duplicate"
+					isPending={isPending}
+				/>
+			</GlassDialogContent>
+		</Dialog.Root>
 	);
 }
 
@@ -349,79 +338,64 @@ export function DeleteAgentButton({
 	agentId: AgentId;
 	agentName: string | null;
 }) {
-	const action = deleteAgent.bind(null, agentId);
-	const { addToast } = useToast();
+	const [isOpen, setIsOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
-	const formRef = useRef<HTMLFormElement>(null);
+	const { addToast } = useToast();
 	const router = useRouter();
-	const handleConfirm = () => {
-		formRef.current?.requestSubmit();
-	};
 
-	const formAction = (formData: FormData) => {
+	const handleConfirm = () => {
 		startTransition(async () => {
-			const res = await action(formData);
-			switch (res.result) {
-				case "success":
-					router.refresh();
-					break;
-				case "error":
-					addToast({ message: res.message, type: "error" });
-					break;
+			const formData = new FormData();
+			const res = await deleteAgent(agentId, formData);
+			if (res.result === "success") {
+				router.refresh();
+			} else {
+				addToast({ message: res.message, type: "error" });
 			}
+			setIsOpen(false);
 		});
 	};
 
 	return (
-		<form ref={formRef} action={formAction}>
-			<AlertDialog>
-				<TooltipProvider delayDuration={0}>
-					<Tooltip>
-						<AlertDialogTrigger asChild>
-							<TooltipTrigger asChild>
-								<button
-									type="button"
-									className="text-black-30 hover:text-red-500"
-									disabled={isPending}
-								>
-									{isPending ? (
-										<LoaderCircleIcon className="w-[16px] h-[16px] animate-spin" />
-									) : (
-										<TrashIcon className="w-[16px] h-[16px]" />
-									)}
-								</button>
-							</TooltipTrigger>
-						</AlertDialogTrigger>
-						<TooltipContent side="top">
-							<p>Delete</p>
-						</TooltipContent>
-					</Tooltip>
-				</TooltipProvider>
-				<AlertDialogContent className="text-white-800">
-					<AlertDialogHeader>
-						<AlertDialogTitle className="font-sans text-[20px] font-medium">
-							Are you sure you want to delete this App?
-						</AlertDialogTitle>
-						{agentName && (
-							<AlertDialogDescription className="text-white-800 font-sans">
-								This action cannot be undone. This will permanently delete the
-								app "{agentName}".
-							</AlertDialogDescription>
-						)}
-					</AlertDialogHeader>
-					<AlertDialogFooter className="mt-6">
-						<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors">
-							Cancel
-						</AlertDialogCancel>
-						<AlertDialogAction
-							onClick={handleConfirm}
-							className="bg-error-900 hover:bg-transparent hover:text-error-900 hover:border-error-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors"
-						>
-							Delete
-						</AlertDialogAction>
-					</AlertDialogFooter>
-				</AlertDialogContent>
-			</AlertDialog>
-		</form>
+		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+			<TooltipProvider delayDuration={0}>
+				<Tooltip>
+					<Dialog.Trigger asChild>
+						<TooltipTrigger asChild>
+							<button
+								type="button"
+								className="text-black-30 hover:text-red-500"
+								disabled={isPending}
+							>
+								{isPending ? (
+									<LoaderCircleIcon className="h-[16px] w-[16px] animate-spin" />
+								) : (
+									<TrashIcon className="h-[16px] w-[16px]" />
+								)}
+							</button>
+						</TooltipTrigger>
+					</Dialog.Trigger>
+					<TooltipContent side="top">
+						<p>Delete</p>
+					</TooltipContent>
+				</Tooltip>
+			</TooltipProvider>
+			<GlassDialogContent>
+				<GlassDialogHeader
+					title="Delete App"
+					description={`This action cannot be undone. This will permanently delete the app "${
+						agentName || "Untitled"
+					}".`}
+					onClose={() => setIsOpen(false)}
+				/>
+				<GlassDialogFooter
+					onCancel={() => setIsOpen(false)}
+					onConfirm={handleConfirm}
+					confirmLabel="Delete"
+					isPending={isPending}
+					variant="destructive"
+				/>
+			</GlassDialogContent>
+		</Dialog.Root>
 	);
 }
