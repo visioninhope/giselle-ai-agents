@@ -95,7 +95,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 	return (
 		<div
 			onMouseMove={handleMouseMove}
-			className="group relative flex h-auto w-full flex-grow basis-[280px] flex-col overflow-hidden rounded-[12px] border-2"
+			className="group relative flex h-auto basis-[280px] flex-col overflow-hidden rounded-[12px] border-2"
 			style={
 				{
 					"--spotlight-color": "rgba(255,255,255,0.3)",
@@ -271,57 +271,50 @@ export function DuplicateAgentButton({
 	agentId,
 	agentName,
 }: { agentId: AgentId; agentName: string | null }) {
-	const [isOpen, setIsOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
+	const [open, setOpen] = useState(false);
 	const { addToast } = useToast();
 
 	const handleConfirm = () => {
 		startTransition(async () => {
-			const formData = new FormData();
-			const res = await copyAgent(agentId, formData);
-			if (res.result === "success") {
-				redirect(`/workspaces/${res.workspaceId}`);
+			const result = await copyAgent(agentId, new FormData());
+			if (result.result === "success") {
+				setOpen(false);
+				redirect(`/workspaces/${result.workspaceId}`);
 			} else {
-				addToast({ message: res.message, type: "error" });
-				setIsOpen(false);
+				addToast({
+					type: "error",
+					message: result.message || "Failed to duplicate app.",
+				});
 			}
 		});
 	};
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-			<TooltipProvider delayDuration={0}>
+		<Dialog.Root open={open} onOpenChange={setOpen}>
+			<TooltipProvider>
 				<Tooltip>
-					<Dialog.Trigger asChild>
-						<TooltipTrigger asChild>
+					<TooltipTrigger asChild>
+						<Dialog.Trigger asChild>
 							<button
 								type="button"
-								className="text-black-30 hover:text-black--30"
-								disabled={isPending}
+								className="grid size-6 place-items-center rounded-full bg-white/10 text-white/60 transition-colors hover:bg-white/20 hover:text-white"
 							>
-								{isPending ? (
-									<LoaderCircleIcon className="h-[16px] w-[16px] animate-spin" />
-								) : (
-									<CopyIcon className="h-[16px] w-[16px]" />
-								)}
+								<CopyIcon className="size-3" />
 							</button>
-						</TooltipTrigger>
-					</Dialog.Trigger>
-					<TooltipContent side="top">
-						<p>Duplicate</p>
-					</TooltipContent>
+						</Dialog.Trigger>
+					</TooltipTrigger>
+					<TooltipContent>Duplicate App</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
 			<GlassDialogContent>
 				<GlassDialogHeader
-					title="Duplicate App"
-					description={`Are you sure you want to duplicate "${
-						agentName || "Untitled"
-					}"?`}
-					onClose={() => setIsOpen(false)}
+					title={`Duplicate "${agentName || "Untitled"}"?`}
+					description="This will create a new app with the same settings as the original."
+					onClose={() => setOpen(false)}
 				/>
 				<GlassDialogFooter
-					onCancel={() => setIsOpen(false)}
+					onCancel={() => setOpen(false)}
 					onConfirm={handleConfirm}
 					confirmLabel="Duplicate"
 					isPending={isPending}
@@ -338,7 +331,7 @@ export function DeleteAgentButton({
 	agentId: AgentId;
 	agentName: string | null;
 }) {
-	const [isOpen, setIsOpen] = useState(false);
+	const [open, setOpen] = useState(false);
 	const [isPending, startTransition] = useTransition();
 	const { addToast } = useToast();
 	const router = useRouter();
@@ -347,49 +340,48 @@ export function DeleteAgentButton({
 		startTransition(async () => {
 			const formData = new FormData();
 			const res = await deleteAgent(agentId, formData);
+			setOpen(false);
 			if (res.result === "success") {
 				router.refresh();
 			} else {
 				addToast({ message: res.message, type: "error" });
 			}
-			setIsOpen(false);
 		});
 	};
 
 	return (
-		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
-			<TooltipProvider delayDuration={0}>
+		<Dialog.Root open={open} onOpenChange={setOpen}>
+			<TooltipProvider>
 				<Tooltip>
-					<Dialog.Trigger asChild>
-						<TooltipTrigger asChild>
+					<TooltipTrigger asChild>
+						<Dialog.Trigger asChild>
 							<button
 								type="button"
-								className="text-black-30 hover:text-red-500"
+								className="grid size-6 place-items-center rounded-full bg-white/10 text-white/60 transition-colors hover:bg-red-500/20 hover:text-red-500"
 								disabled={isPending}
 							>
 								{isPending ? (
-									<LoaderCircleIcon className="h-[16px] w-[16px] animate-spin" />
+									<LoaderCircleIcon className="size-3 animate-spin" />
 								) : (
-									<TrashIcon className="h-[16px] w-[16px]" />
+									<TrashIcon className="size-3" />
 								)}
 							</button>
-						</TooltipTrigger>
-					</Dialog.Trigger>
-					<TooltipContent side="top">
-						<p>Delete</p>
-					</TooltipContent>
+						</Dialog.Trigger>
+					</TooltipTrigger>
+					<TooltipContent>Delete App</TooltipContent>
 				</Tooltip>
 			</TooltipProvider>
-			<GlassDialogContent>
+			<GlassDialogContent variant="destructive">
 				<GlassDialogHeader
 					title="Delete App"
 					description={`This action cannot be undone. This will permanently delete the app "${
 						agentName || "Untitled"
 					}".`}
-					onClose={() => setIsOpen(false)}
+					onClose={() => setOpen(false)}
+					variant="destructive"
 				/>
 				<GlassDialogFooter
-					onCancel={() => setIsOpen(false)}
+					onCancel={() => setOpen(false)}
 					onConfirm={handleConfirm}
 					confirmLabel="Delete"
 					isPending={isPending}

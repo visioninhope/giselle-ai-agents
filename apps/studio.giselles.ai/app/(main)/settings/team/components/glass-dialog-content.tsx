@@ -6,52 +6,81 @@ import { X } from "lucide-react";
 import React from "react";
 import { buttonVariants } from "../../components/button";
 
+type GlassDialogContentProps = React.ComponentPropsWithoutRef<
+	typeof Dialog.Content
+> & {
+	variant?: "default" | "destructive";
+};
+
 export const GlassDialogContent = React.forwardRef<
 	React.ElementRef<typeof Dialog.Content>,
-	React.ComponentPropsWithoutRef<typeof Dialog.Content>
->(({ className, children, ...props }, ref) => (
-	<Dialog.Portal>
-		<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
-		<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-			<Dialog.Content
-				ref={ref}
-				className={cn(
-					"relative z-10 w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6",
-					"shadow-xl focus:outline-none",
-					className,
-				)}
-				{...props}
-			>
-				<div
-					className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
-					style={{
-						background:
-							"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-					}}
-				/>
-				<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
-				<div className="absolute -z-10 inset-0 rounded-[12px] border border-white/10" />
-				{children}
-			</Dialog.Content>
-		</div>
-	</Dialog.Portal>
-));
+	GlassDialogContentProps
+>(({ className, children, variant = "default", ...props }, ref) => {
+	const backgroundStyle =
+		variant === "destructive"
+			? "linear-gradient(135deg, rgba(241, 91, 108, 0.03) 0%, rgba(241, 91, 108, 0.12) 100%)"
+			: "linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)";
+
+	const borderClass =
+		variant === "destructive" ? "border-error-900/10" : "border-white/10";
+
+	return (
+		<Dialog.Portal>
+			<Dialog.Overlay className="fixed inset-0 z-50 bg-black/60" />
+			<div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+				<Dialog.Content
+					ref={ref}
+					className={cn(
+						"relative z-10 w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6",
+						"shadow-xl focus:outline-none",
+						className,
+					)}
+					{...props}
+				>
+					<div
+						className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
+						style={{
+							background: backgroundStyle,
+						}}
+					/>
+					<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+					<div
+						className={cn(
+							"absolute -z-10 inset-0 rounded-[12px] border",
+							borderClass,
+						)}
+					/>
+					{children}
+				</Dialog.Content>
+			</div>
+		</Dialog.Portal>
+	);
+});
 GlassDialogContent.displayName = "GlassDialogContent";
 
 type GlassDialogHeaderProps = {
 	title: string;
 	description: string;
 	onClose: () => void;
+	variant?: "default" | "destructive";
 };
 
 export const GlassDialogHeader = ({
 	title,
 	description,
 	onClose,
+	variant = "default",
 }: GlassDialogHeaderProps) => (
 	<>
 		<div className="flex items-center justify-between">
-			<Dialog.Title className="font-sans text-[20px] font-medium tracking-tight text-white-400">
+			<Dialog.Title
+				className={cn(
+					"font-sans text-[20px] font-medium tracking-tight text-white-400",
+					{
+						"text-error-900": variant === "destructive",
+					},
+				)}
+			>
 				{title}
 			</Dialog.Title>
 			<Dialog.Close
@@ -62,10 +91,18 @@ export const GlassDialogHeader = ({
 				<span className="sr-only">Close</span>
 			</Dialog.Close>
 		</div>
-		<Dialog.Description className="font-geist mt-2 text-[14px] text-black-400">
+		<Dialog.Description
+			className={cn("font-geist mt-2 text-[14px] text-black-400", {
+				"text-error-900/50": variant === "destructive",
+			})}
+		>
 			{description}
 		</Dialog.Description>
 	</>
+);
+
+export const GlassDialogBody = ({ children }: { children: React.ReactNode }) => (
+	<div className="mt-4">{children}</div>
 );
 
 type GlassDialogFooterProps = {
@@ -83,13 +120,16 @@ export const GlassDialogFooter = ({
 	isPending = false,
 	variant = "default",
 }: GlassDialogFooterProps) => {
+	const baseButtonClasses =
+		"relative inline-flex items-center justify-center rounded-lg border-t border-b border-t-white/20 border-b-black/20 px-6 py-2 text-sm font-medium text-white shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.08)] transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.1)]";
+
 	return (
 		<div className="mt-6 flex justify-end gap-x-3">
 			<button
 				type="button"
 				onClick={onCancel}
 				disabled={isPending}
-				className={buttonVariants({ variant: "link" })}
+				className={cn(baseButtonClasses, buttonVariants({ variant: "link" }))}
 			>
 				Cancel
 			</button>
@@ -97,7 +137,12 @@ export const GlassDialogFooter = ({
 				type="button"
 				onClick={onConfirm}
 				disabled={isPending}
-				className={buttonVariants({ variant })}
+				className={cn(
+					baseButtonClasses,
+					buttonVariants({
+						variant: variant === "destructive" ? "destructive" : "primary",
+					}),
+				)}
 			>
 				{isPending ? "Processing..." : confirmLabel}
 			</button>
