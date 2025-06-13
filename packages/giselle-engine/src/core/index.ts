@@ -41,7 +41,7 @@ import {
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
-import { addSecret } from "./secrets";
+import { addSecret, getWorkspaceSecrets } from "./secrets";
 import { addWebPage } from "./sources";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
@@ -208,6 +208,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			value: string;
 		}) {
 			return await addSecret({ ...args, context });
+		},
+		async getWorkspaceSecrets(args: {
+			workspaceId: WorkspaceId;
+		}) {
+			return await getWorkspaceSecrets({ ...args, context });
 		},
 	};
 }

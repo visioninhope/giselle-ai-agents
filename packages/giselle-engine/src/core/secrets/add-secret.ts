@@ -34,7 +34,7 @@ export async function addSecret(args: {
 			workspaceId: args.workspaceId,
 		}),
 	]);
-	return secret.id;
+	return secret;
 }
 
 async function addWorkspaceSecretIndex(args: {
