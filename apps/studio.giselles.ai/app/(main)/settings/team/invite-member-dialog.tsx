@@ -297,13 +297,17 @@ export function InviteMemberDialog({
 				</GlassDialogBody>
 				<GlassDialogFooter
 					onCancel={handleCloseDialog}
-					onConfirm={() =>
-						(
-							document.getElementById(
-								"invite-member-form",
-							) as HTMLFormElement | null
-						)?.requestSubmit()
-					}
+					onConfirm={() => {
+						const form = document.getElementById(
+							"invite-member-form",
+						) as HTMLFormElement | null;
+						if (!form) return;
+						if (typeof form.requestSubmit === "function") {
+							form.requestSubmit();
+						} else {
+							form.submit();
+						}
+					}}
 					confirmLabel="Invite"
 					isPending={isLoading}
 				/>

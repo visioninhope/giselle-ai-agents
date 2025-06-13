@@ -189,22 +189,32 @@ export const AgentGrid = ({ agents }: AgentGridProps) => {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const fadeRef = useRef<HTMLDivElement>(null);
 	const pos = useRef({ x: 0, y: 0 });
-	// biome-ignore lint/suspicious/noExplicitAny: Using any for gsap generic quickSetter
-	const setX = useRef<any>(null);
-	// biome-ignore lint/suspicious/noExplicitAny: Using any for gsap generic quickSetter
-	const setY = useRef<any>(null);
+	// GSAP quickSetter returns a function like (value: number) => void
+	const setX = useRef<((value: number) => void) | null>(null);
+	const setY = useRef<((value: number) => void) | null>(null);
 
 	useEffect(() => {
 		const el = rootRef.current;
 		if (!el) return;
-		setX.current = gsap.quickSetter(el, "--x", "px");
-		setY.current = gsap.quickSetter(el, "--y", "px");
+		setX.current = gsap.quickSetter(el, "--x", "px") as (value: number) => void;
+		setY.current = gsap.quickSetter(el, "--y", "px") as (value: number) => void;
 		const { width, height } = el.getBoundingClientRect();
 		pos.current = { x: width / 2, y: height / 2 };
 		if (setX.current && setY.current) {
 			setX.current(pos.current.x);
 			setY.current(pos.current.y);
 		}
+
+		return () => {
+			// Clean up any GSAP tweens to prevent memory leaks when component unmounts
+			gsap.killTweensOf(pos.current);
+			if (fadeRef.current) {
+				gsap.killTweensOf(fadeRef.current);
+			}
+			// Reset quickSetter refs
+			setX.current = null;
+			setY.current = null;
+		};
 	}, []);
 
 	const moveTo = (x: number, y: number) => {
@@ -306,8 +316,7 @@ export function DuplicateAgentButton({
 
 	const handleConfirm = () => {
 		startTransition(async () => {
-			const formData = new FormData();
-			const res = await copyAgent(agentId, formData);
+			const res = await copyAgent(agentId);
 			if (res.result === "success") {
 				setOpen(false);
 				redirect(`/workspaces/${res.workspaceId}`);
@@ -368,8 +377,7 @@ export function DeleteAgentButton({
 
 	const handleConfirm = () => {
 		startTransition(async () => {
-			const formData = new FormData();
-			const res = await deleteAgent(agentId, formData);
+			const res = await deleteAgent(agentId);
 			setOpen(false);
 			if (res.result === "success") {
 				router.refresh();

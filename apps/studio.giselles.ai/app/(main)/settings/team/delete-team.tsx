@@ -4,12 +4,12 @@ import * as Dialog from "@radix-ui/react-dialog";
 import { useActionState, useState } from "react";
 import { Alert, AlertDescription } from "../components/alert";
 import { Button } from "../components/button";
+import { deleteTeam } from "./actions";
 import {
 	GlassDialogContent,
 	GlassDialogFooter,
 	GlassDialogHeader,
 } from "./components/glass-dialog-content";
-import { deleteTeam } from "./actions";
 
 export function DeleteTeam() {
 	const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -61,18 +61,15 @@ export function DeleteTeam() {
 						</AlertDescription>
 					</Alert>
 				)}
-				<form id="delete-team-form" action={action} />
-				<GlassDialogFooter
-					onCancel={handleCloseDialog}
-					onConfirm={() =>
-						(
-							document.getElementById("delete-team-form") as HTMLFormElement
-						)?.requestSubmit()
-					}
-					confirmLabel={pending ? "Deleting..." : "Delete Team"}
-					isPending={pending}
-					variant="destructive"
-				/>
+				<form id="delete-team-form" action={action} className="mt-4 space-y-0">
+					<GlassDialogFooter
+						onCancel={handleCloseDialog}
+						confirmLabel={pending ? "Deleting..." : "Delete Team"}
+						isPending={pending}
+						variant="destructive"
+						confirmButtonType="submit"
+					/>
+				</form>
 			</GlassDialogContent>
 		</Dialog.Root>
 	);

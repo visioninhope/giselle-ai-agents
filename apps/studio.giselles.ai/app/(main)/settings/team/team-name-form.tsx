@@ -14,13 +14,13 @@ import {
 } from "valibot";
 import { Button } from "../components/button";
 import { Card } from "../components/card";
+import { updateTeamName } from "./actions";
 import {
 	GlassDialogBody,
 	GlassDialogContent,
 	GlassDialogFooter,
 	GlassDialogHeader,
 } from "./components/glass-dialog-content";
-import { updateTeamName } from "./actions";
 
 const TeamNameSchema = pipe(
 	string(),
@@ -135,20 +135,14 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 											</p>
 										)}
 									</div>
+									<GlassDialogFooter
+										onCancel={handleCancelTeamName}
+										confirmLabel="Save"
+										isPending={isLoading}
+										confirmButtonType="submit"
+									/>
 								</form>
 							</GlassDialogBody>
-							<GlassDialogFooter
-								onCancel={handleCancelTeamName}
-								onConfirm={() =>
-									(
-										document.getElementById(
-											"team-name-form",
-										) as HTMLFormElement
-									)?.requestSubmit()
-								}
-								confirmLabel="Save"
-								isPending={isLoading}
-							/>
 						</GlassDialogContent>
 					</Dialog.Root>
 				),

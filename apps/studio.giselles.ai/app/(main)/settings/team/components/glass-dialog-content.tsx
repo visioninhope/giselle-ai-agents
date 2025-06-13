@@ -101,16 +101,17 @@ export const GlassDialogHeader = ({
 	</>
 );
 
-export const GlassDialogBody = ({ children }: { children: React.ReactNode }) => (
-	<div className="mt-4">{children}</div>
-);
+export const GlassDialogBody = ({
+	children,
+}: { children: React.ReactNode }) => <div className="mt-4">{children}</div>;
 
 type GlassDialogFooterProps = {
 	onCancel: () => void;
-	onConfirm: () => void;
+	onConfirm?: () => void;
 	confirmLabel: string;
 	isPending?: boolean;
 	variant?: "default" | "destructive";
+	confirmButtonType?: "button" | "submit";
 };
 
 export const GlassDialogFooter = ({
@@ -119,33 +120,28 @@ export const GlassDialogFooter = ({
 	confirmLabel,
 	isPending = false,
 	variant = "default",
+	confirmButtonType = "button",
 }: GlassDialogFooterProps) => {
-	const baseButtonClasses =
-		"relative inline-flex items-center justify-center rounded-lg border-t border-b border-t-white/20 border-b-black/20 px-6 py-2 text-sm font-medium text-white shadow-[0_1px_0_rgba(255,255,255,0.05)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.08)] transition-all duration-300 hover:shadow-[0_1px_0_rgba(255,255,255,0.1)_inset,0_-1px_0_rgba(0,0,0,0.2)_inset,0_0_0_1px_rgba(255,255,255,0.1)]";
-
 	return (
 		<div className="mt-6 flex justify-end gap-x-3">
 			<button
 				type="button"
 				onClick={onCancel}
 				disabled={isPending}
-				className={cn(baseButtonClasses, buttonVariants({ variant: "link" }))}
+				className={buttonVariants({ variant: "link" })}
 			>
 				Cancel
 			</button>
 			<button
-				type="button"
+				type={confirmButtonType}
 				onClick={onConfirm}
 				disabled={isPending}
-				className={cn(
-					baseButtonClasses,
-					buttonVariants({
-						variant: variant === "destructive" ? "destructive" : "primary",
-					}),
-				)}
+				className={buttonVariants({
+					variant: variant === "destructive" ? "destructive" : "primary",
+				})}
 			>
 				{isPending ? "Processing..." : confirmLabel}
 			</button>
 		</div>
 	);
-}; 
+};

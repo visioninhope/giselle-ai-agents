@@ -83,7 +83,9 @@ export function InvitationListItem({
 
 	const handleConfirmRevoke = () => {
 		startRevokeTransition(async () => {
-			const res = await revokeInvitationAction(undefined, new FormData());
+			const formData = new FormData();
+			formData.append("token", token);
+			const res = await revokeInvitationAction(undefined, formData);
 			if (res.success) {
 				addToast({
 					title: "Success",
