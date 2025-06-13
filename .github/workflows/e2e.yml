@@ -29,9 +29,9 @@ jobs:
         with:
           path: ~/.cache/ms-playwright
           key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
-      - name: Install Playwright Browsers
+      - name: Install Playwright Browsers & OS deps
         shell: bash
-        run: pnpm --filter studio.giselles.ai exec playwright install
+        run: pnpm --filter studio.giselles.ai exec playwright install --with-deps
       - name: Run e2e tests
         run: pnpm test:e2e
         working-directory: apps/studio.giselles.ai
