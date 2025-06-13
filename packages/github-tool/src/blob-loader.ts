@@ -55,14 +55,13 @@ export class GitHubBlobLoader implements DocumentLoader<GitHubBlobMetadata> {
 		console.log(`Loading repository ${owner}/${repo} at commit ${commitSha}`);
 
 		// Get tree for the commit
+		const { data: commit } = await this.octokit.request(
+			"GET /repos/{owner}/{repo}/git/commits/{commit_sha}",
+			{ owner, repo, commit_sha: commitSha },
+		);
 		const { data: tree } = await this.octokit.request(
 			"GET /repos/{owner}/{repo}/git/trees/{tree_sha}",
-			{
-				owner,
-				repo,
-				tree_sha: commitSha,
-				recursive: "true",
-			},
+			{ owner, repo, tree_sha: commit.tree.sha, recursive: "true" },
 		);
 
 		// Check for tree truncation
