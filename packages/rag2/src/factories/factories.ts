@@ -155,7 +155,7 @@ export function createIngestPipeline<
 		documentKey,
 		metadataTransform,
 		options: {
-			batchSize: options.batchSize || 50,
+			maxBatchSize: options.maxBatchSize || 50,
 			onProgress: options.onProgress,
 		},
 	});

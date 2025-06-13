@@ -144,7 +144,7 @@ const pipeline = createIngestPipeline({
     commitSha: documentMetadata.commitSha,
   }),
   options: {
-    batchSize: 50,
+    maxBatchSize: 50,
     onProgress: (progress) => {
       console.log(`Processed: ${progress.processedDocuments}`);
     },

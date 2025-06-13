@@ -46,7 +46,7 @@ export async function ingestGitHubRepository(params: {
 			nodeId: metadata.nodeId,
 		}),
 		options: {
-			batchSize: 50,
+			maxBatchSize: 50,
 			onProgress: (progress) => {
 				console.log(
 					`Ingesting... (${progress.processedDocuments}) ${progress.currentDocument}`,

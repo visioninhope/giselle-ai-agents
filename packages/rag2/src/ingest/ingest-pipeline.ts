@@ -36,7 +36,7 @@ export interface IngestPipelineConfig<
 	metadataTransform: (metadata: TSourceMetadata) => TTargetMetadata;
 	// options
 	options?: {
-		batchSize?: number; // batch size for embedding
+		maxBatchSize?: number; // batch size for embedding
 		maxRetries?: number; // number of retries
 		retryDelay?: number; // retry interval (milliseconds)
 		onProgress?: (progress: IngestProgress) => void;
@@ -87,7 +87,7 @@ export class IngestPipeline<
 		this.documentKey = config.documentKey;
 		this.metadataTransform = config.metadataTransform;
 		this.options = {
-			batchSize: 100,
+			maxBatchSize: 100,
 			maxRetries: 3,
 			retryDelay: 1000,
 			onProgress: () => {},
@@ -121,7 +121,7 @@ export class IngestPipeline<
 				documentBatch.push(document);
 
 				// Process batch when it reaches the configured size
-				if (documentBatch.length >= this.options.batchSize) {
+				if (documentBatch.length >= this.options.maxBatchSize) {
 					await this.processBatch(documentBatch, result, progress);
 					documentBatch.length = 0; // Clear the batch
 				}
@@ -188,8 +188,8 @@ export class IngestPipeline<
 
 				// batch embedding
 				const chunks = [];
-				for (let i = 0; i < chunkTexts.length; i += this.options.batchSize) {
-					const batch = chunkTexts.slice(i, i + this.options.batchSize);
+				for (let i = 0; i < chunkTexts.length; i += this.options.maxBatchSize) {
+					const batch = chunkTexts.slice(i, i + this.options.maxBatchSize);
 					const embeddings = await this.embedder.embedMany(batch);
 
 					for (let j = 0; j < batch.length; j++) {

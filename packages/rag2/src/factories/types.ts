@@ -123,7 +123,7 @@ export interface SimpleIngestConfig<
 	 * pipeline options
 	 */
 	options?: {
-		batchSize?: number;
+		maxBatchSize?: number;
 		onProgress?: (progress: {
 			processedDocuments: number;
 			currentDocument?: string;

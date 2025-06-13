@@ -110,7 +110,7 @@ describe("IngestPipeline", () => {
 			chunkStore: mockChunkStore,
 			documentKey: (doc) => doc.metadata.path,
 			metadataTransform: (metadata) => metadata,
-			options: { batchSize: 1 },
+			options: { maxBatchSize: 1 },
 		});
 
 		await pipeline.ingest({});
