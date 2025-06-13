@@ -160,37 +160,6 @@ export class PostgresQueryService<
 		return result.data;
 	}
 
-	/**
-	 * type guard: check if metadata is valid object
-	 */
-	private isValidMetadataObject(metadata: unknown): metadata is TMetadata {
-		// null check
-		if (metadata === null || metadata === undefined) {
-			return false;
-		}
-
-		// check if metadata is an object
-		if (typeof metadata !== "object") {
-			return false;
-		}
-
-		// exclude array
-		if (Array.isArray(metadata)) {
-			return false;
-		}
-
-		// check if metadata is a plain object
-		// check if metadata is a plain object by checking the prototype chain
-		try {
-			return (
-				Object.getPrototypeOf(metadata) === Object.prototype ||
-				Object.getPrototypeOf(metadata) === null
-			);
-		} catch {
-			return false;
-		}
-	}
-
 	private validateColumnName(column: string): string {
 		const allowedColumns = Object.values(this.config.columnMapping);
 		if (!allowedColumns.includes(column)) {
