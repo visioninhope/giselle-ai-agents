@@ -1,7 +1,7 @@
 import { openai } from "@ai-sdk/openai";
 import { embed, embedMany } from "ai";
 import { z } from "zod/v4";
-import { ConfigurationError } from "../errors";
+import { ConfigurationError, EmbeddingError } from "../errors";
 import type { Embedder } from "./types";
 
 const OpenAIEmbedderConfigSchema = z.object({
@@ -60,20 +60,46 @@ export class OpenAIEmbedder implements Embedder {
 	}
 
 	async embed(text: string): Promise<number[]> {
-		const { embedding } = await embed({
-			model: openai.embedding(this.config.model),
-			maxRetries: this.config.maxRetries,
-			value: text,
-		});
-		return embedding;
+		try {
+			const { embedding } = await embed({
+				model: openai.embedding(this.config.model),
+				maxRetries: this.config.maxRetries,
+				value: text,
+			});
+			return embedding;
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				throw EmbeddingError.apiError(error, {
+					operation: "embed",
+					model: this.config.model,
+				});
+			}
+			throw EmbeddingError.apiError(new Error(String(error)), {
+				operation: "embed",
+				model: this.config.model,
+			});
+		}
 	}
 
 	async embedMany(texts: string[]): Promise<number[][]> {
-		const { embeddings } = await embedMany({
-			model: openai.embedding(this.config.model),
-			maxRetries: this.config.maxRetries,
-			values: texts,
-		});
-		return embeddings;
+		try {
+			const { embeddings } = await embedMany({
+				model: openai.embedding(this.config.model),
+				maxRetries: this.config.maxRetries,
+				values: texts,
+			});
+			return embeddings;
+		} catch (error: unknown) {
+			if (error instanceof Error) {
+				throw EmbeddingError.apiError(error, {
+					operation: "embedMany",
+					model: this.config.model,
+				});
+			}
+			throw EmbeddingError.apiError(new Error(String(error)), {
+				operation: "embedMany",
+				model: this.config.model,
+			});
+		}
 	}
 }
