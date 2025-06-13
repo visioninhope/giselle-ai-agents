@@ -25,7 +25,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 							href="https://docs.giselles.ai/guides/introduction"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-[16px] font-sans font-medium text-black-70 hover:text-white-100"
+							className="text-[14px] font-sans font-medium text-black-70 hover:text-white-100"
 						>
 							Docs
 						</Link>
@@ -36,7 +36,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				<Nav githubVectorStoreFlag={githubVectorStore} />
 
 				{/* Border line below navigation */}
-				<div className="h-[1px] w-full bg-black-800" />
+				<div className="h-[1px] w-full bg-black-70/50" />
 			</header>
 			<main className="flex-1 overflow-y-auto">{children}</main>
 		</div>

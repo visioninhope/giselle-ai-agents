@@ -69,12 +69,14 @@ export default async function TeamVectorStorePage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<h1
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Vector Stores
-				</h3>
+				</h1>
 				<a
 					href="https://docs.giselles.ai/guides/settings/team/vector-store"
 					target="_blank"
@@ -102,12 +104,14 @@ export default async function TeamVectorStorePage() {
 function GitHubAuthRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+			<h2
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
-			</h3>
+			</h2>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
@@ -132,13 +136,15 @@ function GitHubAuthRequiredCard() {
 function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+			<h2
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
-			</h3>
-			<Card className="border-[0.5px] border-red-500/50 rounded-[8px] bg-red-500/5 p-6">
+			</h2>
+			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<div className="flex items-center gap-2 mb-4">
 						<AlertCircle className="text-red-400" size={24} />
@@ -158,12 +164,14 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 function GitHubAppInstallRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h3
-				className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
-				style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+			<h2
+				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+				style={{
+					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+				}}
 			>
 				Vector Store
-			</h3>
+			</h2>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">

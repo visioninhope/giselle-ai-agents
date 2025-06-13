@@ -48,7 +48,7 @@ export const Nav: FC<NavProps> = ({ githubVectorStoreFlag }) => {
 
 	return (
 		<div className="flex items-center px-[24px] py-0 border-t border-black-900/50">
-			<div className="flex items-center">
+			<div className="flex items-center space-x-[12px]">
 				{filteredMenuItems.map((item, index) => {
 					const isActive = index === bestMatchIndex;
 
@@ -59,8 +59,8 @@ export const Nav: FC<NavProps> = ({ githubVectorStoreFlag }) => {
 							className={`text-[16px] font-sans font-medium transition-colors px-2 py-2 relative rounded-md
 							${
 								isActive
-									? "text-primary-100 after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
-									: "text-black-70 hover:text-white-100 hover:bg-white-950/20"
+									? "text-primary-100 [text-shadow:0px_0px_20px_#0087f6] after:content-[''] after:absolute after:left-0 after:right-0 after:bottom-0 after:h-[2px] after:bg-primary-100"
+									: "text-black-70 hover:text-white-100 hover:after:content-[''] hover:after:absolute hover:after:left-0 hover:after:right-0 hover:after:bottom-0 hover:after:h-[2px] hover:after:bg-primary-100"
 							}`}
 						>
 							{item.name}

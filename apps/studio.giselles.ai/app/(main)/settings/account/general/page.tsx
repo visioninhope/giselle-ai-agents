@@ -1,5 +1,6 @@
 import { SignOutButton } from "@/services/accounts/components/user-button/sign-out-button";
 import { ExternalLink } from "lucide-react";
+import { Button } from "../../components/button";
 import { Card } from "../../components/card";
 import { Field } from "../../components/field";
 import { AccountDisplayNameForm } from "../account-display-name-form";
@@ -52,8 +53,8 @@ export default async function AccountGeneralPage() {
 					description="Log out of all sessions."
 					className="flex flex-row justify-between items-center gap-y-6"
 				>
-					<SignOutButton className="px-[16px] py-[4px] rounded-[6.32px] border border-primary-200 w-fit bg-primary-200 text-black-800 font-bold text-[14px] font-sans whitespace-nowrap leading-[19.6px] tracking-normal hover:bg-transparent hover:text-primary-200">
-						Log Out
+					<SignOutButton asChild>
+						<Button variant="link">Log Out</Button>
 					</SignOutButton>
 				</Card>
 			</div>

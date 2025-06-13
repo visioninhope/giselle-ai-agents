@@ -36,7 +36,13 @@ export default function Layout({
 		<div className="h-full bg-black-900">
 			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
-					<h1 className="text-[28px] font-sans font-medium text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
+					<h1
+						className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+						style={{
+							textShadow:
+								"0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+						}}
+					>
 						Apps
 					</h1>
 					<div className="flex items-center gap-4">

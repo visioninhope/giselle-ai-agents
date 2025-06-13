@@ -112,6 +112,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 		</div>
 	);
 }
+
 function BillingInfoForProPlan({ team }: BillingInfoProps) {
 	if (!isProPlan(team)) {
 		return null;

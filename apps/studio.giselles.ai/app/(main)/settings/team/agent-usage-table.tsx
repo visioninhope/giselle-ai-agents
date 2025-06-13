@@ -19,7 +19,7 @@ export function AgentUsageTable({
 }: AgentUsageTableProps) {
 	return (
 		<div className="flex flex-col gap-y-2">
-			<div className="grid grid-cols-4 items-center gap-2 rounded-[4px] bg-white-850/20 p-2 font-bold text-white-400 text-[12px] leading-[15.6px] tracking-normal font-geist">
+			<div className="grid grid-cols-4 items-center gap-2 rounded-[4px] bg-slate-800/40 p-2 font-bold text-white-400 text-[12px] leading-[15.6px] tracking-normal font-geist">
 				<div>App</div>
 				<div>Start Time</div>
 				<div>End Time</div>

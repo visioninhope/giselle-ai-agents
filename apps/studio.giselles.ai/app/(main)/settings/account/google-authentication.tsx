@@ -1,7 +1,7 @@
 import { getGoogleIdentityState } from "@/services/accounts";
 import { TriangleAlert } from "lucide-react";
+import { Button } from "../components/button";
 import { GoogleAuthenticationPresentation } from "../components/google-authentication-presentation";
-import { ProviderConnectionButton } from "../components/provider-connection-button";
 import {
 	connectGoogleIdentity,
 	disconnectGoogleIdentity,
@@ -31,32 +31,48 @@ export async function GoogleAuthentication() {
 
 function GoogleConnectButton() {
 	return (
-		<ProviderConnectionButton action={connectGoogleIdentity}>
-			Connect
-		</ProviderConnectionButton>
+		<form action={connectGoogleIdentity}>
+			<Button
+				type="submit"
+				className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+				style={{
+					background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+					border: "1px solid rgba(0,0,0,0.7)",
+					boxShadow:
+						"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+				}}
+			>
+				Connect
+			</Button>
+		</form>
 	);
 }
 
 function GoogleReconnectButton() {
 	return (
-		<div>
-			<ProviderConnectionButton
-				action={reconnectGoogleIdentity}
-				className="border-warning-900 bg-warning-900 hover:text-warning-900"
-			>
+		<form action={reconnectGoogleIdentity}>
+			<Button variant="destructive" type="submit">
 				<TriangleAlert /> Reconnect
-			</ProviderConnectionButton>
-		</div>
+			</Button>
+		</form>
 	);
 }
 
 function GoogleDisconnectButton() {
 	return (
-		<ProviderConnectionButton
-			action={disconnectGoogleIdentity}
-			className="border-black-400 bg-black-400 text-black-200"
-		>
-			Disconnect
-		</ProviderConnectionButton>
+		<form action={disconnectGoogleIdentity}>
+			<Button
+				type="submit"
+				className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+				style={{
+					background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+					border: "1px solid rgba(0,0,0,0.7)",
+					boxShadow:
+						"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+				}}
+			>
+				Disconnect
+			</Button>
+		</form>
 	);
 }
