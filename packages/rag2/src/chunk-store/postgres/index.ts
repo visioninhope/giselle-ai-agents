@@ -24,7 +24,7 @@ export interface PostgresChunkStoreConfig<TMetadata> {
 	tableName: string;
 	columnMapping: ColumnMapping<TMetadata>;
 	// Zod schema for metadata validation
-	metadataSchema?: z.ZodType<TMetadata>;
+	metadataSchema: z.ZodType<TMetadata>;
 	// static context to be applied to all records
 	staticContext?: Record<string, unknown>;
 }
@@ -49,15 +49,13 @@ export class PostgresChunkStore<
 		} = this.config;
 
 		// Validate metadata first (fail fast)
-		if (metadataSchema) {
-			const result = metadataSchema.safeParse(metadata);
-			if (!result.success) {
-				throw ValidationError.fromZodError(result.error, {
-					operation: "insert",
-					documentKey,
-					tableName,
-				});
-			}
+		const result = metadataSchema.safeParse(metadata);
+		if (!result.success) {
+			throw ValidationError.fromZodError(result.error, {
+				operation: "insert",
+				documentKey,
+				tableName,
+			});
 		}
 
 		// Early return for empty chunks
@@ -245,38 +243,6 @@ export class PostgresChunkStore<
 		`;
 
 		await client.query(query, allValues);
-	}
-
-	/**
-	 * Insert a single record (kept for compatibility, but batch insert is preferred)
-	 */
-	private async insertRecord(
-		client: PoolClient,
-		tableName: string,
-		record: Record<string, unknown>,
-		embedding?: {
-			embeddingColumn: string;
-			embeddingValue: number[];
-		},
-	): Promise<void> {
-		const columns = Object.keys(record);
-		const values = Object.values(record);
-
-		// add embedding column
-		if (embedding) {
-			columns.push(embedding.embeddingColumn);
-			values.push(pgvector.toSql(embedding.embeddingValue));
-		}
-
-		const placeholders = columns.map((_, i) => `$${i + 1}`);
-
-		const query = `
-      INSERT INTO ${this.escapeIdentifier(tableName)}
-      (${columns.map((c) => this.escapeIdentifier(c)).join(", ")})
-      VALUES (${placeholders.join(", ")})
-    `;
-
-		await client.query(query, values);
 	}
 
 	private mapMetadata(
