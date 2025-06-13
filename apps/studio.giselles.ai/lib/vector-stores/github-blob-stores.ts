@@ -52,8 +52,9 @@ export function createGitHubChunkStore(repositoryIndexDbId: number) {
 		staticContext: { repository_index_db_id: repositoryIndexDbId },
 		requiredColumnOverrides: {
 			documentKey: "path",
-			content: "chunk_content",
-			index: "chunk_index",
+			// (default)
+			// chunkContent: "chunk_content",
+			// chunkIndex: "chunk_index",
 			// embedding: "embedding" (default)
 		},
 		// Metadata fields will auto-convert from camelCase to snake_case:
