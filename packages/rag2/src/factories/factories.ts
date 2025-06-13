@@ -83,7 +83,6 @@ export function createChunkStore<
 			metadataColumnOverrides: options.metadataColumnOverrides,
 		});
 
-	// PostgresChunkStoreConfigを構築
 	const config: PostgresChunkStoreConfig<TMetadata> = {
 		database,
 		tableName: options.tableName,
@@ -114,7 +113,6 @@ export function createQueryService<
 			metadataColumnOverrides: options.metadataColumnOverrides,
 		});
 
-	// build PostgresQueryServiceConfig
 	const config: PostgresQueryServiceConfig<TContext, TMetadata> = {
 		database,
 		tableName: options.tableName,
