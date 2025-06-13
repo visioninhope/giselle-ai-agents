@@ -1,4 +1,3 @@
-import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { manageBilling } from "@/services/teams/actions/manage-billing";
@@ -7,6 +6,7 @@ import type { CurrentTeam } from "@/services/teams/types";
 import { ExternalLink } from "lucide-react";
 import { Suspense } from "react";
 import { Button } from "../components/button";
+import { Card } from "../components/card";
 import { getSubscription } from "./actions";
 import { LocalDateTime } from "./components/local-date-time";
 import { DeleteTeam } from "./delete-team";
@@ -16,17 +16,19 @@ export default function TeamPage() {
 	return (
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<h1
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Team Settings
-				</h3>
+				</h1>
 				<a
 					href="https://docs.giselles.ai/guides/settings/team/billing"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 				>
 					About Team Settings
 					<ExternalLink size={14} />
@@ -48,7 +50,7 @@ export default function TeamPage() {
 
 				{/* Delete Team Section */}
 				<div className="mt-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[22px] tracking-normal font-hubot mb-4">
+					<h4 className="text-error-900 font-medium text-[18px] leading-[22px] tracking-normal font-sans mb-4">
 						Danger Zone
 					</h4>
 					<DeleteTeam />
@@ -63,7 +65,7 @@ async function BillingInfo() {
 
 	return (
 		<div className="flex flex-col gap-y-2">
-			<Card className="flex justify-between items-center px-6 py-4 border-[0.5px] border-black-400 rounded-[8px] bg-transparent">
+			<Card title="" className="px-6 py-4">
 				{isProPlan(team) ? (
 					<BillingInfoForProPlan team={team} />
 				) : (
@@ -83,10 +85,10 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 		return null;
 	}
 	return (
-		<>
+		<div className="flex justify-between items-center">
 			<div className="flex flex-col gap-y-0.5">
 				<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
-					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-sans">
 						Free Plan
 					</p>
 				</div>
@@ -107,7 +109,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 					<UpgradeButton team={team} />
 				</Suspense>
 			</form>
-		</>
+		</div>
 	);
 }
 function BillingInfoForProPlan({ team }: BillingInfoProps) {
@@ -115,10 +117,10 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 		return null;
 	}
 	return (
-		<>
+		<div className="flex justify-between items-center">
 			<div className="flex flex-col gap-y-[2px]">
 				<div className="flex flex-col gap-0.5">
-					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-hubot">
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-sans">
 						<span className="text-primary-400">Pro Plan</span>
 					</p>
 				</div>
@@ -148,7 +150,7 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 					</Suspense>
 				</form>
 			)}
-		</>
+		</div>
 	);
 }
 
@@ -156,7 +158,16 @@ function UpgradeButton({ team }: { team: CurrentTeam }) {
 	const upgradeTeamWithTeam = upgradeTeam.bind(null, team);
 
 	return (
-		<Button className="w-fit" formAction={upgradeTeamWithTeam}>
+		<Button
+			formAction={upgradeTeamWithTeam}
+			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			style={{
+				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+				border: "1px solid rgba(0,0,0,0.7)",
+				boxShadow:
+					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+			}}
+		>
 			Upgrade to Pro
 		</Button>
 	);
@@ -169,8 +180,17 @@ function UpdateButton({ subscriptionId }: { subscriptionId: string }) {
 	);
 
 	return (
-		<Button className="w-fit" formAction={manageBillingWithSubscriptionId}>
-			Update
+		<Button
+			formAction={manageBillingWithSubscriptionId}
+			className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+			style={{
+				background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+				border: "1px solid rgba(0,0,0,0.7)",
+				boxShadow:
+					"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+			}}
+		>
+			Manage Subscription
 		</Button>
 	);
 }

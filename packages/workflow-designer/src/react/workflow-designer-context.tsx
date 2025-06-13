@@ -10,9 +10,9 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	type SecretId,
 	type TriggerNode,
 	type UploadedFileData,
-	type VectorStoreNode,
 	type Viewport,
 	type Workspace,
 	createFailedFileData,
@@ -265,7 +265,8 @@ export function WorkflowDesignerProvider({
 			if (
 				!isActionNode(sourceNode) ||
 				!isActionNode(newNode) ||
-				sourceNode.content.command.state.status !== "configured"
+				sourceNode.content.command.state.status !== "configured" ||
+				sourceNode.content.command.provider !== newNode.content.command.provider
 			) {
 				return;
 			}
@@ -278,7 +279,7 @@ export function WorkflowDesignerProvider({
 						state: structuredClone(sourceNode.content.command.state),
 					},
 				},
-			});
+			} as Partial<ActionNode>);
 			setAndSaveWorkspace();
 		},
 		[setAndSaveWorkspace],

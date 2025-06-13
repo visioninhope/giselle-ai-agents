@@ -93,7 +93,7 @@ export const testWorkspace1 = {
 				type: "textGeneration",
 				llm: {
 					provider: "google",
-					id: "gemini-2.5-pro-preview-05-06",
+					id: "gemini-2.5-pro-preview-06-05",
 					configurations: {
 						temperature: 0.7,
 						topP: 1,

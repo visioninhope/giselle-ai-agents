@@ -1,16 +1,24 @@
 "use client";
 
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "@/components/ui/select";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type { TeamRole } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { ChevronDown, X } from "lucide-react";
+import {
+	Check,
+	ChevronDown,
+	Copy,
+	Ellipsis,
+	Plus,
+	RefreshCw,
+	Trash2,
+	X,
+} from "lucide-react";
 import { useEffect, useState } from "react";
 import { email as emailValidator, parse, pipe, string } from "valibot";
 import { Button } from "../components/button";
@@ -143,156 +151,199 @@ export function InviteMemberDialog({
 				<button
 					type="button"
 					onClick={handleOpenDialog}
-					className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-200"
+					className="group relative overflow-hidden rounded-lg px-4 py-2 text-white transition-all duration-300 hover:scale-[1.01] active:scale-95"
+					style={{
+						boxShadow:
+							"0 8px 20px rgba(107, 143, 240, 0.2), 0 3px 10px rgba(107, 143, 240, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+					}}
 				>
-					Invite Member +
+					{/* Outer glow */}
+					<div
+						className="absolute inset-0 rounded-lg blur-[2px] -z-10"
+						style={{ backgroundColor: "#6B8FF0", opacity: 0.08 }}
+					/>
+
+					{/* Main glass background */}
+					<div
+						className="absolute inset-0 rounded-lg backdrop-blur-md"
+						style={{
+							background:
+								"linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(107,143,240,0.1) 50%, rgba(107,143,240,0.2) 100%)",
+						}}
+					/>
+
+					{/* Top reflection */}
+					<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/60 to-transparent" />
+
+					{/* Subtle border */}
+					<div className="absolute inset-0 rounded-lg border border-white/20" />
+
+					{/* Content */}
+					<span className="relative z-10 flex items-center gap-2">
+						<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
+							<Plus className="size-3 text-black-900" />
+						</span>
+						<span className="text-[14px] leading-[20px] font-medium">
+							Invite Member
+						</span>
+					</span>
+
+					{/* Hover overlay */}
+					<div className="absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
 				</button>
 			</Dialog.Trigger>
 
 			<Dialog.Portal>
-				<Dialog.Overlay className="fixed inset-0 bg-black/80 opacity-100" />
-				<Dialog.Content
-					className={cn(
-						"fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2",
-						"w-[90vw] max-w-[500px] rounded-[8px] bg-black-900 p-6",
-						"border border-black-400 shadow-lg focus:outline-none",
-						"opacity-100 scale-100",
-					)}
-					onEscapeKeyDown={handleCloseDialog}
-					onPointerDownOutside={handleCloseDialog}
-				>
-					<div className="flex flex-col space-y-1.5 text-center sm:text-left">
-						<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-hubot">
-							Invite Team Member
-						</Dialog.Title>
-						<Dialog.Description className="text-[14px] text-black-400 font-geist">
-							Each member added to your team will be charged as an additional
-							seat ($20 per seat) on your Pro Plan subscription.
-						</Dialog.Description>
-					</div>
-
-					<form onSubmit={handleSubmit} className="space-y-4 mt-4" noValidate>
-						<div className="flex items-start gap-3 bg-black-900 p-4 rounded-lg border border-black-800">
-							<div className="flex-grow flex flex-wrap items-center gap-1 min-h-[40px]">
-								{emailList.map((email) => (
-									<div
-										key={email}
-										className="flex items-center bg-black-850 border-[0.5px] border-black-400 rounded-md px-2 py-1 mr-2 mb-1"
-									>
-										<span className="text-white-400 text-[14px] max-w-[180px] truncate">
-											{email}
-										</span>
-										<button
-											type="button"
-											onClick={() => removeEmail(email)}
-											className="ml-1.5 text-black-300 hover:text-white-600"
-										>
-											<X className="h-4 w-4" />
-										</button>
-									</div>
-								))}
-								<input
-									type="text"
-									placeholder={
-										emailList.length > 0
-											? ""
-											: "Email Addresses (separate with commas)"
-									}
-									value={emailInput}
-									onChange={(e) => {
-										setError("");
-										setEmailInput(e.target.value);
-									}}
-									onKeyDown={handleKeyDown}
-									onPaste={handlePaste}
-									onBlur={() => {
-										if (emailInput.trim()) {
-											addEmail(emailInput);
-										}
-									}}
-									className="flex-grow bg-transparent border-none outline-none text-white-400 font-medium text-[14px] leading-[20.4px] font-geist placeholder:text-black-400 py-1.5 min-w-[120px]"
-									disabled={isLoading}
-								/>
-							</div>
-
-							<div className="pt-1">
-								<Select
-									value={role}
-									onValueChange={(value) => {
-										setError("");
-										const isTeamRole = (value: string): value is TeamRole => {
-											return ["admin", "member"].includes(value);
-										};
-										if (isTeamRole(value)) {
-											setRole(value);
-										}
-									}}
-									disabled={isLoading}
-								>
-									<SelectTrigger
-										id="role"
-										className="w-[120px] px-3 py-1.5 border-[0.5px] border-black-700 rounded-md h-9 bg-black-850 text-white-900 shadow-none [&_svg]:opacity-100 cursor-pointer focus:ring-0 focus:ring-offset-0 focus:outline-none focus:border-black-600"
-									>
-										<SelectValue />
-										<ChevronDown className="h-4 w-4 opacity-50 ml-1" />
-									</SelectTrigger>
-									<SelectContent className="border-[0.5px] border-black-700 rounded-md bg-black-850 text-white-900 font-hubot">
-										<SelectItem
-											value="admin"
-											className="py-2 pr-2 font-medium text-[14px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-black-700"
-										>
-											Admin
-										</SelectItem>
-										<SelectItem
-											value="member"
-											className="py-2 pr-2 font-medium text-[14px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-black-700"
-										>
-											Member
-										</SelectItem>
-									</SelectContent>
-								</Select>
-							</div>
-						</div>
-
-						{error && (
-							<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-								{error}
-							</p>
+				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
+				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+					<Dialog.Content
+						className={cn(
+							"w-[90vw] max-w-[500px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative",
+							"shadow-xl focus:outline-none",
 						)}
+						onEscapeKeyDown={handleCloseDialog}
+						onPointerDownOutside={handleCloseDialog}
+					>
+						{/* Glass effect layers */}
+						<div
+							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
+							style={{
+								background:
+									"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
+							}}
+						/>
+						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+						<div className="absolute inset-0 rounded-[12px] border border-white/10" />
 
-						<div className="flex justify-between items-center mt-6">
-							<div>
-								{/* We currently don't have a share function */}
-								{/* <button
-									type="button"
-									className="text-black-300 hover:text-white-400 p-2 rounded-full hover:bg-black-800/40 flex items-center gap-1"
-									onClick={() => { }}
-								>
-									<LinkIcon className="h-4 w-4" />
-									<span className="text-sm font-medium">Share</span>
-								</button> */}
+						<div className="relative z-10">
+							<div className="flex justify-between items-center">
+								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
+									Invite Team Member
+								</Dialog.Title>
+								<Dialog.Close className="rounded-sm opacity-70 text-white-400 hover:opacity-100 focus:outline-none">
+									<X className="h-5 w-5" />
+									<span className="sr-only">Close</span>
+								</Dialog.Close>
 							</div>
-							<div className="flex space-x-2">
-								<Button
-									variant="link"
-									onClick={handleCloseDialog}
-									type="button"
-									className="bg-transparent border-[0.5px] border-black-400 text-white-400 hover:bg-black-800"
-								>
-									Cancel
-								</Button>
-								<Button type="submit" disabled={isLoading} className="px-8">
-									{isLoading ? "Sending..." : "Invite"}
-								</Button>
-							</div>
+							<Dialog.Description className="text-[14px] text-black-400 font-geist mt-2">
+								Each member added to your team will be charged as an additional
+								seat ($20 per seat) on your Pro Plan subscription.
+							</Dialog.Description>
+
+							<form
+								onSubmit={handleSubmit}
+								className="space-y-4 mt-4"
+								noValidate
+							>
+								<div className="flex items-start gap-3 bg-black/80 p-1 rounded-lg">
+									<div className="flex-grow flex flex-wrap items-center gap-1 min-h-[40px]">
+										{emailList.map((email) => (
+											<div
+												key={email}
+												className="flex items-center bg-white/10 rounded-md px-2.5 py-1.5 mr-2 mb-1 shadow-sm"
+											>
+												<span className="text-white-400 text-[14px] max-w-[180px] truncate">
+													{email}
+												</span>
+												<button
+													type="button"
+													onClick={() => removeEmail(email)}
+													className="ml-1.5 text-black-300 hover:text-white-600"
+												>
+													<X className="h-4 w-4" />
+												</button>
+											</div>
+										))}
+										<input
+											type="text"
+											placeholder={
+												emailList.length > 0
+													? ""
+													: "Email Addresses (separate with commas)"
+											}
+											value={emailInput}
+											onChange={(e) => {
+												setError("");
+												setEmailInput(e.target.value);
+											}}
+											onKeyDown={handleKeyDown}
+											onPaste={handlePaste}
+											className="flex-1 bg-transparent border-none outline-none text-white-400 placeholder-white/30 px-1 py-1 min-w-[200px] text-[14px]"
+											disabled={isLoading}
+										/>
+									</div>
+									<DropdownMenu>
+										<DropdownMenuTrigger asChild>
+											<button
+												type="button"
+												className="flex items-center gap-1 text-white-400 font-medium text-[14px] leading-[16px] font-sans hover:text-white-100 hover:bg-white/5 rounded-md px-3 h-10"
+												disabled={isLoading}
+											>
+												<span className="capitalize">{role}</span>
+												<ChevronDown className="h-4 w-4 opacity-60" />
+											</button>
+										</DropdownMenuTrigger>
+										<DropdownMenuContent
+											align="end"
+											className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[120px] bg-black-850 shadow-none"
+										>
+											<button
+												type="button"
+												onClick={() => setRole("admin")}
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+											>
+												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
+													{role === "admin" && <Check className="h-4 w-4" />}
+												</span>
+												Admin
+											</button>
+											<button
+												type="button"
+												onClick={() => setRole("member")}
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+											>
+												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
+													{role === "member" && <Check className="h-4 w-4" />}
+												</span>
+												Member
+											</button>
+										</DropdownMenuContent>
+									</DropdownMenu>
+								</div>
+								{error && (
+									<div className="text-error-500 text-sm mt-1">{error}</div>
+								)}
+
+								<div className="flex justify-end items-center mt-6">
+									<div className="flex w-full max-w-[280px] space-x-2">
+										<Button
+											variant="link"
+											onClick={handleCloseDialog}
+											type="button"
+											className="flex-1"
+										>
+											Cancel
+										</Button>
+										<Button
+											type="submit"
+											disabled={isLoading}
+											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+											style={{
+												background:
+													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
+												border: "1px solid rgba(0,0,0,0.7)",
+												boxShadow:
+													"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+											}}
+										>
+											{isLoading ? "Sending..." : "Invite"}
+										</Button>
+									</div>
+								</div>
+							</form>
 						</div>
-					</form>
-
-					<Dialog.Close className="absolute right-4 top-4 rounded-sm opacity-70 text-white-400 hover:opacity-100 focus:outline-none">
-						<X className="h-4 w-4" />
-						<span className="sr-only">Close</span>
-					</Dialog.Close>
-				</Dialog.Content>
+					</Dialog.Content>
+				</div>
 			</Dialog.Portal>
 		</Dialog.Root>
 	);

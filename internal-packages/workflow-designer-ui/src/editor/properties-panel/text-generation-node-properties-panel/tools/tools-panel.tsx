@@ -1,67 +1,212 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { ChevronRightIcon, DatabaseIcon } from "lucide-react";
-import { type SVGProps, useMemo } from "react";
+import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
+import clsx from "clsx/lite";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	CheckIcon,
+	MoveUpRightIcon,
+	PlusIcon,
+	Settings2Icon,
+} from "lucide-react";
+import {
+	type ComponentProps,
+	type PropsWithChildren,
+	type ReactNode,
+	useCallback,
+	useState,
+	useTransition,
+} from "react";
+import { z } from "zod/v4";
 import { GitHubIcon } from "../../../tool";
+import { Button } from "./ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogTitle,
+	DialogTrigger,
+} from "./ui/dialog";
+import { DropdownMenu } from "./ui/dropdown-menu";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
-type UIToolName = "GitHub" | "PostgreSQL";
-interface UITool {
-	name: UIToolName;
-	commands: string[];
-}
+const GitHubToolSetupSecretType = {
+	create: "create",
+	select: "select",
+} as const;
+const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.create),
+		label: z.string().min(1),
+		value: z.string().min(1),
+	}),
+	z.object({
+		secretType: z.literal(GitHubToolSetupSecretType.select),
+		secretId: SecretId.schema,
+	}),
+]);
 
-function ToolIcon({
-	name,
-	...props
-}: { name: UIToolName } & SVGProps<SVGSVGElement>) {
-	switch (name) {
-		case "GitHub":
-			return <GitHubIcon {...props} />;
-		case "PostgreSQL":
-			return <DatabaseIcon {...props} />;
-		default: {
-			const _exhaustiveCheck: never = name;
-			throw new Error(`Unhandled tool name: ${_exhaustiveCheck}`);
-		}
-	}
-}
-
-function ToolsSection({
-	title,
-	tools,
-	description,
-}: {
-	title: string;
-	tools: UITool[];
-	description: (tool: UITool) => string;
-}) {
-	if (tools.length === 0) return null;
+function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
+	const [presentDialog, setPresentDialog] = useState(false);
+	const { updateNodeDataContent, data } = useWorkflowDesigner();
+	const client = useGiselleEngine();
+	const [isPending, startTransition] = useTransition();
+	const setupGitHubTool = useCallback<React.FormEventHandler<HTMLFormElement>>(
+		(e) => {
+			e.preventDefault();
+			const formData = new FormData(e.currentTarget);
+			const secretType = formData.get("secretType");
+			const label = formData.get("label");
+			const value = formData.get("value");
+			const secretId = formData.get("secretId");
+			const parse = GitHubToolSetupPayload.safeParse({
+				secretType,
+				label,
+				value,
+				secretId,
+			});
+			if (!parse.success) {
+				/** @todo Implement error handling */
+				return;
+			}
+			const payload = parse.data;
+			switch (payload.secretType) {
+				case "create":
+					{
+						startTransition(async () => {
+							const result = await client.addSecret({
+								workspaceId: data.id,
+								label: payload.label,
+								value: payload.value,
+							});
+							updateNodeDataContent(node, {
+								...node.content,
+								tools: {
+									...node.content.tools,
+									github: {
+										tools: [],
+										auth: {
+											type: "secret",
+											secretId: result.secretId,
+										},
+									},
+								},
+							});
+							setPresentDialog(false);
+						});
+					}
+					break;
+				case "select":
+					break;
+				default: {
+					const _exhaustiveCheck: never = payload;
+					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
+				}
+			}
+		},
+		[node, updateNodeDataContent, client, data.id],
+	);
 	return (
-		<div className="space-y-[8px]">
-			<h2 className="text-[15px] font-accent">{title}</h2>
-			<div className="space-y-[6px]">
-				{tools.map((tool) => (
-					<div
-						key={tool.name}
-						className="border border-black-400 rounded-[8px] p-[6px] flex items-center justify-between hover:bg-black-800/50 transition-all duration-200 cursor-pointer h-[52px]"
-					>
-						<div className="flex gap-[8px]">
-							<div className="rounded-[6px] size-[38px] flex items-center justify-center bg-white-400/40">
-								<ToolIcon name={tool.name} className="size-[24px] text-white" />
+		<ToolList.Dialog
+			open={presentDialog}
+			onOpenChange={setPresentDialog}
+			enable={!!node.content.tools?.github}
+			onSubmit={setupGitHubTool}
+			submitting={isPending}
+		>
+			<ToolList.DialogHeader
+				title="Conenct to GitHub"
+				description="How would you like to add your Personal Access Token (PAT)? "
+			/>
+			<Tabs defaultValue="create">
+				<TabsList className="mb-[12px]">
+					<TabsTrigger value="create">Paste New Token</TabsTrigger>
+					<TabsTrigger value="select">Use Saved Token</TabsTrigger>
+				</TabsList>
+				<TabsContent value="create">
+					<input
+						type="hidden"
+						name="secretType"
+						value={GitHubToolSetupSecretType.create}
+					/>
+					<div className="flex flex-col gap-[12px]">
+						<fieldset className="flex flex-col">
+							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
+								Token Name
+							</label>
+							<input
+								type="text"
+								id="label"
+								name="label"
+								className={clsx(
+									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+									"focus:border-border-focused",
+								)}
+							/>
+							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+								Give this token a short name (e.g. “Prod-bot”). You’ll use it
+								when linking other nodes.
+							</p>
+						</fieldset>
+						<fieldset className="flex flex-col">
+							<div className="flex justify-between mb-[2px]">
+								<label htmlFor="pat" className="text-text text-[13px]">
+									Personal Access Token (PAT)
+								</label>
+								<a
+									href="https://github.com/settings/personal-access-tokens"
+									className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
+									target="_blank"
+									rel="noreferrer"
+									tabIndex={-1}
+								>
+									<span>GitHub</span>
+									<MoveUpRightIcon className="size-[13px]" />
+								</a>
 							</div>
-							<div>
-								<div className="flex items-center gap-2">
-									<h3 className="text-[15px]">{tool.name}</h3>
-								</div>
-								<p className="text-black-300 text-[11px]">
-									{description(tool)}
-								</p>
-							</div>
-						</div>
-						<ChevronRightIcon className="w-5 h-5 text-gray-400" />
+							<input
+								type="text"
+								id="pat"
+								name="value"
+								className={clsx(
+									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+									"focus:border-border-focused",
+								)}
+							/>
+							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+								We’ll encrypt the token with authenticated encryption before
+								saving it.
+							</p>
+						</fieldset>
 					</div>
-				))}
-			</div>
-		</div>
+				</TabsContent>
+				<TabsContent value="select">
+					<p className="text-[11px] text-text-muted my-[4px]">
+						Pick one of your encrypted tokens to connect.
+					</p>
+					<input
+						type="hidden"
+						name="secretType"
+						value={GitHubToolSetupSecretType.create}
+					/>
+					<fieldset className="flex flex-col">
+						<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
+							Select a saved token
+						</label>
+						<div>
+							<DropdownMenu
+								placeholder="Choose a token… "
+								items={[
+									{ id: "token1", label: "Token 1" },
+									{ id: "token2", label: "Token 2" },
+									{ id: "token3", label: "Token 3" },
+								]}
+								renderItem={(item) => item.label}
+							/>
+						</div>
+					</fieldset>
+				</TabsContent>
+			</Tabs>
+		</ToolList.Dialog>
 	);
 }
 
@@ -70,51 +215,107 @@ export function ToolsPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const { enableTools, availableTools } = useMemo(() => {
-		const enableTools: UITool[] = [];
-		const availableTools: UITool[] = [];
-		if (node.content.tools?.github === undefined) {
-			availableTools.push({
-				name: "GitHub",
-				commands: [],
-			});
-		} else {
-			enableTools.push({
-				name: "GitHub",
-				commands: node.content.tools.github.tools,
-			});
-		}
-		if (node.content.tools?.postgres === undefined) {
-			availableTools.push({
-				name: "PostgreSQL",
-				commands: [],
-			});
-		} else {
-			enableTools.push({
-				name: "PostgreSQL",
-				commands: node.content.tools.postgres.tools,
-			});
-		}
-		return {
-			enableTools,
-			availableTools,
-		};
-	}, [node.content.tools]);
-
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolsSection
-				title="Enabled Tools"
-				tools={enableTools}
-				description={(tool) =>
-					`${tool.commands.length} ${tool.commands.length > 1 ? "tools" : "tool"} enabled`
-				}
-			/>
-			<ToolsSection
-				title="Available Tools"
-				tools={availableTools}
-				description={(tool) => `Add ${tool.name} tool`}
-			/>
+			<ToolList.Item
+				icon={<GitHubIcon data-tool-icon />}
+				configurationPanel={<GitHubToolSetting node={node} />}
+			>
+				<div className="flex gap-[10px] items-center">
+					<h3 className="text-text text-[14px]">GitHub</h3>
+					{node.content.tools?.github && (
+						<CheckIcon className="size-[14px] text-success" />
+					)}
+				</div>
+			</ToolList.Item>
 		</div>
 	);
 }
+
+interface ToolListItemProps {
+	icon: ReactNode;
+	configurationPanel: ReactNode;
+}
+interface ToolListDialogProps
+	extends Omit<ComponentProps<typeof Dialog>, "children"> {
+	enable: boolean;
+	onSubmit: React.FormEventHandler<HTMLFormElement>;
+	submitting: boolean;
+}
+interface ToolListDialogHeaderProps {
+	title: string;
+	description: string;
+}
+const ToolList = {
+	Item({
+		children,
+		icon,
+		configurationPanel,
+	}: PropsWithChildren<ToolListItemProps>) {
+		return (
+			<div
+				className={clsx(
+					"border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]",
+					"**:data-tool-icon:size-[20px] **:data-tool-icon:text-text-muted",
+					"**:data-dialog-trigger-icon:size-[14px]",
+				)}
+			>
+				<div className="flex gap-[10px] items-center">
+					{icon}
+					{children}
+				</div>
+				{configurationPanel}
+			</div>
+		);
+	},
+	Dialog({
+		open,
+		onOpenChange,
+		defaultOpen,
+		children,
+		enable,
+		onSubmit,
+		submitting,
+	}: PropsWithChildren<ToolListDialogProps>) {
+		return (
+			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
+				<DialogTrigger asChild>
+					<Button
+						type="button"
+						leftIcon={
+							enable ? (
+								<Settings2Icon data-dialog-trigger-icon />
+							) : (
+								<PlusIcon data-dialog-trigger-icon />
+							)
+						}
+					>
+						{enable ? "Configure" : "Connect"}
+					</Button>
+				</DialogTrigger>
+				<DialogContent>
+					<form onSubmit={onSubmit}>
+						{children}
+						<DialogFooter>
+							<button
+								type="submit"
+								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+								disabled={submitting}
+							>
+								{submitting ? "..." : "Save & Connect"}
+							</button>
+						</DialogFooter>
+					</form>
+				</DialogContent>
+			</Dialog>
+		);
+	},
+	DialogHeader({ title, description }: ToolListDialogHeaderProps) {
+		return (
+			<div className="py-[12px]">
+				<DialogTitle>{title}</DialogTitle>
+				<DialogDescription>{description}</DialogDescription>
+			</div>
+		);
+	},
+};

@@ -74,7 +74,7 @@ async function AgentList() {
 								{/* <div className="h-[150px] bg-black-80 rounded-[8px] mb-4" /> */}
 
 								<div className="flex-grow">
-									<h3 className="font-hubot text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
+									<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
 										{agent.name || "Untitled"}
 									</h3>
 								</div>

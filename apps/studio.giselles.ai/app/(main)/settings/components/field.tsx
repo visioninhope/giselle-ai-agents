@@ -33,7 +33,7 @@ export const Field: FC<FieldProps> = ({
 			data-1p-ignore={ignore1password}
 			value={value}
 			disabled={disabled}
-			className="py-2 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20 text-white-900 font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-100"
+			className="py-2 border-[0.5px] border-black-820/50 rounded-[8px] bg-black-350/20 text-white-900 font-medium text-[14px] leading-[23.8px] font-geist disabled:opacity-50"
 		/>
 	</div>
 );

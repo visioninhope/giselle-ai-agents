@@ -36,7 +36,13 @@ export default function Layout({
 		<div className="h-full bg-black-900">
 			<div className="px-[40px] py-[24px] flex-1 max-w-[1200px] mx-auto w-full">
 				<div className="flex justify-between items-center mb-8">
-					<h1 className="text-[28px] font-hubot font-medium text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
+					<h1
+						className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+						style={{
+							textShadow:
+								"0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+						}}
+					>
 						Apps
 					</h1>
 					<div className="flex items-center gap-4">
@@ -44,7 +50,7 @@ export default function Layout({
 							href="https://docs.giselles.ai/guides/apps/teamapp"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+							className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 						>
 							About Apps
 							<ExternalLink size={14} />
@@ -52,7 +58,7 @@ export default function Layout({
 						<form action={createAgent}>
 							<button
 								type="submit"
-								className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-hubot cursor-pointer border border-primary-200"
+								className="bg-primary-200 hover:bg-primary-100 text-black-900 font-bold py-2 px-4 rounded-md font-sans cursor-pointer border border-primary-200"
 							>
 								New App +
 							</button>

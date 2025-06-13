@@ -30,7 +30,7 @@ export function NavigationItem({
 		>
 			{icon}
 			<span
-				className={`text-[14px] font-hubot ${isActive ? "font-medium border-b border-white-400 pb-0" : ""}`}
+				className={`text-[14px] font-sans ${isActive ? "font-medium border-b border-white-400 pb-0" : ""}`}
 			>
 				{label}
 			</span>

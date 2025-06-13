@@ -14,12 +14,13 @@ import {
 import {
 	DropdownMenu,
 	DropdownMenuContent,
+	DropdownMenuItem,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import type { TeamRole } from "@/drizzle";
 import { useToast } from "@/packages/contexts/toast";
 import { Copy, Ellipsis, RefreshCw, Trash2 } from "lucide-react";
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { resendInvitationAction, revokeInvitationAction } from "./actions";
 import { LocalDateTime } from "./components/local-date-time";
 
@@ -40,6 +41,7 @@ export function InvitationListItem({
 	const [error, setError] = useState("");
 	const [dialogOpen, setDialogOpen] = useState(false);
 	const [dropdownOpen, setDropdownOpen] = useState(false);
+	const resendFormRef = useRef<HTMLFormElement>(null);
 
 	// server actions
 	const [revokeState, revoke, revokePending] = useActionState(
@@ -116,28 +118,30 @@ export function InvitationListItem({
 	};
 
 	return (
-		<div className="px-2">
-			<div className="flex items-center justify-between gap-4 py-4 border-b-[0.5px] border-black-400 font-hubot">
-				<div className="flex gap-x-4 items-center">
+		<div className="px-2 py-4 border-t-[0.5px] border-white/10 first:border-t-0 font-sans">
+			<div className="flex items-center justify-between gap-2">
+				<div className="flex gap-x-2 items-center">
 					<div className="flex-shrink-0 opacity-50">
-						<div className="w-8 h-8 rounded-full border border-dashed border-white-400 flex items-center justify-center">
+						<div className="w-9 h-9 rounded-full border border-dashed border-white-400 flex items-center justify-center">
 							{/* Empty circle with dashed border */}
 						</div>
 					</div>
-					<div className="flex flex-col gap-y-1 font-medium text-[12px] leading-[12px]">
-						<div className="text-blue-80 flex items-center">
+					<div className="flex flex-col gap-y-1 font-medium">
+						<div className="text-white-900/50 text-[14px] leading-[20.4px] flex items-center">
 							{email}
-							<span className="ml-2 text-black-400">(Invitation pending)</span>
+							<span className="ml-2 text-black-400 text-[12px] leading-[16px]">
+								(Invitation pending)
+							</span>
 						</div>
 						{expired && (
-							<div className="text-error-900 text-[12px]">
+							<div className="text-error-900 text-[12px] leading-[16px]">
 								Expired on <LocalDateTime date={expiredAt} />
 							</div>
 						)}
 					</div>
 				</div>
 				<div className="flex items-center gap-2">
-					<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-hubot">
+					<span className="capitalize text-white-400 font-medium text-[14px] leading-[16px] text-end font-sans">
 						{role}
 					</span>
 					<DropdownMenu
@@ -150,42 +154,47 @@ export function InvitationListItem({
 						</DropdownMenuTrigger>
 						<DropdownMenuContent
 							align="end"
-							className="px-0 py-2 border-[0.5px] border-error-900 rounded-[8px] min-w-[165px] bg-black-850 shadow-none"
+							className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
 						>
-							<button
-								type="button"
-								onClick={handleCopy}
-								className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-black-700"
+							<DropdownMenuItem
+								onSelect={(e) => {
+									e.preventDefault();
+									handleCopy();
+								}}
+								className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md focus:outline-none"
 								title="Copy invite link"
 							>
 								<Copy className="h-4 w-4 mr-2" /> Copy invite link
-							</button>
-							<form action={resend} className="contents">
+							</DropdownMenuItem>
+							<form action={resend} ref={resendFormRef} className="contents">
 								<input type="hidden" name="token" value={token} />
-								<button
-									type="submit"
-									disabled={resendPending}
-									className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-black-700"
-									title="Resend invitation"
-								>
-									{resendPending ? (
-										<>
-											<RefreshCw className="h-4 w-4 animate-spin mr-2" />{" "}
-											Processing...
-										</>
-									) : (
-										<>
-											<RefreshCw className="h-4 w-4 mr-2" /> Resend invitation
-										</>
-									)}
-								</button>
 							</form>
+							<DropdownMenuItem
+								onSelect={(e) => {
+									e.preventDefault();
+									resendFormRef.current?.requestSubmit();
+								}}
+								disabled={resendPending}
+								className="flex items-center px-4 py-3 font-medium text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md"
+								title="Resend invitation"
+							>
+								{resendPending ? (
+									<>
+										<RefreshCw className="h-4 w-4 animate-spin mr-2" />{" "}
+										Processing...
+									</>
+								) : (
+									<>
+										<RefreshCw className="h-4 w-4 mr-2" /> Resend invitation
+									</>
+								)}
+							</DropdownMenuItem>
 							<AlertDialog open={dialogOpen} onOpenChange={setDialogOpen}>
 								<AlertDialogTrigger asChild>
-									<button
-										type="button"
+									<DropdownMenuItem
+										onSelect={(e) => e.preventDefault()}
 										disabled={revokePending}
-										className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-black-700"
+										className="flex items-center w-full px-4 py-3 font-medium text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
 										title="Revoke invitation"
 									>
 										{revokePending ? (
@@ -198,7 +207,7 @@ export function InvitationListItem({
 												<Trash2 className="h-4 w-4 mr-2" /> Revoke invitation
 											</>
 										)}
-									</button>
+									</DropdownMenuItem>
 								</AlertDialogTrigger>
 								<AlertDialogContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850">
 									<AlertDialogHeader>
@@ -212,7 +221,7 @@ export function InvitationListItem({
 									</AlertDialogHeader>
 									<AlertDialogFooter className="mt-4">
 										<AlertDialogCancel
-											className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+											className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
 											disabled={revokePending}
 										>
 											Cancel
@@ -222,7 +231,7 @@ export function InvitationListItem({
 											<AlertDialogAction
 												type="submit"
 												disabled={revokePending}
-												className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
+												className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
 											>
 												Revoke
 											</AlertDialogAction>

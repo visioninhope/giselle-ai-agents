@@ -5,14 +5,16 @@ import { GoogleAuthentication } from "../google-authentication";
 
 export default function AccountAuthenticationPage() {
 	return (
-		<div className="flex flex-col gap-[24px]">
+		<div className="flex flex-col gap-[12px]">
 			<div className="flex flex-col gap-y-2">
-				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
-					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
+				<h1
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
 				>
 					Authentication
-				</h3>
+				</h1>
 				<p className="text-black-400 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
 					Connect your Giselle Account with a third-party service to use it for
 					login.

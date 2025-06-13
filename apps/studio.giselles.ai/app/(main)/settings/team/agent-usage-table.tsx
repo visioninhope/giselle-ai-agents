@@ -19,7 +19,7 @@ export function AgentUsageTable({
 }: AgentUsageTableProps) {
 	return (
 		<div className="flex flex-col gap-y-2">
-			<div className="grid grid-cols-4 items-center gap-2 rounded-[4px] bg-white-850/20 p-2 font-bold text-white-400 text-[12px] leading-[15.6px] tracking-normal font-geist">
+			<div className="grid grid-cols-4 items-center gap-2 rounded-[4px] bg-slate-800/40 p-2 font-bold text-white-400 text-[12px] leading-[15.6px] tracking-normal font-geist">
 				<div>App</div>
 				<div>Start Time</div>
 				<div>End Time</div>
@@ -31,7 +31,7 @@ export function AgentUsageTable({
 						activities.map((activity) => (
 							<div
 								key={`${activity.agentId}-${activity.startTime}`}
-								className="grid grid-cols-4 items-center gap-1 py-2 border-b-[0.5px] border-black-400 text-white-400 font-hubot font-medium text-[12px] leading-[14.4px] tracking-normal"
+								className="grid grid-cols-4 items-center gap-1 py-2 border-b-[0.5px] border-black-400 text-white-400 font-sans font-medium text-[12px] leading-[14.4px] tracking-normal"
 							>
 								<div className="break-words max-w-xs text-blue-80">
 									{activity.agentName ?? activity.agentId}

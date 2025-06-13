@@ -12,6 +12,7 @@ export function KeyboardShortcuts({
 				event.key === "Enter" &&
 				((isMac && event.metaKey) || (!isMac && event.ctrlKey))
 			) {
+				event.preventDefault();
 				generate();
 			}
 		};

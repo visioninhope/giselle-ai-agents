@@ -201,6 +201,12 @@ export function GitHubToolsPanel({ node }: { node: TextGenerationNode }) {
 						className="border border-black-300 rounded-[4px] px-[4px] py-[4px] outline-none"
 						placeholder="ghp_0000000000"
 					/>
+					<button
+						type="submit"
+						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent mt-[8px]"
+					>
+						Set up
+					</button>
 				</form>
 			)}
 			{toolsEnabled && (

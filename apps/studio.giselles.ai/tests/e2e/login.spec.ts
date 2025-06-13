@@ -16,9 +16,12 @@ test("Login", async ({ page }) => {
 	// Fill in password
 	await page.getByRole("textbox", { name: "Password" }).fill(loginPassword);
 
-	// Click login button
-	await page.getByRole("button", { name: "Log in" }).click();
+	// Click login button and wait for navigation
+	await Promise.all([
+		page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
+		page.getByRole("button", { name: "Log in" }).click(),
+	]);
 
 	// Assert navigation to the Apps page
-	await expect(page).toHaveURL(`${baseUrl}/apps`);
+	await expect(page).toHaveURL(`${baseUrl}/apps`, { timeout: 15000 });
 });

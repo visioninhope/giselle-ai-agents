@@ -1,5 +1,6 @@
 import { calculateAgentTimeUsageMs } from "@/services/agents/activities";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
+import { Card } from "../components/card";
 import {
 	AgentTimeUsageForFreePlan,
 	AgentTimeUsageForProPlan,
@@ -13,12 +14,12 @@ export async function AgentTimeCharge() {
 	const usedMinutes = Math.ceil((timeChargeMs / 1000 / 60) * 100) / 100;
 
 	return (
-		<div className="bg-transparent rounded-[8px] border-[0.5px] border-black-400 px-[24px] pt-[16px] pb-[24px] w-full gap-[24px] grid">
+		<Card title="App Usage Time">
 			{currentTeamIsPro ? (
 				<AgentTimeUsageForProPlan usedMinutes={usedMinutes} />
 			) : (
 				<AgentTimeUsageForFreePlan usedMinutes={usedMinutes} />
 			)}
-		</div>
+		</Card>
 	);
 }

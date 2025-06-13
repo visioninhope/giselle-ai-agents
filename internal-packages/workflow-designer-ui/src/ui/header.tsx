@@ -14,7 +14,7 @@ function Button({
 >) {
 	return (
 		<button
-			className="px-[16px] py-[8px] rounded-[8px] flex items-center gap-[2px] bg-[hsla(207,19%,77%,0.3)] font-rosart text-white-900"
+			className="px-[16px] py-[8px] rounded-[8px] flex items-center gap-[2px] bg-[hsla(207,19%,77%,0.3)] font-sans text-white-900"
 			style={{
 				boxShadow: "0px 0px 3px 0px hsla(0, 0%, 100%, 0.25) inset",
 			}}
@@ -73,7 +73,7 @@ export function Header() {
 				<Link href="/">
 					<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
 				</Link>
-				<div className="font-rosart text-[18px] text-black--30">Playground</div>
+				<div className="font-sans text-[18px] text-black-30">Playground</div>
 			</div>
 			<div className="flex items-center gap-[10px] flex-1 justify-center">
 				<ViewSwitch view="editor">edit</ViewSwitch>

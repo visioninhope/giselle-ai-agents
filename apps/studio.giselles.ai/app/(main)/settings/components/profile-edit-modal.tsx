@@ -1,21 +1,15 @@
 "use client";
 
-import { Button } from "@/components/ui/button";
-import {
-	Dialog,
-	DialogClose,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-} from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import type { users } from "@/drizzle";
 import { AvatarImage } from "@/services/accounts/components/user-button/avatar-image";
-import { Camera, ImageIcon } from "lucide-react";
+import * as Dialog from "@radix-ui/react-dialog";
+import { ImageIcon, X } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useRef, useState } from "react";
 import { maxLength, minLength, parse, pipe, string } from "valibot";
 import { updateAvatar, updateDisplayName } from "../account/actions";
+import { Button } from "../components/button";
 import { IMAGE_CONSTRAINTS } from "../constants";
 
 const ACCEPTED_FILE_TYPES = IMAGE_CONSTRAINTS.formats.join(",");
@@ -194,171 +188,177 @@ export function ProfileEditModal({
 	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={onClose}>
-			<DialogContent
-				className="flex flex-col items-center p-0 max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]"
-				style={{
-					animation: "fadeIn 0.2s ease-out",
-					transformOrigin: "center",
-				}}
-				aria-describedby={undefined}
-			>
-				<style jsx global>{`
-					@keyframes fadeIn {
-						from {
-							opacity: 0;
-							transform: scale(0.95);
-						}
-						to {
-							opacity: 1;
-							transform: scale(1);
-						}
-					}
-				`}</style>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
-				/>
-				<DialogHeader className="relative z-10 w-full pt-[40px] mb-4 px-[24px]">
-					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
-						Update Your Profile
-					</DialogTitle>
-					<DialogClose
-						className="absolute right-4 top-4 rounded-sm opacity-70 ring-offset-background transition-opacity hover:opacity-100 focus:outline-none disabled:pointer-events-none"
-						onClick={onClose}
+		<Dialog.Root open={isOpen} onOpenChange={onClose}>
+			<Dialog.Portal>
+				<Dialog.Overlay className="fixed inset-0 bg-black/60 z-50" />
+				<div className="fixed inset-0 flex items-center justify-center z-50 p-4">
+					<Dialog.Content
+						className="w-[90vw] max-w-[420px] max-h-[90vh] overflow-y-auto rounded-[12px] p-6 relative shadow-xl focus:outline-none"
+						style={{
+							animation: "fadeIn 0.2s ease-out",
+							transformOrigin: "center",
+						}}
+						onEscapeKeyDown={onClose}
+						onPointerDownOutside={onClose}
+						aria-describedby={undefined}
 					>
-						<svg
-							width="15"
-							height="15"
-							viewBox="0 0 15 15"
-							fill="none"
-							xmlns="http://www.w3.org/2000/svg"
-							className="h-4 w-4 text-white-800"
-						>
-							<title>Close</title>
-							<path
-								d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z"
-								fill="currentColor"
-								fillRule="evenodd"
-								clipRule="evenodd"
-							/>
-						</svg>
-					</DialogClose>
-				</DialogHeader>
+						{/* Glass effect layers */}
+						<div
+							className="absolute inset-0 rounded-[12px] backdrop-blur-md"
+							style={{
+								background:
+									"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
+							}}
+						/>
+						<div className="absolute top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+						<div className="absolute inset-0 rounded-[12px] border border-white/10" />
 
-				<div className="relative z-10 flex flex-col items-center gap-6 w-full px-[24px] pb-[30px]">
-					{/* Hidden file input */}
-					<Input
-						ref={avatarInputRef}
-						type="file"
-						accept={ACCEPTED_FILE_TYPES}
-						className="hidden"
-						onChange={handleFileSelect}
-					/>
-
-					{/* Avatar Profile Images */}
-					<div className="flex items-center justify-center gap-4 w-full">
-						<div className="flex flex-row gap-4">
-							{/* Left side - clickable avatar */}
-							{initialAvatarUrl && !avatarPreview && (
-								<button
-									type="button"
-									onClick={handleSelectImageClick}
-									className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+						<div className="relative z-10">
+							<div className="flex justify-between items-center">
+								<Dialog.Title className="text-[20px] font-medium text-white-400 tracking-tight font-sans">
+									Edit Profile
+								</Dialog.Title>
+								<Dialog.Close
+									onClick={onClose}
+									className="rounded-sm opacity-70 text-white-400 hover:opacity-100 focus:outline-none"
 								>
-									<AvatarImage
-										avatarUrl={initialAvatarUrl}
-										width={80}
-										height={80}
-										alt={alt}
-										className="object-cover w-full h-full"
-									/>
-									<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
-										<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
-											<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-										</div>
+									<X className="h-5 w-5" />
+									<span className="sr-only">Close</span>
+								</Dialog.Close>
+							</div>
+							<p className="text-[14px] text-black-400 font-geist mt-2">
+								Update your display name and avatar.
+							</p>
+
+							<div className="mt-4 flex flex-col items-center gap-6 w-full">
+								{/* Hidden file input */}
+								<Input
+									ref={avatarInputRef}
+									type="file"
+									accept={ACCEPTED_FILE_TYPES}
+									className="hidden"
+									onChange={handleFileSelect}
+								/>
+
+								{/* Avatar Profile Images */}
+								<div className="flex items-center justify-center gap-4 w-full">
+									<div className="flex flex-row gap-4">
+										{/* Left side - clickable avatar */}
+										{initialAvatarUrl && !avatarPreview && (
+											<button
+												type="button"
+												onClick={handleSelectImageClick}
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 border border-primary-100/20 hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/40 hover:before:z-10"
+											>
+												<AvatarImage
+													avatarUrl={initialAvatarUrl}
+													width={80}
+													height={80}
+													alt={alt}
+													className="object-cover w-full h-full"
+												/>
+												<div className="absolute inset-0 flex items-center justify-center bg-black-900/50 opacity-0 group-hover:opacity-100 transition-opacity">
+													<div className="w-[40px] h-[40px] rounded-full flex items-center justify-center">
+														<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+													</div>
+												</div>
+											</button>
+										)}
+
+										{/* Left side - preview image */}
+										{avatarPreview && (
+											<div className="relative w-[80px] h-[80px] rounded-full overflow-hidden border border-primary-100/30">
+												<Image
+													src={avatarPreview}
+													alt="Avatar preview"
+													fill
+													sizes="80px"
+													className="object-cover w-full h-full scale-[1.02]"
+													style={{ objectPosition: "center" }}
+												/>
+											</div>
+										)}
+
+										{/* Left side - image icon when no initial avatar */}
+										{!initialAvatarUrl && !avatarPreview && (
+											<button
+												type="button"
+												onClick={handleSelectImageClick}
+												className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
+											>
+												<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
+											</button>
+										)}
 									</div>
-								</button>
-							)}
-
-							{/* Left side - preview image */}
-							{avatarPreview && (
-								<div className="relative w-[80px] h-[80px] rounded-full overflow-hidden border border-primary-100/30">
-									<Image
-										src={avatarPreview}
-										alt="Avatar preview"
-										fill
-										sizes="80px"
-										className="object-cover w-full h-full scale-[1.02]"
-										style={{ objectPosition: "center" }}
-									/>
 								</div>
-							)}
 
-							{/* Left side - image icon when no initial avatar */}
-							{!initialAvatarUrl && !avatarPreview && (
-								<button
-									type="button"
-									onClick={handleSelectImageClick}
-									className="group relative w-[80px] h-[80px] rounded-full overflow-hidden cursor-pointer focus:outline-none focus:ring-0 bg-transparent border border-primary-100/20 flex items-center justify-center hover:before:content-[''] hover:before:absolute hover:before:inset-0 hover:before:bg-black-900/50 hover:before:z-10"
-								>
-									<ImageIcon className="w-7 h-7 text-white-800 transform group-hover:scale-110 transition-transform" />
-								</button>
-							)}
+								{/* Display name input */}
+								<div className="w-full">
+									<label
+										htmlFor="displayName"
+										className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
+									>
+										Your Display Name
+									</label>
+									<div
+										className="flex flex-col items-start p-2 rounded-[8px] w-full"
+										style={{
+											background: "#00020A",
+											boxShadow: "inset 0 1px 4px rgba(0,0,0,0.5)",
+											border: "0.5px solid rgba(255,255,255,0.05)",
+										}}
+									>
+										<Input
+											id="displayName"
+											value={displayName}
+											onChange={handleDisplayNameChange}
+											className="w-full bg-transparent text-white-800 font-medium text-[14px] leading-[23.8px] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
+											disabled={isLoading}
+										/>
+									</div>
+								</div>
+
+								{/* Error message */}
+								{(error || avatarError) && (
+									<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
+										{error || avatarError}
+									</p>
+								)}
+
+								{/* Action buttons */}
+								<div className="flex justify-end items-center mt-6 w-full">
+									<div className="flex w-full max-w-[280px] space-x-2 ml-auto">
+										<Button
+											variant="link"
+											onClick={onClose}
+											type="button"
+											className="flex-1"
+											disabled={isLoading}
+										>
+											Cancel
+										</Button>
+										<Button
+											type="button"
+											disabled={!hasChanges || isLoading}
+											onClick={handleSave}
+											className="flex-1 rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98]"
+											style={{
+												background:
+													"linear-gradient(180deg, #202530 0%, #12151f 100%)",
+												border: "1px solid rgba(0,0,0,0.7)",
+												boxShadow:
+													"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+											}}
+										>
+											{isLoading ? "Saving..." : "Save"}
+										</Button>
+									</div>
+								</div>
+							</div>
 						</div>
-					</div>
-
-					{/* Display name input */}
-					<div className="w-full">
-						<label
-							htmlFor="displayName"
-							className="block text-white-800 text-left font-medium text-[12px] leading-[170%] font-geist mb-2"
-						>
-							Your Display Name
-						</label>
-						<div className="flex flex-col items-start p-2 rounded-[8px] bg-white/[0.29] w-full">
-							<Input
-								id="displayName"
-								value={displayName}
-								onChange={handleDisplayNameChange}
-								className="w-full bg-transparent text-white-800 font-medium text-[12px] leading-[170%] font-geist shadow-none focus:text-white border-0 p-0 focus-visible:ring-0 focus-visible:ring-offset-0"
-								disabled={isLoading}
-							/>
-						</div>
-					</div>
-
-					{/* Error message */}
-					{(error || avatarError) && (
-						<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-							{error || avatarError}
-						</p>
-					)}
-
-					{/* Action buttons */}
-					<div className="flex justify-end gap-2 w-full">
-						<Button
-							type="button"
-							onClick={onClose}
-							disabled={isLoading}
-							className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400 transition-colors disabled:border-0 disabled:bg-black-400 disabled:text-black-600"
-						>
-							Cancel
-						</Button>
-						<Button
-							type="button"
-							onClick={handleSave}
-							disabled={!hasChanges || isLoading}
-							className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em] bg-primary-200 text-black-800 font-bold hover:bg-transparent hover:text-primary-200 hover:border-primary-200 transition-colors disabled:border-0 disabled:bg-black-400 disabled:text-black-600"
-						>
-							{isLoading ? (
-								<div className="h-5 w-5 animate-spin rounded-full border-2 border-white-800 border-t-transparent" />
-							) : (
-								"Save"
-							)}
-						</Button>
-					</div>
+					</Dialog.Content>
 				</div>
-			</DialogContent>
-		</Dialog>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }

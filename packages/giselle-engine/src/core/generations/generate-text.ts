@@ -18,6 +18,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
+import { decryptSecret } from "../secrets";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";
@@ -71,18 +72,33 @@ export async function generateText(args: {
 				cleanupFunctions: [],
 			};
 
-			if (operationNode.content.tools?.github?.auth) {
-				const decryptToken = await args.context.vault?.decrypt(
-					operationNode.content.tools.github.auth.token,
-				);
+			const githubTool = operationNode.content.tools?.github;
+			if (githubTool) {
+				let decryptToken: string | undefined;
+				switch (githubTool.auth.type) {
+					case "pat":
+						decryptToken = await args.context.vault?.decrypt(
+							githubTool.auth.token,
+						);
+						break;
+					case "secret":
+						decryptToken = await decryptSecret({
+							...args,
+							secretId: githubTool.auth.secretId,
+						});
+						break;
+					default: {
+						const _exhaustiveCheck: never = githubTool.auth;
+						throw new Error(`Unhandled auth type: ${_exhaustiveCheck}`);
+					}
+				}
 				const allGitHubTools = githubTools(
 					octokit({
 						strategy: "personal-access-token",
-						personalAccessToken:
-							decryptToken ?? operationNode.content.tools.github.auth.token,
+						personalAccessToken: decryptToken ?? "token",
 					}),
 				);
-				for (const tool of operationNode.content.tools.github.tools) {
+				for (const tool of githubTool.tools) {
 					if (tool in allGitHubTools) {
 						preparedToolSet = {
 							...preparedToolSet,

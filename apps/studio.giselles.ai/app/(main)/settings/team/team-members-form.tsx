@@ -103,7 +103,7 @@ export function TeamMembersForm() {
 						<SelectValue />
 						<ChevronDown className="h-4 w-4 opacity-50" />
 					</SelectTrigger>
-					<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-hubot">
+					<SelectContent className="border-[0.5px] border-black-400 rounded-[8px] bg-black-850 text-white-900 font-sans">
 						<SelectItem
 							value="admin"
 							className="py-2 pr-2 font-medium text-[12px] leading-[20.4px] transition duration-300 ease-out cursor-pointer focus:bg-primary-900/50"
