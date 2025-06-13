@@ -1,13 +1,13 @@
-import type { WorkspaceId } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "giselle-sdk/react";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import useSWR from "swr";
 
-export function useWorkspaceSecrets(workspaceId: WorkspaceId) {
+export function useWorkspaceSecrets() {
+	const { data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	return useSWR(
 		{
 			namespace: "get-workspace-secrets",
-			workspaceId,
+			workspaceId: data.id,
 		},
 		({ workspaceId }) =>
 			client.getWorkspaceSecrets({ workspaceId }).then((res) => res.secrets),

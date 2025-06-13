@@ -51,7 +51,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 	const [presentDialog, setPresentDialog] = useState(false);
 	const [tabValue, setTabValue] = useState("create");
 	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
-	const { isLoading, data, mutate } = useWorkspaceSecrets(workspace.id);
+	const { isLoading, data, mutate } = useWorkspaceSecrets();
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const setupGitHubTool = useCallback<React.FormEventHandler<HTMLFormElement>>(
