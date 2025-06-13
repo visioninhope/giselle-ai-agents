@@ -47,8 +47,8 @@ async function resolveGitHubEmbeddingFilter(
 	const teamRecords = await db
 		.select({ dbId: teams.dbId })
 		.from(teams)
-		.innerJoin(agents, eq(agents.workspaceId, workspaceId))
-		.where(eq(teams.dbId, agents.teamDbId))
+		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
+		.where(eq(agents.workspaceId, workspaceId))
 		.limit(1);
 
 	if (teamRecords.length === 0) {
