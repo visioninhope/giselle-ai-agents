@@ -89,9 +89,16 @@ function PropertiesPanel({
 	switch (node.content.command.provider) {
 		case "github":
 			return <GitHubActionPropertiesPanel node={node} onRun={onRunAction} />;
+		case "web-search":
+			// TODO: Implement WebSearchActionPropertiesPanel
+			return <div>Web Search Action (Coming Soon)</div>;
 		default: {
-			const _exhaustiveCheck: never = node.content.command.provider;
-			throw new Error(`Unhandled action provider: ${_exhaustiveCheck}`);
+			// TODO: Uncomment after implementing WebSearchActionPropertiesPanel
+			// const _exhaustiveCheck: never = node.content.command.provider;
+			// throw new Error(`Unhandled action provider: ${_exhaustiveCheck}`);
+			const unknownProvider = (node.content.command as { provider: string })
+				.provider;
+			throw new Error(`Unhandled action provider: ${unknownProvider}`);
 		}
 	}
 }

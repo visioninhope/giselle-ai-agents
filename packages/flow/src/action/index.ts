@@ -1,4 +1,8 @@
 import { actions as githubActions, provider as githubProvider } from "./github";
+import {
+	actions as webSearchActions,
+	provider as webSearchProvider,
+} from "./web-search";
 
 export {
 	actions as githubActions,
@@ -8,5 +12,13 @@ export {
 	type GitHubAction,
 } from "./github";
 
-export type ActionProvider = typeof githubProvider;
-export const actionProviders = [githubProvider];
+export {
+	actions as webSearchActions,
+	provider as webSearchProvider,
+	type ActionCommandId as WebSearchActionCommandId,
+	actionIdToLabel as webSearchActionIdToLabel,
+	type WebSearchAction,
+} from "./web-search";
+
+export type ActionProvider = typeof githubProvider | typeof webSearchProvider;
+export const actionProviders = [githubProvider, webSearchProvider];

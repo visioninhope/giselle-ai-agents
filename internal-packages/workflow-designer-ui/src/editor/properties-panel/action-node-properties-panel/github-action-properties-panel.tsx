@@ -39,6 +39,11 @@ export function GitHubActionPropertiesPanel({
 }) {
 	const { value } = useIntegration();
 
+	// Only handle GitHub actions
+	if (node.content.command.provider !== "github") {
+		return null;
+	}
+
 	if (node.content.command.state.status === "configured") {
 		return (
 			<PanelGroup direction="vertical" className="flex-1 flex flex-col">

@@ -5,6 +5,7 @@ import {
 	githubVectorStoreFlag,
 	runV3Flag,
 	sidemenuFlag,
+	webSearchActionFlag,
 } from "@/flags";
 import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
@@ -44,6 +45,7 @@ export default async function Layout({
 	const runV3 = await runV3Flag();
 	const sidemenu = await sidemenuFlag();
 	const githubTools = await githubToolsFlag();
+	const webSearchAction = await webSearchActionFlag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -74,6 +76,7 @@ export default async function Layout({
 				runV3,
 				sidemenu,
 				githubTools,
+				webSearchAction,
 			}}
 		>
 			{children}
