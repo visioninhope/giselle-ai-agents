@@ -162,6 +162,7 @@ export class IngestPipeline<
 				progress.processedDocuments++;
 			} catch (error) {
 				result.failedDocuments++;
+				progress.processedDocuments++;
 				result.errors.push({
 					document: progress.currentDocument,
 					error: error instanceof Error ? error : new Error(String(error)),
