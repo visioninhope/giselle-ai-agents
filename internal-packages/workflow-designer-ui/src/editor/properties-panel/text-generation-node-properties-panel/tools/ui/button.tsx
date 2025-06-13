@@ -16,7 +16,6 @@ export function Button({
 	variant: style = "subtle",
 	...props
 }: ButtonProps) {
-	console.log(style);
 	return (
 		<button
 			className={clsx(
