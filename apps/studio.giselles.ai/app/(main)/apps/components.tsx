@@ -95,7 +95,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 	return (
 		<div
 			onMouseMove={handleMouseMove}
-			className="group relative flex h-auto basis-[280px] flex-col rounded-[12px] border"
+			className="group relative flex h-[300px] w-[267px] flex-none flex-col rounded-[12px] border-[0.5px]"
 			style={
 				{
 					"--spotlight-color": "rgba(255,255,255,0.15)",
@@ -118,7 +118,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 			<div className="pointer-events-none absolute top-0 left-4 right-4 z-10 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
 			{/* Subtle inner border */}
-			<div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border border-white/10" />
+			<div className="pointer-events-none absolute inset-0 z-10 rounded-[inherit] border-[0.5px] border-white/5" />
 
 			<div className="relative z-10 flex h-full w-full cursor-default flex-col pt-2 px-4 pb-4">
 				<div className="flex w-full justify-end gap-x-2">
@@ -146,7 +146,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 							<h3 className="font-sans text-[16px] font-semibold text-white-400 line-clamp-2">
 								{agent.name || "Untitled"}
 							</h3>
-							<div className="flex items-center justify-between">
+							<div className="flex items-center justify-between mt-1">
 								<span className="max-w-[200px] truncate font-geist text-xs text-white/80">
 									Edited{" "}
 									{formatTimestamp.toRelativeTime(
