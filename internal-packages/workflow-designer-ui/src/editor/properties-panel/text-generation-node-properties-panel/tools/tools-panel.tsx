@@ -27,7 +27,6 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "./ui/dialog";
-import { DropdownMenu } from "./ui/dropdown-menu";
 import { EmptyState } from "./ui/empty-state";
 import { Select } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -71,43 +70,55 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 			});
 			if (!parse.success) {
 				/** @todo Implement error handling */
+				console.log(parse.error);
 				return;
 			}
 			const payload = parse.data;
 			switch (payload.secretType) {
 				case "create":
-					{
-						startTransition(async () => {
-							const result = await client.addSecret({
-								workspaceId: workspace.id,
-								label: payload.label,
-								value: payload.value,
-							});
-							mutate([...(data ?? []), result.secret]);
-							updateNodeDataContent(node, {
-								...node.content,
-								tools: {
-									...node.content.tools,
-									github: {
-										tools: [],
-										auth: {
-											type: "secret",
-											secretId: result.secret.id,
-										},
+					startTransition(async () => {
+						const result = await client.addSecret({
+							workspaceId: workspace.id,
+							label: payload.label,
+							value: payload.value,
+						});
+						mutate([...(data ?? []), result.secret]);
+						updateNodeDataContent(node, {
+							...node.content,
+							tools: {
+								...node.content.tools,
+								github: {
+									tools: [],
+									auth: {
+										type: "secret",
+										secretId: result.secret.id,
 									},
 								},
-							});
-							setPresentDialog(false);
+							},
 						});
-					}
+					});
 					break;
 				case "select":
+					updateNodeDataContent(node, {
+						...node.content,
+						tools: {
+							...node.content.tools,
+							github: {
+								tools: [],
+								auth: {
+									type: "secret",
+									secretId: payload.secretId,
+								},
+							},
+						},
+					});
 					break;
 				default: {
 					const _exhaustiveCheck: never = payload;
 					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
 				}
 			}
+			setPresentDialog(false);
 		},
 		[node, updateNodeDataContent, client, workspace.id, data, mutate],
 	);
@@ -207,7 +218,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 									<input
 										type="hidden"
 										name="secretType"
-										value={GitHubToolSetupSecretType.create}
+										value={GitHubToolSetupSecretType.select}
 									/>
 									<fieldset className="flex flex-col">
 										<label
@@ -218,6 +229,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 										</label>
 										<div>
 											<Select
+												name="secretId"
 												placeholder="Choose a token… "
 												options={data ?? []}
 												renderOption={(option) => option.label}

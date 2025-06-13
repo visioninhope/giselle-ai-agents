@@ -16,6 +16,7 @@ interface SelectProps<T extends Identifiable> {
 	onValueChange?: (value: string) => void;
 	defaultValue?: string;
 	widthClassName?: string;
+	name?: string;
 }
 
 export function Select<T extends Identifiable>({
@@ -26,12 +27,14 @@ export function Select<T extends Identifiable>({
 	onValueChange,
 	defaultValue,
 	widthClassName,
+	name,
 }: SelectProps<T>) {
 	return (
 		<SelectPrimitive.Root
 			value={value}
 			onValueChange={onValueChange}
 			defaultValue={defaultValue}
+			name={name}
 		>
 			<SelectPrimitive.Trigger asChild>
 				<Button
