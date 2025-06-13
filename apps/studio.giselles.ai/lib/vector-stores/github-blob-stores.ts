@@ -75,7 +75,8 @@ async function resolveGitHubEmbeddingFilter(
 
 	// Return DB-level filters
 	return {
-		repository_index_db_id: repositoryIndex[0].dbId,
+		[githubRepositoryEmbeddings.repositoryIndexDbId.name]:
+			repositoryIndex[0].dbId,
 	};
 }
 

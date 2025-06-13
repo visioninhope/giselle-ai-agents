@@ -61,9 +61,7 @@ export class PostgresQueryService<
 
 			for (const [column, value] of Object.entries(filters)) {
 				if (typeof column === "string") {
-					whereConditions.push(
-						`${this.validateColumnName(column)} = $${paramIndex}`,
-					);
+					whereConditions.push(`"${column}" = $${paramIndex}`);
 					values.push(value);
 					paramIndex++;
 				}
