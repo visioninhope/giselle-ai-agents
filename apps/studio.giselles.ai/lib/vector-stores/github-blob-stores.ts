@@ -98,9 +98,10 @@ export function createGitHubQueryService(): GitHubVectorStoreQueryService<GitHub
 		contextToFilter: resolveGitHubEmbeddingFilter,
 		requiredColumnOverrides: {
 			documentKey: "path",
-			content: "chunk_content",
-			index: "chunk_index",
-			// embedding: "embedding" (default)
+			// (default)
+			// chunkContent: "chunk_content",
+			// chunkIndex: "chunk_index",
+			// embedding: "embedding"
 		},
 		// Metadata fields will auto-convert from camelCase to snake_case:
 		// commitSha -> commit_sha
