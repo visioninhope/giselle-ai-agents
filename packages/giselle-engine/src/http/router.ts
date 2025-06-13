@@ -299,7 +299,17 @@ export const createJsonRouters = {
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
-					secretId: await giselleEngine.addSecret(input),
+					secret: await giselleEngine.addSecret(input),
+				}),
+		}),
+	getWorkspaceSecrets: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					secrets: await giselleEngine.getWorkspaceSecrets(input),
 				}),
 		}),
 } as const;
