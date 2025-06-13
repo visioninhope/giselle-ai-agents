@@ -508,7 +508,10 @@ export function Editor({
 													</Panel>
 												</PanelGroup>
 											</Tabs.Content>
-											<Tabs.Content value="secret" className="h-full">
+											<Tabs.Content
+												value="secret"
+												className="h-full outline-none"
+											>
 												<SecretTable />
 											</Tabs.Content>
 										</Panel>
