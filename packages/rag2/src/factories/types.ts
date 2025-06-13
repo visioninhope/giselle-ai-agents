@@ -26,8 +26,9 @@ export interface QueryServiceConfig<
 	tableName: string;
 	/**
 	 * embedder
+	 * if not provided, a default embedder will be used
 	 */
-	embedder: Embedder;
+	embedder?: Embedder;
 	/**
 	 * context to filter
 	 */
