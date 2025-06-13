@@ -191,7 +191,7 @@ export async function useGenerationExecutor<T>(args: {
 				const result = await args.context.callbacks?.generationComplete?.(
 					completedGeneration,
 					{
-						telemetry: args.telemetry?.metadata,
+						telemetry: args.telemetry,
 					},
 				);
 				return result;

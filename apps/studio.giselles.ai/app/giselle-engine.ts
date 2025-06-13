@@ -92,6 +92,7 @@ export const giselleEngine = NextGiselleEngine({
 			try {
 				await emitTelemetry(generation, {
 					telemetry: options.telemetry,
+					storage,
 				});
 			} catch (error) {
 				console.error("Telemetry emission failed:", error);
