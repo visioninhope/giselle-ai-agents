@@ -90,7 +90,7 @@ export function GenerationView({
 											<Accordion.Item
 												value={`messages.${message.id}.parts.[${index}].reasoning`}
 											>
-												<Accordion.Trigger className="group text-white-400 text-[12px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none font-hubot">
+												<Accordion.Trigger className="group text-white-400 text-[12px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none font-sans">
 													<ChevronRightIcon
 														className="size-[16px] transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-90"
 														aria-hidden
@@ -117,7 +117,7 @@ export function GenerationView({
 										<Accordion.Item
 											value={`messages.${message.id}.parts.[${index}].reason`}
 										>
-											<Accordion.Trigger className="group text-white-400 text-[12px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none font-hubot">
+											<Accordion.Trigger className="group text-white-400 text-[12px] flex items-center gap-[4px] cursor-pointer hover:text-white-800 transition-colors data-[state=open]:text-white-800 outline-none font-sans">
 												<ChevronRightIcon
 													className="size-[16px] transition-transform duration-300 ease-[cubic-bezier(0.87,_0,_0.13,_1)] group-data-[state=open]:rotate-90"
 													aria-hidden

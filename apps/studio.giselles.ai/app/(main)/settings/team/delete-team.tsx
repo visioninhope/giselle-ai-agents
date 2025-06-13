@@ -25,7 +25,7 @@ export function DeleteTeam() {
 	return (
 		<div className="flex justify-between items-center gap-x-[10px] bg-transparent rounded-[8px] border-[0.5px] border-error-900 px-[24px] pt-[16px] pb-[24px] w-full">
 			<div className="flex flex-col gap-y-4 max-w-[557px]">
-				<h2 className="text-error-900 font-medium text-[16px] leading-[27.2px] tracking-normal font-hubot">
+				<h2 className="text-error-900 font-medium text-[16px] leading-[27.2px] tracking-normal font-sans">
 					Delete Team
 				</h2>
 				<p className="text-red-900/50 font-medium text-[12px] leading-[20.4px] tracking-normal font-geist">
@@ -51,7 +51,7 @@ export function DeleteTeam() {
 						className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-850 bg-clip-padding"
 					/>
 					<DialogHeader className="relative z-10">
-						<DialogTitle className="text-error-900 font-bold text-[20px] leading-[28px] font-hubot text-center">
+						<DialogTitle className="text-error-900 font-bold text-[20px] leading-[28px] font-sans text-center">
 							Delete Team
 						</DialogTitle>
 					</DialogHeader>

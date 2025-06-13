@@ -81,7 +81,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 		<div className="bg-transparent rounded-[8px] border-[0.5px] border-black-400 px-[24px] py-[16px] w-full">
 			<div className="flex flex-col gap-2">
 				<div className="flex flex-col gap-2">
-					<span className="text-white-400 font-medium text-[16px] leading-[19.2px] font-hubot">
+					<span className="text-white-400 font-medium text-[16px] leading-[19.2px] font-sans">
 						Team Name
 					</span>
 					<p className="text-black-400 text-[14px] leading-[20.4px] font-geist">
@@ -90,7 +90,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 					</p>
 				</div>
 				<div className="flex justify-between items-center gap-2">
-					<span className="text-primary-100 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-hubot px-3 py-2 border-[0.5px] border-black-750 rounded-[4px] bg-black-900 w-[360px] truncate">
+					<span className="text-primary-100 font-normal text-[18px] leading-[21.6px] tracking-[-0.011em] font-sans px-3 py-2 border-[0.5px] border-black-750 rounded-[4px] bg-black-900 w-[360px] truncate">
 						{teamName}
 					</span>
 					<Dialog open={isEditingTeam} onOpenChange={setIsEditingTeam}>
@@ -121,7 +121,7 @@ export function TeamNameForm({ id: teamId, name }: Team) {
 								className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
 							/>
 							<DialogHeader className="relative z-10">
-								<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-hubot text-center">
+								<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-sans text-center">
 									Change Your Team Name
 								</DialogTitle>
 							</DialogHeader>

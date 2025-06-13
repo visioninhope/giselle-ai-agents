@@ -49,7 +49,7 @@ export function RepositoryItem({
 		<div className="border border-black-400 rounded-md p-4 bg-black-900/50">
 			<div className="flex justify-between items-center">
 				<div>
-					<h5 className="text-white-400 font-medium text-[16px] leading-[19.2px] font-hubot">
+					<h5 className="text-white-400 font-medium text-[16px] leading-[19.2px] font-sans">
 						{repositoryIndex.owner}/{repositoryIndex.repo}
 					</h5>
 					<div className="flex items-center gap-2 mt-1">
@@ -91,7 +91,7 @@ export function RepositoryItem({
 									type="button"
 									onClick={() => setShowDeleteDialog(false)}
 									disabled={isPending}
-									className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-hubot"
+									className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
 								>
 									Cancel
 								</AlertDialogCancel>
@@ -99,7 +99,7 @@ export function RepositoryItem({
 									type="submit"
 									onClick={handleDelete}
 									disabled={isPending}
-									className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-hubot"
+									className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
 								>
 									{isPending ? "Deleting..." : "Delete"}
 								</AlertDialogAction>

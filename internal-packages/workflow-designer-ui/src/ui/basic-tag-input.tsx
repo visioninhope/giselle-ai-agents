@@ -236,7 +236,7 @@ export function BasicTagInput({
 							border: "none",
 							fontSize: "14px",
 							fontWeight: 500,
-							fontFamily: "var(--font-hubot-sans), system-ui, sans-serif",
+							fontFamily: "var(--font-dm-sans), system-ui, sans-serif",
 							cursor:
 								inputValue.trim() === "" || isMaxReached
 									? "not-allowed"

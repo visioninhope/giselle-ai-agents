@@ -2,28 +2,28 @@
 
 
 ## Summary
-* 1057 MIT
+* 1058 MIT
 * 110 Apache 2.0
-* 58 ISC
+* 60 ISC
 * 34 New BSD
 * 17 Simplified BSD
+* 5 BlueOak-1.0.0
 * 3 MIT OR Apache-2.0
 * 3 Mozilla Public License 2.0
-* 3 BlueOak-1.0.0
-* 2 MIT-0
 * 2 LGPL-3.0-or-later
+* 2 MIT-0
 * 2 The Unlicense
+* 1 Python-2.0
+* 1 CC-BY-4.0
+* 1 SIL OPEN FONT LICENSE
+* 1 (AFL-2.1 OR BSD-3-Clause)
+* 1 (MIT AND Zlib)
 * 1 (BSD-2-Clause OR MIT OR Apache-2.0)
 * 1 (MIT OR Apache-2.0)
 * 1 Unknown
 * 1 BSD Zero Clause License
 * 1 (MIT OR CC0-1.0)
 * 1 BSD
-* 1 (MIT AND Zlib)
-* 1 (AFL-2.1 OR BSD-3-Clause)
-* 1 SIL OPEN FONT LICENSE
-* 1 CC-BY-4.0
-* 1 Python-2.0
 
 
 
@@ -1385,6 +1385,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@isaacs/cliui"></a>
 ### @isaacs/cliui v8.0.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+
+
+<a name="@isaacs/fs-minipass"></a>
+### @isaacs/fs-minipass v4.0.1
 #### 
 
 ##### Paths
@@ -3661,7 +3672,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@tailwindcss/postcss"></a>
-### @tailwindcss/postcss v4.0.3
+### @tailwindcss/postcss v4.0.9
 #### 
 
 ##### Paths
@@ -5861,6 +5872,17 @@ CC-BY-4.0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="chownr"></a>
+### chownr v3.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+BlueOak-1.0.0 permitted
 
 
 
@@ -10055,6 +10077,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="minizlib"></a>
+### minizlib v3.0.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="mkdirp"></a>
 ### mkdirp v0.5.6
 #### 
@@ -12876,7 +12909,7 @@ Unknown manually approved
 
 
 <a name="tailwindcss"></a>
-### tailwindcss v4.0.3
+### tailwindcss v4.0.9
 #### 
 
 ##### Paths
@@ -12905,6 +12938,17 @@ Unknown manually approved
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="tar"></a>
+### tar v7.4.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
 
 
 
@@ -14240,6 +14284,17 @@ Unknown manually approved
 * /home/runner/work/giselle/giselle
 
 <a href="http://en.wikipedia.org/wiki/ISC_license">ISC</a> permitted
+
+
+
+<a name="yallist"></a>
+### yallist v5.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+BlueOak-1.0.0 permitted
 
 
 

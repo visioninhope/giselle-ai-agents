@@ -17,7 +17,7 @@ export default function TeamPage() {
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center">
 				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Team Settings
@@ -26,7 +26,7 @@ export default function TeamPage() {
 					href="https://docs.giselles.ai/guides/settings/team/billing"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-hubot"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 				>
 					About Team Settings
 					<ExternalLink size={14} />
@@ -48,7 +48,7 @@ export default function TeamPage() {
 
 				{/* Delete Team Section */}
 				<div className="mt-8">
-					<h4 className="text-white-400 font-medium text-[18px] leading-[22px] tracking-normal font-hubot mb-4">
+					<h4 className="text-white-400 font-medium text-[18px] leading-[22px] tracking-normal font-sans mb-4">
 						Danger Zone
 					</h4>
 					<DeleteTeam />
@@ -86,7 +86,7 @@ function BillingInfoForFreePlan({ team }: BillingInfoProps) {
 		<>
 			<div className="flex flex-col gap-y-0.5">
 				<div className="flex flex-wrap items-center gap-x-1 text-white-800 font-medium">
-					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-hubot">
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-sans">
 						Free Plan
 					</p>
 				</div>
@@ -118,7 +118,7 @@ function BillingInfoForProPlan({ team }: BillingInfoProps) {
 		<>
 			<div className="flex flex-col gap-y-[2px]">
 				<div className="flex flex-col gap-0.5">
-					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-hubot">
+					<p className="text-[22px] leading-[26.4px] tracking-[-0.04em] font-medium font-sans">
 						<span className="text-primary-400">Pro Plan</span>
 					</p>
 				</div>

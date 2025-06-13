@@ -1,7 +1,6 @@
 "use client";
 
 import {
-	type ActionNode,
 	type ConnectionId,
 	type FailedFileData,
 	type FileContent,
@@ -10,9 +9,9 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	type SecretId,
 	type TriggerNode,
 	type UploadedFileData,
-	type VectorStoreNode,
 	type Viewport,
 	type Workspace,
 	createFailedFileData,

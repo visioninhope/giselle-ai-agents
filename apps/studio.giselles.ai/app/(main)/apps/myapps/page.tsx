@@ -85,7 +85,7 @@ async function MyAgentList() {
 								<div className="h-[150px] bg-black-80 rounded-[8px] mb-4" />
 
 								<div className="flex-grow">
-									<h3 className="font-hubot text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
+									<h3 className="font-sans text-white-400 text-[16px] font-semibold mb-1 line-clamp-2">
 										{agent.name || "Untitled"}
 									</h3>
 								</div>
@@ -117,11 +117,11 @@ export default function MyAppsPage() {
 	return (
 		<ToastProvider>
 			<div className="w-full">
-				<h1 className="text-[28px] font-hubot font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
+				<h1 className="text-[28px] font-sans font-medium mb-8 text-primary-100 drop-shadow-[0_0_20px_#0087f6]">
 					My Apps
 				</h1>
 				<Suspense
-					fallback={<p className="text-center py-8 font-hubot">Loading...</p>}
+					fallback={<p className="text-center py-8 font-sans">Loading...</p>}
 				>
 					<MyAgentList />
 				</Suspense>

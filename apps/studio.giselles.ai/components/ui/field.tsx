@@ -20,8 +20,8 @@ export const Field: FC<FieldProps> = ({
 	ignore1password = false,
 	disabled = false,
 }) => (
-	<div className="grid gap-[4px]">
-		<Label htmlFor={name} className="text-[14px] font-hubot text-black-70">
+	<div className="grid gap-[8px]">
+		<Label htmlFor={name} className="text-[14px] font-sans text-black-200">
 			{label}
 		</Label>
 		<Input

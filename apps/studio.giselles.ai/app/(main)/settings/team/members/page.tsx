@@ -9,7 +9,7 @@ import { TeamMembersList } from "../team-members-list";
 function TitleWithBorder({ title }: { title: string }) {
 	return (
 		<div className="mb-4">
-			<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-hubot mb-3">
+			<h2 className="text-white-400 text-[16px] leading-[27.2px] tracking-normal font-sans mb-3">
 				{title}
 			</h2>
 			<div className="border-t border-black-400 pb-4" />
@@ -29,7 +29,7 @@ export default async function TeamMembersPage() {
 		return (
 			<div className="flex flex-col gap-[24px]">
 				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Members
@@ -48,7 +48,7 @@ export default async function TeamMembersPage() {
 		return (
 			<div className="flex flex-col gap-[24px]">
 				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Members
@@ -67,7 +67,7 @@ export default async function TeamMembersPage() {
 		<div className="flex flex-col gap-[24px]">
 			<div className="flex justify-between items-center w-full">
 				<h3
-					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-hubot"
+					className="text-primary-100 font-semibold text-[28px] leading-[28px] tracking-[-0.011em] font-sans"
 					style={{ textShadow: "0px 0px 20px hsla(207, 100%, 48%, 1)" }}
 				>
 					Members

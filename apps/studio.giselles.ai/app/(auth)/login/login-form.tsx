@@ -7,7 +7,7 @@ import { login } from "./login";
 export const LoginForm: FC = () => {
 	const [authError, action, isPending] = useActionState(login, null);
 	return (
-		<form action={action} className="font-hubot">
+		<form action={action} className="font-sans">
 			<Form
 				linkToResetPassword={true}
 				submitText="Log in"

@@ -189,13 +189,13 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
-								className="flex-1 flex flex-col overflow-hidden"
+								className="flex-1 flex flex-col overflow-hidden outline-none"
 							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="model"
-								className="flex-1 flex flex-col overflow-y-auto px-[4px]"
+								className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
 							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
@@ -442,13 +442,13 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="input"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-y-auto outline-none"
 							>
 								<InputPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="tools"
-								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px]"
+								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px] outline-none"
 							>
 								{sidemenu ? (
 									<ToolsPanel node={node} />
@@ -460,18 +460,42 @@ export function TextGenerationNodePropertiesPanel({
 								)}
 							</Tabs.Content>
 						</Tabs.Root>
+						<div className="h-[16px]" />
 					</PropertiesPanelContent>
 				</Panel>
-				<PanelResizeHandle
-					className={clsx(
-						"h-[12px] flex items-center justify-center cursor-row-resize",
-						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
-						"hover:after:bg-[#4a90e2]",
-					)}
-				/>
+				{sidemenu ? (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[1px] bg-border cursor-col-resize",
+							"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+						)}
+					/>
+				) : (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[12px] flex items-center justify-center cursor-row-resize",
+							"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+							"hover:after:bg-[#4a90e2]",
+						)}
+					/>
+				)}
 				<Panel>
 					<PropertiesPanelContent>
-						<GenerationPanel node={node} onClickGenerateButton={generateText} />
+						{sidemenu ? (
+							<>
+								<div className="h-[16px]" />
+								<GenerationPanel
+									node={node}
+									onClickGenerateButton={generateText}
+								/>
+								<div className="h-[16px]" />
+							</>
+						) : (
+							<GenerationPanel
+								node={node}
+								onClickGenerateButton={generateText}
+							/>
+						)}
 					</PropertiesPanelContent>
 				</Panel>
 			</PanelGroup>

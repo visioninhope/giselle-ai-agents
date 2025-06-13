@@ -23,10 +23,7 @@ const config = {
 		},
 		extend: {
 			fontFamily: {
-				rosart: ["var(--font-rosart)", "Times New Roman", "serif"],
-				avenir: ["Avenir", "Arial", "sans-serif"],
-				hubot: ["var(--font-hubot-sans)", "Arial", "sans-serif"],
-				geist: ["var(--font-geist)", "Arial", "sans-serif"],
+				sans: ["var(--font-dm-sans)", "DM Sans", "sans-serif"],
 			},
 			colors: {
 				border: "hsl(var(--border))",

@@ -15,7 +15,7 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 				<button
 					type="submit"
 					formAction={authorizeGoogle}
-					className="font-hubot w-full text-center"
+					className="font-sans w-full text-center"
 				>
 					{labelPrefix} with Google
 				</button>
@@ -28,7 +28,7 @@ export const OAuthProviders: FC<OauthProvidersProps> = ({ labelPrefix }) => (
 				<button
 					type="submit"
 					formAction={authorizeGitHub}
-					className="font-hubot w-full text-center"
+					className="font-sans w-full text-center"
 				>
 					{labelPrefix} with GitHub
 				</button>

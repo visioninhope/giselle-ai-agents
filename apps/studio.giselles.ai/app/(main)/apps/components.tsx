@@ -106,22 +106,22 @@ export function DuplicateAgentButton({
 
 			<AlertDialogContent className="text-white-800">
 				<AlertDialogHeader>
-					<AlertDialogTitle className="font-hubot text-[20px] font-medium">
+					<AlertDialogTitle className="font-sans text-[20px] font-medium">
 						Are you sure to duplicate this App?
 					</AlertDialogTitle>
 					{agentName && (
-						<AlertDialogDescription className="text-white-800 font-hubot">
+						<AlertDialogDescription className="text-white-800 font-sans">
 							{agentName}
 						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter className="mt-6">
-					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
+					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleConfirm}
-						className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
+						className="bg-primary-900 hover:bg-transparent hover:text-primary-900 hover:border-primary-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors"
 					>
 						Duplicate
 					</AlertDialogAction>
@@ -194,23 +194,23 @@ export function DeleteAgentButton({
 
 			<AlertDialogContent className="text-white-800">
 				<AlertDialogHeader>
-					<AlertDialogTitle className="font-hubot text-[20px] font-medium">
+					<AlertDialogTitle className="font-sans text-[20px] font-medium">
 						Are you sure you want to delete this App?
 					</AlertDialogTitle>
 					{agentName && (
-						<AlertDialogDescription className="text-white-800 font-hubot">
+						<AlertDialogDescription className="text-white-800 font-sans">
 							This action cannot be undone. This will permanently delete the app
 							"{agentName}".
 						</AlertDialogDescription>
 					)}
 				</AlertDialogHeader>
 				<AlertDialogFooter className="mt-6">
-					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors">
+					<AlertDialogCancel className="border border-black-400 bg-transparent hover:bg-white-800 hover:text-black-900 text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors">
 						Cancel
 					</AlertDialogCancel>
 					<AlertDialogAction
 						onClick={handleConfirm}
-						className="bg-error-900 hover:bg-transparent hover:text-error-900 hover:border-error-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-hubot text-[16px] transition-colors"
+						className="bg-error-900 hover:bg-transparent hover:text-error-900 hover:border-error-900 border border-transparent text-white-800 rounded-lg py-2 px-6 font-sans text-[16px] transition-colors"
 					>
 						Delete
 					</AlertDialogAction>

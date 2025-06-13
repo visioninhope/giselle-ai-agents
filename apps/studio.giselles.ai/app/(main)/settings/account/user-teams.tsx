@@ -140,7 +140,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
+									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
 									disabled={isPending}
 								>
 									Apps
@@ -157,7 +157,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-hubot"
+									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-white-400 font-medium text-[14px] leading-[20.4px] font-sans"
 									disabled={isPending}
 								>
 									Settings
@@ -174,7 +174,7 @@ function UserTeamsItem({
 							renderButton={(isPending) => (
 								<button
 									type="submit"
-									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-error-900 font-medium text-[14px] leading-[20.4px] font-hubot"
+									className="flex items-center gap-x-2 p-2 rounded-[8px] w-full hover:bg-primary-900/50 text-error-900 font-medium text-[14px] leading-[20.4px] font-sans"
 									disabled={isPending}
 								>
 									Leave team

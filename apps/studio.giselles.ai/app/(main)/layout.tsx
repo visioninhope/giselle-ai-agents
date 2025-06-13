@@ -25,7 +25,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 							href="https://docs.giselles.ai/guides/introduction"
 							target="_blank"
 							rel="noopener noreferrer"
-							className="text-[16px] font-hubot font-medium text-black-70 hover:text-white-100"
+							className="text-[16px] font-sans font-medium text-black-70 hover:text-white-100"
 						>
 							Docs
 						</Link>
