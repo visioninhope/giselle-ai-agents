@@ -159,16 +159,4 @@ export class PostgresQueryService<
 
 		return result.data;
 	}
-
-	private validateColumnName(column: string): string {
-		const allowedColumns = Object.values(this.config.columnMapping);
-		if (!allowedColumns.includes(column)) {
-			throw new ValidationError(`Invalid column name: ${column}`, undefined, {
-				operation: "validateColumnName",
-				column,
-				allowedColumns,
-			});
-		}
-		return `"${column}"`;
-	}
 }
