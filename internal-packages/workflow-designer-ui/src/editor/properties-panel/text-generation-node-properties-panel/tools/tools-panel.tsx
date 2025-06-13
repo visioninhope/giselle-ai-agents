@@ -29,6 +29,7 @@ import {
 } from "./ui/dialog";
 import { DropdownMenu } from "./ui/dropdown-menu";
 import { EmptyState } from "./ui/empty-state";
+import { Select } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const GitHubToolSetupSecretType = {
@@ -216,10 +217,11 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 											Select a saved token
 										</label>
 										<div>
-											<DropdownMenu
+											<Select
 												placeholder="Choose a token… "
-												items={data ?? []}
-												renderItem={(item) => item.label}
+												options={data ?? []}
+												renderOption={(option) => option.label}
+												widthClassName="w-[180px]"
 											/>
 										</div>
 									</fieldset>
