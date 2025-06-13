@@ -24,7 +24,7 @@ export type GitHubBlobMetadata = {
 	fileSha: string;
 	path: string;
 	nodeId: string;
-} & Record<string, unknown>;
+};
 
 /**
  * GitHub blob loader that implements rag2's DocumentLoader interface
