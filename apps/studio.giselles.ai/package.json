@@ -120,7 +120,7 @@
 		"@giselle-sdk/usage-limits": "workspace:*",
 		"@octokit/openapi-types": "catalog:",
 		"@octokit/webhooks-types": "7.6.1",
-		"@playwright/test": "1.52.0",
+		"@playwright/test": "1.53.0",
 		"@radix-ui/react-hover-card": "1.1.2",
 		"@tailwindcss/postcss": "4.0.9",
 		"@tailwindcss/typography": "0.5.15",
