@@ -85,8 +85,8 @@ export class PostgresChunkStore<
 			const records = chunks.map((chunk) => ({
 				record: {
 					[columnMapping.documentKey]: documentKey,
-					[columnMapping.content]: chunk.content,
-					[columnMapping.index]: chunk.index,
+					[columnMapping.chunkContent]: chunk.content,
+					[columnMapping.chunkIndex]: chunk.index,
 					// map metadata
 					...this.mapMetadata(metadata, columnMapping),
 					// add static context
