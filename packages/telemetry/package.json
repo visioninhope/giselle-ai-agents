@@ -24,11 +24,12 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
-		"@types/react": "catalog:",
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@types/node": "catalog:",
-		"tsup": "catalog:"
+		"@types/react": "catalog:",
+		"tsup": "catalog:",
+		"unstorage": "catalog:"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "catalog:",
