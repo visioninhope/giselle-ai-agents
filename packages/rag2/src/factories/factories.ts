@@ -1,11 +1,8 @@
 import { ValidationError } from "../errors";
 import type { PostgresQueryServiceConfig } from "../query-service/postgres";
 import { PostgresQueryService } from "../query-service/postgres";
-import {
-	type QueryServiceConfig,
-	createColumnMapping,
-	createDefaultEmbedder,
-} from "./index";
+import type { QueryServiceConfig } from "./types";
+import { createColumnMapping, createDefaultEmbedder } from "./utils";
 
 /**
  * validate database config
