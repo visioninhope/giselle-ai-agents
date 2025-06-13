@@ -57,10 +57,10 @@ export function SideMenu() {
 						<p>Run History</p>
 					</div>
 				</Tabs.Trigger>
-				<Tabs.Trigger value="credentials" className="group" data-list-wrapper>
+				<Tabs.Trigger value="secret" className="group" data-list-wrapper>
 					<div data-list>
 						<FileKey2Icon data-icon />
-						<p>Credentials</p>
+						<p>Secrets</p>
 					</div>
 				</Tabs.Trigger>
 			</Tabs.List>

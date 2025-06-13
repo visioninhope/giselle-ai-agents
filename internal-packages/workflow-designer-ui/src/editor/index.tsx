@@ -34,6 +34,7 @@ import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { RunButton } from "./run-button";
+import { SecretTable } from "./secret/secret-table";
 import { SideMenu } from "./side-menu";
 import {
 	FloatingNodePreview,
@@ -506,6 +507,9 @@ export function Editor({
 														)}
 													</Panel>
 												</PanelGroup>
+											</Tabs.Content>
+											<Tabs.Content value="secret" className="h-full">
+												<SecretTable />
 											</Tabs.Content>
 										</Panel>
 									</PanelGroup>
