@@ -298,7 +298,11 @@ export function InviteMemberDialog({
 				<GlassDialogFooter
 					onCancel={handleCloseDialog}
 					onConfirm={() =>
-						document.getElementById("invite-member-form")?.requestSubmit()
+						(
+							document.getElementById(
+								"invite-member-form",
+							) as HTMLFormElement | null
+						)?.requestSubmit()
 					}
 					confirmLabel="Invite"
 					isPending={isLoading}
