@@ -7,10 +7,8 @@ import {
 	PlusIcon,
 	Settings2Icon,
 } from "lucide-react";
-import { Tabs as RadixTabs } from "radix-ui";
 import {
 	type ComponentProps,
-	type FormEventHandler,
 	type PropsWithChildren,
 	type ReactNode,
 	useCallback,
@@ -113,6 +111,7 @@ function GitHubToolSetting({ node }: { node: TextGenerationNode }) {
 			onOpenChange={setPresentDialog}
 			enable={!!node.content.tools?.github}
 			onSubmit={setupGitHubTool}
+			submitting={isPending}
 		>
 			<ToolList.DialogHeader
 				title="Conenct to GitHub"
@@ -241,6 +240,7 @@ interface ToolListDialogProps
 	extends Omit<ComponentProps<typeof Dialog>, "children"> {
 	enable: boolean;
 	onSubmit: React.FormEventHandler<HTMLFormElement>;
+	submitting: boolean;
 }
 interface ToolListDialogHeaderProps {
 	title: string;
@@ -275,6 +275,7 @@ const ToolList = {
 		children,
 		enable,
 		onSubmit,
+		submitting,
 	}: PropsWithChildren<ToolListDialogProps>) {
 		return (
 			<Dialog open={open} onOpenChange={onOpenChange} defaultOpen={defaultOpen}>
@@ -299,8 +300,9 @@ const ToolList = {
 							<button
 								type="submit"
 								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+								disabled={submitting}
 							>
-								Save & Connect
+								{submitting ? "..." : "Save & Connect"}
 							</button>
 						</DialogFooter>
 					</form>
