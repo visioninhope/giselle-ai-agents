@@ -97,15 +97,13 @@ export class PostgresQueryService<
 			return result.rows.map((row) => {
 				const metadata = this.extractMetadata(row, metadataColumns);
 
-				const validatedMetadata = this.validateMetadata(metadata);
-
 				return {
 					chunk: {
 						content: row.content,
 						index: row.index,
 					},
 					similarity: row.similarity,
-					metadata: validatedMetadata,
+					metadata,
 				};
 			});
 		} catch (error) {
@@ -150,18 +148,6 @@ export class PostgresQueryService<
 	 */
 	private validateMetadata(metadata: unknown): TMetadata {
 		const { metadataSchema } = this.config;
-
-		// if metadataSchema is not provided, perform more strict type check
-		if (!metadataSchema) {
-			if (this.isValidMetadataObject(metadata)) {
-				return metadata;
-			}
-			throw new ValidationError(
-				"Metadata validation failed: expected object with string keys",
-				undefined,
-				{ operation: "validateMetadata", metadata },
-			);
-		}
 
 		// validate metadata
 		const result = metadataSchema.safeParse(metadata);

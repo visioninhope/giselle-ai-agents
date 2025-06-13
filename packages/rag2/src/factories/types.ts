@@ -1,5 +1,6 @@
 import type { z } from "zod/v4";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
+import type { Embedder } from "../embedder";
 
 /**
  * query service config
@@ -26,10 +27,7 @@ export interface QueryServiceConfig<
 	/**
 	 * embedder
 	 */
-	embedder?: {
-		embed: (text: string) => Promise<number[]>;
-		embedMany: (texts: string[]) => Promise<number[][]>;
-	};
+	embedder: Embedder;
 	/**
 	 * context to filter
 	 */
