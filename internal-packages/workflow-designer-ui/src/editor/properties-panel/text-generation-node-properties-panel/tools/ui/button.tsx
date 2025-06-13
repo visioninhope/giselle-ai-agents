@@ -34,11 +34,3 @@ export function Button({
 		</button>
 	);
 }
-/**
- *
- * 	"flex items-center justify-between gap-[2px] bg-background",
- *	"text-text text-[14px] border border-border rounded-[2px] w-full",
- *	"px-[8px] py-[2px] hover:bg-ghost-element-hover cursor-pointer transition-colors",
- *	"outline-none",
- *
- */
