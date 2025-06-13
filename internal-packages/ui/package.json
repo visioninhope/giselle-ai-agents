@@ -9,14 +9,17 @@
 	},
 	"exports": {
 		"./table": "./components/table.tsx",
-		"./empty-state": "./components/empty-state.tsx"
+		"./empty-state": "./components/empty-state.tsx",
+		"./dialog": "./components/dialog.tsx",
+		"./button": "./components/button.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",
 		"lucide-react": "catalog:",
 		"radix-ui": "catalog:",
 		"react": "catalog:",
-		"react-dom": "catalog:"
+		"react-dom": "catalog:",
+		"zod": "catalog:"
 	},
 	"devDependencies": {
 		"@giselle/giselle-sdk-tsconfig": "workspace:^",
