@@ -5,6 +5,7 @@ import { Tabs } from "radix-ui";
 import { useCallback } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Button } from "../../../ui/button";
+import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -12,7 +13,6 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
-import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { QueryPanel } from "./query-panel";
 import { useConnectedSources } from "./sources";
 
