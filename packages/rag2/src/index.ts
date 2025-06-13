@@ -67,7 +67,6 @@ export {
 	createDefaultEmbedder,
 	createIngestPipeline,
 	createQueryService,
-	DEFAULT_REQUIRED_COLUMNS,
 	// Types
 	type ChunkStoreConfig,
 	type QueryServiceConfig,
