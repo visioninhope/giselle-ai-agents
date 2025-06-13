@@ -14,7 +14,6 @@ export {
 	createColumnMapping,
 	createDefaultChunker,
 	createDefaultEmbedder,
-	DEFAULT_REQUIRED_COLUMNS,
 } from "./utils";
 
 // Re-export factory functions

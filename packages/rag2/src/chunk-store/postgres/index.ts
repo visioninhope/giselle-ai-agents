@@ -3,7 +3,11 @@ import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
 import { ensurePgVectorTypes } from "../../database/pgvector-registry";
 import { PoolManager } from "../../database/postgres";
-import type { ColumnMapping, DatabaseConfig } from "../../database/types";
+import {
+	type ColumnMapping,
+	type DatabaseConfig,
+	REQUIRED_COLUMNS,
+} from "../../database/types";
 import { DatabaseError, ValidationError } from "../../errors";
 import type { ChunkStore, ChunkWithEmbedding } from "../types";
 
@@ -253,10 +257,7 @@ export class PostgresChunkStore<
 
 		const metadataObj = metadata;
 		for (const [key, value] of Object.entries(metadataObj)) {
-			if (
-				key in mapping &&
-				!["documentKey", "content", "index", "embedding"].includes(key)
-			) {
+			if (key in mapping && !Object.keys(REQUIRED_COLUMNS).includes(key)) {
 				const columnName = mapping[key as keyof typeof mapping];
 				result[columnName] = value;
 			}

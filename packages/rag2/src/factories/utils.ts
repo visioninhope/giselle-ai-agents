@@ -1,6 +1,10 @@
 import type { z } from "zod/v4";
 import { LineChunker } from "../chunker";
-import type { ColumnMapping, RequiredColumns } from "../database/types";
+import {
+	type ColumnMapping,
+	REQUIRED_COLUMNS,
+	type RequiredColumns,
+} from "../database/types";
 import { OpenAIEmbedder } from "../embedder";
 
 /**
@@ -20,16 +24,6 @@ const FACTORY_DEFAULTS = {
 		OVERLAP: 30,
 		MAX_CHARS: 10000,
 	},
-} as const;
-
-/**
- * Default mapping for required columns
- */
-export const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
-	documentKey: "document_key",
-	chunkContent: "chunk_content",
-	chunkIndex: "chunk_index",
-	embedding: "embedding",
 } as const;
 
 /**
@@ -68,14 +62,7 @@ function validateColumnMapping<TMetadata extends Record<string, unknown>>(
 	metadataSchema: z.ZodType<TMetadata>,
 ): obj is ColumnMapping<TMetadata> {
 	// Check that all required columns are present
-	const requiredKeys: (keyof RequiredColumns)[] = [
-		"documentKey",
-		"chunkContent",
-		"chunkIndex",
-		"embedding",
-	];
-
-	for (const key of requiredKeys) {
+	for (const key of Object.keys(REQUIRED_COLUMNS)) {
 		if (!(key in obj) || typeof obj[key] !== "string") {
 			return false;
 		}
@@ -109,7 +96,7 @@ export function createColumnMapping<
 
 	// set required columns
 	const requiredColumns: RequiredColumns = {
-		...DEFAULT_REQUIRED_COLUMNS,
+		...REQUIRED_COLUMNS,
 		...requiredColumnOverrides,
 	};
 
