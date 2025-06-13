@@ -4,8 +4,8 @@ import {
 	createGitHubChunkStore,
 } from "@/lib/vector-stores/github-blob-stores";
 import {
-	GitHubDocumentLoader,
-	type GitHubDocumentMetadata,
+	GitHubBlobLoader,
+	type GitHubBlobMetadata,
 } from "@giselle-sdk/github-tool";
 import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
@@ -24,21 +24,19 @@ export async function ingestGitHubRepository(params: {
 		params.teamDbId,
 	);
 
-	const githubLoader = new GitHubDocumentLoader(params.octokitClient, {
+	const githubLoader = new GitHubBlobLoader(params.octokitClient, {
 		maxBlobSize: 1 * 1024 * 1024,
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
 
 	const pipeline = createIngestPipeline<
-		GitHubDocumentMetadata,
+		GitHubBlobMetadata,
 		GitHubChunkMetadata
 	>({
 		documentLoader: githubLoader,
 		chunkStore,
 		documentKey: (document) => document.metadata.path,
-		metadataTransform: (
-			metadata: GitHubDocumentMetadata,
-		): GitHubChunkMetadata => ({
+		metadataTransform: (metadata: GitHubBlobMetadata): GitHubChunkMetadata => ({
 			repositoryIndexDbId,
 			commitSha: metadata.commitSha,
 			fileSha: metadata.fileSha,
