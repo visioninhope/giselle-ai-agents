@@ -11,7 +11,6 @@ export { PoolManager } from "./database";
 export type {
 	ColumnMapping,
 	DatabaseConfig,
-	REQUIRED_COLUMNS,
 	RequiredColumns,
 } from "./database";
 
@@ -68,6 +67,7 @@ export {
 	createDefaultEmbedder,
 	createIngestPipeline,
 	createQueryService,
+	DEFAULT_REQUIRED_COLUMNS,
 	// Types
 	type ChunkStoreConfig,
 	type QueryServiceConfig,

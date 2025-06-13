@@ -37,13 +37,12 @@ export interface DatabaseConfig {
 }
 
 // define required columns
-export const REQUIRED_COLUMNS = {
-	documentKey: "documentKey",
-	chunkContent: "chunkContent",
-	chunkIndex: "chunkIndex",
-	embedding: "embedding",
-} as const;
-export type RequiredColumns = typeof REQUIRED_COLUMNS;
+export interface RequiredColumns {
+	documentKey: string;
+	chunkContent: string;
+	chunkIndex: string;
+	embedding: string;
+}
 
 // define column mapping (required columns are enforced)
 export type ColumnMapping<TMetadata> = RequiredColumns & {
