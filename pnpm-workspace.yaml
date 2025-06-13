@@ -7,6 +7,7 @@ catalog:
   "@biomejs/biome": 1.9.4
   typescript: 5.7.3
   zod: 3.25.28
+  "zod/v4": npm:zod@4.0.5
   nanoid: 5.0.9
   tsup: 8.3.5
   "@turbo/gen": 2.3.3
@@ -73,6 +74,7 @@ catalog:
   "@supabase/supabase-js": 2.45.0
   pg: 8.14.1
   "@types/pg": 8.11.13
+  pgvector: 0.2.1
   swr: 2.2.5
   defuddle: 0.6.4
   "happy-dom": 17.6.1

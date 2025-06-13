@@ -165,6 +165,9 @@ catalogs:
     pg:
       specifier: 8.14.1
       version: 8.14.1
+    pgvector:
+      specifier: 0.2.1
+      version: 0.2.1
     pluralize:
       specifier: 8.0.0
       version: 8.0.0
@@ -326,7 +329,7 @@ importers:
     dependencies:
       '@ai-sdk/openai':
         specifier: 'catalog:'
-        version: 1.3.18(zod@3.24.1)
+        version: 1.3.18(zod@3.25.28)
       '@giselle-internal/workflow-designer-ui':
         specifier: workspace:*
         version: link:../../internal-packages/workflow-designer-ui
@@ -348,6 +351,9 @@ importers:
       '@giselle-sdk/rag':
         specifier: workspace:*
         version: link:../../packages/rag
+      '@giselle-sdk/rag2':
+        specifier: workspace:*
+        version: link:../../packages/rag2
       '@giselle-sdk/supabase-driver':
         specifier: workspace:*
         version: link:../../packages/supabase-driver
@@ -497,7 +503,7 @@ importers:
         version: 12.0.3(@types/react@19.1.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       ai:
         specifier: 'catalog:'
-        version: 4.3.9(react@19.1.0)(zod@3.24.1)
+        version: 4.3.9(react@19.1.0)(zod@3.25.28)
       boring-avatars:
         specifier: 1.11.1
         version: 1.11.1
@@ -548,7 +554,7 @@ importers:
         version: 3.26.0
       langfuse-vercel:
         specifier: 3.37.0
-        version: 3.37.0(ai@4.3.9(react@19.1.0)(zod@3.24.1))
+        version: 3.37.0(ai@4.3.9(react@19.1.0)(zod@3.25.28))
       lucide-react:
         specifier: 0.417.0
         version: 0.417.0(react@19.1.0)
@@ -566,7 +572,7 @@ importers:
         version: 6.10.0
       openai:
         specifier: 4.64.0
-        version: 4.64.0(zod@3.24.1)
+        version: 4.64.0(zod@3.25.28)
       pg:
         specifier: 'catalog:'
         version: 8.14.1
@@ -608,13 +614,13 @@ importers:
         version: 1.14.4(@vercel/blob@0.27.3)(aws4fetch@1.0.20)
       unstructured-client:
         specifier: 0.18.1
-        version: 0.18.1(zod@3.24.1)
+        version: 0.18.1(zod@3.25.28)
       valibot:
         specifier: 0.37.0
         version: 0.37.0(typescript@5.7.3)
       zod:
-        specifier: 3.24.1
-        version: 3.24.1
+        specifier: 'catalog:'
+        version: 3.25.28
     devDependencies:
       '@biomejs/biome':
         specifier: 'catalog:'
@@ -902,6 +908,9 @@ importers:
       '@giselle-sdk/rag':
         specifier: workspace:^
         version: link:../rag
+      '@giselle-sdk/rag2':
+        specifier: workspace:^
+        version: link:../rag2
       '@giselle-sdk/telemetry':
         specifier: workspace:^
         version: link:../telemetry
@@ -1140,6 +1149,43 @@ importers:
       tsup:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
+      vitest:
+        specifier: 'catalog:'
+        version: 3.1.4(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.6.1)(jiti@2.4.2)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.30.1)(terser@5.39.0)(yaml@2.7.0)
+
+  packages/rag2:
+    dependencies:
+      '@ai-sdk/openai':
+        specifier: 'catalog:'
+        version: 1.3.18(zod@3.25.28)
+      ai:
+        specifier: 'catalog:'
+        version: 4.3.9(react@19.1.0)(zod@3.25.28)
+      openai:
+        specifier: 'catalog:'
+        version: 5.0.0-alpha.0(zod@3.25.28)
+      pg:
+        specifier: 'catalog:'
+        version: 8.14.1
+      pgvector:
+        specifier: 'catalog:'
+        version: 0.2.1
+      zod:
+        specifier: 'catalog:'
+        version: 3.25.28
+    devDependencies:
+      '@types/node':
+        specifier: 'catalog:'
+        version: 22.14.0
+      '@types/pg':
+        specifier: 'catalog:'
+        version: 8.11.13
+      tsup:
+        specifier: 'catalog:'
+        version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
+      typescript:
+        specifier: 'catalog:'
+        version: 5.7.3
       vitest:
         specifier: 'catalog:'
         version: 3.1.4(@types/debug@4.1.12)(@types/node@22.14.0)(happy-dom@17.6.1)(jiti@2.4.2)(jsdom@26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))(lightningcss@1.30.1)(terser@5.39.0)(yaml@2.7.0)
@@ -8084,6 +8130,10 @@ packages:
   pgpass@1.0.5:
     resolution: {integrity: sha512-FdW9r/jQZhSeohs1Z3sI1yxFQNFvMcnmfuj4WBMUTxOrAyLMaTcE1aAMBiTlbMNaXvBCQuVi0R7hd8udDSP7ug==}
 
+  pgvector@0.2.1:
+    resolution: {integrity: sha512-nKaQY9wtuiidwLMdVIce1O3kL0d+FxrigCVzsShnoqzOSaWWWOvuctb/sYwlai5cTwwzRSNa+a/NtN2kVZGNJw==}
+    engines: {node: '>= 18'}
+
   picocolors@1.0.1:
     resolution: {integrity: sha512-anP1Z8qwhkbmu7MFP5iTt+wQKXgwzf7zTyGlcdzabySa9vd0Xt392U0rVmz9poOaBj0uHJKyyo9/upk0HrEQew==}
 
@@ -9741,9 +9791,6 @@ packages:
     peerDependencies:
       zod: ^3.24.1
 
-  zod@3.24.1:
-    resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
-
   zod@3.25.28:
     resolution: {integrity: sha512-/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==}
 
@@ -9795,12 +9842,6 @@ snapshots:
       '@ai-sdk/provider-utils': 2.2.7(zod@3.25.28)
       zod: 3.25.28
 
-  '@ai-sdk/openai@1.3.18(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      zod: 3.24.1
-
   '@ai-sdk/openai@1.3.18(zod@3.25.28)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
@@ -9813,13 +9854,6 @@ snapshots:
       '@ai-sdk/provider-utils': 2.2.7(zod@3.25.28)
       zod: 3.25.28
 
-  '@ai-sdk/provider-utils@2.2.7(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      nanoid: 3.3.8
-      secure-json-parse: 2.7.0
-      zod: 3.24.1
-
   '@ai-sdk/provider-utils@2.2.7(zod@3.25.28)':
     dependencies:
       '@ai-sdk/provider': 1.1.3
@@ -9831,16 +9865,6 @@ snapshots:
     dependencies:
       json-schema: 0.4.0
 
-  '@ai-sdk/react@1.2.9(react@19.1.0)(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.2.8(zod@3.24.1)
-      react: 19.1.0
-      swr: 2.2.5(react@19.1.0)
-      throttleit: 2.1.0
-    optionalDependencies:
-      zod: 3.24.1
-
   '@ai-sdk/react@1.2.9(react@19.1.0)(zod@3.25.28)':
     dependencies:
       '@ai-sdk/provider-utils': 2.2.7(zod@3.25.28)
@@ -9850,13 +9874,6 @@ snapshots:
       throttleit: 2.1.0
     optionalDependencies:
       zod: 3.25.28
-
-  '@ai-sdk/ui-utils@1.2.8(zod@3.24.1)':
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      zod: 3.24.1
-      zod-to-json-schema: 3.24.1(zod@3.24.1)
 
   '@ai-sdk/ui-utils@1.2.8(zod@3.25.28)':
     dependencies:
@@ -14265,18 +14282,6 @@ snapshots:
       clean-stack: 2.2.0
       indent-string: 4.0.0
 
-  ai@4.3.9(react@19.1.0)(zod@3.24.1):
-    dependencies:
-      '@ai-sdk/provider': 1.1.3
-      '@ai-sdk/provider-utils': 2.2.7(zod@3.24.1)
-      '@ai-sdk/react': 1.2.9(react@19.1.0)(zod@3.24.1)
-      '@ai-sdk/ui-utils': 1.2.8(zod@3.24.1)
-      '@opentelemetry/api': 1.9.0
-      jsondiffpatch: 0.6.0
-      zod: 3.24.1
-    optionalDependencies:
-      react: 19.1.0
-
   ai@4.3.9(react@19.1.0)(zod@3.25.28):
     dependencies:
       '@ai-sdk/provider': 1.1.3
@@ -16076,9 +16081,9 @@ snapshots:
     dependencies:
       mustache: 4.2.0
 
-  langfuse-vercel@3.37.0(ai@4.3.9(react@19.1.0)(zod@3.24.1)):
+  langfuse-vercel@3.37.0(ai@4.3.9(react@19.1.0)(zod@3.25.28)):
     dependencies:
-      ai: 4.3.9(react@19.1.0)(zod@3.24.1)
+      ai: 4.3.9(react@19.1.0)(zod@3.25.28)
       langfuse: 3.37.0
       langfuse-core: 3.37.0
 
@@ -16928,7 +16933,7 @@ snapshots:
     dependencies:
       mimic-fn: 2.1.0
 
-  openai@4.64.0(zod@3.24.1):
+  openai@4.64.0(zod@3.25.28):
     dependencies:
       '@types/node': 18.19.71
       '@types/node-fetch': 2.6.12
@@ -16938,7 +16943,7 @@ snapshots:
       formdata-node: 4.4.1
       node-fetch: 2.7.0
     optionalDependencies:
-      zod: 3.24.1
+      zod: 3.25.28
     transitivePeerDependencies:
       - encoding
 
@@ -17172,6 +17177,8 @@ snapshots:
   pgpass@1.0.5:
     dependencies:
       split2: 4.2.0
+
+  pgvector@0.2.1: {}
 
   picocolors@1.0.1: {}
 
@@ -18529,11 +18536,11 @@ snapshots:
       '@vercel/blob': 0.27.3
       aws4fetch: 1.0.20
 
-  unstructured-client@0.18.1(zod@3.24.1):
+  unstructured-client@0.18.1(zod@3.25.28):
     dependencies:
       async: 3.2.6
       pdf-lib: 1.17.1
-      zod: 3.24.1
+      zod: 3.25.28
 
   update-browserslist-db@1.1.2(browserslist@4.24.4):
     dependencies:
@@ -19016,15 +19023,9 @@ snapshots:
       css-what: 6.1.0
       entities: 5.0.0
 
-  zod-to-json-schema@3.24.1(zod@3.24.1):
-    dependencies:
-      zod: 3.24.1
-
   zod-to-json-schema@3.24.1(zod@3.25.28):
     dependencies:
       zod: 3.25.28
-
-  zod@3.24.1: {}
 
   zod@3.25.28: {}
 
