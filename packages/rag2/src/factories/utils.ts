@@ -26,10 +26,7 @@ export const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
  * Convert string to snake_case
  */
 function toSnakeCase(str: string): string {
-	return str
-		.replace(/([A-Z])/g, "_$1")
-		.toLowerCase()
-		.replace(/^_/, "");
+	return str.replace(/([a-z0-9])([A-Z])/g, "$1_$2").toLowerCase();
 }
 
 /**
