@@ -12,21 +12,23 @@ async function globalSetup() {
 	}
 
 	const browser = await chromium.launch();
-	const page = await browser.newPage();
+	try {
+		const page = await browser.newPage();
 
-	await page.goto(`${baseUrl}/login`);
-	await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
-	await page.getByRole("textbox", { name: "Password" }).fill(loginPassword);
-	await Promise.all([
-		page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
-		page.getByRole("button", { name: "Log in" }).click(),
-	]);
+		await page.goto(`${baseUrl}/login`);
+		await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
+		await page.getByRole("textbox", { name: "Password" }).fill(loginPassword);
+		await Promise.all([
+			page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
+			page.getByRole("button", { name: "Log in" }).click(),
+		]);
 
-	// Save storage state
-	const storagePath = "./tests/e2e/.auth/storageState.json";
-	await page.context().storageState({ path: storagePath });
-
-	await browser.close();
+		// Save storage state
+		const storagePath = "./tests/e2e/.auth/storageState.json";
+		await page.context().storageState({ path: storagePath });
+	} finally {
+		await browser.close();
+	}
 }
 
 export default globalSetup;
