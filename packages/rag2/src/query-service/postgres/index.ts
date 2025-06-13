@@ -62,7 +62,7 @@ export class PostgresQueryService<
 			for (const [column, value] of Object.entries(filters)) {
 				if (typeof column === "string") {
 					whereConditions.push(
-						`${this.escapeIdentifier(column)} = $${paramIndex}`,
+						`${this.validateColumnName(column)} = $${paramIndex}`,
 					);
 					values.push(value);
 					paramIndex++;
@@ -76,20 +76,19 @@ export class PostgresQueryService<
 				)
 				.map(([metadataKey, dbColumn]) => ({
 					metadataKey,
-					dbColumn:
-						typeof dbColumn === "string" ? this.escapeIdentifier(dbColumn) : "",
+					dbColumn: typeof dbColumn === "string" ? `"${dbColumn}"` : "",
 				}))
 				.filter((item) => item.dbColumn !== "");
 
 			const sql = `
         SELECT
-          ${this.escapeIdentifier(columnMapping.content)} as content,
-          ${this.escapeIdentifier(columnMapping.index)} as index,
+          "${columnMapping.content}" as content,
+          "${columnMapping.index}" as index,
           ${metadataColumns.map(({ dbColumn, metadataKey }) => `${dbColumn} as "${metadataKey}"`).join(", ")}${metadataColumns.length > 0 ? "," : ""}
-          1 - (${this.escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
-        FROM ${this.escapeIdentifier(tableName)}
+          1 - ("${columnMapping.embedding}" <=> $1) as similarity
+        FROM "${tableName}"
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
-        ORDER BY ${this.escapeIdentifier(columnMapping.embedding)} <=> $1
+        ORDER BY "${columnMapping.embedding}" <=> $1
         LIMIT ${limit}
       `;
 
@@ -208,7 +207,15 @@ export class PostgresQueryService<
 		}
 	}
 
-	private escapeIdentifier(identifier: string): string {
-		return `"${identifier.replace(/"/g, '""')}"`;
+	private validateColumnName(column: string): string {
+		const allowedColumns = Object.values(this.config.columnMapping);
+		if (!allowedColumns.includes(column)) {
+			throw new ValidationError(`Invalid column name: ${column}`, undefined, {
+				operation: "validateColumnName",
+				column,
+				allowedColumns,
+			});
+		}
+		return `"${column}"`;
 	}
 }
