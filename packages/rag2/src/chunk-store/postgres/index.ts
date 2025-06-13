@@ -1,4 +1,5 @@
 import type { PoolClient } from "pg";
+import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
 import { ensurePgVectorTypes } from "../../database/pgvector-registry";
@@ -151,8 +152,8 @@ export class PostgresChunkStore<
 		const { tableName, columnMapping } = this.config;
 
 		const query = `
-      DELETE FROM ${this.escapeIdentifier(tableName)}
-      WHERE ${this.escapeIdentifier(columnMapping.documentKey)} = $1
+      DELETE FROM ${escapeIdentifier(tableName)}
+      WHERE ${escapeIdentifier(columnMapping.documentKey)} = $1
     `;
 
 		await client.query(query, [documentKey]);
@@ -241,8 +242,8 @@ export class PostgresChunkStore<
 		});
 
 		const query = `
-			INSERT INTO ${this.escapeIdentifier(tableName)}
-			(${columns.map((c) => this.escapeIdentifier(c)).join(", ")})
+			INSERT INTO ${escapeIdentifier(tableName)}
+			(${columns.map((c) => escapeIdentifier(c)).join(", ")})
 			VALUES ${valuePlaceholders.join(", ")}
 		`;
 
@@ -264,10 +265,5 @@ export class PostgresChunkStore<
 		}
 
 		return result;
-	}
-
-	private escapeIdentifier(identifier: string): string {
-		// escape PostgreSQL identifier
-		return `"${identifier.replace(/"/g, '""')}"`;
 	}
 }
