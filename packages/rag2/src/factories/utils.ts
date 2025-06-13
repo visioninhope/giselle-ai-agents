@@ -17,8 +17,8 @@ const FACTORY_DEFAULTS = {
  */
 export const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
 	documentKey: "document_key",
-	content: "content",
-	index: "index",
+	chunkContent: "chunk_content",
+	chunkIndex: "chunk_index",
 	embedding: "embedding",
 } as const;
 
@@ -60,8 +60,8 @@ function validateColumnMapping<TMetadata extends Record<string, unknown>>(
 	// Check that all required columns are present
 	const requiredKeys: (keyof RequiredColumns)[] = [
 		"documentKey",
-		"content",
-		"index",
+		"chunkContent",
+		"chunkIndex",
 		"embedding",
 	];
 

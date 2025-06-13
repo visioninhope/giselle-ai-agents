@@ -82,8 +82,8 @@ export class PostgresQueryService<
 
 			const sql = `
         SELECT
-          "${columnMapping.content}" as content,
-          "${columnMapping.index}" as index,
+          "${columnMapping.chunkContent}" as content,
+          "${columnMapping.chunkIndex}" as index,
           ${metadataColumns.map(({ dbColumn, metadataKey }) => `${dbColumn} as "${metadataKey}"`).join(", ")}${metadataColumns.length > 0 ? "," : ""}
           1 - ("${columnMapping.embedding}" <=> $1) as similarity
         FROM "${tableName}"

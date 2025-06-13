@@ -39,8 +39,8 @@ export interface DatabaseConfig {
 // define required columns
 export interface RequiredColumns {
 	documentKey: string;
-	content: string;
-	index: string;
+	chunkContent: string;
+	chunkIndex: string;
 	embedding: string;
 }
 
