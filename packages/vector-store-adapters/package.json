@@ -1,0 +1,29 @@
+{
+	"name": "@giselle-sdk/vector-store-adapters",
+	"version": "0.0.0",
+	"private": true,
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"scripts": {
+		"build": "tsup",
+		"check-types": "tsc --noEmit",
+		"format": "biome format --write ."
+	},
+	"exports": {
+		"./package.json": "./package.json",
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js"
+		}
+	},
+	"devDependencies": {
+		"@giselle-sdk/giselle-engine": "workspace:^",
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"tsup": "catalog:"
+	},
+	"dependencies": {
+		"openai": "catalog:"
+	}
+}
