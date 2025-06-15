@@ -13,7 +13,7 @@ export function GitHubTriggerConfiguredView({
 	const { isLoading, data, enableFlowTrigger, disableFlowTrigger } =
 		useGitHubTrigger(flowTriggerId);
 	if (isLoading) {
-		return "loading...";
+		return "Loading...";
 	}
 	if (data === undefined) {
 		return "no data";
