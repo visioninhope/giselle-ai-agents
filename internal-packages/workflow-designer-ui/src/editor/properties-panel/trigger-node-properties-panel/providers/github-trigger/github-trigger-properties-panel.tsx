@@ -256,7 +256,7 @@ function Installed({
 				>
 					<GitHubRepositoryBlock owner={step.owner} repo={step.repo} />
 					<p className="text-[14px]">
-						Choose when you want to trigger the flow.
+						Choose when you want to trigger the workflow.
 					</p>
 					<fieldset className="flex flex-col gap-[4px]">
 						<Select
