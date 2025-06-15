@@ -13,6 +13,7 @@ import type {
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
 import type { Vault } from "./vault";
+import type { VectorStore } from "./vector-store";
 
 export interface GiselleEngineContext {
 	storage: Storage;
@@ -41,6 +42,7 @@ export interface GiselleEngineContext {
 			options: GenerationCompleteOption,
 		) => Promise<void>;
 	};
+	vectorStore?: VectorStore;
 }
 
 interface GitHubInstalltionAppAuthResolver {

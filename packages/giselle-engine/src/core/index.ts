@@ -53,6 +53,7 @@ import {
 } from "./workspaces";
 export * from "./types";
 export * from "./vault";
+export * from "./vector-store";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
