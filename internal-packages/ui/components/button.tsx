@@ -27,7 +27,7 @@ export function Button({
 			data-style={style}
 			{...props}
 		>
-			{leftIcon && <div className="*:size-[13px]">{leftIcon}</div>}
+			{leftIcon && <div className="*:size-[13px] *:text-text">{leftIcon}</div>}
 			<div className="text-[13px] text-text">{children}</div>
 			{rightIcon && <div className="*:size-[13px]">{rightIcon}</div>}
 		</button>
