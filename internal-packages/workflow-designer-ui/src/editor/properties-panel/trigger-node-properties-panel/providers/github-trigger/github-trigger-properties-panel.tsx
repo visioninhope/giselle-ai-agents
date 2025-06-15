@@ -135,7 +135,7 @@ function Installed({
 				case "github.issue_comment.created": {
 					const callsign = formData.get("callsign");
 					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("unexpected request");
+						throw new Error("Unexpected request");
 					}
 					event = {
 						id: "github.issue_comment.created",
@@ -148,7 +148,7 @@ function Installed({
 				case "github.pull_request_comment.created": {
 					const callsign = formData.get("callsign");
 					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("unexpected request");
+						throw new Error("Unexpected request");
 					}
 					event = {
 						id: "github.pull_request_comment.created",
@@ -161,7 +161,7 @@ function Installed({
 				case "github.pull_request_review_comment.created": {
 					const callsign = formData.get("callsign");
 					if (typeof callsign !== "string" || callsign.length === 0) {
-						throw new Error("unexpected request");
+						throw new Error("Unexpected request");
 					}
 					event = {
 						id: "github.pull_request_review_comment.created",

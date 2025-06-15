@@ -288,7 +288,7 @@ function Installed({
 
 			const commandId = formData.get("commandId");
 			if (typeof commandId !== "string" || commandId.length === 0) {
-				throw new Error("unexpected request");
+				throw new Error("Unexpected request");
 			}
 
 			/** @todo remove type assertion */
