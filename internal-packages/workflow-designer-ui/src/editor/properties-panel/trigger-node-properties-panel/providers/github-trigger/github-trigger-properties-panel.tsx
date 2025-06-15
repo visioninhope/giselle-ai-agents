@@ -228,7 +228,7 @@ function Installed({
 
 	return (
 		<div className="flex flex-col gap-[16px] px-[16px]">
-			<p className="text-[18px]">Setup trigger in GitHub Repository</p>
+			<p className="text-[18px]">Set Up Trigger in GitHub Repository</p>
 			{step.state === "select-repository" && (
 				<SelectRepository
 					installations={installations}
@@ -324,7 +324,7 @@ function Installed({
 						className="h-[28px] rounded-[8px] bg-white-800 text-[14px] cursor-pointer text-black-800 font-[700] px-[16px] font-accent disabled:opacity-50"
 						disabled={isPending}
 					>
-						{isPending ? "Setting..." : "Setup"}
+						{isPending ? "Setting Up..." : "Set Up"}
 					</button>
 				</form>
 			)}
