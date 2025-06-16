@@ -11,11 +11,12 @@ export interface DocumentLoaderParams {
 
 export interface DocumentLoader<
 	TMetadata extends Record<string, unknown> = Record<string, never>,
+	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
 	/**
 	 * Load documents asynchronously
 	 * @param params loader-specific parameters
 	 * @returns AsyncIterable of Document
 	 */
-	load(params: DocumentLoaderParams): AsyncIterable<Document<TMetadata>>;
+	load(params: TParams): AsyncIterable<Document<TMetadata>>;
 }

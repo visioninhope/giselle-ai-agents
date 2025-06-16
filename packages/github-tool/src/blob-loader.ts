@@ -29,7 +29,9 @@ export type GitHubBlobMetadata = {
 /**
  * GitHub blob loader that implements rag2's DocumentLoader interface
  */
-export class GitHubBlobLoader implements DocumentLoader<GitHubBlobMetadata> {
+export class GitHubBlobLoader
+	implements DocumentLoader<GitHubBlobMetadata, GitHubBlobLoaderParams>
+{
 	private readonly maxBlobSize: number;
 	private readonly maxRetries: number;
 

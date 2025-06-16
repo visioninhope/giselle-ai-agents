@@ -6,6 +6,7 @@ import {
 import {
 	GitHubBlobLoader,
 	type GitHubBlobMetadata,
+	type GitHubBlobLoaderParams,
 } from "@giselle-sdk/github-tool";
 import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
@@ -31,7 +32,8 @@ export async function ingestGitHubRepository(params: {
 
 	const pipeline = createIngestPipeline<
 		GitHubBlobMetadata,
-		GitHubChunkMetadata
+		GitHubChunkMetadata,
+		GitHubBlobLoaderParams
 	>({
 		documentLoader: githubLoader,
 		chunkStore,

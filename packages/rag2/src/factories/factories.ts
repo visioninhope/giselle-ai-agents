@@ -1,5 +1,6 @@
 import type { PostgresChunkStoreConfig } from "../chunk-store/postgres";
 import { PostgresChunkStore } from "../chunk-store/postgres";
+import type { DocumentLoaderParams } from "../document-loader";
 import { ValidationError } from "../errors";
 import { IngestPipeline } from "../ingest";
 import type { PostgresQueryServiceConfig } from "../query-service/postgres";
@@ -132,7 +133,8 @@ export function createQueryService<
 export function createIngestPipeline<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
->(config: SimpleIngestConfig<TSourceMetadata, TTargetMetadata>) {
+	TParams extends DocumentLoaderParams = DocumentLoaderParams,
+>(config: SimpleIngestConfig<TSourceMetadata, TTargetMetadata, TParams>) {
 	const {
 		documentLoader,
 		chunkStore,

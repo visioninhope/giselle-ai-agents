@@ -1,7 +1,11 @@
 import type { z } from "zod/v4";
 import type { ChunkStore } from "../chunk-store";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
-import type { Document, DocumentLoader } from "../document-loader";
+import type {
+	Document,
+	DocumentLoader,
+	DocumentLoaderParams,
+} from "../document-loader";
 import type { Embedder } from "../embedder";
 
 /**
@@ -102,11 +106,12 @@ export interface QueryServiceConfig<
 export interface SimpleIngestConfig<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
+	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
 	/**
 	 * document loader
 	 */
-	documentLoader: DocumentLoader<TSourceMetadata>;
+	documentLoader: DocumentLoader<TSourceMetadata, TParams>;
 	/**
 	 * chunk store
 	 */

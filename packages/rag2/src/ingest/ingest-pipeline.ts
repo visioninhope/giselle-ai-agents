@@ -14,8 +14,9 @@ import { OperationError } from "../errors";
 export interface IngestPipelineConfig<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
+	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
-	documentLoader: DocumentLoader<TSourceMetadata>;
+	documentLoader: DocumentLoader<TSourceMetadata, TParams>;
 	chunker: Chunker;
 	embedder: Embedder;
 	chunkStore: ChunkStore<TTargetMetadata>;
@@ -60,8 +61,9 @@ export interface IngestResult {
 export class IngestPipeline<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
+	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
-	private documentLoader: DocumentLoader<TSourceMetadata>;
+	private documentLoader: DocumentLoader<TSourceMetadata, TParams>;
 	private chunker: Chunker;
 	private embedder: Embedder;
 	private chunkStore: ChunkStore<TTargetMetadata>;
@@ -69,11 +71,13 @@ export class IngestPipeline<
 	private metadataTransform: (metadata: TSourceMetadata) => TTargetMetadata;
 	private options: Required<
 		NonNullable<
-			IngestPipelineConfig<TSourceMetadata, TTargetMetadata>["options"]
+			IngestPipelineConfig<TSourceMetadata, TTargetMetadata, TParams>["options"]
 		>
 	>;
 
-	constructor(config: IngestPipelineConfig<TSourceMetadata, TTargetMetadata>) {
+	constructor(
+		config: IngestPipelineConfig<TSourceMetadata, TTargetMetadata, TParams>,
+	) {
 		this.documentLoader = config.documentLoader;
 		this.chunker = config.chunker;
 		this.embedder = config.embedder;
@@ -90,7 +94,7 @@ export class IngestPipeline<
 		};
 	}
 
-	async ingest(params: unknown): Promise<IngestResult> {
+	async ingest(params: TParams): Promise<IngestResult> {
 		const result: IngestResult = {
 			totalDocuments: 0,
 			successfulDocuments: 0,
@@ -108,9 +112,7 @@ export class IngestPipeline<
 			const documentBatch: Array<Document<TSourceMetadata>> = [];
 
 			// process documents in batches
-			for await (const document of this.documentLoader.load(
-				params as DocumentLoaderParams,
-			)) {
+			for await (const document of this.documentLoader.load(params)) {
 				result.totalDocuments++;
 				documentBatch.push(document);
 
