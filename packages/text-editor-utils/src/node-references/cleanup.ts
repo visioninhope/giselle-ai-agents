@@ -1,6 +1,6 @@
 import type { NodeId, OutputId } from "@giselle-sdk/data-type";
-import { isJsonContent } from "./is-json-content";
-import { findNextNodeReference, formatNodeReference } from "./node-reference";
+import { isJsonContent } from "../is-json-content";
+import { findNextNodeReference, formatNodeReference } from "./formatting";
 
 /**
  * Helper function to process content arrays while maintaining immutability
