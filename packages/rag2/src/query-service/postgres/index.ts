@@ -61,11 +61,9 @@ export class PostgresQueryService<
 			let paramIndex = 2;
 
 			for (const [column, value] of Object.entries(filters)) {
-				if (typeof column === "string") {
-					whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
-					values.push(value);
-					paramIndex++;
-				}
+				whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
+				values.push(value);
+				paramIndex++;
 			}
 
 			const metadataColumns = Object.entries(columnMapping)
