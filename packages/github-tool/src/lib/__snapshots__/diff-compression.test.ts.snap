@@ -1,0 +1,93 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`diff compression > should match snapshot for PR #1118 at 1000 chars > pr-1118-compressed-1000.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+new file mode 100644
+index 000000000..b5ad8bde7
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+@@ -0,0 +1,90 @@
+++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++import { db, githubRepositoryIndex } from "@/drizzle";
++import {
++	type GitHubChunkMetadata,
+..."
+`;
+
+exports[`diff compression > should match snapshot for PR #1118 at 1500 chars > pr-1118-compressed-1500.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+new file mode 100644
+index 000000000..b5ad8bde7
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+@@ -0,0 +1,90 @@
+++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++import { db, githubRepositoryIndex } from "@/drizzle";
++import {
++	type GitHubChunkMetadata,
++	createGitHubChunkStore,
++} from "@/lib/vector-stores/github-blob-stores";
++import {
++	GitHubBlobLoader,
++	type GitHubBlobLoaderParams,
++	type GitHubBlobMetadata,
++} from "@giselle-sdk/github-tool";
++import { createIngestPipeline } from "@giselle-sdk/rag2";
++import type { Octokit } from "@octokit/core";
++import { and, eq } from "drizzle-orm";
++
++/**
++ * Main GitHub repository ingestion coordination
++ */
++export async function ingestGitHubRepository(params: {
++	octokitClient: Octokit;
+..."
+`;
+
+exports[`diff compression > should match snapshot for PR #1118 at 2000 chars > pr-1118-compressed-2000.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+new file mode 100644
+index 000000000..b5ad8bde7
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+@@ -0,0 +1,90 @@
+++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++import { db, githubRepositoryIndex } from "@/drizzle";
++import {
++	type GitHubChunkMetadata,
++	createGitHubChunkStore,
++} from "@/lib/vector-stores/github-blob-stores";
++import {
++	GitHubBlobLoader,
++	type GitHubBlobLoaderParams,
++	type GitHubBlobMetadata,
++} from "@giselle-sdk/github-tool";
++import { createIngestPipeline } from "@giselle-sdk/rag2";
++import type { Octokit } from "@octokit/core";
++import { and, eq } from "drizzle-orm";
++
++/**
++ * Main GitHub repository ingestion coordination
++ */
++export async function ingestGitHubRepository(params: {
++	octokitClient: Octokit;
++	source: { owner: string; repo: string; commitSha: string };
++	teamDbId: number;
++}): Promise<void> {
++	const repositoryIndexDbId = await getRepositoryIndexDbId(
++		params.source,
++		params.teamDbId,
++	);
++
++	const githubLoader = new GitHubBlobLoader(params.octokitClient, {
++		maxBlobSize: 1 * 1024 * 1024,
++	});
++	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
++
++	const pipeline = createIngestPipeline<
++		GitHubBlobMetadata,
++		GitHubChunkMetadata,
++		GitHubBlobLoaderParams
++	>({
+..."
+`;
