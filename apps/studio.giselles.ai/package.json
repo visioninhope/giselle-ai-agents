@@ -22,8 +22,8 @@
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
 		"@giselle-sdk/github-tool": "workspace:*",
-		"@giselle-sdk/language-model": "workspace:*",
 		"@giselle-sdk/integration": "workspace:*",
+		"@giselle-sdk/language-model": "workspace:*",
 		"@giselle-sdk/rag": "workspace:*",
 		"@giselle-sdk/rag2": "workspace:*",
 		"@giselle-sdk/supabase-driver": "workspace:*",
@@ -140,5 +140,7 @@
 		"vite-tsconfig-paths": "5.1.4",
 		"vitest": "catalog:"
 	},
-	"trustedDependencies": ["@sentry/cli"]
+	"trustedDependencies": [
+		"@sentry/cli"
+	]
 }

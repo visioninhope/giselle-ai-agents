@@ -22,7 +22,6 @@ import { Toast } from "@giselles-ai/components/toast";
 import { useToast } from "@giselles-ai/contexts/toast";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import * as Dialog from "@radix-ui/react-dialog";
-import { gsap } from "gsap";
 import { CopyIcon, LoaderCircleIcon, TrashIcon } from "lucide-react";
 import Link from "next/link";
 import { redirect, useRouter } from "next/navigation";
@@ -189,15 +188,16 @@ export const AgentGrid = ({ agents }: AgentGridProps) => {
 	const rootRef = useRef<HTMLDivElement>(null);
 	const fadeRef = useRef<HTMLDivElement>(null);
 	const pos = useRef({ x: 0, y: 0 });
-	// GSAP quickSetter returns a function like (value: number) => void
+	// quickSetter returns a function like (value: number) => void
 	const setX = useRef<((value: number) => void) | null>(null);
 	const setY = useRef<((value: number) => void) | null>(null);
+	const animId = useRef<number | null>(null);
 
 	useEffect(() => {
 		const el = rootRef.current;
 		if (!el) return;
-		setX.current = gsap.quickSetter(el, "--x", "px") as (value: number) => void;
-		setY.current = gsap.quickSetter(el, "--y", "px") as (value: number) => void;
+		setX.current = createQuickSetter(el, "--x");
+		setY.current = createQuickSetter(el, "--y");
 		const { width, height } = el.getBoundingClientRect();
 		pos.current = { x: width / 2, y: height / 2 };
 		if (setX.current && setY.current) {
@@ -206,46 +206,56 @@ export const AgentGrid = ({ agents }: AgentGridProps) => {
 		}
 
 		return () => {
-			// Clean up any GSAP tweens to prevent memory leaks when component unmounts
-			gsap.killTweensOf(pos.current);
-			if (fadeRef.current) {
-				gsap.killTweensOf(fadeRef.current);
-			}
-			// Reset quickSetter refs
+			if (animId.current !== null) cancelAnimationFrame(animId.current);
 			setX.current = null;
 			setY.current = null;
 		};
 	}, []);
 
-	const moveTo = (x: number, y: number) => {
-		gsap.to(pos.current, {
-			x,
-			y,
-			duration: 0.45,
-			ease: "power3.out",
-			onUpdate: () => {
-				if (setX.current && setY.current) {
-					setX.current(pos.current.x);
-					setY.current(pos.current.y);
-				}
-			},
-			overwrite: true,
-		});
+	const animatePos = (targetX: number, targetY: number, duration = 450) => {
+		if (animId.current !== null) cancelAnimationFrame(animId.current);
+		const startX = pos.current.x;
+		const startY = pos.current.y;
+		const startTime = performance.now();
+
+		const easeOutCubic = (t: number) => 1 - (1 - t) ** 3;
+
+		const step = (now: number) => {
+			const elapsed = now - startTime;
+			const progress = Math.min(elapsed / duration, 1);
+			const eased = easeOutCubic(progress);
+
+			pos.current.x = startX + (targetX - startX) * eased;
+			pos.current.y = startY + (targetY - startY) * eased;
+
+			if (setX.current && setY.current) {
+				setX.current(pos.current.x);
+				setY.current(pos.current.y);
+			}
+
+			if (progress < 1) {
+				animId.current = requestAnimationFrame(step);
+			}
+		};
+
+		animId.current = requestAnimationFrame(step);
+	};
+
+	const fadeTo = (opacity: number, duration = 250) => {
+		if (!fadeRef.current) return;
+		fadeRef.current.style.transition = `opacity ${duration}ms ease`; // apply transition
+		fadeRef.current.style.opacity = String(opacity);
 	};
 
 	const handleMove = (e: React.PointerEvent) => {
 		if (!rootRef.current) return;
 		const r = rootRef.current.getBoundingClientRect();
-		moveTo(e.clientX - r.left, e.clientY - r.top);
-		gsap.to(fadeRef.current, { opacity: 0, duration: 0.25, overwrite: true });
+		animatePos(e.clientX - r.left, e.clientY - r.top);
+		fadeTo(0, 250);
 	};
 
 	const handleLeave = () => {
-		gsap.to(fadeRef.current, {
-			opacity: 1,
-			duration: 0.6,
-			overwrite: true,
-		});
+		fadeTo(1, 600);
 	};
 
 	return (
@@ -428,4 +438,21 @@ export function DeleteAgentButton({
 			</GlassDialogContent>
 		</Dialog.Root>
 	);
+}
+
+// Lightweight alternative to GSAP's quickSetter
+function createQuickSetter(el: HTMLElement, cssVar: string, unit = "px") {
+	let frame: number | null = null;
+	let lastValue: number | null = null;
+	return (value: number) => {
+		lastValue = value;
+		if (frame === null) {
+			frame = requestAnimationFrame(() => {
+				if (lastValue !== null) {
+					el.style.setProperty(cssVar, `${lastValue}${unit}`);
+				}
+				frame = null;
+			});
+		}
+	};
 }
