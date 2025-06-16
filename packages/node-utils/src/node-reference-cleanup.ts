@@ -36,11 +36,17 @@ export function cleanupNodeReferencesInJsonContent(
 
 	// Recursively process content array
 	if (Array.isArray(content.content)) {
-		content.content = content.content
+		const processedContent = content.content
 			.map((child: unknown) =>
 				cleanupNodeReferencesInJsonContent(child, deletedNodeId),
 			)
 			.filter((child: unknown) => child !== null);
+
+		// Return a new object with all properties copied and the new content array
+		return {
+			...content,
+			content: processedContent,
+		};
 	}
 
 	return content;
