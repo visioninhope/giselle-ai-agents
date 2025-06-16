@@ -5,7 +5,12 @@ import { ensurePgVectorTypes } from "../../database/pgvector-registry";
 import { PoolManager } from "../../database/postgres";
 import type { ColumnMapping, DatabaseConfig } from "../../database/types";
 import type { Embedder } from "../../embedder/types";
-import { DatabaseError, EmbeddingError, ValidationError } from "../../errors";
+import {
+	ConfigurationError,
+	DatabaseError,
+	EmbeddingError,
+	ValidationError,
+} from "../../errors";
 import type { QueryResult, QueryService } from "../types";
 
 export type DistanceFunction = "cosine" | "euclidean" | "inner_product";
@@ -71,12 +76,23 @@ export class PostgresQueryService<
 					([key]) =>
 						!["documentKey", "content", "index", "embedding"].includes(key),
 				)
-				.map(([metadataKey, dbColumn]) => ({
-					metadataKey,
-					dbColumn:
-						typeof dbColumn === "string" ? escapeIdentifier(dbColumn) : "",
-				}))
-				.filter((item) => item.dbColumn !== "");
+				.map(([metadataKey, dbColumn]) => {
+					if (typeof dbColumn !== "string") {
+						throw ConfigurationError.invalidValue(
+							`columnMapping.${metadataKey}`,
+							dbColumn,
+							"string",
+							{
+								operation: "validateColumnMapping",
+								metadataKey,
+							},
+						);
+					}
+					return {
+						metadataKey,
+						dbColumn: escapeIdentifier(dbColumn),
+					};
+				});
 
 			const sql = `
         SELECT
