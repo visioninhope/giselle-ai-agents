@@ -27,7 +27,6 @@
 		"node": ">=22"
 	},
 	"dependencies": {
-		"framer-motion": "^12.17.0",
-		"gsap": "^3.13.0"
+		"framer-motion": "^12.17.0"
 	}
 }
