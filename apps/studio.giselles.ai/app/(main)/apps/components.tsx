@@ -348,8 +348,13 @@ export function DuplicateAgentButton({
 							<button
 								type="button"
 								className="grid size-6 place-items-center rounded-full text-white/60 transition-colors hover:text-white"
+								disabled={isPending}
 							>
-								<CopyIcon className="size-4" />
+								{isPending ? (
+									<LoaderCircleIcon className="size-4 animate-spin" />
+								) : (
+									<CopyIcon className="size-4" />
+								)}
 							</button>
 						</Dialog.Trigger>
 					</TooltipTrigger>
