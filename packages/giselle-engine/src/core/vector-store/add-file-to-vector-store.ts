@@ -1,5 +1,5 @@
-import type { GiselleEngineContext } from "../../types";
-import type { VectorStoreId } from "../object";
+import type { GiselleEngineContext } from "../types";
+import type { VectorStoreId } from "./types/object";
 
 export async function addFileToVectorStore(args: {
 	context: GiselleEngineContext;

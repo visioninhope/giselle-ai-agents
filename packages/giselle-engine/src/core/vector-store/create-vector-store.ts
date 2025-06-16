@@ -1,6 +1,6 @@
-import type { GiselleEngineContext } from "../../types";
-import { InternalVectorStoreObject } from "../object";
-import { vectorStorePath } from "../paths";
+import type { GiselleEngineContext } from "../types";
+import { vectorStorePath } from "./paths";
+import { InternalVectorStoreObject } from "./types/object";
 
 export async function createVectorStore(args: {
 	context: GiselleEngineContext;
