@@ -5,7 +5,12 @@ export interface FileDiff {
 	header: string;
 }
 
-export function compressLargeDiff(diff: string, maxSize = 8000): string {
+const DEFAULT_PULL_REQUEST_DIFF_MAX_SIZE = 200_000;
+
+export function compressLargeDiff(
+	diff: string,
+	maxSize = DEFAULT_PULL_REQUEST_DIFF_MAX_SIZE,
+): string {
 	if (diff.length <= maxSize) {
 		return diff;
 	}

@@ -219,12 +219,12 @@ index 1234567..abcdefg 100644
 	});
 
 	it("should match snapshot for PR #22 at 200000 chars", () => {
-		const compressed = compressLargeDiff(PR_22_DIFF, 200000);
+		const compressed = compressLargeDiff(PR_22_DIFF, 200_000);
 		expect(compressed).toMatchSnapshot("pr-22-compressed-200000.txt");
 	});
 
 	it("should match snapshot for PR #22 at 12000 chars", () => {
-		const compressed = compressLargeDiff(PR_22_DIFF, 12000);
+		const compressed = compressLargeDiff(PR_22_DIFF, 12_000);
 		expect(compressed).toMatchSnapshot("pr-22-compressed-12000.txt");
 	});
 });

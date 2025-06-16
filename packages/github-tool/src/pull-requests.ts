@@ -32,8 +32,7 @@ export async function getPullRequestDiff(args: {
 		},
 	);
 	const diff = response.data as unknown as string;
-	const maxSize = args.maxSize ?? 8000;
-	return compressLargeDiff(diff, maxSize);
+	return compressLargeDiff(diff, args.maxSize);
 }
 
 export async function getPullRequestReviewComment(args: {
