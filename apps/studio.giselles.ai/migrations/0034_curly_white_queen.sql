@@ -1,1 +1,0 @@
-ALTER TABLE "teams" ADD COLUMN "github_installation_id" integer;
