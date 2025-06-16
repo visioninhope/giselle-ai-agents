@@ -1,3 +1,6 @@
 export { PoolManager } from "./postgres";
-export { ensurePgVectorTypes, clearPgVectorCache } from "./pgvector-registry";
+export {
+	clearPgVectorCache,
+	ensurePgVectorTypes,
+} from "./postgres/pgvector-registry";
 export type { ColumnMapping, DatabaseConfig, RequiredColumns } from "./types";
