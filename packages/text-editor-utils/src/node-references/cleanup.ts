@@ -79,17 +79,15 @@ function cleanupNodeReferencesInJsonContent(
 		return null;
 	}
 
-	const content = jsonContent;
-
 	// If this is a Source with the deleted nodeId, remove it
-	if (isSourceContent(content)) {
-		if (content.attrs.node.id === deletedNodeId) {
+	if (isSourceContent(jsonContent)) {
+		if (jsonContent.attrs.node.id === deletedNodeId) {
 			return null;
 		}
 	}
 
 	// Recursively process content array
-	return processContentArray(content, (child) =>
+	return processContentArray(jsonContent, (child) =>
 		cleanupNodeReferencesInJsonContent(child, deletedNodeId),
 	);
 }
@@ -140,20 +138,18 @@ function cleanupSpecificNodeReferenceInJsonContent(
 		return null;
 	}
 
-	const content = jsonContent;
-
 	// If this is a Source with the specific nodeId and outputId, remove it
-	if (isSourceContent(content)) {
+	if (isSourceContent(jsonContent)) {
 		if (
-			content.attrs.node.id === nodeId &&
-			content.attrs.outputId === outputId
+			jsonContent.attrs.node.id === nodeId &&
+			jsonContent.attrs.outputId === outputId
 		) {
 			return null;
 		}
 	}
 
 	// Recursively process content array
-	const processedContent = processContentArray(content, (child) =>
+	const processedContent = processContentArray(jsonContent, (child) =>
 		cleanupSpecificNodeReferenceInJsonContent(child, nodeId, outputId),
 	);
 
