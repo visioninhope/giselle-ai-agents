@@ -14,7 +14,7 @@ import type {
 } from "@giselle-sdk/data-type";
 import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
-import { createDataSource } from "./data-source";
+import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
@@ -222,6 +222,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			dataSource: DataSourceProviderObject;
 		}) {
 			return await createDataSource({ ...args, context });
+		},
+		async getWorkspaceDataSources(args: {
+			workspaceId: WorkspaceId;
+		}) {
+			return await getWorkspaceDataSources({ ...args, context });
 		},
 	};
 }
