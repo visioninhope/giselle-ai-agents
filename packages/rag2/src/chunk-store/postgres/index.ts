@@ -149,14 +149,22 @@ export class PostgresChunkStore<
 		documentKey: string,
 		client: PoolClient,
 	): Promise<void> {
-		const { tableName, columnMapping } = this.config;
+		const { tableName, columnMapping, staticContext = {} } = this.config;
 
-		const query = `
+		let query = `
       DELETE FROM ${escapeIdentifier(tableName)}
       WHERE ${escapeIdentifier(columnMapping.documentKey)} = $1
     `;
 
-		await client.query(query, [documentKey]);
+		const queryParams: unknown[] = [documentKey];
+
+		// Add static context conditions
+		for (const [key, value] of Object.entries(staticContext)) {
+			queryParams.push(value);
+			query += ` AND ${escapeIdentifier(key)} = $${queryParams.length}`;
+		}
+
+		await client.query(query, queryParams);
 	}
 
 	/**
