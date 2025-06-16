@@ -161,12 +161,6 @@ export class PostgresChunkStore<
 
 	/**
 	 * Batch insert multiple records using optimal batching strategy
-	 *
-	 * Performance improvements over individual inserts:
-	 * - Reduces network round-trips from N queries to 1 (or few batches)
-	 * - Reduces PostgreSQL parsing overhead
-	 * - Enables better transaction efficiency
-	 * - Can improve throughput by 10-100x for large datasets
 	 */
 	private async insertRecords(
 		client: PoolClient,
