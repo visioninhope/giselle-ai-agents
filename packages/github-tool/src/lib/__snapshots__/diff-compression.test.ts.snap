@@ -1,93 +1,732 @@
 // Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
 
-exports[`diff compression > should match snapshot for PR #1118 at 1000 chars > pr-1118-compressed-1000.txt 1`] = `
-"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+exports[`diff compression > should match snapshot for PR #1118 at 5000 chars > pr-1118-compressed-5000.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+index c30cd0971..f7387a494 100644
+--- a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+@@ -1,41 +1,15 @@
+@@ -47,305 +21,37 @@ export async function GET(request: NextRequest) {
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.ts b/packages/rag2/src/chunker/line-chunker.ts
+new file mode 100644
+index 000000000..12e884a0e
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.ts
+@@ -0,0 +1,306 @@
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.test.ts b/packages/rag2/src/chunker/line-chunker.test.ts
+new file mode 100644
+index 000000000..10d0c4b3c
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.test.ts
+@@ -0,0 +1,282 @@
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/index.ts b/packages/rag2/src/chunk-store/postgres/index.ts
+new file mode 100644
+index 000000000..0d90e059b
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/index.ts
+@@ -0,0 +1,274 @@
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.ts b/packages/rag2/src/ingest/ingest-pipeline.ts
+new file mode 100644
+index 000000000..38a40011a
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.ts
+@@ -0,0 +1,238 @@
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.test.ts b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+new file mode 100644
+index 000000000..0e4721d10
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+@@ -0,0 +1,122 @@
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+new file mode 100644
+index 000000000..984a23e28
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+@@ -0,0 +1,148 @@
+...
+diff --git a/packages/rag2/README.md b/packages/rag2/README.md
+index 32d183246..022caa0aa 100644
+--- a/packages/rag2/README.md
++++ b/packages/rag2/README.md
+@@ -13,6 +13,15 @@ and pgvector.
+@@ -66,6 +75,87 @@ results.forEach((result) => {
+@@ -84,11 +174,31 @@ interface QueryResult<TMetadata> {
+...
+diff --git a/packages/rag2/src/factories/factories.ts b/packages/rag2/src/factories/factories.ts
+index 68fe33a80..6b1b5cce1 100644
+--- a/packages/rag2/src/factories/factories.ts
++++ b/packages/rag2/src/factories/factories.ts
+@@ -1,8 +1,20 @@
+@@ -56,6 +68,33 @@ function validateDatabaseConfig(database: {
+@@ -75,7 +114,6 @@ export function createQueryService<
+@@ -87,3 +125,38 @@ export function createQueryService<
+...
+diff --git a/packages/github-tool/src/blob-loader.ts b/packages/github-tool/src/blob-loader.ts
+index 546518682..2c395976a 100644
+--- a/packages/github-tool/src/blob-loader.ts
++++ b/packages/github-tool/src/blob-loader.ts
+@@ -1,17 +1,30 @@
+@@ -32,50 +45,26 @@ interface GitHubBlobResult {
+@@ -94,7 +83,7 @@ export class GitHubBlobLoader
+@@ -228,7 +217,7 @@ async function* traverseTree(
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 new file mode 100644
 index 000000000..b5ad8bde7
 --- /dev/null
 +++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 @@ -0,0 +1,90 @@
-++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
-+import { db, githubRepositoryIndex } from "@/drizzle";
-+import {
-+	type GitHubChunkMetadata,
+...
+diff --git a/packages/rag2/src/factories/types.ts b/packages/rag2/src/factories/types.ts
+index 299283d56..e8757a25c 100644
+--- a/packages/rag2/src/factories/types.ts
++++ b/packages/rag2/src/factories/types.ts
+@@ -1,7 +1,54 @@
+@@ -52,3 +99,39 @@ export interface QueryServiceConfig<
+...
+diff --git a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+index 59f2c2fb2..21602c8fb 100644
+--- a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
++++ b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+@@ -9,10 +9,27 @@ import type {
+@@ -24,6 +41,31 @@ function createDatabaseConfig(): DatabaseConfig {
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+new file mode 100644
+index 000000000..972c880fd
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+@@ -0,0 +1,64 @@
+...
+diff --git a/packages/rag2/src/factories/utils.ts b/packages/rag2/src/factories/utils.ts
+index 3a1388a1e..0aa3d44fc 100644
+--- a/packages/rag2/src/factories/utils.ts
++++ b/packages/rag2/src/factories/utils.ts
+@@ -1,5 +1,7 @@
+@@ -10,12 +12,21 @@ const FACTORY_DEFAULTS = {
+@@ -58,14 +69,7 @@ function validateColumnMapping<TMetadata extends Record<string, unknown>>(
+@@ -155,3 +159,14 @@ export function createDefaultEmbedder() {
+...
+diff --git a/packages/rag2/src/index.ts b/packages/rag2/src/index.ts
+index 87e6eedcf..0671960e9 100644
+--- a/packages/rag2/src/index.ts
++++ b/packages/rag2/src/index.ts
+@@ -14,10 +14,25 @@ export type {
+@@ -28,15 +43,32 @@ export type {
+...
+diff --git a/packages/rag2/src/database/types.ts b/packages/rag2/src/database/types.ts
+index fa651030b..19f53b5f2 100644
+--- a/packages/rag2/src/database/types.ts
++++ b/packages/rag2/src/database/types.ts
+@@ -36,15 +36,21 @@ export interface DatabaseConfig {
+...
+diff --git a/packages/rag2/src/chunk-store/types.ts b/packages/rag2/src/chunk-store/types.ts
+new file mode 100644
+index 000000000..6cee26c3a
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/types.ts
+@@ -0,0 +1,30 @@
+...
+diff --git a/packages/rag2/src/factories/index.ts b/packages/rag2/src/factories/index.ts
+index 5bd0fe108..055418f49 100644
+--- a/packages/rag2/src/factories/index.ts
++++ b/packages/rag2/src/factories/index.ts
+@@ -1,16 +1,24 @@
+...
+diff --git a/packages/rag2/src/document-loader/types.ts b/packages/rag2/src/document-loader/types.ts
+new file mode 100644
+index 000000000..523db71ea
+--- /dev/null
++++ b/packages/rag2/src/document-loader/types.ts
+@@ -0,0 +1,22 @@
+...
+diff --git a/packages/rag2/src/query-service/postgres/index.ts b/packages/rag2/src/query-service/postgres/index.ts
+index 0c95ac6ee..629cd212c 100644
+--- a/packages/rag2/src/query-service/postgres/index.ts
++++ b/packages/rag2/src/query-service/postgres/index.ts
+@@ -1,7 +1,7 @@
+...
+diff --git a/packages/rag2/src/database/index.ts b/packages/rag2/src/database/index.ts
+index fcdf1b6f6..c7241003d 100644
+--- a/packages/rag2/src/database/index.ts
++++ b/packages/rag2/src/database/index.ts
+@@ -1,3 +1,6 @@
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+new file mode 100644
+index 000000000..1b357b265
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/github-tool/package.json b/packages/github-tool/package.json
+index dc5ff847b..056bb95fb 100644
+--- a/packages/github-tool/package.json
++++ b/packages/github-tool/package.json
+@@ -30,6 +30,7 @@
+...
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 82b06065e..54646f804 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -1009,6 +1009,9 @@ importers:
+...
+diff --git a/packages/rag2/src/chunker/types.ts b/packages/rag2/src/chunker/types.ts
+new file mode 100644
+index 000000000..b9c19bcff
+--- /dev/null
++++ b/packages/rag2/src/chunker/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/rag2/src/chunk-store/index.ts b/packages/rag2/src/chunk-store/index.ts
+new file mode 100644
+index 000000000..0b92d7e6f
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/index.ts
+@@ -0,0 +1,5 @@
+...
+diff --git a/packages/rag2/src/ingest/index.ts b/packages/rag2/src/ingest/index.ts
+new file mode 100644
+index 000000000..ba6a0a84b
+--- /dev/null
++++ b/packages/rag2/src/ingest/index.ts
+@@ -0,0 +1,7 @@
+...
+diff --git a/packages/rag2/src/chunker/index.ts b/packages/rag2/src/chunker/index.ts
+new file mode 100644
+index 000000000..0db28ed8c
+--- /dev/null
++++ b/packages/rag2/src/chunker/index.ts
+@@ -0,0 +1,2 @@
+...
+diff --git a/packages/rag2/src/document-loader/index.ts b/packages/rag2/src/document-loader/index.ts
+new file mode 100644
+index 000000000..baf5cf611
+--- /dev/null
++++ b/packages/rag2/src/document-loader/index.ts
+@@ -0,0 +1 @@
+...
+diff --git a/packages/rag2/src/database/pgvector-registry.ts b/packages/rag2/src/database/postgres/pgvector-registry.ts
 ..."
 `;
 
-exports[`diff compression > should match snapshot for PR #1118 at 1500 chars > pr-1118-compressed-1500.txt 1`] = `
-"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+exports[`diff compression > should match snapshot for PR #1118 at 10000 chars > pr-1118-compressed-10000.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+index c30cd0971..f7387a494 100644
+--- a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+@@ -1,41 +1,15 @@
+@@ -47,305 +21,37 @@ export async function GET(request: NextRequest) {
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.ts b/packages/rag2/src/chunker/line-chunker.ts
+new file mode 100644
+index 000000000..12e884a0e
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.ts
+@@ -0,0 +1,306 @@
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.test.ts b/packages/rag2/src/chunker/line-chunker.test.ts
+new file mode 100644
+index 000000000..10d0c4b3c
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.test.ts
+@@ -0,0 +1,282 @@
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/index.ts b/packages/rag2/src/chunk-store/postgres/index.ts
+new file mode 100644
+index 000000000..0d90e059b
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/index.ts
+@@ -0,0 +1,274 @@
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.ts b/packages/rag2/src/ingest/ingest-pipeline.ts
+new file mode 100644
+index 000000000..38a40011a
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.ts
+@@ -0,0 +1,238 @@
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.test.ts b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+new file mode 100644
+index 000000000..0e4721d10
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+@@ -0,0 +1,122 @@
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+new file mode 100644
+index 000000000..984a23e28
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+@@ -0,0 +1,148 @@
+...
+diff --git a/packages/rag2/README.md b/packages/rag2/README.md
+index 32d183246..022caa0aa 100644
+--- a/packages/rag2/README.md
++++ b/packages/rag2/README.md
+@@ -13,6 +13,15 @@ and pgvector.
+@@ -66,6 +75,87 @@ results.forEach((result) => {
+@@ -84,11 +174,31 @@ interface QueryResult<TMetadata> {
+...
+diff --git a/packages/rag2/src/factories/factories.ts b/packages/rag2/src/factories/factories.ts
+index 68fe33a80..6b1b5cce1 100644
+--- a/packages/rag2/src/factories/factories.ts
++++ b/packages/rag2/src/factories/factories.ts
+@@ -1,8 +1,20 @@
+@@ -56,6 +68,33 @@ function validateDatabaseConfig(database: {
+@@ -75,7 +114,6 @@ export function createQueryService<
+@@ -87,3 +125,38 @@ export function createQueryService<
+...
+diff --git a/packages/github-tool/src/blob-loader.ts b/packages/github-tool/src/blob-loader.ts
+index 546518682..2c395976a 100644
+--- a/packages/github-tool/src/blob-loader.ts
++++ b/packages/github-tool/src/blob-loader.ts
+@@ -1,17 +1,30 @@
+@@ -32,50 +45,26 @@ interface GitHubBlobResult {
+@@ -94,7 +83,7 @@ export class GitHubBlobLoader
+@@ -228,7 +217,7 @@ async function* traverseTree(
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 new file mode 100644
 index 000000000..b5ad8bde7
 --- /dev/null
 +++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 @@ -0,0 +1,90 @@
-++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
-+import { db, githubRepositoryIndex } from "@/drizzle";
-+import {
-+	type GitHubChunkMetadata,
-+	createGitHubChunkStore,
-+} from "@/lib/vector-stores/github-blob-stores";
-+import {
-+	GitHubBlobLoader,
-+	type GitHubBlobLoaderParams,
-+	type GitHubBlobMetadata,
-+} from "@giselle-sdk/github-tool";
-+import { createIngestPipeline } from "@giselle-sdk/rag2";
-+import type { Octokit } from "@octokit/core";
-+import { and, eq } from "drizzle-orm";
-+
-+/**
-+ * Main GitHub repository ingestion coordination
-+ */
-+export async function ingestGitHubRepository(params: {
-+	octokitClient: Octokit;
+...
+diff --git a/packages/rag2/src/factories/types.ts b/packages/rag2/src/factories/types.ts
+index 299283d56..e8757a25c 100644
+--- a/packages/rag2/src/factories/types.ts
++++ b/packages/rag2/src/factories/types.ts
+@@ -1,7 +1,54 @@
+@@ -52,3 +99,39 @@ export interface QueryServiceConfig<
+...
+diff --git a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+index 59f2c2fb2..21602c8fb 100644
+--- a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
++++ b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+@@ -9,10 +9,27 @@ import type {
+@@ -24,6 +41,31 @@ function createDatabaseConfig(): DatabaseConfig {
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+new file mode 100644
+index 000000000..972c880fd
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+@@ -0,0 +1,64 @@
+...
+diff --git a/packages/rag2/src/factories/utils.ts b/packages/rag2/src/factories/utils.ts
+index 3a1388a1e..0aa3d44fc 100644
+--- a/packages/rag2/src/factories/utils.ts
++++ b/packages/rag2/src/factories/utils.ts
+@@ -1,5 +1,7 @@
+@@ -10,12 +12,21 @@ const FACTORY_DEFAULTS = {
+@@ -58,14 +69,7 @@ function validateColumnMapping<TMetadata extends Record<string, unknown>>(
+@@ -155,3 +159,14 @@ export function createDefaultEmbedder() {
+...
+diff --git a/packages/rag2/src/index.ts b/packages/rag2/src/index.ts
+index 87e6eedcf..0671960e9 100644
+--- a/packages/rag2/src/index.ts
++++ b/packages/rag2/src/index.ts
+@@ -14,10 +14,25 @@ export type {
+@@ -28,15 +43,32 @@ export type {
+...
+diff --git a/packages/rag2/src/database/types.ts b/packages/rag2/src/database/types.ts
+index fa651030b..19f53b5f2 100644
+--- a/packages/rag2/src/database/types.ts
++++ b/packages/rag2/src/database/types.ts
+@@ -36,15 +36,21 @@ export interface DatabaseConfig {
+...
+diff --git a/packages/rag2/src/chunk-store/types.ts b/packages/rag2/src/chunk-store/types.ts
+new file mode 100644
+index 000000000..6cee26c3a
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/types.ts
+@@ -0,0 +1,30 @@
+...
+diff --git a/packages/rag2/src/factories/index.ts b/packages/rag2/src/factories/index.ts
+index 5bd0fe108..055418f49 100644
+--- a/packages/rag2/src/factories/index.ts
++++ b/packages/rag2/src/factories/index.ts
+@@ -1,16 +1,24 @@
+...
+diff --git a/packages/rag2/src/document-loader/types.ts b/packages/rag2/src/document-loader/types.ts
+new file mode 100644
+index 000000000..523db71ea
+--- /dev/null
++++ b/packages/rag2/src/document-loader/types.ts
+@@ -0,0 +1,22 @@
+...
+diff --git a/packages/rag2/src/query-service/postgres/index.ts b/packages/rag2/src/query-service/postgres/index.ts
+index 0c95ac6ee..629cd212c 100644
+--- a/packages/rag2/src/query-service/postgres/index.ts
++++ b/packages/rag2/src/query-service/postgres/index.ts
+@@ -1,7 +1,7 @@
+...
+diff --git a/packages/rag2/src/database/index.ts b/packages/rag2/src/database/index.ts
+index fcdf1b6f6..c7241003d 100644
+--- a/packages/rag2/src/database/index.ts
++++ b/packages/rag2/src/database/index.ts
+@@ -1,3 +1,6 @@
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+new file mode 100644
+index 000000000..1b357b265
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/github-tool/package.json b/packages/github-tool/package.json
+index dc5ff847b..056bb95fb 100644
+--- a/packages/github-tool/package.json
++++ b/packages/github-tool/package.json
+@@ -30,6 +30,7 @@
+...
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 82b06065e..54646f804 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -1009,6 +1009,9 @@ importers:
+...
+diff --git a/packages/rag2/src/chunker/types.ts b/packages/rag2/src/chunker/types.ts
+new file mode 100644
+index 000000000..b9c19bcff
+--- /dev/null
++++ b/packages/rag2/src/chunker/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/rag2/src/chunk-store/index.ts b/packages/rag2/src/chunk-store/index.ts
+new file mode 100644
+index 000000000..0b92d7e6f
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/index.ts
+@@ -0,0 +1,5 @@
+...
+diff --git a/packages/rag2/src/ingest/index.ts b/packages/rag2/src/ingest/index.ts
+new file mode 100644
+index 000000000..ba6a0a84b
+--- /dev/null
++++ b/packages/rag2/src/ingest/index.ts
+@@ -0,0 +1,7 @@
+...
+diff --git a/packages/rag2/src/chunker/index.ts b/packages/rag2/src/chunker/index.ts
+new file mode 100644
+index 000000000..0db28ed8c
+--- /dev/null
++++ b/packages/rag2/src/chunker/index.ts
+@@ -0,0 +1,2 @@
+...
+diff --git a/packages/rag2/src/document-loader/index.ts b/packages/rag2/src/document-loader/index.ts
+new file mode 100644
+index 000000000..baf5cf611
+--- /dev/null
++++ b/packages/rag2/src/document-loader/index.ts
+@@ -0,0 +1 @@
+...
+diff --git a/packages/rag2/src/database/pgvector-registry.ts b/packages/rag2/src/database/postgres/pgvector-registry.ts
 ..."
 `;
 
-exports[`diff compression > should match snapshot for PR #1118 at 2000 chars > pr-1118-compressed-2000.txt 1`] = `
-"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
+exports[`diff compression > should match snapshot for PR #1118 at 15000 chars > pr-1118-compressed-15000.txt 1`] = `
+"diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+index c30cd0971..f7387a494 100644
+--- a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
+@@ -1,41 +1,15 @@
+@@ -47,305 +21,37 @@ export async function GET(request: NextRequest) {
+-import {
+-	db,
+-	githubRepositoryEmbeddings,
+-	githubRepositoryIndex,
+-} from "@/drizzle";
+-import {
+-	GitHubBlobLoader,
+-	type GitHubBlobMetadata,
+-	type GithubRepositoryParams,
+-	octokit,
+-} from "@giselle-sdk/github-tool";
+-import {
+-	type BaseEmbedding,
+-	type EmbeddingStore,
+-	ingest,
+-} from "@giselle-sdk/rag";
++import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
+ import { captureException } from "@sentry/nextjs";
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.ts b/packages/rag2/src/chunker/line-chunker.ts
+new file mode 100644
+index 000000000..12e884a0e
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.ts
+@@ -0,0 +1,306 @@
++import { z } from "zod/v4";
++import { ConfigurationError } from "../errors";
++import type { Chunker } from "./types";
++
++const LineChunkerOptionsSchema = z
++	.object({
++		/**
++		 * Maximum number of lines per chunk
++		 * Default: 150
++		 */
++		maxLines: z
++			.number()
++			.int()
++			.positive("maxLines must be positive")
++			.max(1000, "maxLines cannot exceed 1000")
++			.optional()
++			.default(150),
++		/**
++		 * Number of lines to overlap between chunks
++		 * Default: 30
++		 */
++		overlap: z
++			.number()
++			.int()
+...
+diff --git a/packages/rag2/src/chunker/line-chunker.test.ts b/packages/rag2/src/chunker/line-chunker.test.ts
+new file mode 100644
+index 000000000..10d0c4b3c
+--- /dev/null
++++ b/packages/rag2/src/chunker/line-chunker.test.ts
+@@ -0,0 +1,282 @@
++import { describe, expect, it } from "vitest";
++import { LineChunker } from "./line-chunker";
++
++describe("LineChunker", () => {
++	describe("Basic functionality", () => {
++		it("should split text into chunks based on line count", () => {
++			const chunker = new LineChunker({
++				maxLines: 3,
++				overlap: 0,
++			});
++			const text = "line1\\nline2\\nline3\\nline4\\nline5\\nline6\\nline7\\nline8";
++
++			const chunks = chunker.chunk(text);
++
++			expect(chunks.length).toBeGreaterThan(1);
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/index.ts b/packages/rag2/src/chunk-store/postgres/index.ts
+new file mode 100644
+index 000000000..0d90e059b
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/index.ts
+@@ -0,0 +1,274 @@
++import type { PoolClient } from "pg";
++import { escapeIdentifier } from "pg";
++import * as pgvector from "pgvector/pg";
++import type { z } from "zod/v4";
++import { PoolManager } from "../../database/postgres";
++import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
++import {
++	type ColumnMapping,
++	type DatabaseConfig,
++	REQUIRED_COLUMN_KEYS,
++} from "../../database/types";
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.ts b/packages/rag2/src/ingest/ingest-pipeline.ts
+new file mode 100644
+index 000000000..38a40011a
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.ts
+@@ -0,0 +1,238 @@
++import type { ChunkStore } from "../chunk-store/types";
++import type { Chunker } from "../chunker/types";
++import type {
++	Document,
++	DocumentLoader,
++	DocumentLoaderParams,
++} from "../document-loader/types";
++import type { Embedder } from "../embedder/types";
++import { OperationError } from "../errors";
++
++/**
++ * Config for IngestPipeline
++ */
++export interface IngestPipelineConfig<
+...
+diff --git a/packages/rag2/src/ingest/ingest-pipeline.test.ts b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+new file mode 100644
+index 000000000..0e4721d10
+--- /dev/null
++++ b/packages/rag2/src/ingest/ingest-pipeline.test.ts
+@@ -0,0 +1,122 @@
++import { beforeEach, describe, expect, it, vi } from "vitest";
+...
+diff --git a/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+new file mode 100644
+index 000000000..984a23e28
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/postgres/metadata-validation.test.ts
+@@ -0,0 +1,148 @@
+...
+diff --git a/packages/rag2/README.md b/packages/rag2/README.md
+index 32d183246..022caa0aa 100644
+--- a/packages/rag2/README.md
++++ b/packages/rag2/README.md
+@@ -13,6 +13,15 @@ and pgvector.
+@@ -66,6 +75,87 @@ results.forEach((result) => {
+@@ -84,11 +174,31 @@ interface QueryResult<TMetadata> {
+...
+diff --git a/packages/rag2/src/factories/factories.ts b/packages/rag2/src/factories/factories.ts
+index 68fe33a80..6b1b5cce1 100644
+--- a/packages/rag2/src/factories/factories.ts
++++ b/packages/rag2/src/factories/factories.ts
+@@ -1,8 +1,20 @@
+@@ -56,6 +68,33 @@ function validateDatabaseConfig(database: {
+@@ -75,7 +114,6 @@ export function createQueryService<
+@@ -87,3 +125,38 @@ export function createQueryService<
+...
+diff --git a/packages/github-tool/src/blob-loader.ts b/packages/github-tool/src/blob-loader.ts
+index 546518682..2c395976a 100644
+--- a/packages/github-tool/src/blob-loader.ts
++++ b/packages/github-tool/src/blob-loader.ts
+@@ -1,17 +1,30 @@
+@@ -32,50 +45,26 @@ interface GitHubBlobResult {
+@@ -94,7 +83,7 @@ export class GitHubBlobLoader
+@@ -228,7 +217,7 @@ async function* traverseTree(
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 new file mode 100644
 index 000000000..b5ad8bde7
 --- /dev/null
 +++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/ingest-github-repository.ts
 @@ -0,0 +1,90 @@
-++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/route.ts
-+import { db, githubRepositoryIndex } from "@/drizzle";
-+import {
-+	type GitHubChunkMetadata,
-+	createGitHubChunkStore,
-+} from "@/lib/vector-stores/github-blob-stores";
-+import {
-+	GitHubBlobLoader,
-+	type GitHubBlobLoaderParams,
-+	type GitHubBlobMetadata,
-+} from "@giselle-sdk/github-tool";
-+import { createIngestPipeline } from "@giselle-sdk/rag2";
-+import type { Octokit } from "@octokit/core";
-+import { and, eq } from "drizzle-orm";
-+
-+/**
-+ * Main GitHub repository ingestion coordination
-+ */
-+export async function ingestGitHubRepository(params: {
-+	octokitClient: Octokit;
-+	source: { owner: string; repo: string; commitSha: string };
-+	teamDbId: number;
-+}): Promise<void> {
-+	const repositoryIndexDbId = await getRepositoryIndexDbId(
-+		params.source,
-+		params.teamDbId,
-+	);
-+
-+	const githubLoader = new GitHubBlobLoader(params.octokitClient, {
-+		maxBlobSize: 1 * 1024 * 1024,
-+	});
-+	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
-+
-+	const pipeline = createIngestPipeline<
-+		GitHubBlobMetadata,
-+		GitHubChunkMetadata,
-+		GitHubBlobLoaderParams
-+	>({
+...
+diff --git a/packages/rag2/src/factories/types.ts b/packages/rag2/src/factories/types.ts
+index 299283d56..e8757a25c 100644
+--- a/packages/rag2/src/factories/types.ts
++++ b/packages/rag2/src/factories/types.ts
+@@ -1,7 +1,54 @@
+@@ -52,3 +99,39 @@ export interface QueryServiceConfig<
+...
+diff --git a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+index 59f2c2fb2..21602c8fb 100644
+--- a/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
++++ b/apps/studio.giselles.ai/lib/vector-stores/github-blob-stores.ts
+@@ -9,10 +9,27 @@ import type {
+@@ -24,6 +41,31 @@ function createDatabaseConfig(): DatabaseConfig {
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+new file mode 100644
+index 000000000..972c880fd
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/utils.ts
+@@ -0,0 +1,64 @@
+...
+diff --git a/packages/rag2/src/factories/utils.ts b/packages/rag2/src/factories/utils.ts
+index 3a1388a1e..0aa3d44fc 100644
+--- a/packages/rag2/src/factories/utils.ts
++++ b/packages/rag2/src/factories/utils.ts
+@@ -1,5 +1,7 @@
+@@ -10,12 +12,21 @@ const FACTORY_DEFAULTS = {
+@@ -58,14 +69,7 @@ function validateColumnMapping<TMetadata extends Record<string, unknown>>(
+@@ -155,3 +159,14 @@ export function createDefaultEmbedder() {
+...
+diff --git a/packages/rag2/src/index.ts b/packages/rag2/src/index.ts
+index 87e6eedcf..0671960e9 100644
+--- a/packages/rag2/src/index.ts
++++ b/packages/rag2/src/index.ts
+@@ -14,10 +14,25 @@ export type {
+@@ -28,15 +43,32 @@ export type {
+...
+diff --git a/packages/rag2/src/database/types.ts b/packages/rag2/src/database/types.ts
+index fa651030b..19f53b5f2 100644
+--- a/packages/rag2/src/database/types.ts
++++ b/packages/rag2/src/database/types.ts
+@@ -36,15 +36,21 @@ export interface DatabaseConfig {
+...
+diff --git a/packages/rag2/src/chunk-store/types.ts b/packages/rag2/src/chunk-store/types.ts
+new file mode 100644
+index 000000000..6cee26c3a
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/types.ts
+@@ -0,0 +1,30 @@
+...
+diff --git a/packages/rag2/src/factories/index.ts b/packages/rag2/src/factories/index.ts
+index 5bd0fe108..055418f49 100644
+--- a/packages/rag2/src/factories/index.ts
++++ b/packages/rag2/src/factories/index.ts
+@@ -1,16 +1,24 @@
+...
+diff --git a/packages/rag2/src/document-loader/types.ts b/packages/rag2/src/document-loader/types.ts
+new file mode 100644
+index 000000000..523db71ea
+--- /dev/null
++++ b/packages/rag2/src/document-loader/types.ts
+@@ -0,0 +1,22 @@
+...
+diff --git a/packages/rag2/src/query-service/postgres/index.ts b/packages/rag2/src/query-service/postgres/index.ts
+index 0c95ac6ee..629cd212c 100644
+--- a/packages/rag2/src/query-service/postgres/index.ts
++++ b/packages/rag2/src/query-service/postgres/index.ts
+@@ -1,7 +1,7 @@
+...
+diff --git a/packages/rag2/src/database/index.ts b/packages/rag2/src/database/index.ts
+index fcdf1b6f6..c7241003d 100644
+--- a/packages/rag2/src/database/index.ts
++++ b/packages/rag2/src/database/index.ts
+@@ -1,3 +1,6 @@
+...
+diff --git a/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+new file mode 100644
+index 000000000..1b357b265
+--- /dev/null
++++ b/apps/studio.giselles.ai/app/api/vector-stores/github/ingest/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/github-tool/package.json b/packages/github-tool/package.json
+index dc5ff847b..056bb95fb 100644
+--- a/packages/github-tool/package.json
++++ b/packages/github-tool/package.json
+@@ -30,6 +30,7 @@
+...
+diff --git a/pnpm-lock.yaml b/pnpm-lock.yaml
+index 82b06065e..54646f804 100644
+--- a/pnpm-lock.yaml
++++ b/pnpm-lock.yaml
+@@ -1009,6 +1009,9 @@ importers:
+...
+diff --git a/packages/rag2/src/chunker/types.ts b/packages/rag2/src/chunker/types.ts
+new file mode 100644
+index 000000000..b9c19bcff
+--- /dev/null
++++ b/packages/rag2/src/chunker/types.ts
+@@ -0,0 +1,8 @@
+...
+diff --git a/packages/rag2/src/chunk-store/index.ts b/packages/rag2/src/chunk-store/index.ts
+new file mode 100644
+index 000000000..0b92d7e6f
+--- /dev/null
++++ b/packages/rag2/src/chunk-store/index.ts
+@@ -0,0 +1,5 @@
+...
+diff --git a/packages/rag2/src/ingest/index.ts b/packages/rag2/src/ingest/index.ts
+new file mode 100644
+index 000000000..ba6a0a84b
+--- /dev/null
++++ b/packages/rag2/src/ingest/index.ts
+@@ -0,0 +1,7 @@
+...
+diff --git a/packages/rag2/src/chunker/index.ts b/packages/rag2/src/chunker/index.ts
+new file mode 100644
+index 000000000..0db28ed8c
+--- /dev/null
++++ b/packages/rag2/src/chunker/index.ts
+@@ -0,0 +1,2 @@
+...
+diff --git a/packages/rag2/src/document-loader/index.ts b/packages/rag2/src/document-loader/index.ts
+new file mode 100644
+index 000000000..baf5cf611
+--- /dev/null
++++ b/packages/rag2/src/document-loader/index.ts
+@@ -0,0 +1 @@
+...
+diff --git a/packages/rag2/src/database/pgvector-registry.ts b/packages/rag2/src/database/postgres/pgvector-registry.ts
 ..."
 `;

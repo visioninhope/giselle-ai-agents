@@ -10,7 +10,9 @@ export function compressLargeDiff(diff: string, maxSize = 8000): string {
 		return diff;
 	}
 
-	const fileDiffs = parseFileDiffs(diff);
+	// Replace encoded data with placeholders before processing
+	const processedDiff = replaceEncodedData(diff);
+	const fileDiffs = parseFileDiffs(processedDiff);
 
 	fileDiffs.sort((a, b) => b.size - a.size);
 	const totalHeaderSize = fileDiffs.reduce((sum, file) => {
@@ -128,6 +130,40 @@ function isHeaderLine(line: string): boolean {
 		line.match(/^new file mode/) !== null ||
 		line.match(/^deleted file mode/) !== null
 	);
+}
+
+function replaceEncodedData(content: string): string {
+	// Replace data URLs with base64 content
+	content = content.replace(
+		/data:([^;]+);base64,[A-Za-z0-9+/]{20,}=*/g,
+		"data:$1;base64,<ENCODED DATA>",
+	);
+
+	// Replace base64 strings in JSON responses (common in API data)
+	content = content.replace(
+		/"([^"]*)":\s*"[A-Za-z0-9+/]{50,}=*"/g,
+		'"$1":"<ENCODED DATA>"',
+	);
+
+	// Replace standalone base64 strings (images, files, etc.)
+	content = content.replace(
+		/^[\s]*[+-]?[A-Za-z0-9+/]{100,}=*[\s]*$/gm,
+		"<ENCODED DATA>",
+	);
+
+	// Replace base64 in various formats with line breaks
+	content = content.replace(/[A-Za-z0-9+/]{80,}=*/g, "<ENCODED DATA>");
+
+	// Replace multiline base64 blocks (common in diffs)
+	content = content.replace(
+		/(\+|\-|\s)([A-Za-z0-9+/]{40,}[=]{0,2}(\n(\+|\-|\s)[A-Za-z0-9+/]{40,}[=]{0,2}){3,})/g,
+		"$1<ENCODED DATA>",
+	);
+
+	// Replace hex-encoded data (long hex strings)
+	content = content.replace(/[0-9a-fA-F]{100,}/g, "<ENCODED HEX DATA>");
+
+	return content;
 }
 
 function extractFileName(diffLine: string): string {
