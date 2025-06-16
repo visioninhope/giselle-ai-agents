@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { PR_1118_DIFF } from "./__fixtures__";
+import { PR_22_DIFF, PR_1118_DIFF } from "./__fixtures__";
 import { type FileDiff, compressLargeDiff } from "./diff-compression";
 
 describe("diff compression", () => {
@@ -188,5 +188,43 @@ index 1234567..abcdefg 100644
 		expect(compressed).not.toContain("89504e470d0a1a0a0000000d49484452");
 		expect(compressed).not.toContain("ffd8ffe000104a46494600010101");
 		expect(compressed).toContain("Short line");
+	});
+
+	it("should compress PR #22 diff effectively", () => {
+		const originalSize = PR_22_DIFF.length;
+		const compressed = compressLargeDiff(PR_22_DIFF, 8000);
+		const compressedSize = compressed.length;
+		const compressionRatio = (
+			((originalSize - compressedSize) / originalSize) *
+			100
+		).toFixed(1);
+
+		console.log(`PR #22 - Original size: ${originalSize} characters`);
+		console.log(`PR #22 - Compressed size: ${compressedSize} characters`);
+		console.log(`PR #22 - Compression ratio: ${compressionRatio}%`);
+
+		expect(compressedSize).toBeLessThanOrEqual(8000);
+		expect(originalSize).toBeGreaterThan(compressedSize);
+		expect(compressed).toContain("diff --git");
+	});
+
+	it("should preserve important file headers in PR #22", () => {
+		const compressed = compressLargeDiff(PR_22_DIFF, 8000);
+
+		// Should contain diff headers for key files
+		expect(compressed).toContain("diff --git");
+		expect(compressed).toContain("index ");
+		expect(compressed).toContain("+++");
+		expect(compressed).toContain("---");
+	});
+
+	it("should match snapshot for PR #22 at 200000 chars", () => {
+		const compressed = compressLargeDiff(PR_22_DIFF, 200000);
+		expect(compressed).toMatchSnapshot("pr-22-compressed-200000.txt");
+	});
+
+	it("should match snapshot for PR #22 at 12000 chars", () => {
+		const compressed = compressLargeDiff(PR_22_DIFF, 12000);
+		expect(compressed).toMatchSnapshot("pr-22-compressed-12000.txt");
 	});
 });

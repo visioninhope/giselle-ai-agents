@@ -10,3 +10,4 @@ function loadFixture(filename: string): string {
 }
 
 export const PR_1118_DIFF = loadFixture("pr-1118.diff");
+export const PR_22_DIFF = loadFixture("pr-22.diff");
