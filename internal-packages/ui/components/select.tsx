@@ -17,6 +17,7 @@ interface SelectProps<T extends Identifiable> {
 	defaultValue?: string;
 	widthClassName?: string;
 	name?: string;
+	id?: string;
 }
 
 export function Select<T extends Identifiable>({
@@ -28,6 +29,7 @@ export function Select<T extends Identifiable>({
 	defaultValue,
 	widthClassName,
 	name,
+	id,
 }: SelectProps<T>) {
 	return (
 		<SelectPrimitive.Root
@@ -36,7 +38,7 @@ export function Select<T extends Identifiable>({
 			defaultValue={defaultValue}
 			name={name}
 		>
-			<SelectPrimitive.Trigger asChild>
+			<SelectPrimitive.Trigger id={id} asChild>
 				<Button
 					type="button"
 					variant="filled"

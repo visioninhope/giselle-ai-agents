@@ -13,7 +13,7 @@ import type {
 import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
 import type { Vault } from "./vault";
-import type { VectorStore } from "./vector-store";
+import type { VectorStore } from "./vector-store/types/interface";
 
 export interface GiselleEngineContext {
 	storage: Storage;

@@ -48,22 +48,22 @@ export function GitHubConnectFieldsets() {
 					</fieldset>
 					<fieldset className="flex flex-col">
 						<div className="flex justify-between mb-[2px]">
-							<label htmlFor="type" className="text-text text-[13px]">
-								Type
+							<label htmlFor="scope" className="text-text text-[13px]">
+								Scope
 							</label>
 						</div>
 						<Select
-							name="provider"
-							options={[
-								{ id: "code", label: "Code" },
-								{
-									id: "pull-request",
-									label: "Pull Request",
-								},
-							]}
+							name="scope"
+							id="scope"
+							options={[{ id: "code", label: "Code" }]}
 							renderOption={(option) => option.label}
-							placeholder="Select provider..."
+							placeholder="Select scope..."
 						/>
+
+						<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+							Select the repository scope to connect. Only Code is currently
+							available.
+						</p>
 					</fieldset>
 				</>
 			);
