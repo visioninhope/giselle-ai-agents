@@ -3,13 +3,13 @@ import type { Storage } from "unstorage";
 import { z } from "zod/v4";
 import type { GiselleEngineContext } from "../types";
 import { createVectorStore } from "../vector-store/create-vector-store";
+import { dataSourcePath, workspaceDataSourceIndexPath } from "./paths";
 import {
 	DataSourceId,
 	DataSourceIndexObject,
 	DataSourceObject,
 	type DataSourceProviderObject,
-} from "./object";
-import { dataSourcePath, workspaceDataSourceIndexPath } from "./paths";
+} from "./types/object";
 
 export async function createDataSource(
 	args: {
