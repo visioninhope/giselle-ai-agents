@@ -35,10 +35,14 @@ function formatDateTime(timestamp: number): string {
 	return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
-const SecretPayload = z.object({
-	label: z.string().min(1),
-	value: z.string().min(1),
+const GitHubDataSourcePayload = z.object({
+	provider: z.literal("github"),
+	installationId: z.number(),
+	repositoryNodeId: z.string(),
 });
+const DataSourcePayload = z.discriminatedUnion("provider", [
+	GitHubDataSourcePayload,
+]);
 
 export function DataSourceTable() {
 	const [presentDialog, setPresentDialog] = useState(false);
@@ -52,12 +56,8 @@ export function DataSourceTable() {
 		(e) => {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
-			const label = formData.get("label");
-			const value = formData.get("value");
-			const parse = SecretPayload.safeParse({
-				label,
-				value,
-			});
+			const formDataObject = Object.fromEntries(formData.entries());
+			const parse = GitHubDataSourcePayload.safeParse(formDataObject)
 			if (!parse.success) {
 				/** @todo Implement error handling */
 				console.log(parse.error);

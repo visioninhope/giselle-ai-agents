@@ -1,2 +1,2 @@
-export * from "./interface";
-export * from "./object";
+export * from "./types/interface";
+export * from "./types/object";
