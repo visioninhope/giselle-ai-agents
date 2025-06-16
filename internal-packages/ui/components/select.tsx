@@ -5,7 +5,7 @@ import { Button } from "./button";
 import { PopoverContent } from "./popover";
 
 type Identifiable = {
-	id: string;
+	id: string | number;
 };
 
 interface SelectProps<T extends Identifiable> {
@@ -57,7 +57,9 @@ export function Select<T extends Identifiable>({
 							{options.map((option) => (
 								<SelectPrimitive.Item
 									key={option.id}
-									value={option.id}
+									value={
+										typeof option.id === "number" ? `${option.id}` : option.id
+									}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
 										"rounded-[2px] px-[6px] py-[2px] text-[14px]",

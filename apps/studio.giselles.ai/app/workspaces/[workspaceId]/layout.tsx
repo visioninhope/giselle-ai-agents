@@ -74,7 +74,7 @@ export default async function Layout({
 			featureFlag={{
 				githubVectorStore,
 				runV3,
-				sidemenu,
+				sidemenu: true,
 				githubTools,
 				webSearchAction,
 			}}
