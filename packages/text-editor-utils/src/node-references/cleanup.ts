@@ -1,25 +1,72 @@
 import type { NodeId, OutputId } from "@giselle-sdk/data-type";
+import type { JSONContent } from "@tiptap/core";
 import { isJsonContent } from "../is-json-content";
 import { findNextNodeReference, formatNodeReference } from "./formatting";
 
 /**
+ * Type guard to check if jsonContent is a Source
+ */
+function isSourceContent(
+	jsonContent: JSONContent,
+): jsonContent is JSONContent & {
+	type: "Source";
+	attrs: {
+		node: { id: NodeId };
+		outputId: OutputId;
+	};
+} {
+	return (
+		jsonContent.type === "Source" &&
+		typeof jsonContent.attrs === "object" &&
+		jsonContent.attrs !== null &&
+		"node" in jsonContent.attrs &&
+		typeof jsonContent.attrs.node === "object" &&
+		jsonContent.attrs.node !== null &&
+		"id" in jsonContent.attrs.node &&
+		"outputId" in jsonContent.attrs
+	);
+}
+
+/**
+ * Type guard to check if jsonContent is a paragraph
+ */
+function isParagraphContent(
+	jsonContent: JSONContent,
+): jsonContent is JSONContent & {
+	type: "paragraph";
+	content?: JSONContent[];
+} {
+	return jsonContent.type === "paragraph";
+}
+
+/**
+ * Type guard to check if jsonContent is a text
+ */
+function isTextContent(jsonContent: JSONContent): jsonContent is JSONContent & {
+	type: "text";
+	text: string;
+} {
+	return jsonContent.type === "text" && typeof jsonContent.text === "string";
+}
+
+/**
  * Helper function to process content arrays while maintaining immutability
  */
-function processContentArray<T>(
-	content: Record<string, unknown>,
-	processor: (child: unknown) => T | null,
-): Record<string, unknown> {
-	if (!Array.isArray(content.content)) {
-		return content;
+function processContentArray(
+	jsonContent: JSONContent,
+	processor: (child: JSONContent) => JSONContent | null,
+): JSONContent {
+	if (!jsonContent.content || !Array.isArray(jsonContent.content)) {
+		return jsonContent;
 	}
 
-	const processedContent = content.content
+	const processedContent = jsonContent.content
 		.map(processor)
-		.filter((child) => child !== null);
+		.filter((child): child is JSONContent => child !== null);
 
 	// Return a new object with all properties copied and the new content array
 	return {
-		...content,
+		...jsonContent,
 		content: processedContent,
 	};
 }
@@ -27,29 +74,17 @@ function processContentArray<T>(
 function cleanupNodeReferencesInJsonContent(
 	jsonContent: unknown,
 	deletedNodeId: NodeId,
-): unknown {
+): JSONContent | null {
 	if (!jsonContent || typeof jsonContent !== "object") {
-		return jsonContent;
+		return jsonContent as JSONContent;
 	}
 
-	const content = jsonContent as Record<string, unknown>;
+	const content = jsonContent as JSONContent;
 
-	// If this is a Source node with the deleted nodeId, remove it
-	if (
-		content.type === "Source" &&
-		typeof content.attrs === "object" &&
-		content.attrs !== null
-	) {
-		const attrs = content.attrs as Record<string, unknown>;
-		if (
-			attrs.node !== null &&
-			typeof attrs.node === "object" &&
-			attrs.node !== null
-		) {
-			const node = attrs.node as Record<string, unknown>;
-			if (node.id === deletedNodeId) {
-				return null;
-			}
+	// If this is a Source with the deleted nodeId, remove it
+	if (isSourceContent(content)) {
+		if (content.attrs.node.id === deletedNodeId) {
+			return null;
 		}
 	}
 
@@ -100,29 +135,20 @@ function cleanupSpecificNodeReferenceInJsonContent(
 	jsonContent: unknown,
 	nodeId: NodeId,
 	outputId: OutputId,
-): unknown {
+): JSONContent | null {
 	if (!jsonContent || typeof jsonContent !== "object") {
-		return jsonContent;
+		return jsonContent as JSONContent;
 	}
 
-	const content = jsonContent as Record<string, unknown>;
+	const content = jsonContent as JSONContent;
 
-	// If this is a Source node with the specific nodeId and outputId, remove it
-	if (
-		content.type === "Source" &&
-		typeof content.attrs === "object" &&
-		content.attrs !== null
-	) {
-		const attrs = content.attrs as Record<string, unknown>;
+	// If this is a Source with the specific nodeId and outputId, remove it
+	if (isSourceContent(content)) {
 		if (
-			attrs.node !== null &&
-			typeof attrs.node === "object" &&
-			attrs.node !== null
+			content.attrs.node.id === nodeId &&
+			content.attrs.outputId === outputId
 		) {
-			const node = attrs.node as Record<string, unknown>;
-			if (node.id === nodeId && attrs.outputId === outputId) {
-				return null;
-			}
+			return null;
 		}
 	}
 
@@ -132,26 +158,17 @@ function cleanupSpecificNodeReferenceInJsonContent(
 	);
 
 	// Remove empty paragraph nodes
-	if (
-		processedContent.type === "paragraph" &&
-		Array.isArray(processedContent.content)
-	) {
-		if (processedContent.content.length === 0) {
+	if (isParagraphContent(processedContent)) {
+		if (!processedContent.content || processedContent.content.length === 0) {
 			return null;
 		}
 		// Check if paragraph only contains empty text nodes
-		const hasOnlyEmptyText = processedContent.content.every(
-			(child: unknown) => {
-				if (typeof child === "object" && child !== null) {
-					const textNode = child as Record<string, unknown>;
-					return (
-						textNode.type === "text" &&
-						(textNode.text === "" || textNode.text === " ")
-					);
-				}
-				return false;
-			},
-		);
+		const hasOnlyEmptyText = processedContent.content.every((child) => {
+			if (isTextContent(child)) {
+				return child.text === "" || child.text === " ";
+			}
+			return false;
+		});
 		if (hasOnlyEmptyText) {
 			return null;
 		}
