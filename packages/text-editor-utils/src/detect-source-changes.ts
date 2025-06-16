@@ -9,9 +9,7 @@ export interface NodeOutputReference {
 /**
  * Extract all Source nodes from TipTap JSONContent
  */
-export function extractSourceNodes(
-	content: JSONContent,
-): NodeOutputReference[] {
+function extractSourceNodes(content: JSONContent): NodeOutputReference[] {
 	const sources: NodeOutputReference[] = [];
 
 	function traverse(node: JSONContent) {

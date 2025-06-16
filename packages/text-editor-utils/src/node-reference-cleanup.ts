@@ -5,7 +5,29 @@ import {
 	isJsonContent,
 } from "@giselle-sdk/text-editor-utils";
 
-export function cleanupNodeReferencesInJsonContent(
+/**
+ * Helper function to process content arrays while maintaining immutability
+ */
+function processContentArray<T>(
+	content: Record<string, unknown>,
+	processor: (child: unknown) => T | null,
+): Record<string, unknown> {
+	if (!Array.isArray(content.content)) {
+		return content;
+	}
+
+	const processedContent = content.content
+		.map(processor)
+		.filter((child) => child !== null);
+
+	// Return a new object with all properties copied and the new content array
+	return {
+		...content,
+		content: processedContent,
+	};
+}
+
+function cleanupNodeReferencesInJsonContent(
 	jsonContent: unknown,
 	deletedNodeId: NodeId,
 ): unknown {
@@ -35,21 +57,9 @@ export function cleanupNodeReferencesInJsonContent(
 	}
 
 	// Recursively process content array
-	if (Array.isArray(content.content)) {
-		const processedContent = content.content
-			.map((child: unknown) =>
-				cleanupNodeReferencesInJsonContent(child, deletedNodeId),
-			)
-			.filter((child: unknown) => child !== null);
-
-		// Return a new object with all properties copied and the new content array
-		return {
-			...content,
-			content: processedContent,
-		};
-	}
-
-	return content;
+	return processContentArray(content, (child) =>
+		cleanupNodeReferencesInJsonContent(child, deletedNodeId),
+	);
 }
 
 export function cleanupNodeReferencesInText(
@@ -89,7 +99,7 @@ export function cleanupNodeReferencesInText(
 /**
  * Clean up specific node reference (nodeId:outputId) from JSON content
  */
-export function cleanupSpecificNodeReferenceInJsonContent(
+function cleanupSpecificNodeReferenceInJsonContent(
 	jsonContent: unknown,
 	nodeId: NodeId,
 	outputId: OutputId,
@@ -120,36 +130,37 @@ export function cleanupSpecificNodeReferenceInJsonContent(
 	}
 
 	// Recursively process content array
-	if (Array.isArray(content.content)) {
-		content.content = content.content
-			.map((child: unknown) =>
-				cleanupSpecificNodeReferenceInJsonContent(child, nodeId, outputId),
-			)
-			.filter((child: unknown) => child !== null);
-	}
+	const processedContent = processContentArray(content, (child) =>
+		cleanupSpecificNodeReferenceInJsonContent(child, nodeId, outputId),
+	);
 
 	// Remove empty paragraph nodes
-	if (content.type === "paragraph" && Array.isArray(content.content)) {
-		if (content.content.length === 0) {
+	if (
+		processedContent.type === "paragraph" &&
+		Array.isArray(processedContent.content)
+	) {
+		if (processedContent.content.length === 0) {
 			return null;
 		}
 		// Check if paragraph only contains empty text nodes
-		const hasOnlyEmptyText = content.content.every((child: unknown) => {
-			if (typeof child === "object" && child !== null) {
-				const textNode = child as Record<string, unknown>;
-				return (
-					textNode.type === "text" &&
-					(textNode.text === "" || textNode.text === " ")
-				);
-			}
-			return false;
-		});
+		const hasOnlyEmptyText = processedContent.content.every(
+			(child: unknown) => {
+				if (typeof child === "object" && child !== null) {
+					const textNode = child as Record<string, unknown>;
+					return (
+						textNode.type === "text" &&
+						(textNode.text === "" || textNode.text === " ")
+					);
+				}
+				return false;
+			},
+		);
 		if (hasOnlyEmptyText) {
 			return null;
 		}
 	}
 
-	return content;
+	return processedContent;
 }
 
 /**
