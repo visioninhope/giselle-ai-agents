@@ -75,11 +75,11 @@ function cleanupNodeReferencesInJsonContent(
 	jsonContent: unknown,
 	deletedNodeId: NodeId,
 ): JSONContent | null {
-	if (!jsonContent || typeof jsonContent !== "object") {
-		return jsonContent as JSONContent;
+	if (!isJsonContent(jsonContent)) {
+		return null;
 	}
 
-	const content = jsonContent as JSONContent;
+	const content = jsonContent;
 
 	// If this is a Source with the deleted nodeId, remove it
 	if (isSourceContent(content)) {
@@ -136,11 +136,11 @@ function cleanupSpecificNodeReferenceInJsonContent(
 	nodeId: NodeId,
 	outputId: OutputId,
 ): JSONContent | null {
-	if (!jsonContent || typeof jsonContent !== "object") {
-		return jsonContent as JSONContent;
+	if (!isJsonContent(jsonContent)) {
+		return null;
 	}
 
-	const content = jsonContent as JSONContent;
+	const content = jsonContent;
 
 	// If this is a Source with the specific nodeId and outputId, remove it
 	if (isSourceContent(content)) {
