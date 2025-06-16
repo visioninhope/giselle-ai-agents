@@ -5,8 +5,8 @@ import {
 } from "@/lib/vector-stores/github-blob-stores";
 import {
 	GitHubBlobLoader,
-	type GitHubBlobMetadata,
 	type GitHubBlobLoaderParams,
+	type GitHubBlobMetadata,
 } from "@giselle-sdk/github-tool";
 import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
