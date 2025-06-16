@@ -10,6 +10,7 @@ import { NodeIcon } from "../../../icons/node";
 import { Button } from "../../../ui/button";
 import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
+import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -17,7 +18,6 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
-import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { FalModelPanel, OpenAIImageModelPanel } from "./models";
 import { PromptPanel } from "./prompt-panel";
 import { useConnectedSources } from "./sources";

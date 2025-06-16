@@ -53,6 +53,19 @@ export const githubVectorStoreFlag = flag<boolean>({
 	],
 });
 
+export const webSearchActionFlag = flag<boolean>({
+	key: "web-search-action",
+	decide() {
+		return takeLocalEnv("WEB_SEARCH_ACTION_FLAG");
+	},
+	description: "Enable Web Search Action",
+	defaultValue: false,
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
 export const runV3Flag = flag<boolean>({
 	key: "run-v3",
 	async decide() {
@@ -66,6 +79,25 @@ export const runV3Flag = flag<boolean>({
 		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Run v3",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const sidemenuFlag = flag<boolean>({
+	key: "sidemenu",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("SIDEMENU_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable Side Menu",
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },

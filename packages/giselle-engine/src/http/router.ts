@@ -290,6 +290,28 @@ export const createJsonRouters = {
 			handler: async ({ input }) =>
 				JsonResponse.json({ text: await giselleEngine.getFileText(input) }),
 		}),
+	addSecret: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				label: z.string(),
+				value: z.string(),
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					secret: await giselleEngine.addSecret(input),
+				}),
+		}),
+	getWorkspaceSecrets: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					secrets: await giselleEngine.getWorkspaceSecrets(input),
+				}),
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

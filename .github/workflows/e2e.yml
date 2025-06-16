@@ -1,0 +1,41 @@
+name: E2E Tests
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "0 0,9 * * 1-5" # Weekdays 9:00 and 18:00 JST
+
+jobs:
+  e2e:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@a7487c7e89a18df4991f7f222e4898a00d66ddda # v4.1.0
+      - name: Set node version to 22.16.0
+        uses: actions/setup-node@49933ea5288caeca8642d1e84afbd3f7d6820020 # v4.4.0
+        with:
+          node-version: 22.16.0
+          cache: 'pnpm'
+      - run: pnpm install
+      - name: Store Playwright's Version
+        shell: bash
+        run: |
+          PLAYWRIGHT_VERSION=$(pnpm -s dlx playwright --version | sed 's/Version //')
+          echo "Playwright's Version: $PLAYWRIGHT_VERSION"
+          echo "PLAYWRIGHT_VERSION=$PLAYWRIGHT_VERSION" >> $GITHUB_ENV
+      - name: Cache Playwright Browsers for Playwright's Version
+        id: cache-playwright-browsers
+        uses: actions/cache@5a3ec84eff668545956fd18022155c47e93e2684 # v4.2.3
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-browsers-${{ env.PLAYWRIGHT_VERSION }}
+      - name: Install Playwright Browsers & OS deps
+        shell: bash
+        run: pnpm --filter studio.giselles.ai exec playwright install --with-deps
+      - name: Run e2e tests
+        run: pnpm test:e2e
+        working-directory: apps/studio.giselles.ai
+        env:
+          PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+          PLAYWRIGHT_LOGIN_EMAIL: ${{ secrets.PLAYWRIGHT_LOGIN_EMAIL }}
+          PLAYWRIGHT_LOGIN_PASSWORD: ${{ secrets.PLAYWRIGHT_LOGIN_PASSWORD }}

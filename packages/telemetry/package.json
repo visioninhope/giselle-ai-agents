@@ -8,7 +8,7 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"format": "biome format --write ."
+		"format": "biome check --write ."
 	},
 	"exports": {
 		"./package.json": "./package.json",
@@ -24,10 +24,12 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
+		"@giselle/giselle-sdk-tsconfig": "workspace:*",
+		"@types/node": "catalog:",
 		"@types/react": "catalog:",
-		"tsup": "catalog:"
+		"tsup": "catalog:",
+		"unstorage": "catalog:"
 	},
 	"dependencies": {
 		"@ai-sdk/anthropic": "catalog:",

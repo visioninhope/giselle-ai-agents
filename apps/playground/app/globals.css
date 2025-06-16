@@ -1,7 +1,8 @@
 @import "tailwindcss";
-@import "../../../internal-packages/workflow-designer-ui/src/workflow-designer-ui.css";
+@import "../../../internal-packages/workflow-designer-ui/src/app/globals.css";
 
 @source "../../../internal-packages/workflow-designer-ui/src";
+@source "../../../internal-packages/ui";
 @source "../../../packages/text-editor/src/react/";
 
 @theme {

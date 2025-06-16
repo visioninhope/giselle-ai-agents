@@ -54,9 +54,15 @@ export function executeAction(args: {
 						generationContentResolver,
 					});
 					break;
+				case "web-search":
+					// TODO: Implement web-search action execution
+					throw new Error("Web-search actions are not yet implemented");
 				default: {
-					const _exhaustiveCheck: never = command.provider;
-					throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+					// TODO: Uncomment after implementing all action providers
+					// const _exhaustiveCheck: never = command.provider;
+					// throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+					const unknownProvider = (command as { provider: string }).provider;
+					throw new Error(`Unhandled provider: ${unknownProvider}`);
 				}
 			}
 			await completeGeneration({

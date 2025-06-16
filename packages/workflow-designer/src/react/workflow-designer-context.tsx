@@ -1,6 +1,7 @@
 "use client";
 
 import {
+	type ActionNode,
 	type ConnectionId,
 	type FailedFileData,
 	type FileContent,
@@ -9,6 +10,7 @@ import {
 	type NodeBase,
 	type NodeId,
 	type NodeUIState,
+	type SecretId,
 	type TriggerNode,
 	type UploadedFileData,
 	type Viewport,
@@ -16,8 +18,10 @@ import {
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
+	isActionNode,
 	isFileNode,
 	isTriggerNode,
+	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
@@ -256,6 +260,52 @@ export function WorkflowDesignerProvider({
 		[client, setAndSaveWorkspace],
 	);
 
+	const handleActionNodeCopy = useCallback(
+		(sourceNode: Node, newNode: Node): void => {
+			if (
+				!isActionNode(sourceNode) ||
+				!isActionNode(newNode) ||
+				sourceNode.content.command.state.status !== "configured" ||
+				sourceNode.content.command.provider !== newNode.content.command.provider
+			) {
+				return;
+			}
+
+			workflowDesignerRef.current.updateNodeData(newNode, {
+				content: {
+					...newNode.content,
+					command: {
+						...newNode.content.command,
+						state: structuredClone(sourceNode.content.command.state),
+					},
+				},
+			} as Partial<ActionNode>);
+			setAndSaveWorkspace();
+		},
+		[setAndSaveWorkspace],
+	);
+
+	const handleVectorStoreNodeCopy = useCallback(
+		(sourceNode: Node, newNode: Node): void => {
+			if (
+				!isVectorStoreNode(sourceNode) ||
+				!isVectorStoreNode(newNode) ||
+				sourceNode.content.source.state.status !== "configured"
+			) {
+				return;
+			}
+
+			workflowDesignerRef.current.updateNodeData(newNode, {
+				content: {
+					...newNode.content,
+					source: structuredClone(sourceNode.content.source),
+				},
+			});
+			setAndSaveWorkspace();
+		},
+		[setAndSaveWorkspace],
+	);
+
 	const copyNode = useCallback(
 		async (
 			sourceNode: Node,
@@ -273,12 +323,21 @@ export function WorkflowDesignerProvider({
 			}
 			setAndSaveWorkspace();
 
+			// Handle different node types - following existing pattern
 			await handleFileNodeCopy(sourceNode, newNodeDefinition);
 			await handleTriggerNodeCopy(sourceNode, newNodeDefinition);
+			handleActionNodeCopy(sourceNode, newNodeDefinition);
+			handleVectorStoreNodeCopy(sourceNode, newNodeDefinition);
 
 			return newNodeDefinition;
 		},
-		[setAndSaveWorkspace, handleFileNodeCopy, handleTriggerNodeCopy],
+		[
+			setAndSaveWorkspace,
+			handleFileNodeCopy,
+			handleTriggerNodeCopy,
+			handleActionNodeCopy,
+			handleVectorStoreNodeCopy,
+		],
 	);
 
 	const updateNodeData = useCallback(

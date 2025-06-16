@@ -20,7 +20,7 @@ const defaultConfigurations: GoogleLanguageModelConfigurations = {
 
 export const GoogleLanguageModelId = z
 	.enum([
-		"gemini-2.5-pro-preview-05-06",
+		"gemini-2.5-pro-preview-06-05",
 		"gemini-2.5-flash-preview-05-20",
 		"gemini-2.0-flash",
 		"gemini-2.0-flash-lite",
@@ -30,7 +30,7 @@ export const GoogleLanguageModelId = z
 			return "gemini-2.0-flash";
 		}
 		if (ctx.value.startsWith("gemini-2.5-pro-preview-")) {
-			return "gemini-2.5-pro-preview-05-06";
+			return "gemini-2.5-pro-preview-06-05";
 		}
 		if (ctx.value.startsWith("gemini-2.5-flash-preview-")) {
 			return "gemini-2.5-flash-preview-05-20";
@@ -47,7 +47,7 @@ type GoogleLanguageModel = z.infer<typeof GoogleLanguageModel>;
 
 const gemini25ProPreview: GoogleLanguageModel = {
 	provider: "google",
-	id: "gemini-2.5-pro-preview-05-06",
+	id: "gemini-2.5-pro-preview-06-05",
 	capabilities:
 		Capability.TextGeneration |
 		Capability.GenericFileInput |

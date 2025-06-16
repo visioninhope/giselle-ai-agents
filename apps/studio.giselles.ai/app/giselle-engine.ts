@@ -9,6 +9,7 @@ import { supabaseVaultDriver } from "@giselle-sdk/supabase-driver";
 import { emitTelemetry } from "@giselle-sdk/telemetry";
 import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import { createStorage } from "unstorage";
+import { gitHubQueryService } from "../lib/vector-stores/github-blob-stores";
 import { queryGithubVectorStore } from "./services/vector-store/";
 
 export const publicStorage = createStorage({
@@ -87,11 +88,15 @@ export const giselleEngine = NextGiselleEngine({
 	vectorStoreQueryFunctions: {
 		github: queryGithubVectorStore,
 	},
+	vectorStoreQueryServices: {
+		github: gitHubQueryService,
+	},
 	callbacks: {
 		generationComplete: async (generation, options) => {
 			try {
 				await emitTelemetry(generation, {
 					telemetry: options.telemetry,
+					storage,
 				});
 			} catch (error) {
 				console.error("Telemetry emission failed:", error);

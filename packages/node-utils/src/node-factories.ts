@@ -328,6 +328,8 @@ const actionFactoryImpl = {
 		}) satisfies ActionNode,
 	clone: (orig: ActionNode): NodeFactoryCloneResult<ActionNode> => {
 		const clonedContent = structuredClone(orig.content);
+		// Reset action state to unconfigured - actual configuration duplication
+		// is handled at higher level in handleActionNodeCopy
 		clonedContent.command.state = { status: "unconfigured" };
 
 		const { newIo: newInputs, idMap: inputIdMap } =
@@ -525,6 +527,8 @@ const vectorStoreFactoryImpl = {
 	}),
 	clone: (orig: VectorStoreNode): NodeFactoryCloneResult<VectorStoreNode> => {
 		const clonedContent = structuredClone(orig.content);
+		// Reset vector store state to unconfigured - actual configuration duplication
+		// is handled at higher level in handleVectorStoreNodeCopy
 		clonedContent.source.state = { status: "unconfigured" };
 
 		const { newIo: newInputs, idMap: inputIdMap } =

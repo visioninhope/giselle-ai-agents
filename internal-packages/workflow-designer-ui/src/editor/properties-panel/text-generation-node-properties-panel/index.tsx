@@ -11,7 +11,11 @@ import {
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
-import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useFeatureFlag,
+	useNodeGenerations,
+	useWorkflowDesigner,
+} from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
@@ -26,7 +30,7 @@ import {
 import { Button } from "../../../ui/button";
 import { useToasts } from "../../../ui/toast";
 import { UsageLimitWarning } from "../../../ui/usage-limit-warning";
-import { useBeta } from "../../beta";
+import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
@@ -34,7 +38,6 @@ import {
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
-import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import {
 	AnthropicModelPanel,
 	GoogleModelPanel,
@@ -43,7 +46,7 @@ import {
 } from "./model";
 import { useConnectedOutputs } from "./outputs";
 import { PromptPanel } from "./prompt-panel";
-import { GitHubToolsPanel, PostgresToolsPanel } from "./tools";
+import { GitHubToolsPanel, PostgresToolsPanel, ToolsPanel } from "./tools";
 
 export function TextGenerationNodePropertiesPanel({
 	node,
@@ -103,7 +106,7 @@ export function TextGenerationNodePropertiesPanel({
 		: jsonOrText;
 	const noWhitespaceText = text?.replace(/[\s\u3000]+/g, "");
 	const disabled = usageLimitsReached || !noWhitespaceText;
-	const beta = useBeta();
+	const { githubTools, sidemenu } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -180,19 +183,19 @@ export function TextGenerationNodePropertiesPanel({
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
 								<Tabs.Trigger value="input">Input</Tabs.Trigger>
-								{beta.githubTools && (
+								{githubTools && (
 									<Tabs.Trigger value="tools">Tools</Tabs.Trigger>
 								)}
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
-								className="flex-1 flex flex-col overflow-hidden"
+								className="flex-1 flex flex-col overflow-hidden outline-none"
 							>
 								<PromptPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="model"
-								className="flex-1 flex flex-col overflow-y-auto px-[4px]"
+								className="flex-1 flex flex-col overflow-y-auto px-[4px] outline-none"
 							>
 								{node.content.llm.provider === "openai" && (
 									<OpenAIModelPanel
@@ -439,30 +442,60 @@ export function TextGenerationNodePropertiesPanel({
 							</Tabs.Content>
 							<Tabs.Content
 								value="input"
-								className="flex-1 flex flex-col overflow-y-auto"
+								className="flex-1 flex flex-col overflow-y-auto outline-none"
 							>
 								<InputPanel node={node} />
 							</Tabs.Content>
 							<Tabs.Content
 								value="tools"
-								className="flex-1 flex flex-col overflow-y-auto p-[16px] gap-[16px]"
+								className="flex-1 flex flex-col overflow-y-auto p-[4px] gap-[16px] outline-none"
 							>
-								<GitHubToolsPanel node={node} />
-								<PostgresToolsPanel node={node} />
+								{sidemenu ? (
+									<ToolsPanel node={node} />
+								) : (
+									<div className="p-[8px]">
+										<GitHubToolsPanel node={node} />
+										<PostgresToolsPanel node={node} />
+									</div>
+								)}
 							</Tabs.Content>
 						</Tabs.Root>
+						<div className="h-[16px]" />
 					</PropertiesPanelContent>
 				</Panel>
-				<PanelResizeHandle
-					className={clsx(
-						"h-[12px] flex items-center justify-center cursor-row-resize",
-						"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
-						"hover:after:bg-[#4a90e2]",
-					)}
-				/>
+				{sidemenu ? (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[1px] bg-border cursor-col-resize",
+							"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+						)}
+					/>
+				) : (
+					<PanelResizeHandle
+						className={clsx(
+							"h-[12px] flex items-center justify-center cursor-row-resize",
+							"after:content-[''] after:h-[3px] after:w-[32px] after:bg-[#3a3f44] after:rounded-full",
+							"hover:after:bg-[#4a90e2]",
+						)}
+					/>
+				)}
 				<Panel>
 					<PropertiesPanelContent>
-						<GenerationPanel node={node} onClickGenerateButton={generateText} />
+						{sidemenu ? (
+							<>
+								<div className="h-[16px]" />
+								<GenerationPanel
+									node={node}
+									onClickGenerateButton={generateText}
+								/>
+								<div className="h-[16px]" />
+							</>
+						) : (
+							<GenerationPanel
+								node={node}
+								onClickGenerateButton={generateText}
+							/>
+						)}
 					</PropertiesPanelContent>
 				</Panel>
 			</PanelGroup>

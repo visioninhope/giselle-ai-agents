@@ -21,10 +21,11 @@ export function triggerNodeDefaultName(triggerProvider: TriggerProvider) {
 
 export const actionProviderLabel: Record<ActionProvider, string> = {
 	github: "GitHub",
+	"web-search": "Web Search",
 };
 
-export function actionNodeDefaultName(triggerProvider: ActionProvider) {
-	return `${triggerProviderLabel[triggerProvider]} Action`;
+export function actionNodeDefaultName(actionProvider: ActionProvider) {
+	return `${actionProviderLabel[actionProvider]} Action`;
 }
 
 export const vectorStoreProviderLabel: Record<

@@ -1,4 +1,7 @@
-import type { GitHubActionCommandId } from "@giselle-sdk/flow";
+import type {
+	GitHubActionCommandId,
+	WebSearchActionCommandId,
+} from "@giselle-sdk/flow";
 import { z } from "zod/v4";
 
 const GitHubActionCommandUnconfiguredState = z.object({
@@ -27,9 +30,41 @@ const GitHubActionCommandData = z.object({
 });
 export type GitHubActionCommandData = z.infer<typeof GitHubActionCommandData>;
 
+const WebSearchActionCommandUnconfiguredState = z.object({
+	status: z.literal("unconfigured"),
+});
+export type WebSearchActionCommandUnconfiguredState = z.infer<
+	typeof WebSearchActionCommandUnconfiguredState
+>;
+
+const WebSearchActionCommandConfiguredState = z.object({
+	status: z.literal("configured"),
+	commandId: z.custom<WebSearchActionCommandId>(),
+});
+export type WebSearchActionCommandConfiguredState = z.infer<
+	typeof WebSearchActionCommandConfiguredState
+>;
+
+const WebSearchActionCommandData = z.object({
+	provider: z.literal("web-search"),
+	state: z.discriminatedUnion("status", [
+		WebSearchActionCommandUnconfiguredState,
+		WebSearchActionCommandConfiguredState,
+	]),
+});
+export type WebSearchActionCommandData = z.infer<
+	typeof WebSearchActionCommandData
+>;
+
+const ActionCommandData = z.discriminatedUnion("provider", [
+	GitHubActionCommandData,
+	WebSearchActionCommandData,
+]);
+export type ActionCommandData = z.infer<typeof ActionCommandData>;
+
 export const ActionContent = z.object({
 	type: z.literal("action"),
-	command: GitHubActionCommandData,
+	command: ActionCommandData,
 });
 export type ActionContent = z.infer<typeof ActionContent>;
 
