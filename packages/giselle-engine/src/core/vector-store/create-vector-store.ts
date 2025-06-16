@@ -14,4 +14,5 @@ export async function createVectorStore(args: {
 		vectorStorePath(vectorStoreObject.id),
 		InternalVectorStoreObject.parse(vectorStoreObject),
 	);
+	return vectorStoreObject;
 }
