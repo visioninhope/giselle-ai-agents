@@ -1,5 +1,5 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
-import type { DataSourceId } from "./object";
+import type { DataSourceId } from "./types/object";
 
 export function dataSourcePath(dataSourceId: DataSourceId) {
 	return `data-sources/${dataSourceId}/data-source.json`;
