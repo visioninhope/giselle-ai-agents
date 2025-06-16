@@ -1,10 +1,13 @@
+import { Note } from "@giselle-internal/ui/note";
 import { Select } from "@giselle-internal/ui/select";
 import { useIntegration } from "@giselle-sdk/integration/react";
 
 export function GitHubConnectFieldsets() {
 	const { value } = useIntegration();
 	if (!value.github) {
-		return null;
+		return (
+			<Note type="error">Error: GitHub integration is not set up yet.</Note>
+		);
 	}
 	switch (value.github.status) {
 		case "unset":
