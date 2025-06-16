@@ -1,7 +1,8 @@
 import type { GiselleEngineContext } from "../types";
 import type { VectorStoreId } from "./types/object";
 
-export async function addFileToVectorStore(args: {
+/** @todo */
+export function addFileToVectorStore(args: {
 	context: GiselleEngineContext;
 	vectorStoreId: VectorStoreId;
 	file: File;
@@ -10,8 +11,8 @@ export async function addFileToVectorStore(args: {
 	if (vectorStore === undefined) {
 		throw new Error("VectorStore is not initialized");
 	}
-	await vectorStore.addFile({
-		vectorStoreId: args.vectorStoreId,
-		file: args.file,
-	});
+	// await vectorStore.addFile({
+	// 	vectorStoreId: args.vectorStoreId,
+	// 	file: args.file,
+	// });
 }
