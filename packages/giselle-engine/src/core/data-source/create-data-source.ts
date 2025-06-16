@@ -11,27 +11,28 @@ import {
 	type DataSourceProviderObject,
 } from "./types/object";
 
-export async function createDataSource(
-	args: {
-		context: GiselleEngineContext;
-		workspaceId: WorkspaceId;
-	} & DataSourceProviderObject,
-) {
+export async function createDataSource(args: {
+	context: GiselleEngineContext;
+	workspaceId: WorkspaceId;
+	dataSource: DataSourceProviderObject;
+}) {
 	const vectorStore = await createVectorStore(args);
 	let dataSource: DataSourceObject | undefined;
-	switch (args.provider) {
+	switch (args.dataSource.provider) {
 		case "github":
 			dataSource = {
 				id: DataSourceId.generate(),
 				status: "inProgress",
 				vectorStoreId: vectorStore.id,
-				provider: args.provider,
-				providerMetadata: args.providerMetadata,
+				provider: args.dataSource.provider,
+				providerMetadata: args.dataSource.providerMetadata,
 				workspaceId: args.workspaceId,
 			};
 	}
 	if (dataSource === undefined) {
-		throw new Error(`Unknown data source provider: ${args.provider}`);
+		throw new Error(
+			`Unknown data source provider: ${args.dataSource.provider}`,
+		);
 	}
 	await Promise.all([
 		args.context.storage.setItem(dataSourcePath(dataSource.id), dataSource),
