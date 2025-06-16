@@ -1,5 +1,6 @@
 import type { NodeId, OutputId } from "@giselle-sdk/data-type";
 import type { JSONContent } from "@tiptap/core";
+import type { SourceJSONContent } from "../extensions/source-extension";
 import { isJsonContent } from "../is-json-content";
 import { findNextNodeReference, formatNodeReference } from "./formatting";
 
@@ -8,13 +9,7 @@ import { findNextNodeReference, formatNodeReference } from "./formatting";
  */
 function isSourceContent(
 	jsonContent: JSONContent,
-): jsonContent is JSONContent & {
-	type: "Source";
-	attrs: {
-		node: { id: NodeId };
-		outputId: OutputId;
-	};
-} {
+): jsonContent is SourceJSONContent {
 	return (
 		jsonContent.type === "Source" &&
 		typeof jsonContent.attrs === "object" &&
