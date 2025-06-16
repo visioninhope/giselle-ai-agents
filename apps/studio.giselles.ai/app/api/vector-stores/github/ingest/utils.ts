@@ -1,6 +1,6 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
-import { and, eq } from "drizzle-orm";
+import { eq } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
 
 export function buildOctokit(installationId: number) {
@@ -26,6 +26,7 @@ export async function fetchTargetGitHubRepositories(): Promise<
 > {
 	const records = await db
 		.select({
+			dbId: githubRepositoryIndex.dbId,
 			owner: githubRepositoryIndex.owner,
 			repo: githubRepositoryIndex.repo,
 			installationId: githubRepositoryIndex.installationId,
@@ -36,6 +37,7 @@ export async function fetchTargetGitHubRepositories(): Promise<
 		.where(eq(githubRepositoryIndex.status, "idle"));
 
 	return records.map((record) => ({
+		dbId: record.dbId,
 		owner: record.owner,
 		repo: record.repo,
 		installationId: record.installationId,
@@ -48,8 +50,7 @@ export async function fetchTargetGitHubRepositories(): Promise<
  * Update the ingestion status of a repository
  */
 export async function updateRepositoryStatus(
-	owner: string,
-	repo: string,
+	dbId: number,
 	status: "idle" | "running" | "failed" | "completed",
 	commitSha?: string,
 ): Promise<void> {
@@ -59,10 +60,5 @@ export async function updateRepositoryStatus(
 			status,
 			lastIngestedCommitSha: commitSha || null,
 		})
-		.where(
-			and(
-				eq(githubRepositoryIndex.owner, owner),
-				eq(githubRepositoryIndex.repo, repo),
-			),
-		);
+		.where(eq(githubRepositoryIndex.dbId, dbId));
 }

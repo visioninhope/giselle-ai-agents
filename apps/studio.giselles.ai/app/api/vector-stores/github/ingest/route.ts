@@ -21,11 +21,12 @@ export async function GET(request: NextRequest) {
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
 
 	for (const targetGitHubRepository of targetGitHubRepositories) {
-		const { owner, repo, installationId, teamDbId } = targetGitHubRepository;
+		const { owner, repo, installationId, teamDbId, dbId } =
+			targetGitHubRepository;
 
 		try {
 			// Update status to running
-			await updateRepositoryStatus(owner, repo, "running");
+			await updateRepositoryStatus(dbId, "running");
 
 			const octokitClient = buildOctokit(installationId);
 			const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
@@ -42,13 +43,13 @@ export async function GET(request: NextRequest) {
 			});
 
 			// Update status to completed
-			await updateRepositoryStatus(owner, repo, "completed", commit.sha);
+			await updateRepositoryStatus(dbId, "completed", commit.sha);
 		} catch (error) {
 			console.error(`Failed to ingest ${owner}/${repo}:`, error);
 			captureException(error, {
 				extra: { owner, repo },
 			});
-			await updateRepositoryStatus(owner, repo, "failed");
+			await updateRepositoryStatus(dbId, "failed");
 		}
 	}
 

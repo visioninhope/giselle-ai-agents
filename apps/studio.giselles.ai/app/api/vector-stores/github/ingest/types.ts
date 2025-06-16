@@ -1,4 +1,5 @@
 export type TargetGitHubRepository = {
+	dbId: number;
 	owner: string;
 	repo: string;
 	teamDbId: number;
