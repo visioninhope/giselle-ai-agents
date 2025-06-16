@@ -17,7 +17,6 @@ import {
 	TableHeader,
 	TableRow,
 } from "@giselle-internal/ui/table";
-import { useIntegration } from "@giselle-sdk/integration/react";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon } from "lucide-react";
