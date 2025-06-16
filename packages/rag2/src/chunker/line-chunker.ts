@@ -41,23 +41,12 @@ const LineChunkerOptionsSchema = z
 		message: "overlap must be less than maxLines",
 		path: ["overlap"],
 	});
+export type LineChunkerOptions = z.input<typeof LineChunkerOptionsSchema>;
 
-export interface LineChunkerOptions {
-	/**
-	 * Maximum number of lines per chunk
-	 * Default: 150
-	 */
-	maxLines?: number;
-	/**
-	 * Number of lines to overlap between chunks
-	 * Default: 30
-	 */
-	overlap?: number;
-	/**
-	 * Maximum characters per chunk before splitting
-	 * Default: 10000
-	 */
-	maxChars?: number;
+enum ShrinkMode {
+	OVERLAP_REDUCTION = "overlap_reduction",
+	LINE_REDUCTION = "line_reduction",
+	CHARACTER_SPLIT = "character_split",
 }
 
 interface ChunkInfo {
@@ -131,44 +120,59 @@ export class LineChunker implements Chunker {
 			// Reset wasLineSplit for each chunk
 			wasLineSplit = false;
 
-			// Phase 1: Gradual overlap reduction
-			while (
-				chunkInfo.content.length > this.maxChars &&
-				chunkInfo.currentOverlap > 0
-			) {
-				const reduced = this.reduceOverlapGradually(chunkInfo, lines);
-				if (reduced === null) break;
-				chunkInfo = reduced;
-			}
-
-			// Phase 2: Gradual line reduction
+			// Shrinking loop: reduce chunk size until it fits maxChars
+			let characterSplit = false;
 			while (chunkInfo.content.length > this.maxChars) {
-				const reduced = this.reduceLineCountGradually(chunkInfo, lines);
-				if (reduced === null) break;
+				const shrinkMode = this.getShrinkMode(chunkInfo);
+				let reduced: ChunkInfo | null = null;
+
+				switch (shrinkMode) {
+					case ShrinkMode.OVERLAP_REDUCTION:
+						reduced = this.reduceOverlapGradually(chunkInfo, lines);
+						break;
+					case ShrinkMode.LINE_REDUCTION:
+						reduced = this.reduceLineCountGradually(chunkInfo, lines);
+						break;
+					case ShrinkMode.CHARACTER_SPLIT: {
+						const splitChunks = this.splitLongContent(chunkInfo.content);
+						chunks.push(...splitChunks);
+						wasLineSplit = true;
+						i = chunkInfo.endIndex;
+						characterSplit = true;
+						break;
+					}
+				}
+
+				if (reduced === null || characterSplit) {
+					break;
+				}
 				chunkInfo = reduced;
 			}
 
-			// Phase 3: Character splitting (last resort)
-			if (chunkInfo.content.length > this.maxChars) {
-				const splitChunks = this.splitLongContent(chunkInfo.content);
-				chunks.push(...splitChunks);
-				wasLineSplit = true;
-				i = chunkInfo.endIndex;
-			} else {
-				// Normal chunk processing
+			// Only process normal chunk if we didn't do character splitting
+			if (!characterSplit) {
 				if (chunkInfo.content.length > 0) {
 					chunks.push(chunkInfo.content);
 				}
-				i = this.calculateNextPosition(chunkInfo, wasLineSplit);
-			}
-
-			// Prevent infinite loop
-			if (i >= lines.length || chunkInfo.endIndex >= lines.length) {
-				break;
+				i = this.nextStartIndex(chunkInfo, wasLineSplit);
 			}
 		}
 
 		return chunks.filter((chunk) => chunk.trim().length > 0);
+	}
+
+	/**
+	 * Determine the appropriate shrink mode for a chunk that exceeds maxChars
+	 */
+	private getShrinkMode(chunkInfo: ChunkInfo): ShrinkMode {
+		if (chunkInfo.currentOverlap > 0) {
+			return ShrinkMode.OVERLAP_REDUCTION;
+		}
+		const currentLineCount = chunkInfo.endIndex - chunkInfo.startIndex;
+		if (currentLineCount > 1) {
+			return ShrinkMode.LINE_REDUCTION;
+		}
+		return ShrinkMode.CHARACTER_SPLIT;
 	}
 
 	/**
@@ -184,10 +188,7 @@ export class LineChunker implements Chunker {
 	/**
 	 * Calculate next starting position based on chunk info and line split status
 	 */
-	private calculateNextPosition(
-		chunkInfo: ChunkInfo,
-		wasLineSplit: boolean,
-	): number {
+	private nextStartIndex(chunkInfo: ChunkInfo, wasLineSplit: boolean): number {
 		const actualChunkSize = chunkInfo.endIndex - chunkInfo.startIndex;
 		const effectiveOverlap = wasLineSplit ? 0 : this.overlap;
 		const nextPosition =
@@ -195,6 +196,27 @@ export class LineChunker implements Chunker {
 
 		// Ensure progress by advancing at least 1 position
 		return Math.max(nextPosition, chunkInfo.startIndex + 1);
+	}
+
+	/**
+	 * Build chunk information from boundary indices
+	 */
+	private buildChunk(
+		startIndex: number,
+		endIndex: number,
+		lines: string[],
+		currentOverlap: number,
+	): ChunkInfo {
+		const chunkLines = lines.slice(startIndex, endIndex);
+		const content = chunkLines.join("\n").trim();
+
+		return {
+			startIndex,
+			endIndex,
+			content,
+			currentOverlap,
+			lines: chunkLines,
+		};
 	}
 
 	/**
@@ -206,16 +228,7 @@ export class LineChunker implements Chunker {
 		initialOverlap: number,
 	): ChunkInfo {
 		const endIndex = Math.min(startIndex + this.maxLines, lines.length);
-		const chunkLines = lines.slice(startIndex, endIndex);
-		const content = chunkLines.join("\n").trim();
-
-		return {
-			startIndex,
-			endIndex,
-			content,
-			currentOverlap: initialOverlap,
-			lines: chunkLines,
-		};
+		return this.buildChunk(startIndex, endIndex, lines, initialOverlap);
 	}
 
 	/**
@@ -242,17 +255,7 @@ export class LineChunker implements Chunker {
 		// Keep the same end position to maintain fixed end boundary
 		const newEndIndex = chunkInfo.endIndex;
 
-		// Create new chunk with adjusted boundaries
-		const newChunkLines = lines.slice(newStartIndex, newEndIndex);
-		const newContent = newChunkLines.join("\n").trim();
-
-		return {
-			startIndex: newStartIndex,
-			endIndex: newEndIndex,
-			content: newContent,
-			currentOverlap: newOverlap,
-			lines: newChunkLines,
-		};
+		return this.buildChunk(newStartIndex, newEndIndex, lines, newOverlap);
 	}
 
 	/**
@@ -272,17 +275,12 @@ export class LineChunker implements Chunker {
 		// Reduce by one line from the end
 		const newEndIndex = chunkInfo.endIndex - 1;
 
-		// Create new chunk with reduced line count
-		const newChunkLines = lines.slice(chunkInfo.startIndex, newEndIndex);
-		const newContent = newChunkLines.join("\n").trim();
-
-		return {
-			startIndex: chunkInfo.startIndex,
-			endIndex: newEndIndex,
-			content: newContent,
-			currentOverlap: chunkInfo.currentOverlap,
-			lines: newChunkLines,
-		};
+		return this.buildChunk(
+			chunkInfo.startIndex,
+			newEndIndex,
+			lines,
+			chunkInfo.currentOverlap,
+		);
 	}
 
 	/**
@@ -290,16 +288,10 @@ export class LineChunker implements Chunker {
 	 * This is only used for single lines that exceed maxChars
 	 */
 	private splitLongContent(content: string): string[] {
-		const chunks: string[] = [];
-		for (let i = 0; i < content.length; i += this.maxChars) {
-			const chunk = content.substring(
-				i,
-				Math.min(i + this.maxChars, content.length),
-			);
-			if (chunk.trim().length > 0) {
-				chunks.push(chunk.trim());
-			}
-		}
-		return chunks;
+		return Array.from(
+			{ length: Math.ceil(content.length / this.maxChars) },
+			(_, k) =>
+				content.slice(k * this.maxChars, (k + 1) * this.maxChars).trim(),
+		).filter(Boolean);
 	}
 }

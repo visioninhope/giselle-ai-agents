@@ -347,7 +347,7 @@ describe("LineChunker", () => {
 			});
 		});
 
-		describe("calculateNextPosition", () => {
+		describe("nextStartIndex", () => {
 			const chunker = new LineChunker({ overlap: 4 });
 
 			it("should calculate next position for normal chunk", () => {
@@ -360,7 +360,7 @@ describe("LineChunker", () => {
 				};
 
 				// @ts-expect-error - accessing private method for testing
-				const nextPos = chunker.calculateNextPosition(chunkInfo, false);
+				const nextPos = chunker.nextStartIndex(chunkInfo, false);
 				// nextPos = start + chunkSize - effectiveOverlap = 6 + 10 - 4 = 12
 				expect(nextPos).toBe(12);
 			});
@@ -375,7 +375,7 @@ describe("LineChunker", () => {
 				};
 
 				// @ts-expect-error - accessing private method for testing
-				const nextPos = chunker.calculateNextPosition(chunkInfo, true);
+				const nextPos = chunker.nextStartIndex(chunkInfo, true);
 				// nextPos = start + chunkSize - 0 = 20 + 1 - 0 = 21
 				expect(nextPos).toBe(21);
 			});
@@ -390,7 +390,7 @@ describe("LineChunker", () => {
 				};
 
 				// @ts-expect-error - accessing private method for testing
-				const nextPos = chunker.calculateNextPosition(chunkInfo, false);
+				const nextPos = chunker.nextStartIndex(chunkInfo, false);
 				// nextPos = start + chunkSize - effectiveOverlap = 0 + 10 - 4 = 6
 				expect(nextPos).toBe(6);
 			});
@@ -405,7 +405,7 @@ describe("LineChunker", () => {
 				};
 
 				// @ts-expect-error - accessing private method for testing
-				const nextPos = chunker.calculateNextPosition(chunkInfo, false);
+				const nextPos = chunker.nextStartIndex(chunkInfo, false);
 				// nextPos = start + chunkSize - effectiveOverlap = 8 + 7 - 4 = 11
 				expect(nextPos).toBe(11);
 			});
@@ -422,7 +422,7 @@ describe("LineChunker", () => {
 				const chunkerWithLargeOverlap = new LineChunker({ overlap: 5 }); // overlap > actualChunkSize
 
 				// @ts-expect-error - accessing private method for testing
-				const nextPos = chunkerWithLargeOverlap.calculateNextPosition(
+				const nextPos = chunkerWithLargeOverlap.nextStartIndex(
 					chunkInfo,
 					false,
 				);
