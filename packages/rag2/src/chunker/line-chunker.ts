@@ -154,7 +154,7 @@ export class LineChunker implements Chunker {
 				if (chunkInfo.content.length > 0) {
 					chunks.push(chunkInfo.content);
 				}
-				i = this.nextStartIndex(chunkInfo, wasLineSplit);
+				i = this.nextStartIndex(chunkInfo, wasLineSplit, lines.length);
 			}
 		}
 
@@ -188,11 +188,20 @@ export class LineChunker implements Chunker {
 	/**
 	 * Calculate next starting position based on chunk info and line split status
 	 */
-	private nextStartIndex(chunkInfo: ChunkInfo, wasLineSplit: boolean): number {
+	private nextStartIndex(
+		chunkInfo: ChunkInfo,
+		wasLineSplit: boolean,
+		totalLines: number,
+	): number {
 		const actualChunkSize = chunkInfo.endIndex - chunkInfo.startIndex;
 		const effectiveOverlap = wasLineSplit ? 0 : this.overlap;
 		const nextPosition =
 			chunkInfo.startIndex + actualChunkSize - effectiveOverlap;
+
+		// If we've processed all lines, return the end index to terminate the loop
+		if (chunkInfo.endIndex >= totalLines) {
+			return chunkInfo.endIndex;
+		}
 
 		// Ensure progress by advancing at least 1 position
 		return Math.max(nextPosition, chunkInfo.startIndex + 1);

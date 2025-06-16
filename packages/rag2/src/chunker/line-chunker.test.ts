@@ -168,6 +168,27 @@ describe("LineChunker", () => {
 			// Should still make progress despite large overlap
 			expect(chunks[0]).not.toEqual(chunks[1]);
 		});
+
+		it("should terminate properly when overlap exceeds remaining content", () => {
+			const chunker = new LineChunker({
+				maxLines: 50,
+				overlap: 30,
+			});
+			// Create text with 40 lines - last chunk will have overlap > remaining content
+			const text = Array.from({ length: 40 }, (_, i) => `line${i + 1}`).join(
+				"\n",
+			);
+
+			const chunks = chunker.chunk(text);
+
+			// Should not create excessive small chunks at the end
+			expect(chunks.length).toBeLessThan(10);
+			// Should not have many 1-line chunks (indicates proper termination)
+			const singleLineChunks = chunks.filter(
+				(chunk) => chunk.split("\n").length === 1,
+			);
+			expect(singleLineChunks.length).toBeLessThan(5);
+		});
 	});
 
 	describe("Complex scenarios", () => {
