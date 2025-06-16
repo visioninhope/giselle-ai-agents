@@ -101,9 +101,9 @@ export interface QueryServiceConfig<
 }
 
 /**
- * simplified ingest pipeline config
+ * ingest pipeline config
  */
-export interface SimpleIngestConfig<
+export interface IngestPipelineConfig<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,

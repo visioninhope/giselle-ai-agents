@@ -6,7 +6,7 @@
 export type {
 	ChunkStoreConfig,
 	QueryServiceConfig,
-	SimpleIngestConfig,
+	IngestPipelineConfig,
 } from "./types";
 
 // Re-export constants and utilities

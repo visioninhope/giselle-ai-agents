@@ -7,8 +7,8 @@ import type { PostgresQueryServiceConfig } from "../query-service/postgres";
 import { PostgresQueryService } from "../query-service/postgres";
 import type {
 	ChunkStoreConfig,
+	IngestPipelineConfig,
 	QueryServiceConfig,
-	SimpleIngestConfig,
 } from "./types";
 import {
 	createColumnMapping,
@@ -134,7 +134,7 @@ export function createIngestPipeline<
 	TSourceMetadata extends Record<string, unknown>,
 	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,
->(config: SimpleIngestConfig<TSourceMetadata, TTargetMetadata, TParams>) {
+>(config: IngestPipelineConfig<TSourceMetadata, TTargetMetadata, TParams>) {
 	const {
 		documentLoader,
 		chunkStore,
