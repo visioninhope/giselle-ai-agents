@@ -8,6 +8,7 @@
 	"files": {
 		"ignoreUnknown": false,
 		"ignore": [
+			"./apps/studio.giselles.ai/migrations",
 			"./packages/github-tool/schema.graphql",
 			"./packages/github-tool/src/graphql-env.d.ts"
 		]
