@@ -1,17 +1,20 @@
 import type { NodeId, OutputId } from "@giselle-sdk/data-type";
 
+const NODE_REFERENCE_PREFIX_BRACKETS = "{{";
+const NODE_REFERENCE_SUFFIX_BRACKETS = "}}";
+
 /**
- * Get node reference prefix {{nodeId:
+ * Get node reference prefix `{{nodeId:`
  */
 function getNodeReferencePrefix(nodeId: NodeId): string {
-	return `{{${nodeId}:`;
+	return `${NODE_REFERENCE_PREFIX_BRACKETS}${nodeId}:`;
 }
 
 /**
- * Get node reference suffix outputId}}
+ * Get node reference suffix `outputId}}`
  */
 function getNodeReferenceSuffix(outputId: OutputId): string {
-	return `${outputId}}}`;
+	return `${outputId}${NODE_REFERENCE_SUFFIX_BRACKETS}`;
 }
 
 /**
@@ -55,11 +58,11 @@ export function findNextNodeReference(
 	const startIndex = text.indexOf(prefix, startFrom);
 	if (startIndex === -1) return null;
 
-	const endIndex = text.indexOf("}}", startIndex);
+	const endIndex = text.indexOf(NODE_REFERENCE_SUFFIX_BRACKETS, startIndex);
 	if (endIndex === -1) return null;
 
 	return {
 		start: startIndex,
-		end: endIndex + 2,
+		end: endIndex + NODE_REFERENCE_SUFFIX_BRACKETS.length,
 	};
 }
