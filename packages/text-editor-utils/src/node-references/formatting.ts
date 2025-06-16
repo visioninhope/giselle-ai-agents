@@ -60,7 +60,10 @@ export function findNextNodeReference(
 
 	// Search for suffix starting after the prefix to avoid false positives
 	const searchFromIndex = startIndex + prefix.length;
-	const endIndex = text.indexOf(NODE_REFERENCE_SUFFIX_BRACKETS, searchFromIndex);
+	const endIndex = text.indexOf(
+		NODE_REFERENCE_SUFFIX_BRACKETS,
+		searchFromIndex,
+	);
 	if (endIndex === -1) return null;
 
 	return {
