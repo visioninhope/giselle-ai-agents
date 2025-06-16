@@ -165,11 +165,8 @@ export class GitHubBlobLoader implements DocumentLoader<GitHubBlobMetadata> {
 				"status" in error &&
 				typeof error.status === "number"
 			) {
-				// Handle errors with status
-				const status = error.status || 0;
-
 				// Retry on server errors
-				if (status >= 500 && currentAttempt < this.maxRetries) {
+				if (error.status >= 500 && currentAttempt < this.maxRetries) {
 					// Exponential backoff
 					await new Promise((resolve) =>
 						setTimeout(resolve, 2 ** currentAttempt * 100),
