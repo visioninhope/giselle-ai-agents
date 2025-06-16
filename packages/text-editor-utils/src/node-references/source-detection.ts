@@ -1,16 +1,16 @@
 import type { NodeId, OutputId } from "@giselle-sdk/data-type";
 import type { JSONContent } from "@tiptap/core";
 
-export interface NodeOutputReference {
+export interface SourceReference {
 	nodeId: NodeId;
 	outputId: OutputId;
 }
 
 /**
- * Extract all Source nodes from TipTap JSONContent
+ * Extract all Source references from TipTap JSONContent
  */
-function extractSourceNodes(content: JSONContent): NodeOutputReference[] {
-	const sources: NodeOutputReference[] = [];
+function extractSourceReferences(content: JSONContent): SourceReference[] {
+	const sources: SourceReference[] = [];
 
 	function traverse(node: JSONContent) {
 		if (node.type === "Source") {
@@ -39,14 +39,14 @@ function extractSourceNodes(content: JSONContent): NodeOutputReference[] {
 }
 
 /**
- * Find Source nodes that were removed between two JSON states
+ * Find Source references that were removed between two JSON states
  */
 export function findRemovedSources(
 	oldContent: JSONContent,
 	newContent: JSONContent,
-): NodeOutputReference[] {
-	const oldSources = extractSourceNodes(oldContent);
-	const newSources = extractSourceNodes(newContent);
+): SourceReference[] {
+	const oldSources = extractSourceReferences(oldContent);
+	const newSources = extractSourceReferences(newContent);
 
 	const newSourcesSet = new Set(
 		newSources.map((s) => `${s.nodeId}:${s.outputId}`),
