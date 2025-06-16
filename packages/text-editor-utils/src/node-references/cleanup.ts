@@ -99,6 +99,10 @@ export function cleanupNodeReferencesInText(
 				jsonContent,
 				deletedNodeId,
 			);
+			// Return empty paragraph if cleaned is null to maintain valid TipTap structure
+			if (cleaned === null) {
+				return JSON.stringify({ type: "paragraph", content: [] });
+			}
 			return JSON.stringify(cleaned);
 		} catch (error) {
 			console.error("Failed to parse JSON content:", error);
@@ -185,6 +189,10 @@ export function cleanupSpecificNodeReferenceInText(
 				nodeId,
 				outputId,
 			);
+			// Return empty paragraph if cleaned is null to maintain valid TipTap structure
+			if (cleaned === null) {
+				return JSON.stringify({ type: "paragraph", content: [] });
+			}
 			return JSON.stringify(cleaned);
 		} catch (error) {
 			console.error("Failed to parse JSON content:", error);
