@@ -35,6 +35,7 @@ import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
 import { RunButton } from "./run-button";
+import { RunHistoryTable } from "./run-history/run-history-table";
 import { SecretTable } from "./secret/secret-table";
 import { SideMenu } from "./side-menu";
 import {
@@ -514,6 +515,13 @@ export function Editor({
 												className="h-full outline-none"
 											>
 												<SecretTable />
+											</Tabs.Content>
+
+											<Tabs.Content
+												value="run-history"
+												className="h-full outline-none"
+											>
+												<RunHistoryTable />
 											</Tabs.Content>
 											<Tabs.Content
 												value="datasource"
