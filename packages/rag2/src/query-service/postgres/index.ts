@@ -108,9 +108,10 @@ export class PostgresQueryService<
         FROM ${escapeIdentifier(tableName)}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
         ORDER BY ${escapeIdentifier(columnMapping.embedding)} <=> $1
-        LIMIT ${limit}
+        LIMIT $${paramIndex}
       `;
 
+			values.push(limit);
 			const result = await pool.query(sql, values);
 
 			return result.rows.map((row) => {
