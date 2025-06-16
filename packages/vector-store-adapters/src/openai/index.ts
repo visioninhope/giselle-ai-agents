@@ -5,7 +5,7 @@ export function openaiVectorStore(apiKey: string): VectorStore {
 	const client = new OpenAI({ apiKey });
 	return {
 		async create() {
-			const vectorStore = await client.beta.vectorStores.create({});
+			const vectorStore = await client.vectorStores.create({});
 			const id = VectorStoreId.generate();
 			return {
 				id,
@@ -22,17 +22,6 @@ export function openaiVectorStore(apiKey: string): VectorStore {
 					id: vectorStore.id,
 				},
 			};
-		},
-		async addFile(params) {
-			const file = await client.files.create({
-				file: params.file,
-				purpose: "assistants",
-			});
-			const vectorStoreFile = await client.beta.vectorStores.files.createAndPoll(
-				params.vectorStore.providerMetadata.id,
-				{ file_id: file.id },
-			);
-			const id =
 		},
 	};
 }

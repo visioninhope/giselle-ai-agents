@@ -40,8 +40,9 @@ export function GitHubConnectFieldsets() {
 						</label>
 
 						<Select
-							name="repository"
+							name="repositoryNodeId"
 							options={value.github.repositories}
+							renderValue={(option) => option.node_id}
 							renderOption={(option) => option.full_name}
 							placeholder="Select provider..."
 						/>
@@ -65,6 +66,9 @@ export function GitHubConnectFieldsets() {
 							available.
 						</p>
 					</fieldset>
+
+					{/**  @todo select */}
+					<input type="hidden" name="installationId" value="199999" />
 				</>
 			);
 		default: {

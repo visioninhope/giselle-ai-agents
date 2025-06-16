@@ -41,6 +41,7 @@ export async function createDataSource(args: {
 			storage: args.context.storage,
 		}),
 	]);
+	return dataSource;
 }
 
 async function addWorkspaceSecretIndex(args: {

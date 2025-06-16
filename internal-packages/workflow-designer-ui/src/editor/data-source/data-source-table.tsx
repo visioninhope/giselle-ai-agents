@@ -22,32 +22,19 @@ import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
-import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
+import { useWorkspaceDataSources } from "../lib/use-workspace-data-sources";
 import { GitHubConnectFieldsets } from "./provider/github";
-
-function formatDateTime(timestamp: number): string {
-	const date = new Date(timestamp);
-	const year = date.getFullYear();
-	const month = String(date.getMonth() + 1).padStart(2, "0");
-	const day = String(date.getDate()).padStart(2, "0");
-	const hours = String(date.getHours()).padStart(2, "0");
-	const minutes = String(date.getMinutes()).padStart(2, "0");
-	return `${year}/${month}/${day} ${hours}:${minutes}`;
-}
 
 const GitHubDataSourcePayload = z.object({
 	provider: z.literal("github"),
-	installationId: z.number(),
+	installationId: z.coerce.number(),
 	repositoryNodeId: z.string(),
 });
-const DataSourcePayload = z.discriminatedUnion("provider", [
-	GitHubDataSourcePayload,
-]);
 
 export function DataSourceTable() {
 	const [presentDialog, setPresentDialog] = useState(false);
 	const { data: workspace } = useWorkflowDesigner();
-	const { isLoading, data, mutate } = useWorkspaceSecrets();
+	const { isLoading, data, mutate } = useWorkspaceDataSources();
 	const [isPending, startTransition] = useTransition();
 	const client = useGiselleEngine();
 	const [provider, setProvider] = useState<string | undefined>();
@@ -57,7 +44,7 @@ export function DataSourceTable() {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
 			const formDataObject = Object.fromEntries(formData.entries());
-			const parse = GitHubDataSourcePayload.safeParse(formDataObject)
+			const parse = GitHubDataSourcePayload.safeParse(formDataObject);
 			if (!parse.success) {
 				/** @todo Implement error handling */
 				console.log(parse.error);
@@ -65,12 +52,26 @@ export function DataSourceTable() {
 			}
 			const payload = parse.data;
 			startTransition(async () => {
-				const result = await client.addSecret({
-					workspaceId: workspace.id,
-					label: payload.label,
-					value: payload.value,
-				});
-				await mutate([...(data ?? []), result.secret]);
+				switch (payload.provider) {
+					case "github": {
+						const result = await client.createDataSource({
+							workspaceId: workspace.id,
+							dataSource: {
+								provider: "github",
+								providerMetadata: {
+									repositoryNodeId: payload.repositoryNodeId,
+									installationId: payload.installationId,
+								},
+							},
+						});
+						await mutate([...(data ?? []), result.dataSource]);
+						break;
+					}
+					default: {
+						const _exhaustiveCheck: never = payload.provider;
+						throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
+					}
+				}
 			});
 			setPresentDialog(false);
 		},
@@ -215,15 +216,13 @@ export function DataSourceTable() {
 			<Table>
 				<TableHeader>
 					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Created at</TableHead>
+						<TableHead>id</TableHead>
 					</TableRow>
 				</TableHeader>
 				<TableBody>
 					{data.map((data) => (
 						<TableRow key={data.id}>
-							<TableCell>{data.label}</TableCell>
-							<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+							<TableCell>{data.id}</TableCell>
 						</TableRow>
 					))}
 				</TableBody>

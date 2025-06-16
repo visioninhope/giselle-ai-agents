@@ -19,11 +19,12 @@
 		}
 	},
 	"devDependencies": {
-		"@giselle-sdk/giselle-engine": "workspace:^",
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"tsup": "catalog:"
 	},
 	"dependencies": {
-		"openai": "catalog:"
+		"@giselle-sdk/giselle-engine": "workspace:^",
+		"openai": "catalog:",
+		"zod": "catalog:"
 	}
 }

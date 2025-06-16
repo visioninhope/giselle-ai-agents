@@ -18,6 +18,7 @@ interface SelectProps<T extends Identifiable> {
 	widthClassName?: string;
 	name?: string;
 	id?: string;
+	renderValue?: (options: T) => string | number;
 }
 
 export function Select<T extends Identifiable>({
@@ -30,6 +31,7 @@ export function Select<T extends Identifiable>({
 	widthClassName,
 	name,
 	id,
+	renderValue,
 }: SelectProps<T>) {
 	return (
 		<SelectPrimitive.Root
@@ -60,7 +62,7 @@ export function Select<T extends Identifiable>({
 								<SelectPrimitive.Item
 									key={option.id}
 									value={
-										typeof option.id === "number" ? `${option.id}` : option.id
+										renderValue ? `${renderValue(option)}` : `${option.id}`
 									}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",

@@ -132,4 +132,5 @@ export interface GiselleEngineConfig {
 			options: GenerationCompleteOption,
 		) => Promise<void>;
 	};
+	vectorStore?: VectorStore;
 }
