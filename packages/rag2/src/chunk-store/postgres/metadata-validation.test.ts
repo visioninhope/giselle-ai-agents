@@ -27,8 +27,8 @@ describe("PostgresChunkStore with metadata validation", () => {
 
 	const mockColumnMapping = {
 		documentKey: "document_key",
-		content: "content",
-		index: "index",
+		chunkContent: "content",
+		chunkIndex: "index",
 		embedding: "embedding",
 		title: "title",
 		author: "author",
