@@ -1,5 +1,5 @@
 /**
- * RAG3 default settings and utilities
+ * RAG2 default settings and utilities
  */
 
 // Re-export types
