@@ -45,10 +45,9 @@ export class GitHubBlobLoader implements DocumentLoader<GitHubBlobMetadata> {
 	}
 
 	async *load(
-		params: DocumentLoaderParams,
+		params: GitHubBlobLoaderParams,
 	): AsyncIterable<Document<GitHubBlobMetadata>> {
-		// Type assertion to GitHubBlobLoaderParams
-		const githubParams = params as GitHubBlobLoaderParams;
+		const githubParams = params;
 		const { owner, repo } = githubParams;
 		const commitSha = githubParams.commitSha;
 
