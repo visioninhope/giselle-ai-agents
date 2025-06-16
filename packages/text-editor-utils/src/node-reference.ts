@@ -8,13 +8,20 @@ function getNodeReferencePrefix(nodeId: NodeId): string {
 }
 
 /**
+ * Get node reference suffix outputId}}
+ */
+function getNodeReferenceSuffix(outputId: OutputId): string {
+	return `${outputId}}}`;
+}
+
+/**
  * Format node reference to {{nodeId:outputId}} format
  */
 export function formatNodeReference(
 	nodeId: NodeId,
 	outputId: OutputId,
 ): string {
-	return `${getNodeReferencePrefix(nodeId)}${outputId}}}`;
+	return `${getNodeReferencePrefix(nodeId)}${getNodeReferenceSuffix(outputId)}`;
 }
 
 /**
