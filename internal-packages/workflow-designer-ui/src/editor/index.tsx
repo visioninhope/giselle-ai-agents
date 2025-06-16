@@ -30,6 +30,7 @@ import { edgeTypes } from "./connector";
 import { type ConnectorType, GradientDef } from "./connector/component";
 import { ContextMenu } from "./context-menu";
 import type { ContextMenuProps } from "./context-menu/types";
+import { DataSourceTable } from "./data-source";
 import { KeyboardShortcuts } from "./keyboard-shortcuts";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "./node";
 import { PropertiesPanel } from "./properties-panel";
@@ -513,6 +514,12 @@ export function Editor({
 												className="h-full outline-none"
 											>
 												<SecretTable />
+											</Tabs.Content>
+											<Tabs.Content
+												value="datasource"
+												className="h-full outline-none"
+											>
+												<DataSourceTable />
 											</Tabs.Content>
 										</Panel>
 									</PanelGroup>

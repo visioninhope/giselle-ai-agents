@@ -14,6 +14,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
+import { DataSourceProviderObject } from "../core/data-source";
 import { ConfigureTriggerInput } from "../core/flows";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
@@ -310,6 +311,27 @@ export const createJsonRouters = {
 			handler: async ({ input }) =>
 				JsonResponse.json({
 					secrets: await giselleEngine.getWorkspaceSecrets(input),
+				}),
+		}),
+	createDataSource: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				dataSource: DataSourceProviderObject,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					dataSource: await giselleEngine.createDataSource(input),
+				}),
+		}),
+	getWorkspaceDataSources: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
 } as const;
