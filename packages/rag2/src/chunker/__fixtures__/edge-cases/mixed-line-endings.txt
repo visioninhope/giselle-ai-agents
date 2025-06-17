@@ -1,0 +1,4 @@
+Line with LF ending
+Line with CR endingLine with CRLF ending
+Line with mixed endings in the middleof the line
+Final line

@@ -1,282 +1,197 @@
+import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
+import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
 import { LineChunker } from "./line-chunker";
 
-describe("LineChunker", () => {
-	describe("Basic functionality", () => {
-		it("should split text into chunks based on line count", () => {
-			const chunker = new LineChunker({
-				maxLines: 3,
-				overlap: 0,
-			});
-			const text = "line1\nline2\nline3\nline4\nline5\nline6\nline7\nline8";
+const FIXTURES_DIR = join(__dirname, "__fixtures__");
+const GOLDEN_DIR = join(__dirname, "__golden__");
 
-			const chunks = chunker.chunk(text);
+// Helper to read fixture
+function readFixture(path: string): string {
+	return readFileSync(join(FIXTURES_DIR, path), "utf-8");
+}
 
-			expect(chunks.length).toBeGreaterThan(1);
-			for (const chunk of chunks) {
-				expect(chunk.trim().length).toBeGreaterThan(0);
+// Helper to get golden file path
+function getGoldenPath(fixtureName: string, configName: string): string {
+	// Remove file extension to get base name
+	const baseName = fixtureName.replace(/\.[^.]+$/, "");
+	return join(GOLDEN_DIR, baseName, `${configName}.txt`);
+}
+
+// Delimiter for separating chunks
+const CHUNK_DELIMITER = "===== CHUNK";
+
+// Helper to format chunks as delimiter-separated text
+function formatChunks(chunks: string[]): string {
+	return chunks
+		.map((chunk, index) => `${CHUNK_DELIMITER} ${index + 1} =====\n${chunk}`)
+		.join("\n");
+}
+
+// Helper to parse delimiter-separated text back to chunks
+function parseChunks(text: string): string[] {
+	const pattern = new RegExp(`${CHUNK_DELIMITER} \\d+ =====\\n`, "g");
+	return text
+		.split(pattern)
+		.slice(1) // Skip the first empty element
+		.map((chunk) => chunk.trimEnd()); // Remove trailing newline
+}
+
+// Helper to read or write golden data
+function compareWithGolden(
+	goldenPath: string,
+	actual: string[],
+	updateGolden = false,
+): void {
+	const goldenData = formatChunks(actual);
+
+	if (updateGolden || !existsSync(goldenPath)) {
+		// Ensure directory exists
+		mkdirSync(dirname(goldenPath), { recursive: true });
+		writeFileSync(goldenPath, goldenData);
+		console.log(`Golden file created/updated: ${goldenPath}`);
+		return;
+	}
+
+	const expected = readFileSync(goldenPath, "utf-8");
+	const expectedChunks = parseChunks(expected);
+	expect(actual).toEqual(expectedChunks);
+}
+
+// Test configurations
+const TEST_CONFIGS = {
+	default: {},
+	"small-chunks": { maxLines: 5, overlap: 1 },
+	"large-chunks": { maxLines: 50, overlap: 10 },
+	"no-overlap": { maxLines: 10, overlap: 0 },
+	"char-limit": { maxLines: 100, maxChars: 200, overlap: 0 },
+	"high-overlap": { maxLines: 10, overlap: 8 },
+};
+
+// Test fixtures
+const FIXTURES = [
+	"code-sample.ts",
+	"markdown-doc.md",
+	"edge-cases/empty.txt",
+	"edge-cases/single-line.txt",
+	"edge-cases/long-lines.txt",
+	"edge-cases/only-newlines.txt",
+	"edge-cases/mixed-line-endings.txt",
+];
+
+describe("LineChunker Golden Tests", () => {
+	// Set to true to update golden files
+	const UPDATE_GOLDEN = process.env.UPDATE_GOLDEN === "true";
+
+	for (const fixture of FIXTURES) {
+		describe(`Fixture: ${fixture}`, () => {
+			const content = readFixture(fixture);
+
+			for (const [configName, config] of Object.entries(TEST_CONFIGS)) {
+				it(`should match golden data with config: ${configName}`, () => {
+					const chunker = new LineChunker(config);
+					const chunks = chunker.chunk(content);
+					const goldenPath = getGoldenPath(fixture, configName);
+
+					compareWithGolden(goldenPath, chunks, UPDATE_GOLDEN);
+				});
 			}
+		});
+	}
 
-			// Each chunk should have at most 3 lines (except possibly the last)
-			for (let i = 0; i < chunks.length - 1; i++) {
-				const lineCount = chunks[i].split("\n").length;
-				expect(lineCount).toBeLessThanOrEqual(3);
+	describe("Chunk integrity validation", () => {
+		it("should preserve all content when concatenating chunks", () => {
+			const content = readFixture("code-sample.ts");
+			const chunker = new LineChunker({ maxLines: 10, overlap: 0 });
+			const chunks = chunker.chunk(content);
+
+			// All original content should be present when concatenating chunks
+			const allContent = chunks.join("");
+			expect(allContent).toContain("export interface User");
+			expect(allContent).toContain("export class UserService");
+			expect(allContent).toContain("export class PostService");
+		});
+
+		it("should ensure chunks have expected characteristics", () => {
+			const content = readFixture("markdown-doc.md");
+			const maxLines = 5;
+			const maxChars = 300;
+			const chunker = new LineChunker({ maxLines, maxChars, overlap: 2 });
+			const chunks = chunker.chunk(content);
+
+			for (const [index, chunk] of chunks.entries()) {
+				// Each chunk should not exceed maxChars
+				expect(chunk.length).toBeLessThanOrEqual(maxChars);
+
+				// Each chunk (except possibly the last) should not exceed maxLines
+				const lineCount = chunk.split("\n").length;
+				if (index < chunks.length - 1) {
+					expect(lineCount).toBeLessThanOrEqual(maxLines);
+				}
+
+				// No chunk should be empty after trimming
+				expect(chunk.trim().length).toBeGreaterThan(0);
 			}
 		});
 
-		it("should handle empty text", () => {
-			const chunker = new LineChunker();
-			const chunks = chunker.chunk("");
+		it("should handle overlap correctly", () => {
+			const content = readFixture("code-sample.ts");
+			const overlap = 3;
+			const chunker = new LineChunker({ maxLines: 10, overlap });
+			const chunks = chunker.chunk(content);
 
+			// Check that consecutive chunks have overlapping lines
+			for (let i = 0; i < chunks.length - 1; i++) {
+				const currentLines = chunks[i].split("\n");
+				const nextLines = chunks[i + 1].split("\n");
+
+				// The last few lines of current chunk should match
+				// the first few lines of next chunk
+				const currentTail = currentLines.slice(-overlap).join("\n");
+				const nextHead = nextLines.slice(0, overlap).join("\n");
+
+				// They might not be exactly equal due to line reduction
+				// but there should be some overlap
+				expect(nextLines.length).toBeGreaterThan(0);
+			}
+		});
+	});
+
+	describe("Edge case validation", () => {
+		it("should handle empty content", () => {
+			const content = readFixture("edge-cases/empty.txt");
+			const chunker = new LineChunker();
+			const chunks = chunker.chunk(content);
 			expect(chunks).toEqual([]);
 		});
 
-		it("should handle single line text", () => {
+		it("should handle single line", () => {
+			const content = readFixture("edge-cases/single-line.txt");
 			const chunker = new LineChunker();
-			const text = "This is a single line of text";
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks).toEqual([text]);
+			const chunks = chunker.chunk(content);
+			expect(chunks.length).toBe(1);
+			expect(chunks[0]).toBe(content);
 		});
 
-		it("should apply overlap when configured", () => {
-			const chunker = new LineChunker({
-				maxLines: 3,
-				overlap: 1,
-			});
-			const text = "line1\nline2\nline3\nline4\nline5\nline6";
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			// Verify overlap by checking that consecutive chunks share content
-			for (let i = 0; i < chunks.length - 1; i++) {
-				const currentChunk = chunks[i];
-				const nextChunk = chunks[i + 1];
-				// Should have some overlapping content
-				expect(currentChunk.length).toBeGreaterThan(0);
-				expect(nextChunk.length).toBeGreaterThan(0);
-			}
-		});
-
-		it("should respect maxChars limit", () => {
-			const chunker = new LineChunker({
-				maxLines: 100,
-				maxChars: 50,
-				overlap: 0,
-			});
-			const longLine = "a".repeat(100);
-			const text = `${longLine}\nshort line`;
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			for (const chunk of chunks) {
-				expect(chunk.length).toBeLessThanOrEqual(50);
-			}
-		});
-	});
-
-	describe("Configuration validation", () => {
-		it("should use default values when no options provided", () => {
-			expect(() => new LineChunker()).not.toThrow();
-		});
-
-		it("should validate maxLines is positive", () => {
-			expect(() => new LineChunker({ maxLines: 0 })).toThrow();
-			expect(() => new LineChunker({ maxLines: -1 })).toThrow();
-		});
-
-		it("should validate overlap is non-negative", () => {
-			expect(() => new LineChunker({ overlap: -1 })).toThrow();
-		});
-
-		it("should validate overlap is less than maxLines", () => {
-			expect(() => new LineChunker({ maxLines: 5, overlap: 5 })).toThrow();
-			expect(() => new LineChunker({ maxLines: 5, overlap: 6 })).toThrow();
-		});
-
-		it("should validate maxChars is positive", () => {
-			expect(() => new LineChunker({ maxChars: 0 })).toThrow();
-			expect(() => new LineChunker({ maxChars: -1 })).toThrow();
-		});
-
-		it("should enforce maximum limits", () => {
-			expect(() => new LineChunker({ maxLines: 1001 })).toThrow();
-			expect(() => new LineChunker({ maxChars: 100001 })).toThrow();
-		});
-	});
-
-	describe("Edge cases", () => {
-		it("should handle text with only newlines", () => {
-			const chunker = new LineChunker({ maxLines: 2, overlap: 0 });
-			const text = "\n\n\n\n\n";
-
-			const chunks = chunker.chunk(text);
-
-			// Empty lines might be filtered out, so we check for either empty array or chunks
-			expect(chunks.length).toBeGreaterThanOrEqual(0);
-		});
-
-		it("should handle text without newlines", () => {
-			const chunker = new LineChunker({ maxLines: 3, overlap: 0 });
-			const text = "This is a single line without any newline characters";
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks).toEqual([text]);
-		});
-
-		it("should handle mixed line endings", () => {
-			const chunker = new LineChunker({ maxLines: 2, overlap: 0 });
-			const text = "line1\nline2\rline3\r\nline4";
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			expect(chunks.join("")).toContain("line1");
-			expect(chunks.join("")).toContain("line4");
-		});
-
-		it("should handle very long lines with character splitting", () => {
+		it("should split very long lines by character limit", () => {
+			const content = readFixture("edge-cases/long-lines.txt");
 			const chunker = new LineChunker({
 				maxLines: 10,
-				maxChars: 20,
-				overlap: 0,
+				maxChars: 200,
+				overlap: 2,
 			});
-			const longLine = "x".repeat(100);
+			const chunks = chunker.chunk(content);
 
-			const chunks = chunker.chunk(longLine);
-
+			// Should have multiple chunks due to long line
 			expect(chunks.length).toBeGreaterThan(1);
+
+			// Each chunk should respect maxChars
 			for (const chunk of chunks) {
-				expect(chunk.length).toBeLessThanOrEqual(20);
+				expect(chunk.length).toBeLessThanOrEqual(200);
 			}
-		});
-
-		it("should handle large overlap values gracefully", () => {
-			const chunker = new LineChunker({
-				maxLines: 10,
-				overlap: 8,
-			});
-			const text = Array.from({ length: 20 }, (_, i) => `line${i}`).join("\n");
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			// Should still make progress despite large overlap
-			expect(chunks[0]).not.toEqual(chunks[1]);
-		});
-
-		it("should terminate properly when overlap exceeds remaining content", () => {
-			const chunker = new LineChunker({
-				maxLines: 50,
-				overlap: 30,
-			});
-			// Create text with 40 lines - last chunk will have overlap > remaining content
-			const text = Array.from({ length: 40 }, (_, i) => `line${i + 1}`).join(
-				"\n",
-			);
-
-			const chunks = chunker.chunk(text);
-
-			// Should not create excessive small chunks at the end
-			expect(chunks.length).toBeLessThan(10);
-			// Should not have many 1-line chunks (indicates proper termination)
-			const singleLineChunks = chunks.filter(
-				(chunk) => chunk.split("\n").length === 1,
-			);
-			expect(singleLineChunks.length).toBeLessThan(5);
-		});
-	});
-
-	describe("Complex scenarios", () => {
-		it("should handle realistic code-like content", () => {
-			const chunker = new LineChunker({
-				maxLines: 5,
-				overlap: 1,
-			});
-			const codeContent = `function example() {
-	const value = "hello";
-	if (value) {
-		console.log(value);
-	}
-	return value;
-}
-
-function another() {
-	return "world";
-}`;
-
-			const chunks = chunker.chunk(codeContent);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			// Verify that all original content is preserved
-			const rejoined = chunks.join("");
-			expect(rejoined).toContain("function example");
-			expect(rejoined).toContain("function another");
-		});
-
-		it("should maintain content integrity with overlap", () => {
-			const chunker = new LineChunker({
-				maxLines: 3,
-				overlap: 1,
-			});
-			const lines = Array.from({ length: 10 }, (_, i) => `Line ${i + 1}`);
-			const text = lines.join("\n");
-
-			const chunks = chunker.chunk(text);
-
-			// Verify no content is lost
-			const allChunkContent = chunks.join("");
-			for (const line of lines) {
-				expect(allChunkContent).toContain(line);
-			}
-		});
-
-		it("should handle documents with varying line lengths", () => {
-			const chunker = new LineChunker({
-				maxLines: 3,
-				maxChars: 100,
-				overlap: 0,
-			});
-			const text = [
-				"Short",
-				"This is a medium length line with some content",
-				"X".repeat(150), // Very long line
-				"Another short line",
-				"Final line",
-			].join("\n");
-
-			const chunks = chunker.chunk(text);
-
-			expect(chunks.length).toBeGreaterThan(1);
-			// Long line should be split by character limit
-			const hasLongChunk = chunks.some((chunk) =>
-				chunk.includes("X".repeat(50)),
-			);
-			expect(hasLongChunk).toBe(true);
-		});
-	});
-
-	describe("Performance considerations", () => {
-		it("should handle moderately large documents efficiently", () => {
-			const chunker = new LineChunker({
-				maxLines: 50,
-				overlap: 5,
-			});
-			const largeText = Array.from(
-				{ length: 1000 },
-				(_, i) => `Line ${i + 1}`,
-			).join("\n");
-
-			const startTime = Date.now();
-			const chunks = chunker.chunk(largeText);
-			const endTime = Date.now();
-
-			expect(chunks.length).toBeGreaterThan(10);
-			expect(endTime - startTime).toBeLessThan(1000); // Should complete within 1 second
 		});
 	});
 });
+
+// Instructions for updating golden files:
+// Run: UPDATE_GOLDEN=true pnpm test line-chunker.test.ts

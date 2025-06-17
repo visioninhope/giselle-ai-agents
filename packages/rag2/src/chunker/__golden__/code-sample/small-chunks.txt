@@ -1,0 +1,208 @@
+===== CHUNK 1 =====
+// Sample TypeScript code for testing chunking behavior
+// This is a test fixture representing typical code structure
+
+export interface User {
+	id: string;
+===== CHUNK 2 =====
+id: string;
+	name: string;
+	email: string;
+	createdAt: Date;
+	updatedAt: Date;
+===== CHUNK 3 =====
+updatedAt: Date;
+}
+
+export interface Post {
+	id: string;
+===== CHUNK 4 =====
+id: string;
+	title: string;
+	content: string;
+	authorId: string;
+	tags: string[];
+===== CHUNK 5 =====
+tags: string[];
+	published: boolean;
+	publishedAt?: Date;
+	createdAt: Date;
+	updatedAt: Date;
+===== CHUNK 6 =====
+updatedAt: Date;
+}
+
+export class UserService {
+	constructor(private readonly db: Database) {}
+===== CHUNK 7 =====
+constructor(private readonly db: Database) {}
+
+	async findById(id: string): Promise<User | null> {
+		const user = await this.db.users.findUnique({
+			where: { id },
+===== CHUNK 8 =====
+where: { id },
+		});
+		return user;
+	}
+===== CHUNK 9 =====
+async findByEmail(email: string): Promise<User | null> {
+		const user = await this.db.users.findUnique({
+			where: { email },
+		});
+===== CHUNK 10 =====
+});
+		return user;
+	}
+
+	async create(data: CreateUserInput): Promise<User> {
+===== CHUNK 11 =====
+async create(data: CreateUserInput): Promise<User> {
+		const user = await this.db.users.create({
+			data: {
+				...data,
+				createdAt: new Date(),
+===== CHUNK 12 =====
+createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		return user;
+===== CHUNK 13 =====
+return user;
+	}
+
+	async update(id: string, data: UpdateUserInput): Promise<User> {
+		const user = await this.db.users.update({
+===== CHUNK 14 =====
+const user = await this.db.users.update({
+			where: { id },
+			data: {
+				...data,
+				updatedAt: new Date(),
+===== CHUNK 15 =====
+updatedAt: new Date(),
+			},
+		});
+		return user;
+	}
+===== CHUNK 16 =====
+}
+
+	async delete(id: string): Promise<void> {
+		await this.db.users.delete({
+			where: { id },
+===== CHUNK 17 =====
+where: { id },
+		});
+	}
+}
+===== CHUNK 18 =====
+export class PostService {
+	constructor(private readonly db: Database) {}
+
+	async findById(id: string): Promise<Post | null> {
+===== CHUNK 19 =====
+async findById(id: string): Promise<Post | null> {
+		const post = await this.db.posts.findUnique({
+			where: { id },
+			include: { author: true },
+		});
+===== CHUNK 20 =====
+});
+		return post;
+	}
+
+	async findByAuthor(authorId: string): Promise<Post[]> {
+===== CHUNK 21 =====
+async findByAuthor(authorId: string): Promise<Post[]> {
+		const posts = await this.db.posts.findMany({
+			where: { authorId },
+			orderBy: { createdAt: 'desc' },
+		});
+===== CHUNK 22 =====
+});
+		return posts;
+	}
+
+	async findPublished(): Promise<Post[]> {
+===== CHUNK 23 =====
+async findPublished(): Promise<Post[]> {
+		const posts = await this.db.posts.findMany({
+			where: { published: true },
+			orderBy: { publishedAt: 'desc' },
+		});
+===== CHUNK 24 =====
+});
+		return posts;
+	}
+
+	async create(data: CreatePostInput): Promise<Post> {
+===== CHUNK 25 =====
+async create(data: CreatePostInput): Promise<Post> {
+		const post = await this.db.posts.create({
+			data: {
+				...data,
+				createdAt: new Date(),
+===== CHUNK 26 =====
+createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		return post;
+===== CHUNK 27 =====
+return post;
+	}
+
+	async publish(id: string): Promise<Post> {
+		const post = await this.db.posts.update({
+===== CHUNK 28 =====
+const post = await this.db.posts.update({
+			where: { id },
+			data: {
+				published: true,
+				publishedAt: new Date(),
+===== CHUNK 29 =====
+publishedAt: new Date(),
+				updatedAt: new Date(),
+			},
+		});
+		return post;
+===== CHUNK 30 =====
+return post;
+	}
+}
+
+// Database interface
+===== CHUNK 31 =====
+// Database interface
+interface Database {
+	users: any;
+	posts: any;
+}
+===== CHUNK 32 =====
+}
+
+// Input types
+interface CreateUserInput {
+	name: string;
+===== CHUNK 33 =====
+name: string;
+	email: string;
+}
+
+interface UpdateUserInput {
+===== CHUNK 34 =====
+interface UpdateUserInput {
+	name?: string;
+	email?: string;
+}
+===== CHUNK 35 =====
+interface CreatePostInput {
+	title: string;
+	content: string;
+	authorId: string;
+===== CHUNK 36 =====
+authorId: string;
+	tags: string[];
+}
