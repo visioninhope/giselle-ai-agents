@@ -334,6 +334,18 @@ export const createJsonRouters = {
 					dataSources: await giselleEngine.getWorkspaceDataSources(input),
 				}),
 		}),
+	createRun: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				jobsCount: z.number(),
+				trigger: z.string(),
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					run: await giselleEngine.createRun(input),
+				}),
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(

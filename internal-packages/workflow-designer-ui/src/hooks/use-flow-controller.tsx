@@ -1,5 +1,8 @@
 import type { Generation, Workflow } from "@giselle-sdk/data-type";
-import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
+import {
+	useGenerationRunnerSystem,
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useCallback, useRef } from "react";
 import {
@@ -13,6 +16,7 @@ export function useFlowController() {
 		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
+	const client = useGiselleEngine();
 
 	const activeGenerationsRef = useRef<Generation[]>([]);
 	const cancelRef = useRef(false);
@@ -60,6 +64,11 @@ export function useFlowController() {
 				),
 			});
 
+			client.createRun({
+				workspaceId: data.id,
+				jobsCount: flow.jobs.length,
+				trigger: "manual",
+			});
 			for (const [jobIndex, job] of flow.jobs.entries()) {
 				await Promise.all(
 					job.operations.map(async (operation) => {
@@ -81,7 +90,7 @@ export function useFlowController() {
 				}
 			}
 		},
-		[createGeneration, data.id, info, startGeneration, stopFlow],
+		[createGeneration, data.id, info, startGeneration, stopFlow, client],
 	);
 
 	return { startFlow };

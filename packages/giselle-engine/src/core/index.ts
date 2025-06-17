@@ -20,6 +20,7 @@ import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
 	configureTrigger,
+	createRun,
 	deleteTrigger,
 	getTrigger,
 	resolveTrigger,
@@ -227,6 +228,13 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 		}) {
 			return await getWorkspaceDataSources({ ...args, context });
+		},
+		createRun(args: {
+			workspaceId: WorkspaceId;
+			jobsCount: number;
+			trigger: string;
+		}) {
+			return createRun({ ...args, context });
 		},
 	};
 }
