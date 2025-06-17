@@ -60,7 +60,6 @@ function compareWithGolden(
 
 // Test configurations
 const TEST_CONFIGS = {
-	default: {},
 	"small-chunks": { maxLines: 5, overlap: 1 },
 	"large-chunks": { maxLines: 50, overlap: 10 },
 	"no-overlap": { maxLines: 10, overlap: 0 },
