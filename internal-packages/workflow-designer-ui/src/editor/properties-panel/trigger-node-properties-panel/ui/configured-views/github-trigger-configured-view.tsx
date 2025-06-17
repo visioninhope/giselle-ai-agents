@@ -16,7 +16,7 @@ export function GitHubTriggerConfiguredView({
 		return "Loading...";
 	}
 	if (data === undefined) {
-		return "no data";
+		return "No Data";
 	}
 
 	return (

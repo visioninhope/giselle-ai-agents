@@ -16,7 +16,7 @@ export function ManualTriggerConfiguredView({
 		return "Loading...";
 	}
 	if (data === undefined || data.configuration.provider !== "manual") {
-		return "no data";
+		return "No Data";
 	}
 
 	return (
