@@ -67,7 +67,8 @@ export async function copyAgent(
 		}
 
 		const newAgentId = `agnt_${createId()}` as AgentId;
-		const newName = `Copy of ${agent.name ?? agentId}`;
+		const baseName = agent.name?.trim() || agentId;
+		const newName = `Copy of ${baseName}`;
 		const workspace = await giselleEngine.copyWorkspace(
 			agent.workspaceId,
 			newName,
