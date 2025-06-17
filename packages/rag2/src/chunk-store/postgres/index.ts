@@ -229,7 +229,7 @@ export class PostgresChunkStore<
 		const valuePlaceholders: string[] = [];
 
 		records.forEach((item, recordIndex) => {
-			const recordValues = Object.values(item.record);
+			const recordValues = columns.map((c) => item.record[c]);
 			recordValues.push(pgvector.toSql(item.embedding.embeddingValue));
 
 			// Add values to the flat array
