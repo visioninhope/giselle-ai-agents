@@ -35,17 +35,19 @@ Here's an example of TypeScript code:
 interface ChunkerOptions {
   maxLines: number;
 ===== CHUNK 7 =====
-maxLines: number;
+  maxLines: number;
   overlap: number;
   maxChars: number;
 }
+
 ===== CHUNK 8 =====
+
 class Chunker {
   constructor(private options: ChunkerOptions) {}
   
   chunk(text: string): string[] {
 ===== CHUNK 9 =====
-chunk(text: string): string[] {
+  chunk(text: string): string[] {
     // Implementation details
     return [];
   }
@@ -55,13 +57,15 @@ chunk(text: string): string[] {
 ```
 
 ### Lists and Enumerations
+
 ===== CHUNK 11 =====
+
 1. **Ordered lists** with various items
 2. **Nested content** that includes:
    - Sub-items with details
    - Multiple levels of nesting
 ===== CHUNK 12 =====
-- Multiple levels of nesting
+   - Multiple levels of nesting
    - Different formatting styles
 3. **Mixed content** combining text and code
 
@@ -97,7 +101,7 @@ const chunker1 = new LineChunker();
 const chunker2 = new LineChunker({
   maxLines: 50,
 ===== CHUNK 18 =====
-maxLines: 50,
+  maxLines: 50,
   overlap: 10
 });
 
@@ -109,7 +113,7 @@ const chunker3 = new LineChunker({
   maxChars: 1000,
   overlap: 20
 ===== CHUNK 20 =====
-overlap: 20
+  overlap: 20
 });
 ```
 
@@ -125,7 +129,9 @@ When using the chunker, consider these guidelines:
 2. **Set overlap** to maintain context between chunks
 3. **Monitor performance** with large documents
 4. **Test edge cases** thoroughly
+
 ===== CHUNK 23 =====
+
 ## Conclusion
 
 This test document covers various markdown elements and should provide good coverage for testing the chunking algorithm. The chunker should handle all these elements gracefully while respecting the configured limits.

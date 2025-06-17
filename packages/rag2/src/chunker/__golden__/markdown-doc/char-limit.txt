@@ -4,10 +4,12 @@
 This is a sample markdown document for testing the LineChunker functionality.
 
 ## Introduction
+
 ===== CHUNK 2 =====
 The purpose of this document is to provide a realistic test fixture for chunking markdown content. It includes various markdown elements like headers, paragraphs, lists, and code blocks.
 
 ## Features
+
 ===== CHUNK 3 =====
 ### Basic Text Processing
 
@@ -21,6 +23,7 @@ The chunker should handle regular paragraphs effectively. This includes:
 ### Code Blocks
 
 Here's an example of TypeScript code:
+
 ===== CHUNK 5 =====
 ```typescript
 interface ChunkerOptions {
@@ -31,8 +34,9 @@ interface ChunkerOptions {
 
 class Chunker {
   constructor(private options: ChunkerOptions) {}
+  
 ===== CHUNK 6 =====
-chunk(text: string): string[] {
+  chunk(text: string): string[] {
     // Implementation details
     return [];
   }
@@ -44,7 +48,7 @@ chunk(text: string): string[] {
 1. **Ordered lists** with various items
 2. **Nested content** that includes:
 ===== CHUNK 7 =====
-- Sub-items with details
+   - Sub-items with details
    - Multiple levels of nesting
    - Different formatting styles
 3. **Mixed content** combining text and code
@@ -59,6 +63,7 @@ chunk(text: string): string[] {
 | Overlap support | Configurable overlap | ✓ |
 
 ## Advanced Usage
+
 ===== CHUNK 9 =====
 ### Configuration Examples
 
@@ -82,6 +87,7 @@ const chunker3 = new LineChunker({
   overlap: 20
 });
 ```
+
 ===== CHUNK 11 =====
 ### Best Practices
 
@@ -94,6 +100,7 @@ When using the chunker, consider these guidelines:
 4. **Test edge cases** thoroughly
 
 ## Conclusion
+
 ===== CHUNK 13 =====
 This test document covers various markdown elements and should provide good coverage for testing the chunking algorithm. The chunker should handle all these elements gracefully while respecting the co
 ===== CHUNK 14 =====

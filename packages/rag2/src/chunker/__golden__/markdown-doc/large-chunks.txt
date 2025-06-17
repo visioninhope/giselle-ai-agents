@@ -48,7 +48,9 @@ class Chunker {
 3. **Mixed content** combining text and code
 
 ### Tables
+
 ===== CHUNK 2 =====
+
 1. **Ordered lists** with various items
 2. **Nested content** that includes:
    - Sub-items with details

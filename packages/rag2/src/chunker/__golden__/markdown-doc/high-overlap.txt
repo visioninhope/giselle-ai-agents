@@ -8,6 +8,7 @@ This is a sample markdown document for testing the LineChunker functionality.
 The purpose of this document is to provide a realistic test fixture for chunking markdown content. It includes various markdown elements like headers, paragraphs, lists, and code blocks.
 
 ## Features
+
 ===== CHUNK 2 =====
 This is a sample markdown document for testing the LineChunker functionality.
 
@@ -18,6 +19,7 @@ The purpose of this document is to provide a realistic test fixture for chunking
 ## Features
 
 ### Basic Text Processing
+
 ===== CHUNK 3 =====
 ## Introduction
 
@@ -28,6 +30,7 @@ The purpose of this document is to provide a realistic test fixture for chunking
 ### Basic Text Processing
 
 The chunker should handle regular paragraphs effectively. This includes:
+
 ===== CHUNK 4 =====
 The purpose of this document is to provide a realistic test fixture for chunking markdown content. It includes various markdown elements like headers, paragraphs, lists, and code blocks.
 
@@ -49,6 +52,7 @@ The chunker should handle regular paragraphs effectively. This includes:
 - Short sentences
 - Medium-length paragraphs with multiple sentences that explain concepts in detail
 - Long paragraphs that might need to be split across chunks
+
 ===== CHUNK 6 =====
 ### Basic Text Processing
 
@@ -59,6 +63,7 @@ The chunker should handle regular paragraphs effectively. This includes:
 - Long paragraphs that might need to be split across chunks
 
 ### Code Blocks
+
 ===== CHUNK 7 =====
 The chunker should handle regular paragraphs effectively. This includes:
 
@@ -69,6 +74,7 @@ The chunker should handle regular paragraphs effectively. This includes:
 ### Code Blocks
 
 Here's an example of TypeScript code:
+
 ===== CHUNK 8 =====
 - Short sentences
 - Medium-length paragraphs with multiple sentences that explain concepts in detail
@@ -123,8 +129,9 @@ interface ChunkerOptions {
 
 class Chunker {
   constructor(private options: ChunkerOptions) {}
+  
 ===== CHUNK 13 =====
-maxLines: number;
+  maxLines: number;
   overlap: number;
   maxChars: number;
 }
@@ -135,7 +142,7 @@ class Chunker {
   chunk(text: string): string[] {
     // Implementation details
 ===== CHUNK 14 =====
-maxChars: number;
+  maxChars: number;
 }
 
 class Chunker {
@@ -146,6 +153,7 @@ class Chunker {
     return [];
   }
 ===== CHUNK 15 =====
+
 class Chunker {
   constructor(private options: ChunkerOptions) {}
   
@@ -156,7 +164,7 @@ class Chunker {
 }
 ```
 ===== CHUNK 16 =====
-constructor(private options: ChunkerOptions) {}
+  constructor(private options: ChunkerOptions) {}
   
   chunk(text: string): string[] {
     // Implementation details
@@ -167,7 +175,7 @@ constructor(private options: ChunkerOptions) {}
 
 ### Lists and Enumerations
 ===== CHUNK 17 =====
-chunk(text: string): string[] {
+  chunk(text: string): string[] {
     // Implementation details
     return [];
   }
@@ -178,7 +186,7 @@ chunk(text: string): string[] {
 
 1. **Ordered lists** with various items
 ===== CHUNK 18 =====
-return [];
+    return [];
   }
 }
 ```
@@ -200,6 +208,7 @@ return [];
    - Multiple levels of nesting
    - Different formatting styles
 ===== CHUNK 20 =====
+
 ### Lists and Enumerations
 
 1. **Ordered lists** with various items
@@ -208,7 +217,9 @@ return [];
    - Multiple levels of nesting
    - Different formatting styles
 3. **Mixed content** combining text and code
+
 ===== CHUNK 21 =====
+
 1. **Ordered lists** with various items
 2. **Nested content** that includes:
    - Sub-items with details
@@ -217,6 +228,7 @@ return [];
 3. **Mixed content** combining text and code
 
 ### Tables
+
 ===== CHUNK 22 =====
 2. **Nested content** that includes:
    - Sub-items with details
@@ -229,7 +241,7 @@ return [];
 | Feature | Description | Status |
 |---------|-------------|--------|
 ===== CHUNK 23 =====
-- Multiple levels of nesting
+   - Multiple levels of nesting
    - Different formatting styles
 3. **Mixed content** combining text and code
 
@@ -249,6 +261,7 @@ return [];
 | Line-based chunking | Split by line count | ✓ |
 | Character limit | Enforce max chars | ✓ |
 | Overlap support | Configurable overlap | ✓ |
+
 ===== CHUNK 25 =====
 ### Tables
 
@@ -259,6 +272,7 @@ return [];
 | Overlap support | Configurable overlap | ✓ |
 
 ## Advanced Usage
+
 ===== CHUNK 26 =====
 | Feature | Description | Status |
 |---------|-------------|--------|
@@ -269,6 +283,7 @@ return [];
 ## Advanced Usage
 
 ### Configuration Examples
+
 ===== CHUNK 27 =====
 | Line-based chunking | Split by line count | ✓ |
 | Character limit | Enforce max chars | ✓ |
@@ -279,6 +294,7 @@ return [];
 ### Configuration Examples
 
 The chunker can be configured in various ways:
+
 ===== CHUNK 28 =====
 | Overlap support | Configurable overlap | ✓ |
 
@@ -300,6 +316,7 @@ The chunker can be configured in various ways:
 ```typescript
 // Default configuration
 const chunker1 = new LineChunker();
+
 ===== CHUNK 30 =====
 ### Configuration Examples
 
@@ -332,6 +349,7 @@ const chunker2 = new LineChunker({
   maxLines: 50,
   overlap: 10
 });
+
 ===== CHUNK 33 =====
 const chunker1 = new LineChunker();
 
@@ -355,7 +373,7 @@ const chunker3 = new LineChunker({
   maxLines: 100,
   maxChars: 1000,
 ===== CHUNK 35 =====
-maxLines: 50,
+  maxLines: 50,
   overlap: 10
 });
 
@@ -375,6 +393,7 @@ const chunker3 = new LineChunker({
   overlap: 20
 });
 ```
+
 ===== CHUNK 37 =====
 // Character-based limits
 const chunker3 = new LineChunker({
@@ -385,8 +404,9 @@ const chunker3 = new LineChunker({
 ```
 
 ### Best Practices
+
 ===== CHUNK 38 =====
-maxLines: 100,
+  maxLines: 100,
   maxChars: 1000,
   overlap: 20
 });
@@ -395,8 +415,9 @@ maxLines: 100,
 ### Best Practices
 
 When using the chunker, consider these guidelines:
+
 ===== CHUNK 39 =====
-overlap: 20
+  overlap: 20
 });
 ```
 

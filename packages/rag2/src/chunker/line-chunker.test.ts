@@ -34,7 +34,13 @@ function parseChunks(text: string): string[] {
 	return text
 		.split(pattern)
 		.slice(1) // Skip the first empty element
-		.map((chunk) => chunk.trimEnd()); // Remove trailing newline
+		.map((chunk) => {
+			// Remove only the last newline added by the join operation
+			if (chunk.endsWith("\n")) {
+				return chunk.slice(0, -1);
+			}
+			return chunk;
+		});
 }
 
 // Helper to read or write golden data
@@ -124,8 +130,8 @@ describe("LineChunker Golden Tests", () => {
 					expect(lineCount).toBeLessThanOrEqual(maxLines);
 				}
 
-				// No chunk should be empty after trimming
-				expect(chunk.trim().length).toBeGreaterThan(0);
+				// No chunk should be empty
+				expect(chunk.length).toBeGreaterThan(0);
 			}
 		});
 

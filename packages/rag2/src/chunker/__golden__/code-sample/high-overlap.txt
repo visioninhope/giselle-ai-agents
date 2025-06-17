@@ -10,6 +10,7 @@ export interface User {
 	updatedAt: Date;
 }
 ===== CHUNK 2 =====
+
 export interface User {
 	id: string;
 	name: string;
@@ -20,7 +21,7 @@ export interface User {
 
 export interface Post {
 ===== CHUNK 3 =====
-id: string;
+	id: string;
 	name: string;
 	email: string;
 	createdAt: Date;
@@ -31,7 +32,7 @@ export interface Post {
 	id: string;
 	title: string;
 ===== CHUNK 4 =====
-email: string;
+	email: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -42,7 +43,7 @@ export interface Post {
 	content: string;
 	authorId: string;
 ===== CHUNK 5 =====
-updatedAt: Date;
+	updatedAt: Date;
 }
 
 export interface Post {
@@ -53,6 +54,7 @@ export interface Post {
 	tags: string[];
 	published: boolean;
 ===== CHUNK 6 =====
+
 export interface Post {
 	id: string;
 	title: string;
@@ -63,7 +65,7 @@ export interface Post {
 	publishedAt?: Date;
 	createdAt: Date;
 ===== CHUNK 7 =====
-id: string;
+	id: string;
 	title: string;
 	content: string;
 	authorId: string;
@@ -74,7 +76,7 @@ id: string;
 	updatedAt: Date;
 }
 ===== CHUNK 8 =====
-content: string;
+	content: string;
 	authorId: string;
 	tags: string[];
 	published: boolean;
@@ -85,7 +87,7 @@ content: string;
 
 export class UserService {
 ===== CHUNK 9 =====
-tags: string[];
+	tags: string[];
 	published: boolean;
 	publishedAt?: Date;
 	createdAt: Date;
@@ -94,8 +96,9 @@ tags: string[];
 
 export class UserService {
 	constructor(private readonly db: Database) {}
+
 ===== CHUNK 10 =====
-publishedAt?: Date;
+	publishedAt?: Date;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -106,7 +109,7 @@ export class UserService {
 	async findById(id: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
 ===== CHUNK 11 =====
-updatedAt: Date;
+	updatedAt: Date;
 }
 
 export class UserService {
@@ -117,6 +120,7 @@ export class UserService {
 			where: { id },
 		});
 ===== CHUNK 12 =====
+
 export class UserService {
 	constructor(private readonly db: Database) {}
 
@@ -127,7 +131,7 @@ export class UserService {
 		return user;
 	}
 ===== CHUNK 13 =====
-constructor(private readonly db: Database) {}
+	constructor(private readonly db: Database) {}
 
 	async findById(id: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
@@ -138,7 +142,7 @@ constructor(private readonly db: Database) {}
 
 	async findByEmail(email: string): Promise<User | null> {
 ===== CHUNK 14 =====
-async findById(id: string): Promise<User | null> {
+	async findById(id: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
 			where: { id },
 		});
@@ -149,7 +153,7 @@ async findById(id: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
 			where: { email },
 ===== CHUNK 15 =====
-where: { id },
+			where: { id },
 		});
 		return user;
 	}
@@ -160,7 +164,7 @@ where: { id },
 		});
 		return user;
 ===== CHUNK 16 =====
-return user;
+		return user;
 	}
 
 	async findByEmail(email: string): Promise<User | null> {
@@ -169,8 +173,10 @@ return user;
 		});
 		return user;
 	}
+
 ===== CHUNK 17 =====
-async findByEmail(email: string): Promise<User | null> {
+
+	async findByEmail(email: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
 			where: { email },
 		});
@@ -180,7 +186,7 @@ async findByEmail(email: string): Promise<User | null> {
 	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
 ===== CHUNK 18 =====
-const user = await this.db.users.findUnique({
+		const user = await this.db.users.findUnique({
 			where: { email },
 		});
 		return user;
@@ -191,7 +197,7 @@ const user = await this.db.users.findUnique({
 			data: {
 				...data,
 ===== CHUNK 19 =====
-});
+		});
 		return user;
 	}
 
@@ -202,7 +208,7 @@ const user = await this.db.users.findUnique({
 				createdAt: new Date(),
 				updatedAt: new Date(),
 ===== CHUNK 20 =====
-}
+	}
 
 	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
@@ -213,7 +219,7 @@ const user = await this.db.users.findUnique({
 			},
 		});
 ===== CHUNK 21 =====
-async create(data: CreateUserInput): Promise<User> {
+	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
 			data: {
 				...data,
@@ -224,7 +230,7 @@ async create(data: CreateUserInput): Promise<User> {
 		return user;
 	}
 ===== CHUNK 22 =====
-data: {
+			data: {
 				...data,
 				createdAt: new Date(),
 				updatedAt: new Date(),
@@ -235,7 +241,7 @@ data: {
 
 	async update(id: string, data: UpdateUserInput): Promise<User> {
 ===== CHUNK 23 =====
-createdAt: new Date(),
+				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 		});
@@ -246,7 +252,7 @@ createdAt: new Date(),
 		const user = await this.db.users.update({
 			where: { id },
 ===== CHUNK 24 =====
-},
+			},
 		});
 		return user;
 	}
@@ -257,7 +263,7 @@ createdAt: new Date(),
 			data: {
 				...data,
 ===== CHUNK 25 =====
-return user;
+		return user;
 	}
 
 	async update(id: string, data: UpdateUserInput): Promise<User> {
@@ -268,7 +274,8 @@ return user;
 				updatedAt: new Date(),
 			},
 ===== CHUNK 26 =====
-async update(id: string, data: UpdateUserInput): Promise<User> {
+
+	async update(id: string, data: UpdateUserInput): Promise<User> {
 		const user = await this.db.users.update({
 			where: { id },
 			data: {
@@ -278,7 +285,7 @@ async update(id: string, data: UpdateUserInput): Promise<User> {
 		});
 		return user;
 ===== CHUNK 27 =====
-const user = await this.db.users.update({
+		const user = await this.db.users.update({
 			where: { id },
 			data: {
 				...data,
@@ -287,8 +294,9 @@ const user = await this.db.users.update({
 		});
 		return user;
 	}
+
 ===== CHUNK 28 =====
-data: {
+			data: {
 				...data,
 				updatedAt: new Date(),
 			},
@@ -299,7 +307,7 @@ data: {
 	async delete(id: string): Promise<void> {
 		await this.db.users.delete({
 ===== CHUNK 29 =====
-updatedAt: new Date(),
+				updatedAt: new Date(),
 			},
 		});
 		return user;
@@ -310,7 +318,7 @@ updatedAt: new Date(),
 			where: { id },
 		});
 ===== CHUNK 30 =====
-});
+		});
 		return user;
 	}
 
@@ -321,7 +329,7 @@ updatedAt: new Date(),
 	}
 }
 ===== CHUNK 31 =====
-}
+	}
 
 	async delete(id: string): Promise<void> {
 		await this.db.users.delete({
@@ -332,7 +340,7 @@ updatedAt: new Date(),
 
 export class PostService {
 ===== CHUNK 32 =====
-async delete(id: string): Promise<void> {
+	async delete(id: string): Promise<void> {
 		await this.db.users.delete({
 			where: { id },
 		});
@@ -341,8 +349,9 @@ async delete(id: string): Promise<void> {
 
 export class PostService {
 	constructor(private readonly db: Database) {}
+
 ===== CHUNK 33 =====
-where: { id },
+			where: { id },
 		});
 	}
 }
@@ -353,7 +362,7 @@ export class PostService {
 	async findById(id: string): Promise<Post | null> {
 		const post = await this.db.posts.findUnique({
 ===== CHUNK 34 =====
-}
+	}
 }
 
 export class PostService {
@@ -364,6 +373,7 @@ export class PostService {
 			where: { id },
 			include: { author: true },
 ===== CHUNK 35 =====
+
 export class PostService {
 	constructor(private readonly db: Database) {}
 
@@ -374,7 +384,7 @@ export class PostService {
 		});
 		return post;
 ===== CHUNK 36 =====
-constructor(private readonly db: Database) {}
+	constructor(private readonly db: Database) {}
 
 	async findById(id: string): Promise<Post | null> {
 		const post = await this.db.posts.findUnique({
@@ -383,8 +393,9 @@ constructor(private readonly db: Database) {}
 		});
 		return post;
 	}
+
 ===== CHUNK 37 =====
-async findById(id: string): Promise<Post | null> {
+	async findById(id: string): Promise<Post | null> {
 		const post = await this.db.posts.findUnique({
 			where: { id },
 			include: { author: true },
@@ -395,7 +406,7 @@ async findById(id: string): Promise<Post | null> {
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 ===== CHUNK 38 =====
-where: { id },
+			where: { id },
 			include: { author: true },
 		});
 		return post;
@@ -406,7 +417,7 @@ where: { id },
 			where: { authorId },
 			orderBy: { createdAt: "desc" },
 ===== CHUNK 39 =====
-});
+		});
 		return post;
 	}
 
@@ -417,7 +428,7 @@ where: { id },
 		});
 		return posts;
 ===== CHUNK 40 =====
-}
+	}
 
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
@@ -426,8 +437,9 @@ where: { id },
 		});
 		return posts;
 	}
+
 ===== CHUNK 41 =====
-async findByAuthor(authorId: string): Promise<Post[]> {
+	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
 			orderBy: { createdAt: "desc" },
@@ -438,7 +450,7 @@ async findByAuthor(authorId: string): Promise<Post[]> {
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 ===== CHUNK 42 =====
-where: { authorId },
+			where: { authorId },
 			orderBy: { createdAt: "desc" },
 		});
 		return posts;
@@ -449,7 +461,7 @@ where: { authorId },
 			where: { published: true },
 			orderBy: { publishedAt: "desc" },
 ===== CHUNK 43 =====
-});
+		});
 		return posts;
 	}
 
@@ -460,7 +472,7 @@ where: { authorId },
 		});
 		return posts;
 ===== CHUNK 44 =====
-}
+	}
 
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
@@ -469,8 +481,9 @@ where: { authorId },
 		});
 		return posts;
 	}
+
 ===== CHUNK 45 =====
-async findPublished(): Promise<Post[]> {
+	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
 			orderBy: { publishedAt: "desc" },
@@ -481,7 +494,7 @@ async findPublished(): Promise<Post[]> {
 	async create(data: CreatePostInput): Promise<Post> {
 		const post = await this.db.posts.create({
 ===== CHUNK 46 =====
-where: { published: true },
+			where: { published: true },
 			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
@@ -492,7 +505,7 @@ where: { published: true },
 			data: {
 				...data,
 ===== CHUNK 47 =====
-});
+		});
 		return posts;
 	}
 
@@ -503,7 +516,7 @@ where: { published: true },
 				createdAt: new Date(),
 				updatedAt: new Date(),
 ===== CHUNK 48 =====
-}
+	}
 
 	async create(data: CreatePostInput): Promise<Post> {
 		const post = await this.db.posts.create({
@@ -514,7 +527,7 @@ where: { published: true },
 			},
 		});
 ===== CHUNK 49 =====
-async create(data: CreatePostInput): Promise<Post> {
+	async create(data: CreatePostInput): Promise<Post> {
 		const post = await this.db.posts.create({
 			data: {
 				...data,
@@ -525,7 +538,7 @@ async create(data: CreatePostInput): Promise<Post> {
 		return post;
 	}
 ===== CHUNK 50 =====
-data: {
+			data: {
 				...data,
 				createdAt: new Date(),
 				updatedAt: new Date(),
@@ -536,7 +549,7 @@ data: {
 
 	async publish(id: string): Promise<Post> {
 ===== CHUNK 51 =====
-createdAt: new Date(),
+				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
 		});
@@ -547,7 +560,7 @@ createdAt: new Date(),
 		const post = await this.db.posts.update({
 			where: { id },
 ===== CHUNK 52 =====
-},
+			},
 		});
 		return post;
 	}
@@ -558,7 +571,7 @@ createdAt: new Date(),
 			data: {
 				published: true,
 ===== CHUNK 53 =====
-return post;
+		return post;
 	}
 
 	async publish(id: string): Promise<Post> {
@@ -569,7 +582,8 @@ return post;
 				publishedAt: new Date(),
 				updatedAt: new Date(),
 ===== CHUNK 54 =====
-async publish(id: string): Promise<Post> {
+
+	async publish(id: string): Promise<Post> {
 		const post = await this.db.posts.update({
 			where: { id },
 			data: {
@@ -579,7 +593,7 @@ async publish(id: string): Promise<Post> {
 			},
 		});
 ===== CHUNK 55 =====
-const post = await this.db.posts.update({
+		const post = await this.db.posts.update({
 			where: { id },
 			data: {
 				published: true,
@@ -590,7 +604,7 @@ const post = await this.db.posts.update({
 		return post;
 	}
 ===== CHUNK 56 =====
-data: {
+			data: {
 				published: true,
 				publishedAt: new Date(),
 				updatedAt: new Date(),
@@ -599,8 +613,9 @@ data: {
 		return post;
 	}
 }
+
 ===== CHUNK 57 =====
-publishedAt: new Date(),
+				publishedAt: new Date(),
 				updatedAt: new Date(),
 			},
 		});
@@ -611,7 +626,7 @@ publishedAt: new Date(),
 // Database interface
 interface Database {
 ===== CHUNK 58 =====
-},
+			},
 		});
 		return post;
 	}
@@ -622,7 +637,7 @@ interface Database {
 	users: unknown;
 	posts: unknown;
 ===== CHUNK 59 =====
-return post;
+		return post;
 	}
 }
 
@@ -631,6 +646,7 @@ interface Database {
 	users: unknown;
 	posts: unknown;
 }
+
 ===== CHUNK 60 =====
 }
 
@@ -654,7 +670,7 @@ interface CreateUserInput {
 	name: string;
 	email: string;
 ===== CHUNK 62 =====
-users: unknown;
+	users: unknown;
 	posts: unknown;
 }
 
@@ -663,6 +679,7 @@ interface CreateUserInput {
 	name: string;
 	email: string;
 }
+
 ===== CHUNK 63 =====
 }
 
@@ -686,7 +703,7 @@ interface UpdateUserInput {
 	email?: string;
 }
 ===== CHUNK 65 =====
-name: string;
+	name: string;
 	email: string;
 }
 
@@ -719,7 +736,7 @@ interface CreatePostInput {
 	authorId: string;
 	tags: string[];
 ===== CHUNK 68 =====
-email?: string;
+	email?: string;
 }
 
 interface CreatePostInput {
@@ -728,3 +745,13 @@ interface CreatePostInput {
 	authorId: string;
 	tags: string[];
 }
+
+===== CHUNK 69 =====
+
+interface CreatePostInput {
+	title: string;
+	content: string;
+	authorId: string;
+	tags: string[];
+}
+

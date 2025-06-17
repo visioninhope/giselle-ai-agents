@@ -50,7 +50,7 @@ export class UserService {
 		return user;
 	}
 ===== CHUNK 2 =====
-async create(data: CreateUserInput): Promise<User> {
+	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
 			data: {
 				...data,
@@ -101,7 +101,7 @@ export class PostService {
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 ===== CHUNK 3 =====
-async findByAuthor(authorId: string): Promise<Post[]> {
+	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
 			orderBy: { createdAt: "desc" },
@@ -175,3 +175,4 @@ interface CreatePostInput {
 	authorId: string;
 	tags: string[];
 }
+
