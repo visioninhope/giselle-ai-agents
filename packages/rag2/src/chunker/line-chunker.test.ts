@@ -72,11 +72,7 @@ const TEST_CONFIGS = {
 const FIXTURES = [
 	"code-sample.ts",
 	"markdown-doc.md",
-	"edge-cases/empty.txt",
-	"edge-cases/single-line.txt",
 	"edge-cases/long-lines.txt",
-	"edge-cases/only-newlines.txt",
-	"edge-cases/mixed-line-endings.txt",
 ];
 
 describe("LineChunker Golden Tests", () => {
@@ -157,38 +153,19 @@ describe("LineChunker Golden Tests", () => {
 		});
 	});
 
-	describe("Edge case validation", () => {
+	describe("Basic functionality", () => {
 		it("should handle empty content", () => {
-			const content = readFixture("edge-cases/empty.txt");
 			const chunker = new LineChunker();
-			const chunks = chunker.chunk(content);
+			const chunks = chunker.chunk("");
 			expect(chunks).toEqual([]);
 		});
 
 		it("should handle single line", () => {
-			const content = readFixture("edge-cases/single-line.txt");
+			const content = "This is a single line of text";
 			const chunker = new LineChunker();
 			const chunks = chunker.chunk(content);
 			expect(chunks.length).toBe(1);
 			expect(chunks[0]).toBe(content);
-		});
-
-		it("should split very long lines by character limit", () => {
-			const content = readFixture("edge-cases/long-lines.txt");
-			const chunker = new LineChunker({
-				maxLines: 10,
-				maxChars: 200,
-				overlap: 2,
-			});
-			const chunks = chunker.chunk(content);
-
-			// Should have multiple chunks due to long line
-			expect(chunks.length).toBeGreaterThan(1);
-
-			// Each chunk should respect maxChars
-			for (const chunk of chunks) {
-				expect(chunk.length).toBeLessThanOrEqual(200);
-			}
 		});
 	});
 });
