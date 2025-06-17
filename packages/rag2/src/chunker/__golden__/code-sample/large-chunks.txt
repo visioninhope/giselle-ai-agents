@@ -1,4 +1,5 @@
 ===== CHUNK 1 =====
+// @ts-nocheck
 // Sample TypeScript code for testing chunking behavior
 // This is a test fixture representing typical code structure
 
@@ -48,8 +49,8 @@ export class UserService {
 			},
 		});
 		return user;
-	}
 ===== CHUNK 2 =====
+
 	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
 			data: {
@@ -99,8 +100,8 @@ export class PostService {
 	}
 
 	async findPublished(): Promise<Post[]> {
-		const posts = await this.db.posts.findMany({
 ===== CHUNK 3 =====
+
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
@@ -150,8 +151,8 @@ interface Database {
 // Input types
 interface CreateUserInput {
 	name: string;
-	email: string;
 ===== CHUNK 4 =====
+
 // Database interface
 interface Database {
 	users: unknown;

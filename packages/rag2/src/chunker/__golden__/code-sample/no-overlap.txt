@@ -1,4 +1,5 @@
 ===== CHUNK 1 =====
+// @ts-nocheck
 // Sample TypeScript code for testing chunking behavior
 // This is a test fixture representing typical code structure
 
@@ -8,8 +9,8 @@ export interface User {
 	email: string;
 	createdAt: Date;
 	updatedAt: Date;
-}
 ===== CHUNK 2 =====
+}
 
 export interface Post {
 	id: string;
@@ -19,8 +20,8 @@ export interface Post {
 	tags: string[];
 	published: boolean;
 	publishedAt?: Date;
-	createdAt: Date;
 ===== CHUNK 3 =====
+	createdAt: Date;
 	updatedAt: Date;
 }
 
@@ -30,8 +31,8 @@ export class UserService {
 	async findById(id: string): Promise<User | null> {
 		const user = await this.db.users.findUnique({
 			where: { id },
-		});
 ===== CHUNK 4 =====
+		});
 		return user;
 	}
 
@@ -41,8 +42,8 @@ export class UserService {
 		});
 		return user;
 	}
-
 ===== CHUNK 5 =====
+
 	async create(data: CreateUserInput): Promise<User> {
 		const user = await this.db.users.create({
 			data: {
@@ -52,8 +53,8 @@ export class UserService {
 			},
 		});
 		return user;
-	}
 ===== CHUNK 6 =====
+	}
 
 	async update(id: string, data: UpdateUserInput): Promise<User> {
 		const user = await this.db.users.update({
@@ -63,8 +64,8 @@ export class UserService {
 				updatedAt: new Date(),
 			},
 		});
-		return user;
 ===== CHUNK 7 =====
+		return user;
 	}
 
 	async delete(id: string): Promise<void> {
@@ -74,8 +75,8 @@ export class UserService {
 	}
 }
 
-export class PostService {
 ===== CHUNK 8 =====
+export class PostService {
 	constructor(private readonly db: Database) {}
 
 	async findById(id: string): Promise<Post | null> {
@@ -85,8 +86,8 @@ export class PostService {
 		});
 		return post;
 	}
-
 ===== CHUNK 9 =====
+
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
@@ -96,8 +97,8 @@ export class PostService {
 	}
 
 	async findPublished(): Promise<Post[]> {
-		const posts = await this.db.posts.findMany({
 ===== CHUNK 10 =====
+		const posts = await this.db.posts.findMany({
 			where: { published: true },
 			orderBy: { publishedAt: "desc" },
 		});
@@ -107,8 +108,8 @@ export class PostService {
 	async create(data: CreatePostInput): Promise<Post> {
 		const post = await this.db.posts.create({
 			data: {
-				...data,
 ===== CHUNK 11 =====
+				...data,
 				createdAt: new Date(),
 				updatedAt: new Date(),
 			},
@@ -118,8 +119,8 @@ export class PostService {
 
 	async publish(id: string): Promise<Post> {
 		const post = await this.db.posts.update({
-			where: { id },
 ===== CHUNK 12 =====
+			where: { id },
 			data: {
 				published: true,
 				publishedAt: new Date(),
@@ -129,8 +130,8 @@ export class PostService {
 		return post;
 	}
 }
-
 ===== CHUNK 13 =====
+
 // Database interface
 interface Database {
 	users: unknown;
@@ -140,8 +141,8 @@ interface Database {
 // Input types
 interface CreateUserInput {
 	name: string;
-	email: string;
 ===== CHUNK 14 =====
+	email: string;
 }
 
 interface UpdateUserInput {
@@ -151,8 +152,8 @@ interface UpdateUserInput {
 
 interface CreatePostInput {
 	title: string;
-	content: string;
 ===== CHUNK 15 =====
+	content: string;
 	authorId: string;
 	tags: string[];
 }

@@ -1,12 +1,13 @@
 ===== CHUNK 1 =====
+// @ts-nocheck
 // Sample TypeScript code for testing chunking behavior
 // This is a test fixture representing typical code structure
 
 export interface User {
 	id: string;
 	name: string;
-	email: string;
 ===== CHUNK 2 =====
+	email: string;
 	createdAt: Date;
 	updatedAt: Date;
 }
@@ -18,8 +19,8 @@ export interface Post {
 	authorId: string;
 	tags: string[];
 	published: boolean;
-	publishedAt?: Date;
 ===== CHUNK 3 =====
+	publishedAt?: Date;
 	createdAt: Date;
 	updatedAt: Date;
 }
