@@ -1,20 +1,51 @@
 import {
+	type FlowTrigger,
 	type FlowTriggerId,
 	type GenerationContextInput,
 	GenerationId,
 	type Job,
 	type QueuedGeneration,
-	RunId,
 	type Workflow,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
+import type { Storage } from "unstorage";
 import { generateImage, generateText } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces/utils";
 import { resolveTrigger } from "./resolve-trigger";
+import { FlowRunId, type FlowRunObject } from "./run/object";
+import { flowRunPath } from "./run/paths";
 import { getFlowTrigger } from "./utils";
+
+async function createFlowRun(parameters: {
+	storage: Storage;
+	flow: Workflow;
+	trigger: FlowTrigger;
+}) {
+	const flowRun: FlowRunObject = {
+		id: FlowRunId.generate(),
+		workspaceId: parameters.trigger.workspaceId,
+		status: "inProgress",
+		steps: {
+			queued: parameters.flow.jobs.length,
+			inProgress: 0,
+			completed: 0,
+			failed: 0,
+			cancelled: 0,
+		},
+		trigger: parameters.trigger.configuration.provider,
+		duration: 0,
+		usage: {
+			promptTokens: 0,
+			completionTokens: 0,
+			totalTokens: 0,
+		},
+	};
+	await parameters.storage.setItem(flowRunPath(flowRun.id), flowRun);
+	return flowRun;
+}
 
 /** @todo telemetry */
 export async function runFlow(args: {
@@ -50,11 +81,19 @@ export async function runFlow(args: {
 
 	await args.callbacks?.flowCreate?.({ flow });
 
-	const runId = RunId.generate();
+	let flowRun = awaitcreateFlowRun({
+		storage: args.context.storage,
+		trigger,
+		flow,
+	});
+	await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
 	for (const job of flow.jobs) {
 		if (args.callbacks?.jobStart) {
 			await args.callbacks.jobStart({ job });
 		}
+		flowRun = {
+			...flowRun,
+		};
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
@@ -66,8 +105,8 @@ export async function runFlow(args: {
 						connections: operation.connections,
 						sourceNodes: operation.sourceNodes,
 						origin: {
-							type: "run",
-							id: runId,
+							type: "flowRun",
+							id: flowRun.id,
 							workspaceId: trigger.workspaceId,
 						},
 						inputs:

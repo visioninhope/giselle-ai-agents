@@ -1,4 +1,5 @@
 import type { WebhookEvent } from "@giselle-sdk/github-tool";
+import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
 import { Connection } from "../connection";
 import { Node, NodeLike, OperationNode, OperationNodeLike } from "../node";
@@ -12,6 +13,11 @@ export type GenerationOriginTypeWorkspace = z.infer<
 
 export const GenerationOriginTypeRun = z.literal("run");
 export type GenerationOriginTypeRun = z.infer<typeof GenerationOriginTypeRun>;
+
+export const GenerationOriginTypeFlowRun = z.literal("flowRun");
+export type GenerationOriginTypeFlowRun = z.infer<
+	typeof GenerationOriginTypeFlowRun
+>;
 
 export const GenerationOriginType = z.union([
 	GenerationOriginTypeWorkspace,
@@ -34,9 +40,19 @@ export const GenerationOriginRun = z.object({
 });
 export type GenerationOriginRun = z.infer<typeof GenerationOriginRun>;
 
+// Temporary definition, will reference GiselleEngine's definition once migrated
+// there, but duplicating the definition for now
+const FlowRunId = createIdGenerator("flrn");
+const GenerationOriginFlowRun = z.object({
+	id: FlowRunId.schema,
+	workspaceId: WorkspaceId.schema,
+	type: GenerationOriginTypeFlowRun,
+});
+
 export const GenerationOrigin = z.discriminatedUnion("type", [
 	GenerationOriginWorkspace,
 	GenerationOriginRun,
+	GenerationOriginFlowRun,
 ]);
 export type GenerationOrigin = z.infer<typeof GenerationOrigin>;
 
