@@ -5,6 +5,7 @@ import {
 	GenerationId,
 	type Job,
 	type QueuedGeneration,
+	RunId,
 	type Workflow,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
@@ -86,6 +87,7 @@ export async function runFlow(args: {
 
 	await args.callbacks?.flowCreate?.({ flow });
 
+	const runId = RunId.generate();
 	let flowRun = await createFlowRun({
 		storage: args.context.storage,
 		trigger,
@@ -119,8 +121,8 @@ export async function runFlow(args: {
 						connections: operation.connections,
 						sourceNodes: operation.sourceNodes,
 						origin: {
-							type: "flowRun",
-							id: flowRun.id,
+							type: "run",
+							id: runId,
 							workspaceId: trigger.workspaceId,
 						},
 						inputs:
