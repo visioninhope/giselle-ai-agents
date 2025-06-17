@@ -1,5 +1,4 @@
 import {
-	type FlowTrigger,
 	type FlowTriggerId,
 	type GenerationContextInput,
 	GenerationId,
@@ -7,6 +6,7 @@ import {
 	type QueuedGeneration,
 	RunId,
 	type Workflow,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import type { Storage } from "unstorage";
@@ -27,21 +27,22 @@ import { getFlowTrigger } from "./utils";
 
 async function createFlowRun(parameters: {
 	storage: Storage;
-	flow: Workflow;
-	trigger: FlowTrigger;
+	jobsCount: number;
+	trigger: string;
+	workspaceId: WorkspaceId;
 }) {
 	const flowRun: FlowRunObject = {
 		id: FlowRunId.generate(),
-		workspaceId: parameters.trigger.workspaceId,
+		workspaceId: parameters.workspaceId,
 		status: "inProgress",
 		steps: {
-			queued: parameters.flow.jobs.length,
+			queued: parameters.jobsCount,
 			inProgress: 0,
 			completed: 0,
 			failed: 0,
 			cancelled: 0,
 		},
-		trigger: parameters.trigger.configuration.provider,
+		trigger: parameters.trigger,
 		duration: 0,
 		usage: {
 			promptTokens: 0,
@@ -90,8 +91,9 @@ export async function runFlow(args: {
 	const runId = RunId.generate();
 	let flowRun = await createFlowRun({
 		storage: args.context.storage,
-		trigger,
-		flow,
+		trigger: trigger.configuration.provider,
+		workspaceId: trigger.workspaceId,
+		jobsCount: flow.jobs.length,
 	});
 	await Promise.all([
 		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
