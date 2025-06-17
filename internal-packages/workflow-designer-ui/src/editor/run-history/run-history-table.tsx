@@ -8,12 +8,10 @@ import {
 } from "@giselle-internal/ui/table";
 import clsx from "clsx/lite";
 import {
-	CheckIcon,
 	CircleAlertIcon,
 	CircleCheckIcon,
 	CircleDotIcon,
 	CircleXIcon,
-	LoaderCircleIcon,
 } from "lucide-react";
 
 const dummyData = [
