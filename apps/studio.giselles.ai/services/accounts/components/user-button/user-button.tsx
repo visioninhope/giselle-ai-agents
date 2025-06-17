@@ -29,7 +29,7 @@ export const UserButton: FC = async () => {
 
 	return (
 		<DropdownMenu>
-			<DropdownMenuTrigger className="cursor-pointer">
+			<DropdownMenuTrigger className="cursor-pointer" aria-label="Profile menu">
 				<AvatarImage
 					className="w-9 h-9 rounded-full"
 					avatarUrl={avatarUrl}
