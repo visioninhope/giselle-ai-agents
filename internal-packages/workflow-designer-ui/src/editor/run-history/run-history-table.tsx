@@ -34,11 +34,6 @@ const dummyData = [
 		},
 		trigger: "Manual",
 		duration: "18s",
-		anotations: [
-			{
-				level: "warning",
-			},
-		],
 	},
 	{
 		id: 3,
