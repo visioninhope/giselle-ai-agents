@@ -158,7 +158,7 @@ export class LineChunker implements Chunker {
 			}
 		}
 
-		return chunks.filter((chunk) => chunk.trim().length > 0);
+		return chunks.filter((chunk) => chunk.length > 0);
 	}
 
 	/**
@@ -217,7 +217,7 @@ export class LineChunker implements Chunker {
 		currentOverlap: number,
 	): ChunkInfo {
 		const chunkLines = lines.slice(startIndex, endIndex);
-		const content = chunkLines.join("\n").trim();
+		const content = chunkLines.join("\n");
 
 		return {
 			startIndex,
@@ -300,7 +300,7 @@ export class LineChunker implements Chunker {
 		return Array.from(
 			{ length: Math.ceil(content.length / this.maxChars) },
 			(_, k) =>
-				content.slice(k * this.maxChars, (k + 1) * this.maxChars).trim(),
-		).filter(Boolean);
+				content.slice(k * this.maxChars, (k + 1) * this.maxChars),
+		).filter((chunk) => chunk.length > 0);
 	}
 }
