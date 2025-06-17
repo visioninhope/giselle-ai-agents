@@ -123,7 +123,7 @@ export function TriggerInputDialog({
 					onSubmit={handleSubmit}
 				>
 					<p className="text-[12px] mb-[8px] text-black-400 font-sans font-semibold">
-						Execute this workflow with custom input values
+						Execute this flow with custom input values
 					</p>
 
 					{requiresActionNodes.length > 0 && (
