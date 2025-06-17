@@ -745,13 +745,3 @@ interface CreatePostInput {
 	authorId: string;
 	tags: string[];
 }
-
-===== CHUNK 69 =====
-
-interface CreatePostInput {
-	title: string;
-	content: string;
-	authorId: string;
-	tags: string[];
-}
-

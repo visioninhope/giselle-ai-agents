@@ -141,4 +141,3 @@ interface CreatePostInput {
 	authorId: string;
 	tags: string[];
 }
-

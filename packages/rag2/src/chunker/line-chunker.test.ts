@@ -31,12 +31,13 @@ function formatChunks(chunks: string[]): string {
 // Helper to parse delimiter-separated text back to chunks
 function parseChunks(text: string): string[] {
 	const pattern = new RegExp(`${CHUNK_DELIMITER} \\d+ =====\\n`, "g");
-	return text
-		.split(pattern)
+	const parts = text.split(pattern);
+	return parts
 		.slice(1) // Skip the first empty element
-		.map((chunk) => {
-			// Remove only the last newline added by the join operation
-			if (chunk.endsWith("\n")) {
+		.map((chunk, index) => {
+			// Only remove the trailing newline if it's not the last chunk
+			// or if the original text ends with a delimiter
+			if (index < parts.length - 2 && chunk.endsWith("\n")) {
 				return chunk.slice(0, -1);
 			}
 			return chunk;

@@ -299,8 +299,7 @@ export class LineChunker implements Chunker {
 	private splitLongContent(content: string): string[] {
 		return Array.from(
 			{ length: Math.ceil(content.length / this.maxChars) },
-			(_, k) =>
-				content.slice(k * this.maxChars, (k + 1) * this.maxChars),
+			(_, k) => content.slice(k * this.maxChars, (k + 1) * this.maxChars),
 		).filter((chunk) => chunk.length > 0);
 	}
 }
