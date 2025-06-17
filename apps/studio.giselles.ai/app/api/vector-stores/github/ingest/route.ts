@@ -25,7 +25,6 @@ export async function GET(request: NextRequest) {
 			targetGitHubRepository;
 
 		try {
-			// Update status to running
 			await updateRepositoryStatus(dbId, "running");
 
 			const octokitClient = buildOctokit(installationId);
@@ -42,7 +41,6 @@ export async function GET(request: NextRequest) {
 				teamDbId,
 			});
 
-			// Update status to completed
 			await updateRepositoryStatus(dbId, "completed", commit.sha);
 		} catch (error) {
 			console.error(`Failed to ingest ${owner}/${repo}:`, error);

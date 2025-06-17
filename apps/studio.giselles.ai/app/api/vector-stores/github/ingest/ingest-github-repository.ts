@@ -1,13 +1,6 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
-import {
-	type GitHubChunkMetadata,
-	createGitHubChunkStore,
-} from "@/lib/vector-stores/github-blob-stores";
-import {
-	GitHubBlobLoader,
-	type GitHubBlobLoaderParams,
-	type GitHubBlobMetadata,
-} from "@giselle-sdk/github-tool";
+import { createGitHubChunkStore } from "@/lib/vector-stores/github-blob-stores";
+import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
 import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
@@ -30,15 +23,11 @@ export async function ingestGitHubRepository(params: {
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
 
-	const pipeline = createIngestPipeline<
-		GitHubBlobMetadata,
-		GitHubChunkMetadata,
-		GitHubBlobLoaderParams
-	>({
+	const pipeline = createIngestPipeline({
 		documentLoader: githubLoader,
 		chunkStore,
 		documentKey: (document) => document.metadata.path,
-		metadataTransform: (metadata: GitHubBlobMetadata): GitHubChunkMetadata => ({
+		metadataTransform: (metadata) => ({
 			repositoryIndexDbId,
 			commitSha: metadata.commitSha,
 			fileSha: metadata.fileSha,
