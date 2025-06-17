@@ -81,7 +81,7 @@ export class PostService {
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 	}
@@ -89,7 +89,7 @@ export class PostService {
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -120,8 +120,8 @@ export class PostService {
 
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 
 // Input types

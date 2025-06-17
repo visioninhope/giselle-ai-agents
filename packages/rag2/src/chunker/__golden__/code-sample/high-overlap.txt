@@ -404,7 +404,7 @@ where: { id },
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 ===== CHUNK 39 =====
 });
 		return post;
@@ -413,7 +413,7 @@ where: { id },
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 ===== CHUNK 40 =====
@@ -422,7 +422,7 @@ where: { id },
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 	}
@@ -430,7 +430,7 @@ where: { id },
 async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 	}
@@ -439,7 +439,7 @@ async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 ===== CHUNK 42 =====
 where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 	}
@@ -447,7 +447,7 @@ where: { authorId },
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 ===== CHUNK 43 =====
 });
 		return posts;
@@ -456,7 +456,7 @@ where: { authorId },
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 ===== CHUNK 44 =====
@@ -465,7 +465,7 @@ where: { authorId },
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -473,7 +473,7 @@ where: { authorId },
 async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -482,7 +482,7 @@ async findPublished(): Promise<Post[]> {
 		const post = await this.db.posts.create({
 ===== CHUNK 46 =====
 where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -619,8 +619,8 @@ interface Database {
 
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 ===== CHUNK 59 =====
 return post;
 	}
@@ -628,16 +628,16 @@ return post;
 
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 ===== CHUNK 60 =====
 }
 
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 
 // Input types
@@ -645,8 +645,8 @@ interface CreateUserInput {
 ===== CHUNK 61 =====
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 
 // Input types
@@ -654,8 +654,8 @@ interface CreateUserInput {
 	name: string;
 	email: string;
 ===== CHUNK 62 =====
-users: any;
-	posts: any;
+users: unknown;
+	posts: unknown;
 }
 
 // Input types

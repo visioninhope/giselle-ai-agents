@@ -90,7 +90,7 @@ return post;
 	async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 ===== CHUNK 10 =====
 return posts;
@@ -99,7 +99,7 @@ return posts;
 	async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -132,8 +132,8 @@ updatedAt: new Date(),
 
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 
 // Input types

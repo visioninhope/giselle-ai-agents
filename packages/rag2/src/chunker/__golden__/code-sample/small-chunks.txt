@@ -118,7 +118,7 @@ async findById(id: string): Promise<Post | null> {
 async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 ===== CHUNK 22 =====
 });
@@ -130,7 +130,7 @@ async findByAuthor(authorId: string): Promise<Post[]> {
 async findPublished(): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 ===== CHUNK 24 =====
 });
@@ -177,8 +177,8 @@ return post;
 ===== CHUNK 31 =====
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 ===== CHUNK 32 =====
 }

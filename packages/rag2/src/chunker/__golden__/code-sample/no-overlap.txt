@@ -86,7 +86,7 @@ constructor(private readonly db: Database) {}
 async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 			where: { authorId },
-			orderBy: { createdAt: 'desc' },
+			orderBy: { createdAt: "desc" },
 		});
 		return posts;
 	}
@@ -95,7 +95,7 @@ async findByAuthor(authorId: string): Promise<Post[]> {
 		const posts = await this.db.posts.findMany({
 ===== CHUNK 10 =====
 where: { published: true },
-			orderBy: { publishedAt: 'desc' },
+			orderBy: { publishedAt: "desc" },
 		});
 		return posts;
 	}
@@ -128,8 +128,8 @@ data: {
 ===== CHUNK 13 =====
 // Database interface
 interface Database {
-	users: any;
-	posts: any;
+	users: unknown;
+	posts: unknown;
 }
 
 // Input types
