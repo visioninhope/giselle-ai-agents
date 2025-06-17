@@ -65,8 +65,8 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		callbacks: config.callbacks,
 	};
 	return {
-		copyWorkspace: async (workspaceId: WorkspaceId) => {
-			return await copyWorkspace({ context, workspaceId });
+		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
+			return await copyWorkspace({ context, workspaceId, name });
 		},
 		createWorkspace: async () => {
 			return await createWorkspace({ context });
