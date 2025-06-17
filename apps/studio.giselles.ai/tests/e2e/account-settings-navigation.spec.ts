@@ -16,19 +16,16 @@ test.describe("Account settings navigation", () => {
 		});
 
 		await page.getByRole("link", { name: "General settings" }).click();
-
 		await expect(page).toHaveURL(`${baseUrl}/settings/account/general`, {
 			timeout: 15000,
 		});
 
 		await page.getByRole("link", { name: "Authentication settings" }).click();
-
 		await expect(page).toHaveURL(`${baseUrl}/settings/account/authentication`, {
 			timeout: 15000,
 		});
 
 		await page.getByRole("link", { name: "Overview settings" }).click();
-
 		await expect(page).toHaveURL(`${baseUrl}/settings/account`, {
 			timeout: 15000,
 		});
