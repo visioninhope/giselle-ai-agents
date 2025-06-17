@@ -7,9 +7,10 @@ test.describe("Account settings navigation", () => {
 		await page.goto(`${baseUrl}/apps`);
 
 		await page.getByRole("button", { name: "Profile menu" }).click();
-
-		await page.getByRole("link", { name: "Account Settings" }).click();
-
+		await page
+			.getByRole("menuitem", { name: "Account settings" })
+			.waitFor({ state: "visible" });
+		await page.getByRole("menuitem", { name: "Account settings" }).click();
 		await expect(page).toHaveURL(`${baseUrl}/settings/account`, {
 			timeout: 15000,
 		});
