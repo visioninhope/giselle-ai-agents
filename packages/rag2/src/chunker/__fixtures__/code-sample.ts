@@ -1,3 +1,4 @@
+// @ts-nocheck
 // Sample TypeScript code for testing chunking behavior
 // This is a test fixture representing typical code structure
 
