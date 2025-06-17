@@ -221,16 +221,21 @@ export class PostgresChunkStore<
 	): Promise<void> {
 		// Get column names from the first record (all records should have same structure)
 		const firstRecord = records[0];
-		const columns = Object.keys(firstRecord.record);
-		columns.push(firstRecord.embedding.embeddingColumn);
+		const columns = [
+			...Object.keys(firstRecord.record),
+			firstRecord.embedding.embeddingColumn,
+		];
 
 		// Build values array for all records
 		const allValues: unknown[] = [];
 		const valuePlaceholders: string[] = [];
 
 		records.forEach((item, recordIndex) => {
-			const recordValues = columns.map((c) => item.record[c]);
-			recordValues.push(pgvector.toSql(item.embedding.embeddingValue));
+			const recordValues = columns.map((c) =>
+				c === item.embedding.embeddingColumn
+					? pgvector.toSql(item.embedding.embeddingValue)
+					: item.record[c],
+			);
 
 			// Add values to the flat array
 			allValues.push(...recordValues);
