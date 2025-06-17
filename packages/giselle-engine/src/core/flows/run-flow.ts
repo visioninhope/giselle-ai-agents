@@ -81,7 +81,7 @@ export async function runFlow(args: {
 
 	await args.callbacks?.flowCreate?.({ flow });
 
-	let flowRun = awaitcreateFlowRun({
+	let flowRun = await createFlowRun({
 		storage: args.context.storage,
 		trigger,
 		flow,
