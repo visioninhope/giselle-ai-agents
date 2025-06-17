@@ -26,7 +26,7 @@ const FlowRunObject = z.object({
 });
 export type FlowRunObject = z.infer<typeof FlowRunObject>;
 
-const FlowRunIndexObject = FlowRunObject.omit({
+export const FlowRunIndexObject = FlowRunObject.omit({
 	id: true,
 	workspaceId: true,
 });

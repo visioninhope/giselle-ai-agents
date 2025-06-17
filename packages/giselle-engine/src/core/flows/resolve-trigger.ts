@@ -38,6 +38,7 @@ export async function resolveTrigger(args: {
 		case "github": {
 			switch (args.generation.context.origin.type) {
 				case "run":
+				case "flowRun":
 					{
 						const githubWebhookEventInput = generationContext.inputs?.find(
 							(input) => input.type === "github-webhook-event",

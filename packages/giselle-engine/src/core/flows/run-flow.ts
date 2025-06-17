@@ -15,8 +15,13 @@ import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces/utils";
 import { resolveTrigger } from "./resolve-trigger";
-import { FlowRunId, type FlowRunObject } from "./run/object";
-import { flowRunPath } from "./run/paths";
+import {
+	FlowRunId,
+	FlowRunIndexObject,
+	type FlowRunObject,
+} from "./run/object";
+import { patchFlowRun } from "./run/patch-object";
+import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { getFlowTrigger } from "./utils";
 
 async function createFlowRun(parameters: {
@@ -86,14 +91,23 @@ export async function runFlow(args: {
 		trigger,
 		flow,
 	});
-	await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
+	await Promise.all([
+		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
+		args.context.storage.setItem(
+			workspaceFlowRunPath(trigger.workspaceId),
+			FlowRunIndexObject.parse(flowRun),
+		),
+	]);
+
 	for (const job of flow.jobs) {
 		if (args.callbacks?.jobStart) {
 			await args.callbacks.jobStart({ job });
 		}
-		flowRun = {
-			...flowRun,
-		};
+		flowRun = patchFlowRun(flowRun, {
+			"steps.inProgress": { increment: 1 },
+			"steps.queued": { decrement: 1 },
+		});
+		await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
@@ -161,5 +175,14 @@ export async function runFlow(args: {
 		if (args.callbacks?.jobComplete) {
 			await args.callbacks.jobComplete({ job });
 		}
+		flowRun = patchFlowRun(flowRun, {
+			"steps.inProgress": { decrement: 1 },
+			"steps.completed": { increment: 1 },
+		});
+		await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
 	}
+	flowRun = patchFlowRun(flowRun, {
+		status: { set: "completed" },
+	});
+	await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
 }
