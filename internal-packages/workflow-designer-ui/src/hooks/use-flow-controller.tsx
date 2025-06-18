@@ -64,7 +64,7 @@ export function useFlowController() {
 				),
 			});
 
-			client.createRun({
+			await client.createRun({
 				workspaceId: data.id,
 				jobsCount: flow.jobs.length,
 				trigger: "manual",
