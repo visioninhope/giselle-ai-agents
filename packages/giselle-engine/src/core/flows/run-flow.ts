@@ -6,54 +6,20 @@ import {
 	type QueuedGeneration,
 	RunId,
 	type Workflow,
-	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
-import type { Storage } from "unstorage";
 import { generateImage, generateText } from "../generations";
 import { executeAction } from "../operations";
 import { executeQuery } from "../operations/execute-query";
 import type { GiselleEngineContext } from "../types";
 import { getWorkspace } from "../workspaces/utils";
+import { createRun } from "./create-run";
 import { patchRun } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
-import {
-	FlowRunId,
-	FlowRunIndexObject,
-	type FlowRunObject,
-} from "./run/object";
+import { FlowRunIndexObject } from "./run/object";
 import { patchFlowRun } from "./run/patch-object";
 import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { getFlowTrigger } from "./utils";
-
-async function createFlowRun(parameters: {
-	storage: Storage;
-	jobsCount: number;
-	trigger: string;
-	workspaceId: WorkspaceId;
-}) {
-	const flowRun: FlowRunObject = {
-		id: FlowRunId.generate(),
-		workspaceId: parameters.workspaceId,
-		status: "inProgress",
-		steps: {
-			queued: parameters.jobsCount,
-			inProgress: 0,
-			completed: 0,
-			failed: 0,
-			cancelled: 0,
-		},
-		trigger: parameters.trigger,
-		duration: 0,
-		usage: {
-			promptTokens: 0,
-			completionTokens: 0,
-			totalTokens: 0,
-		},
-	};
-	await parameters.storage.setItem(flowRunPath(flowRun.id), flowRun);
-	return flowRun;
-}
 
 /** @todo telemetry */
 export async function runFlow(args: {
@@ -90,8 +56,8 @@ export async function runFlow(args: {
 	await args.callbacks?.flowCreate?.({ flow });
 
 	const runId = RunId.generate();
-	let flowRun = await createFlowRun({
-		storage: args.context.storage,
+	let flowRun = await createRun({
+		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
 		jobsCount: flow.jobs.length,

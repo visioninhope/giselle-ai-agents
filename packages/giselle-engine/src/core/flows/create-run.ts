@@ -26,12 +26,17 @@ export async function createRun(args: {
 			cancelled: 0,
 		},
 		trigger: args.trigger,
-		duration: 0,
+		duration: {
+			wallClock: 0,
+			totalTask: 0,
+		},
 		usage: {
 			promptTokens: 0,
 			completionTokens: 0,
 			totalTokens: 0,
 		},
+		createdAt: Date.now(),
+		updatedAt: Date.now(),
 	};
 	await Promise.all([
 		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),
