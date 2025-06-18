@@ -20,7 +20,7 @@ import type { GiselleEngineContext } from "../types";
 import type { parseCommand } from "./utils";
 
 type ProgressTableRow = Job & {
-	status: "queued" | "running" | "complete" | "failed";
+	status: "queued" | "running" | "complete" | "failed" | "skipped";
 	updatedAt: Date | undefined;
 };
 type ProgressTableData = ProgressTableRow[];
@@ -72,6 +72,9 @@ function buildProgressTable(data: ProgressTableData) {
 				break;
 			case "failed":
 				status = "❌";
+				break;
+			case "skipped":
+				status = "--";
 				break;
 			default: {
 				const _exhaustiveCheck: never = row.status;
@@ -469,6 +472,16 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					progressTableData = progressTableData.map((row) =>
 						row.id === job.id
 							? { ...row, status: "failed", updatedAt: new Date() }
+							: row,
+					);
+					await updateComment(
+						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
+					);
+				},
+				jobSkip: async ({ job }) => {
+					progressTableData = progressTableData.map((row) =>
+						row.id === job.id
+							? { ...row, status: "skipped", updatedAt: new Date() }
 							: row,
 					);
 					await updateComment(

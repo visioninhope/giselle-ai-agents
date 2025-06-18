@@ -32,6 +32,7 @@ export async function runFlow(args: {
 		jobStart?: (args: { job: Job }) => void | Promise<void>;
 		jobFail?: (args: { job: Job }) => void | Promise<void>;
 		jobComplete?: (args: { job: Job }) => void | Promise<void>;
+		jobSkip?: (args: { job: Job }) => void | Promise<void>;
 	};
 }) {
 	const trigger = await getFlowTrigger({
@@ -75,6 +76,10 @@ export async function runFlow(args: {
 	const flowStartedAt = Date.now();
 	let hasFlowError = false;
 	for (const job of flow.jobs) {
+		if (hasFlowError) {
+			await args.callbacks?.jobSkip?.({ job });
+			continue;
+		}
 		if (args.callbacks?.jobStart) {
 			await args.callbacks.jobStart({ job });
 		}
