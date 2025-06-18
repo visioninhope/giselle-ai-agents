@@ -24,6 +24,7 @@ import {
 	createRun,
 	deleteTrigger,
 	getTrigger,
+	getWorkspaceFlowRuns,
 	patchRun,
 	resolveTrigger,
 	runFlow,
@@ -244,6 +245,11 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			delta: PatchDelta;
 		}) {
 			return patchRun({ ...args, context });
+		},
+		getWorkspaceFlowRuns(args: {
+			workspaceId: WorkspaceId;
+		}) {
+			return getWorkspaceFlowRuns({ ...args, context });
 		},
 	};
 }

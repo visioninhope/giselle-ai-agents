@@ -358,6 +358,16 @@ export const createJsonRouters = {
 					run: await giselleEngine.patchRun(input),
 				}),
 		}),
+	getWorkspaceFlowRuns: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					runs: await giselleEngine.getWorkspaceFlowRuns(input),
+				}),
+		}),
 } as const;
 
 export const jsonRouterPaths = Object.keys(
