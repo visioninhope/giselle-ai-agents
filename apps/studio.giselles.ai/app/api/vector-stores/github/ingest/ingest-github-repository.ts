@@ -1,7 +1,6 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubChunkStore } from "@/lib/vector-stores/github-blob-stores";
 import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
-import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
 
@@ -23,6 +22,7 @@ export async function ingestGitHubRepository(params: {
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
 
+	/**
 	const pipeline = createIngestPipeline({
 		documentLoader: githubLoader,
 		chunkStore,
@@ -48,6 +48,7 @@ export async function ingestGitHubRepository(params: {
 	console.log(
 		`Ingested from ${result.totalDocuments} documents with success: ${result.successfulDocuments}, failure: ${result.failedDocuments}`,
 	);
+	*/
 }
 
 /**
