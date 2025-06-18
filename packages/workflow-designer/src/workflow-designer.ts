@@ -244,7 +244,9 @@ export function WorkflowDesigner({
 
 		switch (inputNode.content.type) {
 			case "textGeneration": {
-				if (!isTextGenerationNode(inputNode) || !inputNode.content.prompt) return;
+				if (!isTextGenerationNode(inputNode) || !inputNode.content.prompt) {
+					return;
+				}
 				const cleanedPrompt = cleanupSpecificNodeReferenceInText(
 					inputNode.content.prompt,
 					connectionToDelete.outputNode.id,
@@ -258,10 +260,12 @@ export function WorkflowDesigner({
 						},
 					});
 				}
-				break;
+				return;
 			}
 			case "imageGeneration": {
-				if (!isImageGenerationNode(inputNode) || !inputNode.content.prompt) return;
+				if (!isImageGenerationNode(inputNode) || !inputNode.content.prompt) {
+					return;
+				}
 				const cleanedPrompt = cleanupSpecificNodeReferenceInText(
 					inputNode.content.prompt,
 					connectionToDelete.outputNode.id,
@@ -275,7 +279,7 @@ export function WorkflowDesigner({
 						},
 					});
 				}
-				break;
+				return;
 			}
 			case "query": {
 				if (!isQueryNode(inputNode) || !inputNode.content.query) return;
@@ -292,16 +296,17 @@ export function WorkflowDesigner({
 						},
 					});
 				}
-				break;
+				return;
 			}
 			case "action":
 			case "trigger":
 				// These node types don't have text fields that need cleanup
 				return;
-			default:
+			default: {
 				// Exhaustive check: if a new node type is added, this will cause a TypeScript error
 				const _exhaustiveCheck: never = inputNode.content.type;
-				return;
+				throw new Error(`Unhandled node type: ${_exhaustiveCheck}`);
+			}
 		}
 	}
 	function deleteNode(unsafeNodeId: string | NodeId) {
