@@ -237,6 +237,21 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
+	"gemini-2.5-flash-lite-preview-06-17": {
+		prices: [
+			{
+				validFrom: "2025-06-17T00:00:00Z",
+				price: {
+					input: {
+						costPerMegaToken: 0.1,
+					},
+					output: {
+						costPerMegaToken: 0.1,
+					},
+				},
+			},
+		],
+	},
 	"gemini-2.5-pro-preview-06-05": {
 		prices: [
 			{
