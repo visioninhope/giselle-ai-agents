@@ -1,2 +1,6 @@
-export { createIngestPipeline } from "./create-ingest-pipeline";
-export type { IngestProgress, IngestError, IngestResult } from "./types";
+export {
+	IngestPipeline,
+	type IngestPipelineConfig,
+	type IngestPipelineOptions,
+} from "./ingest-pipeline";
+export type { IngestError, IngestProgress, IngestResult } from "./types";

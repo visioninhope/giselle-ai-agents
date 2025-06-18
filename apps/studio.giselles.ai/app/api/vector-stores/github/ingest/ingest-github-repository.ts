@@ -1,7 +1,7 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubChunkStore } from "@/lib/vector-stores/github-blob-stores";
 import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
-import { createIngestPipeline } from "@giselle-sdk/rag2";
+import { IngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
 
@@ -23,18 +23,20 @@ export async function ingestGitHubRepository(params: {
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
 
-	const pipeline = createIngestPipeline({
-		documentLoader: githubLoader,
-		chunkStore,
-		documentKey: (document) => document.metadata.path,
-		metadataTransform: (metadata) => ({
-			repositoryIndexDbId,
-			commitSha: metadata.commitSha,
-			fileSha: metadata.fileSha,
-			path: metadata.path,
-			nodeId: metadata.nodeId,
-		}),
-		options: {
+	const pipeline = new IngestPipeline(
+		{
+			documentLoader: githubLoader,
+			chunkStore,
+			documentKey: (document) => document.metadata.path,
+			metadataTransform: (metadata) => ({
+				repositoryIndexDbId,
+				commitSha: metadata.commitSha,
+				fileSha: metadata.fileSha,
+				path: metadata.path,
+				nodeId: metadata.nodeId,
+			}),
+		},
+		{
 			maxBatchSize: 50,
 			onProgress: (progress) => {
 				console.log(
@@ -42,9 +44,9 @@ export async function ingestGitHubRepository(params: {
 				);
 			},
 		},
-	});
+	);
 
-	const result = await pipeline(params.source);
+	const result = await pipeline.ingest(params.source);
 	console.log(
 		`Ingested from ${result.totalDocuments} documents with success: ${result.successfulDocuments}, failure: ${result.failedDocuments}`,
 	);
