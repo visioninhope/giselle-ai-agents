@@ -82,6 +82,7 @@ export function RunHistoryTable() {
 								(Total tasks)
 							</TableHead>
 							<TableHead />
+							<TableHead />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -135,6 +136,15 @@ export function RunHistoryTable() {
 								<TableCell>{item.trigger}</TableCell>
 								<TableCell>{formatDuration(item.duration.wallClock)}</TableCell>
 								<TableCell>{formatDuration(item.duration.totalTask)}</TableCell>
+								<TableCell>
+									<div className="flex w-[400px]">
+										<div className="truncate text-text-muted text-[12px]">
+											{item.annotations
+												.map((annotation) => annotation.message)
+												.join(",")}
+										</div>
+									</div>
+								</TableCell>
 								<TableCell />
 							</TableRow>
 						))}
