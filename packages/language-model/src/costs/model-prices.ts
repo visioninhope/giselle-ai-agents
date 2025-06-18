@@ -67,21 +67,6 @@ export const openAiTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"gpt-4o-mini": {
-		prices: [
-			{
-				validFrom: "2025-05-12T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.15,
-					},
-					output: {
-						costPerMegaToken: 0.6,
-					},
-				},
-			},
-		],
-	},
 	o3: {
 		prices: [
 			{
@@ -103,21 +88,6 @@ export const openAiTokenPricing: ModelPriceTable = {
 					},
 					output: {
 						costPerMegaToken: 8.0,
-					},
-				},
-			},
-		],
-	},
-	"o3-mini": {
-		prices: [
-			{
-				validFrom: "2025-05-12T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 1.1,
-					},
-					output: {
-						costPerMegaToken: 4.4,
 					},
 				},
 			},
