@@ -12,6 +12,7 @@ import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	CircleAlertIcon,
 	CircleCheckIcon,
+	CircleDashedIcon,
 	CircleDotIcon,
 	CircleXIcon,
 } from "lucide-react";
@@ -173,6 +174,9 @@ export function RunHistoryTable() {
 												key={stepType}
 												className="flex items-center gap-[3px]"
 											>
+												{count > 0 && stepType === "queued" && (
+													<CircleDashedIcon className="size-[13px] text-hint" />
+												)}
 												{count > 0 && stepType === "inProgress" && (
 													<CircleDotIcon className="size-[13px] text-info" />
 												)}
