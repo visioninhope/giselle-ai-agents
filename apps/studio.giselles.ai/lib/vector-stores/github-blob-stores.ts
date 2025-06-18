@@ -13,7 +13,7 @@ import {
 	type DatabaseConfig,
 	createColumnMapping,
 	createPostgresChunkStore,
-	createQueryService,
+	createPostgresQueryService,
 } from "@giselle-sdk/rag2";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
@@ -129,7 +129,7 @@ type GitHubQueryMetadata = z.infer<typeof githubQueryMetadataSchema>;
  * GitHub query service factory - for RAG queries
  */
 export function createGitHubQueryService(): GitHubVectorStoreQueryService<GitHubQueryMetadata> {
-	return createQueryService<GitHubQueryContext, GitHubQueryMetadata>({
+	return createPostgresQueryService<GitHubQueryContext, GitHubQueryMetadata>({
 		database: createDatabaseConfig(),
 		tableName: getTableName(githubRepositoryEmbeddings),
 		metadataSchema: githubQueryMetadataSchema,

@@ -1,9 +1,10 @@
 /**
- * QueryService factory (to be removed in separate PR)
+ * RAG2 QueryService utilities
  */
 
-// Re-export types
-export type { QueryServiceConfig } from "./types";
-
-// Re-export factory functions (only QueryService remains)
-export { createQueryService } from "./factories";
+// Re-export constants and utilities
+export {
+	createColumnMapping,
+	createDefaultEmbedder,
+	DEFAULT_REQUIRED_COLUMNS,
+} from "./utils";

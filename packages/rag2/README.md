@@ -33,7 +33,7 @@ This package is intended for internal use within the Giselle monorepo.
 Search through vector embeddings with type-safe metadata filtering.
 
 ```typescript
-import { createQueryService } from "@giselle-sdk/rag2";
+import { createPostgresQueryService } from "@giselle-sdk/rag2";
 import { z } from "zod/v4";
 
 // Define your metadata schema
@@ -46,7 +46,7 @@ const DocumentSchema = z.object({
 type DocumentMetadata = z.infer<typeof DocumentSchema>;
 
 // Create query service
-const queryService = createQueryService<
+const queryService = createPostgresQueryService<
   { repository: string; owner: string },
   DocumentMetadata
 >({
