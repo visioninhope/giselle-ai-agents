@@ -14,9 +14,11 @@ function toSnakeCase(str: string): string {
 }
 
 /**
- * Get keys from a Zod schema if it's an object schema
+ * Get all field names from a Zod schema if it's an object schema.
+ * Returns an empty array for non-object schemas.
+ * This is used to determine which fields need column mappings in the database.
  */
-function getSchemaKeys(schema: z.ZodType<unknown>): string[] {
+function getSchemaFieldNames<T>(schema: z.ZodType<T>): string[] {
 	if (schema instanceof z.ZodObject) {
 		return Object.keys(schema.shape);
 	}
@@ -24,25 +26,25 @@ function getSchemaKeys(schema: z.ZodType<unknown>): string[] {
 }
 
 /**
- * validate column mapping
+ * Validates that a column mapping contains all required fields.
  */
 function validateColumnMapping<TMetadata>(
 	mapping: Record<string, string>,
 	metadataSchema: z.ZodType<TMetadata>,
 ): mapping is ColumnMapping<TMetadata> {
-	// ensure all required column keys are present
-	for (const key of REQUIRED_COLUMN_KEYS) {
-		if (!(key in mapping)) {
-			return false;
-		}
+	const missingRequiredColumns = REQUIRED_COLUMN_KEYS.filter(
+		(key) => !(key in mapping),
+	);
+	if (missingRequiredColumns.length > 0) {
+		return false;
 	}
 
-	// ensure all metadata fields are included
-	const metadataKeys = getSchemaKeys(metadataSchema);
-	for (const key of metadataKeys) {
-		if (!(key in mapping)) {
-			return false;
-		}
+	const metadataFields = getSchemaFieldNames(metadataSchema);
+	const missingMetadataColumns = metadataFields.filter(
+		(field) => !(field in mapping),
+	);
+	if (missingMetadataColumns.length > 0) {
+		return false;
 	}
 
 	return true;
@@ -62,35 +64,51 @@ export function createColumnMapping<
 	const { metadataSchema, requiredColumnOverrides, metadataColumnOverrides } =
 		options;
 
+	type TMetadata = z.infer<TSchema>;
+
+	// Build required columns
 	const requiredColumns: RequiredColumns = {
 		...DEFAULT_REQUIRED_COLUMNS,
 		...requiredColumnOverrides,
 	};
 
-	const metadataColumns: Record<string, string> = {};
-	const fieldNames = getSchemaKeys(metadataSchema);
-
-	for (const fieldName of fieldNames) {
+	// Build metadata columns
+	const metadataFields = getSchemaFieldNames(metadataSchema);
+	const metadataEntries = metadataFields.map((fieldName) => {
 		const customMapping =
-			metadataColumnOverrides?.[fieldName as keyof z.infer<TSchema>];
-		if (customMapping) {
-			metadataColumns[fieldName] = customMapping;
-		} else if (!metadataColumns[fieldName]) {
-			metadataColumns[fieldName] = toSnakeCase(fieldName);
-		}
-	}
+			metadataColumnOverrides?.[fieldName as keyof TMetadata];
+		return [fieldName, customMapping ?? toSnakeCase(fieldName)];
+	});
 
-	const result: RequiredColumns & Record<string, string> = {
-		...requiredColumns,
-		...metadataColumns,
-	};
+	const allEntries = [...Object.entries(requiredColumns), ...metadataEntries];
+	const result = Object.fromEntries(allEntries);
 
-	// Runtime validation ensures type safety
 	if (!validateColumnMapping(result, metadataSchema)) {
+		const missingRequired = REQUIRED_COLUMN_KEYS.filter(
+			(key) => !(key in result),
+		);
+		const metadataFields = getSchemaFieldNames(metadataSchema);
+		const missingMetadata = metadataFields.filter(
+			(field) => !(field in result),
+		);
+
+		const errorParts: string[] = [];
+		if (missingRequired.length > 0) {
+			errorParts.push(
+				`Missing required columns: ${missingRequired.join(", ")}`,
+			);
+		}
+		if (missingMetadata.length > 0) {
+			errorParts.push(
+				`Missing metadata columns: ${missingMetadata.join(", ")}`,
+			);
+		}
+
 		throw new Error(
-			"Failed to create valid ColumnMapping: missing required columns or metadata fields",
+			`Failed to create valid ColumnMapping. ${errorParts.join(". ")}`,
 		);
 	}
-	// Now we can safely return the validated result
-	return result as ColumnMapping<z.infer<TSchema>>;
+
+	// validateColumnMapping ensures that the result is a valid ColumnMapping
+	return result as ColumnMapping<TMetadata>;
 }
