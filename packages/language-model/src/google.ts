@@ -26,7 +26,7 @@ export const GoogleLanguageModelId = z
 	])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
-			return "gemini-2.5-flash";
+			return "gemini-2.5-flash-lite-preview-06-17";
 		}
 		if (
 			ctx.value.startsWith("gemini-2.5-pro-preview-") ||
@@ -43,7 +43,7 @@ export const GoogleLanguageModelId = z
 		if (ctx.value.startsWith("gemini-2.5-flash-lite-preview-")) {
 			return "gemini-2.5-flash-lite-preview-06-17";
 		}
-		return "gemini-2.5-flash";
+		return "gemini-2.5-flash-lite-preview-06-17";
 	});
 
 const GoogleLanguageModel = LanguageModelBase.extend({
