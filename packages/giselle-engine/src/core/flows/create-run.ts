@@ -21,6 +21,7 @@ export async function createRun(args: {
 		steps: {
 			queued: args.jobsCount,
 			inProgress: 0,
+			warning: 0,
 			completed: 0,
 			failed: 0,
 			cancelled: 0,
@@ -37,6 +38,7 @@ export async function createRun(args: {
 		},
 		createdAt: Date.now(),
 		updatedAt: Date.now(),
+		annotations: [],
 	};
 	await Promise.all([
 		args.context.storage.setItem(flowRunPath(flowRun.id), flowRun),

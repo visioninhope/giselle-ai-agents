@@ -82,6 +82,7 @@ export function RunHistoryTable() {
 								(Total tasks)
 							</TableHead>
 							<TableHead />
+							<TableHead />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -97,7 +98,7 @@ export function RunHistoryTable() {
 										className={clsx(
 											"group-data-[status=completed]:text-success",
 											"group-data-[status=inProgress]:text-info",
-											"group-data-[status=error]:text-error",
+											"group-data-[status=failed]:text-error",
 										)}
 									>
 										{item.status}
@@ -122,7 +123,7 @@ export function RunHistoryTable() {
 												{count > 0 && stepType === "warning" && (
 													<CircleAlertIcon className="size-[13px] text-warning" />
 												)}
-												{count > 0 && stepType === "error" && (
+												{count > 0 && stepType === "failed" && (
 													<CircleXIcon className="size-[13px] text-error" />
 												)}
 												{count > 0 && (
@@ -135,6 +136,15 @@ export function RunHistoryTable() {
 								<TableCell>{item.trigger}</TableCell>
 								<TableCell>{formatDuration(item.duration.wallClock)}</TableCell>
 								<TableCell>{formatDuration(item.duration.totalTask)}</TableCell>
+								<TableCell>
+									<div className="flex w-[400px]">
+										<div className="truncate text-text-muted text-[12px]">
+											{item.annotations
+												.map((annotation) => annotation.message)
+												.join(",")}
+										</div>
+									</div>
+								</TableCell>
 								<TableCell />
 							</TableRow>
 						))}

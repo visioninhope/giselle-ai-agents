@@ -34,6 +34,12 @@ export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
+	callbacks?: {
+		error?: (
+			failedGeneration: FailedGeneration,
+			error: AISDKError,
+		) => void | Promise<void>;
+	};
 }) {
 	return useGenerationExecutor({
 		context: args.context,
