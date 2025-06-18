@@ -19,13 +19,18 @@ import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
+	type PatchDelta,
 	configureTrigger,
+	createRun,
 	deleteTrigger,
 	getTrigger,
+	getWorkspaceFlowRuns,
+	patchRun,
 	resolveTrigger,
 	runFlow,
 	setTrigger,
 } from "./flows";
+import type { FlowRunId } from "./flows/run/object";
 import {
 	type TelemetrySettings,
 	cancelGeneration,
@@ -227,6 +232,24 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 		}) {
 			return await getWorkspaceDataSources({ ...args, context });
+		},
+		createRun(args: {
+			workspaceId: WorkspaceId;
+			jobsCount: number;
+			trigger: string;
+		}) {
+			return createRun({ ...args, context });
+		},
+		patchRun(args: {
+			flowRunId: FlowRunId;
+			delta: PatchDelta;
+		}) {
+			return patchRun({ ...args, context });
+		},
+		getWorkspaceFlowRuns(args: {
+			workspaceId: WorkspaceId;
+		}) {
+			return getWorkspaceFlowRuns({ ...args, context });
 		},
 	};
 }

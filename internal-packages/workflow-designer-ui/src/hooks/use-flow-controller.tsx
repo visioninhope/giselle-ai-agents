@@ -1,5 +1,8 @@
 import type { Generation, Workflow } from "@giselle-sdk/data-type";
-import { useGenerationRunnerSystem } from "@giselle-sdk/giselle-engine/react";
+import {
+	useGenerationRunnerSystem,
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useCallback, useRef } from "react";
 import {
@@ -13,6 +16,7 @@ export function useFlowController() {
 		useGenerationRunnerSystem();
 	const { data } = useWorkflowDesigner();
 	const { info } = useToasts();
+	const client = useGiselleEngine();
 
 	const activeGenerationsRef = useRef<Generation[]>([]);
 	const cancelRef = useRef(false);
@@ -60,7 +64,19 @@ export function useFlowController() {
 				),
 			});
 
+			const { run } = await client.createRun({
+				workspaceId: data.id,
+				jobsCount: flow.jobs.length,
+				trigger: "manual",
+			});
 			for (const [jobIndex, job] of flow.jobs.entries()) {
+				await client.patchRun({
+					flowRunId: run.id,
+					delta: {
+						"steps.inProgress": { increment: 1 },
+						"steps.queued": { decrement: 1 },
+					},
+				});
 				await Promise.all(
 					job.operations.map(async (operation) => {
 						const generation = generations.find(
@@ -79,9 +95,23 @@ export function useFlowController() {
 				if (jobIndex === 0 && onComplete) {
 					onComplete();
 				}
+
+				await client.patchRun({
+					flowRunId: run.id,
+					delta: {
+						"steps.completed": { increment: 1 },
+						"steps.inProgress": { decrement: 1 },
+					},
+				});
 			}
+			await client.patchRun({
+				flowRunId: run.id,
+				delta: {
+					status: { set: "completed" },
+				},
+			});
 		},
-		[createGeneration, data.id, info, startGeneration, stopFlow],
+		[createGeneration, data.id, info, startGeneration, stopFlow, client],
 	);
 
 	return { startFlow };
