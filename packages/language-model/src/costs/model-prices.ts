@@ -221,7 +221,7 @@ export const anthropicTokenPricing: ModelPriceTable = {
 
 export const googleTokenPricing: ModelPriceTable = {
 	// https://ai.google.dev/gemini-api/docs/pricing
-	"gemini-2.5-flash-preview-05-20": {
+	"gemini-2.5-flash": {
 		prices: [
 			{
 				validFrom: "2025-06-01T00:00:00Z",
@@ -252,7 +252,7 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"gemini-2.5-pro-preview-06-05": {
+	"gemini-2.5-pro": {
 		prices: [
 			{
 				validFrom: "2025-06-12T02:00:00Z",
