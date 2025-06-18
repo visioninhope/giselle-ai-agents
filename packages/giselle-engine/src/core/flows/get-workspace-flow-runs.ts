@@ -20,7 +20,6 @@ export async function getWorkspaceFlowRuns(args: {
 	).then((flowRunLike) =>
 		flowRunLike
 			.map((data) => {
-				console.log(data);
 				const parse = FlowRunObject.safeParse(data);
 				if (parse.success) {
 					return parse.data;

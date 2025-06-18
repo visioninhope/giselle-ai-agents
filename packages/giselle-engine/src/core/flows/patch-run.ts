@@ -30,7 +30,10 @@ export async function patchRun(args: {
 	}
 
 	// Apply the patch
-	const updatedFlowRun = patchFlowRun(currentFlowRun, args.delta);
+	const updatedFlowRun = patchFlowRun(currentFlowRun, {
+		...args.delta,
+		updatedAt: { set: Date.now() },
+	});
 
 	await args.context.storage.setItem(
 		flowRunPath(args.flowRunId),

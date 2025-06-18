@@ -18,101 +18,28 @@ import {
 } from "lucide-react";
 import useSWR from "swr";
 
-const dummyData = [
-	{
-		id: 1,
-		time: "2025-06-16 21:22",
-		status: "success",
-		steps: {
-			success: 2,
-		},
-		trigger: "GitHub",
-		duration: "22s",
-	},
-	{
-		id: 2,
-		time: "2025-06-16 21:20",
-		status: "success",
-		steps: {
-			success: 3,
-		},
-		trigger: "Manual",
-		duration: "18s",
-	},
-	{
-		id: 3,
-		time: "2025-06-16 21:18",
-		status: "error",
-		steps: {
-			success: 1,
-			error: 1,
-		},
-		trigger: "GitHub",
-		duration: "5s",
-	},
-	{
-		id: 4,
-		time: "2025-06-16 21:15",
-		status: "success",
-		steps: {
-			success: 4,
-			warning: 1,
-		},
-		trigger: "Manual",
-		duration: "31s",
-	},
-	{
-		id: 5,
-		time: "2025-06-16 21:10",
-		status: "inProgress",
-		steps: {
-			success: 2,
-			inProgress: 1,
-		},
-		trigger: "GitHub",
-		duration: "45s",
-	},
-	{
-		id: 6,
-		time: "2025-06-16 21:05",
-		status: "success",
-		steps: {
-			success: 3,
-		},
-		trigger: "Scheduled",
-		duration: "28s",
-	},
-	{
-		id: 7,
-		time: "2025-06-16 21:00",
-		status: "success",
-		steps: {
-			success: 2,
-		},
-		trigger: "GitHub",
-		duration: "22s",
-	},
-	{
-		id: 8,
-		time: "2025-06-16 20:55",
-		status: "error",
-		steps: {
-			error: 1,
-		},
-		trigger: "Scheduled",
-		duration: "3s",
-	},
-	{
-		id: 9,
-		time: "2025-06-16 20:50",
-		status: "success",
-		steps: {
-			success: 3,
-		},
-		trigger: "GitHub",
-		duration: "26s",
-	},
-];
+function formatDuration(elapsedMs: number): string {
+	const elapsedSeconds = elapsedMs / 1000;
+
+	if (elapsedSeconds < 60) {
+		// Less than 1 minute: show as "30.4s"
+		return `${elapsedSeconds.toFixed(1)}s`;
+	}
+	// 1 minute or more: show as "2m 30s"
+	const minutes = Math.floor(elapsedSeconds / 60);
+	const seconds = Math.floor(elapsedSeconds % 60);
+	return `${minutes}m ${seconds}s`;
+}
+
+function formatTimestamp(timestamp: number): string {
+	const date = new Date(timestamp);
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	const hours = String(date.getHours()).padStart(2, "0");
+	const minutes = String(date.getMinutes()).padStart(2, "0");
+	return `${year}/${month}/${day} ${hours}:${minutes}`;
+}
 
 export function RunHistoryTable() {
 	const client = useGiselleEngine();
@@ -144,7 +71,16 @@ export function RunHistoryTable() {
 							<TableHead className="w-[100px]">Status</TableHead>
 							<TableHead className="w-[100px]">Steps</TableHead>
 							<TableHead className="w-[100px]">Trigger</TableHead>
-							<TableHead className="w-[100px]">Duration</TableHead>
+							<TableHead className="w-[120px]">
+								Duration
+								<br />
+								(Wall-Clock)
+							</TableHead>
+							<TableHead className="w-[120px]">
+								Duration
+								<br />
+								(Total tasks)
+							</TableHead>
 							<TableHead />
 						</TableRow>
 					</TableHeader>
@@ -155,11 +91,11 @@ export function RunHistoryTable() {
 								className="group"
 								key={item.id}
 							>
-								<TableCell>---</TableCell>
+								<TableCell>{formatTimestamp(item.createdAt)}</TableCell>
 								<TableCell>
 									<span
 										className={clsx(
-											"group-data-[status=success]:text-success",
+											"group-data-[status=completed]:text-success",
 											"group-data-[status=inProgress]:text-info",
 											"group-data-[status=error]:text-error",
 										)}
@@ -197,7 +133,8 @@ export function RunHistoryTable() {
 									</div>
 								</TableCell>
 								<TableCell>{item.trigger}</TableCell>
-								<TableCell>{item.duration}</TableCell>
+								<TableCell>{formatDuration(item.duration.wallClock)}</TableCell>
+								<TableCell>{formatDuration(item.duration.totalTask)}</TableCell>
 								<TableCell />
 							</TableRow>
 						))}

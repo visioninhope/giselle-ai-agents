@@ -17,12 +17,17 @@ export const FlowRunObject = z.object({
 		failed: z.number(),
 	}),
 	trigger: z.string(),
-	duration: z.number(),
+	duration: z.object({
+		wallClock: z.number(),
+		totalTask: z.number(),
+	}),
 	usage: z.object({
 		promptTokens: z.number(),
 		completionTokens: z.number(),
 		totalTokens: z.number(),
 	}),
+	createdAt: z.number(),
+	updatedAt: z.number(),
 });
 export type FlowRunObject = z.infer<typeof FlowRunObject>;
 
