@@ -20,9 +20,27 @@ const defaultConfigurations: OpenAILanguageModelConfigurations = {
 	frequencyPenalty: 0.0,
 };
 
-const OpenAILanguageModelId = z
+export const OpenAILanguageModelId = z
 	.enum(["gpt-4o", "o3", "o4-mini", "gpt-4.1", "gpt-4.1-mini", "gpt-4.1-nano"])
-	.catch("gpt-4.1-mini");
+	.catch((ctx) => {
+		if (typeof ctx.value !== "string") {
+			return "gpt-4.1-nano";
+		}
+		const v = ctx.value;
+		if (v === "o1") {
+			return "o3";
+		}
+		if (v === "o3-mini" || v === "o1-mini") {
+			return "o4-mini";
+		}
+		if (v === "gpt-4o-mini") {
+			return "gpt-4.1-mini";
+		}
+		if (v === "gpt-4-turbo" || v === "gpt-4" || v === "gpt-3.5-turbo") {
+			return "gpt-4o";
+		}
+		return "gpt-4.1-nano";
+	});
 
 const OpenAILanguageModel = LanguageModelBase.extend({
 	id: OpenAILanguageModelId,
