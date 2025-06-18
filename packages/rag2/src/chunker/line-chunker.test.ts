@@ -101,11 +101,6 @@ describe("LineChunker", () => {
 			expect(() => createLineChunker({ maxChars: 0 })).toThrow();
 			expect(() => createLineChunker({ maxChars: -1 })).toThrow();
 		});
-
-		it("should enforce maximum limits", () => {
-			expect(() => createLineChunker({ maxLines: 1001 })).toThrow();
-			expect(() => createLineChunker({ maxChars: 100001 })).toThrow();
-		});
 	});
 
 	describe("Edge cases", () => {

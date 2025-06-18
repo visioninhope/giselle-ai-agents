@@ -1,11 +1,11 @@
-export type { ChunkerFunction } from "./types";
 export { createLineChunker, type LineChunkerOptions } from "./line-chunker";
+export type { ChunkerFunction } from "./types";
 import { createLineChunker } from "./line-chunker";
 
 /**
  * Default configuration values for line chunker
  */
-const DEFAULT_CHUNKER_CONFIG = {
+export const DEFAULT_CHUNKER_CONFIG = {
 	maxLines: 150,
 	overlap: 30,
 	maxChars: 10000,
