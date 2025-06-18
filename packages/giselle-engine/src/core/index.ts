@@ -19,14 +19,17 @@ import type { DataSourceProviderObject } from "./data-source/types/object";
 import { copyFile, getFileText, removeFile, uploadFile } from "./files";
 import {
 	type ConfigureTriggerInput,
+	type PatchDelta,
 	configureTrigger,
 	createRun,
 	deleteTrigger,
 	getTrigger,
+	patchRun,
 	resolveTrigger,
 	runFlow,
 	setTrigger,
 } from "./flows";
+import type { FlowRunId } from "./flows/run/object";
 import {
 	type TelemetrySettings,
 	cancelGeneration,
@@ -235,6 +238,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			trigger: string;
 		}) {
 			return createRun({ ...args, context });
+		},
+		patchRun(args: {
+			flowRunId: FlowRunId;
+			delta: PatchDelta;
+		}) {
+			return patchRun({ ...args, context });
 		},
 	};
 }

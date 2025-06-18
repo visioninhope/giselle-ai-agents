@@ -5,3 +5,4 @@ export * from "./set-trigger";
 export * from "./delete-trigger";
 export * from "./run-flow";
 export * from "./create-run";
+export * from "./patch-run";

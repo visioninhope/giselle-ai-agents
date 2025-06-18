@@ -15,7 +15,8 @@ import {
 import { z } from "zod/v4";
 import type { GiselleEngine } from "../core";
 import { DataSourceProviderObject } from "../core/data-source";
-import { ConfigureTriggerInput } from "../core/flows";
+import { ConfigureTriggerInput, type PatchDelta } from "../core/flows";
+import { FlowRunId } from "../core/flows/run/object";
 import type { TelemetrySettings } from "../core/generations";
 import { JsonResponse } from "../utils";
 import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
@@ -344,6 +345,17 @@ export const createJsonRouters = {
 			handler: async ({ input }) =>
 				JsonResponse.json({
 					run: await giselleEngine.createRun(input),
+				}),
+		}),
+	patchRun: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				flowRunId: FlowRunId.schema,
+				delta: z.custom<PatchDelta>(),
+			}),
+			handler: async ({ input }) =>
+				JsonResponse.json({
+					run: await giselleEngine.patchRun(input),
 				}),
 		}),
 } as const;
