@@ -1,14 +1,9 @@
 import type { PoolClient } from "pg";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
-import type { z } from "zod/v4";
-import type { ColumnMapping } from "../../database/types";
-import { ValidationError } from "../../errors";
+import { type ColumnMapping, REQUIRED_COLUMN_KEYS } from "../../database/types";
 import type { ChunkWithEmbedding } from "../types";
 
-/**
- * Performance constants for batch operations
- */
 const PERFORMANCE_CONSTANTS = {
 	/**
 	 * Maximum number of records to insert in a single batch
@@ -19,23 +14,6 @@ const PERFORMANCE_CONSTANTS = {
 } as const;
 
 /**
- * Validate metadata against schema
- */
-export function validateMetadata<TMetadata>(
-	metadata: TMetadata,
-	schema: z.ZodType<TMetadata>,
-	context: { documentKey: string; tableName: string },
-): void {
-	const result = schema.safeParse(metadata);
-	if (!result.success) {
-		throw ValidationError.fromZodError(result.error, {
-			operation: "validateMetadata",
-			...context,
-		});
-	}
-}
-
-/**
  * Map metadata to column names
  */
 export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
@@ -43,15 +21,14 @@ export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
 	columnMapping: ColumnMapping<TMetadata>,
 ): Record<string, unknown> {
 	const result: Record<string, unknown> = {};
-	const requiredKeys = [
-		"documentKey",
-		"chunkContent",
-		"chunkIndex",
-		"embedding",
-	];
 
 	for (const [key, value] of Object.entries(metadata)) {
-		if (key in columnMapping && !requiredKeys.includes(key)) {
+		if (
+			key in columnMapping &&
+			!REQUIRED_COLUMN_KEYS.includes(
+				key as (typeof REQUIRED_COLUMN_KEYS)[number],
+			)
+		) {
 			const columnName = columnMapping[key as keyof typeof columnMapping];
 			result[columnName] = value;
 		}
@@ -66,7 +43,7 @@ export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
 export function buildDeleteQuery(
 	tableName: string,
 	documentKeyColumn: string,
-	scope?: Record<string, unknown>,
+	scope: Record<string, unknown>,
 ): { query: string; params: unknown[] } {
 	let query = `
     DELETE FROM ${escapeIdentifier(tableName)}
@@ -75,11 +52,9 @@ export function buildDeleteQuery(
 
 	const params: unknown[] = [];
 
-	if (scope) {
-		for (const [key, value] of Object.entries(scope)) {
-			params.push(value);
-			query += ` AND ${escapeIdentifier(key)} = $${params.length + 1}`;
-		}
+	for (const [key, value] of Object.entries(scope)) {
+		params.push(value);
+		query += ` AND ${escapeIdentifier(key)} = $${params.length + 1}`;
 	}
 
 	return { query, params };
@@ -93,7 +68,7 @@ export async function deleteChunksByDocumentKey(
 	tableName: string,
 	documentKey: string,
 	documentKeyColumn: string,
-	scope?: Record<string, unknown>,
+	scope: Record<string, unknown>,
 ): Promise<void> {
 	const { query, params } = buildDeleteQuery(
 		tableName,
@@ -111,7 +86,7 @@ export function prepareChunkRecords<TMetadata extends Record<string, unknown>>(
 	chunks: ChunkWithEmbedding[],
 	metadata: TMetadata,
 	columnMapping: ColumnMapping<TMetadata>,
-	scope?: Record<string, unknown>,
+	scope: Record<string, unknown>,
 ): Array<{
 	record: Record<string, unknown>;
 	embedding: {
@@ -160,8 +135,6 @@ async function insertRecordsBatch(
 		...Object.keys(firstRecord.record),
 		firstRecord.embedding.embeddingColumn,
 	];
-
-	// Build values array for all records
 	const allValues: unknown[] = [];
 	const valuePlaceholders: string[] = [];
 
@@ -171,11 +144,8 @@ async function insertRecordsBatch(
 				? pgvector.toSql(item.embedding.embeddingValue)
 				: item.record[c],
 		);
-
-		// Add values to the flat array
 		allValues.push(...recordValues);
 
-		// Create placeholders for this record
 		const startIndex = recordIndex * columns.length;
 		const placeholders = columns.map(
 			(_, colIndex) => `$${startIndex + colIndex + 1}`,

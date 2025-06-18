@@ -1,70 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { z } from "zod/v4";
-import { ValidationError } from "../../errors";
 import {
 	buildDeleteQuery,
 	mapMetadataToColumns,
 	prepareChunkRecords,
-	validateMetadata,
 } from "./utils";
 
 describe("chunk-store/postgres/utils", () => {
-	describe("validateMetadata", () => {
-		const schema = z.object({
-			title: z.string(),
-			author: z.string(),
-			publishedAt: z.date(),
-		});
-
-		it("should pass valid metadata", () => {
-			const metadata = {
-				title: "Test Document",
-				author: "Test Author",
-				publishedAt: new Date("2024-01-01"),
-			};
-
-			expect(() =>
-				validateMetadata(metadata, schema, {
-					documentKey: "doc1",
-					tableName: "test_table",
-				}),
-			).not.toThrow();
-		});
-
-		it("should throw ValidationError for invalid metadata", () => {
-			const metadata = {
-				title: "Test Document",
-				author: 123 as unknown as string, // Invalid type
-				publishedAt: new Date(),
-			};
-
-			expect(() =>
-				validateMetadata(metadata, schema, {
-					documentKey: "doc1",
-					tableName: "test_table",
-				}),
-			).toThrow(ValidationError);
-		});
-
-		it("should include context in validation error", () => {
-			const metadata = { title: 123 }; // Missing fields and wrong type
-
-			try {
-				validateMetadata(metadata, schema, {
-					documentKey: "doc1",
-					tableName: "test_table",
-				});
-				expect.fail("Should have thrown");
-			} catch (error) {
-				expect(error).toBeInstanceOf(ValidationError);
-				if (error instanceof ValidationError) {
-					expect(error.context?.documentKey).toBe("doc1");
-					expect(error.context?.tableName).toBe("test_table");
-				}
-			}
-		});
-	});
-
 	describe("mapMetadataToColumns", () => {
 		it("should map metadata fields to column names", () => {
 			const metadata = {
@@ -119,7 +60,7 @@ describe("chunk-store/postgres/utils", () => {
 
 	describe("buildDeleteQuery", () => {
 		it("should build basic delete query without scope", () => {
-			const { query, params } = buildDeleteQuery("test_table", "doc_key");
+			const { query, params } = buildDeleteQuery("test_table", "doc_key", {});
 
 			expect(query).toContain('DELETE FROM "test_table"');
 			expect(query).toContain('WHERE "doc_key" = $1');
@@ -166,6 +107,7 @@ describe("chunk-store/postgres/utils", () => {
 				chunks,
 				metadata,
 				columnMapping,
+				{},
 			);
 
 			expect(records).toHaveLength(2);

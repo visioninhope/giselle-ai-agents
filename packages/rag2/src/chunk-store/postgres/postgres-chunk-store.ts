@@ -2,18 +2,16 @@ import type { z } from "zod/v4";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { ColumnMapping, DatabaseConfig } from "../../database/types";
-import { DatabaseError } from "../../errors";
+import { DatabaseError, ValidationError } from "../../errors";
 import type { ChunkStore, ChunkWithEmbedding } from "../types";
 import {
 	deleteChunksByDocumentKey,
 	insertChunkRecords,
 	prepareChunkRecords,
-	validateMetadata,
 } from "./utils";
 
 /**
- * Create a PostgreSQL chunk store with automatic type inference
- * Automatically infers TMetadata from metadataSchema
+ * Create a PostgreSQL chunk store
  */
 export function createPostgresChunkStore<
 	TSchema extends z.ZodType<Record<string, unknown>>,
@@ -22,7 +20,7 @@ export function createPostgresChunkStore<
 	tableName: string;
 	columnMapping: ColumnMapping<z.infer<TSchema>>;
 	metadataSchema: TSchema;
-	scope?: Record<string, unknown>;
+	scope: Record<string, unknown>;
 }): ChunkStore<z.infer<TSchema>> {
 	const { database, tableName, columnMapping, metadataSchema, scope } = config;
 
@@ -34,10 +32,15 @@ export function createPostgresChunkStore<
 		chunks: ChunkWithEmbedding[],
 		metadata: z.infer<TSchema>,
 	): Promise<void> {
-		// Validate metadata first
-		validateMetadata(metadata, metadataSchema, { documentKey, tableName });
+		const result = metadataSchema.safeParse(metadata);
+		if (!result.success) {
+			throw ValidationError.fromZodError(result.error, {
+				operation: "insert",
+				documentKey,
+				tableName,
+			});
+		}
 
-		// Early return for empty chunks
 		if (chunks.length === 0) {
 			return;
 		}
@@ -46,13 +49,10 @@ export function createPostgresChunkStore<
 		const client = await pool.connect();
 
 		try {
-			// Register pgvector types once per connection
 			await ensurePgVectorTypes(client, database.connectionString);
 
-			// Start transaction
 			await client.query("BEGIN");
 
-			// Delete existing chunks
 			await deleteChunksByDocumentKey(
 				client,
 				tableName,
@@ -61,7 +61,6 @@ export function createPostgresChunkStore<
 				scope,
 			);
 
-			// Prepare and insert new chunks
 			const records = prepareChunkRecords(
 				documentKey,
 				chunks,
