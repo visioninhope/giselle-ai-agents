@@ -1,10 +1,12 @@
 import type { ChunkStore } from "../chunk-store/types";
+import { createDefaultChunker } from "../chunker";
 import type { ChunkerFunction } from "../chunker/types";
 import type {
 	Document,
 	DocumentLoader,
 	DocumentLoaderParams,
 } from "../document-loader/types";
+import { createDefaultEmbedder } from "../embedder";
 import type { EmbedderFunction } from "../embedder/types";
 import { OperationError } from "../errors";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
@@ -21,8 +23,8 @@ export function createIngestPipeline<
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 >(config: {
 	documentLoader: DocumentLoader<TDocMetadata, TParams>;
-	chunker: ChunkerFunction;
-	embedder: EmbedderFunction;
+	chunker?: ChunkerFunction;
+	embedder?: EmbedderFunction;
 	chunkStore: ChunkStore<TChunkMetadata>;
 	/**
 	 * Function to extract document key from a document
@@ -47,8 +49,8 @@ export function createIngestPipeline<
 }) {
 	const {
 		documentLoader,
-		chunker,
-		embedder,
+		chunker = createDefaultChunker(),
+		embedder = createDefaultEmbedder(),
 		chunkStore,
 		documentKey,
 		metadataTransform,
@@ -137,8 +139,8 @@ async function processBatch<
 	progress: IngestProgress,
 	config: {
 		documentLoader: DocumentLoader<TDocMetadata, TParams>;
-		chunker: ChunkerFunction;
-		embedder: EmbedderFunction;
+		chunker?: ChunkerFunction;
+		embedder?: EmbedderFunction;
 		chunkStore: ChunkStore<TChunkMetadata>;
 		documentKey: (document: Document<TDocMetadata>) => string;
 		metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
@@ -186,8 +188,8 @@ async function processDocument<
 	document: Document<TDocMetadata>,
 	config: {
 		documentLoader: DocumentLoader<TDocMetadata, TParams>;
-		chunker: ChunkerFunction;
-		embedder: EmbedderFunction;
+		chunker?: ChunkerFunction;
+		embedder?: EmbedderFunction;
 		chunkStore: ChunkStore<TChunkMetadata>;
 		documentKey: (document: Document<TDocMetadata>) => string;
 		metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
@@ -216,13 +218,15 @@ async function processDocument<
 	for (let attempt = 1; attempt <= options.maxRetries; attempt++) {
 		try {
 			// Chunking
-			const chunkTexts = chunker(document.content);
+			const actualChunker = chunker || createDefaultChunker();
+			const chunkTexts = actualChunker(document.content);
 
 			// Batch embedding
+			const actualEmbedder = embedder || createDefaultEmbedder();
 			const chunks = [];
 			for (let i = 0; i < chunkTexts.length; i += options.maxBatchSize) {
 				const batch = chunkTexts.slice(i, i + options.maxBatchSize);
-				const embeddings = await embedder.embedMany(batch);
+				const embeddings = await actualEmbedder.embedMany(batch);
 
 				for (let j = 0; j < batch.length; j++) {
 					chunks.push({

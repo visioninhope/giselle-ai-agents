@@ -1,11 +1,7 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubChunkStore } from "@/lib/vector-stores/github-blob-stores";
 import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
-import {
-	createDefaultChunker,
-	createDefaultEmbedder,
-	createIngestPipeline,
-} from "@giselle-sdk/rag2";
+import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
 
@@ -26,13 +22,9 @@ export async function ingestGitHubRepository(params: {
 		maxBlobSize: 1 * 1024 * 1024,
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
-	const chunker = createDefaultChunker();
-	const embedder = createDefaultEmbedder();
 
 	const pipeline = createIngestPipeline({
 		documentLoader: githubLoader,
-		chunker,
-		embedder,
 		chunkStore,
 		documentKey: (document) => document.metadata.path,
 		metadataTransform: (metadata) => ({
