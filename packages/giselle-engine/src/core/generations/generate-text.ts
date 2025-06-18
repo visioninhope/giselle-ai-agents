@@ -170,7 +170,6 @@ export async function generateText(args: {
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
 				messages,
-				maxTokens: 2,
 				maxSteps: 5, // enable multi-step calls
 				tools: preparedToolSet.toolSet,
 				experimental_continueSteps: true,
