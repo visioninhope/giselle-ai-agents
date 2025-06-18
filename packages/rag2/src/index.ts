@@ -22,7 +22,7 @@ export type {
 } from "./document-loader";
 
 // Chunk Store
-export { PostgresChunkStore, createPostgresChunkStore } from "./chunk-store";
+export { createPostgresChunkStore } from "./chunk-store";
 export type {
 	Chunk,
 	ChunkStore,
