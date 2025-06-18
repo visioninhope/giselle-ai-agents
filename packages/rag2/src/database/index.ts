@@ -4,3 +4,4 @@ export {
 	ensurePgVectorTypes,
 } from "./postgres/pgvector-registry";
 export type { ColumnMapping, DatabaseConfig, RequiredColumns } from "./types";
+export { createColumnMapping } from "./utils";

@@ -34,6 +34,23 @@ export interface PostgresChunkStoreConfig<TMetadata> {
 	staticContext?: Record<string, unknown>;
 }
 
+/**
+ * Factory function to create PostgresChunkStore with proper type inference
+ */
+export function createPostgresChunkStore<
+	TSchema extends z.ZodType<Record<string, unknown>>,
+>(config: {
+	database: DatabaseConfig;
+	tableName: string;
+	columnMapping: ColumnMapping<z.infer<TSchema>>;
+	metadataSchema: TSchema;
+	staticContext?: Record<string, unknown>;
+}): PostgresChunkStore<z.infer<TSchema>> {
+	return new PostgresChunkStore<z.infer<TSchema>>(config);
+}
+
+// Export store
+
 export class PostgresChunkStore<
 	TMetadata extends Record<string, unknown> = Record<string, never>,
 > implements ChunkStore<TMetadata>

@@ -3,47 +3,6 @@ import type { ColumnMapping, RequiredColumns } from "../database/types";
 import type { EmbedderFunction } from "../embedder/types";
 
 /**
- * chunk store config
- */
-export interface ChunkStoreConfig<TMetadata extends Record<string, unknown>> {
-	/**
-	 * database config
-	 */
-	database: {
-		connectionString: string;
-		poolConfig?: {
-			max?: number;
-			idleTimeoutMillis?: number;
-			connectionTimeoutMillis?: number;
-		};
-	};
-	/**
-	 * table name
-	 */
-	tableName: string;
-	/**
-	 * metadata schema
-	 */
-	metadataSchema: z.ZodType<TMetadata>;
-	/**
-	 * required column overrides
-	 */
-	requiredColumnOverrides?: Partial<RequiredColumns>;
-	/**
-	 * metadata column overrides
-	 */
-	metadataColumnOverrides?: Partial<Record<keyof TMetadata, string>>;
-	/**
-	 * column mapping
-	 */
-	columnMapping?: ColumnMapping<TMetadata>;
-	/**
-	 * static context
-	 */
-	staticContext?: Record<string, unknown>;
-}
-
-/**
  * query service config
  */
 export interface QueryServiceConfig<

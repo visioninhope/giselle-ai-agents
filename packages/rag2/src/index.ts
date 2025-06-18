@@ -7,7 +7,7 @@ export {
 } from "./errors";
 
 // Database
-export { PoolManager } from "./database";
+export { PoolManager, createColumnMapping } from "./database";
 export type {
 	ColumnMapping,
 	DatabaseConfig,
@@ -22,7 +22,7 @@ export type {
 } from "./document-loader";
 
 // Chunk Store
-export { PostgresChunkStore } from "./chunk-store";
+export { PostgresChunkStore, createPostgresChunkStore } from "./chunk-store";
 export type {
 	Chunk,
 	ChunkStore,
@@ -40,11 +40,11 @@ export type {
 } from "./query-service";
 
 // Embedder
-export { createOpenAIEmbedder } from "./embedder";
+export { createOpenAIEmbedder, createDefaultEmbedder } from "./embedder";
 export type { EmbedderFunction, OpenAIEmbedderConfig } from "./embedder";
 
 // Chunker
-export { createLineChunker } from "./chunker";
+export { createLineChunker, createDefaultChunker } from "./chunker";
 export type { ChunkerFunction, LineChunkerOptions } from "./chunker";
 
 // Ingest Pipeline
@@ -56,21 +56,8 @@ export {
 	type IngestResult,
 } from "./ingest";
 
-// Simplified API with smart defaults
-export {
-	// Factory functions
-	createChunkStore,
-	// Utilities
-	createColumnMapping,
-	createDefaultChunker,
-	// Default instances
-	createDefaultEmbedder,
-	createIngestPipeline as createSimplifiedIngestPipeline,
-	createQueryService,
-	// Types
-	type ChunkStoreConfig,
-	type QueryServiceConfig,
-} from "./factories";
+// Query Service (kept in factories for now)
+export { createQueryService, type QueryServiceConfig } from "./factories";
 
 // Enhanced errors (additional classes and utilities)
 export {

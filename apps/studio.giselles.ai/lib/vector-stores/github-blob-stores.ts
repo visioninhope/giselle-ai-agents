@@ -11,7 +11,8 @@ import type {
 } from "@giselle-sdk/giselle-engine";
 import {
 	type DatabaseConfig,
-	createChunkStore,
+	createColumnMapping,
+	createPostgresChunkStore,
 	createQueryService,
 } from "@giselle-sdk/rag2";
 import { and, eq, getTableName } from "drizzle-orm";
@@ -45,11 +46,8 @@ function createDatabaseConfig(): DatabaseConfig {
  * GitHub chunk store factory - for ingestion pipeline
  */
 export function createGitHubChunkStore(repositoryIndexDbId: number) {
-	return createChunkStore<GitHubChunkMetadata>({
-		database: createDatabaseConfig(),
-		tableName: getTableName(githubRepositoryEmbeddings),
+	const columnMapping = createColumnMapping({
 		metadataSchema: githubChunkMetadataSchema,
-		staticContext: { repository_index_db_id: repositoryIndexDbId },
 		requiredColumnOverrides: {
 			documentKey: "path",
 			// (default)
@@ -63,6 +61,14 @@ export function createGitHubChunkStore(repositoryIndexDbId: number) {
 		// fileSha -> file_sha
 		// path -> path
 		// nodeId -> node_id
+	});
+
+	return createPostgresChunkStore({
+		database: createDatabaseConfig(),
+		tableName: getTableName(githubRepositoryEmbeddings),
+		columnMapping,
+		metadataSchema: githubChunkMetadataSchema,
+		staticContext: { repository_index_db_id: repositoryIndexDbId },
 	});
 }
 
