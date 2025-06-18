@@ -3,6 +3,8 @@ import type { FlowRunId, FlowRunObject } from "./run/object";
 import { type PatchDelta, patchFlowRun } from "./run/patch-object";
 import { flowRunPath } from "./run/paths";
 
+export type { PatchDelta };
+
 export async function patchRun(args: {
 	context: GiselleEngineContext;
 	flowRunId: FlowRunId;
