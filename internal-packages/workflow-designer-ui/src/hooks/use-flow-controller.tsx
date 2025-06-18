@@ -1,4 +1,5 @@
 import type { Generation, Workflow } from "@giselle-sdk/data-type";
+import type { FlowRunId } from "@giselle-sdk/giselle-engine";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
@@ -9,10 +10,7 @@ import {
 	type FormInput,
 	createGenerationsForFlow,
 } from "../header/ui/trigger-input-dialog/helpers";
-
 import { useToasts } from "../ui/toast";
-
-type FlowRunId = `flrn-${string}`;
 
 export function useFlowController() {
 	const { createGeneration, startGeneration, stopGeneration } =

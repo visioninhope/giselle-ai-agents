@@ -7,3 +7,4 @@ export * from "./run-flow";
 export * from "./create-run";
 export * from "./patch-run";
 export * from "./get-workspace-flow-runs";
+export * from "./run/object";
