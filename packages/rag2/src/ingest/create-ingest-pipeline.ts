@@ -11,28 +11,29 @@ import type { IngestError, IngestProgress, IngestResult } from "./types";
 
 /**
  * Create an ingest pipeline with automatic type inference
- * Automatically infers TMetadata from chunkStore parameter
+ * Supports different metadata types for document loader and chunk store
  * @param config Pipeline configuration
  * @returns A function that runs the ingestion process
  */
 export function createIngestPipeline<
-	TMetadata extends Record<string, unknown>,
+	TDocMetadata extends Record<string, unknown>,
+	TChunkMetadata extends Record<string, unknown>,
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 >(config: {
-	documentLoader: DocumentLoader<TMetadata, TParams>;
+	documentLoader: DocumentLoader<TDocMetadata, TParams>;
 	chunker: ChunkerFunction;
 	embedder: EmbedderFunction;
-	chunkStore: ChunkStore<TMetadata>;
+	chunkStore: ChunkStore<TChunkMetadata>;
 	/**
 	 * Function to extract document key from a document
 	 * This is used to uniquely identify documents in the chunk store
 	 */
-	documentKey: (document: Document<TMetadata>) => string;
+	documentKey: (document: Document<TDocMetadata>) => string;
 	/**
-	 * Optional metadata transformation function
-	 * If not provided, metadata is passed through unchanged
+	 * Metadata transformation function to convert document metadata to chunk metadata
+	 * Required when document metadata differs from chunk metadata
 	 */
-	metadataTransform?: (metadata: TMetadata) => TMetadata;
+	metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
 	/**
 	 * Pipeline options
 	 */
@@ -50,7 +51,7 @@ export function createIngestPipeline<
 		embedder,
 		chunkStore,
 		documentKey,
-		metadataTransform = (metadata) => metadata,
+		metadataTransform,
 		options = {},
 	} = config;
 
@@ -81,7 +82,7 @@ export function createIngestPipeline<
 
 		try {
 			// Collect documents into batches for more efficient processing
-			const documentBatch: Array<Document<TMetadata>> = [];
+			const documentBatch: Array<Document<TDocMetadata>> = [];
 
 			// Process documents in batches
 			for await (const document of documentLoader.load(params)) {
@@ -127,19 +128,20 @@ export function createIngestPipeline<
  * Process a batch of documents efficiently
  */
 async function processBatch<
-	TMetadata extends Record<string, unknown>,
+	TDocMetadata extends Record<string, unknown>,
+	TChunkMetadata extends Record<string, unknown>,
 	TParams extends DocumentLoaderParams,
 >(
-	documents: Array<Document<TMetadata>>,
+	documents: Array<Document<TDocMetadata>>,
 	result: IngestResult,
 	progress: IngestProgress,
 	config: {
-		documentLoader: DocumentLoader<TMetadata, TParams>;
+		documentLoader: DocumentLoader<TDocMetadata, TParams>;
 		chunker: ChunkerFunction;
 		embedder: EmbedderFunction;
-		chunkStore: ChunkStore<TMetadata>;
-		documentKey: (document: Document<TMetadata>) => string;
-		metadataTransform?: (metadata: TMetadata) => TMetadata;
+		chunkStore: ChunkStore<TChunkMetadata>;
+		documentKey: (document: Document<TDocMetadata>) => string;
+		metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
 		options?: {
 			maxBatchSize?: number;
 			maxRetries?: number;
@@ -177,17 +179,18 @@ async function processBatch<
  * Process a single document with retry logic
  */
 async function processDocument<
-	TMetadata extends Record<string, unknown>,
+	TDocMetadata extends Record<string, unknown>,
+	TChunkMetadata extends Record<string, unknown>,
 	TParams extends DocumentLoaderParams,
 >(
-	document: Document<TMetadata>,
+	document: Document<TDocMetadata>,
 	config: {
-		documentLoader: DocumentLoader<TMetadata, TParams>;
+		documentLoader: DocumentLoader<TDocMetadata, TParams>;
 		chunker: ChunkerFunction;
 		embedder: EmbedderFunction;
-		chunkStore: ChunkStore<TMetadata>;
-		documentKey: (document: Document<TMetadata>) => string;
-		metadataTransform?: (metadata: TMetadata) => TMetadata;
+		chunkStore: ChunkStore<TChunkMetadata>;
+		documentKey: (document: Document<TDocMetadata>) => string;
+		metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
 		options?: {
 			maxBatchSize?: number;
 			maxRetries?: number;
@@ -207,7 +210,7 @@ async function processDocument<
 	// Apply metadata transformation
 	const targetMetadata = metadataTransform
 		? metadataTransform(document.metadata)
-		: document.metadata;
+		: (document.metadata as unknown as TChunkMetadata);
 
 	// Retry logic
 	for (let attempt = 1; attempt <= options.maxRetries; attempt++) {
