@@ -31,9 +31,6 @@ export const githubChunkMetadataSchema = z.object({
 
 export type GitHubChunkMetadata = z.infer<typeof githubChunkMetadataSchema>;
 
-/**
- * Create PostgreSQL connection config from environment
- */
 function createDatabaseConfig(): DatabaseConfig {
 	const postgresUrl = process.env.POSTGRES_URL;
 	if (!postgresUrl) {
@@ -50,17 +47,7 @@ export function createGitHubChunkStore(repositoryIndexDbId: number) {
 		metadataSchema: githubChunkMetadataSchema,
 		requiredColumnOverrides: {
 			documentKey: "path",
-			// (default)
-			// chunkContent: "chunk_content",
-			// chunkIndex: "chunk_index",
-			// embedding: "embedding" (default)
 		},
-		// Metadata fields will auto-convert from camelCase to snake_case:
-		// repositoryIndexDbId -> repository_index_db_id
-		// commitSha -> commit_sha
-		// fileSha -> file_sha
-		// path -> path
-		// nodeId -> node_id
 	});
 
 	return createPostgresChunkStore({
@@ -68,7 +55,9 @@ export function createGitHubChunkStore(repositoryIndexDbId: number) {
 		tableName: getTableName(githubRepositoryEmbeddings),
 		columnMapping,
 		metadataSchema: githubChunkMetadataSchema,
-		staticContext: { repository_index_db_id: repositoryIndexDbId },
+		staticContext: {
+			repository_index_db_id: repositoryIndexDbId,
+		},
 	});
 }
 
