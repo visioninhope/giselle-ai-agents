@@ -10,12 +10,15 @@ import { OperationError } from "../errors";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
 
 /**
- * Simplified configuration for creating an ingest pipeline
+ * Create an ingest pipeline with automatic type inference
+ * Automatically infers TMetadata from chunkStore parameter
+ * @param config Pipeline configuration
+ * @returns A function that runs the ingestion process
  */
-export interface IngestConfig<
-	TMetadata extends Record<string, unknown> = Record<string, unknown>,
+export function createIngestPipeline<
+	TMetadata extends Record<string, unknown>,
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,
-> {
+>(config: {
 	documentLoader: DocumentLoader<TMetadata, TParams>;
 	chunker: ChunkerFunction;
 	embedder: EmbedderFunction;
@@ -40,17 +43,7 @@ export interface IngestConfig<
 		onProgress?: (progress: IngestProgress) => void;
 		onError?: (error: IngestError) => void;
 	};
-}
-
-/**
- * Create an ingest pipeline with simplified configuration
- * @param config Pipeline configuration
- * @returns A function that runs the ingestion process
- */
-export function createIngestPipeline<
-	TMetadata extends Record<string, unknown> = Record<string, unknown>,
-	TParams extends DocumentLoaderParams = DocumentLoaderParams,
->(config: IngestConfig<TMetadata, TParams>) {
+}) {
 	const {
 		documentLoader,
 		chunker,
@@ -140,8 +133,24 @@ async function processBatch<
 	documents: Array<Document<TMetadata>>,
 	result: IngestResult,
 	progress: IngestProgress,
-	config: IngestConfig<TMetadata, TParams>,
-	options: Required<NonNullable<IngestConfig<TMetadata, TParams>["options"]>>,
+	config: {
+		documentLoader: DocumentLoader<TMetadata, TParams>;
+		chunker: ChunkerFunction;
+		embedder: EmbedderFunction;
+		chunkStore: ChunkStore<TMetadata>;
+		documentKey: (document: Document<TMetadata>) => string;
+		metadataTransform?: (metadata: TMetadata) => TMetadata;
+		options?: {
+			maxBatchSize?: number;
+			maxRetries?: number;
+			retryDelay?: number;
+			onProgress?: (progress: IngestProgress) => void;
+			onError?: (error: IngestError) => void;
+		};
+	},
+	options: Required<
+		NonNullable<Parameters<typeof createIngestPipeline>[0]["options"]>
+	>,
 ): Promise<void> {
 	// Process documents sequentially within the batch
 	for (const document of documents) {
@@ -172,8 +181,24 @@ async function processDocument<
 	TParams extends DocumentLoaderParams,
 >(
 	document: Document<TMetadata>,
-	config: IngestConfig<TMetadata, TParams>,
-	options: Required<NonNullable<IngestConfig<TMetadata, TParams>["options"]>>,
+	config: {
+		documentLoader: DocumentLoader<TMetadata, TParams>;
+		chunker: ChunkerFunction;
+		embedder: EmbedderFunction;
+		chunkStore: ChunkStore<TMetadata>;
+		documentKey: (document: Document<TMetadata>) => string;
+		metadataTransform?: (metadata: TMetadata) => TMetadata;
+		options?: {
+			maxBatchSize?: number;
+			maxRetries?: number;
+			retryDelay?: number;
+			onProgress?: (progress: IngestProgress) => void;
+			onError?: (error: IngestError) => void;
+		};
+	},
+	options: Required<
+		NonNullable<Parameters<typeof createIngestPipeline>[0]["options"]>
+	>,
 ): Promise<void> {
 	const { chunker, embedder, chunkStore, documentKey, metadataTransform } =
 		config;

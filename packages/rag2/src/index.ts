@@ -50,7 +50,6 @@ export type { ChunkerFunction, LineChunkerOptions } from "./chunker";
 export {
 	createIngestPipeline,
 	type IngestError,
-	type IngestPipelineConfig,
 	type IngestProgress,
 	type IngestResult,
 } from "./ingest";
