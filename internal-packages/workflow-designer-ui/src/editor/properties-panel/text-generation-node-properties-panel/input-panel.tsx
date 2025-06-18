@@ -35,13 +35,8 @@ export function InputPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const {
-		data,
-		addConnection,
-		deleteConnection,
-		deleteConnectionWithCleanup,
-		updateNodeData,
-	} = useWorkflowDesigner();
+	const { data, addConnection, deleteConnectionWithCleanup, updateNodeData } =
+		useWorkflowDesigner();
 	const outputs = useMemo<OutputWithDetails[]>(() => {
 		const tmp: OutputWithDetails[] = [];
 		const connectionToThisNode = data.connections.filter(
@@ -121,7 +116,7 @@ export function InputPanel({
 				if (connection === undefined) {
 					continue;
 				}
-				deleteConnection(connection.id);
+				deleteConnectionWithCleanup(connection.id);
 
 				mutableInputs = mutableInputs.filter(
 					(input) => input.id !== connection.inputId,

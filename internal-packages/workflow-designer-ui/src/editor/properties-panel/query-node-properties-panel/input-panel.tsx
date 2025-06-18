@@ -329,13 +329,8 @@ export function InputPanel({
 }: {
 	node: QueryNode;
 }) {
-	const {
-		data,
-		addConnection,
-		deleteConnection,
-		deleteConnectionWithCleanup,
-		updateNodeData,
-	} = useWorkflowDesigner();
+	const { data, addConnection, deleteConnectionWithCleanup, updateNodeData } =
+		useWorkflowDesigner();
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
 		const connections = data.connections.filter(

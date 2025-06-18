@@ -322,13 +322,8 @@ export function InputPanel({
 }: {
 	node: ImageGenerationNode;
 }) {
-	const {
-		data,
-		addConnection,
-		deleteConnection,
-		deleteConnectionWithCleanup,
-		updateNodeData,
-	} = useWorkflowDesigner();
+	const { data, addConnection, deleteConnectionWithCleanup, updateNodeData } =
+		useWorkflowDesigner();
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
 		const connections = data.connections.filter(
