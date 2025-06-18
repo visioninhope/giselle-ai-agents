@@ -28,13 +28,13 @@ export const GoogleLanguageModelId = z
 		if (typeof ctx.value !== "string") {
 			return "gemini-2.5-flash-lite-preview-06-17";
 		}
-		if (ctx.value.startsWith("gemini-2.5-pro")) {
+		if (/^gemini-\d+(?:\.\d+)?-pro/.test(ctx.value)) {
 			return "gemini-2.5-pro";
 		}
-		if (ctx.value.startsWith("gemini-2.5-flash-lite")) {
+		if (/^gemini-\d+(?:\.\d+)?-flash-lite/.test(ctx.value)) {
 			return "gemini-2.5-flash-lite-preview-06-17";
 		}
-		if (ctx.value.startsWith("gemini-2.5-flash")) {
+		if (/^gemini-\d+(?:\.\d+)?-flash/.test(ctx.value)) {
 			return "gemini-2.5-flash";
 		}
 		return "gemini-2.5-flash-lite-preview-06-17";
