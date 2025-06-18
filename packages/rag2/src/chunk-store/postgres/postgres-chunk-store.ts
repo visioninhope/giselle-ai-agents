@@ -22,10 +22,9 @@ export function createPostgresChunkStore<
 	tableName: string;
 	columnMapping: ColumnMapping<z.infer<TSchema>>;
 	metadataSchema: TSchema;
-	staticContext?: Record<string, unknown>;
+	scope?: Record<string, unknown>;
 }): ChunkStore<z.infer<TSchema>> {
-	const { database, tableName, columnMapping, metadataSchema, staticContext } =
-		config;
+	const { database, tableName, columnMapping, metadataSchema, scope } = config;
 
 	/**
 	 * Insert chunks with metadata
@@ -59,7 +58,7 @@ export function createPostgresChunkStore<
 				tableName,
 				documentKey,
 				columnMapping.documentKey,
-				staticContext,
+				scope,
 			);
 
 			// Prepare and insert new chunks
@@ -68,7 +67,7 @@ export function createPostgresChunkStore<
 				chunks,
 				metadata,
 				columnMapping,
-				staticContext,
+				scope,
 			);
 			await insertChunkRecords(client, tableName, records);
 
@@ -104,7 +103,7 @@ export function createPostgresChunkStore<
 				tableName,
 				documentKey,
 				columnMapping.documentKey,
-				staticContext,
+				scope,
 			);
 		} catch (error) {
 			throw DatabaseError.queryFailed(

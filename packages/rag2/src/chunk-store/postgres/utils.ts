@@ -66,7 +66,7 @@ export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
 export function buildDeleteQuery(
 	tableName: string,
 	documentKeyColumn: string,
-	staticContext?: Record<string, unknown>,
+	scope?: Record<string, unknown>,
 ): { query: string; params: unknown[] } {
 	let query = `
     DELETE FROM ${escapeIdentifier(tableName)}
@@ -75,8 +75,8 @@ export function buildDeleteQuery(
 
 	const params: unknown[] = [];
 
-	if (staticContext) {
-		for (const [key, value] of Object.entries(staticContext)) {
+	if (scope) {
+		for (const [key, value] of Object.entries(scope)) {
 			params.push(value);
 			query += ` AND ${escapeIdentifier(key)} = $${params.length + 1}`;
 		}
@@ -93,12 +93,12 @@ export async function deleteChunksByDocumentKey(
 	tableName: string,
 	documentKey: string,
 	documentKeyColumn: string,
-	staticContext?: Record<string, unknown>,
+	scope?: Record<string, unknown>,
 ): Promise<void> {
 	const { query, params } = buildDeleteQuery(
 		tableName,
 		documentKeyColumn,
-		staticContext,
+		scope,
 	);
 	await client.query(query, [documentKey, ...params]);
 }
@@ -111,7 +111,7 @@ export function prepareChunkRecords<TMetadata extends Record<string, unknown>>(
 	chunks: ChunkWithEmbedding[],
 	metadata: TMetadata,
 	columnMapping: ColumnMapping<TMetadata>,
-	staticContext?: Record<string, unknown>,
+	scope?: Record<string, unknown>,
 ): Array<{
 	record: Record<string, unknown>;
 	embedding: {
@@ -127,7 +127,7 @@ export function prepareChunkRecords<TMetadata extends Record<string, unknown>>(
 			[columnMapping.chunkContent]: chunk.content,
 			[columnMapping.chunkIndex]: chunk.index,
 			...metadataColumns,
-			...staticContext,
+			...scope,
 		},
 		embedding: {
 			embeddingColumn: columnMapping.embedding,

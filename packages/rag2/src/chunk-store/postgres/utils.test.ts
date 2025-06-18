@@ -118,7 +118,7 @@ describe("chunk-store/postgres/utils", () => {
 	});
 
 	describe("buildDeleteQuery", () => {
-		it("should build basic delete query without static context", () => {
+		it("should build basic delete query without scope", () => {
 			const { query, params } = buildDeleteQuery("test_table", "doc_key");
 
 			expect(query).toContain('DELETE FROM "test_table"');
@@ -126,7 +126,7 @@ describe("chunk-store/postgres/utils", () => {
 			expect(params).toEqual([]);
 		});
 
-		it("should build delete query with static context", () => {
+		it("should build delete query with scope", () => {
 			const { query, params } = buildDeleteQuery("test_table", "doc_key", {
 				user_id: 123,
 				tenant: "acme",
@@ -186,7 +186,7 @@ describe("chunk-store/postgres/utils", () => {
 			expect(records[1].embedding.embeddingValue).toEqual([4, 5, 6]);
 		});
 
-		it("should include static context in records", () => {
+		it("should include scope in records", () => {
 			const chunks = [{ content: "chunk1", index: 0, embedding: [1, 2, 3] }];
 
 			const metadata = { title: "Test" };
@@ -198,7 +198,7 @@ describe("chunk-store/postgres/utils", () => {
 				title: "title_col",
 			};
 
-			const staticContext = {
+			const scope = {
 				user_id: 123,
 				tenant: "acme",
 			};
@@ -208,7 +208,7 @@ describe("chunk-store/postgres/utils", () => {
 				chunks,
 				metadata,
 				columnMapping,
-				staticContext,
+				scope,
 			);
 
 			expect(records[0].record).toMatchObject({
