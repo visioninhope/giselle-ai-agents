@@ -136,9 +136,12 @@ export const GlassDialogFooter = ({
 				type={confirmButtonType}
 				onClick={onConfirm}
 				disabled={isPending}
-				className={buttonVariants({
-					variant: variant === "destructive" ? "destructive" : "primary",
-				})}
+				className={cn(
+					buttonVariants({
+						variant: variant === "destructive" ? "destructive" : "primary",
+					}),
+					"whitespace-nowrap",
+				)}
 			>
 				{isPending ? "Processing..." : confirmLabel}
 			</button>
