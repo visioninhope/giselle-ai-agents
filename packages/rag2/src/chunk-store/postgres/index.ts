@@ -1,4 +1,1 @@
-export {
-	createPostgresChunkStore,
-	type PostgresChunkStoreConfig,
-} from "./postgres-chunk-store";
+export { createPostgresChunkStore } from "./postgres-chunk-store";

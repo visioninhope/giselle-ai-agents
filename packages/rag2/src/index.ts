@@ -27,7 +27,6 @@ export type {
 	Chunk,
 	ChunkStore,
 	ChunkWithEmbedding,
-	PostgresChunkStoreConfig,
 } from "./chunk-store";
 
 // Query Service

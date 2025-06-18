@@ -12,22 +12,18 @@ import {
 } from "./utils";
 
 /**
- * Configuration for PostgreSQL chunk store
- */
-export interface PostgresChunkStoreConfig<TMetadata> {
-	database: DatabaseConfig;
-	tableName: string;
-	columnMapping: ColumnMapping<TMetadata>;
-	metadataSchema: z.ZodType<TMetadata>;
-	staticContext?: Record<string, unknown>;
-}
-
-/**
- * Create a PostgreSQL chunk store
+ * Create a PostgreSQL chunk store with automatic type inference
+ * Automatically infers TMetadata from metadataSchema
  */
 export function createPostgresChunkStore<
 	TSchema extends z.ZodType<Record<string, unknown>>,
->(config: PostgresChunkStoreConfig<z.infer<TSchema>>): ChunkStore<z.infer<TSchema>> {
+>(config: {
+	database: DatabaseConfig;
+	tableName: string;
+	columnMapping: ColumnMapping<z.infer<TSchema>>;
+	metadataSchema: TSchema;
+	staticContext?: Record<string, unknown>;
+}): ChunkStore<z.infer<TSchema>> {
 	const { database, tableName, columnMapping, metadataSchema, staticContext } =
 		config;
 
