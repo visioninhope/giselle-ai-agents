@@ -465,6 +465,16 @@ export async function processEvent<TEventName extends WebhookEventName>(
 						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
 					);
 				},
+				jobFail: async ({ job }) => {
+					progressTableData = progressTableData.map((row) =>
+						row.id === job.id
+							? { ...row, status: "failed", updatedAt: new Date() }
+							: row,
+					);
+					await updateComment(
+						`Running flow...\n\n${buildProgressTable(progressTableData)}`,
+					);
+				},
 			},
 		});
 		await updateComment(
