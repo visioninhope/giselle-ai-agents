@@ -1,4 +1,5 @@
 import type { Generation, Workflow } from "@giselle-sdk/data-type";
+import type { FlowRunId } from "@giselle-sdk/giselle-engine";
 import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
@@ -29,6 +30,116 @@ export function useFlowController() {
 			),
 		);
 	}, [stopGeneration]);
+
+	const patchRunAnnotations = useCallback(
+		async (runId: FlowRunId, message: string) => {
+			await client.patchRun({
+				flowRunId: runId,
+				delta: {
+					annotations: {
+						push: [{ level: "error", message }],
+					},
+				},
+			});
+		},
+		[client],
+	);
+
+	const runOperation = useCallback(
+		async (
+			runId: FlowRunId,
+			operation: Workflow["jobs"][number]["operations"][number],
+			generations: Generation[],
+			jobStartedAt: number,
+		) => {
+			const generation = generations.find(
+				(g) => g.context.operationNode.id === operation.node.id,
+			);
+			if (generation === undefined || cancelRef.current) {
+				return { duration: 0, hasError: false };
+			}
+			let hasError = false;
+			await startGeneration(generation.id, {
+				onGenerationFailed: async (failedGeneration) => {
+					hasError = true;
+					await patchRunAnnotations(runId, failedGeneration.error.message);
+				},
+			});
+			return { duration: Date.now() - jobStartedAt, hasError };
+		},
+		[patchRunAnnotations, startGeneration],
+	);
+
+	const runJob = useCallback(
+		async (
+			runId: FlowRunId,
+			job: Workflow["jobs"][number],
+			jobIndex: number,
+			generations: Generation[],
+			onComplete?: () => void,
+		) => {
+			await client.patchRun({
+				flowRunId: runId,
+				delta: {
+					"steps.inProgress": { increment: 1 },
+					"steps.queued": { decrement: 1 },
+				},
+			});
+
+			const jobStartedAt = Date.now();
+			let totalTasks = 0;
+			let hasJobError = false;
+			await Promise.all(
+				job.operations.map(async (operation) => {
+					const { duration, hasError } = await runOperation(
+						runId,
+						operation,
+						generations,
+						jobStartedAt,
+					);
+					totalTasks += duration;
+					if (hasError) {
+						hasJobError = true;
+					}
+				}),
+			);
+
+			if (jobIndex === 0 && onComplete) {
+				onComplete();
+			}
+
+			await client.patchRun({
+				flowRunId: runId,
+				delta: hasJobError
+					? {
+							"steps.failed": { increment: 1 },
+							"steps.inProgress": { decrement: 1 },
+							"duration.totalTask": { increment: totalTasks },
+						}
+					: {
+							"steps.completed": { increment: 1 },
+							"steps.inProgress": { decrement: 1 },
+							"duration.totalTask": { increment: totalTasks },
+						},
+			});
+
+			return hasJobError;
+		},
+		[client, runOperation],
+	);
+
+	const finalizeRun = useCallback(
+		async (runId: FlowRunId, hasError: boolean, startedAt: number) => {
+			await client.patchRun({
+				flowRunId: runId,
+				delta: {
+					status: { set: hasError ? "failed" : "completed" },
+					"duration.wallClock": { set: Date.now() - startedAt },
+				},
+			});
+		},
+		[client],
+	);
 
 	const startFlow = useCallback(
 		async (
@@ -69,96 +180,26 @@ export function useFlowController() {
 				jobsCount: flow.jobs.length,
 				trigger: "manual",
 			});
+
 			const flowStartedAt = Date.now();
 			let hasFlowError = false;
+
 			for (const [jobIndex, job] of flow.jobs.entries()) {
-				await client.patchRun({
-					flowRunId: run.id,
-					delta: {
-						"steps.inProgress": { increment: 1 },
-						"steps.queued": { decrement: 1 },
-					},
-				});
-				const jobStartedAt = Date.now();
-				let totalTasks = 0;
-				let hasJobError = false;
-				await Promise.all(
-					job.operations.map(async (operation) => {
-						const generation = generations.find(
-							(g) => g.context.operationNode.id === operation.node.id,
-						);
-						if (generation === undefined) {
-							return;
-						}
-						if (cancelRef.current) {
-							return;
-						}
-						await startGeneration(generation.id, {
-							onGenerationFailed: async (generation) => {
-								hasJobError = true;
-								hasFlowError = true;
-								await client.patchRun({
-									flowRunId: run.id,
-									delta: {
-										annotations: {
-											push: [
-												{
-													level: "error",
-													message: generation.error.message,
-												},
-											],
-										},
-									},
-								});
-							},
-						});
-						totalTasks += Date.now() - jobStartedAt;
-					}),
+				const jobErrored = await runJob(
+					run.id,
+					job,
+					jobIndex,
+					generations,
+					onComplete,
 				);
-
-				if (jobIndex === 0 && onComplete) {
-					onComplete();
-				}
-
-				if (hasJobError) {
-					await client.patchRun({
-						flowRunId: run.id,
-						delta: {
-							"steps.failed": { increment: 1 },
-							"steps.inProgress": { decrement: 1 },
-							"duration.totalTask": { increment: totalTasks },
-						},
-					});
-				} else {
-					await client.patchRun({
-						flowRunId: run.id,
-						delta: {
-							"steps.completed": { increment: 1 },
-							"steps.inProgress": { decrement: 1 },
-							"duration.totalTask": { increment: totalTasks },
-						},
-					});
+				if (jobErrored) {
+					hasFlowError = true;
 				}
 			}
-			if (hasFlowError) {
-				await client.patchRun({
-					flowRunId: run.id,
-					delta: {
-						status: { set: "failed" },
-						"duration.wallClock": { set: Date.now() - flowStartedAt },
-					},
-				});
-			} else {
-				await client.patchRun({
-					flowRunId: run.id,
-					delta: {
-						status: { set: "completed" },
-						"duration.wallClock": { set: Date.now() - flowStartedAt },
-					},
-				});
-			}
+
+			await finalizeRun(run.id, hasFlowError, flowStartedAt);
 		},
-		[createGeneration, data.id, info, startGeneration, stopFlow, client],
+		[createGeneration, data.id, info, stopFlow, client, runJob, finalizeRun],
 	);
 
 	return { startFlow };

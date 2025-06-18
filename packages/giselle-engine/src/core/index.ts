@@ -61,6 +61,7 @@ import {
 export * from "./types";
 export * from "./vault";
 export * from "./vector-store";
+export { FlowRunId } from "./flows";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {
