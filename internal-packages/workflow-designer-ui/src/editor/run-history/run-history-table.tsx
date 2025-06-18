@@ -95,7 +95,7 @@ export function RunHistoryTable() {
 								<TableCell>
 									<span
 										className={clsx(
-											"group-data-[status=success]:text-success",
+											"group-data-[status=completed]:text-success",
 											"group-data-[status=inProgress]:text-info",
 											"group-data-[status=error]:text-error",
 										)}
