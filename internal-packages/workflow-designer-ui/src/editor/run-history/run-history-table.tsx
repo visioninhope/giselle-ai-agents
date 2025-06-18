@@ -18,7 +18,20 @@ import {
 } from "lucide-react";
 import useSWR from "swr";
 
-function formatDateTime(timestamp: number): string {
+function formatDuration(elapsedMs: number): string {
+	const elapsedSeconds = elapsedMs / 1000;
+
+	if (elapsedSeconds < 60) {
+		// Less than 1 minute: show as "30.4s"
+		return `${elapsedSeconds.toFixed(1)}s`;
+	}
+	// 1 minute or more: show as "2m 30s"
+	const minutes = Math.floor(elapsedSeconds / 60);
+	const seconds = Math.floor(elapsedSeconds % 60);
+	return `${minutes}m ${seconds}s`;
+}
+
+function formatTimestamp(timestamp: number): string {
 	const date = new Date(timestamp);
 	const year = date.getFullYear();
 	const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -78,7 +91,7 @@ export function RunHistoryTable() {
 								className="group"
 								key={item.id}
 							>
-								<TableCell>{formatDateTime(item.createdAt)}</TableCell>
+								<TableCell>{formatTimestamp(item.createdAt)}</TableCell>
 								<TableCell>
 									<span
 										className={clsx(
@@ -120,8 +133,8 @@ export function RunHistoryTable() {
 									</div>
 								</TableCell>
 								<TableCell>{item.trigger}</TableCell>
-								<TableCell>{item.duration.wallClock}</TableCell>
-								<TableCell>{item.duration.totalTask}</TableCell>
+								<TableCell>{formatDuration(item.duration.wallClock)}</TableCell>
+								<TableCell>{formatDuration(item.duration.totalTask)}</TableCell>
 								<TableCell />
 							</TableRow>
 						))}
