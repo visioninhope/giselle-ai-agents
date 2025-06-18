@@ -56,7 +56,7 @@ export async function runFlow(args: {
 	await args.callbacks?.flowCreate?.({ flow });
 
 	const runId = RunId.generate();
-	let flowRun = await createRun({
+	const flowRun = await createRun({
 		context: args.context,
 		trigger: trigger.configuration.provider,
 		workspaceId: trigger.workspaceId,
@@ -70,6 +70,7 @@ export async function runFlow(args: {
 		),
 	]);
 
+	const flowStartedAt = Date.now();
 	for (const job of flow.jobs) {
 		if (args.callbacks?.jobStart) {
 			await args.callbacks.jobStart({ job });
@@ -82,6 +83,8 @@ export async function runFlow(args: {
 				"steps.queued": { decrement: 1 },
 			},
 		});
+		const jobStartedAt = Date.now();
+		let totalTasks = 0;
 		await Promise.all(
 			job.operations.map(async (operation) => {
 				const generationId = GenerationId.generate();
@@ -144,6 +147,7 @@ export async function runFlow(args: {
 						throw new Error(`Unhandled operation type: ${_exhaustiveCheck}`);
 					}
 				}
+				totalTasks += Date.now() - jobStartedAt;
 			}),
 		);
 		if (args.callbacks?.jobComplete) {
@@ -155,11 +159,17 @@ export async function runFlow(args: {
 			delta: {
 				"steps.inProgress": { decrement: 1 },
 				"steps.completed": { increment: 1 },
+				"duration.totalTask": { increment: totalTasks },
 			},
 		});
 	}
-	flowRun = patchFlowRun(flowRun, {
-		status: { set: "completed" },
+	await patchRun({
+		context: args.context,
+		flowRunId: flowRun.id,
+		delta: {
+			status: { set: "completed" },
+			"duration.wallClock": { set: Date.now() - flowStartedAt },
+		},
 	});
 	await args.context.storage.setItem(flowRunPath(flowRun.id), flowRun);
 }
