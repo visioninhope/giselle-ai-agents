@@ -1,12 +1,7 @@
 import type { GiselleEngineContext } from "../types";
-import { addWorkspaceIndexItem } from "../utils/workspace-index";
-import {
-	type FlowRunId,
-	FlowRunIndexObject,
-	type FlowRunObject,
-} from "./run/object";
+import type { FlowRunId, FlowRunObject } from "./run/object";
 import { patchFlowRun } from "./run/patch-object";
-import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
+import { flowRunPath } from "./run/paths";
 
 type PatchValue<T> = T extends number
 	? { increment?: number; decrement?: number; set?: number }
@@ -37,16 +32,10 @@ export async function patchRun(args: {
 	// Apply the patch
 	const updatedFlowRun = patchFlowRun(currentFlowRun, args.delta);
 
-	// Update storage
-	await Promise.all([
-		args.context.storage.setItem(flowRunPath(args.flowRunId), updatedFlowRun),
-		addWorkspaceIndexItem({
-			storage: args.context.storage,
-			indexPath: workspaceFlowRunPath(updatedFlowRun.workspaceId),
-			item: updatedFlowRun,
-			itemSchema: FlowRunIndexObject,
-		}),
-	]);
+	await args.context.storage.setItem(
+		flowRunPath(args.flowRunId),
+		updatedFlowRun,
+	);
 
 	return updatedFlowRun;
 }

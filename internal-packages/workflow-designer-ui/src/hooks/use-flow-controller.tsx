@@ -64,12 +64,19 @@ export function useFlowController() {
 				),
 			});
 
-			await client.createRun({
+			const { run } = await client.createRun({
 				workspaceId: data.id,
 				jobsCount: flow.jobs.length,
 				trigger: "manual",
 			});
 			for (const [jobIndex, job] of flow.jobs.entries()) {
+				await client.patchRun({
+					flowRunId: run.id,
+					delta: {
+						"steps.inProgress": { increment: 1 },
+						"steps.queued": { decrement: 1 },
+					},
+				});
 				await Promise.all(
 					job.operations.map(async (operation) => {
 						const generation = generations.find(
@@ -88,7 +95,21 @@ export function useFlowController() {
 				if (jobIndex === 0 && onComplete) {
 					onComplete();
 				}
+
+				await client.patchRun({
+					flowRunId: run.id,
+					delta: {
+						"steps.completed": { increment: 1 },
+						"steps.inProgress": { decrement: 1 },
+					},
+				});
 			}
+			await client.patchRun({
+				flowRunId: run.id,
+				delta: {
+					status: { set: "completed" },
+				},
+			});
 		},
 		[createGeneration, data.id, info, startGeneration, stopFlow, client],
 	);
