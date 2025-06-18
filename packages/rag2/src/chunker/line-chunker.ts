@@ -1,18 +1,10 @@
-import { z } from "zod/v4";
-import { ConfigurationError } from "../errors";
 import type { ChunkerFunction } from "./types";
 
-const LineChunkerOptionsSchema = z
-	.object({
-		maxLines: z.number().min(1),
-		overlap: z.number().min(0),
-		maxChars: z.number().min(1),
-	})
-	.refine((data) => data.overlap < data.maxLines, {
-		message: "overlap must be less than maxLines",
-		path: ["overlap"],
-	});
-export type LineChunkerOptions = z.input<typeof LineChunkerOptionsSchema>;
+export interface LineChunkerOptions {
+	maxLines: number;
+	overlap: number;
+	maxChars: number;
+}
 
 enum ShrinkMode {
 	OVERLAP_REDUCTION = "overlap_reduction",
@@ -34,31 +26,22 @@ interface ChunkInfo {
  * @returns A function that chunks text based on lines
  */
 export function createLineChunker(
-	options: Partial<LineChunkerOptions> = {},
+	options: LineChunkerOptions,
 ): ChunkerFunction {
-	// Apply defaults
-	const optionsWithDefaults = {
-		maxLines: 100,
-		overlap: 0,
-		maxChars: 10000,
-		...options,
-	};
+	const { maxLines, overlap, maxChars } = options;
 
-	const validationResult =
-		LineChunkerOptionsSchema.safeParse(optionsWithDefaults);
-	if (!validationResult.success) {
-		throw ConfigurationError.invalidValue(
-			"LineChunkerOptions",
-			optionsWithDefaults,
-			"Valid chunker configuration",
-			{
-				operation: "createLineChunker",
-				validationErrors: validationResult.error.issues,
-			},
-		);
+	if (maxLines < 1) {
+		throw new Error("maxLines must be at least 1");
 	}
-
-	const { maxLines, overlap, maxChars } = validationResult.data;
+	if (overlap < 0) {
+		throw new Error("overlap cannot be negative");
+	}
+	if (overlap >= maxLines) {
+		throw new Error("overlap must be less than maxLines");
+	}
+	if (maxChars < 1) {
+		throw new Error("maxChars must be at least 1");
+	}
 
 	/**
 	 * Split text into chunks based on lines with overlap
@@ -121,9 +104,6 @@ export function createLineChunker(
 	};
 }
 
-/**
- * Determine the appropriate shrink mode for a chunk that exceeds maxChars
- */
 function getShrinkMode(chunkInfo: ChunkInfo): ShrinkMode {
 	if (chunkInfo.currentOverlap > 0) {
 		return ShrinkMode.OVERLAP_REDUCTION;
@@ -135,9 +115,6 @@ function getShrinkMode(chunkInfo: ChunkInfo): ShrinkMode {
 	return ShrinkMode.CHARACTER_SPLIT;
 }
 
-/**
- * Determine if overlap should be used for the current chunk
- */
 function shouldUseOverlap(
 	isFirstChunk: boolean,
 	skipNextOverlap: boolean,
@@ -145,9 +122,6 @@ function shouldUseOverlap(
 	return !isFirstChunk && !skipNextOverlap;
 }
 
-/**
- * Calculate next starting position for chunking
- */
 function nextStartIndex(
 	chunkInfo: ChunkInfo,
 	skipNextOverlap: boolean,
@@ -164,9 +138,6 @@ function nextStartIndex(
 	return Math.max(nextStart, chunkInfo.startIndex + 1);
 }
 
-/**
- * Build chunk information from boundary indices
- */
 function buildChunk(
 	startIndex: number,
 	endIndex: number,
@@ -185,9 +156,6 @@ function buildChunk(
 	};
 }
 
-/**
- * Create initial chunk information
- */
 function createInitialChunk(
 	startIndex: number,
 	lines: string[],
@@ -198,10 +166,6 @@ function createInitialChunk(
 	return buildChunk(startIndex, endIndex, lines, initialOverlap);
 }
 
-/**
- * Reduce overlap gradually and adjust chunk accordingly
- * Returns null if overlap cannot be reduced further (already 0)
- */
 function reduceOverlapGradually(
 	chunkInfo: ChunkInfo,
 	lines: string[],
@@ -219,10 +183,6 @@ function reduceOverlapGradually(
 	return buildChunk(newStartIndex, newEndIndex, lines, newOverlap);
 }
 
-/**
- * Reduce line count gradually when overlap reduction is not sufficient
- * Returns null if only one line remains (cannot reduce further)
- */
 function reduceLineCountGradually(
 	chunkInfo: ChunkInfo,
 	lines: string[],
@@ -242,10 +202,6 @@ function reduceLineCountGradually(
 	);
 }
 
-/**
- * Split long content into smaller chunks
- * This is only used for single lines that exceed maxChars
- */
 function splitLongContent(content: string, maxChars: number): string[] {
 	return Array.from({ length: Math.ceil(content.length / maxChars) }, (_, k) =>
 		content.slice(k * maxChars, (k + 1) * maxChars).trim(),

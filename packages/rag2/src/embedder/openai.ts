@@ -1,34 +1,16 @@
 import { openai } from "@ai-sdk/openai";
 import { embed, embedMany } from "ai";
-import { z } from "zod/v4";
-import { ConfigurationError, EmbeddingError } from "../errors";
+import { EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 
-const OpenAIEmbedderConfigSchema = z.object({
-	apiKey: z
-		.string()
-		.min(1, "API key cannot be empty")
-		.regex(/^sk-/, "API key must start with 'sk-'"),
-	model: z
-		.enum([
-			"text-embedding-3-small",
-			"text-embedding-3-large",
-			"text-embedding-ada-002",
-		])
-		.optional()
-		.default("text-embedding-3-small"),
-	maxRetries: z
-		.number()
-		.int()
-		.min(0, "Max retries must be non-negative")
-		.max(10, "Max retries cannot exceed 10")
-		.optional()
-		.default(3),
-});
+export type OpenAIEmbeddingModel =
+	| "text-embedding-3-small"
+	| "text-embedding-3-large"
+	| "text-embedding-ada-002";
 
 export interface OpenAIEmbedderConfig {
 	apiKey: string;
-	model?: string;
+	model?: OpenAIEmbeddingModel;
 	maxRetries?: number;
 }
 
@@ -40,22 +22,16 @@ export interface OpenAIEmbedderConfig {
 export function createOpenAIEmbedder(
 	config: OpenAIEmbedderConfig,
 ): EmbedderFunction {
-	// Validate configuration with Zod
-	const validationResult = OpenAIEmbedderConfigSchema.safeParse(config);
-	if (!validationResult.success) {
-		throw ConfigurationError.invalidValue(
-			"OpenAIEmbedderConfig",
-			config,
-			"Valid OpenAI embedder configuration",
-			{
-				operation: "createOpenAIEmbedder",
-				validationErrors: validationResult.error.issues,
-			},
-		);
+	if (!config.apiKey || config.apiKey.length === 0) {
+		throw new Error("API key is required and cannot be empty");
 	}
 
-	// Use validated and defaulted values
-	const { apiKey, model, maxRetries } = validationResult.data;
+	const model = config.model ?? "text-embedding-3-small";
+	const maxRetries = config.maxRetries ?? 3;
+
+	if (config.maxRetries !== undefined && (maxRetries < 0 || maxRetries > 10)) {
+		throw new Error("maxRetries must be between 0 and 10");
+	}
 
 	return {
 		async embed(text: string): Promise<number[]> {
