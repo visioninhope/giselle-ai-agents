@@ -21,23 +21,6 @@ import {
 } from "../../factories/utils";
 import type { QueryResult, QueryService } from "../types";
 
-export type DistanceFunction = "cosine" | "euclidean" | "inner_product";
-
-export interface PostgresQueryServiceConfig<TContext, TMetadata> {
-	database: DatabaseConfig;
-	tableName: string;
-	embedder?: Embedder;
-	columnMapping?: ColumnMapping<TMetadata>;
-	requiredColumnOverrides?: Partial<RequiredColumns>;
-	metadataColumnOverrides?: Partial<Record<keyof TMetadata, string>>;
-	// context to filter
-	contextToFilter: (
-		context: TContext,
-	) => Record<string, unknown> | Promise<Record<string, unknown>>;
-	// metadata schema
-	metadataSchema: z.ZodType<TMetadata>;
-}
-
 /**
  * Extract metadata from database row
  */
@@ -128,13 +111,23 @@ function validateDatabaseConfig(database: {
 
 /**
  * Create a PostgreSQL query service with functional approach
+ * Automatically infers TMetadata from metadataSchema
  */
 export function createPostgresQueryService<
 	TContext,
-	TMetadata extends Record<string, unknown> = Record<string, never>,
->(
-	config: PostgresQueryServiceConfig<TContext, TMetadata>,
-): QueryService<TContext, TMetadata> {
+	TSchema extends z.ZodType<Record<string, unknown>>,
+>(config: {
+	database: DatabaseConfig;
+	tableName: string;
+	embedder?: Embedder;
+	columnMapping?: ColumnMapping<z.infer<TSchema>>;
+	requiredColumnOverrides?: Partial<RequiredColumns>;
+	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
+	contextToFilter: (
+		context: TContext,
+	) => Record<string, unknown> | Promise<Record<string, unknown>>;
+	metadataSchema: TSchema;
+}): QueryService<TContext, z.infer<TSchema>> {
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
 
@@ -154,7 +147,7 @@ export function createPostgresQueryService<
 		query: string,
 		context: TContext,
 		limit = 10,
-	): Promise<QueryResult<TMetadata>[]> => {
+	): Promise<QueryResult<z.infer<TSchema>>[]> => {
 		const { tableName, contextToFilter, metadataSchema } = config;
 		const pool = PoolManager.getPool(database);
 
@@ -211,11 +204,11 @@ export function createPostgresQueryService<
           ${escapeIdentifier(columnMapping.chunkContent)} as content,
           ${escapeIdentifier(columnMapping.chunkIndex)} as index,
           ${metadataColumns
-						.map(
-							({ dbColumn, metadataKey }) =>
-								`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
-						)
-						.join(", ")}${metadataColumns.length > 0 ? "," : ""}
+					.map(
+						({ dbColumn, metadataKey }) =>
+							`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
+					)
+					.join(", ")}${metadataColumns.length > 0 ? "," : ""}
           1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
         FROM ${escapeIdentifier(tableName)}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
