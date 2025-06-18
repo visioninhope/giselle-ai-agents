@@ -50,6 +50,7 @@ export interface WorkflowDesignerContextValue
 			| "updateNodeData"
 			| "addConnection"
 			| "deleteConnection"
+			| "deleteConnectionWithCleanup"
 			| "setUiViewport"
 			| "updateName"
 			| "isSupportedConnection"
@@ -437,6 +438,14 @@ export function WorkflowDesignerProvider({
 		[setAndSaveWorkspace],
 	);
 
+	const deleteConnectionWithCleanup = useCallback(
+		(connectionId: ConnectionId) => {
+			workflowDesignerRef.current.deleteConnectionWithCleanup(connectionId);
+			setAndSaveWorkspace();
+		},
+		[setAndSaveWorkspace],
+	);
+
 	const uploadFile = useCallback(
 		async (
 			files: File[],
@@ -537,6 +546,7 @@ export function WorkflowDesignerProvider({
 				setUiNodeState,
 				deleteNode,
 				deleteConnection,
+				deleteConnectionWithCleanup,
 				uploadFile,
 				removeFile,
 				llmProviders,

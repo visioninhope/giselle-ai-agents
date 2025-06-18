@@ -54,6 +54,7 @@ function NodeCanvas() {
 		setUiViewport,
 		deleteNode,
 		deleteConnection,
+		deleteConnectionWithCleanup,
 		updateNodeData,
 		addNode,
 		addConnection,
@@ -178,7 +179,7 @@ function NodeCanvas() {
 					continue;
 				}
 
-				deleteConnection(connection.id);
+				deleteConnectionWithCleanup(connection.id);
 				const targetNode = data.nodes.find(
 					(node) => node.id === connection.inputNode.id,
 				);
@@ -196,7 +197,7 @@ function NodeCanvas() {
 				}
 			}
 		},
-		[data.nodes, data.connections, deleteConnection, updateNodeData],
+		[data.nodes, data.connections, deleteConnectionWithCleanup, updateNodeData],
 	);
 
 	const isValidConnection: IsValidConnection<ConnectorType> = (connection) => {
@@ -265,7 +266,7 @@ function NodeCanvas() {
 									if (connection.outputNode.id !== nodeChange.id) {
 										continue;
 									}
-									deleteConnection(connection.id);
+									deleteConnectionWithCleanup(connection.id);
 									const connectedNode = data.nodes.find(
 										(node) => node.id === connection.inputNode.id,
 									);

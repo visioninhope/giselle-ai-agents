@@ -35,8 +35,13 @@ export function InputPanel({
 }: {
 	node: TextGenerationNode;
 }) {
-	const { data, addConnection, deleteConnection, updateNodeData } =
-		useWorkflowDesigner();
+	const {
+		data,
+		addConnection,
+		deleteConnection,
+		deleteConnectionWithCleanup,
+		updateNodeData,
+	} = useWorkflowDesigner();
 	const outputs = useMemo<OutputWithDetails[]>(() => {
 		const tmp: OutputWithDetails[] = [];
 		const connectionToThisNode = data.connections.filter(
@@ -48,7 +53,9 @@ export function InputPanel({
 			}
 			for (const output of node.outputs) {
 				const connection = connectionToThisNode.find(
-					(connection) => connection.outputId === output.id,
+					(connection) =>
+						connection.outputId === output.id &&
+						connection.outputNode.id === node.id,
 				);
 				tmp.push({
 					...output,
@@ -129,21 +136,21 @@ export function InputPanel({
 			data.nodes,
 			data.connections,
 			addConnection,
-			deleteConnection,
+			deleteConnectionWithCleanup,
 			updateNodeData,
 		],
 	);
 
 	const handleRemove = useCallback(
 		(connection: Connection) => {
-			deleteConnection(connection.id);
+			deleteConnectionWithCleanup(connection.id);
 			updateNodeData(textGenerationNode, {
 				inputs: textGenerationNode.inputs.filter(
 					(input) => input.id !== connection.inputId,
 				),
 			});
 		},
-		[textGenerationNode, deleteConnection, updateNodeData],
+		[textGenerationNode, deleteConnectionWithCleanup, updateNodeData],
 	);
 
 	if (textGenerationNode.inputs.length === 0) {
