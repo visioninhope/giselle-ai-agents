@@ -69,6 +69,7 @@ export function useFlowController() {
 				jobsCount: flow.jobs.length,
 				trigger: "manual",
 			});
+			const flowStartedAt = Date.now();
 			for (const [jobIndex, job] of flow.jobs.entries()) {
 				await client.patchRun({
 					flowRunId: run.id,
@@ -77,6 +78,8 @@ export function useFlowController() {
 						"steps.queued": { decrement: 1 },
 					},
 				});
+				const jobStartedAt = Date.now();
+				let totalTasks = 0;
 				await Promise.all(
 					job.operations.map(async (operation) => {
 						const generation = generations.find(
@@ -89,6 +92,7 @@ export function useFlowController() {
 							return;
 						}
 						await startGeneration(generation.id);
+						totalTasks += Date.now() - jobStartedAt;
 					}),
 				);
 
@@ -101,6 +105,7 @@ export function useFlowController() {
 					delta: {
 						"steps.completed": { increment: 1 },
 						"steps.inProgress": { decrement: 1 },
+						"duration.totalTask": { increment: totalTasks },
 					},
 				});
 			}
@@ -108,6 +113,7 @@ export function useFlowController() {
 				flowRunId: run.id,
 				delta: {
 					status: { set: "completed" },
+					"duration.wallClock": { set: Date.now() - flowStartedAt },
 				},
 			});
 		},
