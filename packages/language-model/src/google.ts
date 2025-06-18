@@ -28,20 +28,14 @@ export const GoogleLanguageModelId = z
 		if (typeof ctx.value !== "string") {
 			return "gemini-2.5-flash-lite-preview-06-17";
 		}
-		if (
-			ctx.value.startsWith("gemini-2.5-pro-preview-") ||
-			ctx.value.startsWith("gemini-2.5-pro")
-		) {
+		if (ctx.value.startsWith("gemini-2.5-pro")) {
 			return "gemini-2.5-pro";
 		}
-		if (
-			ctx.value.startsWith("gemini-2.5-flash-preview-") ||
-			ctx.value.startsWith("gemini-2.5-flash")
-		) {
-			return "gemini-2.5-flash";
-		}
-		if (ctx.value.startsWith("gemini-2.5-flash-lite-preview-")) {
+		if (ctx.value.startsWith("gemini-2.5-flash-lite")) {
 			return "gemini-2.5-flash-lite-preview-06-17";
+		}
+		if (ctx.value.startsWith("gemini-2.5-flash")) {
+			return "gemini-2.5-flash";
 		}
 		return "gemini-2.5-flash-lite-preview-06-17";
 	});
