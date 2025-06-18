@@ -70,6 +70,7 @@ export function useFlowController() {
 				trigger: "manual",
 			});
 			const flowStartedAt = Date.now();
+			let hasFlowError = false;
 			for (const [jobIndex, job] of flow.jobs.entries()) {
 				await client.patchRun({
 					flowRunId: run.id,
@@ -80,6 +81,7 @@ export function useFlowController() {
 				});
 				const jobStartedAt = Date.now();
 				let totalTasks = 0;
+				let hasJobError = false;
 				await Promise.all(
 					job.operations.map(async (operation) => {
 						const generation = generations.find(
@@ -91,7 +93,25 @@ export function useFlowController() {
 						if (cancelRef.current) {
 							return;
 						}
-						await startGeneration(generation.id);
+						await startGeneration(generation.id, {
+							onGenerationFailed: async (generation) => {
+								hasJobError = true;
+								hasFlowError = true;
+								await client.patchRun({
+									flowRunId: run.id,
+									delta: {
+										annotations: {
+											push: [
+												{
+													level: "error",
+													message: generation.error.message,
+												},
+											],
+										},
+									},
+								});
+							},
+						});
 						totalTasks += Date.now() - jobStartedAt;
 					}),
 				);
@@ -100,22 +120,43 @@ export function useFlowController() {
 					onComplete();
 				}
 
+				if (hasJobError) {
+					await client.patchRun({
+						flowRunId: run.id,
+						delta: {
+							"steps.failed": { increment: 1 },
+							"steps.inProgress": { decrement: 1 },
+							"duration.totalTask": { increment: totalTasks },
+						},
+					});
+				} else {
+					await client.patchRun({
+						flowRunId: run.id,
+						delta: {
+							"steps.completed": { increment: 1 },
+							"steps.inProgress": { decrement: 1 },
+							"duration.totalTask": { increment: totalTasks },
+						},
+					});
+				}
+			}
+			if (hasFlowError) {
 				await client.patchRun({
 					flowRunId: run.id,
 					delta: {
-						"steps.completed": { increment: 1 },
-						"steps.inProgress": { decrement: 1 },
-						"duration.totalTask": { increment: totalTasks },
+						status: { set: "failed" },
+						"duration.wallClock": { set: Date.now() - flowStartedAt },
+					},
+				});
+			} else {
+				await client.patchRun({
+					flowRunId: run.id,
+					delta: {
+						status: { set: "completed" },
+						"duration.wallClock": { set: Date.now() - flowStartedAt },
 					},
 				});
 			}
-			await client.patchRun({
-				flowRunId: run.id,
-				delta: {
-					status: { set: "completed" },
-					"duration.wallClock": { set: Date.now() - flowStartedAt },
-				},
-			});
 		},
 		[createGeneration, data.id, info, startGeneration, stopFlow, client],
 	);

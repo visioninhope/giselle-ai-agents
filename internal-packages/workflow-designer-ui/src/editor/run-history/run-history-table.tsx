@@ -97,7 +97,7 @@ export function RunHistoryTable() {
 										className={clsx(
 											"group-data-[status=completed]:text-success",
 											"group-data-[status=inProgress]:text-info",
-											"group-data-[status=error]:text-error",
+											"group-data-[status=failed]:text-error",
 										)}
 									>
 										{item.status}
@@ -122,7 +122,7 @@ export function RunHistoryTable() {
 												{count > 0 && stepType === "warning" && (
 													<CircleAlertIcon className="size-[13px] text-warning" />
 												)}
-												{count > 0 && stepType === "error" && (
+												{count > 0 && stepType === "failed" && (
 													<CircleXIcon className="size-[13px] text-error" />
 												)}
 												{count > 0 && (
