@@ -10,6 +10,9 @@ describe("google llm", () => {
 			expect(
 				GoogleLanguageModelId.parse("gemini-2.5-flash-preview-05-20"),
 			).toBe("gemini-2.5-flash-preview-05-20");
+			expect(
+				GoogleLanguageModelId.parse("gemini-2.5-flash-lite-preview-06-17"),
+			).toBe("gemini-2.5-flash-lite-preview-06-17");
 			expect(GoogleLanguageModelId.parse("gemini-2.0-flash")).toBe(
 				"gemini-2.0-flash",
 			);
