@@ -267,36 +267,6 @@ export const googleTokenPricing: ModelPriceTable = {
 			},
 		],
 	},
-	"gemini-2.0-flash": {
-		prices: [
-			{
-				validFrom: "2025-05-20T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.1,
-					},
-					output: {
-						costPerMegaToken: 0.4,
-					},
-				},
-			},
-		],
-	},
-	"gemini-2.0-flash-lite": {
-		prices: [
-			{
-				validFrom: "2025-06-01T00:00:00Z",
-				price: {
-					input: {
-						costPerMegaToken: 0.075,
-					},
-					output: {
-						costPerMegaToken: 0.3,
-					},
-				},
-			},
-		],
-	},
 } as const satisfies Record<GoogleModelId, { prices: ModelPrice[] }>;
 
 export function getValidPricing(

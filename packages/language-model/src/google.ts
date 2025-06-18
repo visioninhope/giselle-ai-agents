@@ -23,12 +23,10 @@ export const GoogleLanguageModelId = z
 		"gemini-2.5-pro",
 		"gemini-2.5-flash",
 		"gemini-2.5-flash-lite-preview-06-17",
-		"gemini-2.0-flash",
-		"gemini-2.0-flash-lite",
 	])
 	.catch((ctx) => {
 		if (typeof ctx.value !== "string") {
-			return "gemini-2.0-flash";
+			return "gemini-2.5-flash";
 		}
 		if (
 			ctx.value.startsWith("gemini-2.5-pro-preview-") ||
@@ -45,7 +43,7 @@ export const GoogleLanguageModelId = z
 		if (ctx.value.startsWith("gemini-2.5-flash-lite-preview-")) {
 			return "gemini-2.5-flash-lite-preview-06-17";
 		}
-		return "gemini-2.0-flash";
+		return "gemini-2.5-flash";
 	});
 
 const GoogleLanguageModel = LanguageModelBase.extend({
@@ -90,35 +88,7 @@ const gemini25FlashLitePreview: GoogleLanguageModel = {
 	configurations: defaultConfigurations,
 };
 
-const gemini20Flash: GoogleLanguageModel = {
-	provider: "google",
-	id: "gemini-2.0-flash",
-	capabilities:
-		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding |
-		Capability.GenericFileInput,
-	tier: Tier.enum.free,
-	configurations: defaultConfigurations,
-};
-
-const gemini20FlashLite: GoogleLanguageModel = {
-	provider: "google",
-	id: "gemini-2.0-flash-lite",
-	capabilities:
-		Capability.TextGeneration |
-		Capability.OptionalSearchGrounding |
-		Capability.GenericFileInput,
-	tier: Tier.enum.free,
-	configurations: defaultConfigurations,
-};
-
-export const models = [
-	gemini25Pro,
-	gemini25Flash,
-	gemini25FlashLitePreview,
-	gemini20Flash,
-	gemini20FlashLite,
-];
+export const models = [gemini25Pro, gemini25Flash, gemini25FlashLitePreview];
 
 export const LanguageModel = GoogleLanguageModel;
 export type LanguageModel = GoogleLanguageModel;
