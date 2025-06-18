@@ -18,6 +18,7 @@ export const FlowRunObject = z.object({
 		queued: z.number(),
 		inProgress: z.number(),
 		completed: z.number(),
+		warning: z.number(),
 		cancelled: z.number(),
 		failed: z.number(),
 	}),

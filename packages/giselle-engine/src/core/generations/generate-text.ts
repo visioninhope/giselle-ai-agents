@@ -34,6 +34,12 @@ export async function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
+	callbacks?: {
+		error?: (
+			failedGeneration: FailedGeneration,
+			error: AISDKError,
+		) => void | Promise<void>;
+	};
 }) {
 	return useGenerationExecutor({
 		context: args.context,
@@ -164,6 +170,7 @@ export async function generateText(args: {
 				model: generationModel(operationNode.content.llm),
 				providerOptions,
 				messages,
+				maxTokens: 2,
 				maxSteps: 5, // enable multi-step calls
 				tools: preparedToolSet.toolSet,
 				experimental_continueSteps: true,

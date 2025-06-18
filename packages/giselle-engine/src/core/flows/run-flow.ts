@@ -17,7 +17,6 @@ import { createRun } from "./create-run";
 import { patchRun } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
 import { FlowRunIndexObject } from "./run/object";
-import { patchFlowRun } from "./run/patch-object";
 import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { getFlowTrigger } from "./utils";
 
@@ -126,6 +125,24 @@ export async function runFlow(args: {
 						const generateTextResult = await generateText({
 							context: args.context,
 							generation,
+							callbacks: {
+								error: async (failedGeneration) => {
+									await patchRun({
+										context: args.context,
+										flowRunId: flowRun.id,
+										delta: {
+											annotations: {
+												push: [
+													{
+														level: "error",
+														message: failedGeneration.error.message,
+													},
+												],
+											},
+										},
+									});
+								},
+							},
 						});
 						await generateTextResult.consumeStream();
 						break;

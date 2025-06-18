@@ -6,9 +6,14 @@ type PatchValue<T> = T extends number
 	? { increment?: number; decrement?: number; set?: number }
 	: T extends string
 		? { set: string }
-		: never;
+		: T extends Array<infer U>
+			? {
+					push?: U[];
+					set?: U[];
+				}
+			: never;
 
-type PatchDelta = {
+export type PatchDelta = {
 	[P in FlowRunPath]?: PatchValue<Get<FlowRunObject, P>>;
 };
 
@@ -37,14 +42,28 @@ export function patchFlowRun(flowRun: FlowRunObject, delta: PatchDelta) {
 		if (typeof current === "number" && typeof patch === "object") {
 			if ("set" in patch) {
 				target[lastKey] = patch.set;
-			} else {
+			} else if ("increment" in patch) {
 				const inc = patch.increment ?? 0;
+				target[lastKey] = current + inc;
+			} else if ("decrement" in patch) {
 				const dec = patch.decrement ?? 0;
-				target[lastKey] = current + inc - dec;
+				target[lastKey] = current - dec;
 			}
 		} else if (typeof current === "string" && typeof patch === "object") {
 			if ("set" in patch && patch.set !== undefined) {
 				target[lastKey] = patch.set;
+			}
+		} else if (Array.isArray(current) && typeof patch === "object") {
+			if ("set" in patch && patch.set !== undefined) {
+				target[lastKey] = patch.set;
+			} else {
+				const newArray = [...current];
+
+				if ("push" in patch && patch.push) {
+					newArray.push(...patch.push);
+				}
+
+				target[lastKey] = newArray;
 			}
 		}
 	}
