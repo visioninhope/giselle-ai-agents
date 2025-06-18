@@ -5,7 +5,7 @@ import { z } from "zod/v4";
 export const FlowRunId = createIdGenerator("flrn");
 export type FlowRunId = z.infer<typeof FlowRunId.schema>;
 
-const FlowRunObject = z.object({
+export const FlowRunObject = z.object({
 	id: FlowRunId.schema,
 	workspaceId: WorkspaceId.schema,
 	status: z.enum(["inProgress", "completed", "failed", "cancelled"]),

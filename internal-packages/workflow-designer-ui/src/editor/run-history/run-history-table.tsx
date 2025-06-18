@@ -1,3 +1,4 @@
+import { EmptyState } from "@giselle-internal/ui/empty-state";
 import {
 	Table,
 	TableBody,
@@ -7,12 +8,14 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 import clsx from "clsx/lite";
+import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	CircleAlertIcon,
 	CircleCheckIcon,
 	CircleDotIcon,
 	CircleXIcon,
 } from "lucide-react";
+import useSWR from "swr";
 
 const dummyData = [
 	{
@@ -111,6 +114,18 @@ const dummyData = [
 ];
 
 export function RunHistoryTable() {
+	const client = useGiselleEngine();
+	const { data: workspace } = useWorkflowDesigner();
+	const { data, isLoading } = useSWR(
+		{
+			namespace: "getWorkspaceFlowRuns",
+			workspaceId: workspace.id,
+		},
+		({ workspaceId }) => client.getWorkspaceFlowRuns({ workspaceId }),
+	);
+	if (isLoading) {
+		return null;
+	}
 	return (
 		<div className="h-full bg-surface-background p-[16px]">
 			<div className="flex justify-between items-center">
@@ -118,60 +133,73 @@ export function RunHistoryTable() {
 					Run history
 				</h1>
 			</div>
-			<Table className="table-auto font-mono">
-				<TableHeader>
-					<TableRow>
-						<TableHead className="w-[180px]">Time</TableHead>
-						<TableHead className="w-[100px]">Status</TableHead>
-						<TableHead className="w-[100px]">Steps</TableHead>
-						<TableHead className="w-[100px]">Trigger</TableHead>
-						<TableHead className="w-[100px]">Duration</TableHead>
-						<TableHead />
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{dummyData.map((item) => (
-						<TableRow data-status={item.status} className="group" key={item.id}>
-							<TableCell>{item.time}</TableCell>
-							<TableCell>
-								<span
-									className={clsx(
-										"group-data-[status=success]:text-success",
-										"group-data-[status=inProgress]:text-info",
-										"group-data-[status=error]:text-error",
-									)}
-								>
-									{item.status}
-								</span>
-							</TableCell>
-							<TableCell>
-								<div className="">
-									{Object.entries(item.steps).map(([stepType, count]) => (
-										<div key={stepType} className="flex items-center gap-[3px]">
-											{stepType === "inProgress" && (
-												<CircleDotIcon className="size-[13px] text-info" />
-											)}
-											{stepType === "success" && (
-												<CircleCheckIcon className="size-[13px] text-success" />
-											)}
-											{stepType === "warning" && (
-												<CircleAlertIcon className="size-[13px] text-warning" />
-											)}
-											{stepType === "error" && (
-												<CircleXIcon className="size-[13px] text-error" />
-											)}
-											<span className="text-[11px]">{count}</span>
-										</div>
-									))}
-								</div>
-							</TableCell>
-							<TableCell>{item.trigger}</TableCell>
-							<TableCell>{item.duration}</TableCell>
-							<TableCell />
+			{data === undefined ? (
+				<EmptyState title="no data" />
+			) : (
+				<Table className="table-auto font-mono">
+					<TableHeader>
+						<TableRow>
+							<TableHead className="w-[180px]">Time</TableHead>
+							<TableHead className="w-[100px]">Status</TableHead>
+							<TableHead className="w-[100px]">Steps</TableHead>
+							<TableHead className="w-[100px]">Trigger</TableHead>
+							<TableHead className="w-[100px]">Duration</TableHead>
+							<TableHead />
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{data.runs.map((item) => (
+							<TableRow
+								data-status={item.status}
+								className="group"
+								key={item.id}
+							>
+								<TableCell>---</TableCell>
+								<TableCell>
+									<span
+										className={clsx(
+											"group-data-[status=success]:text-success",
+											"group-data-[status=inProgress]:text-info",
+											"group-data-[status=error]:text-error",
+										)}
+									>
+										{item.status}
+									</span>
+								</TableCell>
+								<TableCell>
+									<div className="">
+										{Object.entries(item.steps).map(([stepType, count]) => (
+											<div
+												key={stepType}
+												className="flex items-center gap-[3px]"
+											>
+												{count > 0 && stepType === "inProgress" && (
+													<CircleDotIcon className="size-[13px] text-info" />
+												)}
+												{count > 0 && stepType === "completed" && (
+													<CircleCheckIcon className="size-[13px] text-success" />
+												)}
+												{count > 0 && stepType === "warning" && (
+													<CircleAlertIcon className="size-[13px] text-warning" />
+												)}
+												{count > 0 && stepType === "error" && (
+													<CircleXIcon className="size-[13px] text-error" />
+												)}
+												{count > 0 && (
+													<span className="text-[11px]">{count}</span>
+												)}
+											</div>
+										))}
+									</div>
+								</TableCell>
+								<TableCell>{item.trigger}</TableCell>
+								<TableCell>{item.duration}</TableCell>
+								<TableCell />
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			)}
 		</div>
 	);
 }

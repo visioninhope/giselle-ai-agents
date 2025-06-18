@@ -14,11 +14,11 @@ export async function addWorkspaceIndexItem<I>(args: {
 	await args.storage.setItem(args.indexPath, [...current, item]);
 }
 
-export async function getWorkspaceIndex<I>(args: {
+export async function getWorkspaceIndex<I extends z.ZodObject>(args: {
 	storage: Storage;
 	indexPath: string;
-	itemSchema: z.ZodType<I>;
-}): Promise<I[]> {
+	itemSchema: I;
+}): Promise<z.infer<I>[]> {
 	const indexLike = await args.storage.getItem(args.indexPath);
 	const parse = z.array(args.itemSchema).safeParse(indexLike);
 	return parse.success ? parse.data : [];
