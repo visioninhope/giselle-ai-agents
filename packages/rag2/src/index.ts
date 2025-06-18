@@ -40,16 +40,16 @@ export type {
 } from "./query-service";
 
 // Embedder
-export { OpenAIEmbedder } from "./embedder";
-export type { Embedder, OpenAIEmbedderConfig } from "./embedder";
+export { createOpenAIEmbedder } from "./embedder";
+export type { EmbedderFunction, OpenAIEmbedderConfig } from "./embedder";
 
 // Chunker
-export { LineChunker } from "./chunker";
-export type { Chunker, LineChunkerOptions } from "./chunker";
+export { createLineChunker } from "./chunker";
+export type { ChunkerFunction, LineChunkerOptions } from "./chunker";
 
 // Ingest Pipeline
 export {
-	IngestPipeline,
+	createIngestPipeline,
 	type IngestError,
 	type IngestPipelineConfig,
 	type IngestProgress,
@@ -65,7 +65,7 @@ export {
 	createDefaultChunker,
 	// Default instances
 	createDefaultEmbedder,
-	createIngestPipeline,
+	createIngestPipeline as createSimplifiedIngestPipeline,
 	createQueryService,
 	// Types
 	type ChunkStoreConfig,

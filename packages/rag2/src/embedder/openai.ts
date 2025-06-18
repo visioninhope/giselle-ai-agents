@@ -2,7 +2,7 @@ import { openai } from "@ai-sdk/openai";
 import { embed, embedMany } from "ai";
 import { z } from "zod/v4";
 import { ConfigurationError, EmbeddingError } from "../errors";
-import type { Embedder } from "./types";
+import type { EmbedderFunction } from "./types";
 
 const OpenAIEmbedderConfigSchema = z.object({
 	apiKey: z
@@ -32,74 +32,74 @@ export interface OpenAIEmbedderConfig {
 	maxRetries?: number;
 }
 
-export class OpenAIEmbedder implements Embedder {
-	private config: Required<OpenAIEmbedderConfig>;
-
-	constructor(config: OpenAIEmbedderConfig) {
-		// Validate configuration with Zod
-		const validationResult = OpenAIEmbedderConfigSchema.safeParse(config);
-		if (!validationResult.success) {
-			throw ConfigurationError.invalidValue(
-				"OpenAIEmbedderConfig",
-				config,
-				"Valid OpenAI embedder configuration",
-				{
-					operation: "constructor",
-					validationErrors: validationResult.error.issues,
-				},
-			);
-		}
-
-		// Use validated and defaulted values
-		const validatedConfig = validationResult.data;
-		this.config = {
-			apiKey: validatedConfig.apiKey,
-			model: validatedConfig.model,
-			maxRetries: validatedConfig.maxRetries,
-		};
+/**
+ * Create an OpenAI embedder with the specified configuration
+ * @param config Configuration for the OpenAI embedder
+ * @returns An embedder object with embed and embedMany functions
+ */
+export function createOpenAIEmbedder(
+	config: OpenAIEmbedderConfig,
+): EmbedderFunction {
+	// Validate configuration with Zod
+	const validationResult = OpenAIEmbedderConfigSchema.safeParse(config);
+	if (!validationResult.success) {
+		throw ConfigurationError.invalidValue(
+			"OpenAIEmbedderConfig",
+			config,
+			"Valid OpenAI embedder configuration",
+			{
+				operation: "createOpenAIEmbedder",
+				validationErrors: validationResult.error.issues,
+			},
+		);
 	}
 
-	async embed(text: string): Promise<number[]> {
-		try {
-			const { embedding } = await embed({
-				model: openai.embedding(this.config.model),
-				maxRetries: this.config.maxRetries,
-				value: text,
-			});
-			return embedding;
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				throw EmbeddingError.apiError(error, {
+	// Use validated and defaulted values
+	const { apiKey, model, maxRetries } = validationResult.data;
+
+	return {
+		async embed(text: string): Promise<number[]> {
+			try {
+				const { embedding } = await embed({
+					model: openai.embedding(model),
+					maxRetries,
+					value: text,
+				});
+				return embedding;
+			} catch (error: unknown) {
+				if (error instanceof Error) {
+					throw EmbeddingError.apiError(error, {
+						operation: "embed",
+						model,
+					});
+				}
+				throw EmbeddingError.apiError(new Error(String(error)), {
 					operation: "embed",
-					model: this.config.model,
+					model,
 				});
 			}
-			throw EmbeddingError.apiError(new Error(String(error)), {
-				operation: "embed",
-				model: this.config.model,
-			});
-		}
-	}
+		},
 
-	async embedMany(texts: string[]): Promise<number[][]> {
-		try {
-			const { embeddings } = await embedMany({
-				model: openai.embedding(this.config.model),
-				maxRetries: this.config.maxRetries,
-				values: texts,
-			});
-			return embeddings;
-		} catch (error: unknown) {
-			if (error instanceof Error) {
-				throw EmbeddingError.apiError(error, {
+		async embedMany(texts: string[]): Promise<number[][]> {
+			try {
+				const { embeddings } = await embedMany({
+					model: openai.embedding(model),
+					maxRetries,
+					values: texts,
+				});
+				return embeddings;
+			} catch (error: unknown) {
+				if (error instanceof Error) {
+					throw EmbeddingError.apiError(error, {
+						operation: "embedMany",
+						model,
+					});
+				}
+				throw EmbeddingError.apiError(new Error(String(error)), {
 					operation: "embedMany",
-					model: this.config.model,
+					model,
 				});
 			}
-			throw EmbeddingError.apiError(new Error(String(error)), {
-				operation: "embedMany",
-				model: this.config.model,
-			});
-		}
-	}
+		},
+	};
 }

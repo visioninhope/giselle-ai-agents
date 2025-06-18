@@ -1,15 +1,17 @@
 import type { PostgresChunkStoreConfig } from "../chunk-store/postgres";
 import { PostgresChunkStore } from "../chunk-store/postgres";
-import type { DocumentLoaderParams } from "../document-loader";
+import type { ChunkStore } from "../chunk-store/types";
+import type {
+	Document,
+	DocumentLoader,
+	DocumentLoaderParams,
+} from "../document-loader/types";
 import { ValidationError } from "../errors";
-import { IngestPipeline } from "../ingest";
+import { createIngestPipeline as createBasePipeline } from "../ingest";
+import type { IngestError, IngestProgress } from "../ingest/types";
 import type { PostgresQueryServiceConfig } from "../query-service/postgres";
 import { PostgresQueryService } from "../query-service/postgres";
-import type {
-	ChunkStoreConfig,
-	IngestPipelineConfig,
-	QueryServiceConfig,
-} from "./types";
+import type { ChunkStoreConfig, QueryServiceConfig } from "./types";
 import {
 	createColumnMapping,
 	createDefaultChunker,
@@ -127,36 +129,35 @@ export function createQueryService<
 }
 
 /**
- * simplified ingest pipeline creation function
- * hide the details of chunker and embedder, and use default settings
+ * Create an ingest pipeline with default chunker and embedder
+ * This is a convenience function that uses sensible defaults
  */
 export function createIngestPipeline<
-	TSourceMetadata extends Record<string, unknown>,
-	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
+	TMetadata extends Record<string, unknown> = Record<string, unknown>,
 	TParams extends DocumentLoaderParams = DocumentLoaderParams,
->(config: IngestPipelineConfig<TSourceMetadata, TTargetMetadata, TParams>) {
-	const {
-		documentLoader,
-		chunkStore,
-		documentKey,
-		metadataTransform,
-		options = {},
-	} = config;
-
-	// use default embedder and chunker
+>(config: {
+	documentLoader: DocumentLoader<TMetadata, TParams>;
+	chunkStore: ChunkStore<TMetadata>;
+	documentKey: (document: Document<TMetadata>) => string;
+	metadataTransform?: (metadata: TMetadata) => TMetadata;
+	options?: {
+		maxBatchSize?: number;
+		onProgress?: (progress: IngestProgress) => void;
+		onError?: (error: IngestError) => void;
+	};
+}) {
+	// Use default embedder and chunker
 	const embedder = createDefaultEmbedder();
 	const chunker = createDefaultChunker();
 
-	return new IngestPipeline({
-		documentLoader,
+	return createBasePipeline({
+		...config,
 		chunker,
 		embedder,
-		chunkStore,
-		documentKey,
-		metadataTransform,
 		options: {
-			maxBatchSize: options.maxBatchSize ?? 50,
-			onProgress: options.onProgress,
+			maxBatchSize: config.options?.maxBatchSize ?? 50,
+			onProgress: config.options?.onProgress,
+			onError: config.options?.onError,
 		},
 	});
 }

@@ -1,8 +1,8 @@
 import type { z } from "zod/v4";
-import { LineChunker } from "../chunker";
+import { createLineChunker } from "../chunker";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
 import { REQUIRED_COLUMN_KEYS } from "../database/types";
-import { OpenAIEmbedder } from "../embedder";
+import { createOpenAIEmbedder } from "../embedder";
 
 /**
  * Default configuration values for factory functions
@@ -154,7 +154,7 @@ export function createDefaultEmbedder() {
 	if (!apiKey) {
 		throw new Error("OPENAI_API_KEY environment variable is required");
 	}
-	return new OpenAIEmbedder({
+	return createOpenAIEmbedder({
 		apiKey,
 		model: FACTORY_DEFAULTS.OPENAI_MODEL,
 	});
@@ -164,7 +164,7 @@ export function createDefaultEmbedder() {
  * create default chunker
  */
 export function createDefaultChunker() {
-	return new LineChunker({
+	return createLineChunker({
 		maxLines: FACTORY_DEFAULTS.CHUNKER.MAX_LINES,
 		overlap: FACTORY_DEFAULTS.CHUNKER.OVERLAP,
 		maxChars: FACTORY_DEFAULTS.CHUNKER.MAX_CHARS,

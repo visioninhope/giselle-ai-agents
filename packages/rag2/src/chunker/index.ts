@@ -1,2 +1,2 @@
-export type { Chunker } from "./types";
-export { LineChunker, type LineChunkerOptions } from "./line-chunker";
+export type { ChunkerFunction } from "./types";
+export { createLineChunker, type LineChunkerOptions } from "./line-chunker";

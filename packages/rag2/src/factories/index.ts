@@ -3,11 +3,7 @@
  */
 
 // Re-export types
-export type {
-	ChunkStoreConfig,
-	QueryServiceConfig,
-	IngestPipelineConfig,
-} from "./types";
+export type { ChunkStoreConfig, QueryServiceConfig } from "./types";
 
 // Re-export constants and utilities
 export {

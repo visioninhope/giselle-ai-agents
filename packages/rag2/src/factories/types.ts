@@ -1,12 +1,6 @@
 import type { z } from "zod/v4";
-import type { ChunkStore } from "../chunk-store";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
-import type {
-	Document,
-	DocumentLoader,
-	DocumentLoaderParams,
-} from "../document-loader";
-import type { Embedder } from "../embedder";
+import type { EmbedderFunction } from "../embedder/types";
 
 /**
  * chunk store config
@@ -75,7 +69,7 @@ export interface QueryServiceConfig<
 	 * embedder
 	 * if not provided, a default embedder will be used
 	 */
-	embedder?: Embedder;
+	embedder?: EmbedderFunction;
 	/**
 	 * context to filter
 	 */
@@ -98,40 +92,4 @@ export interface QueryServiceConfig<
 	 * column mapping
 	 */
 	columnMapping?: ColumnMapping<TMetadata>;
-}
-
-/**
- * ingest pipeline config
- */
-export interface IngestPipelineConfig<
-	TSourceMetadata extends Record<string, unknown>,
-	TTargetMetadata extends Record<string, unknown> = TSourceMetadata,
-	TParams extends DocumentLoaderParams = DocumentLoaderParams,
-> {
-	/**
-	 * document loader
-	 */
-	documentLoader: DocumentLoader<TSourceMetadata, TParams>;
-	/**
-	 * chunk store
-	 */
-	chunkStore: ChunkStore<TTargetMetadata>;
-	/**
-	 * document key function
-	 */
-	documentKey: (document: Document<TSourceMetadata>) => string;
-	/**
-	 * metadata transform function
-	 */
-	metadataTransform: (metadata: TSourceMetadata) => TTargetMetadata;
-	/**
-	 * pipeline options
-	 */
-	options?: {
-		maxBatchSize?: number;
-		onProgress?: (progress: {
-			processedDocuments: number;
-			currentDocument?: string;
-		}) => void;
-	};
 }
