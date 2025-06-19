@@ -82,8 +82,8 @@ Process and store documents with automatic chunking and embedding.
 ```typescript
 import {
   createChunkStore,
+  createIngestPipeline,
   type Document,
-  IngestPipeline,
 } from "@giselle-sdk/rag2";
 import { z } from "zod/v4";
 
@@ -133,8 +133,8 @@ const documentLoader = {
 // additional data for chunk metadata
 const repositoryId = getRepositoryId();
 
-// Create ingest pipeline with unified configuration
-const pipeline = new IngestPipeline({
+// Create ingest pipeline function
+const ingest = createIngestPipeline({
   documentLoader,
   chunkStore,
   documentKey: (doc) => doc.metadata.filePath,
@@ -150,7 +150,7 @@ const pipeline = new IngestPipeline({
 });
 
 // Run ingestion
-const result = await pipeline.ingest({});
+const result = await ingest({});
 console.log(`Successfully processed ${result.successfulDocuments} documents`);
 ```
 
@@ -190,19 +190,17 @@ interface IngestResult {
 
 ### Core API
 
-#### Classes
-
-- `IngestPipeline<TDocMetadata, TChunkMetadata>` - Document processing pipeline
-  with automatic chunking and embedding
-
 #### Factory Functions
 
+- `createIngestPipeline<TDocMetadata, TChunkMetadata>(options)` - Creates a
+  document processing pipeline function with automatic chunking and embedding
 - `createQueryService<TContext, TMetadata>(config)` - Creates a new query
   service
 - `createChunkStore<TMetadata>(config)` - Creates a new chunk store
 - `createDefaultEmbedder()` - Creates OpenAI embedder with default settings
 - `createDefaultChunker()` - Creates line-based chunker with default settings
 - `createColumnMapping(options)` - Creates database column mapping
+
 
 ## Environment Variables
 

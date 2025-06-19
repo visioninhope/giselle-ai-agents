@@ -3,9 +3,9 @@ import type { ChunkStore } from "../chunk-store/types";
 import type { ChunkerFunction } from "../chunker/types";
 import type { DocumentLoader } from "../document-loader/types";
 import type { EmbedderFunction } from "../embedder/types";
-import { IngestPipeline } from "./ingest-pipeline";
+import { createIngestPipeline } from "./ingest-pipeline";
 
-describe("IngestPipeline", () => {
+describe("createIngestPipeline", () => {
 	let mockDocumentLoader: DocumentLoader<{ path: string }>;
 	let mockChunker: ChunkerFunction;
 	let mockEmbedder: EmbedderFunction;
@@ -34,7 +34,7 @@ describe("IngestPipeline", () => {
 	});
 
 	it("should process documents through the pipeline", async () => {
-		const pipeline = new IngestPipeline({
+		const ingest = createIngestPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
@@ -43,7 +43,7 @@ describe("IngestPipeline", () => {
 			metadataTransform: (metadata) => metadata,
 		});
 
-		const result = await pipeline.ingest({});
+		const result = await ingest({});
 
 		expect(result.totalDocuments).toBe(2);
 		expect(result.successfulDocuments).toBe(2);
@@ -62,7 +62,7 @@ describe("IngestPipeline", () => {
 				.mockResolvedValueOnce(undefined),
 		};
 
-		const pipeline = new IngestPipeline({
+		const ingest = createIngestPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
@@ -73,7 +73,7 @@ describe("IngestPipeline", () => {
 			retryDelay: 10,
 		});
 
-		const result = await pipeline.ingest({});
+		const result = await ingest({});
 
 		expect(result.successfulDocuments).toBe(2);
 		expect(failingChunkStore.insert).toHaveBeenCalledTimes(3); // 1 fail + 1 success for first doc, 1 success for second doc
@@ -82,7 +82,7 @@ describe("IngestPipeline", () => {
 	it("should call progress callback", async () => {
 		const onProgress = vi.fn();
 
-		const pipeline = new IngestPipeline({
+		const ingest = createIngestPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
@@ -92,7 +92,7 @@ describe("IngestPipeline", () => {
 			onProgress,
 		});
 
-		await pipeline.ingest({});
+		await ingest({});
 
 		expect(onProgress).toHaveBeenCalled();
 		const lastCall = onProgress.mock.calls[onProgress.mock.calls.length - 1][0];
@@ -100,7 +100,7 @@ describe("IngestPipeline", () => {
 	});
 
 	it("should handle batch processing", async () => {
-		const pipeline = new IngestPipeline({
+		const ingest = createIngestPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
@@ -110,7 +110,7 @@ describe("IngestPipeline", () => {
 			maxBatchSize: 1,
 		});
 
-		await pipeline.ingest({});
+		await ingest({});
 
 		// With batch size 1 and 2 chunks per document, should call embedMany 4 times
 		expect(mockEmbedder.embedMany).toHaveBeenCalledTimes(4);
