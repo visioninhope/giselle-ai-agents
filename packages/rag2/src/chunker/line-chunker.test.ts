@@ -1,35 +1,36 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
-import { dirname, join } from "node:path";
+import {
+	existsSync,
+	mkdirSync,
+	readFileSync,
+	readdirSync,
+	statSync,
+	writeFileSync,
+} from "node:fs";
+import { basename, dirname, extname, join, relative } from "node:path";
 import { describe, expect, it } from "vitest";
 import { DEFAULT_CHUNKER_CONFIG } from "./index";
 import { type LineChunkerOptions, createLineChunker } from "./line-chunker";
 
 const FIXTURES_DIR = join(__dirname, "__fixtures__");
 const GOLDEN_DIR = join(__dirname, "__golden__");
+const CHUNK_DELIMITER = "===== CHUNK";
 
-// Helper to read fixture
 function readFixture(path: string): string {
 	return readFileSync(join(FIXTURES_DIR, path), "utf-8");
 }
 
-// Helper to get golden file path
 function getGoldenPath(fixtureName: string, configName: string): string {
-	// Remove file extension to get base name
-	const baseName = fixtureName.replace(/\.[^.]+$/, "");
-	return join(GOLDEN_DIR, baseName, `${configName}.txt`);
+	const baseName = basename(fixtureName, extname(fixtureName));
+	const dirName = dirname(fixtureName);
+	return join(GOLDEN_DIR, dirName, baseName, `${configName}.txt`);
 }
 
-// Delimiter for separating chunks
-const CHUNK_DELIMITER = "===== CHUNK";
-
-// Helper to format chunks as delimiter-separated text
 function formatChunks(chunks: string[]): string {
 	return chunks
 		.map((chunk, index) => `${CHUNK_DELIMITER} ${index + 1} =====\n${chunk}`)
 		.join("\n");
 }
 
-// Helper to parse delimiter-separated text back to chunks
 function parseChunks(text: string): string[] {
 	const pattern = new RegExp(`${CHUNK_DELIMITER} \\d+ =====\\n`, "g");
 	const parts = text.split(pattern);
@@ -45,7 +46,6 @@ function parseChunks(text: string): string[] {
 		});
 }
 
-// Helper to read or write golden data
 function compareWithGolden(
 	goldenPath: string,
 	actual: string[],
@@ -66,7 +66,6 @@ function compareWithGolden(
 	expect(actual).toEqual(expectedChunks);
 }
 
-// Test configurations
 const TEST_CONFIGS: Record<string, Partial<LineChunkerOptions>> = {
 	"small-chunks": { maxLines: 5, overlap: 1 },
 	"large-chunks": { maxLines: 50, overlap: 10 },
@@ -75,12 +74,22 @@ const TEST_CONFIGS: Record<string, Partial<LineChunkerOptions>> = {
 	"high-overlap": { maxLines: 10, overlap: 8 },
 };
 
-// Test fixtures
-const FIXTURES = [
-	"code-sample.ts",
-	"markdown-doc.md",
-	"edge-cases/long-lines.txt",
-];
+function getAllFiles(dir: string, baseDir: string = dir): string[] {
+	const entries = readdirSync(dir);
+	let files: string[] = [];
+	for (const entry of entries) {
+		const fullPath = join(dir, entry);
+		const stats = statSync(fullPath);
+		if (stats.isDirectory()) {
+			files = files.concat(getAllFiles(fullPath, baseDir));
+		} else {
+			files.push(relative(baseDir, fullPath));
+		}
+	}
+	return files;
+}
+
+const FIXTURES = getAllFiles(FIXTURES_DIR);
 
 describe("LineChunker Golden Tests", () => {
 	// Set to true to update golden files
@@ -131,16 +140,11 @@ describe("LineChunker Golden Tests", () => {
 			const chunks = chunker(content);
 
 			for (const [index, chunk] of chunks.entries()) {
-				// Each chunk should not exceed maxChars
 				expect(chunk.length).toBeLessThanOrEqual(maxChars);
-
-				// Each chunk (except possibly the last) should not exceed maxLines
 				const lineCount = chunk.split("\n").length;
 				if (index < chunks.length - 1) {
 					expect(lineCount).toBeLessThanOrEqual(maxLines);
 				}
-
-				// No chunk should be empty
 				expect(chunk.length).toBeGreaterThan(0);
 			}
 		});
@@ -152,19 +156,14 @@ describe("LineChunker Golden Tests", () => {
 			const chunker = createLineChunker(options);
 			const chunks = chunker(content);
 
-			// Check that consecutive chunks have overlapping lines
 			for (let i = 0; i < chunks.length - 1; i++) {
 				const currentLines = chunks[i].split("\n");
 				const nextLines = chunks[i + 1].split("\n");
 
-				// The last few lines of current chunk should match
-				// the first few lines of next chunk
 				const currentTail = currentLines.slice(-overlap).join("\n");
 				const nextHead = nextLines.slice(0, overlap).join("\n");
 
-				// They might not be exactly equal due to line reduction
-				// but there should be some overlap
-				expect(nextLines.length).toBeGreaterThan(0);
+				expect(currentTail).toBe(nextHead);
 			}
 		});
 	});
