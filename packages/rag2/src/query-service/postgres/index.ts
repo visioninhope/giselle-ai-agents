@@ -9,7 +9,7 @@ import type {
 	DatabaseConfig,
 	RequiredColumns,
 } from "../../database/types";
-import type { Embedder } from "../../embedder";
+import type { EmbedderFunction } from "../../embedder";
 import { createDefaultEmbedder } from "../../embedder";
 import {
 	ConfigurationError,
@@ -107,7 +107,7 @@ export function createPostgresQueryService<
 >(config: {
 	database: DatabaseConfig;
 	tableName: string;
-	embedder?: Embedder;
+	embedder?: EmbedderFunction;
 	columnMapping?: ColumnMapping<z.infer<TSchema>>;
 	requiredColumnOverrides?: Partial<RequiredColumns>;
 	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
@@ -192,11 +192,11 @@ export function createPostgresQueryService<
           ${escapeIdentifier(columnMapping.chunkContent)} as content,
           ${escapeIdentifier(columnMapping.chunkIndex)} as index,
           ${metadataColumns
-						.map(
-							({ dbColumn, metadataKey }) =>
-								`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
-						)
-						.join(", ")}${metadataColumns.length > 0 ? "," : ""}
+					.map(
+						({ dbColumn, metadataKey }) =>
+							`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
+					)
+					.join(", ")}${metadataColumns.length > 0 ? "," : ""}
           1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
         FROM ${escapeIdentifier(tableName)}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
