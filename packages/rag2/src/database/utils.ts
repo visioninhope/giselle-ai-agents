@@ -2,7 +2,7 @@ import { z } from "zod/v4";
 import type { ColumnMapping, RequiredColumns } from "./types";
 import { REQUIRED_COLUMN_KEYS } from "./types";
 
-const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
+export const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
 	documentKey: "document_key",
 	chunkContent: "chunk_content",
 	chunkIndex: "chunk_index",

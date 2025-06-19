@@ -1,5 +1,10 @@
-export { createOpenAIEmbedder, type OpenAIEmbedderConfig } from "./openai";
+export {
+	createOpenAIEmbedder,
+	createOpenAIEmbedder as OpenAIEmbedder,
+	type OpenAIEmbedderConfig,
+} from "./openai";
 export type { EmbedderFunction } from "./types";
+export type { EmbedderFunction as Embedder } from "./types";
 import { createOpenAIEmbedder } from "./openai";
 
 const DEFAULT_OPENAI_MODEL = "text-embedding-3-small";

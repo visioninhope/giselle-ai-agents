@@ -1,2 +1,2 @@
 export { createPostgresQueryService } from "./postgres";
-export type { Chunk, QueryResult, QueryService } from "./types";
+export type { QueryResult, QueryService } from "./types";

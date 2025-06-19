@@ -1,6 +1,7 @@
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
+import { createColumnMapping } from "../../database";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type {
@@ -8,17 +9,14 @@ import type {
 	DatabaseConfig,
 	RequiredColumns,
 } from "../../database/types";
-import type { Embedder } from "../../embedder/types";
+import type { Embedder } from "../../embedder";
+import { createDefaultEmbedder } from "../../embedder";
 import {
 	ConfigurationError,
 	DatabaseError,
 	EmbeddingError,
 	ValidationError,
 } from "../../errors";
-import {
-	createColumnMapping,
-	createDefaultEmbedder,
-} from "../../factories/utils";
 import type { QueryResult, QueryService } from "../types";
 
 /**
@@ -204,11 +202,11 @@ export function createPostgresQueryService<
           ${escapeIdentifier(columnMapping.chunkContent)} as content,
           ${escapeIdentifier(columnMapping.chunkIndex)} as index,
           ${metadataColumns
-						.map(
-							({ dbColumn, metadataKey }) =>
-								`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
-						)
-						.join(", ")}${metadataColumns.length > 0 ? "," : ""}
+					.map(
+						({ dbColumn, metadataKey }) =>
+							`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
+					)
+					.join(", ")}${metadataColumns.length > 0 ? "," : ""}
           1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
         FROM ${escapeIdentifier(tableName)}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
