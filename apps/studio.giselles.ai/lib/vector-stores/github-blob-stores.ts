@@ -40,9 +40,9 @@ function createDatabaseConfig(): DatabaseConfig {
 }
 
 /**
- * GitHub chunk store factory - for ingestion pipeline
+ * GitHub Blob chunk store factory - for ingestion pipeline
  */
-export function createGitHubChunkStore(repositoryIndexDbId: number) {
+export function createGitHubBlobChunkStore(repositoryIndexDbId: number) {
 	const columnMapping = createColumnMapping({
 		metadataSchema: githubChunkMetadataSchema,
 		requiredColumnOverrides: {

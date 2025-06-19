@@ -1,5 +1,5 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
-import { createGitHubChunkStore } from "@/lib/vector-stores/github-blob-stores";
+import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
 import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
 import { IngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
@@ -8,7 +8,7 @@ import { and, eq } from "drizzle-orm";
 /**
  * Main GitHub repository ingestion coordination
  */
-export async function ingestGitHubRepository(params: {
+export async function ingestGitHubBlobs(params: {
 	octokitClient: Octokit;
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
@@ -21,7 +21,7 @@ export async function ingestGitHubRepository(params: {
 	const githubLoader = new GitHubBlobLoader(params.octokitClient, {
 		maxBlobSize: 1 * 1024 * 1024,
 	});
-	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
+	const chunkStore = createGitHubBlobChunkStore(repositoryIndexDbId);
 
 	const pipeline = new IngestPipeline({
 		documentLoader: githubLoader,

@@ -1,7 +1,7 @@
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
-import { ingestGitHubRepository } from "./ingest-github-repository";
+import { ingestGitHubBlobs } from "./ingest-github-repository";
 import {
 	buildOctokit,
 	fetchTargetGitHubRepositories,
@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
 				commitSha: commit.sha,
 			};
 
-			await ingestGitHubRepository({
+			await ingestGitHubBlobs({
 				octokitClient,
 				source,
 				teamDbId,
