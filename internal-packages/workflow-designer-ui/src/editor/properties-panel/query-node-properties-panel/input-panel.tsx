@@ -329,7 +329,7 @@ export function InputPanel({
 }: {
 	node: QueryNode;
 }) {
-	const { data, addConnection, deleteConnectionWithCleanup, updateNodeData } =
+	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
 	const sources = useMemo<Source[]>(() => {
 		const tmpSources: Source[] = [];
@@ -406,7 +406,7 @@ export function InputPanel({
 				if (connection === undefined) {
 					continue;
 				}
-				deleteConnectionWithCleanup(connection.id);
+				deleteConnection(connection.id);
 
 				mutableInputs = mutableInputs.filter(
 					(input) => input.id !== connection.inputId,
@@ -421,21 +421,21 @@ export function InputPanel({
 			data.nodes,
 			data.connections,
 			addConnection,
-			deleteConnectionWithCleanup,
+			deleteConnection,
 			updateNodeData,
 		],
 	);
 
 	const handleRemove = useCallback(
 		(connection: Connection) => {
-			deleteConnectionWithCleanup(connection.id);
+			deleteConnection(connection.id);
 			updateNodeData(queryNode, {
 				inputs: queryNode.inputs.filter(
 					(input) => input.id !== connection.inputId,
 				),
 			});
 		},
-		[queryNode, deleteConnectionWithCleanup, updateNodeData],
+		[queryNode, deleteConnection, updateNodeData],
 	);
 
 	if (queryNode.inputs.length === 0) {

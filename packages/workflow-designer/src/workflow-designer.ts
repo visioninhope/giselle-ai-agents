@@ -218,17 +218,14 @@ export function WorkflowDesigner({
 		ui.viewport = viewport;
 	}
 	function deleteConnection(connectionId: ConnectionId) {
-		connections = connections.filter(
-			(connection) => connection.id !== connectionId,
-		);
-	}
-	function deleteConnectionWithCleanup(connectionId: ConnectionId) {
 		const connectionToDelete = connections.find(
 			(connection) => connection.id === connectionId,
 		);
 
 		// First delete the connection
-		deleteConnection(connectionId);
+		connections = connections.filter(
+			(connection) => connection.id !== connectionId,
+		);
 
 		// Then clean up node references ONLY in the input node
 		if (!connectionToDelete) return;
@@ -330,7 +327,6 @@ export function WorkflowDesigner({
 		setUiViewport,
 		deleteNode,
 		deleteConnection,
-		deleteConnectionWithCleanup,
 		updateName,
 		isSupportedConnection,
 	};
