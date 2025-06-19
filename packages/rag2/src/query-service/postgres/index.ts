@@ -17,7 +17,7 @@ import {
 	EmbeddingError,
 	ValidationError,
 } from "../../errors";
-import type { QueryResult, QueryService } from "../types";
+import type { QueryResult } from "../types";
 
 /**
  * Extract metadata from database row
@@ -27,18 +27,12 @@ function extractMetadata<TMetadata extends Record<string, unknown>>(
 	metadataColumns: Array<{ metadataKey: string; dbColumn: string }>,
 	metadataSchema: z.ZodType<TMetadata>,
 ): TMetadata {
-	// build raw metadata
 	const rawMetadata = Object.fromEntries(
 		metadataColumns.map(({ metadataKey }) => [metadataKey, row[metadataKey]]),
 	);
-
-	// type safe validation
 	return validateMetadata(rawMetadata, metadataSchema);
 }
 
-/**
- * Convert unknown data to TMetadata safely
- */
 function validateMetadata<TMetadata>(
 	metadata: unknown,
 	metadataSchema: z.ZodType<TMetadata>,
@@ -55,9 +49,6 @@ function validateMetadata<TMetadata>(
 	return result.data;
 }
 
-/**
- * Validate database config
- */
 function validateDatabaseConfig(database: {
 	connectionString: string;
 	poolConfig?: {
@@ -108,8 +99,7 @@ function validateDatabaseConfig(database: {
 }
 
 /**
- * Create a PostgreSQL query service with functional approach
- * Automatically infers TMetadata from metadataSchema
+ * Create a PostgreSQL query service
  */
 export function createPostgresQueryService<
 	TContext,
@@ -125,7 +115,7 @@ export function createPostgresQueryService<
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
-}): QueryService<TContext, z.infer<TSchema>> {
+}) {
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
 
