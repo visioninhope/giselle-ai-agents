@@ -1,7 +1,7 @@
 import type { Document, DocumentLoader } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 
-export type GitHubBlobMetadata = {
+type GitHubBlobMetadata = {
 	owner: string;
 	repo: string;
 	commitSha: string;
@@ -10,7 +10,7 @@ export type GitHubBlobMetadata = {
 	nodeId: string;
 };
 
-export type GitHubBlobLoaderParams = {
+type GitHubBlobLoaderParams = {
 	owner: string;
 	repo: string;
 	commitSha: string;
