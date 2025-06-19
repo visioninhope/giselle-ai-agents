@@ -207,7 +207,6 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						updateNodeDataContent(node, {
 							webpages,
 						});
-						error(`Failed to fetch web page: ${failedWebPage.errorMessage}`);
 					}
 				}),
 			);
