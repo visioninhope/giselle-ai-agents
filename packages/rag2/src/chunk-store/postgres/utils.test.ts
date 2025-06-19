@@ -69,15 +69,13 @@ describe("chunk-store/postgres/utils", () => {
 
 		it("should build delete query with scope", () => {
 			const { query, params } = buildDeleteQuery("test_table", "doc_key", {
-				user_id: 123,
-				tenant: "acme",
+				team_id: 123,
 			});
 
 			expect(query).toContain('DELETE FROM "test_table"');
 			expect(query).toContain('WHERE "doc_key" = $1');
-			expect(query).toContain('AND "user_id" = $2');
-			expect(query).toContain('AND "tenant" = $3');
-			expect(params).toEqual([123, "acme"]);
+			expect(query).toContain('AND "team_id" = $2');
+			expect(params).toEqual([123]);
 		});
 	});
 
@@ -141,8 +139,7 @@ describe("chunk-store/postgres/utils", () => {
 			};
 
 			const scope = {
-				user_id: 123,
-				tenant: "acme",
+				team_id: 123,
 			};
 
 			const records = prepareChunkRecords(
@@ -158,8 +155,7 @@ describe("chunk-store/postgres/utils", () => {
 				content: "chunk1",
 				idx: 0,
 				title_col: "Test",
-				user_id: 123,
-				tenant: "acme",
+				team_id: 123,
 			});
 		});
 	});
