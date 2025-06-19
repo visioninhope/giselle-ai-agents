@@ -1,85 +1,42 @@
-import type { ContentLoader, LoaderResult } from "@giselle-sdk/rag";
+import type { Document, DocumentLoader } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 
-/**
- * blob loader metadata
- */
-export interface GitHubBlobMetadata {
+type GitHubBlobMetadata = {
 	owner: string;
 	repo: string;
 	commitSha: string;
 	fileSha: string;
 	path: string;
 	nodeId: string;
-}
+};
 
-/**
- * Parameters for loading a GitHub blob
- */
-interface GitHubLoadBlobParams {
+type GitHubBlobLoaderParams = {
 	owner: string;
 	repo: string;
-	path: string;
-	fileSha: string;
-}
+	commitSha: string;
+};
 
-/**
- * Result of a GitHub blob loading operation
- */
-interface GitHubBlobResult {
-	content: string;
-	metadata: GitHubBlobMetadata;
-}
-
-/**
- * GitHub repository loading parameters
- */
-export interface GithubRepositoryParams {
-	owner: string;
-	repo: string;
-	commitSha?: string;
-	baseCommitSha?: string; // for diffing
-}
-
-/**
- * GitHub repository loader that streams files
- */
 export class GitHubBlobLoader
-	implements ContentLoader<GithubRepositoryParams, GitHubBlobMetadata>
+	implements DocumentLoader<GitHubBlobMetadata, GitHubBlobLoaderParams>
 {
-	private octokit: Octokit;
-	private options: { maxBlobSize: number };
+	private readonly maxBlobSize: number;
 
 	constructor(
-		octokit: Octokit,
-		options: {
-			maxBlobSize: number;
+		private octokit: Octokit,
+		options?: {
+			maxBlobSize?: number;
 		},
 	) {
-		this.octokit = octokit;
-		this.options = options;
+		this.maxBlobSize = options?.maxBlobSize ?? 1024 * 1024; // 1MB default
 	}
 
-	/**
-	 * Load content from a repository as a stream
-	 */
-	async *loadStream(
-		params: GithubRepositoryParams,
-	): AsyncIterable<LoaderResult<GitHubBlobMetadata>> {
-		const { owner, repo } = params;
-		let commitSha = params.commitSha;
-		if (!commitSha) {
-			const defaultBranchHead = await fetchDefaultBranchHead(
-				this.octokit,
-				owner,
-				repo,
-			);
-			commitSha = defaultBranchHead.sha;
-		}
+	async *load(
+		params: GitHubBlobLoaderParams,
+	): AsyncIterable<Document<GitHubBlobMetadata>> {
+		const { owner, repo, commitSha } = params;
 
 		console.log(`Loading repository ${owner}/${repo} at commit ${commitSha}`);
 
-		// Traverse the repository tree
 		for await (const entry of traverseTree(
 			this.octokit,
 			owner,
@@ -93,27 +50,23 @@ export class GitHubBlobLoader
 				continue;
 			}
 
-			// Skip files that are too large
-			if (size > this.options.maxBlobSize) {
+			if (size > this.maxBlobSize) {
 				console.warn(
 					`Blob size is too large: ${size} bytes, skipping: ${path}`,
 				);
 				continue;
 			}
 
-			// Load the blob
 			const blob = await loadBlob(
 				this.octokit,
 				{ owner, repo, path, fileSha },
 				commitSha,
 			);
 
-			// Skip binary files
 			if (blob === null) {
 				continue;
 			}
 
-			// Yield as document
 			yield {
 				content: blob.content,
 				metadata: blob.metadata,
@@ -122,16 +75,20 @@ export class GitHubBlobLoader
 	}
 }
 
-/**
- * Loads a GitHub blob (file) by SHA
- */
+type GitHubLoadBlobParams = {
+	owner: string;
+	repo: string;
+	path: string;
+	fileSha: string;
+};
+
 async function loadBlob(
 	octokit: Octokit,
 	params: GitHubLoadBlobParams,
 	commitSha: string,
 	currentAttempt = 0,
 	maxAttempt = 3,
-): Promise<GitHubBlobResult | null> {
+) {
 	const { owner, repo, path, fileSha } = params;
 
 	// Fetch blob from GitHub API
@@ -146,14 +103,12 @@ async function loadBlob(
 		},
 	);
 
-	// Handle server errors with retry logic
 	if (status >= 500) {
 		if (currentAttempt >= maxAttempt) {
 			throw new Error(
 				`Network error: ${status} when fetching ${owner}/${repo}/${fileSha}`,
 			);
 		}
-		// exponential backoff
 		await new Promise((resolve) =>
 			setTimeout(resolve, 2 ** currentAttempt * 100),
 		);
@@ -165,7 +120,6 @@ async function loadBlob(
 		return null;
 	}
 
-	// Decode base64 content
 	const contentInBytes = Buffer.from(blobData.content, "base64");
 
 	// Check if the content is binary
@@ -228,7 +182,7 @@ async function* traverseTree(
 /**
  * Get the default branch HEAD commit for a GitHub repository
  */
-async function fetchDefaultBranchHead(
+export async function fetchDefaultBranchHead(
 	octokit: Octokit,
 	owner: string,
 	repo: string,

@@ -1,6 +1,6 @@
 import type { z } from "zod/v4";
 import type { ColumnMapping, RequiredColumns } from "../database/types";
-import type { Embedder } from "../embedder";
+import type { EmbedderFunction } from "../embedder/types";
 
 /**
  * query service config
@@ -28,7 +28,7 @@ export interface QueryServiceConfig<
 	 * embedder
 	 * if not provided, a default embedder will be used
 	 */
-	embedder?: Embedder;
+	embedder?: EmbedderFunction;
 	/**
 	 * context to filter
 	 */

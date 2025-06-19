@@ -1,10 +1,10 @@
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
-import { ensurePgVectorTypes } from "../../database/pgvector-registry";
 import { PoolManager } from "../../database/postgres";
+import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { ColumnMapping, DatabaseConfig } from "../../database/types";
-import type { Embedder } from "../../embedder/types";
+import type { EmbedderFunction } from "../../embedder/types";
 import {
 	ConfigurationError,
 	DatabaseError,
@@ -18,7 +18,7 @@ export type DistanceFunction = "cosine" | "euclidean" | "inner_product";
 export interface PostgresQueryServiceConfig<TContext, TMetadata> {
 	database: DatabaseConfig;
 	tableName: string;
-	embedder: Embedder;
+	embedder: EmbedderFunction;
 	columnMapping: ColumnMapping<TMetadata>;
 	// context to filter
 	contextToFilter: (

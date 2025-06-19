@@ -1,8 +1,9 @@
+import { createColumnMapping } from "../database/utils";
+import { createDefaultEmbedder } from "../embedder";
 import { ValidationError } from "../errors";
 import type { PostgresQueryServiceConfig } from "../query-service/postgres";
 import { PostgresQueryService } from "../query-service/postgres";
 import type { QueryServiceConfig } from "./types";
-import { createColumnMapping, createDefaultEmbedder } from "./utils";
 
 /**
  * validate database config
@@ -75,7 +76,6 @@ export function createQueryService<
 			metadataColumnOverrides: options.metadataColumnOverrides,
 		});
 
-	// build PostgresQueryServiceConfig
 	const config: PostgresQueryServiceConfig<TContext, TMetadata> = {
 		database,
 		tableName: options.tableName,
