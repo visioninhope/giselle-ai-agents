@@ -5,15 +5,12 @@ import {
 	githubRepositoryIndex,
 	teams,
 } from "@/drizzle";
-import type {
-	GitHubQueryContext,
-	GitHubVectorStoreQueryService,
-} from "@giselle-sdk/giselle-engine";
+import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
 import {
 	type DatabaseConfig,
 	createColumnMapping,
 	createPostgresChunkStore,
-	createQueryService,
+	createPostgresQueryService,
 } from "@giselle-sdk/rag2";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
@@ -123,33 +120,16 @@ const githubQueryMetadataSchema = z.object({
 	path: z.string(),
 	nodeId: z.string(),
 });
-type GitHubQueryMetadata = z.infer<typeof githubQueryMetadataSchema>;
-
-/**
- * GitHub query service factory - for RAG queries
- */
-export function createGitHubQueryService(): GitHubVectorStoreQueryService<GitHubQueryMetadata> {
-	return createQueryService<GitHubQueryContext, GitHubQueryMetadata>({
-		database: createDatabaseConfig(),
-		tableName: getTableName(githubRepositoryEmbeddings),
-		metadataSchema: githubQueryMetadataSchema,
-		contextToFilter: resolveGitHubEmbeddingFilter,
-		requiredColumnOverrides: {
-			documentKey: "path",
-			// (default)
-			// chunkContent: "chunk_content",
-			// chunkIndex: "chunk_index",
-			// embedding: "embedding"
-		},
-		// Metadata fields will auto-convert from camelCase to snake_case:
-		// commitSha -> commit_sha
-		// fileSha -> file_sha
-		// path -> path
-		// nodeId -> node_id
-	});
-}
 
 /**
  * Pre-configured GitHub query service instance
  */
-export const gitHubQueryService = createGitHubQueryService();
+export const gitHubQueryService = createPostgresQueryService({
+	database: createDatabaseConfig(),
+	tableName: getTableName(githubRepositoryEmbeddings),
+	metadataSchema: githubQueryMetadataSchema,
+	contextToFilter: resolveGitHubEmbeddingFilter,
+	requiredColumnOverrides: {
+		documentKey: "path",
+	},
+});

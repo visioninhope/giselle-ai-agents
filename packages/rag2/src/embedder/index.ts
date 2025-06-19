@@ -1,4 +1,7 @@
-export { createOpenAIEmbedder, type OpenAIEmbedderConfig } from "./openai";
+export {
+	createOpenAIEmbedder,
+	type OpenAIEmbedderConfig,
+} from "./openai";
 export type { EmbedderFunction } from "./types";
 import { createOpenAIEmbedder } from "./openai";
 
