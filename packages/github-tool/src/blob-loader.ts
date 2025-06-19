@@ -16,33 +16,20 @@ type GitHubBlobLoaderParams = {
 	commitSha: string;
 };
 
-export class GitHubBlobLoader
-	implements DocumentLoader<GitHubBlobMetadata, GitHubBlobLoaderParams>
-{
-	private readonly maxBlobSize: number;
+export function createGitHubBlobLoader(
+	octokit: Octokit,
+	options?: { maxBlobSize?: number },
+): DocumentLoader<GitHubBlobMetadata, GitHubBlobLoaderParams> {
+	const maxBlobSize = options?.maxBlobSize ?? 1024 * 1024; // 1MB default
 
-	constructor(
-		private octokit: Octokit,
-		options?: {
-			maxBlobSize?: number;
-		},
-	) {
-		this.maxBlobSize = options?.maxBlobSize ?? 1024 * 1024; // 1MB default
-	}
-
-	async *load(
+	const load = async function* (
 		params: GitHubBlobLoaderParams,
 	): AsyncIterable<Document<GitHubBlobMetadata>> {
 		const { owner, repo, commitSha } = params;
 
 		console.log(`Loading repository ${owner}/${repo} at commit ${commitSha}`);
 
-		for await (const entry of traverseTree(
-			this.octokit,
-			owner,
-			repo,
-			commitSha,
-		)) {
+		for await (const entry of traverseTree(octokit, owner, repo, commitSha)) {
 			const { path, type, sha: fileSha, size } = entry;
 
 			// Process only blob entries (files)
@@ -50,7 +37,7 @@ export class GitHubBlobLoader
 				continue;
 			}
 
-			if (size > this.maxBlobSize) {
+			if (size > maxBlobSize) {
 				console.warn(
 					`Blob size is too large: ${size} bytes, skipping: ${path}`,
 				);
@@ -58,7 +45,7 @@ export class GitHubBlobLoader
 			}
 
 			const blob = await loadBlob(
-				this.octokit,
+				octokit,
 				{ owner, repo, path, fileSha },
 				commitSha,
 			);
@@ -72,7 +59,9 @@ export class GitHubBlobLoader
 				metadata: blob.metadata,
 			};
 		}
-	}
+	};
+
+	return { load };
 }
 
 type GitHubLoadBlobParams = {
