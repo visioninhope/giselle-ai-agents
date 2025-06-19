@@ -50,9 +50,7 @@ export type IngestFunction = (
 export function createIngestPipeline<
 	TDocMetadata extends Record<string, unknown>,
 	TStore extends ChunkStore<Record<string, unknown>>,
->(
-	options: IngestPipelineOptions<TDocMetadata, TStore>,
-): IngestFunction {
+>(options: IngestPipelineOptions<TDocMetadata, TStore>): IngestFunction {
 	// Extract and set defaults for all options
 	const {
 		documentLoader,
