@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { dirname, join } from "node:path";
 import { describe, expect, it } from "vitest";
-import { LineChunker } from "./line-chunker";
+import { DEFAULT_CHUNKER_CONFIG } from "./index";
+import { type LineChunkerOptions, createLineChunker } from "./line-chunker";
 
 const FIXTURES_DIR = join(__dirname, "__fixtures__");
 const GOLDEN_DIR = join(__dirname, "__golden__");
@@ -66,7 +67,7 @@ function compareWithGolden(
 }
 
 // Test configurations
-const TEST_CONFIGS = {
+const TEST_CONFIGS: Record<string, Partial<LineChunkerOptions>> = {
 	"small-chunks": { maxLines: 5, overlap: 1 },
 	"large-chunks": { maxLines: 50, overlap: 10 },
 	"no-overlap": { maxLines: 10, overlap: 0 },
@@ -91,8 +92,9 @@ describe("LineChunker Golden Tests", () => {
 
 			for (const [configName, config] of Object.entries(TEST_CONFIGS)) {
 				it(`should match golden data with config: ${configName}`, () => {
-					const chunker = new LineChunker(config);
-					const chunks = chunker.chunk(content);
+					const options = { ...DEFAULT_CHUNKER_CONFIG, ...config };
+					const chunker = createLineChunker(options);
+					const chunks = chunker(content);
 					const goldenPath = getGoldenPath(fixture, configName);
 
 					compareWithGolden(goldenPath, chunks, UPDATE_GOLDEN);
@@ -104,8 +106,9 @@ describe("LineChunker Golden Tests", () => {
 	describe("Chunk integrity validation", () => {
 		it("should preserve all content when concatenating chunks", () => {
 			const content = readFixture("code-sample.ts");
-			const chunker = new LineChunker({ maxLines: 10, overlap: 0 });
-			const chunks = chunker.chunk(content);
+			const options = { ...DEFAULT_CHUNKER_CONFIG, maxLines: 10, overlap: 0 };
+			const chunker = createLineChunker(options);
+			const chunks = chunker(content);
 
 			// All original content should be present when concatenating chunks
 			const allContent = chunks.join("");
@@ -118,8 +121,14 @@ describe("LineChunker Golden Tests", () => {
 			const content = readFixture("markdown-doc.md");
 			const maxLines = 5;
 			const maxChars = 300;
-			const chunker = new LineChunker({ maxLines, maxChars, overlap: 2 });
-			const chunks = chunker.chunk(content);
+			const options = {
+				...DEFAULT_CHUNKER_CONFIG,
+				maxLines,
+				maxChars,
+				overlap: 2,
+			};
+			const chunker = createLineChunker(options);
+			const chunks = chunker(content);
 
 			for (const [index, chunk] of chunks.entries()) {
 				// Each chunk should not exceed maxChars
@@ -139,8 +148,9 @@ describe("LineChunker Golden Tests", () => {
 		it("should handle overlap correctly", () => {
 			const content = readFixture("code-sample.ts");
 			const overlap = 3;
-			const chunker = new LineChunker({ maxLines: 10, overlap });
-			const chunks = chunker.chunk(content);
+			const options = { ...DEFAULT_CHUNKER_CONFIG, maxLines: 10, overlap };
+			const chunker = createLineChunker(options);
+			const chunks = chunker(content);
 
 			// Check that consecutive chunks have overlapping lines
 			for (let i = 0; i < chunks.length - 1; i++) {
@@ -161,15 +171,15 @@ describe("LineChunker Golden Tests", () => {
 
 	describe("Basic functionality", () => {
 		it("should handle empty content", () => {
-			const chunker = new LineChunker();
-			const chunks = chunker.chunk("");
+			const chunker = createLineChunker(DEFAULT_CHUNKER_CONFIG);
+			const chunks = chunker("");
 			expect(chunks).toEqual([]);
 		});
 
 		it("should handle single line", () => {
 			const content = "This is a single line of text";
-			const chunker = new LineChunker();
-			const chunks = chunker.chunk(content);
+			const chunker = createLineChunker(DEFAULT_CHUNKER_CONFIG);
+			const chunks = chunker(content);
 			expect(chunks.length).toBe(1);
 			expect(chunks[0]).toBe(content);
 		});
