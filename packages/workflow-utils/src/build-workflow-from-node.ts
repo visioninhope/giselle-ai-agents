@@ -1,15 +1,16 @@
 import {
 	type Connection,
+	type ConnectionId,
 	type NodeId,
 	type NodeLike,
 	type Workflow,
 	WorkflowId,
 } from "@giselle-sdk/data-type";
 import {
-	createDownstreamNodeIdMap,
-	createJobMap,
-	findConnectedConnectionMap,
-	findDownstreamNodeMap,
+	buildDownstreamNodeIdList,
+	buildJobList,
+	collectConnectedConnections,
+	collectDownstreamNodes,
 } from "./helper";
 
 /**
@@ -21,16 +22,18 @@ import {
  * @param connections - Array of all connection objects
  * @returns A workflow object or null if the node doesn't exist or isn't an operation node
  */
-export function buildWorkflowFromNode(
+export function buildWorkflowForNode(
 	startNodeId: NodeId,
 	nodes: NodeLike[],
 	connections: Connection[],
 ): Workflow | null {
-	const nodeMap = new Map(nodes.map((node) => [node.id, node]));
-	const connectionMap = new Map(
+	const nodeRecord: Record<NodeId, NodeLike> = Object.fromEntries(
+		nodes.map((node) => [node.id, node]),
+	);
+	const connectionRecord: Record<ConnectionId, Connection> = Object.fromEntries(
 		connections.map((connection) => [connection.id, connection]),
 	);
-	const startNode = nodeMap.get(startNodeId);
+	const startNode = nodeRecord[startNodeId];
 
 	// Check if the node exists and is an operation node
 	if (!startNode || startNode.type !== "operation") {
@@ -38,51 +41,52 @@ export function buildWorkflowFromNode(
 	}
 
 	// Create a map of downstream node IDs (output direction only)
-	const downstreamNodeIdMap = createDownstreamNodeIdMap(
-		new Set(connectionMap.values()),
-		new Set(nodeMap.keys()),
+	const downstreamNodeIdList = buildDownstreamNodeIdList(
+		new Set(Object.values(connectionRecord)),
+		new Set(Object.keys(nodeRecord) as NodeId[]),
 	);
 
 	// Find all downstream nodes from the starting node
-	const downstreamNodeMap = findDownstreamNodeMap(
+	const downstreamNodes = collectDownstreamNodes(
 		startNodeId,
-		nodeMap,
-		downstreamNodeIdMap,
+		nodeRecord,
+		downstreamNodeIdList,
 	);
+	const downstreamNodeIdSet = new Set<NodeId>(downstreamNodes.map((n) => n.id));
 
-	// Include variable nodes that provide inputs to the downstream nodes
-	for (const connection of connectionMap.values()) {
+	for (const connection of Object.values(connectionRecord)) {
 		if (
-			downstreamNodeMap.has(connection.inputNode.id) &&
+			downstreamNodeIdSet.has(connection.inputNode.id) &&
 			connection.outputNode.type === "variable"
 		) {
-			const variableNode = nodeMap.get(connection.outputNode.id);
-			if (variableNode) {
-				downstreamNodeMap.set(variableNode.id, variableNode);
+			const variableNode = nodeRecord[connection.outputNode.id];
+			if (variableNode && !downstreamNodeIdSet.has(variableNode.id)) {
+				downstreamNodes.push(variableNode);
+				downstreamNodeIdSet.add(variableNode.id);
 			}
 		}
 	}
 
 	// Find all connections between the connected nodes
-	const connectedConnectionMap = findConnectedConnectionMap(
-		new Set(downstreamNodeMap.keys()),
-		new Set(connectionMap.values()),
+	const connectedConnections = collectConnectedConnections(
+		downstreamNodeIdSet,
+		new Set(Object.values(connectionRecord)),
 	);
 
 	// Generate a workflow ID
 	const workflowId = WorkflowId.generate();
 
 	// Create jobs based on the connected nodes and connections
-	const jobSet = createJobMap(
-		new Set(downstreamNodeMap.values()),
-		new Set(connectedConnectionMap.values()),
+	const jobList = buildJobList(
+		new Set(downstreamNodes),
+		new Set(connectedConnections),
 		workflowId,
 	);
 
 	// Create and return the workflow
 	return {
 		id: workflowId,
-		jobs: Array.from(jobSet.values()),
-		nodes: Array.from(downstreamNodeMap.values()),
+		jobs: jobList,
+		nodes: downstreamNodes,
 	};
 }

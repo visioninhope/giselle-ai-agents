@@ -7,52 +7,50 @@ import {
 	WorkflowId,
 } from "@giselle-sdk/data-type";
 import {
-	createConnectedNodeIdMap,
-	createJobMap,
-	findConnectedConnectionMap,
-	findConnectedNodeMap,
+	buildConnectedNodeIdList,
+	buildJobList,
+	collectConnectedConnections,
+	collectConnectedNodes,
 } from "./helper";
 
-export function buildWorkflowMap(
-	nodeMap: Map<NodeId, NodeLike>,
-	connectionMap: Map<ConnectionId, Connection>,
+export function buildWorkflowList(
+	nodeRecord: Record<NodeId, NodeLike>,
+	connectionRecord: Record<ConnectionId, Connection>,
 ) {
-	const workflowSet = new Set<Workflow>();
+	const workflows: Workflow[] = [];
 	let processedNodes: NodeId[] = [];
 
-	const connectedNodeIdMap = createConnectedNodeIdMap(
-		new Set(connectionMap.values()),
-		new Set(nodeMap.keys()),
+	const connectedNodeIdList = buildConnectedNodeIdList(
+		new Set(Object.values(connectionRecord)),
+		new Set(Object.keys(nodeRecord) as NodeId[]),
 	);
-	for (const [nodeId, node] of nodeMap) {
+	for (const nodeId of Object.keys(nodeRecord) as NodeId[]) {
+		const node = nodeRecord[nodeId];
 		if (node.type !== "operation") continue;
 		if (processedNodes.includes(nodeId)) continue;
-		const connectedNodeMap = findConnectedNodeMap(
+		const connectedNodes = collectConnectedNodes(
 			nodeId,
-			nodeMap,
-			connectedNodeIdMap,
+			nodeRecord,
+			connectedNodeIdList,
 		);
-		const connectedConnectionMap = findConnectedConnectionMap(
-			new Set(connectedNodeMap.keys()),
-			new Set(connectionMap.values()),
+		const connectedNodeIdSet = new Set<NodeId>(connectedNodes.map((n) => n.id));
+		const connectedConnections = collectConnectedConnections(
+			connectedNodeIdSet,
+			new Set(Object.values(connectionRecord)),
 		);
 		const workflowId = WorkflowId.generate();
-		const jobSet = createJobMap(
-			new Set(connectedNodeMap.values()),
-			new Set(connectedConnectionMap.values()),
+		const jobList = buildJobList(
+			new Set(connectedNodes),
+			new Set(connectedConnections),
 			workflowId,
 		);
-		workflowSet.add({
-			id: WorkflowId.generate(),
-			jobs: Array.from(jobSet.values()),
-			nodes: Array.from(connectedNodeMap.values()),
+		workflows.push({
+			id: workflowId,
+			jobs: jobList,
+			nodes: connectedNodes,
 		});
 
-		processedNodes = [...processedNodes, ...connectedNodeMap.keys()];
+		processedNodes = [...processedNodes, ...connectedNodeIdSet];
 	}
-	const workflowMap = new Map<WorkflowId, Workflow>();
-	for (const workflow of workflowSet) {
-		workflowMap.set(workflow.id, workflow);
-	}
-	return workflowMap;
+	return workflows;
 }

@@ -5,19 +5,19 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, test } from "vitest";
-import { buildWorkflowFromNode } from "./build-workflow-from-node";
+import { buildWorkflowForNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
 import workspace2 from "./test/fixtures/workspace2.json";
 import workspace3 from "./test/fixtures/workspace3.json";
 import { testWorkspace1 } from "./test/test-data";
 
-describe("buildWorkflowFromNode with testWorkspace1", () => {
+describe("buildWorkflowForNode with testWorkspace1", () => {
 	test("should build a workflow starting from Manual trigger node (nd-y7lLktmBplRvcSov)", () => {
 		// Starting node is the Manual trigger
 		const startNodeId = "nd-y7lLktmBplRvcSov" as NodeId;
 
 		// Build the workflow starting from the Manual trigger node
-		const result = buildWorkflowFromNode(
+		const result = buildWorkflowForNode(
 			startNodeId,
 			testWorkspace1.nodes,
 			testWorkspace1.connections,
@@ -68,7 +68,7 @@ describe("buildWorkflowFromNode with testWorkspace1", () => {
 	});
 });
 
-describe("buildWorkflowFromNode with fixture/workspace1", () => {
+describe("buildWorkflowForNode with fixture/workspace1", () => {
 	let workspaceData: Workspace;
 	let result: Workflow | null;
 
@@ -80,7 +80,7 @@ describe("buildWorkflowFromNode with fixture/workspace1", () => {
 		}
 		workspaceData = workspace.data;
 
-		result = buildWorkflowFromNode(
+		result = buildWorkflowForNode(
 			"nd-qRt17h0TP7nQd4Xk",
 			workspaceData.nodes,
 			workspaceData.connections,
@@ -139,7 +139,7 @@ describe("buildWorkflowFromNode with fixture/workspace1", () => {
 	});
 });
 
-describe("buildWorkflowFromNode with testWorkspace2", () => {
+describe("buildWorkflowForNode with testWorkspace2", () => {
 	let workspaceData: Workspace;
 	let result: Workflow | null;
 
@@ -152,7 +152,7 @@ describe("buildWorkflowFromNode with testWorkspace2", () => {
 		workspaceData = workspace.data;
 
 		// Start from the GitHub trigger node "On Issue Comment Created"
-		result = buildWorkflowFromNode(
+		result = buildWorkflowForNode(
 			"nd-Z6YHBDO456UNY6N4",
 			workspaceData.nodes,
 			workspaceData.connections,
@@ -257,7 +257,7 @@ describe("buildWorkflowFromNode with testWorkspace2", () => {
 	});
 });
 
-describe("buildWorkflowFromNode with testWorkspace3", () => {
+describe("buildWorkflowForNode with testWorkspace3", () => {
 	let workspaceData: Workspace;
 	let result: Workflow | null;
 
@@ -270,7 +270,7 @@ describe("buildWorkflowFromNode with testWorkspace3", () => {
 		workspaceData = workspace.data;
 
 		// Start from the GitHub trigger node "On Issue Comment Created"
-		result = buildWorkflowFromNode(
+		result = buildWorkflowForNode(
 			"nd-3k5o1XHYgJIuVE9z",
 			workspaceData.nodes,
 			workspaceData.connections,

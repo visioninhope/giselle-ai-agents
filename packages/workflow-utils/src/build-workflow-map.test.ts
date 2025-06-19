@@ -5,7 +5,7 @@ import type {
 	NodeId,
 } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
-import { buildWorkflowMap } from "./build-workflow-map";
+import { buildWorkflowList } from "./build-workflow-map";
 
 // Sample data for tests based on provided workflow JSON
 const sampleNodes: Node[] = [
@@ -82,22 +82,21 @@ const sampleConnections: Connection[] = [
 ] as Connection[];
 
 // Setup helper variables
-const nodeMap = new Map<NodeId, Node>(
+const nodeRecord: Record<NodeId, Node> = Object.fromEntries(
 	sampleNodes.map((node) => [node.id, node]),
 );
-const connectionMap = new Map<ConnectionId, Connection>(
+const connectionRecord: Record<ConnectionId, Connection> = Object.fromEntries(
 	sampleConnections.map((connection) => [connection.id, connection]),
 );
 
-describe("buildWorkflowMap", () => {
+describe("buildWorkflowList", () => {
 	test("should create a workflow map from sample nodes and connections", () => {
-		const result = buildWorkflowMap(nodeMap, connectionMap);
+		const result = buildWorkflowList(nodeRecord, connectionRecord);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(1); // One workflow in our sample
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(1); // One workflow in our sample
 
-		// Get the workflow from the map
-		const workflow = Array.from(result.values())[0];
+		const workflow = result[0];
 
 		// Check workflow structure
 		expect(workflow.nodes.length).toBe(2); // Two nodes in our workflow
@@ -132,13 +131,12 @@ describe("buildWorkflowMap", () => {
 	});
 
 	test("should handle empty maps", () => {
-		const emptyNodeMap = new Map<NodeId, Node>();
-		const emptyConnectionMap = new Map<ConnectionId, Connection>();
+		const emptyNodeRecord: Record<NodeId, Node> = {};
+		const emptyConnectionRecord: Record<ConnectionId, Connection> = {};
 
-		const result = buildWorkflowMap(emptyNodeMap, emptyConnectionMap);
+		const result = buildWorkflowList(emptyNodeRecord, emptyConnectionRecord);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		expect(result.length).toBe(0);
 	});
 
 	test("should handle maps with only non-operation nodes", () => {
@@ -150,14 +148,13 @@ describe("buildWorkflowMap", () => {
 			content: { type: "data" },
 		} as unknown as Node;
 
-		const nonOperationNodeMap = new Map<NodeId, Node>([
-			["nd-NonOperation", nonOperationNode],
-		]);
+		const nonOperationNodeRecord: Record<NodeId, Node> = {
+			"nd-NonOperation": nonOperationNode,
+		};
 
-		const result = buildWorkflowMap(nonOperationNodeMap, connectionMap);
+		const result = buildWorkflowList(nonOperationNodeRecord, connectionRecord);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		expect(result.length).toBe(0);
 	});
 
 	test("should handle complex workflows with multiple connections", () => {
@@ -295,20 +292,22 @@ describe("buildWorkflowMap", () => {
 			},
 		] as Connection[];
 
-		// Setup maps
-		const complexNodeMap = new Map<NodeId, Node>(
+		const complexNodeRecord: Record<NodeId, Node> = Object.fromEntries(
 			complexNodes.map((node) => [node.id, node]),
 		);
-		const complexConnectionMap = new Map<ConnectionId, Connection>(
-			complexConnections.map((connection) => [connection.id, connection]),
+		const complexConnectionRecord: Record<ConnectionId, Connection> =
+			Object.fromEntries(
+				complexConnections.map((connection) => [connection.id, connection]),
+			);
+
+		const result = buildWorkflowList(
+			complexNodeRecord,
+			complexConnectionRecord,
 		);
 
-		const result = buildWorkflowMap(complexNodeMap, complexConnectionMap);
+		const workflow = result[0];
 
-		const workflow = Array.from(result.values())[0];
-
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(1); // One workflow containing all the nodes
+		expect(result.length).toBe(1); // One workflow containing all the nodes
 
 		// Check workflow structure
 		expect(workflow.nodes.length).toBe(3); // Three nodes in our workflow

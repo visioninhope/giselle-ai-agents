@@ -6,10 +6,10 @@ import type {
 } from "@giselle-sdk/data-type";
 import { describe, expect, test } from "vitest";
 import {
-	createConnectedNodeIdMap,
-	createJobMap,
-	findConnectedConnectionMap,
-	findConnectedNodeMap,
+	buildConnectedNodeIdList,
+	buildJobList,
+	collectConnectedConnections,
+	collectConnectedNodes,
 } from "./helper";
 
 // Sample data for tests based on provided workflow JSON
@@ -90,118 +90,123 @@ const sampleConnections: Connection[] = [
 const nodeSet = new Set<Node>(sampleNodes);
 const connectionSet = new Set<Connection>(sampleConnections);
 const nodeIdSet = new Set<NodeId>(sampleNodes.map((node) => node.id));
-const nodeMap = new Map<NodeId, Node>(
+const nodeRecord: Record<NodeId, Node> = Object.fromEntries(
 	sampleNodes.map((node) => [node.id, node]),
 );
 const workflowId = "wf-N5RH1s46zdx3XjQj" as WorkflowId;
 
-describe("createConnectedNodeIdMap", () => {
+describe("buildConnectedNodeIdList", () => {
 	test("should create a correct connection map for sample nodes", () => {
-		const result = createConnectedNodeIdMap(connectionSet, nodeIdSet);
+		const result = buildConnectedNodeIdList(connectionSet, nodeIdSet);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(2); // Two nodes in our sample
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(2); // Two nodes in our sample
 
-		// Check node1 connections
-		const node1Connections = result.get("nd-KzXeXSIffRIMwZtX");
+		const map = new Map(result);
+		const node1Connections = map.get("nd-KzXeXSIffRIMwZtX");
 		expect(node1Connections).toBeInstanceOf(Set);
 		expect(node1Connections?.size).toBe(1);
 		expect(node1Connections?.has("nd-P2EllMigi6Tm6gij")).toBe(true);
 
 		// Check node2 connections
-		const node2Connections = result.get("nd-P2EllMigi6Tm6gij");
+		const node2Connections = map.get("nd-P2EllMigi6Tm6gij");
 		expect(node2Connections).toBeInstanceOf(Set);
 		expect(node2Connections?.size).toBe(1);
 		expect(node2Connections?.has("nd-KzXeXSIffRIMwZtX")).toBe(true);
 	});
 
 	test("should handle empty connections", () => {
-		const result = createConnectedNodeIdMap(new Set<Connection>(), nodeIdSet);
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		const result = buildConnectedNodeIdList(new Set<Connection>(), nodeIdSet);
+		expect(result.length).toBe(0);
 	});
 });
 
-describe("findConnectedNodeMap", () => {
-	const connectedNodeIdMap = createConnectedNodeIdMap(connectionSet, nodeIdSet);
+describe("collectConnectedNodes", () => {
+	const connectedNodeIdList = buildConnectedNodeIdList(
+		connectionSet,
+		nodeIdSet,
+	);
 
 	test("should find all connected nodes starting from first node", () => {
-		const result = findConnectedNodeMap(
+		const result = collectConnectedNodes(
 			"nd-KzXeXSIffRIMwZtX",
-			nodeMap,
-			connectedNodeIdMap,
+			nodeRecord,
+			connectedNodeIdList,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(2); // Both nodes are connected
-		expect(result.has("nd-KzXeXSIffRIMwZtX")).toBe(true);
-		expect(result.has("nd-P2EllMigi6Tm6gij")).toBe(true);
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(2); // Both nodes are connected
+		const ids = result.map((n) => n.id);
+		expect(ids).toContain("nd-KzXeXSIffRIMwZtX");
+		expect(ids).toContain("nd-P2EllMigi6Tm6gij");
 	});
 
 	test("should find all connected nodes starting from second node", () => {
-		const result = findConnectedNodeMap(
+		const result = collectConnectedNodes(
 			"nd-P2EllMigi6Tm6gij",
-			nodeMap,
-			connectedNodeIdMap,
+			nodeRecord,
+			connectedNodeIdList,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(2); // Both nodes are connected
-		expect(result.has("nd-KzXeXSIffRIMwZtX")).toBe(true);
-		expect(result.has("nd-P2EllMigi6Tm6gij")).toBe(true);
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(2); // Both nodes are connected
+		const ids = result.map((n) => n.id);
+		expect(ids).toContain("nd-KzXeXSIffRIMwZtX");
+		expect(ids).toContain("nd-P2EllMigi6Tm6gij");
 	});
 
 	test("should handle non-existent starting node", () => {
-		const result = findConnectedNodeMap(
+		const result = collectConnectedNodes(
 			"non-existent-node-id" as NodeId,
-			nodeMap,
-			connectedNodeIdMap,
+			nodeRecord,
+			connectedNodeIdList,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(0);
 	});
 });
 
-describe("findConnectedConnectionMap", () => {
+describe("collectConnectedConnections", () => {
 	test("should find connections between connected nodes", () => {
-		const connectedNodeIdMap = createConnectedNodeIdMap(
+		const connectedNodeIdList = buildConnectedNodeIdList(
 			connectionSet,
 			nodeIdSet,
 		);
-		const connectedNodeMap = findConnectedNodeMap(
+		const connectedNodes = collectConnectedNodes(
 			"nd-KzXeXSIffRIMwZtX",
-			nodeMap,
-			connectedNodeIdMap,
+			nodeRecord,
+			connectedNodeIdList,
 		);
 
-		const result = findConnectedConnectionMap(
-			new Set(connectedNodeMap.keys()),
+		const result = collectConnectedConnections(
+			new Set(connectedNodes.map((n) => n.id)),
 			connectionSet,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(1); // One connection in our sample
-		expect(result.has("cnnc-7SZdtE1iSWtoghGD")).toBe(true);
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(1); // One connection in our sample
+		expect(result[0].id).toBe("cnnc-7SZdtE1iSWtoghGD");
 	});
 
 	test("should handle empty node set", () => {
-		const result = findConnectedConnectionMap(new Set<NodeId>(), connectionSet);
+		const result = collectConnectedConnections(
+			new Set<NodeId>(),
+			connectionSet,
+		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		expect(result.length).toBe(0);
 	});
 });
 
-describe("createJobMap", () => {
+describe("buildJobList", () => {
 	test("should create jobs for the sample workflow", () => {
-		const result = createJobMap(nodeSet, connectionSet, workflowId);
+		const result = buildJobList(nodeSet, connectionSet, workflowId);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(2); // Two jobs because of the dependency structure
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(2); // Two jobs because of the dependency structure
 
-		// Convert to array to analyze in order
-		const jobsArray = Array.from(result.values());
+		const jobsArray = result;
 
 		// First job should contain the first node (which has no inputs)
 		expect(jobsArray[0].workflowId).toBe(workflowId);
@@ -222,10 +227,9 @@ describe("createJobMap", () => {
 	});
 
 	test("should handle empty node set", () => {
-		const result = createJobMap(new Set<Node>(), connectionSet, workflowId);
+		const result = buildJobList(new Set<Node>(), connectionSet, workflowId);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(0);
+		expect(result.length).toBe(0);
 	});
 });
 
@@ -368,70 +372,69 @@ describe("Test with complex workflow", () => {
 	const complexNodeSet = new Set<Node>(complexNodes);
 	const complexConnectionSet = new Set<Connection>(complexConnections);
 	const complexNodeIdSet = new Set<NodeId>(complexNodes.map((node) => node.id));
-	const complexNodeMap = new Map<NodeId, Node>(
+	const complexNodeRecord: Record<NodeId, Node> = Object.fromEntries(
 		complexNodes.map((node) => [node.id, node]),
 	);
 	const complexWorkflowId = "wf-fgEzJutLbpYu1Hj3" as WorkflowId;
 
 	test("should create correct connected node id map for complex workflow", () => {
-		const result = createConnectedNodeIdMap(
+		const result = buildConnectedNodeIdList(
 			complexConnectionSet,
 			complexNodeIdSet,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(3); // Three nodes in our complex sample
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(3); // Three nodes in our complex sample
 
-		// Check first node connections (output)
-		const node1Connections = result.get("nd-E89xeYnFyQUGxdCL");
+		const map = new Map(result);
+		const node1Connections = map.get("nd-E89xeYnFyQUGxdCL");
 		expect(node1Connections).toBeInstanceOf(Set);
 		expect(node1Connections?.size).toBe(2);
 		expect(node1Connections?.has("nd-daF6m8YshVoiBARi")).toBe(true);
 		expect(node1Connections?.has("nd-ixIefYTHjZVhpEGq")).toBe(true);
 
 		// Check second node connections (input)
-		const node2Connections = result.get("nd-daF6m8YshVoiBARi");
+		const node2Connections = map.get("nd-daF6m8YshVoiBARi");
 		expect(node2Connections).toBeInstanceOf(Set);
 		expect(node2Connections?.size).toBe(1);
 		expect(node2Connections?.has("nd-E89xeYnFyQUGxdCL")).toBe(true);
 
 		// Check third node connections (input)
-		const node3Connections = result.get("nd-ixIefYTHjZVhpEGq");
+		const node3Connections = map.get("nd-ixIefYTHjZVhpEGq");
 		expect(node3Connections).toBeInstanceOf(Set);
 		expect(node3Connections?.size).toBe(1);
 		expect(node3Connections?.has("nd-E89xeYnFyQUGxdCL")).toBe(true);
 	});
 
 	test("should find all connected nodes starting from source node", () => {
-		const connectedNodeIdMap = createConnectedNodeIdMap(
+		const connectedNodeIdList = buildConnectedNodeIdList(
 			complexConnectionSet,
 			complexNodeIdSet,
 		);
-
-		const result = findConnectedNodeMap(
+		const result = collectConnectedNodes(
 			"nd-E89xeYnFyQUGxdCL",
-			complexNodeMap,
-			connectedNodeIdMap,
+			complexNodeRecord,
+			connectedNodeIdList,
 		);
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(3); // All nodes are connected
-		expect(result.has("nd-E89xeYnFyQUGxdCL")).toBe(true);
-		expect(result.has("nd-daF6m8YshVoiBARi")).toBe(true);
-		expect(result.has("nd-ixIefYTHjZVhpEGq")).toBe(true);
+		expect(Array.isArray(result)).toBe(true);
+		expect(result.length).toBe(3); // All nodes are connected
+		const ids = result.map((n) => n.id);
+		expect(ids).toContain("nd-E89xeYnFyQUGxdCL");
+		expect(ids).toContain("nd-daF6m8YshVoiBARi");
+		expect(ids).toContain("nd-ixIefYTHjZVhpEGq");
 	});
 
 	test("should create correct job map for complex workflow", () => {
-		const result = createJobMap(
+		const result = buildJobList(
 			complexNodeSet,
 			complexConnectionSet,
 			complexWorkflowId,
 		);
 
-		const jobsArray = Array.from(result.values());
+		const jobsArray = result;
 
-		expect(result).toBeInstanceOf(Map);
-		expect(result.size).toBe(2); // Two jobs: one for source node and one for dependent nodes
+		expect(result.length).toBe(2); // Two jobs: one for source node and one for dependent nodes
 
 		// First job should contain the first node (which has no inputs)
 		expect(jobsArray[0].workflowId).toBe(complexWorkflowId);
