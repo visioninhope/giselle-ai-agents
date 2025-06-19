@@ -62,20 +62,16 @@ describe("IngestPipeline", () => {
 				.mockResolvedValueOnce(undefined),
 		};
 
-		const pipeline = new IngestPipeline(
-			{
-				documentLoader: mockDocumentLoader,
-				chunker: mockChunker,
-				embedder: mockEmbedder,
-				chunkStore: failingChunkStore,
-				documentKey: (doc) => doc.metadata.path,
-				metadataTransform: (metadata) => metadata,
-			},
-			{
-				maxRetries: 2,
-				retryDelay: 10,
-			},
-		);
+		const pipeline = new IngestPipeline({
+			documentLoader: mockDocumentLoader,
+			chunker: mockChunker,
+			embedder: mockEmbedder,
+			chunkStore: failingChunkStore,
+			documentKey: (doc) => doc.metadata.path,
+			metadataTransform: (metadata) => metadata,
+			maxRetries: 2,
+			retryDelay: 10,
+		});
 
 		const result = await pipeline.ingest({});
 
@@ -86,17 +82,15 @@ describe("IngestPipeline", () => {
 	it("should call progress callback", async () => {
 		const onProgress = vi.fn();
 
-		const pipeline = new IngestPipeline(
-			{
-				documentLoader: mockDocumentLoader,
-				chunker: mockChunker,
-				embedder: mockEmbedder,
-				chunkStore: mockChunkStore,
-				documentKey: (doc) => doc.metadata.path,
-				metadataTransform: (metadata) => metadata,
-			},
-			{ onProgress },
-		);
+		const pipeline = new IngestPipeline({
+			documentLoader: mockDocumentLoader,
+			chunker: mockChunker,
+			embedder: mockEmbedder,
+			chunkStore: mockChunkStore,
+			documentKey: (doc) => doc.metadata.path,
+			metadataTransform: (metadata) => metadata,
+			onProgress,
+		});
 
 		await pipeline.ingest({});
 
@@ -106,17 +100,15 @@ describe("IngestPipeline", () => {
 	});
 
 	it("should handle batch processing", async () => {
-		const pipeline = new IngestPipeline(
-			{
-				documentLoader: mockDocumentLoader,
-				chunker: mockChunker,
-				embedder: mockEmbedder,
-				chunkStore: mockChunkStore,
-				documentKey: (doc) => doc.metadata.path,
-				metadataTransform: (metadata) => metadata,
-			},
-			{ maxBatchSize: 1 },
-		);
+		const pipeline = new IngestPipeline({
+			documentLoader: mockDocumentLoader,
+			chunker: mockChunker,
+			embedder: mockEmbedder,
+			chunkStore: mockChunkStore,
+			documentKey: (doc) => doc.metadata.path,
+			metadataTransform: (metadata) => metadata,
+			maxBatchSize: 1,
+		});
 
 		await pipeline.ingest({});
 

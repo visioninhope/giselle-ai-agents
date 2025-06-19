@@ -11,20 +11,21 @@ import type { EmbedderFunction } from "../embedder/types";
 import { OperationError } from "../errors";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
 
-export interface IngestPipelineConfig<
+export interface IngestPipelineOptions<
 	TDocMetadata extends Record<string, unknown>,
 	TChunkMetadata extends Record<string, unknown>,
-	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
-	documentLoader: DocumentLoader<TDocMetadata, TParams>;
-	chunker?: ChunkerFunction;
-	embedder?: EmbedderFunction;
+	// Required configuration
+	documentLoader: DocumentLoader<TDocMetadata, DocumentLoaderParams>;
 	chunkStore: ChunkStore<TChunkMetadata>;
 	documentKey: (document: Document<TDocMetadata>) => string;
-	metadataTransform?: (metadata: TDocMetadata) => TChunkMetadata;
-}
+	metadataTransform: (metadata: TDocMetadata) => TChunkMetadata;
 
-export interface IngestPipelineOptions {
+	// Optional processors
+	chunker?: ChunkerFunction;
+	embedder?: EmbedderFunction;
+
+	// Optional settings
 	maxBatchSize?: number;
 	maxRetries?: number;
 	retryDelay?: number;
@@ -32,15 +33,21 @@ export interface IngestPipelineOptions {
 	onError?: (error: IngestError) => void;
 }
 
+const DEFAULT_MAX_BATCH_SIZE = 100;
+const DEFAULT_MAX_RETRIES = 3;
+const DEFAULT_RETRY_DELAY = 1000;
+
 /**
  * IngestPipeline class - encapsulates all configuration and logic
  */
 export class IngestPipeline<
 	TDocMetadata extends Record<string, unknown>,
 	TChunkMetadata extends Record<string, unknown>,
-	TParams extends DocumentLoaderParams = DocumentLoaderParams,
 > {
-	private readonly documentLoader: DocumentLoader<TDocMetadata, TParams>;
+	private readonly documentLoader: DocumentLoader<
+		TDocMetadata,
+		DocumentLoaderParams
+	>;
 	private readonly chunker: ChunkerFunction;
 	private readonly embedder: EmbedderFunction;
 	private readonly chunkStore: ChunkStore<TChunkMetadata>;
@@ -56,22 +63,21 @@ export class IngestPipeline<
 	private readonly onProgress: (progress: IngestProgress) => void;
 	private readonly onError: (error: IngestError) => void;
 
-	constructor(
-		config: IngestPipelineConfig<TDocMetadata, TChunkMetadata, TParams>,
-		options: IngestPipelineOptions = {},
-	) {
-		this.documentLoader = config.documentLoader;
-		this.chunker = config.chunker ?? createDefaultChunker();
-		this.embedder = config.embedder ?? createDefaultEmbedder();
-		this.chunkStore = config.chunkStore;
-		this.documentKey = config.documentKey;
-		this.metadataTransform =
-			config.metadataTransform ??
-			((metadata) => metadata as unknown as TChunkMetadata);
+	constructor(options: IngestPipelineOptions<TDocMetadata, TChunkMetadata>) {
+		// Required configuration
+		this.documentLoader = options.documentLoader;
+		this.chunkStore = options.chunkStore;
+		this.documentKey = options.documentKey;
+		this.metadataTransform = options.metadataTransform;
 
-		this.maxBatchSize = options.maxBatchSize ?? 100;
-		this.maxRetries = options.maxRetries ?? 3;
-		this.retryDelay = options.retryDelay ?? 1000;
+		// Processors with defaults
+		this.chunker = options.chunker ?? createDefaultChunker();
+		this.embedder = options.embedder ?? createDefaultEmbedder();
+
+		// Settings with defaults
+		this.maxBatchSize = options.maxBatchSize ?? DEFAULT_MAX_BATCH_SIZE;
+		this.maxRetries = options.maxRetries ?? DEFAULT_MAX_RETRIES;
+		this.retryDelay = options.retryDelay ?? DEFAULT_RETRY_DELAY;
 		this.onProgress = options.onProgress ?? (() => {});
 		this.onError = options.onError ?? (() => {});
 	}
@@ -79,7 +85,7 @@ export class IngestPipeline<
 	/**
 	 * Run the ingestion pipeline
 	 */
-	async ingest(params: TParams): Promise<IngestResult> {
+	async ingest(params: DocumentLoaderParams) {
 		const result: IngestResult = {
 			totalDocuments: 0,
 			successfulDocuments: 0,
@@ -126,7 +132,7 @@ export class IngestPipeline<
 		documents: Array<Document<TDocMetadata>>,
 		result: IngestResult,
 		progress: IngestProgress,
-	): Promise<void> {
+	) {
 		for (const document of documents) {
 			const docKey = this.documentKey(document);
 			progress.currentDocument = docKey;
@@ -154,7 +160,7 @@ export class IngestPipeline<
 	private async processDocument(
 		document: Document<TDocMetadata>,
 		docKey: string,
-	): Promise<void> {
+	) {
 		const targetMetadata = this.metadataTransform(document.metadata);
 
 		for (let attempt = 1; attempt <= this.maxRetries; attempt++) {

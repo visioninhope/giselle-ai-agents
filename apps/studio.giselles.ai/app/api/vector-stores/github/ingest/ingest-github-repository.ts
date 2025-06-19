@@ -23,28 +23,24 @@ export async function ingestGitHubRepository(params: {
 	});
 	const chunkStore = createGitHubChunkStore(repositoryIndexDbId);
 
-	const pipeline = new IngestPipeline(
-		{
-			documentLoader: githubLoader,
-			chunkStore,
-			documentKey: (document) => document.metadata.path,
-			metadataTransform: (metadata) => ({
-				repositoryIndexDbId,
-				commitSha: metadata.commitSha,
-				fileSha: metadata.fileSha,
-				path: metadata.path,
-				nodeId: metadata.nodeId,
-			}),
+	const pipeline = new IngestPipeline({
+		documentLoader: githubLoader,
+		chunkStore,
+		documentKey: (document) => document.metadata.path,
+		metadataTransform: (metadata) => ({
+			repositoryIndexDbId,
+			commitSha: metadata.commitSha,
+			fileSha: metadata.fileSha,
+			path: metadata.path,
+			nodeId: metadata.nodeId,
+		}),
+		maxBatchSize: 50,
+		onProgress: (progress) => {
+			console.log(
+				`Ingesting... (${progress.processedDocuments}) ${progress.currentDocument}`,
+			);
 		},
-		{
-			maxBatchSize: 50,
-			onProgress: (progress) => {
-				console.log(
-					`Ingesting... (${progress.processedDocuments}) ${progress.currentDocument}`,
-				);
-			},
-		},
-	);
+	});
 
 	const result = await pipeline.ingest(params.source);
 	console.log(
