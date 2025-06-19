@@ -5,7 +5,7 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { beforeEach, describe, expect, it, test } from "vitest";
-import { buildWorkflowForNode } from "./build-workflow-from-node";
+import { buildWorkflowFromNode } from "./build-workflow-from-node";
 import workspace1 from "./test/fixtures/workspace1.json";
 import workspace2 from "./test/fixtures/workspace2.json";
 import workspace3 from "./test/fixtures/workspace3.json";
@@ -15,13 +15,19 @@ describe("buildWorkflowForNode with testWorkspace1", () => {
 	test("should build a workflow starting from Manual trigger node (nd-y7lLktmBplRvcSov)", () => {
 		// Starting node is the Manual trigger
 		const startNodeId = "nd-y7lLktmBplRvcSov" as NodeId;
-
-		// Build the workflow starting from the Manual trigger node
-		const result = buildWorkflowForNode(
-			startNodeId,
-			testWorkspace1.nodes,
-			testWorkspace1.connections,
+		const startNode = testWorkspace1.nodes.find(
+			(node) => node.id === startNodeId,
 		);
+		if (startNode === undefined) {
+			throw new Error(`Node with id ${startNodeId} not found`);
+		}
+
+		console.log(testWorkspace1.nodes);
+		// Build the workflow starting from the Manual trigger node
+		const result = buildWorkflowFromNode(startNode, {
+			nodes: testWorkspace1.nodes,
+			connections: testWorkspace1.connections,
+		});
 
 		expect(result).not.toBeNull();
 		if (result) {
@@ -80,11 +86,13 @@ describe("buildWorkflowForNode with fixture/workspace1", () => {
 		}
 		workspaceData = workspace.data;
 
-		result = buildWorkflowForNode(
-			"nd-qRt17h0TP7nQd4Xk",
-			workspaceData.nodes,
-			workspaceData.connections,
+		const node = workspaceData.nodes.find(
+			(n) => n.id === "nd-qRt17h0TP7nQd4Xk",
 		);
+		if (node === undefined) {
+			throw new Error("Node not found");
+		}
+		result = buildWorkflowFromNode(node, workspaceData);
 	});
 
 	it("should build a workflow with 3 jobs", () => {
@@ -268,13 +276,15 @@ describe("buildWorkflowForNode with testWorkspace3", () => {
 			throw new Error("Failed to parse workspace3");
 		}
 		workspaceData = workspace.data;
+		const node = workspaceData.nodes.find(
+			(node) => node.id === "nd-Z6YHBDO456UNY6N4",
+		);
+		if (!node) {
+			throw new Error("Failed to find node");
+		}
 
 		// Start from the GitHub trigger node "On Issue Comment Created"
-		result = buildWorkflowForNode(
-			"nd-3k5o1XHYgJIuVE9z",
-			workspaceData.nodes,
-			workspaceData.connections,
-		);
+		result = buildWorkflowFromNode(node, workspaceData);
 	});
 
 	it("should build a workflow with 2 jobs", () => {

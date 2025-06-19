@@ -64,7 +64,7 @@ export function sliceGraphFromNode(
 	}
 
 	return {
-		nodes: sliceNodeMap.values().map((sliceNode) => sliceNode),
+		nodes: [...sliceNodeMap.values().map((sliceNode) => sliceNode)],
 		connections: sliceConnections,
 	};
 }
