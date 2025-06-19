@@ -34,16 +34,15 @@ function formatChunks(chunks: string[]): string {
 function parseChunks(text: string): string[] {
 	const pattern = new RegExp(`${CHUNK_DELIMITER} \\d+ =====\\n`, "g");
 	const parts = text.split(pattern);
-	return parts
-		.slice(1) // Skip the first empty element
-		.map((chunk, index) => {
-			// Only remove the trailing newline if it's not the last chunk
-			// or if the original text ends with a delimiter
-			if (index < parts.length - 2 && chunk.endsWith("\n")) {
-				return chunk.slice(0, -1);
-			}
-			return chunk;
-		});
+	const chunks = parts.slice(1); // Skip the first empty element
+	return chunks.map((chunk, index) => {
+		// Only remove the trailing newline if it's not the last chunk
+		// or if the original text ends with a delimiter
+		if (index < chunks.length - 1 && chunk.endsWith("\n")) {
+			return chunk.slice(0, -1);
+		}
+		return chunk;
+	});
 }
 
 function compareWithGolden(
