@@ -1,0 +1,70 @@
+import type {
+	Connection,
+	ConnectionId,
+	NodeId,
+	NodeLike,
+	Workspace,
+} from "@giselle-sdk/data-type";
+
+export function sliceGraphFromNode(
+	node: NodeLike,
+	graph: Pick<Workspace, "connections" | "nodes">,
+) {
+	const nodeMap = new Map(graph.nodes.map((n) => [n.id, n]));
+	const forwardMap = new Map<NodeId, NodeId[]>();
+
+	for (const connection of graph.connections) {
+		if (!forwardMap.has(connection.outputNode.id)) {
+			forwardMap.set(connection.outputNode.id, []);
+		}
+		forwardMap.get(connection.outputNode.id)?.push?.(connection.inputNode.id);
+	}
+
+	const visited = new Set<ConnectionId>();
+	const sliceConnections: Connection[] = [];
+	const sliceNodes: NodeLike[] = [];
+	const queue: NodeId[] = [node.id];
+
+	while (queue.length > 0) {
+		const current = queue.shift();
+		if (current === undefined) {
+			continue;
+		}
+		const currentNode = nodeMap.get(current);
+		if (currentNode === undefined) {
+			continue;
+		}
+
+		const nexts = forwardMap.get(current) ?? [];
+		for (const next of nexts) {
+			const nextNode = nodeMap.get(next);
+			if (nextNode === undefined) {
+				continue;
+			}
+			const connection = graph.connections.find(
+				(connection) =>
+					connection.outputNode.id === currentNode.id &&
+					connection.inputNode.id === nextNode.id,
+			);
+			if (connection === undefined) {
+				continue;
+			}
+			if (!visited.has(connection.id)) {
+				sliceConnections.push(connection);
+				sliceNodes.push(currentNode);
+				visited.add(connection.id);
+			}
+
+			if (nextNode.type === "operation") {
+				queue.push(next);
+			}
+		}
+	}
+
+	return {
+		nodes: sliceNodes.filter(
+			(node, index, self) => self.findIndex((n) => n.id === node.id) === index,
+		),
+		connections: sliceConnections,
+	};
+}

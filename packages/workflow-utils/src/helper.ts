@@ -11,7 +11,7 @@ import {
 	isOperationNode,
 } from "@giselle-sdk/data-type";
 
-type ConnectedNodeIdList = Array<[NodeId, Set<NodeId>]>;
+type ConnectedNodeIdMap = Map<NodeId, Set<NodeId>>;
 
 /**
  * Creates a map of node IDs to their connected node IDs.
@@ -41,17 +41,19 @@ export function buildConnectedNodeIdList(
 		const targetSet = connectionRecord[connection.inputNode.id];
 		targetSet.add(connection.outputNode.id);
 	}
-	return Object.entries(connectionRecord) as ConnectedNodeIdList;
+	return Object.entries(connectionRecord) as ConnectedNodeIdMap;
 }
 
 /**
  * Creates a map of node IDs to their downstream node IDs (output direction only).
  */
-export function buildDownstreamNodeIdList(
-	connectionSet: Set<Connection>,
-	nodeIdSet: Set<NodeId>,
+export function buildDownstreamNodeIdMap(
+	nodes: NodeLike[],
+	connections: Connection[],
 ) {
-	const downstreamRecord: Record<NodeId, Set<NodeId>> = {};
+	const nodeIdSet = new Set(nodes.map((node) => node.id));
+	const connectionSet = new Set(connections);
+	const downstreamNodeIdMap = new Map<NodeId, Set<NodeId>>();
 	for (const connection of connectionSet) {
 		if (
 			!nodeIdSet.has(connection.outputNode.id) ||
@@ -59,13 +61,14 @@ export function buildDownstreamNodeIdList(
 		) {
 			continue;
 		}
-		if (!downstreamRecord[connection.outputNode.id]) {
-			downstreamRecord[connection.outputNode.id] = new Set();
+		if (!downstreamNodeIdMap.has(connection.outputNode.id)) {
+			downstreamNodeIdMap.set(connection.outputNode.id, new Set());
 		}
-		const downstreamSet = downstreamRecord[connection.outputNode.id];
-		downstreamSet.add(connection.inputNode.id);
+		downstreamNodeIdMap
+			.get(connection.outputNode.id)
+			?.add(connection.inputNode.id);
 	}
-	return Object.entries(downstreamRecord) as ConnectedNodeIdList;
+	return downstreamNodeIdMap;
 }
 
 /**
@@ -75,18 +78,18 @@ export function buildDownstreamNodeIdList(
  */
 export function collectDownstreamNodes(
 	startNodeId: NodeId,
-	nodeRecord: Record<NodeId, NodeLike>,
-	downstreamList: ConnectedNodeIdList,
+	nodes: NodeLike[],
+	downstreamNodeIdMap: ConnectedNodeIdMap,
 ): NodeLike[] {
 	const connectedNodes: NodeLike[] = [];
 	const visited = new Set<NodeId>();
-	const map = new Map<NodeId, Set<NodeId>>(downstreamList);
+	const map = new Map<NodeId, Set<NodeId>>(downstreamNodeIdMap);
 	const stack: NodeId[] = [startNodeId];
 
 	while (stack.length > 0) {
 		const currentNodeId = stack.pop() || startNodeId;
 		if (visited.has(currentNodeId)) continue;
-		const currentNode = nodeRecord[currentNodeId];
+		const currentNode = nodes.find((node) => node.id === currentNodeId);
 		if (currentNode === undefined) continue;
 		visited.add(currentNodeId);
 		connectedNodes.push(currentNode);
@@ -110,7 +113,7 @@ export function collectDownstreamNodes(
 export function collectConnectedNodes(
 	startNodeId: NodeId,
 	nodeRecord: Record<NodeId, NodeLike>,
-	connectionList: ConnectedNodeIdList,
+	connectionList: ConnectedNodeIdMap,
 ): NodeLike[] {
 	const connectedNodes: NodeLike[] = [];
 	const visited = new Set<NodeId>();
@@ -173,10 +176,13 @@ export function collectConnectedConnections(
  * @returns Array of jobs for the workflow
  */
 export function buildJobList(
-	nodeSet: Set<NodeLike>,
-	connectionSet: Set<Connection>,
+	nodes: NodeLike[],
+	connections: Connection[],
 	workflowId: WorkflowId,
 ) {
+	const nodeSet = new Set(nodes);
+	const connectionSet = new Set(connections);
+
 	/**
 	 * Calculates the number of incoming edges for each node.
 	 * Handles duplicate connections between the same nodes.
