@@ -100,7 +100,7 @@ export function createLineChunker(
 			}
 		}
 
-		return chunks.filter((chunk) => chunk.trim().length > 0);
+		return chunks.filter((chunk) => chunk.length > 0);
 	};
 }
 
@@ -145,7 +145,7 @@ function buildChunk(
 	currentOverlap: number,
 ): ChunkInfo {
 	const chunkLines = lines.slice(startIndex, endIndex);
-	const content = chunkLines.join("\n").trim();
+	const content = chunkLines.join("\n");
 
 	return {
 		startIndex,
@@ -204,6 +204,6 @@ function reduceLineCountGradually(
 
 function splitLongContent(content: string, maxChars: number): string[] {
 	return Array.from({ length: Math.ceil(content.length / maxChars) }, (_, k) =>
-		content.slice(k * maxChars, (k + 1) * maxChars).trim(),
-	).filter(Boolean);
+		content.slice(k * maxChars, (k + 1) * maxChars),
+	).filter((chunk) => chunk.length > 0);
 }
