@@ -6,3 +6,4 @@ export * from "./embedder";
 export * from "./errors";
 export * from "./factories";
 export * from "./ingest";
+export * from "./query-service";
