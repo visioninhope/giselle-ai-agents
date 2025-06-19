@@ -28,6 +28,8 @@ export function SimpleDomainFilter({
 	// Calculate total domains and check if max is reached
 	const totalDomains = allowList.length + denyList.length;
 	const isMaxReached = totalDomains >= MAX_DOMAINS;
+	const getMaxReachedMessage = () =>
+		`You can add up to ${MAX_DOMAINS} domains only (combined Allow and Deny lists).`;
 
 	// Set initial data
 	useEffect(() => {
@@ -48,7 +50,6 @@ export function SimpleDomainFilter({
 
 	// Handle Allow list changes
 	const handleAllowListChange = (newTags: string[]) => {
-		// Check if adding would exceed limit
 		const totalAfterChange = newTags.length + denyList.length;
 		if (totalAfterChange > MAX_DOMAINS) {
 			return; // Don't allow adding beyond limit
@@ -59,7 +60,6 @@ export function SimpleDomainFilter({
 
 	// Handle Deny list changes
 	const handleDenyListChange = (newTags: string[]) => {
-		// Check if adding would exceed limit
 		const totalAfterChange = allowList.length + newTags.length;
 		if (totalAfterChange > MAX_DOMAINS) {
 			return; // Don't allow adding beyond limit
@@ -80,6 +80,12 @@ export function SimpleDomainFilter({
 
 	// Domain name validation functions for the allow and deny lists
 	const validateAllowDomain = (input: string) => {
+		if (isMaxReached) {
+			return {
+				isValid: false,
+				message: getMaxReachedMessage(),
+			};
+		}
 		if (!isValidDomain(input)) {
 			return {
 				isValid: false,
@@ -102,6 +108,12 @@ export function SimpleDomainFilter({
 	};
 
 	const validateDenyDomain = (input: string) => {
+		if (isMaxReached) {
+			return {
+				isValid: false,
+				message: getMaxReachedMessage(),
+			};
+		}
 		if (!isValidDomain(input)) {
 			return {
 				isValid: false,
@@ -136,8 +148,15 @@ export function SimpleDomainFilter({
 
 			{/* Display domain count */}
 			<div className="mb-4 text-[13px] text-gray-400">
-				Total domains: {totalDomains}/{MAX_DOMAINS}
+				Total domains: {totalDomains}/{MAX_DOMAINS} (combined Allow and Deny
+				lists)
 			</div>
+
+			{isMaxReached && (
+				<div className="mb-4 text-red-700 text-[12px]">
+					{getMaxReachedMessage()}
+				</div>
+			)}
 
 			<div className="space-y-4">
 				{/* Allow list */}
