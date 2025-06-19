@@ -93,6 +93,19 @@ function validateDatabaseConfig(database: {
 				},
 			);
 		}
+		if (
+			database.poolConfig.connectionTimeoutMillis !== undefined &&
+			database.poolConfig.connectionTimeoutMillis < 0
+		) {
+			throw new ValidationError(
+				"Pool connection timeout must be non-negative",
+				undefined,
+				{
+					operation: "validateDatabaseConfig",
+					field: "poolConfig.connectionTimeoutMillis",
+				},
+			);
+		}
 	}
 
 	return database;
