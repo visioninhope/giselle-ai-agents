@@ -18,14 +18,44 @@ const defaultConfigurations: AnthropicLanguageModelConfigurations = {
 	reasoning: false,
 };
 
-const AnthropicLanguageModelId = z
+export const AnthropicLanguageModelId = z
 	.enum([
 		"claude-4-opus-20250514",
 		"claude-4-sonnet-20250514",
 		"claude-3-7-sonnet-20250219",
 		"claude-3-5-haiku-20241022",
 	])
-	.catch("claude-3-5-haiku-20241022");
+	.catch((ctx) => {
+		if (typeof ctx.value !== "string") {
+			return "claude-3-5-haiku-20241022";
+		}
+		const v = ctx.value;
+		if (/^claude-4-opus-4-/.test(v)) {
+			return "claude-4-opus-20250514";
+		}
+		if (/^claude-4-sonnet-4-/.test(v)) {
+			return "claude-4-sonnet-20250514";
+		}
+		if (/^claude-3-7-sonnet-/.test(v)) {
+			return "claude-3-7-sonnet-20250219";
+		}
+		if (/^claude-3-5-haiku-/.test(v)) {
+			return "claude-3-5-haiku-20241022";
+		}
+		if (/^claude-3-5-sonnet-/.test(v)) {
+			return "claude-3-7-sonnet-20250219";
+		}
+		if (/^claude-3-opus-/.test(v)) {
+			return "claude-4-opus-20250514";
+		}
+		if (/^claude-3-sonnet-/.test(v)) {
+			return "claude-3-7-sonnet-20250219";
+		}
+		if (/^claude-3-haiku-/.test(v)) {
+			return "claude-3-5-haiku-20241022";
+		}
+		return "claude-3-5-haiku-20241022";
+	});
 
 const AnthropicLanguageModel = LanguageModelBase.extend({
 	id: AnthropicLanguageModelId,
