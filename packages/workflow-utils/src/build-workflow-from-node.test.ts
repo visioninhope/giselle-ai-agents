@@ -159,12 +159,15 @@ describe("buildWorkflowForNode with testWorkspace2", () => {
 		}
 		workspaceData = workspace.data;
 
-		// Start from the GitHub trigger node "On Issue Comment Created"
-		result = buildWorkflowForNode(
-			"nd-Z6YHBDO456UNY6N4",
-			workspaceData.nodes,
-			workspaceData.connections,
+		const node = workspaceData.nodes.find(
+			(n) => n.id === "nd-Z6YHBDO456UNY6N4",
 		);
+		if (node === undefined) {
+			throw new Error("Node not found");
+		}
+
+		// Start from the GitHub trigger node "On Issue Comment Created"
+		result = buildWorkflowFromNode(node, workspaceData);
 	});
 
 	it("should build a workflow with 3 jobs", () => {
@@ -277,7 +280,7 @@ describe("buildWorkflowForNode with testWorkspace3", () => {
 		}
 		workspaceData = workspace.data;
 		const node = workspaceData.nodes.find(
-			(node) => node.id === "nd-Z6YHBDO456UNY6N4",
+			(node) => node.id === "nd-3k5o1XHYgJIuVE9z",
 		);
 		if (!node) {
 			throw new Error("Failed to find node");
