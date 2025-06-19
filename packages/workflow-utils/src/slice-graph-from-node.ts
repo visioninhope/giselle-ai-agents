@@ -12,12 +12,18 @@ export function sliceGraphFromNode(
 ) {
 	const nodeMap = new Map(graph.nodes.map((n) => [n.id, n]));
 	const forwardMap = new Map<NodeId, NodeId[]>();
+	const referenceMap = new Map<NodeId, NodeId[]>();
 
 	for (const connection of graph.connections) {
 		if (!forwardMap.has(connection.outputNode.id)) {
 			forwardMap.set(connection.outputNode.id, []);
 		}
 		forwardMap.get(connection.outputNode.id)?.push?.(connection.inputNode.id);
+
+		if (!referenceMap.has(connection.inputNode.id)) {
+			referenceMap.set(connection.inputNode.id, []);
+		}
+		referenceMap.get(connection.inputNode.id)?.push?.(connection.outputNode.id);
 	}
 
 	const visited = new Set<ConnectionId>();
@@ -59,6 +65,31 @@ export function sliceGraphFromNode(
 
 			if (nextNode.type === "operation") {
 				queue.push(next);
+			}
+
+			const referencing = referenceMap.get(next) ?? [];
+			for (const ref of referencing) {
+				const refNode = nodeMap.get(ref);
+				if (refNode === undefined) {
+					continue;
+				}
+				const refConnection = graph.connections.find(
+					(connection) =>
+						connection.outputNode.id === refNode.id &&
+						connection.inputNode.id === nextNode.id,
+				);
+				if (refConnection === undefined) {
+					continue;
+				}
+
+				if (refNode.type === "variable") {
+					if (!visited.has(refConnection.id)) {
+						sliceConnections.push(refConnection);
+						sliceNodeMap.set(currentNode.id, currentNode);
+						sliceNodeMap.set(refNode.id, refNode);
+						visited.add(refConnection.id);
+					}
+				}
 			}
 		}
 	}
