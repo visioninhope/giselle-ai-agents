@@ -375,6 +375,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		};
 
 		let progressTableData: ProgressTableData = [];
+		let hasFlowError = false;
 
 		await deps.runFlow({
 			context: args.context,
@@ -469,6 +470,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 					);
 				},
 				jobFail: async ({ job }) => {
+					hasFlowError = true;
 					progressTableData = progressTableData.map((row) =>
 						row.id === job.id
 							? { ...row, status: "failed", updatedAt: new Date() }
@@ -490,8 +492,11 @@ export async function processEvent<TEventName extends WebhookEventName>(
 				},
 			},
 		});
+		const greeting = hasFlowError
+			? "Unexpected error on runinng flow"
+			: "Finished running flow.";
 		await updateComment(
-			`Finished running flow.\n\n${buildProgressTable(progressTableData)}`,
+			`${greeting}\n\n${buildProgressTable(progressTableData)}`,
 		);
 	}
 }
