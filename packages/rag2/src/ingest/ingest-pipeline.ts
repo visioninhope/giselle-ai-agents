@@ -11,15 +11,18 @@ import type { EmbedderFunction } from "../embedder/types";
 import { OperationError } from "../errors";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
 
+// Type helper to extract metadata type from ChunkStore
+type InferChunkMetadata<T> = T extends ChunkStore<infer M> ? M : never;
+
 export interface IngestPipelineOptions<
 	TDocMetadata extends Record<string, unknown>,
-	TChunkMetadata extends Record<string, unknown>,
+	TStore extends ChunkStore<Record<string, unknown>>,
 > {
 	// Required configuration
 	documentLoader: DocumentLoader<TDocMetadata, DocumentLoaderParams>;
-	chunkStore: ChunkStore<TChunkMetadata>;
+	chunkStore: TStore;
 	documentKey: (document: Document<TDocMetadata>) => string;
-	metadataTransform: (metadata: TDocMetadata) => TChunkMetadata;
+	metadataTransform: (metadata: TDocMetadata) => InferChunkMetadata<TStore>;
 
 	// Optional processors
 	chunker?: ChunkerFunction;
@@ -46,9 +49,9 @@ export type IngestFunction = (
  */
 export function createIngestPipeline<
 	TDocMetadata extends Record<string, unknown>,
-	TChunkMetadata extends Record<string, unknown>,
+	TStore extends ChunkStore<Record<string, unknown>>,
 >(
-	options: IngestPipelineOptions<TDocMetadata, TChunkMetadata>,
+	options: IngestPipelineOptions<TDocMetadata, TStore>,
 ): IngestFunction {
 	// Extract and set defaults for all options
 	const {

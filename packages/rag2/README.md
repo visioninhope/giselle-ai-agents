@@ -192,8 +192,9 @@ interface IngestResult {
 
 #### Factory Functions
 
-- `createIngestPipeline<TDocMetadata, TChunkMetadata>(options)` - Creates a
-  document processing pipeline function with automatic chunking and embedding
+- `createIngestPipeline<TDocMetadata, TStore>(options)` - Creates a document
+  processing pipeline function with automatic chunking and embedding. The chunk
+  metadata type is inferred from the provided chunk store for type safety
 - `createQueryService<TContext, TMetadata>(config)` - Creates a new query
   service
 - `createChunkStore<TMetadata>(config)` - Creates a new chunk store
