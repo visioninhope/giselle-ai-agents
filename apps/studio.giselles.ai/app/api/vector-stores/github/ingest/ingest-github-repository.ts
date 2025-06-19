@@ -1,6 +1,6 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
-import { GitHubBlobLoader } from "@giselle-sdk/github-tool";
+import { createGitHubBlobLoader } from "@giselle-sdk/github-tool";
 import { createIngestPipeline } from "@giselle-sdk/rag2";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
@@ -18,7 +18,7 @@ export async function ingestGitHubBlobs(params: {
 		params.teamDbId,
 	);
 
-	const githubLoader = new GitHubBlobLoader(params.octokitClient, {
+	const githubLoader = createGitHubBlobLoader(params.octokitClient, {
 		maxBlobSize: 1 * 1024 * 1024,
 	});
 	const chunkStore = createGitHubBlobChunkStore(repositoryIndexDbId);
