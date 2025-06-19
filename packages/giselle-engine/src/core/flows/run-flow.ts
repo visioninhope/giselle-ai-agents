@@ -153,11 +153,9 @@ async function runJob(args: {
 		},
 	});
 
-	const jobStartedAt = Date.now();
-	let totalTasks = 0;
 	let hasJobError = false;
 
-	await Promise.all(
+	const operationDurations = await Promise.all(
 		job.operations.map(async (operation) => {
 			const generation = createQueuedGeneration({
 				operation,
@@ -165,18 +163,25 @@ async function runJob(args: {
 				workspaceId,
 				triggerInputs,
 			});
+
+			const operationStart = Date.now();
 			const errored = await executeOperation({
 				context,
 				generation,
 				node: operation.node,
 				flowRunId,
 			});
+			const duration = Date.now() - operationStart;
+
 			if (errored) {
 				hasJobError = true;
 			}
-			totalTasks += Date.now() - jobStartedAt;
+
+			return duration;
 		}),
 	);
+
+	const totalTaskDuration = operationDurations.reduce((sum, d) => sum + d, 0);
 
 	if (hasJobError) {
 		await Promise.all([
@@ -187,7 +192,7 @@ async function runJob(args: {
 				delta: {
 					"steps.inProgress": { decrement: 1 },
 					"steps.failed": { increment: 1 },
-					"duration.totalTask": { increment: totalTasks },
+					"duration.totalTask": { increment: totalTaskDuration },
 				},
 			}),
 		]);
@@ -200,7 +205,7 @@ async function runJob(args: {
 				delta: {
 					"steps.inProgress": { decrement: 1 },
 					"steps.completed": { increment: 1 },
-					"duration.totalTask": { increment: totalTasks },
+					"duration.totalTask": { increment: totalTaskDuration },
 				},
 			}),
 		]);
@@ -260,7 +265,7 @@ export async function runFlow(args: {
 		),
 	]);
 
-	const flowStartedAt = Date.now();
+	const flowStart = Date.now();
 
 	for (let i = 0; i < flow.jobs.length; i++) {
 		const job = flow.jobs[i];
@@ -285,7 +290,7 @@ export async function runFlow(args: {
 				flowRunId: flowRun.id,
 				delta: {
 					status: { set: "failed" },
-					"duration.wallClock": { set: Date.now() - flowStartedAt },
+					"duration.wallClock": { set: Date.now() - flowStart },
 				},
 			});
 			return;
@@ -298,7 +303,7 @@ export async function runFlow(args: {
 		flowRunId: flowRun.id,
 		delta: {
 			status: { set: "completed" },
-			"duration.wallClock": { set: Date.now() - flowStartedAt },
+			"duration.wallClock": { set: Date.now() - flowStart },
 		},
 	});
 }
