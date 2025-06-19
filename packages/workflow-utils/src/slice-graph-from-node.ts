@@ -22,8 +22,9 @@ export function sliceGraphFromNode(
 
 	const visited = new Set<ConnectionId>();
 	const sliceConnections: Connection[] = [];
-	const sliceNodes: NodeLike[] = [];
+	const sliceNodeMap = new Map<NodeId, NodeLike>();
 	const queue: NodeId[] = [node.id];
+	sliceNodeMap.set(node.id, node);
 
 	while (queue.length > 0) {
 		const current = queue.shift();
@@ -51,7 +52,8 @@ export function sliceGraphFromNode(
 			}
 			if (!visited.has(connection.id)) {
 				sliceConnections.push(connection);
-				sliceNodes.push(currentNode);
+				sliceNodeMap.set(currentNode.id, currentNode);
+				sliceNodeMap.set(nextNode.id, nextNode);
 				visited.add(connection.id);
 			}
 
@@ -62,9 +64,7 @@ export function sliceGraphFromNode(
 	}
 
 	return {
-		nodes: sliceNodes.filter(
-			(node, index, self) => self.findIndex((n) => n.id === node.id) === index,
-		),
+		nodes: sliceNodeMap.values().map((sliceNode) => sliceNode),
 		connections: sliceConnections,
 	};
 }
