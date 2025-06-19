@@ -34,12 +34,6 @@ export async function ingestGitHubRepository(params: {
 			path: metadata.path,
 			nodeId: metadata.nodeId,
 		}),
-		maxBatchSize: 50,
-		onProgress: (progress) => {
-			console.log(
-				`Ingesting... (${progress.processedDocuments}) ${progress.currentDocument}`,
-			);
-		},
 	});
 
 	const result = await pipeline.ingest(params.source);
