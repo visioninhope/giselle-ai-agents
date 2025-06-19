@@ -55,7 +55,7 @@ export function createGitHubChunkStore(repositoryIndexDbId: number) {
 		tableName: getTableName(githubRepositoryEmbeddings),
 		columnMapping,
 		metadataSchema: githubChunkMetadataSchema,
-		staticContext: {
+		scope: {
 			repository_index_db_id: repositoryIndexDbId,
 		},
 	});
