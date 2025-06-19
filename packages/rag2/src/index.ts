@@ -3,7 +3,7 @@ export {
 	DatabaseError,
 	EmbeddingError,
 	RagError,
-	ValidationError
+	ValidationError,
 } from "./errors";
 
 // Database
@@ -11,7 +11,7 @@ export { PoolManager } from "./database";
 export type {
 	ColumnMapping,
 	DatabaseConfig,
-	RequiredColumns
+	RequiredColumns,
 } from "./database";
 
 // Chunk Store
@@ -50,15 +50,16 @@ export type {
 // Query Service
 export { createPostgresQueryService } from "./query-service";
 export type {
+	Chunk,
 	QueryResult,
-	QueryService
+	QueryService,
 } from "./query-service";
 
 // Utilities from factories
 export {
 	createColumnMapping,
 	createDefaultEmbedder,
-	DEFAULT_REQUIRED_COLUMNS
+	DEFAULT_REQUIRED_COLUMNS,
 } from "./factories";
 
 // Enhanced errors (additional classes and utilities)
@@ -73,5 +74,5 @@ export {
 	// Error types
 	type DatabaseErrorCode,
 	type EmbeddingErrorCode,
-	type OperationErrorCode
+	type OperationErrorCode,
 } from "./errors";
