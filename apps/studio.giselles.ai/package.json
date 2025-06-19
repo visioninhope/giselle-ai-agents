@@ -24,7 +24,6 @@
 		"@giselle-sdk/github-tool": "workspace:*",
 		"@giselle-sdk/integration": "workspace:*",
 		"@giselle-sdk/language-model": "workspace:*",
-		"@giselle-sdk/rag": "workspace:*",
 		"@giselle-sdk/rag2": "workspace:*",
 		"@giselle-sdk/supabase-driver": "workspace:*",
 		"@giselle-sdk/telemetry": "workspace:*",
