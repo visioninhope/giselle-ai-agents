@@ -7,6 +7,7 @@ import {
 	type QueuedGeneration,
 	RunId,
 	type Workflow,
+	type WorkspaceId,
 } from "@giselle-sdk/data-type";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { AISDKError } from "ai";
@@ -18,7 +19,7 @@ import { getWorkspace } from "../workspaces/utils";
 import { createRun } from "./create-run";
 import { patchRun } from "./patch-run";
 import { resolveTrigger } from "./resolve-trigger";
-import { FlowRunIndexObject } from "./run/object";
+import { type FlowRunId, FlowRunIndexObject } from "./run/object";
 import { flowRunPath, workspaceFlowRunPath } from "./run/paths";
 import { getFlowTrigger } from "./utils";
 
@@ -33,9 +34,9 @@ type Callbacks = {
 function createQueuedGeneration(args: {
 	operation: Job["operations"][number];
 	runId: RunId;
-	workspaceId: string;
+	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
-}): QueuedGeneration {
+}) {
 	const { operation, runId, workspaceId, triggerInputs } = args;
 	return {
 		id: GenerationId.generate(),
@@ -57,7 +58,7 @@ async function executeOperation(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	node: Job["operations"][number]["node"];
-	flowRunId: string;
+	flowRunId: FlowRunId;
 }): Promise<boolean> {
 	const { context, generation, node, flowRunId } = args;
 	switch (node.content.type) {
@@ -126,9 +127,9 @@ async function executeOperation(args: {
 async function runJob(args: {
 	job: Job;
 	context: GiselleEngineContext;
-	flowRunId: string;
+	flowRunId: FlowRunId;
 	runId: RunId;
-	workspaceId: string;
+	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
 	callbacks?: Callbacks;
 }): Promise<boolean> {
@@ -158,7 +159,7 @@ async function runJob(args: {
 
 	await Promise.all(
 		job.operations.map(async (operation) => {
-			const generation = await createQueuedGeneration({
+			const generation = createQueuedGeneration({
 				operation,
 				runId,
 				workspaceId,
