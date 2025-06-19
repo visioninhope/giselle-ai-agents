@@ -261,14 +261,9 @@ export async function runFlow(args: {
 	]);
 
 	const flowStartedAt = Date.now();
-	let hasFlowError = false;
 
-	for (const job of flow.jobs) {
-		if (hasFlowError) {
-			await args.callbacks?.jobSkip?.({ job });
-			continue;
-		}
-
+	for (let i = 0; i < flow.jobs.length; i++) {
+		const job = flow.jobs[i];
 		const errored = await runJob({
 			job,
 			context: args.context,
@@ -280,15 +275,29 @@ export async function runFlow(args: {
 		});
 
 		if (errored) {
-			hasFlowError = true;
+			// Skip remaining jobs
+			for (let j = i + 1; j < flow.jobs.length; j++) {
+				await args.callbacks?.jobSkip?.({ job: flow.jobs[j] });
+			}
+
+			await patchRun({
+				context: args.context,
+				flowRunId: flowRun.id,
+				delta: {
+					status: { set: "failed" },
+					"duration.wallClock": { set: Date.now() - flowStartedAt },
+				},
+			});
+			return;
 		}
 	}
 
+	// All jobs completed successfully
 	await patchRun({
 		context: args.context,
 		flowRunId: flowRun.id,
 		delta: {
-			status: { set: hasFlowError ? "failed" : "completed" },
+			status: { set: "completed" },
 			"duration.wallClock": { set: Date.now() - flowStartedAt },
 		},
 	});
