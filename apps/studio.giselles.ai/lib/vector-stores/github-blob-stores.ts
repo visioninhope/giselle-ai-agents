@@ -122,30 +122,14 @@ const githubQueryMetadataSchema = z.object({
 });
 
 /**
- * GitHub query service factory - for RAG queries
- */
-export function createGitHubQueryService() {
-	return createPostgresQueryService({
-		database: createDatabaseConfig(),
-		tableName: getTableName(githubRepositoryEmbeddings),
-		metadataSchema: githubQueryMetadataSchema,
-		contextToFilter: resolveGitHubEmbeddingFilter,
-		requiredColumnOverrides: {
-			documentKey: "path",
-			// (default)
-			// chunkContent: "chunk_content",
-			// chunkIndex: "chunk_index",
-			// embedding: "embedding"
-		},
-		// Metadata fields will auto-convert from camelCase to snake_case:
-		// commitSha -> commit_sha
-		// fileSha -> file_sha
-		// path -> path
-		// nodeId -> node_id
-	});
-}
-
-/**
  * Pre-configured GitHub query service instance
  */
-export const gitHubQueryService = createGitHubQueryService();
+export const gitHubQueryService = createPostgresQueryService({
+	database: createDatabaseConfig(),
+	tableName: getTableName(githubRepositoryEmbeddings),
+	metadataSchema: githubQueryMetadataSchema,
+	contextToFilter: resolveGitHubEmbeddingFilter,
+	requiredColumnOverrides: {
+		documentKey: "path",
+	},
+});
