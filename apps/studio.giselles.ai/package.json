@@ -8,7 +8,7 @@
 	"scripts": {
 		"dev": "SENTRY_SUPPRESS_TURBOPACK_WARNING=1 next dev --turbopack",
 		"dev-debug": "LOGLEVEL=debug pnpm run dev",
-		"build": "next build --turbopack",
+		"build": "next build",
 		"start": "next start",
 		"format": "biome check --write .",
 		"lint": "next lint",
