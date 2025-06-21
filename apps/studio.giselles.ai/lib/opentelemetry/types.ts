@@ -1,4 +1,3 @@
-import { Strategy } from "unstructured-client/sdk/models/shared";
 import { z } from "zod";
 
 export const ExternalServiceName = {
@@ -6,7 +5,6 @@ export const ExternalServiceName = {
 	Google: "google",
 	OpenAI: "openai",
 	Tavily: "tavily",
-	Unstructured: "unstructured",
 	VercelBlob: "vercel_blob",
 } as const;
 
@@ -53,11 +51,6 @@ const BasicRequestCountSchema = RequestCount.extend({
 	externalServiceName: z.enum([ExternalServiceName.Tavily]),
 });
 
-const UnstructuredRequestCountSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.Unstructured),
-	strategy: z.nativeEnum(Strategy),
-});
-
 const VercelBlobPutSchema = RequestCount.extend({
 	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
 	operationType: z.literal("put"),
@@ -91,7 +84,6 @@ const VercelBlobRequestCountSchema = z.discriminatedUnion("operationType", [
 
 const RequestCountSchema = z.union([
 	BasicRequestCountSchema,
-	UnstructuredRequestCountSchema,
 	VercelBlobRequestCountSchema,
 ]);
 
