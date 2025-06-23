@@ -269,6 +269,9 @@ importers:
       giselle-sdk:
         specifier: workspace:^
         version: link:../../packages/giselle-sdk
+      happy-dom:
+        specifier: 'catalog:'
+        version: 17.6.1
       jsdom:
         specifier: 'catalog:'
         version: 26.1.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)
@@ -540,6 +543,9 @@ importers:
       googleapis:
         specifier: 144.0.0
         version: 144.0.0
+      happy-dom:
+        specifier: 'catalog:'
+        version: 17.6.1
       import-in-the-middle:
         specifier: 1.13.1
         version: 1.13.1
