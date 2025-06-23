@@ -1,6 +1,3 @@
-import { Defuddle } from "defuddle/node";
-import { Window } from "happy-dom";
-import TurndownService from "turndown";
 import { z } from "zod";
 
 export const selfMadeProviderName = "self-made" as const;
@@ -19,12 +16,6 @@ export type SelfMadeScrapeResult = {
 	html: string;
 	markdown: string;
 };
-
-const turndownService = new TurndownService({
-	headingStyle: "atx", // Use # heading style for headings
-	codeBlockStyle: "fenced", // Use ``` fenced style for code blocks
-	bulletListMarker: "*", // Use * as the bullet list marker
-});
 
 /**
  * Scrapes the content of a given URL and returns the result in the specified formats.
@@ -74,8 +65,10 @@ export async function scrapeUrl(
 			markdown = content;
 		} else {
 			// If it's HTML, convert it to markdown
+			const Window = (await import("happy-dom")).Window;
 			const window = new Window({ url });
 			window.document.body.innerHTML = content;
+			const Defuddle = (await import("defuddle/node")).Defuddle;
 			const result = await Defuddle(window, url, {
 				markdown: true,
 			});
