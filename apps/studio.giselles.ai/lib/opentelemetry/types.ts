@@ -1,4 +1,3 @@
-import { Strategy } from "unstructured-client/sdk/models/shared";
 import { z } from "zod";
 
 export const ExternalServiceName = {
@@ -52,15 +51,7 @@ const BasicRequestCountSchema = RequestCount.extend({
 	externalServiceName: z.enum([ExternalServiceName.Tavily]),
 });
 
-const UnstructuredRequestCountSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.Unstructured),
-	strategy: z.nativeEnum(Strategy),
-});
-
-const RequestCountSchema = z.union([
-	BasicRequestCountSchema,
-	UnstructuredRequestCountSchema,
-]);
+const RequestCountSchema = BasicRequestCountSchema;
 
 export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;
 export type RequestCountSchema = z.infer<typeof RequestCountSchema>;

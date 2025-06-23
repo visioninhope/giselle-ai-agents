@@ -3,7 +3,6 @@ import { db } from "@/drizzle";
 import type { AgentId } from "@giselles-ai/types";
 import { waitUntil } from "@vercel/functions";
 import type { LanguageModelUsage, LanguageModelV1 } from "ai";
-import type { Strategy } from "unstructured-client/sdk/models/shared";
 import { captureError } from "./log";
 import type { LogSchema, OtelLoggerWrapper } from "./types";
 import {
@@ -93,17 +92,9 @@ async function withMeasurement<T>(
 }
 
 const APICallBasedService = {
-	Unstructured: ExternalServiceName.Unstructured,
 	Tavily: ExternalServiceName.Tavily,
 } as const;
 
-export function withCountMeasurement<T>(
-	logger: OtelLoggerWrapper,
-	operation: () => Promise<T>,
-	externalServiceName: typeof APICallBasedService.Unstructured,
-	measurementStartTime: number | undefined,
-	strategy: Strategy,
-): Promise<T>;
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
@@ -115,7 +106,6 @@ export async function withCountMeasurement<T>(
 	operation: () => Promise<T>,
 	externalServiceName: (typeof APICallBasedService)[keyof typeof APICallBasedService],
 	measurementStartTime?: number,
-	strategyOrOptions?: Strategy | undefined,
 ): Promise<T> {
 	const isR06User = await isRoute06User();
 	const measurementScope = await getCurrentMeasurementScope();
@@ -129,20 +119,6 @@ export async function withCountMeasurement<T>(
 			isR06User,
 			requestCount: 1,
 		};
-
-		if (externalServiceName === APICallBasedService.Unstructured) {
-			if (!strategyOrOptions) {
-				logger.error(
-					new Error("'strategy' is required for Unstructured service"),
-					"missing required strategy parameter",
-				);
-			}
-			return {
-				...baseMetrics,
-				externalServiceName,
-				strategy: strategyOrOptions as Strategy,
-			};
-		}
 
 		return {
 			...baseMetrics,
