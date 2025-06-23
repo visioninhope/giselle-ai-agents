@@ -90,7 +90,7 @@ export async function deleteAgent(agentId: string): Promise<DeleteAgentResult> {
 		where: (agents, { eq }) => eq(agents.id, agentId as AgentId),
 	});
 
-	if (agent === undefined || agent.graphUrl === null) {
+	if (agent === undefined) {
 		return { result: "error", message: `Agent ${agentId} not found` };
 	}
 
