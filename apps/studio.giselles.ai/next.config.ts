@@ -81,7 +81,7 @@ const nextConfig: NextConfig = {
 
 export default withSentryConfig(nextConfig, {
 	// For all available options, see:
-	// https://github.com/getsentry/sentry-webpack-plugin#options
+	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
 	org: "route06cojp",
 	project: "edge",
@@ -108,7 +108,9 @@ export default withSentryConfig(nextConfig, {
 	// tunnelRoute: "/monitoring",
 
 	// Hides source maps from generated client bundles
-	hideSourceMaps: true,
+	sourcemaps: {
+		deleteSourcemapsAfterUpload: true,
+	},
 
 	// Automatically tree-shake Sentry logger statements to reduce bundle size
 	disableLogger: true,
