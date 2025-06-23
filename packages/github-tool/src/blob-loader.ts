@@ -1,4 +1,4 @@
-import type { Document, DocumentLoader } from "@giselle-sdk/rag2";
+import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 
 type GitHubBlobMetadata = {

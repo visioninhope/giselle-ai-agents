@@ -92,52 +92,16 @@ async function withMeasurement<T>(
 }
 
 const APICallBasedService = {
-	VercelBlob: ExternalServiceName.VercelBlob,
+	Unstructured: ExternalServiceName.Unstructured,
 	Tavily: ExternalServiceName.Tavily,
 } as const;
-
-export const VercelBlobOperation = {
-	Copy: {
-		type: "copy" as const,
-		measure: (result: { size: number }) => ({
-			blobSizeStored: result.size,
-		}),
-	},
-	Put: {
-		type: "put" as const,
-		measure: (result: { size: number }) => ({
-			blobSizeStored: result.size,
-		}),
-	},
-	Fetch: {
-		type: "fetch" as const,
-		measure: (result: { size: number }) => ({
-			blobSizeTransfered: result.size,
-		}),
-	},
-	Del: {
-		type: "del" as const,
-		measure: (result: { size: number }) => ({
-			blobSizeStored: -result.size,
-		}),
-	},
-	List: {
-		type: "list" as const,
-		measure: (result: { size: number }) => ({
-			blobSizeTransfered: result.size,
-		}),
-	},
-} as const;
-
-type VercelBlobOperationType =
-	(typeof VercelBlobOperation)[keyof typeof VercelBlobOperation];
 
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
-	externalServiceName: typeof APICallBasedService.VercelBlob,
+	externalServiceName: typeof APICallBasedService.Unstructured,
 	measurementStartTime: number | undefined,
-	blobOperation: VercelBlobOperationType,
+	strategy: Strategy,
 ): Promise<T>;
 export function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
@@ -150,7 +114,7 @@ export async function withCountMeasurement<T>(
 	operation: () => Promise<T>,
 	externalServiceName: (typeof APICallBasedService)[keyof typeof APICallBasedService],
 	measurementStartTime?: number,
-	strategyOrOptions?: VercelBlobOperationType | undefined,
+	strategyOrOptions?: Strategy | undefined,
 ): Promise<T> {
 	const isR06User = await isRoute06User();
 	const measurementScope = await getCurrentMeasurementScope();
@@ -165,15 +129,18 @@ export async function withCountMeasurement<T>(
 			requestCount: 1,
 		};
 
-		if (externalServiceName === APICallBasedService.VercelBlob) {
-			const operation = strategyOrOptions as VercelBlobOperationType;
-			const operationResult = operation.measure(result as { size: number });
+		if (externalServiceName === APICallBasedService.Unstructured) {
+			if (!strategyOrOptions) {
+				logger.error(
+					new Error("'strategy' is required for Unstructured service"),
+					"missing required strategy parameter",
+				);
+			}
 			return {
 				...baseMetrics,
 				externalServiceName,
-				operationType: operation.type,
-				...operationResult,
-			} as RequestCountSchema;
+				strategy: strategyOrOptions as Strategy,
+			};
 		}
 
 		return {

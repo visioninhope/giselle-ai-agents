@@ -5,7 +5,7 @@ export const ExternalServiceName = {
 	Google: "google",
 	OpenAI: "openai",
 	Tavily: "tavily",
-	VercelBlob: "vercel_blob",
+	Unstructured: "unstructured",
 } as const;
 
 export const UnimplementedServiceName = {
@@ -51,40 +51,14 @@ const BasicRequestCountSchema = RequestCount.extend({
 	externalServiceName: z.enum([ExternalServiceName.Tavily]),
 });
 
-const VercelBlobPutSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
-	operationType: z.literal("put"),
-	blobSizeStored: z.number(),
+const UnstructuredRequestCountSchema = RequestCount.extend({
+	externalServiceName: z.literal(ExternalServiceName.Unstructured),
+	strategy: z.nativeEnum(Strategy),
 });
-
-const VercelBlobFetchSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
-	operationType: z.literal("fetch"),
-	blobSizeTransfered: z.number(),
-});
-
-const VercelBlobDelSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
-	operationType: z.literal("del"),
-	blobSizeStored: z.number(), // minus the size of the blob deleted
-});
-
-const VercelBlobListSchema = RequestCount.extend({
-	externalServiceName: z.literal(ExternalServiceName.VercelBlob),
-	operationType: z.literal("list"),
-	blobSizeTransfered: z.number(),
-});
-
-const VercelBlobRequestCountSchema = z.discriminatedUnion("operationType", [
-	VercelBlobPutSchema,
-	VercelBlobFetchSchema,
-	VercelBlobDelSchema,
-	VercelBlobListSchema,
-]);
 
 const RequestCountSchema = z.union([
 	BasicRequestCountSchema,
-	VercelBlobRequestCountSchema,
+	UnstructuredRequestCountSchema,
 ]);
 
 export type TokenConsumedSchema = z.infer<typeof TokenConsumedSchema>;

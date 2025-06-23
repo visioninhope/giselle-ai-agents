@@ -4,7 +4,7 @@ import type {
 	GitHubPersonalAccessTokenAuth,
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import type { QueryService } from "@giselle-sdk/rag2";
+import type { QueryService } from "@giselle-sdk/rag";
 import type {
 	GenerationCompleteOption,
 	TelemetrySettings,
@@ -81,7 +81,7 @@ export type GithubEmbeddingMetadata = {
 	nodeId: string;
 };
 
-// GitHub Query Context for rag2 integration
+// GitHub Query Context for rag integration
 export interface GitHubQueryContext {
 	workspaceId: WorkspaceId;
 	owner: string;

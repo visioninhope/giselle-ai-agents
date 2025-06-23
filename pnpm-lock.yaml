@@ -348,9 +348,9 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:*
         version: link:../../packages/language-model
-      '@giselle-sdk/rag2':
+      '@giselle-sdk/rag':
         specifier: workspace:*
-        version: link:../../packages/rag2
+        version: link:../../packages/rag
       '@giselle-sdk/supabase-driver':
         specifier: workspace:*
         version: link:../../packages/supabase-driver
@@ -942,9 +942,9 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
-      '@giselle-sdk/rag2':
+      '@giselle-sdk/rag':
         specifier: workspace:^
-        version: link:../rag2
+        version: link:../rag
       '@giselle-sdk/telemetry':
         specifier: workspace:^
         version: link:../telemetry
@@ -1040,9 +1040,9 @@ importers:
 
   packages/github-tool:
     dependencies:
-      '@giselle-sdk/rag2':
+      '@giselle-sdk/rag':
         specifier: workspace:*
-        version: link:../rag2
+        version: link:../rag
       '@octokit/auth-app':
         specifier: 'catalog:'
         version: 8.0.1
@@ -1168,7 +1168,7 @@ importers:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
 
-  packages/rag2:
+  packages/rag:
     dependencies:
       '@ai-sdk/openai':
         specifier: 'catalog:'
