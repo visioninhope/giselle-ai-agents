@@ -49,25 +49,41 @@ export async function scrapeUrl(
 	if (!res.ok) {
 		throw new Error(`Failed to fetch: ${res.status} ${res.statusText}`);
 	}
-	const html = await res.text();
-	// Extract title from HTML
-	const match = html.match(/<title>([\s\S]*?)<\/title>/i);
-	const title = match ? match[1].trim() : "";
+	const content = await res.text();
+	const contentType = res.headers.get("content-type") || "";
+
+	// Check if the content is already plain text/markdown
+	const isPlainText =
+		contentType.includes("text/plain") ||
+		contentType.includes("text/markdown") ||
+		url.endsWith(".txt") ||
+		url.endsWith(".md") ||
+		!content.trim().startsWith("<");
+
+	// Extract title from HTML (only if it's HTML content)
+	const match = content.match(/<title>([\s\S]*?)<\/title>/i);
+	const title = match ? match[1].trim() : url.split("/").pop() || "Untitled";
 
 	let markdown = "";
 	if (formats.includes("markdown")) {
-		const window = new Window({ url });
-		window.document.body.innerHTML = html;
-		const result = await Defuddle(window, url, {
-			markdown: true,
-		});
-		markdown = result.content;
+		if (isPlainText) {
+			// If it's already plain text/markdown, use it directly
+			markdown = content;
+		} else {
+			// If it's HTML, convert it to markdown
+			const window = new Window({ url });
+			window.document.body.innerHTML = content;
+			const result = await Defuddle(window, url, {
+				markdown: true,
+			});
+			markdown = result.content;
+		}
 	}
 
 	return {
 		url,
 		title,
-		html: formats.includes("html") ? html : "",
+		html: formats.includes("html") ? content : "",
 		markdown: formats.includes("markdown") ? markdown : "",
 	};
 }

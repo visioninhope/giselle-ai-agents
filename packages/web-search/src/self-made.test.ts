@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { scrapeUrl } from "./self-made";
 
 const TEST_URL = "https://example.com/";
+const TEST_TXT_URL = "https://docs.giselles.ai/llms-full.txt";
 
 const hasExternalApiEnv = process.env.VITEST_WITH_EXTERNAL_API === "1";
 
@@ -43,3 +44,47 @@ describe("scrapeUrl (invalid URL)", () => {
 		expect(result.markdown.length).toBeGreaterThan(0);
 	});
 });
+
+// Test plain text/markdown files
+(hasExternalApiEnv ? describe : describe.skip)(
+	"scrapeUrl (plain text files)",
+	() => {
+		it("should fetch a .txt file and return unescaped markdown", async () => {
+			const result = await scrapeUrl(TEST_TXT_URL, ["markdown"]);
+
+			// Should extract filename as title for .txt files
+			expect(result.title).toBe("llms-full.txt");
+			expect(result).toHaveProperty("html");
+			expect(result).toHaveProperty("markdown");
+			expect(result.html).toBe("");
+			expect(typeof result.markdown).toBe("string");
+			expect(result.markdown.length).toBeGreaterThan(0);
+
+			// Check that URLs are not escaped in the markdown content
+			expect(result.markdown).toContain("https://docs.giselles.ai/");
+			expect(result.markdown).not.toContain("\\/");
+
+			// Check that markdown headers are not escaped
+			expect(result.markdown).toContain("# ");
+			expect(result.markdown).not.toContain("\\#");
+
+			// Check that markdown bold markers are not escaped
+			if (result.markdown.includes("**")) {
+				expect(result.markdown).not.toContain("\\*\\*");
+			}
+		});
+
+		it("should fetch a .txt file and return both html and markdown", async () => {
+			const result = await scrapeUrl(TEST_TXT_URL, ["html", "markdown"]);
+
+			expect(result.title).toBe("llms-full.txt");
+			expect(typeof result.html).toBe("string");
+			expect(typeof result.markdown).toBe("string");
+			expect(result.html.length).toBeGreaterThan(0);
+			expect(result.markdown.length).toBeGreaterThan(0);
+
+			// For plain text files, html and markdown should be the same
+			expect(result.html).toBe(result.markdown);
+		});
+	},
+);
