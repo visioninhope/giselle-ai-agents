@@ -70,6 +70,7 @@ export function WorkspaceProvider({
 										sidemenu: featureFlag?.sidemenu ?? false,
 										githubTools: featureFlag?.githubTools ?? false,
 										webSearchAction: featureFlag?.webSearchAction ?? false,
+										layoutV2: featureFlag?.layoutV2 ?? false,
 									}}
 								>
 									{children}
