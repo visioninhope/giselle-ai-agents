@@ -1,5 +1,11 @@
 import type { StaticImageData } from "next/image";
-import { type ReactNode, useCallback, useEffect, useState } from "react";
+import {
+	type ReactNode,
+	useCallback,
+	useEffect,
+	useRef,
+	useState,
+} from "react";
 import { createPortal } from "react-dom";
 import step2Gif from "./assets/02.gif";
 import step3Gif from "./assets/03.gif";
@@ -315,16 +321,27 @@ const TourGlobalStyles = ({ animationStyle }: { animationStyle: string }) => (
 );
 
 // Transparent overlay that closes the tour on click
-const TourOverlay = ({ onClose }: { onClose: () => void }) => (
-	<div
-		className="absolute inset-0 bg-transparent pointer-events-auto"
-		onClick={onClose}
-		onKeyDown={(e) => e.key === "Escape" && onClose()}
-		tabIndex={0}
-		role="button"
-		aria-label="Close tour"
-	/>
-);
+const TourOverlay = ({ onClose }: { onClose: () => void }) => {
+	const overlayRef = useRef<HTMLDivElement>(null);
+
+	useEffect(() => {
+		// Focus the overlay to capture key events
+		overlayRef.current?.focus();
+	}, []);
+
+	return (
+		<div
+			ref={overlayRef}
+			className="absolute inset-0 bg-transparent pointer-events-auto"
+			onClick={onClose}
+			onKeyDown={(e) => e.key === "Escape" && onClose()}
+			tabIndex={-1} // Allow programmatic focus
+			role="button"
+			aria-label="Close tour"
+			style={{ outline: "none" }} // Hide focus outline
+		/>
+	);
+};
 
 /**
  * Individual step components
