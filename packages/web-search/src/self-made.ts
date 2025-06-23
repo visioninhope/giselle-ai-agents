@@ -53,11 +53,14 @@ export async function scrapeUrl(
 	const contentType = res.headers.get("content-type") || "";
 
 	// Check if the content is already plain text/markdown
+	const normalizedUrl = url.toLowerCase();
 	const isPlainText =
 		contentType.includes("text/plain") ||
 		contentType.includes("text/markdown") ||
-		url.endsWith(".txt") ||
-		url.endsWith(".md") ||
+		contentType.includes("text/x-markdown") ||
+		contentType.includes("application/markdown") ||
+		normalizedUrl.endsWith(".txt") ||
+		normalizedUrl.endsWith(".md") ||
 		!content.trim().startsWith("<");
 
 	// Extract title from HTML (only if it's HTML content)
