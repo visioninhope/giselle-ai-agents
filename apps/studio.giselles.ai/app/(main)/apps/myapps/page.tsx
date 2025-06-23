@@ -1,6 +1,7 @@
 import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
+import { Toasts } from "@giselles-ai/components/toasts";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
@@ -8,7 +9,6 @@ import Link from "next/link";
 import { type ReactNode, Suspense } from "react";
 import { DeleteAgentButton } from "../components/delete-agent-button";
 import { DuplicateAgentButton } from "../components/duplicate-agent-button";
-import { Toasts } from "../components/toasts";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (

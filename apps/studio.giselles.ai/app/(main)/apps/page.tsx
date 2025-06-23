@@ -1,11 +1,11 @@
 import { agents, db } from "@/drizzle";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
+import { Toasts } from "@giselles-ai/components/toasts";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { type ReactNode, Suspense } from "react";
 import { AgentGrid } from "./components/agent-grid";
-import { Toasts } from "./components/toasts";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
