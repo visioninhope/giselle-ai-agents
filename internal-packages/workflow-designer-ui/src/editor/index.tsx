@@ -45,6 +45,7 @@ import {
 	ToolbarContextProvider,
 	useToolbar,
 } from "./tool";
+import { V2Placeholder } from "./v2";
 import { WorkspaceTour, tourSteps } from "./workspace-tour";
 
 function NodeCanvas() {
@@ -444,7 +445,11 @@ export function Editor({
 		setShowReadOnlyBanner(false);
 	}, []);
 
-	const { sidemenu } = useFeatureFlag();
+	const { sidemenu, layoutV2 } = useFeatureFlag();
+
+	if (layoutV2) {
+		return <V2Placeholder />;
+	}
 
 	if (sidemenu) {
 		return (

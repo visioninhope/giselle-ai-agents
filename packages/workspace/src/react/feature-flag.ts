@@ -6,6 +6,7 @@ export interface FeatureFlagContextValue {
 	sidemenu: boolean;
 	githubTools: boolean;
 	webSearchAction: boolean;
+	layoutV2: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined
