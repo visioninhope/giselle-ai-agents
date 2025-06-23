@@ -242,6 +242,9 @@ importers:
 
   apps/playground:
     dependencies:
+      '@giselle-internal/ui':
+        specifier: workspace:^
+        version: link:../../internal-packages/ui
       '@giselle-internal/workflow-designer-ui':
         specifier: workspace:*
         version: link:../../internal-packages/workflow-designer-ui

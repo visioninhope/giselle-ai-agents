@@ -16,6 +16,7 @@
 		"format": "biome check --write ."
 	},
 	"dependencies": {
+		"@giselle-internal/ui": "workspace:^",
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
