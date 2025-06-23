@@ -8,9 +8,9 @@ import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
 import { supabaseVaultDriver } from "@giselle-sdk/supabase-driver";
 import { emitTelemetry } from "@giselle-sdk/telemetry";
 import type { TelemetrySettings } from "@giselle-sdk/telemetry";
+import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
 import { createStorage } from "unstorage";
 import { gitHubQueryService } from "../lib/vector-stores/github-blob-stores";
-import { queryGithubVectorStore } from "./services/vector-store/";
 
 export const publicStorage = createStorage({
 	driver: supabaseStorageDriver({
@@ -85,9 +85,6 @@ export const giselleEngine = NextGiselleEngine({
 		},
 	},
 	vault,
-	vectorStoreQueryFunctions: {
-		github: queryGithubVectorStore,
-	},
 	vectorStoreQueryServices: {
 		github: gitHubQueryService,
 	},
@@ -103,4 +100,5 @@ export const giselleEngine = NextGiselleEngine({
 			}
 		},
 	},
+	vectorStore: openaiVectorStore(process.env.OPENAI_API_KEY ?? ""),
 });

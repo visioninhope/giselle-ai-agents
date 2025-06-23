@@ -1,43 +1,155 @@
+import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
-import { ensurePgVectorTypes } from "../../database/pgvector-registry";
+import { createColumnMapping } from "../../database";
 import { PoolManager } from "../../database/postgres";
-import type { ColumnMapping, DatabaseConfig } from "../../database/types";
-import type { Embedder } from "../../embedder/types";
-import { DatabaseError, EmbeddingError, ValidationError } from "../../errors";
-import type { QueryResult, QueryService } from "../types";
+import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
+import type {
+	ColumnMapping,
+	DatabaseConfig,
+	RequiredColumns,
+} from "../../database/types";
+import type { EmbedderFunction } from "../../embedder";
+import { createDefaultEmbedder } from "../../embedder";
+import {
+	ConfigurationError,
+	DatabaseError,
+	EmbeddingError,
+	ValidationError,
+} from "../../errors";
+import type { QueryResult } from "../types";
 
-export type DistanceFunction = "cosine" | "euclidean" | "inner_product";
+/**
+ * Extract metadata from database row
+ */
+function extractMetadata<TMetadata extends Record<string, unknown>>(
+	row: Record<string, unknown>,
+	metadataColumns: Array<{ metadataKey: string; dbColumn: string }>,
+	metadataSchema: z.ZodType<TMetadata>,
+): TMetadata {
+	const rawMetadata = Object.fromEntries(
+		metadataColumns.map(({ metadataKey }) => [metadataKey, row[metadataKey]]),
+	);
+	return validateMetadata(rawMetadata, metadataSchema);
+}
 
-export interface PostgresQueryServiceConfig<TContext, TMetadata> {
+function validateMetadata<TMetadata>(
+	metadata: unknown,
+	metadataSchema: z.ZodType<TMetadata>,
+): TMetadata {
+	const result = metadataSchema.safeParse(metadata);
+	if (!result.success) {
+		throw ValidationError.fromZodError(result.error, {
+			operation: "validateMetadata",
+			source: "database",
+			metadata,
+		});
+	}
+
+	return result.data;
+}
+
+function validateDatabaseConfig(database: {
+	connectionString: string;
+	poolConfig?: {
+		max?: number;
+		idleTimeoutMillis?: number;
+		connectionTimeoutMillis?: number;
+	};
+}) {
+	if (!database.connectionString || database.connectionString.length === 0) {
+		throw new ValidationError("Connection string is required", undefined, {
+			operation: "validateDatabaseConfig",
+			field: "connectionString",
+		});
+	}
+
+	if (database.poolConfig) {
+		if (database.poolConfig.max !== undefined && database.poolConfig.max < 0) {
+			throw new ValidationError("Pool max must be non-negative", undefined, {
+				operation: "validateDatabaseConfig",
+				field: "poolConfig.max",
+			});
+		}
+		if (
+			database.poolConfig.max !== undefined &&
+			database.poolConfig.max > 100
+		) {
+			throw new ValidationError("Pool max must be 100 or less", undefined, {
+				operation: "validateDatabaseConfig",
+				field: "poolConfig.max",
+			});
+		}
+		if (
+			database.poolConfig.idleTimeoutMillis !== undefined &&
+			database.poolConfig.idleTimeoutMillis < 0
+		) {
+			throw new ValidationError(
+				"Pool idle timeout must be non-negative",
+				undefined,
+				{
+					operation: "validateDatabaseConfig",
+					field: "poolConfig.idleTimeoutMillis",
+				},
+			);
+		}
+		if (
+			database.poolConfig.connectionTimeoutMillis !== undefined &&
+			database.poolConfig.connectionTimeoutMillis < 0
+		) {
+			throw new ValidationError(
+				"Pool connection timeout must be non-negative",
+				undefined,
+				{
+					operation: "validateDatabaseConfig",
+					field: "poolConfig.connectionTimeoutMillis",
+				},
+			);
+		}
+	}
+
+	return database;
+}
+
+/**
+ * Create a PostgreSQL query service
+ */
+export function createPostgresQueryService<
+	TContext,
+	TSchema extends z.ZodType<Record<string, unknown>>,
+>(config: {
 	database: DatabaseConfig;
 	tableName: string;
-	embedder: Embedder;
-	columnMapping: ColumnMapping<TMetadata>;
-	// context to filter
+	embedder?: EmbedderFunction;
+	columnMapping?: ColumnMapping<z.infer<TSchema>>;
+	requiredColumnOverrides?: Partial<RequiredColumns>;
+	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 	contextToFilter: (
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
-	// metadata schema
-	metadataSchema: z.ZodType<TMetadata>;
-}
+	metadataSchema: TSchema;
+}) {
+	// Validate database config
+	const database = validateDatabaseConfig(config.database);
 
-export class PostgresQueryService<
-	TContext,
-	TMetadata extends Record<string, unknown> = Record<string, never>,
-> implements QueryService<TContext, TMetadata>
-{
-	constructor(
-		private config: PostgresQueryServiceConfig<TContext, TMetadata>,
-	) {}
+	// Resolve embedder
+	const embedder = config.embedder || createDefaultEmbedder();
 
-	async search(
+	// Resolve column mapping
+	const columnMapping =
+		config.columnMapping ||
+		createColumnMapping({
+			metadataSchema: config.metadataSchema,
+			requiredColumnOverrides: config.requiredColumnOverrides,
+			metadataColumnOverrides: config.metadataColumnOverrides,
+		});
+
+	const search = async (
 		query: string,
 		context: TContext,
 		limit = 10,
-	): Promise<QueryResult<TMetadata>[]> {
-		const { database, tableName, embedder, columnMapping, contextToFilter } =
-			this.config;
+	): Promise<QueryResult<z.infer<TSchema>>[]> => {
+		const { tableName, contextToFilter, metadataSchema } = config;
 		const pool = PoolManager.getPool(database);
 
 		// register pgvector types using singleton registry
@@ -60,11 +172,9 @@ export class PostgresQueryService<
 			let paramIndex = 2;
 
 			for (const [column, value] of Object.entries(filters)) {
-				if (typeof column === "string") {
-					whereConditions.push(`"${column}" = $${paramIndex}`);
-					values.push(value);
-					paramIndex++;
-				}
+				whereConditions.push(`${escapeIdentifier(column)} = $${paramIndex}`);
+				values.push(value);
+				paramIndex++;
 			}
 
 			const metadataColumns = Object.entries(columnMapping)
@@ -72,28 +182,46 @@ export class PostgresQueryService<
 					([key]) =>
 						!["documentKey", "content", "index", "embedding"].includes(key),
 				)
-				.map(([metadataKey, dbColumn]) => ({
-					metadataKey,
-					dbColumn: typeof dbColumn === "string" ? `"${dbColumn}"` : "",
-				}))
-				.filter((item) => item.dbColumn !== "");
+				.map(([metadataKey, dbColumn]) => {
+					if (typeof dbColumn !== "string") {
+						throw ConfigurationError.invalidValue(
+							`columnMapping.${metadataKey}`,
+							dbColumn,
+							"string",
+							{
+								operation: "validateColumnMapping",
+								metadataKey,
+							},
+						);
+					}
+					return {
+						metadataKey,
+						dbColumn: escapeIdentifier(dbColumn),
+					};
+				});
 
 			const sql = `
         SELECT
-          "${columnMapping.chunkContent}" as content,
-          "${columnMapping.chunkIndex}" as index,
-          ${metadataColumns.map(({ dbColumn, metadataKey }) => `${dbColumn} as "${metadataKey}"`).join(", ")}${metadataColumns.length > 0 ? "," : ""}
-          1 - ("${columnMapping.embedding}" <=> $1) as similarity
-        FROM "${tableName}"
+          ${escapeIdentifier(columnMapping.chunkContent)} as content,
+          ${escapeIdentifier(columnMapping.chunkIndex)} as index,
+          ${metadataColumns
+						.map(
+							({ dbColumn, metadataKey }) =>
+								`${dbColumn} as ${escapeIdentifier(metadataKey)}`,
+						)
+						.join(", ")}${metadataColumns.length > 0 ? "," : ""}
+          1 - (${escapeIdentifier(columnMapping.embedding)} <=> $1) as similarity
+        FROM ${escapeIdentifier(tableName)}
         ${whereConditions.length > 0 ? `WHERE ${whereConditions.join(" AND ")}` : ""}
-        ORDER BY "${columnMapping.embedding}" <=> $1
-        LIMIT ${limit}
+        ORDER BY ${escapeIdentifier(columnMapping.embedding)} <=> $1
+        LIMIT $${paramIndex}
       `;
 
+			values.push(limit);
 			const result = await pool.query(sql, values);
 
 			return result.rows.map((row) => {
-				const metadata = this.extractMetadata(row, metadataColumns);
+				const metadata = extractMetadata(row, metadataColumns, metadataSchema);
 
 				return {
 					chunk: {
@@ -123,40 +251,9 @@ export class PostgresQueryService<
 				},
 			);
 		}
-	}
+	};
 
-	/**
-	 * extract metadata from database row
-	 */
-	private extractMetadata(
-		row: Record<string, unknown>,
-		metadataColumns: Array<{ metadataKey: string; dbColumn: string }>,
-	): TMetadata {
-		// build raw metadata
-		const rawMetadata = Object.fromEntries(
-			metadataColumns.map(({ metadataKey }) => [metadataKey, row[metadataKey]]),
-		);
-
-		// type safe validation
-		return this.validateMetadata(rawMetadata);
-	}
-
-	/**
-	 * convert unknown data to TMetadata safely
-	 */
-	private validateMetadata(metadata: unknown): TMetadata {
-		const { metadataSchema } = this.config;
-
-		// validate metadata
-		const result = metadataSchema.safeParse(metadata);
-		if (!result.success) {
-			throw ValidationError.fromZodError(result.error, {
-				operation: "validateMetadata",
-				source: "database",
-				metadata,
-			});
-		}
-
-		return result.data;
-	}
+	return {
+		search,
+	};
 }

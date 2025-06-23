@@ -1,6 +1,11 @@
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { DraftingCompassIcon, FileKey2Icon, HistoryIcon } from "lucide-react";
+import {
+	DatabaseIcon,
+	DraftingCompassIcon,
+	FileKey2Icon,
+	HistoryIcon,
+} from "lucide-react";
 import Link from "next/link";
 import { Tabs } from "radix-ui";
 import { useCallback } from "react";
@@ -61,6 +66,12 @@ export function SideMenu() {
 					<div data-list>
 						<FileKey2Icon data-icon />
 						<p>Secrets</p>
+					</div>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="datasource" className="group" data-list-wrapper>
+					<div data-list>
+						<DatabaseIcon data-icon />
+						<p>Data Source</p>
 					</div>
 				</Tabs.Trigger>
 			</Tabs.List>
