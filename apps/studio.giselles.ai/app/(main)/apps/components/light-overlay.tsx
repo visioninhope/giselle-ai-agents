@@ -9,7 +9,7 @@ import {
 } from "./constants";
 
 type LightOverlayProps = {
-	fadeRef?: React.RefObject<HTMLDivElement>;
+	fadeRef?: React.RefObject<HTMLDivElement | null>;
 };
 
 const createOverlayStyle = (
