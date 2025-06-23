@@ -1,11 +1,11 @@
 "use client";
 
-import type { AgentId } from "@/services/agents";
 import { formatTimestamp } from "@giselles-ai/lib/utils";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { DeleteAgentButton } from "./delete-agent-button";
 import { DuplicateAgentButton } from "./duplicate-agent-button";
+import type { AgentCardProps } from "./types";
 
 const colors = [
 	{ border: "#3B82F6", gradient: "linear-gradient(145deg, #3B82F6, #0d1117)" },
@@ -30,15 +30,6 @@ const stringToHash = (str: string) => {
 const getDeterministicColor = (id: string) => {
 	const hash = stringToHash(id);
 	return colors[hash % colors.length];
-};
-
-type AgentCardProps = {
-	agent: {
-		id: AgentId;
-		name: string | null;
-		updatedAt: Date;
-		workspaceId: string | null;
-	};
 };
 
 export function AgentCard({ agent }: AgentCardProps) {
