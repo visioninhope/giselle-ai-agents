@@ -960,9 +960,6 @@ importers:
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../text-editor-utils
-      '@giselle-sdk/usage-limits':
-        specifier: workspace:^
-        version: link:../usage-limits
       '@giselle-sdk/web-search':
         specifier: workspace:^
         version: link:../web-search
