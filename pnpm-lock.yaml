@@ -631,9 +631,6 @@ importers:
       '@biomejs/biome':
         specifier: 'catalog:'
         version: 1.9.4
-      '@giselle-sdk/usage-limits':
-        specifier: workspace:*
-        version: link:../../packages/usage-limits
       '@octokit/openapi-types':
         specifier: 'catalog:'
         version: 25.1.0
@@ -761,9 +758,6 @@ importers:
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../../packages/text-editor-utils
-      '@giselle-sdk/usage-limits':
-        specifier: workspace:^
-        version: link:../../packages/usage-limits
       '@giselle-sdk/workflow-utils':
         specifier: workspace:^
         version: link:../../packages/workflow-utils
@@ -1351,25 +1345,6 @@ importers:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
 
-  packages/usage-limits:
-    dependencies:
-      '@giselle-sdk/language-model':
-        specifier: workspace:*
-        version: link:../language-model
-      react:
-        specifier: 'catalog:'
-        version: 19.1.0
-    devDependencies:
-      '@giselle/giselle-sdk-tsconfig':
-        specifier: workspace:*
-        version: link:../../tools/tsconfig
-      '@types/react':
-        specifier: 'catalog:'
-        version: 19.1.0
-      tsup:
-        specifier: 'catalog:'
-        version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
-
   packages/utils:
     dependencies:
       nanoid:
@@ -1522,9 +1497,6 @@ importers:
       '@giselle-sdk/telemetry':
         specifier: workspace:^
         version: link:../telemetry
-      '@giselle-sdk/usage-limits':
-        specifier: workspace:^
-        version: link:../usage-limits
       '@giselle-sdk/vector-store':
         specifier: workspace:^
         version: link:../vector-store

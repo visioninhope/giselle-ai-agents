@@ -1,5 +1,5 @@
+import type { UsageLimits } from "@giselle-sdk/giselle-engine";
 import { type LanguageModel, hasTierAccess } from "@giselle-sdk/language-model";
-import type { UsageLimits } from "@giselle-sdk/usage-limits";
 
 export function languageModelAvailable(
 	languageModel: LanguageModel,

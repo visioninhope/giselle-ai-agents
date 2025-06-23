@@ -118,7 +118,6 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
-		"@giselle-sdk/usage-limits": "workspace:*",
 		"@octokit/openapi-types": "catalog:",
 		"@octokit/webhooks-types": "7.6.1",
 		"@playwright/test": "1.53.0",
