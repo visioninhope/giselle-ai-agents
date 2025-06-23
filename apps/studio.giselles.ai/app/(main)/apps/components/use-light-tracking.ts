@@ -6,8 +6,8 @@ import type { Position } from "./types";
 import { createQuickSetter } from "./utils";
 
 type UseLightTrackingReturn = {
-	rootRef: React.RefObject<HTMLDivElement>;
-	fadeRef: React.RefObject<HTMLDivElement>;
+	rootRef: React.RefObject<HTMLDivElement | null>;
+	fadeRef: React.RefObject<HTMLDivElement | null>;
 	handleMove: (e: React.PointerEvent) => void;
 	handleLeave: () => void;
 };
