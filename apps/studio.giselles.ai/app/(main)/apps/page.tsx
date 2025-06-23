@@ -4,7 +4,8 @@ import { fetchCurrentTeam } from "@/services/teams";
 import { ToastProvider } from "@giselles-ai/contexts/toast";
 import { and, desc, eq, isNotNull } from "drizzle-orm";
 import { type ReactNode, Suspense } from "react";
-import { AgentGrid, Toasts } from "./components";
+import { AgentGrid } from "./components/agent-grid";
+import { Toasts } from "./components/toasts";
 
 function DataList({ label, children }: { label: string; children: ReactNode }) {
 	return (
