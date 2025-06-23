@@ -11,7 +11,7 @@ import {
 	createColumnMapping,
 	createPostgresChunkStore,
 	createPostgresQueryService,
-} from "@giselle-sdk/rag2";
+} from "@giselle-sdk/rag";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
 

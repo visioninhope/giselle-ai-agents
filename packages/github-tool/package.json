@@ -31,7 +31,7 @@
 		"vitest": "catalog:"
 	},
 	"dependencies": {
-		"@giselle-sdk/rag2": "workspace:*",
+		"@giselle-sdk/rag": "workspace:*",
 		"@octokit/auth-app": "catalog:",
 		"@octokit/core": "catalog:",
 		"@octokit/graphql": "catalog:",
