@@ -47,10 +47,8 @@ export default function ComponentShowcase() {
 
 				<div className="flex-1 p-8">
 					<div className="max-w-4xl">
-						<h2 className="text-2xl font-bold text-text mb-6">
-							{selectedComponent.name}
-						</h2>
-						<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm">
+						<h2 className="text-text mb-6">{selectedComponent.name}</h2>
+						<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
 							{selectedComponent.component}
 						</div>
 					</div>
