@@ -3,26 +3,26 @@ import { WorkspaceProvider } from "giselle-sdk/react";
 import type { ReactNode } from "react";
 
 export default async function Layout({
-  params,
-  children,
+	params,
+	children,
 }: {
-  params: Promise<{ workspaceId: string }>;
-  children: ReactNode;
+	params: Promise<{ workspaceId: string }>;
+	children: ReactNode;
 }) {
-  const workspaceId = WorkspaceId.parse((await params).workspaceId);
-  return (
-    <WorkspaceProvider
-      workspaceId={workspaceId}
-      featureFlag={{
-        githubVectorStore: true,
-        runV3: true,
-        sidemenu: true,
-        githubTools: true,
-        webSearchAction: false,
-        layoutV2: true,
-      }}
-    >
-      {children}
-    </WorkspaceProvider>
-  );
+	const workspaceId = WorkspaceId.parse((await params).workspaceId);
+	return (
+		<WorkspaceProvider
+			workspaceId={workspaceId}
+			featureFlag={{
+				githubVectorStore: true,
+				runV3: true,
+				sidemenu: true,
+				githubTools: true,
+				webSearchAction: false,
+				layoutV2: true,
+			}}
+		>
+			{children}
+		</WorkspaceProvider>
+	);
 }
