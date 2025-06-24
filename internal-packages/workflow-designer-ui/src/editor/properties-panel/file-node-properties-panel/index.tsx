@@ -1,5 +1,5 @@
 import type { FileCategory, FileNode } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { FileNodeIcon } from "../../../icons/node";
 import {
 	PropertiesPanelContent,
@@ -29,6 +29,8 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	const { updateNodeData } = useWorkflowDesigner();
+	const { layoutV2 } = useFeatureFlag();
+
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
@@ -41,13 +43,20 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				<ResizableSectionGroup>
-					<ResizableSection title="File Upload" defaultSize={100}>
-						<div className="p-4">
-							<FilePanel node={node} config={fileType[node.content.category]} />
-						</div>
-					</ResizableSection>
-				</ResizableSectionGroup>
+				{layoutV2 ? (
+					<ResizableSectionGroup>
+						<ResizableSection title="File Upload" defaultSize={100}>
+							<div className="p-4">
+								<FilePanel
+									node={node}
+									config={fileType[node.content.category]}
+								/>
+							</div>
+						</ResizableSection>
+					</ResizableSectionGroup>
+				) : (
+					<FilePanel node={node} config={fileType[node.content.category]} />
+				)}
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);
