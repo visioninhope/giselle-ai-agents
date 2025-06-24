@@ -2,6 +2,10 @@ name: E2E Tests
 
 on:
   workflow_dispatch:
+    inputs:
+      PLAYWRIGHT_BASE_URL:
+        description: 'Base URL for Playwright'
+        required: false
   schedule:
     - cron: "0 0,9 * * 1-5" # Weekdays 9:00 and 18:00 JST
 
@@ -36,6 +40,6 @@ jobs:
         run: pnpm test:e2e
         working-directory: apps/studio.giselles.ai
         env:
-          PLAYWRIGHT_BASE_URL: ${{ secrets.PLAYWRIGHT_BASE_URL }}
+          PLAYWRIGHT_BASE_URL: ${{ github.event.inputs.PLAYWRIGHT_BASE_URL != '' && github.event.inputs.PLAYWRIGHT_BASE_URL || secrets.PLAYWRIGHT_BASE_URL }}
           PLAYWRIGHT_LOGIN_EMAIL: ${{ secrets.PLAYWRIGHT_LOGIN_EMAIL }}
           PLAYWRIGHT_LOGIN_PASSWORD: ${{ secrets.PLAYWRIGHT_LOGIN_PASSWORD }}
