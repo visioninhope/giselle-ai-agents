@@ -16,9 +16,9 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { generateTelemetryTags } from "@giselle-sdk/telemetry";
 import { AISDKError, appendResponseMessages, streamText } from "ai";
 import { decryptSecret } from "../secrets";
+import { generateTelemetryTags } from "../telemetry";
 import type { GiselleEngineContext } from "../types";
 import { useGenerationExecutor } from "./internal/use-generation-executor";
 import { createPostgresTools } from "./tools/postgres";

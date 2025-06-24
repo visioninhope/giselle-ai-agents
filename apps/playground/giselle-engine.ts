@@ -1,6 +1,6 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
+import { emitTelemetry } from "@giselle-sdk/giselle-engine";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next-internal";
-import { emitTelemetry } from "@giselle-sdk/telemetry";
 import type {
 	GiselleIntegrationConfig,
 	LanguageModelProvider,

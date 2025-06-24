@@ -448,7 +448,7 @@ export function Editor({
 	const { sidemenu, layoutV2 } = useFeatureFlag();
 
 	if (layoutV2) {
-		return <V2Placeholder />;
+		return <V2Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
 	}
 
 	if (sidemenu) {

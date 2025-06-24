@@ -63,7 +63,6 @@
 		"@giselle-sdk/github-tool": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
 		"@giselle-sdk/rag": "workspace:^",
-		"@giselle-sdk/telemetry": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@giselle-sdk/web-search": "workspace:^",
 		"@giselle-sdk/workflow-utils": "workspace:^",

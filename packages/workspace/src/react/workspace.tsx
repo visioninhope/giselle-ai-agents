@@ -1,7 +1,10 @@
 "use client";
 
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import type { UsageLimits } from "@giselle-sdk/giselle-engine";
+import type {
+	TelemetrySettings,
+	UsageLimits,
+} from "@giselle-sdk/giselle-engine";
 import {
 	GenerationRunnerSystemProvider,
 	IntegrationProvider,
@@ -11,8 +14,10 @@ import {
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
 import { UsageLimitsProvider } from "@giselle-sdk/giselle-engine/react";
-import type { TelemetrySettings } from "@giselle-sdk/telemetry";
-import { TelemetryProvider } from "@giselle-sdk/telemetry/react";
+	TelemetryProvider,
+	UsageLimitsProvider,
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 import {
