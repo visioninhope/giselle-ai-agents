@@ -1,1 +1,1 @@
-export * from "./v2-placeholder";
+export { V2Placeholder } from "./v2-placeholder";
