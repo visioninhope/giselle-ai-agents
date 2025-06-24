@@ -1,5 +1,5 @@
-import type { GitHubIntegrationInstalledState } from "@giselle-sdk/integration";
-import { useIntegration } from "@giselle-sdk/integration/react";
+import type { GitHubIntegrationInstalledState } from "@giselle-sdk/giselle-engine";
+import { useIntegration } from "@giselle-sdk/giselle-engine/react";
 import {
 	type FormEventHandler,
 	useCallback,
