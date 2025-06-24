@@ -64,6 +64,7 @@ export * from "./experimental_vector-store";
 export { FlowRunId } from "./flows";
 export * from "./usage-limits";
 export * from "./integrations";
+export * from "./vector-store";
 export * from "./telemetry";
 
 export function GiselleEngine(config: GiselleEngineConfig) {

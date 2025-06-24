@@ -8,7 +8,7 @@ import {
 	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
 import type { ActionProvider, TriggerProvider } from "@giselle-sdk/flow";
-import type { VectorStoreSourceProvider } from "@giselle-sdk/vector-store";
+import type { VectorStoreSourceProvider } from "@giselle-sdk/giselle-engine";
 
 export const triggerProviderLabel: Record<TriggerProvider, string> = {
 	github: "GitHub",

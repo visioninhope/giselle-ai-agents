@@ -11,12 +11,10 @@ import {
 	type IntegrationProviderProps,
 	TelemetryProvider,
 	UsageLimitsProvider,
-	useGiselleEngine,
-} from "@giselle-sdk/giselle-engine/react";
-import {
 	type VectorStoreContextValue,
 	VectorStoreProvider,
-} from "@giselle-sdk/vector-store/react";
+	useGiselleEngine,
+} from "@giselle-sdk/giselle-engine/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 import {
