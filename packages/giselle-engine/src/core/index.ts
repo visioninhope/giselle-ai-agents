@@ -64,6 +64,7 @@ export * from "./vector-store";
 export { FlowRunId } from "./flows";
 export * from "./usage-limits";
 export * from "./integrations";
+export * from "./telemetry";
 
 export function GiselleEngine(config: GiselleEngineConfig) {
 	const context: GiselleEngineContext = {

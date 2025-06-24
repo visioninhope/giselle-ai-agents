@@ -5,11 +5,8 @@ import type {
 } from "@giselle-sdk/github-tool";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryService } from "@giselle-sdk/rag";
-import type {
-	GenerationCompleteOption,
-	TelemetrySettings,
-} from "@giselle-sdk/telemetry";
 import type { Storage } from "unstorage";
+import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
 import type { VectorStore } from "./vector-store/types/interface";
