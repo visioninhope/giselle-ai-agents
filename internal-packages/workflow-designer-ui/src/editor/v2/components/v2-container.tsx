@@ -5,6 +5,7 @@ import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
+	type NodeChange,
 	ReactFlow,
 	Panel as XYFlowPanel,
 	useReactFlow,
@@ -191,7 +192,7 @@ function V2NodeCanvas() {
 			zoomOnPinch={true}
 			onMoveEnd={(_, viewport) => setUiViewport(viewport)}
 			onNodesChange={useCallback(
-				async (changes) => {
+				async (changes: NodeChange[]) => {
 					await Promise.all(
 						changes.map(async (change) => {
 							if (change.type === "remove") await deleteNode(change.id);
