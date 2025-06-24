@@ -6,15 +6,13 @@ import {
 	GenerationRunnerSystemProvider,
 	IntegrationProvider,
 	type IntegrationProviderProps,
+	type VectorStoreContextValue,
+	VectorStoreProvider,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
 import { UsageLimitsProvider } from "@giselle-sdk/giselle-engine/react";
 import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import { TelemetryProvider } from "@giselle-sdk/telemetry/react";
-import {
-	type VectorStoreContextValue,
-	VectorStoreProvider,
-} from "@giselle-sdk/vector-store/react";
 import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 import {

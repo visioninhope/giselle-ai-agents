@@ -35,7 +35,6 @@
 		"@giselle-sdk/data-type": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:^",
 		"@giselle-sdk/telemetry": "workspace:^",
-		"@giselle-sdk/vector-store": "workspace:^",
 		"@giselle-sdk/workflow-designer": "workspace:^",
 		"react": "catalog:"
 	}

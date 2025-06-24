@@ -1123,15 +1123,15 @@ importers:
       '@giselle-sdk/flow':
         specifier: workspace:*
         version: link:../flow
+      '@giselle-sdk/giselle-engine':
+        specifier: workspace:^
+        version: link:../giselle-engine
       '@giselle-sdk/language-model':
         specifier: workspace:*
         version: link:../language-model
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:*
         version: link:../text-editor-utils
-      '@giselle-sdk/vector-store':
-        specifier: workspace:*
-        version: link:../vector-store
       '@tiptap/react':
         specifier: 'catalog:'
         version: 2.11.5(@tiptap/core@2.11.5(@tiptap/pm@2.11.5))(@tiptap/pm@2.11.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -1469,9 +1469,6 @@ importers:
       '@giselle-sdk/telemetry':
         specifier: workspace:^
         version: link:../telemetry
-      '@giselle-sdk/vector-store':
-        specifier: workspace:^
-        version: link:../vector-store
       '@giselle-sdk/workflow-designer':
         specifier: workspace:^
         version: link:../workflow-designer
