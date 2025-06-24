@@ -62,6 +62,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 	return (
 		<div
 			onMouseMove={handleMouseMove}
+			aria-label={agent.name || "Untitled app"}
 			className="group relative flex h-[300px] w-[267px] flex-none flex-col rounded-[12px] border-[0.5px]"
 			style={
 				{

@@ -54,6 +54,7 @@ export default function Layout({
 						<form action={createAgent}>
 							<button
 								type="submit"
+								aria-label="Create an app"
 								className="group relative overflow-hidden rounded-lg px-4 py-2 text-white transition-all duration-300 hover:scale-[1.01] active:scale-95"
 								style={{
 									boxShadow:

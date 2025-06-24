@@ -14,7 +14,7 @@ export default async function Layout({ children }: { children: ReactNode }) {
 				{/* Top row: Logo, Team Selection, User Icon */}
 				<div className="h-[50px] flex items-center px-[24px] justify-between">
 					<div className="flex items-center gap-2">
-						<Link href="/">
+						<Link href="/" aria-label="Giselle logo">
 							<GiselleLogo className="w-[70px] h-auto fill-white mt-[4px]" />
 						</Link>
 						<span className="text-black-70">/</span>

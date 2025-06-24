@@ -129,6 +129,7 @@ export const GlassDialogFooter = ({
 				onClick={onCancel}
 				disabled={isPending}
 				className={buttonVariants({ variant: "link" })}
+				aria-label="Cancel"
 			>
 				Cancel
 			</button>
@@ -142,6 +143,7 @@ export const GlassDialogFooter = ({
 					}),
 					"whitespace-nowrap",
 				)}
+				aria-label={confirmLabel}
 			>
 				{isPending ? "Processing..." : confirmLabel}
 			</button>
