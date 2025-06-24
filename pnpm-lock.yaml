@@ -1086,6 +1086,9 @@ importers:
       '@graphql-codegen/client-preset':
         specifier: 'catalog:'
         version: 4.7.0(graphql@16.10.0)
+      '@octokit/openapi-types':
+        specifier: 'catalog:'
+        version: 25.1.0
       '@types/node':
         specifier: 'catalog:'
         version: 22.14.0

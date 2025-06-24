@@ -10,6 +10,7 @@ export * from "./webhooks";
 export * from "./errors";
 export * from "./pull-requests";
 export * from "./discussions";
+export * from "./installtion";
 
 export const IssueNodeIdQuery = gql(/* GraphQL */ `
   query IssueNodeIdQuery($name: String!, $owner: String!, $issueNumber: Int!) {

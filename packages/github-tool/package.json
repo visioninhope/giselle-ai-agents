@@ -26,6 +26,7 @@
 		"@giselle/giselle-sdk-tsconfig": "workspace:*",
 		"@graphql-codegen/cli": "catalog:",
 		"@graphql-codegen/client-preset": "catalog:",
+		"@octokit/openapi-types": "catalog:",
 		"@types/node": "catalog:",
 		"tsup": "catalog:",
 		"vitest": "catalog:"
