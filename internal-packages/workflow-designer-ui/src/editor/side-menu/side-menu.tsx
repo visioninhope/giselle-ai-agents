@@ -1,10 +1,40 @@
 import clsx from "clsx/lite";
-import { DraftingCompassIcon } from "lucide-react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	DatabaseIcon,
+	DraftingCompassIcon,
+	FileKey2Icon,
+	HistoryIcon,
+} from "lucide-react";
+import Link from "next/link";
 import { Tabs } from "radix-ui";
+import { useCallback } from "react";
+import { GiselleLogo } from "../../icons";
+import { EditableText } from "../properties-panel/ui";
 
 export function SideMenu() {
+	const { updateName, data } = useWorkflowDesigner();
+	const handleChange = useCallback(
+		(value?: string) => {
+			if (!value) {
+				return;
+			}
+			updateName(value);
+		},
+		[updateName],
+	);
 	return (
 		<div className="px-[8px] flex flex-col gap-[16px]">
+			<Link href="/">
+				<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
+			</Link>
+
+			<EditableText
+				fallbackValue="Untitled"
+				onChange={handleChange}
+				value={data.name}
+				size="large"
+			/>
 			<Tabs.List
 				className={clsx(
 					"flex flex-col w-full text-white-800 text-[14px]",
@@ -24,6 +54,24 @@ export function SideMenu() {
 					<div data-list>
 						<DraftingCompassIcon data-icon />
 						<p>Builder</p>
+					</div>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="run-history" className="group" data-list-wrapper>
+					<div data-list>
+						<HistoryIcon data-icon />
+						<p>Run History</p>
+					</div>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="secret" className="group" data-list-wrapper>
+					<div data-list>
+						<FileKey2Icon data-icon />
+						<p>Secrets</p>
+					</div>
+				</Tabs.Trigger>
+				<Tabs.Trigger value="datasource" className="group" data-list-wrapper>
+					<div data-list>
+						<DatabaseIcon data-icon />
+						<p>Data Source</p>
 					</div>
 				</Tabs.Trigger>
 			</Tabs.List>
