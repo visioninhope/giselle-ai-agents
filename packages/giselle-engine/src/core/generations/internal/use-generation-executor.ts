@@ -14,10 +14,10 @@ import {
 	type WorkspaceId,
 	isCompletedGeneration,
 } from "@giselle-sdk/data-type";
-import type { TelemetrySettings } from "@giselle-sdk/telemetry";
 import type { DataContent } from "ai";
 import { UsageLimitError } from "../../error";
 import { filePath } from "../../files/utils";
+import type { TelemetrySettings } from "../../telemetry";
 import type { GiselleEngineContext } from "../../types";
 import {
 	checkUsageLimits,
