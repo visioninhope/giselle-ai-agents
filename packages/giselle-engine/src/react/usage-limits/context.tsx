@@ -1,5 +1,5 @@
 import { type ReactNode, createContext, useContext } from "react";
-import type { UsageLimits } from "../types";
+import type { UsageLimits } from "../../core";
 
 export const UsageLimitsContext = createContext<UsageLimits | undefined>(
 	undefined,

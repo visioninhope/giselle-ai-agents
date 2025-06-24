@@ -9,8 +9,8 @@ import type {
 	GenerationCompleteOption,
 	TelemetrySettings,
 } from "@giselle-sdk/telemetry";
-import type { UsageLimits } from "@giselle-sdk/usage-limits";
 import type { Storage } from "unstorage";
+import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
 import type { VectorStore } from "./vector-store/types/interface";
 
