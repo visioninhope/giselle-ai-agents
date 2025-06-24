@@ -5,8 +5,8 @@ import {
 	isQueuedGeneration,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
-import { useTelemetry } from "@giselle-sdk/telemetry/react";
 import { useEffect, useRef } from "react";
+import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
 
