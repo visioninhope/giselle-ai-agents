@@ -1,6 +1,9 @@
+import type { components } from "@octokit/openapi-types";
 import { graphql } from "./client";
 import { graphql as gql } from "./graphql";
 import type { GitHubAuthConfig } from "./types";
+
+export type Repository = components["schemas"]["repository"];
 
 const query = gql(/* GraphQL */ `
     query RepositoryNodeIdQuery($id: ID!) {

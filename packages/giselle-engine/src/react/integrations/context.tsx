@@ -1,13 +1,11 @@
 import {
 	type PropsWithChildren,
-	type ReactNode,
 	createContext,
 	useCallback,
 	useContext,
-	useMemo,
 	useState,
 } from "react";
-import type { Integration } from "../schema";
+import type { Integration } from "../../core/integrations";
 
 interface IntegrationContextValue {
 	value: Partial<Integration>;

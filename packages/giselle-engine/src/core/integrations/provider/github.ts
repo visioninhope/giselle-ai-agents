@@ -1,12 +1,12 @@
-import type { components } from "@octokit/openapi-types";
-import { z } from "zod";
+import type { Installtion, Repository } from "@giselle-sdk/github-tool";
+import { z } from "zod/v4";
 
 export const GitHubIntegrationUnsetState = z.object({
 	status: z.literal("unset"),
 });
 export const GitHubIntegrationUnauthorizedState = z.object({
 	status: z.literal("unauthorized"),
-	authUrl: z.string().url(),
+	authUrl: z.url(),
 });
 export type GitHubIntegrationUnauthorizedState = z.infer<
 	typeof GitHubIntegrationUnauthorizedState
@@ -19,21 +19,20 @@ export type GitHubIntegrationInvalidCredentialState = z.infer<
 >;
 export const GitHubIntegrationNotInstalledState = z.object({
 	status: z.literal("not-installed"),
-	installationUrl: z.string().url(),
+	installationUrl: z.url(),
 });
 export type GitHubIntegrationNotInstalledState = z.infer<
 	typeof GitHubIntegrationNotInstalledState
 >;
-export type GitHubIntegrationRepository = components["schemas"]["repository"];
-export type GitHubIntegrationInstallation =
-	components["schemas"]["installation"] & {
-		repositories: GitHubIntegrationRepository[];
-	};
+export type GitHubIntegrationRepository = Repository;
+export type GitHubIntegrationInstallation = Installtion & {
+	repositories: GitHubIntegrationRepository[];
+};
 export const GitHubIntegrationInstalledState = z.object({
 	status: z.literal("installed"),
 	repositories: z.custom<GitHubIntegrationRepository[]>(),
 	installations: z.custom<GitHubIntegrationInstallation[]>(),
-	installationUrl: z.string().url(),
+	installationUrl: z.url(),
 });
 export type GitHubIntegrationInstalledState = z.infer<
 	typeof GitHubIntegrationInstalledState
