@@ -1,6 +1,6 @@
 import clsx from "clsx/lite";
 
-type ButtonStyle = "subtle" | "filled";
+type ButtonStyle = "subtle" | "filled" | "solid";
 interface ButtonProps
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
 	leftIcon?: React.ReactNode;
