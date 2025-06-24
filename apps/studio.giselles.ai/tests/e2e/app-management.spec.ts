@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+function escapeRegExp(string: string): string {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 test.describe("App management", () => {
 	const baseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
 
@@ -14,9 +18,12 @@ test.describe("App management", () => {
 		await page.getByRole("button", { name: "Create an app" }).click();
 
 		// Wait for navigation to the new app's page (workspace)
-		await expect(page).toHaveURL(new RegExp(`${baseUrl}/workspaces/.*`), {
-			timeout: 15000,
-		});
+		await expect(page).toHaveURL(
+			new RegExp(`${escapeRegExp(baseUrl)}/workspaces/.*`),
+			{
+				timeout: 15000,
+			},
+		);
 
 		// Wait for the tour to be visible before closing it
 		await page.getByRole("button", { name: "Close tour" }).waitFor();
