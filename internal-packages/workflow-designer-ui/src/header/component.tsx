@@ -165,7 +165,7 @@ export function Header({
 		<ToastProvider>
 			<div className="h-[54px] pl-[24px] pr-[16px] flex items-center justify-between shrink-0">
 				<div className="flex items-center gap-[8px] text-white-950">
-					<Link href="/">
+					<Link href="/" aria-label="Giselle logo">
 						<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />
 					</Link>
 					<Divider />
@@ -179,6 +179,7 @@ export function Header({
 								fallbackValue="Untitled"
 								onChange={updateWorkflowName}
 								value={data.name}
+								ariaLabel="App name"
 							/>
 						)}
 					</div>

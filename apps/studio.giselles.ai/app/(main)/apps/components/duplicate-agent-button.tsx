@@ -50,6 +50,7 @@ export function DuplicateAgentButton({
 						<Dialog.Trigger asChild>
 							<button
 								type="button"
+								aria-label="Duplicate an app"
 								className="grid size-6 place-items-center rounded-full text-white/60 transition-colors hover:text-white"
 								disabled={isPending}
 							>
