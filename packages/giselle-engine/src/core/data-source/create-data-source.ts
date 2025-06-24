@@ -1,7 +1,7 @@
 import type { WorkspaceId } from "@giselle-sdk/data-type";
+import { createVectorStore } from "../experimental_vector-store/create-vector-store";
 import type { GiselleEngineContext } from "../types";
 import { addWorkspaceIndexItem } from "../utils/workspace-index";
-import { createVectorStore } from "../vector-store/create-vector-store";
 import { dataSourcePath, workspaceDataSourceIndexPath } from "./paths";
 import {
 	DataSourceId,

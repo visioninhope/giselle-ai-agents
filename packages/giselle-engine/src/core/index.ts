@@ -60,7 +60,7 @@ import {
 } from "./workspaces";
 export * from "./types";
 export * from "./vault";
-export * from "./vector-store";
+export * from "./experimental_vector-store";
 export { FlowRunId } from "./flows";
 export * from "./usage-limits";
 export * from "./integrations";
