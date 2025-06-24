@@ -10,9 +10,9 @@ import type {
 	TelemetrySettings,
 } from "@giselle-sdk/telemetry";
 import type { Storage } from "unstorage";
+import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type { UsageLimits } from "./usage-limits";
 import type { Vault } from "./vault";
-import type { VectorStore } from "./vector-store/types/interface";
 
 export interface GiselleEngineContext {
 	storage: Storage;

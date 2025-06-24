@@ -1,7 +1,7 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { createIdGenerator } from "@giselle-sdk/utils";
 import { z } from "zod/v4";
-import { VectorStoreId } from "../../vector-store/types/object";
+import { VectorStoreId } from "../../experimental_vector-store/types/object";
 
 export const DataSourceId = createIdGenerator("ds");
 export type DataSourceId = z.infer<typeof DataSourceId.schema>;
