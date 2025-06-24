@@ -17,7 +17,12 @@
 				"SENTRY_*",
 				"BLOB_READ_WRITE_TOKEN",
 				"SEND_EMAIL_DEBUG",
-				"SAMPLE_APP_WORKSPACE_ID"
+				"SAMPLE_APP_WORKSPACE_ID",
+				"INNGEST_*",
+				"OTEL_*",
+				"GOOGLE_OAUTH_CLIENT_*",
+				"WAITUNTIL_OFFSET_MILLIS",
+				"EDGE_CONFIG"
 			],
 			"dependsOn": ["^build"],
 			"inputs": [
