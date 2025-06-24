@@ -9,7 +9,7 @@ import type {
 	GitHubIntegrationInvalidCredentialState,
 	GitHubIntegrationNotInstalledState,
 	GitHubIntegrationUnauthorizedState,
-} from "@giselle-sdk/integration";
+} from "@giselle-sdk/giselle-engine";
 
 export async function getGitHubIntegrationState(
 	agentDbId: number,

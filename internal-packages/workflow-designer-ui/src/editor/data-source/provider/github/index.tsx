@@ -1,6 +1,6 @@
 import { Note } from "@giselle-internal/ui/note";
 import { Select } from "@giselle-internal/ui/select";
-import { useIntegration } from "@giselle-sdk/integration/react";
+import { useIntegration } from "@giselle-sdk/giselle-engine/react";
 import { InstallGitHubApplication } from "./install-application";
 import { Unauthorized } from "./unauthorized";
 
