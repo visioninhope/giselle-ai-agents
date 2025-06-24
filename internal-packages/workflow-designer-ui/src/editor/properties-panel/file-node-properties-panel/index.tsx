@@ -5,6 +5,8 @@ import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
+	ResizableSection,
+	ResizableSectionGroup,
 } from "../ui";
 import { FilePanel } from "./file-panel";
 import type { FileTypeConfig } from "./file-panel-type";
@@ -39,7 +41,13 @@ export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				<FilePanel node={node} config={fileType[node.content.category]} />
+				<ResizableSectionGroup>
+					<ResizableSection title="File Upload" defaultSize={100}>
+						<div className="p-4">
+							<FilePanel node={node} config={fileType[node.content.category]} />
+						</div>
+					</ResizableSection>
+				</ResizableSectionGroup>
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);

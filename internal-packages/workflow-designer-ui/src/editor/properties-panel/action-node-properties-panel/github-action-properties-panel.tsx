@@ -16,7 +16,6 @@ import {
 	useState,
 	useTransition,
 } from "react";
-import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { GitHubIcon, SpinnerIcon } from "../../../icons";
 import {
 	Select,
@@ -26,7 +25,12 @@ import {
 	SelectValue,
 } from "../../../ui/select";
 import { GitHubRepositoryBlock } from "../trigger-node-properties-panel/ui";
-import { SelectRepository } from "../ui";
+import {
+	ResizableSection,
+	ResizableSectionGroup,
+	ResizableSectionHandle,
+	SelectRepository,
+} from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 
@@ -46,19 +50,23 @@ export function GitHubActionPropertiesPanel({
 
 	if (node.content.command.state.status === "configured") {
 		return (
-			<PanelGroup direction="vertical" className="flex-1 flex flex-col">
-				<Panel defaultSize={50} minSize={20}>
-					<GitHubActionConfiguredView
-						state={node.content.command.state}
-						nodeId={node.id}
-						inputs={node.inputs}
-					/>
-				</Panel>
-				<PanelResizeHandle className="h-[1px] bg-black-700/50 data-[resize-handle-state=drag]:bg-black-600 transition-colors duration-100 ease-in-out" />
-				<Panel>
-					<GenerationPanel node={node} />
-				</Panel>
-			</PanelGroup>
+			<ResizableSectionGroup>
+				<ResizableSection title="Configuration" defaultSize={50} minSize={20}>
+					<div className="p-4">
+						<GitHubActionConfiguredView
+							state={node.content.command.state}
+							nodeId={node.id}
+							inputs={node.inputs}
+						/>
+					</div>
+				</ResizableSection>
+				<ResizableSectionHandle />
+				<ResizableSection title="Generation" defaultSize={50}>
+					<div className="p-4">
+						<GenerationPanel node={node} />
+					</div>
+				</ResizableSection>
+			</ResizableSectionGroup>
 		);
 	}
 
@@ -95,11 +103,7 @@ export function GitHubActionPropertiesPanel({
 	}
 }
 
-function Unauthorized({
-	authUrl,
-}: {
-	authUrl: string;
-}) {
+function Unauthorized({ authUrl }: { authUrl: string }) {
 	const { refresh } = useIntegration();
 	const [isPending, startTransition] = useTransition();
 	const popupRef = useRef<Window | null>(null);
