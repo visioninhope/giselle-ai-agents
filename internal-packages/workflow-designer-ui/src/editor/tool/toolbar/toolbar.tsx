@@ -95,8 +95,7 @@ export function Toolbar() {
 	const limits = useUsageLimits();
 	const { githubVectorStore, webSearchAction } = useFeatureFlag();
 	const vectorStore = useVectorStore();
-	const canUseGithubVectorStore =
-		vectorStore && vectorStore.github && githubVectorStore;
+	const canUseGithubVectorStore = vectorStore?.github && githubVectorStore;
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
