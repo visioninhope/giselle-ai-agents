@@ -34,11 +34,10 @@ import { PropertiesPanel } from "../../properties-panel";
 import { RunHistoryTable } from "../../run-history/run-history-table";
 import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
+import type { LeftPanelValue, V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
 
-interface V2ContainerProps {
-	activeTab: string;
-}
+interface V2ContainerProps extends V2LayoutState {}
 
 function V2NodeCanvas() {
 	const {
@@ -257,7 +256,7 @@ function V2NodeCanvas() {
 	);
 }
 
-export function V2Container({ activeTab }: V2ContainerProps) {
+export function V2Container({ leftPanel }: V2ContainerProps) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
 		() =>
@@ -272,33 +271,54 @@ export function V2Container({ activeTab }: V2ContainerProps) {
 
 	return (
 		<main className="flex-1 bg-black-900 overflow-hidden">
-			<Tabs.Root value={activeTab} asChild>
-				<div className="h-full flex px-[16px] py-[16px]">
-					<div className="flex-1 border border-border rounded-[12px] relative">
-						<Tabs.Content value="builder" className="h-full">
-							<V2NodeCanvas />
+			<PanelGroup direction="horizontal">
+				<LeftPanel value={leftPanel} />
+				<PanelResizeHandle
+					className={clsx(
+						"w-[1px] bg-border cursor-col-resize",
+						"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+						"opacity-0 data-[left-panel=show]:opacity-100 transition-opacity",
+					)}
+					data-left-panel={leftPanel !== null ? "show" : "hide"}
+				/>
+				<Panel>
+					<V2NodeCanvas />
 
-							{/* Floating Properties Panel */}
-							<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
-								<PropertiesPanel />
-							</FloatingPropertiesPanel>
-						</Tabs.Content>
-
-						<Tabs.Content value="secret" className="h-full outline-none">
-							<SecretTable />
-						</Tabs.Content>
-
-						<Tabs.Content value="data-source" className="h-full outline-none">
-							<DataSourceTable />
-						</Tabs.Content>
-
-						<Tabs.Content value="run-history" className="h-full outline-none">
-							<RunHistoryTable />
-						</Tabs.Content>
-					</div>
-				</div>
-			</Tabs.Root>
+					{/* Floating Properties Panel */}
+					<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
+						<PropertiesPanel />
+					</FloatingPropertiesPanel>
+				</Panel>
+			</PanelGroup>
 			<GradientDef />
 		</main>
+	);
+}
+
+function LeftPanel({ value }: { value: LeftPanelValue | null }) {
+	const content = useMemo(() => {
+		if (value === null) {
+			return null;
+		}
+		switch (value) {
+			case "data-source":
+				return <DataSourceTable />;
+			case "run-history":
+				return <RunHistoryTable />;
+			case "secret":
+				return <SecretTable />;
+			default: {
+				const _exhaustiveCheck: never = value;
+				throw new Error(`Unhandled leftPanel: ${_exhaustiveCheck}`);
+			}
+		}
+	}, [value]);
+	return (
+		<Panel
+			maxSize={content === null ? 0 : 40}
+			minSize={content === null ? 0 : 20}
+		>
+			{content}
+		</Panel>
 	);
 }

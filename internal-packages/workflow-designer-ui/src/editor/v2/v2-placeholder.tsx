@@ -1,11 +1,10 @@
 "use client";
 
-import { ReactFlowProvider } from "@xyflow/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
-import { ToastProvider } from "../../ui/toast";
-import { MousePositionProvider, ToolbarContextProvider } from "../tool";
 import { V2Container, V2Footer, V2Header } from "./components";
+import { RootProvider } from "./components/provider";
+import type { LeftPanelValue, V2LayoutState } from "./state";
 
 export function V2Placeholder({
 	isReadOnly = false,
@@ -15,15 +14,24 @@ export function V2Placeholder({
 	userRole?: "viewer" | "guest" | "editor" | "owner";
 }) {
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
-	const [activeTab, setActiveTab] = useState("builder");
+	const [layoutState, setLayoutState] = useState<V2LayoutState>({
+		leftPanel: null,
+	});
 
 	const handleDismissBanner = useCallback(() => {
 		setShowReadOnlyBanner(false);
 	}, []);
 
-	const handleTabChange = useCallback((tab: string) => {
-		setActiveTab(tab);
-	}, []);
+	const handleLeftPanelValueChange = useCallback(
+		(newLeftPanelValue: LeftPanelValue) => {
+			setLayoutState((prev) => ({
+				...prev,
+				leftPanel:
+					prev.leftPanel === newLeftPanelValue ? null : newLeftPanelValue,
+			}));
+		},
+		[],
+	);
 
 	return (
 		<div className="flex-1 overflow-hidden font-sans pl-[16px] flex flex-col">
@@ -35,17 +43,11 @@ export function V2Placeholder({
 				/>
 			)}
 
-			<ToastProvider>
-				<ReactFlowProvider>
-					<ToolbarContextProvider>
-						<MousePositionProvider>
-							<V2Header />
-							<V2Container activeTab={activeTab} />
-							<V2Footer onTabChange={handleTabChange} />
-						</MousePositionProvider>
-					</ToolbarContextProvider>
-				</ReactFlowProvider>
-			</ToastProvider>
+			<RootProvider>
+				<V2Header />
+				<V2Container {...layoutState} />
+				<V2Footer onLeftPaelValueChange={handleLeftPanelValueChange} />
+			</RootProvider>
 		</div>
 	);
 }
