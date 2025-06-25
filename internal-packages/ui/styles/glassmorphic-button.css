@@ -1,0 +1,38 @@
+[data-glassmorphic-button] {
+	box-shadow:
+		0 8px 20px rgba(107, 143, 240, 0.2),
+		0 3px 10px rgba(107, 143, 240, 0.15),
+		inset 0 1px 0 rgba(255, 255, 255, 0.25),
+		inset 0 -1px 0 rgba(0, 0, 0, 0.15),
+		0 0 0 1px rgba(255, 255, 255, 0.08);
+}
+
+[data-glassmorphic-button-outer-glow] {
+	background-color: #6b8ff0;
+	opacity: 0.08;
+}
+[data-glassmorphic-button-background] {
+	background: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.15) 0%,
+		rgba(107, 143, 240, 0.1) 50%,
+		rgba(107, 143, 240, 0.2) 100%
+	);
+}
+
+[data-glassmorphic-button-top-reflection] {
+	background: linear-gradient(
+		to right,
+		transparent,
+		rgba(255, 255, 255, 0.6),
+		transparent
+	);
+}
+
+[data-glassmorphic-button-border] {
+	border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+[data-glassmorphic-button-hover-overlay] {
+	background: linear-gradient(to top, transparent, rgba(255, 255, 255, 0.1));
+}

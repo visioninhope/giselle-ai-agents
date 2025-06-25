@@ -8,10 +8,29 @@ const components = [
 		id: "button",
 		name: "Button",
 		component: (
-			<div className="space-y-4">
-				<Button>Subtle(default)</Button>
-				<Button variant="filled">Filled</Button>
-				<Button variant="solid">Solid</Button>
+			<div className="space-y-8">
+				<div>
+					<p className="text-text mb-2 text-sm">Style</p>
+					<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
+						<div className="space-y-4">
+							<Button>Subtle(default)</Button>
+							<Button variant="filled">Filled</Button>
+							<Button variant="solid">Solid</Button>
+							<Button variant="glassmorphic">Glassmorphic</Button>
+						</div>
+					</div>
+				</div>
+				<div>
+					<p className="text-text mb-2 text-sm">Size</p>
+					<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
+						<div className="space-y-4">
+							<Button variant="glassmorphic">default</Button>
+							<Button variant="glassmorphic" size="large">
+								Large
+							</Button>
+						</div>
+					</div>
+				</div>
 			</div>
 		),
 	},
@@ -48,9 +67,7 @@ export default function ComponentShowcase() {
 				<div className="flex-1 p-8">
 					<div className="max-w-4xl">
 						<h2 className="text-text mb-6">{selectedComponent.name}</h2>
-						<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
-							{selectedComponent.component}
-						</div>
+						{selectedComponent.component}
 					</div>
 				</div>
 			</div>
