@@ -13,14 +13,15 @@ describe("createPipeline", () => {
 
 	beforeEach(() => {
 		mockDocumentLoader = {
-			// @ts-expect-error - this is a mock
-			*loadMetadata() {
-				yield { path: "file1.txt" };
-				yield { path: "file2.txt" };
+			async *loadMetadata() {
+				yield await Promise.resolve({ path: "file1.txt" });
+				yield await Promise.resolve({ path: "file2.txt" });
 			},
-			// @ts-expect-error - this is a mock
 			async loadDocument(metadata) {
-				return { content: `doc for ${metadata.path}`, metadata };
+				return await Promise.resolve({
+					content: `doc for ${metadata.path}`,
+					metadata,
+				});
 			},
 		};
 
