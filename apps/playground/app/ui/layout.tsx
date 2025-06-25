@@ -5,6 +5,10 @@ const components = [
 		id: "button",
 		name: "Button",
 	},
+	{
+		id: "dialog",
+		name: "Dialog",
+	},
 ];
 export default function ({
 	children,
@@ -17,7 +21,7 @@ export default function ({
 				<div className="w-64 border-r border-border min-h-screen">
 					<div className="p-6">
 						<h1 className="text-text mb-6">Components</h1>
-						<nav className="space-y-1">
+						<nav className="gap-1 flex flex-col">
 							{components.map((component) => (
 								<NavLink key={component.id} pathname={`/ui/${component.id}`}>
 									{component.name}

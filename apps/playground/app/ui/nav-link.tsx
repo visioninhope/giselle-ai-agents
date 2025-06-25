@@ -14,7 +14,7 @@ export function NavLink(
 	return (
 		<Link
 			className={clsx(
-				"w-full text-left px-3 py-2 rounded-[4px] text-sm font-medium transition-colors",
+				"w-full text-left px-3 py-2 rounded-[4px] text-sm font-medium transition-colors hover:bg-ghost-element-hover",
 				"data-[state=active]:text-text data-[state=active]:bg-ghost-element-selected",
 			)}
 			href={props.pathname}
