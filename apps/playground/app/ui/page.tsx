@@ -12,6 +12,7 @@ const components = [
 				<Button>Subtle(default)</Button>
 				<Button variant="filled">Filled</Button>
 				<Button variant="solid">Solid</Button>
+				<Button variant="glassmorphic">Glassmorphic</Button>
 			</div>
 		),
 	},
@@ -48,7 +49,7 @@ export default function ComponentShowcase() {
 				<div className="flex-1 p-8">
 					<div className="max-w-4xl">
 						<h2 className="text-text mb-6">{selectedComponent.name}</h2>
-						<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
+						<div className="bg-black p-8 rounded-[4px] border border-border shadow-sm text-sans">
 							{selectedComponent.component}
 						</div>
 					</div>
