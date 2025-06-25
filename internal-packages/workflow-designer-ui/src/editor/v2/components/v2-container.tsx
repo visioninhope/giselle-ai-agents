@@ -272,7 +272,6 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 	return (
 		<main className="flex-1 bg-black-900 overflow-hidden">
 			<PanelGroup direction="horizontal">
-				<LeftPanel value={leftPanel} />
 				<PanelResizeHandle
 					className={clsx(
 						"w-[1px] bg-border cursor-col-resize",
@@ -282,6 +281,7 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 					data-left-panel={leftPanel !== null ? "show" : "hide"}
 				/>
 				<Panel>
+					<LeftPanel value={leftPanel} />
 					<V2NodeCanvas />
 
 					{/* Floating Properties Panel */}
@@ -313,12 +313,12 @@ function LeftPanel({ value }: { value: LeftPanelValue | null }) {
 			}
 		}
 	}, [value]);
+	if (content === null) {
+		return null;
+	}
 	return (
-		<Panel
-			maxSize={content === null ? 0 : 40}
-			minSize={content === null ? 0 : 20}
-		>
+		<FloatingPropertiesPanel isOpen position="left">
 			{content}
-		</Panel>
+		</FloatingPropertiesPanel>
 	);
 }
