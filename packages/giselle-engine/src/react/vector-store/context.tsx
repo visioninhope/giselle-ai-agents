@@ -26,10 +26,5 @@ export function VectorStoreProvider({
 
 export const useVectorStore = () => {
 	const vectorStore = useContext(VectorStoreContext);
-	if (!vectorStore) {
-		throw new Error(
-			"useVectorStore must be used within an VectorStoreProvider",
-		);
-	}
 	return vectorStore;
 };

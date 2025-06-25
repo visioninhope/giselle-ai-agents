@@ -34,6 +34,7 @@ import clsx from "clsx/lite";
 import {
 	useFeatureFlag,
 	useUsageLimits,
+	useVectorStore,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
 import { DatabaseZapIcon, LucideSearch, WorkflowIcon } from "lucide-react";
@@ -93,6 +94,9 @@ export function Toolbar() {
 	const { llmProviders } = useWorkflowDesigner();
 	const limits = useUsageLimits();
 	const { githubVectorStore, webSearchAction } = useFeatureFlag();
+	const vectorStore = useVectorStore();
+	const canUseGithubVectorStore =
+		vectorStore && vectorStore.github && githubVectorStore;
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
@@ -851,7 +855,7 @@ export function Toolbar() {
 						</div>
 					</ToggleGroup.Item>
 
-					{githubVectorStore && (
+					{canUseGithubVectorStore && (
 						<ToggleGroup.Item
 							value="selectRetrievalCategory"
 							data-tool
@@ -949,7 +953,7 @@ export function Toolbar() {
 													<PromptIcon className="w-[20px] h-[20px]" />
 													<p className="text-[14px]">Plain Text</p>
 												</ToggleGroup.Item>
-												{githubVectorStore && (
+												{canUseGithubVectorStore && (
 													<ToggleGroup.Item value="githubVectorStore" data-tool>
 														<GitHubIcon className="w-[20px] h-[20px]" />
 														<p className="text-[14px]">GitHub Vector Store</p>
