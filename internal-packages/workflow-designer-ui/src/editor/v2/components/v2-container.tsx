@@ -12,16 +12,8 @@ import {
 	useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import {
-	type ImperativePanelHandle,
-	Panel,
-	PanelGroup,
-	PanelResizeHandle,
-} from "react-resizable-panels";
 import { Background } from "../../../ui/background";
 import { useToasts } from "../../../ui/toast";
 import { edgeTypes } from "../../connector";
@@ -271,25 +263,15 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 
 	return (
 		<main className="flex-1 bg-black-900 overflow-hidden">
-			<PanelGroup direction="horizontal">
-				<PanelResizeHandle
-					className={clsx(
-						"w-[1px] bg-border cursor-col-resize",
-						"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-						"opacity-0 data-[left-panel=show]:opacity-100 transition-opacity",
-					)}
-					data-left-panel={leftPanel !== null ? "show" : "hide"}
-				/>
-				<Panel>
-					<LeftPanel value={leftPanel} />
-					<V2NodeCanvas />
+			<div className="relative h-full">
+				<LeftPanel value={leftPanel} />
+				<V2NodeCanvas />
 
-					{/* Floating Properties Panel */}
-					<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
-						<PropertiesPanel />
-					</FloatingPropertiesPanel>
-				</Panel>
-			</PanelGroup>
+				{/* Floating Properties Panel */}
+				<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
+					<PropertiesPanel />
+				</FloatingPropertiesPanel>
+			</div>
 			<GradientDef />
 		</main>
 	);
