@@ -24,7 +24,7 @@ const components = [
 							<Button>Subtle(default)</Button>
 							<Button variant="filled">Filled</Button>
 							<Button variant="solid">Solid</Button>
-							<Button variant="glassmorphic">Glassmorphic</Button>
+							<Button variant="glass">glass</Button>
 						</div>
 					</div>
 				</div>
@@ -32,8 +32,8 @@ const components = [
 					<p className="text-text mb-2 text-sm">Size</p>
 					<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
 						<div className="space-y-4">
-							<Button variant="glassmorphic">default</Button>
-							<Button variant="glassmorphic" size="large">
+							<Button variant="glass">default</Button>
+							<Button variant="glass" size="large">
 								Large
 							</Button>
 						</div>

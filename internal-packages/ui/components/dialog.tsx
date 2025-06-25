@@ -13,11 +13,11 @@ export function DialogContent({ children }: PropsWithChildren) {
 			<DialogPrimitive.Content
 				className={clsx(
 					"fixed left-[50%] top-[15%] translate-x-[-50%] w-[400px] z-20 overflow-hidden outline-none",
-					"bg-(image:--glassmorphic-dialog-bg)",
-					"border border-glassmorphic-border/20 shadow-xl text-text",
+					"bg-(image:--glass-dialog-bg)",
+					"border border-glass-border/20 shadow-xl text-text",
 					"px-6 rounded-[12px]",
 					"backdrop-blur-md",
-					"after:absolute after:bg-(image:--glassmorphic-highlight-bg) after:left-4 after:right-4 after:h-px after:top-0",
+					"after:absolute after:bg-(image:--glass-highlight-bg) after:left-4 after:right-4 after:h-px after:top-0",
 				)}
 			>
 				{children}

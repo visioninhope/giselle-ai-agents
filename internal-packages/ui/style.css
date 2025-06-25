@@ -77,39 +77,45 @@
 	--color-unreachable: #a9afbc;
 	--color-warning: #dec184;
 
-	/* glassmorphic common */
-	--glassmorphic-highlight-bg: linear-gradient(
+	/* glass common */
+	--glass-highlight-bg: linear-gradient(
 		to right,
 		transparent,
 		rgba(255, 255, 255, 0.4),
 		transparent
 	);
-	/* glassmorphic button */
-	--shadow-glassmorphic:
+	/* glass button */
+	--shadow-glass:
 		0 8px 20px rgba(107, 143, 240, 0.2),
 		0 3px 10px rgba(107, 143, 240, 0.15),
 		inset 0 1px 0 rgba(255, 255, 255, 0.25),
 		inset 0 -1px 0 rgba(0, 0, 0, 0.15),
 		0 0 0 1px rgba(255, 255, 255, 0.08);
-	--color-glassmorphic-border: var(--color-white);
-	--color-glassmorphic-highlight: var(--color-white);
+	--color-glass-border: var(--color-white);
+	--color-glass-highlight: var(--color-white);
 
-	--glassmorphic-bg-default: linear-gradient(
+	--glass-bg-default: linear-gradient(
 		135deg,
 		rgba(255, 255, 255, 0.15) 0%,
 		rgba(107, 143, 240, 0.1) 50%,
 		rgba(107, 143, 240, 0.2) 100%
 	);
-	--glassmorphic-bg-hover: linear-gradient(
+	--glass-bg-hover: linear-gradient(
 		to top,
 		transparent,
 		rgba(255, 255, 255, 0.1)
 	);
 
-	/* glassmorphic dialog */
-	--glassmorphic-dialog-bg: linear-gradient(
+	/* glass dialog */
+	--glass-dialog-bg: linear-gradient(
 		135deg,
 		rgba(150, 150, 150, 0.03) 0%,
 		rgba(60, 90, 160, 0.12) 100%
 	);
+
+	/* solid button */
+	--solid-button-bg: linear-gradient(180deg, #202530 0%, #12151f 100%);
+	--color-button-solid-border: rgba(0, 0, 0, 0.7);
+	--solid-button-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.05), 0 2px 8px
+		rgba(5, 10, 20, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
 }
