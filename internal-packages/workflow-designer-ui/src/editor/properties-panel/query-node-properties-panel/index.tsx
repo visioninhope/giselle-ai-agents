@@ -1,15 +1,23 @@
 import type { QueryNode } from "@giselle-sdk/data-type";
-import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useFeatureFlag,
+	useNodeGenerations,
+	useWorkflowDesigner,
+} from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft, DatabaseZapIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+
 import { Button } from "../../../ui/button";
 import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
+	ResizableSection,
+	ResizableSectionGroup,
+	ResizableSectionHandle,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { InputPanel } from "./input-panel";
@@ -24,6 +32,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			origin: { type: "workspace", id: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
+	const { layoutV2 } = useFeatureFlag();
 
 	const generate = useCallback(() => {
 		createAndStartGeneration({
@@ -83,39 +92,73 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 				}
 			/>
 
-			<PanelGroup direction="vertical" className="flex-1 flex flex-col">
-				<Panel defaultSize={50} minSize={20}>
-					<PropertiesPanelContent>
-						<Tabs.Root
-							className="flex flex-col gap-[8px] h-full"
-							defaultValue="query"
-						>
-							<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
-								<Tabs.Trigger value="query">Query</Tabs.Trigger>
-								<Tabs.Trigger value="input">Input</Tabs.Trigger>
-							</Tabs.List>
-							<Tabs.Content
-								value="query"
-								className="flex-1 flex flex-col overflow-hidden"
+			<PropertiesPanelContent>
+				{layoutV2 ? (
+					<ResizableSectionGroup>
+						<ResizableSection title="Query" defaultSize={50} minSize={20}>
+							<div className="p-4">
+								<Tabs.Root
+									className="flex flex-col gap-[8px] h-full"
+									defaultValue="query"
+								>
+									<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
+										<Tabs.Trigger value="query">Query</Tabs.Trigger>
+										<Tabs.Trigger value="input">Input</Tabs.Trigger>
+									</Tabs.List>
+									<Tabs.Content
+										value="query"
+										className="flex-1 flex flex-col overflow-hidden"
+									>
+										<QueryPanel node={node} />
+									</Tabs.Content>
+									<Tabs.Content
+										value="input"
+										className="flex-1 flex flex-col overflow-y-auto"
+									>
+										<InputPanel node={node} />
+									</Tabs.Content>
+								</Tabs.Root>
+							</div>
+						</ResizableSection>
+						<ResizableSectionHandle />
+						<ResizableSection title="Generation" defaultSize={50} minSize={20}>
+							<div className="p-4">
+								<GenerationPanel node={node} onClickGenerateButton={generate} />
+							</div>
+						</ResizableSection>
+					</ResizableSectionGroup>
+				) : (
+					<PanelGroup direction="vertical" className="flex-1 flex flex-col">
+						<Panel defaultSize={50} minSize={20}>
+							<Tabs.Root
+								className="flex flex-col gap-[8px] h-full"
+								defaultValue="query"
 							>
-								<QueryPanel node={node} />
-							</Tabs.Content>
-							<Tabs.Content
-								value="input"
-								className="flex-1 flex flex-col overflow-y-auto"
-							>
-								<InputPanel node={node} />
-							</Tabs.Content>
-						</Tabs.Root>
-					</PropertiesPanelContent>
-				</Panel>
-				<PanelResizeHandle className="h-[1px] bg-black-700/50 data-[resize-handle-state=drag]:bg-black-600 transition-colors duration-100 ease-in-out" />
-				<Panel defaultSize={50} minSize={20}>
-					<PropertiesPanelContent>
-						<GenerationPanel node={node} onClickGenerateButton={generate} />
-					</PropertiesPanelContent>
-				</Panel>
-			</PanelGroup>
+								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
+									<Tabs.Trigger value="query">Query</Tabs.Trigger>
+									<Tabs.Trigger value="input">Input</Tabs.Trigger>
+								</Tabs.List>
+								<Tabs.Content
+									value="query"
+									className="flex-1 flex flex-col overflow-hidden"
+								>
+									<QueryPanel node={node} />
+								</Tabs.Content>
+								<Tabs.Content
+									value="input"
+									className="flex-1 flex flex-col overflow-y-auto"
+								>
+									<InputPanel node={node} />
+								</Tabs.Content>
+							</Tabs.Root>
+						</Panel>
+						<PanelResizeHandle className="h-[1px] bg-black-700/50 data-[resize-handle-state=drag]:bg-black-600 transition-colors duration-100 ease-in-out" />
+						<Panel defaultSize={50} minSize={20}>
+							<GenerationPanel node={node} onClickGenerateButton={generate} />
+						</Panel>
+					</PanelGroup>
+				)}
+			</PropertiesPanelContent>
 			<KeyboardShortcuts
 				generate={() => {
 					if (!isGenerating) {

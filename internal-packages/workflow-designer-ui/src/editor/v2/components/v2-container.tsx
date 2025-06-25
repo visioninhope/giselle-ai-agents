@@ -34,6 +34,7 @@ import { PropertiesPanel } from "../../properties-panel";
 import { RunHistoryTable } from "../../run-history/run-history-table";
 import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
+import { FloatingPropertiesPanel } from "./floating-properties-panel";
 
 interface V2ContainerProps {
 	activeTab: string;
@@ -267,55 +268,20 @@ export function V2Container({ activeTab }: V2ContainerProps) {
 		[data],
 	);
 
-	const rightPanelRef = useRef<ImperativePanelHandle>(null);
-
-	useEffect(() => {
-		const rightPanel = rightPanelRef.current;
-		if (!rightPanel) return;
-
-		if (selectedNodes.length === 1) {
-			rightPanel.resize(30);
-		} else {
-			rightPanel.resize(0);
-		}
-	}, [selectedNodes]);
+	const isPropertiesPanelOpen = selectedNodes.length === 1;
 
 	return (
 		<main className="flex-1 bg-black-900 overflow-hidden">
 			<Tabs.Root value={activeTab} asChild>
 				<div className="h-full flex px-[16px] py-[16px]">
-					<div className="flex-1 border border-border rounded-[12px]">
+					<div className="flex-1 border border-border rounded-[12px] relative">
 						<Tabs.Content value="builder" className="h-full">
-							<PanelGroup direction="horizontal">
-								<Panel>
-									<V2NodeCanvas />
-								</Panel>
-								<PanelResizeHandle
-									className={clsx(
-										"w-[1px] bg-border cursor-col-resize",
-										"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-										"opacity-0 data-[right-panel=show]:opacity-100 transition-opacity",
-									)}
-									data-right-panel={
-										selectedNodes.length === 1 ? "show" : "hide"
-									}
-								/>
-								<Panel
-									id="right-panel"
-									className="flex bg-surface-background"
-									ref={rightPanelRef}
-									defaultSize={0}
-									data-right-panel={
-										selectedNodes.length === 1 ? "show" : "hide"
-									}
-								>
-									{selectedNodes.length === 1 && (
-										<div className="flex-1 overflow-hidden">
-											<PropertiesPanel />
-										</div>
-									)}
-								</Panel>
-							</PanelGroup>
+							<V2NodeCanvas />
+
+							{/* Floating Properties Panel */}
+							<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
+								<PropertiesPanel />
+							</FloatingPropertiesPanel>
 						</Tabs.Content>
 
 						<Tabs.Content value="secret" className="h-full outline-none">
