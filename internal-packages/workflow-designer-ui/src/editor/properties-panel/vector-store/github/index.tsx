@@ -18,7 +18,9 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	node,
 }: GitHubVectorStoreNodePropertiesPanelProps) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
-	const { github, settingPath } = useVectorStore();
+	const vectorStore = useVectorStore();
+	const github = vectorStore?.github;
+	const settingPath = vectorStore?.settingPath;
 	const vectorStoreInfos = github ?? [];
 
 	const currentSelectedRepoId = useMemo(() => {
