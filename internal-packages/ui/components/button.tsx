@@ -1,6 +1,6 @@
 import clsx from "clsx/lite";
 
-type ButtonStyle = "subtle" | "filled" | "solid" | "glass";
+type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline";
 type ButtonSize = "compact" | "default" | "large";
 interface ButtonProps
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
@@ -28,9 +28,9 @@ export function Button({
 				"data-[style=subtle]:hover:bg-ghost-element-hover",
 				"data-[style=filled]:bg-background data-[style=filled]:border data-[style=filled]:border-border data-[style=filled]:hover:bg-ghost-element-hover",
 				"data-[style=solid]:bg-(image:--solid-button-bg) data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-button-solid-border data-[style=solid]:shadow-(--solid-button-shadow) data-[style=solid]:hover:bg-primary-800",
-				"data-[glass]:shadow-glass data-[sglass]:backdrop-blur-md",
-				"data-[glass]:after:absolute data-[sglass]:after:bg-linear-to-r data-[glass]:after:from-transparent data-[sglass]:after:via-glass-highlight/60 data-[glass]:after:left-4 data-[sglass]:after:right-4 data-[glass]:after:h-px data-[sglass]:after:top-0",
-				"data-[glass]:border data-[sglass]:border-glass-border/20",
+				"data-[style=glass]:shadow-glass data-[style=glass]:backdrop-blur-md",
+				"data-[style=glass]:after:absolute data-[style=glass]:after:bg-linear-to-r data-[style=glass]:after:from-transparent data-[style=glass]:after:via-glass-highlight/60 data-[style=glass]:after:left-4 data-[style=glass]:after:right-4 data-[style=glass]:after:h-px data-[style=glass]:after:top-0",
+				"data-[style=glass]:border data-[style=glass]:border-glass-border/20",
 				"cursor-pointer transition-colors",
 				className,
 			)}
