@@ -23,7 +23,7 @@ export function OverlayDrawer({
 }: OverlayDrawerProps) {
 	const drawerRef = useRef<HTMLDivElement>(null);
 
-	// Close on Escape key
+	// Close on Escape key and manage focus
 	useEffect(() => {
 		const handleEscape = (event: KeyboardEvent) => {
 			if (event.key === "Escape" && isOpen) {
@@ -35,6 +35,13 @@ export function OverlayDrawer({
 			document.addEventListener("keydown", handleEscape);
 			// Prevent body scroll when drawer is open
 			document.body.style.overflow = "hidden";
+
+			// Focus management: focus the drawer when opened
+			setTimeout(() => {
+				if (drawerRef.current) {
+					drawerRef.current.focus();
+				}
+			}, 100);
 		}
 
 		return () => {
@@ -79,6 +86,7 @@ export function OverlayDrawer({
 				}}
 				role="button"
 				tabIndex={0}
+				aria-label="Close drawer"
 			/>
 
 			{/* Drawer */}
@@ -94,6 +102,7 @@ export function OverlayDrawer({
 							: "-translate-x-full",
 				)}
 				style={{ width: `${width}px` }}
+				tabIndex={-1}
 			>
 				{/* Header */}
 				{title && (

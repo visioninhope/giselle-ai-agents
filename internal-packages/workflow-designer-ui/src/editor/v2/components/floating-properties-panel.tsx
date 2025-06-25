@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx/lite";
-import { type ReactNode, useCallback, useRef, useState } from "react";
+import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
 
 interface FloatingPropertiesPanelProps {
 	isOpen: boolean;
@@ -23,6 +23,32 @@ export function FloatingPropertiesPanel({
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
 	const panelRef = useRef<HTMLDivElement>(null);
+	const intermediateWidthRef = useRef(defaultWidth);
+
+	// Throttle utility for mousemove events
+	const throttle = useCallback(
+		(func: (e: MouseEvent) => void, delay: number) => {
+			let timeoutId: NodeJS.Timeout | null = null;
+			let lastExecTime = 0;
+			return (e: MouseEvent) => {
+				const currentTime = Date.now();
+				if (currentTime - lastExecTime > delay) {
+					func(e);
+					lastExecTime = currentTime;
+				} else {
+					if (timeoutId) clearTimeout(timeoutId);
+					timeoutId = setTimeout(
+						() => {
+							func(e);
+							lastExecTime = Date.now();
+						},
+						delay - (currentTime - lastExecTime),
+					);
+				}
+			};
+		},
+		[],
+	);
 
 	const handleMouseDown = useCallback(
 		(e: React.MouseEvent) => {
@@ -31,6 +57,7 @@ export function FloatingPropertiesPanel({
 
 			const startX = e.clientX;
 			const startWidth = width;
+			intermediateWidthRef.current = startWidth;
 
 			const handleMouseMove = (e: MouseEvent) => {
 				const deltaX = startX - e.clientX; // Left resize, so subtract
@@ -38,19 +65,22 @@ export function FloatingPropertiesPanel({
 					minWidth,
 					Math.min(maxWidth, startWidth + deltaX),
 				);
+				intermediateWidthRef.current = newWidth;
 				setWidth(newWidth);
 			};
 
+			const throttledMouseMove = throttle(handleMouseMove, 16); // ~60fps throttling
+
 			const handleMouseUp = () => {
 				setIsResizing(false);
-				document.removeEventListener("mousemove", handleMouseMove);
+				document.removeEventListener("mousemove", throttledMouseMove);
 				document.removeEventListener("mouseup", handleMouseUp);
 			};
 
-			document.addEventListener("mousemove", handleMouseMove);
+			document.addEventListener("mousemove", throttledMouseMove);
 			document.addEventListener("mouseup", handleMouseUp);
 		},
-		[width, minWidth, maxWidth],
+		[width, minWidth, maxWidth, throttle],
 	);
 
 	if (!isOpen) return null;
@@ -72,9 +102,9 @@ export function FloatingPropertiesPanel({
 				{/* Resize handle */}
 				<div
 					className={clsx(
-						"absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-blue-500 transition-colors",
+						"absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-primary-500 transition-colors",
 						"bg-transparent hover:bg-opacity-50",
-						isResizing && "bg-blue-500 bg-opacity-50",
+						isResizing && "bg-primary-500 bg-opacity-50",
 					)}
 					onMouseDown={handleMouseDown}
 				/>
