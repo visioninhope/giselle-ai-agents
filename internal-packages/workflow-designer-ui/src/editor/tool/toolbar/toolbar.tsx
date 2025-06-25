@@ -39,7 +39,7 @@ import {
 } from "giselle-sdk/react";
 import { DatabaseZapIcon, LucideSearch, WorkflowIcon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tooltip } from "../../../ui/tooltip";
 import { isToolAction } from "../types";
 import {
@@ -95,7 +95,10 @@ export function Toolbar() {
 	const limits = useUsageLimits();
 	const { githubVectorStore, webSearchAction } = useFeatureFlag();
 	const vectorStore = useVectorStore();
-	const canUseGithubVectorStore = vectorStore?.github && githubVectorStore;
+	const canUseGithubVectorStore = useMemo(
+		() => !!vectorStore?.github && githubVectorStore,
+		[vectorStore, githubVectorStore],
+	);
 
 	const modelsFilteredBySearchOnly = languageModels
 		.filter((model) => llmProviders.includes(model.provider))
