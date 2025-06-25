@@ -29,7 +29,7 @@ export function Button({
 				"data-[style=filled]:bg-background data-[style=filled]:border data-[style=filled]:border-border data-[style=filled]:hover:bg-ghost-element-hover",
 				"data-[style=solid]:bg-primary-900 data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-primary-800 data-[style=solid]:hover:bg-primary-800",
 				"data-[style=glassmorphic]:shadow-glassmorphic data-[style=glassmorphic]:relative data-[style=glassmorphic]:bg-linear-[135deg] data-[style=glassmorphic]:from-glassmorphic-bg-gradient-from data-[style=glassmorphic]:via-glassmorphic-bg-gradient-via data-[style=glassmorphic]:to-glassmorphic-bg-gradient-to data-[style=glassmorphic]:backdrop-blur-md",
-				"data-[style=glassmorphic]:after:absolute data-[style=glassmorphic]:after:bg-linear-to-r  data-[style=glassmorphic]:after:from-transparentl  data-[style=glassmorphic]:after:via-glassmorphic-highlight/60 data-[style=glassmorphic]:after:left-4 data-[style=glassmorphic]:after:right-4 data-[style=glassmorphic]:after:h-px data-[style=glassmorphic]:after:top-0",
+				"data-[style=glassmorphic]:after:absolute data-[style=glassmorphic]:after:bg-linear-to-r data-[style=glassmorphic]:after:from-transparent data-[style=glassmorphic]:after:via-glassmorphic-highlight/60 data-[style=glassmorphic]:after:left-4 data-[style=glassmorphic]:after:right-4 data-[style=glassmorphic]:after:h-px data-[style=glassmorphic]:after:top-0",
 				"data-[style=glassmorphic]:border data-[style=glassmorphic]:border-glassmorphic-border/20",
 				"cursor-pointer transition-colors",
 				className,
