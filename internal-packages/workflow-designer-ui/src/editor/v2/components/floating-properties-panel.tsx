@@ -1,7 +1,7 @@
 "use client";
 
 import clsx from "clsx/lite";
-import { type ReactNode, useCallback, useMemo, useRef, useState } from "react";
+import { type ReactNode, useCallback, useRef, useState } from "react";
 
 interface FloatingPropertiesPanelProps {
 	isOpen: boolean;
@@ -10,6 +10,7 @@ interface FloatingPropertiesPanelProps {
 	defaultWidth?: number;
 	minWidth?: number;
 	maxWidth?: number;
+	position?: "right" | "left";
 }
 
 export function FloatingPropertiesPanel({
@@ -19,6 +20,7 @@ export function FloatingPropertiesPanel({
 	defaultWidth = 400,
 	minWidth = 300,
 	maxWidth = 800,
+	position = "right",
 }: FloatingPropertiesPanelProps) {
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
@@ -60,7 +62,8 @@ export function FloatingPropertiesPanel({
 			intermediateWidthRef.current = startWidth;
 
 			const handleMouseMove = (e: MouseEvent) => {
-				const deltaX = startX - e.clientX; // Left resize, so subtract
+				const deltaX =
+					position === "right" ? startX - e.clientX : e.clientX - startX;
 				const newWidth = Math.max(
 					minWidth,
 					Math.min(maxWidth, startWidth + deltaX),
@@ -80,14 +83,17 @@ export function FloatingPropertiesPanel({
 			document.addEventListener("mousemove", throttledMouseMove);
 			document.addEventListener("mouseup", handleMouseUp);
 		},
-		[width, minWidth, maxWidth, throttle],
+		[width, minWidth, maxWidth, throttle, position],
 	);
 
 	if (!isOpen) return null;
 
 	return (
 		<div
-			className="absolute top-4 right-4 bottom-4 z-10 pointer-events-none"
+			className={clsx(
+				"absolute top-4 bottom-4 z-10 pointer-events-none",
+				position === "right" ? "right-4" : "left-4",
+			)}
 			style={{ width: `${width}px` }}
 		>
 			<div
@@ -95,14 +101,19 @@ export function FloatingPropertiesPanel({
 				className={clsx(
 					"h-full bg-surface-background border border-border rounded-lg shadow-2xl pointer-events-auto relative",
 					"transform transition-all duration-300 ease-out",
-					isOpen ? "translate-x-0 opacity-100" : "translate-x-full opacity-0",
+					isOpen
+						? "translate-x-0 opacity-100"
+						: position === "right"
+							? "translate-x-full opacity-0"
+							: "-translate-x-full opacity-0",
 					className,
 				)}
 			>
 				{/* Resize handle */}
 				<div
 					className={clsx(
-						"absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-primary-500 transition-colors",
+						"absolute top-0 bottom-0 w-1 cursor-ew-resize hover:bg-primary-500 transition-colors",
+						position === "right" ? "left-0" : "right-0",
 						"bg-transparent hover:bg-opacity-50",
 						isResizing && "bg-primary-500 bg-opacity-50",
 					)}
@@ -110,7 +121,14 @@ export function FloatingPropertiesPanel({
 				/>
 
 				{/* Content */}
-				<div className="h-full overflow-hidden pl-1">{children}</div>
+				<div
+					className={clsx(
+						"h-full overflow-hidden",
+						position === "right" ? "pl-1" : "pr-1",
+					)}
+				>
+					{children}
+				</div>
 			</div>
 		</div>
 	);
