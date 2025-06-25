@@ -31,7 +31,9 @@ export default function () {
 									<div>
 										<p>Contents</p>
 										<DialogFooter>
-											<Button type="button">Create</Button>
+											<Button type="button" variant="solid" size="large">
+												Create
+											</Button>
 										</DialogFooter>
 									</div>
 								</DialogContent>
