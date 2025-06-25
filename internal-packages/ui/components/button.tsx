@@ -1,6 +1,6 @@
 import clsx from "clsx/lite";
 
-type ButtonStyle = "subtle" | "filled";
+type ButtonStyle = "subtle" | "filled" | "solid";
 interface ButtonProps
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
 	leftIcon?: React.ReactNode;
@@ -21,6 +21,7 @@ export function Button({
 			className={clsx(
 				"flex items-center justify-between gap-[4px] px-[8px] py-[2px] rounded-[2px] outline-none",
 				"data-[style=filled]:bg-background data-[style=filled]:border data-[style=filled]:border-border",
+				"data-[style=solid]:bg-primary-900 data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-primary-800 data-[style=solid]:hover:bg-primary-800",
 				"cursor-pointer hover:bg-ghost-element-hover transition-colors",
 				className,
 			)}
