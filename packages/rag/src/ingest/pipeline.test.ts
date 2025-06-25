@@ -34,7 +34,9 @@ describe("createPipeline", () => {
 
 		mockChunkStore = {
 			insert: vi.fn(async () => {}),
-			deleteByDocumentKey: vi.fn(async () => {}),
+			delete: vi.fn(async () => {}),
+			deleteBatch: vi.fn(async () => {}),
+			getDocumentVersions: vi.fn(async () => []),
 		};
 	});
 
@@ -45,6 +47,7 @@ describe("createPipeline", () => {
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
+			documentVersion: (metadata) => "v1",
 			metadataTransform: (metadata) => metadata,
 		});
 
@@ -73,6 +76,7 @@ describe("createPipeline", () => {
 			embedder: mockEmbedder,
 			chunkStore: failingChunkStore,
 			documentKey: (metadata) => metadata.path,
+			documentVersion: (metadata) => "v1",
 			metadataTransform: (metadata) => metadata,
 			maxRetries: 2,
 			retryDelay: 10,
@@ -93,6 +97,7 @@ describe("createPipeline", () => {
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
+			documentVersion: (metadata) => "v1",
 			metadataTransform: (metadata) => metadata,
 			onProgress,
 		});
@@ -111,6 +116,7 @@ describe("createPipeline", () => {
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
 			documentKey: (metadata) => metadata.path,
+			documentVersion: (metadata) => "v1",
 			metadataTransform: (metadata) => metadata,
 			maxBatchSize: 1,
 		});

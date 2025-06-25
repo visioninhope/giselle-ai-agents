@@ -2,12 +2,18 @@ import type { z } from "zod/v4";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
 import type { ColumnMapping, DatabaseConfig } from "../../database/types";
-import { DatabaseError, ValidationError } from "../../errors";
+import {
+	ConfigurationError,
+	DatabaseError,
+	ValidationError,
+} from "../../errors";
 import type { ChunkStore, ChunkWithEmbedding } from "../types";
 import {
 	deleteChunksByDocumentKey,
+	deleteChunksByDocumentKeys,
 	insertChunkRecords,
 	prepareChunkRecords,
+	queryDocumentVersions,
 } from "./utils";
 
 /**
@@ -91,7 +97,7 @@ export function createPostgresChunkStore<
 	/**
 	 * Delete chunks by document key
 	 */
-	async function deleteByDocumentKey(documentKey: string): Promise<void> {
+	async function deleteDocument(documentKey: string): Promise<void> {
 		const pool = PoolManager.getPool(database);
 		const client = await pool.connect();
 
@@ -109,8 +115,87 @@ export function createPostgresChunkStore<
 				`DELETE FROM ${tableName}`,
 				error instanceof Error ? error : undefined,
 				{
-					operation: "deleteByDocumentKey",
+					operation: "deleteDocument",
 					documentKey,
+					tableName,
+				},
+			);
+		} finally {
+			client.release();
+		}
+	}
+
+	/**
+	 * Delete chunks associated with multiple document keys
+	 */
+	async function deleteBatch(documentKeys: string[]): Promise<void> {
+		if (documentKeys.length === 0) {
+			return;
+		}
+
+		const pool = PoolManager.getPool(database);
+		const client = await pool.connect();
+
+		try {
+			await ensurePgVectorTypes(client, database.connectionString);
+
+			await deleteChunksByDocumentKeys(
+				client,
+				tableName,
+				documentKeys,
+				columnMapping.documentKey,
+				scope,
+			);
+		} catch (error) {
+			throw DatabaseError.queryFailed(
+				`DELETE FROM ${tableName}`,
+				error instanceof Error ? error : undefined,
+				{
+					operation: "deleteBatch",
+					documentKeyCount: documentKeys.length,
+					tableName,
+				},
+			);
+		} finally {
+			client.release();
+		}
+	}
+
+	/**
+	 * Get document versions for differential ingestion
+	 */
+	async function getDocumentVersions(): Promise<
+		Array<{
+			documentKey: string;
+			version: string;
+		}>
+	> {
+		// Check version column before connecting to DB
+		if (!columnMapping.version) {
+			throw ConfigurationError.missingField("columnMapping.version", {
+				hint: "Please provide systemColumns.version when calling createColumnMapping",
+			});
+		}
+
+		const pool = PoolManager.getPool(database);
+		const client = await pool.connect();
+
+		try {
+			await ensurePgVectorTypes(client, database.connectionString);
+
+			return await queryDocumentVersions(
+				client,
+				tableName,
+				columnMapping.documentKey,
+				columnMapping.version,
+				scope,
+			);
+		} catch (error) {
+			throw DatabaseError.queryFailed(
+				`SELECT DISTINCT FROM ${tableName}`,
+				error instanceof Error ? error : undefined,
+				{
+					operation: "getDocumentVersions",
 					tableName,
 				},
 			);
@@ -121,6 +206,8 @@ export function createPostgresChunkStore<
 
 	return {
 		insert,
-		deleteByDocumentKey,
+		delete: deleteDocument,
+		deleteBatch,
+		getDocumentVersions,
 	};
 }

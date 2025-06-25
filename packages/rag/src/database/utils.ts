@@ -7,6 +7,7 @@ const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
 	chunkContent: "chunk_content",
 	chunkIndex: "chunk_index",
 	embedding: "embedding",
+	version: "version",
 } as const;
 
 function toSnakeCase(str: string): string {
@@ -61,8 +62,11 @@ export function createColumnMapping<
 	requiredColumnOverrides?: Partial<RequiredColumns>;
 	metadataColumnOverrides?: Partial<Record<keyof z.infer<TSchema>, string>>;
 }): ColumnMapping<z.infer<TSchema>> {
-	const { metadataSchema, requiredColumnOverrides, metadataColumnOverrides } =
-		options;
+	const {
+		metadataSchema,
+		requiredColumnOverrides,
+		metadataColumnOverrides,
+	} = options;
 
 	type TMetadata = z.infer<TSchema>;
 

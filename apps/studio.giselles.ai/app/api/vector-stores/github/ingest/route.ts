@@ -5,7 +5,9 @@ import { ingestGitHubBlobs } from "./ingest-github-repository";
 import {
 	buildOctokit,
 	fetchTargetGitHubRepositories,
-	updateRepositoryStatus,
+	updateRepositoryStatusToCompleted,
+	updateRepositoryStatusToFailed,
+	updateRepositoryStatusToRunning,
 } from "./utils";
 
 export const maxDuration = 800;
@@ -25,7 +27,7 @@ export async function GET(request: NextRequest) {
 			targetGitHubRepository;
 
 		try {
-			await updateRepositoryStatus(dbId, "running");
+			await updateRepositoryStatusToRunning(dbId);
 
 			const octokitClient = buildOctokit(installationId);
 			const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
@@ -41,13 +43,13 @@ export async function GET(request: NextRequest) {
 				teamDbId,
 			});
 
-			await updateRepositoryStatus(dbId, "completed", commit.sha);
+			await updateRepositoryStatusToCompleted(dbId, commit.sha);
 		} catch (error) {
 			console.error(`Failed to ingest ${owner}/${repo}:`, error);
 			captureException(error, {
 				extra: { owner, repo },
 			});
-			await updateRepositoryStatus(dbId, "failed");
+			await updateRepositoryStatusToFailed(dbId);
 		}
 	}
 

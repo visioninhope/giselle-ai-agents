@@ -9,6 +9,7 @@ import { OperationError } from "../errors";
 import { embedContent } from "./embedder";
 import { retryOperation } from "./retry";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
+import { createVersionTracker } from "./version-tracker";
 
 // Type helper to extract metadata type from ChunkStore
 type InferChunkMetadata<T> = T extends ChunkStore<infer M> ? M : never;
@@ -21,6 +22,7 @@ export interface IngestPipelineOptions<
 	documentLoader: DocumentLoader<TDocMetadata>;
 	chunkStore: TStore;
 	documentKey: (metadata: TDocMetadata) => string;
+	documentVersion: (metadata: TDocMetadata) => string;
 	metadataTransform: (metadata: TDocMetadata) => InferChunkMetadata<TStore>;
 
 	// Optional processors
@@ -53,6 +55,7 @@ export function createPipeline<
 		documentLoader,
 		chunkStore,
 		documentKey,
+		documentVersion,
 		metadataTransform,
 		chunker = createDefaultChunker(),
 		embedder = createDefaultEmbedder(),
@@ -108,9 +111,22 @@ export function createPipeline<
 		};
 
 		try {
+			// Initialize version tracking
+			const existingDocs = await chunkStore.getDocumentVersions();
+			const existingVersions = new Map(
+				existingDocs.map((doc) => [doc.documentKey, doc.version]),
+			);
+			const versionTracker = createVersionTracker(existingVersions);
+
 			// Process all documents
 			for await (const metadata of documentLoader.loadMetadata()) {
 				const docKey = documentKey(metadata);
+				const newVersion = documentVersion(metadata);
+				versionTracker.trackSeen(docKey);
+
+				if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
+					continue;
+				}
 
 				const document = await documentLoader.loadDocument(metadata);
 				if (!document) {
@@ -133,6 +149,25 @@ export function createPipeline<
 
 				progress.processedDocuments++;
 				onProgress?.(progress);
+			}
+
+			// Handle orphaned documents
+			const orphanedKeys = versionTracker.getOrphaned();
+			if (orphanedKeys.length > 0) {
+				try {
+					await chunkStore.deleteBatch(orphanedKeys);
+					const deletedCount = orphanedKeys.length;
+
+					if (onProgress) {
+						progress.processedDocuments += deletedCount;
+						onProgress(progress);
+					}
+				} catch (error) {
+					result.errors.push({
+						document: `batch-delete: ${orphanedKeys.join(", ")}`,
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
+				}
 			}
 		} catch (error) {
 			throw OperationError.invalidOperation(

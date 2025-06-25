@@ -29,6 +29,7 @@ export async function ingestGitHubBlobs(params: {
 		documentLoader: githubLoader,
 		chunkStore,
 		documentKey: (metadata) => metadata.path,
+		documentVersion: (metadata) => metadata.fileSha,
 		metadataTransform: (metadata) => ({
 			repositoryIndexDbId,
 			commitSha: metadata.commitSha,
