@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@import "./styles/glassmorphic-button.css";
 
 @theme {
 	/* v2 theme */
@@ -87,9 +86,16 @@
 		0 0 0 1px rgba(255, 255, 255, 0.08);
 	--color-glassmorphic-border: var(--color-white);
 	--color-glassmorphic-highlight: var(--color-white);
-	--color-glassmorphic-outer-glow: #6b8ff002;
 
-	--color-glassmorphic-bg-gradient-from: rgba(255, 255, 255, 0.15);
-	--color-glassmorphic-bg-gradient-via: rgba(107, 143, 240, 0.1);
-	--color-glassmorphic-bg-gradient-to: rgba(107, 143, 240, 0.2);
+	--glassmorphic-bg-default: linear-gradient(
+		135deg,
+		rgba(255, 255, 255, 0.15) 0%,
+		rgba(107, 143, 240, 0.1) 50%,
+		rgba(107, 143, 240, 0.2) 100%
+	);
+	--glassmorphic-bg-hover: linear-gradient(
+		to top,
+		transparent,
+		rgba(255, 255, 255, 0.1)
+	);
 }
