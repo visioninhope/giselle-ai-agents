@@ -12,6 +12,8 @@ const nextConfig: NextConfig = {
 		"pino-pretty",
 		"unstorage",
 		"happy-dom",
+		"@supabase/supabase-js",
+		"@supabase/realtime-js",
 	],
 	images: {
 		remotePatterns: [
