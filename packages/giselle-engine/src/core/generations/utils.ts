@@ -198,13 +198,32 @@ async function buildGenerationMessageForTextGeneration(
 					contextNode.content,
 					fileResolver,
 				);
-				userMessage = userMessage.replace(
-					replaceKeyword,
-					getFilesDescription(attachedFiles.length, fileContents.length),
-				);
+				if (llmProvider === "openai") {
+					userMessage = userMessage.replace(
+						replaceKeyword,
+						fileContents
+							.map((fileContent) => {
+								if (fileContent.type !== "file") {
+									return null;
+								}
+								if (!(fileContent.data instanceof Uint8Array)) {
+									return null;
+								}
+								const text = new TextDecoder().decode(fileContent.data);
+								return `<WebPage name=${fileContent.filename}>${text}</WebPage>`;
+							})
+							.filter((data): data is string => data !== null)
+							.join(),
+					);
+				} else {
+					userMessage = userMessage.replace(
+						replaceKeyword,
+						getFilesDescription(attachedFiles.length, fileContents.length),
+					);
 
-				attachedFiles.push(...fileContents);
-				attachedFileNodeIds.push(contextNode.id);
+					attachedFiles.push(...fileContents);
+					attachedFileNodeIds.push(contextNode.id);
+				}
 				break;
 			}
 
