@@ -3,9 +3,9 @@ import type { ChunkStore } from "../chunk-store/types";
 import type { ChunkerFunction } from "../chunker/types";
 import type { DocumentLoader } from "../document-loader/types";
 import type { EmbedderFunction } from "../embedder/types";
-import { createIngestPipeline } from "./ingest-pipeline";
+import { createPipeline } from "./pipeline";
 
-describe("createIngestPipeline", () => {
+describe("createPipeline", () => {
 	let mockDocumentLoader: DocumentLoader<{ path: string }>;
 	let mockChunker: ChunkerFunction;
 	let mockEmbedder: EmbedderFunction;
@@ -13,10 +13,15 @@ describe("createIngestPipeline", () => {
 
 	beforeEach(() => {
 		mockDocumentLoader = {
-			// @ts-expect-error - this is a mock
-			*load() {
-				yield { content: "doc1", metadata: { path: "file1.txt" } };
-				yield { content: "doc2", metadata: { path: "file2.txt" } };
+			async *loadMetadata() {
+				yield await Promise.resolve({ path: "file1.txt" });
+				yield await Promise.resolve({ path: "file2.txt" });
+			},
+			async loadDocument(metadata) {
+				return await Promise.resolve({
+					content: `doc for ${metadata.path}`,
+					metadata,
+				});
 			},
 		};
 
@@ -34,16 +39,16 @@ describe("createIngestPipeline", () => {
 	});
 
 	it("should process documents through the pipeline", async () => {
-		const ingest = createIngestPipeline({
+		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
-			documentKey: (doc) => doc.metadata.path,
+			documentKey: (metadata) => metadata.path,
 			metadataTransform: (metadata) => metadata,
 		});
 
-		const result = await ingest({});
+		const result = await ingest();
 
 		expect(result.totalDocuments).toBe(2);
 		expect(result.successfulDocuments).toBe(2);
@@ -62,18 +67,18 @@ describe("createIngestPipeline", () => {
 				.mockResolvedValueOnce(undefined),
 		};
 
-		const ingest = createIngestPipeline({
+		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
 			chunkStore: failingChunkStore,
-			documentKey: (doc) => doc.metadata.path,
+			documentKey: (metadata) => metadata.path,
 			metadataTransform: (metadata) => metadata,
 			maxRetries: 2,
 			retryDelay: 10,
 		});
 
-		const result = await ingest({});
+		const result = await ingest();
 
 		expect(result.successfulDocuments).toBe(2);
 		expect(failingChunkStore.insert).toHaveBeenCalledTimes(3); // 1 fail + 1 success for first doc, 1 success for second doc
@@ -82,17 +87,17 @@ describe("createIngestPipeline", () => {
 	it("should call progress callback", async () => {
 		const onProgress = vi.fn();
 
-		const ingest = createIngestPipeline({
+		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
-			documentKey: (doc) => doc.metadata.path,
+			documentKey: (metadata) => metadata.path,
 			metadataTransform: (metadata) => metadata,
 			onProgress,
 		});
 
-		await ingest({});
+		await ingest();
 
 		expect(onProgress).toHaveBeenCalled();
 		const lastCall = onProgress.mock.calls[onProgress.mock.calls.length - 1][0];
@@ -100,17 +105,17 @@ describe("createIngestPipeline", () => {
 	});
 
 	it("should handle batch processing", async () => {
-		const ingest = createIngestPipeline({
+		const ingest = createPipeline({
 			documentLoader: mockDocumentLoader,
 			chunker: mockChunker,
 			embedder: mockEmbedder,
 			chunkStore: mockChunkStore,
-			documentKey: (doc) => doc.metadata.path,
+			documentKey: (metadata) => metadata.path,
 			metadataTransform: (metadata) => metadata,
 			maxBatchSize: 1,
 		});
 
-		await ingest({});
+		await ingest();
 
 		// With batch size 1 and 2 chunks per document, should call embedMany 4 times
 		expect(mockEmbedder.embedMany).toHaveBeenCalledTimes(4);
