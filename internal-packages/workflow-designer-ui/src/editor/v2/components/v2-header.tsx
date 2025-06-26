@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useCallback } from "react";
 import { GiselleLogo } from "../../../icons";
 import { EditableText } from "../../properties-panel/ui";
+import { RunButton } from "./run-button";
 
 export function V2Header() {
 	const { updateName, data } = useWorkflowDesigner();
@@ -33,12 +34,7 @@ export function V2Header() {
 					/>
 				</div>
 				<div className="flex items-center space-x-4">
-					<button
-						type="button"
-						className="px-4 py-2 text-sm font-medium text-white bg-blue-600 border border-transparent rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-					>
-						Run
-					</button>
+					<RunButton />
 				</div>
 			</div>
 		</header>
