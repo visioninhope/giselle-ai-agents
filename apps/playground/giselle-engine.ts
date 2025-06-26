@@ -8,6 +8,7 @@ import type {
 
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
+import { nodeVaultDriver } from "./lib/vault-driver";
 import supabaseStorageDriver from "./supabase-storage-driver";
 
 const isVercelEnvironment = process.env.VERCEL === "1";
@@ -135,4 +136,7 @@ export const giselleEngine = NextGiselleEngine({
 			}
 		},
 	},
+	vault: nodeVaultDriver({
+		secret: "secret",
+	}),
 });

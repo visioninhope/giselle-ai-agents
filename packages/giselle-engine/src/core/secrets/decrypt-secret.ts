@@ -14,7 +14,7 @@ export async function decryptSecret(args: {
 	}
 	const secret = Secret.parse(secretLike);
 
-	const decryptValue = await args.context.vault?.decrypt(secret.value);
+	const decryptValue = await args.context.vault.decrypt(secret.value);
 	if (!decryptValue) {
 		return undefined;
 	}

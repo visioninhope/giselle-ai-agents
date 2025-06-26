@@ -16,10 +16,10 @@ export default async function Layout({
 			featureFlag={{
 				githubVectorStore: true,
 				runV3: true,
-				sidemenu: true,
+				sidemenu: false,
 				githubTools: true,
 				webSearchAction: false,
-				layoutV2: true,
+				layoutV2: false,
 			}}
 		>
 			{children}
