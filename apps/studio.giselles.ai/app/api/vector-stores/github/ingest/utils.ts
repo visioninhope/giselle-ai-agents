@@ -25,6 +25,17 @@ export function buildOctokit(installationId: number) {
 	});
 }
 
+/**
+ * Fetch target GitHub repositories to ingest
+ *
+ * target repositories are:
+ * - idle
+ * - failed
+ * - running and updated more than 15 minutes ago (stale)
+ * - completed and updated more than 24 hours ago (outdated)
+ *
+ * @returns Target GitHub repositories to ingest
+ */
 export async function fetchTargetGitHubRepositories(): Promise<
 	TargetGitHubRepository[]
 > {
