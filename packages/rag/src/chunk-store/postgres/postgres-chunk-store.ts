@@ -192,7 +192,7 @@ export function createPostgresChunkStore<
 			);
 		} catch (error) {
 			throw DatabaseError.queryFailed(
-				`SELECT DISTINCT FROM ${tableName}`,
+				`SELECT DISTINCT ${columnMapping.documentKey}, ${columnMapping.version} FROM ${tableName}`,
 				error instanceof Error ? error : undefined,
 				{
 					operation: "getDocumentVersions",
