@@ -1,3 +1,12 @@
+import { Button } from "@giselle-internal/ui/button";
+import {
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogTitle,
+	DialogTrigger,
+} from "@giselle-internal/ui/dialog";
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
@@ -18,15 +27,6 @@ import {
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../../../lib/use-workspace-secrets";
 import { GitHubIcon } from "../../../tool";
-import { Button } from "./ui/button";
-import {
-	Dialog,
-	DialogContent,
-	DialogDescription,
-	DialogFooter,
-	DialogTitle,
-	DialogTrigger,
-} from "./ui/dialog";
 import { EmptyState } from "./ui/empty-state";
 import { Select } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
@@ -337,13 +337,14 @@ const ToolList = {
 					<form onSubmit={onSubmit}>
 						{children}
 						<DialogFooter>
-							<button
+							<Button
 								type="submit"
-								className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+								variant="solid"
 								disabled={submitting}
+								size="large"
 							>
 								{submitting ? "..." : "Save & Connect"}
-							</button>
+							</Button>
 						</DialogFooter>
 					</form>
 				</DialogContent>
