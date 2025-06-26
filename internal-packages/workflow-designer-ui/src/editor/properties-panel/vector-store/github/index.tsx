@@ -2,6 +2,7 @@ import type { VectorStoreNode } from "@giselle-sdk/data-type";
 import { useVectorStore, useWorkflowDesigner } from "giselle-sdk/react";
 import Link from "next/link";
 import { useMemo } from "react";
+import { TriangleAlert } from "../../../../icons";
 import {
 	Select,
 	SelectContent,
@@ -23,7 +24,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const settingPath = vectorStore?.settingPath;
 	const vectorStoreInfos = github ?? [];
 
-	const currentSelectedRepoId = useMemo(() => {
+	const { currentSelectedRepoId, isOrphaned } = useMemo(() => {
 		const sourceState = node.content.source.state;
 		if (sourceState.status === "configured") {
 			const foundInfo = vectorStoreInfos.find(
@@ -31,9 +32,12 @@ export function GitHubVectorStoreNodePropertiesPanel({
 					info.reference.owner === sourceState.owner &&
 					info.reference.repo === sourceState.repo,
 			);
-			return foundInfo?.id;
+			return {
+				currentSelectedRepoId: foundInfo?.id,
+				isOrphaned: !foundInfo,
+			};
 		}
-		return undefined;
+		return { currentSelectedRepoId: undefined, isOrphaned: false };
 	}, [node.content.source, vectorStoreInfos]);
 
 	const handleRepositoryChange = (selectedId: string) => {
@@ -61,6 +65,20 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				<p className="text-[14px] py-[1.5px] text-white-400">
 					GitHub Repository
 				</p>
+				{isOrphaned && node.content.source.state.status === "configured" && (
+					<div className="flex items-center gap-[6px] text-error-900 text-[13px] mb-[8px]">
+						<TriangleAlert className="size-[16px]" />
+						<span>
+							The repository{" "}
+							<span className="font-mono font-semibold">
+								{node.content.source.state.owner}/
+								{node.content.source.state.repo}
+							</span>{" "}
+							is no longer available in your vector stores. Please select a
+							different repository or set up this repository again.
+						</span>
+					</div>
+				)}
 				<Select
 					value={currentSelectedRepoId}
 					onValueChange={handleRepositoryChange}
