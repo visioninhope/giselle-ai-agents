@@ -38,26 +38,20 @@ export function mapMetadataToColumns<TMetadata extends Record<string, unknown>>(
 }
 
 /**
- * Build delete query with optional static context
+ * Build scope conditions for WHERE clause
  */
-export function buildDeleteQuery(
-	tableName: string,
-	documentKeyColumn: string,
+function buildScopeConditions(
 	scope: Record<string, unknown>,
-): { query: string; params: unknown[] } {
-	let query = `
-    DELETE FROM ${escapeIdentifier(tableName)}
-    WHERE ${escapeIdentifier(documentKeyColumn)} = $1
-  `;
-
-	const params: unknown[] = [];
-
-	for (const [key, value] of Object.entries(scope)) {
-		params.push(value);
-		query += ` AND ${escapeIdentifier(key)} = $${params.length + 1}`;
-	}
-
-	return { query, params };
+	startParamIndex = 1,
+): { conditions: string; values: unknown[] } {
+	const conditions = Object.entries(scope)
+		.map(
+			([key, _], index) =>
+				`${escapeIdentifier(key)} = $${startParamIndex + index}`,
+		)
+		.join(" AND ");
+	const values = Object.values(scope);
+	return { conditions, values };
 }
 
 /**
@@ -70,12 +64,19 @@ export async function deleteChunksByDocumentKey(
 	documentKeyColumn: string,
 	scope: Record<string, unknown>,
 ): Promise<void> {
-	const { query, params } = buildDeleteQuery(
-		tableName,
-		documentKeyColumn,
-		scope,
-	);
-	await client.query(query, [documentKey, ...params]);
+	const { conditions: scopeConditions, values: scopeValues } =
+		buildScopeConditions(scope, 2);
+
+	let query = `
+		DELETE FROM ${escapeIdentifier(tableName)}
+		WHERE ${escapeIdentifier(documentKeyColumn)} = $1
+	`;
+
+	if (scopeConditions) {
+		query += ` AND ${scopeConditions}`;
+	}
+
+	await client.query(query, [documentKey, ...scopeValues]);
 }
 
 /**
@@ -207,11 +208,10 @@ export async function deleteChunksByDocumentKeys(
 		return;
 	}
 
-	const scopeConditions = Object.entries(scope)
-		.map(([key, _], index) => `${escapeIdentifier(key)} = $${index + 1}`)
-		.join(" AND ");
+	const { conditions: scopeConditions, values: scopeValues } =
+		buildScopeConditions(scope);
 
-	const scopeValueCount = Object.keys(scope).length;
+	const scopeValueCount = scopeValues.length;
 	const documentKeyPlaceholders = documentKeys
 		.map((_, index) => `$${scopeValueCount + index + 1}`)
 		.join(", ");
@@ -222,7 +222,7 @@ export async function deleteChunksByDocumentKeys(
 			AND ${escapeIdentifier(documentKeyColumn)} IN (${documentKeyPlaceholders})
 	`;
 
-	const queryValues = [...Object.values(scope), ...documentKeys];
+	const queryValues = [...scopeValues, ...documentKeys];
 	await client.query(query, queryValues);
 }
 
@@ -241,11 +241,8 @@ export async function queryDocumentVersions(
 		version: string;
 	}>
 > {
-	const scopeConditions = Object.entries(scope)
-		.map(([key, _], index) => `${escapeIdentifier(key)} = $${index + 1}`)
-		.join(" AND ");
-
-	const scopeValues = Object.values(scope);
+	const { conditions: scopeConditions, values: scopeValues } =
+		buildScopeConditions(scope);
 
 	const query = `
 		SELECT DISTINCT
