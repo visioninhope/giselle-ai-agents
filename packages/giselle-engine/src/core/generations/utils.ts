@@ -198,13 +198,46 @@ async function buildGenerationMessageForTextGeneration(
 					contextNode.content,
 					fileResolver,
 				);
-				userMessage = userMessage.replace(
-					replaceKeyword,
-					getFilesDescription(attachedFiles.length, fileContents.length),
-				);
+				switch (llmProvider) {
+					case "anthropic":
+					case "openai":
+					case "perplexity":
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							fileContents
+								.map((fileContent) => {
+									if (fileContent.type !== "file") {
+										return null;
+									}
+									if (
+										!(
+											fileContent.data instanceof Uint8Array ||
+											fileContent.data instanceof ArrayBuffer
+										)
+									) {
+										return null;
+									}
+									const text = new TextDecoder().decode(fileContent.data);
+									return `<WebPage name=${fileContent.filename}>${text}</WebPage>`;
+								})
+								.filter((data): data is string => data !== null)
+								.join(),
+						);
+						break;
+					case "google":
+						userMessage = userMessage.replace(
+							replaceKeyword,
+							getFilesDescription(attachedFiles.length, fileContents.length),
+						);
 
-				attachedFiles.push(...fileContents);
-				attachedFileNodeIds.push(contextNode.id);
+						attachedFiles.push(...fileContents);
+						attachedFileNodeIds.push(contextNode.id);
+						break;
+					default: {
+						const _exhaustiveCheck: never = llmProvider;
+						throw new Error(`Unhandled type: ${_exhaustiveCheck}`);
+					}
+				}
 				break;
 			}
 
@@ -226,55 +259,18 @@ async function buildGenerationMessageForTextGeneration(
 			}
 		}
 	}
-
-	switch (llmProvider) {
-		case "openai": {
-			return [
+	return [
+		{
+			role: "user",
+			content: [
+				...attachedFiles,
 				{
-					role: "user",
-					content: [
-						...attachedFiles,
-						{
-							type: "text",
-							text: userMessage,
-						},
-					],
+					type: "text",
+					text: userMessage,
 				},
-			];
-		}
-		case "anthropic":
-		case "google": {
-			return [
-				{
-					role: "user",
-					content: [
-						...attachedFiles,
-						{
-							type: "text",
-							text: userMessage,
-						},
-					],
-				},
-			];
-		}
-		case "perplexity": {
-			return [
-				{
-					role: "user",
-					content: [
-						{
-							type: "text",
-							text: userMessage,
-						},
-					],
-				},
-			];
-		}
-		default: {
-			const _exhaustiveCheck: never = llmProvider;
-			throw new Error(`Unhandled provider: ${_exhaustiveCheck}`);
-		}
-	}
+			],
+		},
+	];
 }
 
 function getOrdinal(n: number): string {
