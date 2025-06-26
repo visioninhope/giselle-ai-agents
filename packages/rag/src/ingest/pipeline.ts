@@ -32,6 +32,7 @@ export interface IngestPipelineOptions<
 	maxBatchSize?: number;
 	maxRetries?: number;
 	retryDelay?: number;
+	parallelLimit?: number;
 	onProgress?: (progress: IngestProgress) => void;
 	onError?: (error: IngestError) => void;
 }
@@ -39,6 +40,7 @@ export interface IngestPipelineOptions<
 const DEFAULT_MAX_BATCH_SIZE = 100;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000;
+const DEFAULT_PARALLEL_LIMIT = 5;
 
 export type IngestFunction = () => Promise<IngestResult>;
 
@@ -61,6 +63,7 @@ export function createPipeline<
 		maxBatchSize = DEFAULT_MAX_BATCH_SIZE,
 		maxRetries = DEFAULT_MAX_RETRIES,
 		retryDelay = DEFAULT_RETRY_DELAY,
+		parallelLimit = DEFAULT_PARALLEL_LIMIT,
 		onProgress = () => {},
 		onError = () => {},
 	} = options;
@@ -138,6 +141,48 @@ export function createPipeline<
 			);
 			const versionTracker = createVersionTracker(existingVersions);
 
+			// Buffer for batch processing
+			const buffer: Array<{
+				metadata: TDocMetadata;
+				docKey: string;
+			}> = [];
+
+			// Process buffered documents
+			const processBuffer = async () => {
+				if (buffer.length === 0) return;
+
+				await Promise.all(
+					buffer.map(async ({ metadata, docKey }) => {
+						const document = await documentLoader.loadDocument(metadata);
+						if (!document) {
+							return;
+						}
+
+						result.totalDocuments++;
+						progress.currentDocument = docKey;
+
+						try {
+							await processDocument(document);
+							result.successfulDocuments++;
+						} catch (error) {
+							result.failedDocuments++;
+							result.errors.push({
+								document: docKey,
+								error:
+									error instanceof Error ? error : new Error(String(error)),
+							});
+						}
+
+						progress.processedDocuments++;
+						onProgress?.(progress);
+					}),
+				);
+
+				// Clear buffer after processing
+				buffer.length = 0;
+			};
+
+			// Process documents with buffering
 			for await (const metadata of documentLoader.loadMetadata()) {
 				let docKey: string;
 				let newVersion: string;
@@ -158,28 +203,16 @@ export function createPipeline<
 					continue;
 				}
 
-				const document = await documentLoader.loadDocument(metadata);
-				if (!document) {
-					continue;
+				buffer.push({ metadata, docKey });
+
+				// Process buffer when it reaches the limit
+				if (buffer.length >= parallelLimit) {
+					await processBuffer();
 				}
-
-				result.totalDocuments++;
-				progress.currentDocument = docKey;
-
-				try {
-					await processDocument(document);
-					result.successfulDocuments++;
-				} catch (error) {
-					result.failedDocuments++;
-					result.errors.push({
-						document: docKey,
-						error: error instanceof Error ? error : new Error(String(error)),
-					});
-				}
-
-				progress.processedDocuments++;
-				onProgress?.(progress);
 			}
+
+			// Process any remaining documents in buffer
+			await processBuffer();
 
 			// Handle orphaned documents
 			const orphanedKeys = versionTracker.getOrphaned();
