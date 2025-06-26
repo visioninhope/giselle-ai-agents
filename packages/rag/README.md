@@ -21,6 +21,8 @@ and pgvector.
 - **Retry logic** with exponential backoff
 - **Progress tracking** and error reporting
 - **Transaction safety** with automatic rollback
+- **Differential ingestion** with version tracking
+- **Orphaned document cleanup** for maintaining data consistency
 
 ## Installation
 
@@ -82,7 +84,7 @@ Process and store documents with automatic chunking and embedding.
 ```typescript
 import {
   createChunkStore,
-  createIngestPipeline,
+  createPipeline,
   type Document,
 } from "@giselle-sdk/rag";
 import { z } from "zod/v4";
@@ -134,10 +136,11 @@ const documentLoader = {
 const repositoryId = getRepositoryId();
 
 // Create ingest pipeline function
-const ingest = createIngestPipeline({
+const ingest = createPipeline({
   documentLoader,
   chunkStore,
   documentKey: (doc) => doc.metadata.filePath,
+  documentVersion: (doc) => doc.metadata.commitSha,
   metadataTransform: (documentMetadata) => ({
     repositoryId,
     filePath: documentMetadata.filePath,
@@ -150,7 +153,7 @@ const ingest = createIngestPipeline({
 });
 
 // Run ingestion
-const result = await ingest({});
+const result = await ingest();
 console.log(`Successfully processed ${result.successfulDocuments} documents`);
 ```
 
@@ -192,9 +195,10 @@ interface IngestResult {
 
 #### Factory Functions
 
-- `createIngestPipeline<TDocMetadata, TStore>(options)` - Creates a document
-  processing pipeline function with automatic chunking and embedding. The chunk
-  metadata type is inferred from the provided chunk store for type safety
+- `createPipeline<TDocMetadata, TStore>(options)` - Creates a document
+  processing pipeline function with automatic chunking, embedding, and differential
+  ingestion. The chunk metadata type is inferred from the provided chunk store for
+  type safety. Supports version tracking to only process changed documents
 - `createQueryService<TContext, TMetadata>(config)` - Creates a new query
   service
 - `createChunkStore<TMetadata>(config)` - Creates a new chunk store

@@ -7,6 +7,7 @@ const DEFAULT_REQUIRED_COLUMNS: RequiredColumns = {
 	chunkContent: "chunk_content",
 	chunkIndex: "chunk_index",
 	embedding: "embedding",
+	version: "version",
 } as const;
 
 function toSnakeCase(str: string): string {

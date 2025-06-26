@@ -1,6 +1,10 @@
-import { db, githubRepositoryIndex } from "@/drizzle";
+import {
+	type GitHubRepositoryIndexStatus,
+	db,
+	githubRepositoryIndex,
+} from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
-import { eq } from "drizzle-orm";
+import { and, eq, lt, or } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
 
 export function buildOctokit(installationId: number) {
@@ -21,9 +25,25 @@ export function buildOctokit(installationId: number) {
 	});
 }
 
+/**
+ * Fetch target GitHub repositories to ingest
+ *
+ * target repositories are:
+ * - idle
+ * - failed
+ * - running and updated more than 15 minutes ago (stale)
+ * - completed and updated more than 24 hours ago (outdated)
+ *
+ * @returns Target GitHub repositories to ingest
+ */
 export async function fetchTargetGitHubRepositories(): Promise<
 	TargetGitHubRepository[]
 > {
+	// To prevent the race condition, consider running status as stale if it hasn't been updated for 15 minutes (> 800 seconds)
+	const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
+	// To update repository which updated more than 24 hours ago
+	const outdatedThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
+
 	const records = await db
 		.select({
 			dbId: githubRepositoryIndex.dbId,
@@ -34,7 +54,20 @@ export async function fetchTargetGitHubRepositories(): Promise<
 			teamDbId: githubRepositoryIndex.teamDbId,
 		})
 		.from(githubRepositoryIndex)
-		.where(eq(githubRepositoryIndex.status, "idle"));
+		.where(
+			or(
+				eq(githubRepositoryIndex.status, "idle"),
+				eq(githubRepositoryIndex.status, "failed"),
+				and(
+					eq(githubRepositoryIndex.status, "running"),
+					lt(githubRepositoryIndex.updatedAt, staleThreshold),
+				),
+				and(
+					eq(githubRepositoryIndex.status, "completed"),
+					lt(githubRepositoryIndex.updatedAt, outdatedThreshold),
+				),
+			),
+		);
 
 	return records.map((record) => ({
 		dbId: record.dbId,
@@ -46,19 +79,36 @@ export async function fetchTargetGitHubRepositories(): Promise<
 	}));
 }
 
-/**
- * Update the ingestion status of a repository
- */
-export async function updateRepositoryStatus(
+export async function updateRepositoryStatusToRunning(dbId: number) {
+	await updateRepositoryStatus(dbId, "running");
+}
+
+export async function updateRepositoryStatusToCompleted(
 	dbId: number,
-	status: "idle" | "running" | "failed" | "completed",
+	commitSha: string,
+) {
+	await updateRepositoryStatus(dbId, "completed", commitSha);
+}
+
+export async function updateRepositoryStatusToFailed(dbId: number) {
+	await updateRepositoryStatus(dbId, "failed");
+}
+
+async function updateRepositoryStatus(
+	dbId: number,
+	status: Exclude<GitHubRepositoryIndexStatus, "idle">,
 	commitSha?: string,
 ): Promise<void> {
+	const updates: Partial<typeof githubRepositoryIndex.$inferInsert> = {
+		status,
+	};
+
+	if (commitSha != null) {
+		updates.lastIngestedCommitSha = commitSha;
+	}
+
 	await db
 		.update(githubRepositoryIndex)
-		.set({
-			status,
-			lastIngestedCommitSha: commitSha || null,
-		})
+		.set(updates)
 		.where(eq(githubRepositoryIndex.dbId, dbId));
 }

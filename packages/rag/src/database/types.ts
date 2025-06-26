@@ -33,6 +33,7 @@ export const REQUIRED_COLUMN_KEYS = [
 	"chunkContent",
 	"chunkIndex",
 	"embedding",
+	"version",
 ] as const;
 
 export type RequiredColumns = Record<

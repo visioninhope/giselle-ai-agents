@@ -44,6 +44,7 @@ export function createGitHubBlobChunkStore(repositoryIndexDbId: number) {
 		metadataSchema: githubChunkMetadataSchema,
 		requiredColumnOverrides: {
 			documentKey: "path",
+			version: "file_sha",
 		},
 	});
 
