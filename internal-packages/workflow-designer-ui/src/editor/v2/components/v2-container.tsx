@@ -13,7 +13,14 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useWorkflowDesigner } from "giselle-sdk/react";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+	type RefObject,
+	useCallback,
+	useEffect,
+	useMemo,
+	useRef,
+	useState,
+} from "react";
 import { Background } from "../../../ui/background";
 import { useToasts } from "../../../ui/toast";
 import { edgeTypes } from "../../connector";
@@ -261,14 +268,22 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 
 	const isPropertiesPanelOpen = selectedNodes.length === 1;
 
+	const mainRef = useRef<HTMLDivElement>(null);
+
 	return (
-		<main className="flex-1 bg-black-900 overflow-hidden">
-			<div className="relative h-full">
-				<LeftPanel value={leftPanel} />
+		<main
+			className="relative flex-1 bg-black-900 overflow-hidden"
+			ref={mainRef}
+		>
+			<div className="h-full">
+				<LeftPanel value={leftPanel} containerRef={mainRef} />
 				<V2NodeCanvas />
 
 				{/* Floating Properties Panel */}
-				<FloatingPropertiesPanel isOpen={isPropertiesPanelOpen}>
+				<FloatingPropertiesPanel
+					isOpen={isPropertiesPanelOpen}
+					container={mainRef.current}
+				>
 					<PropertiesPanel />
 				</FloatingPropertiesPanel>
 			</div>
@@ -277,7 +292,13 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 	);
 }
 
-function LeftPanel({ value }: { value: LeftPanelValue | null }) {
+function LeftPanel({
+	value,
+	containerRef,
+}: {
+	value: LeftPanelValue | null;
+	containerRef: RefObject<HTMLDivElement | null>;
+}) {
 	const content = useMemo(() => {
 		if (value === null) {
 			return null;
@@ -299,7 +320,11 @@ function LeftPanel({ value }: { value: LeftPanelValue | null }) {
 		return null;
 	}
 	return (
-		<FloatingPropertiesPanel isOpen position="left">
+		<FloatingPropertiesPanel
+			isOpen
+			position="left"
+			container={containerRef?.current}
+		>
 			{content}
 		</FloatingPropertiesPanel>
 	);
