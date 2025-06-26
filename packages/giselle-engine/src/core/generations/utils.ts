@@ -215,7 +215,6 @@ async function buildGenerationMessageForTextGeneration(
 											fileContent.data instanceof ArrayBuffer
 										)
 									) {
-										
 										return null;
 									}
 									const text = new TextDecoder().decode(fileContent.data);
