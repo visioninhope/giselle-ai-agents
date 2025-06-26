@@ -4,9 +4,9 @@ import {
 	isTriggerNode,
 	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { useVectorStore } from "giselle-sdk/react";
 import { CircleAlertIcon } from "lucide-react";
-import { type ReactElement, useMemo } from "react";
+import type { ReactElement } from "react";
+import { useGitHubVectorStoreStatus } from "../../lib/use-github-vector-store-status";
 import {
 	GitHubRepositoryBadge,
 	GitHubRepositoryBadgeFromRepo,
@@ -25,24 +25,8 @@ function RequiresSetupBadge(): ReactElement {
 }
 
 export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
-	const vectorStore = useVectorStore();
-	const github = vectorStore?.github;
-
-	const isOrphanedVectorNode = useMemo(() => {
-		if (
-			!isVectorStoreNode(node, "github") ||
-			node.content.source.state.status !== "configured"
-		) {
-			return false;
-		}
-
-		const { owner, repo } = node.content.source.state;
-		const vectorStoreInfos = github ?? [];
-		const exists = vectorStoreInfos.some(
-			(info) => info.reference.owner === owner && info.reference.repo === repo,
-		);
-		return !exists;
-	}, [node, github]);
+	const { isOrphaned: isVectorStoreOrphaned } =
+		useGitHubVectorStoreStatus(node);
 
 	if (isTriggerNode(node, "github")) {
 		return node.content.state.status === "configured" ? (
@@ -71,7 +55,7 @@ export function GitHubNodeInfo({ node }: { node: Node }): ReactElement | null {
 
 	if (isVectorStoreNode(node, "github")) {
 		return node.content.source.state.status === "configured" &&
-			!isOrphanedVectorNode ? (
+			!isVectorStoreOrphaned ? (
 			<div className="px-[16px] relative">
 				<GitHubRepositoryBadge
 					owner={node.content.source.state.owner}

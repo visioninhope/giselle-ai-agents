@@ -1,7 +1,6 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
 import { useVectorStore, useWorkflowDesigner } from "giselle-sdk/react";
 import Link from "next/link";
-import { useMemo } from "react";
 import { TriangleAlert } from "../../../../icons";
 import {
 	Select,
@@ -10,6 +9,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "../../../../ui/select";
+import { useGitHubVectorStoreStatus } from "../../../lib/use-github-vector-store-status";
 
 type GitHubVectorStoreNodePropertiesPanelProps = {
 	node: VectorStoreNode;
@@ -24,21 +24,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 	const settingPath = vectorStore?.settingPath;
 	const vectorStoreInfos = github ?? [];
 
-	const { currentSelectedRepoId, isOrphaned } = useMemo(() => {
-		const sourceState = node.content.source.state;
-		if (sourceState.status === "configured") {
-			const foundInfo = vectorStoreInfos.find(
-				(info) =>
-					info.reference.owner === sourceState.owner &&
-					info.reference.repo === sourceState.repo,
-			);
-			return {
-				currentSelectedRepoId: foundInfo?.id,
-				isOrphaned: !foundInfo,
-			};
-		}
-		return { currentSelectedRepoId: undefined, isOrphaned: false };
-	}, [node.content.source, vectorStoreInfos]);
+	const { isOrphaned, repositoryId } = useGitHubVectorStoreStatus(node);
 
 	const handleRepositoryChange = (selectedId: string) => {
 		const selectedInfo = vectorStoreInfos.find(
@@ -79,10 +65,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 						</span>
 					</div>
 				)}
-				<Select
-					value={currentSelectedRepoId}
-					onValueChange={handleRepositoryChange}
-				>
+				<Select value={repositoryId} onValueChange={handleRepositoryChange}>
 					<SelectTrigger className="w-full">
 						<SelectValue placeholder="Select a repository" />
 					</SelectTrigger>
