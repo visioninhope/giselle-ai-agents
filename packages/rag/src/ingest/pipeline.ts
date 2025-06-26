@@ -188,10 +188,8 @@ export function createPipeline<
 					await chunkStore.deleteBatch(orphanedKeys);
 					const deletedCount = orphanedKeys.length;
 
-					if (onProgress) {
-						progress.processedDocuments += deletedCount;
-						onProgress(progress);
-					}
+					progress.processedDocuments += deletedCount;
+					onProgress?.(progress);
 				} catch (error) {
 					result.errors.push({
 						document: `batch-delete: ${orphanedKeys.join(", ")}`,
