@@ -206,7 +206,6 @@ async function buildGenerationMessageForTextGeneration(
 							replaceKeyword,
 							fileContents
 								.map((fileContent) => {
-									console.log(fileContent);
 									if (fileContent.type !== "file") {
 										return null;
 									}
