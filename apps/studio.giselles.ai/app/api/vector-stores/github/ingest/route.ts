@@ -16,8 +16,8 @@ async function processRepository(targetGitHubRepository: {
 	owner: string;
 	repo: string;
 	installationId: number;
-	teamDbId: string;
-	dbId: string;
+	teamDbId: number;
+	dbId: number;
 }) {
 	const { owner, repo, installationId, teamDbId, dbId } =
 		targetGitHubRepository;
