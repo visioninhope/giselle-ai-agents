@@ -141,6 +141,6 @@ export const giselleEngine = NextGiselleEngine({
 		},
 	},
 	vault: nodeVaultDriver({
-		secret: "secret",
+		secret: process.env.VAULT_SECRET,
 	}),
 });
