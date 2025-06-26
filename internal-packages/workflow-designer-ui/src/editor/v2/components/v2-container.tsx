@@ -283,6 +283,7 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 				<FloatingPropertiesPanel
 					isOpen={isPropertiesPanelOpen}
 					container={mainRef.current}
+					title="Properties Panel"
 				>
 					<PropertiesPanel />
 				</FloatingPropertiesPanel>
@@ -324,6 +325,7 @@ function LeftPanel({
 			isOpen
 			position="left"
 			container={containerRef?.current}
+			title="Left Panel"
 		>
 			{content}
 		</FloatingPropertiesPanel>

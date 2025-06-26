@@ -14,6 +14,7 @@ interface FloatingPropertiesPanelProps {
 	maxWidth?: number;
 	position?: "right" | "left";
 	container?: React.ComponentProps<typeof Dialog.Portal>["container"];
+	title: string;
 }
 
 export function FloatingPropertiesPanel({
@@ -25,6 +26,7 @@ export function FloatingPropertiesPanel({
 	maxWidth = 800,
 	position = "right",
 	container,
+	title,
 }: FloatingPropertiesPanelProps) {
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
@@ -107,6 +109,7 @@ export function FloatingPropertiesPanel({
 						)}
 						style={{ width: `${width}px` }}
 					>
+						<Dialog.Title className="sr-only">{title}</Dialog.Title>
 						<div
 							ref={panelRef}
 							className={clsx(
