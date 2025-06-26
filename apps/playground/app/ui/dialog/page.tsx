@@ -31,7 +31,14 @@ export default function () {
 									<div>
 										<p>Contents</p>
 										<DialogFooter>
-											<Button type="button">Create</Button>
+											<div className="flex items-center gap-[6px]">
+												<Button type="button" variant="outline" size="large">
+													Cancel
+												</Button>
+												<Button type="button" variant="solid" size="large">
+													Create
+												</Button>
+											</div>
 										</DialogFooter>
 									</div>
 								</DialogContent>

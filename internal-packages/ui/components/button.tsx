@@ -1,6 +1,6 @@
 import clsx from "clsx/lite";
 
-type ButtonStyle = "subtle" | "filled" | "solid" | "glassmorphic";
+type ButtonStyle = "subtle" | "filled" | "solid" | "glass" | "outline";
 type ButtonSize = "compact" | "default" | "large";
 interface ButtonProps
 	extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, "style"> {
@@ -27,10 +27,11 @@ export function Button({
 				"data-[size=large]:px-4 data-[size=large]:py-2 data-[size=large]:rounded-lg",
 				"data-[style=subtle]:hover:bg-ghost-element-hover",
 				"data-[style=filled]:bg-background data-[style=filled]:border data-[style=filled]:border-border data-[style=filled]:hover:bg-ghost-element-hover",
-				"data-[style=solid]:bg-primary-900 data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-primary-800 data-[style=solid]:hover:bg-primary-800",
-				"data-[style=glassmorphic]:shadow-glassmorphic data-[style=glassmorphic]:backdrop-blur-md",
-				"data-[style=glassmorphic]:after:absolute data-[style=glassmorphic]:after:bg-linear-to-r data-[style=glassmorphic]:after:from-transparent data-[style=glassmorphic]:after:via-glassmorphic-highlight/60 data-[style=glassmorphic]:after:left-4 data-[style=glassmorphic]:after:right-4 data-[style=glassmorphic]:after:h-px data-[style=glassmorphic]:after:top-0",
-				"data-[style=glassmorphic]:border data-[style=glassmorphic]:border-glassmorphic-border/20",
+				"data-[style=solid]:bg-(image:--solid-button-bg) data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-button-solid-border data-[style=solid]:shadow-(--solid-button-shadow) data-[style=solid]:hover:bg-primary-800",
+				"data-[style=glass]:shadow-glass data-[style=glass]:backdrop-blur-md",
+				"data-[style=glass]:after:absolute data-[style=glass]:after:bg-linear-to-r data-[style=glass]:after:from-transparent data-[style=glass]:after:via-glass-highlight/60 data-[style=glass]:after:left-4 data-[style=glass]:after:right-4 data-[style=glass]:after:h-px data-[style=glass]:after:top-0",
+				"data-[style=glass]:border data-[style=glass]:border-glass-border/20",
+				"data-[style=outline]:border data-[style=outline]:border-t-border/60 data-[style=outline]:border-x-border/40 data-[style=outline]:border-b-black/60",
 				"cursor-pointer transition-colors",
 				className,
 			)}
@@ -38,10 +39,10 @@ export function Button({
 			data-size={size}
 			{...props}
 		>
-			{style === "glassmorphic" && (
+			{style === "glass" && (
 				<>
-					<div className="absolute inset-0 bg-(image:--glassmorphic-bg-default)" />
-					<div className="absolute inset-0 bg-(image:--glassmorphic-bg-hover) opacity-0 hover:opacity-100 transition-opacity" />
+					<div className="absolute inset-0 bg-(image:--glass-bg-default)" />
+					<div className="absolute inset-0 bg-(image:--glass-bg-hover) opacity-0 hover:opacity-100 transition-opacity" />
 				</>
 			)}
 			{leftIcon && <div className="*:size-[13px] *:text-text">{leftIcon}</div>}
