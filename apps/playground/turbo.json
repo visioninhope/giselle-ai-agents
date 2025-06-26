@@ -2,7 +2,12 @@
 	"extends": ["//"],
 	"tasks": {
 		"build": {
-			"env": ["*_API_KEY", "SUPABASE_*", "BLOB_READ_WRITE_TOKEN"],
+			"env": [
+				"*_API_KEY",
+				"SUPABASE_*",
+				"BLOB_READ_WRITE_TOKEN",
+				"VAULT_SECRET"
+			],
 			"inputs": [
 				"$TURBO_DEFAULT$",
 				".env.production.local",

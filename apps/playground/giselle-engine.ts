@@ -40,6 +40,10 @@ if (llmProviders.length === 0) {
 	throw new Error("No LLM providers configured");
 }
 
+if (process.env.VAULT_SECRET === undefined) {
+	throw new Error("VAULT_SECRET is not defined");
+}
+
 const integrationConfigs: GiselleIntegrationConfig = {};
 
 const githubAppId = process.env.GITHUB_APP_ID;
