@@ -11,7 +11,7 @@ import {
 export default function () {
 	return (
 		<>
-			<h2 className="text-text mb-6">Button</h2>
+			<h2 className="text-text mb-6">Dialog</h2>
 			<div className="space-y-8">
 				<div>
 					<p className="text-text mb-2 text-sm">Demo</p>
