@@ -32,10 +32,8 @@ export async function ingestGitHubBlobs(params: {
 		documentVersion: (metadata) => metadata.fileSha,
 		metadataTransform: (metadata) => ({
 			repositoryIndexDbId,
-			commitSha: metadata.commitSha,
 			fileSha: metadata.fileSha,
 			path: metadata.path,
-			nodeId: metadata.nodeId,
 		}),
 	});
 

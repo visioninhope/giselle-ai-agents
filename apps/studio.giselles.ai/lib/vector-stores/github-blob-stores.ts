@@ -20,10 +20,8 @@ import { z } from "zod/v4";
  */
 export const githubChunkMetadataSchema = z.object({
 	repositoryIndexDbId: z.number(),
-	commitSha: z.string(),
 	fileSha: z.string(),
 	path: z.string(),
-	nodeId: z.string(),
 });
 
 export type GitHubChunkMetadata = z.infer<typeof githubChunkMetadataSchema>;
@@ -116,10 +114,8 @@ async function resolveGitHubEmbeddingFilter(
 }
 
 const githubQueryMetadataSchema = z.object({
-	commitSha: z.string(),
 	fileSha: z.string(),
 	path: z.string(),
-	nodeId: z.string(),
 });
 
 /**
