@@ -25,7 +25,7 @@ export interface GiselleEngineContext {
 		waitForFlushFn?: () => Promise<unknown>;
 		metadata?: TelemetrySettings["metadata"];
 	};
-	vault?: Vault;
+	vault: Vault;
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};
@@ -99,7 +99,7 @@ export interface GiselleEngineConfig {
 		metadata?: TelemetrySettings["metadata"];
 	};
 	fetchUsageLimitsFn?: FetchUsageLimitsFn;
-	vault?: Vault;
+	vault: Vault;
 	vectorStoreQueryServices?: {
 		github?: GitHubVectorStoreQueryService<Record<string, unknown>>;
 	};

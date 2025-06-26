@@ -8,6 +8,7 @@ import type {
 
 import { createStorage } from "unstorage";
 import fsDriver from "unstorage/drivers/fs";
+import { nodeVaultDriver } from "./lib/vault-driver";
 import supabaseStorageDriver from "./supabase-storage-driver";
 
 const isVercelEnvironment = process.env.VERCEL === "1";
@@ -37,6 +38,10 @@ if (process.env.GOOGLE_GENERATIVE_AI_API_KEY) {
 
 if (llmProviders.length === 0) {
 	throw new Error("No LLM providers configured");
+}
+
+if (process.env.VAULT_SECRET === undefined) {
+	throw new Error("VAULT_SECRET is not defined");
 }
 
 const integrationConfigs: GiselleIntegrationConfig = {};
@@ -135,4 +140,7 @@ export const giselleEngine = NextGiselleEngine({
 			}
 		},
 	},
+	vault: nodeVaultDriver({
+		secret: process.env.VAULT_SECRET,
+	}),
 });

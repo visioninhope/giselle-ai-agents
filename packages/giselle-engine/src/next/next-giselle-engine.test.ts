@@ -39,6 +39,16 @@ describe("createHttpHandler", () => {
 			config: {
 				basePath,
 				storage: memoryStorage,
+				vault: {
+					// biome-ignore lint/suspicious/useAwait: decryption is synchronous
+					async encrypt() {
+						return "fake";
+					},
+					// biome-ignore lint/suspicious/useAwait: decryption is synchronous
+					async decrypt() {
+						return "fake";
+					},
+				},
 			},
 		});
 	});
