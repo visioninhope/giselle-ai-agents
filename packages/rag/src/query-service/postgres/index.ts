@@ -4,10 +4,11 @@ import type { z } from "zod/v4";
 import { createColumnMapping } from "../../database";
 import { PoolManager } from "../../database/postgres";
 import { ensurePgVectorTypes } from "../../database/postgres/pgvector-registry";
-import type {
-	ColumnMapping,
-	DatabaseConfig,
-	RequiredColumns,
+import {
+	type ColumnMapping,
+	type DatabaseConfig,
+	REQUIRED_COLUMN_KEYS,
+	type RequiredColumns,
 } from "../../database/types";
 import type { EmbedderFunction } from "../../embedder";
 import { createDefaultEmbedder } from "../../embedder";
@@ -177,11 +178,9 @@ export function createPostgresQueryService<
 				paramIndex++;
 			}
 
+			const requiredKeys = new Set<string>(REQUIRED_COLUMN_KEYS);
 			const metadataColumns = Object.entries(columnMapping)
-				.filter(
-					([key]) =>
-						!["documentKey", "content", "index", "embedding"].includes(key),
-				)
+				.filter(([key]) => !requiredKeys.has(key))
 				.map(([metadataKey, dbColumn]) => {
 					if (typeof dbColumn !== "string") {
 						throw ConfigurationError.invalidValue(
