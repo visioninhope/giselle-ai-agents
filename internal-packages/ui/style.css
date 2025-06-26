@@ -84,6 +84,12 @@
 		rgba(255, 255, 255, 0.4),
 		transparent
 	);
+	--glass-bg: linear-gradient(
+		135deg,
+		rgba(150, 150, 150, 0.03) 0%,
+		rgba(60, 90, 160, 0.12) 100%
+	);
+
 	/* glass button */
 	--shadow-glass:
 		0 8px 20px rgba(107, 143, 240, 0.2),
@@ -94,23 +100,16 @@
 	--color-glass-border: var(--color-white);
 	--color-glass-highlight: var(--color-white);
 
-	--glass-bg-default: linear-gradient(
+	--glass-button-bg: linear-gradient(
 		135deg,
 		rgba(255, 255, 255, 0.15) 0%,
 		rgba(107, 143, 240, 0.1) 50%,
 		rgba(107, 143, 240, 0.2) 100%
 	);
-	--glass-bg-hover: linear-gradient(
+	--glass-button-bg-hover: linear-gradient(
 		to top,
 		transparent,
 		rgba(255, 255, 255, 0.1)
-	);
-
-	/* glass dialog */
-	--glass-dialog-bg: linear-gradient(
-		135deg,
-		rgba(150, 150, 150, 0.03) 0%,
-		rgba(60, 90, 160, 0.12) 100%
 	);
 
 	/* solid button */
