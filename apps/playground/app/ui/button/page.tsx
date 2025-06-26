@@ -13,6 +13,7 @@ export default function () {
 							<Button variant="filled">Filled</Button>
 							<Button variant="solid">Solid</Button>
 							<Button variant="glass">Glass</Button>
+							<Button variant="outline">Outline</Button>
 						</div>
 					</div>
 				</div>

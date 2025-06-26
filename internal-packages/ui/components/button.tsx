@@ -31,6 +31,7 @@ export function Button({
 				"data-[style=glass]:shadow-glass data-[style=glass]:backdrop-blur-md",
 				"data-[style=glass]:after:absolute data-[style=glass]:after:bg-linear-to-r data-[style=glass]:after:from-transparent data-[style=glass]:after:via-glass-highlight/60 data-[style=glass]:after:left-4 data-[style=glass]:after:right-4 data-[style=glass]:after:h-px data-[style=glass]:after:top-0",
 				"data-[style=glass]:border data-[style=glass]:border-glass-border/20",
+				"data-[style=outline]:border data-[style=outline]:border-t-border/60 data-[style=outline]:border-x-border/40 data-[style=outline]:border-b-black/60",
 				"cursor-pointer transition-colors",
 				className,
 			)}
