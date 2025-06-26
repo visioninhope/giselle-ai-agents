@@ -1,11 +1,10 @@
 import type { ChunkStore } from "../chunk-store/types";
 import { createDefaultChunker } from "../chunker";
 import type { ChunkerFunction } from "../chunker/types";
-import type { DocumentLoader } from "../document-loader/types";
-import type { Document } from "../document-loader/types";
+import type { Document, DocumentLoader } from "../document-loader/types";
 import { createDefaultEmbedder } from "../embedder";
 import type { EmbedderFunction } from "../embedder/types";
-import { OperationError } from "../errors";
+import { ConfigurationError, OperationError } from "../errors";
 import { embedContent } from "./embedder";
 import { retryOperation } from "./retry";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
@@ -58,7 +57,7 @@ export function createPipeline<
 		documentVersion,
 		metadataTransform,
 		chunker = createDefaultChunker(),
-		embedder = createDefaultEmbedder(),
+		embedder,
 		maxBatchSize = DEFAULT_MAX_BATCH_SIZE,
 		maxRetries = DEFAULT_MAX_RETRIES,
 		retryDelay = DEFAULT_RETRY_DELAY,
@@ -66,21 +65,42 @@ export function createPipeline<
 		onError = () => {},
 	} = options;
 
+	let resolvedEmbedder = embedder;
+	if (resolvedEmbedder == null) {
+		try {
+			resolvedEmbedder = createDefaultEmbedder();
+		} catch (error) {
+			throw ConfigurationError.missingField("OPENAI_API_KEY", {
+				cause: error instanceof Error ? error.message : String(error),
+			});
+		}
+	}
+
 	/**
 	 * Process a single document
 	 */
 	async function processDocument(
 		document: Document<TDocMetadata>,
 	): Promise<void> {
-		const docKey = documentKey(document.metadata);
-		const targetMetadata = metadataTransform(document.metadata);
+		let docKey: string;
+		let targetMetadata: InferChunkMetadata<TStore>;
+		try {
+			docKey = documentKey(document.metadata);
+			targetMetadata = metadataTransform(document.metadata);
+		} catch (error) {
+			throw OperationError.invalidOperation(
+				"processDocument",
+				"Failed to process document metadata",
+				{ cause: error instanceof Error ? error.message : String(error) },
+			);
+		}
 
 		await retryOperation(
 			async () => {
 				const chunks = await embedContent(
 					document.content,
 					chunker,
-					embedder,
+					resolvedEmbedder as EmbedderFunction,
 					maxBatchSize,
 				);
 				await chunkStore.insert(docKey, chunks, targetMetadata);
@@ -118,10 +138,20 @@ export function createPipeline<
 			);
 			const versionTracker = createVersionTracker(existingVersions);
 
-			// Process all documents
 			for await (const metadata of documentLoader.loadMetadata()) {
-				const docKey = documentKey(metadata);
-				const newVersion = documentVersion(metadata);
+				let docKey: string;
+				let newVersion: string;
+				try {
+					docKey = documentKey(metadata);
+					newVersion = documentVersion(metadata);
+				} catch (error) {
+					result.failedDocuments++;
+					result.errors.push({
+						document: "<unknown>",
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
+					continue;
+				}
 				versionTracker.trackSeen(docKey);
 
 				if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
