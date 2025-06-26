@@ -26,9 +26,12 @@ export function DialogContent({ children }: PropsWithChildren) {
 	);
 }
 
-export function DialogTitle({ children }: PropsWithChildren) {
+export function DialogTitle({
+	children,
+	className,
+}: PropsWithChildren<{ className?: string }>) {
 	return (
-		<DialogPrimitive.Title className="text-[14px]">
+		<DialogPrimitive.Title className={clsx("text-[14px]", className)}>
 			{children}
 		</DialogPrimitive.Title>
 	);

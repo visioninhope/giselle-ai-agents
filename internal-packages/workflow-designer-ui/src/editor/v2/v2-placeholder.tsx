@@ -34,7 +34,7 @@ export function V2Placeholder({
 	);
 
 	return (
-		<div className="flex-1 overflow-hidden font-sans pl-[16px] flex flex-col">
+		<div className="flex-1 overflow-hidden font-sans flex flex-col">
 			{showReadOnlyBanner && isReadOnly && (
 				<ReadOnlyBanner
 					onDismiss={handleDismissBanner}
