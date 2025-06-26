@@ -118,6 +118,28 @@ export function createPipeline<
 	}
 
 	/**
+	 * Create batches from an async iterable
+	 */
+	async function* createBatches<T>(
+		items: AsyncIterable<T>,
+		batchSize: number,
+	): AsyncGenerator<T[]> {
+		const batch: T[] = [];
+
+		for await (const item of items) {
+			batch.push(item);
+			if (batch.length >= batchSize) {
+				yield [...batch];
+				batch.length = 0;
+			}
+		}
+
+		if (batch.length > 0) {
+			yield batch;
+		}
+	}
+
+	/**
 	 * The main ingest function
 	 */
 	return async function ingest(): Promise<IngestResult> {
@@ -141,18 +163,45 @@ export function createPipeline<
 			);
 			const versionTracker = createVersionTracker(existingVersions);
 
-			// Buffer for batch processing
-			const buffer: Array<{
+			/**
+			 * Filter and prepare documents for processing
+			 */
+			async function* prepareDocuments(): AsyncGenerator<{
 				metadata: TDocMetadata;
 				docKey: string;
-			}> = [];
+			}> {
+				for await (const metadata of documentLoader.loadMetadata()) {
+					let docKey: string;
+					let newVersion: string;
+					try {
+						docKey = documentKey(metadata);
+						newVersion = documentVersion(metadata);
+					} catch (error) {
+						result.failedDocuments++;
+						result.errors.push({
+							document: "<unknown>",
+							error: error instanceof Error ? error : new Error(String(error)),
+						});
+						continue;
+					}
+					versionTracker.trackSeen(docKey);
 
-			// Process buffered documents
-			const processBuffer = async () => {
-				if (buffer.length === 0) return;
+					if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
+						continue;
+					}
 
+					yield { metadata, docKey };
+				}
+			}
+
+			/**
+			 * Process a batch of documents
+			 */
+			async function processBatch(
+				batch: Array<{ metadata: TDocMetadata; docKey: string }>,
+			): Promise<void> {
 				await Promise.all(
-					buffer.map(async ({ metadata, docKey }) => {
+					batch.map(async ({ metadata, docKey }) => {
 						const document = await documentLoader.loadDocument(metadata);
 						if (!document) {
 							return;
@@ -177,42 +226,16 @@ export function createPipeline<
 						onProgress?.(progress);
 					}),
 				);
-
-				// Clear buffer after processing
-				buffer.length = 0;
-			};
-
-			// Process documents with buffering
-			for await (const metadata of documentLoader.loadMetadata()) {
-				let docKey: string;
-				let newVersion: string;
-				try {
-					docKey = documentKey(metadata);
-					newVersion = documentVersion(metadata);
-				} catch (error) {
-					result.failedDocuments++;
-					result.errors.push({
-						document: "<unknown>",
-						error: error instanceof Error ? error : new Error(String(error)),
-					});
-					continue;
-				}
-				versionTracker.trackSeen(docKey);
-
-				if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
-					continue;
-				}
-
-				buffer.push({ metadata, docKey });
-
-				// Process buffer when it reaches the limit
-				if (buffer.length >= parallelLimit) {
-					await processBuffer();
-				}
 			}
 
-			// Process any remaining documents in buffer
-			await processBuffer();
+			// Process documents in batches
+			const documentsToProcess = prepareDocuments();
+			for await (const batch of createBatches(
+				documentsToProcess,
+				parallelLimit,
+			)) {
+				await processBatch(batch);
+			}
 
 			// Handle orphaned documents
 			const orphanedKeys = versionTracker.getOrphaned();
