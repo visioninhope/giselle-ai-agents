@@ -39,7 +39,7 @@ type RepositoryRegistrationDialogProps = {
 		owner: string,
 		repo: string,
 		installationId: number,
-	) => Promise<void>;
+	) => Promise<{ success: true } | { success: false; error: string }>;
 };
 
 export function RepositoryRegistrationDialog({
@@ -71,28 +71,31 @@ export function RepositoryRegistrationDialog({
 		}
 
 		startTransition(async () => {
-			try {
-				const owner = installationsWithRepos.find(
-					(i) => String(i.installation.id) === ownerId,
-				)?.installation.name;
-				if (!owner) {
-					setError("Owner not found");
-					return;
-				}
-				const repo = repositoryOptions.find(
-					(r) => String(r.id) === repositoryId,
-				)?.name;
-				if (!repo) {
-					setError("Repository not found");
-					return;
-				}
-				await registerRepositoryIndexAction(owner, repo, Number(ownerId));
+			const owner = installationsWithRepos.find(
+				(i) => String(i.installation.id) === ownerId,
+			)?.installation.name;
+			if (!owner) {
+				setError("Owner not found");
+				return;
+			}
+			const repo = repositoryOptions.find(
+				(r) => String(r.id) === repositoryId,
+			)?.name;
+			if (!repo) {
+				setError("Repository not found");
+				return;
+			}
+			const result = await registerRepositoryIndexAction(
+				owner,
+				repo,
+				Number(ownerId),
+			);
+			if (result.success) {
 				setIsOpen(false);
 				setOwnerId("");
 				setRepositoryId("");
-			} catch (error) {
-				setError("An error occurred");
-				console.error(error);
+			} else {
+				setError(result.error);
 			}
 		});
 	};
