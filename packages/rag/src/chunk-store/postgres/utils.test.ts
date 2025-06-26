@@ -1,9 +1,5 @@
 import { describe, expect, it } from "vitest";
-import {
-	buildDeleteQuery,
-	mapMetadataToColumns,
-	prepareChunkRecords,
-} from "./utils";
+import { mapMetadataToColumns, prepareChunkRecords } from "./utils";
 
 describe("chunk-store/postgres/utils", () => {
 	describe("mapMetadataToColumns", () => {
@@ -55,27 +51,6 @@ describe("chunk-store/postgres/utils", () => {
 			});
 			expect(result.doc_key).toBeUndefined();
 			expect(result.content).toBeUndefined();
-		});
-	});
-
-	describe("buildDeleteQuery", () => {
-		it("should build basic delete query without scope", () => {
-			const { query, params } = buildDeleteQuery("test_table", "doc_key", {});
-
-			expect(query).toContain('DELETE FROM "test_table"');
-			expect(query).toContain('WHERE "doc_key" = $1');
-			expect(params).toEqual([]);
-		});
-
-		it("should build delete query with scope", () => {
-			const { query, params } = buildDeleteQuery("test_table", "doc_key", {
-				team_id: 123,
-			});
-
-			expect(query).toContain('DELETE FROM "test_table"');
-			expect(query).toContain('WHERE "doc_key" = $1');
-			expect(query).toContain('AND "team_id" = $2');
-			expect(params).toEqual([123]);
 		});
 	});
 
