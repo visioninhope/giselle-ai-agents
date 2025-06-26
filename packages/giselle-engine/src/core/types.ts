@@ -72,10 +72,8 @@ export type FetchUsageLimitsFn = (
 ) => Promise<UsageLimits>;
 
 export type GithubEmbeddingMetadata = {
-	commitSha: string;
 	fileSha: string;
 	path: string;
-	nodeId: string;
 };
 
 // GitHub Query Context for rag integration
