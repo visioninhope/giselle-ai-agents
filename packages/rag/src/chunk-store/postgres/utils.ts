@@ -208,10 +208,7 @@ export async function deleteChunksByDocumentKeys(
 	}
 
 	const scopeConditions = Object.entries(scope)
-		.map(
-			(_, index) =>
-				`${escapeIdentifier(Object.keys(scope)[index])} = $${index + 1}`,
-		)
+		.map(([key, _], index) => `${escapeIdentifier(key)} = $${index + 1}`)
 		.join(" AND ");
 
 	const scopeValueCount = Object.keys(scope).length;
