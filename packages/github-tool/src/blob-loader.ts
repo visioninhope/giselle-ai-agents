@@ -4,10 +4,8 @@ import type { Octokit } from "@octokit/core";
 type GitHubBlobMetadata = {
 	owner: string;
 	repo: string;
-	commitSha: string;
 	fileSha: string;
 	path: string;
-	nodeId: string;
 };
 
 type GitHubBlobLoaderParams = {
@@ -48,13 +46,8 @@ export function createGitHubBlobLoader(
 			yield {
 				owner,
 				repo,
-				commitSha,
 				fileSha,
 				path,
-				// TODO: We can consider removing this from metadata.
-				// - nodeId is not used for now and
-				// - Tree API doesn't have nodeId.
-				nodeId: "",
 			};
 		}
 	};
@@ -140,10 +133,8 @@ async function loadBlob(
 			metadata: {
 				owner,
 				repo,
-				commitSha,
 				fileSha,
 				path,
-				nodeId: blobData.node_id,
 			},
 		};
 	} catch (error: unknown) {
