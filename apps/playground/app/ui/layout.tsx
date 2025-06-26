@@ -9,6 +9,10 @@ const components = [
 		id: "dialog",
 		name: "Dialog",
 	},
+	{
+		id: "select",
+		name: "Select",
+	},
 ];
 export default function ({
 	children,

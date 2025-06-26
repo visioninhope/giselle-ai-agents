@@ -41,8 +41,8 @@ export function Button({
 		>
 			{style === "glass" && (
 				<>
-					<div className="absolute inset-0 bg-(image:--glass-bg-default)" />
-					<div className="absolute inset-0 bg-(image:--glass-bg-hover) opacity-0 hover:opacity-100 transition-opacity" />
+					<div className="absolute inset-0 bg-(image:--glass-button-bg)" />
+					<div className="absolute inset-0 bg-(image:--glass-button-bg-hover) opacity-0 hover:opacity-100 transition-opacity" />
 				</>
 			)}
 			{leftIcon && <div className="*:size-[13px] *:text-text">{leftIcon}</div>}

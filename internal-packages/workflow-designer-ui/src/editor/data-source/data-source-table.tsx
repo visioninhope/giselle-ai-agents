@@ -124,13 +124,14 @@ export function DataSourceTable() {
 									{provider === "github" && <GitHubConnectFieldsets />}
 								</div>
 								<DialogFooter>
-									<button
+									<Button
 										type="submit"
-										className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+										variant="solid"
+										size="large"
 										disabled={isPending}
 									>
 										{isPending ? "..." : "Create"}
-									</button>
+									</Button>
 								</DialogFooter>
 							</form>
 						</DialogContent>
@@ -201,13 +202,14 @@ export function DataSourceTable() {
 								</fieldset>
 							</div>
 							<DialogFooter>
-								<button
+								<Button
 									type="submit"
-									className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
 									disabled={isPending}
+									variant="solid"
+									size="large"
 								>
 									{isPending ? "..." : "Create"}
-								</button>
+								</Button>
 							</DialogFooter>
 						</form>
 					</DialogContent>

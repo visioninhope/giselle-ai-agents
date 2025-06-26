@@ -66,7 +66,7 @@ export function Select<T extends Identifiable>({
 									}
 									className={clsx(
 										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-										"rounded-[2px] px-[6px] py-[2px] text-[14px]",
+										"rounded-[4px] px-[8px] py-[6px] text-[14px]",
 										"flex items-center justify-between gap-[4px]",
 									)}
 								>
