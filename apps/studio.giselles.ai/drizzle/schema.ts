@@ -313,10 +313,8 @@ export const githubRepositoryEmbeddings = pgTable(
 		repositoryIndexDbId: integer("repository_index_db_id")
 			.notNull()
 			.references(() => githubRepositoryIndex.dbId, { onDelete: "cascade" }),
-		commitSha: text("commit_sha").notNull(),
 		fileSha: text("file_sha").notNull(),
 		path: text("path").notNull(),
-		nodeId: text("node_id").notNull(),
 		embedding: vector("embedding", { dimensions: 1536 }).notNull(),
 		chunkContent: text("chunk_content").notNull(),
 		chunkIndex: integer("chunk_index").notNull(),
