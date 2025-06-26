@@ -190,13 +190,9 @@ export function TextGenerationNodePropertiesPanel({
 						</Panel>
 					</PanelGroup>
 				) : (
-					<ResizableSectionGroup>
-						<ResizableSection
-							title="Configuration"
-							defaultSize={70}
-							minSize={30}
-						>
-							<div className="p-4">
+					<PanelGroup direction="vertical" className="flex-1 flex flex-col">
+						<Panel>
+							<PropertiesPanelContent>
 								<TextGenerationTabContent
 									node={node}
 									uiState={uiState}
@@ -208,18 +204,18 @@ export function TextGenerationNodePropertiesPanel({
 									githubTools={githubTools}
 									sidemenu={sidemenu}
 								/>
-							</div>
-						</ResizableSection>
+							</PropertiesPanelContent>
+						</Panel>
 						<ResizableSectionHandle />
-						<ResizableSection title="Generation" defaultSize={30}>
-							<div className="p-4">
+						<Panel>
+							<PropertiesPanelContent>
 								<GenerationPanel
 									node={node}
 									onClickGenerateButton={generateText}
 								/>
-							</div>
-						</ResizableSection>
-					</ResizableSectionGroup>
+							</PropertiesPanelContent>
+						</Panel>
+					</PanelGroup>
 				)}
 			</PropertiesPanelContent>
 			<KeyboardShortcuts
