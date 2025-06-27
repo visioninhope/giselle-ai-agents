@@ -1,9 +1,7 @@
-import type { Dialog } from "@giselle-internal/ui/dialog";
-import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { CheckIcon } from "lucide-react";
-import type { ComponentProps, PropsWithChildren, ReactNode } from "react";
-import { z } from "zod/v4";
+import type { PropsWithChildren, ReactNode } from "react";
 import { GitHubIcon } from "../../../tool";
 import { GitHubToolConfigurationDialog } from "./tool-provider/github";
 
