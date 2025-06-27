@@ -250,9 +250,9 @@ export function FilePanel({ node, config }: FilePanelProps) {
 
 	const getContentClasses = () => {
 		if (sidemenu) {
-			return "px-[16px] divide-y divide-black-50";
+			return "px-[16px]";
 		}
-		return "pl-0 pr-[16px] divide-y divide-black-50";
+		return "pl-0 pr-[16px]";
 	};
 
 	return (
@@ -263,14 +263,19 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		>
 			<div className={getContentClasses()}>
 				{node.content.files.length > 0 && (
-					<div className="pb-[16px] flex flex-col gap-[8px]">
-						{node.content.files.map((file) => (
-							<FileListItem
-								key={file.id}
-								fileData={file}
-								onRemove={removeFile}
-							/>
-						))}
+					<div className="pb-[16px]">
+						<h3 className="text-[14px] font-semibold text-white-800 mb-[8px]">
+							Added Files
+						</h3>
+						<div className="flex flex-col gap-[8px]">
+							{node.content.files.map((file) => (
+								<FileListItem
+									key={file.id}
+									fileData={file}
+									onRemove={removeFile}
+								/>
+							))}
+						</div>
 					</div>
 				)}
 				<div className="py-[16px]">

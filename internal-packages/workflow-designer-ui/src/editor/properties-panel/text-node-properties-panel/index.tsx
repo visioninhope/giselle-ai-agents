@@ -31,7 +31,7 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 							<TextEditor
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
-								placeholder="Write your text here..."
+								placeholder="Write your text"
 							/>
 						</ResizableSection>
 					</ResizableSectionGroup>
@@ -41,7 +41,7 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 							<TextEditor
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
-								placeholder="Write your text here..."
+								placeholder="Write your text"
 							/>
 						</ResizableSection>
 					</ResizableSectionGroup>
