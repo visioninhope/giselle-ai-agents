@@ -27,22 +27,22 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 			<PropertiesPanelContent>
 				{layoutV2 ? (
 					<ResizableSectionGroup>
-						<ResizableSection title="Content" defaultSize={100}>
-							<div className="p-4">
-								<TextEditor
-									value={node.content.text}
-									onValueChange={(text) =>
-										updateNodeDataContent(node, { text })
-									}
-								/>
-							</div>
+						<ResizableSection defaultSize={100}>
+							<TextEditor
+								value={node.content.text}
+								onValueChange={(text) => updateNodeDataContent(node, { text })}
+							/>
 						</ResizableSection>
 					</ResizableSectionGroup>
 				) : (
-					<TextEditor
-						value={node.content.text}
-						onValueChange={(text) => updateNodeDataContent(node, { text })}
-					/>
+					<ResizableSectionGroup>
+						<ResizableSection defaultSize={100}>
+							<TextEditor
+								value={node.content.text}
+								onValueChange={(text) => updateNodeDataContent(node, { text })}
+							/>
+						</ResizableSection>
+					</ResizableSectionGroup>
 				)}
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
