@@ -6,12 +6,10 @@ import { ChevronDownIcon } from "lucide-react";
 import { useRef } from "react";
 import { GiselleIcon } from "../../../icons";
 import {
-	Select,
-	SelectContent,
-	SelectItem,
-	SelectTrigger,
-	SelectValue,
-} from "../../../ui/select";
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuTrigger,
+} from "../../../ui/dropdown-menu";
 import { EditableText, type EditableTextRef } from "../../properties-panel/ui";
 import { RunButton } from "./run-button";
 
@@ -27,8 +25,8 @@ export function V2Header({ teamName }: { teamName?: string }) {
 	return (
 		<div
 			className={clsx(
-				"relative h-[56px] flex items-center justify-between",
-				"pl-[16px] pr-[16px] gap-[8px]",
+				"relative h-[48px] flex items-center justify-between",
+				"pl-[8px] pr-[8px] gap-[8px]",
 				"border-b border-black-600",
 				"shrink-0",
 			)}
@@ -64,35 +62,33 @@ export function V2Header({ teamName }: { teamName?: string }) {
 						/>
 					</div>
 					{/* dropdown menu */}
-					<Select
-						onValueChange={(value) => {
-							switch (value) {
-								case "rename":
-									editableTextRef.current?.triggerEdit();
-									break;
-								case "duplicate":
-									console.debug("Duplicate app – not yet implemented");
-									break;
-								case "delete":
-									console.debug("Delete app – not yet implemented");
-									break;
-							}
-						}}
-					>
-						<SelectTrigger className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent">
+					<DropdownMenu>
+						<DropdownMenuTrigger className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none">
 							<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
-						</SelectTrigger>
-						<SelectContent
-							className="min-w-[165px] bg-black-900 text-white-900 border-[0.25px] border-white/10 rounded-[8px] p-1"
-							sideOffset={12}
-							align="start"
-						>
-							<SelectItem value="rename">Rename</SelectItem>
-							<SelectItem value="duplicate">Duplicate</SelectItem>
-							<SelectItem
-								value="template"
+						</DropdownMenuTrigger>
+						<DropdownMenuContent sideOffset={12} align="start">
+							<button
+								type="button"
+								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 hover:bg-white-900/20 hover:text-white-900 w-full text-left"
+								onClick={() => {
+									editableTextRef.current?.triggerEdit();
+								}}
+							>
+								Rename
+							</button>
+							<button
+								type="button"
+								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 hover:bg-white-900/20 hover:text-white-900 w-full text-left"
+								onClick={() => {
+									console.debug("Duplicate app – not yet implemented");
+								}}
+							>
+								Duplicate
+							</button>
+							<button
+								type="button"
 								disabled
-								className="opacity-50 cursor-not-allowed"
+								className="relative flex cursor-not-allowed select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none opacity-50 w-full text-left"
 							>
 								<div className="flex items-center justify-between w-full">
 									<span>Create a Template</span>
@@ -100,16 +96,19 @@ export function V2Header({ teamName }: { teamName?: string }) {
 										Coming&nbsp;soon
 									</span>
 								</div>
-							</SelectItem>
-							<div className="my-2 h-px bg-white/10" />
-							<SelectItem
-								value="delete"
-								className="text-error-900 hover:bg-error-900/20"
+							</button>
+							<div className="my-2 h-px bg-muted" />
+							<button
+								type="button"
+								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-error-900/20 focus:text-error-900 hover:bg-error-900/20 hover:text-error-900 text-error-900 w-full text-left"
+								onClick={() => {
+									console.debug("Delete app – not yet implemented");
+								}}
 							>
 								Delete
-							</SelectItem>
-						</SelectContent>
-					</Select>
+							</button>
+						</DropdownMenuContent>
+					</DropdownMenu>
 				</div>
 			</div>
 
