@@ -14,7 +14,8 @@
 		"./button": "./components/button.tsx",
 		"./select": "./components/select.tsx",
 		"./note": "./components/note.tsx",
-		"./dropdown-menu": "./components/dropdown-menu.tsx"
+		"./dropdown-menu": "./components/dropdown-menu.tsx",
+		"./popover": "./components/popover.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",

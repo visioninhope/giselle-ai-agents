@@ -17,6 +17,10 @@ const components = [
 		id: "dropdown-menu",
 		name: "Dropdown Menu",
 	},
+	{
+		id: "popover",
+		name: "Popover",
+	},
 ];
 export default function ({
 	children,
