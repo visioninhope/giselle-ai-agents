@@ -20,10 +20,9 @@ export function V2Header({ teamName }: { teamName?: string }) {
 		<div
 			className={clsx(
 				"relative h-[54px] flex items-center justify-between",
-				"pl-[8px] pr-[16px] gap-[12px]",
+				"pl-[16px] pr-[16px] gap-[12px]",
 				"border-b border-black-600",
 				"shrink-0",
-				"-ml-[44px]",
 			)}
 		>
 			{/* Left section: Logo + Team/App names */}
