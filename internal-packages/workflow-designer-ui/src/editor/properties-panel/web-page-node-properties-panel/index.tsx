@@ -246,17 +246,6 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 			/>
 			<PropertiesPanelContent>
 				<div>
-					<ul className="flex flex-col gap-[8px]">
-						{node.content.webpages.map((webpage) => (
-							<WebPageListItem
-								key={webpage.id}
-								webpage={webpage}
-								workspaceId={data.id}
-								onRemove={removeWebPage(webpage.id)}
-							/>
-						))}
-					</ul>
-
 					<form
 						className="p-[4px] flex flex-col gap-[8px]"
 						onSubmit={handleSubmit}
@@ -272,12 +261,14 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 								id="webpage-urls"
 								name="urls"
 								className={clsx(
-									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-white-900 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
+									"w-full min-h-[80px] p-[8px] border-[0.5px] border-white-900 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
 									// urlError && "border-error-900",
 								)}
 								// value={urls}
 								// onChange={(e) => setUrls(e.target.value)}
-								placeholder={"https://example.com\nhttps://docs.giselles.ai"}
+								placeholder={
+									"Write the URLs (one per line)\nhttp://example.com"
+								}
 								required
 							/>
 							{/* {urlError && (
@@ -291,6 +282,17 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 							Insert
 						</button>
 					</form>
+
+					<ul className="flex flex-col gap-[8px]">
+						{node.content.webpages.map((webpage) => (
+							<WebPageListItem
+								key={webpage.id}
+								webpage={webpage}
+								workspaceId={data.id}
+								onRemove={removeWebPage(webpage.id)}
+							/>
+						))}
+					</ul>
 				</div>
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
