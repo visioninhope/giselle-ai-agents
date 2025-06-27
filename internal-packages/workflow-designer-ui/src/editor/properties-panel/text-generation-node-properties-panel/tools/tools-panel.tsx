@@ -7,6 +7,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
+import { Select } from "@giselle-internal/ui/select";
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
@@ -28,7 +29,6 @@ import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../../../lib/use-workspace-secrets";
 import { GitHubIcon } from "../../../tool";
 import { EmptyState } from "./ui/empty-state";
-import { Select } from "./ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
 
 const GitHubToolSetupSecretType = {
