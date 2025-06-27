@@ -13,10 +13,12 @@ interface DropdownMenuProps<T extends Identifiable> {
 	items: Array<T>;
 	trigger: React.ReactNode;
 	renderItem: (item: T) => React.ReactNode;
-	onSelect?: (option: T) => void;
+	onSelect?: (event: Event, option: T) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
+	open?: DropdownMenuPrimitive.DropdownMenuProps["open"];
+	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps["onOpenChange"];
 }
 
 export function DropdownMenu<T extends Identifiable>({
@@ -27,9 +29,11 @@ export function DropdownMenu<T extends Identifiable>({
 	widthClassName,
 	sideOffset,
 	align,
+	open,
+	onOpenChange,
 }: DropdownMenuProps<T>) {
 	return (
-		<DropdownMenuPrimitive.Root>
+		<DropdownMenuPrimitive.Root open={open} onOpenChange={onOpenChange}>
 			<DropdownMenuPrimitive.Trigger asChild>
 				{trigger}
 			</DropdownMenuPrimitive.Trigger>
@@ -37,13 +41,13 @@ export function DropdownMenu<T extends Identifiable>({
 				<DropdownMenuPrimitive.Content
 					sideOffset={sideOffset}
 					align={align}
-					className={clsx("z-50", widthClassName)}
+					className={clsx("z-10", widthClassName)}
 				>
 					<PopoverContent>
 						{items.map((option) => (
 							<DropdownMenuPrimitive.Item
 								key={option.id}
-								onSelect={() => onSelect?.(option)}
+								onSelect={(event) => onSelect?.(event, option)}
 								className={clsx(
 									"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
 									"rounded-[4px] px-[8px] py-[6px] text-[14px]",

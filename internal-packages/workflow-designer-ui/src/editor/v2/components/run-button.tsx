@@ -85,8 +85,44 @@ export function RunButton() {
 
 	return (
 		<DropdownMenu
+			open={isDropdownOpen}
+			onOpenChange={setIsDropdownOpen}
+			onSelect={async (event, startingNode) => {
+				event.preventDefault();
+				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
+					await startOperationFlow(startingNode);
+				}
+			}}
 			items={startingNodes}
-			renderItem={(startingNode) => <NodeSelectItem node={startingNode} />}
+			renderItem={(startingNode) =>
+				isTriggerNode(startingNode) ? (
+					<Dialog
+						open={openDialogNodeId === startingNode.id}
+						onOpenChange={(isOpen) => {
+							setOpenDialogNodeId(isOpen ? startingNode.id : null);
+						}}
+					>
+						<DialogTrigger asChild>
+							<NodeSelectItem node={startingNode} />
+						</DialogTrigger>
+						<DialogContent>
+							<DialogTitle className="sr-only">
+								Override inputs to test workflow
+							</DialogTitle>
+
+							<TriggerInputDialog
+								node={startingNode}
+								onClose={() => {
+									setIsDropdownOpen(false);
+									setOpenDialogNodeId(null);
+								}}
+							/>
+						</DialogContent>
+					</Dialog>
+				) : (
+					<NodeSelectItem node={startingNode} />
+				)
+			}
 			trigger={
 				<Button
 					leftIcon={<PlayIcon className="size-[15px] fill-current" />}
