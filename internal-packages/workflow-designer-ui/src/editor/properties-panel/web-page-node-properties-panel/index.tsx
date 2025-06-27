@@ -272,7 +272,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 								id="webpage-urls"
 								name="urls"
 								className={clsx(
-									"w-full min-h-[80px] p-[8px] border-[2px] border-black-400 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
+									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-white-900 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
 									// urlError && "border-error-900",
 								)}
 								// value={urls}
@@ -286,7 +286,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						</div>
 						<button
 							type="submit"
-							className="w-fit flex items-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
+							className="w-full flex items-center justify-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
 						>
 							Insert
 						</button>
