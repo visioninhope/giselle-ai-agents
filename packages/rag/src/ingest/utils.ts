@@ -52,3 +52,25 @@ export async function retryOperation<T>(
 
 	return attemptOperation();
 }
+
+/**
+ * Create batches from an async iterable
+ */
+export async function* createBatches<T>(
+	items: AsyncIterable<T>,
+	batchSize: number,
+): AsyncGenerator<T[]> {
+	const batch: T[] = [];
+
+	for await (const item of items) {
+		batch.push(item);
+		if (batch.length >= batchSize) {
+			yield [...batch];
+			batch.length = 0;
+		}
+	}
+
+	if (batch.length > 0) {
+		yield batch;
+	}
+}

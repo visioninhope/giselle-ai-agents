@@ -6,8 +6,8 @@ import { createDefaultEmbedder } from "../embedder";
 import type { EmbedderFunction } from "../embedder/types";
 import { ConfigurationError, OperationError } from "../errors";
 import { embedContent } from "./embedder";
-import { retryOperation } from "./retry";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
+import { createBatches, retryOperation } from "./utils";
 import { createVersionTracker } from "./version-tracker";
 
 // Type helper to extract metadata type from ChunkStore
@@ -118,28 +118,6 @@ export function createPipeline<
 				context: docKey,
 			},
 		);
-	}
-
-	/**
-	 * Create batches from an async iterable
-	 */
-	async function* createBatches<T>(
-		items: AsyncIterable<T>,
-		batchSize: number,
-	): AsyncGenerator<T[]> {
-		const batch: T[] = [];
-
-		for await (const item of items) {
-			batch.push(item);
-			if (batch.length >= batchSize) {
-				yield [...batch];
-				batch.length = 0;
-			}
-		}
-
-		if (batch.length > 0) {
-			yield batch;
-		}
 	}
 
 	/**

@@ -2,6 +2,7 @@ import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
+import { TargetGitHubRepository } from "./types";
 import {
 	buildOctokit,
 	fetchTargetGitHubRepositories,
@@ -12,13 +13,22 @@ import {
 
 export const maxDuration = 800;
 
-async function processRepository(targetGitHubRepository: {
-	owner: string;
-	repo: string;
-	installationId: number;
-	teamDbId: number;
-	dbId: number;
-}) {
+export async function GET(request: NextRequest) {
+	const authHeader = request.headers.get("authorization");
+	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+		return new Response("Unauthorized", {
+			status: 401,
+		});
+	}
+
+	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
+
+	await Promise.all(targetGitHubRepositories.map(processRepository));
+
+	return new Response("ok", { status: 200 });
+}
+
+async function processRepository(targetGitHubRepository: TargetGitHubRepository) {
 	const { owner, repo, installationId, teamDbId, dbId } =
 		targetGitHubRepository;
 
@@ -47,20 +57,4 @@ async function processRepository(targetGitHubRepository: {
 		});
 		await updateRepositoryStatusToFailed(dbId);
 	}
-}
-
-export async function GET(request: NextRequest) {
-	const authHeader = request.headers.get("authorization");
-	if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-		return new Response("Unauthorized", {
-			status: 401,
-		});
-	}
-
-	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
-
-	// Process all repositories in parallel
-	await Promise.all(targetGitHubRepositories.map(processRepository));
-
-	return new Response("ok", { status: 200 });
 }
