@@ -1,15 +1,11 @@
 "use client";
 
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { ChevronDownIcon } from "lucide-react";
 import { useRef } from "react";
 import { GiselleIcon } from "../../../icons";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuTrigger,
-} from "../../../ui/dropdown-menu";
 import { EditableText, type EditableTextRef } from "../../properties-panel/ui";
 import { RunButton } from "./run-button";
 
@@ -62,53 +58,57 @@ export function V2Header({ teamName }: { teamName?: string }) {
 						/>
 					</div>
 					{/* dropdown menu */}
-					<DropdownMenu>
-						<DropdownMenuTrigger className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none">
-							<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
-						</DropdownMenuTrigger>
-						<DropdownMenuContent sideOffset={12} align="start">
+					<DropdownMenu
+						items={[
+							{
+								id: "rename",
+								name: "Rename",
+								action: () => editableTextRef.current?.triggerEdit(),
+							},
+							{
+								id: "duplicate",
+								name: "Duplicate",
+								action: () =>
+									console.debug("Duplicate app – not yet implemented"),
+							},
+							{ id: "template", name: "Create a Template", disabled: true },
+							{
+								id: "delete",
+								name: "Delete",
+								action: () => console.debug("Delete app – not yet implemented"),
+								destructive: true,
+							},
+						]}
+						trigger={
 							<button
 								type="button"
-								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 hover:bg-white-900/20 hover:text-white-900 w-full text-left"
-								onClick={() => {
-									editableTextRef.current?.triggerEdit();
-								}}
+								className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none"
 							>
-								Rename
+								<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
 							</button>
-							<button
-								type="button"
-								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 hover:bg-white-900/20 hover:text-white-900 w-full text-left"
-								onClick={() => {
-									console.debug("Duplicate app – not yet implemented");
-								}}
-							>
-								Duplicate
-							</button>
-							<button
-								type="button"
-								disabled
-								className="relative flex cursor-not-allowed select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none opacity-50 w-full text-left"
-							>
-								<div className="flex items-center justify-between w-full">
-									<span>Create a Template</span>
+						}
+						renderItem={(item) =>
+							item.id === "template" ? (
+								<div className="flex items-center justify-between w-full opacity-50">
+									<span>{item.name}</span>
 									<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
 										Coming&nbsp;soon
 									</span>
 								</div>
-							</button>
-							<div className="my-2 h-px bg-muted" />
-							<button
-								type="button"
-								className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-error-900/20 focus:text-error-900 hover:bg-error-900/20 hover:text-error-900 text-error-900 w-full text-left"
-								onClick={() => {
-									console.debug("Delete app – not yet implemented");
-								}}
-							>
-								Delete
-							</button>
-						</DropdownMenuContent>
-					</DropdownMenu>
+							) : (
+								<span className={item.destructive ? "text-error-900" : ""}>
+									{item.name}
+								</span>
+							)
+						}
+						onSelect={(event, item) => {
+							if (!item.disabled && item.action) {
+								item.action();
+							}
+						}}
+						sideOffset={12}
+						align="start"
+					/>
 				</div>
 			</div>
 
