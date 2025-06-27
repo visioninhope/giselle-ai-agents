@@ -1,5 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
+import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -13,11 +14,7 @@ import { Toolbar as ToolbarPrimitive } from "radix-ui";
 import { type ReactNode, useMemo } from "react";
 import { SourceExtensionReact } from "./source-extension-react";
 
-function Toolbar({
-	tools,
-}: {
-	tools?: (editor: Editor) => ReactNode;
-}) {
+function Toolbar({ tools }: { tools?: (editor: Editor) => ReactNode }) {
 	const { editor } = useCurrentEditor();
 	if (!editor) {
 		return null;
@@ -127,24 +124,33 @@ export function TextEditor({
 	onValueChange,
 	tools,
 	nodes,
+	placeholder,
 }: {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
+	placeholder?: string;
 }) {
-	const extensions = useMemo(
-		() =>
-			nodes === undefined
-				? baseExtensions
-				: [
-						...baseExtensions,
-						SourceExtensionReact.configure({
-							nodes,
-						}),
-					],
-		[nodes],
-	);
+	const extensions = useMemo(() => {
+		const extensionsWithPlaceholder = placeholder
+			? [
+					...baseExtensions,
+					Placeholder.configure({
+						placeholder,
+					}),
+				]
+			: baseExtensions;
+
+		return nodes === undefined
+			? extensionsWithPlaceholder
+			: [
+					...extensionsWithPlaceholder,
+					SourceExtensionReact.configure({
+						nodes,
+					}),
+				];
+	}, [nodes, placeholder]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider
@@ -158,7 +164,7 @@ export function TextEditor({
 							: JSON.parse(value)
 				}
 				editorContainerProps={{
-					className: "flex-1 overflow-hidden",
+					className: "flex-1 overflow-hidden flex flex-col h-full",
 				}}
 				onUpdate={(p) => {
 					onValueChange?.(JSON.stringify(p.editor.getJSON()));
@@ -167,7 +173,7 @@ export function TextEditor({
 				editorProps={{
 					attributes: {
 						class:
-							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] h-full overflow-y-auto",
+							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-white-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0",
 					},
 				}}
 			/>
