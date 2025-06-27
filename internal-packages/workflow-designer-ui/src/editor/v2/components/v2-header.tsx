@@ -60,7 +60,7 @@ export function V2Header({ teamName }: { teamName?: string }) {
 							fallbackValue="Untitled"
 							onChange={handleUpdateName}
 							value={data.name}
-							className="text-[#6B8FF0] text-[13px]"
+							className="text-[#6B8FF0] text-[13px] font-medium"
 						/>
 					</span>
 					{/* dropdown menu */}

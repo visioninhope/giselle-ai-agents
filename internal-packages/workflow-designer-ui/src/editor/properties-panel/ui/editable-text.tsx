@@ -69,7 +69,8 @@ export const EditableText = forwardRef<
 					"w-full py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
 					"outline-none",
 					"data-[size=medium]:text-[14px] data-[size=large]:text-[16px]",
-					className || "text-white-900",
+					!className && "text-white-900",
+					className,
 				)}
 				ref={inputRef}
 				data-editing={edit}
@@ -91,7 +92,8 @@ export const EditableText = forwardRef<
 					"hover:bg-white-900/20 group-hover:bg-white-900/10",
 					"data-[size=medium]:text-[14px] data-[size=large]:text-[16px]",
 					"cursor-default w-full",
-					className || "text-white-900",
+					!className && "text-white-900",
+					className,
 				)}
 				data-editing={edit}
 				onClick={() => setEdit(true)}
