@@ -68,7 +68,7 @@ function ViewSwitch(props: ViewSwitchProps) {
 
 export function Header() {
 	return (
-		<div className="h-[72px] flex items-center justify-between mx-[20px]">
+		<div className="h-[60px] flex items-center justify-between mx-[20px]">
 			<div className="flex gap-[8px] items-center flex-1">
 				<Link href="/">
 					<GiselleLogo className="fill-white-900 w-[70px] h-auto mt-[6px]" />

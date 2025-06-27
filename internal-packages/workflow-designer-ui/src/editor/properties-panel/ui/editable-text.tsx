@@ -66,7 +66,7 @@ export const EditableText = forwardRef<
 				type="text"
 				aria-label={ariaLabel}
 				className={clsx(
-					"w-full py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
+					"w-full min-w-[200px] py-[2px] px-[4px] rounded-[4px] hidden data-[editing=true]:block",
 					"outline-none",
 					"data-[size=medium]:text-[14px] data-[size=large]:text-[16px]",
 					!className && "text-white-900",
