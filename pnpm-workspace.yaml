@@ -71,7 +71,7 @@ catalog:
   langfuse: 3.37.0
   langfuse-core: 3.37.0
   "@vercel/edge-config": 1.4.0
-  "@supabase/supabase-js": 2.45.0
+  "@supabase/supabase-js": 2.50.0
   pg: 8.14.1
   "@types/pg": 8.11.13
   pgvector: 0.2.1
