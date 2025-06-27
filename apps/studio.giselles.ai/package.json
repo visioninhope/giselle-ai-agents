@@ -62,7 +62,6 @@
 		"@radix-ui/react-tooltip": "1.1.4",
 		"@sentry/nextjs": "9.30.0",
 		"@sentry/wizard": "3.38.0",
-		"@supabase/auth-js": "2.70.0",
 		"@supabase/ssr": "0.6.1",
 		"@supabase/supabase-js": "catalog:",
 		"@valibot/to-json-schema": "1.0.0-beta.3",
