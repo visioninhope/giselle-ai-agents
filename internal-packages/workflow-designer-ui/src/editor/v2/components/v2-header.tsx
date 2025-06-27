@@ -68,14 +68,19 @@ export function V2Header({ teamName }: { teamName?: string }) {
 							{
 								id: "duplicate",
 								name: "Duplicate",
-								action: () =>
-									console.debug("Duplicate app – not yet implemented"),
+								action: () => {
+									// TODO: Implement app duplication functionality
+									console.warn("Duplicate functionality not yet implemented");
+								},
 							},
 							{ id: "template", name: "Create a Template", disabled: true },
 							{
 								id: "delete",
 								name: "Delete",
-								action: () => console.debug("Delete app – not yet implemented"),
+								action: () => {
+									// TODO: Implement app deletion functionality
+									console.warn("Delete functionality not yet implemented");
+								},
 								destructive: true,
 							},
 						]}
