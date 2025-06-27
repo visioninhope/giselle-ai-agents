@@ -5,7 +5,7 @@ import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { MoveUpRightIcon, PlusIcon } from "lucide-react";
-import { useCallback, useState, useTransition } from "react";
+import { useCallback, useMemo, useState, useTransition } from "react";
 import z from "zod/v4";
 import { useWorkspaceSecrets } from "../../../../lib/use-workspace-secrets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
@@ -28,6 +28,18 @@ const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
 ]);
 
 export function GitHubToolConfigurationDialog({
+	node,
+}: { node: TextGenerationNode }) {
+	const connected = useMemo(() => !node.content.tools?.github, [node]);
+
+	if (connected) {
+		return <GitHubToolConnectionDialog node={node} />;
+	}
+
+	return <p>TODO</p>;
+}
+
+export function GitHubToolConnectionDialog({
 	node,
 }: { node: TextGenerationNode }) {
 	const [presentDialog, setPresentDialog] = useState(false);
