@@ -2,7 +2,7 @@ import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
-import { TargetGitHubRepository } from "./types";
+import type { TargetGitHubRepository } from "./types";
 import {
 	buildOctokit,
 	fetchTargetGitHubRepositories,
@@ -28,7 +28,9 @@ export async function GET(request: NextRequest) {
 	return new Response("ok", { status: 200 });
 }
 
-async function processRepository(targetGitHubRepository: TargetGitHubRepository) {
+async function processRepository(
+	targetGitHubRepository: TargetGitHubRepository,
+) {
 	const { owner, repo, installationId, teamDbId, dbId } =
 		targetGitHubRepository;
 
