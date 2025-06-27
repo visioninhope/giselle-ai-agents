@@ -1,6 +1,7 @@
 "use client";
 
 import clsx from "clsx/lite";
+import { Dialog } from "radix-ui";
 import { type ReactNode, useCallback, useRef, useState } from "react";
 import { ResizeHandle } from "../../properties-panel/ui/resizable-section";
 
@@ -12,6 +13,8 @@ interface FloatingPropertiesPanelProps {
 	minWidth?: number;
 	maxWidth?: number;
 	position?: "right" | "left";
+	container?: React.ComponentProps<typeof Dialog.Portal>["container"];
+	title: string;
 }
 
 export function FloatingPropertiesPanel({
@@ -22,6 +25,8 @@ export function FloatingPropertiesPanel({
 	minWidth = 300,
 	maxWidth = 800,
 	position = "right",
+	container,
+	title,
 }: FloatingPropertiesPanelProps) {
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
@@ -93,65 +98,70 @@ export function FloatingPropertiesPanel({
 		[width, minWidth, maxWidth, throttle, position],
 	);
 
-	if (!isOpen) return null;
-
 	return (
-		<div
-			className={clsx(
-				"absolute top-4 bottom-4 z-10 pointer-events-none",
-				position === "right" ? "right-4" : "left-4",
-			)}
-			style={{ width: `${width}px` }}
-		>
-			<div
-				ref={panelRef}
-				className={clsx(
-					"h-full pointer-events-auto relative rounded-[12px] shadow-xl",
-					isOpen
-						? "translate-x-0 opacity-100"
-						: position === "right"
-							? "translate-x-full opacity-0"
-							: "-translate-x-full opacity-0",
-					!isResizing && "transform transition-all duration-300 ease-out",
-					className,
-				)}
-			>
-				{/* Glass effect background with backdrop blur */}
-				<div
-					className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
-					style={{
-						background:
-							"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
-					}}
-				/>
+		<Dialog.Root open={isOpen} modal={false}>
+			<Dialog.Portal container={container}>
+				<Dialog.Content asChild>
+					<div
+						className={clsx(
+							"absolute top-4 bottom-4 z-10 pointer-events-none",
+							position === "right" ? "right-4" : "left-4",
+						)}
+						style={{ width: `${width}px` }}
+					>
+						<Dialog.Title className="sr-only">{title}</Dialog.Title>
+						<div
+							ref={panelRef}
+							className={clsx(
+								"h-full pointer-events-auto relative rounded-[12px] shadow-xl",
+								isOpen
+									? "translate-x-0 opacity-100"
+									: position === "right"
+										? "translate-x-full opacity-0"
+										: "-translate-x-full opacity-0",
+								!isResizing && "transform transition-all duration-300 ease-out",
+								className,
+							)}
+						>
+							{/* Glass effect background with backdrop blur */}
+							<div
+								className="absolute inset-0 -z-10 rounded-[12px] backdrop-blur-md"
+								style={{
+									background:
+										"linear-gradient(135deg, rgba(150, 150, 150, 0.03) 0%, rgba(60, 90, 160, 0.12) 100%)",
+								}}
+							/>
 
-				{/* Top gradient line */}
-				<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
+							{/* Top gradient line */}
+							<div className="absolute -z-10 top-0 left-4 right-4 h-px bg-gradient-to-r from-transparent via-white/40 to-transparent" />
 
-				{/* Border */}
-				<div className="absolute -z-10 inset-0 rounded-[12px] border border-white/10" />
+							{/* Border */}
+							<div className="absolute -z-10 inset-0 rounded-[12px] border border-white/10" />
 
-				{/* Resize handle */}
-				<ResizeHandle
-					direction="horizontal"
-					className={clsx(
-						"absolute top-0 bottom-0 z-20",
-						position === "right" ? "left-0" : "right-0",
-					)}
-					onMouseDown={handleMouseDown}
-					style={{ pointerEvents: "auto" }}
-				/>
+							{/* Resize handle */}
+							<ResizeHandle
+								direction="horizontal"
+								className={clsx(
+									"absolute top-0 bottom-0 z-20",
+									position === "right" ? "left-0" : "right-0",
+								)}
+								onMouseDown={handleMouseDown}
+								style={{ pointerEvents: "auto" }}
+							/>
 
-				{/* Content */}
-				<div
-					className={clsx(
-						"h-full overflow-hidden relative z-10 px-2 pb-2",
-						position === "right" ? "pl-3" : "pr-3",
-					)}
-				>
-					{children}
-				</div>
-			</div>
-		</div>
+							{/* Content */}
+							<div
+								className={clsx(
+									"h-full overflow-hidden relative z-10 px-2 pb-2",
+									position === "right" ? "pl-3" : "pr-3",
+								)}
+							>
+								{children}
+							</div>
+						</div>
+					</div>
+				</Dialog.Content>
+			</Dialog.Portal>
+		</Dialog.Root>
 	);
 }
