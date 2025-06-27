@@ -18,7 +18,7 @@ export default function () {
 									{ id: 2, name: "banana" },
 									{ id: 3, name: "melon" },
 								]}
-								renderOption={(option) => option.name}
+								renderItem={(option) => option.name}
 								trigger={<Button>Hello</Button>}
 							/>
 						</div>

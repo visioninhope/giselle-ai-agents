@@ -86,7 +86,7 @@ export function RunButton() {
 	return (
 		<DropdownMenu
 			items={startingNodes}
-			renderOption={(startingNode) => <NodeSelectItem node={startingNode} />}
+			renderItem={(startingNode) => <NodeSelectItem node={startingNode} />}
 			trigger={
 				<Button
 					leftIcon={<PlayIcon className="size-[15px] fill-current" />}

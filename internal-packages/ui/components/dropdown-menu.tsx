@@ -12,7 +12,7 @@ interface Identifiable {
 interface DropdownMenuProps<T extends Identifiable> {
 	items: Array<T>;
 	trigger: React.ReactNode;
-	renderOption: (option: T) => React.ReactNode;
+	renderItem: (item: T) => React.ReactNode;
 	onSelect?: (option: T) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
@@ -22,7 +22,7 @@ interface DropdownMenuProps<T extends Identifiable> {
 export function DropdownMenu<T extends Identifiable>({
 	trigger,
 	items,
-	renderOption,
+	renderItem: renderOption,
 	onSelect,
 	widthClassName,
 	sideOffset,
