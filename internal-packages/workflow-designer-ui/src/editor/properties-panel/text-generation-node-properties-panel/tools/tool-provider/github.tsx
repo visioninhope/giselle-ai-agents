@@ -4,12 +4,21 @@ import { Select } from "@giselle-internal/ui/select";
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { MoveUpRightIcon, PlusIcon } from "lucide-react";
+import {
+	CheckIcon,
+	MoveUpRightIcon,
+	PlusIcon,
+	Settings2Icon,
+} from "lucide-react";
+import { Checkbox } from "radix-ui";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import z from "zod/v4";
 import { useWorkspaceSecrets } from "../../../../lib/use-workspace-secrets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
-import { ToolConfigurationDialog } from "../ui/tool-configuration-dialog";
+import {
+	ToolConfigurationDialog,
+	type ToolConfigurationDialogProps,
+} from "../ui/tool-configuration-dialog";
 
 const GitHubToolSetupSecretType = {
 	create: "create",
@@ -30,17 +39,35 @@ const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
 export function GitHubToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
+	const [presentDialog, setPresentDialog] = useState(false);
 	const connected = useMemo(() => !node.content.tools?.github, [node]);
 
 	if (connected) {
-		return <GitHubToolConnectionDialog node={node} />;
+		return (
+			<GitHubToolConnectionDialog
+				node={node}
+				open={presentDialog}
+				onOpenChange={setPresentDialog}
+			/>
+		);
 	}
 
-	return <p>TODO</p>;
+	return (
+		<GitHubToolConfigurationDialogInternal
+			node={node}
+			open={presentDialog}
+			onOpenChange={setPresentDialog}
+		/>
+	);
 }
 
-function GitHubToolConnectionDialog({ node }: { node: TextGenerationNode }) {
-	const [presentDialog, setPresentDialog] = useState(false);
+function GitHubToolConnectionDialog({
+	node,
+	open,
+	onOpenChange,
+}: Pick<ToolConfigurationDialogProps, "open" | "onOpenChange"> & {
+	node: TextGenerationNode;
+}) {
 	const [tabValue, setTabValue] = useState("create");
 	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
 	const { isLoading, data, mutate } = useWorkspaceSecrets();
@@ -110,7 +137,6 @@ function GitHubToolConnectionDialog({ node }: { node: TextGenerationNode }) {
 					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
 				}
 			}
-			setPresentDialog(false);
 		},
 		[node, updateNodeDataContent, client, workspace.id, data, mutate],
 	);
@@ -125,8 +151,8 @@ function GitHubToolConnectionDialog({ node }: { node: TextGenerationNode }) {
 					Connect
 				</Button>
 			}
-			open={presentDialog}
-			onOpenChange={setPresentDialog}
+			open={open}
+			onOpenChange={onOpenChange}
 		>
 			<Tabs value={tabValue} onValueChange={setTabValue}>
 				<TabsList className="mb-[12px]">
@@ -240,6 +266,167 @@ function GitHubToolConnectionDialog({ node }: { node: TextGenerationNode }) {
 					)}
 				</TabsContent>
 			</Tabs>
+		</ToolConfigurationDialog>
+	);
+}
+
+const githubToolCatalog = [
+	{
+		label: "Repository",
+		tools: [
+			"createRepository",
+			"forkRepository",
+			"getFileContents",
+			"listBranches",
+			"searchCode",
+		],
+	},
+	{
+		label: "Issues",
+		tools: [
+			"createIssue",
+			"getIssue",
+			"listIssues",
+			"searchIssues",
+			"updateIssue",
+			"addIssueComment",
+			"getIssueComments",
+		],
+	},
+	{
+		label: "Pull Requests",
+		tools: [
+			"createPullRequest",
+			"getPullRequest",
+			"updatePullRequest",
+			"listPullRequests",
+			"searchPullRequests",
+			"getPullRequestComments",
+			"getPullRequestFiles",
+			"getPullRequestReviews",
+			"getPullRequestStatus",
+			"createPullRequestReview",
+			"addPullRequestReviewComment",
+			"mergePullRequest",
+			"updatePullRequestBranch",
+		],
+	},
+	{
+		label: "Code Management",
+		tools: [
+			"createBranch",
+			"createOrUpdateFile",
+			"getCommit",
+			"listCommits",
+			"listCodeScanningAlerts",
+			"getCodeScanningAlert",
+		],
+	},
+	{
+		label: "Search",
+		tools: [
+			"searchCode",
+			"searchIssues",
+			"searchPullRequests",
+			"searchRepositories",
+			"searchUsers",
+		],
+	},
+	{
+		label: "User",
+		tools: ["getMe"],
+	},
+];
+
+function GitHubToolConfigurationDialogInternal({
+	node,
+	open,
+	onOpenChange,
+}: Pick<ToolConfigurationDialogProps, "open" | "onOpenChange"> & {
+	node: TextGenerationNode;
+}) {
+	const { updateNodeDataContent } = useWorkflowDesigner();
+
+	const updateAvailableTools = useCallback<
+		React.FormEventHandler<HTMLFormElement>
+	>(
+		(e) => {
+			e.preventDefault();
+			if (node.content.tools?.github === undefined) {
+				return;
+			}
+			const formData = new FormData(e.currentTarget);
+
+			const tools = formData
+				.getAll("tools")
+				.filter((tool) => typeof tool === "string");
+			updateNodeDataContent(node, {
+				...node.content,
+				tools: {
+					...node.content.tools,
+					github: {
+						...node.content.tools.github,
+						tools,
+					},
+				},
+			});
+			onOpenChange?.(false);
+		},
+		[node, updateNodeDataContent],
+	);
+
+	return (
+		<ToolConfigurationDialog
+			title="Configuration of GitHub"
+			description="Select the GitHub tools you want to enable"
+			onSubmit={updateAvailableTools}
+			submitting={false}
+			trigger={
+				<Button
+					type="button"
+					leftIcon={<Settings2Icon data-dialog-trigger-icon />}
+				>
+					Configuration
+				</Button>
+			}
+			open={open}
+			onOpenChange={onOpenChange}
+		>
+			<div className="flex flex-col">
+				<div className="flex flex-col gap-6">
+					{githubToolCatalog.map((category) => (
+						<div key={category.label} className="flex flex-col gap-2">
+							<div className="text-[13px] font-medium text-text">
+								{category.label}
+							</div>
+							<div className="flex flex-col gap-1 border border-border-variant rounded-[4px] overflow-hidden">
+								{category.tools.map((tool) => (
+									<label
+										key={tool}
+										className="flex items-center justify-between p-3 hover:bg-black-800/30 cursor-pointer transition-colors"
+										htmlFor={tool}
+									>
+										<Checkbox.Root
+											className="group appearance-none size-[18px] rounded border flex items-center justify-center transition-colors outline-none data-[state=checked]:border-success data-[state=checked]:bg-success"
+											value={tool}
+											id={tool}
+											defaultChecked={node.content.tools?.github?.tools.includes(
+												tool,
+											)}
+											name="tools"
+										>
+											<Checkbox.Indicator className="text-background">
+												<CheckIcon className="size-[16px]" />
+											</Checkbox.Indicator>
+										</Checkbox.Root>
+										<p className="text-sm text-text flex-1 pl-[8px]">{tool}</p>
+									</label>
+								))}
+							</div>
+						</div>
+					))}
+				</div>
+			</div>
 		</ToolConfigurationDialog>
 	);
 }

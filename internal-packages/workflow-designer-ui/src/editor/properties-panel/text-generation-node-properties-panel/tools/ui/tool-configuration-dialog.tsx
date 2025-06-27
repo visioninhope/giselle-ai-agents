@@ -7,10 +7,9 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
-import { PlusIcon, Settings2Icon } from "lucide-react";
 import type { ComponentProps, PropsWithChildren } from "react";
 
-interface ToolConfigurationDialogProps
+export interface ToolConfigurationDialogProps
 	extends Omit<ComponentProps<typeof Dialog>, "children"> {
 	title: string;
 	description: string;

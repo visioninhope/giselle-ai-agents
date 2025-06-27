@@ -15,6 +15,7 @@ export function ToolsPanel({
 			<ToolListItem
 				icon={<GitHubIcon data-tool-icon />}
 				configurationPanel={<GitHubToolConfigurationDialog node={node} />}
+				availableTools={node.content.tools?.github?.tools}
 			>
 				<div className="flex gap-[10px] items-center">
 					<h3 className="text-text text-[14px]">GitHub</h3>
@@ -30,25 +31,39 @@ export function ToolsPanel({
 interface ToolListItemProps {
 	icon: ReactNode;
 	configurationPanel: ReactNode;
+	availableTools?: string[];
 }
 function ToolListItem({
 	children,
 	icon,
 	configurationPanel,
+	availableTools = [],
 }: PropsWithChildren<ToolListItemProps>) {
 	return (
 		<div
 			className={clsx(
-				"border border-border rounded-[8px] px-[12px] w-full flex items-center justify-between py-[10px]",
+				"border border-border rounded-[8px] px-[12px] w-full py-[10px]",
 				"**:data-tool-icon:size-[20px] **:data-tool-icon:text-text-muted",
 				"**:data-dialog-trigger-icon:size-[14px]",
 			)}
 		>
-			<div className="flex gap-[10px] items-center">
-				{icon}
-				{children}
+			<div className=" flex items-center justify-between">
+				<div className="flex gap-[10px] items-center">
+					{icon}
+					{children}
+				</div>
+				{configurationPanel}
 			</div>
-			{configurationPanel}
+			<div className="flex flex-wrap text-[12px] text-text-muted gap-x-[6px] mt-[6px] gap-y-[6px]">
+				{availableTools.map((availableTool) => (
+					<p
+						className="border border-border rounded-full px-[6px] py-[1px]"
+						key={availableTool}
+					>
+						{availableTool}
+					</p>
+				))}
+			</div>
 		</div>
 	);
 }
