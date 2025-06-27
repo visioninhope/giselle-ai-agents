@@ -353,9 +353,13 @@ const ToolList = {
 	},
 	DialogHeader({ title, description }: ToolListDialogHeaderProps) {
 		return (
-			<div className="py-[12px]">
-				<DialogTitle>{title}</DialogTitle>
-				<DialogDescription>{description}</DialogDescription>
+			<div className="mb-4">
+				<DialogTitle className="text-[20px] font-medium text-text tracking-tight font-sans">
+					{title}
+				</DialogTitle>
+				<DialogDescription className="text-[14px] text-text-muted font-geist mt-2">
+					{description}
+				</DialogDescription>
 			</div>
 		);
 	},
