@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1054 MIT
+* 1055 MIT
 * 108 Apache 2.0
 * 60 ISC
 * 34 New BSD
@@ -3859,6 +3859,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@tiptap/extension-paragraph"></a>
 ### @tiptap/extension-paragraph v2.11.5
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@tiptap/extension-placeholder"></a>
+### @tiptap/extension-placeholder v2.11.5
 #### 
 
 ##### Paths
