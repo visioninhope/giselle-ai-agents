@@ -5,9 +5,9 @@
 export const PANEL_SPACING = {
 	// Header spacing
 	HEADER: {
-		HEIGHT: "48px",
-		PADDING_LEFT: "pl-1", // 4px
-		PADDING_TOP: "pt-2", // 8px (sidemenu only)
+		HEIGHT: "h-[48.5px]",
+		HEIGHT_VALUE: 48.5, // For calculations or style objects
+		PADDING: "pt-2 pr-0 pb-0 pl-1", // 8px 0 0 4px
 		ICON_SIZE: "28px",
 		ICON_GAP: "gap-[8px]",
 	},
@@ -36,19 +36,34 @@ export const PANEL_SPACING = {
 } as const;
 
 /**
+ * Common header height utilities
+ */
+export const PANEL_HEADER = {
+	HEIGHT_CLASS: PANEL_SPACING.HEADER.HEIGHT,
+	HEIGHT_VALUE: PANEL_SPACING.HEADER.HEIGHT_VALUE,
+	PADDING_CLASS: PANEL_SPACING.HEADER.PADDING,
+
+	/**
+	 * Get inline style for header height
+	 */
+	getHeightStyle: () => ({ height: `${PANEL_SPACING.HEADER.HEIGHT_VALUE}px` }),
+
+	/**
+	 * Get complete header classes
+	 */
+	getClasses: (sidemenu = false) => getHeaderClasses(sidemenu),
+} as const;
+
+/**
  * Get header classes based on sidemenu flag
  */
 export function getHeaderClasses(sidemenu: boolean): string {
 	const baseClasses = [
 		PANEL_SPACING.HEADER.HEIGHT,
 		"flex justify-between items-center",
-		PANEL_SPACING.HEADER.PADDING_LEFT,
+		PANEL_SPACING.HEADER.PADDING,
 		PANEL_SPACING.LAYOUT.SHRINK_0,
 	];
-
-	if (sidemenu) {
-		baseClasses.push(PANEL_SPACING.HEADER.PADDING_TOP);
-	}
 
 	return baseClasses.join(" ");
 }
