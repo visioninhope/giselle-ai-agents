@@ -54,7 +54,7 @@ export function V2Header({ teamName }: { teamName?: string }) {
 						</span>
 					)}
 					{/* app name editable */}
-					<div className="min-w-[120px] max-w-[200px]">
+					<div className="max-w-[200px]">
 						<EditableText
 							ref={editableTextRef}
 							fallbackValue="Untitled"
