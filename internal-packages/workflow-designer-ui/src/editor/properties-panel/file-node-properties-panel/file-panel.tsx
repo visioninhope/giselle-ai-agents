@@ -252,18 +252,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 			tabIndex={-1}
 		>
 			<div className="divide-y divide-black-50">
-				{node.content.files.length > 0 && (
-					<div className="pb-[16px] flex flex-col gap-[8px]">
-						{node.content.files.map((file) => (
-							<FileListItem
-								key={file.id}
-								fileData={file}
-								onRemove={removeFile}
-							/>
-						))}
-					</div>
-				)}
-				<div className={node.content.files.length > 0 ? "pt-[16px]" : ""}>
+				<div>
 					<div
 						className={clsx(
 							"group h-[300px] p-[8px]",
@@ -345,6 +334,17 @@ export function FilePanel({ node, config }: FilePanelProps) {
 						</div>
 					</div>
 				</div>
+				{node.content.files.length > 0 && (
+					<div className="pt-[16px] flex flex-col gap-[8px]">
+						{node.content.files.map((file) => (
+							<FileListItem
+								key={file.id}
+								fileData={file}
+								onRemove={removeFile}
+							/>
+						))}
+					</div>
+				)}
 			</div>
 		</div>
 	);
