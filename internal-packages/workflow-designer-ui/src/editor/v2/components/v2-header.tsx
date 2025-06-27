@@ -19,29 +19,29 @@ export function V2Header({ teamName }: { teamName?: string }) {
 	return (
 		<div
 			className={clsx(
-				"relative h-[54px] flex items-center justify-between",
-				"pl-[16px] pr-[16px] gap-[12px]",
+				"relative h-[44px] flex items-center justify-between",
+				"pl-[16px] pr-[16px] gap-[8px]",
 				"border-b border-black-600",
 				"shrink-0",
 			)}
 		>
 			{/* Left section: Logo + Team/App names */}
-			<div className="flex items-center gap-[4px] min-w-0">
-				<GiselleIcon className="text-white-900 w-[30px] h-[30px]" />
-				<span className="text-white-900 text-[14px] font-semibold">Studio</span>
-				<span className="text-white-900/20 text-[20px] font-[250] leading-none ml-[6px]">
+			<div className="flex items-center gap-[3px] min-w-0">
+				<GiselleIcon className="text-white-900 w-[24px] h-[24px]" />
+				<span className="text-white-900 text-[13px] font-semibold">Studio</span>
+				<span className="text-white-900/20 text-[18px] font-[250] leading-none ml-[4px]">
 					/
 				</span>
 
 				{/* Team / App names */}
-				<div className="flex items-center gap-[4px] min-w-0 ml-[8px]">
+				<div className="flex items-center gap-[3px] min-w-0 ml-[6px]">
 					{teamName && (
-						<span className="text-[#6B8FF0] text-[14px] truncate max-w-[160px]">
+						<span className="text-[#6B8FF0] text-[13px] truncate max-w-[160px]">
 							{teamName}
 						</span>
 					)}
 					{teamName && (
-						<span className="text-white-600 text-[20px] font-[250] leading-none">
+						<span className="text-white-600 text-[18px] font-[250] leading-none">
 							/
 						</span>
 					)}
