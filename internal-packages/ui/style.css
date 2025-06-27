@@ -5,6 +5,8 @@
 
 	/* border */
 	--color-border: #464b57;
+	--color-light-border: rgba(255, 255, 255, 0.15);
+	--color-dark-border: rgba(0, 0, 0, 0.25);
 	--color-border-variant: #363c46;
 	--color-border-focused: #47679e;
 	--color-border-selected: #293b5b;
@@ -14,7 +16,7 @@
 	/* surface */
 	--color-elevated-surface-background: #2f343e;
 	--color-surface-background: #2f343e;
-	--color-background: #3b414d;
+	--color-background: #00020b;
 
 	/* element */
 	--color-element-background: #2e343e;
@@ -29,7 +31,7 @@
 	--color-tab-active-background: #282c33;
 
 	/* text */
-	--color-text: #dce0e5;
+	--color-text: #f7f9fd;
 	--color-text-muted: #a9afbc;
 	--color-text-placeholder: #878a98;
 	--color-text-disabled: #878a98;
@@ -40,7 +42,7 @@
 
 	/* editor */
 	--color-editor-foreground: #acb2be;
-	--color-editor-background: #282c33;
+	--color-editor-background: #00020b;
 	--color-editor-gutter-background: #282c33;
 	--color-editor-subheader-background: #2f343e;
 	--color-editor-active-line-background: #2f343e;
