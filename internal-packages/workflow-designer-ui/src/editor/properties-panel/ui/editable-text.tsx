@@ -91,7 +91,7 @@ export const EditableText = forwardRef<
 					"py-[2px] px-[4px] rounded-[4px] data-[editing=true]:hidden text-left",
 					"hover:bg-white-900/20 group-hover:bg-white-900/10",
 					"data-[size=medium]:text-[14px] data-[size=large]:text-[16px]",
-					"cursor-default w-full",
+					"cursor-default w-full overflow-hidden text-ellipsis whitespace-nowrap",
 					!className && "text-white-900",
 					className,
 				)}

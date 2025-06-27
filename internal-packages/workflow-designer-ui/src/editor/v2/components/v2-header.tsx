@@ -54,7 +54,7 @@ export function V2Header({ teamName }: { teamName?: string }) {
 						</span>
 					)}
 					{/* app name editable */}
-					<span className="truncate max-w-[160px]">
+					<div className="min-w-[120px] max-w-[200px]">
 						<EditableText
 							ref={editableTextRef}
 							fallbackValue="Untitled"
@@ -62,7 +62,7 @@ export function V2Header({ teamName }: { teamName?: string }) {
 							value={data.name}
 							className="text-[#6B8FF0] text-[13px] font-medium"
 						/>
-					</span>
+					</div>
 					{/* dropdown menu */}
 					<Select
 						onValueChange={(value) => {
