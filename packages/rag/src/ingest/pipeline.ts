@@ -40,7 +40,10 @@ export interface IngestPipelineOptions<
 const DEFAULT_MAX_BATCH_SIZE = 100;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000;
-const DEFAULT_PARALLEL_LIMIT = 5;
+// Balanced for GitHub API limits (5,000/h) and memory constraints.
+// With differential ingest, most runs process few files.
+// Initial ingests may hit rate limits but will resume automatically.
+const DEFAULT_PARALLEL_LIMIT = 15;
 
 export type IngestFunction = () => Promise<IngestResult>;
 
