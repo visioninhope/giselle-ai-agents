@@ -1,13 +1,14 @@
 import type { FileData, FileNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
+import { useFeatureFlag } from "giselle-sdk/react";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { toRelativeTime } from "../../../helper/datetime";
-import { TriangleAlert } from "../../../icons";
-import { FileNodeIcon } from "../../../icons/node";
-import { useToasts } from "../../../ui/toast";
-import { RemoveButton } from "../ui";
+import { toRelativeTime } from "../../../../helper/datetime";
+import { TriangleAlert } from "../../../../icons";
+import { FileNodeIcon } from "../../../../icons/node";
+import { useToasts } from "../../../../ui/toast";
+import { RemoveButton } from "../../../properties-panel/ui";
 import type { FilePanelProps } from "./file-panel-type";
 import { useFileNode } from "./use-file-node";
 
@@ -245,13 +246,22 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		}
 	}, [handlePaste, node.content.category]);
 
+	const { sidemenu } = useFeatureFlag();
+
+	const getContentClasses = () => {
+		if (sidemenu) {
+			return "px-[16px] divide-y divide-black-50";
+		}
+		return "pl-0 pr-[16px] divide-y divide-black-50";
+	};
+
 	return (
 		<div
 			ref={panelRef}
 			className="relative z-10 flex flex-col gap-[2px] h-full text-[14px] text-black-300 outline-none"
 			tabIndex={-1}
 		>
-			<div className="divide-y divide-black-50">
+			<div className={getContentClasses()}>
 				{node.content.files.length > 0 && (
 					<div className="pb-[16px] flex flex-col gap-[8px]">
 						{node.content.files.map((file) => (
@@ -263,7 +273,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 						))}
 					</div>
 				)}
-				<div className={node.content.files.length > 0 ? "pt-[16px]" : ""}>
+				<div className="py-[16px]">
 					<div
 						className={clsx(
 							"group h-[300px] p-[8px]",
@@ -278,7 +288,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 					>
 						<div
 							className={clsx(
-								"h-full flex flex-col justify-center items-center gap-[16px] px-[24px] py-[16px]",
+								"h-full flex flex-col justify-center items-center gap-[16px] px-[24px] py-[10px]",
 								"border border-dotted rounded-[8px] border-transparent",
 								"group-data-[dragging=true]:border-black-400",
 								"group-data-[dragging=true]:group-data-[valid=false]:border-error-900",
