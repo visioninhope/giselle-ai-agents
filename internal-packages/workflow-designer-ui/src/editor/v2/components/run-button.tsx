@@ -5,6 +5,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
 	type NodeLike,
 	type OperationNode,
@@ -16,7 +17,6 @@ import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { PlayIcon } from "lucide-react";
-import { DropdownMenu } from "radix-ui";
 import {
 	type ButtonHTMLAttributes,
 	useCallback,
@@ -33,7 +33,7 @@ function NodeSelectItem({
 }: { node: NodeLike } & ButtonHTMLAttributes<HTMLButtonElement>) {
 	return (
 		<button
-			className="group relative flex items-center py-[8px] px-[12px] gap-[10px] outline-none cursor-pointer hover:bg-black-400/30 rounded-[6px] w-full"
+			className="flex items-center py-[8px] px-[12px] gap-[10px] outline-none w-full cursor-pointer"
 			{...props}
 		>
 			<div className="p-[12px] bg-black-800 rounded-[8px]">
@@ -84,8 +84,10 @@ export function RunButton() {
 	}
 
 	return (
-		<DropdownMenu.Root open={isDropdownOpen} onOpenChange={setIsDropdownOpen}>
-			<DropdownMenu.Trigger asChild>
+		<DropdownMenu
+			items={startingNodes}
+			renderOption={(startingNode) => <NodeSelectItem node={startingNode} />}
+			trigger={
 				<Button
 					leftIcon={<PlayIcon className="size-[15px] fill-current" />}
 					variant="glass"
@@ -93,59 +95,9 @@ export function RunButton() {
 				>
 					Run
 				</Button>
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
-					className={clsx(
-						"relative rounded-[8px] px-[8px] py-[8px] min-w-[200px]",
-						"bg-[rgba(0,0,0,_0.8)] text-white-900",
-						"backdrop-blur-[4px]",
-					)}
-					sideOffset={5}
-					align="end"
-				>
-					<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-border border-transparent" />
-					{startingNodes.map((startingNode) => (
-						<DropdownMenu.Item
-							key={startingNode.id}
-							asChild
-							onSelect={async () => {
-								if (isOperationNode(startingNode)) {
-									await startOperationFlow(startingNode);
-								}
-							}}
-						>
-							{isTriggerNode(startingNode) ? (
-								<Dialog
-									open={openDialogNodeId === startingNode.id}
-									onOpenChange={(isOpen) => {
-										setOpenDialogNodeId(isOpen ? startingNode.id : null);
-									}}
-								>
-									<DialogTrigger asChild>
-										<NodeSelectItem node={startingNode} />
-									</DialogTrigger>
-									<DialogContent>
-										<DialogTitle className="sr-only">
-											Override inputs to test workflow
-										</DialogTitle>
-
-										<TriggerInputDialog
-											node={startingNode}
-											onClose={() => {
-												setIsDropdownOpen(false);
-												setOpenDialogNodeId(null);
-											}}
-										/>
-									</DialogContent>
-								</Dialog>
-							) : (
-								<NodeSelectItem node={startingNode} />
-							)}
-						</DropdownMenu.Item>
-					))}
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+			}
+			sideOffset={4}
+			align="end"
+		/>
 	);
 }

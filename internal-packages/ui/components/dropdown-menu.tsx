@@ -1,3 +1,5 @@
+"use client";
+
 import clsx from "clsx/lite";
 import { DropdownMenu as DropdownMenuPrimitive } from "radix-ui";
 import type React from "react";
@@ -8,19 +10,23 @@ interface Identifiable {
 }
 
 interface DropdownMenuProps<T extends Identifiable> {
+	items: Array<T>;
 	trigger: React.ReactNode;
-	options: Array<T>;
 	renderOption: (option: T) => React.ReactNode;
 	onSelect?: (option: T) => void;
 	widthClassName?: string;
+	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
+	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
 }
 
 export function DropdownMenu<T extends Identifiable>({
 	trigger,
-	options,
+	items,
 	renderOption,
 	onSelect,
 	widthClassName,
+	sideOffset,
+	align,
 }: DropdownMenuProps<T>) {
 	return (
 		<DropdownMenuPrimitive.Root>
@@ -29,11 +35,12 @@ export function DropdownMenu<T extends Identifiable>({
 			</DropdownMenuPrimitive.Trigger>
 			<DropdownMenuPrimitive.Portal>
 				<DropdownMenuPrimitive.Content
-					sideOffset={4}
+					sideOffset={sideOffset}
+					align={align}
 					className={clsx("z-50", widthClassName)}
 				>
 					<PopoverContent>
-						{options.map((option) => (
+						{items.map((option) => (
 							<DropdownMenuPrimitive.Item
 								key={option.id}
 								onSelect={() => onSelect?.(option)}
