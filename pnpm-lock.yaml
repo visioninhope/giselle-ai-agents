@@ -468,6 +468,9 @@ importers:
       '@sentry/wizard':
         specifier: 3.38.0
         version: 3.38.0
+      '@supabase/auth-js':
+        specifier: 2.70.0
+        version: 2.70.0
       '@supabase/ssr':
         specifier: 0.6.1
         version: 0.6.1(@supabase/supabase-js@2.50.0(bufferutil@4.0.9)(utf-8-validate@6.0.5))
