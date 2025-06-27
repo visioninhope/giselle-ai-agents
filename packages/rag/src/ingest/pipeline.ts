@@ -121,6 +121,75 @@ export function createPipeline<
 	}
 
 	/**
+	 * Filter and prepare documents for processing
+	 */
+	async function* prepareDocuments(
+		versionTracker: ReturnType<typeof createVersionTracker>,
+		result: IngestResult,
+	): AsyncGenerator<{
+		metadata: TDocMetadata;
+		docKey: string;
+	}> {
+		for await (const metadata of documentLoader.loadMetadata()) {
+			let docKey: string;
+			let newVersion: string;
+			try {
+				docKey = documentKey(metadata);
+				newVersion = documentVersion(metadata);
+			} catch (error) {
+				result.failedDocuments++;
+				result.errors.push({
+					document: "<unknown>",
+					error: error instanceof Error ? error : new Error(String(error)),
+				});
+				continue;
+			}
+			versionTracker.trackSeen(docKey);
+
+			if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
+				continue;
+			}
+
+			yield { metadata, docKey };
+		}
+	}
+
+	/**
+	 * Process a batch of documents
+	 */
+	async function processBatch(
+		batch: Array<{ metadata: TDocMetadata; docKey: string }>,
+		result: IngestResult,
+		progress: IngestProgress,
+	): Promise<void> {
+		await Promise.all(
+			batch.map(async ({ metadata, docKey }) => {
+				const document = await documentLoader.loadDocument(metadata);
+				if (!document) {
+					return;
+				}
+
+				result.totalDocuments++;
+				progress.currentDocument = docKey;
+
+				try {
+					await processDocument(document);
+					result.successfulDocuments++;
+				} catch (error) {
+					result.failedDocuments++;
+					result.errors.push({
+						document: docKey,
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
+				}
+
+				progress.processedDocuments++;
+				onProgress?.(progress);
+			}),
+		);
+	}
+
+	/**
 	 * The main ingest function
 	 */
 	return async function ingest(): Promise<IngestResult> {
@@ -144,78 +213,13 @@ export function createPipeline<
 			);
 			const versionTracker = createVersionTracker(existingVersions);
 
-			/**
-			 * Filter and prepare documents for processing
-			 */
-			async function* prepareDocuments(): AsyncGenerator<{
-				metadata: TDocMetadata;
-				docKey: string;
-			}> {
-				for await (const metadata of documentLoader.loadMetadata()) {
-					let docKey: string;
-					let newVersion: string;
-					try {
-						docKey = documentKey(metadata);
-						newVersion = documentVersion(metadata);
-					} catch (error) {
-						result.failedDocuments++;
-						result.errors.push({
-							document: "<unknown>",
-							error: error instanceof Error ? error : new Error(String(error)),
-						});
-						continue;
-					}
-					versionTracker.trackSeen(docKey);
-
-					if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
-						continue;
-					}
-
-					yield { metadata, docKey };
-				}
-			}
-
-			/**
-			 * Process a batch of documents
-			 */
-			async function processBatch(
-				batch: Array<{ metadata: TDocMetadata; docKey: string }>,
-			): Promise<void> {
-				await Promise.all(
-					batch.map(async ({ metadata, docKey }) => {
-						const document = await documentLoader.loadDocument(metadata);
-						if (!document) {
-							return;
-						}
-
-						result.totalDocuments++;
-						progress.currentDocument = docKey;
-
-						try {
-							await processDocument(document);
-							result.successfulDocuments++;
-						} catch (error) {
-							result.failedDocuments++;
-							result.errors.push({
-								document: docKey,
-								error:
-									error instanceof Error ? error : new Error(String(error)),
-							});
-						}
-
-						progress.processedDocuments++;
-						onProgress?.(progress);
-					}),
-				);
-			}
-
 			// Process documents in batches
-			const documentsToProcess = prepareDocuments();
+			const documentsToProcess = prepareDocuments(versionTracker, result);
 			for await (const batch of createBatches(
 				documentsToProcess,
 				parallelLimit,
 			)) {
-				await processBatch(batch);
+				await processBatch(batch, result, progress);
 			}
 
 			// Handle orphaned documents
