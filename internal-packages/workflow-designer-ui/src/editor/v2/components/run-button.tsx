@@ -100,6 +100,9 @@ export function RunButton() {
 						open={openDialogNodeId === startingNode.id}
 						onOpenChange={(isOpen) => {
 							setOpenDialogNodeId(isOpen ? startingNode.id : null);
+							if (!isOpen) {
+								setIsDropdownOpen(false);
+							}
 						}}
 					>
 						<DialogTrigger asChild>
