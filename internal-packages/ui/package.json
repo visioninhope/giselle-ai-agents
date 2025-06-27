@@ -13,7 +13,8 @@
 		"./dialog": "./components/dialog.tsx",
 		"./button": "./components/button.tsx",
 		"./select": "./components/select.tsx",
-		"./note": "./components/note.tsx"
+		"./note": "./components/note.tsx",
+		"./dropdown-menu": "./components/dropdown-menu.tsx"
 	},
 	"dependencies": {
 		"clsx": "catalog:",

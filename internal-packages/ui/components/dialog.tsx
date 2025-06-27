@@ -9,7 +9,7 @@ export const DialogTrigger = DialogPrimitive.Trigger;
 export function DialogContent({ children }: PropsWithChildren) {
 	return (
 		<DialogPortal>
-			<DialogPrimitive.Overlay className="fixed inset-0 bg-black/60" />
+			<DialogPrimitive.Overlay className="fixed inset-0 bg-black/60 z-20" />
 			<DialogPrimitive.Content
 				className={clsx(
 					"fixed left-[50%] top-[15%] translate-x-[-50%] w-[400px] z-20 overflow-hidden outline-none",

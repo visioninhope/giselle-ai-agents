@@ -13,6 +13,10 @@ const components = [
 		id: "select",
 		name: "Select",
 	},
+	{
+		id: "dropdown-menu",
+		name: "Dropdown Menu",
+	},
 ];
 export default function ({
 	children,
