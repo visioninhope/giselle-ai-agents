@@ -39,9 +39,7 @@ export function GitHubToolConfigurationDialog({
 	return <p>TODO</p>;
 }
 
-export function GitHubToolConnectionDialog({
-	node,
-}: { node: TextGenerationNode }) {
+function GitHubToolConnectionDialog({ node }: { node: TextGenerationNode }) {
 	const [presentDialog, setPresentDialog] = useState(false);
 	const [tabValue, setTabValue] = useState("create");
 	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
