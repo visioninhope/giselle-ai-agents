@@ -43,10 +43,10 @@ export const githubToolsFlag = flag<boolean>({
 export const githubVectorStoreFlag = flag<boolean>({
 	key: "github-vector-store",
 	decide() {
-		return takeLocalEnv("GITHUB_VECTOR_STORE_FLAG");
+		return true;
 	},
 	description: "Enable GitHub Vector Store",
-	defaultValue: false,
+	defaultValue: true,
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },
