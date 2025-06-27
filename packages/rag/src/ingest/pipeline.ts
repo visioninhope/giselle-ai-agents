@@ -6,8 +6,8 @@ import { createDefaultEmbedder } from "../embedder";
 import type { EmbedderFunction } from "../embedder/types";
 import { ConfigurationError, OperationError } from "../errors";
 import { embedContent } from "./embedder";
-import { retryOperation } from "./retry";
 import type { IngestError, IngestProgress, IngestResult } from "./types";
+import { createBatches, retryOperation } from "./utils";
 import { createVersionTracker } from "./version-tracker";
 
 // Type helper to extract metadata type from ChunkStore
@@ -32,6 +32,7 @@ export interface IngestPipelineOptions<
 	maxBatchSize?: number;
 	maxRetries?: number;
 	retryDelay?: number;
+	parallelLimit?: number;
 	onProgress?: (progress: IngestProgress) => void;
 	onError?: (error: IngestError) => void;
 }
@@ -39,6 +40,10 @@ export interface IngestPipelineOptions<
 const DEFAULT_MAX_BATCH_SIZE = 100;
 const DEFAULT_MAX_RETRIES = 3;
 const DEFAULT_RETRY_DELAY = 1000;
+// Balanced for GitHub API limits (5,000/h) and memory constraints.
+// With differential ingest, most runs process few files.
+// Initial ingests may hit rate limits but will resume automatically.
+const DEFAULT_PARALLEL_LIMIT = 15;
 
 export type IngestFunction = () => Promise<IngestResult>;
 
@@ -61,6 +66,7 @@ export function createPipeline<
 		maxBatchSize = DEFAULT_MAX_BATCH_SIZE,
 		maxRetries = DEFAULT_MAX_RETRIES,
 		retryDelay = DEFAULT_RETRY_DELAY,
+		parallelLimit = DEFAULT_PARALLEL_LIMIT,
 		onProgress = () => {},
 		onError = () => {},
 	} = options;
@@ -115,6 +121,75 @@ export function createPipeline<
 	}
 
 	/**
+	 * Filter and prepare documents for processing
+	 */
+	async function* prepareDocuments(
+		versionTracker: ReturnType<typeof createVersionTracker>,
+		result: IngestResult,
+	): AsyncGenerator<{
+		metadata: TDocMetadata;
+		docKey: string;
+	}> {
+		for await (const metadata of documentLoader.loadMetadata()) {
+			let docKey: string;
+			let newVersion: string;
+			try {
+				docKey = documentKey(metadata);
+				newVersion = documentVersion(metadata);
+			} catch (error) {
+				result.failedDocuments++;
+				result.errors.push({
+					document: "<unknown>",
+					error: error instanceof Error ? error : new Error(String(error)),
+				});
+				continue;
+			}
+			versionTracker.trackSeen(docKey);
+
+			if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
+				continue;
+			}
+
+			yield { metadata, docKey };
+		}
+	}
+
+	/**
+	 * Process a batch of documents
+	 */
+	async function processBatch(
+		batch: Array<{ metadata: TDocMetadata; docKey: string }>,
+		result: IngestResult,
+		progress: IngestProgress,
+	): Promise<void> {
+		await Promise.all(
+			batch.map(async ({ metadata, docKey }) => {
+				const document = await documentLoader.loadDocument(metadata);
+				if (!document) {
+					return;
+				}
+
+				result.totalDocuments++;
+				progress.currentDocument = docKey;
+
+				try {
+					await processDocument(document);
+					result.successfulDocuments++;
+				} catch (error) {
+					result.failedDocuments++;
+					result.errors.push({
+						document: docKey,
+						error: error instanceof Error ? error : new Error(String(error)),
+					});
+				}
+
+				progress.processedDocuments++;
+				onProgress?.(progress);
+			}),
+		);
+	}
+
+	/**
 	 * The main ingest function
 	 */
 	return async function ingest(): Promise<IngestResult> {
@@ -138,47 +213,13 @@ export function createPipeline<
 			);
 			const versionTracker = createVersionTracker(existingVersions);
 
-			for await (const metadata of documentLoader.loadMetadata()) {
-				let docKey: string;
-				let newVersion: string;
-				try {
-					docKey = documentKey(metadata);
-					newVersion = documentVersion(metadata);
-				} catch (error) {
-					result.failedDocuments++;
-					result.errors.push({
-						document: "<unknown>",
-						error: error instanceof Error ? error : new Error(String(error)),
-					});
-					continue;
-				}
-				versionTracker.trackSeen(docKey);
-
-				if (!versionTracker.isUpdateNeeded(docKey, newVersion)) {
-					continue;
-				}
-
-				const document = await documentLoader.loadDocument(metadata);
-				if (!document) {
-					continue;
-				}
-
-				result.totalDocuments++;
-				progress.currentDocument = docKey;
-
-				try {
-					await processDocument(document);
-					result.successfulDocuments++;
-				} catch (error) {
-					result.failedDocuments++;
-					result.errors.push({
-						document: docKey,
-						error: error instanceof Error ? error : new Error(String(error)),
-					});
-				}
-
-				progress.processedDocuments++;
-				onProgress?.(progress);
+			// Process documents in batches
+			const documentsToProcess = prepareDocuments(versionTracker, result);
+			for await (const batch of createBatches(
+				documentsToProcess,
+				parallelLimit,
+			)) {
+				await processBatch(batch, result, progress);
 			}
 
 			// Handle orphaned documents

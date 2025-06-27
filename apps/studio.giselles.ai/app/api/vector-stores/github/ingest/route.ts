@@ -2,6 +2,7 @@ import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
+import type { TargetGitHubRepository } from "./types";
 import {
 	buildOctokit,
 	fetchTargetGitHubRepositories,
@@ -22,36 +23,40 @@ export async function GET(request: NextRequest) {
 
 	const targetGitHubRepositories = await fetchTargetGitHubRepositories();
 
-	for (const targetGitHubRepository of targetGitHubRepositories) {
-		const { owner, repo, installationId, teamDbId, dbId } =
-			targetGitHubRepository;
-
-		try {
-			await updateRepositoryStatusToRunning(dbId);
-
-			const octokitClient = buildOctokit(installationId);
-			const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
-			const source = {
-				owner,
-				repo,
-				commitSha: commit.sha,
-			};
-
-			await ingestGitHubBlobs({
-				octokitClient,
-				source,
-				teamDbId,
-			});
-
-			await updateRepositoryStatusToCompleted(dbId, commit.sha);
-		} catch (error) {
-			console.error(`Failed to ingest ${owner}/${repo}:`, error);
-			captureException(error, {
-				extra: { owner, repo },
-			});
-			await updateRepositoryStatusToFailed(dbId);
-		}
-	}
+	await Promise.all(targetGitHubRepositories.map(processRepository));
 
 	return new Response("ok", { status: 200 });
+}
+
+async function processRepository(
+	targetGitHubRepository: TargetGitHubRepository,
+) {
+	const { owner, repo, installationId, teamDbId, dbId } =
+		targetGitHubRepository;
+
+	try {
+		await updateRepositoryStatusToRunning(dbId);
+
+		const octokitClient = buildOctokit(installationId);
+		const commit = await fetchDefaultBranchHead(octokitClient, owner, repo);
+		const source = {
+			owner,
+			repo,
+			commitSha: commit.sha,
+		};
+
+		await ingestGitHubBlobs({
+			octokitClient,
+			source,
+			teamDbId,
+		});
+
+		await updateRepositoryStatusToCompleted(dbId, commit.sha);
+	} catch (error) {
+		console.error(`Failed to ingest ${owner}/${repo}:`, error);
+		captureException(error, {
+			extra: { owner, repo },
+		});
+		await updateRepositoryStatusToFailed(dbId);
+	}
 }
