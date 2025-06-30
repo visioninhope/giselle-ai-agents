@@ -293,6 +293,8 @@ export const githubRepositoryIndex = pgTable(
 			.notNull()
 			.$type<GitHubRepositoryIndexStatus>()
 			.default("idle"),
+		errorCode: text("error_code"),
+		isRetryable: boolean("is_retryable"),
 		createdAt: timestamp("created_at").defaultNow().notNull(),
 		updatedAt: timestamp("updated_at")
 			.defaultNow()
