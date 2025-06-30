@@ -1559,7 +1559,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/env"></a>
-### @next/env v15.1.4
+### @next/env v15.3.4
 #### 
 
 ##### Paths
@@ -1570,7 +1570,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.3.0
+### @next/swc-linux-x64-gnu v15.3.4
 #### 
 
 ##### Paths
@@ -1581,7 +1581,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.3.0
+### @next/swc-linux-x64-musl v15.3.4
 #### 
 
 ##### Paths
@@ -1592,7 +1592,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v15.1.4
+### @next/third-parties v15.3.4
 #### 
 
 ##### Paths
@@ -6656,7 +6656,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="detect-libc"></a>
-### detect-libc v2.0.3
+### detect-libc v2.0.4
 #### 
 
 ##### Paths
@@ -10187,7 +10187,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.3.0
+### next v15.3.4
 #### 
 
 ##### Paths
