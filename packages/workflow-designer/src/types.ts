@@ -1,8 +1,12 @@
 import type {
+	ConnectionId,
+	FileNode,
+	InputId,
 	Node,
 	NodeBase,
 	NodeId,
 	NodeUIState,
+	OutputId,
 	UploadedFileData,
 	Viewport,
 	Workspace,
@@ -24,9 +28,9 @@ export interface WorkflowDesignerContextValue {
 	) => Promise<Node | undefined> | Node | undefined;
 	addConnection: (args: {
 		outputNode: Node;
-		outputId: string;
+		outputId: OutputId;
 		inputNode: Node;
-		inputId: string;
+		inputId: InputId;
 	}) => void;
 	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
 	updateNodeDataContent: <T extends Node>(
@@ -40,11 +44,11 @@ export interface WorkflowDesignerContextValue {
 	) => void;
 	setUiViewport: (viewport: Viewport) => void;
 	deleteNode: (nodeId: NodeId | string) => Promise<void> | void;
-	deleteConnection: (connectionId: string) => void;
+	deleteConnection: (connectionId: ConnectionId) => void;
 	updateName: (name: string | undefined) => void;
 	uploadFile: (
 		files: File[],
-		node: Node,
+		node: FileNode,
 		options?: { onError?: (message: string) => void },
 	) => Promise<void>;
 	removeFile: (uploadedFile: UploadedFileData) => Promise<void>;

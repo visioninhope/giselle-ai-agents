@@ -1,34 +1,23 @@
 "use client";
 
 import {
-  type ActionNode,
-  type ConnectionId,
-  type FailedFileData,
-  type FileContent,
-  type FileNode,
-  type Node,
-  type NodeBase,
-  NodeId,
-  type NodeUIState,
-  type TriggerNode,
-  type UploadedFileData,
-  type Viewport,
-  type Workspace,
+	type ConnectionId,
+	type FileNode,
+	type Node,
+	NodeId,
+	type NodeUIState,
+	type UploadedFileData,
+	type Viewport,
+	type Workspace,
 	createFailedFileData,
 	createUploadedFileData,
 	createUploadingFileData,
-	isActionNode,
-	isFileNode,
-	isTriggerNode,
-	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { GenerationRunnerSystemProvider } from "@giselle-sdk/giselle-engine/react";
 import {
 	APICallError,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
-import { isClonedFileDataPayload } from "@giselle-sdk/node-utils";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
 
 import {
@@ -39,10 +28,7 @@ import {
 	usePropertiesPanel,
 	useView,
 } from "./hooks";
-import {
-	ConnectionCloneStrategy,
-	type WorkflowDesignerContextValue,
-} from "./types";
+import type { WorkflowDesignerContextValue } from "./types";
 import { isSupportedConnection } from "./utils";
 
 const DEFAULT_SAVE_DELAY = 1000;
@@ -115,9 +101,9 @@ export function WorkflowDesignerProvider({
 			ui: Partial<NodeUIState>,
 			options?: { save?: boolean },
 		) => {
-      setWorkspace((ws) => {
-        const id = NodeId.parse(nodeId);
-        const nodeState = ws.ui.nodeState[id] ?? {};
+			setWorkspace((ws) => {
+				const id = NodeId.parse(nodeId);
+				const nodeState = ws.ui.nodeState[id] ?? {};
 				return {
 					...ws,
 					ui: {
@@ -154,8 +140,8 @@ export function WorkflowDesignerProvider({
 
 	const deleteNode = useCallback(
 		async (nodeId: NodeId | string) => {
-      setWorkspace((ws) => {
-        const id = NodeId.parse(nodeId);
+			setWorkspace((ws) => {
+				const id = NodeId.parse(nodeId);
 				const ui = { ...ws.ui };
 				delete ui.nodeState[id];
 				return { ...ws, ui, nodes: ws.nodes.filter((n) => n.id !== id) };
@@ -198,7 +184,7 @@ export function WorkflowDesignerProvider({
 		async (files, node, options) => {
 			const uploaders = files.map((file) => {
 				return async () => {
-					let fileContents: FileContent[] = node.content.files;
+					let fileContents = node.content.files;
 					if (fileContents.some((f) => f.name === file.name)) {
 						options?.onError?.("duplicate file name");
 						return;
@@ -209,7 +195,7 @@ export function WorkflowDesignerProvider({
 						size: file.size,
 					});
 					fileContents = [...fileContents, uploadingFileData];
-          updateNodeDataContent(node, { files: fileContents } as any);
+					updateNodeDataContent(node, { files: fileContents });
 					try {
 						await client.uploadFile({
 							workspaceId: data.id,
@@ -240,7 +226,7 @@ export function WorkflowDesignerProvider({
 							];
 						}
 					}
-          updateNodeDataContent(node, { files: fileContents } as any);
+					updateNodeDataContent(node, { files: fileContents });
 				};
 			});
 			for (const uploader of uploaders) {
@@ -288,9 +274,7 @@ export function WorkflowDesignerProvider({
 				...viewHelper,
 			}}
 		>
-			<GenerationRunnerSystemProvider>
-				{children}
-			</GenerationRunnerSystemProvider>
+			{children}
 		</WorkflowDesignerContext.Provider>
 	);
 }
