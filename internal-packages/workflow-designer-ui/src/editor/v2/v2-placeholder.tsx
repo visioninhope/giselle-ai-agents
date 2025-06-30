@@ -46,7 +46,10 @@ export function V2Placeholder({
 			<RootProvider>
 				<V2Header />
 				<V2Container {...layoutState} />
-				<V2Footer onLeftPaelValueChange={handleLeftPanelValueChange} />
+				<V2Footer
+					onLeftPaelValueChange={handleLeftPanelValueChange}
+					activePanel={layoutState.leftPanel}
+				/>
 			</RootProvider>
 		</div>
 	);
