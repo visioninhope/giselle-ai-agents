@@ -36,6 +36,15 @@ export abstract class RagError extends Error {
 			stack: this.stack,
 		};
 	}
+
+	/**
+	 * Determine if this error is retryable
+	 * Override in subclasses to define specific retry behavior
+	 * Default: all errors are retryable
+	 */
+	isRetryable(): boolean {
+		return true;
+	}
 }
 
 /**
@@ -337,6 +346,20 @@ export class DocumentLoaderError extends RagError {
 			cause,
 			{ ...context, resourcePath, size, maxSize },
 		);
+	}
+
+	/**
+	 * Override isRetryable for DocumentLoaderError
+	 * Some document errors should not be retried
+	 */
+	isRetryable(): boolean {
+		const nonRetryableErrorCodes: DocumentLoaderErrorCode[] = [
+			"DOCUMENT_NOT_FOUND",
+			"DOCUMENT_ACCESS_DENIED",
+			"DOCUMENT_TOO_LARGE",
+		];
+
+		return !nonRetryableErrorCodes.includes(this.code);
 	}
 }
 

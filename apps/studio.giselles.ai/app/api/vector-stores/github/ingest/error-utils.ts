@@ -1,7 +1,4 @@
-import type {
-	DocumentLoaderError,
-	DocumentLoaderErrorCode,
-} from "@giselle-sdk/rag";
+import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
 
 /**
  * Get user-friendly error message from DocumentLoaderError
@@ -21,26 +18,4 @@ export function getErrorMessage(code: DocumentLoaderErrorCode): string {
 		default:
 			return "An error occurred while processing the repository.";
 	}
-}
-
-/**
- * Determine if an error is retryable
- */
-export function isRetryableError(error: DocumentLoaderError): boolean {
-	// Rate limit errors are retryable after waiting
-	if (error.code === "DOCUMENT_RATE_LIMITED") {
-		return true;
-	}
-
-	// Server errors are typically transient and retryable
-	if (
-		error.code === "DOCUMENT_FETCH_ERROR" &&
-		error.context?.statusCode &&
-		typeof error.context.statusCode === "number" &&
-		error.context.statusCode >= 500
-	) {
-		return true;
-	}
-
-	return false;
 }

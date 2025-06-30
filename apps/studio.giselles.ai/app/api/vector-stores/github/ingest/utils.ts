@@ -97,16 +97,14 @@ export async function updateRepositoryStatusToFailed(
 		errorCode: string;
 	},
 ) {
-	// For now, we only update the status to "failed"
-	// In the future, we could store the error information in the database
-	// Log the structured error information for debugging
-	await updateRepositoryStatus(dbId, "failed");
-	if (errorInfo) {
-		console.log(`Repository ${dbId} failed with:`, {
-			errorCode: errorInfo.errorCode,
-			isRetryable: errorInfo.isRetryable,
-		});
-	}
+	await db
+		.update(githubRepositoryIndex)
+		.set({
+			status: "failed",
+			errorCode: errorInfo?.errorCode ?? null,
+			isRetryable: errorInfo?.isRetryable ?? null,
+		})
+		.where(eq(githubRepositoryIndex.dbId, dbId));
 }
 
 async function updateRepositoryStatus(
@@ -116,6 +114,8 @@ async function updateRepositoryStatus(
 ): Promise<void> {
 	const updates: Partial<typeof githubRepositoryIndex.$inferInsert> = {
 		status,
+		errorCode: null,
+		isRetryable: null,
 	};
 
 	if (commitSha != null) {
