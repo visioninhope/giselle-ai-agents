@@ -32,7 +32,7 @@ export function RunHistoryTable() {
           <tbody>
             <tr className="border-b border-white-400/10">
               <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:55
+                2025/01/15 14:30
               </td>
               <td className="py-3 px-4 whitespace-nowrap">
                 <span className="text-[#39FF7F]">completed</span>
@@ -57,157 +57,7 @@ export function RunHistoryTable() {
             </tr>
             <tr className="border-b border-white-400/10">
               <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:12
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2.1s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2.5s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:13
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.7s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2.1s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:14
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.1s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.5s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:15
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.6s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2.0s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:16
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.7s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2.0s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:16
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#39FF7F]">completed</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">2</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.2s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.5s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:19
+                2025/01/15 14:25
               </td>
               <td className="py-3 px-4 whitespace-nowrap">
                 <span className="text-[#FF3D71]">failed</span>
@@ -220,35 +70,6 @@ export function RunHistoryTable() {
                   <span className="text-xs">1</span>
                   <span className="w-4 h-4 rounded-full bg-[#FF3D71] text-black text-xs flex items-center justify-center font-bold">
                     ✕
-                  </span>
-                  <span className="text-xs">1</span>
-                </span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                manual
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.1s
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                1.0s
-              </td>
-            </tr>
-            <tr className="border-b border-white-400/10">
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                2025/06/18 16:20
-              </td>
-              <td className="py-3 px-4 whitespace-nowrap">
-                <span className="text-[#FFE551]">warning</span>
-              </td>
-              <td className="py-3 px-4 text-white-800 whitespace-nowrap">
-                <span className="inline-flex items-center gap-1">
-                  <span className="w-4 h-4 rounded-full bg-[#39FF7F] text-black text-xs flex items-center justify-center font-bold">
-                    ✓
-                  </span>
-                  <span className="text-xs">1</span>
-                  <span className="w-4 h-4 rounded-full bg-[#FFE551] text-black text-xs flex items-center justify-center font-bold">
-                    !
                   </span>
                   <span className="text-xs">1</span>
                 </span>

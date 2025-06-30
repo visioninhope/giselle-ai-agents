@@ -5,6 +5,7 @@ import { useMemo } from "react";
 import { DataSourceTable } from "../../../data-source";
 import { RunHistoryTable } from "../../../run-history/run-history-table";
 import { SecretTable } from "../../../secret/secret-table";
+import { getPanelConfig } from "../../../shared/panel-config";
 import type { LeftPanelValue } from "../../state";
 import { PanelContent } from "./panel-content";
 import { ResizablePanel } from "./resizable-panel";
@@ -16,28 +17,10 @@ interface PanelWrapperProps {
   onWidthChange?: (width: number) => void;
 }
 
-const panelConfig = {
-  "run-history": {
-    title: "Run History",
-    component: RunHistoryTable,
-    minWidth: 500,
-    defaultWidth: 650,
-    maxWidth: 1000,
-  },
-  secret: {
-    title: "Secrets",
-    component: SecretTable,
-    minWidth: 300,
-    defaultWidth: 400,
-    maxWidth: 600,
-  },
-  "data-source": {
-    title: "Data Source",
-    component: DataSourceTable,
-    minWidth: 350,
-    defaultWidth: 450,
-    maxWidth: 700,
-  },
+const componentMap = {
+  "run-history": RunHistoryTable,
+  secret: SecretTable,
+  "data-source": DataSourceTable,
 } as const;
 
 export function PanelWrapper({
@@ -57,8 +40,8 @@ export function PanelWrapper({
       };
     }
 
-    const config = panelConfig[panelType];
-    if (!config) {
+    const Component = componentMap[panelType];
+    if (!Component) {
       console.warn(`Unknown panel type: ${panelType}`);
       return {
         content: null,
@@ -69,7 +52,7 @@ export function PanelWrapper({
       };
     }
 
-    const Component = config.component;
+    const config = getPanelConfig(panelType);
     return {
       content: <Component />,
       title: config.title,

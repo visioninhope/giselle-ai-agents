@@ -83,70 +83,60 @@ export function DataSourceTable() {
   }
   return (
     <div className="px-[16px] pb-[16px] pt-[8px] h-full">
-      <div className="flex justify-end items-center">
-        <Dialog open={presentDialog} onOpenChange={setPresentDialog}>
-          <DialogTrigger asChild>
-            <Button type="button" leftIcon={<PlusIcon className="text-text" />}>
-              Add Data Source
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <div className="py-[12px]">
-              <DialogTitle>Add Data Source</DialogTitle>
-              <DialogDescription>
-                Connect to external data sources to query and use in your
-                workflows.
-              </DialogDescription>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-[12px]">
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="provider"
-                    className="text-text text-[13px] mb-[2px]"
-                  >
-                    Provider
-                  </label>
-                  <Select
-                    name="provider"
-                    options={[{ id: "github", label: "GitHub" }]}
-                    renderOption={(option) => option.label}
-                    placeholder="Select provider..."
-                    value={provider}
-                    onValueChange={setProvider}
-                  />
-                  <p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-                    Currently, only GitHub is supported. More coming soon!
-                  </p>
-                </fieldset>
-
-                {provider === "github" && <GitHubConnectFieldsets />}
-              </div>
-              <DialogFooter>
-                <Button
-                  type="submit"
-                  variant="solid"
-                  size="large"
-                  disabled={isPending}
+      <Dialog open={presentDialog} onOpenChange={setPresentDialog}>
+        <DialogContent>
+          <div className="py-[12px]">
+            <DialogTitle>Add Data Source</DialogTitle>
+            <DialogDescription>
+              Connect to external data sources to query and use in your
+              workflows.
+            </DialogDescription>
+          </div>
+          <form onSubmit={handleSubmit}>
+            <div className="flex flex-col gap-[12px]">
+              <fieldset className="flex flex-col">
+                <label
+                  htmlFor="provider"
+                  className="text-text text-[13px] mb-[2px]"
                 >
-                  {isPending ? "..." : "Create"}
-                </Button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
+                  Provider
+                </label>
+                <Select
+                  name="provider"
+                  options={[{ id: "github", label: "GitHub" }]}
+                  renderOption={(option) => option.label}
+                  placeholder="Select provider..."
+                  value={provider}
+                  onValueChange={setProvider}
+                />
+                <p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+                  Currently, only GitHub is supported. More coming soon!
+                </p>
+              </fieldset>
+
+              {provider === "github" && <GitHubConnectFieldsets />}
+            </div>
+            <DialogFooter>
+              <Button
+                type="submit"
+                variant="solid"
+                size="large"
+                disabled={isPending}
+              >
+                {isPending ? "..." : "Create"}
+              </Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
       {data === undefined || data.length < 1 ? (
         <EmptyState
           title="No data source connected."
           description="Add your first one below to start building."
         >
-          <Button
-            leftIcon={<PlusIcon />}
-            onClick={() => setPresentDialog(true)}
-          >
-            Add Data Source
-          </Button>
+          <DialogTrigger asChild>
+            <Button leftIcon={<PlusIcon />}>Add Data Source</Button>
+          </DialogTrigger>
         </EmptyState>
       ) : (
         <Table>
