@@ -1,5 +1,6 @@
 "use client";
 
+import { useFeatureFlag } from "giselle-sdk/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
 import { V2Container, V2Footer, V2Header } from "./components";
@@ -33,6 +34,8 @@ export function V2Placeholder({
 		[],
 	);
 
+	const { layoutV3 } = useFeatureFlag();
+
 	return (
 		<div className="flex-1 overflow-hidden font-sans flex flex-col">
 			{showReadOnlyBanner && isReadOnly && (
@@ -46,7 +49,9 @@ export function V2Placeholder({
 			<RootProvider>
 				<V2Header />
 				<V2Container {...layoutState} />
-				<V2Footer onLeftPaelValueChange={handleLeftPanelValueChange} />
+				{layoutV3 && (
+					<V2Footer onLeftPaelValueChange={handleLeftPanelValueChange} />
+				)}
 			</RootProvider>
 		</div>
 	);

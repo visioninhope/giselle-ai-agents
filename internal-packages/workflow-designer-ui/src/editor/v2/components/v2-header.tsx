@@ -2,7 +2,7 @@
 
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { ChevronDownIcon } from "lucide-react";
 import { useRef } from "react";
 import { GiselleIcon } from "../../../icons";
@@ -12,6 +12,7 @@ import { RunButton } from "./run-button";
 export function V2Header({ teamName }: { teamName?: string }) {
 	const { data, updateName } = useWorkflowDesigner();
 	const editableTextRef = useRef<EditableTextRef>(null);
+	const { layoutV3 } = useFeatureFlag();
 
 	const handleUpdateName = (value?: string) => {
 		if (!value) return;
@@ -58,62 +59,64 @@ export function V2Header({ teamName }: { teamName?: string }) {
 						/>
 					</div>
 					{/* dropdown menu */}
-					<DropdownMenu
-						items={[
-							{
-								id: "rename",
-								name: "Rename",
-								action: () => editableTextRef.current?.triggerEdit(),
-							},
-							{
-								id: "duplicate",
-								name: "Duplicate",
-								action: () => {
-									// TODO: Implement app duplication functionality
-									console.warn("Duplicate functionality not yet implemented");
+					{layoutV3 && (
+						<DropdownMenu
+							items={[
+								{
+									id: "rename",
+									name: "Rename",
+									action: () => editableTextRef.current?.triggerEdit(),
 								},
-							},
-							{ id: "template", name: "Create a Template", disabled: true },
-							{
-								id: "delete",
-								name: "Delete",
-								action: () => {
-									// TODO: Implement app deletion functionality
-									console.warn("Delete functionality not yet implemented");
+								{
+									id: "duplicate",
+									name: "Duplicate",
+									action: () => {
+										// TODO: Implement app duplication functionality
+										console.warn("Duplicate functionality not yet implemented");
+									},
 								},
-								destructive: true,
-							},
-						]}
-						trigger={
-							<button
-								type="button"
-								className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none"
-							>
-								<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
-							</button>
-						}
-						renderItem={(item) =>
-							item.id === "template" ? (
-								<div className="flex items-center justify-between w-full opacity-50">
-									<span>{item.name}</span>
-									<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
-										Coming&nbsp;soon
-									</span>
-								</div>
-							) : (
-								<span className={item.destructive ? "text-error-900" : ""}>
-									{item.name}
-								</span>
-							)
-						}
-						onSelect={(event, item) => {
-							if (!item.disabled && item.action) {
-								item.action();
+								{ id: "template", name: "Create a Template", disabled: true },
+								{
+									id: "delete",
+									name: "Delete",
+									action: () => {
+										// TODO: Implement app deletion functionality
+										console.warn("Delete functionality not yet implemented");
+									},
+									destructive: true,
+								},
+							]}
+							trigger={
+								<button
+									type="button"
+									className="ml-[4px] p-0 border-none bg-transparent w-auto h-auto hover:bg-transparent focus:bg-transparent outline-none"
+								>
+									<ChevronDownIcon className="size-[16px] text-[#6B8FF0] hover:text-white-950" />
+								</button>
 							}
-						}}
-						sideOffset={12}
-						align="start"
-					/>
+							renderItem={(item) =>
+								item.id === "template" ? (
+									<div className="flex items-center justify-between w-full opacity-50">
+										<span>{item.name}</span>
+										<span className="ml-2 text-[10px] leading-none text-white-600 bg-white/30 px-1.5 py-[1px] rounded-full">
+											Coming&nbsp;soon
+										</span>
+									</div>
+								) : (
+									<span className={item.destructive ? "text-error-900" : ""}>
+										{item.name}
+									</span>
+								)
+							}
+							onSelect={(event, item) => {
+								if (!item.disabled && item.action) {
+									item.action();
+								}
+							}}
+							sideOffset={12}
+							align="start"
+						/>
+					)}
 				</div>
 			</div>
 
