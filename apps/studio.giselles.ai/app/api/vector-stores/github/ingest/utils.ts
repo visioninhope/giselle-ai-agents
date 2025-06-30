@@ -4,7 +4,7 @@ import {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
-import { and, eq, lt, or } from "drizzle-orm";
+import { and, eq, isNull, lt, or } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
 
 export function buildOctokit(installationId: number) {
@@ -30,7 +30,7 @@ export function buildOctokit(installationId: number) {
  *
  * target repositories are:
  * - idle
- * - failed
+ * - failed (only if retryable or isRetryable is null for backward compatibility)
  * - running and updated more than 15 minutes ago (stale)
  * - completed and updated more than 24 hours ago (outdated)
  *
@@ -52,12 +52,22 @@ export async function fetchTargetGitHubRepositories(): Promise<
 			installationId: githubRepositoryIndex.installationId,
 			lastIngestedCommitSha: githubRepositoryIndex.lastIngestedCommitSha,
 			teamDbId: githubRepositoryIndex.teamDbId,
+			status: githubRepositoryIndex.status,
+			isRetryable: githubRepositoryIndex.isRetryable,
 		})
 		.from(githubRepositoryIndex)
 		.where(
 			or(
 				eq(githubRepositoryIndex.status, "idle"),
-				eq(githubRepositoryIndex.status, "failed"),
+				// Only include failed repositories that are retryable
+				and(
+					eq(githubRepositoryIndex.status, "failed"),
+					or(
+						eq(githubRepositoryIndex.isRetryable, true),
+						// Include repositories without isRetryable set (backward compatibility)
+						isNull(githubRepositoryIndex.isRetryable),
+					),
+				),
 				and(
 					eq(githubRepositoryIndex.status, "running"),
 					lt(githubRepositoryIndex.updatedAt, staleThreshold),
