@@ -69,7 +69,9 @@ export function ResizableSection({
 					<h3 className="text-sm font-medium text-white-900">{title}</h3>
 				</div>
 			)}
-			<div className="flex-1 overflow-hidden">{children}</div>
+			<div className="flex-1 overflow-hidden h-full flex flex-col">
+				{children}
+			</div>
 		</Panel>
 	);
 }

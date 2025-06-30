@@ -1,5 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
+
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -13,11 +14,7 @@ import { Toolbar as ToolbarPrimitive } from "radix-ui";
 import { type ReactNode, useMemo } from "react";
 import { SourceExtensionReact } from "./source-extension-react";
 
-function Toolbar({
-	tools,
-}: {
-	tools?: (editor: Editor) => ReactNode;
-}) {
+function Toolbar({ tools }: { tools?: (editor: Editor) => ReactNode }) {
 	const { editor } = useCurrentEditor();
 	if (!editor) {
 		return null;
@@ -133,18 +130,16 @@ export function TextEditor({
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
 }) {
-	const extensions = useMemo(
-		() =>
-			nodes === undefined
-				? baseExtensions
-				: [
-						...baseExtensions,
-						SourceExtensionReact.configure({
-							nodes,
-						}),
-					],
-		[nodes],
-	);
+	const extensions = useMemo(() => {
+		return nodes === undefined
+			? baseExtensions
+			: [
+					...baseExtensions,
+					SourceExtensionReact.configure({
+						nodes,
+					}),
+				];
+	}, [nodes]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider
@@ -158,7 +153,7 @@ export function TextEditor({
 							: JSON.parse(value)
 				}
 				editorContainerProps={{
-					className: "flex-1 overflow-hidden",
+					className: "flex-1 overflow-hidden flex flex-col h-full",
 				}}
 				onUpdate={(p) => {
 					onValueChange?.(JSON.stringify(p.editor.getJSON()));
@@ -167,7 +162,7 @@ export function TextEditor({
 				editorProps={{
 					attributes: {
 						class:
-							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] h-full overflow-y-auto",
+							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto",
 					},
 				}}
 			/>

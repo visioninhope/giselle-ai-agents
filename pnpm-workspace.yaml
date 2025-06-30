@@ -44,6 +44,7 @@ catalog:
   "@tiptap/core": 2.11.5
   "@tiptap/react": 2.11.5
   "@tiptap/starter-kit": 2.11.5
+  "@tiptap/extension-placeholder": 2.11.5
   "@tiptap/extension-code-block-lowlight": 2.11.5
   "@tiptap/html": 2.11.5
   highlight.js: 11.11.1
