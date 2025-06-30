@@ -10,7 +10,8 @@ export abstract class RagError extends Error {
 		| "database"
 		| "embedding"
 		| "configuration"
-		| "operation";
+		| "operation"
+		| "document-loader";
 
 	constructor(
 		message: string,
@@ -249,6 +250,102 @@ export class OperationError extends RagError {
 }
 
 export type OperationErrorCode = "INVALID_OPERATION";
+
+/**
+ * Document loader error
+ */
+export class DocumentLoaderError extends RagError {
+	readonly category = "document-loader" as const;
+
+	constructor(
+		message: string,
+		public readonly code: DocumentLoaderErrorCode,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		super(message, cause, context);
+	}
+
+	/**
+	 * Helper to create common document loader errors
+	 */
+	static notFound(
+		resourcePath: string,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document not found: ${resourcePath}`,
+			"DOCUMENT_NOT_FOUND",
+			cause,
+			{ ...context, resourcePath },
+		);
+	}
+
+	static accessDenied(
+		resourcePath: string,
+		reason: string,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Access denied to document '${resourcePath}': ${reason}`,
+			"DOCUMENT_ACCESS_DENIED",
+			cause,
+			{ ...context, resourcePath, reason },
+		);
+	}
+
+	static fetchError(
+		source: string,
+		operation: string,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document fetch error from '${source}' during ${operation}`,
+			"DOCUMENT_FETCH_ERROR",
+			cause,
+			{ ...context, source, operation },
+		);
+	}
+
+	static rateLimited(
+		source: string,
+		retryAfter: string | number | undefined,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Rate limit exceeded for ${source}`,
+			"DOCUMENT_RATE_LIMITED",
+			cause,
+			{ ...context, source, retryAfter },
+		);
+	}
+
+	static tooLarge(
+		resourcePath: string,
+		size: number,
+		maxSize: number,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document '${resourcePath}' exceeds size limit: ${size} > ${maxSize}`,
+			"DOCUMENT_TOO_LARGE",
+			cause,
+			{ ...context, resourcePath, size, maxSize },
+		);
+	}
+}
+
+export type DocumentLoaderErrorCode =
+	| "DOCUMENT_NOT_FOUND"
+	| "DOCUMENT_ACCESS_DENIED"
+	| "DOCUMENT_FETCH_ERROR"
+	| "DOCUMENT_RATE_LIMITED"
+	| "DOCUMENT_TOO_LARGE";
 
 /**
  * Utility function for error handling

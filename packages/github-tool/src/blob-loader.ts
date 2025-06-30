@@ -1,4 +1,5 @@
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
+import { DocumentLoaderError } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { RequestError } from "@octokit/request-error";
 
@@ -90,8 +91,17 @@ async function executeWithRetry<T>(
 			// Handle 5xx errors with retry
 			if (error.status && error.status >= 500) {
 				if (currentAttempt >= maxAttempt) {
-					throw new Error(
-						`GitHub Server error: ${error.status} when fetching ${resourceType} ${resourcePath}`,
+					throw DocumentLoaderError.fetchError(
+						"github",
+						`fetching ${resourceType}`,
+						error,
+						{
+							statusCode: error.status,
+							resourceType,
+							resourcePath,
+							retryAttempts: currentAttempt,
+							maxAttempts: maxAttempt,
+						},
 					);
 				}
 				await new Promise((resolve) =>
@@ -108,15 +118,39 @@ async function executeWithRetry<T>(
 
 			// Handle 404 errors with helpful message
 			if (error.status === 404) {
-				throw new Error(
-					`${resourceType} not found: ${resourcePath}. This may be due to insufficient permissions or the resource being private/deleted.`,
+				throw DocumentLoaderError.notFound(resourcePath, error, {
+					source: "github",
+					resourceType,
+					statusCode: 404,
+				});
+			}
+
+			// Handle rate limit errors (403, 429)
+			if (error.status === 403 || error.status === 429) {
+				throw DocumentLoaderError.rateLimited(
+					"github",
+					error.response?.headers?.["retry-after"],
+					error,
+					{
+						statusCode: error.status,
+						resourceType,
+						resourcePath,
+					},
 				);
 			}
 
-			// Other 4xx errors (including rate limit: 403, 429)
+			// Other 4xx errors
 			if (error.status && error.status >= 400 && error.status < 500) {
-				throw new Error(
-					`GitHub API error ${error.status}: ${error.message} when fetching ${resourceType} ${resourcePath}`,
+				throw DocumentLoaderError.fetchError(
+					"github",
+					`fetching ${resourceType}`,
+					error,
+					{
+						statusCode: error.status,
+						resourceType,
+						resourcePath,
+						errorMessage: error.message,
+					},
 				);
 			}
 		}
@@ -219,7 +253,19 @@ async function* traverseTree(
 		 * If this limit is exceeded, please consider another way to ingest the repository.
 		 * For example, you can use the git clone or GET tarball API for first time ingestion.
 		 */
-		throw new Error(`Tree is truncated: ${owner}/${repo}/${treeData.sha}`);
+		throw DocumentLoaderError.tooLarge(
+			`${owner}/${repo}`,
+			treeData.tree.length,
+			100000, // GitHub's limit
+			undefined,
+			{
+				source: "github",
+				treeSha: treeData.sha,
+				truncated: true,
+				suggestion:
+					"Consider using git clone or GET tarball API for large repositories",
+			},
+		);
 	}
 
 	for (const entry of treeData.tree) {
