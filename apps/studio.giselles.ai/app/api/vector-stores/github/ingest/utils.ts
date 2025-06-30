@@ -90,8 +90,23 @@ export async function updateRepositoryStatusToCompleted(
 	await updateRepositoryStatus(dbId, "completed", commitSha);
 }
 
-export async function updateRepositoryStatusToFailed(dbId: number) {
+export async function updateRepositoryStatusToFailed(
+	dbId: number,
+	errorInfo?: {
+		isRetryable: boolean;
+		errorCode: string;
+	},
+) {
+	// For now, we only update the status to "failed"
+	// In the future, we could store the error information in the database
+	// Log the structured error information for debugging
 	await updateRepositoryStatus(dbId, "failed");
+	if (errorInfo) {
+		console.log(`Repository ${dbId} failed with:`, {
+			errorCode: errorInfo.errorCode,
+			isRetryable: errorInfo.isRetryable,
+		});
+	}
 }
 
 async function updateRepositoryStatus(

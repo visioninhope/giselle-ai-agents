@@ -1,6 +1,8 @@
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
+import { DocumentLoaderError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
+import { isRetryableError } from "./error-utils";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
 import type { TargetGitHubRepository } from "./types";
 import {
@@ -57,9 +59,31 @@ async function processRepository(
 			`Failed to ingest GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
 			error,
 		);
+
+		// Handle DocumentLoaderError specifically
+		let shouldRetry = false;
+		let errorCode: string | undefined;
+
+		if (error instanceof DocumentLoaderError) {
+			shouldRetry = isRetryableError(error);
+			errorCode = error.code;
+		}
+
 		captureException(error, {
-			extra: { owner, repo, teamDbId },
+			extra: {
+				owner,
+				repo,
+				teamDbId,
+				shouldRetry,
+				errorCode,
+				errorContext:
+					error instanceof DocumentLoaderError ? error.context : undefined,
+			},
 		});
-		await updateRepositoryStatusToFailed(dbId);
+
+		await updateRepositoryStatusToFailed(dbId, {
+			isRetryable: shouldRetry,
+			errorCode: errorCode || "UNKNOWN",
+		});
 	}
 }
