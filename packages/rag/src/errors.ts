@@ -291,20 +291,6 @@ export class DocumentLoaderError extends RagError {
 		);
 	}
 
-	static accessDenied(
-		resourcePath: string,
-		reason: string,
-		cause?: Error,
-		context?: Record<string, unknown>,
-	) {
-		return new DocumentLoaderError(
-			`Access denied to document '${resourcePath}': ${reason}`,
-			"DOCUMENT_ACCESS_DENIED",
-			cause,
-			{ ...context, resourcePath, reason },
-		);
-	}
-
 	static fetchError(
 		source: string,
 		operation: string,
@@ -355,7 +341,6 @@ export class DocumentLoaderError extends RagError {
 	isRetryable(): boolean {
 		const nonRetryableErrorCodes: DocumentLoaderErrorCode[] = [
 			"DOCUMENT_NOT_FOUND",
-			"DOCUMENT_ACCESS_DENIED",
 			"DOCUMENT_TOO_LARGE",
 		];
 
@@ -365,7 +350,6 @@ export class DocumentLoaderError extends RagError {
 
 export type DocumentLoaderErrorCode =
 	| "DOCUMENT_NOT_FOUND"
-	| "DOCUMENT_ACCESS_DENIED"
 	| "DOCUMENT_FETCH_ERROR"
 	| "DOCUMENT_RATE_LIMITED"
 	| "DOCUMENT_TOO_LARGE";

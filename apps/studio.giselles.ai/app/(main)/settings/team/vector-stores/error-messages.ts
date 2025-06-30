@@ -5,8 +5,6 @@ import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
  */
 export function getErrorMessage(code: DocumentLoaderErrorCode): string {
 	switch (code) {
-		case "DOCUMENT_ACCESS_DENIED":
-			return "Access denied to repository. Please check GitHub App permissions.";
 		case "DOCUMENT_NOT_FOUND":
 			return "We couldn't find this repository. It might be private, deleted, or your Vector Store may need to be reconfigured with proper permissions.";
 		case "DOCUMENT_RATE_LIMITED":
