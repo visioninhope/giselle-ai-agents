@@ -1,6 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
-import Placeholder from "@tiptap/extension-placeholder";
+
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -124,33 +124,22 @@ export function TextEditor({
 	onValueChange,
 	tools,
 	nodes,
-	placeholder,
 }: {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
-	placeholder?: string;
 }) {
 	const extensions = useMemo(() => {
-		const extensionsWithPlaceholder = placeholder
-			? [
-					...baseExtensions,
-					Placeholder.configure({
-						placeholder,
-					}),
-				]
-			: baseExtensions;
-
 		return nodes === undefined
-			? extensionsWithPlaceholder
+			? baseExtensions
 			: [
-					...extensionsWithPlaceholder,
+					...baseExtensions,
 					SourceExtensionReact.configure({
 						nodes,
 					}),
 				];
-	}, [nodes, placeholder]);
+	}, [nodes]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider
@@ -173,7 +162,7 @@ export function TextEditor({
 				editorProps={{
 					attributes: {
 						class:
-							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto [&_.ProseMirror_p.is-editor-empty:first-child::before]:text-white-400 [&_.ProseMirror_p.is-editor-empty:first-child::before]:content-[attr(data-placeholder)] [&_.ProseMirror_p.is-editor-empty:first-child::before]:float-left [&_.ProseMirror_p.is-editor-empty:first-child::before]:pointer-events-none [&_.ProseMirror_p.is-editor-empty:first-child::before]:h-0",
+							"prompt-editor border-[0.5px] border-white-900 rounded-[8px] p-[16px] pb-0 flex-1 box-border overflow-y-auto",
 					},
 				}}
 			/>
