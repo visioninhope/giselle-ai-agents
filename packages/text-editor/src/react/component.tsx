@@ -124,26 +124,25 @@ export function TextEditor({
 	onValueChange,
 	tools,
 	nodes,
+	placeholder,
 }: {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
+	placeholder?: string;
 }) {
 	const extensions = useMemo(() => {
 		return nodes === undefined
-			? [
-					...baseExtensions,
-					Placeholder.configure({ placeholder: "Type something..." }),
-				]
+			? [...baseExtensions, Placeholder.configure({ placeholder })]
 			: [
 					...baseExtensions,
 					SourceExtensionReact.configure({
 						nodes,
 					}),
-					Placeholder.configure({ placeholder: "Type something..." }),
+					Placeholder.configure({ placeholder }),
 				];
-	}, [nodes]);
+	}, [nodes, placeholder]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider
