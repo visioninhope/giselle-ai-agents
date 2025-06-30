@@ -33,6 +33,13 @@ export function V2Placeholder({
 		[],
 	);
 
+	const handleLeftPanelClose = useCallback(() => {
+		setLayoutState((prev) => ({
+			...prev,
+			leftPanel: null,
+		}));
+	}, []);
+
 	return (
 		<div className="flex-1 overflow-hidden font-sans flex flex-col">
 			{showReadOnlyBanner && isReadOnly && (
@@ -45,7 +52,7 @@ export function V2Placeholder({
 
 			<RootProvider>
 				<V2Header />
-				<V2Container {...layoutState} />
+				<V2Container {...layoutState} onLeftPanelClose={handleLeftPanelClose} />
 				<V2Footer
 					onLeftPaelValueChange={handleLeftPanelValueChange}
 					activePanel={layoutState.leftPanel}

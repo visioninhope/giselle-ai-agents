@@ -15,6 +15,7 @@ interface FloatingPropertiesPanelProps {
 	position?: "right" | "left";
 	container?: React.ComponentProps<typeof Dialog.Portal>["container"];
 	title: string;
+	onClose?: () => void;
 }
 
 export function FloatingPropertiesPanel({
@@ -27,6 +28,7 @@ export function FloatingPropertiesPanel({
 	position = "right",
 	container,
 	title,
+	onClose,
 }: FloatingPropertiesPanelProps) {
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
@@ -101,7 +103,7 @@ export function FloatingPropertiesPanel({
 	return (
 		<Dialog.Root open={isOpen} modal={false}>
 			<Dialog.Portal container={container}>
-				<Dialog.Content asChild>
+				<Dialog.Content asChild onPointerDownOutside={onClose}>
 					<div
 						className={clsx(
 							"absolute top-4 bottom-4 z-10 pointer-events-none",

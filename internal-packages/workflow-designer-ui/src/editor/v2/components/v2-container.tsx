@@ -36,7 +36,9 @@ import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
 import type { LeftPanelValue, V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
 
-interface V2ContainerProps extends V2LayoutState {}
+interface V2ContainerProps extends V2LayoutState {
+	onLeftPanelClose?: () => void;
+}
 
 function V2NodeCanvas() {
 	const {
@@ -255,7 +257,7 @@ function V2NodeCanvas() {
 	);
 }
 
-export function V2Container({ leftPanel }: V2ContainerProps) {
+export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
 		() =>
@@ -276,7 +278,11 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 			ref={mainRef}
 		>
 			<div className="h-full">
-				<LeftPanel value={leftPanel} containerRef={mainRef} />
+				<LeftPanel
+					value={leftPanel}
+					containerRef={mainRef}
+					onClose={onLeftPanelClose}
+				/>
 				<V2NodeCanvas />
 
 				{/* Floating Properties Panel */}
@@ -296,9 +302,11 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 function LeftPanel({
 	value,
 	containerRef,
+	onClose,
 }: {
 	value: LeftPanelValue | null;
 	containerRef: RefObject<HTMLDivElement | null>;
+	onClose?: () => void;
 }) {
 	const content = useMemo(() => {
 		if (value === null) {
@@ -326,6 +334,7 @@ function LeftPanel({
 			position="left"
 			container={containerRef?.current}
 			title="Left Panel"
+			onClose={onClose}
 		>
 			{content}
 		</FloatingPropertiesPanel>
