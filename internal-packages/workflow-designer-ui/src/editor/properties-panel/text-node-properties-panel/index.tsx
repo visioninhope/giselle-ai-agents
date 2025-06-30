@@ -32,7 +32,6 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 								placeholder="Write or paste text here..."
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
-								placeholder="Write your text"
 							/>
 						</ResizableSection>
 					</ResizableSectionGroup>
@@ -43,7 +42,6 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 								placeholder="Write or paste text here..."
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
-								placeholder="Write your text"
 							/>
 						</ResizableSection>
 					</ResizableSectionGroup>
