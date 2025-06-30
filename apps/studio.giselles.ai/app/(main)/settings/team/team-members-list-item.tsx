@@ -37,6 +37,7 @@ type TeamMemberListItemProps = {
 	role: TeamRole;
 	currentUserRole: TeamRole;
 	isProPlan: boolean;
+	currentUserId: string;
 	profileImage?: string | null;
 };
 
@@ -47,6 +48,7 @@ export function TeamMemberListItem({
 	role: initialRole,
 	currentUserRole,
 	isProPlan,
+	currentUserId,
 	profileImage = null,
 }: TeamMemberListItemProps) {
 	const [isLoading, setIsLoading] = useState(false);
