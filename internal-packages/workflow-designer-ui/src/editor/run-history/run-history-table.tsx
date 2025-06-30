@@ -1,11 +1,6 @@
 export function RunHistoryTable() {
   return (
-    <div className="p-4 h-full">
-      <div className="flex justify-between items-center">
-        <h1 className="font-accent text-text text-[20px] font-thin mb-[8px]">
-          Run History
-        </h1>
-      </div>
+    <div className="px-4 pb-4 pt-2 h-full">
       <div className="overflow-auto h-full">
         <table className="w-full text-sm">
           <thead>

@@ -8,14 +8,7 @@ import {
   DialogTrigger,
 } from "@giselle-internal/ui/dialog";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@giselle-internal/ui/table";
+
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon } from "lucide-react";
@@ -78,11 +71,8 @@ export function SecretTable() {
     return null;
   }
   return (
-    <div className="p-[16px] h-full">
-      <div className="flex justify-between items-center">
-        <h1 className="font-sans text-text text-[20px] font-thin mb-[8px]">
-          Secrets
-        </h1>
+    <div className="px-[16px] pb-[16px] pt-[8px] h-full">
+      <div className="flex justify-end items-center">
         <Dialog open={presentDialog} onOpenChange={setPresentDialog}>
           <DialogTrigger asChild>
             <Button type="button" leftIcon={<PlusIcon className="text-text" />}>
@@ -159,22 +149,28 @@ export function SecretTable() {
       {data === undefined || data.length < 1 ? (
         <EmptyState description="No secret" />
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-sans">Name</TableHead>
-              <TableHead className="font-sans">Created at</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <table className="w-full text-sm">
+          <thead>
+            <tr className="border-b border-white-400/20">
+              <th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+                Name
+              </th>
+              <th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+                Created at
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {data.map((data) => (
-              <TableRow key={data.id}>
-                <TableCell>{data.label}</TableCell>
-                <TableCell>{formatDateTime(data.createdAt)}</TableCell>
-              </TableRow>
+              <tr key={data.id} className="border-b border-white-400/10">
+                <td className="py-3 px-4 text-white-800">{data.label}</td>
+                <td className="py-3 px-4 text-white-800">
+                  {formatDateTime(data.createdAt)}
+                </td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       )}
     </div>
   );

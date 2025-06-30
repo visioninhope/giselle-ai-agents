@@ -82,11 +82,8 @@ export function DataSourceTable() {
     return null;
   }
   return (
-    <div className="p-[16px] h-full">
-      <div className="flex justify-between items-center">
-        <h1 className="font-sans text-text text-[20px] font-thin mb-[8px]">
-          Data Sources
-        </h1>
+    <div className="px-[16px] pb-[16px] pt-[8px] h-full">
+      <div className="flex justify-end items-center">
         <Dialog open={presentDialog} onOpenChange={setPresentDialog}>
           <DialogTrigger asChild>
             <Button type="button" leftIcon={<PlusIcon className="text-text" />}>

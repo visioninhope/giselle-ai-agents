@@ -91,18 +91,8 @@ export function PanelWrapper({
       maxWidth={maxWidth}
       onWidthChange={onWidthChange}
     >
-      <PanelContent showHeader={false}>
-        <div className="relative h-full">
-          {/* Close button */}
-          <button
-            type="button"
-            onClick={onClose}
-            className="absolute top-4 right-4 z-10 p-1 rounded hover:bg-black-700 text-white-900 hover:text-white-950 transition-colors"
-          >
-            <X className="w-4 h-4" />
-          </button>
-          {content}
-        </div>
+      <PanelContent showHeader={true} title={title} onClose={onClose}>
+        {content}
       </PanelContent>
     </ResizablePanel>
   );
