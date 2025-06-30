@@ -11,7 +11,9 @@ catalog:
   nanoid: 5.0.9
   tsup: 8.3.5
   "@turbo/gen": 2.3.3
-  next: 15.3.0
+  next: 15.3.4
+  "@next/env": 15.3.4
+  "@next/third-parties": 15.3.4
   unstorage: 1.14.4
   ai: 4.3.9
   "@types/node": 22.14.0
