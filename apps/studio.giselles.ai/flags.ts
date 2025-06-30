@@ -40,19 +40,6 @@ export const githubToolsFlag = flag<boolean>({
 	],
 });
 
-export const githubVectorStoreFlag = flag<boolean>({
-	key: "github-vector-store",
-	decide() {
-		return true;
-	},
-	description: "Enable GitHub Vector Store",
-	defaultValue: true,
-	options: [
-		{ value: false, label: "disable" },
-		{ value: true, label: "Enable" },
-	],
-});
-
 export const webSearchActionFlag = flag<boolean>({
 	key: "web-search-action",
 	decide() {
@@ -117,6 +104,25 @@ export const layoutV2Flag = flag<boolean>({
 		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V2",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const layoutV3Flag = flag<boolean>({
+	key: "layout-v3",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("LAYOUT_V3_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable Layout V3",
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },

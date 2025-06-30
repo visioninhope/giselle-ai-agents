@@ -2,8 +2,8 @@ import { getGitHubVectorStores } from "@/app/services/vector-store";
 import { db } from "@/drizzle";
 import {
 	githubToolsFlag,
-	githubVectorStoreFlag,
 	layoutV2Flag,
+	layoutV3Flag,
 	runV3Flag,
 	sidemenuFlag,
 	webSearchActionFlag,
@@ -41,13 +41,13 @@ export default async function Layout({
 		return notFound();
 	}
 	const usageLimits = await getUsageLimitsForTeam(currentTeam);
-	const githubVectorStore = await githubVectorStoreFlag();
 	const gitHubVectorStores = await getGitHubVectorStores(currentTeam.dbId);
 	const runV3 = await runV3Flag();
 	const sidemenu = await sidemenuFlag();
 	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV2 = await layoutV2Flag();
+	const layoutV3 = await layoutV3Flag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -74,12 +74,12 @@ export default async function Layout({
 				},
 			}}
 			featureFlag={{
-				githubVectorStore,
 				runV3,
 				sidemenu,
 				githubTools,
 				webSearchAction,
 				layoutV2,
+				layoutV3,
 			}}
 		>
 			{children}

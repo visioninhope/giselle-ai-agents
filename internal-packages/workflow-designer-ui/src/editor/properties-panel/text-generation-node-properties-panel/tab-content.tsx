@@ -50,8 +50,6 @@ export function TextGenerationTabContent({
 	githubTools,
 	sidemenu,
 }: TextGenerationTabContentProps) {
-	const { layoutV2 } = useFeatureFlag();
-
 	return (
 		<>
 			<Tabs.Root

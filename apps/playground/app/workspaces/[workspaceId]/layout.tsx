@@ -14,12 +14,12 @@ export default async function Layout({
 		<WorkspaceProvider
 			workspaceId={workspaceId}
 			featureFlag={{
-				githubVectorStore: true,
 				runV3: true,
 				sidemenu: true,
 				githubTools: true,
 				webSearchAction: false,
 				layoutV2: true,
+				layoutV3: false,
 			}}
 		>
 			{children}

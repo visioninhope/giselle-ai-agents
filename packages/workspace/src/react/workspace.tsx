@@ -63,12 +63,12 @@ export function WorkspaceProvider({
 							<GenerationRunnerSystemProvider>
 								<FeatureFlagContext
 									value={{
-										githubVectorStore: featureFlag?.githubVectorStore ?? false,
 										runV3: featureFlag?.runV3 ?? false,
 										sidemenu: featureFlag?.sidemenu ?? false,
 										githubTools: featureFlag?.githubTools ?? false,
 										webSearchAction: featureFlag?.webSearchAction ?? false,
 										layoutV2: featureFlag?.layoutV2 ?? false,
+										layoutV3: featureFlag?.layoutV3 ?? false,
 									}}
 								>
 									{children}

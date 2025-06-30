@@ -147,10 +147,26 @@ describe("Enhanced Error System", () => {
 			const error = OperationError.invalidOperation(
 				"search",
 				"index not ready",
+				undefined,
 				{ indexName: "embeddings" },
 			);
 
 			expect(error.code).toBe("INVALID_OPERATION");
+			expect(error.context?.operation).toBe("search");
+			expect(error.context?.reason).toBe("index not ready");
+		});
+
+		it("should create invalid operation error with cause", () => {
+			const originalError = new Error("Index connection failed");
+			const error = OperationError.invalidOperation(
+				"search",
+				"index not ready",
+				originalError,
+				{ indexName: "embeddings" },
+			);
+
+			expect(error.code).toBe("INVALID_OPERATION");
+			expect(error.cause).toBe(originalError);
 			expect(error.context?.operation).toBe("search");
 			expect(error.context?.reason).toBe("index not ready");
 		});

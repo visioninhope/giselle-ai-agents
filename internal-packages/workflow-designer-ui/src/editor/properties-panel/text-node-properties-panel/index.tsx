@@ -29,6 +29,7 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 					<ResizableSectionGroup>
 						<ResizableSection defaultSize={100}>
 							<TextEditor
+								placeholder="Write or paste text here..."
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
 							/>
@@ -38,6 +39,7 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 					<ResizableSectionGroup>
 						<ResizableSection defaultSize={100}>
 							<TextEditor
+								placeholder="Write or paste text here..."
 								value={node.content.text}
 								onValueChange={(text) => updateNodeDataContent(node, { text })}
 							/>
