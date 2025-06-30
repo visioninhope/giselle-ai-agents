@@ -27,10 +27,10 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	const { updateNodeData } = useWorkflowDesigner();
-	const { layoutV2, layoutV3, sidemenu } = useFeatureFlag();
+	const { layoutV2, sidemenu } = useFeatureFlag();
 
 	const getFilePanelContent = () => {
-		if (layoutV2 || layoutV3) {
+		if (layoutV2) {
 			return (
 				<div className={sidemenu ? "p-4" : "pl-0 pr-4 py-4"}>
 					<FilePanel node={node} config={fileType[node.content.category]} />

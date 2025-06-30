@@ -445,9 +445,9 @@ export function Editor({
 		setShowReadOnlyBanner(false);
 	}, []);
 
-	const { sidemenu, layoutV2, layoutV3 } = useFeatureFlag();
+	const { sidemenu, layoutV2 } = useFeatureFlag();
 
-	if (layoutV2 || layoutV3) {
+	if (layoutV2) {
 		return <V2Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
 	}
 
