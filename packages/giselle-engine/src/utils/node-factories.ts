@@ -43,8 +43,8 @@ import {
 	languageModels,
 } from "@giselle-sdk/language-model";
 import {
-	isJsonContent,
 	type JSONContent,
+	isJsonContent,
 } from "@giselle-sdk/text-editor-utils";
 import {
 	actionNodeDefaultName,

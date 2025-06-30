@@ -4,7 +4,7 @@ import {
 	isOperationNode,
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/node-utils";
+import { defaultName } from "@giselle-sdk/giselle-engine";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";

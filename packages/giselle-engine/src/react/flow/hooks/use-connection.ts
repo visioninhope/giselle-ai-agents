@@ -1,4 +1,5 @@
 import type {
+	Connection,
 	InputId,
 	NodeLike,
 	OutputId,
@@ -22,27 +23,27 @@ export function useAddConnection(
 			inputNode: NodeLike;
 			inputId: InputId;
 		}) => {
-        setWorkspace((ws) => ({
-                ...ws,
-                connections: [
-                        ...ws.connections,
-                        {
-                                id: ConnectionId.generate(),
-                                outputNode: {
-                                        id: outputNode.id,
-                                        type: outputNode.type,
-                                        content: { type: outputNode.content.type },
-                                } as any,
-                                outputId,
-                                inputNode: {
-                                        id: inputNode.id,
-                                        type: inputNode.type,
-                                        content: { type: inputNode.content.type },
-                                } as any,
-                                inputId,
-                        },
-                ],
-        }));
+			setWorkspace((ws) => ({
+				...ws,
+				connections: [
+					...ws.connections,
+					{
+						id: ConnectionId.generate(),
+						outputNode: {
+							id: outputNode.id,
+							type: outputNode.type,
+							content: { type: outputNode.content.type },
+						},
+						outputId,
+						inputNode: {
+							id: inputNode.id,
+							type: inputNode.type,
+							content: { type: inputNode.content.type },
+						},
+						inputId,
+					} as Connection,
+				],
+			}));
 		},
 		[setWorkspace],
 	);

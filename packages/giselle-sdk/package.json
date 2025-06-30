@@ -38,7 +38,6 @@
 	"dependencies": {
 		"@giselle-sdk/giselle-engine": "workspace:^",
 		"@giselle-sdk/language-model": "workspace:^",
-		"@giselle-sdk/workflow-designer": "workspace:^",
 		"@giselle-sdk/workspace": "workspace:^"
 	}
 }
