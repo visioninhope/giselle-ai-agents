@@ -1,0 +1,48 @@
+"use client";
+
+import clsx from "clsx/lite";
+import { X } from "lucide-react";
+import type { ReactNode } from "react";
+
+interface PanelContentProps {
+  title?: string;
+  children: ReactNode;
+  onClose?: () => void;
+  className?: string;
+  showHeader?: boolean;
+}
+
+export function PanelContent({
+  title,
+  children,
+  onClose,
+  className,
+  showHeader = false,
+}: PanelContentProps) {
+  return (
+    <div className={clsx("h-full flex flex-col", className)}>
+      {/* Header */}
+      {showHeader && (
+        <div className="flex items-center justify-between px-4 py-3 border-b border-black-600 bg-black-900 flex-shrink-0">
+          <h2 className="text-sm font-medium text-white-900 uppercase tracking-wide">
+            {title}
+          </h2>
+          {onClose && (
+            <button
+              type="button"
+              onClick={onClose}
+              className="p-1 rounded hover:bg-black-700 text-white-600 hover:text-white-900 transition-colors"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* Content */}
+      <div className="flex-1 overflow-hidden">
+        <div className="h-full">{children}</div>
+      </div>
+    </div>
+  );
+}
