@@ -68,6 +68,7 @@ export function WorkspaceProvider({
 										githubTools: featureFlag?.githubTools ?? false,
 										webSearchAction: featureFlag?.webSearchAction ?? false,
 										layoutV2: featureFlag?.layoutV2 ?? false,
+										layoutV3: featureFlag?.layoutV3 ?? false,
 									}}
 								>
 									{children}

@@ -50,7 +50,7 @@ export function TextGenerationTabContent({
 	githubTools,
 	sidemenu,
 }: TextGenerationTabContentProps) {
-	const { layoutV2 } = useFeatureFlag();
+	const { layoutV2, layoutV3 } = useFeatureFlag();
 
 	return (
 		<>

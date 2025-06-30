@@ -32,7 +32,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			origin: { type: "workspace", id: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
-	const { layoutV2 } = useFeatureFlag();
+	const { layoutV2, layoutV3 } = useFeatureFlag();
 
 	const generate = useCallback(() => {
 		createAndStartGeneration({
@@ -93,7 +93,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			/>
 
 			<PropertiesPanelContent>
-				{layoutV2 ? (
+				{layoutV2 || layoutV3 ? (
 					<ResizableSectionGroup>
 						<ResizableSection title="Query" defaultSize={50} minSize={20}>
 							<div className="p-4">

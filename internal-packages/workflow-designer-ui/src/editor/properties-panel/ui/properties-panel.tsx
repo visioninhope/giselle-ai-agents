@@ -34,19 +34,19 @@ export function PropertiesPanelHeader({
 	onChangeName?: (name?: string) => void;
 	action?: ReactNode;
 }) {
-	const { sidemenu, layoutV2 } = useFeatureFlag();
+	const { sidemenu, layoutV2, layoutV3 } = useFeatureFlag();
 	if (sidemenu) {
 		return (
 			<div className={getHeaderClasses(sidemenu)}>
 				<div className={`flex ${PANEL_SPACING.HEADER.ICON_GAP} items-center`}>
 					<div
 						className={
-							layoutV2
+							layoutV2 || layoutV3
 								? "bg-white-900 rounded-[4px] flex items-center justify-center"
 								: `w-[${PANEL_SPACING.HEADER.ICON_SIZE}] h-[${PANEL_SPACING.HEADER.ICON_SIZE}] bg-white-900 rounded-[4px] flex items-center justify-center`
 						}
 						style={
-							layoutV2
+							layoutV2 || layoutV3
 								? {
 										width: PANEL_SPACING.HEADER.ICON_SIZE,
 										height: PANEL_SPACING.HEADER.ICON_SIZE,
@@ -88,12 +88,12 @@ export function PropertiesPanelHeader({
 			<div className={`flex ${PANEL_SPACING.HEADER.ICON_GAP} items-center`}>
 				<div
 					className={
-						layoutV2
+						layoutV2 || layoutV3
 							? "bg-white-900 rounded-[4px] flex items-center justify-center"
 							: `w-[${PANEL_SPACING.HEADER.ICON_SIZE}] h-[${PANEL_SPACING.HEADER.ICON_SIZE}] bg-white-900 rounded-[4px] flex items-center justify-center`
 					}
 					style={
-						layoutV2
+						layoutV2 || layoutV3
 							? {
 									width: PANEL_SPACING.HEADER.ICON_SIZE,
 									height: PANEL_SPACING.HEADER.ICON_SIZE,

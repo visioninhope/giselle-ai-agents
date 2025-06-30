@@ -64,7 +64,7 @@ export function TextGenerationNodePropertiesPanel({
 	const { all: connectedSources } = useConnectedOutputs(node);
 	const usageLimitsReached = useUsageLimitsReached();
 	const { error } = useToasts();
-	const { layoutV2 } = useFeatureFlag();
+	const { layoutV2, layoutV3 } = useFeatureFlag();
 
 	const uiState = useMemo(() => data.ui.nodeState[node.id], [data, node.id]);
 
@@ -160,7 +160,7 @@ export function TextGenerationNodePropertiesPanel({
 			/>
 
 			<PropertiesPanelContent>
-				{layoutV2 ? (
+				{layoutV2 || layoutV3 ? (
 					<PanelGroup direction="vertical" className="flex-1 flex flex-col">
 						<Panel>
 							<PropertiesPanelContent>
