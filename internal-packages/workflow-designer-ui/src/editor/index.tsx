@@ -46,7 +46,6 @@ import {
 	useToolbar,
 } from "./tool";
 import { V2Placeholder } from "./v2";
-import { V3Placeholder } from "./v3";
 import { WorkspaceTour, tourSteps } from "./workspace-tour";
 
 function NodeCanvas() {
@@ -448,11 +447,7 @@ export function Editor({
 
 	const { sidemenu, layoutV2, layoutV3 } = useFeatureFlag();
 
-	if (layoutV3) {
-		return <V3Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
-	}
-
-	if (layoutV2) {
+	if (layoutV2 || layoutV3) {
 		return <V2Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
 	}
 
