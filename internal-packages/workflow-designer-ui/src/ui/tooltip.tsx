@@ -12,6 +12,8 @@ export type TooltipProps = Omit<
 	delayDuration?: number;
 	className?: string;
 	variant?: "light" | "dark";
+	side?: "top" | "right" | "bottom" | "left";
+	align?: "start" | "center" | "end";
 };
 
 export function Tooltip({
@@ -20,6 +22,8 @@ export function Tooltip({
 	delayDuration = 300,
 	className,
 	variant = "light",
+	side = "top",
+	align = "center",
 	...props
 }: TooltipProps) {
 	return (
@@ -29,6 +33,8 @@ export function Tooltip({
 				<TooltipPrimitive.Portal>
 					<TooltipPrimitive.Content
 						data-variant={variant}
+						side={side}
+						align={align}
 						className={clsx(
 							"group z-50 overflow-hidden rounded-md px-2 py-1 text-xs shadow-md animate-in fade-in-0 zoom-in-95 data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2",
 							"data-[variant=light]:bg-[#97A2BE] data-[variant=light]:text-black-850",
@@ -38,15 +44,6 @@ export function Tooltip({
 						sideOffset={sideOffset}
 					>
 						{text}
-						<TooltipPrimitive.Arrow
-							className={clsx(
-								"border-[hsla(232,36%,72%,0.2)]",
-								"group-data-[variant=light]:fill-[#97A2BE]",
-								"group-data-[variant=dark]:fill-black-850",
-							)}
-							width={12}
-							height={6}
-						/>
 					</TooltipPrimitive.Content>
 				</TooltipPrimitive.Portal>
 			</TooltipPrimitive.Root>
