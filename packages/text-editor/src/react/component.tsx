@@ -1,6 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
-
+import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -124,22 +124,25 @@ export function TextEditor({
 	onValueChange,
 	tools,
 	nodes,
+	placeholder,
 }: {
 	value?: string;
 	onValueChange?: (value: string) => void;
 	tools?: (editor: Editor) => ReactNode;
 	nodes?: Node[];
+	placeholder?: string;
 }) {
 	const extensions = useMemo(() => {
 		return nodes === undefined
-			? baseExtensions
+			? [...baseExtensions, Placeholder.configure({ placeholder })]
 			: [
 					...baseExtensions,
 					SourceExtensionReact.configure({
 						nodes,
 					}),
+					Placeholder.configure({ placeholder }),
 				];
-	}, [nodes]);
+	}, [nodes, placeholder]);
 	return (
 		<div className="flex flex-col h-full w-full">
 			<EditorProvider
