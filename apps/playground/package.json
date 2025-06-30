@@ -21,7 +21,7 @@
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
 		"@giselle-sdk/workflow-designer": "workspace:*",
-		"@supabase/supabase-js": "2.45.0",
+		"@supabase/supabase-js": "catalog:",
 		"@xyflow/react": "catalog:",
 		"clsx": "catalog:",
 		"geist": "1.3.1",

@@ -38,6 +38,7 @@ import {
 	ResizableSection,
 	ResizableSectionGroup,
 	ResizableSectionHandle,
+	ResizeHandle,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
 import { useConnectedOutputs } from "./outputs";
@@ -160,13 +161,9 @@ export function TextGenerationNodePropertiesPanel({
 
 			<PropertiesPanelContent>
 				{layoutV2 ? (
-					<ResizableSectionGroup>
-						<ResizableSection
-							title="Configuration"
-							defaultSize={70}
-							minSize={30}
-						>
-							<div className="p-4">
+					<PanelGroup direction="vertical" className="flex-1 flex flex-col">
+						<Panel>
+							<PropertiesPanelContent>
 								<TextGenerationTabContent
 									node={node}
 									uiState={uiState}
@@ -178,18 +175,20 @@ export function TextGenerationNodePropertiesPanel({
 									githubTools={githubTools}
 									sidemenu={sidemenu}
 								/>
-							</div>
-						</ResizableSection>
-						<ResizableSectionHandle />
-						<ResizableSection title="Generation" defaultSize={30}>
-							<div className="p-4">
+							</PropertiesPanelContent>
+						</Panel>
+						<PanelResizeHandle className="h-[12px] flex items-center justify-center cursor-row-resize">
+							<ResizeHandle direction="vertical" />
+						</PanelResizeHandle>
+						<Panel>
+							<PropertiesPanelContent>
 								<GenerationPanel
 									node={node}
 									onClickGenerateButton={generateText}
 								/>
-							</div>
-						</ResizableSection>
-					</ResizableSectionGroup>
+							</PropertiesPanelContent>
+						</Panel>
+					</PanelGroup>
 				) : (
 					<PanelGroup direction="vertical" className="flex-1 flex flex-col">
 						<Panel>

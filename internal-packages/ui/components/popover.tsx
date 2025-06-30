@@ -1,4 +1,5 @@
 import clsx from "clsx/lite";
+import { Popover as PopoverPrimitive } from "radix-ui";
 
 export function PopoverContent(props: React.PropsWithChildren) {
 	return (
@@ -10,5 +11,23 @@ export function PopoverContent(props: React.PropsWithChildren) {
 			)}
 			{...props}
 		/>
+	);
+}
+
+export function Popover({
+	trigger,
+	children,
+}: React.PropsWithChildren<{
+	trigger: React.ReactNode;
+}>) {
+	return (
+		<PopoverPrimitive.Root>
+			<PopoverPrimitive.Trigger asChild>{trigger}</PopoverPrimitive.Trigger>
+			<PopoverPrimitive.Portal>
+				<PopoverPrimitive.Content asChild>
+					<PopoverContent>{children}</PopoverContent>
+				</PopoverPrimitive.Content>
+			</PopoverPrimitive.Portal>
+		</PopoverPrimitive.Root>
 	);
 }
