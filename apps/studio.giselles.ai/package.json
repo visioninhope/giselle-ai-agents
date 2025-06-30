@@ -9,6 +9,7 @@
 		"dev": "next dev --turbopack",
 		"dev-debug": "LOGLEVEL=debug pnpm run dev",
 		"build": "next build",
+		"build:analyze": "ANALYZE=true next build",
 		"start": "next start",
 		"format": "biome check --write .",
 		"lint": "next lint",
@@ -117,6 +118,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "catalog:",
+		"@next/bundle-analyzer": "15.3.4",
 		"@octokit/openapi-types": "catalog:",
 		"@octokit/webhooks-types": "7.6.1",
 		"@playwright/test": "1.53.0",
