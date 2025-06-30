@@ -1,6 +1,6 @@
 import type { Node, NodeUIState, Workspace } from "@giselle-sdk/data-type";
-import { nodeFactories } from "@giselle-sdk/node-utils";
 import { useCallback } from "react";
+import { nodeFactories } from "../../../utils";
 import type { ConnectionCloneStrategy } from "../types";
 import { isSupportedConnection } from "../utils";
 import { useAddConnection } from "./use-connection";

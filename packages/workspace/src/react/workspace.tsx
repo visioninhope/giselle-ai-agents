@@ -13,9 +13,9 @@ import {
 	UsageLimitsProvider,
 	type VectorStoreContextValue,
 	VectorStoreProvider,
+	WorkflowDesignerProvider,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
-import { WorkflowDesignerProvider } from "@giselle-sdk/workflow-designer/react";
 import { type ReactNode, useEffect, useState } from "react";
 import {
 	FeatureFlagContext,

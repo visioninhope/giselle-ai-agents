@@ -42,14 +42,16 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { isJsonContent } from "@giselle-sdk/text-editor-utils";
-import type { JSONContent } from "@tiptap/react";
+import {
+	isJsonContent,
+	type JSONContent,
+} from "@giselle-sdk/text-editor-utils";
 import {
 	actionNodeDefaultName,
 	defaultName,
 	triggerNodeDefaultName,
 	vectorStoreNodeDefaultName,
-} from "./default-name";
+} from "./node-default-name";
 
 type ClonedFileDataPayload = FileData & {
 	originalFileIdForCopy: FileId;
@@ -168,10 +170,7 @@ const textGenerationFactoryImpl = {
 
 		if (clonedContent.prompt && isJsonContent(clonedContent.prompt)) {
 			try {
-				const promptJsonContent: JSONContent =
-					typeof clonedContent.prompt === "string"
-						? JSON.parse(clonedContent.prompt)
-						: clonedContent.prompt;
+				const promptJsonContent = clonedContent.prompt;
 
 				function keepSourceRefs(
 					content: JSONContent[] | undefined,

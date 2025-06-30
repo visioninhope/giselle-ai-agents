@@ -13,12 +13,10 @@ import {
 	createUploadedFileData,
 	createUploadingFileData,
 } from "@giselle-sdk/data-type";
-import {
-	APICallError,
-	useGiselleEngine,
-} from "@giselle-sdk/giselle-engine/react";
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { createContext, useCallback, useEffect, useRef, useState } from "react";
+import { APICallError } from "../errors";
+import { useGiselleEngine } from "../use-giselle-engine";
 
 import {
 	useAddConnection,
@@ -26,7 +24,6 @@ import {
 	useCopyNode,
 	useNodeUpdate,
 	usePropertiesPanel,
-	useView,
 } from "./hooks";
 import type { WorkflowDesignerContextValue } from "./types";
 import { isSupportedConnection } from "./utils";
@@ -248,7 +245,6 @@ export function WorkflowDesignerProvider({
 	);
 
 	const propertiesPanelHelper = usePropertiesPanel();
-	const viewHelper = useView();
 
 	return (
 		<WorkflowDesignerContext.Provider
@@ -271,7 +267,6 @@ export function WorkflowDesignerProvider({
 				updateName,
 				isSupportedConnection: isSupportedConnectionCb,
 				...propertiesPanelHelper,
-				...viewHelper,
 			}}
 		>
 			{children}
