@@ -54,10 +54,12 @@ export function TeamMemberListItem({
 	const [open, setOpen] = useState(false);
 	const [role, setRole] = useState(initialRole);
 	const user = userId;
-	const currentUser = "current-user-id"; // should come from getUserId() or similar
+	const currentUser = currentUserId;
 
-	const canEdit =
+	const canEditRole =
 		isProPlan && currentUserRole === "admin" && user !== currentUser;
+	const canRemove = user === currentUser || canEditRole;
+	const hasMenu = canEditRole || canRemove;
 
 	const handleRoleChange = (value: string) => {
 		setRole(value as TeamRole);
@@ -132,7 +134,7 @@ export function TeamMemberListItem({
 				</div>
 				<div className="flex justify-between gap-2">
 					<div className="flex items-center gap-[5px]">
-						{canEdit ? (
+						{hasMenu ? (
 							<DropdownMenu modal={false}>
 								<DropdownMenuTrigger asChild>
 									<button
@@ -147,27 +149,31 @@ export function TeamMemberListItem({
 									align="end"
 									className="p-1 border-[0.25px] border-white/10 rounded-[8px] min-w-[165px] bg-black-900 shadow-none"
 								>
-									<button
-										type="button"
-										onClick={() => handleRoleChange("admin")}
-										className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
-									>
-										<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
-											{role === "admin" && <Check className="h-4 w-4" />}
-										</span>
-										Admin
-									</button>
-									<button
-										type="button"
-										onClick={() => handleRoleChange("member")}
-										className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
-									>
-										<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
-											{role === "member" && <Check className="h-4 w-4" />}
-										</span>
-										Member
-									</button>
-									<div className="my-2 h-px bg-white/10" />
+									{canEditRole && (
+										<>
+											<button
+												type="button"
+												onClick={() => handleRoleChange("admin")}
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+											>
+												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
+													{role === "admin" && <Check className="h-4 w-4" />}
+												</span>
+												Admin
+											</button>
+											<button
+												type="button"
+												onClick={() => handleRoleChange("member")}
+												className="flex items-center w-full px-3 py-2 text-left text-[14px] leading-[16px] hover:bg-white/5 text-white-400 capitalize rounded-md"
+											>
+												<span className="inline-flex justify-center items-center w-4 h-4 mr-2">
+													{role === "member" && <Check className="h-4 w-4" />}
+												</span>
+												Member
+											</button>
+											<div className="my-2 h-px bg-white/10" />
+										</>
+									)}
 									<AlertDialog open={open} onOpenChange={setOpen}>
 										<AlertDialogTrigger asChild>
 											<button
