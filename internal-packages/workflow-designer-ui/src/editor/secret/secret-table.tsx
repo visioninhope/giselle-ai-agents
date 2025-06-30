@@ -1,11 +1,11 @@
 import { Button } from "@giselle-internal/ui/button";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogTitle,
-  DialogTrigger,
+	Dialog,
+	DialogContent,
+	DialogDescription,
+	DialogFooter,
+	DialogTitle,
+	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
 
@@ -17,161 +17,162 @@ import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
 
 function formatDateTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, "0");
-  const day = String(date.getDate()).padStart(2, "0");
-  const hours = String(date.getHours()).padStart(2, "0");
-  const minutes = String(date.getMinutes()).padStart(2, "0");
-  return `${year}/${month}/${day} ${hours}:${minutes}`;
+	const date = new Date(timestamp);
+	const year = date.getFullYear();
+	const month = String(date.getMonth() + 1).padStart(2, "0");
+	const day = String(date.getDate()).padStart(2, "0");
+	const hours = String(date.getHours()).padStart(2, "0");
+	const minutes = String(date.getMinutes()).padStart(2, "0");
+	return `${year}/${month}/${day} ${hours}:${minutes}`;
 }
 
 const SecretPayload = z.object({
-  label: z.string().min(1),
-  value: z.string().min(1),
+	label: z.string().min(1),
+	value: z.string().min(1),
 });
 
 export function SecretTable() {
-  const [presentDialog, setPresentDialog] = useState(false);
-  const { data: workspace } = useWorkflowDesigner();
-  const { isLoading, data, mutate } = useWorkspaceSecrets();
-  const [isPending, startTransition] = useTransition();
-  const client = useGiselleEngine();
+	const [presentDialog, setPresentDialog] = useState(false);
+	const { data: workspace } = useWorkflowDesigner();
+	const { isLoading, data, mutate } = useWorkspaceSecrets();
+	const [isPending, startTransition] = useTransition();
+	const client = useGiselleEngine();
 
-  const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
-    (e) => {
-      e.preventDefault();
-      const formData = new FormData(e.currentTarget);
-      const label = formData.get("label");
-      const value = formData.get("value");
-      const parse = SecretPayload.safeParse({
-        label,
-        value,
-      });
-      if (!parse.success) {
-        /** @todo Implement error handling */
-        console.log(parse.error);
-        return;
-      }
-      const payload = parse.data;
-      startTransition(async () => {
-        const result = await client.addSecret({
-          workspaceId: workspace.id,
-          label: payload.label,
-          value: payload.value,
-        });
-        await mutate([...(data ?? []), result.secret]);
-      });
-      setPresentDialog(false);
-    },
-    [client, workspace.id, data, mutate],
-  );
+	const handleSubmit = useCallback<React.FormEventHandler<HTMLFormElement>>(
+		(e) => {
+			e.preventDefault();
+			const formData = new FormData(e.currentTarget);
+			const label = formData.get("label");
+			const value = formData.get("value");
+			const parse = SecretPayload.safeParse({
+				label,
+				value,
+			});
+			if (!parse.success) {
+				/** @todo Implement error handling */
+				console.log(parse.error);
+				return;
+			}
+			const payload = parse.data;
+			startTransition(async () => {
+				const result = await client.addSecret({
+					workspaceId: workspace.id,
+					label: payload.label,
+					value: payload.value,
+				});
+				await mutate([...(data ?? []), result.secret]);
+			});
+			setPresentDialog(false);
+		},
+		[client, workspace.id, data, mutate],
+	);
 
-  if (isLoading) {
-    return null;
-  }
-  return (
-    <div className="px-[16px] pb-[16px] pt-[8px] h-full">
-      <div className="flex justify-end items-center">
-        <Dialog open={presentDialog} onOpenChange={setPresentDialog}>
-          <DialogTrigger asChild>
-            <Button type="button" leftIcon={<PlusIcon className="text-text" />}>
-              Add new secret
-            </Button>
-          </DialogTrigger>
-          <DialogContent>
-            <div className="py-[12px]">
-              <DialogTitle>Add new secret</DialogTitle>
-              <DialogDescription>
-                Enter a name and value for the secret.
-              </DialogDescription>
-            </div>
-            <form onSubmit={handleSubmit}>
-              <div className="flex flex-col gap-[12px]">
-                <fieldset className="flex flex-col">
-                  <label
-                    htmlFor="label"
-                    className="text-text text-[13px] mb-[2px]"
-                  >
-                    Secret Name
-                  </label>
-                  <input
-                    type="text"
-                    id="label"
-                    name="label"
-                    className={clsx(
-                      "border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-                      "focus:border-border-focused",
-                    )}
-                  />
-                  <p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-                    Give this token a short name (e.g. “Prod-bot”). You’ll use
-                    it when linking other nodes.
-                  </p>
-                </fieldset>
-                <fieldset className="flex flex-col">
-                  <div className="flex justify-between mb-[2px]">
-                    <label htmlFor="pat" className="text-text text-[13px]">
-                      Value
-                    </label>
-                  </div>
-                  <input
-                    type="password"
-                    autoComplete="off"
-                    data-1p-ignore
-                    data-lpignore="true"
-                    id="pat"
-                    name="value"
-                    className={clsx(
-                      "border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-                      "focus:border-border-focused",
-                    )}
-                  />
-                  <p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-                    We’ll encrypt the token with authenticated encryption before
-                    saving it.
-                  </p>
-                </fieldset>
-              </div>
-              <DialogFooter>
-                <button
-                  type="submit"
-                  className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
-                  disabled={isPending}
-                >
-                  {isPending ? "..." : "Create"}
-                </button>
-              </DialogFooter>
-            </form>
-          </DialogContent>
-        </Dialog>
-      </div>
-      {data === undefined || data.length < 1 ? (
-        <EmptyState description="No secret" />
-      ) : (
-        <table className="w-full text-sm">
-          <thead>
-            <tr className="border-b border-white-400/20">
-              <th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
-                Name
-              </th>
-              <th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
-                Created at
-              </th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map((data) => (
-              <tr key={data.id} className="border-b border-white-400/10">
-                <td className="py-3 px-4 text-white-800">{data.label}</td>
-                <td className="py-3 px-4 text-white-800">
-                  {formatDateTime(data.createdAt)}
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      )}
-    </div>
-  );
+	if (isLoading) {
+		return null;
+	}
+	return (
+		<div className="px-[16px] pb-[16px] pt-[8px] h-full">
+			<div className="flex justify-end items-center">
+				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
+					<DialogTrigger asChild>
+						<Button type="button" leftIcon={<PlusIcon className="text-text" />}>
+							Add new secret
+						</Button>
+					</DialogTrigger>
+					<DialogContent>
+						<div className="py-[12px]">
+							<DialogTitle>Add new secret</DialogTitle>
+							<DialogDescription>
+								Enter a name and value for the secret.
+							</DialogDescription>
+						</div>
+						<form onSubmit={handleSubmit}>
+							<div className="flex flex-col gap-[12px]">
+								<fieldset className="flex flex-col">
+									<label
+										htmlFor="label"
+										className="text-text text-[13px] mb-[2px]"
+									>
+										Secret Name
+									</label>
+									<input
+										type="text"
+										id="label"
+										name="label"
+										className={clsx(
+											"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+											"focus:border-border-focused",
+										)}
+									/>
+									<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+										Give this token a short name (e.g. “Prod-bot”). You’ll use
+										it when linking other nodes.
+									</p>
+								</fieldset>
+								<fieldset className="flex flex-col">
+									<div className="flex justify-between mb-[2px]">
+										<label htmlFor="pat" className="text-text text-[13px]">
+											Value
+										</label>
+									</div>
+									<input
+										type="password"
+										autoComplete="off"
+										data-1p-ignore
+										data-lpignore="true"
+										id="pat"
+										name="value"
+										className={clsx(
+											"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
+											"focus:border-border-focused",
+										)}
+									/>
+									<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
+										We’ll encrypt the token with authenticated encryption before
+										saving it.
+									</p>
+								</fieldset>
+							</div>
+							<DialogFooter>
+								<Button
+									type="submit"
+									variant="solid"
+									size="large"
+									disabled={isPending}
+								>
+									{isPending ? "..." : "Create"}
+								</Button>
+							</DialogFooter>
+						</form>
+					</DialogContent>
+				</Dialog>
+			</div>
+			{data === undefined || data.length < 1 ? (
+				<EmptyState description="No secret" />
+			) : (
+				<table className="w-full text-sm">
+					<thead>
+						<tr className="border-b border-white-400/20">
+							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+								Name
+							</th>
+							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+								Created at
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{data.map((data) => (
+							<tr key={data.id} className="border-b border-white-400/10">
+								<td className="py-3 px-4 text-white-800">{data.label}</td>
+								<td className="py-3 px-4 text-white-800">
+									{formatDateTime(data.createdAt)}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			)}
+		</div>
+	);
 }
