@@ -1,6 +1,6 @@
 import type { Node } from "@giselle-sdk/data-type";
 import { extensions as baseExtensions } from "@giselle-sdk/text-editor-utils";
-
+import Placeholder from "@tiptap/extension-placeholder";
 import { type Editor, EditorProvider, useCurrentEditor } from "@tiptap/react";
 import clsx from "clsx/lite";
 import {
@@ -132,12 +132,16 @@ export function TextEditor({
 }) {
 	const extensions = useMemo(() => {
 		return nodes === undefined
-			? baseExtensions
+			? [
+					...baseExtensions,
+					Placeholder.configure({ placeholder: "Type something..." }),
+				]
 			: [
 					...baseExtensions,
 					SourceExtensionReact.configure({
 						nodes,
 					}),
+					Placeholder.configure({ placeholder: "Type something..." }),
 				];
 	}, [nodes]);
 	return (
