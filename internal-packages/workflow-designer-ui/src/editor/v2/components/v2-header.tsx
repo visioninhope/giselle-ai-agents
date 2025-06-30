@@ -4,6 +4,7 @@ import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import clsx from "clsx/lite";
 import { useWorkflowDesigner } from "giselle-sdk/react";
 import { ChevronDownIcon } from "lucide-react";
+import Link from "next/link";
 import { useRef } from "react";
 import { GiselleIcon } from "../../../icons";
 import { EditableText, type EditableTextRef } from "../../properties-panel/ui";
@@ -29,8 +30,16 @@ export function V2Header({ teamName }: { teamName?: string }) {
 		>
 			{/* Left section: Logo + Team/App names */}
 			<div className="flex items-center gap-[3px] min-w-0">
-				<GiselleIcon className="text-white-900 w-[24px] h-[24px]" />
-				<span className="text-white-900 text-[13px] font-semibold">Studio</span>
+				<Link
+					href="/"
+					className="flex items-center gap-[3px] group"
+					aria-label="Go to home"
+				>
+					<GiselleIcon className="text-white-900 w-[24px] h-[24px] group-hover:text-primary-100 transition-colors" />
+					<span className="text-white-900 text-[13px] font-semibold group-hover:text-primary-100 transition-colors">
+						Studio
+					</span>
+				</Link>
 				<span className="text-white-900/20 text-[18px] font-[250] leading-none ml-[4px]">
 					/
 				</span>
