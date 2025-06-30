@@ -1,5 +1,5 @@
 import { useContext } from "react";
-import { WorkflowDesignerContext } from "../workflow-designer-context";
+import { WorkflowDesignerContext } from "../context";
 
 export function useWorkflowDesigner() {
 	const context = useContext(WorkflowDesignerContext);

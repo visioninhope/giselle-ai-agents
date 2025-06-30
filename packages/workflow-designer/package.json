@@ -8,11 +8,11 @@
 	"scripts": {
 		"build": "tsup",
 		"check-types": "tsc --noEmit",
-		"clean": "rm -rf .turbo dist node_modules react",
+		"clean": "rm -rf .turbo dist node_modules",
 		"format": "biome check --write .",
 		"test": "vitest run"
 	},
-	"files": ["dist/**/*", "react/dist/**/*"],
+	"files": ["dist/**/*"],
 	"exports": {
 		"./package.json": "./package.json",
 		".": {
@@ -21,12 +21,6 @@
 			"require": "./dist/index.js",
 			"default": "./dist/index.js"
 		},
-		"./react": {
-			"types": "./react/dist/index.d.ts",
-			"require": "./react/dist/index.js",
-			"default": "./react/dist/index.js"
-		},
-		"./react-internal": "./src/react/index.ts",
 		"./dist/style.css": "./dist/style.css"
 	},
 	"devDependencies": {
