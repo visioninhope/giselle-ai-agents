@@ -3254,7 +3254,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@rollup/rollup-linux-x64-gnu"></a>
-### @rollup/rollup-linux-x64-gnu v4.34.4
+### @rollup/rollup-linux-x64-gnu v4.35.0
 #### 
 
 ##### Paths
@@ -3265,7 +3265,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@rollup/rollup-linux-x64-musl"></a>
-### @rollup/rollup-linux-x64-musl v4.34.4
+### @rollup/rollup-linux-x64-musl v4.35.0
 #### 
 
 ##### Paths
@@ -4530,7 +4530,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/ws"></a>
-### @types/ws v8.5.13
+### @types/ws v8.18.1
 #### 
 
 ##### Paths
@@ -10232,7 +10232,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="nanoid"></a>
-### nanoid v3.3.8
+### nanoid v3.3.11
 #### 
 
 ##### Paths
@@ -12135,7 +12135,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="rollup"></a>
-### rollup v4.34.4
+### rollup v4.35.0
 #### 
 
 ##### Paths
