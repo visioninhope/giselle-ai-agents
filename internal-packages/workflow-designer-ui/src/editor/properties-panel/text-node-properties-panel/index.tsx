@@ -12,7 +12,7 @@ import {
 
 export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 	const { updateNodeDataContent, updateNodeData } = useWorkflowDesigner();
-	const { layoutV2 } = useFeatureFlag();
+	const { layoutV2, layoutV3 } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -25,7 +25,7 @@ export function TextNodePropertiesPanel({ node }: { node: TextNode }) {
 				}}
 			/>
 			<PropertiesPanelContent>
-				{layoutV2 ? (
+				{layoutV2 || layoutV3 ? (
 					<ResizableSectionGroup>
 						<ResizableSection defaultSize={100}>
 							<TextEditor

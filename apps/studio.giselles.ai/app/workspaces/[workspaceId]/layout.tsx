@@ -3,6 +3,7 @@ import { db } from "@/drizzle";
 import {
 	githubToolsFlag,
 	layoutV2Flag,
+	layoutV3Flag,
 	runV3Flag,
 	sidemenuFlag,
 	webSearchActionFlag,
@@ -46,6 +47,7 @@ export default async function Layout({
 	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV2 = await layoutV2Flag();
+	const layoutV3 = await layoutV3Flag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -77,6 +79,7 @@ export default async function Layout({
 				githubTools,
 				webSearchAction,
 				layoutV2,
+				layoutV3,
 			}}
 		>
 			{children}

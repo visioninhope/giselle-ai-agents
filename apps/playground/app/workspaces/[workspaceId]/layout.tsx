@@ -19,6 +19,7 @@ export default async function Layout({
 				githubTools: true,
 				webSearchAction: false,
 				layoutV2: true,
+				layoutV3: false,
 			}}
 		>
 			{children}
