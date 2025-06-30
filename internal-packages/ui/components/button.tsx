@@ -25,6 +25,7 @@ export function Button({
 				"relative flex items-center justify-between outline-none overflow-hidden",
 				"data-[size=default]:px-[8px] data-[size=default]:py-[2px] data-[size=default]:rounded-[2px] data-[size=default]:gap-[4px]",
 				"data-[size=large]:px-4 data-[size=large]:py-2 data-[size=large]:rounded-lg data-[size=large]:gap-[6px]",
+				"data-[size=compact]:px-[4px] data-[size=compact]:py-[0px] data-[size=compact]:rounded-[2px] data-[size=compact]:gap-[2px]",
 				"data-[style=subtle]:hover:bg-ghost-element-hover",
 				"data-[style=filled]:bg-background data-[style=filled]:border data-[style=filled]:border-border data-[style=filled]:hover:bg-ghost-element-hover",
 				"data-[style=solid]:bg-(image:--solid-button-bg) data-[style=solid]:text-white-900 data-[style=solid]:border data-[style=solid]:border-button-solid-border data-[style=solid]:shadow-(--solid-button-shadow) data-[style=solid]:hover:bg-primary-800",

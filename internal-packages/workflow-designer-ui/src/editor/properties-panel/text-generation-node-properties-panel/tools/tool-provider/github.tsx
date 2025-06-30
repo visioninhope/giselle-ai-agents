@@ -9,6 +9,7 @@ import {
 	MoveUpRightIcon,
 	PlusIcon,
 	Settings2Icon,
+	TrashIcon,
 } from "lucide-react";
 import { Checkbox } from "radix-ui";
 import { useCallback, useMemo, useState, useTransition } from "react";
@@ -372,7 +373,7 @@ function GitHubToolConfigurationDialogInternal({
 			});
 			onOpenChange?.(false);
 		},
-		[node, updateNodeDataContent],
+		[node, updateNodeDataContent, onOpenChange],
 	);
 
 	return (
@@ -393,6 +394,28 @@ function GitHubToolConfigurationDialogInternal({
 			onOpenChange={onOpenChange}
 		>
 			<div className="flex flex-col">
+				<div className="flex justify-between items-center border border-border rounded-[4px] px-[6px] py-[3px] text-[13px] mb-[16px]">
+					<div className="flex gap-[6px] items-center">
+						<CheckIcon className="size-[14px] text-green-900" />
+						Token configured.
+					</div>
+					<Button
+						type="button"
+						onClick={() => {
+							updateNodeDataContent(node, {
+								...node.content,
+								tools: {
+									...node.content.tools,
+									github: undefined,
+								},
+							});
+						}}
+						leftIcon={<TrashIcon className="size-[12px]" />}
+						size="compact"
+					>
+						Reset key
+					</Button>
+				</div>
 				<div className="flex flex-col gap-6">
 					{githubToolCatalog.map((category) => (
 						<div key={category.label} className="flex flex-col gap-2">

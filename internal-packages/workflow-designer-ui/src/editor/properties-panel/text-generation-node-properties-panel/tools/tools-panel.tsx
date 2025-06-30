@@ -54,16 +54,20 @@ function ToolListItem({
 				</div>
 				{configurationPanel}
 			</div>
-			<div className="flex flex-wrap text-[12px] text-text-muted gap-x-[6px] mt-[6px] gap-y-[6px]">
-				{availableTools.map((availableTool) => (
-					<p
-						className="border border-border rounded-full px-[6px] py-[1px]"
-						key={availableTool}
-					>
-						{availableTool}
-					</p>
-				))}
-			</div>
+			{availableTools.length > 0 && (
+				<div className="mt-[6px]">
+					<div className="flex flex-wrap text-[12px] text-text-muted gap-x-[6px] gap-y-[6px]">
+						{availableTools.map((availableTool) => (
+							<p
+								className="border border-border rounded-full px-[6px] py-[1px]"
+								key={availableTool}
+							>
+								{availableTool}
+							</p>
+						))}
+					</div>
+				</div>
+			)}
 		</div>
 	);
 }
