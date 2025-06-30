@@ -38,6 +38,15 @@
 	cursor: default;
 }
 
+/* for @giselle-sdk/text-editor */
+.tiptap p.is-editor-empty:first-child::before {
+	color: var(--color-text-muted);
+	content: attr(data-placeholder);
+	float: left;
+	height: 0;
+	pointer-events: none;
+}
+
 @theme {
 	--animate-pop-pop-1: pop-pop 2.1s steps(1) infinite;
 	--animate-pop-pop-2: pop-pop 2.1s steps(1) 0.7s infinite;
@@ -101,6 +110,36 @@
 		}
 		100% {
 			background-position: 0% 50%;
+		}
+	}
+	@keyframes twinkle-effect {
+		0% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		0.32% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		0.43% {
+			opacity: 1;
+			transform: rotate(720deg) scale(1);
+		}
+		0.86% {
+			opacity: 1;
+			transform: rotate(1440deg) scale(0.2);
+		}
+		0.88% {
+			opacity: 0;
+			transform: rotate(1440deg) scale(0);
+		}
+		0.90% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		100% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
 		}
 	}
 	--animate-shimmer: shimmer 2s infinite;

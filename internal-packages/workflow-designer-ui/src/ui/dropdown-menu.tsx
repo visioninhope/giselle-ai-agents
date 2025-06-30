@@ -112,3 +112,18 @@ export function DropdownMenuRadioItem({
 	);
 }
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
+
+export function DropdownMenuItem({
+	children,
+	...props
+}: Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "className">) {
+	return (
+		<DropdownMenuPrimitive.Item
+			className="relative flex cursor-default select-none items-center py-[8px] pl-2 pr-8 text-sm outline-none transition-colors focus:bg-white-900/20 focus:text-white-900 data-[disabled]:pointer-events-none data-[disabled]:opacity-50"
+			{...props}
+		>
+			{children}
+		</DropdownMenuPrimitive.Item>
+	);
+}
+DropdownMenuItem.displayName = DropdownMenuPrimitive.Item.displayName;
