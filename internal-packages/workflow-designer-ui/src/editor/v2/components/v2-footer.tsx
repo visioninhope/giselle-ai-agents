@@ -20,7 +20,7 @@ export function V2Footer({
 	activePanel,
 }: V2FooterProps) {
 	return (
-		<footer className="h-[30px] border-t border-black-600 px-4 flex items-center">
+		<footer className="h-[30px] border-t border-white/10 px-4 flex items-center">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-3">
 					<Tooltip
