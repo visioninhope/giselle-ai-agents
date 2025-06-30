@@ -27,7 +27,6 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	const { updateNodeData } = useWorkflowDesigner();
-	const { layoutV2, layoutV3 } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
