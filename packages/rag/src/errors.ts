@@ -224,9 +224,10 @@ export class OperationError extends RagError {
 	constructor(
 		message: string,
 		public readonly code: OperationErrorCode,
+		cause?: Error,
 		context?: Record<string, unknown>,
 	) {
-		super(message, undefined, context);
+		super(message, cause, context);
 	}
 
 	/**
@@ -235,11 +236,13 @@ export class OperationError extends RagError {
 	static invalidOperation(
 		operation: string,
 		reason: string,
+		cause?: Error,
 		context?: Record<string, unknown>,
 	) {
 		return new OperationError(
 			`Invalid operation '${operation}': ${reason}`,
 			"INVALID_OPERATION",
+			cause,
 			{ ...context, operation, reason },
 		);
 	}

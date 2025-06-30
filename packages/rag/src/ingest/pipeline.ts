@@ -97,7 +97,7 @@ export function createPipeline<
 			throw OperationError.invalidOperation(
 				"processDocument",
 				"Failed to process document metadata",
-				{ cause: error instanceof Error ? error.message : String(error) },
+				error instanceof Error ? error : new Error(String(error)),
 			);
 		}
 
@@ -242,7 +242,7 @@ export function createPipeline<
 			throw OperationError.invalidOperation(
 				"ingestion pipeline",
 				"Failed to complete ingestion pipeline",
-				{ cause: error instanceof Error ? error.message : String(error) },
+				error instanceof Error ? error : new Error(String(error)),
 			);
 		}
 
