@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import { TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useState } from "react";
 import useSWR from "swr";
@@ -46,7 +47,7 @@ function WebPageListItem({
 	return (
 		<li
 			key={webpage.id}
-			className="group bg-black-750 px-[8px] py-[4px] flex items-center justify-between gap-[8px] hover:bg-black-800 transition-colors"
+			className="group bg-white-850/10 p-[8px] rounded-[8px] flex items-center justify-between gap-[8px]"
 		>
 			{webpage.status === "fetched" && (
 				<Dialog.Root open={open} onOpenChange={setOpen}>
@@ -55,7 +56,7 @@ function WebPageListItem({
 							type="button"
 							className="text-left overflow-x-hidden cursor-pointer flex-1 outline-none"
 						>
-							<p className="truncate">{webpage.title}</p>
+							<p className="text-[14px] truncate">{webpage.title}</p>
 							<a
 								className="text-[14px] underline truncate block"
 								href={webpage.url}
@@ -127,9 +128,9 @@ function WebPageListItem({
 			<button
 				type="button"
 				onClick={onRemove}
-				className="cursor-pointer hidden group-hover:block"
+				className="cursor-pointer hidden group-hover:block p-[4px] hover:bg-white-850/10 rounded-[4px] transition-colors"
 			>
-				Delete
+				<TrashIcon className="size-[16px] text-white-600" />
 			</button>
 		</li>
 	);
@@ -246,38 +247,18 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 			/>
 			<PropertiesPanelContent>
 				<div>
-					<ul className="flex flex-col gap-[8px]">
-						{node.content.webpages.map((webpage) => (
-							<WebPageListItem
-								key={webpage.id}
-								webpage={webpage}
-								workspaceId={data.id}
-								onRemove={removeWebPage(webpage.id)}
-							/>
-						))}
-					</ul>
-
-					<form
-						className="p-[4px] flex flex-col gap-[8px]"
-						onSubmit={handleSubmit}
-					>
+					<form className="flex flex-col gap-[8px]" onSubmit={handleSubmit}>
 						<div className="flex flex-col gap-[8px]">
-							<label
-								htmlFor="webpage-urls"
-								className="font-semibold text-white-800"
-							>
-								URLs (one per line)
-							</label>
 							<textarea
 								id="webpage-urls"
 								name="urls"
 								className={clsx(
-									"w-full min-h-[80px] p-[8px] border-[2px] border-black-400 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
+									"w-full min-h-[80px] p-[16px] pb-0 border-[0.5px] border-white-900 rounded-[8px] bg-black-100 text-white-800 outline-none resize-none",
 									// urlError && "border-error-900",
 								)}
 								// value={urls}
 								// onChange={(e) => setUrls(e.target.value)}
-								placeholder={"https://example.com\nhttps://docs.giselles.ai"}
+								placeholder={"URLs (one per line)\nhttps://example.com"}
 								required
 							/>
 							{/* {urlError && (
@@ -286,11 +267,29 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 						</div>
 						<button
 							type="submit"
-							className="w-fit flex items-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
+							className="w-full flex items-center justify-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
 						>
 							Insert
 						</button>
 					</form>
+
+					{node.content.webpages.length > 0 && (
+						<div className="mt-[16px]">
+							<h3 className="text-[14px] font-semibold text-white-800 mb-[8px]">
+								Added URLs
+							</h3>
+							<ul className="flex flex-col gap-[8px]">
+								{node.content.webpages.map((webpage) => (
+									<WebPageListItem
+										key={webpage.id}
+										webpage={webpage}
+										workspaceId={data.id}
+										onRemove={removeWebPage(webpage.id)}
+									/>
+								))}
+							</ul>
+						</div>
+					)}
 				</div>
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
