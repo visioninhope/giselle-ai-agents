@@ -6,12 +6,13 @@ import { createClient } from "@/lib/supabase";
 import type { OAuthProvider } from "@/services/accounts";
 import { redirect } from "next/navigation";
 
-async function authorizeOAuth(provider: OAuthProvider) {
+async function authorizeOAuth(provider: OAuthProvider, formData?: FormData) {
+	const returnUrl = formData?.get("returnUrl") as string | undefined;
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider,
 		options: {
-			redirectTo: getAuthCallbackUrl({ provider }),
+			redirectTo: getAuthCallbackUrl({ provider, next: returnUrl || "/" }),
 		},
 	});
 	logger.debug(`authorized with ${provider}`);
@@ -27,10 +28,10 @@ async function authorizeOAuth(provider: OAuthProvider) {
 	}
 }
 
-export async function authorizeGitHub() {
-	return await authorizeOAuth("github");
+export async function authorizeGitHub(formData: FormData) {
+	return await authorizeOAuth("github", formData);
 }
 
-export async function authorizeGoogle() {
-	return await authorizeOAuth("google");
+export async function authorizeGoogle(formData: FormData) {
+	return await authorizeOAuth("google", formData);
 }

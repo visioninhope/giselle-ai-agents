@@ -15,6 +15,7 @@ export async function login(
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
 	};
+	const returnUrl = formData.get("returnUrl") as string | null;
 	const { data, error } = await supabase.auth.signInWithPassword(credentails);
 
 	if (error) {
@@ -25,6 +26,9 @@ export async function login(
 			name: error.name,
 		};
 	}
-	redirect("/apps");
+
+	// Validate returnUrl to prevent open redirect attacks
+	const validReturnUrl = returnUrl?.startsWith("/") ? returnUrl : "/apps";
+	redirect(validReturnUrl);
 	return null;
 }
