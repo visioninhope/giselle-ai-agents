@@ -21,6 +21,10 @@ const components = [
 		id: "popover",
 		name: "Popover",
 	},
+	{
+		id: "toggle",
+		name: "Toggle",
+	},
 ];
 export default function ({
 	children,
