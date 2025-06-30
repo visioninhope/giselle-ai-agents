@@ -103,6 +103,36 @@
 			background-position: 0% 50%;
 		}
 	}
+	@keyframes twinkle-effect {
+		0% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		0.32% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		0.43% {
+			opacity: 1;
+			transform: rotate(720deg) scale(1);
+		}
+		0.86% {
+			opacity: 1;
+			transform: rotate(1440deg) scale(0.2);
+		}
+		0.88% {
+			opacity: 0;
+			transform: rotate(1440deg) scale(0);
+		}
+		0.90% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+		100% {
+			opacity: 1;
+			transform: rotate(0deg) scale(1);
+		}
+	}
 	--animate-shimmer: shimmer 2s infinite;
 }
 

@@ -5,6 +5,7 @@ export * from "./data";
 export * from "./document";
 export * from "./folder";
 export * from "./giselle-logo";
+export * from "./giselle-icon";
 export * from "./globe";
 export * from "./layers";
 export * from "./panel-close";
