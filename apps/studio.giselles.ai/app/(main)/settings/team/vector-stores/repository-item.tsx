@@ -17,11 +17,19 @@ import type {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-import { Trash } from "lucide-react";
+import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
+import { AlertCircle, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
+import { getErrorMessage } from "./error-messages";
+
+// Extend the type to include the mock error code and retryable fields
+type ExtendedRepositoryIndex = typeof githubRepositoryIndex.$inferSelect & {
+	errorCode?: string | null;
+	isRetryable?: boolean | null;
+};
 
 type RepositoryItemProps = {
-	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
+	repositoryIndex: ExtendedRepositoryIndex;
 	deleteRepositoryIndexAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<void>;
@@ -61,6 +69,23 @@ export function RepositoryItem({
 							</span>
 						)}
 					</div>
+					{repositoryIndex.status === "failed" && repositoryIndex.errorCode && (
+						<div className="flex items-start gap-2 mt-2">
+							<AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
+							<div className="flex-1">
+								<p className="text-red-400 text-[12px] leading-[16px] font-geist">
+									{getErrorMessage(
+										repositoryIndex.errorCode as DocumentLoaderErrorCode,
+									)}
+								</p>
+								{repositoryIndex.isRetryable && (
+									<p className="text-black-400 text-[11px] leading-[14px] font-geist mt-1">
+										This error will be retried automatically.
+									</p>
+								)}
+							</div>
+						</div>
+					)}
 				</div>
 				<div className="ml-auto flex gap-2 items-center">
 					<AlertDialog
