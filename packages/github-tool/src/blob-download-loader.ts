@@ -1,5 +1,5 @@
 import { createHash } from "node:crypto";
-import { promises as fs } from "node:fs";
+import { promises as fs, type Dirent } from "node:fs";
 import { tmpdir } from "node:os";
 import { join, normalize } from "node:path";
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
@@ -68,12 +68,18 @@ export function createGitHubBlobDownloadLoader(
 	}
 
 	async function* walk(dir: string): AsyncGenerator<string> {
-		const entries = await fs.readdir(dir, { withFileTypes: true });
+		let entries: Dirent[];
+		try {
+			entries = await fs.readdir(dir, { withFileTypes: true });
+		} catch (error) {
+			console.warn(`Failed to read directory ${dir}:`, error);
+			return;
+		}
 		for (const entry of entries) {
 			const full = join(dir, entry.name);
 			if (entry.isDirectory()) {
 				yield* walk(full);
-			} else if (entry.isFile()) {
+			} else if (entry.isFile() && !entry.isSymbolicLink()) {
 				yield full;
 			}
 		}
