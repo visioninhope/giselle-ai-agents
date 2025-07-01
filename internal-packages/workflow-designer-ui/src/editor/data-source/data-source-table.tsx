@@ -9,14 +9,6 @@ import {
 } from "@giselle-internal/ui/dialog";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
 import { Select } from "@giselle-internal/ui/select";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@giselle-internal/ui/table";
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon } from "lucide-react";
@@ -142,20 +134,22 @@ export function DataSourceTable() {
           </Button>
         </EmptyState>
       ) : (
-        <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="font-sans">ID</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
+        <table className="w-full text-sm">
+          <thead>
+            <tr>
+              <th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+                ID
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {data.map((data) => (
-              <TableRow key={data.id}>
-                <TableCell>{data.id}</TableCell>
-              </TableRow>
+              <tr key={data.id} className="border-b border-white-400/10">
+                <td className="py-3 px-4 text-white-800">{data.id}</td>
+              </tr>
             ))}
-          </TableBody>
-        </Table>
+          </tbody>
+        </table>
       )}
     </div>
   );

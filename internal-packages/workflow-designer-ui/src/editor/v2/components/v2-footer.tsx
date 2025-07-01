@@ -34,6 +34,7 @@ export function V2Footer({
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("run-history")}
+							data-panel-trigger="run-history"
 							className={`cursor-pointer ${
 								activePanel === "run-history"
 									? "text-[#6B8FF0]"
@@ -54,6 +55,7 @@ export function V2Footer({
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("secret")}
+							data-panel-trigger="secret"
 							className={`cursor-pointer ${
 								activePanel === "secret"
 									? "text-[#6B8FF0]"
@@ -74,6 +76,7 @@ export function V2Footer({
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("data-source")}
+							data-panel-trigger="data-source"
 							className={`cursor-pointer ${
 								activePanel === "data-source"
 									? "text-[#6B8FF0]"

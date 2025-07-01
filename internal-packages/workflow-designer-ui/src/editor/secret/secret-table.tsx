@@ -152,7 +152,7 @@ export function SecretTable() {
 			) : (
 				<table className="w-full text-sm">
 					<thead>
-						<tr className="border-b border-white-400/20">
+						<tr>
 							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
 								Name
 							</th>

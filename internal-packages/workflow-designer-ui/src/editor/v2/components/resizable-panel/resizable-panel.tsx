@@ -17,6 +17,7 @@ interface ResizablePanelProps {
 	defaultWidth: number;
 	className?: string;
 	onWidthChange?: (width: number) => void;
+	panelRef?: React.RefObject<HTMLDivElement>;
 }
 
 export function ResizablePanel({
@@ -27,10 +28,12 @@ export function ResizablePanel({
 	defaultWidth,
 	className,
 	onWidthChange,
+	panelRef: externalPanelRef,
 }: ResizablePanelProps) {
 	const [width, setWidth] = useState(defaultWidth);
 	const [isResizing, setIsResizing] = useState(false);
-	const panelRef = useRef<HTMLDivElement>(null);
+	const internalPanelRef = useRef<HTMLDivElement>(null);
+	const panelRef = externalPanelRef || internalPanelRef;
 
 	// Update width when panel opens/closes
 	useEffect(() => {

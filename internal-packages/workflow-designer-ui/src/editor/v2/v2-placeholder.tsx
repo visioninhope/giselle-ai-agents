@@ -8,68 +8,71 @@ import { RootProvider } from "./components/provider";
 import type { LeftPanelValue, V2LayoutState } from "./state";
 
 export function V2Placeholder({
-  isReadOnly = false,
-  userRole = "viewer",
+	isReadOnly = false,
+	userRole = "viewer",
 }: {
-  isReadOnly?: boolean;
-  userRole?: "viewer" | "guest" | "editor" | "owner";
+	isReadOnly?: boolean;
+	userRole?: "viewer" | "guest" | "editor" | "owner";
 }) {
-  const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
-  const [layoutState, setLayoutState] = useState<V2LayoutState>({
-    leftPanel: null,
-  });
+	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
+	const [layoutState, setLayoutState] = useState<V2LayoutState>({
+		leftPanel: null,
+	});
 
-  const handleDismissBanner = useCallback(() => {
-    setShowReadOnlyBanner(false);
-  }, []);
+	const handleDismissBanner = useCallback(() => {
+		setShowReadOnlyBanner(false);
+	}, []);
 
-  const handleLeftPanelValueChange = useCallback(
-    (newLeftPanelValue: LeftPanelValue) => {
-      setLayoutState((prev) => ({
-        ...prev,
-        leftPanel:
-          prev.leftPanel === newLeftPanelValue ? null : newLeftPanelValue,
-      }));
-    },
-    [],
-  );
+	const handleLeftPanelValueChange = useCallback(
+		(newLeftPanelValue: LeftPanelValue) => {
+			setLayoutState((prev) => ({
+				...prev,
+				leftPanel:
+					prev.leftPanel === newLeftPanelValue ? null : newLeftPanelValue,
+			}));
+		},
+		[],
+	);
 
-  const handleLeftPanelClose = useCallback(() => {
-    setLayoutState((prev) => ({
-      ...prev,
-      leftPanel: null,
-    }));
-  }, []);
+	const handleLeftPanelClose = useCallback(() => {
+		setLayoutState((prev) => ({
+			...prev,
+			leftPanel: null,
+		}));
+	}, []);
 
-  const { layoutV3 } = useFeatureFlag();
+	const { layoutV3 } = useFeatureFlag();
 
-  return (
-    <div className="flex-1 overflow-hidden font-sans flex flex-col">
-      {showReadOnlyBanner && isReadOnly && (
-        <ReadOnlyBanner
-          onDismiss={handleDismissBanner}
-          userRole={userRole}
-          className="z-50"
-        />
-      )}
+	return (
+		<div className="flex-1 overflow-hidden font-sans flex flex-col">
+			{showReadOnlyBanner && isReadOnly && (
+				<ReadOnlyBanner
+					onDismiss={handleDismissBanner}
+					userRole={userRole}
+					className="z-50"
+				/>
+			)}
 
-      <RootProvider>
-        <V2Header />
-        {layoutV3 ? (
-          <>
-            <V2Container
-              {...layoutState}
-              onLeftPanelClose={handleLeftPanelClose}
-            />
-            <V2Footer
-              onLeftPaelValueChange={handleLeftPanelValueChange}
-              activePanel={layoutState.leftPanel}
-            />
-          </>
-        ) : (
-          <V2Container {...layoutState} />
-        )}
-      </RootProvider>
-    </div>
-  );
+			<RootProvider>
+				<V2Header />
+				{layoutV3 ? (
+					<>
+						<V2Container
+							{...layoutState}
+							onLeftPanelClose={handleLeftPanelClose}
+						/>
+						<V2Footer
+							onLeftPaelValueChange={handleLeftPanelValueChange}
+							activePanel={layoutState.leftPanel}
+						/>
+					</>
+				) : (
+					<V2Container
+						{...layoutState}
+						onLeftPanelClose={handleLeftPanelClose}
+					/>
+				)}
+			</RootProvider>
+		</div>
+	);
 }
