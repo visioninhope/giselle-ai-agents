@@ -311,11 +311,30 @@ export class DocumentLoaderError extends RagError {
 		cause?: Error,
 		context?: Record<string, unknown>,
 	) {
+		let retryAfterDate: Date | undefined;
+
+		if (retryAfter !== undefined) {
+			if (typeof retryAfter === "number") {
+				retryAfterDate = new Date(Date.now() + retryAfter * 1000);
+			} else if (typeof retryAfter === "string") {
+				const seconds = Number.parseInt(retryAfter, 10);
+				if (!Number.isNaN(seconds)) {
+					retryAfterDate = new Date(Date.now() + seconds * 1000);
+				}
+			}
+		}
+
 		return new DocumentLoaderError(
 			`Rate limit exceeded for ${source}`,
 			"DOCUMENT_RATE_LIMITED",
 			cause,
-			{ ...context, source, retryAfter },
+			{
+				...context,
+				source,
+				retryAfter, // Keep original value
+				retryAfterDate,
+				occurredAt: new Date(),
+			},
 		);
 	}
 
@@ -345,6 +364,18 @@ export class DocumentLoaderError extends RagError {
 		];
 
 		return !nonRetryableErrorCodes.includes(this.code);
+	}
+
+	/**
+	 * Get the retry-after time as a Date object
+	 * @returns Date when the request can be retried, or undefined if not available
+	 */
+	getRetryAfterDate(): Date | undefined {
+		// For DOCUMENT_RATE_LIMITED errors, return pre-calculated date
+		if (this.code === "DOCUMENT_RATE_LIMITED") {
+			return this.context?.retryAfterDate as Date | undefined;
+		}
+		return undefined;
 	}
 }
 
