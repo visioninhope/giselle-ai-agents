@@ -1,7 +1,7 @@
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { join, normalize } from "node:path";
 import type { Document, DocumentLoader } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { extract } from "tar";
@@ -75,6 +75,13 @@ export function createGitHubBlobDownloadLoader(
 			.digest("hex");
 	}
 
+	function isValidPath(path: string): boolean {
+		// Prevent path traversal attacks
+		return (
+			!path.includes("..") && !path.startsWith("/") && !path.includes("\0")
+		);
+	}
+
 	const loadMetadata = async function* (): AsyncIterable<GitHubBlobMetadata> {
 		const root = await prepare();
 		for await (const file of walk(root)) {
@@ -88,6 +95,10 @@ export function createGitHubBlobDownloadLoader(
 			const content = await fs.readFile(file);
 			const fileSha = computeSha(content);
 			const relative = file.slice(root.length + 1);
+			if (!isValidPath(relative)) {
+				console.warn(`Skipping potentially unsafe path: ${relative}`);
+				continue;
+			}
 			yield { owner, repo, fileSha, path: relative };
 		}
 	};
@@ -96,7 +107,14 @@ export function createGitHubBlobDownloadLoader(
 		metadata: GitHubBlobMetadata,
 	): Promise<Document<GitHubBlobMetadata> | null> => {
 		const root = await prepare();
-		const fullPath = join(root, metadata.path);
+		const fullPath = normalize(join(root, metadata.path));
+
+		// Prevent path traversal attacks
+		if (!fullPath.startsWith(normalize(root))) {
+			console.warn(`Path traversal attempt detected: ${metadata.path}`);
+			return null;
+		}
+
 		let contentBytes: Buffer;
 		try {
 			contentBytes = await fs.readFile(fullPath);
