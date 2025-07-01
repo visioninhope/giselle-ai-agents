@@ -74,7 +74,7 @@ export default async function TeamVectorStorePage() {
 					href="https://docs.giselles.ai/guides/settings/team/vector-store"
 					target="_blank"
 					rel="noopener noreferrer"
-					className="text-black-300 text-[14px] font-medium border border-black-300 rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
 				>
 					About Vector Stores
 					<ExternalLink size={14} />
@@ -97,14 +97,25 @@ export default async function TeamVectorStorePage() {
 function GitHubAuthRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h2
-				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{
-					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-				}}
-			>
-				Vector Store
-			</h2>
+			<div className="flex justify-between items-center">
+				<h2
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
+				>
+					Vector Store
+				</h2>
+				<a
+					href="https://docs.giselles.ai/guides/settings/team/vector-store"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+				>
+					About Vector Stores
+					<ExternalLink size={14} />
+				</a>
+			</div>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
@@ -129,14 +140,25 @@ function GitHubAuthRequiredCard() {
 function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h2
-				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{
-					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-				}}
-			>
-				Vector Store
-			</h2>
+			<div className="flex justify-between items-center">
+				<h2
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
+				>
+					Vector Store
+				</h2>
+				<a
+					href="https://docs.giselles.ai/guides/settings/team/vector-store"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+				>
+					About Vector Stores
+					<ExternalLink size={14} />
+				</a>
+			</div>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<div className="flex items-center gap-2 mb-4">
@@ -157,14 +179,25 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 function GitHubAppInstallRequiredCard() {
 	return (
 		<div className="flex flex-col gap-[24px]">
-			<h2
-				className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-				style={{
-					textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-				}}
-			>
-				Vector Store
-			</h2>
+			<div className="flex justify-between items-center">
+				<h2
+					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+					style={{
+						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+					}}
+				>
+					Vector Store
+				</h2>
+				<a
+					href="https://docs.giselles.ai/guides/settings/team/vector-store"
+					target="_blank"
+					rel="noopener noreferrer"
+					className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+				>
+					About Vector Stores
+					<ExternalLink size={14} />
+				</a>
+			</div>
 			<Card className="border-[0.5px] border-black-400 rounded-[8px] bg-transparent p-6">
 				<div className="flex flex-col items-center justify-center py-8">
 					<h4 className="text-white-400 font-medium text-[18px] leading-[21.6px] font-sans mb-2">
