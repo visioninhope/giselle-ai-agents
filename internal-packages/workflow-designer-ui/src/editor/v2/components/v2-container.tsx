@@ -38,7 +38,7 @@ interface V2ContainerProps extends V2LayoutState {
 	onLeftPanelClose?: () => void;
 }
 
-function V2NodeCanvas() {
+function V2NodeCanvas({ onLeftPanelClose }: { onLeftPanelClose?: () => void }) {
 	const {
 		data,
 		setUiNodeState,
@@ -319,7 +319,7 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 
 				{/* Main Content Area */}
 				<div className="flex-1 relative">
-					<V2NodeCanvas />
+					<V2NodeCanvas onLeftPanelClose={onLeftPanelClose} />
 
 					{/* Floating Properties Panel */}
 					<FloatingPropertiesPanel
