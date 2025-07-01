@@ -1,10 +1,9 @@
 import {
-	type GitHubRepositoryIndexStatus,
 	db,
-	githubRepositoryIndex,
+	githubRepositoryIndex
 } from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
-import { and, eq, isNull, lt, or } from "drizzle-orm";
+import { and, eq, lt, or } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
 
 export function buildOctokit(installationId: number) {
@@ -30,7 +29,7 @@ export function buildOctokit(installationId: number) {
  *
  * target repositories are:
  * - idle
- * - failed (only if retryable or isRetryable is null for backward compatibility)
+ * - failed and retryable
  * - running and updated more than 15 minutes ago (stale)
  * - completed and updated more than 24 hours ago (outdated)
  *
@@ -59,14 +58,9 @@ export async function fetchTargetGitHubRepositories(): Promise<
 		.where(
 			or(
 				eq(githubRepositoryIndex.status, "idle"),
-				// Only include failed repositories that are retryable
 				and(
 					eq(githubRepositoryIndex.status, "failed"),
-					or(
-						eq(githubRepositoryIndex.isRetryable, true),
-						// Include repositories without isRetryable set (backward compatibility)
-						isNull(githubRepositoryIndex.isRetryable),
-					),
+					eq(githubRepositoryIndex.isRetryable, true),
 				),
 				and(
 					eq(githubRepositoryIndex.status, "running"),
@@ -90,19 +84,35 @@ export async function fetchTargetGitHubRepositories(): Promise<
 }
 
 export async function updateRepositoryStatusToRunning(dbId: number) {
-	await updateRepositoryStatus(dbId, "running");
+	await db
+		.update(githubRepositoryIndex)
+		.set({
+			status: "running",
+		})
+		.where(eq(githubRepositoryIndex.dbId, dbId));
+
 }
 
 export async function updateRepositoryStatusToCompleted(
 	dbId: number,
 	commitSha: string,
 ) {
-	await updateRepositoryStatus(dbId, "completed", commitSha);
+	await db
+		.update(githubRepositoryIndex)
+		.set({
+			status: "completed",
+			lastIngestedCommitSha: commitSha,
+			// clear error info
+			errorCode: null,
+			isRetryable: null,
+		})
+		.where(eq(githubRepositoryIndex.dbId, dbId));
+
 }
 
 export async function updateRepositoryStatusToFailed(
 	dbId: number,
-	errorInfo?: {
+	errorInfo: {
 		isRetryable: boolean;
 		errorCode: string;
 	},
@@ -111,29 +121,8 @@ export async function updateRepositoryStatusToFailed(
 		.update(githubRepositoryIndex)
 		.set({
 			status: "failed",
-			errorCode: errorInfo?.errorCode ?? null,
-			isRetryable: errorInfo?.isRetryable ?? null,
+			errorCode: errorInfo.errorCode,
+			isRetryable: errorInfo.isRetryable,
 		})
-		.where(eq(githubRepositoryIndex.dbId, dbId));
-}
-
-async function updateRepositoryStatus(
-	dbId: number,
-	status: Exclude<GitHubRepositoryIndexStatus, "idle">,
-	commitSha?: string,
-): Promise<void> {
-	const updates: Partial<typeof githubRepositoryIndex.$inferInsert> = {
-		status,
-		errorCode: null,
-		isRetryable: null,
-	};
-
-	if (commitSha != null) {
-		updates.lastIngestedCommitSha = commitSha;
-	}
-
-	await db
-		.update(githubRepositoryIndex)
-		.set(updates)
 		.where(eq(githubRepositoryIndex.dbId, dbId));
 }

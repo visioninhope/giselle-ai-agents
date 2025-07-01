@@ -22,14 +22,8 @@ import { AlertCircle, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
 import { getErrorMessage } from "./error-messages";
 
-// Extend the type to include the mock error code and retryable fields
-type ExtendedRepositoryIndex = typeof githubRepositoryIndex.$inferSelect & {
-	errorCode?: string | null;
-	isRetryable?: boolean | null;
-};
-
 type RepositoryItemProps = {
-	repositoryIndex: ExtendedRepositoryIndex;
+	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
 	deleteRepositoryIndexAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<void>;
