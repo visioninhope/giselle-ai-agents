@@ -32,14 +32,33 @@ export interface GlassButtonProps
 
 const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
 	({ className, variant, size, asChild = false, children, ...props }, ref) => {
-		const Comp = asChild ? Slot : "button";
+		if (asChild) {
+			return (
+				<Slot
+					className={cn(glassButtonVariants({ variant, size, className }))}
+					ref={ref}
+					style={{
+						boxShadow:
+							"0 8px 20px rgba(107, 143, 240, 0.2), 0 3px 10px rgba(107, 143, 240, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+						background:
+							"linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(107,143,240,0.15) 50%, rgba(107,143,240,0.25) 100%)",
+					}}
+					{...props}
+				>
+					{children}
+				</Slot>
+			);
+		}
+
 		return (
-			<Comp
+			<button
 				className={cn(glassButtonVariants({ variant, size, className }))}
 				ref={ref}
 				style={{
 					boxShadow:
 						"0 8px 20px rgba(107, 143, 240, 0.2), 0 3px 10px rgba(107, 143, 240, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.25), inset 0 -1px 0 rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(255, 255, 255, 0.08)",
+					background:
+						"linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(107,143,240,0.15) 50%, rgba(107,143,240,0.25) 100%)",
 				}}
 				{...props}
 			>
@@ -65,11 +84,13 @@ const GlassButton = React.forwardRef<HTMLButtonElement, GlassButtonProps>(
 				<div className="absolute inset-0 rounded-lg border border-white/20" />
 
 				{/* Content */}
-				<span className="relative z-10">{children}</span>
+				<span className="relative z-10 flex items-center gap-1.5">
+					{children}
+				</span>
 
 				{/* Hover overlay */}
 				<div className="absolute inset-0 rounded-lg bg-gradient-to-t from-transparent to-white/10 opacity-0 transition-opacity duration-300 group-hover:opacity-100" />
-			</Comp>
+			</button>
 		);
 	},
 );
