@@ -30,8 +30,15 @@ export function createGitHubBlobDownloadLoader(
 ): DocumentLoader<GitHubBlobMetadata> {
 	const { maxBlobSize = 1024 * 1024 } = options;
 	const { owner, repo, commitSha } = params;
-	const archivePath = join(tmpdir(), `${owner}-${repo}-${commitSha}.tar.gz`);
-	const extractDir = join(tmpdir(), `${owner}-${repo}-${commitSha}`);
+	const uniqueId = Math.random().toString(36).substring(2, 15);
+	const archivePath = join(
+		tmpdir(),
+		`${owner}-${repo}-${commitSha}-${uniqueId}.tar.gz`,
+	);
+	const extractDir = join(
+		tmpdir(),
+		`${owner}-${repo}-${commitSha}-${uniqueId}`,
+	);
 	let prepared: Promise<string> | null = null;
 
 	function prepare(): Promise<string> {
