@@ -1,10 +1,10 @@
 import { Card } from "@/components/ui/card";
-import { GlassButton } from "@/components/ui/glass-button";
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { desc, eq } from "drizzle-orm";
 import { AlertCircle, ExternalLink } from "lucide-react";
+import { Button } from "../../components/button";
 import { deleteRepositoryIndex, registerRepositoryIndex } from "./actions";
 import { RepositoryItem } from "./repository-item";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
@@ -126,11 +126,11 @@ function GitHubAuthRequiredCard() {
 						To use Vector Store, you need to authenticate your GitHub account.
 						Please authenticate in the account settings.
 					</p>
-					<GlassButton asChild>
+					<Button asChild variant="primary">
 						<a href="/settings/account/authentication">
 							Open Authentication Settings
 						</a>
-					</GlassButton>
+					</Button>
 				</div>
 			</Card>
 		</div>
@@ -207,9 +207,9 @@ function GitHubAppInstallRequiredCard() {
 						To use Vector Store, you need to install Giselle's GitHub App.
 						Please install in the integrations settings.
 					</p>
-					<GlassButton asChild>
+					<Button asChild variant="primary">
 						<a href="/settings/team/integrations">Open Integrations Settings</a>
-					</GlassButton>
+					</Button>
 				</div>
 			</Card>
 		</div>
