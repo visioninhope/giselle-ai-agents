@@ -34,6 +34,13 @@ export function V2Placeholder({
 		[],
 	);
 
+	const handleLeftPanelClose = useCallback(() => {
+		setLayoutState((prev) => ({
+			...prev,
+			leftPanel: null,
+		}));
+	}, []);
+
 	const { layoutV3 } = useFeatureFlag();
 
 	return (
@@ -48,9 +55,22 @@ export function V2Placeholder({
 
 			<RootProvider>
 				<V2Header />
-				<V2Container {...layoutState} />
-				{layoutV3 && (
-					<V2Footer onLeftPaelValueChange={handleLeftPanelValueChange} />
+				{layoutV3 ? (
+					<>
+						<V2Container
+							{...layoutState}
+							onLeftPanelClose={handleLeftPanelClose}
+						/>
+						<V2Footer
+							onLeftPaelValueChange={handleLeftPanelValueChange}
+							activePanel={layoutState.leftPanel}
+						/>
+					</>
+				) : (
+					<V2Container
+						{...layoutState}
+						onLeftPanelClose={handleLeftPanelClose}
+					/>
 				)}
 			</RootProvider>
 		</div>

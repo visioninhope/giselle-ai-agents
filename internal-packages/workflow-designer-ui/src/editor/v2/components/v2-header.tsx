@@ -25,7 +25,7 @@ export function V2Header({ teamName }: { teamName?: string }) {
 			className={clsx(
 				"relative h-[48px] flex items-center justify-between",
 				"pl-[8px] pr-[8px] gap-[8px]",
-				"border-b border-black-600",
+				"border-b border-white/10",
 				"shrink-0",
 			)}
 		>
