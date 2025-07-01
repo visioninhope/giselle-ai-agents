@@ -17,8 +17,10 @@ import type {
 	githubRepositoryIndex,
 } from "@/drizzle";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-import { Trash } from "lucide-react";
+import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
+import { AlertCircle, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
+import { getErrorMessage } from "./error-messages";
 
 type RepositoryItemProps = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
@@ -61,6 +63,24 @@ export function RepositoryItem({
 							</span>
 						)}
 					</div>
+					{repositoryIndex.status === "failed" && repositoryIndex.errorCode && (
+						<div className="flex items-start gap-2 mt-2">
+							<AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
+							<div className="flex-1">
+								<p className="text-red-400 text-[12px] leading-[16px] font-geist">
+									{getErrorMessage(
+										repositoryIndex.errorCode as DocumentLoaderErrorCode,
+									)}
+								</p>
+								{repositoryIndex.retryAfter && (
+									<p className="text-black-400 text-[11px] leading-[14px] font-geist mt-1">
+										This error will be retried automatically after{" "}
+										{formatRetryTime(repositoryIndex.retryAfter)}.
+									</p>
+								)}
+							</div>
+						</div>
+					)}
 				</div>
 				<div className="ml-auto flex gap-2 items-center">
 					<AlertDialog
@@ -151,4 +171,25 @@ function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
 			{label}
 		</span>
 	);
+}
+
+function formatRetryTime(retryAfter: Date): string {
+	const now = new Date();
+	const diffMs = retryAfter.getTime() - now.getTime();
+
+	if (diffMs <= 0) {
+		return "now";
+	}
+
+	const diffSeconds = Math.floor(diffMs / 1000);
+	const diffMinutes = Math.floor(diffSeconds / 60);
+	const diffHours = Math.floor(diffMinutes / 60);
+
+	if (diffHours > 0) {
+		return `${diffHours} hour${diffHours > 1 ? "s" : ""}`;
+	}
+	if (diffMinutes > 0) {
+		return `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}`;
+	}
+	return `${diffSeconds} second${diffSeconds > 1 ? "s" : ""}`;
 }

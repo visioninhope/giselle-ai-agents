@@ -245,5 +245,6 @@ async function getGitHubRepositoryIndexes() {
 		.from(githubRepositoryIndex)
 		.where(eq(githubRepositoryIndex.teamDbId, team.dbId))
 		.orderBy(desc(githubRepositoryIndex.dbId));
+
 	return records;
 }
