@@ -170,7 +170,10 @@ const textGenerationFactoryImpl = {
 
 		if (clonedContent.prompt && isJsonContent(clonedContent.prompt)) {
 			try {
-				const promptJsonContent = clonedContent.prompt;
+				const promptJsonContent: JSONContent =
+					typeof clonedContent.prompt === "string"
+						? JSON.parse(clonedContent.prompt)
+						: clonedContent.prompt;
 
 				function keepSourceRefs(
 					content: JSONContent[] | undefined,
