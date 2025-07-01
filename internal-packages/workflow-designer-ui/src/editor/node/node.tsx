@@ -18,7 +18,7 @@ import {
 	isTriggerNode,
 	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/giselle-engine";
+import { defaultName } from "@giselle-sdk/giselle-engine/react";
 import {
 	Handle,
 	type NodeProps,

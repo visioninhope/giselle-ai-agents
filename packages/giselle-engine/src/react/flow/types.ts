@@ -5,6 +5,7 @@ import type {
 	Node,
 	NodeBase,
 	NodeId,
+	NodeLike,
 	NodeUIState,
 	OutputId,
 	UploadedFileData,
@@ -27,9 +28,9 @@ export interface WorkflowDesignerContextValue {
 		},
 	) => Promise<Node | undefined> | Node | undefined;
 	addConnection: (args: {
-		outputNode: Node;
+		outputNode: NodeLike;
 		outputId: OutputId;
-		inputNode: Node;
+		inputNode: NodeLike;
 		inputId: InputId;
 	}) => void;
 	updateNodeData: <T extends NodeBase>(node: T, data: Partial<T>) => void;
@@ -55,7 +56,7 @@ export interface WorkflowDesignerContextValue {
 	llmProviders: LanguageModelProvider[];
 	isLoading: boolean;
 	isSupportedConnection: (
-		outputNode: Node,
-		inputNode: Node,
+		outputNode: NodeLike,
+		inputNode: NodeLike,
 	) => { canConnect: boolean; message?: string };
 }

@@ -23,7 +23,7 @@ import {
 	createVectorStoreNode,
 	createWebPageNode,
 	triggerNodeDefaultName,
-} from "@giselle-sdk/giselle-engine";
+} from "@giselle-sdk/giselle-engine/react";
 import {
 	Capability,
 	type LanguageModel,
