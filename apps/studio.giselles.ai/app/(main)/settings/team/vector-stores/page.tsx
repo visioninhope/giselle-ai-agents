@@ -474,9 +474,11 @@ function RepositoryListCard({
 
 function EmptyRepositoryCard() {
 	return (
-		<div className="text-black-400 text-center py-8">
-			No repositories are registered. Please register a repository using the
-			"Register Repository" button.
+		<div className="text-black-300 text-center py-16 bg-black-300/10 rounded-lg">
+			<div>No repositories are registered.</div>
+			<div>
+				Please register a repository using the "Register Repository" button.
+			</div>
 		</div>
 	);
 }
