@@ -1,26 +1,25 @@
 "use client";
 
 import type { Workspace, WorkspaceId } from "@giselle-sdk/data-type";
-import type {
-	TelemetrySettings,
-	UsageLimits,
-} from "@giselle-sdk/giselle-engine";
-import {
-	GenerationRunnerSystemProvider,
-	IntegrationProvider,
-	type IntegrationProviderProps,
-	TelemetryProvider,
-	UsageLimitsProvider,
-	type VectorStoreContextValue,
-	VectorStoreProvider,
-	WorkflowDesignerProvider,
-	useGiselleEngine,
-} from "@giselle-sdk/giselle-engine/react";
 import { type ReactNode, useEffect, useState } from "react";
+import type { TelemetrySettings, UsageLimits } from "../../core";
 import {
 	FeatureFlagContext,
 	type FeatureFlagContextValue,
-} from "./feature-flag";
+} from "../feature-flags";
+import { WorkflowDesignerProvider } from "../flow";
+import { GenerationRunnerSystemProvider } from "../generations";
+import {
+	IntegrationProvider,
+	type IntegrationProviderProps,
+} from "../integrations";
+import { TelemetryProvider } from "../telemetry";
+import { UsageLimitsProvider } from "../usage-limits";
+import { useGiselleEngine } from "../use-giselle-engine";
+import {
+	type VectorStoreContextValue,
+	VectorStoreProvider,
+} from "../vector-store";
 
 export function WorkspaceProvider({
 	children,

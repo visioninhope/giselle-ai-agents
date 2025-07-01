@@ -9,12 +9,12 @@ import {
 	isTextGenerationNode,
 	isTextNode,
 } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import {
 	isJsonContent,
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, DatabaseZapIcon, TrashIcon } from "lucide-react";
 import pluralize from "pluralize";
 import { Popover, ToggleGroup } from "radix-ui";

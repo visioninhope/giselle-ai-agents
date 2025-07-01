@@ -4,7 +4,7 @@ import {
 	useGenerationRunnerSystem,
 	useGiselleEngine,
 } from "@giselle-sdk/giselle-engine/react";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { useCallback, useRef } from "react";
 import {
 	type FormInput,

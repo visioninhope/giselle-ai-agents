@@ -4,8 +4,11 @@ import {
 	type WebPageNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useState } from "react";

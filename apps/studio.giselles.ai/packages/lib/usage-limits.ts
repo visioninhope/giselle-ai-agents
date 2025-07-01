@@ -1,7 +1,7 @@
 import { agentTimeRestrictions, db, teams } from "@/drizzle";
 import type { UsageLimits } from "@giselle-sdk/giselle-engine";
+import { Tier } from "@giselle-sdk/language-model";
 import { eq } from "drizzle-orm";
-import { Tier } from "giselle-sdk";
 import {
 	AGENT_TIME_CHARGE_LIMIT_MINUTES,
 	calculateAgentTimeUsageMs,

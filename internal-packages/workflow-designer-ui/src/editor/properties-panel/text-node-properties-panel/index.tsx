@@ -1,6 +1,9 @@
 import type { TextNode } from "@giselle-sdk/data-type";
+import {
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react";
-import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { PromptIcon } from "../../../icons";
 import {
 	PropertiesPanelContent,

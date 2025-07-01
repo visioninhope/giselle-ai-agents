@@ -5,9 +5,9 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CirclePlayIcon } from "lucide-react";
 import { Dialog, DropdownMenu } from "radix-ui";
 import {

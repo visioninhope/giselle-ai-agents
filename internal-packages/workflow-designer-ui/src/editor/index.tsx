@@ -12,8 +12,11 @@ import {
 	useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import {
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
 import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";

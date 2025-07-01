@@ -1,4 +1,5 @@
 import { OpenAIImageLanguageModelData } from "@giselle-sdk/data-type";
+import { useUsageLimits } from "@giselle-sdk/giselle-engine/react";
 import {
 	openaiImageBackground,
 	openaiImageModels,
@@ -6,7 +7,6 @@ import {
 	openaiImageQuality,
 	openaiImageSize,
 } from "@giselle-sdk/language-model";
-import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,

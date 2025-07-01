@@ -1,5 +1,8 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { CheckIcon, DatabaseIcon, TrashIcon } from "lucide-react";
 import { Switch } from "../../../../ui/switch";
 

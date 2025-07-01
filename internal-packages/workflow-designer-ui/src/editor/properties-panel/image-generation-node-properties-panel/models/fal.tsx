@@ -1,9 +1,9 @@
 import { FalLanguageModelData } from "@giselle-sdk/data-type";
+import { useUsageLimits } from "@giselle-sdk/giselle-engine/react";
 import {
 	falLanguageModels,
 	imageGenerationSizes,
 } from "@giselle-sdk/language-model";
-import { useUsageLimits } from "giselle-sdk/react";
 import {
 	Select,
 	SelectContent,

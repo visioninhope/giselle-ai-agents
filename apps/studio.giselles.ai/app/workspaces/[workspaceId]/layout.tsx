@@ -13,7 +13,7 @@ import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "giselle-sdk/react";
+import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 

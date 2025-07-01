@@ -23,7 +23,6 @@
 		"@xyflow/react": "catalog:",
 		"ai": "catalog:",
 		"clsx": "catalog:",
-		"giselle-sdk": "workspace:^",
 		"lucide-react": "catalog:",
 		"marked": "catalog:",
 		"motion": "catalog:",

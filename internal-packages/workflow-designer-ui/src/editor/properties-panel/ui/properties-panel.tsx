@@ -2,7 +2,7 @@
 
 import type { Node } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle-engine/react";
-import { useFeatureFlag } from "giselle-sdk/react";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import type { ReactNode } from "react";
 import { EditableText } from "../../../ui/editable-text";
 import {

@@ -4,10 +4,10 @@ import {
 	Node,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AtSignIcon } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
 import { useMemo } from "react";

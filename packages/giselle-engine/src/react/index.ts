@@ -6,4 +6,6 @@ export * from "./integrations";
 export * from "./vector-store";
 export * from "./telemetry";
 export * from "./flow";
+export * from "./workspace";
+export * from "./feature-flags";
 export * from "../utils";
