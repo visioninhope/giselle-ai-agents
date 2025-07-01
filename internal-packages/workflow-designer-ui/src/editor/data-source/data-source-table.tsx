@@ -134,9 +134,12 @@ export function DataSourceTable() {
           title="No data source connected."
           description="Add your first one below to start building."
         >
-          <DialogTrigger asChild>
-            <Button leftIcon={<PlusIcon />}>Add Data Source</Button>
-          </DialogTrigger>
+          <Button
+            leftIcon={<PlusIcon />}
+            onClick={() => setPresentDialog(true)}
+          >
+            Add Data Source
+          </Button>
         </EmptyState>
       ) : (
         <Table>
