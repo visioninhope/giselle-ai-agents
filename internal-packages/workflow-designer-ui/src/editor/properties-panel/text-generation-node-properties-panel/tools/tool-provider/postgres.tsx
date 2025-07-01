@@ -38,7 +38,7 @@ export function PostgresToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
 	const [presentDialog, setPresentDialog] = useState(false);
-	const connected = useMemo(() => !node.content.tools?.github, [node]);
+	const connected = useMemo(() => !node.content.tools?.postgres, [node]);
 
 	if (connected) {
 		return (
@@ -332,7 +332,7 @@ function PostgresToolConfigurationDialogInternal({
 								...node.content,
 								tools: {
 									...node.content.tools,
-									github: undefined,
+									postgres: undefined,
 								},
 							});
 						}}
