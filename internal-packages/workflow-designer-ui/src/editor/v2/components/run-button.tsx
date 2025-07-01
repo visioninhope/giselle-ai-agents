@@ -93,6 +93,7 @@ export function RunButton() {
 				}
 			}}
 			items={startingNodes}
+			renderItemAsChild
 			renderItem={(startingNode) =>
 				isTriggerNode(startingNode) ? (
 					<Dialog
