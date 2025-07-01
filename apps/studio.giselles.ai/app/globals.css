@@ -16,6 +16,7 @@
 	--color-black-400: hsl(222, 21%, 40%);
 	--color-black-350: hsl(207, 11%, 47%);
 	--color-black-300: hsl(222, 21%, 50%);
+	--color-black-200: hsl(209, 17%, 75%);
 	--color-black-250: hsl(222, 57%, 73%);
 	--color-black-100: hsl(234, 91%, 5%);
 	--color-black-80: hsl(218, 58%, 21%);
@@ -287,5 +288,77 @@
 		pre code::after {
 			content: none;
 		}
+	}
+}
+
+@layer components {
+	/* Auth Container Styles */
+	.auth-glass-container {
+		/* Moved to Tailwind utilities inside AuthContainer component */
+	}
+
+	.auth-gradient-border {
+		@apply absolute inset-0 rounded-2xl pointer-events-none;
+		background: linear-gradient(
+			135deg,
+			rgba(255, 255, 255, 0.4),
+			rgba(255, 255, 255, 0.1)
+		);
+		mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+		mask-composite: xor;
+		-webkit-mask: linear-gradient(#fff 0 0) content-box,
+			linear-gradient(#fff 0 0);
+		-webkit-mask-composite: xor;
+		padding: 1px;
+	}
+
+	.auth-corner-dot {
+		@apply absolute w-1 h-1 rounded-full;
+		background-color: hsl(192, 73%, 84%);
+		box-shadow: 0 0 16px hsla(192, 73%, 84%, 0.6);
+	}
+
+	.auth-corner-dot--top-left {
+		@apply top-4 left-4;
+	}
+
+	.auth-corner-dot--top-right {
+		@apply top-4 right-4;
+	}
+
+	.auth-corner-dot--bottom-left {
+		@apply bottom-4 left-4;
+	}
+
+	.auth-corner-dot--bottom-right {
+		@apply bottom-4 right-4;
+	}
+
+	.auth-container-header {
+		@apply text-center mb-[50px];
+	}
+
+	.auth-container-title {
+		@apply text-[20px] font-[500] text-gray-200 font-sans mb-4;
+	}
+
+	.auth-container-description {
+		@apply text-[14px] font-sans text-black-200;
+	}
+
+	.auth-form-section {
+		@apply mb-6;
+	}
+
+	.auth-legal-section {
+		@apply text-center mb-8;
+	}
+
+	.auth-action-section {
+		@apply text-center mb-7.5;
+	}
+
+	.auth-divider-section {
+		@apply py-2;
 	}
 }
