@@ -49,7 +49,7 @@ export function RepositoryItem({
 	return (
 		<div
 			className={cn(
-				"relative rounded-[12px] overflow-hidden px-[24px] pt-[16px] pb-[24px] w-full gap-[16px] grid bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none",
+				"group relative rounded-[12px] overflow-hidden px-[24px] pt-[16px] pb-[24px] w-full gap-[16px] grid bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200",
 			)}
 		>
 			<div className="flex items-center justify-between gap-4">
@@ -74,18 +74,11 @@ export function RepositoryItem({
 					<AlertDialogTrigger asChild>
 						<button
 							type="button"
-							className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
-							style={{
-								background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
-								border: "1px solid rgba(0,0,0,0.7)",
-								boxShadow:
-									"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
-							}}
+							className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
 							disabled={isPending}
 							onClick={() => setShowDeleteDialog(true)}
 						>
-							<Trash className="h-4 w-4 mr-1 inline" />
-							{isPending ? "Deleting..." : "Delete"}
+							<Trash className="h-4 w-4" />
 						</button>
 					</AlertDialogTrigger>
 					<AlertDialogContent>
