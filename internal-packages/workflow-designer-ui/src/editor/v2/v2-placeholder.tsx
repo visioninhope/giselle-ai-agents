@@ -10,9 +10,11 @@ import type { LeftPanelValue, V2LayoutState } from "./state";
 export function V2Placeholder({
 	isReadOnly = false,
 	userRole = "viewer",
+	onNameChange,
 }: {
 	isReadOnly?: boolean;
 	userRole?: "viewer" | "guest" | "editor" | "owner";
+	onNameChange?: (name: string) => Promise<void>;
 }) {
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 	const [layoutState, setLayoutState] = useState<V2LayoutState>({
@@ -54,7 +56,7 @@ export function V2Placeholder({
 			)}
 
 			<RootProvider>
-				<V2Header />
+				<V2Header onNameChange={onNameChange} />
 				{layoutV3 ? (
 					<>
 						<V2Container

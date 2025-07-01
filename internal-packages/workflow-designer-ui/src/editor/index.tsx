@@ -378,9 +378,11 @@ function NodeCanvas() {
 export function Editor({
 	isReadOnly = false,
 	userRole = "viewer",
+	onFlowNameChange,
 }: {
 	isReadOnly?: boolean;
 	userRole?: "viewer" | "guest" | "editor" | "owner";
+	onFlowNameChange?: (name: string) => Promise<void>;
 }) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
@@ -448,7 +450,13 @@ export function Editor({
 	const { sidemenu, layoutV2 } = useFeatureFlag();
 
 	if (layoutV2) {
-		return <V2Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
+		return (
+			<V2Placeholder
+				isReadOnly={isReadOnly}
+				userRole={userRole}
+				onNameChange={onFlowNameChange}
+			/>
+		);
 	}
 
 	if (sidemenu) {
