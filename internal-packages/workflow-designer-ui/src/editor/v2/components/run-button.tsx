@@ -88,7 +88,7 @@ export function RunButton() {
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
 			onSelect={async (_event, startingNode) => {
-				if (isTriggerNode(startingNode) && isOperationNode(startingNode)) {
+				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
 					await startOperationFlow(startingNode);
 				}
 			}}
