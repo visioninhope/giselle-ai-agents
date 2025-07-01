@@ -61,11 +61,19 @@ async function processRepository(
 
 		// Determine if error is retryable
 		let shouldRetry = true; // Default: retry all errors
-		let errorCode: string | undefined;
+		let errorCode = "UNKNOWN";
+		let retryAfter: Date | null = null;
 
 		if (error instanceof RagError) {
 			shouldRetry = error.isRetryable();
 			errorCode = error.code;
+
+			if (error instanceof DocumentLoaderError) {
+				const retryAfterDate = error.getRetryAfterDate();
+				if (retryAfterDate) {
+					retryAfter = retryAfterDate;
+				}
+			}
 		}
 
 		captureException(error, {
@@ -75,6 +83,7 @@ async function processRepository(
 				teamDbId,
 				shouldRetry,
 				errorCode,
+				retryAfter,
 				errorContext:
 					error instanceof DocumentLoaderError ? error.context : undefined,
 			},
@@ -82,7 +91,8 @@ async function processRepository(
 
 		await updateRepositoryStatusToFailed(dbId, {
 			isRetryable: shouldRetry,
-			errorCode: errorCode || "UNKNOWN",
+			errorCode: errorCode,
+			retryAfter,
 		});
 	}
 }

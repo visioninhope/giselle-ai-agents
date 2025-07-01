@@ -1,7 +1,4 @@
-import {
-	db,
-	githubRepositoryIndex
-} from "@/drizzle";
+import { db, githubRepositoryIndex } from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
 import { and, eq, lt, or } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
@@ -90,7 +87,6 @@ export async function updateRepositoryStatusToRunning(dbId: number) {
 			status: "running",
 		})
 		.where(eq(githubRepositoryIndex.dbId, dbId));
-
 }
 
 export async function updateRepositoryStatusToCompleted(
@@ -105,9 +101,9 @@ export async function updateRepositoryStatusToCompleted(
 			// clear error info
 			errorCode: null,
 			isRetryable: null,
+			retryAfter: null,
 		})
 		.where(eq(githubRepositoryIndex.dbId, dbId));
-
 }
 
 export async function updateRepositoryStatusToFailed(
@@ -115,6 +111,7 @@ export async function updateRepositoryStatusToFailed(
 	errorInfo: {
 		isRetryable: boolean;
 		errorCode: string;
+		retryAfter?: Date | null;
 	},
 ) {
 	await db
@@ -123,6 +120,7 @@ export async function updateRepositoryStatusToFailed(
 			status: "failed",
 			errorCode: errorInfo.errorCode,
 			isRetryable: errorInfo.isRetryable,
+			retryAfter: errorInfo.retryAfter,
 		})
 		.where(eq(githubRepositoryIndex.dbId, dbId));
 }
