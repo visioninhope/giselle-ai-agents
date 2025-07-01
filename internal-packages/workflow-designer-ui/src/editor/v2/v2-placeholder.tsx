@@ -1,7 +1,7 @@
 "use client";
 
-import { useFeatureFlag } from "giselle-sdk/react";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
 import { WorkspaceTour, tourSteps } from "../workspace-tour";

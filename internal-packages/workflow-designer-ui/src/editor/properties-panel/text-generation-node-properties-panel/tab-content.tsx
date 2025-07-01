@@ -7,8 +7,8 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import type { Node, Workspace } from "@giselle-sdk/data-type";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag } from "giselle-sdk/react";
 import { Tabs } from "radix-ui";
 import { InputPanel } from "./input-panel";
 import {

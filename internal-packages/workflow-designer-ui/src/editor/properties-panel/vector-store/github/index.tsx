@@ -1,5 +1,8 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
-import { useVectorStore, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useVectorStore,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import Link from "next/link";
 import { TriangleAlert } from "../../../../icons";
 import {

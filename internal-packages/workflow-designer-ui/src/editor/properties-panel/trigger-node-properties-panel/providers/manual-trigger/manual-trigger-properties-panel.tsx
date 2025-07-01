@@ -5,8 +5,11 @@ import {
 	OutputId,
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon, TrashIcon } from "lucide-react";
 import {
 	type FormEventHandler,

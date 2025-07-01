@@ -1,5 +1,5 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "giselle-sdk/react";
+import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
 import type { ReactNode } from "react";
 
 export default async function Layout({

@@ -12,7 +12,7 @@ import {
 	useUpdateNodeInternals,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import {
 	type RefObject,
 	useCallback,
