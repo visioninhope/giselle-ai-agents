@@ -19,7 +19,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { describe, expect, test } from "vitest";
 
-import { isSupportedConnection } from "./is-supported-connection";
+import { isSupportedConnection } from "./utils";
 
 describe("isSupportedConnection", () => {
 	const createTextGenerationNode = (

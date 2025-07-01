@@ -4,7 +4,7 @@ import {
 	type WorkspaceId,
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
-import { triggerNodeDefaultName } from "@giselle-sdk/node-utils";
+import { triggerNodeDefaultName } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
 import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlayIcon } from "lucide-react";

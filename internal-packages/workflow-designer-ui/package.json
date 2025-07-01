@@ -16,7 +16,6 @@
 		"@giselle-sdk/flow": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:*",
 		"@giselle-sdk/language-model": "workspace:^",
-		"@giselle-sdk/node-utils": "workspace:^",
 		"@giselle-sdk/text-editor": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@giselle-sdk/workflow-utils": "workspace:^",

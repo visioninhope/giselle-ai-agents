@@ -42,14 +42,16 @@ import {
 	hasCapability,
 	languageModels,
 } from "@giselle-sdk/language-model";
-import { isJsonContent } from "@giselle-sdk/text-editor-utils";
-import type { JSONContent } from "@tiptap/react";
+import {
+	type JSONContent,
+	isJsonContent,
+} from "@giselle-sdk/text-editor-utils";
 import {
 	actionNodeDefaultName,
 	defaultName,
 	triggerNodeDefaultName,
 	vectorStoreNodeDefaultName,
-} from "./default-name";
+} from "./node-default-name";
 
 type ClonedFileDataPayload = FileData & {
 	originalFileIdForCopy: FileId;

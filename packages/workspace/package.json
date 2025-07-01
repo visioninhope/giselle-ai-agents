@@ -34,7 +34,6 @@
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
 		"@giselle-sdk/giselle-engine": "workspace:^",
-		"@giselle-sdk/workflow-designer": "workspace:^",
 		"react": "catalog:"
 	}
 }

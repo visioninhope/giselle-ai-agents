@@ -12,12 +12,6 @@ import {
 	triggerProviders,
 } from "@giselle-sdk/flow";
 import {
-	Capability,
-	type LanguageModel,
-	hasCapability,
-	languageModels,
-} from "@giselle-sdk/language-model";
-import {
 	actionNodeDefaultName,
 	createActionNode,
 	createFileNode,
@@ -29,7 +23,13 @@ import {
 	createVectorStoreNode,
 	createWebPageNode,
 	triggerNodeDefaultName,
-} from "@giselle-sdk/node-utils";
+} from "@giselle-sdk/giselle-engine/react";
+import {
+	Capability,
+	type LanguageModel,
+	hasCapability,
+	languageModels,
+} from "@giselle-sdk/language-model";
 import clsx from "clsx/lite";
 import {
 	useFeatureFlag,
