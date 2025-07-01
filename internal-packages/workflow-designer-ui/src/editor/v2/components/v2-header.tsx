@@ -10,14 +10,21 @@ import { GiselleIcon } from "../../../icons";
 import { EditableText, type EditableTextRef } from "../../properties-panel/ui";
 import { RunButton } from "./run-button";
 
-export function V2Header({ teamName }: { teamName?: string }) {
+export function V2Header({
+	teamName,
+	onNameChange,
+}: {
+	teamName?: string;
+	onNameChange?: (name: string) => Promise<void>;
+}) {
 	const { data, updateName } = useWorkflowDesigner();
 	const editableTextRef = useRef<EditableTextRef>(null);
 	const { layoutV3 } = useFeatureFlag();
 
-	const handleUpdateName = (value?: string) => {
+	const handleUpdateName = async (value?: string) => {
 		if (!value) return;
 		updateName(value);
+		await onNameChange?.(value);
 	};
 
 	return (
