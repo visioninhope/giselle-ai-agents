@@ -105,6 +105,9 @@ catalogs:
     '@types/react-dom':
       specifier: 19.1.2
       version: 19.1.2
+    '@types/tar':
+      specifier: 6.1.13
+      version: 6.1.13
     '@types/turndown':
       specifier: 5.0.5
       version: 5.0.5
@@ -207,6 +210,9 @@ catalogs:
     tailwindcss-animate:
       specifier: 1.0.7
       version: 1.0.7
+    tar:
+      specifier: 7.4.3
+      version: 7.4.3
     tsup:
       specifier: 8.3.5
       version: 8.3.5
@@ -1064,6 +1070,9 @@ importers:
       graphql:
         specifier: 'catalog:'
         version: 16.10.0
+      tar:
+        specifier: 'catalog:'
+        version: 7.4.3
       urql:
         specifier: 'catalog:'
         version: 4.2.2(@urql/core@5.1.1(graphql@16.10.0))(react@19.1.0)
@@ -1086,6 +1095,9 @@ importers:
       '@types/node':
         specifier: 'catalog:'
         version: 22.14.0
+      '@types/tar':
+        specifier: 'catalog:'
+        version: 6.1.13
       tsup:
         specifier: 'catalog:'
         version: 8.3.5(jiti@2.4.2)(postcss@8.5.5)(typescript@5.7.3)(yaml@2.7.0)
@@ -4965,6 +4977,9 @@ packages:
 
   '@types/shimmer@1.2.0':
     resolution: {integrity: sha512-UE7oxhQLLd9gub6JKIAhDq06T0F6FnztwMNRvYgjeQSBeMc1ZG/tA47EwfduvkuQS8apbkM/lpLpWsaCeYsXVg==}
+
+  '@types/tar@6.1.13':
+    resolution: {integrity: sha512-IznnlmU5f4WcGTh2ltRu/Ijpmk8wiWXfF0VA4s+HPjHZgvFggk1YaIkbo5krX/zUCzWF8N/l4+W/LNxnvAJ8nw==}
 
   '@types/tedious@4.0.14':
     resolution: {integrity: sha512-KHPsfX/FoVbUGbyYvk1q9MMQHLPeRZhRJZdO45Q4YjvFkv4hMNghCWTvy7rdKessBsmtz4euWCWAB6/tVpI1Iw==}
@@ -13555,6 +13570,11 @@ snapshots:
       csstype: 3.1.3
 
   '@types/shimmer@1.2.0': {}
+
+  '@types/tar@6.1.13':
+    dependencies:
+      '@types/node': 22.15.3
+      minipass: 4.2.8
 
   '@types/tedious@4.0.14':
     dependencies:

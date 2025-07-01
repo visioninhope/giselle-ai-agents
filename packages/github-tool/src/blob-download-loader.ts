@@ -1,13 +1,10 @@
-import { execFile } from "node:child_process";
+import type { Document, DocumentLoader } from "@giselle-sdk/rag";
+import type { Octokit } from "@octokit/core";
 import { createHash } from "node:crypto";
 import { promises as fs } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { promisify } from "node:util";
-import type { Document, DocumentLoader } from "@giselle-sdk/rag";
-import type { Octokit } from "@octokit/core";
-
-const execFileAsync = promisify(execFile);
+import { extract } from "tar";
 
 export type GitHubBlobMetadata = {
 	owner: string;
@@ -52,12 +49,8 @@ export function createGitHubBlobDownloadLoader(
 				);
 				const buffer = Buffer.from(data as ArrayBuffer);
 				await fs.writeFile(archivePath, buffer);
-				await execFileAsync("tar", ["-xzf", archivePath, "-C", extractDir]);
-				const dirs = await fs.readdir(extractDir);
-				if (dirs.length === 0) {
-					throw new Error("No directory extracted from tarball");
-				}
-				return join(extractDir, dirs[0]);
+				await extract({ file: archivePath, cwd: extractDir, strip: 1 });
+				return extractDir;
 			})();
 		}
 		return prepared;
