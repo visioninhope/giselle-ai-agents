@@ -1,16 +1,5 @@
 "use client";
 
-import {
-	AlertDialog,
-	AlertDialogAction,
-	AlertDialogCancel,
-	AlertDialogContent,
-	AlertDialogDescription,
-	AlertDialogFooter,
-	AlertDialogHeader,
-	AlertDialogTitle,
-	AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
 import type {
 	GitHubRepositoryIndexStatus,
 	githubRepositoryIndex,
@@ -18,8 +7,14 @@ import type {
 import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { SiGithub } from "@icons-pack/react-simple-icons";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
 import { useState, useTransition } from "react";
+import {
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "../components/glass-dialog-content";
 
 type RepositoryItemProps = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;
@@ -70,8 +65,8 @@ export function RepositoryItem({
 						</div>
 					</div>
 				</div>
-				<AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-					<AlertDialogTrigger asChild>
+				<Dialog.Root open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+					<Dialog.Trigger asChild>
 						<button
 							type="button"
 							className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
@@ -80,35 +75,23 @@ export function RepositoryItem({
 						>
 							<Trash className="h-4 w-4" />
 						</button>
-					</AlertDialogTrigger>
-					<AlertDialogContent>
-						<AlertDialogHeader>
-							<AlertDialogTitle>Delete Repository</AlertDialogTitle>
-							<AlertDialogDescription>
-								This action cannot be undone. Are you sure you want to delete
-								this repository?
-							</AlertDialogDescription>
-						</AlertDialogHeader>
-						<AlertDialogFooter>
-							<AlertDialogCancel
-								type="button"
-								onClick={() => setShowDeleteDialog(false)}
-								disabled={isPending}
-								className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
-							>
-								Cancel
-							</AlertDialogCancel>
-							<AlertDialogAction
-								type="submit"
-								onClick={handleDelete}
-								disabled={isPending}
-								className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
-							>
-								{isPending ? "Deleting..." : "Delete"}
-							</AlertDialogAction>
-						</AlertDialogFooter>
-					</AlertDialogContent>
-				</AlertDialog>
+					</Dialog.Trigger>
+					<GlassDialogContent variant="destructive">
+						<GlassDialogHeader
+							title="Delete Repository"
+							description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}".`}
+							onClose={() => setShowDeleteDialog(false)}
+							variant="destructive"
+						/>
+						<GlassDialogFooter
+							onCancel={() => setShowDeleteDialog(false)}
+							onConfirm={handleDelete}
+							confirmLabel="Delete"
+							isPending={isPending}
+							variant="destructive"
+						/>
+					</GlassDialogContent>
+				</Dialog.Root>
 			</div>
 		</div>
 	);
