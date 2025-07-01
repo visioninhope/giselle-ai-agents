@@ -36,15 +36,6 @@ export abstract class RagError extends Error {
 			stack: this.stack,
 		};
 	}
-
-	/**
-	 * Determine if this error is retryable
-	 * Override in subclasses to define specific retry behavior
-	 * Default: all errors are retryable
-	 */
-	isRetryable(): boolean {
-		return true;
-	}
 }
 
 /**
@@ -312,14 +303,15 @@ export class DocumentLoaderError extends RagError {
 		context?: Record<string, unknown>,
 	) {
 		let retryAfterDate: Date | undefined;
+		const occurredAt = new Date();
 
 		if (retryAfter !== undefined) {
 			if (typeof retryAfter === "number") {
-				retryAfterDate = new Date(Date.now() + retryAfter * 1000);
+				retryAfterDate = new Date(occurredAt.getTime() + retryAfter * 1000);
 			} else if (typeof retryAfter === "string") {
 				const seconds = Number.parseInt(retryAfter, 10);
 				if (!Number.isNaN(seconds)) {
-					retryAfterDate = new Date(Date.now() + seconds * 1000);
+					retryAfterDate = new Date(occurredAt.getTime() + seconds * 1000);
 				}
 			}
 		}
@@ -333,7 +325,7 @@ export class DocumentLoaderError extends RagError {
 				source,
 				retryAfter, // Keep original value
 				retryAfterDate,
-				occurredAt: new Date(),
+				occurredAt,
 			},
 		);
 	}
@@ -354,26 +346,16 @@ export class DocumentLoaderError extends RagError {
 	}
 
 	/**
-	 * Override isRetryable for DocumentLoaderError
-	 * Some document errors should not be retried
-	 */
-	isRetryable(): boolean {
-		const nonRetryableErrorCodes: DocumentLoaderErrorCode[] = [
-			"DOCUMENT_NOT_FOUND",
-			"DOCUMENT_TOO_LARGE",
-		];
-
-		return !nonRetryableErrorCodes.includes(this.code);
-	}
-
-	/**
 	 * Get the retry-after time as a Date object
 	 * @returns Date when the request can be retried, or undefined if not available
 	 */
 	getRetryAfterDate(): Date | undefined {
 		// For DOCUMENT_RATE_LIMITED errors, return pre-calculated date
-		if (this.code === "DOCUMENT_RATE_LIMITED") {
-			return this.context?.retryAfterDate as Date | undefined;
+		if (this.code === "DOCUMENT_RATE_LIMITED" && this.context?.retryAfterDate) {
+			const retryAfterDate = this.context.retryAfterDate;
+			if (retryAfterDate instanceof Date) {
+				return retryAfterDate;
+			}
 		}
 		return undefined;
 	}

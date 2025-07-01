@@ -255,18 +255,6 @@ describe("Enhanced Error System", () => {
 			expect(fetchError.getRetryAfterDate()).toBeUndefined();
 			expect(tooLargeError.getRetryAfterDate()).toBeUndefined();
 		});
-
-		it("should correctly identify retryable errors", () => {
-			const rateLimited = DocumentLoaderError.rateLimited("github", 60);
-			const fetchError = DocumentLoaderError.fetchError("github", "fetching");
-			const notFound = DocumentLoaderError.notFound("/path/to/file");
-			const tooLarge = DocumentLoaderError.tooLarge("/path", 1000, 500);
-
-			expect(rateLimited.isRetryable()).toBe(true);
-			expect(fetchError.isRetryable()).toBe(true);
-			expect(notFound.isRetryable()).toBe(false);
-			expect(tooLarge.isRetryable()).toBe(false);
-		});
 	});
 
 	describe("Error Utilities", () => {
