@@ -98,7 +98,6 @@ export const layoutV2Flag = flag<boolean>({
 			return takeLocalEnv("LAYOUT_V2_FLAG");
 		}
 		const edgeConfig = await get(`flag__${this.key}`);
-		console.log(`edgeconfig.flag__${this.key}: ${edgeConfig}`);
 		if (edgeConfig === undefined) {
 			return true;
 		}
