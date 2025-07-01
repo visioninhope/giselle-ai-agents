@@ -1,3 +1,4 @@
+import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
 import { Card } from "../../components/card";
 import { getCurrentUserRole, getTeamMembers } from "../actions";
@@ -33,6 +34,7 @@ function TitleWithBorder({ title }: { title: string }) {
 
 export default async function TeamMembersPage() {
 	const team = await fetchCurrentTeam();
+	const currentUser = await fetchCurrentUser();
 	const { success: hasCurrentUserRole, data: currentUserRole } =
 		await getCurrentUserRole();
 	const { success: hasMembers, data: members } = await getTeamMembers();
@@ -88,6 +90,7 @@ export default async function TeamMembersPage() {
 					members={members}
 					invitations={invitations}
 					currentUserRole={currentUserRole}
+					currentUserId={currentUser.id}
 				/>
 			</Card>
 		</div>
