@@ -130,38 +130,24 @@ function getRelativeTimeString(date: Date): string {
 	return "just now";
 }
 
-function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
-	let dotColor = "bg-gray-500";
-	let label = "unknown";
+const STATUS_CONFIG = {
+	idle: { dotColor: "bg-[#B8E8F4]", label: "idle" },
+	running: { dotColor: "bg-[#39FF7F] animate-custom-pulse", label: "running" },
+	completed: { dotColor: "bg-[#39FF7F]", label: "ready" },
+	failed: { dotColor: "bg-[#FF3D71]", label: "error" },
+} as const;
 
-	switch (status) {
-		case "idle":
-			dotColor = "bg-[#B8E8F4]";
-			label = "idle";
-			break;
-		case "running":
-			dotColor = "bg-[#39FF7F] animate-custom-pulse";
-			label = "running";
-			break;
-		case "completed":
-			dotColor = "bg-[#39FF7F]";
-			label = "ready";
-			break;
-		case "failed":
-			dotColor = "bg-[#FF3D71]";
-			label = "error";
-			break;
-		default: {
-			const _exhaustiveCheck: never = status;
-			throw new Error(`Unknown status: ${_exhaustiveCheck}`);
-		}
-	}
+function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
+	const config = STATUS_CONFIG[status] ?? {
+		dotColor: "bg-gray-500",
+		label: "unknown",
+	};
 
 	return (
-		<div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-white/20 w-[80px]">
-			<div className={`w-2 h-2 rounded-full ${dotColor}`} />
-			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist">
-				{label}
+		<div className="flex items-center px-2 py-1 rounded-full border border-white/20 w-[80px]">
+			<div className={`w-2 h-2 rounded-full ${config.dotColor} shrink-0`} />
+			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist flex-1 text-center">
+				{config.label}
 			</span>
 		</div>
 	);
