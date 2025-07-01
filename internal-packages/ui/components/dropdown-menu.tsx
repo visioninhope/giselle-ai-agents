@@ -46,6 +46,7 @@ export function DropdownMenu<T extends Identifiable>({
 					<PopoverContent>
 						{items.map((option) => (
 							<DropdownMenuPrimitive.Item
+								asChild
 								key={option.id}
 								onSelect={(event) => onSelect?.(event, option)}
 								className={clsx(
