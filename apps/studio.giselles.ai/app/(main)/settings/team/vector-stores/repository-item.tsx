@@ -7,11 +7,7 @@ import type {
 import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 
-type DocumentLoaderErrorCode =
-	| "DOCUMENT_NOT_FOUND"
-	| "DOCUMENT_FETCH_ERROR"
-	| "DOCUMENT_RATE_LIMITED"
-	| "DOCUMENT_TOO_LARGE";
+import type { DocumentLoaderErrorCode } from "./types";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertCircle, Trash } from "lucide-react";

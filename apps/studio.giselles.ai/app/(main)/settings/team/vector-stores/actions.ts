@@ -9,7 +9,7 @@ import { createId } from "@paralleldrive/cuid2";
 import { and, eq } from "drizzle-orm";
 import { revalidatePath } from "next/cache";
 
-type ActionResult = { success: true } | { success: false; error: string };
+import type { ActionResult } from "./types";
 
 export async function registerRepositoryIndex(
 	owner: string,

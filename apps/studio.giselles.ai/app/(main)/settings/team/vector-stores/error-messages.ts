@@ -1,8 +1,4 @@
-type DocumentLoaderErrorCode =
-	| "DOCUMENT_NOT_FOUND"
-	| "DOCUMENT_FETCH_ERROR"
-	| "DOCUMENT_RATE_LIMITED"
-	| "DOCUMENT_TOO_LARGE";
+import type { DocumentLoaderErrorCode } from "./types";
 
 /**
  * Get user-friendly error message from DocumentLoaderError

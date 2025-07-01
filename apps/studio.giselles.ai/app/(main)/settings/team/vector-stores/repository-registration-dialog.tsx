@@ -16,22 +16,7 @@ import {
 	GlassDialogFooter,
 	GlassDialogHeader,
 } from "../components/glass-dialog-content";
-
-type Installation = {
-	id: number;
-	name: string;
-};
-
-type Repository = {
-	id: number;
-	owner: string;
-	name: string;
-};
-
-export type InstallationWithRepos = {
-	installation: Installation;
-	repositories: Repository[];
-};
+import type { ActionResult, InstallationWithRepos } from "./types";
 
 type RepositoryRegistrationDialogProps = {
 	installationsWithRepos: InstallationWithRepos[];
@@ -39,7 +24,7 @@ type RepositoryRegistrationDialogProps = {
 		owner: string,
 		repo: string,
 		installationId: number,
-	) => Promise<{ success: true } | { success: false; error: string }>;
+	) => Promise<ActionResult>;
 };
 
 export function RepositoryRegistrationDialog({
