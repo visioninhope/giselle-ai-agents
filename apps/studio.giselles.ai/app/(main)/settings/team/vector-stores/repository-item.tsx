@@ -6,7 +6,12 @@ import type {
 } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
+
+type DocumentLoaderErrorCode =
+	| "DOCUMENT_NOT_FOUND"
+	| "DOCUMENT_FETCH_ERROR"
+	| "DOCUMENT_RATE_LIMITED"
+	| "DOCUMENT_TOO_LARGE";
 
 import * as Dialog from "@radix-ui/react-dialog";
 import { AlertCircle, Trash } from "lucide-react";
@@ -62,33 +67,29 @@ export function RepositoryItem({
 					<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 						Updated {getRelativeTimeString(repositoryIndex.updatedAt)}
 					</span>
-					{repositoryIndex.status === "failed" && repositoryIndex.errorCode && (
-						<div className="flex items-start gap-2 mt-2">
-							<AlertCircle className="h-4 w-4 text-red-500 mt-0.5" />
-							<div className="flex-1">
-								<p className="text-red-400 text-[12px] leading-[16px] font-geist">
+				</div>
+				<div className="flex items-center gap-3">
+					<div className="flex flex-col items-end gap-1">
+						<div className="flex items-center gap-3">
+							<StatusBadge status={repositoryIndex.status} />
+							{repositoryIndex.lastIngestedCommitSha && (
+								<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+									Last Ingested:{" "}
+									{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
+								</span>
+							)}
+						</div>
+						{repositoryIndex.status === "failed" &&
+							repositoryIndex.errorCode && (
+								<span className="text-red-400 font-medium text-[12px] leading-[20.4px] font-geist">
 									{getErrorMessage(
 										repositoryIndex.errorCode as DocumentLoaderErrorCode,
 									)}
-								</p>
-								{repositoryIndex.retryAfter && (
-									<p className="text-black-400 text-[11px] leading-[14px] font-geist mt-1">
-										This error will be retried automatically after{" "}
-										{formatRetryTime(repositoryIndex.retryAfter)}.
-									</p>
-								)}
-							</div>
-						</div>
-					)}
-				</div>
-				<div className="flex items-center gap-3">
-					<StatusBadge status={repositoryIndex.status} />
-					{repositoryIndex.lastIngestedCommitSha && (
-						<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-							Last Ingested:{" "}
-							{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
-						</span>
-					)}
+									{repositoryIndex.retryAfter &&
+										` Retrying in ${formatRetryTime(repositoryIndex.retryAfter)}.`}
+								</span>
+							)}
+					</div>
 					<Dialog.Root
 						open={showDeleteDialog}
 						onOpenChange={setShowDeleteDialog}

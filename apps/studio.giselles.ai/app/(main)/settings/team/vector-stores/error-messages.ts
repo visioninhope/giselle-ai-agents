@@ -1,4 +1,8 @@
-import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
+type DocumentLoaderErrorCode =
+	| "DOCUMENT_NOT_FOUND"
+	| "DOCUMENT_FETCH_ERROR"
+	| "DOCUMENT_RATE_LIMITED"
+	| "DOCUMENT_TOO_LARGE";
 
 /**
  * Get user-friendly error message from DocumentLoaderError
@@ -6,14 +10,14 @@ import type { DocumentLoaderErrorCode } from "@giselle-sdk/rag";
 export function getErrorMessage(code: DocumentLoaderErrorCode): string {
 	switch (code) {
 		case "DOCUMENT_NOT_FOUND":
-			return "We couldn't find this repository. It might be private, deleted, or your Vector Store may need to be reconfigured with proper permissions.";
+			return "Repository not found.";
 		case "DOCUMENT_RATE_LIMITED":
-			return "GitHub API rate limit reached. Will be processed in the next sync cycle.";
+			return "Rate limited.";
 		case "DOCUMENT_TOO_LARGE":
-			return "This repository is too large for our current processing capabilities.";
+			return "Repository too large.";
 		case "DOCUMENT_FETCH_ERROR":
-			return "Failed to fetch repository data. The system will retry automatically.";
+			return "Repository error.";
 		default:
-			return "An error occurred while processing the repository.";
+			return "Repository error.";
 	}
 }

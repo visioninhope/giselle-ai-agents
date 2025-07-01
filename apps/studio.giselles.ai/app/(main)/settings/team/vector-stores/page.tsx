@@ -3,98 +3,334 @@ import { GlassButton } from "@/components/ui/glass-button";
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
+import type { components } from "@octokit/openapi-types";
 import { desc, eq } from "drizzle-orm";
 import { AlertCircle, ExternalLink, Plus } from "lucide-react";
 import { Button } from "../../components/button";
 import { deleteRepositoryIndex, registerRepositoryIndex } from "./actions";
+import { DebugPanel } from "./debug-panel";
 import { RepositoryItem } from "./repository-item";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
 
-export default async function TeamVectorStorePage() {
+export default async function TeamVectorStorePage({
+	searchParams,
+}: {
+	searchParams: Promise<{ debug?: string }>;
+}) {
+	const resolvedSearchParams = await searchParams;
+	const debugState = resolvedSearchParams.debug;
+
+	// Mock data for debug states
+	if (debugState === "unauthorized") {
+		return (
+			<>
+				<DebugPanel currentState="unauthorized" />
+				<GitHubAuthRequiredCard />
+			</>
+		);
+	}
+
+	if (debugState === "error") {
+		return (
+			<>
+				<DebugPanel currentState="error" />
+				<GitHubAuthErrorCard errorMessage="Mock GitHub authentication error for debugging" />
+			</>
+		);
+	}
+
+	if (debugState === "no-installation") {
+		return (
+			<>
+				<DebugPanel currentState="no-installation" />
+				<GitHubAppInstallRequiredCard />
+			</>
+		);
+	}
+
+	if (debugState === "connected") {
+		const mockInstallationsWithRepos = [
+			{
+				installation: { id: 1, name: "test-org" },
+				repositories: [
+					{ id: 1, owner: "test-org", name: "repo1" },
+					{ id: 2, owner: "test-org", name: "repo2" },
+				],
+			},
+		];
+
+		const mockRepositoryIndexes: Awaited<
+			ReturnType<typeof getGitHubRepositoryIndexes>
+		> = []; // Empty - connected but no repos registered
+
+		return (
+			<>
+				<DebugPanel
+					currentState="connected"
+					repositoryCount={mockRepositoryIndexes.length}
+				/>
+				<div className="flex flex-col gap-[24px]">
+					<div className="flex justify-between items-center">
+						<h1
+							className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+							style={{
+								textShadow:
+									"0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+							}}
+						>
+							Vector Stores
+						</h1>
+						<div className="flex items-center gap-4">
+							<a
+								href="https://docs.giselles.ai/guides/settings/team/vector-store"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+							>
+								About Vector Stores
+								<ExternalLink size={14} />
+							</a>
+							<RepositoryRegistrationDialog
+								installationsWithRepos={mockInstallationsWithRepos}
+								registerRepositoryIndexAction={registerRepositoryIndex}
+							/>
+						</div>
+					</div>
+
+					<RepositoryListCard
+						registrationDialog={null}
+						repositoryIndexes={mockRepositoryIndexes}
+					/>
+				</div>
+			</>
+		);
+	}
+
+	if (debugState === "multiple-repos") {
+		const mockInstallationsWithRepos = [
+			{
+				installation: { id: 1, name: "test-org" },
+				repositories: [
+					{ id: 1, owner: "test-org", name: "repo1" },
+					{ id: 2, owner: "test-org", name: "repo2" },
+				],
+			},
+		];
+
+		const mockRepositoryIndexes: Awaited<
+			ReturnType<typeof getGitHubRepositoryIndexes>
+		> = [
+			{
+				id: "gthbi_1" as const,
+				dbId: 1,
+				owner: "test-org",
+				repo: "repo1",
+				teamDbId: 1,
+				installationId: 1,
+				lastIngestedCommitSha: "abc123f",
+				status: "completed" as const,
+				errorCode: null,
+				retryAfter: null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: "gthbi_2" as const,
+				dbId: 2,
+				owner: "test-org",
+				repo: "repo2",
+				teamDbId: 1,
+				installationId: 1,
+				lastIngestedCommitSha: null,
+				status: "idle" as const,
+				errorCode: null,
+				retryAfter: null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: "gthbi_3" as const,
+				dbId: 3,
+				owner: "test-org",
+				repo: "repo3",
+				teamDbId: 1,
+				installationId: 1,
+				lastIngestedCommitSha: null,
+				status: "running" as const,
+				errorCode: null,
+				retryAfter: null,
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+			{
+				id: "gthbi_4" as const,
+				dbId: 4,
+				owner: "test-org",
+				repo: "repo4",
+				teamDbId: 1,
+				installationId: 1,
+				lastIngestedCommitSha: null,
+				status: "failed" as const,
+				errorCode: "NETWORK_ERROR",
+				retryAfter: new Date(Date.now() + 5 * 60 * 1000),
+				createdAt: new Date(),
+				updatedAt: new Date(),
+			},
+		];
+
+		return (
+			<>
+				<DebugPanel
+					currentState="multiple-repos"
+					repositoryCount={mockRepositoryIndexes.length}
+				/>
+				<div className="flex flex-col gap-[24px]">
+					<div className="flex justify-between items-center">
+						<h1
+							className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+							style={{
+								textShadow:
+									"0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+							}}
+						>
+							Vector Stores
+						</h1>
+						<div className="flex items-center gap-4">
+							<a
+								href="https://docs.giselles.ai/guides/settings/team/vector-store"
+								target="_blank"
+								rel="noopener noreferrer"
+								className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+							>
+								About Vector Stores
+								<ExternalLink size={14} />
+							</a>
+							<RepositoryRegistrationDialog
+								installationsWithRepos={mockInstallationsWithRepos}
+								registerRepositoryIndexAction={registerRepositoryIndex}
+							/>
+						</div>
+					</div>
+
+					<RepositoryListCard
+						registrationDialog={null}
+						repositoryIndexes={mockRepositoryIndexes}
+					/>
+				</div>
+			</>
+		);
+	}
+
 	// Normal flow - fetch real data
 	const githubIdentityState = await getGitHubIdentityState();
 	if (
 		githubIdentityState.status === "unauthorized" ||
 		githubIdentityState.status === "invalid-credential"
 	) {
-		return <GitHubAuthRequiredCard />;
+		return (
+			<>
+				<DebugPanel currentState="unauthorized" />
+				<GitHubAuthRequiredCard />
+			</>
+		);
 	}
 
 	if (githubIdentityState.status === "error") {
 		return (
-			<GitHubAuthErrorCard errorMessage={githubIdentityState.errorMessage} />
+			<>
+				<DebugPanel currentState="error" />
+				<GitHubAuthErrorCard errorMessage={githubIdentityState.errorMessage} />
+			</>
 		);
 	}
 
 	const userClient = githubIdentityState.gitHubUserClient;
 	const installationData = await userClient.getInstallations();
 	if (installationData.total_count === 0) {
-		return <GitHubAppInstallRequiredCard />;
+		return (
+			<>
+				<DebugPanel currentState="no-installation" />
+				<GitHubAppInstallRequiredCard />
+			</>
+		);
 	}
 	const installations = installationData.installations;
 
 	const installationsWithRepos = await Promise.all(
-		installations.map(async (installation) => {
-			const repos = await userClient.getRepositories(installation.id);
-			const installationId = installation.id;
-			if (!installation.account) {
-				throw new Error("Installation account is null");
-			}
+		installations.map(
+			async (installation: components["schemas"]["installation"]) => {
+				const repos = await userClient.getRepositories(installation.id);
+				const installationId = installation.id;
+				if (!installation.account) {
+					throw new Error("Installation account is null");
+				}
 
-			const installationName =
-				"login" in installation.account
-					? installation.account.login
-					: installation.account.name;
+				const installationName =
+					"login" in installation.account
+						? installation.account.login
+						: installation.account.name;
 
-			return {
-				installation: {
-					id: installationId,
-					name: installationName,
-				},
-				repositories: repos.repositories.map((repo) => ({
-					id: repo.id,
-					owner: repo.owner.login,
-					name: repo.name,
-				})),
-			};
-		}),
+				return {
+					installation: {
+						id: installationId,
+						name: installationName,
+					},
+					repositories: repos.repositories.map(
+						(repo: components["schemas"]["repository"]) => ({
+							id: repo.id,
+							owner: repo.owner.login,
+							name: repo.name,
+						}),
+					),
+				};
+			},
+		),
 	);
 
 	const repositoryIndexes = await getGitHubRepositoryIndexes();
 
 	return (
-		<div className="flex flex-col gap-[24px]">
-			<div className="flex justify-between items-center">
-				<h1
-					className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
-					style={{
-						textShadow: "0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
-					}}
-				>
-					Vector Stores
-				</h1>
-				<div className="flex items-center gap-4">
-					<a
-						href="https://docs.giselles.ai/guides/settings/team/vector-store"
-						target="_blank"
-						rel="noopener noreferrer"
-						className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
-					>
-						About Vector Stores
-						<ExternalLink size={14} />
-					</a>
-					<RepositoryRegistrationDialog
-						installationsWithRepos={installationsWithRepos}
-						registerRepositoryIndexAction={registerRepositoryIndex}
-					/>
-				</div>
-			</div>
-
-			<RepositoryListCard
-				registrationDialog={null}
-				repositoryIndexes={repositoryIndexes}
+		<>
+			<DebugPanel
+				currentState={
+					repositoryIndexes.length > 2 ? "multiple-repos" : "connected"
+				}
+				repositoryCount={repositoryIndexes.length}
 			/>
-		</div>
+			<div className="flex flex-col gap-[24px]">
+				<div className="flex justify-between items-center">
+					<h1
+						className="text-[30px] font-sans font-medium text-[hsl(192,73%,84%)]"
+						style={{
+							textShadow:
+								"0 0 20px #0087f6, 0 0 40px #0087f6, 0 0 60px #0087f6",
+						}}
+					>
+						Vector Stores
+					</h1>
+					<div className="flex items-center gap-4">
+						<a
+							href="https://docs.giselles.ai/guides/settings/team/vector-store"
+							target="_blank"
+							rel="noopener noreferrer"
+							className="text-black-300 text-[14px] font-medium rounded-[4px] px-1.5 py-0.5 hover:bg-black-300/10 flex items-center gap-1.5 font-sans"
+						>
+							About Vector Stores
+							<ExternalLink size={14} />
+						</a>
+						<RepositoryRegistrationDialog
+							installationsWithRepos={installationsWithRepos}
+							registerRepositoryIndexAction={registerRepositoryIndex}
+						/>
+					</div>
+				</div>
+
+				<RepositoryListCard
+					registrationDialog={null}
+					repositoryIndexes={repositoryIndexes}
+				/>
+			</div>
+		</>
 	);
 }
 
