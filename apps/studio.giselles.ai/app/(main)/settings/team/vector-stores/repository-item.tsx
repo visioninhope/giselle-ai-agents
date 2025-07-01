@@ -11,12 +11,13 @@ import {
 	AlertDialogTitle,
 	AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Button } from "@/components/ui/button";
 import type {
 	GitHubRepositoryIndexStatus,
 	githubRepositoryIndex,
 } from "@/drizzle";
+import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
+import { SiGithub } from "@icons-pack/react-simple-icons";
 import { Trash } from "lucide-react";
 import { useState, useTransition } from "react";
 
@@ -46,67 +47,75 @@ export function RepositoryItem({
 	};
 
 	return (
-		<div className="border border-black-400 rounded-md p-4 bg-black-900/50">
-			<div className="flex justify-between items-center">
-				<div>
-					<h5 className="text-white-400 font-medium text-[16px] leading-[19.2px] font-sans">
-						{repositoryIndex.owner}/{repositoryIndex.repo}
-					</h5>
-					<div className="flex items-center gap-2 mt-1">
-						<StatusBadge status={repositoryIndex.status} />
-						{repositoryIndex.lastIngestedCommitSha && (
-							<span className="text-black-400 text-[12px] leading-[20.4px] font-geist">
-								Last Ingested:{" "}
-								{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
-							</span>
-						)}
+		<div
+			className={cn(
+				"relative rounded-[12px] overflow-hidden px-[24px] pt-[16px] pb-[24px] w-full gap-[16px] grid bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none",
+			)}
+		>
+			<div className="flex items-center justify-between gap-4">
+				<div className="flex items-center gap-4">
+					<SiGithub className="text-white-400 h-[20px] w-[20px]" />
+					<div className="flex flex-col">
+						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+							{repositoryIndex.owner}/{repositoryIndex.repo}
+						</div>
+						<div className="flex items-center gap-2 mt-1">
+							<StatusBadge status={repositoryIndex.status} />
+							{repositoryIndex.lastIngestedCommitSha && (
+								<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+									Last Ingested:{" "}
+									{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
+								</span>
+							)}
+						</div>
 					</div>
 				</div>
-				<div className="ml-auto flex gap-2 items-center">
-					<AlertDialog
-						open={showDeleteDialog}
-						onOpenChange={setShowDeleteDialog}
-					>
-						<AlertDialogTrigger asChild>
-							<Button
-								variant="destructive"
-								className="h-8 px-3 text-[12px] flex items-center gap-1 rounded-md transition-colors duration-150"
+				<AlertDialog open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
+					<AlertDialogTrigger asChild>
+						<button
+							type="button"
+							className="rounded-lg px-4 py-2 text-white/80 transition-all duration-200 active:scale-[0.98] disabled:opacity-50"
+							style={{
+								background: "linear-gradient(180deg, #202530 0%, #12151f 100%)",
+								border: "1px solid rgba(0,0,0,0.7)",
+								boxShadow:
+									"inset 0 1px 1px rgba(255,255,255,0.05), 0 2px 8px rgba(5,10,20,0.4), 0 1px 2px rgba(0,0,0,0.3)",
+							}}
+							disabled={isPending}
+							onClick={() => setShowDeleteDialog(true)}
+						>
+							<Trash className="h-4 w-4 mr-1 inline" />
+							{isPending ? "Deleting..." : "Delete"}
+						</button>
+					</AlertDialogTrigger>
+					<AlertDialogContent>
+						<AlertDialogHeader>
+							<AlertDialogTitle>Delete Repository</AlertDialogTitle>
+							<AlertDialogDescription>
+								This action cannot be undone. Are you sure you want to delete
+								this repository?
+							</AlertDialogDescription>
+						</AlertDialogHeader>
+						<AlertDialogFooter>
+							<AlertDialogCancel
+								type="button"
+								onClick={() => setShowDeleteDialog(false)}
 								disabled={isPending}
-								onClick={() => setShowDeleteDialog(true)}
+								className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
 							>
-								<Trash className="h-4 w-4 mr-1" />
+								Cancel
+							</AlertDialogCancel>
+							<AlertDialogAction
+								type="submit"
+								onClick={handleDelete}
+								disabled={isPending}
+								className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
+							>
 								{isPending ? "Deleting..." : "Delete"}
-							</Button>
-						</AlertDialogTrigger>
-						<AlertDialogContent>
-							<AlertDialogHeader>
-								<AlertDialogTitle>Delete Repository</AlertDialogTitle>
-								<AlertDialogDescription>
-									This action cannot be undone. Are you sure you want to delete
-									this repository?
-								</AlertDialogDescription>
-							</AlertDialogHeader>
-							<AlertDialogFooter>
-								<AlertDialogCancel
-									type="button"
-									onClick={() => setShowDeleteDialog(false)}
-									disabled={isPending}
-									className="py-2 px-4 border-[0.5px] border-black-400 rounded-[8px] font-sans"
-								>
-									Cancel
-								</AlertDialogCancel>
-								<AlertDialogAction
-									type="submit"
-									onClick={handleDelete}
-									disabled={isPending}
-									className="py-2 px-4 bg-error-900 rounded-[8px] text-white-400 font-sans"
-								>
-									{isPending ? "Deleting..." : "Delete"}
-								</AlertDialogAction>
-							</AlertDialogFooter>
-						</AlertDialogContent>
-					</AlertDialog>
-				</div>
+							</AlertDialogAction>
+						</AlertDialogFooter>
+					</AlertDialogContent>
+				</AlertDialog>
 			</div>
 		</div>
 	);
