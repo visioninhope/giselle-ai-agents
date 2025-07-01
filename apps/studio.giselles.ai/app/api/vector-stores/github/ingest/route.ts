@@ -105,9 +105,10 @@ function extractErrorInfo(error: unknown): {
 			case "DOCUMENT_FETCH_ERROR":
 				retryAfter = new Date();
 				break;
-			default:
+			default: {
 				const _exhaustiveCheck: never = error.code;
 				throw new Error(`Unknown error code: ${_exhaustiveCheck}`);
+			}
 		}
 
 		return { errorCode, retryAfter };
