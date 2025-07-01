@@ -241,20 +241,7 @@ function EmptyRepositoryCard() {
 async function getGitHubRepositoryIndexes() {
 	const team = await fetchCurrentTeam();
 	const records = await db
-		.select({
-			id: githubRepositoryIndex.id,
-			dbId: githubRepositoryIndex.dbId,
-			owner: githubRepositoryIndex.owner,
-			repo: githubRepositoryIndex.repo,
-			teamDbId: githubRepositoryIndex.teamDbId,
-			installationId: githubRepositoryIndex.installationId,
-			lastIngestedCommitSha: githubRepositoryIndex.lastIngestedCommitSha,
-			status: githubRepositoryIndex.status,
-			errorCode: githubRepositoryIndex.errorCode,
-			isRetryable: githubRepositoryIndex.isRetryable,
-			createdAt: githubRepositoryIndex.createdAt,
-			updatedAt: githubRepositoryIndex.updatedAt,
-		})
+		.select()
 		.from(githubRepositoryIndex)
 		.where(eq(githubRepositoryIndex.teamDbId, team.dbId))
 		.orderBy(desc(githubRepositoryIndex.dbId));

@@ -74,7 +74,10 @@ export function RepositoryItem({
 								</p>
 								{repositoryIndex.isRetryable && (
 									<p className="text-black-400 text-[11px] leading-[14px] font-geist mt-1">
-										This error will be retried automatically.
+										This error will be retried automatically
+										{repositoryIndex.retryAfter &&
+											` after ${formatRetryTime(repositoryIndex.retryAfter)}`}
+										.
 									</p>
 								)}
 							</div>
@@ -170,4 +173,27 @@ function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
 			{label}
 		</span>
 	);
+}
+
+function formatRetryTime(retryAfter: Date | string): string {
+	const date =
+		typeof retryAfter === "string" ? new Date(retryAfter) : retryAfter;
+	const now = new Date();
+	const diffMs = date.getTime() - now.getTime();
+
+	if (diffMs <= 0) {
+		return "now";
+	}
+
+	const diffSeconds = Math.floor(diffMs / 1000);
+	const diffMinutes = Math.floor(diffSeconds / 60);
+	const diffHours = Math.floor(diffMinutes / 60);
+
+	if (diffHours > 0) {
+		return `${diffHours} hour${diffHours > 1 ? "s" : ""}`;
+	}
+	if (diffMinutes > 0) {
+		return `${diffMinutes} minute${diffMinutes > 1 ? "s" : ""}`;
+	}
+	return `${diffSeconds} second${diffSeconds > 1 ? "s" : ""}`;
 }
