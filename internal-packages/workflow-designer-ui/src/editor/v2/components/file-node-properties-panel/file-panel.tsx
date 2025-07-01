@@ -1,6 +1,6 @@
 import type { FileData, FileNode } from "@giselle-sdk/data-type";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag } from "giselle-sdk/react";
 import { ArrowUpFromLineIcon, FileXIcon, TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { useCallback, useEffect, useRef, useState } from "react";

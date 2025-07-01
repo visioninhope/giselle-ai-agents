@@ -4,8 +4,8 @@ import {
 	isImageGenerationNode,
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, TrashIcon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import {

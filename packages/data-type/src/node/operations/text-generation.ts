@@ -83,7 +83,7 @@ export type GitHubTool = z.infer<typeof GitHubTool>;
 
 export const PostgresTool = z.object({
 	tools: z.string().array(),
-	connectionString: z.string(),
+	secretId: SecretId.schema,
 });
 export type PostgresTool = z.infer<typeof PostgresTool>;
 

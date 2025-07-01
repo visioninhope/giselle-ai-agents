@@ -9,10 +9,16 @@ interface Identifiable {
 	id: string | number;
 }
 
-interface DropdownMenuProps<T extends Identifiable> {
+interface DropdownMenuProps<
+	T extends Identifiable,
+	TRenderItemAsChild extends boolean,
+> {
 	items: Array<T>;
 	trigger: React.ReactNode;
-	renderItem: (item: T) => React.ReactNode;
+	renderItemAsChild?: TRenderItemAsChild;
+	renderItem: TRenderItemAsChild extends true
+		? (item: T) => React.ReactElement
+		: (item: T) => React.ReactNode;
 	onSelect?: (event: Event, option: T) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
@@ -21,17 +27,21 @@ interface DropdownMenuProps<T extends Identifiable> {
 	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps["onOpenChange"];
 }
 
-export function DropdownMenu<T extends Identifiable>({
+export function DropdownMenu<
+	T extends Identifiable,
+	TRenderItemAsChild extends boolean = false,
+>({
 	trigger,
 	items,
-	renderItem: renderOption,
+	renderItem,
+	renderItemAsChild,
 	onSelect,
 	widthClassName,
 	sideOffset,
 	align,
 	open,
 	onOpenChange,
-}: DropdownMenuProps<T>) {
+}: DropdownMenuProps<T, TRenderItemAsChild>) {
 	return (
 		<DropdownMenuPrimitive.Root open={open} onOpenChange={onOpenChange}>
 			<DropdownMenuPrimitive.Trigger asChild>
@@ -46,6 +56,7 @@ export function DropdownMenu<T extends Identifiable>({
 					<PopoverContent>
 						{items.map((option) => (
 							<DropdownMenuPrimitive.Item
+								asChild={renderItemAsChild}
 								key={option.id}
 								onSelect={(event) => onSelect?.(event, option)}
 								className={clsx(
@@ -54,7 +65,7 @@ export function DropdownMenu<T extends Identifiable>({
 									"flex items-center justify-between gap-[4px]",
 								)}
 							>
-								{renderOption(option)}
+								{renderItem(option)}
 							</DropdownMenuPrimitive.Item>
 						))}
 					</PopoverContent>

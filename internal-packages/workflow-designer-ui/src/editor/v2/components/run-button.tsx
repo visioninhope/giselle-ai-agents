@@ -13,9 +13,9 @@ import {
 	isTriggerNode,
 } from "@giselle-sdk/data-type";
 import { defaultName } from "@giselle-sdk/giselle-engine/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { PlayIcon } from "lucide-react";
 import {
 	type ButtonHTMLAttributes,
@@ -87,13 +87,13 @@ export function RunButton() {
 		<DropdownMenu
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
-			onSelect={async (event, startingNode) => {
-				event.preventDefault();
+			onSelect={async (_event, startingNode) => {
 				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
 					await startOperationFlow(startingNode);
 				}
 			}}
 			items={startingNodes}
+			renderItemAsChild
 			renderItem={(startingNode) =>
 				isTriggerNode(startingNode) ? (
 					<Dialog

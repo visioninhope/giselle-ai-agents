@@ -111,15 +111,18 @@ export async function generateText(args: {
 				}
 			}
 
-			if (operationNode.content.tools?.postgres?.connectionString) {
-				const connectionString = await args.context.vault?.decrypt(
-					operationNode.content.tools.postgres.connectionString,
-				);
-				const postgresTool = createPostgresTools(
-					connectionString ??
-						operationNode.content.tools.postgres.connectionString,
-				);
-				for (const tool of operationNode.content.tools.postgres.tools) {
+			const postgresToolData = operationNode.content.tools?.postgres;
+			if (postgresToolData?.secretId) {
+				const connectionString = await decryptSecret({
+					...args,
+					secretId: postgresToolData.secretId,
+				});
+				if (connectionString === undefined) {
+					throw new Error("Failed to decrypt secret");
+				}
+
+				const postgresTool = createPostgresTools(connectionString);
+				for (const tool of postgresToolData.tools) {
 					if (tool in postgresTool.toolSet) {
 						preparedToolSet = {
 							...preparedToolSet,

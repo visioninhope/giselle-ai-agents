@@ -273,6 +273,7 @@ function EmptyRepositoryCard() {
 }
 
 async function getGitHubRepositoryIndexes() {
+<<<<<<< HEAD
   const team = await fetchCurrentTeam();
   const records = await db
     .select()
@@ -280,4 +281,14 @@ async function getGitHubRepositoryIndexes() {
     .where(eq(githubRepositoryIndex.teamDbId, team.dbId))
     .orderBy(desc(githubRepositoryIndex.dbId));
   return records;
+=======
+	const team = await fetchCurrentTeam();
+	const records = await db
+		.select()
+		.from(githubRepositoryIndex)
+		.where(eq(githubRepositoryIndex.teamDbId, team.dbId))
+		.orderBy(desc(githubRepositoryIndex.dbId));
+
+	return records;
+>>>>>>> main
 }

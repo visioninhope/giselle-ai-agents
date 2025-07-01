@@ -7,15 +7,15 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import {
+	useFeatureFlag,
+	useNodeGenerations,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
+import {
 	isJsonContent,
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
-import {
-	useFeatureFlag,
-	useNodeGenerations,
-	useWorkflowDesigner,
-} from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
 import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";

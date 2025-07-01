@@ -1,7 +1,7 @@
 "use client";
 
 import { Editor, Header } from "@giselle-internal/workflow-designer-ui";
-import { useFeatureFlag } from "giselle-sdk/react";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import { useSearchParams } from "next/navigation";
 
 export default function Page() {

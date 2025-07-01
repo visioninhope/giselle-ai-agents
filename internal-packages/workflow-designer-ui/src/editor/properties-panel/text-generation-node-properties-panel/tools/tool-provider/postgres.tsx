@@ -7,13 +7,7 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import {
-	CheckIcon,
-	MoveUpRightIcon,
-	PlusIcon,
-	Settings2Icon,
-	TrashIcon,
-} from "lucide-react";
+import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
 import { useCallback, useMemo, useState, useTransition } from "react";
 import z from "zod/v4";
@@ -24,31 +18,31 @@ import {
 	type ToolConfigurationDialogProps,
 } from "../ui/tool-configuration-dialog";
 
-const GitHubToolSetupSecretType = {
+const PostgresToolSetupSecretType = {
 	create: "create",
 	select: "select",
 } as const;
-const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
+const PostgresToolSetupPayload = z.discriminatedUnion("secretType", [
 	z.object({
-		secretType: z.literal(GitHubToolSetupSecretType.create),
+		secretType: z.literal(PostgresToolSetupSecretType.create),
 		label: z.string().min(1),
 		value: z.string().min(1),
 	}),
 	z.object({
-		secretType: z.literal(GitHubToolSetupSecretType.select),
+		secretType: z.literal(PostgresToolSetupSecretType.select),
 		secretId: SecretId.schema,
 	}),
 ]);
 
-export function GitHubToolConfigurationDialog({
+export function PostgresToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
 	const [presentDialog, setPresentDialog] = useState(false);
-	const connected = useMemo(() => !node.content.tools?.github, [node]);
+	const connected = useMemo(() => !node.content.tools?.postgres, [node]);
 
 	if (connected) {
 		return (
-			<GitHubToolConnectionDialog
+			<PostgresToolConnectionDialog
 				node={node}
 				open={presentDialog}
 				onOpenChange={setPresentDialog}
@@ -57,7 +51,7 @@ export function GitHubToolConfigurationDialog({
 	}
 
 	return (
-		<GitHubToolConfigurationDialogInternal
+		<PostgresToolConfigurationDialogInternal
 			node={node}
 			open={presentDialog}
 			onOpenChange={setPresentDialog}
@@ -65,7 +59,7 @@ export function GitHubToolConfigurationDialog({
 	);
 }
 
-function GitHubToolConnectionDialog({
+function PostgresToolConnectionDialog({
 	node,
 	open,
 	onOpenChange,
@@ -77,7 +71,9 @@ function GitHubToolConnectionDialog({
 	const { isLoading, data, mutate } = useWorkspaceSecrets();
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
-	const setupGitHubTool = useCallback<React.FormEventHandler<HTMLFormElement>>(
+	const setupPostgresTool = useCallback<
+		React.FormEventHandler<HTMLFormElement>
+	>(
 		(e) => {
 			e.preventDefault();
 			const formData = new FormData(e.currentTarget);
@@ -85,7 +81,7 @@ function GitHubToolConnectionDialog({
 			const label = formData.get("label");
 			const value = formData.get("value");
 			const secretId = formData.get("secretId");
-			const parse = GitHubToolSetupPayload.safeParse({
+			const parse = PostgresToolSetupPayload.safeParse({
 				secretType,
 				label,
 				value,
@@ -110,12 +106,9 @@ function GitHubToolConnectionDialog({
 							...node.content,
 							tools: {
 								...node.content.tools,
-								github: {
+								postgres: {
 									tools: [],
-									auth: {
-										type: "secret",
-										secretId: result.secret.id,
-									},
+									secretId: result.secret.id,
 								},
 							},
 						});
@@ -126,12 +119,9 @@ function GitHubToolConnectionDialog({
 						...node.content,
 						tools: {
 							...node.content.tools,
-							github: {
+							postgres: {
 								tools: [],
-								auth: {
-									type: "secret",
-									secretId: payload.secretId,
-								},
+								secretId: payload.secretId,
 							},
 						},
 					});
@@ -146,9 +136,9 @@ function GitHubToolConnectionDialog({
 	);
 	return (
 		<ToolConfigurationDialog
-			title="Connect to GitHub"
-			description="How would you like to add your Personal Access Token (PAT)?"
-			onSubmit={setupGitHubTool}
+			title="Connect to PostgreSQL"
+			description="How would you like to set database url?"
+			onSubmit={setupPostgresTool}
 			submitting={isPending}
 			trigger={
 				<Button type="button" leftIcon={<PlusIcon data-dialog-trigger-icon />}>
@@ -160,19 +150,19 @@ function GitHubToolConnectionDialog({
 		>
 			<Tabs value={tabValue} onValueChange={setTabValue}>
 				<TabsList className="mb-[12px]">
-					<TabsTrigger value="create">Paste New Token</TabsTrigger>
-					<TabsTrigger value="select">Use Saved Token</TabsTrigger>
+					<TabsTrigger value="create">Paste conncetion string</TabsTrigger>
+					<TabsTrigger value="select">Use Saved string</TabsTrigger>
 				</TabsList>
 				<TabsContent value="create">
 					<input
 						type="hidden"
 						name="secretType"
-						value={GitHubToolSetupSecretType.create}
+						value={PostgresToolSetupSecretType.create}
 					/>
 					<div className="flex flex-col gap-[12px]">
 						<fieldset className="flex flex-col">
 							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
-								Token Name
+								Connection Name
 							</label>
 							<input
 								type="text"
@@ -184,25 +174,15 @@ function GitHubToolConnectionDialog({
 								)}
 							/>
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								Give this token a short name (e.g. “Prod-bot”). You’ll use it
+								Give this onnection a short name (e.g. “Prod-DB”). You’ll use it
 								when linking other nodes.
 							</p>
 						</fieldset>
 						<fieldset className="flex flex-col">
 							<div className="flex justify-between mb-[2px]">
 								<label htmlFor="pat" className="text-text text-[13px]">
-									Personal Access Token (PAT)
+									Connection String
 								</label>
-								<a
-									href="https://github.com/settings/personal-access-tokens"
-									className="flex items-center gap-[4px] text-[13px] text-text-muted hover:bg-ghost-element-hover transition-colors px-[4px] rounded-[2px]"
-									target="_blank"
-									rel="noreferrer"
-									tabIndex={-1}
-								>
-									<span>GitHub</span>
-									<MoveUpRightIcon className="size-[13px]" />
-								</a>
 							</div>
 							<input
 								type="password"
@@ -217,8 +197,8 @@ function GitHubToolConnectionDialog({
 								)}
 							/>
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								We’ll encrypt the token with authenticated encryption before
-								saving it.
+								We’ll encrypt the connection string with authenticated
+								encryption before saving it.
 							</p>
 						</fieldset>
 					</div>
@@ -234,30 +214,30 @@ function GitHubToolConnectionDialog({
 										onClick={() => setTabValue("create")}
 										leftIcon={<PlusIcon />}
 									>
-										Save First Token
+										Save First connection string
 									</Button>
 								</EmptyState>
 							) : (
 								<>
 									<p className="text-[11px] text-text-muted my-[4px]">
-										Pick one of your encrypted tokens to connect.
+										Pick one of your encrypted string to connect.
 									</p>
 									<input
 										type="hidden"
 										name="secretType"
-										value={GitHubToolSetupSecretType.select}
+										value={PostgresToolSetupSecretType.select}
 									/>
 									<fieldset className="flex flex-col">
 										<label
 											htmlFor="label"
 											className="text-text text-[13px] mb-[2px]"
 										>
-											Select a saved token
+											Select a saved connection string
 										</label>
 										<div>
 											<Select
 												name="secretId"
-												placeholder="Choose a token… "
+												placeholder="Choose a connection string… "
 												options={data ?? []}
 												renderOption={(option) => option.label}
 												widthClassName="w-[180px]"
@@ -274,75 +254,18 @@ function GitHubToolConnectionDialog({
 	);
 }
 
-const githubToolCatalog = [
+const postgresToolCatalog = [
 	{
-		label: "Repository",
-		tools: [
-			"createRepository",
-			"forkRepository",
-			"getFileContents",
-			"listBranches",
-			"searchCode",
-		],
+		label: "Schema",
+		tools: ["getTableStructure"],
 	},
 	{
-		label: "Issues",
-		tools: [
-			"createIssue",
-			"getIssue",
-			"listIssues",
-			"searchIssues",
-			"updateIssue",
-			"addIssueComment",
-			"getIssueComments",
-		],
-	},
-	{
-		label: "Pull Requests",
-		tools: [
-			"createPullRequest",
-			"getPullRequest",
-			"updatePullRequest",
-			"listPullRequests",
-			"searchPullRequests",
-			"getPullRequestComments",
-			"getPullRequestFiles",
-			"getPullRequestReviews",
-			"getPullRequestStatus",
-			"createPullRequestReview",
-			"addPullRequestReviewComment",
-			"mergePullRequest",
-			"updatePullRequestBranch",
-		],
-	},
-	{
-		label: "Code Management",
-		tools: [
-			"createBranch",
-			"createOrUpdateFile",
-			"getCommit",
-			"listCommits",
-			"listCodeScanningAlerts",
-			"getCodeScanningAlert",
-		],
-	},
-	{
-		label: "Search",
-		tools: [
-			"searchCode",
-			"searchIssues",
-			"searchPullRequests",
-			"searchRepositories",
-			"searchUsers",
-		],
-	},
-	{
-		label: "User",
-		tools: ["getMe"],
+		label: "Query",
+		tools: ["query"],
 	},
 ];
 
-function GitHubToolConfigurationDialogInternal({
+function PostgresToolConfigurationDialogInternal({
 	node,
 	open,
 	onOpenChange,
@@ -356,7 +279,7 @@ function GitHubToolConfigurationDialogInternal({
 	>(
 		(e) => {
 			e.preventDefault();
-			if (node.content.tools?.github === undefined) {
+			if (node.content.tools?.postgres === undefined) {
 				return;
 			}
 			const formData = new FormData(e.currentTarget);
@@ -368,8 +291,8 @@ function GitHubToolConfigurationDialogInternal({
 				...node.content,
 				tools: {
 					...node.content.tools,
-					github: {
-						...node.content.tools.github,
+					postgres: {
+						...node.content.tools.postgres,
 						tools,
 					},
 				},
@@ -400,7 +323,7 @@ function GitHubToolConfigurationDialogInternal({
 				<div className="flex justify-between items-center border border-border rounded-[4px] px-[6px] py-[3px] text-[13px] mb-[16px]">
 					<div className="flex gap-[6px] items-center">
 						<CheckIcon className="size-[14px] text-green-900" />
-						Token configured.
+						Connection configured.
 					</div>
 					<Button
 						type="button"
@@ -409,18 +332,18 @@ function GitHubToolConfigurationDialogInternal({
 								...node.content,
 								tools: {
 									...node.content.tools,
-									github: undefined,
+									postgres: undefined,
 								},
 							});
 						}}
 						leftIcon={<TrashIcon className="size-[12px]" />}
 						size="compact"
 					>
-						Reset key
+						Reset
 					</Button>
 				</div>
 				<div className="flex flex-col gap-6">
-					{githubToolCatalog.map((category) => (
+					{postgresToolCatalog.map((category) => (
 						<div key={category.label} className="flex flex-col gap-2">
 							<div className="text-[13px] font-medium text-text">
 								{category.label}
@@ -436,7 +359,7 @@ function GitHubToolConfigurationDialogInternal({
 											className="group appearance-none size-[18px] rounded border flex items-center justify-center transition-colors outline-none data-[state=checked]:border-success data-[state=checked]:bg-success"
 											value={tool}
 											id={tool}
-											defaultChecked={node.content.tools?.github?.tools.includes(
+											defaultChecked={node.content.tools?.postgres?.tools.includes(
 												tool,
 											)}
 											name="tools"

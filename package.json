@@ -4,7 +4,7 @@
 	"private": true,
 	"scripts": {
 		"build": "turbo build",
-		"build-sdk": "turbo build --filter '@giselle-sdk/*' --filter giselle-sdk",
+		"build-sdk": "turbo build --filter '@giselle-sdk/*'",
 		"build-data-type": "turbo build --filter '@giselle-sdk/data-type'",
 		"check-types": "turbo check-types",
 		"format": "turbo format",

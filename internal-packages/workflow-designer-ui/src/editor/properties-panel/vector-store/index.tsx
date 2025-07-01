@@ -1,5 +1,5 @@
 import type { VectorStoreNode } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { NodeIcon } from "../../../icons/node";
 import {
 	PropertiesPanelContent,

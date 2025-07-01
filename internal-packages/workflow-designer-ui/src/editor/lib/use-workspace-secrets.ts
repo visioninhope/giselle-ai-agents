@@ -1,4 +1,7 @@
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import useSWR from "swr";
 
 export function useWorkspaceSecrets() {

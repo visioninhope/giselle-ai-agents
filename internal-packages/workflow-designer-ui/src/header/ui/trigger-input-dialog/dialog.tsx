@@ -4,9 +4,9 @@ import {
 	type TriggerNode,
 	isActionNode,
 } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { buildWorkflowFromNode } from "@giselle-sdk/workflow-utils";
 import { clsx } from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AlertTriangleIcon, PlayIcon, XIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useMemo, useState } from "react";
