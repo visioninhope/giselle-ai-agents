@@ -59,29 +59,13 @@ async function processRepository(
 			error,
 		);
 
-		// Determine if error is retryable
-		let shouldRetry = true; // Default: retry all errors
-		let errorCode = "UNKNOWN";
-		let retryAfter: Date | null = null;
-
-		if (error instanceof RagError) {
-			shouldRetry = error.isRetryable();
-			errorCode = error.code;
-
-			if (error instanceof DocumentLoaderError) {
-				const retryAfterDate = error.getRetryAfterDate();
-				if (retryAfterDate) {
-					retryAfter = retryAfterDate;
-				}
-			}
-		}
+		const { errorCode, retryAfter } = extractErrorInfo(error);
 
 		captureException(error, {
 			extra: {
 				owner,
 				repo,
 				teamDbId,
-				shouldRetry,
 				errorCode,
 				retryAfter,
 				errorContext:
@@ -90,9 +74,54 @@ async function processRepository(
 		});
 
 		await updateRepositoryStatusToFailed(dbId, {
-			isRetryable: shouldRetry,
-			errorCode: errorCode,
+			errorCode,
 			retryAfter,
 		});
 	}
+}
+
+/**
+ * Extract error code and retry time from an error
+ * @param error The error to extract information from
+ * @returns Error code and retry time
+ */
+function extractErrorInfo(error: unknown): {
+	errorCode: string;
+	retryAfter: Date | null;
+} {
+	if (error instanceof DocumentLoaderError) {
+		const errorCode = error.code;
+
+		let retryAfter: Date | null;
+		switch (error.code) {
+			case "DOCUMENT_NOT_FOUND":
+			case "DOCUMENT_TOO_LARGE":
+				// Not retryable
+				retryAfter = null;
+				break;
+			case "DOCUMENT_RATE_LIMITED":
+				retryAfter = error.getRetryAfterDate() ?? new Date();
+				break;
+			case "DOCUMENT_FETCH_ERROR":
+				retryAfter = new Date();
+				break;
+			default:
+				const _exhaustiveCheck: never = error.code;
+				throw new Error(`Unknown error code: ${_exhaustiveCheck}`);
+		}
+
+		return { errorCode, retryAfter };
+	}
+
+	if (error instanceof RagError) {
+		return {
+			errorCode: error.code,
+			retryAfter: new Date(),
+		};
+	}
+
+	return {
+		errorCode: "UNKNOWN",
+		retryAfter: new Date(),
+	};
 }

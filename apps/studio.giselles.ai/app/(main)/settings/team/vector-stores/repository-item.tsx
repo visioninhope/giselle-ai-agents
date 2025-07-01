@@ -72,12 +72,10 @@ export function RepositoryItem({
 										repositoryIndex.errorCode as DocumentLoaderErrorCode,
 									)}
 								</p>
-								{repositoryIndex.isRetryable && (
+								{repositoryIndex.retryAfter && (
 									<p className="text-black-400 text-[11px] leading-[14px] font-geist mt-1">
-										This error will be retried automatically
-										{repositoryIndex.retryAfter &&
-											` after ${formatRetryTime(repositoryIndex.retryAfter)}`}
-										.
+										This error will be retried automatically after{" "}
+										{formatRetryTime(repositoryIndex.retryAfter)}.
 									</p>
 								)}
 							</div>
@@ -175,11 +173,9 @@ function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
 	);
 }
 
-function formatRetryTime(retryAfter: Date | string): string {
-	const date =
-		typeof retryAfter === "string" ? new Date(retryAfter) : retryAfter;
+function formatRetryTime(retryAfter: Date): string {
 	const now = new Date();
-	const diffMs = date.getTime() - now.getTime();
+	const diffMs = retryAfter.getTime() - now.getTime();
 
 	if (diffMs <= 0) {
 		return "now";
