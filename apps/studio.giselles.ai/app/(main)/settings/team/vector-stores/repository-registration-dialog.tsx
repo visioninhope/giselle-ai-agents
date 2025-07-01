@@ -7,6 +7,7 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { GlassButton } from "@/components/ui/glass-button";
 import {
 	Select,
 	SelectContent,
@@ -14,6 +15,7 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import { Plus } from "lucide-react";
 import { useState, useTransition } from "react";
 import { Button } from "../../components/button";
 
@@ -103,7 +105,12 @@ export function RepositoryRegistrationDialog({
 	return (
 		<Dialog open={isOpen} onOpenChange={setIsOpen}>
 			<DialogTrigger asChild>
-				<Button variant="default">Register Repository</Button>
+				<GlassButton className="whitespace-nowrap">
+					<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
+						<Plus className="size-3 text-black-900" />
+					</span>
+					Register Repository
+				</GlassButton>
 			</DialogTrigger>
 			<DialogContent
 				className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]"
@@ -113,17 +120,17 @@ export function RepositoryRegistrationDialog({
 				}}
 			>
 				<style jsx global>{`
-					@keyframes fadeIn {
-						from {
-							opacity: 0;
-							transform: scale(0.95);
-						}
-						to {
-							opacity: 1;
-							transform: scale(1);
-						}
-					}
-				`}</style>
+          @keyframes fadeIn {
+            from {
+              opacity: 0;
+              transform: scale(0.95);
+            }
+            to {
+              opacity: 1;
+              transform: scale(1);
+            }
+          }
+        `}</style>
 				<div
 					aria-hidden="true"
 					className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
