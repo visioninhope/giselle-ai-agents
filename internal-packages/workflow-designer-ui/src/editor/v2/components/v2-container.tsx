@@ -27,18 +27,18 @@ import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
-import { DataSourceTable } from "../../data-source";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
-import { RunHistoryTable } from "../../run-history/run-history-table";
-import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
 import type { LeftPanelValue, V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
+import { PanelWrapper } from "./resizable-panel";
 
-interface V2ContainerProps extends V2LayoutState {}
+interface V2ContainerProps extends V2LayoutState {
+	onLeftPanelClose?: () => void;
+}
 
-function V2NodeCanvas() {
+function V2NodeCanvas({ onLeftPanelClose }: { onLeftPanelClose?: () => void }) {
 	const {
 		data,
 		setUiNodeState,
@@ -223,6 +223,11 @@ function V2NodeCanvas() {
 					addNode(selectedTool.node, { ui: { position } });
 				}
 				reset();
+
+				// Close panel when clicking on canvas
+				if (onLeftPanelClose) {
+					onLeftPanelClose();
+				}
 			}}
 			onNodeContextMenu={(event, node) => {
 				event.preventDefault();
@@ -255,7 +260,7 @@ function V2NodeCanvas() {
 	);
 }
 
-export function V2Container({ leftPanel }: V2ContainerProps) {
+export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
 		() =>
@@ -270,64 +275,63 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 
 	const mainRef = useRef<HTMLDivElement>(null);
 
+	// Handle click outside to close panel
+	useEffect(() => {
+		if (!leftPanel || !onLeftPanelClose) return;
+
+		const handleClickOutside = (event: MouseEvent) => {
+			const target = event.target as Element;
+
+			// Check if click is on panel trigger button
+			const isPanelTriggerButton = target.closest("[data-panel-trigger]");
+			if (isPanelTriggerButton) return;
+
+			// Check if click is inside the panel
+			const panelElement = document.querySelector("[data-panel-wrapper]");
+			if (panelElement?.contains(target)) return;
+
+			// Close panel for clicks outside
+			onLeftPanelClose();
+		};
+
+		// Use capture phase to ensure we catch the event before ReactFlow
+		document.addEventListener("mousedown", handleClickOutside, true);
+
+		return () => {
+			document.removeEventListener("mousedown", handleClickOutside, true);
+		};
+	}, [leftPanel, onLeftPanelClose]);
+
 	return (
 		<main
 			className="relative flex-1 bg-black-900 overflow-hidden"
 			ref={mainRef}
 		>
-			<div className="h-full">
-				<LeftPanel value={leftPanel} containerRef={mainRef} />
-				<V2NodeCanvas />
+			<div className="h-full flex">
+				{/* Left Panel */}
+				<div data-panel-wrapper>
+					<PanelWrapper
+						isOpen={leftPanel !== null}
+						panelType={leftPanel}
+						onClose={() => onLeftPanelClose?.()}
+					/>
+				</div>
 
-				{/* Floating Properties Panel */}
-				<FloatingPropertiesPanel
-					isOpen={isPropertiesPanelOpen}
-					container={mainRef.current}
-					title="Properties Panel"
-				>
-					<PropertiesPanel />
-				</FloatingPropertiesPanel>
+				{/* Main Content Area */}
+				<div className="flex-1 relative">
+					<V2NodeCanvas onLeftPanelClose={onLeftPanelClose} />
+
+					{/* Floating Properties Panel */}
+					<FloatingPropertiesPanel
+						isOpen={isPropertiesPanelOpen}
+						container={mainRef.current}
+						title="Properties Panel"
+					>
+						<PropertiesPanel />
+					</FloatingPropertiesPanel>
+				</div>
 			</div>
 			<GradientDef />
 		</main>
-	);
-}
-
-function LeftPanel({
-	value,
-	containerRef,
-}: {
-	value: LeftPanelValue | null;
-	containerRef: RefObject<HTMLDivElement | null>;
-}) {
-	const content = useMemo(() => {
-		if (value === null) {
-			return null;
-		}
-		switch (value) {
-			case "data-source":
-				return <DataSourceTable />;
-			case "run-history":
-				return <RunHistoryTable />;
-			case "secret":
-				return <SecretTable />;
-			default: {
-				const _exhaustiveCheck: never = value;
-				throw new Error(`Unhandled leftPanel: ${_exhaustiveCheck}`);
-			}
-		}
-	}, [value]);
-	if (content === null) {
-		return null;
-	}
-	return (
-		<FloatingPropertiesPanel
-			isOpen
-			position="left"
-			container={containerRef?.current}
-			title="Left Panel"
-		>
-			{content}
-		</FloatingPropertiesPanel>
 	);
 }

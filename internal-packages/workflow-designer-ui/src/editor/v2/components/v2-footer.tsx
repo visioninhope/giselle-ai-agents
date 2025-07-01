@@ -12,11 +12,15 @@ import type { LeftPanelValue } from "../state";
 
 interface V2FooterProps {
 	onLeftPaelValueChange: (leftMenu: LeftPanelValue) => void;
+	activePanel?: LeftPanelValue | null;
 }
 
-export function V2Footer({ onLeftPaelValueChange }: V2FooterProps) {
+export function V2Footer({
+	onLeftPaelValueChange,
+	activePanel,
+}: V2FooterProps) {
 	return (
-		<footer className="h-[30px] border-t border-black-600 px-6 flex items-center">
+		<footer className="h-[30px] border-t border-white/10 px-4 flex items-center">
 			<div className="flex items-center justify-between w-full">
 				<div className="flex items-center space-x-3">
 					<Tooltip
@@ -30,7 +34,12 @@ export function V2Footer({ onLeftPaelValueChange }: V2FooterProps) {
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("run-history")}
-							className="text-white-900 hover:text-[#6B8FF0] cursor-pointer"
+							data-panel-trigger="run-history"
+							className={`cursor-pointer ${
+								activePanel === "run-history"
+									? "text-[#6B8FF0]"
+									: "text-white-900 hover:text-[#6B8FF0]"
+							}`}
 						>
 							<HistoryIcon className="w-[14px] h-[14px]" />
 						</button>
@@ -46,7 +55,12 @@ export function V2Footer({ onLeftPaelValueChange }: V2FooterProps) {
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("secret")}
-							className="text-white-900 hover:text-[#6B8FF0] cursor-pointer"
+							data-panel-trigger="secret"
+							className={`cursor-pointer ${
+								activePanel === "secret"
+									? "text-[#6B8FF0]"
+									: "text-white-900 hover:text-[#6B8FF0]"
+							}`}
 						>
 							<FileKey2Icon className="w-[14px] h-[14px]" />
 						</button>
@@ -62,7 +76,12 @@ export function V2Footer({ onLeftPaelValueChange }: V2FooterProps) {
 						<button
 							type="button"
 							onClick={() => onLeftPaelValueChange("data-source")}
-							className="text-white-900 hover:text-[#6B8FF0] cursor-pointer"
+							data-panel-trigger="data-source"
+							className={`cursor-pointer ${
+								activePanel === "data-source"
+									? "text-[#6B8FF0]"
+									: "text-white-900 hover:text-[#6B8FF0]"
+							}`}
 						>
 							<DatabaseIcon className="w-[14px] h-[14px]" />
 						</button>

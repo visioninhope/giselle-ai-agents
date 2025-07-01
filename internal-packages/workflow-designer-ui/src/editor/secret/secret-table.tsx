@@ -8,14 +8,7 @@ import {
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
-import {
-	Table,
-	TableBody,
-	TableCell,
-	TableHead,
-	TableHeader,
-	TableRow,
-} from "@giselle-internal/ui/table";
+
 import clsx from "clsx/lite";
 import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlusIcon } from "lucide-react";
@@ -77,13 +70,9 @@ export function SecretTable() {
 	if (isLoading) {
 		return null;
 	}
-	if (data === undefined || data.length < 1) {
-		return <EmptyState description="No secret" />;
-	}
 	return (
-		<div className="p-[16px] bg-surface-background h-full">
-			<div className="flex justify-between items-center">
-				<h1 className="font-accent text-text text-[18px] mb-[8px]">Secrets</h1>
+		<div className="px-[16px] pb-[16px] pt-[8px] h-full">
+			<div className="flex justify-end items-center">
 				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
 					<DialogTrigger asChild>
 						<Button type="button" leftIcon={<PlusIcon className="text-text" />}>
@@ -145,34 +134,45 @@ export function SecretTable() {
 								</fieldset>
 							</div>
 							<DialogFooter>
-								<button
+								<Button
 									type="submit"
-									className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+									variant="solid"
+									size="large"
 									disabled={isPending}
 								>
 									{isPending ? "..." : "Create"}
-								</button>
+								</Button>
 							</DialogFooter>
 						</form>
 					</DialogContent>
 				</Dialog>
 			</div>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Created at</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{data.map((data) => (
-						<TableRow key={data.id}>
-							<TableCell>{data.label}</TableCell>
-							<TableCell>{formatDateTime(data.createdAt)}</TableCell>
-						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+			{data === undefined || data.length < 1 ? (
+				<EmptyState description="No secret" />
+			) : (
+				<table className="w-full text-sm">
+					<thead>
+						<tr>
+							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+								Name
+							</th>
+							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
+								Created at
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						{data.map((data) => (
+							<tr key={data.id} className="border-b border-white-400/10">
+								<td className="py-3 px-4 text-white-800">{data.label}</td>
+								<td className="py-3 px-4 text-white-800">
+									{formatDateTime(data.createdAt)}
+								</td>
+							</tr>
+						))}
+					</tbody>
+				</table>
+			)}
 		</div>
 	);
 }
