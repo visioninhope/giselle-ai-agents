@@ -49,9 +49,14 @@ export function RepositoryItem({
 		>
 			<div className="flex items-center justify-between gap-4">
 				<div className="flex flex-col gap-1">
-					<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+					<a
+						href={`https://github.com/${repositoryIndex.owner}/${repositoryIndex.repo}`}
+						target="_blank"
+						rel="noopener noreferrer"
+						className="text-[#1663F3] font-medium text-[16px] leading-[22.4px] font-geist hover:text-[#0f4cd1] transition-colors duration-200"
+					>
 						{repositoryIndex.owner}/{repositoryIndex.repo}
-					</div>
+					</a>
 					<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 						Updated {getRelativeTimeString(repositoryIndex.updatedAt)}
 					</span>
