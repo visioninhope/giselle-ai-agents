@@ -78,15 +78,11 @@ export const sidemenuFlag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("SIDEMENU_FLAG");
 		}
-		const forceDisable = await get(`disable__${this.key}`);
-		console.log(`edgeconfig.flag__${this.key}: ${forceDisable}`);
-		if (forceDisable === undefined) {
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return true;
 		}
-		if (forceDisable) {
-			return false;
-		}
-		return true;
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Side Menu",
 	options: [
@@ -101,15 +97,12 @@ export const layoutV2Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("LAYOUT_V2_FLAG");
 		}
-		const forceDisable = await get(`disable__${this.key}`);
-		console.log(`edgeconfig.flag__${this.key}: ${forceDisable}`);
-		if (forceDisable === undefined) {
+		const edgeConfig = await get(`flag__${this.key}`);
+		console.log(`edgeconfig.flag__${this.key}: ${edgeConfig}`);
+		if (edgeConfig === undefined) {
 			return true;
 		}
-		if (forceDisable) {
-			return false;
-		}
-		return true;
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V2",
 	options: [
