@@ -2,8 +2,11 @@ import { Button } from "@giselle-internal/ui/button";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
 import { Select } from "@giselle-internal/ui/select";
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
 import { useCallback, useMemo, useState, useTransition } from "react";
