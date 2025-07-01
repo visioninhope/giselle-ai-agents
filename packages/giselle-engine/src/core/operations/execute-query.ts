@@ -254,6 +254,10 @@ async function queryVectorStore(
 		throw new Error("No vector store query service provided");
 	}
 
+	if (query.trim().length === 0) {
+		throw new Error("Query is empty");
+	}
+
 	// Default values for query parameters
 	// TODO: Make these configurable via the UI
 	const LIMIT = 10;
