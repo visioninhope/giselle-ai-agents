@@ -54,7 +54,11 @@ export function createGitHubBlobDownloadLoader(
 						request: { redirect: "follow" },
 					},
 				);
-				const buffer = Buffer.from(data as ArrayBuffer);
+				const buffer = Buffer.isBuffer(data)
+					? data
+					: data instanceof ArrayBuffer
+						? Buffer.from(data)
+						: Buffer.from(data as string, "binary");
 				await fs.writeFile(archivePath, buffer);
 				await extract({ file: archivePath, cwd: extractDir, strip: 1 });
 				return extractDir;
