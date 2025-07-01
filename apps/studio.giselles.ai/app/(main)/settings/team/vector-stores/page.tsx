@@ -306,12 +306,12 @@ function GitHubAuthErrorCard({ errorMessage }: { errorMessage: string }) {
 			<Card className="rounded-[8px] bg-transparent p-6 border-0">
 				<div className="flex flex-col items-center justify-center py-8">
 					<div className="flex items-center gap-2 mb-4">
-						<AlertCircle className="text-red-400" size={24} />
-						<h4 className="text-red-200 font-medium text-[18px] leading-[21.6px] font-sans">
+						<AlertCircle className="text-error-900" size={24} />
+						<h4 className="text-error-900 font-medium text-[18px] leading-[21.6px] font-sans">
 							GitHub authentication error occurred.
 						</h4>
 					</div>
-					<p className="text-red-300 text-[14px] leading-[20.4px] font-geist text-center mb-4">
+					<p className="text-error-900/70 text-[14px] leading-[20.4px] font-geist text-center mb-4">
 						{errorMessage}
 					</p>
 				</div>

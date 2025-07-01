@@ -52,6 +52,9 @@
 	--color-turquoise-900: hsl(178, 94%, 49%);
 
 	--color-red-900: hsl(344, 100%, 62%);
+	--color-red-400: hsl(344, 100%, 62%);
+	--color-red-300: hsl(344, 100%, 70%);
+	--color-red-200: hsl(344, 100%, 80%);
 
 	--color-deep-purple-900: hsl(275, 96%, 44%);
 
@@ -103,6 +106,11 @@
 	--color-query-node-2: hsl(200, 80%, 30%);
 
 	--color-error-900: var(--color-red-900);
+	--error_900: var(--color-red-900);
+	--red_900: var(--color-red-900);
+	--red_400: var(--color-red-400);
+	--red_300: var(--color-red-300);
+	--red_200: var(--color-red-200);
 
 	--font-accent: var(--font-dm-sans);
 	--font-sans: var(--font-dm-sans);
