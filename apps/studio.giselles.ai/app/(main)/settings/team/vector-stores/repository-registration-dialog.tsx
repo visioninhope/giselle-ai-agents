@@ -1,12 +1,5 @@
 "use client";
 
-import {
-	Dialog,
-	DialogContent,
-	DialogHeader,
-	DialogTitle,
-	DialogTrigger,
-} from "@/components/ui/dialog";
 import { GlassButton } from "@/components/ui/glass-button";
 import {
 	Select,
@@ -15,9 +8,15 @@ import {
 	SelectTrigger,
 	SelectValue,
 } from "@/components/ui/select";
+import * as Dialog from "@radix-ui/react-dialog";
 import { Plus } from "lucide-react";
 import { useState, useTransition } from "react";
-import { Button } from "../../components/button";
+import {
+	GlassDialogBody,
+	GlassDialogContent,
+	GlassDialogFooter,
+	GlassDialogHeader,
+} from "../components/glass-dialog-content";
 
 type Installation = {
 	id: number;
@@ -103,147 +102,129 @@ export function RepositoryRegistrationDialog({
 	};
 
 	return (
-		<Dialog open={isOpen} onOpenChange={setIsOpen}>
-			<DialogTrigger asChild>
+		<Dialog.Root open={isOpen} onOpenChange={setIsOpen}>
+			<Dialog.Trigger asChild>
 				<GlassButton className="whitespace-nowrap">
 					<span className="grid place-items-center rounded-full size-4 bg-primary-200 opacity-50">
 						<Plus className="size-3 text-black-900" />
 					</span>
 					Register Repository
 				</GlassButton>
-			</DialogTrigger>
-			<DialogContent
-				className="gap-y-6 px-[57px] py-[40px] max-w-[380px] w-full bg-black-900 border-none rounded-[16px] bg-linear-to-br/hsl from-black-600 to-black-250 sm:rounded-[16px]"
-				style={{
-					animation: "fadeIn 0.2s ease-out",
-					transformOrigin: "center",
-				}}
+			</Dialog.Trigger>
+			<GlassDialogContent
+				onEscapeKeyDown={() => setIsOpen(false)}
+				onPointerDownOutside={() => setIsOpen(false)}
 			>
-				<style jsx global>{`
-          @keyframes fadeIn {
-            from {
-              opacity: 0;
-              transform: scale(0.95);
-            }
-            to {
-              opacity: 1;
-              transform: scale(1);
-            }
-          }
-        `}</style>
-				<div
-					aria-hidden="true"
-					className="absolute inset-0 rounded-[16px] border-[0.5px] border-transparent bg-black-900 bg-clip-padding"
+				<GlassDialogHeader
+					title="Register GitHub Repository"
+					description="Add a GitHub repository to your Vector Store to use it in GitHub Vector Store Nodes."
+					onClose={() => setIsOpen(false)}
 				/>
-				<DialogHeader className="relative z-10">
-					<DialogTitle className="text-white-800 font-semibold text-[20px] leading-[28px] font-sans text-center">
-						Register GitHub Repository
-					</DialogTitle>
-				</DialogHeader>
-				<form
-					onSubmit={handleSubmit}
-					className="flex flex-col gap-y-4 relative z-10"
-				>
-					<div className="flex flex-col gap-y-2">
-						<label
-							htmlFor="owner"
-							className="text-white-400 text-[14px] leading-[16.8px] font-sans"
-						>
-							Owner
-						</label>
-						<Select
-							value={ownerId}
-							onValueChange={(val) => {
-								setOwnerId(val);
-								setRepositoryId("");
-							}}
-							disabled={isPending}
-						>
-							<SelectTrigger
-								id="owner"
-								className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white border border-white-400"
+				<GlassDialogBody>
+					<form
+						id="register-repository-form"
+						onSubmit={handleSubmit}
+						className="space-y-4"
+						noValidate
+					>
+						<div className="flex flex-col gap-y-2">
+							<label
+								htmlFor="owner"
+								className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 							>
-								<SelectValue placeholder="Select owner" />
-							</SelectTrigger>
-							<SelectContent>
-								{installationsWithRepos.length === 0 ? (
-									<div className="px-3 py-2 text-muted-foreground text-sm">
-										No owners available
-									</div>
-								) : (
-									installationsWithRepos.map(({ installation }) => (
-										<SelectItem
-											key={installation.id}
-											value={String(installation.id)}
-										>
-											{installation.name}
-										</SelectItem>
-									))
-								)}
-							</SelectContent>
-						</Select>
-					</div>
-					<div className="flex flex-col gap-y-2">
-						<label
-							htmlFor="repo"
-							className="text-white-400 text-[14px] leading-[16.8px] font-sans"
-						>
-							Repository Name
-						</label>
-						<Select
-							value={repositoryId}
-							onValueChange={setRepositoryId}
-							disabled={isPending || !ownerId}
-						>
-							<SelectTrigger
-								id="repo"
-								className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white border border-white-400"
+								Owner
+							</label>
+							<Select
+								value={ownerId}
+								onValueChange={(val) => {
+									setOwnerId(val);
+									setRepositoryId("");
+								}}
+								disabled={isPending}
 							>
-								<SelectValue placeholder="Select repository" />
-							</SelectTrigger>
-							<SelectContent>
-								{!ownerId ? (
-									<div className="px-3 py-2 text-muted-foreground text-sm">
-										Select owner first
-									</div>
-								) : repositoryOptions.length === 0 ? (
-									<div className="px-3 py-2 text-muted-foreground text-sm">
-										No repositories available
-									</div>
-								) : (
-									repositoryOptions.map((repo) => (
-										<SelectItem key={repo.id} value={String(repo.id)}>
-											{repo.name}
-										</SelectItem>
-									))
-								)}
-							</SelectContent>
-						</Select>
-					</div>
-					{error && (
-						<p className="text-[12px] leading-[20.4px] text-error-900 font-geist">
-							{error}
-						</p>
-					)}
-					<div className="flex justify-end space-x-4 mt-2">
-						<Button
-							type="button"
-							onClick={() => setIsOpen(false)}
-							disabled={isPending}
-							className="w-full h-[38px] bg-transparent border-black-400 text-black-400 text-[16px] leading-[19.2px] tracking-[-0.04em] hover:bg-transparent hover:text-black-400 "
-						>
-							Cancel
-						</Button>
-						<Button
-							type="submit"
-							disabled={isPending}
-							className="w-full h-[38px] text-[16px] leading-[19.2px] tracking-[-0.04em]"
-						>
-							Register
-						</Button>
-					</div>
-				</form>
-			</DialogContent>
-		</Dialog>
+								<SelectTrigger
+									id="owner"
+									className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white border border-white-400"
+								>
+									<SelectValue placeholder="Select owner" />
+								</SelectTrigger>
+								<SelectContent>
+									{installationsWithRepos.length === 0 ? (
+										<div className="px-3 py-2 text-muted-foreground text-sm">
+											No owners available
+										</div>
+									) : (
+										installationsWithRepos.map(({ installation }) => (
+											<SelectItem
+												key={installation.id}
+												value={String(installation.id)}
+											>
+												{installation.name}
+											</SelectItem>
+										))
+									)}
+								</SelectContent>
+							</Select>
+						</div>
+						<div className="flex flex-col gap-y-2">
+							<label
+								htmlFor="repo"
+								className="text-white-400 text-[14px] leading-[16.8px] font-sans"
+							>
+								Repository Name
+							</label>
+							<Select
+								value={repositoryId}
+								onValueChange={setRepositoryId}
+								disabled={isPending || !ownerId}
+							>
+								<SelectTrigger
+									id="repo"
+									className="py-2 rounded-[8px] w-full bg-white-30/30 text-black-800 font-medium text-[12px] leading-[20.4px] font-geist shadow-none focus:text-white border border-white-400"
+								>
+									<SelectValue placeholder="Select repository" />
+								</SelectTrigger>
+								<SelectContent>
+									{!ownerId ? (
+										<div className="px-3 py-2 text-muted-foreground text-sm">
+											Select owner first
+										</div>
+									) : repositoryOptions.length === 0 ? (
+										<div className="px-3 py-2 text-muted-foreground text-sm">
+											No repositories available
+										</div>
+									) : (
+										repositoryOptions.map((repo) => (
+											<SelectItem key={repo.id} value={String(repo.id)}>
+												{repo.name}
+											</SelectItem>
+										))
+									)}
+								</SelectContent>
+							</Select>
+						</div>
+						{error && (
+							<div className="mt-1 text-sm text-error-500">{error}</div>
+						)}
+					</form>
+				</GlassDialogBody>
+				<GlassDialogFooter
+					onCancel={() => setIsOpen(false)}
+					onConfirm={() => {
+						const form = document.getElementById(
+							"register-repository-form",
+						) as HTMLFormElement | null;
+						if (!form) return;
+						if (typeof form.requestSubmit === "function") {
+							form.requestSubmit();
+						} else {
+							form.submit();
+						}
+					}}
+					confirmLabel="Register"
+					isPending={isPending}
+				/>
+			</GlassDialogContent>
+		</Dialog.Root>
 	);
 }
