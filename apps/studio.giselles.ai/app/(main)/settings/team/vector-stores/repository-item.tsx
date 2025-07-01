@@ -6,7 +6,7 @@ import type {
 } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-import { SiGithub } from "@icons-pack/react-simple-icons";
+
 import * as Dialog from "@radix-ui/react-dialog";
 import { Trash } from "lucide-react";
 import { useState, useTransition } from "react";
@@ -44,84 +44,107 @@ export function RepositoryItem({
 	return (
 		<div
 			className={cn(
-				"group relative rounded-[12px] overflow-hidden px-[24px] pt-[16px] pb-[24px] w-full gap-[16px] grid bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200",
+				"group relative rounded-[12px] overflow-hidden px-[24px] py-[16px] w-full bg-white/[0.02] backdrop-blur-[8px] border-[0.5px] border-white/8 shadow-[inset_0_1px_1px_rgba(255,255,255,0.4),inset_0_-1px_1px_rgba(255,255,255,0.2)] before:content-[''] before:absolute before:inset-0 before:bg-white before:opacity-[0.02] before:rounded-[inherit] before:pointer-events-none hover:border-white/12 transition-colors duration-200",
 			)}
 		>
 			<div className="flex items-center justify-between gap-4">
-				<div className="flex items-center gap-4">
-					<SiGithub className="text-white-400 h-[20px] w-[20px]" />
-					<div className="flex flex-col">
-						<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
-							{repositoryIndex.owner}/{repositoryIndex.repo}
-						</div>
-						<div className="flex items-center gap-2 mt-1">
-							<StatusBadge status={repositoryIndex.status} />
-							{repositoryIndex.lastIngestedCommitSha && (
-								<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
-									Last Ingested:{" "}
-									{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
-								</span>
-							)}
-						</div>
+				<div className="flex flex-col gap-1">
+					<div className="text-white-400 font-medium text-[16px] leading-[22.4px] font-geist">
+						{repositoryIndex.owner}/{repositoryIndex.repo}
 					</div>
+					<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+						Updated {getRelativeTimeString(repositoryIndex.updatedAt)}
+					</span>
 				</div>
-				<Dialog.Root open={showDeleteDialog} onOpenChange={setShowDeleteDialog}>
-					<Dialog.Trigger asChild>
-						<button
-							type="button"
-							className="opacity-0 group-hover:opacity-100 transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
-							disabled={isPending}
-							onClick={() => setShowDeleteDialog(true)}
-						>
-							<Trash className="h-4 w-4" />
-						</button>
-					</Dialog.Trigger>
-					<GlassDialogContent variant="destructive">
-						<GlassDialogHeader
-							title="Delete Repository"
-							description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}".`}
-							onClose={() => setShowDeleteDialog(false)}
-							variant="destructive"
-						/>
-						<GlassDialogFooter
-							onCancel={() => setShowDeleteDialog(false)}
-							onConfirm={handleDelete}
-							confirmLabel="Delete"
-							isPending={isPending}
-							variant="destructive"
-						/>
-					</GlassDialogContent>
-				</Dialog.Root>
+				<div className="flex items-center gap-3">
+					<StatusBadge status={repositoryIndex.status} />
+					{repositoryIndex.lastIngestedCommitSha && (
+						<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
+							Last Ingested:{" "}
+							{repositoryIndex.lastIngestedCommitSha.substring(0, 7)}
+						</span>
+					)}
+					<Dialog.Root
+						open={showDeleteDialog}
+						onOpenChange={setShowDeleteDialog}
+					>
+						<Dialog.Trigger asChild>
+							<button
+								type="button"
+								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
+								disabled={isPending}
+								onClick={() => setShowDeleteDialog(true)}
+							>
+								<Trash className="h-4 w-4" />
+							</button>
+						</Dialog.Trigger>
+						<GlassDialogContent variant="destructive">
+							<GlassDialogHeader
+								title="Delete Repository"
+								description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}".`}
+								onClose={() => setShowDeleteDialog(false)}
+								variant="destructive"
+							/>
+							<GlassDialogFooter
+								onCancel={() => setShowDeleteDialog(false)}
+								onConfirm={handleDelete}
+								confirmLabel="Delete"
+								isPending={isPending}
+								variant="destructive"
+							/>
+						</GlassDialogContent>
+					</Dialog.Root>
+				</div>
 			</div>
 		</div>
 	);
 }
 
+function getRelativeTimeString(date: Date): string {
+	const now = new Date();
+	const diffInMs = now.getTime() - date.getTime();
+	const diffInSeconds = Math.floor(diffInMs / 1000);
+	const diffInMinutes = Math.floor(diffInSeconds / 60);
+	const diffInHours = Math.floor(diffInMinutes / 60);
+	const diffInDays = Math.floor(diffInHours / 24);
+
+	if (diffInDays > 7) {
+		return date.toLocaleDateString("en-US");
+	}
+	if (diffInDays >= 1) {
+		return diffInDays === 1 ? "yesterday" : `${diffInDays} days ago`;
+	}
+	if (diffInHours >= 1) {
+		return diffInHours === 1 ? "1 hour ago" : `${diffInHours} hours ago`;
+	}
+	if (diffInMinutes >= 1) {
+		return diffInMinutes === 1
+			? "1 minute ago"
+			: `${diffInMinutes} minutes ago`;
+	}
+	return "just now";
+}
+
 function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
-	let bgColor = "bg-gray-500";
-	let textColor = "text-white";
-	let label = "Unknown";
+	let dotColor = "bg-gray-500";
+	let label = "unknown";
 
 	switch (status) {
 		case "idle":
-			bgColor = "bg-gray-500";
-			textColor = "text-white";
-			label = "Waiting for ingestion";
+			dotColor = "bg-[#B8E8F4]";
+			label = "idle";
 			break;
 		case "running":
-			bgColor = "bg-blue-500";
-			textColor = "text-white";
-			label = "Ingesting";
+			dotColor = "bg-[#39FF7F] animate-custom-pulse";
+			label = "running";
 			break;
 		case "completed":
-			bgColor = "bg-green-500";
-			textColor = "text-white";
-			label = "Ready";
+			dotColor = "bg-[#39FF7F]";
+			label = "ready";
 			break;
 		case "failed":
-			bgColor = "bg-red-500";
-			textColor = "text-white";
-			label = "Error";
+			dotColor = "bg-[#FF3D71]";
+			label = "error";
 			break;
 		default: {
 			const _exhaustiveCheck: never = status;
@@ -130,10 +153,11 @@ function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
 	}
 
 	return (
-		<span
-			className={`${bgColor} ${textColor} text-[10px] leading-[12px] font-semibold px-2 py-0.5 rounded-full`}
-		>
-			{label}
-		</span>
+		<div className="flex items-center gap-1.5 px-2 py-1 rounded-full border border-white/20 w-[80px]">
+			<div className={`w-2 h-2 rounded-full ${dotColor}`} />
+			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist">
+				{label}
+			</span>
+		</div>
 	);
 }
