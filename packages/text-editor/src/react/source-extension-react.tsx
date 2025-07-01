@@ -1,5 +1,5 @@
 import { Node as GiselleNode } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/giselle-engine";
+import { defaultName } from "@giselle-sdk/giselle-engine/react";
 import { SourceExtension } from "@giselle-sdk/text-editor-utils";
 import {
 	type NodeViewProps,
