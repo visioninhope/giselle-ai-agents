@@ -1,9 +1,10 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { CheckIcon } from "lucide-react";
+import { CheckIcon, DatabaseIcon } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
 import { GitHubIcon } from "../../../tool";
 import { GitHubToolConfigurationDialog } from "./tool-provider/github";
+import { PostgresToolConfigurationDialog } from "./tool-provider/postgres";
 
 export function ToolsPanel({
 	node,
@@ -20,6 +21,18 @@ export function ToolsPanel({
 				<div className="flex gap-[10px] items-center">
 					<h3 className="text-text text-[14px]">GitHub</h3>
 					{node.content.tools?.github && (
+						<CheckIcon className="size-[14px] text-success" />
+					)}
+				</div>
+			</ToolListItem>
+			<ToolListItem
+				icon={<DatabaseIcon data-tool-icon />}
+				configurationPanel={<PostgresToolConfigurationDialog node={node} />}
+				availableTools={node.content.tools?.postgres?.tools}
+			>
+				<div className="flex gap-[10px] items-center">
+					<h3 className="text-text text-[14px]">PostgreSQL</h3>
+					{node.content.tools?.postgres && (
 						<CheckIcon className="size-[14px] text-success" />
 					)}
 				</div>
