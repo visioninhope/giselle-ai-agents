@@ -246,13 +246,6 @@
 			"when": 1750920392746,
 			"tag": "0034_steady_roulette",
 			"breakpoints": true
-		},
-		{
-			"idx": 35,
-			"version": "7",
-			"when": 1751272553997,
-			"tag": "0035_secret_spencer_smythe",
-			"breakpoints": true
 		}
 	]
 }
