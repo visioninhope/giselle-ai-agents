@@ -1,6 +1,6 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { octokit } from "@giselle-sdk/github-tool";
-import { and, eq, lt, or } from "drizzle-orm";
+import { and, eq, isNull, lt, or } from "drizzle-orm";
 import type { TargetGitHubRepository } from "./types";
 
 export function buildOctokit(installationId: number) {
@@ -26,7 +26,7 @@ export function buildOctokit(installationId: number) {
  *
  * target repositories are:
  * - idle
- * - failed and retryable
+ * - failed and retryable and retryAfter has passed
  * - running and updated more than 15 minutes ago (stale)
  * - completed and updated more than 24 hours ago (outdated)
  *
@@ -39,6 +39,8 @@ export async function fetchTargetGitHubRepositories(): Promise<
 	const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
 	// To update repository which updated more than 24 hours ago
 	const outdatedThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	// Current time for retryAfter comparison
+	const now = new Date();
 
 	const records = await db
 		.select({
@@ -58,6 +60,10 @@ export async function fetchTargetGitHubRepositories(): Promise<
 				and(
 					eq(githubRepositoryIndex.status, "failed"),
 					eq(githubRepositoryIndex.isRetryable, true),
+					or(
+						isNull(githubRepositoryIndex.retryAfter),
+						lt(githubRepositoryIndex.retryAfter, now),
+					),
 				),
 				and(
 					eq(githubRepositoryIndex.status, "running"),
