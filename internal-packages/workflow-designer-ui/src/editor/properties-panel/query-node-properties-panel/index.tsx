@@ -1,15 +1,19 @@
 import type { QueryNode } from "@giselle-sdk/data-type";
 import {
+	isJsonContent,
+	jsonContentToText,
+} from "@giselle-sdk/text-editor-utils";
+import {
 	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "giselle-sdk/react";
 import { CommandIcon, CornerDownLeft, DatabaseZapIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-
 import { Button } from "../../../ui/button";
+import { useToasts } from "../../../ui/toast";
 import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
@@ -33,8 +37,21 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		});
 	const { all: connectedSources } = useConnectedSources(node);
 	const { layoutV2, layoutV3 } = useFeatureFlag();
+	const { error } = useToasts();
+
+	const query = useMemo(() => {
+		const rawQuery = node.content.query.trim();
+		if (isJsonContent(rawQuery)) {
+			return jsonContentToText(JSON.parse(rawQuery));
+		}
+		return rawQuery;
+	}, [node.content.query]);
 
 	const generate = useCallback(() => {
+		if (query.length === 0) {
+			error("Query is empty");
+			return;
+		}
 		createAndStartGeneration({
 			origin: {
 				type: "workspace",
@@ -54,6 +71,8 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		data.connections,
 		node,
 		createAndStartGeneration,
+		error,
+		query,
 	]);
 
 	return (
@@ -75,6 +94,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 								generate();
 							}
 						}}
+						disabled={query.length === 0}
 						className="w-[150px] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isGenerating ? (
