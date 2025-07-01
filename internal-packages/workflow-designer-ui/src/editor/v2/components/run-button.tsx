@@ -87,9 +87,8 @@ export function RunButton() {
 		<DropdownMenu
 			open={isDropdownOpen}
 			onOpenChange={setIsDropdownOpen}
-			onSelect={async (event, startingNode) => {
-				event.preventDefault();
-				if (!isTriggerNode(startingNode) && isOperationNode(startingNode)) {
+			onSelect={async (_event, startingNode) => {
+				if (isTriggerNode(startingNode) && isOperationNode(startingNode)) {
 					await startOperationFlow(startingNode);
 				}
 			}}
