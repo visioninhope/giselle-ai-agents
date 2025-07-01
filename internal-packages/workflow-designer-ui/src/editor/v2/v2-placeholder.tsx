@@ -1,8 +1,10 @@
 "use client";
 
 import { useFeatureFlag } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "giselle-sdk/react";
 import { useCallback, useState } from "react";
 import { ReadOnlyBanner } from "../../ui/read-only-banner";
+import { WorkspaceTour, tourSteps } from "../workspace-tour";
 import { V2Container, V2Footer, V2Header } from "./components";
 import { RootProvider } from "./components/provider";
 import type { LeftPanelValue, V2LayoutState } from "./state";
@@ -16,10 +18,12 @@ export function V2Placeholder({
 	userRole?: "viewer" | "guest" | "editor" | "owner";
 	onNameChange?: (name: string) => Promise<void>;
 }) {
+	const { data } = useWorkflowDesigner();
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 	const [layoutState, setLayoutState] = useState<V2LayoutState>({
 		leftPanel: null,
 	});
+	const [isTourOpen, setIsTourOpen] = useState(data.nodes.length === 0);
 
 	const handleDismissBanner = useCallback(() => {
 		setShowReadOnlyBanner(false);
@@ -75,6 +79,11 @@ export function V2Placeholder({
 					/>
 				)}
 			</RootProvider>
+			<WorkspaceTour
+				steps={tourSteps}
+				isOpen={isTourOpen}
+				onOpenChange={setIsTourOpen}
+			/>
 		</div>
 	);
 }
