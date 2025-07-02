@@ -1,5 +1,6 @@
 import type { ImageGenerationNode } from "@giselle-sdk/data-type";
 import {
+	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -31,13 +32,8 @@ export function ImageGenerationNodePropertiesPanel({
 }: {
 	node: ImageGenerationNode;
 }) {
-	const {
-		data,
-		updateNodeDataContent,
-		updateNodeData,
-		setUiNodeState,
-		deleteConnection,
-	} = useWorkflowDesigner();
+	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
+		useWorkflowDesigner();
 	const { createAndStartGeneration, isGenerating, stopGeneration } =
 		useNodeGenerations({
 			nodeId: node.id,
@@ -77,6 +73,8 @@ export function ImageGenerationNodePropertiesPanel({
 		usageLimitsReached,
 		error,
 	]);
+
+	const { layoutV2 } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>
@@ -137,7 +135,7 @@ export function ImageGenerationNodePropertiesPanel({
 							>
 								<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 								<Tabs.Trigger value="model">Model</Tabs.Trigger>
-								<Tabs.Trigger value="input">Input</Tabs.Trigger>
+								{!layoutV2 && <Tabs.Trigger value="input">Input</Tabs.Trigger>}
 							</Tabs.List>
 							<Tabs.Content
 								value="prompt"
