@@ -31,13 +31,8 @@ export function ImageGenerationNodePropertiesPanel({
 }: {
 	node: ImageGenerationNode;
 }) {
-	const {
-		data,
-		updateNodeDataContent,
-		updateNodeData,
-		setUiNodeState,
-		deleteConnection,
-	} = useWorkflowDesigner();
+	const { data, updateNodeDataContent, updateNodeData, setUiNodeState } =
+		useWorkflowDesigner();
 	const { createAndStartGeneration, isGenerating, stopGeneration } =
 		useNodeGenerations({
 			nodeId: node.id,
