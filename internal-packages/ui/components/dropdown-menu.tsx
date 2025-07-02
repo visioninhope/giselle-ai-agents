@@ -11,9 +11,24 @@ interface Identifiable {
 
 interface GroupItem<T extends Identifiable> {
 	id: string | number;
-	label: string;
+	groupLabel: string;
 	items: Array<T>;
 }
+
+type RenderItem<
+	T extends Identifiable,
+	TRenderItemAsChild extends boolean,
+> = TRenderItemAsChild extends true
+	? (item: T) => React.ReactElement
+	: (item: T) => React.ReactNode;
+
+// IsArray extends true
+// 	? DoesRenderItemAsChild extends true
+// 		? (item: ItemLike[number]['items']) => React.ReactElement
+// 		: (item: ItemLike[number]) => React.ReactNode
+// 	: DoesRenderItemAsChild extends true
+// 		? (item: ItemLike) => React.ReactElement
+// 		: (item: ItemLike) => React.ReactNode;
 
 interface DropdownMenuProps<
 	T extends Identifiable,
@@ -22,9 +37,7 @@ interface DropdownMenuProps<
 	items: Array<T> | Array<GroupItem<T>>;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: TRenderItemAsChild extends true
-		? (item: T) => React.ReactElement
-		: (item: T) => React.ReactNode;
+	renderItem: RenderItem<T, TRenderItemAsChild>;
 	onSelect?: (event: Event, option: T) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
@@ -36,7 +49,9 @@ interface DropdownMenuProps<
 function isGroupItem<T extends Identifiable>(
 	option: T | GroupItem<T>,
 ): option is GroupItem<T> {
-	return "items" in option && Array.isArray((option as GroupItem<T>).items);
+	return (
+		"groupLabel" in option && Array.isArray((option as GroupItem<T>).items)
+	);
 }
 
 export function DropdownMenu<
@@ -71,7 +86,7 @@ export function DropdownMenu<
 								return (
 									<DropdownMenuPrimitive.Group key={option.id}>
 										<DropdownMenuPrimitive.Label className="text-text-tertiary px-[8px] py-[6px] text-[12px] font-medium">
-											{option.label}
+											{option.groupLabel}
 										</DropdownMenuPrimitive.Label>
 										{option.items.map((item) => (
 											<DropdownMenuPrimitive.Item
