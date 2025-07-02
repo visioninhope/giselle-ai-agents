@@ -192,7 +192,7 @@ function SelectOutputPopover({
 		return [
 			{ label: "Generated Content", nodes: generatedNodes },
 			{ label: "Text", nodes: textNodes },
-		];
+		].filter((group) => group.nodes.length > 0);
 	}, [data.nodes, nodeId]);
 
 	const { addConnection } = useWorkflowDesigner();
