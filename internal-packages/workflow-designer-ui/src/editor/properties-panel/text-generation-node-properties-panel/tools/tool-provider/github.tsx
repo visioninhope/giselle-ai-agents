@@ -19,7 +19,7 @@ import {
 	type ToolConfigurationDialogProps,
 } from "../ui/tool-configuration-dialog";
 import {
-	ToolProviderSecretType,
+	ToolProviderSecretTypeValue,
 	useToolProviderConnection,
 } from "./use-tool-provider-connection";
 
@@ -106,7 +106,7 @@ function GitHubToolConnectionDialog({
 			<Tabs
 				value={tabValue}
 				onValueChange={(value) =>
-					setTabValue(ToolProviderSecretType.parse(value))
+					setTabValue(ToolProviderSecretTypeValue.parse(value))
 				}
 			>
 				<TabsList className="mb-[12px]">
@@ -117,7 +117,7 @@ function GitHubToolConnectionDialog({
 					<Input
 						type="hidden"
 						name="secretType"
-						value={ToolProviderSecretType.enum.create}
+						value={ToolProviderSecretTypeValue.enum.create}
 					/>
 					<div className="flex flex-col gap-[12px]">
 						<fieldset className="flex flex-col">
@@ -183,7 +183,7 @@ function GitHubToolConnectionDialog({
 									<Input
 										type="hidden"
 										name="secretType"
-										value={ToolProviderSecretType.enum.select}
+										value={ToolProviderSecretTypeValue.enum.select}
 									/>
 									<fieldset className="flex flex-col">
 										<label
