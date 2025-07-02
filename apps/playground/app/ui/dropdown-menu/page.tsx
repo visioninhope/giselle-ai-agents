@@ -22,7 +22,7 @@ export default function () {
 						</div>
 					</div>
 				</div>
-				
+
 				<div>
 					<p className="text-text mb-2 text-sm">Group Demo</p>
 					<div className="bg-transparent p-8 rounded-[4px] border border-border shadow-sm text-sans">
