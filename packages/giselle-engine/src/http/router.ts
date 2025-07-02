@@ -377,10 +377,10 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 				secretId: SecretId.schema,
 			}),
-			handler: async ({ input }) =>
-				JsonResponse.json({
-					success: await giselleEngine.deleteSecret(input),
-				}),
+			handler: async ({ input }) => {
+				await giselleEngine.deleteSecret(input);
+				return new Response(null, { status: 204 });
+			},
 		}),
 } as const;
 
