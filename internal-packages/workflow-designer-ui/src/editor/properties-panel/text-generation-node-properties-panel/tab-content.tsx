@@ -50,6 +50,7 @@ export function TextGenerationTabContent({
 	githubTools,
 	sidemenu,
 }: TextGenerationTabContentProps) {
+	const { layoutV2 } = useFeatureFlag();
 	return (
 		<>
 			<Tabs.Root
@@ -69,7 +70,7 @@ export function TextGenerationTabContent({
 				>
 					<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 					<Tabs.Trigger value="model">Model</Tabs.Trigger>
-					<Tabs.Trigger value="input">Input</Tabs.Trigger>
+					{!layoutV2 && <Tabs.Trigger value="input">Input</Tabs.Trigger>}
 					{githubTools && <Tabs.Trigger value="tools">Tools</Tabs.Trigger>}
 				</Tabs.List>
 				<Tabs.Content
