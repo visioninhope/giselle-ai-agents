@@ -17,6 +17,7 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 
+import type { SecretId } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
@@ -26,7 +27,6 @@ import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
-import type { SecretId } from "@giselle-sdk/data-type";
 
 function formatDateTime(timestamp: number): string {
 	const date = new Date(timestamp);
