@@ -1,12 +1,12 @@
 import { Button } from "@giselle-internal/ui/button";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
+import { Input } from "@giselle-internal/ui/input";
 import { Select } from "@giselle-internal/ui/select";
 import { SecretId, type TextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
-import clsx from "clsx/lite";
 import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
 import { useCallback, useMemo, useState, useTransition } from "react";
@@ -157,7 +157,7 @@ function PostgresToolConnectionDialog({
 					<TabsTrigger value="select">Use Saved string</TabsTrigger>
 				</TabsList>
 				<TabsContent value="create">
-					<input
+					<Input
 						type="hidden"
 						name="secretType"
 						value={PostgresToolSetupSecretType.create}
@@ -167,15 +167,7 @@ function PostgresToolConnectionDialog({
 							<label htmlFor="label" className="text-text text-[13px] mb-[2px]">
 								Connection Name
 							</label>
-							<input
-								type="text"
-								id="label"
-								name="label"
-								className={clsx(
-									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-									"focus:border-border-focused",
-								)}
-							/>
+							<Input type="text" id="label" name="label" />
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
 								Give this onnection a short name (e.g. “Prod-DB”). You’ll use it
 								when linking other nodes.
@@ -187,17 +179,13 @@ function PostgresToolConnectionDialog({
 									Connection String
 								</label>
 							</div>
-							<input
+							<Input
 								type="password"
 								autoComplete="off"
 								data-1p-ignore
 								data-lpignore="true"
 								id="pat"
 								name="value"
-								className={clsx(
-									"border border-border rounded-[4px] bg-editor-background outline-none px-[8px] py-[2px] text-[14px]",
-									"focus:border-border-focused",
-								)}
 							/>
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
 								We’ll encrypt the connection string with authenticated
@@ -225,7 +213,7 @@ function PostgresToolConnectionDialog({
 									<p className="text-[11px] text-text-muted my-[4px]">
 										Pick one of your encrypted string to connect.
 									</p>
-									<input
+									<Input
 										type="hidden"
 										name="secretType"
 										value={PostgresToolSetupSecretType.select}
