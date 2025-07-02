@@ -11,22 +11,22 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import z from "zod/v4";
 import { useWorkspaceSecrets } from "../../../../lib/use-workspace-secrets";
 
-export const ToolProviderSecretType = z.enum(["create", "select"]);
+export const ToolProviderSecretTypeValue = z.enum(["create", "select"]);
 
 const ToolProviderSetupPayload = z.discriminatedUnion("secretType", [
 	z.object({
-		secretType: z.literal(ToolProviderSecretType.enum.create),
+		secretType: z.literal(ToolProviderSecretTypeValue.enum.create),
 		label: z.string().min(1),
 		value: z.string().min(1),
 	}),
 	z.object({
-		secretType: z.literal(ToolProviderSecretType.enum.select),
+		secretType: z.literal(ToolProviderSecretTypeValue.enum.select),
 		secretId: SecretId.schema,
 	}),
 ]);
 
 export type ToolProviderSecretType =
-	(typeof ToolProviderSecretType)[keyof typeof ToolProviderSecretType];
+	(typeof ToolProviderSecretTypeValue)[keyof typeof ToolProviderSecretTypeValue];
 export type ToolProviderSetupPayload = z.infer<typeof ToolProviderSetupPayload>;
 
 export function useToolProviderConnection<T extends keyof ToolSet>(config: {
