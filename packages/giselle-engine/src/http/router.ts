@@ -298,6 +298,7 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 				label: z.string(),
 				value: z.string(),
+				tags: z.array(z.string()).optional(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
@@ -308,6 +309,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
+				tags: z.array(z.string()).optional(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({

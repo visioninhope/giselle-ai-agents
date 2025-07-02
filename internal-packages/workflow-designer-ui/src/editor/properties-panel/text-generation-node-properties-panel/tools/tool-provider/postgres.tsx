@@ -34,6 +34,8 @@ const PostgresToolSetupPayload = z.discriminatedUnion("secretType", [
 	}),
 ]);
 
+const secretTags = ["postgres-connection-string"];
+
 export function PostgresToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
@@ -68,7 +70,7 @@ function PostgresToolConnectionDialog({
 }) {
 	const [tabValue, setTabValue] = useState("create");
 	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
-	const { isLoading, data, mutate } = useWorkspaceSecrets();
+	const { isLoading, data, mutate } = useWorkspaceSecrets(secretTags);
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const setupPostgresTool = useCallback<
@@ -100,6 +102,7 @@ function PostgresToolConnectionDialog({
 							workspaceId: workspace.id,
 							label: payload.label,
 							value: payload.value,
+							tags: secretTags,
 						});
 						mutate([...(data ?? []), result.secret]);
 						updateNodeDataContent(node, {

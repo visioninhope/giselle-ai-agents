@@ -6,10 +6,20 @@ import { workspaceSecretIndexPath } from "./paths";
 export async function getWorkspaceSecrets(args: {
 	context: GiselleEngineContext;
 	workspaceId: WorkspaceId;
+	tags?: string[];
 }) {
-	return await getWorkspaceIndex({
+	const secrets = await getWorkspaceIndex({
 		storage: args.context.storage,
 		indexPath: workspaceSecretIndexPath(args.workspaceId),
 		itemSchema: SecretIndex,
+	});
+
+	if (args.tags === undefined || args.tags.length === 0) {
+		return secrets;
+	}
+
+	return secrets.filter((secret) => {
+		const secretTags = secret.tags ?? [];
+		return args.tags?.every((tag) => secretTags.includes(tag));
 	});
 }

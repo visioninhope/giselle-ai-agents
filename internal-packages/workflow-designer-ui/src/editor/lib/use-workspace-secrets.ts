@@ -3,16 +3,18 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import useSWR from "swr";
-
-export function useWorkspaceSecrets() {
+export function useWorkspaceSecrets(tags?: string[]) {
 	const { data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 	return useSWR(
 		{
 			namespace: "get-workspace-secrets",
 			workspaceId: data.id,
+			tags: tags ?? [],
 		},
-		({ workspaceId }) =>
-			client.getWorkspaceSecrets({ workspaceId }).then((res) => res.secrets),
+		({ workspaceId, tags }) =>
+			client
+				.getWorkspaceSecrets({ workspaceId, tags })
+				.then((res) => res.secrets),
 	);
 }

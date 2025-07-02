@@ -13,6 +13,7 @@ export async function addSecret(args: {
 	label: string;
 	value: string;
 	workspaceId: WorkspaceId;
+	tags?: string[];
 }) {
 	const encryptedValue = await args.context.vault.encrypt(args.value);
 
@@ -22,6 +23,7 @@ export async function addSecret(args: {
 		value: encryptedValue,
 		createdAt: Date.now(),
 		workspaceId: args.workspaceId,
+		tags: args.tags,
 	};
 
 	await Promise.all([

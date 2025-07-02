@@ -219,11 +219,13 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 			label: string;
 			value: string;
+			tags?: string[];
 		}) {
 			return await addSecret({ ...args, context });
 		},
 		async getWorkspaceSecrets(args: {
 			workspaceId: WorkspaceId;
+			tags?: string[];
 		}) {
 			return await getWorkspaceSecrets({ ...args, context });
 		},
