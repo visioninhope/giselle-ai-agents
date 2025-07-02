@@ -75,7 +75,6 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		query,
 	]);
 
-	const { layoutV2 } = useFeatureFlag();
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
