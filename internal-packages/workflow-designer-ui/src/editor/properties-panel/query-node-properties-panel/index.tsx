@@ -75,6 +75,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		query,
 	]);
 
+	const { layoutV2 } = useFeatureFlag();
 	return (
 		<PropertiesPanelRoot>
 			<PropertiesPanelHeader
@@ -123,7 +124,9 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 								>
 									<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 										<Tabs.Trigger value="query">Query</Tabs.Trigger>
-										<Tabs.Trigger value="input">Input</Tabs.Trigger>
+										{!layoutV2 && (
+											<Tabs.Trigger value="input">Input</Tabs.Trigger>
+										)}
 									</Tabs.List>
 									<Tabs.Content
 										value="query"
