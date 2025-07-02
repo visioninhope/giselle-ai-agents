@@ -17,7 +17,7 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 
-import type { SecretId } from "@giselle-sdk/data-type";
+import { type SecretId, isTextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
@@ -45,7 +45,7 @@ const SecretPayload = z.object({
 
 export function SecretTable() {
 	const [presentDialog, setPresentDialog] = useState(false);
-	const { data: workspace } = useWorkflowDesigner();
+	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const { isLoading, data, mutate } = useWorkspaceSecrets();
 	const [isPending, startTransition] = useTransition();
 	const client = useGiselleEngine();
@@ -82,6 +82,35 @@ export function SecretTable() {
 	const handleDelete = useCallback(
 		(secretId: SecretId) => {
 			startTransition(async () => {
+				for (const node of workspace.nodes) {
+					if (!isTextGenerationNode(node)) {
+						continue;
+					}
+					const tools = node.content.tools;
+					if (!tools) {
+						continue;
+					}
+					let changed = false;
+					const newTools = { ...tools };
+					if (
+						tools.github?.auth.type === "secret" &&
+						tools.github.auth.secretId === secretId
+					) {
+						newTools.github = undefined;
+						changed = true;
+					}
+					if (tools.postgres?.secretId === secretId) {
+						newTools.postgres = undefined;
+						changed = true;
+					}
+					if (changed) {
+						updateNodeDataContent(node, {
+							...node.content,
+							tools: newTools,
+						});
+					}
+				}
+
 				await client.deleteSecret({
 					workspaceId: workspace.id,
 					secretId,
@@ -89,7 +118,14 @@ export function SecretTable() {
 				await mutate((data ?? []).filter((secret) => secret.id !== secretId));
 			});
 		},
-		[client, workspace.id, data, mutate],
+		[
+			client,
+			workspace.id,
+			data,
+			mutate,
+			workspace.nodes,
+			updateNodeDataContent,
+		],
 	);
 
 	if (isLoading) {
