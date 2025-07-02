@@ -22,7 +22,7 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
@@ -74,6 +74,19 @@ export function SecretTable() {
 				await mutate([...(data ?? []), result.secret]);
 			});
 			setPresentDialog(false);
+		},
+		[client, workspace.id, data, mutate],
+	);
+
+	const handleDelete = useCallback(
+		(secretId: string) => {
+			startTransition(async () => {
+				await client.deleteSecret({
+					workspaceId: workspace.id,
+					secretId,
+				});
+				await mutate((data ?? []).filter((secret) => secret.id !== secretId));
+			});
 		},
 		[client, workspace.id, data, mutate],
 	);
@@ -166,6 +179,7 @@ export function SecretTable() {
 						<TableRow>
 							<TableHead>Name</TableHead>
 							<TableHead>Created at</TableHead>
+							<TableHead />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -173,6 +187,17 @@ export function SecretTable() {
 							<TableRow key={data.id}>
 								<TableCell>{data.label}</TableCell>
 								<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+								<TableCell className="w-[1%] whitespace-nowrap">
+									<Button
+										variant="outline"
+										size="compact"
+										leftIcon={<TrashIcon className="size-[12px]" />}
+										onClick={() => handleDelete(data.id)}
+										disabled={isPending}
+									>
+										Delete
+									</Button>
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
