@@ -1,3 +1,5 @@
+import { Button } from "@giselle-internal/ui/button";
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
 	type ConnectionId,
 	type GitHubActionCommandConfiguredState,
@@ -9,14 +11,14 @@ import {
 	isTextNode,
 } from "@giselle-sdk/data-type";
 import { githubActionIdToLabel, githubActions } from "@giselle-sdk/flow";
-import { defaultName } from "@giselle-sdk/giselle-engine/react";
+import { defaultName, useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
 import { TrashIcon, TriangleAlert } from "lucide-react";
-import { DropdownMenu } from "radix-ui";
+import { DropdownMenu as RadixDropdownMenu } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 import { NodeIcon } from "../../../../icons/node";
@@ -192,7 +194,7 @@ function SelectOutputPopover({
 		return [
 			{ label: "Generated Content", nodes: generatedNodes },
 			{ label: "Text", nodes: textNodes },
-		];
+		].filter((group) => group.nodes.length > 0);
 	}, [data.nodes, nodeId]);
 
 	const { addConnection } = useWorkflowDesigner();
@@ -212,9 +214,29 @@ function SelectOutputPopover({
 		[node, addConnection, input],
 	);
 
+	const { layoutV2 } = useFeatureFlag();
+	if (layoutV2) {
+		return (
+			<DropdownMenu
+				trigger={<Button>Select Source</Button>}
+				items={groupedOutputs.map((groupedOutput) => ({
+					groupId: groupedOutput.label,
+					groupLabel: groupedOutput.label,
+					items: groupedOutput.nodes,
+				}))}
+				renderItem={(item) => (
+					<p className="text-[12px] truncate">
+						{item.node.name ?? defaultName(item.node)} / {item.label}
+					</p>
+				)}
+				onSelect={(_event, item) => handleSelectOutput(item.node, item.id)}
+			/>
+		);
+	}
+
 	return (
-		<DropdownMenu.Root>
-			<DropdownMenu.Trigger
+		<RadixDropdownMenu.Root>
+			<RadixDropdownMenu.Trigger
 				className={clsx(
 					"flex items-center cursor-pointer p-[10px] rounded-[8px]",
 					"border border-transparent hover:border-white-800",
@@ -223,9 +245,9 @@ function SelectOutputPopover({
 				)}
 			>
 				Select Source
-			</DropdownMenu.Trigger>
-			<DropdownMenu.Portal>
-				<DropdownMenu.Content
+			</RadixDropdownMenu.Trigger>
+			<RadixDropdownMenu.Portal>
+				<RadixDropdownMenu.Content
 					className={clsx(
 						"relative w-[300px] py-[8px]",
 						"rounded-[8px] border-[1px] bg-black-900/60 backdrop-blur-[8px]",
@@ -243,15 +265,15 @@ function SelectOutputPopover({
 						<div className="grow flex flex-col pb-[8px] gap-[8px] overflow-y-auto min-h-0">
 							{groupedOutputs.map((groupedOutput) =>
 								groupedOutput.nodes.length === 0 ? null : (
-									<DropdownMenu.Group
+									<RadixDropdownMenu.Group
 										className="flex flex-col px-[8px]"
 										key={groupedOutput.label}
 									>
-										<DropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
+										<RadixDropdownMenu.Label className="py-[4px] px-[8px] text-black-400 text-[10px] font-[700]">
 											{groupedOutput.label}
-										</DropdownMenu.Label>
+										</RadixDropdownMenu.Label>
 										{groupedOutput.nodes.map((output) => (
-											<DropdownMenu.Item
+											<RadixDropdownMenu.Item
 												key={output.id}
 												className={clsx(
 													"group flex p-[8px] justify-between rounded-[8px] hover:bg-primary-900/50 transition-colors cursor-pointer",
@@ -266,15 +288,15 @@ function SelectOutputPopover({
 												<p className="text-[12px] truncate">
 													{defaultName(output.node)} / {output.label}
 												</p>
-											</DropdownMenu.Item>
+											</RadixDropdownMenu.Item>
 										))}
-									</DropdownMenu.Group>
+									</RadixDropdownMenu.Group>
 								),
 							)}
 						</div>
 					</div>
-				</DropdownMenu.Content>
-			</DropdownMenu.Portal>
-		</DropdownMenu.Root>
+				</RadixDropdownMenu.Content>
+			</RadixDropdownMenu.Portal>
+		</RadixDropdownMenu.Root>
 	);
 }

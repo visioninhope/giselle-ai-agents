@@ -9,17 +9,35 @@ interface Identifiable {
 	id: string | number;
 }
 
+interface GroupItem<T extends Identifiable> {
+	groupId: string | number;
+	groupLabel: string;
+	items: Array<T>;
+}
+
+type ItemLike = Identifiable | GroupItem<Identifiable>;
+
 interface DropdownMenuProps<
-	T extends Identifiable,
+	T extends Array<ItemLike>,
 	TRenderItemAsChild extends boolean,
 > {
-	items: Array<T>;
+	items: T;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: TRenderItemAsChild extends true
-		? (item: T) => React.ReactElement
-		: (item: T) => React.ReactNode;
-	onSelect?: (event: Event, option: T) => void;
+	renderItem: T[number] extends GroupItem<infer I>
+		? (
+				item: I,
+			) => TRenderItemAsChild extends true
+				? React.ReactElement
+				: React.ReactNode
+		: (
+				item: T[number],
+			) => TRenderItemAsChild extends true
+				? React.ReactElement
+				: React.ReactNode;
+	onSelect?: T[number] extends GroupItem<infer I>
+		? (event: Event, option: I) => void
+		: (event: Event, option: T[number]) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
@@ -27,8 +45,16 @@ interface DropdownMenuProps<
 	onOpenChange?: DropdownMenuPrimitive.DropdownMenuProps["onOpenChange"];
 }
 
+function isGroupItem<T extends Identifiable>(
+	option: T | GroupItem<T>,
+): option is GroupItem<T> {
+	return (
+		"groupLabel" in option && Array.isArray((option as GroupItem<T>).items)
+	);
+}
+
 export function DropdownMenu<
-	T extends Identifiable,
+	T extends Array<ItemLike>,
 	TRenderItemAsChild extends boolean = false,
 >({
 	trigger,
@@ -54,20 +80,45 @@ export function DropdownMenu<
 					className={clsx("z-10", widthClassName)}
 				>
 					<PopoverContent>
-						{items.map((option) => (
-							<DropdownMenuPrimitive.Item
-								asChild={renderItemAsChild}
-								key={option.id}
-								onSelect={(event) => onSelect?.(event, option)}
-								className={clsx(
-									"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
-									"rounded-[4px] px-[8px] py-[6px] text-[14px]",
-									"flex items-center justify-between gap-[4px]",
-								)}
-							>
-								{renderItem(option)}
-							</DropdownMenuPrimitive.Item>
-						))}
+						{items.map((option) => {
+							if (isGroupItem(option)) {
+								return (
+									<DropdownMenuPrimitive.Group key={option.groupId}>
+										<DropdownMenuPrimitive.Label className="text-text-tertiary px-[8px] py-[6px] text-[12px] font-medium">
+											{option.groupLabel}
+										</DropdownMenuPrimitive.Label>
+										{option.items.map((item) => (
+											<DropdownMenuPrimitive.Item
+												asChild={renderItemAsChild}
+												key={item.id}
+												onSelect={(event) => onSelect?.(event, item)}
+												className={clsx(
+													"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+													"rounded-[4px] px-[8px] py-[6px] text-[14px]",
+													"flex items-center justify-between gap-[4px]",
+												)}
+											>
+												{renderItem(item)}
+											</DropdownMenuPrimitive.Item>
+										))}
+									</DropdownMenuPrimitive.Group>
+								);
+							}
+							return (
+								<DropdownMenuPrimitive.Item
+									asChild={renderItemAsChild}
+									key={option.id}
+									onSelect={(event) => onSelect?.(event, option)}
+									className={clsx(
+										"text-text outline-none cursor-pointer hover:bg-ghost-element-hover",
+										"rounded-[4px] px-[8px] py-[6px] text-[14px]",
+										"flex items-center justify-between gap-[4px]",
+									)}
+								>
+									{renderItem(option)}
+								</DropdownMenuPrimitive.Item>
+							);
+						})}
 					</PopoverContent>
 				</DropdownMenuPrimitive.Content>
 			</DropdownMenuPrimitive.Portal>
