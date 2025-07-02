@@ -17,12 +17,13 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 
+import { type SecretId, isTextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
@@ -44,7 +45,7 @@ const SecretPayload = z.object({
 
 export function SecretTable() {
 	const [presentDialog, setPresentDialog] = useState(false);
-	const { data: workspace } = useWorkflowDesigner();
+	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const { isLoading, data, mutate } = useWorkspaceSecrets();
 	const [isPending, startTransition] = useTransition();
 	const client = useGiselleEngine();
@@ -76,6 +77,55 @@ export function SecretTable() {
 			setPresentDialog(false);
 		},
 		[client, workspace.id, data, mutate],
+	);
+
+	const handleDelete = useCallback(
+		(secretId: SecretId) => {
+			startTransition(async () => {
+				for (const node of workspace.nodes) {
+					if (!isTextGenerationNode(node)) {
+						continue;
+					}
+					const tools = node.content.tools;
+					if (!tools) {
+						continue;
+					}
+					let changed = false;
+					const newTools = { ...tools };
+					if (
+						tools.github?.auth.type === "secret" &&
+						tools.github.auth.secretId === secretId
+					) {
+						newTools.github = undefined;
+						changed = true;
+					}
+					if (tools.postgres?.secretId === secretId) {
+						newTools.postgres = undefined;
+						changed = true;
+					}
+					if (changed) {
+						updateNodeDataContent(node, {
+							...node.content,
+							tools: newTools,
+						});
+					}
+				}
+
+				await client.deleteSecret({
+					workspaceId: workspace.id,
+					secretId,
+				});
+				await mutate((data ?? []).filter((secret) => secret.id !== secretId));
+			});
+		},
+		[
+			client,
+			workspace.id,
+			data,
+			mutate,
+			workspace.nodes,
+			updateNodeDataContent,
+		],
 	);
 
 	if (isLoading) {
@@ -166,6 +216,7 @@ export function SecretTable() {
 						<TableRow>
 							<TableHead>Name</TableHead>
 							<TableHead>Created at</TableHead>
+							<TableHead />
 						</TableRow>
 					</TableHeader>
 					<TableBody>
@@ -173,6 +224,17 @@ export function SecretTable() {
 							<TableRow key={data.id}>
 								<TableCell>{data.label}</TableCell>
 								<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+								<TableCell className="w-[1%] whitespace-nowrap">
+									<Button
+										variant="outline"
+										size="compact"
+										leftIcon={<TrashIcon className="size-[12px]" />}
+										onClick={() => handleDelete(data.id)}
+										disabled={isPending}
+									>
+										Delete
+									</Button>
+								</TableCell>
 							</TableRow>
 						))}
 					</TableBody>
