@@ -9,6 +9,7 @@ import {
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	SecretId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -369,6 +370,17 @@ export const createJsonRouters = {
 				JsonResponse.json({
 					runs: await giselleEngine.getWorkspaceFlowRuns(input),
 				}),
+		}),
+	deleteSecret: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				secretId: SecretId.schema,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.deleteSecret(input);
+				return new Response(null, { status: 204 });
+			},
 		}),
 } as const;
 
