@@ -36,7 +36,9 @@ interface DropdownMenuProps<
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
 	renderItem: RenderItem<T[number], TRenderItemAsChild>;
-	onSelect?: (event: Event, option: T[number]) => void;
+	onSelect?: T[number] extends GroupItem<infer I>
+		? (event: Event, option: I) => void
+		: (event: Event, option: T[number]) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
