@@ -94,9 +94,9 @@ export function createGitHubBlobDownloadLoader(
 
 	function isValidPath(path: string): boolean {
 		// Prevent path traversal attacks
-		return (
-			!path.includes("..") && !path.startsWith("/") && !path.includes("\0")
-		);
+		const segments = path.split(/[/\\]/);
+		const hasTraversal = segments.some((segment) => segment === "..");
+		return !hasTraversal && !path.startsWith("/") && !path.includes("\0");
 	}
 
 	const loadMetadata = async function* (): AsyncIterable<GitHubBlobMetadata> {
