@@ -220,7 +220,7 @@ function SelectOutputPopover({
 			<DropdownMenu
 				trigger={<Button>Select Source</Button>}
 				items={groupedOutputs.map((groupedOutput) => ({
-					id: groupedOutput.label,
+					groupId: groupedOutput.label,
 					groupLabel: groupedOutput.label,
 					items: groupedOutput.nodes,
 				}))}

@@ -10,23 +10,12 @@ interface Identifiable {
 }
 
 interface GroupItem<T extends Identifiable> {
-	id: string | number;
+	groupId: string | number;
 	groupLabel: string;
 	items: Array<T>;
 }
 
 type ItemLike = Identifiable | GroupItem<Identifiable>;
-
-type RenderItem<
-	T extends ItemLike,
-	TRenderItemAsChild extends boolean,
-> = T extends GroupItem<infer I>
-	? (
-			item: I,
-		) => TRenderItemAsChild extends true ? React.ReactElement : React.ReactNode
-	: (
-			item: T,
-		) => TRenderItemAsChild extends true ? React.ReactElement : React.ReactNode;
 
 interface DropdownMenuProps<
 	T extends Array<ItemLike>,
@@ -35,7 +24,17 @@ interface DropdownMenuProps<
 	items: T;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: RenderItem<T[number], TRenderItemAsChild>;
+	renderItem: T[number] extends GroupItem<infer I>
+		? (
+				item: I,
+			) => TRenderItemAsChild extends true
+				? React.ReactElement
+				: React.ReactNode
+		: (
+				item: T[number],
+			) => TRenderItemAsChild extends true
+				? React.ReactElement
+				: React.ReactNode;
 	onSelect?: T[number] extends GroupItem<infer I>
 		? (event: Event, option: I) => void
 		: (event: Event, option: T[number]) => void;
@@ -84,7 +83,7 @@ export function DropdownMenu<
 						{items.map((option) => {
 							if (isGroupItem(option)) {
 								return (
-									<DropdownMenuPrimitive.Group key={option.id}>
+									<DropdownMenuPrimitive.Group key={option.groupId}>
 										<DropdownMenuPrimitive.Label className="text-text-tertiary px-[8px] py-[6px] text-[12px] font-medium">
 											{option.groupLabel}
 										</DropdownMenuPrimitive.Label>
