@@ -1,3 +1,5 @@
+import { Button } from "@giselle-internal/ui/button";
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
 	type ConnectionId,
 	type GitHubActionCommandConfiguredState,
@@ -211,6 +213,26 @@ function SelectOutputPopover({
 		},
 		[node, addConnection, input],
 	);
+
+	const { layoutV2 } = useFeatureFlag();
+	if (layoutV2) {
+		return (
+			<DropdownMenu
+				trigger={<Button>Select Source</Button>}
+				items={groupedOutputs.map((groupedOutput) => ({
+					id: groupedOutput.label,
+					groupLabel: groupedOutput.label,
+					items: groupedOutput.nodes,
+				}))}
+				renderItem={(item) => (
+					<p className="text-[12px] truncate">
+						{item.node.name ?? defaultName(item.node)} / {item.label}
+					</p>
+				)}
+				onSelect={(_event, item) => handleSelectOutput(item.node, item.id)}
+			/>
+		);
+	}
 
 	return (
 		<RadixDropdownMenu.Root>
