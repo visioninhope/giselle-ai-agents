@@ -16,6 +16,10 @@ test.describe("Header menu navigation", () => {
 			url: "/settings/team/integrations",
 		},
 		{
+			label: "Vector Stores",
+			url: "/settings/team/vector-stores",
+		},
+		{
 			label: "Usage menu",
 			url: "/settings/team/usage",
 		},
