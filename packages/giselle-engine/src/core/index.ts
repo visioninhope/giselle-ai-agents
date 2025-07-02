@@ -9,6 +9,7 @@ import type {
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	SecretId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -48,7 +49,7 @@ import {
 } from "./github";
 import { executeAction } from "./operations";
 import { executeQuery } from "./operations/execute-query";
-import { addSecret, getWorkspaceSecrets } from "./secrets";
+import { addSecret, deleteSecret, getWorkspaceSecrets } from "./secrets";
 import { addWebPage } from "./sources";
 import type { GiselleEngineConfig, GiselleEngineContext } from "./types";
 import {
@@ -257,6 +258,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 		}) {
 			return getWorkspaceFlowRuns({ ...args, context });
+		},
+		deleteSecret(args: {
+			workspaceId: WorkspaceId;
+			secretId: SecretId;
+		}) {
+			return deleteSecret({ ...args, context });
 		},
 	};
 }
