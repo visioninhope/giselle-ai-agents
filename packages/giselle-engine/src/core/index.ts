@@ -219,6 +219,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 			label: string;
 			value: string;
+			tags?: string[];
 		}) {
 			return await addSecret({ ...args, context });
 		},
