@@ -26,6 +26,7 @@ import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
+import type { SecretId } from "@giselle-sdk/data-type";
 
 function formatDateTime(timestamp: number): string {
 	const date = new Date(timestamp);
@@ -79,7 +80,7 @@ export function SecretTable() {
 	);
 
 	const handleDelete = useCallback(
-		(secretId: string) => {
+		(secretId: SecretId) => {
 			startTransition(async () => {
 				await client.deleteSecret({
 					workspaceId: workspace.id,
