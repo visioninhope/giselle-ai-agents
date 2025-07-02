@@ -11,19 +11,16 @@ import { useCallback, useMemo, useState, useTransition } from "react";
 import z from "zod/v4";
 import { useWorkspaceSecrets } from "../../../../lib/use-workspace-secrets";
 
-export const ToolProviderSecretType = {
-	create: "create",
-	select: "select",
-} as const;
+export const ToolProviderSecretType = z.enum(["create", "select"]);
 
 const ToolProviderSetupPayload = z.discriminatedUnion("secretType", [
 	z.object({
-		secretType: z.literal(ToolProviderSecretType.create),
+		secretType: z.literal(ToolProviderSecretType.enum.create),
 		label: z.string().min(1),
 		value: z.string().min(1),
 	}),
 	z.object({
-		secretType: z.literal(ToolProviderSecretType.select),
+		secretType: z.literal(ToolProviderSecretType.enum.select),
 		secretId: SecretId.schema,
 	}),
 ]);
@@ -36,7 +33,7 @@ export function useToolProviderConnection<T extends keyof ToolSet>(config: {
 	secretTags: string[];
 	toolKey: T;
 	node: TextGenerationNode;
-	buildToolConfig: (secretId: string) => ToolSet[T];
+	buildToolConfig: (secretId: SecretId) => ToolSet[T];
 }) {
 	const { secretTags, toolKey, node, buildToolConfig } = config;
 	const [presentDialog, setPresentDialog] = useState(false);

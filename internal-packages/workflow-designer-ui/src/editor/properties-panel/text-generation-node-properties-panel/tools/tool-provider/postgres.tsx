@@ -8,9 +8,11 @@ import {
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
 import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
+import { useCallback } from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
 	ToolConfigurationDialog,
@@ -98,7 +100,12 @@ function PostgresToolConnectionDialog({
 			open={open}
 			onOpenChange={onOpenChange}
 		>
-			<Tabs value={tabValue} onValueChange={setTabValue}>
+			<Tabs
+				value={tabValue}
+				onValueChange={(value) =>
+					setTabValue(ToolProviderSecretType.parse(value))
+				}
+			>
 				<TabsList className="mb-[12px]">
 					<TabsTrigger value="create">Paste connection string</TabsTrigger>
 					<TabsTrigger value="select">Use Saved string</TabsTrigger>
@@ -107,7 +114,7 @@ function PostgresToolConnectionDialog({
 					<Input
 						type="hidden"
 						name="secretType"
-						value={ToolProviderSecretType.create}
+						value={ToolProviderSecretType.enum.create}
 					/>
 					<div className="flex flex-col gap-[12px]">
 						<fieldset className="flex flex-col">
@@ -163,7 +170,7 @@ function PostgresToolConnectionDialog({
 									<Input
 										type="hidden"
 										name="secretType"
-										value={ToolProviderSecretType.select}
+										value={ToolProviderSecretType.enum.select}
 									/>
 									<fieldset className="flex flex-col">
 										<label
