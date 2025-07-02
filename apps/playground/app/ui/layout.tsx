@@ -6,6 +6,10 @@ const components = [
 		name: "Button",
 	},
 	{
+		id: "input",
+		name: "Input",
+	},
+	{
 		id: "dialog",
 		name: "Dialog",
 	},
