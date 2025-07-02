@@ -1,5 +1,6 @@
 import { graphql as gql } from "./graphql";
 export * from "./blob-loader";
+export * from "./blob-download-loader";
 export * from "./issues";
 export * from "./octokit";
 export * from "./repository";

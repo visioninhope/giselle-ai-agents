@@ -29,7 +29,8 @@
 		"@octokit/openapi-types": "catalog:",
 		"@types/node": "catalog:",
 		"tsup": "catalog:",
-		"vitest": "catalog:"
+		"vitest": "catalog:",
+		"@types/tar": "catalog:"
 	},
 	"dependencies": {
 		"@giselle-sdk/rag": "workspace:*",
@@ -43,6 +44,7 @@
 		"gql.tada": "catalog:",
 		"graphql": "catalog:",
 		"urql": "catalog:",
-		"zod": "catalog:"
+		"zod": "catalog:",
+		"tar": "catalog:"
 	}
 }

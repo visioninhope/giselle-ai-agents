@@ -1,6 +1,9 @@
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
-import { createGitHubBlobLoader } from "@giselle-sdk/github-tool";
+import {
+	createGitHubBlobDownloadLoader,
+	createGitHubBlobLoader,
+} from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import { and, eq } from "drizzle-orm";
@@ -13,16 +16,18 @@ export async function ingestGitHubBlobs(params: {
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
 }): Promise<void> {
-	const repositoryIndexDbId = await getRepositoryIndexDbId(
+	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
 		params.teamDbId,
 	);
 
-	const githubLoader = createGitHubBlobLoader(
-		params.octokitClient,
-		params.source,
-		{ maxBlobSize: 1 * 1024 * 1024 },
-	);
+	const githubLoader = isInitialIngest
+		? createGitHubBlobDownloadLoader(params.octokitClient, params.source, {
+				maxBlobSize: 1 * 1024 * 1024,
+			})
+		: createGitHubBlobLoader(params.octokitClient, params.source, {
+				maxBlobSize: 1 * 1024 * 1024,
+			});
 	const chunkStore = createGitHubBlobChunkStore(repositoryIndexDbId);
 
 	const ingest = createPipeline({
@@ -44,14 +49,18 @@ export async function ingestGitHubBlobs(params: {
 }
 
 /**
- * Get repository index database ID
+ * Get repository index info including whether this is an initial ingest
  */
-async function getRepositoryIndexDbId(
+async function getRepositoryIndexInfo(
 	source: { owner: string; repo: string },
 	teamDbId: number,
-): Promise<number> {
+): Promise<{ repositoryIndexDbId: number; isInitialIngest: boolean }> {
 	const repositoryIndex = await db
-		.select({ dbId: githubRepositoryIndex.dbId })
+		.select({
+			dbId: githubRepositoryIndex.dbId,
+			status: githubRepositoryIndex.status,
+			lastIngestedCommitSha: githubRepositoryIndex.lastIngestedCommitSha,
+		})
 		.from(githubRepositoryIndex)
 		.where(
 			and(
@@ -68,5 +77,8 @@ async function getRepositoryIndexDbId(
 		);
 	}
 
-	return repositoryIndex[0].dbId;
+	const { dbId, status, lastIngestedCommitSha } = repositoryIndex[0];
+	const isInitialIngest = status === "idle" || lastIngestedCommitSha === null;
+
+	return { repositoryIndexDbId: dbId, isInitialIngest };
 }
