@@ -78,7 +78,7 @@ async function getRepositoryIndexInfo(
 	}
 
 	const { dbId, status, lastIngestedCommitSha } = repositoryIndex[0];
-	const isInitialIngest = status === "idle" || lastIngestedCommitSha === null;
+	const isInitialIngest = lastIngestedCommitSha === null;
 
 	return { repositoryIndexDbId: dbId, isInitialIngest };
 }
