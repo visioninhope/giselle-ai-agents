@@ -15,30 +15,28 @@ interface GroupItem<T extends Identifiable> {
 	items: Array<T>;
 }
 
-type RenderItem<
-	T extends Identifiable,
-	TRenderItemAsChild extends boolean,
-> = TRenderItemAsChild extends true
-	? (item: T) => React.ReactElement
-	: (item: T) => React.ReactNode;
+type ItemLike = Identifiable | GroupItem<Identifiable>;
 
-// IsArray extends true
-// 	? DoesRenderItemAsChild extends true
-// 		? (item: ItemLike[number]['items']) => React.ReactElement
-// 		: (item: ItemLike[number]) => React.ReactNode
-// 	: DoesRenderItemAsChild extends true
-// 		? (item: ItemLike) => React.ReactElement
-// 		: (item: ItemLike) => React.ReactNode;
+type RenderItem<
+	T extends ItemLike,
+	TRenderItemAsChild extends boolean,
+> = T extends GroupItem<infer I>
+	? TRenderItemAsChild extends true
+		? (item: I) => React.ReactElement
+		: (item: I) => React.ReactNode
+	: TRenderItemAsChild extends true
+		? (item: T) => React.ReactElement
+		: (item: T) => React.ReactNode;
 
 interface DropdownMenuProps<
-	T extends Identifiable,
+	T extends Array<ItemLike>,
 	TRenderItemAsChild extends boolean,
 > {
-	items: Array<T> | Array<GroupItem<T>>;
+	items: T;
 	trigger: React.ReactNode;
 	renderItemAsChild?: TRenderItemAsChild;
-	renderItem: RenderItem<T, TRenderItemAsChild>;
-	onSelect?: (event: Event, option: T) => void;
+	renderItem: RenderItem<T[number], TRenderItemAsChild>;
+	onSelect?: (event: Event, option: T[number]) => void;
 	widthClassName?: string;
 	sideOffset?: DropdownMenuPrimitive.DropdownMenuContentProps["sideOffset"];
 	align?: DropdownMenuPrimitive.DropdownMenuContentProps["align"];
@@ -55,7 +53,7 @@ function isGroupItem<T extends Identifiable>(
 }
 
 export function DropdownMenu<
-	T extends Identifiable,
+	T extends Array<ItemLike>,
 	TRenderItemAsChild extends boolean = false,
 >({
 	trigger,
