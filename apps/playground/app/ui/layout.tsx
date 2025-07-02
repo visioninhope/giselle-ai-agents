@@ -25,6 +25,10 @@ const components = [
 		id: "toggle",
 		name: "Toggle",
 	},
+	{
+		id: "table",
+		name: "Table",
+	},
 ];
 export default function ({
 	children,

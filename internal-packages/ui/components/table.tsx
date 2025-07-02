@@ -4,13 +4,10 @@ import clsx from "clsx/lite";
 
 function Table({ className, ...props }: React.ComponentProps<"table">) {
 	return (
-		<div
-			data-slot="table-container"
-			className="relative w-full overflow-x-auto bg-background/25 rounded-[4px] border border-border"
-		>
+		<div data-slot="table-container" className="overflow-auto">
 			<table
 				data-slot="table"
-				className={clsx("w-full caption-bottom text-[13px]", className)}
+				className={clsx("w-full text-sm", className)}
 				{...props}
 			/>
 		</div>
@@ -19,21 +16,13 @@ function Table({ className, ...props }: React.ComponentProps<"table">) {
 
 function TableHeader({ className, ...props }: React.ComponentProps<"thead">) {
 	return (
-		<thead
-			data-slot="table-header"
-			className={clsx("[&>tr]:border-b [&_tr]:border-b", className)}
-			{...props}
-		/>
+		<thead data-slot="table-header" className={clsx(className)} {...props} />
 	);
 }
 
 function TableBody({ className, ...props }: React.ComponentProps<"tbody">) {
 	return (
-		<tbody
-			data-slot="table-body"
-			className={clsx("[&>tr]:border-b [&_tr:last-child]:border-0", className)}
-			{...props}
-		/>
+		<tbody data-slot="table-body" className={clsx(className)} {...props} />
 	);
 }
 
@@ -54,10 +43,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
 	return (
 		<tr
 			data-slot="table-row"
-			className={clsx(
-				"data-[state=selected]:bg-ghost-element-selected border-border transition-colors",
-				className,
-			)}
+			className={clsx("border-b border-white-400/10", className)}
 			{...props}
 		/>
 	);
@@ -68,7 +54,7 @@ function TableHead({ className, ...props }: React.ComponentProps<"th">) {
 		<th
 			data-slot="table-head"
 			className={clsx(
-				"text-text h-[48px] px-[8px] text-left align-middle font-medium [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
+				"text-left py-3 px-4 text-white-400 font-normal text-xs",
 				className,
 			)}
 			{...props}
@@ -80,10 +66,7 @@ function TableCell({ className, ...props }: React.ComponentProps<"td">) {
 	return (
 		<td
 			data-slot="table-cell"
-			className={clsx(
-				"text-text h-[48px] px-[8px]  align-middle [&:has([role=checkbox])]:pr-0 [&>[role=checkbox]]:translate-y-[2px]",
-				className,
-			)}
+			className={clsx("py-3 px-4 text-white-800 whitespace-nowrap", className)}
 			{...props}
 		/>
 	);
