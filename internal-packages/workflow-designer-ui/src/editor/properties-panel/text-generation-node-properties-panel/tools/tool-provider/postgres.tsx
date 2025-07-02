@@ -7,47 +7,53 @@ import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import clsx from "clsx/lite";
 import { CheckIcon, PlusIcon, Settings2Icon, TrashIcon } from "lucide-react";
 import { Checkbox } from "radix-ui";
-import { useCallback, useMemo, useState, useTransition } from "react";
-import z from "zod/v4";
-import { useWorkspaceSecrets } from "../../../../lib/use-workspace-secrets";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../ui/tabs";
 import {
 	ToolConfigurationDialog,
 	type ToolConfigurationDialogProps,
 } from "../ui/tool-configuration-dialog";
-
-const PostgresToolSetupSecretType = {
-	create: "create",
-	select: "select",
-} as const;
-const PostgresToolSetupPayload = z.discriminatedUnion("secretType", [
-	z.object({
-		secretType: z.literal(PostgresToolSetupSecretType.create),
-		label: z.string().min(1),
-		value: z.string().min(1),
-	}),
-	z.object({
-		secretType: z.literal(PostgresToolSetupSecretType.select),
-		secretId: SecretId.schema,
-	}),
-]);
+import {
+	ToolProviderSecretType,
+	useToolProviderConnection,
+} from "./use-tool-provider-connection";
 
 const secretTags = ["postgres-connection-string"];
 
 export function PostgresToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
-	const [presentDialog, setPresentDialog] = useState(false);
-	const connected = useMemo(() => !node.content.tools?.postgres, [node]);
+	const {
+		presentDialog,
+		setPresentDialog,
+		tabValue,
+		setTabValue,
+		isPending,
+		isConfigured,
+		isLoading,
+		secrets,
+		handleSubmit,
+	} = useToolProviderConnection({
+		secretTags,
+		toolKey: "postgres",
+		node,
+		buildToolConfig: (secretId) => ({ tools: [], secretId }),
+	});
 
-	if (connected) {
+	if (!isConfigured) {
 		return (
 			<PostgresToolConnectionDialog
-				node={node}
 				open={presentDialog}
 				onOpenChange={setPresentDialog}
+				tabValue={tabValue}
+				setTabValue={setTabValue}
+				isPending={isPending}
+				isLoading={isLoading}
+				secrets={secrets}
+				onSubmit={handleSubmit}
 			/>
 		);
 	}
@@ -62,86 +68,27 @@ export function PostgresToolConfigurationDialog({
 }
 
 function PostgresToolConnectionDialog({
-	node,
 	open,
 	onOpenChange,
+	tabValue,
+	setTabValue,
+	isPending,
+	isLoading,
+	secrets,
+	onSubmit,
 }: Pick<ToolConfigurationDialogProps, "open" | "onOpenChange"> & {
-	node: TextGenerationNode;
+	tabValue: "create" | "select";
+	setTabValue: React.Dispatch<React.SetStateAction<"create" | "select">>;
+	isPending: boolean;
+	isLoading: boolean;
+	secrets: { id: string; label: string }[] | undefined;
+	onSubmit: React.FormEventHandler<HTMLFormElement>;
 }) {
-	const [tabValue, setTabValue] = useState("create");
-	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
-	const { isLoading, data, mutate } = useWorkspaceSecrets(secretTags);
-	const client = useGiselleEngine();
-	const [isPending, startTransition] = useTransition();
-	const setupPostgresTool = useCallback<
-		React.FormEventHandler<HTMLFormElement>
-	>(
-		(e) => {
-			e.preventDefault();
-			const formData = new FormData(e.currentTarget);
-			const secretType = formData.get("secretType");
-			const label = formData.get("label");
-			const value = formData.get("value");
-			const secretId = formData.get("secretId");
-			const parse = PostgresToolSetupPayload.safeParse({
-				secretType,
-				label,
-				value,
-				secretId,
-			});
-			if (!parse.success) {
-				/** @todo Implement error handling */
-				console.log(parse.error);
-				return;
-			}
-			const payload = parse.data;
-			switch (payload.secretType) {
-				case "create":
-					startTransition(async () => {
-						const result = await client.addSecret({
-							workspaceId: workspace.id,
-							label: payload.label,
-							value: payload.value,
-							tags: secretTags,
-						});
-						mutate([...(data ?? []), result.secret]);
-						updateNodeDataContent(node, {
-							...node.content,
-							tools: {
-								...node.content.tools,
-								postgres: {
-									tools: [],
-									secretId: result.secret.id,
-								},
-							},
-						});
-					});
-					break;
-				case "select":
-					updateNodeDataContent(node, {
-						...node.content,
-						tools: {
-							...node.content.tools,
-							postgres: {
-								tools: [],
-								secretId: payload.secretId,
-							},
-						},
-					});
-					break;
-				default: {
-					const _exhaustiveCheck: never = payload;
-					throw new Error(`Unhandled secretType: ${_exhaustiveCheck}`);
-				}
-			}
-		},
-		[node, updateNodeDataContent, client, workspace.id, data, mutate],
-	);
 	return (
 		<ToolConfigurationDialog
 			title="Connect to PostgreSQL"
 			description="How would you like to set database url?"
-			onSubmit={setupPostgresTool}
+			onSubmit={onSubmit}
 			submitting={isPending}
 			trigger={
 				<Button type="button" leftIcon={<PlusIcon data-dialog-trigger-icon />}>
@@ -153,14 +100,14 @@ function PostgresToolConnectionDialog({
 		>
 			<Tabs value={tabValue} onValueChange={setTabValue}>
 				<TabsList className="mb-[12px]">
-					<TabsTrigger value="create">Paste conncetion string</TabsTrigger>
+					<TabsTrigger value="create">Paste connection string</TabsTrigger>
 					<TabsTrigger value="select">Use Saved string</TabsTrigger>
 				</TabsList>
 				<TabsContent value="create">
 					<Input
 						type="hidden"
 						name="secretType"
-						value={PostgresToolSetupSecretType.create}
+						value={ToolProviderSecretType.create}
 					/>
 					<div className="flex flex-col gap-[12px]">
 						<fieldset className="flex flex-col">
@@ -169,8 +116,8 @@ function PostgresToolConnectionDialog({
 							</label>
 							<Input type="text" id="label" name="label" />
 							<p className="text-[11px] text-text-muted px-[4px] mt-[1px]">
-								Give this onnection a short name (e.g. “Prod-DB”). You’ll use it
-								when linking other nodes.
+								Give this connection a short name (e.g. “Prod-DB”). You’ll use
+								it when linking other nodes.
 							</p>
 						</fieldset>
 						<fieldset className="flex flex-col">
@@ -199,7 +146,7 @@ function PostgresToolConnectionDialog({
 						<p>Loading...</p>
 					) : (
 						<>
-							{(data ?? []).length < 1 ? (
+							{(secrets ?? []).length < 1 ? (
 								<EmptyState description="No saved tokens yet">
 									<Button
 										onClick={() => setTabValue("create")}
@@ -216,7 +163,7 @@ function PostgresToolConnectionDialog({
 									<Input
 										type="hidden"
 										name="secretType"
-										value={PostgresToolSetupSecretType.select}
+										value={ToolProviderSecretType.select}
 									/>
 									<fieldset className="flex flex-col">
 										<label
@@ -229,7 +176,7 @@ function PostgresToolConnectionDialog({
 											<Select
 												name="secretId"
 												placeholder="Choose a connection string… "
-												options={data ?? []}
+												options={secrets ?? []}
 												renderOption={(option) => option.label}
 												widthClassName="w-[180px]"
 											/>
