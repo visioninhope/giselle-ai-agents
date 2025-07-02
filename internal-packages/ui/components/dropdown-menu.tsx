@@ -21,12 +21,12 @@ type RenderItem<
 	T extends ItemLike,
 	TRenderItemAsChild extends boolean,
 > = T extends GroupItem<infer I>
-	? TRenderItemAsChild extends true
-		? (item: I) => React.ReactElement
-		: (item: I) => React.ReactNode
-	: TRenderItemAsChild extends true
-		? (item: T) => React.ReactElement
-		: (item: T) => React.ReactNode;
+	? (
+			item: I,
+		) => TRenderItemAsChild extends true ? React.ReactElement : React.ReactNode
+	: (
+			item: T,
+		) => TRenderItemAsChild extends true ? React.ReactElement : React.ReactNode;
 
 interface DropdownMenuProps<
 	T extends Array<ItemLike>,
