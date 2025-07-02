@@ -40,6 +40,8 @@ const GitHubToolSetupPayload = z.discriminatedUnion("secretType", [
 	}),
 ]);
 
+const secretTags = ["github-access-token"];
+
 export function GitHubToolConfigurationDialog({
 	node,
 }: { node: TextGenerationNode }) {
@@ -74,7 +76,7 @@ function GitHubToolConnectionDialog({
 }) {
 	const [tabValue, setTabValue] = useState("create");
 	const { updateNodeDataContent, data: workspace } = useWorkflowDesigner();
-	const { isLoading, data, mutate } = useWorkspaceSecrets();
+	const { isLoading, data, mutate } = useWorkspaceSecrets(secretTags);
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const setupGitHubTool = useCallback<React.FormEventHandler<HTMLFormElement>>(
@@ -104,6 +106,7 @@ function GitHubToolConnectionDialog({
 							workspaceId: workspace.id,
 							label: payload.label,
 							value: payload.value,
+							tags: secretTags,
 						});
 						mutate([...(data ?? []), result.secret]);
 						updateNodeDataContent(node, {

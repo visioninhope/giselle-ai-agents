@@ -225,6 +225,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		async getWorkspaceSecrets(args: {
 			workspaceId: WorkspaceId;
+			tags?: string[];
 		}) {
 			return await getWorkspaceSecrets({ ...args, context });
 		},
