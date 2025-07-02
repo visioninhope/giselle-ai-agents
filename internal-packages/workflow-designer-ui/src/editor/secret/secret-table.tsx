@@ -8,6 +8,14 @@ import {
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
+import {
+	Table,
+	TableBody,
+	TableCell,
+	TableHead,
+	TableHeader,
+	TableRow,
+} from "@giselle-internal/ui/table";
 
 import {
 	useGiselleEngine,
@@ -153,28 +161,22 @@ export function SecretTable() {
 			{data === undefined || data.length < 1 ? (
 				<EmptyState description="No secret" />
 			) : (
-				<table className="w-full text-sm">
-					<thead>
-						<tr>
-							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
-								Name
-							</th>
-							<th className="text-left py-3 px-4 text-white-400 font-normal text-xs font-sans">
-								Created at
-							</th>
-						</tr>
-					</thead>
-					<tbody>
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Created at</TableHead>
+						</TableRow>
+					</TableHeader>
+					<TableBody>
 						{data.map((data) => (
-							<tr key={data.id} className="border-b border-white-400/10">
-								<td className="py-3 px-4 text-white-800">{data.label}</td>
-								<td className="py-3 px-4 text-white-800">
-									{formatDateTime(data.createdAt)}
-								</td>
-							</tr>
+							<TableRow key={data.id}>
+								<TableCell>{data.label}</TableCell>
+								<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+							</TableRow>
 						))}
-					</tbody>
-				</table>
+					</TableBody>
+				</Table>
 			)}
 		</div>
 	);
