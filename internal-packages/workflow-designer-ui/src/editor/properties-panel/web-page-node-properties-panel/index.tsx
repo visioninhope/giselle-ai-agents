@@ -272,7 +272,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 							type="submit"
 							className="w-full flex items-center justify-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
 						>
-							Insert
+							Add
 						</button>
 					</form>
 
