@@ -1,8 +1,20 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import type { TextGenerationNode, ToolSet } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { CheckIcon } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
 import { toolProviders } from "./tool-provider";
+
+function ensureTools(key: keyof ToolSet, node: TextGenerationNode): string[] {
+	const toolConfig = node.content.tools?.[key];
+	if (!toolConfig) return [];
+
+	// Check if the toolConfig has a tools property
+	if ("tools" in toolConfig) {
+		return toolConfig.tools;
+	}
+
+	return [];
+}
 
 export function ToolsPanel({
 	node,
@@ -16,7 +28,7 @@ export function ToolsPanel({
 					key={provider.key}
 					icon={provider.icon}
 					configurationPanel={provider.renderConfiguration(node)}
-					availableTools={node.content.tools?.[provider.key]?.tools}
+					availableTools={ensureTools(provider.key, node)}
 				>
 					<div className="flex gap-[10px] items-center">
 						<h3 className="text-text text-[14px]">{provider.label}</h3>
