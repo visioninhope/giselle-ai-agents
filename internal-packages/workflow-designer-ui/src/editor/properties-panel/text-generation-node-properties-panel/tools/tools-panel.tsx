@@ -1,10 +1,8 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { CheckIcon, DatabaseIcon } from "lucide-react";
+import { CheckIcon } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
-import { GitHubIcon } from "../../../tool";
-import { GitHubToolConfigurationDialog } from "./tool-provider/github";
-import { PostgresToolConfigurationDialog } from "./tool-provider/postgres";
+import { toolProviders } from "./tool-provider";
 
 export function ToolsPanel({
 	node,
@@ -13,30 +11,21 @@ export function ToolsPanel({
 }) {
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolListItem
-				icon={<GitHubIcon data-tool-icon />}
-				configurationPanel={<GitHubToolConfigurationDialog node={node} />}
-				availableTools={node.content.tools?.github?.tools}
-			>
-				<div className="flex gap-[10px] items-center">
-					<h3 className="text-text text-[14px]">GitHub</h3>
-					{node.content.tools?.github && (
-						<CheckIcon className="size-[14px] text-success" />
-					)}
-				</div>
-			</ToolListItem>
-			<ToolListItem
-				icon={<DatabaseIcon data-tool-icon />}
-				configurationPanel={<PostgresToolConfigurationDialog node={node} />}
-				availableTools={node.content.tools?.postgres?.tools}
-			>
-				<div className="flex gap-[10px] items-center">
-					<h3 className="text-text text-[14px]">PostgreSQL</h3>
-					{node.content.tools?.postgres && (
-						<CheckIcon className="size-[14px] text-success" />
-					)}
-				</div>
-			</ToolListItem>
+			{toolProviders.map((provider) => (
+				<ToolListItem
+					key={provider.key}
+					icon={provider.icon}
+					configurationPanel={provider.renderConfiguration(node)}
+					availableTools={node.content.tools?.[provider.key]?.tools}
+				>
+					<div className="flex gap-[10px] items-center">
+						<h3 className="text-text text-[14px]">{provider.label}</h3>
+						{node.content.tools?.[provider.key] && (
+							<CheckIcon className="size-[14px] text-success" />
+						)}
+					</div>
+				</ToolListItem>
+			))}
 		</div>
 	);
 }
