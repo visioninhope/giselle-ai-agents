@@ -17,6 +17,7 @@ import {
 	GlassDialogFooter,
 	GlassDialogHeader,
 } from "../components/glass-dialog-content";
+import { DiagnosticModal } from "./diagnostic-modal";
 import { getErrorMessage } from "./error-messages";
 
 type RepositoryItemProps = {
@@ -31,6 +32,7 @@ export function RepositoryItem({
 	deleteRepositoryIndexAction,
 }: RepositoryItemProps) {
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
+	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 	const [isPending, startTransition] = useTransition();
 
 	const handleDelete = () => {
@@ -67,7 +69,15 @@ export function RepositoryItem({
 				<div className="flex items-center gap-3">
 					<div className="flex flex-col items-end gap-1">
 						<div className="flex items-center gap-3">
-							<StatusBadge status={repositoryIndex.status} />
+							<StatusBadge
+								status={repositoryIndex.status}
+								onVerify={
+									repositoryIndex.status === "failed" &&
+									repositoryIndex.errorCode === "DOCUMENT_NOT_FOUND"
+										? () => setShowDiagnosticModal(true)
+										: undefined
+								}
+							/>
 							{repositoryIndex.lastIngestedCommitSha && (
 								<span className="text-black-400 font-medium text-[12px] leading-[20.4px] font-geist">
 									Last Ingested:{" "}
@@ -118,6 +128,15 @@ export function RepositoryItem({
 					</Dialog.Root>
 				</div>
 			</div>
+			<DiagnosticModal
+				repositoryIndex={repositoryIndex}
+				open={showDiagnosticModal}
+				onOpenChange={setShowDiagnosticModal}
+				onComplete={() => {
+					// Refresh will happen via revalidatePath in the action
+				}}
+				onDelete={() => handleDelete()}
+			/>
 		</div>
 	);
 }
@@ -154,18 +173,51 @@ const STATUS_CONFIG = {
 	failed: { dotColor: "bg-[#FF3D71]", label: "error" },
 } as const;
 
-function StatusBadge({ status }: { status: GitHubRepositoryIndexStatus }) {
+function StatusBadge({
+	status,
+	onVerify,
+}: {
+	status: GitHubRepositoryIndexStatus;
+	onVerify?: () => void;
+}) {
 	const config = STATUS_CONFIG[status] ?? {
 		dotColor: "bg-gray-500",
 		label: "unknown",
 	};
 
-	return (
-		<div className="flex items-center px-2 py-1 rounded-full border border-white/20 w-[80px]">
+	const badgeContent = (
+		<>
 			<div className={`w-2 h-2 rounded-full ${config.dotColor} shrink-0`} />
-			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist flex-1 text-center">
+			<span className="text-black-400 text-[12px] leading-[14px] font-medium font-geist flex-1 text-center ml-1.5">
 				{config.label}
 			</span>
+			{status === "failed" && onVerify && (
+				<>
+					<span className="text-black-400 text-[12px] mx-1">•</span>
+					<span className="text-[#1663F3] text-[12px] leading-[14px] font-medium font-geist">
+						Check
+					</span>
+					<span className="text-[#1663F3] text-[10px] ml-0.5">↗</span>
+				</>
+			)}
+		</>
+	);
+
+	if (onVerify) {
+		return (
+			<button
+				type="button"
+				onClick={onVerify}
+				className="flex items-center px-2 py-1 rounded-full border border-white/20 w-auto hover:bg-white/5 transition-colors duration-200"
+			>
+				{badgeContent}
+			</button>
+		);
+	}
+
+	return (
+		<div className="flex items-center px-2 py-1 rounded-full border border-white/20 w-[80px]">
+			{badgeContent}
 		</div>
 	);
 }
