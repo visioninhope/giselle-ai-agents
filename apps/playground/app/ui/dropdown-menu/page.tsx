@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@giselle-internal/ui/button";
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 
