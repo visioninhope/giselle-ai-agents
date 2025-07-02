@@ -7,8 +7,8 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@giselle-internal/ui/dialog";
-import { DemoSection } from "../demo-section";
-import { UiPage } from "../ui-page";
+import { DemoSection } from "../components/demo-section";
+import { UiPage } from "../components/ui-page";
 
 export default function () {
 	return (
