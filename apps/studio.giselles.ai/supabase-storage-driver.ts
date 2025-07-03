@@ -81,11 +81,9 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			const dirPath = path.split("/").slice(0, -1).join("/");
 			const fileName = path.split("/").pop() || "";
 
-			const { data, error } = await supabase.storage
-				.from(bucket)
-				.list(dirPath, {
-					search: fileName,
-				});
+			const { error } = await supabase.storage.from(bucket).list(dirPath, {
+				search: fileName,
+			});
 
 			if (error) {
 				return false;
@@ -111,9 +109,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 				path = `${path}?timestamp=${Date.now()}`;
 			}
 
-			const { data, error } = await supabase.storage
-				.from(bucket)
-				.download(path);
+			const { error } = await supabase.storage.from(bucket).download(path);
 
 			if (error) {
 				return null;
@@ -127,7 +123,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			const cacheControl = opts?.cacheControl;
 			const contentType = opts?.contentType;
 
-			const { data, error } = await supabase.storage
+			const { error } = await supabase.storage
 				.from(bucket)
 				.upload(r(key), value, {
 					upsert: true,
