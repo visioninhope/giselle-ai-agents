@@ -12,7 +12,7 @@ export function githubTools(octokit: Octokit) {
 				owner: z.string().describe("Repository owner"),
 				repo: z.string().describe("Repository name"),
 			}),
-			execute: async (params) => {
+			execute: async (_params) => {
 				const { body, issueNumber, owner, repo } = params;
 				const response = await octokit.request(
 					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
@@ -519,7 +519,7 @@ export function githubTools(octokit: Octokit) {
 					.describe("Optional: reason the session was created")
 					.optional(),
 			}),
-			execute: async (params) => {
+			execute: async (_params) => {
 				const response = await octokit.request("GET /user");
 				return response.data;
 			},
