@@ -3,7 +3,7 @@
 import type { githubRepositoryIndex } from "@/drizzle";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Check, Loader2 } from "lucide-react";
-import { useEffect, useState, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import {
 	GlassDialogContent,
 	GlassDialogFooter,
@@ -35,15 +35,7 @@ export function DiagnosticModal({
 	const [isFixing, startFixTransition] = useTransition();
 	const [isDiagnosing, setIsDiagnosing] = useState(false);
 
-	useEffect(() => {
-		if (open) {
-			runDiagnosis();
-		} else {
-			setDiagnosisResult(null);
-		}
-	}, [open]);
-
-	const runDiagnosis = async () => {
+	const runDiagnosis = useCallback(async () => {
 		setIsDiagnosing(true);
 
 		try {
@@ -59,12 +51,20 @@ export function DiagnosticModal({
 		} finally {
 			setIsDiagnosing(false);
 		}
-	};
+	}, [repositoryIndex.id]);
 
-	const handleFix = () => {
+	useEffect(() => {
+		if (open) {
+			runDiagnosis();
+		} else {
+			setDiagnosisResult(null);
+		}
+	}, [open, runDiagnosis]);
+
+	const handleFix = useCallback(() => {
 		startFixTransition(async () => {
 			try {
-				if (diagnosisResult?.canBeFixed && diagnosisResult.newInstallationId) {
+				if (diagnosisResult?.canBeFixed) {
 					await updateRepositoryInstallation(
 						repositoryIndex.id,
 						diagnosisResult.newInstallationId,
@@ -76,7 +76,7 @@ export function DiagnosticModal({
 				console.error("Failed to fix repository:", error);
 			}
 		});
-	};
+	}, [repositoryIndex.id, diagnosisResult, onComplete, onOpenChange]);
 
 	const renderDiagnosisResult = () => {
 		if (!diagnosisResult) return null;
