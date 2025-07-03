@@ -21,6 +21,7 @@ import {
 	useRef,
 	useState,
 } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Background } from "../../../ui/background";
 import { useToasts } from "../../../ui/toast";
 import { edgeTypes } from "../../connector";
@@ -275,16 +276,23 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 			className="relative flex-1 bg-black-900 overflow-hidden"
 			ref={mainRef}
 		>
-			<div className="h-full flex">
-				{/* Left Panel */}
-				<PanelWrapper
-					isOpen={leftPanel !== null}
-					panelType={leftPanel}
-					onClose={() => onLeftPanelClose?.()}
-				/>
+			<PanelGroup direction="horizontal" className="h-full flex">
+				{leftPanel !== null && (
+					<>
+						<Panel order={1}>
+							{/* Left Panel */}
+							<PanelWrapper
+								isOpen={leftPanel !== null}
+								panelType={leftPanel}
+								onClose={() => onLeftPanelClose?.()}
+							/>
+						</Panel>
+						<PanelResizeHandle />
+					</>
+				)}
 
-				{/* Main Content Area */}
-				<div className="flex-1 relative">
+				<Panel order={2}>
+					{/* Main Content Area */}
 					<V2NodeCanvas />
 
 					{/* Floating Properties Panel */}
@@ -295,8 +303,8 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 					>
 						<PropertiesPanel />
 					</FloatingPropertiesPanel>
-				</div>
-			</div>
+				</Panel>
+			</PanelGroup>
 			<GradientDef />
 		</main>
 	);
