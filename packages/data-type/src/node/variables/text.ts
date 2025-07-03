@@ -4,7 +4,7 @@ export const TextContent = z.object({
 	type: z.literal("text"),
 	text: z.string(),
 });
-type TextContent = z.infer<typeof TextContent>;
+export type TextContent = z.infer<typeof TextContent>;
 
 export const CreateTextNodeParams = TextContent.omit({
 	type: true,
