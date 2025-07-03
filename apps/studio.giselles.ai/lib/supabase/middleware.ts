@@ -6,7 +6,7 @@ export const supabaseMiddleware = (
 	guardCallback?: (
 		user: User | null,
 		request: NextRequest,
-	) => Promise<NextResponse>,
+	) => Promise<NextResponse | undefined>,
 ) => {
 	return async (request: NextRequest) => {
 		let supabaseResponse = NextResponse.next({
