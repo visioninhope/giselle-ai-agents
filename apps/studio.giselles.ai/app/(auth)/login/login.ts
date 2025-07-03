@@ -15,7 +15,7 @@ export async function login(
 		email: formData.get("email") as string,
 		password: formData.get("password") as string,
 	};
-	const returnUrl = formData.get("returnUrl") as string | null;
+	const returnUrlEntry = formData.get("returnUrl");
 	const { data, error } = await supabase.auth.signInWithPassword(credentails);
 
 	if (error) {
@@ -28,7 +28,19 @@ export async function login(
 	}
 
 	// Validate returnUrl to prevent open redirect attacks
-	const validReturnUrl = returnUrl?.startsWith("/") ? returnUrl : "/apps";
+	const validReturnUrl = isValidReturnUrl(returnUrlEntry)
+		? returnUrlEntry
+		: "/apps";
 	redirect(validReturnUrl);
 	return null;
+}
+
+function isValidReturnUrl(
+	returnUrl: FormDataEntryValue | null,
+): returnUrl is string {
+	return (
+		returnUrl !== null &&
+		typeof returnUrl === "string" &&
+		returnUrl.startsWith("/")
+	);
 }
