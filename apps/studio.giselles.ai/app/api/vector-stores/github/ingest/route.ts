@@ -1,11 +1,9 @@
-import { db, subscriptions, teams } from "@/drizzle";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
-import type { TelemetrySettings } from "ai";
-import { and, eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
+import { createIngestTelemetrySettings } from "./telemetry";
 import type { TargetGitHubRepository } from "./types";
 import {
 	buildOctokit,
@@ -49,40 +47,10 @@ async function processRepository(
 			commitSha: commit.sha,
 		};
 
-		// Get team information for telemetry
-		const teamInfo = await db
-			.select({
-				type: teams.type,
-				activeSubscriptionId: subscriptions.id,
-			})
-			.from(teams)
-			.leftJoin(
-				subscriptions,
-				and(
-					eq(subscriptions.teamDbId, teams.dbId),
-					eq(subscriptions.status, "active"),
-				),
-			)
-			.where(eq(teams.dbId, teamDbId))
-			.limit(1);
-
-		const experimental_telemetry: TelemetrySettings | undefined = teamInfo[0]
-			? {
-					metadata: {
-						teamDbId,
-						teamType: teamInfo[0].type,
-						isProPlan:
-							teamInfo[0].activeSubscriptionId != null ||
-							teamInfo[0].type === "internal",
-						subscriptionId: teamInfo[0].activeSubscriptionId ?? "",
-						repository: `${owner}/${repo}`,
-						// Note: userId is not available in cron job context
-						// This is a system-initiated operation
-						operation: "github-repository-ingest",
-						tags: ["auto-instrumented", "embedding", "github-ingest"],
-					},
-				}
-			: undefined;
+		const experimental_telemetry = await createIngestTelemetrySettings(
+			teamDbId,
+			`${owner}/${repo}`,
+		);
 
 		await ingestGitHubBlobs({
 			octokitClient,

@@ -15,6 +15,7 @@ import {
 import type { TelemetrySettings } from "ai";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
+import { createQueryTelemetrySettings } from "./telemetry";
 
 /**
  * GitHub chunk metadata schema and type for RAG storage
@@ -138,6 +139,21 @@ export function createGitHubQueryService(
 }
 
 /**
- * Pre-configured GitHub query service instance (for backward compatibility)
+ * Pre-configured GitHub query service instance with dynamic telemetry
  */
-export const gitHubQueryService = createGitHubQueryService();
+export const gitHubQueryService = {
+	async search(
+		query: string,
+		context: GitHubQueryContext,
+		limit?: number,
+	) {
+		// Create telemetry settings dynamically based on context
+		const experimental_telemetry = await createQueryTelemetrySettings(context);
+
+		// Create a new query service instance with telemetry
+		const queryService = createGitHubQueryService(experimental_telemetry);
+
+		// Execute the search
+		return queryService.search(query, context, limit);
+	},
+};
