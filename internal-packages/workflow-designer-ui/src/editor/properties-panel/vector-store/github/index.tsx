@@ -140,12 +140,12 @@ export function GitHubVectorStoreNodePropertiesPanel({
 				</div>
 
 				{settingPath && (
-					<div className="pt-[8px]">
+					<div className="pt-[8px] flex justify-end">
 						<Link
 							href={settingPath}
-							className="text-blue-600 hover:text-blue-500 text-[14px] hover:underline"
+							className="text-white-400 hover:text-white-300 text-[14px] underline"
 						>
-							Set Up GitHub Vector Store →
+							Set Up Vector Store
 						</Link>
 					</div>
 				)}
