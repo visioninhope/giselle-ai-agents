@@ -295,11 +295,18 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 						</Panel>
 						<PanelResizeHandle
 							className={clsx(
-								"w-[1px] bg-border cursor-col-resize transition-colors",
-								"data-[resize-handle-state=hover]:bg-[#4a90e2]",
-								"data-[resize-handle-state=drag]:bg-[#4a90e2]",
+								"w-[12px] cursor-col-resize group flex items-center justify-center",
 							)}
-						/>
+						>
+							<div
+								className={clsx(
+									"w-[3px] h-[32px] rounded-full transition-colors",
+									"bg-[#6b7280] opacity-60",
+									"group-data-[resize-handle-state=hover]:bg-[#4a90e2]",
+									"group-data-[resize-handle-state=drag]:bg-[#4a90e2]",
+								)}
+							/>
+						</PanelResizeHandle>
 					</>
 				)}
 
