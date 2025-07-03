@@ -124,10 +124,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 		},
 
 		async setItem(key, value, opts) {
-			const cacheControl =
-				opts?.cacheControlMaxAge !== undefined
-					? `max-age=${opts.cacheControlMaxAge}`
-					: undefined;
+			const cacheControl = opts?.cacheControl;
 			const contentType = opts?.contentType;
 
 			const { data, error } = await supabase.storage

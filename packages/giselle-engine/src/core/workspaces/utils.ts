@@ -16,8 +16,8 @@ export async function setWorkspace({
 	workspace: Workspace;
 }) {
 	await storage.setItem(workspacePath(workspaceId), workspace, {
-		// Disable caching by setting cacheControlMaxAge to 0 for Supabase storage
-		cacheControlMaxAge: 0,
+		// Disable caching by setting cacheControl to 0 for Supabase storage
+		cacheControl: 0,
 	});
 }
 
