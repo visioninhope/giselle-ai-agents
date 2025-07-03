@@ -1,3 +1,4 @@
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
 	ConnectionId,
 	isTextGenerationNode,
@@ -9,7 +10,7 @@ import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx";
 import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
-import { DropdownMenu, Toolbar } from "radix-ui";
+import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
@@ -203,94 +204,34 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 						) : undefined
 					}
 					tools={(editor) => (
-						<DropdownMenu.Root>
-							<Toolbar.Button
-								value="bulletList"
-								aria-label="Bulleted list"
-								data-toolbar-item
-								asChild
-							>
-								<DropdownMenu.Trigger>
-									<AtSignIcon className="w-[18px]" />
-								</DropdownMenu.Trigger>
-							</Toolbar.Button>
-							<DropdownMenu.Portal>
-								<DropdownMenu.Content
-									className={clsx(
-										"relative w-[300px] rounded py-[8px]",
-										"rounded-[8px] border-[1px] bg-transparent backdrop-blur-[8px]",
-										"shadow-[-2px_-1px_0px_0px_rgba(0,0,0,0.1),1px_1px_8px_0px_rgba(0,0,0,0.25)]",
-									)}
-									onCloseAutoFocus={(e) => {
-										e.preventDefault();
-									}}
-								>
-									<div
-										className={clsx(
-											"absolute z-0 rounded-[8px] inset-0 border-[1px] mask-fill bg-gradient-to-br bg-origin-border bg-clip-boarder border-transparent",
-											"from-[hsl(232,_36%,_72%)]/40 to-[hsl(218,_58%,_21%)]/90",
-										)}
-									/>
-									<div className="relative flex flex-col gap-[8px]">
-										<div className="flex px-[16px] text-white-900">
-											Insert Sources
-										</div>
-										<div className="flex flex-col py-[4px]">
-											<div className="border-t border-black-300/20" />
-										</div>
-
-										<DropdownMenu.RadioGroup
-											className="flex flex-col pb-[8px] gap-[8px]"
-											onValueChange={(connectionIdLike) => {
-												const parsedConnectionId =
-													ConnectionId.safeParse(connectionIdLike);
-												if (!parsedConnectionId.success) {
-													return;
-												}
-												const connectionId = parsedConnectionId.data;
-												const connectedInput =
-													connectedInputsWithoutDatasource.find(
-														(connectedInput) =>
-															connectedInput.connection.id === connectionId,
-													);
-												if (connectedInput === undefined) {
-													return;
-												}
-												const embedNode = {
-													outputId: connectedInput.connection.outputId,
-													node: connectedInput.connection.outputNode,
-												};
-												editor
-													.chain()
-													.focus()
-													.insertContentAt(
-														editor.state.selection.$anchor.pos,
-														createSourceExtensionJSONContent({
-															node: connectedInput.connection.outputNode,
-															outputId: embedNode.outputId,
-														}),
-													)
-													.insertContent(" ")
-													.run();
-											}}
-										>
-											<div className="flex flex-col px-[8px]">
-												{connectedInputsWithoutDatasource.map((input) => (
-													<DropdownMenu.RadioItem
-														key={input.connection.id}
-														className="p-[8px] rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
-														value={input.connection.id}
-													>
-														{input.node.name ?? getDefaultNodeName(input)}/{" "}
-														{input.output.label}
-													</DropdownMenu.RadioItem>
-												))}
-											</div>
-										</DropdownMenu.RadioGroup>
-									</div>
-								</DropdownMenu.Content>
-							</DropdownMenu.Portal>
-						</DropdownMenu.Root>
+						<DropdownMenu
+							trigger={<AtSignIcon className="w-[18px]" />}
+							items={connectedInputsWithoutDatasource.map((input) => ({
+								id: input.connection.id,
+								input,
+							}))}
+							renderItem={(item) =>
+								`${item.input.node.name ?? getDefaultNodeName(item.input)} / ${item.input.output.label}`
+							}
+							onSelect={(_, item) => {
+								const embedNode = {
+									outputId: item.input.connection.outputId,
+									node: item.input.connection.outputNode,
+								};
+								editor
+									.chain()
+									.focus()
+									.insertContentAt(
+										editor.state.selection.$anchor.pos,
+										createSourceExtensionJSONContent({
+											node: item.input.connection.outputNode,
+											outputId: embedNode.outputId,
+										}),
+									)
+									.insertContent(" ")
+									.run();
+							}}
+						/>
 					)}
 				/>
 			</div>
