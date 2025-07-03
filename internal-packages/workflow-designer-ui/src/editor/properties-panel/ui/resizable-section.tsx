@@ -123,8 +123,8 @@ export function ResizeHandle({
 	const isVertical = direction === "vertical";
 
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: fix after
-		<div
+		<button
+			type="button"
 			className={clsx(
 				"transition-colors duration-200 flex items-center justify-center group",
 				isVertical
@@ -141,6 +141,6 @@ export function ResizeHandle({
 					isVertical ? "h-[3px] w-[32px]" : "w-[3px] h-[32px]",
 				)}
 			/>
-		</div>
+		</button>
 	);
 }
