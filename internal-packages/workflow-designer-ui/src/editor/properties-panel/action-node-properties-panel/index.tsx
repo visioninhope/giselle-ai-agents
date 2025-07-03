@@ -14,11 +14,7 @@ import {
 import { GitHubActionPropertiesPanel } from "./github-action-properties-panel";
 import { useConnectedInputs } from "./lib";
 
-export function ActionNodePropertiesPanel({
-	node,
-}: {
-	node: ActionNode;
-}) {
+export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	const { data, updateNodeData, setUiNodeState } = useWorkflowDesigner();
 	const { isValid, connectedInputs } = useConnectedInputs(node.id, node.inputs);
 	const { createAndStartGeneration, isGenerating, stopGeneration } =
@@ -26,7 +22,7 @@ export function ActionNodePropertiesPanel({
 			nodeId: node.id,
 			origin: { type: "workspace", id: data.id },
 		});
-	const handleClick = useCallback(async () => {
+	const handleClick = useCallback(() => {
 		if (!isValid) {
 			setUiNodeState(node.id, {
 				showError: true,

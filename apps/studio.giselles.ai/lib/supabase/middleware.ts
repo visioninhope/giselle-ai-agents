@@ -6,7 +6,7 @@ export const supabaseMiddleware = (
 	guardCallback?: (
 		user: User | null,
 		request: NextRequest,
-		// biome-ignore lint/suspicious/noConfusingVoidType:
+		// biome-ignore lint/suspicious/noConfusingVoidType: fix after
 	) => Promise<NextResponse | void>,
 ) => {
 	return async (request: NextRequest) => {

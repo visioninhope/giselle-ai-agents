@@ -17,7 +17,7 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 
-import { type SecretId, isTextGenerationNode } from "@giselle-sdk/data-type";
+import { isTextGenerationNode, type SecretId } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,

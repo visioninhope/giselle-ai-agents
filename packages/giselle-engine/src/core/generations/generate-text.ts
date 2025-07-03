@@ -5,10 +5,10 @@ import { perplexity } from "@ai-sdk/perplexity";
 import {
 	type FailedGeneration,
 	type GenerationOutput,
+	isTextGenerationNode,
 	type QueuedGeneration,
 	type TextGenerationLanguageModelData,
 	type UrlSource,
-	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
@@ -30,7 +30,7 @@ export type PerplexityProviderOptions = {
 	search_domain_filter?: string[];
 };
 
-export async function generateText(args: {
+export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;

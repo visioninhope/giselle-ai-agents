@@ -90,6 +90,7 @@ export function ResizablePanel({
 			<div className="h-full overflow-hidden">{children}</div>
 
 			{/* Resize handle */}
+			{/** biome-ignore lint/a11y/noStaticElementInteractions: fix after */}
 			<div
 				className={clsx(
 					"absolute top-0 right-0 w-[12px] h-full cursor-col-resize",
