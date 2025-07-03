@@ -8,7 +8,7 @@ import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx";
-import { AtSignIcon, DatabaseZapIcon } from "lucide-react";
+import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
@@ -115,7 +115,7 @@ function DataSourceDisplayBar({
 }
 
 export function QueryPanel({ node }: { node: QueryNode }) {
-	const { updateNodeDataContent } = useWorkflowDesigner();
+	const { updateNodeDataContent, deleteConnection } = useWorkflowDesigner();
 	const { all: connectedInputs } = useConnectedSources(node);
 	const connectedDatasourceInputs = useMemo(
 		() =>
@@ -136,11 +136,49 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 		<div className="flex flex-col h-full">
 			<div className="flex-1 min-h-0">
 				<TextEditor
+					placeholder="Write your query here..."
 					value={node.content.query}
 					onValueChange={(value) => {
 						updateNodeDataContent(node, { query: value });
 					}}
 					nodes={connectedInputsWithoutDatasource.map((input) => input.node)}
+					header={
+						connectedDatasourceInputs.length > 0 ? (
+							<div className="flex items-center gap-[6px] flex-wrap">
+								{connectedDatasourceInputs.map((dataSource) => {
+									const { name, description, icon } =
+										getDataSourceDisplayInfo(dataSource);
+									return (
+										<div
+											key={dataSource.connection.id}
+											className={clsx(
+												"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
+												"bg-white-800/15 border border-white-800/25 text-white-100",
+											)}
+										>
+											<div className="text-white-200 shrink-0">{icon}</div>
+											<span
+												className="text-[10px] font-medium"
+												title={`${name} • ${description}`}
+											>
+												{name} • {description}
+											</span>
+											<button
+												type="button"
+												onClick={() =>
+													deleteConnection(dataSource.connection.id)
+												}
+												className="text-white-400 hover:text-white-100 ml-1 p-0.5 rounded hover:bg-white-800/20 transition-colors"
+												title="Remove data source"
+											>
+												<X className="w-3 h-3" />
+											</button>
+										</div>
+									);
+								})}
+							</div>
+						) : undefined
+					}
 					tools={(editor) => (
 						<DropdownMenu.Root>
 							<Toolbar.Button
@@ -233,7 +271,6 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 					)}
 				/>
 			</div>
-			<DataSourceDisplayBar dataSources={connectedDatasourceInputs} />
 		</div>
 	);
 }
