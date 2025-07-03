@@ -9,7 +9,7 @@ import {
 
 export function RunHistoryTable() {
 	return (
-		<div className="px-4 pb-4 pt-2 h-full">
+		<div className="pl-4 pb-4 pt-2 h-full">
 			<Table>
 				<TableHeader>
 					<TableRow>

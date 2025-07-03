@@ -16,7 +16,7 @@ export function LeftPanel({
 	return (
 		<div className={clsx("h-full flex flex-col", className)}>
 			{/* Header */}
-			<div className="flex items-center justify-between px-4 py-3 bg-black-900 flex-shrink-0">
+			<div className="flex items-center justify-between pl-4 py-3 bg-black-900 flex-shrink-0">
 				<h2 className="font-sans text-text text-[20px] font-thin">{title}</h2>
 				{onClose && (
 					<button
