@@ -12,7 +12,7 @@ export function githubTools(octokit: Octokit) {
 				owner: z.string().describe("Repository owner"),
 				repo: z.string().describe("Repository name"),
 			}),
-			execute: async (_params) => {
+			execute: async (params) => {
 				const { body, issueNumber, owner, repo } = params;
 				const response = await octokit.request(
 					"POST /repos/{owner}/{repo}/issues/{issue_number}/comments",
