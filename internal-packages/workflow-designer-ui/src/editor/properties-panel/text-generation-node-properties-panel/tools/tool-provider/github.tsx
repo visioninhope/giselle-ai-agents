@@ -220,7 +220,6 @@ const githubToolCatalog = [
 			"forkRepository",
 			"getFileContents",
 			"listBranches",
-			"searchCode",
 		],
 	},
 	{
@@ -229,7 +228,6 @@ const githubToolCatalog = [
 			"createIssue",
 			"getIssue",
 			"listIssues",
-			"searchIssues",
 			"updateIssue",
 			"addIssueComment",
 			"getIssueComments",
@@ -242,7 +240,6 @@ const githubToolCatalog = [
 			"getPullRequest",
 			"updatePullRequest",
 			"listPullRequests",
-			"searchPullRequests",
 			"getPullRequestComments",
 			"getPullRequestFiles",
 			"getPullRequestReviews",
@@ -274,10 +271,10 @@ const githubToolCatalog = [
 			"searchUsers",
 		],
 	},
-	{
-		label: "User",
-		tools: ["getMe"],
-	},
+	// {
+	// 	label: "User",
+	// 	tools: ["getMe"],
+	// },
 ];
 
 function GitHubToolConfigurationDialogInternal({
