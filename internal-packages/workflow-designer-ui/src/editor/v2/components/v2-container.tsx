@@ -38,7 +38,7 @@ interface V2ContainerProps extends V2LayoutState {
 	onLeftPanelClose?: () => void;
 }
 
-function V2NodeCanvas({ onLeftPanelClose }: { onLeftPanelClose?: () => void }) {
+function V2NodeCanvas() {
 	const {
 		data,
 		setUiNodeState,
@@ -223,11 +223,6 @@ function V2NodeCanvas({ onLeftPanelClose }: { onLeftPanelClose?: () => void }) {
 					addNode(selectedTool.node, { ui: { position } });
 				}
 				reset();
-
-				// // Close panel when clicking on canvas
-				// if (onLeftPanelClose) {
-				// 	onLeftPanelClose();
-				// }
 			}}
 			onNodeContextMenu={(event, node) => {
 				event.preventDefault();
@@ -290,7 +285,7 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 
 				{/* Main Content Area */}
 				<div className="flex-1 relative">
-					<V2NodeCanvas onLeftPanelClose={onLeftPanelClose} />
+					<V2NodeCanvas />
 
 					{/* Floating Properties Panel */}
 					<FloatingPropertiesPanel
