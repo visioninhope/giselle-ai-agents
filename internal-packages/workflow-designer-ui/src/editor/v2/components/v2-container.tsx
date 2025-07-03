@@ -224,10 +224,10 @@ function V2NodeCanvas({ onLeftPanelClose }: { onLeftPanelClose?: () => void }) {
 				}
 				reset();
 
-				// Close panel when clicking on canvas
-				if (onLeftPanelClose) {
-					onLeftPanelClose();
-				}
+				// // Close panel when clicking on canvas
+				// if (onLeftPanelClose) {
+				// 	onLeftPanelClose();
+				// }
 			}}
 			onNodeContextMenu={(event, node) => {
 				event.preventDefault();
@@ -275,33 +275,6 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 
 	const mainRef = useRef<HTMLDivElement>(null);
 
-	// Handle click outside to close panel
-	useEffect(() => {
-		if (!leftPanel || !onLeftPanelClose) return;
-
-		const handleClickOutside = (event: MouseEvent) => {
-			const target = event.target as Element;
-
-			// Check if click is on panel trigger button
-			const isPanelTriggerButton = target.closest("[data-panel-trigger]");
-			if (isPanelTriggerButton) return;
-
-			// Check if click is inside the panel
-			const panelElement = document.querySelector("[data-panel-wrapper]");
-			if (panelElement?.contains(target)) return;
-
-			// Close panel for clicks outside
-			onLeftPanelClose();
-		};
-
-		// Use capture phase to ensure we catch the event before ReactFlow
-		document.addEventListener("mousedown", handleClickOutside, true);
-
-		return () => {
-			document.removeEventListener("mousedown", handleClickOutside, true);
-		};
-	}, [leftPanel, onLeftPanelClose]);
-
 	return (
 		<main
 			className="relative flex-1 bg-black-900 overflow-hidden"
@@ -309,13 +282,11 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 		>
 			<div className="h-full flex">
 				{/* Left Panel */}
-				<div data-panel-wrapper>
-					<PanelWrapper
-						isOpen={leftPanel !== null}
-						panelType={leftPanel}
-						onClose={() => onLeftPanelClose?.()}
-					/>
-				</div>
+				<PanelWrapper
+					isOpen={leftPanel !== null}
+					panelType={leftPanel}
+					onClose={() => onLeftPanelClose?.()}
+				/>
 
 				{/* Main Content Area */}
 				<div className="flex-1 relative">
