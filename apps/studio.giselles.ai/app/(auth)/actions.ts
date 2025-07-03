@@ -1,18 +1,23 @@
 "use server";
 
-import { getAuthCallbackUrl } from "@/app/(auth)/lib";
+import { getAuthCallbackUrl, isValidReturnUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import type { OAuthProvider } from "@/services/accounts";
 import { redirect } from "next/navigation";
 
 async function authorizeOAuth(provider: OAuthProvider, formData?: FormData) {
-	const returnUrl = formData?.get("returnUrl") as string | undefined;
+	const returnUrlEntry = formData?.get("returnUrl");
+	// Validate returnUrl to prevent open redirect attacks
+	const validReturnUrl = isValidReturnUrl(returnUrlEntry)
+		? returnUrlEntry
+		: "/";
+
 	const supabase = await createClient();
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider,
 		options: {
-			redirectTo: getAuthCallbackUrl({ provider, next: returnUrl || "/" }),
+			redirectTo: getAuthCallbackUrl({ provider, next: validReturnUrl }),
 		},
 	});
 	logger.debug(`authorized with ${provider}`);

@@ -1,5 +1,6 @@
 "use server";
 
+import { isValidReturnUrl } from "@/app/(auth)/lib";
 import { type AuthError, createClient } from "@/lib/supabase";
 import { redirect } from "next/navigation";
 
@@ -33,14 +34,4 @@ export async function login(
 		: "/apps";
 	redirect(validReturnUrl);
 	return null;
-}
-
-function isValidReturnUrl(
-	returnUrl: FormDataEntryValue | null,
-): returnUrl is string {
-	return (
-		returnUrl !== null &&
-		typeof returnUrl === "string" &&
-		returnUrl.startsWith("/")
-	);
 }
