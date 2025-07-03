@@ -271,10 +271,10 @@ const githubToolCatalog = [
 			"searchUsers",
 		],
 	},
-	{
-		label: "User",
-		tools: ["getMe"],
-	},
+	// {
+	// 	label: "User",
+	// 	tools: ["getMe"],
+	// },
 ];
 
 function GitHubToolConfigurationDialogInternal({
