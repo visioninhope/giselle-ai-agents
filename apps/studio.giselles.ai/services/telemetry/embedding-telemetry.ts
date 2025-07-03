@@ -5,15 +5,15 @@ import { and, eq } from "drizzle-orm";
 
 type EmbeddingTelemetryContext =
 	| {
-		operation: "github-repository-ingest";
-		teamDbId: number;
-		repository: string;
-	}
+			operation: "github-repository-ingest";
+			teamDbId: number;
+			repository: string;
+	  }
 	| {
-		operation: "github-repository-query";
-		workspaceId: WorkspaceId;
-		repository: string;
-	};
+			operation: "github-repository-query";
+			workspaceId: WorkspaceId;
+			repository: string;
+	  };
 
 interface TeamTelemetryInfo {
 	teamDbId: number;
