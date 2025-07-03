@@ -15,41 +15,28 @@ type EmbeddingTelemetryContext =
 			repository: string;
 	  };
 
+interface TeamTelemetryInfo {
+	teamDbId: number;
+	workspaceId: WorkspaceId;
+	teamType: string;
+	activeSubscriptionId: string | null;
+}
+
 /**
- * Create telemetry settings for embedding operations
- * Handles both ingest and query operations with proper team/subscription metadata
+ * Resolve team telemetry info from teamDbId (used for ingest operations)
  */
-export async function createEmbeddingTelemetrySettings(
-	context: EmbeddingTelemetryContext,
-	isEnabled = true,
-): Promise<TelemetrySettings | undefined> {
-	let teamDbId: number;
-
-	// Resolve teamDbId based on the operation type
-	if (context.operation === "github-repository-ingest") {
-		teamDbId = context.teamDbId;
-	} else {
-		// For query operations, look up teamDbId from workspaceId
-		const teamRecords = await db
-			.select({ dbId: teams.dbId })
-			.from(teams)
-			.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
-			.where(eq(agents.workspaceId, context.workspaceId))
-			.limit(1);
-
-		if (teamRecords.length === 0) {
-			return undefined;
-		}
-		teamDbId = teamRecords[0].dbId;
-	}
-
-	// Get team information with subscription
-	const teamInfo = await db
+async function resolveTeamTelemetryInfoByTeamId(
+	teamDbId: number,
+): Promise<TeamTelemetryInfo | undefined> {
+	const result = await db
 		.select({
-			type: teams.type,
+			teamDbId: teams.dbId,
+			teamType: teams.type,
 			activeSubscriptionId: subscriptions.id,
+			workspaceId: agents.workspaceId,
 		})
 		.from(teams)
+		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
 		.leftJoin(
 			subscriptions,
 			and(
@@ -60,17 +47,78 @@ export async function createEmbeddingTelemetrySettings(
 		.where(eq(teams.dbId, teamDbId))
 		.limit(1);
 
-	if (!teamInfo[0]) {
+	if (result.length === 0) {
+		return undefined;
+	}
+
+	return {
+		teamDbId: result[0].teamDbId,
+		workspaceId: result[0].workspaceId,
+		teamType: result[0].teamType,
+		activeSubscriptionId: result[0].activeSubscriptionId,
+	};
+}
+
+/**
+ * Resolve team telemetry info from workspaceId (used for query operations)
+ */
+async function resolveTeamTelemetryInfoByWorkspaceId(
+	workspaceId: WorkspaceId,
+): Promise<TeamTelemetryInfo | undefined> {
+	const result = await db
+		.select({
+			teamDbId: teams.dbId,
+			teamType: teams.type,
+			activeSubscriptionId: subscriptions.id,
+		})
+		.from(teams)
+		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
+		.leftJoin(
+			subscriptions,
+			and(
+				eq(subscriptions.teamDbId, teams.dbId),
+				eq(subscriptions.status, "active"),
+			),
+		)
+		.where(eq(agents.workspaceId, workspaceId))
+		.limit(1);
+
+	if (result.length === 0) {
+		return undefined;
+	}
+
+	return {
+		teamDbId: result[0].teamDbId,
+		workspaceId: workspaceId,
+		teamType: result[0].teamType,
+		activeSubscriptionId: result[0].activeSubscriptionId,
+	};
+}
+
+/**
+ * Create telemetry settings for embedding operations
+ * Handles both ingest and query operations with proper team/subscription metadata
+ */
+export async function createEmbeddingTelemetrySettings(
+	context: EmbeddingTelemetryContext,
+	isEnabled = true,
+): Promise<TelemetrySettings | undefined> {
+	const teamInfo =
+		context.operation === "github-repository-ingest"
+			? await resolveTeamTelemetryInfoByTeamId(context.teamDbId)
+			: await resolveTeamTelemetryInfoByWorkspaceId(context.workspaceId);
+
+	if (!teamInfo) {
 		return undefined;
 	}
 
 	const metadata: Record<string, unknown> = {
-		teamDbId,
-		teamType: teamInfo[0].type,
+		teamDbId: teamInfo.teamDbId,
+		teamType: teamInfo.teamType,
 		isProPlan:
-			teamInfo[0].activeSubscriptionId != null ||
-			teamInfo[0].type === "internal",
-		subscriptionId: teamInfo[0].activeSubscriptionId ?? "",
+			teamInfo.activeSubscriptionId != null || teamInfo.teamType === "internal",
+		subscriptionId: teamInfo.activeSubscriptionId ?? "",
+		workspaceId: teamInfo.workspaceId,
 		repository: context.repository,
 		operation: context.operation,
 		tags: [
@@ -81,11 +129,6 @@ export async function createEmbeddingTelemetrySettings(
 				: "github-query",
 		],
 	};
-
-	// Add workspaceId for query operations
-	if (context.operation === "github-repository-query") {
-		metadata.workspaceId = context.workspaceId;
-	}
 
 	// Note: userId is not available in cron job context for ingest operations
 
