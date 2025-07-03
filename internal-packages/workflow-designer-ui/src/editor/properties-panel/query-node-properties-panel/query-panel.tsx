@@ -15,6 +15,18 @@ import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
+// Style constants for consistent styling
+const ICON_SIZE = "w-[14px] h-[14px]";
+const TEXT_STYLES = {
+  small: "text-[11px]",
+  badge: "text-[10px] font-medium",
+} as const;
+
+const BADGE_STYLES = {
+  connected: "bg-blue-900/15 border border-blue-900/25 text-blue-100",
+  disconnected: "bg-white-900/8 border border-white-900/15",
+} as const;
+
 function getDefaultNodeName(input: ConnectedSource): string {
   if (isTextGenerationNode(input.node)) {
     return input.node.content.llm.id;
@@ -66,8 +78,8 @@ function DataSourceDisplayBar({
           "bg-white-900/8 border border-white-900/15",
         )}
       >
-        <DatabaseZapIcon className="w-[14px] h-[14px] text-white-600" />
-        <p className="text-[11px] text-white-600">
+        <DatabaseZapIcon className={`${ICON_SIZE} text-white-600`} />
+        <p className={`${TEXT_STYLES.small} text-white-600`}>
           No data sources connected • Connect from Input tab to query
         </p>
       </div>
@@ -82,8 +94,8 @@ function DataSourceDisplayBar({
       )}
     >
       <div className="flex items-center gap-[8px]">
-        <DatabaseZapIcon className="w-[14px] h-[14px] text-blue-300" />
-        <span className="text-[11px] text-blue-200">
+        <DatabaseZapIcon className={`${ICON_SIZE} text-blue-300`} />
+        <span className={`${TEXT_STYLES.small} text-blue-200`}>
           Querying {dataSources.length} data source
           {dataSources.length !== 1 ? "s" : ""}:
         </span>
@@ -97,12 +109,12 @@ function DataSourceDisplayBar({
               key={dataSource.connection.id}
               className={clsx(
                 "flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
-                "bg-blue-900/15 border border-blue-900/25 text-blue-100",
+                BADGE_STYLES.connected,
               )}
             >
               <div className="text-blue-200 shrink-0">{icon}</div>
               <span
-                className="text-[10px] font-medium"
+                className={TEXT_STYLES.badge}
                 title={`${name} • ${description}`}
               >
                 {name} • {description}
