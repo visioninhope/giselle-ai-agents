@@ -5,19 +5,19 @@ import { and, eq } from "drizzle-orm";
 
 type EmbeddingTelemetryContext =
 	| {
-			operation: "github-repository-ingest";
-			teamDbId: number;
-			repository: string;
-	  }
+		operation: "github-repository-ingest";
+		teamDbId: number;
+		repository: string;
+	}
 	| {
-			operation: "github-repository-query";
-			workspaceId: WorkspaceId;
-			repository: string;
-	  };
+		operation: "github-repository-query";
+		workspaceId: WorkspaceId;
+		repository: string;
+	};
 
 interface TeamTelemetryInfo {
 	teamDbId: number;
-	workspaceId: WorkspaceId;
+	workspaceId?: WorkspaceId | null;
 	teamType: string;
 	activeSubscriptionId: string | null;
 }
@@ -112,13 +112,13 @@ export async function createEmbeddingTelemetrySettings(
 		return undefined;
 	}
 
-	const metadata: Record<string, unknown> = {
+	const metadata: TelemetrySettings["metadata"] = {
 		teamDbId: teamInfo.teamDbId,
 		teamType: teamInfo.teamType,
 		isProPlan:
 			teamInfo.activeSubscriptionId != null || teamInfo.teamType === "internal",
 		subscriptionId: teamInfo.activeSubscriptionId ?? "",
-		workspaceId: teamInfo.workspaceId,
+		workspaceId: teamInfo.workspaceId ?? "",
 		repository: context.repository,
 		operation: context.operation,
 		tags: [
