@@ -60,9 +60,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 	}, [agent.updatedAt]);
 
 	return (
-		// biome-ignore lint/a11y/noStaticElementInteractions: fix after
-		// biome-ignore lint/a11y/useAriaPropsSupportedByRole: fix after
-		<div
+		<section
 			onMouseMove={handleMouseMove}
 			aria-label={agent.name || "Untitled app"}
 			className="group relative flex h-[300px] w-[267px] flex-none flex-col rounded-[12px] border-[0.5px]"
@@ -132,6 +130,6 @@ export function AgentCard({ agent }: AgentCardProps) {
 					</div>
 				</Link>
 			</div>
-		</div>
+		</section>
 	);
 }
