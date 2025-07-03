@@ -131,13 +131,15 @@ export function createPostgresQueryService<
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
 	experimental_telemetry?: TelemetrySettings;
+	contextToTelemetrySettings?: (
+		context: TContext,
+	) => TelemetrySettings | undefined | Promise<TelemetrySettings | undefined>;
 }) {
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
 
-	// Resolve embedder
-	const embedder =
-		config.embedder || createDefaultEmbedder(config.experimental_telemetry);
+	// Resolve default embedder if not provided
+	const defaultEmbedder = config.embedder;
 
 	// Resolve column mapping
 	const columnMapping =
@@ -167,6 +169,15 @@ export function createPostgresQueryService<
 		let filters: Record<string, unknown> = {};
 
 		try {
+			// Resolve telemetry settings from context if resolver is provided
+			const telemetrySettings = config.contextToTelemetrySettings
+				? await config.contextToTelemetrySettings(context)
+				: config.experimental_telemetry;
+
+			// Create embedder with resolved telemetry settings
+			const embedder =
+				defaultEmbedder || createDefaultEmbedder(telemetrySettings);
+
 			const queryEmbedding = await embedder.embed(query);
 
 			filters = await contextToFilter(context);
