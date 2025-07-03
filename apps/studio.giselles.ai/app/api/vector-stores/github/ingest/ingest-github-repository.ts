@@ -6,6 +6,7 @@ import {
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
+import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 
 /**
@@ -15,6 +16,7 @@ export async function ingestGitHubBlobs(params: {
 	octokitClient: Octokit;
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
+	experimental_telemetry?: TelemetrySettings;
 }): Promise<void> {
 	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
@@ -40,6 +42,7 @@ export async function ingestGitHubBlobs(params: {
 			fileSha: metadata.fileSha,
 			path: metadata.path,
 		}),
+		experimental_telemetry: params.experimental_telemetry,
 	});
 
 	const result = await ingest();

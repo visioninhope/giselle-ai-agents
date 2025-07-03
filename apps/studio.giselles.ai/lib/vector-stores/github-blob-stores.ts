@@ -12,6 +12,7 @@ import {
 	createPostgresChunkStore,
 	createPostgresQueryService,
 } from "@giselle-sdk/rag";
+import type { TelemetrySettings } from "ai";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
 
@@ -119,14 +120,24 @@ const githubQueryMetadataSchema = z.object({
 });
 
 /**
- * Pre-configured GitHub query service instance
+ * Create a GitHub query service with optional telemetry
  */
-export const gitHubQueryService = createPostgresQueryService({
-	database: createDatabaseConfig(),
-	tableName: getTableName(githubRepositoryEmbeddings),
-	metadataSchema: githubQueryMetadataSchema,
-	contextToFilter: resolveGitHubEmbeddingFilter,
-	requiredColumnOverrides: {
-		documentKey: "path",
-	},
-});
+export function createGitHubQueryService(
+	experimental_telemetry?: TelemetrySettings,
+) {
+	return createPostgresQueryService({
+		database: createDatabaseConfig(),
+		tableName: getTableName(githubRepositoryEmbeddings),
+		metadataSchema: githubQueryMetadataSchema,
+		contextToFilter: resolveGitHubEmbeddingFilter,
+		requiredColumnOverrides: {
+			documentKey: "path",
+		},
+		experimental_telemetry,
+	});
+}
+
+/**
+ * Pre-configured GitHub query service instance (for backward compatibility)
+ */
+export const gitHubQueryService = createGitHubQueryService();

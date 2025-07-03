@@ -1,3 +1,4 @@
+import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
@@ -129,12 +130,14 @@ export function createPostgresQueryService<
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
+	experimental_telemetry?: TelemetrySettings;
 }) {
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
 
 	// Resolve embedder
-	const embedder = config.embedder || createDefaultEmbedder();
+	const embedder =
+		config.embedder || createDefaultEmbedder(config.experimental_telemetry);
 
 	// Resolve column mapping
 	const columnMapping =

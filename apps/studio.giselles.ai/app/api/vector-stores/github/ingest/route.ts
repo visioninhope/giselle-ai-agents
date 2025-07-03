@@ -1,6 +1,9 @@
+import { db, teams } from "@/drizzle";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
+import type { TelemetrySettings } from "ai";
+import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
 import type { TargetGitHubRepository } from "./types";
@@ -46,10 +49,31 @@ async function processRepository(
 			commitSha: commit.sha,
 		};
 
+		// Get team information for telemetry
+		const teamInfo = await db
+			.select({
+				type: teams.type,
+			})
+			.from(teams)
+			.where(eq(teams.dbId, teamDbId))
+			.limit(1);
+
+		const experimental_telemetry: TelemetrySettings | undefined = teamInfo[0]
+			? {
+					metadata: {
+						teamType: teamInfo[0].type,
+						// Note: userId is not available in cron job context
+						// This is a system-initiated operation
+						operation: "github-repository-ingest",
+					},
+				}
+			: undefined;
+
 		await ingestGitHubBlobs({
 			octokitClient,
 			source,
 			teamDbId,
+			experimental_telemetry,
 		});
 
 		await updateRepositoryStatusToCompleted(dbId, commit.sha);
