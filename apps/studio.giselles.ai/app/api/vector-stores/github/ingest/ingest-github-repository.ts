@@ -1,5 +1,3 @@
-import { db, githubRepositoryIndex } from "@/drizzle";
-import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
 import {
 	createGitHubBlobDownloadLoader,
 	createGitHubBlobLoader,
@@ -8,6 +6,8 @@ import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
 import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
+import { db, githubRepositoryIndex } from "@/drizzle";
+import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
 
 /**
  * Main GitHub repository ingestion coordination

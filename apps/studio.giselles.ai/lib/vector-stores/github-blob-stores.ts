@@ -1,3 +1,14 @@
+import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
+import {
+	createColumnMapping,
+	createPostgresChunkStore,
+	createPostgresQueryService,
+	type DatabaseConfig,
+} from "@giselle-sdk/rag";
+import type { TelemetrySettings } from "ai";
+import { and, eq, getTableName } from "drizzle-orm";
+import { z } from "zod/v4";
+import { createQueryTelemetrySettings } from "./telemetry";
 import {
 	agents,
 	db,
@@ -5,17 +16,6 @@ import {
 	githubRepositoryIndex,
 	teams,
 } from "@/drizzle";
-import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
-import {
-	type DatabaseConfig,
-	createColumnMapping,
-	createPostgresChunkStore,
-	createPostgresQueryService,
-} from "@giselle-sdk/rag";
-import type { TelemetrySettings } from "ai";
-import { and, eq, getTableName } from "drizzle-orm";
-import { z } from "zod/v4";
-import { createQueryTelemetrySettings } from "./telemetry";
 
 /**
  * GitHub chunk metadata schema and type for RAG storage

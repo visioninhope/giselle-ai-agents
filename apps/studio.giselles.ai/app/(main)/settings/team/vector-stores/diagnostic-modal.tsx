@@ -1,9 +1,9 @@
 "use client";
 
-import type { githubRepositoryIndex } from "@/drizzle";
 import * as Dialog from "@radix-ui/react-dialog";
 import { Check, Loader2 } from "lucide-react";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import type { githubRepositoryIndex } from "@/drizzle";
 import {
 	GlassDialogContent,
 	GlassDialogFooter,

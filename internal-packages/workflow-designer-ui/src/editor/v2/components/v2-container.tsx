@@ -1,41 +1,39 @@
 "use client";
 
-import { InputId, OutputId, isActionNode } from "@giselle-sdk/data-type";
+import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
 	type NodeChange,
 	ReactFlow,
-	Panel as XYFlowPanel,
 	useReactFlow,
 	useUpdateNodeInternals,
+	Panel as XYFlowPanel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
-import {
-	type RefObject,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import clsx from "clsx/lite";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Background } from "../../../ui/background";
 import { useToasts } from "../../../ui/toast";
 import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
+import { DataSourceTable } from "../../data-source";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
+import { RunHistoryTable } from "../../run-history/run-history-table";
+import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
-import type { LeftPanelValue, V2LayoutState } from "../state";
+import type { V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
-import { PanelWrapper } from "./resizable-panel";
+import { LeftPanel } from "./left-panel";
 
 interface V2ContainerProps extends V2LayoutState {
-	onLeftPanelClose?: () => void;
+	onLeftPanelClose: () => void;
 }
 
 function V2NodeCanvas() {
@@ -275,16 +273,45 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 			className="relative flex-1 bg-black-900 overflow-hidden"
 			ref={mainRef}
 		>
-			<div className="h-full flex">
-				{/* Left Panel */}
-				<PanelWrapper
-					isOpen={leftPanel !== null}
-					panelType={leftPanel}
-					onClose={() => onLeftPanelClose?.()}
-				/>
+			<PanelGroup direction="horizontal" className="h-full flex">
+				{leftPanel !== null && (
+					<>
+						<Panel order={1}>
+							{leftPanel === "data-source" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Data Source">
+									<DataSourceTable />
+								</LeftPanel>
+							)}
+							{leftPanel === "run-history" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Run History">
+									<RunHistoryTable />
+								</LeftPanel>
+							)}
+							{leftPanel === "secret" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Secrets">
+									<SecretTable />
+								</LeftPanel>
+							)}
+						</Panel>
+						<PanelResizeHandle
+							className={clsx(
+								"w-[12px] cursor-col-resize group flex items-center justify-center",
+							)}
+						>
+							<div
+								className={clsx(
+									"w-[3px] h-[32px] rounded-full transition-colors",
+									"bg-[#6b7280] opacity-60",
+									"group-data-[resize-handle-state=hover]:bg-[#4a90e2]",
+									"group-data-[resize-handle-state=drag]:bg-[#4a90e2]",
+								)}
+							/>
+						</PanelResizeHandle>
+					</>
+				)}
 
-				{/* Main Content Area */}
-				<div className="flex-1 relative">
+				<Panel order={2}>
+					{/* Main Content Area */}
 					<V2NodeCanvas />
 
 					{/* Floating Properties Panel */}
@@ -295,8 +322,8 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 					>
 						<PropertiesPanel />
 					</FloatingPropertiesPanel>
-				</div>
-			</div>
+				</Panel>
+			</PanelGroup>
 			<GradientDef />
 		</main>
 	);

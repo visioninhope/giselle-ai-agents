@@ -17,7 +17,7 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 
-import { type SecretId, isTextGenerationNode } from "@giselle-sdk/data-type";
+import { isTextGenerationNode, type SecretId } from "@giselle-sdk/data-type";
 import {
 	useGiselleEngine,
 	useWorkflowDesigner,
@@ -132,7 +132,7 @@ export function SecretTable() {
 		return null;
 	}
 	return (
-		<div className="px-[16px] pb-[16px] pt-[8px] h-full">
+		<div className="pl-[16px] pb-[16px] pt-[8px] h-full">
 			<div className="flex justify-end items-center">
 				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
 					<DialogTrigger asChild>

@@ -4,6 +4,7 @@ export {
 } from "./openai";
 export type { EmbedderFunction } from "./types";
 import type { TelemetrySettings } from "ai";
+
 import { createOpenAIEmbedder } from "./openai";
 
 const DEFAULT_OPENAI_MODEL = "text-embedding-3-small";

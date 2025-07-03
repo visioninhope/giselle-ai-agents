@@ -202,6 +202,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			// No specific cleanup needed for Supabase client
 		},
 
+		// biome-ignore lint/suspicious/useAwait: depends on interface
 		async watch(_callback) {
 			// Supabase doesn't support file watching natively
 			// Return unwatch function
