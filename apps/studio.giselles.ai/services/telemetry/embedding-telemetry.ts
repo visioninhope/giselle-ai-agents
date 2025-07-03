@@ -33,10 +33,8 @@ async function resolveTeamTelemetryInfoByTeamId(
 			teamDbId: teams.dbId,
 			teamType: teams.type,
 			activeSubscriptionId: subscriptions.id,
-			workspaceId: agents.workspaceId,
 		})
 		.from(teams)
-		.innerJoin(agents, eq(agents.teamDbId, teams.dbId))
 		.leftJoin(
 			subscriptions,
 			and(
@@ -53,7 +51,6 @@ async function resolveTeamTelemetryInfoByTeamId(
 
 	return {
 		teamDbId: result[0].teamDbId,
-		workspaceId: result[0].workspaceId,
 		teamType: result[0].teamType,
 		activeSubscriptionId: result[0].activeSubscriptionId,
 	};
