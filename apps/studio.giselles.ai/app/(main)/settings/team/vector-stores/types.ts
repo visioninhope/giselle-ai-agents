@@ -23,3 +23,14 @@ export type InstallationWithRepos = {
 export type ActionResult =
 	| { success: true }
 	| { success: false; error: string };
+
+export type DiagnosticResult =
+	| {
+			canBeFixed: true;
+			newInstallationId: number;
+	  }
+	| {
+			canBeFixed: false;
+			reason: "no-installation" | "repository-not-found" | "diagnosis-failed";
+			errorMessage?: string;
+	  };
