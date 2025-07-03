@@ -130,7 +130,6 @@ export function createPostgresQueryService<
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
-	experimental_telemetry?: TelemetrySettings;
 	contextToTelemetrySettings?: (
 		context: TContext,
 	) => TelemetrySettings | undefined | Promise<TelemetrySettings | undefined>;
@@ -172,7 +171,7 @@ export function createPostgresQueryService<
 			// Resolve telemetry settings from context if resolver is provided
 			const telemetrySettings = config.contextToTelemetrySettings
 				? await config.contextToTelemetrySettings(context)
-				: config.experimental_telemetry;
+				: undefined;
 
 			// Create embedder with resolved telemetry settings
 			const embedder =
