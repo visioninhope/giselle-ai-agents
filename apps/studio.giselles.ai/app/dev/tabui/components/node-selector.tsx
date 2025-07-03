@@ -30,6 +30,7 @@ export const NodeSelector: FC<NodeSelectorProps> = ({
 	return (
 		<div className={`grid gap-1 ${className}`}>
 			<div className="flex justify-center">
+				{/** biome-ignore lint/a11y/noStaticElementInteractions: fix after */}
 				<div
 					draggable
 					onDragStart={handleDragStart(nodeClassName)}

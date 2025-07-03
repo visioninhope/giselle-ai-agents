@@ -279,6 +279,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 					</div>
 				)}
 				<div className="py-[16px]">
+					{/** biome-ignore lint/a11y/noStaticElementInteractions: fix after */}
 					<div
 						className={clsx(
 							"group h-[300px] p-[8px]",

@@ -1,17 +1,14 @@
 "use client";
 
+import * as Dialog from "@radix-ui/react-dialog";
+import { AlertCircle, Trash } from "lucide-react";
+import { useState, useTransition } from "react";
 import type {
 	GitHubRepositoryIndexStatus,
 	githubRepositoryIndex,
 } from "@/drizzle";
 import { cn } from "@/lib/utils";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
-
-import type { DocumentLoaderErrorCode } from "./types";
-
-import * as Dialog from "@radix-ui/react-dialog";
-import { AlertCircle, Trash } from "lucide-react";
-import { useState, useTransition } from "react";
 import {
 	GlassDialogContent,
 	GlassDialogFooter,
@@ -19,6 +16,7 @@ import {
 } from "../components/glass-dialog-content";
 import { DiagnosticModal } from "./diagnostic-modal";
 import { getErrorMessage } from "./error-messages";
+import type { DocumentLoaderErrorCode } from "./types";
 
 type RepositoryItemProps = {
 	repositoryIndex: typeof githubRepositoryIndex.$inferSelect;

@@ -21,7 +21,7 @@ export function useTrigger(node: TriggerNode) {
 	);
 
 	const setFlowTrigger = useCallback(
-		async (newValue: Partial<FlowTrigger>) => {
+		(newValue: Partial<FlowTrigger>) => {
 			if (data === undefined) {
 				return;
 			}

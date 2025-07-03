@@ -50,7 +50,7 @@ export async function retryOperation<T>(
 		}
 	};
 
-	return attemptOperation();
+	return await attemptOperation();
 }
 
 /**
