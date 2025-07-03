@@ -13,14 +13,8 @@ import {
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
-import {
-	type RefObject,
-	useCallback,
-	useEffect,
-	useMemo,
-	useRef,
-	useState,
-} from "react";
+import clsx from "clsx/lite";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { Background } from "../../../ui/background";
 import { useToasts } from "../../../ui/toast";
@@ -28,15 +22,18 @@ import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
+import { DataSourceTable } from "../../data-source";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
+import { RunHistoryTable } from "../../run-history/run-history-table";
+import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
-import type { LeftPanelValue, V2LayoutState } from "../state";
+import type { V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
-import { PanelWrapper } from "./resizable-panel";
+import { LeftPanel } from "./left-panel";
 
 interface V2ContainerProps extends V2LayoutState {
-	onLeftPanelClose?: () => void;
+	onLeftPanelClose: () => void;
 }
 
 function V2NodeCanvas() {
@@ -280,14 +277,29 @@ export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 				{leftPanel !== null && (
 					<>
 						<Panel order={1}>
-							{/* Left Panel */}
-							<PanelWrapper
-								isOpen={leftPanel !== null}
-								panelType={leftPanel}
-								onClose={() => onLeftPanelClose?.()}
-							/>
+							{leftPanel === "data-source" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Data Source">
+									<DataSourceTable />
+								</LeftPanel>
+							)}
+							{leftPanel === "run-history" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Run History">
+									<RunHistoryTable />
+								</LeftPanel>
+							)}
+							{leftPanel === "secret" && (
+								<LeftPanel onClose={onLeftPanelClose} title="Secrets">
+									<SecretTable />
+								</LeftPanel>
+							)}
 						</Panel>
-						<PanelResizeHandle />
+						<PanelResizeHandle
+							className={clsx(
+								"w-[1px] bg-border cursor-col-resize transition-colors",
+								"data-[resize-handle-state=hover]:bg-[#4a90e2]",
+								"data-[resize-handle-state=drag]:bg-[#4a90e2]",
+							)}
+						/>
 					</>
 				)}
 
