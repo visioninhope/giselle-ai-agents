@@ -145,30 +145,53 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 					header={
 						connectedDatasourceInputs.length > 0 ? (
 							<div className="flex items-center gap-[6px] flex-wrap">
+								<span className="text-[11px] mr-2" style={{ color: "#839DC3" }}>
+									Querying {connectedDatasourceInputs.length} data source
+									{connectedDatasourceInputs.length !== 1 ? "s" : ""}:
+								</span>
 								{connectedDatasourceInputs.map((dataSource) => {
 									const { name, description, icon } =
 										getDataSourceDisplayInfo(dataSource);
 									return (
 										<div
 											key={dataSource.connection.id}
-											className={clsx(
-												"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
-												"bg-white-800/15 border border-white-800/25 text-white-100",
-											)}
+											className="flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]"
+											style={{
+												backgroundColor: "rgba(131, 157, 195, 0.15)",
+												borderColor: "rgba(131, 157, 195, 0.25)",
+												border: "1px solid",
+												color: "#839DC3",
+											}}
 										>
-											<div className="text-white-200 shrink-0">{icon}</div>
+											<div className="shrink-0" style={{ color: "#839DC3" }}>
+												{icon}
+											</div>
 											<span
 												className="text-[10px] font-medium"
+												style={{ color: "#839DC3" }}
 												title={`${name} • ${description}`}
 											>
-												{name} • {description}
+												{description}
 											</span>
 											<button
 												type="button"
 												onClick={() =>
 													deleteConnection(dataSource.connection.id)
 												}
-												className="text-white-400 hover:text-white-100 ml-1 p-0.5 rounded hover:bg-white-800/20 transition-colors"
+												className="ml-1 p-0.5 rounded transition-colors"
+												style={{
+													color: "rgba(131, 157, 195, 0.7)",
+												}}
+												onMouseEnter={(e) => {
+													e.currentTarget.style.color = "#839DC3";
+													e.currentTarget.style.backgroundColor =
+														"rgba(131, 157, 195, 0.2)";
+												}}
+												onMouseLeave={(e) => {
+													e.currentTarget.style.color =
+														"rgba(131, 157, 195, 0.7)";
+													e.currentTarget.style.backgroundColor = "transparent";
+												}}
 												title="Remove data source"
 											>
 												<X className="w-3 h-3" />
