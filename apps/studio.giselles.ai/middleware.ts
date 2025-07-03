@@ -16,7 +16,7 @@ export default supabaseMiddleware(async (user, request) => {
 		url.pathname = "/login";
 		return NextResponse.redirect(url);
 	}
-	return;
+	return NextResponse.next({ request });
 });
 
 export const config = {
