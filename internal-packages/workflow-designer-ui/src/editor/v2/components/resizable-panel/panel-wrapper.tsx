@@ -46,16 +46,8 @@ export function PanelWrapper({
 	const { Component, config } = panelData;
 
 	return (
-		<ResizablePanel
-			isOpen={isOpen}
-			minWidth={config.minWidth}
-			defaultWidth={config.defaultWidth}
-			maxWidth={config.maxWidth}
-			onWidthChange={onWidthChange}
-		>
-			<PanelContent showHeader={true} title={config.title} onClose={onClose}>
-				<Component />
-			</PanelContent>
-		</ResizablePanel>
+		<PanelContent showHeader={true} title={config.title} onClose={onClose}>
+			<Component />
+		</PanelContent>
 	);
 }

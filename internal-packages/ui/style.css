@@ -4,7 +4,7 @@
 	/* v2 theme */
 
 	/* border */
-	--color-border: #464b57;
+	--color-border: rgba(255, 255, 255, 0.1);
 	--color-light-border: rgba(255, 255, 255, 0.15);
 	--color-dark-border: rgba(0, 0, 0, 0.25);
 	--color-border-variant: #363c46;
