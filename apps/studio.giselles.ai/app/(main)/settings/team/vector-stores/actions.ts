@@ -1,15 +1,15 @@
 "use server";
 
+import { createId } from "@paralleldrive/cuid2";
+import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { db, githubRepositoryIndex } from "@/drizzle";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
-import { createId } from "@paralleldrive/cuid2";
-import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 
-type ActionResult = { success: true } | { success: false; error: string };
+import type { ActionResult, DiagnosticResult } from "./types";
 
 export async function registerRepositoryIndex(
 	owner: string,
@@ -102,5 +102,110 @@ export async function deleteRepositoryIndex(indexId: GitHubRepositoryIndexId) {
 				eq(githubRepositoryIndex.id, indexId),
 			),
 		);
+	revalidatePath("/settings/team/vector-stores");
+}
+
+export async function diagnoseRepositoryConnection(
+	indexId: GitHubRepositoryIndexId,
+): Promise<DiagnosticResult> {
+	try {
+		const team = await fetchCurrentTeam();
+
+		const [repositoryIndex] = await db
+			.select()
+			.from(githubRepositoryIndex)
+			.where(
+				and(
+					eq(githubRepositoryIndex.teamDbId, team.dbId),
+					eq(githubRepositoryIndex.id, indexId),
+				),
+			)
+			.limit(1);
+
+		if (!repositoryIndex) {
+			return {
+				canBeFixed: false,
+				reason: "repository-not-found",
+				errorMessage: "Repository index not found",
+			};
+		}
+
+		const githubIdentityState = await getGitHubIdentityState();
+		if (githubIdentityState.status !== "authorized") {
+			return {
+				canBeFixed: false,
+				reason: "diagnosis-failed",
+				errorMessage: "GitHub authentication required",
+			};
+		}
+
+		const userClient = githubIdentityState.gitHubUserClient;
+		const installationData = await userClient.getInstallations();
+
+		let validInstallationId: number | null = null;
+		for (const installation of installationData.installations) {
+			try {
+				const installationClient = await buildAppInstallationClient(
+					installation.id,
+				);
+				const response = await installationClient.request(
+					"GET /repos/{owner}/{repo}",
+					{
+						owner: repositoryIndex.owner,
+						repo: repositoryIndex.repo,
+					},
+				);
+
+				if (response.status === 200) {
+					validInstallationId = installation.id;
+					break;
+				}
+			} catch (error) {}
+		}
+
+		if (!validInstallationId) {
+			return {
+				canBeFixed: false,
+				reason: "no-installation",
+				errorMessage:
+					"No GitHub App installation has access to this repository",
+			};
+		}
+
+		return {
+			canBeFixed: true,
+			newInstallationId: validInstallationId,
+		};
+	} catch (error) {
+		console.error("Error diagnosing repository connection:", error);
+		return {
+			canBeFixed: false,
+			reason: "diagnosis-failed",
+			errorMessage: "Failed to diagnose the connection issue",
+		};
+	}
+}
+
+export async function updateRepositoryInstallation(
+	indexId: GitHubRepositoryIndexId,
+	newInstallationId: number,
+): Promise<void> {
+	const team = await fetchCurrentTeam();
+
+	await db
+		.update(githubRepositoryIndex)
+		.set({
+			installationId: newInstallationId,
+			status: "idle",
+			errorCode: null,
+			retryAfter: null,
+		})
+		.where(
+			and(
+				eq(githubRepositoryIndex.teamDbId, team.dbId),
+				eq(githubRepositoryIndex.id, indexId),
+			),
+		);
+
 	revalidatePath("/settings/team/vector-stores");
 }

@@ -7,16 +7,10 @@ import {
 } from "@giselle-sdk/data-type";
 import {
 	type ActionProvider,
-	type TriggerProvider,
 	actionProviders,
+	type TriggerProvider,
 	triggerProviders,
 } from "@giselle-sdk/flow";
-import {
-	Capability,
-	type LanguageModel,
-	hasCapability,
-	languageModels,
-} from "@giselle-sdk/language-model";
 import {
 	actionNodeDefaultName,
 	createActionNode,
@@ -29,14 +23,18 @@ import {
 	createVectorStoreNode,
 	createWebPageNode,
 	triggerNodeDefaultName,
-} from "@giselle-sdk/node-utils";
-import clsx from "clsx/lite";
-import {
 	useFeatureFlag,
 	useUsageLimits,
 	useVectorStore,
 	useWorkflowDesigner,
-} from "giselle-sdk/react";
+} from "@giselle-sdk/giselle-engine/react";
+import {
+	Capability,
+	hasCapability,
+	type LanguageModel,
+	languageModels,
+} from "@giselle-sdk/language-model";
+import clsx from "clsx/lite";
 import { DatabaseZapIcon, LucideSearch, WorkflowIcon } from "lucide-react";
 import { Popover, ToggleGroup } from "radix-ui";
 import { useEffect, useMemo, useState } from "react";
@@ -47,9 +45,9 @@ import {
 	AudioIcon,
 	CapabilityIcon,
 	DocumentIcon,
-	GenNodeIcon,
 	GenerateImageIcon,
 	GenerateTextIcon,
+	GenNodeIcon,
 	GitHubIcon,
 	GoogleWhiteIcon,
 	ImageGenerationNodeIcon,
@@ -57,8 +55,8 @@ import {
 	PdfFileIcon,
 	PerplexityIcon,
 	PictureIcon,
-	ProTag,
 	PromptIcon,
+	ProTag,
 	SearchIcon,
 	SourceLinkIcon,
 	TextFileIcon,
@@ -220,11 +218,11 @@ export function Toolbar() {
 	return (
 		<div className="relative rounded-[8px] overflow-hidden bg-white-900/10">
 			<div className="absolute z-0 rounded-[8px] inset-0 border mask-fill bg-gradient-to-br from-[hsla(232,37%,72%,0.2)] to-[hsla(218,58%,21%,0.9)] bg-origin-border bg-clip-boarder border-transparent" />
-			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[8px] py-[8px]">
+			<div className="flex divide-x divide-[hsla(232,36%,72%,0.2)] items-center px-[4px] py-[8px]">
 				<ToggleGroup.Root
 					type="single"
 					className={clsx(
-						"flex items-center px-[8px] z-10 h-full gap-[12px] text-white-950",
+						"flex items-center px-[4px] z-10 h-full gap-[12px] text-white-950",
 						"**:data-tool:hover:bg-white-850/10 **:data-tool:p-[4px] **:data-tool:rounded-[4px]",
 						"**:data-tool:data-[state=on]:bg-primary-900 **:data-tool:focus:outline-none",
 						"**:data-icon:w-[24px] **:data-icon:h-[24px] **:data-icon:text-white-950 ",

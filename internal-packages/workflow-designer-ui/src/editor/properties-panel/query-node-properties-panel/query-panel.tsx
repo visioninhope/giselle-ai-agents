@@ -1,13 +1,13 @@
 import {
 	ConnectionId,
-	type QueryNode,
 	isTextGenerationNode,
 	isVectorStoreNode,
+	type QueryNode,
 } from "@giselle-sdk/data-type";
-import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
+import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import { AtSignIcon, DatabaseZapIcon } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
 import { useMemo } from "react";
@@ -54,7 +54,9 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
 
 function DataSourceDisplayBar({
 	dataSources,
-}: { dataSources: ConnectedSource[] }) {
+}: {
+	dataSources: ConnectedSource[];
+}) {
 	if (dataSources.length === 0) {
 		return (
 			<div

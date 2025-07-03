@@ -4,8 +4,11 @@ import {
 	type WebPageNode,
 	type WorkspaceId,
 } from "@giselle-sdk/data-type";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
 import { TrashIcon } from "lucide-react";
 import { Dialog } from "radix-ui";
 import { type FormEventHandler, useCallback, useState } from "react";
@@ -269,7 +272,7 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 							type="submit"
 							className="w-full flex items-center justify-center gap-[4px] px-[16px] py-[8px] rounded-[8px] bg-blue-700 text-white-800 font-semibold hover:bg-blue-800 cursor-pointer"
 						>
-							Insert
+							Add
 						</button>
 					</form>
 

@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1055 MIT
+* 1066 MIT
 * 108 Apache 2.0
 * 60 ISC
 * 34 New BSD
@@ -10,19 +10,20 @@
 * 5 BlueOak-1.0.0
 * 3 MIT OR Apache-2.0
 * 3 Mozilla Public License 2.0
-* 2 MIT-0
 * 2 LGPL-3.0-or-later
+* 2 MIT-0
 * 2 The Unlicense
-* 1 BSD
-* 1 (MIT OR CC0-1.0)
-* 1 BSD Zero Clause License
-* 1 Unknown
-* 1 (MIT OR Apache-2.0)
-* 1 (BSD-2-Clause OR MIT OR Apache-2.0)
-* 1 (AFL-2.1 OR BSD-3-Clause)
-* 1 SIL OPEN FONT LICENSE
-* 1 CC-BY-4.0
 * 1 Python-2.0
+* 1 CC-BY-4.0
+* 1 SIL OPEN FONT LICENSE
+* 1 (AFL-2.1 OR BSD-3-Clause)
+* 1 (WTFPL OR MIT)
+* 1 (BSD-2-Clause OR MIT OR Apache-2.0)
+* 1 (MIT OR Apache-2.0)
+* 1 Unknown
+* 1 BSD Zero Clause License
+* 1 (MIT OR CC0-1.0)
+* 1 BSD
 
 
 
@@ -426,7 +427,7 @@
 
 
 <a name="@biomejs/biome"></a>
-### @biomejs/biome v1.9.4
+### @biomejs/biome v2.0.6
 #### 
 
 ##### Paths
@@ -437,7 +438,7 @@ MIT OR Apache-2.0 permitted
 
 
 <a name="@biomejs/cli-linux-x64"></a>
-### @biomejs/cli-linux-x64 v1.9.4
+### @biomejs/cli-linux-x64 v2.0.6
 #### 
 
 ##### Paths
@@ -448,7 +449,7 @@ MIT OR Apache-2.0 permitted
 
 
 <a name="@biomejs/cli-linux-x64-musl"></a>
-### @biomejs/cli-linux-x64-musl v1.9.4
+### @biomejs/cli-linux-x64-musl v2.0.6
 #### 
 
 ##### Paths
@@ -724,6 +725,17 @@ MIT-0 permitted
 
 <a name="@csstools/css-tokenizer"></a>
 ### @csstools/css-tokenizer v3.0.3
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@discoveryjs/json-ext"></a>
+### @discoveryjs/json-ext v0.5.7
 #### 
 
 ##### Paths
@@ -1558,8 +1570,19 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@next/bundle-analyzer"></a>
+### @next/bundle-analyzer v15.3.4
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@next/env"></a>
-### @next/env v15.1.4
+### @next/env v15.3.4
 #### 
 
 ##### Paths
@@ -1570,7 +1593,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-gnu"></a>
-### @next/swc-linux-x64-gnu v15.3.0
+### @next/swc-linux-x64-gnu v15.3.4
 #### 
 
 ##### Paths
@@ -1581,7 +1604,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/swc-linux-x64-musl"></a>
-### @next/swc-linux-x64-musl v15.3.0
+### @next/swc-linux-x64-musl v15.3.4
 #### 
 
 ##### Paths
@@ -1592,7 +1615,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@next/third-parties"></a>
-### @next/third-parties v15.1.4
+### @next/third-parties v15.3.4
 #### 
 
 ##### Paths
@@ -2416,6 +2439,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@polka/url"></a>
+### @polka/url v1.0.0-next.29
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@popperjs/core"></a>
 ### @popperjs/core v2.11.8
 #### 
@@ -3220,7 +3254,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@rollup/rollup-linux-x64-gnu"></a>
-### @rollup/rollup-linux-x64-gnu v4.34.4
+### @rollup/rollup-linux-x64-gnu v4.35.0
 #### 
 
 ##### Paths
@@ -3231,7 +3265,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@rollup/rollup-linux-x64-musl"></a>
-### @rollup/rollup-linux-x64-musl v4.34.4
+### @rollup/rollup-linux-x64-musl v4.35.0
 #### 
 
 ##### Paths
@@ -4429,6 +4463,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@types/tar"></a>
+### @types/tar v6.1.13
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@types/tedious"></a>
 ### @types/tedious v4.0.14
 #### 
@@ -4496,7 +4541,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@types/ws"></a>
-### @types/ws v8.5.13
+### @types/ws v8.18.1
 #### 
 
 ##### Paths
@@ -6656,7 +6701,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="detect-libc"></a>
-### detect-libc v2.0.3
+### detect-libc v2.0.4
 #### 
 
 ##### Paths
@@ -6778,6 +6823,17 @@ BlueOak-1.0.0 permitted
 
 <a name="dunder-proto"></a>
 ### dunder-proto v1.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="duplexer"></a>
+### duplexer v0.1.2
 #### 
 
 ##### Paths
@@ -7832,6 +7888,17 @@ SIL OPEN FONT LICENSE permitted
 
 
 
+<a name="gzip-size"></a>
+### gzip-size v6.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="h3"></a>
 ### h3 v1.15.0
 #### 
@@ -8516,6 +8583,17 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="is-plain-obj"></a>
 ### is-plain-obj v4.1.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="is-plain-object"></a>
+### is-plain-object v5.0.0
 #### 
 
 ##### Paths
@@ -10109,6 +10187,17 @@ BlueOak-1.0.0 permitted
 
 
 
+<a name="mrmime"></a>
+### mrmime v2.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="ms"></a>
 ### ms v2.1.3
 #### 
@@ -10154,7 +10243,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="nanoid"></a>
-### nanoid v3.3.8
+### nanoid v3.3.11
 #### 
 
 ##### Paths
@@ -10187,7 +10276,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="next"></a>
-### next v15.3.0
+### next v15.3.4
 #### 
 
 ##### Paths
@@ -10491,6 +10580,17 @@ MIT-0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
+
+
+
+<a name="opener"></a>
+### opener v1.5.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+(WTFPL OR MIT) permitted
 
 
 
@@ -12046,7 +12146,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="rollup"></a>
-### rollup v4.34.4
+### rollup v4.35.0
 #### 
 
 ##### Paths
@@ -12399,6 +12499,17 @@ BlueOak-1.0.0 permitted
 
 <a name="simple-swizzle"></a>
 ### simple-swizzle v0.2.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="sirv"></a>
+### sirv v2.0.4
 #### 
 
 ##### Paths
@@ -13204,6 +13315,17 @@ Unknown manually approved
 
 
 
+<a name="totalist"></a>
+### totalist v3.0.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="tough-cookie"></a>
 ### tough-cookie v5.1.2
 #### 
@@ -14000,6 +14122,17 @@ Unknown manually approved
 
 
 
+<a name="webpack-bundle-analyzer"></a>
+### webpack-bundle-analyzer v4.10.1
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="webpack-sources"></a>
 ### webpack-sources v3.2.3
 #### 
@@ -14122,7 +14255,7 @@ Unknown manually approved
 
 
 <a name="ws"></a>
-### ws v8.18.0
+### ws v7.5.10
 #### 
 
 ##### Paths

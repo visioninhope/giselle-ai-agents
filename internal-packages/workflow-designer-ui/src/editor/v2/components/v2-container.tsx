@@ -1,18 +1,18 @@
 "use client";
 
-import { InputId, OutputId, isActionNode } from "@giselle-sdk/data-type";
+import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
 	type NodeChange,
 	ReactFlow,
-	Panel as XYFlowPanel,
 	useReactFlow,
 	useUpdateNodeInternals,
+	Panel as XYFlowPanel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import {
 	type RefObject,
 	useCallback,
@@ -27,16 +27,16 @@ import { edgeTypes } from "../../connector";
 import { type ConnectorType, GradientDef } from "../../connector/component";
 import { ContextMenu } from "../../context-menu";
 import type { ContextMenuProps } from "../../context-menu/types";
-import { DataSourceTable } from "../../data-source";
 import { type GiselleWorkflowDesignerNode, nodeTypes } from "../../node";
 import { PropertiesPanel } from "../../properties-panel";
-import { RunHistoryTable } from "../../run-history/run-history-table";
-import { SecretTable } from "../../secret/secret-table";
 import { FloatingNodePreview, Toolbar, useToolbar } from "../../tool";
 import type { LeftPanelValue, V2LayoutState } from "../state";
 import { FloatingPropertiesPanel } from "./floating-properties-panel";
+import { PanelWrapper } from "./resizable-panel";
 
-interface V2ContainerProps extends V2LayoutState {}
+interface V2ContainerProps extends V2LayoutState {
+	onLeftPanelClose?: () => void;
+}
 
 function V2NodeCanvas() {
 	const {
@@ -255,7 +255,7 @@ function V2NodeCanvas() {
 	);
 }
 
-export function V2Container({ leftPanel }: V2ContainerProps) {
+export function V2Container({ leftPanel, onLeftPanelClose }: V2ContainerProps) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
 		() =>
@@ -275,59 +275,29 @@ export function V2Container({ leftPanel }: V2ContainerProps) {
 			className="relative flex-1 bg-black-900 overflow-hidden"
 			ref={mainRef}
 		>
-			<div className="h-full">
-				<LeftPanel value={leftPanel} containerRef={mainRef} />
-				<V2NodeCanvas />
+			<div className="h-full flex">
+				{/* Left Panel */}
+				<PanelWrapper
+					isOpen={leftPanel !== null}
+					panelType={leftPanel}
+					onClose={() => onLeftPanelClose?.()}
+				/>
 
-				{/* Floating Properties Panel */}
-				<FloatingPropertiesPanel
-					isOpen={isPropertiesPanelOpen}
-					container={mainRef.current}
-					title="Properties Panel"
-				>
-					<PropertiesPanel />
-				</FloatingPropertiesPanel>
+				{/* Main Content Area */}
+				<div className="flex-1 relative">
+					<V2NodeCanvas />
+
+					{/* Floating Properties Panel */}
+					<FloatingPropertiesPanel
+						isOpen={isPropertiesPanelOpen}
+						container={mainRef.current}
+						title="Properties Panel"
+					>
+						<PropertiesPanel />
+					</FloatingPropertiesPanel>
+				</div>
 			</div>
 			<GradientDef />
 		</main>
-	);
-}
-
-function LeftPanel({
-	value,
-	containerRef,
-}: {
-	value: LeftPanelValue | null;
-	containerRef: RefObject<HTMLDivElement | null>;
-}) {
-	const content = useMemo(() => {
-		if (value === null) {
-			return null;
-		}
-		switch (value) {
-			case "data-source":
-				return <DataSourceTable />;
-			case "run-history":
-				return <RunHistoryTable />;
-			case "secret":
-				return <SecretTable />;
-			default: {
-				const _exhaustiveCheck: never = value;
-				throw new Error(`Unhandled leftPanel: ${_exhaustiveCheck}`);
-			}
-		}
-	}, [value]);
-	if (content === null) {
-		return null;
-	}
-	return (
-		<FloatingPropertiesPanel
-			isOpen
-			position="left"
-			container={containerRef?.current}
-			title="Left Panel"
-		>
-			{content}
-		</FloatingPropertiesPanel>
 	);
 }

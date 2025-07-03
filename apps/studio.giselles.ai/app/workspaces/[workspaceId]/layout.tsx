@@ -1,8 +1,13 @@
+import { WorkspaceId } from "@giselle-sdk/data-type";
+import { WorkspaceProvider } from "@giselle-sdk/giselle-engine/react";
+import { notFound } from "next/navigation";
+import type { ReactNode } from "react";
 import { getGitHubVectorStores } from "@/app/services/vector-store";
 import { db } from "@/drizzle";
 import {
 	githubToolsFlag,
 	layoutV2Flag,
+	layoutV3Flag,
 	runV3Flag,
 	sidemenuFlag,
 	webSearchActionFlag,
@@ -11,10 +16,6 @@ import { getGitHubIntegrationState } from "@/packages/lib/github";
 import { getUsageLimitsForTeam } from "@/packages/lib/usage-limits";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam, isProPlan } from "@/services/teams";
-import { WorkspaceId } from "@giselle-sdk/data-type";
-import { WorkspaceProvider } from "giselle-sdk/react";
-import { notFound } from "next/navigation";
-import type { ReactNode } from "react";
 
 export default async function Layout({
 	params,
@@ -46,6 +47,7 @@ export default async function Layout({
 	const githubTools = await githubToolsFlag();
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV2 = await layoutV2Flag();
+	const layoutV3 = await layoutV3Flag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -77,6 +79,7 @@ export default async function Layout({
 				githubTools,
 				webSearchAction,
 				layoutV2,
+				layoutV3,
 			}}
 		>
 			{children}

@@ -4,6 +4,9 @@ import {
 	GitHubNode,
 	ImageGenerationNode,
 	type InputId,
+	isImageGenerationNode,
+	isTextGenerationNode,
+	isTriggerNode,
 	type Node,
 	type OutputId,
 	QueryNode,
@@ -12,13 +15,12 @@ import {
 	TriggerNode,
 	VectorStoreNode,
 	WebPageNode,
-	isActionNode,
-	isImageGenerationNode,
-	isTextGenerationNode,
-	isTriggerNode,
-	isVectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { defaultName } from "@giselle-sdk/node-utils";
+import {
+	defaultName,
+	useNodeGenerations,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import {
 	Handle,
 	type NodeProps,
@@ -27,10 +29,9 @@ import {
 	type Node as XYFlowNode,
 } from "@xyflow/react";
 import clsx from "clsx/lite";
-import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
-import { CheckIcon, CircleAlertIcon, SquareIcon } from "lucide-react";
+import { CheckIcon, SquareIcon } from "lucide-react";
 import { AnimatePresence, motion } from "motion/react";
-import { useEffect, useMemo, useState, useTransition } from "react";
+import { useEffect, useMemo, useRef, useTransition } from "react";
 import { NodeIcon } from "../../icons/node";
 import { EditableText } from "../../ui/editable-text";
 import { Tooltip } from "../../ui/tooltip";
@@ -145,16 +146,14 @@ export function NodeComponent({
 		nodeId: node.id,
 		origin: { type: "workspace", id: data.id },
 	});
-	const [prevGenerationStatus, setPrevGenerationStatus] = useState(
-		currentGeneration?.status,
-	);
+	const prevGenerationStatusRef = useRef(currentGeneration?.status);
 	const [showCompleteLabel, startTransition] = useTransition();
 	useEffect(() => {
 		if (currentGeneration === undefined) {
 			return;
 		}
 		if (
-			prevGenerationStatus === "running" &&
+			prevGenerationStatusRef.current === "running" &&
 			currentGeneration.status === "completed"
 		) {
 			startTransition(
@@ -166,8 +165,8 @@ export function NodeComponent({
 					}),
 			);
 		}
-		setPrevGenerationStatus(currentGeneration.status);
-	}, [currentGeneration, prevGenerationStatus]);
+		prevGenerationStatusRef.current = currentGeneration.status;
+	}, [currentGeneration]);
 	const metadataTexts = useMemo(() => {
 		const tmp: { label: string; tooltip: string }[] = [];
 		if (isTextGenerationNode(node) || isImageGenerationNode(node)) {

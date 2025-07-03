@@ -1,29 +1,39 @@
-import type { TextGenerationNode } from "@giselle-sdk/data-type";
+import type { TextGenerationNode, ToolSet } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
 import { CheckIcon } from "lucide-react";
 import type { PropsWithChildren, ReactNode } from "react";
-import { GitHubIcon } from "../../../tool";
-import { GitHubToolConfigurationDialog } from "./tool-provider/github";
+import { toolProviders } from "./tool-provider";
 
-export function ToolsPanel({
-	node,
-}: {
-	node: TextGenerationNode;
-}) {
+function ensureTools(key: keyof ToolSet, node: TextGenerationNode): string[] {
+	const toolConfig = node.content.tools?.[key];
+	if (!toolConfig) return [];
+
+	// Check if the toolConfig has a tools property
+	if ("tools" in toolConfig) {
+		return toolConfig.tools;
+	}
+
+	return [];
+}
+
+export function ToolsPanel({ node }: { node: TextGenerationNode }) {
 	return (
 		<div className="text-white-400 space-y-[16px]">
-			<ToolListItem
-				icon={<GitHubIcon data-tool-icon />}
-				configurationPanel={<GitHubToolConfigurationDialog node={node} />}
-				availableTools={node.content.tools?.github?.tools}
-			>
-				<div className="flex gap-[10px] items-center">
-					<h3 className="text-text text-[14px]">GitHub</h3>
-					{node.content.tools?.github && (
-						<CheckIcon className="size-[14px] text-success" />
-					)}
-				</div>
-			</ToolListItem>
+			{toolProviders.map((provider) => (
+				<ToolListItem
+					key={provider.key}
+					icon={provider.icon}
+					configurationPanel={provider.renderConfiguration(node)}
+					availableTools={ensureTools(provider.key, node)}
+				>
+					<div className="flex gap-[10px] items-center">
+						<h3 className="text-text text-[14px]">{provider.label}</h3>
+						{node.content.tools?.[provider.key] && (
+							<CheckIcon className="size-[14px] text-success" />
+						)}
+					</div>
+				</ToolListItem>
+			))}
 		</div>
 	);
 }

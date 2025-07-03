@@ -9,6 +9,7 @@ import {
 	GenerationOrigin,
 	NodeId,
 	QueuedGeneration,
+	SecretId,
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
@@ -298,6 +299,7 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 				label: z.string(),
 				value: z.string(),
+				tags: z.array(z.string()).optional(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
@@ -308,6 +310,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
+				tags: z.array(z.string()).optional(),
 			}),
 			handler: async ({ input }) =>
 				JsonResponse.json({
@@ -367,6 +370,17 @@ export const createJsonRouters = {
 				JsonResponse.json({
 					runs: await giselleEngine.getWorkspaceFlowRuns(input),
 				}),
+		}),
+	deleteSecret: (giselleEngine: GiselleEngine) =>
+		createHandler({
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				secretId: SecretId.schema,
+			}),
+			handler: async ({ input }) => {
+				await giselleEngine.deleteSecret(input);
+				return new Response(null, { status: 204 });
+			},
 		}),
 } as const;
 

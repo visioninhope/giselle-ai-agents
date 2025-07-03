@@ -1,4 +1,5 @@
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
+import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
@@ -53,10 +54,75 @@ async function processRepository(
 
 		await updateRepositoryStatusToCompleted(dbId, commit.sha);
 	} catch (error) {
-		console.error(`Failed to ingest ${owner}/${repo}:`, error);
+		console.error(
+			`Failed to ingest GitHub Repository: teamDbId=${teamDbId}, repository=${owner}/${repo}`,
+			error,
+		);
+
+		const { errorCode, retryAfter } = extractErrorInfo(error);
+
 		captureException(error, {
-			extra: { owner, repo },
+			extra: {
+				owner,
+				repo,
+				teamDbId,
+				errorCode,
+				retryAfter,
+				errorContext:
+					error instanceof DocumentLoaderError ? error.context : undefined,
+			},
 		});
-		await updateRepositoryStatusToFailed(dbId);
+
+		await updateRepositoryStatusToFailed(dbId, {
+			errorCode,
+			retryAfter,
+		});
 	}
+}
+
+/**
+ * Extract error code and retry time from an error
+ * @param error The error to extract information from
+ * @returns Error code and retry time
+ */
+function extractErrorInfo(error: unknown): {
+	errorCode: string;
+	retryAfter: Date | null;
+} {
+	if (error instanceof DocumentLoaderError) {
+		const errorCode = error.code;
+
+		let retryAfter: Date | null;
+		switch (error.code) {
+			case "DOCUMENT_NOT_FOUND":
+			case "DOCUMENT_TOO_LARGE":
+				// Not retryable
+				retryAfter = null;
+				break;
+			case "DOCUMENT_RATE_LIMITED":
+				retryAfter = error.getRetryAfterDate() ?? new Date();
+				break;
+			case "DOCUMENT_FETCH_ERROR":
+				retryAfter = new Date();
+				break;
+			default: {
+				const _exhaustiveCheck: never = error.code;
+				throw new Error(`Unknown error code: ${_exhaustiveCheck}`);
+			}
+		}
+
+		return { errorCode, retryAfter };
+	}
+
+	if (error instanceof RagError) {
+		return {
+			errorCode: error.code,
+			retryAfter: new Date(),
+		};
+	}
+
+	return {
+		errorCode: "UNKNOWN",
+		retryAfter: new Date(),
+	};
 }

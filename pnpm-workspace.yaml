@@ -4,14 +4,16 @@ packages:
   - packages/*
   - tools/*
 catalog:
-  "@biomejs/biome": 1.9.4
+  "@biomejs/biome": 2.0.6
   typescript: 5.7.3
   zod: 3.25.28
   "zod/v4": npm:zod@4.0.5
   nanoid: 5.0.9
   tsup: 8.3.5
   "@turbo/gen": 2.3.3
-  next: 15.3.0
+  next: 15.3.4
+  "@next/env": 15.3.4
+  "@next/third-parties": 15.3.4
   unstorage: 1.14.4
   ai: 4.3.9
   "@types/node": 22.14.0
@@ -80,3 +82,5 @@ catalog:
   defuddle: 0.6.4
   "happy-dom": 17.6.1
   jsdom: 26.1.0
+  tar: 7.4.3
+  "@types/tar": 6.1.13

@@ -1,14 +1,14 @@
+import type { Node, Workspace } from "@giselle-sdk/data-type";
 import {
+	isImageGenerationNode,
+	isTextGenerationNode,
 	type Output,
 	OutputId,
 	type TextGenerationNode,
 	type ToolSet,
-	isImageGenerationNode,
-	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
-import type { Node, Workspace } from "@giselle-sdk/data-type";
+import { useFeatureFlag } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag } from "giselle-sdk/react";
 import { Tabs } from "radix-ui";
 import { InputPanel } from "./input-panel";
 import {
@@ -51,7 +51,6 @@ export function TextGenerationTabContent({
 	sidemenu,
 }: TextGenerationTabContentProps) {
 	const { layoutV2 } = useFeatureFlag();
-
 	return (
 		<>
 			<Tabs.Root
@@ -71,7 +70,7 @@ export function TextGenerationTabContent({
 				>
 					<Tabs.Trigger value="prompt">Prompt</Tabs.Trigger>
 					<Tabs.Trigger value="model">Model</Tabs.Trigger>
-					<Tabs.Trigger value="input">Input</Tabs.Trigger>
+					{!layoutV2 && <Tabs.Trigger value="input">Input</Tabs.Trigger>}
 					{githubTools && <Tabs.Trigger value="tools">Tools</Tabs.Trigger>}
 				</Tabs.List>
 				<Tabs.Content

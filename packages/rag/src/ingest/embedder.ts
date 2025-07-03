@@ -16,6 +16,7 @@ export async function embedContent(
 		throw OperationError.invalidOperation(
 			"embedContent",
 			"maxBatchSize must be a positive number",
+			undefined,
 			{ maxBatchSize },
 		);
 	}
@@ -31,6 +32,7 @@ export async function embedContent(
 			throw OperationError.invalidOperation(
 				"embedMany",
 				`returned ${embeddings.length} embeddings for ${batch.length} chunks`,
+				undefined,
 				{ batchSize: batch.length, embeddingsLength: embeddings.length },
 			);
 		}

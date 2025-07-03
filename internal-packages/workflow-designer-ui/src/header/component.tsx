@@ -1,12 +1,15 @@
 "use client";
 import {
+	isTriggerNode,
 	type TriggerNode,
 	type WorkspaceId,
-	isTriggerNode,
 } from "@giselle-sdk/data-type";
-import { triggerNodeDefaultName } from "@giselle-sdk/node-utils";
+import {
+	triggerNodeDefaultName,
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { PlayIcon } from "lucide-react";
 import Link from "next/link";
 import { Dialog, VisuallyHidden } from "radix-ui";
@@ -19,7 +22,7 @@ import { ShareModal } from "../ui/share-modal";
 import { ToastProvider } from "../ui/toast";
 import { UserPresence } from "../ui/user-presence";
 import { RunButton } from "./run-button";
-import { Button, TriggerInputDialog, buttonLabel } from "./ui";
+import { Button, buttonLabel, TriggerInputDialog } from "./ui";
 
 function Trigger() {
 	const { data } = useWorkflowDesigner();

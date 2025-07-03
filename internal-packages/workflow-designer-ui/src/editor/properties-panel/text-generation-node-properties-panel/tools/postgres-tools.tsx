@@ -1,5 +1,8 @@
 import type { TextGenerationNode } from "@giselle-sdk/data-type";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { CheckIcon, DatabaseIcon, TrashIcon } from "lucide-react";
 import { Switch } from "../../../../ui/switch";
 
@@ -15,7 +18,7 @@ const POSTGRES_TOOL_CATEGORIES = [
 ];
 
 export function PostgresToolsPanel({ node }: { node: TextGenerationNode }) {
-	const { updateNodeDataContent } = useWorkflowDesigner();
+	const { updateNodeDataContent, data } = useWorkflowDesigner();
 	const client = useGiselleEngine();
 
 	const toolsEnabled = !!node.content.tools?.postgres;
@@ -60,8 +63,10 @@ export function PostgresToolsPanel({ node }: { node: TextGenerationNode }) {
 							alert("Invalid Connection String");
 							return;
 						}
-						const { encrypted } = await client.encryptSecret({
-							plaintext: connectionString,
+						const result = await client.addSecret({
+							workspaceId: data.id,
+							label: "test",
+							value: connectionString,
 						});
 
 						updateNodeDataContent(node, {
@@ -69,7 +74,7 @@ export function PostgresToolsPanel({ node }: { node: TextGenerationNode }) {
 							tools: {
 								...node.content.tools,
 								postgres: {
-									connectionString: encrypted,
+									secretId: result.secret.id,
 									tools: [],
 								},
 							},

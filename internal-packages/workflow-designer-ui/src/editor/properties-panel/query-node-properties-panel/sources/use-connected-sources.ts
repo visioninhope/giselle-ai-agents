@@ -6,7 +6,7 @@ import type {
 	VariableNode,
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "giselle-sdk/react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { useMemo } from "react";
 import type { ConnectedSource, DatastoreNode } from "./types";
 

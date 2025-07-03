@@ -1,5 +1,7 @@
+import createBundleAnalyzer from "@next/bundle-analyzer";
 import { withSentryConfig } from "@sentry/nextjs";
 import type { NextConfig } from "next";
+
 const nextConfig: NextConfig = {
 	eslint: {
 		// Warning: This allows production builds to successfully complete even if
@@ -81,7 +83,7 @@ const nextConfig: NextConfig = {
 	},
 };
 
-export default withSentryConfig(nextConfig, {
+const withSentry = withSentryConfig(nextConfig, {
 	// For all available options, see:
 	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
 
@@ -123,3 +125,8 @@ export default withSentryConfig(nextConfig, {
 	// https://vercel.com/docs/cron-jobs
 	automaticVercelMonitors: true,
 });
+
+const withAnalyzer = createBundleAnalyzer({
+	enabled: process.env.ANALYZE === "true",
+});
+export default withAnalyzer(withSentry);

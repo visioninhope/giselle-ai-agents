@@ -3,12 +3,13 @@ import { ZodError, z } from "zod/v4";
 import {
 	ConfigurationError,
 	DatabaseError,
+	DocumentLoaderError,
 	EmbeddingError,
-	OperationError,
-	ValidationError,
 	handleError,
 	isErrorCategory,
 	isErrorCode,
+	OperationError,
+	ValidationError,
 } from "./errors";
 
 describe("Enhanced Error System", () => {
@@ -147,12 +148,112 @@ describe("Enhanced Error System", () => {
 			const error = OperationError.invalidOperation(
 				"search",
 				"index not ready",
+				undefined,
 				{ indexName: "embeddings" },
 			);
 
 			expect(error.code).toBe("INVALID_OPERATION");
 			expect(error.context?.operation).toBe("search");
 			expect(error.context?.reason).toBe("index not ready");
+		});
+
+		it("should create invalid operation error with cause", () => {
+			const originalError = new Error("Index connection failed");
+			const error = OperationError.invalidOperation(
+				"search",
+				"index not ready",
+				originalError,
+				{ indexName: "embeddings" },
+			);
+
+			expect(error.code).toBe("INVALID_OPERATION");
+			expect(error.cause).toBe(originalError);
+			expect(error.context?.operation).toBe("search");
+			expect(error.context?.reason).toBe("index not ready");
+		});
+	});
+
+	describe("DocumentLoaderError", () => {
+		it("should create rate limited error with number retry-after", () => {
+			const error = DocumentLoaderError.rateLimited(
+				"github",
+				60, // 60 seconds
+				undefined,
+				{ endpoint: "/api/v1/repos" },
+			);
+
+			expect(error.code).toBe("DOCUMENT_RATE_LIMITED");
+			expect(error.category).toBe("document-loader");
+			expect(error.context?.source).toBe("github");
+			expect(error.context?.retryAfter).toBe(60);
+			expect(error.context?.retryAfterDate).toBeInstanceOf(Date);
+			expect(error.context?.occurredAt).toBeInstanceOf(Date);
+
+			// Check that retryAfterDate is approximately 60 seconds in the future
+			const retryAfterDate = error.context?.retryAfterDate as Date;
+			const occurredAt = error.context?.occurredAt as Date;
+			const diffMs = retryAfterDate.getTime() - occurredAt.getTime();
+			expect(diffMs).toBeGreaterThanOrEqual(59000); // Allow small timing variance
+			expect(diffMs).toBeLessThanOrEqual(61000);
+		});
+
+		it("should create rate limited error with string retry-after", () => {
+			const error = DocumentLoaderError.rateLimited(
+				"github",
+				"120", // 120 seconds as string
+				undefined,
+				{ endpoint: "/api/v1/repos" },
+			);
+
+			expect(error.code).toBe("DOCUMENT_RATE_LIMITED");
+			expect(error.context?.retryAfter).toBe("120");
+			expect(error.context?.retryAfterDate).toBeInstanceOf(Date);
+
+			// Check that retryAfterDate is approximately 120 seconds in the future
+			const retryAfterDate = error.context?.retryAfterDate as Date;
+			const occurredAt = error.context?.occurredAt as Date;
+			const diffMs = retryAfterDate.getTime() - occurredAt.getTime();
+			expect(diffMs).toBeGreaterThanOrEqual(119000);
+			expect(diffMs).toBeLessThanOrEqual(121000);
+		});
+
+		it("should create rate limited error without retry-after", () => {
+			const error = DocumentLoaderError.rateLimited(
+				"github",
+				undefined,
+				undefined,
+				{ endpoint: "/api/v1/repos" },
+			);
+
+			expect(error.code).toBe("DOCUMENT_RATE_LIMITED");
+			expect(error.context?.retryAfter).toBeUndefined();
+			expect(error.context?.retryAfterDate).toBeUndefined();
+			expect(error.context?.occurredAt).toBeInstanceOf(Date);
+		});
+
+		it("should return retryAfterDate for rate limited errors", () => {
+			const error = DocumentLoaderError.rateLimited("github", 30);
+			const retryAfterDate = error.getRetryAfterDate();
+
+			expect(retryAfterDate).toBeInstanceOf(Date);
+			expect(retryAfterDate).toBe(error.context?.retryAfterDate);
+		});
+
+		it("should return undefined for non-rate-limited errors", () => {
+			const notFoundError = DocumentLoaderError.notFound("/path/to/file");
+			const fetchError = DocumentLoaderError.fetchError(
+				"github",
+				"fetching file",
+			);
+			const tooLargeError = DocumentLoaderError.tooLarge(
+				"/path/to/file",
+				1000,
+				500,
+			);
+
+			expect(notFoundError.getRetryAfterDate()).toBeUndefined();
+			expect(fetchError.getRetryAfterDate()).toBeUndefined();
+			expect(tooLargeError.getRetryAfterDate()).toBeUndefined();
 		});
 	});
 

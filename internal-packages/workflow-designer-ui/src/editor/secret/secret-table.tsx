@@ -16,9 +16,14 @@ import {
 	TableHeader,
 	TableRow,
 } from "@giselle-internal/ui/table";
+
+import { isTextGenerationNode, type SecretId } from "@giselle-sdk/data-type";
+import {
+	useGiselleEngine,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useGiselleEngine, useWorkflowDesigner } from "giselle-sdk/react";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, TrashIcon } from "lucide-react";
 import { useCallback, useState, useTransition } from "react";
 import { z } from "zod/v4";
 import { useWorkspaceSecrets } from "../lib/use-workspace-secrets";
@@ -40,7 +45,7 @@ const SecretPayload = z.object({
 
 export function SecretTable() {
 	const [presentDialog, setPresentDialog] = useState(false);
-	const { data: workspace } = useWorkflowDesigner();
+	const { data: workspace, updateNodeDataContent } = useWorkflowDesigner();
 	const { isLoading, data, mutate } = useWorkspaceSecrets();
 	const [isPending, startTransition] = useTransition();
 	const client = useGiselleEngine();
@@ -74,16 +79,61 @@ export function SecretTable() {
 		[client, workspace.id, data, mutate],
 	);
 
+	const handleDelete = useCallback(
+		(secretId: SecretId) => {
+			startTransition(async () => {
+				for (const node of workspace.nodes) {
+					if (!isTextGenerationNode(node)) {
+						continue;
+					}
+					const tools = node.content.tools;
+					if (!tools) {
+						continue;
+					}
+					let changed = false;
+					const newTools = { ...tools };
+					if (
+						tools.github?.auth.type === "secret" &&
+						tools.github.auth.secretId === secretId
+					) {
+						newTools.github = undefined;
+						changed = true;
+					}
+					if (tools.postgres?.secretId === secretId) {
+						newTools.postgres = undefined;
+						changed = true;
+					}
+					if (changed) {
+						updateNodeDataContent(node, {
+							...node.content,
+							tools: newTools,
+						});
+					}
+				}
+
+				await client.deleteSecret({
+					workspaceId: workspace.id,
+					secretId,
+				});
+				await mutate((data ?? []).filter((secret) => secret.id !== secretId));
+			});
+		},
+		[
+			client,
+			workspace.id,
+			data,
+			mutate,
+			workspace.nodes,
+			updateNodeDataContent,
+		],
+	);
+
 	if (isLoading) {
 		return null;
 	}
-	if (data === undefined || data.length < 1) {
-		return <EmptyState description="No secret" />;
-	}
 	return (
-		<div className="p-[16px] bg-surface-background h-full">
-			<div className="flex justify-between items-center">
-				<h1 className="font-accent text-text text-[18px] mb-[8px]">Secrets</h1>
+		<div className="px-[16px] pb-[16px] pt-[8px] h-full">
+			<div className="flex justify-end items-center">
 				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
 					<DialogTrigger asChild>
 						<Button type="button" leftIcon={<PlusIcon className="text-text" />}>
@@ -145,34 +195,51 @@ export function SecretTable() {
 								</fieldset>
 							</div>
 							<DialogFooter>
-								<button
+								<Button
 									type="submit"
-									className="flex items-center gap-[4px] text-[14px] text-text hover:bg-ghost-element-hover transition-colors px-[8px] rounded-[2px] cursor-pointer"
+									variant="solid"
+									size="large"
 									disabled={isPending}
 								>
 									{isPending ? "..." : "Create"}
-								</button>
+								</Button>
 							</DialogFooter>
 						</form>
 					</DialogContent>
 				</Dialog>
 			</div>
-			<Table>
-				<TableHeader>
-					<TableRow>
-						<TableHead>Name</TableHead>
-						<TableHead>Created at</TableHead>
-					</TableRow>
-				</TableHeader>
-				<TableBody>
-					{data.map((data) => (
-						<TableRow key={data.id}>
-							<TableCell>{data.label}</TableCell>
-							<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+			{data === undefined || data.length < 1 ? (
+				<EmptyState description="No secret" />
+			) : (
+				<Table>
+					<TableHeader>
+						<TableRow>
+							<TableHead>Name</TableHead>
+							<TableHead>Created at</TableHead>
+							<TableHead />
 						</TableRow>
-					))}
-				</TableBody>
-			</Table>
+					</TableHeader>
+					<TableBody>
+						{data.map((data) => (
+							<TableRow key={data.id}>
+								<TableCell>{data.label}</TableCell>
+								<TableCell>{formatDateTime(data.createdAt)}</TableCell>
+								<TableCell className="w-[1%] whitespace-nowrap">
+									<Button
+										variant="outline"
+										size="compact"
+										leftIcon={<TrashIcon className="size-[12px]" />}
+										onClick={() => handleDelete(data.id)}
+										disabled={isPending}
+									>
+										Delete
+									</Button>
+								</TableCell>
+							</TableRow>
+						))}
+					</TableBody>
+				</Table>
+			)}
 		</div>
 	);
 }

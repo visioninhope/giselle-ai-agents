@@ -10,7 +10,8 @@ export abstract class RagError extends Error {
 		| "database"
 		| "embedding"
 		| "configuration"
-		| "operation";
+		| "operation"
+		| "document-loader";
 
 	constructor(
 		message: string,
@@ -224,9 +225,10 @@ export class OperationError extends RagError {
 	constructor(
 		message: string,
 		public readonly code: OperationErrorCode,
+		cause?: Error,
 		context?: Record<string, unknown>,
 	) {
-		super(message, undefined, context);
+		super(message, cause, context);
 	}
 
 	/**
@@ -235,17 +237,135 @@ export class OperationError extends RagError {
 	static invalidOperation(
 		operation: string,
 		reason: string,
+		cause?: Error,
 		context?: Record<string, unknown>,
 	) {
 		return new OperationError(
 			`Invalid operation '${operation}': ${reason}`,
 			"INVALID_OPERATION",
+			cause,
 			{ ...context, operation, reason },
 		);
 	}
 }
 
 export type OperationErrorCode = "INVALID_OPERATION";
+
+/**
+ * Document loader error
+ */
+export class DocumentLoaderError extends RagError {
+	readonly category = "document-loader" as const;
+
+	constructor(
+		message: string,
+		public readonly code: DocumentLoaderErrorCode,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		super(message, cause, context);
+	}
+
+	/**
+	 * Helper to create common document loader errors
+	 */
+	static notFound(
+		resourcePath: string,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document not found: ${resourcePath}`,
+			"DOCUMENT_NOT_FOUND",
+			cause,
+			{ ...context, resourcePath },
+		);
+	}
+
+	static fetchError(
+		source: string,
+		operation: string,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document fetch error from '${source}' during ${operation}`,
+			"DOCUMENT_FETCH_ERROR",
+			cause,
+			{ ...context, source, operation },
+		);
+	}
+
+	static rateLimited(
+		source: string,
+		retryAfter: string | number | undefined,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		let retryAfterDate: Date | undefined;
+		const occurredAt = new Date();
+
+		if (retryAfter !== undefined) {
+			if (typeof retryAfter === "number") {
+				retryAfterDate = new Date(occurredAt.getTime() + retryAfter * 1000);
+			} else if (typeof retryAfter === "string") {
+				const seconds = Number.parseInt(retryAfter, 10);
+				if (!Number.isNaN(seconds)) {
+					retryAfterDate = new Date(occurredAt.getTime() + seconds * 1000);
+				}
+			}
+		}
+
+		return new DocumentLoaderError(
+			`Rate limit exceeded for ${source}`,
+			"DOCUMENT_RATE_LIMITED",
+			cause,
+			{
+				...context,
+				source,
+				retryAfter, // Keep original value
+				retryAfterDate,
+				occurredAt,
+			},
+		);
+	}
+
+	static tooLarge(
+		resourcePath: string,
+		size: number,
+		maxSize: number,
+		cause?: Error,
+		context?: Record<string, unknown>,
+	) {
+		return new DocumentLoaderError(
+			`Document '${resourcePath}' exceeds size limit: ${size} > ${maxSize}`,
+			"DOCUMENT_TOO_LARGE",
+			cause,
+			{ ...context, resourcePath, size, maxSize },
+		);
+	}
+
+	/**
+	 * Get the retry-after time as a Date object
+	 * @returns Date when the request can be retried, or undefined if not available
+	 */
+	getRetryAfterDate(): Date | undefined {
+		// For DOCUMENT_RATE_LIMITED errors, return pre-calculated date
+		if (this.code === "DOCUMENT_RATE_LIMITED" && this.context?.retryAfterDate) {
+			const retryAfterDate = this.context.retryAfterDate;
+			if (retryAfterDate instanceof Date) {
+				return retryAfterDate;
+			}
+		}
+		return undefined;
+	}
+}
+
+export type DocumentLoaderErrorCode =
+	| "DOCUMENT_NOT_FOUND"
+	| "DOCUMENT_FETCH_ERROR"
+	| "DOCUMENT_RATE_LIMITED"
+	| "DOCUMENT_TOO_LARGE";
 
 /**
  * Utility function for error handling

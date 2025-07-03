@@ -1,5 +1,5 @@
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	DatabaseIcon,
 	DraftingCompassIcon,

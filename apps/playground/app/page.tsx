@@ -1,6 +1,7 @@
 "use client";
 
-import { useGiselleEngine } from "giselle-sdk/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useCallback } from "react";
 
@@ -32,6 +33,9 @@ export default function Home() {
 			>
 				Create sample workspace
 			</button>
+			<Link className="cursor-pointer" href="/ui">
+				UI
+			</Link>
 		</div>
 	);
 }

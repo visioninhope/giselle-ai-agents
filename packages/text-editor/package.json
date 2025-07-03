@@ -11,7 +11,10 @@
 		"check-types": "tsc --noEmit",
 		"format": "biome check --write ."
 	},
-	"files": ["dist/**/*", "react/dist/**/*"],
+	"files": [
+		"dist/**/*",
+		"react/dist/**/*"
+	],
 	"exports": {
 		"./package.json": "./package.json",
 		"./react": {
@@ -29,7 +32,7 @@
 	},
 	"dependencies": {
 		"@giselle-sdk/data-type": "workspace:^",
-		"@giselle-sdk/node-utils": "workspace:^",
+		"@giselle-sdk/giselle-engine": "workspace:^",
 		"@giselle-sdk/text-editor-utils": "workspace:^",
 		"@tiptap/extension-placeholder": "catalog:",
 		"@tiptap/react": "catalog:",

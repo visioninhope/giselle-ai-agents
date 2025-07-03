@@ -3,13 +3,17 @@ import {
 	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "giselle-sdk/react";
+} from "@giselle-sdk/giselle-engine/react";
+import {
+	isJsonContent,
+	jsonContentToText,
+} from "@giselle-sdk/text-editor-utils";
 import { CommandIcon, CornerDownLeft, DatabaseZapIcon } from "lucide-react";
 import { Tabs } from "radix-ui";
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
-
 import { Button } from "../../../ui/button";
+import { useToasts } from "../../../ui/toast";
 import { KeyboardShortcuts } from "../../components/keyboard-shortcuts";
 import {
 	PropertiesPanelContent,
@@ -32,9 +36,22 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			origin: { type: "workspace", id: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
-	const { layoutV2 } = useFeatureFlag();
+	const { layoutV2, layoutV3 } = useFeatureFlag();
+	const { error } = useToasts();
+
+	const query = useMemo(() => {
+		const rawQuery = node.content.query.trim();
+		if (isJsonContent(rawQuery)) {
+			return jsonContentToText(JSON.parse(rawQuery));
+		}
+		return rawQuery;
+	}, [node.content.query]);
 
 	const generate = useCallback(() => {
+		if (query.length === 0) {
+			error("Query is empty");
+			return;
+		}
 		createAndStartGeneration({
 			origin: {
 				type: "workspace",
@@ -54,6 +71,8 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 		data.connections,
 		node,
 		createAndStartGeneration,
+		error,
+		query,
 	]);
 
 	return (
@@ -75,6 +94,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 								generate();
 							}
 						}}
+						disabled={query.length === 0}
 						className="w-[150px] disabled:cursor-not-allowed disabled:opacity-50"
 					>
 						{isGenerating ? (
@@ -93,7 +113,7 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			/>
 
 			<PropertiesPanelContent>
-				{layoutV2 ? (
+				{layoutV2 || layoutV3 ? (
 					<ResizableSectionGroup>
 						<ResizableSection title="Query" defaultSize={50} minSize={20}>
 							<div className="p-4">
@@ -103,7 +123,9 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 								>
 									<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 										<Tabs.Trigger value="query">Query</Tabs.Trigger>
-										<Tabs.Trigger value="input">Input</Tabs.Trigger>
+										{!layoutV2 && (
+											<Tabs.Trigger value="input">Input</Tabs.Trigger>
+										)}
 									</Tabs.List>
 									<Tabs.Content
 										value="query"

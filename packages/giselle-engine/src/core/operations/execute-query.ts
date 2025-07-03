@@ -1,6 +1,9 @@
 import {
 	GenerationContext,
 	type GenerationOutput,
+	isCompletedGeneration,
+	isQueryNode,
+	isTextNode,
 	NodeId,
 	type Output,
 	OutputId,
@@ -8,9 +11,6 @@ import {
 	type RunningGeneration,
 	type VectorStoreNode,
 	type WorkspaceId,
-	isCompletedGeneration,
-	isQueryNode,
-	isTextNode,
 } from "@giselle-sdk/data-type";
 import {
 	isJsonContent,
@@ -25,7 +25,7 @@ import {
 } from "../generations/utils";
 import type { GiselleEngineContext, GitHubQueryContext } from "../types";
 
-export async function executeQuery(args: {
+export function executeQuery(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 }) {
@@ -252,6 +252,10 @@ async function queryVectorStore(
 	const { vectorStoreQueryServices } = context;
 	if (vectorStoreQueryServices === undefined) {
 		throw new Error("No vector store query service provided");
+	}
+
+	if (query.trim().length === 0) {
+		throw new Error("Query is empty");
 	}
 
 	// Default values for query parameters

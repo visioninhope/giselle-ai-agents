@@ -1,12 +1,15 @@
 import type { Connection, NodeId } from "@giselle-sdk/data-type";
 import {
+	useNodeGenerations,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
+import {
 	BaseEdge,
 	type EdgeProps,
-	type Edge as XYFlowEdge,
 	getBezierPath,
+	type Edge as XYFlowEdge,
 } from "@xyflow/react";
 import clsx from "clsx/lite";
-import { useNodeGenerations, useWorkflowDesigner } from "giselle-sdk/react";
 import type { PropsWithChildren } from "react";
 
 export type ConnectorType = XYFlowEdge<{ connection: Connection }>;

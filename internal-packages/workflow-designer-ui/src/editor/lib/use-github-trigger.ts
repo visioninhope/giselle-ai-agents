@@ -3,7 +3,7 @@ import type {
 	FlowTriggerId,
 	GitHubFlowTrigger,
 } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "giselle-sdk/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useCallback, useMemo } from "react";
 import useSWR from "swr";
 
@@ -51,7 +51,7 @@ export function useGitHubTrigger(flowTriggerId: FlowTriggerId) {
 		[trigger, githubRepositoryFullnameData],
 	);
 	const setFlowTrigger = useCallback(
-		async (newValue: Partial<FlowTrigger>) => {
+		(newValue: Partial<FlowTrigger>) => {
 			if (trigger === undefined) {
 				return;
 			}

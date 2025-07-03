@@ -18,6 +18,7 @@ type TeamMembersListProps = {
 	invitations: Invitation[];
 	currentUserRole: TeamRole;
 	isProPlan: boolean;
+	currentUserId: string;
 };
 
 export function TeamMembersList({
@@ -26,6 +27,7 @@ export function TeamMembersList({
 	invitations,
 	currentUserRole,
 	isProPlan,
+	currentUserId,
 }: TeamMembersListProps) {
 	const { toasts } = useToast();
 
@@ -40,6 +42,7 @@ export function TeamMembersList({
 					role={member.role}
 					currentUserRole={currentUserRole}
 					isProPlan={isProPlan}
+					currentUserId={currentUserId}
 				/>
 			))}
 

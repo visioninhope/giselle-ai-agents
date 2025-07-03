@@ -5,10 +5,10 @@ import { perplexity } from "@ai-sdk/perplexity";
 import {
 	type FailedGeneration,
 	type GenerationOutput,
+	isTextGenerationNode,
 	type QueuedGeneration,
 	type TextGenerationLanguageModelData,
 	type UrlSource,
-	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { githubTools, octokit } from "@giselle-sdk/github-tool";
 import {
@@ -30,7 +30,7 @@ export type PerplexityProviderOptions = {
 	search_domain_filter?: string[];
 };
 
-export async function generateText(args: {
+export function generateText(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
@@ -111,15 +111,18 @@ export async function generateText(args: {
 				}
 			}
 
-			if (operationNode.content.tools?.postgres?.connectionString) {
-				const connectionString = await args.context.vault?.decrypt(
-					operationNode.content.tools.postgres.connectionString,
-				);
-				const postgresTool = createPostgresTools(
-					connectionString ??
-						operationNode.content.tools.postgres.connectionString,
-				);
-				for (const tool of operationNode.content.tools.postgres.tools) {
+			const postgresToolData = operationNode.content.tools?.postgres;
+			if (postgresToolData?.secretId) {
+				const connectionString = await decryptSecret({
+					...args,
+					secretId: postgresToolData.secretId,
+				});
+				if (connectionString === undefined) {
+					throw new Error("Failed to decrypt secret");
+				}
+
+				const postgresTool = createPostgresTools(connectionString);
+				for (const tool of postgresToolData.tools) {
 					if (tool in postgresTool.toolSet) {
 						preparedToolSet = {
 							...preparedToolSet,

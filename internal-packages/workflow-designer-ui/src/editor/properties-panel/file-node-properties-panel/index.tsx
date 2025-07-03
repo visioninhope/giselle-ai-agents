@@ -1,5 +1,8 @@
 import type { FileCategory, FileNode } from "@giselle-sdk/data-type";
-import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
+import {
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { FileNodeIcon } from "../../../icons/node";
 import {
 	PropertiesPanelContent,
@@ -27,7 +30,6 @@ const fileType: Record<FileCategory, FileTypeConfig> = {
 
 export function FileNodePropertiesPanel({ node }: { node: FileNode }) {
 	const { updateNodeData } = useWorkflowDesigner();
-	const { layoutV2 } = useFeatureFlag();
 
 	return (
 		<PropertiesPanelRoot>

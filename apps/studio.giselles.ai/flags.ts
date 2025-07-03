@@ -29,8 +29,15 @@ export const developerFlag = flag<boolean>({
 
 export const githubToolsFlag = flag<boolean>({
 	key: "github-tools",
-	decide() {
-		return takeLocalEnv("GITHUB_TOOLS_FLAG");
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("GITHUB_TOOLS_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return true;
+		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable GitHub Tools",
 	defaultValue: false,
@@ -80,7 +87,7 @@ export const sidemenuFlag = flag<boolean>({
 		}
 		const edgeConfig = await get(`flag__${this.key}`);
 		if (edgeConfig === undefined) {
-			return false;
+			return true;
 		}
 		return edgeConfig === true || edgeConfig === "true";
 	},
@@ -99,11 +106,30 @@ export const layoutV2Flag = flag<boolean>({
 		}
 		const edgeConfig = await get(`flag__${this.key}`);
 		if (edgeConfig === undefined) {
-			return false;
+			return true;
 		}
 		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V2",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
+
+export const layoutV3Flag = flag<boolean>({
+	key: "layout-v3",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("LAYOUT_V3_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable Layout V3",
 	options: [
 		{ value: false, label: "disable" },
 		{ value: true, label: "Enable" },

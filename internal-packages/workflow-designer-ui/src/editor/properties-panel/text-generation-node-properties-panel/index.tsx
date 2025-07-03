@@ -1,23 +1,14 @@
-import {
-	type Output,
-	OutputId,
-	type TextGenerationNode,
-	type ToolSet,
-	isImageGenerationNode,
-	isTextGenerationNode,
-} from "@giselle-sdk/data-type";
-import {
-	isJsonContent,
-	jsonContentToText,
-} from "@giselle-sdk/text-editor-utils";
-import clsx from "clsx/lite";
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import {
 	useFeatureFlag,
 	useNodeGenerations,
 	useWorkflowDesigner,
-} from "giselle-sdk/react";
+} from "@giselle-sdk/giselle-engine/react";
+import {
+	isJsonContent,
+	jsonContentToText,
+} from "@giselle-sdk/text-editor-utils";
 import { CommandIcon, CornerDownLeft } from "lucide-react";
-import { Tabs } from "radix-ui";
 import { useCallback, useMemo } from "react";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { useUsageLimitsReached } from "../../../hooks/usage-limits";
@@ -35,8 +26,6 @@ import {
 	PropertiesPanelContent,
 	PropertiesPanelHeader,
 	PropertiesPanelRoot,
-	ResizableSection,
-	ResizableSectionGroup,
 	ResizableSectionHandle,
 	ResizeHandle,
 } from "../ui";

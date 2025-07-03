@@ -103,6 +103,9 @@ const config = {
 				},
 				red: {
 					900: "hsl(var(--red_900))",
+					400: "hsl(var(--red_400))",
+					300: "hsl(var(--red_300))",
+					200: "hsl(var(--red_200))",
 					50: "hsl(var(--red_50))",
 				},
 				blue: {

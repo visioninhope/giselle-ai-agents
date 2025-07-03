@@ -1,19 +1,22 @@
 "use client";
 
-import { InputId, OutputId, isActionNode } from "@giselle-sdk/data-type";
+import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
 	ReactFlow,
 	ReactFlowProvider,
-	Panel as XYFlowPanel,
 	useReactFlow,
 	useUpdateNodeInternals,
+	Panel as XYFlowPanel,
 } from "@xyflow/react";
 import "@xyflow/react/dist/style.css";
+import {
+	useFeatureFlag,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import clsx from "clsx/lite";
-import { useFeatureFlag, useWorkflowDesigner } from "giselle-sdk/react";
 import { useAnimationFrame, useSpring } from "motion/react";
 import { Tabs } from "radix-ui";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
@@ -46,7 +49,7 @@ import {
 	useToolbar,
 } from "./tool";
 import { V2Placeholder } from "./v2";
-import { WorkspaceTour, tourSteps } from "./workspace-tour";
+import { tourSteps, WorkspaceTour } from "./workspace-tour";
 
 function NodeCanvas() {
 	const {
@@ -378,9 +381,11 @@ function NodeCanvas() {
 export function Editor({
 	isReadOnly = false,
 	userRole = "viewer",
+	onFlowNameChange,
 }: {
 	isReadOnly?: boolean;
 	userRole?: "viewer" | "guest" | "editor" | "owner";
+	onFlowNameChange?: (name: string) => Promise<void>;
 }) {
 	const { data } = useWorkflowDesigner();
 	const selectedNodes = useMemo(
@@ -448,7 +453,13 @@ export function Editor({
 	const { sidemenu, layoutV2 } = useFeatureFlag();
 
 	if (layoutV2) {
-		return <V2Placeholder isReadOnly={isReadOnly} userRole={userRole} />;
+		return (
+			<V2Placeholder
+				isReadOnly={isReadOnly}
+				userRole={userRole}
+				onNameChange={onFlowNameChange}
+			/>
+		);
 	}
 
 	if (sidemenu) {

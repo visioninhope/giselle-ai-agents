@@ -2,17 +2,17 @@ import {
 	type Connection,
 	type Input,
 	InputId,
-	OutputId,
-	type QueryNode,
 	isImageGenerationNode,
 	isTextGenerationNode,
+	OutputId,
+	type QueryNode,
 } from "@giselle-sdk/data-type";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import {
 	isJsonContent,
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
-import { useWorkflowDesigner } from "giselle-sdk/react";
 import {
 	CheckIcon,
 	DatabaseZapIcon,
@@ -43,7 +43,10 @@ import {
 function SourceToggleItem({
 	source,
 	disabled = false,
-}: { source: Source; disabled?: boolean }) {
+}: {
+	source: Source;
+	disabled?: boolean;
+}) {
 	const getDisplayName = () => {
 		if (
 			isTextGenerationNode(source.node) ||
@@ -324,11 +327,7 @@ function SourceListItem({
 	);
 }
 
-export function InputPanel({
-	node: queryNode,
-}: {
-	node: QueryNode;
-}) {
+export function InputPanel({ node: queryNode }: { node: QueryNode }) {
 	const { data, addConnection, deleteConnection, updateNodeData } =
 		useWorkflowDesigner();
 	const sources = useMemo<Source[]>(() => {

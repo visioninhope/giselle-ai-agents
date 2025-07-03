@@ -3,7 +3,7 @@ import type {
 	FlowTriggerId,
 	TriggerNode,
 } from "@giselle-sdk/data-type";
-import { useGiselleEngine } from "giselle-sdk/react";
+import { useGiselleEngine } from "@giselle-sdk/giselle-engine/react";
 import { useCallback } from "react";
 import useSWR from "swr";
 
@@ -21,7 +21,7 @@ export function useTrigger(node: TriggerNode) {
 	);
 
 	const setFlowTrigger = useCallback(
-		async (newValue: Partial<FlowTrigger>) => {
+		(newValue: Partial<FlowTrigger>) => {
 			if (data === undefined) {
 				return;
 			}

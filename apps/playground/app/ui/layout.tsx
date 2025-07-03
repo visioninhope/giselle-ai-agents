@@ -6,6 +6,10 @@ const components = [
 		name: "Button",
 	},
 	{
+		id: "input",
+		name: "Input",
+	},
+	{
 		id: "dialog",
 		name: "Dialog",
 	},
@@ -25,12 +29,12 @@ const components = [
 		id: "toggle",
 		name: "Toggle",
 	},
+	{
+		id: "table",
+		name: "Table",
+	},
 ];
-export default function ({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export default function ({ children }: { children: React.ReactNode }) {
 	return (
 		<div className="min-h-screen bg-surface-background font-mono">
 			<div className="flex">

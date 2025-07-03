@@ -16,8 +16,8 @@ export async function setWorkspace({
 	workspace: Workspace;
 }) {
 	await storage.setItem(workspacePath(workspaceId), workspace, {
-		// Disable caching by setting cacheControlMaxAge to 0 for Vercel Blob storage
-		cacheControlMaxAge: 0,
+		// Disable caching by setting cacheControl to 0 for Supabase storage
+		cacheControl: 0,
 	});
 }
 
@@ -28,7 +28,9 @@ export async function getWorkspace({
 	storage: Storage;
 	workspaceId: WorkspaceId;
 }) {
-	const result = await storage.getItem(workspacePath(workspaceId));
+	const result = await storage.getItem(workspacePath(workspaceId), {
+		bypassingCache: true,
+	});
 	const workspace = parseAndMod(
 		Workspace,
 		result,
