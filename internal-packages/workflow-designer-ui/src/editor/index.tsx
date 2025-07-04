@@ -349,23 +349,19 @@ function NodeCanvas() {
 				// Get node element and its bounding rect
 				const nodeElement = event.currentTarget as HTMLElement;
 				const nodeRect = nodeElement.getBoundingClientRect();
-				
-				// Position menu at bottom-right corner with slight overlap
-				const menuLeft = nodeRect.right - 10; // 10px from right edge
-				const menuTop = nodeRect.bottom - 10; // 10px from bottom edge
+
+				// Position menu at bottom-right corner with more spacing
+				const menuLeft = nodeRect.right + 10; // 10px to the right of node
+				const menuTop = nodeRect.bottom + 10; // 10px below the node
 
 				setMenu({
 					id: node.id,
 					top: menuTop < pane.height - 200 ? menuTop : undefined,
 					left: menuLeft < pane.width - 200 ? menuLeft : undefined,
 					right:
-						menuLeft >= pane.width - 200
-							? pane.width - menuLeft
-							: undefined,
+						menuLeft >= pane.width - 200 ? pane.width - menuLeft : undefined,
 					bottom:
-						menuTop >= pane.height - 200
-							? pane.height - menuTop
-							: undefined,
+						menuTop >= pane.height - 200 ? pane.height - menuTop : undefined,
 				});
 			}}
 		>
