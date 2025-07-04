@@ -24,7 +24,6 @@ import {
 	createWebPageNode,
 	triggerNodeDefaultName,
 	useFeatureFlag,
-	useUsageLimits,
 	useVectorStore,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -90,7 +89,6 @@ export function Toolbar() {
 	const [searchQuery, setSearchQuery] = useState<string>("");
 	const [selectedCategory, setSelectedCategory] = useState<string>("All");
 	const { llmProviders } = useWorkflowDesigner();
-	const limits = useUsageLimits();
 	const { webSearchAction } = useFeatureFlag();
 	const vectorStore = useVectorStore();
 	const canUseGithubVectorStore = useMemo(
