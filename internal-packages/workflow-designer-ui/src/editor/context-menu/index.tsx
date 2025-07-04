@@ -1,3 +1,6 @@
+import { Button } from "@giselle-internal/ui/button";
+import { PopoverContent } from "@giselle-internal/ui/popover";
+import { Copy } from "lucide-react";
 import { useCallback } from "react";
 import { useToasts } from "../../ui/toast";
 import { useDuplicateNode } from "../node";
@@ -22,18 +25,21 @@ export function ContextMenu({
 	return (
 		<div
 			style={{ top, left, right, bottom }}
-			className="fixed bg-[#1a1a1a] border border-[#333] rounded-md p-1 z-[1000] shadow-lg"
+			className="fixed z-[1000]"
 			role="menu"
 			aria-label="Node actions"
 		>
-			<button
-				type="button"
-				className="w-full px-3 py-2 text-white bg-transparent border-none cursor-pointer text-left whitespace-nowrap hover:bg-[#333] focus:outline-none focus:bg-[#444] rounded-sm block"
-				onClick={handleDuplicate}
-				role="menuitem"
-			>
-				Duplicate Node
-			</button>
+			<PopoverContent>
+				<Button
+					variant="subtle"
+					size="default"
+					onClick={handleDuplicate}
+					className="w-full justify-start"
+					leftIcon={<Copy />}
+				>
+					Duplicate Node
+				</Button>
+			</PopoverContent>
 		</div>
 	);
 }
