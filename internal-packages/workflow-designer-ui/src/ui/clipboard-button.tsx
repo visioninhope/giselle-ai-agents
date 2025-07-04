@@ -15,7 +15,6 @@ interface ClipboardButtonProps {
 export default function ClipboardButton({
 	tooltip = "Copy to clipboard",
 	text,
-	className = "",
 	sizeClassName = "h-[20px] w-[20px]",
 	defaultIcon,
 }: ClipboardButtonProps) {

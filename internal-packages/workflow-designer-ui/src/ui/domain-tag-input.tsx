@@ -25,7 +25,6 @@ export function DomainTagInput({
 	onAddDomain,
 	onRemoveDomain,
 	placeholder = "Enter text to add",
-	className = "",
 	label,
 }: DomainTagInputProps) {
 	const [inputValue, setInputValue] = useState("");

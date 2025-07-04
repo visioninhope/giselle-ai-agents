@@ -10,7 +10,6 @@ import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
-	type NodeChange,
 	ReactFlow,
 	useReactFlow,
 	useUpdateNodeInternals,
@@ -214,16 +213,39 @@ function V2NodeCanvas() {
 			zoomOnScroll={false}
 			zoomOnPinch={true}
 			onMoveEnd={(_, viewport) => setUiViewport(viewport)}
-			onNodesChange={useCallback(
-				async (changes: NodeChange[]) => {
-					await Promise.all(
-						changes.map(async (change) => {
-							if (change.type === "remove") await deleteNode(change.id);
-						}),
-					);
-				},
-				[deleteNode],
-			)}
+			onNodesChange={async (nodesChange) => {
+				await Promise.all(
+					nodesChange.map(async (nodeChange) => {
+						switch (nodeChange.type) {
+							case "remove": {
+								for (const connection of data.connections) {
+									if (connection.outputNode.id !== nodeChange.id) {
+										continue;
+									}
+									deleteConnection(connection.id);
+									const connectedNode = data.nodes.find(
+										(node) => node.id === connection.inputNode.id,
+									);
+									if (connectedNode === undefined) {
+										continue;
+									}
+									switch (connectedNode.content.type) {
+										case "textGeneration": {
+											updateNodeData(connectedNode, {
+												inputs: connectedNode.inputs.filter(
+													(input) => input.id !== connection.inputId,
+												),
+											});
+										}
+									}
+								}
+								await deleteNode(nodeChange.id);
+								break;
+							}
+						}
+					}),
+				);
+			}}
 			onNodeClick={(_, nodeClicked) => {
 				for (const node of data.nodes) {
 					setUiNodeState(node.id, { selected: node.id === nodeClicked.id });

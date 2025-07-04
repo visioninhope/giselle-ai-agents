@@ -24,15 +24,18 @@ import {
 	getNodeGenerationIndexes,
 	queryResultToText,
 } from "../generations/utils";
+import type { TelemetrySettings } from "../telemetry";
 import type { GiselleEngineContext, GitHubQueryContext } from "../types";
 
 export function executeQuery(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
+	telemetry?: TelemetrySettings;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
+		telemetry: args.telemetry,
 		execute: async ({
 			runningGeneration,
 			generationContext,
@@ -64,6 +67,7 @@ export function executeQuery(args: {
 					query,
 					args.context,
 					vectorStoreNodes as VectorStoreNode[],
+					args.telemetry,
 				);
 
 				const outputId = generationContext.operationNode.outputs.find(
@@ -262,6 +266,7 @@ async function queryVectorStore(
 	query: string,
 	context: GiselleEngineContext,
 	vectorStoreNodes: VectorStoreNode[],
+	telemetry?: TelemetrySettings,
 ) {
 	if (vectorStoreNodes.length === 0) {
 		return [];
@@ -279,7 +284,6 @@ async function queryVectorStore(
 	// Default values for query parameters
 	// TODO: Make these configurable via the UI
 	const LIMIT = 10;
-	const _SIMILARITY_THRESHOLD = 0.2;
 
 	const results = await Promise.all(
 		vectorStoreNodes
@@ -306,6 +310,7 @@ async function queryVectorStore(
 							query,
 							queryContext,
 							LIMIT,
+							telemetry,
 						);
 						return {
 							type: "vector-store" as const,

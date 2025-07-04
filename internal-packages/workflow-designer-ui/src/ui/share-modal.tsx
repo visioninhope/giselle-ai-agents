@@ -9,11 +9,9 @@ type AccessScope = "team" | "anyone";
 export function ShareModal({
 	open,
 	onOpenChange,
-	appId = "example-app-123",
 }: {
 	open: boolean;
 	onOpenChange: (open: boolean) => void;
-	appId?: string;
 }) {
 	const [permission, setPermission] = useState<SharePermission>("view");
 	const [accessScope, setAccessScope] = useState<AccessScope>("team");
