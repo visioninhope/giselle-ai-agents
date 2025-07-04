@@ -1,6 +1,6 @@
 import { Button } from "@giselle-internal/ui/button";
 import { PopoverContent } from "@giselle-internal/ui/popover";
-import { Copy } from "lucide-react";
+import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { useCallback } from "react";
 import { useToasts } from "../../ui/toast";
 import { useDuplicateNode } from "../node";
@@ -15,12 +15,18 @@ export function ContextMenu({
 	onClose,
 }: ContextMenuProps) {
 	const duplicateNode = useDuplicateNode();
+	const { deleteNode } = useWorkflowDesigner();
 	const toast = useToasts();
 
 	const handleDuplicate = useCallback(() => {
 		duplicateNode(id, () => toast.error("Failed to duplicate node"));
 		onClose();
 	}, [id, duplicateNode, toast, onClose]);
+
+	const handleDelete = useCallback(() => {
+		deleteNode(id);
+		onClose();
+	}, [id, deleteNode, onClose]);
 
 	return (
 		<div
@@ -34,10 +40,17 @@ export function ContextMenu({
 					variant="subtle"
 					size="default"
 					onClick={handleDuplicate}
-					className="w-full justify-start"
-					leftIcon={<Copy />}
+					className="w-full justify-start [&>div]:text-[12px]"
 				>
 					Duplicate Node
+				</Button>
+				<Button
+					variant="subtle"
+					size="default"
+					onClick={handleDelete}
+					className="w-full justify-start text-red-400 hover:text-red-300 [&>div]:text-[12px]"
+				>
+					Delete Node
 				</Button>
 			</PopoverContent>
 		</div>
