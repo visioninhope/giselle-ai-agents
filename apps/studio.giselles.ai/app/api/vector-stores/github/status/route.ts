@@ -1,9 +1,9 @@
-import { db, githubRepositoryIndex } from "@/drizzle";
-import { fetchCurrentTeam } from "@/services/teams";
 import { eq } from "drizzle-orm";
 import type { NextRequest } from "next/server";
+import { db, githubRepositoryIndex } from "@/drizzle";
+import { fetchCurrentTeam } from "@/services/teams";
 
-export async function GET(request: NextRequest) {
+export async function GET(_request: NextRequest) {
 	// Only allow in development environment
 	if (process.env.NODE_ENV !== "development") {
 		return new Response("Not available in production", {

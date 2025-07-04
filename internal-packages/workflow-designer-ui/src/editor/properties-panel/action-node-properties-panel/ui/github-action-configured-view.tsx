@@ -13,7 +13,6 @@ import {
 import { githubActionIdToLabel } from "@giselle-sdk/flow";
 import {
 	defaultName,
-	useFeatureFlag,
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";

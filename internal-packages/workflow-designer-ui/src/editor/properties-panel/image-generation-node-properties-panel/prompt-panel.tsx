@@ -1,6 +1,5 @@
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
-	ConnectionId,
 	type ImageGenerationNode,
 	isTextGenerationNode,
 	Node,
@@ -8,9 +7,7 @@ import {
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
-import clsx from "clsx/lite";
 import { AtSignIcon } from "lucide-react";
-import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { type Source, useConnectedSources } from "./sources";
 
