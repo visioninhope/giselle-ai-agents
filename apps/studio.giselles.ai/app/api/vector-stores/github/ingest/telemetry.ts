@@ -1,5 +1,5 @@
-import { createEmbeddingTelemetrySettings } from "@/services/telemetry/embedding-telemetry";
 import type { TelemetrySettings } from "ai";
+import { createEmbeddingTelemetrySettings } from "@/services/telemetry/embedding-telemetry";
 
 /**
  * Create telemetry settings for GitHub repository ingestion

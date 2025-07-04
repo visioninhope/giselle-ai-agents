@@ -1,5 +1,5 @@
 import { openai } from "@ai-sdk/openai";
-import { type TelemetrySettings, embed, embedMany } from "ai";
+import { embed, embedMany, type TelemetrySettings } from "ai";
 import { EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 

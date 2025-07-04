@@ -3,6 +3,7 @@ export {
 	type OpenAIEmbedderConfig,
 } from "./openai";
 export type { EmbedderFunction } from "./types";
+
 import type { TelemetrySettings } from "ai";
 
 import { createOpenAIEmbedder } from "./openai";

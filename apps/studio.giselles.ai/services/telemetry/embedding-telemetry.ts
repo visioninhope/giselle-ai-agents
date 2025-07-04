@@ -1,7 +1,7 @@
-import { agents, db, subscriptions, teams } from "@/drizzle";
 import type { WorkspaceId } from "@giselle-sdk/data-type";
 import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
+import { agents, db, subscriptions, teams } from "@/drizzle";
 
 type EmbeddingTelemetryContext =
 	| {

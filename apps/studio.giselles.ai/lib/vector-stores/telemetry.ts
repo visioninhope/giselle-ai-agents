@@ -1,6 +1,6 @@
-import { createEmbeddingTelemetrySettings } from "@/services/telemetry/embedding-telemetry";
 import type { GitHubQueryContext } from "@giselle-sdk/giselle-engine";
 import type { TelemetrySettings } from "ai";
+import { createEmbeddingTelemetrySettings } from "@/services/telemetry/embedding-telemetry";
 
 /**
  * Create telemetry settings for GitHub query operations

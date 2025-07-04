@@ -8,7 +8,6 @@ import {
 import type { TelemetrySettings } from "ai";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
-import { createQueryTelemetrySettings } from "./telemetry";
 import {
 	agents,
 	db,
@@ -16,6 +15,7 @@ import {
 	githubRepositoryIndex,
 	teams,
 } from "@/drizzle";
+import { createQueryTelemetrySettings } from "./telemetry";
 
 /**
  * GitHub chunk metadata schema and type for RAG storage
