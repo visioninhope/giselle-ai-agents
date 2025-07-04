@@ -42,7 +42,7 @@ export function ContextMenu({
 					onClick={handleDuplicate}
 					className="w-full justify-start [&>div]:text-[12px]"
 				>
-					Duplicate Node
+					Duplicate
 				</Button>
 				<Button
 					variant="subtle"
@@ -50,7 +50,7 @@ export function ContextMenu({
 					onClick={handleDelete}
 					className="w-full justify-start text-red-400 hover:text-red-300 [&>div]:text-[12px]"
 				>
-					Delete Node
+					Delete
 				</Button>
 			</PopoverContent>
 		</div>
