@@ -36,13 +36,7 @@ import {
 import { GenerationPanel } from "./generation-panel";
 import { GitHubActionConfiguredView } from "./ui/github-action-configured-view";
 
-export function GitHubActionPropertiesPanel({
-	node,
-	onRun,
-}: {
-	node: ActionNode;
-	onRun?: () => void;
-}) {
+export function GitHubActionPropertiesPanel({ node }: { node: ActionNode }) {
 	const { value } = useIntegration();
 
 	// Only handle GitHub actions

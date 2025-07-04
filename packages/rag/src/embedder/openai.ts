@@ -1,5 +1,5 @@
 import { openai } from "@ai-sdk/openai";
-import { embed, embedMany } from "ai";
+import { embed, embedMany, type TelemetrySettings } from "ai";
 import { EmbeddingError } from "../errors";
 import type { EmbedderFunction } from "./types";
 
@@ -12,6 +12,7 @@ export interface OpenAIEmbedderConfig {
 	apiKey: string;
 	model?: OpenAIEmbeddingModel;
 	maxRetries?: number;
+	telemetry?: TelemetrySettings;
 }
 
 /**
@@ -28,6 +29,7 @@ export function createOpenAIEmbedder(
 
 	const model = config.model ?? "text-embedding-3-small";
 	const maxRetries = config.maxRetries ?? 3;
+	const telemetry = config.telemetry;
 
 	if (config.maxRetries !== undefined && (maxRetries < 0 || maxRetries > 10)) {
 		throw new Error("maxRetries must be between 0 and 10");
@@ -40,6 +42,7 @@ export function createOpenAIEmbedder(
 					model: openai.embedding(model),
 					maxRetries,
 					value: text,
+					experimental_telemetry: telemetry,
 				});
 				return embedding;
 			} catch (error: unknown) {
@@ -62,6 +65,7 @@ export function createOpenAIEmbedder(
 					model: openai.embedding(model),
 					maxRetries,
 					values: texts,
+					experimental_telemetry: telemetry,
 				});
 				return embeddings;
 			} catch (error: unknown) {

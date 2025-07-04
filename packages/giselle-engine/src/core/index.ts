@@ -13,7 +13,6 @@ import type {
 	Workspace,
 	WorkspaceId,
 } from "@giselle-sdk/data-type";
-import { calculateDisplayCost } from "@giselle-sdk/language-model";
 import { getLanguageModelProviders } from "./configurations/get-language-model-providers";
 import { createDataSource, getWorkspaceDataSources } from "./data-source";
 import type { DataSourceProviderObject } from "./data-source/types/object";
@@ -197,8 +196,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => runFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
-		executeQuery: async (args: { generation: QueuedGeneration }) =>
-			executeQuery({ ...args, context }),
+		executeQuery: async (
+			generation: QueuedGeneration,
+			telemetry?: TelemetrySettings,
+		) => executeQuery({ context, generation, telemetry }),
 		addWebPage: async (args: {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
