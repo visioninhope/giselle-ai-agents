@@ -207,11 +207,7 @@ export function Header({
 					)}
 				</div>
 
-				<ShareModal
-					open={openShareModal}
-					onOpenChange={setOpenShareModal}
-					appId={data.id}
-				/>
+				<ShareModal open={openShareModal} onOpenChange={setOpenShareModal} />
 
 				<style jsx global>{`
 				@keyframes softFade {
