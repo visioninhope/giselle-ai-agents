@@ -407,7 +407,7 @@ export function Editor({
 
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 
-	// 380pxをパーセンテージに変換する関数
+	// Function to convert 380px to a percentage
 	const getPercentageForPixels = (pixels: number) => {
 		const containerWidth = window.innerWidth - 16 - 16; // padding分を引く
 		const sideMenuWidth = containerWidth * 0.1; // サイドメニューの10%
