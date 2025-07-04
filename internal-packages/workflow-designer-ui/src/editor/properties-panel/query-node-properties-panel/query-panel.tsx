@@ -7,7 +7,6 @@ import {
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
-import clsx from "clsx/lite";
 import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
 import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
@@ -50,68 +49,6 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
 		description: "Unknown source",
 		icon: <DatabaseZapIcon className="w-[14px] h-[14px]" />,
 	};
-}
-
-function _DataSourceDisplayBar({
-	dataSources,
-}: {
-	dataSources: ConnectedSource[];
-}) {
-	if (dataSources.length === 0) {
-		return (
-			<div
-				className={clsx(
-					"flex items-center gap-[8px] px-[12px] py-[8px] rounded-[6px] mt-[8px]",
-					"bg-white-900/8 border border-white-900/15",
-				)}
-			>
-				<DatabaseZapIcon className="w-[14px] h-[14px] text-white-600" />
-				<p className="text-[11px] text-white-600">
-					No data sources connected • Connect from Input tab to query
-				</p>
-			</div>
-		);
-	}
-
-	return (
-		<div
-			className={clsx(
-				"flex flex-col gap-1 px-2 py-1 rounded-[6px] my-2",
-				"bg-blue-900/8 border border-blue-900/15",
-			)}
-		>
-			<div className="flex items-center gap-[8px]">
-				<DatabaseZapIcon className="w-[14px] h-[14px] text-blue-300" />
-				<span className="text-[11px] text-blue-200">
-					Querying {dataSources.length} data source
-					{dataSources.length !== 1 ? "s" : ""}:
-				</span>
-			</div>
-			<div className="flex items-center gap-[6px] flex-wrap">
-				{dataSources.map((dataSource) => {
-					const { name, description, icon } =
-						getDataSourceDisplayInfo(dataSource);
-					return (
-						<div
-							key={dataSource.connection.id}
-							className={clsx(
-								"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
-								"bg-blue-900/15 border border-blue-900/25 text-blue-100",
-							)}
-						>
-							<div className="text-blue-200 shrink-0">{icon}</div>
-							<span
-								className="text-[10px] font-medium"
-								title={`${name} • ${description}`}
-							>
-								{name} • {description}
-							</span>
-						</div>
-					);
-				})}
-			</div>
-		</div>
-	);
 }
 
 export function QueryPanel({ node }: { node: QueryNode }) {

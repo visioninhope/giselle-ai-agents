@@ -173,13 +173,15 @@ function QueryResultCard({ result }: { result: QueryResultData }) {
 	);
 
 	const toggleRecord = (recordIndex: number) => {
-		const newExpanded = new Set(expandedRecords);
-		if (newExpanded.has(recordIndex)) {
-			newExpanded.delete(recordIndex);
-		} else {
-			newExpanded.add(recordIndex);
-		}
-		setExpandedRecords(newExpanded);
+		setExpandedRecords((prev) => {
+			const newExpanded = new Set(prev);
+			if (newExpanded.has(recordIndex)) {
+				newExpanded.delete(recordIndex);
+			} else {
+				newExpanded.add(recordIndex);
+			}
+			return newExpanded;
+		});
 	};
 
 	if (result.type !== "vector-store") {
