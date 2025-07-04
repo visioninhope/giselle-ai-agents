@@ -130,9 +130,6 @@ export function createPostgresQueryService<
 		context: TContext,
 	) => Record<string, unknown> | Promise<Record<string, unknown>>;
 	metadataSchema: TSchema;
-	contextToTelemetrySettings?: (
-		context: TContext,
-	) => TelemetrySettings | undefined | Promise<TelemetrySettings | undefined>;
 }) {
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
@@ -153,6 +150,7 @@ export function createPostgresQueryService<
 		query: string,
 		context: TContext,
 		limit = 10,
+		telemetry?: TelemetrySettings,
 	): Promise<QueryResult<z.infer<TSchema>>[]> => {
 		const { tableName, contextToFilter, metadataSchema } = config;
 		const pool = PoolManager.getPool(database);
@@ -168,14 +166,8 @@ export function createPostgresQueryService<
 		let filters: Record<string, unknown> = {};
 
 		try {
-			// Resolve telemetry settings from context if resolver is provided
-			const telemetrySettings = config.contextToTelemetrySettings
-				? await config.contextToTelemetrySettings(context)
-				: undefined;
-
-			// Create embedder with resolved telemetry settings
-			const embedder =
-				defaultEmbedder || createDefaultEmbedder(telemetrySettings);
+			// Create embedder with telemetry settings from parameter
+			const embedder = defaultEmbedder || createDefaultEmbedder(telemetry);
 
 			const queryEmbedding = await embedder.embed(query);
 

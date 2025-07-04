@@ -5,7 +5,6 @@ import {
 	createPostgresQueryService,
 	type DatabaseConfig,
 } from "@giselle-sdk/rag";
-import type { TelemetrySettings } from "ai";
 import { and, eq, getTableName } from "drizzle-orm";
 import { z } from "zod/v4";
 import {
@@ -15,7 +14,6 @@ import {
 	githubRepositoryIndex,
 	teams,
 } from "@/drizzle";
-import { createQueryTelemetrySettings } from "./telemetry";
 
 /**
  * GitHub chunk metadata schema and type for RAG storage
@@ -121,7 +119,7 @@ const githubQueryMetadataSchema = z.object({
 });
 
 /**
- * Pre-configured GitHub query service instance with contextual telemetry
+ * Pre-configured GitHub query service instance
  */
 export const gitHubQueryService = createPostgresQueryService({
 	database: createDatabaseConfig(),
@@ -131,5 +129,4 @@ export const gitHubQueryService = createPostgresQueryService({
 	requiredColumnOverrides: {
 		documentKey: "path",
 	},
-	contextToTelemetrySettings: createQueryTelemetrySettings,
 });
