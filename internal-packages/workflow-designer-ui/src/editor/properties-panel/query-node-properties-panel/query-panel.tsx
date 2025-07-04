@@ -214,14 +214,17 @@ export function QueryPanel({ node }: { node: QueryNode }) {
                   <AtSignIcon className="w-[18px]" />
                 </Toolbar.Button>
               }
-              items={connectedInputsWithoutDatasource}
-              renderItem={(input) =>
-                `${input.node.name ?? getDefaultNodeName(input)} / ${input.output.label}`
+              items={connectedInputsWithoutDatasource.map((source) => ({
+                id: source.connection.id,
+                source,
+              }))}
+              renderItem={(item) =>
+                `${item.source.node.name ?? getDefaultNodeName(item.source)} / ${item.source.output.label}`
               }
-              onSelect={(_, input) => {
+              onSelect={(_, item) => {
                 const embedNode = {
-                  outputId: input.connection.outputId,
-                  node: input.connection.outputNode,
+                  outputId: item.source.connection.outputId,
+                  node: item.source.connection.outputNode,
                 };
                 editor
                   .chain()
@@ -229,7 +232,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
                   .insertContentAt(
                     editor.state.selection.$anchor.pos,
                     createSourceExtensionJSONContent({
-                      node: input.connection.outputNode,
+                      node: item.source.connection.outputNode,
                       outputId: embedNode.outputId,
                     }),
                   )
