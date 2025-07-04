@@ -47,7 +47,7 @@ async function processRepository(
 			commitSha: commit.sha,
 		};
 
-		const experimental_telemetry = await createIngestTelemetrySettings(
+		const telemetry = await createIngestTelemetrySettings(
 			teamDbId,
 			`${owner}/${repo}`,
 		);
@@ -56,7 +56,7 @@ async function processRepository(
 			octokitClient,
 			source,
 			teamDbId,
-			experimental_telemetry,
+			telemetry,
 		});
 
 		await updateRepositoryStatusToCompleted(dbId, commit.sha);

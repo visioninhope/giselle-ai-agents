@@ -36,7 +36,7 @@ export interface IngestPipelineOptions<
 	parallelLimit?: number;
 	onProgress?: (progress: IngestProgress) => void;
 	onError?: (error: IngestError) => void;
-	experimental_telemetry?: TelemetrySettings;
+	telemetry?: TelemetrySettings;
 }
 
 const DEFAULT_MAX_BATCH_SIZE = 100;
@@ -71,13 +71,13 @@ export function createPipeline<
 		parallelLimit = DEFAULT_PARALLEL_LIMIT,
 		onProgress = () => {},
 		onError = () => {},
-		experimental_telemetry,
+		telemetry,
 	} = options;
 
 	let resolvedEmbedder = embedder;
 	if (resolvedEmbedder == null) {
 		try {
-			resolvedEmbedder = createDefaultEmbedder(experimental_telemetry);
+			resolvedEmbedder = createDefaultEmbedder(telemetry);
 		} catch (error) {
 			throw ConfigurationError.missingField("OPENAI_API_KEY", {
 				cause: error instanceof Error ? error.message : String(error),

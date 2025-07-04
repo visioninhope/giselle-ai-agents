@@ -16,7 +16,7 @@ export async function ingestGitHubBlobs(params: {
 	octokitClient: Octokit;
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
-	experimental_telemetry?: TelemetrySettings;
+	telemetry?: TelemetrySettings;
 }): Promise<void> {
 	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
@@ -42,7 +42,7 @@ export async function ingestGitHubBlobs(params: {
 			fileSha: metadata.fileSha,
 			path: metadata.path,
 		}),
-		experimental_telemetry: params.experimental_telemetry,
+		telemetry: params.telemetry,
 	});
 
 	const result = await ingest();
