@@ -1,6 +1,11 @@
 "use client";
 
-import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
+import {
+	InputId,
+	isActionNode,
+	isOperationNode,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
@@ -146,6 +151,35 @@ function V2NodeCanvas() {
 		[addConnection, data.nodes, toast, isSupportedConnection, updateNodeData],
 	);
 
+	const handleEdgesDelete = useCallback(
+		(edgesToDelete: Edge[]) => {
+			for (const edge of edgesToDelete) {
+				const connection = data.connections.find((conn) => conn.id === edge.id);
+				if (!connection) {
+					continue;
+				}
+
+				deleteConnection(connection.id);
+				const targetNode = data.nodes.find(
+					(node) => node.id === connection.inputNode.id,
+				);
+				if (
+					targetNode &&
+					isOperationNode(targetNode) &&
+					!isActionNode(targetNode)
+				) {
+					const updatedInputs = targetNode.inputs.filter(
+						(input) => input.id !== connection.inputId,
+					);
+					updateNodeData(targetNode, {
+						inputs: updatedInputs,
+					});
+				}
+			}
+		},
+		[data.nodes, data.connections, deleteConnection, updateNodeData],
+	);
+
 	const isValidConnection: IsValidConnection<ConnectorType> = (connection) => {
 		if (
 			!connection.sourceHandle ||
@@ -174,15 +208,7 @@ function V2NodeCanvas() {
 			edgeTypes={edgeTypes}
 			defaultViewport={data.ui.viewport}
 			onConnect={handleConnect}
-			onEdgesDelete={useCallback(
-				(edges: Edge[]) => {
-					for (const edge of edges) {
-						const conn = data.connections.find((c) => c.id === edge.id);
-						if (conn) deleteConnection(conn.id);
-					}
-				},
-				[data.connections, deleteConnection],
-			)}
+			onEdgesDelete={handleEdgesDelete}
 			isValidConnection={isValidConnection}
 			panOnScroll={true}
 			zoomOnScroll={false}

@@ -142,7 +142,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	);
 
 	const onDragOver = useCallback(
-		(e: React.DragEvent<HTMLDivElement>) => {
+		(e: React.DragEvent<HTMLButtonElement>) => {
 			e.preventDefault();
 			setIsDragging(true);
 			setIsValidFile(validateItems(e.dataTransfer.items));
@@ -150,7 +150,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		[validateItems],
 	);
 
-	const onDragLeave = useCallback((e: React.DragEvent<HTMLDivElement>) => {
+	const onDragLeave = useCallback((e: React.DragEvent<HTMLButtonElement>) => {
 		e.preventDefault();
 		setIsDragging(false);
 		setIsValidFile(true);
@@ -175,7 +175,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 	);
 
 	const onDrop = useCallback(
-		(e: React.DragEvent<HTMLDivElement>) => {
+		(e: React.DragEvent<HTMLButtonElement>) => {
 			e.preventDefault();
 			setIsDragging(false);
 			setIsValidFile(true);
@@ -253,10 +253,10 @@ export function FilePanel({ node, config }: FilePanelProps) {
 		>
 			<div>
 				<div>
-					{/** biome-ignore lint/a11y/noStaticElementInteractions: fix later */}
-					<div
+					<button
+						type="button"
 						className={clsx(
-							"group h-[300px] p-[8px]",
+							"group h-[300px] p-[8px] w-full",
 							"border border-black-400 rounded-[8px]",
 							"data-[dragging=true]:data-[valid=false]:border-error-900",
 						)}
@@ -333,7 +333,7 @@ export function FilePanel({ node, config }: FilePanelProps) {
 								</div>
 							)}
 						</div>
-					</div>
+					</button>
 				</div>
 				{node.content.files.length > 0 && (
 					<div className="mt-[24px]">

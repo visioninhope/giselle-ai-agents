@@ -160,7 +160,7 @@ export async function diagnoseRepositoryConnection(
 					validInstallationId = installation.id;
 					break;
 				}
-			} catch (error) {}
+			} catch (_error) {}
 		}
 
 		if (!validInstallationId) {
