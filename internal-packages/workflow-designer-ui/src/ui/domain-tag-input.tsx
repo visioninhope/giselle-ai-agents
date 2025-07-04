@@ -1,5 +1,5 @@
 import { XIcon } from "lucide-react";
-import React, { type KeyboardEvent, useEffect, useState } from "react";
+import { type KeyboardEvent, useState } from "react";
 import { Button } from "./button";
 import { Input } from "./input";
 

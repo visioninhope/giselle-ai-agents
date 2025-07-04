@@ -1,5 +1,4 @@
 import type {
-	FlowTriggerId,
 	ManualTriggerParameter,
 	TriggerNode,
 } from "@giselle-sdk/data-type";

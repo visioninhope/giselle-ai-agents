@@ -279,7 +279,7 @@ async function queryVectorStore(
 	// Default values for query parameters
 	// TODO: Make these configurable via the UI
 	const LIMIT = 10;
-	const SIMILARITY_THRESHOLD = 0.2;
+	const _SIMILARITY_THRESHOLD = 0.2;
 
 	const results = await Promise.all(
 		vectorStoreNodes

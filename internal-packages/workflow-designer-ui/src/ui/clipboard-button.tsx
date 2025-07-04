@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, CopyIcon, FingerprintIcon } from "lucide-react";
+import { CheckCircle, CopyIcon } from "lucide-react";
 import { type ReactNode, useCallback, useState } from "react";
 import { Tooltip } from "./tooltip";
 
