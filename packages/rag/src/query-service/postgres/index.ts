@@ -1,3 +1,4 @@
+import type { TelemetrySettings } from "ai";
 import { escapeIdentifier } from "pg";
 import * as pgvector from "pgvector/pg";
 import type { z } from "zod/v4";
@@ -133,8 +134,8 @@ export function createPostgresQueryService<
 	// Validate database config
 	const database = validateDatabaseConfig(config.database);
 
-	// Resolve embedder
-	const embedder = config.embedder || createDefaultEmbedder();
+	// Resolve default embedder if not provided
+	const defaultEmbedder = config.embedder;
 
 	// Resolve column mapping
 	const columnMapping =
@@ -149,6 +150,7 @@ export function createPostgresQueryService<
 		query: string,
 		context: TContext,
 		limit = 10,
+		telemetry?: TelemetrySettings,
 	): Promise<QueryResult<z.infer<TSchema>>[]> => {
 		const { tableName, contextToFilter, metadataSchema } = config;
 		const pool = PoolManager.getPool(database);
@@ -164,6 +166,9 @@ export function createPostgresQueryService<
 		let filters: Record<string, unknown> = {};
 
 		try {
+			// Create embedder with telemetry settings from parameter
+			const embedder = defaultEmbedder || createDefaultEmbedder(telemetry);
+
 			const queryEmbedding = await embedder.embed(query);
 
 			filters = await contextToFilter(context);

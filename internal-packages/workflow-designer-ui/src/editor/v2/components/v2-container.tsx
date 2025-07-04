@@ -1,11 +1,15 @@
 "use client";
 
-import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
+import {
+	InputId,
+	isActionNode,
+	isOperationNode,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
 	type IsValidConnection,
-	type NodeChange,
 	ReactFlow,
 	useReactFlow,
 	useUpdateNodeInternals,
@@ -146,6 +150,35 @@ function V2NodeCanvas() {
 		[addConnection, data.nodes, toast, isSupportedConnection, updateNodeData],
 	);
 
+	const handleEdgesDelete = useCallback(
+		(edgesToDelete: Edge[]) => {
+			for (const edge of edgesToDelete) {
+				const connection = data.connections.find((conn) => conn.id === edge.id);
+				if (!connection) {
+					continue;
+				}
+
+				deleteConnection(connection.id);
+				const targetNode = data.nodes.find(
+					(node) => node.id === connection.inputNode.id,
+				);
+				if (
+					targetNode &&
+					isOperationNode(targetNode) &&
+					!isActionNode(targetNode)
+				) {
+					const updatedInputs = targetNode.inputs.filter(
+						(input) => input.id !== connection.inputId,
+					);
+					updateNodeData(targetNode, {
+						inputs: updatedInputs,
+					});
+				}
+			}
+		},
+		[data.nodes, data.connections, deleteConnection, updateNodeData],
+	);
+
 	const isValidConnection: IsValidConnection<ConnectorType> = (connection) => {
 		if (
 			!connection.sourceHandle ||
@@ -174,30 +207,45 @@ function V2NodeCanvas() {
 			edgeTypes={edgeTypes}
 			defaultViewport={data.ui.viewport}
 			onConnect={handleConnect}
-			onEdgesDelete={useCallback(
-				(edges: Edge[]) => {
-					for (const edge of edges) {
-						const conn = data.connections.find((c) => c.id === edge.id);
-						if (conn) deleteConnection(conn.id);
-					}
-				},
-				[data.connections, deleteConnection],
-			)}
+			onEdgesDelete={handleEdgesDelete}
 			isValidConnection={isValidConnection}
 			panOnScroll={true}
 			zoomOnScroll={false}
 			zoomOnPinch={true}
 			onMoveEnd={(_, viewport) => setUiViewport(viewport)}
-			onNodesChange={useCallback(
-				async (changes: NodeChange[]) => {
-					await Promise.all(
-						changes.map(async (change) => {
-							if (change.type === "remove") await deleteNode(change.id);
-						}),
-					);
-				},
-				[deleteNode],
-			)}
+			onNodesChange={async (nodesChange) => {
+				await Promise.all(
+					nodesChange.map(async (nodeChange) => {
+						switch (nodeChange.type) {
+							case "remove": {
+								for (const connection of data.connections) {
+									if (connection.outputNode.id !== nodeChange.id) {
+										continue;
+									}
+									deleteConnection(connection.id);
+									const connectedNode = data.nodes.find(
+										(node) => node.id === connection.inputNode.id,
+									);
+									if (connectedNode === undefined) {
+										continue;
+									}
+									switch (connectedNode.content.type) {
+										case "textGeneration": {
+											updateNodeData(connectedNode, {
+												inputs: connectedNode.inputs.filter(
+													(input) => input.id !== connection.inputId,
+												),
+											});
+										}
+									}
+								}
+								await deleteNode(nodeChange.id);
+								break;
+							}
+						}
+					}),
+				);
+			}}
 			onNodeClick={(_, nodeClicked) => {
 				for (const node of data.nodes) {
 					setUiNodeState(node.id, { selected: node.id === nodeClicked.id });

@@ -196,8 +196,10 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		}) => runFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),
-		executeQuery: async (args: { generation: QueuedGeneration }) =>
-			executeQuery({ ...args, context }),
+		executeQuery: async (
+			generation: QueuedGeneration,
+			telemetry?: TelemetrySettings,
+		) => executeQuery({ context, generation, telemetry }),
 		addWebPage: async (args: {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
