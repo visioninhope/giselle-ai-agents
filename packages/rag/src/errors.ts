@@ -165,12 +165,10 @@ export class EmbeddingError extends RagError {
 	 * Helper to create common embedding errors
 	 */
 	static apiError(cause?: Error, context?: Record<string, unknown>) {
-		return new EmbeddingError(
-			"Embedding API request failed",
-			"API_ERROR",
-			cause,
-			context,
-		);
+		const message = cause?.message
+			? `Embedding API request failed: ${cause.message}`
+			: "Embedding API request failed";
+		return new EmbeddingError(message, "API_ERROR", cause, context);
 	}
 }
 
