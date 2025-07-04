@@ -44,7 +44,7 @@ export function AgentCard({ agent }: AgentCardProps) {
 		return null;
 	}
 
-	const color = getDeterministicColor(agent.id);
+	const _color = getDeterministicColor(agent.id);
 
 	const [relativeTime, setRelativeTime] = useState("");
 

@@ -38,7 +38,7 @@ export function FloatingPropertiesPanel({
 	// Throttle utility for mousemove events
 	const throttle = useCallback(
 		(func: (e: MouseEvent) => void, delay: number) => {
-			let timeoutId: NodeJS.Timeout | null = null;
+			let timeoutId: ReturnType<typeof setTimeout> | null = null;
 			let lastExecTime = 0;
 			return (e: MouseEvent) => {
 				const currentTime = Date.now();
