@@ -45,7 +45,6 @@ export function generateText(args: {
 			setGeneration,
 			fileResolver,
 			generationContentResolver,
-			workspaceId,
 			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
@@ -236,7 +235,7 @@ export function generateText(args: {
 							sources,
 						});
 					}
-					const completedGeneration = await completeGeneration({
+					const _completedGeneration = await completeGeneration({
 						outputs: generationOutputs,
 						usage: event.usage,
 						messages: appendResponseMessages({
