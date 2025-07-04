@@ -63,68 +63,6 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
 	};
 }
 
-function _DataSourceDisplayBar({
-	dataSources,
-}: {
-	dataSources: ConnectedSource[];
-}) {
-	if (dataSources.length === 0) {
-		return (
-			<div
-				className={clsx(
-					"flex items-center gap-[8px] px-[12px] py-[8px] rounded-[6px] mt-[8px]",
-					"bg-white-900/8 border border-white-900/15",
-				)}
-			>
-				<DatabaseZapIcon className={`${ICON_SIZE} text-white-600`} />
-				<p className={`${TEXT_STYLES.small} text-white-600`}>
-					No data sources connected • Connect from Input tab to query
-				</p>
-			</div>
-		);
-	}
-
-	return (
-		<div
-			className={clsx(
-				"flex flex-col gap-1 px-2 py-1 rounded-[6px] my-2",
-				"bg-blue-900/8 border border-blue-900/15",
-			)}
-		>
-			<div className="flex items-center gap-[8px]">
-				<DatabaseZapIcon className={`${ICON_SIZE} text-blue-300`} />
-				<span className={`${TEXT_STYLES.small} text-blue-200`}>
-					Querying {dataSources.length} data source
-					{dataSources.length !== 1 ? "s" : ""}:
-				</span>
-			</div>
-			<div className="flex items-center gap-[6px] flex-wrap">
-				{dataSources.map((dataSource) => {
-					const { name, description, icon } =
-						getDataSourceDisplayInfo(dataSource);
-					return (
-						<div
-							key={dataSource.connection.id}
-							className={clsx(
-								"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
-								BADGE_STYLES.connected,
-							)}
-						>
-							<div className="text-blue-200 shrink-0">{icon}</div>
-							<span
-								className={TEXT_STYLES.badge}
-								title={`${name} • ${description}`}
-							>
-								{name} • {description}
-							</span>
-						</div>
-					);
-				})}
-			</div>
-		</div>
-	);
-}
-
 export function QueryPanel({ node }: { node: QueryNode }) {
 	const { updateNodeDataContent, deleteConnection } = useWorkflowDesigner();
 	const { all: connectedInputs } = useConnectedSources(node);
@@ -156,7 +94,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 					header={
 						connectedDatasourceInputs.length > 0 ? (
 							<div className="flex items-center gap-[6px] flex-wrap">
-								<span className="text-[11px] mr-2" style={{ color: "#839DC3" }}>
+								<span className={clsx(TEXT_STYLES.small, "mr-2 text-blue-300")}>
 									Querying {connectedDatasourceInputs.length} data source
 									{connectedDatasourceInputs.length !== 1 ? "s" : ""}:
 								</span>
@@ -166,20 +104,14 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 									return (
 										<div
 											key={dataSource.connection.id}
-											className="flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]"
-											style={{
-												backgroundColor: "rgba(131, 157, 195, 0.15)",
-												borderColor: "rgba(131, 157, 195, 0.25)",
-												border: "1px solid",
-												color: "#839DC3",
-											}}
+											className={clsx(
+												"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
+												BADGE_STYLES.connected
+											)}
 										>
-											<div className="shrink-0" style={{ color: "#839DC3" }}>
-												{icon}
-											</div>
+											<div className="shrink-0 text-blue-200">{icon}</div>
 											<span
-												className="text-[10px] font-medium"
-												style={{ color: "#839DC3" }}
+												className={TEXT_STYLES.badge}
 												title={`${name} • ${description}`}
 											>
 												{description}
@@ -189,20 +121,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 												onClick={() =>
 													deleteConnection(dataSource.connection.id)
 												}
-												className="ml-1 p-0.5 rounded transition-colors"
-												style={{
-													color: "rgba(131, 157, 195, 0.7)",
-												}}
-												onMouseEnter={(e) => {
-													e.currentTarget.style.color = "#839DC3";
-													e.currentTarget.style.backgroundColor =
-														"rgba(131, 157, 195, 0.2)";
-												}}
-												onMouseLeave={(e) => {
-													e.currentTarget.style.color =
-														"rgba(131, 157, 195, 0.7)";
-													e.currentTarget.style.backgroundColor = "transparent";
-												}}
+												className="ml-1 p-0.5 rounded transition-colors text-blue-300/70 hover:text-blue-300 hover:bg-blue-300/20"
 												title="Remove data source"
 											>
 												<X className="w-3 h-3" />
@@ -213,7 +132,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 							</div>
 						) : (
 							<div className="flex items-center">
-								<span className="text-[11px]" style={{ color: "#839DC3" }}>
+								<span className={clsx(TEXT_STYLES.small, "text-blue-300/60")}>
 									No data sources connected • Connect from Input tab to query
 								</span>
 							</div>
