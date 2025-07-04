@@ -4,7 +4,7 @@ import {
   isFailedGeneration,
 } from "@giselle-sdk/data-type";
 import clsx from "clsx/lite";
-import { ChevronDownIcon, ChevronRightIcon } from "lucide-react";
+import { ChevronRightIcon } from "lucide-react";
 import { useState } from "react";
 import { GitHubIcon, WilliIcon } from "../icons";
 

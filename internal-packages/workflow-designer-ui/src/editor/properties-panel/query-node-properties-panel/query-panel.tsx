@@ -1,5 +1,5 @@
+import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import {
-  ConnectionId,
   isTextGenerationNode,
   isVectorStoreNode,
   type QueryNode,
@@ -7,7 +7,6 @@ import {
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
-import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
 import clsx from "clsx/lite";
 import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
 import { Toolbar } from "radix-ui";
@@ -53,7 +52,7 @@ function getDataSourceDisplayInfo(input: ConnectedSource) {
   };
 }
 
-function DataSourceDisplayBar({
+function _DataSourceDisplayBar({
   dataSources,
 }: {
   dataSources: ConnectedSource[];
@@ -201,7 +200,13 @@ export function QueryPanel({ node }: { node: QueryNode }) {
                   );
                 })}
               </div>
-            ) : undefined
+            ) : (
+              <div className="flex items-center gap-[6px]">
+                <span className="text-[11px]" style={{ color: "rgba(131, 157, 195, 0.6)" }}>
+                  No data sources connected • Connect from Input tab to query
+                </span>
+              </div>
+            )
           }
           tools={(editor) => (
             <DropdownMenu
