@@ -12,7 +12,7 @@ import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
-import { RefreshCcwIcon } from "lucide-react";
+import { LoaderIcon, RefreshCcwIcon } from "lucide-react";
 import useSWR from "swr";
 
 function formatDateTime(timestamp: number): string {
@@ -32,7 +32,7 @@ function formatDuration(ms: number): string {
 export function RunHistoryTable() {
 	const client = useGiselleEngine();
 	const { data: workspace } = useWorkflowDesigner();
-	const { data, isLoading, mutate } = useSWR(
+	const { data, isLoading, isValidating, mutate } = useSWR(
 		{
 			namespace: "getWorkspaceFlowRuns",
 			workspaceId: workspace.id,
@@ -53,9 +53,16 @@ export function RunHistoryTable() {
 					variant="outline"
 					size="compact"
 					onClick={() => mutate()}
-					leftIcon={<RefreshCcwIcon className="size-[12px]" />}
+					disabled={isValidating}
+					leftIcon={
+						isValidating ? (
+							<LoaderIcon className="size-[12px] animate-spin" />
+						) : (
+							<RefreshCcwIcon className="size-[12px]" />
+						)
+					}
 				>
-					Refresh
+					{isValidating ? "Refreshing..." : "Refresh"}
 				</Button>
 			</div>
 			{data === undefined || data.length < 1 ? (
