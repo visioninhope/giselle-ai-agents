@@ -1,6 +1,11 @@
 "use client";
 
-import { InputId, isActionNode, OutputId } from "@giselle-sdk/data-type";
+import {
+	InputId,
+	isActionNode,
+	isOperationNode,
+	OutputId,
+} from "@giselle-sdk/data-type";
 import {
 	type Connection,
 	type Edge,
@@ -160,8 +165,8 @@ function V2NodeCanvas() {
 				);
 				if (
 					targetNode &&
-					targetNode.type === "operation" &&
-					targetNode.content.type !== "action"
+					isOperationNode(targetNode) &&
+					!isActionNode(targetNode)
 				) {
 					const updatedInputs = targetNode.inputs.filter(
 						(input) => input.id !== connection.inputId,
