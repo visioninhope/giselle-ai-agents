@@ -77,7 +77,6 @@ export async function GET(_request: NextRequest) {
 			repositories: targetGitHubRepositories.map((repo) => ({
 				owner: repo.owner,
 				repo: repo.repo,
-				status: repo.status,
 			})),
 		}),
 		{
