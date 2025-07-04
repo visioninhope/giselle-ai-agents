@@ -1,4 +1,5 @@
 import {
+	type FailedGeneration,
 	GenerationContext,
 	type GenerationOutput,
 	isCompletedGeneration,
@@ -36,50 +37,67 @@ export function executeQuery(args: {
 			runningGeneration,
 			generationContext,
 			completeGeneration,
+			setGeneration,
 			workspaceId,
 		}) => {
-			const operationNode = generationContext.operationNode;
-			if (!isQueryNode(operationNode)) {
-				throw new Error("Invalid generation type for executeQuery");
+			try {
+				const operationNode = generationContext.operationNode;
+				if (!isQueryNode(operationNode)) {
+					throw new Error("Invalid generation type for executeQuery");
+				}
+
+				const query = await resolveQuery(
+					operationNode.content.query,
+					runningGeneration,
+					args.context.storage,
+				);
+
+				const vectorStoreNodes = generationContext.sourceNodes.filter(
+					(node) =>
+						node.content.type === "vectorStore" &&
+						generationContext.connections.some(
+							(connection) => connection.outputNode.id === node.id,
+						),
+				);
+				const queryResults = await queryVectorStore(
+					workspaceId,
+					query,
+					args.context,
+					vectorStoreNodes as VectorStoreNode[],
+				);
+
+				const outputId = generationContext.operationNode.outputs.find(
+					(output) => output.accessor === "result",
+				)?.id;
+				if (outputId === undefined) {
+					throw new Error("query-results output not found in operation node");
+				}
+				const outputs: GenerationOutput[] = [
+					{
+						type: "query-result",
+						content: queryResults,
+						outputId,
+					},
+				];
+
+				await completeGeneration({
+					outputs,
+				});
+			} catch (error) {
+				const failedGeneration = {
+					...runningGeneration,
+					status: "failed",
+					failedAt: Date.now(),
+					error: {
+						name: error instanceof Error ? error.name : "UnknownError",
+						message: error instanceof Error ? error.message : String(error),
+						dump: error,
+					},
+				} satisfies FailedGeneration;
+
+				await setGeneration(failedGeneration);
+				throw error;
 			}
-
-			const query = await resolveQuery(
-				operationNode.content.query,
-				runningGeneration,
-				args.context.storage,
-			);
-
-			const vectorStoreNodes = generationContext.sourceNodes.filter(
-				(node) =>
-					node.content.type === "vectorStore" &&
-					generationContext.connections.some(
-						(connection) => connection.outputNode.id === node.id,
-					),
-			);
-			const queryResults = await queryVectorStore(
-				workspaceId,
-				query,
-				args.context,
-				vectorStoreNodes as VectorStoreNode[],
-			);
-
-			const outputId = generationContext.operationNode.outputs.find(
-				(output) => output.accessor === "result",
-			)?.id;
-			if (outputId === undefined) {
-				throw new Error("query-results output not found in operation node");
-			}
-			const outputs: GenerationOutput[] = [
-				{
-					type: "query-result",
-					content: queryResults,
-					outputId,
-				},
-			];
-
-			await completeGeneration({
-				outputs,
-			});
 		},
 	});
 }
