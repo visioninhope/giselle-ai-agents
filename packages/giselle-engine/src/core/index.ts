@@ -60,6 +60,7 @@ import {
 } from "./workspaces";
 
 export * from "./experimental_vector-store";
+export * from "./experimental_storage";
 export { FlowRunId } from "./flows";
 export * from "./integrations";
 export * from "./telemetry";
