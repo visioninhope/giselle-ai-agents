@@ -23,7 +23,7 @@ export function RepositoryList({
 							GitHub Repositories
 						</h4>
 						<p className="text-black-400 text-[14px] leading-[20.4px] font-geist mt-1">
-							You can ingest your project's code into Vector Store and use it in
+							You can ingest your project's code into a Vector Store and use it in
 							GitHub Vector Store Nodes.
 						</p>
 					</div>

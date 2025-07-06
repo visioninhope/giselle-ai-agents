@@ -111,7 +111,7 @@ export function RepositoryItem({
 						<GlassDialogContent variant="destructive">
 							<GlassDialogHeader
 								title="Delete Repository"
-								description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}".`}
+								description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo} from your Vector Stores".`}
 								onClose={() => setShowDeleteDialog(false)}
 								variant="destructive"
 							/>
