@@ -222,7 +222,6 @@ export async function triggerManualIngest(
 		const team = await fetchCurrentTeam();
 		const now = new Date();
 
-		// Fetch the repository index with validation
 		const [repositoryIndex] = await db
 			.select()
 			.from(githubRepositoryIndex)
@@ -233,7 +232,6 @@ export async function triggerManualIngest(
 				),
 			)
 			.limit(1);
-
 		if (!repositoryIndex) {
 			return {
 				success: false,
@@ -241,14 +239,12 @@ export async function triggerManualIngest(
 			};
 		}
 
-		// Check if the repository can be ingested
 		const canIngest =
 			repositoryIndex.status === "idle" ||
 			repositoryIndex.status === "completed" ||
 			(repositoryIndex.status === "failed" &&
 				repositoryIndex.retryAfter &&
 				repositoryIndex.retryAfter <= now);
-
 		if (!canIngest) {
 			return {
 				success: false,
@@ -256,7 +252,6 @@ export async function triggerManualIngest(
 			};
 		}
 
-		// Prepare target repository data
 		const targetRepository: TargetGitHubRepository = {
 			dbId: repositoryIndex.dbId,
 			owner: repositoryIndex.owner,
@@ -270,7 +265,6 @@ export async function triggerManualIngest(
 		after(async () => {
 			await processRepository(targetRepository);
 		});
-
 		// Immediately revalidate to show "running" status
 		revalidatePath("/settings/team/vector-stores");
 
