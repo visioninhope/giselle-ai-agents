@@ -1,8 +1,15 @@
 "use client";
 
 import * as Dialog from "@radix-ui/react-dialog";
-import { Trash } from "lucide-react";
+import { MoreVertical, RefreshCw, Trash } from "lucide-react";
 import { useState, useTransition } from "react";
+import {
+	DropdownMenu,
+	DropdownMenuContent,
+	DropdownMenuItem,
+	DropdownMenuSeparator,
+	DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import type {
 	GitHubRepositoryIndexStatus,
 	githubRepositoryIndex,
@@ -94,15 +101,6 @@ export function RepositoryItem({
 				<div className="flex items-center gap-3">
 					<div className="flex flex-col items-end gap-1">
 						<div className="flex items-center gap-3">
-							{canManuallyIngest && !isIngesting && (
-								<button
-									type="button"
-									onClick={handleManualIngest}
-									className="px-3 py-1 text-[12px] font-medium font-geist text-white bg-[#1663F3] hover:bg-[#0f4cd1] rounded-full transition-colors duration-200"
-								>
-									Ingest Now
-								</button>
-							)}
 							<StatusBadge
 								status={isIngesting ? "running" : repositoryIndex.status}
 								onVerify={
@@ -130,20 +128,49 @@ export function RepositoryItem({
 								</span>
 							)}
 					</div>
+					<DropdownMenu>
+						<DropdownMenuTrigger asChild>
+							<button
+								type="button"
+								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
+								disabled={isPending || isIngesting}
+							>
+								<MoreVertical className="h-4 w-4" />
+							</button>
+						</DropdownMenuTrigger>
+						<DropdownMenuContent
+							align="end"
+							className="w-[160px] bg-black-850 border-[0.5px] border-black-400 rounded-[8px]"
+						>
+							<DropdownMenuItem
+								onClick={handleManualIngest}
+								disabled={!canManuallyIngest || isIngesting}
+								className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-white-400 hover:bg-white/5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+							>
+								<RefreshCw className="h-4 w-4 mr-2" />
+								Ingest Now
+							</DropdownMenuItem>
+							<DropdownMenuSeparator className="my-1 h-px bg-white/10" />
+							<Dialog.Root
+								open={showDeleteDialog}
+								onOpenChange={setShowDeleteDialog}
+							>
+								<Dialog.Trigger asChild>
+									<DropdownMenuItem
+										onClick={() => setShowDeleteDialog(true)}
+										className="flex items-center px-3 py-2 text-[14px] leading-[16px] text-error-900 hover:bg-error-900/20 rounded-md"
+									>
+										<Trash className="h-4 w-4 mr-2" />
+										Delete
+									</DropdownMenuItem>
+								</Dialog.Trigger>
+							</Dialog.Root>
+						</DropdownMenuContent>
+					</DropdownMenu>
 					<Dialog.Root
 						open={showDeleteDialog}
 						onOpenChange={setShowDeleteDialog}
 					>
-						<Dialog.Trigger asChild>
-							<button
-								type="button"
-								className="transition-opacity duration-200 p-2 text-white/60 hover:text-white/80 hover:bg-white/5 rounded-md disabled:opacity-50"
-								disabled={isPending}
-								onClick={() => setShowDeleteDialog(true)}
-							>
-								<Trash className="h-4 w-4" />
-							</button>
-						</Dialog.Trigger>
 						<GlassDialogContent variant="destructive">
 							<GlassDialogHeader
 								title="Delete Repository"

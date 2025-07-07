@@ -1,8 +1,8 @@
-import { db, githubRepositoryIndex } from "@/drizzle";
 import { fetchDefaultBranchHead } from "@giselle-sdk/github-tool";
 import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
 import { eq } from "drizzle-orm";
+import { db, githubRepositoryIndex } from "@/drizzle";
 import type { TargetGitHubRepository } from "../types";
 import { buildOctokit } from "./build-octokit";
 import { ingestGitHubBlobs } from "./ingest-github-blobs";
