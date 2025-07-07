@@ -1,4 +1,4 @@
-import type { NodeLike } from "@giselle-sdk/data-type";
+import type { Node, NodeLike } from "@giselle-sdk/data-type";
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { useEffect, useState } from "react";
 import { useDuplicateNode } from "./node";
@@ -65,7 +65,13 @@ export function KeyboardShortcuts() {
 							x: nodeState.position.x + 200,
 							y: nodeState.position.y + 100,
 						};
-						copyNode(copiedNode, { ui: { position } });
+						// Type guard: ensure copiedNode is a proper Node, not just NodeLike
+						if (
+							copiedNode.type === "operation" ||
+							copiedNode.type === "variable"
+						) {
+							copyNode(copiedNode as Node, { ui: { position } });
+						}
 					}
 				}
 				return;
