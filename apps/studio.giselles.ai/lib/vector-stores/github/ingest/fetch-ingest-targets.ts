@@ -2,6 +2,9 @@ import { and, eq, isNotNull, lt, or } from "drizzle-orm";
 import { db, githubRepositoryIndex } from "@/drizzle";
 import type { TargetGitHubRepository } from "../types";
 
+const STALE_THRESHOLD_MINUTES = 15;
+const OUTDATED_THRESHOLD_MINUTES = 24 * 60; // 24 hours
+
 /**
  * Fetch GitHub repositories that need to be ingested
  *
@@ -15,9 +18,13 @@ import type { TargetGitHubRepository } from "../types";
  */
 export async function fetchIngestTargets(): Promise<TargetGitHubRepository[]> {
 	// To prevent the race condition, consider running status as stale if it hasn't been updated for 15 minutes (> 800 seconds)
-	const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
+	const staleThreshold = new Date(
+		Date.now() - STALE_THRESHOLD_MINUTES * 60 * 1000,
+	);
 	// To update repository which updated more than 24 hours ago
-	const outdatedThreshold = new Date(Date.now() - 24 * 60 * 60 * 1000);
+	const outdatedThreshold = new Date(
+		Date.now() - OUTDATED_THRESHOLD_MINUTES * 60 * 1000,
+	);
 	// Current time for retryAfter comparison
 	const now = new Date();
 
