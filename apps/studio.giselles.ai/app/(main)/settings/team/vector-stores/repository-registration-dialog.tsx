@@ -1,14 +1,14 @@
 "use client";
 
-import * as Dialog from "@radix-ui/react-dialog";
-import { Check, ChevronDown, Plus } from "lucide-react";
-import { useState, useTransition } from "react";
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { GlassButton } from "@/components/ui/glass-button";
+import * as Dialog from "@radix-ui/react-dialog";
+import { Check, ChevronDown, Plus } from "lucide-react";
+import { useState, useTransition } from "react";
 import {
 	GlassDialogBody,
 	GlassDialogContent,
@@ -115,7 +115,7 @@ export function RepositoryRegistrationDialog({
 								htmlFor="owner"
 								className="text-white-400 text-[14px] leading-[16.8px] font-sans"
 							>
-								Owner
+								Owner / Organization
 							</label>
 							<div className="relative">
 								<DropdownMenu>
