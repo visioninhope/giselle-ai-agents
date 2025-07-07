@@ -17,11 +17,10 @@ import { useConnectedInputs } from "./lib";
 export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 	const { data, updateNodeData, setUiNodeState } = useWorkflowDesigner();
 	const { isValid, connectedInputs } = useConnectedInputs(node.id, node.inputs);
-	const { createAndStartGeneration, isGenerating, stopGeneration } =
-		useNodeGenerations({
-			nodeId: node.id,
-			origin: { type: "workspace", id: data.id },
-		});
+	const { createAndStartGeneration } = useNodeGenerations({
+		nodeId: node.id,
+		origin: { type: "workspace", id: data.id },
+	});
 	const handleClick = useCallback(() => {
 		if (!isValid) {
 			setUiNodeState(node.id, {
@@ -72,22 +71,16 @@ export function ActionNodePropertiesPanel({ node }: { node: ActionNode }) {
 				}
 			/>
 			<PropertiesPanelContent>
-				<PropertiesPanel node={node} onRunAction={handleClick} />
+				<PropertiesPanel node={node} />
 			</PropertiesPanelContent>
 		</PropertiesPanelRoot>
 	);
 }
 
-function PropertiesPanel({
-	node,
-	onRunAction,
-}: {
-	node: ActionNode;
-	onRunAction: () => void;
-}) {
+function PropertiesPanel({ node }: { node: ActionNode }) {
 	switch (node.content.command.provider) {
 		case "github":
-			return <GitHubActionPropertiesPanel node={node} onRun={onRunAction} />;
+			return <GitHubActionPropertiesPanel node={node} />;
 		case "web-search":
 			// TODO: Implement WebSearchActionPropertiesPanel
 			return <div>Web Search Action (Coming Soon)</div>;

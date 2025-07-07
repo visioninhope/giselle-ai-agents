@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle, CopyIcon, FingerprintIcon } from "lucide-react";
+import { CheckCircle, CopyIcon } from "lucide-react";
 import { type ReactNode, useCallback, useState } from "react";
 import { Tooltip } from "./tooltip";
 
@@ -15,7 +15,6 @@ interface ClipboardButtonProps {
 export default function ClipboardButton({
 	tooltip = "Copy to clipboard",
 	text,
-	className = "",
 	sizeClassName = "h-[20px] w-[20px]",
 	defaultIcon,
 }: ClipboardButtonProps) {
