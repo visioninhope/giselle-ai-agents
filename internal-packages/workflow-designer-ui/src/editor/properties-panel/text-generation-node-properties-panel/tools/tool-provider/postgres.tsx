@@ -241,8 +241,8 @@ function PostgresToolConfigurationDialogInternal({
 
 	return (
 		<ToolConfigurationDialog
-			title="Configuration of GitHub"
-			description="Select the GitHub tools you want to enable"
+			title="Configuration of PostgreSQL"
+			description="Select the PostgreSQL tools you want to enable"
 			onSubmit={updateAvailableTools}
 			submitting={false}
 			trigger={
