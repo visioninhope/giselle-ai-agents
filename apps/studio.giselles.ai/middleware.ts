@@ -18,7 +18,6 @@ export default supabaseMiddleware(async (user, request) => {
 		url.searchParams.set("returnUrl", returnUrl);
 		return NextResponse.redirect(url);
 	}
-	return;
 });
 
 export const config = {

@@ -1,11 +1,11 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { isValidReturnUrl } from "@/app/(auth)/lib";
 import { type AuthError, createClient } from "@/lib/supabase";
-import { redirect } from "next/navigation";
 
 export async function login(
-	prevState: AuthError | null,
+	_prevState: AuthError | null,
 	formData: FormData,
 ): Promise<AuthError | null> {
 	const supabase = await createClient();
@@ -17,7 +17,7 @@ export async function login(
 		password: formData.get("password") as string,
 	};
 	const returnUrlEntry = formData.get("returnUrl");
-	const { data, error } = await supabase.auth.signInWithPassword(credentails);
+	const { error } = await supabase.auth.signInWithPassword(credentails);
 
 	if (error) {
 		return {

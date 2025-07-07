@@ -116,7 +116,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			const cacheControl = opts?.cacheControl;
 			const contentType = opts?.contentType;
 
-			const { data, error } = await supabase.storage
+			const { error } = await supabase.storage
 				.from(bucket)
 				.upload(r(key), value, {
 					upsert: true,

@@ -4,6 +4,7 @@ import {
 } from "@giselle-sdk/github-tool";
 import { createPipeline } from "@giselle-sdk/rag";
 import type { Octokit } from "@octokit/core";
+import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 import { db, githubRepositoryIndex } from "@/drizzle";
 import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
@@ -15,6 +16,7 @@ export async function ingestGitHubBlobs(params: {
 	octokitClient: Octokit;
 	source: { owner: string; repo: string; commitSha: string };
 	teamDbId: number;
+	telemetry?: TelemetrySettings;
 }): Promise<void> {
 	const { repositoryIndexDbId, isInitialIngest } = await getRepositoryIndexInfo(
 		params.source,
@@ -40,6 +42,7 @@ export async function ingestGitHubBlobs(params: {
 			fileSha: metadata.fileSha,
 			path: metadata.path,
 		}),
+		telemetry: params.telemetry,
 	});
 
 	const result = await ingest();
@@ -58,7 +61,6 @@ async function getRepositoryIndexInfo(
 	const repositoryIndex = await db
 		.select({
 			dbId: githubRepositoryIndex.dbId,
-			status: githubRepositoryIndex.status,
 			lastIngestedCommitSha: githubRepositoryIndex.lastIngestedCommitSha,
 		})
 		.from(githubRepositoryIndex)
@@ -77,7 +79,7 @@ async function getRepositoryIndexInfo(
 		);
 	}
 
-	const { dbId, status, lastIngestedCommitSha } = repositoryIndex[0];
+	const { dbId, lastIngestedCommitSha } = repositoryIndex[0];
 	const isInitialIngest = lastIngestedCommitSha === null;
 
 	return { repositoryIndexDbId: dbId, isInitialIngest };

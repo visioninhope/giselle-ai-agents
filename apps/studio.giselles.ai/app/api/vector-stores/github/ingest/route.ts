@@ -3,6 +3,7 @@ import { DocumentLoaderError, RagError } from "@giselle-sdk/rag";
 import { captureException } from "@sentry/nextjs";
 import type { NextRequest } from "next/server";
 import { ingestGitHubBlobs } from "./ingest-github-repository";
+import { createIngestTelemetrySettings } from "./telemetry";
 import type { TargetGitHubRepository } from "./types";
 import {
 	buildOctokit,
@@ -46,10 +47,16 @@ async function processRepository(
 			commitSha: commit.sha,
 		};
 
+		const telemetry = await createIngestTelemetrySettings(
+			teamDbId,
+			`${owner}/${repo}`,
+		);
+
 		await ingestGitHubBlobs({
 			octokitClient,
 			source,
 			teamDbId,
+			telemetry,
 		});
 
 		await updateRepositoryStatusToCompleted(dbId, commit.sha);

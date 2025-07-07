@@ -81,7 +81,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			const dirPath = path.split("/").slice(0, -1).join("/");
 			const fileName = path.split("/").pop() || "";
 
-			const { data, error } = await supabase.storage
+			const { error, data } = await supabase.storage
 				.from(bucket)
 				.list(dirPath, {
 					search: fileName,
@@ -111,7 +111,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 				path = `${path}?timestamp=${Date.now()}`;
 			}
 
-			const { data, error } = await supabase.storage
+			const { error, data } = await supabase.storage
 				.from(bucket)
 				.download(path);
 
@@ -127,7 +127,7 @@ export default defineDriver((options: SupabaseStorageDriverOptions) => {
 			const cacheControl = opts?.cacheControl;
 			const contentType = opts?.contentType;
 
-			const { data, error } = await supabase.storage
+			const { error } = await supabase.storage
 				.from(bucket)
 				.upload(r(key), value, {
 					upsert: true,

@@ -9,7 +9,7 @@ export default defineConfig({
 	out: "./migrations",
 	dialect: "postgresql",
 	dbCredentials: {
-		// biome-ignore lint/style/noNonNullAssertion: <explanation>
+		// biome-ignore lint/style/noNonNullAssertion: environment variable is defined
 		url: process.env.POSTGRES_URL!,
 	},
 });

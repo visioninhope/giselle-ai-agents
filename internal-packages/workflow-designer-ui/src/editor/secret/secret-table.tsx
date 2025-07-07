@@ -132,7 +132,7 @@ export function SecretTable() {
 		return null;
 	}
 	return (
-		<div className="px-[16px] pb-[16px] pt-[8px] h-full">
+		<div className="pl-[16px] pb-[16px] pt-[8px] h-full">
 			<div className="flex justify-end items-center">
 				<Dialog open={presentDialog} onOpenChange={setPresentDialog}>
 					<DialogTrigger asChild>

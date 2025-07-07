@@ -1,10 +1,10 @@
 "use server";
 
+import { redirect } from "next/navigation";
 import { getAuthCallbackUrl, isValidReturnUrl } from "@/app/(auth)/lib";
 import { logger } from "@/lib/logger";
 import { createClient } from "@/lib/supabase";
 import type { OAuthProvider } from "@/services/accounts";
-import { redirect } from "next/navigation";
 
 async function authorizeOAuth(provider: OAuthProvider, formData?: FormData) {
 	const returnUrlEntry = formData?.get("returnUrl");
