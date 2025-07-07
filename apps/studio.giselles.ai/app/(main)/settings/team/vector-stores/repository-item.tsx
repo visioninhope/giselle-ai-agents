@@ -23,15 +23,20 @@ type RepositoryItemProps = {
 	deleteRepositoryIndexAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<void>;
+	triggerManualIngestAction: (
+		indexId: GitHubRepositoryIndexId,
+	) => Promise<{ success: boolean; error?: string }>;
 };
 
 export function RepositoryItem({
 	repositoryIndex,
 	deleteRepositoryIndexAction,
+	triggerManualIngestAction,
 }: RepositoryItemProps) {
 	const [showDeleteDialog, setShowDeleteDialog] = useState(false);
 	const [showDiagnosticModal, setShowDiagnosticModal] = useState(false);
 	const [isPending, startTransition] = useTransition();
+	const [isIngesting, startIngestTransition] = useTransition();
 
 	const handleDelete = () => {
 		startTransition(async () => {
@@ -43,6 +48,28 @@ export function RepositoryItem({
 			}
 		});
 	};
+
+	const handleManualIngest = () => {
+		startIngestTransition(async () => {
+			try {
+				const result = await triggerManualIngestAction(repositoryIndex.id);
+				if (!result.success) {
+					console.error("Failed to trigger manual ingest:", result.error);
+				}
+			} catch (error) {
+				console.error("Error triggering manual ingest:", error);
+			}
+		});
+	};
+
+	// Check if manual ingest is allowed
+	const now = new Date();
+	const canManuallyIngest =
+		repositoryIndex.status === "idle" ||
+		repositoryIndex.status === "completed" ||
+		(repositoryIndex.status === "failed" &&
+			repositoryIndex.retryAfter &&
+			new Date(repositoryIndex.retryAfter) <= now);
 
 	return (
 		<div
@@ -67,8 +94,17 @@ export function RepositoryItem({
 				<div className="flex items-center gap-3">
 					<div className="flex flex-col items-end gap-1">
 						<div className="flex items-center gap-3">
+							{canManuallyIngest && !isIngesting && (
+								<button
+									type="button"
+									onClick={handleManualIngest}
+									className="px-3 py-1 text-[12px] font-medium font-geist text-white bg-[#1663F3] hover:bg-[#0f4cd1] rounded-full transition-colors duration-200"
+								>
+									Ingest Now
+								</button>
+							)}
 							<StatusBadge
-								status={repositoryIndex.status}
+								status={isIngesting ? "running" : repositoryIndex.status}
 								onVerify={
 									repositoryIndex.status === "failed" &&
 									repositoryIndex.errorCode === "DOCUMENT_NOT_FOUND"

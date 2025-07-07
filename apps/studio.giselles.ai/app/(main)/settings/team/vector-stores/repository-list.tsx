@@ -8,11 +8,15 @@ type RepositoryListProps = {
 	deleteRepositoryIndexAction: (
 		indexId: GitHubRepositoryIndexId,
 	) => Promise<void>;
+	triggerManualIngestAction: (
+		indexId: GitHubRepositoryIndexId,
+	) => Promise<{ success: boolean; error?: string }>;
 };
 
 export function RepositoryList({
 	repositoryIndexes,
 	deleteRepositoryIndexAction,
+	triggerManualIngestAction,
 }: RepositoryListProps) {
 	return (
 		<div className="flex flex-col gap-y-[16px]">
@@ -36,6 +40,7 @@ export function RepositoryList({
 								key={index.id}
 								repositoryIndex={index}
 								deleteRepositoryIndexAction={deleteRepositoryIndexAction}
+								triggerManualIngestAction={triggerManualIngestAction}
 							/>
 						))}
 					</div>
