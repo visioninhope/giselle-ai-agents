@@ -91,7 +91,7 @@ export async function updateDisplayName(formData: FormData) {
 			.set({ displayName })
 			.where(eq(users.dbId, userDbIdSubquery));
 
-		revalidatePath("/settings/account/authentication");
+		revalidatePath("/settings/account");
 		revalidatePath("/", "layout");
 
 		return { success: true };
