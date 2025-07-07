@@ -1,13 +1,18 @@
 "use server";
 
-import { createId } from "@paralleldrive/cuid2";
-import { and, eq } from "drizzle-orm";
-import { revalidatePath } from "next/cache";
 import { db, githubRepositoryIndex } from "@/drizzle";
+import {
+	processRepository,
+	type TargetGitHubRepository,
+} from "@/lib/vector-stores/github";
 import type { GitHubRepositoryIndexId } from "@/packages/types";
 import { getGitHubIdentityState } from "@/services/accounts";
 import { buildAppInstallationClient } from "@/services/external/github";
 import { fetchCurrentTeam } from "@/services/teams";
+import { createId } from "@paralleldrive/cuid2";
+import { and, eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
+import { after } from "next/server";
 
 import type { ActionResult, DiagnosticResult } from "./types";
 
@@ -208,4 +213,73 @@ export async function updateRepositoryInstallation(
 		);
 
 	revalidatePath("/settings/team/vector-stores");
+}
+
+export async function triggerManualIngest(
+	indexId: GitHubRepositoryIndexId,
+): Promise<ActionResult> {
+	try {
+		const team = await fetchCurrentTeam();
+		const now = new Date();
+
+		// Fetch the repository index with validation
+		const [repositoryIndex] = await db
+			.select()
+			.from(githubRepositoryIndex)
+			.where(
+				and(
+					eq(githubRepositoryIndex.teamDbId, team.dbId),
+					eq(githubRepositoryIndex.id, indexId),
+				),
+			)
+			.limit(1);
+
+		if (!repositoryIndex) {
+			return {
+				success: false,
+				error: "Repository not found",
+			};
+		}
+
+		// Check if the repository can be ingested
+		const canIngest =
+			repositoryIndex.status === "idle" ||
+			repositoryIndex.status === "completed" ||
+			(repositoryIndex.status === "failed" &&
+				repositoryIndex.retryAfter &&
+				repositoryIndex.retryAfter <= now);
+
+		if (!canIngest) {
+			return {
+				success: false,
+				error: "Repository cannot be ingested at this time",
+			};
+		}
+
+		// Prepare target repository data
+		const targetRepository: TargetGitHubRepository = {
+			dbId: repositoryIndex.dbId,
+			owner: repositoryIndex.owner,
+			repo: repositoryIndex.repo,
+			teamDbId: repositoryIndex.teamDbId,
+			installationId: repositoryIndex.installationId,
+			lastIngestedCommitSha: repositoryIndex.lastIngestedCommitSha,
+		};
+
+		// Execute ingest in background using after()
+		after(async () => {
+			await processRepository(targetRepository);
+		});
+
+		// Immediately revalidate to show "running" status
+		revalidatePath("/settings/team/vector-stores");
+
+		return { success: true };
+	} catch (error) {
+		console.error("Error triggering manual ingest:", error);
+		return {
+			success: false,
+			error: "Failed to trigger manual ingest",
+		};
+	}
 }

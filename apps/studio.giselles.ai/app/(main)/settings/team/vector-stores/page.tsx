@@ -1,6 +1,10 @@
-import { ExternalLink } from "lucide-react";
 import { getGitHubIdentityState } from "@/services/accounts";
-import { deleteRepositoryIndex, registerRepositoryIndex } from "./actions";
+import { ExternalLink } from "lucide-react";
+import {
+	deleteRepositoryIndex,
+	registerRepositoryIndex,
+	triggerManualIngest,
+} from "./actions";
 import { getGitHubRepositoryIndexes, getInstallationsWithRepos } from "./data";
 import { RepositoryList } from "./repository-list";
 import { RepositoryRegistrationDialog } from "./repository-registration-dialog";
@@ -70,6 +74,7 @@ export default async function TeamVectorStorePage() {
 				<RepositoryList
 					repositoryIndexes={repositoryIndexes}
 					deleteRepositoryIndexAction={deleteRepositoryIndex}
+					triggerManualIngestAction={triggerManualIngest}
 				/>
 			</div>
 		);
