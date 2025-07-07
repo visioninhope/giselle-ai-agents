@@ -7,10 +7,11 @@ import type { Octokit } from "@octokit/core";
 import type { TelemetrySettings } from "ai";
 import { and, eq } from "drizzle-orm";
 import { db, githubRepositoryIndex } from "@/drizzle";
-import { createGitHubBlobChunkStore } from "@/lib/vector-stores/github-blob-stores";
+import { createGitHubBlobChunkStore } from "./chunk-store";
 
 /**
- * Main GitHub repository ingestion coordination
+ * Ingest GitHub blobs into the vector store
+ * Uses different loaders based on whether this is an initial ingest
  */
 export async function ingestGitHubBlobs(params: {
 	octokitClient: Octokit;
