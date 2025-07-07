@@ -272,6 +272,9 @@ importers:
       '@giselle-sdk/giselle-engine':
         specifier: workspace:*
         version: link:../../packages/giselle-engine
+      '@giselle-sdk/supabase-driver':
+        specifier: workspace:^
+        version: link:../../packages/supabase-driver
       '@supabase/supabase-js':
         specifier: 'catalog:'
         version: 2.50.0(bufferutil@4.0.9)(utf-8-validate@6.0.5)

@@ -6,6 +6,7 @@ import type { TelemetrySettings, UsageLimits } from "../../core";
 import {
 	FeatureFlagContext,
 	type FeatureFlagContextValue,
+	useFeatureFlag,
 } from "../feature-flags";
 import { WorkflowDesignerProvider } from "../flow";
 import { GenerationRunnerSystemProvider } from "../generations";
@@ -39,12 +40,14 @@ export function WorkspaceProvider({
 	vectorStore?: VectorStoreContextValue;
 }) {
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 
 	const [workspace, setWorkspace] = useState<Workspace | undefined>();
 	useEffect(() => {
 		client
 			.getWorkspace({
 				workspaceId,
+				useExperimentalStorage: experimental_storage,
 			})
 			.then((workspace) => {
 				setWorkspace(workspace);

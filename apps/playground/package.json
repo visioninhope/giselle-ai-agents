@@ -20,6 +20,7 @@
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
 		"@giselle-sdk/giselle-engine": "workspace:*",
+		"@giselle-sdk/supabase-driver": "workspace:^",
 		"@supabase/supabase-js": "catalog:",
 		"@xyflow/react": "catalog:",
 		"clsx": "catalog:",

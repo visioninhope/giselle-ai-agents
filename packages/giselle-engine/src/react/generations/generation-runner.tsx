@@ -6,6 +6,7 @@ import {
 	isTextGenerationNode,
 } from "@giselle-sdk/data-type";
 import { useEffect, useRef } from "react";
+import { useFeatureFlag } from "../feature-flags";
 import { useTelemetry } from "../telemetry";
 import { useGiselleEngine } from "../use-giselle-engine";
 import { useGenerationRunnerSystem } from "./contexts/generation-runner-system";
@@ -146,6 +147,7 @@ function TriggerRunner({ generation }: { generation: Generation }) {
 		updateGenerationStatusToRunning,
 		addStopHandler,
 	} = useGenerationRunnerSystem();
+	const { experimental_storage } = useFeatureFlag();
 	const client = useGiselleEngine();
 	const stop = () => {};
 	useOnce(() => {
@@ -158,6 +160,7 @@ function TriggerRunner({ generation }: { generation: Generation }) {
 			client
 				.resolveTrigger({
 					generation,
+					useExperimentalStorage: experimental_storage,
 				})
 				.then(() => {
 					updateGenerationStatusToComplete(generation.id);
