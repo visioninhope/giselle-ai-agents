@@ -92,6 +92,7 @@ export async function updateDisplayName(formData: FormData) {
 			.where(eq(users.dbId, userDbIdSubquery));
 
 		revalidatePath("/settings/account/authentication");
+		revalidatePath("/", "layout");
 
 		return { success: true };
 	} catch (error) {
@@ -230,6 +231,7 @@ export async function updateAvatar(formData: FormData) {
 			.where(eq(users.dbId, userDbIdSubquery));
 
 		revalidatePath("/settings/account");
+		revalidatePath("/", "layout");
 
 		return {
 			success: true,
