@@ -45,7 +45,6 @@ export function generateText(args: {
 			setGeneration,
 			fileResolver,
 			generationContentResolver,
-			workspaceId,
 			completeGeneration,
 		}) => {
 			const operationNode = generationContext.operationNode;
