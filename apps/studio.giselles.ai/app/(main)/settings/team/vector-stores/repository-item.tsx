@@ -111,7 +111,7 @@ export function RepositoryItem({
 						<GlassDialogContent variant="destructive">
 							<GlassDialogHeader
 								title="Delete Repository"
-								description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}".`}
+								description={`This action cannot be undone. This will permanently delete the repository "${repositoryIndex.owner}/${repositoryIndex.repo}" from your Vector Stores.`}
 								onClose={() => setShowDeleteDialog(false)}
 								variant="destructive"
 							/>
@@ -165,10 +165,10 @@ function getRelativeTimeString(date: Date): string {
 }
 
 const STATUS_CONFIG = {
-	idle: { dotColor: "bg-[#B8E8F4]", label: "idle" },
-	running: { dotColor: "bg-[#39FF7F] animate-custom-pulse", label: "running" },
-	completed: { dotColor: "bg-[#39FF7F]", label: "ready" },
-	failed: { dotColor: "bg-[#FF3D71]", label: "error" },
+	idle: { dotColor: "bg-[#B8E8F4]", label: "Idle" },
+	running: { dotColor: "bg-[#39FF7F] animate-custom-pulse", label: "Running" },
+	completed: { dotColor: "bg-[#39FF7F]", label: "Ready" },
+	failed: { dotColor: "bg-[#FF3D71]", label: "Error" },
 } as const;
 
 function StatusBadge({

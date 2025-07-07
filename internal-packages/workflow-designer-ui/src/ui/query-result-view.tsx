@@ -270,7 +270,7 @@ export function QueryResultView({ generation }: { generation: Generation }) {
 		if (queryResults.length === 0) {
 			return (
 				<div className="text-white-600 text-[14px] p-[16px] bg-white-900/5 rounded-[8px] border border-white-900/10 text-center">
-					No search results found
+					No results found.
 				</div>
 			);
 		}
