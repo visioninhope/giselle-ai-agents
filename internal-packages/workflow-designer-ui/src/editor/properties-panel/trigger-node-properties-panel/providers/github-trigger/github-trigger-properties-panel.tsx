@@ -7,6 +7,7 @@ import {
 import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
 import type { GitHubIntegrationInstallation } from "@giselle-sdk/giselle-engine";
 import {
+	useFeatureFlag,
 	useGiselleEngine,
 	useIntegration,
 	useWorkflowDesigner,
@@ -108,6 +109,7 @@ function Installed({
 	node: TriggerNode;
 	installationUrl: string;
 }) {
+	const { experimental_storage } = useFeatureFlag();
 	const [step, setStep] = useState<GitHubTriggerSetupStep>({
 		state: "select-repository",
 	});
@@ -205,6 +207,7 @@ function Installed({
 							event,
 						},
 					},
+					useExperimentalStorage: experimental_storage,
 				});
 				updateNodeData(node, {
 					content: {
