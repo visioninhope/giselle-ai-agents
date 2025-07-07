@@ -1,5 +1,5 @@
-import { getGitHubIdentityState } from "@/services/accounts";
 import { ExternalLink } from "lucide-react";
+import { getGitHubIdentityState } from "@/services/accounts";
 import {
 	deleteRepositoryIndex,
 	registerRepositoryIndex,
