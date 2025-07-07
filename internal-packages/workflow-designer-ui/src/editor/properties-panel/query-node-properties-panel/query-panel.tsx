@@ -67,7 +67,7 @@ function DataSourceDisplayBar({
 			>
 				<DatabaseZapIcon className="w-[14px] h-[14px] text-white-600" />
 				<p className="text-[11px] text-white-600">
-					No data sources connected • Connect from Input tab to query
+					No data sources connected. Connect a source to the Input tab to query.
 				</p>
 			</div>
 		);

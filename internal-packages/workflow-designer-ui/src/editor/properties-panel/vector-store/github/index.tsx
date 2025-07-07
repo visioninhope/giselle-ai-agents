@@ -101,7 +101,7 @@ export function GitHubVectorStoreNodePropertiesPanel({
 								{node.content.source.state.owner}/
 								{node.content.source.state.repo}
 							</span>{" "}
-							is no longer available in your vector stores. Please select a
+							is no longer available in your Vector Stores. Please select a
 							different repository or set up this repository again.
 						</span>
 					</div>

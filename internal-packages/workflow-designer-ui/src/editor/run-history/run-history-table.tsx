@@ -1,3 +1,4 @@
+import { Button } from "@giselle-internal/ui/button";
 import { EmptyState } from "@giselle-internal/ui/empty-state";
 import {
 	Table,
@@ -11,6 +12,7 @@ import {
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
+import { LoaderIcon, RefreshCcwIcon } from "lucide-react";
 import useSWR from "swr";
 
 function formatDateTime(timestamp: number): string {
@@ -30,7 +32,7 @@ function formatDuration(ms: number): string {
 export function RunHistoryTable() {
 	const client = useGiselleEngine();
 	const { data: workspace } = useWorkflowDesigner();
-	const { data, isLoading } = useSWR(
+	const { data, isLoading, isValidating, mutate } = useSWR(
 		{
 			namespace: "getWorkspaceFlowRuns",
 			workspaceId: workspace.id,
@@ -45,6 +47,24 @@ export function RunHistoryTable() {
 
 	return (
 		<div className="pl-4 pb-4 pt-2 h-full">
+			<div className="flex justify-end pb-2">
+				<Button
+					type="button"
+					variant="outline"
+					size="compact"
+					onClick={() => mutate()}
+					disabled={isValidating}
+					leftIcon={
+						isValidating ? (
+							<LoaderIcon className="size-[12px] animate-spin" />
+						) : (
+							<RefreshCcwIcon className="size-[12px]" />
+						)
+					}
+				>
+					{isValidating ? "Refreshing..." : "Refresh"}
+				</Button>
+			</div>
 			{data === undefined || data.length < 1 ? (
 				<EmptyState title="No run" description="No runs have been executed." />
 			) : (
