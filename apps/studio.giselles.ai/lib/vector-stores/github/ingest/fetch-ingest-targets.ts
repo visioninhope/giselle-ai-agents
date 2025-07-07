@@ -1,40 +1,19 @@
-import { octokit } from "@giselle-sdk/github-tool";
 import { and, eq, isNotNull, lt, or } from "drizzle-orm";
 import { db, githubRepositoryIndex } from "@/drizzle";
-import type { TargetGitHubRepository } from "./types";
-
-export function buildOctokit(installationId: number) {
-	const appId = process.env.GITHUB_APP_ID;
-	if (!appId) {
-		throw new Error("GITHUB_APP_ID is empty");
-	}
-	const privateKey = process.env.GITHUB_APP_PRIVATE_KEY;
-	if (!privateKey) {
-		throw new Error("GITHUB_APP_PRIVATE_KEY is empty");
-	}
-
-	return octokit({
-		strategy: "app-installation",
-		appId,
-		privateKey,
-		installationId,
-	});
-}
+import type { TargetGitHubRepository } from "../types";
 
 /**
- * Fetch target GitHub repositories to ingest
+ * Fetch GitHub repositories that need to be ingested
  *
- * target repositories are:
+ * Target repositories are:
  * - idle
  * - failed and retryAfter has passed
  * - running and updated more than 15 minutes ago (stale)
  * - completed and updated more than 24 hours ago (outdated)
  *
- * @returns Target GitHub repositories to ingest
+ * @returns Repositories to ingest
  */
-export async function fetchTargetGitHubRepositories(): Promise<
-	TargetGitHubRepository[]
-> {
+export async function fetchIngestTargets(): Promise<TargetGitHubRepository[]> {
 	// To prevent the race condition, consider running status as stale if it hasn't been updated for 15 minutes (> 800 seconds)
 	const staleThreshold = new Date(Date.now() - 15 * 60 * 1000);
 	// To update repository which updated more than 24 hours ago
@@ -80,46 +59,4 @@ export async function fetchTargetGitHubRepositories(): Promise<
 		lastIngestedCommitSha: record.lastIngestedCommitSha,
 		teamDbId: record.teamDbId,
 	}));
-}
-
-export async function updateRepositoryStatusToRunning(dbId: number) {
-	await db
-		.update(githubRepositoryIndex)
-		.set({
-			status: "running",
-		})
-		.where(eq(githubRepositoryIndex.dbId, dbId));
-}
-
-export async function updateRepositoryStatusToCompleted(
-	dbId: number,
-	commitSha: string,
-) {
-	await db
-		.update(githubRepositoryIndex)
-		.set({
-			status: "completed",
-			lastIngestedCommitSha: commitSha,
-			// clear error info
-			errorCode: null,
-			retryAfter: null,
-		})
-		.where(eq(githubRepositoryIndex.dbId, dbId));
-}
-
-export async function updateRepositoryStatusToFailed(
-	dbId: number,
-	errorInfo: {
-		errorCode: string;
-		retryAfter: Date | null;
-	},
-) {
-	await db
-		.update(githubRepositoryIndex)
-		.set({
-			status: "failed",
-			errorCode: errorInfo.errorCode,
-			retryAfter: errorInfo.retryAfter,
-		})
-		.where(eq(githubRepositoryIndex.dbId, dbId));
 }
