@@ -1,7 +1,10 @@
 import { WorkspaceId } from "@giselle-sdk/data-type";
 import { emitTelemetry } from "@giselle-sdk/giselle-engine";
 import { NextGiselleEngine } from "@giselle-sdk/giselle-engine/next";
-import { supabaseVaultDriver } from "@giselle-sdk/supabase-driver";
+import {
+	supabaseStorageDriver as experimental_supabaseStorageDriver,
+	supabaseVaultDriver,
+} from "@giselle-sdk/supabase-driver";
 import { openaiVectorStore } from "@giselle-sdk/vector-store-adapters";
 import { createStorage } from "unstorage";
 import { waitForLangfuseFlush } from "@/instrumentation.node";
@@ -24,6 +27,14 @@ const storage = createStorage({
 		supabaseServiceKey: process.env.SUPABASE_SERVICE_KEY ?? "",
 		bucket: "app",
 	}),
+});
+
+const experimental_storage = experimental_supabaseStorageDriver({
+	endpoint: process.env.SUPABASE_STORAGE_URL ?? "",
+	region: process.env.SUPABASE_STORAGE_REGION ?? "",
+	accessKeyId: process.env.SUPABASE_STORAGE_ACCESS_KEY_ID ?? "",
+	secretAccessKey: process.env.SUPABASE_STORAGE_SECRET_ACCESS_KEY ?? "",
+	bucket: "app",
 });
 
 const vault = supabaseVaultDriver({
@@ -54,6 +65,7 @@ if (
 export const giselleEngine = NextGiselleEngine({
 	basePath: "/api/giselle",
 	storage,
+	experimental_storage,
 	llmProviders: ["openai", "anthropic", "google", "perplexity", "fal"],
 	onConsumeAgentTime,
 	telemetry: {
