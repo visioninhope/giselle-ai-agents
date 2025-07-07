@@ -409,8 +409,8 @@ export function Editor({
 
 	// Function to convert 380px to a percentage
 	const getPercentageForPixels = (pixels: number) => {
-		const containerWidth = window.innerWidth - 16 - 16; // padding分を引く
-		const sideMenuWidth = containerWidth * 0.1; // サイドメニューの10%
+		const containerWidth = window.innerWidth - 16 - 16; // subtract padding
+		const sideMenuWidth = containerWidth * 0.1; // 10% for side menu
 		const availableWidth = containerWidth - sideMenuWidth;
 		return (pixels / availableWidth) * 100;
 	};
