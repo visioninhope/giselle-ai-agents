@@ -55,31 +55,30 @@ export function WorkspaceProvider({
 		return null;
 	}
 	return (
-		<TelemetryProvider settings={telemetry}>
-			<UsageLimitsProvider limits={usageLimits}>
-				<IntegrationProvider {...integration}>
-					<VectorStoreProvider value={vectorStore}>
-						<WorkflowDesignerProvider data={workspace}>
-							<GenerationRunnerSystemProvider>
-								<FeatureFlagContext
-									value={{
-										runV3: featureFlag?.runV3 ?? false,
-										sidemenu: featureFlag?.sidemenu ?? false,
-										githubTools: featureFlag?.githubTools ?? false,
-										webSearchAction: featureFlag?.webSearchAction ?? false,
-										layoutV2: featureFlag?.layoutV2 ?? false,
-										layoutV3: featureFlag?.layoutV3 ?? false,
-										experimental_storage:
-											featureFlag?.experimental_storage ?? false,
-									}}
-								>
+		<FeatureFlagContext
+			value={{
+				runV3: featureFlag?.runV3 ?? false,
+				sidemenu: featureFlag?.sidemenu ?? false,
+				githubTools: featureFlag?.githubTools ?? false,
+				webSearchAction: featureFlag?.webSearchAction ?? false,
+				layoutV2: featureFlag?.layoutV2 ?? false,
+				layoutV3: featureFlag?.layoutV3 ?? false,
+				experimental_storage: featureFlag?.experimental_storage ?? false,
+			}}
+		>
+			<TelemetryProvider settings={telemetry}>
+				<UsageLimitsProvider limits={usageLimits}>
+					<IntegrationProvider {...integration}>
+						<VectorStoreProvider value={vectorStore}>
+							<WorkflowDesignerProvider data={workspace}>
+								<GenerationRunnerSystemProvider>
 									{children}
-								</FeatureFlagContext>
-							</GenerationRunnerSystemProvider>
-						</WorkflowDesignerProvider>
-					</VectorStoreProvider>
-				</IntegrationProvider>
-			</UsageLimitsProvider>
-		</TelemetryProvider>
+								</GenerationRunnerSystemProvider>
+							</WorkflowDesignerProvider>
+						</VectorStoreProvider>
+					</IntegrationProvider>
+				</UsageLimitsProvider>
+			</TelemetryProvider>
+		</FeatureFlagContext>
 	);
 }
