@@ -135,3 +135,22 @@ export const layoutV3Flag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const experimental_storageFlag = flag<boolean>({
+	key: "experimental-storage",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("EXPERIMENTAL_STORAGE_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable experimental storage",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});

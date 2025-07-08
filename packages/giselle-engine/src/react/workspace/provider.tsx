@@ -68,6 +68,8 @@ export function WorkspaceProvider({
 										webSearchAction: featureFlag?.webSearchAction ?? false,
 										layoutV2: featureFlag?.layoutV2 ?? false,
 										layoutV3: featureFlag?.layoutV3 ?? false,
+										experimental_storage:
+											featureFlag?.experimental_storage ?? false,
 									}}
 								>
 									{children}

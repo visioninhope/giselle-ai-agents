@@ -5,6 +5,7 @@ import type { ReactNode } from "react";
 import { getGitHubVectorStores } from "@/app/services/vector-store";
 import { db } from "@/drizzle";
 import {
+	experimental_storageFlag,
 	githubToolsFlag,
 	layoutV2Flag,
 	layoutV3Flag,
@@ -48,6 +49,7 @@ export default async function Layout({
 	const webSearchAction = await webSearchActionFlag();
 	const layoutV2 = await layoutV2Flag();
 	const layoutV3 = await layoutV3Flag();
+	const experimental_storage = await experimental_storageFlag();
 	return (
 		<WorkspaceProvider
 			workspaceId={workspaceId}
@@ -80,6 +82,7 @@ export default async function Layout({
 				webSearchAction,
 				layoutV2,
 				layoutV3,
+				experimental_storage,
 			}}
 		>
 			{children}
