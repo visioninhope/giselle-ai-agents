@@ -22,7 +22,7 @@ export default supabaseMiddleware(async (user, request) => {
 
 export const config: MiddlewareConfig = {
 	matcher: [
-		"/apps",
+		"/apps/:path*",
 		"/settings/:path*",
 		"/workspaces/:path*",
 		"/api/giselle/:path*",
