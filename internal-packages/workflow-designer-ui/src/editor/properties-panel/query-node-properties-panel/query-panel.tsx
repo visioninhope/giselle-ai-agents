@@ -13,17 +13,6 @@ import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
 
-// Style constants for consistent styling
-const TEXT_STYLES = {
-	small: "text-[11px]",
-	badge: "text-[10px] font-medium",
-} as const;
-
-const BADGE_STYLES = {
-	connected: "bg-blue-900/15 border border-blue-900/25 text-blue-100",
-	disconnected: "bg-white-900/8 border border-white-900/15",
-} as const;
-
 function getDefaultNodeName(input: ConnectedSource): string {
 	if (isTextGenerationNode(input.node)) {
 		return input.node.content.llm.id;
