@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { performLogin } from "./helpers/login";
 
 function escapeRegExp(string: string): string {
 	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
@@ -54,24 +55,8 @@ test.describe("Login redirect functionality", () => {
 		const returnUrl = url.searchParams.get("returnUrl");
 		expect(returnUrl).toBe(protectedPath);
 
-		// Login with test credentials
-		const loginEmail = process.env.PLAYWRIGHT_LOGIN_EMAIL;
-		const loginPassword = process.env.PLAYWRIGHT_LOGIN_PASSWORD;
-
-		if (!loginEmail || !loginPassword) {
-			throw new Error(
-				"PLAYWRIGHT_LOGIN_EMAIL and PLAYWRIGHT_LOGIN_PASSWORD must be set in environment variables.",
-			);
-		}
-
-		await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
-		await page.getByRole("textbox", { name: "Password" }).fill(loginPassword);
-
-		// Click login and wait for redirect to the original protected page
-		await Promise.all([
-			page.waitForURL(`${baseUrl}${protectedPath}`, { timeout: 15000 }),
-			page.getByRole("button", { name: "Log in" }).click(),
-		]);
+		// Login with test credentials and wait for redirect to the original protected page
+		await performLogin(page, `${baseUrl}${protectedPath}`);
 	});
 
 	test.describe("Should prevent open redirect attacks", () => {
@@ -96,26 +81,8 @@ test.describe("Login redirect functionality", () => {
 					`${baseUrl}/login?returnUrl=${encodeURIComponent(maliciousUrl)}`,
 				);
 
-				// Login with test credentials
-				const loginEmail = process.env.PLAYWRIGHT_LOGIN_EMAIL;
-				const loginPassword = process.env.PLAYWRIGHT_LOGIN_PASSWORD;
-
-				if (!loginEmail || !loginPassword) {
-					throw new Error(
-						"PLAYWRIGHT_LOGIN_EMAIL and PLAYWRIGHT_LOGIN_PASSWORD must be set in environment variables.",
-					);
-				}
-
-				await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
-				await page
-					.getByRole("textbox", { name: "Password" })
-					.fill(loginPassword);
-
-				// Click login and wait for redirect (should go to /apps instead of malicious URL)
-				await Promise.all([
-					page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
-					page.getByRole("button", { name: "Log in" }).click(),
-				]);
+				// Login with test credentials and wait for redirect (should go to /apps instead of malicious URL)
+				await performLogin(page, `${baseUrl}/apps`);
 			});
 		}
 	});
