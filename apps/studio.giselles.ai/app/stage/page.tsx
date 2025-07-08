@@ -9,6 +9,8 @@ import {
 	TableRow,
 } from "@giselle-internal/ui/table";
 import { Mic } from "lucide-react";
+import { notFound } from "next/navigation";
+import { stageFlag } from "@/flags";
 
 const teamOptions = [
 	{ id: "app", label: "teams/app" },
