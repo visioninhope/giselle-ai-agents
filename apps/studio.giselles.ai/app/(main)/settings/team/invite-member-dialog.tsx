@@ -243,7 +243,7 @@ export function InviteMemberDialog({
 			const errorList: { message: string; emails?: string[] }[] = [];
 
 			if (response.overallStatus === "partial_success") {
-				const successCount = emailList.length - failedInvites.length;
+				const successCount = validEmails.length - failedInvites.length;
 				errorList.push({
 					message: `${successCount} invitation(s) sent successfully.`,
 				});
