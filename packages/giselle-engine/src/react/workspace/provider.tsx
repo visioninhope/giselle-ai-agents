@@ -45,6 +45,7 @@ export function WorkspaceProvider({
 		client
 			.getWorkspace({
 				workspaceId,
+				useExperimentalStorage: featureFlag?.experimental_storage ?? false,
 			})
 			.then((workspace) => {
 				setWorkspace(workspace);

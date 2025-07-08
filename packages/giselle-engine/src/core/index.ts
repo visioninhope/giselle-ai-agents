@@ -83,8 +83,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		createWorkspace: async () => {
 			return await createWorkspace({ context });
 		},
-		getWorkspace: async (workspaceId: WorkspaceId) => {
-			return await getWorkspace({ context, workspaceId });
+		getWorkspace: async (
+			workspaceId: WorkspaceId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getWorkspace({
+				context,
+				workspaceId,
+				useExperimentalStorage,
+			});
 		},
 		updateWorkspace: async (workspace: Workspace) => {
 			return await updateWorkspace({ context, workspace });
@@ -170,10 +177,16 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			}
 			return await context.vault.encrypt(plaintext);
 		},
-		resolveTrigger: async (args: { generation: QueuedGeneration }) => {
+		resolveTrigger: async (args: {
+			generation: QueuedGeneration;
+			useExperimentalStorage: boolean;
+		}) => {
 			return await resolveTrigger({ ...args, context });
 		},
-		configureTrigger: async (args: { trigger: ConfigureTriggerInput }) => {
+		configureTrigger: async (args: {
+			trigger: ConfigureTriggerInput;
+			useExperimentalStorage: boolean;
+		}) => {
 			return await configureTrigger({ ...args, context });
 		},
 		getTrigger: async (args: { flowTriggerId: FlowTriggerId }) => {
@@ -194,6 +207,7 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		runFlow: async (args: {
 			triggerId: FlowTriggerId;
 			triggerInputs?: GenerationContextInput[];
+			useExperimentalStorage: boolean;
 		}) => runFlow({ ...args, context }),
 		handleGitHubWebhookV2: async (args: { request: Request }) =>
 			handleGitHubWebhookV2({ ...args, context }),

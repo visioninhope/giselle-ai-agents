@@ -6,6 +6,7 @@ import {
 	type TriggerNode,
 } from "@giselle-sdk/data-type";
 import {
+	useFeatureFlag,
 	useGiselleEngine,
 	useWorkflowDesigner,
 } from "@giselle-sdk/giselle-engine/react";
@@ -25,6 +26,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
+	const { experimental_storage } = useFeatureFlag();
 
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
@@ -82,6 +84,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 							},
 						},
 					},
+					useExperimentalStorage: experimental_storage,
 				});
 
 				updateNodeData(node, {

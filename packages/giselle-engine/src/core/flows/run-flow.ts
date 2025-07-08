@@ -226,6 +226,7 @@ export async function runFlow(args: {
 		jobComplete?: (args: { job: Job }) => void | Promise<void>;
 		jobSkip?: (args: { job: Job }) => void | Promise<void>;
 	};
+	useExperimentalStorage: boolean;
 }) {
 	const trigger = await getFlowTrigger({
 		storage: args.context.storage,
@@ -236,7 +237,9 @@ export async function runFlow(args: {
 	}
 	const workspace = await getWorkspace({
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
 		workspaceId: trigger.workspaceId,
+		useExperimentalStorage: args.useExperimentalStorage,
 	});
 
 	const triggerNode = workspace.nodes.find(

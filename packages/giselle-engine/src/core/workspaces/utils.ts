@@ -1,6 +1,7 @@
 import { parseAndMod } from "@giselle-sdk/data-mod";
 import { Node, Workspace, type WorkspaceId } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 
 export function workspacePath(workspaceId: WorkspaceId) {
 	return `workspaces/${workspaceId}/workspace.json`;
@@ -23,11 +24,27 @@ export async function setWorkspace({
 
 export async function getWorkspace({
 	storage,
+	experimental_storage,
+	useExperimentalStorage,
 	workspaceId,
 }: {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage: boolean;
 	workspaceId: WorkspaceId;
 }) {
+	if (useExperimentalStorage) {
+		const workspace = await experimental_storage.getJson({
+			path: workspacePath(workspaceId),
+			// bypassingCache: true,
+			schema: Workspace,
+		});
+		const nodes = workspace.nodes.map((node) => parseAndMod(Node, node));
+		return {
+			...workspace,
+			nodes,
+		};
+	}
 	const result = await storage.getItem(workspacePath(workspaceId), {
 		bypassingCache: true,
 	});
