@@ -105,8 +105,6 @@ test.describe("Login redirect functionality", () => {
 
 		// Verify the full path is preserved in returnUrl
 		const url = new URL(page.url());
-		expect(decodeURIComponent(url.searchParams.get("returnUrl") || "")).toBe(
-			nestedPath,
-		);
+		expect(url.searchParams.get("returnUrl")).toBe(nestedPath);
 	});
 });
