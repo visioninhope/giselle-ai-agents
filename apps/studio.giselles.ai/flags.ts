@@ -66,19 +66,11 @@ export const runV3Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("RUN_V3_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(
-				"Edge Config not available, falling back to default:",
-				error,
-			);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Run v3",
 	options: [
@@ -93,19 +85,11 @@ export const sidemenuFlag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("SIDEMENU_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return true;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(
-				"Edge Config not available, falling back to default:",
-				error,
-			);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return true;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Side Menu",
 	options: [
@@ -120,19 +104,11 @@ export const layoutV2Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("LAYOUT_V2_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return true;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(
-				"Edge Config not available, falling back to default:",
-				error,
-			);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return true;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V2",
 	options: [
@@ -147,19 +123,11 @@ export const layoutV3Flag = flag<boolean>({
 		if (process.env.NODE_ENV === "development") {
 			return takeLocalEnv("LAYOUT_V3_FLAG");
 		}
-		try {
-			const edgeConfig = await get(`flag__${this.key}`);
-			if (edgeConfig === undefined) {
-				return false;
-			}
-			return edgeConfig === true || edgeConfig === "true";
-		} catch (error) {
-			console.warn(
-				"Edge Config not available, falling back to default:",
-				error,
-			);
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
 			return false;
 		}
+		return edgeConfig === true || edgeConfig === "true";
 	},
 	description: "Enable Layout V3",
 	options: [
