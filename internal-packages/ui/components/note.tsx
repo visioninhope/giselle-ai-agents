@@ -5,16 +5,10 @@ import type React from "react";
 interface NoteProps {
 	children: React.ReactNode;
 	type?: "error" | "warning" | "success" | "info";
-
 	action?: React.ReactNode;
 }
 
-export function Note({
-	children,
-	type = "error",
-
-	action,
-}: NoteProps) {
+export function Note({ children, type = "error", action }: NoteProps) {
 	return (
 		<div
 			className={clsx(

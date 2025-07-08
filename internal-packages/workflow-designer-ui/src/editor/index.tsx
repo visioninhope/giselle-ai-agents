@@ -346,18 +346,22 @@ function NodeCanvas() {
 				const pane = reactFlowRef.current?.getBoundingClientRect();
 				if (!pane) return;
 
+				// Get node element and its bounding rect
+				const nodeElement = event.currentTarget as HTMLElement;
+				const nodeRect = nodeElement.getBoundingClientRect();
+
+				// Position menu at bottom-right corner with more spacing
+				const menuLeft = nodeRect.right + 10; // 10px to the right of node
+				const menuTop = nodeRect.bottom + 10; // 10px below the node
+
 				setMenu({
 					id: node.id,
-					top: event.clientY < pane.height - 200 ? event.clientY : undefined,
-					left: event.clientX < pane.width - 200 ? event.clientX : undefined,
+					top: menuTop < pane.height - 200 ? menuTop : undefined,
+					left: menuLeft < pane.width - 200 ? menuLeft : undefined,
 					right:
-						event.clientX >= pane.width - 200
-							? pane.width - event.clientX
-							: undefined,
+						menuLeft >= pane.width - 200 ? pane.width - menuLeft : undefined,
 					bottom:
-						event.clientY >= pane.height - 200
-							? pane.height - event.clientY
-							: undefined,
+						menuTop >= pane.height - 200 ? pane.height - menuTop : undefined,
 				});
 			}}
 		>
@@ -407,10 +411,10 @@ export function Editor({
 
 	const [showReadOnlyBanner, setShowReadOnlyBanner] = useState(isReadOnly);
 
-	// Function to convert 380px to a percentage
+	// Convert 380px to percentage value
 	const getPercentageForPixels = (pixels: number) => {
 		const containerWidth = window.innerWidth - 16 - 16; // subtract padding
-		const sideMenuWidth = containerWidth * 0.1; // 10% for side menu
+		const sideMenuWidth = containerWidth * 0.1; // side menu takes 10%
 		const availableWidth = containerWidth - sideMenuWidth;
 		return (pixels / availableWidth) * 100;
 	};
