@@ -30,25 +30,63 @@ export default defineConfig({
 
 		/* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
 		trace: "on-first-retry",
-		// Use the saved storage state for all tests
-		storageState: "./tests/e2e/.auth/storageState.json",
 	},
 
 	/* Configure projects for major browsers */
 	projects: [
+		// Logged-in tests with authentication
+		{
+			name: "chromium-authenticated",
+			testMatch: "**/logged-in/**/*.spec.ts",
+			use: {
+				...devices["Desktop Chrome"],
+				// Use the saved storage state for authenticated tests
+				storageState: "./tests/e2e/.auth/storageState.json",
+			},
+		},
+		{
+			name: "firefox-authenticated",
+			testMatch: "**/logged-in/**/*.spec.ts",
+			use: {
+				...devices["Desktop Firefox"],
+				// Use the saved storage state for authenticated tests
+				storageState: "./tests/e2e/.auth/storageState.json",
+			},
+		},
+		{
+			name: "webkit-authenticated",
+			testMatch: "**/logged-in/**/*.spec.ts",
+			use: {
+				...devices["Desktop Safari"],
+				// Use the saved storage state for authenticated tests
+				storageState: "./tests/e2e/.auth/storageState.json",
+			},
+		},
+
+		// Non-authenticated tests without authentication
 		{
 			name: "chromium",
-			use: { ...devices["Desktop Chrome"] },
+			testMatch: "**/non-authenticated/**/*.spec.ts",
+			use: {
+				...devices["Desktop Chrome"],
+				// No storage state for non-authenticated tests
+			},
 		},
-
 		{
 			name: "firefox",
-			use: { ...devices["Desktop Firefox"] },
+			testMatch: "**/non-authenticated/**/*.spec.ts",
+			use: {
+				...devices["Desktop Firefox"],
+				// No storage state for non-authenticated tests
+			},
 		},
-
 		{
 			name: "webkit",
-			use: { ...devices["Desktop Safari"] },
+			testMatch: "**/non-authenticated/**/*.spec.ts",
+			use: {
+				...devices["Desktop Safari"],
+				// No storage state for non-authenticated tests
+			},
 		},
 
 		/* Test against mobile viewports. */
