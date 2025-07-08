@@ -29,5 +29,6 @@ export const config: MiddlewareConfig = {
 		"/connected",
 		"/github/:path*",
 		"/subscriptions/:path*",
+		"/stage/:path*",
 	],
 };

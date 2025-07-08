@@ -154,3 +154,22 @@ export const experimental_storageFlag = flag<boolean>({
 		{ value: true, label: "Enable" },
 	],
 });
+
+export const stageFlag = flag<boolean>({
+	key: "stage",
+	async decide() {
+		if (process.env.NODE_ENV === "development") {
+			return takeLocalEnv("STAGE_FLAG");
+		}
+		const edgeConfig = await get(`flag__${this.key}`);
+		if (edgeConfig === undefined) {
+			return false;
+		}
+		return edgeConfig === true || edgeConfig === "true";
+	},
+	description: "Enable stage",
+	options: [
+		{ value: false, label: "disable" },
+		{ value: true, label: "Enable" },
+	],
+});
