@@ -20,6 +20,7 @@ export default async function Layout({
 				webSearchAction: false,
 				layoutV2: true,
 				layoutV3: true,
+				experimental_storage: true,
 			}}
 		>
 			{children}

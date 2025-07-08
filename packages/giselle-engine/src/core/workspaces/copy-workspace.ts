@@ -12,7 +12,9 @@ export async function copyWorkspace(args: {
 	name?: string;
 }) {
 	const sourceWorkspace = await getWorkspace({
+		useExperimentalStorage: false,
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
 		workspaceId: args.workspaceId,
 	});
 

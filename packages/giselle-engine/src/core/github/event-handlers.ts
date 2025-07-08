@@ -378,6 +378,7 @@ export async function processEvent<TEventName extends WebhookEventName>(
 		let hasFlowError = false;
 
 		await deps.runFlow({
+			useExperimentalStorage: false,
 			context: args.context,
 			triggerId: args.trigger.id,
 			triggerInputs: [

@@ -364,7 +364,7 @@ const queryFactoryImpl = {
 			outputs: [
 				{
 					id: OutputId.generate(),
-					label: "Result",
+					label: "Output",
 					accessor: "result",
 				},
 			],

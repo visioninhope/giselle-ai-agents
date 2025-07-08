@@ -7,8 +7,8 @@ import {
 import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
-import clsx from "clsx";
 import { AtSignIcon, DatabaseZapIcon, X } from "lucide-react";
+import { Toolbar } from "radix-ui";
 import { useMemo } from "react";
 import { GitHubIcon } from "../../../icons";
 import { type ConnectedSource, useConnectedSources } from "./sources";
@@ -93,7 +93,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 					header={
 						connectedDatasourceInputs.length > 0 ? (
 							<div className="flex items-center gap-[6px] flex-wrap">
-								<span className={clsx(TEXT_STYLES.small, "mr-2 text-blue-300")}>
+								<span className="text-[11px] mr-2" style={{ color: "#839DC3" }}>
 									Querying {connectedDatasourceInputs.length} data source
 									{connectedDatasourceInputs.length !== 1 ? "s" : ""}:
 								</span>
@@ -103,14 +103,20 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 									return (
 										<div
 											key={dataSource.connection.id}
-											className={clsx(
-												"flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]",
-												BADGE_STYLES.connected,
-											)}
+											className="flex items-center gap-[4px] px-[6px] py-[2px] rounded-[4px]"
+											style={{
+												backgroundColor: "rgba(131, 157, 195, 0.15)",
+												borderColor: "rgba(131, 157, 195, 0.25)",
+												border: "1px solid",
+												color: "#839DC3",
+											}}
 										>
-											<div className="shrink-0 text-blue-200">{icon}</div>
+											<div className="shrink-0" style={{ color: "#839DC3" }}>
+												{icon}
+											</div>
 											<span
-												className={TEXT_STYLES.badge}
+												className="text-[10px] font-medium"
+												style={{ color: "#839DC3" }}
 												title={`${name} • ${description}`}
 											>
 												{description}
@@ -120,7 +126,20 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 												onClick={() =>
 													deleteConnection(dataSource.connection.id)
 												}
-												className="ml-1 p-0.5 rounded transition-colors text-blue-300/70 hover:text-blue-300 hover:bg-blue-300/20"
+												className="ml-1 p-0.5 rounded transition-colors"
+												style={{
+													color: "rgba(131, 157, 195, 0.7)",
+												}}
+												onMouseEnter={(e) => {
+													e.currentTarget.style.color = "#839DC3";
+													e.currentTarget.style.backgroundColor =
+														"rgba(131, 157, 195, 0.2)";
+												}}
+												onMouseLeave={(e) => {
+													e.currentTarget.style.color =
+														"rgba(131, 157, 195, 0.7)";
+													e.currentTarget.style.backgroundColor = "transparent";
+												}}
 												title="Remove data source"
 											>
 												<X className="w-3 h-3" />
@@ -130,8 +149,11 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 								})}
 							</div>
 						) : (
-							<div className="flex items-center">
-								<span className={clsx(TEXT_STYLES.small, "text-blue-300/60")}>
+							<div className="flex items-center gap-[6px]">
+								<span
+									className="text-[11px]"
+									style={{ color: "rgba(131, 157, 195, 0.6)" }}
+								>
 									No data sources connected • Connect from Input tab to query
 								</span>
 							</div>
@@ -139,18 +161,26 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 					}
 					tools={(editor) => (
 						<DropdownMenu
-							trigger={<AtSignIcon className="w-[18px]" />}
-							items={connectedInputsWithoutDatasource.map((input) => ({
-								id: input.connection.id,
-								input,
+							trigger={
+								<Toolbar.Button
+									value="bulletList"
+									aria-label="Insert sources"
+									data-toolbar-item
+								>
+									<AtSignIcon className="w-[18px]" />
+								</Toolbar.Button>
+							}
+							items={connectedInputsWithoutDatasource.map((source) => ({
+								id: source.connection.id,
+								source,
 							}))}
 							renderItem={(item) =>
-								`${item.input.node.name ?? getDefaultNodeName(item.input)} / ${item.input.output.label}`
+								`${item.source.node.name ?? getDefaultNodeName(item.source)} / ${item.source.output.label}`
 							}
 							onSelect={(_, item) => {
 								const embedNode = {
-									outputId: item.input.connection.outputId,
-									node: item.input.connection.outputNode,
+									outputId: item.source.connection.outputId,
+									node: item.source.connection.outputNode,
 								};
 								editor
 									.chain()
@@ -158,7 +188,7 @@ export function QueryPanel({ node }: { node: QueryNode }) {
 									.insertContentAt(
 										editor.state.selection.$anchor.pos,
 										createSourceExtensionJSONContent({
-											node: item.input.connection.outputNode,
+											node: item.source.connection.outputNode,
 											outputId: embedNode.outputId,
 										}),
 									)

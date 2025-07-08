@@ -32,9 +32,15 @@ export const createJsonRouters = {
 		}),
 	getWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ workspaceId: WorkspaceId.schema }),
+			input: z.object({
+				workspaceId: WorkspaceId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
-				const workspace = await giselleEngine.getWorkspace(input.workspaceId);
+				const workspace = await giselleEngine.getWorkspace(
+					input.workspaceId,
+					input.useExperimentalStorage,
+				);
 				return JsonResponse.json(workspace);
 			},
 		}),
@@ -184,6 +190,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				generation: QueuedGeneration,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -195,6 +202,7 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				trigger: ConfigureTriggerInput,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				return JsonResponse.json({
@@ -259,6 +267,7 @@ export const createJsonRouters = {
 			input: z.object({
 				triggerId: FlowTriggerId.schema,
 				triggerInputs: z.array(GenerationContextInput).optional(),
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.runFlow(input);

@@ -21,7 +21,6 @@ import {
 	ResizeHandle,
 } from "../ui";
 import { GenerationPanel } from "./generation-panel";
-import { InputPanel } from "./input-panel";
 import { QueryPanel } from "./query-panel";
 import { useConnectedSources } from "./sources";
 
@@ -33,7 +32,6 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 			origin: { type: "workspace", id: data.id },
 		});
 	const { all: connectedSources } = useConnectedSources(node);
-
 	const { error } = useToasts();
 
 	const query = useMemo(() => {
@@ -119,19 +117,12 @@ export function QueryNodePropertiesPanel({ node }: { node: QueryNode }) {
 							>
 								<Tabs.List className="flex gap-[16px] text-[14px] font-accent **:p-[4px] **:border-b **:cursor-pointer **:data-[state=active]:text-white-900 **:data-[state=active]:border-white-900 **:data-[state=inactive]:text-black-400 **:data-[state=inactive]:border-transparent">
 									<Tabs.Trigger value="query">Query</Tabs.Trigger>
-									<Tabs.Trigger value="input">Input</Tabs.Trigger>
 								</Tabs.List>
 								<Tabs.Content
 									value="query"
 									className="flex-1 flex flex-col overflow-hidden"
 								>
 									<QueryPanel node={node} />
-								</Tabs.Content>
-								<Tabs.Content
-									value="input"
-									className="flex-1 flex flex-col overflow-y-auto"
-								>
-									<InputPanel node={node} />
 								</Tabs.Content>
 							</Tabs.Root>
 						</PropertiesPanelContent>

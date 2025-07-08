@@ -1,0 +1,4 @@
+export { fetchIngestTargets } from "./ingest/fetch-ingest-targets";
+export { processRepository } from "./ingest/process-repository";
+export { gitHubQueryService } from "./query/service";
+export type { TargetGitHubRepository } from "./types";

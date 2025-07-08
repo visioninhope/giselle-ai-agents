@@ -7,6 +7,7 @@ export interface FeatureFlagContextValue {
 	webSearchAction: boolean;
 	layoutV2: boolean;
 	layoutV3: boolean;
+	experimental_storage: boolean;
 }
 export const FeatureFlagContext = createContext<
 	FeatureFlagContextValue | undefined

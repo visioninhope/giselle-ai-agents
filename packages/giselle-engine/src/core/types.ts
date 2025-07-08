@@ -6,6 +6,7 @@ import type {
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import type { QueryService } from "@giselle-sdk/rag";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "./experimental_storage";
 import type { VectorStore } from "./experimental_vector-store/types/interface";
 import type { GenerationCompleteOption, TelemetrySettings } from "./telemetry";
 import type { UsageLimits } from "./usage-limits";
@@ -13,6 +14,7 @@ import type { Vault } from "./vault";
 
 export interface GiselleEngineContext {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders: LanguageModelProvider[];
 	integrationConfigs?: {
@@ -89,6 +91,7 @@ export type GitHubVectorStoreQueryService<
 
 export interface GiselleEngineConfig {
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 	sampleAppWorkspaceId?: WorkspaceId;
 	llmProviders?: LanguageModelProvider[];
 	integrationConfigs?: GiselleIntegrationConfig;
