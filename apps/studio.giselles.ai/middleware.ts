@@ -28,6 +28,6 @@ export const config: MiddlewareConfig = {
 		"/api/giselle/:path*",
 		"/connected",
 		"/github/:path*",
-		"/subscriptions/:path*"
+		"/subscriptions/:path*",
 	],
 };
