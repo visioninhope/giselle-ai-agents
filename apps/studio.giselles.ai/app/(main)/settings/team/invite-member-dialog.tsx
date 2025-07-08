@@ -30,10 +30,12 @@ export function InviteMemberDialog({
 }: InviteMemberDialogProps) {
 	const [open, setOpen] = useState(false);
 	const [emailInput, setEmailInput] = useState("");
-	const [emailList, setEmailList] = useState<string[]>([]);
+	const [emailTags, setEmailTags] = useState<string[]>([]);
 	const [role, setRole] = useState<TeamRole>("member");
 	const [isLoading, setIsLoading] = useState(false);
-	const [error, setError] = useState<string>("");
+	const [errors, setErrors] = useState<
+		{ message: string; emails?: string[] }[]
+	>([]);
 	const [dialogKey, setDialogKey] = useState(Date.now()); // Key for forced re-rendering
 
 	// Reset state when dialog state changes
@@ -41,9 +43,9 @@ export function InviteMemberDialog({
 		if (!open) {
 			// Reset state when dialog is closed
 			setEmailInput("");
-			setEmailList([]);
+			setEmailTags([]);
 			setRole("member");
-			setError("");
+			setErrors([]);
 			setIsLoading(false);
 		}
 	}, [open]);
@@ -57,65 +59,158 @@ export function InviteMemberDialog({
 		setOpen(false);
 	};
 
-	const addEmail = (emailToAdd: string) => {
-		const trimmedEmail = emailToAdd.trim();
-		if (!trimmedEmail) return;
+	const addEmailTags = () => {
+		if (!emailInput.trim()) return;
 
-		// Email format validation
-		try {
-			parse(pipe(string(), emailValidator()), trimmedEmail);
-			// Check for duplicates
-			if (
-				!emailList.includes(trimmedEmail) &&
-				!memberEmails.includes(trimmedEmail) &&
-				!invitationEmails.includes(trimmedEmail)
-			) {
-				setEmailList((prev) => [...prev, trimmedEmail]);
+		// Parse and validate emails
+		const emails = emailInput
+			.trim()
+			.split(/[,;\s]+/)
+			.filter((email) => email.trim());
+
+		const validTags: string[] = [];
+		const invalidEmails: string[] = [];
+
+		for (const email of emails) {
+			try {
+				// Validate email format
+				parse(pipe(string(), emailValidator()), email);
+
+				// Skip if already in tags
+				if (!emailTags.includes(email)) {
+					validTags.push(email);
+				}
+			} catch {
+				invalidEmails.push(email);
 			}
+		}
+
+		// Show error for invalid emails
+		if (invalidEmails.length > 0) {
+			setErrors([
+				{ message: "Invalid email addresses", emails: invalidEmails },
+			]);
+		}
+
+		// Add valid tags
+		if (validTags.length > 0) {
+			setEmailTags([...emailTags, ...validTags]);
+			// Clear input only if all emails were valid
+			if (invalidEmails.length === 0) {
+				setEmailInput("");
+			} else {
+				// Keep invalid emails in input for correction
+				setEmailInput(invalidEmails.join(", "));
+			}
+		} else if (invalidEmails.length === 0) {
+			// All emails were duplicates
 			setEmailInput("");
-		} catch {
-			setError(`Invalid email address: ${trimmedEmail}`);
 		}
 	};
 
-	const removeEmail = (email: string) => {
-		setEmailList((prev) => prev.filter((e) => e !== email));
+	const removeEmailTag = (emailToRemove: string) => {
+		setEmailTags(emailTags.filter((email) => email !== emailToRemove));
 	};
 
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-		if (e.key === "Enter" || e.key === ",") {
+		if (e.key === "Enter") {
 			e.preventDefault();
-			addEmail(emailInput);
+			// Just add to tags, don't submit
+			addEmailTags();
 		}
 	};
 
-	const handlePaste = (e: React.ClipboardEvent<HTMLInputElement>) => {
+	const handleSubmit = (e: React.FormEvent) => {
 		e.preventDefault();
-		const pastedText = e.clipboardData.getData("text");
-		const emails = pastedText.split(/[,;\s]+/);
-
-		for (const email of emails) {
-			if (email) addEmail(email);
-		}
+		processInvitations();
 	};
 
-	const handleSubmit = async (e: React.FormEvent) => {
-		e.preventDefault();
-		setError("");
+	const processInvitations = async () => {
+		setErrors([]);
 
-		if (emailInput.trim()) {
-			addEmail(emailInput);
+		// Combine tags and current input
+		const allEmails = [...emailTags];
+
+		// Parse current input if any
+		const inputText = emailInput.trim();
+		if (inputText) {
+			const inputEmails = inputText
+				.split(/[,;\s]+/)
+				.filter((email) => email.trim());
+			allEmails.push(...inputEmails);
 		}
 
-		if (emailList.length === 0) {
-			setError("Please enter at least one email address");
+		// Check if we have any emails
+		if (allEmails.length === 0) {
+			setErrors([{ message: "Please enter at least one email address" }]);
+			return;
+		}
+
+		// Remove duplicates
+		const uniqueEmails = Array.from(new Set(allEmails));
+
+		// Validate emails
+		const validEmails: string[] = [];
+		const invalidEmails: string[] = [];
+		const alreadyMembers: string[] = [];
+		const alreadyInvited: string[] = [];
+
+		for (const email of uniqueEmails) {
+			try {
+				parse(pipe(string(), emailValidator()), email);
+
+				// Check if already a member
+				if (memberEmails.includes(email)) {
+					alreadyMembers.push(email);
+				}
+				// Check if already invited
+				else if (invitationEmails.includes(email)) {
+					alreadyInvited.push(email);
+				}
+				// Valid email to send
+				else {
+					validEmails.push(email);
+				}
+			} catch {
+				invalidEmails.push(email);
+			}
+		}
+
+		// Build error messages
+		const errorList: { message: string; emails?: string[] }[] = [];
+
+		if (invalidEmails.length > 0) {
+			errorList.push({
+				message: "Invalid email addresses",
+				emails: invalidEmails,
+			});
+		}
+
+		if (alreadyMembers.length > 0) {
+			errorList.push({
+				message: "Already team members",
+				emails: alreadyMembers,
+			});
+		}
+
+		if (alreadyInvited.length > 0) {
+			errorList.push({ message: "Already invited", emails: alreadyInvited });
+		}
+
+		if (errorList.length > 0) {
+			setErrors(errorList);
+			return;
+		}
+
+		if (validEmails.length === 0) {
+			setErrors([{ message: "Please enter at least one email address" }]);
 			return;
 		}
 
 		setIsLoading(true);
 
 		const response: SendInvitationsResult = await sendInvitationsAction(
-			emailList,
+			validEmails,
 			role,
 		);
 
@@ -125,17 +220,44 @@ export function InviteMemberDialog({
 			const failedInvites = response.results.filter(
 				(r) => r.status !== "success",
 			);
-			const errorMessages = failedInvites
-				.map((r) => `${r.email}: ${r.error || r.status}`)
-				.join(", ");
-			let message = `Failed to send ${failedInvites.length} invitation(s).`;
+
+			// Create more user-friendly error messages
+			const errorGroups: Record<string, string[]> = {};
+			for (const result of failedInvites) {
+				let errorKey = result.error || result.status || "unknown";
+
+				// Map technical errors to user-friendly messages
+				if (errorKey.includes("already a member")) {
+					errorKey = "Already team members";
+				} else if (errorKey.includes("active invitation already exists")) {
+					errorKey = "Already invited";
+				}
+
+				if (!errorGroups[errorKey]) {
+					errorGroups[errorKey] = [];
+				}
+				errorGroups[errorKey].push(result.email);
+			}
+
+			// Build the error array
+			const errorList: { message: string; emails?: string[] }[] = [];
+
 			if (response.overallStatus === "partial_success") {
 				const successCount = emailList.length - failedInvites.length;
-				message = `${successCount} invitation(s) sent successfully. Failed to send ${failedInvites.length}: ${errorMessages}`;
-			} else {
-				message = `Failed to send all ${failedInvites.length} invitation(s): ${errorMessages}`;
+				errorList.push({
+					message: `${successCount} invitation(s) sent successfully.`,
+				});
 			}
-			setError(message);
+
+			// Add grouped error messages
+			for (const [errorKey, emails] of Object.entries(errorGroups)) {
+				errorList.push({
+					message: errorKey,
+					emails: emails,
+				});
+			}
+
+			setErrors(errorList);
 		}
 		setIsLoading(false);
 	};
@@ -171,7 +293,7 @@ export function InviteMemberDialog({
 					>
 						<div className="flex items-start gap-3 rounded-lg bg-black/80 p-1">
 							<div className="flex min-h-[40px] flex-grow flex-wrap items-center gap-1">
-								{emailList.map((email) => (
+								{emailTags.map((email) => (
 									<div
 										key={email}
 										className="mb-1 mr-2 flex items-center rounded-md bg-white/10 px-2.5 py-1.5 shadow-sm"
@@ -181,8 +303,9 @@ export function InviteMemberDialog({
 										</span>
 										<button
 											type="button"
-											onClick={() => removeEmail(email)}
+											onClick={() => removeEmailTag(email)}
 											className="ml-1.5 text-black-300 hover:text-white-600"
+											disabled={isLoading}
 										>
 											<X className="h-4 w-4" />
 										</button>
@@ -191,17 +314,17 @@ export function InviteMemberDialog({
 								<input
 									type="text"
 									placeholder={
-										emailList.length > 0
-											? ""
+										emailTags.length > 0
+											? "Add more emails..."
 											: "Email Addresses (separate with commas)"
 									}
 									value={emailInput}
 									onChange={(e) => {
-										setError("");
+										setErrors([]);
 										setEmailInput(e.target.value);
 									}}
 									onKeyDown={handleKeyDown}
-									onPaste={handlePaste}
+									onBlur={() => addEmailTags()}
 									className="min-w-[200px] flex-1 border-none bg-transparent px-1 py-1 text-[14px] text-white-400 outline-none placeholder:text-white/30"
 									disabled={isLoading}
 								/>
@@ -244,8 +367,24 @@ export function InviteMemberDialog({
 								</DropdownMenuContent>
 							</DropdownMenu>
 						</div>
-						{error && (
-							<div className="mt-1 text-sm text-error-500">{error}</div>
+						{errors.length > 0 && (
+							<div className="mt-1 space-y-1">
+								{errors.map((error) => (
+									<div
+										key={`${error.message}-${error.emails?.join(",") || ""}`}
+										className="text-sm text-error-500"
+									>
+										{error.emails && error.emails.length > 0 ? (
+											<>
+												<span className="font-medium">{error.message}:</span>{" "}
+												<span>{error.emails.join(", ")}</span>
+											</>
+										) : (
+											<span>{error.message}</span>
+										)}
+									</div>
+								))}
+							</div>
 						)}
 					</form>
 				</GlassDialogBody>
