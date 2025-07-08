@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { escapeRegExp } from "../helpers/regex";
 
 test.describe("Protected paths authentication", () => {
 	const baseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
@@ -35,7 +36,7 @@ test.describe("Protected paths authentication", () => {
 
 				// Should be redirected to login page with returnUrl parameter
 				await expect(page).toHaveURL(
-					new RegExp(`${baseUrl}/login\\?returnUrl=`),
+					new RegExp(`${escapeRegExp(baseUrl)}/login\\?returnUrl=`),
 					{ timeout: 15000 },
 				);
 
