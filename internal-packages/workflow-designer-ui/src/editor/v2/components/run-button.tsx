@@ -63,7 +63,13 @@ export function RunButton() {
 			if (isTriggerNode(node)) {
 				return false;
 			}
-			if (node.inputs.length > 0) {
+			if (
+				data.connections.some(
+					(connection) =>
+						connection.outputNode.type === "operation" &&
+						connection.inputNode.id === node.id,
+				)
+			) {
 				return false;
 			}
 			return true;
