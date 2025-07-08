@@ -11,15 +11,26 @@ export async function setWorkspace({
 	storage,
 	workspaceId,
 	workspace,
+	experimental_storage,
+	useExperimentalStorage,
 }: {
 	storage: Storage;
 	workspaceId: WorkspaceId;
 	workspace: Workspace;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage: boolean;
 }) {
-	await storage.setItem(workspacePath(workspaceId), workspace, {
-		// Disable caching by setting cacheControl to 0 for Supabase storage
-		cacheControl: 0,
-	});
+	if (useExperimentalStorage) {
+		await experimental_storage.setJson({
+			path: workspacePath(workspaceId),
+			data: workspace,
+		});
+	} else {
+		await storage.setItem(workspacePath(workspaceId), workspace, {
+			// Disable caching by setting cacheControl to 0 for Supabase storage
+			cacheControl: 0,
+		});
+	}
 }
 
 export async function getWorkspace({

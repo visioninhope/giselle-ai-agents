@@ -80,8 +80,12 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		copyWorkspace: async (workspaceId: WorkspaceId, name?: string) => {
 			return await copyWorkspace({ context, workspaceId, name });
 		},
-		createWorkspace: async () => {
-			return await createWorkspace({ context });
+		createWorkspace: async ({
+			useExperimentalStorage,
+		}: {
+			useExperimentalStorage: boolean;
+		}) => {
+			return await createWorkspace({ context, useExperimentalStorage });
 		},
 		getWorkspace: async (
 			workspaceId: WorkspaceId,
@@ -93,8 +97,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 				useExperimentalStorage,
 			});
 		},
-		updateWorkspace: async (workspace: Workspace) => {
-			return await updateWorkspace({ context, workspace });
+		updateWorkspace: async (
+			workspace: Workspace,
+			useExperimentalStorage: boolean,
+		) => {
+			return await updateWorkspace({
+				context,
+				workspace,
+				useExperimentalStorage,
+			});
 		},
 		getLanguageModelProviders: async () => {
 			return await getLanguageModelProviders({ context });

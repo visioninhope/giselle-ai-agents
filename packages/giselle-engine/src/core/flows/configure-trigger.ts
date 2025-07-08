@@ -61,6 +61,8 @@ export async function configureTrigger(args: {
 					: node,
 			),
 		},
+		experimental_storage: args.context.experimental_storage,
+		useExperimentalStorage: args.useExperimentalStorage,
 	});
 	return flowTriggerId;
 }

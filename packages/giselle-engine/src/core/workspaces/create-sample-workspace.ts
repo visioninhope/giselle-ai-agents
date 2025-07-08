@@ -121,6 +121,8 @@ export async function createSampleWorkspace(args: {
 			storage: args.context.storage,
 			workspaceId: newWorkspaceId,
 			workspace: newWorkspace,
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: false,
 		}),
 		copyFiles({
 			storage: args.context.storage,

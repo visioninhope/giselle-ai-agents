@@ -25,8 +25,11 @@ import { createHandler, withUsageLimitErrorHandler } from "./create-handler";
 export const createJsonRouters = {
 	createWorkspace: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			handler: async () => {
-				const workspace = await giselleEngine.createWorkspace();
+			input: z.object({
+				useExperimentalStorage: z.boolean(),
+			}),
+			handler: async ({ input }) => {
+				const workspace = await giselleEngine.createWorkspace(input);
 				return JsonResponse.json(workspace);
 			},
 		}),
@@ -49,9 +52,13 @@ export const createJsonRouters = {
 		createHandler({
 			input: z.object({
 				workspace: Workspace,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				const workspace = await giselleEngine.updateWorkspace(input.workspace);
+				const workspace = await giselleEngine.updateWorkspace(
+					input.workspace,
+					input.useExperimentalStorage,
+				);
 				return JsonResponse.json(workspace);
 			},
 		}),

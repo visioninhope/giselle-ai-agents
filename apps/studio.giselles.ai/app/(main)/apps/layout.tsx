@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import type { ReactNode } from "react";
 import { GlassButton } from "@/components/ui/glass-button";
 import { agents, db } from "@/drizzle";
+import { experimental_storageFlag } from "@/flags";
 import { fetchCurrentUser } from "@/services/accounts";
 import { fetchCurrentTeam } from "@/services/teams";
 import { giselleEngine } from "../../giselle-engine";
@@ -14,7 +15,10 @@ export default function Layout({ children }: { children: ReactNode }) {
 		const agentId = `agnt_${createId()}` as const;
 		const user = await fetchCurrentUser();
 		const team = await fetchCurrentTeam();
-		const workspace = await giselleEngine.createWorkspace();
+		const experimental_storage = await experimental_storageFlag();
+		const workspace = await giselleEngine.createWorkspace({
+			useExperimentalStorage: experimental_storage,
+		});
 
 		await db.insert(agents).values({
 			id: agentId,
