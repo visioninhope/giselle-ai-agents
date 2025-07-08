@@ -141,7 +141,7 @@ function WebPageListItem({
 
 export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 	const client = useGiselleEngine();
-	const { data, updateName, updateNodeDataContent } = useWorkflowDesigner();
+	const { data, updateNodeData, updateNodeDataContent } = useWorkflowDesigner();
 	const { error } = useToasts();
 	const handleSubmit = useCallback<FormEventHandler<HTMLFormElement>>(
 		async (e) => {
@@ -246,7 +246,9 @@ export function WebPageNodePropertiesPanel({ node }: { node: WebPageNode }) {
 			<PropertiesPanelHeader
 				icon={<WebPageFileIcon className="size-[20px] text-black-900" />}
 				node={node}
-				onChangeName={(name) => updateName(name)}
+				onChangeName={(name) => {
+					updateNodeData(node, { name });
+				}}
 			/>
 			<PropertiesPanelContent>
 				<div>

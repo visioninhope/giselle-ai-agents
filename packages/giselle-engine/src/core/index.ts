@@ -59,6 +59,7 @@ import {
 	updateWorkspace,
 } from "./workspaces";
 
+export * from "./experimental_storage";
 export * from "./experimental_vector-store";
 export { FlowRunId } from "./flows";
 export * from "./integrations";
