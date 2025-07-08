@@ -74,46 +74,49 @@ test.describe("Login redirect functionality", () => {
 		]);
 	});
 
-	test("Should prevent open redirect attacks", async ({ page, context }) => {
-		// Clear authentication state
-		await context.clearCookies();
-
-		// Test various malicious returnUrl patterns
+	test.describe("Should prevent open redirect attacks", () => {
 		const maliciousUrls = [
-			"//example.com",
-			"/\\example.com",
-			"http://example.com",
-			"https://example.com",
-			"javascript:alert('xss')",
+			{ url: "//example.com", description: "protocol-relative URL" },
+			{ url: "/\\example.com", description: "backslash confusion" },
+			{ url: "http://example.com", description: "absolute HTTP URL" },
+			{ url: "https://example.com", description: "absolute HTTPS URL" },
+			{ url: "javascript:alert('xss')", description: "JavaScript protocol" },
 		];
 
-		for (const maliciousUrl of maliciousUrls) {
-			// Navigate to login with malicious returnUrl
-			await page.goto(
-				`${baseUrl}/login?returnUrl=${encodeURIComponent(maliciousUrl)}`,
-			);
+		for (const { url: maliciousUrl, description } of maliciousUrls) {
+			test(`Should block ${description}: ${maliciousUrl}`, async ({
+				page,
+				context,
+			}) => {
+				// Clear authentication state
+				await context.clearCookies();
 
-			// Login with test credentials
-			const loginEmail = process.env.PLAYWRIGHT_LOGIN_EMAIL;
-			const loginPassword = process.env.PLAYWRIGHT_LOGIN_PASSWORD;
-
-			if (!loginEmail || !loginPassword) {
-				throw new Error(
-					"PLAYWRIGHT_LOGIN_EMAIL and PLAYWRIGHT_LOGIN_PASSWORD must be set in environment variables.",
+				// Navigate to login with malicious returnUrl
+				await page.goto(
+					`${baseUrl}/login?returnUrl=${encodeURIComponent(maliciousUrl)}`,
 				);
-			}
 
-			await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
-			await page.getByRole("textbox", { name: "Password" }).fill(loginPassword);
+				// Login with test credentials
+				const loginEmail = process.env.PLAYWRIGHT_LOGIN_EMAIL;
+				const loginPassword = process.env.PLAYWRIGHT_LOGIN_PASSWORD;
 
-			// Click login and wait for redirect (should go to /apps instead of malicious URL)
-			await Promise.all([
-				page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
-				page.getByRole("button", { name: "Log in" }).click(),
-			]);
+				if (!loginEmail || !loginPassword) {
+					throw new Error(
+						"PLAYWRIGHT_LOGIN_EMAIL and PLAYWRIGHT_LOGIN_PASSWORD must be set in environment variables.",
+					);
+				}
 
-			// Clear cookies for next iteration
-			await context.clearCookies();
+				await page.getByRole("textbox", { name: "Email" }).fill(loginEmail);
+				await page
+					.getByRole("textbox", { name: "Password" })
+					.fill(loginPassword);
+
+				// Click login and wait for redirect (should go to /apps instead of malicious URL)
+				await Promise.all([
+					page.waitForURL(`${baseUrl}/apps`, { timeout: 15000 }),
+					page.getByRole("button", { name: "Log in" }).click(),
+				]);
+			});
 		}
 	});
 
