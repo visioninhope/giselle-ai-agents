@@ -302,7 +302,7 @@ export function NodeComponent({
 						<NodeIcon
 							node={node}
 							className={clsx(
-								"w-[16px] h-[16px] fill-current",
+								"w-[16px] h-[16px] stroke-current fill-none",
 								"group-data-[content-type=text]:text-black-900",
 								"group-data-[content-type=file]:text-black-900",
 								"group-data-[content-type=webPage]:text-black-900",
