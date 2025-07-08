@@ -71,7 +71,11 @@ const tasks = [
 	},
 ];
 
-export default function StagePage() {
+export default async function StagePage() {
+	const enableStage = await stageFlag();
+	if (enableStage) {
+		return notFound();
+	}
 	return (
 		<div className="p-[24px] space-y-6">
 			<div className="text-center text-[24px] font-sans text-white-100">
