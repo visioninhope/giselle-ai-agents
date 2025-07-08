@@ -75,7 +75,7 @@ const tasks = [
 
 export default async function StagePage() {
 	const enableStage = await stageFlag();
-	if (enableStage) {
+	if (!enableStage) {
 		return notFound();
 	}
 	return (
