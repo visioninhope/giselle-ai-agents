@@ -1,5 +1,9 @@
 import { expect, test } from "@playwright/test";
 
+function escapeRegExp(string: string): string {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 test.describe("Login redirect functionality", () => {
 	const baseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
 
@@ -38,9 +42,12 @@ test.describe("Login redirect functionality", () => {
 
 		// Should be redirected to login page with returnUrl parameter
 		// Note: The original query parameters are preserved in the login URL
-		await expect(page).toHaveURL(new RegExp(`${baseUrl}/login.*returnUrl=`), {
-			timeout: 15000,
-		});
+		await expect(page).toHaveURL(
+			new RegExp(`${escapeRegExp(baseUrl)}/login.*returnUrl=`),
+			{
+				timeout: 15000,
+			},
+		);
 
 		// Verify the returnUrl parameter contains the full original path
 		const url = new URL(page.url());
@@ -122,9 +129,12 @@ test.describe("Login redirect functionality", () => {
 		await page.goto(`${baseUrl}${nestedPath}`);
 
 		// Should be redirected to login page with returnUrl parameter
-		await expect(page).toHaveURL(new RegExp(`${baseUrl}/login.*returnUrl=`), {
-			timeout: 15000,
-		});
+		await expect(page).toHaveURL(
+			new RegExp(`${escapeRegExp(baseUrl)}/login.*returnUrl=`),
+			{
+				timeout: 15000,
+			},
+		);
 
 		// Verify the full path is preserved in returnUrl
 		const url = new URL(page.url());
