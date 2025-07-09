@@ -10,7 +10,9 @@ export default function Home() {
 	const giselleEngine = useGiselleEngine();
 
 	const createWorkspace = useCallback(async () => {
-		const workspace = await giselleEngine.createWorkspace();
+		const workspace = await giselleEngine.createWorkspace({
+			useExperimentalStorage: true,
+		});
 		router.push(`/workspaces/${workspace.id}`);
 	}, [router.push, giselleEngine]);
 	const createSampleWorkspace = useCallback(async () => {

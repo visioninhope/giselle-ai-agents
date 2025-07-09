@@ -33,6 +33,8 @@ export async function copyWorkspace(args: {
 			storage: args.context.storage,
 			workspaceId: workspaceCopy.id,
 			workspace: Workspace.parse(workspaceCopy),
+			experimental_storage: args.context.experimental_storage,
+			useExperimentalStorage: false,
 		}),
 		copyFiles({
 			storage: args.context.storage,

@@ -16,8 +16,8 @@ import {
 import type { LanguageModelProvider } from "@giselle-sdk/language-model";
 import { createContext, useCallback, useEffect, useState } from "react";
 import { APICallError } from "../errors";
+import { useFeatureFlag } from "../feature-flags";
 import { useGiselleEngine } from "../use-giselle-engine";
-
 import {
 	useAddConnection,
 	useAddNode,
@@ -49,11 +49,15 @@ export function WorkflowDesignerProvider({
 	saveWorkflowDelay?: number;
 }) {
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 	const { workspace, dispatch } = useWorkspaceReducer(
 		data,
 		async (ws) => {
 			try {
-				await client.updateWorkspace({ workspace: ws });
+				await client.updateWorkspace({
+					workspace: ws,
+					useExperimentalStorage: experimental_storage,
+				});
 			} catch (error) {
 				console.error("Failed to persist graph:", error);
 			}
