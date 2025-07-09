@@ -600,17 +600,17 @@ export async function setGeneratedImage(params: {
 	generatedImageFilename: string;
 	generatedImage: GeneratedImageData;
 }) {
-	if (params.useExperimentalStorage && params.experimental_storage) {
+	if (params.useExperimentalStorage) {
 		await params.experimental_storage.setBlob(
 			generatedImagePath(params.generation.id, params.generatedImageFilename),
 			params.generatedImage.uint8Array,
 		);
-	} else {
-		await params.storage.setItemRaw(
-			generatedImagePath(params.generation.id, params.generatedImageFilename),
-			params.generatedImage.uint8Array,
-		);
+		return;
 	}
+	await params.storage.setItemRaw(
+		generatedImagePath(params.generation.id, params.generatedImageFilename),
+		params.generatedImage.uint8Array,
+	);
 }
 
 export async function getGeneratedImage(params: {
