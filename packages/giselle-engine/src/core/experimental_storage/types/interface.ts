@@ -1,21 +1,22 @@
 import type { z } from "zod/v4";
 
-export interface GetJsonParams<T extends z.ZodObject> {
+export type JsonSchema = z.ZodObject | z.ZodDiscriminatedUnion | z.ZodArray;
+export interface GetJsonParams<T extends JsonSchema> {
 	path: string;
 	schema?: T;
 }
 
-export interface SetJsonParams<T extends z.ZodObject> {
+export interface SetJsonParams<T extends JsonSchema> {
 	path: string;
 	schema?: T;
 	data: z.infer<T>;
 }
 
-type GetJson = <T extends z.ZodObject>(
+type GetJson = <T extends JsonSchema>(
 	params: GetJsonParams<T>,
 ) => Promise<z.infer<T>>;
 
-type SetJson = <T extends z.ZodObject>(
+type SetJson = <T extends JsonSchema>(
 	params: SetJsonParams<T>,
 ) => Promise<void>;
 

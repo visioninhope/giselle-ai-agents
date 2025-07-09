@@ -1,4 +1,4 @@
-import { Generation, type NodeGenerationIndex } from "@giselle-sdk/data-type";
+import { Generation, NodeGenerationIndex } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
 import type { GiselleStorage } from "../../experimental_storage";
 import {

@@ -115,6 +115,7 @@ async function generateImageWithFal({
 	tracer,
 	telemetry,
 	context,
+	useExperimentalStorage,
 }: {
 	operationNode: ImageGenerationNode;
 	generationContext: GenerationContext;
@@ -123,6 +124,7 @@ async function generateImageWithFal({
 	telemetry?: TelemetrySettings;
 	tracer: Langfuse;
 	context: GiselleEngineContext;
+	useExperimentalStorage?: boolean;
 }) {
 	const trace = tracer.trace({
 		name: "ai-sdk/fal",
@@ -180,7 +182,7 @@ async function generateImageWithFal({
 				await setGeneratedImage({
 					storage: context.storage,
 					experimental_storage: context.experimental_storage,
-					useExperimentalStorage: args.useExperimentalStorage,
+					useExperimentalStorage,
 					generation: runningGeneration,
 					generatedImage: {
 						uint8Array: image.uint8Array,
@@ -246,6 +248,7 @@ export async function generateImageWithOpenAI({
 	context,
 	tracer,
 	telemetry,
+	useExperimentalStorage,
 }: {
 	messages: CoreMessage[];
 	generationContext: GenerationContext;
@@ -254,6 +257,7 @@ export async function generateImageWithOpenAI({
 	context: GiselleEngineContext;
 	tracer: Langfuse;
 	telemetry?: TelemetrySettings;
+	useExperimentalStorage?: boolean;
 }) {
 	const trace = tracer.trace({
 		name: "ai-sdk/openai",
@@ -314,7 +318,7 @@ export async function generateImageWithOpenAI({
 				await setGeneratedImage({
 					storage: context.storage,
 					experimental_storage: context.experimental_storage,
-					useExperimentalStorage: args.useExperimentalStorage,
+					useExperimentalStorage,
 					generation: runningGeneration,
 					generatedImage: {
 						uint8Array: image.uint8Array,

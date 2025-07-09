@@ -9,6 +9,7 @@ import {
 import type {
 	GetJsonParams,
 	GiselleStorage,
+	JsonSchema,
 	SetJsonParams,
 } from "@giselle-sdk/giselle-engine";
 import type { z } from "zod/v4";
@@ -49,7 +50,7 @@ export function supabaseStorageDriver(
 	});
 
 	return {
-		async getJson<T extends z.ZodObject>(
+		async getJson<T extends JsonSchema>(
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const res = await client.send(
@@ -63,7 +64,7 @@ export function supabaseStorageDriver(
 			return params.schema ? params.schema.parse(obj) : obj;
 		},
 
-		async setJson<T extends z.ZodObject>(
+		async setJson<T extends JsonSchema>(
 			params: SetJsonParams<T>,
 		): Promise<void> {
 			const data = params.schema
