@@ -1,5 +1,6 @@
 import { Generation, type NodeGenerationIndex } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../../experimental_storage";
 import {
 	generationPath,
 	getNodeGenerationIndexes,
@@ -8,17 +9,29 @@ import {
 
 export async function internalSetGeneration(params: {
 	storage: Storage;
+	experimental_storage?: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generation: Generation;
 }) {
-	await params.storage.setItem(
-		generationPath(params.generation.id),
-		Generation.parse(params.generation),
-	);
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		await params.experimental_storage.setJson({
+			path: generationPath(params.generation.id),
+			data: params.generation,
+			schema: Generation,
+		});
+	} else {
+		await params.storage.setItem(
+			generationPath(params.generation.id),
+			Generation.parse(params.generation),
+		);
+	}
 	let newNodeGenerationIndexes: NodeGenerationIndex[] | undefined;
 	const newNodeGenerationIndex = toNodeGenerationIndex(params.generation);
 	const nodeId = params.generation.context.operationNode.id;
 	const currentNodeGenerationIndexes = await getNodeGenerationIndexes({
 		storage: params.storage,
+		experimental_storage: params.experimental_storage,
+		useExperimentalStorage: params.useExperimentalStorage,
 		nodeId,
 	});
 
@@ -41,10 +54,18 @@ export async function internalSetGeneration(params: {
 			];
 		}
 	}
-	await params.storage.setItem(
-		nodeGenerationIndexPath(nodeId),
-		newNodeGenerationIndexes,
-	);
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		await params.experimental_storage.setJson({
+			path: nodeGenerationIndexPath(nodeId),
+			data: newNodeGenerationIndexes,
+			schema: NodeGenerationIndex.array(),
+		});
+	} else {
+		await params.storage.setItem(
+			nodeGenerationIndexPath(nodeId),
+			newNodeGenerationIndexes,
+		);
+	}
 }
 
 export function toNodeGenerationIndex(

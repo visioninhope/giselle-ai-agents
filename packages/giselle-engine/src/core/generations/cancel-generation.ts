@@ -6,9 +6,12 @@ import { getGeneration } from "./utils";
 export async function cancelGeneration(args: {
 	context: GiselleEngineContext;
 	generationId: GenerationId;
+	useExperimentalStorage?: boolean;
 }) {
 	const generation = await getGeneration({
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
+		useExperimentalStorage: args.useExperimentalStorage,
 		generationId: args.generationId,
 	});
 	if (generation === undefined) {
@@ -21,6 +24,8 @@ export async function cancelGeneration(args: {
 	};
 	await internalSetGeneration({
 		storage: args.context.storage,
+		experimental_storage: args.context.experimental_storage,
+		useExperimentalStorage: args.useExperimentalStorage,
 		generation: cancelledGeneration,
 	});
 	return cancelledGeneration;

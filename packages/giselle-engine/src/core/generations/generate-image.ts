@@ -33,11 +33,13 @@ export function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
+	useExperimentalStorage?: boolean;
 }) {
 	return useGenerationExecutor({
 		context: args.context,
 		generation: args.generation,
 		telemetry: args.telemetry,
+		useExperimentalStorage: args.useExperimentalStorage,
 		execute: async ({
 			runningGeneration,
 			generationContext,
@@ -177,6 +179,8 @@ async function generateImageWithFal({
 
 				await setGeneratedImage({
 					storage: context.storage,
+					experimental_storage: context.experimental_storage,
+					useExperimentalStorage: args.useExperimentalStorage,
 					generation: runningGeneration,
 					generatedImage: {
 						uint8Array: image.uint8Array,
@@ -309,6 +313,8 @@ export async function generateImageWithOpenAI({
 
 				await setGeneratedImage({
 					storage: context.storage,
+					experimental_storage: context.experimental_storage,
+					useExperimentalStorage: args.useExperimentalStorage,
 					generation: runningGeneration,
 					generatedImage: {
 						uint8Array: image.uint8Array,

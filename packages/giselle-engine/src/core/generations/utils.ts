@@ -26,6 +26,7 @@ import {
 } from "@giselle-sdk/text-editor-utils";
 import type { CoreMessage, DataContent, FilePart, ImagePart } from "ai";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 import type { GiselleEngineContext } from "../types";
 
 export interface GeneratedImageData {
@@ -291,18 +292,32 @@ export function generationPath(generationId: GenerationId) {
 
 export async function getGeneration(params: {
 	storage: Storage;
+	experimental_storage?: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generationId: GenerationId;
 	options?: {
 		bypassingCache?: boolean;
 		skipMod?: boolean;
 	};
 }): Promise<Generation | undefined> {
-	const unsafeGeneration = await params.storage.getItem(
-		`${generationPath(params.generationId)}`,
-		{
-			bypassingCache: params.options?.bypassingCache ?? false,
-		},
-	);
+	let unsafeGeneration: unknown;
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		try {
+			unsafeGeneration = await params.experimental_storage.getJson({
+				path: generationPath(params.generationId),
+				schema: Generation,
+			});
+		} catch {
+			unsafeGeneration = undefined;
+		}
+	} else {
+		unsafeGeneration = await params.storage.getItem(
+			`${generationPath(params.generationId)}`,
+			{
+				bypassingCache: params.options?.bypassingCache ?? false,
+			},
+		);
+	}
 	if (unsafeGeneration == null) {
 		throw new Error("Generation not found");
 	}
@@ -333,15 +348,31 @@ export function nodeGenerationIndexPath(nodeId: NodeId) {
 
 export async function getNodeGenerationIndexes(params: {
 	storage: Storage;
+	experimental_storage?: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	nodeId: NodeId;
 }) {
-	const unsafeNodeGenerationIndexData = await params.storage.getItem(
-		nodeGenerationIndexPath(params.nodeId),
-		{
-			bypassingCache: true,
-		},
-	);
-	if (unsafeNodeGenerationIndexData === null) {
+	let unsafeNodeGenerationIndexData: unknown;
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		try {
+			unsafeNodeGenerationIndexData = await params.experimental_storage.getJson(
+				{
+					path: nodeGenerationIndexPath(params.nodeId),
+					schema: NodeGenerationIndex.array(),
+				},
+			);
+		} catch {
+			unsafeNodeGenerationIndexData = undefined;
+		}
+	} else {
+		unsafeNodeGenerationIndexData = await params.storage.getItem(
+			nodeGenerationIndexPath(params.nodeId),
+			{
+				bypassingCache: true,
+			},
+		);
+	}
+	if (unsafeNodeGenerationIndexData == null) {
 		return undefined;
 	}
 	return NodeGenerationIndex.array().parse(unsafeNodeGenerationIndexData);
@@ -572,24 +603,46 @@ export function generatedImagePath(
 
 export async function setGeneratedImage(params: {
 	storage: Storage;
+	experimental_storage?: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generation: Generation;
 	generatedImageFilename: string;
 	generatedImage: GeneratedImageData;
 }) {
-	await params.storage.setItemRaw(
-		generatedImagePath(params.generation.id, params.generatedImageFilename),
-		params.generatedImage.uint8Array,
-	);
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		await params.experimental_storage.setBlob(
+			generatedImagePath(params.generation.id, params.generatedImageFilename),
+			params.generatedImage.uint8Array,
+		);
+	} else {
+		await params.storage.setItemRaw(
+			generatedImagePath(params.generation.id, params.generatedImageFilename),
+			params.generatedImage.uint8Array,
+		);
+	}
 }
 
 export async function getGeneratedImage(params: {
 	storage: Storage;
+	experimental_storage?: GiselleStorage;
+	useExperimentalStorage?: boolean;
 	generation: Generation;
 	filename: string;
 }) {
-	let image = await params.storage.getItemRaw(
-		generatedImagePath(params.generation.id, params.filename),
-	);
+	let image: unknown;
+	if (params.useExperimentalStorage && params.experimental_storage) {
+		try {
+			image = await params.experimental_storage.getBlob(
+				generatedImagePath(params.generation.id, params.filename),
+			);
+		} catch {
+			image = undefined;
+		}
+	} else {
+		image = await params.storage.getItemRaw(
+			generatedImagePath(params.generation.id, params.filename),
+		);
+	}
 	if (image instanceof ArrayBuffer) {
 		image = new Uint8Array(image);
 	}
