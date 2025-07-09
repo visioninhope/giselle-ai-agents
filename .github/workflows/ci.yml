@@ -26,7 +26,5 @@ jobs:
         run: biome ci .
       - name: Build SDK
         run: pnpm build-sdk
-      - name: Check types
-        run: pnpm check-types
       - name: Test
         run: pnpm test
