@@ -11,11 +11,7 @@ import {
 import { Mic } from "lucide-react";
 import { notFound } from "next/navigation";
 import { stageFlag } from "@/flags";
-
-const teamOptions = [
-	{ id: "app", label: "teams/app" },
-	{ id: "core", label: "teams/core" },
-];
+import { fetchUserTeams } from "@/services/teams";
 
 const flowOptions = [
 	{ id: "flow", label: "flow" },
@@ -78,6 +74,8 @@ export default async function StagePage() {
 	if (!enableStage) {
 		return notFound();
 	}
+	const teams = await fetchUserTeams();
+	const teamOptions = teams.map((team) => ({ id: team.id, label: team.name }));
 	return (
 		<div className="p-[24px] space-y-6">
 			<div className="text-center text-[24px] font-sans text-white-100">
