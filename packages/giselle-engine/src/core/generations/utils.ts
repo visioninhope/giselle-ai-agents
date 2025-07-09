@@ -292,7 +292,7 @@ export function generationPath(generationId: GenerationId) {
 
 export async function getGeneration(params: {
 	storage: Storage;
-	experimental_storage?: GiselleStorage;
+	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	generationId: GenerationId;
 	options?: {
@@ -300,24 +300,23 @@ export async function getGeneration(params: {
 		skipMod?: boolean;
 	};
 }): Promise<Generation | undefined> {
-	let unsafeGeneration: unknown;
-	if (params.useExperimentalStorage && params.experimental_storage) {
-		try {
-			unsafeGeneration = await params.experimental_storage.getJson({
-				path: generationPath(params.generationId),
-				schema: Generation,
-			});
-		} catch {
-			unsafeGeneration = undefined;
-		}
-	} else {
-		unsafeGeneration = await params.storage.getItem(
-			`${generationPath(params.generationId)}`,
-			{
-				bypassingCache: params.options?.bypassingCache ?? false,
-			},
-		);
+	if (params.useExperimentalStorage) {
+		const generation = await params.experimental_storage.getJson({
+			path: generationPath(params.generationId),
+			schema: Generation,
+		});
+		const parsedGenerationContext = GenerationContext.parse(generation.context);
+		return {
+			...generation,
+			context: parsedGenerationContext,
+		};
 	}
+	const unsafeGeneration = await params.storage.getItem(
+		`${generationPath(params.generationId)}`,
+		{
+			bypassingCache: params.options?.bypassingCache ?? false,
+		},
+	);
 	if (unsafeGeneration == null) {
 		throw new Error("Generation not found");
 	}
