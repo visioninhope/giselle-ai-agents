@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { escapeRegExp } from "./helpers/regex";
+import { escapeRegExp } from "../helpers/regex";
 
 test.describe("App management", () => {
 	const baseUrl = process.env.PLAYWRIGHT_BASE_URL || "http://localhost:3000";
