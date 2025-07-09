@@ -347,30 +347,22 @@ export function nodeGenerationIndexPath(nodeId: NodeId) {
 
 export async function getNodeGenerationIndexes(params: {
 	storage: Storage;
-	experimental_storage?: GiselleStorage;
+	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	nodeId: NodeId;
 }) {
-	let unsafeNodeGenerationIndexData: unknown;
-	if (params.useExperimentalStorage && params.experimental_storage) {
-		try {
-			unsafeNodeGenerationIndexData = await params.experimental_storage.getJson(
-				{
-					path: nodeGenerationIndexPath(params.nodeId),
-					schema: NodeGenerationIndex.array(),
-				},
-			);
-		} catch {
-			unsafeNodeGenerationIndexData = undefined;
-		}
-	} else {
-		unsafeNodeGenerationIndexData = await params.storage.getItem(
-			nodeGenerationIndexPath(params.nodeId),
-			{
-				bypassingCache: true,
-			},
-		);
+	if (params.useExperimentalStorage) {
+		return await params.experimental_storage.getJson({
+			path: nodeGenerationIndexPath(params.nodeId),
+			schema: NodeGenerationIndex.array(),
+		});
 	}
+	const unsafeNodeGenerationIndexData = await params.storage.getItem(
+		nodeGenerationIndexPath(params.nodeId),
+		{
+			bypassingCache: true,
+		},
+	);
 	if (unsafeNodeGenerationIndexData == null) {
 		return undefined;
 	}
