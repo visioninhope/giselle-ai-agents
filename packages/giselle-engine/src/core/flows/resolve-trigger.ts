@@ -165,5 +165,6 @@ export async function resolveTrigger(args: {
 	await internalSetGeneration({
 		storage: args.context.storage,
 		generation: completedGeneration,
+		experimental_storage: args.context.experimental_storage,
 	});
 }

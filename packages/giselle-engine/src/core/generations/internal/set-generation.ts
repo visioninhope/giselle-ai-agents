@@ -9,11 +9,11 @@ import {
 
 export async function internalSetGeneration(params: {
 	storage: Storage;
-	experimental_storage?: GiselleStorage;
+	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	generation: Generation;
 }) {
-	if (params.useExperimentalStorage && params.experimental_storage) {
+	if (params.useExperimentalStorage) {
 		await params.experimental_storage.setJson({
 			path: generationPath(params.generation.id),
 			data: params.generation,
