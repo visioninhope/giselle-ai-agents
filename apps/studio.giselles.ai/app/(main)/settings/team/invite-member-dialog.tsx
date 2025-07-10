@@ -70,14 +70,24 @@ export function InviteMemberDialog({
 
 		const validTags: string[] = [];
 		const invalidEmails: string[] = [];
+		const duplicateEmails: string[] = [];
+		const seenInBatch = new Set<string>();
 
 		for (const email of emails) {
 			try {
 				// Validate email format
 				parse(pipe(string(), emailValidator()), email);
 
-				// Skip if already in tags
-				if (!emailTags.includes(email)) {
+				// Check for duplicates within the current batch
+				if (seenInBatch.has(email)) {
+					continue; // Skip duplicates within the same input
+				}
+				seenInBatch.add(email);
+
+				// Check if already in tags
+				if (emailTags.includes(email)) {
+					duplicateEmails.push(email);
+				} else {
 					validTags.push(email);
 				}
 			} catch {
@@ -85,26 +95,42 @@ export function InviteMemberDialog({
 			}
 		}
 
-		// Show error for invalid emails
+		// Show errors
+		const errorList: { message: string; emails?: string[] }[] = [];
 		if (invalidEmails.length > 0) {
-			setErrors([
-				{ message: "Invalid email addresses", emails: invalidEmails },
-			]);
+			errorList.push({
+				message: "Invalid email addresses",
+				emails: invalidEmails,
+			});
+		}
+		if (duplicateEmails.length > 0) {
+			errorList.push({ message: "Already added", emails: duplicateEmails });
+		}
+		if (errorList.length > 0) {
+			setErrors(errorList);
+		} else {
+			setErrors([]);
 		}
 
 		// Add valid tags
 		if (validTags.length > 0) {
 			setEmailTags([...emailTags, ...validTags]);
-			// Clear input only if all emails were valid
-			if (invalidEmails.length === 0) {
+			// Clear input only if all emails were processed successfully
+			if (invalidEmails.length === 0 && duplicateEmails.length === 0) {
 				setEmailInput("");
 			} else {
-				// Keep invalid emails in input for correction
-				setEmailInput(invalidEmails.join(", "));
+				// Keep problematic emails in input for correction
+				setEmailInput([...invalidEmails, ...duplicateEmails].join(", "));
 			}
-		} else if (invalidEmails.length === 0) {
-			// All emails were duplicates
-			setEmailInput("");
+		} else {
+			// No valid tags to add
+			if (invalidEmails.length > 0 || duplicateEmails.length > 0) {
+				// Keep problematic emails in input
+				setEmailInput([...invalidEmails, ...duplicateEmails].join(", "));
+			} else {
+				// All emails were duplicates within the batch (edge case)
+				setEmailInput("");
+			}
 		}
 	};
 
