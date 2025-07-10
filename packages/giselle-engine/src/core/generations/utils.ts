@@ -363,7 +363,7 @@ export async function getNodeGenerationIndexes(params: {
 			bypassingCache: true,
 		},
 	);
-	if (unsafeNodeGenerationIndexData == null) {
+	if (unsafeNodeGenerationIndexData === null) {
 		return undefined;
 	}
 	return NodeGenerationIndex.array().parse(unsafeNodeGenerationIndexData);
