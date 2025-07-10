@@ -4,6 +4,7 @@ import type { z } from "zod/v4";
 import type {
 	GetJsonParams,
 	GiselleStorage,
+	JsonSchema,
 	SetJsonParams,
 } from "./types/interface";
 
@@ -17,7 +18,7 @@ async function ensureDir(filePath: string): Promise<void> {
 
 export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 	return {
-		async getJson<T extends z.ZodObject>(
+		async getJson<T extends JsonSchema>(
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const fullPath = join(config.root, params.path);
@@ -26,7 +27,7 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 			return params.schema ? params.schema.parse(obj) : obj;
 		},
 
-		async setJson<T extends z.ZodObject>(
+		async setJson<T extends JsonSchema>(
 			params: SetJsonParams<T>,
 		): Promise<void> {
 			const fullPath = join(config.root, params.path);

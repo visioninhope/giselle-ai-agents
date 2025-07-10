@@ -18,6 +18,7 @@ import {
 	jsonContentToText,
 } from "@giselle-sdk/text-editor-utils";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 import { useGenerationExecutor } from "../generations/internal/use-generation-executor";
 import {
 	getGeneration,
@@ -53,6 +54,7 @@ export function executeQuery(args: {
 					operationNode.content.query,
 					runningGeneration,
 					args.context.storage,
+					args.context.experimental_storage,
 				);
 
 				const vectorStoreNodes = generationContext.sourceNodes.filter(
@@ -110,12 +112,14 @@ async function resolveQuery(
 	query: string,
 	runningGeneration: RunningGeneration,
 	storage: Storage,
+	experimental_storage: GiselleStorage,
 ) {
 	const generationContext = GenerationContext.parse(runningGeneration.context);
 
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			storage,
+			experimental_storage,
 			nodeId,
 		});
 		if (
@@ -126,6 +130,7 @@ async function resolveQuery(
 		}
 		const generation = await getGeneration({
 			storage,
+			experimental_storage,
 			generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 			options: {
 				bypassingCache: true,

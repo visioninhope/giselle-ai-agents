@@ -2,6 +2,7 @@ import type { z } from "zod/v4";
 import type {
 	GetJsonParams,
 	GiselleStorage,
+	JsonSchema,
 	SetJsonParams,
 } from "./types/interface";
 
@@ -24,7 +25,7 @@ export function memoryStorageDriver(
 	);
 
 	return {
-		getJson<T extends z.ZodObject>(
+		getJson<T extends JsonSchema>(
 			params: GetJsonParams<T>,
 		): Promise<z.infer<T>> {
 			const data = jsonStore.get(params.path);
@@ -37,7 +38,7 @@ export function memoryStorageDriver(
 			return Promise.resolve(parsed);
 		},
 
-		setJson<T extends z.ZodObject>(params: SetJsonParams<T>): Promise<void> {
+		setJson<T extends JsonSchema>(params: SetJsonParams<T>): Promise<void> {
 			const parsed = params.schema
 				? params.schema.parse(params.data)
 				: params.data;
