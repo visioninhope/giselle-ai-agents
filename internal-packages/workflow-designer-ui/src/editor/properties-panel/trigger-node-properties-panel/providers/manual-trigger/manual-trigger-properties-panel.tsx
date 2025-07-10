@@ -82,6 +82,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								id: "manual",
 								parameters,
 							},
+							staged: false, // todo next pull request
 						},
 					},
 					useExperimentalStorage: experimental_storage,

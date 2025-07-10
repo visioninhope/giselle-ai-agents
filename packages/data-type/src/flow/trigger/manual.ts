@@ -24,5 +24,6 @@ export type ManualFlowTriggerEvent = z.infer<typeof ManualFlowTriggerEvent>;
 export const ManualFlowTrigger = z.object({
 	provider: Provider,
 	event: ManualFlowTriggerEvent,
+	staged: z.boolean().default(false),
 });
 export type ManualFlowTrigger = z.infer<typeof ManualFlowTrigger>;
