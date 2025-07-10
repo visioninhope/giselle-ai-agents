@@ -54,7 +54,7 @@ export async function internalSetGeneration(params: {
 			];
 		}
 	}
-	if (params.useExperimentalStorage && params.experimental_storage) {
+	if (params.useExperimentalStorage) {
 		await params.experimental_storage.setJson({
 			path: nodeGenerationIndexPath(nodeId),
 			data: newNodeGenerationIndexes,

@@ -8,7 +8,7 @@ export async function getNodeGenerations(args: {
 	context: GiselleEngineContext;
 	origin: GenerationOrigin;
 	nodeId: NodeId;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	const nodeGenerationIndexes = await getNodeGenerationIndexes({
 		storage: args.context.storage,

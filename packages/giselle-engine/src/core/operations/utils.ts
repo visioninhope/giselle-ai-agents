@@ -5,6 +5,7 @@ import {
 	type Output,
 } from "@giselle-sdk/data-type";
 import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 import { getGeneration, getNodeGenerationIndexes } from "../generations/utils";
 
 export async function connectionResolver(args: {
@@ -12,9 +13,11 @@ export async function connectionResolver(args: {
 	input: string;
 	context: GenerationContext;
 	storage: Storage;
+	experimental_storage: GiselleStorage;
 }) {
 	const nodeGenerationIndexes = await getNodeGenerationIndexes({
 		storage: args.storage,
+		experimental_storage: args.experimental_storage,
 		nodeId: args.nodeId,
 	});
 	if (
@@ -26,6 +29,7 @@ export async function connectionResolver(args: {
 	const generation = await getGeneration({
 		...args,
 		storage: args.storage,
+		experimental_storage: args.experimental_storage,
 		generationId: nodeGenerationIndexes[nodeGenerationIndexes.length - 1].id,
 	});
 	if (generation === undefined || !isCompletedGeneration(generation)) {

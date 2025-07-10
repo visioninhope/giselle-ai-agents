@@ -5,7 +5,7 @@ import { getGeneration as getGenerationInternal } from "./utils";
 export async function getGeneration(args: {
 	context: GiselleEngineContext;
 	generationId: GenerationId;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	return await getGenerationInternal({
 		storage: args.context.storage,

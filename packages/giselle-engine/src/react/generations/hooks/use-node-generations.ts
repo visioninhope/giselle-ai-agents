@@ -5,6 +5,7 @@ import {
 } from "@giselle-sdk/data-type";
 import { useCallback, useEffect, useMemo, useState } from "react";
 import useSWR from "swr";
+import { useFeatureFlag } from "../../feature-flags";
 import { useGiselleEngine } from "../../use-giselle-engine";
 import { useGenerationRunnerSystem } from "../contexts";
 
@@ -30,6 +31,7 @@ export function useNodeGenerations({
 		setGenerations,
 	} = useGenerationRunnerSystem();
 	const client = useGiselleEngine();
+	const { experimental_storage } = useFeatureFlag();
 	/** @todo fetch on server */
 	const { data, isLoading } = useSWR(
 		() => {
@@ -41,6 +43,7 @@ export function useNodeGenerations({
 				api: "node-generations",
 				origin,
 				nodeId,
+				useExperimentalStorage: experimental_storage,
 			};
 		},
 		(args) => client.getNodeGenerations(args),
