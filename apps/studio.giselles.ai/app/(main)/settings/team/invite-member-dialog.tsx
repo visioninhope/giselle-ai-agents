@@ -151,13 +151,10 @@ export function InviteMemberDialog({
 		processInvitations();
 	};
 
-	const processInvitations = async () => {
-		setErrors([]);
-
-		// Combine tags and current input
+	// Helper function to parse and combine emails from tags and input
+	const parseAndCombineEmails = (): string[] => {
 		const allEmails = [...emailTags];
 
-		// Parse current input if any
 		const inputText = emailInput.trim();
 		if (inputText) {
 			const inputEmails = inputText
@@ -166,16 +163,12 @@ export function InviteMemberDialog({
 			allEmails.push(...inputEmails);
 		}
 
-		// Check if we have any emails
-		if (allEmails.length === 0) {
-			setErrors([{ message: "Please enter at least one email address" }]);
-			return;
-		}
-
 		// Remove duplicates
-		const uniqueEmails = Array.from(new Set(allEmails));
+		return Array.from(new Set(allEmails));
+	};
 
-		// Validate emails
+	// Helper function to validate and categorize emails
+	const validateAndCategorizeEmails = (uniqueEmails: string[]) => {
 		const validEmails: string[] = [];
 		const invalidEmails: string[] = [];
 		const alreadyMembers: string[] = [];
@@ -202,7 +195,15 @@ export function InviteMemberDialog({
 			}
 		}
 
-		// Build error messages
+		return { validEmails, invalidEmails, alreadyMembers, alreadyInvited };
+	};
+
+	// Helper function to build error messages from categorized emails
+	const buildErrorMessages = (
+		invalidEmails: string[],
+		alreadyMembers: string[],
+		alreadyInvited: string[],
+	): { message: string; emails?: string[] }[] => {
 		const errorList: { message: string; emails?: string[] }[] = [];
 
 		if (invalidEmails.length > 0) {
@@ -223,8 +224,82 @@ export function InviteMemberDialog({
 			errorList.push({ message: "Already invited", emails: alreadyInvited });
 		}
 
-		if (errorList.length > 0) {
-			setErrors(errorList);
+		return errorList;
+	};
+
+	// Helper function to build error messages from API response
+	const buildApiErrorMessages = (
+		response: SendInvitationsResult,
+		validEmailsCount: number,
+	): { message: string; emails?: string[] }[] => {
+		const failedInvites = response.results.filter(
+			(r) => r.status !== "success",
+		);
+
+		// Group errors by type
+		const errorGroups: Record<string, string[]> = {};
+		for (const result of failedInvites) {
+			let errorKey = result.error || result.status || "unknown";
+
+			// Map technical errors to user-friendly messages
+			if (errorKey.includes("already a member")) {
+				errorKey = "Already team members";
+			} else if (errorKey.includes("active invitation already exists")) {
+				errorKey = "Already invited";
+			}
+
+			if (!errorGroups[errorKey]) {
+				errorGroups[errorKey] = [];
+			}
+			errorGroups[errorKey].push(result.email);
+		}
+
+		// Build the error array
+		const errorList: { message: string; emails?: string[] }[] = [];
+
+		if (response.overallStatus === "partial_success") {
+			const successCount = validEmailsCount - failedInvites.length;
+			errorList.push({
+				message: `${successCount} invitation(s) sent successfully.`,
+			});
+		}
+
+		// Add grouped error messages
+		for (const [errorKey, emails] of Object.entries(errorGroups)) {
+			errorList.push({
+				message: errorKey,
+				emails: emails,
+			});
+		}
+
+		return errorList;
+	};
+
+	const processInvitations = async () => {
+		setErrors([]);
+
+		// Parse and combine emails
+		const uniqueEmails = parseAndCombineEmails();
+
+		// Check if we have any emails
+		if (uniqueEmails.length === 0) {
+			setErrors([{ message: "Please enter at least one email address" }]);
+			return;
+		}
+
+		// Validate and categorize emails
+		const { validEmails, invalidEmails, alreadyMembers, alreadyInvited } =
+			validateAndCategorizeEmails(uniqueEmails);
+
+		// Build error messages for validation issues
+		const validationErrors = buildErrorMessages(
+			invalidEmails,
+			alreadyMembers,
+			alreadyInvited,
+		);
+
+		if (validationErrors.length > 0) {
+			setErrors(validationErrors);
 			return;
 		}
 
@@ -243,47 +318,8 @@ export function InviteMemberDialog({
 		if (response.overallStatus === "success") {
 			handleCloseDialog();
 		} else {
-			const failedInvites = response.results.filter(
-				(r) => r.status !== "success",
-			);
-
-			// Create more user-friendly error messages
-			const errorGroups: Record<string, string[]> = {};
-			for (const result of failedInvites) {
-				let errorKey = result.error || result.status || "unknown";
-
-				// Map technical errors to user-friendly messages
-				if (errorKey.includes("already a member")) {
-					errorKey = "Already team members";
-				} else if (errorKey.includes("active invitation already exists")) {
-					errorKey = "Already invited";
-				}
-
-				if (!errorGroups[errorKey]) {
-					errorGroups[errorKey] = [];
-				}
-				errorGroups[errorKey].push(result.email);
-			}
-
-			// Build the error array
-			const errorList: { message: string; emails?: string[] }[] = [];
-
-			if (response.overallStatus === "partial_success") {
-				const successCount = validEmails.length - failedInvites.length;
-				errorList.push({
-					message: `${successCount} invitation(s) sent successfully.`,
-				});
-			}
-
-			// Add grouped error messages
-			for (const [errorKey, emails] of Object.entries(errorGroups)) {
-				errorList.push({
-					message: errorKey,
-					emails: emails,
-				});
-			}
-
-			setErrors(errorList);
+			const apiErrors = buildApiErrorMessages(response, validEmails.length);
+			setErrors(apiErrors);
 		}
 		setIsLoading(false);
 	};
