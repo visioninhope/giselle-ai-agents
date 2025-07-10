@@ -119,6 +119,7 @@ async function resolveQuery(
 	async function generationContentResolver(nodeId: NodeId, outputId: OutputId) {
 		const nodeGenerationIndexes = await getNodeGenerationIndexes({
 			storage,
+			experimental_storage,
 			nodeId,
 		});
 		if (

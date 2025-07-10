@@ -594,7 +594,7 @@ export function generatedImagePath(
 
 export async function setGeneratedImage(params: {
 	storage: Storage;
-	experimental_storage?: GiselleStorage;
+	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	generation: Generation;
 	generatedImageFilename: string;
@@ -615,25 +615,19 @@ export async function setGeneratedImage(params: {
 
 export async function getGeneratedImage(params: {
 	storage: Storage;
-	experimental_storage?: GiselleStorage;
+	experimental_storage: GiselleStorage;
 	useExperimentalStorage?: boolean;
 	generation: Generation;
 	filename: string;
 }) {
-	let image: unknown;
-	if (params.useExperimentalStorage && params.experimental_storage) {
-		try {
-			image = await params.experimental_storage.getBlob(
-				generatedImagePath(params.generation.id, params.filename),
-			);
-		} catch {
-			image = undefined;
-		}
-	} else {
-		image = await params.storage.getItemRaw(
+	if (params.useExperimentalStorage) {
+		return await params.experimental_storage.getBlob(
 			generatedImagePath(params.generation.id, params.filename),
 		);
 	}
+	let image = await params.storage.getItemRaw(
+		generatedImagePath(params.generation.id, params.filename),
+	);
 	if (image instanceof ArrayBuffer) {
 		image = new Uint8Array(image);
 	}
