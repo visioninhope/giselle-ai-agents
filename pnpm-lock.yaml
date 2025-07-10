@@ -260,6 +260,9 @@ importers:
 
   apps/playground:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 'catalog:'
+        version: 3.842.0
       '@giselle-internal/ui':
         specifier: workspace:^
         version: link:../../internal-packages/ui
@@ -945,9 +948,6 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
-      '@giselle-sdk/rag':
-        specifier: workspace:^
-        version: link:../rag
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../text-editor-utils
@@ -991,6 +991,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../data-type
+      '@giselle-sdk/rag':
+        specifier: workspace:^
+        version: link:../rag
       '@giselle-sdk/utils':
         specifier: workspace:*
         version: link:../utils

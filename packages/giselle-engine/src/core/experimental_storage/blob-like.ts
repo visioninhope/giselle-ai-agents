@@ -14,7 +14,7 @@ export type BlobLike = Buffer | Uint8Array | ArrayBuffer | ArrayBufferView;
  * console.log(uint8Array); // Uint8Array(5) [72, 101, 108, 108, 111]
  * ```
  */
-export function blobLikeToUint8Array(data: BlobLike): Uint8Array {
+export function blobLikeToUint8Array(data: BlobLike) {
 	if (data instanceof Uint8Array) {
 		return new Uint8Array(data);
 	}

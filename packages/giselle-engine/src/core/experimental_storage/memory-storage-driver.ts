@@ -1,7 +1,6 @@
 import type { z } from "zod/v4";
-import { blobLikeToUint8Array } from "./blob-like";
+import { type BlobLike, blobLikeToUint8Array } from "./blob-like";
 import type {
-	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
 	JsonSchema,
