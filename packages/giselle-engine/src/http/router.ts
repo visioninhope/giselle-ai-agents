@@ -462,7 +462,7 @@ export const createFormDataRouters = {
 				fileId: FileId.schema,
 				fileName: z.string(),
 				file: z.instanceof(File),
-				useExperimentalStorage: z.boolean(),
+				useExperimentalStorage: z.coerce.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.uploadFile(
