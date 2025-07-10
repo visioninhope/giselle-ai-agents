@@ -112,22 +112,47 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		generateText: async (
 			generation: QueuedGeneration,
+			useExperimentalStorage: boolean,
 			telemetry?: TelemetrySettings,
 		) => {
 			return await generateText({
 				context,
 				generation,
+				useExperimentalStorage,
 				telemetry,
 			});
 		},
-		getGeneration: async (generationId: GenerationId) => {
-			return await getGeneration({ context, generationId });
+		getGeneration: async (
+			generationId: GenerationId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getGeneration({
+				context,
+				generationId,
+				useExperimentalStorage,
+			});
 		},
-		getNodeGenerations: async (origin: GenerationOrigin, nodeId: NodeId) => {
-			return await getNodeGenerations({ context, origin, nodeId });
+		getNodeGenerations: async (
+			origin: GenerationOrigin,
+			nodeId: NodeId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await getNodeGenerations({
+				context,
+				origin,
+				nodeId,
+				useExperimentalStorage,
+			});
 		},
-		cancelGeneration: async (generationId: GenerationId) => {
-			return await cancelGeneration({ context, generationId });
+		cancelGeneration: async (
+			generationId: GenerationId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await cancelGeneration({
+				context,
+				generationId,
+				useExperimentalStorage,
+			});
 		},
 		copyFile: async (
 			workspaceId: WorkspaceId,
@@ -154,25 +179,36 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 		},
 		generateImage: async (
 			generation: QueuedGeneration,
+			useExperimentalStorage: boolean,
 			telemetry?: TelemetrySettings,
 		) => {
 			return await generateImage({
 				context,
 				generation,
+				useExperimentalStorage,
 				telemetry,
 			});
 		},
-		getGeneratedImage: async (generationId: GenerationId, filename: string) => {
+		getGeneratedImage: async (
+			generationId: GenerationId,
+			filename: string,
+			useExperimentalStorage: boolean,
+		) => {
 			return await getGeneratedImage({
 				context,
 				generationId,
 				filename,
+				useExperimentalStorage,
 			});
 		},
-		setGeneration: async (generation: Generation) => {
+		setGeneration: async (
+			generation: Generation,
+			useExperimentalStorage: boolean,
+		) => {
 			return await setGeneration({
 				context,
 				generation,
+				useExperimentalStorage,
 			});
 		},
 		createSampleWorkspace: async () => {

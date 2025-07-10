@@ -6,7 +6,7 @@ import { getGeneration } from "./utils";
 export async function cancelGeneration(args: {
 	context: GiselleEngineContext;
 	generationId: GenerationId;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	const generation = await getGeneration({
 		storage: args.context.storage,

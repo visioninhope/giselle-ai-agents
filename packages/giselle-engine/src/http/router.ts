@@ -74,11 +74,13 @@ export const createJsonRouters = {
 			createHandler({
 				input: z.object({
 					generation: QueuedGeneration,
+					useExperimentalStorage: z.boolean(),
 					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input }) => {
 					const stream = await giselleEngine.generateText(
 						input.generation,
+						input.useExperimentalStorage,
 						input.telemetry,
 					);
 					return stream.toDataStreamResponse({
@@ -89,10 +91,14 @@ export const createJsonRouters = {
 		),
 	getGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generationId: GenerationId.schema }),
+			input: z.object({
+				generationId: GenerationId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
 				const generation = await giselleEngine.getGeneration(
 					input.generationId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generation);
 			},
@@ -102,21 +108,27 @@ export const createJsonRouters = {
 			input: z.object({
 				origin: GenerationOrigin,
 				nodeId: NodeId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				const generations = await giselleEngine.getNodeGenerations(
 					input.origin,
 					input.nodeId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generations);
 			},
 		}),
 	cancelGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generationId: GenerationId.schema }),
+			input: z.object({
+				generationId: GenerationId.schema,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
 				const generation = await giselleEngine.cancelGeneration(
 					input.generationId,
+					input.useExperimentalStorage,
 				);
 				return JsonResponse.json(generation);
 			},
@@ -154,19 +166,30 @@ export const createJsonRouters = {
 			createHandler({
 				input: z.object({
 					generation: QueuedGeneration,
+					useExperimentalStorage: z.boolean(),
 					telemetry: z.custom<TelemetrySettings>().optional(),
 				}),
 				handler: async ({ input }) => {
-					await giselleEngine.generateImage(input.generation, input.telemetry);
+					await giselleEngine.generateImage(
+						input.generation,
+						input.useExperimentalStorage,
+						input.telemetry,
+					);
 					return new Response(null, { status: 204 });
 				},
 			}),
 		),
 	setGeneration: (giselleEngine: GiselleEngine) =>
 		createHandler({
-			input: z.object({ generation: Generation }),
+			input: z.object({
+				generation: Generation,
+				useExperimentalStorage: z.boolean(),
+			}),
 			handler: async ({ input }) => {
-				await giselleEngine.setGeneration(input.generation);
+				await giselleEngine.setGeneration(
+					input.generation,
+					input.useExperimentalStorage,
+				);
 				return new Response(null, { status: 204 });
 			},
 		}),

@@ -33,7 +33,7 @@ export function generateImage(args: {
 	context: GiselleEngineContext;
 	generation: QueuedGeneration;
 	telemetry?: TelemetrySettings;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	return useGenerationExecutor({
 		context: args.context,

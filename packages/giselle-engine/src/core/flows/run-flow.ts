@@ -59,18 +59,23 @@ async function executeOperation(args: {
 	generation: QueuedGeneration;
 	node: Job["operations"][number]["node"];
 	flowRunId: FlowRunId;
+	useExperimentalStorage: boolean;
 }): Promise<boolean> {
-	const { context, generation, node, flowRunId } = args;
+	const { context, generation, node, flowRunId, useExperimentalStorage } = args;
 	switch (node.content.type) {
 		case "action":
 			await executeAction({ context, generation });
 			return false;
 		case "imageGeneration":
-			await generateImage({ context, generation });
+			await generateImage({ context, generation, useExperimentalStorage });
 			return false;
 		case "textGeneration": {
 			let hadError = false;
-			const result = await generateText({ context, generation });
+			const result = await generateText({
+				context,
+				generation,
+				useExperimentalStorage,
+			});
 			await result.consumeStream({
 				onError: async (error) => {
 					hadError = true;
@@ -90,6 +95,7 @@ async function executeOperation(args: {
 							setGeneration({
 								context,
 								generation: failedGeneration,
+								useExperimentalStorage,
 							}),
 							patchRun({
 								context,
@@ -132,6 +138,7 @@ async function runJob(args: {
 	workspaceId: WorkspaceId;
 	triggerInputs?: GenerationContextInput[];
 	callbacks?: Callbacks;
+	useExperimentalStorage: boolean;
 }): Promise<boolean> {
 	const {
 		job,
@@ -141,6 +148,7 @@ async function runJob(args: {
 		workspaceId,
 		triggerInputs,
 		callbacks,
+		useExperimentalStorage,
 	} = args;
 
 	await callbacks?.jobStart?.({ job });
@@ -170,6 +178,7 @@ async function runJob(args: {
 				generation,
 				node: operation.node,
 				flowRunId,
+				useExperimentalStorage,
 			});
 			const duration = Date.now() - operationStart;
 
@@ -283,6 +292,7 @@ export async function runFlow(args: {
 			workspaceId: trigger.workspaceId,
 			triggerInputs: args.triggerInputs,
 			callbacks: args.callbacks,
+			useExperimentalStorage: args.useExperimentalStorage,
 		});
 
 		if (errored) {

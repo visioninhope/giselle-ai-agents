@@ -5,7 +5,7 @@ import { internalSetGeneration } from "./internal/set-generation";
 export async function setGeneration(args: {
 	context: GiselleEngineContext;
 	generation: Generation;
-	useExperimentalStorage?: boolean;
+	useExperimentalStorage: boolean;
 }) {
 	await internalSetGeneration({
 		storage: args.context.storage,

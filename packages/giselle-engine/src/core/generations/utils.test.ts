@@ -3,6 +3,7 @@ import type { GenerationId } from "@giselle-sdk/data-type";
 import { createStorage } from "unstorage";
 import memoryDriver from "unstorage/drivers/memory";
 import { beforeEach, describe, expect, test, vi } from "vitest";
+import { memoryStorageDriver } from "../experimental_storage";
 import { getGeneration } from "./utils";
 
 // Mock parseAndMod to track when it's called
@@ -14,6 +15,7 @@ vi.mock("@giselle-sdk/data-mod", () => ({
 
 describe("getGeneration", () => {
 	const storage = createStorage({ driver: memoryDriver() });
+	const experimental_storage = memoryStorageDriver(); // Mock experimental storage
 	const generationId: GenerationId = "gnr-1234567890abcdef";
 
 	const mockGeneration = {
@@ -66,6 +68,7 @@ describe("getGeneration", () => {
 	test("should use parseAndMod when skipMod is false", async () => {
 		const result = await getGeneration({
 			storage,
+			experimental_storage,
 			generationId,
 			options: { skipMod: false },
 		});
@@ -79,6 +82,7 @@ describe("getGeneration", () => {
 	test("should use parseAndMod when skipMod is undefined", async () => {
 		const result = await getGeneration({
 			storage,
+			experimental_storage,
 			generationId,
 		});
 
@@ -91,6 +95,7 @@ describe("getGeneration", () => {
 	test("should use regular parse when skipMod is true", async () => {
 		const result = await getGeneration({
 			storage,
+			experimental_storage,
 			generationId,
 			options: { skipMod: true },
 		});
@@ -107,6 +112,7 @@ describe("getGeneration", () => {
 		await expect(
 			getGeneration({
 				storage,
+				experimental_storage,
 				generationId: nonExistentId,
 			}),
 		).rejects.toThrow("Generation not found");
@@ -115,6 +121,7 @@ describe("getGeneration", () => {
 	test("should respect bypassingCache option", async () => {
 		const result = await getGeneration({
 			storage,
+			experimental_storage,
 			generationId,
 			options: { bypassingCache: true, skipMod: true },
 		});
