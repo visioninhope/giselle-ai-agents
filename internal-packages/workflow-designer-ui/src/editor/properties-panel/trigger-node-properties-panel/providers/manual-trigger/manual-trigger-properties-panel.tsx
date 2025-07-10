@@ -28,7 +28,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
 	const [staged, setStaged] = useState(false);
-	const { experimental_storage } = useFeatureFlag();
+	const { experimental_storage, stage } = useFeatureFlag();
 
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
 		(e) => {
@@ -216,14 +216,16 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				</div>
 			</div>
 
-			<div className="mt-[8px]">
-				<Toggle name="staged" checked={staged} onCheckedChange={setStaged}>
-					<label className="text-[12px]" htmlFor="staged">
-						Staged
-					</label>
-					<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
-				</Toggle>
-			</div>
+			{stage && (
+				<div className="mt-[8px]">
+					<Toggle name="staged" checked={staged} onCheckedChange={setStaged}>
+						<label className="text-[12px]" htmlFor="staged">
+							Staged
+						</label>
+						<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+					</Toggle>
+				</div>
+			)}
 
 			<form onSubmit={handleSubmit}>
 				<button
