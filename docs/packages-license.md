@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1045 MIT
+* 1048 MIT
 * 192 Apache 2.0
 * 59 ISC
 * 34 New BSD
@@ -4957,6 +4957,17 @@ LGPL-3.0-or-later permitted
 
 
 
+<a name="@types/chai"></a>
+### @types/chai v5.2.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="@types/connect"></a>
 ### @types/connect v3.4.38
 #### 
@@ -5047,6 +5058,17 @@ LGPL-3.0-or-later permitted
 
 <a name="@types/debug"></a>
 ### @types/debug v4.1.12
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@types/deep-eql"></a>
+### @types/deep-eql v4.0.2
 #### 
 
 ##### Paths
@@ -5574,7 +5596,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/expect"></a>
-### @vitest/expect v3.1.4
+### @vitest/expect v3.2.4
 #### 
 
 ##### Paths
@@ -5585,7 +5607,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/mocker"></a>
-### @vitest/mocker v3.1.4
+### @vitest/mocker v3.2.4
 #### 
 
 ##### Paths
@@ -5596,7 +5618,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/pretty-format"></a>
-### @vitest/pretty-format v3.1.4
+### @vitest/pretty-format v3.2.4
 #### 
 
 ##### Paths
@@ -5607,7 +5629,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/runner"></a>
-### @vitest/runner v3.1.4
+### @vitest/runner v3.2.4
 #### 
 
 ##### Paths
@@ -5618,7 +5640,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/snapshot"></a>
-### @vitest/snapshot v3.1.4
+### @vitest/snapshot v3.2.4
 #### 
 
 ##### Paths
@@ -5629,7 +5651,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/spy"></a>
-### @vitest/spy v3.1.4
+### @vitest/spy v3.2.4
 #### 
 
 ##### Paths
@@ -5640,7 +5662,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@vitest/utils"></a>
-### @vitest/utils v3.1.4
+### @vitest/utils v3.2.4
 #### 
 
 ##### Paths
@@ -13534,6 +13556,17 @@ Unknown manually approved
 
 
 
+<a name="strip-literal"></a>
+### strip-literal v3.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
 <a name="stripe"></a>
 ### stripe v17.4.0
 #### 
@@ -13909,7 +13942,7 @@ Unknown manually approved
 
 
 <a name="tinypool"></a>
-### tinypool v1.0.2
+### tinypool v1.1.1
 #### 
 
 ##### Paths
@@ -13931,7 +13964,7 @@ Unknown manually approved
 
 
 <a name="tinyspy"></a>
-### tinyspy v3.0.2
+### tinyspy v4.0.3
 #### 
 
 ##### Paths
@@ -14683,7 +14716,7 @@ Unknown manually approved
 
 
 <a name="vite-node"></a>
-### vite-node v3.1.4
+### vite-node v3.2.4
 #### 
 
 ##### Paths
@@ -14705,7 +14738,7 @@ Unknown manually approved
 
 
 <a name="vitest"></a>
-### vitest v3.1.4
+### vitest v3.2.4
 #### 
 
 ##### Paths
