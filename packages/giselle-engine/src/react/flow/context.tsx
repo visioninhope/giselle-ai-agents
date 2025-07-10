@@ -163,6 +163,7 @@ export function WorkflowDesignerProvider({
 							file,
 							fileId: uploadingFileData.id,
 							fileName: file.name,
+							useExperimentalStorage: experimental_storage,
 						});
 						const uploadedFileData = createUploadedFileData(
 							uploadingFileData,
@@ -202,6 +203,7 @@ export function WorkflowDesignerProvider({
 			await client.removeFile({
 				workspaceId: data.id,
 				fileId: uploadedFile.id,
+				useExperimentalStorage: experimental_storage,
 			});
 			dispatch({ type: "NO_OP" });
 		},

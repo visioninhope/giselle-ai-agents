@@ -158,12 +158,15 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId,
 			sourceFileId: FileId,
 			destinationFileId: FileId,
+			useExperimentalStorage: boolean,
 		) => {
 			return await copyFile({
-				context,
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
 				workspaceId,
 				sourceFileId,
 				destinationFileId,
+				useExperimentalStorage,
 			});
 		},
 		uploadFile: async (
@@ -171,11 +174,30 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId,
 			fileId: FileId,
 			fileName: string,
+			useExperimentalStorage: boolean,
 		) => {
-			return await uploadFile({ context, file, workspaceId, fileId, fileName });
+			return await uploadFile({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				useExperimentalStorage,
+				file,
+				workspaceId,
+				fileId,
+				fileName,
+			});
 		},
-		removeFile: async (workspaceId: WorkspaceId, fileId: FileId) => {
-			return await removeFile({ context, fileId, workspaceId });
+		removeFile: async (
+			workspaceId: WorkspaceId,
+			fileId: FileId,
+			useExperimentalStorage: boolean,
+		) => {
+			return await removeFile({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				workspaceId,
+				fileId,
+				useExperimentalStorage,
+			});
 		},
 		generateImage: async (
 			generation: QueuedGeneration,
@@ -266,8 +288,18 @@ export function GiselleEngine(config: GiselleEngineConfig) {
 			workspaceId: WorkspaceId;
 			webpage: FetchingWebPage;
 		}) => addWebPage({ ...args, context }),
-		async getFileText(args: { workspaceId: WorkspaceId; fileId: FileId }) {
-			return await getFileText({ ...args, context });
+		async getFileText(args: {
+			workspaceId: WorkspaceId;
+			fileId: FileId;
+			useExperimentalStorage: boolean;
+		}) {
+			return await getFileText({
+				storage: context.storage,
+				experimental_storage: context.experimental_storage,
+				workspaceId: args.workspaceId,
+				fileId: args.fileId,
+				useExperimentalStorage: args.useExperimentalStorage,
+			});
 		},
 		async addSecret(args: {
 			workspaceId: WorkspaceId;

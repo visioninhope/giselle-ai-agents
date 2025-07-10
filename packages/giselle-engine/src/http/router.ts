@@ -138,9 +138,14 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				fileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
-				await giselleEngine.removeFile(input.workspaceId, input.fileId);
+				await giselleEngine.removeFile(
+					input.workspaceId,
+					input.fileId,
+					input.useExperimentalStorage,
+				);
 				return new Response(null, { status: 204 });
 			},
 		}),
@@ -150,12 +155,14 @@ export const createJsonRouters = {
 				workspaceId: WorkspaceId.schema,
 				sourceFileId: FileId.schema,
 				destinationFileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.copyFile(
 					input.workspaceId,
 					input.sourceFileId,
 					input.destinationFileId,
+					input.useExperimentalStorage,
 				);
 
 				return new Response(null, { status: 204 });
@@ -329,9 +336,16 @@ export const createJsonRouters = {
 			input: z.object({
 				workspaceId: WorkspaceId.schema,
 				fileId: FileId.schema,
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) =>
-				JsonResponse.json({ text: await giselleEngine.getFileText(input) }),
+				JsonResponse.json({
+					text: await giselleEngine.getFileText({
+						workspaceId: input.workspaceId,
+						fileId: input.fileId,
+						useExperimentalStorage: input.useExperimentalStorage,
+					}),
+				}),
 		}),
 	addSecret: (giselleEngine: GiselleEngine) =>
 		createHandler({
@@ -448,6 +462,7 @@ export const createFormDataRouters = {
 				fileId: FileId.schema,
 				fileName: z.string(),
 				file: z.instanceof(File),
+				useExperimentalStorage: z.boolean(),
 			}),
 			handler: async ({ input }) => {
 				await giselleEngine.uploadFile(
@@ -455,6 +470,7 @@ export const createFormDataRouters = {
 					input.workspaceId,
 					input.fileId,
 					input.fileName,
+					input.useExperimentalStorage,
 				);
 				return new Response(null, { status: 202 });
 			},

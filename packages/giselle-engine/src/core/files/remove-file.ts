@@ -1,17 +1,23 @@
 import type { FileId, WorkspaceId } from "@giselle-sdk/data-type";
-import type { GiselleEngineContext } from "../types";
+import type { Storage } from "unstorage";
+import type { GiselleStorage } from "../experimental_storage";
 import { filePath } from "./utils";
 
 export async function removeFile(args: {
-	context: GiselleEngineContext;
+	storage: Storage;
+	experimental_storage: GiselleStorage;
+	useExperimentalStorage: boolean;
 	workspaceId: WorkspaceId;
 	fileId: FileId;
 }) {
-	await args.context.storage.removeItem(
-		filePath({
-			type: "workspace",
-			id: args.workspaceId,
-			fileId: args.fileId,
-		}),
-	);
+	const path = filePath({
+		type: "workspace",
+		id: args.workspaceId,
+		fileId: args.fileId,
+	});
+	if (args.useExperimentalStorage) {
+		await args.experimental_storage.remove(path);
+	} else {
+		await args.storage.removeItem(path);
+	}
 }
