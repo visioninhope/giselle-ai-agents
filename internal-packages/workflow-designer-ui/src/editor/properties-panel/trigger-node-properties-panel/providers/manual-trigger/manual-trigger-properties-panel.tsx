@@ -1,3 +1,4 @@
+import { Toggle } from "@giselle-internal/ui/toggle";
 import {
 	ManualTriggerParameter,
 	ManualTriggerParameterId,
@@ -26,6 +27,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 	const client = useGiselleEngine();
 	const [isPending, startTransition] = useTransition();
 	const [parameters, setParameters] = useState<ManualTriggerParameter[]>([]);
+	const [staged, setStaged] = useState(false);
 	const { experimental_storage } = useFeatureFlag();
 
 	const handleAddParameter = useCallback<FormEventHandler<HTMLFormElement>>(
@@ -82,7 +84,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 								id: "manual",
 								parameters,
 							},
-							staged: false, // todo next pull request
+							staged,
 						},
 					},
 					useExperimentalStorage: experimental_storage,
@@ -101,7 +103,7 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 				});
 			});
 		},
-		[parameters, client, node, workspace?.id, updateNodeData],
+		[parameters, staged, client, node, workspace?.id, updateNodeData],
 	);
 
 	if (node.content.state.status === "configured") {
@@ -212,6 +214,15 @@ export function ManualTriggerPropertiesPanel({ node }: { node: TriggerNode }) {
 						</button>
 					</form>
 				</div>
+			</div>
+
+			<div className="mt-[8px]">
+				<Toggle name="staged" checked={staged} onCheckedChange={setStaged}>
+					<label className="text-[12px]" htmlFor="staged">
+						Staged
+					</label>
+					<div className="flex-grow mx-[12px] h-[1px] bg-black-200/30" />
+				</Toggle>
 			</div>
 
 			<form onSubmit={handleSubmit}>
