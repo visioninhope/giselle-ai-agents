@@ -67,6 +67,7 @@ function TextGenerationRunner({ generation }: { generation: Generation }) {
 }
 
 function CompletionRunner({ generation }: { generation: Generation }) {
+	const { experimental_storage } = useFeatureFlag();
 	const {
 		generateTextApi,
 		updateGenerationStatusToRunning,
@@ -105,6 +106,7 @@ function CompletionRunner({ generation }: { generation: Generation }) {
 				body: {
 					generation,
 					telemetry,
+					useExperimentalStorage: experimental_storage,
 				},
 			},
 		);
