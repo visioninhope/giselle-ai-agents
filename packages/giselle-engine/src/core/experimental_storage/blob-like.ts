@@ -1,4 +1,4 @@
-export type BlobLike = Buffer | Uint8Array | ArrayBuffer | ArrayBufferView;
+export type BlobLike = Buffer | Uint8Array | ArrayBuffer;
 
 /**
  * Converts any BlobLike data to a Uint8Array.
@@ -20,10 +20,6 @@ export function blobLikeToUint8Array(data: BlobLike) {
 	}
 	if (data instanceof ArrayBuffer) {
 		return new Uint8Array(data);
-	}
-	// For ArrayBufferView (includes Buffer, TypedArrays, DataView)
-	if (ArrayBuffer.isView(data)) {
-		return new Uint8Array(data.buffer, data.byteOffset, data.byteLength);
 	}
 	// Fallback should not happen with proper typing
 	throw new Error("Invalid BlobLike data type");
