@@ -1,10 +1,11 @@
 import type { z } from "zod/v4";
 import type {
+	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
 	JsonSchema,
 	SetJsonParams,
-} from "./types/interface";
+} from "./types";
 
 export interface MemoryStorageDriverConfig {
 	initialJson?: Record<string, unknown>;
@@ -54,8 +55,9 @@ export function memoryStorageDriver(
 			return Promise.resolve(new Uint8Array(data));
 		},
 
-		setBlob(path: string, data: Uint8Array): Promise<void> {
-			blobStore.set(path, new Uint8Array(data));
+		setBlob(path: string, data: BlobLike): Promise<void> {
+			const uint8Array = new Uint8Array(data);
+			blobStore.set(path, uint8Array);
 			return Promise.resolve();
 		},
 

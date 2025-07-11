@@ -1,5 +1,7 @@
 import type { z } from "zod/v4";
 
+export type BlobLike = Buffer | Uint8Array | ArrayBuffer;
+
 export type JsonSchema = z.ZodObject | z.ZodDiscriminatedUnion | z.ZodArray;
 export interface GetJsonParams<T extends JsonSchema> {
 	path: string;
@@ -22,7 +24,7 @@ type SetJson = <T extends JsonSchema>(
 
 type GetBlob = (path: string) => Promise<Uint8Array>;
 
-type SetBlob = (path: string, data: Uint8Array) => Promise<void>;
+type SetBlob = (path: string, data: BlobLike) => Promise<void>;
 
 type Copy = (source: string, destination: string) => Promise<void>;
 

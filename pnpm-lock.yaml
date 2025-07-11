@@ -266,6 +266,9 @@ importers:
 
   apps/playground:
     dependencies:
+      '@aws-sdk/client-s3':
+        specifier: 'catalog:'
+        version: 3.842.0
       '@giselle-internal/ui':
         specifier: workspace:^
         version: link:../../internal-packages/ui
@@ -292,7 +295,7 @@ importers:
         version: 2.1.1
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.4(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       happy-dom:
         specifier: 'catalog:'
         version: 17.6.1
@@ -357,6 +360,9 @@ importers:
       '@ai-sdk/openai':
         specifier: 'catalog:'
         version: 1.3.18(zod@3.25.28)
+      '@aws-sdk/client-s3':
+        specifier: 'catalog:'
+        version: 3.842.0
       '@giselle-internal/ui':
         specifier: workspace:*
         version: link:../../internal-packages/ui
@@ -551,7 +557,7 @@ importers:
         version: 6.7.1
       geist:
         specifier: 1.3.1
-        version: 1.3.1(next@15.3.4(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
+        version: 1.3.1(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       google-auth-library:
         specifier: 9.15.0
         version: 9.15.0
@@ -951,9 +957,6 @@ importers:
       '@giselle-sdk/language-model':
         specifier: workspace:^
         version: link:../language-model
-      '@giselle-sdk/rag':
-        specifier: workspace:^
-        version: link:../rag
       '@giselle-sdk/text-editor-utils':
         specifier: workspace:^
         version: link:../text-editor-utils
@@ -997,6 +1000,9 @@ importers:
       '@giselle-sdk/data-type':
         specifier: workspace:*
         version: link:../data-type
+      '@giselle-sdk/rag':
+        specifier: workspace:^
+        version: link:../rag
       '@giselle-sdk/utils':
         specifier: workspace:*
         version: link:../utils
@@ -15768,7 +15774,7 @@ snapshots:
       - encoding
       - supports-color
 
-  geist@1.3.1(next@15.3.4(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
+  geist@1.3.1(next@15.3.4(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)):
     dependencies:
       next: 15.3.4(@babel/core@7.26.7)(@opentelemetry/api@1.9.0)(@playwright/test@1.53.0)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 

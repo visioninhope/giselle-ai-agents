@@ -16,6 +16,7 @@
 		"format": "biome check --write ."
 	},
 	"dependencies": {
+		"@aws-sdk/client-s3": "catalog:",
 		"@giselle-internal/ui": "workspace:^",
 		"@giselle-internal/workflow-designer-ui": "workspace:*",
 		"@giselle-sdk/data-type": "workspace:*",
