@@ -1,4 +1,4 @@
-import type { WorkspaceId } from "@giselle-sdk/data-type";
+import type { FlowTriggerId, WorkspaceId } from "@giselle-sdk/data-type";
 import type {
 	FlowId,
 	GitHubEventNodeMapping,
@@ -332,5 +332,27 @@ export const githubRepositoryEmbeddings = pgTable(
 			"hnsw",
 			table.embedding.op("vector_cosine_ops"),
 		),
+	}),
+);
+
+export const flowTriggers = pgTable(
+	"flow_triggers",
+	{
+		dbId: serial("db_id").primaryKey(),
+		teamDbId: integer("team_db_id")
+			.notNull()
+			.references(() => teams.dbId, { onDelete: "cascade" }),
+		staged: boolean("staged").notNull().default(false),
+		sdkWorkspaceId: text("workspace_id").$type<WorkspaceId>().notNull(),
+		sdkFlowTriggerId: text("flow_trigger_id").$type<FlowTriggerId>().notNull(),
+		createdAt: timestamp("created_at").defaultNow().notNull(),
+		updatedAt: timestamp("updated_at")
+			.defaultNow()
+			.notNull()
+			.$onUpdate(() => new Date()),
+	},
+	(table) => ({
+		teamDbIdIdx: index().on(table.teamDbId),
+		stagedIdx: index().on(table.staged),
 	}),
 );
