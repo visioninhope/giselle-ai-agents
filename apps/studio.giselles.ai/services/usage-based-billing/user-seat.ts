@@ -1,11 +1,21 @@
 import { createId } from "@paralleldrive/cuid2";
-import { and, desc, eq, gte, lt } from "drizzle-orm";
+import {
+	and,
+	desc,
+	type ExtractTablesWithRelations,
+	eq,
+	gte,
+	lt,
+} from "drizzle-orm";
+import type { PgTransaction } from "drizzle-orm/pg-core";
+import type { VercelPgQueryResultHKT } from "drizzle-orm/vercel-postgres";
 import {
 	db,
 	subscriptions,
 	teamMemberships,
 	userSeatUsageReports,
 } from "@/drizzle";
+import type * as schema from "../../drizzle/schema";
 import { stripe } from "../external/stripe";
 
 const USER_SEAT_METER_NAME = "user_seat";
@@ -64,7 +74,13 @@ export async function reportUserSeatUsage(
 }
 
 async function reportCurrentUserSeatUsage(
-	tx: typeof db,
+	tx:
+		| PgTransaction<
+				VercelPgQueryResultHKT,
+				typeof schema,
+				ExtractTablesWithRelations<typeof schema>
+		  >
+		| typeof db,
 	teamDbId: number,
 	customerId: string,
 ) {
@@ -96,7 +112,13 @@ async function reportCurrentUserSeatUsage(
 }
 
 async function reportDeltaUserSeatUsage(
-	tx: typeof db,
+	tx:
+		| PgTransaction<
+				VercelPgQueryResultHKT,
+				typeof schema,
+				ExtractTablesWithRelations<typeof schema>
+		  >
+		| typeof db,
 	teamDbId: number,
 	customerId: string,
 	lastReport: typeof userSeatUsageReports.$inferSelect,
@@ -132,7 +154,13 @@ async function reportDeltaUserSeatUsage(
 }
 
 async function saveUserSeatUsage(
-	tx: typeof db,
+	tx:
+		| PgTransaction<
+				VercelPgQueryResultHKT,
+				typeof schema,
+				ExtractTablesWithRelations<typeof schema>
+		  >
+		| typeof db,
 	params: {
 		stripeMeterEventId: string;
 		teamDbId: number;
@@ -145,7 +173,16 @@ async function saveUserSeatUsage(
 	await tx.insert(userSeatUsageReports).values(params);
 }
 
-async function findSubscriptionWithLock(tx: typeof db, subscriptionId: string) {
+async function findSubscriptionWithLock(
+	tx:
+		| PgTransaction<
+				VercelPgQueryResultHKT,
+				typeof schema,
+				ExtractTablesWithRelations<typeof schema>
+		  >
+		| typeof db,
+	subscriptionId: string,
+) {
 	const record = await tx
 		.select({
 			dbid: subscriptions.dbId,
@@ -162,7 +199,16 @@ async function findSubscriptionWithLock(tx: typeof db, subscriptionId: string) {
 	return record[0];
 }
 
-async function listTeamMembers(tx: typeof db, teamDbId: number) {
+async function listTeamMembers(
+	tx:
+		| PgTransaction<
+				VercelPgQueryResultHKT,
+				typeof schema,
+				ExtractTablesWithRelations<typeof schema>
+		  >
+		| typeof db,
+	teamDbId: number,
+) {
 	const teamMembers = await tx
 		.select({ userDbId: teamMemberships.userDbId })
 		.from(teamMemberships)

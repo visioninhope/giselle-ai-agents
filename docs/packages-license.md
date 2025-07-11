@@ -3,7 +3,7 @@
 
 ## Summary
 * 1049 MIT
-* 192 Apache 2.0
+* 193 Apache 2.0
 * 59 ISC
 * 34 New BSD
 * 17 Simplified BSD
@@ -1137,6 +1137,17 @@ MIT-0 permitted
 * /home/runner/work/giselle/giselle
 
 <a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="@drizzle-team/brocli"></a>
+### @drizzle-team/brocli v0.10.2
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://www.apache.org/licenses/LICENSE-2.0.txt">Apache 2.0</a> permitted
 
 
 
@@ -7657,7 +7668,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="drizzle-kit"></a>
-### drizzle-kit v0.23.0
+### drizzle-kit v0.31.4
 #### 
 
 ##### Paths
@@ -7668,7 +7679,7 @@ BlueOak-1.0.0 permitted
 
 
 <a name="drizzle-orm"></a>
-### drizzle-orm v0.32.1
+### drizzle-orm v0.44.2
 #### 
 
 ##### Paths
