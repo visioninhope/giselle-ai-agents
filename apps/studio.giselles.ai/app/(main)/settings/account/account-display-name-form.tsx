@@ -8,7 +8,7 @@ import { Card } from "../components/card";
 import { ProfileEditModal } from "../components/profile-edit-modal";
 
 export function AccountDisplayNameForm({
-	displayName: _displayName,
+	displayName,
 	avatarUrl,
 	alt,
 }: {
@@ -16,19 +16,7 @@ export function AccountDisplayNameForm({
 	avatarUrl: typeof users.$inferSelect.avatarUrl;
 	alt?: string;
 }) {
-	const [displayName, _setDisplayName] = useState(
-		_displayName ?? "No display name",
-	);
-	const [currentAvatarUrl, _setCurrentAvatarUrl] = useState<string | null>(
-		avatarUrl,
-	);
 	const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-
-	const handleProfileUpdate = () => {
-		// We don't need to update state here as the page will be revalidated
-		// after successful update through the server actions
-		window.location.reload();
-	};
 
 	return (
 		<Card title="" className="gap-y-2">
@@ -47,7 +35,7 @@ export function AccountDisplayNameForm({
 						{/* Avatar image (no longer clickable) */}
 						<div className="relative h-[48px] w-[48px] rounded-full overflow-hidden">
 							<AvatarImage
-								avatarUrl={currentAvatarUrl}
+								avatarUrl={avatarUrl}
 								width={48}
 								height={48}
 								alt={alt}
@@ -62,7 +50,7 @@ export function AccountDisplayNameForm({
 								border: "0.5px solid rgba(255,255,255,0.05)",
 							}}
 						>
-							{displayName}
+							{displayName ?? "No display name"}
 						</span>
 					</div>
 
@@ -85,10 +73,9 @@ export function AccountDisplayNameForm({
 			<ProfileEditModal
 				isOpen={isEditModalOpen}
 				onClose={() => setIsEditModalOpen(false)}
-				displayName={_displayName}
+				displayName={displayName}
 				avatarUrl={avatarUrl}
 				alt={alt}
-				onSuccess={handleProfileUpdate}
 			/>
 		</Card>
 	);
