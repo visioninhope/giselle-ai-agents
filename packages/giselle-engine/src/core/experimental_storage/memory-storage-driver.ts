@@ -1,6 +1,6 @@
 import type { z } from "zod/v4";
-import { type BlobLike, blobLikeToUint8Array } from "./blob-like";
 import type {
+	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
 	JsonSchema,
@@ -56,7 +56,7 @@ export function memoryStorageDriver(
 		},
 
 		setBlob(path: string, data: BlobLike): Promise<void> {
-			const uint8Array = blobLikeToUint8Array(data);
+			const uint8Array = new Uint8Array(data);
 			blobStore.set(path, uint8Array);
 			return Promise.resolve();
 		},

@@ -13,7 +13,6 @@ import type {
 	JsonSchema,
 	SetJsonParams,
 } from "@giselle-sdk/giselle-engine";
-import { blobLikeToUint8Array } from "@giselle-sdk/giselle-engine";
 import type { z } from "zod/v4";
 
 export interface SupabaseStorageDriverConfig {

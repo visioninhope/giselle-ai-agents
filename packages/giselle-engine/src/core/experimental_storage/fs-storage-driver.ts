@@ -1,8 +1,8 @@
 import { promises as fs } from "node:fs";
 import { dirname, join } from "node:path";
 import type { z } from "zod/v4";
-import { type BlobLike, blobLikeToUint8Array } from "./blob-like";
 import type {
+	BlobLike,
 	GetJsonParams,
 	GiselleStorage,
 	JsonSchema,
@@ -48,7 +48,7 @@ export function fsStorageDriver(config: FsStorageDriverConfig): GiselleStorage {
 		async setBlob(path: string, data: BlobLike): Promise<void> {
 			const fullPath = join(config.root, path);
 			await ensureDir(fullPath);
-			const uint8Array = blobLikeToUint8Array(data);
+			const uint8Array = new Uint8Array(data);
 			await fs.writeFile(fullPath, uint8Array);
 		},
 
