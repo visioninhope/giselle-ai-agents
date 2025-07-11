@@ -1,6 +1,6 @@
 import type { z } from "zod/v4";
 
-type BlobLike = Buffer | Uint8Array | ArrayBuffer;
+export type BlobLike = Buffer | Uint8Array | ArrayBuffer;
 
 export type JsonSchema = z.ZodObject | z.ZodDiscriminatedUnion | z.ZodArray;
 export interface GetJsonParams<T extends JsonSchema> {

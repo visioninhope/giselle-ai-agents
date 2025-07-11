@@ -99,7 +99,7 @@ export function supabaseStorageDriver(
 		},
 
 		async setBlob(path: string, data: BlobLike): Promise<void> {
-			const uint8Array = blobLikeToUint8Array(data);
+			const uint8Array = new Uint8Array(data);
 			await client.send(
 				new PutObjectCommand({
 					Bucket: config.bucket,
