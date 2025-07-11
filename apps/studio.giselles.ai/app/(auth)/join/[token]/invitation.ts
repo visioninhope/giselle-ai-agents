@@ -1,5 +1,5 @@
 import type { User } from "@supabase/supabase-js";
-import { and, eq, isNull } from "drizzle-orm";
+import { and, eq, ExtractTablesWithRelations, isNull } from "drizzle-orm";
 import {
 	db,
 	db as dbInstance,
@@ -13,6 +13,9 @@ import {
 import { getUser } from "@/lib/supabase/get-user";
 import type { TeamId } from "@/services/teams";
 import { JoinError } from "./errors";
+import { PgTransaction } from "drizzle-orm/pg-core";
+import { VercelPgQueryResultHKT } from "drizzle-orm/vercel-postgres";
+import * as schema from "../../../../drizzle/schema";
 
 export type InvitationToken = {
 	token: string;
@@ -26,7 +29,7 @@ export type InvitationToken = {
 
 export async function fetchInvitationToken(
 	token: string,
-	tx: typeof db = dbInstance,
+	tx: PgTransaction<VercelPgQueryResultHKT, typeof schema, ExtractTablesWithRelations<typeof schema>> | typeof db = dbInstance,
 	withLock = false,
 ): Promise<InvitationToken | null> {
 	const baseQuery = tx
