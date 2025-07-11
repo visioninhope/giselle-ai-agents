@@ -2,7 +2,7 @@
 
 
 ## Summary
-* 1048 MIT
+* 1049 MIT
 * 192 Apache 2.0
 * 59 ISC
 * 34 New BSD
@@ -4397,7 +4397,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/auth-js"></a>
-### @supabase/auth-js v2.64.4
+### @supabase/auth-js v2.70.0
 #### 
 
 ##### Paths
@@ -4408,7 +4408,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/functions-js"></a>
-### @supabase/functions-js v2.4.1
+### @supabase/functions-js v2.4.5
 #### 
 
 ##### Paths
@@ -4430,7 +4430,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/postgrest-js"></a>
-### @supabase/postgrest-js v1.15.8
+### @supabase/postgrest-js v1.19.4
 #### 
 
 ##### Paths
@@ -4441,7 +4441,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/realtime-js"></a>
-### @supabase/realtime-js v2.10.2
+### @supabase/realtime-js v2.11.15
 #### 
 
 ##### Paths
@@ -4463,7 +4463,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/storage-js"></a>
-### @supabase/storage-js v2.6.0
+### @supabase/storage-js v2.7.1
 #### 
 
 ##### Paths
@@ -4474,7 +4474,7 @@ LGPL-3.0-or-later permitted
 
 
 <a name="@supabase/supabase-js"></a>
-### @supabase/supabase-js v2.45.0
+### @supabase/supabase-js v2.50.5
 #### 
 
 ##### Paths
@@ -9583,6 +9583,17 @@ SIL OPEN FONT LICENSE permitted
 
 <a name="isomorphic-ws"></a>
 ### isomorphic-ws v5.0.0
+#### 
+
+##### Paths
+* /home/runner/work/giselle/giselle
+
+<a href="http://opensource.org/licenses/mit-license">MIT</a> permitted
+
+
+
+<a name="isows"></a>
+### isows v1.0.7
 #### 
 
 ##### Paths
