@@ -333,7 +333,7 @@ function GitHubToolConfigurationDialogInternal({
 				<div className="flex justify-between items-center border border-border rounded-[4px] px-[6px] py-[3px] text-[13px] mb-[16px]">
 					<div className="flex gap-[6px] items-center">
 						<CheckIcon className="size-[14px] text-green-900" />
-						Token updated.
+						Token configured.
 					</div>
 					<Button
 						type="button"
