@@ -153,7 +153,7 @@ function PostgresToolConnectionDialog({
 								onClick={() => setTabValue("create")}
 								leftIcon={<PlusIcon />}
 							>
-								Add a Connection
+								Add a Connection String
 							</Button>
 						</EmptyState>
 					) : (
