@@ -27,15 +27,14 @@ const nextConfig: NextConfig = {
 				protocol: "https",
 				hostname: "lh3.googleusercontent.com",
 			},
-			{
-				protocol: "https",
-				hostname: (() => {
-					if (!process.env.NEXT_PUBLIC_SUPABASE_URL) {
-						throw new Error("NEXT_PUBLIC_SUPABASE_URL is not defined");
-					}
-					return new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname;
-				})(),
-			},
+			...(process.env.NEXT_PUBLIC_SUPABASE_URL
+				? [
+						{
+							protocol: "https" as const,
+							hostname: new URL(process.env.NEXT_PUBLIC_SUPABASE_URL).hostname,
+						},
+					]
+				: []),
 		],
 	},
 	// biome-ignore lint/suspicious/useAwait: Next.js specification
