@@ -1,0 +1,17 @@
+{
+	"$schema": "https://unpkg.com/knip@5/schema.json",
+	// Knip's biome plugin does not support biome 2.0
+	// https://github.com/webpro-nl/knip/issues/1154
+	"biome": false,
+	"rules": {
+		"files": "off",
+		"exports": "off",
+		"classMembers": "off",
+		"duplicates": "off",
+		"types": "off",
+		"binaries": "off",
+		"unlisted": "off",
+		"devDependencies": "off",
+		"dependencies": "off"
+	}
+}

@@ -24,6 +24,7 @@ jobs:
           cache: "pnpm"
       - name: Run Biome
         run: biome ci .
+      - run: pnpm knip
       - name: Build SDK
         run: pnpm build-sdk
       - name: Test
