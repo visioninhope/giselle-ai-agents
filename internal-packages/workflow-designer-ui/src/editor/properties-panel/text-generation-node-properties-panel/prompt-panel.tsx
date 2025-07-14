@@ -1,20 +1,13 @@
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
+import type { TextGenerationNode } from "@giselle-sdk/data-type";
 import {
-	isTextGenerationNode,
-	type TextGenerationNode,
-} from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+	defaultName,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import { AtSignIcon } from "lucide-react";
-import { type OutputWithDetails, useConnectedOutputs } from "./outputs";
-
-function getDefaultNodeName(source: OutputWithDetails): string {
-	if (isTextGenerationNode(source.node)) {
-		return source.node.content.llm.id;
-	}
-	return source.node.type;
-}
+import { useConnectedOutputs } from "./outputs";
 
 export function PromptPanel({ node }: { node: TextGenerationNode }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
@@ -33,7 +26,7 @@ export function PromptPanel({ node }: { node: TextGenerationNode }) {
 					trigger={<AtSignIcon className="w-[18px]" />}
 					items={connectedSources}
 					renderItem={(connectedSource) =>
-						`${connectedSource.node.name ?? getDefaultNodeName(connectedSource)} / ${connectedSource.label}`
+						`${defaultName(connectedSource.node)} / ${connectedSource.label}`
 					}
 					onSelect={(_, connectedSource) => {
 						const embedNode = {

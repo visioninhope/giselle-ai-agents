@@ -1,24 +1,19 @@
 import {
 	ConnectionId,
 	type ImageGenerationNode,
-	isTextGenerationNode,
 	Node,
 } from "@giselle-sdk/data-type";
-import { useWorkflowDesigner } from "@giselle-sdk/giselle-engine/react";
+import {
+	defaultName,
+	useWorkflowDesigner,
+} from "@giselle-sdk/giselle-engine/react";
 import { TextEditor } from "@giselle-sdk/text-editor/react-internal";
 import { createSourceExtensionJSONContent } from "@giselle-sdk/text-editor-utils";
 import clsx from "clsx/lite";
 import { AtSignIcon } from "lucide-react";
 import { DropdownMenu, Toolbar } from "radix-ui";
 import { useMemo } from "react";
-import { type Source, useConnectedSources } from "./sources";
-
-function getDefaultNodeName(source: Source): string {
-	if (isTextGenerationNode(source.node)) {
-		return source.node.content.llm.id;
-	}
-	return source.node.type;
-}
+import { useConnectedSources } from "./sources";
 
 export function PromptPanel({ node }: { node: ImageGenerationNode }) {
 	const { updateNodeDataContent } = useWorkflowDesigner();
@@ -117,8 +112,7 @@ export function PromptPanel({ node }: { node: ImageGenerationNode }) {
 												className="p-[8px] rounded-[8px] text-white-900 hover:bg-primary-900/50 transition-colors cursor-pointer text-[12px] outline-none select-none"
 												value={source.connection.id}
 											>
-												{source.node.name ?? getDefaultNodeName(source)}/{" "}
-												{source.output.label}
+												{defaultName(source.node)} / {source.output.label}
 											</DropdownMenu.RadioItem>
 										))}
 									</div>
