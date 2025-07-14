@@ -7,10 +7,11 @@ import type {
 	QueryNode,
 	TextGenerationLanguageModelData,
 	TextGenerationNode,
+	TriggerNode,
 	VariableNode,
 	VectorStoreNode,
 } from "@giselle-sdk/data-type";
-import { NodeId } from "@giselle-sdk/data-type";
+import { NodeId, OutputId } from "@giselle-sdk/data-type";
 import {
 	anthropicLanguageModels,
 	falLanguageModels,
@@ -19,7 +20,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { describe, expect, test } from "vitest";
 
-import { isSupportedConnection } from "./utils";
+import { isSupportedConnection } from "./is-supported-connection";
 
 describe("isSupportedConnection", () => {
 	const createTextGenerationNode = (
@@ -110,6 +111,35 @@ describe("isSupportedConnection", () => {
 		content: {
 			type: "vectorStore",
 			source: { provider: "github", state: { status: "unconfigured" } },
+		},
+	});
+
+	const createWebPageNode = (id: NodeId): VariableNode => ({
+		id,
+		type: "variable",
+		inputs: [],
+		outputs: [
+			{
+				id: OutputId.generate(),
+				label: "Output",
+				accessor: "web-page",
+			},
+		],
+		content: {
+			type: "webPage",
+			webpages: [],
+		},
+	});
+
+	const createTriggerNode = (id: NodeId): TriggerNode => ({
+		id,
+		type: "operation",
+		inputs: [],
+		outputs: [],
+		content: {
+			type: "trigger",
+			provider: "manual",
+			state: { status: "unconfigured" },
 		},
 	});
 
@@ -279,6 +309,64 @@ describe("isSupportedConnection", () => {
 		});
 	});
 
+	describe("Image generation node input restrictions", () => {
+		test("should reject WebPageNode as input", () => {
+			const outputNode = createWebPageNode(NodeId.generate());
+			const inputNode = createImageGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(false);
+			if (!result.canConnect) {
+				expect(result.message).toBe(
+					"Web page node is not supported as an input for this node",
+				);
+			}
+		});
+
+		test("should reject TriggerNode as input", () => {
+			const outputNode = createTriggerNode(NodeId.generate());
+			const inputNode = createImageGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(false);
+			if (!result.canConnect) {
+				expect(result.message).toBe(
+					"Trigger node is not supported as an input for this node",
+				);
+			}
+		});
+
+		test("should reject ActionNode as input", () => {
+			const outputNode = createActionNode(NodeId.generate());
+			const inputNode = createImageGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(false);
+			if (!result.canConnect) {
+				expect(result.message).toBe(
+					"Action node is not supported as an input for this node",
+				);
+			}
+		});
+
+		test("should reject GitHubNode as input", () => {
+			const outputNode = createGitHubNode(NodeId.generate());
+			const inputNode = createImageGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(false);
+			if (!result.canConnect) {
+				expect(result.message).toBe(
+					"GitHub node is not supported as an input for this node",
+				);
+			}
+		});
+	});
+
 	describe("Query node output restrictions", () => {
 		test("should allow connection from QueryNode to TextGenerationNode", () => {
 			const outputNode = createQueryNode(NodeId.generate());
@@ -319,6 +407,33 @@ describe("isSupportedConnection", () => {
 
 			expect(result.canConnect).toBe(true);
 			expect(result).not.toHaveProperty("message");
+		});
+
+		test("should allow TriggerNode to connect to TextGenerationNode", () => {
+			const outputNode = createTriggerNode(NodeId.generate());
+			const inputNode = createTextGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(true);
+		});
+
+		test("should allow ActionNode to connect to TextGenerationNode", () => {
+			const outputNode = createActionNode(NodeId.generate());
+			const inputNode = createTextGenerationNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(true);
+		});
+
+		test("should allow ActionNode to connect to QueryNode", () => {
+			const outputNode = createActionNode(NodeId.generate());
+			const inputNode = createQueryNode(NodeId.generate());
+
+			const result = isSupportedConnection(outputNode, inputNode);
+
+			expect(result.canConnect).toBe(true);
 		});
 	});
 });
