@@ -1,8 +1,5 @@
 import { DropdownMenu } from "@giselle-internal/ui/dropdown-menu";
-import {
-	type ImageGenerationNode,
-	Node,
-} from "@giselle-sdk/data-type";
+import { type ImageGenerationNode, Node } from "@giselle-sdk/data-type";
 import {
 	defaultName,
 	useWorkflowDesigner,
