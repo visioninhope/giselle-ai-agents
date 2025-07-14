@@ -8,6 +8,7 @@ export * from "./installtion";
 export * from "./issues";
 export * from "./octokit";
 export * from "./pull-requests";
+export * from "./pull-requests-loader";
 export * from "./reactions";
 export * from "./repository";
 export * from "./tools";
