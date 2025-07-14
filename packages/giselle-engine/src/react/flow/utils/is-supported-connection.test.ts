@@ -20,7 +20,7 @@ import {
 } from "@giselle-sdk/language-model";
 import { describe, expect, test } from "vitest";
 
-import { isSupportedConnection } from "./utils";
+import { isSupportedConnection } from "./is-supported-connection";
 
 describe("isSupportedConnection", () => {
 	const createTextGenerationNode = (
@@ -310,20 +310,6 @@ describe("isSupportedConnection", () => {
 	});
 
 	describe("Image generation node input restrictions", () => {
-		test("should reject VectorStoreNode as input", () => {
-			const outputNode = createVectorStoreNode(NodeId.generate());
-			const inputNode = createImageGenerationNode(NodeId.generate());
-
-			const result = isSupportedConnection(outputNode, inputNode);
-
-			expect(result.canConnect).toBe(false);
-			if (!result.canConnect) {
-				expect(result.message).toBe(
-					"Vector store node is not supported as an input for this node",
-				);
-			}
-		});
-
 		test("should reject WebPageNode as input", () => {
 			const outputNode = createWebPageNode(NodeId.generate());
 			const inputNode = createImageGenerationNode(NodeId.generate());

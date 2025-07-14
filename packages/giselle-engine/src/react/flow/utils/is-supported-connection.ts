@@ -40,12 +40,6 @@ export function isSupportedConnection(
 
 	// prevent unsupported inputs for image generation node
 	if (isImageGenerationNode(inputNode)) {
-		if (isVectorStoreNode(outputNode)) {
-			return {
-				canConnect: false,
-				message: "Vector store node is not supported as an input for this node",
-			};
-		}
 		if (isWebPageNode(outputNode)) {
 			return {
 				canConnect: false,
