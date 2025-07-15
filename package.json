@@ -7,7 +7,7 @@
 		"build-sdk": "turbo build --filter '@giselle-sdk/*'",
 		"build-data-type": "turbo build --filter '@giselle-sdk/data-type'",
 		"check-types": "turbo check-types",
-		"format": "turbo format",
+		"format": "biome check --write .",
 		"clean": "turbo clean",
 		"dev": "turbo dev --filter playground",
 		"dev:studio.giselles.ai": "NODE_NO_WARNINGS=1 turbo dev --filter studio.giselles.ai",
