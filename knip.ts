@@ -84,9 +84,6 @@ const nextPredefinedExternalPackages = [
 
 const config: KnipConfig = {
 	biome: false,
-	rules: {
-		types: "off",
-	},
 	workspaces: {
 		"apps/playground": {
 			ignoreDependencies: [
