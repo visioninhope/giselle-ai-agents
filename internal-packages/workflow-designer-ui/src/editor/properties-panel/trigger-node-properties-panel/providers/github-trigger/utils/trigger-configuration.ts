@@ -10,7 +10,7 @@ import { type GitHubTriggerEventId, githubTriggers } from "@giselle-sdk/flow";
 /**
  * Type definitions for trigger configuration options
  */
-export interface TriggerConfigOptions {
+interface TriggerConfigOptions {
 	nodeId: string;
 	workspaceId?: string;
 	eventId: GitHubTriggerEventId;
@@ -23,7 +23,7 @@ export interface TriggerConfigOptions {
 /**
  * Result of a successful trigger configuration
  */
-export interface TriggerConfigResult {
+interface TriggerConfigResult {
 	triggerId: string;
 	outputs: Output[];
 	name: string;
@@ -67,7 +67,7 @@ export function createTriggerEvent(
 /**
  * Determines if a trigger type requires a callsign
  */
-export function isTriggerRequiringCallsign(
+function isTriggerRequiringCallsign(
 	eventId: GitHubTriggerEventId,
 ): boolean {
 	return [
@@ -80,7 +80,7 @@ export function isTriggerRequiringCallsign(
 /**
  * Generates the outputs for a given trigger
  */
-export function generateTriggerOutputs(
+function generateTriggerOutputs(
 	eventId: GitHubTriggerEventId,
 ): Output[] {
 	const trigger = githubTriggers[eventId];
@@ -100,7 +100,7 @@ export function generateTriggerOutputs(
 /**
  * Creates the configuration payload for the trigger
  */
-export function createTriggerConfiguration(options: TriggerConfigOptions) {
+function createTriggerConfiguration(options: TriggerConfigOptions) {
 	const {
 		nodeId,
 		workspaceId,
@@ -149,7 +149,7 @@ export function createTriggerConfiguration(options: TriggerConfigOptions) {
 /**
  * Updates the node data with the configured trigger
  */
-export function updateNodeWithTrigger(
+function updateNodeWithTrigger(
 	node: TriggerNode,
 	triggerId: string,
 	outputs: Output[],
@@ -175,7 +175,7 @@ export function updateNodeWithTrigger(
  * Handles the complete trigger configuration process
  * Combines creating the configuration, making the API call, and updating the node
  */
-export async function configureTriggerAndUpdateNode(
+async function configureTriggerAndUpdateNode(
 	client: {
 		configureTrigger: (options: {
 			trigger: FlowTrigger;

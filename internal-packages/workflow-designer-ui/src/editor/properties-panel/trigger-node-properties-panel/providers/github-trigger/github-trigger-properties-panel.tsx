@@ -103,7 +103,7 @@ interface ConfirmRepositoryStep {
 	repoNodeId: string;
 }
 
-export type GitHubTriggerSetupStep =
+type GitHubTriggerSetupStep =
 	| SelectEventStep
 	| SelectRepositoryStep
 	| InputCallsignStep

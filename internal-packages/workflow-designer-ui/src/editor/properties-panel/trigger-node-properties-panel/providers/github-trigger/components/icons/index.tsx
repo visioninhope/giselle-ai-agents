@@ -6,7 +6,7 @@ interface IconProps {
 	title?: string;
 }
 
-export function IssueCreatedIcon({
+function IssueCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Created",
@@ -53,7 +53,7 @@ export function IssueCreatedIcon({
 	);
 }
 
-export function IssueClosedIcon({
+function IssueClosedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Closed",
@@ -82,7 +82,7 @@ export function IssueClosedIcon({
 	);
 }
 
-export function IssueCommentCreatedIcon({
+function IssueCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Issue Comment Created",
@@ -116,7 +116,7 @@ export function IssueCommentCreatedIcon({
 	);
 }
 
-export function PullRequestCommentCreatedIcon({
+function PullRequestCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Comment Created",
@@ -150,7 +150,7 @@ export function PullRequestCommentCreatedIcon({
 	);
 }
 
-export function PullRequestReviewCommentCreatedIcon({
+function PullRequestReviewCommentCreatedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Review Comment Created",
@@ -180,7 +180,7 @@ export function PullRequestReviewCommentCreatedIcon({
 	);
 }
 
-export function PullRequestOpenedIcon({
+function PullRequestOpenedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Opened",
@@ -210,7 +210,7 @@ export function PullRequestOpenedIcon({
 	);
 }
 
-export function PullRequestReadyForReviewIcon({
+function PullRequestReadyForReviewIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Ready For Review",
@@ -240,7 +240,7 @@ export function PullRequestReadyForReviewIcon({
 	);
 }
 
-export function PullRequestClosedIcon({
+function PullRequestClosedIcon({
 	className = "text-white",
 	size = 18,
 	title = "Pull Request Closed",
@@ -269,7 +269,7 @@ export function PullRequestClosedIcon({
 	);
 }
 
-export function DefaultGitHubIcon({
+function DefaultGitHubIcon({
 	className = "text-white",
 	size = 22,
 	title = "GitHub",
