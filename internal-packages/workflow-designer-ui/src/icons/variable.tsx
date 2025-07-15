@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const VariableIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const VariableIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="20"
 		height="20"

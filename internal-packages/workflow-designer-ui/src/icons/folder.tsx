@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const FolderIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const FolderIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="26"
 		height="25"

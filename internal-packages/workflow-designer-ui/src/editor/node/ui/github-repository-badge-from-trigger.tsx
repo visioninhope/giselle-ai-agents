@@ -29,5 +29,3 @@ export function GitHubRepositoryBadgeFromTrigger({
 		/>
 	);
 }
-
-export default GitHubRepositoryBadgeFromTrigger;

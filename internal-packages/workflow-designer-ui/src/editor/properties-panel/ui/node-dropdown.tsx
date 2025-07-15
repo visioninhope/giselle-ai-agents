@@ -12,7 +12,7 @@ import {
 	DropdownMenuTrigger,
 } from "../../../ui/dropdown-menu";
 
-export function NodeDropdown({
+function NodeDropdown({
 	trigerNode,
 	nodes,
 	onValueChange,

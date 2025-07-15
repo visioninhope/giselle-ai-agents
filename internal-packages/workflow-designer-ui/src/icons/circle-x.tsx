@@ -1,10 +1,7 @@
 import clsx from "clsx/lite";
 import type { FC, SVGProps } from "react";
 
-export const CircleXIcon: FC<SVGProps<SVGSVGElement>> = ({
-	className,
-	...props
-}) => (
+const CircleXIcon: FC<SVGProps<SVGSVGElement>> = ({ className, ...props }) => (
 	<svg
 		width="20"
 		height="21"

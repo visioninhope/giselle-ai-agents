@@ -95,13 +95,13 @@ const APICallBasedService = {
 	Tavily: ExternalServiceName.Tavily,
 } as const;
 
-export function withCountMeasurement<T>(
+function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: typeof APICallBasedService.Tavily,
 	measurementStartTime?: number,
 ): Promise<T>;
-export async function withCountMeasurement<T>(
+async function withCountMeasurement<T>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	externalServiceName: (typeof APICallBasedService)[keyof typeof APICallBasedService],
@@ -129,9 +129,7 @@ export async function withCountMeasurement<T>(
 	return withMeasurement(logger, operation, measurement, measurementStartTime);
 }
 
-export async function withTokenMeasurement<
-	T extends { usage: LanguageModelUsage },
->(
+async function withTokenMeasurement<T extends { usage: LanguageModelUsage }>(
 	logger: OtelLoggerWrapper,
 	operation: () => Promise<T>,
 	model: LanguageModelV1,
@@ -173,7 +171,7 @@ export async function withTokenMeasurement<
 	return withMeasurement(logger, operation, measurements, measurementStartTime);
 }
 
-export function waitForTelemetryExport() {
+function waitForTelemetryExport() {
 	waitUntil(
 		new Promise((resolve) =>
 			setTimeout(

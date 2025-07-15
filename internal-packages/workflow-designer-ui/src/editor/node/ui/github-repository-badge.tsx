@@ -23,5 +23,3 @@ export function GitHubRepositoryBadge({
 		</div>
 	);
 }
-
-export default GitHubRepositoryBadge;

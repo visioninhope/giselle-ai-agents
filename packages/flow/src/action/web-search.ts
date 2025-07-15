@@ -7,7 +7,7 @@ export interface WebSearchActionBase extends ActionBase {
 	provider: typeof provider;
 }
 
-export const webSearchFetchAction = {
+const webSearchFetchAction = {
 	provider,
 	command: {
 		id: "web-search.fetch",

@@ -1,7 +1,7 @@
 import clsx from "clsx/lite";
 import type { ReactNode } from "react";
 
-export function CategoryTab({
+function CategoryTab({
 	isActive,
 	children,
 	onClick,

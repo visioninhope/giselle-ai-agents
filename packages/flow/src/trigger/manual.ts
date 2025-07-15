@@ -6,7 +6,7 @@ export interface ManualTrigger extends TriggerBase {
 	provider: typeof provider;
 }
 
-export const manualTrigger = {
+const manualTrigger = {
 	provider,
 	event: {
 		id: "manual",
