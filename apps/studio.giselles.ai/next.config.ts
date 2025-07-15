@@ -82,7 +82,6 @@ const nextConfig: NextConfig = {
 	},
 };
 
-const enableSentry = process.env.VERCEL_ENV !== undefined;
 const sentryBuildOptions: SentryBuildOptions = {
 	// For all available options, see:
 	// https://www.npmjs.com/package/@sentry/webpack-plugin#options
@@ -129,10 +128,12 @@ const sentryBuildOptions: SentryBuildOptions = {
 const withAnalyzer = createBundleAnalyzer({
 	enabled: process.env.ANALYZE === "true",
 });
-export default enableSentry
-	? withAnalyzer(
-			await import("@sentry/nextjs").then((mod) =>
-				mod.withSentryConfig(nextConfig, sentryBuildOptions),
-			),
-		)
-	: nextConfig;
+export default async function () {
+	const enableSentry = process.env.VERCEL_ENV !== undefined;
+	if (enableSentry) {
+		return await import("@sentry/nextjs").then((mod) =>
+			withAnalyzer(mod.withSentryConfig(nextConfig, sentryBuildOptions)),
+		);
+	}
+	return withAnalyzer(nextConfig);
+}
