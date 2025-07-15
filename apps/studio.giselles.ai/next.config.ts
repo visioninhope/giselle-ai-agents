@@ -2,21 +2,22 @@ import createBundleAnalyzer from "@next/bundle-analyzer";
 import type { SentryBuildOptions } from "@sentry/nextjs";
 import type { NextConfig } from "next";
 
+export const serverExternalPackages = [
+	"@opentelemetry/sdk-node",
+	"pino",
+	"pino-pretty",
+	"unstorage",
+	"happy-dom",
+	"@supabase/supabase-js",
+	"@supabase/realtime-js",
+];
 const nextConfig: NextConfig = {
 	eslint: {
 		// Warning: This allows production builds to successfully complete even if
 		// your project has ESLint errors.
 		ignoreDuringBuilds: true,
 	},
-	serverExternalPackages: [
-		"@opentelemetry/sdk-node",
-		"pino",
-		"pino-pretty",
-		"unstorage",
-		"happy-dom",
-		"@supabase/supabase-js",
-		"@supabase/realtime-js",
-	],
+	serverExternalPackages,
 	images: {
 		remotePatterns: [
 			{
