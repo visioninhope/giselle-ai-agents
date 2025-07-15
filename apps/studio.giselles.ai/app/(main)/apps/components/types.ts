@@ -1,6 +1,6 @@
 import type { AgentId } from "@/services/agents";
 
-export type Agent = {
+type Agent = {
 	id: AgentId;
 	name: string | null;
 	updatedAt: Date;
@@ -20,7 +20,7 @@ export type Position = {
 	y: number;
 };
 
-export type LightTrackingConfig = {
+type LightTrackingConfig = {
 	radius: number;
 	fadeInDuration: number;
 	fadeOutDuration: number;

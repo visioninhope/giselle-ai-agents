@@ -2,7 +2,7 @@ import { z } from "zod";
 import type { TriggerBase } from "../base";
 
 export const provider = "manual" as const;
-export interface ManualTrigger extends TriggerBase {
+interface ManualTrigger extends TriggerBase {
 	provider: typeof provider;
 }
 

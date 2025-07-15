@@ -3,7 +3,7 @@ import type { ActionBase } from "../base";
 
 export const provider = "github" as const;
 
-export interface GitHubActionBase extends ActionBase {
+interface GitHubActionBase extends ActionBase {
 	provider: typeof provider;
 }
 

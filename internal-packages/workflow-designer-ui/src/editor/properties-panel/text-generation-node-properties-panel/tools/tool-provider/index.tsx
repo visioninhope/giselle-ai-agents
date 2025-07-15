@@ -5,7 +5,7 @@ import { GitHubIcon } from "../../../../../icons";
 import { GitHubToolConfigurationDialog } from "./github";
 import { PostgresToolConfigurationDialog } from "./postgres";
 
-export interface ToolProviderDescriptor {
+interface ToolProviderDescriptor {
 	key: keyof ToolSet;
 	label: string;
 	icon: ReactNode;

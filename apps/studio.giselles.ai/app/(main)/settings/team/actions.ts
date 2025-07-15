@@ -710,9 +710,7 @@ export async function sendInvitationsAction(
 }
 
 // Define a unified result type for actions
-export type ActionResult =
-	| { success: true }
-	| { success: false; error: string };
+type ActionResult = { success: true } | { success: false; error: string };
 
 export async function revokeInvitationAction(
 	_prevState: ActionResult | undefined,

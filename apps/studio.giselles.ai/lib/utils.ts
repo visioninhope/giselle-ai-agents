@@ -25,7 +25,7 @@ class MaxRetriesExceededError extends Error {
 	}
 }
 
-export type RetryOptions = {
+type RetryOptions = {
 	maxRetries: number;
 	onRetry?: (retryCount: number, error: unknown) => void;
 	shouldAbort?: (error: unknown) => boolean;

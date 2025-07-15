@@ -107,7 +107,7 @@ export type EventHandlerArgs<TEventName extends WebhookEventName> = {
 	deps: EventHandlerDependencies;
 };
 
-export type EventHandlerResult = {
+type EventHandlerResult = {
 	shouldRun: boolean;
 	reactionNodeId?: string;
 };
