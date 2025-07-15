@@ -63,7 +63,10 @@ const gpt4o: OpenAILanguageModel = {
 const o3: OpenAILanguageModel = {
 	provider: "openai",
 	id: "o3",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
@@ -71,7 +74,10 @@ const o3: OpenAILanguageModel = {
 const o4Mini: OpenAILanguageModel = {
 	provider: "openai",
 	id: "o4-mini",
-	capabilities: Capability.ImageFileInput | Capability.TextGeneration,
+	capabilities:
+		Capability.ImageFileInput |
+		Capability.TextGeneration |
+		Capability.OptionalSearchGrounding,
 	tier: Tier.enum.pro,
 	configurations: defaultConfigurations,
 };
