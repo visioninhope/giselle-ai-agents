@@ -33,4 +33,4 @@ const ClickableText = forwardRef<HTMLButtonElement, ClickableTextProps>(
 );
 ClickableText.displayName = "ClickableText";
 
-export { ClickableText, clickableTextVariant as linkTextVariants };
+export { ClickableText,  };

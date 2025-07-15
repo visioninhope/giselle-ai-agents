@@ -69,7 +69,7 @@ const logExporter = new OTLPLogExporter({
 });
 
 export const logRecordProcessor = new BatchLogRecordProcessor(logExporter);
-export const pinoLogRecordProcessor = new BatchLogRecordProcessor(
+const pinoLogRecordProcessor = new BatchLogRecordProcessor(
 	new PinoLogRecordExporter(),
 );
 
@@ -149,7 +149,7 @@ const getVersion = () => {
 	return undefined; // to be implemented
 };
 
-export function createLogger(usecase: string): OtelLoggerWrapper {
+function createLogger(usecase: string): OtelLoggerWrapper {
 	const loggerProvider = getOrCreateLoggerProvider();
 	const otelLogger = loggerProvider.getLogger(usecase, getVersion(), {
 		schemaUrl: getSchemaUrl(),

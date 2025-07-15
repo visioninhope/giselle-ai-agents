@@ -3,7 +3,7 @@ import type { AgentId } from "../types";
 /**
  * @deprecated
  */
-export class AgentActivity {
+class AgentActivity {
 	private actions: AgentActivityAction[] = [];
 	public agentId: AgentId;
 	public startedAt: Date;

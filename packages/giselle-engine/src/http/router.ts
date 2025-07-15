@@ -438,7 +438,7 @@ export const createJsonRouters = {
 		}),
 } as const;
 
-export const jsonRouterPaths = Object.keys(
+const jsonRouterPaths = Object.keys(
 	createJsonRouters,
 ) as JsonRouterPaths[];
 
@@ -477,7 +477,7 @@ export const createFormDataRouters = {
 		}),
 } as const;
 
-export const formDataRouterPaths = Object.keys(
+const formDataRouterPaths = Object.keys(
 	createFormDataRouters,
 ) as JsonRouterPaths[];
 

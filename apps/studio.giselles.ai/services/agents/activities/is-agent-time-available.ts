@@ -3,7 +3,7 @@ import type { CurrentTeam } from "@/services/teams/types";
 import { calculateAgentTimeUsageMs } from "./agent-time-usage";
 import { AGENT_TIME_CHARGE_LIMIT_MINUTES } from "./constants";
 
-export async function isAgentTimeAvailable(currentTeam: CurrentTeam) {
+async function isAgentTimeAvailable(currentTeam: CurrentTeam) {
 	// If team is on a pro plan, proceed
 	if (isProPlan(currentTeam)) {
 		return true;

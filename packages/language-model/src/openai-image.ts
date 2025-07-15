@@ -9,7 +9,7 @@ export const moderation = z.enum(["auto", "low"]);
 
 export const background = z.enum(["transparent", "opaque", "auto"]);
 
-export const OpenAIImageModelConfigurations = z.object({
+const OpenAIImageModelConfigurations = z.object({
 	n: z.number(),
 	size,
 	quality,

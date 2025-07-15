@@ -68,7 +68,7 @@ export async function internalSetGeneration(params: {
 	}
 }
 
-export function toNodeGenerationIndex(
+function toNodeGenerationIndex(
 	generation: Generation,
 ): NodeGenerationIndex {
 	return {

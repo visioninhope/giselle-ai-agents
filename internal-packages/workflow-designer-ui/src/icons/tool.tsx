@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const ToolIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const ToolIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="22"
 		height="22"

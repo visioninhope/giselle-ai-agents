@@ -1,7 +1,7 @@
 import { TrashIcon } from "lucide-react";
 import { Tooltip, type TooltipProps } from "../../../ui/tooltip";
 
-export function RemoveButton({
+function RemoveButton({
 	onClick,
 	className = "",
 	...props

@@ -101,7 +101,7 @@ export function ResizableSectionHandle({
 	);
 }
 
-export function ResizableSectionHandleWithIcon({
+function ResizableSectionHandleWithIcon({
 	direction = "vertical",
 	className,
 }: ResizableSectionHandleProps) {

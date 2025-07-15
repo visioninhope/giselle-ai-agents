@@ -23,7 +23,7 @@ const createOverlayStyle = (
 	...additionalStyles,
 });
 
-export function DarkOverlay() {
+function DarkOverlay() {
 	return (
 		<div
 			className={`pointer-events-none absolute inset-0 z-${Z_INDEX.darkLayer}`}
@@ -36,7 +36,7 @@ export function DarkOverlay() {
 	);
 }
 
-export function LightOverlay({ fadeRef }: LightOverlayProps) {
+function LightOverlay({ fadeRef }: LightOverlayProps) {
 	return (
 		<div
 			ref={fadeRef}

@@ -117,7 +117,7 @@ export async function getTeamMembers() {
 	}
 }
 
-export async function addTeamMember(formData: FormData) {
+async function addTeamMember(formData: FormData) {
 	try {
 		const email = formData.get("email") as string;
 		const role = formData.get("role") as string;

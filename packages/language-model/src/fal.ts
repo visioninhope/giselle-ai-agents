@@ -13,7 +13,7 @@ export const falImageGenerationSizes = z.enum([
 	imageGenerationSize16x9.value,
 ]);
 
-export const FalLanguageModelConfigurations = z.object({
+const FalLanguageModelConfigurations = z.object({
 	n: z.number(),
 	size: falImageGenerationSizes,
 });

@@ -9,7 +9,7 @@ import { useMemo } from "react";
 import type { Source } from "./types";
 import { filterSources } from "./utils";
 
-export function useSourceCategories(sources: Source[]) {
+function useSourceCategories(sources: Source[]) {
 	// does not support image generation
 	const generatedSources = useMemo(
 		() => filterSources(sources, isTextGenerationNode),

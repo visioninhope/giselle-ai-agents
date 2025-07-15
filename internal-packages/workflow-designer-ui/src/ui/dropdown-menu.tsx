@@ -6,9 +6,9 @@ export const DropdownMenu = DropdownMenuPrimitive.Root;
 
 export const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger;
 
-export const DropdownMenuGroup = DropdownMenuPrimitive.Group;
+const DropdownMenuGroup = DropdownMenuPrimitive.Group;
 
-export const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
+const DropdownMenuPortal = DropdownMenuPrimitive.Portal;
 
 export const DropdownMenuRadioGroup = DropdownMenuPrimitive.RadioGroup;
 
@@ -50,7 +50,7 @@ export function DropdownMenuContent({
 }
 DropdownMenuContent.displayName = DropdownMenuPrimitive.Content.displayName;
 
-export function DropdownMenuCheckboxItem({
+function DropdownMenuCheckboxItem({
 	children,
 	...props
 }: Omit<
@@ -113,7 +113,7 @@ export function DropdownMenuRadioItem({
 }
 DropdownMenuRadioItem.displayName = DropdownMenuPrimitive.RadioItem.displayName;
 
-export function DropdownMenuItem({
+function DropdownMenuItem({
 	children,
 	...props
 }: Omit<ComponentProps<typeof DropdownMenuPrimitive.Item>, "className">) {

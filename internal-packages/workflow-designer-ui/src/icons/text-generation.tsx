@@ -1,6 +1,6 @@
 import type { FC, SVGProps } from "react";
 
-export const TextGenerationIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
+const TextGenerationIcon: FC<SVGProps<SVGSVGElement>> = (props) => (
 	<svg
 		width="16"
 		height="16"

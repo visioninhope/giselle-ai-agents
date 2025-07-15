@@ -434,7 +434,7 @@ function getFilesDescription(
 	return `${getOrdinal(currentCount + 1)} attached file`;
 }
 
-export async function getRedirectedUrlAndTitle(url: string) {
+async function getRedirectedUrlAndTitle(url: string) {
 	// Make the request with fetch and set redirect to 'follow'
 	const response = await fetch(url, {
 		redirect: "follow", // This automatically follows redirects
@@ -585,7 +585,7 @@ async function buildGenerationMessageForImageGeneration(
 	];
 }
 
-export function generatedImagePath(
+function generatedImagePath(
 	generationId: GenerationId,
 	filename: string,
 ) {

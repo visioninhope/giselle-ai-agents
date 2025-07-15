@@ -1,6 +1,6 @@
 import { z } from "zod/v4";
 
-export const DatabaseConfigSchema = z.object({
+const DatabaseConfigSchema = z.object({
 	connectionString: z.string().min(1, "Connection string cannot be empty"),
 	poolConfig: z
 		.object({

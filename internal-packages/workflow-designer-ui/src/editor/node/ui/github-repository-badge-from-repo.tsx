@@ -43,4 +43,3 @@ export function GitHubRepositoryBadgeFromRepo({
 	);
 }
 
-export default GitHubRepositoryBadgeFromRepo;

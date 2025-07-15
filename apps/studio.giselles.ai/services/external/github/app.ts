@@ -47,7 +47,7 @@ export async function buildAppInstallationClient(installationId: number) {
 	});
 }
 
-export function needsAdditionalPermissions(error: unknown) {
+function needsAdditionalPermissions(error: unknown) {
 	if (error instanceof RequestError) {
 		return error.status === 403;
 	}
