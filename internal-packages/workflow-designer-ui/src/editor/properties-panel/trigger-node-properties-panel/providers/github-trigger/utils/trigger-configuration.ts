@@ -67,9 +67,7 @@ export function createTriggerEvent(
 /**
  * Determines if a trigger type requires a callsign
  */
-function isTriggerRequiringCallsign(
-	eventId: GitHubTriggerEventId,
-): boolean {
+function isTriggerRequiringCallsign(eventId: GitHubTriggerEventId): boolean {
 	return [
 		"github.issue_comment.created",
 		"github.pull_request_comment.created",
@@ -80,9 +78,7 @@ function isTriggerRequiringCallsign(
 /**
  * Generates the outputs for a given trigger
  */
-function generateTriggerOutputs(
-	eventId: GitHubTriggerEventId,
-): Output[] {
+function generateTriggerOutputs(eventId: GitHubTriggerEventId): Output[] {
 	const trigger = githubTriggers[eventId];
 	const outputs: Output[] = [];
 
