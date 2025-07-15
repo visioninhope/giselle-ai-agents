@@ -85,7 +85,6 @@ const nextPredefinedExternalPackages = [
 const config: KnipConfig = {
 	biome: false,
 	rules: {
-		exports: "off",
 		classMembers: "off",
 		duplicates: "off",
 		types: "off",
